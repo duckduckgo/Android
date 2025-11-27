@@ -199,6 +199,14 @@ enum class DuckChatPixelName(override val pixelName: String) : Pixel.PixelName {
     DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_CONFIRMED("m_aichat_new_address_bar_picker_confirmed"),
     DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_NOT_NOW("m_aichat_new_address_bar_picker_not_now"),
     DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_CANCELLED("m_aichat_new_address_bar_picker_cancelled"),
+    DUCK_CHAT_SETTINGS_NEW_CHAT_TAB_TAPPED("m_aichat_settings_menu_new_chat_tab_tapped"),
+    DUCK_CHAT_OMNIBAR_NEW_CHAT_TAPPED("m_aichat_omnibar_new_chat_button_tapped"),
+    DUCK_CHAT_OMNIBAR_SIDEBAR_TAPPED("m_aichat_omnibar_sidebar_button_tapped"),
+    DUCK_CHAT_SETTINGS_SIDEBAR_TAPPED("m_aichat_settings_menu_sidebar_tapped"),
+    DUCK_CHAT_SETTINGS_MENU_OPEN("m_aichat_settings_menu_opened"),
+    DUCK_CHAT_DUCK_AI_SETTINGS_TAPPED("m_aichat_settings_menu_aichat_settings_tapped"),
+    DUCK_CHAT_TAB_SWITCHER_OPENED("m_aichat_tab_switcher_opened"),
+    DUCK_CHAT_FIRE_BUTTON_TAPPED("m_aichat_fire_button_tapped"),
 }
 
 object DuckChatPixelParameters {

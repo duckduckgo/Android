@@ -461,7 +461,6 @@ class BrowserMenu(
 
     private fun renderDuckAIMenu(viewState: BrowserMenuViewState.DuckAi) {
         showCommonItems()
-
         siteOptionsMenuDivider.isVisible = true
         browserOptionsMenuDivider.isVisible = true
         settingsMenuDivider.isVisible = true
