@@ -17,11 +17,15 @@
 package com.duckduckgo.app.browser.urlDisplay
 
 import android.content.Context
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import com.squareup.anvil.annotations.ContributesMultibinding
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @ContributesMultibinding(
@@ -32,15 +36,19 @@ class RealUrlDisplayPlugin @Inject constructor(
     private val settingsDataStore: SettingsDataStore,
     private val browserConfigFeature: AndroidBrowserConfigFeature,
     private val context: Context,
+    @AppCoroutineScope private val coroutineScope: CoroutineScope,
+    private val dispatcherProvider: DispatcherProvider,
 ) : PrivacyConfigCallbackPlugin {
     override fun onPrivacyConfigDownloaded() {
         // User has explicitly set their preference - always honor it
         if (settingsDataStore.hasUrlPreferenceSet()) {
             return
         }
-        val packageInfo = context.packageManager.getPackageInfo(context.packageName, 0)
-        val isNewInstall = packageInfo.firstInstallTime == packageInfo.lastUpdateTime
-        val defaultValue = !(isNewInstall && browserConfigFeature.shorterUrlDefault().isEnabled())
-        settingsDataStore.isFullUrlEnabled = defaultValue
+        coroutineScope.launch(dispatcherProvider.io()) {
+            val packageInfo = context.packageManager.getPackageInfo(context.packageName, 0)
+            val isNewInstall = packageInfo.firstInstallTime == packageInfo.lastUpdateTime
+            val defaultValue = !(isNewInstall && browserConfigFeature.shorterUrlDefault().isEnabled())
+            settingsDataStore.isFullUrlEnabled = defaultValue
+        }
     }
 }

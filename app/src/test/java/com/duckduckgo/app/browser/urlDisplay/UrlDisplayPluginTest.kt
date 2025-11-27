@@ -24,6 +24,7 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -53,11 +54,13 @@ class UrlDisplayPluginTest {
             settingsDataStore = settingsDataStore,
             browserConfigFeature = browserConfigFeature,
             context = context,
+            coroutineScope = coroutineRule.testScope,
+            dispatcherProvider = coroutineRule.testDispatcherProvider,
         )
     }
 
     @Test
-    fun whenUserHasExplicitPreferenceSet_thenNothingChange() {
+    fun whenUserHasExplicitPreferenceSet_thenNothingChange() = runTest {
         // Given: User has explicitly set preference to true
         whenever(settingsDataStore.hasUrlPreferenceSet()).thenReturn(true)
 
@@ -70,7 +73,7 @@ class UrlDisplayPluginTest {
     }
 
     @Test
-    fun whenExistingUserAlreadyInstalledApp_thenSetFullUrlToTrue() {
+    fun whenExistingUserAlreadyInstalledApp_thenSetFullUrlToTrue() = runTest {
         // Given: User already migrated (flag is set)
         whenever(settingsDataStore.hasUrlPreferenceSet()).thenReturn(false)
         val packageInfo = PackageInfo().apply {
@@ -88,7 +91,7 @@ class UrlDisplayPluginTest {
     }
 
     @Test
-    fun whenNewUserAndRemoteConfigDisabled_thenSetFullUrlToTrue() {
+    fun whenNewUserAndRemoteConfigDisabled_thenSetFullUrlToTrue() = runTest {
         // Given: New user (no preference, fresh install)
         whenever(settingsDataStore.hasUrlPreferenceSet()).thenReturn(false)
         val packageInfo = PackageInfo().apply {
@@ -106,7 +109,7 @@ class UrlDisplayPluginTest {
     }
 
     @Test
-    fun whenNewUserAndRemoteConfigEnabled_thenSetFullUrlToFalse() {
+    fun whenNewUserAndRemoteConfigEnabled_thenSetFullUrlToFalse() = runTest {
         // Given: New user (no preference, fresh install)
         whenever(settingsDataStore.hasUrlPreferenceSet()).thenReturn(false)
         val packageInfo = PackageInfo().apply {
