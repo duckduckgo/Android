@@ -50,7 +50,6 @@ import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.TestScope
-import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
@@ -168,7 +167,7 @@ class BrokenSitesReferenceTest(private val testCase: TestCase) {
     }
 
     @Test
-    fun whenReferenceTestRunsItReturnsTheExpectedResult() = runTest {
+    fun whenReferenceTestRunsItReturnsTheExpectedResult() {
         whenever(mockAppBuildConfig.sdkInt).thenReturn(testCase.os?.toInt() ?: 1)
         whenever(mockAppBuildConfig.manufacturer).thenReturn(testCase.manufacturer)
         whenever(mockAppBuildConfig.model).thenReturn(testCase.model)

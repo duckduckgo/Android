@@ -20,7 +20,6 @@ import androidx.annotation.StringRes
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.pixels.AppPixelName.*
@@ -30,7 +29,6 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @ContributesViewModel(ActivityScope::class)
@@ -57,13 +55,10 @@ class GlobalPrivacyControlViewModel @Inject constructor(
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
     init {
-        viewModelScope.launch {
-            _viewState.value = ViewState(
-                globalPrivacyControlEnabled = gpc.isEnabled(),
-                globalPrivacyControlFeatureEnabled = featureToggle.isFeatureEnabled(PrivacyFeatureName.GpcFeatureName.value, true),
-            )
-        }
-
+        _viewState.value = ViewState(
+            globalPrivacyControlEnabled = gpc.isEnabled(),
+            globalPrivacyControlFeatureEnabled = featureToggle.isFeatureEnabled(PrivacyFeatureName.GpcFeatureName.value, true),
+        )
         pixel.fire(SETTINGS_DO_NOT_SELL_SHOWN)
     }
 

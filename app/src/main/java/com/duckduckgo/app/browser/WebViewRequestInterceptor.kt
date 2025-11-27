@@ -363,13 +363,13 @@ class WebViewRequestInterceptor(
         return WebResourceResponse(null, null, null)
     }
 
-    private suspend fun getHeaders(request: WebResourceRequest): Map<String, String> {
+    private fun getHeaders(request: WebResourceRequest): Map<String, String> {
         return request.requestHeaders.apply {
             putAll(gpc.getHeaders(request.url.toString()))
         }
     }
 
-    private suspend fun shouldAddGcpHeaders(request: WebResourceRequest): Boolean {
+    private fun shouldAddGcpHeaders(request: WebResourceRequest): Boolean {
         val existingHeaders = request.requestHeaders
         return (request.isForMainFrame && request.method == "GET" && gpc.canUrlAddHeaders(request.url.toString(), existingHeaders))
     }

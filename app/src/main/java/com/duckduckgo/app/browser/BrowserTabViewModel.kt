@@ -1194,9 +1194,7 @@ class BrowserTabViewModel @Inject constructor(
                 }
 
                 site?.nextUrl = urlToNavigate
-                viewModelScope.launch {
-                    command.value = NavigationCommand.Navigate(urlToNavigate, getUrlHeaders(urlToNavigate))
-                }
+                command.value = NavigationCommand.Navigate(urlToNavigate, getUrlHeaders(urlToNavigate))
             }
         }
 
@@ -1221,7 +1219,7 @@ class BrowserTabViewModel @Inject constructor(
             currentAutoCompleteViewState().copy(showSuggestions = false, showFavorites = false, searchResults = AutoCompleteResult("", emptyList()))
     }
 
-    private suspend fun getUrlHeaders(url: String?): Map<String, String> = url?.let { customHeadersProvider.getCustomHeaders(it) } ?: emptyMap()
+    private fun getUrlHeaders(url: String?): Map<String, String> = url?.let { customHeadersProvider.getCustomHeaders(it) } ?: emptyMap()
 
     private fun extractVerticalParameter(currentUrl: String?): String? {
         val url = currentUrl ?: return null
@@ -2797,9 +2795,7 @@ class BrowserTabViewModel @Inject constructor(
         if (desktopSiteRequested && uri.isMobileSite) {
             val desktopUrl = uri.toDesktopUri().toString()
             logcat(INFO) { "Original URL $url - attempting $desktopUrl with desktop site UA string" }
-            viewModelScope.launch {
-                command.value = NavigationCommand.Navigate(desktopUrl, getUrlHeaders(desktopUrl))
-            }
+            command.value = NavigationCommand.Navigate(desktopUrl, getUrlHeaders(desktopUrl))
         } else {
             command.value = NavigationCommand.Refresh
         }
@@ -3169,9 +3165,7 @@ class BrowserTabViewModel @Inject constructor(
 
     fun nonHttpAppLinkClicked(appLink: NonHttpAppLink) {
         if (nonHttpAppLinkChecker.isPermitted(appLink.intent)) {
-            viewModelScope.launch {
-                command.value = HandleNonHttpAppLink(appLink, getUrlHeaders(appLink.fallbackUrl))
-            }
+            command.value = HandleNonHttpAppLink(appLink, getUrlHeaders(appLink.fallbackUrl))
         }
     }
 

@@ -29,7 +29,7 @@ import java.time.temporal.ChronoUnit
 import javax.inject.Inject
 
 interface CustomHeaderAllowedChecker {
-    suspend fun isAllowed(): Result<TrafficQualityAppVersion>
+    fun isAllowed(): Result<TrafficQualityAppVersion>
 }
 
 sealed class Result<out R> {
@@ -42,7 +42,7 @@ class RealCustomHeaderGracePeriodChecker @Inject constructor(
     private val appBuildConfig: AppBuildConfig,
     private val featuresRequestHeaderStore: FeaturesRequestHeaderStore,
 ) : CustomHeaderAllowedChecker {
-    override suspend fun isAllowed(): Result<TrafficQualityAppVersion> {
+    override fun isAllowed(): Result<TrafficQualityAppVersion> {
         val config = featuresRequestHeaderStore.getConfig()
         val versionConfig = config.find { it.appVersion == appBuildConfig.versionCode }
         return if (versionConfig != null) {
