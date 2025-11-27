@@ -79,7 +79,7 @@ tags:
     childOf:
       id: "browserLayout"
 
-# verify that tapping on a tabs menu opens the tam switcher
+# verify that tapping on a tabs menu opens the tab switcher
 - tapOn:
     id: "tabsButton"
 - assertVisible:
