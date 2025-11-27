@@ -37,9 +37,9 @@ tags:
 - runFlow: ../shared/browser_screen/click_on_menu_button.yaml
 - tapOn:
     text: "add bookmark"
-- runFlow: ../shared/browser_screen/click_on_menu_button.yaml
+- action: back
 - tapOn:
-    text: "bookmarks"
+    id: "bookmarksImageView"
 - tapOn:
     id: "com.duckduckgo.mobile.android:id/trailingIcon"
     index: 0
@@ -58,14 +58,9 @@ tags:
     id: "browserLayout"
 - extendedWaitUntil:
     visible:
-      text: "https://www.eff.org/"
-      childOf:
-        id: "omnibarTextInput"
-    timeout: 10000
-- assertVisible:
-    text: "https://www.eff.org/"
-    childOf:
       id: "omnibarTextInput"
+      text: "https://www.eff.org/"
+    timeout: 10000
 
 # verify that tapping on a favorite opens the web page (SERP in this case)
 - tapOn:
@@ -77,10 +72,46 @@ tags:
 - assertVisible:
     id: "browserLayout"
 - assertVisible:
+    id: "omnibarTextInput"
     text: "reddit"
-    childOf:
-      id: "omnibarTextInput"
 - assertVisible:
     text: "reddit"
     childOf:
       id: "browserLayout"
+
+# verify that tapping on a tabs menu opens the tab switcher
+- tapOn:
+    id: "tabsButton"
+- assertVisible:
+    id: "newTabButton"
+- assertVisible:
+    id: "fireButton"
+- assertVisible:
+    id: "menuButton"
+- tapOn:
+    id: "cardContentsContainer"
+- assertVisible:
+    id: "omnibarTextInput"
+    text: "reddit"
+
+# verify that tapping on a new tab button opens a new tab
+- tapOn:
+    id: "newTabButton"
+- hideKeyboard
+- assertVisible:
+    text: "2"
+    childOf:
+      id: "tabsButton"
+- assertVisible:
+    id: "autofillButton"
+- assertNotVisible:
+    id: "newTabButton"
+- tapOn:
+    id: "quickAccessFaviconCard"
+- assertVisible:
+    id: "omnibarTextInput"
+    text: "reddit"
+- assertVisible:
+    id: "newTabButton"
+- assertNotVisible:
+    id: "autofillButton"
