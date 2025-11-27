@@ -16,10 +16,10 @@
 
 package com.duckduckgo.app.browser.urldisplay
 
-import android.content.Context
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
@@ -68,7 +68,7 @@ interface UrlDisplayRepository {
 class RealUrlDisplayRepository @Inject constructor(
     private val settingsDataStore: SettingsDataStore,
     private val browserConfigFeature: AndroidBrowserConfigFeature,
-    private val context: Context,
+    private val appBuildConfig: AppBuildConfig,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : UrlDisplayRepository {
     private val refreshTrigger = MutableSharedFlow<Unit>(replay = 0)
@@ -109,8 +109,7 @@ class RealUrlDisplayRepository @Inject constructor(
         }
 
         // First launch: calculate and persist for future consistency
-        val packageInfo = context.packageManager.getPackageInfo(context.packageName, 0)
-        val isNewInstall = packageInfo.firstInstallTime == packageInfo.lastUpdateTime
+        val isNewInstall = appBuildConfig.isNewInstall()
         val defaultValue = !isNewInstall
         settingsDataStore.isFullUrlEnabled = defaultValue
         settingsDataStore.urlPreferenceMigrated = true
