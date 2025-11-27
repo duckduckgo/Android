@@ -40,11 +40,11 @@ class RealUrlDisplayPlugin @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
 ) : PrivacyConfigCallbackPlugin {
     override fun onPrivacyConfigDownloaded() {
-        // User has explicitly set their preference - always honor it
-        if (settingsDataStore.hasUrlPreferenceSet()) {
-            return
-        }
         coroutineScope.launch(dispatcherProvider.io()) {
+            // User has explicitly set their preference - always honor it
+            if (settingsDataStore.hasUrlPreferenceSet()) {
+                return@launch
+            }
             val packageInfo = context.packageManager.getPackageInfo(context.packageName, 0)
             val isNewInstall = packageInfo.firstInstallTime == packageInfo.lastUpdateTime
             val defaultValue = !(isNewInstall && browserConfigFeature.shorterUrlDefault().isEnabled())
