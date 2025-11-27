@@ -24,6 +24,8 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -34,7 +36,8 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
-class UrlDisplayPluginTest {
+@OptIn(ExperimentalCoroutinesApi::class)
+class RealUrlDisplayPluginTest {
     @get:Rule
     var coroutineRule = CoroutineTestRule()
 
@@ -66,6 +69,7 @@ class UrlDisplayPluginTest {
 
         // When
         testee.onPrivacyConfigDownloaded()
+        advanceUntilIdle()
 
         // Then: Settings data store is never called
         verify(settingsDataStore, atLeastOnce()).hasUrlPreferenceSet()
@@ -84,6 +88,7 @@ class UrlDisplayPluginTest {
 
         // When
         testee.onPrivacyConfigDownloaded()
+        advanceUntilIdle()
 
         // Then: isFullUrlEnabled is changed to true
         verify(settingsDataStore, atLeastOnce()).hasUrlPreferenceSet()
@@ -103,6 +108,7 @@ class UrlDisplayPluginTest {
 
         // When
         testee.onPrivacyConfigDownloaded()
+        advanceUntilIdle()
 
         // Then
         verify(settingsDataStore, atLeastOnce()).isFullUrlEnabled = true
@@ -121,6 +127,7 @@ class UrlDisplayPluginTest {
 
         // When
         testee.onPrivacyConfigDownloaded()
+        advanceUntilIdle()
 
         // Then
         verify(settingsDataStore, atLeastOnce()).isFullUrlEnabled = false
