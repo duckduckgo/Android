@@ -46,6 +46,7 @@ import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_SKIP_ONBOARDING_SHOW
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.duckchat.impl.inputscreen.wideevents.InputScreenOnboardingWideEvent
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
@@ -76,6 +77,7 @@ class WelcomePageViewModelTest {
     private val mockAndroidBrowserConfigFeature: AndroidBrowserConfigFeature = FakeFeatureToggleFactory.create(
         AndroidBrowserConfigFeature::class.java,
     )
+    private val mockInputScreenOnboardingWideEvent: InputScreenOnboardingWideEvent = mock()
 
     private fun createViewModel(): WelcomePageViewModel {
         return WelcomePageViewModel(
@@ -89,6 +91,7 @@ class WelcomePageViewModelTest {
             mockOnboardingDesignExperimentManager,
             mockOnboardingStore,
             mockAndroidBrowserConfigFeature,
+            mockInputScreenOnboardingWideEvent,
         )
     }
 
@@ -104,6 +107,7 @@ class WelcomePageViewModelTest {
             mockOnboardingDesignExperimentManager,
             mockOnboardingStore,
             mockAndroidBrowserConfigFeature,
+            mockInputScreenOnboardingWideEvent,
         )
     }
 
