@@ -25,4 +25,5 @@ interface OnboardingStore {
     fun getSitesOptions(): List<DaxDialogIntroOption>
     fun storeInputScreenSelection(selected: Boolean)
     fun getInputScreenSelection(): Boolean?
+    fun clearInputScreenSelection()
 }

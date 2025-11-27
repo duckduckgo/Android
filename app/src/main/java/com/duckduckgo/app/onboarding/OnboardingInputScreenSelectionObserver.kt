@@ -27,8 +27,11 @@ import com.duckduckgo.duckchat.api.DuckChat
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
 @ContributesMultibinding(
@@ -37,22 +40,40 @@ import javax.inject.Inject
 )
 class OnboardingInputScreenSelectionObserver @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
-    dispatchers: DispatcherProvider,
+    private val dispatchers: DispatcherProvider,
     private val userStageStore: UserStageStore,
     private val onboardingStore: OnboardingStore,
     private val duckChat: DuckChat,
 ) : MainProcessLifecycleObserver {
 
     init {
-        appCoroutineScope.launch(dispatchers.io()) {
-            userStageStore.userAppStageFlow()
-                .distinctUntilChanged()
-                .filter { it == AppStage.ESTABLISHED }
-                .collect {
-                    onboardingStore.getInputScreenSelection()?.let { selection ->
-                        duckChat.setInputScreenUserSetting(selection)
-                    }
+        observeInputScreenSetting()
+        setSelectionWhenEstablished()
+    }
+
+    private fun observeInputScreenSetting() {
+        duckChat.observeInputScreenUserSettingEnabled()
+            .distinctUntilChanged()
+            .drop(1)
+            .onEach {
+                if (userStageStore.getUserAppStage() != AppStage.ESTABLISHED && onboardingStore.getInputScreenSelection() != null) {
+                    onboardingStore.clearInputScreenSelection()
                 }
-        }
+            }
+            .flowOn(dispatchers.io())
+            .launchIn(appCoroutineScope)
+    }
+
+    private fun setSelectionWhenEstablished() {
+        userStageStore.userAppStageFlow()
+            .distinctUntilChanged()
+            .filter { it == AppStage.ESTABLISHED }
+            .onEach {
+                onboardingStore.getInputScreenSelection()?.let { selection ->
+                    duckChat.setInputScreenUserSetting(selection)
+                }
+            }
+            .flowOn(dispatchers.io())
+            .launchIn(appCoroutineScope)
     }
 }
