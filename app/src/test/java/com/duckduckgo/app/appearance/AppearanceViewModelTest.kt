@@ -34,6 +34,7 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.ui.DuckDuckGoTheme
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.store.ThemingDataStore
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -362,6 +363,114 @@ internal class AppearanceViewModelTest {
                 cancelAndConsumeRemainingEvents()
             }
         }
+
+    @Test
+    fun `when url display repository emits true then view state reflects full url enabled`() = runTest {
+        // Given: Repository flow emits true
+        whenever(mockUrlDisplayRepository.isFullUrlEnabled).thenReturn(flowOf(true))
+        initializeViewModel()
+
+        // When: Collect view state
+        testee.viewState().test {
+            val viewState = awaitItem()
+
+            // Then: View state shows full URL enabled
+            assertEquals(true, viewState.isFullUrlEnabled)
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when url display repository emits false then view state reflects full url disabled`() = runTest {
+        // Given: Repository flow emits false
+        whenever(mockUrlDisplayRepository.isFullUrlEnabled).thenReturn(flowOf(false))
+        initializeViewModel()
+
+        // When: Collect view state
+        testee.viewState().test {
+            val viewState = awaitItem()
+
+            // Then: View state shows full URL disabled
+            assertEquals(false, viewState.isFullUrlEnabled)
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when url display repository flow emits new value then view state updates`() = runTest {
+        // Given: Repository flow that emits multiple values
+        val urlDisplayFlow = MutableStateFlow(true)
+        whenever(mockUrlDisplayRepository.isFullUrlEnabled).thenReturn(urlDisplayFlow)
+        initializeViewModel()
+
+        // When: Collect view state and change repository value
+        testee.viewState().test {
+            // First emission
+            assertEquals(true, awaitItem().isFullUrlEnabled)
+
+            // Change the flow value
+            urlDisplayFlow.value = false
+
+            // Then: View state updates with new value
+            assertEquals(false, awaitItem().isFullUrlEnabled)
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when url display changes multiple times then view state reflects each change`() = runTest {
+        // Given: Repository flow that can emit multiple values
+        val urlDisplayFlow = MutableStateFlow(false)
+        whenever(mockUrlDisplayRepository.isFullUrlEnabled).thenReturn(urlDisplayFlow)
+        initializeViewModel()
+
+        // When: Collect view state and toggle multiple times
+        testee.viewState().test {
+            assertEquals(false, awaitItem().isFullUrlEnabled)
+
+            urlDisplayFlow.value = true
+            assertEquals(true, awaitItem().isFullUrlEnabled)
+
+            urlDisplayFlow.value = false
+            assertEquals(false, awaitItem().isFullUrlEnabled)
+
+            urlDisplayFlow.value = true
+            assertEquals(true, awaitItem().isFullUrlEnabled)
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when url display repository flow updates then other view state properties remain unchanged`() = runTest {
+        // Given: Repository flow changes
+        val urlDisplayFlow = MutableStateFlow(true)
+        whenever(mockUrlDisplayRepository.isFullUrlEnabled).thenReturn(urlDisplayFlow)
+        whenever(mockThemeSettingsDataStore.theme).thenReturn(DuckDuckGoTheme.DARK)
+        whenever(mockAppSettingsDataStore.appIcon).thenReturn(AppIcon.BLUE)
+        initializeViewModel()
+
+        // When: URL display changes
+        testee.viewState().test {
+            val initialState = awaitItem()
+            assertEquals(true, initialState.isFullUrlEnabled)
+            assertEquals(DuckDuckGoTheme.DARK, initialState.theme)
+            assertEquals(AppIcon.BLUE, initialState.appIcon)
+
+            urlDisplayFlow.value = false
+
+            // Then: Only isFullUrlEnabled changes, other properties remain
+            val updatedState = awaitItem()
+            assertEquals(false, updatedState.isFullUrlEnabled)
+            assertEquals(DuckDuckGoTheme.DARK, updatedState.theme)
+            assertEquals(AppIcon.BLUE, updatedState.appIcon)
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
 
     private fun givenThemeSelected(theme: DuckDuckGoTheme) {
         whenever(mockThemeSettingsDataStore.theme).thenReturn(theme)
