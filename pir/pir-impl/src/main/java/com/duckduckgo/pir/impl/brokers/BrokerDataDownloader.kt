@@ -19,6 +19,7 @@ package com.duckduckgo.pir.impl.brokers
 import android.content.Context
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.pir.impl.pixels.PirPixelSender
 import com.duckduckgo.pir.impl.service.DbpService
 import com.duckduckgo.pir.impl.service.DbpService.PirJsonBroker
 import com.duckduckgo.pir.impl.store.PirRepository
@@ -52,6 +53,7 @@ class RealBrokerDataDownloader @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val pirRepository: PirRepository,
     private val context: Context,
+    private val pirPixelSender: PirPixelSender,
 ) : BrokerDataDownloader {
     override suspend fun downloadBrokerData(brokersToUpdate: List<String>) {
         withContext(dispatcherProvider.io()) {
@@ -110,9 +112,25 @@ class RealBrokerDataDownloader @Inject constructor(
         }?.forEach { jsonFile ->
             logcat { "PIR-update: Processing data from ${jsonFile.name}" }
             val content = jsonFile.readText() // Read JSON file as string
-            val broker = adapter.fromJson(content)
+            val broker = runCatching { adapter.fromJson(content) }.getOrNull()
             if (broker != null) {
-                pirRepository.updateBrokerData(jsonFile.name, broker)
+                try {
+                    pirRepository.updateBrokerData(jsonFile.name, broker)
+                    pirPixelSender.reportUpdateBrokerJsonSuccess(
+                        brokerJsonFileName = jsonFile.name,
+                        removedAtMs = broker.removedAt ?: 0L,
+                    )
+                } catch (e: Throwable) {
+                    pirPixelSender.reportUpdateBrokerJsonFailure(
+                        brokerJsonFileName = jsonFile.name,
+                        removedAtMs = broker.removedAt ?: 0L,
+                    )
+                }
+            } else {
+                pirPixelSender.reportUpdateBrokerJsonFailure(
+                    brokerJsonFileName = jsonFile.name,
+                    removedAtMs = 0L,
+                )
             }
         }
 
