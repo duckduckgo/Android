@@ -64,6 +64,7 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.SmoothProgressAnimator
 import com.duckduckgo.app.browser.animations.AddressBarTrackersAnimationFeatureToggle
 import com.duckduckgo.app.browser.api.OmnibarRepository
+import com.duckduckgo.app.browser.customtabs.CustomTabPixelNames
 import com.duckduckgo.app.browser.databinding.IncludeCustomTabToolbarBinding
 import com.duckduckgo.app.browser.databinding.IncludeFindInPageBinding
 import com.duckduckgo.app.browser.databinding.IncludeNewCustomTabToolbarBinding
@@ -99,6 +100,7 @@ import com.duckduckgo.app.global.view.renderIfChanged
 import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentManager
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.browser.ui.tabs.TabSwitcherButton
 import com.duckduckgo.common.ui.DuckDuckGoActivity
@@ -1133,6 +1135,11 @@ class OmnibarLayout @JvmOverloads constructor(
                         customToolbarContainer.setCardBackgroundColor(secondaryToolbarColor)
                         browserMenuImageView.setColorFilter(foregroundColor)
 
+                        customToolbarContainer.setOnClickListener {
+                            pixel.fire(CustomTabPixelNames.CUSTOM_TABS_ADDRESS_BAR_CLICKED)
+                            pixel.fire(CustomTabPixelNames.CUSTOM_TABS_ADDRESS_BAR_CLICKED_DAILY, type = PixelType.Daily())
+                        }
+
                         animationBackgroundColor = calculateAnimationBackgroundColor(customTab.toolbarColor)
                     } else {
                         animationBackgroundColor = customTab.toolbarColor
@@ -1218,7 +1225,7 @@ class OmnibarLayout @JvmOverloads constructor(
             ColorUtils.HSLToColor(hsl)
         } else {
             // Use a darkened version of the main toolbar color for dark themes
-            ColorUtils.blendARGB(mainToolbarColor,  Color.WHITE, 0.20f)
+            ColorUtils.blendARGB(mainToolbarColor, Color.WHITE, 0.20f)
         }
     }
 

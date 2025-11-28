@@ -26,4 +26,6 @@ enum class CustomTabPixelNames(override val pixelName: String) : Pixel.PixelName
     CUSTOM_TABS_OPEN_IN_DDG("m_custom_tabs_open_in_ddg"),
     CUSTOM_TABS_MENU_DISABLE_PROTECTIONS_ALLOW_LIST_ADD("m_custom_tabs_menu_disable_protections_allow_list_add"),
     CUSTOM_TABS_MENU_DISABLE_PROTECTIONS_ALLOW_LIST_REMOVE("m_custom_tabs_menu_disable_protections_allow_list_remove"),
+    CUSTOM_TABS_ADDRESS_BAR_CLICKED("m_custom_tabs_address_bar_clicked"),
+    CUSTOM_TABS_ADDRESS_BAR_CLICKED_DAILY("m_custom_tabs_address_bar_clicked_daily"),
 }
