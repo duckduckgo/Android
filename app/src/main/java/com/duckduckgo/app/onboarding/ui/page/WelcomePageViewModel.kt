@@ -45,13 +45,16 @@ import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentM
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.NOTIFICATION_RUNTIME_PERMISSION_SHOWN
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_ADDRESS_BAR_POSITION_SHOWN_UNIQUE
+import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_AICHAT_SELECTED
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_BOTTOM_ADDRESS_BAR_SELECTED_UNIQUE
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_CHOOSE_BROWSER_PRESSED
+import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_CHOOSE_SEARCH_EXPERIENCE_IMPRESSIONS_UNIQUE
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_COMPARISON_CHART_SHOWN_UNIQUE
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_CONFIRM_SKIP_ONBOARDING_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_INTRO_REINSTALL_USER_SHOWN_UNIQUE
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_INTRO_SHOWN_UNIQUE
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_RESUME_ONBOARDING_PRESSED
+import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_SEARCH_ONLY_SELECTED
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_SKIP_ONBOARDING_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_SKIP_ONBOARDING_SHOWN_UNIQUE
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
@@ -192,6 +195,11 @@ class WelcomePageViewModel @Inject constructor(
 
             INPUT_SCREEN -> {
                 viewModelScope.launch(dispatchers.io()) {
+                    if (inputScreenSelected) {
+                        pixel.fire(PREONBOARDING_AICHAT_SELECTED)
+                    } else {
+                        pixel.fire(PREONBOARDING_SEARCH_ONLY_SELECTED)
+                    }
                     onboardingStore.storeInputScreenSelection(inputScreenSelected)
                     _commands.send(Finish)
                 }
@@ -290,7 +298,7 @@ class WelcomePageViewModel @Inject constructor(
                 }
             }
             INPUT_SCREEN -> {
-                // no-op
+                pixel.fire(PREONBOARDING_CHOOSE_SEARCH_EXPERIENCE_IMPRESSIONS_UNIQUE, type = Unique())
             }
         }
     }

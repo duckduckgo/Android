@@ -34,13 +34,16 @@ import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowSk
 import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentManager
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.NOTIFICATION_RUNTIME_PERMISSION_SHOWN
+import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_AICHAT_SELECTED
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_BOTTOM_ADDRESS_BAR_SELECTED_UNIQUE
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_CHOOSE_BROWSER_PRESSED
+import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_CHOOSE_SEARCH_EXPERIENCE_IMPRESSIONS_UNIQUE
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_COMPARISON_CHART_SHOWN_UNIQUE
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_CONFIRM_SKIP_ONBOARDING_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_INTRO_REINSTALL_USER_SHOWN_UNIQUE
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_INTRO_SHOWN_UNIQUE
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_RESUME_ONBOARDING_PRESSED
+import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_SEARCH_ONLY_SELECTED
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_SKIP_ONBOARDING_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_SKIP_ONBOARDING_SHOWN_UNIQUE
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
@@ -414,7 +417,7 @@ class WelcomePageViewModelTest {
         }
 
     @Test
-    fun whenOnPrimaryCtaClickedWithInputScreenSelectedThenStoreSelectionAndFinish() =
+    fun whenOnPrimaryCtaClickedWithInputScreenSelectedThenFireAiChatSelectedPixelAndStoreSelectionAndFinish() =
         runTest {
             mockAndroidBrowserConfigFeature.showInputScreenOnboarding().setRawStoredState(Toggle.State(enable = true))
             testee.onInputScreenOptionSelected(true)
@@ -424,11 +427,12 @@ class WelcomePageViewModelTest {
                 val command = awaitItem()
                 Assert.assertTrue(command is Finish)
             }
+            verify(mockPixel).fire(PREONBOARDING_AICHAT_SELECTED)
             verify(mockOnboardingStore).storeInputScreenSelection(true)
         }
 
     @Test
-    fun whenOnPrimaryCtaClickedWithInputScreenNotSelectedThenStoreSelectionAndFinish() =
+    fun whenOnPrimaryCtaClickedWithInputScreenNotSelectedThenFireSearchOnlySelectedPixelAndStoreSelectionAndFinish() =
         runTest {
             mockAndroidBrowserConfigFeature.showInputScreenOnboarding().setRawStoredState(Toggle.State(enable = true))
             testee.onInputScreenOptionSelected(false)
@@ -438,6 +442,7 @@ class WelcomePageViewModelTest {
                 val command = awaitItem()
                 Assert.assertTrue(command is Finish)
             }
+            verify(mockPixel).fire(PREONBOARDING_SEARCH_ONLY_SELECTED)
             verify(mockOnboardingStore).storeInputScreenSelection(false)
         }
 
@@ -458,4 +463,11 @@ class WelcomePageViewModelTest {
 
             Assert.assertEquals(2, viewModel.getMaxPageCount())
         }
+
+    @Test
+    fun whenInputScreenDialogIsShownThenFireChooseSearchExperienceImpressionsUniquePixel() {
+        testee.onDialogShown(PreOnboardingDialogType.INPUT_SCREEN)
+
+        verify(mockPixel).fire(PREONBOARDING_CHOOSE_SEARCH_EXPERIENCE_IMPRESSIONS_UNIQUE, type = Unique())
+    }
 }
