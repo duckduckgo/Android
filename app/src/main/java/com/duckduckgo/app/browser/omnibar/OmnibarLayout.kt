@@ -46,6 +46,7 @@ import androidx.core.transition.doOnEnd
 import androidx.core.view.doOnLayout
 import androidx.core.view.isGone
 import androidx.core.view.isInvisible
+import androidx.core.view.isNotEmpty
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.LifecycleOwner
@@ -63,6 +64,7 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.SmoothProgressAnimator
 import com.duckduckgo.app.browser.animations.AddressBarTrackersAnimationFeatureToggle
 import com.duckduckgo.app.browser.api.OmnibarRepository
+import com.duckduckgo.app.browser.customtabs.CustomTabPixelNames
 import com.duckduckgo.app.browser.databinding.IncludeCustomTabToolbarBinding
 import com.duckduckgo.app.browser.databinding.IncludeFindInPageBinding
 import com.duckduckgo.app.browser.databinding.IncludeNewCustomTabToolbarBinding
@@ -98,6 +100,7 @@ import com.duckduckgo.app.global.view.renderIfChanged
 import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentManager
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.browser.ui.tabs.TabSwitcherButton
 import com.duckduckgo.common.ui.DuckDuckGoActivity
@@ -1150,6 +1153,11 @@ class OmnibarLayout @JvmOverloads constructor(
                         customToolbarContainer.setCardBackgroundColor(secondaryToolbarColor)
                         browserMenuImageView.setColorFilter(foregroundColor)
 
+                        customToolbarContainer.setOnClickListener {
+                            pixel.fire(CustomTabPixelNames.CUSTOM_TABS_ADDRESS_BAR_CLICKED)
+                            pixel.fire(CustomTabPixelNames.CUSTOM_TABS_ADDRESS_BAR_CLICKED_DAILY, type = PixelType.Daily())
+                        }
+
                         animationBackgroundColor = calculateAnimationBackgroundColor(customTab.toolbarColor)
                     } else {
                         animationBackgroundColor = customTab.toolbarColor
@@ -1213,30 +1221,30 @@ class OmnibarLayout @JvmOverloads constructor(
     }
 
     private fun calculateAddressBarColor(mainToolbarColor: Int): Int {
-        // Create a lighter, muted version of the toolbar color for the address bar
-        val targetSaturation = 0.55f // 15% Saturation for muted, pastel tone
-        val targetLightness = 0.90f // Target lightness for consistently light appearance
+        return if (isColorLight(mainToolbarColor)) {
+            val targetSaturation = 0.55f
+            val targetLightness = 0.90f
+            val hsl = floatArrayOf(0f, 0f, 0f)
+            ColorUtils.colorToHSL(mainToolbarColor, hsl)
 
-        // 1. Convert the main color to HSL
-        val hsl = floatArrayOf(0f, 0f, 0f)
-        ColorUtils.colorToHSL(mainToolbarColor, hsl)
+            // hsl[0] is Hue (H) - keep this the same to maintain color identity
+            // hsl[1] is Saturation (S) - reduce for muted appearance
+            // hsl[2] is Lightness (L) - increase for lighter shade
 
-        // hsl[0] is Hue (H) - keep this the same to maintain color identity
-        // hsl[1] is Saturation (S) - reduce for muted appearance
-        // hsl[2] is Lightness (L) - increase for lighter shade
+            // If the original color is grayscale (near-zero saturation),
+            // keep it grayscale to maintain color identity
+            if (hsl[1] < 0.01f) {
+                hsl[1] = 0f // Keep saturation at 0
+            } else {
+                hsl[1] = targetSaturation
+            }
+            hsl[2] = targetLightness
 
-        // If the original color is grayscale (near-zero saturation),
-        // keep it grayscale to maintain color identity
-        if (hsl[1] < 0.01f) {
-            hsl[1] = 0f // Keep saturation at 0
+            ColorUtils.HSLToColor(hsl)
         } else {
-            hsl[1] = targetSaturation
+            // Use a darkened version of the main toolbar color for dark themes
+            ColorUtils.blendARGB(mainToolbarColor, Color.WHITE, 0.20f)
         }
-
-        hsl[2] = targetLightness
-
-        // 3. Convert the modified HSL back to an Android color Int
-        return ColorUtils.HSLToColor(hsl)
     }
 
     private fun calculateAnimationBackgroundColor(mainToolbarColor: Int): Int {
@@ -1314,6 +1322,35 @@ class OmnibarLayout @JvmOverloads constructor(
         return luminance > 0.5
     }
 
+    private fun applyFindInPageTheme(toolbarColor: Int) {
+        val backgroundColor = calculateAddressBarColor(toolbarColor)
+        val isColorLight = isColorLight(backgroundColor)
+
+        with(findInPage) {
+            findInPageContainer.background = backgroundColor.toDrawable()
+
+            val foregroundColor = if (isColorLight) Color.BLACK else Color.WHITE
+            val hintColor = if (foregroundColor == Color.WHITE) {
+                Color.argb(153, 255, 255, 255) // 60% white for dark theme
+            } else {
+                Color.argb(153, 0, 0, 0) // 60% black for light theme
+            }
+
+            findInPageInput.setTextColor(foregroundColor)
+            findInPageInput.setHintTextColor(hintColor)
+            findInPageMatches.setTextColor(foregroundColor)
+
+            listOf(
+                findIcon,
+                previousSearchTermButton,
+                nextSearchTermButton,
+                closeFindInPagePanel,
+            ).forEach { imageView ->
+                imageView.setColorFilter(foregroundColor)
+            }
+        }
+    }
+
     private fun onLogoClicked(url: String) {
         omnibarLogoClickedListener?.onClick(url)
     }
@@ -1388,6 +1425,11 @@ class OmnibarLayout @JvmOverloads constructor(
         omniBarContentContainer.hide()
         customTabToolbarContainerWrapper.hide()
         if (viewModel.viewState.value.viewMode is ViewMode.CustomTab) {
+            val toolbarColor = (viewModel.viewState.value.viewMode as ViewMode.CustomTab).toolbarColor
+
+            if (!isDefaultToolbarColor(toolbarColor)) {
+                applyFindInPageTheme(toolbarColor)
+            }
             omniBarContainer.show()
             browserMenu.gone()
         }

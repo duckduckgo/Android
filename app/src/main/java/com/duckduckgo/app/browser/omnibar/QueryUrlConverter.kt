@@ -33,12 +33,14 @@ import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import com.duckduckgo.urlpredictor.Decision
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
+import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @ContributesBinding(AppScope::class, boundType = OmnibarEntryConverter::class)
 @ContributesMultibinding(scope = AppScope::class, boundType = PrivacyConfigCallbackPlugin::class)
+@SingleInstanceIn(scope = AppScope::class)
 class QueryUrlConverter @Inject constructor(
     private val requestRewriter: RequestRewriter,
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
@@ -67,7 +69,7 @@ class QueryUrlConverter @Inject constructor(
         val isUrl = when (queryOrigin) {
             is QueryOrigin.FromAutocomplete -> queryOrigin.isNav
             is QueryOrigin.FromUser, QueryOrigin.FromBookmark -> {
-                if (useUrlPredictor) {
+                if (useUrlPredictor && queryUrlPredictor.isReady()) {
                     var queryClassification = queryUrlPredictor.classify(input = searchQuery)
 
                     if (extractUrlFromQuery) {
