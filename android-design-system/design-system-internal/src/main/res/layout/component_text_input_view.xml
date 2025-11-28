@@ -623,6 +623,179 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/keyline_1"/>
 
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="32dp"/>
+
+        <com.duckduckgo.common.ui.internal.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            app:platformType="view"/>
+
+        <com.duckduckgo.common.ui.view.text.DaxTextInput
+            android:id="@+id/outlinedinputtext25"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_2"
+            app:editable="true"
+            app:type="ip_address"
+            android:hint="IP Address"
+            android:text="192.168.1.1" />
+
+        <com.duckduckgo.common.ui.internal.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_4"
+            app:platformType="compose"/>
+
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/compose_text_input_25"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"/>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="32dp"/>
+
+        <com.duckduckgo.common.ui.internal.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            app:platformType="view"/>
+
+        <com.duckduckgo.common.ui.view.text.DaxTextInput
+            android:id="@+id/outlinedinputtext26"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_2"
+            app:editable="true"
+            app:type="url"
+            android:hint="URL Address"
+            android:text="https://duckduckgo.com" />
+
+        <com.duckduckgo.common.ui.internal.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_4"
+            app:platformType="compose"/>
+
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/compose_text_input_26"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"/>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="32dp"/>
+
+        <com.duckduckgo.common.ui.internal.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            app:platformType="view"/>
+
+        <com.duckduckgo.common.ui.view.text.DaxTextInput
+            android:id="@+id/outlinedinputtext27"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_2"
+            app:editable="true"
+            android:hint="Observable TextInput - start typing" />
+
+        <com.duckduckgo.common.ui.internal.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_4"
+            app:platformType="compose"/>
+
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/compose_text_input_27a"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"/>
+
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/compose_text_input_27b"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"/>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="32dp"/>
+
+        <com.duckduckgo.common.ui.internal.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            app:platformType="view"/>
+
+        <com.duckduckgo.common.ui.view.text.DaxTextInput
+            android:id="@+id/outlinedinputtext28"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_2"
+            app:editable="true"
+            android:hint="Autoselect Text Input"
+            android:text="Tap to focus and select all text" />
+
+        <com.duckduckgo.common.ui.internal.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_4"
+            app:platformType="compose"/>
+
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/compose_text_input_28"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"/>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="32dp"/>
+
+        <com.duckduckgo.common.ui.internal.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            app:platformType="view"/>
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+            android:id="@+id/button1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Click to focus the input below"
+            android:layout_marginTop="@dimen/keyline_1" />
+
+        <com.duckduckgo.common.ui.view.text.DaxTextInput
+            android:id="@+id/outlinedinputtext29"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_2"
+            app:editable="true"
+            android:hint="Programmatically focusable text input" />
+
+        <com.duckduckgo.common.ui.internal.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_4"
+            app:platformType="compose"/>
+
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/compose_text_input_29"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"/>
+
     </LinearLayout>
 
 </androidx.core.widget.NestedScrollView>

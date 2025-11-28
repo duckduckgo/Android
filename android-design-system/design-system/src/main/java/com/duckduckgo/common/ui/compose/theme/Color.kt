@@ -122,6 +122,7 @@ val Black = Color(0xFF000000)
 
 //region White color variants
 val White84 = Color(0xD6FFFFFF)
+val White78 = Color(0xC7FFFFFF)
 val White60 = Color(0x99FFFFFF)
 val White48 = Color(0x7AFFFFFF)
 val White40 = Color(0x66FFFFFF)
