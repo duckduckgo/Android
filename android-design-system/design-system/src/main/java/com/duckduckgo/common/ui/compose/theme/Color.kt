@@ -197,10 +197,6 @@ val DisabledColor
     @Composable
     @ReadOnlyComposable
     get() = colorResource(R.color.disabledColor)
-val BackgroundColor
-    @Composable
-    @ReadOnlyComposable
-    get() = colorResource(R.color.background_background_light)
 val AlertGreen
     @Composable
     @ReadOnlyComposable
