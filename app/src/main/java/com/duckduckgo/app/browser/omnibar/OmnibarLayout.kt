@@ -1196,30 +1196,30 @@ class OmnibarLayout @JvmOverloads constructor(
     }
 
     private fun calculateAddressBarColor(mainToolbarColor: Int): Int {
-        // Create a lighter, muted version of the toolbar color for the address bar
-        val targetSaturation = 0.55f // 15% Saturation for muted, pastel tone
-        val targetLightness = 0.90f // Target lightness for consistently light appearance
+        return if (isColorLight(mainToolbarColor)) {
+            val targetSaturation = 0.55f
+            val targetLightness = 0.90f
+            val hsl = floatArrayOf(0f, 0f, 0f)
+            ColorUtils.colorToHSL(mainToolbarColor, hsl)
 
-        // 1. Convert the main color to HSL
-        val hsl = floatArrayOf(0f, 0f, 0f)
-        ColorUtils.colorToHSL(mainToolbarColor, hsl)
+            // hsl[0] is Hue (H) - keep this the same to maintain color identity
+            // hsl[1] is Saturation (S) - reduce for muted appearance
+            // hsl[2] is Lightness (L) - increase for lighter shade
 
-        // hsl[0] is Hue (H) - keep this the same to maintain color identity
-        // hsl[1] is Saturation (S) - reduce for muted appearance
-        // hsl[2] is Lightness (L) - increase for lighter shade
+            // If the original color is grayscale (near-zero saturation),
+            // keep it grayscale to maintain color identity
+            if (hsl[1] < 0.01f) {
+                hsl[1] = 0f // Keep saturation at 0
+            } else {
+                hsl[1] = targetSaturation
+            }
+            hsl[2] = targetLightness
 
-        // If the original color is grayscale (near-zero saturation),
-        // keep it grayscale to maintain color identity
-        if (hsl[1] < 0.01f) {
-            hsl[1] = 0f // Keep saturation at 0
+            ColorUtils.HSLToColor(hsl)
         } else {
-            hsl[1] = targetSaturation
+            // Use a darkened version of the main toolbar color for dark themes
+            ColorUtils.blendARGB(mainToolbarColor,  Color.WHITE, 0.20f)
         }
-
-        hsl[2] = targetLightness
-
-        // 3. Convert the modified HSL back to an Android color Int
-        return ColorUtils.HSLToColor(hsl)
     }
 
     private fun calculateAnimationBackgroundColor(mainToolbarColor: Int): Int {
