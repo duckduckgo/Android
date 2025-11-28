@@ -103,7 +103,11 @@ class RealUrlDisplayRepository @Inject constructor(
             return true
         }
 
-        // Auto-assigned preference exists - use it for consistency
+        // Preference was auto-assigned on first launch, we return cached value
+        // to avoid recalculating from appBuildConfig.isNewInstall on every call
+        // and keep the expected preference for future update where new user
+        // won't be considered anymore as new user but has started to use the app
+        // after the release of this migration feature.
         if (settingsDataStore.hasUrlPreferenceSet()) {
             return settingsDataStore.isFullUrlEnabled
         }
