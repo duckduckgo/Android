@@ -73,6 +73,7 @@ class ComponentTextInputFragment : Fragment() {
         return binding.root
     }
 
+    @Suppress("DenyListedApi")
     override fun onViewCreated(
         view: View,
         savedInstanceState: Bundle?,
