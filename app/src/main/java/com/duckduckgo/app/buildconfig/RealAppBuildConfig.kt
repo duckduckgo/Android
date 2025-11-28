@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.buildconfig
 
+import android.content.Context
 import android.os.Build
 import android.os.Environment
 import androidx.core.content.edit
@@ -44,6 +45,7 @@ class RealAppBuildConfig @Inject constructor(
     private val variantManager: Lazy<VariantManager>, // break any possible DI dependency cycle
     private val dispatcherProvider: DispatcherProvider,
     private val sharedPreferencesProvider: SharedPreferencesProvider,
+    private val context: Context,
 ) : AppBuildConfig {
     private val preferences by lazy {
         sharedPreferencesProvider.getSharedPreferences("com.duckduckgo.app.buildconfig.cache", false, false)
@@ -104,6 +106,11 @@ class RealAppBuildConfig @Inject constructor(
             preferences.edit(commit = true) { putBoolean(APP_REINSTALLED_KEY, appReinstallValue) }
             return@withContext appReinstallValue
         }.getOrDefault(false)
+    }
+
+    override fun isNewInstall(): Boolean {
+        val packageInfo = context.packageManager.getPackageInfo(context.packageName, 0)
+        return packageInfo.firstInstallTime == packageInfo.lastUpdateTime
     }
 
     override val buildDateTimeMillis: Long
