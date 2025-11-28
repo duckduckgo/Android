@@ -30,6 +30,7 @@
     because the remaining 4dp are added by the omnibar selection animation -->
 
     <ImageView
+        android:id="@+id/findIcon"
         android:layout_width="@dimen/toolbarIcon"
         android:layout_height="@dimen/toolbarIcon"
         android:gravity="center"
