@@ -18,24 +18,40 @@ package com.duckduckgo.common.ui.internal.ui.component.textinput
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.text.Editable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.text.input.rememberTextFieldState
+import androidx.compose.foundation.text.input.selectAll
+import androidx.compose.material3.Button
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
-import com.duckduckgo.common.ui.compose.text.DaxTextField
-import com.duckduckgo.common.ui.compose.text.DaxTextFieldType
-import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
+import com.duckduckgo.common.ui.compose.text.DaxText
+import com.duckduckgo.common.ui.compose.textfield.DaxSecureTextField
+import com.duckduckgo.common.ui.compose.textfield.DaxTextField
+import com.duckduckgo.common.ui.compose.textfield.DaxTextFieldDefaults
+import com.duckduckgo.common.ui.compose.textfield.DaxTextFieldLineLimits
+import com.duckduckgo.common.ui.compose.textfield.DaxTextFieldTrailingIcon
 import com.duckduckgo.common.ui.internal.databinding.ComponentTextInputViewBinding
 import com.duckduckgo.common.ui.internal.ui.appComponentsViewModel
 import com.duckduckgo.common.ui.internal.ui.setupThemedComposeView
 import com.duckduckgo.common.ui.view.text.TextInput.Action
+import com.duckduckgo.common.utils.text.TextChangedWatcher
 import com.duckduckgo.mobile.android.R
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import com.duckduckgo.common.ui.DuckDuckGoTheme as AppTheme
@@ -45,6 +61,8 @@ class ComponentTextInputFragment : Fragment() {
 
     private val appComponentsViewModel by appComponentsViewModel()
     private lateinit var binding: ComponentTextInputViewBinding
+
+    private var textChangedWatcher: TextChangedWatcher? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -73,8 +91,33 @@ class ComponentTextInputFragment : Fragment() {
         binding.outlinedinputtext33.onAction { toastOnClick(it) }
         binding.outlinedinputtext21.error = "This is an error"
 
+        textChangedWatcher = object : TextChangedWatcher() {
+            override fun afterTextChanged(editable: Editable) {
+                binding.outlinedinputtext27.error = if (editable.toString() != "Compose") {
+                    "Text must be 'Compose'"
+                } else {
+                    null
+                }
+            }
+        }.also {
+            binding.outlinedinputtext27.addTextChangedListener(it)
+        }
+        binding.outlinedinputtext28.setSelectAllOnFocus(true)
+
+        binding.button1.setOnClickListener {
+            binding.outlinedinputtext29.requestFocus()
+        }
+
         val isDarkTheme = runBlocking { appComponentsViewModel.themeFlow.first() } == AppTheme.DARK
         setupComposeViews(view, isDarkTheme)
+    }
+
+    override fun onDestroyView() {
+        textChangedWatcher?.let {
+            binding.outlinedinputtext27.removeTextChangedListener(it)
+        }
+        textChangedWatcher = null
+        super.onDestroyView()
     }
 
     private fun toastOnClick(action: Action) = when (action) {
@@ -84,241 +127,331 @@ class ComponentTextInputFragment : Fragment() {
     }
 
     @Suppress("LongMethod")
-    private fun setupComposeViews(view: View, isDarkTheme: Boolean) {
+    private fun setupComposeViews(
+        view: View,
+        isDarkTheme: Boolean
+    ) {
         // Hint text
         view.setupThemedComposeView(id = com.duckduckgo.common.ui.internal.R.id.compose_text_input_1, isDarkTheme = isDarkTheme) {
-            var text by remember { mutableStateOf("") }
+            val state = rememberTextFieldState()
             DaxTextField(
-                value = text,
-                onValueChange = { text = it },
+                state = state,
                 hint = "Hint text",
             )
         }
 
         // Single line editable text
         view.setupThemedComposeView(id = com.duckduckgo.common.ui.internal.R.id.compose_text_input_3, isDarkTheme = isDarkTheme) {
-            var text by remember {
-                mutableStateOf("This is an editable text! It has a very long text to show how it behaves when the text is too long to fit in a single line.\n\nIt is restricted to a single line.")
-            }
+            val state =
+                rememberTextFieldState("This is an editable text! It has a very long text to show how it behaves when the text is too long to fit in a single line.\n\nIt is restricted to a single line.")
             DaxTextField(
-                value = text,
-                onValueChange = { text = it },
+                state = state,
                 hint = "Single line editable text",
-                inputType = DaxTextFieldType.SingleLine,
-                endIcon = R.drawable.ic_copy_24,
-                endIconContentDescription = "Copy",
-                onEndIconClick = { toastOnClick(Action.PerformEndAction) },
+                lineLimits = DaxTextFieldLineLimits.SingleLine,
             )
         }
 
         // Multi line editable text
         view.setupThemedComposeView(id = com.duckduckgo.common.ui.internal.R.id.compose_text_input_2, isDarkTheme = isDarkTheme) {
-            var text by remember {
-                mutableStateOf("This is an editable text! It has a very long text to show how it behaves when the text is too long to fit in a single line.\n\nIt can include multiline text.")
-            }
+            val state =
+                rememberTextFieldState("This is an editable text! It has a very long text to show how it behaves when the text is too long to fit in a single line.\n\nIt can include multiline text.")
             DaxTextField(
-                value = text,
-                onValueChange = { text = it },
+                state = state,
                 hint = "Multi line editable text",
-                inputType = DaxTextFieldType.MultiLine,
-                endIcon = R.drawable.ic_copy_24,
-                endIconContentDescription = "Copy",
-                onEndIconClick = { toastOnClick(Action.PerformEndAction) },
+                lineLimits = DaxTextFieldLineLimits.MultiLine,
             )
         }
 
         // Form mode editable text
         view.setupThemedComposeView(id = com.duckduckgo.common.ui.internal.R.id.compose_text_input_40, isDarkTheme = isDarkTheme) {
-            var text by remember {
-                mutableStateOf("This is an editable text! It has a very long text to show how it behaves when the text is too long to fit in a single line.\n\nIt can include multiline text. Form mode is 3 lines minimum")
-            }
+            val state =
+                rememberTextFieldState("This is an editable text! It has a very long text to show how it behaves when the text is too long to fit in a single line.\n\nIt can include multiline text. Form mode is 3 lines minimum")
             DaxTextField(
-                value = text,
-                onValueChange = { text = it },
+                state = state,
                 hint = "Form mode editable text",
-                inputType = DaxTextFieldType.FormMode,
-                endIcon = R.drawable.ic_copy_24,
-                endIconContentDescription = "Copy",
-                onEndIconClick = { toastOnClick(Action.PerformEndAction) },
+                lineLimits = DaxTextFieldLineLimits.Form,
             )
         }
 
         // Non-editable text full click listener with end icon
         view.setupThemedComposeView(id = com.duckduckgo.common.ui.internal.R.id.compose_text_input_30, isDarkTheme = isDarkTheme) {
-            val text = remember { "Non-editable text full click listener with end icon." }
+            val state = rememberTextFieldState("Non-editable text full click listener with end icon.")
             DaxTextField(
-                value = text,
-                onValueChange = {},
+                state = state,
+                onClick = { toastOnClick(Action.PerformEndAction) },
                 hint = "Non-editable text full click listener with end icon",
-                inputType = DaxTextFieldType.SingleLine,
+                trailingIcon = DaxTextFieldTrailingIcon(
+                    iconResId = R.drawable.ic_copy_24,
+                    contentDescription = "Copy",
+                ),
+                editable = false,
                 clickable = true,
-                endIcon = R.drawable.ic_copy_24,
-                endIconContentDescription = "Copy",
-                onEndIconClick = { toastOnClick(Action.PerformEndAction) },
+                lineLimits = DaxTextFieldLineLimits.SingleLine,
             )
         }
 
         // Non-editable text full click listener
         view.setupThemedComposeView(id = com.duckduckgo.common.ui.internal.R.id.compose_text_input_31, isDarkTheme = isDarkTheme) {
-            val text = remember { "Non-editable text full click listener." }
+            val state = rememberTextFieldState("Non-editable text full click listener.")
             DaxTextField(
-                value = text,
-                onValueChange = {},
+                state = state,
+                onClick = { toastOnClick(Action.PerformEndAction) },
                 hint = "Non-editable text full click listener",
-                inputType = DaxTextFieldType.SingleLine,
                 clickable = true,
-                onEndIconClick = { toastOnClick(Action.PerformEndAction) },
+                editable = false,
+                lineLimits = DaxTextFieldLineLimits.SingleLine,
             )
         }
 
         // Non-editable text with line truncation and end icon
         view.setupThemedComposeView(id = com.duckduckgo.common.ui.internal.R.id.compose_text_input_32, isDarkTheme = isDarkTheme) {
-            val text = remember { "Non-editable text with line truncation and end icon. It has a very long text to show how it behaves when the text is too long to fit in a single line." }
+            val state =
+                rememberTextFieldState("Non-editable text with line truncation and end icon. It has a very long text to show how it behaves when the text is too long to fit in a single line.")
             DaxTextField(
-                value = text,
-                onValueChange = {},
+                state = state,
                 hint = "Non-editable text with line truncation and end icon",
-                isEditable = false,
-                inputType = DaxTextFieldType.SingleLine,
-                endIcon = R.drawable.ic_copy_24,
-                endIconContentDescription = "Copy",
-                onEndIconClick = { toastOnClick(Action.PerformEndAction) },
+                trailingIcon = DaxTextFieldTrailingIcon(
+                    iconResId = R.drawable.ic_copy_24,
+                    contentDescription = "Copy",
+                ),
+                onClick = { toastOnClick(Action.PerformEndAction) },
+                editable = false,
+                lineLimits = DaxTextFieldLineLimits.SingleLine,
             )
         }
 
         // Non-editable text with line truncation
         view.setupThemedComposeView(id = com.duckduckgo.common.ui.internal.R.id.compose_text_input_33, isDarkTheme = isDarkTheme) {
-            val text = remember { "Non-editable text with line truncation. It has a very long text to show how it behaves when the text is too long to fit in a single line." }
+            val state =
+                rememberTextFieldState("Non-editable text with line truncation. It has a very long text to show how it behaves when the text is too long to fit in a single line.")
             DaxTextField(
-                value = text,
-                onValueChange = {},
+                state = state,
                 hint = "Non-editable text with line truncation",
-                isEditable = false,
-                inputType = DaxTextFieldType.SingleLine,
-                onEndIconClick = { toastOnClick(Action.PerformEndAction) },
+                onClick = { toastOnClick(Action.PerformEndAction) },
+                editable = false,
+                lineLimits = DaxTextFieldLineLimits.SingleLine,
             )
         }
 
         // Non-editable text with end icon
         view.setupThemedComposeView(id = com.duckduckgo.common.ui.internal.R.id.compose_text_input_4, isDarkTheme = isDarkTheme) {
-            val text = remember { "This is not editable." }
+            val state = rememberTextFieldState("This is not editable.")
             DaxTextField(
-                value = text,
-                onValueChange = {},
+                state = state,
                 hint = "Non-editable text with end icon",
-                isEditable = false,
-                endIcon = R.drawable.ic_copy_24,
-                endIconContentDescription = "Copy",
-                onEndIconClick = { toastOnClick(Action.PerformEndAction) },
+                trailingIcon = DaxTextFieldTrailingIcon(
+                    iconResId = R.drawable.ic_copy_24,
+                    contentDescription = "Copy",
+                ),
+                onClick = { toastOnClick(Action.PerformEndAction) },
+                editable = false,
+                lineLimits = DaxTextFieldLineLimits.SingleLine,
             )
         }
 
         // Non-editable text without end icon
         view.setupThemedComposeView(id = com.duckduckgo.common.ui.internal.R.id.compose_text_input_5, isDarkTheme = isDarkTheme) {
-            val text = remember { "This is not editable and has no icon. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua." }
+            val state =
+                rememberTextFieldState("This is not editable and has no icon. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.")
             DaxTextField(
-                value = text,
-                onValueChange = {},
+                state = state,
                 hint = "Non-editable text without end icon",
-                isEditable = false,
+                editable = false,
             )
         }
 
         // Editable password that fits in one line
         view.setupThemedComposeView(id = com.duckduckgo.common.ui.internal.R.id.compose_text_input_6, isDarkTheme = isDarkTheme) {
-            var text by remember { mutableStateOf("Loremipsumolor") }
-            DaxTextField(
-                value = text,
-                onValueChange = { text = it },
+            val state = rememberTextFieldState("Loremipsumolor")
+            DaxSecureTextField(
+                state = state,
                 hint = "Editable password that fits in one line",
-                inputType = DaxTextFieldType.Password,
-                onEndIconClick = { toastOnClick(Action.PerformEndAction) },
             )
         }
 
         // Editable password that doesn't fit in one line
         view.setupThemedComposeView(id = com.duckduckgo.common.ui.internal.R.id.compose_text_input_9, isDarkTheme = isDarkTheme) {
-            var text by remember { mutableStateOf("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore.") }
-            DaxTextField(
-                value = text,
-                onValueChange = { text = it },
+            val state = rememberTextFieldState("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore.")
+            DaxSecureTextField(
+                state = state,
                 hint = "Editable password that doesn't fit in one line",
-                inputType = DaxTextFieldType.Password,
             )
         }
 
         // Non-editable password
         view.setupThemedComposeView(id = com.duckduckgo.common.ui.internal.R.id.compose_text_input_8, isDarkTheme = isDarkTheme) {
-            val text = remember { "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore." }
-            DaxTextField(
-                value = text,
-                onValueChange = {},
+            val state = rememberTextFieldState("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore.")
+            DaxSecureTextField(
+                state = state,
                 hint = "Non-editable password",
-                isEditable = false,
-                inputType = DaxTextFieldType.Password,
-                onEndIconClick = { toastOnClick(Action.PerformEndAction) },
+                editable = false,
             )
         }
 
         // Non-editable password with icon
         view.setupThemedComposeView(id = com.duckduckgo.common.ui.internal.R.id.compose_text_input_20, isDarkTheme = isDarkTheme) {
-            val text = remember { "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore." }
-            DaxTextField(
-                value = text,
-                onValueChange = {},
+            val state = rememberTextFieldState("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore.")
+            DaxSecureTextField(
+                state = state,
                 hint = "Non-editable password with icon",
-                isEditable = false,
-                inputType = DaxTextFieldType.Password,
-                endIcon = R.drawable.ic_copy_24,
-                endIconContentDescription = "Copy",
-                onEndIconClick = { toastOnClick(Action.PerformEndAction) },
+                trailingIcon = DaxTextFieldTrailingIcon(
+                    iconResId = R.drawable.ic_copy_24,
+                    contentDescription = "Copy",
+                ),
+                editable = false,
             )
         }
 
         // Error
         view.setupThemedComposeView(id = com.duckduckgo.common.ui.internal.R.id.compose_text_input_21, isDarkTheme = isDarkTheme) {
-            var text by remember { mutableStateOf("This is an error") }
+            val state = rememberTextFieldState("This is an error")
             DaxTextField(
-                value = text,
-                onValueChange = { text = it },
+                state = state,
                 hint = "Error",
                 error = "This is an error",
+                lineLimits = DaxTextFieldLineLimits.SingleLine,
             )
         }
 
         // Disabled text input
         view.setupThemedComposeView(id = com.duckduckgo.common.ui.internal.R.id.compose_text_input_22, isDarkTheme = isDarkTheme) {
-            val text = remember { "This input is disabled" }
+            val state = rememberTextFieldState("This input is disabled")
             DaxTextField(
-                value = text,
-                onValueChange = {},
+                state = state,
                 hint = "Disabled text input",
                 enabled = false,
+                lineLimits = DaxTextFieldLineLimits.SingleLine,
             )
         }
 
         // Disabled multi line input
         view.setupThemedComposeView(id = com.duckduckgo.common.ui.internal.R.id.compose_text_input_23, isDarkTheme = isDarkTheme) {
-            val text = remember { "This input is disabled" }
+            val state = rememberTextFieldState("This input is disabled")
             DaxTextField(
-                value = text,
-                onValueChange = {},
+                state = state,
                 hint = "Disabled multi line input",
                 enabled = false,
-                inputType = DaxTextFieldType.MultiLine,
+                lineLimits = DaxTextFieldLineLimits.MultiLine,
             )
         }
 
         // Disabled password
         view.setupThemedComposeView(id = com.duckduckgo.common.ui.internal.R.id.compose_text_input_24, isDarkTheme = isDarkTheme) {
-            val text = remember { "This password input is disabled" }
-            DaxTextField(
-                value = text,
-                onValueChange = {},
+            val state = rememberTextFieldState("This password input is disabled")
+            DaxSecureTextField(
+                state = state,
                 hint = "Disabled password",
                 enabled = false,
-                inputType = DaxTextFieldType.Password,
             )
+        }
+
+        // IP Address
+        view.setupThemedComposeView(id = com.duckduckgo.common.ui.internal.R.id.compose_text_input_25, isDarkTheme = isDarkTheme) {
+            val state = rememberTextFieldState("192.168.1.1")
+            DaxTextField(
+                state = state,
+                hint = "IP Address",
+                keyboardOptions = DaxTextFieldDefaults.IpAddressKeyboardOptions,
+                inputTransformation = DaxTextFieldDefaults.IpAddressInputTransformation(),
+                lineLimits = DaxTextFieldLineLimits.SingleLine,
+            )
+        }
+
+        // URL
+        view.setupThemedComposeView(id = com.duckduckgo.common.ui.internal.R.id.compose_text_input_26, isDarkTheme = isDarkTheme) {
+            val state = rememberTextFieldState("https://www.duckduckgo.com")
+            DaxTextField(
+                state = state,
+                hint = "URL",
+                keyboardOptions = DaxTextFieldDefaults.UrlKeyboardOptions,
+                lineLimits = DaxTextFieldLineLimits.SingleLine,
+            )
+        }
+
+        // Observable text - option 1
+        view.setupThemedComposeView(id = com.duckduckgo.common.ui.internal.R.id.compose_text_input_27a, isDarkTheme = isDarkTheme) {
+            val state = rememberTextFieldState("")
+
+            DaxTextField(
+                state = state,
+                hint = "Observable text - option 1",
+                error = if (state.text.isNotEmpty() && state.text != "Compose") {
+                    "Text must be 'Compose'"
+                } else {
+                    null
+                },
+                lineLimits = DaxTextFieldLineLimits.SingleLine,
+            )
+        }
+
+        // Observable text - option 2
+        view.setupThemedComposeView(id = com.duckduckgo.common.ui.internal.R.id.compose_text_input_27b, isDarkTheme = isDarkTheme) {
+            val state = rememberTextFieldState("")
+            var error by remember { mutableStateOf<String?>(null) }
+
+            // provides a way to observe text changes as recommended by
+            // https://developer.android.com/develop/ui/compose/text/migrate-state-based#conforming-approach
+            LaunchedEffect(state) {
+                snapshotFlow { state.text.toString() }.collectLatest {
+                    // can call a view model function here with the new text value
+                    // for demo purposes, we'll show an error
+                    error = if (it.isNotEmpty() && it != "Compose") {
+                        "Text must be 'Compose'"
+                    } else {
+                        null
+                    }
+                }
+            }
+
+            DaxTextField(
+                state = state,
+                hint = "Observable text - option 2",
+                error = error,
+                lineLimits = DaxTextFieldLineLimits.SingleLine,
+            )
+        }
+
+        // Autoselect text on focus
+        view.setupThemedComposeView(id = com.duckduckgo.common.ui.internal.R.id.compose_text_input_28, isDarkTheme = isDarkTheme) {
+            val state = rememberTextFieldState("Tap to focus and select all text")
+
+            var isFocused by remember { mutableStateOf(false) }
+            LaunchedEffect(isFocused) {
+                if (isFocused) {
+                    state.edit {
+                        selectAll()
+                    }
+                }
+            }
+
+            DaxTextField(
+                state = state,
+                hint = "Autoselect text on focus",
+                onFocusChanged = {
+                    isFocused = it
+                },
+                lineLimits = DaxTextFieldLineLimits.SingleLine,
+            )
+        }
+
+        // Focus programmatically
+        view.setupThemedComposeView(id = com.duckduckgo.common.ui.internal.R.id.compose_text_input_29, isDarkTheme = isDarkTheme) {
+            val focusRequester = remember { FocusRequester() }
+            val state = rememberTextFieldState("")
+
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Button(onClick = { focusRequester.requestFocus() }) {
+                    DaxText(text = "Click to focus the input below")
+                }
+
+                DaxTextField(
+                    state = state,
+                    hint = "Programmatically focusable text input",
+                    modifier = Modifier.focusRequester(focusRequester),
+                    lineLimits = DaxTextFieldLineLimits.SingleLine,
+                )
+            }
+
         }
     }
 }

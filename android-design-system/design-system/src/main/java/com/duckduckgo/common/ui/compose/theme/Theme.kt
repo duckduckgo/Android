@@ -96,6 +96,7 @@ fun DuckDuckGoTheme(
             logoTitle = Gray85,
             omnibarHighlight = colorResource(R.color.blue50_20),
         ),
+        iconPrimary = Black84,
         isDark = false,
     )
 
@@ -123,6 +124,7 @@ fun DuckDuckGoTheme(
             logoTitle = White,
             omnibarHighlight = colorResource(R.color.blue30_20),
         ),
+        iconPrimary = White78,
         isDark = true,
     )
 
