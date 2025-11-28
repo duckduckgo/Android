@@ -65,9 +65,4 @@
 
     <!-- ADS -->
     <string name="ads_demo_activity_title" translatable="false">Android Design System Demo</string>
-
-    <!-- Input Screen Onboarding step -->
-    <string name="preOnboardingInputScreenTitle">Want easy access to private AI chat?</string>
-    <string name="preOnboardingInputScreenButton">Next</string>
-    <string name="preOnboardingInputScreenDescription"><![CDATA[AI features are private and optional. You can make changes in <b>Settings > AI Features</b>.]]></string>
 </resources>

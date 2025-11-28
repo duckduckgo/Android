@@ -828,6 +828,11 @@
     <!-- Bubble BB & Buck experiment-->
     <string name="onboardingBubbleExperimentSearchDaxDialogDescription">Le tue ricerche su DuckDuckGo sono sempre anonime.</string>
 
+    <!-- Input Screen Onboarding step -->
+    <string name="preOnboardingInputScreenTitle">Vuoi un accesso facile alla chat AI privata?</string>
+    <string name="preOnboardingInputScreenButton">Successivo</string>
+    <string name="preOnboardingInputScreenDescription"><![CDATA[Le funzionalità AI sono private e opzionali. Puoi effettuare modifiche in <b>Impostazioni > Funzionalità AI</b>.]]></string>
+
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Barra degli indirizzi</string>
     <string name="settingsAddressBarPositionHeaderTitle">Posizione Barra degli indirizzi</string>
