@@ -45,10 +45,14 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.PreviewFontScale
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import com.duckduckgo.common.ui.compose.text.DaxText
 import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
 import com.duckduckgo.common.ui.compose.theme.Transparent
 import com.duckduckgo.common.ui.compose.theme.asTextStyle
+import com.duckduckgo.common.ui.compose.tools.PreviewBox
+import com.duckduckgo.mobile.android.R
 
 /**
  * Base text field component for the DuckDuckGo design system that allows user input.
@@ -316,3 +320,243 @@ internal fun daxTextFieldColors(): TextFieldColors = OutlinedTextFieldDefaults.c
     disabledPlaceholderColor = DuckDuckGoTheme.colors.text.secondary,
     errorPlaceholderColor = DuckDuckGoTheme.colors.text.secondary,
 )
+
+@PreviewLightDark
+@Composable
+private fun DaxTextFieldEmptyPreview() {
+    DaxTextFieldPreviewBox {
+        DaxTextField(
+            state = TextFieldState(),
+            hint = "Enter text",
+        )
+    }
+}
+
+@PreviewFontScale
+@PreviewLightDark
+@Composable
+private fun DaxTextFieldWithTextPreview() {
+    DaxTextFieldPreviewBox {
+        DaxTextField(
+            state = TextFieldState(initialText = "Sample text content"),
+            hint = "Enter text",
+        )
+    }
+}
+
+@PreviewLightDark
+@Composable
+private fun DaxTextFieldNoHintPreview() {
+    DaxTextFieldPreviewBox {
+        DaxTextField(
+            state = TextFieldState(initialText = "Text without hint"),
+        )
+    }
+}
+
+@PreviewLightDark
+@Composable
+private fun DaxTextFieldSingleLinePreview() {
+    DaxTextFieldPreviewBox {
+        DaxTextField(
+            state = TextFieldState(initialText = "Single line text field"),
+            hint = "Enter single line",
+            lineLimits = DaxTextFieldLineLimits.SingleLine,
+        )
+    }
+}
+
+@PreviewLightDark
+@Composable
+private fun DaxTextFieldMultiLinePreview() {
+    DaxTextFieldPreviewBox {
+        DaxTextField(
+            state = TextFieldState(initialText = "Multi line text field\nwith multiple lines\nof content"),
+            hint = "Enter multiple lines",
+            lineLimits = DaxTextFieldLineLimits.MultiLine,
+        )
+    }
+}
+
+@PreviewLightDark
+@Composable
+private fun DaxTextFieldFormPreview() {
+    DaxTextFieldPreviewBox {
+        DaxTextField(
+            state = TextFieldState(initialText = "Form text field\ntakes minimum 3 lines"),
+            hint = "Enter form content",
+            lineLimits = DaxTextFieldLineLimits.Form,
+        )
+    }
+}
+
+@PreviewLightDark
+@Composable
+private fun DaxTextFieldEnabledPreview() {
+    DaxTextFieldPreviewBox {
+        DaxTextField(
+            state = TextFieldState(initialText = "Enabled text field"),
+            hint = "Enter text",
+            enabled = true,
+        )
+    }
+}
+
+@PreviewLightDark
+@Composable
+private fun DaxTextFieldDisabledPreview() {
+    DaxTextFieldPreviewBox {
+        DaxTextField(
+            state = TextFieldState(initialText = "Disabled text field"),
+            hint = "Enter text",
+            enabled = false,
+        )
+    }
+}
+
+@PreviewLightDark
+@Composable
+private fun DaxTextFieldEditablePreview() {
+    DaxTextFieldPreviewBox {
+        DaxTextField(
+            state = TextFieldState(initialText = "Editable text field"),
+            hint = "Enter text",
+            editable = true,
+        )
+    }
+}
+
+@PreviewLightDark
+@Composable
+private fun DaxTextFieldNonEditablePreview() {
+    DaxTextFieldPreviewBox {
+        DaxTextField(
+            state = TextFieldState(initialText = "Non-editable text field"),
+            hint = "Read only",
+            editable = false,
+        )
+    }
+}
+
+@PreviewLightDark
+@Composable
+private fun DaxTextFieldClickablePreview() {
+    DaxTextFieldPreviewBox {
+        DaxTextField(
+            state = TextFieldState(initialText = "Clickable text field"),
+            hint = "Click to interact",
+            clickable = true,
+            onClick = {},
+        )
+    }
+}
+
+@PreviewLightDark
+@Composable
+private fun DaxTextFieldNonClickablePreview() {
+    DaxTextFieldPreviewBox {
+        DaxTextField(
+            state = TextFieldState(initialText = "Non-clickable text field"),
+            hint = "Enter text",
+            clickable = false,
+        )
+    }
+}
+
+@PreviewLightDark
+@Composable
+private fun DaxTextFieldWithErrorPreview() {
+    DaxTextFieldPreviewBox {
+        DaxTextField(
+            state = TextFieldState(initialText = "Invalid input"),
+            hint = "Enter text",
+            error = "This field contains an error",
+        )
+    }
+}
+
+@PreviewLightDark
+@Composable
+private fun DaxTextFieldWithTrailingIconPreview() {
+    DaxTextFieldPreviewBox {
+        DaxTextField(
+            state = TextFieldState(initialText = "Text with icon"),
+            hint = "Enter text",
+            trailingIcon = DaxTextFieldTrailingIcon(
+                iconResId = R.drawable.ic_copy_24,
+                contentDescription = "Copy",
+            ),
+            onClick = {},
+        )
+    }
+}
+
+@PreviewLightDark
+@Composable
+private fun DaxTextFieldEmptyWithTrailingIconPreview() {
+    DaxTextFieldPreviewBox {
+        DaxTextField(
+            state = TextFieldState(),
+            hint = "Enter text",
+            trailingIcon = DaxTextFieldTrailingIcon(
+                iconResId = R.drawable.ic_copy_24,
+                contentDescription = "Copy",
+            ),
+            onClick = {},
+        )
+    }
+}
+
+@PreviewLightDark
+@Composable
+private fun DaxTextFieldErrorWithTrailingIconPreview() {
+    DaxTextFieldPreviewBox {
+        DaxTextField(
+            state = TextFieldState(initialText = "Invalid input"),
+            hint = "Enter text",
+            error = "Enter at least 3 characters",
+            trailingIcon = DaxTextFieldTrailingIcon(
+                iconResId = R.drawable.ic_copy_24,
+                contentDescription = "Copy",
+            ),
+            onClick = {},
+        )
+    }
+}
+
+@PreviewLightDark
+@Composable
+private fun DaxTextFieldDisabledWithTextPreview() {
+    DaxTextFieldPreviewBox {
+        DaxTextField(
+            state = TextFieldState(initialText = "Disabled with text"),
+            hint = "Enter text",
+            enabled = false,
+        )
+    }
+}
+
+@PreviewLightDark
+@Composable
+private fun DaxTextFieldNonEditableClickablePreview() {
+    DaxTextFieldPreviewBox {
+        DaxTextField(
+            state = TextFieldState(initialText = "Read-only but clickable"),
+            hint = "Click to select",
+            editable = false,
+            clickable = true,
+            onClick = {},
+        )
+    }
+}
+
+@Composable
+private fun DaxTextFieldPreviewBox(
+    content: @Composable () -> Unit,
+) {
+    DuckDuckGoTheme {
+        PreviewBox(backgroundColor = DuckDuckGoTheme.colors.background) {
+            content()
+        }
+    }
+}
