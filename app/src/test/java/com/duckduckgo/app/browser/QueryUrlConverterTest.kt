@@ -77,6 +77,7 @@ class QueryUrlConverterTest {
     fun setup() {
         whenever(variantManager.getVariantKey()).thenReturn("")
         whenever(duckChat.isEnabled()).thenReturn(true)
+        whenever(queryUrlPredictor.isReady()).thenReturn(true)
         androidBrowserConfigFeature.hideDuckAiInSerpKillSwitch().setRawStoredState(State(true))
     }
 
@@ -453,6 +454,20 @@ class QueryUrlConverterTest {
         val result = testee.convertQueryToUrl(input, queryOrigin = QueryOrigin.FromUser, extractUrlFromQuery = false)
         assertDuckDuckGoSearchQuery(expected, result)
         verify(queryUrlPredictor).classify("foo")
+    }
+
+    @Test
+    fun `when url predictor is not ready and config enabled then url predictor not used`() {
+        val testee = createTestee(useUrlPredictorEnabled = false)
+        whenever(queryUrlPredictor.classify("foo")).thenReturn(Decision.Search("foo"))
+        whenever(queryUrlPredictor.isReady()).thenReturn(false)
+        androidBrowserConfigFeature.useUrlPredictor().setRawStoredState(State(true))
+        testee.onPrivacyConfigDownloaded()
+        val input = "foo"
+        val expected = "foo"
+        val result = testee.convertQueryToUrl(input, queryOrigin = QueryOrigin.FromUser, extractUrlFromQuery = false)
+        assertDuckDuckGoSearchQuery(expected, result)
+        verify(queryUrlPredictor, never()).classify("foo")
     }
 
     @Test
