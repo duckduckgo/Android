@@ -107,6 +107,7 @@
                         android:id="@+id/duckAiInputScreenToggleWithoutAiImage"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:adjustViewBounds="true"
                         android:scaleType="fitXY"
                         android:foreground="@drawable/selectable_large_rounded_ripple"
                         android:src="@drawable/searchbox_withoutai_active" />
@@ -147,6 +148,7 @@
                         android:id="@+id/duckAiInputScreenToggleWithAiImage"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:adjustViewBounds="true"
                         android:scaleType="fitXY"
                         android:foreground="@drawable/selectable_large_rounded_ripple"
                         android:src="@drawable/searchbox_withai_inactive" />

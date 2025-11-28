@@ -76,11 +76,6 @@ interface DuckChatInternal : DuckChat {
     suspend fun setEnableDuckChatUserSetting(enabled: Boolean)
 
     /**
-     * Set user setting to determine whether dedicated Duck.ai input screen with a mode switch should be used.
-     */
-    suspend fun setInputScreenUserSetting(enabled: Boolean)
-
-    /**
      * Set user setting to determine whether DuckChat should be shown in browser menu.
      */
     suspend fun setShowInBrowserMenuUserSetting(showDuckChat: Boolean)
@@ -104,11 +99,6 @@ interface DuckChatInternal : DuckChat {
      * Observes whether DuckChat is user enabled or disabled.
      */
     fun observeEnableDuckChatUserSetting(): Flow<Boolean>
-
-    /**
-     * Observes whether Duck.ai input screen with a mode switch is enabled or disabled.
-     */
-    fun observeInputScreenUserSettingEnabled(): Flow<Boolean>
 
     /**
      * Observes whether DuckChat should be shown in browser menu based on user settings only.
