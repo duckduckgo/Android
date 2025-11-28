@@ -53,6 +53,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.duckchat.impl.inputscreen.wideevents.InputScreenOnboardingWideEvent
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.test.runTest
@@ -79,6 +80,7 @@ class WelcomePageViewModelTest {
     private val mockAndroidBrowserConfigFeature: AndroidBrowserConfigFeature = FakeFeatureToggleFactory.create(
         AndroidBrowserConfigFeature::class.java,
     )
+    private val mockInputScreenOnboardingWideEvent: InputScreenOnboardingWideEvent = mock()
 
     private fun createViewModel(): WelcomePageViewModel {
         return WelcomePageViewModel(
@@ -92,6 +94,7 @@ class WelcomePageViewModelTest {
             mockOnboardingDesignExperimentManager,
             mockOnboardingStore,
             mockAndroidBrowserConfigFeature,
+            mockInputScreenOnboardingWideEvent,
         )
     }
 
@@ -107,6 +110,7 @@ class WelcomePageViewModelTest {
             mockOnboardingDesignExperimentManager,
             mockOnboardingStore,
             mockAndroidBrowserConfigFeature,
+            mockInputScreenOnboardingWideEvent,
         )
     }
 
