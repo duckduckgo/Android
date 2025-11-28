@@ -129,7 +129,7 @@ class ComponentTextInputFragment : Fragment() {
     @Suppress("LongMethod")
     private fun setupComposeViews(
         view: View,
-        isDarkTheme: Boolean
+        isDarkTheme: Boolean,
     ) {
         // Hint text
         view.setupThemedComposeView(id = com.duckduckgo.common.ui.internal.R.id.compose_text_input_1, isDarkTheme = isDarkTheme) {
@@ -143,7 +143,10 @@ class ComponentTextInputFragment : Fragment() {
         // Single line editable text
         view.setupThemedComposeView(id = com.duckduckgo.common.ui.internal.R.id.compose_text_input_3, isDarkTheme = isDarkTheme) {
             val state =
-                rememberTextFieldState("This is an editable text! It has a very long text to show how it behaves when the text is too long to fit in a single line.\n\nIt is restricted to a single line.")
+                rememberTextFieldState(
+                    "This is an editable text! It has a very long text to show how it behaves when " +
+                        "the text is too long to fit in a single line.\n\nIt is restricted to a single line.",
+                )
             DaxTextField(
                 state = state,
                 hint = "Single line editable text",
@@ -154,7 +157,10 @@ class ComponentTextInputFragment : Fragment() {
         // Multi line editable text
         view.setupThemedComposeView(id = com.duckduckgo.common.ui.internal.R.id.compose_text_input_2, isDarkTheme = isDarkTheme) {
             val state =
-                rememberTextFieldState("This is an editable text! It has a very long text to show how it behaves when the text is too long to fit in a single line.\n\nIt can include multiline text.")
+                rememberTextFieldState(
+                    "This is an editable text! It has a very long text to show how it behaves when " +
+                        "the text is too long to fit in a single line.\n\nIt can include multiline text.",
+                )
             DaxTextField(
                 state = state,
                 hint = "Multi line editable text",
@@ -165,7 +171,10 @@ class ComponentTextInputFragment : Fragment() {
         // Form mode editable text
         view.setupThemedComposeView(id = com.duckduckgo.common.ui.internal.R.id.compose_text_input_40, isDarkTheme = isDarkTheme) {
             val state =
-                rememberTextFieldState("This is an editable text! It has a very long text to show how it behaves when the text is too long to fit in a single line.\n\nIt can include multiline text. Form mode is 3 lines minimum")
+                rememberTextFieldState(
+                    "This is an editable text! It has a very long text to show how it behaves when " +
+                        "the text is too long to fit in a single line.\n\nIt can include multiline text. Form mode is 3 lines minimum",
+                )
             DaxTextField(
                 state = state,
                 hint = "Form mode editable text",
@@ -206,7 +215,10 @@ class ComponentTextInputFragment : Fragment() {
         // Non-editable text with line truncation and end icon
         view.setupThemedComposeView(id = com.duckduckgo.common.ui.internal.R.id.compose_text_input_32, isDarkTheme = isDarkTheme) {
             val state =
-                rememberTextFieldState("Non-editable text with line truncation and end icon. It has a very long text to show how it behaves when the text is too long to fit in a single line.")
+                rememberTextFieldState(
+                    "Non-editable text with line truncation and end icon. It has a very long text to " +
+                        "show how it behaves when the text is too long to fit in a single line.",
+                )
             DaxTextField(
                 state = state,
                 hint = "Non-editable text with line truncation and end icon",
@@ -223,7 +235,10 @@ class ComponentTextInputFragment : Fragment() {
         // Non-editable text with line truncation
         view.setupThemedComposeView(id = com.duckduckgo.common.ui.internal.R.id.compose_text_input_33, isDarkTheme = isDarkTheme) {
             val state =
-                rememberTextFieldState("Non-editable text with line truncation. It has a very long text to show how it behaves when the text is too long to fit in a single line.")
+                rememberTextFieldState(
+                    "Non-editable text with line truncation. It has a very long text to show how it " +
+                        "behaves when the text is too long to fit in a single line.",
+                )
             DaxTextField(
                 state = state,
                 hint = "Non-editable text with line truncation",
@@ -252,7 +267,10 @@ class ComponentTextInputFragment : Fragment() {
         // Non-editable text without end icon
         view.setupThemedComposeView(id = com.duckduckgo.common.ui.internal.R.id.compose_text_input_5, isDarkTheme = isDarkTheme) {
             val state =
-                rememberTextFieldState("This is not editable and has no icon. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.")
+                rememberTextFieldState(
+                    "This is not editable and has no icon. Lorem ipsum dolor sit amet, consectetur " +
+                        "adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+                )
             DaxTextField(
                 state = state,
                 hint = "Non-editable text without end icon",
@@ -271,7 +289,10 @@ class ComponentTextInputFragment : Fragment() {
 
         // Editable password that doesn't fit in one line
         view.setupThemedComposeView(id = com.duckduckgo.common.ui.internal.R.id.compose_text_input_9, isDarkTheme = isDarkTheme) {
-            val state = rememberTextFieldState("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore.")
+            val state = rememberTextFieldState(
+                "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do " +
+                    "eiusmod tempor incididunt ut labore.",
+            )
             DaxSecureTextField(
                 state = state,
                 hint = "Editable password that doesn't fit in one line",
@@ -280,7 +301,10 @@ class ComponentTextInputFragment : Fragment() {
 
         // Non-editable password
         view.setupThemedComposeView(id = com.duckduckgo.common.ui.internal.R.id.compose_text_input_8, isDarkTheme = isDarkTheme) {
-            val state = rememberTextFieldState("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore.")
+            val state = rememberTextFieldState(
+                "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do " +
+                    "eiusmod tempor incididunt ut labore.",
+            )
             DaxSecureTextField(
                 state = state,
                 hint = "Non-editable password",
@@ -290,7 +314,10 @@ class ComponentTextInputFragment : Fragment() {
 
         // Non-editable password with icon
         view.setupThemedComposeView(id = com.duckduckgo.common.ui.internal.R.id.compose_text_input_20, isDarkTheme = isDarkTheme) {
-            val state = rememberTextFieldState("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore.")
+            val state = rememberTextFieldState(
+                "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do " +
+                    "eiusmod tempor incididunt ut labore.",
+            )
             DaxSecureTextField(
                 state = state,
                 hint = "Non-editable password with icon",
@@ -451,7 +478,6 @@ class ComponentTextInputFragment : Fragment() {
                     lineLimits = DaxTextFieldLineLimits.SingleLine,
                 )
             }
-
         }
     }
 }
