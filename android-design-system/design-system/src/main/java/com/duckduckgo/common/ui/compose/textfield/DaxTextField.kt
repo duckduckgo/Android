@@ -221,7 +221,9 @@ enum class DaxTextFieldLineLimits {
     /**
      * The TextField will always take at least 3 lines of height and then expand vertically as needed based on the input.
      */
-    Form;
+    Form,
+
+    ;
 
     /**
      * Converts this [DaxTextFieldLineLimits] to a [TextFieldLineLimits] used by the underlying TextField.
