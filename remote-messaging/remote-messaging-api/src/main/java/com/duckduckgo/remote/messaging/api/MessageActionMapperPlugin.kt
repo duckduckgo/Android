@@ -37,4 +37,5 @@ sealed class JsonActionType(val jsonValue: String) {
     data object SHARE : JsonActionType("share")
     data object NAVIGATION : JsonActionType("navigation")
     data object SURVEY : JsonActionType("survey")
+    data object DEFAULT_CREDENTIAL_PROVIDER : JsonActionType("defaultCredentialProvider")
 }

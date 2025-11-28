@@ -46,6 +46,7 @@ class RealCommandActionMapper @Inject constructor(
                 val queryParams = action.additionalParameters?.get("queryParams")?.split(";") ?: emptyList()
                 NewTabLegacyPageViewModel.Command.SubmitUrl(surveyParameterManager.buildSurveyUrl(action.value, queryParams))
             }
+            is DefaultCredentialProvider -> NewTabLegacyPageViewModel.Command.LaunchDefaultCredentialProvider
         }
     }
 }

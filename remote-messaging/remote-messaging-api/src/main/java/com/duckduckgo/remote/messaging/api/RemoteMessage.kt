@@ -26,6 +26,7 @@ import com.duckduckgo.remote.messaging.api.Content.MessageType.SMALL
 import com.duckduckgo.remote.messaging.api.Content.Placeholder
 import com.duckduckgo.remote.messaging.api.JsonActionType.APP_TP_ONBOARDING
 import com.duckduckgo.remote.messaging.api.JsonActionType.DEFAULT_BROWSER
+import com.duckduckgo.remote.messaging.api.JsonActionType.DEFAULT_CREDENTIAL_PROVIDER
 import com.duckduckgo.remote.messaging.api.JsonActionType.DISMISS
 import com.duckduckgo.remote.messaging.api.JsonActionType.NAVIGATION
 import com.duckduckgo.remote.messaging.api.JsonActionType.PLAYSTORE
@@ -142,6 +143,8 @@ sealed class Action(val actionType: String, open val value: String, open val add
         override val value: String,
         override val additionalParameters: Map<String, String>?,
     ) : Action(JsonActionType.SURVEY.jsonValue, value, additionalParameters)
+
+    data object DefaultCredentialProvider : Action(DEFAULT_CREDENTIAL_PROVIDER.jsonValue, "", null)
 }
 
 data class CardItem(
