@@ -1064,5 +1064,45 @@
         "triggers": ["other"],
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"]
+    },
+    "dbp_data_broker_action-failed_error": {
+        "description": "Fired when a scan or opt-out action fails while processing a data broker.",
+        "owners": ["karlenDimla", "landomen"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "data_broker",
+                "description": "The URL of the data broker that this action was operating on",
+                "type": "string"
+            },
+            {
+                "key": "broker_version",
+                "description": "The version of the broker JSON file",
+                "type": "string"
+            },
+            {
+                "key": "actionID",
+                "description": "The unique identifier of the action that failed",
+                "type": "string"
+            },
+            {
+                "key": "message",
+                "description": "Failure message describing why the action failed",
+                "type": "string"
+            },
+            {
+                "key": "stepType",
+                "description": "Identifies the failing step type (scan or optOut)",
+                "type": "string",
+                "enum": ["scan", "optOut", "unknown"]
+            },
+            {
+                "key": "parent",
+                "description": "The parent data broker of the one this action was operating on",
+                "type": "string"
+            }
+        ]
     }
 }

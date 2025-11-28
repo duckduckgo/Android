@@ -16,42 +16,132 @@
 
 package com.duckduckgo.pir.impl.scripts.models
 
-import com.duckduckgo.pir.impl.scripts.models.PirError.JsError
+import com.duckduckgo.pir.impl.scripts.models.PirError.ActionFailed
+import com.duckduckgo.pir.impl.scripts.models.PirError.CaptchaServiceError
+import com.duckduckgo.pir.impl.scripts.models.PirError.CaptchaServiceMaxAttempts
+import com.duckduckgo.pir.impl.scripts.models.PirError.CaptchaSolutionFailed
+import com.duckduckgo.pir.impl.scripts.models.PirError.ClientError
+import com.duckduckgo.pir.impl.scripts.models.PirError.EmailError
+import com.duckduckgo.pir.impl.scripts.models.PirError.JsError.ActionError
 import com.duckduckgo.pir.impl.scripts.models.PirError.JsError.NoActionFound
 import com.duckduckgo.pir.impl.scripts.models.PirError.JsError.ParsingErrorObjectFailed
-import com.duckduckgo.pir.impl.scripts.models.PirError.JsError.Unknown
+import com.duckduckgo.pir.impl.scripts.models.PirError.UnableToLoadBrokerUrl
+import com.duckduckgo.pir.impl.scripts.models.PirError.Unknown
 
 data class PirScriptError(
     val error: String,
 )
 
 sealed class PirError {
+    data object UnableToLoadBrokerUrl : PirError()
+
+    /**
+     * Unexpected error and unrecoverable error from the js layer.
+     */
     sealed class JsError : PirError() {
         data object NoActionFound : JsError()
         data object ParsingErrorObjectFailed : JsError()
-        data class Unknown(
+        data class ActionError(
             val error: String,
         ) : JsError()
     }
 
+    /**
+     * Action execution resolved to a failure (not an error) for a specific action.
+     */
     data class ActionFailed(
         val actionID: String,
         val message: String,
     ) : PirError()
 
+    /**
+     * Captcha service returned an error.
+     */
     data class CaptchaServiceError(
+        val errorCode: Int,
+        val errorDetails: String,
+        val maxAttemptReached: Boolean = false,
+    ) : PirError()
+
+    /**
+     * Captcha service failed to solve the captcha
+     */
+    data class CaptchaSolutionFailed(
+        val message: String,
+    ) : PirError()
+
+    /**
+     * Captcha service solution check attempts has been maxed.
+     */
+    data object CaptchaServiceMaxAttempts : PirError()
+
+    /**
+     * Email service returned an error.
+     */
+    data class EmailError(
+        val errorCode: Int,
         val error: String,
     ) : PirError()
 
-    data class EmailError(
+    /**
+     * Error originating from the client.
+     */
+    data class ClientError(
+        val message: String,
+    ) : PirError()
+
+    /**
+     * Catch all for any unknown error.
+     */
+    data class Unknown(
         val error: String,
     ) : PirError()
 }
 
-fun JsError.asErrorString(): String {
+fun PirError.getCategory(): String {
     return when (this) {
-        is NoActionFound -> "No action found"
-        is ParsingErrorObjectFailed -> "Error in parsing object"
+        is ActionFailed -> ERROR_CATEGORY_VALIDATION
+        NoActionFound -> ERROR_CATEGORY_VALIDATION
+        ParsingErrorObjectFailed -> ERROR_CATEGORY_VALIDATION
+        is ActionError -> ERROR_CATEGORY_VALIDATION
+        CaptchaServiceMaxAttempts -> ERROR_CATEGORY_VALIDATION
+        is CaptchaSolutionFailed -> ERROR_CATEGORY_VALIDATION
+        is CaptchaServiceError -> mapErrorCode(this.errorCode)
+        is EmailError -> mapErrorCode(this.errorCode)
+        UnableToLoadBrokerUrl -> ERROR_CATEGORY_NETWORK_ERROR
+        is ClientError -> ERROR_CATEGORY_CLIENT
+        is Unknown -> ERROR_CATEGORY_UNCLASSIFIED
+    }
+}
+
+private fun mapErrorCode(errorCode: Int): String {
+    return if (errorCode == 0) {
+        ERROR_CATEGORY_CLIENT
+    } else if (errorCode >= 500) {
+        "$ERROR_CATEGORY_SERVER-$errorCode"
+    } else {
+        "$ERROR_CATEGORY_CLIENT-$errorCode"
+    }
+}
+
+private const val ERROR_CATEGORY_NETWORK_ERROR = "network-error"
+private const val ERROR_CATEGORY_VALIDATION = "validation-error"
+private const val ERROR_CATEGORY_CLIENT = "client-error"
+private const val ERROR_CATEGORY_SERVER = "server-error"
+private const val ERROR_CATEGORY_UNCLASSIFIED = ""
+
+fun PirError.getDetails(): String {
+    return when (this) {
+        UnableToLoadBrokerUrl -> "Unable to load broker url"
+        NoActionFound -> "No action found"
+        ParsingErrorObjectFailed -> "Error in parsing object"
+        CaptchaServiceMaxAttempts -> "Maximum attempts for captcha solution reached"
+        is CaptchaSolutionFailed -> "Failed to solve captcha"
+        is ActionError -> this.error
+        is ActionFailed -> this.message
+        is CaptchaServiceError -> this.errorDetails
+        is EmailError -> this.error
         is Unknown -> this.error
+        is ClientError -> this.message
     }
 }
