@@ -96,6 +96,10 @@ interface SettingsDataStore {
 
     /**
      * Indicates whether the user has manually set their URL display preference.
+     * You shouldn't use `hasUrlPreferenceSet` to check the same thing because we can edit
+     * automatically (e.g. in `UrlDisplayRepository`) the preference without a manual action
+     * from the user.
+     *
      * When true, the user's preference should be preserved even if default behavior changes.
      * When false, the preference may be updated if business rules change (via feature flags).
      */
@@ -103,7 +107,7 @@ interface SettingsDataStore {
     var clearDuckAiData: Boolean
 
     /**
-     * Check if user has explicitly set their URL display preference.
+     * Check if a value has been set to the URL display preference.
      */
     fun hasUrlPreferenceSet(): Boolean
 
