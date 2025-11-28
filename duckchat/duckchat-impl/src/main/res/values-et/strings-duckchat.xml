@@ -78,4 +78,14 @@
     <string name="newAddressBarOptionBottomSheetDialogSearchOnly">Ainult otsi</string>
     <string name="newAddressBarOptionBottomSheetDialogSearchAndDuckAi">Otsi ja Duck.ai</string>
     <string name="newAddressBarOptionBottomSheetDialogHeader">Aadressiriba valik</string>
+
+    <!-- Duck AI SERP Settings Title -->
+    <string name="duckAiSerpSettingsTitle">AI funktsioonid</string>
+
+    <!-- Duck AI Search Section Header -->
+    <string name="duckAiSearchSettingsSectionHeader">Otsing</string>
+
+    <!-- Duck AI Hide Generated Images Settings Option -->
+    <string name="duckAiHideAiGeneratedImagesTitle">Peida AI loodud pildid</string>
+    <string name="duckAiHideAiGeneratedImagesDescription">Eemaldab tehisintellekti loodud pildid pildiotsingu tulemustest</string>
 </resources>

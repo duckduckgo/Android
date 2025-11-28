@@ -19,6 +19,7 @@ package com.duckduckgo.remote.messaging.impl.mappers
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.remote.messaging.api.JsonToMatchingAttributeMapper
 import com.duckduckgo.remote.messaging.api.MessageActionMapperPlugin
+import com.duckduckgo.remote.messaging.api.Surface
 import com.duckduckgo.remote.messaging.impl.models.JsonRemoteMessagingConfig
 import com.duckduckgo.remote.messaging.impl.models.RemoteConfig
 import logcat.LogPriority.INFO
@@ -31,6 +32,10 @@ class RemoteMessagingConfigJsonMapper(
 ) {
     fun map(jsonRemoteMessagingConfig: JsonRemoteMessagingConfig): RemoteConfig {
         val messages = jsonRemoteMessagingConfig.messages.mapToRemoteMessage(appBuildConfig.deviceLocale, actionMappers)
+            // TODO ANA: Remove this mapping once the feature is fully implemented.
+            .mapNotNull { message ->
+                if (message.surfaces.isEmpty() || message.surfaces.contains(Surface.NEW_TAB_PAGE)) message else null
+            }
         logcat(INFO) { "RMF: messages parsed $messages" }
         val rules = jsonRemoteMessagingConfig.rules.mapToMatchingRules(matchingAttributeMappers)
         return RemoteConfig(

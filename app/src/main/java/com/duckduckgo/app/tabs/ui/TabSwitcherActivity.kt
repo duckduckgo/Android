@@ -52,7 +52,6 @@ import com.duckduckgo.app.global.view.FireDialogProvider
 import com.duckduckgo.app.settings.SettingsActivity
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.tabs.TabManagerFeatureFlags
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab
@@ -85,7 +84,6 @@ import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.duckchat.api.DuckChat
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.collectLatest
@@ -125,13 +123,7 @@ class TabSwitcherActivity :
     lateinit var faviconManager: FaviconManager
 
     @Inject
-    lateinit var duckChat: DuckChat
-
-    @Inject
     lateinit var trackerCountAnimator: TrackerCountAnimator
-
-    @Inject
-    lateinit var tabManagerFeatureFlags: TabManagerFeatureFlags
 
     @Inject
     lateinit var fireDialogProvider: FireDialogProvider
@@ -910,6 +902,7 @@ class TabSwitcherActivity :
 
         const val EXTRA_KEY_SELECTED_TAB = "selected"
         const val EXTRA_KEY_DELETED_TAB_IDS = "deletedTabIds"
+        const val EXTRA_KEY_DUCK_AI_URL = "duckAIUrl"
 
         private const val TAB_GRID_COLUMN_WIDTH_DP = 180
         private const val TAB_GRID_MAX_COLUMN_COUNT = 4

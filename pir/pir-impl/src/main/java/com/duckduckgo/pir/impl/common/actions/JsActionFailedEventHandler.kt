@@ -59,13 +59,14 @@ class JsActionFailedEventHandler @Inject constructor(
          * We end the run for the broker.
          */
         val currentBrokerStep = state.brokerStepsToExecute[state.currentBrokerStepIndex]
-        val currentAction = currentBrokerStep.actions[state.currentActionIndex]
+        val brokerName = currentBrokerStep.broker.name
+        val currentAction = currentBrokerStep.step.actions[state.currentActionIndex]
         val error = (event as JsActionFailed).error
 
         if (currentBrokerStep is OptOutStep) {
             pirRunStateHandler.handleState(
                 BrokerOptOutActionFailed(
-                    brokerName = currentBrokerStep.brokerName,
+                    brokerName = brokerName,
                     extractedProfile = currentBrokerStep.profileToOptOut,
                     completionTimeInMillis = currentTimeProvider.currentTimeMillis(),
                     actionType = currentAction.asActionType(),
@@ -76,7 +77,7 @@ class JsActionFailedEventHandler @Inject constructor(
         } else if (currentBrokerStep is EmailConfirmationStep) {
             pirRunStateHandler.handleState(
                 BrokerOptOutActionFailed(
-                    brokerName = currentBrokerStep.brokerName,
+                    brokerName = brokerName,
                     extractedProfile = currentBrokerStep.profileToOptOut,
                     completionTimeInMillis = currentTimeProvider.currentTimeMillis(),
                     actionType = currentAction.asActionType(),
@@ -87,7 +88,7 @@ class JsActionFailedEventHandler @Inject constructor(
         } else {
             pirRunStateHandler.handleState(
                 BrokerScanActionFailed(
-                    brokerName = currentBrokerStep.brokerName,
+                    brokerName = brokerName,
                     actionType = currentAction.asActionType(),
                     actionID = error.actionID,
                     message = error.message,

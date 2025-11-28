@@ -30,6 +30,7 @@ import android.provider.MediaStore
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
+import android.webkit.CookieManager
 import android.webkit.MimeTypeMap
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
@@ -176,6 +177,8 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
     @Inject
     lateinit var browserAndInputScreenTransitionProvider: BrowserAndInputScreenTransitionProvider
 
+    private val cookieManager: CookieManager by lazy { CookieManager.getInstance() }
+
     private var pendingFileDownload: PendingFileDownload? = null
     private val downloadMessagesJob = ConflatedJob()
 
@@ -209,7 +212,11 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
                     view?.requestFocusNodeHref(resultMsg)
                     val newWindowUrl = resultMsg?.data?.getString("url")
                     if (newWindowUrl != null) {
-                        startActivity(browserNav.openInNewTab(requireContext(), newWindowUrl))
+                        if (viewModel.handleOnSameWebView(newWindowUrl)) {
+                            simpleWebview.loadUrl(newWindowUrl)
+                        } else {
+                            startActivity(browserNav.openInNewTab(requireContext(), newWindowUrl))
+                        }
                         return true
                     }
                     return false
@@ -597,17 +604,25 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
     }
 
     fun onBackPressed(): Boolean {
-        if (isVisible) {
-            if (simpleWebview.canGoBack()) {
-                simpleWebview.goBack()
-            } else {
-                hideSoftKeyboard()
-                duckChat.closeDuckChat()
-            }
+        if (!isVisible) return false
+
+        if (!simpleWebview.canGoBack()) {
+            exit()
             return true
-        } else {
-            return false
         }
+
+        val history = simpleWebview.copyBackForwardList()
+        if (viewModel.shouldCloseDuckChat(history)) {
+            exit()
+        } else {
+            simpleWebview.goBack()
+        }
+        return true
+    }
+
+    private fun exit() {
+        hideSoftKeyboard()
+        duckChat.closeDuckChat()
     }
 
     override fun continueDownload(pendingFileDownload: PendingFileDownload) {
@@ -736,7 +751,13 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
     override fun onPause() {
         downloadMessagesJob.cancel()
         simpleWebview.onPause()
+        cookieManager.flush()
         super.onPause()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        cookieManager.flush()
     }
 
     companion object {

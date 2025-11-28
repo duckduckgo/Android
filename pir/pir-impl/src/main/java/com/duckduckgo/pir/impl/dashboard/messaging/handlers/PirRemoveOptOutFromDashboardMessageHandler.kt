@@ -16,6 +16,8 @@
 
 package com.duckduckgo.pir.impl.dashboard.messaging.handlers
 
+import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessageCallback
@@ -23,7 +25,10 @@ import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebMessages
 import com.duckduckgo.pir.impl.dashboard.messaging.model.PirWebMessageRequest
 import com.duckduckgo.pir.impl.dashboard.messaging.model.PirWebMessageResponse
+import com.duckduckgo.pir.impl.scheduling.JobRecordUpdater
 import com.squareup.anvil.annotations.ContributesMultibinding
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import logcat.logcat
 import javax.inject.Inject
 
@@ -34,7 +39,11 @@ import javax.inject.Inject
     scope = ActivityScope::class,
     boundType = PirWebJsMessageHandler::class,
 )
-class PirRemoveOptOutFromDashboardMessageHandler @Inject constructor() : PirWebJsMessageHandler() {
+class PirRemoveOptOutFromDashboardMessageHandler @Inject constructor(
+    private val jobRecordUpdater: JobRecordUpdater,
+    private val dispatcherProvider: DispatcherProvider,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+) : PirWebJsMessageHandler() {
 
     override val message = PirDashboardWebMessages.REMOVE_OPT_OUT_FROM_DASHBOARD
 
@@ -58,12 +67,14 @@ class PirRemoveOptOutFromDashboardMessageHandler @Inject constructor() : PirWebJ
             return
         }
 
-        logcat { "PIR-WEB: PirRemoveOptOutFromDashboardMessageHandler: removing recordId=$recordId" }
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            jobRecordUpdater.markRecordsAsRemovedByUser(extractedProfileId = recordId)
 
-        // TODO: Implement actual removal logic
-        jsMessaging.sendResponse(
-            jsMessage = jsMessage,
-            response = PirWebMessageResponse.DefaultResponse.SUCCESS,
-        )
+            logcat { "PIR-WEB: PirRemoveOptOutFromDashboardMessageHandler: successfully removed recordId=$recordId" }
+            jsMessaging.sendResponse(
+                jsMessage = jsMessage,
+                response = PirWebMessageResponse.DefaultResponse.SUCCESS,
+            )
+        }
     }
 }

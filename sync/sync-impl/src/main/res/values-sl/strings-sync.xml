@@ -208,4 +208,8 @@
 
     <string name="deep_link_auth_prompt_title">Nastavitev funkcije Sync &amp; Backup</string>
     <string name="deep_link_auth_prompt_message">Odklenite napravo, da nastavite funkcijo Sync &amp; Backup (Sinhronizacija in varnostno kopiranje)</string>
+
+    <!-- Sync promo in bookmark added confirmation dialog -->
+    <string name="addBookmarkDialogSyncPromoText">Sinhronizirajte zaznamke med napravami</string>
+    <string name="addBookmarkDialogHideSyncSuggestion">Skrij se</string>
 </resources>

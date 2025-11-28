@@ -103,7 +103,7 @@ class RealPirEmailConfirmation @Inject constructor(
 
         jobRecordsParts.mapIndexed { index, partSteps ->
             logcat { "PIR-EMAIL-CONFIRMATION:: Record part [$index] -> ${partSteps.size}" }
-            logcat { "PIR-EMAIL-CONFIRMATION: Record part [$index] breakdown -> ${partSteps.map { it.first.id to it.second.brokerName }}" }
+            logcat { "PIR-EMAIL-CONFIRMATION: Record part [$index] breakdown -> ${partSteps.map { it.first.id to it.second.broker.name }}" }
             // We want to run the runners in parallel but wait for everything to complete before we proceed
             async {
                 partSteps.forEach { (profile, step) ->
@@ -147,9 +147,18 @@ class RealPirEmailConfirmation @Inject constructor(
             return emptyList()
         }
 
+        val activeBrokers = repository.getAllActiveBrokerObjects().associateBy { it.name }
+        if (activeBrokers.isEmpty()) {
+            logcat { "PIR-EMAIL-CONFIRMATION: Nothing to scan here. No active brokers" }
+            return emptyList()
+        }
+
         return jobRecords.mapNotNull {
             val json = relevantBrokerJsons[it.brokerName] ?: return@mapNotNull null
+            val broker = activeBrokers[it.brokerName] ?: return@mapNotNull null
+
             val brokerStep = brokerStepsParser.parseEmailConfirmationStep(
+                broker,
                 json,
                 it,
             )

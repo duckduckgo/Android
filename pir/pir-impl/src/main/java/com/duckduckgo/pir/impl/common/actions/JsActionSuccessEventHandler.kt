@@ -71,11 +71,12 @@ class JsActionSuccessEventHandler @Inject constructor(
         val baseSuccessState = state.copy(
             actionRetryCount = 0,
         )
+        val brokerName = currentBrokerStep.broker.name
 
         if (currentBrokerStep is OptOutStep) {
             pirRunStateHandler.handleState(
                 BrokerOptOutActionSucceeded(
-                    brokerName = currentBrokerStep.brokerName,
+                    brokerName = brokerName,
                     extractedProfile = currentBrokerStep.profileToOptOut,
                     completionTimeInMillis = currentTimeProvider.currentTimeMillis(),
                     actionType = pirSuccessResponse.actionType,
@@ -85,7 +86,7 @@ class JsActionSuccessEventHandler @Inject constructor(
         } else if (currentBrokerStep is EmailConfirmationStep) {
             pirRunStateHandler.handleState(
                 BrokerOptOutActionSucceeded(
-                    brokerName = currentBrokerStep.brokerName,
+                    brokerName = brokerName,
                     extractedProfile = currentBrokerStep.profileToOptOut,
                     completionTimeInMillis = currentTimeProvider.currentTimeMillis(),
                     actionType = pirSuccessResponse.actionType,
@@ -95,7 +96,7 @@ class JsActionSuccessEventHandler @Inject constructor(
         } else {
             pirRunStateHandler.handleState(
                 BrokerScanActionSucceeded(
-                    currentBrokerStep.brokerName,
+                    brokerName,
                     state.profileQuery.id,
                     pirSuccessResponse,
                 ),

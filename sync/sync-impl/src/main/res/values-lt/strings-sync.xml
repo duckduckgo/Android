@@ -208,4 +208,8 @@
 
     <string name="deep_link_auth_prompt_title">Nustatyk sinchronizavimą ir atsarginės kopijos kūrimą</string>
     <string name="deep_link_auth_prompt_message">Atrakinkite įrenginį, kad galėtumėte nustatyti funkciją „Sinchronizuoti ir kurti atsarginę kopiją“.</string>
+
+    <!-- Sync promo in bookmark added confirmation dialog -->
+    <string name="addBookmarkDialogSyncPromoText">Sinchronizuoti žymes skirtinguose įrenginiuose</string>
+    <string name="addBookmarkDialogHideSyncSuggestion">Slėpti</string>
 </resources>

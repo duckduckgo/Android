@@ -24,6 +24,7 @@ import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
@@ -35,6 +36,10 @@ import javax.inject.Inject
     scope = AppScope::class,
     boundType = MainProcessLifecycleObserver::class,
 )
+@ContributesMultibinding(
+    scope = AppScope::class,
+    boundType = PrivacyConfigCallbackPlugin::class,
+)
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(scope = AppScope::class, boundType = OmnibarRepository::class)
 open class OmnibarFeatureRepository @Inject constructor(
@@ -42,8 +47,9 @@ open class OmnibarFeatureRepository @Inject constructor(
     private val browserFeatures: AndroidBrowserConfigFeature,
     private val dispatcherProvider: DispatcherProvider,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
-) : OmnibarRepository, MainProcessLifecycleObserver {
+) : OmnibarRepository, MainProcessLifecycleObserver, PrivacyConfigCallbackPlugin {
     private var isSplitOmnibarFlagEnabled: Boolean = false
+    private var isNewCustomTabFlagEnabled: Boolean = false
 
     override val omnibarType: OmnibarType
         get() = settingsDataStore.omnibarType
@@ -51,9 +57,13 @@ open class OmnibarFeatureRepository @Inject constructor(
     override val isSplitOmnibarAvailable: Boolean
         get() = isSplitOmnibarFlagEnabled
 
+    override val isNewCustomTabEnabled: Boolean
+        get() = isNewCustomTabFlagEnabled
+
     override fun onStart(owner: LifecycleOwner) {
         coroutineScope.launch(dispatcherProvider.io()) {
             isSplitOmnibarFlagEnabled = browserFeatures.splitOmnibar().isEnabled()
+            isNewCustomTabFlagEnabled = browserFeatures.newCustomTab().isEnabled()
 
             resetOmnibarTypeIfNecessary()
         }
@@ -67,6 +77,15 @@ open class OmnibarFeatureRepository @Inject constructor(
             // Restore user's choice if the feature is re-enabled
             settingsDataStore.omnibarType = OmnibarType.SPLIT
             settingsDataStore.isSplitOmnibarSelected = false
+        }
+    }
+
+    override fun onPrivacyConfigDownloaded() {
+        coroutineScope.launch(dispatcherProvider.io()) {
+            if (settingsDataStore.omnibarType != OmnibarType.SPLIT) {
+                isSplitOmnibarFlagEnabled = browserFeatures.splitOmnibar().isEnabled()
+            }
+            isNewCustomTabFlagEnabled = browserFeatures.newCustomTab().isEnabled()
         }
     }
 }

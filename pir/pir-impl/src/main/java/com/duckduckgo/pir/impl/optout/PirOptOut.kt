@@ -33,6 +33,7 @@ import com.duckduckgo.pir.impl.common.PirJob.RunType.OPTOUT
 import com.duckduckgo.pir.impl.common.PirJobConstants.MAX_DETACHED_WEBVIEW_COUNT
 import com.duckduckgo.pir.impl.common.RealPirActionsRunner
 import com.duckduckgo.pir.impl.common.splitIntoParts
+import com.duckduckgo.pir.impl.models.Broker
 import com.duckduckgo.pir.impl.models.ProfileQuery
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.OptOutJobRecord
 import com.duckduckgo.pir.impl.scripts.PirCssScriptLoader
@@ -133,7 +134,14 @@ class RealPirOptOut @Inject constructor(
             cleanRunners()
         }
 
-        val processedJobRecords = processJobRecords(jobRecords)
+        val activeBrokers = repository.getAllActiveBrokerObjects().associateBy { it.name }
+        if (activeBrokers.isEmpty()) {
+            logcat { "PIR-OPT-OUT: No active brokers here." }
+            completeOptOut()
+            return@withContext Result.success(Unit)
+        }
+
+        val processedJobRecords = processJobRecords(jobRecords, activeBrokers)
 
         if (processedJobRecords.isEmpty()) {
             logcat { "PIR-OPT-OUT: No valid records. Nothing to opt-out." }
@@ -161,13 +169,13 @@ class RealPirOptOut @Inject constructor(
                 partSteps.map { (profileQuery, step) ->
                     logcat {
                         "PIR-OPT-OUT: Start opt-out on runner=$index, extractedProfile=${(step as OptOutStep).profileToOptOut.dbId} " +
-                            "broker=${step.brokerName} profile=${profileQuery.id}"
+                            "broker=${step.broker.name} profile=${profileQuery.id}"
                     }
                     runners[index].start(profileQuery, listOf(step))
                     runners[index].stop()
                     logcat {
                         "PIR-OPT-OUT: Finish opt-out on runner=$index, extractedProfile=${(step as OptOutStep).profileToOptOut.dbId} " +
-                            "broker=${step.brokerName} profile=${profileQuery.id}"
+                            "broker=${step.broker.name} profile=${profileQuery.id}"
                     }
                 }
             }
@@ -177,7 +185,10 @@ class RealPirOptOut @Inject constructor(
         return@withContext Result.success(Unit)
     }
 
-    private suspend fun processJobRecords(jobRecords: List<OptOutJobRecord>): List<Pair<ProfileQuery, BrokerStep>> {
+    private suspend fun processJobRecords(
+        jobRecords: List<OptOutJobRecord>,
+        activeBrokers: Map<String, Broker>,
+    ): List<Pair<ProfileQuery, BrokerStep>> {
         // Multiple profile support (includes deprecated profiles as we need to process opt-out for them if there are extracted profiles)
         val allUserProfiles = obtainProfiles().associateBy { it.id }
         if (allUserProfiles.isEmpty()) {
@@ -212,9 +223,11 @@ class RealPirOptOut @Inject constructor(
                 brokerStep = temporaryCache[temporaryCacheKey]?.find { (it as OptOutStep).profileToOptOut.dbId == record.extractedProfileId }
             } else {
                 // Parse broker steps - this will return the extractedProfiles too
+                val broker = activeBrokers[record.brokerName] ?: return@mapNotNull null
+
                 val brokerSteps = brokerOptOutStepsJsons[record.brokerName]?.let { stepsJson ->
                     brokerStepsParser.parseStep(
-                        record.brokerName,
+                        broker,
                         stepsJson,
                         record.userProfileId,
                     )
@@ -278,10 +291,12 @@ class RealPirOptOut @Inject constructor(
             repository.getBrokerOptOutSteps(broker)?.let { broker to it }
         }
 
+        val activeBrokers = repository.getAllActiveBrokerObjects().associateBy { it.name }
+
         // Map broker steps with their associated profile queries
         val allSteps = profileQueries.map { profileQuery ->
             brokerOptOutStepsJsons.map { (broker, stepsJson) ->
-                brokerStepsParser.parseStep(broker, stepsJson, profileQuery.id)
+                brokerStepsParser.parseStep(activeBrokers[broker]!!, stepsJson, profileQuery.id)
             }.flatten().map { step -> profileQuery to step }
         }.flatten()
 
@@ -321,10 +336,12 @@ class RealPirOptOut @Inject constructor(
             repository.getBrokerOptOutSteps(broker)?.let { broker to it }
         }
 
+        val activeBrokers = repository.getAllActiveBrokerObjects().associateBy { it.name }
+
         // Map broker steps with their associated profile queries
         val allSteps = profileQueries.map { profileQuery ->
             brokerOptOutStepsJsons.map { (broker, stepsJson) ->
-                brokerStepsParser.parseStep(broker, stepsJson, profileQuery.id)
+                brokerStepsParser.parseStep(activeBrokers[broker]!!, stepsJson, profileQuery.id)
             }.flatten().map { step -> profileQuery to step }
         }.flatten()
 

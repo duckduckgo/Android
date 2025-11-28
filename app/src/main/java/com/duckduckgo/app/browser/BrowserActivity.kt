@@ -962,6 +962,13 @@ open class BrowserActivity : DuckDuckGoActivity() {
             if (result.resultCode == RESULT_OK) {
                 // Handle any result data if needed
                 result.data?.let { intent ->
+                    logcat { "Duck.ai: tabSwitcherActivityResult ${intent.extras}" }
+                    if (intent.hasExtra(TabSwitcherActivity.EXTRA_KEY_DUCK_AI_URL)) {
+                        val duckAIUrl = intent.getStringExtra(TabSwitcherActivity.EXTRA_KEY_DUCK_AI_URL)
+                        if (!duckAIUrl.isNullOrEmpty()) {
+                            currentTab?.submitQuery(duckAIUrl)
+                        }
+                    }
                     intent.extras?.let { extras ->
                         val deletedTabIds = extras.getStringArrayList(TabSwitcherActivity.EXTRA_KEY_DELETED_TAB_IDS)
                         if (!deletedTabIds.isNullOrEmpty()) {

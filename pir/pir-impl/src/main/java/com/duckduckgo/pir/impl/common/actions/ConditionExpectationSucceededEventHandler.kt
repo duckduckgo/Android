@@ -43,16 +43,30 @@ class ConditionExpectationSucceededEventHandler @Inject constructor() : EventHan
         val currentBrokerStep = state.brokerStepsToExecute[state.currentBrokerStepIndex]
 
         val updatedBrokerSteps = state.brokerStepsToExecute.toMutableList()
-        val updatedBrokerActions = currentBrokerStep.actions.toMutableList().apply {
+        val updatedBrokerActions = currentBrokerStep.step.actions.toMutableList().apply {
             this.addAll(
                 state.currentActionIndex + 1,
                 actionsToAppend,
             )
         }
         val updatedBrokerStep = when (currentBrokerStep) {
-            is BrokerStep.ScanStep -> currentBrokerStep.copy(actions = updatedBrokerActions)
-            is BrokerStep.OptOutStep -> currentBrokerStep.copy(actions = updatedBrokerActions)
-            is BrokerStep.EmailConfirmationStep -> currentBrokerStep.copy(actions = updatedBrokerActions)
+            is BrokerStep.ScanStep -> currentBrokerStep.copy(
+                step = currentBrokerStep.step.copy(
+                    actions = updatedBrokerActions,
+                ),
+            )
+
+            is BrokerStep.OptOutStep -> currentBrokerStep.copy(
+                step = currentBrokerStep.step.copy(
+                    actions = updatedBrokerActions,
+                ),
+            )
+
+            is BrokerStep.EmailConfirmationStep -> currentBrokerStep.copy(
+                step = currentBrokerStep.step.copy(
+                    actions = updatedBrokerActions,
+                ),
+            )
         }
 
         updatedBrokerSteps[state.currentBrokerStepIndex] = updatedBrokerStep

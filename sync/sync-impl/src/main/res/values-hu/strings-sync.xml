@@ -208,4 +208,8 @@
 
     <string name="deep_link_auth_prompt_title">Szinkronizálás és biztonsági mentés beállítása</string>
     <string name="deep_link_auth_prompt_message">Oldd fel az eszközt a Szinkronizálás és biztonsági mentés funkció beállításához</string>
+
+    <!-- Sync promo in bookmark added confirmation dialog -->
+    <string name="addBookmarkDialogSyncPromoText">Könyvjelzők eszközök közötti szinkronizálása</string>
+    <string name="addBookmarkDialogHideSyncSuggestion">Elrejtés</string>
 </resources>

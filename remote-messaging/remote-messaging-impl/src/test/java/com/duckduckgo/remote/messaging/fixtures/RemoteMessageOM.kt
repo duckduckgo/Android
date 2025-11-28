@@ -17,10 +17,14 @@
 package com.duckduckgo.remote.messaging.fixtures
 
 import com.duckduckgo.remote.messaging.api.Action
+import com.duckduckgo.remote.messaging.api.CardItem
+import com.duckduckgo.remote.messaging.api.CardItemType
 import com.duckduckgo.remote.messaging.api.Content
 import com.duckduckgo.remote.messaging.api.Content.Placeholder
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.ANNOUNCE
+import com.duckduckgo.remote.messaging.api.Content.Placeholder.IMAGE_AI
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.MAC_AND_WINDOWS
+import com.duckduckgo.remote.messaging.api.Content.Placeholder.RADAR
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.api.Surface
 
@@ -94,6 +98,39 @@ object RemoteMessageOM {
         action = action,
     )
 
+    fun cardsListContent(
+        titleText: String = "title",
+        descriptionText: String = "description",
+        placeholder: Placeholder = ANNOUNCE,
+        primaryActionText: String = "Action",
+        primaryAction: Action = urlAction(),
+        listItems: List<CardItem> = listOf(
+            CardItem(
+                id = "item1",
+                type = CardItemType.TWO_LINE_LIST_ITEM,
+                titleText = "Item Title 1",
+                descriptionText = "Item Description 1",
+                placeholder = IMAGE_AI,
+                primaryAction = urlAction(),
+            ),
+            CardItem(
+                id = "item2",
+                type = CardItemType.TWO_LINE_LIST_ITEM,
+                titleText = "Item Title 2",
+                descriptionText = "Item Description 2",
+                placeholder = RADAR,
+                primaryAction = urlAction(),
+            ),
+        ),
+    ) = Content.CardsList(
+        titleText = titleText,
+        descriptionText = descriptionText,
+        placeholder = placeholder,
+        primaryActionText = primaryActionText,
+        primaryAction = primaryAction,
+        listItems = listItems,
+    )
+
     fun aSmallMessage(
         id: String = "id",
         content: Content = smallContent(),
@@ -161,6 +198,22 @@ object RemoteMessageOM {
     fun aPromoSingleActionMessage(
         id: String = "id",
         content: Content = promoSingleActionContent(),
+        exclusionRules: List<Int> = emptyList(),
+        matchingRules: List<Int> = emptyList(),
+        surfaces: List<Surface> = emptyList(),
+    ): RemoteMessage {
+        return RemoteMessage(
+            id = id,
+            content = content,
+            exclusionRules = exclusionRules,
+            matchingRules = matchingRules,
+            surfaces = surfaces,
+        )
+    }
+
+    fun aCardsListMessage(
+        id: String = "id",
+        content: Content = cardsListContent(),
         exclusionRules: List<Int> = emptyList(),
         matchingRules: List<Int> = emptyList(),
         surfaces: List<Surface> = emptyList(),

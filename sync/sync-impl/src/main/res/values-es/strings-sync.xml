@@ -208,4 +208,8 @@
 
     <string name="deep_link_auth_prompt_title">Configurar Sync &amp; Backup</string>
     <string name="deep_link_auth_prompt_message">Desbloquea el dispositivo para configurar Sincronización y copia de seguridad</string>
+
+    <!-- Sync promo in bookmark added confirmation dialog -->
+    <string name="addBookmarkDialogSyncPromoText">Sincronizar marcadores entre dispositivos</string>
+    <string name="addBookmarkDialogHideSyncSuggestion">Ocultar</string>
 </resources>

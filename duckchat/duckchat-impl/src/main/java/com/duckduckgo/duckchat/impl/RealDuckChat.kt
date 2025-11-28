@@ -34,6 +34,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
+import com.duckduckgo.duckchat.impl.DuckChatConstants.HOST_DUCK_AI
 import com.duckduckgo.duckchat.impl.feature.AIChatImageUploadFeature
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarCallback
@@ -65,6 +66,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import logcat.logcat
+import okhttp3.HttpUrl.Companion.toHttpUrl
 import javax.inject.Inject
 
 interface DuckChatInternal : DuckChat {
@@ -182,6 +184,11 @@ interface DuckChatInternal : DuckChat {
     fun isImageUploadEnabled(): Boolean
 
     /**
+     * Returns whether standalone migration is supported.
+     */
+    fun isStandaloneMigrationEnabled(): Boolean
+
+    /**
      * Returns the time a Duck Chat session should be kept alive
      */
     fun keepSessionIntervalInMinutes(): Int
@@ -205,6 +212,12 @@ interface DuckChatInternal : DuckChat {
      * Checks whether DuckChat is enabled based on remote config flag.
      */
     fun isDuckChatFeatureEnabled(): Boolean
+
+    /**
+     * This method takes a [url] and returns `true` or `false`.
+     * @return `true` if the given [url] can be handled in the duck ai webview and `false` otherwise.
+     */
+    fun canHandleOnAiWebView(url: String): Boolean
 
     /**
      * Indicates whether Input Screen will present the input box at the bottom, if user has the omnibar also set to the bottom position.
@@ -315,6 +328,7 @@ class RealDuckChat @Inject constructor(
     private var isAddressBarEntryPointEnabled: Boolean = false
     private var isVoiceSearchEntryPointEnabled: Boolean = false
     private var isImageUploadEnabled: Boolean = false
+    private var isStandaloneMigrationEnabled: Boolean = false
     private var keepSessionAliveInMinutes: Int = DEFAULT_SESSION_ALIVE
     private var clearChatHistory: Boolean = true
     private var inputScreenMainButtonsEnabled = false
@@ -423,6 +437,10 @@ class RealDuckChat @Inject constructor(
         }
     }
 
+    override fun canHandleOnAiWebView(url: String): Boolean {
+        return runCatching { HOST_DUCK_AI == url.toHttpUrl().topPrivateDomain() || url == REVOKE_URL }.getOrElse { false }
+    }
+
     override fun isAddressBarEntryPointEnabled(): Boolean = isAddressBarEntryPointEnabled
     override fun isVoiceSearchEntryPointEnabled(): Boolean = isVoiceSearchEntryPointEnabled
 
@@ -461,6 +479,8 @@ class RealDuckChat @Inject constructor(
     override val chatState: StateFlow<ChatState> = _chatState.asStateFlow()
 
     override fun isImageUploadEnabled(): Boolean = isImageUploadEnabled
+
+    override fun isStandaloneMigrationEnabled(): Boolean = isStandaloneMigrationEnabled
 
     override fun keepSessionIntervalInMinutes() = keepSessionAliveInMinutes
 
@@ -701,6 +721,7 @@ class RealDuckChat @Inject constructor(
             isAddressBarEntryPointEnabled = settingsJson?.addressBarEntryPoint ?: false
             isVoiceSearchEntryPointEnabled = duckChatFeature.duckAiVoiceSearch().isEnabled()
             isImageUploadEnabled = imageUploadFeature.self().isEnabled()
+            isStandaloneMigrationEnabled = duckChatFeature.standaloneMigration().isEnabled()
 
             keepSession.value = duckChatFeature.keepSession().isEnabled()
             keepSessionAliveInMinutes = settingsJson?.sessionTimeoutMinutes ?: DEFAULT_SESSION_ALIVE
@@ -763,5 +784,6 @@ class RealDuckChat @Inject constructor(
         private const val BANG_QUERY_NAME = "bang"
         private const val BANG_QUERY_VALUE = "true"
         private const val DEFAULT_SESSION_ALIVE = 60
+        private const val REVOKE_URL = "https://duckduckgo.com/revoke-duckai-access"
     }
 }

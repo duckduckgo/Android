@@ -58,10 +58,10 @@ class BrokerStepCompletedEventHandler @Inject constructor(
             val currentBrokerStep = state.brokerStepsToExecute[state.currentBrokerStepIndex]
             pirRunStateHandler.handleState(
                 PirRunStateHandler.PirRunState.BrokerRecordEmailConfirmationNeeded(
-                    brokerName = currentBrokerStep.brokerName,
+                    brokerName = currentBrokerStep.broker.name,
                     extractedProfile = (currentBrokerStep as OptOutStep).profileToOptOut,
                     attemptId = state.attemptId ?: "no-attempt-id",
-                    lastActionId = currentBrokerStep.actions[state.currentBrokerStepIndex].id,
+                    lastActionId = currentBrokerStep.step.actions[state.currentBrokerStepIndex].id,
                 ),
             )
         } else {
@@ -95,7 +95,7 @@ class BrokerStepCompletedEventHandler @Inject constructor(
             RunType.MANUAL ->
                 pirRunStateHandler.handleState(
                     BrokerManualScanCompleted(
-                        brokerName = currentBrokerStep.brokerName,
+                        brokerName = currentBrokerStep.broker.name,
                         profileQueryId = state.profileQuery.id,
                         eventTimeInMillis = currentTimeProvider.currentTimeMillis(),
                         totalTimeMillis = totalTimeMillis,
@@ -107,7 +107,7 @@ class BrokerStepCompletedEventHandler @Inject constructor(
             RunType.SCHEDULED ->
                 pirRunStateHandler.handleState(
                     BrokerScheduledScanCompleted(
-                        brokerName = currentBrokerStep.brokerName,
+                        brokerName = currentBrokerStep.broker.name,
                         profileQueryId = state.profileQuery.id,
                         eventTimeInMillis = currentTimeProvider.currentTimeMillis(),
                         totalTimeMillis = totalTimeMillis,
@@ -120,7 +120,7 @@ class BrokerStepCompletedEventHandler @Inject constructor(
                 val currentOptOutStep = currentBrokerStep as OptOutStep
                 if (isSuccess) {
                     BrokerRecordOptOutSubmitted(
-                        brokerName = currentOptOutStep.brokerName,
+                        brokerName = currentOptOutStep.broker.name,
                         extractedProfile = currentOptOutStep.profileToOptOut,
                         attemptId = state.attemptId ?: "no-attempt-id",
                         startTimeInMillis = state.brokerStepStartTime,
@@ -129,10 +129,10 @@ class BrokerStepCompletedEventHandler @Inject constructor(
                     )
                 } else {
                     // Whatever last action that was executed is the last action that failed.
-                    val lastAction = currentBrokerStep.actions[state.currentBrokerStepIndex]
+                    val lastAction = currentBrokerStep.step.actions[state.currentBrokerStepIndex]
 
                     BrokerRecordOptOutFailed(
-                        brokerName = currentOptOutStep.brokerName,
+                        brokerName = currentOptOutStep.broker.name,
                         extractedProfile = currentOptOutStep.profileToOptOut,
                         startTimeInMillis = state.brokerStepStartTime,
                         endTimeInMillis = currentTimeProvider.currentTimeMillis(),
@@ -150,13 +150,13 @@ class BrokerStepCompletedEventHandler @Inject constructor(
                 val currentOptOutStep = currentBrokerStep as EmailConfirmationStep
                 pirRunStateHandler.handleState(
                     BrokerRecordEmailConfirmationCompleted(
-                        brokerName = currentOptOutStep.brokerName,
+                        brokerName = currentOptOutStep.broker.name,
                         isSuccess = isSuccess,
                         // Success means we finished all steps and reaching here means that index has been incremented. If error, we don't increment.
                         lastActionId = if (isSuccess) {
-                            currentOptOutStep.actions[state.currentActionIndex - 1]
+                            currentOptOutStep.step.actions[state.currentActionIndex - 1]
                         } else {
-                            currentOptOutStep.actions[state.currentActionIndex]
+                            currentOptOutStep.step.actions[state.currentActionIndex]
                         }.id,
                         totalTimeMillis = totalTimeMillis,
                         extractedProfileId = currentBrokerStep.emailConfirmationJob.extractedProfileId,

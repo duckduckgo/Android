@@ -28,8 +28,9 @@ class DuckChatContentScopeJsMessageHandlerTest {
     @Test
     fun `only allow duckduckgo dot com domains`() {
         val domains = handler.allowedDomains
-        assertTrue(domains.size == 1)
-        assertTrue(domains.first() == "duckduckgo.com")
+        assertTrue(domains.size == 2)
+        assertTrue(domains[0] == "duckduckgo.com")
+        assertTrue(domains[1] == "duck.ai")
     }
 
     @Test

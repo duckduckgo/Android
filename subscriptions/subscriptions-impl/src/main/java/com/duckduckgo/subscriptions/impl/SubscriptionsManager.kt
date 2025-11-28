@@ -76,6 +76,7 @@ import com.duckduckgo.subscriptions.impl.services.ValidateTokenResponse
 import com.duckduckgo.subscriptions.impl.services.toEntitlements
 import com.duckduckgo.subscriptions.impl.wideevents.AuthTokenRefreshWideEvent
 import com.duckduckgo.subscriptions.impl.wideevents.SubscriptionPurchaseWideEvent
+import com.duckduckgo.subscriptions.impl.wideevents.SubscriptionSwitchWideEvent
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.JsonDataException
 import com.squareup.moshi.JsonEncodingException
@@ -252,6 +253,7 @@ interface SubscriptionsManager {
      * @param planId The new plan ID to switch to
      * @param offerId The offer ID for the new plan (optional)
      * @param replacementMode The replacement mode for the subscription switch
+     * @param origin The entry point where the switch was initiated (e.g., "subscription_settings", "dev_settings")
      *
      */
     suspend fun switchSubscriptionPlan(
@@ -259,6 +261,7 @@ interface SubscriptionsManager {
         planId: String,
         offerId: String? = null,
         replacementMode: SubscriptionReplacementMode,
+        origin: String? = null,
     )
 
     /**
@@ -295,6 +298,7 @@ class RealSubscriptionsManager @Inject constructor(
     private val backgroundTokenRefresh: BackgroundTokenRefresh,
     private val subscriptionPurchaseWideEvent: SubscriptionPurchaseWideEvent,
     private val tokenRefreshWideEvent: AuthTokenRefreshWideEvent,
+    private val subscriptionSwitchWideEvent: SubscriptionSwitchWideEvent,
 ) : SubscriptionsManager {
     private val adapter = Moshi.Builder().build().adapter(ResponseError::class.java)
 
@@ -371,6 +375,7 @@ class RealSubscriptionsManager @Inject constructor(
                 when (it) {
                     is PurchaseState.Purchased -> {
                         subscriptionPurchaseWideEvent.onBillingFlowPurchaseSuccess()
+                        subscriptionSwitchWideEvent.onPlayBillingSwitchSuccess()
                         checkPurchase(it.packageName, it.purchaseToken)
                     }
                     is PurchaseState.Canceled -> {
@@ -495,34 +500,49 @@ class RealSubscriptionsManager @Inject constructor(
         planId: String,
         offerId: String?,
         replacementMode: SubscriptionReplacementMode,
+        origin: String?,
     ) = withContext(dispatcherProvider.io()) {
         try {
-            if (!isSignedIn()) {
-                logcat { "Subs: Cannot switch plan - user not signed in" }
-                _currentPurchaseState.emit(CurrentPurchase.Failure("User not signed in for switch"))
-                return@withContext
-            }
-
             val currentSubscription = authRepository.getSubscription()
             if (currentSubscription == null || !currentSubscription.isActive()) {
-                logcat { "Subs: Cannot switch plan - no active subscription found" }
                 _currentPurchaseState.emit(CurrentPurchase.Failure("No active subscription found for switch"))
                 return@withContext
             }
 
+            // Start wide event tracking
+            subscriptionSwitchWideEvent.onSwitchFlowStarted(
+                context = origin,
+                fromPlan = currentSubscription.productId,
+                toPlan = planId,
+            )
+
+            if (!isSignedIn()) {
+                val errorMessage = "User not signed in for switch"
+                logcat { "Subs: Cannot switch plan - $errorMessage" }
+                subscriptionSwitchWideEvent.onValidationFailure(errorMessage)
+                _currentPurchaseState.emit(CurrentPurchase.Failure(errorMessage))
+                return@withContext
+            }
+
+            subscriptionSwitchWideEvent.onCurrentSubscriptionValidated()
+
             val currentPurchaseToken = playBillingManager.getLatestPurchaseToken()
 
             if (currentPurchaseToken == null) {
-                logcat { "Subs: Cannot switch plan - no current purchase token found" }
-                _currentPurchaseState.emit(CurrentPurchase.Failure("No current purchase token found for switch"))
+                val errorMessage = "No current purchase token found for switch"
+                logcat { "Subs: Cannot switch plan - $errorMessage" }
+                subscriptionSwitchWideEvent.onSwitchFailed(errorMessage)
+                _currentPurchaseState.emit(CurrentPurchase.Failure(errorMessage))
                 return@withContext
             }
 
             // Get account details for external ID
             val account = authRepository.getAccount()
             if (account == null) {
-                logcat { "Subs: Cannot switch plan - no account found" }
-                _currentPurchaseState.emit(CurrentPurchase.Failure("No account found for switch"))
+                val errorMessage = "No account found for switch"
+                logcat { "Subs: Cannot switch plan - $errorMessage" }
+                subscriptionSwitchWideEvent.onSwitchFailed(errorMessage)
+                _currentPurchaseState.emit(CurrentPurchase.Failure(errorMessage))
                 return@withContext
             }
 
@@ -530,10 +550,14 @@ class RealSubscriptionsManager @Inject constructor(
             val availableOffers = getSubscriptionOffer()
             val targetOffer = availableOffers.find { it.planId == planId && it.offerId == offerId }
             if (targetOffer == null) {
-                logcat { "Subs: Cannot switch plan - target plan not found: $planId" }
-                _currentPurchaseState.emit(CurrentPurchase.Failure("Target plan not found: $planId for switch"))
+                val errorMessage = "Target plan not found: $planId"
+                logcat { "Subs: Cannot switch plan - $errorMessage" }
+                subscriptionSwitchWideEvent.onTargetPlanRetrievalFailure()
+                _currentPurchaseState.emit(CurrentPurchase.Failure(errorMessage))
                 return@withContext
             }
+
+            subscriptionSwitchWideEvent.onTargetPlanRetrieved()
 
             // Launch Google Play billing flow for subscription update
             logcat { "Subs: Launching subscription update flow for plan: $planId" }
@@ -550,8 +574,10 @@ class RealSubscriptionsManager @Inject constructor(
                 )
             }
         } catch (e: Exception) {
-            logcat(ERROR) { "Subs: Failed to switch subscription plan: ${e.asLog()}" }
-            _currentPurchaseState.emit(CurrentPurchase.Failure("Failed to switch subscription plan: ${e.message}"))
+            val error = extractError(e)
+            logcat(ERROR) { "Subs: Failed to switch subscription plan: $error" }
+            _currentPurchaseState.emit(CurrentPurchase.Failure("Failed to switch subscription plan: $error"))
+            subscriptionSwitchWideEvent.onSwitchFailed(javaClass.simpleName)
         }
     }
 
@@ -693,6 +719,8 @@ class RealSubscriptionsManager @Inject constructor(
                 emitEntitlementsValues()
                 _currentPurchaseState.emit(CurrentPurchase.Success)
                 authRepository.registerLocalPurchasedAt()
+
+                subscriptionSwitchWideEvent.onSwitchConfirmationSuccess()
                 subscriptionPurchaseWideEvent.onPurchaseConfirmationSuccess()
             } else {
                 handlePurchaseFailed()
@@ -890,6 +918,7 @@ class RealSubscriptionsManager @Inject constructor(
         )
 
         subscriptionPurchaseWideEvent.onSubscriptionUpdated(oldStatus = oldStatus, newStatus = subscription.status.toStatus())
+        subscriptionSwitchWideEvent.onSubscriptionUpdated(oldStatus = oldStatus, newStatus = subscription.status.toStatus())
 
         _subscriptionStatus.emit(subscription.status.toStatus())
     }
@@ -1390,7 +1419,6 @@ data class PricingPhase(
     val priceCurrency: Currency,
     val formattedPrice: String,
     val billingPeriod: String,
-
 ) {
     internal fun getBillingPeriodInDays(): Int? {
         return try {

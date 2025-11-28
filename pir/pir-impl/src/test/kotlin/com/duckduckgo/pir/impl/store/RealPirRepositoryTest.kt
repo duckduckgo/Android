@@ -18,7 +18,6 @@ package com.duckduckgo.pir.impl.store
 
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.CurrentTimeProvider
-import com.duckduckgo.pir.impl.models.Address
 import com.duckduckgo.pir.impl.models.AddressCityState
 import com.duckduckgo.pir.impl.models.ExtractedProfile
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.EmailConfirmationJobRecord.EmailData
@@ -852,5 +851,17 @@ class RealPirRepositoryTest {
         // Then
         verify(mockUserProfileDao).getUserProfile(profileQueryId)
         verify(mockExtractedProfileDao).insertNewExtractedProfiles(any())
+    }
+
+    @Test
+    fun whenMarkExtractedProfileAsDeprecatedThenCallsDaoUpdateMethod() = runTest {
+        // Given
+        val extractedProfileId = 123L
+
+        // When
+        testee.markExtractedProfileAsDeprecated(extractedProfileId)
+
+        // Then
+        verify(mockExtractedProfileDao).updateExtractedProfileDeprecated(extractedProfileId, true)
     }
 }

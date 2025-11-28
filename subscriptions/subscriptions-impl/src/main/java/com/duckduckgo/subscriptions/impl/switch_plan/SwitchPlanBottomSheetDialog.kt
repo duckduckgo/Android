@@ -35,6 +35,7 @@ import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.billing.SubscriptionReplacementMode
 import com.duckduckgo.subscriptions.impl.databinding.BottomSheetSwitchPlanBinding
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.SwitchPlanType
+import com.duckduckgo.subscriptions.impl.wideevents.SubscriptionSwitchWideEvent
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.shape.CornerFamily
@@ -54,6 +55,7 @@ class SwitchPlanBottomSheetDialog @AssistedInject constructor(
     @Assisted private val onSwitchSuccess: () -> Unit,
     private val subscriptionsManager: SubscriptionsManager,
     private val dispatcherProvider: DispatcherProvider,
+    private val subscriptionSwitchWideEvent: SubscriptionSwitchWideEvent,
 ) : BottomSheetDialog(context) {
 
     private val binding: BottomSheetSwitchPlanBinding = BottomSheetSwitchPlanBinding.inflate(LayoutInflater.from(context))
@@ -167,15 +169,8 @@ class SwitchPlanBottomSheetDialog @AssistedInject constructor(
                 when (it) {
                     is CurrentPurchase.Success -> {
                         logcat { "Switch flow: Successfully switched plans" }
+                        subscriptionSwitchWideEvent.onUIRefreshed()
                         onSwitchSuccess.invoke()
-                    }
-
-                    is CurrentPurchase.Failure -> {
-                        logcat { "Switch flow: Failed to switch plans. Error: ${it.message}" }
-                    }
-
-                    is CurrentPurchase.Canceled -> {
-                        logcat { "Switch flow: Canceled switch plans" }
                     }
 
                     else -> {}
@@ -210,6 +205,7 @@ class SwitchPlanBottomSheetDialog @AssistedInject constructor(
                         planId = targetPlanId,
                         offerId = null,
                         replacementMode = SubscriptionReplacementMode.WITHOUT_PRORATION,
+                        origin = "subscription_settings",
                     )
                 }
             } catch (e: Exception) {

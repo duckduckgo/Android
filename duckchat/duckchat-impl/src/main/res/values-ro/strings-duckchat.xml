@@ -78,4 +78,14 @@
     <string name="newAddressBarOptionBottomSheetDialogSearchOnly">Doar căutare</string>
     <string name="newAddressBarOptionBottomSheetDialogSearchAndDuckAi">Caută pe Duck.ai</string>
     <string name="newAddressBarOptionBottomSheetDialogHeader">Opțiunea bară de adrese</string>
+
+    <!-- Duck AI SERP Settings Title -->
+    <string name="duckAiSerpSettingsTitle">Caracteristici AI</string>
+
+    <!-- Duck AI Search Section Header -->
+    <string name="duckAiSearchSettingsSectionHeader">Căutare</string>
+
+    <!-- Duck AI Hide Generated Images Settings Option -->
+    <string name="duckAiHideAiGeneratedImagesTitle">Ascunde imaginile generate de IA</string>
+    <string name="duckAiHideAiGeneratedImagesDescription">Filtrează imaginile generate de IA din rezultatele căutării de imagini</string>
 </resources>

@@ -208,4 +208,8 @@
 
     <string name="deep_link_auth_prompt_title">Настройка на Синхронизиране и архивиране</string>
     <string name="deep_link_auth_prompt_message">Отключете устройството, за да настроите Sync &amp; Backup.</string>
+
+    <!-- Sync promo in bookmark added confirmation dialog -->
+    <string name="addBookmarkDialogSyncPromoText">Синхронизирай отметките между устройства</string>
+    <string name="addBookmarkDialogHideSyncSuggestion">Скрий</string>
 </resources>

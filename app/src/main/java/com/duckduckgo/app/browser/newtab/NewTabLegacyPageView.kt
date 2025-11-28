@@ -222,10 +222,11 @@ class NewTabLegacyPageView @JvmOverloads constructor(
         newMessage: Boolean,
     ) {
         val parentVisible = (this.parent as? View)?.isVisible ?: false
+        val msg = message.asMessage(isLightModeEnabled = appTheme.isLightModeEnabled())
         val shouldRender = parentVisible && (newMessage || binding.messageCta.isGone)
 
-        if (shouldRender) {
-            binding.messageCta.setMessage(message.asMessage(isLightModeEnabled = appTheme.isLightModeEnabled()))
+        if (msg != null && shouldRender) {
+            binding.messageCta.setMessage(msg)
             binding.messageCta.onCloseButtonClicked {
                 viewModel.onMessageCloseButtonClicked()
             }

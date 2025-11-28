@@ -19,6 +19,7 @@ package com.duckduckgo.remote.messaging.impl
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
+import com.duckduckgo.remote.messaging.api.Surface
 import com.duckduckgo.remote.messaging.impl.mappers.MessageMapper
 import com.duckduckgo.remote.messaging.store.RemoteMessageEntity
 import com.duckduckgo.remote.messaging.store.RemoteMessageEntity.Status
@@ -69,7 +70,7 @@ class AppRemoteMessagingRepository(
             content = remoteMessage.content,
             emptyList(),
             emptyList(),
-            emptyList(),
+            listOf(Surface.NEW_TAB_PAGE),
         )
         return remoteMessage
     }
@@ -84,7 +85,7 @@ class AppRemoteMessagingRepository(
                 content = message.content,
                 emptyList(),
                 emptyList(),
-                emptyList(),
+                listOf(Surface.NEW_TAB_PAGE),
             )
         }
     }

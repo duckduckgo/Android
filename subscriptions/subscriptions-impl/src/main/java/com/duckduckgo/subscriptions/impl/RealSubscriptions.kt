@@ -256,6 +256,9 @@ interface PrivacyProFeature {
     fun sendAuthTokenRefreshWideEvent(): Toggle
 
     @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.TRUE)
+    fun sendSubscriptionSwitchWideEvent(): Toggle
+
+    @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.TRUE)
     fun useSubscriptionSupport(): Toggle
 
     @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.INTERNAL)

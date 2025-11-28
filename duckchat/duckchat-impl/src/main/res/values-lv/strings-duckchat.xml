@@ -78,4 +78,14 @@
     <string name="newAddressBarOptionBottomSheetDialogSearchOnly">Meklēt tikai</string>
     <string name="newAddressBarOptionBottomSheetDialogSearchAndDuckAi">Meklēšana &amp; Duck.ai</string>
     <string name="newAddressBarOptionBottomSheetDialogHeader">Adreses joslas opcija</string>
+
+    <!-- Duck AI SERP Settings Title -->
+    <string name="duckAiSerpSettingsTitle">Mākslīgā intelekta funkcijas</string>
+
+    <!-- Duck AI Search Section Header -->
+    <string name="duckAiSearchSettingsSectionHeader">Meklēt</string>
+
+    <!-- Duck AI Hide Generated Images Settings Option -->
+    <string name="duckAiHideAiGeneratedImagesTitle">Paslēpt MI ģenerētus attēlus</string>
+    <string name="duckAiHideAiGeneratedImagesDescription">Filtrē MI radītus attēlus no attēlu meklēšanas rezultātiem</string>
 </resources>

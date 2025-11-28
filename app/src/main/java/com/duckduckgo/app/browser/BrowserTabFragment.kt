@@ -1298,7 +1298,43 @@ class BrowserTabFragment :
             requireActivity().window.navigationBarColor = customTabToolbarColor
             requireActivity().window.statusBarColor = customTabToolbarColor
 
+            // Update status bar icon colors based on toolbar color luminance
+            updateStatusBarIconColors(customTabToolbarColor)
+
             browserNavigationBarIntegration.configureCustomTab()
+        }
+    }
+
+    @Suppress("DEPRECATION")
+    private fun updateStatusBarIconColors(backgroundColor: Int) {
+        val window = requireActivity().window
+        val decorView = window.decorView
+
+        // Calculate luminance to determine if background is light or dark
+        val luminance = androidx.core.graphics.ColorUtils.calculateLuminance(backgroundColor)
+        val isLightBackground = luminance > 0.5
+
+        if (Build.VERSION.SDK_INT >= 30) {
+            // Use WindowInsetsController for Android R and above
+            window.insetsController?.let { controller ->
+                controller.setSystemBarsAppearance(
+                    if (isLightBackground) {
+                        android.view.WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS
+                    } else {
+                        0
+                    },
+                    android.view.WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS,
+                )
+            }
+        } else {
+            // Use systemUiVisibility for Android M to Q
+            var flags = decorView.systemUiVisibility
+            flags = if (isLightBackground) {
+                flags or View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+            } else {
+                flags and View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR.inv()
+            }
+            decorView.systemUiVisibility = flags
         }
     }
 
@@ -1407,7 +1443,7 @@ class BrowserTabFragment :
                 viewModel.openNewDuckChat()
             }
             onMenuItemClicked(duckChatHistoryMenuItem) {
-                viewModel.openDuckChatHistory()
+                viewModel.openDuckChatSidebar()
             }
             onMenuItemClicked(duckChatSettingsMenuItem) {
                 viewModel.openDuckChatSettings()
@@ -3089,6 +3125,10 @@ class BrowserTabFragment :
 
                 override fun onBackButtonPressed() {
                     hideKeyboard()
+                }
+
+                override fun onDuckAISidebarButtonPressed() {
+                    viewModel.openDuckChatSidebar()
                 }
             },
         )

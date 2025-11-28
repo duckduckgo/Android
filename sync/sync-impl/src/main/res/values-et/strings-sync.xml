@@ -208,4 +208,8 @@
 
     <string name="deep_link_auth_prompt_title">Seadista sünkroonimine ja varundamine</string>
     <string name="deep_link_auth_prompt_message">Ava seade, et seadistada Sync &amp; Backup</string>
+
+    <!-- Sync promo in bookmark added confirmation dialog -->
+    <string name="addBookmarkDialogSyncPromoText">Järjehoidjate sünkroonimine seadmete vahel</string>
+    <string name="addBookmarkDialogHideSyncSuggestion">Peida</string>
 </resources>

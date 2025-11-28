@@ -568,7 +568,13 @@ class TabSwitcherViewModel @Inject constructor(
             val params = duckChat.createWasUsedBeforePixelParams()
             pixel.fire(DuckChatPixelName.DUCK_CHAT_OPEN_TAB_SWITCHER_FAB, parameters = params)
 
-            duckChat.openDuckChat()
+            if (duckAiFeatureState.showFullScreenMode.value) {
+                val url = duckChat.getDuckChatUrl("", false)
+                tabRepository.add(url, true)
+                command.value = Command.Close
+            } else {
+                duckChat.openDuckChat()
+            }
         }
     }
 

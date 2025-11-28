@@ -388,6 +388,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
@@ -602,6 +603,7 @@ class BrowserTabViewModel @Inject constructor(
     private var allowlistRefreshTriggerJob: Job? = null
     private var isCustomTabScreen: Boolean = false
     private var alreadyShownKeyboard: Boolean = false
+    private var handleAboutBlankEnabled: Boolean = false
 
     private val fireproofWebsitesObserver =
         Observer<List<FireproofWebsiteEntity>> {
@@ -791,6 +793,10 @@ class BrowserTabViewModel @Inject constructor(
                     command.value = LaunchInputScreen
                 }
             }.launchIn(viewModelScope)
+
+        viewModelScope.launch(dispatchers.io()) {
+            handleAboutBlankEnabled = androidBrowserConfig.handleAboutBlank().isEnabled()
+        }
     }
 
     fun loadData(
@@ -1328,9 +1334,6 @@ class BrowserTabViewModel @Inject constructor(
 
         if (swipingTabsFeature.isEnabled) {
             viewModelScope.launch {
-                val handleAboutBlankEnabled = withContext(dispatchers.io()) {
-                    androidBrowserConfig.handleAboutBlank().isEnabled()
-                }
                 val emptyTab = tabRepository.getTabs().firstOrNull {
                     if (handleAboutBlankEnabled) {
                         it.url.isNullOrBlank() && it.sourceTabId.isNullOrBlank()
@@ -1436,8 +1439,16 @@ class BrowserTabViewModel @Inject constructor(
      */
     fun onUserPressedBack(isCustomTab: Boolean = false): Boolean {
         navigationAwareLoginDetector.onEvent(NavigationEvent.UserAction.NavigateBack)
-        val navigation = webNavigationState ?: return false
         val hasSourceTab = tabRepository.liveSelectedTab.value?.sourceTabId != null
+
+        if (isNavigationToEmptyUrlFromParent(hasSourceTab, isCustomTab) && handleAboutBlankEnabled) {
+            viewModelScope.launch {
+                removeCurrentTabFromRepository()
+            }
+            return true
+        }
+
+        val navigation = webNavigationState ?: return false
 
         if (currentFindInPageViewState().visible) {
             dismissFindInView()
@@ -1480,6 +1491,12 @@ class BrowserTabViewModel @Inject constructor(
         }
         return false
     }
+
+    private fun isNavigationToEmptyUrlFromParent(
+        hasSourceTab: Boolean,
+        isCustomTab: Boolean,
+    ): Boolean =
+        isLinkOpenedInNewTab && hasSourceTab && !isCustomTab && site?.url.isNullOrEmpty()
 
     private fun navigateHome() {
         site = null
@@ -1562,6 +1579,7 @@ class BrowserTabViewModel @Inject constructor(
                         }
                     } else {
                         withContext(dispatchers.main()) {
+                            evaluateDuckAIPage(stateChange.url)
                             pageChanged(stateChange.url, stateChange.title)
                         }
                     }
@@ -2195,7 +2213,6 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private fun onSiteChanged() {
-        logcat { "Duck.ai: onSiteChanged" }
         httpsUpgraded = false
         site?.isDesktopMode = currentBrowserViewState().isDesktopBrowsingMode
         viewModelScope.launch {
@@ -3797,15 +3814,33 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private fun handleNewTabIfEmptyUrl() {
-        viewModelScope.launch {
-            val shouldDisplayAboutBlank = withContext(dispatchers.io()) {
-                androidBrowserConfig.handleAboutBlank().isEnabled() && site?.url.isNullOrEmpty()
-            }
-            if (shouldDisplayAboutBlank) {
+        val shouldDisplayAboutBlank = handleAboutBlankEnabled && site?.url.isNullOrEmpty()
+        if (shouldDisplayAboutBlank) {
+            if (isCustomTabScreen) {
+                handleNewTabForEmptyUrlOnCustomTab()
+            } else {
                 omnibarViewState.value = currentOmnibarViewState().copy(
                     omnibarText = ABOUT_BLANK,
                 )
             }
+        }
+    }
+
+    private fun handleNewTabForEmptyUrlOnCustomTab() {
+        viewModelScope.launch {
+            val newCustomTabEnabled = withContext(dispatchers.io()) {
+                androidBrowserConfig.newCustomTab().isEnabled()
+            }
+            command.postValue(
+                ShowWebPageTitle(
+                    title = ABOUT_BLANK,
+                    url = if (newCustomTabEnabled) {
+                        ABOUT_BLANK
+                    } else {
+                        site?.url
+                    },
+                ),
+            )
         }
     }
 
@@ -4479,9 +4514,9 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    fun openDuckChatHistory() {
+    fun openDuckChatSidebar() {
         viewModelScope.launch {
-            val subscriptionEvent = duckChatJSHelper.onNativeAction(NativeAction.HISTORY)
+            val subscriptionEvent = duckChatJSHelper.onNativeAction(NativeAction.SIDEBAR)
             _subscriptionEventDataChannel.send(subscriptionEvent)
         }
     }

@@ -622,6 +622,7 @@ class BrowserTabViewModelTest {
     private val mockDeviceAppLookup: DeviceAppLookup = mock()
 
     private val mockDuckAiFullScreenMode = MutableStateFlow(false)
+    private val mockDuckAiFullScreenModeEnabled = MutableStateFlow(true)
 
     private lateinit var fakeContentScopeScriptsSubscriptionEventPluginPoint: FakeContentScopeScriptsSubscriptionEventPluginPoint
     private var serpSettingsFeature = FakeFeatureToggleFactory.create(SerpSettingsFeature::class.java)
@@ -727,18 +728,6 @@ class BrowserTabViewModelTest {
                     onboardingDesignExperimentManager = mockOnboardingDesignExperimentManager,
                 )
 
-            val siteFactory =
-                SiteFactoryImpl(
-                    mockEntityLookup,
-                    mockContentBlocking,
-                    mockUserAllowListRepository,
-                    mockBypassedSSLCertificatesRepository,
-                    coroutineRule.testScope,
-                    coroutineRule.testDispatcherProvider,
-                    DuckDuckGoUrlDetectorImpl(),
-                    mockDuckPlayer,
-                )
-
             accessibilitySettingsDataStore =
                 AccessibilitySettingsSharedPreferences(
                     context,
@@ -768,107 +757,138 @@ class BrowserTabViewModelTest {
 
             whenever(mockDuckChat.getDuckChatUrl(any(), any())).thenReturn(duckChatURL)
 
-            testee =
-                BrowserTabViewModel(
-                    statisticsUpdater = mockStatisticsUpdater,
-                    queryUrlConverter = mockOmnibarConverter,
-                    duckDuckGoUrlDetector = DuckDuckGoUrlDetectorImpl(),
-                    siteFactory = siteFactory,
-                    tabRepository = mockTabRepository,
-                    userAllowListRepository = mockUserAllowListRepository,
-                    networkLeaderboardDao = mockNetworkLeaderboardDao,
-                    autoComplete = mockAutoCompleteApi,
-                    appSettingsPreferencesStore = ctaViewModelMockSettingsStore,
-                    longPressHandler = mockLongPressHandler,
-                    webViewSessionStorage = webViewSessionStorage,
-                    specialUrlDetector = mockSpecialUrlDetector,
-                    faviconManager = mockFaviconManager,
-                    addToHomeCapabilityDetector = mockAddToHomeCapabilityDetector,
-                    ctaViewModel = ctaViewModel,
-                    searchCountDao = mockSearchCountDao,
-                    pixel = mockPixel,
-                    dispatchers = coroutineRule.testDispatcherProvider,
-                    fireproofWebsiteRepository = fireproofWebsiteRepositoryImpl,
-                    savedSitesRepository = mockSavedSitesRepository,
-                    navigationAwareLoginDetector = mockNavigationAwareLoginDetector,
-                    userEventsStore = mockUserEventsStore,
-                    fileDownloader = mockFileDownloader,
-                    fireproofDialogsEventHandler = fireproofDialogsEventHandler,
-                    emailManager = mockEmailManager,
-                    appCoroutineScope = TestScope(),
-                    appLinksHandler = mockAppLinksHandler,
-                    contentBlocking = mockContentBlocking,
-                    accessibilitySettingsDataStore = accessibilitySettingsDataStore,
-                    ampLinks = mockAmpLinks,
-                    downloadCallback = mockDownloadCallback,
-                    trackingParameters = mockTrackingParameters,
-                    settingsDataStore = mockSettingsDataStore,
-                    adClickManager = mockAdClickManager,
-                    autofillCapabilityChecker = autofillCapabilityChecker,
-                    autofillFireproofDialogSuppressor = autofillFireproofDialogSuppressor,
-                    automaticSavedLoginsMonitor = automaticSavedLoginsMonitor,
-                    device = mockDeviceInfo,
-                    sitePermissionsManager = mockSitePermissionsManager,
-                    cameraHardwareChecker = cameraHardwareChecker,
-                    androidBrowserConfig = fakeAndroidConfigBrowserFeature,
-                    privacyProtectionsPopupManager = mockPrivacyProtectionsPopupManager,
-                    privacyProtectionsToggleUsageListener = mockPrivacyProtectionsToggleUsageListener,
-                    privacyProtectionsPopupExperimentExternalPixels = privacyProtectionsPopupExperimentExternalPixels,
-                    faviconsFetchingPrompt = mockFaviconFetchingPrompt,
-                    subscriptions = subscriptions,
-                    sslCertificatesFeature = mockSSLCertificatesFeature,
-                    bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
-                    userBrowserProperties = mockUserBrowserProperties,
-                    history = mockNavigationHistory,
-                    newTabPixels = { mockNewTabPixels },
-                    httpErrorPixels = { mockHttpErrorPixels },
-                    duckPlayer = mockDuckPlayer,
-                    duckChat = mockDuckChat,
-                    duckAiFeatureState = mockDuckAiFeatureState,
-                    duckPlayerJSHelper =
-                    DuckPlayerJSHelper(
-                        mockDuckPlayer,
-                        mockAppBuildConfig,
-                        mockPixel,
-                        mockDuckDuckGoUrlDetector,
-                        mockPagesSettingPlugin,
-                    ),
-                    duckChatJSHelper = mockDuckChatJSHelper,
-                    refreshPixelSender = refreshPixelSender,
-                    privacyProtectionTogglePlugin = protectionTogglePluginPoint,
-                    showOnAppLaunchOptionHandler = mockShowOnAppLaunchHandler,
-                    customHeadersProvider = fakeCustomHeadersPlugin,
-                    toggleReports = mockToggleReports,
-                    brokenSitePrompt = mockBrokenSitePrompt,
-                    tabStatsBucketing = mockTabStatsBucketing,
-                    additionalDefaultBrowserPrompts = mockAdditionalDefaultBrowserPrompts,
-                    swipingTabsFeature = swipingTabsFeatureProvider,
-                    siteErrorHandler = mockSiteErrorHandler,
-                    siteHttpErrorHandler = mockSiteHttpErrorHandler,
-                    subscriptionsJSHelper = mockSubscriptionsJSHelper,
-                    onboardingDesignExperimentManager = mockOnboardingDesignExperimentManager,
-                    tabManager = tabManager,
-                    addressDisplayFormatter = mockAddressDisplayFormatter,
-                    autoCompleteSettings = mockAutoCompleteSettings,
-                    serpEasterEggLogosToggles = mockSerpEasterEggLogoToggles,
-                    nonHttpAppLinkChecker = nonHttpAppLinkChecker,
-                    externalIntentProcessingState = mockExternalIntentProcessingState,
-                    vpnMenuStateProvider = mockVpnMenuStateProvider,
-                    webViewCompatWrapper = mockWebViewCompatWrapper,
-                    addressBarTrackersAnimationFeatureToggle = mockAddressBarTrackersAnimationFeatureToggle,
-                    autoconsentPixelManager = mockAutoconsentPixelManager,
-                    omnibarRepository = mockOmnibarFeatureRepository,
-                    contentScopeScriptsSubscriptionEventPluginPoint = fakeContentScopeScriptsSubscriptionEventPluginPoint,
-                    serpSettingsFeature = serpSettingsFeature,
-                )
+            initialiseViewModel()
 
-            testee.loadData("abc", null, false, false)
-            testee.command.observeForever(mockCommandObserver)
             val mockWebHistoryItem: WebHistoryItem = mock()
             whenever(mockWebHistoryItem.title).thenReturn("title")
             whenever(mockWebHistoryItem.url).thenReturn(exampleUrl)
             whenever(mockStack.getItemAtIndex(any())).thenReturn(mockWebHistoryItem)
         }
+
+    private fun initialiseViewModel() {
+        val siteFactory =
+            SiteFactoryImpl(
+                mockEntityLookup,
+                mockContentBlocking,
+                mockUserAllowListRepository,
+                mockBypassedSSLCertificatesRepository,
+                coroutineRule.testScope,
+                coroutineRule.testDispatcherProvider,
+                DuckDuckGoUrlDetectorImpl(),
+                mockDuckPlayer,
+            )
+
+        val fireproofWebsiteRepositoryImpl =
+            FireproofWebsiteRepositoryImpl(
+                fireproofWebsiteDao,
+                coroutineRule.testDispatcherProvider,
+                lazyFaviconManager,
+            )
+
+        testee =
+            BrowserTabViewModel(
+                statisticsUpdater = mockStatisticsUpdater,
+                queryUrlConverter = mockOmnibarConverter,
+                duckDuckGoUrlDetector = DuckDuckGoUrlDetectorImpl(),
+                siteFactory = siteFactory,
+                tabRepository = mockTabRepository,
+                userAllowListRepository = mockUserAllowListRepository,
+                networkLeaderboardDao = mockNetworkLeaderboardDao,
+                autoComplete = mockAutoCompleteApi,
+                appSettingsPreferencesStore = ctaViewModelMockSettingsStore,
+                longPressHandler = mockLongPressHandler,
+                webViewSessionStorage = webViewSessionStorage,
+                specialUrlDetector = mockSpecialUrlDetector,
+                faviconManager = mockFaviconManager,
+                addToHomeCapabilityDetector = mockAddToHomeCapabilityDetector,
+                ctaViewModel = ctaViewModel,
+                searchCountDao = mockSearchCountDao,
+                pixel = mockPixel,
+                dispatchers = coroutineRule.testDispatcherProvider,
+                fireproofWebsiteRepository = fireproofWebsiteRepositoryImpl,
+                savedSitesRepository = mockSavedSitesRepository,
+                navigationAwareLoginDetector = mockNavigationAwareLoginDetector,
+                userEventsStore = mockUserEventsStore,
+                fileDownloader = mockFileDownloader,
+                fireproofDialogsEventHandler = fireproofDialogsEventHandler,
+                emailManager = mockEmailManager,
+                appCoroutineScope = TestScope(),
+                appLinksHandler = mockAppLinksHandler,
+                contentBlocking = mockContentBlocking,
+                accessibilitySettingsDataStore = accessibilitySettingsDataStore,
+                ampLinks = mockAmpLinks,
+                downloadCallback = mockDownloadCallback,
+                trackingParameters = mockTrackingParameters,
+                settingsDataStore = mockSettingsDataStore,
+                adClickManager = mockAdClickManager,
+                autofillCapabilityChecker = autofillCapabilityChecker,
+                autofillFireproofDialogSuppressor = autofillFireproofDialogSuppressor,
+                automaticSavedLoginsMonitor = automaticSavedLoginsMonitor,
+                device = mockDeviceInfo,
+                sitePermissionsManager = mockSitePermissionsManager,
+                cameraHardwareChecker = cameraHardwareChecker,
+                androidBrowserConfig = fakeAndroidConfigBrowserFeature,
+                privacyProtectionsPopupManager = mockPrivacyProtectionsPopupManager,
+                privacyProtectionsToggleUsageListener = mockPrivacyProtectionsToggleUsageListener,
+                privacyProtectionsPopupExperimentExternalPixels = privacyProtectionsPopupExperimentExternalPixels,
+                faviconsFetchingPrompt = mockFaviconFetchingPrompt,
+                subscriptions = subscriptions,
+                sslCertificatesFeature = mockSSLCertificatesFeature,
+                bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
+                userBrowserProperties = mockUserBrowserProperties,
+                history = mockNavigationHistory,
+                newTabPixels = { mockNewTabPixels },
+                httpErrorPixels = { mockHttpErrorPixels },
+                duckPlayer = mockDuckPlayer,
+                duckChat = mockDuckChat,
+                duckAiFeatureState = mockDuckAiFeatureState,
+                duckPlayerJSHelper =
+                DuckPlayerJSHelper(
+                    mockDuckPlayer,
+                    mockAppBuildConfig,
+                    mockPixel,
+                    mockDuckDuckGoUrlDetector,
+                    mockPagesSettingPlugin,
+                ),
+                duckChatJSHelper = mockDuckChatJSHelper,
+                refreshPixelSender = refreshPixelSender,
+                privacyProtectionTogglePlugin = protectionTogglePluginPoint,
+                showOnAppLaunchOptionHandler = mockShowOnAppLaunchHandler,
+                customHeadersProvider = fakeCustomHeadersPlugin,
+                toggleReports = mockToggleReports,
+                brokenSitePrompt = mockBrokenSitePrompt,
+                tabStatsBucketing = mockTabStatsBucketing,
+                additionalDefaultBrowserPrompts = mockAdditionalDefaultBrowserPrompts,
+                swipingTabsFeature = swipingTabsFeatureProvider,
+                siteErrorHandler = mockSiteErrorHandler,
+                siteHttpErrorHandler = mockSiteHttpErrorHandler,
+                subscriptionsJSHelper = mockSubscriptionsJSHelper,
+                onboardingDesignExperimentManager = mockOnboardingDesignExperimentManager,
+                tabManager = tabManager,
+                addressDisplayFormatter = mockAddressDisplayFormatter,
+                autoCompleteSettings = mockAutoCompleteSettings,
+                serpEasterEggLogosToggles = mockSerpEasterEggLogoToggles,
+                nonHttpAppLinkChecker = nonHttpAppLinkChecker,
+                externalIntentProcessingState = mockExternalIntentProcessingState,
+                vpnMenuStateProvider = mockVpnMenuStateProvider,
+                webViewCompatWrapper = mockWebViewCompatWrapper,
+                addressBarTrackersAnimationFeatureToggle = mockAddressBarTrackersAnimationFeatureToggle,
+                autoconsentPixelManager = mockAutoconsentPixelManager,
+                omnibarRepository = mockOmnibarFeatureRepository,
+                contentScopeScriptsSubscriptionEventPluginPoint = fakeContentScopeScriptsSubscriptionEventPluginPoint,
+                serpSettingsFeature = serpSettingsFeature,
+            )
+
+        testee.loadData("abc", null, false, false)
+        testee.command.observeForever(mockCommandObserver)
+    }
+
+    private fun resetChannels() {
+        whenever(mockDismissedCtaDao.dismissedCtas()).thenReturn(flowOf(emptyList()))
+        whenever(mockSavedSitesRepository.getFavorites()).thenReturn(flowOf(emptyList()))
+        whenever(mockSavedSitesRepository.getBookmarks()).thenReturn(flowOf(emptyList()))
+        whenever(mockRemoteMessagingRepository.messageFlow()).thenReturn(flowOf())
+    }
 
     @After
     fun after() {
@@ -1537,7 +1557,7 @@ class BrowserTabViewModelTest {
         }
 
     @Test
-    fun whenNoOmnibarTextEverEnteredThenViewStateHasEmptyString() {
+    fun whenNoOmnibarTextEverEnteredThenViewStateHasEmptyString() = runTest {
         assertEquals("", omnibarViewState().omnibarText)
     }
 
@@ -1914,6 +1934,69 @@ class BrowserTabViewModelTest {
 
         val issuedCommand = commandCaptor.allValues.find { it is NavigationCommand.NavigateBack }
         assertNull(issuedCommand)
+    }
+
+    @Test
+    fun whenNavigationToEmptyUrlFromParentAndAboutBlankEnabledThenRemoveTabAndReturnTrue() = runTest {
+        fakeAndroidConfigBrowserFeature.handleAboutBlank().setRawStoredState(State(enable = true))
+        resetChannels()
+        initialiseViewModel()
+        loadUrl(null)
+        setupNavigation(isBrowsing = true, canGoBack = true)
+        testee.onMessageReceived()
+        selectedTabLiveData.value = aTabEntity(id = "id").copy(sourceTabId = "source")
+
+        val result = testee.onUserPressedBack(isCustomTab = false)
+
+        assertTrue(result)
+        verify(mockTabRepository).deleteTabAndSelectSource("id")
+        verify(mockAdClickManager).clearTabId("id")
+    }
+
+    @Test
+    fun whenNavigationToEmptyUrlFromParentButAboutBlankDisabledThenDoNotRemoveTab() = runTest {
+        fakeAndroidConfigBrowserFeature.handleAboutBlank().setRawStoredState(State(enable = false))
+        resetChannels()
+        initialiseViewModel()
+        loadUrl(null)
+        setupNavigation(isBrowsing = true, canGoBack = true)
+        testee.onMessageReceived()
+        selectedTabLiveData.value = aTabEntity(id = "id").copy(sourceTabId = "source")
+
+        testee.onUserPressedBack(isCustomTab = false)
+
+        verify(mockTabRepository, never()).deleteTabAndSelectSource(any())
+    }
+
+    @Test
+    fun whenNotLinkOpenedInNewTabAndAboutBlankEnabledThenDoNotRemoveTab() = runTest {
+        fakeAndroidConfigBrowserFeature.handleAboutBlank().setRawStoredState(State(enable = true))
+        resetChannels()
+        initialiseViewModel()
+        loadUrl(null, isBrowserShowing = true)
+        setupNavigation(isBrowsing = true, canGoBack = true)
+        selectedTabLiveData.value = aTabEntity(id = "id").copy(sourceTabId = "source")
+
+        val result = testee.onUserPressedBack(isCustomTab = false)
+
+        assertTrue(result)
+        verify(mockTabRepository, never()).deleteTabAndSelectSource(any())
+    }
+
+    @Test
+    fun whenIsCustomTabAndNavigationToEmptyUrlFromParentThenDoNotRemoveTab() = runTest {
+        fakeAndroidConfigBrowserFeature.handleAboutBlank().setRawStoredState(State(enable = true))
+        resetChannels()
+        initialiseViewModel()
+
+        loadUrl(null, isBrowserShowing = true)
+        setupNavigation(isBrowsing = true, canGoBack = true)
+        selectedTabLiveData.value = aTabEntity(id = "id").copy(sourceTabId = "source")
+        testee.onMessageReceived()
+
+        testee.onUserPressedBack(isCustomTab = true)
+
+        verify(mockTabRepository, never()).deleteTabAndSelectSource(any())
     }
 
     @Test
@@ -2700,6 +2783,8 @@ class BrowserTabViewModelTest {
                     TabEntity("EMPTY_TAB", url = "", sourceTabId = "SOURCE_TAB", position = 1),
                 ),
             )
+            resetChannels()
+            initialiseViewModel()
 
             testee.onNewTabMenuItemClicked()
 
@@ -2816,6 +2901,8 @@ class BrowserTabViewModelTest {
                     TabEntity("1", url = "", sourceTabId = "SOURCE_TAB", position = 0),
                 ),
             )
+            resetChannels()
+            initialiseViewModel()
 
             testee.onNavigationBarNewTabButtonClicked()
 
@@ -4569,11 +4656,44 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenHandleAboutBlankEnabledAndMessageReceivedAndNullSiteUrlThenSetOmnibarText() {
+    fun whenHandleAboutBlankEnabledAndMessageReceivedAndNullSiteUrlThenSetOmnibarText() = runTest {
         fakeAndroidConfigBrowserFeature.handleAboutBlank().setRawStoredState(State(enable = true))
+        resetChannels()
+        initialiseViewModel()
         loadUrl(null)
         testee.onMessageReceived()
         assertEquals(omnibarViewState().omnibarText, "about:blank")
+    }
+
+    @Test
+    fun whenHandleAboutBlankEnabledAndMessageReceivedAndNullSiteUrlAndCustomTabEmitCommandForUpdateTitle() = runTest {
+        fakeAndroidConfigBrowserFeature.handleAboutBlank().setRawStoredState(State(enable = true))
+        resetChannels()
+        initialiseViewModel()
+        loadUrl(null)
+        testee.setIsCustomTab(true)
+        testee.onMessageReceived()
+
+        val command = captureCommands().lastValue as Command.ShowWebPageTitle
+        assertFalse(command.showDuckPlayerIcon)
+        assertEquals("about:blank", command.title)
+        assertNull("Web page url should be null when opening a page with no url", command.url)
+    }
+
+    @Test
+    fun whenHandleAboutBlankEnabledAndMessageReceivedAndNullSiteUrlAndNewCustomTabEmitCommandForUpdateTitle() = runTest {
+        fakeAndroidConfigBrowserFeature.handleAboutBlank().setRawStoredState(State(enable = true))
+        fakeAndroidConfigBrowserFeature.newCustomTab().setRawStoredState(State(enable = true))
+        resetChannels()
+        initialiseViewModel()
+        loadUrl(null)
+        testee.setIsCustomTab(true)
+        testee.onMessageReceived()
+
+        val command = captureCommands().lastValue as Command.ShowWebPageTitle
+        assertFalse(command.showDuckPlayerIcon)
+        assertEquals("about:blank", command.title)
+        assertEquals("about:blank", command.url)
     }
 
     @Test
@@ -8211,9 +8331,9 @@ class BrowserTabViewModelTest {
             subscriptionName = "subscription1",
             params = JSONObject(),
         )
-        whenever(mockDuckChatJSHelper.onNativeAction(NativeAction.HISTORY)).thenReturn(expectedEvent)
+        whenever(mockDuckChatJSHelper.onNativeAction(NativeAction.SIDEBAR)).thenReturn(expectedEvent)
 
-        testee.openDuckChatHistory()
+        testee.openDuckChatSidebar()
 
         testee.subscriptionEventDataFlow.test {
             val emittedEvent = awaitItem()
@@ -8242,5 +8362,143 @@ class BrowserTabViewModelTest {
             assertEquals(expectedEvent.params.toString(), emittedEvent.params.toString())
             cancelAndIgnoreRemainingEvents()
         }
+    }
+
+    @Test
+    fun whenNonDuckAiPageFinishedAndFullscreenModeEnabledThenDisabledDuckAiModeCommandSent() = runTest {
+        whenever(mockDuckDuckGoUrlDetector.isDuckDuckGoChatUrl(any())).thenReturn(false)
+        whenever(mockDuckAiFeatureState.showFullScreenMode).thenReturn(mockDuckAiFullScreenModeEnabled)
+
+        val nonDdgUrl = "https://example.com/search?q=test"
+        val webViewNavState = WebViewNavigationState(mockStack, 100)
+
+        testee.pageFinished(mockWebView, webViewNavState, nonDdgUrl)
+
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+
+        val commands = commandCaptor.allValues
+        assertFalse(commands.any { it is Command.EnableDuckAIFullScreen })
+        assertTrue(commands.any { it is Command.DisableDuckAIFullScreen })
+    }
+
+    @Test
+    fun whenDuckAiPageFinishedAndFullscreenModeEnabledThenEnableDuckAiModeCommandSent() = runTest {
+        whenever(mockDuckDuckGoUrlDetector.isDuckDuckGoChatUrl(any())).thenReturn(true)
+        whenever(mockDuckAiFeatureState.showFullScreenMode).thenReturn(mockDuckAiFullScreenModeEnabled)
+
+        val nonDdgUrl = "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5"
+        val webViewNavState = WebViewNavigationState(mockStack, 100)
+
+        testee.pageFinished(mockWebView, webViewNavState, nonDdgUrl)
+
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+
+        val commands = commandCaptor.allValues
+        assertFalse(commands.any { it is Command.DisableDuckAIFullScreen })
+        assertTrue(commands.any { it is Command.EnableDuckAIFullScreen })
+    }
+
+    @Test
+    fun whenNonDuckAiPageFinishedAndFullscreenModeDisabledThenDuckAiCommandsNotSent() = runTest {
+        mockDuckAiFullScreenMode.emit(false)
+
+        val nonDdgUrl = "https://example.com/search?q=test"
+        val webViewNavState = WebViewNavigationState(mockStack, 100)
+
+        testee.pageFinished(mockWebView, webViewNavState, nonDdgUrl)
+
+        val commands = commandCaptor.allValues
+        assertFalse(commands.any { it is Command.EnableDuckAIFullScreen })
+        assertFalse(commands.any { it is Command.DisableDuckAIFullScreen })
+    }
+
+    @Test
+    fun whenDuckAiPageFinishedAndFullscreenModeDisabledThenDuckAiCommandsNotSent() = runTest {
+        mockDuckAiFullScreenMode.emit(false)
+
+        val nonDdgUrl = "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5"
+        val webViewNavState = WebViewNavigationState(mockStack, 100)
+
+        testee.pageFinished(mockWebView, webViewNavState, nonDdgUrl)
+
+        val commands = commandCaptor.allValues
+        assertFalse(commands.any { it is Command.DisableDuckAIFullScreen })
+        assertFalse(commands.any { it is Command.EnableDuckAIFullScreen })
+    }
+
+    @Test
+    fun whenNewPageWithDuckAIUrlAndFullscreenModeEnabledThenEnableDuckAiModeCommandSent() = runTest {
+        whenever(mockDuckDuckGoUrlDetector.isDuckDuckGoChatUrl(any())).thenReturn(true)
+        whenever(mockDuckAiFeatureState.showFullScreenMode).thenReturn(mockDuckAiFullScreenModeEnabled)
+        testee.browserViewState.value = browserViewState().copy(browserShowing = true)
+
+        testee.navigationStateChanged(
+            buildWebNavigation(
+                currentUrl = "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5",
+                originalUrl = "https://www.example.com",
+            ),
+        )
+
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+
+        val commands = commandCaptor.allValues
+        assertFalse(commands.any { it is Command.DisableDuckAIFullScreen })
+        assertTrue(commands.any { it is Command.EnableDuckAIFullScreen })
+    }
+
+    @Test
+    fun whenNewPageWithNonDuckAIUrlAndFullscreenModeEnabledThenDisableDuckAiModeCommandSent() = runTest {
+        whenever(mockDuckDuckGoUrlDetector.isDuckDuckGoChatUrl(any())).thenReturn(false)
+        whenever(mockDuckAiFeatureState.showFullScreenMode).thenReturn(mockDuckAiFullScreenModeEnabled)
+        testee.browserViewState.value = browserViewState().copy(browserShowing = true)
+
+        testee.navigationStateChanged(
+            buildWebNavigation(
+                currentUrl = "https://test.com",
+                originalUrl = "https://www.example.com",
+            ),
+        )
+
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+
+        val commands = commandCaptor.allValues
+        assertTrue(commands.any { it is Command.DisableDuckAIFullScreen })
+        assertFalse(commands.any { it is Command.EnableDuckAIFullScreen })
+    }
+
+    @Test
+    fun whenNewPageWithDuckAIUrlAndFullscreenModeDisabledThenNoDuckAICommandsSent() = runTest {
+        testee.browserViewState.value = browserViewState().copy(browserShowing = true)
+
+        testee.navigationStateChanged(
+            buildWebNavigation(
+                currentUrl = "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5",
+                originalUrl = "https://www.example.com",
+            ),
+        )
+
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+
+        val commands = commandCaptor.allValues
+        assertFalse(commands.any { it is Command.DisableDuckAIFullScreen })
+        assertFalse(commands.any { it is Command.EnableDuckAIFullScreen })
+    }
+
+    @Test
+    fun whenNewPageWithNonDuckAIUrlAndFullscreenModeDisabledThenNoDuckAICommandsSent() = runTest {
+        testee.browserViewState.value = browserViewState().copy(browserShowing = true)
+
+        testee.navigationStateChanged(
+            buildWebNavigation(
+                currentUrl = "https://test.com",
+                originalUrl = "https://www.example.com",
+            ),
+        )
+
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+
+        val commands = commandCaptor.allValues
+        assertFalse(commands.any { it is Command.DisableDuckAIFullScreen })
+        assertFalse(commands.any { it is Command.EnableDuckAIFullScreen })
     }
 }

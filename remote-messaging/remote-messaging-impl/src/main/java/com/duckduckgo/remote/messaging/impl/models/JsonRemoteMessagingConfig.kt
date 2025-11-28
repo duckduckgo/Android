@@ -45,6 +45,7 @@ data class JsonContent(
     val secondaryAction: JsonMessageAction? = null,
     val actionText: String = "",
     val action: JsonMessageAction? = null,
+    val listItems: List<JsonListItem>? = null,
 )
 
 data class JsonContentTranslations(
@@ -66,6 +67,15 @@ data class JsonTargetPercentile(
     val before: Float?,
 )
 
+data class JsonListItem(
+    val id: String,
+    val type: String,
+    val titleText: String,
+    val descriptionText: String,
+    val placeholder: String = "",
+    val primaryAction: JsonMessageAction?,
+)
+
 @Suppress("ktlint:standard:class-naming")
 sealed class JsonMessageType(val jsonValue: String) {
     data object SMALL : JsonMessageType("small")
@@ -73,4 +83,5 @@ sealed class JsonMessageType(val jsonValue: String) {
     data object BIG_SINGLE_ACTION : JsonMessageType("big_single_action")
     data object BIG_TWO_ACTION : JsonMessageType("big_two_action")
     data object PROMO_SINGLE_ACTION : JsonMessageType("promo_single_action")
+    data object CARDS_LIST : JsonMessageType("cards_list")
 }
