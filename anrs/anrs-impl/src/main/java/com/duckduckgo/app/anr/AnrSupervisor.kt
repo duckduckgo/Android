@@ -20,6 +20,7 @@ import android.os.Debug
 import android.os.Handler
 import android.os.Looper
 import com.duckduckgo.app.anrs.store.AnrsDatabase
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.api.BrowserLifecycleObserver
 import com.duckduckgo.browser.api.WebViewVersionProvider
 import com.duckduckgo.customtabs.api.CustomTabDetector
@@ -61,6 +62,7 @@ internal fun Any.notifyAll() = (this as Object).notifyAll()
 class AnrSupervisorRunnable @Inject constructor(
     private val webViewVersionProvider: WebViewVersionProvider,
     private val customTabDetector: CustomTabDetector,
+    private val appBuildConfig: AppBuildConfig,
     anrsDatabase: AnrsDatabase,
 ) : Runnable {
 
@@ -93,7 +95,13 @@ class AnrSupervisorRunnable @Inject constructor(
                         val e = AnrException(handler.looper.thread)
                         logcat { "In custom tab: ${customTabDetector.isCustomTab()}. ANR Detected: ${e.threadStateMap}." }
 
-                        anrDao.insert(e.asAnrData(webViewVersionProvider.getFullVersion(), customTabDetector.isCustomTab()).asAnrEntity())
+                        anrDao.insert(
+                            e.asAnrData(
+                                webView = webViewVersionProvider.getFullVersion(),
+                                customTab = customTabDetector.isCustomTab(),
+                                appVersion = appBuildConfig.versionName,
+                            ).asAnrEntity(),
+                        )
 
                         // wait until thread responds again
                         callback.wait()
