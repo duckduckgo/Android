@@ -451,6 +451,7 @@ class RealPirRunStateHandlerTest {
                 BrokerRecordOptOutStarted(
                     broker = testBroker,
                     extractedProfile = testExtractedProfile,
+                    attemptId = "c9982ded-021a-4251-9e03-2c58b130410f",
                 )
 
             testee.handleState(state)
@@ -569,6 +570,8 @@ class RealPirRunStateHandlerTest {
                     extractedProfile = testExtractedProfile,
                     attemptId = "c9982ded-021a-4251-9e03-2c58b130410f",
                     lastActionId = "hello82ded-021a-4251-9e03-2c58b130410f",
+                    durationMs = testTotalTimeMillis,
+                    tries = 1,
                 )
             whenever(mockRepository.getBrokerForName(testBrokerName)).thenReturn(testBroker)
 
@@ -586,8 +589,8 @@ class RealPirRunStateHandlerTest {
                 brokerVersion = testBroker.version,
                 attemptId = "c9982ded-021a-4251-9e03-2c58b130410f",
                 actionId = "hello82ded-021a-4251-9e03-2c58b130410f",
-                durationMs = 0L,
-                tries = 0,
+                durationMs = testTotalTimeMillis,
+                tries = 1,
             )
         }
 
