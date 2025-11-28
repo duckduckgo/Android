@@ -55,3 +55,7 @@ tags:
       - tapOn: "New Tab"
       - assertVisible:
           text: ".*Try our Home screen widget!.*"
+      - assertVisible:
+          id: homeScreenWidgetBottomSheetDialogGhostButton
+      - tapOn:
+          id: homeScreenWidgetBottomSheetDialogGhostButton
