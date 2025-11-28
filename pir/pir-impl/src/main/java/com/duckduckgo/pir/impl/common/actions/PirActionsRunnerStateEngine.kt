@@ -80,10 +80,6 @@ interface PirActionsRunnerStateEngine {
             val url: String,
         ) : Event()
 
-        data class EmailFailed(
-            val error: PirError.EmailError,
-        ) : Event()
-
         data class EmailReceived(
             val generatedEmailData: GeneratedEmailData,
         ) : Event()
@@ -106,21 +102,17 @@ interface PirActionsRunnerStateEngine {
             }
         }
 
-        data class JsErrorReceived(
-            val error: PirError.JsError,
+        data class ErrorReceived(
+            val error: PirError,
         ) : Event()
 
         data class JsActionSuccess(
             val pirSuccessResponse: PirSuccessResponse,
         ) : Event()
 
-        data class JsActionFailed(
-            val error: PirError.ActionFailed,
+        data class BrokerActionFailed(
+            val error: PirError,
             val allowRetry: Boolean,
-        ) : Event()
-
-        data class CaptchaServiceFailed(
-            val error: PirError.CaptchaServiceError,
         ) : Event()
 
         data class RetryAwaitCaptchaSolution(

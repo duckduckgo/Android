@@ -19,10 +19,9 @@ package com.duckduckgo.pir.impl.common.actions
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.impl.common.actions.EventHandler.Next
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event
-import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.CaptchaServiceFailed
-import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.ExecuteBrokerStepAction
+import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.BrokerActionFailed
+import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.ErrorReceived
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.State
-import com.duckduckgo.pir.impl.scripts.models.PirScriptRequestData.UserProfile
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import kotlin.reflect.KClass
@@ -31,25 +30,27 @@ import kotlin.reflect.KClass
     scope = AppScope::class,
     boundType = EventHandler::class,
 )
-class CaptchaServiceFailedEventHandler @Inject constructor() : EventHandler {
-    override val event: KClass<out Event> = CaptchaServiceFailed::class
+class ErrorReceivedHandler @Inject constructor() : EventHandler {
+    override val event: KClass<out Event> = ErrorReceived::class
 
     override suspend fun invoke(
         state: State,
         event: Event,
     ): Next {
         /**
-         * A captcha related error has occurred. However, we still would like to continue to the next broker action.
+         * An error occurred while the engine is running means that the current action executions then fails.
+         * The following errors could be:
+         *  - JsError (Unrecoverable)
+         *  - CaptchaServiceError (Unrecoverable)
+         *  - EmailError (Unrecoverable)
+         *  - ClientError (Unrecoverable)
+         *  We don't need to retry the action if any of these errors happen.
          */
         return Next(
-            nextState = state.copy(
-                currentActionIndex = state.currentActionIndex + 1,
-                actionRetryCount = 0,
-            ),
-            nextEvent = ExecuteBrokerStepAction(
-                UserProfile(
-                    userProfile = state.profileQuery,
-                ),
+            nextState = state,
+            nextEvent = BrokerActionFailed(
+                error = (event as ErrorReceived).error,
+                allowRetry = false,
             ),
         )
     }
