@@ -42,9 +42,12 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.PreviewFontScale
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import com.duckduckgo.common.ui.compose.text.DaxText
 import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
 import com.duckduckgo.common.ui.compose.theme.asTextStyle
+import com.duckduckgo.common.ui.compose.tools.PreviewBox
 import com.duckduckgo.mobile.android.R
 
 /**
@@ -177,5 +180,209 @@ fun DaxSecureTextField(
             },
             colors = daxTextFieldColors(),
         )
+    }
+}
+
+@PreviewLightDark
+@Composable
+private fun DaxSecureTextFieldEmptyPreview() {
+    DaxSecureTextFieldPreviewBox {
+        DaxSecureTextField(
+            state = TextFieldState(),
+            hint = "Enter password",
+        )
+    }
+}
+
+@PreviewFontScale
+@PreviewLightDark
+@Composable
+private fun DaxSecureTextFieldWithTextPreview() {
+    DaxSecureTextFieldPreviewBox {
+        DaxSecureTextField(
+            state = TextFieldState(initialText = "SecurePassword123"),
+            hint = "Enter password",
+        )
+    }
+}
+
+@PreviewLightDark
+@Composable
+private fun DaxSecureTextFieldNoHintPreview() {
+    DaxSecureTextFieldPreviewBox {
+        DaxSecureTextField(
+            state = TextFieldState(initialText = "SecurePassword123"),
+        )
+    }
+}
+
+@PreviewLightDark
+@Composable
+private fun DaxSecureTextFieldEnabledPreview() {
+    DaxSecureTextFieldPreviewBox {
+        DaxSecureTextField(
+            state = TextFieldState(initialText = "SecurePassword123"),
+            hint = "Enter password",
+            enabled = true,
+        )
+    }
+}
+
+@PreviewLightDark
+@Composable
+private fun DaxSecureTextFieldDisabledPreview() {
+    DaxSecureTextFieldPreviewBox {
+        DaxSecureTextField(
+            state = TextFieldState(initialText = "SecurePassword123"),
+            hint = "Enter password",
+            enabled = false,
+        )
+    }
+}
+
+@PreviewLightDark
+@Composable
+private fun DaxSecureTextFieldEditablePreview() {
+    DaxSecureTextFieldPreviewBox {
+        DaxSecureTextField(
+            state = TextFieldState(initialText = "SecurePassword123"),
+            hint = "Enter password",
+            editable = true,
+        )
+    }
+}
+
+@PreviewLightDark
+@Composable
+private fun DaxSecureTextFieldNonEditablePreview() {
+    DaxSecureTextFieldPreviewBox {
+        DaxSecureTextField(
+            state = TextFieldState(initialText = "SecurePassword123"),
+            hint = "Read only password",
+            editable = false,
+        )
+    }
+}
+
+@PreviewLightDark
+@Composable
+private fun DaxSecureTextFieldClickablePreview() {
+    DaxSecureTextFieldPreviewBox {
+        DaxSecureTextField(
+            state = TextFieldState(initialText = "SecurePassword123"),
+            hint = "Click to interact",
+            clickable = true,
+            onClick = {},
+        )
+    }
+}
+
+@PreviewLightDark
+@Composable
+private fun DaxSecureTextFieldNonClickablePreview() {
+    DaxSecureTextFieldPreviewBox {
+        DaxSecureTextField(
+            state = TextFieldState(initialText = "SecurePassword123"),
+            hint = "Enter password",
+            clickable = false,
+        )
+    }
+}
+
+@PreviewLightDark
+@Composable
+private fun DaxSecureTextFieldWithErrorPreview() {
+    DaxSecureTextFieldPreviewBox {
+        DaxSecureTextField(
+            state = TextFieldState(initialText = "weak"),
+            hint = "Enter password",
+            error = "Password must be at least 8 characters",
+        )
+    }
+}
+
+@PreviewLightDark
+@Composable
+private fun DaxSecureTextFieldWithTrailingIconPreview() {
+    DaxSecureTextFieldPreviewBox {
+        DaxSecureTextField(
+            state = TextFieldState(initialText = "SecurePassword123"),
+            hint = "Enter password",
+            trailingIcon = DaxTextFieldTrailingIcon(
+                iconResId = R.drawable.ic_copy_24,
+                contentDescription = "Copy",
+            ),
+            onClick = {},
+        )
+    }
+}
+
+@PreviewLightDark
+@Composable
+private fun DaxSecureTextFieldEmptyWithTrailingIconPreview() {
+    DaxSecureTextFieldPreviewBox {
+        DaxSecureTextField(
+            state = TextFieldState(),
+            hint = "Enter password",
+            trailingIcon = DaxTextFieldTrailingIcon(
+                iconResId = R.drawable.ic_copy_24,
+                contentDescription = "Copy",
+            ),
+            onClick = {},
+        )
+    }
+}
+
+@PreviewLightDark
+@Composable
+private fun DaxSecureTextFieldErrorWithTrailingIconPreview() {
+    DaxSecureTextFieldPreviewBox {
+        DaxSecureTextField(
+            state = TextFieldState(initialText = "weak"),
+            hint = "Enter password",
+            error = "Password must contain uppercase, lowercase, and numbers",
+            trailingIcon = DaxTextFieldTrailingIcon(
+                iconResId = R.drawable.ic_copy_24,
+                contentDescription = "Copy",
+            ),
+            onClick = {},
+        )
+    }
+}
+
+@PreviewLightDark
+@Composable
+private fun DaxSecureTextFieldDisabledWithTextPreview() {
+    DaxSecureTextFieldPreviewBox {
+        DaxSecureTextField(
+            state = TextFieldState(initialText = "SecurePassword123"),
+            hint = "Enter password",
+            enabled = false,
+        )
+    }
+}
+
+@PreviewLightDark
+@Composable
+private fun DaxSecureTextFieldNonEditableClickablePreview() {
+    DaxSecureTextFieldPreviewBox {
+        DaxSecureTextField(
+            state = TextFieldState(initialText = "SecurePassword123"),
+            hint = "Click to select",
+            editable = false,
+            clickable = true,
+            onClick = {},
+        )
+    }
+}
+
+@Composable
+private fun DaxSecureTextFieldPreviewBox(
+    content: @Composable () -> Unit,
+) {
+    DuckDuckGoTheme {
+        PreviewBox(backgroundColor = DuckDuckGoTheme.colors.background) {
+            content()
+        }
     }
 }
