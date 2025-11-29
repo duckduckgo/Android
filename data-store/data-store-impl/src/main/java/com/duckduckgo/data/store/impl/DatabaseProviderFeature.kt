@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2025 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,28 +14,19 @@
  * limitations under the License.
  */
 
-plugins {
-    id 'com.android.library'
-    id 'kotlin-android'
+package com.duckduckgo.data.store.impl
+
+import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
+import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
+
+@ContributesRemoteFeature(
+    scope = AppScope::class,
+    featureName = "databaseProvider",
+)
+interface DatabaseProviderFeature {
+
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun self(): Toggle
 }
-
-apply from: "$rootProject.projectDir/gradle/android-library.gradle"
-
-android {
-    namespace "com.duckduckgo.datastore.api"
-    compileOptions {
-        coreLibraryDesugaringEnabled = true
-    }
-}
-
-dependencies {
-    implementation project(':navigation-api')
-
-    implementation KotlinX.coroutines.core
-    implementation AndroidX.appCompat
-    implementation AndroidX.room.ktx
-
-    coreLibraryDesugaring Android.tools.desugarJdkLibs
-}
-
-

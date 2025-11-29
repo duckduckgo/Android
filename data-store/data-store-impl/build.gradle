@@ -30,6 +30,7 @@ dependencies {
     anvil project(':anvil-compiler')
     implementation project(':anvil-annotations')
     implementation project(':di')
+    implementation project(':feature-toggles-api')
     ksp AndroidX.room.compiler
 
     implementation KotlinX.coroutines.android
@@ -45,8 +46,15 @@ dependencies {
     // Security crypto
     implementation AndroidX.security.crypto
 
+    // Room
+    implementation AndroidX.room.runtime
+    implementation AndroidX.room.rxJava2
+    implementation AndroidX.room.ktx
+    ksp AndroidX.room.compiler
+
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation project(':common-test')
+    testImplementation project(':feature-toggles-test')
     testImplementation Testing.junit4
     testImplementation AndroidX.test.ext.junit
     testImplementation CashApp.turbine
