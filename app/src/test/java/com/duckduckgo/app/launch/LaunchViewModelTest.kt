@@ -24,7 +24,9 @@ import com.duckduckgo.app.launch.LaunchViewModel.Command.Home
 import com.duckduckgo.app.launch.LaunchViewModel.Command.Onboarding
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.UserStageStore
+import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.referral.StubAppReferrerFoundStateListener
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.daxprompts.api.DaxPrompts
 import com.duckduckgo.daxprompts.api.DaxPrompts.ActionType
@@ -50,6 +52,7 @@ class LaunchViewModelTest {
     private val mockCommandObserver: Observer<LaunchViewModel.Command> = mock()
     private val mockDaxPrompts: DaxPrompts = mock()
     private val mockAppInstallStore: AppInstallStore = mock()
+    private val pixel: Pixel = mock()
 
     private lateinit var testee: LaunchViewModel
 
@@ -65,6 +68,7 @@ class LaunchViewModelTest {
             StubAppReferrerFoundStateListener("xx"),
             mockDaxPrompts,
             mockAppInstallStore,
+            pixel = pixel,
         )
         whenever(mockDaxPrompts.evaluate()).thenReturn(ActionType.NONE)
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.NEW)
@@ -82,6 +86,7 @@ class LaunchViewModelTest {
             StubAppReferrerFoundStateListener("xx", mockDelayMs = 1_000),
             mockDaxPrompts,
             mockAppInstallStore,
+            pixel = pixel,
         )
         whenever(mockDaxPrompts.evaluate()).thenReturn(ActionType.NONE)
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.NEW)
@@ -99,6 +104,7 @@ class LaunchViewModelTest {
             StubAppReferrerFoundStateListener("xx", mockDelayMs = Long.MAX_VALUE),
             mockDaxPrompts,
             mockAppInstallStore,
+            pixel = pixel,
         )
         whenever(mockDaxPrompts.evaluate()).thenReturn(ActionType.NONE)
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.NEW)
@@ -116,6 +122,7 @@ class LaunchViewModelTest {
             StubAppReferrerFoundStateListener("xx"),
             mockDaxPrompts,
             mockAppInstallStore,
+            pixel = pixel,
         )
         whenever(mockDaxPrompts.evaluate()).thenReturn(ActionType.NONE)
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
@@ -131,6 +138,7 @@ class LaunchViewModelTest {
             StubAppReferrerFoundStateListener("xx", mockDelayMs = 1_000),
             mockDaxPrompts,
             mockAppInstallStore,
+            pixel = pixel,
         )
         whenever(mockDaxPrompts.evaluate()).thenReturn(ActionType.NONE)
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
@@ -146,6 +154,7 @@ class LaunchViewModelTest {
             StubAppReferrerFoundStateListener("xx", mockDelayMs = Long.MAX_VALUE),
             mockDaxPrompts,
             mockAppInstallStore,
+            pixel = pixel,
         )
         whenever(mockDaxPrompts.evaluate()).thenReturn(ActionType.NONE)
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
@@ -161,11 +170,28 @@ class LaunchViewModelTest {
             StubAppReferrerFoundStateListener("xx", mockDelayMs = Long.MAX_VALUE),
             mockDaxPrompts,
             mockAppInstallStore,
+            pixel = pixel,
         )
         whenever(mockDaxPrompts.evaluate()).thenReturn(ActionType.SHOW_BROWSER_COMPARISON_PROMPT)
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
         testee.command.observeForever(mockCommandObserver)
         testee.determineViewToShow()
         verify(mockCommandObserver).onChanged(any<DaxPromptBrowserComparison>())
+    }
+
+    @Test
+    fun whenReferrerDataTimesOutThenPixelIsSent() = runTest {
+        testee = LaunchViewModel(
+            userStageStore,
+            StubAppReferrerFoundStateListener("xx", mockDelayMs = Long.MAX_VALUE),
+            mockDaxPrompts,
+            mockAppInstallStore,
+            pixel = pixel,
+        )
+        whenever(mockDaxPrompts.evaluate()).thenReturn(ActionType.NONE)
+
+        testee.determineViewToShow()
+
+        verify(pixel).fire(AppPixelName.TIMEOUT_WAITING_FOR_APP_REFERRER)
     }
 }

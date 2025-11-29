@@ -21,6 +21,7 @@ import com.duckduckgo.anvil.annotations.ContributesPluginPoint
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
+import com.duckduckgo.app.statistics.pixels.AtbInitializationPluginPixelSender
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
@@ -50,6 +51,7 @@ class AtbInitializer @Inject constructor(
     private val statisticsUpdater: StatisticsUpdater,
     private val listeners: PluginPoint<AtbInitializerListener>,
     private val dispatcherProvider: DispatcherProvider,
+    private val pixelSender: AtbInitializationPluginPixelSender,
 ) : MainProcessLifecycleObserver, PrivacyConfigCallbackPlugin {
 
     override fun onResume(owner: LifecycleOwner) {
@@ -65,14 +67,26 @@ class AtbInitializer @Inject constructor(
     override fun onPrivacyConfigDownloaded() {
         if (!statisticsDataStore.hasInstallationStatistics) {
             appCoroutineScope.launch(dispatcherProvider.io()) {
-                logcat(VERBOSE) { "Initialize ATB" }
-                listeners.getPlugins().forEach {
-                    withTimeoutOrNull(it.beforeAtbInitTimeoutMillis()) { it.beforeAtbInit() }
+                val preAtbInitPlugins = listeners.getPlugins()
+                logcat(VERBOSE) { "AtbInitializer: About to initialize ATB; running ${preAtbInitPlugins.size} pre ATB initialization plugins" }
+
+                preAtbInitPlugins.forEach { plugin ->
+                    val pluginName = plugin.javaClass.simpleName
+                    logcat(VERBOSE) { "AtbInitializer: Running pre-ATB init plugin [$pluginName]" }
+
+                    withTimeoutOrNull(plugin.beforeAtbInitTimeoutMillis()) {
+                        plugin.beforeAtbInit()
+                    } ?: onPluginTimeout(pluginName)
                 }
+
                 // First time we initializeAtb
                 statisticsUpdater.initializeAtb()
             }
         }
+    }
+
+    private fun onPluginTimeout(pluginName: String) {
+        pixelSender.pluginTimedOut(pluginName)
     }
 }
 
