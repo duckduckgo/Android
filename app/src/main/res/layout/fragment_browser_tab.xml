@@ -20,14 +20,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.duckduckgo.app.browser.omnibar.OmnibarLayout
-        android:id="@+id/omnibarLayoutTop"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:elevation="1dp"
-        android:outlineProvider="none"
-        app:omnibarPosition="top" />
-
     <FrameLayout
         android:id="@+id/webViewFullScreenContainer"
         android:layout_width="match_parent"
@@ -159,14 +151,6 @@
             android:layout_alignParentBottom="true" />
 
     </RelativeLayout>
-
-    <com.duckduckgo.app.browser.omnibar.OmnibarLayout
-        android:id="@+id/omnibarLayoutBottom"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:outlineProvider="none"
-        app:omnibarPosition="bottom"  />
 
     <com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView
         android:id="@+id/navigationBar"
