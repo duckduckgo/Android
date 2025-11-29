@@ -66,7 +66,7 @@ class JsActionFailedEventHandler @Inject constructor(
         if (currentBrokerStep is OptOutStep) {
             pirRunStateHandler.handleState(
                 BrokerOptOutActionFailed(
-                    brokerName = brokerName,
+                    broker = currentBrokerStep.broker,
                     extractedProfile = currentBrokerStep.profileToOptOut,
                     completionTimeInMillis = currentTimeProvider.currentTimeMillis(),
                     actionType = currentAction.asActionType(),
@@ -77,7 +77,7 @@ class JsActionFailedEventHandler @Inject constructor(
         } else if (currentBrokerStep is EmailConfirmationStep) {
             pirRunStateHandler.handleState(
                 BrokerOptOutActionFailed(
-                    brokerName = brokerName,
+                    broker = currentBrokerStep.broker,
                     extractedProfile = currentBrokerStep.profileToOptOut,
                     completionTimeInMillis = currentTimeProvider.currentTimeMillis(),
                     actionType = currentAction.asActionType(),
@@ -88,7 +88,7 @@ class JsActionFailedEventHandler @Inject constructor(
         } else {
             pirRunStateHandler.handleState(
                 BrokerScanActionFailed(
-                    brokerName = brokerName,
+                    broker = currentBrokerStep.broker,
                     actionType = currentAction.asActionType(),
                     actionID = error.actionID,
                     message = error.message,
