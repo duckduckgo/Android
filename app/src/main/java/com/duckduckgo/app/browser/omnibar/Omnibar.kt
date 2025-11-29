@@ -49,7 +49,6 @@ import com.duckduckgo.common.ui.view.hideKeyboard
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.showKeyboard
 import com.duckduckgo.common.utils.extensions.replaceTextChangedListener
-import com.duckduckgo.common.utils.extractDomain
 import com.duckduckgo.common.utils.text.TextChangedWatcher
 import com.google.android.material.appbar.AppBarLayout.GONE
 import com.google.android.material.appbar.AppBarLayout.VISIBLE
@@ -147,7 +146,7 @@ class Omnibar(
         data class CustomTab(
             val toolbarColor: Int,
             val title: String?,
-            val domain: String?,
+            val domain: String? = null,
             val showDuckPlayerIcon: Boolean = false,
         ) : ViewMode()
 
@@ -381,19 +380,14 @@ class Omnibar(
 
     fun configureCustomTab(
         customTabToolbarColor: Int,
-        customTabDomainText: String?,
     ) {
-        omnibarView.decorate(Mode(ViewMode.CustomTab(toolbarColor = customTabToolbarColor, title = null, domain = customTabDomainText)))
+        omnibarView.decorate(Mode(ViewMode.CustomTab(toolbarColor = customTabToolbarColor, title = null)))
     }
 
     fun showWebPageTitleInCustomTab(
         title: String,
-        url: String?,
-        showDuckPlayerIcon: Boolean,
     ) {
-        val redirectedDomain = url?.extractDomain()
-
-        omnibarView.decorate(Decoration.ChangeCustomTabTitle(title, redirectedDomain, showDuckPlayerIcon))
+        omnibarView.decorate(Decoration.ChangeCustomTabTitle(title))
     }
 
     fun show() {
