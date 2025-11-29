@@ -8161,7 +8161,7 @@ class BrowserTabViewModelTest {
     class FakeCustomHeadersProvider(
         var headers: Map<String, String>,
     ) : CustomHeadersProvider {
-        override fun getCustomHeaders(url: String): Map<String, String> = headers
+        override suspend fun getCustomHeaders(url: String): Map<String, String> = headers
     }
 
     class FakeContentScopeScriptsSubscriptionEventPlugin(
