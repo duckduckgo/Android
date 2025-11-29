@@ -1056,11 +1056,11 @@ class BrowserTabFragment :
         configureOmnibar()
 
         if (savedInstanceState == null) {
-            viewModel.onViewReady()
             viewModel.setIsCustomTab(tabDisplayedInCustomTabScreen)
             messageFromPreviousTab?.let {
                 processMessage(it)
             }
+            viewModel.onViewReady()
         } else {
             viewModel.onViewRecreated()
         }

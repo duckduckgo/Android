@@ -31,7 +31,9 @@ class TabPagerAdapter(
     private val activity: BrowserActivity,
 ) : FragmentStateAdapter(activity) {
     private val tabs = mutableListOf<TabModel>()
-    private var messageForNewFragment: Message? = null
+
+    // Key is the source tab ID, value is the message for the popup
+    private val messagesForTabs = mutableMapOf<String, Message>()
 
     var currentTabIndex = -1
         @SuppressLint("NotifyDataSetChanged")
@@ -60,10 +62,10 @@ class TabPagerAdapter(
         val tab = tabs[position]
         val isExternal = activity.intent?.getBooleanExtra(BrowserActivity.LAUNCH_FROM_EXTERNAL_EXTRA, false) == true
 
-        return if (messageForNewFragment != null) {
-            val message = messageForNewFragment
-            messageForNewFragment = null
-            return BrowserTabFragment.newInstance(tab.tabId, null, false, isExternal).apply {
+        // Check if there's a message specifically for this tab's source tab ID
+        val message = messagesForTabs.remove(tab.sourceTabId)
+        return if (message != null) {
+            BrowserTabFragment.newInstance(tab.tabId, null, false, isExternal).apply {
                 this.messageFromPreviousTab = message
             }
         } else {
@@ -83,8 +85,12 @@ class TabPagerAdapter(
         }
     }
 
-    fun setMessageForNewFragment(message: Message) {
-        messageForNewFragment = message
+    /**
+     * Sets a message for the next tab created from the given source tab.
+     * This should be called BEFORE calling openNewTab().
+     */
+    fun setMessageForNewFragment(sourceTabId: String, message: Message) {
+        messagesForTabs[sourceTabId] = message
     }
 
     @SuppressLint("NotifyDataSetChanged")
@@ -135,7 +141,7 @@ class TabPagerAdapter(
         }
     }
 
-    inner class PagerDiffUtil(
+    class PagerDiffUtil(
         private val oldList: List<TabModel>,
         private val newList: List<TabModel>,
     ) : DiffUtil.Callback() {

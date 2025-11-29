@@ -58,7 +58,7 @@ class DefaultTabManagerTest {
     fun whenOnTabsChangedThenOnTabsUpdatedCalledWithNewTabs() = runTest {
         val tabId = "tabId"
         val tabId2 = "tabId2"
-        val tabs = listOf(TabModel(tabId, "cnn.com", false), TabModel(tabId2, "bbc.com", true))
+        val tabs = listOf(TabModel(tabId, "cnn.com", false, null), TabModel(tabId2, "bbc.com", true, null))
         val onTabsUpdated: (List<TabModel>) -> Unit = mock()
 
         testee.registerCallbacks(onTabsUpdated)
