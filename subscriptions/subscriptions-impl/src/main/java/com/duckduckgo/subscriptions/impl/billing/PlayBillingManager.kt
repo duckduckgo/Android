@@ -327,15 +327,11 @@ class RealPlayBillingManager @Inject constructor(
 
                 PurchaseAbsent -> {}
                 UserCancelled -> {
-                    subscriptionPurchaseWideEvent.onPurchaseCancelledByUser()
-                    subscriptionSwitchWideEvent.onUserCancelled()
                     _purchaseState.emit(Canceled)
                     // Handle an error caused by a user cancelling the purchase flow.
                 }
 
                 is PurchasesUpdateResult.Failure -> {
-                    subscriptionPurchaseWideEvent.onBillingFlowPurchaseFailure(result.errorType)
-                    subscriptionSwitchWideEvent.onSwitchFailed(result.errorType)
                     pixelSender.reportPurchaseFailureStore(result.errorType)
                     _purchaseState.emit(PurchaseState.Failure(result.errorType))
                 }
