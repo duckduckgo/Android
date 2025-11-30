@@ -361,6 +361,19 @@ class RealPlayBillingManagerTest {
 
         billingClientAdapter.verifyLaunchSubscriptionUpdateNotInvoked()
     }
+
+    @Test
+    fun `when purchase update fails then emits failure state`() = runTest {
+        processLifecycleOwner.currentState = RESUMED
+
+        subject.purchaseState.test {
+            expectNoEvents()
+
+            billingClientAdapter.purchasesListener?.invoke(PurchasesUpdateResult.Failure("BILLING_UNAVAILABLE"))
+
+            assertEquals(PurchaseState.Failure("BILLING_UNAVAILABLE"), awaitItem())
+        }
+    }
 }
 
 class FakeBillingClientAdapter : BillingClientAdapter {

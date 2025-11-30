@@ -393,6 +393,10 @@ class RealSubscriptionsManager @Inject constructor(
                         }
                     }
 
+                    is PurchaseState.Failure -> {
+                        _currentPurchaseState.emit(CurrentPurchase.Failure(it.errorType))
+                    }
+
                     else -> {
                         // NOOP
                     }

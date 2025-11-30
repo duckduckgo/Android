@@ -336,7 +336,7 @@ class RealPlayBillingManager @Inject constructor(
                     subscriptionPurchaseWideEvent.onBillingFlowPurchaseFailure(result.errorType)
                     subscriptionSwitchWideEvent.onSwitchFailed(result.errorType)
                     pixelSender.reportPurchaseFailureStore(result.errorType)
-                    _purchaseState.emit(Canceled)
+                    _purchaseState.emit(PurchaseState.Failure(result.errorType))
                 }
             }
         }
@@ -413,4 +413,5 @@ sealed class PurchaseState {
     ) : PurchaseState()
 
     data object Canceled : PurchaseState()
+    data class Failure(val errorType: String) : PurchaseState()
 }
