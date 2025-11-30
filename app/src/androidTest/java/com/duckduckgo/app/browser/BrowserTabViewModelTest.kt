@@ -248,7 +248,6 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerOrigin.AUTO
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerOrigin.OVERLAY
-import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.DISABLED
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.ENABLED
 import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.Off
 import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.On
@@ -2299,37 +2298,6 @@ class BrowserTabViewModelTest {
             val command = captureCommands().lastValue as Command.ShowSavedSiteAddedConfirmation
             assertEquals(url, command.savedSiteChangedViewState.savedSite.url)
             assertEquals(title, command.savedSiteChangedViewState.savedSite.title)
-        }
-
-    @Test
-    fun whenSiteLoadedWithSimulatedYouTubeNoCookieAndDuckPlayerEnabledThenShowWebPageTitleWithDuckPlayerIcon() =
-        runTest {
-            val url = "http://youtube-nocookie.com/videoID=1234"
-            val title = "Duck Player"
-            whenever(mockDuckPlayer.isDuckPlayerUri(anyString())).thenReturn(true)
-            whenever(mockDuckPlayer.isSimulatedYoutubeNoCookie(any())).thenReturn(true)
-            whenever(mockDuckPlayer.createDuckPlayerUriFromYoutubeNoCookie(any())).thenReturn("duck://player/1234")
-            whenever(mockDuckPlayer.getDuckPlayerState()).thenReturn(ENABLED)
-
-            loadUrl(url = url)
-            testee.titleReceived(newTitle = title)
-            val command = captureCommands().lastValue as Command.ShowWebPageTitle
-            assertTrue(command.showDuckPlayerIcon)
-            assertEquals("duck://player/1234", command.url)
-        }
-
-    @Test
-    fun whenSiteLoadedWithDuckPlayerDisabledThenShowWebPageTitleWithoutDuckPlayerIcon() =
-        runTest {
-            val url = "http://youtube-nocookie.com/videoID=1234"
-            val title = "Duck Player"
-            whenever(mockDuckPlayer.getDuckPlayerState()).thenReturn(DISABLED)
-
-            loadUrl(url = url)
-            testee.titleReceived(newTitle = title)
-            val command = captureCommands().lastValue as Command.ShowWebPageTitle
-            assertFalse(command.showDuckPlayerIcon)
-            assertEquals("http://youtube-nocookie.com/videoID=1234", command.url)
         }
 
     @Test
@@ -4675,9 +4643,7 @@ class BrowserTabViewModelTest {
         testee.onMessageReceived()
 
         val command = captureCommands().lastValue as Command.ShowWebPageTitle
-        assertFalse(command.showDuckPlayerIcon)
         assertEquals("about:blank", command.title)
-        assertNull("Web page url should be null when opening a page with no url", command.url)
     }
 
     @Test
@@ -4691,9 +4657,7 @@ class BrowserTabViewModelTest {
         testee.onMessageReceived()
 
         val command = captureCommands().lastValue as Command.ShowWebPageTitle
-        assertFalse(command.showDuckPlayerIcon)
         assertEquals("about:blank", command.title)
-        assertEquals("about:blank", command.url)
     }
 
     @Test
