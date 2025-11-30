@@ -224,8 +224,9 @@ class RealPlayBillingManager @Inject constructor(
             ?.offerToken
 
         if (productDetails == null || offerToken == null) {
-            subscriptionPurchaseWideEvent.onBillingFlowInitFailure(error = "Missing product details")
-            _purchaseState.emit(Canceled)
+            val error = "Missing product details"
+            subscriptionPurchaseWideEvent.onBillingFlowInitFailure(error = error)
+            _purchaseState.emit(PurchaseState.Failure(error))
             return@withContext
         }
 
@@ -246,7 +247,7 @@ class RealPlayBillingManager @Inject constructor(
             is LaunchBillingFlowResult.Failure -> {
                 val error = "Billing error: ${launchBillingFlowResult.error.name}"
                 subscriptionPurchaseWideEvent.onBillingFlowInitFailure(error)
-                _purchaseState.emit(Canceled)
+                _purchaseState.emit(PurchaseState.Failure(error))
             }
         }
     }
@@ -270,7 +271,7 @@ class RealPlayBillingManager @Inject constructor(
             val errorMessage = "empty old purchase token"
             logcat { "Billing: $errorMessage" }
             subscriptionSwitchWideEvent.onBillingFlowInitFailure(errorMessage)
-            _purchaseState.emit(Canceled)
+            _purchaseState.emit(PurchaseState.Failure(errorMessage))
             return@withContext
         }
 
@@ -285,7 +286,7 @@ class RealPlayBillingManager @Inject constructor(
             val errorMessage = "Missing product details"
             logcat { "Billing: $errorMessage" }
             subscriptionSwitchWideEvent.onBillingFlowInitFailure(errorMessage)
-            _purchaseState.emit(Canceled)
+            _purchaseState.emit(PurchaseState.Failure(errorMessage))
             return@withContext
         }
 
@@ -307,7 +308,7 @@ class RealPlayBillingManager @Inject constructor(
 
             is LaunchBillingFlowResult.Failure -> {
                 subscriptionSwitchWideEvent.onBillingFlowInitFailure(launchBillingFlowResult.error.name)
-                _purchaseState.emit(Canceled)
+                _purchaseState.emit(PurchaseState.Failure(launchBillingFlowResult.error.name))
             }
         }
     }
