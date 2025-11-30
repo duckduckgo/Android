@@ -2076,15 +2076,8 @@ class BrowserTabViewModel @Inject constructor(
 
     override fun titleReceived(newTitle: String) {
         site?.title = newTitle
-        val url = site?.url
-        viewModelScope.launch(dispatchers.main()) {
-            val isDuckPlayerUrl =
-                withContext(dispatchers.io()) {
-                    url != null && duckPlayer.getDuckPlayerState() == ENABLED && duckPlayer.isDuckPlayerUri(url)
-                }
-            command.postValue(ShowWebPageTitle(newTitle, url, isDuckPlayerUrl))
-            onSiteChanged()
-        }
+        command.postValue(ShowWebPageTitle(newTitle))
+        onSiteChanged()
     }
 
     @AnyThread
@@ -3827,21 +3820,11 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private fun handleNewTabForEmptyUrlOnCustomTab() {
-        viewModelScope.launch {
-            val newCustomTabEnabled = withContext(dispatchers.io()) {
-                androidBrowserConfig.newCustomTab().isEnabled()
-            }
-            command.postValue(
-                ShowWebPageTitle(
-                    title = ABOUT_BLANK,
-                    url = if (newCustomTabEnabled) {
-                        ABOUT_BLANK
-                    } else {
-                        site?.url
-                    },
-                ),
-            )
-        }
+        command.postValue(
+            ShowWebPageTitle(
+                title = ABOUT_BLANK,
+            ),
+        )
     }
 
     private fun processGlobalMessages(

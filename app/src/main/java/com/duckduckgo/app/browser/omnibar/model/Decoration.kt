@@ -41,8 +41,6 @@ sealed class Decoration {
 
     data class ChangeCustomTabTitle(
         val title: String,
-        val domain: String?,
-        val showDuckPlayerIcon: Boolean,
     ) : Decoration()
 
     data class PrivacyShieldChanged(

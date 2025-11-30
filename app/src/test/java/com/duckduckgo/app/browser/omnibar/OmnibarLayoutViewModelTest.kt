@@ -332,13 +332,12 @@ class OmnibarLayoutViewModelTest {
     fun whenViewModeChangedToCustomTabThenViewStateCorrect() = runTest {
         val expectedToolbarColor = 100
         val expectedTitle = "example"
-        val expectedDomain = "example.com"
+        val expectedDomain = ""
         val expectedShowDuckPlayerIcon = false
         testee.onViewModeChanged(
             ViewMode.CustomTab(
                 toolbarColor = expectedToolbarColor,
                 title = expectedTitle,
-                domain = expectedDomain,
                 showDuckPlayerIcon = expectedShowDuckPlayerIcon,
             ),
         )
@@ -355,7 +354,7 @@ class OmnibarLayoutViewModelTest {
             val customTabMode = viewState.viewMode as ViewMode.CustomTab
             assertEquals(expectedToolbarColor, customTabMode.toolbarColor)
             assertEquals(expectedTitle, customTabMode.title)
-            assertEquals(expectedDomain, customTabMode.domain)
+            assertEquals(expectedDomain, customTabMode.domain) // Empty string because no URL is set
             assertEquals(expectedShowDuckPlayerIcon, customTabMode.showDuckPlayerIcon)
         }
     }
@@ -363,32 +362,140 @@ class OmnibarLayoutViewModelTest {
     @Test
     fun `when custom tab title updates, update view mode state`() = runTest {
         val expectedTitle = "newTitle"
-        val expectedDomain = "newDomain"
-        val expectedShowDuckPlayerIcon = true
+        val initialUrl = "https://example.com/page"
+        val expectedDomain = "example.com"
         val decoration = ChangeCustomTabTitle(
             title = expectedTitle,
-            domain = expectedDomain,
-            showDuckPlayerIcon = expectedShowDuckPlayerIcon,
         )
 
         testee.onViewModeChanged(ViewMode.CustomTab(100, "example", "example.com", showDuckPlayerIcon = false))
+        // Set URL in state so domain can be extracted
+        testee.onExternalStateChange(
+            StateChange.LoadingStateChange(
+                LoadingViewState(
+                    isLoading = false,
+                    trackersAnimationEnabled = false,
+                    progress = 100,
+                    url = initialUrl,
+                ),
+            ),
+        )
+        testee.onCustomTabTitleUpdate(decoration)
+
         testee.viewState.test {
-            // skipping initial update
-            skipItems(1)
-            testee.onCustomTabTitleUpdate(decoration)
-            val viewState = awaitItem()
-            assertFalse(viewState.showClearButton)
-            assertFalse(viewState.showVoiceSearch)
-            assertFalse(viewState.showTabsMenu)
-            assertFalse(viewState.showFireIcon)
-            assertTrue(viewState.showBrowserMenu)
+            val viewState = expectMostRecentItem()
 
             assertTrue(viewState.viewMode is ViewMode.CustomTab)
             val customTabMode = viewState.viewMode as ViewMode.CustomTab
             assertEquals(100, customTabMode.toolbarColor)
             assertEquals(expectedTitle, customTabMode.title)
             assertEquals(expectedDomain, customTabMode.domain)
-            assertEquals(expectedShowDuckPlayerIcon, customTabMode.showDuckPlayerIcon)
+            assertFalse(customTabMode.showDuckPlayerIcon)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when custom tab view mode changed and URL loaded then domain extracted from URL`() = runTest {
+        val testUrl = "https://example.com/path/to/page"
+        val expectedDomain = "example.com"
+
+        testee.onViewModeChanged(ViewMode.CustomTab(100, "example"))
+        testee.onExternalStateChange(
+            StateChange.LoadingStateChange(
+                LoadingViewState(
+                    isLoading = false,
+                    trackersAnimationEnabled = false,
+                    progress = 100,
+                    url = testUrl,
+                ),
+            ),
+        )
+
+        testee.viewState.test {
+            val viewState = expectMostRecentItem()
+            assertTrue(viewState.viewMode is ViewMode.CustomTab)
+            val customTabMode = viewState.viewMode as ViewMode.CustomTab
+            assertEquals(expectedDomain, customTabMode.domain)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when custom tab URL changes to different domain then domain is dynamically updated`() = runTest {
+        val initialUrl = "https://example.com/page"
+        val newUrl = "https://different.com/other"
+        val expectedNewDomain = "different.com"
+
+        testee.onViewModeChanged(ViewMode.CustomTab(100, "title", "example.com", showDuckPlayerIcon = false))
+        testee.onExternalStateChange(
+            StateChange.LoadingStateChange(
+                LoadingViewState(
+                    isLoading = false,
+                    trackersAnimationEnabled = false,
+                    progress = 100,
+                    url = initialUrl,
+                ),
+            ),
+        )
+
+        testee.viewState.test {
+            skipItems(1)
+            testee.onExternalStateChange(
+                StateChange.LoadingStateChange(
+                    LoadingViewState(
+                        isLoading = false,
+                        trackersAnimationEnabled = false,
+                        progress = 100,
+                        url = newUrl,
+                    ),
+                ),
+            )
+            val viewState = awaitItem()
+            assertTrue(viewState.viewMode is ViewMode.CustomTab)
+            val customTabMode = viewState.viewMode as ViewMode.CustomTab
+            assertEquals(expectedNewDomain, customTabMode.domain)
+            assertFalse(customTabMode.showDuckPlayerIcon)
+        }
+    }
+
+    @Test
+    fun `when custom tab URL changes to DuckPlayer URL and DuckPlayer enabled then showDuckPlayerIcon is true`() = runTest {
+        val initialUrl = "https://example.com/page"
+        val duckPlayerUrl = DUCK_PLAYER_URL
+        val expectedDomain = "duck://player" // DuckPlayer URLs extract as "duck://player" (without the path)
+
+        whenever(duckPlayer.getDuckPlayerState()).thenReturn(DuckPlayer.DuckPlayerState.ENABLED)
+
+        testee.onViewModeChanged(ViewMode.CustomTab(100, "title", "example.com", showDuckPlayerIcon = false))
+        testee.onExternalStateChange(
+            StateChange.LoadingStateChange(
+                LoadingViewState(
+                    isLoading = false,
+                    trackersAnimationEnabled = false,
+                    progress = 100,
+                    url = initialUrl,
+                ),
+            ),
+        )
+
+        testee.viewState.test {
+            skipItems(1)
+            testee.onExternalStateChange(
+                StateChange.LoadingStateChange(
+                    LoadingViewState(
+                        isLoading = false,
+                        trackersAnimationEnabled = false,
+                        progress = 100,
+                        url = duckPlayerUrl,
+                    ),
+                ),
+            )
+            val viewState = awaitItem()
+            assertTrue(viewState.viewMode is ViewMode.CustomTab)
+            val customTabMode = viewState.viewMode as ViewMode.CustomTab
+            assertEquals(expectedDomain, customTabMode.domain)
+            assertTrue(customTabMode.showDuckPlayerIcon)
         }
     }
 

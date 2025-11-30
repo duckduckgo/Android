@@ -57,10 +57,12 @@ import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.extractDomain
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
+import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.ENABLED
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels
 import com.duckduckgo.serp.logos.api.SerpEasterEggLogosToggles
 import com.duckduckgo.serp.logos.api.SerpLogo
@@ -128,8 +130,26 @@ class OmnibarLayoutViewModel @Inject constructor(
             tabCount = tabs.size,
             hasUnreadTabs = tabs.firstOrNull { !it.viewed } != null,
             showBrowserMenuHighlight = highlightOverflowMenu,
+            viewMode = getViewMode(state),
         )
     }.flowOn(dispatcherProvider.io()).stateIn(viewModelScope, SharingStarted.Eagerly, _viewState.value)
+
+    private fun getViewMode(state: ViewState): ViewMode {
+        return if (state.viewMode is CustomTab) {
+            val domain = state.url.extractDomain()
+            if (domain != state.viewMode.domain) {
+                val isDuckPlayerUrl = duckPlayer.getDuckPlayerState() == ENABLED && duckPlayer.isDuckPlayerUri(state.url)
+                state.viewMode.copy(
+                    domain = state.url.extractDomain(),
+                    showDuckPlayerIcon = isDuckPlayerUrl,
+                )
+            } else {
+                state.viewMode
+            }
+        } else {
+            state.viewMode
+        }
+    }
 
     private val showDuckAiButton = combine(
         _viewState,
@@ -934,8 +954,6 @@ class OmnibarLayoutViewModel @Inject constructor(
                 it.copy(
                     viewMode = customTabMode.copy(
                         title = decoration.title,
-                        domain = decoration.domain,
-                        showDuckPlayerIcon = decoration.showDuckPlayerIcon,
                     ),
                 )
             }

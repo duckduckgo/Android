@@ -279,7 +279,6 @@ import com.duckduckgo.common.utils.extensions.hideKeyboard
 import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.common.utils.extensions.showKeyboard
 import com.duckduckgo.common.utils.extensions.websiteFromGeoLocationsApiOrigin
-import com.duckduckgo.common.utils.extractDomain
 import com.duckduckgo.common.utils.playstore.PlayStoreUtils
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.FragmentScope
@@ -1293,7 +1292,6 @@ class BrowserTabFragment :
         if (tabDisplayedInCustomTabScreen) {
             omnibar.configureCustomTab(
                 customTabToolbarColor,
-                viewModel.url?.extractDomain(),
             )
             requireActivity().window.navigationBarColor = customTabToolbarColor
             requireActivity().window.statusBarColor = customTabToolbarColor
@@ -2327,7 +2325,7 @@ class BrowserTabFragment :
             is Command.WebViewCompatScreenLock -> webViewCompatScreenLock(it.data, it.onResponse)
             is Command.ScreenUnlock -> screenUnlock()
             is Command.ShowFaviconsPrompt -> showFaviconsPrompt()
-            is Command.ShowWebPageTitle -> showWebPageTitleInCustomTab(it.title, it.url, it.showDuckPlayerIcon)
+            is Command.ShowWebPageTitle -> showWebPageTitleInCustomTab(it.title)
             is Command.ShowSSLError -> showSSLWarning(it.handler, it.error)
             is Command.HideSSLError -> hideSSLWarning()
             is Command.LaunchScreen -> launchScreen(it.screen, it.payload)
@@ -2541,11 +2539,9 @@ class BrowserTabFragment :
 
     private fun showWebPageTitleInCustomTab(
         title: String,
-        url: String?,
-        showDuckPlayerIcon: Boolean,
     ) {
         if (isActiveCustomTab()) {
-            omnibar.showWebPageTitleInCustomTab(title, url, showDuckPlayerIcon)
+            omnibar.showWebPageTitleInCustomTab(title)
         }
     }
 
