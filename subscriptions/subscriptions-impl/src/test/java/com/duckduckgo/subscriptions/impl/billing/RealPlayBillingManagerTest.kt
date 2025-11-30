@@ -23,7 +23,6 @@ import com.duckduckgo.subscriptions.impl.billing.FakeBillingClientAdapter.FakeMe
 import com.duckduckgo.subscriptions.impl.billing.FakeBillingClientAdapter.FakeMethodInvocation.LaunchBillingFlow
 import com.duckduckgo.subscriptions.impl.billing.FakeBillingClientAdapter.FakeMethodInvocation.LaunchSubscriptionUpdate
 import com.duckduckgo.subscriptions.impl.billing.FakeBillingClientAdapter.FakeMethodInvocation.QueryPurchases
-import com.duckduckgo.subscriptions.impl.billing.PurchaseState.Canceled
 import com.duckduckgo.subscriptions.impl.billing.PurchaseState.InProgress
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.advanceTimeBy
@@ -121,7 +120,7 @@ class RealPlayBillingManagerTest {
     }
 
     @Test
-    fun `when can't connect to service then launching billing flow is cancelled`() = runTest {
+    fun `when can't connect to service then launching billing flow fails`() = runTest {
         billingClientAdapter.billingInitResult = BillingInitResult.Failure(BILLING_UNAVAILABLE)
         processLifecycleOwner.currentState = RESUMED
         billingClientAdapter.launchBillingFlowResult = LaunchBillingFlowResult.Failure(error = SERVICE_UNAVAILABLE)
@@ -134,7 +133,7 @@ class RealPlayBillingManagerTest {
 
             subject.launchBillingFlow(activity = mock(), planId = MONTHLY_PLAN_US, externalId, null)
 
-            assertEquals(Canceled, awaitItem())
+            assertEquals(PurchaseState.Failure("Missing product details"), awaitItem())
         }
 
         billingClientAdapter.verifyConnectInvoked()
@@ -255,7 +254,7 @@ class RealPlayBillingManagerTest {
     }
 
     @Test
-    fun `when launchSubscriptionUpdate called with invalid plan then emits canceled state`() = runTest {
+    fun `when launchSubscriptionUpdate called with invalid plan then emits failure state`() = runTest {
         // Set up purchase history so getCurrentPurchaseToken() returns a valid token
         val mockPurchase: PurchaseHistoryRecord = mock {
             whenever(it.products).thenReturn(listOf(BASIC_SUBSCRIPTION))
@@ -282,14 +281,14 @@ class RealPlayBillingManagerTest {
                 replacementMode = SubscriptionReplacementMode.DEFERRED,
             )
 
-            assertEquals(Canceled, awaitItem())
+            assertEquals(PurchaseState.Failure("Missing product details"), awaitItem())
         }
 
         billingClientAdapter.verifyLaunchSubscriptionUpdateNotInvoked()
     }
 
     @Test
-    fun `when launchSubscriptionUpdate fails then emits canceled state`() = runTest {
+    fun `when launchSubscriptionUpdate fails then emits failure state`() = runTest {
         // Set up purchase history so getCurrentPurchaseToken() returns a valid token
         val mockPurchase: PurchaseHistoryRecord = mock {
             whenever(it.products).thenReturn(listOf(BASIC_SUBSCRIPTION))
@@ -321,7 +320,7 @@ class RealPlayBillingManagerTest {
                 replacementMode = replacementMode,
             )
 
-            assertEquals(Canceled, awaitItem())
+            assertEquals(PurchaseState.Failure("SERVICE_UNAVAILABLE"), awaitItem())
         }
 
         billingClientAdapter.verifyLaunchSubscriptionUpdateInvoked(
@@ -334,7 +333,7 @@ class RealPlayBillingManagerTest {
     }
 
     @Test
-    fun `when launchSubscriptionUpdate called with empty purchase token then emits canceled state`() = runTest {
+    fun `when launchSubscriptionUpdate called with empty purchase token then emits failure state`() = runTest {
         // Test with empty purchase token to simulate no valid token scenario
         billingClientAdapter.subscriptionsPurchaseHistory = emptyList()
 
@@ -356,7 +355,7 @@ class RealPlayBillingManagerTest {
                 replacementMode = SubscriptionReplacementMode.DEFERRED,
             )
 
-            assertEquals(Canceled, awaitItem())
+            assertEquals(PurchaseState.Failure("empty old purchase token"), awaitItem())
         }
 
         billingClientAdapter.verifyLaunchSubscriptionUpdateNotInvoked()
