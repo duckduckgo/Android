@@ -384,6 +384,8 @@ class RealSubscriptionsManager @Inject constructor(
                         checkPurchase(it.packageName, it.purchaseToken)
                     }
                     is PurchaseState.Canceled -> {
+                        subscriptionPurchaseWideEvent.onPurchaseCancelledByUser()
+                        subscriptionSwitchWideEvent.onUserCancelled()
                         _currentPurchaseState.emit(CurrentPurchase.Canceled)
                         if (removeExpiredSubscriptionOnCancelledPurchase) {
                             if (subscriptionStatus().isExpired()) {
@@ -394,6 +396,8 @@ class RealSubscriptionsManager @Inject constructor(
                     }
 
                     is PurchaseState.Failure -> {
+                        subscriptionPurchaseWideEvent.onPurchaseFailed(it.errorType)
+                        subscriptionSwitchWideEvent.onSwitchFailed(it.errorType)
                         _currentPurchaseState.emit(CurrentPurchase.Failure(it.errorType))
                     }
 
@@ -538,20 +542,14 @@ class RealSubscriptionsManager @Inject constructor(
             val currentPurchaseToken = playBillingManager.getLatestPurchaseToken()
 
             if (currentPurchaseToken == null) {
-                val errorMessage = "No current purchase token found for switch"
-                logcat { "Subs: Cannot switch plan - $errorMessage" }
-                subscriptionSwitchWideEvent.onSwitchFailed(errorMessage)
-                _currentPurchaseState.emit(CurrentPurchase.Failure(errorMessage))
+                _currentPurchaseState.emit(CurrentPurchase.Failure("No current purchase token found for switch"))
                 return@withContext
             }
 
             // Get account details for external ID
             val account = authRepository.getAccount()
             if (account == null) {
-                val errorMessage = "No account found for switch"
-                logcat { "Subs: Cannot switch plan - $errorMessage" }
-                subscriptionSwitchWideEvent.onSwitchFailed(errorMessage)
-                _currentPurchaseState.emit(CurrentPurchase.Failure(errorMessage))
+                _currentPurchaseState.emit(CurrentPurchase.Failure("No account found for switch"))
                 return@withContext
             }
 
