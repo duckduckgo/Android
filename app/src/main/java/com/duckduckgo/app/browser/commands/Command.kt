@@ -269,8 +269,6 @@ sealed class Command {
 
     class ShowWebPageTitle(
         val title: String,
-        val url: String?,
-        val showDuckPlayerIcon: Boolean = false,
     ) : Command()
 
     class RefreshUserAgent(
