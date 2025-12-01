@@ -18,6 +18,7 @@ package com.duckduckgo.pir.impl.common
 
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.pir.impl.common.CaptchaResolver.CaptchaResolverError.ClientFailure
 import com.duckduckgo.pir.impl.common.CaptchaResolver.CaptchaResolverError.CriticalFailure
 import com.duckduckgo.pir.impl.common.CaptchaResolver.CaptchaResolverError.InvalidRequest
 import com.duckduckgo.pir.impl.common.CaptchaResolver.CaptchaResolverError.SolutionNotReady
@@ -74,6 +75,7 @@ interface CaptchaResolver {
         ) : CaptchaResolverResult()
 
         data class CaptchaFailure(
+            val code: Int,
             val type: CaptchaResolverError,
             val message: String,
         ) : CaptchaResolverResult()
@@ -85,6 +87,7 @@ interface CaptchaResolver {
         data object CriticalFailure : CaptchaResolverError()
         data object InvalidRequest : CaptchaResolverError()
         data object TransientFailure : CaptchaResolverError()
+        data object ClientFailure : CaptchaResolverError()
     }
 }
 
@@ -115,27 +118,31 @@ class RealCaptchaResolver @Inject constructor(
             }
         }.getOrElse { error ->
             if (error is HttpException) {
-                val errorMessage = error.message()
+                val errorMessage = PREFIX_SUBMIT_CAPTCHA_ERROR + (error.response()?.errorBody()?.string() ?: error.message ?: "Unknown error")
                 if (errorMessage.startsWith("INVALID_REQUEST")) {
                     CaptchaFailure(
+                        code = error.code(),
                         type = InvalidRequest,
                         message = errorMessage,
                     )
                 } else if (errorMessage.startsWith("FAILURE_TRANSIENT")) {
                     CaptchaFailure(
+                        code = error.code(),
                         type = TransientFailure,
                         message = errorMessage,
                     )
                 } else {
                     CaptchaFailure(
+                        code = error.code(),
                         type = CriticalFailure,
                         message = errorMessage,
                     )
                 }
             } else {
                 CaptchaFailure(
-                    type = CriticalFailure,
-                    message = error.message ?: "Unknown error",
+                    code = 0,
+                    type = ClientFailure,
+                    message = PREFIX_SUBMIT_CAPTCHA_ERROR + (error.message ?: "Unknown error"),
                 )
             }
         }
@@ -151,13 +158,15 @@ class RealCaptchaResolver @Inject constructor(
                 logcat { "PIR-CAPTCHA: RESULT -> $this" }
                 when (message) {
                     "SOLUTION_NOT_READY" -> CaptchaFailure(
+                        code = 0,
                         type = SolutionNotReady,
                         message = message,
                     )
 
                     "FAILURE" -> CaptchaFailure(
+                        code = 0,
                         type = UnableToSolveCaptcha,
-                        message = message,
+                        message = PREFIX_SOLVE_CAPTCHA_ERROR + message,
                     )
 
                     else -> SolveCaptchaSuccess(
@@ -166,12 +175,27 @@ class RealCaptchaResolver @Inject constructor(
                     )
                 }
             }
-        }.getOrElse {
-            logcat { "PIR-CAPTCHA: Failure -> $it" }
-            CaptchaFailure(
-                type = InvalidRequest,
-                message = it.message ?: "Unknown error",
-            )
+        }.getOrElse { error ->
+            logcat { "PIR-CAPTCHA: Failure -> $error" }
+            if (error is HttpException) {
+                val errorMessage = PREFIX_SOLVE_CAPTCHA_ERROR + (error.response()?.errorBody()?.string() ?: error.message ?: "Unknown error")
+                CaptchaFailure(
+                    code = error.code(),
+                    type = InvalidRequest,
+                    message = errorMessage,
+                )
+            } else {
+                CaptchaFailure(
+                    code = 0,
+                    type = ClientFailure,
+                    message = PREFIX_SOLVE_CAPTCHA_ERROR + (error.message ?: "Unknown error"),
+                )
+            }
         }
+    }
+
+    companion object {
+        private const val PREFIX_SUBMIT_CAPTCHA_ERROR = "Submit captcha error: "
+        private const val PREFIX_SOLVE_CAPTCHA_ERROR = "Solve captcha error: "
     }
 }

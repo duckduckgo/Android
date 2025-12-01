@@ -20,7 +20,6 @@ import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState
-import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerActionFailed
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerOptOutActionSucceeded
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerOptOutConditionFound
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerOptOutConditionNotFound
@@ -42,6 +41,7 @@ import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerScanA
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerScanFailed
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerScanStarted
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerScanSuccess
+import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerStepActionFailed
 import com.duckduckgo.pir.impl.models.AddressCityState
 import com.duckduckgo.pir.impl.models.Broker
 import com.duckduckgo.pir.impl.models.ExtractedProfile
@@ -243,7 +243,7 @@ interface PirRunStateHandler {
             val tries: Int,
         ) : PirRunState(broker)
 
-        data class BrokerActionFailed(
+        data class BrokerStepActionFailed(
             override val broker: Broker,
             val extractedProfile: ExtractedProfile?,
             val completionTimeInMillis: Long,
@@ -276,7 +276,7 @@ class RealPirRunStateHandler @Inject constructor(
                 is BrokerScanSuccess -> handleBrokerScanSuccess(pirRunState)
                 is BrokerScanActionStarted -> handleBrokerScanActionStarted(pirRunState)
                 is BrokerScanActionSucceeded -> handleBrokerScanActionSucceeded(pirRunState)
-                is BrokerActionFailed -> handleBrokerActionFailed(pirRunState)
+                is BrokerStepActionFailed -> handleBrokerActionFailed(pirRunState)
                 is BrokerRecordOptOutStarted -> handleRecordOptOutStarted(pirRunState)
                 is BrokerRecordOptOutSubmitted -> handleBrokerRecordOptOutSubmitted(pirRunState)
                 is BrokerRecordOptOutFailed -> handleBrokerRecordOptOutFailed(pirRunState)
@@ -625,7 +625,7 @@ class RealPirRunStateHandler @Inject constructor(
         }
     }
 
-    private suspend fun handleBrokerActionFailed(state: BrokerActionFailed) {
+    private suspend fun handleBrokerActionFailed(state: BrokerStepActionFailed) {
         pixelSender.reportBrokerActionFailure(
             brokerUrl = state.broker.url,
             brokerVersion = state.broker.version,
