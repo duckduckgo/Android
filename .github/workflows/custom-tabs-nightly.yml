@@ -47,8 +47,8 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
 
-      - name: Assemble play release APK
-        run: ./gradlew assemblePlayRelease -Pforce-default-variant -x lint
+      - name: Assemble internal release APK
+        run: ./gradlew assembleInternalRelease -Pforce-default-variant -x lint
 
       - name: Move APK to new folder
         if: always()
