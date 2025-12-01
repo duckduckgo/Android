@@ -53,7 +53,7 @@
 
     <!-- Omnibar -->
     <dimen name="omnibarCookieAnimationBannerHeight">38dp</dimen>
-    <dimen name="omnibarCardMarginHorizontal">8dp</dimen>
+    <dimen name="omnibarCardMarginHorizontal">16dp</dimen>
     <dimen name="omnibarCardMarginEnd">8dp</dimen>
     <dimen name="omnibarCardExtendedMarginEnd">4dp</dimen>
     <dimen name="omnibarCardMarginTop">4dp</dimen>
