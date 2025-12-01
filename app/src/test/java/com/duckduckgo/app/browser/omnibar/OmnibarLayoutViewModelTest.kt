@@ -2133,6 +2133,65 @@ class OmnibarLayoutViewModelTest {
     }
 
     @Test
+    fun `when custom tab URL changes to simulated YouTube NoCookie and DuckPlayer enabled then showDuckPlayerIcon is true`() = runTest {
+        val youtubeNoCookieUrl = "http://youtube-nocookie.com/videoID=1234"
+        val duckPlayerUrl = "duck://player/1234"
+
+        whenever(duckPlayer.isSimulatedYoutubeNoCookie(any())).thenReturn(true)
+        whenever(duckPlayer.createDuckPlayerUriFromYoutubeNoCookie(any())).thenReturn(duckPlayerUrl)
+        whenever(duckPlayer.isDuckPlayerUri(duckPlayerUrl)).thenReturn(true)
+        whenever(duckPlayer.getDuckPlayerState()).thenReturn(DuckPlayer.DuckPlayerState.ENABLED)
+
+        testee.onViewModeChanged(ViewMode.CustomTab(100, "title", "example.com", showDuckPlayerIcon = false))
+        testee.onExternalStateChange(
+            StateChange.LoadingStateChange(
+                LoadingViewState(
+                    isLoading = false,
+                    trackersAnimationEnabled = false,
+                    progress = 100,
+                    url = duckPlayerUrl,
+                ),
+            ),
+        )
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertTrue(viewState.viewMode is ViewMode.CustomTab)
+            val customTabMode = viewState.viewMode as ViewMode.CustomTab
+            assertTrue(customTabMode.showDuckPlayerIcon)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when custom tab URL is DuckPlayer URL and DuckPlayer disabled then showDuckPlayerIcon is false`() = runTest {
+        val duckPlayerUrl = DUCK_PLAYER_URL
+
+        whenever(duckPlayer.isDuckPlayerUri(duckPlayerUrl)).thenReturn(true)
+        whenever(duckPlayer.getDuckPlayerState()).thenReturn(DuckPlayer.DuckPlayerState.DISABLED)
+
+        testee.onViewModeChanged(ViewMode.CustomTab(100, "title", "example.com", showDuckPlayerIcon = false))
+        testee.onExternalStateChange(
+            StateChange.LoadingStateChange(
+                LoadingViewState(
+                    isLoading = false,
+                    trackersAnimationEnabled = false,
+                    progress = 100,
+                    url = duckPlayerUrl,
+                ),
+            ),
+        )
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertTrue(viewState.viewMode is ViewMode.CustomTab)
+            val customTabMode = viewState.viewMode as ViewMode.CustomTab
+            assertFalse(customTabMode.showDuckPlayerIcon)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
     fun whenDuckAiHeaderPressedAndInputScreenEnabledThenInputScreenShown() = runTest {
         duckAiShowInputScreenFlow.value = true
         testee.onDuckAiHeaderClicked()
