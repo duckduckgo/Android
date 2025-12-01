@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.browser.newtab
 
+import android.annotation.SuppressLint
 import android.app.PendingIntent
 import android.content.ActivityNotFoundException
 import android.content.Context
@@ -184,6 +185,7 @@ class NewTabLegacyPageView @JvmOverloads constructor(
         context.launchDefaultAppActivity()
     }
 
+    @SuppressLint("DenyListedApi")
     private fun launchDefaultCredentialProvider() {
         runCatching {
             val intent = if (appBuildConfig.sdkInt >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {

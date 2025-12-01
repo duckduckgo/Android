@@ -16,6 +16,7 @@
 
 package com.duckduckgo.remote.messaging.impl.newtab
 
+import android.annotation.SuppressLint
 import android.app.PendingIntent
 import android.content.ActivityNotFoundException
 import android.content.Context
@@ -193,6 +194,7 @@ class RemoteMessageView @JvmOverloads constructor(
         }
     }
 
+    @SuppressLint("DenyListedApi")
     private fun launchDefaultCredentialProvider() {
         runCatching {
             val intent = if (appBuildConfig.sdkInt >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
