@@ -20,25 +20,29 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import android.os.Message
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListUpdateCallback
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.BrowserTabFragment
 import com.duckduckgo.app.browser.tabs.TabManager.TabModel
-import com.duckduckgo.common.utils.DispatcherProvider
-import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class TabPagerAdapter(
     private val activity: BrowserActivity,
-    private val dispatcherProvider: DispatcherProvider,
 ) : FragmentStateAdapter(activity) {
     private val tabs = mutableListOf<TabModel>()
 
-    // Key is the source tab ID, value is the message for the popup
-    private val messagesForTabs = mutableMapOf<String, Message>()
+    private data class PendingMessage(
+        val message: Message,
+        val cleanupJob: Job,
+    )
+
+    // Key is the source tab ID, value contains the message and its cleanup job
+    private val pendingMessages = mutableMapOf<String, PendingMessage>()
 
     var currentTabIndex = -1
         @SuppressLint("NotifyDataSetChanged")
@@ -68,10 +72,12 @@ class TabPagerAdapter(
         val isExternal = activity.intent?.getBooleanExtra(BrowserActivity.LAUNCH_FROM_EXTERNAL_EXTRA, false) == true
 
         // Check if there's a message specifically for this tab's source tab ID
-        val message = messagesForTabs.remove(tab.sourceTabId)
-        return if (message != null) {
+        val pendingMessage = pendingMessages.remove(tab.sourceTabId)
+        pendingMessage?.cleanupJob?.cancel()
+
+        return if (pendingMessage != null) {
             BrowserTabFragment.newInstance(tab.tabId, null, false, isExternal).apply {
-                this.messageFromPreviousTab = message
+                this.messageFromPreviousTab = pendingMessage.message
             }
         } else {
             BrowserTabFragment.newInstance(tab.tabId, tab.url, tab.skipHome, isExternal)
@@ -96,15 +102,15 @@ class TabPagerAdapter(
      * The message will be automatically cleared after 10 seconds if not picked up.
      */
     fun setMessageForNewFragment(sourceTabId: String, message: Message) {
-        messagesForTabs[sourceTabId] = message
-        scheduleMessageCleanup(sourceTabId)
-    }
+        // Cancel any existing cleanup job for this source tab to prevent race conditions
+        pendingMessages.remove(sourceTabId)?.cleanupJob?.cancel()
 
-    private fun scheduleMessageCleanup(sourceTabId: String) {
-        CoroutineScope(dispatcherProvider.main()).launch {
+        val cleanupJob = activity.lifecycleScope.launch {
             delay(10_000L)
-            messagesForTabs.remove(sourceTabId)
+            pendingMessages.remove(sourceTabId)
         }
+
+        pendingMessages[sourceTabId] = PendingMessage(message, cleanupJob)
     }
 
     @SuppressLint("NotifyDataSetChanged")
