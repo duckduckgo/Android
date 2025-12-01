@@ -669,6 +669,13 @@ class OmnibarLayout @JvmOverloads constructor(
                 }
             }
 
+            duckAISidebar.updateLayoutParams {
+                (this as MarginLayoutParams).apply {
+                    topMargin = omnibarCardMarginBottom
+                    bottomMargin = omnibarCardMarginTop
+                }
+            }
+
             shieldIconPulseAnimationContainer.updateLayoutParams {
                 (this as MarginLayoutParams).apply {
                     topMargin = omnibarCardMarginBottom
