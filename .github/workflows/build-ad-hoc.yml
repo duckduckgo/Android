@@ -46,14 +46,32 @@ jobs:
         if: always()
         run: mkdir apk
 
-      - name: Decode keys
+      - name: Decode debug keys
+        if: contains(github.event.inputs.build-variant, 'Debug')
+        uses: davidSchuppa/base64Secret-toFile-action@v2
+        with:
+          secret: ${{ secrets.DEBUG_PROPERTIES }}
+          fileName: ddg_android_debug_build.properties
+          destination-path: $HOME/jenkins_static/com.duckduckgo.mobile.android/
+
+      - name: Decode debug key file
+        if: contains(github.event.inputs.build-variant, 'Debug')
+        uses: davidSchuppa/base64Secret-toFile-action@v2
+        with:
+          secret: ${{ secrets.DEBUG_KEY }}
+          fileName: android
+          destination-path: $HOME/jenkins_static/com.duckduckgo.mobile.android/
+
+      - name: Decode release keys
+        if: contains(github.event.inputs.build-variant, 'Release')
         uses: davidSchuppa/base64Secret-toFile-action@v2
         with:
           secret: ${{ secrets.FAKE_RELEASE_PROPERTIES }}
           fileName: ddg_android_build.properties
           destination-path: $HOME/jenkins_static/com.duckduckgo.mobile.android/
 
-      - name: Decode key file
+      - name: Decode release key file
+        if: contains(github.event.inputs.build-variant, 'Release')
         uses: davidSchuppa/base64Secret-toFile-action@v2
         with:
           secret: ${{ secrets.FAKE_RELEASE_KEY }}
