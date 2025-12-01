@@ -105,7 +105,7 @@ class CardsListRemoteMessageViewModelTest {
             content = cardsList,
             matchingRules = emptyList(),
             exclusionRules = emptyList(),
-            surfaces = listOf(Surface.MODAL)
+            surfaces = listOf(Surface.MODAL),
         )
         whenever(remoteMessagingRepository.getMessageById(eq(messageId))).thenReturn(message)
 
@@ -132,7 +132,7 @@ class CardsListRemoteMessageViewModelTest {
             content = Content.Small(titleText = "Small Message", descriptionText = "Description"),
             matchingRules = emptyList(),
             exclusionRules = emptyList(),
-            surfaces = listOf()
+            surfaces = listOf(),
         )
         whenever(remoteMessagingRepository.getMessageById(eq(messageId))).thenReturn(message)
 
@@ -197,14 +197,14 @@ class CardsListRemoteMessageViewModelTest {
             listItems = emptyList(),
             placeholder = Content.Placeholder.DDG_ANNOUNCE,
             primaryAction = primaryAction,
-            primaryActionText = "Action"
+            primaryActionText = "Action",
         )
         val message = RemoteMessage(
             id = messageId,
             content = cardsList,
             matchingRules = emptyList(),
             exclusionRules = emptyList(),
-            surfaces = listOf(Surface.MODAL)
+            surfaces = listOf(Surface.MODAL),
         )
         val expectedCommand = Command.SubmitUrl("https://example.com")
         whenever(remoteMessagingRepository.getMessageById(eq(messageId))).thenReturn(message)
@@ -234,7 +234,7 @@ class CardsListRemoteMessageViewModelTest {
             descriptionText = "Description",
             primaryAction = itemAction,
             placeholder = Content.Placeholder.DDG_ANNOUNCE,
-            type = CardItemType.TWO_LINE_LIST_ITEM
+            type = CardItemType.TWO_LINE_LIST_ITEM,
         )
         val expectedCommand = Command.LaunchPlayStore("com.example.app")
         whenever(commandActionMapper.asCommand(eq(itemAction))).thenReturn(expectedCommand)
