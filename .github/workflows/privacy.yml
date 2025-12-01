@@ -93,7 +93,7 @@ jobs:
           asana-task-description: The privacy workflow has failed. See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
 
       - name: Adding as a release blocker
-        if: ${{ failure() }}
+        if: ${{ failure() && steps.create-failure-task.outputs.taskId != '' }}
         uses: duckduckgo/native-github-asana-sync@v2.0
         with:
           asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}

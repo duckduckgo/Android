@@ -182,6 +182,7 @@ jobs:
           action: 'create-asana-task'
 
       - name: Adding as a release blocker
+        if: ${{ steps.create-failure-task.outputs.taskId != '' }}
         uses: duckduckgo/native-github-asana-sync@v2.0
         with:
           asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
