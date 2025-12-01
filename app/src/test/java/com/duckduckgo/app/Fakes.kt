@@ -198,7 +198,7 @@ class FakeSettingsDataStore :
             store["urlPreferenceMigrated"] = value
         }
 
-    override var urlPreferenceManuallySet: Boolean
+    override var urlPreferenceSetByUser: Boolean
         get() = store["urlPreferenceManuallySet"] as Boolean? ?: false
         set(value) {
             store["urlPreferenceManuallySet"] = value

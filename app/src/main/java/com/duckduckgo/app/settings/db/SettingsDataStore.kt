@@ -103,7 +103,7 @@ interface SettingsDataStore {
      * When true, the user's preference should be preserved even if default behavior changes.
      * When false, the preference may be updated if business rules change (via feature flags).
      */
-    var urlPreferenceManuallySet: Boolean
+    var urlPreferenceSetByUser: Boolean
     var clearDuckAiData: Boolean
 
     /**
@@ -259,9 +259,9 @@ class SettingsSharedPreferences @Inject constructor(
         get() = preferences.getBoolean(URL_PREFERENCE_MIGRATED, false)
         set(value) = preferences.edit { putBoolean(URL_PREFERENCE_MIGRATED, value) }
 
-    override var urlPreferenceManuallySet: Boolean
-        get() = preferences.getBoolean(URL_PREFERENCE_MANUALLY_SET, false)
-        set(value) = preferences.edit { putBoolean(URL_PREFERENCE_MANUALLY_SET, value) }
+    override var urlPreferenceSetByUser: Boolean
+        get() = preferences.getBoolean(URL_PREFERENCE_SET_BY_USER, false)
+        set(value) = preferences.edit { putBoolean(URL_PREFERENCE_SET_BY_USER, value) }
 
     override var clearDuckAiData: Boolean
         get() = preferences.getBoolean(KEY_CLEAR_DUCK_AI_DATA, false)
@@ -343,7 +343,7 @@ class SettingsSharedPreferences @Inject constructor(
         const val KEY_SPLIT_OMNIBAR = "KEY_SPLIT_OMNIBAR"
         const val KEY_IS_FULL_URL_ENABLED = "KEY_IS_FULL_URL_ENABLED"
         const val URL_PREFERENCE_MIGRATED = "URL_PREFERENCE_MIGRATED"
-        const val URL_PREFERENCE_MANUALLY_SET = "URL_PREFERENCE_MANUALLY_SET"
+        const val URL_PREFERENCE_SET_BY_USER = "URL_PREFERENCE_SET_BY_USER"
         const val KEY_CLEAR_DUCK_AI_DATA = "KEY_CLEAR_DUCK_AI_DATA"
     }
 

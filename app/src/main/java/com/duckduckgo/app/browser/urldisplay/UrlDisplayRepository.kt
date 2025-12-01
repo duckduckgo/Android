@@ -87,13 +87,13 @@ class RealUrlDisplayRepository @Inject constructor(
 
     override suspend fun isFullUrlEnabled(): Boolean {
         // User manually set preference - honor it
-        if (settingsDataStore.urlPreferenceManuallySet) {
+        if (settingsDataStore.urlPreferenceSetByUser) {
             return settingsDataStore.isFullUrlEnabled
         }
 
         // Treat as manual to preserve user's choice from old app
         if (settingsDataStore.hasUrlPreferenceSet() && !settingsDataStore.urlPreferenceMigrated) {
-            settingsDataStore.urlPreferenceManuallySet = true
+            settingsDataStore.urlPreferenceSetByUser = true
             settingsDataStore.urlPreferenceMigrated = true
             return settingsDataStore.isFullUrlEnabled
         }
@@ -121,7 +121,7 @@ class RealUrlDisplayRepository @Inject constructor(
     }
 
     override suspend fun setFullUrlEnabled(enabled: Boolean) {
-        settingsDataStore.urlPreferenceManuallySet = true
+        settingsDataStore.urlPreferenceSetByUser = true
         settingsDataStore.urlPreferenceMigrated = true
         settingsDataStore.isFullUrlEnabled = enabled
         refreshTrigger.emit(Unit)

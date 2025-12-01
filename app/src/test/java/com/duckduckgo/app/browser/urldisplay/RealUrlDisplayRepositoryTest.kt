@@ -62,7 +62,7 @@ class RealUrlDisplayRepositoryTest {
     @Test
     fun `when user manually set preference to true then return true and ignore everything else`() = runTest {
         // Given: User manually set preference to true
-        whenever(settingsDataStore.urlPreferenceManuallySet).thenReturn(true)
+        whenever(settingsDataStore.urlPreferenceSetByUser).thenReturn(true)
         whenever(settingsDataStore.isFullUrlEnabled).thenReturn(true)
         whenever(shorterUrlToggle.isEnabled()).thenReturn(false)
 
@@ -71,7 +71,7 @@ class RealUrlDisplayRepositoryTest {
 
         // Then: Return user's manual choice, ignore feature flag
         assertTrue(result)
-        verify(settingsDataStore, atLeastOnce()).urlPreferenceManuallySet
+        verify(settingsDataStore, atLeastOnce()).urlPreferenceSetByUser
         verify(settingsDataStore, atLeastOnce()).isFullUrlEnabled
         verify(shorterUrlToggle, never()).isEnabled()
         verify(settingsDataStore, never()).hasUrlPreferenceSet()
@@ -80,7 +80,7 @@ class RealUrlDisplayRepositoryTest {
     @Test
     fun `when user manually set preference to false then return false and ignore everything else`() = runTest {
         // Given: User manually set preference to false
-        whenever(settingsDataStore.urlPreferenceManuallySet).thenReturn(true)
+        whenever(settingsDataStore.urlPreferenceSetByUser).thenReturn(true)
         whenever(settingsDataStore.isFullUrlEnabled).thenReturn(false)
         whenever(shorterUrlToggle.isEnabled()).thenReturn(false)
 
@@ -89,7 +89,7 @@ class RealUrlDisplayRepositoryTest {
 
         // Then: Return user's manual choice, ignore feature flag
         assertFalse(result)
-        verify(settingsDataStore, atLeastOnce()).urlPreferenceManuallySet
+        verify(settingsDataStore, atLeastOnce()).urlPreferenceSetByUser
         verify(settingsDataStore, atLeastOnce()).isFullUrlEnabled
         verify(shorterUrlToggle, never()).isEnabled()
         verify(settingsDataStore, never()).hasUrlPreferenceSet()
@@ -98,7 +98,7 @@ class RealUrlDisplayRepositoryTest {
     @Test
     fun `when old app user with preference and not migrated then migrate to manual`() = runTest {
         // Given: Old app user who manually set shorter URL (before migration flag existed)
-        whenever(settingsDataStore.urlPreferenceManuallySet).thenReturn(false)
+        whenever(settingsDataStore.urlPreferenceSetByUser).thenReturn(false)
         whenever(settingsDataStore.hasUrlPreferenceSet()).thenReturn(true)
         whenever(settingsDataStore.urlPreferenceMigrated).thenReturn(false)
         whenever(settingsDataStore.isFullUrlEnabled).thenReturn(false)
@@ -108,7 +108,7 @@ class RealUrlDisplayRepositoryTest {
 
         // Then: Migrates to manual preference
         assertFalse(result)
-        verify(settingsDataStore).urlPreferenceManuallySet = true
+        verify(settingsDataStore).urlPreferenceSetByUser = true
         verify(settingsDataStore).urlPreferenceMigrated = true
         verify(settingsDataStore, atLeastOnce()).isFullUrlEnabled
     }
@@ -116,7 +116,7 @@ class RealUrlDisplayRepositoryTest {
     @Test
     fun `when old app user with full url preference and not migrated then migrate to manual`() = runTest {
         // Given: Old app user who manually set full URL (before migration flag existed)
-        whenever(settingsDataStore.urlPreferenceManuallySet).thenReturn(false)
+        whenever(settingsDataStore.urlPreferenceSetByUser).thenReturn(false)
         whenever(settingsDataStore.hasUrlPreferenceSet()).thenReturn(true)
         whenever(settingsDataStore.urlPreferenceMigrated).thenReturn(false)
         whenever(settingsDataStore.isFullUrlEnabled).thenReturn(true)
@@ -126,14 +126,14 @@ class RealUrlDisplayRepositoryTest {
 
         // Then: Migrates to manual preference
         assertTrue(result)
-        verify(settingsDataStore).urlPreferenceManuallySet = true
+        verify(settingsDataStore).urlPreferenceSetByUser = true
         verify(settingsDataStore).urlPreferenceMigrated = true
     }
 
     @Test
     fun `when old app user migrated then rollback does not affect them`() = runTest {
         // Given: Old app user who was migrated to manual (chose shorter URL)
-        whenever(settingsDataStore.urlPreferenceManuallySet).thenReturn(true)
+        whenever(settingsDataStore.urlPreferenceSetByUser).thenReturn(true)
         whenever(settingsDataStore.isFullUrlEnabled).thenReturn(false)
         // Feature flag disabled (rollback)
         whenever(shorterUrlToggle.isEnabled()).thenReturn(false)
@@ -149,7 +149,7 @@ class RealUrlDisplayRepositoryTest {
     @Test
     fun `when preference exists and already migrated then skip migration`() = runTest {
         // Given: User has preference and already migrated
-        whenever(settingsDataStore.urlPreferenceManuallySet).thenReturn(false)
+        whenever(settingsDataStore.urlPreferenceSetByUser).thenReturn(false)
         whenever(settingsDataStore.hasUrlPreferenceSet()).thenReturn(true)
         whenever(settingsDataStore.urlPreferenceMigrated).thenReturn(true)
         whenever(settingsDataStore.isFullUrlEnabled).thenReturn(false)
@@ -160,14 +160,14 @@ class RealUrlDisplayRepositoryTest {
 
         // Then: Skip migration, use stored value
         assertFalse(result)
-        verify(settingsDataStore, never()).urlPreferenceManuallySet = true
+        verify(settingsDataStore, never()).urlPreferenceSetByUser = true
         verify(settingsDataStore, never()).urlPreferenceMigrated = true
     }
 
     @Test
     fun `when new user with auto-assigned preference then not migrated to manual`() = runTest {
         // Given: New user (fresh install), feature enabled, no preference
-        whenever(settingsDataStore.urlPreferenceManuallySet).thenReturn(false)
+        whenever(settingsDataStore.urlPreferenceSetByUser).thenReturn(false)
         whenever(shorterUrlToggle.isEnabled()).thenReturn(true)
         whenever(settingsDataStore.hasUrlPreferenceSet()).thenReturn(false)
         whenever(appBuildConfig.isNewInstall()).thenReturn(true)
@@ -178,13 +178,13 @@ class RealUrlDisplayRepositoryTest {
         // Then: Auto-assigned, NOT manual
         assertFalse(result)
         verify(settingsDataStore).urlPreferenceMigrated = true
-        verify(settingsDataStore, never()).urlPreferenceManuallySet = true
+        verify(settingsDataStore, never()).urlPreferenceSetByUser = true
     }
 
     @Test
     fun `when feature toggle disabled and no manual preference then return true for rollback`() = runTest {
         // Given: Feature toggle disabled (rollback mode), no manual preference
-        whenever(settingsDataStore.urlPreferenceManuallySet).thenReturn(false)
+        whenever(settingsDataStore.urlPreferenceSetByUser).thenReturn(false)
         whenever(settingsDataStore.hasUrlPreferenceSet()).thenReturn(false)
         whenever(shorterUrlToggle.isEnabled()).thenReturn(false)
 
@@ -193,14 +193,14 @@ class RealUrlDisplayRepositoryTest {
 
         // Then: Return true (rollback to full URL)
         assertTrue(result)
-        verify(settingsDataStore, atLeastOnce()).urlPreferenceManuallySet
+        verify(settingsDataStore, atLeastOnce()).urlPreferenceSetByUser
         verify(shorterUrlToggle, atLeastOnce()).isEnabled()
     }
 
     @Test
     fun `when auto assigned preference exists and feature enabled then return stored value`() = runTest {
         // Given: Auto-assigned preference (not manual), feature enabled
-        whenever(settingsDataStore.urlPreferenceManuallySet).thenReturn(false)
+        whenever(settingsDataStore.urlPreferenceSetByUser).thenReturn(false)
         whenever(shorterUrlToggle.isEnabled()).thenReturn(true)
         whenever(settingsDataStore.hasUrlPreferenceSet()).thenReturn(true)
         whenever(settingsDataStore.isFullUrlEnabled).thenReturn(false)
@@ -219,7 +219,7 @@ class RealUrlDisplayRepositoryTest {
     @Test
     fun `when existing user and feature enabled then set and return true`() = runTest {
         // Given: Existing user (app update), feature enabled, no preference
-        whenever(settingsDataStore.urlPreferenceManuallySet).thenReturn(false)
+        whenever(settingsDataStore.urlPreferenceSetByUser).thenReturn(false)
         whenever(shorterUrlToggle.isEnabled()).thenReturn(true)
         whenever(settingsDataStore.hasUrlPreferenceSet()).thenReturn(false)
         whenever(appBuildConfig.isNewInstall()).thenReturn(false)
@@ -231,13 +231,13 @@ class RealUrlDisplayRepositoryTest {
         assertTrue(result)
         verify(settingsDataStore, atLeastOnce()).isFullUrlEnabled = true
         verify(settingsDataStore).urlPreferenceMigrated = true // Auto-assigned, mark migrated
-        verify(settingsDataStore, never()).urlPreferenceManuallySet = true
+        verify(settingsDataStore, never()).urlPreferenceSetByUser = true
     }
 
     @Test
     fun `when new user and feature enabled then set and return false`() = runTest {
         // Given: New user (fresh install), feature enabled, no preference
-        whenever(settingsDataStore.urlPreferenceManuallySet).thenReturn(false)
+        whenever(settingsDataStore.urlPreferenceSetByUser).thenReturn(false)
         whenever(shorterUrlToggle.isEnabled()).thenReturn(true)
         whenever(settingsDataStore.hasUrlPreferenceSet()).thenReturn(false)
         whenever(appBuildConfig.isNewInstall()).thenReturn(true)
@@ -249,7 +249,7 @@ class RealUrlDisplayRepositoryTest {
         assertFalse(result)
         verify(settingsDataStore, atLeastOnce()).isFullUrlEnabled = false
         verify(settingsDataStore).urlPreferenceMigrated = true // Auto-assigned, mark migrated
-        verify(settingsDataStore, never()).urlPreferenceManuallySet = true
+        verify(settingsDataStore, never()).urlPreferenceSetByUser = true
     }
 
     @Test
@@ -258,7 +258,7 @@ class RealUrlDisplayRepositoryTest {
         testee.setFullUrlEnabled(true)
 
         // Then: All flags set
-        verify(settingsDataStore).urlPreferenceManuallySet = true
+        verify(settingsDataStore).urlPreferenceSetByUser = true
         verify(settingsDataStore).urlPreferenceMigrated = true
         verify(settingsDataStore).isFullUrlEnabled = true
     }
@@ -269,7 +269,7 @@ class RealUrlDisplayRepositoryTest {
         testee.setFullUrlEnabled(false)
 
         // Then: All flags set
-        verify(settingsDataStore).urlPreferenceManuallySet = true
+        verify(settingsDataStore).urlPreferenceSetByUser = true
         verify(settingsDataStore).urlPreferenceMigrated = true
         verify(settingsDataStore).isFullUrlEnabled = false
     }
@@ -277,7 +277,7 @@ class RealUrlDisplayRepositoryTest {
     @Test
     fun `when flow collected first time then emit value from suspend function`() = runTest {
         // Given: User has manual preference
-        whenever(settingsDataStore.urlPreferenceManuallySet).thenReturn(true)
+        whenever(settingsDataStore.urlPreferenceSetByUser).thenReturn(true)
         whenever(settingsDataStore.isFullUrlEnabled).thenReturn(true)
 
         // When: Collect flow
@@ -292,7 +292,7 @@ class RealUrlDisplayRepositoryTest {
     @Test
     fun `when flow collected and setter called then emit new value`() = runTest {
         // Given: Initial state - new user
-        whenever(settingsDataStore.urlPreferenceManuallySet).thenReturn(false)
+        whenever(settingsDataStore.urlPreferenceSetByUser).thenReturn(false)
         whenever(shorterUrlToggle.isEnabled()).thenReturn(true)
         whenever(settingsDataStore.hasUrlPreferenceSet()).thenReturn(false)
         whenever(appBuildConfig.isNewInstall()).thenReturn(true)
@@ -302,7 +302,7 @@ class RealUrlDisplayRepositoryTest {
             assertEquals(false, awaitItem())
 
             // When: User manually changes preference
-            whenever(settingsDataStore.urlPreferenceManuallySet).thenReturn(true)
+            whenever(settingsDataStore.urlPreferenceSetByUser).thenReturn(true)
             whenever(settingsDataStore.isFullUrlEnabled).thenReturn(true)
             testee.setFullUrlEnabled(true)
 
@@ -316,7 +316,7 @@ class RealUrlDisplayRepositoryTest {
     @Test
     fun `when flow collected multiple times then each gets latest value`() = runTest {
         // Given: Initial state
-        whenever(settingsDataStore.urlPreferenceManuallySet).thenReturn(true)
+        whenever(settingsDataStore.urlPreferenceSetByUser).thenReturn(true)
         whenever(settingsDataStore.isFullUrlEnabled).thenReturn(false)
 
         // When: First collector
@@ -342,7 +342,7 @@ class RealUrlDisplayRepositoryTest {
     @Test
     fun `when same value set multiple times then distinct until changed prevents reemission`() = runTest {
         // Given
-        whenever(settingsDataStore.urlPreferenceManuallySet).thenReturn(true)
+        whenever(settingsDataStore.urlPreferenceSetByUser).thenReturn(true)
         whenever(settingsDataStore.isFullUrlEnabled).thenReturn(true)
 
         testee.isFullUrlEnabled.test {
@@ -363,7 +363,7 @@ class RealUrlDisplayRepositoryTest {
     @Test
     fun `when user manually changes from auto-assigned then manual flag locks preference`() = runTest {
         // Given: User starts with auto-assigned preference
-        whenever(settingsDataStore.urlPreferenceManuallySet).thenReturn(false)
+        whenever(settingsDataStore.urlPreferenceSetByUser).thenReturn(false)
         whenever(settingsDataStore.urlPreferenceMigrated).thenReturn(true)
         whenever(shorterUrlToggle.isEnabled()).thenReturn(true)
         whenever(settingsDataStore.hasUrlPreferenceSet()).thenReturn(true)
@@ -374,12 +374,12 @@ class RealUrlDisplayRepositoryTest {
         assertFalse(initialResult)
 
         // When: User manually changes it
-        whenever(settingsDataStore.urlPreferenceManuallySet).thenReturn(true)
+        whenever(settingsDataStore.urlPreferenceSetByUser).thenReturn(true)
         whenever(settingsDataStore.isFullUrlEnabled).thenReturn(true)
         testee.setFullUrlEnabled(true)
 
         // Then: Manual flag is set
-        verify(settingsDataStore).urlPreferenceManuallySet = true
+        verify(settingsDataStore).urlPreferenceSetByUser = true
 
         // And: Future calls honor manual preference even if feature flag changes
         whenever(shorterUrlToggle.isEnabled()).thenReturn(false)
