@@ -305,7 +305,6 @@ class Omnibar(
         viewState: OmnibarViewState,
         forceRender: Boolean = false,
     ) {
-        logcat { "Omnibar: renderOmnibarViewState $viewState" }
         omnibarView.reduce(StateChange.OmnibarStateChange(viewState, forceRender))
     }
 

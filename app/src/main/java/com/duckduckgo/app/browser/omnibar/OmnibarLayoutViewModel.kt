@@ -313,7 +313,7 @@ class OmnibarLayoutViewModel @Inject constructor(
         hasFocus: Boolean,
         inputFieldText: String,
     ) {
-        logcat { "Omnibar: onOmnibarFocusChanged" }
+        logcat { "Omnibar: onOmnibarFocusChanged hasFocus $hasFocus" }
         val showClearButton = hasFocus && inputFieldText.isNotBlank()
         val showControls = inputFieldText.isBlank() && !isSplitOmnibarEnabled
 
@@ -325,9 +325,13 @@ class OmnibarLayoutViewModel @Inject constructor(
             _viewState.update {
                 val shouldUpdateOmnibarText = !isFullUrlEnabled.value &&
                     !it.omnibarText.isEmpty() &&
-                    !duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(it.url)
+                    !duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(it.url) || it.viewMode == ViewMode.DuckAI
                 val omnibarText = if (shouldUpdateOmnibarText) {
-                    it.url
+                    if (it.viewMode == ViewMode.DuckAI) {
+                        ""
+                    } else {
+                        it.url
+                    }
                 } else {
                     it.omnibarText
                 }
@@ -526,6 +530,8 @@ class OmnibarLayoutViewModel @Inject constructor(
                             scrollingEnabled = false,
                             hasFocus = false,
                             isLoading = false,
+                            omnibarText = "",
+                            updateOmnibarText = true,
                             showDuckAIHeader = shouldShowDuckAiHeader(viewMode, hasFocus),
                             showDuckAISidebar = shouldShowDuckAiHeader(viewMode, hasFocus),
                         )
@@ -717,6 +723,7 @@ class OmnibarLayoutViewModel @Inject constructor(
         omnibarViewState: OmnibarViewState,
         forceRender: Boolean,
     ) {
+        logcat { "Omnibar: onExternalOmnibarStateChanged $omnibarViewState forceRender $forceRender" }
         if (serpEasterEggLogosToggles.feature().isEnabled()) {
             val state = if (shouldUpdateOmnibarTextInput(omnibarViewState, _viewState.value.omnibarText) || forceRender) {
                 if (forceRender && !duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(omnibarViewState.queryOrFullUrl)) {
@@ -730,8 +737,13 @@ class OmnibarLayoutViewModel @Inject constructor(
                         updateOmnibarText = true,
                     )
                 } else {
+                    val omnibarText = if (_viewState.value.viewMode == ViewMode.DuckAI) {
+                        ""
+                    } else {
+                        omnibarViewState.omnibarText
+                    }
                     _viewState.value.copy(
-                        omnibarText = omnibarViewState.omnibarText,
+                        omnibarText = omnibarText,
                     )
                 }
             } else {
@@ -921,8 +933,7 @@ class OmnibarLayoutViewModel @Inject constructor(
     private fun shouldUpdateOmnibarTextInput(
         viewState: OmnibarViewState,
         currentText: String,
-    ) =
-        (!viewState.isEditing || viewState.omnibarText.isEmpty()) && currentText != viewState.omnibarText
+    ) = (!viewState.isEditing || viewState.omnibarText.isEmpty()) && currentText != viewState.omnibarText
 
     private fun firePixelBasedOnCurrentUrl(
         emptyUrlPixel: AppPixelName,
