@@ -26,6 +26,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.BrowserTabFragment
 import com.duckduckgo.app.browser.tabs.TabManager.TabModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class TabPagerAdapter(
     private val activity: BrowserActivity,
@@ -88,9 +92,18 @@ class TabPagerAdapter(
     /**
      * Sets a message for the next tab created from the given source tab.
      * This should be called BEFORE calling openNewTab().
+     * The message will be automatically cleared after 10 seconds if not picked up.
      */
     fun setMessageForNewFragment(sourceTabId: String, message: Message) {
         messagesForTabs[sourceTabId] = message
+        scheduleMessageCleanup(sourceTabId)
+    }
+
+    private fun scheduleMessageCleanup(sourceTabId: String) {
+        CoroutineScope(Dispatchers.Main).launch {
+            delay(10_000L)
+            messagesForTabs.remove(sourceTabId)
+        }
     }
 
     @SuppressLint("NotifyDataSetChanged")
