@@ -1,28 +1,31 @@
-// See https://app.asana.com/0/72649045549333/1208001118995887/f.
+// Duck Chat Fullscreen pixels: https://app.asana.com/1/137249556945/project/1174433894299346/task/1211821261289598?focus=true.
 {
-    "pixel_name": {
-        "description": "Describe when the pixel fires and its purpose",
-        // Github usernames of the people responsible for the pixel (https://github.com/duckduckgo/internal-github-asana-utils/blob/main/user_map.yml)
-        "owners": ["nshuba"],
+    "m_aichat_settings_menu_opened": {
+        "description": "Duck.ai Browser Menu opened",
+        "owners": ["malmstein"],
         "triggers": ["other"],
-        "suffixes": [
-            // A suffix is a dynamic part of the pixel name, e.g. "some.pixel.[count|daily]"
-            "first_daily_count", // shortcut to a commonly used suffix, defined in common_suffixes.json.
-            {
-                // Custom suffix.
-                "description": "Describe the custom suffix and its purpose",
-                "enum": ["suffix1", "suffix2"]
-            }
-        ],
-        "parameters": [
-            // Commonly used param, defined in params_dictionary.json.
-            "appVersion",
-            {
-                "key": "paramKey",
-                "description": "Describe the parameter and its purpose"
-            }
-        ],
-        // If pixel is temporary, remove if pixel is permanent.
-        "expires": "2025-01-30"
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_settings_menu_aichat_settings_tapped": {
+        "description": "Duck.ai settings opened from the Duck.ai Browser Menu",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_tab_switcher_opened": {
+        "description": "Tab Switcher opened from Duck.ai",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_fire_button_tapped": {
+        "description": "Fire Button opened from Duck.ai",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
     }
 }
