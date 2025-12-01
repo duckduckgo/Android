@@ -16,62 +16,25 @@
 
 package com.duckduckgo.app.browser.omnibar
 
-import android.animation.ValueAnimator
-import android.annotation.SuppressLint
 import android.content.Context
-import android.graphics.Color
-import android.os.Build
-import android.text.Editable
-import android.transition.ChangeBounds
-import android.transition.Fade
-import android.transition.TransitionManager
-import android.transition.TransitionSet
 import android.util.AttributeSet
-import android.view.KeyEvent
-import android.view.View
-import android.view.ViewGroup
 import android.view.ViewTreeObserver.OnGlobalLayoutListener
-import android.view.animation.OvershootInterpolator
-import android.view.inputmethod.EditorInfo
-import android.widget.FrameLayout
-import android.widget.ImageView
-import android.widget.ProgressBar
-import android.widget.TextView
-import androidx.appcompat.widget.Toolbar
-import androidx.coordinatorlayout.widget.CoordinatorLayout
-import androidx.core.content.ContextCompat
-import androidx.core.graphics.ColorUtils
-import androidx.core.graphics.drawable.toDrawable
-import androidx.core.transition.doOnEnd
 import androidx.core.view.doOnLayout
-import androidx.core.view.isGone
-import androidx.core.view.isInvisible
-import androidx.core.view.isNotEmpty
 import androidx.core.view.isVisible
-import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import com.airbnb.lottie.LottieAnimationView
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.PulseAnimation
-import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.browser.SmoothProgressAnimator
 import com.duckduckgo.app.browser.animations.AddressBarTrackersAnimationFeatureToggle
 import com.duckduckgo.app.browser.api.OmnibarRepository
 import com.duckduckgo.app.browser.customtabs.CustomTabPixelNames
-import com.duckduckgo.app.browser.databinding.IncludeCustomTabToolbarBinding
-import com.duckduckgo.app.browser.databinding.IncludeFindInPageBinding
-import com.duckduckgo.app.browser.databinding.IncludeNewCustomTabToolbarBinding
 import com.duckduckgo.app.browser.omnibar.Omnibar.InputScreenLaunchListener
 import com.duckduckgo.app.browser.omnibar.Omnibar.ItemPressedListener
 import com.duckduckgo.app.browser.omnibar.Omnibar.LogoClickListener
-import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarTextState
 import com.duckduckgo.app.browser.omnibar.Omnibar.TextListener
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command
@@ -79,12 +42,10 @@ import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.LaunchI
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.MoveCaretToFront
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.StartCookiesAnimation
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.StartTrackersAnimation
-import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState.EasterEggLogo
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState.PrivacyShield
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.ViewState
 import com.duckduckgo.app.browser.omnibar.animations.addressbar.BrowserTrackersAnimatorHelper
 import com.duckduckgo.app.browser.omnibar.animations.addressbar.PrivacyShieldAnimationHelper
-import com.duckduckgo.app.browser.omnibar.animations.addressbar.TrackersAnimatorListener
 import com.duckduckgo.app.browser.omnibar.animations.omnibaranimation.OmnibarAnimationManager
 import com.duckduckgo.app.browser.omnibar.model.Decoration
 import com.duckduckgo.app.browser.omnibar.model.Decoration.ChangeCustomTabTitle
@@ -96,64 +57,33 @@ import com.duckduckgo.app.browser.omnibar.model.Decoration.Mode
 import com.duckduckgo.app.browser.omnibar.model.Decoration.PrivacyShieldChanged
 import com.duckduckgo.app.browser.omnibar.model.Decoration.QueueCookiesAnimation
 import com.duckduckgo.app.browser.omnibar.model.StateChange
-import com.duckduckgo.app.global.view.renderIfChanged
 import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentManager
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType
 import com.duckduckgo.app.trackerdetection.model.Entity
-import com.duckduckgo.browser.ui.tabs.TabSwitcherButton
-import com.duckduckgo.common.ui.DuckDuckGoActivity
-import com.duckduckgo.common.ui.view.KeyboardAwareEditText
-import com.duckduckgo.common.ui.view.KeyboardAwareEditText.ShowSuggestionsListener
-import com.duckduckgo.common.ui.view.addBottomShadow
-import com.duckduckgo.common.ui.view.gone
-import com.duckduckgo.common.ui.view.hide
-import com.duckduckgo.common.ui.view.show
-import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.FragmentViewModelFactory
-import com.duckduckgo.common.utils.extensions.replaceTextChangedListener
-import com.duckduckgo.common.utils.text.TextChangedWatcher
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.serp.logos.api.SerpEasterEggLogosToggles
 import com.duckduckgo.serp.logos.api.SerpLogos
-import com.google.android.material.appbar.AppBarLayout
-import com.google.android.material.card.MaterialCardView
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import logcat.logcat
 import javax.inject.Inject
-import com.duckduckgo.app.global.model.PrivacyShield as PrivacyShieldState
-import com.duckduckgo.mobile.android.R as CommonR
 
 @InjectWith(FragmentScope::class)
 class OmnibarLayout @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
-) : AppBarLayout(context, attrs, defStyle),
-    OmnibarView,
-    OmnibarBehaviour,
-    TrackersAnimatorListener {
-
-    data class TransitionState(
-        val showClearButton: Boolean,
-        val showVoiceSearch: Boolean,
-        val showTabsMenu: Boolean,
-        val showFireIcon: Boolean,
-        val showBrowserMenu: Boolean,
-        val showBrowserMenuHighlight: Boolean,
-        val showChatMenu: Boolean,
-        val showSpacer: Boolean,
-        val showDuckSidebar: Boolean,
-    )
+) : OmnibarLayoutView(context, attrs, defStyle), OmnibarView {
 
     @Inject
     lateinit var viewModelFactory: FragmentViewModelFactory
@@ -200,8 +130,6 @@ class OmnibarLayout @JvmOverloads constructor(
     @Inject
     lateinit var omnibarRepository: OmnibarRepository
 
-    private var previousTransitionState: TransitionState? = null
-
     private val lifecycleOwner: LifecycleOwner by lazy {
         requireNotNull(findViewTreeLifecycleOwner())
     }
@@ -210,157 +138,33 @@ class OmnibarLayout @JvmOverloads constructor(
         PulseAnimation(lifecycleOwner, onboardingDesignExperimentManager)
     }
 
-    private var omnibarTextListener: TextListener? = null
-    private var omnibarItemPressedListener: ItemPressedListener? = null
     private var omnibarInputScreenLaunchListener: InputScreenLaunchListener? = null
     private var omnibarLogoClickedListener: LogoClickListener? = null
 
     private var decoration: Decoration? = null
     private var lastViewMode: Mode? = null
     private var stateBuffer: MutableList<StateChange> = mutableListOf()
-    private var customTabToolbarColor: Int = 0
 
-    private val omnibarCardShadow: MaterialCardView by lazy { findViewById(R.id.omniBarContainerShadow) }
-    private val iconsContainer: View by lazy { findViewById(R.id.iconsContainer) }
-    private val shieldIconPulseAnimationContainer: View by lazy { findViewById(R.id.shieldIconPulseAnimationContainer) }
-    private val omniBarContentContainer: View by lazy { findViewById(R.id.omniBarContentContainer) }
-    private val backIcon: ImageView by lazy { findViewById(R.id.backIcon) }
-    private val customTabToolbarContainerWrapper: ViewGroup by lazy { findViewById(R.id.customTabToolbarContainerWrapper) }
-    private val leadingIconContainer: View by lazy { findViewById(R.id.omnibarIconContainer) }
-    private val duckAIHeader: View by lazy { findViewById(R.id.duckAIHeader) }
-    private val duckAISidebar: View by lazy { findViewById(R.id.duckAiSidebar) }
-
-    private var isFindInPageVisible = false
     private val findInPageLayoutVisibilityChangeListener =
         OnGlobalLayoutListener {
-            val isVisible = findInPage.findInPageContainer.isVisible
-            if (isFindInPageVisible != isVisible) {
-                isFindInPageVisible = isVisible
+            if (isFindInPageVisible()) {
+                updateFindInPageVisibility()
                 if (isVisible) {
-                    onFindInPageShown()
+                    onFindInPageShown(viewModel.viewState.value.viewMode)
+                    viewModel.onFindInPageRequested()
                 } else {
-                    onFindInPageHidden()
+                    onFindInPageHidden(viewModel.viewState.value)
+                    viewModel.onFindInPageDismissed()
                 }
             }
         }
 
-    private val omnibarCardMarginTop by lazy {
-        resources.getDimensionPixelSize(CommonR.dimen.omnibarCardMarginTop)
-    }
-
-    private val omnibarCardMarginBottom by lazy {
-        resources.getDimensionPixelSize(CommonR.dimen.omnibarCardMarginBottom)
-    }
-
-    private var focusAnimator: ValueAnimator? = null
-
-    override val omnibarType: OmnibarType
-
     init {
-        inflate(context, R.layout.view_omnibar, this)
-
         AndroidSupportInjection.inject(this)
 
-        omnibarType = settingsDataStore.omnibarType
-
-        val attr = context.theme.obtainStyledAttributes(attrs, R.styleable.OmnibarLayout, defStyle, 0)
-        val omnibarType = OmnibarType.entries[attr.getInt(R.styleable.OmnibarLayout_omnibarPosition, 0)]
-        val isTopPosition = omnibarType == OmnibarType.SINGLE_TOP || omnibarType == OmnibarType.SPLIT
-
-        renderPosition(isTopPosition)
-
-        if (Build.VERSION.SDK_INT >= 28) {
-            omnibarCardShadow.addBottomShadow()
-        }
+        setType(settingsDataStore.omnibarType)
+        renderPosition(animationEnabled = addressBarTrackersAnimationFeatureToggle.feature().isEnabled())
     }
-
-    override val findInPage: IncludeFindInPageBinding by lazy {
-        IncludeFindInPageBinding.bind(findViewById(R.id.findInPage))
-    }
-    override val omnibarTextInput: KeyboardAwareEditText by lazy { findViewById(R.id.omnibarTextInput) }
-    internal val tabsMenu: TabSwitcherButton by lazy { findViewById(R.id.tabsMenu) }
-    internal val fireIconMenu: FrameLayout by lazy { findViewById(R.id.fireIconMenu) }
-    internal val aiChatMenu: View? by lazy { findViewById(R.id.aiChatIconMenu) }
-    private val aiChatDivider: View by lazy { findViewById(R.id.verticalDivider) }
-    internal val browserMenu: FrameLayout by lazy { findViewById(R.id.browserMenu) }
-    internal val browserMenuHighlight: View by lazy { findViewById(R.id.browserMenuHighlight) }
-    internal val animatedIconBackgroundView: View by lazy { findViewById(R.id.animatedIconBackgroundView) }
-    internal val cookieAnimation: LottieAnimationView by lazy { findViewById(R.id.cookieAnimation) }
-    internal val sceneRoot: ViewGroup by lazy { findViewById(R.id.sceneRoot) }
-    override val omniBarContainer: View by lazy { findViewById(R.id.omniBarContainer) }
-    override val toolbar: Toolbar by lazy { findViewById(R.id.toolbar) }
-    internal val toolbarContainer: ViewGroup by lazy { findViewById(R.id.toolbarContainer) }
-    internal val customTabToolbarContainer by lazy {
-        IncludeCustomTabToolbarBinding.bind(
-            findViewById(R.id.customTabToolbarContainer),
-        )
-    }
-    internal val newCustomTabToolbarContainer by lazy {
-        IncludeNewCustomTabToolbarBinding.bind(
-            findViewById(R.id.newCustomTabToolbarContainer),
-        )
-    }
-    internal val browserMenuImageView: ImageView by lazy { findViewById(R.id.browserMenuImageView) }
-    override val shieldIcon: LottieAnimationView by lazy { findViewById(R.id.shieldIcon) }
-    internal val addressBarTrackersBlockedAnimationShieldIcon: LottieAnimationView by lazy {
-        findViewById(R.id.addressBarTrackersBlockedAnimationShieldIcon)
-    }
-    internal val pageLoadingIndicator: ProgressBar by lazy { findViewById(R.id.pageLoadingIndicator) }
-    internal val searchIcon: ImageView by lazy { findViewById(R.id.searchIcon) }
-    override val daxIcon: ImageView by lazy { findViewById(R.id.daxIcon) }
-    internal val globeIcon: ImageView by lazy { findViewById(R.id.globeIcon) }
-    internal val clearTextButton: ImageView by lazy { findViewById(R.id.clearTextButton) }
-    internal val fireIconImageView: ImageView by lazy { findViewById(R.id.fireIconImageView) }
-    internal val placeholder: View by lazy { findViewById(R.id.placeholder) }
-    internal val voiceSearchButton: ImageView by lazy { findViewById(R.id.voiceSearchButton) }
-    internal val trackersAnimation: LottieAnimationView by lazy { findViewById(R.id.trackersAnimation) }
-    internal val duckPlayerIcon: ImageView by lazy { findViewById(R.id.duckPlayerIcon) }
-    internal val omniBarButtonTransitionSet: TransitionSet by lazy {
-        TransitionSet().apply {
-            ordering = TransitionSet.ORDERING_TOGETHER
-            addTransition(
-                ChangeBounds().apply {
-                    duration = omnibarAnimationManager.getChangeBoundsDuration()
-                    interpolator = OvershootInterpolator(omnibarAnimationManager.getTension())
-                },
-            )
-            addTransition(
-                Fade().apply {
-                    duration = omnibarAnimationManager.getFadeDuration()
-                    addTarget(clearTextButton)
-                    addTarget(voiceSearchButton)
-                    addTarget(fireIconMenu)
-                    addTarget(tabsMenu)
-                    addTarget(aiChatMenu)
-                    addTarget(browserMenu)
-                    addTarget(duckAISidebar)
-                },
-            )
-        }
-    }
-    private val omnibarTextInputClickCatcher: View by lazy { findViewById(R.id.omnibarTextInputClickCatcher) }
-
-    internal fun omnibarViews(): List<View> =
-        listOf(
-            clearTextButton,
-            omnibarTextInput,
-            searchIcon,
-        )
-
-    internal fun customTabViews(): List<View> =
-        listOf(
-            newCustomTabToolbarContainer.customTabDomain,
-        )
-
-    internal fun shieldViews(): List<View> =
-        listOf(
-            shieldIcon,
-        )
-
-    internal fun customTabShieldViews(): List<View> =
-        listOf(
-            newCustomTabToolbarContainer.customTabShieldIcon,
-        )
 
     override var isScrollingEnabled: Boolean
         get() {
@@ -391,8 +195,6 @@ class OmnibarLayout @JvmOverloads constructor(
         }
     }
 
-    private val smoothProgressAnimator by lazy { SmoothProgressAnimator(pageLoadingIndicator) }
-
     private val viewModel: OmnibarLayoutViewModel by lazy {
         ViewModelProvider(
             findViewTreeViewModelStoreOwner()!!,
@@ -402,8 +204,6 @@ class OmnibarLayout @JvmOverloads constructor(
 
     private val conflatedStateJob = ConflatedJob()
     private val conflatedCommandJob = ConflatedJob()
-
-    private var lastSeenPrivacyShield: PrivacyShieldState? = null
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
@@ -450,147 +250,38 @@ class OmnibarLayout @JvmOverloads constructor(
     override fun onDetachedFromWindow() {
         conflatedStateJob.cancel()
         conflatedCommandJob.cancel()
-        focusAnimator?.cancel()
         findInPage.findInPageContainer.viewTreeObserver.removeOnGlobalLayoutListener(findInPageLayoutVisibilityChangeListener)
         super.onDetachedFromWindow()
     }
 
-    @SuppressLint("ClickableViewAccessibility")
     override fun setOmnibarTextListener(textListener: TextListener) {
-        omnibarTextListener = textListener
-
-        omnibarTextInput.onFocusChangeListener =
-            OnFocusChangeListener { _, hasFocus: Boolean ->
-                if (isAttachedToWindow) {
-                    viewModel.onOmnibarFocusChanged(hasFocus, omnibarTextInput.text.toString())
-                    omnibarTextListener?.onFocusChanged(hasFocus, omnibarTextInput.text.toString())
-                }
-            }
-
-        omnibarTextInput.onBackKeyListener =
-            object : KeyboardAwareEditText.OnBackKeyListener {
-                override fun onBackKey(): Boolean {
-                    if (isAttachedToWindow) {
-                        viewModel.onBackKeyPressed()
-                        omnibarTextListener?.onBackKeyPressed()
-                    }
-                    return false
-                }
-            }
-
-        omnibarTextInput.setOnEditorActionListener(
-            TextView.OnEditorActionListener { _, actionId, keyEvent ->
-                if (isAttachedToWindow) {
-                    if (actionId == EditorInfo.IME_ACTION_GO || keyEvent?.keyCode == KeyEvent.KEYCODE_ENTER) {
-                        viewModel.onEnterKeyPressed()
-                        omnibarTextListener?.onEnterPressed()
-                        return@OnEditorActionListener true
-                    }
-                }
-                false
-            },
-        )
-
-        omnibarTextInput.setOnTouchListener { _, event ->
-            if (isAttachedToWindow) {
-                viewModel.onUserTouchedOmnibarTextInput(event.action)
-            }
-            false
+        setTextListener(textListener)
+        setOnFocusChangeListener { hasFocus, textInput ->
+            viewModel.onOmnibarFocusChanged(hasFocus, textInput)
         }
-
-        omnibarTextInput.replaceTextChangedListener(
-            object : TextChangedWatcher() {
-                var clearQuery = false
-                var deleteLastCharacter = false
-
-                override fun afterTextChanged(editable: Editable) {
-                    if (isAttachedToWindow) {
-                        viewModel.onInputStateChanged(
-                            omnibarTextInput.text.toString(),
-                            omnibarTextInput.hasFocus(),
-                            clearQuery,
-                            deleteLastCharacter,
-                        )
-                    }
-                    omnibarTextListener?.onOmnibarTextChanged(
-                        OmnibarTextState(
-                            omnibarTextInput.text.toString(),
-                            omnibarTextInput.hasFocus(),
-                        ),
-                    )
-                }
-
-                override fun beforeTextChanged(
-                    s: CharSequence,
-                    start: Int,
-                    count: Int,
-                    after: Int,
-                ) {
-                    logcat { "Omnibar: $count characters beginning at $start are about to be replaced by new text with length $after" }
-                    clearQuery = start == 0 && after == 0
-                    deleteLastCharacter = count == 1 && clearQuery
-                }
-            },
-        )
-
-        omnibarTextInput.showSuggestionsListener =
-            object : ShowSuggestionsListener {
-                override fun showSuggestions() {
-                    omnibarTextListener?.onShowSuggestions(
-                        OmnibarTextState(
-                            omnibarTextInput.text.toString(),
-                            omnibarTextInput.hasFocus(),
-                        ),
-                    )
-                }
-            }
+        setOnBackKeyListener { viewModel.onBackKeyPressed() }
+        setOnEnterPressedListener { viewModel.onEnterKeyPressed() }
+        setOnTouchListener { event ->
+            viewModel.onUserTouchedOmnibarTextInput(event.action)
+        }
+        setReplaceTextChangeListener { hasFocus, textInput, queryCleared, deleteLastCharacter ->
+            viewModel.onInputStateChanged(
+                query = textInput,
+                hasFocus = hasFocus,
+                clearQuery = queryCleared,
+                deleteLastCharacter = deleteLastCharacter,
+            )
+        }
+        setShowSuggestionListener()
     }
 
     override fun setOmnibarItemPressedListener(itemPressedListener: ItemPressedListener) {
-        omnibarItemPressedListener = itemPressedListener
-        tabsMenu.setOnClickListener {
-            omnibarItemPressedListener?.onTabsButtonPressed()
+        setItemPressedListener(itemPressedListener)
+        setOnClearTextButtonClickListener {
+            viewModel.onClearTextButtonPressed()
         }
-        tabsMenu.setOnLongClickListener {
-            omnibarItemPressedListener?.onTabsButtonLongPressed()
-            return@setOnLongClickListener true
-        }
-        fireIconMenu.setOnClickListener {
-            if (isAttachedToWindow) {
-                viewModel.onFireIconPressed(isPulseAnimationPlaying())
-            }
-            omnibarItemPressedListener?.onFireButtonPressed()
-        }
-        browserMenu.setOnClickListener {
-            omnibarItemPressedListener?.onBrowserMenuPressed()
-        }
-        aiChatMenu?.setOnClickListener {
-            viewModel.onDuckChatButtonPressed()
-            omnibarItemPressedListener?.onDuckChatButtonPressed()
-        }
-        shieldIcon.setOnClickListener {
-            if (isAttachedToWindow) {
-                viewModel.onPrivacyShieldButtonPressed()
-            }
-            omnibarItemPressedListener?.onPrivacyShieldPressed()
-        }
-        clearTextButton.setOnClickListener {
-            if (isAttachedToWindow) {
-                viewModel.onClearTextButtonPressed()
-            }
-        }
-        voiceSearchButton.setOnClickListener {
-            omnibarItemPressedListener?.onVoiceSearchPressed()
-        }
-        backIcon.setOnClickListener {
-            viewModel.onBackButtonPressed()
-            omnibarItemPressedListener?.onBackButtonPressed()
-        }
-        duckAIHeader.setOnClickListener {
+        setDuckAIHeaderClickListener {
             viewModel.onDuckAiHeaderClicked()
-        }
-        duckAISidebar.setOnClickListener {
-            omnibarItemPressedListener?.onDuckAISidebarButtonPressed()
         }
     }
 
@@ -598,99 +289,31 @@ class OmnibarLayout @JvmOverloads constructor(
         omnibarLogoClickedListener = logoClickListener
     }
 
-    fun render(viewState: ViewState) {
-        when (viewState.viewMode) {
-            is ViewMode.CustomTab -> {
-                renderCustomTabMode(viewState, viewState.viewMode)
-            }
-
-            is ViewMode.DuckAI -> {
-                renderDuckAiMode(viewState)
-            }
-
-            else -> {
-                renderBrowserMode(viewState)
-            }
-        }
-
-        duckAIHeader.isVisible = viewState.showDuckAIHeader
-
-        leadingIconContainer.isGone = viewState.showDuckAIHeader
-        omnibarTextInput.isGone = viewState.showDuckAIHeader
-
-        if (viewState.leadingIconState == PrivacyShield) {
-            renderPrivacyShield(viewState.privacyShield, viewState.viewMode)
-        } else {
-            lastSeenPrivacyShield = null
-        }
-
-        if (viewState.hasFocus || isFindInPageVisible) {
-            animateOmnibarFocusedState(focused = true)
-        } else {
-            animateOmnibarFocusedState(focused = false)
-        }
-
-        omnibarCardShadow.isGone = viewState.viewMode is ViewMode.CustomTab && !isFindInPageVisible
-
-        renderButtons(viewState)
-
-        omniBarButtonTransitionSet.doOnEnd {
-            omnibarTextInput.requestLayout()
-        }
-    }
-
-    private fun renderPosition(isTopPosition: Boolean) {
-        if (isTopPosition) {
-            if (Build.VERSION.SDK_INT < 28) {
-                omnibarCardShadow.cardElevation = 2f.toPx(context)
-            }
-
-            shieldIconPulseAnimationContainer.updateLayoutParams {
-                (this as MarginLayoutParams).apply {
-                    if (addressBarTrackersAnimationFeatureToggle.feature().isEnabled()) {
-                        // TODO when the animation is made permanent we should add this adjustment to the actual layout
-                        marginStart = 1.toPx()
-                    }
-                }
-            }
-        } else {
-            // When omnibar is at the bottom, we're adding an additional space at the top
-            omnibarCardShadow.updateLayoutParams {
-                (this as MarginLayoutParams).apply {
-                    topMargin = omnibarCardMarginBottom
-                    bottomMargin = omnibarCardMarginTop
-                }
-            }
-
-            iconsContainer.updateLayoutParams {
-                (this as MarginLayoutParams).apply {
-                    topMargin = omnibarCardMarginBottom
-                    bottomMargin = omnibarCardMarginTop
-                }
-            }
-
-            shieldIconPulseAnimationContainer.updateLayoutParams {
-                (this as MarginLayoutParams).apply {
-                    topMargin = omnibarCardMarginBottom
-                    bottomMargin = omnibarCardMarginTop
-                    if (addressBarTrackersAnimationFeatureToggle.feature().isEnabled()) {
-                        // TODO when the animation is made permanent we should add this adjustment to the actual layout
-                        marginStart = 1.toPx()
-                    }
-                }
-            }
-
-            shieldIconPulseAnimationContainer.setPadding(
-                shieldIconPulseAnimationContainer.paddingLeft,
-                shieldIconPulseAnimationContainer.paddingTop,
-                shieldIconPulseAnimationContainer.paddingRight,
-                6.toPx(),
-            )
-
-            // Try to reduce the bottom omnibar material shadow when not using the custom shadow
-            if (Build.VERSION.SDK_INT < 28) {
-                omnibarCardShadow.cardElevation = 0.5f.toPx(context)
-            }
+    private fun render(viewState: ViewState) {
+        setButtonTransitionSet(
+            boundsDuration = omnibarAnimationManager.getChangeBoundsDuration(),
+            tension = omnibarAnimationManager.getTension(),
+            fadeDuration = omnibarAnimationManager.getFadeDuration(),
+        )
+        render(
+            viewState = viewState,
+            containerClicked = {
+                pixel.fire(CustomTabPixelNames.CUSTOM_TABS_ADDRESS_BAR_CLICKED)
+                pixel.fire(CustomTabPixelNames.CUSTOM_TABS_ADDRESS_BAR_CLICKED_DAILY, type = PixelType.Daily())
+            },
+            daxIconClicked = {
+                viewModel.onLogoClicked()
+            },
+            newCustomTabEnabled = omnibarRepository.isNewCustomTabEnabled,
+            omnibarAnimationEnabled = omnibarAnimationManager.isFeatureEnabled(),
+            easterEggLogoEnabled = serpEasterEggLogosToggles.feature().isEnabled(),
+            privacyShieldAnimationListener = { shieldIconView, privacyShieldState, viewMode, useLightAnimation ->
+                privacyShieldView.setAnimationView(shieldIconView, privacyShieldState, viewMode, useLightAnimation)
+            },
+        )
+        if (viewState.viewMode !is ViewMode.CustomTab && viewState.viewMode !is ViewMode.DuckAI) {
+            isScrollingEnabled = viewState.scrollingEnabled
+            renderPulseAnimation(viewState)
         }
     }
 
@@ -729,193 +352,6 @@ class OmnibarLayout @JvmOverloads constructor(
                 )
             }
         }
-    }
-
-    private fun moveCaretToFront() {
-        omnibarTextInput.post {
-            omnibarTextInput.setSelection(0)
-        }
-    }
-
-    private fun renderTabIcon(viewState: ViewState) {
-        if (viewState.shouldUpdateTabsCount) {
-            tabsMenu.count = viewState.tabCount
-            tabsMenu.hasUnread = viewState.hasUnreadTabs
-        }
-    }
-
-    private fun renderLeadingIconState(viewState: ViewState) {
-        when (val leadingIconState = viewState.leadingIconState) {
-            OmnibarLayoutViewModel.LeadingIconState.Search -> {
-                searchIcon.show()
-                shieldIcon.gone()
-                daxIcon.gone()
-                globeIcon.gone()
-                duckPlayerIcon.gone()
-            }
-
-            PrivacyShield -> {
-                shieldIcon.show()
-                searchIcon.gone()
-                daxIcon.gone()
-                globeIcon.gone()
-                duckPlayerIcon.gone()
-            }
-
-            OmnibarLayoutViewModel.LeadingIconState.Dax -> {
-                if (serpEasterEggLogosToggles.feature().isEnabled()) {
-                    with(daxIcon) {
-                        setOnClickListener(null)
-                        show()
-                        Glide
-                            .with(this)
-                            .load(CommonR.drawable.ic_ddg_logo)
-                            .transition(withCrossFade())
-                            .placeholder(daxIcon.drawable)
-                            .into(this)
-                    }
-                } else {
-                    daxIcon.show()
-                }
-                shieldIcon.gone()
-                searchIcon.gone()
-                globeIcon.gone()
-                duckPlayerIcon.gone()
-            }
-
-            OmnibarLayoutViewModel.LeadingIconState.Globe -> {
-                globeIcon.show()
-                daxIcon.gone()
-                shieldIcon.gone()
-                searchIcon.gone()
-                duckPlayerIcon.gone()
-            }
-
-            OmnibarLayoutViewModel.LeadingIconState.DuckPlayer -> {
-                globeIcon.gone()
-                daxIcon.gone()
-                shieldIcon.gone()
-                searchIcon.gone()
-                duckPlayerIcon.show()
-            }
-
-            is EasterEggLogo -> {
-                daxIcon.show()
-                Glide
-                    .with(daxIcon)
-                    .load(leadingIconState.logoUrl)
-                    .placeholder(daxIcon.drawable)
-                    .transition(withCrossFade())
-                    .into(daxIcon)
-                daxIcon.setOnClickListener {
-                    viewModel.onLogoClicked()
-                }
-                globeIcon.gone()
-                shieldIcon.gone()
-                searchIcon.gone()
-                duckPlayerIcon.gone()
-            }
-        }
-    }
-
-    fun renderButtons(viewState: ViewState) {
-        val newTransitionState =
-            TransitionState(
-                showClearButton = viewState.showClearButton,
-                showVoiceSearch = viewState.showVoiceSearch,
-                showTabsMenu = viewState.showTabsMenu && !viewState.showFindInPage,
-                showFireIcon = viewState.showFireIcon && !viewState.showFindInPage,
-                showBrowserMenu = viewState.showBrowserMenu && !viewState.showFindInPage,
-                showBrowserMenuHighlight = viewState.showBrowserMenuHighlight,
-                showChatMenu = viewState.showChatMenu,
-                showSpacer = viewState.showClearButton || viewState.showVoiceSearch,
-                showDuckSidebar = viewState.showDuckAISidebar,
-            )
-
-        if (omnibarAnimationManager.isFeatureEnabled() && previousTransitionState != null &&
-            (
-                newTransitionState.showFireIcon != previousTransitionState?.showFireIcon ||
-                    newTransitionState.showTabsMenu != previousTransitionState?.showTabsMenu ||
-                    newTransitionState.showBrowserMenu != previousTransitionState?.showBrowserMenu ||
-                    newTransitionState.showDuckSidebar != previousTransitionState?.showDuckSidebar
-                )
-        ) {
-            TransitionManager.beginDelayedTransition(toolbarContainer, omniBarButtonTransitionSet)
-        }
-
-        clearTextButton.isVisible = viewState.showClearButton
-        voiceSearchButton.isVisible = viewState.showVoiceSearch
-        tabsMenu.isVisible = newTransitionState.showTabsMenu
-        fireIconMenu.isVisible = newTransitionState.showFireIcon
-        browserMenu.isVisible = newTransitionState.showBrowserMenu
-        browserMenuHighlight.isVisible = newTransitionState.showBrowserMenuHighlight
-        aiChatMenu?.isVisible = newTransitionState.showChatMenu
-        aiChatDivider.isVisible = (viewState.showVoiceSearch || viewState.showClearButton) && viewState.showChatMenu
-        duckAISidebar.isVisible = newTransitionState.showDuckSidebar
-
-        if (omnibarAnimationManager.isFeatureEnabled()) {
-            toolbarContainer.requestLayout()
-        }
-
-        previousTransitionState = newTransitionState
-
-        enableTextInputClickCatcher(viewState.showTextInputClickCatcher)
-
-        val showBackArrow = viewState.hasFocus
-        if (showBackArrow) {
-            backIcon.show()
-            searchIcon.gone()
-            shieldIcon.gone()
-            daxIcon.gone()
-            globeIcon.gone()
-            duckPlayerIcon.gone()
-        } else {
-            backIcon.hide()
-        }
-    }
-
-    private fun renderBrowserMode(viewState: ViewState) {
-        renderOutline(viewState.hasFocus)
-        if (viewState.updateOmnibarText) {
-            omnibarTextInput.setText(viewState.omnibarText)
-        }
-        if (viewState.expanded) {
-            setExpanded(true, viewState.expandedAnimated)
-        }
-
-        if (viewState.isLoading) {
-            pageLoadingIndicator.show()
-        }
-        smoothProgressAnimator.onNewProgress(viewState.loadingProgress) {
-            if (!viewState.isLoading) {
-                pageLoadingIndicator.hide()
-            }
-        }
-
-        isScrollingEnabled = viewState.scrollingEnabled
-
-        renderTabIcon(viewState)
-        renderPulseAnimation(viewState)
-
-        renderLeadingIconState(viewState)
-
-        omnibarTextInput.hint = context.getString(R.string.search)
-    }
-
-    private fun renderDuckAiMode(viewState: ViewState) {
-        logcat { "Omnibar: renderDuckAiMode $viewState" }
-        renderTabIcon(viewState)
-        pageLoadingIndicator.isVisible = viewState.isLoading
-        voiceSearchButton.isVisible = viewState.showVoiceSearch
-    }
-
-    private fun renderCustomTabMode(
-        viewState: ViewState,
-        viewMode: ViewMode.CustomTab,
-    ) {
-        logcat { "Omnibar: renderCustomTabMode $viewState" }
-        configureCustomTabOmnibar(viewMode)
-        renderCustomTab(viewMode)
     }
 
     override fun decorate(decoration: Decoration) {
@@ -1061,13 +497,7 @@ class OmnibarLayout @JvmOverloads constructor(
                 )
             }
         } else if (omnibarRepository.isNewCustomTabEnabled) {
-            val (animationBackgroundColor, useLightAnimation) = if (!isDefaultToolbarColor(customTabToolbarColor)) {
-                val background = calculateAnimationBackgroundColor(customTabToolbarColor)
-                Pair(background, isColorLight(background))
-            } else {
-                Pair(customTabToolbarColor, null)
-            }
-
+            val (animationBackgroundColor, useLightAnimation) = animationBackground()
             if (addressBarTrackersAnimationFeatureToggle.feature().isEnabled()) {
                 animatorHelper.startAddressBarTrackersAnimation(
                     context = context,
@@ -1092,322 +522,12 @@ class OmnibarLayout @JvmOverloads constructor(
         }
     }
 
-    private fun renderPrivacyShield(
-        privacyShieldState: PrivacyShieldState,
-        viewMode: ViewMode,
-    ) {
-        renderIfChanged(privacyShieldState, lastSeenPrivacyShield) {
-            lastSeenPrivacyShield = privacyShieldState
-            val shieldIconView =
-                if (viewMode is ViewMode.Browser) {
-                    shieldIcon
-                } else if (omnibarRepository.isNewCustomTabEnabled) {
-                    newCustomTabToolbarContainer.customTabShieldIcon
-                } else {
-                    customTabToolbarContainer.customTabShieldIcon
-                }
-
-            // For new custom tabs, determine light/dark variant based on container color
-            // Shield sits on secondaryToolbarColor background, so invert: light bg needs dark shield
-            val useLightAnimation = if (viewMode is ViewMode.CustomTab &&
-                omnibarRepository.isNewCustomTabEnabled &&
-                !isDefaultToolbarColor(customTabToolbarColor)
-            ) {
-                val secondaryToolbarColor = calculateAddressBarColor(customTabToolbarColor)
-                isColorLight(secondaryToolbarColor)
-            } else {
-                null // Use default theme-based selection
-            }
-
-            privacyShieldView.setAnimationView(shieldIconView, privacyShieldState, viewMode, useLightAnimation)
-        }
-    }
-
-    private fun renderOutline(enabled: Boolean) {
-        omniBarContainer.isPressed = enabled
-    }
-
-    private fun configureCustomTabOmnibar(customTab: ViewMode.CustomTab) {
-        if (omnibarRepository.isNewCustomTabEnabled) {
-            customTabToolbarColor = customTab.toolbarColor
-            with(newCustomTabToolbarContainer) {
-                if (!customTabToolbar.isVisible) {
-                    if (omnibarRepository.omnibarType == OmnibarType.SINGLE_BOTTOM) {
-                        newCustomTabToolbarContainer.customTabToolbar.updateLayoutParams {
-                            (this as MarginLayoutParams).apply {
-                                topMargin = omnibarCardMarginBottom
-                                bottomMargin = omnibarCardMarginTop
-                            }
-                        }
-                    }
-
-                    val animationBackgroundColor: Int
-                    if (customTab.toolbarColor != 0 && !isDefaultToolbarColor(customTab.toolbarColor)) {
-                        toolbar.background = customTab.toolbarColor.toDrawable()
-                        toolbarContainer.background = customTab.toolbarColor.toDrawable()
-
-                        val foregroundColor = calculateCustomTabForegroundColor(customTab.toolbarColor)
-                        val secondaryToolbarColor = calculateAddressBarColor(customTab.toolbarColor)
-                        customTabCloseIcon.setColorFilter(foregroundColor)
-                        customTabDomain.setTextColor(calculateCustomTabForegroundColor(secondaryToolbarColor))
-                        customToolbarContainer.setCardBackgroundColor(secondaryToolbarColor)
-                        browserMenuImageView.setColorFilter(foregroundColor)
-
-                        customToolbarContainer.setOnClickListener {
-                            pixel.fire(CustomTabPixelNames.CUSTOM_TABS_ADDRESS_BAR_CLICKED)
-                            pixel.fire(CustomTabPixelNames.CUSTOM_TABS_ADDRESS_BAR_CLICKED_DAILY, type = PixelType.Daily())
-                        }
-
-                        animationBackgroundColor = calculateAnimationBackgroundColor(customTab.toolbarColor)
-                    } else {
-                        animationBackgroundColor = customTab.toolbarColor
-                    }
-
-                    val iconBackground = newCustomTabToolbarContainer.animatedIconBackgroundView.background
-                    if (iconBackground is android.graphics.drawable.GradientDrawable) {
-                        val mutatedDrawable = iconBackground.mutate() as android.graphics.drawable.GradientDrawable
-                        mutatedDrawable.setColor(animationBackgroundColor)
-                        mutatedDrawable.setStroke(1, animationBackgroundColor)
-                    }
-
-                    browserMenu.isVisible = true
-
-                    omniBarContainer.hide()
-                    customTabToolbar.show()
-
-                    customTabCloseIcon.setOnClickListener {
-                        omnibarItemPressedListener?.onCustomTabClosePressed()
-                    }
-
-                    customTabShieldIcon.setOnClickListener { _ ->
-                        omnibarItemPressedListener?.onCustomTabPrivacyDashboardPressed()
-                    }
-                }
-            }
-        } else {
-            with(customTabToolbarContainer) {
-                if (!customTabToolbar.isVisible) {
-                    customTabCloseIcon.setOnClickListener {
-                        omnibarItemPressedListener?.onCustomTabClosePressed()
-                    }
-
-                    customTabShieldIcon.setOnClickListener { _ ->
-                        omnibarItemPressedListener?.onCustomTabPrivacyDashboardPressed()
-                    }
-
-                    toolbar.background = customTab.toolbarColor.toDrawable()
-                    toolbarContainer.background = customTab.toolbarColor.toDrawable()
-
-                    omniBarContainer.hide()
-                    customTabToolbar.show()
-
-                    browserMenu.isVisible = true
-
-                    val foregroundColor = calculateCustomTabBackgroundColor(customTab.toolbarColor)
-                    customTabCloseIcon.setColorFilter(foregroundColor)
-                    customTabDomain.setTextColor(foregroundColor)
-                    customTabDomainOnly.setTextColor(foregroundColor)
-                    customTabTitle.setTextColor(foregroundColor)
-                    browserMenuImageView.setColorFilter(foregroundColor)
-                }
-            }
-        }
-    }
-
-    private fun isDefaultToolbarColor(color: Int): Boolean {
-        val defaultLightColor = ContextCompat.getColor(context, CommonR.color.background_background_light)
-        val defaultDarkColor = ContextCompat.getColor(context, CommonR.color.background_background_dark)
-        return color == defaultLightColor || color == defaultDarkColor
-    }
-
-    private fun calculateAddressBarColor(mainToolbarColor: Int): Int {
-        return if (isColorLight(mainToolbarColor)) {
-            val targetSaturation = 0.55f
-            val targetLightness = 0.90f
-            val hsl = floatArrayOf(0f, 0f, 0f)
-            ColorUtils.colorToHSL(mainToolbarColor, hsl)
-
-            // hsl[0] is Hue (H) - keep this the same to maintain color identity
-            // hsl[1] is Saturation (S) - reduce for muted appearance
-            // hsl[2] is Lightness (L) - increase for lighter shade
-
-            // If the original color is grayscale (near-zero saturation),
-            // keep it grayscale to maintain color identity
-            if (hsl[1] < 0.01f) {
-                hsl[1] = 0f // Keep saturation at 0
-            } else {
-                hsl[1] = targetSaturation
-            }
-            hsl[2] = targetLightness
-
-            ColorUtils.HSLToColor(hsl)
-        } else {
-            // Use a darkened version of the main toolbar color for dark themes
-            ColorUtils.blendARGB(mainToolbarColor, Color.WHITE, 0.20f)
-        }
-    }
-
-    private fun calculateAnimationBackgroundColor(mainToolbarColor: Int): Int {
-        return ColorUtils.blendARGB(mainToolbarColor, Color.WHITE, 0.12f)
-    }
-
-    private fun renderCustomTab(viewMode: ViewMode.CustomTab) {
-        logcat { "Omnibar: updateCustomTabTitle $decoration" }
-
-        if (omnibarRepository.isNewCustomTabEnabled) {
-            with(newCustomTabToolbarContainer) {
-                viewMode.domain?.let {
-                    customTabDomain.text = viewMode.domain
-                    customTabDomain.show()
-                }
-
-                customTabShieldIcon.isInvisible = viewMode.showDuckPlayerIcon
-                customTabDuckPlayerIcon.isVisible = viewMode.showDuckPlayerIcon
-            }
-        } else {
-            with(customTabToolbarContainer) {
-                viewMode.domain?.let {
-                    customTabDomain.text = viewMode.domain
-                    customTabDomainOnly.text = viewMode.domain
-                    customTabDomain.show()
-                    customTabDomainOnly.show()
-                }
-
-                viewMode.title?.let {
-                    customTabTitle.text = viewMode.title
-                    customTabTitle.show()
-                    customTabDomainOnly.hide()
-                }
-
-                customTabShieldIcon.isInvisible = viewMode.showDuckPlayerIcon
-                customTabDuckPlayerIcon.isVisible = viewMode.showDuckPlayerIcon
-            }
-        }
-    }
-
-    private fun calculateCustomTabBackgroundColor(color: Int): Int {
-        // Handle the case where we did not receive a color.
-        if (color == 0) {
-            return if ((context as DuckDuckGoActivity).isDarkThemeEnabled()) Color.WHITE else Color.BLACK
-        }
-
-        if (color == Color.WHITE || Color.alpha(color) < 128) {
-            return Color.BLACK
-        }
-        val greyValue =
-            (0.299 * Color.red(color) + 0.587 * Color.green(color) + 0.114 * Color.blue(color)).toInt()
-        return if (greyValue < 186) {
-            Color.WHITE
-        } else {
-            Color.BLACK
-        }
-    }
-
-    private fun calculateCustomTabForegroundColor(color: Int): Int {
-        return if (isColorLight(color)) Color.BLACK else Color.WHITE
-    }
-
-    private fun isColorLight(color: Int): Boolean {
-        if (color == 0) {
-            return !(context as DuckDuckGoActivity).isDarkThemeEnabled()
-        }
-
-        if (color == Color.WHITE || Color.alpha(color) < 128) {
-            return true
-        }
-
-        // Use W3C relative luminance calculation
-        val luminance = ColorUtils.calculateLuminance(color)
-        // Use 0.5 threshold - lighter backgrounds have higher luminance
-        return luminance > 0.5
-    }
-
-    private fun applyFindInPageTheme(toolbarColor: Int) {
-        val backgroundColor = calculateAddressBarColor(toolbarColor)
-        val isColorLight = isColorLight(backgroundColor)
-
-        with(findInPage) {
-            findInPageContainer.background = backgroundColor.toDrawable()
-
-            val foregroundColor = if (isColorLight) Color.BLACK else Color.WHITE
-            val hintColor = if (foregroundColor == Color.WHITE) {
-                Color.argb(153, 255, 255, 255) // 60% white for dark theme
-            } else {
-                Color.argb(153, 0, 0, 0) // 60% black for light theme
-            }
-
-            findInPageInput.setTextColor(foregroundColor)
-            findInPageInput.setHintTextColor(hintColor)
-            findInPageMatches.setTextColor(foregroundColor)
-
-            listOf(
-                findIcon,
-                previousSearchTermButton,
-                nextSearchTermButton,
-                closeFindInPagePanel,
-            ).forEach { imageView ->
-                imageView.setColorFilter(foregroundColor)
-            }
-        }
-    }
-
     private fun onLogoClicked(url: String) {
         omnibarLogoClickedListener?.onClick(url)
     }
 
-    override fun measuredHeight(): Int = measuredHeight
-
-    override fun height(): Int = height
-
-    override fun getTranslation(): Float = translationY
-
-    override fun setTranslation(y: Float) {
-        translationY = y
-    }
-
-    override fun isOmnibarScrollingEnabled(): Boolean = isScrollingEnabled
-
-    override fun isBottomNavEnabled(): Boolean = false
-
-    override fun getBehavior(): CoordinatorLayout.Behavior<AppBarLayout> =
-        when (omnibarType) {
-            OmnibarType.SINGLE_TOP, OmnibarType.SPLIT -> TopAppBarBehavior(context, this)
-            OmnibarType.SINGLE_BOTTOM -> BottomAppBarBehavior(context, this)
-        }
-
-    override fun setExpanded(expanded: Boolean) {
-        when (omnibarType) {
-            OmnibarType.SINGLE_TOP, OmnibarType.SPLIT -> super.setExpanded(expanded)
-            OmnibarType.SINGLE_BOTTOM -> (behavior as BottomAppBarBehavior).setExpanded(expanded)
-        }
-    }
-
-    override fun setExpanded(
-        expanded: Boolean,
-        animate: Boolean,
-    ) {
-        when (omnibarType) {
-            OmnibarType.SINGLE_TOP, OmnibarType.SPLIT -> super.setExpanded(expanded, animate)
-            OmnibarType.SINGLE_BOTTOM -> (behavior as BottomAppBarBehavior).setExpanded(expanded)
-        }
-    }
-
-    override fun onAnimationFinished() {
-        omnibarTextListener?.onTrackersCountFinished()
-    }
-
     override fun setDraftTextIfNtpOrSerp(query: String) {
         viewModel.setDraftTextIfNtpOrSerp(query)
-    }
-
-    private fun enableTextInputClickCatcher(enabled: Boolean) {
-        omnibarTextInputClickCatcher.isVisible = enabled
-
-        omnibarTextInput.apply {
-            isEnabled = !enabled
-            isFocusable = !enabled
-            isFocusableInTouchMode = !enabled
-        }
     }
 
     override fun setInputScreenLaunchListener(listener: InputScreenLaunchListener) {
@@ -1417,44 +537,5 @@ class OmnibarLayout @JvmOverloads constructor(
         }
     }
 
-    private fun animateOmnibarFocusedState(focused: Boolean) {
-        // temporarily disable focus animation
-    }
-
-    private fun onFindInPageShown() {
-        omniBarContentContainer.hide()
-        customTabToolbarContainerWrapper.hide()
-        if (viewModel.viewState.value.viewMode is ViewMode.CustomTab) {
-            val toolbarColor = (viewModel.viewState.value.viewMode as ViewMode.CustomTab).toolbarColor
-
-            if (!isDefaultToolbarColor(toolbarColor)) {
-                applyFindInPageTheme(toolbarColor)
-            }
-            omniBarContainer.show()
-            browserMenu.gone()
-        }
-        animateOmnibarFocusedState(focused = true)
-        viewModel.onFindInPageRequested()
-    }
-
-    private fun onFindInPageHidden() {
-        omniBarContentContainer.show()
-        customTabToolbarContainerWrapper.show()
-        if (viewModel.viewState.value.viewMode is ViewMode.CustomTab) {
-            omniBarContainer.hide()
-            browserMenu.isVisible = viewModel.viewState.value.showBrowserMenu
-        }
-        if (!viewModel.viewState.value.hasFocus) {
-            animateOmnibarFocusedState(focused = false)
-        }
-        viewModel.onFindInPageDismissed()
-    }
-
-    override fun show() {
-        visibility = View.VISIBLE
-    }
-
-    override fun gone() {
-        visibility = View.GONE
-    }
+    override fun isOmnibarScrollingEnabled(): Boolean = isScrollingEnabled
 }
