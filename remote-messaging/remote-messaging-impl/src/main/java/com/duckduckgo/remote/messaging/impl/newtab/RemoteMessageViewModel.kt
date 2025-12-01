@@ -72,7 +72,6 @@ class RemoteMessageViewModel @Inject constructor(
         data object DismissMessage : Command()
         data class LaunchPlayStore(val appPackage: String) : Command()
         data class SubmitUrl(val url: String) : Command()
-        data class SubmitUrlInContext(val url: String) : Command()
         data object LaunchDefaultBrowser : Command()
         data object LaunchAppTPOnboarding : Command()
         data class SharePromoLinkRMF(
@@ -172,7 +171,7 @@ class RemoteMessageViewModel @Inject constructor(
             is Dismiss -> Command.DismissMessage
             is PlayStore -> Command.LaunchPlayStore(this.value)
             is Url -> Command.SubmitUrl(this.value)
-            is UrlInContext -> Command.SubmitUrlInContext(this.value)
+            is UrlInContext -> Command.SubmitUrl(this.value)
             is DefaultBrowser -> Command.LaunchDefaultBrowser
             is AppTpOnboarding -> Command.LaunchAppTPOnboarding
             is Share -> Command.SharePromoLinkRMF(this.value, this.title)
