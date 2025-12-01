@@ -216,7 +216,7 @@
                             <LinearLayout
                                 android:id="@+id/duckAIHeader"
                                 android:layout_width="0dp"
-                                android:layout_height="wrap_content"
+                                android:layout_height="match_parent"
                                 android:orientation="horizontal"
                                 android:gravity="center"
                                 android:background="?daxColorWindow"

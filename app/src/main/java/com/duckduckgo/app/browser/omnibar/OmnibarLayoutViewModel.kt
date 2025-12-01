@@ -163,6 +163,10 @@ class OmnibarLayoutViewModel @Inject constructor(
                 false
             }
 
+            viewState.viewMode is ViewMode.DuckAI -> {
+                false
+            }
+
             showInAllStates -> {
                 true
             }
