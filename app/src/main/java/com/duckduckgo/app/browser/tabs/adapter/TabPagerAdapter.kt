@@ -26,13 +26,14 @@ import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.BrowserTabFragment
 import com.duckduckgo.app.browser.tabs.TabManager.TabModel
+import com.duckduckgo.common.utils.DispatcherProvider
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class TabPagerAdapter(
     private val activity: BrowserActivity,
+    private val dispatcherProvider: DispatcherProvider,
 ) : FragmentStateAdapter(activity) {
     private val tabs = mutableListOf<TabModel>()
 
@@ -100,7 +101,7 @@ class TabPagerAdapter(
     }
 
     private fun scheduleMessageCleanup(sourceTabId: String) {
-        CoroutineScope(Dispatchers.Main).launch {
+        CoroutineScope(dispatcherProvider.main()).launch {
             delay(10_000L)
             messagesForTabs.remove(sourceTabId)
         }
