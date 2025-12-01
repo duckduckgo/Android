@@ -100,6 +100,17 @@ android {
                     keyAlias = properties['customDebugCertAlias']?.toString()
                     keyPassword properties['customDebugCertKeyPassword']?.toString()
                 }
+            } else {
+                def propertiesPath = "${CI_HOME_DIR}/ddg_android_debug_build.properties"
+                def propertiesFile = new File(propertiesPath)
+                if (propertiesFile.exists()) {
+                    def props = new Properties()
+                    props.load(new FileInputStream(propertiesFile))
+                    storeFile = file("${CI_HOME_DIR}/${props['key.store']}")
+                    storePassword = props['key.store.password']
+                    keyAlias = props['key.alias']
+                    keyPassword = props['key.alias.password']
+                }
             }
         }
         release {
