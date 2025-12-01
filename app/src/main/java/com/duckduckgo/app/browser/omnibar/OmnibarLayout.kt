@@ -657,22 +657,22 @@ class OmnibarLayout @JvmOverloads constructor(
             // When omnibar is at the bottom, we're adding an additional space at the top
             omnibarCardShadow.updateLayoutParams {
                 (this as MarginLayoutParams).apply {
-                    topMargin = omnibarCardMarginBottom
-                    bottomMargin = omnibarCardMarginTop
+                    topMargin = omnibarCardMarginTop
+                    bottomMargin = omnibarCardMarginBottom
                 }
             }
 
             iconsContainer.updateLayoutParams {
                 (this as MarginLayoutParams).apply {
-                    topMargin = omnibarCardMarginBottom
-                    bottomMargin = omnibarCardMarginTop
+                    topMargin = omnibarCardMarginTop
+                    bottomMargin = omnibarCardMarginBottom
                 }
             }
 
             shieldIconPulseAnimationContainer.updateLayoutParams {
                 (this as MarginLayoutParams).apply {
-                    topMargin = omnibarCardMarginBottom
-                    bottomMargin = omnibarCardMarginTop
+                    topMargin = omnibarCardMarginTop
+                    bottomMargin = omnibarCardMarginBottom
                     if (addressBarTrackersAnimationFeatureToggle.feature().isEnabled()) {
                         // TODO when the animation is made permanent we should add this adjustment to the actual layout
                         marginStart = 1.toPx()
@@ -1135,8 +1135,8 @@ class OmnibarLayout @JvmOverloads constructor(
                     if (omnibarRepository.omnibarType == OmnibarType.SINGLE_BOTTOM) {
                         newCustomTabToolbarContainer.customTabToolbar.updateLayoutParams {
                             (this as MarginLayoutParams).apply {
-                                topMargin = omnibarCardMarginBottom
-                                bottomMargin = omnibarCardMarginTop
+                                topMargin = omnibarCardMarginTop
+                                bottomMargin = omnibarCardMarginBottom
                             }
                         }
                     }
