@@ -24,6 +24,7 @@ import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.impl.inputscreen.wideevents.InputScreenOnboardingWideEvent
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -44,6 +45,7 @@ class OnboardingInputScreenSelectionObserver @Inject constructor(
     private val userStageStore: UserStageStore,
     private val onboardingStore: OnboardingStore,
     private val duckChat: DuckChat,
+    private val inputScreenOnboardingWideEvent: InputScreenOnboardingWideEvent,
 ) : MainProcessLifecycleObserver {
 
     init {
@@ -58,6 +60,7 @@ class OnboardingInputScreenSelectionObserver @Inject constructor(
             .onEach {
                 if (userStageStore.getUserAppStage() != AppStage.ESTABLISHED && onboardingStore.getInputScreenSelection() != null) {
                     onboardingStore.setInputScreenSelectionOverriddenByUser()
+                    inputScreenOnboardingWideEvent.onInputScreenSettingEnabledBeforeInputScreenShown()
                 }
             }
             .flowOn(dispatchers.io())

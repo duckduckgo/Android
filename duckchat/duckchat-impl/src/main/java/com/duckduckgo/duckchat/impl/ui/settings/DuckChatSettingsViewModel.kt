@@ -73,7 +73,7 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
     val viewState =
         combine(
             duckChat.observeEnableDuckChatUserSetting(),
-            duckChat.observeInputScreenUserSettingEnabled(),
+            duckChat.observeCosmeticInputScreenUserSettingEnabled(),
             duckChat.observeFullscreenModeUserSetting(),
             flowOf(duckChatFeature.showHideAiGeneratedImages().isEnabled()).flowOn(dispatcherProvider.io()),
         ) { isDuckChatUserEnabled, isInputScreenEnabled, isFullScreenModeEnabled, showHideAiGeneratedImagesOption ->

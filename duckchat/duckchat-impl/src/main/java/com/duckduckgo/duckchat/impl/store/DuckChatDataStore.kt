@@ -70,6 +70,8 @@ interface DuckChatDataStore {
 
     fun observeInputScreenUserSettingEnabled(): Flow<Boolean>
 
+    fun observeCosmeticInputScreenUserSettingEnabled(): Flow<Boolean>
+
     suspend fun isCosmeticInputScreenUserSettingEnabled(): Boolean
 
     fun observeShowInBrowserMenu(): Flow<Boolean>
@@ -156,11 +158,13 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
 
     private val inputScreenUserSettingEnabled: StateFlow<Boolean> =
         store.data
-            .map { prefs ->
-                val actualValue = prefs[DUCK_AI_INPUT_SCREEN_USER_SETTING] ?: false
-                val cosmeticValue = prefs[DUCK_AI_INPUT_SCREEN_COSMETIC_SETTING] ?: false
-                actualValue || cosmeticValue
-            }
+            .map { prefs -> prefs[DUCK_AI_INPUT_SCREEN_USER_SETTING] ?: false }
+            .distinctUntilChanged()
+            .stateIn(appCoroutineScope, SharingStarted.Eagerly, false)
+
+    private val cosmeticInputScreenUserSettingEnabled: StateFlow<Boolean> =
+        store.data
+            .map { prefs -> prefs[DUCK_AI_INPUT_SCREEN_COSMETIC_SETTING] ?: false }
             .distinctUntilChanged()
             .stateIn(appCoroutineScope, SharingStarted.Eagerly, false)
 
@@ -189,7 +193,7 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
     override suspend fun setInputScreenUserSetting(enabled: Boolean) {
         store.edit { prefs ->
             prefs[DUCK_AI_INPUT_SCREEN_USER_SETTING] = enabled
-            prefs.remove(DUCK_AI_INPUT_SCREEN_COSMETIC_SETTING)
+            prefs[DUCK_AI_INPUT_SCREEN_COSMETIC_SETTING] = enabled
         }
     }
 
@@ -216,6 +220,8 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
     override fun observeDuckChatUserEnabled(): Flow<Boolean> = duckChatUserEnabled
 
     override fun observeInputScreenUserSettingEnabled(): Flow<Boolean> = inputScreenUserSettingEnabled
+
+    override fun observeCosmeticInputScreenUserSettingEnabled(): Flow<Boolean> = cosmeticInputScreenUserSettingEnabled
 
     override fun observeShowInBrowserMenu(): Flow<Boolean> = duckChatShowInBrowserMenu
 
