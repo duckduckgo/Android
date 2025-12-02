@@ -349,11 +349,11 @@ class NetworkProtectionManagementViewModel @Inject constructor(
 
     fun onStartVpn() {
         viewModelScope.launch(dispatcherProvider.io()) {
+            vpnEnableWideEvent.onStartVpn()
             networkProtectionState.start()
             networkProtectionRepository.enabledTimeInMillis = -1L
             forceUpdateRunningState()
             tryShowAlwaysOnPromotion()
-            vpnEnableWideEvent.onStartVpn()
         }
     }
 
