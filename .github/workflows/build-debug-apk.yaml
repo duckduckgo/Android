@@ -24,17 +24,16 @@ jobs:
           submodules: recursive
 
       - name: Create folder
-        if: always()
         run: mkdir apk
 
-      - name: Decode keys
+      - name: Decode debug keys
         uses: davidSchuppa/base64Secret-toFile-action@v2
         with:
           secret: ${{ secrets.DEBUG_PROPERTIES }}
           fileName: ddg_android_debug_build.properties
           destination-path: $HOME/jenkins_static/com.duckduckgo.mobile.android/
 
-      - name: Decode key file
+      - name: Decode debug key file
         uses: davidSchuppa/base64Secret-toFile-action@v2
         with:
           secret: ${{ secrets.DEBUG_KEY }}
@@ -70,3 +69,7 @@ jobs:
         with:
           name: pr-ddg-debug
           path: pr-ddg-debug.apk
+
+      - name: Cleanup secrets
+        if: always()
+        run: rm -rf $HOME/jenkins_static/com.duckduckgo.mobile.android/*.properties $HOME/jenkins_static/com.duckduckgo.mobile.android/

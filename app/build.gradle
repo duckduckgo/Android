@@ -105,7 +105,7 @@ android {
                 def propertiesFile = new File(propertiesPath)
                 if (propertiesFile.exists()) {
                     def props = new Properties()
-                    props.load(new FileInputStream(propertiesFile))
+                    propertiesFile.withInputStream { props.load(it) }
                     storeFile = file("${CI_HOME_DIR}/${props['key.store']}")
                     storePassword = props['key.store.password']
                     keyAlias = props['key.alias']
@@ -118,7 +118,7 @@ android {
             def propertiesFile = new File(propertiesPath)
             if (propertiesFile.exists()) {
                 def props = new Properties()
-                props.load(new FileInputStream(propertiesFile))
+                propertiesFile.withInputStream { props.load(it) }
                 storeFile = file("${CI_HOME_DIR}/${props['key.store']}")
                 storePassword = props['key.store.password']
                 keyAlias = props['key.alias']
@@ -130,7 +130,7 @@ android {
             def propertiesFile = new File(propertiesPath)
             if (propertiesFile.exists()) {
                 def props = new Properties()
-                props.load(new FileInputStream(propertiesFile))
+                propertiesFile.withInputStream { props.load(it) }
                 storeFile = file("${CI_HOME_DIR}/${props['key.store']}")
                 storePassword = props['key.store.password']
                 keyAlias = props['key.alias']
