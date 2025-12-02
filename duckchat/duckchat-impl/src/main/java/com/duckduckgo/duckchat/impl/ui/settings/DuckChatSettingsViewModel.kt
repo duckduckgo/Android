@@ -85,7 +85,7 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
                 isSearchSectionVisible = isSearchSectionVisible(duckChatActivityParams),
                 isHideGeneratedImagesOptionVisible = showHideAiGeneratedImagesOption,
                 shouldShowFullScreenModeToggle = duckChat.isDuckChatFullScreenModeFeatureAvailable(),
-                isFullScreenModeEnabled = isFullScreenModeEnabled,
+                isFullScreenModeEnabled = duckChat.isDuckChatFullScreenModeEnabled(),
             )
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ViewState())
 
