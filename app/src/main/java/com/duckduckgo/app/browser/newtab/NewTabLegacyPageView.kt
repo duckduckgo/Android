@@ -16,10 +16,13 @@
 
 package com.duckduckgo.app.browser.newtab
 
+import android.annotation.SuppressLint
 import android.app.PendingIntent
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
+import android.os.Build
+import android.provider.Settings
 import android.util.AttributeSet
 import android.view.View
 import android.widget.LinearLayout
@@ -37,6 +40,7 @@ import com.duckduckgo.app.browser.newtab.NewTabLegacyPageViewModel.Command
 import com.duckduckgo.app.browser.newtab.NewTabLegacyPageViewModel.Command.DismissMessage
 import com.duckduckgo.app.browser.newtab.NewTabLegacyPageViewModel.Command.LaunchAppTPOnboarding
 import com.duckduckgo.app.browser.newtab.NewTabLegacyPageViewModel.Command.LaunchDefaultBrowser
+import com.duckduckgo.app.browser.newtab.NewTabLegacyPageViewModel.Command.LaunchDefaultCredentialProvider
 import com.duckduckgo.app.browser.newtab.NewTabLegacyPageViewModel.Command.LaunchPlayStore
 import com.duckduckgo.app.browser.newtab.NewTabLegacyPageViewModel.Command.LaunchScreen
 import com.duckduckgo.app.browser.newtab.NewTabLegacyPageViewModel.Command.SharePromoLinkRMF
@@ -49,6 +53,7 @@ import com.duckduckgo.app.browser.remotemessage.asMessage
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.BrowserNav
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
@@ -95,6 +100,9 @@ class NewTabLegacyPageView @JvmOverloads constructor(
 
     @Inject
     lateinit var dispatchers: DispatcherProvider
+
+    @Inject
+    lateinit var appBuildConfig: AppBuildConfig
 
     private val binding: ViewNewTabLegacyBinding by viewBinding()
 
@@ -169,11 +177,29 @@ class NewTabLegacyPageView @JvmOverloads constructor(
             is LaunchScreen -> launchScreen(command.screen, command.payload)
             is SharePromoLinkRMF -> launchSharePromoRMFPageChooser(command.url, command.shareTitle)
             is SubmitUrl -> submitUrl(command.url)
+            is LaunchDefaultCredentialProvider -> launchDefaultCredentialProvider()
         }
     }
 
     private fun launchDefaultBrowser() {
         context.launchDefaultAppActivity()
+    }
+
+    @SuppressLint("DenyListedApi")
+    private fun launchDefaultCredentialProvider() {
+        runCatching {
+            val intent = if (appBuildConfig.sdkInt >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                Intent(Settings.ACTION_CREDENTIAL_PROVIDER).apply {
+                    data = android.net.Uri.parse("package:${context.packageName}")
+                }
+            } else {
+                Intent(Settings.ACTION_SETTINGS)
+            }
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            context.startActivity(intent, null)
+        }.onFailure {
+            logcat { "RMF: Error launching credential provider / system settings." }
+        }
     }
 
     private fun launchAppTPOnboardingScreen() {
