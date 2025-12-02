@@ -46,20 +46,6 @@ class DuckChatWebViewViewModel @Inject constructor(
     private val commandChannel = Channel<Command>(capacity = 1, onBufferOverflow = DROP_OLDEST)
     val commands = commandChannel.receiveAsFlow()
 
-    data class ViewState(
-        val isFullScreenModeEnabled: Boolean = false,
-    )
-
-    val viewState =
-        combine(
-            duckChat.observeInputScreenUserSettingEnabled(),
-            duckChat.observeFullscreenModeUserSetting(),
-        ) { isInputScreenEnabled, isFullScreenModeEnabled ->
-            ViewState(
-                isFullScreenModeEnabled = isFullScreenModeEnabled && isInputScreenEnabled,
-            )
-        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ViewState())
-
     sealed class Command {
         data object SendSubscriptionAuthUpdateEvent : Command()
     }
