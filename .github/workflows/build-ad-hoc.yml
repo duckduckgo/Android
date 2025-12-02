@@ -47,7 +47,7 @@ jobs:
         run: mkdir apk
 
       - name: Decode debug keys
-        if: contains(toLower(github.event.inputs.build-variant), 'debug')
+        if: contains(github.event.inputs.build-variant, 'Debug')
         uses: davidSchuppa/base64Secret-toFile-action@v2
         with:
           secret: ${{ secrets.DEBUG_PROPERTIES }}
@@ -55,7 +55,7 @@ jobs:
           destination-path: $HOME/jenkins_static/com.duckduckgo.mobile.android/
 
       - name: Decode debug key file
-        if: contains(toLower(github.event.inputs.build-variant), 'debug')
+        if: contains(github.event.inputs.build-variant, 'Debug')
         uses: davidSchuppa/base64Secret-toFile-action@v2
         with:
           secret: ${{ secrets.DEBUG_KEY }}
@@ -63,7 +63,7 @@ jobs:
           destination-path: $HOME/jenkins_static/com.duckduckgo.mobile.android/
 
       - name: Decode release keys
-        if: contains(toLower(github.event.inputs.build-variant), 'release')
+        if: contains(github.event.inputs.build-variant, 'Release')
         uses: davidSchuppa/base64Secret-toFile-action@v2
         with:
           secret: ${{ secrets.FAKE_RELEASE_PROPERTIES }}
@@ -71,7 +71,7 @@ jobs:
           destination-path: $HOME/jenkins_static/com.duckduckgo.mobile.android/
 
       - name: Decode release key file
-        if: contains(toLower(github.event.inputs.build-variant), 'release')
+        if: contains(github.event.inputs.build-variant, 'Release')
         uses: davidSchuppa/base64Secret-toFile-action@v2
         with:
           secret: ${{ secrets.FAKE_RELEASE_KEY }}
@@ -98,4 +98,4 @@ jobs:
 
       - name: Cleanup secrets
         if: always()
-        run: rm -rf $HOME/jenkins_static/com.duckduckgo.mobile.android/*.properties $HOME/jenkins_static/com.duckduckgo.mobile.android/
+        run: rm -rf "$HOME/jenkins_static/com.duckduckgo.mobile.android/"*.properties "$HOME/jenkins_static/com.duckduckgo.mobile.android/"

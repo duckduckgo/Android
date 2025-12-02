@@ -72,4 +72,4 @@ jobs:
 
       - name: Cleanup secrets
         if: always()
-        run: rm -rf $HOME/jenkins_static/com.duckduckgo.mobile.android/*.properties $HOME/jenkins_static/com.duckduckgo.mobile.android/
+        run: rm -rf "$HOME/jenkins_static/com.duckduckgo.mobile.android/"*.properties "$HOME/jenkins_static/com.duckduckgo.mobile.android/"
