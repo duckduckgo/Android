@@ -56,7 +56,6 @@ class GetNativeSettingsHandler @Inject constructor(
             ) {
                 appScope.launch(dispatcherProvider.io()) {
                     if (serpSettingsFeature.storeSerpSettings().isEnabled()) {
-
                         val settingsString = serpSettingsDataStore.getSerpSettings()
 
                         val settingsJsonObject = if (settingsString.isNullOrEmpty()) {

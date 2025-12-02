@@ -39,7 +39,6 @@ import com.duckduckgo.settings.impl.databinding.ActivitySettingsWebviewBinding
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import logcat.logcat
 import org.json.JSONObject
 import javax.inject.Inject
 import javax.inject.Named

@@ -26,7 +26,6 @@ import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessageHandler
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.squareup.anvil.annotations.ContributesMultibinding
-import logcat.logcat
 import org.json.JSONObject
 import javax.inject.Inject
 

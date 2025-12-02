@@ -52,7 +52,6 @@ class UpdateNativeSettingsHandler @Inject constructor(
             ) {
                 appScope.launch(dispatcherProvider.io()) {
                     if (serpSettingsFeature.storeSerpSettings().isEnabled()) {
-
                         val params = jsMessage.params
                         serpSettingsDataStore.setSerpSettings(params.toString())
                     }
