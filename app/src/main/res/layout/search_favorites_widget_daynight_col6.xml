@@ -31,14 +31,13 @@
 
         <GridView
             android:id="@+id/emptyfavoritesGrid"
-            style="@style/Widget.DuckDuckGo.SearchWidgetFavoritesGrid" />
+            style="@style/Widget.DuckDuckGo.SearchWidgetFavoritesGrid"
+            android:numColumns="6" />
 
         <GridView
             android:id="@+id/favoritesGrid"
             style="@style/Widget.DuckDuckGo.SearchWidgetFavoritesGrid"
-            android:columnWidth="@dimen/searchWidgetFavoriteItemContainerWidth"
-            android:numColumns="auto_fit"
-            android:stretchMode="columnWidth" />
+            android:numColumns="6" />
 
         <include layout="@layout/search_favorites_widget_empty_hint_daylight" />
     </FrameLayout>
