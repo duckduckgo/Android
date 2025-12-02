@@ -31,20 +31,17 @@ class SearchAndFavoritesGridCalculator {
         val margins = context.resources.getDimension(CommonR.dimen.searchWidgetFavoriteMargin).toDp()
         val item = context.resources.getDimension(CommonR.dimen.searchWidgetFavoriteItemContainerWidth).toDp()
         val divider = context.resources.getDimension(CommonR.dimen.searchWidgetFavoritesHorizontalSpacing).toDp()
-
-        // Buffer to prevent column count from changing with small size variations.
-        val sizeBuffer = 8
         var n = 2
         var totalSize = (n * item) + ((n - 1) * divider) + (margins * 2)
 
         logcat(INFO) { "SearchAndFavoritesWidget width n:$n $totalSize vs $width" }
-        while (totalSize + sizeBuffer <= width) {
+        while (totalSize <= width) {
             ++n
             totalSize = (n * item) + ((n - 1) * divider) + (margins * 2)
             logcat(INFO) { "SearchAndFavoritesWidget width n:$n $totalSize vs $width" }
         }
 
-        return (n - 1).coerceIn(WIDGET_COLUMNS_MIN, limitColumns)
+        return WIDGET_COLUMNS_MIN.coerceAtLeast(n - 1).coerceAtMost(limitColumns)
     }
 
     fun calculateRows(
@@ -56,20 +53,20 @@ class SearchAndFavoritesGridCalculator {
             (context.resources.getDimension(CommonR.dimen.searchWidgetPadding).toDp() * 2)
         val item = context.resources.getDimension(CommonR.dimen.searchWidgetFavoriteItemContainerHeight).toDp()
         val divider = context.resources.getDimension(CommonR.dimen.searchWidgetFavoritesVerticalSpacing).toDp()
-
-        // Buffer to prevent row count from changing with small size variations.
-        val sizeBuffer = 8
         var n = 1
         var totalSize = searchBar + (n * item) + ((n - 1) * divider) + margins
 
         logcat(INFO) { "SearchAndFavoritesWidget height n:$n $totalSize vs $height" }
-        while (totalSize + sizeBuffer <= height) {
+        while (totalSize <= height) {
             ++n
             totalSize = searchBar + (n * item) + ((n - 1) * divider) + margins
             logcat(INFO) { "SearchAndFavoritesWidget height n:$n $totalSize vs $height" }
         }
 
-        return (n - 1).coerceIn(WIDGET_ROWS_MIN, WIDGET_ROWS_MAX)
+        var rows = n - 1
+        rows = WIDGET_ROWS_MIN.coerceAtLeast(rows)
+        rows = WIDGET_ROWS_MAX.coerceAtMost(rows)
+        return rows
     }
 
     companion object {
