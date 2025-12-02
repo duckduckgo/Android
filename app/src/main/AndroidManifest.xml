@@ -489,6 +489,16 @@
             />
 
         <service
+            android:name="com.duckduckgo.widget.FavoritesWidgetService"
+            android:exported="false"
+            android:permission="android.permission.BIND_REMOTEVIEWS" />
+
+        <service
+            android:name="com.duckduckgo.widget.EmptyFavoritesWidgetService"
+            android:exported="false"
+            android:permission="android.permission.BIND_REMOTEVIEWS" />
+
+        <service
             android:name="com.duckduckgo.customtabs.impl.service.DuckDuckGoCustomTabService"
             android:exported="true"
             tools:ignore="ExportedService">
