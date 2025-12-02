@@ -74,6 +74,20 @@ class DuckChatFeatureRepositoryTest {
     }
 
     @Test
+    fun `when setCosmeticInputScreenUserSetting then set in data store`() = runTest {
+        testee.setCosmeticInputScreenUserSetting(true)
+
+        verify(mockDataStore).setCosmeticInputScreenUserSetting(true)
+    }
+
+    @Test
+    fun `when setCosmeticInputScreenUserSetting false then set in data store`() = runTest {
+        testee.setCosmeticInputScreenUserSetting(false)
+
+        verify(mockDataStore).setCosmeticInputScreenUserSetting(false)
+    }
+
+    @Test
     fun whenObserveDuckChatUserEnabledThenObserveDataStore() = runTest {
         whenever(mockDataStore.observeDuckChatUserEnabled()).thenReturn(flowOf(true, false))
 

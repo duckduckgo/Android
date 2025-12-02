@@ -72,6 +72,10 @@ class FakeDuckChat(
         inputScreenUserSettingEnabled.value = enabled
     }
 
+    override suspend fun setCosmeticInputScreenUserSetting(enabled: Boolean) {
+        // No-op for testing
+    }
+
     override fun observeInputScreenUserSettingEnabled(): Flow<Boolean> {
         return inputScreenUserSettingEnabled
     }
