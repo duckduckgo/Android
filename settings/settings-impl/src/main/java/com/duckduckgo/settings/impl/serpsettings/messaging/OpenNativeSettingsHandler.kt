@@ -51,7 +51,6 @@ class OpenNativeSettingsHandler @Inject constructor(
                 jsMessaging: JsMessaging,
                 jsMessageCallback: JsMessageCallback?,
             ) {
-                logcat { "SERP-SETTINGS: OpenNativeSettingsHandler processing message" }
                 val params = jsMessage.params
 
                 when (val screenParam = params.optString("screen", "")) {

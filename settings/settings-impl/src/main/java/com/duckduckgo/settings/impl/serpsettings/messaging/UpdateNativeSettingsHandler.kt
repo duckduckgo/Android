@@ -30,7 +30,6 @@ import com.duckduckgo.settings.impl.serpsettings.store.SerpSettingsDataStore
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import logcat.logcat
 import javax.inject.Inject
 
 /**
@@ -53,10 +52,7 @@ class UpdateNativeSettingsHandler @Inject constructor(
             ) {
                 appScope.launch(dispatcherProvider.io()) {
                     if (serpSettingsFeature.storeSerpSettings().isEnabled()) {
-                        logcat { "SERP-SETTINGS: UpdateNativeSettingsHandler processing message" }
-
                         val params = jsMessage.params
-                        logcat { "SERP-SETTINGS: UpdateNativeSettingsHandler storing: $params" }
                         serpSettingsDataStore.setSerpSettings(params.toString())
                     }
                 }

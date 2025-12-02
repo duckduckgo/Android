@@ -998,7 +998,6 @@ class BrowserTabFragment :
 
     private fun observeSubscriptionEventDataChannel() {
         viewModel.subscriptionEventDataFlow.onEach { subscriptionEventData ->
-            logcat { "SERP-Settings: Sending subscription event data to content scope scripts: $subscriptionEventData" }
             contentScopeScripts.sendSubscriptionEvent(subscriptionEventData)
         }.launchIn(lifecycleScope)
     }
