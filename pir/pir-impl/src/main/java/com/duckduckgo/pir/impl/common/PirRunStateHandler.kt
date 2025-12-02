@@ -307,7 +307,7 @@ class RealPirRunStateHandler @Inject constructor(
     private fun handleBrokerOptOutStageSubmit(pirRunState: BrokerOptOutStageSubmit) {
         pixelSender.reportOptOutStageStart(
             brokerUrl = pirRunState.broker.url,
-            parentUrl = pirRunState.broker.parent ?: "",
+            parentUrl = pirRunState.broker.parent.orEmpty(),
             attemptId = pirRunState.attemptId,
         )
     }
