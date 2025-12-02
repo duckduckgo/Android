@@ -27,14 +27,6 @@
         android:id="@+id/includeToolbar"
         layout="@layout/include_default_toolbar" />
 
-    <com.duckduckgo.duckchat.impl.ui.DuckChatOmnibarLayout
-        android:id="@+id/omnibarLayoutTop"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:elevation="1dp"
-        android:outlineProvider="none"
-        app:duckOmnibarPosition="top" />
-
     <WebView
         android:id="@+id/simpleWebview"
         android:layout_width="match_parent"

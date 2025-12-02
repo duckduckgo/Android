@@ -27,13 +27,10 @@ import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.subscriptions.api.Subscriptions
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
-import kotlinx.coroutines.flow.stateIn
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import javax.inject.Inject
 
