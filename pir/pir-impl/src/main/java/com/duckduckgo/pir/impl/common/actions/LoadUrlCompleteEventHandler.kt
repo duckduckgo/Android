@@ -22,10 +22,12 @@ import com.duckduckgo.pir.impl.common.PirJobConstants.RECOVERY_URL
 import com.duckduckgo.pir.impl.common.actions.EventHandler.Next
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.BrokerStepCompleted
+import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.BrokerStepCompleted.StepStatus
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.ExecuteBrokerStepAction
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.ExecuteNextBrokerStep
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.LoadUrlComplete
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.State
+import com.duckduckgo.pir.impl.scripts.models.PirError
 import com.duckduckgo.pir.impl.scripts.models.PirScriptRequestData.UserProfile
 import com.squareup.anvil.annotations.ContributesMultibinding
 import logcat.logcat
@@ -77,7 +79,12 @@ class LoadUrlCompleteEventHandler @Inject constructor() : EventHandler {
                     state.copy(
                         pendingUrl = null,
                     ),
-                    nextEvent = BrokerStepCompleted(needsEmailConfirmation = false, isSuccess = false),
+                    nextEvent = BrokerStepCompleted(
+                        needsEmailConfirmation = false,
+                        stepStatus = StepStatus.Failure(
+                            error = PirError.UnableToLoadBrokerUrl,
+                        ),
+                    ),
                 )
             }
 
