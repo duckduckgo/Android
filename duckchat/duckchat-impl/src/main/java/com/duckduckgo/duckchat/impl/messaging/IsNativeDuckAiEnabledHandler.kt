@@ -48,7 +48,6 @@ class IsNativeDuckAiEnabledHandler @Inject constructor(
                 jsMessaging: JsMessaging,
                 jsMessageCallback: JsMessageCallback?,
             ) {
-                logcat { "SERP-SETTINGS: IsNativeDuckAiEnabledHandler processing message" }
                 val response = JSONObject().apply {
                     put("enabled", duckChat.isEnabled())
                 }

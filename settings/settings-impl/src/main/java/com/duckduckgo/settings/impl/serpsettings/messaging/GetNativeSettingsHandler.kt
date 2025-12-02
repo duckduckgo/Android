@@ -31,7 +31,6 @@ import com.duckduckgo.settings.impl.serpsettings.store.SerpSettingsDataStore
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import logcat.logcat
 import org.json.JSONObject
 import javax.inject.Inject
 
@@ -57,7 +56,6 @@ class GetNativeSettingsHandler @Inject constructor(
             ) {
                 appScope.launch(dispatcherProvider.io()) {
                     if (serpSettingsFeature.storeSerpSettings().isEnabled()) {
-                        logcat { "SERP-SETTINGS: GetNativeSettingsHandler processing message" }
 
                         val settingsString = serpSettingsDataStore.getSerpSettings()
 
@@ -68,7 +66,6 @@ class GetNativeSettingsHandler @Inject constructor(
                             JSONObject(settingsString)
                         }
 
-                        logcat { "SERP-SETTINGS: GetNativeSettingsHandler sending: $settingsJsonObject" }
                         jsMessage.id?.let { id ->
                             jsMessaging.onResponse(
                                 JsCallbackData(
