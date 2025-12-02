@@ -566,6 +566,7 @@ class DuckChatSettingsViewModelTest {
     fun `duck full screen mode - when user has setting enabled, then emit enabled`() =
         runTest {
             whenever(duckChat.observeFullscreenModeUserSetting()).thenReturn(flowOf(true))
+            whenever(duckChat.isDuckChatFullScreenModeEnabled()).thenReturn(true)
             testee = DuckChatSettingsViewModel(
                 duckChatActivityParams = DuckChatSettingsNoParams,
                 duckChat = duckChat,

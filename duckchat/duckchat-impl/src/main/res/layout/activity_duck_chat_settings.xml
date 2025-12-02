@@ -204,6 +204,7 @@
                 android:layout_height="wrap_content"
                 android:visibility="gone"
                 app:showSwitch="true"
+                app:showBetaPill="true"
                 app:primaryText="@string/duckAiFullScreenModeTitle"
                 app:secondaryText="@string/duckAiFullScreenModeDescription" />
 

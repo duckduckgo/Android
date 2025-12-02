@@ -689,8 +689,6 @@ class RealDuckChat @Inject constructor(
             showInputScreenOnSystemSearchLaunchEnabled = duckChatFeature.showInputScreenOnSystemSearchLaunch().isEnabled()
             inputScreenMainButtonsEnabled = duckChatFeature.showMainButtonsInInputScreen().isEnabled()
 
-            isFullscreenModeEnabled = duckChatFeature.fullscreenMode().isEnabled()
-
             val showMainButtons = duckChatFeature.showMainButtonsInInputScreen().isEnabled()
             _showMainButtonsInInputScreen.emit(showMainButtons)
 
@@ -758,8 +756,9 @@ class RealDuckChat @Inject constructor(
                     isDuckChatFeatureEnabled && isDuckChatUserEnabled && isVoiceSearchEntryPointEnabled
             _showVoiceSearchToggle.emit(showVoiceSearchToggle)
 
-            val showFullScreenMode = duckChatFeature.fullscreenMode()
-                .isEnabled() && duckChatFeatureRepository.isFullScreenModeUserSettingEnabled() && isDuckChatFeatureEnabled
+            val showFullScreenMode =
+                duckChatFeature.fullscreenMode().isEnabled() && duckChatFeatureRepository.isFullScreenModeUserSettingEnabled()
+            isFullscreenModeEnabled = showFullScreenMode
             _showFullScreenMode.emit(showFullScreenMode)
         }
 
