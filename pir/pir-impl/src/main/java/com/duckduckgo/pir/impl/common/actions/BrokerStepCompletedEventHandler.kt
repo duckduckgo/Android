@@ -33,10 +33,15 @@ import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerScanS
 import com.duckduckgo.pir.impl.common.actions.EventHandler.Next
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.BrokerStepCompleted
+import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.BrokerStepCompleted.StepStatus
+import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.BrokerStepCompleted.StepStatus.Failure
+import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.BrokerStepCompleted.StepStatus.Success
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.ExecuteNextBrokerStep
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.PirStageStatus
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.State
 import com.duckduckgo.pir.impl.pixels.PirStage
+import com.duckduckgo.pir.impl.scripts.models.getCategory
+import com.duckduckgo.pir.impl.scripts.models.getDetails
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import kotlin.reflect.KClass
@@ -74,7 +79,7 @@ class BrokerStepCompletedEventHandler @Inject constructor(
             emitBrokerStepCompletePixel(
                 state = state,
                 totalTimeMillis = currentTimeProvider.currentTimeMillis() - state.brokerStepStartTime,
-                isSuccess = completedEvent.isSuccess,
+                stepStatus = completedEvent.stepStatus,
             )
         }
 
@@ -96,10 +101,12 @@ class BrokerStepCompletedEventHandler @Inject constructor(
     private suspend fun emitBrokerStepCompletePixel(
         state: State,
         totalTimeMillis: Long,
-        isSuccess: Boolean,
+        stepStatus: StepStatus,
     ) {
         val currentBrokerStep = state.brokerStepsToExecute[state.currentBrokerStepIndex]
         val brokerStartTime = state.brokerStepStartTime
+        val isSuccess = stepStatus is Success
+
         when (state.runType) {
             RunType.MANUAL, SCHEDULED -> {
                 val isManual = state.runType == RunType.MANUAL
@@ -121,6 +128,8 @@ class BrokerStepCompletedEventHandler @Inject constructor(
                 } else {
                     // Whatever last action that was executed is the last action that failed.
                     val lastAction = currentBrokerStep.step.actions[state.currentActionIndex]
+                    val failure = stepStatus as Failure
+
                     pirRunStateHandler.handleState(
                         BrokerScanFailed(
                             broker = currentBrokerStep.broker,
@@ -129,8 +138,8 @@ class BrokerStepCompletedEventHandler @Inject constructor(
                             totalTimeMillis = totalTimeMillis,
                             startTimeInMillis = brokerStartTime,
                             isManualRun = isManual,
-                            errorCategory = "", // TODO: Integrate failure later on
-                            errorDetails = "", // TODO: Integrate failure later on
+                            errorCategory = failure.error.getCategory(),
+                            errorDetails = failure.error.getDetails(),
                             failedAction = lastAction,
                         ),
                     )

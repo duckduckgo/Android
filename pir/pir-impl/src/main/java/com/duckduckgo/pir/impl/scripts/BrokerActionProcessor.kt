@@ -174,7 +174,7 @@ class RealBrokerActionProcessor(
             if (result?.error == "No action found.") {
                 handleError(PirError.JsError.NoActionFound)
             } else if (result != null) {
-                handleError(PirError.JsError.Unknown(result.error))
+                handleError(PirError.JsError.ActionError(result.error))
             } else {
                 handleError(PirError.JsError.ParsingErrorObjectFailed)
             }

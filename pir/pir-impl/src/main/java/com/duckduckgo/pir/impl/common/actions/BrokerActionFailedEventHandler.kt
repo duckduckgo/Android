@@ -22,20 +22,20 @@ import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep.EmailConfirma
 import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep.OptOutStep
 import com.duckduckgo.pir.impl.common.PirJob.RunType
 import com.duckduckgo.pir.impl.common.PirRunStateHandler
-import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerOptOutActionFailed
-import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerScanActionFailed
+import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerStepActionFailed
 import com.duckduckgo.pir.impl.common.actions.EventHandler.Next
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event
+import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.BrokerActionFailed
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.BrokerStepCompleted
+import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.BrokerStepCompleted.StepStatus.Failure
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.ExecuteBrokerStepAction
-import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.JsActionFailed
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.State
 import com.duckduckgo.pir.impl.scripts.models.BrokerAction
 import com.duckduckgo.pir.impl.scripts.models.BrokerAction.Expectation
-import com.duckduckgo.pir.impl.scripts.models.BrokerAction.GetCaptchaInfo
-import com.duckduckgo.pir.impl.scripts.models.BrokerAction.SolveCaptcha
+import com.duckduckgo.pir.impl.scripts.models.PirError
 import com.duckduckgo.pir.impl.scripts.models.PirScriptRequestData.UserProfile
 import com.duckduckgo.pir.impl.scripts.models.asActionType
+import com.duckduckgo.pir.impl.scripts.models.getDetails
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import kotlin.reflect.KClass
@@ -44,11 +44,11 @@ import kotlin.reflect.KClass
     scope = AppScope::class,
     boundType = EventHandler::class,
 )
-class JsActionFailedEventHandler @Inject constructor(
+class BrokerActionFailedEventHandler @Inject constructor(
     private val pirRunStateHandler: PirRunStateHandler,
     private val currentTimeProvider: CurrentTimeProvider,
 ) : EventHandler {
-    override val event: KClass<out Event> = JsActionFailed::class
+    override val event: KClass<out Event> = BrokerActionFailed::class
 
     override suspend fun invoke(
         state: State,
@@ -59,42 +59,8 @@ class JsActionFailedEventHandler @Inject constructor(
          * We end the run for the broker.
          */
         val currentBrokerStep = state.brokerStepsToExecute[state.currentBrokerStepIndex]
-        val brokerName = currentBrokerStep.broker.name
         val currentAction = currentBrokerStep.step.actions[state.currentActionIndex]
-        val error = (event as JsActionFailed).error
-
-        if (currentBrokerStep is OptOutStep) {
-            pirRunStateHandler.handleState(
-                BrokerOptOutActionFailed(
-                    broker = currentBrokerStep.broker,
-                    extractedProfile = currentBrokerStep.profileToOptOut,
-                    completionTimeInMillis = currentTimeProvider.currentTimeMillis(),
-                    actionType = currentAction.asActionType(),
-                    actionID = error.actionID,
-                    message = error.message,
-                ),
-            )
-        } else if (currentBrokerStep is EmailConfirmationStep) {
-            pirRunStateHandler.handleState(
-                BrokerOptOutActionFailed(
-                    broker = currentBrokerStep.broker,
-                    extractedProfile = currentBrokerStep.profileToOptOut,
-                    completionTimeInMillis = currentTimeProvider.currentTimeMillis(),
-                    actionType = currentAction.asActionType(),
-                    actionID = error.actionID,
-                    message = error.message,
-                ),
-            )
-        } else {
-            pirRunStateHandler.handleState(
-                BrokerScanActionFailed(
-                    broker = currentBrokerStep.broker,
-                    actionType = currentAction.asActionType(),
-                    actionID = error.actionID,
-                    message = error.message,
-                ),
-            )
-        }
+        val error = (event as BrokerActionFailed).error
 
         // If failure is on Any captcha action, we proceed to next action
         return if (shouldRetryFailedAction(state, event, currentAction)) {
@@ -111,32 +77,24 @@ class JsActionFailedEventHandler @Inject constructor(
                     ),
                 ),
             )
-        } else if (currentAction is GetCaptchaInfo || currentAction is SolveCaptcha) {
-            Next(
-                nextState =
-                state.copy(
-                    currentActionIndex = state.currentActionIndex + 1,
-                    actionRetryCount = 0,
-                ),
-                nextEvent =
-                ExecuteBrokerStepAction(
-                    UserProfile(
-                        userProfile = state.profileQuery,
-                    ),
-                ),
-            )
         } else {
             // If error happens we skip to next Broker as next steps will not make sense
+            emitBrokerActionFailedPixel(state, error)
             Next(
                 nextState = state,
-                nextEvent = BrokerStepCompleted(needsEmailConfirmation = false, isSuccess = false),
+                nextEvent = BrokerStepCompleted(
+                    needsEmailConfirmation = false,
+                    stepStatus = Failure(
+                        error = error,
+                    ),
+                ),
             )
         }
     }
 
     private fun shouldRetryFailedAction(
         state: State,
-        event: JsActionFailed,
+        event: BrokerActionFailed,
         currentAction: BrokerAction,
     ): Boolean {
         if (!event.allowRetry) {
@@ -150,6 +108,39 @@ class JsActionFailedEventHandler @Inject constructor(
             // For scans, we ONLY retry once if the action is expectation
             return (currentAction is Expectation && state.actionRetryCount < MAX_RETRY_COUNT_SCAN)
         }
+    }
+
+    private suspend fun emitBrokerActionFailedPixel(
+        state: State,
+        error: PirError,
+    ) {
+        val currentBrokerStep = state.brokerStepsToExecute[state.currentBrokerStepIndex]
+        val currentAction = currentBrokerStep.step.actions[state.currentActionIndex]
+        val extractedProfile = when (currentBrokerStep) {
+            is OptOutStep -> {
+                currentBrokerStep.profileToOptOut
+            }
+
+            is EmailConfirmationStep -> {
+                currentBrokerStep.profileToOptOut
+            }
+
+            else -> {
+                null
+            }
+        }
+
+        pirRunStateHandler.handleState(
+            BrokerStepActionFailed(
+                broker = currentBrokerStep.broker,
+                extractedProfile = extractedProfile,
+                actionID = currentAction.id,
+                errorMessage = error.getDetails(),
+                stepType = currentBrokerStep.step.stepType,
+                completionTimeInMillis = currentTimeProvider.currentTimeMillis(),
+                actionType = currentAction.asActionType(),
+            ),
+        )
     }
 
     companion object {
