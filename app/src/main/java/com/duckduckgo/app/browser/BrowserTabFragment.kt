@@ -1214,8 +1214,7 @@ class BrowserTabFragment :
     }
 
     private fun onTabsButtonPressed() {
-        val isFocusedNtp = omnibar.viewMode == ViewMode.NewTab && omnibar.getText().isEmpty() && omnibar.omnibarTextInput.hasFocus()
-        launch { viewModel.userLaunchingTabSwitcher(isFocusedNtp) }
+        launch { viewModel.userLaunchingTabSwitcher(omnibar.viewMode, omnibar.getText().isEmpty() && omnibar.omnibarTextInput.hasFocus()) }
     }
 
     private fun onTabsButtonLongPressed() {
@@ -1250,7 +1249,7 @@ class BrowserTabFragment :
     private fun onFireButtonPressed() {
         val isFocusedNtp = omnibar.viewMode == ViewMode.NewTab && omnibar.getText().isEmpty() && omnibar.omnibarTextInput.hasFocus()
         browserActivity?.launchFire(launchedFromFocusedNtp = isFocusedNtp)
-        viewModel.onFireMenuSelected()
+        viewModel.onFireMenuSelected(omnibar.viewMode)
     }
 
     private fun onBrowserMenuButtonPressed() {
@@ -1440,6 +1439,7 @@ class BrowserTabFragment :
                 viewModel.openNewDuckChat()
             }
             onMenuItemClicked(duckChatHistoryMenuItem) {
+                pixel.fire(DuckChatPixelName.DUCK_CHAT_SETTINGS_SIDEBAR_TAPPED)
                 viewModel.openDuckChatSidebar()
             }
             onMenuItemClicked(duckChatSettingsMenuItem) {
@@ -1493,6 +1493,8 @@ class BrowserTabFragment :
                 viewModel.onPopupMenuLaunched()
                 if (isActiveCustomTab()) {
                     pixel.fire(CustomTabPixelNames.CUSTOM_TABS_MENU_OPENED)
+                } else if (omnibar.viewMode == ViewMode.DuckAI) {
+                    pixel.fire(DuckChatPixelName.DUCK_CHAT_SETTINGS_MENU_OPEN.pixelName)
                 } else {
                     val params = mapOf(PixelParameter.FROM_FOCUSED_NTP to isFocusedNtp.toString())
                     pixel.fire(AppPixelName.MENU_ACTION_POPUP_OPENED.pixelName, params)
@@ -3123,6 +3125,7 @@ class BrowserTabFragment :
                 }
 
                 override fun onDuckAISidebarButtonPressed() {
+                    pixel.fire(DuckChatPixelName.DUCK_CHAT_OMNIBAR_SIDEBAR_TAPPED)
                     viewModel.openDuckChatSidebar()
                 }
             },

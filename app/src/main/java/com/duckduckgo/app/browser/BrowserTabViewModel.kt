@@ -191,6 +191,8 @@ import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter
+import com.duckduckgo.app.browser.omnibar.Omnibar
+import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.browser.omnibar.QueryOrigin
@@ -388,7 +390,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
@@ -3219,21 +3220,28 @@ class BrowserTabViewModel @Inject constructor(
         command.value = ShowWebContent
     }
 
-    fun userLaunchingTabSwitcher(launchedFromFocusedNtp: Boolean) {
+    fun userLaunchingTabSwitcher(viewMode: Omnibar.ViewMode, hasFocus: Boolean) {
         command.value = LaunchTabSwitcher
+
         pixel.fire(AppPixelName.TAB_MANAGER_CLICKED)
         fireDailyLaunchPixel()
 
-        if (!currentBrowserViewState().browserShowing) {
-            val params = mapOf(PixelParameter.FROM_FOCUSED_NTP to launchedFromFocusedNtp.toString())
-            pixel.fire(AppPixelName.TAB_MANAGER_OPENED_FROM_NEW_TAB, parameters = params)
-        } else {
-            val url = site?.url
-            if (url != null) {
-                if (duckDuckGoUrlDetector.isDuckDuckGoUrl(url)) {
-                    pixel.fire(AppPixelName.TAB_MANAGER_OPENED_FROM_SERP)
-                } else {
-                    pixel.fire(AppPixelName.TAB_MANAGER_OPENED_FROM_SITE)
+        when (viewMode) {
+            is Omnibar.ViewMode.DuckAI -> {
+                pixel.fire(DuckChatPixelName.DUCK_CHAT_TAB_SWITCHER_OPENED)
+            }
+            is Omnibar.ViewMode.NewTab -> {
+                val params = mapOf(PixelParameter.FROM_FOCUSED_NTP to hasFocus.toString())
+                pixel.fire(AppPixelName.TAB_MANAGER_OPENED_FROM_NEW_TAB, parameters = params)
+            }
+            else -> {
+                val url = site?.url
+                if (url != null) {
+                    if (duckDuckGoUrlDetector.isDuckDuckGoUrl(url)) {
+                        pixel.fire(AppPixelName.TAB_MANAGER_OPENED_FROM_SERP)
+                    } else {
+                        pixel.fire(AppPixelName.TAB_MANAGER_OPENED_FROM_SITE)
+                    }
                 }
             }
         }
@@ -4286,7 +4294,10 @@ class BrowserTabViewModel @Inject constructor(
         command.value = HideOnboardingDaxDialog(cta)
     }
 
-    fun onFireMenuSelected() {
+    fun onFireMenuSelected(viewMode: Omnibar.ViewMode) {
+        if (viewMode == ViewMode.DuckAI) {
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_FIRE_BUTTON_TAPPED)
+        }
         val cta = currentCtaViewState().cta
         if (cta is OnboardingDaxDialogCta.DaxFireButtonCta) {
             viewModelScope.launch {
@@ -4491,6 +4502,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun openNewDuckChat() {
+        pixel.fire(DuckChatPixelName.DUCK_CHAT_OMNIBAR_NEW_CHAT_TAPPED)
         viewModelScope.launch {
             val subscriptionEvent = duckChatJSHelper.onNativeAction(NativeAction.NEW_CHAT)
             _subscriptionEventDataChannel.send(subscriptionEvent)
@@ -4506,22 +4518,23 @@ class BrowserTabViewModel @Inject constructor(
 
     fun openDuckChatSettings() {
         viewModelScope.launch {
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_DUCK_AI_SETTINGS_TAPPED)
             val subscriptionEvent = duckChatJSHelper.onNativeAction(NativeAction.DUCK_AI_SETTINGS)
             _subscriptionEventDataChannel.send(subscriptionEvent)
         }
     }
 
     fun onDuckChatMenuClicked() {
-        viewModelScope.launch {
-            command.value = HideKeyboardForChat
-            val params = duckChat.createWasUsedBeforePixelParams()
-            pixel.fire(DuckChatPixelName.DUCK_CHAT_OPEN_BROWSER_MENU, parameters = params)
-        }
-
         if (duckAiFeatureState.showFullScreenMode.value) {
             val url = duckChat.getDuckChatUrl("", false)
             command.value = OpenInNewTab(url, tabId)
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_SETTINGS_NEW_CHAT_TAB_TAPPED)
         } else {
+            viewModelScope.launch {
+                command.value = HideKeyboardForChat
+                val params = duckChat.createWasUsedBeforePixelParams()
+                pixel.fire(DuckChatPixelName.DUCK_CHAT_OPEN_BROWSER_MENU, parameters = params)
+            }
             duckChat.openDuckChat()
         }
     }
