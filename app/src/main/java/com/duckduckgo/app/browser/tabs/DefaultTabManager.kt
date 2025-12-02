@@ -48,6 +48,7 @@ interface TabManager {
         val tabId: String,
         val url: String?,
         val skipHome: Boolean,
+        val sourceTabId: String?,
     )
 }
 
