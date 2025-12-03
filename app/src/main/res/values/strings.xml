@@ -25,15 +25,6 @@
     <string name="open">Open</string>
     <string name="cancel">Cancel</string>
     <string name="search">Search</string>
-    <string name="asset_statements" translatable="false">
-      [{
-        \"relation\": [\"delegate_permission/common.handle_all_urls\"],
-        \"target\": {
-          \"namespace\": \"web\",
-          \"site\": \"https://duckduckgo.com\"
-        }
-      }]
-    </string>
 
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Visit Settings to search and browse with DuckDuckGo every time.</string>
