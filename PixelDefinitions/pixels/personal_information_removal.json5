@@ -1,5 +1,5 @@
 {
-    "dbp_optout_process_submit-success": {
+    "m_dbp_optout_process_submit-success": {
         "description": "Fired when an opt-out submission succeeds.",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["other"],
@@ -49,7 +49,7 @@
             }
         ]
     },
-    "dbp_optout_process_failure": {
+    "m_dbp_optout_process_failure": {
         "description": "Fired when an opt-out attempt fails.",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["other"],
@@ -130,7 +130,7 @@
             }
         ]
     },
-    "dbp_databroker_custom_stats_optoutsubmit": {
+    "m_dbp_databroker_custom_stats_optoutsubmit": {
         "description": "Pixel that contains a broker's opt-out 24h submission success rate.",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["other"],
@@ -149,7 +149,7 @@
             }
         ]
     },
-    "dbp_optoutjob_at-7-days_confirmed": {
+    "m_dbp_optoutjob_at-7-days_confirmed": {
         "description": "Pixel that contains if any submitted opt-out has been confirmed 7 days after submission.",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["other"],
@@ -163,7 +163,7 @@
             }
         ]
     },
-    "dbp_optoutjob_at-7-days_unconfirmed": {
+    "m_dbp_optoutjob_at-7-days_unconfirmed": {
         "description": "Pixel that contains if any submitted opt-out are still unconfirmed 7 days after submission.",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["other"],
@@ -177,7 +177,7 @@
             }
         ]
     },
-    "dbp_optoutjob_at-14-days_confirmed": {
+    "m_dbp_optoutjob_at-14-days_confirmed": {
         "description": "Pixel that contains if any submitted opt-out has been confirmed 14 days after submission.",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["other"],
@@ -191,7 +191,7 @@
             }
         ]
     },
-    "dbp_optoutjob_at-14-days_unconfirmed": {
+    "m_dbp_optoutjob_at-14-days_unconfirmed": {
         "description": "Pixel that contains if any submitted opt-out are still unconfirmed 14 days after submission.",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["other"],
@@ -205,7 +205,7 @@
             }
         ]
     },
-    "dbp_optoutjob_at-21-days_confirmed": {
+    "m_dbp_optoutjob_at-21-days_confirmed": {
         "description": "Pixel that contains if any submitted opt-out has been confirmed 21 days after submission.",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["other"],
@@ -219,7 +219,7 @@
             }
         ]
     },
-    "dbp_optoutjob_at-21-days_unconfirmed": {
+    "m_dbp_optoutjob_at-21-days_unconfirmed": {
         "description": "Pixel that contains if any submitted opt-out are still unconfirmed 21 days after submission.",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["other"],
@@ -233,7 +233,7 @@
             }
         ]
     },
-    "dbp_optoutjob_at-42-days_confirmed": {
+    "m_dbp_optoutjob_at-42-days_confirmed": {
         "description": "Pixel that contains if any submitted opt-out has been confirmed 42 days after submission.",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["other"],
@@ -247,7 +247,7 @@
             }
         ]
     },
-    "dbp_optoutjob_at-42-days_unconfirmed": {
+    "m_dbp_optoutjob_at-42-days_unconfirmed": {
         "description": "Pixel that contains if any submitted opt-out are still unconfirmed 42 days after submission.",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["other"],
@@ -261,28 +261,28 @@
             }
         ]
     },
-    "dbp_engagement_dau": {
+    "m_dbp_engagement_dau": {
         "description": "Pixel for PIR daily active users.",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"]
     },
-    "dbp_engagement_wau": {
+    "m_dbp_engagement_wau": {
         "description": "Pixel for PIR weekly active users.",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"]
     },
-    "dbp_engagement_mau": {
+    "m_dbp_engagement_mau": {
         "description": "Pixel for PIR monthly active users.",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"]
     },
-    "dbp_weekly_child-broker_orphaned-optouts": {
+    "m_dbp_weekly_child-broker_orphaned-optouts": {
         "description": "Pixel to know orphaned opt-out records on child data brokers that don't have matching profiles on their parent broker.",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["other"],
@@ -302,6 +302,805 @@
             {
                 "key": "calculated-orphaned-records",
                 "description": "The Number of child profiles with no parent match",
+                "type": "string"
+            }
+        ]
+    },
+    "m_dbp_scan_started": {
+        "description": "Pixel emitted when scan is started for a broker",
+        "owners": ["karlenDimla", "landomen"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "data_broker",
+                "description": "The URL of the broker the stage was for",
+                "type": "string"
+            }
+        ]
+    },
+    "m_dbp_scan_stage": {
+        "description": "Pixel emitted for every stage of a scan for a broker x profile.",
+        "owners": ["karlenDimla", "landomen"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "data_broker",
+                "description": "The URL of the broker the stage was for",
+                "type": "string"
+            },
+            {
+                "key": "broker_version",
+                "description": "The version of the broker JSON file",
+                "type": "string"
+            },
+            {
+                "key": "tries",
+                "description": "The number of tries recorded when the stage happened",
+                "type": "string"
+            },
+            {
+                "key": "parent",
+                "description": "The parent data broker of the scan",
+                "type": "string"
+            },
+            {
+                "key": "action_id",
+                "description": "Predefined identifier of the broker action the stage is for",
+                "type": "string"
+            },
+            {
+                "key": "action_type",
+                "description": "Type of action associated to the stage",
+                "type": "string",
+                "enum": [
+                    "extract",
+                    "navigate",
+                    "fillForm",
+                    "click",
+                    "expectation",
+                    "emailConfirmation",
+                    "getCaptchaInfo",
+                    "solveCaptcha",
+                    "condition"
+                ]
+            }
+        ]
+    },
+    "m_dbp_search_stage_main_status_success": {
+        "description": "Pixel emitted when the scan is completed with results.",
+        "owners": ["karlenDimla", "landomen"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "data_broker",
+                "description": "The URL of the broker scanned",
+                "type": "string"
+            },
+            {
+                "key": "num_found",
+                "description": "The profiles extracted from the broker",
+                "type": "string"
+            },
+            {
+                "key": "duration",
+                "description": "Total duration of the scan in ms",
+                "type": "string"
+            },
+            {
+                "key": "is_manual_scan",
+                "description": "True if the scan was manually initiated",
+                "type": "string"
+            },
+            {
+                "key": "vpn_connection_state",
+                "description": "Reported VPN connection state when the scan happened",
+                "type": "string"
+            },
+            {
+                "key": "vpn_bypass",
+                "description": "VPN bypass status when the scan happened",
+                "type": "string",
+                "enum": ["on", "off", "unsupported"]
+            },
+            {
+                "key": "parent",
+                "description": "The parent data broker of the broker scanned",
+                "type": "string"
+            }
+        ]
+    },
+    "m_dbp_search_stage_main_status_no_results": {
+        "description": "Pixel for PIR monthly active users.",
+        "owners": ["karlenDimla", "landomen"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "data_broker",
+                "description": "The URL of the broker scanned",
+                "type": "string"
+            },
+            {
+                "key": "broker_version",
+                "description": "The version of the broker JSON file",
+                "type": "string"
+            },
+            {
+                "key": "duration",
+                "description": "Total duration of the scan in ms",
+                "type": "string"
+            },
+            {
+                "key": "is_manual_scan",
+                "description": "True if the scan was manually initiated",
+                "type": "string"
+            },
+            {
+                "key": "vpn_connection_state",
+                "description": "Reported VPN connection state when the scan happened",
+                "type": "string"
+            },
+            {
+                "key": "vpn_bypass",
+                "description": "VPN bypass status when the scan happened",
+                "type": "string",
+                "enum": ["on", "off", "unsupported"]
+            },
+            {
+                "key": "parent",
+                "description": "The parent data broker of the broker scanned",
+                "type": "string"
+            },
+            {
+                "key": "action_id",
+                "description": "Predefined identifier of the broker action last executed",
+                "type": "string"
+            },
+            {
+                "key": "action_type",
+                "description": "Type of action last executed",
+                "type": "string",
+                "enum": [
+                    "extract",
+                    "navigate",
+                    "fillForm",
+                    "click",
+                    "expectation",
+                    "emailConfirmation",
+                    "getCaptchaInfo",
+                    "solveCaptcha",
+                    "condition"
+                ]
+            }
+        ]
+    },
+    "m_dbp_search_stage_main_status_error": {
+        "description": "Pixel for PIR monthly active users.",
+        "owners": ["karlenDimla", "landomen"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "data_broker",
+                "description": "The URL of the broker scanned",
+                "type": "string"
+            },
+            {
+                "key": "broker_version",
+                "description": "The version of the broker JSON file",
+                "type": "string"
+            },
+            {
+                "key": "duration",
+                "description": "Total duration of the scan in ms",
+                "type": "string"
+            },
+            {
+                "key": "error_category",
+                "description": "Category associated to the error",
+                "type": "string"
+            },
+            {
+                "key": "error_details",
+                "description": "Localized description of the error if available",
+                "type": "string"
+            },
+            {
+                "key": "is_manual_scan",
+                "description": "True if the scan was manually initiated",
+                "type": "string"
+            },
+            {
+                "key": "vpn_connection_state",
+                "description": "Reported VPN connection state when the error happened",
+                "type": "string"
+            },
+            {
+                "key": "vpn_bypass",
+                "description": "VPN bypass status when the error happened",
+                "type": "string",
+                "enum": ["on", "off", "unsupported"]
+            },
+            {
+                "key": "parent",
+                "description": "The parent data broker of the broker scanned",
+                "type": "string"
+            },
+            {
+                "key": "action_id",
+                "description": "Predefined identifier of the broker action that failed",
+                "type": "string"
+            },
+            {
+                "key": "action_type",
+                "description": "Type of action that failed",
+                "type": "string",
+                "enum": [
+                    "extract",
+                    "navigate",
+                    "fillForm",
+                    "click",
+                    "expectation",
+                    "emailConfirmation",
+                    "getCaptchaInfo",
+                    "solveCaptcha",
+                    "condition"
+                ]
+            }
+        ]
+    },
+    "m_dbp_optout_stage_start": {
+        "description": "Fired at the start stage of an opt-out attempt.",
+        "owners": ["karlenDimla", "landomen"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "data_broker",
+                "description": "The URL of the data broker that this opt-out attempt targets",
+                "type": "string"
+            },
+            {
+                "key": "parent",
+                "description": "The parent data broker url of the one this opt-out attempt targets",
+                "type": "string"
+            },
+            {
+                "key": "attempt_id",
+                "description": "Client-generated ID of the opt-out attempt",
+                "type": "string"
+            }
+        ]
+    },
+    "m_dbp_optout_stage_email-generate": {
+        "description": "Fired at the email generation stage of an opt-out attempt.",
+        "owners": ["karlenDimla", "landomen"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "data_broker",
+                "description": "The URL of the data broker that this opt-out attempt targets",
+                "type": "string"
+            },
+            {
+                "key": "parent",
+                "description": "The parent data broker of the one this opt-out attempt targets",
+                "type": "string"
+            },
+            {
+                "key": "broker_version",
+                "description": "The version of the broker JSON file",
+                "type": "string"
+            },
+            {
+                "key": "attempt_id",
+                "description": "Client-generated ID of the opt-out attempt",
+                "type": "string"
+            },
+            {
+                "key": "duration",
+                "description": "Stage duration in milliseconds",
+                "type": "string"
+            },
+            {
+                "key": "tries",
+                "description": "The number of tries it took to complete the stage",
+                "type": "string"
+            },
+            {
+                "key": "action_id",
+                "description": "Predefined identifier of the broker action executed in this stage",
+                "type": "string"
+            }
+        ]
+    },
+    "m_dbp_optout_stage_captcha-parse": {
+        "description": "Fired at the captcha parse stage of an opt-out attempt.",
+        "owners": ["karlenDimla", "landomen"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "data_broker",
+                "description": "The URL of the data broker that this opt-out attempt targets",
+                "type": "string"
+            },
+            {
+                "key": "parent",
+                "description": "The parent data broker of the one this opt-out attempt targets",
+                "type": "string"
+            },
+            {
+                "key": "broker_version",
+                "description": "The version of the broker JSON file",
+                "type": "string"
+            },
+            {
+                "key": "attempt_id",
+                "description": "Client-generated ID of the opt-out attempt",
+                "type": "string"
+            },
+            {
+                "key": "duration",
+                "description": "Stage duration in milliseconds",
+                "type": "string"
+            },
+            {
+                "key": "tries",
+                "description": "The number of tries it took to complete the stage",
+                "type": "string"
+            },
+            {
+                "key": "action_id",
+                "description": "Predefined identifier of the broker action executed in this stage",
+                "type": "string"
+            }
+        ]
+    },
+    "m_dbp_optout_stage_captcha-send": {
+        "description": "Fired at the captcha send stage of an opt-out attempt.",
+        "owners": ["karlenDimla", "landomen"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "data_broker",
+                "description": "The URL of the data broker that this opt-out attempt targets",
+                "type": "string"
+            },
+            {
+                "key": "parent",
+                "description": "The parent data broker of the one this opt-out attempt targets",
+                "type": "string"
+            },
+            {
+                "key": "broker_version",
+                "description": "The version of the broker JSON file",
+                "type": "string"
+            },
+            {
+                "key": "attempt_id",
+                "description": "Client-generated ID of the opt-out attempt",
+                "type": "string"
+            },
+            {
+                "key": "duration",
+                "description": "Stage duration in milliseconds",
+                "type": "string"
+            },
+            {
+                "key": "tries",
+                "description": "The number of tries it took to complete the stage",
+                "type": "string"
+            },
+            {
+                "key": "action_id",
+                "description": "Predefined identifier of the broker action executed in this stage",
+                "type": "string"
+            }
+        ]
+    },
+    "m_dbp_optout_stage_captcha-solve": {
+        "description": "Fired at the captcha solve stage of an opt-out attempt.",
+        "owners": ["karlenDimla", "landomen"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "data_broker",
+                "description": "The URL of the data broker that this opt-out attempt targets",
+                "type": "string"
+            },
+            {
+                "key": "parent",
+                "description": "The parent data broker of the one this opt-out attempt targets",
+                "type": "string"
+            },
+            {
+                "key": "broker_version",
+                "description": "The version of the broker JSON file",
+                "type": "string"
+            },
+            {
+                "key": "attempt_id",
+                "description": "Client-generated ID of the opt-out attempt",
+                "type": "string"
+            },
+            {
+                "key": "duration",
+                "description": "Stage duration in milliseconds",
+                "type": "string"
+            },
+            {
+                "key": "tries",
+                "description": "The number of tries it took to complete the stage",
+                "type": "string"
+            },
+            {
+                "key": "action_id",
+                "description": "Predefined identifier of the broker action executed in this stage",
+                "type": "string"
+            }
+        ]
+    },
+    "m_dbp_optout_stage_submit": {
+        "description": "Fired at the submit stage of an opt-out attempt.",
+        "owners": ["karlenDimla", "landomen"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "data_broker",
+                "description": "The URL of the data broker that this opt-out attempt targets",
+                "type": "string"
+            },
+            {
+                "key": "parent",
+                "description": "The parent data broker of the one this opt-out attempt targets",
+                "type": "string"
+            },
+            {
+                "key": "broker_version",
+                "description": "The version of the broker JSON file",
+                "type": "string"
+            },
+            {
+                "key": "attempt_id",
+                "description": "Client-generated ID of the opt-out attempt",
+                "type": "string"
+            },
+            {
+                "key": "duration",
+                "description": "Stage duration in milliseconds",
+                "type": "string"
+            },
+            {
+                "key": "tries",
+                "description": "The number of tries it took to complete the stage",
+                "type": "string"
+            },
+            {
+                "key": "action_id",
+                "description": "Predefined identifier of the broker action executed in this stage",
+                "type": "string"
+            }
+        ]
+    },
+    "m_dbp_optout_stage_condition-found": {
+        "description": "Fired when DBP runs a condition action and its expectation is met",
+        "owners": ["karlenDimla", "landomen"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "tries",
+                "description": "The number of tries it took for the action to complete",
+                "type": "integer"
+            },
+            {
+                "key": "data_broker",
+                "description": "The URL of the data broker that this action was operating on",
+                "type": "string"
+            },
+            {
+                "key": "parent",
+                "description": "The parent data broker of the one this action was operating on",
+                "type": "string"
+            },
+            {
+                "key": "broker_version",
+                "description": "The version of the broker JSON file",
+                "type": "string"
+            },
+            {
+                "key": "attempt_id",
+                "description": "The ID of the opt out attempt",
+                "type": "string"
+            },
+            {
+                "key": "action_id",
+                "description": "The ID of the action, to disambiguate between multiple actions in the same opt out attempt",
+                "type": "string"
+            },
+            {
+                "key": "duration",
+                "description": "The duration of the action execution in milliseconds",
+                "type": "number"
+            }
+        ]
+    },
+    "m_dbp_optout_stage_condition-not-found": {
+        "description": "Fired when PIR runs a condition action and its expectation is not met",
+        "owners": ["karlenDimla", "landomen"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "tries",
+                "description": "The number of tries it took for the action to complete",
+                "type": "integer"
+            },
+            {
+                "key": "data_broker",
+                "description": "The URL of the data broker that this action was operating on",
+                "type": "string"
+            },
+            {
+                "key": "parent",
+                "description": "The parent data broker of the one this action was operating on",
+                "type": "string"
+            },
+            {
+                "key": "broker_version",
+                "description": "The version of the broker JSON file",
+                "type": "string"
+            },
+            {
+                "key": "attempt_id",
+                "description": "The ID of the opt out attempt",
+                "type": "string"
+            },
+            {
+                "key": "action_id",
+                "description": "The ID of the action, to disambiguate between multiple actions in the same opt out attempt",
+                "type": "string"
+            },
+            {
+                "key": "duration",
+                "description": "The duration of the action execution in milliseconds",
+                "type": "number"
+            }
+        ]
+    },
+    "m_dbp_optout_stage_validate": {
+        "description": "Fired at the validation stage of an opt-out attempt.",
+        "owners": ["karlenDimla", "landomen"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "data_broker",
+                "description": "The URL of the data broker that this opt-out attempt targets",
+                "type": "string"
+            },
+            {
+                "key": "parent",
+                "description": "The parent data broker of the one this opt-out attempt targets",
+                "type": "string"
+            },
+            {
+                "key": "broker_version",
+                "description": "The version of the broker JSON file",
+                "type": "string"
+            },
+            {
+                "key": "attempt_id",
+                "description": "Client-generated ID of the opt-out attempt",
+                "type": "string"
+            },
+            {
+                "key": "duration",
+                "description": "Stage duration in milliseconds",
+                "type": "string"
+            },
+            {
+                "key": "tries",
+                "description": "The number of tries it took to complete the stage",
+                "type": "string"
+            },
+            {
+                "key": "action_id",
+                "description": "Predefined identifier of the broker action executed in this stage",
+                "type": "string"
+            }
+        ]
+    },
+    "m_dbp_optout_stage_fill-form": {
+        "description": "Fired at the fill-form stage of an opt-out attempt.",
+        "owners": ["karlenDimla", "landomen"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "data_broker",
+                "description": "The URL of the data broker that this opt-out attempt targets",
+                "type": "string"
+            },
+            {
+                "key": "parent",
+                "description": "The parent data broker of the one this opt-out attempt targets",
+                "type": "string"
+            },
+            {
+                "key": "broker_version",
+                "description": "The version of the broker JSON file",
+                "type": "string"
+            },
+            {
+                "key": "attempt_id",
+                "description": "Client-generated ID of the opt-out attempt",
+                "type": "string"
+            },
+            {
+                "key": "duration",
+                "description": "Stage duration in milliseconds",
+                "type": "string"
+            },
+            {
+                "key": "tries",
+                "description": "The number of tries it took to complete the stage",
+                "type": "string"
+            },
+            {
+                "key": "action_id",
+                "description": "Predefined identifier of the broker action executed in this stage",
+                "type": "string"
+            }
+        ]
+    },
+    "m_dbp_optout_stage_finish": {
+        "description": "Fired at the finish stage of an opt-out attempt.",
+        "owners": ["karlenDimla", "landomen"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "data_broker",
+                "description": "The URL of the data broker that this opt-out attempt targets",
+                "type": "string"
+            },
+            {
+                "key": "parent",
+                "description": "The parent data broker of the one this opt-out attempt targets",
+                "type": "string"
+            },
+            {
+                "key": "attempt_id",
+                "description": "Client-generated ID of the opt-out attempt",
+                "type": "string"
+            },
+            {
+                "key": "duration",
+                "description": "Duration of the final stage in milliseconds",
+                "type": "string"
+            }
+        ]
+    },
+    "m_dbp_update_databrokers_success": {
+        "description": "Fired when a data broker JSON is updated successfuly.",
+        "owners": ["karlenDimla", "landomen"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "data_broker_json_file",
+                "description": "The JSON file name for the data broker that this action was operating on",
+                "type": "string"
+            },
+            {
+                "key": "removed_at",
+                "description": "Timestamp, in milliseconds, when the broker was removed at (contained on the JSON)",
+                "type": "string"
+            }
+        ]
+    },
+    "m_dbp_update_databrokers_failure": {
+        "description": "Fired when a data broker JSON update has failed.",
+        "owners": ["karlenDimla", "landomen"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "data_broker_json_file",
+                "description": "The JSON file name for the data broker that this action was operating on",
+                "type": "string"
+            },
+            {
+                "key": "removed_at",
+                "description": "Timestamp, in milliseconds, when the broker was removed at (contained on the JSON)",
+                "type": "string"
+            }
+        ]
+    },
+    "m_dbp_download_mainconfig_service_failure": {
+        "description": "Android specific pixel which is fired when downloading the main config failed due to a BE error.",
+        "owners": ["karlenDimla", "landomen"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "error_code",
+                "description": "Error code from BE",
+                "type": "string"
+            }
+        ]
+    },
+    "m_dbp_download_mainconfig_failure": {
+        "description": "Android specific pixel which is fired when downloading the main config failed.",
+        "owners": ["karlenDimla", "landomen"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_dbp_data_broker_action-failed_error": {
+        "description": "Fired when a scan or opt-out action fails while processing a data broker.",
+        "owners": ["karlenDimla", "landomen"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "data_broker",
+                "description": "The URL of the data broker that this action was operating on",
+                "type": "string"
+            },
+            {
+                "key": "broker_version",
+                "description": "The version of the broker JSON file",
+                "type": "string"
+            },
+            {
+                "key": "actionID",
+                "description": "The unique identifier of the action that failed",
+                "type": "string"
+            },
+            {
+                "key": "message",
+                "description": "Failure message describing why the action failed",
+                "type": "string"
+            },
+            {
+                "key": "stepType",
+                "description": "Identifies the failing step type (scan or optOut)",
+                "type": "string",
+                "enum": ["scan", "optOut", "unknown"]
+            },
+            {
+                "key": "parent",
+                "description": "The parent data broker of the one this action was operating on",
                 "type": "string"
             }
         ]

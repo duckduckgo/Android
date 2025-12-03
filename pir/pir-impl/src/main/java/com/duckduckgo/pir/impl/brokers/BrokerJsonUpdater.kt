@@ -18,6 +18,7 @@ package com.duckduckgo.pir.impl.brokers
 
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.pir.impl.pixels.PirPixelSender
 import com.duckduckgo.pir.impl.service.DbpService
 import com.duckduckgo.pir.impl.service.DbpService.PirMainConfig
 import com.duckduckgo.pir.impl.store.PirRepository
@@ -43,6 +44,7 @@ class RealBrokerJsonUpdater @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val pirRepository: PirRepository,
     private val brokerDataDownloader: BrokerDataDownloader,
+    private val pixelSender: PirPixelSender,
 ) : BrokerJsonUpdater {
 
     /**
@@ -74,12 +76,14 @@ class RealBrokerJsonUpdater @Inject constructor(
                     }
                 } else {
                     logcat(ERROR) { "PIR-update: Failed to get mainconfig ${it.code()}: ${it.message()}" }
+                    pixelSender.reportDownloadMainConfigBEFailure(it.code().toString())
                     return@withContext false
                 }
             }
             true
         }.getOrElse {
             logcat(ERROR) { "PIR-update: Json update failed to complete due to: $it" }
+            pixelSender.reportDownloadMainConfigFailure()
             false
         }
     }

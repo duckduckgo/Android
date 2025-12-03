@@ -17,6 +17,7 @@
 package com.duckduckgo.pir.impl.brokers
 
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.pir.impl.pixels.PirPixelSender
 import com.duckduckgo.pir.impl.service.DbpService
 import com.duckduckgo.pir.impl.service.DbpService.PirBrokerEtags
 import com.duckduckgo.pir.impl.service.DbpService.PirMainConfig
@@ -47,6 +48,7 @@ class RealBrokerJsonUpdaterTest {
     private val mockDbpService: DbpService = mock()
     private val mockPirRepository: PirRepository = mock()
     private val mockBrokerDataDownloader: BrokerDataDownloader = mock()
+    private val mockPirPixelSender: PirPixelSender = mock()
 
     @Before
     fun setUp() = runTest {
@@ -57,6 +59,7 @@ class RealBrokerJsonUpdaterTest {
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             pirRepository = mockPirRepository,
             brokerDataDownloader = mockBrokerDataDownloader,
+            pixelSender = mockPirPixelSender,
         )
     }
 

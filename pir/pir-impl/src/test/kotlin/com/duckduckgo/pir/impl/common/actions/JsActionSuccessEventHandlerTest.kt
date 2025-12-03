@@ -29,6 +29,7 @@ import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerOptOu
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerScanActionSucceeded
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.ExecuteBrokerStepAction
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.JsActionSuccess
+import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.PirStageStatus
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.SideEffect.EvaluateJs
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.SideEffect.GetCaptchaSolution
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.SideEffect.LoadUrl
@@ -40,6 +41,7 @@ import com.duckduckgo.pir.impl.models.scheduling.JobRecord.EmailConfirmationJobR
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.EmailConfirmationJobRecord.EmailData
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.EmailConfirmationJobRecord.JobAttemptData
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.EmailConfirmationJobRecord.LinkFetchData
+import com.duckduckgo.pir.impl.pixels.PirStage
 import com.duckduckgo.pir.impl.scripts.models.BrokerAction
 import com.duckduckgo.pir.impl.scripts.models.PirScriptRequestData.UserProfile
 import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.ClickResponse
@@ -177,6 +179,10 @@ class JsActionSuccessEventHandlerTest {
                 currentBrokerStepIndex = 0,
                 currentActionIndex = testCurrentActionIndex,
                 actionRetryCount = testActionRetryCount,
+                stageStatus = PirStageStatus(
+                    currentStage = PirStage.OTHER,
+                    stageStartMs = 0L,
+                ),
             )
         val event = JsActionSuccess(pirSuccessResponse = navigateResponse)
 
@@ -193,7 +199,7 @@ class JsActionSuccessEventHandlerTest {
 
         val capturedState = argumentCaptor<BrokerScanActionSucceeded>()
         verify(mockPirRunStateHandler).handleState(capturedState.capture())
-        assertEquals(testBrokerName, capturedState.firstValue.brokerName)
+        assertEquals(testBroker1, capturedState.firstValue.broker)
         assertEquals(testProfileQueryId, capturedState.firstValue.profileQueryId)
         assertEquals(navigateResponse, capturedState.firstValue.pirSuccessResponse)
     }
@@ -213,6 +219,10 @@ class JsActionSuccessEventHandlerTest {
                 currentBrokerStepIndex = 0,
                 currentActionIndex = testCurrentActionIndex,
                 actionRetryCount = testActionRetryCount,
+                stageStatus = PirStageStatus(
+                    currentStage = PirStage.OTHER,
+                    stageStartMs = 0,
+                ),
             )
         val event = JsActionSuccess(pirSuccessResponse = fillFormResponse)
 
@@ -248,6 +258,10 @@ class JsActionSuccessEventHandlerTest {
                 currentBrokerStepIndex = 0,
                 currentActionIndex = testCurrentActionIndex,
                 actionRetryCount = testActionRetryCount,
+                stageStatus = PirStageStatus(
+                    currentStage = PirStage.OTHER,
+                    stageStartMs = 0,
+                ),
             )
         val event = JsActionSuccess(pirSuccessResponse = clickResponse)
 
@@ -281,6 +295,10 @@ class JsActionSuccessEventHandlerTest {
                 currentBrokerStepIndex = 0,
                 currentActionIndex = testCurrentActionIndex,
                 actionRetryCount = testActionRetryCount,
+                stageStatus = PirStageStatus(
+                    currentStage = PirStage.OTHER,
+                    stageStartMs = 0,
+                ),
             )
         val event = JsActionSuccess(pirSuccessResponse = expectationResponse)
 
@@ -315,6 +333,10 @@ class JsActionSuccessEventHandlerTest {
                 currentBrokerStepIndex = 0,
                 currentActionIndex = testCurrentActionIndex,
                 actionRetryCount = testActionRetryCount,
+                stageStatus = PirStageStatus(
+                    currentStage = PirStage.OTHER,
+                    stageStartMs = 0,
+                ),
             )
         val event = JsActionSuccess(pirSuccessResponse = extractedResponse)
 
@@ -355,12 +377,22 @@ class JsActionSuccessEventHandlerTest {
                     currentBrokerStepIndex = 0,
                     currentActionIndex = testCurrentActionIndex,
                     actionRetryCount = testActionRetryCount,
+                    stageStatus = PirStageStatus(
+                        currentStage = PirStage.CAPTCHA_PARSE,
+                        stageStartMs = testCurrentTimeInMillis,
+                    ),
                 )
             val event = JsActionSuccess(pirSuccessResponse = captchaResponse)
 
             val result = testee.invoke(state, event)
 
-            val expectedState = state.copy(actionRetryCount = 0)
+            val expectedState = state.copy(
+                actionRetryCount = 0,
+                stageStatus = PirStageStatus(
+                    currentStage = PirStage.CAPTCHA_SEND,
+                    stageStartMs = testCurrentTimeInMillis,
+                ),
+            )
             assertEquals(expectedState, result.nextState)
             assertEquals(
                 GetCaptchaSolution(
@@ -393,6 +425,10 @@ class JsActionSuccessEventHandlerTest {
                     currentBrokerStepIndex = 0,
                     currentActionIndex = testCurrentActionIndex,
                     actionRetryCount = testActionRetryCount,
+                    stageStatus = PirStageStatus(
+                        currentStage = PirStage.OTHER,
+                        stageStartMs = 0,
+                    ),
                 )
             val event = JsActionSuccess(pirSuccessResponse = solveCaptchaResponse)
 
@@ -436,6 +472,10 @@ class JsActionSuccessEventHandlerTest {
                     currentBrokerStepIndex = 0,
                     currentActionIndex = testCurrentActionIndex,
                     actionRetryCount = testActionRetryCount,
+                    stageStatus = PirStageStatus(
+                        currentStage = PirStage.OTHER,
+                        stageStartMs = 0,
+                    ),
                 )
             val event = JsActionSuccess(pirSuccessResponse = conditionResponse)
 
@@ -466,6 +506,10 @@ class JsActionSuccessEventHandlerTest {
                 currentBrokerStepIndex = 0,
                 currentActionIndex = testCurrentActionIndex,
                 actionRetryCount = testActionRetryCount,
+                stageStatus = PirStageStatus(
+                    currentStage = PirStage.OTHER,
+                    stageStartMs = 0,
+                ),
             )
         val event = JsActionSuccess(pirSuccessResponse = conditionResponse)
 
@@ -509,6 +553,10 @@ class JsActionSuccessEventHandlerTest {
                 currentBrokerStepIndex = 0,
                 currentActionIndex = testCurrentActionIndex,
                 actionRetryCount = testActionRetryCount,
+                stageStatus = PirStageStatus(
+                    currentStage = PirStage.OTHER,
+                    stageStartMs = 0,
+                ),
             )
         val event = JsActionSuccess(pirSuccessResponse = navigateResponse)
 
@@ -516,7 +564,7 @@ class JsActionSuccessEventHandlerTest {
 
         val capturedState = argumentCaptor<BrokerOptOutActionSucceeded>()
         verify(mockPirRunStateHandler).handleState(capturedState.capture())
-        assertEquals(testBrokerName, capturedState.firstValue.brokerName)
+        assertEquals(testBroker1, capturedState.firstValue.broker)
         assertEquals(testExtractedProfile, capturedState.firstValue.extractedProfile)
         assertEquals(testCurrentTimeInMillis, capturedState.firstValue.completionTimeInMillis)
         assertEquals("navigate", capturedState.firstValue.actionType)
@@ -552,6 +600,10 @@ class JsActionSuccessEventHandlerTest {
                 currentBrokerStepIndex = 0,
                 currentActionIndex = testCurrentActionIndex,
                 actionRetryCount = testActionRetryCount,
+                stageStatus = PirStageStatus(
+                    currentStage = PirStage.OTHER,
+                    stageStartMs = 0,
+                ),
             )
         val event = JsActionSuccess(pirSuccessResponse = navigateResponse)
 
@@ -559,7 +611,7 @@ class JsActionSuccessEventHandlerTest {
 
         val capturedState = argumentCaptor<BrokerOptOutActionSucceeded>()
         verify(mockPirRunStateHandler).handleState(capturedState.capture())
-        assertEquals(testBrokerName, capturedState.firstValue.brokerName)
+        assertEquals(testBroker1, capturedState.firstValue.broker)
         assertEquals(testExtractedProfile, capturedState.firstValue.extractedProfile)
         assertEquals(testCurrentTimeInMillis, capturedState.firstValue.completionTimeInMillis)
         assertEquals("navigate", capturedState.firstValue.actionType)

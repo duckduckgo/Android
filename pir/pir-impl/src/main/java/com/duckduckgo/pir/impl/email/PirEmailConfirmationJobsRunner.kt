@@ -111,7 +111,6 @@ class RealPirEmailConfirmationJobsRunner @Inject constructor(
                     }.associateBy { it.emailData.email }
             if (eligibleJobRecordsMap.isEmpty()) {
                 logcat { "PIR-EMAIL-CONFIRMATION: No fetch to run" }
-                handleJobCompleted()
                 return@withContext
             }
 

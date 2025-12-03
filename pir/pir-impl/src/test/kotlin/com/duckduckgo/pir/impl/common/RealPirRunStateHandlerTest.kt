@@ -18,7 +18,6 @@ package com.duckduckgo.pir.impl.common
 
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.CurrentTimeProvider
-import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerManualScanCompleted
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerRecordEmailConfirmationCompleted
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerRecordEmailConfirmationNeeded
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerRecordEmailConfirmationStarted
@@ -26,7 +25,9 @@ import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerRecor
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerRecordOptOutStarted
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerRecordOptOutSubmitted
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerScanActionSucceeded
-import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerScheduledScanCompleted
+import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerScanFailed
+import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerScanStarted
+import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerScanSuccess
 import com.duckduckgo.pir.impl.models.AddressCityState
 import com.duckduckgo.pir.impl.models.Broker
 import com.duckduckgo.pir.impl.models.ExtractedProfile
@@ -49,6 +50,7 @@ import com.duckduckgo.pir.impl.store.PirEventsRepository
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.pir.impl.store.PirSchedulingRepository
 import com.duckduckgo.pir.impl.store.db.BrokerScanEventType.BROKER_ERROR
+import com.duckduckgo.pir.impl.store.db.BrokerScanEventType.BROKER_STARTED
 import com.duckduckgo.pir.impl.store.db.BrokerScanEventType.BROKER_SUCCESS
 import com.duckduckgo.pir.impl.store.db.EmailConfirmationEventType.EMAIL_CONFIRMATION_FAILED
 import com.duckduckgo.pir.impl.store.db.EmailConfirmationEventType.EMAIL_CONFIRMATION_SUCCESS
@@ -185,20 +187,54 @@ class RealPirRunStateHandlerTest {
         )
 
     @Test
-    fun whenHandleBrokerManualScanCompletedWithSuccessThenSavesLogsAndReportsPixel() =
+    fun whenHandleBrokerManualScanStartedThenSavesLogsAndReportsPixel() =
         runTest {
             val state =
-                BrokerManualScanCompleted(
+                BrokerScanStarted(
+                    broker = testBroker,
+                    eventTimeInMillis = testEventTimeInMillis,
+                )
+            testee.handleState(state)
+
+            verify(mockPixelSender).reportScanStarted(
+                brokerUrl = testBroker.url,
+            )
+            verify(mockEventsRepository).saveBrokerScanLog(
+                PirBrokerScanLog(
+                    eventTimeInMillis = testEventTimeInMillis,
                     brokerName = testBrokerName,
+                    eventType = BROKER_STARTED,
+                ),
+            )
+            verifyNoMoreInteractions(mockEventsRepository)
+            verifyNoMoreInteractions(mockPixelSender)
+        }
+
+    @Test
+    fun whenHandleBrokerManualScanCompletedWithSuccessWithNoMatchThenSavesLogsAndReportsPixel() =
+        runTest {
+            val state =
+                BrokerScanSuccess(
+                    broker = testBroker,
                     profileQueryId = testProfileQueryId,
                     startTimeInMillis = testStartTimeInMillis,
                     eventTimeInMillis = testEventTimeInMillis,
                     totalTimeMillis = testTotalTimeMillis,
-                    isSuccess = true,
+                    isManualRun = true,
+                    lastAction = BrokerAction.Navigate(id = "1234", url = "hello.com"),
                 )
-
+            whenever(mockRepository.getExtractedProfiles(any(), any())).thenReturn(emptyList())
             testee.handleState(state)
 
+            verify(mockPixelSender).reportScanNoMatch(
+                brokerUrl = testBroker.url,
+                brokerVersion = testBroker.version,
+                durationMs = testTotalTimeMillis,
+                inManualStarted = true,
+                parentUrl = "",
+                actionId = "1234",
+                actionType = "navigate",
+            )
             verify(mockEventsRepository).saveBrokerScanLog(
                 PirBrokerScanLog(
                     eventTimeInMillis = testEventTimeInMillis,
@@ -213,9 +249,46 @@ class RealPirRunStateHandlerTest {
                 endTimeInMillis = testEventTimeInMillis,
                 isSuccess = true,
             )
-            verify(mockPixelSender).reportBrokerScanCompleted(
+            verifyNoInteractions(mockJobRecordUpdater)
+        }
+
+    @Test
+    fun whenHandleBrokerManualScanCompletedWithSuccessWithMatchesThenSavesLogsAndReportsPixel() =
+        runTest {
+            val state =
+                BrokerScanSuccess(
+                    broker = testBroker,
+                    profileQueryId = testProfileQueryId,
+                    startTimeInMillis = testStartTimeInMillis,
+                    eventTimeInMillis = testEventTimeInMillis,
+                    totalTimeMillis = testTotalTimeMillis,
+                    isManualRun = true,
+                    lastAction = BrokerAction.Navigate(id = "1234", url = "hello.com"),
+                )
+            whenever(mockRepository.getExtractedProfiles(any(), any())).thenReturn(
+                listOf(testExtractedProfile),
+            )
+            testee.handleState(state)
+
+            verify(mockPixelSender).reportScanMatches(
+                brokerUrl = testBroker.url,
+                durationMs = testTotalTimeMillis,
+                inManualStarted = true,
+                parentUrl = "",
+                totalMatches = 1,
+            )
+            verify(mockEventsRepository).saveBrokerScanLog(
+                PirBrokerScanLog(
+                    eventTimeInMillis = testEventTimeInMillis,
+                    brokerName = testBrokerName,
+                    eventType = BROKER_SUCCESS,
+                ),
+            )
+            verify(mockEventsRepository).saveScanCompletedBroker(
                 brokerName = testBrokerName,
-                totalTimeInMillis = testTotalTimeMillis,
+                profileQueryId = testProfileQueryId,
+                startTimeInMillis = testStartTimeInMillis,
+                endTimeInMillis = testEventTimeInMillis,
                 isSuccess = true,
             )
             verifyNoInteractions(mockJobRecordUpdater)
@@ -225,95 +298,30 @@ class RealPirRunStateHandlerTest {
     fun whenHandleBrokerManualScanCompletedWithFailureThenSavesErrorLogsAndReportsPixel() =
         runTest {
             val state =
-                BrokerManualScanCompleted(
-                    brokerName = testBrokerName,
+                BrokerScanFailed(
+                    broker = testBroker,
                     profileQueryId = testProfileQueryId,
                     startTimeInMillis = testStartTimeInMillis,
                     eventTimeInMillis = testEventTimeInMillis,
                     totalTimeMillis = testTotalTimeMillis,
-                    isSuccess = false,
+                    isManualRun = true,
+                    errorCategory = "network-error",
+                    errorDetails = "Error details",
+                    failedAction = BrokerAction.Navigate(id = "123243", url = "test.com"),
                 )
 
             testee.handleState(state)
 
-            verify(mockEventsRepository).saveBrokerScanLog(
-                PirBrokerScanLog(
-                    eventTimeInMillis = testEventTimeInMillis,
-                    brokerName = testBrokerName,
-                    eventType = BROKER_ERROR,
-                ),
-            )
-            verify(mockEventsRepository).saveScanCompletedBroker(
-                brokerName = testBrokerName,
-                profileQueryId = testProfileQueryId,
-                startTimeInMillis = testStartTimeInMillis,
-                endTimeInMillis = testEventTimeInMillis,
-                isSuccess = false,
-            )
-            verify(mockPixelSender).reportBrokerScanCompleted(
-                brokerName = testBrokerName,
-                totalTimeInMillis = testTotalTimeMillis,
-                isSuccess = false,
-            )
-            verify(mockJobRecordUpdater).updateScanError(testBrokerName, testProfileQueryId)
-        }
-
-    @Test
-    fun whenHandleBrokerScheduledScanCompletedWithSuccessThenSavesLogsAndReportsPixel() =
-        runTest {
-            val state =
-                BrokerScheduledScanCompleted(
-                    brokerName = testBrokerName,
-                    profileQueryId = testProfileQueryId,
-                    startTimeInMillis = testStartTimeInMillis,
-                    eventTimeInMillis = testEventTimeInMillis,
-                    totalTimeMillis = testTotalTimeMillis,
-                    isSuccess = true,
-                )
-
-            testee.handleState(state)
-
-            verify(mockPixelSender).reportBrokerScanCompleted(
-                brokerName = testBrokerName,
-                totalTimeInMillis = testTotalTimeMillis,
-                isSuccess = true,
-            )
-            verify(mockEventsRepository).saveBrokerScanLog(
-                PirBrokerScanLog(
-                    eventTimeInMillis = testEventTimeInMillis,
-                    brokerName = testBrokerName,
-                    eventType = BROKER_SUCCESS,
-                ),
-            )
-            verify(mockEventsRepository).saveScanCompletedBroker(
-                brokerName = testBrokerName,
-                profileQueryId = testProfileQueryId,
-                startTimeInMillis = testStartTimeInMillis,
-                endTimeInMillis = testEventTimeInMillis,
-                isSuccess = true,
-            )
-            verifyNoInteractions(mockJobRecordUpdater)
-        }
-
-    @Test
-    fun whenHandleBrokerScheduledScanCompletedWithFailureThenSavesErrorLogsAndReportsPixel() =
-        runTest {
-            val state =
-                BrokerScheduledScanCompleted(
-                    brokerName = testBrokerName,
-                    profileQueryId = testProfileQueryId,
-                    startTimeInMillis = testStartTimeInMillis,
-                    eventTimeInMillis = testEventTimeInMillis,
-                    totalTimeMillis = testTotalTimeMillis,
-                    isSuccess = false,
-                )
-
-            testee.handleState(state)
-
-            verify(mockPixelSender).reportBrokerScanCompleted(
-                brokerName = testBrokerName,
-                totalTimeInMillis = testTotalTimeMillis,
-                isSuccess = false,
+            verify(mockPixelSender).reportScanError(
+                brokerUrl = testBroker.url,
+                brokerVersion = testBroker.version,
+                durationMs = testTotalTimeMillis,
+                errorCategory = "network-error",
+                errorDetails = "Error details",
+                inManualStarted = true,
+                parentUrl = "",
+                actionId = "123243",
+                actionType = "navigate",
             )
             verify(mockEventsRepository).saveBrokerScanLog(
                 PirBrokerScanLog(
@@ -343,7 +351,7 @@ class RealPirRunStateHandlerTest {
                 )
             val state =
                 BrokerScanActionSucceeded(
-                    brokerName = testBrokerName,
+                    broker = testBroker,
                     profileQueryId = testProfileQueryId,
                     pirSuccessResponse = extractedResponse,
                 )
@@ -403,7 +411,7 @@ class RealPirRunStateHandlerTest {
                 )
             val state =
                 BrokerScanActionSucceeded(
-                    brokerName = testBrokerName,
+                    broker = testBroker,
                     profileQueryId = testProfileQueryId,
                     pirSuccessResponse = extractedResponse,
                 )
@@ -425,7 +433,7 @@ class RealPirRunStateHandlerTest {
                 )
             val state =
                 BrokerScanActionSucceeded(
-                    brokerName = testBrokerName,
+                    broker = testBroker,
                     profileQueryId = testProfileQueryId,
                     pirSuccessResponse = navigateResponse,
                 )
@@ -441,8 +449,9 @@ class RealPirRunStateHandlerTest {
         runTest {
             val state =
                 BrokerRecordOptOutStarted(
-                    brokerName = testBrokerName,
+                    broker = testBroker,
                     extractedProfile = testExtractedProfile,
+                    attemptId = "c9982ded-021a-4251-9e03-2c58b130410f",
                 )
 
             testee.handleState(state)
@@ -456,7 +465,7 @@ class RealPirRunStateHandlerTest {
         runTest {
             val state =
                 BrokerRecordOptOutSubmitted(
-                    brokerName = testBrokerName,
+                    broker = testBroker,
                     extractedProfile = testExtractedProfile,
                     startTimeInMillis = testStartTimeInMillis,
                     endTimeInMillis = testEventTimeInMillis,
@@ -492,7 +501,7 @@ class RealPirRunStateHandlerTest {
                 parent = "",
                 attemptId = state.attemptId,
                 durationMs = testEventTimeInMillis - testStartTimeInMillis,
-                tries = 2,
+                optOutAttemptCount = 2,
                 emailPattern = state.emailPattern,
             )
         }
@@ -502,7 +511,7 @@ class RealPirRunStateHandlerTest {
         runTest {
             val state =
                 BrokerRecordOptOutFailed(
-                    brokerName = testBrokerName,
+                    broker = testBroker,
                     extractedProfile = testExtractedProfile,
                     startTimeInMillis = testStartTimeInMillis,
                     endTimeInMillis = testEventTimeInMillis,
@@ -557,10 +566,12 @@ class RealPirRunStateHandlerTest {
         runTest {
             val state =
                 BrokerRecordEmailConfirmationNeeded(
-                    brokerName = testBrokerName,
+                    broker = testBroker,
                     extractedProfile = testExtractedProfile,
                     attemptId = "c9982ded-021a-4251-9e03-2c58b130410f",
                     lastActionId = "hello82ded-021a-4251-9e03-2c58b130410f",
+                    durationMs = testTotalTimeMillis,
+                    currentActionAttemptCount = 1,
                 )
             whenever(mockRepository.getBrokerForName(testBrokerName)).thenReturn(testBroker)
 
@@ -578,8 +589,8 @@ class RealPirRunStateHandlerTest {
                 brokerVersion = testBroker.version,
                 attemptId = "c9982ded-021a-4251-9e03-2c58b130410f",
                 actionId = "hello82ded-021a-4251-9e03-2c58b130410f",
-                durationMs = 0L,
-                tries = 0,
+                durationMs = testTotalTimeMillis,
+                tries = 1,
             )
         }
 
@@ -588,7 +599,7 @@ class RealPirRunStateHandlerTest {
         runTest {
             val state =
                 BrokerRecordEmailConfirmationStarted(
-                    brokerName = testBrokerName,
+                    broker = testBroker,
                     extractedProfileId = testExtractedProfileId,
                     firstActionId = "first82ded-021a-4251-9e03-2c58b130410f",
                 )
@@ -617,7 +628,7 @@ class RealPirRunStateHandlerTest {
         runTest {
             val state =
                 BrokerRecordEmailConfirmationCompleted(
-                    brokerName = testBrokerName,
+                    broker = testBroker,
                     extractedProfileId = testExtractedProfileId,
                     isSuccess = true,
                     lastActionId = "last82ded-021a-4251-9e03-2c58b130410f",
@@ -657,7 +668,7 @@ class RealPirRunStateHandlerTest {
         runTest {
             val state =
                 BrokerRecordEmailConfirmationCompleted(
-                    brokerName = testBrokerName,
+                    broker = testBroker,
                     extractedProfileId = testExtractedProfileId,
                     isSuccess = false,
                     lastActionId = "last82ded-021a-4251-9e03-2c58b130410f",
