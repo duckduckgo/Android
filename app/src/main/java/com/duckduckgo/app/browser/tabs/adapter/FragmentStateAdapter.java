@@ -295,8 +295,8 @@ public abstract class FragmentStateAdapter extends RecyclerView.Adapter<Fragment
             placeFragmentInViewHolder(holder);
             gcFragments();
         }
-        long duration = SystemClock.elapsedRealtime() - startTime;
         if (BuildConfig.DEBUG) {
+            long duration = SystemClock.elapsedRealtime() - startTime;
             LogcatKt.logcat("TabPerf",
                     LogPriority.DEBUG, () -> String.format(Locale.getDefault(),
                             "[TabCreation] onViewAttachedToWindow completed in %dms (itemId: %d)",
