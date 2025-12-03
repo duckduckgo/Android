@@ -41,4 +41,12 @@ interface RemoteMessagingFeatureToggles {
 
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun canScheduleOnPrivacyConfigUpdates(): Toggle
+
+    /**
+     * @return `true` when the remote config has the global "remoteMessageModalSurface" androidBrowserConfig
+     * sub-feature flag enabled
+     * If the remote feature is not present defaults to `false`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun remoteMessageModalSurface(): Toggle
 }
