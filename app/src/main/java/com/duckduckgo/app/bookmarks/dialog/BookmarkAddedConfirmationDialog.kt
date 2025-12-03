@@ -45,6 +45,7 @@ import com.google.android.material.shape.CornerFamily
 import com.google.android.material.shape.MaterialShapeDrawable
 import com.google.android.material.shape.ShapeAppearanceModel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import logcat.logcat
 import com.duckduckgo.mobile.android.R as CommonR
@@ -136,7 +137,9 @@ class BookmarkAddedConfirmationDialog(
     private fun startAutoDismissTimer() {
         autoDismissDialogJob += lifecycleScope.launch {
             delay(BOOKMARKS_BOTTOM_SHEET_DURATION)
-            dismiss()
+            if (isShowing && isActive) {
+                dismiss()
+            }
         }
     }
 
