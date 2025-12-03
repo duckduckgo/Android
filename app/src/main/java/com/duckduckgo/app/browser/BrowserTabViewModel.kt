@@ -201,6 +201,7 @@ import com.duckduckgo.app.browser.refreshpixels.RefreshPixelSender
 import com.duckduckgo.app.browser.santize.NonHttpAppLinkChecker
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.tabs.TabManager
+import com.duckduckgo.app.browser.urldisplay.UrlDisplayRepository
 import com.duckduckgo.app.browser.urlextraction.UrlExtractionListener
 import com.duckduckgo.app.browser.viewstate.AccessibilityViewState
 import com.duckduckgo.app.browser.viewstate.AutoCompleteViewState
@@ -448,6 +449,7 @@ class BrowserTabViewModel @Inject constructor(
     private val trackingParameters: TrackingParameters,
     private val downloadCallback: DownloadStateListener,
     private val settingsDataStore: SettingsDataStore,
+    private val urlDisplayRepository: UrlDisplayRepository,
     private val autofillCapabilityChecker: AutofillCapabilityChecker,
     private val adClickManager: AdClickManager,
     private val autofillFireproofDialogSuppressor: AutofillFireproofDialogSuppressor,
@@ -506,7 +508,6 @@ class BrowserTabViewModel @Inject constructor(
     private var buildingSiteFactoryJob: Job? = null
     private var hasUserSeenHistoryIAM = false
     private var lastAutoCompleteState: AutoCompleteViewState? = null
-    private var lastFullSiteUrlEnabled: Boolean = settingsDataStore.isFullUrlEnabled
 
     // Map<String, Map<String, JavaScriptReplyProxy>>() = Map<Origin, Map<location.href, JavaScriptReplyProxy>>()
     private val fixedReplyProxyMap = mutableMapOf<String, Map<String, JavaScriptReplyProxy>>()
@@ -605,6 +606,13 @@ class BrowserTabViewModel @Inject constructor(
     private var isCustomTabScreen: Boolean = false
     private var alreadyShownKeyboard: Boolean = false
     private var handleAboutBlankEnabled: Boolean = false
+
+    private val isFullUrlEnabled = urlDisplayRepository.isFullUrlEnabled
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.Eagerly,
+            initialValue = true,
+        )
 
     private val fireproofWebsitesObserver =
         Observer<List<FireproofWebsiteEntity>> {
@@ -798,6 +806,12 @@ class BrowserTabViewModel @Inject constructor(
         viewModelScope.launch(dispatchers.io()) {
             handleAboutBlankEnabled = androidBrowserConfig.handleAboutBlank().isEnabled()
         }
+
+        isFullUrlEnabled
+            .onEach {
+                command.value = Command.RefreshOmnibar
+            }
+            .launchIn(viewModelScope)
     }
 
     fun loadData(
@@ -942,11 +956,6 @@ class BrowserTabViewModel @Inject constructor(
     fun onViewResumed() {
         if (currentGlobalLayoutState() is Invalidated && currentBrowserViewState().browserShowing) {
             showErrorWithAction()
-        }
-
-        if (lastFullSiteUrlEnabled != settingsDataStore.isFullUrlEnabled) {
-            lastFullSiteUrlEnabled = settingsDataStore.isFullUrlEnabled
-            command.value = Command.RefreshOmnibar
         }
 
         if (serpSettingsFeature.storeSerpSettings().isEnabled()) {
@@ -1203,7 +1212,7 @@ class BrowserTabViewModel @Inject constructor(
         findInPageViewState.value = FindInPageViewState(visible = false)
         omnibarViewState.value =
             currentOmnibarViewState().copy(
-                omnibarText = if (settingsDataStore.isFullUrlEnabled) trimmedInput else addressDisplayFormatter.getShortUrl(trimmedInput),
+                omnibarText = if (isFullUrlEnabled.value) trimmedInput else addressDisplayFormatter.getShortUrl(trimmedInput),
                 queryOrFullUrl = trimmedInput,
                 forceExpand = true,
             )
@@ -1665,7 +1674,7 @@ class BrowserTabViewModel @Inject constructor(
         omnibarViewState.value =
             currentOmnibarViewState.copy(
                 queryOrFullUrl = omnibarTextForUrl(url, true),
-                omnibarText = omnibarTextForUrl(url, settingsDataStore.isFullUrlEnabled),
+                omnibarText = omnibarTextForUrl(url, isFullUrlEnabled.value),
                 forceExpand = true,
                 serpLogo = null,
             )
@@ -1863,7 +1872,7 @@ class BrowserTabViewModel @Inject constructor(
         omnibarViewState.postValue(
             currentOmnibarViewState.copy(
                 queryOrFullUrl = omnibarTextForUrl(url, true),
-                omnibarText = omnibarTextForUrl(url, settingsDataStore.isFullUrlEnabled),
+                omnibarText = omnibarTextForUrl(url, isFullUrlEnabled.value),
                 forceExpand = false,
             ),
         )
@@ -2188,7 +2197,7 @@ class BrowserTabViewModel @Inject constructor(
                     )
                 omnibarViewState.value =
                     currentOmnibarViewState().copy(
-                        omnibarText = if (settingsDataStore.isFullUrlEnabled) {
+                        omnibarText = if (isFullUrlEnabled.value) {
                             documentUrlString
                         } else {
                             addressDisplayFormatter.getShortUrl(
@@ -3197,7 +3206,7 @@ class BrowserTabViewModel @Inject constructor(
         if (request.host != site?.uri?.host) {
             omnibarViewState.value =
                 currentOmnibarViewState().copy(
-                    omnibarText = if (settingsDataStore.isFullUrlEnabled) request.site else addressDisplayFormatter.getShortUrl(request.site),
+                    omnibarText = if (isFullUrlEnabled.value) request.site else addressDisplayFormatter.getShortUrl(request.site),
                     queryOrFullUrl = request.site,
                     forceExpand = true,
                 )
@@ -3626,7 +3635,7 @@ class BrowserTabViewModel @Inject constructor(
 
                 omnibarViewState.value =
                     currentOmnibarViewState().copy(
-                        omnibarText = if (settingsDataStore.isFullUrlEnabled) siteUrlString else addressDisplayFormatter.getShortUrl(siteUrlString),
+                        omnibarText = if (isFullUrlEnabled.value) siteUrlString else addressDisplayFormatter.getShortUrl(siteUrlString),
                         queryOrFullUrl = siteUrlString,
                         isEditing = false,
                     )
@@ -3639,7 +3648,7 @@ class BrowserTabViewModel @Inject constructor(
                 browserViewState.value = currentBrowserViewState().copy(maliciousSiteStatus = maliciousSiteStatus)
                 omnibarViewState.value =
                     currentOmnibarViewState().copy(
-                        omnibarText = if (settingsDataStore.isFullUrlEnabled) siteUrlString else addressDisplayFormatter.getShortUrl(siteUrlString),
+                        omnibarText = if (isFullUrlEnabled.value) siteUrlString else addressDisplayFormatter.getShortUrl(siteUrlString),
                         queryOrFullUrl = siteUrlString,
                         isEditing = false,
                     )
