@@ -27,6 +27,7 @@ import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.di.DuckChat
+import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_AI_INPUT_SCREEN_COSMETIC_SETTING
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_AI_INPUT_SCREEN_USER_SETTING
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_CHAT_FULLSCREEN_MODE_SETTING
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_CHAT_LAST_SESSION_TIMESTAMP
@@ -55,6 +56,8 @@ interface DuckChatDataStore {
 
     suspend fun setInputScreenUserSetting(enabled: Boolean)
 
+    suspend fun setCosmeticInputScreenUserSetting(enabled: Boolean)
+
     suspend fun setShowInBrowserMenu(showDuckChat: Boolean)
 
     suspend fun setShowInAddressBar(showDuckChat: Boolean)
@@ -66,6 +69,8 @@ interface DuckChatDataStore {
     fun observeDuckChatUserEnabled(): Flow<Boolean>
 
     fun observeInputScreenUserSettingEnabled(): Flow<Boolean>
+
+    suspend fun isCosmeticInputScreenUserSettingEnabled(): Boolean
 
     fun observeShowInBrowserMenu(): Flow<Boolean>
 
@@ -111,6 +116,7 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
     private object Keys {
         val DUCK_CHAT_USER_ENABLED = booleanPreferencesKey(name = "DUCK_CHAT_USER_ENABLED")
         val DUCK_AI_INPUT_SCREEN_USER_SETTING = booleanPreferencesKey(name = "DUCK_AI_INPUT_SCREEN_USER_SETTING")
+        val DUCK_AI_INPUT_SCREEN_COSMETIC_SETTING = booleanPreferencesKey(name = "DUCK_AI_INPUT_SCREEN_COSMETIC_SETTING")
         val DUCK_CHAT_SHOW_IN_MENU = booleanPreferencesKey(name = "DUCK_CHAT_SHOW_IN_MENU")
         val DUCK_CHAT_SHOW_IN_ADDRESS_BAR = booleanPreferencesKey(name = "DUCK_CHAT_SHOW_IN_ADDRESS_BAR")
         val DUCK_CHAT_SHOW_IN_VOICE_SEARCH = booleanPreferencesKey(name = "DUCK_CHAT_SHOW_IN_VOICE_SEARCH")
@@ -150,7 +156,11 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
 
     private val inputScreenUserSettingEnabled: StateFlow<Boolean> =
         store.data
-            .map { prefs -> prefs[DUCK_AI_INPUT_SCREEN_USER_SETTING] ?: false }
+            .map { prefs ->
+                val actualValue = prefs[DUCK_AI_INPUT_SCREEN_USER_SETTING] ?: false
+                val cosmeticValue = prefs[DUCK_AI_INPUT_SCREEN_COSMETIC_SETTING] ?: false
+                actualValue || cosmeticValue
+            }
             .distinctUntilChanged()
             .stateIn(appCoroutineScope, SharingStarted.Eagerly, false)
 
@@ -177,7 +187,14 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
     }
 
     override suspend fun setInputScreenUserSetting(enabled: Boolean) {
-        store.edit { prefs -> prefs[DUCK_AI_INPUT_SCREEN_USER_SETTING] = enabled }
+        store.edit { prefs ->
+            prefs[DUCK_AI_INPUT_SCREEN_USER_SETTING] = enabled
+            prefs.remove(DUCK_AI_INPUT_SCREEN_COSMETIC_SETTING)
+        }
+    }
+
+    override suspend fun setCosmeticInputScreenUserSetting(enabled: Boolean) {
+        store.edit { prefs -> prefs[DUCK_AI_INPUT_SCREEN_COSMETIC_SETTING] = enabled }
     }
 
     override suspend fun setFullScreenModeUserSetting(enabled: Boolean) {
@@ -210,7 +227,16 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
 
     override suspend fun isDuckChatUserEnabled(): Boolean = store.data.firstOrNull()?.let { it[DUCK_CHAT_USER_ENABLED] } ?: true
 
-    override suspend fun isInputScreenUserSettingEnabled(): Boolean = store.data.firstOrNull()?.let { it[DUCK_AI_INPUT_SCREEN_USER_SETTING] } ?: false
+    override suspend fun isInputScreenUserSettingEnabled(): Boolean {
+        val prefs = store.data.firstOrNull() ?: return false
+        val actualValue = prefs[DUCK_AI_INPUT_SCREEN_USER_SETTING] ?: false
+        val cosmeticValue = prefs[DUCK_AI_INPUT_SCREEN_COSMETIC_SETTING] ?: false
+        return actualValue || cosmeticValue
+    }
+
+    override suspend fun isCosmeticInputScreenUserSettingEnabled(): Boolean = store.data.firstOrNull()?.let {
+        it[DUCK_AI_INPUT_SCREEN_COSMETIC_SETTING]
+    } ?: false
 
     override suspend fun getShowInBrowserMenu(): Boolean = store.data.firstOrNull()?.let { it[DUCK_CHAT_SHOW_IN_MENU] } ?: true
 

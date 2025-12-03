@@ -31,6 +31,8 @@ interface DuckChatFeatureRepository {
 
     suspend fun setInputScreenUserSetting(enabled: Boolean)
 
+    suspend fun setCosmeticInputScreenUserSetting(enabled: Boolean)
+
     suspend fun setShowInBrowserMenu(showDuckChat: Boolean)
 
     suspend fun setShowInAddressBar(showDuckChat: Boolean)
@@ -84,6 +86,10 @@ class RealDuckChatFeatureRepository @Inject constructor(
 
     override suspend fun setInputScreenUserSetting(enabled: Boolean) {
         duckChatDataStore.setInputScreenUserSetting(enabled)
+    }
+
+    override suspend fun setCosmeticInputScreenUserSetting(enabled: Boolean) {
+        duckChatDataStore.setCosmeticInputScreenUserSetting(enabled)
     }
 
     override suspend fun setShowInBrowserMenu(showDuckChat: Boolean) {

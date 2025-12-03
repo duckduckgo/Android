@@ -345,6 +345,10 @@ class RealDuckChat @Inject constructor(
         cacheUserSettings()
     }
 
+    override suspend fun setCosmeticInputScreenUserSetting(enabled: Boolean) {
+        duckChatFeatureRepository.setCosmeticInputScreenUserSetting(enabled)
+    }
+
     override suspend fun setShowInBrowserMenuUserSetting(showDuckChat: Boolean) =
         withContext(dispatchers.io()) {
             duckChatFeatureRepository.setShowInBrowserMenu(showDuckChat)
