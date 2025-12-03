@@ -541,20 +541,14 @@ class OmnibarLayoutViewModel @Inject constructor(
                 else -> {
                     val scrollingEnabled = viewMode != NewTab
                     val hasFocus = _viewState.value.hasFocus
-                    val leadingIcon = if (hasFocus) {
-                        Search
-                    } else {
-                        when (viewMode) {
-                            Error, SSLWarning, MaliciousSiteWarning -> Globe
-                            NewTab -> Search
-                            else -> Search
-                        }
-                    }
-
                     _viewState.update {
                         it.copy(
                             viewMode = viewMode,
-                            leadingIconState = leadingIcon,
+                            leadingIconState = getLeadingIconState(
+                                hasFocus = hasFocus,
+                                url = _viewState.value.url,
+                                logoUrl = null,
+                            ),
                             scrollingEnabled = scrollingEnabled,
                             showVoiceSearch = shouldShowVoiceSearch(
                                 viewMode = _viewState.value.viewMode,
