@@ -272,6 +272,10 @@ enum class PirPixel(
     PIR_BROKER_ACTION_FAILED(
         baseName = "m_dbp_data_broker_action-failed_error",
         type = Count,
+    ),
+    PIR_DASHBOARD_OPENED(
+        baseName = "pir_webui_dashboard_opened",
+        types = setOf(Count, Daily()),
     ), ;
 
     constructor(

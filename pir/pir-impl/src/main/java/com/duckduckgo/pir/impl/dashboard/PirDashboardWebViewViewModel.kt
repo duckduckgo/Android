@@ -16,12 +16,14 @@
 
 package com.duckduckgo.pir.impl.dashboard
 
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
+import com.duckduckgo.pir.impl.pixels.PirPixelSender
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -31,8 +33,8 @@ import javax.inject.Inject
 
 @ContributesViewModel(ActivityScope::class)
 class PirDashboardWebViewViewModel @Inject constructor(
-    private val dispatcherProvider: DispatcherProvider,
-) : ViewModel() {
+    private val pirPixelSender: PirPixelSender,
+) : ViewModel(), DefaultLifecycleObserver {
 
     private val command = Channel<Command>(1, DROP_OLDEST)
     internal fun commands(): Flow<Command> = command.receiveAsFlow()
@@ -44,6 +46,11 @@ class PirDashboardWebViewViewModel @Inject constructor(
         data: JSONObject?,
     ) {
         // TODO Handle any JS messages that requires UI updates or other user actions
+    }
+
+    override fun onStart(owner: LifecycleOwner) {
+        super.onStart(owner)
+        pirPixelSender.reportDashboardOpened()
     }
 
     sealed class Command {
