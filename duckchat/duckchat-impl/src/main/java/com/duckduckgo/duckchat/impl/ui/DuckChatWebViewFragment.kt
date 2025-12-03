@@ -39,6 +39,7 @@ import android.webkit.WebSettings
 import android.webkit.WebView
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.annotation.AnyThread
+import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ActivityOptionsCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.activityViewModels
@@ -182,6 +183,7 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
     private var pendingUploadTask: ValueCallback<Array<Uri>>? = null
 
     private val root: ViewGroup by lazy { binding.root }
+    private val toolbar: Toolbar? by lazy { binding.includeToolbar.toolbar }
 
     internal val simpleWebview: WebView by lazy { binding.simpleWebview }
 
@@ -322,7 +324,19 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
             pendingUploadTask = null
         }
 
+        configureOmnibar()
         observeViewModel()
+    }
+
+    private fun configureOmnibar() {
+        toolbar?.let {
+            it.show()
+            it.setNavigationIcon(com.duckduckgo.mobile.android.R.drawable.ic_arrow_left_24)
+            it.setNavigationOnClickListener {
+                requireActivity().onBackPressed()
+            }
+            it.setTitle(R.string.duck_chat_title)
+        }
     }
 
     private fun observeViewModel() {
