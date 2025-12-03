@@ -31,7 +31,10 @@ import com.duckduckgo.pir.impl.common.CaptchaResolver.CaptchaResolverResult.Solv
 import com.duckduckgo.pir.impl.service.DbpService
 import com.duckduckgo.pir.impl.service.DbpService.CaptchaSolutionMeta
 import com.duckduckgo.pir.impl.service.DbpService.PirStartCaptchaSolutionBody
+import com.duckduckgo.pir.impl.service.ResponseError
+import com.duckduckgo.pir.impl.service.parseError
 import com.squareup.anvil.annotations.ContributesBinding
+import com.squareup.moshi.Moshi
 import kotlinx.coroutines.withContext
 import logcat.logcat
 import retrofit2.HttpException
@@ -95,7 +98,10 @@ interface CaptchaResolver {
 class RealCaptchaResolver @Inject constructor(
     private val dbpService: DbpService,
     private val dispatcherProvider: DispatcherProvider,
+    moshi: Moshi,
 ) : CaptchaResolver {
+    private val adapter = moshi.adapter(ResponseError::class.java)
+
     override suspend fun submitCaptchaInformation(
         siteKey: String,
         url: String,
@@ -118,12 +124,13 @@ class RealCaptchaResolver @Inject constructor(
             }
         }.getOrElse { error ->
             if (error is HttpException) {
-                val errorMessage = error.message()
+                val errorMessage = adapter.parseError(error)?.message.orEmpty()
+
                 if (errorMessage.startsWith("INVALID_REQUEST")) {
                     CaptchaFailure(
                         code = error.code(),
                         type = InvalidRequest,
-                        message = "$PREFIX_SUBMIT_CAPTCHA_ERROR$errorMessage",
+                        message = "$PREFIX_SUBMIT_CAPTCHA_ERROR${error.code()} $errorMessage",
                     )
                 } else if (errorMessage.startsWith("FAILURE_TRANSIENT")) {
                     CaptchaFailure(
@@ -135,7 +142,7 @@ class RealCaptchaResolver @Inject constructor(
                     CaptchaFailure(
                         code = error.code(),
                         type = CriticalFailure,
-                        message = "$PREFIX_SUBMIT_CAPTCHA_ERROR$errorMessage",
+                        message = "$PREFIX_SUBMIT_CAPTCHA_ERROR${error.code()} $errorMessage",
                     )
                 }
             } else {
@@ -178,11 +185,12 @@ class RealCaptchaResolver @Inject constructor(
         }.getOrElse { error ->
             logcat { "PIR-CAPTCHA: Failure -> $error" }
             if (error is HttpException) {
-                val errorMessage = PREFIX_SOLVE_CAPTCHA_ERROR + error.message()
+                val errorMessage = adapter.parseError(error)?.message.orEmpty()
+
                 CaptchaFailure(
                     code = error.code(),
                     type = InvalidRequest,
-                    message = errorMessage,
+                    message = "$PREFIX_SOLVE_CAPTCHA_ERROR${error.code()} $errorMessage",
                 )
             } else {
                 CaptchaFailure(
