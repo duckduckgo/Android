@@ -130,7 +130,7 @@ class RealNativeBrokerActionHandler(
                 }
             }.getOrElse { error ->
                 if (error is HttpException) {
-                    val errorMessage = PREFIX_GEN_EMAIL_ERROR + (error.response()?.errorBody()?.string() ?: error.message ?: "Unknown error")
+                    val errorMessage = PREFIX_GEN_EMAIL_ERROR + error.message()
                     Failure(
                         actionId = action.actionId,
                         error = EmailError(

@@ -205,7 +205,7 @@ class JsActionSuccessEventHandler @Inject constructor(
                         actionID = currentBrokerStep.step.actions[state.currentActionIndex].id,
                         attemptId = state.attemptId,
                         durationMs = currentTimeProvider.currentTimeMillis() - state.stageStatus.stageStartMs,
-                        tries = state.actionRetryCount + 1,
+                        currentActionAttemptCount = state.actionRetryCount + 1,
                     ),
                 )
             } else if (response is FillFormResponse || response is ClickResponse) {
@@ -215,7 +215,7 @@ class JsActionSuccessEventHandler @Inject constructor(
                         actionID = currentBrokerStep.step.actions[state.currentActionIndex].id,
                         attemptId = state.attemptId,
                         durationMs = currentTimeProvider.currentTimeMillis() - state.stageStatus.stageStartMs,
-                        tries = state.actionRetryCount + 1,
+                        currentActionAttemptCount = state.actionRetryCount + 1,
                     ),
                 )
             } else if (response is ConditionResponse && response.response.actions.isEmpty()) {
@@ -225,7 +225,7 @@ class JsActionSuccessEventHandler @Inject constructor(
                         actionID = currentBrokerStep.step.actions[state.currentActionIndex].id,
                         attemptId = state.attemptId,
                         durationMs = currentTimeProvider.currentTimeMillis() - state.stageStatus.stageStartMs,
-                        tries = state.actionRetryCount + 1,
+                        currentActionAttemptCount = state.actionRetryCount + 1,
                     ),
                 )
             }

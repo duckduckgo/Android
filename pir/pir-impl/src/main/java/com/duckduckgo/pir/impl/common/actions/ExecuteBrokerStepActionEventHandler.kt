@@ -145,7 +145,7 @@ class ExecuteBrokerStepActionEventHandler @Inject constructor(
                             actionID = actionToExecute.id,
                             attemptId = state.attemptId,
                             durationMs = currentTimeProvider.currentTimeMillis() - state.stageStatus.stageStartMs,
-                            tries = state.actionRetryCount + 1,
+                            currentActionAttemptCount = state.actionRetryCount + 1,
                         ),
                     )
                     Next(
@@ -207,7 +207,7 @@ class ExecuteBrokerStepActionEventHandler @Inject constructor(
                             BrokerScanActionStarted(
                                 broker = currentBrokerStep.broker,
                                 profileQueryId = state.profileQuery.id,
-                                currentAtemptCount = state.actionRetryCount + 1, // actionRetryCount starts at 0
+                                currentActionAttemptCount = state.actionRetryCount + 1, // actionRetryCount starts at 0
                                 currentAction = actionToExecute,
                             ),
                         )
@@ -218,7 +218,7 @@ class ExecuteBrokerStepActionEventHandler @Inject constructor(
                                 actionID = currentBrokerStep.step.actions[state.currentActionIndex].id,
                                 attemptId = state.attemptId,
                                 durationMs = currentTimeProvider.currentTimeMillis() - state.stageStatus.stageStartMs,
-                                tries = state.actionRetryCount + 1,
+                                currentActionAttemptCount = state.actionRetryCount + 1,
                             ),
                         )
                     }

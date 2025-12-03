@@ -501,7 +501,7 @@ class RealPirRunStateHandlerTest {
                 parent = "",
                 attemptId = state.attemptId,
                 durationMs = testEventTimeInMillis - testStartTimeInMillis,
-                tries = 2,
+                optOutAttemptCount = 2,
                 emailPattern = state.emailPattern,
             )
         }
@@ -571,7 +571,7 @@ class RealPirRunStateHandlerTest {
                     attemptId = "c9982ded-021a-4251-9e03-2c58b130410f",
                     lastActionId = "hello82ded-021a-4251-9e03-2c58b130410f",
                     durationMs = testTotalTimeMillis,
-                    tries = 1,
+                    currentActionAttemptCount = 1,
                 )
             whenever(mockRepository.getBrokerForName(testBrokerName)).thenReturn(testBroker)
 

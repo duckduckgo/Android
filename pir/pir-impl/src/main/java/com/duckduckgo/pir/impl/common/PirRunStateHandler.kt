@@ -104,7 +104,7 @@ interface PirRunStateHandler {
         data class BrokerScanActionStarted(
             override val broker: Broker,
             val profileQueryId: Long,
-            val currentAtemptCount: Int,
+            val currentActionAttemptCount: Int,
             val currentAction: BrokerAction,
         ) : PirRunState(broker)
 
@@ -120,7 +120,7 @@ interface PirRunStateHandler {
             val attemptId: String,
             val lastActionId: String,
             val durationMs: Long,
-            val tries: Int,
+            val currentActionAttemptCount: Int,
         ) : PirRunState(broker)
 
         data class BrokerRecordEmailConfirmationStarted(
@@ -176,7 +176,7 @@ interface PirRunStateHandler {
             val actionID: String,
             val attemptId: String,
             val durationMs: Long,
-            val tries: Int,
+            val currentActionAttemptCount: Int,
         ) : PirRunState(broker)
 
         data class BrokerOptOutStageCaptchaParsed(
@@ -184,7 +184,7 @@ interface PirRunStateHandler {
             val actionID: String,
             val attemptId: String,
             val durationMs: Long,
-            val tries: Int,
+            val currentActionAttemptCount: Int,
         ) : PirRunState(broker)
 
         data class BrokerOptOutStageCaptchaSent(
@@ -192,7 +192,7 @@ interface PirRunStateHandler {
             val actionID: String,
             val attemptId: String,
             val durationMs: Long,
-            val tries: Int,
+            val currentActionAttemptCount: Int,
         ) : PirRunState(broker)
 
         data class BrokerOptOutStageCaptchaSolved(
@@ -200,7 +200,7 @@ interface PirRunStateHandler {
             val actionID: String,
             val attemptId: String,
             val durationMs: Long,
-            val tries: Int,
+            val currentActionAttemptCount: Int,
         ) : PirRunState(broker)
 
         data class BrokerOptOutStageSubmit(
@@ -208,7 +208,7 @@ interface PirRunStateHandler {
             val actionID: String,
             val attemptId: String,
             val durationMs: Long,
-            val tries: Int,
+            val currentActionAttemptCount: Int,
         ) : PirRunState(broker)
 
         data class BrokerOptOutStageValidate(
@@ -216,7 +216,7 @@ interface PirRunStateHandler {
             val actionID: String,
             val attemptId: String,
             val durationMs: Long,
-            val tries: Int,
+            val currentActionAttemptCount: Int,
         ) : PirRunState(broker)
 
         data class BrokerOptOutStageFillForm(
@@ -224,7 +224,7 @@ interface PirRunStateHandler {
             val actionID: String,
             val attemptId: String,
             val durationMs: Long,
-            val tries: Int,
+            val currentActionAttemptCount: Int,
         ) : PirRunState(broker)
 
         data class BrokerOptOutConditionFound(
@@ -232,7 +232,7 @@ interface PirRunStateHandler {
             val actionID: String,
             val attemptId: String,
             val durationMs: Long,
-            val tries: Int,
+            val currentActionAttemptCount: Int,
         ) : PirRunState(broker)
 
         data class BrokerOptOutConditionNotFound(
@@ -240,7 +240,7 @@ interface PirRunStateHandler {
             val actionID: String,
             val attemptId: String,
             val durationMs: Long,
-            val tries: Int,
+            val currentActionAttemptCount: Int,
         ) : PirRunState(broker)
 
         data class BrokerStepActionFailed(
@@ -297,21 +297,25 @@ class RealPirRunStateHandler @Inject constructor(
         }
 
     private fun handleBrokerOptOutStageSubmit(pirRunState: BrokerOptOutStageSubmit) {
-        pixelSender.reportOptOutStageStart(
+        pixelSender.reportOptOutStageSubmit(
             brokerUrl = pirRunState.broker.url,
             parentUrl = pirRunState.broker.parent.orEmpty(),
             attemptId = pirRunState.attemptId,
+            brokerVersion = pirRunState.broker.version,
+            durationMs = pirRunState.durationMs,
+            tries = pirRunState.currentActionAttemptCount,
+            actionId = pirRunState.actionID,
         )
     }
 
     private fun handleBrokerOptOutStageGenerateEmailReceived(pirRunState: BrokerOptOutStageGenerateEmailReceived) {
         pixelSender.reportOptOutStageEmailGenerate(
             brokerUrl = pirRunState.broker.url,
-            parentUrl = pirRunState.broker.parent ?: "",
+            parentUrl = pirRunState.broker.parent.orEmpty(),
             brokerVersion = pirRunState.broker.version,
             attemptId = pirRunState.attemptId,
             durationMs = pirRunState.durationMs,
-            tries = pirRunState.tries,
+            tries = pirRunState.currentActionAttemptCount,
             actionId = pirRunState.actionID,
         )
     }
@@ -319,11 +323,11 @@ class RealPirRunStateHandler @Inject constructor(
     private fun handleBrokerOptOutStageFillForm(pirRunState: BrokerOptOutStageFillForm) {
         pixelSender.reportOptOutStageFillForm(
             brokerUrl = pirRunState.broker.url,
-            parentUrl = pirRunState.broker.parent ?: "",
+            parentUrl = pirRunState.broker.parent.orEmpty(),
             brokerVersion = pirRunState.broker.version,
             attemptId = pirRunState.attemptId,
             durationMs = pirRunState.durationMs,
-            tries = pirRunState.tries,
+            tries = pirRunState.currentActionAttemptCount,
             actionId = pirRunState.actionID,
         )
     }
@@ -331,11 +335,11 @@ class RealPirRunStateHandler @Inject constructor(
     private fun handleBrokerOptOutStageCaptchaSolved(pirRunState: BrokerOptOutStageCaptchaSolved) {
         pixelSender.reportOptOutStageCaptchaSolve(
             brokerUrl = pirRunState.broker.url,
-            parentUrl = pirRunState.broker.parent ?: "",
+            parentUrl = pirRunState.broker.parent.orEmpty(),
             brokerVersion = pirRunState.broker.version,
             attemptId = pirRunState.attemptId,
             durationMs = pirRunState.durationMs,
-            tries = pirRunState.tries,
+            tries = pirRunState.currentActionAttemptCount,
             actionId = pirRunState.actionID,
         )
     }
@@ -343,11 +347,11 @@ class RealPirRunStateHandler @Inject constructor(
     private fun handleBrokerOptOutStageCaptchaSent(pirRunState: BrokerOptOutStageCaptchaSent) {
         pixelSender.reportOptOutStageCaptchaSend(
             brokerUrl = pirRunState.broker.url,
-            parentUrl = pirRunState.broker.parent ?: "",
+            parentUrl = pirRunState.broker.parent.orEmpty(),
             brokerVersion = pirRunState.broker.version,
             attemptId = pirRunState.attemptId,
             durationMs = pirRunState.durationMs,
-            tries = pirRunState.tries,
+            tries = pirRunState.currentActionAttemptCount,
             actionId = pirRunState.actionID,
         )
     }
@@ -355,11 +359,11 @@ class RealPirRunStateHandler @Inject constructor(
     private fun handleBrokerOptOutStageCaptchaParsed(pirRunState: BrokerOptOutStageCaptchaParsed) {
         pixelSender.reportOptOutStageCaptchaParse(
             brokerUrl = pirRunState.broker.url,
-            parentUrl = pirRunState.broker.parent ?: "",
+            parentUrl = pirRunState.broker.parent.orEmpty(),
             brokerVersion = pirRunState.broker.version,
             attemptId = pirRunState.attemptId,
             durationMs = pirRunState.durationMs,
-            tries = pirRunState.tries,
+            tries = pirRunState.currentActionAttemptCount,
             actionId = pirRunState.actionID,
         )
     }
@@ -367,11 +371,11 @@ class RealPirRunStateHandler @Inject constructor(
     private fun handleBrokerOptOutConditionNotFound(pirRunState: BrokerOptOutConditionNotFound) {
         pixelSender.reportOptOutConditionNotFound(
             brokerUrl = pirRunState.broker.url,
-            parentUrl = pirRunState.broker.parent ?: "",
+            parentUrl = pirRunState.broker.parent.orEmpty(),
             brokerVersion = pirRunState.broker.version,
             attemptId = pirRunState.attemptId,
             durationMs = pirRunState.durationMs,
-            tries = pirRunState.tries,
+            tries = pirRunState.currentActionAttemptCount,
             actionId = pirRunState.actionID,
         )
     }
@@ -379,11 +383,11 @@ class RealPirRunStateHandler @Inject constructor(
     private fun handleBrokerOptOutConditionFound(pirRunState: BrokerOptOutConditionFound) {
         pixelSender.reportOptOutConditionFound(
             brokerUrl = pirRunState.broker.url,
-            parentUrl = pirRunState.broker.parent ?: "",
+            parentUrl = pirRunState.broker.parent.orEmpty(),
             brokerVersion = pirRunState.broker.version,
             attemptId = pirRunState.attemptId,
             durationMs = pirRunState.durationMs,
-            tries = pirRunState.tries,
+            tries = pirRunState.currentActionAttemptCount,
             actionId = pirRunState.actionID,
         )
     }
@@ -391,11 +395,11 @@ class RealPirRunStateHandler @Inject constructor(
     private fun handleBrokerOptOutStageValidate(pirRunState: BrokerOptOutStageValidate) {
         pixelSender.reportOptOutStageValidate(
             brokerUrl = pirRunState.broker.url,
-            parentUrl = pirRunState.broker.parent ?: "",
+            parentUrl = pirRunState.broker.parent.orEmpty(),
             brokerVersion = pirRunState.broker.version,
             attemptId = pirRunState.attemptId,
             durationMs = pirRunState.durationMs,
-            tries = pirRunState.tries,
+            tries = pirRunState.currentActionAttemptCount,
             actionId = pirRunState.actionID,
         )
     }
@@ -404,8 +408,8 @@ class RealPirRunStateHandler @Inject constructor(
         pixelSender.reportScanStage(
             brokerUrl = state.broker.url,
             brokerVersion = state.broker.version,
-            tries = state.currentAtemptCount,
-            parentUrl = state.broker.parent ?: "",
+            tries = state.currentActionAttemptCount,
+            parentUrl = state.broker.parent.orEmpty(),
             actionId = state.currentAction.id,
             actionType = state.currentAction.asActionType(),
         )
@@ -432,7 +436,7 @@ class RealPirRunStateHandler @Inject constructor(
             errorCategory = state.errorCategory ?: "Unknown",
             errorDetails = state.errorDetails ?: "Unknown",
             inManualStarted = state.isManualRun,
-            parentUrl = state.broker.parent ?: "",
+            parentUrl = state.broker.parent.orEmpty(),
             actionId = state.failedAction.id,
             actionType = state.failedAction.asActionType(),
         )
@@ -460,7 +464,7 @@ class RealPirRunStateHandler @Inject constructor(
                 brokerVersion = state.broker.version,
                 durationMs = state.totalTimeMillis,
                 inManualStarted = state.isManualRun,
-                parentUrl = state.broker.parent ?: "",
+                parentUrl = state.broker.parent.orEmpty(),
                 actionId = state.lastAction.id,
                 actionType = state.lastAction.asActionType(),
             )
@@ -469,7 +473,7 @@ class RealPirRunStateHandler @Inject constructor(
                 brokerUrl = state.broker.url,
                 durationMs = state.totalTimeMillis,
                 inManualStarted = state.isManualRun,
-                parentUrl = state.broker.parent ?: "",
+                parentUrl = state.broker.parent.orEmpty(),
                 totalMatches = matchCount,
             )
         }
@@ -569,7 +573,7 @@ class RealPirRunStateHandler @Inject constructor(
             attemptId = pirRunState.attemptId,
             actionId = pirRunState.lastActionId,
             durationMs = pirRunState.durationMs,
-            tries = pirRunState.tries,
+            tries = pirRunState.currentActionAttemptCount,
         )
     }
 
@@ -629,7 +633,7 @@ class RealPirRunStateHandler @Inject constructor(
         pixelSender.reportBrokerActionFailure(
             brokerUrl = state.broker.url,
             brokerVersion = state.broker.version,
-            parentUrl = state.broker.url,
+            parentUrl = state.broker.parent.orEmpty(),
             actionId = state.actionID,
             errorMessage = state.errorMessage,
             stepType = state.stepType,
@@ -642,7 +646,7 @@ class RealPirRunStateHandler @Inject constructor(
                 completionTimeInMillis = state.completionTimeInMillis,
                 actionType = state.actionType,
                 isError = true,
-                result = "${state.actionID}: ${state.errorMessage}}",
+                result = "${state.actionID}: ${state.errorMessage}",
             )
         }
     }
@@ -651,7 +655,7 @@ class RealPirRunStateHandler @Inject constructor(
         jobRecordUpdater.markOptOutAsAttempted(state.extractedProfile.dbId)
         pixelSender.reportOptOutStageStart(
             brokerUrl = state.broker.url,
-            parentUrl = state.broker.parent ?: "",
+            parentUrl = state.broker.parent.orEmpty(),
             attemptId = state.attemptId,
         )
 
@@ -665,10 +669,10 @@ class RealPirRunStateHandler @Inject constructor(
 
         pixelSender.reportOptOutSubmitted(
             brokerUrl = state.broker.url,
-            parent = state.broker.parent ?: "",
+            parent = state.broker.parent.orEmpty(),
             attemptId = state.attemptId,
             durationMs = state.endTimeInMillis - state.startTimeInMillis,
-            tries = optOutJobRecord.attemptCount,
+            optOutAttemptCount = optOutJobRecord.attemptCount,
             emailPattern = state.emailPattern,
         )
 
@@ -686,7 +690,7 @@ class RealPirRunStateHandler @Inject constructor(
 
         pixelSender.reportOptOutFailed(
             brokerUrl = state.broker.url,
-            parent = state.broker.parent ?: "",
+            parent = state.broker.parent.orEmpty(),
             brokerJsonVersion = state.broker.version,
             attemptId = state.attemptId,
             durationMs = state.endTimeInMillis - state.startTimeInMillis,

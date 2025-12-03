@@ -40,6 +40,7 @@ import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.PirStageStatus
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.State
 import com.duckduckgo.pir.impl.pixels.PirStage
+import com.duckduckgo.pir.impl.scripts.models.BrokerAction
 import com.duckduckgo.pir.impl.scripts.models.getCategory
 import com.duckduckgo.pir.impl.scripts.models.getDetails
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -71,7 +72,7 @@ class BrokerStepCompletedEventHandler @Inject constructor(
                     attemptId = state.attemptId,
                     lastActionId = currentBrokerStep.step.actions[state.currentActionIndex].id,
                     durationMs = currentTimeProvider.currentTimeMillis() - state.stageStatus.stageStartMs,
-                    tries = state.actionRetryCount + 1,
+                    currentActionAttemptCount = state.actionRetryCount + 1,
                 ),
             )
         } else {
@@ -111,8 +112,7 @@ class BrokerStepCompletedEventHandler @Inject constructor(
             RunType.MANUAL, SCHEDULED -> {
                 val isManual = state.runType == RunType.MANUAL
                 if (isSuccess) {
-                    // If success, it means we reached currentBrokerStepIndex == currentBrokerStep.step.actions.size, so last action would be -1.
-                    val lastAction = currentBrokerStep.step.actions[state.currentActionIndex - 1]
+                    val lastAction = currentBrokerStep.step.actions.getLastActionForSuccess(state.currentActionIndex)
 
                     pirRunStateHandler.handleState(
                         BrokerScanSuccess(
@@ -126,8 +126,7 @@ class BrokerStepCompletedEventHandler @Inject constructor(
                         ),
                     )
                 } else {
-                    // Whatever last action that was executed is the last action that failed.
-                    val lastAction = currentBrokerStep.step.actions[state.currentActionIndex]
+                    val lastAction = currentBrokerStep.step.actions.getLastActionForFailure(state.currentActionIndex)
                     val failure = stepStatus as Failure
 
                     pirRunStateHandler.handleState(
@@ -149,13 +148,15 @@ class BrokerStepCompletedEventHandler @Inject constructor(
             RunType.OPTOUT -> {
                 val currentOptOutStep = currentBrokerStep as OptOutStep
                 if (isSuccess) {
+                    val lastAction = currentBrokerStep.step.actions.getLastActionForSuccess(state.currentActionIndex)
+
                     pirRunStateHandler.handleState(
                         BrokerOptOutStageValidate(
                             broker = currentBrokerStep.broker,
-                            actionID = currentBrokerStep.step.actions[state.currentActionIndex].id,
+                            actionID = lastAction.id,
                             attemptId = state.attemptId,
                             durationMs = currentTimeProvider.currentTimeMillis() - state.stageStatus.stageStartMs,
-                            tries = state.actionRetryCount + 1,
+                            currentActionAttemptCount = state.actionRetryCount + 1,
                         ),
                     )
                     pirRunStateHandler.handleState(
@@ -169,8 +170,7 @@ class BrokerStepCompletedEventHandler @Inject constructor(
                         ),
                     )
                 } else {
-                    // Whatever last action that was executed is the last action that failed.
-                    val lastAction = currentBrokerStep.step.actions[state.currentActionIndex]
+                    val lastAction = currentBrokerStep.step.actions.getLastActionForFailure(state.currentActionIndex)
 
                     pirRunStateHandler.handleState(
                         BrokerRecordOptOutFailed(
@@ -193,11 +193,10 @@ class BrokerStepCompletedEventHandler @Inject constructor(
                     BrokerRecordEmailConfirmationCompleted(
                         broker = currentBrokerStep.broker,
                         isSuccess = isSuccess,
-                        // Success means we finished all steps and reaching here means that index has been incremented. If error, we don't increment.
                         lastActionId = if (isSuccess) {
-                            currentOptOutStep.step.actions[state.currentActionIndex - 1]
+                            currentOptOutStep.step.actions.getLastActionForSuccess(state.currentActionIndex)
                         } else {
-                            currentOptOutStep.step.actions[state.currentActionIndex]
+                            currentOptOutStep.step.actions.getLastActionForFailure(state.currentActionIndex)
                         }.id,
                         totalTimeMillis = totalTimeMillis,
                         extractedProfileId = currentBrokerStep.emailConfirmationJob.extractedProfileId,
@@ -209,5 +208,15 @@ class BrokerStepCompletedEventHandler @Inject constructor(
                 // No op
             }
         }
+    }
+
+    private fun List<BrokerAction>.getLastActionForSuccess(currentActionIndex: Int): BrokerAction {
+        // If success, it means we reached currentBrokerStepIndex == currentBrokerStep.step.actions.size, so last action would be -1.
+        return this[currentActionIndex - 1]
+    }
+
+    private fun List<BrokerAction>.getLastActionForFailure(currentActionIndex: Int): BrokerAction {
+        // Whatever last action that was executed is the last action that failed.
+        return this[currentActionIndex]
     }
 }

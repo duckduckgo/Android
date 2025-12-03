@@ -129,7 +129,7 @@ interface PirPixelSender {
      * @param parent The parent data broker of the one this opt-out attempt targets
      * @param attemptId - Client-generated ID of the opt-out attempt
      * @param durationMs - Total duration of the opt-out attempt in milliseconds
-     * @param tries - The number of tries it took to submit successfully.
+     * @param optOutAttemptCount - The number of tries it took to submit successfully.
      * @param emailPattern - Email pattern used during submission, when available else null.
      */
     fun reportOptOutSubmitted(
@@ -137,7 +137,7 @@ interface PirPixelSender {
         parent: String,
         attemptId: String,
         durationMs: Long,
-        tries: Int,
+        optOutAttemptCount: Int,
         emailPattern: String?,
     )
 
@@ -634,7 +634,7 @@ class RealPirPixelSender @Inject constructor(
         parent: String,
         attemptId: String,
         durationMs: Long,
-        tries: Int,
+        optOutAttemptCount: Int,
         emailPattern: String?,
     ) {
         val params = mapOf(
@@ -642,7 +642,7 @@ class RealPirPixelSender @Inject constructor(
             PARAM_KEY_PARENT to parent,
             PARAM_ATTEMPT_ID to attemptId,
             PARAM_DURATION to durationMs.toString(),
-            PARAM_TRIES to tries.toString(),
+            PARAM_TRIES to optOutAttemptCount.toString(),
             PARAM_KEY_PATTERN to (emailPattern ?: ""),
         )
         fire(PIR_OPTOUT_SUBMIT_SUCCESS, params)

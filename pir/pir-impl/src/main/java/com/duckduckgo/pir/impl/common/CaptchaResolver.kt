@@ -118,24 +118,24 @@ class RealCaptchaResolver @Inject constructor(
             }
         }.getOrElse { error ->
             if (error is HttpException) {
-                val errorMessage = PREFIX_SUBMIT_CAPTCHA_ERROR + (error.response()?.errorBody()?.string() ?: error.message ?: "Unknown error")
+                val errorMessage = error.message()
                 if (errorMessage.startsWith("INVALID_REQUEST")) {
                     CaptchaFailure(
                         code = error.code(),
                         type = InvalidRequest,
-                        message = errorMessage,
+                        message = "$PREFIX_SUBMIT_CAPTCHA_ERROR$errorMessage",
                     )
                 } else if (errorMessage.startsWith("FAILURE_TRANSIENT")) {
                     CaptchaFailure(
                         code = error.code(),
                         type = TransientFailure,
-                        message = errorMessage,
+                        message = "$PREFIX_SUBMIT_CAPTCHA_ERROR$errorMessage",
                     )
                 } else {
                     CaptchaFailure(
                         code = error.code(),
                         type = CriticalFailure,
-                        message = errorMessage,
+                        message = "$PREFIX_SUBMIT_CAPTCHA_ERROR$errorMessage",
                     )
                 }
             } else {
@@ -178,7 +178,7 @@ class RealCaptchaResolver @Inject constructor(
         }.getOrElse { error ->
             logcat { "PIR-CAPTCHA: Failure -> $error" }
             if (error is HttpException) {
-                val errorMessage = PREFIX_SOLVE_CAPTCHA_ERROR + (error.response()?.errorBody()?.string() ?: error.message ?: "Unknown error")
+                val errorMessage = PREFIX_SOLVE_CAPTCHA_ERROR + error.message()
                 CaptchaFailure(
                     code = error.code(),
                     type = InvalidRequest,
