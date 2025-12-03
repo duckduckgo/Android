@@ -1,0 +1,87 @@
+{
+  "version": 1,
+  "messages": [
+    {
+      "id": "8274589c-8aeb-4322-a737-3852911569e3",
+      "content": {
+        "messageType": "big_single_action",
+        "titleText": "title",
+        "descriptionText": "description",
+        "placeholder": "Announce",
+        "primaryActionText": "Ok",
+        "primaryAction": {
+          "type": "url",
+          "value": "https://duckduckgo.com"
+        }
+      },
+      "translations": {
+        "es": {
+          "titleText": "Titulo",
+          "descriptionText": "Descripción."
+        },
+        "ru": {
+          "titleText": "Добавить закладку",
+          "descriptionText": "Введите поисковый запрос или адрес сайта"
+        },
+        "en-US": {
+          "titleText": "title",
+          "descriptionText": "description"
+        }
+      }
+    },
+    {
+      "id": "whats_new_october_2025",
+      "surfaces": [
+        "modal"
+      ],
+      "content": {
+        "messageType": "cards_list",
+        "titleText": "What's New",
+        "placeholder": "DDGAnnounce",
+        "descriptionText": "Some description.",
+        "listItems": [
+          {
+            "id": "hide_search_images",
+            "type": "two_line_list_item",
+            "titleText": "Hide AI Images in Search",
+            "descriptionText": "Easily hide AI images in your search results with the \"AI images\" search filter.",
+            "placeholder": "ImageAI",
+            "primaryAction": {
+              "type": "url_in_context",
+              "value": "https://duckduckgo.com/duckduckgo-help-pages/results/how-to-filter-out-ai-images-in-duckduckgo-search-results"
+            }
+          },
+          {
+            "id": "enhanced_scam_blocker",
+            "type": "two_line_list_item",
+            "titleText": "Enhanced Scam Blocker",
+            "descriptionText": "Browse confidently with protection against even more sneaky online threats.",
+            "placeholder": "Radar",
+            "primaryAction": {
+              "type": "url_in_context",
+              "value": "https://spreadprivacy.com/scam-blocker/"
+            }
+          },
+          {
+            "id": "import_passwords",
+            "type": "two_line_list_item",
+            "titleText": "Simpler Password Management",
+            "descriptionText": "Use DuckDuckGo to manage passwords on apps and sites across your whole device.",
+            "placeholder": "KeyImport",
+            "primaryAction": {
+              "type": "defaultCredentialProvider",
+              "value": ""
+            }
+          }
+        ],
+        "primaryActionText": "Got It",
+        "primaryAction": {
+          "type": "dismiss",
+          "value": ""
+        }
+      }
+    }
+  ],
+  "rules": [
+  ]
+}
