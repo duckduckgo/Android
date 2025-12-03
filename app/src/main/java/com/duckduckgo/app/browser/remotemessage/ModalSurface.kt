@@ -30,6 +30,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
 import com.duckduckgo.remote.messaging.api.Surface
+import com.duckduckgo.remote.messaging.impl.RemoteMessagingFeatureToggles
 import com.duckduckgo.remote.messaging.impl.ui.ModalSurfaceActivityFromMessageId
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -59,6 +60,7 @@ class ModalSurfaceImpl @Inject constructor(
     private val globalActivityStarter: GlobalActivityStarter,
     private val dispatchers: DispatcherProvider,
     private val applicationContext: Context,
+    private val remoteMessagingFeatureToggles: RemoteMessagingFeatureToggles,
 ) : ModalSurface, MainProcessLifecycleObserver {
 
     override fun onResume(owner: LifecycleOwner) {
@@ -70,9 +72,14 @@ class ModalSurfaceImpl @Inject constructor(
 
     private suspend fun evaluate() {
         withContext(dispatchers.io()) {
+            if (!remoteMessagingFeatureToggles.self().isEnabled() || !remoteMessagingFeatureToggles.remoteMessageModalSurface().isEnabled()) {
+                return@withContext
+            }
+
             if (!isHomeOnboardingComplete()) {
                 return@withContext
             }
+
             // TODO ANA: This is now called all the time. Update!
             val message = remoteMessagingRepository.message() ?: return@withContext
             if (message.surfaces.contains(Surface.MODAL)) {

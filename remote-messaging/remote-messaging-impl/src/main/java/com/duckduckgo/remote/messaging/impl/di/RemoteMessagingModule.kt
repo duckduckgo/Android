@@ -112,8 +112,9 @@ object DataSourceModule {
         matchingAttributeMappers: DaggerSet<JsonToMatchingAttributeMapper>,
         actionMappers: DaggerSet<MessageActionMapperPlugin>,
         appBuildConfig: AppBuildConfig,
+        remoteMessagingFeatureToggles: RemoteMessagingFeatureToggles,
     ): RemoteMessagingConfigJsonMapper {
-        return RemoteMessagingConfigJsonMapper(appBuildConfig, matchingAttributeMappers, actionMappers)
+        return RemoteMessagingConfigJsonMapper(appBuildConfig, matchingAttributeMappers, actionMappers, remoteMessagingFeatureToggles)
     }
 
     @Provides
