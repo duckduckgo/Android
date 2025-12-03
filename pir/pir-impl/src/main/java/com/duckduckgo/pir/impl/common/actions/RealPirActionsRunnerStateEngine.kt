@@ -22,9 +22,11 @@ import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep
 import com.duckduckgo.pir.impl.common.PirJob.RunType
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event
+import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.PirStageStatus
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.SideEffect
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.State
 import com.duckduckgo.pir.impl.models.ProfileQuery
+import com.duckduckgo.pir.impl.pixels.PirStage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
@@ -45,6 +47,10 @@ class RealPirActionsRunnerStateEngine(
         runType = runType,
         brokerStepsToExecute = brokerSteps,
         profileQuery = profileQuery,
+        stageStatus = PirStageStatus(
+            currentStage = PirStage.OTHER,
+            stageStartMs = 0L,
+        ),
     )
     private val sideEffectFlow = MutableSharedFlow<SideEffect>(
         replay = 1,
@@ -85,6 +91,10 @@ class RealPirActionsRunnerStateEngine(
         logcat { "PIR-ENGINE($this): Event resulted to state: ${next.nextState}" }
         logcat { "PIR-ENGINE($this): Event resulted to event: ${next.nextEvent}" }
         logcat { "PIR-ENGINE($this): Event resulted to sideeffect: ${next.sideEffect}" }
+
+        if (engineState.stageStatus != next.nextState.stageStatus) {
+            logcat { "PIR-STAGE($this): ${next.nextState.stageStatus}" }
+        }
         engineState = next.nextState
 
         next.sideEffect?.let {

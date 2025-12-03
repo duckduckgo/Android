@@ -19,74 +19,57 @@ package com.duckduckgo.pir.impl.pixels
 enum class PirStage(val stageName: String) {
     /**
      *
-     * Start of an opt-out job execution, after verifying all dependencies
+     * Stage starts: at the beginning of an opt-out job execution, after verifying all dependencies
      */
     START("start"),
 
     /**
-     * Stage before querying dbp-api v0 for a generated email.
+     * Stage starts: before we query the dbp-api v0 for a generated email.
      */
     EMAIL_GENERATE("email-generate"),
 
     /**
-     * Stage where we start the getCaptchaInfo action
+     * Stage starts: when we receive the getCaptchaInfo action
      */
     CAPTCHA_PARSE("captcha-parse"),
 
     /**
-     * Stage after captcha info is parsed and  before it's submitted to the captcha service
+     * Stage starts: after captcha info is parsed and  before it's submitted to the captcha service
      */
     CAPTCHA_SEND("captcha-send"),
 
     /**
-     * Stage during the solveCaptcha action and just before submitting the captcha to be solved
+     * Stage starts: once we have received the transaction id and before we start polling the captcha service for solution
      */
     CAPTCHA_SOLVE("captcha-solve"),
 
     /**
-     * Stage can be set in two places:
-     *  (1) at the start of the expectation action
-     *  (2) right before executing the emailConfirmation action (prior to email decoupling flow changes)
+     * Stage starts: when we receive an expectation action
      */
     SUBMIT("submit"),
 
     /**
-     * Stage after halting opt-out jobs at email confirmation step.
+     * Stage starts: after halting opt-out jobs at email confirmation step.
      */
     EMAIL_CONFIRM_HALTED("email-confirm-halted"),
 
     /**
-     * Stage when email confirmation job resumes, after verifying all dependencies.
+     * Stage starts: when email confirmation job resumes, after verifying all dependencies.
      */
     EMAIL_CONFIRM_DECOUPLED("email-confirm-decoupled"),
 
     /**
-     * Stage when finalizing an opt-out job, after it has been submitted and right before submitting a dbp_optout_process_submit-success pixel.
+     * Stage starts: when finalizing an opt-out job, after it has been submitted and right before submitting a dbp_optout_process_submit-success pixel.
      */
     VALIDATE("validate"),
+
+    /**
+     * Stage starts: when we receive a Click or FillForm action.
+     */
+    FILL_FORM("fill-form"),
 
     /**
      * Catch-all stage
      */
     OTHER("other"),
-
-    /**
-     * Stage at the start of the click and fillForm actions.
-     */
-    FILL_FORM("fill-form"),
-
-    /**
-     * Stage when the opt-out's condition action meets its expectation.
-     */
-    CONDITION_FOUND("condition-found"),
-
-    /**
-     *
-     * Stage when either:
-     *  (1) the opt-out's condition action completes with no follow-up actions or
-     *  (2) when it doesn't meet its expectation, continuing with regular action execution.
-     */
-    CONDITION_NOT_FOUND("condition-not-found"),
-
-    NOT_STARTED("not-started"),
 }

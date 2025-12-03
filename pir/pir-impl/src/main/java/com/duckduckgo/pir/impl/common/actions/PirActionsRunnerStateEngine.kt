@@ -20,6 +20,7 @@ import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep
 import com.duckduckgo.pir.impl.common.PirJob.RunType
 import com.duckduckgo.pir.impl.models.ExtractedProfile
 import com.duckduckgo.pir.impl.models.ProfileQuery
+import com.duckduckgo.pir.impl.pixels.PirStage
 import com.duckduckgo.pir.impl.scripts.models.BrokerAction
 import com.duckduckgo.pir.impl.scripts.models.PirError
 import com.duckduckgo.pir.impl.scripts.models.PirScriptRequestData
@@ -54,7 +55,13 @@ interface PirActionsRunnerStateEngine {
         val pendingUrl: String? = null,
         val actionRetryCount: Int = 0,
         val generatedEmailData: GeneratedEmailData? = null,
-        val attemptId: String? = null,
+        val attemptId: String = "",
+        val stageStatus: PirStageStatus,
+    )
+
+    data class PirStageStatus(
+        val currentStage: PirStage,
+        val stageStartMs: Long,
     )
 
     /**
@@ -73,10 +80,6 @@ interface PirActionsRunnerStateEngine {
             val url: String,
         ) : Event()
 
-        data class EmailFailed(
-            val error: PirError.EmailError,
-        ) : Event()
-
         data class EmailReceived(
             val generatedEmailData: GeneratedEmailData,
         ) : Event()
@@ -89,24 +92,27 @@ interface PirActionsRunnerStateEngine {
 
         data class BrokerStepCompleted(
             val needsEmailConfirmation: Boolean,
-            val isSuccess: Boolean,
-        ) : Event()
+            val stepStatus: StepStatus,
+        ) : Event() {
+            sealed class StepStatus {
+                data object Success : StepStatus()
+                data class Failure(
+                    val error: PirError,
+                ) : StepStatus()
+            }
+        }
 
-        data class JsErrorReceived(
-            val error: PirError.JsError,
+        data class ErrorReceived(
+            val error: PirError,
         ) : Event()
 
         data class JsActionSuccess(
             val pirSuccessResponse: PirSuccessResponse,
         ) : Event()
 
-        data class JsActionFailed(
-            val error: PirError.ActionFailed,
+        data class BrokerActionFailed(
+            val error: PirError,
             val allowRetry: Boolean,
-        ) : Event()
-
-        data class CaptchaServiceFailed(
-            val error: PirError.CaptchaServiceError,
         ) : Event()
 
         data class RetryAwaitCaptchaSolution(

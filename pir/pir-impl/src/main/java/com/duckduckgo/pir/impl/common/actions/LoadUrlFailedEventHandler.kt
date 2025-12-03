@@ -21,9 +21,11 @@ import com.duckduckgo.pir.impl.common.PirJobConstants.RECOVERY_URL
 import com.duckduckgo.pir.impl.common.actions.EventHandler.Next
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.BrokerStepCompleted
+import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.BrokerStepCompleted.StepStatus.Failure
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.LoadUrlFailed
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.SideEffect.LoadUrl
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.State
+import com.duckduckgo.pir.impl.scripts.models.PirError
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import kotlin.reflect.KClass
@@ -55,7 +57,12 @@ class LoadUrlFailedEventHandler @Inject constructor() : EventHandler {
                 state.copy(
                     pendingUrl = null,
                 ),
-                nextEvent = BrokerStepCompleted(needsEmailConfirmation = false, isSuccess = false),
+                nextEvent = BrokerStepCompleted(
+                    needsEmailConfirmation = false,
+                    stepStatus = Failure(
+                        error = PirError.UnableToLoadBrokerUrl,
+                    ),
+                ),
             )
         }
 

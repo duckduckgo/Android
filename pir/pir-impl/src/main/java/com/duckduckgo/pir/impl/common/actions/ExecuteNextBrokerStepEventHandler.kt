@@ -32,8 +32,10 @@ import com.duckduckgo.pir.impl.common.actions.EventHandler.Next
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.ExecuteBrokerStepAction
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.ExecuteNextBrokerStep
+import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.PirStageStatus
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.SideEffect.CompleteExecution
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.State
+import com.duckduckgo.pir.impl.pixels.PirStage
 import com.duckduckgo.pir.impl.scripts.models.PirScriptRequestData.UserProfile
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
@@ -68,6 +70,18 @@ class ExecuteNextBrokerStepEventHandler @Inject constructor(
             )
         } else {
             // Entry point of execution for a Broker
+            val nextStage = if (state.brokerStepsToExecute[state.currentBrokerStepIndex] is EmailConfirmationStep) {
+                PirStageStatus(
+                    currentStage = PirStage.EMAIL_CONFIRM_DECOUPLED,
+                    stageStartMs = currentTimeProvider.currentTimeMillis(),
+                )
+            } else {
+                PirStageStatus(
+                    currentStage = PirStage.START,
+                    stageStartMs = currentTimeProvider.currentTimeMillis(),
+                )
+            }
+
             emitBrokerStartPixel(state)
 
             Next(
@@ -76,6 +90,7 @@ class ExecuteNextBrokerStepEventHandler @Inject constructor(
                     currentActionIndex = 0,
                     brokerStepStartTime = currentTimeProvider.currentTimeMillis(),
                     actionRetryCount = 0,
+                    stageStatus = nextStage,
                 ),
                 nextEvent =
                 ExecuteBrokerStepAction(
@@ -90,7 +105,6 @@ class ExecuteNextBrokerStepEventHandler @Inject constructor(
     private suspend fun emitBrokerStartPixel(state: State) {
         val runType = state.runType
         val currentBrokerStep = state.brokerStepsToExecute[state.currentBrokerStepIndex]
-        val brokerName = currentBrokerStep.broker.name
 
         when (runType) {
             MANUAL, SCHEDULED -> {
@@ -107,7 +121,8 @@ class ExecuteNextBrokerStepEventHandler @Inject constructor(
                 pirRunStateHandler.handleState(
                     BrokerRecordOptOutStarted(
                         broker = currentBrokerStep.broker,
-                        (currentBrokerStep as OptOutStep).profileToOptOut,
+                        extractedProfile = (currentBrokerStep as OptOutStep).profileToOptOut,
+                        attemptId = state.attemptId,
                     ),
                 )
             }
