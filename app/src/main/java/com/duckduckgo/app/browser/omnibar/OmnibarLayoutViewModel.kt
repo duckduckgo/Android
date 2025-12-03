@@ -236,7 +236,11 @@ class OmnibarLayoutViewModel @Inject constructor(
 
     sealed class Command {
         data object CancelAnimations : Command()
-        data class StartTrackersAnimation(val entities: List<Entity>?, val isCustomTab: Boolean) : Command()
+        data class StartTrackersAnimation(
+            val entities: List<Entity>?,
+            val isCustomTab: Boolean,
+        ) : Command()
+
         data class StartCookiesAnimation(val isCosmetic: Boolean) : Command()
         data object MoveCaretToFront : Command()
         data class LaunchInputScreen(val query: String) : Command()
@@ -388,7 +392,12 @@ class OmnibarLayoutViewModel @Inject constructor(
                 it.copy(
                     hasFocus = false,
                     expanded = false,
-                    leadingIconState = getLeadingIconState(false, it.url, currentLogoUrl),
+                    leadingIconState = getLeadingIconState(
+                        _viewState.value.viewMode,
+                        false,
+                        it.url,
+                        currentLogoUrl,
+                    ),
                     previousLeadingIconState = null,
                     highlightFireButton = HighlightableButton.Visible(highlighted = false),
                     showClearButton = false,
@@ -430,11 +439,12 @@ class OmnibarLayoutViewModel @Inject constructor(
     }
 
     private fun getLeadingIconState(
+        viewMode: ViewMode,
         hasFocus: Boolean,
         url: String,
         logoUrl: String?,
     ): LeadingIconState {
-        return when (_viewState.value.viewMode) {
+        return when (viewMode) {
             Error, SSLWarning, MaliciousSiteWarning -> Globe
             NewTab -> Search
             else -> {
@@ -545,6 +555,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                         it.copy(
                             viewMode = viewMode,
                             leadingIconState = getLeadingIconState(
+                                viewMode = viewMode,
                                 hasFocus = hasFocus,
                                 url = _viewState.value.url,
                                 logoUrl = null,
@@ -767,12 +778,14 @@ class OmnibarLayoutViewModel @Inject constructor(
                         ),
                         leadingIconState = when (omnibarViewState.serpLogo) {
                             is SerpLogo.EasterEgg -> getLeadingIconState(
+                                viewMode = _viewState.value.viewMode,
                                 hasFocus = omnibarViewState.isEditing,
                                 url = _viewState.value.url,
                                 logoUrl = omnibarViewState.serpLogo.logoUrl,
                             )
 
                             SerpLogo.Normal, null -> getLeadingIconState(
+                                viewMode = _viewState.value.viewMode,
                                 hasFocus = omnibarViewState.isEditing,
                                 url = _viewState.value.url,
                                 logoUrl = null,
@@ -835,7 +848,12 @@ class OmnibarLayoutViewModel @Inject constructor(
                 url = loadingState.url,
                 isLoading = loadingState.isLoading,
                 loadingProgress = loadingState.progress,
-                leadingIconState = getLeadingIconState(it.hasFocus, loadingState.url, currentLogoUrl),
+                leadingIconState = getLeadingIconState(
+                    viewMode = _viewState.value.viewMode,
+                    hasFocus = it.hasFocus,
+                    url = loadingState.url,
+                    logoUrl = currentLogoUrl,
+                ),
                 showVoiceSearch = shouldShowVoiceSearch(
                     viewMode = _viewState.value.viewMode,
                     hasFocus = _viewState.value.hasFocus,
