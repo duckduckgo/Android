@@ -16,6 +16,8 @@
 
 package com.duckduckgo.duckchat.impl.inputscreen.wideevents
 
+import android.annotation.SuppressLint
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.wideevents.FlowStatus
 import com.duckduckgo.app.statistics.wideevents.WideEventClient
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -24,6 +26,8 @@ import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.Lazy
 import dagger.SingleInstanceIn
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -31,17 +35,17 @@ interface InputScreenOnboardingWideEvent {
     /**
      * Called when the user enables the Input Screen during onboarding
      */
-    suspend fun onInputScreenEnabledDuringOnboarding()
+    fun onInputScreenEnabledDuringOnboarding()
 
     /**
      * Called when the user enables the Input Screen in AI Features settings before the Input Screen is shown to the user.
      */
-    suspend fun onInputScreenSettingEnabledBeforeInputScreenShown()
+    fun onInputScreenSettingEnabledBeforeInputScreenShown()
 
     /**
      * Called when the Input Screen is shown to the user
      */
-    suspend fun onInputScreenShown()
+    fun onInputScreenShown()
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -50,41 +54,55 @@ class InputScreenOnboardingWideEventImpl @Inject constructor(
     private val wideEventClient: WideEventClient,
     private val duckChatFeature: Lazy<DuckChatFeature>,
     private val dispatchers: DispatcherProvider,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : InputScreenOnboardingWideEvent {
+
+    // This is to ensure modifications of the wide event are serialized
+    @SuppressLint("AvoidComputationUsage")
+    private val coroutineScope = CoroutineScope(
+        context = appCoroutineScope.coroutineContext +
+            dispatchers.computation().limitedParallelism(1),
+    )
 
     private var cachedFlowId: Long? = null
 
-    override suspend fun onInputScreenEnabledDuringOnboarding() {
-        if (!isFeatureEnabled()) return
+    override fun onInputScreenEnabledDuringOnboarding() {
+        coroutineScope.launch {
+            if (!isFeatureEnabled()) return@launch
 
-        cachedFlowId = wideEventClient
-            .flowStart(
-                name = INPUT_SCREEN_ONBOARDING_FEATURE_NAME,
-                flowEntryPoint = "onboarding",
+            cachedFlowId = wideEventClient
+                .flowStart(
+                    name = INPUT_SCREEN_ONBOARDING_FEATURE_NAME,
+                    flowEntryPoint = "onboarding",
+                )
+                .getOrNull()
+        }
+    }
+
+    override fun onInputScreenSettingEnabledBeforeInputScreenShown() {
+        coroutineScope.launch {
+            if (!isFeatureEnabled()) return@launch
+            val currentFlowId = getCurrentWideEventId() ?: return@launch
+
+            wideEventClient.flowFinish(
+                wideEventId = currentFlowId,
+                status = FlowStatus.Cancelled,
             )
-            .getOrNull()
+            cachedFlowId = null
+        }
     }
 
-    override suspend fun onInputScreenSettingEnabledBeforeInputScreenShown() {
-        if (!isFeatureEnabled()) return
-        val currentFlowId = getCurrentWideEventId() ?: return
+    override fun onInputScreenShown() {
+        coroutineScope.launch {
+            if (!isFeatureEnabled()) return@launch
+            val wideEventId = getCurrentWideEventId() ?: return@launch
 
-        wideEventClient.flowFinish(
-            wideEventId = currentFlowId,
-            status = FlowStatus.Cancelled,
-        )
-        cachedFlowId = null
-    }
-
-    override suspend fun onInputScreenShown() {
-        if (!isFeatureEnabled()) return
-        val wideEventId = getCurrentWideEventId() ?: return
-
-        wideEventClient.flowFinish(
-            wideEventId = wideEventId,
-            status = FlowStatus.Success,
-        )
-        cachedFlowId = null
+            wideEventClient.flowFinish(
+                wideEventId = wideEventId,
+                status = FlowStatus.Success,
+            )
+            cachedFlowId = null
+        }
     }
 
     private suspend fun isFeatureEnabled(): Boolean = withContext(dispatchers.io()) {

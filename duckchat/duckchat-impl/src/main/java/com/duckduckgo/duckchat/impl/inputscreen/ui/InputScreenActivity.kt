@@ -21,7 +21,6 @@ import android.os.Build.VERSION
 import android.os.Bundle
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.di.scopes.ActivityScope
@@ -31,8 +30,6 @@ import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.inputscreen.ui.metrics.discovery.InputScreenDiscoveryFunnel
 import com.duckduckgo.duckchat.impl.inputscreen.wideevents.InputScreenOnboardingWideEvent
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
@@ -53,10 +50,6 @@ class InputScreenActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var inputScreenOnboardingWideEvent: InputScreenOnboardingWideEvent
 
-    @Inject
-    @AppCoroutineScope
-    lateinit var appCoroutineScope: CoroutineScope
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_input_screen)
@@ -71,9 +64,7 @@ class InputScreenActivity : DuckDuckGoActivity() {
                     },
             )
         pixel.fire(pixel = DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_TEXT_AREA_FOCUSED, parameters = params)
-        appCoroutineScope.launch {
-            inputScreenOnboardingWideEvent.onInputScreenShown()
-        }
+        inputScreenOnboardingWideEvent.onInputScreenShown()
     }
 
     override fun finish() {
