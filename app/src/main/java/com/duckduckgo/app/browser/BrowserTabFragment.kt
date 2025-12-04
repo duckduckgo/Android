@@ -614,6 +614,7 @@ class BrowserTabFragment :
     private lateinit var popupMenu: BrowserMenu
     private lateinit var ctaBottomSheet: PromoBottomSheetDialog
     private lateinit var widgetBottomSheetDialog: AlternativeHomeScreenWidgetBottomSheetDialog
+    private val widgetBottomSheetDialogJob: ConflatedJob = ConflatedJob()
 
     private lateinit var autoCompleteSuggestionsAdapter: BrowserAutoCompleteSuggestionsAdapter
 
@@ -4085,6 +4086,7 @@ class BrowserTabFragment :
         dismissAppLinkSnackBar()
         supervisorJob.cancel()
         if (::popupMenu.isInitialized) popupMenu.dismiss()
+        widgetBottomSheetDialogJob?.cancel()
         loginDetectionDialog?.dismiss()
         automaticFireproofDialog?.dismiss()
         browserAutofill.removeJsInterface()
@@ -4358,6 +4360,7 @@ class BrowserTabFragment :
         const val KEYBOARD_DELAY = 200L
         private const val NAVIGATION_DELAY = 100L
         private const val POPUP_MENU_DELAY = 200L
+        private const val WIDGET_PROMPT_DELAY = 200L
 
         private const val REQUEST_CODE_CHOOSE_FILE = 100
         private const val PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE = 200
@@ -4849,10 +4852,13 @@ class BrowserTabFragment :
         }
 
         private fun showBottomSheetCta(configuration: HomePanelCta) {
-            if (configuration is AddWidgetAutoOnboardingExperiment) {
-                showAlternativeHomeWidgetPrompt(configuration)
-            } else {
-                showHomeCta(configuration)
+            widgetBottomSheetDialogJob += viewLifecycleOwner.lifecycleScope.launch {
+                delay(WIDGET_PROMPT_DELAY)
+                if (configuration is AddWidgetAutoOnboardingExperiment) {
+                    showAlternativeHomeWidgetPrompt(configuration)
+                } else {
+                    showHomeCta(configuration)
+                }
             }
         }
 
