@@ -310,6 +310,7 @@ class BrowserMenu(
 
         newTabMenuItem.isVisible = true
         duckChatMenuItem.isVisible = viewState.showDuckChatOption
+        duckNewChatMenuItem.isVisible = viewState.showNewDuckChatTabOption
         sharePageMenuItem.isVisible = viewState.canSharePage
 
         defaultBrowserMenuItem.isVisible = viewState.showSelectDefaultBrowserMenuItem

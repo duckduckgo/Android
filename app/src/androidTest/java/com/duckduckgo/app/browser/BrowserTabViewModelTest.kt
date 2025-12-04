@@ -8318,7 +8318,7 @@ class BrowserTabViewModelTest {
         )
         whenever(mockDuckChatJSHelper.onNativeAction(NativeAction.NEW_CHAT)).thenReturn(expectedEvent)
 
-        testee.openNewDuckChat()
+        testee.openNewDuckChat(omnibar.viewMode)
 
         testee.subscriptionEventDataFlow.test {
             val emittedEvent = awaitItem()
