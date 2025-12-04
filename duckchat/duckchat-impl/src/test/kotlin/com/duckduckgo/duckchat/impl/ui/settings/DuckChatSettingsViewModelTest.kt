@@ -589,6 +589,7 @@ class DuckChatSettingsViewModelTest {
     @Test
     fun `duck full screen mode - when flags disabled, then emit disabled`() =
         runTest {
+            @Suppress("DenyListedApi")
             duckChatFeature.fullscreenModeToggle().setRawStoredState(State(enable = false))
             whenever(duckChat.isDuckChatFullScreenModeFeatureAvailable()).thenReturn(false)
             testee = DuckChatSettingsViewModel(
@@ -610,6 +611,7 @@ class DuckChatSettingsViewModelTest {
     @Test
     fun `duck full screen mode - when toggle flag disabled and feature flag enabled, then emit disabled`() =
         runTest {
+            @Suppress("DenyListedApi")
             duckChatFeature.fullscreenModeToggle().setRawStoredState(State(enable = false))
             whenever(duckChat.isDuckChatFullScreenModeFeatureAvailable()).thenReturn(true)
             testee = DuckChatSettingsViewModel(
@@ -631,6 +633,7 @@ class DuckChatSettingsViewModelTest {
     @Test
     fun `duck full screen mode - when toggle flag enabled and feature flag disabled, then emit disabled`() =
         runTest {
+            @Suppress("DenyListedApi")
             duckChatFeature.fullscreenModeToggle().setRawStoredState(State(enable = true))
             whenever(duckChat.isDuckChatFullScreenModeFeatureAvailable()).thenReturn(false)
             testee = DuckChatSettingsViewModel(
@@ -652,6 +655,7 @@ class DuckChatSettingsViewModelTest {
     @Test
     fun `duck full screen mode - when both flags enabled then emit enabled`() =
         runTest {
+            @Suppress("DenyListedApi")
             duckChatFeature.fullscreenModeToggle().setRawStoredState(State(enable = true))
             whenever(duckChat.isDuckChatFullScreenModeFeatureAvailable()).thenReturn(true)
             testee = DuckChatSettingsViewModel(
