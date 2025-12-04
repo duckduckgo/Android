@@ -43,6 +43,7 @@
     <string name="browserMenuRunningInDDG">Redare în DuckDuckGo</string>
     <string name="browserMenuSetAsDefaultBrowser">Setare ca browser implicit</string>
     <string name="browserMenuNewChat">Chat nou</string>
+    <string name="browserMenuNewAIChat">Chat AI nou</string>
     <string name="browserMenuChatHistory">Istoricul chaturilor</string>
     <string name="browserMenuChatSettings">Setări Duck.ai</string>
     <string name="browserMenuVPN">VPN</string>

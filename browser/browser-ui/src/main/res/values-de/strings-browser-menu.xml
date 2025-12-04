@@ -43,6 +43,7 @@
     <string name="browserMenuRunningInDDG">Laufen in DuckDuckGo</string>
     <string name="browserMenuSetAsDefaultBrowser">Als Standard-Browser festlegen</string>
     <string name="browserMenuNewChat">Neuer Chat</string>
+    <string name="browserMenuNewAIChat">Neuer AI Chat</string>
     <string name="browserMenuChatHistory">Chatverlauf</string>
     <string name="browserMenuChatSettings">Duck.ai-Einstellungen</string>
     <string name="browserMenuVPN">VPN</string>

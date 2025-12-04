@@ -43,6 +43,7 @@
     <string name="browserMenuRunningInDDG">DuckDuckGo-s käivitamine</string>
     <string name="browserMenuSetAsDefaultBrowser">Määrake vaikebrauseriks</string>
     <string name="browserMenuNewChat">Uus vestlus</string>
+    <string name="browserMenuNewAIChat">Uus AI vestlus</string>
     <string name="browserMenuChatHistory">Vestluse ajalugu</string>
     <string name="browserMenuChatSettings">Duck.ai seaded</string>
     <string name="browserMenuVPN">VPN</string>
