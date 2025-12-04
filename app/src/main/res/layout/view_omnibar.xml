@@ -45,7 +45,7 @@
                 android:layout_marginStart="@dimen/keyline_3"
                 android:layout_marginTop="@dimen/omnibarCardMarginTop"
                 android:layout_marginBottom="@dimen/omnibarCardMarginBottom"
-                android:background="?attr/selectableItemBackgroundBorderless"
+                android:background="@drawable/selectable_item_rounded_corner_background"
                 android:contentDescription="@string/browserMenuChatHistory"
                 android:padding="@dimen/keyline_1"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -216,7 +216,7 @@
                             <LinearLayout
                                 android:id="@+id/duckAIHeader"
                                 android:layout_width="0dp"
-                                android:layout_height="wrap_content"
+                                android:layout_height="match_parent"
                                 android:orientation="horizontal"
                                 android:gravity="center"
                                 android:background="?daxColorWindow"

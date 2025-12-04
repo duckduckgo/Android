@@ -750,6 +750,12 @@ class OmnibarLayout @JvmOverloads constructor(
         }
     }
 
+    private fun renderOmnibarText(viewState: ViewState) {
+        if (viewState.updateOmnibarText) {
+            omnibarTextInput.setText(viewState.omnibarText)
+        }
+    }
+
     private fun renderLeadingIconState(viewState: ViewState) {
         when (val leadingIconState = viewState.leadingIconState) {
             OmnibarLayoutViewModel.LeadingIconState.Search -> {
@@ -882,9 +888,7 @@ class OmnibarLayout @JvmOverloads constructor(
 
     private fun renderBrowserMode(viewState: ViewState) {
         renderOutline(viewState.hasFocus)
-        if (viewState.updateOmnibarText) {
-            omnibarTextInput.setText(viewState.omnibarText)
-        }
+        renderOmnibarText(viewState)
         if (viewState.expanded) {
             setExpanded(true, viewState.expandedAnimated)
         }
@@ -911,6 +915,7 @@ class OmnibarLayout @JvmOverloads constructor(
     private fun renderDuckAiMode(viewState: ViewState) {
         logcat { "Omnibar: renderDuckAiMode $viewState" }
         renderTabIcon(viewState)
+        renderOmnibarText(viewState)
         pageLoadingIndicator.isVisible = viewState.isLoading
         voiceSearchButton.isVisible = viewState.showVoiceSearch
     }

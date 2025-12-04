@@ -1027,10 +1027,19 @@ class BrowserTabFragment :
     private fun DuckDuckGoWebView.ensureVisible() =
         postDelayed(100) {
             if (swipingTabsFeature.isEnabled) {
-                scrollBy(0, 1)
-                scrollBy(0, -1)
+                wiggle()
+            }
+            if (omnibar.viewMode == ViewMode.DuckAI) {
+                wiggle()
+                requestLayout()
             }
         }
+
+    // This is a hack to make sure the WebView content is always rendered when the fragment is resumed
+    private fun DuckDuckGoWebView.wiggle() {
+        scrollBy(0, 1)
+        scrollBy(0, -1)
+    }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
