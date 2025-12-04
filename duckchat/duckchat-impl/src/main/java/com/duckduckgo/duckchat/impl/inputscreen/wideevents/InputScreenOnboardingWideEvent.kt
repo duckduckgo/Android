@@ -18,6 +18,7 @@ package com.duckduckgo.duckchat.impl.inputscreen.wideevents
 
 import android.annotation.SuppressLint
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.statistics.wideevents.CleanupPolicy
 import com.duckduckgo.app.statistics.wideevents.FlowStatus
 import com.duckduckgo.app.statistics.wideevents.WideEventClient
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -26,6 +27,7 @@ import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.Lazy
 import dagger.SingleInstanceIn
+import java.time.Duration
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -74,6 +76,10 @@ class InputScreenOnboardingWideEventImpl @Inject constructor(
                 .flowStart(
                     name = INPUT_SCREEN_ONBOARDING_FEATURE_NAME,
                     flowEntryPoint = "onboarding",
+                    cleanupPolicy = CleanupPolicy.OnTimeout(
+                        duration = Duration.ofDays(30),
+                        flowStatus = FlowStatus.Unknown,
+                    ),
                 )
                 .getOrNull()
         }
