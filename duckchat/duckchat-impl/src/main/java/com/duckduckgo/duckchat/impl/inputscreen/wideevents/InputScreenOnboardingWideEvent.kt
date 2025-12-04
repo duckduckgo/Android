@@ -27,10 +27,10 @@ import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.Lazy
 import dagger.SingleInstanceIn
-import java.time.Duration
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.time.Duration
 import javax.inject.Inject
 
 interface InputScreenOnboardingWideEvent {

@@ -27,6 +27,7 @@ import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.inputscreen.wideevents.InputScreenOnboardingWideEvent
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.filter
@@ -54,10 +55,17 @@ class OnboardingInputScreenSelectionObserver @Inject constructor(
     }
 
     private fun observeInputScreenSetting() {
-        duckChat.observeInputScreenUserSettingEnabled()
+        combine(
+            duckChat.observeCosmeticInputScreenUserSettingEnabled(),
+            duckChat.observeInputScreenUserSettingEnabled(),
+        ) { isCosmeticallyEnabled, isInputScreenEnabled ->
+            isCosmeticallyEnabled to isInputScreenEnabled
+        }
             .distinctUntilChanged()
             .drop(1)
-            .onEach {
+            .onEach { (isInputScreenCosmeticallyEnabled, isInputScreenEnabled) ->
+                if (isInputScreenCosmeticallyEnabled != isInputScreenEnabled) return@onEach
+
                 if (userStageStore.getUserAppStage() != AppStage.ESTABLISHED && onboardingStore.getInputScreenSelection() != null) {
                     onboardingStore.setInputScreenSelectionOverriddenByUser()
                     inputScreenOnboardingWideEvent.onInputScreenSettingEnabledBeforeInputScreenShown()

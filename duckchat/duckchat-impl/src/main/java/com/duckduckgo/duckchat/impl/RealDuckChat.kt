@@ -121,12 +121,6 @@ interface DuckChatInternal : DuckChat {
     fun observeShowInVoiceSearchUserSetting(): Flow<Boolean>
 
     /**
-     * Observes the cosmetic value for the input screen user setting.
-     * Returns null if the cosmetic value has not been set before.
-     */
-    fun observeCosmeticInputScreenUserSettingEnabled(): Flow<Boolean?>
-
-    /**
      * Opens DuckChat settings.
      */
     fun openDuckChatSettings()
