@@ -70,7 +70,7 @@ interface DuckChatDataStore {
 
     fun observeInputScreenUserSettingEnabled(): Flow<Boolean>
 
-    fun observeCosmeticInputScreenUserSettingEnabled(): Flow<Boolean>
+    fun observeCosmeticInputScreenUserSettingEnabled(): Flow<Boolean?>
 
     suspend fun isCosmeticInputScreenUserSettingEnabled(): Boolean
 
@@ -162,11 +162,11 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
             .distinctUntilChanged()
             .stateIn(appCoroutineScope, SharingStarted.Eagerly, false)
 
-    private val cosmeticInputScreenUserSettingEnabled: StateFlow<Boolean> =
+    private val cosmeticInputScreenUserSettingEnabled: StateFlow<Boolean?> =
         store.data
-            .map { prefs -> prefs[DUCK_AI_INPUT_SCREEN_COSMETIC_SETTING] ?: false }
+            .map { prefs -> prefs[DUCK_AI_INPUT_SCREEN_COSMETIC_SETTING] }
             .distinctUntilChanged()
-            .stateIn(appCoroutineScope, SharingStarted.Eagerly, false)
+            .stateIn(appCoroutineScope, SharingStarted.Eagerly, null)
 
     private val duckChatShowInBrowserMenu: StateFlow<Boolean> =
         store.data
@@ -221,7 +221,7 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
 
     override fun observeInputScreenUserSettingEnabled(): Flow<Boolean> = inputScreenUserSettingEnabled
 
-    override fun observeCosmeticInputScreenUserSettingEnabled(): Flow<Boolean> = cosmeticInputScreenUserSettingEnabled
+    override fun observeCosmeticInputScreenUserSettingEnabled(): Flow<Boolean?> = cosmeticInputScreenUserSettingEnabled
 
     override fun observeShowInBrowserMenu(): Flow<Boolean> = duckChatShowInBrowserMenu
 

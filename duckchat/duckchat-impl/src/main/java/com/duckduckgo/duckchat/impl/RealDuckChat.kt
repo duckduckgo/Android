@@ -122,8 +122,9 @@ interface DuckChatInternal : DuckChat {
 
     /**
      * Observes the cosmetic value for the input screen user setting.
+     * Returns null if the cosmetic value has not been set before.
      */
-    fun observeCosmeticInputScreenUserSettingEnabled(): Flow<Boolean>
+    fun observeCosmeticInputScreenUserSettingEnabled(): Flow<Boolean?>
 
     /**
      * Opens DuckChat settings.
@@ -393,7 +394,7 @@ class RealDuckChat @Inject constructor(
 
     override fun observeInputScreenUserSettingEnabled(): Flow<Boolean> = duckChatFeatureRepository.observeInputScreenUserSettingEnabled()
 
-    override fun observeCosmeticInputScreenUserSettingEnabled(): Flow<Boolean> =
+    override fun observeCosmeticInputScreenUserSettingEnabled(): Flow<Boolean?> =
         duckChatFeatureRepository.observeCosmeticInputScreenUserSettingEnabled()
 
     override fun observeShowInBrowserMenuUserSetting(): Flow<Boolean> = duckChatFeatureRepository.observeShowInBrowserMenu()
