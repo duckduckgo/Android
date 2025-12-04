@@ -17,5 +17,6 @@
 <resources>
 
     <string name="tabSwitcherContentDescription">Tabs</string>
+    <string name="browserMenuNewAIChat">New AI Chat</string>
 
 </resources>
