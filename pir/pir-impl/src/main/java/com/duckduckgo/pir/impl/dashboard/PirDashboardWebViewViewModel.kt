@@ -16,6 +16,7 @@
 
 package com.duckduckgo.pir.impl.dashboard
 
+import android.annotation.SuppressLint
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
@@ -31,6 +32,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import org.json.JSONObject
 import javax.inject.Inject
 
+@SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
 @ContributesViewModel(ActivityScope::class)
 class PirDashboardWebViewViewModel @Inject constructor(
     private val pirPixelSender: PirPixelSender,
