@@ -587,28 +587,9 @@ class DuckChatSettingsViewModelTest {
         }
 
     @Test
-    fun `duck full screen mode - when flag enabled, then emit enabled`() =
+    fun `duck full screen mode - when flags disabled, then emit disabled`() =
         runTest {
-            whenever(duckChat.isDuckChatFullScreenModeFeatureAvailable()).thenReturn(true)
-            testee = DuckChatSettingsViewModel(
-                duckChatActivityParams = DuckChatSettingsNoParams,
-                duckChat = duckChat,
-                pixel = mockPixel,
-                inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
-                settingsPageFeature = settingsPageFeature,
-                dispatcherProvider = coroutineRule.testDispatcherProvider,
-                duckChatFeature = duckChatFeature,
-            )
-
-            testee.viewState.test {
-                val state = awaitItem()
-                assertTrue(state.shouldShowFullScreenModeToggle)
-            }
-        }
-
-    @Test
-    fun `duck full screen mode - when flag disabled, then emit enabled`() =
-        runTest {
+            duckChatFeature.fullscreenModeToggle().setRawStoredState(State(enable = false))
             whenever(duckChat.isDuckChatFullScreenModeFeatureAvailable()).thenReturn(false)
             testee = DuckChatSettingsViewModel(
                 duckChatActivityParams = DuckChatSettingsNoParams,
@@ -623,6 +604,69 @@ class DuckChatSettingsViewModelTest {
             testee.viewState.test {
                 val state = awaitItem()
                 assertFalse(state.shouldShowFullScreenModeToggle)
+            }
+        }
+
+    @Test
+    fun `duck full screen mode - when toggle flag disabled and feature flag enabled, then emit disabled`() =
+        runTest {
+            duckChatFeature.fullscreenModeToggle().setRawStoredState(State(enable = false))
+            whenever(duckChat.isDuckChatFullScreenModeFeatureAvailable()).thenReturn(true)
+            testee = DuckChatSettingsViewModel(
+                duckChatActivityParams = DuckChatSettingsNoParams,
+                duckChat = duckChat,
+                pixel = mockPixel,
+                inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
+                settingsPageFeature = settingsPageFeature,
+                dispatcherProvider = coroutineRule.testDispatcherProvider,
+                duckChatFeature = duckChatFeature,
+            )
+
+            testee.viewState.test {
+                val state = awaitItem()
+                assertFalse(state.shouldShowFullScreenModeToggle)
+            }
+        }
+
+    @Test
+    fun `duck full screen mode - when toggle flag enabled and feature flag disabled, then emit disabled`() =
+        runTest {
+            duckChatFeature.fullscreenModeToggle().setRawStoredState(State(enable = true))
+            whenever(duckChat.isDuckChatFullScreenModeFeatureAvailable()).thenReturn(false)
+            testee = DuckChatSettingsViewModel(
+                duckChatActivityParams = DuckChatSettingsNoParams,
+                duckChat = duckChat,
+                pixel = mockPixel,
+                inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
+                settingsPageFeature = settingsPageFeature,
+                dispatcherProvider = coroutineRule.testDispatcherProvider,
+                duckChatFeature = duckChatFeature,
+            )
+
+            testee.viewState.test {
+                val state = awaitItem()
+                assertFalse(state.shouldShowFullScreenModeToggle)
+            }
+        }
+
+    @Test
+    fun `duck full screen mode - when both flags enabled then emit enabled`() =
+        runTest {
+            duckChatFeature.fullscreenModeToggle().setRawStoredState(State(enable = true))
+            whenever(duckChat.isDuckChatFullScreenModeFeatureAvailable()).thenReturn(true)
+            testee = DuckChatSettingsViewModel(
+                duckChatActivityParams = DuckChatSettingsNoParams,
+                duckChat = duckChat,
+                pixel = mockPixel,
+                inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
+                settingsPageFeature = settingsPageFeature,
+                dispatcherProvider = coroutineRule.testDispatcherProvider,
+                duckChatFeature = duckChatFeature,
+            )
+
+            testee.viewState.test {
+                val state = awaitItem()
+                assertTrue(state.shouldShowFullScreenModeToggle)
             }
         }
 
