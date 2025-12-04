@@ -16,6 +16,7 @@
 
 package com.duckduckgo.remote.messaging.impl
 
+import android.annotation.SuppressLint
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
@@ -47,6 +48,7 @@ import org.mockito.kotlin.whenever
 import java.io.BufferedReader
 import java.util.Locale.US
 
+@SuppressLint("DenyListedApi")
 class RemoteMessagingConfigJsonMapperTest {
 
     @get:Rule
