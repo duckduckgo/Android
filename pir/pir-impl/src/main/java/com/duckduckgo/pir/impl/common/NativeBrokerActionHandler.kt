@@ -41,8 +41,11 @@ import com.duckduckgo.pir.impl.scripts.models.PirError.CaptchaSolutionFailed
 import com.duckduckgo.pir.impl.scripts.models.PirError.ClientError
 import com.duckduckgo.pir.impl.scripts.models.PirError.EmailError
 import com.duckduckgo.pir.impl.service.DbpService.CaptchaSolutionMeta
+import com.duckduckgo.pir.impl.service.ResponseError
+import com.duckduckgo.pir.impl.service.parseError
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.pir.impl.store.PirRepository.GeneratedEmailData
+import com.squareup.moshi.Moshi
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
 
@@ -110,7 +113,10 @@ class RealNativeBrokerActionHandler(
     private val repository: PirRepository,
     private val dispatcherProvider: DispatcherProvider,
     private val captchaResolver: CaptchaResolver,
+    val moshi: Moshi,
 ) : NativeBrokerActionHandler {
+    private val adapter = moshi.adapter(ResponseError::class.java)
+
     override suspend fun pushAction(nativeAction: NativeAction): NativeActionResult =
         withContext(dispatcherProvider.io()) {
             when (nativeAction) {
@@ -130,7 +136,8 @@ class RealNativeBrokerActionHandler(
                 }
             }.getOrElse { error ->
                 if (error is HttpException) {
-                    val errorMessage = PREFIX_GEN_EMAIL_ERROR + error.message()
+                    val errorMessage = "$PREFIX_GEN_EMAIL_ERROR${error.code()} ${adapter.parseError(error)?.message.orEmpty()}"
+
                     Failure(
                         actionId = action.actionId,
                         error = EmailError(

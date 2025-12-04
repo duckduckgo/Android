@@ -101,12 +101,14 @@ class PirModule {
         repository: PirRepository,
         dispatcherProvider: DispatcherProvider,
         captchaResolver: CaptchaResolver,
+        moshi: Moshi,
     ): NativeBrokerActionHandler {
         // Creates a new instance everytime is NativeBrokerActionHandler injected
         return RealNativeBrokerActionHandler(
             repository,
             dispatcherProvider,
             captchaResolver,
+            moshi,
         )
     }
 
