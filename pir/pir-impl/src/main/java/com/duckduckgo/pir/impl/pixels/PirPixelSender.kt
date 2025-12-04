@@ -28,6 +28,7 @@ import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BROKER_CUSTOM_STATS_42DAY_UNC
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BROKER_CUSTOM_STATS_7DAY_CONFIRMED_OPTOUT
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BROKER_CUSTOM_STATS_7DAY_UNCONFIRMED_OPTOUT
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BROKER_CUSTOM_STATS_OPTOUT_SUBMIT_SUCCESSRATE
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_DASHBOARD_OPENED
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_DOWNLOAD_MAINCONFIG_BE_FAILURE
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_DOWNLOAD_MAINCONFIG_FAILURE
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_EMAIL_CONFIRMATION_ATTEMPT_FAILED
@@ -584,6 +585,8 @@ interface PirPixelSender {
         errorMessage: String,
         stepType: String,
     )
+
+    fun reportDashboardOpened()
 }
 
 @ContributesBinding(AppScope::class)
@@ -1354,6 +1357,10 @@ class RealPirPixelSender @Inject constructor(
         )
 
         fire(PIR_BROKER_ACTION_FAILED, params)
+    }
+
+    override fun reportDashboardOpened() {
+        fire(PIR_DASHBOARD_OPENED)
     }
 
     private fun fire(

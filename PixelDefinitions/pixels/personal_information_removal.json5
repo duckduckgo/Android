@@ -1104,5 +1104,12 @@
                 "type": "string"
             }
         ]
+    },
+    "pir_webui_dashboard_opened": {
+        "description": "Android specific pixel which is fired when the PIR dashboard is opened",
+        "owners": ["karlenDimla", "landomen"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
     }
 }
