@@ -233,12 +233,9 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
 
     override suspend fun isDuckChatUserEnabled(): Boolean = store.data.firstOrNull()?.let { it[DUCK_CHAT_USER_ENABLED] } ?: true
 
-    override suspend fun isInputScreenUserSettingEnabled(): Boolean {
-        val prefs = store.data.firstOrNull() ?: return false
-        val actualValue = prefs[DUCK_AI_INPUT_SCREEN_USER_SETTING] ?: false
-        val cosmeticValue = prefs[DUCK_AI_INPUT_SCREEN_COSMETIC_SETTING] ?: false
-        return actualValue || cosmeticValue
-    }
+    override suspend fun isInputScreenUserSettingEnabled(): Boolean = store.data.firstOrNull()?.let {
+        it[DUCK_AI_INPUT_SCREEN_USER_SETTING]
+    } ?: false
 
     override suspend fun isCosmeticInputScreenUserSettingEnabled(): Boolean = store.data.firstOrNull()?.let {
         it[DUCK_AI_INPUT_SCREEN_COSMETIC_SETTING]
