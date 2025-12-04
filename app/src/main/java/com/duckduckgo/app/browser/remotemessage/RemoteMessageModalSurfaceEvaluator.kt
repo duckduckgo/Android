@@ -40,7 +40,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-interface ModalSurface
+interface RemoteMessageModalSurfaceEvaluator
 
 @ContributesMultibinding(
     scope = AppScope::class,
@@ -48,10 +48,10 @@ interface ModalSurface
 )
 @ContributesBinding(
     scope = AppScope::class,
-    boundType = ModalSurface::class,
+    boundType = RemoteMessageModalSurfaceEvaluator::class,
 )
 @SingleInstanceIn(scope = AppScope::class)
-class ModalSurfaceImpl @Inject constructor(
+class RemoteMessageModalSurfaceEvaluatorImpl @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val remoteMessagingRepository: RemoteMessagingRepository,
     private val dismissedCtaDao: DismissedCtaDao,
@@ -61,7 +61,7 @@ class ModalSurfaceImpl @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val applicationContext: Context,
     private val remoteMessagingFeatureToggles: RemoteMessagingFeatureToggles,
-) : ModalSurface, MainProcessLifecycleObserver {
+) : RemoteMessageModalSurfaceEvaluator, MainProcessLifecycleObserver {
 
     override fun onResume(owner: LifecycleOwner) {
         super.onResume(owner)
