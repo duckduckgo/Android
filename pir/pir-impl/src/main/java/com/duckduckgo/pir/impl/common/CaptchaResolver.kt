@@ -136,7 +136,7 @@ class RealCaptchaResolver @Inject constructor(
                     CaptchaFailure(
                         code = error.code(),
                         type = TransientFailure,
-                        message = "$PREFIX_SUBMIT_CAPTCHA_ERROR$errorMessage",
+                        message = "$PREFIX_SUBMIT_CAPTCHA_ERROR${error.code()} $errorMessage",
                     )
                 } else {
                     CaptchaFailure(
