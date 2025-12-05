@@ -62,6 +62,7 @@ object BrowserMenuViewStateFactory {
             showDuckChatOption = browserViewState.showDuckChatOption,
             vpnMenuState = browserViewState.vpnMenuState,
             showAutofill = browserViewState.showAutofill,
+            canGoForward = browserViewState.canGoForward,
         )
     }
 

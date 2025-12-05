@@ -430,10 +430,10 @@ class BrowserMenu(
         showCommonItems()
 
         backMenuItem.isEnabled = false
-        forwardMenuItem.isEnabled = false
         refreshMenuItem.isEnabled = false
-
         newTabMenuItem.isVisible = true
+
+        forwardMenuItem.isEnabled = viewState.canGoForward
         duckChatMenuItem.isVisible = viewState.showDuckChatOption
         autofillMenuItem.isVisible = viewState.showAutofill
 
