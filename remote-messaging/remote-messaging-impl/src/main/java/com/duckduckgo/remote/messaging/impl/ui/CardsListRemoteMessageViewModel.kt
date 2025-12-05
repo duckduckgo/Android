@@ -98,7 +98,7 @@ class CardsListRemoteMessageViewModel @Inject constructor(
             val customParams = mapOf(
                 PARAM_NAME_DISMISS_TYPE to PARAM_VALUE_CLOSE_BUTTON,
             )
-            cardsListPixelHelper.dismissCardsListMessage(message, customParams)
+            cardsListPixelHelper.dismissCardsListMessage(message.id, customParams)
         }
     }
 
