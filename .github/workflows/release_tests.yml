@@ -12,6 +12,32 @@ on:
         required: true
         default: 'releaseTest'
 
+  workflow_call:
+    inputs:
+      app-version:
+        description: 'App Version for Release'
+        required: true
+        type: string
+      test-tag:
+        description: 'Maestro Tests tag to include'
+        required: true
+        default: 'releaseTest'
+        type: string
+      secrets:
+        ASANA_ACCESS_TOKEN:
+          required: false
+        FAKE_RELEASE_PROPERTIES:
+          required: true
+        FAKE_RELEASE_KEY:
+          required: true
+        MM_AUTH_TOKEN:
+          required: true
+        MM_TEAM_ID:
+          required: true
+        ROBIN_API_KEY:
+          required: true
+
+
 env:
   ASANA_PAT: ${{ secrets.ASANA_ACCESS_TOKEN }}
   emoji_info: ":information_source:" # ℹ️
