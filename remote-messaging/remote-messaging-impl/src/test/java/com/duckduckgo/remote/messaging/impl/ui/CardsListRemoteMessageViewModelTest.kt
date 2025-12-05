@@ -265,7 +265,7 @@ class CardsListRemoteMessageViewModelTest {
             cancelAndIgnoreRemainingEvents()
         }
 
-        verify(cardsListPixelHelper).dismissCardsListMessage(eq(message), any())
+        verify(cardsListPixelHelper).dismissCardsListMessage(eq(messageId), any())
     }
 
     @Test

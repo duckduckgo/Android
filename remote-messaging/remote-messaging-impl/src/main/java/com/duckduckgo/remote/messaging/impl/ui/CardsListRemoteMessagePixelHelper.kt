@@ -22,6 +22,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.remote.messaging.api.CardItem
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
+import com.duckduckgo.remote.messaging.impl.pixels.RemoteMessagingPixelName
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -53,17 +54,16 @@ interface CardsListRemoteMessagePixelHelper {
      * This should be used instead of the generic RemoteMessageModel.onMessageDismissed()
      * for CardsList messages to include CardsList-specific parameters.
      *
-     * @param remoteMessage The remote message to dismiss
+     * @param remoteMessageId The id of the remote message to dismiss
      * @param customParams Additional parameters for the dismiss pixel (e.g. dismissType)
      */
-    suspend fun dismissCardsListMessage(remoteMessage: RemoteMessage, customParams: Map<String, String> = emptyMap())
+    suspend fun dismissCardsListMessage(remoteMessageId: String, customParams: Map<String, String> = emptyMap())
 }
 
 @ContributesBinding(AppScope::class)
 class RealCardsListRemoteMessagePixelHelper @Inject constructor(
     private val pixel: Pixel,
     private val remoteMessagingRepository: RemoteMessagingRepository,
-    private val dispatchers: DispatcherProvider,
 ) : CardsListRemoteMessagePixelHelper {
 
     override fun fireCardItemShownPixel(remoteMessage: RemoteMessage, cardItem: CardItem) {
@@ -89,22 +89,18 @@ class RealCardsListRemoteMessagePixelHelper @Inject constructor(
     }
 
     override suspend fun dismissCardsListMessage(
-        remoteMessage: RemoteMessage,
+        remoteMessageId: String,
         customParams: Map<String, String>,
     ) {
         val pixelParams = buildMap {
-            put(PARAM_NAME_MESSAGE_ID, remoteMessage.id)
+            put(PARAM_NAME_MESSAGE_ID, remoteMessageId)
             putAll(customParams)
         }
         pixel.fire(
-            pixel = CardsListRemoteMessagePixelName.REMOTE_MESSAGE_CARD_DISMISSED,
+            pixel = RemoteMessagingPixelName.REMOTE_MESSAGE_DISMISSED,
             parameters = pixelParams,
         )
-
-        // Dismiss from repository
-        withContext(dispatchers.io()) {
-            remoteMessagingRepository.dismissMessage(remoteMessage.id)
-        }
+        remoteMessagingRepository.dismissMessage(remoteMessageId)
     }
 
     companion object {
@@ -122,5 +118,4 @@ class RealCardsListRemoteMessagePixelHelper @Inject constructor(
 enum class CardsListRemoteMessagePixelName(override val pixelName: String) : Pixel.PixelName {
     REMOTE_MESSAGE_CARD_SHOWN("m_remote_message_card_shown"),
     REMOTE_MESSAGE_CARD_CLICKED("m_remote_message_card_clicked"),
-    REMOTE_MESSAGE_CARD_DISMISSED("m_remote_message_card_dismissed"),
 }

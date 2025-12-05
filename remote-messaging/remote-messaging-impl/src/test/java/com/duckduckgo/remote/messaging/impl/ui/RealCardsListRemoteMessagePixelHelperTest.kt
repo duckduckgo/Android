@@ -25,6 +25,7 @@ import com.duckduckgo.remote.messaging.api.Content
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
 import com.duckduckgo.remote.messaging.api.Surface
+import com.duckduckgo.remote.messaging.impl.pixels.RemoteMessagingPixelName
 import com.duckduckgo.remote.messaging.impl.ui.RealCardsListRemoteMessagePixelHelper.Companion.PARAM_NAME_DISMISS_TYPE
 import com.duckduckgo.remote.messaging.impl.ui.RealCardsListRemoteMessagePixelHelper.Companion.PARAM_VALUE_CLOSE_BUTTON
 import kotlinx.coroutines.test.runTest
@@ -74,7 +75,6 @@ class RealCardsListRemoteMessagePixelHelperTest {
         pixelHelper = RealCardsListRemoteMessagePixelHelper(
             pixel = pixel,
             remoteMessagingRepository = remoteMessagingRepository,
-            dispatchers = coroutineTestRule.testDispatcherProvider,
         )
     }
 
@@ -114,14 +114,14 @@ class RealCardsListRemoteMessagePixelHelperTest {
 
     @Test
     fun whenDismissCardsListMessageWithNoCustomParamsThenPixelFiredAndMessageDismissed() = runTest {
-        pixelHelper.dismissCardsListMessage(testRemoteMessage)
+        pixelHelper.dismissCardsListMessage(testRemoteMessage.id)
 
         val expectedParams = mapOf(
             "message" to "test-message-123",
         )
 
         verify(pixel).fire(
-            pixel = eq(CardsListRemoteMessagePixelName.REMOTE_MESSAGE_CARD_DISMISSED),
+            pixel = eq(RemoteMessagingPixelName.REMOTE_MESSAGE_DISMISSED),
             parameters = eq(expectedParams),
             encodedParameters = any(),
             type = any(),
@@ -136,7 +136,7 @@ class RealCardsListRemoteMessagePixelHelperTest {
             PARAM_NAME_DISMISS_TYPE to PARAM_VALUE_CLOSE_BUTTON,
         )
 
-        pixelHelper.dismissCardsListMessage(testRemoteMessage, customParams)
+        pixelHelper.dismissCardsListMessage(testRemoteMessage.id, customParams)
 
         val expectedParams = mapOf(
             "message" to "test-message-123",
@@ -144,7 +144,7 @@ class RealCardsListRemoteMessagePixelHelperTest {
         )
 
         verify(pixel).fire(
-            pixel = eq(CardsListRemoteMessagePixelName.REMOTE_MESSAGE_CARD_DISMISSED),
+            pixel = eq(RemoteMessagingPixelName.REMOTE_MESSAGE_DISMISSED),
             parameters = eq(expectedParams),
             encodedParameters = any(),
             type = any(),
@@ -161,7 +161,7 @@ class RealCardsListRemoteMessagePixelHelperTest {
             "extraParam2" to "value2",
         )
 
-        pixelHelper.dismissCardsListMessage(testRemoteMessage, customParams)
+        pixelHelper.dismissCardsListMessage(testRemoteMessage.id, customParams)
 
         val expectedParams = mapOf(
             "message" to "test-message-123",
@@ -171,7 +171,7 @@ class RealCardsListRemoteMessagePixelHelperTest {
         )
 
         verify(pixel).fire(
-            pixel = eq(CardsListRemoteMessagePixelName.REMOTE_MESSAGE_CARD_DISMISSED),
+            pixel = eq(RemoteMessagingPixelName.REMOTE_MESSAGE_DISMISSED),
             parameters = eq(expectedParams),
             encodedParameters = any(),
             type = any(),
