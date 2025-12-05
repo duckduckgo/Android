@@ -30,6 +30,8 @@ import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -66,104 +68,98 @@ class VpnEnableWideEventImpl @Inject constructor(
             dispatchers.computation().limitedParallelism(1),
     )
 
+    private val mutex = Mutex()
+
     private var wideEventId: Long? = null
 
     override fun onUserRequestedVpnStart(entryPoint: VpnEnableWideEvent.EntryPoint) {
         coroutineScope.launch {
-            if (!isFeatureEnabled()) return@launch
+            mutex.withLock {
+                if (!isFeatureEnabled()) return@launch
 
-            wideEventId?.let { id ->
-                wideEventClient.flowFinish(wideEventId = id, status = FlowStatus.Unknown)
-                wideEventId = null
+                wideEventId?.let { id ->
+                    wideEventClient.flowFinish(wideEventId = id, status = FlowStatus.Unknown)
+                    wideEventId = null
+                }
+
+                wideEventId = wideEventClient
+                    .flowStart(
+                        name = VPN_ENABLE_FEATURE_NAME,
+                        metadata = mapOf(
+                            KEY_SUBSCRIPTION_STATUS to runCatching { subscriptions.getSubscriptionStatus().statusName }.getOrDefault(""),
+                            KEY_IS_FIRST_SETUP to runCatching { networkProtectionState.isOnboarded().not().toString() }.getOrDefault(""),
+                        ),
+                        flowEntryPoint = entryPoint.asString(),
+                        cleanupPolicy = CleanupPolicy.OnProcessStart(ignoreIfIntervalTimeoutPresent = false),
+                    )
+                    .getOrNull()
             }
-
-            wideEventId = wideEventClient
-                .flowStart(
-                    name = VPN_ENABLE_FEATURE_NAME,
-                    metadata = mapOf(
-                        KEY_SUBSCRIPTION_STATUS to runCatching { subscriptions.getSubscriptionStatus().statusName }.getOrDefault(""),
-                        KEY_IS_FIRST_SETUP to runCatching { networkProtectionState.isOnboarded().not().toString() }.getOrDefault(""),
-                    ),
-                    flowEntryPoint = entryPoint.asString(),
-                    cleanupPolicy = CleanupPolicy.OnProcessStart(ignoreIfIntervalTimeoutPresent = false),
-                )
-                .getOrNull()
         }
     }
 
     override fun onVpnConflictDialogShown() {
-        coroutineScope.launch {
-            if (!isFeatureEnabled()) return@launch
-
-            wideEventId?.let { id ->
-                wideEventClient.flowStep(
-                    wideEventId = id,
-                    stepName = STEP_SHOW_VPN_CONFLICT_DIALOG,
-                )
-            }
+        updateWideEventAsync { eventId ->
+            wideEventClient.flowStep(
+                wideEventId = eventId,
+                stepName = STEP_SHOW_VPN_CONFLICT_DIALOG,
+            )
         }
     }
 
     override fun onVpnConflictDialogCancel() {
-        coroutineScope.launch {
-            if (!isFeatureEnabled()) return@launch
-
-            wideEventId?.let { id ->
-                wideEventClient.flowFinish(
-                    wideEventId = id,
-                    status = FlowStatus.Cancelled,
-                    metadata = mapOf(
-                        KEY_CANCELLATION_REASON to CANCELLATION_REASON_VPN_CONFLICT,
-                    ),
-                )
-                wideEventId = null
-            }
+        updateWideEventAsync { eventId ->
+            wideEventClient.flowFinish(
+                wideEventId = eventId,
+                status = FlowStatus.Cancelled,
+                metadata = mapOf(
+                    KEY_CANCELLATION_REASON to CANCELLATION_REASON_VPN_CONFLICT,
+                ),
+            )
+            wideEventId = null
         }
     }
 
     override fun onAskForVpnPermission() {
-        coroutineScope.launch {
-            if (!isFeatureEnabled()) return@launch
-
-            wideEventId?.let { id ->
-                wideEventClient.flowStep(
-                    wideEventId = id,
-                    stepName = STEP_ASK_FOR_VPN_PERMISSION,
-                )
-            }
+        updateWideEventAsync { eventId ->
+            wideEventClient.flowStep(
+                wideEventId = eventId,
+                stepName = STEP_ASK_FOR_VPN_PERMISSION,
+            )
         }
     }
 
     override fun onVpnPermissionRejected() {
-        coroutineScope.launch {
-            if (!isFeatureEnabled()) return@launch
-
-            wideEventId?.let { id ->
-                wideEventClient.flowFinish(
-                    wideEventId = id,
-                    status = FlowStatus.Cancelled,
-                    metadata = mapOf(
-                        KEY_CANCELLATION_REASON to CANCELLATION_REASON_PERMISSION_DENIED,
-                    ),
-                )
-                wideEventId = null
-            }
+        updateWideEventAsync { eventId ->
+            wideEventClient.flowFinish(
+                wideEventId = eventId,
+                status = FlowStatus.Cancelled,
+                metadata = mapOf(
+                    KEY_CANCELLATION_REASON to CANCELLATION_REASON_PERMISSION_DENIED,
+                ),
+            )
+            wideEventId = null
         }
     }
 
     override fun onStartVpn() {
-        coroutineScope.launch {
-            if (!isFeatureEnabled()) return@launch
-
-            wideEventId?.let { id ->
-                wideEventClient.flowStep(wideEventId = id, stepName = STEP_VPN_START_ATTEMPT)
-                wideEventClient.intervalStart(wideEventId = id, key = KEY_INTERVAL_SERVICE_START_DURATION)
-            }
+        updateWideEventAsync { eventId ->
+            wideEventClient.flowStep(wideEventId = eventId, stepName = STEP_VPN_START_ATTEMPT)
+            wideEventClient.intervalStart(wideEventId = eventId, key = KEY_INTERVAL_SERVICE_START_DURATION)
         }
     }
 
     private suspend fun isFeatureEnabled() = withContext(dispatchers.io()) {
         vpnRemoteFeatures.sendVpnEnableWideEvent().isEnabled()
+    }
+
+    private fun updateWideEventAsync(operation: suspend (Long) -> Unit) {
+        coroutineScope.launch {
+            mutex.withLock {
+                if (isFeatureEnabled()) {
+                    wideEventId?.let { id -> operation(id) }
+                }
+            }
+        }
     }
 
     private companion object {
