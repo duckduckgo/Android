@@ -301,6 +301,7 @@ class RealDuckChat @Inject constructor(
     private val _showInputScreenOnSystemSearchLaunch = MutableStateFlow(false)
     private val _showVoiceSearchToggle = MutableStateFlow(false)
     private val _showFullScreenMode = MutableStateFlow(false)
+    private val _showFullScreenModeToggle = MutableStateFlow(false)
 
     private val jsonAdapter: JsonAdapter<DuckChatSettingJson> by lazy {
         moshi.adapter(DuckChatSettingJson::class.java)
@@ -472,6 +473,8 @@ class RealDuckChat @Inject constructor(
     override val showVoiceSearchToggle: StateFlow<Boolean> = _showVoiceSearchToggle.asStateFlow()
 
     override val showFullScreenMode: StateFlow<Boolean> = _showFullScreenMode.asStateFlow()
+
+    override val showFullScreenModeToggle: StateFlow<Boolean> = _showFullScreenModeToggle.asStateFlow()
 
     override val chatState: StateFlow<ChatState> = _chatState.asStateFlow()
 
@@ -767,6 +770,10 @@ class RealDuckChat @Inject constructor(
                 duckChatFeature.fullscreenMode().isEnabled() && duckChatFeatureRepository.isFullScreenModeUserSettingEnabled()
             isFullscreenModeEnabled = showFullScreenMode
             _showFullScreenMode.emit(showFullScreenMode)
+
+            val showFullScreenModeToggle =
+                duckChatFeature.fullscreenMode().isEnabled() && duckChatFeature.fullscreenModeToggle().isEnabled()
+            _showFullScreenModeToggle.emit(showFullScreenModeToggle)
         }
 
     companion object {
