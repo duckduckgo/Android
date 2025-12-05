@@ -1,0 +1,53 @@
+name: Mattermost - Send Message
+
+on:
+  workflow_dispatch:
+    inputs:
+      mattermost-message:
+        description: 'Message to Send to Mattermost'
+        required: true
+        type: string
+      mattermost-channel-name:
+        description: 'Channel to Send the message to'
+        required: true
+        type: string
+  workflow_call:
+    inputs:
+      mattermost-message:
+        description: 'Message to Send to Mattermost'
+        required: true
+        type: string
+      mattermost-channel-name:
+        description: 'Channel to Send the message to'
+        required: true
+        type: string
+    secrets:
+      MM_AUTH_TOKEN:
+        required: true
+      MM_TEAM_ID:
+        required: true
+
+env:
+  ASANA_PAT: ${{ secrets.ASANA_ACCESS_TOKEN }}
+  emoji_start: ":flight_departure:" # 🛫
+  emoji_info: ":information_source:" # ℹ️
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  notify_mattermost:
+    name: Send Message to Mattermost
+    runs-on: macos-latest
+
+    steps:
+      - name: Notify Mattermost of Release starting
+        id: send-mm-release-starting
+        uses: duckduckgo/native-github-asana-sync@v2.0
+        with:
+          mattermost-token: ${{ secrets.MM_AUTH_TOKEN }}
+          mattermost-team-id: ${{ secrets.MM_TEAM_ID }}
+          mattermost-channel-name: ${{ github.event.inputs.mattermost-channel }}
+          mattermost-message: ${{ github.event.inputs.mattermost-message }}
+          action: 'send-mattermost-message'

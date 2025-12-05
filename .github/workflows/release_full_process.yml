@@ -25,19 +25,44 @@ jobs:
       mattermost-channel-name: ${{ vars.MM_RELEASE_NOTIFY_CHANNEL }}
     secrets: inherit
 
+  create_task:
+    name: 'Step 2: Create Asana Task'
+    uses: ./.github/workflows/release_create_task.yml
+    needs: notify_mattermost_start
+    with:
+      app-version: ${{ github.event.inputs.app-version }}
+
   run_release_tests:
     name: 'Step 3: Run Release Tests'
-    needs: notify_mattermost_start
+    needs: create_task
     uses: ./.github/workflows/release_tests.yml
     with:
       app-version: ${{ github.event.inputs.app-version }}
-      test-tag: 'omnibarTest'
+      test-tag: 'releaseTest'
+    secrets: inherit
+
+  upload_play_store:
+    name: 'Step 4: Upload to Play Store'
+    needs: run_tests
+    uses: ./.github/workflows/release_upload_play_store.yml
+    with:
+      app-version: ${{ github.event.inputs.app-version }}
+      asana-task-url: ${{ needs.create_task.outputs.asana-task-url }}
+    secrets: inherit
+
+  upload_internal:
+    name: 'Step 5: Upload Internal Build'
+    needs: run_tests
+    uses: ./.github/workflows/release_upload_internal.yml
+    with:
+      app-version: ${{ github.event.inputs.app-version }}
+      asana-task-url: ${{ needs.create_task.outputs.asana-task-url }}
     secrets: inherit
 
   notify_mattermost_finish:
     name: 'Step 1: Notify Mattermost of Release completed'
     uses: ./.github/workflows/notify_mattermost.yml
-    needs: run_release_tests
+    needs: upload_play_store
     with:
       mattermost-message: ${{env.emoji_end}} Release ${{ github.event.inputs.app-version }} completed successfully and is now in review.
       mattermost-channel-name: ${{ vars.MM_RELEASE_NOTIFY_CHANNEL }}
