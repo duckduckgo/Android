@@ -24,11 +24,16 @@ import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 
 class ModalSurfaceViewModelTest {
 
     @get:Rule
     val coroutineTestRule = CoroutineTestRule()
+
+    private val cardsListPixelHelper: CardsListRemoteMessagePixelHelper = mock()
 
     private lateinit var viewModel: ModalSurfaceViewModel
 
@@ -36,6 +41,7 @@ class ModalSurfaceViewModelTest {
     fun setup() {
         viewModel = ModalSurfaceViewModel(
             dispatchers = coroutineTestRule.testDispatcherProvider,
+            cardsListPixelHelper = cardsListPixelHelper,
         )
     }
 
@@ -94,6 +100,67 @@ class ModalSurfaceViewModelTest {
 
             val command = awaitItem()
             assertTrue(command is ModalSurfaceViewModel.Command.DismissMessage)
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenOnBackPressedWithCardsListViewShownThenDismissMessageCommandEmittedAndPixelFired() = runTest {
+        val messageId = "test-message-id"
+        val params = ModalSurfaceActivityFromMessageId(
+            messageId = messageId,
+            messageType = Content.MessageType.CARDS_LIST,
+        )
+
+        // Initialize with CARDS_LIST to set showCardsListView = true
+        viewModel.onInitialise(params)
+
+        viewModel.commands.test {
+            viewModel.onBackPressed()
+
+            val command = awaitItem()
+            assertTrue(command is ModalSurfaceViewModel.Command.DismissMessage)
+
+            // Verify pixel helper was called with correct parameters
+            val expectedParams = mapOf(
+                RealCardsListRemoteMessagePixelHelper.PARAM_NAME_DISMISS_TYPE to
+                    RealCardsListRemoteMessagePixelHelper.PARAM_VALUE_BACK_BUTTON_OR_GESTURE,
+            )
+            verify(cardsListPixelHelper).dismissCardsListMessage(messageId, expectedParams)
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenOnBackPressedWithCardsListViewNotShownThenDismissMessageCommandEmittedWithoutPixel() = runTest {
+        // Don't initialize or initialize with non-CARDS_LIST type, so showCardsListView = false
+        viewModel.commands.test {
+            viewModel.onBackPressed()
+
+            val command = awaitItem()
+            assertTrue(command is ModalSurfaceViewModel.Command.DismissMessage)
+
+            // Verify pixel helper was NOT called
+            verifyNoInteractions(cardsListPixelHelper)
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenOnBackPressedWithCardsListViewButNoMessageIdThenDismissMessageCommandEmittedWithoutPixel() = runTest {
+        // This tests an edge case where viewState might be set but lastRemoteMessageIdSeen is null
+        // In the current implementation, this shouldn't happen, but it's good to verify the null-safe behavior
+        viewModel.commands.test {
+            viewModel.onBackPressed()
+
+            val command = awaitItem()
+            assertTrue(command is ModalSurfaceViewModel.Command.DismissMessage)
+
+            // Verify pixel helper was NOT called since lastRemoteMessageIdSeen is null
+            verifyNoInteractions(cardsListPixelHelper)
 
             cancelAndIgnoreRemainingEvents()
         }
