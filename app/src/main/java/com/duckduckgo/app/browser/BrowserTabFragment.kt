@@ -1544,7 +1544,7 @@ class BrowserTabFragment :
             {
                 viewModel.handleNewTabIfEmptyUrl()
             },
-            100L,
+            200L,
         )
 
         viewModel.onMessageProcessed()
