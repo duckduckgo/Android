@@ -23,6 +23,7 @@ import com.duckduckgo.remote.messaging.api.CardItem
 import com.duckduckgo.remote.messaging.api.CardItemType
 import com.duckduckgo.remote.messaging.api.Content
 import com.duckduckgo.remote.messaging.api.RemoteMessage
+import com.duckduckgo.remote.messaging.api.RemoteMessageModel
 import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
 import com.duckduckgo.remote.messaging.api.Surface
 import com.duckduckgo.remote.messaging.impl.ui.CardsListRemoteMessageViewModel.Command
@@ -31,6 +32,7 @@ import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
@@ -43,14 +45,18 @@ class CardsListRemoteMessageViewModelTest {
 
     private lateinit var viewModel: CardsListRemoteMessageViewModel
     private val remoteMessagingRepository: RemoteMessagingRepository = mock()
+    private val remoteMessagingModel: RemoteMessageModel = mock()
     private val commandActionMapper: CommandActionMapper = mock()
+    private val cardsListPixelHelper: CardsListRemoteMessagePixelHelper = mock()
 
     @Before
     fun setup() {
         viewModel = CardsListRemoteMessageViewModel(
             remoteMessagingRepository = remoteMessagingRepository,
+            remoteMessagingModel = remoteMessagingModel,
             commandActionMapper = commandActionMapper,
             dispatchers = coroutineTestRule.testDispatcherProvider,
+            cardsListPixelHelper = cardsListPixelHelper,
         )
     }
 
@@ -165,7 +171,91 @@ class CardsListRemoteMessageViewModelTest {
     }
 
     @Test
-    fun whenOnCloseButtonClickedThenDismissMessageCommandEmitted() = runTest {
+    fun whenOnMessageShownWithNullMessageThenNoPixelsFired() = runTest {
+        viewModel.onMessageShown()
+
+        verify(remoteMessagingModel, org.mockito.kotlin.never()).onMessageShown(any())
+        verify(cardsListPixelHelper, org.mockito.kotlin.never()).fireCardItemShownPixel(any(), any())
+    }
+
+    @Test
+    fun whenOnMessageShownWithValidMessageThenPixelsFiredForAllItems() = runTest {
+        val messageId = "message-123"
+        val cardItem1 = CardItem(
+            id = "item1",
+            type = CardItemType.TWO_LINE_LIST_ITEM,
+            placeholder = Content.Placeholder.DDG_ANNOUNCE,
+            titleText = "Card 1",
+            descriptionText = "Description 1",
+            primaryAction = Action.Dismiss,
+        )
+        val cardItem2 = CardItem(
+            id = "item2",
+            type = CardItemType.TWO_LINE_LIST_ITEM,
+            placeholder = Content.Placeholder.CRITICAL_UPDATE,
+            titleText = "Card 2",
+            descriptionText = "Description 2",
+            primaryAction = Action.Dismiss,
+        )
+        val cardsList = Content.CardsList(
+            titleText = "Test Cards",
+            descriptionText = "Description",
+            placeholder = Content.Placeholder.DDG_ANNOUNCE,
+            listItems = listOf(cardItem1, cardItem2),
+            primaryActionText = "Dismiss",
+            primaryAction = Action.Dismiss,
+        )
+        val message = RemoteMessage(
+            id = messageId,
+            content = cardsList,
+            matchingRules = emptyList(),
+            exclusionRules = emptyList(),
+            surfaces = listOf(Surface.MODAL),
+        )
+        whenever(remoteMessagingRepository.getMessageById(eq(messageId))).thenReturn(message)
+
+        viewModel.init(messageId)
+
+        viewModel.onMessageShown()
+
+        verify(remoteMessagingModel).onMessageShown(eq(message))
+        verify(cardsListPixelHelper).fireCardItemShownPixel(eq(message), eq(cardItem1))
+        verify(cardsListPixelHelper).fireCardItemShownPixel(eq(message), eq(cardItem2))
+    }
+
+    @Test
+    fun whenOnCloseButtonClickedWithNullMessageThenOnlyDismissCommandEmitted() = runTest {
+        viewModel.commands.test {
+            viewModel.onCloseButtonClicked()
+
+            expectNoEvents()
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenOnCloseButtonClickedWithValidMessageThenDismissMessageCommandEmittedAndPixelFired() = runTest {
+        val messageId = "message-123"
+        val cardsList = Content.CardsList(
+            titleText = "Test Cards",
+            descriptionText = "Description",
+            placeholder = Content.Placeholder.DDG_ANNOUNCE,
+            listItems = emptyList(),
+            primaryActionText = "Dismiss",
+            primaryAction = Action.Dismiss,
+        )
+        val message = RemoteMessage(
+            id = messageId,
+            content = cardsList,
+            matchingRules = emptyList(),
+            exclusionRules = emptyList(),
+            surfaces = listOf(Surface.MODAL),
+        )
+        whenever(remoteMessagingRepository.getMessageById(eq(messageId))).thenReturn(message)
+
+        viewModel.init(messageId)
+
         viewModel.commands.test {
             viewModel.onCloseButtonClicked()
 
@@ -174,6 +264,8 @@ class CardsListRemoteMessageViewModelTest {
 
             cancelAndIgnoreRemainingEvents()
         }
+
+        verify(cardsListPixelHelper).dismissCardsListMessage(eq(messageId), any())
     }
 
     @Test
@@ -188,7 +280,7 @@ class CardsListRemoteMessageViewModelTest {
     }
 
     @Test
-    fun whenOnActionButtonClickedWithValidActionThenCommandEmitted() = runTest {
+    fun whenOnActionButtonClickedWithValidActionThenCommandEmittedAndModelUpdated() = runTest {
         val messageId = "message-123"
         val primaryAction = Action.Url("https://example.com")
         val cardsList = Content.CardsList(
@@ -212,7 +304,6 @@ class CardsListRemoteMessageViewModelTest {
 
         // Initialize view state
         viewModel.init(messageId)
-        coroutineTestRule.testDispatcher.scheduler.advanceUntilIdle()
 
         viewModel.commands.test {
             viewModel.onActionButtonClicked()
@@ -223,10 +314,12 @@ class CardsListRemoteMessageViewModelTest {
 
             cancelAndIgnoreRemainingEvents()
         }
+
+        verify(remoteMessagingModel).onPrimaryActionClicked(eq(message))
     }
 
     @Test
-    fun whenOnItemClickedThenCommandEmittedForItemAction() = runTest {
+    fun whenOnItemClickedWithNullMessageThenCommandEmittedButNoPixel() = runTest {
         val itemAction = Action.PlayStore("com.example.app")
         val cardItem = CardItem(
             id = "id",
@@ -242,16 +335,61 @@ class CardsListRemoteMessageViewModelTest {
         viewModel.commands.test {
             viewModel.onItemClicked(cardItem)
 
-            val command = awaitItem()
-            assertTrue(command is Command.LaunchPlayStore)
-            assertEquals("com.example.app", (command as Command.LaunchPlayStore).appPackage)
+            expectNoEvents()
 
             cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun whenOnItemClickedMultipleTimesThenMultipleCommandsEmitted() = runTest {
+    fun whenOnItemClickedWithValidMessageThenCommandEmittedAndPixelFired() = runTest {
+        val messageId = "message-123"
+        val itemAction = Action.PlayStore("com.example.app")
+        val cardItem = CardItem(
+            id = "item1",
+            titleText = "Test Card",
+            descriptionText = "Description",
+            primaryAction = itemAction,
+            placeholder = Content.Placeholder.DDG_ANNOUNCE,
+            type = CardItemType.TWO_LINE_LIST_ITEM,
+        )
+        val cardsList = Content.CardsList(
+            titleText = "Test Cards",
+            descriptionText = "Description",
+            placeholder = Content.Placeholder.DDG_ANNOUNCE,
+            listItems = listOf(cardItem),
+            primaryActionText = "Action",
+            primaryAction = Action.Dismiss,
+        )
+        val message = RemoteMessage(
+            id = messageId,
+            content = cardsList,
+            matchingRules = emptyList(),
+            exclusionRules = emptyList(),
+            surfaces = listOf(Surface.MODAL),
+        )
+        val expectedCommand = Command.LaunchPlayStore("com.example.app")
+        whenever(remoteMessagingRepository.getMessageById(eq(messageId))).thenReturn(message)
+        whenever(commandActionMapper.asCommand(eq(itemAction))).thenReturn(expectedCommand)
+
+        viewModel.init(messageId)
+
+        viewModel.commands.test {
+            viewModel.onItemClicked(cardItem)
+
+            val command = awaitItem()
+            assertTrue(command is Command.LaunchPlayStore)
+            assertEquals("com.example.app", (command as Command.LaunchPlayStore).appPackage)
+
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        verify(cardsListPixelHelper).fireCardItemClickedPixel(eq(message), eq(cardItem))
+    }
+
+    @Test
+    fun whenOnItemClickedMultipleTimesThenMultipleCommandsEmittedAndPixelsFired() = runTest {
+        val messageId = "message-123"
         val itemAction1 = Action.Url("https://example1.com")
         val itemAction2 = Action.Url("https://example2.com")
         val cardItem1 = CardItem(
@@ -270,8 +408,26 @@ class CardsListRemoteMessageViewModelTest {
             type = CardItemType.TWO_LINE_LIST_ITEM,
             placeholder = Content.Placeholder.DDG_ANNOUNCE,
         )
+        val cardsList = Content.CardsList(
+            titleText = "Test Cards",
+            descriptionText = "Description",
+            placeholder = Content.Placeholder.DDG_ANNOUNCE,
+            listItems = listOf(cardItem1, cardItem2),
+            primaryActionText = "Action",
+            primaryAction = Action.Dismiss,
+        )
+        val message = RemoteMessage(
+            id = messageId,
+            content = cardsList,
+            matchingRules = emptyList(),
+            exclusionRules = emptyList(),
+            surfaces = listOf(Surface.MODAL),
+        )
+        whenever(remoteMessagingRepository.getMessageById(eq(messageId))).thenReturn(message)
         whenever(commandActionMapper.asCommand(eq(itemAction1))).thenReturn(Command.SubmitUrl("https://example1.com"))
         whenever(commandActionMapper.asCommand(eq(itemAction2))).thenReturn(Command.SubmitUrl("https://example2.com"))
+
+        viewModel.init(messageId)
 
         viewModel.commands.test {
             viewModel.onItemClicked(cardItem1)
@@ -284,10 +440,14 @@ class CardsListRemoteMessageViewModelTest {
 
             cancelAndIgnoreRemainingEvents()
         }
+
+        verify(cardsListPixelHelper).fireCardItemClickedPixel(eq(message), eq(cardItem1))
+        verify(cardsListPixelHelper).fireCardItemClickedPixel(eq(message), eq(cardItem2))
     }
 
     @Test
     fun whenCommandActionMapperCalledThenVerifyCorrectActionPassed() = runTest {
+        val messageId = "message-123"
         val action = Action.DefaultBrowser
         val cardItem = CardItem(
             id = "id",
@@ -297,10 +457,27 @@ class CardsListRemoteMessageViewModelTest {
             type = CardItemType.TWO_LINE_LIST_ITEM,
             placeholder = Content.Placeholder.DDG_ANNOUNCE,
         )
+        val cardsList = Content.CardsList(
+            titleText = "Test Cards",
+            descriptionText = "Description",
+            placeholder = Content.Placeholder.DDG_ANNOUNCE,
+            listItems = listOf(cardItem),
+            primaryActionText = "Action",
+            primaryAction = Action.Dismiss,
+        )
+        val message = RemoteMessage(
+            id = messageId,
+            content = cardsList,
+            matchingRules = emptyList(),
+            exclusionRules = emptyList(),
+            surfaces = listOf(Surface.MODAL),
+        )
+        whenever(remoteMessagingRepository.getMessageById(eq(messageId))).thenReturn(message)
         whenever(commandActionMapper.asCommand(eq(action))).thenReturn(Command.LaunchDefaultBrowser)
 
+        viewModel.init(messageId)
+
         viewModel.onItemClicked(cardItem)
-        coroutineTestRule.testDispatcher.scheduler.advanceUntilIdle()
 
         verify(commandActionMapper).asCommand(eq(action))
     }
