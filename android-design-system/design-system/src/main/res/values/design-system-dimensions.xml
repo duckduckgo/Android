@@ -52,6 +52,7 @@
     <dimen name="bottomNavIcon">24dp</dimen>
 
     <!-- Omnibar -->
+    <dimen name="omnibarToolbarSize">64dp</dimen>
     <dimen name="omnibarCookieAnimationBannerHeight">38dp</dimen>
     <dimen name="omnibarCardMarginHorizontal">16dp</dimen>
     <dimen name="omnibarCardMarginEnd">8dp</dimen>
