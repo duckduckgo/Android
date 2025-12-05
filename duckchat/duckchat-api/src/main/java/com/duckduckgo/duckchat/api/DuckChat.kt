@@ -81,7 +81,12 @@ interface DuckChat {
 
     /**
      * Observes whether Duck.ai input screen with a mode switch is enabled or disabled.
-     * Note: This will return true if cosmetically set (so not actually enabled, may be shown as enabled for onboarding purposes)
      */
     fun observeInputScreenUserSettingEnabled(): Flow<Boolean>
+
+    /**
+     * Observes the cosmetic value for the input screen user setting.
+     * Returns null if the cosmetic value has not been set before.
+     */
+    fun observeCosmeticInputScreenUserSettingEnabled(): Flow<Boolean?>
 }

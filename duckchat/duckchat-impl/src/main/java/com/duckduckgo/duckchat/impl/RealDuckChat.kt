@@ -388,6 +388,9 @@ class RealDuckChat @Inject constructor(
 
     override fun observeInputScreenUserSettingEnabled(): Flow<Boolean> = duckChatFeatureRepository.observeInputScreenUserSettingEnabled()
 
+    override fun observeCosmeticInputScreenUserSettingEnabled(): Flow<Boolean?> =
+        duckChatFeatureRepository.observeCosmeticInputScreenUserSettingEnabled()
+
     override fun observeShowInBrowserMenuUserSetting(): Flow<Boolean> = duckChatFeatureRepository.observeShowInBrowserMenu()
 
     override fun observeShowInAddressBarUserSetting(): Flow<Boolean> = duckChatFeatureRepository.observeShowInAddressBar()

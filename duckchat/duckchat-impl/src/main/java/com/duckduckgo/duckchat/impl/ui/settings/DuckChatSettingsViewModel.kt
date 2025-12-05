@@ -73,13 +73,14 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
     val viewState =
         combine(
             duckChat.observeEnableDuckChatUserSetting(),
+            duckChat.observeCosmeticInputScreenUserSettingEnabled(),
             duckChat.observeInputScreenUserSettingEnabled(),
             duckChat.observeFullscreenModeUserSetting(),
             flowOf(duckChatFeature.showHideAiGeneratedImages().isEnabled()).flowOn(dispatcherProvider.io()),
-        ) { isDuckChatUserEnabled, isInputScreenEnabled, isFullScreenModeEnabled, showHideAiGeneratedImagesOption ->
+        ) { isDuckChatUserEnabled, cosmeticInputScreenEnabled, inputScreenEnabled, isFullScreenModeEnabled, showHideAiGeneratedImagesOption ->
             ViewState(
                 isDuckChatUserEnabled = isDuckChatUserEnabled,
-                isInputScreenEnabled = isInputScreenEnabled,
+                isInputScreenEnabled = cosmeticInputScreenEnabled ?: inputScreenEnabled,
                 shouldShowShortcuts = isDuckChatUserEnabled,
                 shouldShowInputScreenToggle = isDuckChatUserEnabled && duckChat.isInputScreenFeatureAvailable(),
                 isSearchSectionVisible = isSearchSectionVisible(duckChatActivityParams),

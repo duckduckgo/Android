@@ -24,8 +24,10 @@ import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.impl.inputscreen.wideevents.InputScreenOnboardingWideEvent
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.filter
@@ -44,6 +46,7 @@ class OnboardingInputScreenSelectionObserver @Inject constructor(
     private val userStageStore: UserStageStore,
     private val onboardingStore: OnboardingStore,
     private val duckChat: DuckChat,
+    private val inputScreenOnboardingWideEvent: InputScreenOnboardingWideEvent,
 ) : MainProcessLifecycleObserver {
 
     init {
@@ -52,12 +55,20 @@ class OnboardingInputScreenSelectionObserver @Inject constructor(
     }
 
     private fun observeInputScreenSetting() {
-        duckChat.observeInputScreenUserSettingEnabled()
+        combine(
+            duckChat.observeCosmeticInputScreenUserSettingEnabled(),
+            duckChat.observeInputScreenUserSettingEnabled(),
+        ) { isCosmeticallyEnabled, isInputScreenEnabled ->
+            isCosmeticallyEnabled to isInputScreenEnabled
+        }
             .distinctUntilChanged()
             .drop(1)
-            .onEach {
+            .onEach { (isInputScreenCosmeticallyEnabled, isInputScreenEnabled) ->
+                if (isInputScreenCosmeticallyEnabled != isInputScreenEnabled) return@onEach
+
                 if (userStageStore.getUserAppStage() != AppStage.ESTABLISHED && onboardingStore.getInputScreenSelection() != null) {
                     onboardingStore.setInputScreenSelectionOverriddenByUser()
+                    inputScreenOnboardingWideEvent.onInputScreenSettingEnabledBeforeInputScreenShown(enabled = isInputScreenEnabled)
                 }
             }
             .flowOn(dispatchers.io())

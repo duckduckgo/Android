@@ -28,6 +28,7 @@ import com.duckduckgo.duckchat.api.inputscreen.BrowserAndInputScreenTransitionPr
 import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityParams
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.inputscreen.ui.metrics.discovery.InputScreenDiscoveryFunnel
+import com.duckduckgo.duckchat.impl.inputscreen.wideevents.InputScreenOnboardingWideEvent
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import javax.inject.Inject
 
@@ -46,6 +47,9 @@ class InputScreenActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var inputScreenConfigResolver: InputScreenConfigResolver
 
+    @Inject
+    lateinit var inputScreenOnboardingWideEvent: InputScreenOnboardingWideEvent
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_input_screen)
@@ -60,6 +64,7 @@ class InputScreenActivity : DuckDuckGoActivity() {
                     },
             )
         pixel.fire(pixel = DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_TEXT_AREA_FOCUSED, parameters = params)
+        inputScreenOnboardingWideEvent.onInputScreenShown()
     }
 
     override fun finish() {

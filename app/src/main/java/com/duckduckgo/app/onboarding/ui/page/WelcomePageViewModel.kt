@@ -66,6 +66,7 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.impl.inputscreen.wideevents.InputScreenOnboardingWideEvent
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -88,6 +89,7 @@ class WelcomePageViewModel @Inject constructor(
     private val onboardingStore: OnboardingStore,
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
     private val duckChat: DuckChat,
+    private val inputScreenOnboardingWideEvent: InputScreenOnboardingWideEvent,
 ) : ViewModel() {
     private val _commands = Channel<Command>(1, DROP_OLDEST)
     val commands: Flow<Command> = _commands.receiveAsFlow()
@@ -95,6 +97,7 @@ class WelcomePageViewModel @Inject constructor(
     private var defaultAddressBarPosition: Boolean = true
     private var inputScreenSelected: Boolean = true
     private var maxPageCount: Int = 2
+    private var reinstallUser: Boolean = false
 
     init {
         viewModelScope.launch(dispatchers.io()) {
@@ -199,6 +202,7 @@ class WelcomePageViewModel @Inject constructor(
                 viewModelScope.launch(dispatchers.io()) {
                     if (inputScreenSelected) {
                         pixel.fire(PREONBOARDING_AICHAT_SELECTED)
+                        inputScreenOnboardingWideEvent.onInputScreenEnabledDuringOnboarding(reinstallUser = reinstallUser)
                     } else {
                         pixel.fire(PREONBOARDING_SEARCH_ONLY_SELECTED)
                     }
@@ -214,6 +218,7 @@ class WelcomePageViewModel @Inject constructor(
         when (currentDialog) {
             INITIAL_REINSTALL_USER -> {
                 viewModelScope.launch {
+                    reinstallUser = true
                     _commands.send(ShowSkipOnboardingOption)
                     pixel.fire(PREONBOARDING_SKIP_ONBOARDING_PRESSED)
                 }
