@@ -31,7 +31,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 interface UriLoadedManager {
-    fun sendUriLoadedPixel()
+    fun sendUriLoadedPixels(isDuckDuckGoUrl: Boolean)
 }
 
 @ContributesBinding(
@@ -61,9 +61,17 @@ class DuckDuckGoUriLoadedManager @Inject constructor(
         }
     }
 
-    override fun sendUriLoadedPixel() {
+    override fun sendUriLoadedPixels(isDuckDuckGoUrl: Boolean) {
         if (shouldSendUriLoadedPixel) {
             pixel.fire(AppPixelName.URI_LOADED)
+        }
+
+        if (isDuckDuckGoUrl) {
+            pixel.fire(AppPixelName.SERP_LOADED)
+            pixel.fire(AppPixelName.SERP_LOADED_DAILY, type = Pixel.PixelType.Daily())
+        } else {
+            pixel.fire(AppPixelName.WEBSITE_LOADED)
+            pixel.fire(AppPixelName.WEBSITE_LOADED_DAILY, type = Pixel.PixelType.Daily())
         }
     }
 
