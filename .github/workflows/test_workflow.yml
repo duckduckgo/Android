@@ -17,7 +17,7 @@ jobs:
     name: 'Step 1: Notify Mattermost of Release start'
     uses: ./.github/workflows/notify_mattermost.yml
     with:
-      mattermost-message: ':flight_departure:' Starting release process for version ${{ github.event.inputs.app-version }}
+      mattermost-message: ":flight_departure: Starting release process for version ${{ github.event.inputs.app-version }}"
       mattermost-channel-name: ${{ vars.MM_TEST_NOTIFY_CHANNEL }}
     secrets: inherit
 
@@ -35,6 +35,6 @@ jobs:
     uses: ./.github/workflows/notify_mattermost.yml
     needs: run_release_tests
     with:
-      mattermost-message: ':white_check_mark:' Release ${{ github.event.inputs.app-version }} completed successfully and is now in review.
+      mattermost-message: ":white_check_mark: Release ${{ github.event.inputs.app-version }} completed successfully and is now in review."
       mattermost-channel-name: ${{ vars.MM_TEST_NOTIFY_CHANNEL }}
     secrets: inherit
