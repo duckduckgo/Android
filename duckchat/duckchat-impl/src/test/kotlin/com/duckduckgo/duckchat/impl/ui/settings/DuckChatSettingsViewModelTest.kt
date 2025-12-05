@@ -66,6 +66,7 @@ class DuckChatSettingsViewModelTest {
             whenever(duckChat.observeEnableDuckChatUserSetting()).thenReturn(flowOf(true))
             whenever(duckChat.observeShowInBrowserMenuUserSetting()).thenReturn(flowOf(false))
             whenever(duckChat.observeShowInAddressBarUserSetting()).thenReturn(flowOf(false))
+            whenever(duckChat.observeCosmeticInputScreenUserSettingEnabled()).thenReturn(flowOf(null))
             whenever(duckChat.observeInputScreenUserSettingEnabled()).thenReturn(flowOf(false))
             whenever(duckChat.observeFullscreenModeUserSetting()).thenReturn(flowOf(false))
             whenever(duckChat.isDuckChatFullScreenModeFeatureAvailable()).thenReturn(false)
@@ -153,6 +154,7 @@ class DuckChatSettingsViewModelTest {
     @Test
     fun `input screen - user preference enabled then set correct state`() =
         runTest {
+            whenever(duckChat.observeCosmeticInputScreenUserSettingEnabled()).thenReturn(flowOf(null))
             whenever(duckChat.observeInputScreenUserSettingEnabled()).thenReturn(flowOf(true))
             testee = DuckChatSettingsViewModel(
                 duckChatActivityParams = DuckChatSettingsNoParams,
@@ -172,6 +174,7 @@ class DuckChatSettingsViewModelTest {
     @Test
     fun `input screen - user preference disabled then set correct state`() =
         runTest {
+            whenever(duckChat.observeCosmeticInputScreenUserSettingEnabled()).thenReturn(flowOf(null))
             whenever(duckChat.observeInputScreenUserSettingEnabled()).thenReturn(flowOf(false))
             testee = DuckChatSettingsViewModel(
                 duckChatActivityParams = DuckChatSettingsNoParams,
@@ -185,6 +188,66 @@ class DuckChatSettingsViewModelTest {
 
             testee.viewState.test {
                 assertFalse(awaitItem().isInputScreenEnabled)
+            }
+        }
+
+    @Test
+    fun `input screen - cosmetic enabled then use cosmetic value`() =
+        runTest {
+            whenever(duckChat.observeCosmeticInputScreenUserSettingEnabled()).thenReturn(flowOf(true))
+            whenever(duckChat.observeInputScreenUserSettingEnabled()).thenReturn(flowOf(false))
+            testee = DuckChatSettingsViewModel(
+                duckChatActivityParams = DuckChatSettingsNoParams,
+                duckChat = duckChat,
+                pixel = mockPixel,
+                inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
+                settingsPageFeature = settingsPageFeature,
+                dispatcherProvider = coroutineRule.testDispatcherProvider,
+                duckChatFeature = duckChatFeature,
+            )
+
+            testee.viewState.test {
+                assertTrue(awaitItem().isInputScreenEnabled)
+            }
+        }
+
+    @Test
+    fun `input screen - cosmetic disabled then use cosmetic value`() =
+        runTest {
+            whenever(duckChat.observeCosmeticInputScreenUserSettingEnabled()).thenReturn(flowOf(false))
+            whenever(duckChat.observeInputScreenUserSettingEnabled()).thenReturn(flowOf(true))
+            testee = DuckChatSettingsViewModel(
+                duckChatActivityParams = DuckChatSettingsNoParams,
+                duckChat = duckChat,
+                pixel = mockPixel,
+                inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
+                settingsPageFeature = settingsPageFeature,
+                dispatcherProvider = coroutineRule.testDispatcherProvider,
+                duckChatFeature = duckChatFeature,
+            )
+
+            testee.viewState.test {
+                assertFalse(awaitItem().isInputScreenEnabled)
+            }
+        }
+
+    @Test
+    fun `input screen - cosmetic null then fallback to actual inputScreen value`() =
+        runTest {
+            whenever(duckChat.observeCosmeticInputScreenUserSettingEnabled()).thenReturn(flowOf(null))
+            whenever(duckChat.observeInputScreenUserSettingEnabled()).thenReturn(flowOf(true))
+            testee = DuckChatSettingsViewModel(
+                duckChatActivityParams = DuckChatSettingsNoParams,
+                duckChat = duckChat,
+                pixel = mockPixel,
+                inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
+                settingsPageFeature = settingsPageFeature,
+                dispatcherProvider = coroutineRule.testDispatcherProvider,
+                duckChatFeature = duckChatFeature,
+            )
+
+            testee.viewState.test {
+                assertTrue(awaitItem().isInputScreenEnabled)
             }
         }
 
@@ -234,6 +297,7 @@ class DuckChatSettingsViewModelTest {
     fun whenDuckChatDisabledThenNoSubTogglesShown() =
         runTest {
             whenever(duckChat.observeEnableDuckChatUserSetting()).thenReturn(flowOf(false))
+            whenever(duckChat.observeCosmeticInputScreenUserSettingEnabled()).thenReturn(flowOf(null))
             whenever(duckChat.observeInputScreenUserSettingEnabled()).thenReturn(flowOf(true))
             testee = DuckChatSettingsViewModel(
                 duckChatActivityParams = DuckChatSettingsNoParams,

@@ -34,6 +34,7 @@ class FakeDuckChat(
     private val openDuckChatWithPrefillCalls = mutableListOf<String>()
     private var wasOpenedBeforeValue: Boolean = false
     private val inputScreenUserSettingEnabled = MutableStateFlow<Boolean>(false)
+    private val cosmeticInputScreenUserSettingEnabled = MutableStateFlow<Boolean?>(null)
 
     override fun isEnabled(): Boolean = enabled
 
@@ -73,11 +74,15 @@ class FakeDuckChat(
     }
 
     override suspend fun setCosmeticInputScreenUserSetting(enabled: Boolean) {
-        // No-op for testing
+        cosmeticInputScreenUserSettingEnabled.value = enabled
     }
 
     override fun observeInputScreenUserSettingEnabled(): Flow<Boolean> {
         return inputScreenUserSettingEnabled
+    }
+
+    override fun observeCosmeticInputScreenUserSettingEnabled(): Flow<Boolean?> {
+        return cosmeticInputScreenUserSettingEnabled
     }
 
     fun setEnabled(enabled: Boolean) {

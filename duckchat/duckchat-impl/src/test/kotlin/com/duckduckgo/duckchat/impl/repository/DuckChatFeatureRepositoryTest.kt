@@ -23,6 +23,7 @@ import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.mockito.Mockito.mock
@@ -130,6 +131,16 @@ class DuckChatFeatureRepositoryTest {
         val results = testee.observeInputScreenUserSettingEnabled().take(2).toList()
         assertFalse(results[0])
         assertTrue(results[1])
+    }
+
+    @Test
+    fun `when observeCosmeticInputScreenUserSettingEnabled then observe data store`() = runTest {
+        whenever(mockDataStore.observeCosmeticInputScreenUserSettingEnabled()).thenReturn(flowOf(null, true, false))
+
+        val results = testee.observeCosmeticInputScreenUserSettingEnabled().take(3).toList()
+        assertNull(results[0])
+        assertTrue(results[1] == true)
+        assertTrue(results[2] == false)
     }
 
     @Test
