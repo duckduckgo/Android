@@ -16,7 +16,8 @@
             {
                 "key": "plugin",
                 "description": "The class name of the plugin which timed out",
-                "type": "string"
+                "type": "string",
+                "enum": ["AuraExperimentManager", "EmptyReferrerStateListener", "PlayStoreAppReferrerStateListener", "ReinstallAtbListener"]
             }
         ]
     }
