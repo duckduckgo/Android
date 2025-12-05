@@ -42,8 +42,9 @@ interface InputScreenOnboardingWideEvent {
 
     /**
      * Called when the user enables the Input Screen in AI Features settings before the Input Screen is shown to the user.
+     * @param enabled true if the Input Screen is enabled, false otherwise
      */
-    fun onInputScreenSettingEnabledBeforeInputScreenShown()
+    fun onInputScreenSettingEnabledBeforeInputScreenShown(enabled: Boolean)
 
     /**
      * Called when the Input Screen is shown to the user
@@ -87,7 +88,7 @@ class InputScreenOnboardingWideEventImpl @Inject constructor(
         }
     }
 
-    override fun onInputScreenSettingEnabledBeforeInputScreenShown() {
+    override fun onInputScreenSettingEnabledBeforeInputScreenShown(enabled: Boolean) {
         coroutineScope.launch {
             if (!isFeatureEnabled()) return@launch
             val currentFlowId = getCurrentWideEventId() ?: return@launch
@@ -95,6 +96,7 @@ class InputScreenOnboardingWideEventImpl @Inject constructor(
             wideEventClient.flowFinish(
                 wideEventId = currentFlowId,
                 status = FlowStatus.Cancelled,
+                metadata = mapOf("enabled" to enabled.toString()),
             )
             cachedFlowId = null
         }

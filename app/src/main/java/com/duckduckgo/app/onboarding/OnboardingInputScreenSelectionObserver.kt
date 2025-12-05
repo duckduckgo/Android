@@ -68,7 +68,7 @@ class OnboardingInputScreenSelectionObserver @Inject constructor(
 
                 if (userStageStore.getUserAppStage() != AppStage.ESTABLISHED && onboardingStore.getInputScreenSelection() != null) {
                     onboardingStore.setInputScreenSelectionOverriddenByUser()
-                    inputScreenOnboardingWideEvent.onInputScreenSettingEnabledBeforeInputScreenShown()
+                    inputScreenOnboardingWideEvent.onInputScreenSettingEnabledBeforeInputScreenShown(enabled = isInputScreenEnabled)
                 }
             }
             .flowOn(dispatchers.io())
