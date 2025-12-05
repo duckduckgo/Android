@@ -557,6 +557,7 @@ class RealDuckChat @Inject constructor(
 
             withContext(dispatchers.main()) {
                 pixel.fire(DuckChatPixelName.DUCK_CHAT_OPEN, parameters = params)
+                pixel.fire(DuckChatPixelName.DUCK_CHAT_OPEN_DAILY, type = Pixel.PixelType.Daily())
                 if (keepSession.value) {
                     logcat { "Duck.ai: restoring Duck.ai session $url hasSessionActive $hasSessionActive" }
                     openDuckChatSession(url, hasSessionActive)

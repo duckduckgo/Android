@@ -683,6 +683,7 @@ class AutofillPasswordsManagementViewModel @Inject constructor(
             val source = launchSource.asString()
             val hasCredentialsSaved = (autofillStore.getCredentialCount().firstOrNull() ?: 0) > 0
             pixel.fire(AUTOFILL_MANAGEMENT_SCREEN_OPENED, mapOf("source" to source, "has_credentials_saved" to hasCredentialsSaved.toBinaryString()))
+            pixel.fire(AutofillPixelNames.AUTOFILL_MANAGEMENT_SCREEN_OPENED_DAILY, type = Pixel.PixelType.Daily())
         }
     }
 
