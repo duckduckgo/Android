@@ -4,7 +4,7 @@
         "description": "Triggered when a remote message is displayed to the user for the first time",
         "owners": ["cmonfortep"],
         "triggers": ["other"],
-        "suffixes": ["platform", "form_factor"],
+        "suffixes": ["form_factor"],
         "parameters": [
             "appVersion",
             "atb",
@@ -19,7 +19,7 @@
         "description": "Triggered when a remote message is displayed to the user, regardless of whether it's their first time seeing it",
         "owners": ["cmonfortep"],
         "triggers": ["other"],
-        "suffixes": ["platform", "form_factor"],
+        "suffixes": ["form_factor"],
         "parameters": [
             "appVersion",
             "atb",
@@ -34,7 +34,7 @@
         "description": "Triggered when a remote message is dismissed by the user",
         "owners": ["cmonfortep", "anikiki"],
         "triggers": ["other"],
-        "suffixes": ["platform", "form_factor"],
+        "suffixes": ["form_factor"],
         "parameters": [
             "appVersion",
             "atb",
@@ -55,7 +55,7 @@
         "description": "Triggered when the user clicks the action button on the remote message",
         "owners": ["cmonfortep"],
         "triggers": ["other"],
-        "suffixes": ["platform", "form_factor"],
+        "suffixes": ["form_factor"],
         "parameters": [
             "appVersion",
             "atb",
@@ -70,7 +70,7 @@
         "description": "Triggered when the user clicks the primary action button on the remote message",
         "owners": ["cmonfortep"],
         "triggers": ["other"],
-        "suffixes": ["platform", "form_factor"],
+        "suffixes": ["form_factor"],
         "parameters": [
             "appVersion",
             "atb",
@@ -85,7 +85,7 @@
         "description": "Triggered when the user clicks the secondary action button on the remote message",
         "owners": ["cmonfortep"],
         "triggers": ["other"],
-        "suffixes": ["platform", "form_factor"],
+        "suffixes": ["form_factor"],
         "parameters": [
             "appVersion",
             "atb",
@@ -100,7 +100,7 @@
         "description": "Triggered after the share action sheet has closed",
         "owners": ["cmonfortep"],
         "triggers": ["other"],
-        "suffixes": ["platform", "form_factor"],
+        "suffixes": ["form_factor"],
         "parameters": [
             "appVersion",
             "atb",
@@ -120,7 +120,7 @@
         "description": "Triggered when a card is displayed within a card-style remote message",
         "owners": ["anikiki"],
         "triggers": ["other"],
-        "suffixes": ["platform", "form_factor"],
+        "suffixes": ["form_factor"],
         "parameters": [
             "appVersion",
             "atb",
@@ -140,7 +140,7 @@
         "description": "Triggered when a card is clicked within a card-style remote message",
         "owners": ["anikiki"],
         "triggers": ["other"],
-        "suffixes": ["platform", "form_factor"],
+        "suffixes": ["form_factor"],
         "parameters": [
             "appVersion",
             "atb",
