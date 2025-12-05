@@ -307,7 +307,7 @@ class NetworkProtectionManagementViewModel @Inject constructor(
     ) {
         lastVpnRequestTime = lastVpnRequestTimeInMillis
         sendCommand(RequestVPNPermission(vpnIntent))
-        viewModelScope.launch { vpnEnableWideEvent.onAskForVpnPermission() }
+        vpnEnableWideEvent.onAskForVpnPermission()
     }
 
     fun onNetpToggleClicked(enabled: Boolean) {
