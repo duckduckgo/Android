@@ -17,6 +17,7 @@
 package com.duckduckgo.remote.messaging.impl.ui
 
 import android.os.Bundle
+import androidx.activity.addCallback
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -45,6 +46,7 @@ class ModalSurfaceActivity : DuckDuckGoActivity(), CardsListRemoteMessageView.Ca
 
         initialise()
         setupObservers()
+        setupBackNavigationHandler()
     }
 
     override fun onDismiss() {
@@ -82,6 +84,12 @@ class ModalSurfaceActivity : DuckDuckGoActivity(), CardsListRemoteMessageView.Ca
             is Command.DismissMessage -> {
                 finish()
             }
+        }
+    }
+
+    private fun setupBackNavigationHandler() {
+        onBackPressedDispatcher.addCallback(this) {
+            viewModel.onBackPressed()
         }
     }
 }
