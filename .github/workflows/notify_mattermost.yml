@@ -48,6 +48,6 @@ jobs:
         with:
           mattermost-token: ${{ secrets.MM_AUTH_TOKEN }}
           mattermost-team-id: ${{ secrets.MM_TEAM_ID }}
-          mattermost-channel-name: ${{ github.event.inputs.mattermost-channel }}
+          mattermost-channel-name: ${{ github.event.inputs.mattermost-channel-name }}
           mattermost-message: ${{ github.event.inputs.mattermost-message }}
           action: 'send-mattermost-message'
