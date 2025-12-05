@@ -54,6 +54,7 @@ sealed class BrowserMenuViewState {
         val isPrivacyProtectionDisabled: Boolean = false,
     ) : BrowserMenuViewState()
     data class NewTabPage(
+        val canGoForward: Boolean = false,
         val showDuckChatOption: Boolean = false,
         val vpnMenuState: VpnMenuState = VpnMenuState.Hidden,
         val showAutofill: Boolean = false,
