@@ -1557,6 +1557,7 @@ class BrowserTabViewModel @Inject constructor(
     fun navigationStateChanged(newWebNavigationState: WebNavigationState) {
         val stateChange = newWebNavigationState.compare(webNavigationState)
 
+        logcat(tag = "RadoiuA") { "Navigation state changed : $newWebNavigationState" }
         viewModelScope.launch {
             showOnAppLaunchOptionHandler.handleResolvedUrlStorage(
                 currentUrl = newWebNavigationState.currentUrl,
@@ -3560,8 +3561,6 @@ class BrowserTabViewModel @Inject constructor(
 
     fun onMessageReceived() {
         isLinkOpenedInNewTab = true
-
-        handleNewTabIfEmptyUrl()
     }
 
     override fun linkOpenedInNewTab(): Boolean = isLinkOpenedInNewTab
@@ -3824,8 +3823,8 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    private fun handleNewTabIfEmptyUrl() {
-        val shouldDisplayAboutBlank = handleAboutBlankEnabled && site?.url.isNullOrEmpty()
+    fun handleNewTabIfEmptyUrl() {
+        val shouldDisplayAboutBlank = handleAboutBlankEnabled && webNavigationState == null
         if (shouldDisplayAboutBlank) {
             if (isCustomTabScreen) {
                 handleNewTabForEmptyUrlOnCustomTab()
@@ -4353,6 +4352,10 @@ class BrowserTabViewModel @Inject constructor(
             }
             hasUserSeenHistoryIAM = false
             lastAutoCompleteState?.searchResults?.suggestions?.let { suggestions ->
+                if (suggestions.isNotEmpty()) {
+                    pixel.fire(DuckChatPixelName.AUTOCOMPLETE_DISPLAYED)
+                    pixel.fire(DuckChatPixelName.AUTOCOMPLETE_DISPLAYED_DAILY, type = Daily())
+                }
                 if (suggestions.any { it is AutoCompleteBookmarkSuggestion && it.isFavorite }) {
                     pixel.fire(AppPixelName.AUTOCOMPLETE_DISPLAYED_LOCAL_FAVORITE)
                 }
