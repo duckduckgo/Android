@@ -279,6 +279,7 @@ import com.duckduckgo.common.utils.extensions.hideKeyboard
 import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.common.utils.extensions.showKeyboard
 import com.duckduckgo.common.utils.extensions.websiteFromGeoLocationsApiOrigin
+import com.duckduckgo.common.utils.keyboardVisibilityFlow
 import com.duckduckgo.common.utils.playstore.PlayStoreUtils
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.FragmentScope
@@ -343,6 +344,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.cancellable
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -960,6 +962,7 @@ class BrowserTabFragment :
                             omnibar.setText(result.query)
                             userEnteredQuery(result.query)
                         }
+
                         is VoiceSearchLauncher.VoiceRecognitionResult.DuckAiResult -> {
                             duckChat.openDuckChatWithAutoPrompt(result.query)
                         }
@@ -1062,6 +1065,7 @@ class BrowserTabFragment :
 
         configureNavigationBar()
         configureOmnibar()
+        configureBrowserTabKeyboardListener()
 
         if (savedInstanceState == null) {
             viewModel.setIsCustomTab(tabDisplayedInCustomTabScreen)
@@ -1480,7 +1484,10 @@ class BrowserTabFragment :
         startActivity(intent)
     }
 
-    private fun launchPopupMenu(anchorToNavigationBar: Boolean, addExtraDelay: Boolean = false) {
+    private fun launchPopupMenu(
+        anchorToNavigationBar: Boolean,
+        addExtraDelay: Boolean = false,
+    ) {
         val isFocusedNtp = omnibar.viewMode == ViewMode.NewTab && omnibar.getText().isEmpty() && omnibar.omnibarTextInput.hasFocus()
         val delay = if (addExtraDelay) POPUP_MENU_DELAY * 2 else POPUP_MENU_DELAY
         // small delay added to let keyboard disappear and avoid jarring transition
@@ -1508,6 +1515,7 @@ class BrowserTabFragment :
                 } else {
                     val params = mapOf(PixelParameter.FROM_FOCUSED_NTP to isFocusedNtp.toString())
                     pixel.fire(AppPixelName.MENU_ACTION_POPUP_OPENED.pixelName, params)
+                    pixel.fire(AppPixelName.MENU_ACTION_POPUP_OPENED_DAILY.pixelName, type = Daily())
                 }
             }
         }
@@ -5109,6 +5117,18 @@ class BrowserTabFragment :
             params = EasterEggLogoScreen(logoUrl = logoUrl, transitionName = logoUrl),
             options = activityOptions,
         )
+    }
+
+    private fun configureBrowserTabKeyboardListener() {
+        binding.root.rootView.keyboardVisibilityFlow()
+            .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+            .distinctUntilChanged()
+            .onEach { isVisible ->
+                if (isVisible) {
+                    viewModel.sendKeyboardFocusedPixel()
+                }
+            }
+            .launchIn(lifecycleScope)
     }
 }
 
