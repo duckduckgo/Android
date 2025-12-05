@@ -1787,6 +1787,53 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun wheneverAutoCompleteIsGoneAndSuggestionsIsNotEmptyFireAutocompleteDisplayed() = runTest {
+        whenever(mockAutoCompleteService.autoComplete("query")).thenReturn(emptyList())
+        whenever(mockSavedSitesRepository.getBookmarks()).thenReturn(
+            flowOf(listOf(Bookmark("abc", "query", "https://example.com", lastModified = null))),
+        )
+        whenever(mockSavedSitesRepository.getFavorites()).thenReturn(
+            flowOf(listOf(Favorite("abc", "query", "https://example.com", position = 1, lastModified = null))),
+        )
+        whenever(mockNavigationHistory.getHistory()).thenReturn(
+            flowOf(listOf(VisitedPage("https://foo.com".toUri(), "query", listOf(LocalDateTime.now())))),
+        )
+        whenever(mockTabRepository.flowTabs).thenReturn(
+            flowOf(listOf(TabEntity(tabId = "1", position = 1, url = "https://example.com", title = "query"))),
+        )
+        doReturn(true).whenever(mockAutoCompleteSettings).autoCompleteSuggestionsEnabled
+
+        whenever(mockAutoCompleteRepository.wasHistoryInAutoCompleteIAMDismissed()).thenReturn(false)
+        whenever(mockAutoCompleteRepository.countHistoryInAutoCompleteIAMShown()).thenReturn(0)
+        whenever(mockAutoCompleteScorer.score("query", "https://foo.com".toUri(), 1, "query")).thenReturn(1)
+        whenever(mockUserStageStore.getUserAppStage()).thenReturn(ESTABLISHED)
+
+        testee.triggerAutocomplete("query", hasFocus = true, hasQueryChanged = true)
+        delay(500)
+        testee.autoCompleteSuggestionsGone()
+
+        verify(mockPixel).fire(DuckChatPixelName.AUTOCOMPLETE_DISPLAYED)
+        verify(mockPixel).fire(DuckChatPixelName.AUTOCOMPLETE_DISPLAYED_DAILY, type = Daily())
+    }
+
+    @Test
+    fun wheneverAutoCompleteIsGoneAndSuggestionsIsEmptyDoNotFireAutocompleteDisplayed() = runTest {
+        doReturn(true).whenever(mockAutoCompleteSettings).autoCompleteSuggestionsEnabled
+        whenever(mockAutoCompleteService.autoComplete("query")).thenReturn(emptyList())
+
+        testee.autoCompleteStateFlow.value = "query"
+        testee.autoCompleteSuggestionsGone()
+
+        verify(mockPixel, never()).fire(DuckChatPixelName.AUTOCOMPLETE_DISPLAYED)
+        verify(mockPixel, never()).fire(
+            pixel = eq(DuckChatPixelName.AUTOCOMPLETE_DISPLAYED_DAILY),
+            parameters = any(),
+            encodedParameters = any(),
+            type = any(),
+        )
+    }
+
+    @Test
     fun whenEnteringEmptyQueryThenHideKeyboardCommandNotIssued() {
         testee.onUserSubmittedQuery("")
         verify(mockCommandObserver, never()).onChanged(any<Command.HideKeyboard>())
@@ -8508,5 +8555,13 @@ class BrowserTabViewModelTest {
         val commands = commandCaptor.allValues
         assertFalse(commands.any { it is Command.DisableDuckAIFullScreen })
         assertFalse(commands.any { it is Command.EnableDuckAIFullScreen })
+    }
+
+    @Test
+    fun whenSendKeyboardFocusedPixelThenFireBothKeyboardUsagePixels() = runTest {
+        testee.sendKeyboardFocusedPixel()
+
+        verify(mockPixel).fire(DuckChatPixelName.KEYBOARD_USAGE)
+        verify(mockPixel).fire(DuckChatPixelName.KEYBOARD_USAGE_DAILY, type = Daily())
     }
 }

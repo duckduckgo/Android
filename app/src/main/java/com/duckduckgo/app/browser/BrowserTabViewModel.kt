@@ -1510,7 +1510,6 @@ class BrowserTabViewModel @Inject constructor(
         isLinkOpenedInNewTab && hasSourceTab && !isCustomTab && site?.url.isNullOrEmpty()
 
     private fun navigateHome() {
-        logcat(tag = "RadoiuD") { "Navigate home" }
         site = null
         onSiteChanged()
         webNavigationState = null
@@ -1558,7 +1557,6 @@ class BrowserTabViewModel @Inject constructor(
     fun navigationStateChanged(newWebNavigationState: WebNavigationState) {
         val stateChange = newWebNavigationState.compare(webNavigationState)
 
-        logcat(tag = "RadoiuD") { "Navigation state changed : $newWebNavigationState" }
         viewModelScope.launch {
             showOnAppLaunchOptionHandler.handleResolvedUrlStorage(
                 currentUrl = newWebNavigationState.currentUrl,
@@ -3827,7 +3825,6 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private fun handleNewTabIfEmptyUrl() {
-        logcat(tag = "RadoiuA") { "handleNewTabIfEmptyUrl" }
         val shouldDisplayAboutBlank = handleAboutBlankEnabled && site?.url.isNullOrEmpty()
         if (shouldDisplayAboutBlank) {
             if (isCustomTabScreen) {

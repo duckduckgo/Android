@@ -18,7 +18,10 @@ package com.duckduckgo.duckchat.impl.ui
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
+import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewActivityViewModel.Command
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE
@@ -34,6 +37,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
@@ -43,6 +47,7 @@ class DuckChatWebViewActivityViewModelTest {
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
     private val subscriptions: Subscriptions = mock()
+    private val mockPixel: Pixel = mock()
     private val subscriptionStatusFlow = MutableSharedFlow<SubscriptionStatus>()
 
     private lateinit var viewModel: DuckChatWebViewActivityViewModel
@@ -50,7 +55,7 @@ class DuckChatWebViewActivityViewModelTest {
     @Before
     fun setup() {
         whenever(subscriptions.getSubscriptionStatusFlow()).thenReturn(subscriptionStatusFlow)
-        viewModel = DuckChatWebViewActivityViewModel(subscriptions)
+        viewModel = DuckChatWebViewActivityViewModel(subscriptions, mockPixel)
     }
 
     @Test
@@ -134,5 +139,13 @@ class DuckChatWebViewActivityViewModelTest {
                 assertTrue(command is Command.SendSubscriptionAuthUpdateEvent)
             }
         }
+    }
+
+    @Test
+    fun whenSendKeyboardFocusedPixelThenFireBothKeyboardUsagePixels() = runTest {
+        viewModel.sendKeyboardFocusedPixel()
+
+        verify(mockPixel).fire(DuckChatPixelName.KEYBOARD_USAGE)
+        verify(mockPixel).fire(DuckChatPixelName.KEYBOARD_USAGE_DAILY, type = Daily())
     }
 }

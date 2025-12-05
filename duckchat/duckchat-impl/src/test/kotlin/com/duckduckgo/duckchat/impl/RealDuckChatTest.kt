@@ -35,6 +35,7 @@ import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBa
 import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarOptionBottomSheetDialogFactory
 import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarSelection.SEARCH_AND_AI
 import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarSelection.SEARCH_ONLY
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_CANCELLED
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_CONFIRMED
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_DISPLAYED
@@ -428,6 +429,14 @@ class RealDuckChatTest {
         )
         verify(mockContext).startActivity(any())
         verify(mockDuckChatFeatureRepository).registerOpened()
+    }
+
+    @Test
+    fun whenDuckChatCalledThenFireOpenDuckChatPixels() = runTest {
+        testee.openDuckChat()
+
+        verify(mockPixel).fire(pixel = DuckChatPixelName.DUCK_CHAT_OPEN, parameters = mapOf("delta-timestamp-minutes" to "10"))
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_OPEN_DAILY, type = Pixel.PixelType.Daily())
     }
 
     @Test
