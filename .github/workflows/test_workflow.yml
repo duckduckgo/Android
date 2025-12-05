@@ -8,10 +8,6 @@ on:
         required: true
         default: 'PLACEHOLDER'
 
-env:
-  emoji_start: ":flight_departure:" # 🛫
-  emoji_info: ":information_source:" # ℹ️
-
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.inputs.app-version }}
   cancel-in-progress: true
@@ -21,7 +17,7 @@ jobs:
     name: 'Step 1: Notify Mattermost of Release start'
     uses: ./.github/workflows/notify_mattermost.yml
     with:
-      mattermost-message: ${{env.emoji_start}} Starting release process for version ${{ github.event.inputs.app-version }}
+      mattermost-message: ':flight_departure:' Starting release process for version ${{ github.event.inputs.app-version }}
       mattermost-channel-name: ${{ vars.MM_TEST_NOTIFY_CHANNEL }}
     secrets: inherit
 
@@ -39,6 +35,6 @@ jobs:
     uses: ./.github/workflows/notify_mattermost.yml
     needs: run_release_tests
     with:
-      mattermost-message: ${{env.emoji_end}} Release ${{ github.event.inputs.app-version }} completed successfully and is now in review.
+      mattermost-message: ':white_check_mark:' Release ${{ github.event.inputs.app-version }} completed successfully and is now in review.
       mattermost-channel-name: ${{ vars.MM_TEST_NOTIFY_CHANNEL }}
     secrets: inherit
