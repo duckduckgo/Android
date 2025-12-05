@@ -163,6 +163,9 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
                     }
             },
         )
+        sceneRoot.setOnClickListener {
+            cancelAnimations(omnibarViews)
+        }
     }
 
     override fun createCookiesAnimation(
