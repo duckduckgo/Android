@@ -20,10 +20,13 @@ import android.webkit.WebBackForwardList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.impl.DuckChatConstants.HOST_DUCK_AI
 import com.duckduckgo.duckchat.impl.DuckChatInternal
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.subscriptions.api.Subscriptions
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
@@ -38,6 +41,7 @@ import javax.inject.Inject
 class DuckChatWebViewViewModel @Inject constructor(
     private val subscriptions: Subscriptions,
     private val duckChat: DuckChatInternal,
+    private val pixel: Pixel,
 ) : ViewModel() {
 
     private val commandChannel = Channel<Command>(capacity = 1, onBufferOverflow = DROP_OLDEST)
@@ -64,6 +68,11 @@ class DuckChatWebViewViewModel @Inject constructor(
             currentItem?.toHttpUrl()?.topPrivateDomain() == HOST_DUCK_AI &&
                 firstItem.toHttpUrl().topPrivateDomain() == AppUrl.Url.HOST
         }.getOrElse { false }
+    }
+
+    fun sendKeyboardFocusedPixel() {
+        pixel.fire(DuckChatPixelName.KEYBOARD_USAGE)
+        pixel.fire(DuckChatPixelName.KEYBOARD_USAGE_DAILY, type = Daily())
     }
 
     private fun observeSubscriptionChanges() {

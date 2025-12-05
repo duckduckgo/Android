@@ -43,7 +43,9 @@ import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ActivityOptionsCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.di.AppCoroutineScope
@@ -57,6 +59,7 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.FragmentViewModelFactory
+import com.duckduckgo.common.utils.keyboardVisibilityFlow
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.downloads.api.DOWNLOAD_SNACKBAR_DELAY
 import com.duckduckgo.downloads.api.DOWNLOAD_SNACKBAR_LENGTH
@@ -96,6 +99,7 @@ import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.cancellable
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -326,6 +330,7 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
 
         configureOmnibar()
         observeViewModel()
+        configureKeyboardListener()
     }
 
     private fun configureOmnibar() {
@@ -698,6 +703,18 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
     override fun onDestroyView() {
         super.onDestroyView()
         cookieManager.flush()
+    }
+
+    private fun configureKeyboardListener() {
+        binding.root.rootView.keyboardVisibilityFlow()
+            .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+            .distinctUntilChanged()
+            .onEach { isVisible ->
+                if (isVisible) {
+                    viewModel.sendKeyboardFocusedPixel()
+                }
+            }
+            .launchIn(lifecycleScope)
     }
 
     companion object {
