@@ -97,6 +97,7 @@ class WelcomePageViewModel @Inject constructor(
     private var defaultAddressBarPosition: Boolean = true
     private var inputScreenSelected: Boolean = true
     private var maxPageCount: Int = 2
+    private var reinstallUser: Boolean = false
 
     init {
         viewModelScope.launch(dispatchers.io()) {
@@ -201,7 +202,7 @@ class WelcomePageViewModel @Inject constructor(
                 viewModelScope.launch(dispatchers.io()) {
                     if (inputScreenSelected) {
                         pixel.fire(PREONBOARDING_AICHAT_SELECTED)
-                        inputScreenOnboardingWideEvent.onInputScreenEnabledDuringOnboarding()
+                        inputScreenOnboardingWideEvent.onInputScreenEnabledDuringOnboarding(reinstallUser = reinstallUser)
                     } else {
                         pixel.fire(PREONBOARDING_SEARCH_ONLY_SELECTED)
                     }
@@ -217,6 +218,7 @@ class WelcomePageViewModel @Inject constructor(
         when (currentDialog) {
             INITIAL_REINSTALL_USER -> {
                 viewModelScope.launch {
+                    reinstallUser = true
                     _commands.send(ShowSkipOnboardingOption)
                     pixel.fire(PREONBOARDING_SKIP_ONBOARDING_PRESSED)
                 }

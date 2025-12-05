@@ -36,8 +36,9 @@ import javax.inject.Inject
 interface InputScreenOnboardingWideEvent {
     /**
      * Called when the user enables the Input Screen during onboarding
+     * @param reinstallUser true if the user tapped "I've been here before", false otherwise
      */
-    fun onInputScreenEnabledDuringOnboarding()
+    fun onInputScreenEnabledDuringOnboarding(reinstallUser: Boolean = false)
 
     /**
      * Called when the user enables the Input Screen in AI Features settings before the Input Screen is shown to the user.
@@ -68,7 +69,7 @@ class InputScreenOnboardingWideEventImpl @Inject constructor(
 
     private var cachedFlowId: Long? = null
 
-    override fun onInputScreenEnabledDuringOnboarding() {
+    override fun onInputScreenEnabledDuringOnboarding(reinstallUser: Boolean) {
         coroutineScope.launch {
             if (!isFeatureEnabled()) return@launch
 
@@ -76,6 +77,7 @@ class InputScreenOnboardingWideEventImpl @Inject constructor(
                 .flowStart(
                     name = INPUT_SCREEN_ONBOARDING_FEATURE_NAME,
                     flowEntryPoint = "onboarding",
+                    metadata = mapOf("reinstallUser" to reinstallUser.toString()),
                     cleanupPolicy = CleanupPolicy.OnTimeout(
                         duration = Duration.ofDays(30),
                         flowStatus = FlowStatus.Unknown,
