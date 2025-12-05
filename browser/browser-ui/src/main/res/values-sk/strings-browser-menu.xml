@@ -43,6 +43,7 @@
     <string name="browserMenuRunningInDDG">Spustené v DuckDuckGo</string>
     <string name="browserMenuSetAsDefaultBrowser">Nastaviť ako predvolený prehliadač</string>
     <string name="browserMenuNewChat">Nový chat</string>
+    <string name="browserMenuNewAIChat">Nový AI Chat</string>
     <string name="browserMenuChatHistory">História chatov</string>
     <string name="browserMenuChatSettings">Nastavenia Duck.ai</string>
     <string name="browserMenuVPN">VPN</string>

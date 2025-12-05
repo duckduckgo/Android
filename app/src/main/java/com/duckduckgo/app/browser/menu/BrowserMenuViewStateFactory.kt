@@ -20,9 +20,26 @@ import com.duckduckgo.app.browser.SSLErrorType.NONE
 import com.duckduckgo.app.browser.omnibar.Omnibar
 import com.duckduckgo.app.browser.viewstate.BrowserViewState
 import com.duckduckgo.browser.ui.browsermenu.BrowserMenuViewState
+import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.api.DuckAiFeatureState
+import com.squareup.anvil.annotations.ContributesBinding
+import dagger.SingleInstanceIn
+import javax.inject.Inject
 
-object BrowserMenuViewStateFactory {
+interface BrowserMenuViewStateFactory {
     fun create(
+        omnibarViewMode: Omnibar.ViewMode,
+        viewState: BrowserViewState,
+        customTabsMode: Boolean,
+    ): BrowserMenuViewState
+}
+
+@ContributesBinding(AppScope::class)
+@SingleInstanceIn(AppScope::class)
+class RealBrowserMenuViewStateFactory @Inject constructor(
+    private val duckAiFeatureState: DuckAiFeatureState,
+) : BrowserMenuViewStateFactory {
+    override fun create(
         omnibarViewMode: Omnibar.ViewMode,
         viewState: BrowserViewState,
         customTabsMode: Boolean,
@@ -79,10 +96,12 @@ object BrowserMenuViewStateFactory {
     private fun createBrowserViewState(
         browserViewState: BrowserViewState,
     ): BrowserMenuViewState.Browser {
+        val isDuckAIFullscreenModeEnabled = duckAiFeatureState.showFullScreenMode.value
         return BrowserMenuViewState.Browser(
             canGoBack = browserViewState.canGoBack,
             canGoForward = browserViewState.canGoForward,
-            showDuckChatOption = browserViewState.showDuckChatOption,
+            showDuckChatOption = browserViewState.showDuckChatOption && !isDuckAIFullscreenModeEnabled,
+            showNewDuckChatTabOption = isDuckAIFullscreenModeEnabled,
             canSharePage = browserViewState.canSharePage,
             showSelectDefaultBrowserMenuItem = browserViewState.showSelectDefaultBrowserMenuItem,
             canSaveSite = browserViewState.canSaveSite,
