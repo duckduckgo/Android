@@ -254,7 +254,7 @@ sealed class OnboardingDaxDialogCta(
             binding: FragmentBrowserTabBinding,
             onPrimaryCtaClicked: () -> Unit,
             onSecondaryCtaClicked: () -> Unit,
-            onTypingAnimationFinished: () -> Unit, // TODO should be renamed to onAnimationEnd if buck wins
+            onTypingAnimationFinished: () -> Unit,
             onSuggestedOptionClicked: ((DaxDialogIntroOption) -> Unit)?,
             onDismissCtaClicked: () -> Unit,
         ) {
