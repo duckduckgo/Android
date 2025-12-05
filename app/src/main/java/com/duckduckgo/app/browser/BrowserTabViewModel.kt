@@ -4352,10 +4352,6 @@ class BrowserTabViewModel @Inject constructor(
             }
             hasUserSeenHistoryIAM = false
             lastAutoCompleteState?.searchResults?.suggestions?.let { suggestions ->
-                if (suggestions.isNotEmpty()) {
-                    pixel.fire(DuckChatPixelName.AUTOCOMPLETE_DISPLAYED)
-                    pixel.fire(DuckChatPixelName.AUTOCOMPLETE_DISPLAYED_DAILY, type = Daily())
-                }
                 if (suggestions.any { it is AutoCompleteBookmarkSuggestion && it.isFavorite }) {
                     pixel.fire(AppPixelName.AUTOCOMPLETE_DISPLAYED_LOCAL_FAVORITE)
                 }
