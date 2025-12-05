@@ -88,4 +88,8 @@
     <!-- Duck AI Hide Generated Images Settings Option -->
     <string name="duckAiHideAiGeneratedImagesTitle">Ocultar Imagens Geradas por IA</string>
     <string name="duckAiHideAiGeneratedImagesDescription">Filtra imagens geradas por IA dos resultados de pesquisa de imagens</string>
+
+    <!-- Duck AI Tabs Mode Toggle -->
+    <string name="duckAiFullScreenModeTitle">Modo de separadores Duck.ai</string>
+    <string name="duckAiFullScreenModeDescription">Mostrar os novos Duck.ai Chats como separadores no navegador</string>
 </resources>

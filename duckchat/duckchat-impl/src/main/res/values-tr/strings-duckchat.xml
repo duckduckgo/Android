@@ -88,4 +88,8 @@
     <!-- Duck AI Hide Generated Images Settings Option -->
     <string name="duckAiHideAiGeneratedImagesTitle">Yapay Zeka Tarafından Oluşturulan Görselleri Gizle</string>
     <string name="duckAiHideAiGeneratedImagesDescription">Görsel arama sonuçlarından yapay zeka tarafından üretilmiş görselleri filtreler</string>
+
+    <!-- Duck AI Tabs Mode Toggle -->
+    <string name="duckAiFullScreenModeTitle">Duck.ai Sekme Modu</string>
+    <string name="duckAiFullScreenModeDescription">Tarayıcıda yeni Duck.ai sohbetlerini sekmeler olarak göster</string>
 </resources>
