@@ -20,6 +20,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 
 enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     APP_LAUNCH("ml"),
+    APP_LAUNCH_DAILY("ml_daily"),
     PROCESS_CREATED_MAIN("m_process_created_main"),
     PROCESS_CREATED_VPN("m_process_created_vpn"),
 
@@ -116,6 +117,7 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     LONG_PRESS_OPEN_IMAGE_IN_BACKGROUND_TAB("mlp_ibt"),
 
     SETTINGS_OPENED("ms"),
+    SETTINGS_OPENED_DAILY("ms_daily"),
     SETTINGS_THEME_OPENED("ms_t_o"),
     SETTINGS_THEME_TOGGLED_LIGHT("ms_tl"),
     SETTINGS_THEME_TOGGLED_DARK("ms_td"),
@@ -212,6 +214,9 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     APP_LINKS_SNACKBAR_SHOWN("m_app_links_snackbar_shown"),
     APP_LINKS_SNACKBAR_OPEN_ACTION_PRESSED("m_app_links_snackbar_open_action_pressed"),
 
+    LANDSCAPE_ORIENTATION_USED("m_product_telemetry_surface_usage_landscape"),
+    LANDSCAPE_ORIENTATION_USED_DAILY("m_product_telemetry_surface_usage_landscape_daily"),
+
     FEEDBACK_POSITIVE_SUBMISSION("mfbs_%s_submit"),
     FEEDBACK_NEGATIVE_SUBMISSION("mfbs_%s_%s_%s"),
 
@@ -245,11 +250,11 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     CHANGE_APP_ICON_OPENED("m_ic"),
 
     MENU_ACTION_POPUP_OPENED("m_nav_pm_o"),
+    MENU_ACTION_POPUP_OPENED_DAILY("m_nav_pm_o_daily"),
     MENU_ACTION_FIRE_PRESSED("m_nav_f_p"),
     MENU_ACTION_REFRESH_PRESSED("m_nav_r_p"),
     MENU_ACTION_NEW_TAB_PRESSED_FROM_SERP("m_new_tab_open_from_serp"),
     MENU_ACTION_NEW_TAB_PRESSED_FROM_SITE("m_new_tab_open_from_website"),
-    MENU_ACTION_BOOKMARKS_PRESSED("m_navigation_menu_bookmarks"),
     MENU_ACTION_NAVIGATE_FORWARD_PRESSED("m_nav_nf_p"),
     MENU_ACTION_NAVIGATE_BACK_PRESSED("m_nav_nb_p"),
     MENU_ACTION_ADD_BOOKMARK_PRESSED("m_nav_ab_p"),
@@ -293,6 +298,7 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
 
     FIRE_DIALOG_PROMOTED_CLEAR_PRESSED("m_fdp_p"),
     FIRE_DIALOG_CLEAR_PRESSED("m_fd_p"),
+    FIRE_DIALOG_CLEAR_PRESSED_DAILY("m_fd_p_daily"),
     FIRE_DIALOG_CANCEL("m_fd_c"),
     FIRE_DIALOG_ANIMATION("m_fd_a"),
 
@@ -427,6 +433,11 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     SITE_NOT_WORKING_SHOWN("m_site-not-working_shown"),
 
     URI_LOADED("m_uri_loaded"),
+
+    SERP_LOADED("m_product_telemetry_surface_usage_serp"),
+    SERP_LOADED_DAILY("m_product_telemetry_surface_usage_serp_daily"),
+    WEBSITE_LOADED("m_product_telemetry_surface_usage_website"),
+    WEBSITE_LOADED_DAILY("m_product_telemetry_surface_usage_website_daily"),
 
     ERROR_PAGE_SHOWN("m_errorpageshown"),
 
