@@ -1,17 +1,27 @@
 name: Production Release to Play Store and Github
 
 on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: 'Ref to build APK from (branch, tag, commit)'
+        required: true
   workflow_call:
     inputs:
       ref:
         description: 'Ref to build APK from (branch, tag, commit)'
         type: string
         required: true
-
-  workflow_dispatch:
-    inputs:
-      ref:
-        description: 'Ref to build APK from (branch, tag, commit)'
+    secrets:
+      ASANA_ACCESS_TOKEN:
+        required: true
+      GT_DAXMOBILE:
+        required: true
+      UPLOAD_PLAY_CREDENTIALS:
+        required: true
+      MM_AUTH_TOKEN:
+        required: true
+      MM_TEAM_ID:
         required: true
 
 env:
