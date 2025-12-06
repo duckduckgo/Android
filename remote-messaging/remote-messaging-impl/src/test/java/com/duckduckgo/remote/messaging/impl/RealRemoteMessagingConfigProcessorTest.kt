@@ -48,18 +48,19 @@ class RealRemoteMessagingConfigProcessorTest {
     @get:Rule var coroutineRule = CoroutineTestRule()
 
     private val appBuildConfig: AppBuildConfig = mock()
+    private var remoteMessagingFeatureToggles: RemoteMessagingFeatureToggles = FakeFeatureToggleFactory.create(
+        RemoteMessagingFeatureToggles::class.java,
+    )
     private val remoteMessagingConfigJsonMapper = RemoteMessagingConfigJsonMapper(
         appBuildConfig,
         jsonMatchingAttributeMappers,
         messageActionPlugins,
+        remoteMessagingFeatureToggles,
     )
     private val remoteMessagingConfigRepository = mock<RemoteMessagingConfigRepository>()
     private val remoteMessagingRepository = mock<RemoteMessagingRepository>()
     private val remoteMessagingCohortStore = mock<RemoteMessagingCohortStore>()
     private val remoteMessagingConfigMatcher = RemoteMessagingConfigMatcher(setOf(mock(), mock(), mock()), mock(), remoteMessagingCohortStore)
-    private var remoteMessagingFeatureToggles: RemoteMessagingFeatureToggles = FakeFeatureToggleFactory.create(
-        RemoteMessagingFeatureToggles::class.java,
-    )
 
     private val testee = RealRemoteMessagingConfigProcessor(
         remoteMessagingConfigJsonMapper,

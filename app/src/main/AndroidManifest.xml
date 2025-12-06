@@ -247,6 +247,10 @@
             android:label="@string/appName" />
 
         <activity
+            android:name="com.duckduckgo.remote.messaging.impl.ui.ModalSurfaceActivity"
+            android:exported="false" />
+
+        <activity
             android:name="com.duckduckgo.app.browser.customtabs.CustomTabActivity"
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden"
             android:exported="false"

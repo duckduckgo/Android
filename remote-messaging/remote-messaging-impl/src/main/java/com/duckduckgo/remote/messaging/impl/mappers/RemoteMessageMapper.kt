@@ -78,7 +78,7 @@ fun RemoteMessage.asMessage(isLightModeEnabled: Boolean): Message? {
     }
 }
 
-private fun Placeholder.drawable(isLightModeEnabled: Boolean): Int {
+fun Placeholder.drawable(isLightModeEnabled: Boolean): Int {
     return when (this) {
         ANNOUNCE -> R.drawable.ic_announce
         DDG_ANNOUNCE -> R.drawable.ic_ddg_announce
