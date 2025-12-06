@@ -43,6 +43,7 @@ import logcat.LogPriority.WARN
 import logcat.asLog
 import logcat.logcat
 import javax.inject.Inject
+import javax.inject.Provider
 
 @ContributesBinding(
     scope = AppScope::class,
@@ -55,13 +56,14 @@ import javax.inject.Inject
 @SingleInstanceIn(AppScope::class)
 class RxPixelSender @Inject constructor(
     private val api: PixelService,
-    private val pendingPixelDao: PendingPixelDao,
+    private val pendingPixelDaoProvider: Provider<PendingPixelDao>,
     private val statisticsDataStore: StatisticsDataStore,
     private val deviceInfo: DeviceInfo,
     private val statisticsLibraryConfig: StatisticsLibraryConfig?,
     private val pixelFiredRepository: PixelFiredRepository,
 ) : PixelSender, MainProcessLifecycleObserver {
 
+    private val pendingPixelDao by lazy { pendingPixelDaoProvider.get() }
     private val compositeDisposable = CompositeDisposable()
 
     private val shouldFirePixelsAsDev: Int? by lazy {

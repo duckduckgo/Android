@@ -91,7 +91,7 @@ class RxPixelSenderTest {
 
         testee = RxPixelSender(
             api,
-            pendingPixelDao,
+            { pendingPixelDao },
             mockStatisticsDataStore,
             mockDeviceInfo,
             object : StatisticsLibraryConfig {
