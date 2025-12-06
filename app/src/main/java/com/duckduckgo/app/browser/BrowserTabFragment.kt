@@ -343,6 +343,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.cancellable
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -1542,6 +1543,13 @@ class BrowserTabFragment :
 
         viewModel.onMessageReceived()
         message.sendToTarget()
+
+        webView?.postDelayed(
+            {
+                viewModel.handleNewTabIfEmptyUrl()
+            },
+            200L,
+        )
 
         viewModel.onMessageProcessed()
     }
