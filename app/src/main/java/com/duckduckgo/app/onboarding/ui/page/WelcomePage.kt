@@ -53,7 +53,6 @@ import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowIn
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowInitialReinstallUserDialog
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowInputScreenDialog
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowSkipOnboardingOption
-import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentManager
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.view.gone
@@ -61,7 +60,6 @@ import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.common.utils.extensions.html
-import com.duckduckgo.common.utils.extensions.preventWidows
 import com.duckduckgo.di.scopes.FragmentScope
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -79,9 +77,6 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
 
     @Inject
     lateinit var appTheme: AppTheme
-
-    @Inject
-    lateinit var onboardingDesignExperimentManager: OnboardingDesignExperimentManager
 
     private val binding: ContentOnboardingWelcomePageBinding by viewBinding()
     private val viewModel by lazy {
@@ -149,11 +144,7 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
             },
         )
 
-        if (onboardingDesignExperimentManager.isModifiedControlEnrolledAndEnabled()) {
-            scheduleWelcomeAnimation()
-        } else {
-            requestNotificationsPermissions()
-        }
+        requestNotificationsPermissions()
 
         setSkipAnimationListener()
     }
@@ -307,13 +298,7 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
                     binding.daxDialogCta.progressBar.show()
                     binding.daxDialogCta.progressBar.max = maxPages
                     binding.daxDialogCta.progressBar.progress = 2
-                    val ctaText = it.getString(R.string.preOnboardingAddressBarTitle).run {
-                        if (onboardingDesignExperimentManager.isModifiedControlEnrolledAndEnabled()) {
-                            preventWidows()
-                        } else {
-                            this
-                        }
-                    }
+                    val ctaText = it.getString(R.string.preOnboardingAddressBarTitle)
                     binding.daxDialogCta.hiddenTextCta.text = ctaText.html(it)
                     binding.daxDialogCta.primaryCta.alpha = MIN_ALPHA
                     binding.daxDialogCta.addressBarPosition.root.show()
