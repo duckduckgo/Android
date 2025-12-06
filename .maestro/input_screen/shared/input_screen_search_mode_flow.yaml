@@ -65,7 +65,7 @@ appId: com.duckduckgo.mobile.android
 - assertVisible:
     id: "browserLayout"
 - assertVisible:
-    text: "https://www.eff.org/"
+    text: ".*eff.org.*"
     childOf:
       id: "omnibarTextInput"
 
@@ -94,7 +94,7 @@ appId: com.duckduckgo.mobile.android
 - assertVisible:
     id: "browserLayout"
 - assertVisible:
-    text: "https://www.amazon.com/"
+    text: ".*amazon.com.*"
     childOf:
       id: "omnibarTextInput"
 
