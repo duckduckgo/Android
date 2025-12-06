@@ -88,4 +88,8 @@
     <!-- Duck AI Hide Generated Images Settings Option -->
     <string name="duckAiHideAiGeneratedImagesTitle">Ascunde imaginile generate de IA</string>
     <string name="duckAiHideAiGeneratedImagesDescription">Filtrează imaginile generate de IA din rezultatele căutării de imagini</string>
+
+    <!-- Duck AI Tabs Mode Toggle -->
+    <string name="duckAiFullScreenModeTitle">Modul de file Duck.ai</string>
+    <string name="duckAiFullScreenModeDescription">Afișează noile chaturi Duck.ai ca file în browser</string>
 </resources>
