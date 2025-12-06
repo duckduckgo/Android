@@ -36,6 +36,7 @@ import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_GENERAL_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_NEXT_STEPS_ADDRESS_BAR
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_NEXT_STEPS_VOICE_SEARCH
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_OPENED
+import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_OPENED_DAILY
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_PASSWORDS_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_PERMISSIONS_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_PRIVATE_SEARCH_PRESSED
@@ -176,6 +177,7 @@ class SettingsViewModel @Inject constructor(
 
     init {
         pixel.fire(SETTINGS_OPENED)
+        pixel.fire(SETTINGS_OPENED_DAILY, type = Pixel.PixelType.Daily())
 
         duckAiFeatureState.showSettings.onEach { showDuckAiSettings ->
             viewState.update { it.copy(isDuckChatEnabled = showDuckAiSettings) }

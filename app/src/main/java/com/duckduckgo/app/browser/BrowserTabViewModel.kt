@@ -4353,6 +4353,10 @@ class BrowserTabViewModel @Inject constructor(
             }
             hasUserSeenHistoryIAM = false
             lastAutoCompleteState?.searchResults?.suggestions?.let { suggestions ->
+                if (suggestions.isNotEmpty()) {
+                    pixel.fire(DuckChatPixelName.AUTOCOMPLETE_DISPLAYED)
+                    pixel.fire(DuckChatPixelName.AUTOCOMPLETE_DISPLAYED_DAILY, type = Daily())
+                }
                 if (suggestions.any { it is AutoCompleteBookmarkSuggestion && it.isFavorite }) {
                     pixel.fire(AppPixelName.AUTOCOMPLETE_DISPLAYED_LOCAL_FAVORITE)
                 }
@@ -4617,7 +4621,6 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onBookmarksMenuItemClicked() {
-        pixel.fire(AppPixelName.MENU_ACTION_BOOKMARKS_PRESSED.pixelName)
         launchBookmarksActivity()
     }
 
@@ -4663,6 +4666,11 @@ class BrowserTabViewModel @Inject constructor(
 
     fun onDynamicLogoClicked(url: String) {
         command.value = Command.ShowSerpEasterEggLogo(url)
+    }
+
+    fun sendKeyboardFocusedPixel() {
+        pixel.fire(DuckChatPixelName.KEYBOARD_USAGE)
+        pixel.fire(DuckChatPixelName.KEYBOARD_USAGE_DAILY, type = Daily())
     }
 
     private fun trackersCount(): String =

@@ -138,7 +138,10 @@ class RealDuckChatPixels @Inject constructor(
 }
 
 enum class DuckChatPixelName(override val pixelName: String) : Pixel.PixelName {
+    AUTOCOMPLETE_DISPLAYED("m_product_telemetry_surface_usage_autocomplete"),
+    AUTOCOMPLETE_DISPLAYED_DAILY("m_product_telemetry_surface_usage_autocomplete_daily"),
     DUCK_CHAT_OPEN("aichat_open"),
+    DUCK_CHAT_OPEN_DAILY("aichat_open_daily"),
     DUCK_CHAT_OPEN_BROWSER_MENU("aichat_open_browser_menu"),
     DUCK_CHAT_OPEN_NEW_TAB_MENU("aichat_open_new_tab_menu"),
     DUCK_CHAT_OPEN_TAB_SWITCHER_FAB("aichat_open_tab_switcher_fab"),
@@ -211,6 +214,8 @@ enum class DuckChatPixelName(override val pixelName: String) : Pixel.PixelName {
     DUCK_CHAT_DUCK_AI_SETTINGS_TAPPED("m_aichat_settings_menu_aichat_settings_tapped"),
     DUCK_CHAT_TAB_SWITCHER_OPENED("m_aichat_tab_switcher_opened"),
     DUCK_CHAT_FIRE_BUTTON_TAPPED("m_aichat_fire_button_tapped"),
+    KEYBOARD_USAGE("m_product_telemetry_surface_usage_keyboard_active"),
+    KEYBOARD_USAGE_DAILY("m_product_telemetry_surface_usage_keyboard_active"),
 }
 
 object DuckChatPixelParameters {

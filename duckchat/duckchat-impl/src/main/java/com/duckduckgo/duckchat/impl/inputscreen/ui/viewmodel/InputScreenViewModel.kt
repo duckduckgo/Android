@@ -271,6 +271,7 @@ class InputScreenViewModel @AssistedInject constructor(
 
         shouldShowAutoComplete
             .onEach { showAutoComplete ->
+                fireAutocompletePixels(showAutoComplete)
                 _visibilityState.update {
                     it.copy(
                         autoCompleteSuggestionsVisible = showAutoComplete,
@@ -603,6 +604,10 @@ class InputScreenViewModel @AssistedInject constructor(
         pixel.fire(DUCK_CHAT_EXPERIMENTAL_OMNIBAR_SHOWN_COUNT)
     }
 
+    fun sendKeyboardFocusedPixel() {
+        pixel.fire(DuckChatPixelName.KEYBOARD_USAGE)
+        pixel.fire(DuckChatPixelName.KEYBOARD_USAGE_DAILY, type = Daily())
+    }
     private fun fireModeSwitchedPixel(directionToSearch: Boolean) {
         val hadText =
             if (directionToSearch) {
@@ -621,6 +626,13 @@ class InputScreenViewModel @AssistedInject constructor(
                 "had_text" to hadText.toString(),
             )
         pixel.fire(pixel = DUCK_CHAT_EXPERIMENTAL_OMNIBAR_MODE_SWITCHED, parameters = params)
+    }
+
+    private fun fireAutocompletePixels(showAutocomplete: Boolean) {
+        if (showAutocomplete) {
+            pixel.fire(DuckChatPixelName.AUTOCOMPLETE_DISPLAYED)
+            pixel.fire(DuckChatPixelName.AUTOCOMPLETE_DISPLAYED_DAILY, type = Daily())
+        }
     }
 
     private suspend fun checkAndFireBothModesPixel() {

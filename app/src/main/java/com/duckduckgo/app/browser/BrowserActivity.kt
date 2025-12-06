@@ -20,6 +20,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.Intent.EXTRA_TEXT
+import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -353,6 +354,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         }
         configureOnBackPressedListener()
         showNewAddressBarOptionChoiceScreen()
+        checkForLanscapeOrientation()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -1009,6 +1011,13 @@ open class BrowserActivity : DuckDuckGoActivity() {
         hideMockupOmnibar()
     }
 
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            viewModel.sendPixelEventForLandscapeOrientation()
+        }
+    }
+
     private fun hideMockupOmnibar() {
         // Delaying this code to avoid race condition when fragment and activity recreated
         Handler(Looper.getMainLooper()).postDelayed(
@@ -1470,6 +1479,12 @@ open class BrowserActivity : DuckDuckGoActivity() {
                     omnibarToolbarMockupBottomBinding.mockOmniBarContainerShadow.addBottomShadow()
                 }
             }
+        }
+    }
+
+    private fun checkForLanscapeOrientation() {
+        if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            viewModel.sendPixelEventForLandscapeOrientation()
         }
     }
 }

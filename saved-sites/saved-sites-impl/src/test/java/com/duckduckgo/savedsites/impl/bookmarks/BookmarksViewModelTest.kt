@@ -22,6 +22,7 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.autofill.api.ImportFromGoogle
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.InstantSchedulersRule
@@ -36,6 +37,7 @@ import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import com.duckduckgo.savedsites.api.models.SavedSitesNames.BOOKMARKS_ROOT
 import com.duckduckgo.savedsites.api.service.SavedSitesManager
 import com.duckduckgo.savedsites.impl.SavedSitesPixelName
+import com.duckduckgo.savedsites.impl.SavedSitesPixelParameters
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksAdapter.BookmarkItem
 import com.duckduckgo.savedsites.impl.store.BookmarksDataStore
 import com.duckduckgo.savedsites.impl.store.SortingMode.MANUAL
@@ -137,6 +139,16 @@ class BookmarksViewModelTest {
     fun after() {
         testee.viewState.removeObserver(viewStateObserver)
         testee.command.removeObserver(commandObserver)
+    }
+
+    @Test
+    fun whenInitSendBookmarksPressedPixels() {
+        verify(pixel).fire(SavedSitesPixelName.MENU_ACTION_BOOKMARKS_PRESSED.pixelName)
+        verify(pixel).fire(
+            SavedSitesPixelName.MENU_ACTION_BOOKMARKS_PRESSED_DAILY.pixelName,
+            parameters = mapOf(SavedSitesPixelParameters.SORT_MODE to bookmarksDataStore.getSortingMode().name),
+            type = Daily(),
+        )
     }
 
     @Test
