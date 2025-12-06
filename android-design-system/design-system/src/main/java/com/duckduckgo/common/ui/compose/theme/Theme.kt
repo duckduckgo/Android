@@ -81,6 +81,7 @@ fun DuckDuckGoTheme(
         window = colorResource(R.color.white),
         destructive = colorResource(R.color.alertRedOnLightDefault),
         lines = colorResource(R.color.black9),
+        borders = colorResource(R.color.black30),
         accentContentPrimary = colorResource(R.color.white),
         accentBlue = colorResource(R.color.blue50),
         accentYellow = colorResource(R.color.yellow50),
@@ -95,6 +96,7 @@ fun DuckDuckGoTheme(
             logoTitle = Gray85,
             omnibarHighlight = colorResource(R.color.blue50_20),
         ),
+        iconPrimary = Black84,
         isDark = false,
     )
 
@@ -107,6 +109,7 @@ fun DuckDuckGoTheme(
         window = colorResource(R.color.gray85),
         destructive = colorResource(R.color.alertRedOnDarkDefault),
         lines = colorResource(R.color.white9),
+        borders = colorResource(R.color.white30),
         accentContentPrimary = colorResource(R.color.blue80),
         accentBlue = colorResource(R.color.blue30),
         accentYellow = colorResource(R.color.yellow50),
@@ -121,6 +124,7 @@ fun DuckDuckGoTheme(
             logoTitle = White,
             omnibarHighlight = colorResource(R.color.blue30_20),
         ),
+        iconPrimary = White78,
         isDark = true,
     )
 
