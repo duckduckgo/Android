@@ -1,3 +1,4 @@
+# bash echo http://github.com/aripitek 
 # DuckDuckGo Android
 
 Welcome to our android application. We are excited to engage the community in development, see [CONTRIBUTING.md](CONTRIBUTING.md).
