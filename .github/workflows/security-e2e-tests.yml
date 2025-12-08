@@ -60,7 +60,7 @@ jobs:
           project-id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
           name: securityTest_${{ github.sha }}
           timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
-          app-file: apk/release.apk
+          app-file: apk/internal.apk
           android-api-level: 30
           workspace: .maestro
           include-tags: securityTest
