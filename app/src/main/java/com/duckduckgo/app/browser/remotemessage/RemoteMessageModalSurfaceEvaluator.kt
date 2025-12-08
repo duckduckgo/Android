@@ -86,8 +86,9 @@ class RemoteMessageModalSurfaceEvaluatorImpl @Inject constructor(
                 val intent = globalActivityStarter.startIntent(
                     applicationContext,
                     ModalSurfaceActivityFromMessageId(message.id, message.content.messageType),
-                )
-                intent?.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
+                ) ?: return@withContext
+
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
                 applicationContext.startActivity(intent)
             }
         }
