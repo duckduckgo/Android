@@ -597,6 +597,9 @@ class BrowserTabFragment :
     @Inject
     lateinit var webViewCompatTestHelper: WebViewCompatTestHelper
 
+    @Inject
+    lateinit var browserMenuViewStateFactory: BrowserMenuViewStateFactory
+
     /**
      * We use this to monitor whether the user was seeing the in-context Email Protection signup prompt
      * This is needed because the activity stack will be cleared if an external link is opened in our browser
@@ -1161,6 +1164,7 @@ class BrowserTabFragment :
                     query = query,
                     isTopOmnibar = isTopOmnibar,
                     browserButtonsConfig = InputScreenBrowserButtonsConfig.Enabled(tabs = viewModel.tabs.value?.size ?: 0),
+                    launchOnChat = omnibar.viewMode == ViewMode.DuckAI,
                 ),
             )
         val enterTransition = browserAndInputScreenTransitionProvider.getInputScreenEnterAnimation(isTopOmnibar)
@@ -1447,7 +1451,7 @@ class BrowserTabFragment :
                 viewModel.onVpnMenuClicked()
             }
             onMenuItemClicked(duckNewChatMenuItem) {
-                viewModel.openNewDuckChat()
+                viewModel.openNewDuckChat(omnibar.viewMode)
             }
             onMenuItemClicked(duckChatHistoryMenuItem) {
                 pixel.fire(DuckChatPixelName.DUCK_CHAT_SETTINGS_SIDEBAR_TAPPED)
@@ -1826,7 +1830,7 @@ class BrowserTabFragment :
     }
 
     private fun showDuckAI(browserViewState: BrowserViewState) {
-        val browseMenuState = BrowserMenuViewStateFactory.create(
+        val browseMenuState = browserMenuViewStateFactory.create(
             omnibarViewMode = ViewMode.DuckAI,
             viewState = browserViewState,
             customTabsMode = tabDisplayedInCustomTabScreen,
@@ -2056,9 +2060,8 @@ class BrowserTabFragment :
         }
     }
 
-    fun getBottomNavigationBar(): BrowserNavigationBarView {
-        return binding.navigationBar
-    }
+    val navigationBar: BrowserNavigationBarView
+        get() = binding.navigationBar
 
     private fun processCommand(it: Command?) {
         if (it is NavigationCommand) {
@@ -4627,7 +4630,7 @@ class BrowserTabFragment :
 
                 browserNavigationBarIntegration.configureFireButtonHighlight(highlighted = viewState.fireButton.isHighlighted())
 
-                val browseMenuState = BrowserMenuViewStateFactory.create(
+                val browseMenuState = browserMenuViewStateFactory.create(
                     omnibarViewMode = omnibar.viewMode,
                     viewState = viewState,
                     customTabsMode = tabDisplayedInCustomTabScreen,

@@ -4509,11 +4509,17 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    fun openNewDuckChat() {
-        pixel.fire(DuckChatPixelName.DUCK_CHAT_OMNIBAR_NEW_CHAT_TAPPED)
-        viewModelScope.launch {
-            val subscriptionEvent = duckChatJSHelper.onNativeAction(NativeAction.NEW_CHAT)
-            _subscriptionEventDataChannel.send(subscriptionEvent)
+    fun openNewDuckChat(viewMode: ViewMode) {
+        if (viewMode == ViewMode.DuckAI) {
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_OMNIBAR_NEW_CHAT_TAPPED)
+            viewModelScope.launch {
+                val subscriptionEvent = duckChatJSHelper.onNativeAction(NativeAction.NEW_CHAT)
+                _subscriptionEventDataChannel.send(subscriptionEvent)
+            }
+        } else {
+            val url = duckChat.getDuckChatUrl("", false)
+            command.value = OpenInNewTab(url, tabId)
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_SETTINGS_NEW_CHAT_TAB_TAPPED)
         }
     }
 
@@ -4533,18 +4539,12 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onDuckChatMenuClicked() {
-        if (duckAiFeatureState.showFullScreenMode.value) {
-            val url = duckChat.getDuckChatUrl("", false)
-            command.value = OpenInNewTab(url, tabId)
-            pixel.fire(DuckChatPixelName.DUCK_CHAT_SETTINGS_NEW_CHAT_TAB_TAPPED)
-        } else {
-            viewModelScope.launch {
-                command.value = HideKeyboardForChat
-                val params = duckChat.createWasUsedBeforePixelParams()
-                pixel.fire(DuckChatPixelName.DUCK_CHAT_OPEN_BROWSER_MENU, parameters = params)
-            }
-            duckChat.openDuckChat()
+        viewModelScope.launch {
+            command.value = HideKeyboardForChat
+            val params = duckChat.createWasUsedBeforePixelParams()
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_OPEN_BROWSER_MENU, parameters = params)
         }
+        duckChat.openDuckChat()
     }
 
     fun onDuckChatOmnibarButtonClicked(

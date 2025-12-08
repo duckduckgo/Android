@@ -116,6 +116,7 @@ import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter.QuickAccessFavorite
 import com.duckduckgo.app.browser.omnibar.Omnibar
+import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.browser.omnibar.QueryOrigin.FromBookmark
@@ -6636,24 +6637,6 @@ class BrowserTabViewModelTest {
         }
 
     @Test
-    fun whenDuckChatMenuItemClickedAndFullScreenModeThenDontOpenDuckChatScreen() =
-        runTest {
-            mockDuckAiFeatureStateFullScreenModeFlow.emit(true)
-            whenever(mockDuckChat.wasOpenedBefore()).thenReturn(false)
-            whenever(mockOmnibarConverter.convertQueryToUrl(duckChatURL, null)).thenReturn(duckChatURL)
-
-            testee.onDuckChatMenuClicked()
-
-            verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-
-            val command = commandCaptor.lastValue as Command.OpenInNewTab
-            assertTrue(command.query == duckChatURL)
-
-            verify(mockDuckChat, never()).openDuckChat()
-            verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_SETTINGS_NEW_CHAT_TAB_TAPPED)
-        }
-
-    @Test
     fun whenDuckChatMenuItemClickedAndItWasUsedBeforeThenOpenDuckChatAndSendPixel() =
         runTest {
             whenever(mockDuckChat.wasOpenedBefore()).thenReturn(true)
@@ -8324,7 +8307,7 @@ class BrowserTabViewModelTest {
         )
         whenever(mockDuckChatJSHelper.onNativeAction(NativeAction.NEW_CHAT)).thenReturn(expectedEvent)
 
-        testee.openNewDuckChat()
+        testee.openNewDuckChat(ViewMode.DuckAI)
 
         testee.subscriptionEventDataFlow.test {
             val emittedEvent = awaitItem()
@@ -8335,6 +8318,24 @@ class BrowserTabViewModelTest {
         }
         verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_OMNIBAR_NEW_CHAT_TAPPED)
     }
+
+    @Test
+    fun whenDuckChatMenuItemClickedAndFullScreenModeDisabledThenDontOpenDuckChatScreen() =
+        runTest {
+            mockDuckAiFeatureStateFullScreenModeFlow.emit(true)
+            whenever(mockDuckChat.wasOpenedBefore()).thenReturn(false)
+            whenever(mockOmnibarConverter.convertQueryToUrl(duckChatURL, null)).thenReturn(duckChatURL)
+
+            testee.openNewDuckChat(ViewMode.NewTab)
+
+            verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+
+            val command = commandCaptor.lastValue as Command.OpenInNewTab
+            assertTrue(command.query == duckChatURL)
+
+            verify(mockDuckChat, never()).openDuckChat()
+            verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_SETTINGS_NEW_CHAT_TAB_TAPPED)
+        }
 
     @Test
     fun whenDuckChatNativeHistoryRequested() = runTest {

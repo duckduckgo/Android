@@ -269,6 +269,9 @@ interface PrivacyProFeature {
 
     @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.TRUE)
     fun handleSubscriptionsWebViewRenderProcessCrash(): Toggle
+
+    @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.TRUE)
+    fun sendFreeTrialConversionWideEvent(): Toggle
 }
 
 @ContributesBinding(AppScope::class)
