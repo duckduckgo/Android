@@ -1,8 +1,6 @@
 name: Security End-to-End tests
 
 on:
-  schedule:
-    - cron: '0 7 * * *' # run at 7 AM UTC
   workflow_dispatch:
 
 concurrency:
