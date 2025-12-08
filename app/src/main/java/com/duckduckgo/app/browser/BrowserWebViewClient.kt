@@ -471,7 +471,6 @@ class BrowserWebViewClient @Inject constructor(
         url: String?,
         favicon: Bitmap?,
     ) {
-        logcat(tag = "RadoiuA") { "On page started: $url" }
         logcat { "Duck.ai onPageStarted webViewUrl: ${webView.url} URL: $url lastPageStarted $lastPageStarted" }
         url?.let {
             // See https://app.asana.com/0/0/1206159443951489/f (WebView limitations)
