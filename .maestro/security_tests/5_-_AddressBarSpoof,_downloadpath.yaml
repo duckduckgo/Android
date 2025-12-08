@@ -32,6 +32,8 @@ tags:
                 timeout: 10000
             - tapOn: "Cancel"
             # Should redirect back to the last page.
+            - tapOn:
+                id: "omnibarTextInput"
             - copyTextFrom:
                 id: "omnibarTextInput"
             - assertTrue: ${maestro.copiedText.indexOf("https://staticcdn.duckduckgo.com") == -1}
