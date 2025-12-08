@@ -215,7 +215,7 @@ enum class DuckChatPixelName(override val pixelName: String) : Pixel.PixelName {
     DUCK_CHAT_TAB_SWITCHER_OPENED("m_aichat_tab_switcher_opened"),
     DUCK_CHAT_FIRE_BUTTON_TAPPED("m_aichat_fire_button_tapped"),
     KEYBOARD_USAGE("m_product_telemetry_surface_usage_keyboard_active"),
-    KEYBOARD_USAGE_DAILY("m_product_telemetry_surface_usage_keyboard_active"),
+    KEYBOARD_USAGE_DAILY("m_product_telemetry_surface_usage_keyboard_active_daily"),
 }
 
 object DuckChatPixelParameters {
