@@ -24,6 +24,7 @@ import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
 import android.text.style.URLSpan
 import android.view.View
+import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -41,6 +42,7 @@ import com.duckduckgo.duckchat.impl.databinding.ActivityDuckAiPaidSettingsBindin
 import com.duckduckgo.duckchat.impl.subscription.DuckAiPaidSettingsViewModel.Command
 import com.duckduckgo.duckchat.impl.subscription.DuckAiPaidSettingsViewModel.Command.LaunchLearnMoreWebPage
 import com.duckduckgo.duckchat.impl.subscription.DuckAiPaidSettingsViewModel.Command.OpenDuckAi
+import com.duckduckgo.duckchat.impl.subscription.DuckAiPaidSettingsViewModel.ViewState
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import kotlinx.coroutines.flow.launchIn
@@ -97,6 +99,15 @@ class DuckAiPaidSettingsActivity : DuckDuckGoActivity() {
             .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
             .onEach { processCommand(it) }
             .launchIn(lifecycleScope)
+
+        viewModel.viewState
+            .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+            .onEach { viewState -> viewState?.let { renderViewState(it) } }
+            .launchIn(lifecycleScope)
+    }
+
+    private fun renderViewState(viewState: ViewState) {
+        binding.statusIndicator.setStatus(viewState.isDuckChatEnabled)
     }
 
     private fun processCommand(command: Command) {
