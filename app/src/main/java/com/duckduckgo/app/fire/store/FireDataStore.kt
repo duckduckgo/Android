@@ -142,14 +142,14 @@ class SharedPreferencesFireDataStore @Inject constructor(
 
     override suspend fun addManualClearOption(option: FireClearOption) {
         store.edit { preferences ->
-            val currentOptions = preferences[KEY_MANUAL_CLEAR_OPTIONS] ?: emptySet()
+            val currentOptions = preferences[KEY_MANUAL_CLEAR_OPTIONS] ?: DEFAULT_OPTIONS.map { it.name }.toSet()
             preferences[KEY_MANUAL_CLEAR_OPTIONS] = currentOptions + option.name
         }
     }
 
     override suspend fun removeManualClearOption(option: FireClearOption) {
         store.edit { preferences ->
-            val currentOptions = preferences[KEY_MANUAL_CLEAR_OPTIONS] ?: emptySet()
+            val currentOptions = preferences[KEY_MANUAL_CLEAR_OPTIONS] ?: DEFAULT_OPTIONS.map { it.name }.toSet()
             preferences[KEY_MANUAL_CLEAR_OPTIONS] = currentOptions - option.name
         }
     }
@@ -177,14 +177,14 @@ class SharedPreferencesFireDataStore @Inject constructor(
 
     override suspend fun addAutomaticClearOption(option: FireClearOption) {
         store.edit { preferences ->
-            val currentOptions = preferences[KEY_AUTOMATIC_CLEAR_OPTIONS] ?: emptySet()
+            val currentOptions = preferences[KEY_AUTOMATIC_CLEAR_OPTIONS] ?: getLegacyOptions().map { it.name }.toSet()
             preferences[KEY_AUTOMATIC_CLEAR_OPTIONS] = currentOptions + option.name
         }
     }
 
     override suspend fun removeAutomaticClearOption(option: FireClearOption) {
         store.edit { preferences ->
-            val currentOptions = preferences[KEY_AUTOMATIC_CLEAR_OPTIONS] ?: emptySet()
+            val currentOptions = preferences[KEY_AUTOMATIC_CLEAR_OPTIONS] ?: getLegacyOptions().map { it.name }.toSet()
             preferences[KEY_AUTOMATIC_CLEAR_OPTIONS] = currentOptions - option.name
         }
     }
