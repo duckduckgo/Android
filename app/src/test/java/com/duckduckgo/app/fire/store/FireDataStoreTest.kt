@@ -19,46 +19,53 @@ package com.duckduckgo.app.fire.store
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.preferencesDataStoreFile
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.platform.app.InstrumentationRegistry
 import app.cash.turbine.test
 import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.clear.FireClearOption
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.common.test.CoroutineTestRule
 import kotlinx.coroutines.test.runTest
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.junit.rules.TemporaryFolder
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
+import java.io.File
 
 @RunWith(AndroidJUnit4::class)
 class FireDataStoreTest {
 
     @get:Rule
-    val temporaryFolder = TemporaryFolder()
+    var coroutinesTestRule = CoroutineTestRule()
 
+    private lateinit var testDataStoreFile: File
     private lateinit var dataStore: DataStore<Preferences>
     private lateinit var settingsDataStore: SettingsDataStore
     private lateinit var fireDataStore: FireDataStore
 
     @Before
     fun setup() {
-        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        testDataStoreFile = File.createTempFile("fire_clearing_preferences_test", ".preferences_pb")
         dataStore = PreferenceDataStoreFactory.create(
-            produceFile = { context.preferencesDataStoreFile("fire_clearing_preferences_test") },
+            scope = coroutinesTestRule.testScope,
+            produceFile = { testDataStoreFile },
         )
         settingsDataStore = mock()
         whenever(settingsDataStore.automaticallyClearWhatOption).thenReturn(ClearWhatOption.CLEAR_NONE)
         whenever(settingsDataStore.automaticallyClearWhenOption).thenReturn(ClearWhenOption.APP_EXIT_ONLY)
         fireDataStore = SharedPreferencesFireDataStore(dataStore, settingsDataStore)
+    }
+
+    @After
+    fun tearDown() {
+        testDataStoreFile.delete()
     }
 
     @Test
