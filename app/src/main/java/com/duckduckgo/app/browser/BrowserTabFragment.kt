@@ -2052,9 +2052,8 @@ class BrowserTabFragment :
         }
     }
 
-    fun getBottomNavigationBar(): BrowserNavigationBarView {
-        return binding.navigationBar
-    }
+    val navigationBar: BrowserNavigationBarView
+        get() = binding.navigationBar
 
     private fun processCommand(it: Command?) {
         if (it is NavigationCommand) {
