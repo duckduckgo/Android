@@ -2280,6 +2280,48 @@ class AutoCompleteApiTest {
         assertEquals(5, middleSuggestions.size)
     }
 
+    @Test
+    fun whenSearchSuggestionsIncludeUrlAlreadyInTopHitsThenUrlIsNotDuplicatedInMiddleSection() = runTest {
+        whenever(mockAutoCompleteService.autoComplete("example")).thenReturn(
+            listOf(
+                AutoCompleteServiceRawResult("https://example.com", isNav = true),
+                AutoCompleteServiceRawResult("example suggestion 1", isNav = false),
+                AutoCompleteServiceRawResult("example suggestion 2", isNav = false),
+                AutoCompleteServiceRawResult("example suggestion 3", isNav = false),
+            ),
+        )
+        whenever(mockSavedSitesRepository.getBookmarks()).thenReturn(flowOf(emptyList()))
+        whenever(mockSavedSitesRepository.getFavorites()).thenReturn(
+            flowOf(
+                listOf(favorite(url = "https://example.com", title = "Example Site")),
+            ),
+        )
+
+        val result = testee.autoComplete("example")
+        val value = result.first()
+
+        // Verify example.com appears only once as a top hit (favorite)
+        val topHits = value.suggestions.filter {
+            it is AutoCompleteBookmarkSuggestion && it.isFavorite ||
+                (it is AutoCompleteSearchSuggestion && it.isAllowedInTopHits)
+        }
+        val middleSuggestions = value.suggestions.filterIsInstance<AutoCompleteSearchSuggestion>().filter { !it.isAllowedInTopHits }
+
+        // Should have 2 top hit (the URL as favorite and the URL as a suggestion)
+        assertEquals(2, topHits.size)
+        assertTrue(topHits[0] is AutoCompleteBookmarkSuggestion)
+        assertTrue(topHits[1] is AutoCompleteSearchSuggestion)
+        assertEquals("example.com", topHits[0].phrase)
+        assertEquals("example.com", topHits[1].phrase)
+
+        // Verify no duplicate of example.com in middle section
+        val exampleUrlInMiddle = middleSuggestions.any { it.phrase.contains("example.com") }
+        assertFalse(exampleUrlInMiddle)
+
+        // Should have 3 non-URL suggestions in middle section
+        assertEquals(3, middleSuggestions.size)
+    }
+
     private fun favorite(
         id: String = UUID.randomUUID().toString(),
         title: String = "title",
