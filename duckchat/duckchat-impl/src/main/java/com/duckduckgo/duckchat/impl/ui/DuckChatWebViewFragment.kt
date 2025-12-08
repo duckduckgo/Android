@@ -691,13 +691,17 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
     override fun onPause() {
         downloadMessagesJob.cancel()
         simpleWebview.onPause()
-        cookieManager.flush()
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            cookieManager.flush()
+        }
         super.onPause()
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        cookieManager.flush()
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            cookieManager.flush()
+        }
     }
 
     companion object {
