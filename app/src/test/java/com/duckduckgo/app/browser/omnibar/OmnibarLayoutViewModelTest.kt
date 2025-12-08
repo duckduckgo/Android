@@ -504,6 +504,41 @@ class OmnibarLayoutViewModelTest {
     }
 
     @Test
+    fun `when custom tab URL is blank and omnibarText is about blank then domain displays about blank`() = runTest {
+        val expectedDomain = "about:blank"
+
+        testee.onViewModeChanged(ViewMode.CustomTab(100, "title", "", showDuckPlayerIcon = false))
+        testee.onExternalStateChange(
+            StateChange.OmnibarStateChange(
+                OmnibarViewState(
+                    omnibarText = "about:blank",
+                    queryOrFullUrl = "",
+                    navigationChange = false,
+                    forceExpand = false,
+                ),
+            ),
+        )
+        testee.onExternalStateChange(
+            StateChange.LoadingStateChange(
+                LoadingViewState(
+                    isLoading = false,
+                    trackersAnimationEnabled = false,
+                    progress = 100,
+                    url = "",
+                ),
+            ),
+        )
+
+        testee.viewState.test {
+            val viewState = expectMostRecentItem()
+            assertTrue(viewState.viewMode is ViewMode.CustomTab)
+            val customTabMode = viewState.viewMode as ViewMode.CustomTab
+            assertEquals(expectedDomain, customTabMode.domain)
+            assertFalse(customTabMode.showDuckPlayerIcon)
+        }
+    }
+
+    @Test
     fun whenViewModeChangedToErrorAndFocusedThenViewStateCorrect() = runTest {
         testee.onOmnibarFocusChanged(true, RANDOM_URL)
         testee.onViewModeChanged(ViewMode.Error)

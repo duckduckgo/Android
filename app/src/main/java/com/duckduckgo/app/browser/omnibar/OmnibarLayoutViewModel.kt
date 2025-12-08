@@ -138,11 +138,11 @@ class OmnibarLayoutViewModel @Inject constructor(
 
     private fun getViewMode(state: ViewState): ViewMode {
         return if (state.viewMode is CustomTab) {
-            val domain = state.url.extractDomain()
+            val domain = if (state.url.isBlank()) state.omnibarText else state.url.extractDomain()
             if (domain != state.viewMode.domain) {
                 val isDuckPlayerUrl = duckPlayer.getDuckPlayerState() == ENABLED && duckPlayer.isDuckPlayerUri(state.url)
                 state.viewMode.copy(
-                    domain = state.url.extractDomain(),
+                    domain = domain,
                     showDuckPlayerIcon = isDuckPlayerUrl,
                 )
             } else {
