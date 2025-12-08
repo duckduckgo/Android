@@ -71,19 +71,15 @@ class FireDataStoreTest {
     @Test
     fun whenNoManualOptionsSet_thenReturnsDefaultOptions() = runTest {
         val options = fireDataStore.getManualClearOptions()
-        // Default is TABS + DATA
         assertEquals(setOf(FireClearOption.TABS, FireClearOption.DATA), options)
     }
 
     @Test
     fun whenManualOptionsCleared_thenReturnsEmptySet() = runTest {
-        // Set options first
         fireDataStore.setManualClearOptions(setOf(FireClearOption.TABS))
 
-        // Clear by setting empty set
         fireDataStore.setManualClearOptions(emptySet())
 
-        // Should return empty set, not default
         val options = fireDataStore.getManualClearOptions()
         assertTrue(options.isEmpty())
     }
@@ -139,18 +135,14 @@ class FireDataStoreTest {
     @Test
     fun whenManualOptionsChanged_thenFlowEmitsNewValues() = runTest {
         fireDataStore.getManualClearOptionsFlow().test {
-            // Initial default state (TABS + DATA)
             assertEquals(setOf(FireClearOption.TABS, FireClearOption.DATA), awaitItem())
 
-            // Set options to just TABS
             fireDataStore.setManualClearOptions(setOf(FireClearOption.TABS))
             assertEquals(setOf(FireClearOption.TABS), awaitItem())
 
-            // Add DATA option
             fireDataStore.addManualClearOption(FireClearOption.DATA)
             assertEquals(setOf(FireClearOption.TABS, FireClearOption.DATA), awaitItem())
 
-            // Remove TABS option
             fireDataStore.removeManualClearOption(FireClearOption.TABS)
             assertEquals(setOf(FireClearOption.DATA), awaitItem())
 
@@ -215,18 +207,14 @@ class FireDataStoreTest {
     @Test
     fun whenAutomaticOptionsChanged_thenFlowEmitsNewValues() = runTest {
         fireDataStore.getAutomaticClearOptionsFlow().test {
-            // Initial empty state
             assertEquals(emptySet<FireClearOption>(), awaitItem())
 
-            // Set options
             fireDataStore.setAutomaticClearOptions(setOf(FireClearOption.TABS))
             assertEquals(setOf(FireClearOption.TABS), awaitItem())
 
-            // Add option
             fireDataStore.addAutomaticClearOption(FireClearOption.DATA)
             assertEquals(setOf(FireClearOption.TABS, FireClearOption.DATA), awaitItem())
 
-            // Remove option
             fireDataStore.removeAutomaticClearOption(FireClearOption.TABS)
             assertEquals(setOf(FireClearOption.DATA), awaitItem())
 
@@ -234,14 +222,11 @@ class FireDataStoreTest {
         }
     }
 
-    // Test Independence of Both Sets
     @Test
     fun whenBothSetsConfigured_thenTheyAreIndependent() = runTest {
-        // Set different options for each
         fireDataStore.setManualClearOptions(setOf(FireClearOption.TABS))
         fireDataStore.setAutomaticClearOptions(setOf(FireClearOption.DATA, FireClearOption.DUCKAI_CHATS))
 
-        // Verify they are stored independently
         val manual = fireDataStore.getManualClearOptions()
         val automatic = fireDataStore.getAutomaticClearOptions()
 
@@ -251,14 +236,11 @@ class FireDataStoreTest {
 
     @Test
     fun whenManualCleared_thenAutomaticUnaffected() = runTest {
-        // Set both
         fireDataStore.setManualClearOptions(setOf(FireClearOption.TABS, FireClearOption.DATA))
         fireDataStore.setAutomaticClearOptions(setOf(FireClearOption.TABS, FireClearOption.DATA))
 
-        // Clear manual
         fireDataStore.setManualClearOptions(emptySet())
 
-        // Verify automatic is unchanged
         val manual = fireDataStore.getManualClearOptions()
         val automatic = fireDataStore.getAutomaticClearOptions()
 
@@ -268,14 +250,11 @@ class FireDataStoreTest {
 
     @Test
     fun whenAutomaticCleared_thenManualUnaffected() = runTest {
-        // Set both
         fireDataStore.setManualClearOptions(setOf(FireClearOption.TABS, FireClearOption.DATA))
         fireDataStore.setAutomaticClearOptions(setOf(FireClearOption.TABS, FireClearOption.DATA))
 
-        // Clear automatic
         fireDataStore.setAutomaticClearOptions(emptySet())
 
-        // Verify manual is unchanged
         val manual = fireDataStore.getManualClearOptions()
         val automatic = fireDataStore.getAutomaticClearOptions()
 
@@ -283,10 +262,8 @@ class FireDataStoreTest {
         assertTrue(automatic.isEmpty())
     }
 
-    // Migration Tests
     @Test
     fun whenNoAutomaticOptionsSet_andLegacyIsNone_thenReturnsEmptySet() = runTest {
-        // Legacy setting is CLEAR_NONE (already mocked in setup)
         whenever(settingsDataStore.automaticallyClearWhatOption).thenReturn(ClearWhatOption.CLEAR_NONE)
 
         val options = fireDataStore.getAutomaticClearOptions()
@@ -296,7 +273,6 @@ class FireDataStoreTest {
 
     @Test
     fun whenNoAutomaticOptionsSet_andLegacyIsTabsOnly_thenReturnsTabsOnly() = runTest {
-        // Set legacy setting to CLEAR_TABS_ONLY
         whenever(settingsDataStore.automaticallyClearWhatOption).thenReturn(ClearWhatOption.CLEAR_TABS_ONLY)
 
         val options = fireDataStore.getAutomaticClearOptions()
@@ -306,7 +282,6 @@ class FireDataStoreTest {
 
     @Test
     fun whenNoAutomaticOptionsSet_andLegacyIsTabsAndData_thenReturnsTabsAndData() = runTest {
-        // Set legacy setting to CLEAR_TABS_AND_DATA
         whenever(settingsDataStore.automaticallyClearWhatOption).thenReturn(ClearWhatOption.CLEAR_TABS_AND_DATA)
 
         val options = fireDataStore.getAutomaticClearOptions()
@@ -316,13 +291,10 @@ class FireDataStoreTest {
 
     @Test
     fun whenAutomaticOptionsAlreadySet_thenLegacyOptionsIgnored() = runTest {
-        // Set legacy setting to CLEAR_TABS_AND_DATA
         whenever(settingsDataStore.automaticallyClearWhatOption).thenReturn(ClearWhatOption.CLEAR_TABS_AND_DATA)
 
-        // Explicitly set automatic options to something different
         fireDataStore.setAutomaticClearOptions(setOf(FireClearOption.DUCKAI_CHATS))
 
-        // Should return stored value, not legacy value
         val options = fireDataStore.getAutomaticClearOptions()
 
         assertEquals(setOf(FireClearOption.DUCKAI_CHATS), options)
@@ -330,7 +302,6 @@ class FireDataStoreTest {
 
     @Test
     fun whenNoAutomaticOptionsSet_andLegacyIsTabsOnly_thenFlowEmitsTabsOnly() = runTest {
-        // Set legacy setting to CLEAR_TABS_ONLY
         whenever(settingsDataStore.automaticallyClearWhatOption).thenReturn(ClearWhatOption.CLEAR_TABS_ONLY)
 
         fireDataStore.getAutomaticClearOptionsFlow().test {
@@ -341,7 +312,6 @@ class FireDataStoreTest {
 
     @Test
     fun whenNoAutomaticOptionsSet_andLegacyIsTabsAndData_thenFlowEmitsTabsAndData() = runTest {
-        // Set legacy setting to CLEAR_TABS_AND_DATA
         whenever(settingsDataStore.automaticallyClearWhatOption).thenReturn(ClearWhatOption.CLEAR_TABS_AND_DATA)
 
         fireDataStore.getAutomaticClearOptionsFlow().test {
@@ -350,10 +320,8 @@ class FireDataStoreTest {
         }
     }
 
-    // AutomaticallyClearWhenOption Tests
     @Test
     fun whenNoWhenOptionSet_thenReturnsLegacyDefault() = runTest {
-        // Legacy setting is APP_EXIT_ONLY (mocked in setup)
         val option = fireDataStore.getAutomaticallyClearWhenOption()
         assertEquals(ClearWhenOption.APP_EXIT_ONLY, option)
     }
@@ -401,14 +369,11 @@ class FireDataStoreTest {
     @Test
     fun whenWhenOptionChanged_thenFlowEmitsNewValues() = runTest {
         fireDataStore.getAutomaticallyClearWhenOptionFlow().test {
-            // Initial legacy state
             assertEquals(ClearWhenOption.APP_EXIT_ONLY, awaitItem())
 
-            // Change to 5 mins
             fireDataStore.setAutomaticallyClearWhenOption(ClearWhenOption.APP_EXIT_OR_5_MINS)
             assertEquals(ClearWhenOption.APP_EXIT_OR_5_MINS, awaitItem())
 
-            // Change to 15 mins
             fireDataStore.setAutomaticallyClearWhenOption(ClearWhenOption.APP_EXIT_OR_15_MINS)
             assertEquals(ClearWhenOption.APP_EXIT_OR_15_MINS, awaitItem())
 
@@ -436,13 +401,10 @@ class FireDataStoreTest {
 
     @Test
     fun whenWhenOptionAlreadySet_thenLegacyOptionIgnored() = runTest {
-        // Set legacy setting to 30 mins
         whenever(settingsDataStore.automaticallyClearWhenOption).thenReturn(ClearWhenOption.APP_EXIT_OR_30_MINS)
 
-        // Explicitly set option to something different
         fireDataStore.setAutomaticallyClearWhenOption(ClearWhenOption.APP_EXIT_OR_5_MINS)
 
-        // Should return stored value, not legacy value
         val option = fireDataStore.getAutomaticallyClearWhenOption()
         assertEquals(ClearWhenOption.APP_EXIT_OR_5_MINS, option)
     }
