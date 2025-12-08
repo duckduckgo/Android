@@ -50,6 +50,8 @@ tags:
                 text: "convert.ad-company.site"
             - action: back
             - action: back
+            - tapOn:
+                id: "omnibarTextInput"
             - copyTextFrom:
                 id: "omnibarTextInput"
             - action: back
