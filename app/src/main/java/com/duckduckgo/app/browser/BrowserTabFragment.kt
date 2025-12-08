@@ -343,6 +343,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.cancellable
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -1542,6 +1543,13 @@ class BrowserTabFragment :
 
         viewModel.onMessageReceived()
         message.sendToTarget()
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            delay(CHECK_IF_ABOUT_BLANK_DELAY)
+            if (isAdded && view != null) {
+                viewModel.handleNewTabIfEmptyUrl()
+            }
+        }
 
         viewModel.onMessageProcessed()
     }
@@ -4364,6 +4372,7 @@ class BrowserTabFragment :
         private const val NAVIGATION_DELAY = 100L
         private const val POPUP_MENU_DELAY = 200L
         private const val WIDGET_PROMPT_DELAY = 200L
+        private const val CHECK_IF_ABOUT_BLANK_DELAY = 200L
 
         private const val REQUEST_CODE_CHOOSE_FILE = 100
         private const val PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE = 200
