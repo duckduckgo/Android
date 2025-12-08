@@ -78,6 +78,7 @@ import com.duckduckgo.subscriptions.impl.services.toEntitlements
 import com.duckduckgo.subscriptions.impl.wideevents.AuthTokenRefreshWideEvent
 import com.duckduckgo.subscriptions.impl.wideevents.FreeTrialConversionWideEvent
 import com.duckduckgo.subscriptions.impl.wideevents.SubscriptionPurchaseWideEvent
+import com.duckduckgo.subscriptions.impl.wideevents.SubscriptionRestoreWideEvent
 import com.duckduckgo.subscriptions.impl.wideevents.SubscriptionSwitchWideEvent
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.JsonDataException
@@ -302,6 +303,7 @@ class RealSubscriptionsManager @Inject constructor(
     private val tokenRefreshWideEvent: AuthTokenRefreshWideEvent,
     private val subscriptionSwitchWideEvent: SubscriptionSwitchWideEvent,
     private val freeTrialConversionWideEvent: FreeTrialConversionWideEvent,
+    private val subscriptionRestoreWideEvent: SubscriptionRestoreWideEvent,
 ) : SubscriptionsManager {
     private val adapter = Moshi.Builder().build().adapter(ResponseError::class.java)
 
@@ -1022,7 +1024,7 @@ class RealSubscriptionsManager @Inject constructor(
                     }
 
                     is StoreLoginResult.Failure -> {
-                        RecoverSubscriptionResult.Failure("")
+                        RecoverSubscriptionResult.Failure(message = "Store login error: ${storeLoginResult.javaClass.simpleName}")
                     }
                 }
             } else {
@@ -1060,6 +1062,18 @@ class RealSubscriptionsManager @Inject constructor(
     sealed class RecoverSubscriptionResult {
         data class Success(val subscription: Subscription) : RecoverSubscriptionResult()
         data class Failure(val message: String) : RecoverSubscriptionResult()
+    }
+
+    private suspend fun recoverSubscriptionFromStoreOnPurchaseAttempt() {
+        subscriptionRestoreWideEvent.onGooglePlayRestoreFlowStartedOnPurchaseAttempt()
+        when (val result = recoverSubscriptionFromStore()) {
+            is RecoverSubscriptionResult.Success -> {
+                subscriptionRestoreWideEvent.onGooglePlayRestoreSuccess()
+            }
+            is RecoverSubscriptionResult.Failure -> {
+                subscriptionRestoreWideEvent.onGooglePlayRestoreFailure(error = result.message)
+            }
+        }
     }
 
     private suspend fun activePlanIds(): List<String> =
@@ -1152,13 +1166,13 @@ class RealSubscriptionsManager @Inject constructor(
             subscriptionPurchaseWideEvent.onSubscriptionRefreshSuccess()
 
             if (!isSignedIn()) {
-                recoverSubscriptionFromStore()
+                recoverSubscriptionFromStoreOnPurchaseAttempt()
             } else {
                 authRepository.getSubscription()?.run {
                     if (status.isExpired() && platform == "google") {
                         // re-authenticate in case previous subscription was bought using different google account
                         val accountId = authRepository.getAccount()?.externalId
-                        recoverSubscriptionFromStore()
+                        recoverSubscriptionFromStoreOnPurchaseAttempt()
                         removeExpiredSubscriptionOnCancelledPurchase =
                             accountId != null && accountId != authRepository.getAccount()?.externalId
                     }
