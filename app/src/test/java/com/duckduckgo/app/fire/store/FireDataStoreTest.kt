@@ -24,6 +24,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import app.cash.turbine.test
 import com.duckduckgo.app.settings.clear.ClearWhatOption
+import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.clear.FireClearOption
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import kotlinx.coroutines.test.runTest
@@ -56,6 +57,7 @@ class FireDataStoreTest {
         )
         settingsDataStore = mock()
         whenever(settingsDataStore.automaticallyClearWhatOption).thenReturn(ClearWhatOption.CLEAR_NONE)
+        whenever(settingsDataStore.automaticallyClearWhenOption).thenReturn(ClearWhenOption.APP_EXIT_ONLY)
         fireDataStore = SharedPreferencesFireDataStore(dataStore, settingsDataStore)
     }
 
@@ -339,5 +341,102 @@ class FireDataStoreTest {
             assertEquals(setOf(FireClearOption.TABS, FireClearOption.DATA), awaitItem())
             cancelAndIgnoreRemainingEvents()
         }
+    }
+
+    // AutomaticallyClearWhenOption Tests
+    @Test
+    fun whenNoWhenOptionSet_thenReturnsLegacyDefault() = runTest {
+        // Legacy setting is APP_EXIT_ONLY (mocked in setup)
+        val option = fireDataStore.getAutomaticallyClearWhenOption()
+        assertEquals(ClearWhenOption.APP_EXIT_ONLY, option)
+    }
+
+    @Test
+    fun whenWhenOptionSet_thenReturnsCorrectOption() = runTest {
+        fireDataStore.setAutomaticallyClearWhenOption(ClearWhenOption.APP_EXIT_OR_5_MINS)
+
+        val option = fireDataStore.getAutomaticallyClearWhenOption()
+        assertEquals(ClearWhenOption.APP_EXIT_OR_5_MINS, option)
+    }
+
+    @Test
+    fun whenWhenOptionSetToAppExitOnly_thenReturnsAppExitOnly() = runTest {
+        fireDataStore.setAutomaticallyClearWhenOption(ClearWhenOption.APP_EXIT_ONLY)
+
+        val option = fireDataStore.getAutomaticallyClearWhenOption()
+        assertEquals(ClearWhenOption.APP_EXIT_ONLY, option)
+    }
+
+    @Test
+    fun whenWhenOptionSetTo15Mins_thenReturns15Mins() = runTest {
+        fireDataStore.setAutomaticallyClearWhenOption(ClearWhenOption.APP_EXIT_OR_15_MINS)
+
+        val option = fireDataStore.getAutomaticallyClearWhenOption()
+        assertEquals(ClearWhenOption.APP_EXIT_OR_15_MINS, option)
+    }
+
+    @Test
+    fun whenWhenOptionSetTo30Mins_thenReturns30Mins() = runTest {
+        fireDataStore.setAutomaticallyClearWhenOption(ClearWhenOption.APP_EXIT_OR_30_MINS)
+
+        val option = fireDataStore.getAutomaticallyClearWhenOption()
+        assertEquals(ClearWhenOption.APP_EXIT_OR_30_MINS, option)
+    }
+
+    @Test
+    fun whenWhenOptionSetTo60Mins_thenReturns60Mins() = runTest {
+        fireDataStore.setAutomaticallyClearWhenOption(ClearWhenOption.APP_EXIT_OR_60_MINS)
+
+        val option = fireDataStore.getAutomaticallyClearWhenOption()
+        assertEquals(ClearWhenOption.APP_EXIT_OR_60_MINS, option)
+    }
+
+    @Test
+    fun whenWhenOptionChanged_thenFlowEmitsNewValues() = runTest {
+        fireDataStore.getAutomaticallyClearWhenOptionFlow().test {
+            // Initial legacy state
+            assertEquals(ClearWhenOption.APP_EXIT_ONLY, awaitItem())
+
+            // Change to 5 mins
+            fireDataStore.setAutomaticallyClearWhenOption(ClearWhenOption.APP_EXIT_OR_5_MINS)
+            assertEquals(ClearWhenOption.APP_EXIT_OR_5_MINS, awaitItem())
+
+            // Change to 15 mins
+            fireDataStore.setAutomaticallyClearWhenOption(ClearWhenOption.APP_EXIT_OR_15_MINS)
+            assertEquals(ClearWhenOption.APP_EXIT_OR_15_MINS, awaitItem())
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenNoWhenOptionSet_andLegacyIs5Mins_thenReturns5Mins() = runTest {
+        whenever(settingsDataStore.automaticallyClearWhenOption).thenReturn(ClearWhenOption.APP_EXIT_OR_5_MINS)
+
+        val option = fireDataStore.getAutomaticallyClearWhenOption()
+        assertEquals(ClearWhenOption.APP_EXIT_OR_5_MINS, option)
+    }
+
+    @Test
+    fun whenNoWhenOptionSet_andLegacyIs15Mins_thenFlowEmits15Mins() = runTest {
+        whenever(settingsDataStore.automaticallyClearWhenOption).thenReturn(ClearWhenOption.APP_EXIT_OR_15_MINS)
+
+        fireDataStore.getAutomaticallyClearWhenOptionFlow().test {
+            assertEquals(ClearWhenOption.APP_EXIT_OR_15_MINS, awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenWhenOptionAlreadySet_thenLegacyOptionIgnored() = runTest {
+        // Set legacy setting to 30 mins
+        whenever(settingsDataStore.automaticallyClearWhenOption).thenReturn(ClearWhenOption.APP_EXIT_OR_30_MINS)
+
+        // Explicitly set option to something different
+        fireDataStore.setAutomaticallyClearWhenOption(ClearWhenOption.APP_EXIT_OR_5_MINS)
+
+        // Should return stored value, not legacy value
+        val option = fireDataStore.getAutomaticallyClearWhenOption()
+        assertEquals(ClearWhenOption.APP_EXIT_OR_5_MINS, option)
     }
 }

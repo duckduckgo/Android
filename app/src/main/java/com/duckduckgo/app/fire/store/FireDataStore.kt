@@ -19,8 +19,10 @@ package com.duckduckgo.app.fire.store
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
 import com.duckduckgo.app.settings.clear.ClearWhatOption
+import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.clear.FireClearOption
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.di.scopes.AppScope
@@ -99,6 +101,22 @@ interface FireDataStore {
      * Checks if a specific option is in the automatic selection.
      */
     suspend fun isAutomaticClearOptionSelected(option: FireClearOption): Boolean
+
+    /**
+     * Gets the flow of automatic clear when option.
+     */
+    fun getAutomaticallyClearWhenOptionFlow(): Flow<ClearWhenOption>
+
+    /**
+     * Gets the automatic clear when option.
+     */
+    suspend fun getAutomaticallyClearWhenOption(): ClearWhenOption
+
+    /**
+     * Sets the automatic clear when option.
+     * @param option The option determining when to automatically clear data.
+     */
+    suspend fun setAutomaticallyClearWhenOption(option: ClearWhenOption)
 }
 
 @ContributesBinding(AppScope::class)
@@ -111,6 +129,7 @@ class SharedPreferencesFireDataStore @Inject constructor(
     private companion object {
         val KEY_MANUAL_CLEAR_OPTIONS = stringSetPreferencesKey(name = "MANUAL_CLEAR_OPTIONS")
         val KEY_AUTOMATIC_CLEAR_OPTIONS = stringSetPreferencesKey(name = "AUTOMATIC_CLEAR_OPTIONS")
+        val KEY_AUTOMATIC_CLEAR_WHEN_OPTION = stringPreferencesKey(name = "AUTOMATIC_CLEAR_WHEN_OPTION")
         val DEFAULT_OPTIONS = setOf(FireClearOption.TABS, FireClearOption.DATA)
     }
 
@@ -121,6 +140,10 @@ class SharedPreferencesFireDataStore @Inject constructor(
             ClearWhatOption.CLEAR_TABS_ONLY -> setOf(FireClearOption.TABS)
             ClearWhatOption.CLEAR_TABS_AND_DATA -> setOf(FireClearOption.TABS, FireClearOption.DATA)
         }
+    }
+
+    private fun getLegacyWhenOption(): ClearWhenOption {
+        return settingsDataStore.automaticallyClearWhenOption
     }
 
     override fun getManualClearOptionsFlow(): Flow<Set<FireClearOption>> {
@@ -191,6 +214,31 @@ class SharedPreferencesFireDataStore @Inject constructor(
 
     override suspend fun isAutomaticClearOptionSelected(option: FireClearOption): Boolean {
         return getAutomaticClearOptions().contains(option)
+    }
+
+    override fun getAutomaticallyClearWhenOptionFlow(): Flow<ClearWhenOption> {
+        return store.data.map { preferences ->
+            val savedValue = preferences[KEY_AUTOMATIC_CLEAR_WHEN_OPTION]
+            if (savedValue != null) {
+                try {
+                    ClearWhenOption.valueOf(savedValue)
+                } catch (e: IllegalArgumentException) {
+                    getLegacyWhenOption()
+                }
+            } else {
+                getLegacyWhenOption()
+            }
+        }
+    }
+
+    override suspend fun getAutomaticallyClearWhenOption(): ClearWhenOption {
+        return getAutomaticallyClearWhenOptionFlow().firstOrNull() ?: getLegacyWhenOption()
+    }
+
+    override suspend fun setAutomaticallyClearWhenOption(option: ClearWhenOption) {
+        store.edit { preferences ->
+            preferences[KEY_AUTOMATIC_CLEAR_WHEN_OPTION] = option.name
+        }
     }
 
     // Helper method to parse options from strings
