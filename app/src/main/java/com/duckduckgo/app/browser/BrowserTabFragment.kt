@@ -1540,12 +1540,12 @@ class BrowserTabFragment :
         viewModel.onMessageReceived()
         message.sendToTarget()
 
-        webView?.postDelayed(
-            {
+        viewLifecycleOwner.lifecycleScope.launch {
+            delay(CHECK_IF_ABOUT_BLANK_DELAY)
+            if (isAdded && view != null) {
                 viewModel.handleNewTabIfEmptyUrl()
-            },
-            200L,
-        )
+            }
+        }
 
         viewModel.onMessageProcessed()
     }
@@ -4369,6 +4369,7 @@ class BrowserTabFragment :
         private const val NAVIGATION_DELAY = 100L
         private const val POPUP_MENU_DELAY = 200L
         private const val WIDGET_PROMPT_DELAY = 200L
+        private const val CHECK_IF_ABOUT_BLANK_DELAY = 200L
 
         private const val REQUEST_CODE_CHOOSE_FILE = 100
         private const val PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE = 200
