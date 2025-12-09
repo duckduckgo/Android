@@ -19,6 +19,8 @@ package com.duckduckgo.duckchat.impl.messaging.fakes
 import android.content.Context
 import android.net.Uri
 import com.duckduckgo.duckchat.api.DuckChat
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 
 /**
  * Fake implementation of [DuckChat] for testing purposes.
@@ -31,6 +33,8 @@ class FakeDuckChat(
     private val openDuckChatWithAutoPromptCalls = mutableListOf<String>()
     private val openDuckChatWithPrefillCalls = mutableListOf<String>()
     private var wasOpenedBeforeValue: Boolean = false
+    private val inputScreenUserSettingEnabled = MutableStateFlow<Boolean>(false)
+    private val cosmeticInputScreenUserSettingEnabled = MutableStateFlow<Boolean?>(null)
 
     override fun isEnabled(): Boolean = enabled
 
@@ -63,6 +67,22 @@ class FakeDuckChat(
 
     override fun showNewAddressBarOptionChoiceScreen(context: Context, isDarkThemeEnabled: Boolean) {
         // No-op for testing
+    }
+
+    override suspend fun setInputScreenUserSetting(enabled: Boolean) {
+        inputScreenUserSettingEnabled.value = enabled
+    }
+
+    override suspend fun setCosmeticInputScreenUserSetting(enabled: Boolean) {
+        cosmeticInputScreenUserSettingEnabled.value = enabled
+    }
+
+    override fun observeInputScreenUserSettingEnabled(): Flow<Boolean> {
+        return inputScreenUserSettingEnabled
+    }
+
+    override fun observeCosmeticInputScreenUserSettingEnabled(): Flow<Boolean?> {
+        return cosmeticInputScreenUserSettingEnabled
     }
 
     fun setEnabled(enabled: Boolean) {

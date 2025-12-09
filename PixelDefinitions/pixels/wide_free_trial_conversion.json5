@@ -1,0 +1,50 @@
+// Wide event pixel for Free Trial conversion flow monitoring
+// https://app.asana.com/1/137249556945/task/1211999907583853?focus=true
+{
+    "wide_free-trial-conversion": {
+        "description": "Monitors free trial user journey from activation to conversion or expiration",
+        "owners": ["nalcalag"],
+        "triggers": ["other"],
+        "suffixes": ["daily_count_short", "form_factor"],
+        "parameters": [
+            "widePixelPlatform",
+            "widePixelType",
+            "widePixelSampleRate",
+            "widePixelFeatureStatus",
+            "widePixelAppVersion",
+            "widePixelAppName",
+            "widePixelFormFactor",
+            "widePixelDevMode",
+            {
+                "key": "feature.name",
+                "description": "Feature identifier for this wide pixel",
+                "enum": ["free-trial-conversion"]
+            },
+            {
+                "key": "feature.data.ext.free_trial_plan",
+                "description": "The base plan ID of the free trial product activated",
+                "enum": [
+                    "ddg.privacy.pro.monthly.renews.us",
+                    "ddg.privacy.pro.monthly.renews.row",
+                    "ddg.privacy.pro.yearly.renews.us",
+                    "ddg.privacy.pro.yearly.renews.row"
+                ]
+            },
+            {
+                "key": "feature.data.ext.failure_reason",
+                "description": "Reason for failure. Only present on FAILURE events.",
+                "enum": ["expired", "timeout"]
+            },
+            {
+                "key": "feature.data.ext.step.vpn_activated_d1.success",
+                "description": "true if VPN was successfully activated within first day of Free Trial",
+                "enum": ["true", "false"]
+            },
+            {
+                "key": "feature.data.ext.step.vpn_activated_d2_to_d7.success",
+                "description": "true if VPN was successfully activated between D2-D7 of Free Trial",
+                "enum": ["true", "false"]
+            }
+        ]
+    }
+}

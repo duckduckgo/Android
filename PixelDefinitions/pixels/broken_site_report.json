@@ -173,6 +173,11 @@
                 ]
             },
             {
+                "key": "contentScopeExperiments",
+                "description": "Experiments enabled that impact the page content",
+                "type": "string"
+            },
+            {
                 "key": "debugFlags",
                 "description": "Enabled debug flags, comma-separated (may be URL-encoded).",
                 "type": "string"

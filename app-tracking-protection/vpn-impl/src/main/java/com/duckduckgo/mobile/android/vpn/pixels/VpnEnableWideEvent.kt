@@ -27,6 +27,8 @@ import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import logcat.LogPriority
 import logcat.logcat
 import javax.inject.Inject
@@ -55,6 +57,7 @@ class VpnEnableWideEventImpl @Inject constructor(
             dispatchers.computation().limitedParallelism(1),
     )
 
+    private val mutex = Mutex()
     private var cachedFlowId: Long? = null
 
     override fun onNotifyVpnStartSuccess() {
@@ -101,7 +104,9 @@ class VpnEnableWideEventImpl @Inject constructor(
 
     private fun updateWideEventAsync(operation: suspend (Long) -> Unit) {
         coroutineScope.launch {
-            getCurrentFlowId()?.let { id -> operation(id) }
+            mutex.withLock {
+                getCurrentFlowId()?.let { id -> operation(id) }
+            }
         }
     }
 

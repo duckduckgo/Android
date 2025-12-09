@@ -36,32 +36,22 @@
             android:id="@+id/toolbarContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingStart="@dimen/keyline_2"
             android:background="?attr/daxColorToolbar">
 
-            <FrameLayout
+            <ImageView
                 android:id="@+id/duckAiSidebar"
-                android:layout_width="@dimen/toolbarIcon"
-                android:layout_height="@dimen/toolbarIcon"
-                android:visibility="gone"
-                tools:visibility="visible"
-                android:layout_marginStart="@dimen/keyline_1"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginStart="@dimen/keyline_3"
                 android:layout_marginTop="@dimen/omnibarCardMarginTop"
                 android:layout_marginBottom="@dimen/omnibarCardMarginBottom"
                 android:background="@drawable/selectable_item_rounded_corner_background"
+                android:contentDescription="@string/browserMenuChatHistory"
+                android:padding="@dimen/keyline_1"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
-
-                <ImageView
-                    android:id="@+id/duckAiSidebarButton"
-                    android:layout_width="@dimen/bottomNavIcon"
-                    android:layout_height="@dimen/bottomNavIcon"
-                    android:layout_gravity="center"
-                    android:contentDescription="@string/browserMenuChatHistory"
-                    android:scaleType="center"
-                    android:src="@drawable/ic_list_24" />
-            </FrameLayout>
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/ic_list_24" />
 
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/toolbar"
@@ -226,7 +216,7 @@
                             <LinearLayout
                                 android:id="@+id/duckAIHeader"
                                 android:layout_width="0dp"
-                                android:layout_height="wrap_content"
+                                android:layout_height="match_parent"
                                 android:orientation="horizontal"
                                 android:gravity="center"
                                 android:background="?daxColorWindow"
@@ -234,26 +224,6 @@
                                 app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintBottom_toBottomOf="parent"
                                 app:layout_constraintTop_toTopOf="parent">
-
-                                <ImageView
-                                    android:id="@+id/duckAiHeaderDaxIcon"
-                                    android:layout_width="@dimen/toolbarIconSize"
-                                    android:layout_height="@dimen/toolbarIconSize"
-                                    android:importantForAccessibility="no"
-                                    android:scaleType="fitCenter"
-                                    app:srcCompat="@drawable/ic_dax_icon"
-                                    tools:visibility="visible" />
-
-                                <ImageView
-                                    android:id="@+id/caretIcon"
-                                    android:layout_width="@dimen/toolbarIconSize"
-                                    android:layout_height="@dimen/toolbarIconSize"
-                                    android:layout_gravity="center"
-                                    android:importantForAccessibility="no"
-                                    android:scaleType="fitCenter"
-                                    android:layout_marginStart="@dimen/keyline_1"
-                                    app:srcCompat="@drawable/ic_chevron_small_right_24"
-                                    tools:visibility="visible" />
 
                                 <ImageView
                                     android:id="@+id/aiIcon"

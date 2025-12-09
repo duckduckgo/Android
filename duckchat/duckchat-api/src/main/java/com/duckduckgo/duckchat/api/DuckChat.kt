@@ -18,6 +18,7 @@ package com.duckduckgo.duckchat.api
 
 import android.content.Context
 import android.net.Uri
+import kotlinx.coroutines.flow.Flow
 
 /**
  * DuckChat interface provides a set of methods for interacting and controlling DuckChat.
@@ -67,4 +68,25 @@ interface DuckChat {
      * Displays the new address bar option choice screen.
      */
     fun showNewAddressBarOptionChoiceScreen(context: Context, isDarkThemeEnabled: Boolean)
+
+    /**
+     * Set user setting to determine whether dedicated Duck.ai input screen with a mode switch should be used.
+     */
+    suspend fun setInputScreenUserSetting(enabled: Boolean)
+
+    /**
+     * Cosmetically sets the input screen user setting.
+     */
+    suspend fun setCosmeticInputScreenUserSetting(enabled: Boolean)
+
+    /**
+     * Observes whether Duck.ai input screen with a mode switch is enabled or disabled.
+     */
+    fun observeInputScreenUserSettingEnabled(): Flow<Boolean>
+
+    /**
+     * Observes the cosmetic value for the input screen user setting.
+     * Returns null if the cosmetic value has not been set before.
+     */
+    fun observeCosmeticInputScreenUserSettingEnabled(): Flow<Boolean?>
 }

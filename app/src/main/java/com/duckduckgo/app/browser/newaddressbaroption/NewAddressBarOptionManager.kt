@@ -19,6 +19,7 @@ package com.duckduckgo.app.browser.newaddressbaroption
 import android.app.Activity
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.onboarding.store.AppStage
+import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.common.ui.DuckDuckGoActivity
@@ -55,6 +56,7 @@ class RealNewAddressBarOptionManager @Inject constructor(
     private val remoteMessagingRepository: RemoteMessagingRepository,
     private val newAddressBarOptionDataStore: NewAddressBarOptionDataStore,
     private val settingsDataStore: SettingsDataStore,
+    private val onboardingStore: OnboardingStore,
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
 ) : NewAddressBarOptionManager {
     private val showChoiceScreenMutex = Mutex()
@@ -97,7 +99,8 @@ class RealNewAddressBarOptionManager @Inject constructor(
             hasNotInteractedWithSearchAndDuckAiRMF() &&
             isNewAddressBarOptionChoiceScreenEnabled() &&
             isNotLaunchedFromExternal(isLaunchedFromExternal) &&
-            isSubsequentLaunch()
+            isSubsequentLaunch() &&
+            hasNoInputScreenSelection()
     }
 
     private fun isActivityValid(activity: Activity): Boolean =
@@ -128,6 +131,11 @@ class RealNewAddressBarOptionManager @Inject constructor(
     private fun isInputScreenDisabled(): Boolean =
         (!duckAiFeatureState.showInputScreen.value).also {
             logcat(DEBUG) { "NewAddressBarOptionManager: $it isInputScreenDisabled" }
+        }
+
+    private fun hasNoInputScreenSelection(): Boolean =
+        (onboardingStore.getInputScreenSelection() == null).also {
+            logcat(DEBUG) { "NewAddressBarOptionManager: $it hasNoInputScreenSelection" }
         }
 
     private fun isBottomAddressBarDisabled(): Boolean =

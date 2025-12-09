@@ -43,6 +43,7 @@
     <string name="browserMenuRunningInDDG">Veikia sistemoje „DuckDuckGo“</string>
     <string name="browserMenuSetAsDefaultBrowser">Nustatyti kaip numatytąją naršyklę</string>
     <string name="browserMenuNewChat">Naujas pokalbis</string>
+    <string name="browserMenuNewAIChat">Naujas DI pokalbis</string>
     <string name="browserMenuChatHistory">Pokalbių istorija</string>
     <string name="browserMenuChatSettings">„Duck.ai“ nustatymai</string>
     <string name="browserMenuVPN">VPN</string>

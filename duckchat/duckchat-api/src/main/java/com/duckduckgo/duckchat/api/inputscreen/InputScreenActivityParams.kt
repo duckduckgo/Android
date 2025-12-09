@@ -36,6 +36,7 @@ data class InputScreenActivityParams(
     val browserButtonsConfig: InputScreenBrowserButtonsConfig,
     val showInstalledApps: Boolean = false,
     val launchWithVoice: Boolean = false,
+    val launchOnChat: Boolean = false,
 ) : GlobalActivityStarter.ActivityParams
 
 /**

@@ -26,7 +26,6 @@ import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessageHandler
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.squareup.anvil.annotations.ContributesMultibinding
-import logcat.logcat
 import org.json.JSONObject
 import javax.inject.Inject
 
@@ -48,7 +47,6 @@ class IsNativeDuckAiEnabledHandler @Inject constructor(
                 jsMessaging: JsMessaging,
                 jsMessageCallback: JsMessageCallback?,
             ) {
-                logcat { "SERP-SETTINGS: IsNativeDuckAiEnabledHandler processing message" }
                 val response = JSONObject().apply {
                     put("enabled", duckChat.isEnabled())
                 }

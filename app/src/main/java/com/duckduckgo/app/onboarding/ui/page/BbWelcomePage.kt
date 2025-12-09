@@ -57,8 +57,10 @@ import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.ADDRESS_BAR
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.COMPARISON_CHART
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INITIAL
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INITIAL_REINSTALL_USER
+import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INPUT_SCREEN
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.SKIP_ONBOARDING_OPTION
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.*
+import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowInputScreenDialog
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.view.TypeAnimationTextView
@@ -116,6 +118,7 @@ class BbWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome
                 is ShowSkipOnboardingOption -> configureDaxCta(SKIP_ONBOARDING_OPTION)
                 is ShowDefaultBrowserDialog -> showDefaultBrowserDialog(it.intent)
                 is ShowAddressBarPositionDialog -> configureDaxCta(ADDRESS_BAR_POSITION)
+                is ShowInputScreenDialog -> onContinuePressed()
                 is Finish -> onContinuePressed()
                 is OnboardingSkipped -> onSkipPressed()
                 is SetAddressBarPositionOptions -> setAddressBarPositionOptions(it.defaultOption)
@@ -435,6 +438,10 @@ class BbWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome
 
                     scheduleTypingAnimation(binding.daxDialogCta.addressBarPosition.dialogTitle, titleText) { afterTypingAnimation() }
                     backgroundSceneManager?.transitionToNextTile(expectedTile = TILE_04)
+                }
+
+                INPUT_SCREEN -> {
+                    // Ignored
                 }
             }
             backgroundSceneManager?.setBackgroundClickListener(afterTypingAnimation)

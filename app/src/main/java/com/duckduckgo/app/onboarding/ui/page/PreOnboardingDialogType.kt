@@ -22,4 +22,5 @@ enum class PreOnboardingDialogType {
     SKIP_ONBOARDING_OPTION,
     COMPARISON_CHART,
     ADDRESS_BAR_POSITION,
+    INPUT_SCREEN,
 }

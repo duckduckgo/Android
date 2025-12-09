@@ -1,0 +1,15 @@
+appId: com.duckduckgo.mobile.android
+name: "ReleaseTest: Deeplink to SERP with search query"
+tags:
+  - releaseTest
+---
+- retry:
+    maxRetries: 3
+    commands:
+      - openLink:
+          link: duck://https://duckduckgo.com?q=why%20use%20duckduckgo
+
+      - copyTextFrom:
+          id: "omnibarTextInput"
+
+      - assertTrue: ${maestro.copiedText == "why use duckduckgo" }

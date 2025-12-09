@@ -31,6 +31,8 @@ interface DuckChatFeatureRepository {
 
     suspend fun setInputScreenUserSetting(enabled: Boolean)
 
+    suspend fun setCosmeticInputScreenUserSetting(enabled: Boolean)
+
     suspend fun setShowInBrowserMenu(showDuckChat: Boolean)
 
     suspend fun setShowInAddressBar(showDuckChat: Boolean)
@@ -42,6 +44,8 @@ interface DuckChatFeatureRepository {
     fun observeDuckChatUserEnabled(): Flow<Boolean>
 
     fun observeInputScreenUserSettingEnabled(): Flow<Boolean>
+
+    fun observeCosmeticInputScreenUserSettingEnabled(): Flow<Boolean?>
 
     fun observeShowInBrowserMenu(): Flow<Boolean>
 
@@ -86,6 +90,10 @@ class RealDuckChatFeatureRepository @Inject constructor(
         duckChatDataStore.setInputScreenUserSetting(enabled)
     }
 
+    override suspend fun setCosmeticInputScreenUserSetting(enabled: Boolean) {
+        duckChatDataStore.setCosmeticInputScreenUserSetting(enabled)
+    }
+
     override suspend fun setShowInBrowserMenu(showDuckChat: Boolean) {
         duckChatDataStore.setShowInBrowserMenu(showDuckChat)
     }
@@ -105,6 +113,8 @@ class RealDuckChatFeatureRepository @Inject constructor(
     override fun observeDuckChatUserEnabled(): Flow<Boolean> = duckChatDataStore.observeDuckChatUserEnabled()
 
     override fun observeInputScreenUserSettingEnabled(): Flow<Boolean> = duckChatDataStore.observeInputScreenUserSettingEnabled()
+
+    override fun observeCosmeticInputScreenUserSettingEnabled(): Flow<Boolean?> = duckChatDataStore.observeCosmeticInputScreenUserSettingEnabled()
 
     override fun observeShowInBrowserMenu(): Flow<Boolean> = duckChatDataStore.observeShowInBrowserMenu()
 

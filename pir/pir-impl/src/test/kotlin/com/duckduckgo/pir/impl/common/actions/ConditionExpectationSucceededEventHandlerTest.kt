@@ -17,14 +17,17 @@
 package com.duckduckgo.pir.impl.common.actions
 
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep.EmailConfirmationStep
 import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep.OptOutStep
 import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep.ScanStep
 import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStepActions.OptOutStepActions
 import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStepActions.ScanStepActions
 import com.duckduckgo.pir.impl.common.PirJob.RunType
+import com.duckduckgo.pir.impl.common.PirRunStateHandler
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.ConditionExpectationSucceeded
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.ExecuteBrokerStepAction
+import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.PirStageStatus
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.State
 import com.duckduckgo.pir.impl.models.Broker
 import com.duckduckgo.pir.impl.models.ExtractedProfile
@@ -33,6 +36,7 @@ import com.duckduckgo.pir.impl.models.scheduling.JobRecord.EmailConfirmationJobR
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.EmailConfirmationJobRecord.EmailData
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.EmailConfirmationJobRecord.JobAttemptData
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.EmailConfirmationJobRecord.LinkFetchData
+import com.duckduckgo.pir.impl.pixels.PirStage
 import com.duckduckgo.pir.impl.scripts.models.BrokerAction
 import com.duckduckgo.pir.impl.scripts.models.PirScriptRequestData.UserProfile
 import kotlinx.coroutines.test.runTest
@@ -41,11 +45,14 @@ import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.mock
 
 class ConditionExpectationSucceededEventHandlerTest {
     @get:Rule
     val coroutineRule = CoroutineTestRule()
 
+    private val mockCurrentTimeProvider: CurrentTimeProvider = mock()
+    private val mockPirRunStateHandler: PirRunStateHandler = mock()
     private lateinit var testee: ConditionExpectationSucceededEventHandler
 
     // Test data
@@ -142,7 +149,10 @@ class ConditionExpectationSucceededEventHandlerTest {
 
     @Before
     fun setUp() {
-        testee = ConditionExpectationSucceededEventHandler()
+        testee = ConditionExpectationSucceededEventHandler(
+            mockPirRunStateHandler,
+            mockCurrentTimeProvider,
+        )
     }
 
     @Test
@@ -168,6 +178,10 @@ class ConditionExpectationSucceededEventHandlerTest {
                 profileQuery = testProfileQuery,
                 currentBrokerStepIndex = 0,
                 currentActionIndex = testCurrentActionIndex,
+                stageStatus = PirStageStatus(
+                    currentStage = PirStage.OTHER,
+                    stageStartMs = 0,
+                ),
             )
         val conditionActions = listOf(conditionAction1, conditionAction2)
         val event = ConditionExpectationSucceeded(conditionActions = conditionActions)
@@ -214,6 +228,10 @@ class ConditionExpectationSucceededEventHandlerTest {
                 profileQuery = testProfileQuery,
                 currentBrokerStepIndex = 0,
                 currentActionIndex = testCurrentActionIndex,
+                stageStatus = PirStageStatus(
+                    currentStage = PirStage.OTHER,
+                    stageStartMs = 0,
+                ),
             )
         val conditionActions = listOf(conditionAction1)
         val event = ConditionExpectationSucceeded(conditionActions = conditionActions)
@@ -257,6 +275,10 @@ class ConditionExpectationSucceededEventHandlerTest {
                     profileQuery = testProfileQuery,
                     currentBrokerStepIndex = 0,
                     currentActionIndex = testCurrentActionIndex,
+                    stageStatus = PirStageStatus(
+                        currentStage = PirStage.OTHER,
+                        stageStartMs = 0,
+                    ),
                 )
             val conditionActions = listOf(conditionAction1)
             val event = ConditionExpectationSucceeded(conditionActions = conditionActions)
@@ -298,6 +320,10 @@ class ConditionExpectationSucceededEventHandlerTest {
                 profileQuery = testProfileQuery,
                 currentBrokerStepIndex = 0,
                 currentActionIndex = 0, // At the beginning
+                stageStatus = PirStageStatus(
+                    currentStage = PirStage.OTHER,
+                    stageStartMs = 0,
+                ),
             )
         val conditionActions = listOf(conditionAction1)
         val event = ConditionExpectationSucceeded(conditionActions = conditionActions)
@@ -333,6 +359,10 @@ class ConditionExpectationSucceededEventHandlerTest {
                 profileQuery = testProfileQuery,
                 currentBrokerStepIndex = 0,
                 currentActionIndex = 1, // At the last action
+                stageStatus = PirStageStatus(
+                    currentStage = PirStage.OTHER,
+                    stageStartMs = 0,
+                ),
             )
         val conditionActions = listOf(conditionAction1, conditionAction2)
         val event = ConditionExpectationSucceeded(conditionActions = conditionActions)
@@ -380,6 +410,10 @@ class ConditionExpectationSucceededEventHandlerTest {
                 profileQuery = testProfileQuery,
                 currentBrokerStepIndex = 0,
                 currentActionIndex = 0,
+                stageStatus = PirStageStatus(
+                    currentStage = PirStage.OTHER,
+                    stageStartMs = 0,
+                ),
             )
         val conditionActions = listOf(conditionAction1)
         val event = ConditionExpectationSucceeded(conditionActions = conditionActions)
@@ -415,6 +449,10 @@ class ConditionExpectationSucceededEventHandlerTest {
                 profileQuery = testProfileQuery,
                 currentBrokerStepIndex = 0,
                 currentActionIndex = testCurrentActionIndex,
+                stageStatus = PirStageStatus(
+                    currentStage = PirStage.OTHER,
+                    stageStartMs = 0,
+                ),
             )
         val event = ConditionExpectationSucceeded(conditionActions = emptyList())
 

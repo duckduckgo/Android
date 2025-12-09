@@ -26,6 +26,9 @@ tags:
           text: ".*where should I put your address bar?.*"
       - tapOn: "next"
       - assertVisible:
+          text: ".*want easy access to private AI chat?.*"
+      - tapOn: "next"
+      - assertVisible:
           text: ".*Try a search!.*"
       - runFlow: ../shared/browser_screen/click_on_menu_button.yaml
       - tapOn:

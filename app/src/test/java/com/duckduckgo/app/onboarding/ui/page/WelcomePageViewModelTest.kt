@@ -22,6 +22,7 @@ import app.cash.turbine.test
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.global.install.AppInstallStore
+import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.Finish
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.OnboardingSkipped
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowAddressBarPositionDialog
@@ -33,21 +34,29 @@ import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowSk
 import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentManager
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.NOTIFICATION_RUNTIME_PERMISSION_SHOWN
+import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_AICHAT_SELECTED
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_BOTTOM_ADDRESS_BAR_SELECTED_UNIQUE
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_CHOOSE_BROWSER_PRESSED
+import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_CHOOSE_SEARCH_EXPERIENCE_IMPRESSIONS_UNIQUE
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_COMPARISON_CHART_SHOWN_UNIQUE
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_CONFIRM_SKIP_ONBOARDING_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_INTRO_REINSTALL_USER_SHOWN_UNIQUE
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_INTRO_SHOWN_UNIQUE
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_RESUME_ONBOARDING_PRESSED
+import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_SEARCH_ONLY_SELECTED
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_SKIP_ONBOARDING_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_SKIP_ONBOARDING_SHOWN_UNIQUE
+import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.impl.inputscreen.wideevents.InputScreenOnboardingWideEvent
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Rule
@@ -68,6 +77,29 @@ class WelcomePageViewModelTest {
     private val mockSettingsDataStore: SettingsDataStore = mock()
     private val mockAppBuildConfig: AppBuildConfig = mock()
     private val mockOnboardingDesignExperimentManager: OnboardingDesignExperimentManager = mock()
+    private val mockOnboardingStore: OnboardingStore = mock()
+    private val mockAndroidBrowserConfigFeature: AndroidBrowserConfigFeature = FakeFeatureToggleFactory.create(
+        AndroidBrowserConfigFeature::class.java,
+    )
+    private val mockDuckChat: DuckChat = mock()
+    private val mockInputScreenOnboardingWideEvent: InputScreenOnboardingWideEvent = mock()
+
+    private fun createViewModel(): WelcomePageViewModel {
+        return WelcomePageViewModel(
+            mockDefaultRoleBrowserDialog,
+            mockContext,
+            mockPixel,
+            mockAppInstallStore,
+            mockSettingsDataStore,
+            coroutineRule.testDispatcherProvider,
+            mockAppBuildConfig,
+            mockOnboardingDesignExperimentManager,
+            mockOnboardingStore,
+            mockAndroidBrowserConfigFeature,
+            mockDuckChat,
+            mockInputScreenOnboardingWideEvent,
+        )
+    }
 
     private val testee: WelcomePageViewModel by lazy {
         WelcomePageViewModel(
@@ -79,6 +111,10 @@ class WelcomePageViewModelTest {
             coroutineRule.testDispatcherProvider,
             mockAppBuildConfig,
             mockOnboardingDesignExperimentManager,
+            mockOnboardingStore,
+            mockAndroidBrowserConfigFeature,
+            mockDuckChat,
+            mockInputScreenOnboardingWideEvent,
         )
     }
 
@@ -386,5 +422,82 @@ class WelcomePageViewModelTest {
                 Assert.assertTrue(command is ShowComparisonChart)
             }
             verify(mockPixel).fire(PREONBOARDING_RESUME_ONBOARDING_PRESSED)
+        }
+
+    @Test
+    fun whenOnPrimaryCtaClickedWithInputScreenSelectedThenFireAiChatSelectedPixelAndStoreSelectionAndFinish() =
+        runTest {
+            mockAndroidBrowserConfigFeature.showInputScreenOnboarding().setRawStoredState(Toggle.State(enable = true))
+            testee.onInputScreenOptionSelected(true)
+            testee.onPrimaryCtaClicked(PreOnboardingDialogType.INPUT_SCREEN)
+
+            testee.commands.test {
+                val command = awaitItem()
+                Assert.assertTrue(command is Finish)
+            }
+            verify(mockPixel).fire(PREONBOARDING_AICHAT_SELECTED)
+            verify(mockOnboardingStore).storeInputScreenSelection(true)
+            verify(mockDuckChat).setCosmeticInputScreenUserSetting(true)
+            verify(mockInputScreenOnboardingWideEvent).onInputScreenEnabledDuringOnboarding(reinstallUser = false)
+        }
+
+    @Test
+    fun whenOnPrimaryCtaClickedWithInputScreenNotSelectedThenFireSearchOnlySelectedPixelAndStoreSelectionAndFinish() =
+        runTest {
+            mockAndroidBrowserConfigFeature.showInputScreenOnboarding().setRawStoredState(Toggle.State(enable = true))
+            testee.onInputScreenOptionSelected(false)
+            testee.onPrimaryCtaClicked(PreOnboardingDialogType.INPUT_SCREEN)
+
+            testee.commands.test {
+                val command = awaitItem()
+                Assert.assertTrue(command is Finish)
+            }
+            verify(mockPixel).fire(PREONBOARDING_SEARCH_ONLY_SELECTED)
+            verify(mockOnboardingStore).storeInputScreenSelection(false)
+            verify(mockDuckChat).setCosmeticInputScreenUserSetting(false)
+        }
+
+    @Test
+    fun whenInputScreenOnboardingIsEnabledThenGetMaxPageCountReturns3() =
+        runTest {
+            mockAndroidBrowserConfigFeature.showInputScreenOnboarding().setRawStoredState(Toggle.State(enable = true))
+            val viewModel = createViewModel()
+
+            Assert.assertEquals(3, viewModel.getMaxPageCount())
+        }
+
+    @Test
+    fun whenInputScreenOnboardingIsDisabledThenGetMaxPageCountReturns2() =
+        runTest {
+            mockAndroidBrowserConfigFeature.showInputScreenOnboarding().setRawStoredState(Toggle.State(enable = false))
+            val viewModel = createViewModel()
+
+            Assert.assertEquals(2, viewModel.getMaxPageCount())
+        }
+
+    @Test
+    fun whenInputScreenDialogIsShownThenFireChooseSearchExperienceImpressionsUniquePixel() {
+        testee.onDialogShown(PreOnboardingDialogType.INPUT_SCREEN)
+
+        verify(mockPixel).fire(PREONBOARDING_CHOOSE_SEARCH_EXPERIENCE_IMPRESSIONS_UNIQUE, type = Unique())
+    }
+
+    @Test
+    fun whenOnPrimaryCtaClickedWithInputScreenSelectedAndReinstallUserTrueThenCallWideEventWithReinstallUserTrue() =
+        runTest {
+            mockAndroidBrowserConfigFeature.showInputScreenOnboarding().setRawStoredState(Toggle.State(enable = true))
+            testee.onSecondaryCtaClicked(PreOnboardingDialogType.INITIAL_REINSTALL_USER)
+
+            testee.commands.test {
+                val skipCommand = awaitItem()
+                Assert.assertTrue(skipCommand is ShowSkipOnboardingOption)
+
+                testee.onInputScreenOptionSelected(true)
+                testee.onPrimaryCtaClicked(PreOnboardingDialogType.INPUT_SCREEN)
+
+                val finishCommand = awaitItem()
+                Assert.assertTrue(finishCommand is Finish)
+            }
+            verify(mockInputScreenOnboardingWideEvent).onInputScreenEnabledDuringOnboarding(reinstallUser = true)
         }
 }

@@ -39,6 +39,7 @@ internal data class AnrData(
     val timeStamp: String = FORMATTER_SECONDS.format(LocalDateTime.now()),
     val webView: String,
     val customTab: Boolean,
+    val appVersion: String,
 )
 
 internal fun AnrData.asAnrEntity(): AnrEntity {
@@ -52,10 +53,15 @@ internal fun AnrData.asAnrEntity(): AnrEntity {
         timestamp = timeStamp,
         webView = webView,
         customTab = customTab,
+        appVersion = appVersion,
     )
 }
 
-internal fun Throwable.asAnrData(webView: String, customTab: Boolean): AnrData {
+internal fun Throwable.asAnrData(
+    webView: String,
+    customTab: Boolean,
+    appVersion: String,
+): AnrData {
     return AnrData(
         name = this.toString().replace(": $message", "", true),
         message = message,
@@ -64,6 +70,7 @@ internal fun Throwable.asAnrData(webView: String, customTab: Boolean): AnrData {
         lineNumber = stackTrace.getOrNull(0)?.lineNumber ?: Int.MIN_VALUE,
         webView = webView,
         customTab = customTab,
+        appVersion = appVersion,
     )
 }
 

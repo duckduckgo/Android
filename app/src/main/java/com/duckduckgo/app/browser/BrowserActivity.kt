@@ -244,7 +244,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
     }
 
     private val tabPagerAdapter by lazy {
-        TabPagerAdapter(activity = this)
+        TabPagerAdapter(this)
     }
 
     private lateinit var omnibarToolbarMockupBinding: IncludeOmnibarToolbarMockupBinding
@@ -758,7 +758,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 when (settingsDataStore.omnibarType) {
                     OmnibarType.SINGLE_TOP -> null
                     OmnibarType.SINGLE_BOTTOM -> currentTab?.getOmnibar()?.omnibarView?.toolbar ?: binding.fragmentContainer
-                    OmnibarType.SPLIT -> currentTab?.getBottomNavigationBar() ?: binding.fragmentContainer
+                    OmnibarType.SPLIT -> currentTab?.navigationBar ?: binding.fragmentContainer
                 }
             DefaultSnackbar(
                 parentView = binding.fragmentContainer,
@@ -1351,7 +1351,10 @@ open class BrowserActivity : DuckDuckGoActivity() {
         openMessageInNewTabJob =
             lifecycleScope.launch {
                 if (swipingTabsFeature.isEnabled) {
-                    tabPagerAdapter.setMessageForNewFragment(message)
+                    // Set the pending message BEFORE creating the tab to avoid race conditions
+                    if (sourceTabId != null) {
+                        tabPagerAdapter.setMessageForNewFragment(sourceTabId, message)
+                    }
                     tabManager.openNewTab(sourceTabId = sourceTabId)
                 } else {
                     val tabId = viewModel.onNewTabRequested(sourceTabId = sourceTabId)

@@ -130,6 +130,7 @@ jobs:
 
       - name: Create Asana task when workflow failed
         if: ${{ failure() }}
+        id: create-failure-task
         uses: duckduckgo/native-github-asana-sync@v2.0
         with:
           asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
@@ -138,3 +139,13 @@ jobs:
           asana-task-name: GH Workflow Failure - Update content scope scripts
           asana-task-description: The update content scope scripts tests workflow has failed. See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
           action: 'create-asana-task'
+
+      - name: Adding as a release blocker
+        if: ${{ failure() && steps.create-failure-task.outputs.taskId != '' }}
+        uses: duckduckgo/native-github-asana-sync@v2.0
+        with:
+          asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          asana-project: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_ID }}
+          asana-section: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_BLOCKER_SECTION_ID }}
+          asana-task-id: ${{ steps.create-failure-task.outputs.taskId }}
+          action: 'add-task-asana-project'

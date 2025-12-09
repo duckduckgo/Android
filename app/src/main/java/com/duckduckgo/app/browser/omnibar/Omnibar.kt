@@ -48,8 +48,8 @@ import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.hideKeyboard
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.showKeyboard
+import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.utils.extensions.replaceTextChangedListener
-import com.duckduckgo.common.utils.extractDomain
 import com.duckduckgo.common.utils.text.TextChangedWatcher
 import com.google.android.material.appbar.AppBarLayout.GONE
 import com.google.android.material.appbar.AppBarLayout.VISIBLE
@@ -147,7 +147,7 @@ class Omnibar(
         data class CustomTab(
             val toolbarColor: Int,
             val title: String?,
-            val domain: String?,
+            val domain: String? = null,
             val showDuckPlayerIcon: Boolean = false,
         ) : ViewMode()
 
@@ -155,23 +155,43 @@ class Omnibar(
     }
 
     val omnibarView: OmnibarView by lazy {
-        when (omnibarType) {
-            OmnibarType.SINGLE_TOP -> {
-                binding.rootView.removeView(binding.omnibarLayoutBottom)
-                binding.omnibarLayoutTop
-            }
-            OmnibarType.SPLIT -> {
-                binding.rootView.removeView(binding.omnibarLayoutBottom)
-                binding.bottomBrowserOutlineStroke.gone()
-                binding.includeNewBrowserTab.bottomNtpOutlineStroke.gone()
-                binding.omnibarLayoutTop
-            }
-            OmnibarType.SINGLE_BOTTOM -> {
-                binding.rootView.removeView(binding.omnibarLayoutTop)
-                adjustCoordinatorLayoutBehaviorForBottomOmnibar()
-                binding.omnibarLayoutBottom
-            }
+        if (omnibarType == OmnibarType.SPLIT) {
+            binding.bottomBrowserOutlineStroke.gone()
+            binding.includeNewBrowserTab.bottomNtpOutlineStroke.gone()
+        } else if (omnibarType == OmnibarType.SINGLE_BOTTOM) {
+            adjustCoordinatorLayoutBehaviorForBottomOmnibar()
         }
+        createAndAddOmnibarLayout(omnibarType)
+    }
+
+    private fun createAndAddOmnibarLayout(omnibarType: OmnibarType): OmnibarLayout {
+        val omnibarLayout = OmnibarLayout(binding.root.context, omnibarType)
+        omnibarLayout.id = View.generateViewId()
+        omnibarLayout.outlineProvider = null
+
+        val layoutParams = CoordinatorLayout.LayoutParams(
+            CoordinatorLayout.LayoutParams.MATCH_PARENT,
+            CoordinatorLayout.LayoutParams.WRAP_CONTENT,
+        )
+
+        val isBottomPosition = omnibarType == OmnibarType.SINGLE_BOTTOM
+        if (isBottomPosition) {
+            layoutParams.gravity = android.view.Gravity.BOTTOM
+        } else {
+            omnibarLayout.elevation = 1f.toPx()
+        }
+
+        omnibarLayout.layoutParams = layoutParams
+
+        val insertIndex = if (isBottomPosition) {
+            binding.rootView.childCount
+        } else {
+            0
+        }
+
+        binding.rootView.addView(omnibarLayout, insertIndex)
+
+        return omnibarLayout
     }
 
     /**
@@ -306,7 +326,6 @@ class Omnibar(
         viewState: OmnibarViewState,
         forceRender: Boolean = false,
     ) {
-        logcat { "Omnibar: renderOmnibarViewState $viewState" }
         omnibarView.reduce(StateChange.OmnibarStateChange(viewState, forceRender))
     }
 
@@ -381,19 +400,14 @@ class Omnibar(
 
     fun configureCustomTab(
         customTabToolbarColor: Int,
-        customTabDomainText: String?,
     ) {
-        omnibarView.decorate(Mode(ViewMode.CustomTab(toolbarColor = customTabToolbarColor, title = null, domain = customTabDomainText)))
+        omnibarView.decorate(Mode(ViewMode.CustomTab(toolbarColor = customTabToolbarColor, title = null)))
     }
 
     fun showWebPageTitleInCustomTab(
         title: String,
-        url: String?,
-        showDuckPlayerIcon: Boolean,
     ) {
-        val redirectedDomain = url?.extractDomain()
-
-        omnibarView.decorate(Decoration.ChangeCustomTabTitle(title, redirectedDomain, showDuckPlayerIcon))
+        omnibarView.decorate(Decoration.ChangeCustomTabTitle(title))
     }
 
     fun show() {

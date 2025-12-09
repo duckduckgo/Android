@@ -16,11 +16,9 @@
 
 package com.duckduckgo.app.userstate
 
-import android.content.Context
-import android.content.pm.PackageInfo
-import android.content.pm.PackageManager
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.duckduckgo.app.tabs.model.TabDataRepository
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.test.CoroutineTestRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
@@ -43,40 +41,30 @@ class UserStateReporterTest {
 
     private val dispatcherProvider = coroutinesTestRule.testDispatcherProvider
     private val repository = mock<TabDataRepository>()
-    private val context = mock<Context>()
-    private val packageManager = mock<PackageManager>()
+    private val appBuildConfig = mock<AppBuildConfig>()
 
     @Before
     fun setUp() {
-        whenever(context.packageManager).thenReturn(packageManager)
     }
 
     @Test
     fun verifyUserIsNewWhenFirstInstallTimeEqualsLastInstallTime() = runTest {
-        val packageInfo = PackageInfo().apply {
-            firstInstallTime = 1000L
-            lastUpdateTime = 1000L
-        }
-        initializeSut(packageInfo)
+        initializeSut(isNewInstall = true)
 
         verify(repository).setIsUserNew(true)
     }
 
     @Test
     fun verifyUserExistingWhenFirstInstallTimeDoesNotEqualLastInstallTime() = runTest {
-        val packageInfo = PackageInfo().apply {
-            firstInstallTime = 1000L
-            lastUpdateTime = 2000L
-        }
-        initializeSut(packageInfo)
+        initializeSut(isNewInstall = false)
 
         verify(repository).setIsUserNew(false)
     }
 
-    private fun initializeSut(packageInfo: PackageInfo) {
-        whenever(packageManager.getPackageInfo(context.packageName, 0)).thenReturn(packageInfo)
+    private fun initializeSut(isNewInstall: Boolean) {
+        whenever(appBuildConfig.isNewInstall()).thenReturn(isNewInstall)
 
-        val userStateReporter = UserStateReporter(dispatcherProvider, repository, context, TestScope())
+        val userStateReporter = UserStateReporter(dispatcherProvider, repository, appBuildConfig, TestScope())
 
         userStateReporter.onCreate(mock())
     }

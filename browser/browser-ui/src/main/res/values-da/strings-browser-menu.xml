@@ -43,6 +43,7 @@
     <string name="browserMenuRunningInDDG">Kører i DuckDuckGo</string>
     <string name="browserMenuSetAsDefaultBrowser">Angiv som standardbrowser</string>
     <string name="browserMenuNewChat">Ny chat</string>
+    <string name="browserMenuNewAIChat">Ny AI-chat</string>
     <string name="browserMenuChatHistory">Chathistorik</string>
     <string name="browserMenuChatSettings">Duck.ai-indstillinger</string>
     <string name="browserMenuVPN">VPN</string>

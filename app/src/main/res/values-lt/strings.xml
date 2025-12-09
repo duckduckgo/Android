@@ -860,6 +860,11 @@
     <!-- Bubble BB & Buck experiment-->
     <string name="onboardingBubbleExperimentSearchDaxDialogDescription">Jūsų „DuckDuckGo“ paieškos visada yra anoniminės.</string>
 
+    <!-- Input Screen Onboarding step -->
+    <string name="preOnboardingInputScreenTitle">Norite lengvos prieigos prie privačių DI pokalbių?</string>
+    <string name="preOnboardingInputScreenButton">Kitas</string>
+    <string name="preOnboardingInputScreenDescription"><![CDATA[DI funkcijos yra privačios ir neprivalomos. Galite atlikti pakeitimus <b>Nustatymai > DI funkcijos</b>.]]></string>
+
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Adreso juosta</string>
     <string name="settingsAddressBarPositionHeaderTitle">Adreso juostos padėtis</string>

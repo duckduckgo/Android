@@ -15,6 +15,7 @@ import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconStat
 import com.duckduckgo.app.browser.omnibar.model.Decoration
 import com.duckduckgo.app.browser.omnibar.model.Decoration.ChangeCustomTabTitle
 import com.duckduckgo.app.browser.omnibar.model.StateChange
+import com.duckduckgo.app.browser.urldisplay.UrlDisplayRepository
 import com.duckduckgo.app.browser.viewstate.HighlightableButton
 import com.duckduckgo.app.browser.viewstate.LoadingViewState
 import com.duckduckgo.app.browser.viewstate.OmnibarViewState
@@ -85,7 +86,9 @@ class OmnibarLayoutViewModelTest {
     private val duckAiShowOmnibarShortcutOnNtpAndOnFocusFlow = MutableStateFlow(true)
     private val duckAiShowOmnibarShortcutInAllStatesFlow = MutableStateFlow(true)
     private val duckAiShowInputScreenFlow = MutableStateFlow(false)
+    private val isFullUrlEnabledFlow = MutableStateFlow(true)
     private val settingsDataStore: SettingsDataStore = mock()
+    private val urlDisplayRepository: UrlDisplayRepository = mock()
     private val mockAddressDisplayFormatter: AddressDisplayFormatter by lazy {
         mock {
             on { getShortUrl(any()) } doAnswer { invocation ->
@@ -115,7 +118,7 @@ class OmnibarLayoutViewModelTest {
         whenever(duckPlayer.isDuckPlayerUri(DUCK_PLAYER_URL)).thenReturn(true)
         whenever(duckAiFeatureState.showOmnibarShortcutOnNtpAndOnFocus).thenReturn(duckAiShowOmnibarShortcutOnNtpAndOnFocusFlow)
         whenever(duckAiFeatureState.showOmnibarShortcutInAllStates).thenReturn(duckAiShowOmnibarShortcutInAllStatesFlow)
-        whenever(settingsDataStore.isFullUrlEnabled).thenReturn(true)
+        whenever(urlDisplayRepository.isFullUrlEnabled).then { isFullUrlEnabledFlow }
         whenever(duckAiFeatureState.showInputScreen).thenReturn(duckAiShowInputScreenFlow)
         whenever(serpEasterEggLogosToggles.feature()).thenReturn(mock())
         whenever(serpEasterEggLogosToggles.feature().isEnabled()).thenReturn(false)
@@ -161,6 +164,7 @@ class OmnibarLayoutViewModelTest {
             duckAiFeatureState = duckAiFeatureState,
             addressDisplayFormatter = mockAddressDisplayFormatter,
             settingsDataStore = settingsDataStore,
+            urlDisplayRepository = urlDisplayRepository,
             serpEasterEggLogosToggles = serpEasterEggLogosToggles,
             androidBrowserToggles = androidBrowserToggles,
         )
@@ -332,13 +336,12 @@ class OmnibarLayoutViewModelTest {
     fun whenViewModeChangedToCustomTabThenViewStateCorrect() = runTest {
         val expectedToolbarColor = 100
         val expectedTitle = "example"
-        val expectedDomain = "example.com"
+        val expectedDomain = ""
         val expectedShowDuckPlayerIcon = false
         testee.onViewModeChanged(
             ViewMode.CustomTab(
                 toolbarColor = expectedToolbarColor,
                 title = expectedTitle,
-                domain = expectedDomain,
                 showDuckPlayerIcon = expectedShowDuckPlayerIcon,
             ),
         )
@@ -355,7 +358,7 @@ class OmnibarLayoutViewModelTest {
             val customTabMode = viewState.viewMode as ViewMode.CustomTab
             assertEquals(expectedToolbarColor, customTabMode.toolbarColor)
             assertEquals(expectedTitle, customTabMode.title)
-            assertEquals(expectedDomain, customTabMode.domain)
+            assertEquals(expectedDomain, customTabMode.domain) // Empty string because no URL is set
             assertEquals(expectedShowDuckPlayerIcon, customTabMode.showDuckPlayerIcon)
         }
     }
@@ -363,37 +366,194 @@ class OmnibarLayoutViewModelTest {
     @Test
     fun `when custom tab title updates, update view mode state`() = runTest {
         val expectedTitle = "newTitle"
-        val expectedDomain = "newDomain"
-        val expectedShowDuckPlayerIcon = true
+        val initialUrl = "https://example.com/page"
+        val expectedDomain = "example.com"
         val decoration = ChangeCustomTabTitle(
             title = expectedTitle,
-            domain = expectedDomain,
-            showDuckPlayerIcon = expectedShowDuckPlayerIcon,
         )
 
         testee.onViewModeChanged(ViewMode.CustomTab(100, "example", "example.com", showDuckPlayerIcon = false))
+        // Set URL in state so domain can be extracted
+        testee.onExternalStateChange(
+            StateChange.LoadingStateChange(
+                LoadingViewState(
+                    isLoading = false,
+                    trackersAnimationEnabled = false,
+                    progress = 100,
+                    url = initialUrl,
+                ),
+            ),
+        )
+        testee.onCustomTabTitleUpdate(decoration)
+
         testee.viewState.test {
-            // skipping initial update
-            skipItems(1)
-            testee.onCustomTabTitleUpdate(decoration)
-            val viewState = awaitItem()
-            assertFalse(viewState.showClearButton)
-            assertFalse(viewState.showVoiceSearch)
-            assertFalse(viewState.showTabsMenu)
-            assertFalse(viewState.showFireIcon)
-            assertTrue(viewState.showBrowserMenu)
+            val viewState = expectMostRecentItem()
 
             assertTrue(viewState.viewMode is ViewMode.CustomTab)
             val customTabMode = viewState.viewMode as ViewMode.CustomTab
             assertEquals(100, customTabMode.toolbarColor)
             assertEquals(expectedTitle, customTabMode.title)
             assertEquals(expectedDomain, customTabMode.domain)
-            assertEquals(expectedShowDuckPlayerIcon, customTabMode.showDuckPlayerIcon)
+            assertFalse(customTabMode.showDuckPlayerIcon)
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun whenViewModeChangedToErrorThenViewStateCorrect() = runTest {
+    fun `when custom tab view mode changed and URL loaded then domain extracted from URL`() = runTest {
+        val testUrl = "https://example.com/path/to/page"
+        val expectedDomain = "example.com"
+
+        testee.onViewModeChanged(ViewMode.CustomTab(100, "example"))
+        testee.onExternalStateChange(
+            StateChange.LoadingStateChange(
+                LoadingViewState(
+                    isLoading = false,
+                    trackersAnimationEnabled = false,
+                    progress = 100,
+                    url = testUrl,
+                ),
+            ),
+        )
+
+        testee.viewState.test {
+            val viewState = expectMostRecentItem()
+            assertTrue(viewState.viewMode is ViewMode.CustomTab)
+            val customTabMode = viewState.viewMode as ViewMode.CustomTab
+            assertEquals(expectedDomain, customTabMode.domain)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when custom tab URL changes to different domain then domain is dynamically updated`() = runTest {
+        val initialUrl = "https://example.com/page"
+        val newUrl = "https://different.com/other"
+        val expectedNewDomain = "different.com"
+
+        testee.onViewModeChanged(ViewMode.CustomTab(100, "title", "example.com", showDuckPlayerIcon = false))
+        testee.onExternalStateChange(
+            StateChange.LoadingStateChange(
+                LoadingViewState(
+                    isLoading = false,
+                    trackersAnimationEnabled = false,
+                    progress = 100,
+                    url = initialUrl,
+                ),
+            ),
+        )
+
+        testee.viewState.test {
+            skipItems(1)
+            testee.onExternalStateChange(
+                StateChange.LoadingStateChange(
+                    LoadingViewState(
+                        isLoading = false,
+                        trackersAnimationEnabled = false,
+                        progress = 100,
+                        url = newUrl,
+                    ),
+                ),
+            )
+            val viewState = awaitItem()
+            assertTrue(viewState.viewMode is ViewMode.CustomTab)
+            val customTabMode = viewState.viewMode as ViewMode.CustomTab
+            assertEquals(expectedNewDomain, customTabMode.domain)
+            assertFalse(customTabMode.showDuckPlayerIcon)
+        }
+    }
+
+    @Test
+    fun `when custom tab URL changes to DuckPlayer URL and DuckPlayer enabled then showDuckPlayerIcon is true`() = runTest {
+        val initialUrl = "https://example.com/page"
+        val duckPlayerUrl = DUCK_PLAYER_URL
+        val expectedDomain = "duck://player" // DuckPlayer URLs extract as "duck://player" (without the path)
+
+        whenever(duckPlayer.getDuckPlayerState()).thenReturn(DuckPlayer.DuckPlayerState.ENABLED)
+
+        testee.onViewModeChanged(ViewMode.CustomTab(100, "title", "example.com", showDuckPlayerIcon = false))
+        testee.onExternalStateChange(
+            StateChange.LoadingStateChange(
+                LoadingViewState(
+                    isLoading = false,
+                    trackersAnimationEnabled = false,
+                    progress = 100,
+                    url = initialUrl,
+                ),
+            ),
+        )
+
+        testee.viewState.test {
+            skipItems(1)
+            testee.onExternalStateChange(
+                StateChange.LoadingStateChange(
+                    LoadingViewState(
+                        isLoading = false,
+                        trackersAnimationEnabled = false,
+                        progress = 100,
+                        url = duckPlayerUrl,
+                    ),
+                ),
+            )
+            val viewState = awaitItem()
+            assertTrue(viewState.viewMode is ViewMode.CustomTab)
+            val customTabMode = viewState.viewMode as ViewMode.CustomTab
+            assertEquals(expectedDomain, customTabMode.domain)
+            assertTrue(customTabMode.showDuckPlayerIcon)
+        }
+    }
+
+    @Test
+    fun `when custom tab URL is blank and omnibarText is about blank then domain displays about blank`() = runTest {
+        val expectedDomain = "about:blank"
+
+        testee.onViewModeChanged(ViewMode.CustomTab(100, "title", "", showDuckPlayerIcon = false))
+        testee.onExternalStateChange(
+            StateChange.OmnibarStateChange(
+                OmnibarViewState(
+                    omnibarText = "about:blank",
+                    queryOrFullUrl = "",
+                    navigationChange = false,
+                    forceExpand = false,
+                ),
+            ),
+        )
+        testee.onExternalStateChange(
+            StateChange.LoadingStateChange(
+                LoadingViewState(
+                    isLoading = false,
+                    trackersAnimationEnabled = false,
+                    progress = 100,
+                    url = "",
+                ),
+            ),
+        )
+
+        testee.viewState.test {
+            val viewState = expectMostRecentItem()
+            assertTrue(viewState.viewMode is ViewMode.CustomTab)
+            val customTabMode = viewState.viewMode as ViewMode.CustomTab
+            assertEquals(expectedDomain, customTabMode.domain)
+            assertFalse(customTabMode.showDuckPlayerIcon)
+        }
+    }
+
+    @Test
+    fun whenViewModeChangedToErrorAndFocusedThenViewStateCorrect() = runTest {
+        testee.onOmnibarFocusChanged(true, RANDOM_URL)
+        testee.onViewModeChanged(ViewMode.Error)
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertTrue(viewState.leadingIconState == LeadingIconState.Globe)
+            assertTrue(viewState.scrollingEnabled)
+            assertTrue(viewState.viewMode is ViewMode.Error)
+        }
+    }
+
+    @Test
+    fun whenViewModeChangedToErrorAndUnfocusedThenViewStateCorrect() = runTest {
+        testee.onOmnibarFocusChanged(false, RANDOM_URL)
         testee.onViewModeChanged(ViewMode.Error)
 
         testee.viewState.test {
@@ -459,7 +619,7 @@ class OmnibarLayoutViewModelTest {
 
         testee.viewState.test {
             val viewState = expectMostRecentItem()
-            assertTrue(viewState.leadingIconState == LeadingIconState.Search)
+            assertTrue(viewState.leadingIconState == LeadingIconState.Globe)
             assertTrue(viewState.viewMode is ViewMode.Error)
         }
     }
@@ -471,7 +631,7 @@ class OmnibarLayoutViewModelTest {
 
         testee.viewState.test {
             val viewState = expectMostRecentItem()
-            assertTrue(viewState.leadingIconState == LeadingIconState.Search)
+            assertTrue(viewState.leadingIconState == LeadingIconState.Globe)
             assertTrue(viewState.viewMode is ViewMode.SSLWarning)
         }
     }
@@ -483,7 +643,7 @@ class OmnibarLayoutViewModelTest {
 
         testee.viewState.test {
             val viewState = expectMostRecentItem()
-            assertTrue(viewState.leadingIconState == LeadingIconState.Search)
+            assertTrue(viewState.leadingIconState == LeadingIconState.Globe)
             assertTrue(viewState.viewMode is ViewMode.MaliciousSiteWarning)
         }
     }
@@ -1297,7 +1457,7 @@ class OmnibarLayoutViewModelTest {
 
     @Test
     fun `when input text click catcher clicked and random URL then input screen launched with full URL`() = runTest {
-        whenever(settingsDataStore.isFullUrlEnabled).thenReturn(false)
+        isFullUrlEnabledFlow.emit(false)
         initializeViewModel()
         val omnibarViewState = OmnibarViewState(omnibarText = "test", queryOrFullUrl = "test", isEditing = false)
         testee.onExternalStateChange(StateChange.OmnibarStateChange(omnibarViewState))
@@ -1317,7 +1477,7 @@ class OmnibarLayoutViewModelTest {
     fun whenOmnibarLosesFocusAndFullUrlEnabledThenAddressDisplayDisplaysFullUrl() = runTest {
         val query = "query"
         val url = "https://example.com/test.html"
-        whenever(settingsDataStore.isFullUrlEnabled).thenReturn(true)
+        isFullUrlEnabledFlow.emit(true)
         initializeViewModel()
         testee.onOmnibarFocusChanged(hasFocus = true, inputFieldText = query) // Initial focus
         testee.onExternalStateChange(StateChange.LoadingStateChange(LoadingViewState(url = url))) // Set URL
@@ -1337,8 +1497,7 @@ class OmnibarLayoutViewModelTest {
         val query = "query"
         val url = "https://example.com/test.html"
         val formattedUrl = "example.com"
-        whenever(settingsDataStore.isFullUrlEnabled).thenReturn(false)
-        initializeViewModel()
+        isFullUrlEnabledFlow.emit(false)
         testee.onOmnibarFocusChanged(hasFocus = true, inputFieldText = query) // Initial focus
         testee.onExternalStateChange(StateChange.LoadingStateChange(LoadingViewState(url = url))) // Set URL
 
@@ -1357,8 +1516,7 @@ class OmnibarLayoutViewModelTest {
         val url = "https://example.com/test.html"
         val formattedUrl = "https://example.com/test.html"
         val omnibarViewState = OmnibarViewState(omnibarText = url, queryOrFullUrl = url, isEditing = false)
-        whenever(settingsDataStore.isFullUrlEnabled).thenReturn(true)
-        initializeViewModel()
+        isFullUrlEnabledFlow.emit(true)
 
         testee.onExternalStateChange(StateChange.OmnibarStateChange(omnibarViewState))
 
@@ -1374,8 +1532,7 @@ class OmnibarLayoutViewModelTest {
     fun whenOmnibarGainsFocusAndFullUrlDisabledThenOmnibarTextIsFullUrl() = runTest {
         val url = "https://example.com/test.html"
         val shortUrl = "example.com"
-        whenever(settingsDataStore.isFullUrlEnabled).thenReturn(false)
-        initializeViewModel()
+        isFullUrlEnabledFlow.emit(false)
 
         // Set initial state: site loaded, omnibar not focused (showing short url)
         givenSiteLoaded(url)
@@ -1395,8 +1552,7 @@ class OmnibarLayoutViewModelTest {
     fun whenOmnibarGainsFocusAndFullUrlEnabledThenOmnibarTextIsFullUrl() = runTest {
         val url = "https://example.com/test.html"
         val shortUrl = "example.com"
-        whenever(settingsDataStore.isFullUrlEnabled).thenReturn(true)
-        initializeViewModel()
+        isFullUrlEnabledFlow.emit(true)
 
         // Set initial state: site loaded, omnibar not focused (showing short url)
         givenSiteLoaded(url)
@@ -1416,7 +1572,7 @@ class OmnibarLayoutViewModelTest {
     @Test
     fun whenExternalOmnibarStateChangedWithForceRenderAndNotDDGUrlAndFullUrlEnabledThenOmnibarTextIsFullUrl() = runTest {
         val omnibarViewState = OmnibarViewState(omnibarText = RANDOM_URL, queryOrFullUrl = RANDOM_URL)
-        whenever(settingsDataStore.isFullUrlEnabled).thenReturn(true)
+        isFullUrlEnabledFlow.emit(true)
 
         testee.onExternalStateChange(StateChange.OmnibarStateChange(omnibarViewState, forceRender = true))
 
@@ -1432,7 +1588,7 @@ class OmnibarLayoutViewModelTest {
     fun whenExternalOmnibarStateChangedWithForceRenderAndNotDDGUrlAndFullUrlDisabledThenOmnibarTextIsShortUrl() = runTest {
         val shortUrl = RANDOM_URL.toUri().baseHost!!
         val omnibarViewState = OmnibarViewState(omnibarText = RANDOM_URL, queryOrFullUrl = RANDOM_URL)
-        whenever(settingsDataStore.isFullUrlEnabled).thenReturn(false)
+        isFullUrlEnabledFlow.emit(false)
 
         testee.onExternalStateChange(StateChange.OmnibarStateChange(omnibarViewState, forceRender = true))
 
@@ -1448,7 +1604,7 @@ class OmnibarLayoutViewModelTest {
     fun whenExternalOmnibarStateChangedWithForceRenderAndNotDDGUrlAndFullUrlEndabledThenOmnibarTextIsFullUrl() = runTest {
         val shortUrl = RANDOM_URL.toUri().baseHost!!
         val omnibarViewState = OmnibarViewState(omnibarText = shortUrl, queryOrFullUrl = RANDOM_URL)
-        whenever(settingsDataStore.isFullUrlEnabled).thenReturn(true)
+        isFullUrlEnabledFlow.emit(true)
 
         testee.onExternalStateChange(StateChange.OmnibarStateChange(omnibarViewState, forceRender = true))
 
@@ -1463,7 +1619,7 @@ class OmnibarLayoutViewModelTest {
     @Test
     fun whenExternalOmnibarStateChangedWithoutForceRenderThenOmnibarTextIsFromState() = runTest {
         val omnibarViewState = OmnibarViewState(omnibarText = RANDOM_URL, queryOrFullUrl = RANDOM_URL)
-        whenever(settingsDataStore.isFullUrlEnabled).thenReturn(false)
+        isFullUrlEnabledFlow.emit(false)
 
         testee.onExternalStateChange(StateChange.OmnibarStateChange(omnibarViewState, forceRender = false))
 
@@ -2026,6 +2182,65 @@ class OmnibarLayoutViewModelTest {
     }
 
     @Test
+    fun `when custom tab URL changes to simulated YouTube NoCookie and DuckPlayer enabled then showDuckPlayerIcon is true`() = runTest {
+        val youtubeNoCookieUrl = "http://youtube-nocookie.com/videoID=1234"
+        val duckPlayerUrl = "duck://player/1234"
+
+        whenever(duckPlayer.isSimulatedYoutubeNoCookie(any())).thenReturn(true)
+        whenever(duckPlayer.createDuckPlayerUriFromYoutubeNoCookie(any())).thenReturn(duckPlayerUrl)
+        whenever(duckPlayer.isDuckPlayerUri(duckPlayerUrl)).thenReturn(true)
+        whenever(duckPlayer.getDuckPlayerState()).thenReturn(DuckPlayer.DuckPlayerState.ENABLED)
+
+        testee.onViewModeChanged(ViewMode.CustomTab(100, "title", "example.com", showDuckPlayerIcon = false))
+        testee.onExternalStateChange(
+            StateChange.LoadingStateChange(
+                LoadingViewState(
+                    isLoading = false,
+                    trackersAnimationEnabled = false,
+                    progress = 100,
+                    url = duckPlayerUrl,
+                ),
+            ),
+        )
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertTrue(viewState.viewMode is ViewMode.CustomTab)
+            val customTabMode = viewState.viewMode as ViewMode.CustomTab
+            assertTrue(customTabMode.showDuckPlayerIcon)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when custom tab URL is DuckPlayer URL and DuckPlayer disabled then showDuckPlayerIcon is false`() = runTest {
+        val duckPlayerUrl = DUCK_PLAYER_URL
+
+        whenever(duckPlayer.isDuckPlayerUri(duckPlayerUrl)).thenReturn(true)
+        whenever(duckPlayer.getDuckPlayerState()).thenReturn(DuckPlayer.DuckPlayerState.DISABLED)
+
+        testee.onViewModeChanged(ViewMode.CustomTab(100, "title", "example.com", showDuckPlayerIcon = false))
+        testee.onExternalStateChange(
+            StateChange.LoadingStateChange(
+                LoadingViewState(
+                    isLoading = false,
+                    trackersAnimationEnabled = false,
+                    progress = 100,
+                    url = duckPlayerUrl,
+                ),
+            ),
+        )
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertTrue(viewState.viewMode is ViewMode.CustomTab)
+            val customTabMode = viewState.viewMode as ViewMode.CustomTab
+            assertFalse(customTabMode.showDuckPlayerIcon)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
     fun whenDuckAiHeaderPressedAndInputScreenEnabledThenInputScreenShown() = runTest {
         duckAiShowInputScreenFlow.value = true
         testee.onDuckAiHeaderClicked()
@@ -2064,6 +2279,191 @@ class OmnibarLayoutViewModelTest {
             val viewState = expectMostRecentItem()
             assertFalse(viewState.showDuckAISidebar)
             assertFalse(viewState.showDuckAISidebar)
+        }
+    }
+
+    @Test
+    fun whenHandleAboutBlankEnabledAndOmnibarTextIsAboutBlankAndForceRenderThenOmnibarTextNotUpdated() = runTest {
+        whenever(androidBrowserToggles.handleAboutBlank().isEnabled()).thenReturn(true)
+        initializeViewModel()
+
+        givenSiteLoaded(RANDOM_URL)
+
+        testee.onExternalStateChange(
+            StateChange.OmnibarStateChange(
+                OmnibarViewState(
+                    omnibarText = "about:blank",
+                    queryOrFullUrl = RANDOM_URL,
+                    navigationChange = false,
+                    forceExpand = false,
+                ),
+                forceRender = true,
+            ),
+        )
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertEquals("about:blank", viewState.omnibarText)
+            assertTrue(viewState.updateOmnibarText)
+        }
+    }
+
+    @Test
+    fun whenHandleAboutBlankEnabledAndOmnibarTextIsAboutBlankAndForceRenderWithEasterEggThenOmnibarTextNotUpdated() = runTest {
+        whenever(androidBrowserToggles.handleAboutBlank().isEnabled()).thenReturn(true)
+        whenever(serpEasterEggLogosToggles.feature().isEnabled()).thenReturn(true)
+        initializeViewModel()
+
+        givenSiteLoaded(RANDOM_URL)
+
+        testee.onExternalStateChange(
+            StateChange.OmnibarStateChange(
+                OmnibarViewState(
+                    omnibarText = "about:blank",
+                    queryOrFullUrl = RANDOM_URL,
+                    navigationChange = false,
+                    forceExpand = false,
+                ),
+                forceRender = true,
+            ),
+        )
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertEquals("about:blank", viewState.omnibarText)
+        }
+    }
+
+    @Test
+    fun whenHandleAboutBlankEnabledAndOmnibarTextIsNotAboutBlankAndForceRenderThenOmnibarTextUpdated() = runTest {
+        whenever(androidBrowserToggles.handleAboutBlank().isEnabled()).thenReturn(true)
+        initializeViewModel()
+
+        givenSiteLoaded(RANDOM_URL)
+
+        testee.onExternalStateChange(
+            StateChange.OmnibarStateChange(
+                OmnibarViewState(
+                    omnibarText = "",
+                    queryOrFullUrl = RANDOM_URL,
+                    navigationChange = false,
+                    forceExpand = false,
+                ),
+                forceRender = true,
+            ),
+        )
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertEquals(RANDOM_URL, viewState.omnibarText)
+            assertTrue(viewState.updateOmnibarText)
+        }
+    }
+
+    @Test
+    fun whenHandleAboutBlankEnabledAndOmnibarTextIsNotAboutBlankAndForceRenderWithEasterEggThenOmnibarTextUpdated() = runTest {
+        whenever(androidBrowserToggles.handleAboutBlank().isEnabled()).thenReturn(true)
+        whenever(serpEasterEggLogosToggles.feature().isEnabled()).thenReturn(true)
+        initializeViewModel()
+
+        givenSiteLoaded(RANDOM_URL)
+
+        testee.onExternalStateChange(
+            StateChange.OmnibarStateChange(
+                OmnibarViewState(
+                    omnibarText = "",
+                    queryOrFullUrl = RANDOM_URL,
+                    navigationChange = false,
+                    forceExpand = false,
+                ),
+                forceRender = true,
+            ),
+        )
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertEquals(RANDOM_URL, viewState.omnibarText)
+            assertTrue(viewState.updateOmnibarText)
+        }
+    }
+
+    @Test
+    fun whenHandleAboutBlankDisabledAndOmnibarTextIsAboutBlankAndForceRenderThenOmnibarTextUpdated() = runTest {
+        whenever(androidBrowserToggles.handleAboutBlank().isEnabled()).thenReturn(false)
+        initializeViewModel()
+
+        givenSiteLoaded(RANDOM_URL)
+
+        testee.onExternalStateChange(
+            StateChange.OmnibarStateChange(
+                OmnibarViewState(
+                    omnibarText = "about:blank",
+                    queryOrFullUrl = RANDOM_URL,
+                    navigationChange = false,
+                    forceExpand = false,
+                ),
+                forceRender = true,
+            ),
+        )
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertEquals(RANDOM_URL, viewState.omnibarText)
+            assertTrue(viewState.updateOmnibarText)
+        }
+    }
+
+    @Test
+    fun whenHandleAboutBlankDisabledAndOmnibarTextIsAboutBlankAndForceRenderWithEasterEggThenOmnibarTextUpdated() = runTest {
+        whenever(androidBrowserToggles.handleAboutBlank().isEnabled()).thenReturn(false)
+        whenever(serpEasterEggLogosToggles.feature().isEnabled()).thenReturn(true)
+        initializeViewModel()
+
+        givenSiteLoaded(RANDOM_URL)
+
+        testee.onExternalStateChange(
+            StateChange.OmnibarStateChange(
+                OmnibarViewState(
+                    omnibarText = "about:blank",
+                    queryOrFullUrl = RANDOM_URL,
+                    navigationChange = false,
+                    forceExpand = false,
+                ),
+                forceRender = true,
+            ),
+        )
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertEquals(RANDOM_URL, viewState.omnibarText)
+            assertTrue(viewState.updateOmnibarText)
+        }
+    }
+
+    @Test
+    fun whenHandleAboutBlankEnabledAndOmnibarTextIsAboutBlankWithShortUrlAndForceRenderThenOmnibarTextNotUpdated() = runTest {
+        whenever(androidBrowserToggles.handleAboutBlank().isEnabled()).thenReturn(true)
+        isFullUrlEnabledFlow.value = false
+        initializeViewModel()
+
+        givenSiteLoaded(RANDOM_URL)
+
+        testee.onExternalStateChange(
+            StateChange.OmnibarStateChange(
+                OmnibarViewState(
+                    omnibarText = "about:blank",
+                    queryOrFullUrl = RANDOM_URL,
+                    navigationChange = false,
+                    forceExpand = false,
+                ),
+                forceRender = true,
+            ),
+        )
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertEquals("about:blank", viewState.omnibarText)
+            assertTrue(viewState.updateOmnibarText)
         }
     }
 }

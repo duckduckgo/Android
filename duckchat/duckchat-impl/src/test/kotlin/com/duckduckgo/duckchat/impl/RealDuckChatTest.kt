@@ -755,6 +755,30 @@ class RealDuckChatTest {
     }
 
     @Test
+    fun `when observe cosmetic input screen user setting then emit correct values`() = runTest {
+        whenever(mockDuckChatFeatureRepository.observeCosmeticInputScreenUserSettingEnabled()).thenReturn(flowOf(null, true, false))
+
+        val results = testee.observeCosmeticInputScreenUserSettingEnabled().take(3).toList()
+        assertNull(results[0])
+        assertTrue(results[1] == true)
+        assertTrue(results[2] == false)
+    }
+
+    @Test
+    fun `when enable cosmetic input screen user setting then repository updated`() = runTest {
+        testee.setCosmeticInputScreenUserSetting(true)
+
+        verify(mockDuckChatFeatureRepository).setCosmeticInputScreenUserSetting(true)
+    }
+
+    @Test
+    fun `when disable cosmetic input screen user setting then repository updated`() = runTest {
+        testee.setCosmeticInputScreenUserSetting(false)
+
+        verify(mockDuckChatFeatureRepository).setCosmeticInputScreenUserSetting(false)
+    }
+
+    @Test
     fun `input screen feature - when enabled then emit enabled`() = runTest {
         assertTrue(testee.showInputScreen.value)
     }

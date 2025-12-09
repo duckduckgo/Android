@@ -76,11 +76,6 @@ interface DuckChatInternal : DuckChat {
     suspend fun setEnableDuckChatUserSetting(enabled: Boolean)
 
     /**
-     * Set user setting to determine whether dedicated Duck.ai input screen with a mode switch should be used.
-     */
-    suspend fun setInputScreenUserSetting(enabled: Boolean)
-
-    /**
      * Set user setting to determine whether DuckChat should be shown in browser menu.
      */
     suspend fun setShowInBrowserMenuUserSetting(showDuckChat: Boolean)
@@ -104,11 +99,6 @@ interface DuckChatInternal : DuckChat {
      * Observes whether DuckChat is user enabled or disabled.
      */
     fun observeEnableDuckChatUserSetting(): Flow<Boolean>
-
-    /**
-     * Observes whether Duck.ai input screen with a mode switch is enabled or disabled.
-     */
-    fun observeInputScreenUserSettingEnabled(): Flow<Boolean>
 
     /**
      * Observes whether DuckChat should be shown in browser menu based on user settings only.
@@ -311,6 +301,7 @@ class RealDuckChat @Inject constructor(
     private val _showInputScreenOnSystemSearchLaunch = MutableStateFlow(false)
     private val _showVoiceSearchToggle = MutableStateFlow(false)
     private val _showFullScreenMode = MutableStateFlow(false)
+    private val _showFullScreenModeToggle = MutableStateFlow(false)
 
     private val jsonAdapter: JsonAdapter<DuckChatSettingJson> by lazy {
         moshi.adapter(DuckChatSettingJson::class.java)
@@ -355,6 +346,10 @@ class RealDuckChat @Inject constructor(
         cacheUserSettings()
     }
 
+    override suspend fun setCosmeticInputScreenUserSetting(enabled: Boolean) {
+        duckChatFeatureRepository.setCosmeticInputScreenUserSetting(enabled)
+    }
+
     override suspend fun setShowInBrowserMenuUserSetting(showDuckChat: Boolean) =
         withContext(dispatchers.io()) {
             duckChatFeatureRepository.setShowInBrowserMenu(showDuckChat)
@@ -393,6 +388,9 @@ class RealDuckChat @Inject constructor(
     override fun observeEnableDuckChatUserSetting(): Flow<Boolean> = duckChatFeatureRepository.observeDuckChatUserEnabled()
 
     override fun observeInputScreenUserSettingEnabled(): Flow<Boolean> = duckChatFeatureRepository.observeInputScreenUserSettingEnabled()
+
+    override fun observeCosmeticInputScreenUserSettingEnabled(): Flow<Boolean?> =
+        duckChatFeatureRepository.observeCosmeticInputScreenUserSettingEnabled()
 
     override fun observeShowInBrowserMenuUserSetting(): Flow<Boolean> = duckChatFeatureRepository.observeShowInBrowserMenu()
 
@@ -475,6 +473,8 @@ class RealDuckChat @Inject constructor(
     override val showVoiceSearchToggle: StateFlow<Boolean> = _showVoiceSearchToggle.asStateFlow()
 
     override val showFullScreenMode: StateFlow<Boolean> = _showFullScreenMode.asStateFlow()
+
+    override val showFullScreenModeToggle: StateFlow<Boolean> = _showFullScreenModeToggle.asStateFlow()
 
     override val chatState: StateFlow<ChatState> = _chatState.asStateFlow()
 
@@ -699,8 +699,6 @@ class RealDuckChat @Inject constructor(
             showInputScreenOnSystemSearchLaunchEnabled = duckChatFeature.showInputScreenOnSystemSearchLaunch().isEnabled()
             inputScreenMainButtonsEnabled = duckChatFeature.showMainButtonsInInputScreen().isEnabled()
 
-            isFullscreenModeEnabled = duckChatFeature.fullscreenMode().isEnabled()
-
             val showMainButtons = duckChatFeature.showMainButtonsInInputScreen().isEnabled()
             _showMainButtonsInInputScreen.emit(showMainButtons)
 
@@ -768,9 +766,14 @@ class RealDuckChat @Inject constructor(
                     isDuckChatFeatureEnabled && isDuckChatUserEnabled && isVoiceSearchEntryPointEnabled
             _showVoiceSearchToggle.emit(showVoiceSearchToggle)
 
-            val showFullScreenMode = duckChatFeature.fullscreenMode()
-                .isEnabled() && duckChatFeatureRepository.isFullScreenModeUserSettingEnabled() && isDuckChatFeatureEnabled
+            val showFullScreenMode =
+                duckChatFeature.fullscreenMode().isEnabled() && duckChatFeatureRepository.isFullScreenModeUserSettingEnabled()
+            isFullscreenModeEnabled = showFullScreenMode
             _showFullScreenMode.emit(showFullScreenMode)
+
+            val showFullScreenModeToggle =
+                duckChatFeature.fullscreenMode().isEnabled() && duckChatFeature.fullscreenModeToggle().isEnabled()
+            _showFullScreenModeToggle.emit(showFullScreenModeToggle)
         }
 
     companion object {

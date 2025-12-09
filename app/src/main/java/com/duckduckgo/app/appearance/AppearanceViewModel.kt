@@ -22,6 +22,7 @@ import androidx.webkit.WebViewFeature
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.api.OmnibarRepository
 import com.duckduckgo.app.browser.omnibar.OmnibarType
+import com.duckduckgo.app.browser.urldisplay.UrlDisplayRepository
 import com.duckduckgo.app.icon.api.AppIcon
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_THEME_TOGGLED_DARK
@@ -53,6 +54,7 @@ import kotlin.to
 class AppearanceViewModel @Inject constructor(
     private val themingDataStore: ThemingDataStore,
     private val settingsDataStore: SettingsDataStore,
+    private val urlDisplayRepository: UrlDisplayRepository,
     private val pixel: Pixel,
     private val dispatcherProvider: DispatcherProvider,
     private val tabSwitcherDataStore: TabSwitcherDataStore,
@@ -91,7 +93,6 @@ class AppearanceViewModel @Inject constructor(
             forceDarkModeEnabled = settingsDataStore.experimentalWebsiteDarkMode,
             canForceDarkMode = canForceDarkMode(),
             supportsForceDarkMode = WebViewFeature.isFeatureSupported(WebViewFeature.ALGORITHMIC_DARKENING),
-            isFullUrlEnabled = settingsDataStore.isFullUrlEnabled,
             omnibarType = settingsDataStore.omnibarType,
             shouldShowSplitOmnibarSettings = omnibarRepository.isSplitOmnibarAvailable,
         ),
@@ -99,10 +100,12 @@ class AppearanceViewModel @Inject constructor(
 
     fun viewState() = combine(
         viewState,
+        urlDisplayRepository.isFullUrlEnabled,
         tabSwitcherDataStore.isTrackersAnimationInfoTileHidden(),
-    ) { currentViewState, isTrackersAnimationTileHidden ->
+    ) { currentViewState, isFullUrlEnabled, isTrackersAnimationTileHidden ->
         currentViewState.copy(
             isTrackersCountInTabSwitcherEnabled = !isTrackersAnimationTileHidden,
+            isFullUrlEnabled = isFullUrlEnabled,
         )
     }.stateIn(viewModelScope, SharingStarted.Lazily, viewState.value)
 
@@ -175,8 +178,7 @@ class AppearanceViewModel @Inject constructor(
 
     fun onFullUrlSettingChanged(checked: Boolean) {
         viewModelScope.launch(dispatcherProvider.io()) {
-            settingsDataStore.isFullUrlEnabled = checked
-            viewState.update { it.copy(isFullUrlEnabled = checked) }
+            urlDisplayRepository.setFullUrlEnabled(checked)
 
             val params = mapOf(Pixel.PixelParameter.IS_ENABLED to checked.toString())
             pixel.fire(AppPixelName.SETTINGS_APPEARANCE_IS_FULL_URL_OPTION_TOGGLED, params)

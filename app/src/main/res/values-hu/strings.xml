@@ -828,6 +828,11 @@
     <!-- Bubble BB & Buck experiment-->
     <string name="onboardingBubbleExperimentSearchDaxDialogDescription">A DuckDuckGo-kereséseid mindig névtelenek.</string>
 
+    <!-- Input Screen Onboarding step -->
+    <string name="preOnboardingInputScreenTitle">Szeretnél könnyedén hozzáférni a privát AI-csevegéshez?</string>
+    <string name="preOnboardingInputScreenButton">Következő</string>
+    <string name="preOnboardingInputScreenDescription"><![CDATA[Az AI-funkciók privátak és opcionálisak. Módosításokat a <b>Beállítások > AI-funkciók</b> menüpontban végezhetsz.]]></string>
+
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Címsor</string>
     <string name="settingsAddressBarPositionHeaderTitle">Címsor elhelyezkedése</string>

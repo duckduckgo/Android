@@ -46,7 +46,6 @@ import androidx.core.transition.doOnEnd
 import androidx.core.view.doOnLayout
 import androidx.core.view.isGone
 import androidx.core.view.isInvisible
-import androidx.core.view.isNotEmpty
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.LifecycleOwner
@@ -136,12 +135,19 @@ import com.duckduckgo.mobile.android.R as CommonR
 @InjectWith(FragmentScope::class)
 class OmnibarLayout @JvmOverloads constructor(
     context: Context,
+    override val omnibarType: OmnibarType,
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
 ) : AppBarLayout(context, attrs, defStyle),
     OmnibarView,
     OmnibarBehaviour,
     TrackersAnimatorListener {
+
+    constructor(
+        context: Context,
+        attrs: AttributeSet? = null,
+        defStyle: Int = 0,
+    ) : this(context, OmnibarType.SINGLE_TOP, attrs, defStyle)
 
     data class TransitionState(
         val showClearButton: Boolean,
@@ -254,20 +260,12 @@ class OmnibarLayout @JvmOverloads constructor(
 
     private var focusAnimator: ValueAnimator? = null
 
-    override val omnibarType: OmnibarType
-
     init {
         inflate(context, R.layout.view_omnibar, this)
 
         AndroidSupportInjection.inject(this)
 
-        omnibarType = settingsDataStore.omnibarType
-
-        val attr = context.theme.obtainStyledAttributes(attrs, R.styleable.OmnibarLayout, defStyle, 0)
-        val omnibarType = OmnibarType.entries[attr.getInt(R.styleable.OmnibarLayout_omnibarPosition, 0)]
-        val isTopPosition = omnibarType == OmnibarType.SINGLE_TOP || omnibarType == OmnibarType.SPLIT
-
-        renderPosition(isTopPosition)
+        renderPosition()
 
         if (Build.VERSION.SDK_INT >= 28) {
             omnibarCardShadow.addBottomShadow()
@@ -639,8 +637,8 @@ class OmnibarLayout @JvmOverloads constructor(
         }
     }
 
-    private fun renderPosition(isTopPosition: Boolean) {
-        if (isTopPosition) {
+    private fun renderPosition() {
+        if (omnibarType == OmnibarType.SINGLE_TOP || omnibarType == OmnibarType.SPLIT) {
             if (Build.VERSION.SDK_INT < 28) {
                 omnibarCardShadow.cardElevation = 2f.toPx(context)
             }
@@ -663,6 +661,13 @@ class OmnibarLayout @JvmOverloads constructor(
             }
 
             iconsContainer.updateLayoutParams {
+                (this as MarginLayoutParams).apply {
+                    topMargin = omnibarCardMarginBottom
+                    bottomMargin = omnibarCardMarginTop
+                }
+            }
+
+            duckAISidebar.updateLayoutParams {
                 (this as MarginLayoutParams).apply {
                     topMargin = omnibarCardMarginBottom
                     bottomMargin = omnibarCardMarginTop
@@ -741,6 +746,12 @@ class OmnibarLayout @JvmOverloads constructor(
         if (viewState.shouldUpdateTabsCount) {
             tabsMenu.count = viewState.tabCount
             tabsMenu.hasUnread = viewState.hasUnreadTabs
+        }
+    }
+
+    private fun renderOmnibarText(viewState: ViewState) {
+        if (viewState.updateOmnibarText) {
+            omnibarTextInput.setText(viewState.omnibarText)
         }
     }
 
@@ -876,9 +887,7 @@ class OmnibarLayout @JvmOverloads constructor(
 
     private fun renderBrowserMode(viewState: ViewState) {
         renderOutline(viewState.hasFocus)
-        if (viewState.updateOmnibarText) {
-            omnibarTextInput.setText(viewState.omnibarText)
-        }
+        renderOmnibarText(viewState)
         if (viewState.expanded) {
             setExpanded(true, viewState.expandedAnimated)
         }
@@ -905,6 +914,7 @@ class OmnibarLayout @JvmOverloads constructor(
     private fun renderDuckAiMode(viewState: ViewState) {
         logcat { "Omnibar: renderDuckAiMode $viewState" }
         renderTabIcon(viewState)
+        renderOmnibarText(viewState)
         pageLoadingIndicator.isVisible = viewState.isLoading
         voiceSearchButton.isVisible = viewState.showVoiceSearch
     }

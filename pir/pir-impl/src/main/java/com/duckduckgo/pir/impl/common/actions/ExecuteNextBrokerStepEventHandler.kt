@@ -25,16 +25,17 @@ import com.duckduckgo.pir.impl.common.PirJob.RunType.MANUAL
 import com.duckduckgo.pir.impl.common.PirJob.RunType.OPTOUT
 import com.duckduckgo.pir.impl.common.PirJob.RunType.SCHEDULED
 import com.duckduckgo.pir.impl.common.PirRunStateHandler
-import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerManualScanStarted
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerRecordEmailConfirmationStarted
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerRecordOptOutStarted
-import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerScheduledScanStarted
+import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerScanStarted
 import com.duckduckgo.pir.impl.common.actions.EventHandler.Next
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.ExecuteBrokerStepAction
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.ExecuteNextBrokerStep
+import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.PirStageStatus
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.SideEffect.CompleteExecution
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.State
+import com.duckduckgo.pir.impl.pixels.PirStage
 import com.duckduckgo.pir.impl.scripts.models.PirScriptRequestData.UserProfile
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
@@ -69,6 +70,18 @@ class ExecuteNextBrokerStepEventHandler @Inject constructor(
             )
         } else {
             // Entry point of execution for a Broker
+            val nextStage = if (state.brokerStepsToExecute[state.currentBrokerStepIndex] is EmailConfirmationStep) {
+                PirStageStatus(
+                    currentStage = PirStage.EMAIL_CONFIRM_DECOUPLED,
+                    stageStartMs = currentTimeProvider.currentTimeMillis(),
+                )
+            } else {
+                PirStageStatus(
+                    currentStage = PirStage.START,
+                    stageStartMs = currentTimeProvider.currentTimeMillis(),
+                )
+            }
+
             emitBrokerStartPixel(state)
 
             Next(
@@ -77,6 +90,7 @@ class ExecuteNextBrokerStepEventHandler @Inject constructor(
                     currentActionIndex = 0,
                     brokerStepStartTime = currentTimeProvider.currentTimeMillis(),
                     actionRetryCount = 0,
+                    stageStatus = nextStage,
                 ),
                 nextEvent =
                 ExecuteBrokerStepAction(
@@ -91,31 +105,24 @@ class ExecuteNextBrokerStepEventHandler @Inject constructor(
     private suspend fun emitBrokerStartPixel(state: State) {
         val runType = state.runType
         val currentBrokerStep = state.brokerStepsToExecute[state.currentBrokerStepIndex]
-        val brokerName = currentBrokerStep.broker.name
 
         when (runType) {
-            MANUAL ->
+            MANUAL, SCHEDULED -> {
                 pirRunStateHandler.handleState(
-                    BrokerManualScanStarted(
-                        brokerName,
+                    BrokerScanStarted(
+                        broker = currentBrokerStep.broker,
                         currentTimeProvider.currentTimeMillis(),
                     ),
                 )
-
-            SCHEDULED ->
-                pirRunStateHandler.handleState(
-                    BrokerScheduledScanStarted(
-                        brokerName,
-                        currentTimeProvider.currentTimeMillis(),
-                    ),
-                )
+            }
 
             OPTOUT -> {
                 // It also means we are starting it for the first profile. Succeeding profiles are handled in HandleNextProfileForBroker
                 pirRunStateHandler.handleState(
                     BrokerRecordOptOutStarted(
-                        brokerName,
-                        (currentBrokerStep as OptOutStep).profileToOptOut,
+                        broker = currentBrokerStep.broker,
+                        extractedProfile = (currentBrokerStep as OptOutStep).profileToOptOut,
+                        attemptId = state.attemptId,
                     ),
                 )
             }
@@ -123,12 +130,13 @@ class ExecuteNextBrokerStepEventHandler @Inject constructor(
             EMAIL_CONFIRMATION -> {
                 pirRunStateHandler.handleState(
                     BrokerRecordEmailConfirmationStarted(
-                        brokerName = brokerName,
+                        broker = currentBrokerStep.broker,
                         extractedProfileId = (currentBrokerStep as EmailConfirmationStep).emailConfirmationJob.extractedProfileId,
                         firstActionId = currentBrokerStep.step.actions[state.currentActionIndex].id,
                     ),
                 )
             }
+
             else -> {
                 // No-op
             }

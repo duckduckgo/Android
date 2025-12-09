@@ -141,6 +141,111 @@
                     layout="@layout/pre_onboarding_address_bar_position"
                     android:visibility="gone" />
 
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/duckAiInputScreenToggleContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/keyline_4"
+                    android:layout_marginHorizontal="@dimen/keyline_4"
+                    android:visibility="gone">
+
+                    <LinearLayout
+                        android:id="@+id/duckAiInputScreenWithoutAiContainer"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:paddingTop="@dimen/keyline_6"
+                        android:paddingBottom="@dimen/keyline_2"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        app:layout_constraintWidth_max="160dp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/duckAiInputScreenWithAiContainer"
+                        app:layout_constraintHorizontal_chainStyle="packed"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent">
+
+                        <ImageView
+                            android:id="@+id/duckAiInputScreenToggleWithoutAiImage"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:adjustViewBounds="true"
+                            android:scaleType="fitXY"
+                            android:foreground="@drawable/selectable_large_rounded_ripple"
+                            android:src="@drawable/searchbox_withoutai_active" />
+
+                        <com.duckduckgo.common.ui.view.text.DaxTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
+                            android:gravity="center"
+                            android:text="@string/input_screen_user_pref_without_ai"
+                            app:textType="primary"
+                            app:typography="caption" />
+
+                        <ImageView
+                            android:id="@+id/duckAiInputScreenToggleWithoutAiCheck"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
+                            android:src="@drawable/ic_check_accent_24" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/duckAiInputScreenWithAiContainer"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/inputScreenUserPrefToggleSpacing"
+                        android:paddingTop="@dimen/keyline_6"
+                        android:paddingBottom="@dimen/keyline_2"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        app:layout_constraintWidth_max="160dp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@+id/duckAiInputScreenWithoutAiContainer"
+                        app:layout_constraintTop_toTopOf="parent">
+
+                        <ImageView
+                            android:id="@+id/duckAiInputScreenToggleWithAiImage"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:adjustViewBounds="true"
+                            android:scaleType="fitXY"
+                            android:foreground="@drawable/selectable_large_rounded_ripple"
+                            android:src="@drawable/searchbox_withai_inactive" />
+
+                        <com.duckduckgo.common.ui.view.text.DaxTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
+                            android:gravity="center"
+                            android:text="@string/input_screen_user_pref_with_ai"
+                            app:textType="primary"
+                            app:typography="caption" />
+
+                        <ImageView
+                            android:id="@+id/duckAiInputScreenToggleWithAiCheck"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
+                            android:src="@drawable/ic_shape_circle_24" />
+
+                    </LinearLayout>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <com.duckduckgo.common.ui.view.text.DaxTextView
+                    android:id="@+id/duckAiInputScreenToggleDescription"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/keyline_6"
+                    android:layout_marginHorizontal="@dimen/keyline_4"
+                    android:gravity="start"
+                    android:visibility="gone"
+                    app:textType="secondary"
+                    app:typography="caption" />
+
                 <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
                     android:id="@+id/primaryCta"
                     android:layout_width="match_parent"

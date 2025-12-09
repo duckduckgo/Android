@@ -279,7 +279,6 @@ import com.duckduckgo.common.utils.extensions.hideKeyboard
 import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.common.utils.extensions.showKeyboard
 import com.duckduckgo.common.utils.extensions.websiteFromGeoLocationsApiOrigin
-import com.duckduckgo.common.utils.extractDomain
 import com.duckduckgo.common.utils.playstore.PlayStoreUtils
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.FragmentScope
@@ -344,6 +343,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.cancellable
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -597,6 +597,9 @@ class BrowserTabFragment :
     @Inject
     lateinit var webViewCompatTestHelper: WebViewCompatTestHelper
 
+    @Inject
+    lateinit var browserMenuViewStateFactory: BrowserMenuViewStateFactory
+
     /**
      * We use this to monitor whether the user was seeing the in-context Email Protection signup prompt
      * This is needed because the activity stack will be cleared if an external link is opened in our browser
@@ -615,6 +618,7 @@ class BrowserTabFragment :
     private lateinit var popupMenu: BrowserMenu
     private lateinit var ctaBottomSheet: PromoBottomSheetDialog
     private lateinit var widgetBottomSheetDialog: AlternativeHomeScreenWidgetBottomSheetDialog
+    private val widgetBottomSheetDialogJob: ConflatedJob = ConflatedJob()
 
     private lateinit var autoCompleteSuggestionsAdapter: BrowserAutoCompleteSuggestionsAdapter
 
@@ -999,7 +1003,6 @@ class BrowserTabFragment :
 
     private fun observeSubscriptionEventDataChannel() {
         viewModel.subscriptionEventDataFlow.onEach { subscriptionEventData ->
-            logcat { "SERP-Settings: Sending subscription event data to content scope scripts: $subscriptionEventData" }
             contentScopeScripts.sendSubscriptionEvent(subscriptionEventData)
         }.launchIn(lifecycleScope)
     }
@@ -1029,10 +1032,19 @@ class BrowserTabFragment :
     private fun DuckDuckGoWebView.ensureVisible() =
         postDelayed(100) {
             if (swipingTabsFeature.isEnabled) {
-                scrollBy(0, 1)
-                scrollBy(0, -1)
+                wiggle()
+            }
+            if (omnibar.viewMode == ViewMode.DuckAI) {
+                wiggle()
+                requestLayout()
             }
         }
+
+    // This is a hack to make sure the WebView content is always rendered when the fragment is resumed
+    private fun DuckDuckGoWebView.wiggle() {
+        scrollBy(0, 1)
+        scrollBy(0, -1)
+    }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
@@ -1056,11 +1068,11 @@ class BrowserTabFragment :
         configureOmnibar()
 
         if (savedInstanceState == null) {
-            viewModel.onViewReady()
             viewModel.setIsCustomTab(tabDisplayedInCustomTabScreen)
             messageFromPreviousTab?.let {
                 processMessage(it)
             }
+            viewModel.onViewReady()
         } else {
             viewModel.onViewRecreated()
         }
@@ -1152,6 +1164,7 @@ class BrowserTabFragment :
                     query = query,
                     isTopOmnibar = isTopOmnibar,
                     browserButtonsConfig = InputScreenBrowserButtonsConfig.Enabled(tabs = viewModel.tabs.value?.size ?: 0),
+                    launchOnChat = omnibar.viewMode == ViewMode.DuckAI,
                 ),
             )
         val enterTransition = browserAndInputScreenTransitionProvider.getInputScreenEnterAnimation(isTopOmnibar)
@@ -1216,8 +1229,7 @@ class BrowserTabFragment :
     }
 
     private fun onTabsButtonPressed() {
-        val isFocusedNtp = omnibar.viewMode == ViewMode.NewTab && omnibar.getText().isEmpty() && omnibar.omnibarTextInput.hasFocus()
-        launch { viewModel.userLaunchingTabSwitcher(isFocusedNtp) }
+        launch { viewModel.userLaunchingTabSwitcher(omnibar.viewMode, omnibar.getText().isEmpty() && omnibar.omnibarTextInput.hasFocus()) }
     }
 
     private fun onTabsButtonLongPressed() {
@@ -1252,7 +1264,7 @@ class BrowserTabFragment :
     private fun onFireButtonPressed() {
         val isFocusedNtp = omnibar.viewMode == ViewMode.NewTab && omnibar.getText().isEmpty() && omnibar.omnibarTextInput.hasFocus()
         browserActivity?.launchFire(launchedFromFocusedNtp = isFocusedNtp)
-        viewModel.onFireMenuSelected()
+        viewModel.onFireMenuSelected(omnibar.viewMode)
     }
 
     private fun onBrowserMenuButtonPressed() {
@@ -1293,7 +1305,6 @@ class BrowserTabFragment :
         if (tabDisplayedInCustomTabScreen) {
             omnibar.configureCustomTab(
                 customTabToolbarColor,
-                viewModel.url?.extractDomain(),
             )
             requireActivity().window.navigationBarColor = customTabToolbarColor
             requireActivity().window.statusBarColor = customTabToolbarColor
@@ -1440,9 +1451,10 @@ class BrowserTabFragment :
                 viewModel.onVpnMenuClicked()
             }
             onMenuItemClicked(duckNewChatMenuItem) {
-                viewModel.openNewDuckChat()
+                viewModel.openNewDuckChat(omnibar.viewMode)
             }
             onMenuItemClicked(duckChatHistoryMenuItem) {
+                pixel.fire(DuckChatPixelName.DUCK_CHAT_SETTINGS_SIDEBAR_TAPPED)
                 viewModel.openDuckChatSidebar()
             }
             onMenuItemClicked(duckChatSettingsMenuItem) {
@@ -1496,6 +1508,8 @@ class BrowserTabFragment :
                 viewModel.onPopupMenuLaunched()
                 if (isActiveCustomTab()) {
                     pixel.fire(CustomTabPixelNames.CUSTOM_TABS_MENU_OPENED)
+                } else if (omnibar.viewMode == ViewMode.DuckAI) {
+                    pixel.fire(DuckChatPixelName.DUCK_CHAT_SETTINGS_MENU_OPEN.pixelName)
                 } else {
                     val params = mapOf(PixelParameter.FROM_FOCUSED_NTP to isFocusedNtp.toString())
                     pixel.fire(AppPixelName.MENU_ACTION_POPUP_OPENED.pixelName, params)
@@ -1529,6 +1543,13 @@ class BrowserTabFragment :
 
         viewModel.onMessageReceived()
         message.sendToTarget()
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            delay(CHECK_IF_ABOUT_BLANK_DELAY)
+            if (isAdded && view != null) {
+                viewModel.handleNewTabIfEmptyUrl()
+            }
+        }
 
         viewModel.onMessageProcessed()
     }
@@ -1809,7 +1830,7 @@ class BrowserTabFragment :
     }
 
     private fun showDuckAI(browserViewState: BrowserViewState) {
-        val browseMenuState = BrowserMenuViewStateFactory.create(
+        val browseMenuState = browserMenuViewStateFactory.create(
             omnibarViewMode = ViewMode.DuckAI,
             viewState = browserViewState,
             customTabsMode = tabDisplayedInCustomTabScreen,
@@ -2039,9 +2060,8 @@ class BrowserTabFragment :
         }
     }
 
-    fun getBottomNavigationBar(): BrowserNavigationBarView {
-        return binding.navigationBar
-    }
+    val navigationBar: BrowserNavigationBarView
+        get() = binding.navigationBar
 
     private fun processCommand(it: Command?) {
         if (it is NavigationCommand) {
@@ -2327,7 +2347,7 @@ class BrowserTabFragment :
             is Command.WebViewCompatScreenLock -> webViewCompatScreenLock(it.data, it.onResponse)
             is Command.ScreenUnlock -> screenUnlock()
             is Command.ShowFaviconsPrompt -> showFaviconsPrompt()
-            is Command.ShowWebPageTitle -> showWebPageTitleInCustomTab(it.title, it.url, it.showDuckPlayerIcon)
+            is Command.ShowWebPageTitle -> showWebPageTitleInCustomTab(it.title)
             is Command.ShowSSLError -> showSSLWarning(it.handler, it.error)
             is Command.HideSSLError -> hideSSLWarning()
             is Command.LaunchScreen -> launchScreen(it.screen, it.payload)
@@ -2541,11 +2561,9 @@ class BrowserTabFragment :
 
     private fun showWebPageTitleInCustomTab(
         title: String,
-        url: String?,
-        showDuckPlayerIcon: Boolean,
     ) {
         if (isActiveCustomTab()) {
-            omnibar.showWebPageTitleInCustomTab(title, url, showDuckPlayerIcon)
+            omnibar.showWebPageTitleInCustomTab(title)
         }
     }
 
@@ -3128,6 +3146,7 @@ class BrowserTabFragment :
                 }
 
                 override fun onDuckAISidebarButtonPressed() {
+                    pixel.fire(DuckChatPixelName.DUCK_CHAT_OMNIBAR_SIDEBAR_TAPPED)
                     viewModel.openDuckChatSidebar()
                 }
             },
@@ -4078,6 +4097,7 @@ class BrowserTabFragment :
         dismissAppLinkSnackBar()
         supervisorJob.cancel()
         if (::popupMenu.isInitialized) popupMenu.dismiss()
+        widgetBottomSheetDialogJob?.cancel()
         loginDetectionDialog?.dismiss()
         automaticFireproofDialog?.dismiss()
         browserAutofill.removeJsInterface()
@@ -4351,6 +4371,8 @@ class BrowserTabFragment :
         const val KEYBOARD_DELAY = 200L
         private const val NAVIGATION_DELAY = 100L
         private const val POPUP_MENU_DELAY = 200L
+        private const val WIDGET_PROMPT_DELAY = 200L
+        private const val CHECK_IF_ABOUT_BLANK_DELAY = 200L
 
         private const val REQUEST_CODE_CHOOSE_FILE = 100
         private const val PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE = 200
@@ -4608,7 +4630,7 @@ class BrowserTabFragment :
 
                 browserNavigationBarIntegration.configureFireButtonHighlight(highlighted = viewState.fireButton.isHighlighted())
 
-                val browseMenuState = BrowserMenuViewStateFactory.create(
+                val browseMenuState = browserMenuViewStateFactory.create(
                     omnibarViewMode = omnibar.viewMode,
                     viewState = viewState,
                     customTabsMode = tabDisplayedInCustomTabScreen,
@@ -4842,10 +4864,13 @@ class BrowserTabFragment :
         }
 
         private fun showBottomSheetCta(configuration: HomePanelCta) {
-            if (configuration is AddWidgetAutoOnboardingExperiment) {
-                showAlternativeHomeWidgetPrompt(configuration)
-            } else {
-                showHomeCta(configuration)
+            widgetBottomSheetDialogJob += viewLifecycleOwner.lifecycleScope.launch {
+                delay(WIDGET_PROMPT_DELAY)
+                if (configuration is AddWidgetAutoOnboardingExperiment) {
+                    showAlternativeHomeWidgetPrompt(configuration)
+                } else {
+                    showHomeCta(configuration)
+                }
             }
         }
 

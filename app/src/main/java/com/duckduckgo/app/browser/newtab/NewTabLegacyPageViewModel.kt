@@ -111,6 +111,8 @@ class NewTabLegacyPageViewModel @AssistedInject constructor(
             val screen: String,
             val payload: String,
         ) : Command()
+
+        data object LaunchDefaultCredentialProvider : Command()
     }
 
     private var lastRemoteMessageSeen: RemoteMessage? = null

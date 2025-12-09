@@ -828,6 +828,11 @@
     <!-- Bubble BB & Buck experiment-->
     <string name="onboardingBubbleExperimentSearchDaxDialogDescription">Οι αναζητήσεις σας στο DuckDuckGo είναι πάντα ανώνυμες.</string>
 
+    <!-- Input Screen Onboarding step -->
+    <string name="preOnboardingInputScreenTitle">Θέλετε εύκολη πρόσβαση στο ιδιωτικό AI chat;</string>
+    <string name="preOnboardingInputScreenButton">Επόμενο</string>
+    <string name="preOnboardingInputScreenDescription"><![CDATA[Οι λειτουργίες τεχνητής νοημοσύνης είναι ιδιωτικές και προαιρετικές. Μπορείτε να κάνετε αλλαγές στις <b>Ρυθμίσεις > Λειτουργίες τεχνητής νοημοσύνης</b>.]]></string>
+
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Γραμμή διευθύνσεων</string>
     <string name="settingsAddressBarPositionHeaderTitle">Θέση γραμμής διευθύνσεων</string>

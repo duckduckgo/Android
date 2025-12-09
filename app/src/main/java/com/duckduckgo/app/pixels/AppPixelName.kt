@@ -44,6 +44,9 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     PREONBOARDING_ADDRESS_BAR_POSITION_SHOWN_UNIQUE("m_preonboarding_address_bar_position_dialog_shown_unique"),
     PREONBOARDING_BOTTOM_ADDRESS_BAR_SELECTED_UNIQUE("m_preonboarding_bottom_address_bar_selected_unique"),
     PREONBOARDING_SKIP_ONBOARDING_SHOWN_UNIQUE("m_preonboarding_skip_onboarding_shown_unique"),
+    PREONBOARDING_CHOOSE_SEARCH_EXPERIENCE_IMPRESSIONS_UNIQUE("m_preonboarding_choose_search_experience_impressions_unique"),
+    PREONBOARDING_AICHAT_SELECTED("m_preonboarding_aichat_selected"),
+    PREONBOARDING_SEARCH_ONLY_SELECTED("m_preonboarding_search_only_selected"),
     PREONBOARDING_SKIP_ONBOARDING_PRESSED("m_preonboarding_skip-onboarding-pressed"),
     PREONBOARDING_CONFIRM_SKIP_ONBOARDING_PRESSED("m_preonboarding_confirm-skip-onboarding-pressed"),
     PREONBOARDING_RESUME_ONBOARDING_PRESSED("m_preonboarding_resume-onboarding-pressed"),
@@ -458,4 +461,6 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     BROWSER_NAV_TABS_PRESSED("m_browser_nav_tabs_pressed"),
     BROWSER_NAV_TABS_LONG_PRESSED("m_browser_nav_tabs_long_pressed"),
     BROWSER_NAV_MENU_PRESSED("m_browser_nav_menu_pressed"),
+
+    TIMEOUT_WAITING_FOR_APP_REFERRER("timeout_waiting_for_referrer"),
 }
