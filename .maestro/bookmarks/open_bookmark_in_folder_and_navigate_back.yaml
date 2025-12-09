@@ -24,7 +24,7 @@ tags:
             - tapOn:
                   text: "add bookmark"
             - tapOn:
-                  text: "https://privacy-test-pages.site/"
+                  id: "omnibarTextInput"
             - inputText: "https://www.search-company.site/"
             - pressKey: Enter
             - assertVisible:
