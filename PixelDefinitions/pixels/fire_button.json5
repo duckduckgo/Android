@@ -1,0 +1,16 @@
+{
+    "m_fd_p": {
+        "description": "Fires when Clear Tabs and Data is clicked in the Fire Dialog (total impressions)",
+        "owners": ["catalinradoiu"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_fd_p_daily": {
+        "description": "Fires when Clear Tabs and Data is clicked in the Fire Dialog (daily unique)",
+        "owners": ["catalinradoiu"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    }
+}

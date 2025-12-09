@@ -1,0 +1,16 @@
+{
+    "m_navigation_menu_bookmarks": {
+        "description": "Fires when the Bookmarks page is opened from the navigation menu (total impressions)",
+        "owners": ["catalinradoiu"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_navigation_menu_bookmarks_daily": {
+        "description": "Fires when the Bookmarks page is opened from the navigation menu (daily unique)",
+        "owners": ["catalinradoiu"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    }
+}

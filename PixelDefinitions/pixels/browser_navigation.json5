@@ -1,0 +1,44 @@
+{
+    "m_tab_manager_clicked": {
+        "description": "Fires when the Tab Manager is opened (total impressions)",
+        "owners": ["catalinradoiu"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_tab_manager_clicked_daily": {
+        "description": "Fires when the Tab Manager is opened (daily unique)",
+        "owners": ["catalinradoiu"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_new_tab_page_displayed": {
+        "description": "Fires when the New Tab Page is displayed (total impressions)",
+        "owners": ["catalinradoiu"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_new_tab_page_displayed_unique": {
+        "description": "Fires when the New Tab Page is displayed (daily unique)",
+        "owners": ["catalinradoiu"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_nav_pm_o": {
+        "description": "Fires when the browser menu is opened (total impressions)",
+        "owners": ["catalinradoiu"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_nav_pm_o_daily": {
+        "description": "Fires when the browser menu is opened (daily unique)",
+        "owners": ["catalinradoiu"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    }
+}
