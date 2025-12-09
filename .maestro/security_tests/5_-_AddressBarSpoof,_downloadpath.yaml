@@ -1,7 +1,6 @@
 appId: com.duckduckgo.mobile.android
 tags:
-    ## This tag will be updated to securityTest once we close the https://app.asana.com/1/137249556945/project/1211724162604201/task/1212015085457815?focus=true task
-    - securityTestInternal
+    - securityTest
 ---
 - retry:
       maxRetries: 3
@@ -23,7 +22,7 @@ tags:
             - tapOn: "Save to Downloads"
             - copyTextFrom:
                 id: "omnibarTextInput"
-            - assertTrue: ${maestro.copiedText == "about:blank"} # Downloads should occur in empty origin.
+            - assertTrue: ${maestro.copiedText == "Search"} # Downloads should occur in empty origin.
             - pressKey: Back
             # Download Cancel Flow:
             - tapOn: "Start"
