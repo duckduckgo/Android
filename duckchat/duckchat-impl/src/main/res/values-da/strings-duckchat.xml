@@ -88,4 +88,8 @@
     <!-- Duck AI Hide Generated Images Settings Option -->
     <string name="duckAiHideAiGeneratedImagesTitle">Skjul AI-genererede billeder</string>
     <string name="duckAiHideAiGeneratedImagesDescription">Filtrerer AI-genererede billeder fra billedsøgeresultater</string>
+
+    <!-- Duck AI Tabs Mode Toggle -->
+    <string name="duckAiFullScreenModeTitle">Duck.ai fanetilstand</string>
+    <string name="duckAiFullScreenModeDescription">Vis nye Duck.ai-chats som faner i browseren</string>
 </resources>
