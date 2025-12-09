@@ -3827,11 +3827,10 @@ class BrowserTabViewModel @Inject constructor(
         if (shouldDisplayAboutBlank) {
             if (isCustomTabScreen) {
                 handleNewTabForEmptyUrlOnCustomTab()
-            } else {
-                omnibarViewState.value = currentOmnibarViewState().copy(
-                    omnibarText = ABOUT_BLANK,
-                )
             }
+            omnibarViewState.value = currentOmnibarViewState().copy(
+                omnibarText = ABOUT_BLANK,
+            )
         }
     }
 
