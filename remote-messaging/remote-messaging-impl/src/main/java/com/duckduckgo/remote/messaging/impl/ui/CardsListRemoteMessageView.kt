@@ -83,6 +83,9 @@ class CardsListRemoteMessageView @JvmOverloads constructor(
 
         val coroutineScope = findViewTreeLifecycleOwner()?.lifecycleScope
 
+        setupUi()
+        viewModel.init(messageId)
+
         conflatedStateJob += viewModel.viewState
             .onEach { render(it) }
             .launchIn(coroutineScope!!)
@@ -90,10 +93,6 @@ class CardsListRemoteMessageView @JvmOverloads constructor(
         conflatedCommandJob += viewModel.commands
             .onEach { processCommand(it) }
             .launchIn(coroutineScope!!)
-
-        setupUi()
-
-        viewModel.init(messageId)
     }
 
     override fun onDetachedFromWindow() {
