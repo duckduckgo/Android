@@ -1,0 +1,64 @@
+// Wide event pixel for subscription restore flow monitoring
+{
+    "wide_subscription-restore": {
+        "description": "User attempts to restore their Privacy Pro subscription",
+        "owners": ["lmac012"],
+        "triggers": ["other"],
+        "suffixes": ["daily_count_short", "form_factor"],
+        "parameters": [
+            "widePixelPlatform",
+            "widePixelType",
+            "widePixelSampleRate",
+            "widePixelFeatureStatus",
+            "widePixelAppVersion",
+            "widePixelAppName",
+            "widePixelFormFactor",
+            "widePixelDevMode",
+            {
+                "key": "feature.name",
+                "description": "Feature identifier for this wide pixel",
+                "enum": ["subscription-restore"]
+            },
+            {
+                "key": "context.name",
+                "description": "Entry point to the restore flow",
+                "enum": ["funnel_appsettings_android", "funnel_purchase_offer_page_android"]
+            },
+            {
+                "key": "feature.data.ext.restore_platform",
+                "description": "The platform used to restore the subscription",
+                "enum": ["google_play", "email_address"]
+            },
+            {
+                "key": "feature.data.ext.is_purchase_attempt",
+                "description": "true if the restore was triggered during a purchase attempt, false otherwise",
+                "enum": ["true", "false"]
+            },
+            {
+                "key": "feature.data.ext.restore_latency_ms_bucketed",
+                "description": "The duration of the restore flow in milliseconds, bucketed (using the upper end of each range)",
+                "enum": ["1000", "5000", "10000", "30000", "60000", "300000", "600000"]
+            },
+            {
+                "key": "feature.data.ext.failure_reason",
+                "description": "Error message indicating cause of the failure. Only present on FAILURE events.",
+                "type": "string"
+            },
+            {
+                "key": "feature.data.ext.step.activation_flow_started",
+                "description": "Parameter present if the activation flow page was displayed during restore using email address.",
+                "enum": ["true"]
+            },
+            {
+                "key": "feature.data.ext.step.email_address_input",
+                "description": "Parameter present if the email address input page was displayed during restore using email address.",
+                "enum": ["true"]
+            },
+            {
+                "key": "feature.data.ext.step.one_time_password_input",
+                "description": "Parameter present if the otp input page was displayed during restore using email address.",
+                "enum": ["true"]
+            }
+        ]
+    }
+}
