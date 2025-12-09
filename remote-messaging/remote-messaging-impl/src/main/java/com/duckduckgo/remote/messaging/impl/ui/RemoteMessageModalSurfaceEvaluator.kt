@@ -18,10 +18,12 @@ package com.duckduckgo.remote.messaging.impl.ui
 
 import android.content.Context
 import android.content.Intent
+import android.os.SystemClock
 import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.onboarding.OnboardingFlowChecker
+import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
@@ -50,6 +52,7 @@ interface RemoteMessageModalSurfaceEvaluator
 class RemoteMessageModalSurfaceEvaluatorImpl @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val remoteMessagingRepository: RemoteMessagingRepository,
+    private val settingsDataStore: SettingsDataStore,
     private val globalActivityStarter: GlobalActivityStarter,
     private val dispatchers: DispatcherProvider,
     private val applicationContext: Context,
@@ -74,17 +77,38 @@ class RemoteMessageModalSurfaceEvaluatorImpl @Inject constructor(
                 return@withContext
             }
 
-            // TODO ANA: This is now called all the time. Update!
+            if (!hasMetBackgroundTimeThreshold()) {
+                return@withContext
+            }
+
             val message = remoteMessagingRepository.message() ?: return@withContext
+
             if (message.surfaces.contains(Surface.MODAL)) {
                 val intent = globalActivityStarter.startIntent(
                     applicationContext,
                     ModalSurfaceActivityFromMessageId(message.id, message.content.messageType),
                 ) ?: return@withContext
 
-                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
-                applicationContext.startActivity(intent)
+                withContext(dispatchers.main()) {
+                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
+                    applicationContext.startActivity(intent)
+                }
             }
         }
+    }
+
+    private fun hasMetBackgroundTimeThreshold(): Boolean {
+        if (!settingsDataStore.hasBackgroundTimestampRecorded()) {
+            return false
+        }
+
+        val backgroundTimestamp = settingsDataStore.appBackgroundedTimestamp
+        // Using elapsed real time as this is how it's saved in the data store.
+        val currentTimestamp = SystemClock.elapsedRealtime()
+        return (currentTimestamp - backgroundTimestamp) >= BACKGROUND_THRESHOLD_MILLIS
+    }
+
+    companion object {
+        private const val BACKGROUND_THRESHOLD_MILLIS = 4 * 60 * 60 * 1000L // 4 hours
     }
 }
