@@ -39,6 +39,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withContext
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.mockito.kotlin.mock
@@ -48,7 +49,6 @@ import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import java.io.File
 
-@Suppress("RemoveExplicitTypeArguments")
 @SuppressLint("NoHardcodedCoroutineDispatcher")
 class WebViewDataManagerTest {
 
@@ -272,6 +272,187 @@ class WebViewDataManagerTest {
                 File(context.applicationInfo.dataDir, "app_webview/Default"),
                 listOf("Cookies"),
             )
+        }
+    }
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun whenClearDataWithShouldClearDataTrueAndShouldClearChatsFalseThenWebStorageAndOtherDataCleared() = runTest {
+        withContext(Dispatchers.Main) {
+            feature.webLocalStorage().setRawStoredState(State(enable = true))
+            val webView = TestWebView(context)
+
+            testee.clearData(webView, mockStorage, shouldClearData = true, shouldClearChats = false)
+
+            verify(mockWebLocalStorageManager).clearWebLocalStorage(true, false)
+            verify(mockStorage, never()).deleteAllData()
+            assertTrue(webView.historyCleared)
+            assertTrue(webView.cacheCleared)
+            assertTrue(webView.clearedFormData)
+            verify(mockWebViewHttpAuthStore).clearHttpAuthUsernamePassword(webView)
+            verify(mockCookieManager).removeExternalCookies()
+        }
+    }
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun whenClearDataWithShouldClearDataFalseAndShouldClearChatsTrueThenOnlyWebStorageCleared() = runTest {
+        withContext(Dispatchers.Main) {
+            feature.webLocalStorage().setRawStoredState(State(enable = true))
+            val webView = TestWebView(context)
+
+            testee.clearData(webView, mockStorage, shouldClearData = false, shouldClearChats = true)
+
+            verify(mockWebLocalStorageManager).clearWebLocalStorage(false, true)
+            verify(mockStorage, never()).deleteAllData()
+            assertFalse(webView.historyCleared)
+            assertFalse(webView.cacheCleared)
+            assertFalse(webView.clearedFormData)
+            verify(mockWebViewHttpAuthStore, never()).clearHttpAuthUsernamePassword(webView)
+            verify(mockCookieManager, never()).removeExternalCookies()
+        }
+    }
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun whenClearDataWithBothTrueThenAllDataCleared() = runTest {
+        withContext(Dispatchers.Main) {
+            feature.webLocalStorage().setRawStoredState(State(enable = true))
+            val webView = TestWebView(context)
+
+            testee.clearData(webView, mockStorage, shouldClearData = true, shouldClearChats = true)
+
+            verify(mockWebLocalStorageManager).clearWebLocalStorage(true, true)
+            verify(mockStorage, never()).deleteAllData()
+            assertTrue(webView.historyCleared)
+            assertTrue(webView.cacheCleared)
+            assertTrue(webView.clearedFormData)
+            verify(mockWebViewHttpAuthStore).clearHttpAuthUsernamePassword(webView)
+            verify(mockCookieManager).removeExternalCookies()
+        }
+    }
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun whenClearDataWithBothFalseThenNothingCleared() = runTest {
+        withContext(Dispatchers.Main) {
+            feature.webLocalStorage().setRawStoredState(State(enable = true))
+            val webView = TestWebView(context)
+
+            testee.clearData(webView, mockStorage, shouldClearData = false, shouldClearChats = false)
+
+            verify(mockWebLocalStorageManager).clearWebLocalStorage(false, false)
+            verify(mockStorage, never()).deleteAllData()
+            assertFalse(webView.historyCleared)
+            assertFalse(webView.cacheCleared)
+            assertFalse(webView.clearedFormData)
+            verify(mockWebViewHttpAuthStore, never()).clearHttpAuthUsernamePassword(webView)
+            verify(mockCookieManager, never()).removeExternalCookies()
+        }
+    }
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun whenClearDataWithParametersAndThrowsExceptionAndShouldClearDataTrueThenFallbackToDeleteAllData() = runTest {
+        withContext(Dispatchers.Main) {
+            feature.webLocalStorage().setRawStoredState(State(enable = true))
+            val exception = RuntimeException("test")
+            val webView = TestWebView(context)
+            whenever(mockAppBuildConfig.flavor).thenReturn(INTERNAL)
+            whenever(mockWebLocalStorageManager.clearWebLocalStorage(true, false)).thenThrow(exception)
+
+            testee.clearData(webView, mockStorage, shouldClearData = true, shouldClearChats = false)
+
+            verify(mockWebLocalStorageManager).clearWebLocalStorage(true, false)
+            verify(mockCrashLogger).logCrash(CrashLogger.Crash(shortName = "web_storage_on_clear_error", t = exception))
+            verify(mockStorage).deleteAllData()
+            assertTrue(webView.historyCleared)
+            assertTrue(webView.cacheCleared)
+        }
+    }
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun whenClearDataWithParametersAndThrowsExceptionAndShouldClearDataFalseThenDoNotFallbackToDeleteAllData() = runTest {
+        withContext(Dispatchers.Main) {
+            feature.webLocalStorage().setRawStoredState(State(enable = true))
+            val exception = RuntimeException("test")
+            val webView = TestWebView(context)
+            whenever(mockAppBuildConfig.flavor).thenReturn(INTERNAL)
+            whenever(mockWebLocalStorageManager.clearWebLocalStorage(false, true)).thenThrow(exception)
+
+            testee.clearData(webView, mockStorage, shouldClearData = false, shouldClearChats = true)
+
+            verify(mockWebLocalStorageManager).clearWebLocalStorage(false, true)
+            verify(mockCrashLogger).logCrash(CrashLogger.Crash(shortName = "web_storage_on_clear_error", t = exception))
+            verify(mockStorage, never()).deleteAllData()
+            assertFalse(webView.historyCleared)
+            assertFalse(webView.cacheCleared)
+        }
+    }
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun whenClearDataWithParametersAndWebLocalStorageFeatureDisabledAndShouldClearDataTrueThenDeleteAllData() = runTest {
+        withContext(Dispatchers.Main) {
+            feature.webLocalStorage().setRawStoredState(State(enable = false))
+            val webView = TestWebView(context)
+
+            testee.clearData(webView, mockStorage, shouldClearData = true, shouldClearChats = false)
+
+            verifyNoInteractions(mockWebLocalStorageManager)
+            verify(mockStorage).deleteAllData()
+            assertTrue(webView.historyCleared)
+            assertTrue(webView.cacheCleared)
+        }
+    }
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun whenClearDataWithParametersAndWebLocalStorageFeatureDisabledAndShouldClearDataFalseThenDoNotDeleteAllData() = runTest {
+        withContext(Dispatchers.Main) {
+            feature.webLocalStorage().setRawStoredState(State(enable = false))
+            val webView = TestWebView(context)
+
+            testee.clearData(webView, mockStorage, shouldClearData = false, shouldClearChats = true)
+
+            verifyNoInteractions(mockWebLocalStorageManager)
+            verify(mockStorage, never()).deleteAllData()
+            assertFalse(webView.historyCleared)
+            assertFalse(webView.cacheCleared)
+        }
+    }
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun whenClearDataWithShouldClearDataTrueAndShouldClearChatsFalseThenWebViewDirectoriesCleared() = runTest {
+        withContext(Dispatchers.Main) {
+            feature.webLocalStorage().setRawStoredState(State(enable = true))
+            val webView = TestWebView(context)
+
+            testee.clearData(webView, mockStorage, shouldClearData = true, shouldClearChats = false)
+
+            verify(mockFileDeleter).deleteContents(
+                File(context.applicationInfo.dataDir, "app_webview"),
+                listOf("Default", "Cookies"),
+            )
+            verify(mockFileDeleter).deleteContents(
+                File(context.applicationInfo.dataDir, "app_webview/Default"),
+                listOf("Cookies", "Local Storage"),
+            )
+        }
+    }
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun whenClearDataWithShouldClearDataFalseAndShouldClearChatsTrueThenWebViewDirectoriesNotCleared() = runTest {
+        withContext(Dispatchers.Main) {
+            feature.webLocalStorage().setRawStoredState(State(enable = true))
+            val webView = TestWebView(context)
+
+            testee.clearData(webView, mockStorage, shouldClearData = false, shouldClearChats = true)
+
+            verifyNoInteractions(mockFileDeleter)
         }
     }
 

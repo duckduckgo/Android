@@ -50,6 +50,13 @@ interface WebDataManager {
         webStorage: WebStorage,
     )
 
+    suspend fun clearData(
+        webView: WebView,
+        webStorage: WebStorage,
+        shouldClearData: Boolean,
+        shouldClearChats: Boolean,
+    )
+
     fun clearWebViewSessions()
 }
 
@@ -76,11 +83,29 @@ class WebViewDataManager @Inject constructor(
     ) {
         clearWebViewCache(webView)
         clearHistory(webView)
-        clearWebStorage(webStorage)
+        clearEntireWebStorage(webStorage)
         clearFormData(webView)
         clearAuthentication(webView)
         clearExternalCookies()
         clearWebViewDirectories()
+    }
+
+    override suspend fun clearData(
+        webView: WebView,
+        webStorage: WebStorage,
+        shouldClearData: Boolean,
+        shouldClearChats: Boolean,
+    ) {
+        clearWebStorageGranularly(webStorage, shouldClearData, shouldClearChats)
+
+        if (shouldClearData) {
+            clearWebViewCache(webView)
+            clearHistory(webView)
+            clearFormData(webView)
+            clearAuthentication(webView)
+            clearExternalCookies()
+            clearWebViewDirectories()
+        }
     }
 
     private fun clearWebViewCache(webView: WebView) {
@@ -91,20 +116,51 @@ class WebViewDataManager @Inject constructor(
         webView.clearHistory()
     }
 
-    private suspend fun clearWebStorage(webStorage: WebStorage) = withContext(dispatcherProvider.io()) {
-        if (androidBrowserConfigFeature.webLocalStorage().isEnabled()) {
-            kotlin.runCatching {
-                webLocalStorageManager.clearWebLocalStorage()
-            }.onFailure { e ->
-                logcat(ERROR) { "WebDataManager: Could not selectively clear web storage: ${e.asLog()}" }
-                if (appBuildConfig.isInternalBuild()) {
-                    sendCrashPixel(e)
+    private suspend fun clearEntireWebStorage(webStorage: WebStorage) {
+        withContext(dispatcherProvider.io()) {
+            if (androidBrowserConfigFeature.webLocalStorage().isEnabled()) {
+                kotlin.runCatching {
+                    webLocalStorageManager.clearWebLocalStorage()
+                }.onFailure { e ->
+                    logcat(ERROR) { "WebDataManager: Could not selectively clear web storage: ${e.asLog()}" }
+                    if (appBuildConfig.isInternalBuild()) {
+                        sendCrashPixel(e)
+                    }
+                    // fallback, if we crash we delete everything
+                    deleteAllData(webStorage)
                 }
-                // fallback, if we crash we delete everything
+            } else {
                 deleteAllData(webStorage)
             }
-        } else {
-            deleteAllData(webStorage)
+        }
+    }
+
+    private suspend fun clearWebStorageGranularly(
+        webStorage: WebStorage,
+        shouldClearData: Boolean,
+        shouldClearChats: Boolean,
+    ) {
+        withContext(dispatcherProvider.io()) {
+            if (androidBrowserConfigFeature.webLocalStorage().isEnabled()) {
+                kotlin.runCatching {
+                    webLocalStorageManager.clearWebLocalStorage(shouldClearData, shouldClearChats)
+                }.onFailure { e ->
+                    logcat(ERROR) { "WebDataManager: Could not selectively clear web storage: ${e.asLog()}" }
+                    if (appBuildConfig.isInternalBuild()) {
+                        sendCrashPixel(e)
+                    }
+                    if (shouldClearData) {
+                        // fallback, if we crash we delete everything
+                        deleteAllData(webStorage)
+                    }
+                }
+            } else {
+                if (shouldClearData) {
+                    deleteAllData(webStorage)
+                } else {
+                    // No-op when shouldClearData is false
+                }
+            }
         }
     }
 
