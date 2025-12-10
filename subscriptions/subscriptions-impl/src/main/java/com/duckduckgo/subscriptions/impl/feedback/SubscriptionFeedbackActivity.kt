@@ -132,9 +132,8 @@ class SubscriptionFeedbackActivity :
 
     override fun onUserSubmit(
         description: String,
-        email: String?,
     ) {
-        viewModel.onSubmitFeedback(description, email)
+        viewModel.onSubmitFeedback(description)
     }
 
     override fun onFaqsOpened() {
