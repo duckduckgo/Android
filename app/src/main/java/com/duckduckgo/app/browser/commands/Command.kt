@@ -456,10 +456,6 @@ sealed class Command {
         @ColorRes val colorRes: Int,
     ) : Command()
 
-    class SetBubbleDialogBackground(
-        @DrawableRes val backgroundRes: Int,
-    ) : Command()
-
     class SetOnboardingDialogBackground(
         @DrawableRes val backgroundRes: Int,
     ) : Command()
