@@ -56,6 +56,7 @@ class DuckAiPaidSettingsViewModel @Inject constructor(
 
     sealed class Command {
         data object OpenDuckAi : Command()
+        data object OpenDuckChatSettings : Command()
         data class LaunchLearnMoreWebPage(
             val url: String = "https://duckduckgo.com/duckduckgo-help-pages/privacy-pro/",
             @StringRes val titleId: Int = R.string.duck_ai_paid_settings_learn_more_title,
@@ -90,6 +91,12 @@ class DuckAiPaidSettingsViewModel @Inject constructor(
         viewModelScope.launch {
             _commands.send(Command.OpenDuckAi)
             pixel.fire(DUCK_CHAT_PAID_OPEN_DUCK_AI_CLICKED)
+        }
+    }
+
+    fun onEnableInSettingsSelected() {
+        viewModelScope.launch {
+            _commands.send(Command.OpenDuckChatSettings)
         }
     }
 }
