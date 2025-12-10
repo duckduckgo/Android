@@ -91,6 +91,14 @@
                 app:trailingIconTint="?attr/daxColorSecondaryIcon"
                 app:trailingIcon="@drawable/ic_open_in_16" />
 
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                android:id="@+id/duckAiPaidSettingsEnableInSettings"
+                android:layout_marginTop="@dimen/keyline_2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                tools:text="@string/duck_ai_paid_settings_manage_in_settings" />
+
         </LinearLayout>
     </ScrollView>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

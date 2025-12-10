@@ -119,8 +119,7 @@ class DuckAiPaidSettingsViewModelTest {
         )
 
         viewModel.viewState.test {
-            assertNull(awaitItem()) // Initial null
-            val state = awaitItem()
+            val state = expectMostRecentItem()
             assertTrue(state!!.isDuckChatEnabled)
         }
     }
@@ -140,8 +139,7 @@ class DuckAiPaidSettingsViewModelTest {
         )
 
         viewModel.viewState.test {
-            assertNull(awaitItem()) // Initial null
-            val state = awaitItem()
+            val state = expectMostRecentItem()
             assertFalse(state!!.isDuckChatEnabled)
         }
     }
@@ -162,6 +160,14 @@ class DuckAiPaidSettingsViewModelTest {
 
         viewModel.viewState.test {
             assertNull(awaitItem()) // Remains null when feature is disabled
+        }
+    }
+
+    @Test
+    fun `when onEnableInSettingsSelected is called then OpenDuckChatSettings command is emitted`() = runTest {
+        testee.commands.test {
+            testee.onEnableInSettingsSelected()
+            assertEquals(Command.OpenDuckChatSettings, awaitItem())
         }
     }
 }
