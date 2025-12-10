@@ -296,6 +296,7 @@ import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityResultCodes
 import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityResultParams
 import com.duckduckgo.duckchat.api.inputscreen.InputScreenBrowserButtonsConfig
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
+import com.duckduckgo.duckchat.impl.ui.DuckChatContextualBottomSheet
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayerSettingsNoParams
 import com.duckduckgo.js.messaging.api.JsCallbackData
@@ -3104,13 +3105,15 @@ class BrowserTabFragment :
                 }
 
                 override fun onDuckChatButtonPressed() {
-                    if (!duckAiFeatureState.showInputScreen.value) {
-                        pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_LEGACY_OMNIBAR_AICHAT_BUTTON_PRESSED)
-                        pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_LEGACY_OMNIBAR_AICHAT_BUTTON_PRESSED_DAILY, type = Daily())
-                    }
-                    val hasFocus = omnibar.omnibarTextInput.hasFocus()
-                    val isNtp = omnibar.viewMode == ViewMode.NewTab
-                    onOmnibarDuckChatPressed(query = omnibar.getText(), hasFocus = hasFocus, isNtp = isNtp)
+                    showDuckChatBottomSheet()
+
+                    // if (!duckAiFeatureState.showInputScreen.value) {
+                    //     pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_LEGACY_OMNIBAR_AICHAT_BUTTON_PRESSED)
+                    //     pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_LEGACY_OMNIBAR_AICHAT_BUTTON_PRESSED_DAILY, type = Daily())
+                    // }
+                    // val hasFocus = omnibar.omnibarTextInput.hasFocus()
+                    // val isNtp = omnibar.viewMode == ViewMode.NewTab
+                    // onOmnibarDuckChatPressed(query = omnibar.getText(), hasFocus = hasFocus, isNtp = isNtp)
                 }
 
                 override fun onBackButtonPressed() {
@@ -3123,6 +3126,11 @@ class BrowserTabFragment :
                 }
             },
         )
+    }
+
+    private fun showDuckChatBottomSheet() {
+        val bottomSheet = DuckChatContextualBottomSheet.newInstance()
+        bottomSheet.show(childFragmentManager, DuckChatContextualBottomSheet.TAG)
     }
 
     private fun configureOmnibarTextInput() {
