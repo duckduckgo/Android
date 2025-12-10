@@ -444,7 +444,7 @@ class RealPirEmailConfirmationTest {
         ).thenReturn(testEmailConfirmationStep2)
         whenever(mockPirCssScriptLoader.getScript()).thenReturn(testScript)
         whenever(mockPirActionsRunnerFactory.create(mockContext, testScript, RunType.MANUAL))
-            .thenReturn(mockPirActionsRunner, mock<RealPirActionsRunner>())
+            .thenReturn(mockPirActionsRunner)
         whenever(mockPirActionsRunner.start(any(), any())).thenReturn(Result.success(Unit))
 
         val result = testee.executeForEmailConfirmationJobs(
@@ -494,7 +494,7 @@ class RealPirEmailConfirmationTest {
         ).thenReturn(testEmailConfirmationStep)
         whenever(mockPirCssScriptLoader.getScript()).thenReturn(testScript)
         whenever(mockPirActionsRunnerFactory.create(mockContext, testScript, RunType.MANUAL))
-            .thenReturn(mockPirActionsRunner, mock<RealPirActionsRunner>())
+            .thenReturn(mockPirActionsRunner)
         whenever(mockPirActionsRunner.start(any(), any())).thenReturn(Result.success(Unit))
 
         val result = testee.executeForEmailConfirmationJobs(
@@ -585,12 +585,9 @@ class RealPirEmailConfirmationTest {
             ),
         ).thenReturn(testEmailConfirmationStep)
         whenever(mockPirCssScriptLoader.getScript()).thenReturn(testScript)
-        val mockRunner1 = mock<RealPirActionsRunner>()
-        val mockRunner2 = mock<RealPirActionsRunner>()
         whenever(mockPirActionsRunnerFactory.create(mockContext, testScript, RunType.MANUAL))
-            .thenReturn(mockRunner1, mockRunner2)
-        whenever(mockRunner1.start(any(), any())).thenReturn(Result.success(Unit))
-        whenever(mockRunner2.start(any(), any())).thenReturn(Result.success(Unit))
+            .thenReturn(mockPirActionsRunner)
+        whenever(mockPirActionsRunner.start(any(), any())).thenReturn(Result.success(Unit))
 
         testee.executeForEmailConfirmationJobs(
             listOf(testEmailConfirmationJobRecord),
@@ -604,8 +601,7 @@ class RealPirEmailConfirmationTest {
             RunType.MANUAL,
         )
 
-        verify(mockRunner1, times(2)).stop()
-        verify(mockRunner2, times(1)).stop()
+        verify(mockPirActionsRunner, times(3)).stop()
     }
 
     @Test

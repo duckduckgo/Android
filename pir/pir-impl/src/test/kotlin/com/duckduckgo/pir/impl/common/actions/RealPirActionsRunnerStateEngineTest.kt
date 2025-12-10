@@ -34,7 +34,7 @@ import com.duckduckgo.pir.impl.scripts.models.PirError
 import com.duckduckgo.pir.impl.scripts.models.PirScriptRequestData.UserProfile
 import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
@@ -339,7 +339,8 @@ class RealPirActionsRunnerStateEngineTest {
 
         var sideEffectEmitted = false
         val job = launch {
-            testee.sideEffect.first()
+            val result = testee.sideEffect.firstOrNull()
+            assertTrue(result != null)
             sideEffectEmitted = true
         }
 
