@@ -499,7 +499,6 @@ class SubscriptionFeedbackViewModel @Inject constructor(
     }
 
     sealed class Command {
-        data object FeedbackFailed : Command()
         data object FeedbackCompleted : Command()
         data object FeedbackCancelled : Command()
         data class ShowHelpPages(val url: String) : Command()
