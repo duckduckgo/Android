@@ -27,7 +27,7 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissionQueryResponse
-import com.duckduckgo.site.permissions.impl.feature.MicrophoneSitePermissionsFeature
+import com.duckduckgo.site.permissions.impl.feature.MicrophoneSitePermissionsDomainRecoveryFeature
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionsEntity
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
@@ -52,7 +52,9 @@ class SitePermissionsManagerTest {
     private val mockPackageManager = mock<PackageManager>()
     private val mockLocationManager = mock<LocationManager>()
     private val mockContext = mock<Context>()
-    private val fakeMicrophoneSitePermissionsFeature = FakeFeatureToggleFactory.create(MicrophoneSitePermissionsFeature::class.java)
+    private val fakeMicrophoneSitePermissionsDomainRecoveryFeature = FakeFeatureToggleFactory.create(
+        MicrophoneSitePermissionsDomainRecoveryFeature::class.java,
+    )
 
     private val testee = SitePermissionsManagerImpl(
         mockPackageManager,
@@ -60,7 +62,7 @@ class SitePermissionsManagerTest {
         mockSitePermissionsRepository,
         coroutineRule.testDispatcherProvider,
         mockContext,
-        fakeMicrophoneSitePermissionsFeature,
+        fakeMicrophoneSitePermissionsDomainRecoveryFeature,
     )
 
     private val url = "https://domain.com/whatever"
@@ -69,7 +71,7 @@ class SitePermissionsManagerTest {
     @Before
     fun before() {
         whenever(mockPackageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)).thenReturn(true)
-        fakeMicrophoneSitePermissionsFeature.self().setRawStoredState(Toggle.State(false))
+        fakeMicrophoneSitePermissionsDomainRecoveryFeature.self().setRawStoredState(Toggle.State(false))
     }
 
     @Test

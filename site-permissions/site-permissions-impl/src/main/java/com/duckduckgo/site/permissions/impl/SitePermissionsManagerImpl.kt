@@ -30,7 +30,7 @@ import com.duckduckgo.site.permissions.api.SitePermissionsManager
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.LocationPermissionRequest
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissionQueryResponse
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissions
-import com.duckduckgo.site.permissions.impl.feature.MicrophoneSitePermissionsFeature
+import com.duckduckgo.site.permissions.impl.feature.MicrophoneSitePermissionsDomainRecoveryFeature
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.withContext
 import logcat.logcat
@@ -44,7 +44,7 @@ class SitePermissionsManagerImpl @Inject constructor(
     private val sitePermissionsRepository: SitePermissionsRepository,
     private val dispatcherProvider: DispatcherProvider,
     private val context: Context,
-    private val microphoneSitePermissionsFeature: MicrophoneSitePermissionsFeature,
+    private val microphoneSitePermissionsDomainRecoveryFeature: MicrophoneSitePermissionsDomainRecoveryFeature,
 ) : SitePermissionsManager {
 
     private suspend fun getSitePermissionsGranted(
@@ -70,7 +70,7 @@ class SitePermissionsManagerImpl @Inject constructor(
 
         logcat { "Permissions: sitePermissionsAllowedToAsk in $url ${sitePermissionsAllowedToAsk.asList()}" }
 
-        val sitePermissionsGranted = if (microphoneSitePermissionsFeature.self().isEnabled()) {
+        val sitePermissionsGranted = if (microphoneSitePermissionsDomainRecoveryFeature.self().isEnabled()) {
             getSitePermissionsGranted(url, tabId, sitePermissionsAllowedToAsk).filter { permission ->
                 if (permission == PermissionRequest.RESOURCE_AUDIO_CAPTURE && AUDIO_CAPTURE_PERMISSION_DOMAINS.contains(url.extractDomain())) {
                     ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED &&

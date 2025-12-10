@@ -22,9 +22,9 @@ import com.duckduckgo.feature.toggles.api.Toggle
 
 @ContributesRemoteFeature(
     scope = AppScope::class,
-    featureName = "microphoneSitePermissions",
+    featureName = "microphoneSitePermissionsDomainRecovery",
 )
-interface MicrophoneSitePermissionsFeature {
+interface MicrophoneSitePermissionsDomainRecoveryFeature {
     @Toggle.DefaultValue(Toggle.DefaultFeatureValue.TRUE)
     fun self(): Toggle
 }
