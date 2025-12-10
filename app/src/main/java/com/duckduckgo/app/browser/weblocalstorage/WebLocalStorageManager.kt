@@ -38,8 +38,18 @@ import java.nio.charset.StandardCharsets
 import javax.inject.Inject
 
 interface WebLocalStorageManager {
+    /**
+     * Clears web local storage based on predefined settings and fireproofed websites (legacy).
+     *
+     * Uses settingsDataStore.clearDuckAiData to determine if DuckAi data should be cleared.
+     */
     suspend fun clearWebLocalStorage()
 
+    /**
+     * Clears web local storage based on the specified options.
+     * @param shouldClearData If true, clears browser web data (cache, history, form data, authentication, cookies, directories).
+     * @param shouldClearChats If true, clears chat-related data from WebStorage.
+     */
     suspend fun clearWebLocalStorage(
         shouldClearData: Boolean,
         shouldClearChats: Boolean,
