@@ -95,7 +95,7 @@ class DuckAiPlusSettingsView @JvmOverloads constructor(
             when (viewState.settingState) {
                 is SettingState.Enabled -> {
                     isVisible = true
-                    setStatus(isOn = true)
+                    setStatus(isOn = viewState.isDuckChatEnabled)
                     setLeadingIconResource(com.duckduckgo.mobile.android.R.drawable.ic_ai_chat_color_24)
                     isClickable = true
                     setClickListener { viewModel.onDuckAiClicked() }
