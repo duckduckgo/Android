@@ -37,14 +37,17 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
 import com.duckduckgo.duckchat.impl.R.string
 import com.duckduckgo.duckchat.impl.databinding.ActivityDuckAiPaidSettingsBinding
 import com.duckduckgo.duckchat.impl.subscription.DuckAiPaidSettingsViewModel.Command
 import com.duckduckgo.duckchat.impl.subscription.DuckAiPaidSettingsViewModel.Command.LaunchLearnMoreWebPage
 import com.duckduckgo.duckchat.impl.subscription.DuckAiPaidSettingsViewModel.Command.OpenDuckAi
+import com.duckduckgo.duckchat.impl.subscription.DuckAiPaidSettingsViewModel.Command.OpenDuckChatSettings
 import com.duckduckgo.duckchat.impl.subscription.DuckAiPaidSettingsViewModel.ViewState
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.navigation.api.GlobalActivityStarter
+import androidx.core.view.isVisible
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
@@ -92,6 +95,9 @@ class DuckAiPaidSettingsActivity : DuckDuckGoActivity() {
         binding.duckAiPaidSettingsOpenDuckAi.setOnClickListener {
             viewModel.onOpenDuckAiSelected()
         }
+        binding.duckAiPaidSettingsEnableInSettings.setOnClickListener {
+            viewModel.onEnableInSettingsSelected()
+        }
     }
 
     private fun observeViewModel() {
@@ -108,6 +114,22 @@ class DuckAiPaidSettingsActivity : DuckDuckGoActivity() {
 
     private fun renderViewState(viewState: ViewState) {
         binding.statusIndicator.setStatus(viewState.isDuckChatEnabled)
+        binding.duckAiPaidSettingsOpenDuckAi.isVisible = viewState.isDuckChatEnabled
+        binding.duckAiPaidSettingsEnableInSettings.isVisible = true
+        binding.duckAiPaidSettingsEnableInSettings.setPrimaryText(
+            if (viewState.isDuckChatEnabled) {
+                getString(string.duck_ai_paid_settings_manage_in_settings)
+            } else {
+                getString(string.duck_ai_paid_settings_enable_in_settings)
+            },
+        )
+        binding.duckAiPaidSettingsEnableInSettings.setSecondaryText(
+            if (viewState.isDuckChatEnabled) {
+                getString(string.duck_ai_paid_settings_manage_secondary)
+            } else {
+                ""
+            },
+        )
     }
 
     private fun processCommand(command: Command) {
@@ -119,6 +141,10 @@ class DuckAiPaidSettingsActivity : DuckDuckGoActivity() {
 
             OpenDuckAi -> {
                 duckChat.openDuckChat()
+            }
+
+            OpenDuckChatSettings -> {
+                globalActivityStarter.start(this, DuckChatSettingsNoParams)
             }
         }
     }
