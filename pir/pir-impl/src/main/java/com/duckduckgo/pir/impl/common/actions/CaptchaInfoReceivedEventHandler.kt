@@ -35,7 +35,7 @@ import kotlin.reflect.KClass
     scope = AppScope::class,
     boundType = EventHandler::class,
 )
-class CaptchaInforReceivedEventHandler @Inject constructor(
+class CaptchaInfoReceivedEventHandler @Inject constructor(
     private val currentTimeProvider: CurrentTimeProvider,
     private val pirRunStateHandler: PirRunStateHandler,
 ) : EventHandler {
