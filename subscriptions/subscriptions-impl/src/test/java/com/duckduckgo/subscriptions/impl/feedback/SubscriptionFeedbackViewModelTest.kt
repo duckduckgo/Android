@@ -16,6 +16,7 @@ import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackReportType
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackReportType.REPORT_PROBLEM
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackReportType.REQUEST_FEATURE
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.Command.FeedbackCancelled
+import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.Command.FeedbackCompleted
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.Command.ShowHelpPages
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.Command.ShowSupportPage
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.FeedbackFragmentState.FeedbackAction
@@ -920,6 +921,9 @@ class SubscriptionFeedbackViewModelTest {
         viewModel.onReportTypeSelected(REQUEST_FEATURE) // Show submit
         viewModel.onSubmitFeedback("Test")
 
+        viewModel.commands().test {
+            assertEquals(FeedbackCompleted, expectMostRecentItem())
+        }
         verify(pixelSender).sendPproFeatureRequest(
             mapOf(
                 "source" to "settings",
@@ -935,6 +939,9 @@ class SubscriptionFeedbackViewModelTest {
         viewModel.onReportTypeSelected(GENERAL_FEEDBACK) // Show submit
         viewModel.onSubmitFeedback("Test")
 
+        viewModel.commands().test {
+            assertEquals(FeedbackCompleted, expectMostRecentItem())
+        }
         verify(pixelSender).sendPproGeneralFeedback(
             mapOf(
                 "source" to "settings",
@@ -951,6 +958,9 @@ class SubscriptionFeedbackViewModelTest {
         viewModel.onSubcategorySelected(SubscriptionFeedbackSubsSubCategory.OTHER)
         viewModel.onSubmitFeedback("Test")
 
+        viewModel.commands().test {
+            assertEquals(FeedbackCompleted, expectMostRecentItem())
+        }
         verify(pixelSender).sendPproReportIssue(
             mapOf(
                 "source" to "ppro",
@@ -971,6 +981,9 @@ class SubscriptionFeedbackViewModelTest {
         viewModel.onSubcategorySelected(SubscriptionFeedbackVpnSubCategory.CANNOT_CONNECT_TO_LOCAL_DEVICE)
         viewModel.onSubmitFeedback("Test")
 
+        viewModel.commands().test {
+            assertEquals(FeedbackCompleted, expectMostRecentItem())
+        }
         verify(pixelSender).sendPproReportIssue(
             mapOf(
                 "source" to "vpn",
@@ -989,6 +1002,9 @@ class SubscriptionFeedbackViewModelTest {
         viewModel.allowUserToReportAppIssue("test", "com.test")
         viewModel.onSubmitFeedback("Test")
 
+        viewModel.commands().test {
+            assertEquals(FeedbackCompleted, expectMostRecentItem())
+        }
         verify(pixelSender).sendPproReportIssue(
             mapOf(
                 "source" to "vpnExcludedApps",
@@ -1010,6 +1026,9 @@ class SubscriptionFeedbackViewModelTest {
         viewModel.onSubcategorySelected(SubscriptionFeedbackPirSubCategory.REMOVAL_STUCK)
         viewModel.onSubmitFeedback("Test")
 
+        viewModel.commands().test {
+            assertEquals(FeedbackCompleted, expectMostRecentItem())
+        }
         verify(pixelSender).sendPproReportIssue(
             mapOf(
                 "source" to "settings",
@@ -1031,6 +1050,9 @@ class SubscriptionFeedbackViewModelTest {
         viewModel.onSubcategorySelected(SubscriptionFeedbackItrSubCategory.UNHELPFUL)
         viewModel.onSubmitFeedback("Test")
 
+        viewModel.commands().test {
+            assertEquals(FeedbackCompleted, expectMostRecentItem())
+        }
         verify(pixelSender).sendPproReportIssue(
             mapOf(
                 "source" to "settings",
