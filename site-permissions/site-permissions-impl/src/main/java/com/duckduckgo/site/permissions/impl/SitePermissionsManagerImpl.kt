@@ -24,6 +24,7 @@ import android.webkit.PermissionRequest
 import androidx.core.content.ContextCompat
 import androidx.core.location.LocationManagerCompat
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.extractDomain
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.LocationPermissionRequest
@@ -71,7 +72,7 @@ class SitePermissionsManagerImpl @Inject constructor(
 
         val sitePermissionsGranted = if (microphoneSitePermissionsFeature.self().isEnabled()) {
             getSitePermissionsGranted(url, tabId, sitePermissionsAllowedToAsk).filter { permission ->
-                if (permission == PermissionRequest.RESOURCE_AUDIO_CAPTURE) {
+                if (permission == PermissionRequest.RESOURCE_AUDIO_CAPTURE && AUDIO_CAPTURE_PERMISSION_DOMAINS.contains(url.extractDomain())) {
                     ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED &&
                         ContextCompat.checkSelfPermission(context, Manifest.permission.MODIFY_AUDIO_SETTINGS) == PackageManager.PERMISSION_GRANTED
                 } else {
@@ -165,5 +166,9 @@ class SitePermissionsManagerImpl @Inject constructor(
             "microphone" -> PermissionRequest.RESOURCE_AUDIO_CAPTURE
             else -> null
         }
+    }
+
+    companion object {
+        private val AUDIO_CAPTURE_PERMISSION_DOMAINS = listOf("duck.ai", "duckduckgo.com")
     }
 }
