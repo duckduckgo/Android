@@ -21,7 +21,8 @@ import com.duckduckgo.anvil.annotations.ContributesPluginPoint
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
-import com.duckduckgo.app.statistics.pixels.AtbInitializationPluginPixelSender
+import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.StatisticsPixelName.ATB_PRE_INITIALIZER_PLUGIN_TIMEOUT
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
@@ -32,6 +33,7 @@ import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
+import logcat.LogPriority
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
 import javax.inject.Inject
@@ -51,7 +53,7 @@ class AtbInitializer @Inject constructor(
     private val statisticsUpdater: StatisticsUpdater,
     private val listeners: PluginPoint<AtbInitializerListener>,
     private val dispatcherProvider: DispatcherProvider,
-    private val pixelSender: AtbInitializationPluginPixelSender,
+    private val pixel: Pixel,
 ) : MainProcessLifecycleObserver, PrivacyConfigCallbackPlugin {
 
     override fun onResume(owner: LifecycleOwner) {
@@ -86,7 +88,12 @@ class AtbInitializer @Inject constructor(
     }
 
     private fun onPluginTimeout(pluginName: String) {
-        pixelSender.pluginTimedOut(pluginName)
+        logcat(LogPriority.ERROR) { "AtbInitializer: pre-init plugin timed out [$pluginName]" }
+
+        val params = mapOf(
+            "plugin" to pluginName,
+        )
+        pixel.fire(ATB_PRE_INITIALIZER_PLUGIN_TIMEOUT, parameters = params, emptyMap())
     }
 }
 
