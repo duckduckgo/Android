@@ -272,6 +272,14 @@ interface PrivacyProFeature {
 
     @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.TRUE)
     fun sendFreeTrialConversionWideEvent(): Toggle
+
+    /**
+     * When enabled, the native app will respond to the getSubscriptionTierOptions message
+     * with the new tier-based payload structure supporting Plus/Pro tiers.
+     * The flag is exposed to FE via getFeatureConfig.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun useGetSubscriptionTierOptions(): Toggle
 }
 
 @ContributesBinding(AppScope::class)

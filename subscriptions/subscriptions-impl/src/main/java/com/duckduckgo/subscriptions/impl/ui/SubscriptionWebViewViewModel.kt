@@ -94,6 +94,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
 
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
     private val jsonAdapter: JsonAdapter<SubscriptionOptionsJson> = moshi.adapter(SubscriptionOptionsJson::class.java)
+    private val tierJsonAdapter: JsonAdapter<SubscriptionTierOptionsJson> = moshi.adapter(SubscriptionTierOptionsJson::class.java)
 
     private val command = Channel<Command>(1, DROP_OLDEST)
     internal fun commands(): Flow<Command> = command.receiveAsFlow()
@@ -148,6 +149,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
             "backToSettings" -> backToSettings()
             "backToSettingsActivateSuccess" -> backToSettingsActiveSuccess()
             "getSubscriptionOptions" -> id?.let { getSubscriptionOptions(featureName, method, it) }
+            "getSubscriptionTierOptions" -> id?.let { getSubscriptionTierOptions(featureName, method, it) }
             "subscriptionSelected" -> subscriptionSelected(data)
             "activateSubscription" -> activateSubscription()
             "featureSelected" -> data?.let { featureSelected(data) }
@@ -321,6 +323,92 @@ class SubscriptionWebViewViewModel @Inject constructor(
         }
     }
 
+    private fun getSubscriptionTierOptions(featureName: String, method: String, id: String) {
+        suspend fun sendTierOptionJson(optionsJson: SubscriptionTierOptionsJson) {
+            val response = JsCallbackData(
+                featureName = featureName,
+                method = method,
+                id = id,
+                params = JSONObject(tierJsonAdapter.toJson(optionsJson)),
+            )
+            command.send(SendResponseToJs(response))
+        }
+
+        viewModelScope.launch(dispatcherProvider.io()) {
+            val defaultOptions = SubscriptionTierOptionsJson(
+                products = emptyList(),
+            )
+
+            val subscriptionTierOptions = if (privacyProFeature.allowPurchase().isEnabled()) {
+                val subscriptionOffers = subscriptionsManager.getSubscriptionOffer().associateBy { it.offerId ?: it.planId }
+                when {
+                    subscriptionOffers.keys.containsAll(listOf(MONTHLY_FREE_TRIAL_OFFER_US, YEARLY_FREE_TRIAL_OFFER_US)) &&
+                        subscriptionsManager.isFreeTrialEligible() -> {
+                        createSubscriptionTierOptions(
+                            monthlyOffer = subscriptionOffers.getValue(MONTHLY_FREE_TRIAL_OFFER_US),
+                            yearlyOffer = subscriptionOffers.getValue(YEARLY_FREE_TRIAL_OFFER_US),
+                        )
+                    }
+
+                    subscriptionOffers.keys.containsAll(listOf(MONTHLY_FREE_TRIAL_OFFER_ROW, YEARLY_FREE_TRIAL_OFFER_ROW)) &&
+                        subscriptionsManager.isFreeTrialEligible() -> {
+                        createSubscriptionTierOptions(
+                            monthlyOffer = subscriptionOffers.getValue(MONTHLY_FREE_TRIAL_OFFER_ROW),
+                            yearlyOffer = subscriptionOffers.getValue(YEARLY_FREE_TRIAL_OFFER_ROW),
+                        )
+                    }
+
+                    subscriptionOffers.keys.containsAll(listOf(MONTHLY_PLAN_US, YEARLY_PLAN_US)) -> {
+                        createSubscriptionTierOptions(
+                            monthlyOffer = subscriptionOffers.getValue(MONTHLY_PLAN_US),
+                            yearlyOffer = subscriptionOffers.getValue(YEARLY_PLAN_US),
+                        )
+                    }
+
+                    subscriptionOffers.keys.containsAll(listOf(MONTHLY_PLAN_ROW, YEARLY_PLAN_ROW)) -> {
+                        createSubscriptionTierOptions(
+                            monthlyOffer = subscriptionOffers.getValue(MONTHLY_PLAN_ROW),
+                            yearlyOffer = subscriptionOffers.getValue(YEARLY_PLAN_ROW),
+                        )
+                    }
+
+                    else -> defaultOptions
+                }
+            } else {
+                defaultOptions
+            }
+
+            sendTierOptionJson(subscriptionTierOptions)
+        }
+    }
+
+    private suspend fun createSubscriptionTierOptions(
+        monthlyOffer: SubscriptionOffer,
+        yearlyOffer: SubscriptionOffer,
+    ): SubscriptionTierOptionsJson {
+        // For now, all offers are grouped under a single "plus" tier
+        // TODO: update this when new Tiers are supported
+        val tierFeatures = monthlyOffer.features.map { featureName ->
+            TierFeatureJson(
+                product = featureName,
+                name = TIER_PLUS,
+            )
+        }
+
+        val product = ProductJson(
+            tier = TIER_PLUS, // TODO: update this when new Tiers are supported
+            features = tierFeatures,
+            options = listOf(
+                createOptionsJson(yearlyOffer, YEARLY.lowercase()),
+                createOptionsJson(monthlyOffer, MONTHLY.lowercase()),
+            ),
+        )
+
+        return SubscriptionTierOptionsJson(
+            products = listOf(product),
+        )
+    }
+
     private suspend fun createSubscriptionOptions(
         monthlyOffer: SubscriptionOffer,
         yearlyOffer: SubscriptionOffer,
@@ -412,6 +500,23 @@ class SubscriptionWebViewViewModel @Inject constructor(
 
     data class FeatureJson(val name: String)
 
+    // New tier-based data classes for getSubscriptionTierOptions
+    data class SubscriptionTierOptionsJson(
+        val platform: String = PLATFORM,
+        val products: List<ProductJson>,
+    )
+
+    data class ProductJson(
+        val tier: String,
+        val features: List<TierFeatureJson>,
+        val options: List<OptionsJson>,
+    )
+
+    data class TierFeatureJson(
+        val product: String,
+        val name: String,
+    )
+
     enum class OfferType(val type: String) {
         FREE_TRIAL("freeTrial"),
         UNKNOWN("unknown"),
@@ -451,5 +556,8 @@ class SubscriptionWebViewViewModel @Inject constructor(
         const val PURCHASE_COMPLETED_SUBSCRIPTION_NAME = "onPurchaseUpdate"
         const val PURCHASE_COMPLETED_JSON = """{ type: "completed" }"""
         const val PURCHASE_CANCELED_JSON = """{ type: "canceled" }"""
+
+        // Tier constants - placeholder values until v2 API is available
+        private const val TIER_PLUS = "plus"
     }
 }

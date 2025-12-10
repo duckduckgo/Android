@@ -147,6 +147,7 @@ class SubscriptionMessagingInterface @Inject constructor(
         override val methods: List<String> = listOf(
             "subscriptionSelected",
             "getSubscriptionOptions",
+            "getSubscriptionTierOptions",
             "backToSettings",
             "activateSubscription",
             "featureSelected",
@@ -409,10 +410,12 @@ class SubscriptionMessagingInterface @Inject constructor(
             val authV2Enabled = privacyProFeature.enableSubscriptionFlowsV2().isEnabled()
             val duckAiSubscriberModelsEnabled = privacyProFeature.duckAiPlus().isEnabled()
             val supportsAlternateStripePaymentFlow = privacyProFeature.supportsAlternateStripePaymentFlow().isEnabled()
+            val useGetSubscriptionTierOptions = privacyProFeature.useGetSubscriptionTierOptions().isEnabled()
             val resultJson = JSONObject().apply {
                 put("useSubscriptionsAuthV2", authV2Enabled)
                 put("usePaidDuckAi", duckAiSubscriberModelsEnabled)
                 put("useAlternateStripePaymentFlow", supportsAlternateStripePaymentFlow)
+                put("useGetSubscriptionTierOptions", useGetSubscriptionTierOptions)
             }
 
             val response = JsRequestResponse.Success(
