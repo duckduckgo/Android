@@ -403,6 +403,8 @@ class TabDataRepository @Inject constructor(
         tabsDao.deleteAllTabs()
         webViewPreviewPersister.deleteAll()
         faviconManager.deleteAllTemp()
+        adClickManager.clearAll()
+        webViewSessionStorage.deleteAllSessions()
         siteData.clear()
     }
 

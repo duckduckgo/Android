@@ -22,7 +22,6 @@ import android.webkit.WebView
 import com.duckduckgo.anrs.api.CrashLogger
 import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
 import com.duckduckgo.app.browser.indexeddb.IndexedDBManager
-import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.weblocalstorage.WebLocalStorageManager
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.file.FileDeleter
@@ -64,18 +63,12 @@ interface WebDataManager {
         shouldClearData: Boolean,
         shouldClearChats: Boolean,
     )
-
-    /**
-     * Clears all stored WebView sessions.
-     */
-    fun clearWebViewSessions()
 }
 
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
 class WebViewDataManager @Inject constructor(
     private val context: Context,
-    private val webViewSessionStorage: WebViewSessionStorage,
     private val cookieManager: DuckDuckGoCookieManager,
     private val fileDeleter: FileDeleter,
     private val webViewHttpAuthStore: WebViewHttpAuthStore,
@@ -230,9 +223,5 @@ class WebViewDataManager @Inject constructor(
 
     private suspend fun clearExternalCookies() {
         cookieManager.removeExternalCookies()
-    }
-
-    override fun clearWebViewSessions() {
-        webViewSessionStorage.deleteAllSessions()
     }
 }
