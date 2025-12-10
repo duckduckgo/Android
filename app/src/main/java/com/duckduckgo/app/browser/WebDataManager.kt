@@ -45,11 +45,19 @@ import java.io.File
 import javax.inject.Inject
 
 interface WebDataManager {
+    /**
+     * Clears all web data from the provided WebView and WebStorage (legacy full clear).
+     */
     suspend fun clearData(
         webView: WebView,
         webStorage: WebStorage,
     )
 
+    /**
+     * Clears web data from the provided WebView and WebStorage based on the specified options.
+     * @param shouldClearData If true, clears browser web data (cache, history, form data, authentication, cookies, directories).
+     * @param shouldClearChats If true, clears chat-related data from WebStorage.
+     */
     suspend fun clearData(
         webView: WebView,
         webStorage: WebStorage,
@@ -57,6 +65,9 @@ interface WebDataManager {
         shouldClearChats: Boolean,
     )
 
+    /**
+     * Clears all stored WebView sessions.
+     */
     fun clearWebViewSessions()
 }
 
