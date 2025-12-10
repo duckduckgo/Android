@@ -43,7 +43,7 @@
     <dimen name="toolbarIconSize">24dp</dimen>
     <dimen name="toolbarIconPadding">3dp</dimen>
     <dimen name="toolbarIcon">40dp</dimen>
-    <dimen name="toolbarSize">60dp</dimen>
+    <dimen name="toolbarSize">64dp</dimen>
 
     <!-- Navigation Bar -->
     <dimen name="navigationBarPaddingTop">8dp</dimen>
@@ -52,7 +52,6 @@
     <dimen name="bottomNavIcon">24dp</dimen>
 
     <!-- Omnibar -->
-    <dimen name="omnibarToolbarSize">64dp</dimen>
     <dimen name="omnibarCookieAnimationBannerHeight">38dp</dimen>
     <dimen name="omnibarCardMarginHorizontal">16dp</dimen>
     <dimen name="omnibarCardMarginEnd">8dp</dimen>

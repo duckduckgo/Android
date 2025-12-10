@@ -56,7 +56,7 @@
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/toolbar"
                 android:layout_width="0dp"
-                android:layout_height="@dimen/omnibarToolbarSize"
+                android:layout_height="?attr/actionBarSize"
                 android:clipChildren="false"
                 app:contentInsetEnd="0dp"
                 app:contentInsetStart="0dp"
@@ -429,7 +429,7 @@
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/customTabToolbarContainerWrapper"
                 android:layout_width="0dp"
-                android:layout_height="@dimen/omnibarToolbarSize"
+                android:layout_height="?attr/actionBarSize"
                 android:layout_marginHorizontal="@dimen/keyline_2"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/iconsContainer"
