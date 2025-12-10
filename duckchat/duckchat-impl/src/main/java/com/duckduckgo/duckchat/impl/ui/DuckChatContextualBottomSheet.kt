@@ -20,14 +20,49 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.WindowManager
 import android.widget.FrameLayout
-import com.duckduckgo.common.utils.extensions.showKeyboard
+import com.duckduckgo.app.tabs.BrowserNav
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.FragmentViewModelFactory
+import com.duckduckgo.downloads.api.DownloadStateListener
+import com.duckduckgo.downloads.api.DownloadsFileActions
+import com.duckduckgo.downloads.api.FileDownloader
+import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.databinding.BottomSheetDuckAiContextualBinding
+import com.duckduckgo.duckchat.impl.feature.AIChatDownloadFeature
+import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
+import com.duckduckgo.duckchat.impl.ui.filechooser.FileChooserIntentBuilder
+import com.duckduckgo.duckchat.impl.ui.filechooser.capture.camera.CameraHardwareChecker
+import com.duckduckgo.duckchat.impl.ui.filechooser.capture.launcher.UploadFromExternalMediaAppLauncher
+import com.duckduckgo.js.messaging.api.JsMessaging
+import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.google.android.material.shape.CornerFamily
+import com.google.android.material.shape.MaterialShapeDrawable
+import kotlinx.coroutines.CoroutineScope
 
-class DuckChatContextualBottomSheet : BottomSheetDialogFragment() {
+class DuckChatContextualBottomSheet(
+    viewModelFactory: FragmentViewModelFactory,
+    webViewClient: DuckChatWebViewClient,
+    contentScopeScripts: JsMessaging,
+    duckChatJSHelper: DuckChatJSHelper,
+    subscriptionsHandler: SubscriptionsHandler,
+    appCoroutineScope: CoroutineScope,
+    dispatcherProvider: DispatcherProvider,
+    browserNav: BrowserNav,
+    appBuildConfig: AppBuildConfig,
+    fileDownloader: FileDownloader,
+    downloadCallback: DownloadStateListener,
+    downloadsFileActions: DownloadsFileActions,
+    duckChat: DuckChatInternal,
+    aiChatDownloadFeature: AIChatDownloadFeature,
+    fileChooserIntentBuilder: FileChooserIntentBuilder,
+    cameraHardwareChecker: CameraHardwareChecker,
+    externalCameraLauncher: UploadFromExternalMediaAppLauncher,
+    globalActivityStarter: GlobalActivityStarter,
+) : BottomSheetDialogFragment() {
 
     private var _binding: BottomSheetDuckAiContextualBinding? = null
     private val binding get() = _binding!!
@@ -44,12 +79,11 @@ class DuckChatContextualBottomSheet : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        dialog?.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
-
-        // Request focus and show the keyboard
-        binding.inputField.post {
-            binding.inputField.requestFocus()
-            showKeyboard(binding.inputField)
+        binding.actionSend.setOnClickListener {
+            dialog?.findViewById<FrameLayout>(com.google.android.material.R.id.design_bottom_sheet)?.let { bottomSheet ->
+                val behavior = BottomSheetBehavior.from(bottomSheet)
+                behavior.state = BottomSheetBehavior.STATE_EXPANDED
+            }
         }
     }
 
@@ -58,6 +92,20 @@ class DuckChatContextualBottomSheet : BottomSheetDialogFragment() {
         dialog?.findViewById<FrameLayout>(com.google.android.material.R.id.design_bottom_sheet)?.let { bottomSheet ->
             val behavior = BottomSheetBehavior.from(bottomSheet)
             behavior.state = BottomSheetBehavior.STATE_COLLAPSED
+
+            val shapeDrawable = MaterialShapeDrawable.createWithElevationOverlay(context)
+            shapeDrawable.shapeAppearanceModel = shapeDrawable.shapeAppearanceModel
+                .toBuilder()
+                .setTopLeftCorner(
+                    CornerFamily.ROUNDED,
+                    requireContext().resources.getDimension(com.duckduckgo.mobile.android.R.dimen.dialogBorderRadius),
+                )
+                .setTopRightCorner(
+                    CornerFamily.ROUNDED,
+                    requireContext().resources.getDimension(com.duckduckgo.mobile.android.R.dimen.dialogBorderRadius),
+                )
+                .build()
+            bottomSheet.background = shapeDrawable
         }
     }
 
@@ -68,10 +116,5 @@ class DuckChatContextualBottomSheet : BottomSheetDialogFragment() {
 
     companion object {
         const val TAG = "DuckChatBottomSheet"
-
-        // You can use a newInstance pattern if you need to pass arguments
-        fun newInstance(): DuckChatContextualBottomSheet {
-            return DuckChatContextualBottomSheet()
-        }
     }
 }

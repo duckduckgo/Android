@@ -121,6 +121,7 @@ import com.duckduckgo.app.browser.customtabs.CustomTabViewModel.Companion.CUSTOM
 import com.duckduckgo.app.browser.databinding.FragmentBrowserTabBinding
 import com.duckduckgo.app.browser.databinding.HttpAuthenticationBinding
 import com.duckduckgo.app.browser.downloader.BlobConverterInjector
+import com.duckduckgo.app.browser.duckchat.DuckChatContextualBottomSheetFactory
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.filechooser.FileChooserIntentBuilder
 import com.duckduckgo.app.browser.filechooser.capture.launcher.UploadFromExternalMediaAppLauncher
@@ -339,7 +340,6 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.cancellable
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -587,6 +587,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var browserMenuViewStateFactory: BrowserMenuViewStateFactory
+
+    @Inject
+    lateinit var duckChatContextualBottomSheetFactory: DuckChatContextualBottomSheetFactory
 
     /**
      * We use this to monitor whether the user was seeing the in-context Email Protection signup prompt
@@ -3129,8 +3132,8 @@ class BrowserTabFragment :
     }
 
     private fun showDuckChatBottomSheet() {
-        val bottomSheet = DuckChatContextualBottomSheet.newInstance()
-        bottomSheet.show(childFragmentManager, DuckChatContextualBottomSheet.TAG)
+        val duckChatContextualSheet = duckChatContextualBottomSheetFactory.create()
+        duckChatContextualSheet.show(childFragmentManager, DuckChatContextualBottomSheet.TAG)
     }
 
     private fun configureOmnibarTextInput() {
