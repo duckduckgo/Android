@@ -52,7 +52,8 @@ interface ClearDataAction {
     ): Unit?
 
     /**
-     * Clears tabs and associated data
+     * Clears tabs and associated data.
+     * @param appInForeground whether the app is in foreground
      */
     suspend fun clearTabsOnly(appInForeground: Boolean)
 
