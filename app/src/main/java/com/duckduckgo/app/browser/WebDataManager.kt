@@ -26,6 +26,7 @@ import com.duckduckgo.app.browser.weblocalstorage.WebLocalStorageManager
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.file.FileDeleter
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
+import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -79,6 +80,7 @@ class WebViewDataManager @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
     private val appBuildConfig: AppBuildConfig,
+    private val settingsDataStore: SettingsDataStore,
 ) : WebDataManager {
 
     override suspend fun clearData(
@@ -91,7 +93,7 @@ class WebViewDataManager @Inject constructor(
         clearFormData(webView)
         clearAuthentication(webView)
         clearExternalCookies()
-        clearWebViewDirectories()
+        clearWebViewDirectories(settingsDataStore.clearDuckAiData)
     }
 
     override suspend fun clearData(
@@ -108,7 +110,11 @@ class WebViewDataManager @Inject constructor(
             clearFormData(webView)
             clearAuthentication(webView)
             clearExternalCookies()
-            clearWebViewDirectories()
+            clearWebViewDirectories(false)
+        }
+
+        if (shouldClearDuckAiData) {
+            clearOnlyDuckAiWebViewDirectories()
         }
     }
 
@@ -194,7 +200,7 @@ class WebViewDataManager @Inject constructor(
      *
      *  the excluded directories above are to avoid clearing unnecessary cookies and because localStorage is cleared using clearWebStorage
      */
-    private suspend fun clearWebViewDirectories() {
+    private suspend fun clearWebViewDirectories(shouldClearDuckAiData: Boolean) {
         val dataDir = context.applicationInfo.dataDir
         fileDeleter.deleteContents(File(dataDir, "app_webview"), listOf("Default", "Cookies"))
 
@@ -206,7 +212,7 @@ class WebViewDataManager @Inject constructor(
         }
         if (androidBrowserConfigFeature.indexedDB().isEnabled()) {
             runCatching {
-                indexedDBManager.clearIndexedDB()
+                indexedDBManager.clearIndexedDB(shouldClearDuckAiData)
             }.onSuccess {
                 excludedDirectories.add("IndexedDB")
             }.onFailure { t ->
@@ -214,6 +220,23 @@ class WebViewDataManager @Inject constructor(
             }
         }
         fileDeleter.deleteContents(File(dataDir, "app_webview/Default"), excludedDirectories)
+    }
+
+    /**
+     * Clears only DuckAI-related WebView directories.
+     * All other website data is preserved.
+     */
+    private suspend fun clearOnlyDuckAiWebViewDirectories() {
+        withContext(dispatcherProvider.io()) {
+            // Clear DuckAI data from IndexedDB
+            if (androidBrowserConfigFeature.indexedDB().isEnabled()) {
+                runCatching {
+                    indexedDBManager.clearOnlyDuckAiData()
+                }.onFailure { t ->
+                    logcat(WARN) { "Failed to clear DuckAI data from IndexedDB: ${t.asLog()}" }
+                }
+            }
+        }
     }
 
     private suspend fun clearAuthentication(webView: WebView) {
