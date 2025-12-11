@@ -17,12 +17,16 @@
 package com.duckduckgo.remote.messaging.impl.ui
 
 import android.annotation.SuppressLint
+import android.app.PendingIntent
+import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.provider.Settings
 import android.util.AttributeSet
 import android.widget.FrameLayout
+import android.widget.Toast
+import androidx.core.os.bundleOf
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
@@ -33,14 +37,30 @@ import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.ViewViewModelFactory
+import com.duckduckgo.common.utils.playstore.PlayStoreUtils
 import com.duckduckgo.di.scopes.ViewScope
+import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreens.AppTrackerOnboardingActivityWithEmptyParamsParams
 import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.navigation.api.GlobalActivityStarter.DeeplinkActivityParams
+import com.duckduckgo.remote.messaging.impl.R
 import com.duckduckgo.remote.messaging.impl.databinding.ViewCardsListRemoteMessageBinding
 import com.duckduckgo.remote.messaging.impl.mappers.drawable
+import com.duckduckgo.remote.messaging.impl.newtab.SharePromoLinkBroadCastReceiver
 import com.duckduckgo.remote.messaging.impl.ui.CardsListRemoteMessageViewModel.Command
+import com.duckduckgo.remote.messaging.impl.ui.CardsListRemoteMessageViewModel.Command.DismissMessage
+import com.duckduckgo.remote.messaging.impl.ui.CardsListRemoteMessageViewModel.Command.LaunchAppTPOnboarding
+import com.duckduckgo.remote.messaging.impl.ui.CardsListRemoteMessageViewModel.Command.LaunchDefaultBrowser
+import com.duckduckgo.remote.messaging.impl.ui.CardsListRemoteMessageViewModel.Command.LaunchDefaultCredentialProvider
+import com.duckduckgo.remote.messaging.impl.ui.CardsListRemoteMessageViewModel.Command.LaunchPlayStore
+import com.duckduckgo.remote.messaging.impl.ui.CardsListRemoteMessageViewModel.Command.LaunchScreen
+import com.duckduckgo.remote.messaging.impl.ui.CardsListRemoteMessageViewModel.Command.SharePromoLinkRMF
+import com.duckduckgo.remote.messaging.impl.ui.CardsListRemoteMessageViewModel.Command.SubmitUrl
+import com.duckduckgo.remote.messaging.impl.ui.CardsListRemoteMessageViewModel.Command.SubmitUrlInContext
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import logcat.LogPriority.WARN
+import logcat.asLog
 import logcat.logcat
 import javax.inject.Inject
 
@@ -59,6 +79,9 @@ class CardsListRemoteMessageView @JvmOverloads constructor(
 
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
+
+    @Inject
+    lateinit var playStoreUtils: PlayStoreUtils
 
     @Inject
     lateinit var appBuildConfig: AppBuildConfig
@@ -124,26 +147,34 @@ class CardsListRemoteMessageView @JvmOverloads constructor(
 
     private fun processCommand(command: Command) {
         when (command) {
-            is Command.SubmitUrlInContext -> {
-                globalActivityStarter.start(
-                    context,
-                    WebViewActivityWithParams(
-                        url = command.url,
-                        "",
-                    ),
-                )
-            }
-            is Command.DismissMessage -> {
-                listener?.onDismiss()
-            }
-            is Command.LaunchDefaultCredentialProvider -> {
-                launchDefaultCredentialProvider()
-            }
-            else -> {
-                // Unsupported command, close.
-                listener?.onDismiss()
-            }
+            is SubmitUrl -> submitUrl(command.url)
+            is SubmitUrlInContext -> submitUrl(command.url)
+            is DismissMessage -> dismiss()
+            is LaunchDefaultCredentialProvider -> launchDefaultCredentialProvider()
+            is LaunchAppTPOnboarding -> launchAppTPOnboarding()
+            is LaunchDefaultBrowser -> launchDefaultBrowser()
+            is LaunchPlayStore -> openPlayStore(command.appPackage)
+            is SharePromoLinkRMF -> launchSharePromoRMFPageChooser(command.url, command.shareTitle)
+            is LaunchScreen -> launchScreen(command.screen, command.payload)
         }
+    }
+
+    private fun submitUrl(url: String) {
+        globalActivityStarter.start(
+            context,
+            WebViewActivityWithParams(
+                url = url,
+                "",
+            ),
+        )
+    }
+
+    private fun dismiss() {
+        listener?.onDismiss()
+    }
+
+    private fun launchAppTPOnboarding() {
+        globalActivityStarter.start(context, AppTrackerOnboardingActivityWithEmptyParamsParams)
     }
 
     @SuppressLint("DenyListedApi")
@@ -160,6 +191,56 @@ class CardsListRemoteMessageView @JvmOverloads constructor(
             context.startActivity(intent)
         }.onFailure {
             logcat { "RMF: Error launching credential provider / system settings." }
+        }
+    }
+
+    private fun launchDefaultBrowser() {
+        try {
+            val intent = Intent(Settings.ACTION_MANAGE_DEFAULT_APPS_SETTINGS)
+            intent.putExtra(":settings:fragment_args_key", "default_browser")
+            intent.putExtra(":settings:show_fragment_args", bundleOf(":settings:fragment_args_key" to "default_browser"))
+            context.startActivity(intent)
+        } catch (e: ActivityNotFoundException) {
+            val errorMessage = context.getString(R.string.cannotLaunchDefaultAppSettings)
+            logcat(WARN) { errorMessage }
+            Toast.makeText(context, errorMessage, Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun openPlayStore(appPackage: String) {
+        playStoreUtils.launchPlayStore(appPackage)
+    }
+
+    private fun launchSharePromoRMFPageChooser(
+        url: String,
+        shareTitle: String,
+    ) {
+        val share = Intent().apply {
+            action = Intent.ACTION_SEND
+            putExtra(Intent.EXTRA_TEXT, url)
+            putExtra(Intent.EXTRA_TITLE, shareTitle)
+            type = "text/plain"
+        }
+
+        val pi = PendingIntent.getBroadcast(
+            context,
+            0,
+            Intent(context, SharePromoLinkBroadCastReceiver::class.java),
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+        )
+        try {
+            context.startActivity(Intent.createChooser(share, null, pi.intentSender))
+        } catch (e: ActivityNotFoundException) {
+            logcat(WARN) { "Activity not found: ${e.asLog()}" }
+        }
+    }
+
+    private fun launchScreen(
+        screen: String,
+        payload: String,
+    ) {
+        context?.let {
+            globalActivityStarter.start(it, DeeplinkActivityParams(screenName = screen, jsonArguments = payload), null)
         }
     }
 
