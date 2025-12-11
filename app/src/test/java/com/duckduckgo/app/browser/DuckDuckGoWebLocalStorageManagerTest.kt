@@ -223,7 +223,7 @@ class DuckDuckGoWebLocalStorageManagerTest {
         val entry3 = createMockDBEntry(key3)
 
         whenever(mockDB.iterator()).thenReturn(mockIterator)
-        whenever(mockIterator.hasNext()).thenReturn(true, true, false)
+        whenever(mockIterator.hasNext()).thenReturn(true, true, true, false)
         whenever(mockIterator.next()).thenReturn(entry1, entry2, entry3)
 
         testee.clearWebLocalStorage(shouldClearData = false, shouldClearChats = false)
