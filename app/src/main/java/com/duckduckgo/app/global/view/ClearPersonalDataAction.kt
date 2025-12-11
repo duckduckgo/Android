@@ -181,8 +181,8 @@ class ClearPersonalDataAction(
             dataManager.clearData(
                 webView = createWebView(),
                 webStorage = createWebStorage(),
-                shouldClearData = false,
-                shouldClearChats = true,
+                shouldClearBrowserData = false,
+                shouldClearDuckAiData = true,
             )
 
             logcat(INFO) { "Finished clearing chats" }
@@ -211,8 +211,8 @@ class ClearPersonalDataAction(
             dataManager.clearData(
                 webView = createWebView(),
                 webStorage = createWebStorage(),
-                shouldClearData = true,
-                shouldClearChats = false,
+                shouldClearBrowserData = true,
+                shouldClearDuckAiData = false,
             )
             appCacheClearer.clearCache()
 

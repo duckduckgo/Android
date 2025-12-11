@@ -280,7 +280,7 @@ class WebViewDataManagerTest {
             feature.webLocalStorage().setRawStoredState(State(enable = true))
             val webView = TestWebView(context)
 
-            testee.clearData(webView, mockStorage, shouldClearData = true, shouldClearChats = false)
+            testee.clearData(webView, mockStorage, shouldClearBrowserData = true, shouldClearDuckAiData = false)
 
             verify(mockWebLocalStorageManager).clearWebLocalStorage(true, false)
             verify(mockStorage, never()).deleteAllData()
@@ -299,7 +299,7 @@ class WebViewDataManagerTest {
             feature.webLocalStorage().setRawStoredState(State(enable = true))
             val webView = TestWebView(context)
 
-            testee.clearData(webView, mockStorage, shouldClearData = false, shouldClearChats = true)
+            testee.clearData(webView, mockStorage, shouldClearBrowserData = false, shouldClearDuckAiData = true)
 
             verify(mockWebLocalStorageManager).clearWebLocalStorage(false, true)
             verify(mockStorage, never()).deleteAllData()
@@ -318,7 +318,7 @@ class WebViewDataManagerTest {
             feature.webLocalStorage().setRawStoredState(State(enable = true))
             val webView = TestWebView(context)
 
-            testee.clearData(webView, mockStorage, shouldClearData = true, shouldClearChats = true)
+            testee.clearData(webView, mockStorage, shouldClearBrowserData = true, shouldClearDuckAiData = true)
 
             verify(mockWebLocalStorageManager).clearWebLocalStorage(true, true)
             verify(mockStorage, never()).deleteAllData()
@@ -337,7 +337,7 @@ class WebViewDataManagerTest {
             feature.webLocalStorage().setRawStoredState(State(enable = true))
             val webView = TestWebView(context)
 
-            testee.clearData(webView, mockStorage, shouldClearData = false, shouldClearChats = false)
+            testee.clearData(webView, mockStorage, shouldClearBrowserData = false, shouldClearDuckAiData = false)
 
             verify(mockWebLocalStorageManager).clearWebLocalStorage(false, false)
             verify(mockStorage, never()).deleteAllData()
@@ -359,7 +359,7 @@ class WebViewDataManagerTest {
             whenever(mockAppBuildConfig.flavor).thenReturn(INTERNAL)
             whenever(mockWebLocalStorageManager.clearWebLocalStorage(true, false)).thenThrow(exception)
 
-            testee.clearData(webView, mockStorage, shouldClearData = true, shouldClearChats = false)
+            testee.clearData(webView, mockStorage, shouldClearBrowserData = true, shouldClearDuckAiData = false)
 
             verify(mockWebLocalStorageManager).clearWebLocalStorage(true, false)
             verify(mockCrashLogger).logCrash(CrashLogger.Crash(shortName = "web_storage_on_clear_error", t = exception))
@@ -379,7 +379,7 @@ class WebViewDataManagerTest {
             whenever(mockAppBuildConfig.flavor).thenReturn(INTERNAL)
             whenever(mockWebLocalStorageManager.clearWebLocalStorage(false, true)).thenThrow(exception)
 
-            testee.clearData(webView, mockStorage, shouldClearData = false, shouldClearChats = true)
+            testee.clearData(webView, mockStorage, shouldClearBrowserData = false, shouldClearDuckAiData = true)
 
             verify(mockWebLocalStorageManager).clearWebLocalStorage(false, true)
             verify(mockCrashLogger).logCrash(CrashLogger.Crash(shortName = "web_storage_on_clear_error", t = exception))
@@ -396,7 +396,7 @@ class WebViewDataManagerTest {
             feature.webLocalStorage().setRawStoredState(State(enable = false))
             val webView = TestWebView(context)
 
-            testee.clearData(webView, mockStorage, shouldClearData = true, shouldClearChats = false)
+            testee.clearData(webView, mockStorage, shouldClearBrowserData = true, shouldClearDuckAiData = false)
 
             verifyNoInteractions(mockWebLocalStorageManager)
             verify(mockStorage).deleteAllData()
@@ -412,7 +412,7 @@ class WebViewDataManagerTest {
             feature.webLocalStorage().setRawStoredState(State(enable = false))
             val webView = TestWebView(context)
 
-            testee.clearData(webView, mockStorage, shouldClearData = false, shouldClearChats = true)
+            testee.clearData(webView, mockStorage, shouldClearBrowserData = false, shouldClearDuckAiData = true)
 
             verifyNoInteractions(mockWebLocalStorageManager)
             verify(mockStorage, never()).deleteAllData()
@@ -428,7 +428,7 @@ class WebViewDataManagerTest {
             feature.webLocalStorage().setRawStoredState(State(enable = true))
             val webView = TestWebView(context)
 
-            testee.clearData(webView, mockStorage, shouldClearData = true, shouldClearChats = false)
+            testee.clearData(webView, mockStorage, shouldClearBrowserData = true, shouldClearDuckAiData = false)
 
             verify(mockFileDeleter).deleteContents(
                 File(context.applicationInfo.dataDir, "app_webview"),
@@ -448,7 +448,7 @@ class WebViewDataManagerTest {
             feature.webLocalStorage().setRawStoredState(State(enable = true))
             val webView = TestWebView(context)
 
-            testee.clearData(webView, mockStorage, shouldClearData = false, shouldClearChats = true)
+            testee.clearData(webView, mockStorage, shouldClearBrowserData = false, shouldClearDuckAiData = true)
 
             verifyNoInteractions(mockFileDeleter)
         }

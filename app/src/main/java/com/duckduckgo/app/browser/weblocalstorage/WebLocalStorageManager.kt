@@ -47,12 +47,12 @@ interface WebLocalStorageManager {
 
     /**
      * Clears web local storage based on the specified options.
-     * @param shouldClearData If true, clears browser web data (cache, history, form data, authentication, cookies, directories).
-     * @param shouldClearChats If true, clears chat-related data from WebStorage.
+     * @param shouldClearBrowserData If true, clears browser web data (cache, history, form data, authentication, cookies, directories).
+     * @param shouldClearDuckAiData If true, clears chat-related data from WebStorage.
      */
     suspend fun clearWebLocalStorage(
-        shouldClearData: Boolean,
-        shouldClearChats: Boolean,
+        shouldClearBrowserData: Boolean,
+        shouldClearDuckAiData: Boolean,
     )
 }
 
@@ -107,8 +107,8 @@ class DuckDuckGoWebLocalStorageManager @Inject constructor(
     }
 
     override suspend fun clearWebLocalStorage(
-        shouldClearData: Boolean,
-        shouldClearChats: Boolean,
+        shouldClearBrowserData: Boolean,
+        shouldClearDuckAiData: Boolean,
     ) {
         withContext(dispatcherProvider.io()) {
             val settings = androidBrowserConfigFeature.webLocalStorage().getSettings()
@@ -133,10 +133,10 @@ class DuckDuckGoWebLocalStorageManager @Inject constructor(
                     val key = String(entry.key, StandardCharsets.UTF_8)
 
                     val domainForMatchingAllowedKey = getDomainForMatchingAllowedKey(key)
-                    if (domainForMatchingAllowedKey == null && shouldClearData) {
+                    if (domainForMatchingAllowedKey == null && shouldClearBrowserData) {
                         db.delete(entry.key)
                         logcat { "WebLocalStorageManager: Deleted key: $key" }
-                    } else if (shouldClearChats && DUCKDUCKGO_DOMAINS.contains(domainForMatchingAllowedKey)) {
+                    } else if (shouldClearDuckAiData && DUCKDUCKGO_DOMAINS.contains(domainForMatchingAllowedKey)) {
                         if (keysToDelete.any { key.endsWith(it) }) {
                             db.delete(entry.key)
                             logcat { "WebLocalStorageManager: Deleted key: $key" }
