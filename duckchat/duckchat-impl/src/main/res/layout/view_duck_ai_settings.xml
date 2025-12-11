@@ -21,5 +21,4 @@
     android:layout_height="wrap_content"
     app:indicatorStatus="on"
     app:leadingIcon="@drawable/ic_ai_chat_color_24"
-    app:pillIcon="newPill"
     app:primaryText="@string/duck_ai_paid_settings_title" />
