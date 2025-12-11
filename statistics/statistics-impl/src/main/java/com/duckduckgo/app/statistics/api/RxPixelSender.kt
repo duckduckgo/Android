@@ -108,16 +108,21 @@ class RxPixelSender @Inject constructor(
     ): Single<PixelSender.SendPixelResult> = Single.fromCallable {
         runBlocking {
             if (shouldFirePixel(pixelName, type)) {
-                api.fire(
-                    pixelName,
-                    getDeviceFactor(),
-                    getAtbInfo(),
-                    addDeviceParametersTo(parameters),
-                    encodedParameters,
-                    devMode = shouldFirePixelsAsDev,
-                ).blockingAwait()
-                storePixelFired(pixelName, type)
-                PixelSender.SendPixelResult.PIXEL_SENT
+                try {
+                    api.fire(
+                        pixelName,
+                        getDeviceFactor(),
+                        getAtbInfo(),
+                        addDeviceParametersTo(parameters),
+                        encodedParameters,
+                        devMode = shouldFirePixelsAsDev,
+                    ).blockingAwait()
+                    storePixelFired(pixelName, type)
+                    PixelSender.SendPixelResult.PIXEL_SENT
+                } catch (_: Exception) {
+                    logcat(tag = "RadoiuC") { "Pixel failed to send: $pixelName" }
+                    PixelSender.SendPixelResult.PIXEL_IGNORED
+                }
             } else {
                 PixelSender.SendPixelResult.PIXEL_IGNORED
             }
