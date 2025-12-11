@@ -241,13 +241,13 @@ class SharedPreferencesFireDataStore @Inject constructor(
         }
     }
 
-    // Helper method to parse options from strings
     private fun parseOptionsFromStrings(stringSet: Set<String>): Set<FireClearOption> {
         return stringSet.mapNotNull { name ->
             try {
                 FireClearOption.valueOf(name)
             } catch (e: IllegalArgumentException) {
-                null // Ignore invalid values
+                logcat { "Invalid FireClearOption value: $name" }
+                null
             }
         }.toSet()
     }
