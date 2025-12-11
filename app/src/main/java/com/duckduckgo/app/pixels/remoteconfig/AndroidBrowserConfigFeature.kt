@@ -249,10 +249,10 @@ interface AndroidBrowserConfigFeature {
 
     /**
      * Controls the fire dialog and data clearing options.
-     * @return `true` when the remote config has the global "newDataClearingOptions" androidBrowserConfig
+     * @return `true` when the remote config has the global "moreGranularDataClearingOptions" androidBrowserConfig
      * sub-feature flag enabled
      * If the remote feature is not present defaults to `false`
      */
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
-    fun newDataClearingOptions(): Toggle
+    fun moreGranularDataClearingOptions(): Toggle
 }
