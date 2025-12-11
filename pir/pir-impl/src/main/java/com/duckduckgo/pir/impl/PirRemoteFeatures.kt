@@ -38,7 +38,7 @@ interface PirRemoteFeatures {
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun self(): Toggle
 
-    @DefaultValue(DefaultFeatureValue.FALSE)
+    @DefaultValue(DefaultFeatureValue.INTERNAL)
     fun pirBeta(): Toggle
 }
 
