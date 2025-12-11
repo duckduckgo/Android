@@ -760,7 +760,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 when (settingsDataStore.omnibarType) {
                     OmnibarType.SINGLE_TOP -> null
                     OmnibarType.SINGLE_BOTTOM -> currentTab?.getOmnibar()?.omnibarView?.toolbar ?: binding.fragmentContainer
-                    OmnibarType.SPLIT -> currentTab?.getBottomNavigationBar() ?: binding.fragmentContainer
+                    OmnibarType.SPLIT -> currentTab?.navigationBar ?: binding.fragmentContainer
                 }
             DefaultSnackbar(
                 parentView = binding.fragmentContainer,

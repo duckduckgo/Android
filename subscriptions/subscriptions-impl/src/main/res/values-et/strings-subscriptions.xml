@@ -160,10 +160,6 @@
     <string name="feedbackSubmitVpnDisclaimer">"Lisaks eespool sisestatud andmetele saadame koos sinu tagasisidega ka mõned anonüümsed andmed:\n\n• Kas mõned brauseri funktsioonid on aktiivsed\n• Rakenduse koonddiagnostika (nt veakoodid)\n\nVajutades nuppu Saada, nõustud, et DuckDuckGo võib kasutada esitatud teavet rakenduse täiustamiseks."</string>
     <string name="feedbackSubmitVpnSubmit">Esita</string>
     <string name="feedbackSubmitCompletedMessage">Aitäh! Tagasiside on esitatud.</string>
-    <string name="feedbackSubmitFailedMessage">Midagi läks valesti</string>
-
-    <string name="feedbackSubmitEmailByLine">Anna oma e-posti aadress, kui soovid, et võtaksime sinuga selle probleemi osas ühendust (me ei pruugi kõigile probleemidele vastata):</string>
-    <string name="feedbackSubmitEmailHint">E-post (valikuline)</string>
 
     <string name="feedbackSubmitGeneralDescriptionHint">Palun anna meile tagasisidet...</string>
     <string name="feedbackSubmitFeatureRequestDescriptionHint">Millist funktsiooni soovid näha?</string>

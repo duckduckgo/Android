@@ -134,9 +134,7 @@ import com.duckduckgo.app.browser.commands.Command.SendEmail
 import com.duckduckgo.app.browser.commands.Command.SendResponseToJs
 import com.duckduckgo.app.browser.commands.Command.SendSms
 import com.duckduckgo.app.browser.commands.Command.SetBrowserBackground
-import com.duckduckgo.app.browser.commands.Command.SetBrowserBackgroundColor
 import com.duckduckgo.app.browser.commands.Command.SetOnboardingDialogBackground
-import com.duckduckgo.app.browser.commands.Command.SetOnboardingDialogBackgroundColor
 import com.duckduckgo.app.browser.commands.Command.ShareLink
 import com.duckduckgo.app.browser.commands.Command.ShowAppLinkPrompt
 import com.duckduckgo.app.browser.commands.Command.ShowAutoconsentAnimation
@@ -245,7 +243,6 @@ import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.global.model.domain
 import com.duckduckgo.app.global.model.domainMatchesUrl
 import com.duckduckgo.app.location.data.LocationPermissionType
-import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentManager
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_BANNER_DISMISSED
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_BANNER_SHOWN
@@ -407,8 +404,6 @@ import java.net.URISyntaxException
 import java.util.Locale
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
-import kotlin.time.Duration.Companion.milliseconds
-import com.duckduckgo.mobile.android.R as CommonR
 
 private const val SCAM_PROTECTION_REPORT_ERROR_URL = "https://duckduckgo.com/malicious-site-protection/report-error?url="
 
@@ -488,7 +483,6 @@ class BrowserTabViewModel @Inject constructor(
     private val duckChatJSHelper: DuckChatJSHelper,
     private val tabManager: TabManager,
     private val addressDisplayFormatter: AddressDisplayFormatter,
-    private val onboardingDesignExperimentManager: OnboardingDesignExperimentManager,
     private val serpEasterEggLogosToggles: SerpEasterEggLogosToggles,
     private val nonHttpAppLinkChecker: NonHttpAppLinkChecker,
     private val externalIntentProcessingState: ExternalIntentProcessingState,
@@ -976,15 +970,6 @@ class BrowserTabViewModel @Inject constructor(
             viewModelScope.launch {
                 val cta = refreshCta()
                 showOrHideKeyboard(cta)
-                if (onboardingDesignExperimentManager.isBuckEnrolledAndEnabled()) {
-                    when (cta) {
-                        is DaxBubbleCta.DaxIntroSearchOptionsCta -> {
-                            // Let the keyboard show before showing the animation, using insets were problematic
-                            delay(750.milliseconds)
-                            buckTryASearchAnimationEnabled.value = true
-                        }
-                    }
-                }
             }
         } else {
             command.value = HideKeyboard
@@ -1118,9 +1103,6 @@ class BrowserTabViewModel @Inject constructor(
             -> {
                 if (!ctaViewModel.isSuggestedSearchOption(query)) {
                     pixel.fire(ONBOARDING_SEARCH_CUSTOM, type = Unique())
-                    viewModelScope.launch {
-                        onboardingDesignExperimentManager.fireSearchOrNavCustomPixel()
-                    }
                 }
             }
 
@@ -1982,10 +1964,6 @@ class BrowserTabViewModel @Inject constructor(
         if (!currentBrowserViewState().maliciousSiteBlocked) {
             navigationStateChanged(webViewNavigationState)
             url?.let { prefetchFavicon(url) }
-
-            viewModelScope.launch {
-                onboardingDesignExperimentManager.onWebPageFinishedLoading(url)
-            }
 
             evaluateDuckAIPage(url)
             evaluateSerpLogoState(url)
@@ -2988,7 +2966,6 @@ class BrowserTabViewModel @Inject constructor(
         val cta = ctaViewState.value?.cta ?: return
         viewModelScope.launch(dispatchers.io()) {
             ctaViewModel.onCtaShown(cta)
-            onboardingDesignExperimentManager.fireInContextDialogShownPixel(cta)
         }
     }
 
@@ -3560,8 +3537,6 @@ class BrowserTabViewModel @Inject constructor(
 
     fun onMessageReceived() {
         isLinkOpenedInNewTab = true
-
-        handleNewTabIfEmptyUrl()
     }
 
     override fun linkOpenedInNewTab(): Boolean = isLinkOpenedInNewTab
@@ -3824,16 +3799,15 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    private fun handleNewTabIfEmptyUrl() {
-        val shouldDisplayAboutBlank = handleAboutBlankEnabled && site?.url.isNullOrEmpty()
+    fun handleNewTabIfEmptyUrl() {
+        val shouldDisplayAboutBlank = handleAboutBlankEnabled && webNavigationState == null
         if (shouldDisplayAboutBlank) {
             if (isCustomTabScreen) {
                 handleNewTabForEmptyUrlOnCustomTab()
-            } else {
-                omnibarViewState.value = currentOmnibarViewState().copy(
-                    omnibarText = ABOUT_BLANK,
-                )
             }
+            omnibarViewState.value = currentOmnibarViewState().copy(
+                omnibarText = ABOUT_BLANK,
+            )
         }
     }
 
@@ -4310,9 +4284,6 @@ class BrowserTabViewModel @Inject constructor(
         }
         val cta = currentCtaViewState().cta
         if (cta is OnboardingDaxDialogCta.DaxFireButtonCta) {
-            viewModelScope.launch {
-                onboardingDesignExperimentManager.fireFireButtonClickedFromOnboardingPixel()
-            }
             onUserDismissedCta(cta)
             command.value = HideOnboardingDaxDialog(cta as OnboardingDaxDialogCta)
         }
@@ -4449,43 +4420,11 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun setBrowserBackground(lightModeEnabled: Boolean) {
-        when {
-            onboardingDesignExperimentManager.isBuckEnrolledAndEnabled() -> {
-                command.value = SetBrowserBackgroundColor(getBuckOnboardingExperimentBackgroundColor(lightModeEnabled))
-            }
-
-            onboardingDesignExperimentManager.isBbEnrolledAndEnabled() -> {
-                // TODO if BB wins the we should rename the function to SetBubbleDialogBackground
-                command.value = Command.SetBubbleDialogBackground(getBBBackgroundResource(lightModeEnabled))
-            }
-
-            else -> {
-                command.value = SetBrowserBackground(getBackgroundResource(lightModeEnabled))
-            }
-        }
+        command.value = SetBrowserBackground(getBackgroundResource(lightModeEnabled))
     }
 
-    private fun getBuckOnboardingExperimentBackgroundColor(lightModeEnabled: Boolean): Int =
-        if (lightModeEnabled) {
-            CommonR.color.buckYellow
-        } else {
-            CommonR.color.buckLightBlue
-        }
-
     fun setOnboardingDialogBackground(lightModeEnabled: Boolean) {
-        when {
-            onboardingDesignExperimentManager.isBuckEnrolledAndEnabled() -> {
-                command.value = SetOnboardingDialogBackgroundColor(getBuckOnboardingExperimentBackgroundColor(lightModeEnabled))
-            }
-
-            onboardingDesignExperimentManager.isBbEnrolledAndEnabled() -> {
-                command.value = SetOnboardingDialogBackground(getBBBackgroundResource(lightModeEnabled))
-            }
-
-            else -> {
-                command.value = SetOnboardingDialogBackground(getBackgroundResource(lightModeEnabled))
-            }
-        }
+        command.value = SetOnboardingDialogBackground(getBackgroundResource(lightModeEnabled))
     }
 
     private fun getBackgroundResource(lightModeEnabled: Boolean): Int =
@@ -4493,13 +4432,6 @@ class BrowserTabViewModel @Inject constructor(
             R.drawable.onboarding_background_bitmap_light
         } else {
             R.drawable.onboarding_background_bitmap_dark
-        }
-
-    private fun getBBBackgroundResource(lightModeEnabled: Boolean): Int =
-        if (lightModeEnabled) {
-            R.drawable.onboarding_background_bb_bitmap_light
-        } else {
-            R.drawable.onboarding_background_bb_bitmap_dark
         }
 
     private fun onUserSwitchedToTab(tabId: String) {
@@ -4515,11 +4447,17 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    fun openNewDuckChat() {
-        pixel.fire(DuckChatPixelName.DUCK_CHAT_OMNIBAR_NEW_CHAT_TAPPED)
-        viewModelScope.launch {
-            val subscriptionEvent = duckChatJSHelper.onNativeAction(NativeAction.NEW_CHAT)
-            _subscriptionEventDataChannel.send(subscriptionEvent)
+    fun openNewDuckChat(viewMode: ViewMode) {
+        if (viewMode == ViewMode.DuckAI) {
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_OMNIBAR_NEW_CHAT_TAPPED)
+            viewModelScope.launch {
+                val subscriptionEvent = duckChatJSHelper.onNativeAction(NativeAction.NEW_CHAT)
+                _subscriptionEventDataChannel.send(subscriptionEvent)
+            }
+        } else {
+            val url = duckChat.getDuckChatUrl("", false)
+            command.value = OpenInNewTab(url, tabId)
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_SETTINGS_NEW_CHAT_TAB_TAPPED)
         }
     }
 
@@ -4539,18 +4477,12 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onDuckChatMenuClicked() {
-        if (duckAiFeatureState.showFullScreenMode.value) {
-            val url = duckChat.getDuckChatUrl("", false)
-            command.value = OpenInNewTab(url, tabId)
-            pixel.fire(DuckChatPixelName.DUCK_CHAT_SETTINGS_NEW_CHAT_TAB_TAPPED)
-        } else {
-            viewModelScope.launch {
-                command.value = HideKeyboardForChat
-                val params = duckChat.createWasUsedBeforePixelParams()
-                pixel.fire(DuckChatPixelName.DUCK_CHAT_OPEN_BROWSER_MENU, parameters = params)
-            }
-            duckChat.openDuckChat()
+        viewModelScope.launch {
+            command.value = HideKeyboardForChat
+            val params = duckChat.createWasUsedBeforePixelParams()
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_OPEN_BROWSER_MENU, parameters = params)
         }
+        duckChat.openDuckChat()
     }
 
     fun onDuckChatOmnibarButtonClicked(
@@ -4637,27 +4569,18 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onOmnibarPrivacyShieldButtonPressed() {
-        if (currentCtaViewState().cta is OnboardingDaxDialogCta.DaxTrackersBlockedCta) {
-            viewModelScope.launch {
-                onboardingDesignExperimentManager.firePrivacyDashClickedFromOnboardingPixel()
-            }
-        }
+        // No-op: experiment pixel tracking removed
     }
 
     fun onUserSelectedOnboardingDialogOption(
         cta: Cta,
         index: Int?,
     ) {
-        if (index == null) return
-        viewModelScope.launch {
-            onboardingDesignExperimentManager.fireOptionSelectedPixel(cta, index)
-        }
+        // No-op: experiment pixel tracking removed
     }
 
     fun onUserSelectedOnboardingSiteSuggestionOption(index: Int) {
-        viewModelScope.launch {
-            onboardingDesignExperimentManager.fireSiteSuggestionOptionSelectedPixel(index)
-        }
+        // No-op: experiment pixel tracking removed
     }
 
     fun onLogoReceived(serpLogo: SerpLogo) {

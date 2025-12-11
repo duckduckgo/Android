@@ -101,12 +101,12 @@ class BrokerActionFailedEventHandler @Inject constructor(
             return false
         }
 
-        if (state.runType == RunType.OPTOUT || state.runType == RunType.EMAIL_CONFIRMATION) {
+        return if (state.runType == RunType.OPTOUT || state.runType == RunType.EMAIL_CONFIRMATION) {
             // for optout, for ANY action we retry at most 3 times
-            return state.actionRetryCount < MAX_RETRY_COUNT_OPTOUT
+            state.actionRetryCount < MAX_RETRY_COUNT_OPTOUT
         } else {
             // For scans, we ONLY retry once if the action is expectation
-            return (currentAction is Expectation && state.actionRetryCount < MAX_RETRY_COUNT_SCAN)
+            (currentAction is Expectation && state.actionRetryCount < MAX_RETRY_COUNT_SCAN)
         }
     }
 

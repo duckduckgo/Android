@@ -96,7 +96,6 @@ import com.duckduckgo.app.browser.omnibar.model.Decoration.PrivacyShieldChanged
 import com.duckduckgo.app.browser.omnibar.model.Decoration.QueueCookiesAnimation
 import com.duckduckgo.app.browser.omnibar.model.StateChange
 import com.duckduckgo.app.global.view.renderIfChanged
-import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentManager
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType
@@ -135,12 +134,19 @@ import com.duckduckgo.mobile.android.R as CommonR
 @InjectWith(FragmentScope::class)
 class OmnibarLayout @JvmOverloads constructor(
     context: Context,
+    override val omnibarType: OmnibarType,
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
 ) : AppBarLayout(context, attrs, defStyle),
     OmnibarView,
     OmnibarBehaviour,
     TrackersAnimatorListener {
+
+    constructor(
+        context: Context,
+        attrs: AttributeSet? = null,
+        defStyle: Int = 0,
+    ) : this(context, OmnibarType.SINGLE_TOP, attrs, defStyle)
 
     data class TransitionState(
         val showClearButton: Boolean,
@@ -179,9 +185,6 @@ class OmnibarLayout @JvmOverloads constructor(
     lateinit var omnibarAnimationManager: OmnibarAnimationManager
 
     @Inject
-    lateinit var onboardingDesignExperimentManager: OnboardingDesignExperimentManager
-
-    @Inject
     lateinit var serpLogos: SerpLogos
 
     @Inject
@@ -206,7 +209,7 @@ class OmnibarLayout @JvmOverloads constructor(
     }
 
     private val pulseAnimation: PulseAnimation by lazy {
-        PulseAnimation(lifecycleOwner, onboardingDesignExperimentManager)
+        PulseAnimation(lifecycleOwner)
     }
 
     private var omnibarTextListener: TextListener? = null
@@ -253,20 +256,12 @@ class OmnibarLayout @JvmOverloads constructor(
 
     private var focusAnimator: ValueAnimator? = null
 
-    override val omnibarType: OmnibarType
-
     init {
         inflate(context, R.layout.view_omnibar, this)
 
         AndroidSupportInjection.inject(this)
 
-        omnibarType = settingsDataStore.omnibarType
-
-        val attr = context.theme.obtainStyledAttributes(attrs, R.styleable.OmnibarLayout, defStyle, 0)
-        val omnibarType = OmnibarType.entries[attr.getInt(R.styleable.OmnibarLayout_omnibarPosition, 0)]
-        val isTopPosition = omnibarType == OmnibarType.SINGLE_TOP || omnibarType == OmnibarType.SPLIT
-
-        renderPosition(isTopPosition)
+        renderPosition()
 
         if (Build.VERSION.SDK_INT >= 28) {
             omnibarCardShadow.addBottomShadow()
@@ -638,8 +633,8 @@ class OmnibarLayout @JvmOverloads constructor(
         }
     }
 
-    private fun renderPosition(isTopPosition: Boolean) {
-        if (isTopPosition) {
+    private fun renderPosition() {
+        if (omnibarType == OmnibarType.SINGLE_TOP || omnibarType == OmnibarType.SPLIT) {
             if (Build.VERSION.SDK_INT < 28) {
                 omnibarCardShadow.cardElevation = 2f.toPx(context)
             }

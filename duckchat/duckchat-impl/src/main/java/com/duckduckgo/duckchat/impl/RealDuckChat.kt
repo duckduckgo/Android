@@ -49,7 +49,6 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_NEW_ADDRES
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelParameters
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelParameters.NEW_ADDRESS_BAR_SELECTION
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
-import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewActivityWithParams
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import com.squareup.anvil.annotations.ContributesBinding
@@ -297,10 +296,10 @@ class RealDuckChat @Inject constructor(
     private val _showMainButtonsInInputScreen = MutableStateFlow(false)
 
     private val _chatState = MutableStateFlow(ChatState.HIDE)
-    private val keepSession = MutableStateFlow(false)
     private val _showInputScreenOnSystemSearchLaunch = MutableStateFlow(false)
     private val _showVoiceSearchToggle = MutableStateFlow(false)
     private val _showFullScreenMode = MutableStateFlow(false)
+    private val _showFullScreenModeToggle = MutableStateFlow(false)
 
     private val jsonAdapter: JsonAdapter<DuckChatSettingJson> by lazy {
         moshi.adapter(DuckChatSettingJson::class.java)
@@ -409,15 +408,9 @@ class RealDuckChat @Inject constructor(
     }
 
     override fun closeDuckChat() {
-        if (keepSession.value) {
-            browserNav.closeDuckChat(context).apply {
-                flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                context.startActivity(this)
-            }
-        } else {
-            appCoroutineScope.launch {
-                closeChatFlow.emit(Unit)
-            }
+        browserNav.closeDuckChat(context).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            context.startActivity(this)
         }
     }
 
@@ -472,6 +465,8 @@ class RealDuckChat @Inject constructor(
     override val showVoiceSearchToggle: StateFlow<Boolean> = _showVoiceSearchToggle.asStateFlow()
 
     override val showFullScreenMode: StateFlow<Boolean> = _showFullScreenMode.asStateFlow()
+
+    override val showFullScreenModeToggle: StateFlow<Boolean> = _showFullScreenModeToggle.asStateFlow()
 
     override val chatState: StateFlow<ChatState> = _chatState.asStateFlow()
 
@@ -549,8 +544,7 @@ class RealDuckChat @Inject constructor(
             val hasSessionActive =
                 when {
                     forceNewSession -> false
-                    keepSession.value -> hasActiveSession()
-                    else -> false
+                    else -> hasActiveSession()
                 }
 
             duckChatFeatureRepository.registerOpened()
@@ -558,13 +552,8 @@ class RealDuckChat @Inject constructor(
             withContext(dispatchers.main()) {
                 pixel.fire(DuckChatPixelName.DUCK_CHAT_OPEN, parameters = params)
                 pixel.fire(DuckChatPixelName.DUCK_CHAT_OPEN_DAILY, type = Pixel.PixelType.Daily())
-                if (keepSession.value) {
-                    logcat { "Duck.ai: restoring Duck.ai session $url hasSessionActive $hasSessionActive" }
-                    openDuckChatSession(url, hasSessionActive)
-                } else {
-                    logcat { "Duck.ai: opening standalone Duck.ai screen $url" }
-                    startDuckChatActivity(url)
-                }
+                logcat { "Duck.ai: restoring Duck.ai session $url hasSessionActive $hasSessionActive" }
+                openDuckChatSession(url, hasSessionActive)
             }
         }
     }
@@ -582,16 +571,6 @@ class RealDuckChat @Inject constructor(
                 context.startActivity(this)
             }
     }
-
-    private fun startDuckChatActivity(url: String) {
-        globalActivityStarter
-            .startIntent(context, DuckChatWebViewActivityWithParams(url))
-            ?.apply {
-                flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                context.startActivity(this)
-            }
-    }
-
     private fun appendParameters(
         parameters: Map<String, String>,
         url: String,
@@ -719,7 +698,6 @@ class RealDuckChat @Inject constructor(
             isImageUploadEnabled = imageUploadFeature.self().isEnabled()
             isStandaloneMigrationEnabled = duckChatFeature.standaloneMigration().isEnabled()
 
-            keepSession.value = duckChatFeature.keepSession().isEnabled()
             keepSessionAliveInMinutes = settingsJson?.sessionTimeoutMinutes ?: DEFAULT_SESSION_ALIVE
 
             cacheUserSettings()
@@ -768,6 +746,10 @@ class RealDuckChat @Inject constructor(
                 duckChatFeature.fullscreenMode().isEnabled() && duckChatFeatureRepository.isFullScreenModeUserSettingEnabled()
             isFullscreenModeEnabled = showFullScreenMode
             _showFullScreenMode.emit(showFullScreenMode)
+
+            val showFullScreenModeToggle =
+                duckChatFeature.fullscreenMode().isEnabled() && duckChatFeature.fullscreenModeToggle().isEnabled()
+            _showFullScreenModeToggle.emit(showFullScreenModeToggle)
         }
 
     companion object {

@@ -233,7 +233,12 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         configureLogoAnimation()
         configureKeyboardListener()
 
-        inputModeWidget.init()
+        val launchOnChat = params?.launchOnChat ?: false
+        if (launchOnChat) {
+            inputModeWidget.initOnChat()
+        } else {
+            inputModeWidget.initOnSearch()
+        }
 
         requireActivity().onBackPressedDispatcher.addCallback(
             viewLifecycleOwner,

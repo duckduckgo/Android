@@ -43,6 +43,7 @@
     <string name="browserMenuRunningInDDG">Izvodi se u DuckDuckGou</string>
     <string name="browserMenuSetAsDefaultBrowser">Postavi kao zadani preglednik</string>
     <string name="browserMenuNewChat">Novo čavrljanje</string>
+    <string name="browserMenuNewAIChat">Nova opcija AI čavrljanja</string>
     <string name="browserMenuChatHistory">Povijest čavrljanja</string>
     <string name="browserMenuChatSettings">Postavke usluge Duck.ai</string>
     <string name="browserMenuVPN">VPN</string>

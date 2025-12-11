@@ -75,17 +75,17 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
             duckChat.observeEnableDuckChatUserSetting(),
             duckChat.observeCosmeticInputScreenUserSettingEnabled(),
             duckChat.observeInputScreenUserSettingEnabled(),
-            duckChat.observeFullscreenModeUserSetting(),
             flowOf(duckChatFeature.showHideAiGeneratedImages().isEnabled()).flowOn(dispatcherProvider.io()),
-        ) { isDuckChatUserEnabled, cosmeticInputScreenEnabled, inputScreenEnabled, isFullScreenModeEnabled, showHideAiGeneratedImagesOption ->
+            flowOf(duckChatFeature.fullscreenModeToggle().isEnabled()).flowOn(dispatcherProvider.io()),
+        ) { isDuckChatUserEnabled, cosmeticInputScreenEnabled, isInputScreenEnabled, showHideAiGeneratedImagesOption, fullscreenModeToggle ->
             ViewState(
                 isDuckChatUserEnabled = isDuckChatUserEnabled,
-                isInputScreenEnabled = cosmeticInputScreenEnabled ?: inputScreenEnabled,
+                isInputScreenEnabled = cosmeticInputScreenEnabled ?: isInputScreenEnabled,
                 shouldShowShortcuts = isDuckChatUserEnabled,
                 shouldShowInputScreenToggle = isDuckChatUserEnabled && duckChat.isInputScreenFeatureAvailable(),
                 isSearchSectionVisible = isSearchSectionVisible(duckChatActivityParams),
                 isHideGeneratedImagesOptionVisible = showHideAiGeneratedImagesOption,
-                shouldShowFullScreenModeToggle = duckChat.isDuckChatFullScreenModeFeatureAvailable(),
+                shouldShowFullScreenModeToggle = duckChat.isDuckChatFullScreenModeFeatureAvailable() && fullscreenModeToggle,
                 isFullScreenModeEnabled = duckChat.isDuckChatFullScreenModeEnabled(),
             )
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ViewState())

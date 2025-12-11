@@ -43,6 +43,7 @@
     <string name="browserMenuRunningInDDG">Uitgevoerd in DuckDuckGo</string>
     <string name="browserMenuSetAsDefaultBrowser">Instellen als standaard browser</string>
     <string name="browserMenuNewChat">Nieuwe chat</string>
+    <string name="browserMenuNewAIChat">Nieuwe AI Chat</string>
     <string name="browserMenuChatHistory">Chatgeschiedenis</string>
     <string name="browserMenuChatSettings">Duck.ai-instellingen</string>
     <string name="browserMenuVPN">VPN</string>

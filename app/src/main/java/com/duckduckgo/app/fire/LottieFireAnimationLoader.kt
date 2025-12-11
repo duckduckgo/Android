@@ -21,8 +21,6 @@ import androidx.annotation.UiThread
 import androidx.lifecycle.LifecycleOwner
 import com.airbnb.lottie.LottieCompositionFactory
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
-import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentManager
-import com.duckduckgo.app.settings.clear.OnboardingExperimentFireAnimationHelper
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import kotlinx.coroutines.CoroutineScope
@@ -37,8 +35,6 @@ class LottieFireAnimationLoader constructor(
     private val settingsDataStore: SettingsDataStore,
     private val dispatchers: DispatcherProvider,
     private val appCoroutineScope: CoroutineScope,
-    private val onboardingDesignExperimentManager: OnboardingDesignExperimentManager,
-    private val onboardingExperimentFireAnimationHelper: OnboardingExperimentFireAnimationHelper,
 ) : FireAnimationLoader {
 
     override fun onCreate(owner: LifecycleOwner) {
@@ -49,15 +45,8 @@ class LottieFireAnimationLoader constructor(
     override fun preloadSelectedAnimation() {
         appCoroutineScope.launch(dispatchers.io()) {
             if (animationEnabled()) {
-                if (onboardingDesignExperimentManager.isAnyExperimentEnrolledAndEnabled()) {
-                    // If experiment is successful delete this chain as we can just update HeroFire res id
-                    val selectedFireAnimation = settingsDataStore.selectedFireAnimation
-                    val resId = onboardingExperimentFireAnimationHelper.getSelectedFireAnimationResId(selectedFireAnimation)
-                    LottieCompositionFactory.fromRawRes(context, resId)
-                } else {
-                    val selectedFireAnimation = settingsDataStore.selectedFireAnimation
-                    LottieCompositionFactory.fromRawRes(context, selectedFireAnimation.resId)
-                }
+                val selectedFireAnimation = settingsDataStore.selectedFireAnimation
+                LottieCompositionFactory.fromRawRes(context, selectedFireAnimation.resId)
             }
         }
     }

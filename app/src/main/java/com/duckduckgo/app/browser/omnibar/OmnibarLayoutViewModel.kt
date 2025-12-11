@@ -138,11 +138,11 @@ class OmnibarLayoutViewModel @Inject constructor(
 
     private fun getViewMode(state: ViewState): ViewMode {
         return if (state.viewMode is CustomTab) {
-            val domain = state.url.extractDomain()
+            val domain = if (state.url.isBlank()) state.omnibarText else state.url.extractDomain()
             if (domain != state.viewMode.domain) {
                 val isDuckPlayerUrl = duckPlayer.getDuckPlayerState() == ENABLED && duckPlayer.isDuckPlayerUri(state.url)
                 state.viewMode.copy(
-                    domain = state.url.extractDomain(),
+                    domain = domain,
                     showDuckPlayerIcon = isDuckPlayerUrl,
                 )
             } else {
@@ -731,7 +731,10 @@ class OmnibarLayoutViewModel @Inject constructor(
         logcat { "Omnibar: onExternalOmnibarStateChanged $omnibarViewState forceRender $forceRender" }
         if (serpEasterEggLogosToggles.feature().isEnabled()) {
             val state = if (shouldUpdateOmnibarTextInput(omnibarViewState, _viewState.value.omnibarText) || forceRender) {
-                if (forceRender && !duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(omnibarViewState.queryOrFullUrl)) {
+                if (forceRender &&
+                    !duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(omnibarViewState.queryOrFullUrl) &&
+                    isNotAboutBlank(omnibarViewState)
+                ) {
                     val url = if (isFullUrlEnabled.value) {
                         omnibarViewState.queryOrFullUrl
                     } else {
@@ -796,7 +799,10 @@ class OmnibarLayoutViewModel @Inject constructor(
             }
         } else {
             if (shouldUpdateOmnibarTextInput(omnibarViewState, _viewState.value.omnibarText) || forceRender) {
-                val omnibarText = if (forceRender && !duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(omnibarViewState.queryOrFullUrl)) {
+                val omnibarText = if (forceRender &&
+                    !duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(omnibarViewState.queryOrFullUrl) &&
+                    isNotAboutBlank(omnibarViewState)
+                ) {
                     if (isFullUrlEnabled.value) {
                         omnibarViewState.queryOrFullUrl
                     } else {
@@ -864,6 +870,8 @@ class OmnibarLayoutViewModel @Inject constructor(
             )
         }
     }
+
+    private fun isNotAboutBlank(viewState: OmnibarViewState) = !(handleAboutBlankEnabled && viewState.omnibarText == ABOUT_BLANK)
 
     fun onUserTouchedOmnibarTextInput(touchAction: Int) {
         logcat { "Omnibar: onUserTouchedOmnibarTextInput" }
@@ -1075,4 +1083,8 @@ class OmnibarLayoutViewModel @Inject constructor(
         val isFireButtonVisible: Boolean,
         val isBrowserMenuButtonVisible: Boolean,
     )
+
+    companion object {
+        private const val ABOUT_BLANK = "about:blank"
+    }
 }
