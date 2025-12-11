@@ -261,6 +261,9 @@ dependencies {
 	implementation project(":verified-installation-impl")
 	implementation project(":verified-installation-api")
 
+	implementation project(":modal-coordinator-impl")
+	implementation project(":modal-coordinator-api")
+
     implementation project(':navigation-api')
     implementation project(':navigation-impl')
 
