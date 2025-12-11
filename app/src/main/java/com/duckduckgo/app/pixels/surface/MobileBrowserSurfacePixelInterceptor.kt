@@ -46,10 +46,10 @@ class MobileBrowserSurfacePixelInterceptor @Inject constructor(
 
         if (shouldCheckFeatureFlag) {
             if (!productSurfaceTelemetryFeature.self().isEnabled()) {
-                // logcat { "Mobile surfaces pixel dropped: $pixelName (feature disabled)" }
+                logcat { "Mobile surfaces pixel dropped: $pixelName (feature disabled)" }
                 return dummyResponse(chain)
             } else {
-                logcat(tag = "RadoiuC") { "Mobile surfaces pixel sending: ${chain.request()}" }
+                logcat { "Mobile surfaces pixel sending: $pixelName" }
             }
         }
 
@@ -57,10 +57,8 @@ class MobileBrowserSurfacePixelInterceptor @Inject constructor(
     }
 
     private fun dummyResponse(chain: Chain): Response {
-        logcat(tag = "RadoiuC") { "Surface pixel request dropped: ${chain.request()}" }
-
         return Response.Builder()
-            .code(500)
+            .code(200)
             .protocol(Protocol.HTTP_2)
             .body("Mobile surfaces pixel dropped".toResponseBody())
             .message("Dropped mobile surfaces pixel")

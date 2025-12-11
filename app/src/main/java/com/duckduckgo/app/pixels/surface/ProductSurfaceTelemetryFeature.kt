@@ -28,5 +28,6 @@ import com.duckduckgo.feature.toggles.api.Toggle.DefaultValue
 interface ProductSurfaceTelemetryFeature {
 
     @DefaultValue(Toggle.DefaultFeatureValue.FALSE)
+    @Toggle.InternalAlwaysEnabled
     fun self(): Toggle
 }
