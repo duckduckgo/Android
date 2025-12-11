@@ -48,7 +48,7 @@ class DuckAiPaidSettingsViewModel @Inject constructor(
 ) : ViewModel() {
 
     data class ViewState(
-        val isDuckChatEnabled: Boolean = true,
+        val isDuckAIEnabled: Boolean = true,
     )
 
     private val _viewState = MutableStateFlow<ViewState?>(null)
@@ -73,8 +73,8 @@ class DuckAiPaidSettingsViewModel @Inject constructor(
             val isFeatureEnabled = duckChatFeature.duckAiPaidSettingsStatus().isEnabled()
             if (isFeatureEnabled) {
                 duckChat.observeEnableDuckChatUserSetting()
-                    .onEach { isDuckChatEnabled ->
-                        _viewState.update { ViewState(isDuckChatEnabled = isDuckChatEnabled) }
+                    .onEach { isDuckAiEnabled ->
+                        _viewState.update { ViewState(isDuckAIEnabled = isDuckAiEnabled) }
                     }
                     .launchIn(viewModelScope)
             }

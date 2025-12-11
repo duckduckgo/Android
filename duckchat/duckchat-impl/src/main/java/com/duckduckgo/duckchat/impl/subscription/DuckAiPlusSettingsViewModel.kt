@@ -63,7 +63,7 @@ class DuckAiPlusSettingsViewModel @Inject constructor(
     internal fun commands(): Flow<Command> = command.receiveAsFlow()
     data class ViewState(
         val settingState: SettingState = Hidden,
-        val isDuckChatEnabled: Boolean = true,
+        val isDuckAiEnabled: Boolean = true,
     ) {
 
         sealed class SettingState {
@@ -95,13 +95,13 @@ class DuckAiPlusSettingsViewModel @Inject constructor(
                         }
                     },
                     duckChat.observeEnableDuckChatUserSetting(),
-                ) { hasValidEntitlement, isDuckChatEnabled ->
+                ) { hasValidEntitlement, isDuckAiEnabled ->
                     val subscriptionStatus = subscriptions.getSubscriptionStatus()
                     val state = getDuckAiProState(hasValidEntitlement, subscriptionStatus)
                     _viewState.update {
                         it.copy(
                             settingState = state,
-                            isDuckChatEnabled = isDuckChatEnabled,
+                            isDuckAiEnabled = isDuckAiEnabled,
                         )
                     }
                 }.launchIn(viewModelScope)

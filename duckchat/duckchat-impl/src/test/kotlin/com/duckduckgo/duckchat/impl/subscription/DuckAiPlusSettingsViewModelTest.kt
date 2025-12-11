@@ -213,7 +213,7 @@ class DuckAiPlusSettingsViewModelTest {
     }
 
     @Test
-    fun `when duck chat is enabled and feature is enabled then isDuckChatEnabled is true`() = runTest {
+    fun `when duck chat is enabled and feature is enabled then isDuckAiEnabled is true`() = runTest {
         val enabledFakeDuckChat = FakeDuckChatInternal(enabled = true)
         val featureToggle = FakeFeatureToggleFactory.create(DuckChatFeature::class.java).apply {
             duckAiPaidSettingsStatus().setRawStoredState(State(enable = true))
@@ -233,12 +233,12 @@ class DuckAiPlusSettingsViewModelTest {
 
         viewModel.viewState.test {
             val state = expectMostRecentItem()
-            assertTrue(state.isDuckChatEnabled)
+            assertTrue(state.isDuckAiEnabled)
         }
     }
 
     @Test
-    fun `when duck chat is disabled and feature is enabled then isDuckChatEnabled is false`() = runTest {
+    fun `when duck chat is disabled and feature is enabled then isDuckAiEnabled is false`() = runTest {
         val disabledFakeDuckChat = FakeDuckChatInternal(enabled = false)
         val featureToggle = FakeFeatureToggleFactory.create(DuckChatFeature::class.java).apply {
             duckAiPaidSettingsStatus().setRawStoredState(State(enable = true))
@@ -258,12 +258,12 @@ class DuckAiPlusSettingsViewModelTest {
 
         viewModel.viewState.test {
             val state = expectMostRecentItem()
-            assertFalse(state.isDuckChatEnabled)
+            assertFalse(state.isDuckAiEnabled)
         }
     }
 
     @Test
-    fun `when feature is disabled then isDuckChatEnabled defaults to true`() = runTest {
+    fun `when feature is disabled then isDuckAiEnabled defaults to true`() = runTest {
         val disabledFakeDuckChat = FakeDuckChatInternal(enabled = false)
         val featureToggle = FakeFeatureToggleFactory.create(DuckChatFeature::class.java).apply {
             duckAiPaidSettingsStatus().setRawStoredState(State(enable = false))
@@ -283,7 +283,7 @@ class DuckAiPlusSettingsViewModelTest {
 
         viewModel.viewState.test {
             val state = expectMostRecentItem()
-            assertTrue(state.isDuckChatEnabled)
+            assertTrue(state.isDuckAiEnabled)
         }
     }
 }
