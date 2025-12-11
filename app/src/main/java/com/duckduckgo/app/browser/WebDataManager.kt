@@ -54,14 +54,14 @@ interface WebDataManager {
 
     /**
      * Clears web data from the provided WebView and WebStorage based on the specified options.
-     * @param shouldClearData If true, clears browser web data (cache, history, form data, authentication, cookies, directories).
-     * @param shouldClearChats If true, clears chat-related data from WebStorage.
+     * @param shouldClearBrowserData If true, clears browser web data (cache, history, form data, authentication, cookies, directories).
+     * @param shouldClearDuckAiData If true, clears chat-related data from WebStorage.
      */
     suspend fun clearData(
         webView: WebView,
         webStorage: WebStorage,
-        shouldClearData: Boolean,
-        shouldClearChats: Boolean,
+        shouldClearBrowserData: Boolean,
+        shouldClearDuckAiData: Boolean,
     )
 }
 
@@ -97,12 +97,12 @@ class WebViewDataManager @Inject constructor(
     override suspend fun clearData(
         webView: WebView,
         webStorage: WebStorage,
-        shouldClearData: Boolean,
-        shouldClearChats: Boolean,
+        shouldClearBrowserData: Boolean,
+        shouldClearDuckAiData: Boolean,
     ) {
-        clearWebStorageGranularly(webStorage, shouldClearData, shouldClearChats)
+        clearWebStorageGranularly(webStorage, shouldClearBrowserData, shouldClearDuckAiData)
 
-        if (shouldClearData) {
+        if (shouldClearBrowserData) {
             clearWebViewCache(webView)
             clearHistory(webView)
             clearFormData(webView)
@@ -141,25 +141,25 @@ class WebViewDataManager @Inject constructor(
 
     private suspend fun clearWebStorageGranularly(
         webStorage: WebStorage,
-        shouldClearData: Boolean,
-        shouldClearChats: Boolean,
+        shouldClearBrowserData: Boolean,
+        shouldClearDuckAiData: Boolean,
     ) {
         withContext(dispatcherProvider.io()) {
             if (androidBrowserConfigFeature.webLocalStorage().isEnabled()) {
                 kotlin.runCatching {
-                    webLocalStorageManager.clearWebLocalStorage(shouldClearData, shouldClearChats)
+                    webLocalStorageManager.clearWebLocalStorage(shouldClearBrowserData, shouldClearDuckAiData)
                 }.onFailure { e ->
                     logcat(ERROR) { "WebDataManager: Could not selectively clear web storage: ${e.asLog()}" }
                     if (appBuildConfig.isInternalBuild()) {
                         sendCrashPixel(e)
                     }
-                    if (shouldClearData) {
+                    if (shouldClearBrowserData) {
                         // fallback, if we crash we delete everything
                         deleteAllData(webStorage)
                     }
                 }
             } else {
-                if (shouldClearData) {
+                if (shouldClearBrowserData) {
                     deleteAllData(webStorage)
                 } else {
                     // No-op when shouldClearData is false
