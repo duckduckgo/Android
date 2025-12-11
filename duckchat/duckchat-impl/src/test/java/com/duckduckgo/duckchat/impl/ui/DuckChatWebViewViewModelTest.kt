@@ -20,11 +20,8 @@ import android.webkit.WebBackForwardList
 import android.webkit.WebHistoryItem
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
-import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.impl.DuckChatInternal
-import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewViewModel.Command
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE
@@ -54,7 +51,6 @@ class DuckChatWebViewViewModelTest {
 
     private val subscriptions: Subscriptions = mock()
     private val duckChat: DuckChatInternal = mock()
-    private val mockPixel: Pixel = mock()
     private val subscriptionStatusFlow = MutableSharedFlow<SubscriptionStatus>()
 
     private lateinit var viewModel: DuckChatWebViewViewModel
@@ -63,7 +59,7 @@ class DuckChatWebViewViewModelTest {
     fun setup() {
         whenever(subscriptions.getSubscriptionStatusFlow()).thenReturn(subscriptionStatusFlow)
         whenever(duckChat.observeFullscreenModeUserSetting()).thenReturn(flowOf(true))
-        viewModel = DuckChatWebViewViewModel(subscriptions, duckChat, mockPixel)
+        viewModel = DuckChatWebViewViewModel(subscriptions, duckChat)
     }
 
     @Test
@@ -210,13 +206,5 @@ class DuckChatWebViewViewModelTest {
         whenever(history.currentItem).thenReturn(currentItem)
         whenever(history.getItemAtIndex(0)).thenReturn(firstItem)
         assertFalse(viewModel.shouldCloseDuckChat(history))
-    }
-
-    @Test
-    fun whenSendKeyboardFocusedPixelThenFireBothKeyboardUsagePixels() = runTest {
-        viewModel.sendKeyboardFocusedPixel()
-
-        verify(mockPixel).fire(DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_KEYBOARD_USAGE)
-        verify(mockPixel).fire(DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_KEYBOARD_USAGE_DAILY, type = Daily())
     }
 }
