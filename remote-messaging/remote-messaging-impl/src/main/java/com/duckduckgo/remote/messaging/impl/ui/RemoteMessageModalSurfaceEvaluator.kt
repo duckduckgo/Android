@@ -19,13 +19,12 @@ package com.duckduckgo.remote.messaging.impl.ui
 import android.content.Context
 import android.content.Intent
 import android.os.SystemClock
-import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.onboarding.OnboardingFlowChecker
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.modalcoordinator.api.ModalEvaluator
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
 import com.duckduckgo.remote.messaging.api.Surface
@@ -42,7 +41,7 @@ interface RemoteMessageModalSurfaceEvaluator
 
 @ContributesMultibinding(
     scope = AppScope::class,
-    boundType = MainProcessLifecycleObserver::class,
+    boundType = ModalEvaluator::class,
 )
 @ContributesBinding(
     scope = AppScope::class,
@@ -58,42 +57,44 @@ class RemoteMessageModalSurfaceEvaluatorImpl @Inject constructor(
     private val applicationContext: Context,
     private val remoteMessagingFeatureToggles: RemoteMessagingFeatureToggles,
     private val onboardingFlowChecker: OnboardingFlowChecker,
-) : RemoteMessageModalSurfaceEvaluator, MainProcessLifecycleObserver {
+) : RemoteMessageModalSurfaceEvaluator, ModalEvaluator {
 
-    override fun onResume(owner: LifecycleOwner) {
-        super.onResume(owner)
-        appCoroutineScope.launch {
-            evaluate()
-        }
-    }
+    override val priority: Int = 1
+    override val evaluatorId: String = "remote_message_modal"
 
-    private suspend fun evaluate() {
-        withContext(dispatchers.io()) {
+    override suspend fun evaluate(): ModalEvaluator.EvaluationResult {
+        return withContext(dispatchers.io()) {
             if (!remoteMessagingFeatureToggles.remoteMessageModalSurface().isEnabled()) {
-                return@withContext
+                return@withContext ModalEvaluator.EvaluationResult.Skipped
             }
 
             if (!onboardingFlowChecker.isOnboardingComplete()) {
-                return@withContext
+                return@withContext ModalEvaluator.EvaluationResult.Skipped
             }
 
             if (!hasMetBackgroundTimeThreshold()) {
-                return@withContext
+                return@withContext ModalEvaluator.EvaluationResult.Skipped
             }
 
-            val message = remoteMessagingRepository.message() ?: return@withContext
+            val message = remoteMessagingRepository.message()
+                ?: return@withContext ModalEvaluator.EvaluationResult.Skipped
 
             if (message.surfaces.contains(Surface.MODAL)) {
                 val intent = globalActivityStarter.startIntent(
                     applicationContext,
                     ModalSurfaceActivityFromMessageId(message.id, message.content.messageType),
-                ) ?: return@withContext
+                ) ?: return@withContext ModalEvaluator.EvaluationResult.Skipped
 
-                withContext(dispatchers.main()) {
+                // Launch activity in app scope to decouple from evaluation completion
+                appCoroutineScope.launch(dispatchers.main()) {
                     intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
                     applicationContext.startActivity(intent)
                 }
+
+                return@withContext ModalEvaluator.EvaluationResult.CompletedWithAction
             }
+
+            return@withContext ModalEvaluator.EvaluationResult.Skipped
         }
     }
 
