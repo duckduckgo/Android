@@ -120,7 +120,7 @@ class DuckAiPaidSettingsViewModelTest {
 
         viewModel.viewState.test {
             val state = expectMostRecentItem()
-            assertTrue(state!!.isDuckChatEnabled)
+            assertTrue(state!!.isDuckAIEnabled)
         }
     }
 
@@ -140,7 +140,7 @@ class DuckAiPaidSettingsViewModelTest {
 
         viewModel.viewState.test {
             val state = expectMostRecentItem()
-            assertFalse(state!!.isDuckChatEnabled)
+            assertFalse(state!!.isDuckAIEnabled)
         }
     }
 

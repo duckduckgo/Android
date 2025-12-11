@@ -113,18 +113,18 @@ class DuckAiPaidSettingsActivity : DuckDuckGoActivity() {
 
     private fun renderViewState(viewState: ViewState) {
         with(binding) {
-            statusIndicator.setStatus(viewState.isDuckChatEnabled)
-            duckAiPaidSettingsOpenDuckAi.isVisible = viewState.isDuckChatEnabled
+            statusIndicator.setStatus(viewState.isDuckAIEnabled)
+            duckAiPaidSettingsOpenDuckAi.isVisible = viewState.isDuckAIEnabled
             duckAiPaidSettingsEnableInSettings.isVisible = true
             duckAiPaidSettingsEnableInSettings.setPrimaryText(
-                if (viewState.isDuckChatEnabled) {
+                if (viewState.isDuckAIEnabled) {
                     getString(string.duck_ai_paid_settings_manage_in_settings)
                 } else {
                     getString(string.duck_ai_paid_settings_enable_in_settings)
                 },
             )
             duckAiPaidSettingsEnableInSettings.setSecondaryText(
-                if (viewState.isDuckChatEnabled) {
+                if (viewState.isDuckAIEnabled) {
                     getString(string.duck_ai_paid_settings_manage_secondary)
                 } else {
                     ""
