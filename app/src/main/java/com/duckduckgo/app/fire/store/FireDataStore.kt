@@ -25,12 +25,15 @@ import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.clear.FireClearOption
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withContext
+import logcat.logcat
 import javax.inject.Inject
 
 /**
@@ -124,6 +127,7 @@ interface FireDataStore {
 class SharedPreferencesFireDataStore @Inject constructor(
     @FireData private val store: DataStore<Preferences>,
     private val settingsDataStore: SettingsDataStore,
+    private val dispatcherProvider: DispatcherProvider,
 ) : FireDataStore {
 
     private companion object {
@@ -133,17 +137,17 @@ class SharedPreferencesFireDataStore @Inject constructor(
         val DEFAULT_OPTIONS = setOf(FireClearOption.TABS, FireClearOption.DATA)
     }
 
-    private fun getLegacyOptions(): Set<FireClearOption> {
+    private suspend fun getLegacyOptions(): Set<FireClearOption> = withContext(dispatcherProvider.io()) {
         val oldOption = settingsDataStore.automaticallyClearWhatOption
-        return when (oldOption) {
+        when (oldOption) {
             ClearWhatOption.CLEAR_NONE -> emptySet()
             ClearWhatOption.CLEAR_TABS_ONLY -> setOf(FireClearOption.TABS)
             ClearWhatOption.CLEAR_TABS_AND_DATA -> setOf(FireClearOption.TABS, FireClearOption.DATA)
         }
     }
 
-    private fun getLegacyWhenOption(): ClearWhenOption {
-        return settingsDataStore.automaticallyClearWhenOption
+    private suspend fun getLegacyWhenOption(): ClearWhenOption = withContext(dispatcherProvider.io()) {
+        settingsDataStore.automaticallyClearWhenOption
     }
 
     override fun getManualClearOptionsFlow(): Flow<Set<FireClearOption>> {

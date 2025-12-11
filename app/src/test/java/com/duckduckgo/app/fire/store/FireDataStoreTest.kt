@@ -41,7 +41,6 @@ import java.io.File
 
 @RunWith(AndroidJUnit4::class)
 class FireDataStoreTest {
-
     @get:Rule
     var coroutinesTestRule = CoroutineTestRule()
 
@@ -60,7 +59,7 @@ class FireDataStoreTest {
         settingsDataStore = mock()
         whenever(settingsDataStore.automaticallyClearWhatOption).thenReturn(ClearWhatOption.CLEAR_NONE)
         whenever(settingsDataStore.automaticallyClearWhenOption).thenReturn(ClearWhenOption.APP_EXIT_ONLY)
-        fireDataStore = SharedPreferencesFireDataStore(dataStore, settingsDataStore)
+        fireDataStore = SharedPreferencesFireDataStore(dataStore, settingsDataStore, coroutinesTestRule.testDispatcherProvider)
     }
 
     @After
