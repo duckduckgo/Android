@@ -27,7 +27,7 @@ import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
 
 @Composable
 internal fun PreviewBox(
-    backgroundColor: @Composable () -> Color = { DuckDuckGoTheme.colors.background },
+    backgroundColor: @Composable () -> Color = { DuckDuckGoTheme.colors.backgrounds.background },
     content: @Composable () -> Unit,
 ) {
     DuckDuckGoTheme {

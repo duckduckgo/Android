@@ -60,14 +60,14 @@ internal fun DaxColorAttributeListItem(
 private fun DaxColorAttributeListItemPreview() {
     DuckDuckGoTheme {
         Box(
-            modifier = Modifier.background(DuckDuckGoTheme.colors.background)
+            modifier = Modifier.background(DuckDuckGoTheme.colors.backgrounds.background)
                 .padding(16.dp),
         ) {
             DaxColorAttributeListItem(
                 text = "DaxColorAttributeListItem",
                 dotColors = DaxColorDotColors(
-                    fillColor = DuckDuckGoTheme.colors.accentBlue,
-                    strokeColor = DuckDuckGoTheme.colors.backgroundInverted,
+                    fillColor = DuckDuckGoTheme.colors.brand.accentBlue,
+                    strokeColor = DuckDuckGoTheme.colors.backgrounds.backgroundInverted,
                 ),
             )
         }

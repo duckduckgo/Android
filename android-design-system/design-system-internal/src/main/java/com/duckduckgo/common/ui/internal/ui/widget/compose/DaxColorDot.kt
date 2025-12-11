@@ -52,13 +52,13 @@ internal data class DaxColorDotColors(
 private fun DaxColorDotPreview() {
     DuckDuckGoTheme {
         Box(
-            modifier = Modifier.background(DuckDuckGoTheme.colors.background)
+            modifier = Modifier.background(DuckDuckGoTheme.colors.backgrounds.background)
                 .padding(16.dp),
         ) {
             DaxColorDot(
                 colors = DaxColorDotColors(
-                    fillColor = DuckDuckGoTheme.colors.accentBlue,
-                    strokeColor = DuckDuckGoTheme.colors.backgroundInverted,
+                    fillColor = DuckDuckGoTheme.colors.brand.accentBlue,
+                    strokeColor = DuckDuckGoTheme.colors.backgrounds.backgroundInverted,
                 ),
             )
         }

@@ -64,8 +64,8 @@ class ColorPaletteFragment : Fragment() {
             DaxColorAttributeListItem(
                 text = "Background",
                 dotColors = DaxColorDotColors(
-                    fillColor = DuckDuckGoTheme.colors.background,
-                    DuckDuckGoTheme.colors.backgroundInverted,
+                    fillColor = DuckDuckGoTheme.colors.backgrounds.background,
+                    DuckDuckGoTheme.colors.backgrounds.backgroundInverted,
                 ),
             )
         }
@@ -74,8 +74,8 @@ class ColorPaletteFragment : Fragment() {
             DaxColorAttributeListItem(
                 text = "Surface",
                 dotColors = DaxColorDotColors(
-                    fillColor = DuckDuckGoTheme.colors.surface,
-                    strokeColor = DuckDuckGoTheme.colors.backgroundInverted,
+                    fillColor = DuckDuckGoTheme.colors.backgrounds.surface,
+                    strokeColor = DuckDuckGoTheme.colors.backgrounds.backgroundInverted,
                 ),
             )
         }
@@ -85,8 +85,8 @@ class ColorPaletteFragment : Fragment() {
             DaxColorAttributeListItem(
                 text = "Container",
                 dotColors = DaxColorDotColors(
-                    fillColor = DuckDuckGoTheme.colors.container,
-                    strokeColor = DuckDuckGoTheme.colors.backgroundInverted,
+                    fillColor = DuckDuckGoTheme.colors.backgrounds.container,
+                    strokeColor = DuckDuckGoTheme.colors.backgrounds.backgroundInverted,
                 ),
             )
         }
@@ -96,8 +96,8 @@ class ColorPaletteFragment : Fragment() {
             DaxColorAttributeListItem(
                 text = "Destructive",
                 dotColors = DaxColorDotColors(
-                    fillColor = DuckDuckGoTheme.colors.destructive,
-                    strokeColor = DuckDuckGoTheme.colors.backgroundInverted,
+                    fillColor = DuckDuckGoTheme.colors.text.destructive,
+                    strokeColor = DuckDuckGoTheme.colors.backgrounds.backgroundInverted,
                 ),
             )
         }
@@ -107,8 +107,8 @@ class ColorPaletteFragment : Fragment() {
             DaxColorAttributeListItem(
                 text = "Container Disabled",
                 dotColors = DaxColorDotColors(
-                    fillColor = DuckDuckGoTheme.colors.containerDisabled,
-                    strokeColor = DuckDuckGoTheme.colors.backgroundInverted,
+                    fillColor = DuckDuckGoTheme.colors.backgrounds.containerDisabled,
+                    strokeColor = DuckDuckGoTheme.colors.backgrounds.backgroundInverted,
                 ),
             )
         }
@@ -118,8 +118,8 @@ class ColorPaletteFragment : Fragment() {
             DaxColorAttributeListItem(
                 text = "Lines",
                 dotColors = DaxColorDotColors(
-                    fillColor = DuckDuckGoTheme.colors.lines,
-                    strokeColor = DuckDuckGoTheme.colors.backgroundInverted,
+                    fillColor = DuckDuckGoTheme.colors.system.lines,
+                    strokeColor = DuckDuckGoTheme.colors.backgrounds.backgroundInverted,
                 ),
             )
         }
@@ -129,8 +129,8 @@ class ColorPaletteFragment : Fragment() {
             DaxColorAttributeListItem(
                 text = "Accent Blue",
                 dotColors = DaxColorDotColors(
-                    fillColor = DuckDuckGoTheme.colors.accentBlue,
-                    strokeColor = DuckDuckGoTheme.colors.backgroundInverted,
+                    fillColor = DuckDuckGoTheme.colors.brand.accentBlue,
+                    strokeColor = DuckDuckGoTheme.colors.backgrounds.backgroundInverted,
                 ),
             )
         }
@@ -140,8 +140,8 @@ class ColorPaletteFragment : Fragment() {
             DaxColorAttributeListItem(
                 text = "Accent Yellow",
                 dotColors = DaxColorDotColors(
-                    fillColor = DuckDuckGoTheme.colors.accentYellow,
-                    strokeColor = DuckDuckGoTheme.colors.backgroundInverted,
+                    fillColor = DuckDuckGoTheme.colors.brand.accentYellow,
+                    strokeColor = DuckDuckGoTheme.colors.backgrounds.backgroundInverted,
                 ),
             )
         }
@@ -152,7 +152,7 @@ class ColorPaletteFragment : Fragment() {
                 text = "Primary Text",
                 dotColors = DaxColorDotColors(
                     fillColor = DuckDuckGoTheme.textColors.primary,
-                    strokeColor = DuckDuckGoTheme.colors.backgroundInverted,
+                    strokeColor = DuckDuckGoTheme.colors.backgrounds.backgroundInverted,
                 ),
             )
         }
@@ -163,7 +163,7 @@ class ColorPaletteFragment : Fragment() {
                 text = "Secondary Text",
                 dotColors = DaxColorDotColors(
                     fillColor = DuckDuckGoTheme.textColors.secondary,
-                    strokeColor = DuckDuckGoTheme.colors.backgroundInverted,
+                    strokeColor = DuckDuckGoTheme.colors.backgrounds.backgroundInverted,
                 ),
             )
         }
@@ -174,7 +174,7 @@ class ColorPaletteFragment : Fragment() {
                 text = "Text Disabled",
                 dotColors = DaxColorDotColors(
                     fillColor = DuckDuckGoTheme.textColors.disabled,
-                    strokeColor = DuckDuckGoTheme.colors.backgroundInverted,
+                    strokeColor = DuckDuckGoTheme.colors.backgrounds.backgroundInverted,
                 ),
             )
         }
@@ -185,7 +185,7 @@ class ColorPaletteFragment : Fragment() {
                 text = "Primary Icon",
                 dotColors = DaxColorDotColors(
                     fillColor = DuckDuckGoTheme.textColors.primary,
-                    strokeColor = DuckDuckGoTheme.colors.backgroundInverted,
+                    strokeColor = DuckDuckGoTheme.colors.backgrounds.backgroundInverted,
                 ),
             )
         }
