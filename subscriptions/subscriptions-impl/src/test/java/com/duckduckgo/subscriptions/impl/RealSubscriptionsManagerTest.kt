@@ -66,6 +66,7 @@ import com.duckduckgo.subscriptions.impl.store.SubscriptionsDataStore
 import com.duckduckgo.subscriptions.impl.wideevents.AuthTokenRefreshWideEvent
 import com.duckduckgo.subscriptions.impl.wideevents.FreeTrialConversionWideEvent
 import com.duckduckgo.subscriptions.impl.wideevents.SubscriptionPurchaseWideEvent
+import com.duckduckgo.subscriptions.impl.wideevents.SubscriptionRestoreWideEvent
 import com.duckduckgo.subscriptions.impl.wideevents.SubscriptionSwitchWideEvent
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.first
@@ -127,6 +128,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
     private val tokenRefreshWideEvent: AuthTokenRefreshWideEvent = mock()
     private val subscriptionSwitchWideEvent: SubscriptionSwitchWideEvent = mock()
     private val freeTrialConversionWideEvent: FreeTrialConversionWideEvent = mock()
+    private val subscriptionRestoreWideEvent: SubscriptionRestoreWideEvent = mock()
 
     @SuppressLint("DenyListedApi")
     private val privacyProFeature: PrivacyProFeature = FakeFeatureToggleFactory.create(PrivacyProFeature::class.java)
@@ -163,6 +165,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             tokenRefreshWideEvent,
             subscriptionSwitchWideEvent,
             freeTrialConversionWideEvent,
+            subscriptionRestoreWideEvent,
         )
     }
 
@@ -609,6 +612,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             tokenRefreshWideEvent,
             subscriptionSwitchWideEvent,
             freeTrialConversionWideEvent,
+            subscriptionRestoreWideEvent,
         )
 
         manager.subscriptionStatus.test {
@@ -642,6 +646,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             tokenRefreshWideEvent,
             subscriptionSwitchWideEvent,
             freeTrialConversionWideEvent,
+            subscriptionRestoreWideEvent,
         )
 
         manager.subscriptionStatus.test {
@@ -679,6 +684,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             tokenRefreshWideEvent,
             subscriptionSwitchWideEvent,
             freeTrialConversionWideEvent,
+            subscriptionRestoreWideEvent,
         )
 
         manager.currentPurchaseState.test {
@@ -730,6 +736,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             tokenRefreshWideEvent,
             subscriptionSwitchWideEvent,
             freeTrialConversionWideEvent,
+            subscriptionRestoreWideEvent,
         )
 
         manager.currentPurchaseState.test {
@@ -771,6 +778,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             tokenRefreshWideEvent,
             subscriptionSwitchWideEvent,
             freeTrialConversionWideEvent,
+            subscriptionRestoreWideEvent,
         )
 
         manager.currentPurchaseState.test {
@@ -1125,6 +1133,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             tokenRefreshWideEvent,
             subscriptionSwitchWideEvent,
             freeTrialConversionWideEvent,
+            subscriptionRestoreWideEvent,
         )
         manager.signOut()
         verify(mockRepo).setSubscription(null)
@@ -1175,6 +1184,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             tokenRefreshWideEvent,
             subscriptionSwitchWideEvent,
             freeTrialConversionWideEvent,
+            subscriptionRestoreWideEvent,
         )
 
         manager.subscriptionStatus.test {
@@ -1361,6 +1371,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             tokenRefreshWideEvent,
             subscriptionSwitchWideEvent,
             freeTrialConversionWideEvent,
+            subscriptionRestoreWideEvent,
         )
 
         assertFalse(subscriptionsManager.canSupportEncryption())

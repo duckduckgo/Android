@@ -25,7 +25,6 @@ import com.duckduckgo.app.statistics.api.PixelSender.SendPixelResult
 import com.duckduckgo.app.statistics.api.PixelSender.SendPixelResult.PIXEL_SENT
 import com.duckduckgo.app.statistics.api.StatisticsService
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
-import com.duckduckgo.app.statistics.pixels.AtbInitializationPluginPixelSender
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
@@ -118,9 +117,9 @@ class StubStatisticsModule {
         statisticsUpdater: StatisticsUpdater,
         listeners: PluginPoint<AtbInitializerListener>,
         dispatcherProvider: DispatcherProvider,
-        pixelSender: AtbInitializationPluginPixelSender,
+        pixel: Pixel,
     ): MainProcessLifecycleObserver {
-        return AtbInitializer(appCoroutineScope, statisticsDataStore, statisticsUpdater, listeners, dispatcherProvider, pixelSender)
+        return AtbInitializer(appCoroutineScope, statisticsDataStore, statisticsUpdater, listeners, dispatcherProvider, pixel)
     }
 
     @Provides

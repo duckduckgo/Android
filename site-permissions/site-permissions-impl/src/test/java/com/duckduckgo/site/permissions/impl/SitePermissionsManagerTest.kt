@@ -16,13 +16,18 @@
 
 package com.duckduckgo.site.permissions.impl
 
+import android.annotation.SuppressLint
+import android.content.Context
 import android.content.pm.PackageManager
 import android.location.LocationManager
 import android.webkit.PermissionRequest
 import androidx.core.net.toUri
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissionQueryResponse
+import com.duckduckgo.site.permissions.impl.feature.MicrophoneSitePermissionsDomainRecoveryFeature
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionsEntity
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
@@ -36,6 +41,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
+@SuppressLint("DenyListedApi")
 @RunWith(AndroidJUnit4::class)
 class SitePermissionsManagerTest {
 
@@ -45,12 +51,18 @@ class SitePermissionsManagerTest {
     private val mockSitePermissionsRepository: SitePermissionsRepository = mock()
     private val mockPackageManager = mock<PackageManager>()
     private val mockLocationManager = mock<LocationManager>()
+    private val mockContext = mock<Context>()
+    private val fakeMicrophoneSitePermissionsDomainRecoveryFeature = FakeFeatureToggleFactory.create(
+        MicrophoneSitePermissionsDomainRecoveryFeature::class.java,
+    )
 
     private val testee = SitePermissionsManagerImpl(
         mockPackageManager,
         mockLocationManager,
         mockSitePermissionsRepository,
         coroutineRule.testDispatcherProvider,
+        mockContext,
+        fakeMicrophoneSitePermissionsDomainRecoveryFeature,
     )
 
     private val url = "https://domain.com/whatever"
@@ -59,6 +71,7 @@ class SitePermissionsManagerTest {
     @Before
     fun before() {
         whenever(mockPackageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)).thenReturn(true)
+        fakeMicrophoneSitePermissionsDomainRecoveryFeature.self().setRawStoredState(Toggle.State(false))
     }
 
     @Test

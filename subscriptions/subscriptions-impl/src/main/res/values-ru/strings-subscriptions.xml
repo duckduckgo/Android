@@ -160,10 +160,6 @@
     <string name="feedbackSubmitVpnDisclaimer">"Помимо указанных выше данных, вместе с отзывом отправляется следующая обезличенная информация:\n\n• сведения о том, были ли активированы те или иные функции браузера;\n• обобщенные результаты диагностики приложений (например, коды ошибок).\n\nНажимая кнопку «Отправить», вы разрешаете DuckDuckGo использовать отправленную информацию для улучшения работы приложения."</string>
     <string name="feedbackSubmitVpnSubmit">Подтвердить</string>
     <string name="feedbackSubmitCompletedMessage">Спасибо! Ваш отзыв отправлен.</string>
-    <string name="feedbackSubmitFailedMessage">Что-то пошло не так</string>
-
-    <string name="feedbackSubmitEmailByLine">Укажите адрес эл. почты, если вы хотите, чтобы мы связались с вами по этому вопросу (мы отвечаем не во всех случаях):</string>
-    <string name="feedbackSubmitEmailHint">Электронная почта (необязательно)</string>
 
     <string name="feedbackSubmitGeneralDescriptionHint">Оставьте комментарий здесь...</string>
     <string name="feedbackSubmitFeatureRequestDescriptionHint">Какую функцию вы хотели бы увидеть?</string>

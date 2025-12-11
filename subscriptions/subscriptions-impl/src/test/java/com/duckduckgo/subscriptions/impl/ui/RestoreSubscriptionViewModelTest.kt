@@ -19,6 +19,7 @@ import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.Command
 import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.Command.RestoreFromEmail
 import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.Command.SubscriptionNotFound
 import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.Command.Success
+import com.duckduckgo.subscriptions.impl.wideevents.SubscriptionRestoreWideEvent
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
@@ -39,6 +40,7 @@ class RestoreSubscriptionViewModelTest {
     private val pixelSender: SubscriptionPixelSender = mock()
     private val subscriptionsChecker: SubscriptionsChecker = mock()
     private val authClient: AuthClient = mock()
+    private val subscriptionRestoreWideEvent: SubscriptionRestoreWideEvent = mock()
     private lateinit var viewModel: RestoreSubscriptionViewModel
 
     @Before
@@ -50,6 +52,7 @@ class RestoreSubscriptionViewModelTest {
             subscriptionsChecker = subscriptionsChecker,
             authClient = authClient,
             appCoroutineScope = coroutineTestRule.testScope,
+            subscriptionRestoreWideEvent = subscriptionRestoreWideEvent,
         )
     }
 
