@@ -67,11 +67,11 @@ class DuckDuckGoUriLoadedManager @Inject constructor(
         }
 
         if (isDuckDuckGoUrl) {
-            pixel.fire(AppPixelName.SERP_LOADED)
-            pixel.fire(AppPixelName.SERP_LOADED_DAILY, type = Pixel.PixelType.Daily())
+            pixel.fire(AppPixelName.PRODUCT_TELEMETRY_SURFACE_SERP_LOADED)
+            pixel.fire(AppPixelName.PRODUCT_TELEMETRY_SURFACE_SERP_LOADED_DAILY, type = Pixel.PixelType.Daily())
         } else {
-            pixel.fire(AppPixelName.WEBSITE_LOADED)
-            pixel.fire(AppPixelName.WEBSITE_LOADED_DAILY, type = Pixel.PixelType.Daily())
+            pixel.fire(AppPixelName.PRODUCT_TELEMETRY_SURFACE_WEBSITE_LOADED)
+            pixel.fire(AppPixelName.PRODUCT_TELEMETRY_SURFACE_WEBSITE_LOADED_DAILY, type = Pixel.PixelType.Daily())
         }
     }
 

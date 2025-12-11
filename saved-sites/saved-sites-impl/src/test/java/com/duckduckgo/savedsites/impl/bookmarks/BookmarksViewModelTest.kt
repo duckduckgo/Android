@@ -149,6 +149,8 @@ class BookmarksViewModelTest {
             parameters = mapOf(SavedSitesPixelParameters.SORT_MODE to bookmarksDataStore.getSortingMode().name),
             type = Daily(),
         )
+        verify(pixel).fire(SavedSitesPixelName.PRODUCT_TELEMETRY_SURFACE_BOOKMARKS_OPENED.pixelName)
+        verify(pixel).fire(SavedSitesPixelName.PRODUCT_TELEMETRY_SURFACE_BOOKMARKS_OPENED_DAILY.pixelName, type = Daily())
     }
 
     @Test

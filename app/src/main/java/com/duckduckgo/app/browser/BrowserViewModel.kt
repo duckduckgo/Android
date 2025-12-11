@@ -512,8 +512,8 @@ class BrowserViewModel @Inject constructor(
     }
 
     fun sendPixelEventForLandscapeOrientation() {
-        pixel.fire(AppPixelName.LANDSCAPE_ORIENTATION_USED)
-        pixel.fire(AppPixelName.LANDSCAPE_ORIENTATION_USED_DAILY, type = Daily())
+        pixel.fire(AppPixelName.PRODUCT_TELEMETRY_SURFACE_LANDSCAPE_ORIENTATION_USED)
+        pixel.fire(AppPixelName.PRODUCT_TELEMETRY_SURFACE_LANDSCAPE_ORIENTATION_USED_DAILY, type = Daily())
     }
 }
 

@@ -145,6 +145,11 @@ class BookmarksViewModel @Inject constructor(
             parameters = mapOf(SavedSitesPixelParameters.SORT_MODE to bookmarksDataStore.getSortingMode().name),
             type = Daily(),
         )
+        pixel.fire(SavedSitesPixelName.PRODUCT_TELEMETRY_SURFACE_BOOKMARKS_OPENED.pixelName)
+        pixel.fire(
+            SavedSitesPixelName.PRODUCT_TELEMETRY_SURFACE_BOOKMARKS_OPENED_DAILY.pixelName,
+            type = Daily(),
+        )
     }
 
     override fun onFavouriteEdited(favorite: Favorite) {

@@ -141,7 +141,8 @@ class SettingsViewModelTest {
     fun `when ViewModel initialised then pixel is fired`() {
         testee // init
         verify(pixelMock).fire(AppPixelName.SETTINGS_OPENED)
-        verify(pixelMock).fire(AppPixelName.SETTINGS_OPENED_DAILY, type = Pixel.PixelType.Daily())
+        verify(pixelMock).fire(AppPixelName.PRODUCT_TELEMETRY_SURFACE_SETTINGS_OPENED)
+        verify(pixelMock).fire(AppPixelName.PRODUCT_TELEMETRY_SURFACE_SETTINGS_OPENED_DAILY, type = Pixel.PixelType.Daily())
     }
 
     @Test

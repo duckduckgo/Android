@@ -114,7 +114,10 @@ class EnqueuedPixelWorker @Inject constructor(
             parameters = parameters,
         )
         pixel.get().fire(
-            pixel = AppPixelName.APP_LAUNCH_DAILY,
+            pixel = AppPixelName.PRODUCT_TELEMETRY_SURFACE_DAU,
+        )
+        pixel.get().fire(
+            pixel = AppPixelName.PRODUCT_TELEMETRY_SURFACE_DAU_DAILY,
             type = Pixel.PixelType.Daily(),
         )
 

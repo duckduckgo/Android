@@ -105,8 +105,9 @@ class EnqueuedPixelWorkerTest {
         enqueuedPixelWorker.onStart(lifecycleOwner)
 
         verify(pixel, never()).fire(AppPixelName.APP_LAUNCH)
+        verify(pixel, never()).fire(AppPixelName.PRODUCT_TELEMETRY_SURFACE_DAU)
         verify(pixel, never()).fire(
-            pixel = eq(AppPixelName.APP_LAUNCH_DAILY),
+            pixel = eq(AppPixelName.PRODUCT_TELEMETRY_SURFACE_DAU_DAILY),
             type = eq(Pixel.PixelType.Daily()),
             parameters = any(),
             encodedParameters = any(),
@@ -130,7 +131,8 @@ class EnqueuedPixelWorkerTest {
                 Pixel.PixelParameter.IS_DUCKDUCKGO_PACKAGE to "false",
             ),
         )
-        verify(pixel).fire(AppPixelName.APP_LAUNCH_DAILY, type = Pixel.PixelType.Daily())
+        verify(pixel).fire(AppPixelName.PRODUCT_TELEMETRY_SURFACE_DAU)
+        verify(pixel).fire(AppPixelName.PRODUCT_TELEMETRY_SURFACE_DAU_DAILY, type = Pixel.PixelType.Daily())
     }
 
     @Test

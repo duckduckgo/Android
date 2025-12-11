@@ -94,11 +94,11 @@ class DuckDuckGoUriLoadedManagerTest {
         initialize()
         testee.sendUriLoadedPixels(isDuckDuckGoUrl = true)
 
-        verify(mockPixel).fire(AppPixelName.SERP_LOADED)
-        verify(mockPixel).fire(AppPixelName.SERP_LOADED_DAILY, type = Pixel.PixelType.Daily())
-        verify(mockPixel, never()).fire(AppPixelName.WEBSITE_LOADED)
+        verify(mockPixel).fire(AppPixelName.PRODUCT_TELEMETRY_SURFACE_SERP_LOADED)
+        verify(mockPixel).fire(AppPixelName.PRODUCT_TELEMETRY_SURFACE_SERP_LOADED_DAILY, type = Pixel.PixelType.Daily())
+        verify(mockPixel, never()).fire(AppPixelName.PRODUCT_TELEMETRY_SURFACE_WEBSITE_LOADED)
         verify(mockPixel, never()).fire(
-            pixel = eq(AppPixelName.WEBSITE_LOADED_DAILY),
+            pixel = eq(AppPixelName.PRODUCT_TELEMETRY_SURFACE_WEBSITE_LOADED_DAILY),
             parameters = any(),
             encodedParameters = any(),
             type = any(),
@@ -112,11 +112,11 @@ class DuckDuckGoUriLoadedManagerTest {
         initialize()
         testee.sendUriLoadedPixels(isDuckDuckGoUrl = false)
 
-        verify(mockPixel).fire(AppPixelName.WEBSITE_LOADED)
-        verify(mockPixel).fire(AppPixelName.WEBSITE_LOADED_DAILY, type = Pixel.PixelType.Daily())
-        verify(mockPixel, never()).fire(AppPixelName.SERP_LOADED)
+        verify(mockPixel).fire(AppPixelName.PRODUCT_TELEMETRY_SURFACE_WEBSITE_LOADED)
+        verify(mockPixel).fire(AppPixelName.PRODUCT_TELEMETRY_SURFACE_WEBSITE_LOADED_DAILY, type = Pixel.PixelType.Daily())
+        verify(mockPixel, never()).fire(AppPixelName.PRODUCT_TELEMETRY_SURFACE_SERP_LOADED)
         verify(mockPixel, never()).fire(
-            pixel = eq(AppPixelName.SERP_LOADED_DAILY),
+            pixel = eq(AppPixelName.PRODUCT_TELEMETRY_SURFACE_SERP_LOADED_DAILY),
             parameters = any(),
             encodedParameters = any(),
             type = any(),

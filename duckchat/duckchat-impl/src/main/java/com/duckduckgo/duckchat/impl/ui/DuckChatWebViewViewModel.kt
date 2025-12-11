@@ -71,8 +71,8 @@ class DuckChatWebViewViewModel @Inject constructor(
     }
 
     fun sendKeyboardFocusedPixel() {
-        pixel.fire(DuckChatPixelName.KEYBOARD_USAGE)
-        pixel.fire(DuckChatPixelName.KEYBOARD_USAGE_DAILY, type = Daily())
+        pixel.fire(DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_KEYBOARD_USAGE)
+        pixel.fire(DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_KEYBOARD_USAGE_DAILY, type = Daily())
     }
 
     private fun observeSubscriptionChanges() {

@@ -216,7 +216,7 @@ class DuckChatWebViewViewModelTest {
     fun whenSendKeyboardFocusedPixelThenFireBothKeyboardUsagePixels() = runTest {
         viewModel.sendKeyboardFocusedPixel()
 
-        verify(mockPixel).fire(DuckChatPixelName.KEYBOARD_USAGE)
-        verify(mockPixel).fire(DuckChatPixelName.KEYBOARD_USAGE_DAILY, type = Daily())
+        verify(mockPixel).fire(DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_KEYBOARD_USAGE)
+        verify(mockPixel).fire(DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_KEYBOARD_USAGE_DAILY, type = Daily())
     }
 }

@@ -695,8 +695,8 @@ class BrowserViewModelTest {
     fun whenSendPixelEventForLandscapeOrientationThenPixelsAreFired() = runTest {
         testee.sendPixelEventForLandscapeOrientation()
 
-        verify(mockPixel).fire(AppPixelName.LANDSCAPE_ORIENTATION_USED)
-        verify(mockPixel).fire(AppPixelName.LANDSCAPE_ORIENTATION_USED_DAILY, type = Daily())
+        verify(mockPixel).fire(AppPixelName.PRODUCT_TELEMETRY_SURFACE_LANDSCAPE_ORIENTATION_USED)
+        verify(mockPixel).fire(AppPixelName.PRODUCT_TELEMETRY_SURFACE_LANDSCAPE_ORIENTATION_USED_DAILY, type = Daily())
     }
 
     companion object {

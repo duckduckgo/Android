@@ -29,8 +29,6 @@ import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_SELECT_FIRST_HISTORY_I
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_SUBMIT_FIRST_PROMPT
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_SUBMIT_PROMPT
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_TAP_KEYBOARD_RETURN_KEY
-import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.AUTOCOMPLETE_DISPLAYED
-import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.AUTOCOMPLETE_DISPLAYED_DAILY
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_ADDRESS_BAR_IS_ENABLED_DAILY
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_BROWSER_MENU_IS_ENABLED_DAILY
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_DUCK_AI_SETTINGS_TAPPED
@@ -78,7 +76,6 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_NEW_ADDRES
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_NOT_NOW
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_OPEN
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_OPEN_BROWSER_MENU
-import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_OPEN_DAILY
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_OPEN_HISTORY
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_OPEN_MOST_RECENT_HISTORY_CHAT
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_OPEN_NEW_TAB_MENU
@@ -98,8 +95,12 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_START_NEW_
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_TAB_SWITCHER_OPENED
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_USER_DISABLED
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_USER_ENABLED
-import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.KEYBOARD_USAGE
-import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.KEYBOARD_USAGE_DAILY
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_AUTOCOMPLETE_DISPLAYED
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_AUTOCOMPLETE_DISPLAYED_DAILY
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_DUCK_AI_OPEN
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_DUCK_AI_OPEN_DAILY
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_KEYBOARD_USAGE
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_KEYBOARD_USAGE_DAILY
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.SERP_SETTINGS_OPEN_HIDE_AI_GENERATED_IMAGES
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
 import com.squareup.anvil.annotations.ContributesBinding
@@ -143,10 +144,7 @@ class RealDuckChatPixels @Inject constructor(
 }
 
 enum class DuckChatPixelName(override val pixelName: String) : Pixel.PixelName {
-    AUTOCOMPLETE_DISPLAYED("m_product_telemetry_surface_usage_autocomplete"),
-    AUTOCOMPLETE_DISPLAYED_DAILY("m_product_telemetry_surface_usage_autocomplete_daily"),
     DUCK_CHAT_OPEN("aichat_open"),
-    DUCK_CHAT_OPEN_DAILY("aichat_open_daily"),
     DUCK_CHAT_OPEN_BROWSER_MENU("aichat_open_browser_menu"),
     DUCK_CHAT_OPEN_NEW_TAB_MENU("aichat_open_new_tab_menu"),
     DUCK_CHAT_OPEN_TAB_SWITCHER_FAB("aichat_open_tab_switcher_fab"),
@@ -219,8 +217,12 @@ enum class DuckChatPixelName(override val pixelName: String) : Pixel.PixelName {
     DUCK_CHAT_DUCK_AI_SETTINGS_TAPPED("m_aichat_settings_menu_aichat_settings_tapped"),
     DUCK_CHAT_TAB_SWITCHER_OPENED("m_aichat_tab_switcher_opened"),
     DUCK_CHAT_FIRE_BUTTON_TAPPED("m_aichat_fire_button_tapped"),
-    KEYBOARD_USAGE("m_product_telemetry_surface_usage_keyboard_active"),
-    KEYBOARD_USAGE_DAILY("m_product_telemetry_surface_usage_keyboard_active_daily"),
+    PRODUCT_TELEMETRY_SURFACE_AUTOCOMPLETE_DISPLAYED("m_product_telemetry_surface_usage_autocomplete"),
+    PRODUCT_TELEMETRY_SURFACE_AUTOCOMPLETE_DISPLAYED_DAILY("m_product_telemetry_surface_usage_autocomplete_daily"),
+    PRODUCT_TELEMETRY_SURFACE_DUCK_AI_OPEN("m_product_telemetry_surface_usage_duck_ai"),
+    PRODUCT_TELEMETRY_SURFACE_DUCK_AI_OPEN_DAILY("m_product_telemetry_surface_usage_duck_ai_daily"),
+    PRODUCT_TELEMETRY_SURFACE_KEYBOARD_USAGE("m_product_telemetry_surface_usage_keyboard_active"),
+    PRODUCT_TELEMETRY_SURFACE_KEYBOARD_USAGE_DAILY("m_product_telemetry_surface_usage_keyboard_active_daily"),
 }
 
 object DuckChatPixelParameters {
@@ -235,10 +237,7 @@ object DuckChatPixelParameters {
 class DuckChatParamRemovalPlugin @Inject constructor() : PixelParamRemovalPlugin {
     override fun names(): List<Pair<String, Set<PixelParameter>>> {
         return listOf(
-            AUTOCOMPLETE_DISPLAYED.pixelName to PixelParameter.removeAtb(),
-            AUTOCOMPLETE_DISPLAYED_DAILY.pixelName to PixelParameter.removeAtb(),
             DUCK_CHAT_OPEN.pixelName to PixelParameter.removeAtb(),
-            DUCK_CHAT_OPEN_DAILY.pixelName to PixelParameter.removeAtb(),
             DUCK_CHAT_OPEN_BROWSER_MENU.pixelName to PixelParameter.removeAtb(),
             DUCK_CHAT_OPEN_NEW_TAB_MENU.pixelName to PixelParameter.removeAtb(),
             DUCK_CHAT_OPEN_TAB_SWITCHER_FAB.pixelName to PixelParameter.removeAtb(),
@@ -304,8 +303,12 @@ class DuckChatParamRemovalPlugin @Inject constructor() : PixelParamRemovalPlugin
             DUCK_CHAT_DUCK_AI_SETTINGS_TAPPED.pixelName to PixelParameter.removeAtb(),
             DUCK_CHAT_TAB_SWITCHER_OPENED.pixelName to PixelParameter.removeAtb(),
             DUCK_CHAT_FIRE_BUTTON_TAPPED.pixelName to PixelParameter.removeAtb(),
-            KEYBOARD_USAGE.pixelName to PixelParameter.removeAtb(),
-            KEYBOARD_USAGE_DAILY.pixelName to PixelParameter.removeAtb(),
+            PRODUCT_TELEMETRY_SURFACE_AUTOCOMPLETE_DISPLAYED.pixelName to PixelParameter.removeAtb(),
+            PRODUCT_TELEMETRY_SURFACE_AUTOCOMPLETE_DISPLAYED_DAILY.pixelName to PixelParameter.removeAtb(),
+            PRODUCT_TELEMETRY_SURFACE_DUCK_AI_OPEN.pixelName to PixelParameter.removeAtb(),
+            PRODUCT_TELEMETRY_SURFACE_DUCK_AI_OPEN_DAILY.pixelName to PixelParameter.removeAtb(),
+            PRODUCT_TELEMETRY_SURFACE_KEYBOARD_USAGE.pixelName to PixelParameter.removeAtb(),
+            PRODUCT_TELEMETRY_SURFACE_KEYBOARD_USAGE_DAILY.pixelName to PixelParameter.removeAtb(),
         )
     }
 }

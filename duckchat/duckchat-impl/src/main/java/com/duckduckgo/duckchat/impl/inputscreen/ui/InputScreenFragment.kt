@@ -557,7 +557,7 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
 
     private fun configureKeyboardListener() {
         binding.root.rootView.keyboardVisibilityFlow()
-            .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+            .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
             .distinctUntilChanged()
             .onEach { isVisible ->
                 if (isVisible) {

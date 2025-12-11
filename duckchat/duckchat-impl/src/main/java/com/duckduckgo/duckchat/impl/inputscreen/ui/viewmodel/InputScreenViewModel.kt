@@ -605,8 +605,8 @@ class InputScreenViewModel @AssistedInject constructor(
     }
 
     fun sendKeyboardFocusedPixel() {
-        pixel.fire(DuckChatPixelName.KEYBOARD_USAGE)
-        pixel.fire(DuckChatPixelName.KEYBOARD_USAGE_DAILY, type = Daily())
+        pixel.fire(DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_KEYBOARD_USAGE)
+        pixel.fire(DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_KEYBOARD_USAGE_DAILY, type = Daily())
     }
     private fun fireModeSwitchedPixel(directionToSearch: Boolean) {
         val hadText =
@@ -630,8 +630,8 @@ class InputScreenViewModel @AssistedInject constructor(
 
     private fun fireAutocompletePixels(showAutocomplete: Boolean) {
         if (showAutocomplete) {
-            pixel.fire(DuckChatPixelName.AUTOCOMPLETE_DISPLAYED)
-            pixel.fire(DuckChatPixelName.AUTOCOMPLETE_DISPLAYED_DAILY, type = Daily())
+            pixel.fire(DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_AUTOCOMPLETE_DISPLAYED)
+            pixel.fire(DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_AUTOCOMPLETE_DISPLAYED_DAILY, type = Daily())
         }
     }
 

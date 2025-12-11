@@ -41,6 +41,7 @@ import com.duckduckgo.app.global.view.FireDialog.FireDialogClearAllEvent.ClearAl
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.FIRE_DIALOG_ANIMATION
 import com.duckduckgo.app.pixels.AppPixelName.FIRE_DIALOG_CLEAR_PRESSED
+import com.duckduckgo.app.pixels.AppPixelName.PRODUCT_TELEMETRY_SURFACE_DATA_CLEARING
 import com.duckduckgo.app.settings.clear.getPixelValue
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -158,6 +159,7 @@ class FireDialog(
     private fun onClearOptionClicked() {
         trySendDailyClearOptionClicked()
         pixel.enqueueFire(FIRE_DIALOG_CLEAR_PRESSED)
+        pixel.enqueueFire(PRODUCT_TELEMETRY_SURFACE_DATA_CLEARING)
         pixel.enqueueFire(
             pixel = FIRE_DIALOG_ANIMATION,
             parameters = mapOf(FIRE_ANIMATION to settingsDataStore.selectedFireAnimation.getPixelValue()),
@@ -235,7 +237,7 @@ class FireDialog(
 
         if (timestamp == null || now > timestamp) {
             fireButtonStore.storeLastFireButtonClearEventTime(now)
-            pixel.enqueueFire(AppPixelName.FIRE_DIALOG_CLEAR_PRESSED_DAILY)
+            pixel.enqueueFire(AppPixelName.PRODUCT_TELEMETRY_SURFACE_DATA_CLEARING_DAILY)
         }
     }
 

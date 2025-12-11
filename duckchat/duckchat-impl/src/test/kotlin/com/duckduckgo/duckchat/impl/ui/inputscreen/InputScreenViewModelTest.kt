@@ -149,8 +149,8 @@ class InputScreenViewModelTest {
         runTest {
             createViewModel("search query")
 
-            verify(pixel).fire(DuckChatPixelName.AUTOCOMPLETE_DISPLAYED)
-            verify(pixel).fire(DuckChatPixelName.AUTOCOMPLETE_DISPLAYED_DAILY, type = Daily())
+            verify(pixel).fire(DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_AUTOCOMPLETE_DISPLAYED)
+            verify(pixel).fire(DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_AUTOCOMPLETE_DISPLAYED_DAILY, type = Daily())
         }
 
     @Test
@@ -2042,7 +2042,7 @@ class InputScreenViewModelTest {
 
             viewModel.sendKeyboardFocusedPixel()
 
-            verify(pixel).fire(DuckChatPixelName.KEYBOARD_USAGE)
-            verify(pixel).fire(DuckChatPixelName.KEYBOARD_USAGE_DAILY, type = Daily())
+            verify(pixel).fire(DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_KEYBOARD_USAGE)
+            verify(pixel).fire(DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_KEYBOARD_USAGE_DAILY, type = Daily())
         }
 }

@@ -30,6 +30,8 @@ import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin.PixelPa
 import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin.PixelParameter.APP_VERSION
 import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin.PixelParameter.ATB
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.newtabpage.impl.pixels.NewTabPixelNames
+import com.duckduckgo.savedsites.impl.SavedSitesPixelName
 import com.duckduckgo.site.permissions.impl.SitePermissionsPixelName
 import com.squareup.anvil.annotations.ContributesMultibinding
 import okhttp3.Interceptor
@@ -125,16 +127,26 @@ object PixelInterceptorPixelsRequiringDataCleaning : PixelParamRemovalPlugin {
             AppPixelName.SEARCH_WIDGET_DELETED.pixelName to PixelParameter.removeAtb(),
             AppPixelName.SETTINGS_APPEARANCE_IS_TRACKER_COUNT_IN_TAB_SWITCHER_TOGGLED.pixelName to PixelParameter.removeAll(),
             AppPixelName.TIMEOUT_WAITING_FOR_APP_REFERRER.pixelName to PixelParameter.removeAtb(),
-            AppPixelName.LANDSCAPE_ORIENTATION_USED.pixelName to PixelParameter.removeAtb(),
-            AppPixelName.LANDSCAPE_ORIENTATION_USED_DAILY.pixelName to PixelParameter.removeAtb(),
-            AppPixelName.SERP_LOADED.pixelName to PixelParameter.removeAtb(),
-            AppPixelName.SERP_LOADED_DAILY.pixelName to PixelParameter.removeAtb(),
-            AppPixelName.WEBSITE_LOADED.pixelName to PixelParameter.removeAtb(),
-            AppPixelName.WEBSITE_LOADED_DAILY.pixelName to PixelParameter.removeAtb(),
-            AppPixelName.FIRE_DIALOG_CLEAR_PRESSED_DAILY.pixelName to PixelParameter.removeAtb(),
-            AppPixelName.MENU_ACTION_POPUP_OPENED_DAILY.pixelName to PixelParameter.removeAtb(),
-            AppPixelName.SETTINGS_OPENED_DAILY.pixelName to PixelParameter.removeAtb(),
-            AppPixelName.APP_LAUNCH_DAILY.pixelName to PixelParameter.removeAtb(),
+            AppPixelName.PRODUCT_TELEMETRY_SURFACE_LANDSCAPE_ORIENTATION_USED.pixelName to PixelParameter.removeAtb(),
+            AppPixelName.PRODUCT_TELEMETRY_SURFACE_LANDSCAPE_ORIENTATION_USED_DAILY.pixelName to PixelParameter.removeAtb(),
+            AppPixelName.PRODUCT_TELEMETRY_SURFACE_SERP_LOADED.pixelName to PixelParameter.removeAtb(),
+            AppPixelName.PRODUCT_TELEMETRY_SURFACE_SERP_LOADED_DAILY.pixelName to PixelParameter.removeAtb(),
+            AppPixelName.PRODUCT_TELEMETRY_SURFACE_WEBSITE_LOADED.pixelName to PixelParameter.removeAtb(),
+            AppPixelName.PRODUCT_TELEMETRY_SURFACE_WEBSITE_LOADED_DAILY.pixelName to PixelParameter.removeAtb(),
+            AppPixelName.PRODUCT_TELEMETRY_SURFACE_TAB_MANAGER_CLICKED.pixelName to PixelParameter.removeAtb(),
+            AppPixelName.PRODUCT_TELEMETRY_SURFACE_TAB_MANAGER_CLICKED_DAILY.pixelName to PixelParameter.removeAtb(),
+            AppPixelName.PRODUCT_TELEMETRY_SURFACE_DATA_CLEARING.pixelName to PixelParameter.removeAtb(),
+            AppPixelName.PRODUCT_TELEMETRY_SURFACE_DATA_CLEARING_DAILY.pixelName to PixelParameter.removeAtb(),
+            AppPixelName.PRODUCT_TELEMETRY_SURFACE_MENU_OPENED.pixelName to PixelParameter.removeAtb(),
+            AppPixelName.PRODUCT_TELEMETRY_SURFACE_MENU_OPENED_DAILY.pixelName to PixelParameter.removeAtb(),
+            AppPixelName.PRODUCT_TELEMETRY_SURFACE_SETTINGS_OPENED.pixelName to PixelParameter.removeAtb(),
+            AppPixelName.PRODUCT_TELEMETRY_SURFACE_SETTINGS_OPENED_DAILY.pixelName to PixelParameter.removeAtb(),
+            AppPixelName.PRODUCT_TELEMETRY_SURFACE_DAU.pixelName to PixelParameter.removeAtb(),
+            AppPixelName.PRODUCT_TELEMETRY_SURFACE_DAU_DAILY.pixelName to PixelParameter.removeAtb(),
+            NewTabPixelNames.PRODUCT_SURFACE_TELEMETRY_NEW_TAB_DISPLAYED.pixelName to PixelParameter.removeAtb(),
+            NewTabPixelNames.PRODUCT_SURFACE_TELEMETRY_NEW_TAB_DISPLAYED_DAILY.pixelName to PixelParameter.removeAtb(),
+            SavedSitesPixelName.PRODUCT_TELEMETRY_SURFACE_BOOKMARKS_OPENED.pixelName to PixelParameter.removeAtb(),
+            SavedSitesPixelName.PRODUCT_TELEMETRY_SURFACE_BOOKMARKS_OPENED_DAILY.pixelName to PixelParameter.removeAtb(),
         )
     }
 }

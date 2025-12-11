@@ -1804,8 +1804,8 @@ class BrowserTabViewModelTest {
         delay(500)
         testee.autoCompleteSuggestionsGone()
 
-        verify(mockPixel).fire(DuckChatPixelName.AUTOCOMPLETE_DISPLAYED)
-        verify(mockPixel).fire(DuckChatPixelName.AUTOCOMPLETE_DISPLAYED_DAILY, type = Daily())
+        verify(mockPixel).fire(DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_AUTOCOMPLETE_DISPLAYED)
+        verify(mockPixel).fire(DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_AUTOCOMPLETE_DISPLAYED_DAILY, type = Daily())
     }
 
     @Test
@@ -1816,9 +1816,9 @@ class BrowserTabViewModelTest {
         testee.autoCompleteStateFlow.value = "query"
         testee.autoCompleteSuggestionsGone()
 
-        verify(mockPixel, never()).fire(DuckChatPixelName.AUTOCOMPLETE_DISPLAYED)
+        verify(mockPixel, never()).fire(DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_AUTOCOMPLETE_DISPLAYED)
         verify(mockPixel, never()).fire(
-            pixel = eq(DuckChatPixelName.AUTOCOMPLETE_DISPLAYED_DAILY),
+            pixel = eq(DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_AUTOCOMPLETE_DISPLAYED_DAILY),
             parameters = any(),
             encodedParameters = any(),
             type = any(),
@@ -6216,6 +6216,8 @@ class BrowserTabViewModelTest {
             assertCommandIssued<Command.LaunchTabSwitcher>()
             verify(mockPixel).fire(AppPixelName.TAB_MANAGER_CLICKED)
             verify(mockPixel).fire(AppPixelName.TAB_MANAGER_CLICKED_DAILY, params, emptyMap(), Daily())
+            verify(mockPixel).fire(AppPixelName.PRODUCT_TELEMETRY_SURFACE_TAB_MANAGER_CLICKED)
+            verify(mockPixel).fire(AppPixelName.PRODUCT_TELEMETRY_SURFACE_TAB_MANAGER_CLICKED_DAILY, type = Daily())
         }
 
     @Test
@@ -6248,6 +6250,8 @@ class BrowserTabViewModelTest {
             verify(mockPixel).fire(AppPixelName.TAB_MANAGER_CLICKED)
             verify(mockPixel).fire(AppPixelName.TAB_MANAGER_CLICKED_DAILY, params, emptyMap(), Daily())
             verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_TAB_SWITCHER_OPENED)
+            verify(mockPixel).fire(AppPixelName.PRODUCT_TELEMETRY_SURFACE_TAB_MANAGER_CLICKED)
+            verify(mockPixel).fire(AppPixelName.PRODUCT_TELEMETRY_SURFACE_TAB_MANAGER_CLICKED_DAILY, type = Daily())
         }
 
     @Test
@@ -8397,7 +8401,7 @@ class BrowserTabViewModelTest {
     fun whenSendKeyboardFocusedPixelThenFireBothKeyboardUsagePixels() = runTest {
         testee.sendKeyboardFocusedPixel()
 
-        verify(mockPixel).fire(DuckChatPixelName.KEYBOARD_USAGE)
-        verify(mockPixel).fire(DuckChatPixelName.KEYBOARD_USAGE_DAILY, type = Daily())
+        verify(mockPixel).fire(DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_KEYBOARD_USAGE)
+        verify(mockPixel).fire(DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_KEYBOARD_USAGE_DAILY, type = Daily())
     }
 }

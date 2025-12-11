@@ -757,7 +757,8 @@ class AutofillSettingsActivityScreenViewModelTest {
         testee.sendLaunchPixel(BrowserSnackbar)
         val expectedParams = mapOf("source" to "browser_snackbar", "has_credentials_saved" to "0")
         verify(pixel).fire(eq(AUTOFILL_MANAGEMENT_SCREEN_OPENED), eq(expectedParams), any(), eq(Count))
-        verify(pixel).fire(AutofillPixelNames.AUTOFILL_MANAGEMENT_SCREEN_OPENED_DAILY, type = Pixel.PixelType.Daily())
+        verify(pixel).fire(AutofillPixelNames.PRODUCT_TELEMETRY_SURFACE_PASSWORDS_OPENED)
+        verify(pixel).fire(AutofillPixelNames.PRODUCT_TELEMETRY_SURFACE_PASSWORDS_OPENED_DAILY, type = Pixel.PixelType.Daily())
     }
 
     @Test
@@ -765,7 +766,8 @@ class AutofillSettingsActivityScreenViewModelTest {
         testee.sendLaunchPixel(BrowserOverflow)
         val expectedParams = mapOf("source" to "overflow_menu", "has_credentials_saved" to "0")
         verify(pixel).fire(eq(AUTOFILL_MANAGEMENT_SCREEN_OPENED), eq(expectedParams), any(), eq(Count))
-        verify(pixel).fire(AutofillPixelNames.AUTOFILL_MANAGEMENT_SCREEN_OPENED_DAILY, type = Pixel.PixelType.Daily())
+        verify(pixel).fire(AutofillPixelNames.PRODUCT_TELEMETRY_SURFACE_PASSWORDS_OPENED)
+        verify(pixel).fire(AutofillPixelNames.PRODUCT_TELEMETRY_SURFACE_PASSWORDS_OPENED_DAILY, type = Pixel.PixelType.Daily())
     }
 
     @Test
@@ -773,7 +775,8 @@ class AutofillSettingsActivityScreenViewModelTest {
         testee.sendLaunchPixel(Sync)
         val expectedParams = mapOf("source" to "sync", "has_credentials_saved" to "0")
         verify(pixel).fire(eq(AUTOFILL_MANAGEMENT_SCREEN_OPENED), eq(expectedParams), any(), eq(Count))
-        verify(pixel).fire(AutofillPixelNames.AUTOFILL_MANAGEMENT_SCREEN_OPENED_DAILY, type = Pixel.PixelType.Daily())
+        verify(pixel).fire(AutofillPixelNames.PRODUCT_TELEMETRY_SURFACE_PASSWORDS_OPENED)
+        verify(pixel).fire(AutofillPixelNames.PRODUCT_TELEMETRY_SURFACE_PASSWORDS_OPENED_DAILY, type = Pixel.PixelType.Daily())
     }
 
     @Test
@@ -781,7 +784,8 @@ class AutofillSettingsActivityScreenViewModelTest {
         testee.sendLaunchPixel(DisableInSettingsPrompt)
         val expectedParams = mapOf("source" to "save_login_disable_prompt", "has_credentials_saved" to "0")
         verify(pixel).fire(eq(AUTOFILL_MANAGEMENT_SCREEN_OPENED), eq(expectedParams), any(), eq(Count))
-        verify(pixel).fire(AutofillPixelNames.AUTOFILL_MANAGEMENT_SCREEN_OPENED_DAILY, type = Pixel.PixelType.Daily())
+        verify(pixel).fire(AutofillPixelNames.PRODUCT_TELEMETRY_SURFACE_PASSWORDS_OPENED)
+        verify(pixel).fire(AutofillPixelNames.PRODUCT_TELEMETRY_SURFACE_PASSWORDS_OPENED_DAILY, type = Pixel.PixelType.Daily())
     }
 
     @Test
@@ -789,7 +793,8 @@ class AutofillSettingsActivityScreenViewModelTest {
         testee.sendLaunchPixel(NewTabShortcut)
         val expectedParams = mapOf("source" to "new_tab_page_shortcut", "has_credentials_saved" to "0")
         verify(pixel).fire(eq(AUTOFILL_MANAGEMENT_SCREEN_OPENED), eq(expectedParams), any(), eq(Count))
-        verify(pixel).fire(AutofillPixelNames.AUTOFILL_MANAGEMENT_SCREEN_OPENED_DAILY, type = Pixel.PixelType.Daily())
+        verify(pixel).fire(AutofillPixelNames.PRODUCT_TELEMETRY_SURFACE_PASSWORDS_OPENED)
+        verify(pixel).fire(AutofillPixelNames.PRODUCT_TELEMETRY_SURFACE_PASSWORDS_OPENED_DAILY, type = Pixel.PixelType.Daily())
     }
 
     @Test
@@ -797,7 +802,8 @@ class AutofillSettingsActivityScreenViewModelTest {
         testee.sendLaunchPixel(SettingsActivity)
         val expectedParams = mapOf("source" to "settings", "has_credentials_saved" to "0")
         verify(pixel).fire(eq(AUTOFILL_MANAGEMENT_SCREEN_OPENED), eq(expectedParams), any(), eq(Count))
-        verify(pixel).fire(AutofillPixelNames.AUTOFILL_MANAGEMENT_SCREEN_OPENED_DAILY, type = Pixel.PixelType.Daily())
+        verify(pixel).fire(AutofillPixelNames.PRODUCT_TELEMETRY_SURFACE_PASSWORDS_OPENED)
+        verify(pixel).fire(AutofillPixelNames.PRODUCT_TELEMETRY_SURFACE_PASSWORDS_OPENED_DAILY, type = Pixel.PixelType.Daily())
     }
 
     @Test
@@ -805,7 +811,8 @@ class AutofillSettingsActivityScreenViewModelTest {
         testee.sendLaunchPixel(InternalDevSettings)
         val expectedParams = mapOf("source" to "internal_dev_settings", "has_credentials_saved" to "0")
         verify(pixel).fire(eq(AUTOFILL_MANAGEMENT_SCREEN_OPENED), eq(expectedParams), any(), eq(Count))
-        verify(pixel).fire(AutofillPixelNames.AUTOFILL_MANAGEMENT_SCREEN_OPENED_DAILY, type = Pixel.PixelType.Daily())
+        verify(pixel).fire(AutofillPixelNames.PRODUCT_TELEMETRY_SURFACE_PASSWORDS_OPENED)
+        verify(pixel).fire(AutofillPixelNames.PRODUCT_TELEMETRY_SURFACE_PASSWORDS_OPENED_DAILY, type = Pixel.PixelType.Daily())
     }
 
     @Test
@@ -815,7 +822,8 @@ class AutofillSettingsActivityScreenViewModelTest {
         testee.sendLaunchPixel(SettingsActivity)
         val expectedParams = mapOf("source" to "settings", "has_credentials_saved" to "1")
         verify(pixel).fire(eq(AUTOFILL_MANAGEMENT_SCREEN_OPENED), eq(expectedParams), any(), eq(Count))
-        verify(pixel).fire(AutofillPixelNames.AUTOFILL_MANAGEMENT_SCREEN_OPENED_DAILY, type = Pixel.PixelType.Daily())
+        verify(pixel).fire(AutofillPixelNames.PRODUCT_TELEMETRY_SURFACE_PASSWORDS_OPENED)
+        verify(pixel).fire(AutofillPixelNames.PRODUCT_TELEMETRY_SURFACE_PASSWORDS_OPENED_DAILY, type = Pixel.PixelType.Daily())
     }
 
     @Test
@@ -825,7 +833,8 @@ class AutofillSettingsActivityScreenViewModelTest {
         testee.sendLaunchPixel(BrowserOverflow)
         val expectedParams = mapOf("source" to "overflow_menu", "has_credentials_saved" to "1")
         verify(pixel).fire(eq(AUTOFILL_MANAGEMENT_SCREEN_OPENED), eq(expectedParams), any(), eq(Count))
-        verify(pixel).fire(AutofillPixelNames.AUTOFILL_MANAGEMENT_SCREEN_OPENED_DAILY, type = Pixel.PixelType.Daily())
+        verify(pixel).fire(AutofillPixelNames.PRODUCT_TELEMETRY_SURFACE_PASSWORDS_OPENED)
+        verify(pixel).fire(AutofillPixelNames.PRODUCT_TELEMETRY_SURFACE_PASSWORDS_OPENED_DAILY, type = Pixel.PixelType.Daily())
     }
 
     @Test

@@ -435,7 +435,8 @@ class RealDuckChatTest {
         testee.openDuckChat()
 
         verify(mockPixel).fire(pixel = DuckChatPixelName.DUCK_CHAT_OPEN, parameters = mapOf("delta-timestamp-minutes" to "10"))
-        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_OPEN_DAILY, type = Pixel.PixelType.Daily())
+        verify(mockPixel).fire(DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_DUCK_AI_OPEN)
+        verify(mockPixel).fire(DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_DUCK_AI_OPEN_DAILY, type = Pixel.PixelType.Daily())
     }
 
     @Test

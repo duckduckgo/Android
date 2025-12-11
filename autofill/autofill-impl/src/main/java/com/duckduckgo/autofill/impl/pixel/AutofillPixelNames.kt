@@ -36,7 +36,6 @@ import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_IMPORT_PAS
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_IMPORT_PASSWORDS_USER_JOURNEY_UNSUCCESSFUL
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_IMPORT_PASSWORDS_USER_TOOK_NO_ACTION
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_MANAGEMENT_SCREEN_OPENED
-import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_MANAGEMENT_SCREEN_OPENED_DAILY
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_NEVER_SAVE_FOR_THIS_SITE_OVERFLOW_MENU
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ONBOARDING_SAVE_PROMPT_DISMISSED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ONBOARDING_SAVE_PROMPT_EXCLUDE
@@ -73,6 +72,8 @@ import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.BOOKMARK_IMPORT_FRO
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.EMAIL_TOOLTIP_DISMISSED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.EMAIL_USE_ADDRESS
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.EMAIL_USE_ALIAS
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.PRODUCT_TELEMETRY_SURFACE_PASSWORDS_OPENED
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.PRODUCT_TELEMETRY_SURFACE_PASSWORDS_OPENED_DAILY
 import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin
 import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin.PixelParameter
 import com.duckduckgo.di.scopes.AppScope
@@ -125,7 +126,6 @@ enum class AutofillPixelNames(override val pixelName: String) : Pixel.PixelName 
     AUTOFILL_ENABLE_AUTOFILL_TOGGLE_MANUALLY_DISABLED("m_autofill_logins_settings_disabled"),
 
     AUTOFILL_MANAGEMENT_SCREEN_OPENED("m_autofill_management_opened"),
-    AUTOFILL_MANAGEMENT_SCREEN_OPENED_DAILY("m_autofill_management_opened_daily"),
     AUTOFILL_DELETE_LOGIN("m_autofill_management_delete_login"),
     AUTOFILL_DELETE_ALL_LOGINS("m_autofill_management_delete_all_logins"),
     AUTOFILL_MANUALLY_UPDATE_CREDENTIAL("m_autofill_management_update_login"),
@@ -224,6 +224,8 @@ enum class AutofillPixelNames(override val pixelName: String) : Pixel.PixelName 
     BOOKMARK_IMPORT_FROM_GOOGLE_FLOW_ERROR("bookmark_import_from_google_flow_error"),
     BOOKMARK_IMPORT_FROM_GOOGLE_FLOW_CANCELLED("bookmark_import_from_google_flow_cancelled"),
     BOOKMARK_IMPORT_FROM_GOOGLE_FLOW_EXTRA_CHROME_EXPORT("bookmark_import_from_google_flow_extra_chrome_export"),
+    PRODUCT_TELEMETRY_SURFACE_PASSWORDS_OPENED("m_product_telemetry_surface_usage_passwords_page"),
+    PRODUCT_TELEMETRY_SURFACE_PASSWORDS_OPENED_DAILY("m_product_telemetry_surface_usage_passwords_page_daily"),
 }
 
 object AutofillPixelParameters {
@@ -238,7 +240,8 @@ object AutofillPixelsRequiringDataCleaning : PixelParamRemovalPlugin {
     override fun names(): List<Pair<String, Set<PixelParameter>>> {
         return listOf(
             AUTOFILL_MANAGEMENT_SCREEN_OPENED.pixelName to PixelParameter.removeAtb(),
-            AUTOFILL_MANAGEMENT_SCREEN_OPENED_DAILY.pixelName to PixelParameter.removeAtb(),
+            PRODUCT_TELEMETRY_SURFACE_PASSWORDS_OPENED.pixelName to PixelParameter.removeAtb(),
+            PRODUCT_TELEMETRY_SURFACE_PASSWORDS_OPENED_DAILY.pixelName to PixelParameter.removeAtb(),
 
             EMAIL_USE_ALIAS.pixelName to PixelParameter.removeAll(),
             EMAIL_USE_ADDRESS.pixelName to PixelParameter.removeAll(),

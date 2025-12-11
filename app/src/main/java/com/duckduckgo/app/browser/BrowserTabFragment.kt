@@ -1499,7 +1499,8 @@ class BrowserTabFragment :
                 } else {
                     val params = mapOf(PixelParameter.FROM_FOCUSED_NTP to isFocusedNtp.toString())
                     pixel.fire(AppPixelName.MENU_ACTION_POPUP_OPENED.pixelName, params)
-                    pixel.fire(AppPixelName.MENU_ACTION_POPUP_OPENED_DAILY.pixelName, type = Daily())
+                    pixel.fire(AppPixelName.PRODUCT_TELEMETRY_SURFACE_MENU_OPENED.pixelName)
+                    pixel.fire(AppPixelName.PRODUCT_TELEMETRY_SURFACE_MENU_OPENED_DAILY.pixelName, type = Daily())
                 }
             }
         }
@@ -4977,7 +4978,7 @@ class BrowserTabFragment :
 
     private fun configureBrowserTabKeyboardListener() {
         binding.root.rootView.keyboardVisibilityFlow()
-            .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+            .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
             .distinctUntilChanged()
             .onEach { isVisible ->
                 if (isVisible) {
