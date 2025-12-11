@@ -29,8 +29,8 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.getActivityParams
 import com.duckduckgo.remote.messaging.impl.databinding.ActivityModalSurfaceBinding
 import com.duckduckgo.remote.messaging.impl.ui.ModalSurfaceViewModel.Command
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(ModalSurfaceActivityFromMessageId::class)
@@ -56,17 +56,15 @@ class ModalSurfaceActivity : DuckDuckGoActivity(), CardsListRemoteMessageView.Ca
     }
 
     private fun setupObservers() {
-        lifecycleScope.launch {
-            viewModel.viewState
-                .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
-                .collectLatest { render(it) }
-        }
+        viewModel.viewState
+            .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+            .onEach { render(it) }
+            .launchIn(lifecycleScope)
 
-        lifecycleScope.launch {
-            viewModel.commands
-                .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
-                .collectLatest { processCommand(it) }
-        }
+        viewModel.commands
+            .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+            .onEach { processCommand(it) }
+            .launchIn(lifecycleScope)
     }
 
     private fun render(viewState: ModalSurfaceViewModel.ViewState?) {
