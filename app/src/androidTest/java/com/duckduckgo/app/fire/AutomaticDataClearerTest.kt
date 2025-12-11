@@ -573,11 +573,11 @@ class AutomaticDataClearerTest {
     }
 
     private suspend fun verifyTabsCleared() {
-        verify(mockClearAction).clearTabsAsync(any())
+        verify(mockClearAction).clearTabsOnly(any())
     }
 
     private suspend fun verifyTabsNotCleared() {
-        verify(mockClearAction, never()).clearTabsAsync(any())
+        verify(mockClearAction, never()).clearTabsOnly(any())
     }
 
     private suspend fun verifyEverythingCleared() {
