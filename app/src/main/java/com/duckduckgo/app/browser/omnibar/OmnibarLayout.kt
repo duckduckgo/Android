@@ -650,17 +650,11 @@ class OmnibarLayout @JvmOverloads constructor(
         } else {
             // When omnibar is at the bottom, we're adding an additional space at the top
             omnibarCardShadow.updateLayoutParams {
-                (this as MarginLayoutParams).apply {
-                    topMargin = omnibarCardMarginBottom
-                    bottomMargin = omnibarCardMarginTop
-                }
+                flipOmnibarMargins()
             }
 
             iconsContainer.updateLayoutParams {
-                (this as MarginLayoutParams).apply {
-                    topMargin = omnibarCardMarginBottom
-                    bottomMargin = omnibarCardMarginTop
-                }
+                flipOmnibarMargins()
             }
 
             duckAISidebar.updateLayoutParams {
@@ -671,9 +665,8 @@ class OmnibarLayout @JvmOverloads constructor(
             }
 
             shieldIconPulseAnimationContainer.updateLayoutParams {
+                flipOmnibarMargins()
                 (this as MarginLayoutParams).apply {
-                    topMargin = omnibarCardMarginBottom
-                    bottomMargin = omnibarCardMarginTop
                     if (addressBarTrackersAnimationFeatureToggle.feature().isEnabled()) {
                         // TODO when the animation is made permanent we should add this adjustment to the actual layout
                         marginStart = 1.toPx()
@@ -1140,10 +1133,7 @@ class OmnibarLayout @JvmOverloads constructor(
                 if (!customTabToolbar.isVisible) {
                     if (omnibarRepository.omnibarType == OmnibarType.SINGLE_BOTTOM) {
                         newCustomTabToolbarContainer.customTabToolbar.updateLayoutParams {
-                            (this as MarginLayoutParams).apply {
-                                topMargin = omnibarCardMarginBottom
-                                bottomMargin = omnibarCardMarginTop
-                            }
+                            flipOmnibarMargins()
                         }
                     }
 
@@ -1217,6 +1207,17 @@ class OmnibarLayout @JvmOverloads constructor(
                     browserMenuImageView.setColorFilter(foregroundColor)
                 }
             }
+        }
+    }
+
+    /**
+     * Flip the top and bottom margins of the toolbar layout params.
+     * Used when the omnibar is positioned at the bottom.
+     */
+    private fun ViewGroup.LayoutParams.flipOmnibarMargins() {
+        (this as MarginLayoutParams).apply {
+            topMargin = omnibarCardMarginBottom
+            bottomMargin = omnibarCardMarginTop
         }
     }
 
