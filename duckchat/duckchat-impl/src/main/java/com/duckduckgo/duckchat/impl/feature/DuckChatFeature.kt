@@ -142,4 +142,13 @@ interface DuckChatFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun sendInputScreenOnboardingWideEvent(): Toggle
+
+    /**
+     * @return `true` when the Duck.ai Paid Settings status indicator and navigation features are enabled.
+     * This controls syncing the status indicator with DuckChat enabled state and showing the
+     * "Enable/Manage in AI Features Settings" item.
+     * If the remote feature is not present defaults to `internal`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun duckAiPaidSettingsStatus(): Toggle
 }
