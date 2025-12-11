@@ -80,12 +80,12 @@ jobs:
         with:
           api-key: ${{ secrets.ROBIN_API_KEY }}
           project-id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
-          name: deeplinkTest_${{ github.sha }}
+          name: navigationTest_${{ github.sha }}
           timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
           app-file: apk/release.apk
           android-api-level: 30
           workspace: .maestro
-          include-tags: deeplinkTest
+          include-tags: navigationTest
 
       - name: Ad click detection flows
         uses: mobile-dev-inc/action-maestro-cloud@v1.9.8
