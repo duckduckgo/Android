@@ -1,4 +1,4 @@
-appId: com.duckduckgo.mobile.android.debug
+appId: com.duckduckgo.mobile.android
 name: "Deeplink Test: Deeplink to SERP with search query"
 tags:
   - deeplinkTest
