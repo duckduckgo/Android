@@ -1230,7 +1230,7 @@ class BrowserWebViewClientTest {
         testee.onPageStarted(mockWebView, EXAMPLE_URL, null)
         testee.onPageFinished(mockWebView, EXAMPLE_URL)
 
-        mockUriLoadedManager.sendUriLoadedPixels(false)
+        verify(mockUriLoadedManager).sendUriLoadedPixels(false)
     }
 
     @UiThreadTest
@@ -1245,7 +1245,7 @@ class BrowserWebViewClientTest {
         testee.onPageStarted(mockWebView, EXAMPLE_SERP_URL, null)
         testee.onPageFinished(mockWebView, EXAMPLE_SERP_URL)
 
-        mockUriLoadedManager.sendUriLoadedPixels(false)
+        verify(mockUriLoadedManager).sendUriLoadedPixels(false)
     }
 
     private class TestWebView(
