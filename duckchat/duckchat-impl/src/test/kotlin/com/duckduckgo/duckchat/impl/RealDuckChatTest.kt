@@ -46,6 +46,7 @@ import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
+import com.duckduckgo.sync.api.DeviceSyncState
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -92,6 +93,7 @@ class RealDuckChatTest {
     private val imageUploadFeature: AIChatImageUploadFeature = FakeFeatureToggleFactory.create(AIChatImageUploadFeature::class.java)
     private val mockNewAddressBarOptionBottomSheetDialogFactory: NewAddressBarOptionBottomSheetDialogFactory = mock()
     private val mockNewAddressBarOptionBottomSheetDialog: NewAddressBarOptionBottomSheetDialog = mock()
+    private val mockDeviceSyncState: DeviceSyncState = mock()
 
     private lateinit var testee: RealDuckChat
 
@@ -125,6 +127,7 @@ class RealDuckChatTest {
                 imageUploadFeature,
                 mockBrowserNav,
                 mockNewAddressBarOptionBottomSheetDialogFactory,
+                mockDeviceSyncState,
             ),
         )
         coroutineRule.testScope.advanceUntilIdle()
@@ -1148,6 +1151,24 @@ class RealDuckChatTest {
         assertTrue(testee.canHandleOnAiWebView("https://duck.ai/somepath/someotherpath?test=1"))
         assertTrue(testee.canHandleOnAiWebView("https://duck.ai"))
         assertTrue(testee.canHandleOnAiWebView("https://duckduckgo.com/revoke-duckai-access"))
+    }
+
+    @Test
+    fun `when isDuckChatSyncFeatureEnabled returns true then isChatSyncEnabled returns true`() = runTest {
+        whenever(mockDeviceSyncState.isDuckChatSyncFeatureEnabled()).thenReturn(true)
+
+        testee.onPrivacyConfigDownloaded()
+
+        assertTrue(testee.isChatSyncEnabled())
+    }
+
+    @Test
+    fun `when isDuckChatSyncFeatureEnabled returns false then isChatSyncEnabled returns false`() = runTest {
+        whenever(mockDeviceSyncState.isDuckChatSyncFeatureEnabled()).thenReturn(false)
+
+        testee.onPrivacyConfigDownloaded()
+
+        assertFalse(testee.isChatSyncEnabled())
     }
 
     companion object {

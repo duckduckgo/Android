@@ -20,8 +20,10 @@ import com.duckduckgo.common.test.FileUtilities
 import com.duckduckgo.sync.TestSyncFixtures
 import com.duckduckgo.sync.api.engine.ModifiedSince.FirstSync
 import com.duckduckgo.sync.api.engine.SyncChangesRequest
+import com.duckduckgo.sync.api.engine.SyncDeletionRequest
 import com.duckduckgo.sync.api.engine.SyncableType.BOOKMARKS
 import com.duckduckgo.sync.api.engine.SyncableType.CREDENTIALS
+import com.duckduckgo.sync.api.engine.SyncableType.DUCK_AI_CHATS
 import com.duckduckgo.sync.impl.API_CODE
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.SyncApi
@@ -165,5 +167,51 @@ internal class SyncApiClientTest {
         val result = apiClient.get(CREDENTIALS, "")
         assertTrue(result is Result.Error)
         verify(syncApiErrorRecorder).record(CREDENTIALS, getCountLimitError)
+    }
+
+    @Test
+    fun whenDeleteAndTokenEmptyThenReturnError() {
+        whenever(syncStore.token).thenReturn("")
+
+        val result = apiClient.delete(SyncDeletionRequest(DUCK_AI_CHATS, "timestamp"))
+
+        assertEquals(result, Result.Error(reason = "Token Empty"))
+        verifyNoInteractions(syncApiErrorRecorder)
+    }
+
+    @Test
+    fun whenDeleteDuckAiChatsAndApiSucceedsThenReturnSuccess() {
+        val timestamp = "2025-01-01T00:00:00Z"
+        whenever(syncStore.token).thenReturn(TestSyncFixtures.token)
+        whenever(syncApi.deleteAiChats(any(), any())).thenReturn(Result.Success(Unit))
+
+        val result = apiClient.delete(SyncDeletionRequest(DUCK_AI_CHATS, timestamp))
+
+        assertTrue(result is Result.Success)
+        verifyNoInteractions(syncApiErrorRecorder)
+    }
+
+    @Test
+    fun whenDeleteDuckAiChatsAndApiFailsThenReturnErrorAndRecordError() {
+        val timestamp = "2025-01-01T00:00:00Z"
+        val deleteError = Result.Error(-1, "Delete Error")
+        whenever(syncStore.token).thenReturn(TestSyncFixtures.token)
+        whenever(syncApi.deleteAiChats(any(), any())).thenReturn(deleteError)
+
+        val result = apiClient.delete(SyncDeletionRequest(DUCK_AI_CHATS, timestamp))
+
+        assertTrue(result is Result.Error)
+        verify(syncApiErrorRecorder).record(DUCK_AI_CHATS, deleteError)
+    }
+
+    @Test
+    fun whenDeleteUnsupportedTypeThenReturnError() {
+        whenever(syncStore.token).thenReturn(TestSyncFixtures.token)
+
+        val result = apiClient.delete(SyncDeletionRequest(BOOKMARKS, "timestamp"))
+
+        assertTrue(result is Result.Error)
+        assertEquals("Deletion not supported for BOOKMARKS", (result as Result.Error).reason)
+        verifyNoInteractions(syncApiErrorRecorder)
     }
 }

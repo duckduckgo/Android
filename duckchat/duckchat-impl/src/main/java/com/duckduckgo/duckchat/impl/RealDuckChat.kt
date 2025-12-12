@@ -51,6 +51,7 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelParameters.NEW_ADDRESS_BA
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
+import com.duckduckgo.sync.api.DeviceSyncState
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.JsonAdapter
@@ -192,6 +193,8 @@ interface DuckChatInternal : DuckChat {
      */
     fun isDuckChatFeatureEnabled(): Boolean
 
+    fun isChatSyncEnabled(): Boolean
+
     /**
      * This method takes a [url] and returns `true` or `false`.
      * @return `true` if the given [url] can be handled in the duck ai webview and `false` otherwise.
@@ -270,6 +273,7 @@ class RealDuckChat @Inject constructor(
     private val imageUploadFeature: AIChatImageUploadFeature,
     private val browserNav: BrowserNav,
     private val newAddressBarOptionBottomSheetDialogFactory: NewAddressBarOptionBottomSheetDialogFactory,
+    private val deviceSyncState: DeviceSyncState,
 ) : DuckChatInternal,
     DuckAiFeatureState,
     PrivacyConfigCallbackPlugin {
@@ -303,6 +307,7 @@ class RealDuckChat @Inject constructor(
     private var duckAiInputScreenBottomBarEnabled = false
     private var showAIChatAddressBarChoiceScreen = false
     private var isDuckChatUserEnabled = false
+    private var isChatSyncFeatureEnabled = false
     private var duckChatLink = DUCK_CHAT_WEB_LINK
     private var bangRegex: Regex? = null
     private var isAddressBarEntryPointEnabled: Boolean = false
@@ -362,6 +367,7 @@ class RealDuckChat @Inject constructor(
     override fun isInputScreenFeatureAvailable(): Boolean = duckAiInputScreen
 
     override fun isDuckChatFeatureEnabled(): Boolean = isDuckChatFeatureEnabled
+    override fun isChatSyncEnabled(): Boolean = isChatSyncFeatureEnabled
 
     override fun isDuckChatFullScreenModeFeatureAvailable(): Boolean = duckChatFeature.fullscreenMode().isEnabled()
 
@@ -660,6 +666,7 @@ class RealDuckChat @Inject constructor(
             showAIChatAddressBarChoiceScreen = duckChatFeature.showAIChatAddressBarChoiceScreen().isEnabled()
             showInputScreenOnSystemSearchLaunchEnabled = duckChatFeature.showInputScreenOnSystemSearchLaunch().isEnabled()
             inputScreenMainButtonsEnabled = duckChatFeature.showMainButtonsInInputScreen().isEnabled()
+            isChatSyncFeatureEnabled = deviceSyncState.isDuckChatSyncFeatureEnabled()
 
             val showMainButtons = duckChatFeature.showMainButtonsInInputScreen().isEnabled()
             _showMainButtonsInInputScreen.emit(showMainButtons)

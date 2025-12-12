@@ -16,6 +16,7 @@
 
 package com.duckduckgo.sync.impl
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
@@ -38,6 +39,7 @@ import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
+@SuppressLint("DenyListedApi")
 @RunWith(AndroidJUnit4::class)
 class SyncRemoteFeatureToggleTest {
 
@@ -171,6 +173,58 @@ class SyncRemoteFeatureToggleTest {
         assertTrue(testee.allowSetupFlows())
     }
 
+    @Test
+    fun whenAllSyncLevelsEnabledAndAiChatSyncEnabledThenAllowAiChatSyncTrue() {
+        syncFeature.aiChatSync().setRawStoredState(State(enable = true))
+        givenSyncRemoteFeatureToggle(syncFeature)
+
+        assertTrue(testee.allowAiChatSync())
+    }
+
+    @Test
+    fun whenAllSyncLevelsEnabledAndAiChatSyncDisabledThenAllowAiChatSyncFalse() {
+        syncFeature.aiChatSync().setRawStoredState(State(enable = false))
+        givenSyncRemoteFeatureToggle(syncFeature)
+
+        assertFalse(testee.allowAiChatSync())
+    }
+
+    @Test
+    fun whenShowSyncDisabledThenAllowAiChatSyncFalse() {
+        syncFeature.level0ShowSync().setRawStoredState(State(enable = false))
+        syncFeature.aiChatSync().setRawStoredState(State(enable = true))
+        givenSyncRemoteFeatureToggle(syncFeature)
+
+        assertFalse(testee.allowAiChatSync())
+    }
+
+    @Test
+    fun whenAllowDataSyncingDisabledThenAllowAiChatSyncFalse() {
+        syncFeature.level1AllowDataSyncing().setRawStoredState(State(enable = false))
+        syncFeature.aiChatSync().setRawStoredState(State(enable = true))
+        givenSyncRemoteFeatureToggle(syncFeature)
+
+        assertFalse(testee.allowAiChatSync())
+    }
+
+    @Test
+    fun whenAllowSetupFlowsDisabledThenAllowAiChatSyncFalse() {
+        syncFeature.level2AllowSetupFlows().setRawStoredState(State(enable = false))
+        syncFeature.aiChatSync().setRawStoredState(State(enable = true))
+        givenSyncRemoteFeatureToggle(syncFeature)
+
+        assertFalse(testee.allowAiChatSync())
+    }
+
+    @Test
+    fun whenAllowCreateAccountDisabledThenAllowAiChatSyncFalse() {
+        syncFeature.level3AllowCreateAccount().setRawStoredState(State(enable = false))
+        syncFeature.aiChatSync().setRawStoredState(State(enable = true))
+        givenSyncRemoteFeatureToggle(syncFeature)
+
+        assertFalse(testee.allowAiChatSync())
+    }
+
     private fun givenSyncRemoteFeatureToggle(syncFeature: SyncFeature) {
         testee = SyncRemoteFeatureToggle(
             context = context,
@@ -185,6 +239,7 @@ class SyncRemoteFeatureToggleTest {
     }
 }
 
+@SuppressLint("DenyListedApi")
 class TestSharedPrefsProvider(val context: Context) : SharedPrefsProvider {
     override fun getEncryptedSharedPrefs(fileName: String): SharedPreferences? {
         return context.getSharedPreferences(fileName, Context.MODE_PRIVATE)

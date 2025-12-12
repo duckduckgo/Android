@@ -65,6 +65,7 @@ class RealSyncEngine @Inject constructor(
     private val syncOperationErrorRecorder: SyncOperationErrorRecorder,
     private val providerPlugins: PluginPoint<SyncableDataProvider>,
     private val persisterPlugins: PluginPoint<SyncableDataPersister>,
+    private val deletableDataManagerPlugins: PluginPoint<DeletableDataManager>,
     private val lifecyclePlugins: PluginPoint<SyncEngineLifecycle>,
 ) : SyncEngine {
 
@@ -130,8 +131,12 @@ class RealSyncEngine @Inject constructor(
             syncPixels.fireDailySuccessRatePixel()
             syncPixels.fireDailyPixel()
 
-            logcat(INFO) { "Sync-Engine: getChanges - performSync" }
-            val changes = getChanges()
+            // If there are changes and deletions, process deletions first
+            val deletedTypes = processDeletions()
+
+            // Then process changes, excluding types that had deletions
+            logcat(INFO) { "Sync-Engine: processing changes for types without deletions" }
+            val changes = getChanges().filter { it.type !in deletedTypes }
             performFirstSync(changes.filter { it.isFirstSync() })
             performRegularSync(changes.filter { !it.isFirstSync() })
 
@@ -232,6 +237,49 @@ class RealSyncEngine @Inject constructor(
         }
     }
 
+    private fun getDeletionRequests(): List<PendingDeletion> {
+        return deletableDataManagerPlugins.getPlugins().mapNotNull { manager ->
+            logcat { "Sync-Engine: asking for deletions in ${manager.javaClass}" }
+            kotlin.runCatching {
+                manager.getDeletions()?.let { deletionRequest ->
+                    PendingDeletion(deletionRequest, manager)
+                }
+            }.getOrElse { error ->
+                syncOperationErrorRecorder.record(manager.getType().field, DATA_PROVIDER_ERROR)
+                null
+            }
+        }
+    }
+    private fun processDeletions(): Set<SyncableType> {
+        val deletions = getDeletionRequests()
+        if (deletions.isEmpty()) {
+            return emptySet()
+        }
+
+        logcat(INFO) { "Sync-Engine: processing ${deletions.size} deletions" }
+
+        val processedTypes = mutableSetOf<SyncableType>()
+        deletions.forEach { (request, manager) ->
+            logcat { "Sync-Engine: processing deletion for ${request.type}" }
+            when (val result = syncApiClient.delete(request)) {
+                is Error -> {
+                    val featureError = result.featureError() ?: return@forEach
+                    manager.onError(SyncErrorResponse(request.type, featureError))
+                }
+                is Success -> {
+                    logcat { "Sync-Engine: deletion completed successfully for ${request.type}" }
+                    kotlin.runCatching {
+                        manager.onSuccess(result.data)
+                    }.getOrElse { error ->
+                        logcat { "Sync-Engine: error notifying deletable data manager of deletion success: $error" }
+                    }
+                    processedTypes.add(request.type)
+                }
+            }
+        }
+        return processedTypes
+    }
+
     private fun persistChanges(
         remoteChanges: SyncChangesResponse,
         conflictResolution: SyncConflictResolution,
@@ -287,4 +335,9 @@ class RealSyncEngine @Inject constructor(
             else -> null
         }
     }
+
+    private data class PendingDeletion(
+        val request: SyncDeletionRequest,
+        val manager: DeletableDataManager,
+    )
 }

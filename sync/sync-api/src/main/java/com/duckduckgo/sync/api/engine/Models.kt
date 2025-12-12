@@ -94,6 +94,7 @@ enum class SyncableType(val field: String) {
     BOOKMARKS("bookmarks"),
     CREDENTIALS("credentials"),
     SETTINGS("settings"),
+    DUCK_AI_CHATS("ai_chats"),
 }
 
 // TODO: document api, when is it expected each case? https://app.asana.com/0/0/1204958251694095/f

@@ -17,10 +17,12 @@
 package com.duckduckgo.app.browser.weblocalstorage
 
 import android.content.Context
+import com.duckduckgo.app.browser.api.DuckAiChatDeletionListener
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesTo
@@ -64,6 +66,7 @@ class DuckDuckGoWebLocalStorageManager @Inject constructor(
     private val fireproofWebsiteRepository: FireproofWebsiteRepository,
     private val dispatcherProvider: DispatcherProvider,
     private val settingsDataStore: SettingsDataStore,
+    private val duckAiChatDeletionListeners: PluginPoint<DuckAiChatDeletionListener>,
 ) : WebLocalStorageManager {
 
     private var domains = emptyList<String>()
@@ -89,6 +92,7 @@ class DuckDuckGoWebLocalStorageManager @Inject constructor(
             domains = webLocalStorageSettings.domains.list + fireproofedDomains
             keysToDelete = webLocalStorageSettings.keysToDelete.list
             matchingRegex = webLocalStorageSettings.matchingRegex.list
+            var duckAiDataDeleted = false
 
             logcat { "WebLocalStorageManager: Allowed domains: $domains" }
             logcat { "WebLocalStorageManager: Keys to delete: $keysToDelete" }
@@ -109,9 +113,18 @@ class DuckDuckGoWebLocalStorageManager @Inject constructor(
                     } else if (shouldClearDuckAiData && DUCKDUCKGO_DOMAINS.contains(domainForMatchingAllowedKey)) {
                         if (keysToDelete.any { key.endsWith(it) }) {
                             db.delete(entry.key)
+                            duckAiDataDeleted = true
                             logcat { "WebLocalStorageManager: Deleted key: $key" }
                         }
                     }
+                }
+            }
+
+            logcat { "WebLocalStorageManager: finished deleting local storage data. duck AI chats cleared:$duckAiDataDeleted" }
+            if (duckAiDataDeleted) {
+                // Notify all listeners that Duck AI chats have been deleted
+                duckAiChatDeletionListeners.getPlugins().forEach { listener ->
+                    listener.onDuckAiChatsDeleted()
                 }
             }
         }

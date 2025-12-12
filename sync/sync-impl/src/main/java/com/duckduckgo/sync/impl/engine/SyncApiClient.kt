@@ -21,6 +21,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.api.engine.*
 import com.duckduckgo.sync.api.engine.SyncableType.BOOKMARKS
 import com.duckduckgo.sync.api.engine.SyncableType.CREDENTIALS
+import com.duckduckgo.sync.api.engine.SyncableType.DUCK_AI_CHATS
 import com.duckduckgo.sync.api.engine.SyncableType.SETTINGS
 import com.duckduckgo.sync.impl.API_CODE
 import com.duckduckgo.sync.impl.Result
@@ -28,6 +29,7 @@ import com.duckduckgo.sync.impl.SyncApi
 import com.duckduckgo.sync.impl.error.SyncApiErrorRecorder
 import com.duckduckgo.sync.store.SyncStore
 import com.squareup.anvil.annotations.ContributesBinding
+import logcat.LogPriority
 import logcat.logcat
 import org.json.JSONObject
 import javax.inject.Inject
@@ -39,6 +41,7 @@ interface SyncApiClient {
         type: SyncableType,
         since: String,
     ): Result<SyncChangesResponse>
+    fun delete(deletions: SyncDeletionRequest): Result<SyncDeletionResponse>
 }
 
 @ContributesBinding(AppScope::class)
@@ -96,6 +99,7 @@ class AppSyncApiClient @Inject constructor(
             BOOKMARKS -> syncApi.getBookmarks(token, since)
             CREDENTIALS -> syncApi.getCredentials(token, since)
             SETTINGS -> syncApi.getSettings(token, since)
+            DUCK_AI_CHATS -> return Result.Success(SyncChangesResponse.empty(type)) // Duck AI chats only supports deletion, no GET
         }
 
         return when (result) {
@@ -130,5 +134,34 @@ class AppSyncApiClient @Inject constructor(
         val jsonString = response.toString()
         logcat { "Sync-Engine: $type response mapped to $jsonString" }
         return SyncChangesResponse(type, jsonString)
+    }
+
+    override fun delete(deletions: SyncDeletionRequest): Result<SyncDeletionResponse> {
+        val token = syncStore.token.takeUnless { it.isNullOrEmpty() } ?: return Result.Error(reason = "Token Empty")
+
+        // Currently only Duck AI chats support deletion
+        return when (deletions.type) {
+            DUCK_AI_CHATS -> handleDuckAiChatsDeletion(token, deletions.untilTimestamp ?: "")
+            else -> Result.Error(reason = "Deletion not supported for ${deletions.type}")
+        }
+    }
+
+    private fun handleDuckAiChatsDeletion(
+        token: String,
+        until: String,
+    ): Result<SyncDeletionResponse> {
+        logcat { "Sync-Engine: deleting duck ai chats until $until" }
+
+        return when (val result = syncApi.deleteAiChats(token, until)) {
+            is Result.Error -> {
+                logcat(LogPriority.ERROR) { "DuckChat-Sync: failed to inform sync of of deleted duck ai chats $result" }
+                syncApiErrorRecorder.record(DUCK_AI_CHATS, result)
+                result
+            }
+            is Result.Success -> {
+                logcat(LogPriority.INFO) { "DuckChat-Sync: successfully informed sync of deleted duck ai chats" }
+                Result.Success(SyncDeletionResponse(DUCK_AI_CHATS, until))
+            }
+        }
     }
 }

@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.browser
 
+import com.duckduckgo.app.browser.api.DuckAiChatDeletionListener
 import com.duckduckgo.app.browser.weblocalstorage.Domains
 import com.duckduckgo.app.browser.weblocalstorage.DuckDuckGoWebLocalStorageManager
 import com.duckduckgo.app.browser.weblocalstorage.MatchingRegex
@@ -26,6 +27,7 @@ import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.feature.toggles.api.Toggle
 import dagger.Lazy
 import kotlinx.coroutines.test.runTest
@@ -54,20 +56,14 @@ class DuckDuckGoWebLocalStorageManagerTest {
     private val mockFireproofWebsiteRepository: FireproofWebsiteRepository = mock()
     private val mockSettingsDataStore: SettingsDataStore = mock()
 
-    private val testee = DuckDuckGoWebLocalStorageManager(
-        mockDatabaseProvider,
-        mockAndroidBrowserConfigFeature,
-        mockWebLocalStorageSettingsJsonParser,
-        mockFireproofWebsiteRepository,
-        coroutineRule.testDispatcherProvider,
-        mockSettingsDataStore,
-    )
+    private lateinit var testee: DuckDuckGoWebLocalStorageManager
 
     @Before
     fun setup() = runTest {
         whenever(mockDatabaseProvider.get()).thenReturn(mockDB)
         whenever(mockAndroidBrowserConfigFeature.webLocalStorage()).thenReturn(mockWebLocalStorageToggle)
         whenever(mockWebLocalStorageToggle.getSettings()).thenReturn("settings")
+        whenever(mockSettingsDataStore.clearDuckAiData).thenReturn(false)
 
         val domains = Domains(list = listOf("duckduckgo.com", "duck.ai"))
         val matchingRegex = MatchingRegex(
@@ -80,6 +76,20 @@ class DuckDuckGoWebLocalStorageManagerTest {
         val keysToDelete = com.duckduckgo.app.browser.weblocalstorage.KeysToDelete(list = listOf("chat-history", "ai-conversations"))
         val webLocalStorageSettings = WebLocalStorageSettings(domains = domains, keysToDelete = keysToDelete, matchingRegex = matchingRegex)
         whenever(mockWebLocalStorageSettingsJsonParser.parseJson("settings")).thenReturn(webLocalStorageSettings)
+
+        testee = DuckDuckGoWebLocalStorageManager(
+            mockDatabaseProvider,
+            mockAndroidBrowserConfigFeature,
+            mockWebLocalStorageSettingsJsonParser,
+            mockFireproofWebsiteRepository,
+            coroutineRule.testDispatcherProvider,
+            mockSettingsDataStore,
+            duckAiChatDeletionListeners = object : PluginPoint<DuckAiChatDeletionListener> {
+                override fun getPlugins(): Collection<DuckAiChatDeletionListener> {
+                    return emptyList()
+                }
+            },
+        )
     }
 
     @Test

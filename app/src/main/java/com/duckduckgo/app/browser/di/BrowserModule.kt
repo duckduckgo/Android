@@ -29,6 +29,7 @@ import com.duckduckgo.app.bookmarks.BookmarkAddedDialogPlugin
 import com.duckduckgo.app.browser.*
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.addtohome.AddToHomeSystemCapabilityDetector
+import com.duckduckgo.app.browser.api.DuckAiChatDeletionListener
 import com.duckduckgo.app.browser.applinks.ExternalAppIntentFlagsFeature
 import com.duckduckgo.app.browser.certificates.rootstore.TrustedCertificateStore
 import com.duckduckgo.app.browser.cookies.AppThirdPartyCookieManager
@@ -391,3 +392,6 @@ annotation class IndonesiaNewTabSection
 
 @ContributesPluginPoint(scope = AppScope::class, boundType = BookmarkAddedDialogPlugin::class)
 private interface BookmarkAddedDialogPluginPoint
+
+@ContributesPluginPoint(scope = AppScope::class, boundType = DuckAiChatDeletionListener::class)
+private interface DuckAiChatDeletionListenerPluginPoint

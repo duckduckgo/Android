@@ -28,6 +28,9 @@ import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.BACKGROUND_SYNC
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.DATA_CHANGE
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.FEATURE_READ
 import com.duckduckgo.sync.api.engine.SyncableType.BOOKMARKS
+import com.duckduckgo.sync.api.engine.SyncableType.CREDENTIALS
+import com.duckduckgo.sync.api.engine.SyncableType.DUCK_AI_CHATS
+import com.duckduckgo.sync.api.engine.SyncableType.SETTINGS
 import com.duckduckgo.sync.impl.API_CODE
 import com.duckduckgo.sync.impl.API_CODE.TOO_MANY_REQUESTS_1
 import com.duckduckgo.sync.impl.Result
@@ -41,18 +44,22 @@ import com.duckduckgo.sync.store.model.SyncAttempt
 import com.duckduckgo.sync.store.model.SyncAttemptState.FAIL
 import com.duckduckgo.sync.store.model.SyncAttemptState.IN_PROGRESS
 import com.duckduckgo.sync.store.model.SyncAttemptState.SUCCESS
+import com.duckduckgo.sync.store.model.SyncOperationErrorType.DATA_PROVIDER_ERROR
 import com.duckduckgo.sync.store.model.SyncOperationErrorType.ORPHANS_PRESENT
 import com.duckduckgo.sync.store.model.SyncOperationErrorType.TIMESTAMP_CONFLICT
 import org.junit.Before
 import org.junit.Ignore
 import org.junit.Test
 import org.mockito.kotlin.any
+import org.mockito.kotlin.atLeastOnce
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
+@Suppress("SameParameterValue")
 internal class SyncEngineTest {
 
     private val syncApiClient: SyncApiClient = mock()
@@ -62,7 +69,8 @@ internal class SyncEngineTest {
     private val syncStore: SyncStore = mock()
     private val syncOperationErrorRecorder: SyncOperationErrorRecorder = mock()
     private val providerPlugins: PluginPoint<SyncableDataProvider> = mock()
-    private val persisterPlugins: PluginPoint<SyncableDataPersister> = mock()
+    private val syncablePersisterPlugins: PluginPoint<SyncableDataPersister> = mock()
+    private val deletableDataManagerPlugins: PluginPoint<DeletableDataManager> = mock()
     private val lifecyclePlugins: PluginPoint<SyncEngineLifecycle> = mock()
     private lateinit var syncEngine: RealSyncEngine
 
@@ -76,11 +84,13 @@ internal class SyncEngineTest {
             syncStore,
             syncOperationErrorRecorder,
             providerPlugins,
-            persisterPlugins,
+            syncablePersisterPlugins,
+            deletableDataManagerPlugins,
             lifecyclePlugins,
         )
         whenever(syncStore.isSignedIn()).thenReturn(true)
         whenever(syncStore.syncingDataEnabled).thenReturn(true)
+        whenever(deletableDataManagerPlugins.getPlugins()).thenReturn(emptyList())
     }
 
     @Test
@@ -448,7 +458,7 @@ internal class SyncEngineTest {
         givenLocalChanges()
         givenPatchLimitError()
         val persisterPluginMock = mock<SyncableDataPersister>()
-        whenever(persisterPlugins.getPlugins()).thenReturn(listOf(persisterPluginMock))
+        whenever(syncablePersisterPlugins.getPlugins()).thenReturn(listOf(persisterPluginMock))
 
         syncEngine.triggerSync(DATA_CHANGE)
 
@@ -460,7 +470,7 @@ internal class SyncEngineTest {
         givenLocalChanges()
         givenPatchContentTooLargeError()
         val persisterPluginMock = mock<SyncableDataPersister>()
-        whenever(persisterPlugins.getPlugins()).thenReturn(listOf(persisterPluginMock))
+        whenever(syncablePersisterPlugins.getPlugins()).thenReturn(listOf(persisterPluginMock))
 
         syncEngine.triggerSync(DATA_CHANGE)
 
@@ -472,7 +482,7 @@ internal class SyncEngineTest {
         givenLocalChanges()
         givenPatchError()
         val persisterPluginMock = mock<SyncableDataPersister>()
-        whenever(persisterPlugins.getPlugins()).thenReturn(listOf(persisterPluginMock))
+        whenever(syncablePersisterPlugins.getPlugins()).thenReturn(listOf(persisterPluginMock))
 
         syncEngine.triggerSync(DATA_CHANGE)
 
@@ -520,10 +530,184 @@ internal class SyncEngineTest {
         verify(syncStateRepository).updateSyncState(SUCCESS)
     }
 
+    @Test
+    fun whenFirstSyncThenGetChangesCalledTwiceAndNewChangesAfterDedupAreProcessed() {
+        givenFirstSyncWithChangesAfterDedup()
+        givenGetSuccess()
+        givenPatchSuccess()
+
+        syncEngine.triggerSync(APP_OPEN)
+
+        // Verify getChanges() called twice: once in performSync, once in performFirstSync
+        verify(providerPlugins, times(2)).getPlugins()
+        // Verify GET called for first sync (DEDUPLICATION)
+        verify(syncApiClient).get(BOOKMARKS, "0")
+        // Verify PATCH called for changes after dedup (LOCAL_WINS)
+        verify(syncApiClient).patch(any())
+        verify(syncStateRepository).updateSyncState(SUCCESS)
+    }
+
+    @Test
+    fun whenMultipleTypesWithDifferentSyncStatesThenAllProcessedCorrectly() {
+        givenMultipleTypesWithDifferentSyncStates()
+        whenever(syncApiClient.get(BOOKMARKS, "0")).thenReturn(Success(SyncChangesResponse.empty(BOOKMARKS)))
+        whenever(syncApiClient.get(eq(SETTINGS), any())).thenReturn(Success(SyncChangesResponse.empty(SETTINGS)))
+        givenPatchSuccess()
+
+        syncEngine.triggerSync(APP_OPEN)
+
+        // Verify first sync for BOOKMARKS: GET with DEDUPLICATION
+        verify(syncApiClient).get(BOOKMARKS, "0")
+        // Verify regular sync for CREDENTIALS: PATCH
+        verify(syncApiClient).patch(any())
+        // Verify empty changes for SETTINGS: GET
+        verify(syncApiClient).get(eq(SETTINGS), any())
+        verify(syncStateRepository).updateSyncState(SUCCESS)
+    }
+
+    @Test
+    fun whenOneProviderThrowsErrorThenOtherProvidersStillProcessed() {
+        givenProviderThrowsError()
+        givenPatchSuccess()
+
+        syncEngine.triggerSync(APP_OPEN)
+
+        // Verify error recorded for SETTINGS provider (at least once)
+        verify(syncOperationErrorRecorder, atLeastOnce()).record(SETTINGS.field, DATA_PROVIDER_ERROR)
+        // Verify BOOKMARKS and CREDENTIALS still processed
+        verify(syncApiClient, times(2)).patch(any())
+        verify(syncStateRepository).updateSyncState(SUCCESS)
+    }
+
+    @Test
+    fun whenPerformFirstSyncGetsEmptyListThenNoOperationsPerformed() {
+        givenNoProviders()
+
+        syncEngine.triggerSync(APP_OPEN)
+
+        // Verify no API calls made
+        verifyNoInteractions(syncApiClient)
+        // Verify state still updated (empty sync is successful)
+        verify(syncStateRepository).updateSyncState(SUCCESS)
+    }
+
+    @Test
+    fun whenPerformRegularSyncGetsEmptyListThenNoOperationsPerformed() {
+        givenNoProviders()
+
+        syncEngine.triggerSync(APP_OPEN)
+
+        // Verify no API calls made
+        verifyNoInteractions(syncApiClient)
+        // Verify state still updated (empty sync is successful)
+        verify(syncStateRepository).updateSyncState(SUCCESS)
+    }
+
+    @Test
+    fun whenMultiplePersistersThenAllNotifiedOnSuccess() {
+        val persister1 = mock<SyncableDataPersister>()
+        val persister2 = mock<SyncableDataPersister>()
+        val persister3 = mock<SyncableDataPersister>()
+        givenMultiplePersistersWithLocalChanges(listOf(persister1, persister2, persister3))
+        givenPatchSuccess()
+
+        syncEngine.triggerSync(APP_OPEN)
+
+        // Verify all persisters notified
+        verify(persister1).onSuccess(any(), any())
+        verify(persister2).onSuccess(any(), any())
+        verify(persister3).onSuccess(any(), any())
+        verify(syncStateRepository).updateSyncState(SUCCESS)
+    }
+
+    @Test
+    fun whenDeletionsExistThenTheyAreProcessedAndTypesExcludedFromChanges() {
+        val deletionRequest = givenDeletions(DUCK_AI_CHATS, "2024-01-01T00:00:00.000Z")
+        givenDeletionSuccess(deletionRequest)
+
+        val bookmarksChanges = givenChangesForType(BOOKMARKS, "{}", ModifiedSince.Timestamp("2021-01-01T00:00:00.000Z"))
+        givenPatchSuccess()
+
+        syncEngine.triggerSync(APP_OPEN)
+
+        // Verify deletion processed
+        verify(syncApiClient).delete(deletionRequest)
+        // Verify BOOKMARKS changes processed (DUCK_AI_CHATS excluded)
+        verify(syncApiClient).patch(bookmarksChanges)
+        verify(syncStateRepository).updateSyncState(SUCCESS)
+    }
+
+    @Test
+    fun whenTypeAHasDeletionsAndTypeBHasChangesThenBothAreProcessed() {
+        val deletionRequest = givenDeletions(DUCK_AI_CHATS, "2024-01-01T00:00:00.000Z")
+        givenDeletionSuccess(deletionRequest)
+
+        val bookmarksChanges = givenChangesForType(BOOKMARKS, "{}", ModifiedSince.Timestamp("2021-01-01T00:00:00.000Z"))
+        givenPatchSuccess()
+
+        syncEngine.triggerSync(APP_OPEN)
+
+        // Verify DUCK_AI_CHATS deletion processed
+        verify(syncApiClient).delete(deletionRequest)
+        // Verify BOOKMARKS changes processed
+        verify(syncApiClient).patch(bookmarksChanges)
+        verify(syncStateRepository).updateSyncState(SUCCESS)
+    }
+
+    @Test
+    fun whenDeletionSucceedsThenManagerOnSuccessIsCalled() {
+        val deletionRequest = SyncDeletionRequest(DUCK_AI_CHATS, "2024-01-01T00:00:00.000Z")
+        val deletionManager = mock<DeletableDataManager>()
+        whenever(deletionManager.getType()).thenReturn(DUCK_AI_CHATS)
+        whenever(deletionManager.getDeletions()).thenReturn(deletionRequest)
+
+        val deletionResponse = SyncDeletionResponse(DUCK_AI_CHATS, "2024-01-01T00:00:00.000Z")
+        givenDeletionSuccess(deletionRequest, deletionResponse)
+        whenever(deletableDataManagerPlugins.getPlugins()).thenReturn(listOf(deletionManager))
+        givenNoProviders()
+
+        syncEngine.triggerSync(APP_OPEN)
+
+        verify(deletionManager).onSuccess(deletionResponse)
+        verify(syncStateRepository).updateSyncState(SUCCESS)
+    }
+
+    @Test
+    fun whenDeletionFailsWithFeatureErrorThenManagerOnErrorIsCalled() {
+        val deletionRequest = SyncDeletionRequest(DUCK_AI_CHATS, "2024-01-01T00:00:00.000Z")
+        val deletionManager = mock<DeletableDataManager>()
+        whenever(deletionManager.getType()).thenReturn(DUCK_AI_CHATS)
+        whenever(deletionManager.getDeletions()).thenReturn(deletionRequest)
+
+        givenDeletionError(deletionRequest, API_CODE.COUNT_LIMIT.code)
+        whenever(deletableDataManagerPlugins.getPlugins()).thenReturn(listOf(deletionManager))
+        givenNoProviders()
+
+        syncEngine.triggerSync(APP_OPEN)
+
+        verify(deletionManager).onError(SyncErrorResponse(DUCK_AI_CHATS, FeatureSyncError.COLLECTION_LIMIT_REACHED))
+        verify(syncStateRepository).updateSyncState(SUCCESS)
+    }
+
+    @Test
+    fun whenNoDeletionsThenNormalSyncContinues() {
+        givenNoLocalChanges()
+        givenNoDeletions()
+        givenGetSuccess()
+
+        syncEngine.triggerSync(APP_OPEN)
+
+        // Verify no deletion calls
+        verify(syncApiClient, times(0)).delete(any())
+        // Verify normal sync continues
+        verify(syncApiClient).get(any(), any())
+        verify(syncStateRepository).updateSyncState(SUCCESS)
+    }
+
     private fun givenNoLocalChanges() {
         val fakePersisterPlugin = FakeSyncableDataPersister()
         val fakeProviderPlugin = FakeSyncableDataProvider(fakeChanges = SyncChangesRequest.empty())
-        whenever(persisterPlugins.getPlugins()).thenReturn(listOf(fakePersisterPlugin))
+        whenever(syncablePersisterPlugins.getPlugins()).thenReturn(listOf(fakePersisterPlugin))
         whenever(providerPlugins.getPlugins()).thenReturn(listOf(fakeProviderPlugin))
     }
 
@@ -532,7 +716,7 @@ internal class SyncEngineTest {
         val localChanges = SyncChangesRequest(BOOKMARKS, updatesJSON, ModifiedSince.Timestamp("2021-01-01T00:00:00.000Z"))
         val fakePersisterPlugin = FakeSyncableDataPersister()
         val fakeProviderPlugin = FakeSyncableDataProvider(fakeChanges = localChanges)
-        whenever(persisterPlugins.getPlugins()).thenReturn(listOf(fakePersisterPlugin)).thenReturn(listOf(FakeSyncableDataPersister()))
+        whenever(syncablePersisterPlugins.getPlugins()).thenReturn(listOf(fakePersisterPlugin)).thenReturn(listOf(FakeSyncableDataPersister()))
         whenever(providerPlugins.getPlugins()).thenReturn(listOf(fakeProviderPlugin))
             .thenReturn(listOf(FakeSyncableDataProvider(fakeChanges = SyncChangesRequest.empty())))
     }
@@ -541,7 +725,7 @@ internal class SyncEngineTest {
         val updatesJSON = FileUtilities.loadText(javaClass.classLoader!!, "data_sync_sent_bookmarks.json")
         val localChanges = SyncChangesRequest(BOOKMARKS, updatesJSON, ModifiedSince.Timestamp("2021-01-01T00:00:00.000Z"))
         val fakeProviderPlugin = FakeSyncableDataProvider(fakeChanges = localChanges)
-        whenever(persisterPlugins.getPlugins()).thenReturn(listOf(FakeSyncableDataPersister(timestampConflict = true)))
+        whenever(syncablePersisterPlugins.getPlugins()).thenReturn(listOf(FakeSyncableDataPersister(timestampConflict = true)))
             .thenReturn(listOf(FakeSyncableDataPersister(timestampConflict = true)))
         whenever(providerPlugins.getPlugins()).thenReturn(listOf(fakeProviderPlugin))
             .thenReturn(listOf(FakeSyncableDataProvider(fakeChanges = SyncChangesRequest.empty())))
@@ -551,7 +735,7 @@ internal class SyncEngineTest {
         val updatesJSON = FileUtilities.loadText(javaClass.classLoader!!, "data_sync_sent_bookmarks.json")
         val localChanges = SyncChangesRequest(BOOKMARKS, updatesJSON, ModifiedSince.Timestamp("2021-01-01T00:00:00.000Z"))
         val fakeProviderPlugin = FakeSyncableDataProvider(fakeChanges = localChanges)
-        whenever(persisterPlugins.getPlugins()).thenReturn(listOf(FakeSyncableDataPersister(orphans = true)))
+        whenever(syncablePersisterPlugins.getPlugins()).thenReturn(listOf(FakeSyncableDataPersister(orphans = true)))
             .thenReturn(listOf(FakeSyncableDataPersister(orphans = true)))
         whenever(providerPlugins.getPlugins()).thenReturn(listOf(fakeProviderPlugin))
             .thenReturn(listOf(FakeSyncableDataProvider(fakeChanges = SyncChangesRequest.empty())))
@@ -562,7 +746,7 @@ internal class SyncEngineTest {
         val firstSyncLocalChanges = SyncChangesRequest(BOOKMARKS, updatesJSON, FirstSync)
         val localChanges = SyncChangesRequest(BOOKMARKS, updatesJSON, ModifiedSince.Timestamp("2021-01-01T00:00:00.000Z"))
         val fakePersisterPlugin = FakeSyncableDataPersister()
-        whenever(persisterPlugins.getPlugins()).thenReturn(listOf(fakePersisterPlugin)).thenReturn(listOf(FakeSyncableDataPersister()))
+        whenever(syncablePersisterPlugins.getPlugins()).thenReturn(listOf(fakePersisterPlugin)).thenReturn(listOf(FakeSyncableDataPersister()))
         whenever(providerPlugins.getPlugins())
             .thenReturn(listOf(FakeSyncableDataProvider(fakeChanges = firstSyncLocalChanges)))
             .thenReturn(listOf(FakeSyncableDataProvider(fakeChanges = localChanges)))
@@ -607,5 +791,127 @@ internal class SyncEngineTest {
                 SyncChangesResponse.empty(BOOKMARKS),
             ),
         )
+    }
+
+    private fun givenFirstSyncWithChangesAfterDedup() {
+        val updatesJSON = FileUtilities.loadText(javaClass.classLoader!!, "data_sync_sent_bookmarks.json")
+        val firstSyncChanges = SyncChangesRequest(BOOKMARKS, updatesJSON, FirstSync)
+        val changesAfterDedup = SyncChangesRequest(BOOKMARKS, updatesJSON, ModifiedSince.Timestamp("2021-01-01T00:00:00.000Z"))
+        val fakePersisterPlugin = FakeSyncableDataPersister()
+
+        whenever(syncablePersisterPlugins.getPlugins()).thenReturn(listOf(fakePersisterPlugin)).thenReturn(listOf(FakeSyncableDataPersister()))
+        whenever(providerPlugins.getPlugins())
+            .thenReturn(listOf(FakeSyncableDataProvider(fakeChanges = firstSyncChanges)))
+            .thenReturn(listOf(FakeSyncableDataProvider(fakeChanges = changesAfterDedup)))
+    }
+
+    private fun givenMultipleTypesWithDifferentSyncStates() {
+        val updatesJSON = FileUtilities.loadText(javaClass.classLoader!!, "data_sync_sent_bookmarks.json")
+        val bookmarksFirstSync = SyncChangesRequest(BOOKMARKS, updatesJSON, FirstSync)
+        val credentialsRegular = SyncChangesRequest(CREDENTIALS, updatesJSON, ModifiedSince.Timestamp("2021-01-01T00:00:00.000Z"))
+        val settingsEmpty = SyncChangesRequest(SETTINGS, "", ModifiedSince.FirstSync)
+
+        val bookmarksPersister = FakeSyncableDataPersister()
+        val credentialsPersister = FakeSyncableDataPersister()
+        val settingsPersister = FakeSyncableDataPersister()
+
+        whenever(syncablePersisterPlugins.getPlugins())
+            .thenReturn(listOf(bookmarksPersister, credentialsPersister, settingsPersister))
+            .thenReturn(listOf(bookmarksPersister, credentialsPersister, settingsPersister))
+        whenever(providerPlugins.getPlugins())
+            .thenReturn(
+                listOf(
+                    FakeSyncableDataProvider(BOOKMARKS, bookmarksFirstSync),
+                    FakeSyncableDataProvider(CREDENTIALS, credentialsRegular),
+                    FakeSyncableDataProvider(SETTINGS, settingsEmpty),
+                ),
+            )
+            .thenReturn(
+                listOf(
+                    FakeSyncableDataProvider(BOOKMARKS, SyncChangesRequest.empty()),
+                    FakeSyncableDataProvider(CREDENTIALS, credentialsRegular),
+                    FakeSyncableDataProvider(SETTINGS, settingsEmpty),
+                ),
+            )
+    }
+
+    private fun givenProviderThrowsError() {
+        val updatesJSON = FileUtilities.loadText(javaClass.classLoader!!, "data_sync_sent_bookmarks.json")
+        val bookmarksChanges = SyncChangesRequest(BOOKMARKS, updatesJSON, ModifiedSince.Timestamp("2021-01-01T00:00:00.000Z"))
+        val credentialsChanges = SyncChangesRequest(CREDENTIALS, updatesJSON, ModifiedSince.Timestamp("2021-01-01T00:00:00.000Z"))
+
+        val throwingProvider = mock<SyncableDataProvider>()
+        whenever(throwingProvider.getType()).thenReturn(SETTINGS)
+        whenever(throwingProvider.getChanges()).thenThrow(RuntimeException("Provider error"))
+
+        val workingProvider1 = FakeSyncableDataProvider(BOOKMARKS, bookmarksChanges)
+        val workingProvider2 = FakeSyncableDataProvider(CREDENTIALS, credentialsChanges)
+
+        val persister1 = FakeSyncableDataPersister()
+        val persister2 = FakeSyncableDataPersister()
+
+        whenever(syncablePersisterPlugins.getPlugins())
+            .thenReturn(listOf(persister1, persister2))
+            .thenReturn(listOf(persister1, persister2))
+        whenever(providerPlugins.getPlugins()).thenReturn(listOf(throwingProvider, workingProvider1, workingProvider2))
+    }
+
+    private fun givenNoProviders() {
+        whenever(providerPlugins.getPlugins()).thenReturn(emptyList())
+        whenever(syncablePersisterPlugins.getPlugins()).thenReturn(emptyList())
+    }
+
+    private fun givenMultiplePersistersWithLocalChanges(persisters: List<SyncableDataPersister>) {
+        val updatesJSON = FileUtilities.loadText(javaClass.classLoader!!, "data_sync_sent_bookmarks.json")
+        val localChanges = SyncChangesRequest(BOOKMARKS, updatesJSON, ModifiedSince.Timestamp("2021-01-01T00:00:00.000Z"))
+        val fakeProviderPlugin = FakeSyncableDataProvider(fakeChanges = localChanges)
+
+        persisters.forEach { persister ->
+            whenever(persister.onSuccess(any(), any())).thenReturn(SyncMergeResult.Success())
+        }
+        whenever(syncablePersisterPlugins.getPlugins())
+            .thenReturn(persisters)
+            .thenReturn(persisters)
+        whenever(providerPlugins.getPlugins())
+            .thenReturn(listOf(fakeProviderPlugin))
+            .thenReturn(listOf(FakeSyncableDataProvider(fakeChanges = SyncChangesRequest.empty())))
+    }
+
+    private fun givenDeletions(type: SyncableType, untilTimestamp: String): SyncDeletionRequest {
+        val deletionRequest = SyncDeletionRequest(type, untilTimestamp)
+        val deletionManager = FakeDeletableDataManager(type, deletionRequest)
+        whenever(deletableDataManagerPlugins.getPlugins()).thenReturn(listOf(deletionManager))
+        return deletionRequest
+    }
+
+    private fun givenDeletionSuccess(deletionRequest: SyncDeletionRequest, response: SyncDeletionResponse? = null) {
+        val deletionResponse = response ?: SyncDeletionResponse(deletionRequest.type, deletionRequest.untilTimestamp)
+        whenever(syncApiClient.delete(deletionRequest)).thenReturn(Success(deletionResponse))
+    }
+
+    private fun givenDeletionError(deletionRequest: SyncDeletionRequest, errorCode: Int) {
+        whenever(syncApiClient.delete(deletionRequest)).thenReturn(Result.Error(errorCode, "deletion failed"))
+    }
+
+    private fun givenNoDeletions() {
+        whenever(deletableDataManagerPlugins.getPlugins()).thenReturn(emptyList())
+    }
+
+    private fun givenChangesForType(
+        type: SyncableType,
+        jsonString: String,
+        modifiedSince: ModifiedSince,
+    ): SyncChangesRequest {
+        val changes = SyncChangesRequest(type, jsonString, modifiedSince)
+        val provider = FakeSyncableDataProvider(type, changes)
+        val persister = FakeSyncableDataPersister()
+
+        whenever(syncablePersisterPlugins.getPlugins())
+            .thenReturn(listOf(persister))
+            .thenReturn(listOf(FakeSyncableDataPersister()))
+        whenever(providerPlugins.getPlugins())
+            .thenReturn(listOf(provider))
+            .thenReturn(listOf(FakeSyncableDataProvider(type, SyncChangesRequest.empty())))
+        return changes
     }
 }

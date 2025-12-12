@@ -92,6 +92,11 @@ interface SyncApi {
         token: String,
         since: String,
     ): Result<JSONObject>
+
+    fun deleteAiChats(
+        token: String,
+        until: String,
+    ): Result<Unit>
 }
 
 @ContributesBinding(AppScope::class)
@@ -375,6 +380,23 @@ class SyncServiceRemote @Inject constructor(
             logcat(INFO) { "Sync-service: get settings response: $it" }
             val data = response.body() ?: return@onSuccess Result.Error(reason = "GetSettings: empty body")
             Result.Success(data)
+        }
+    }
+
+    override fun deleteAiChats(
+        token: String,
+        until: String,
+    ): Result<Unit> {
+        val response = runCatching {
+            val deleteCall = syncService.deleteAiChats("Bearer $token", until)
+            deleteCall.execute()
+        }.getOrElse { throwable ->
+            logcat(INFO) { "Sync-service: error ${throwable.localizedMessage}" }
+            return Result.Error(reason = throwable.message.toString())
+        }
+
+        return onSuccess(response) {
+            Result.Success(Unit)
         }
     }
 

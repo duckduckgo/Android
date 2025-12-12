@@ -22,6 +22,7 @@ import com.squareup.moshi.Json
 import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.PATCH
@@ -108,6 +109,12 @@ interface SyncService {
 
     @GET("$SYNC_PROD_ENVIRONMENT_URL/sync/settings")
     fun settingsSince(@Header("Authorization") token: String, @Query("since") since: String): Call<JSONObject>
+
+    @DELETE("$SYNC_PROD_ENVIRONMENT_URL/sync/ai_chats")
+    fun deleteAiChats(
+        @Header("Authorization") token: String,
+        @Query("until") until: String,
+    ): Call<JSONObject>
 
     companion object {
         const val SYNC_PROD_ENVIRONMENT_URL = "https://sync.duckduckgo.com"
