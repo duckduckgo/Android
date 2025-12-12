@@ -16,13 +16,14 @@
 
 package com.duckduckgo.common.ui.compose.textfield
 
-import androidx.annotation.DrawableRes
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.input.InputTransformation
 import androidx.compose.foundation.text.input.TextFieldBuffer
 import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.foundation.text.selection.LocalTextSelectionColors
 import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -35,10 +36,11 @@ import androidx.compose.material3.TextFieldColors
 import androidx.compose.material3.TextFieldLabelPosition
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.ImeAction
@@ -60,18 +62,18 @@ import com.duckduckgo.mobile.android.R
  *
  * @param state The state of the text field that is used to read and write the text and selection.
  * @param modifier Optional [Modifier] for this text field. Can be used request focus via [Modifier.focusRequester] for example.
- * @param hint Optional hint text to display inside the text field when it's empty or above the text field when it has text or is focused.
+ * @param label Optional label/hint text to display inside the text field when it's empty or above the text field when it has text or is focused.
  * @param lineLimits Line limits configuration for the text field, such as single-line, multi-line or form. See [DaxTextFieldLineLimits] for details.
- * @param enabled Whether the interaction with the text field is enabled or disabled.
- * @param editable Whether the text field is editable by the user or read-only.
- * @param clickable Whether the text field is clickable, triggering the [onClick] callback when focused.
+ * @param inputMode Input mode for the text field, such as editable, read-only or disabled. See [DaxTextFieldInputMode] for details.
  * @param error Optional error message to display below the text field. If provided, the text field will be styled to indicate an error.
  * @param keyboardOptions Software keyboard options that contains configuration such as [KeyboardType] and [ImeAction].
- * See [DaxTextFieldDefaults.TextKeyboardOptions], [DaxTextFieldDefaults.IpAddressKeyboardOptions] and [DaxTextFieldDefaults.UrlKeyboardOptions] for examples.
- * @param trailingIcon Optional [DaxTextFieldTrailingIcon] that will be displayed at the end of the text field.
+ * See [DaxTextFieldDefaults.TextKeyboardOptions], [DaxTextFieldDefaults.IpAddressKeyboardOptions] and
+ * [DaxTextFieldDefaults.UrlKeyboardOptions] for examples.
  * @param inputTransformation Optional transformation to apply to the input text before it's written to the state. Can be used for input filtering.
- * @param onClick Optional callback that is triggered when the text field is [clickable] or when [trailingIcon] is clicked.
- * @param onFocusChanged Optional callback that is triggered when the focus state of the text field changes.
+ * @param interactionSource Optional interaction source for observing and emitting interaction events.
+ * You can use this to observe focus, pressed, hover and drag events.
+ * @param trailingIcon Optional trailing icon composable to display at the end of the text field.
+ * Use [DaxTextFieldTrailingIconScope.DaxTextFieldTrailingIcon] to create the icon.
  *
  * Asana Task: https://app.asana.com/1/137249556945/project/1202857801505092/task/1212213756433276?focus=true
  * Figma reference: https://www.figma.com/design/BOHDESHODUXK7wSRNBOHdu/%F0%9F%A4%96-Android-Components?m=auto&node-id=2691-3327
@@ -80,17 +82,14 @@ import com.duckduckgo.mobile.android.R
 fun DaxTextField(
     state: TextFieldState,
     modifier: Modifier = Modifier,
-    hint: String? = null,
+    label: String? = null,
     lineLimits: DaxTextFieldLineLimits = DaxTextFieldLineLimits.MultiLine,
-    enabled: Boolean = true,
-    editable: Boolean = true,
-    clickable: Boolean = false,
+    inputMode: DaxTextFieldInputMode = DaxTextFieldInputMode.Editable,
     error: String? = null,
-    trailingIcon: DaxTextFieldTrailingIcon? = null,
     keyboardOptions: KeyboardOptions = DaxTextFieldDefaults.TextKeyboardOptions,
     inputTransformation: InputTransformation? = null,
-    onClick: (() -> Unit)? = null,
-    onFocusChanged: ((Boolean) -> Unit)? = null,
+    interactionSource: MutableInteractionSource? = null,
+    trailingIcon: (@Composable DaxTextFieldTrailingIconScope.() -> Unit)? = null,
 ) {
     // override is needed as TextField uses MaterialTheme.typography internally for animating the label text style
     MaterialTheme(
@@ -105,59 +104,68 @@ fun DaxTextField(
             ),
         ),
     ) {
-        OutlinedTextField(
-            state = state,
-            modifier = modifier
-                .fillMaxWidth()
-                .onFocusChanged { focusState ->
-                    onFocusChanged?.invoke(focusState.isFocused)
-                    if (focusState.isFocused && clickable) {
-                        onClick?.invoke()
+        CompositionLocalProvider(LocalTextSelectionColors provides daxTextFieldColors().textSelectionColors) {
+            OutlinedTextField(
+                state = state,
+                modifier = modifier
+                    .fillMaxWidth()
+                    .alpha(
+                        if (inputMode == DaxTextFieldInputMode.Editable || inputMode == DaxTextFieldInputMode.ReadOnly) {
+                            DaxTextFieldDefaults.ALPHA_ENABLED
+                        } else {
+                            DaxTextFieldDefaults.ALPHA_DISABLED
+                        },
+                    ),
+                enabled = when (inputMode) {
+                    DaxTextFieldInputMode.Editable -> true
+                    DaxTextFieldInputMode.ReadOnly -> true
+                    DaxTextFieldInputMode.Disabled -> false
+                },
+                readOnly = when (inputMode) {
+                    DaxTextFieldInputMode.Editable -> false
+                    DaxTextFieldInputMode.ReadOnly -> true
+                    DaxTextFieldInputMode.Disabled -> true
+                },
+                label = if (!label.isNullOrBlank()) {
+                    {
+                        // can't use DaxText here as TextField applies its own style to label and the Text style needs to be Unspecified
+                        Text(
+                            text = label,
+                            overflow = TextOverflow.Ellipsis,
+                            maxLines = 1,
+                            color = LocalContentColor.current,
+                        )
                     }
-                }
-                .alpha(
-                    if (enabled || (!editable && clickable)) {
-                        DaxTextFieldDefaults.ALPHA_ENABLED
-                    } else {
-                        DaxTextFieldDefaults.ALPHA_DISABLED
-                    },
-                ),
-            enabled = enabled || editable || clickable,
-            readOnly = !editable || clickable,
-            label = if (!hint.isNullOrBlank()) {
-                {
-                    // can't use DaxText here as TextField applies its own style to label and the Text style needs to be Unspecified
-                    Text(
-                        text = hint,
-                        overflow = TextOverflow.Ellipsis,
-                        maxLines = 1,
-                        color = LocalContentColor.current,
-                    )
-                }
-            } else {
-                null
-            },
-            labelPosition = TextFieldLabelPosition.Attached(),
-            textStyle = DuckDuckGoTheme.typography.body1.asTextStyle,
-            trailingIcon = trailingIcon?.let { { trailingIcon.ToIcon(enabled, onClick) } },
-            isError = !error.isNullOrBlank(),
-            shape = DuckDuckGoTheme.shapes.small,
-            supportingText = if (!error.isNullOrBlank()) {
-                {
-                    DaxText(
-                        text = error,
-                        style = DuckDuckGoTheme.typography.caption,
-                        color = DuckDuckGoTheme.colors.destructive,
-                    )
-                }
-            } else {
-                null
-            },
-            keyboardOptions = keyboardOptions,
-            lineLimits = lineLimits.toLineLimits(),
-            inputTransformation = inputTransformation,
-            colors = daxTextFieldColors(),
-        )
+                } else {
+                    null
+                },
+                labelPosition = TextFieldLabelPosition.Attached(),
+                textStyle = DuckDuckGoTheme.typography.body1.asTextStyle,
+                trailingIcon = trailingIcon?.let {
+                    {
+                        DaxTextFieldTrailingIconScope.it()
+                    }
+                },
+                isError = !error.isNullOrBlank(),
+                shape = DuckDuckGoTheme.shapes.small,
+                supportingText = if (!error.isNullOrBlank()) {
+                    {
+                        DaxText(
+                            text = error,
+                            style = DuckDuckGoTheme.typography.caption,
+                            color = DuckDuckGoTheme.colors.destructive,
+                        )
+                    }
+                } else {
+                    null
+                },
+                keyboardOptions = keyboardOptions,
+                lineLimits = lineLimits.toLineLimits(),
+                inputTransformation = inputTransformation,
+                interactionSource = interactionSource,
+                colors = daxTextFieldColors(),
+            )
+        }
     }
 }
 
@@ -210,6 +218,38 @@ object DaxTextFieldDefaults {
     }
 }
 
+object DaxTextFieldTrailingIconScope {
+    /**
+     * Represents a trailing icon for the text field.
+     *
+     * @param painter Painter for the icon to display.
+     * @param contentDescription Optional content description for accessibility.
+     * @param modifier Optional [Modifier] for this icon button.
+     * @param enabled Whether the icon button is enabled or disabled.
+     * @param onClick Optional callback that is triggered when the icon button is clicked.
+     */
+    @Composable
+    fun DaxTextFieldTrailingIcon(
+        painter: Painter,
+        contentDescription: String?,
+        modifier: Modifier = Modifier,
+        enabled: Boolean = true,
+        onClick: (() -> Unit)? = null,
+    ) {
+        IconButton(
+            onClick = { onClick?.invoke() },
+            enabled = enabled,
+            modifier = modifier,
+        ) {
+            Icon(
+                painter = painter,
+                contentDescription = contentDescription,
+                tint = DuckDuckGoTheme.iconColors.primary,
+            )
+        }
+    }
+}
+
 @Stable
 enum class DaxTextFieldLineLimits {
     /**
@@ -239,36 +279,22 @@ enum class DaxTextFieldLineLimits {
     }
 }
 
-/**
- * Represents a trailing icon for the text field.
- *
- * @param iconResId Resource ID of the drawable icon.
- * @param contentDescription Optional content description for accessibility.
- */
 @Stable
-data class DaxTextFieldTrailingIcon(
-    @DrawableRes val iconResId: Int,
-    val contentDescription: String? = null,
-)
+enum class DaxTextFieldInputMode {
+    /**
+     * The TextField is editable by the user.
+     */
+    Editable,
 
-/**
- * Converts a [DaxTextFieldTrailingIcon] to a [IconButton] composable.
- */
-@Composable
-internal fun DaxTextFieldTrailingIcon.ToIcon(
-    enabled: Boolean,
-    onClick: (() -> Unit)?,
-) {
-    IconButton(
-        onClick = { onClick?.invoke() },
-        enabled = enabled,
-    ) {
-        Icon(
-            painter = painterResource(iconResId),
-            contentDescription = contentDescription,
-            tint = DuckDuckGoTheme.colors.iconPrimary,
-        )
-    }
+    /**
+     * The TextField is read-only and cannot be edited by the user.
+     */
+    ReadOnly,
+
+    /**
+     * The TextField is disabled and does not allow any interaction.
+     */
+    Disabled,
 }
 
 @Composable
@@ -282,16 +308,16 @@ internal fun daxTextFieldColors(): TextFieldColors = OutlinedTextFieldDefaults.c
     disabledContainerColor = Transparent,
     errorContainerColor = Transparent,
     focusedBorderColor = DuckDuckGoTheme.colors.accentBlue,
-    unfocusedBorderColor = DuckDuckGoTheme.colors.borders,
-    disabledBorderColor = DuckDuckGoTheme.colors.borders,
+    unfocusedBorderColor = DuckDuckGoTheme.colors.textField.borders,
+    disabledBorderColor = DuckDuckGoTheme.colors.textField.borders,
     errorBorderColor = DuckDuckGoTheme.colors.destructive,
     focusedLabelColor = DuckDuckGoTheme.colors.accentBlue,
     unfocusedLabelColor = DuckDuckGoTheme.colors.text.secondary,
     disabledLabelColor = DuckDuckGoTheme.colors.text.secondary,
     errorLabelColor = DuckDuckGoTheme.colors.destructive,
-    focusedTrailingIconColor = DuckDuckGoTheme.colors.iconPrimary,
-    unfocusedTrailingIconColor = DuckDuckGoTheme.colors.iconPrimary,
-    disabledTrailingIconColor = DuckDuckGoTheme.colors.iconPrimary,
+    focusedTrailingIconColor = DuckDuckGoTheme.colors.icons.primary,
+    unfocusedTrailingIconColor = DuckDuckGoTheme.colors.icons.primary,
+    disabledTrailingIconColor = DuckDuckGoTheme.colors.icons.primary,
     errorTrailingIconColor = DuckDuckGoTheme.colors.destructive,
     focusedSupportingTextColor = DuckDuckGoTheme.colors.destructive,
     unfocusedSupportingTextColor = DuckDuckGoTheme.colors.destructive,
@@ -303,9 +329,9 @@ internal fun daxTextFieldColors(): TextFieldColors = OutlinedTextFieldDefaults.c
         handleColor = DuckDuckGoTheme.colors.accentBlue,
         backgroundColor = DuckDuckGoTheme.colors.accentBlue.copy(alpha = DaxTextFieldDefaults.ALPHA_DISABLED),
     ),
-    focusedLeadingIconColor = DuckDuckGoTheme.colors.iconPrimary,
-    unfocusedLeadingIconColor = DuckDuckGoTheme.colors.iconPrimary,
-    disabledLeadingIconColor = DuckDuckGoTheme.colors.iconPrimary,
+    focusedLeadingIconColor = DuckDuckGoTheme.colors.icons.primary,
+    unfocusedLeadingIconColor = DuckDuckGoTheme.colors.icons.primary,
+    disabledLeadingIconColor = DuckDuckGoTheme.colors.icons.primary,
     errorLeadingIconColor = DuckDuckGoTheme.colors.destructive,
     focusedPrefixColor = DuckDuckGoTheme.colors.text.secondary,
     unfocusedPrefixColor = DuckDuckGoTheme.colors.text.secondary,
@@ -327,7 +353,7 @@ private fun DaxTextFieldEmptyPreview() {
     DaxTextFieldPreviewBox {
         DaxTextField(
             state = TextFieldState(),
-            hint = "Enter text",
+            label = "Enter text",
         )
     }
 }
@@ -339,17 +365,17 @@ private fun DaxTextFieldWithTextPreview() {
     DaxTextFieldPreviewBox {
         DaxTextField(
             state = TextFieldState(initialText = "Sample text content"),
-            hint = "Enter text",
+            label = "Enter text",
         )
     }
 }
 
 @PreviewLightDark
 @Composable
-private fun DaxTextFieldNoHintPreview() {
+private fun DaxTextFieldNoLabelPreview() {
     DaxTextFieldPreviewBox {
         DaxTextField(
-            state = TextFieldState(initialText = "Text without hint"),
+            state = TextFieldState(initialText = "Text without label"),
         )
     }
 }
@@ -360,7 +386,7 @@ private fun DaxTextFieldSingleLinePreview() {
     DaxTextFieldPreviewBox {
         DaxTextField(
             state = TextFieldState(initialText = "Single line text field"),
-            hint = "Enter single line",
+            label = "Enter single line",
             lineLimits = DaxTextFieldLineLimits.SingleLine,
         )
     }
@@ -372,7 +398,7 @@ private fun DaxTextFieldMultiLinePreview() {
     DaxTextFieldPreviewBox {
         DaxTextField(
             state = TextFieldState(initialText = "Multi line text field\nwith multiple lines\nof content"),
-            hint = "Enter multiple lines",
+            label = "Enter multiple lines",
             lineLimits = DaxTextFieldLineLimits.MultiLine,
         )
     }
@@ -384,32 +410,8 @@ private fun DaxTextFieldFormPreview() {
     DaxTextFieldPreviewBox {
         DaxTextField(
             state = TextFieldState(initialText = "Form text field\ntakes minimum 3 lines"),
-            hint = "Enter form content",
+            label = "Enter form content",
             lineLimits = DaxTextFieldLineLimits.Form,
-        )
-    }
-}
-
-@PreviewLightDark
-@Composable
-private fun DaxTextFieldEnabledPreview() {
-    DaxTextFieldPreviewBox {
-        DaxTextField(
-            state = TextFieldState(initialText = "Enabled text field"),
-            hint = "Enter text",
-            enabled = true,
-        )
-    }
-}
-
-@PreviewLightDark
-@Composable
-private fun DaxTextFieldDisabledPreview() {
-    DaxTextFieldPreviewBox {
-        DaxTextField(
-            state = TextFieldState(initialText = "Disabled text field"),
-            hint = "Enter text",
-            enabled = false,
         )
     }
 }
@@ -420,8 +422,20 @@ private fun DaxTextFieldEditablePreview() {
     DaxTextFieldPreviewBox {
         DaxTextField(
             state = TextFieldState(initialText = "Editable text field"),
-            hint = "Enter text",
-            editable = true,
+            label = "Enter text",
+            inputMode = DaxTextFieldInputMode.Editable,
+        )
+    }
+}
+
+@PreviewLightDark
+@Composable
+private fun DaxTextFieldDisabledPreview() {
+    DaxTextFieldPreviewBox {
+        DaxTextField(
+            state = TextFieldState(initialText = "Disabled text field"),
+            label = "Enter text",
+            inputMode = DaxTextFieldInputMode.Disabled,
         )
     }
 }
@@ -432,33 +446,8 @@ private fun DaxTextFieldNonEditablePreview() {
     DaxTextFieldPreviewBox {
         DaxTextField(
             state = TextFieldState(initialText = "Non-editable text field"),
-            hint = "Read only",
-            editable = false,
-        )
-    }
-}
-
-@PreviewLightDark
-@Composable
-private fun DaxTextFieldClickablePreview() {
-    DaxTextFieldPreviewBox {
-        DaxTextField(
-            state = TextFieldState(initialText = "Clickable text field"),
-            hint = "Click to interact",
-            clickable = true,
-            onClick = {},
-        )
-    }
-}
-
-@PreviewLightDark
-@Composable
-private fun DaxTextFieldNonClickablePreview() {
-    DaxTextFieldPreviewBox {
-        DaxTextField(
-            state = TextFieldState(initialText = "Non-clickable text field"),
-            hint = "Enter text",
-            clickable = false,
+            label = "Read only",
+            inputMode = DaxTextFieldInputMode.ReadOnly,
         )
     }
 }
@@ -469,7 +458,7 @@ private fun DaxTextFieldWithErrorPreview() {
     DaxTextFieldPreviewBox {
         DaxTextField(
             state = TextFieldState(initialText = "Invalid input"),
-            hint = "Enter text",
+            label = "Enter text",
             error = "This field contains an error",
         )
     }
@@ -481,12 +470,13 @@ private fun DaxTextFieldWithTrailingIconPreview() {
     DaxTextFieldPreviewBox {
         DaxTextField(
             state = TextFieldState(initialText = "Text with icon"),
-            hint = "Enter text",
-            trailingIcon = DaxTextFieldTrailingIcon(
-                iconResId = R.drawable.ic_copy_24,
-                contentDescription = "Copy",
-            ),
-            onClick = {},
+            label = "Enter text",
+            trailingIcon = {
+                DaxTextFieldTrailingIconScope.DaxTextFieldTrailingIcon(
+                    painter = painterResource(R.drawable.ic_copy_24),
+                    contentDescription = "Copy",
+                )
+            },
         )
     }
 }
@@ -497,12 +487,13 @@ private fun DaxTextFieldEmptyWithTrailingIconPreview() {
     DaxTextFieldPreviewBox {
         DaxTextField(
             state = TextFieldState(),
-            hint = "Enter text",
-            trailingIcon = DaxTextFieldTrailingIcon(
-                iconResId = R.drawable.ic_copy_24,
-                contentDescription = "Copy",
-            ),
-            onClick = {},
+            label = "Enter text",
+            trailingIcon = {
+                DaxTextFieldTrailingIconScope.DaxTextFieldTrailingIcon(
+                    painter = painterResource(R.drawable.ic_copy_24),
+                    contentDescription = "Copy",
+                )
+            },
         )
     }
 }
@@ -513,13 +504,14 @@ private fun DaxTextFieldErrorWithTrailingIconPreview() {
     DaxTextFieldPreviewBox {
         DaxTextField(
             state = TextFieldState(initialText = "Invalid input"),
-            hint = "Enter text",
+            label = "Enter text",
             error = "Enter at least 3 characters",
-            trailingIcon = DaxTextFieldTrailingIcon(
-                iconResId = R.drawable.ic_copy_24,
-                contentDescription = "Copy",
-            ),
-            onClick = {},
+            trailingIcon = {
+                DaxTextFieldTrailingIcon(
+                    painter = painterResource(R.drawable.ic_copy_24),
+                    contentDescription = "Copy",
+                )
+            },
         )
     }
 }
@@ -530,22 +522,8 @@ private fun DaxTextFieldDisabledWithTextPreview() {
     DaxTextFieldPreviewBox {
         DaxTextField(
             state = TextFieldState(initialText = "Disabled with text"),
-            hint = "Enter text",
-            enabled = false,
-        )
-    }
-}
-
-@PreviewLightDark
-@Composable
-private fun DaxTextFieldNonEditableClickablePreview() {
-    DaxTextFieldPreviewBox {
-        DaxTextField(
-            state = TextFieldState(initialText = "Read-only but clickable"),
-            hint = "Click to select",
-            editable = false,
-            clickable = true,
-            onClick = {},
+            label = "Enter text",
+            inputMode = DaxTextFieldInputMode.Disabled,
         )
     }
 }

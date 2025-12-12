@@ -37,6 +37,7 @@ data class DuckDuckGoColors(
     val brand: DuckDuckGoBrandColors,
     val icons: DuckDuckGoIconsColors,
     val infoPanel: DuckDuckGoInfoPanelColors,
+    val textField: DuckDuckGoTextFieldColors,
     val system: DuckDuckGoSystemColors,
     val isDark: Boolean, // TODO we'll need to do an exploration into using the app pref for Theme switching
 )
@@ -63,6 +64,11 @@ data class DuckDuckGoTextColors(
     val disabled: Color,
     val logoTitle: Color,
     val omnibarHighlight: Color,
+)
+
+@Immutable
+data class DuckDuckGoTextFieldColors(
+    val borders: Color,
 )
 
 @Immutable
