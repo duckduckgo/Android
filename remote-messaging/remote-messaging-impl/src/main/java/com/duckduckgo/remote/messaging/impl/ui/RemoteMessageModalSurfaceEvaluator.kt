@@ -21,10 +21,10 @@ import android.content.Intent
 import android.os.SystemClock
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.onboarding.OnboardingFlowChecker
-import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.modalcoordinator.api.ModalEvaluator
+import com.duckduckgo.modalcoordinator.api.ModalEvaluatorCompletionStore
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
 import com.duckduckgo.remote.messaging.api.Surface
@@ -51,7 +51,7 @@ interface RemoteMessageModalSurfaceEvaluator
 class RemoteMessageModalSurfaceEvaluatorImpl @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val remoteMessagingRepository: RemoteMessagingRepository,
-    private val settingsDataStore: SettingsDataStore,
+    private val modalEvaluatorCompletionStore: ModalEvaluatorCompletionStore,
     private val globalActivityStarter: GlobalActivityStarter,
     private val dispatchers: DispatcherProvider,
     private val applicationContext: Context,
@@ -98,15 +98,22 @@ class RemoteMessageModalSurfaceEvaluatorImpl @Inject constructor(
         }
     }
 
-    private fun hasMetBackgroundTimeThreshold(): Boolean {
-        if (!settingsDataStore.hasBackgroundTimestampRecorded()) {
+    private suspend fun hasMetBackgroundTimeThreshold(): Boolean {
+        if (!modalEvaluatorCompletionStore.hasBackgroundTimestampRecorded()) {
             return false
         }
 
-        val backgroundTimestamp = settingsDataStore.appBackgroundedTimestamp
+        val backgroundTimestamp = modalEvaluatorCompletionStore.getBackgroundedTimestamp()
         // Using elapsed real time as this is how it's saved in the data store.
         val currentTimestamp = SystemClock.elapsedRealtime()
-        return (currentTimestamp - backgroundTimestamp) >= BACKGROUND_THRESHOLD_MILLIS
+        val hasMetThreshold = (currentTimestamp - backgroundTimestamp) >= BACKGROUND_THRESHOLD_MILLIS
+
+        // Clear timestamp after checking to reset for next cycle
+        if (hasMetThreshold) {
+            modalEvaluatorCompletionStore.clearBackgroundTimestamp()
+        }
+
+        return hasMetThreshold
     }
 
     companion object {
