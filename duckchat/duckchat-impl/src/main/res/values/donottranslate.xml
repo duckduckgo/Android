@@ -14,11 +14,9 @@
   ~ limitations under the License.
   -->
 
-<com.duckduckgo.common.ui.view.listitem.SettingsListItem xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/duckAiSettings"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    app:indicatorStatus="on"
-    app:leadingIcon="@drawable/ic_ai_chat_color_24"
-    app:primaryText="@string/duck_ai_paid_settings_title" />
+<resources>
+    <!-- Duck AI Paid Settings -->
+    <string name="duck_ai_paid_settings_enable_in_settings">Enable in AI Features Settings</string>
+    <string name="duck_ai_paid_settings_manage_in_settings">Manage in AI Features Settings</string>
+    <string name="duck_ai_paid_settings_manage_secondary">Configure Duck.ai in AI Features settings.</string>
+</resources>

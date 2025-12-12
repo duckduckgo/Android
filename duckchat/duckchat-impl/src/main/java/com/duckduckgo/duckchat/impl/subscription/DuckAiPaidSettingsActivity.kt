@@ -24,6 +24,7 @@ import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
 import android.text.style.URLSpan
 import android.view.View
+import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -36,11 +37,14 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
 import com.duckduckgo.duckchat.impl.R.string
 import com.duckduckgo.duckchat.impl.databinding.ActivityDuckAiPaidSettingsBinding
 import com.duckduckgo.duckchat.impl.subscription.DuckAiPaidSettingsViewModel.Command
 import com.duckduckgo.duckchat.impl.subscription.DuckAiPaidSettingsViewModel.Command.LaunchLearnMoreWebPage
 import com.duckduckgo.duckchat.impl.subscription.DuckAiPaidSettingsViewModel.Command.OpenDuckAi
+import com.duckduckgo.duckchat.impl.subscription.DuckAiPaidSettingsViewModel.Command.OpenDuckChatSettings
+import com.duckduckgo.duckchat.impl.subscription.DuckAiPaidSettingsViewModel.ViewState
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import kotlinx.coroutines.flow.launchIn
@@ -90,6 +94,9 @@ class DuckAiPaidSettingsActivity : DuckDuckGoActivity() {
         binding.duckAiPaidSettingsOpenDuckAi.setOnClickListener {
             viewModel.onOpenDuckAiSelected()
         }
+        binding.duckAiPaidSettingsEnableInSettings.setOnClickListener {
+            viewModel.onEnableInSettingsSelected()
+        }
     }
 
     private fun observeViewModel() {
@@ -97,6 +104,33 @@ class DuckAiPaidSettingsActivity : DuckDuckGoActivity() {
             .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
             .onEach { processCommand(it) }
             .launchIn(lifecycleScope)
+
+        viewModel.viewState
+            .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+            .onEach { viewState -> viewState?.let { renderViewState(it) } }
+            .launchIn(lifecycleScope)
+    }
+
+    private fun renderViewState(viewState: ViewState) {
+        with(binding) {
+            statusIndicator.setStatus(viewState.isDuckAIEnabled)
+            duckAiPaidSettingsOpenDuckAi.isVisible = viewState.isDuckAIEnabled
+            duckAiPaidSettingsEnableInSettings.isVisible = true
+            duckAiPaidSettingsEnableInSettings.setPrimaryText(
+                if (viewState.isDuckAIEnabled) {
+                    getString(string.duck_ai_paid_settings_manage_in_settings)
+                } else {
+                    getString(string.duck_ai_paid_settings_enable_in_settings)
+                },
+            )
+            duckAiPaidSettingsEnableInSettings.setSecondaryText(
+                if (viewState.isDuckAIEnabled) {
+                    getString(string.duck_ai_paid_settings_manage_secondary)
+                } else {
+                    ""
+                },
+            )
+        }
     }
 
     private fun processCommand(command: Command) {
@@ -108,6 +142,10 @@ class DuckAiPaidSettingsActivity : DuckDuckGoActivity() {
 
             OpenDuckAi -> {
                 duckChat.openDuckChat()
+            }
+
+            OpenDuckChatSettings -> {
+                globalActivityStarter.start(this, DuckChatSettingsNoParams)
             }
         }
     }
