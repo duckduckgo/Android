@@ -18,6 +18,9 @@
     package="com.duckduckgo.remote.messaging.impl">
 
     <application>
+        <activity
+            android:name="com.duckduckgo.remote.messaging.impl.ui.ModalSurfaceActivity"
+            android:exported="false" />
         <receiver
             android:name=".newtab.SharePromoLinkBroadCastReceiver"
             android:exported="false" />
