@@ -16,6 +16,8 @@
 
 package com.duckduckgo.subscriptions.impl.wideevents
 
+import androidx.core.net.toUri
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.wideevents.CleanupPolicy
 import com.duckduckgo.app.statistics.wideevents.FlowStatus
 import com.duckduckgo.app.statistics.wideevents.WideEventClient
@@ -25,6 +27,8 @@ import com.duckduckgo.subscriptions.impl.PrivacyProFeature
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.Lazy
 import dagger.SingleInstanceIn
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -32,6 +36,7 @@ interface SubscriptionRestoreWideEvent {
     suspend fun onEmailRestoreFlowStarted()
     suspend fun onGooglePlayRestoreFlowStarted()
     suspend fun onGooglePlayRestoreFlowStartedOnPurchaseAttempt()
+    fun onSubscriptionWebViewUrlChanged(url: String)
 
     suspend fun onEmailRestoreSuccess()
     suspend fun onGooglePlayRestoreSuccess()
@@ -44,6 +49,7 @@ class SubscriptionRestoreWideEventImpl @Inject constructor(
     private val wideEventClient: WideEventClient,
     private val privacyProFeature: Lazy<PrivacyProFeature>,
     private val dispatchers: DispatcherProvider,
+    @AppCoroutineScope private val coroutineScope: CoroutineScope,
 ) : SubscriptionRestoreWideEvent {
 
     private var cachedFlowId: Long? = null
@@ -89,6 +95,26 @@ class SubscriptionRestoreWideEventImpl @Inject constructor(
         cachedFlowId = null
     }
 
+    override fun onSubscriptionWebViewUrlChanged(url: String) {
+        coroutineScope.launch {
+            runCatching {
+                if (!isFeatureEnabled()) return@runCatching
+                val wideEventId = getCurrentWideEventId() ?: return@runCatching
+
+                val stepName = when (url.toUri().path) {
+                    PATH_ACTIVATE_BY_EMAIL_OTP -> STEP_ONE_TIME_PASSWORD_INPUT
+                    PATH_ACTIVATE_BY_EMAIL -> STEP_EMAIL_INPUT
+                    PATH_ACTIVATION_FLOW -> STEP_ACTIVATION_FLOW_STARTED
+                    else -> null
+                }
+
+                if (stepName != null) {
+                    wideEventClient.flowStep(wideEventId, stepName)
+                }
+            }
+        }
+    }
+
     private suspend fun onRestoreFlowStarted(restorePlatform: String, purchaseAttempt: Boolean) {
         getCurrentWideEventId()?.let { wideEventId ->
             wideEventClient.flowFinish(wideEventId = wideEventId, status = FlowStatus.Unknown)
@@ -132,5 +158,13 @@ class SubscriptionRestoreWideEventImpl @Inject constructor(
         const val KEY_IS_PURCHASE_ATTEMPT = "is_purchase_attempt"
         const val RESTORE_PLATFORM_GOOGLE_PLAY = "google_play"
         const val RESTORE_PLATFORM_EMAIL_ADDRESS = "email_address"
+
+        const val PATH_ACTIVATION_FLOW = "/subscriptions/activation-flow"
+        const val PATH_ACTIVATE_BY_EMAIL = "/subscriptions/activation-flow/this-device/activate-by-email"
+        const val PATH_ACTIVATE_BY_EMAIL_OTP = "/subscriptions/activation-flow/this-device/activate-by-email/otp"
+
+        const val STEP_ACTIVATION_FLOW_STARTED = "activation_flow_started"
+        const val STEP_EMAIL_INPUT = "email_input"
+        const val STEP_ONE_TIME_PASSWORD_INPUT = "one_time_password_input"
     }
 }
