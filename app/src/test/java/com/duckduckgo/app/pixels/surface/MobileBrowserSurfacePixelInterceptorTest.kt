@@ -50,7 +50,7 @@ class MobileBrowserSurfacePixelInterceptorTest {
         val startUrl = "$URL_PIXEL_BASE/m_product_telemetry_surface_usage_serp_phone"
         val response = interceptor.intercept(FakeChain(startUrl))
 
-        assertEquals(200, response.code)
+        assertEquals(500, response.code)
         assertEquals("Dropped mobile surfaces pixel", response.message)
         assertEquals("Mobile surfaces pixel dropped", response.body?.string())
     }
@@ -126,7 +126,7 @@ class MobileBrowserSurfacePixelInterceptorTest {
         val startUrl = "$URL_PIXEL_BASE/m_product_telemetry_surface_usage_serp_phone"
         val response = interceptor.intercept(FakeChain(startUrl))
 
-        assertEquals(200, response.code)
+        assertEquals(500, response.code)
         assertEquals("Dropped mobile surfaces pixel", response.message)
     }
 
@@ -157,7 +157,7 @@ class MobileBrowserSurfacePixelInterceptorTest {
         val startUrl = "$URL_PIXEL_BASE/m_product_telemetry_surface_usage_serp_phone?appVersion=5.123.0"
         val response = interceptor.intercept(FakeChain(startUrl))
 
-        assertEquals(200, response.code)
+        assertEquals(500, response.code)
         assertEquals("Dropped mobile surfaces pixel", response.message)
     }
 

@@ -58,7 +58,7 @@ class MobileBrowserSurfacePixelInterceptor @Inject constructor(
 
     private fun dummyResponse(chain: Chain): Response {
         return Response.Builder()
-            .code(200)
+            .code(500)
             .protocol(Protocol.HTTP_2)
             .body("Mobile surfaces pixel dropped".toResponseBody())
             .message("Dropped mobile surfaces pixel")
