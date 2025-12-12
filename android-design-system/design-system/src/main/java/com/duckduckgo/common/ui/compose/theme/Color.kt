@@ -40,13 +40,13 @@ data class DuckDuckGoColors(
     val window: Color,
     val destructive: Color,
     val lines: Color,
-    val borders: Color,
     val accentContentPrimary: Color,
     val accentBlue: Color,
     val accentYellow: Color,
     val ripple: Color,
     val text: DuckDuckGoTextColors,
-    val iconPrimary: Color,
+    val textField: DuckDuckGoTextFieldColors,
+    val icons: DuckDuckGoIconColors,
     val isDark: Boolean, // TODO we'll need to do an exploration into using the app pref for Theme switching
 )
 
@@ -60,6 +60,16 @@ data class DuckDuckGoTextColors(
     val disabled: Color,
     val logoTitle: Color,
     val omnibarHighlight: Color,
+)
+
+@Immutable
+data class DuckDuckGoTextFieldColors(
+    val borders: Color,
+)
+
+@Immutable
+data class DuckDuckGoIconColors(
+    val primary: Color,
 )
 
 @SuppressLint("ComposeCompositionLocalUsage")

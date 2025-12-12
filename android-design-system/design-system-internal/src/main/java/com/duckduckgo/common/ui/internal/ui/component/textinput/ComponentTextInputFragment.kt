@@ -22,6 +22,9 @@ import android.text.Editable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsFocusedAsState
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.text.input.rememberTextFieldState
@@ -36,14 +39,16 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
 import com.duckduckgo.common.ui.compose.text.DaxText
 import com.duckduckgo.common.ui.compose.textfield.DaxSecureTextField
 import com.duckduckgo.common.ui.compose.textfield.DaxTextField
 import com.duckduckgo.common.ui.compose.textfield.DaxTextFieldDefaults
+import com.duckduckgo.common.ui.compose.textfield.DaxTextFieldInputMode
 import com.duckduckgo.common.ui.compose.textfield.DaxTextFieldLineLimits
-import com.duckduckgo.common.ui.compose.textfield.DaxTextFieldTrailingIcon
+import com.duckduckgo.common.ui.compose.textfield.DaxTextFieldTrailingIconScope
 import com.duckduckgo.common.ui.internal.databinding.ComponentTextInputViewBinding
 import com.duckduckgo.common.ui.internal.ui.appComponentsViewModel
 import com.duckduckgo.common.ui.internal.ui.setupThemedComposeView
@@ -137,7 +142,7 @@ class ComponentTextInputFragment : Fragment() {
             val state = rememberTextFieldState()
             DaxTextField(
                 state = state,
-                hint = "Hint text",
+                label = "Hint text",
             )
         }
 
@@ -150,7 +155,7 @@ class ComponentTextInputFragment : Fragment() {
                 )
             DaxTextField(
                 state = state,
-                hint = "Single line editable text",
+                label = "Single line editable text",
                 lineLimits = DaxTextFieldLineLimits.SingleLine,
             )
         }
@@ -164,7 +169,7 @@ class ComponentTextInputFragment : Fragment() {
                 )
             DaxTextField(
                 state = state,
-                hint = "Multi line editable text",
+                label = "Multi line editable text",
                 lineLimits = DaxTextFieldLineLimits.MultiLine,
             )
         }
@@ -178,7 +183,7 @@ class ComponentTextInputFragment : Fragment() {
                 )
             DaxTextField(
                 state = state,
-                hint = "Form mode editable text",
+                label = "Form mode editable text",
                 lineLimits = DaxTextFieldLineLimits.Form,
             )
         }
@@ -186,30 +191,53 @@ class ComponentTextInputFragment : Fragment() {
         // Non-editable text full click listener with end icon
         view.setupThemedComposeView(id = com.duckduckgo.common.ui.internal.R.id.compose_text_input_30, isDarkTheme = isDarkTheme) {
             val state = rememberTextFieldState("Non-editable text full click listener with end icon.")
+
+            val interactionSource = remember { MutableInteractionSource() }
+            val pressed by interactionSource.collectIsPressedAsState()
+
+            LaunchedEffect(pressed) {
+                if (pressed) {
+                    toastOnClick(Action.PerformEndAction)
+                }
+            }
+
             DaxTextField(
                 state = state,
-                onClick = { toastOnClick(Action.PerformEndAction) },
-                hint = "Non-editable text full click listener with end icon",
-                trailingIcon = DaxTextFieldTrailingIcon(
-                    iconResId = R.drawable.ic_copy_24,
-                    contentDescription = "Copy",
-                ),
-                editable = false,
-                clickable = true,
+                label = "Non-editable text full click listener with end icon",
+                trailingIcon = {
+                    DaxTextFieldTrailingIconScope.DaxTextFieldTrailingIcon(
+                        painter = painterResource(R.drawable.ic_copy_24),
+                        contentDescription = "Copy",
+                        onClick = {
+                            toastOnClick(Action.PerformEndAction)
+                        },
+                    )
+                },
+                inputMode = DaxTextFieldInputMode.ReadOnly,
                 lineLimits = DaxTextFieldLineLimits.SingleLine,
+                interactionSource = interactionSource,
             )
         }
 
         // Non-editable text full click listener
         view.setupThemedComposeView(id = com.duckduckgo.common.ui.internal.R.id.compose_text_input_31, isDarkTheme = isDarkTheme) {
             val state = rememberTextFieldState("Non-editable text full click listener.")
+
+            val interactionSource = remember { MutableInteractionSource() }
+            val pressed by interactionSource.collectIsPressedAsState()
+
+            LaunchedEffect(pressed) {
+                if (pressed) {
+                    toastOnClick(Action.PerformEndAction)
+                }
+            }
+
             DaxTextField(
                 state = state,
-                onClick = { toastOnClick(Action.PerformEndAction) },
-                hint = "Non-editable text full click listener",
-                clickable = true,
-                editable = false,
+                label = "Non-editable text full click listener",
+                inputMode = DaxTextFieldInputMode.ReadOnly,
                 lineLimits = DaxTextFieldLineLimits.SingleLine,
+                interactionSource = interactionSource,
             )
         }
 
@@ -222,13 +250,17 @@ class ComponentTextInputFragment : Fragment() {
                 )
             DaxTextField(
                 state = state,
-                hint = "Non-editable text with line truncation and end icon",
-                trailingIcon = DaxTextFieldTrailingIcon(
-                    iconResId = R.drawable.ic_copy_24,
-                    contentDescription = "Copy",
-                ),
-                onClick = { toastOnClick(Action.PerformEndAction) },
-                editable = false,
+                label = "Non-editable text with line truncation and end icon",
+                trailingIcon = {
+                    DaxTextFieldTrailingIconScope.DaxTextFieldTrailingIcon(
+                        painter = painterResource(R.drawable.ic_copy_24),
+                        contentDescription = "Copy",
+                        onClick = {
+                            toastOnClick(Action.PerformEndAction)
+                        },
+                    )
+                },
+                inputMode = DaxTextFieldInputMode.ReadOnly,
                 lineLimits = DaxTextFieldLineLimits.SingleLine,
             )
         }
@@ -240,11 +272,20 @@ class ComponentTextInputFragment : Fragment() {
                     "Non-editable text with line truncation. It has a very long text to show how it " +
                         "behaves when the text is too long to fit in a single line.",
                 )
+
+            val interactionSource = remember { MutableInteractionSource() }
+            val pressed by interactionSource.collectIsPressedAsState()
+
+            LaunchedEffect(pressed) {
+                if (pressed) {
+                    toastOnClick(Action.PerformEndAction)
+                }
+            }
+
             DaxTextField(
                 state = state,
-                hint = "Non-editable text with line truncation",
-                onClick = { toastOnClick(Action.PerformEndAction) },
-                editable = false,
+                label = "Non-editable text with line truncation",
+                inputMode = DaxTextFieldInputMode.ReadOnly,
                 lineLimits = DaxTextFieldLineLimits.SingleLine,
             )
         }
@@ -254,13 +295,17 @@ class ComponentTextInputFragment : Fragment() {
             val state = rememberTextFieldState("This is not editable.")
             DaxTextField(
                 state = state,
-                hint = "Non-editable text with end icon",
-                trailingIcon = DaxTextFieldTrailingIcon(
-                    iconResId = R.drawable.ic_copy_24,
-                    contentDescription = "Copy",
-                ),
-                onClick = { toastOnClick(Action.PerformEndAction) },
-                editable = false,
+                label = "Non-editable text with end icon",
+                trailingIcon = {
+                    DaxTextFieldTrailingIconScope.DaxTextFieldTrailingIcon(
+                        painter = painterResource(R.drawable.ic_copy_24),
+                        contentDescription = "Copy",
+                        onClick = {
+                            toastOnClick(Action.PerformEndAction)
+                        },
+                    )
+                },
+                inputMode = DaxTextFieldInputMode.ReadOnly,
                 lineLimits = DaxTextFieldLineLimits.SingleLine,
             )
         }
@@ -274,8 +319,8 @@ class ComponentTextInputFragment : Fragment() {
                 )
             DaxTextField(
                 state = state,
-                hint = "Non-editable text without end icon",
-                editable = false,
+                label = "Non-editable text without end icon",
+                inputMode = DaxTextFieldInputMode.ReadOnly,
             )
         }
 
@@ -284,7 +329,7 @@ class ComponentTextInputFragment : Fragment() {
             val state = rememberTextFieldState("Loremipsumolor")
             DaxSecureTextField(
                 state = state,
-                hint = "Editable password that fits in one line",
+                label = "Editable password that fits in one line",
             )
         }
 
@@ -296,7 +341,7 @@ class ComponentTextInputFragment : Fragment() {
             )
             DaxSecureTextField(
                 state = state,
-                hint = "Editable password that doesn't fit in one line",
+                label = "Editable password that doesn't fit in one line",
             )
         }
 
@@ -308,8 +353,8 @@ class ComponentTextInputFragment : Fragment() {
             )
             DaxSecureTextField(
                 state = state,
-                hint = "Non-editable password",
-                editable = false,
+                label = "Non-editable password",
+                inputMode = DaxTextFieldInputMode.ReadOnly,
             )
         }
 
@@ -321,12 +366,17 @@ class ComponentTextInputFragment : Fragment() {
             )
             DaxSecureTextField(
                 state = state,
-                hint = "Non-editable password with icon",
-                trailingIcon = DaxTextFieldTrailingIcon(
-                    iconResId = R.drawable.ic_copy_24,
-                    contentDescription = "Copy",
-                ),
-                editable = false,
+                label = "Non-editable password with icon",
+                trailingIcon = {
+                    DaxTextFieldTrailingIconScope.DaxTextFieldTrailingIcon(
+                        painter = painterResource(R.drawable.ic_copy_24),
+                        contentDescription = "Copy",
+                        onClick = {
+                            toastOnClick(Action.PerformEndAction)
+                        },
+                    )
+                },
+                inputMode = DaxTextFieldInputMode.ReadOnly,
             )
         }
 
@@ -335,7 +385,7 @@ class ComponentTextInputFragment : Fragment() {
             val state = rememberTextFieldState("This is an error")
             DaxTextField(
                 state = state,
-                hint = "Error",
+                label = "Error",
                 error = "This is an error",
                 lineLimits = DaxTextFieldLineLimits.SingleLine,
             )
@@ -346,8 +396,8 @@ class ComponentTextInputFragment : Fragment() {
             val state = rememberTextFieldState("This input is disabled")
             DaxTextField(
                 state = state,
-                hint = "Disabled text input",
-                enabled = false,
+                label = "Disabled text input",
+                inputMode = DaxTextFieldInputMode.Disabled,
                 lineLimits = DaxTextFieldLineLimits.SingleLine,
             )
         }
@@ -357,8 +407,8 @@ class ComponentTextInputFragment : Fragment() {
             val state = rememberTextFieldState("This input is disabled")
             DaxTextField(
                 state = state,
-                hint = "Disabled multi line input",
-                enabled = false,
+                label = "Disabled multi line input",
+                inputMode = DaxTextFieldInputMode.Disabled,
                 lineLimits = DaxTextFieldLineLimits.MultiLine,
             )
         }
@@ -368,8 +418,8 @@ class ComponentTextInputFragment : Fragment() {
             val state = rememberTextFieldState("This password input is disabled")
             DaxSecureTextField(
                 state = state,
-                hint = "Disabled password",
-                enabled = false,
+                label = "Disabled password",
+                inputMode = DaxTextFieldInputMode.Disabled,
             )
         }
 
@@ -378,7 +428,7 @@ class ComponentTextInputFragment : Fragment() {
             val state = rememberTextFieldState("192.168.1.1")
             DaxTextField(
                 state = state,
-                hint = "IP Address",
+                label = "IP Address",
                 keyboardOptions = DaxTextFieldDefaults.IpAddressKeyboardOptions,
                 inputTransformation = DaxTextFieldDefaults.IpAddressInputTransformation(),
                 lineLimits = DaxTextFieldLineLimits.SingleLine,
@@ -390,7 +440,7 @@ class ComponentTextInputFragment : Fragment() {
             val state = rememberTextFieldState("https://www.duckduckgo.com")
             DaxTextField(
                 state = state,
-                hint = "URL",
+                label = "URL",
                 keyboardOptions = DaxTextFieldDefaults.UrlKeyboardOptions,
                 lineLimits = DaxTextFieldLineLimits.SingleLine,
             )
@@ -402,7 +452,7 @@ class ComponentTextInputFragment : Fragment() {
 
             DaxTextField(
                 state = state,
-                hint = "Observable text - option 1",
+                label = "Observable text - option 1",
                 error = if (state.text.isNotEmpty() && state.text != "Compose") {
                     "Text must be 'Compose'"
                 } else {
@@ -433,7 +483,7 @@ class ComponentTextInputFragment : Fragment() {
 
             DaxTextField(
                 state = state,
-                hint = "Observable text - option 2",
+                label = "Observable text - option 2",
                 error = error,
                 lineLimits = DaxTextFieldLineLimits.SingleLine,
             )
@@ -443,7 +493,8 @@ class ComponentTextInputFragment : Fragment() {
         view.setupThemedComposeView(id = com.duckduckgo.common.ui.internal.R.id.compose_text_input_28, isDarkTheme = isDarkTheme) {
             val state = rememberTextFieldState("Tap to focus and select all text")
 
-            var isFocused by remember { mutableStateOf(false) }
+            val interactionSource = remember { MutableInteractionSource() }
+            val isFocused by interactionSource.collectIsFocusedAsState()
             LaunchedEffect(isFocused) {
                 if (isFocused) {
                     state.edit {
@@ -454,10 +505,8 @@ class ComponentTextInputFragment : Fragment() {
 
             DaxTextField(
                 state = state,
-                hint = "Autoselect text on focus",
-                onFocusChanged = {
-                    isFocused = it
-                },
+                label = "Autoselect text on focus",
+                interactionSource = interactionSource,
                 lineLimits = DaxTextFieldLineLimits.SingleLine,
             )
         }
@@ -474,7 +523,7 @@ class ComponentTextInputFragment : Fragment() {
 
                 DaxTextField(
                     state = state,
-                    hint = "Programmatically focusable text input",
+                    label = "Programmatically focusable text input",
                     modifier = Modifier.focusRequester(focusRequester),
                     lineLimits = DaxTextFieldLineLimits.SingleLine,
                 )
