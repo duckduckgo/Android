@@ -51,7 +51,7 @@
         <item name="actionOverflowMenuStyle">@style/Widget.DuckDuckGo.PopUpOverflowMenu</item>
         <item name="actionOverflowButtonStyle">@style/Widget.DuckDuckGo.OverflowButton</item>
         <item name="popupMenuStyle">@style/Widget.DuckDuckGo.PopupMenu</item>
-        <item name="bottomSheetDialogTheme">@style/Widget.DuckDuckGo.BottomSheetDialog</item>
+<!--        <item name="bottomSheetDialogTheme">@style/Widget.DuckDuckGo.BottomSheetDialog</item>-->
         <item name="tabStyle">@style/Widget.DuckDuckGo.TabLayout</item>
         <item name="radioButtonStyle">@style/Widget.DuckDuckGo.RadioButton</item>
         <item name="checkboxStyle">@style/Widget.DuckDuckGo.CheckBox</item>
