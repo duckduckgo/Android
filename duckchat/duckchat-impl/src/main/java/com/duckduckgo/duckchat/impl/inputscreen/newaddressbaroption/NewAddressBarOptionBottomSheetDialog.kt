@@ -26,7 +26,10 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.core.content.ContextCompat
 import com.airbnb.lottie.LottieAnimationView
+import com.airbnb.lottie.LottieComposition
+import com.airbnb.lottie.LottieCompositionFactory
 import com.airbnb.lottie.LottieDrawable
+import com.airbnb.lottie.LottieTask
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.databinding.BottomSheetNewAddressBarOptionBinding
@@ -61,8 +64,11 @@ class NewAddressBarOptionBottomSheetDialog(
 
     private var searchAndDuckAiSelected = true
     private var originalOrientation: Int = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
-    private var isLottieLoaded = false
+
+    private var lottieTask: LottieTask<LottieComposition>? = null
+    private var preloadedComposition: LottieComposition? = null
     private var pendingShow = false
+    private var animationStarted = false
 
     init {
         setContentView(binding.root)
@@ -73,6 +79,7 @@ class NewAddressBarOptionBottomSheetDialog(
         setOnShowListener {
             setRoundCorners()
             newAddressBarCallback?.onDisplayed()
+            startLottieAnimation()
         }
 
         setOnCancelListener {
@@ -81,7 +88,7 @@ class NewAddressBarOptionBottomSheetDialog(
             dismiss()
         }
 
-        setupLottieAnimation()
+        preloadLottieAnimation()
         setupSelectionLogic()
 
         binding.newAddressBarOptionBottomSheetDialogPrimaryButton.setOnClickListener {
@@ -159,23 +166,50 @@ class NewAddressBarOptionBottomSheetDialog(
             }
     }
 
-    private fun setupLottieAnimation() {
-        val lottieView = binding.newAddressBarOptionBottomSheetDialogAnimation
+    private fun preloadLottieAnimation() {
+        if (preloadedComposition != null || lottieTask != null) return
 
         val animationResource = if (isDarkThemeEnabled) {
             R.raw.new_address_bar_option_animation_dark
         } else {
             R.raw.new_address_bar_option_animation_light
         }
-        lottieView.setAnimation(animationResource)
 
-        lottieView.addLottieOnCompositionLoadedListener { composition ->
-            isLottieLoaded = true
+        lottieTask = LottieCompositionFactory.fromRawRes(context.applicationContext, animationResource)
+            .addListener { composition ->
+                preloadedComposition = composition
+                lottieTask = null
+
+                binding.newAddressBarOptionBottomSheetDialogAnimation.setComposition(composition)
+                binding.newAddressBarOptionBottomSheetDialogAnimation.progress = 0f
+
+                if (pendingShow) {
+                    pendingShow = false
+                    if (isWindowValid()) { super.show() }
+                }
+            }
+            .addFailureListener {
+                lottieTask = null
+                if (pendingShow) {
+                    pendingShow = false
+                    if (isWindowValid()) { super.show() }
+                }
+            }
+    }
+
+    private fun startLottieAnimation() {
+        if (animationStarted) return
+
+        val lottieView = binding.newAddressBarOptionBottomSheetDialogAnimation
+        val composition = preloadedComposition ?: lottieView.composition
+        if (composition != null) {
+            animationStarted = true
             playIntroThenLoop(lottieView, composition.durationFrames.toInt())
-
-            if (pendingShow) {
-                pendingShow = false
-                if (isWindowValid()) { super.show() }
+        } else {
+            lottieView.addLottieOnCompositionLoadedListener {
+                if (animationStarted) return@addLottieOnCompositionLoadedListener
+                animationStarted = true
+                playIntroThenLoop(lottieView, it.durationFrames.toInt())
             }
         }
     }
@@ -237,18 +271,13 @@ class NewAddressBarOptionBottomSheetDialog(
     }
 
     override fun show() {
-        val lottieView = binding.newAddressBarOptionBottomSheetDialogAnimation
-        val composition = lottieView.composition
-        if (isLottieLoaded || composition != null) {
-            if (!isLottieLoaded) {
-                isLottieLoaded = true
-                composition?.let {
-                    playIntroThenLoop(lottieView, it.durationFrames.toInt())
-                }
-            }
-            if (isWindowValid()) { super.show() }
+        if (!isWindowValid()) return
+
+        if (preloadedComposition != null) {
+            super.show()
         } else {
             pendingShow = true
+            preloadLottieAnimation()
         }
     }
 
