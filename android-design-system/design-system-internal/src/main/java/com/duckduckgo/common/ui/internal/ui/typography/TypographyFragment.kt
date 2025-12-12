@@ -216,7 +216,7 @@ class TypographyFragment : Fragment() {
             DaxText(
                 text = "Text Appearance Body 1 set manually",
                 style = DuckDuckGoTheme.typography.body1,
-                color = DuckDuckGoTheme.colors.destructive,
+                color = DuckDuckGoTheme.colors.text.destructive,
             )
         }
     }
