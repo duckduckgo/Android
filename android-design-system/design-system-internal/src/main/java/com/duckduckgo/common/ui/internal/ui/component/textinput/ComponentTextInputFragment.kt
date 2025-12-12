@@ -273,15 +273,6 @@ class ComponentTextInputFragment : Fragment() {
                         "behaves when the text is too long to fit in a single line.",
                 )
 
-            val interactionSource = remember { MutableInteractionSource() }
-            val pressed by interactionSource.collectIsPressedAsState()
-
-            LaunchedEffect(pressed) {
-                if (pressed) {
-                    toastOnClick(Action.PerformEndAction)
-                }
-            }
-
             DaxTextField(
                 state = state,
                 label = "Non-editable text with line truncation",
