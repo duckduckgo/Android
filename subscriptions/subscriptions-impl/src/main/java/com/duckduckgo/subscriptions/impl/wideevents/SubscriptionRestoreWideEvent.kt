@@ -33,8 +33,8 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 interface SubscriptionRestoreWideEvent {
-    suspend fun onEmailRestoreFlowStarted()
-    suspend fun onGooglePlayRestoreFlowStarted()
+    suspend fun onEmailRestoreFlowStarted(isOriginWeb: Boolean)
+    suspend fun onGooglePlayRestoreFlowStarted(isOriginWeb: Boolean)
     suspend fun onGooglePlayRestoreFlowStartedOnPurchaseAttempt()
     fun onSubscriptionWebViewUrlChanged(url: String)
 
@@ -54,19 +54,21 @@ class SubscriptionRestoreWideEventImpl @Inject constructor(
 
     private var cachedFlowId: Long? = null
 
-    override suspend fun onEmailRestoreFlowStarted() {
+    override suspend fun onEmailRestoreFlowStarted(isOriginWeb: Boolean) {
         if (!isFeatureEnabled()) return
-        onRestoreFlowStarted(restorePlatform = RESTORE_PLATFORM_EMAIL_ADDRESS, purchaseAttempt = false)
+        val flowEntryPoint = if (isOriginWeb) FLOW_ENTRY_POINT_PURCHASE_OFFER_PAGE else FLOW_ENTRY_POINT_APP_SETTINGS
+        onRestoreFlowStarted(restorePlatform = RESTORE_PLATFORM_EMAIL_ADDRESS, purchaseAttempt = false, flowEntryPoint = flowEntryPoint)
     }
 
-    override suspend fun onGooglePlayRestoreFlowStarted() {
+    override suspend fun onGooglePlayRestoreFlowStarted(isOriginWeb: Boolean) {
         if (!isFeatureEnabled()) return
-        onRestoreFlowStarted(restorePlatform = RESTORE_PLATFORM_GOOGLE_PLAY, purchaseAttempt = false)
+        val flowEntryPoint = if (isOriginWeb) FLOW_ENTRY_POINT_PURCHASE_OFFER_PAGE else FLOW_ENTRY_POINT_APP_SETTINGS
+        onRestoreFlowStarted(restorePlatform = RESTORE_PLATFORM_GOOGLE_PLAY, purchaseAttempt = false, flowEntryPoint = flowEntryPoint)
     }
 
     override suspend fun onGooglePlayRestoreFlowStartedOnPurchaseAttempt() {
         if (!isFeatureEnabled()) return
-        onRestoreFlowStarted(restorePlatform = RESTORE_PLATFORM_GOOGLE_PLAY, purchaseAttempt = true)
+        onRestoreFlowStarted(restorePlatform = RESTORE_PLATFORM_GOOGLE_PLAY, purchaseAttempt = true, flowEntryPoint = null)
     }
 
     override suspend fun onEmailRestoreSuccess() {
@@ -115,7 +117,7 @@ class SubscriptionRestoreWideEventImpl @Inject constructor(
         }
     }
 
-    private suspend fun onRestoreFlowStarted(restorePlatform: String, purchaseAttempt: Boolean) {
+    private suspend fun onRestoreFlowStarted(restorePlatform: String, purchaseAttempt: Boolean, flowEntryPoint: String?) {
         getCurrentWideEventId()?.let { wideEventId ->
             wideEventClient.flowFinish(wideEventId = wideEventId, status = FlowStatus.Unknown)
         }
@@ -124,6 +126,7 @@ class SubscriptionRestoreWideEventImpl @Inject constructor(
             .flowStart(
                 name = SUBSCRIPTION_RESTORE_FEATURE_NAME,
                 cleanupPolicy = CleanupPolicy.OnProcessStart(ignoreIfIntervalTimeoutPresent = true),
+                flowEntryPoint = flowEntryPoint,
                 metadata = mapOf(
                     KEY_RESTORE_PLATFORM to restorePlatform,
                     KEY_IS_PURCHASE_ATTEMPT to purchaseAttempt.toString(),
@@ -158,6 +161,8 @@ class SubscriptionRestoreWideEventImpl @Inject constructor(
         const val KEY_IS_PURCHASE_ATTEMPT = "is_purchase_attempt"
         const val RESTORE_PLATFORM_GOOGLE_PLAY = "google_play"
         const val RESTORE_PLATFORM_EMAIL_ADDRESS = "email_address"
+        const val FLOW_ENTRY_POINT_APP_SETTINGS = "funnel_appsettings_android"
+        const val FLOW_ENTRY_POINT_PURCHASE_OFFER_PAGE = "funnel_purchase_offer_page_android"
 
         const val PATH_ACTIVATION_FLOW = "/subscriptions/activation-flow"
         const val PATH_ACTIVATE_BY_EMAIL = "/subscriptions/activation-flow/this-device/activate-by-email"
