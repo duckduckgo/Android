@@ -19,12 +19,9 @@ package com.duckduckgo.app.browser.remotemessage
 import android.content.Context
 import android.content.Intent
 import androidx.lifecycle.LifecycleOwner
-import com.duckduckgo.app.cta.db.DismissedCtaDao
-import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
-import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles
-import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.onboarding.OnboardingFlowChecker
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
@@ -54,13 +51,11 @@ interface RemoteMessageModalSurfaceEvaluator
 class RemoteMessageModalSurfaceEvaluatorImpl @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val remoteMessagingRepository: RemoteMessagingRepository,
-    private val dismissedCtaDao: DismissedCtaDao,
-    private val extendedOnboardingFeatureToggles: ExtendedOnboardingFeatureToggles,
-    private val settingsDataStore: SettingsDataStore,
     private val globalActivityStarter: GlobalActivityStarter,
     private val dispatchers: DispatcherProvider,
     private val applicationContext: Context,
     private val remoteMessagingFeatureToggles: RemoteMessagingFeatureToggles,
+    private val onboardingFlowChecker: OnboardingFlowChecker,
 ) : RemoteMessageModalSurfaceEvaluator, MainProcessLifecycleObserver {
 
     override fun onResume(owner: LifecycleOwner) {
@@ -76,7 +71,7 @@ class RemoteMessageModalSurfaceEvaluatorImpl @Inject constructor(
                 return@withContext
             }
 
-            if (!isHomeOnboardingComplete()) {
+            if (!onboardingFlowChecker.isOnboardingComplete()) {
                 return@withContext
             }
 
@@ -92,13 +87,5 @@ class RemoteMessageModalSurfaceEvaluatorImpl @Inject constructor(
                 applicationContext.startActivity(intent)
             }
         }
-    }
-
-    private fun isHomeOnboardingComplete(): Boolean {
-        val noBrowserCtaExperiment = extendedOnboardingFeatureToggles.noBrowserCtas().isEnabled()
-        return dismissedCtaDao.exists(CtaId.DAX_END) ||
-            noBrowserCtaExperiment ||
-            settingsDataStore.hideTips ||
-            dismissedCtaDao.exists(CtaId.ADD_WIDGET)
     }
 }
