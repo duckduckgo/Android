@@ -1,0 +1,198 @@
+{
+    "m_product_telemetry_surface_usage_keyboard_active": {
+        "description": "Fires when keyboard is displayed on browser or Duck.ai WebView (total impressions)",
+        "owners": ["catalinradoiu"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_product_telemetry_surface_usage_keyboard_active_daily": {
+        "description": "Fires when keyboard is displayed on browser or Duck.ai WebView (daily unique)",
+        "owners": ["catalinradoiu"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_product_telemetry_surface_usage_autocomplete": {
+        "description": "Fires when autocomplete is displayed (total impressions)",
+        "owners": ["catalinradoiu"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_product_telemetry_surface_usage_autocomplete_daily": {
+        "description": "Fires when autocomplete is displayed (daily unique)",
+        "owners": ["catalinradoiu"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_product_telemetry_surface_usage_serp": {
+        "description": "Fires when a SERP is loaded (total impressions)",
+        "owners": ["catalinradoiu"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_product_telemetry_surface_usage_serp_daily": {
+        "description": "Fires when a SERP is loaded (daily unique)",
+        "owners": ["catalinradoiu"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_product_telemetry_surface_usage_website": {
+        "description": "Fires when a website is loaded (total impressions)",
+        "owners": ["catalinradoiu"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_product_telemetry_surface_usage_website_daily": {
+        "description": "Fires when a website is loaded (daily unique)",
+        "owners": ["catalinradoiu"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_product_telemetry_surface_usage_landscape": {
+        "description": "Fires when the app is used in landscape mode (total impressions)",
+        "owners": ["catalinradoiu"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_product_telemetry_surface_usage_landscape_daily": {
+        "description": "Fires when the app is used in landscape mode (daily unique)",
+        "owners": ["catalinradoiu"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_product_telemetry_surface_usage_data_clearing": {
+        "description": "Fires when Clear Tabs and Data is clicked in the Fire Dialog (total impressions)",
+        "owners": ["catalinradoiu"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_product_telemetry_surface_usage_data_clearing_daily": {
+        "description": "Fires when Clear Tabs and Data is clicked in the Fire Dialog (daily unique)",
+        "owners": ["catalinradoiu"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_product_telemetry_surface_usage_duck_ai": {
+        "description": "Fires when Duck.ai is opened (total impressions)",
+        "owners": ["catalinradoiu"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_product_telemetry_surface_usage_duck_ai_daily": {
+        "description": "Fires when Duck.ai is opened (daily unique)",
+        "owners": ["catalinradoiu"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_product_telemetry_surface_usage_tab_manager": {
+        "description": "Fires when the Tab Manager is opened (total impressions)",
+        "owners": ["catalinradoiu"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_product_telemetry_surface_usage_tab_manager_daily": {
+        "description": "Fires when the Tab Manager is opened (daily unique)",
+        "owners": ["catalinradoiu"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_product_telemetry_surface_usage_new_tab_page": {
+        "description": "Fires when the New Tab Page is displayed (total impressions)",
+        "owners": ["catalinradoiu"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_product_telemetry_surface_usage_new_tab_page_daily": {
+        "description": "Fires when the New Tab Page is displayed (daily unique)",
+        "owners": ["catalinradoiu"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_product_telemetry_surface_usage_menu": {
+        "description": "Fires when the browser menu is opened (total impressions)",
+        "owners": ["catalinradoiu"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_product_telemetry_surface_usage_menu_daily": {
+        "description": "Fires when the browser menu is opened (daily unique)",
+        "owners": ["catalinradoiu"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_product_telemetry_surface_usage_bookmarks_page": {
+        "description": "Fires when the Bookmarks page is opened from the navigation menu (total impressions)",
+        "owners": ["catalinradoiu"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_product_telemetry_surface_usage_bookmarks_page_daily": {
+        "description": "Fires when the Bookmarks page is opened from the navigation menu (daily unique)",
+        "owners": ["catalinradoiu"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_product_telemetry_surface_usage_passwords_page": {
+        "description": "Fires when the passwords page is opened (total impressions)",
+        "owners": ["catalinradoiu"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_product_telemetry_surface_usage_passwords_page_daily": {
+        "description": "Fires when the passwords page is opened (daily unique)",
+        "owners": ["catalinradoiu"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_product_telemetry_surface_usage_dau": {
+        "description": "Fires when the app is launched (total impressions)",
+        "owners": ["catalinradoiu"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_product_telemetry_surface_usage_dau_daily": {
+        "description": "App launch - daily unique (DAU)",
+        "owners": ["catalinradoiu"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_product_telemetry_surface_usage_settings": {
+        "description": "Fires when Settings is opened (total impressions)",
+        "owners": ["catalinradoiu"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_product_telemetry_surface_usage_settings_daily": {
+        "description": "Fires when Settings is opened (daily unique)",
+        "owners": ["catalinradoiu"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    }
+}

@@ -691,6 +691,14 @@ class BrowserViewModelTest {
         skipUrlConversionOnNewTabFeature.self().setRawStoredState(State(enable = enabled))
     }
 
+    @Test
+    fun whenSendPixelEventForLandscapeOrientationThenPixelsAreFired() = runTest {
+        testee.sendPixelEventForLandscapeOrientation()
+
+        verify(mockPixel).fire(AppPixelName.PRODUCT_TELEMETRY_SURFACE_LANDSCAPE_ORIENTATION_USED)
+        verify(mockPixel).fire(AppPixelName.PRODUCT_TELEMETRY_SURFACE_LANDSCAPE_ORIENTATION_USED_DAILY, type = Daily())
+    }
+
     companion object {
         const val TAB_ID = "TAB_ID"
     }

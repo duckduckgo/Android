@@ -24,6 +24,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
+import com.duckduckgo.app.pixels.AppPixelName.PRODUCT_TELEMETRY_SURFACE_SETTINGS_OPENED
+import com.duckduckgo.app.pixels.AppPixelName.PRODUCT_TELEMETRY_SURFACE_SETTINGS_OPENED_DAILY
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_ABOUT_DDG_SHARE_FEEDBACK_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_ABOUT_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_ACCESSIBILITY_PRESSED
@@ -176,6 +178,8 @@ class SettingsViewModel @Inject constructor(
 
     init {
         pixel.fire(SETTINGS_OPENED)
+        pixel.fire(PRODUCT_TELEMETRY_SURFACE_SETTINGS_OPENED)
+        pixel.fire(PRODUCT_TELEMETRY_SURFACE_SETTINGS_OPENED_DAILY, type = Pixel.PixelType.Daily())
 
         duckAiFeatureState.showSettings.onEach { showDuckAiSettings ->
             viewState.update { it.copy(isDuckChatEnabled = showDuckAiSettings) }

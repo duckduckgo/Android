@@ -24,7 +24,10 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 
 enum class SavedSitesPixelName(override val pixelName: String) : Pixel.PixelName {
     /** Bookmarks Screen **/
+    MENU_ACTION_BOOKMARKS_PRESSED("m_navigation_menu_bookmarks"),
     MENU_ACTION_BOOKMARKS_PRESSED_DAILY("m_navigation_menu_bookmarks_daily"),
+    PRODUCT_TELEMETRY_SURFACE_BOOKMARKS_OPENED("m_product_telemetry_surface_usage_bookmarks_page"),
+    PRODUCT_TELEMETRY_SURFACE_BOOKMARKS_OPENED_DAILY("m_product_telemetry_surface_usage_bookmarks_page_daily"),
     BOOKMARK_IMPORT_SUCCESS("m_bi_s"),
     BOOKMARK_IMPORT_ERROR("m_bi_e"),
     BOOKMARK_EXPORT_SUCCESS("m_be_a"),

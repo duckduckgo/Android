@@ -113,6 +113,13 @@ class EnqueuedPixelWorker @Inject constructor(
             pixel = AppPixelName.APP_LAUNCH,
             parameters = parameters,
         )
+        pixel.get().fire(
+            pixel = AppPixelName.PRODUCT_TELEMETRY_SURFACE_DAU,
+        )
+        pixel.get().fire(
+            pixel = AppPixelName.PRODUCT_TELEMETRY_SURFACE_DAU_DAILY,
+            type = Pixel.PixelType.Daily(),
+        )
 
         // verified app launch pixel
         if (isVerifiedPlayStoreInstall() && !customTabDetector.isCustomTab()) {

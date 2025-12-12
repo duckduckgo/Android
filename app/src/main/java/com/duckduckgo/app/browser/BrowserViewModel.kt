@@ -510,6 +510,11 @@ class BrowserViewModel @Inject constructor(
         val tabsCount = tabs.value?.size ?: 0
         sendCommand(OpenDuckChat(duckChatUrl, duckChatSessionActive, withTransition, tabsCount))
     }
+
+    fun sendPixelEventForLandscapeOrientation() {
+        pixel.fire(AppPixelName.PRODUCT_TELEMETRY_SURFACE_LANDSCAPE_ORIENTATION_USED)
+        pixel.fire(AppPixelName.PRODUCT_TELEMETRY_SURFACE_LANDSCAPE_ORIENTATION_USED_DAILY, type = Daily())
+    }
 }
 
 /**

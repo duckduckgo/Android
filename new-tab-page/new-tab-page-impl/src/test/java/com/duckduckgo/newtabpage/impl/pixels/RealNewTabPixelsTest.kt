@@ -98,6 +98,8 @@ class RealNewTabPixelsTest {
 
         verify(pixel).fire(NewTabPixelNames.NEW_TAB_DISPLAYED)
         verify(pixel).fire(NewTabPixelNames.NEW_TAB_DISPLAYED_UNIQUE, type = Daily(), parameters = paramsMap)
+        verify(pixel).fire(NewTabPixelNames.PRODUCT_SURFACE_TELEMETRY_NEW_TAB_DISPLAYED)
+        verify(pixel).fire(NewTabPixelNames.PRODUCT_SURFACE_TELEMETRY_NEW_TAB_DISPLAYED_DAILY, type = Daily())
     }
 
     @Test
@@ -114,6 +116,8 @@ class RealNewTabPixelsTest {
 
         verify(pixel).fire(NewTabPixelNames.NEW_TAB_DISPLAYED)
         verify(pixel).fire(NewTabPixelNames.NEW_TAB_DISPLAYED_UNIQUE, type = Daily(), parameters = paramsMap)
+        verify(pixel).fire(NewTabPixelNames.PRODUCT_SURFACE_TELEMETRY_NEW_TAB_DISPLAYED)
+        verify(pixel).fire(NewTabPixelNames.PRODUCT_SURFACE_TELEMETRY_NEW_TAB_DISPLAYED_DAILY, type = Daily())
     }
 
     @Test
@@ -130,6 +134,8 @@ class RealNewTabPixelsTest {
 
         verify(pixel).fire(NewTabPixelNames.NEW_TAB_DISPLAYED)
         verify(pixel).fire(NewTabPixelNames.NEW_TAB_DISPLAYED_UNIQUE, type = Daily(), parameters = paramsMap)
+        verify(pixel).fire(NewTabPixelNames.PRODUCT_SURFACE_TELEMETRY_NEW_TAB_DISPLAYED)
+        verify(pixel).fire(NewTabPixelNames.PRODUCT_SURFACE_TELEMETRY_NEW_TAB_DISPLAYED_DAILY, type = Daily())
     }
 
     @Test
@@ -146,6 +152,8 @@ class RealNewTabPixelsTest {
 
         verify(pixel).fire(NewTabPixelNames.NEW_TAB_DISPLAYED)
         verify(pixel).fire(NewTabPixelNames.NEW_TAB_DISPLAYED_UNIQUE, type = Daily(), parameters = paramsMap)
+        verify(pixel).fire(NewTabPixelNames.PRODUCT_SURFACE_TELEMETRY_NEW_TAB_DISPLAYED)
+        verify(pixel).fire(NewTabPixelNames.PRODUCT_SURFACE_TELEMETRY_NEW_TAB_DISPLAYED_DAILY, type = Daily())
     }
 
     @Test
@@ -162,6 +170,8 @@ class RealNewTabPixelsTest {
 
         verify(pixel).fire(NewTabPixelNames.NEW_TAB_DISPLAYED)
         verify(pixel).fire(NewTabPixelNames.NEW_TAB_DISPLAYED_UNIQUE, type = Daily(), parameters = paramsMap)
+        verify(pixel).fire(NewTabPixelNames.PRODUCT_SURFACE_TELEMETRY_NEW_TAB_DISPLAYED)
+        verify(pixel).fire(NewTabPixelNames.PRODUCT_SURFACE_TELEMETRY_NEW_TAB_DISPLAYED_DAILY, type = Daily())
     }
 
     @Test
@@ -178,6 +188,8 @@ class RealNewTabPixelsTest {
 
         verify(pixel).fire(NewTabPixelNames.NEW_TAB_DISPLAYED)
         verify(pixel).fire(NewTabPixelNames.NEW_TAB_DISPLAYED_UNIQUE, type = Daily(), parameters = paramsMap)
+        verify(pixel).fire(NewTabPixelNames.PRODUCT_SURFACE_TELEMETRY_NEW_TAB_DISPLAYED)
+        verify(pixel).fire(NewTabPixelNames.PRODUCT_SURFACE_TELEMETRY_NEW_TAB_DISPLAYED_DAILY, type = Daily())
     }
 
     @Test
@@ -194,6 +206,8 @@ class RealNewTabPixelsTest {
 
         verify(pixel).fire(NewTabPixelNames.NEW_TAB_DISPLAYED)
         verify(pixel).fire(NewTabPixelNames.NEW_TAB_DISPLAYED_UNIQUE, type = Daily(), parameters = paramsMap)
+        verify(pixel).fire(NewTabPixelNames.PRODUCT_SURFACE_TELEMETRY_NEW_TAB_DISPLAYED)
+        verify(pixel).fire(NewTabPixelNames.PRODUCT_SURFACE_TELEMETRY_NEW_TAB_DISPLAYED_DAILY, type = Daily())
     }
 
     @Test
@@ -210,6 +224,8 @@ class RealNewTabPixelsTest {
 
         verify(pixel).fire(NewTabPixelNames.NEW_TAB_DISPLAYED)
         verify(pixel).fire(NewTabPixelNames.NEW_TAB_DISPLAYED_UNIQUE, type = Daily(), parameters = paramsMap)
+        verify(pixel).fire(NewTabPixelNames.PRODUCT_SURFACE_TELEMETRY_NEW_TAB_DISPLAYED)
+        verify(pixel).fire(NewTabPixelNames.PRODUCT_SURFACE_TELEMETRY_NEW_TAB_DISPLAYED_DAILY, type = Daily())
     }
 
     @Test
@@ -234,5 +250,7 @@ class RealNewTabPixelsTest {
 
         verify(pixel).fire(NewTabPixelNames.NEW_TAB_DISPLAYED)
         verify(pixel).fire(NewTabPixelNames.NEW_TAB_DISPLAYED_UNIQUE, type = Daily(), parameters = paramsMap)
+        verify(pixel).fire(NewTabPixelNames.PRODUCT_SURFACE_TELEMETRY_NEW_TAB_DISPLAYED)
+        verify(pixel).fire(NewTabPixelNames.PRODUCT_SURFACE_TELEMETRY_NEW_TAB_DISPLAYED_DAILY, type = Daily())
     }
 }

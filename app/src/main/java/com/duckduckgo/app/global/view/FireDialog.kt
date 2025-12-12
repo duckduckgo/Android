@@ -32,15 +32,16 @@ import androidx.core.view.WindowInsetsCompat.Type
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.updatePadding
 import com.airbnb.lottie.RenderMode
-import com.duckduckgo.app.R
 import com.duckduckgo.app.browser.databinding.SheetFireClearDataBinding
 import com.duckduckgo.app.firebutton.FireButtonStore
 import com.duckduckgo.app.global.events.db.UserEventKey
 import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.view.FireDialog.FireDialogClearAllEvent.AnimationFinished
 import com.duckduckgo.app.global.view.FireDialog.FireDialogClearAllEvent.ClearAllDataFinished
+import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.FIRE_DIALOG_ANIMATION
 import com.duckduckgo.app.pixels.AppPixelName.FIRE_DIALOG_CLEAR_PRESSED
+import com.duckduckgo.app.pixels.AppPixelName.PRODUCT_TELEMETRY_SURFACE_DATA_CLEARING
 import com.duckduckgo.app.settings.clear.getPixelValue
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -54,6 +55,9 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import java.time.Instant
+import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
 import com.duckduckgo.mobile.android.R as CommonR
 import com.google.android.material.R as MaterialR
 
@@ -153,7 +157,9 @@ class FireDialog(
     }
 
     private fun onClearOptionClicked() {
+        trySendDailyClearOptionClicked()
         pixel.enqueueFire(FIRE_DIALOG_CLEAR_PRESSED)
+        pixel.enqueueFire(PRODUCT_TELEMETRY_SURFACE_DATA_CLEARING)
         pixel.enqueueFire(
             pixel = FIRE_DIALOG_ANIMATION,
             parameters = mapOf(FIRE_ANIMATION to settingsDataStore.selectedFireAnimation.getPixelValue()),
@@ -223,6 +229,21 @@ class FireDialog(
         } else {
             clearPersonalDataAction.killAndRestartProcess(notifyDataCleared = false, enableTransitionAnimation = false)
         }
+    }
+
+    private fun trySendDailyClearOptionClicked() {
+        val now = getUtcIsoLocalDate()
+        val timestamp = fireButtonStore.lastEventSendTime
+
+        if (timestamp == null || now > timestamp) {
+            fireButtonStore.storeLastFireButtonClearEventTime(now)
+            pixel.enqueueFire(AppPixelName.PRODUCT_TELEMETRY_SURFACE_DATA_CLEARING_DAILY)
+        }
+    }
+
+    private fun getUtcIsoLocalDate(): String {
+        // returns YYYY-MM-dd
+        return Instant.now().atOffset(ZoneOffset.UTC).format(DateTimeFormatter.ISO_LOCAL_DATE)
     }
 
     private sealed class FireDialogClearAllEvent {
