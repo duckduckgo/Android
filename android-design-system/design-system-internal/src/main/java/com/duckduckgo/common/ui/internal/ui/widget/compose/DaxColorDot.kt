@@ -19,7 +19,6 @@ package com.duckduckgo.common.ui.internal.ui.widget.compose
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
@@ -28,6 +27,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
+import com.duckduckgo.common.ui.compose.tools.PreviewBox
 
 @Composable
 internal fun DaxColorDot(
@@ -50,17 +50,12 @@ internal data class DaxColorDotColors(
 @PreviewLightDark
 @Composable
 private fun DaxColorDotPreview() {
-    DuckDuckGoTheme {
-        Box(
-            modifier = Modifier.background(DuckDuckGoTheme.colors.backgrounds.background)
-                .padding(16.dp),
-        ) {
-            DaxColorDot(
-                colors = DaxColorDotColors(
-                    fillColor = DuckDuckGoTheme.colors.brand.accentBlue,
-                    strokeColor = DuckDuckGoTheme.colors.backgrounds.backgroundInverted,
-                ),
-            )
-        }
+    PreviewBox {
+        DaxColorDot(
+            colors = DaxColorDotColors(
+                fillColor = DuckDuckGoTheme.colors.brand.accentBlue,
+                strokeColor = DuckDuckGoTheme.colors.backgrounds.backgroundInverted,
+            ),
+        )
     }
 }

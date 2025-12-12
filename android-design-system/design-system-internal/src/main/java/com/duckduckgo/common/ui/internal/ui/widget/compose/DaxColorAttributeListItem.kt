@@ -16,8 +16,6 @@
 
 package com.duckduckgo.common.ui.internal.ui.widget.compose
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -29,6 +27,7 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import com.duckduckgo.common.ui.compose.text.DaxText
 import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
+import com.duckduckgo.common.ui.compose.tools.PreviewBox
 
 @Composable
 internal fun DaxColorAttributeListItem(
@@ -58,18 +57,13 @@ internal fun DaxColorAttributeListItem(
 @PreviewLightDark
 @Composable
 private fun DaxColorAttributeListItemPreview() {
-    DuckDuckGoTheme {
-        Box(
-            modifier = Modifier.background(DuckDuckGoTheme.colors.backgrounds.background)
-                .padding(16.dp),
-        ) {
-            DaxColorAttributeListItem(
-                text = "DaxColorAttributeListItem",
-                dotColors = DaxColorDotColors(
-                    fillColor = DuckDuckGoTheme.colors.brand.accentBlue,
-                    strokeColor = DuckDuckGoTheme.colors.backgrounds.backgroundInverted,
-                ),
-            )
-        }
+    PreviewBox {
+        DaxColorAttributeListItem(
+            text = "DaxColorAttributeListItem",
+            dotColors = DaxColorDotColors(
+                fillColor = DuckDuckGoTheme.colors.brand.accentBlue,
+                strokeColor = DuckDuckGoTheme.colors.backgrounds.backgroundInverted,
+            ),
+        )
     }
 }
