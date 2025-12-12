@@ -362,6 +362,26 @@ class RxPixelSenderTest {
     }
 
     @Test
+    fun whenDailyPixelFireFailsThenPixelIsNotStored() = runTest {
+        givenPixelApiFails()
+
+        testee.sendPixel(TEST.pixelName, emptyMap(), emptyMap(), Daily("tag"))
+            .test().assertError(RuntimeException::class.java)
+
+        assertTrue(pixelFiredRepository.dailyPixelsFiredToday.isEmpty())
+    }
+
+    @Test
+    fun whenUniquePixelFireFailsThenPixelIsNotStored() = runTest {
+        givenPixelApiFails()
+
+        testee.sendPixel(TEST.pixelName, emptyMap(), emptyMap(), Daily("tag"))
+            .test().assertError(RuntimeException::class.java)
+
+        assertTrue(pixelFiredRepository.uniquePixelsFired.isEmpty())
+    }
+
+    @Test
     fun whenDailyPixelHasAlreadyBeenFiredAndUsesTagTodayThenItIsNotFiredAgain() = runTest {
         pixelFiredRepository.dailyPixelsFiredToday += "tag"
 
