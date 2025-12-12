@@ -180,11 +180,7 @@ class NewAddressBarOptionBottomSheetDialog(
         lottieTask = LottieCompositionFactory.fromRawRes(context.applicationContext, animationResource)
             .addListener { composition ->
                 lottieTask = null
-                if (!isWindowValid()) return@addListener
-
                 preloadedComposition = composition
-                binding.newAddressBarOptionBottomSheetDialogAnimation.setComposition(composition)
-                binding.newAddressBarOptionBottomSheetDialogAnimation.progress = 0f
 
                 if (pendingShow) {
                     pendingShow = false
@@ -204,16 +200,24 @@ class NewAddressBarOptionBottomSheetDialog(
         if (animationStarted) return
 
         val lottieView = binding.newAddressBarOptionBottomSheetDialogAnimation
-        val composition = preloadedComposition ?: lottieView.composition
-        if (composition != null) {
+
+        preloadedComposition?.let { composition ->
+            if (lottieView.composition == null) {
+                lottieView.setComposition(composition)
+                lottieView.progress = 0f
+            }
+        }
+
+        lottieView.composition?.let { composition ->
             animationStarted = true
             playIntroThenLoop(lottieView, composition.durationFrames.toInt())
-        } else {
-            lottieView.addLottieOnCompositionLoadedListener {
-                if (animationStarted || !isWindowValid()) return@addLottieOnCompositionLoadedListener
-                animationStarted = true
-                playIntroThenLoop(lottieView, it.durationFrames.toInt())
-            }
+            return
+        }
+
+        lottieView.addLottieOnCompositionLoadedListener { composition ->
+            if (animationStarted || !isWindowValid()) return@addLottieOnCompositionLoadedListener
+            animationStarted = true
+            playIntroThenLoop(lottieView, composition.durationFrames.toInt())
         }
     }
 
