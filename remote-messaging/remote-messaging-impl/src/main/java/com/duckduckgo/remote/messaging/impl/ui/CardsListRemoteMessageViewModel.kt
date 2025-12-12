@@ -60,8 +60,10 @@ class CardsListRemoteMessageViewModel @Inject constructor(
         viewModelScope.launch(dispatchers.io()) {
             val message = remoteMessagingRepository.getMessageById(messageId)
             val cardsList = message?.content as? Content.CardsList
-            cardsList?.let {
-                _viewState.value = ViewState(it)
+            if (cardsList != null) {
+                _viewState.value = ViewState(cardsList)
+            } else {
+                _command.send(Command.DismissMessage)
             }
         }
     }
