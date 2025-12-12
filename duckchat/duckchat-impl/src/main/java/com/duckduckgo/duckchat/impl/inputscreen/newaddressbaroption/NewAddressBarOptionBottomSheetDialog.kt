@@ -77,9 +77,11 @@ class NewAddressBarOptionBottomSheetDialog(
         this.behavior.maxHeight = MAX_HEIGHT_DP.toPx()
 
         setOnShowListener {
+            if (!isWindowValid()) return@setOnShowListener
+
             setRoundCorners()
-            newAddressBarCallback?.onDisplayed()
             startLottieAnimation()
+            newAddressBarCallback?.onDisplayed()
         }
 
         setOnCancelListener {
@@ -177,9 +179,10 @@ class NewAddressBarOptionBottomSheetDialog(
 
         lottieTask = LottieCompositionFactory.fromRawRes(context.applicationContext, animationResource)
             .addListener { composition ->
-                preloadedComposition = composition
                 lottieTask = null
+                if (!isWindowValid()) return@addListener
 
+                preloadedComposition = composition
                 binding.newAddressBarOptionBottomSheetDialogAnimation.setComposition(composition)
                 binding.newAddressBarOptionBottomSheetDialogAnimation.progress = 0f
 
@@ -207,7 +210,7 @@ class NewAddressBarOptionBottomSheetDialog(
             playIntroThenLoop(lottieView, composition.durationFrames.toInt())
         } else {
             lottieView.addLottieOnCompositionLoadedListener {
-                if (animationStarted) return@addLottieOnCompositionLoadedListener
+                if (animationStarted || !isWindowValid()) return@addLottieOnCompositionLoadedListener
                 animationStarted = true
                 playIntroThenLoop(lottieView, it.durationFrames.toInt())
             }
@@ -225,6 +228,7 @@ class NewAddressBarOptionBottomSheetDialog(
 
                 override fun onAnimationEnd(animation: Animator) {
                     lottieView.removeAnimatorListener(this)
+                    if (!isWindowValid()) return
 
                     lottieView.setMinAndMaxFrame(31, totalFrames - 1)
                     lottieView.repeatCount = LottieDrawable.INFINITE
@@ -284,6 +288,8 @@ class NewAddressBarOptionBottomSheetDialog(
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
         restoreOrientation()
+        lottieTask = null
+        pendingShow = false
     }
 
     private fun isWindowValid(): Boolean = (context as? Activity)?.let { activity ->
