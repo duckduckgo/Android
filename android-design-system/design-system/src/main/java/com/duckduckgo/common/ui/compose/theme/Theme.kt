@@ -41,6 +41,11 @@ object DuckDuckGoTheme {
         @ReadOnlyComposable
         get() = colors.text
 
+    val iconColors: DuckDuckGoIconColors
+        @Composable
+        @ReadOnlyComposable
+        get() = colors.icons
+
     val shapes
         @Composable
         @ReadOnlyComposable
@@ -95,6 +100,12 @@ fun DuckDuckGoTheme(
             logoTitle = Gray85,
             omnibarHighlight = colorResource(R.color.blue50_20),
         ),
+        textField = DuckDuckGoTextFieldColors(
+            borders = colorResource(R.color.black30),
+        ),
+        icons = DuckDuckGoIconColors(
+            primary = Black84,
+        ),
         isDark = false,
     )
 
@@ -120,6 +131,12 @@ fun DuckDuckGoTheme(
             disabled = White40,
             logoTitle = White,
             omnibarHighlight = colorResource(R.color.blue30_20),
+        ),
+        textField = DuckDuckGoTextFieldColors(
+            borders = colorResource(R.color.white30),
+        ),
+        icons = DuckDuckGoIconColors(
+            primary = White78,
         ),
         isDark = true,
     )
