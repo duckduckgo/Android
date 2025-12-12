@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.remotemessage
+package com.duckduckgo.remote.messaging.impl.ui
 
 import android.content.Context
 import android.content.Intent
@@ -28,7 +28,6 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
 import com.duckduckgo.remote.messaging.api.Surface
 import com.duckduckgo.remote.messaging.impl.RemoteMessagingFeatureToggles
-import com.duckduckgo.remote.messaging.impl.ui.ModalSurfaceActivityFromMessageId
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
