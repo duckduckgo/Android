@@ -28,9 +28,19 @@ interface ModalEvaluatorCompletionStore {
      */
     suspend fun isBlockedBy24HourWindow(): Boolean
 
-    suspend fun getBackgroundedTimestamp(): Long
+    /**
+     * Returns the timestamp of when the app was last backgrounded.
+     * @return the timestamp in milliseconds, or null if not available.
+     */
+    suspend fun getBackgroundedTimestamp(): Long?
 
-    suspend fun hasBackgroundTimestampRecorded(): Boolean
-
+    /**
+     * Clears the stored timestamp of when the app was last backgrounded.
+     */
     suspend fun clearBackgroundTimestamp()
+
+    /**
+     * Records the current timestamp as the time the app was backgrounded.
+     */
+    suspend fun recordBackgroundedTimestamp()
 }

@@ -63,6 +63,13 @@ class ModalEvaluatorCoordinator @Inject constructor(
         }
     }
 
+    override fun onStop(owner: LifecycleOwner) {
+        super.onStop(owner)
+        appCoroutineScope.launch(dispatchers.io()) {
+            completionStore.recordBackgroundedTimestamp()
+        }
+    }
+
     private suspend fun coordinateEvaluation() = evaluationMutex.withLock {
         logcat { "ModalEvaluatorCoordinator: Starting coordinated evaluation" }
 
