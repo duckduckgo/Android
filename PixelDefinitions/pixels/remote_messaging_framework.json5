@@ -1,0 +1,159 @@
+// RMF pixels
+{
+    "m_remote_message_shown_unique": {
+        "description": "Triggered when a remote message is displayed to the user for the first time",
+        "owners": ["cmonfortep"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            "atb",
+            {
+                "key": "message",
+                "description": "The identifier for the message, sourced from the remote message configuration",
+                "type": "string"
+            }
+        ]
+    },
+    "m_remote_message_shown": {
+        "description": "Triggered when a remote message is displayed to the user, regardless of whether it's their first time seeing it",
+        "owners": ["cmonfortep"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            "atb",
+            {
+                "key": "message",
+                "description": "The identifier for the message, sourced from the remote message configuration",
+                "type": "string"
+            }
+        ]
+    },
+    "m_remote_message_dismissed": {
+        "description": "Triggered when a remote message is dismissed by the user",
+        "owners": ["cmonfortep", "anikiki"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            "atb",
+            {
+                "key": "message",
+                "description": "The identifier for the message, sourced from the remote message configuration",
+                "type": "string"
+            },
+            {
+                "key": "dismiss_type",
+                "description": "The type of dismissal. This value is optional",
+                "type": "string",
+                "enum": ["close_button", "back_button_or_gesture"]
+            }
+        ]
+    },
+    "m_remote_message_action_clicked": {
+        "description": "Triggered when the user clicks the action button on the remote message",
+        "owners": ["cmonfortep"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            "atb",
+            {
+                "key": "message",
+                "description": "The identifier for the message, sourced from the remote message configuration",
+                "type": "string"
+            }
+        ]
+    },
+    "m_remote_message_primary_action_clicked": {
+        "description": "Triggered when the user clicks the primary action button on the remote message",
+        "owners": ["cmonfortep"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            "atb",
+            {
+                "key": "message",
+                "description": "The identifier for the message, sourced from the remote message configuration",
+                "type": "string"
+            }
+        ]
+    },
+    "m_remote_message_secondary_action_clicked": {
+        "description": "Triggered when the user clicks the secondary action button on the remote message",
+        "owners": ["cmonfortep"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            "atb",
+            {
+                "key": "message",
+                "description": "The identifier for the message, sourced from the remote message configuration",
+                "type": "string"
+            }
+        ]
+    },
+    "m_remote_message_sheet": {
+        "description": "Triggered after the share action sheet has closed",
+        "owners": ["cmonfortep"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            "atb",
+            {
+                "key": "message",
+                "description": "The identifier for the message, sourced from the remote message configuration",
+                "type": "string"
+            },
+            {
+                "key": "success",
+                "description": "Indicates whether the user utilised one of the actions. `False` means the user closed the share action sheet without taking any action",
+                "type": "boolean"
+            }
+        ]
+    },
+    "m_remote_message_card_shown": {
+        "description": "Triggered when a card is displayed within a card-style remote message",
+        "owners": ["anikiki"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            "atb",
+            {
+                "key": "message",
+                "description": "The identifier for the message, sourced from the remote message configuration",
+                "type": "string"
+            },
+            {
+                "key": "card",
+                "description": "The identifier for the card, sourced from the remote message configuration",
+                "type": "string"
+            }
+        ]
+    },
+    "m_remote_message_card_clicked": {
+        "description": "Triggered when a card is clicked within a card-style remote message",
+        "owners": ["anikiki"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            "atb",
+            {
+                "key": "message",
+                "description": "The identifier for the message, sourced from the remote message configuration",
+                "type": "string"
+            },
+            {
+                "key": "card",
+                "description": "The identifier for the card, sourced from the remote message configuration",
+                "type": "string"
+            }
+        ]
+    }
+}

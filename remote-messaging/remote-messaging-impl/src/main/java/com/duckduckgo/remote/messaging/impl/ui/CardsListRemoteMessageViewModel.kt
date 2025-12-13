@@ -25,7 +25,11 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.remote.messaging.api.CardItem
 import com.duckduckgo.remote.messaging.api.Content
+import com.duckduckgo.remote.messaging.api.RemoteMessage
+import com.duckduckgo.remote.messaging.api.RemoteMessageModel
 import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
+import com.duckduckgo.remote.messaging.impl.ui.RealCardsListRemoteMessagePixelHelper.Companion.PARAM_NAME_DISMISS_TYPE
+import com.duckduckgo.remote.messaging.impl.ui.RealCardsListRemoteMessagePixelHelper.Companion.PARAM_VALUE_CLOSE_BUTTON
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -39,8 +43,10 @@ import javax.inject.Inject
 @ContributesViewModel(ViewScope::class)
 class CardsListRemoteMessageViewModel @Inject constructor(
     private val remoteMessagingRepository: RemoteMessagingRepository,
+    private val remoteMessagingModel: RemoteMessageModel,
     private val commandActionMapper: CommandActionMapper,
     private val dispatchers: DispatcherProvider,
+    private val cardsListPixelHelper: CardsListRemoteMessagePixelHelper,
 ) : ViewModel(), DefaultLifecycleObserver, ModalSurfaceListener {
 
     private val _viewState = MutableStateFlow<ViewState?>(null)
@@ -48,6 +54,8 @@ class CardsListRemoteMessageViewModel @Inject constructor(
 
     val commands: Flow<Command> = _command.receiveAsFlow()
     val viewState: Flow<ViewState?> = _viewState.asStateFlow()
+
+    private var lastRemoteMessageSeen: RemoteMessage? = null
 
     fun init(messageId: String?) {
         if (messageId == null) {
@@ -59,6 +67,10 @@ class CardsListRemoteMessageViewModel @Inject constructor(
 
         viewModelScope.launch(dispatchers.io()) {
             val message = remoteMessagingRepository.getMessageById(messageId)
+            val newMessage = message?.id != lastRemoteMessageSeen?.id
+            if (newMessage) {
+                lastRemoteMessageSeen = message
+            }
             val cardsList = message?.content as? Content.CardsList
             if (cardsList != null) {
                 _viewState.value = ViewState(cardsList)
@@ -68,27 +80,47 @@ class CardsListRemoteMessageViewModel @Inject constructor(
         }
     }
 
+    fun onMessageShown() {
+        val message = lastRemoteMessageSeen ?: return
+        viewModelScope.launch {
+            remoteMessagingModel.onMessageShown(message)
+            val cardsList = message.content as? Content.CardsList
+            cardsList?.listItems?.forEach { cardItem ->
+                cardsListPixelHelper.fireCardItemShownPixel(message, cardItem)
+            }
+        }
+    }
+
     fun onCloseButtonClicked() {
+        val message = lastRemoteMessageSeen ?: return
         viewModelScope.launch {
             _command.send(Command.DismissMessage)
+            val customParams = mapOf(
+                PARAM_NAME_DISMISS_TYPE to PARAM_VALUE_CLOSE_BUTTON,
+            )
+            cardsListPixelHelper.dismissCardsListMessage(message.id, customParams)
         }
     }
 
     fun onActionButtonClicked() {
+        val message = lastRemoteMessageSeen ?: return
         viewModelScope.launch {
             val action = _viewState.value?.cardsLists?.primaryAction
             action?.let {
                 val command = commandActionMapper.asCommand(it)
                 _command.send(command)
+                remoteMessagingModel.onPrimaryActionClicked(message)
             }
         }
     }
 
     override fun onItemClicked(item: CardItem) {
         viewModelScope.launch {
+            val message = lastRemoteMessageSeen ?: return@launch
             val action = item.primaryAction
             val command = commandActionMapper.asCommand(action)
             _command.send(command)
+            cardsListPixelHelper.fireCardItemClickedPixel(message, item)
         }
     }
 
@@ -105,10 +137,12 @@ class CardsListRemoteMessageViewModel @Inject constructor(
             val url: String,
             val shareTitle: String,
         ) : Command()
+
         data class LaunchScreen(
             val screen: String,
             val payload: String,
         ) : Command()
+
         data object LaunchDefaultCredentialProvider : Command()
     }
 }
