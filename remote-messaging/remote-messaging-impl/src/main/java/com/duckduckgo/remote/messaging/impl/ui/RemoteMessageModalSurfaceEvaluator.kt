@@ -99,11 +99,8 @@ class RemoteMessageModalSurfaceEvaluatorImpl @Inject constructor(
     }
 
     private suspend fun hasMetBackgroundTimeThreshold(): Boolean {
-        if (!modalEvaluatorCompletionStore.hasBackgroundTimestampRecorded()) {
-            return false
-        }
+        val backgroundTimestamp = modalEvaluatorCompletionStore.getBackgroundedTimestamp() ?: return false
 
-        val backgroundTimestamp = modalEvaluatorCompletionStore.getBackgroundedTimestamp()
         // Using elapsed real time as this is how it's saved in the data store.
         val currentTimestamp = SystemClock.elapsedRealtime()
         val hasMetThreshold = (currentTimestamp - backgroundTimestamp) >= BACKGROUND_THRESHOLD_MILLIS

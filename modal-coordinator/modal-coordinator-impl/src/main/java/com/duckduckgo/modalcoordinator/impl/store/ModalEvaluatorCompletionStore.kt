@@ -53,20 +53,10 @@ class ModalEvaluatorCompletionStoreImpl @Inject constructor(
         }
     }
 
-    override suspend fun getBackgroundedTimestamp(): Long {
+    override suspend fun getBackgroundedTimestamp(): Long? {
         return withContext(dispatchers.io()) {
             val key = getKeyBackgroundedTimestamp()
-            store.data.firstOrNull()?.get(key) ?: run {
-                val newTimestamp = SystemClock.elapsedRealtime()
-                store.edit { it[key] = newTimestamp }
-                newTimestamp
-            }
-        }
-    }
-
-    override suspend fun hasBackgroundTimestampRecorded(): Boolean {
-        return withContext(dispatchers.io()) {
-            store.data.firstOrNull()?.get(getKeyBackgroundedTimestamp()) != null
+            store.data.firstOrNull()?.get(key)
         }
     }
 
@@ -74,6 +64,13 @@ class ModalEvaluatorCompletionStoreImpl @Inject constructor(
         withContext(dispatchers.io()) {
             val key = getKeyBackgroundedTimestamp()
             store.edit { it.remove(key) }
+        }
+    }
+
+    override suspend fun recordBackgroundedTimestamp() {
+        withContext(dispatchers.io()) {
+            val key = getKeyBackgroundedTimestamp()
+            store.edit { it[key] = SystemClock.elapsedRealtime() }
         }
     }
 
