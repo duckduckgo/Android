@@ -97,6 +97,10 @@ class TabDataRepositoryTest {
 
     private val mockAdClickManager: AdClickManager = mock()
 
+    private val mockWebViewPreviewPersister: WebViewPreviewPersister = mock()
+
+    private val mockFaviconManager: FaviconManager = mock()
+
     @After
     fun after() {
         daoDeletableTabs.close()
@@ -217,13 +221,20 @@ class TabDataRepositoryTest {
 
     @Test
     fun whenAllDeletedThenTabAndDataCleared() = runTest {
-        val testee = tabDataRepository()
+        val testee = tabDataRepository(
+            webViewPreviewPersister = mockWebViewPreviewPersister,
+            faviconManager = mockFaviconManager,
+        )
         val addedTabId = testee.add()
         val siteData = testee.retrieveSiteData(addedTabId)
 
         testee.deleteAll()
 
         verify(mockDao).deleteAllTabs()
+        verify(mockWebViewPreviewPersister).deleteAll()
+        verify(mockFaviconManager).deleteAllTemp()
+        verify(mockAdClickManager).clearAll()
+        verify(mockWebViewSessionStorage).deleteAllSessions()
         assertNotSame(siteData, testee.retrieveSiteData(addedTabId))
     }
 

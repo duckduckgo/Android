@@ -69,7 +69,7 @@ class DuckDuckGoWebLocalStorageManagerTest {
         whenever(mockAndroidBrowserConfigFeature.webLocalStorage()).thenReturn(mockWebLocalStorageToggle)
         whenever(mockWebLocalStorageToggle.getSettings()).thenReturn("settings")
 
-        val domains = Domains(list = listOf("duckduckgo.com"))
+        val domains = Domains(list = listOf("duckduckgo.com", "duck.ai"))
         val matchingRegex = MatchingRegex(
             list = listOf(
                 "^_https://([a-zA-Z0-9.-]+\\.)?{domain}\u0000\u0001.+$",
@@ -77,7 +77,8 @@ class DuckDuckGoWebLocalStorageManagerTest {
                 "^METAACCESS:https://([a-zA-Z0-9.-]+\\.)?{domain}$",
             ),
         )
-        val webLocalStorageSettings = WebLocalStorageSettings(domains = domains, matchingRegex = matchingRegex)
+        val keysToDelete = com.duckduckgo.app.browser.weblocalstorage.KeysToDelete(list = listOf("chat-history", "ai-conversations"))
+        val webLocalStorageSettings = WebLocalStorageSettings(domains = domains, keysToDelete = keysToDelete, matchingRegex = matchingRegex)
         whenever(mockWebLocalStorageSettingsJsonParser.parseJson("settings")).thenReturn(webLocalStorageSettings)
     }
 
@@ -193,6 +194,186 @@ class DuckDuckGoWebLocalStorageManagerTest {
 
         verify(mockDB, never()).delete(key1)
         verify(mockDB).delete(key2)
+    }
+
+    @Test
+    fun whenClearWebLocalStorageWithShouldClearDataTrueThenDeletesNonAllowedKeys() = runTest {
+        val key1 = bytes("_https://example.com\u0000\u0001key1")
+        val key2 = bytes("_https://duckduckgo.com\u0000\u0001chat-history")
+        val entry1 = createMockDBEntry(key1)
+        val entry2 = createMockDBEntry(key2)
+
+        whenever(mockDB.iterator()).thenReturn(mockIterator)
+        whenever(mockIterator.hasNext()).thenReturn(true, true, false)
+        whenever(mockIterator.next()).thenReturn(entry1, entry2)
+
+        testee.clearWebLocalStorage(shouldClearBrowserData = true, shouldClearDuckAiData = false)
+
+        verify(mockDB).delete(key1)
+        verify(mockDB, never()).delete(key2)
+    }
+
+    @Test
+    fun whenClearWebLocalStorageWithShouldClearDataFalseThenDoesNotDeleteNonAllowedKeys() = runTest {
+        val key1 = bytes("_https://example.com\u0000\u0001key1")
+        val key2 = bytes("_https://foo.com\u0000\u0001key2")
+        val key3 = bytes("_https://duckduckgo.com\u0000\u0001chat-history")
+        val entry1 = createMockDBEntry(key1)
+        val entry2 = createMockDBEntry(key2)
+        val entry3 = createMockDBEntry(key3)
+
+        whenever(mockDB.iterator()).thenReturn(mockIterator)
+        whenever(mockIterator.hasNext()).thenReturn(true, true, true, false)
+        whenever(mockIterator.next()).thenReturn(entry1, entry2, entry3)
+
+        testee.clearWebLocalStorage(shouldClearBrowserData = false, shouldClearDuckAiData = false)
+
+        verify(mockDB, never()).delete(key1)
+        verify(mockDB, never()).delete(key2)
+        verify(mockDB, never()).delete(key3)
+    }
+
+    @Test
+    fun whenClearWebLocalStorageWithShouldClearChatsTrueThenDeletesDuckDuckGoChatKeys() = runTest {
+        val key1 = bytes("_https://duckduckgo.com\u0000\u0001chat-history")
+        val key2 = bytes("_https://duckduckgo.com\u0000\u0001regular-key")
+        val entry1 = createMockDBEntry(key1)
+        val entry2 = createMockDBEntry(key2)
+
+        whenever(mockDB.iterator()).thenReturn(mockIterator)
+        whenever(mockIterator.hasNext()).thenReturn(true, true, false)
+        whenever(mockIterator.next()).thenReturn(entry1, entry2)
+
+        testee.clearWebLocalStorage(shouldClearBrowserData = false, shouldClearDuckAiData = true)
+
+        verify(mockDB).delete(key1)
+        verify(mockDB, never()).delete(key2)
+    }
+
+    @Test
+    fun whenClearWebLocalStorageWithShouldClearChatsTrueThenDeletesDuckAiChatKeys() = runTest {
+        val key1 = bytes("_https://duck.ai\u0000\u0001ai-conversations")
+        val key2 = bytes("_https://duck.ai\u0000\u0001regular-key")
+        val entry1 = createMockDBEntry(key1)
+        val entry2 = createMockDBEntry(key2)
+
+        whenever(mockDB.iterator()).thenReturn(mockIterator)
+        whenever(mockIterator.hasNext()).thenReturn(true, true, false)
+        whenever(mockIterator.next()).thenReturn(entry1, entry2)
+
+        testee.clearWebLocalStorage(shouldClearBrowserData = false, shouldClearDuckAiData = true)
+
+        verify(mockDB).delete(key1)
+        verify(mockDB, never()).delete(key2)
+    }
+
+    @Test
+    fun whenClearWebLocalStorageWithShouldClearChatsFalseThenDoesNotDeleteDuckDuckGoChatKeys() = runTest {
+        val key1 = bytes("_https://duckduckgo.com\u0000\u0001chat-history")
+        val key2 = bytes("_https://duckduckgo.com\u0000\u0001ai-conversations")
+        val entry1 = createMockDBEntry(key1)
+        val entry2 = createMockDBEntry(key2)
+
+        whenever(mockDB.iterator()).thenReturn(mockIterator)
+        whenever(mockIterator.hasNext()).thenReturn(true, true, false)
+        whenever(mockIterator.next()).thenReturn(entry1, entry2)
+
+        testee.clearWebLocalStorage(shouldClearBrowserData = false, shouldClearDuckAiData = false)
+
+        verify(mockDB, never()).delete(key1)
+        verify(mockDB, never()).delete(key2)
+    }
+
+    @Test
+    fun whenClearWebLocalStorageWithBothTrueThenDeletesBothDataAndChatKeys() = runTest {
+        val key1 = bytes("_https://example.com\u0000\u0001key1")
+        val key2 = bytes("_https://duckduckgo.com\u0000\u0001chat-history")
+        val key3 = bytes("_https://duckduckgo.com\u0000\u0001regular-key")
+        val entry1 = createMockDBEntry(key1)
+        val entry2 = createMockDBEntry(key2)
+        val entry3 = createMockDBEntry(key3)
+
+        whenever(mockDB.iterator()).thenReturn(mockIterator)
+        whenever(mockIterator.hasNext()).thenReturn(true, true, true, false)
+        whenever(mockIterator.next()).thenReturn(entry1, entry2, entry3)
+
+        testee.clearWebLocalStorage(shouldClearBrowserData = true, shouldClearDuckAiData = true)
+
+        verify(mockDB).delete(key1)
+        verify(mockDB).delete(key2)
+        verify(mockDB, never()).delete(key3)
+    }
+
+    @Test
+    fun whenClearWebLocalStorageWithBothFalseThenDoesNotDeleteAnything() = runTest {
+        val key1 = bytes("_https://example.com\u0000\u0001key1")
+        val key2 = bytes("_https://duckduckgo.com\u0000\u0001chat-history")
+        val entry1 = createMockDBEntry(key1)
+        val entry2 = createMockDBEntry(key2)
+
+        whenever(mockDB.iterator()).thenReturn(mockIterator)
+        whenever(mockIterator.hasNext()).thenReturn(true, true, false)
+        whenever(mockIterator.next()).thenReturn(entry1, entry2)
+
+        testee.clearWebLocalStorage(shouldClearBrowserData = false, shouldClearDuckAiData = false)
+
+        verify(mockDB, never()).delete(key1)
+        verify(mockDB, never()).delete(key2)
+    }
+
+    @Test
+    fun whenClearWebLocalStorageWithShouldClearDataTrueThenRespectsFireproofedDomains() = runTest {
+        whenever(mockFireproofWebsiteRepository.fireproofWebsitesSync()).thenReturn(listOf(FireproofWebsiteEntity("example.com")))
+
+        val key1 = bytes("_https://example.com\u0000\u0001key1")
+        val key2 = bytes("_https://foo.com\u0000\u0001key2")
+        val entry1 = createMockDBEntry(key1)
+        val entry2 = createMockDBEntry(key2)
+
+        whenever(mockDB.iterator()).thenReturn(mockIterator)
+        whenever(mockIterator.hasNext()).thenReturn(true, true, false)
+        whenever(mockIterator.next()).thenReturn(entry1, entry2)
+
+        testee.clearWebLocalStorage(shouldClearBrowserData = true, shouldClearDuckAiData = false)
+
+        verify(mockDB, never()).delete(key1)
+        verify(mockDB).delete(key2)
+    }
+
+    @Test
+    fun whenClearWebLocalStorageWithShouldClearChatsTrueThenOnlyDeletesChatKeysForDuckDuckGoDomains() = runTest {
+        val key1 = bytes("_https://example.com\u0000\u0001chat-history")
+        val key2 = bytes("_https://duckduckgo.com\u0000\u0001chat-history")
+        val entry1 = createMockDBEntry(key1)
+        val entry2 = createMockDBEntry(key2)
+
+        whenever(mockDB.iterator()).thenReturn(mockIterator)
+        whenever(mockIterator.hasNext()).thenReturn(true, true, false)
+        whenever(mockIterator.next()).thenReturn(entry1, entry2)
+
+        testee.clearWebLocalStorage(shouldClearBrowserData = false, shouldClearDuckAiData = true)
+
+        verify(mockDB, never()).delete(key1)
+        verify(mockDB).delete(key2)
+    }
+
+    @Test
+    fun whenClearWebLocalStorageWithParametersThenIteratorSeeksToFirst() = runTest {
+        whenever(mockDB.iterator()).thenReturn(mockIterator)
+
+        testee.clearWebLocalStorage(shouldClearBrowserData = true, shouldClearDuckAiData = true)
+
+        verify(mockIterator).seekToFirst()
+    }
+
+    @Test
+    fun whenClearWebLocalStorageWithParametersThenIteratorIsClosed() = runTest {
+        whenever(mockDB.iterator()).thenReturn(mockIterator)
+        whenever(mockIterator.hasNext()).thenReturn(false)
+
+        testee.clearWebLocalStorage(shouldClearBrowserData = true, shouldClearDuckAiData = false)
+
+        verify(mockIterator).close()
     }
 
     private fun createMockDBEntry(key: ByteArray): MutableMap.MutableEntry<ByteArray, ByteArray> {
