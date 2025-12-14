@@ -55,7 +55,12 @@ interface ClearDataAction {
      * Clears tabs and associated data.
      * @param appInForeground whether the app is in foreground
      */
-    suspend fun clearTabsOnly(appInForeground: Boolean)
+    suspend fun clearTabsAsync(appInForeground: Boolean)
+
+    /**
+     * Clears tabs and associated data.
+     */
+    suspend fun clearTabsOnly()
 
     /**
      * Clears browser data except tabs and chats.
@@ -133,7 +138,7 @@ class ClearPersonalDataAction(
 
             privacyProtectionsPopupDataClearer.clearPersonalData()
 
-            clearTabsOnly(appInForeground)
+            clearTabsAsync(appInForeground)
 
             webTrackersBlockedRepository.deleteAll()
 
@@ -145,10 +150,17 @@ class ClearPersonalDataAction(
         logcat(INFO) { "Finished clearing everything" }
     }
 
-    override suspend fun clearTabsOnly(appInForeground: Boolean) {
+    override suspend fun clearTabsAsync(appInForeground: Boolean) {
         withContext(dispatchers.io()) {
             tabRepository.deleteAll()
             setAppUsedSinceLastClearFlag(appInForeground)
+            logcat { "Finished clearing tabs" }
+        }
+    }
+
+    override suspend fun clearTabsOnly() {
+        withContext(dispatchers.io()) {
+            tabRepository.deleteAll()
             logcat { "Finished clearing tabs" }
         }
     }
