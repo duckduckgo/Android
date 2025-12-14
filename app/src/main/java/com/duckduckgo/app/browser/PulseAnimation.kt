@@ -29,14 +29,12 @@ import androidx.core.view.doOnLayout
 import androidx.core.view.isVisible
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
-import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentManager
 import com.duckduckgo.common.ui.view.setAllParentsClip
 import com.duckduckgo.common.utils.ConflatedJob
 
 @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
 class PulseAnimation(
     private val lifecycleOwner: LifecycleOwner,
-    private val onboardingDesignExperimentManager: OnboardingDesignExperimentManager,
 ) : DefaultLifecycleObserver {
 
     private var pulseAnimation: AnimatorSet = AnimatorSet()
@@ -126,21 +124,8 @@ class PulseAnimation(
 
         val highlightImageView = ImageView(targetView.context)
         highlightImageView.id = View.generateViewId()
-        val gravity: Int
-        when {
-            onboardingDesignExperimentManager.isBuckEnrolledAndEnabled() -> {
-                highlightImageView.setImageResource(R.drawable.ic_circle_pulse_buck)
-                gravity = Gravity.CENTER
-            }
-            onboardingDesignExperimentManager.isBbEnrolledAndEnabled() -> {
-                highlightImageView.setImageResource(R.drawable.ic_circle_pulse_bb)
-                gravity = Gravity.CENTER
-            }
-            else -> {
-                highlightImageView.setImageResource(R.drawable.ic_circle_pulse_blue)
-                gravity = Gravity.CENTER
-            }
-        }
+        highlightImageView.setImageResource(R.drawable.ic_circle_pulse_blue)
+        val gravity = Gravity.CENTER
         val layoutParams = FrameLayout.LayoutParams(targetView.width, targetView.height, gravity)
         (targetView.parent as ViewGroup).addView(highlightImageView, 0, layoutParams)
         return highlightImageView

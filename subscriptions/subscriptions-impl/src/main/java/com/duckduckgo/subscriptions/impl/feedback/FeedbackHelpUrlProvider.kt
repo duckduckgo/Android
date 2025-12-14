@@ -83,7 +83,7 @@ class RealFeedbackHelpUrlProvider @Inject constructor(
         private const val HELP_PAGE_PPRO_ITR = "https://duckduckgo.com/duckduckgo-help-pages/privacy-pro/identity-theft-restoration/"
         private const val HELP_PAGE_PPRO_ITR_IRIS = "https://duckduckgo.com/duckduckgo-help-pages/privacy-pro/identity-theft-restoration/iris/"
         private const val HELP_PAGE_DUCK_AI_ACCESS_SUBSCRIPTION_MODELS =
-            "https://duckduckgo.com/duckduckgo-help-pages/duckai/access-subscriber-AI-models"
+            "https://duckduckgo.com/duckduckgo-help-pages/duckai/subscriber-only-ai"
         private const val HELP_PAGE_DUCK_AI_LOGIN_THIRD_PARTY_BROWSER = "https://duckduckgo.com/duckduckgo-help-pages/privacy-pro/activating"
         private const val HELP_PAGE_DUCK_AI_OTHER = "https://duckduckgo.com/duckduckgo-help-pages/duckai"
     }

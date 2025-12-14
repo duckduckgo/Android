@@ -160,10 +160,6 @@
     <string name="feedbackSubmitVpnDisclaimer">"A visszajelzéseddel együtt a fent megadott adatokon kívül továbbítunk néhány anonimizált adatot is:\n\n• Aktívak-e bizonyos böngészőfunkciók\n• Összesített alkalmazásdiagnosztika (pl. hibakódok)\n\nA Küldés lehetőségre kattintva elfogadod, hogy a DuckDuckGo a megadott információkat felhasználhatja az alkalmazás fejlesztéséhez."</string>
     <string name="feedbackSubmitVpnSubmit">Küldés</string>
     <string name="feedbackSubmitCompletedMessage">Köszönjük! Visszajelzés elküldve.</string>
-    <string name="feedbackSubmitFailedMessage">Hiba történt</string>
-
-    <string name="feedbackSubmitEmailByLine">Adj meg egy e-mail-címet, ha szeretnéd, hogy a problémára vonatkozóan kapcsolatba lépjünk veled (előfordulhat, hogy nem tudunk minden bejelentésre reagálni):</string>
-    <string name="feedbackSubmitEmailHint">E-mail-cím (opcionális)</string>
 
     <string name="feedbackSubmitGeneralDescriptionHint">Küldj nekünk visszajelzést…</string>
     <string name="feedbackSubmitFeatureRequestDescriptionHint">Milyen funkciót szeretnél látni?</string>

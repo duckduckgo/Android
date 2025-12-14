@@ -110,6 +110,12 @@ interface DuckChatFeature {
     fun fullscreenMode(): Toggle
 
     /**
+     * @return `true` when the new toggle to enable fullscreen mode is enabled
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun fullscreenModeToggle(): Toggle
+
+    /**
      * @return `true` when the remote config has the "duckAiVoiceSearch"
      * sub-feature flag enabled
      * If the remote feature is not present defaults to `true`
@@ -129,4 +135,11 @@ interface DuckChatFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun showHideAiGeneratedImages(): Toggle
+
+    /**
+     * @return `true` when the Input Screen onboarding wide event should be sent
+     * If the remote feature is not present defaults to `internal`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun sendInputScreenOnboardingWideEvent(): Toggle
 }

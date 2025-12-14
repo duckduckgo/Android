@@ -99,24 +99,17 @@ class SubscriptionFeedbackSubmitFragment : SubscriptionFeedbackFragment(R.layout
             }
             binding.feedbackSubmitDescription.hint = getString(R.string.feedbackSubmitVpnDescriptionHint)
 
-            if (privacyProFeature.useSubscriptionSupport().isEnabled()) {
-                binding.hideEmail()
-                binding.feedbackSubmitContactSupportByLine.show()
-                binding.feedbackSubmitContactSupportByLine.setClickableLink(
-                    "support_link",
-                    SpannableString(getText(R.string.feedbackSubmitContactSupport)),
-                ) {
-                    listener.onContactSupportOpened()
-                }
-            } else {
-                binding.showEmail()
-                binding.feedbackSubmitContactSupportByLine.gone()
+            binding.feedbackSubmitContactSupportByLine.show()
+            binding.feedbackSubmitContactSupportByLine.setClickableLink(
+                "support_link",
+                SpannableString(getText(R.string.feedbackSubmitContactSupport)),
+            ) {
+                listener.onContactSupportOpened()
             }
         } else {
             binding.feedbackSubmitHeader.gone()
             binding.feedbackSubmitByLine.gone()
             binding.feedbackSubmitContactSupportByLine.gone()
-            binding.hideEmail()
             if (reportType == GENERAL_FEEDBACK) {
                 binding.feedbackSubmitDescription.hint = getString(R.string.feedbackSubmitGeneralDescriptionHint)
             } else {
@@ -125,20 +118,10 @@ class SubscriptionFeedbackSubmitFragment : SubscriptionFeedbackFragment(R.layout
         }
 
         binding.feedbackSubmitButton.setOnClickListener {
-            listener.onUserSubmit(binding.feedbackSubmitDescription.text.trim(), binding.feedbackSubmitEmail.text.trim())
+            listener.onUserSubmit(binding.feedbackSubmitDescription.text.trim())
         }
 
         binding.feedbackSubmitDescription.showKeyboard()
-    }
-
-    private fun ContentFeedbackSubmitBinding.showEmail() {
-        feedbackSubmitEmailByLine.show()
-        feedbackSubmitEmail.show()
-    }
-
-    private fun ContentFeedbackSubmitBinding.hideEmail() {
-        feedbackSubmitEmailByLine.gone()
-        feedbackSubmitEmail.gone()
     }
 
     private fun DaxTextView.setClickableLink(
@@ -186,7 +169,6 @@ class SubscriptionFeedbackSubmitFragment : SubscriptionFeedbackFragment(R.layout
     interface Listener {
         fun onUserSubmit(
             description: String,
-            email: String? = null,
         )
 
         fun onFaqsOpened()

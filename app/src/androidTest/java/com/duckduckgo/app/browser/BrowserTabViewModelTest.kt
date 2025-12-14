@@ -115,6 +115,8 @@ import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter.QuickAccessFavorite
+import com.duckduckgo.app.browser.omnibar.Omnibar
+import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.browser.omnibar.QueryOrigin.FromBookmark
@@ -126,6 +128,7 @@ import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.tabs.TabManager
 import com.duckduckgo.app.browser.trafficquality.AndroidFeaturesHeaderPlugin.Companion.X_DUCKDUCKGO_ANDROID_HEADER
 import com.duckduckgo.app.browser.ui.dialogs.widgetprompt.OnboardingHomeScreenWidgetToggles
+import com.duckduckgo.app.browser.urldisplay.UrlDisplayRepository
 import com.duckduckgo.app.browser.viewstate.BrowserViewState
 import com.duckduckgo.app.browser.viewstate.CtaViewState
 import com.duckduckgo.app.browser.viewstate.FindInPageViewState
@@ -149,7 +152,6 @@ import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.cta.ui.DaxBubbleCta
 import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxIntroSearchOptionsCta
 import com.duckduckgo.app.cta.ui.HomePanelCta
-import com.duckduckgo.app.cta.ui.OnboardingDaxDialogCta
 import com.duckduckgo.app.cta.ui.OnboardingDaxDialogCta.DaxMainNetworkCta
 import com.duckduckgo.app.cta.ui.OnboardingDaxDialogCta.DaxSerpCta
 import com.duckduckgo.app.cta.ui.OnboardingDaxDialogCta.DaxTrackersBlockedCta
@@ -172,7 +174,6 @@ import com.duckduckgo.app.onboarding.store.AppStage.ESTABLISHED
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles
-import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentManager
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_BANNER_SHOWN
 import com.duckduckgo.app.pixels.AppPixelName.DUCK_PLAYER_SETTING_ALWAYS_DUCK_PLAYER
@@ -349,7 +350,6 @@ import java.security.interfaces.RSAPublicKey
 import java.time.LocalDateTime
 import java.util.UUID
 import java.util.concurrent.TimeUnit
-import com.duckduckgo.mobile.android.R as CommonR
 
 @SuppressLint("DenyListedApi")
 @FlowPreview
@@ -440,6 +440,7 @@ class BrowserTabViewModelTest {
     private val voiceSearchPixelLogger: VoiceSearchAvailabilityPixelLogger = mock()
 
     private val mockSettingsDataStore: SettingsDataStore = mock()
+    private val mockUrlDisplayRepository: UrlDisplayRepository = mock()
 
     private val mockAutoCompleteSettings: AutoCompleteSettings = mock()
 
@@ -599,7 +600,6 @@ class BrowserTabViewModelTest {
         }
     }
 
-    private val mockOnboardingDesignExperimentManager: OnboardingDesignExperimentManager = mock()
     private val mockSerpEasterEggLogoToggles: SerpEasterEggLogosToggles = mock()
     private val mockAddressBarTrackersAnimationFeatureToggle: AddressBarTrackersAnimationFeatureToggle = mock()
 
@@ -611,8 +611,7 @@ class BrowserTabViewModelTest {
 
     private val selectedTab = TabEntity("TAB_ID", exampleUrl, position = 0, sourceTabId = "TAB_ID_SOURCE")
     private val flowSelectedTab = MutableStateFlow(selectedTab)
-
-    private var isFullSiteAddressEnabled = true
+    private val isFullSiteAddressEnabledFlow = MutableStateFlow(true)
 
     private val mockWebViewCompatWrapper: WebViewCompatWrapper = mock()
 
@@ -679,7 +678,7 @@ class BrowserTabViewModelTest {
             whenever(mockRemoteMessagingRepository.messageFlow()).thenReturn(remoteMessageFlow.consumeAsFlow())
             whenever(mockSettingsDataStore.automaticFireproofSetting).thenReturn(AutomaticFireproofSetting.ASK_EVERY_TIME)
             whenever(mockSettingsDataStore.omnibarType).thenReturn(OmnibarType.SINGLE_TOP)
-            whenever(mockSettingsDataStore.isFullUrlEnabled).then { isFullSiteAddressEnabled }
+            whenever(mockUrlDisplayRepository.isFullUrlEnabled).then { isFullSiteAddressEnabledFlow }
             whenever(mockSSLCertificatesFeature.allowBypass()).thenReturn(mockEnabledToggle)
             whenever(subscriptions.shouldLaunchPrivacyProForUrl(any())).thenReturn(false)
             whenever(mockDuckDuckGoUrlDetector.isDuckDuckGoUrl(any())).thenReturn(false)
@@ -698,9 +697,6 @@ class BrowserTabViewModelTest {
             whenever(mockExternalIntentProcessingState.hasPendingTabLaunch).thenReturn(mockHasPendingTabLaunchFlow)
             whenever(mockExternalIntentProcessingState.hasPendingDuckAiOpen).thenReturn(mockHasPendingDuckAiOpenFlow)
             whenever(mockVpnMenuStateProvider.getVpnMenuState()).thenReturn(flowOf(VpnMenuState.Hidden))
-            whenever(mockOnboardingDesignExperimentManager.isModifiedControlEnrolledAndEnabled()).thenReturn(false)
-            whenever(mockOnboardingDesignExperimentManager.isBuckEnrolledAndEnabled()).thenReturn(false)
-            whenever(mockOnboardingDesignExperimentManager.isBbEnrolledAndEnabled()).thenReturn(false)
             whenever(mockSerpEasterEggLogoToggles.feature()).thenReturn(mockDisabledToggle)
             whenever(nonHttpAppLinkChecker.isPermitted(anyOrNull())).thenReturn(true)
             remoteMessagingModel = givenRemoteMessagingModel(mockRemoteMessagingRepository, mockPixel, coroutineRule.testDispatcherProvider)
@@ -724,7 +720,6 @@ class BrowserTabViewModelTest {
                     duckPlayer = mockDuckPlayer,
                     brokenSitePrompt = mockBrokenSitePrompt,
                     onboardingHomeScreenWidgetToggles = mockOnboardingHomeScreenWidgetToggles,
-                    onboardingDesignExperimentManager = mockOnboardingDesignExperimentManager,
                 )
 
             accessibilitySettingsDataStore =
@@ -819,6 +814,7 @@ class BrowserTabViewModelTest {
                 downloadCallback = mockDownloadCallback,
                 trackingParameters = mockTrackingParameters,
                 settingsDataStore = mockSettingsDataStore,
+                urlDisplayRepository = mockUrlDisplayRepository,
                 adClickManager = mockAdClickManager,
                 autofillCapabilityChecker = autofillCapabilityChecker,
                 autofillFireproofDialogSuppressor = autofillFireproofDialogSuppressor,
@@ -862,7 +858,6 @@ class BrowserTabViewModelTest {
                 siteErrorHandler = mockSiteErrorHandler,
                 siteHttpErrorHandler = mockSiteHttpErrorHandler,
                 subscriptionsJSHelper = mockSubscriptionsJSHelper,
-                onboardingDesignExperimentManager = mockOnboardingDesignExperimentManager,
                 tabManager = tabManager,
                 addressDisplayFormatter = mockAddressDisplayFormatter,
                 autoCompleteSettings = mockAutoCompleteSettings,
@@ -1436,8 +1431,8 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenBrowsingAndUrlLoadedAndFullUrlDisabledThenUrlTitleAndOmnibarTextUpdatedToMatch() {
-        isFullSiteAddressEnabled = false
+    fun whenBrowsingAndUrlLoadedAndFullUrlDisabledThenUrlTitleAndOmnibarTextUpdatedToMatch() = runTest {
+        isFullSiteAddressEnabledFlow.emit(false)
         val exampleUrl = "http://example.com/abc"
         val exampleTitle = "Title"
         loadUrl(exampleUrl, title = exampleTitle, isBrowserShowing = true)
@@ -1465,8 +1460,8 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenBrowsingAndUrlIsUpdatedAndFullUrlDisabledThenUrlAndOmnibarTextUpdatedToMatch() {
-        isFullSiteAddressEnabled = false
+    fun whenBrowsingAndUrlIsUpdatedAndFullUrlDisabledThenUrlAndOmnibarTextUpdatedToMatch() = runTest {
+        isFullSiteAddressEnabledFlow.emit(false)
         val currentUrl = "http://example.com/current"
         loadUrl(exampleUrl, isBrowserShowing = true)
         updateUrl(exampleUrl, currentUrl, true)
@@ -1485,8 +1480,8 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenNotBrowsingAndUrlIsUpdatedAndFullUrlDisabledThenUrlAndOmnibarTextRemainUnchanged() {
-        isFullSiteAddressEnabled = false
+    fun whenNotBrowsingAndUrlIsUpdatedAndFullUrlDisabledThenUrlAndOmnibarTextRemainUnchanged() = runTest {
+        isFullSiteAddressEnabledFlow.emit(false)
         val currentUrl = "http://example.com/current"
         loadUrl(exampleUrl, isBrowserShowing = true)
         updateUrl(exampleUrl, currentUrl, false)
@@ -1573,8 +1568,8 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenDuckDuckGoUrlNotContainingQueryLoadedAndFullUrlDisabledThenShortUrlShown() {
-        isFullSiteAddressEnabled = false
+    fun whenDuckDuckGoUrlNotContainingQueryLoadedAndFullUrlDisabledThenShortUrlShown() = runTest {
+        isFullSiteAddressEnabledFlow.emit(false)
         loadUrl("http://duckduckgo.com")
         assertEquals("duckduckgo.com", omnibarViewState().omnibarText)
     }
@@ -1586,8 +1581,8 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenNonDuckDuckGoUrlLoadedAndFullUrlDisabledThenShortUrlShown() {
-        isFullSiteAddressEnabled = false
+    fun whenNonDuckDuckGoUrlLoadedAndFullUrlDisabledThenShortUrlShown() = runTest {
+        isFullSiteAddressEnabledFlow.emit(false)
         loadUrl(exampleUrl)
         assertEquals(shortExampleUrl, omnibarViewState().omnibarText)
     }
@@ -2596,8 +2591,8 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenAuthenticationIsRequiredForSameHostAndFullUrlDisabledThenNoChangesOnBrowser() {
-        isFullSiteAddressEnabled = false
+    fun whenAuthenticationIsRequiredForSameHostAndFullUrlDisabledThenNoChangesOnBrowser() = runTest {
+        isFullSiteAddressEnabledFlow.emit(false)
 
         val mockHandler = mock<HttpAuthHandler>()
         val siteURL = "http://example.com/requires-auth"
@@ -2624,8 +2619,8 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenAuthenticationIsRequiredForDifferentHostAndFullUrlDisabledThenUpdateUrlAndHideWebContent() {
-        isFullSiteAddressEnabled = false
+    fun whenAuthenticationIsRequiredForDifferentHostAndFullUrlDisabledThenUpdateUrlAndHideWebContent() = runTest {
+        isFullSiteAddressEnabledFlow.emit(false)
         val mockHandler = mock<HttpAuthHandler>()
         val siteURL = "http://example.com/requires-auth"
         val authenticationRequest = BasicAuthenticationRequest(mockHandler, "example.com", "test realm", siteURL)
@@ -3047,7 +3042,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenUserClickedDaxMainNetworkCtaOKButtonAndMaliciousSiteBlockedThenCtaIsNull() {
-        val cta = DaxMainNetworkCta(mockOnboardingStore, mockAppInstallStore, "", "", mockOnboardingDesignExperimentManager)
+        val cta = DaxMainNetworkCta(mockOnboardingStore, mockAppInstallStore, "", "")
         setCta(cta)
 
         testee.onUserClickCtaOkButton(cta)
@@ -4624,55 +4619,61 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenHandleAboutBlankEnabledAndMessageReceivedAndNullSiteUrlThenSetOmnibarText() = runTest {
+    fun whenHandleNewTabIfEmptyUrlAndHandleAboutBlankEnabledAndNoNavigationStateThenSetOmnibarText() = runTest {
         fakeAndroidConfigBrowserFeature.handleAboutBlank().setRawStoredState(State(enable = true))
         resetChannels()
         initialiseViewModel()
-        loadUrl(null)
-        testee.onMessageReceived()
+        testee.handleNewTabIfEmptyUrl()
         assertEquals(omnibarViewState().omnibarText, "about:blank")
     }
 
     @Test
-    fun whenHandleAboutBlankEnabledAndMessageReceivedAndNullSiteUrlAndCustomTabEmitCommandForUpdateTitle() = runTest {
+    fun whenHandleNewTabIfEmptyUrlAndHandleAboutBlankEnabledAndNavigationStateChangedThenDoNotSetOmnibarText() = runTest {
         fakeAndroidConfigBrowserFeature.handleAboutBlank().setRawStoredState(State(enable = true))
         resetChannels()
         initialiseViewModel()
         loadUrl(null)
+        testee.handleNewTabIfEmptyUrl()
+        assertEquals(omnibarViewState().omnibarText, "")
+    }
+
+    @Test
+    fun whenHandleNewTabIfEmptyUrlAndHandleAboutBlankEnabledAndNoNavigationStateAndCustomTabEmitCommandForUpdateTitle() = runTest {
+        fakeAndroidConfigBrowserFeature.handleAboutBlank().setRawStoredState(State(enable = true))
+        resetChannels()
+        initialiseViewModel()
         testee.setIsCustomTab(true)
-        testee.onMessageReceived()
+        testee.handleNewTabIfEmptyUrl()
 
         val command = captureCommands().lastValue as Command.ShowWebPageTitle
         assertEquals("about:blank", command.title)
     }
 
     @Test
-    fun whenHandleAboutBlankEnabledAndMessageReceivedAndNullSiteUrlAndNewCustomTabEmitCommandForUpdateTitle() = runTest {
+    fun whenHandleNewTabIfEmptyUrlAndHandleAboutBlankEnabledAndNoNavigationStateAndNewCustomTabEmitCommandForUpdateTitle() = runTest {
         fakeAndroidConfigBrowserFeature.handleAboutBlank().setRawStoredState(State(enable = true))
         fakeAndroidConfigBrowserFeature.newCustomTab().setRawStoredState(State(enable = true))
         resetChannels()
         initialiseViewModel()
-        loadUrl(null)
         testee.setIsCustomTab(true)
-        testee.onMessageReceived()
+        testee.handleNewTabIfEmptyUrl()
 
         val command = captureCommands().lastValue as Command.ShowWebPageTitle
         assertEquals("about:blank", command.title)
     }
 
     @Test
-    fun whenHandleAboutBlankEnabledAndMessageReceivedAndNonNullSiteUrlThenThenDoNotSetOmnibarText() {
+    fun whenHandleNewTabIfEmptyUrlAndHandleAboutBlankEnabledAndNonNoNavigationStateThenThenDoNotSetOmnibarText() {
         fakeAndroidConfigBrowserFeature.handleAboutBlank().setRawStoredState(State(enable = true))
         loadUrl("url")
-        testee.onMessageReceived()
+        testee.handleNewTabIfEmptyUrl()
         assertEquals(omnibarViewState().omnibarText, "url")
     }
 
     @Test
-    fun whenHandleAboutBlankDisabledAndMessageReceivedAndNullSiteUrlThenDoNotSetOmnibarText() {
+    fun whenHandleNewTabIfEmptyUrlAndHandleAboutBlankDisabledAndNoNavigationStateThenDoNotSetOmnibarText() {
         fakeAndroidConfigBrowserFeature.handleAboutBlank().setRawStoredState(State(enable = false))
-        loadUrl(null)
-        testee.onMessageReceived()
+        testee.handleNewTabIfEmptyUrl()
         assertEquals(omnibarViewState().omnibarText, "")
     }
 
@@ -5968,7 +5969,6 @@ class BrowserTabViewModelTest {
                     appInstallStore = mockAppInstallStore,
                     trackers = emptyList(),
                     settingsDataStore = mockSettingsDataStore,
-                    onboardingDesignExperimentManager = mockOnboardingDesignExperimentManager,
                 )
             testee.ctaViewState.value = ctaViewState().copy(cta = cta)
             testee.browserViewState.value = browserViewState().copy(browserShowing = true, maliciousSiteBlocked = false)
@@ -5987,7 +5987,6 @@ class BrowserTabViewModelTest {
                     appInstallStore = mockAppInstallStore,
                     trackers = emptyList(),
                     settingsDataStore = mockSettingsDataStore,
-                    onboardingDesignExperimentManager = mockOnboardingDesignExperimentManager,
                 )
             testee.ctaViewState.value = ctaViewState().copy(cta = cta)
             testee.browserViewState.value = browserViewState().copy(browserShowing = false, maliciousSiteBlocked = true)
@@ -6006,11 +6005,10 @@ class BrowserTabViewModelTest {
                     appInstallStore = mockAppInstallStore,
                     trackers = emptyList(),
                     settingsDataStore = mockSettingsDataStore,
-                    onboardingDesignExperimentManager = mockOnboardingDesignExperimentManager,
                 )
             testee.ctaViewState.value = ctaViewState().copy(cta = cta)
 
-            testee.userLaunchingTabSwitcher(false)
+            testee.userLaunchingTabSwitcher(Omnibar.ViewMode.Browser(exampleUrl), false)
 
             verify(mockDismissedCtaDao).insert(DismissedCta(cta.ctaId))
         }
@@ -6024,7 +6022,6 @@ class BrowserTabViewModelTest {
                     appInstallStore = mockAppInstallStore,
                     trackers = emptyList(),
                     settingsDataStore = mockSettingsDataStore,
-                    onboardingDesignExperimentManager = mockOnboardingDesignExperimentManager,
                 )
             testee.ctaViewState.value = ctaViewState().copy(cta = cta)
 
@@ -6041,7 +6038,6 @@ class BrowserTabViewModelTest {
                 appInstallStore = mockAppInstallStore,
                 trackers = emptyList(),
                 settingsDataStore = mockSettingsDataStore,
-                onboardingDesignExperimentManager = mockOnboardingDesignExperimentManager,
             )
         setCta(cta)
 
@@ -6052,7 +6048,7 @@ class BrowserTabViewModelTest {
     @Test
     fun givenOnboardingCtaShownWhenUserSubmittedQueryThenDismissCta() {
         whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
-        val cta = DaxSerpCta(mockOnboardingStore, mockAppInstallStore, mockOnboardingDesignExperimentManager)
+        val cta = DaxSerpCta(mockOnboardingStore, mockAppInstallStore)
         testee.ctaViewState.value = CtaViewState(cta = cta)
 
         testee.onUserSubmittedQuery("foo")
@@ -6168,11 +6164,43 @@ class BrowserTabViewModelTest {
                     PixelParameter.TAB_INACTIVE_3W to inactive3w,
                 )
 
-            testee.userLaunchingTabSwitcher(false)
+            testee.userLaunchingTabSwitcher(Omnibar.ViewMode.Browser(exampleUrl), false)
 
             assertCommandIssued<Command.LaunchTabSwitcher>()
             verify(mockPixel).fire(AppPixelName.TAB_MANAGER_CLICKED)
             verify(mockPixel).fire(AppPixelName.TAB_MANAGER_CLICKED_DAILY, params, emptyMap(), Daily())
+        }
+
+    @Test
+    fun whenUserLaunchingTabSwitcherInDuckAIThenLaunchTabSwitcherCommandSentAndPixelsFired() =
+        runTest {
+            val tabCount = "61-80"
+            val active7d = "21+"
+            val inactive1w = "11-20"
+            val inactive2w = "6-10"
+            val inactive3w = "0"
+
+            whenever(mockTabStatsBucketing.getNumberOfOpenTabs()).thenReturn(tabCount)
+            whenever(mockTabStatsBucketing.getTabsActiveLastWeek()).thenReturn(active7d)
+            whenever(mockTabStatsBucketing.getTabsActiveOneWeekAgo()).thenReturn(inactive1w)
+            whenever(mockTabStatsBucketing.getTabsActiveTwoWeeksAgo()).thenReturn(inactive2w)
+            whenever(mockTabStatsBucketing.getTabsActiveMoreThanThreeWeeksAgo()).thenReturn(inactive3w)
+
+            val params =
+                mapOf(
+                    PixelParameter.TAB_COUNT to tabCount,
+                    PixelParameter.TAB_ACTIVE_7D to active7d,
+                    PixelParameter.TAB_INACTIVE_1W to inactive1w,
+                    PixelParameter.TAB_INACTIVE_2W to inactive2w,
+                    PixelParameter.TAB_INACTIVE_3W to inactive3w,
+                )
+
+            testee.userLaunchingTabSwitcher(Omnibar.ViewMode.DuckAI, false)
+
+            assertCommandIssued<Command.LaunchTabSwitcher>()
+            verify(mockPixel).fire(AppPixelName.TAB_MANAGER_CLICKED)
+            verify(mockPixel).fire(AppPixelName.TAB_MANAGER_CLICKED_DAILY, params, emptyMap(), Daily())
+            verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_TAB_SWITCHER_OPENED)
         }
 
     @Test
@@ -6260,7 +6288,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenNewPageWithUrlYouTubeNoCookieAndFullUrlDisabledThenReplaceUrlWithDuckPlayer() =
         runTest {
-            isFullSiteAddressEnabled = false
+            isFullSiteAddressEnabledFlow.emit(false)
             whenever(mockDuckPlayer.isSimulatedYoutubeNoCookie("https://youtube-nocookie.com/?videoID=1234".toUri())).thenReturn(true)
             whenever(mockDuckPlayer.isSimulatedYoutubeNoCookie("duck://player/1234".toUri())).thenReturn(false)
             whenever(mockDuckPlayer.createDuckPlayerUriFromYoutubeNoCookie("https://youtube-nocookie.com/?videoID=1234".toUri())).thenReturn(
@@ -6307,7 +6335,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenUrlUpdatedWithUrlYouTubeNoCookieAndFullUrlDisabledThenReplaceUrlWithDuckPlayerString() =
         runTest {
-            isFullSiteAddressEnabled = false
+            isFullSiteAddressEnabledFlow.emit(false)
             whenever(mockDuckPlayer.isSimulatedYoutubeNoCookie("https://youtube-nocookie.com/?videoID=1234".toUri())).thenReturn(true)
             whenever(mockDuckPlayer.isSimulatedYoutubeNoCookie("duck://player/1234".toUri())).thenReturn(false)
             whenever(mockDuckPlayer.isSimulatedYoutubeNoCookie(exampleUrl.toUri())).thenReturn(false)
@@ -6450,7 +6478,7 @@ class BrowserTabViewModelTest {
             val domain = "https://www.example.com"
             givenCurrentSite(domain)
 
-            testee.userLaunchingTabSwitcher(false)
+            testee.userLaunchingTabSwitcher(Omnibar.ViewMode.Browser(domain), false)
 
             verify(mockPixel).fire(AppPixelName.TAB_MANAGER_OPENED_FROM_SITE)
         }
@@ -6461,7 +6489,7 @@ class BrowserTabViewModelTest {
             givenTabManagerData()
             setBrowserShowing(false)
 
-            testee.userLaunchingTabSwitcher(false)
+            testee.userLaunchingTabSwitcher(Omnibar.ViewMode.NewTab, false)
 
             verify(mockPixel).fire(AppPixelName.TAB_MANAGER_OPENED_FROM_NEW_TAB, mapOf(PixelParameter.FROM_FOCUSED_NTP to "false"))
         }
@@ -6472,7 +6500,7 @@ class BrowserTabViewModelTest {
             givenTabManagerData()
             setBrowserShowing(false)
 
-            testee.userLaunchingTabSwitcher(true)
+            testee.userLaunchingTabSwitcher(Omnibar.ViewMode.NewTab, true)
 
             verify(mockPixel).fire(AppPixelName.TAB_MANAGER_OPENED_FROM_NEW_TAB, mapOf(PixelParameter.FROM_FOCUSED_NTP to "true"))
         }
@@ -6486,7 +6514,7 @@ class BrowserTabViewModelTest {
             val domain = "https://duckduckgo.com/?q=test&atb=v395-1-wb&ia=web"
             givenCurrentSite(domain)
 
-            testee.userLaunchingTabSwitcher(false)
+            testee.userLaunchingTabSwitcher(Omnibar.ViewMode.Browser(domain), false)
 
             verify(mockPixel).fire(AppPixelName.TAB_MANAGER_OPENED_FROM_SERP)
         }
@@ -6592,23 +6620,6 @@ class BrowserTabViewModelTest {
 
             verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_OPEN_BROWSER_MENU, mapOf("was_used_before" to "0"))
             verify(mockDuckChat).openDuckChat()
-        }
-
-    @Test
-    fun whenDuckChatMenuItemClickedAndFullScreenModeThenDontOpenDuckChatScreen() =
-        runTest {
-            mockDuckAiFeatureStateFullScreenModeFlow.emit(true)
-            whenever(mockDuckChat.wasOpenedBefore()).thenReturn(false)
-            whenever(mockOmnibarConverter.convertQueryToUrl(duckChatURL, null)).thenReturn(duckChatURL)
-
-            testee.onDuckChatMenuClicked()
-
-            verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-
-            val command = commandCaptor.lastValue as Command.OpenInNewTab
-            assertTrue(command.query == duckChatURL)
-
-            verify(mockDuckChat, never()).openDuckChat()
         }
 
     @Test
@@ -6905,8 +6916,8 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenVisitSiteThenUpdateLoadingViewStateAndOmnibarViewStateAndFullUrlDisabled() {
-        isFullSiteAddressEnabled = false
+    fun whenVisitSiteThenUpdateLoadingViewStateAndOmnibarViewStateAndFullUrlDisabled() = runTest {
+        isFullSiteAddressEnabledFlow.emit(false)
 
         testee.browserViewState.value =
             browserViewState().copy(
@@ -6987,7 +6998,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenUserClicksDaxSerpCtaDismissButtonThenHideOnboardingDaxDialogCommandIssuedAndPixelFired() =
         runTest {
-            val cta = DaxSerpCta(mockOnboardingStore, mockAppInstallStore, mockOnboardingDesignExperimentManager)
+            val cta = DaxSerpCta(mockOnboardingStore, mockAppInstallStore)
 
             testee.onUserClickCtaDismissButton(cta)
 
@@ -7090,13 +7101,9 @@ class BrowserTabViewModelTest {
     @Test
     fun whenShowFullSiteAddressSettingDisabledThenOmnibarIsRefreshed() =
         runTest {
-            testee.onViewResumed()
-
-            assertCommandNotIssued<Command.RefreshOmnibar>()
-
-            isFullSiteAddressEnabled = false
-
-            testee.onViewResumed()
+            // Because it is flow-based implementation, we just need to update the flow
+            // to call the refresh omnibar command
+            isFullSiteAddressEnabledFlow.emit(false)
 
             assertCommandIssued<Command.RefreshOmnibar>()
         }
@@ -7104,11 +7111,11 @@ class BrowserTabViewModelTest {
     @Test
     fun whenShowFullSiteAddressSettingEnabledThenOmnibarIsRefreshed() =
         runTest {
-            isFullSiteAddressEnabled = false
+            isFullSiteAddressEnabledFlow.emit(false)
 
             testee.onViewResumed()
 
-            isFullSiteAddressEnabled = true
+            isFullSiteAddressEnabledFlow.emit(true)
 
             testee.onViewResumed()
 
@@ -7116,31 +7123,7 @@ class BrowserTabViewModelTest {
         }
 
     @Test
-    fun whenSetBrowserBackgroundWithBuckOnboardingEnabledAndLightModeEnabledThenSetBrowserBackgroundColorCommandIssuedWithCorrectColor() {
-        whenever(mockOnboardingDesignExperimentManager.isBuckEnrolledAndEnabled()).thenReturn(true)
-
-        testee.setBrowserBackground(lightModeEnabled = true)
-
-        assertCommandIssued<Command.SetBrowserBackgroundColor> {
-            assertEquals(CommonR.color.buckYellow, this.colorRes)
-        }
-    }
-
-    @Test
-    fun whenSetBrowserBackgroundWithBuckOnboardingEnabledAndLightModeDisabledThenSetBrowserBackgroundColorCommandIssuedWithCorrectColor() {
-        whenever(mockOnboardingDesignExperimentManager.isBuckEnrolledAndEnabled()).thenReturn(true)
-
-        testee.setBrowserBackground(lightModeEnabled = false)
-
-        assertCommandIssued<Command.SetBrowserBackgroundColor> {
-            assertEquals(CommonR.color.buckLightBlue, this.colorRes)
-        }
-    }
-
-    @Test
     fun whenSetBrowserBackgroundWithBuckOnboardingDisabledAndLightModeEnabledThenSetBrowserBackgroundCommandIssuedWithCorrectColor() {
-        whenever(mockOnboardingDesignExperimentManager.isBuckEnrolledAndEnabled()).thenReturn(false)
-
         testee.setBrowserBackground(lightModeEnabled = true)
 
         assertCommandIssued<Command.SetBrowserBackground> {
@@ -7150,8 +7133,6 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenSetBrowserBackgroundWithBuckOnboardingDisabledAndDarkModeEnabledThenSetBrowserBackgroundCommandIssuedWithCorrectColor() {
-        whenever(mockOnboardingDesignExperimentManager.isBuckEnrolledAndEnabled()).thenReturn(false)
-
         testee.setBrowserBackground(lightModeEnabled = false)
 
         assertCommandIssued<Command.SetBrowserBackground> {
@@ -7160,31 +7141,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenSetOnboardingDialogBackgroundWithBuckOnboardingAndLightModeEnabledThenSetOnboardingDialogBackgroundColorCommandIssuedWithCorrectColor() {
-        whenever(mockOnboardingDesignExperimentManager.isBuckEnrolledAndEnabled()).thenReturn(true)
-
-        testee.setOnboardingDialogBackground(lightModeEnabled = true)
-
-        assertCommandIssued<Command.SetOnboardingDialogBackgroundColor> {
-            assertEquals(CommonR.color.buckYellow, this.colorRes)
-        }
-    }
-
-    @Test
-    fun whenSetOnboardingDialogBackgroundWithBuckOnboardinAndDarkModeEnabledThenSetOnboardingDialogBackgroundColorCommandIssuedWithCorrectColor() {
-        whenever(mockOnboardingDesignExperimentManager.isBuckEnrolledAndEnabled()).thenReturn(true)
-
-        testee.setOnboardingDialogBackground(lightModeEnabled = false)
-
-        assertCommandIssued<Command.SetOnboardingDialogBackgroundColor> {
-            assertEquals(CommonR.color.buckLightBlue, this.colorRes)
-        }
-    }
-
-    @Test
     fun whenSetOnboardingDialogBackgroundAndLightModeEnabledThenSetBrowserBackgroundCommandIssuedWithCorrectColor() {
-        whenever(mockOnboardingDesignExperimentManager.isBuckEnrolledAndEnabled()).thenReturn(false)
-
         testee.setOnboardingDialogBackground(lightModeEnabled = true)
 
         assertCommandIssued<Command.SetOnboardingDialogBackground> {
@@ -7194,8 +7151,6 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenSetOnboardingDialogBackgroundAndDarkModeEnabledThenSetBrowserBackgroundCommandIssuedWithCorrectColor() {
-        whenever(mockOnboardingDesignExperimentManager.isBuckEnrolledAndEnabled()).thenReturn(false)
-
         testee.setOnboardingDialogBackground(lightModeEnabled = false)
 
         assertCommandIssued<Command.SetOnboardingDialogBackground> {
@@ -7248,7 +7203,7 @@ class BrowserTabViewModelTest {
             // Setup initial state
             val initialUrl = "https://example.org"
             val title = "Example Page"
-            isFullSiteAddressEnabled = false
+            isFullSiteAddressEnabledFlow.emit(false)
 
             // First load initial URL
             loadUrl(initialUrl)
@@ -7280,7 +7235,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenNavigatingAndFullUrlDisabledThenQueryOrFullUrlIsPreserved() =
         runTest {
-            isFullSiteAddressEnabled = false
+            isFullSiteAddressEnabledFlow.emit(false)
 
             loadUrl(exampleUrl)
 
@@ -7316,8 +7271,8 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenMaliciousSiteVisitedAndFullUrlDisabledThenQueryOrFullUrlUpdates() {
-        isFullSiteAddressEnabled = false
+    fun whenMaliciousSiteVisitedAndFullUrlDisabledThenQueryOrFullUrlUpdates() = runTest {
+        isFullSiteAddressEnabledFlow.emit(false)
 
         testee.browserViewState.value =
             browserViewState().copy(
@@ -7333,115 +7288,10 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenOnOmnibarPrivacyShieldButtonPressedWithTrackersBlockedCtaThenFirePrivacyDashClickedFromOnboardingPixel() =
-        runTest {
-            val cta =
-                DaxTrackersBlockedCta(
-                    onboardingStore = mockOnboardingStore,
-                    appInstallStore = mockAppInstallStore,
-                    trackers = emptyList(),
-                    settingsDataStore = mockSettingsDataStore,
-                    onboardingDesignExperimentManager = mockOnboardingDesignExperimentManager,
-                )
-            setCta(cta)
-
-            testee.onOmnibarPrivacyShieldButtonPressed()
-
-            verify(mockOnboardingDesignExperimentManager).firePrivacyDashClickedFromOnboardingPixel()
-        }
-
-    @Test
-    fun whenOnOmnibarPrivacyShieldButtonPressedWithoutTrackersBlockedCtaThenDoNotFirePrivacyDashClickedFromOnboardingPixel() =
-        runTest {
-            val cta = DaxSerpCta(mockOnboardingStore, mockAppInstallStore, mockOnboardingDesignExperimentManager)
-            setCta(cta)
-
-            testee.onOmnibarPrivacyShieldButtonPressed()
-
-            verify(mockOnboardingDesignExperimentManager, never()).firePrivacyDashClickedFromOnboardingPixel()
-        }
-
-    @Test
-    fun whenOnUserSelectedOnboardingDialogOptionWithValidIndexThenFireOptionSelectedPixel() =
-        runTest {
-            val cta = DaxSerpCta(mockOnboardingStore, mockAppInstallStore, mockOnboardingDesignExperimentManager)
-            val index = 2
-
-            testee.onUserSelectedOnboardingDialogOption(cta, index)
-
-            verify(mockOnboardingDesignExperimentManager).fireOptionSelectedPixel(cta, index)
-        }
-
-    @Test
-    fun whenOnUserSelectedOnboardingDialogOptionWithNullIndexThenDoNotFireOptionSelectedPixel() =
-        runTest {
-            val cta = DaxSerpCta(mockOnboardingStore, mockAppInstallStore, mockOnboardingDesignExperimentManager)
-
-            testee.onUserSelectedOnboardingDialogOption(cta, null)
-
-            verify(mockOnboardingDesignExperimentManager, never()).fireOptionSelectedPixel(any(), any())
-        }
-
-    @Test
-    fun whenOnUserSelectedOnboardingSiteSuggestionOptionWithValidIndexThenFireOptionSelectedPixel() =
-        runTest {
-            testee.onUserSelectedOnboardingSiteSuggestionOption(1)
-
-            verify(mockOnboardingDesignExperimentManager).fireSiteSuggestionOptionSelectedPixel(1)
-        }
-
-    @Test
-    fun whenUserSubmittedQueryNotSuggestedSearchOptionThenFireSearchOrNavCustomPixel() =
-        runTest {
-            whenever(mockOmnibarConverter.convertQueryToUrl("custom query", null)).thenReturn("custom query")
-            whenever(mockOnboardingStore.getSearchOptions()).thenReturn(emptyList())
-            val cta = DaxIntroSearchOptionsCta(mockOnboardingStore, mockAppInstallStore)
-            setCta(cta)
-
-            testee.onUserSubmittedQuery("custom query")
-
-            verify(mockOnboardingDesignExperimentManager).fireSearchOrNavCustomPixel()
-        }
-
-    @Test
-    fun whenPageFinishedThenOnWebPageFinishedLoadingCalled() =
-        runTest {
-            val url = "https://example.com"
-            val webViewNavState = WebViewNavigationState(mockStack, 100)
-            whenever(mockDuckAiFeatureState.showFullScreenMode).thenReturn(mockDuckAiFullScreenMode)
-
-            testee.pageFinished(mockWebView, webViewNavState, url)
-
-            verify(mockOnboardingDesignExperimentManager).onWebPageFinishedLoading(url)
-        }
-
-    @Test
-    fun whenCtaShownThenFireInContextDialogShownPixel() =
-        runTest {
-            val cta = DaxSerpCta(mockOnboardingStore, mockAppInstallStore, mockOnboardingDesignExperimentManager)
-            setCta(cta)
-
-            testee.onCtaShown()
-
-            verify(mockOnboardingDesignExperimentManager).fireInContextDialogShownPixel(cta)
-        }
-
-    @Test
-    fun whenFireMenuSelectedAndDaxFireButtonCtaThenFireFireButtonClickedFromOnboardingPixel() =
-        runTest {
-            val cta = OnboardingDaxDialogCta.DaxFireButtonCta(mockOnboardingStore, mockAppInstallStore, mockOnboardingDesignExperimentManager)
-            setCta(cta)
-
-            testee.onFireMenuSelected()
-
-            verify(mockOnboardingDesignExperimentManager).fireFireButtonClickedFromOnboardingPixel()
-        }
-
-    @Test
     fun whenFireMenuSelectedAndFireButtonHighlightedThenHighlightIsCleared() = runTest {
         testee.browserViewState.value = browserViewState().copy(fireButton = HighlightableButton.Visible(highlighted = true))
 
-        testee.onFireMenuSelected()
+        testee.onFireMenuSelected(Omnibar.ViewMode.Browser(exampleUrl))
 
         val viewState = testee.browserViewState.value
         assertNotNull(viewState)
@@ -7452,11 +7302,20 @@ class BrowserTabViewModelTest {
     fun whenFireMenuSelectedAndFireButtonNotHighlightedThenStateUnchanged() = runTest {
         testee.browserViewState.value = browserViewState().copy(fireButton = HighlightableButton.Visible(highlighted = false))
 
-        testee.onFireMenuSelected()
+        testee.onFireMenuSelected(Omnibar.ViewMode.Browser(exampleUrl))
 
         val viewState = testee.browserViewState.value
         assertNotNull(viewState)
         assertFalse((viewState.fireButton as HighlightableButton.Visible).highlighted)
+    }
+
+    @Test
+    fun whenFireMenuSelectedAndDuckAIModeThenPixelFired() = runTest {
+        testee.browserViewState.value = browserViewState()
+
+        testee.onFireMenuSelected(Omnibar.ViewMode.DuckAI)
+
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_FIRE_BUTTON_TAPPED)
     }
 
     @Test
@@ -8277,7 +8136,7 @@ class BrowserTabViewModelTest {
         )
         whenever(mockDuckChatJSHelper.onNativeAction(NativeAction.NEW_CHAT)).thenReturn(expectedEvent)
 
-        testee.openNewDuckChat()
+        testee.openNewDuckChat(ViewMode.DuckAI)
 
         testee.subscriptionEventDataFlow.test {
             val emittedEvent = awaitItem()
@@ -8286,7 +8145,26 @@ class BrowserTabViewModelTest {
             assertEquals(expectedEvent.params.toString(), emittedEvent.params.toString())
             cancelAndIgnoreRemainingEvents()
         }
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_OMNIBAR_NEW_CHAT_TAPPED)
     }
+
+    @Test
+    fun whenDuckChatMenuItemClickedAndFullScreenModeDisabledThenDontOpenDuckChatScreen() =
+        runTest {
+            mockDuckAiFeatureStateFullScreenModeFlow.emit(true)
+            whenever(mockDuckChat.wasOpenedBefore()).thenReturn(false)
+            whenever(mockOmnibarConverter.convertQueryToUrl(duckChatURL, null)).thenReturn(duckChatURL)
+
+            testee.openNewDuckChat(ViewMode.NewTab)
+
+            verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+
+            val command = commandCaptor.lastValue as Command.OpenInNewTab
+            assertTrue(command.query == duckChatURL)
+
+            verify(mockDuckChat, never()).openDuckChat()
+            verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_SETTINGS_NEW_CHAT_TAB_TAPPED)
+        }
 
     @Test
     fun whenDuckChatNativeHistoryRequested() = runTest {
@@ -8326,6 +8204,8 @@ class BrowserTabViewModelTest {
             assertEquals(expectedEvent.params.toString(), emittedEvent.params.toString())
             cancelAndIgnoreRemainingEvents()
         }
+
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_DUCK_AI_SETTINGS_TAPPED)
     }
 
     @Test

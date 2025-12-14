@@ -65,4 +65,15 @@
 
     <!-- ADS -->
     <string name="ads_demo_activity_title" translatable="false">Android Design System Demo</string>
+
+    <!-- Digital Asset Links -->
+    <string name="asset_statements">
+      [{
+        \"relation\": [\"delegate_permission/common.handle_all_urls\"],
+        \"target\": {
+          \"namespace\": \"web\",
+          \"site\": \"https://duckduckgo.com\"
+        }
+      }]
+    </string>
 </resources>

@@ -44,6 +44,13 @@ interface AppBuildConfig {
      * @return `true` if the user re-installed the app, `false` otherwise
      */
     suspend fun isAppReinstall(): Boolean
+
+    /**
+     * Detects if this is a fresh installation of the app (first time install).
+     *
+     * @return true if this is a new installation (not an update), false otherwise
+     */
+    fun isNewInstall(): Boolean
 }
 
 enum class BuildFlavor {

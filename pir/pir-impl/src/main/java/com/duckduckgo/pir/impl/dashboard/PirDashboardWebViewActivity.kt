@@ -73,6 +73,7 @@ class PirDashboardWebViewActivity : DuckDuckGoActivity() {
         observeCommands()
 
         pirNotificationManager.createNotificationChannel()
+        lifecycle.addObserver(viewModel)
     }
 
     override fun onDestroy() {

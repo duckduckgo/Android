@@ -18,6 +18,7 @@ package com.duckduckgo.pir.impl.common
 
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.pir.impl.common.CaptchaResolver.CaptchaResolverError.ClientFailure
 import com.duckduckgo.pir.impl.common.CaptchaResolver.CaptchaResolverError.CriticalFailure
 import com.duckduckgo.pir.impl.common.CaptchaResolver.CaptchaResolverError.InvalidRequest
 import com.duckduckgo.pir.impl.common.CaptchaResolver.CaptchaResolverError.SolutionNotReady
@@ -30,7 +31,10 @@ import com.duckduckgo.pir.impl.common.CaptchaResolver.CaptchaResolverResult.Solv
 import com.duckduckgo.pir.impl.service.DbpService
 import com.duckduckgo.pir.impl.service.DbpService.CaptchaSolutionMeta
 import com.duckduckgo.pir.impl.service.DbpService.PirStartCaptchaSolutionBody
+import com.duckduckgo.pir.impl.service.ResponseError
+import com.duckduckgo.pir.impl.service.parseError
 import com.squareup.anvil.annotations.ContributesBinding
+import com.squareup.moshi.Moshi
 import kotlinx.coroutines.withContext
 import logcat.logcat
 import retrofit2.HttpException
@@ -74,6 +78,7 @@ interface CaptchaResolver {
         ) : CaptchaResolverResult()
 
         data class CaptchaFailure(
+            val code: Int,
             val type: CaptchaResolverError,
             val message: String,
         ) : CaptchaResolverResult()
@@ -85,6 +90,7 @@ interface CaptchaResolver {
         data object CriticalFailure : CaptchaResolverError()
         data object InvalidRequest : CaptchaResolverError()
         data object TransientFailure : CaptchaResolverError()
+        data object ClientFailure : CaptchaResolverError()
     }
 }
 
@@ -92,7 +98,10 @@ interface CaptchaResolver {
 class RealCaptchaResolver @Inject constructor(
     private val dbpService: DbpService,
     private val dispatcherProvider: DispatcherProvider,
+    moshi: Moshi,
 ) : CaptchaResolver {
+    private val adapter = moshi.adapter(ResponseError::class.java)
+
     override suspend fun submitCaptchaInformation(
         siteKey: String,
         url: String,
@@ -115,27 +124,32 @@ class RealCaptchaResolver @Inject constructor(
             }
         }.getOrElse { error ->
             if (error is HttpException) {
-                val errorMessage = error.message()
+                val errorMessage = adapter.parseError(error)?.message.orEmpty()
+
                 if (errorMessage.startsWith("INVALID_REQUEST")) {
                     CaptchaFailure(
+                        code = error.code(),
                         type = InvalidRequest,
-                        message = errorMessage,
+                        message = "$PREFIX_SUBMIT_CAPTCHA_ERROR${error.code()} $errorMessage",
                     )
                 } else if (errorMessage.startsWith("FAILURE_TRANSIENT")) {
                     CaptchaFailure(
+                        code = error.code(),
                         type = TransientFailure,
-                        message = errorMessage,
+                        message = "$PREFIX_SUBMIT_CAPTCHA_ERROR${error.code()} $errorMessage",
                     )
                 } else {
                     CaptchaFailure(
+                        code = error.code(),
                         type = CriticalFailure,
-                        message = errorMessage,
+                        message = "$PREFIX_SUBMIT_CAPTCHA_ERROR${error.code()} $errorMessage",
                     )
                 }
             } else {
                 CaptchaFailure(
-                    type = CriticalFailure,
-                    message = error.message ?: "Unknown error",
+                    code = 0,
+                    type = ClientFailure,
+                    message = PREFIX_SUBMIT_CAPTCHA_ERROR + (error.message ?: "Unknown error"),
                 )
             }
         }
@@ -151,13 +165,15 @@ class RealCaptchaResolver @Inject constructor(
                 logcat { "PIR-CAPTCHA: RESULT -> $this" }
                 when (message) {
                     "SOLUTION_NOT_READY" -> CaptchaFailure(
+                        code = 0,
                         type = SolutionNotReady,
                         message = message,
                     )
 
                     "FAILURE" -> CaptchaFailure(
+                        code = 0,
                         type = UnableToSolveCaptcha,
-                        message = message,
+                        message = PREFIX_SOLVE_CAPTCHA_ERROR + message,
                     )
 
                     else -> SolveCaptchaSuccess(
@@ -166,12 +182,28 @@ class RealCaptchaResolver @Inject constructor(
                     )
                 }
             }
-        }.getOrElse {
-            logcat { "PIR-CAPTCHA: Failure -> $it" }
-            CaptchaFailure(
-                type = InvalidRequest,
-                message = it.message ?: "Unknown error",
-            )
+        }.getOrElse { error ->
+            logcat { "PIR-CAPTCHA: Failure -> $error" }
+            if (error is HttpException) {
+                val errorMessage = adapter.parseError(error)?.message.orEmpty()
+
+                CaptchaFailure(
+                    code = error.code(),
+                    type = InvalidRequest,
+                    message = "$PREFIX_SOLVE_CAPTCHA_ERROR${error.code()} $errorMessage",
+                )
+            } else {
+                CaptchaFailure(
+                    code = 0,
+                    type = ClientFailure,
+                    message = PREFIX_SOLVE_CAPTCHA_ERROR + (error.message ?: "Unknown error"),
+                )
+            }
         }
+    }
+
+    companion object {
+        private const val PREFIX_SUBMIT_CAPTCHA_ERROR = "Submit captcha error: "
+        private const val PREFIX_SOLVE_CAPTCHA_ERROR = "Solve captcha error: "
     }
 }

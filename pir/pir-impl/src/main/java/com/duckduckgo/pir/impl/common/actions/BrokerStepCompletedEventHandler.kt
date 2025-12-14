@@ -22,18 +22,27 @@ import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep.EmailConfirma
 import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep.OptOutStep
 import com.duckduckgo.pir.impl.common.PirJob.RunType
 import com.duckduckgo.pir.impl.common.PirJob.RunType.EMAIL_CONFIRMATION
+import com.duckduckgo.pir.impl.common.PirJob.RunType.SCHEDULED
 import com.duckduckgo.pir.impl.common.PirRunStateHandler
-import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerManualScanCompleted
+import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerOptOutStageValidate
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerRecordEmailConfirmationCompleted
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerRecordOptOutFailed
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerRecordOptOutSubmitted
-import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerScheduledScanCompleted
+import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerScanFailed
+import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerScanSuccess
 import com.duckduckgo.pir.impl.common.actions.EventHandler.Next
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.BrokerStepCompleted
+import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.BrokerStepCompleted.StepStatus
+import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.BrokerStepCompleted.StepStatus.Failure
+import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.BrokerStepCompleted.StepStatus.Success
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.ExecuteNextBrokerStep
+import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.PirStageStatus
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.State
 import com.duckduckgo.pir.impl.pixels.PirStage
+import com.duckduckgo.pir.impl.scripts.models.BrokerAction
+import com.duckduckgo.pir.impl.scripts.models.getCategory
+import com.duckduckgo.pir.impl.scripts.models.getDetails
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import kotlin.reflect.KClass
@@ -53,15 +62,17 @@ class BrokerStepCompletedEventHandler @Inject constructor(
         event: Event,
     ): Next {
         val completedEvent = event as BrokerStepCompleted
+        val currentBrokerStep = state.brokerStepsToExecute[state.currentBrokerStepIndex]
 
         if (completedEvent.needsEmailConfirmation) {
-            val currentBrokerStep = state.brokerStepsToExecute[state.currentBrokerStepIndex]
             pirRunStateHandler.handleState(
                 PirRunStateHandler.PirRunState.BrokerRecordEmailConfirmationNeeded(
-                    brokerName = currentBrokerStep.broker.name,
+                    broker = currentBrokerStep.broker,
                     extractedProfile = (currentBrokerStep as OptOutStep).profileToOptOut,
-                    attemptId = state.attemptId ?: "no-attempt-id",
-                    lastActionId = currentBrokerStep.step.actions[state.currentBrokerStepIndex].id,
+                    attemptId = state.attemptId,
+                    lastActionId = currentBrokerStep.step.actions[state.currentActionIndex].id,
+                    durationMs = currentTimeProvider.currentTimeMillis() - state.stageStatus.stageStartMs,
+                    currentActionAttemptCount = state.actionRetryCount + 1,
                 ),
             )
         } else {
@@ -69,7 +80,7 @@ class BrokerStepCompletedEventHandler @Inject constructor(
             emitBrokerStepCompletePixel(
                 state = state,
                 totalTimeMillis = currentTimeProvider.currentTimeMillis() - state.brokerStepStartTime,
-                isSuccess = completedEvent.isSuccess,
+                stepStatus = completedEvent.stepStatus,
             )
         }
 
@@ -79,6 +90,10 @@ class BrokerStepCompletedEventHandler @Inject constructor(
                 currentBrokerStepIndex = state.currentBrokerStepIndex + 1,
                 actionRetryCount = 0,
                 generatedEmailData = null,
+                stageStatus = PirStageStatus(
+                    currentStage = PirStage.VALIDATE,
+                    stageStartMs = currentTimeProvider.currentTimeMillis(),
+                ),
             ),
             nextEvent = ExecuteNextBrokerStep,
         )
@@ -87,62 +102,88 @@ class BrokerStepCompletedEventHandler @Inject constructor(
     private suspend fun emitBrokerStepCompletePixel(
         state: State,
         totalTimeMillis: Long,
-        isSuccess: Boolean,
+        stepStatus: StepStatus,
     ) {
         val currentBrokerStep = state.brokerStepsToExecute[state.currentBrokerStepIndex]
         val brokerStartTime = state.brokerStepStartTime
-        when (state.runType) {
-            RunType.MANUAL ->
-                pirRunStateHandler.handleState(
-                    BrokerManualScanCompleted(
-                        brokerName = currentBrokerStep.broker.name,
-                        profileQueryId = state.profileQuery.id,
-                        eventTimeInMillis = currentTimeProvider.currentTimeMillis(),
-                        totalTimeMillis = totalTimeMillis,
-                        isSuccess = isSuccess,
-                        startTimeInMillis = brokerStartTime,
-                    ),
-                )
+        val isSuccess = stepStatus is Success
 
-            RunType.SCHEDULED ->
-                pirRunStateHandler.handleState(
-                    BrokerScheduledScanCompleted(
-                        brokerName = currentBrokerStep.broker.name,
-                        profileQueryId = state.profileQuery.id,
-                        eventTimeInMillis = currentTimeProvider.currentTimeMillis(),
-                        totalTimeMillis = totalTimeMillis,
-                        isSuccess = isSuccess,
-                        startTimeInMillis = brokerStartTime,
-                    ),
-                )
+        when (state.runType) {
+            RunType.MANUAL, SCHEDULED -> {
+                val isManual = state.runType == RunType.MANUAL
+                if (isSuccess) {
+                    val lastAction = currentBrokerStep.step.actions.getLastActionForSuccess(state.currentActionIndex)
+
+                    pirRunStateHandler.handleState(
+                        BrokerScanSuccess(
+                            broker = currentBrokerStep.broker,
+                            profileQueryId = state.profileQuery.id,
+                            eventTimeInMillis = currentTimeProvider.currentTimeMillis(),
+                            totalTimeMillis = totalTimeMillis,
+                            startTimeInMillis = brokerStartTime,
+                            isManualRun = isManual,
+                            lastAction = lastAction,
+                        ),
+                    )
+                } else {
+                    val lastAction = currentBrokerStep.step.actions.getLastActionForFailure(state.currentActionIndex)
+                    val failure = stepStatus as Failure
+
+                    pirRunStateHandler.handleState(
+                        BrokerScanFailed(
+                            broker = currentBrokerStep.broker,
+                            profileQueryId = state.profileQuery.id,
+                            eventTimeInMillis = currentTimeProvider.currentTimeMillis(),
+                            totalTimeMillis = totalTimeMillis,
+                            startTimeInMillis = brokerStartTime,
+                            isManualRun = isManual,
+                            errorCategory = failure.error.getCategory(),
+                            errorDetails = failure.error.getDetails(),
+                            failedAction = lastAction,
+                        ),
+                    )
+                }
+            }
 
             RunType.OPTOUT -> {
                 val currentOptOutStep = currentBrokerStep as OptOutStep
                 if (isSuccess) {
-                    BrokerRecordOptOutSubmitted(
-                        brokerName = currentOptOutStep.broker.name,
-                        extractedProfile = currentOptOutStep.profileToOptOut,
-                        attemptId = state.attemptId ?: "no-attempt-id",
-                        startTimeInMillis = state.brokerStepStartTime,
-                        endTimeInMillis = currentTimeProvider.currentTimeMillis(),
-                        emailPattern = state.generatedEmailData?.pattern,
+                    val lastAction = currentBrokerStep.step.actions.getLastActionForSuccess(state.currentActionIndex)
+
+                    pirRunStateHandler.handleState(
+                        BrokerOptOutStageValidate(
+                            broker = currentBrokerStep.broker,
+                            actionID = lastAction.id,
+                            attemptId = state.attemptId,
+                            durationMs = currentTimeProvider.currentTimeMillis() - state.stageStatus.stageStartMs,
+                            currentActionAttemptCount = state.actionRetryCount + 1,
+                        ),
+                    )
+                    pirRunStateHandler.handleState(
+                        BrokerRecordOptOutSubmitted(
+                            broker = currentBrokerStep.broker,
+                            extractedProfile = currentOptOutStep.profileToOptOut,
+                            attemptId = state.attemptId,
+                            startTimeInMillis = state.brokerStepStartTime,
+                            endTimeInMillis = currentTimeProvider.currentTimeMillis(),
+                            emailPattern = state.generatedEmailData?.pattern,
+                        ),
                     )
                 } else {
-                    // Whatever last action that was executed is the last action that failed.
-                    val lastAction = currentBrokerStep.step.actions[state.currentBrokerStepIndex]
+                    val lastAction = currentBrokerStep.step.actions.getLastActionForFailure(state.currentActionIndex)
 
-                    BrokerRecordOptOutFailed(
-                        brokerName = currentOptOutStep.broker.name,
-                        extractedProfile = currentOptOutStep.profileToOptOut,
-                        startTimeInMillis = state.brokerStepStartTime,
-                        endTimeInMillis = currentTimeProvider.currentTimeMillis(),
-                        attemptId = state.attemptId ?: "no-attempt-id",
-                        failedAction = lastAction,
-                        stage = PirStage.OTHER, // TODO: Integrate stages properly later on
-                        emailPattern = state.generatedEmailData?.pattern,
+                    pirRunStateHandler.handleState(
+                        BrokerRecordOptOutFailed(
+                            broker = currentBrokerStep.broker,
+                            extractedProfile = currentOptOutStep.profileToOptOut,
+                            startTimeInMillis = state.brokerStepStartTime,
+                            endTimeInMillis = currentTimeProvider.currentTimeMillis(),
+                            attemptId = state.attemptId,
+                            failedAction = lastAction,
+                            stage = state.stageStatus.currentStage,
+                            emailPattern = state.generatedEmailData?.pattern,
+                        ),
                     )
-                }.also {
-                    pirRunStateHandler.handleState(it)
                 }
             }
 
@@ -150,13 +191,12 @@ class BrokerStepCompletedEventHandler @Inject constructor(
                 val currentOptOutStep = currentBrokerStep as EmailConfirmationStep
                 pirRunStateHandler.handleState(
                     BrokerRecordEmailConfirmationCompleted(
-                        brokerName = currentOptOutStep.broker.name,
+                        broker = currentBrokerStep.broker,
                         isSuccess = isSuccess,
-                        // Success means we finished all steps and reaching here means that index has been incremented. If error, we don't increment.
                         lastActionId = if (isSuccess) {
-                            currentOptOutStep.step.actions[state.currentActionIndex - 1]
+                            currentOptOutStep.step.actions.getLastActionForSuccess(state.currentActionIndex)
                         } else {
-                            currentOptOutStep.step.actions[state.currentActionIndex]
+                            currentOptOutStep.step.actions.getLastActionForFailure(state.currentActionIndex)
                         }.id,
                         totalTimeMillis = totalTimeMillis,
                         extractedProfileId = currentBrokerStep.emailConfirmationJob.extractedProfileId,
@@ -168,5 +208,15 @@ class BrokerStepCompletedEventHandler @Inject constructor(
                 // No op
             }
         }
+    }
+
+    private fun List<BrokerAction>.getLastActionForSuccess(currentActionIndex: Int): BrokerAction {
+        // If success, it means we reached currentBrokerStepIndex == currentBrokerStep.step.actions.size, so last action would be -1.
+        return this[currentActionIndex - 1]
+    }
+
+    private fun List<BrokerAction>.getLastActionForFailure(currentActionIndex: Int): BrokerAction {
+        // Whatever last action that was executed is the last action that failed.
+        return this[currentActionIndex]
     }
 }

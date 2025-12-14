@@ -134,9 +134,7 @@ import com.duckduckgo.app.browser.commands.Command.SendEmail
 import com.duckduckgo.app.browser.commands.Command.SendResponseToJs
 import com.duckduckgo.app.browser.commands.Command.SendSms
 import com.duckduckgo.app.browser.commands.Command.SetBrowserBackground
-import com.duckduckgo.app.browser.commands.Command.SetBrowserBackgroundColor
 import com.duckduckgo.app.browser.commands.Command.SetOnboardingDialogBackground
-import com.duckduckgo.app.browser.commands.Command.SetOnboardingDialogBackgroundColor
 import com.duckduckgo.app.browser.commands.Command.ShareLink
 import com.duckduckgo.app.browser.commands.Command.ShowAppLinkPrompt
 import com.duckduckgo.app.browser.commands.Command.ShowAutoconsentAnimation
@@ -191,6 +189,8 @@ import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter
+import com.duckduckgo.app.browser.omnibar.Omnibar
+import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.browser.omnibar.QueryOrigin
@@ -199,6 +199,7 @@ import com.duckduckgo.app.browser.refreshpixels.RefreshPixelSender
 import com.duckduckgo.app.browser.santize.NonHttpAppLinkChecker
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.tabs.TabManager
+import com.duckduckgo.app.browser.urldisplay.UrlDisplayRepository
 import com.duckduckgo.app.browser.urlextraction.UrlExtractionListener
 import com.duckduckgo.app.browser.viewstate.AccessibilityViewState
 import com.duckduckgo.app.browser.viewstate.AutoCompleteViewState
@@ -242,7 +243,6 @@ import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.global.model.domain
 import com.duckduckgo.app.global.model.domainMatchesUrl
 import com.duckduckgo.app.location.data.LocationPermissionType
-import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentManager
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_BANNER_DISMISSED
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_BANNER_SHOWN
@@ -388,7 +388,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
@@ -405,8 +404,6 @@ import java.net.URISyntaxException
 import java.util.Locale
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
-import kotlin.time.Duration.Companion.milliseconds
-import com.duckduckgo.mobile.android.R as CommonR
 
 private const val SCAM_PROTECTION_REPORT_ERROR_URL = "https://duckduckgo.com/malicious-site-protection/report-error?url="
 
@@ -447,6 +444,7 @@ class BrowserTabViewModel @Inject constructor(
     private val trackingParameters: TrackingParameters,
     private val downloadCallback: DownloadStateListener,
     private val settingsDataStore: SettingsDataStore,
+    private val urlDisplayRepository: UrlDisplayRepository,
     private val autofillCapabilityChecker: AutofillCapabilityChecker,
     private val adClickManager: AdClickManager,
     private val autofillFireproofDialogSuppressor: AutofillFireproofDialogSuppressor,
@@ -485,7 +483,6 @@ class BrowserTabViewModel @Inject constructor(
     private val duckChatJSHelper: DuckChatJSHelper,
     private val tabManager: TabManager,
     private val addressDisplayFormatter: AddressDisplayFormatter,
-    private val onboardingDesignExperimentManager: OnboardingDesignExperimentManager,
     private val serpEasterEggLogosToggles: SerpEasterEggLogosToggles,
     private val nonHttpAppLinkChecker: NonHttpAppLinkChecker,
     private val externalIntentProcessingState: ExternalIntentProcessingState,
@@ -505,7 +502,6 @@ class BrowserTabViewModel @Inject constructor(
     private var buildingSiteFactoryJob: Job? = null
     private var hasUserSeenHistoryIAM = false
     private var lastAutoCompleteState: AutoCompleteViewState? = null
-    private var lastFullSiteUrlEnabled: Boolean = settingsDataStore.isFullUrlEnabled
 
     // Map<String, Map<String, JavaScriptReplyProxy>>() = Map<Origin, Map<location.href, JavaScriptReplyProxy>>()
     private val fixedReplyProxyMap = mutableMapOf<String, Map<String, JavaScriptReplyProxy>>()
@@ -604,6 +600,13 @@ class BrowserTabViewModel @Inject constructor(
     private var isCustomTabScreen: Boolean = false
     private var alreadyShownKeyboard: Boolean = false
     private var handleAboutBlankEnabled: Boolean = false
+
+    private val isFullUrlEnabled = urlDisplayRepository.isFullUrlEnabled
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.Eagerly,
+            initialValue = true,
+        )
 
     private val fireproofWebsitesObserver =
         Observer<List<FireproofWebsiteEntity>> {
@@ -797,6 +800,12 @@ class BrowserTabViewModel @Inject constructor(
         viewModelScope.launch(dispatchers.io()) {
             handleAboutBlankEnabled = androidBrowserConfig.handleAboutBlank().isEnabled()
         }
+
+        isFullUrlEnabled
+            .onEach {
+                command.value = Command.RefreshOmnibar
+            }
+            .launchIn(viewModelScope)
     }
 
     fun loadData(
@@ -939,13 +948,9 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onViewResumed() {
+        logcat { "Duck.ai: onViewResumed" }
         if (currentGlobalLayoutState() is Invalidated && currentBrowserViewState().browserShowing) {
             showErrorWithAction()
-        }
-
-        if (lastFullSiteUrlEnabled != settingsDataStore.isFullUrlEnabled) {
-            lastFullSiteUrlEnabled = settingsDataStore.isFullUrlEnabled
-            command.value = Command.RefreshOmnibar
         }
 
         if (serpSettingsFeature.storeSerpSettings().isEnabled()) {
@@ -965,15 +970,6 @@ class BrowserTabViewModel @Inject constructor(
             viewModelScope.launch {
                 val cta = refreshCta()
                 showOrHideKeyboard(cta)
-                if (onboardingDesignExperimentManager.isBuckEnrolledAndEnabled()) {
-                    when (cta) {
-                        is DaxBubbleCta.DaxIntroSearchOptionsCta -> {
-                            // Let the keyboard show before showing the animation, using insets were problematic
-                            delay(750.milliseconds)
-                            buckTryASearchAnimationEnabled.value = true
-                        }
-                    }
-                }
             }
         } else {
             command.value = HideKeyboard
@@ -1107,9 +1103,6 @@ class BrowserTabViewModel @Inject constructor(
             -> {
                 if (!ctaViewModel.isSuggestedSearchOption(query)) {
                     pixel.fire(ONBOARDING_SEARCH_CUSTOM, type = Unique())
-                    viewModelScope.launch {
-                        onboardingDesignExperimentManager.fireSearchOrNavCustomPixel()
-                    }
                 }
             }
 
@@ -1202,7 +1195,7 @@ class BrowserTabViewModel @Inject constructor(
         findInPageViewState.value = FindInPageViewState(visible = false)
         omnibarViewState.value =
             currentOmnibarViewState().copy(
-                omnibarText = if (settingsDataStore.isFullUrlEnabled) trimmedInput else addressDisplayFormatter.getShortUrl(trimmedInput),
+                omnibarText = if (isFullUrlEnabled.value) trimmedInput else addressDisplayFormatter.getShortUrl(trimmedInput),
                 queryOrFullUrl = trimmedInput,
                 forceExpand = true,
             )
@@ -1664,7 +1657,7 @@ class BrowserTabViewModel @Inject constructor(
         omnibarViewState.value =
             currentOmnibarViewState.copy(
                 queryOrFullUrl = omnibarTextForUrl(url, true),
-                omnibarText = omnibarTextForUrl(url, settingsDataStore.isFullUrlEnabled),
+                omnibarText = omnibarTextForUrl(url, isFullUrlEnabled.value),
                 forceExpand = true,
                 serpLogo = null,
             )
@@ -1862,7 +1855,7 @@ class BrowserTabViewModel @Inject constructor(
         omnibarViewState.postValue(
             currentOmnibarViewState.copy(
                 queryOrFullUrl = omnibarTextForUrl(url, true),
-                omnibarText = omnibarTextForUrl(url, settingsDataStore.isFullUrlEnabled),
+                omnibarText = omnibarTextForUrl(url, isFullUrlEnabled.value),
                 forceExpand = false,
             ),
         )
@@ -1971,10 +1964,6 @@ class BrowserTabViewModel @Inject constructor(
         if (!currentBrowserViewState().maliciousSiteBlocked) {
             navigationStateChanged(webViewNavigationState)
             url?.let { prefetchFavicon(url) }
-
-            viewModelScope.launch {
-                onboardingDesignExperimentManager.onWebPageFinishedLoading(url)
-            }
 
             evaluateDuckAIPage(url)
             evaluateSerpLogoState(url)
@@ -2187,7 +2176,7 @@ class BrowserTabViewModel @Inject constructor(
                     )
                 omnibarViewState.value =
                     currentOmnibarViewState().copy(
-                        omnibarText = if (settingsDataStore.isFullUrlEnabled) {
+                        omnibarText = if (isFullUrlEnabled.value) {
                             documentUrlString
                         } else {
                             addressDisplayFormatter.getShortUrl(
@@ -2977,7 +2966,6 @@ class BrowserTabViewModel @Inject constructor(
         val cta = ctaViewState.value?.cta ?: return
         viewModelScope.launch(dispatchers.io()) {
             ctaViewModel.onCtaShown(cta)
-            onboardingDesignExperimentManager.fireInContextDialogShownPixel(cta)
         }
     }
 
@@ -3196,7 +3184,7 @@ class BrowserTabViewModel @Inject constructor(
         if (request.host != site?.uri?.host) {
             omnibarViewState.value =
                 currentOmnibarViewState().copy(
-                    omnibarText = if (settingsDataStore.isFullUrlEnabled) request.site else addressDisplayFormatter.getShortUrl(request.site),
+                    omnibarText = if (isFullUrlEnabled.value) request.site else addressDisplayFormatter.getShortUrl(request.site),
                     queryOrFullUrl = request.site,
                     forceExpand = true,
                 )
@@ -3219,21 +3207,28 @@ class BrowserTabViewModel @Inject constructor(
         command.value = ShowWebContent
     }
 
-    fun userLaunchingTabSwitcher(launchedFromFocusedNtp: Boolean) {
+    fun userLaunchingTabSwitcher(viewMode: Omnibar.ViewMode, hasFocus: Boolean) {
         command.value = LaunchTabSwitcher
+
         pixel.fire(AppPixelName.TAB_MANAGER_CLICKED)
         fireDailyLaunchPixel()
 
-        if (!currentBrowserViewState().browserShowing) {
-            val params = mapOf(PixelParameter.FROM_FOCUSED_NTP to launchedFromFocusedNtp.toString())
-            pixel.fire(AppPixelName.TAB_MANAGER_OPENED_FROM_NEW_TAB, parameters = params)
-        } else {
-            val url = site?.url
-            if (url != null) {
-                if (duckDuckGoUrlDetector.isDuckDuckGoUrl(url)) {
-                    pixel.fire(AppPixelName.TAB_MANAGER_OPENED_FROM_SERP)
-                } else {
-                    pixel.fire(AppPixelName.TAB_MANAGER_OPENED_FROM_SITE)
+        when (viewMode) {
+            is Omnibar.ViewMode.DuckAI -> {
+                pixel.fire(DuckChatPixelName.DUCK_CHAT_TAB_SWITCHER_OPENED)
+            }
+            is Omnibar.ViewMode.NewTab -> {
+                val params = mapOf(PixelParameter.FROM_FOCUSED_NTP to hasFocus.toString())
+                pixel.fire(AppPixelName.TAB_MANAGER_OPENED_FROM_NEW_TAB, parameters = params)
+            }
+            else -> {
+                val url = site?.url
+                if (url != null) {
+                    if (duckDuckGoUrlDetector.isDuckDuckGoUrl(url)) {
+                        pixel.fire(AppPixelName.TAB_MANAGER_OPENED_FROM_SERP)
+                    } else {
+                        pixel.fire(AppPixelName.TAB_MANAGER_OPENED_FROM_SITE)
+                    }
                 }
             }
         }
@@ -3542,8 +3537,6 @@ class BrowserTabViewModel @Inject constructor(
 
     fun onMessageReceived() {
         isLinkOpenedInNewTab = true
-
-        handleNewTabIfEmptyUrl()
     }
 
     override fun linkOpenedInNewTab(): Boolean = isLinkOpenedInNewTab
@@ -3618,7 +3611,7 @@ class BrowserTabViewModel @Inject constructor(
 
                 omnibarViewState.value =
                     currentOmnibarViewState().copy(
-                        omnibarText = if (settingsDataStore.isFullUrlEnabled) siteUrlString else addressDisplayFormatter.getShortUrl(siteUrlString),
+                        omnibarText = if (isFullUrlEnabled.value) siteUrlString else addressDisplayFormatter.getShortUrl(siteUrlString),
                         queryOrFullUrl = siteUrlString,
                         isEditing = false,
                     )
@@ -3631,7 +3624,7 @@ class BrowserTabViewModel @Inject constructor(
                 browserViewState.value = currentBrowserViewState().copy(maliciousSiteStatus = maliciousSiteStatus)
                 omnibarViewState.value =
                     currentOmnibarViewState().copy(
-                        omnibarText = if (settingsDataStore.isFullUrlEnabled) siteUrlString else addressDisplayFormatter.getShortUrl(siteUrlString),
+                        omnibarText = if (isFullUrlEnabled.value) siteUrlString else addressDisplayFormatter.getShortUrl(siteUrlString),
                         queryOrFullUrl = siteUrlString,
                         isEditing = false,
                     )
@@ -3806,16 +3799,15 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    private fun handleNewTabIfEmptyUrl() {
-        val shouldDisplayAboutBlank = handleAboutBlankEnabled && site?.url.isNullOrEmpty()
+    fun handleNewTabIfEmptyUrl() {
+        val shouldDisplayAboutBlank = handleAboutBlankEnabled && webNavigationState == null
         if (shouldDisplayAboutBlank) {
             if (isCustomTabScreen) {
                 handleNewTabForEmptyUrlOnCustomTab()
-            } else {
-                omnibarViewState.value = currentOmnibarViewState().copy(
-                    omnibarText = ABOUT_BLANK,
-                )
             }
+            omnibarViewState.value = currentOmnibarViewState().copy(
+                omnibarText = ABOUT_BLANK,
+            )
         }
     }
 
@@ -4286,12 +4278,12 @@ class BrowserTabViewModel @Inject constructor(
         command.value = HideOnboardingDaxDialog(cta)
     }
 
-    fun onFireMenuSelected() {
+    fun onFireMenuSelected(viewMode: Omnibar.ViewMode) {
+        if (viewMode == ViewMode.DuckAI) {
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_FIRE_BUTTON_TAPPED)
+        }
         val cta = currentCtaViewState().cta
         if (cta is OnboardingDaxDialogCta.DaxFireButtonCta) {
-            viewModelScope.launch {
-                onboardingDesignExperimentManager.fireFireButtonClickedFromOnboardingPixel()
-            }
             onUserDismissedCta(cta)
             command.value = HideOnboardingDaxDialog(cta as OnboardingDaxDialogCta)
         }
@@ -4424,43 +4416,11 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun setBrowserBackground(lightModeEnabled: Boolean) {
-        when {
-            onboardingDesignExperimentManager.isBuckEnrolledAndEnabled() -> {
-                command.value = SetBrowserBackgroundColor(getBuckOnboardingExperimentBackgroundColor(lightModeEnabled))
-            }
-
-            onboardingDesignExperimentManager.isBbEnrolledAndEnabled() -> {
-                // TODO if BB wins the we should rename the function to SetBubbleDialogBackground
-                command.value = Command.SetBubbleDialogBackground(getBBBackgroundResource(lightModeEnabled))
-            }
-
-            else -> {
-                command.value = SetBrowserBackground(getBackgroundResource(lightModeEnabled))
-            }
-        }
+        command.value = SetBrowserBackground(getBackgroundResource(lightModeEnabled))
     }
 
-    private fun getBuckOnboardingExperimentBackgroundColor(lightModeEnabled: Boolean): Int =
-        if (lightModeEnabled) {
-            CommonR.color.buckYellow
-        } else {
-            CommonR.color.buckLightBlue
-        }
-
     fun setOnboardingDialogBackground(lightModeEnabled: Boolean) {
-        when {
-            onboardingDesignExperimentManager.isBuckEnrolledAndEnabled() -> {
-                command.value = SetOnboardingDialogBackgroundColor(getBuckOnboardingExperimentBackgroundColor(lightModeEnabled))
-            }
-
-            onboardingDesignExperimentManager.isBbEnrolledAndEnabled() -> {
-                command.value = SetOnboardingDialogBackground(getBBBackgroundResource(lightModeEnabled))
-            }
-
-            else -> {
-                command.value = SetOnboardingDialogBackground(getBackgroundResource(lightModeEnabled))
-            }
-        }
+        command.value = SetOnboardingDialogBackground(getBackgroundResource(lightModeEnabled))
     }
 
     private fun getBackgroundResource(lightModeEnabled: Boolean): Int =
@@ -4468,13 +4428,6 @@ class BrowserTabViewModel @Inject constructor(
             R.drawable.onboarding_background_bitmap_light
         } else {
             R.drawable.onboarding_background_bitmap_dark
-        }
-
-    private fun getBBBackgroundResource(lightModeEnabled: Boolean): Int =
-        if (lightModeEnabled) {
-            R.drawable.onboarding_background_bb_bitmap_light
-        } else {
-            R.drawable.onboarding_background_bb_bitmap_dark
         }
 
     private fun onUserSwitchedToTab(tabId: String) {
@@ -4490,10 +4443,17 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    fun openNewDuckChat() {
-        viewModelScope.launch {
-            val subscriptionEvent = duckChatJSHelper.onNativeAction(NativeAction.NEW_CHAT)
-            _subscriptionEventDataChannel.send(subscriptionEvent)
+    fun openNewDuckChat(viewMode: ViewMode) {
+        if (viewMode == ViewMode.DuckAI) {
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_OMNIBAR_NEW_CHAT_TAPPED)
+            viewModelScope.launch {
+                val subscriptionEvent = duckChatJSHelper.onNativeAction(NativeAction.NEW_CHAT)
+                _subscriptionEventDataChannel.send(subscriptionEvent)
+            }
+        } else {
+            val url = duckChat.getDuckChatUrl("", false)
+            command.value = OpenInNewTab(url, tabId)
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_SETTINGS_NEW_CHAT_TAB_TAPPED)
         }
     }
 
@@ -4506,6 +4466,7 @@ class BrowserTabViewModel @Inject constructor(
 
     fun openDuckChatSettings() {
         viewModelScope.launch {
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_DUCK_AI_SETTINGS_TAPPED)
             val subscriptionEvent = duckChatJSHelper.onNativeAction(NativeAction.DUCK_AI_SETTINGS)
             _subscriptionEventDataChannel.send(subscriptionEvent)
         }
@@ -4517,13 +4478,7 @@ class BrowserTabViewModel @Inject constructor(
             val params = duckChat.createWasUsedBeforePixelParams()
             pixel.fire(DuckChatPixelName.DUCK_CHAT_OPEN_BROWSER_MENU, parameters = params)
         }
-
-        if (duckAiFeatureState.showFullScreenMode.value) {
-            val url = duckChat.getDuckChatUrl("", false)
-            command.value = OpenInNewTab(url, tabId)
-        } else {
-            duckChat.openDuckChat()
-        }
+        duckChat.openDuckChat()
     }
 
     fun onDuckChatOmnibarButtonClicked(
@@ -4611,27 +4566,18 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onOmnibarPrivacyShieldButtonPressed() {
-        if (currentCtaViewState().cta is OnboardingDaxDialogCta.DaxTrackersBlockedCta) {
-            viewModelScope.launch {
-                onboardingDesignExperimentManager.firePrivacyDashClickedFromOnboardingPixel()
-            }
-        }
+        // No-op: experiment pixel tracking removed
     }
 
     fun onUserSelectedOnboardingDialogOption(
         cta: Cta,
         index: Int?,
     ) {
-        if (index == null) return
-        viewModelScope.launch {
-            onboardingDesignExperimentManager.fireOptionSelectedPixel(cta, index)
-        }
+        // No-op: experiment pixel tracking removed
     }
 
     fun onUserSelectedOnboardingSiteSuggestionOption(index: Int) {
-        viewModelScope.launch {
-            onboardingDesignExperimentManager.fireSiteSuggestionOptionSelectedPixel(index)
-        }
+        // No-op: experiment pixel tracking removed
     }
 
     fun onLogoReceived(serpLogo: SerpLogo) {

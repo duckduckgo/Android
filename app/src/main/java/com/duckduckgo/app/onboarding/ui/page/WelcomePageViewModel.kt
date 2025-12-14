@@ -41,7 +41,6 @@ import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowDe
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowInitialDialog
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowInitialReinstallUserDialog
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowSkipOnboardingOption
-import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentManager
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.NOTIFICATION_RUNTIME_PERMISSION_SHOWN
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_ADDRESS_BAR_POSITION_SHOWN_UNIQUE
@@ -65,6 +64,8 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.impl.inputscreen.wideevents.InputScreenOnboardingWideEvent
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -83,9 +84,10 @@ class WelcomePageViewModel @Inject constructor(
     private val settingsDataStore: SettingsDataStore,
     private val dispatchers: DispatcherProvider,
     private val appBuildConfig: AppBuildConfig,
-    private val onboardingDesignExperimentManager: OnboardingDesignExperimentManager,
     private val onboardingStore: OnboardingStore,
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
+    private val duckChat: DuckChat,
+    private val inputScreenOnboardingWideEvent: InputScreenOnboardingWideEvent,
 ) : ViewModel() {
     private val _commands = Channel<Command>(1, DROP_OLDEST)
     val commands: Flow<Command> = _commands.receiveAsFlow()
@@ -93,6 +95,7 @@ class WelcomePageViewModel @Inject constructor(
     private var defaultAddressBarPosition: Boolean = true
     private var inputScreenSelected: Boolean = true
     private var maxPageCount: Int = 2
+    private var reinstallUser: Boolean = false
 
     init {
         viewModelScope.launch(dispatchers.io()) {
@@ -164,7 +167,6 @@ class WelcomePageViewModel @Inject constructor(
                         PREONBOARDING_CHOOSE_BROWSER_PRESSED,
                         mapOf(PixelParameter.DEFAULT_BROWSER to isDDGDefaultBrowser.toString()),
                     )
-                    onboardingDesignExperimentManager.fireChooseBrowserPixel()
                 }
             }
 
@@ -180,10 +182,6 @@ class WelcomePageViewModel @Inject constructor(
                     if (!defaultAddressBarPosition) {
                         settingsDataStore.omnibarType = OmnibarType.SINGLE_BOTTOM
                         pixel.fire(PREONBOARDING_BOTTOM_ADDRESS_BAR_SELECTED_UNIQUE)
-
-                        onboardingDesignExperimentManager.fireAddressBarSetBottomPixel()
-                    } else {
-                        onboardingDesignExperimentManager.fireAddressBarSetTopPixel()
                     }
                     if (androidBrowserConfigFeature.showInputScreenOnboarding().isEnabled()) {
                         _commands.send(Command.ShowInputScreenDialog)
@@ -197,9 +195,11 @@ class WelcomePageViewModel @Inject constructor(
                 viewModelScope.launch(dispatchers.io()) {
                     if (inputScreenSelected) {
                         pixel.fire(PREONBOARDING_AICHAT_SELECTED)
+                        inputScreenOnboardingWideEvent.onInputScreenEnabledDuringOnboarding(reinstallUser = reinstallUser)
                     } else {
                         pixel.fire(PREONBOARDING_SEARCH_ONLY_SELECTED)
                     }
+                    duckChat.setCosmeticInputScreenUserSetting(inputScreenSelected)
                     onboardingStore.storeInputScreenSelection(inputScreenSelected)
                     _commands.send(Finish)
                 }
@@ -211,6 +211,7 @@ class WelcomePageViewModel @Inject constructor(
         when (currentDialog) {
             INITIAL_REINSTALL_USER -> {
                 viewModelScope.launch {
+                    reinstallUser = true
                     _commands.send(ShowSkipOnboardingOption)
                     pixel.fire(PREONBOARDING_SKIP_ONBOARDING_PRESSED)
                 }
@@ -247,7 +248,6 @@ class WelcomePageViewModel @Inject constructor(
         pixel.fire(AppPixelName.DEFAULT_BROWSER_SET, mapOf(PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString()))
 
         viewModelScope.launch {
-            onboardingDesignExperimentManager.fireSetDefaultRatePixel()
             _commands.send(ShowAddressBarPositionDialog)
         }
     }
@@ -280,22 +280,13 @@ class WelcomePageViewModel @Inject constructor(
             }
             INITIAL -> {
                 pixel.fire(PREONBOARDING_INTRO_SHOWN_UNIQUE, type = Unique())
-                viewModelScope.launch {
-                    onboardingDesignExperimentManager.fireIntroScreenDisplayedPixel()
-                }
             }
             COMPARISON_CHART -> {
                 pixel.fire(PREONBOARDING_COMPARISON_CHART_SHOWN_UNIQUE, type = Unique())
-                viewModelScope.launch {
-                    onboardingDesignExperimentManager.fireComparisonScreenDisplayedPixel()
-                }
             }
             SKIP_ONBOARDING_OPTION -> pixel.fire(PREONBOARDING_SKIP_ONBOARDING_SHOWN_UNIQUE, type = Unique())
             ADDRESS_BAR_POSITION -> {
                 pixel.fire(PREONBOARDING_ADDRESS_BAR_POSITION_SHOWN_UNIQUE, type = Unique())
-                viewModelScope.launch {
-                    onboardingDesignExperimentManager.fireSetAddressBarDisplayedPixel()
-                }
             }
             INPUT_SCREEN -> {
                 pixel.fire(PREONBOARDING_CHOOSE_SEARCH_EXPERIENCE_IMPRESSIONS_UNIQUE, type = Unique())

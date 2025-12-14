@@ -22,6 +22,7 @@ import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.impl.inputscreen.wideevents.InputScreenOnboardingWideEvent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
@@ -41,9 +42,11 @@ class OnboardingInputScreenSelectionObserverTest {
     private val mockUserStageStore: UserStageStore = mock()
     private val mockOnboardingStore: OnboardingStore = mock()
     private val mockDuckChat: DuckChat = mock()
+    private val mockInputScreenOnboardingWideEvent: InputScreenOnboardingWideEvent = mock()
     private val dispatcherProvider: DispatcherProvider = coroutineRule.testDispatcherProvider
     private val userAppStageFlow = MutableStateFlow(AppStage.NEW)
     private val inputScreenSettingFlow = MutableStateFlow(false)
+    private val cosmeticInputScreenSettingFlow = MutableStateFlow(false)
 
     @Test
     fun whenUserStageIsEstablishedAndInputScreenSelectionIsTrueThenSetInputScreenUserSettingToTrue() =
@@ -52,6 +55,7 @@ class OnboardingInputScreenSelectionObserverTest {
             whenever(mockUserStageStore.getUserAppStage()).thenReturn(AppStage.NEW)
             whenever(mockOnboardingStore.getInputScreenSelection()).thenReturn(true)
             whenever(mockDuckChat.observeInputScreenUserSettingEnabled()).thenReturn(inputScreenSettingFlow)
+            whenever(mockDuckChat.observeCosmeticInputScreenUserSettingEnabled()).thenReturn(cosmeticInputScreenSettingFlow)
 
             OnboardingInputScreenSelectionObserver(
                 mockAppCoroutineScope,
@@ -59,6 +63,7 @@ class OnboardingInputScreenSelectionObserverTest {
                 mockUserStageStore,
                 mockOnboardingStore,
                 mockDuckChat,
+                mockInputScreenOnboardingWideEvent,
             )
 
             userAppStageFlow.value = AppStage.ESTABLISHED
@@ -73,6 +78,7 @@ class OnboardingInputScreenSelectionObserverTest {
             whenever(mockUserStageStore.getUserAppStage()).thenReturn(AppStage.NEW)
             whenever(mockOnboardingStore.getInputScreenSelection()).thenReturn(false)
             whenever(mockDuckChat.observeInputScreenUserSettingEnabled()).thenReturn(inputScreenSettingFlow)
+            whenever(mockDuckChat.observeCosmeticInputScreenUserSettingEnabled()).thenReturn(cosmeticInputScreenSettingFlow)
 
             OnboardingInputScreenSelectionObserver(
                 mockAppCoroutineScope,
@@ -80,6 +86,7 @@ class OnboardingInputScreenSelectionObserverTest {
                 mockUserStageStore,
                 mockOnboardingStore,
                 mockDuckChat,
+                mockInputScreenOnboardingWideEvent,
             )
 
             userAppStageFlow.value = AppStage.ESTABLISHED
@@ -94,6 +101,7 @@ class OnboardingInputScreenSelectionObserverTest {
             whenever(mockUserStageStore.getUserAppStage()).thenReturn(AppStage.NEW)
             whenever(mockOnboardingStore.getInputScreenSelection()).thenReturn(null)
             whenever(mockDuckChat.observeInputScreenUserSettingEnabled()).thenReturn(inputScreenSettingFlow)
+            whenever(mockDuckChat.observeCosmeticInputScreenUserSettingEnabled()).thenReturn(cosmeticInputScreenSettingFlow)
 
             OnboardingInputScreenSelectionObserver(
                 mockAppCoroutineScope,
@@ -101,6 +109,7 @@ class OnboardingInputScreenSelectionObserverTest {
                 mockUserStageStore,
                 mockOnboardingStore,
                 mockDuckChat,
+                mockInputScreenOnboardingWideEvent,
             )
 
             userAppStageFlow.value = AppStage.ESTABLISHED
@@ -115,6 +124,7 @@ class OnboardingInputScreenSelectionObserverTest {
             whenever(mockUserStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
             whenever(mockOnboardingStore.getInputScreenSelection()).thenReturn(true)
             whenever(mockDuckChat.observeInputScreenUserSettingEnabled()).thenReturn(inputScreenSettingFlow)
+            whenever(mockDuckChat.observeCosmeticInputScreenUserSettingEnabled()).thenReturn(cosmeticInputScreenSettingFlow)
 
             OnboardingInputScreenSelectionObserver(
                 mockAppCoroutineScope,
@@ -122,6 +132,7 @@ class OnboardingInputScreenSelectionObserverTest {
                 mockUserStageStore,
                 mockOnboardingStore,
                 mockDuckChat,
+                mockInputScreenOnboardingWideEvent,
             )
 
             userAppStageFlow.value = AppStage.DAX_ONBOARDING
@@ -137,6 +148,7 @@ class OnboardingInputScreenSelectionObserverTest {
             whenever(mockOnboardingStore.getInputScreenSelection()).thenReturn(true)
             whenever(mockOnboardingStore.isInputScreenSelectionOverriddenByUser()).thenReturn(true)
             whenever(mockDuckChat.observeInputScreenUserSettingEnabled()).thenReturn(inputScreenSettingFlow)
+            whenever(mockDuckChat.observeCosmeticInputScreenUserSettingEnabled()).thenReturn(cosmeticInputScreenSettingFlow)
 
             OnboardingInputScreenSelectionObserver(
                 mockAppCoroutineScope,
@@ -144,11 +156,14 @@ class OnboardingInputScreenSelectionObserverTest {
                 mockUserStageStore,
                 mockOnboardingStore,
                 mockDuckChat,
+                mockInputScreenOnboardingWideEvent,
             )
 
+            cosmeticInputScreenSettingFlow.value = true
             inputScreenSettingFlow.value = true
 
             verify(mockOnboardingStore).setInputScreenSelectionOverriddenByUser()
+            verify(mockInputScreenOnboardingWideEvent).onInputScreenSettingEnabledBeforeInputScreenShown(enabled = true)
 
             userAppStageFlow.value = AppStage.ESTABLISHED
 

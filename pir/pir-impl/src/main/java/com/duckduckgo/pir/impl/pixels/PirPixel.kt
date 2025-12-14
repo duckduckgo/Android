@@ -61,16 +61,6 @@ enum class PirPixel(
         type = Count,
     ),
 
-    PIR_INTERNAL_BROKER_SCAN_STARTED(
-        baseName = "pir_internal_broker_scan_started",
-        type = Count,
-    ),
-
-    PIR_INTERNAL_BROKER_SCAN_COMPLETED(
-        baseName = "pir_internal_broker_scan_completed",
-        type = Count,
-    ),
-
     PIR_INTERNAL_BROKER_OPT_OUT_STARTED(
         baseName = "pir_internal_opt-out_started",
         type = Count,
@@ -87,10 +77,6 @@ enum class PirPixel(
     ),
     PIR_EMAIL_CONFIRMATION_LINK_BE_ERROR(
         baseName = "pir_email-confirmation-link_backend-status_error",
-        type = Count,
-    ),
-    PIR_OPTOUT_STAGE_PENDING_EMAIL_CONFIRMATION(
-        baseName = "pir_optout_stage_submit-awaiting-email-confirmation",
         type = Count,
     ),
     PIR_EMAIL_CONFIRMATION_ATTEMPT_START(
@@ -128,76 +114,168 @@ enum class PirPixel(
     ),
 
     PIR_OPTOUT_SUBMIT_SUCCESS(
-        baseName = "dbp_optout_process_submit-success",
+        baseName = "m_dbp_optout_process_submit-success",
         types = setOf(Count),
     ),
 
     PIR_OPTOUT_SUBMIT_FAILURE(
-        baseName = "dbp_optout_process_failure",
+        baseName = "m_dbp_optout_process_failure",
         types = setOf(Count),
     ),
 
     PIR_BROKER_CUSTOM_STATS_OPTOUT_SUBMIT_SUCCESSRATE(
-        baseName = "dbp_databroker_custom_stats_optoutsubmit",
+        baseName = "m_dbp_databroker_custom_stats_optoutsubmit",
         type = Count,
     ),
 
     PIR_BROKER_CUSTOM_STATS_7DAY_CONFIRMED_OPTOUT(
-        baseName = "dbp_optoutjob_at-7-days_confirmed",
+        baseName = "m_dbp_optoutjob_at-7-days_confirmed",
         type = Count,
     ),
 
     PIR_BROKER_CUSTOM_STATS_7DAY_UNCONFIRMED_OPTOUT(
-        baseName = "dbp_optoutjob_at-7-days_unconfirmed",
+        baseName = "m_dbp_optoutjob_at-7-days_unconfirmed",
         type = Count,
     ),
     PIR_BROKER_CUSTOM_STATS_14DAY_CONFIRMED_OPTOUT(
-        baseName = "dbp_optoutjob_at-14-days_confirmed",
+        baseName = "m_dbp_optoutjob_at-14-days_confirmed",
         type = Count,
     ),
 
     PIR_BROKER_CUSTOM_STATS_14DAY_UNCONFIRMED_OPTOUT(
-        baseName = "dbp_optoutjob_at-14-days_unconfirmed",
+        baseName = "m_dbp_optoutjob_at-14-days_unconfirmed",
         type = Count,
     ),
 
     PIR_BROKER_CUSTOM_STATS_21DAY_CONFIRMED_OPTOUT(
-        baseName = "dbp_optoutjob_at-21-days_confirmed",
+        baseName = "m_dbp_optoutjob_at-21-days_confirmed",
         type = Count,
     ),
 
     PIR_BROKER_CUSTOM_STATS_21DAY_UNCONFIRMED_OPTOUT(
-        baseName = "dbp_optoutjob_at-21-days_unconfirmed",
+        baseName = "m_dbp_optoutjob_at-21-days_unconfirmed",
         type = Count,
     ),
     PIR_BROKER_CUSTOM_STATS_42DAY_CONFIRMED_OPTOUT(
-        baseName = "dbp_optoutjob_at-42-days_confirmed",
+        baseName = "m_dbp_optoutjob_at-42-days_confirmed",
         type = Count,
     ),
 
     PIR_BROKER_CUSTOM_STATS_42DAY_UNCONFIRMED_OPTOUT(
-        baseName = "dbp_optoutjob_at-42-days_unconfirmed",
+        baseName = "m_dbp_optoutjob_at-42-days_unconfirmed",
         type = Count,
     ),
 
     PIR_ENGAGEMENT_DAU(
-        baseName = "dbp_engagement_dau",
+        baseName = "m_dbp_engagement_dau",
         type = Count,
     ),
 
     PIR_ENGAGEMENT_WAU(
-        baseName = "dbp_engagement_wau",
+        baseName = "m_dbp_engagement_wau",
         type = Count,
     ),
 
     PIR_ENGAGEMENT_MAU(
-        baseName = "dbp_engagement_mau",
+        baseName = "m_dbp_engagement_mau",
         type = Count,
     ),
 
     PIR_WEEKLY_CHILD_ORPHANED_OPTOUTS(
-        baseName = "dbp_weekly_child-broker_orphaned-optouts",
+        baseName = "m_dbp_weekly_child-broker_orphaned-optouts",
         type = Count,
+    ),
+    PIR_SCAN_STARTED(
+        baseName = "m_dbp_scan_started",
+        type = Count,
+    ),
+    PIR_SCAN_STAGE(
+        baseName = "m_dbp_scan_stage",
+        type = Count,
+    ),
+    PIR_SCAN_STAGE_RESULT_MATCHES(
+        baseName = "m_dbp_search_stage_main_status_success",
+        type = Count,
+    ),
+    PIR_SCAN_STAGE_RESULT_NO_MATCH(
+        baseName = "m_dbp_search_stage_main_status_no_results",
+        type = Count,
+    ),
+    PIR_SCAN_STAGE_RESULT_ERROR(
+        baseName = "m_dbp_search_stage_main_status_error",
+        type = Count,
+    ),
+    PIR_OPTOUT_STAGE_START(
+        baseName = "m_dbp_optout_stage_start",
+        type = Count,
+    ),
+    PIR_OPTOUT_STAGE_EMAIL_GENERATE(
+        baseName = "m_dbp_optout_stage_email-generate",
+        type = Count,
+    ),
+    PIR_OPTOUT_STAGE_PENDING_EMAIL_CONFIRMATION(
+        baseName = "m_dbp_optout_stage_submit-awaiting-email-confirmation",
+        type = Count,
+    ),
+    PIR_OPTOUT_STAGE_CAPTCHA_PARSE(
+        baseName = "m_dbp_optout_stage_captcha-parse",
+        type = Count,
+    ),
+    PIR_OPTOUT_STAGE_CAPTCHA_SEND(
+        baseName = "m_dbp_optout_stage_captcha-send",
+        type = Count,
+    ),
+    PIR_OPTOUT_STAGE_CAPTCHA_SOLVE(
+        baseName = "m_dbp_optout_stage_captcha-solve",
+        type = Count,
+    ),
+    PIR_OPTOUT_STAGE_SUBMIT(
+        baseName = "m_dbp_optout_stage_submit",
+        type = Count,
+    ),
+    PIR_OPTOUT_STAGE_CONDITION_FOUND(
+        baseName = "m_dbp_optout_stage_condition-found",
+        type = Count,
+    ),
+    PIR_OPTOUT_STAGE_CONDITION_NOT_FOUND(
+        baseName = "m_dbp_optout_stage_condition-not-found",
+        type = Count,
+    ),
+    PIR_OPTOUT_STAGE_VALIDATE(
+        baseName = "m_dbp_optout_stage_validate",
+        type = Count,
+    ),
+    PIR_OPTOUT_STAGE_FILLFORM(
+        baseName = "m_dbp_optout_stage_fill-form",
+        type = Count,
+    ),
+    PIR_OPTOUT_STAGE_FINISH(
+        baseName = "m_dbp_optout_stage_finish",
+        type = Count,
+    ),
+    PIR_UPDATE_BROKER_SUCCESS(
+        baseName = "m_dbp_update_databrokers_success",
+        type = Count,
+    ),
+    PIR_UPDATE_BROKER_FAILURE(
+        baseName = "m_dbp_update_databrokers_failure",
+        type = Count,
+    ),
+    PIR_DOWNLOAD_MAINCONFIG_BE_FAILURE(
+        baseName = "m_dbp_download_mainconfig_service_failure",
+        type = Count,
+    ),
+    PIR_DOWNLOAD_MAINCONFIG_FAILURE(
+        baseName = "m_dbp_download_mainconfig_failure",
+        type = Count,
+    ),
+    PIR_BROKER_ACTION_FAILED(
+        baseName = "m_dbp_data_broker_action-failed_error",
+        types = setOf(Count, Daily()),
+    ),
+    PIR_DASHBOARD_OPENED(
+        baseName = "pir_webui_dashboard_opened",
+        types = setOf(Count, Daily()),
     ), ;
 
     constructor(

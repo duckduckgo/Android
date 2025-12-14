@@ -43,6 +43,7 @@
     <string name="browserMenuRunningInDDG">Εκτέλεση στο DuckDuckGo</string>
     <string name="browserMenuSetAsDefaultBrowser">Ορισμός ως προεπιλεγμένο πρόγραμμα περιήγησης</string>
     <string name="browserMenuNewChat">Νέα συνομιλία</string>
+    <string name="browserMenuNewAIChat">Νέο AI Chat</string>
     <string name="browserMenuChatHistory">Ιστορικό συνομιλίας</string>
     <string name="browserMenuChatSettings">Ρυθμίσεις Duck.ai</string>
     <string name="browserMenuVPN">VPN</string>

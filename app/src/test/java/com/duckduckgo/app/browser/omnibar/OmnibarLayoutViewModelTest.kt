@@ -15,6 +15,7 @@ import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconStat
 import com.duckduckgo.app.browser.omnibar.model.Decoration
 import com.duckduckgo.app.browser.omnibar.model.Decoration.ChangeCustomTabTitle
 import com.duckduckgo.app.browser.omnibar.model.StateChange
+import com.duckduckgo.app.browser.urldisplay.UrlDisplayRepository
 import com.duckduckgo.app.browser.viewstate.HighlightableButton
 import com.duckduckgo.app.browser.viewstate.LoadingViewState
 import com.duckduckgo.app.browser.viewstate.OmnibarViewState
@@ -85,7 +86,9 @@ class OmnibarLayoutViewModelTest {
     private val duckAiShowOmnibarShortcutOnNtpAndOnFocusFlow = MutableStateFlow(true)
     private val duckAiShowOmnibarShortcutInAllStatesFlow = MutableStateFlow(true)
     private val duckAiShowInputScreenFlow = MutableStateFlow(false)
+    private val isFullUrlEnabledFlow = MutableStateFlow(true)
     private val settingsDataStore: SettingsDataStore = mock()
+    private val urlDisplayRepository: UrlDisplayRepository = mock()
     private val mockAddressDisplayFormatter: AddressDisplayFormatter by lazy {
         mock {
             on { getShortUrl(any()) } doAnswer { invocation ->
@@ -115,7 +118,7 @@ class OmnibarLayoutViewModelTest {
         whenever(duckPlayer.isDuckPlayerUri(DUCK_PLAYER_URL)).thenReturn(true)
         whenever(duckAiFeatureState.showOmnibarShortcutOnNtpAndOnFocus).thenReturn(duckAiShowOmnibarShortcutOnNtpAndOnFocusFlow)
         whenever(duckAiFeatureState.showOmnibarShortcutInAllStates).thenReturn(duckAiShowOmnibarShortcutInAllStatesFlow)
-        whenever(settingsDataStore.isFullUrlEnabled).thenReturn(true)
+        whenever(urlDisplayRepository.isFullUrlEnabled).then { isFullUrlEnabledFlow }
         whenever(duckAiFeatureState.showInputScreen).thenReturn(duckAiShowInputScreenFlow)
         whenever(serpEasterEggLogosToggles.feature()).thenReturn(mock())
         whenever(serpEasterEggLogosToggles.feature().isEnabled()).thenReturn(false)
@@ -161,6 +164,7 @@ class OmnibarLayoutViewModelTest {
             duckAiFeatureState = duckAiFeatureState,
             addressDisplayFormatter = mockAddressDisplayFormatter,
             settingsDataStore = settingsDataStore,
+            urlDisplayRepository = urlDisplayRepository,
             serpEasterEggLogosToggles = serpEasterEggLogosToggles,
             androidBrowserToggles = androidBrowserToggles,
         )
@@ -500,7 +504,56 @@ class OmnibarLayoutViewModelTest {
     }
 
     @Test
-    fun whenViewModeChangedToErrorThenViewStateCorrect() = runTest {
+    fun `when custom tab URL is blank and omnibarText is about blank then domain displays about blank`() = runTest {
+        val expectedDomain = "about:blank"
+
+        testee.onViewModeChanged(ViewMode.CustomTab(100, "title", "", showDuckPlayerIcon = false))
+        testee.onExternalStateChange(
+            StateChange.OmnibarStateChange(
+                OmnibarViewState(
+                    omnibarText = "about:blank",
+                    queryOrFullUrl = "",
+                    navigationChange = false,
+                    forceExpand = false,
+                ),
+            ),
+        )
+        testee.onExternalStateChange(
+            StateChange.LoadingStateChange(
+                LoadingViewState(
+                    isLoading = false,
+                    trackersAnimationEnabled = false,
+                    progress = 100,
+                    url = "",
+                ),
+            ),
+        )
+
+        testee.viewState.test {
+            val viewState = expectMostRecentItem()
+            assertTrue(viewState.viewMode is ViewMode.CustomTab)
+            val customTabMode = viewState.viewMode as ViewMode.CustomTab
+            assertEquals(expectedDomain, customTabMode.domain)
+            assertFalse(customTabMode.showDuckPlayerIcon)
+        }
+    }
+
+    @Test
+    fun whenViewModeChangedToErrorAndFocusedThenViewStateCorrect() = runTest {
+        testee.onOmnibarFocusChanged(true, RANDOM_URL)
+        testee.onViewModeChanged(ViewMode.Error)
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertTrue(viewState.leadingIconState == LeadingIconState.Globe)
+            assertTrue(viewState.scrollingEnabled)
+            assertTrue(viewState.viewMode is ViewMode.Error)
+        }
+    }
+
+    @Test
+    fun whenViewModeChangedToErrorAndUnfocusedThenViewStateCorrect() = runTest {
+        testee.onOmnibarFocusChanged(false, RANDOM_URL)
         testee.onViewModeChanged(ViewMode.Error)
 
         testee.viewState.test {
@@ -566,7 +619,7 @@ class OmnibarLayoutViewModelTest {
 
         testee.viewState.test {
             val viewState = expectMostRecentItem()
-            assertTrue(viewState.leadingIconState == LeadingIconState.Search)
+            assertTrue(viewState.leadingIconState == LeadingIconState.Globe)
             assertTrue(viewState.viewMode is ViewMode.Error)
         }
     }
@@ -578,7 +631,7 @@ class OmnibarLayoutViewModelTest {
 
         testee.viewState.test {
             val viewState = expectMostRecentItem()
-            assertTrue(viewState.leadingIconState == LeadingIconState.Search)
+            assertTrue(viewState.leadingIconState == LeadingIconState.Globe)
             assertTrue(viewState.viewMode is ViewMode.SSLWarning)
         }
     }
@@ -590,7 +643,7 @@ class OmnibarLayoutViewModelTest {
 
         testee.viewState.test {
             val viewState = expectMostRecentItem()
-            assertTrue(viewState.leadingIconState == LeadingIconState.Search)
+            assertTrue(viewState.leadingIconState == LeadingIconState.Globe)
             assertTrue(viewState.viewMode is ViewMode.MaliciousSiteWarning)
         }
     }
@@ -1404,7 +1457,7 @@ class OmnibarLayoutViewModelTest {
 
     @Test
     fun `when input text click catcher clicked and random URL then input screen launched with full URL`() = runTest {
-        whenever(settingsDataStore.isFullUrlEnabled).thenReturn(false)
+        isFullUrlEnabledFlow.emit(false)
         initializeViewModel()
         val omnibarViewState = OmnibarViewState(omnibarText = "test", queryOrFullUrl = "test", isEditing = false)
         testee.onExternalStateChange(StateChange.OmnibarStateChange(omnibarViewState))
@@ -1424,7 +1477,7 @@ class OmnibarLayoutViewModelTest {
     fun whenOmnibarLosesFocusAndFullUrlEnabledThenAddressDisplayDisplaysFullUrl() = runTest {
         val query = "query"
         val url = "https://example.com/test.html"
-        whenever(settingsDataStore.isFullUrlEnabled).thenReturn(true)
+        isFullUrlEnabledFlow.emit(true)
         initializeViewModel()
         testee.onOmnibarFocusChanged(hasFocus = true, inputFieldText = query) // Initial focus
         testee.onExternalStateChange(StateChange.LoadingStateChange(LoadingViewState(url = url))) // Set URL
@@ -1444,8 +1497,7 @@ class OmnibarLayoutViewModelTest {
         val query = "query"
         val url = "https://example.com/test.html"
         val formattedUrl = "example.com"
-        whenever(settingsDataStore.isFullUrlEnabled).thenReturn(false)
-        initializeViewModel()
+        isFullUrlEnabledFlow.emit(false)
         testee.onOmnibarFocusChanged(hasFocus = true, inputFieldText = query) // Initial focus
         testee.onExternalStateChange(StateChange.LoadingStateChange(LoadingViewState(url = url))) // Set URL
 
@@ -1464,8 +1516,7 @@ class OmnibarLayoutViewModelTest {
         val url = "https://example.com/test.html"
         val formattedUrl = "https://example.com/test.html"
         val omnibarViewState = OmnibarViewState(omnibarText = url, queryOrFullUrl = url, isEditing = false)
-        whenever(settingsDataStore.isFullUrlEnabled).thenReturn(true)
-        initializeViewModel()
+        isFullUrlEnabledFlow.emit(true)
 
         testee.onExternalStateChange(StateChange.OmnibarStateChange(omnibarViewState))
 
@@ -1481,8 +1532,7 @@ class OmnibarLayoutViewModelTest {
     fun whenOmnibarGainsFocusAndFullUrlDisabledThenOmnibarTextIsFullUrl() = runTest {
         val url = "https://example.com/test.html"
         val shortUrl = "example.com"
-        whenever(settingsDataStore.isFullUrlEnabled).thenReturn(false)
-        initializeViewModel()
+        isFullUrlEnabledFlow.emit(false)
 
         // Set initial state: site loaded, omnibar not focused (showing short url)
         givenSiteLoaded(url)
@@ -1502,8 +1552,7 @@ class OmnibarLayoutViewModelTest {
     fun whenOmnibarGainsFocusAndFullUrlEnabledThenOmnibarTextIsFullUrl() = runTest {
         val url = "https://example.com/test.html"
         val shortUrl = "example.com"
-        whenever(settingsDataStore.isFullUrlEnabled).thenReturn(true)
-        initializeViewModel()
+        isFullUrlEnabledFlow.emit(true)
 
         // Set initial state: site loaded, omnibar not focused (showing short url)
         givenSiteLoaded(url)
@@ -1523,7 +1572,7 @@ class OmnibarLayoutViewModelTest {
     @Test
     fun whenExternalOmnibarStateChangedWithForceRenderAndNotDDGUrlAndFullUrlEnabledThenOmnibarTextIsFullUrl() = runTest {
         val omnibarViewState = OmnibarViewState(omnibarText = RANDOM_URL, queryOrFullUrl = RANDOM_URL)
-        whenever(settingsDataStore.isFullUrlEnabled).thenReturn(true)
+        isFullUrlEnabledFlow.emit(true)
 
         testee.onExternalStateChange(StateChange.OmnibarStateChange(omnibarViewState, forceRender = true))
 
@@ -1539,7 +1588,7 @@ class OmnibarLayoutViewModelTest {
     fun whenExternalOmnibarStateChangedWithForceRenderAndNotDDGUrlAndFullUrlDisabledThenOmnibarTextIsShortUrl() = runTest {
         val shortUrl = RANDOM_URL.toUri().baseHost!!
         val omnibarViewState = OmnibarViewState(omnibarText = RANDOM_URL, queryOrFullUrl = RANDOM_URL)
-        whenever(settingsDataStore.isFullUrlEnabled).thenReturn(false)
+        isFullUrlEnabledFlow.emit(false)
 
         testee.onExternalStateChange(StateChange.OmnibarStateChange(omnibarViewState, forceRender = true))
 
@@ -1555,7 +1604,7 @@ class OmnibarLayoutViewModelTest {
     fun whenExternalOmnibarStateChangedWithForceRenderAndNotDDGUrlAndFullUrlEndabledThenOmnibarTextIsFullUrl() = runTest {
         val shortUrl = RANDOM_URL.toUri().baseHost!!
         val omnibarViewState = OmnibarViewState(omnibarText = shortUrl, queryOrFullUrl = RANDOM_URL)
-        whenever(settingsDataStore.isFullUrlEnabled).thenReturn(true)
+        isFullUrlEnabledFlow.emit(true)
 
         testee.onExternalStateChange(StateChange.OmnibarStateChange(omnibarViewState, forceRender = true))
 
@@ -1570,7 +1619,7 @@ class OmnibarLayoutViewModelTest {
     @Test
     fun whenExternalOmnibarStateChangedWithoutForceRenderThenOmnibarTextIsFromState() = runTest {
         val omnibarViewState = OmnibarViewState(omnibarText = RANDOM_URL, queryOrFullUrl = RANDOM_URL)
-        whenever(settingsDataStore.isFullUrlEnabled).thenReturn(false)
+        isFullUrlEnabledFlow.emit(false)
 
         testee.onExternalStateChange(StateChange.OmnibarStateChange(omnibarViewState, forceRender = false))
 
@@ -2230,6 +2279,191 @@ class OmnibarLayoutViewModelTest {
             val viewState = expectMostRecentItem()
             assertFalse(viewState.showDuckAISidebar)
             assertFalse(viewState.showDuckAISidebar)
+        }
+    }
+
+    @Test
+    fun whenHandleAboutBlankEnabledAndOmnibarTextIsAboutBlankAndForceRenderThenOmnibarTextNotUpdated() = runTest {
+        whenever(androidBrowserToggles.handleAboutBlank().isEnabled()).thenReturn(true)
+        initializeViewModel()
+
+        givenSiteLoaded(RANDOM_URL)
+
+        testee.onExternalStateChange(
+            StateChange.OmnibarStateChange(
+                OmnibarViewState(
+                    omnibarText = "about:blank",
+                    queryOrFullUrl = RANDOM_URL,
+                    navigationChange = false,
+                    forceExpand = false,
+                ),
+                forceRender = true,
+            ),
+        )
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertEquals("about:blank", viewState.omnibarText)
+            assertTrue(viewState.updateOmnibarText)
+        }
+    }
+
+    @Test
+    fun whenHandleAboutBlankEnabledAndOmnibarTextIsAboutBlankAndForceRenderWithEasterEggThenOmnibarTextNotUpdated() = runTest {
+        whenever(androidBrowserToggles.handleAboutBlank().isEnabled()).thenReturn(true)
+        whenever(serpEasterEggLogosToggles.feature().isEnabled()).thenReturn(true)
+        initializeViewModel()
+
+        givenSiteLoaded(RANDOM_URL)
+
+        testee.onExternalStateChange(
+            StateChange.OmnibarStateChange(
+                OmnibarViewState(
+                    omnibarText = "about:blank",
+                    queryOrFullUrl = RANDOM_URL,
+                    navigationChange = false,
+                    forceExpand = false,
+                ),
+                forceRender = true,
+            ),
+        )
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertEquals("about:blank", viewState.omnibarText)
+        }
+    }
+
+    @Test
+    fun whenHandleAboutBlankEnabledAndOmnibarTextIsNotAboutBlankAndForceRenderThenOmnibarTextUpdated() = runTest {
+        whenever(androidBrowserToggles.handleAboutBlank().isEnabled()).thenReturn(true)
+        initializeViewModel()
+
+        givenSiteLoaded(RANDOM_URL)
+
+        testee.onExternalStateChange(
+            StateChange.OmnibarStateChange(
+                OmnibarViewState(
+                    omnibarText = "",
+                    queryOrFullUrl = RANDOM_URL,
+                    navigationChange = false,
+                    forceExpand = false,
+                ),
+                forceRender = true,
+            ),
+        )
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertEquals(RANDOM_URL, viewState.omnibarText)
+            assertTrue(viewState.updateOmnibarText)
+        }
+    }
+
+    @Test
+    fun whenHandleAboutBlankEnabledAndOmnibarTextIsNotAboutBlankAndForceRenderWithEasterEggThenOmnibarTextUpdated() = runTest {
+        whenever(androidBrowserToggles.handleAboutBlank().isEnabled()).thenReturn(true)
+        whenever(serpEasterEggLogosToggles.feature().isEnabled()).thenReturn(true)
+        initializeViewModel()
+
+        givenSiteLoaded(RANDOM_URL)
+
+        testee.onExternalStateChange(
+            StateChange.OmnibarStateChange(
+                OmnibarViewState(
+                    omnibarText = "",
+                    queryOrFullUrl = RANDOM_URL,
+                    navigationChange = false,
+                    forceExpand = false,
+                ),
+                forceRender = true,
+            ),
+        )
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertEquals(RANDOM_URL, viewState.omnibarText)
+            assertTrue(viewState.updateOmnibarText)
+        }
+    }
+
+    @Test
+    fun whenHandleAboutBlankDisabledAndOmnibarTextIsAboutBlankAndForceRenderThenOmnibarTextUpdated() = runTest {
+        whenever(androidBrowserToggles.handleAboutBlank().isEnabled()).thenReturn(false)
+        initializeViewModel()
+
+        givenSiteLoaded(RANDOM_URL)
+
+        testee.onExternalStateChange(
+            StateChange.OmnibarStateChange(
+                OmnibarViewState(
+                    omnibarText = "about:blank",
+                    queryOrFullUrl = RANDOM_URL,
+                    navigationChange = false,
+                    forceExpand = false,
+                ),
+                forceRender = true,
+            ),
+        )
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertEquals(RANDOM_URL, viewState.omnibarText)
+            assertTrue(viewState.updateOmnibarText)
+        }
+    }
+
+    @Test
+    fun whenHandleAboutBlankDisabledAndOmnibarTextIsAboutBlankAndForceRenderWithEasterEggThenOmnibarTextUpdated() = runTest {
+        whenever(androidBrowserToggles.handleAboutBlank().isEnabled()).thenReturn(false)
+        whenever(serpEasterEggLogosToggles.feature().isEnabled()).thenReturn(true)
+        initializeViewModel()
+
+        givenSiteLoaded(RANDOM_URL)
+
+        testee.onExternalStateChange(
+            StateChange.OmnibarStateChange(
+                OmnibarViewState(
+                    omnibarText = "about:blank",
+                    queryOrFullUrl = RANDOM_URL,
+                    navigationChange = false,
+                    forceExpand = false,
+                ),
+                forceRender = true,
+            ),
+        )
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertEquals(RANDOM_URL, viewState.omnibarText)
+            assertTrue(viewState.updateOmnibarText)
+        }
+    }
+
+    @Test
+    fun whenHandleAboutBlankEnabledAndOmnibarTextIsAboutBlankWithShortUrlAndForceRenderThenOmnibarTextNotUpdated() = runTest {
+        whenever(androidBrowserToggles.handleAboutBlank().isEnabled()).thenReturn(true)
+        isFullUrlEnabledFlow.value = false
+        initializeViewModel()
+
+        givenSiteLoaded(RANDOM_URL)
+
+        testee.onExternalStateChange(
+            StateChange.OmnibarStateChange(
+                OmnibarViewState(
+                    omnibarText = "about:blank",
+                    queryOrFullUrl = RANDOM_URL,
+                    navigationChange = false,
+                    forceExpand = false,
+                ),
+                forceRender = true,
+            ),
+        )
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertEquals("about:blank", viewState.omnibarText)
+            assertTrue(viewState.updateOmnibarText)
         }
     }
 }

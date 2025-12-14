@@ -1,0 +1,31 @@
+// Duck Chat Fullscreen pixels: https://app.asana.com/1/137249556945/project/1174433894299346/task/1211821261289598?focus=true.
+{
+    "m_aichat_settings_menu_opened": {
+        "description": "Duck.ai Browser Menu opened",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_settings_menu_aichat_settings_tapped": {
+        "description": "Duck.ai settings opened from the Duck.ai Browser Menu",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_tab_switcher_opened": {
+        "description": "Tab Switcher opened from Duck.ai",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_fire_button_tapped": {
+        "description": "Fire Button opened from Duck.ai",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    }
+}

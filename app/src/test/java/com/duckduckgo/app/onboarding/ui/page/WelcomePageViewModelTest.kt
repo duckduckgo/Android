@@ -31,7 +31,6 @@ import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowDe
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowInitialDialog
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowInitialReinstallUserDialog
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowSkipOnboardingOption
-import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentManager
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.NOTIFICATION_RUNTIME_PERMISSION_SHOWN
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_AICHAT_SELECTED
@@ -53,6 +52,8 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.impl.inputscreen.wideevents.InputScreenOnboardingWideEvent
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.test.runTest
@@ -74,11 +75,12 @@ class WelcomePageViewModelTest {
     private val mockAppInstallStore: AppInstallStore = mock()
     private val mockSettingsDataStore: SettingsDataStore = mock()
     private val mockAppBuildConfig: AppBuildConfig = mock()
-    private val mockOnboardingDesignExperimentManager: OnboardingDesignExperimentManager = mock()
     private val mockOnboardingStore: OnboardingStore = mock()
     private val mockAndroidBrowserConfigFeature: AndroidBrowserConfigFeature = FakeFeatureToggleFactory.create(
         AndroidBrowserConfigFeature::class.java,
     )
+    private val mockDuckChat: DuckChat = mock()
+    private val mockInputScreenOnboardingWideEvent: InputScreenOnboardingWideEvent = mock()
 
     private fun createViewModel(): WelcomePageViewModel {
         return WelcomePageViewModel(
@@ -89,9 +91,10 @@ class WelcomePageViewModelTest {
             mockSettingsDataStore,
             coroutineRule.testDispatcherProvider,
             mockAppBuildConfig,
-            mockOnboardingDesignExperimentManager,
             mockOnboardingStore,
             mockAndroidBrowserConfigFeature,
+            mockDuckChat,
+            mockInputScreenOnboardingWideEvent,
         )
     }
 
@@ -104,9 +107,10 @@ class WelcomePageViewModelTest {
             mockSettingsDataStore,
             coroutineRule.testDispatcherProvider,
             mockAppBuildConfig,
-            mockOnboardingDesignExperimentManager,
             mockOnboardingStore,
             mockAndroidBrowserConfigFeature,
+            mockDuckChat,
+            mockInputScreenOnboardingWideEvent,
         )
     }
 
@@ -150,82 +154,6 @@ class WelcomePageViewModelTest {
                 val command = awaitItem()
                 Assert.assertTrue(command is ShowComparisonChart)
             }
-        }
-
-    @Test
-    fun whenInitialDialogIsShownThenFireIntroScreenDisplayedPixel() =
-        runTest {
-            testee.onDialogShown(PreOnboardingDialogType.INITIAL)
-
-            verify(mockOnboardingDesignExperimentManager).fireIntroScreenDisplayedPixel()
-        }
-
-    @Test
-    fun whenComparisonChartDialogIsShownThenFireComparisonScreenDisplayedPixel() =
-        runTest {
-            testee.onDialogShown(PreOnboardingDialogType.COMPARISON_CHART)
-
-            verify(mockOnboardingDesignExperimentManager).fireComparisonScreenDisplayedPixel()
-        }
-
-    @Test
-    fun whenAddressBarPositionDialogIsShownThenFireSetAddressBarDisplayedPixel() =
-        runTest {
-            testee.onDialogShown(PreOnboardingDialogType.ADDRESS_BAR_POSITION)
-
-            verify(mockOnboardingDesignExperimentManager).fireSetAddressBarDisplayedPixel()
-        }
-
-    @Test
-    fun givenComparisonChartDialogWhenOnPrimaryCtaClickedThenFireChooseBrowserPixel() =
-        runTest {
-            whenever(mockDefaultRoleBrowserDialog.shouldShowDialog()).thenReturn(true)
-            testee.onPrimaryCtaClicked(PreOnboardingDialogType.COMPARISON_CHART)
-
-            verify(mockOnboardingDesignExperimentManager).fireChooseBrowserPixel()
-        }
-
-    @Test
-    fun givenComparisonChartDialogWhenDDGIsDefaultBrowserThenFireChooseBrowserPixel() =
-        runTest {
-            whenever(mockDefaultRoleBrowserDialog.shouldShowDialog()).thenReturn(false)
-            testee.onPrimaryCtaClicked(PreOnboardingDialogType.COMPARISON_CHART)
-
-            verify(mockOnboardingDesignExperimentManager).fireChooseBrowserPixel()
-        }
-
-    @Test
-    fun whenDefaultBrowserIsSetThenFireSetDefaultRatePixel() =
-        runTest {
-            testee.onDefaultBrowserSet()
-
-            verify(mockOnboardingDesignExperimentManager).fireSetDefaultRatePixel()
-        }
-
-    @Test
-    fun whenBottomAddressBarIsSelectedAndPrimaryCtaClickedThenFireAddressBarSetBottomPixel() =
-        runTest {
-            testee.onAddressBarPositionOptionSelected(false)
-            testee.onPrimaryCtaClicked(PreOnboardingDialogType.ADDRESS_BAR_POSITION)
-
-            verify(mockOnboardingDesignExperimentManager).fireAddressBarSetBottomPixel()
-        }
-
-    @Test
-    fun whenTopAddressBarIsSelectedAndPrimaryCtaClickedThenFireAddressBarSetTopPixel() =
-        runTest {
-            testee.onAddressBarPositionOptionSelected(true)
-            testee.onPrimaryCtaClicked(PreOnboardingDialogType.ADDRESS_BAR_POSITION)
-
-            verify(mockOnboardingDesignExperimentManager).fireAddressBarSetTopPixel()
-        }
-
-    @Test
-    fun whenDefaultAddressBarPositionIsKeptAndPrimaryCtaClickedThenFireAddressBarSetTopPixel() =
-        runTest {
-            testee.onPrimaryCtaClicked(PreOnboardingDialogType.ADDRESS_BAR_POSITION)
-
-            verify(mockOnboardingDesignExperimentManager).fireAddressBarSetTopPixel()
         }
 
     @Test
@@ -429,6 +357,8 @@ class WelcomePageViewModelTest {
             }
             verify(mockPixel).fire(PREONBOARDING_AICHAT_SELECTED)
             verify(mockOnboardingStore).storeInputScreenSelection(true)
+            verify(mockDuckChat).setCosmeticInputScreenUserSetting(true)
+            verify(mockInputScreenOnboardingWideEvent).onInputScreenEnabledDuringOnboarding(reinstallUser = false)
         }
 
     @Test
@@ -444,6 +374,7 @@ class WelcomePageViewModelTest {
             }
             verify(mockPixel).fire(PREONBOARDING_SEARCH_ONLY_SELECTED)
             verify(mockOnboardingStore).storeInputScreenSelection(false)
+            verify(mockDuckChat).setCosmeticInputScreenUserSetting(false)
         }
 
     @Test
@@ -470,4 +401,23 @@ class WelcomePageViewModelTest {
 
         verify(mockPixel).fire(PREONBOARDING_CHOOSE_SEARCH_EXPERIENCE_IMPRESSIONS_UNIQUE, type = Unique())
     }
+
+    @Test
+    fun whenOnPrimaryCtaClickedWithInputScreenSelectedAndReinstallUserTrueThenCallWideEventWithReinstallUserTrue() =
+        runTest {
+            mockAndroidBrowserConfigFeature.showInputScreenOnboarding().setRawStoredState(Toggle.State(enable = true))
+            testee.onSecondaryCtaClicked(PreOnboardingDialogType.INITIAL_REINSTALL_USER)
+
+            testee.commands.test {
+                val skipCommand = awaitItem()
+                Assert.assertTrue(skipCommand is ShowSkipOnboardingOption)
+
+                testee.onInputScreenOptionSelected(true)
+                testee.onPrimaryCtaClicked(PreOnboardingDialogType.INPUT_SCREEN)
+
+                val finishCommand = awaitItem()
+                Assert.assertTrue(finishCommand is Finish)
+            }
+            verify(mockInputScreenOnboardingWideEvent).onInputScreenEnabledDuringOnboarding(reinstallUser = true)
+        }
 }
