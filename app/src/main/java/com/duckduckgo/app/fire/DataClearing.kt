@@ -20,8 +20,9 @@ interface DataClearing {
     /**
      * Clears data when user requests data clearing using the FireDialog.
      * @param shouldRestartProcess whether to restart the app process after clearing data
+     * @param wasAppUsedSinceLastClear whether the app was used since the last data clear
      */
-    suspend fun clearDataUsingManualFireOptions(shouldRestartProcess: Boolean = false)
+    suspend fun clearDataUsingManualFireOptions(shouldRestartProcess: Boolean = false, wasAppUsedSinceLastClear: Boolean = false)
 
     /**
      * Clears data automatically based on auto-clear settings.
@@ -46,9 +47,9 @@ interface DataClearing {
     ): Boolean
 
     /**
-     * Determines whether the process should be killed when the app exits after automatic data-clearing.
+     * Determines whether the process should be killed after automatic data-clearing.
      *
      * @return true if process should be killed on exit, false otherwise
      */
-    suspend fun shouldKillProcessOnExit(): Boolean
+    suspend fun shouldKillProcessAfterAutomaticDataClearing(): Boolean
 }

@@ -186,7 +186,7 @@ class AutomaticDataClearer @Inject constructor(
         launch(dispatchers.io()) {
             // the app does not have any activity in CREATED state we kill the process
             val shouldKillProcess = if (androidBrowserConfigFeature.moreGranularDataClearingOptions().isEnabled()) {
-                dataClearing.shouldKillProcessOnExit()
+                dataClearing.shouldKillProcessAfterAutomaticDataClearing()
             } else {
                 settingsDataStore.automaticallyClearWhatOption != ClearWhatOption.CLEAR_NONE
             }

@@ -70,7 +70,7 @@ class DataClearingTest {
     fun whenManualClearWithTabsOnly_thenOnlyClearTabs() = runTest {
         configureManualOptions(setOf(FireClearOption.TABS))
 
-        testee.clearDataUsingManualFireOptions(shouldRestartProcess = false)
+        testee.clearDataUsingManualFireOptions(shouldRestartProcess = false, wasAppUsedSinceLastClear = true)
 
         verify(mockClearDataAction).clearTabsOnly()
         verify(mockClearDataAction, never()).clearBrowserDataOnly(any())
@@ -83,7 +83,7 @@ class DataClearingTest {
     fun whenManualClearWithDataOnly_thenClearDataAndSetFlag() = runTest {
         configureManualOptions(setOf(FireClearOption.DATA))
 
-        testee.clearDataUsingManualFireOptions(shouldRestartProcess = false)
+        testee.clearDataUsingManualFireOptions(shouldRestartProcess = false, wasAppUsedSinceLastClear = true)
 
         verify(mockClearDataAction, never()).clearTabsOnly()
         verify(mockClearDataAction).clearBrowserDataOnly(true)
@@ -96,7 +96,7 @@ class DataClearingTest {
     fun whenManualClearWithTabsAndData_thenClearBothAndSetFlag() = runTest {
         configureManualOptions(setOf(FireClearOption.TABS, FireClearOption.DATA))
 
-        testee.clearDataUsingManualFireOptions(shouldRestartProcess = false)
+        testee.clearDataUsingManualFireOptions(shouldRestartProcess = false, wasAppUsedSinceLastClear = true)
 
         verify(mockClearDataAction).clearTabsOnly()
         verify(mockClearDataAction).clearBrowserDataOnly(true)
@@ -109,7 +109,7 @@ class DataClearingTest {
     fun whenManualClearWithDuckAiChatsOnly_thenClearChatsAndSetFlag() = runTest {
         configureManualOptions(setOf(FireClearOption.DUCKAI_CHATS))
 
-        testee.clearDataUsingManualFireOptions(shouldRestartProcess = false)
+        testee.clearDataUsingManualFireOptions(shouldRestartProcess = false, wasAppUsedSinceLastClear = true)
 
         verify(mockClearDataAction, never()).clearTabsOnly()
         verify(mockClearDataAction, never()).clearBrowserDataOnly(any())
@@ -122,7 +122,7 @@ class DataClearingTest {
     fun whenManualClearWithAllOptions_thenClearAllAndSetFlag() = runTest {
         configureManualOptions(setOf(FireClearOption.TABS, FireClearOption.DATA, FireClearOption.DUCKAI_CHATS))
 
-        testee.clearDataUsingManualFireOptions(shouldRestartProcess = false)
+        testee.clearDataUsingManualFireOptions(shouldRestartProcess = false, wasAppUsedSinceLastClear = true)
 
         verify(mockClearDataAction).clearTabsOnly()
         verify(mockClearDataAction).clearBrowserDataOnly(true)
@@ -135,7 +135,7 @@ class DataClearingTest {
     fun whenManualClearWithNoOptionsSelected_thenOnlySetFlag() = runTest {
         configureManualOptions(emptySet())
 
-        testee.clearDataUsingManualFireOptions(shouldRestartProcess = false)
+        testee.clearDataUsingManualFireOptions(shouldRestartProcess = false, wasAppUsedSinceLastClear = true)
 
         verify(mockClearDataAction, never()).clearTabsOnly()
         verify(mockClearDataAction, never()).clearBrowserDataOnly(any())
@@ -148,7 +148,7 @@ class DataClearingTest {
     fun whenManualClearWithNoOptionsSelectedAndShouldRestartProcess_thenOnlySetFlagAndDoNotRestart() = runTest {
         configureManualOptions(emptySet())
 
-        testee.clearDataUsingManualFireOptions(shouldRestartProcess = true)
+        testee.clearDataUsingManualFireOptions(shouldRestartProcess = true, wasAppUsedSinceLastClear = true)
 
         verify(mockClearDataAction, never()).clearTabsOnly()
         verify(mockClearDataAction, never()).clearBrowserDataOnly(any())
@@ -161,7 +161,7 @@ class DataClearingTest {
     fun whenManualClearWithTabsOnlyAndShouldRestartProcess_thenDoNotRestart() = runTest {
         configureManualOptions(setOf(FireClearOption.TABS))
 
-        testee.clearDataUsingManualFireOptions(shouldRestartProcess = true)
+        testee.clearDataUsingManualFireOptions(shouldRestartProcess = true, wasAppUsedSinceLastClear = true)
 
         verify(mockClearDataAction).clearTabsOnly()
         verify(mockClearDataAction).setAppUsedSinceLastClearFlag(true)
@@ -172,7 +172,7 @@ class DataClearingTest {
     fun whenManualClearWithDataAndShouldRestartProcess_thenRestartProcess() = runTest {
         configureManualOptions(setOf(FireClearOption.DATA))
 
-        testee.clearDataUsingManualFireOptions(shouldRestartProcess = true)
+        testee.clearDataUsingManualFireOptions(shouldRestartProcess = true, wasAppUsedSinceLastClear = false)
 
         verify(mockClearDataAction).clearBrowserDataOnly(true)
         verify(mockClearDataAction).setAppUsedSinceLastClearFlag(false)
@@ -183,7 +183,7 @@ class DataClearingTest {
     fun whenManualClearWithTabsAndDataAndShouldRestartProcess_thenRestartProcess() = runTest {
         configureManualOptions(setOf(FireClearOption.TABS, FireClearOption.DATA))
 
-        testee.clearDataUsingManualFireOptions(shouldRestartProcess = true)
+        testee.clearDataUsingManualFireOptions(shouldRestartProcess = true, wasAppUsedSinceLastClear = false)
 
         verify(mockClearDataAction).clearTabsOnly()
         verify(mockClearDataAction).clearBrowserDataOnly(true)
@@ -195,7 +195,7 @@ class DataClearingTest {
     fun whenManualClearWithDuckAiChatsAndShouldRestartProcess_thenRestartProcess() = runTest {
         configureManualOptions(setOf(FireClearOption.DUCKAI_CHATS))
 
-        testee.clearDataUsingManualFireOptions(shouldRestartProcess = true)
+        testee.clearDataUsingManualFireOptions(shouldRestartProcess = true, wasAppUsedSinceLastClear = false)
 
         verify(mockClearDataAction).clearDuckAiChatsOnly()
         verify(mockClearDataAction).setAppUsedSinceLastClearFlag(false)
@@ -490,10 +490,10 @@ class DataClearingTest {
     }
 
     @Test
-    fun whenAutomaticClearOptionsConfigured_thenShouldKillProcessOnExit() = runTest {
+    fun whenAutomaticClearOptionsConfigured_thenShouldKillProcessAfterAutomaticDataClearing() = runTest {
         configureAutomaticOptions(setOf(FireClearOption.DATA))
 
-        val result = testee.shouldKillProcessOnExit()
+        val result = testee.shouldKillProcessAfterAutomaticDataClearing()
 
         assertTrue(result)
     }
@@ -502,25 +502,25 @@ class DataClearingTest {
     fun whenNoAutomaticClearOptionsConfigured_thenShouldNotKillProcessOnExit() = runTest {
         configureAutomaticOptions(emptySet())
 
-        val result = testee.shouldKillProcessOnExit()
+        val result = testee.shouldKillProcessAfterAutomaticDataClearing()
 
         assertFalse(result)
     }
 
     @Test
-    fun whenAutomaticClearOptionsConfiguredWithTabsOnly_thenShouldKillProcessOnExit() = runTest {
+    fun whenAutomaticClearOptionsConfiguredWithTabsOnly_thenShouldKillProcessAfterAutomaticDataClearing() = runTest {
         configureAutomaticOptions(setOf(FireClearOption.TABS))
 
-        val result = testee.shouldKillProcessOnExit()
+        val result = testee.shouldKillProcessAfterAutomaticDataClearing()
 
         assertTrue(result)
     }
 
     @Test
-    fun whenAutomaticClearOptionsConfiguredWithMultipleOptions_thenShouldKillProcessOnExit() = runTest {
+    fun whenAutomaticClearOptionsConfiguredWithMultipleOptions_thenShouldKillProcessAfterAutomaticDataClearing() = runTest {
         configureAutomaticOptions(setOf(FireClearOption.TABS, FireClearOption.DATA, FireClearOption.DUCKAI_CHATS))
 
-        val result = testee.shouldKillProcessOnExit()
+        val result = testee.shouldKillProcessAfterAutomaticDataClearing()
 
         assertTrue(result)
     }
