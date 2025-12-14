@@ -18,16 +18,20 @@
 
 package com.duckduckgo.app.fire
 
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.annotation.UiThreadTest
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.work.WorkManager
 import com.duckduckgo.app.global.view.ClearDataAction
+import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.InstantSchedulersRule
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle.State
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -37,8 +41,12 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import kotlin.jvm.java
 
 class AutomaticDataClearerTest {
+
+    @get:Rule
+    val instantTaskExecutorRule = InstantTaskExecutorRule()
 
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
@@ -52,6 +60,8 @@ class AutomaticDataClearerTest {
     private val mockClearAction: ClearDataAction = mock()
     private val mockTimeKeeper: BackgroundTimeKeeper = mock()
     private val mockWorkManager: WorkManager = mock()
+    private val mockDataClearing: DataClearing = mock()
+    private val fakeAndroidBrowserConfigFeature = FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
     private val pixel: Pixel = mock()
     private val dataClearerForegroundAppRestartPixel =
         DataClearerForegroundAppRestartPixel(
@@ -69,6 +79,8 @@ class AutomaticDataClearerTest {
             workManager = mockWorkManager,
             settingsDataStore = mockSettingsDataStore,
             clearDataAction = mockClearAction,
+            dataClearing = mockDataClearing,
+            androidBrowserConfigFeature = fakeAndroidBrowserConfigFeature,
             dataClearerTimeKeeper = mockTimeKeeper,
             dataClearerForegroundAppRestartPixel = dataClearerForegroundAppRestartPixel,
             dispatchers = coroutineTestRule.testDispatcherProvider,
@@ -573,11 +585,11 @@ class AutomaticDataClearerTest {
     }
 
     private suspend fun verifyTabsCleared() {
-        verify(mockClearAction).clearTabsOnly(any())
+        verify(mockClearAction).clearTabsAsync(any())
     }
 
     private suspend fun verifyTabsNotCleared() {
-        verify(mockClearAction, never()).clearTabsOnly(any())
+        verify(mockClearAction, never()).clearTabsAsync(any())
     }
 
     private suspend fun verifyEverythingCleared() {
@@ -590,5 +602,175 @@ class AutomaticDataClearerTest {
 
     private fun verifyAppIconFlagReset() {
         verify(mockSettingsDataStore).appIconChanged = false
+    }
+
+    @UiThreadTest
+    @Test
+    fun whenGranularFeatureEnabledAndEmptyOptions_thenNoClearing() = runTest {
+        enableGranularFeature()
+        configureShouldClearAutomatically(false)
+        configureAppUsedSinceLastClear()
+
+        simulateLifecycle(isFreshAppLaunch = true)
+
+        verify(mockDataClearing).shouldClearDataAutomatically(any(), any(), any())
+        verify(mockDataClearing, never()).clearDataUsingAutomaticFireOptions(any())
+    }
+
+    @UiThreadTest
+    @Test
+    fun whenGranularFeatureEnabledAndTabsOnlyAndFreshLaunch_thenClearTabsWithoutRestart() = runTest {
+        enableGranularFeature()
+        configureShouldClearAutomatically(true)
+        configureAppUsedSinceLastClear()
+        whenever(mockDataClearing.clearDataUsingAutomaticFireOptions(false)).thenReturn(false)
+
+        simulateLifecycle(isFreshAppLaunch = true)
+
+        verify(mockDataClearing).shouldClearDataAutomatically(true, true, false)
+        verify(mockDataClearing).clearDataUsingAutomaticFireOptions(false)
+        verify(mockClearAction, never()).killAndRestartProcess(any(), any())
+    }
+
+    @UiThreadTest
+    @Test
+    fun whenGranularFeatureEnabledAndTabsOnlyAndNotFreshLaunch_thenClearTabsWithoutRestart() = runTest {
+        enableGranularFeature()
+        configureShouldClearAutomatically(true)
+        configureAppUsedSinceLastClear()
+        whenever(mockDataClearing.clearDataUsingAutomaticFireOptions(false)).thenReturn(false)
+
+        simulateLifecycle(isFreshAppLaunch = false)
+
+        verify(mockDataClearing).shouldClearDataAutomatically(false, true, false)
+        verify(mockDataClearing).clearDataUsingAutomaticFireOptions(false)
+        verify(mockClearAction, never()).killAndRestartProcess(any(), any())
+    }
+
+    @UiThreadTest
+    @Test
+    fun whenGranularFeatureEnabledAndDataAndFreshLaunch_thenClearDataWithoutRestart() = runTest {
+        enableGranularFeature()
+        configureShouldClearAutomatically(true)
+        configureAppUsedSinceLastClear()
+        whenever(mockDataClearing.clearDataUsingAutomaticFireOptions(false)).thenReturn(true)
+
+        simulateLifecycle(isFreshAppLaunch = true)
+
+        verify(mockDataClearing).shouldClearDataAutomatically(true, true, false)
+        verify(mockDataClearing).clearDataUsingAutomaticFireOptions(false)
+        verify(mockClearAction, never()).setAppUsedSinceLastClearFlag(false)
+        verify(mockClearAction, never()).killAndRestartProcess(any(), any())
+    }
+
+    @Test
+    fun whenGranularFeatureEnabledAndDataAndNotFreshLaunch_thenClearDataAndRestart() = runTest {
+        enableGranularFeature()
+        configureShouldClearAutomatically(true)
+        configureAppUsedSinceLastClear()
+        whenever(mockDataClearing.clearDataUsingAutomaticFireOptions(false)).thenReturn(true)
+
+        simulateLifecycle(isFreshAppLaunch = false)
+
+        // Wait for Handler.postDelayed callback to execute on main thread
+        Thread.sleep(200)
+        InstrumentationRegistry.getInstrumentation().waitForIdleSync()
+
+        verify(mockDataClearing).shouldClearDataAutomatically(false, true, false)
+        verify(mockDataClearing).clearDataUsingAutomaticFireOptions(false)
+        verify(mockClearAction).setAppUsedSinceLastClearFlag(false)
+        verify(mockClearAction).killAndRestartProcess(notifyDataCleared = true)
+    }
+
+    @Test
+    fun whenGranularFeatureEnabledAndTabsAndDataAndNotFreshLaunch_thenClearBothAndRestart() = runTest {
+        enableGranularFeature()
+        configureShouldClearAutomatically(true)
+        configureAppUsedSinceLastClear()
+        whenever(mockDataClearing.clearDataUsingAutomaticFireOptions(false)).thenReturn(true)
+
+        simulateLifecycle(isFreshAppLaunch = false)
+
+        // Wait for Handler.postDelayed callback to execute on main thread
+        Thread.sleep(200)
+        InstrumentationRegistry.getInstrumentation().waitForIdleSync()
+
+        verify(mockDataClearing).shouldClearDataAutomatically(false, true, false)
+        verify(mockDataClearing).clearDataUsingAutomaticFireOptions(false)
+        verify(mockClearAction).setAppUsedSinceLastClearFlag(false)
+        verify(mockClearAction).killAndRestartProcess(notifyDataCleared = true)
+    }
+
+    @Test
+    fun whenGranularFeatureEnabledAndDuckAiChatsAndNotFreshLaunch_thenClearChatsAndRestart() = runTest {
+        enableGranularFeature()
+        configureShouldClearAutomatically(true)
+        configureAppUsedSinceLastClear()
+        whenever(mockDataClearing.clearDataUsingAutomaticFireOptions(false)).thenReturn(true)
+
+        simulateLifecycle(isFreshAppLaunch = false)
+
+        // Wait for Handler.postDelayed callback to execute on main thread
+        Thread.sleep(200)
+        InstrumentationRegistry.getInstrumentation().waitForIdleSync()
+
+        verify(mockDataClearing).shouldClearDataAutomatically(false, true, false)
+        verify(mockDataClearing).clearDataUsingAutomaticFireOptions(false)
+        verify(mockClearAction).setAppUsedSinceLastClearFlag(false)
+        verify(mockClearAction).killAndRestartProcess(notifyDataCleared = true)
+    }
+
+    @UiThreadTest
+    @Test
+    fun whenGranularFeatureEnabledAndAppIconChanged_thenNoClearing() = runTest {
+        enableGranularFeature()
+        configureShouldClearAutomatically(false)
+        configureAppUsedSinceLastClear()
+        configureAppIconJustChanged()
+
+        simulateLifecycle(isFreshAppLaunch = false)
+
+        verify(mockDataClearing).shouldClearDataAutomatically(false, true, true)
+        verify(mockDataClearing, never()).clearDataUsingAutomaticFireOptions(any())
+    }
+
+    @UiThreadTest
+    @Test
+    fun whenGranularFeatureEnabledAndAppNotUsedSinceLastClear_thenNoClearing() = runTest {
+        enableGranularFeature()
+        configureShouldClearAutomatically(false)
+        configureAppNotUsedSinceLastClear()
+
+        simulateLifecycle(isFreshAppLaunch = true)
+
+        verify(mockDataClearing).shouldClearDataAutomatically(true, false, false)
+        verify(mockDataClearing, never()).clearDataUsingAutomaticFireOptions(any())
+    }
+
+    @UiThreadTest
+    @Test
+    fun whenGranularFeatureDisabled_thenUseLegacyFlow() = runTest {
+        disableGranularFeature()
+        configureUserOptions(ClearWhatOption.CLEAR_TABS_AND_DATA, ClearWhenOption.APP_EXIT_ONLY)
+        configureEnoughTimePassed()
+        configureAppUsedSinceLastClear()
+
+        simulateLifecycle(isFreshAppLaunch = true)
+
+        verify(mockDataClearing, never()).shouldClearDataAutomatically(any(), any(), any())
+        verify(mockDataClearing, never()).clearDataUsingAutomaticFireOptions(any())
+        verify(mockClearAction).clearTabsAndAllDataAsync(any(), any())
+    }
+
+    private fun enableGranularFeature() {
+        fakeAndroidBrowserConfigFeature.moreGranularDataClearingOptions().setRawStoredState(State(true))
+    }
+
+    private fun disableGranularFeature() {
+        fakeAndroidBrowserConfigFeature.moreGranularDataClearingOptions().setRawStoredState(State(false))
+    }
+
+    private suspend fun configureShouldClearAutomatically(shouldClear: Boolean) {
+        whenever(mockDataClearing.shouldClearDataAutomatically(any(), any(), any())).thenReturn(shouldClear)
     }
 }
