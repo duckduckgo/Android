@@ -75,7 +75,7 @@ import com.duckduckgo.app.downloads.DownloadsScreens.DownloadsScreenNoParams
 import com.duckduckgo.app.feedback.ui.common.FeedbackActivity
 import com.duckduckgo.app.fire.DataClearer
 import com.duckduckgo.app.fire.DataClearerForegroundAppRestartPixel
-import com.duckduckgo.app.fire.DataClearing
+import com.duckduckgo.app.fire.ManualDataClearing
 import com.duckduckgo.app.global.ApplicationClearDataState
 import com.duckduckgo.app.global.intentText
 import com.duckduckgo.app.global.rating.PromptCount
@@ -146,7 +146,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
     lateinit var clearDataAction: ClearDataAction
 
     @Inject
-    lateinit var dataClearing: DataClearing
+    lateinit var dataClearing: ManualDataClearing
 
     @Inject
     lateinit var androidBrowserConfigFeature: AndroidBrowserConfigFeature

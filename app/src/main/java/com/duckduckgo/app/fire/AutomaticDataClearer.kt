@@ -69,7 +69,7 @@ class AutomaticDataClearer @Inject constructor(
     private val workManager: WorkManager,
     private val settingsDataStore: SettingsDataStore,
     private val clearDataAction: ClearDataAction,
-    private val dataClearing: DataClearing,
+    private val dataClearing: AutomaticDataClearing,
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
     private val dataClearerTimeKeeper: BackgroundTimeKeeper,
     private val dataClearerForegroundAppRestartPixel: DataClearerForegroundAppRestartPixel,

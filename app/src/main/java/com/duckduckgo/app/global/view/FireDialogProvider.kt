@@ -18,7 +18,7 @@ package com.duckduckgo.app.global.view
 
 import android.content.Context
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.fire.DataClearing
+import com.duckduckgo.app.fire.ManualDataClearing
 import com.duckduckgo.app.firebutton.FireButtonStore
 import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
@@ -44,7 +44,7 @@ class FireDialogLauncherImpl @Inject constructor() : FireDialogProvider {
     lateinit var clearDataAction: ClearDataAction
 
     @Inject
-    lateinit var dataClearing: DataClearing
+    lateinit var dataClearing: ManualDataClearing
 
     @Inject
     lateinit var androidBrowserConfigFeature: AndroidBrowserConfigFeature

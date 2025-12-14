@@ -48,7 +48,7 @@ class DataClearingWorker(
     lateinit var clearDataAction: ClearDataAction
 
     @Inject
-    lateinit var dataClearing: DataClearing
+    lateinit var dataClearing: AutomaticDataClearing
 
     @Inject
     lateinit var androidBrowserConfigFeature: AndroidBrowserConfigFeature

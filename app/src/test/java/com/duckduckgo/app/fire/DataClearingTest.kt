@@ -41,7 +41,7 @@ class DataClearingTest {
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
-    private lateinit var testee: RealDataClearing
+    private lateinit var testee: DataClearing
 
     @Mock
     private lateinit var mockFireDataStore: FireDataStore
@@ -58,7 +58,7 @@ class DataClearingTest {
     @Before
     fun setup() {
         MockitoAnnotations.openMocks(this)
-        testee = RealDataClearing(
+        testee = DataClearing(
             fireDataStore = mockFireDataStore,
             clearDataAction = mockClearDataAction,
             settingsDataStore = mockSettingsDataStore,

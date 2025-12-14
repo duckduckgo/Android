@@ -60,7 +60,7 @@ class AutomaticDataClearerTest {
     private val mockClearAction: ClearDataAction = mock()
     private val mockTimeKeeper: BackgroundTimeKeeper = mock()
     private val mockWorkManager: WorkManager = mock()
-    private val mockDataClearing: DataClearing = mock()
+    private val mockDataClearing: AutomaticDataClearing = mock()
     private val fakeAndroidBrowserConfigFeature = FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
     private val pixel: Pixel = mock()
     private val dataClearerForegroundAppRestartPixel =

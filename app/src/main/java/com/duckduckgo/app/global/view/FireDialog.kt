@@ -33,7 +33,7 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.updatePadding
 import com.airbnb.lottie.RenderMode
 import com.duckduckgo.app.browser.databinding.SheetFireClearDataBinding
-import com.duckduckgo.app.fire.DataClearing
+import com.duckduckgo.app.fire.ManualDataClearing
 import com.duckduckgo.app.firebutton.FireButtonStore
 import com.duckduckgo.app.global.events.db.UserEventKey
 import com.duckduckgo.app.global.events.db.UserEventsStore
@@ -70,7 +70,7 @@ private const val ANIMATION_SPEED_INCREMENT = 0.15f
 class FireDialog(
     context: Context,
     private val clearDataAction: ClearDataAction,
-    private val dataClearing: DataClearing,
+    private val dataClearing: ManualDataClearing,
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
     private val pixel: Pixel,
     private val settingsDataStore: SettingsDataStore,

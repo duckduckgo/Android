@@ -16,40 +16,151 @@
 
 package com.duckduckgo.app.fire
 
-interface DataClearing {
-    /**
-     * Clears data when user requests data clearing using the FireDialog.
-     * @param shouldRestartProcess whether to restart the app process after clearing data
-     * @param wasAppUsedSinceLastClear whether the app was used since the last data clear
-     */
-    suspend fun clearDataUsingManualFireOptions(shouldRestartProcess: Boolean = false, wasAppUsedSinceLastClear: Boolean = false)
+import com.duckduckgo.app.fire.store.FireDataStore
+import com.duckduckgo.app.global.view.ClearDataAction
+import com.duckduckgo.app.settings.clear.ClearWhenOption
+import com.duckduckgo.app.settings.clear.FireClearOption
+import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.di.scopes.AppScope
+import com.squareup.anvil.annotations.ContributesBinding
+import dagger.SingleInstanceIn
+import logcat.LogPriority.WARN
+import logcat.logcat
+import javax.inject.Inject
 
-    /**
-     * Clears data automatically based on auto-clear settings.
-     * @param killProcessIfNeeded whether to kill the app process after clearing data and
-     *
-     * @return true if process should be restarted later, false otherwise
-     */
-    suspend fun clearDataUsingAutomaticFireOptions(killProcessIfNeeded: Boolean = true): Boolean
+/**
+ * Implementation that provides granular data clearing capabilities for both manual and automatic clearing.
+ * This uses the FireDataStore to determine which data to clear based on user preferences.
+ */
+@ContributesBinding(
+    scope = AppScope::class,
+    boundType = ManualDataClearing::class,
+)
+@ContributesBinding(
+    scope = AppScope::class,
+    boundType = AutomaticDataClearing::class,
+)
+@SingleInstanceIn(AppScope::class)
+class DataClearing @Inject constructor(
+    private val fireDataStore: FireDataStore,
+    private val clearDataAction: ClearDataAction,
+    private val settingsDataStore: SettingsDataStore,
+    private val dataClearerTimeKeeper: BackgroundTimeKeeper,
+) : ManualDataClearing, AutomaticDataClearing {
 
-    /**
-     * Determines whether data should be cleared based on auto-clear settings.
-     * @param isFreshAppLaunch true if the app has been freshly launched, false otherwise
-     * @param appUsedSinceLastClear true if the app has been used since the last data clear, false otherwise
-     * @param appIconChanged true if the app icon has changed since the last
-     *
-     * @return true if data should be cleared automatically, false otherwise
-     */
-    suspend fun shouldClearDataAutomatically(
+    override suspend fun clearDataUsingManualFireOptions(shouldRestartProcess: Boolean, wasAppUsedSinceLastClear: Boolean) {
+        val options = fireDataStore.getManualClearOptions()
+        performGranularClear(
+            options = options,
+            shouldFireDataClearPixel = true,
+        )
+
+        clearDataAction.setAppUsedSinceLastClearFlag(wasAppUsedSinceLastClear)
+
+        val wasDataCleared = options.contains(FireClearOption.DATA) || options.contains(FireClearOption.DUCKAI_CHATS)
+        if (shouldRestartProcess && wasDataCleared) {
+            clearDataAction.killAndRestartProcess(notifyDataCleared = false)
+        }
+    }
+
+    override suspend fun clearDataUsingAutomaticFireOptions(killProcessIfNeeded: Boolean): Boolean {
+        val options = fireDataStore.getAutomaticClearOptions()
+        performGranularClear(
+            options = options,
+            shouldFireDataClearPixel = false,
+        )
+
+        clearDataAction.setAppUsedSinceLastClearFlag(!killProcessIfNeeded)
+
+        val wasDataCleared = options.contains(FireClearOption.DATA) || options.contains(FireClearOption.DUCKAI_CHATS)
+        if (killProcessIfNeeded && wasDataCleared) {
+            clearDataAction.killProcess()
+            return false
+        } else {
+            return wasDataCleared
+        }
+    }
+
+    override suspend fun shouldClearDataAutomatically(
         isFreshAppLaunch: Boolean,
         appUsedSinceLastClear: Boolean,
         appIconChanged: Boolean,
-    ): Boolean
+    ): Boolean {
+        val clearWhenOption = fireDataStore.getAutomaticallyClearWhenOption()
+
+        logcat { "Determining if data should be cleared for option $clearWhenOption" }
+
+        if (fireDataStore.getAutomaticClearOptions().isEmpty()) {
+            logcat { "No automatic clear options selected; will not clear data" }
+            return false
+        }
+
+        if (!appUsedSinceLastClear) {
+            logcat { "App hasn't been used since last clear; no need to clear again" }
+            return false
+        }
+
+        logcat { "App has been used since last clear" }
+
+        if (isFreshAppLaunch) {
+            logcat { "This is a fresh app launch, so will clear the data" }
+            return true
+        }
+
+        if (appIconChanged) {
+            logcat { "No data will be cleared as the app icon was just changed" }
+            return false
+        }
+
+        if (clearWhenOption == ClearWhenOption.APP_EXIT_ONLY) {
+            logcat { "This is NOT a fresh app launch, and the configuration is for app exit only. Not clearing the data" }
+            return false
+        }
+        if (!settingsDataStore.hasBackgroundTimestampRecorded()) {
+            logcat { "No background timestamp recorded; will not clear the data" }
+            logcat(WARN) { "No background timestamp recorded; will not clear the data" }
+            return false
+        }
+
+        val enoughTimePassed = dataClearerTimeKeeper.hasEnoughTimeElapsed(
+            backgroundedTimestamp = settingsDataStore.appBackgroundedTimestamp,
+            clearWhenOption = clearWhenOption,
+        )
+        logcat { "Has enough time passed to trigger the data clear? $enoughTimePassed" }
+
+        return enoughTimePassed
+    }
+
+    override suspend fun shouldKillProcessAfterAutomaticDataClearing(): Boolean {
+        return fireDataStore.getAutomaticClearOptions().isNotEmpty()
+    }
 
     /**
-     * Determines whether the process should be killed after automatic data-clearing.
-     *
-     * @return true if process should be killed on exit, false otherwise
+     * Performs granular data clearing based on the provided options
+     * @return true if process needs to be restarted
      */
-    suspend fun shouldKillProcessAfterAutomaticDataClearing(): Boolean
+    private suspend fun performGranularClear(
+        options: Set<FireClearOption>,
+        shouldFireDataClearPixel: Boolean,
+    ) {
+        logcat { "Performing granular clear with options: $options" }
+
+        val shouldClearTabs = FireClearOption.TABS in options
+        val shouldClearData = FireClearOption.DATA in options
+        val shouldClearDuckAiChats = FireClearOption.DUCKAI_CHATS in options
+
+        if (shouldClearTabs) {
+            clearDataAction.clearTabsOnly()
+        }
+
+        if (shouldClearData) {
+            clearDataAction.clearBrowserDataOnly(shouldFireDataClearPixel)
+        }
+
+        if (shouldClearDuckAiChats) {
+            clearDataAction.clearDuckAiChatsOnly()
+        }
+
+        logcat { "Granular clear completed" }
+    }
 }
