@@ -44,4 +44,11 @@ interface DataClearing {
         appUsedSinceLastClear: Boolean,
         appIconChanged: Boolean,
     ): Boolean
+
+    /**
+     * Determines whether the process should be killed when the app exits after automatic data-clearing.
+     *
+     * @return true if process should be killed on exit, false otherwise
+     */
+    suspend fun shouldKillProcessOnExit(): Boolean
 }

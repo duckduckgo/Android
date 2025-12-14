@@ -125,6 +125,10 @@ class RealDataClearing @Inject constructor(
         return enoughTimePassed
     }
 
+    override suspend fun shouldKillProcessOnExit(): Boolean {
+        return fireDataStore.getAutomaticClearOptions().isNotEmpty()
+    }
+
     /**
      * Performs granular data clearing based on the provided options
      * @return true if process needs to be restarted

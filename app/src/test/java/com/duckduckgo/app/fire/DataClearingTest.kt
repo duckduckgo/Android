@@ -489,6 +489,42 @@ class DataClearingTest {
         assertTrue(result)
     }
 
+    @Test
+    fun whenAutomaticClearOptionsConfigured_thenShouldKillProcessOnExit() = runTest {
+        configureAutomaticOptions(setOf(FireClearOption.DATA))
+
+        val result = testee.shouldKillProcessOnExit()
+
+        assertTrue(result)
+    }
+
+    @Test
+    fun whenNoAutomaticClearOptionsConfigured_thenShouldNotKillProcessOnExit() = runTest {
+        configureAutomaticOptions(emptySet())
+
+        val result = testee.shouldKillProcessOnExit()
+
+        assertFalse(result)
+    }
+
+    @Test
+    fun whenAutomaticClearOptionsConfiguredWithTabsOnly_thenShouldKillProcessOnExit() = runTest {
+        configureAutomaticOptions(setOf(FireClearOption.TABS))
+
+        val result = testee.shouldKillProcessOnExit()
+
+        assertTrue(result)
+    }
+
+    @Test
+    fun whenAutomaticClearOptionsConfiguredWithMultipleOptions_thenShouldKillProcessOnExit() = runTest {
+        configureAutomaticOptions(setOf(FireClearOption.TABS, FireClearOption.DATA, FireClearOption.DUCKAI_CHATS))
+
+        val result = testee.shouldKillProcessOnExit()
+
+        assertTrue(result)
+    }
+
     private suspend fun configureManualOptions(options: Set<FireClearOption>) {
         whenever(mockFireDataStore.getManualClearOptions()).thenReturn(options)
     }
