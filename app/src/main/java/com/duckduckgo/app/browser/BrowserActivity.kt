@@ -801,17 +801,22 @@ open class BrowserActivity : DuckDuckGoActivity() {
         val params = mapOf(PixelParameter.FROM_FOCUSED_NTP to launchedFromFocusedNtp.toString())
         pixel.fire(AppPixelName.FORGET_ALL_PRESSED_BROWSING, params)
 
-        val dialog = fireDialogProvider.createFireDialog(context = this)
-        dialog.setOnShowListener { currentTab?.onFireDialogVisibilityChanged(isVisible = true) }
-        dialog.setOnCancelListener {
-            pixel.fire(FIRE_DIALOG_CANCEL)
-            currentTab?.onFireDialogVisibilityChanged(isVisible = false)
+        lifecycleScope.launch {
+            val dialog = fireDialogProvider.createFireDialog(
+                onShowListener = {
+                    currentTab?.onFireDialogVisibilityChanged(isVisible = true)
+                                 },
+                onCancelListener = {
+                    pixel.fire(FIRE_DIALOG_CANCEL)
+                    currentTab?.onFireDialogVisibilityChanged(isVisible = false)
+                },
+                onClearStartedListener = {
+                    isDataClearingInProgress = true
+                    removeObservers()
+                }
+            )
+            dialog.show(supportFragmentManager)
         }
-        dialog.clearStarted = {
-            isDataClearingInProgress = true
-            removeObservers()
-        }
-        dialog.show()
     }
 
     fun launchSettings() {
