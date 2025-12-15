@@ -16,6 +16,7 @@
 
 package com.duckduckgo.remote.messaging.impl.ui
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.os.SystemClock
@@ -48,6 +49,7 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
+@SuppressLint("DenyListedApi")
 class RemoteMessageModalSurfaceEvaluatorImplTest {
 
     @get:Rule
