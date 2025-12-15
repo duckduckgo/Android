@@ -39,7 +39,7 @@ interface FireDialogProvider {
     suspend fun createFireDialog(
         onShowListener: (() -> Unit)? = null,
         onCancelListener: (() -> Unit)? = null,
-        onClearStartedListener: (() -> Unit)? = null
+        onClearStartedListener: (() -> Unit)? = null,
     ): FireDialog
 }
 
@@ -53,7 +53,7 @@ class FireDialogProviderImpl @Inject constructor(
     override suspend fun createFireDialog(
         onShowListener: (() -> Unit)?,
         onCancelListener: (() -> Unit)?,
-        onClearStartedListener: (() -> Unit)?
+        onClearStartedListener: (() -> Unit)?,
     ): FireDialog {
         val isGranularMode = withContext(dispatcherProvider.io()) {
             androidBrowserConfigFeature.moreGranularDataClearingOptions().isEnabled()

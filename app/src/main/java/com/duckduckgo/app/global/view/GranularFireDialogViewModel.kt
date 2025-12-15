@@ -142,9 +142,7 @@ class GranularFireDialogViewModel @Inject constructor(
                 parameters = mapOf(FIRE_ANIMATION to settingsDataStore.selectedFireAnimation.getPixelValue()),
             )
 
-            val animationEnabled = settingsDataStore.fireAnimationEnabled
-
-            if (animationEnabled) {
+            if (settingsDataStore.fireAnimationEnabled) {
                 command.send(Command.PlayAnimation)
             }
 

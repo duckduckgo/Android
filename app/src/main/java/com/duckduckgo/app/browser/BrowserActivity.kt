@@ -805,7 +805,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             val dialog = fireDialogProvider.createFireDialog(
                 onShowListener = {
                     currentTab?.onFireDialogVisibilityChanged(isVisible = true)
-                                 },
+                },
                 onCancelListener = {
                     pixel.fire(FIRE_DIALOG_CANCEL)
                     currentTab?.onFireDialogVisibilityChanged(isVisible = false)
@@ -813,7 +813,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 onClearStartedListener = {
                     isDataClearingInProgress = true
                     removeObservers()
-                }
+                },
             )
             dialog.show(supportFragmentManager)
         }
