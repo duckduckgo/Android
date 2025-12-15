@@ -104,7 +104,7 @@ class GranularFireDialog : BottomSheetDialogFragment(), FireDialog {
         }
     }
 
-    private var canRestart = false
+    private var hasRestarted = false
     private var isAnimationComplete = false
     private var isClearingComplete = false
 
@@ -129,7 +129,7 @@ class GranularFireDialog : BottomSheetDialogFragment(), FireDialog {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        canRestart = !animationEnabled()
+        hasRestarted = false
 
         setupLayout()
         configureBottomSheet()
@@ -341,8 +341,8 @@ class GranularFireDialog : BottomSheetDialogFragment(), FireDialog {
             isClearingComplete
         }
 
-        if (shouldRestart && !canRestart) {
-            canRestart = true
+        if (shouldRestart && !hasRestarted) {
+            hasRestarted = true
             clearDataAction.killAndRestartProcess(notifyDataCleared = false, enableTransitionAnimation = false)
         }
     }
