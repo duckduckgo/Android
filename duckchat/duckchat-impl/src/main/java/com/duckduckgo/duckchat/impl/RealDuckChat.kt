@@ -724,7 +724,8 @@ class RealDuckChat @Inject constructor(
                     isDuckChatFeatureEnabled && isDuckChatUserEnabled && isVoiceSearchEntryPointEnabled
             _showVoiceSearchToggle.emit(showVoiceSearchToggle)
 
-            val showFullScreenMode = isDuckChatFeatureEnabled && isDuckChatUserEnabled && duckChatFeature.fullscreenMode().isEnabled()
+            val showFullScreenMode = isDuckChatFeatureEnabled && isDuckChatUserEnabled &&
+                (duckChatFeature.fullscreenMode().isEnabled() || duckChatFeatureRepository.isFullScreenModeUserSettingEnabled())
             isFullscreenModeEnabled = showFullScreenMode
             _showFullScreenMode.emit(showFullScreenMode)
         }

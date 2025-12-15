@@ -29,6 +29,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.di.DuckChat
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_AI_INPUT_SCREEN_COSMETIC_SETTING
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_AI_INPUT_SCREEN_USER_SETTING
+import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_CHAT_FULLSCREEN_MODE_SETTING
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_CHAT_LAST_SESSION_TIMESTAMP
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_CHAT_OPENED
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_CHAT_SESSION_DELTA_TIMESTAMP
@@ -81,6 +82,8 @@ interface DuckChatDataStore {
 
     suspend fun isInputScreenUserSettingEnabled(): Boolean
 
+    suspend fun isFullScreenUserSettingEnabled(): Boolean
+
     suspend fun getShowInBrowserMenu(): Boolean
 
     suspend fun getShowInAddressBar(): Boolean
@@ -119,6 +122,7 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
         val DUCK_CHAT_USER_PREFERENCES = stringPreferencesKey("DUCK_CHAT_USER_PREFERENCES")
         val DUCK_CHAT_LAST_SESSION_TIMESTAMP = longPreferencesKey(name = "DUCK_CHAT_LAST_SESSION_TIMESTAMP")
         val DUCK_CHAT_SESSION_DELTA_TIMESTAMP = longPreferencesKey(name = "DUCK_CHAT_SESSION_DELTA_TIMESTAMP")
+        val DUCK_CHAT_FULLSCREEN_MODE_SETTING = booleanPreferencesKey(name = "DUCK_CHAT_FULLSCREEN_MODE_SETTING")
     }
 
     private fun Preferences.defaultShowInAddressBar(): Boolean =
@@ -221,6 +225,10 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
 
     override suspend fun isInputScreenUserSettingEnabled(): Boolean = store.data.firstOrNull()?.let {
         it[DUCK_AI_INPUT_SCREEN_USER_SETTING]
+    } ?: false
+
+    override suspend fun isFullScreenUserSettingEnabled(): Boolean = store.data.firstOrNull()?.let {
+        it[DUCK_CHAT_FULLSCREEN_MODE_SETTING]
     } ?: false
 
     override suspend fun isCosmeticInputScreenUserSettingEnabled(): Boolean = store.data.firstOrNull()?.let {

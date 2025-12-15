@@ -81,6 +81,20 @@ class DuckChatSettingsViewModelTest {
         }
 
     @Test
+    fun whenDuckChatUserEnabledToggledDisabledThenSetUserSetting() =
+        runTest {
+            testee.onDuckChatUserEnabledToggled(false)
+            verify(duckChat).setEnableDuckChatUserSetting(false)
+        }
+
+    @Test
+    fun whenDuckChatUserEnabledToggledEnabledThenSetUserSetting() =
+        runTest {
+            testee.onDuckChatUserEnabledToggled(true)
+            verify(duckChat).setEnableDuckChatUserSetting(true)
+        }
+
+    @Test
     fun whenShowDuckChatInMenuDisabledThenSetUserSetting() =
         runTest {
             testee.onShowDuckChatInMenuToggled(false)
@@ -395,6 +409,20 @@ class DuckChatSettingsViewModelTest {
                 assertEquals(R.string.duckAiSerpSettingsTitle, command.titleRes)
                 cancelAndIgnoreRemainingEvents()
             }
+        }
+
+    @Test
+    fun `when onDuckChatUserEnabledToggled true then enabled pixel fired`() =
+        runTest {
+            testee.onDuckChatUserEnabledToggled(true)
+            verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_USER_ENABLED)
+        }
+
+    @Test
+    fun `when onDuckChatUserEnabledToggled false then disabled pixel fired`() =
+        runTest {
+            testee.onDuckChatUserEnabledToggled(false)
+            verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_USER_DISABLED)
         }
 
     @Test
