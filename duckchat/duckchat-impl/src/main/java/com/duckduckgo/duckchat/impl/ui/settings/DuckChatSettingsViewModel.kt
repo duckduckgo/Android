@@ -85,7 +85,7 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
                 shouldShowInputScreenToggle = isDuckChatUserEnabled && duckChat.isInputScreenFeatureAvailable(),
                 isSearchSectionVisible = isSearchSectionVisible(duckChatActivityParams),
                 isHideGeneratedImagesOptionVisible = showHideAiGeneratedImagesOption,
-                shouldShowContextualModeToggle = duckChat.isDuckChatFullScreenModeFeatureAvailable() && contextualModeToggle,
+                shouldShowContextualModeToggle = duckChat.isDuckChatContextualModeFeatureAvailable() && contextualModeToggle,
                 isContextualModeEnabled = duckChat.isDuckChatContextualModeEnabled(),
             )
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ViewState())

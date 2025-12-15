@@ -193,6 +193,11 @@ interface DuckChatInternal : DuckChat {
     fun isDuckChatFullScreenModeEnabled(): Boolean
 
     /**
+     * Returns whether dedicated Duck.ai contextual mode feature is available (its feature flag is enabled).
+     */
+    fun isDuckChatContextualModeFeatureAvailable(): Boolean
+
+    /**
      * Returns whether dedicated Duck.ai contextual mode is enabled by the user and the feature flag is enabled.
      */
     fun isDuckChatContextualModeEnabled(): Boolean
@@ -300,6 +305,8 @@ class RealDuckChat @Inject constructor(
     private val _showVoiceSearchToggle = MutableStateFlow(false)
     private val _showFullScreenMode = MutableStateFlow(false)
     private val _showFullScreenModeToggle = MutableStateFlow(false)
+    private val _showContextualMode = MutableStateFlow(false)
+    private val _showContextualModeToggle = MutableStateFlow(false)
 
     private val jsonAdapter: JsonAdapter<DuckChatSettingJson> by lazy {
         moshi.adapter(DuckChatSettingJson::class.java)
@@ -323,6 +330,7 @@ class RealDuckChat @Inject constructor(
     private var inputScreenMainButtonsEnabled = false
     private var showInputScreenOnSystemSearchLaunchEnabled: Boolean = true
     private var isFullscreenModeEnabled: Boolean = false
+    private var isContextualModeEnabled: Boolean = false
 
     init {
         if (isMainProcess) {
@@ -382,6 +390,10 @@ class RealDuckChat @Inject constructor(
     override fun isDuckChatFullScreenModeFeatureAvailable(): Boolean = duckChatFeature.fullscreenMode().isEnabled()
 
     override fun isDuckChatFullScreenModeEnabled(): Boolean = isFullscreenModeEnabled
+
+    override fun isDuckChatContextualModeFeatureAvailable(): Boolean = duckChatFeature.contextualMode().isEnabled()
+
+    override fun isDuckChatContextualModeEnabled(): Boolean = isContextualModeEnabled
 
     override fun observeEnableDuckChatUserSetting(): Flow<Boolean> = duckChatFeatureRepository.observeDuckChatUserEnabled()
 
@@ -465,6 +477,10 @@ class RealDuckChat @Inject constructor(
     override val showFullScreenMode: StateFlow<Boolean> = _showFullScreenMode.asStateFlow()
 
     override val showFullScreenModeToggle: StateFlow<Boolean> = _showFullScreenModeToggle.asStateFlow()
+
+    override val showContextualMode: StateFlow<Boolean> = _showContextualMode.asStateFlow()
+
+    override val showContextualModeToggle: StateFlow<Boolean> = _showContextualModeToggle.asStateFlow()
 
     override val chatState: StateFlow<ChatState> = _chatState.asStateFlow()
 
@@ -745,6 +761,10 @@ class RealDuckChat @Inject constructor(
                 (duckChatFeature.fullscreenMode().isEnabled() || duckChatFeatureRepository.isFullScreenModeUserSettingEnabled())
             isFullscreenModeEnabled = showFullScreenMode
             _showFullScreenMode.emit(showFullScreenMode)
+
+            val showContextualModeToggle =
+                duckChatFeature.contextualMode().isEnabled() && duckChatFeature.contextualModeToggle().isEnabled()
+            _showContextualModeToggle.emit(showContextualModeToggle)
         }
 
     companion object {

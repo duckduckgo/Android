@@ -199,6 +199,16 @@
                 app:typography="body2" />
 
             <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                android:id="@+id/duckAiContextualMode"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:showSwitch="true"
+                app:showBetaPill="true"
+                app:primaryText="@string/duckAiContextualModeTitle"
+                app:secondaryText="@string/duckAiContextualModeDescription" />
+
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
                 android:id="@+id/duckAiShortcuts"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
