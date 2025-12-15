@@ -91,6 +91,9 @@ class RemoteMessageModalSurfaceEvaluatorImpl @Inject constructor(
                     applicationContext.startActivity(intent)
                 }
 
+                // Clear timestamp as the modal will be shown
+                modalEvaluatorCompletionStore.clearBackgroundTimestamp()
+
                 return@withContext ModalEvaluator.EvaluationResult.CompletedWithAction
             }
 
@@ -103,14 +106,7 @@ class RemoteMessageModalSurfaceEvaluatorImpl @Inject constructor(
 
         // Using elapsed real time as this is how it's saved in the data store.
         val currentTimestamp = SystemClock.elapsedRealtime()
-        val hasMetThreshold = (currentTimestamp - backgroundTimestamp) >= BACKGROUND_THRESHOLD_MILLIS
-
-        // Clear timestamp after checking to reset for next cycle
-        if (hasMetThreshold) {
-            modalEvaluatorCompletionStore.clearBackgroundTimestamp()
-        }
-
-        return hasMetThreshold
+        return (currentTimestamp - backgroundTimestamp) >= BACKGROUND_THRESHOLD_MILLIS
     }
 
     companion object {
