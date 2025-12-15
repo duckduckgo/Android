@@ -16,64 +16,61 @@
 
 package com.duckduckgo.duckchat.impl.ui
 
-import android.content.Intent
-import android.net.Uri
+import android.Manifest
+import android.annotation.SuppressLint
+import android.content.pm.PackageManager
 import android.os.Bundle
+import android.os.Environment
 import android.os.Message
-import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.webkit.MimeTypeMap
-import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
-import android.webkit.WebChromeClient.FileChooserParams
 import android.webkit.WebSettings
 import android.webkit.WebView
+import androidx.annotation.AnyThread
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import com.duckduckgo.common.ui.view.dialog.ActionBottomSheetDialog
 import com.duckduckgo.common.ui.view.gone
+import com.duckduckgo.common.ui.view.makeSnackbarWithNoBottomInset
+import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.FragmentViewModelFactory
+import com.duckduckgo.downloads.api.DOWNLOAD_SNACKBAR_DELAY
+import com.duckduckgo.downloads.api.DOWNLOAD_SNACKBAR_LENGTH
+import com.duckduckgo.downloads.api.DownloadCommand
+import com.duckduckgo.downloads.api.DownloadConfirmationDialogListener
 import com.duckduckgo.downloads.api.DownloadStateListener
 import com.duckduckgo.downloads.api.DownloadsFileActions
 import com.duckduckgo.downloads.api.FileDownloader
-import com.duckduckgo.duckchat.impl.DuckChatInternal
+import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.databinding.BottomSheetDuckAiContextualBinding
 import com.duckduckgo.duckchat.impl.feature.AIChatDownloadFeature
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper.Companion.DUCK_CHAT_FEATURE_NAME
 import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewFragment.Companion.KEY_DUCK_AI_URL
-import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewFragment.Companion.REQUEST_CODE_CHOOSE_FILE
-import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewFragment.FileChooserRequestedParams
-import com.duckduckgo.duckchat.impl.ui.filechooser.FileChooserIntentBuilder
-import com.duckduckgo.duckchat.impl.ui.filechooser.capture.camera.CameraHardwareChecker
-import com.duckduckgo.duckchat.impl.ui.filechooser.capture.launcher.UploadFromExternalMediaAppLauncher
-import com.duckduckgo.duckchat.impl.ui.filechooser.capture.launcher.UploadFromExternalMediaAppLauncher.MediaCaptureResult.CouldNotCapturePermissionDenied
-import com.duckduckgo.duckchat.impl.ui.filechooser.capture.launcher.UploadFromExternalMediaAppLauncher.MediaCaptureResult.ErrorAccessingMediaApp
-import com.duckduckgo.duckchat.impl.ui.filechooser.capture.launcher.UploadFromExternalMediaAppLauncher.MediaCaptureResult.MediaCaptured
-import com.duckduckgo.duckchat.impl.ui.filechooser.capture.launcher.UploadFromExternalMediaAppLauncher.MediaCaptureResult.NoMediaCaptured
+import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewFragment.Companion.PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
-import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.subscriptions.api.SUBSCRIPTIONS_FEATURE_NAME
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.cancellable
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import logcat.logcat
 import org.json.JSONObject
+import java.io.File
 
 class DuckChatContextualBottomSheet(
     private val viewModelFactory: FragmentViewModelFactory,
@@ -88,13 +85,8 @@ class DuckChatContextualBottomSheet(
     private val fileDownloader: FileDownloader,
     private val downloadCallback: DownloadStateListener,
     private val downloadsFileActions: DownloadsFileActions,
-    private val duckChat: DuckChatInternal,
     private val aiChatDownloadFeature: AIChatDownloadFeature,
-    private val fileChooserIntentBuilder: FileChooserIntentBuilder,
-    private val cameraHardwareChecker: CameraHardwareChecker,
-    private val externalCameraLauncher: UploadFromExternalMediaAppLauncher,
-    private val globalActivityStarter: GlobalActivityStarter,
-) : BottomSheetDialogFragment() {
+) : BottomSheetDialogFragment(), DownloadConfirmationDialogListener {
 
     internal lateinit var simpleWebview: WebView
     internal lateinit var inputControls: View
@@ -103,7 +95,8 @@ class DuckChatContextualBottomSheet(
         ViewModelProvider(this, viewModelFactory)[DuckChatWebViewViewModel::class.java]
     }
 
-    private var pendingUploadTask: ValueCallback<Array<Uri>>? = null
+    private var pendingFileDownload: PendingFileDownload? = null
+    private val downloadMessagesJob = ConflatedJob()
 
     override fun getTheme(): Int {
         return R.style.DuckChatBottomSheetDialogTheme
@@ -162,21 +155,6 @@ class DuckChatContextualBottomSheet(
                     }
                     return false
                 }
-
-                override fun onShowFileChooser(
-                    webView: WebView,
-                    filePathCallback: ValueCallback<Array<Uri>>,
-                    fileChooserParams: FileChooserParams,
-                ): Boolean {
-                    return try {
-                        showFileChooser(filePathCallback, fileChooserParams)
-                        true
-                    } catch (e: Throwable) {
-                        // cancel the request using the documented way
-                        filePathCallback.onReceiveValue(null)
-                        throw e
-                    }
-                }
             }
 
             it.settings.apply {
@@ -196,7 +174,7 @@ class DuckChatContextualBottomSheet(
             it.setDownloadListener { url, _, contentDisposition, mimeType, _ ->
                 appCoroutineScope.launch(dispatcherProvider.io()) {
                     if (aiChatDownloadFeature.self().isEnabled()) {
-                        // requestFileDownload(url, contentDisposition, mimeType)
+                        requestFileDownload(url, contentDisposition, mimeType)
                     }
                 }
             }
@@ -245,24 +223,8 @@ class DuckChatContextualBottomSheet(
             simpleWebview.loadUrl(it)
         }
 
-        externalCameraLauncher.registerForResult(this) {
-            when (it) {
-                is MediaCaptured -> pendingUploadTask?.onReceiveValue(arrayOf(Uri.fromFile(it.file)))
-                is CouldNotCapturePermissionDenied -> {
-                    pendingUploadTask?.onReceiveValue(null)
-                    externalCameraLauncher.showPermissionRationaleDialog(requireActivity(), it.inputAction)
-                }
-
-                is NoMediaCaptured -> pendingUploadTask?.onReceiveValue(null)
-                is ErrorAccessingMediaApp -> {
-                    pendingUploadTask?.onReceiveValue(null)
-                    Snackbar.make(simpleWebview, it.messageId, BaseTransientBottomBar.LENGTH_SHORT).show()
-                }
-            }
-            pendingUploadTask = null
-        }
-
         observeViewModel()
+        launchDownloadMessagesJob()
     }
 
     private fun observeViewModel() {
@@ -281,127 +243,103 @@ class DuckChatContextualBottomSheet(
             }.launchIn(lifecycleScope)
     }
 
-    fun showFileChooser(
-        filePathCallback: ValueCallback<Array<Uri>>,
-        fileChooserParams: FileChooserParams,
+    private fun requestFileDownload(
+        url: String,
+        contentDisposition: String?,
+        mimeType: String,
     ) {
-        val mimeTypes = convertAcceptTypesToMimeTypes(fileChooserParams.acceptTypes)
-        val fileChooserRequestedParams = FileChooserRequestedParams(fileChooserParams.mode, mimeTypes)
-        val cameraHardwareAvailable = cameraHardwareChecker.hasCameraHardware()
+        pendingFileDownload = PendingFileDownload(
+            url = url,
+            contentDisposition = contentDisposition,
+            mimeType = mimeType,
+            subfolder = Environment.DIRECTORY_DOWNLOADS,
+            fileName = "duck.ai_${System.currentTimeMillis()}",
+        )
 
-        when {
-            fileChooserParams.isCaptureEnabled -> {
-                when {
-                    acceptsOnly("image/", fileChooserParams.acceptTypes) && cameraHardwareAvailable ->
-                        launchCameraCapture(filePathCallback, fileChooserRequestedParams, MediaStore.ACTION_IMAGE_CAPTURE)
-
-                    acceptsOnly("video/", fileChooserParams.acceptTypes) && cameraHardwareAvailable ->
-                        launchCameraCapture(filePathCallback, fileChooserRequestedParams, MediaStore.ACTION_VIDEO_CAPTURE)
-
-                    acceptsOnly("audio/", fileChooserParams.acceptTypes) ->
-                        launchCameraCapture(filePathCallback, fileChooserRequestedParams, MediaStore.Audio.Media.RECORD_SOUND_ACTION)
-
-                    else ->
-                        launchFilePicker(filePathCallback, fileChooserRequestedParams)
-                }
-            }
-
-            fileChooserParams.acceptTypes.any { it.startsWith("image/") && cameraHardwareAvailable } ->
-                launchImageOrCameraChooser(filePathCallback, fileChooserRequestedParams, MediaStore.ACTION_IMAGE_CAPTURE)
-
-            fileChooserParams.acceptTypes.any { it.startsWith("video/") && cameraHardwareAvailable } ->
-                launchImageOrCameraChooser(filePathCallback, fileChooserRequestedParams, MediaStore.ACTION_VIDEO_CAPTURE)
-
-            else ->
-                launchFilePicker(filePathCallback, fileChooserRequestedParams)
+        if (hasWriteStoragePermission()) {
+            downloadFile()
+        } else {
+            requestWriteStoragePermission()
         }
     }
 
-    private fun acceptsOnly(
-        type: String,
-        acceptTypes: Array<String>,
-    ): Boolean {
-        return acceptTypes.filter { it.startsWith(type) }.size == acceptTypes.size
+    private fun minSdk30(): Boolean {
+        return appBuildConfig.sdkInt >= 30
     }
 
-    private fun launchImageOrCameraChooser(
-        filePathCallback: ValueCallback<Array<Uri>>,
-        fileChooserParams: FileChooserRequestedParams,
-        inputAction: String,
-    ) {
-        val cameraString = getString(R.string.imageCaptureCameraGalleryDisambiguationCameraOption)
-        val cameraIcon = com.duckduckgo.mobile.android.R.drawable.ic_camera_24
-
-        val galleryString = getString(R.string.imageCaptureCameraGalleryDisambiguationGalleryOption)
-        val galleryIcon = com.duckduckgo.mobile.android.R.drawable.ic_image_24
-
-        ActionBottomSheetDialog.Builder(requireContext())
-            .setTitle(getString(R.string.imageCaptureCameraGalleryDisambiguationTitle))
-            .setPrimaryItem(galleryString, galleryIcon)
-            .setSecondaryItem(cameraString, cameraIcon)
-            .addEventListener(
-                object : ActionBottomSheetDialog.EventListener() {
-                    override fun onPrimaryItemClicked() {
-                        launchFilePicker(filePathCallback, fileChooserParams)
-                    }
-
-                    override fun onSecondaryItemClicked() {
-                        launchCameraCapture(filePathCallback, fileChooserParams, inputAction)
-                    }
-
-                    override fun onBottomSheetDismissed() {
-                        filePathCallback.onReceiveValue(null)
-                        pendingUploadTask = null
-                    }
-                },
-            )
-            .show()
+    @Suppress("NewApi")
+    private fun hasWriteStoragePermission(): Boolean {
+        return minSdk30() ||
+            ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
     }
 
-    private fun convertAcceptTypesToMimeTypes(acceptTypes: Array<String>): List<String> {
-        val mimeTypeMap = MimeTypeMap.getSingleton()
-        val mimeTypes = mutableSetOf<String>()
-        acceptTypes.forEach { type ->
-            // Attempt to convert any identified file extensions into corresponding MIME types.
-            val fileExtension = MimeTypeMap.getFileExtensionFromUrl(type)
-            if (fileExtension.isNotEmpty()) {
-                mimeTypeMap.getMimeTypeFromExtension(type.substring(1))?.let {
-                    mimeTypes.add(it)
-                }
-            } else {
-                mimeTypes.add(type)
+    private fun requestWriteStoragePermission() {
+        requestPermissions(arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE)
+    }
+
+    @AnyThread
+    private fun downloadFile() {
+        val pendingDownload = pendingFileDownload ?: return
+
+        pendingFileDownload = null
+
+        continueDownload(pendingDownload)
+    }
+
+    override fun continueDownload(pendingFileDownload: PendingFileDownload) {
+        fileDownloader.enqueueDownload(pendingFileDownload)
+    }
+
+    override fun cancelDownload() {
+        // NOOP
+    }
+
+    private fun launchDownloadMessagesJob() {
+        downloadMessagesJob += lifecycleScope.launch {
+            downloadCallback.commands().cancellable().collect {
+                processFileDownloadedCommand(it)
             }
         }
-        return mimeTypes.toList()
     }
 
-    private fun launchCameraCapture(
-        filePathCallback: ValueCallback<Array<Uri>>,
-        fileChooserParams: FileChooserRequestedParams,
-        inputAction: String,
-    ) {
-        if (Intent(inputAction).resolveActivity(requireActivity().packageManager) == null) {
-            launchFilePicker(filePathCallback, fileChooserParams)
-            return
+    private fun processFileDownloadedCommand(command: DownloadCommand) {
+        when (command) {
+            is DownloadCommand.ShowDownloadStartedMessage -> downloadStarted(command)
+            is DownloadCommand.ShowDownloadFailedMessage -> downloadFailed(command)
+            is DownloadCommand.ShowDownloadSuccessMessage -> downloadSucceeded(command)
         }
-
-        pendingUploadTask = filePathCallback
-        externalCameraLauncher.launch(inputAction)
     }
 
-    private fun launchFilePicker(
-        filePathCallback: ValueCallback<Array<Uri>>,
-        fileChooserParams: FileChooserRequestedParams,
-    ) {
-        pendingUploadTask = filePathCallback
-        val canChooseMultipleFiles = fileChooserParams.filePickingMode == FileChooserParams.MODE_OPEN_MULTIPLE
-        val intent = fileChooserIntentBuilder.intent(fileChooserParams.acceptMimeTypes.toTypedArray(), canChooseMultipleFiles)
-        startActivityForResult(intent, REQUEST_CODE_CHOOSE_FILE)
+    @SuppressLint("WrongConstant")
+    private fun downloadStarted(command: DownloadCommand.ShowDownloadStartedMessage) {
+        simpleWebview.makeSnackbarWithNoBottomInset(getString(command.messageId, command.fileName), DOWNLOAD_SNACKBAR_LENGTH)?.show()
+    }
+
+    private fun downloadFailed(command: DownloadCommand.ShowDownloadFailedMessage) {
+        val downloadFailedSnackbar = simpleWebview.makeSnackbarWithNoBottomInset(getString(command.messageId), Snackbar.LENGTH_LONG)
+        simpleWebview.postDelayed({ downloadFailedSnackbar.show() }, DOWNLOAD_SNACKBAR_DELAY)
+    }
+
+    private fun downloadSucceeded(command: DownloadCommand.ShowDownloadSuccessMessage) {
+        val downloadSucceededSnackbar = simpleWebview.makeSnackbarWithNoBottomInset(
+            getString(command.messageId, command.fileName),
+            Snackbar.LENGTH_LONG,
+        )
+            .apply {
+                this.setAction(R.string.duck_chat_download_finished_action_name) {
+                    val result = downloadsFileActions.openFile(context, File(command.filePath))
+                    if (!result) {
+                        view.makeSnackbarWithNoBottomInset(getString(R.string.duck_chat_cannot_open_file_error_message), Snackbar.LENGTH_LONG).show()
+                    }
+                }
+            }
+        simpleWebview.postDelayed({ downloadSucceededSnackbar.show() }, DOWNLOAD_SNACKBAR_DELAY)
     }
 
     companion object {
         const val TAG = "DuckChatBottomSheet"
         private const val CUSTOM_UA =
             "Mozilla/5.0 (Linux; Android 16) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/124.0.0.0 Mobile DuckDuckGo/5 Safari/537.36"
+        private const val PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE = 200
     }
 }

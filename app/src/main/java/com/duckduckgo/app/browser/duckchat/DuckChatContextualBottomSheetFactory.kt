@@ -25,17 +25,12 @@ import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.downloads.api.DownloadStateListener
 import com.duckduckgo.downloads.api.DownloadsFileActions
 import com.duckduckgo.downloads.api.FileDownloader
-import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.feature.AIChatDownloadFeature
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
 import com.duckduckgo.duckchat.impl.ui.DuckChatContextualBottomSheet
 import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewClient
 import com.duckduckgo.duckchat.impl.ui.SubscriptionsHandler
-import com.duckduckgo.duckchat.impl.ui.filechooser.FileChooserIntentBuilder
-import com.duckduckgo.duckchat.impl.ui.filechooser.capture.camera.CameraHardwareChecker
-import com.duckduckgo.duckchat.impl.ui.filechooser.capture.launcher.UploadFromExternalMediaAppLauncher
 import com.duckduckgo.js.messaging.api.JsMessaging
-import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
@@ -89,22 +84,8 @@ class DuckChatContextualBottomSheetFactoryImpl @Inject constructor() : DuckChatC
     lateinit var downloadsFileActions: DownloadsFileActions
 
     @Inject
-    lateinit var duckChatInternal: DuckChatInternal
-
-    @Inject
     lateinit var aiChatDownloadFeature: AIChatDownloadFeature
 
-    @Inject
-    lateinit var fileChooserIntentBuilder: FileChooserIntentBuilder
-
-    @Inject
-    lateinit var cameraHardwareChecker: CameraHardwareChecker
-
-    @Inject
-    lateinit var externalCameraLauncher: UploadFromExternalMediaAppLauncher
-
-    @Inject
-    lateinit var globalActivityStarter: GlobalActivityStarter
     override fun create(): DuckChatContextualBottomSheet {
         return DuckChatContextualBottomSheet(
             viewModelFactory = viewModelFactory,
@@ -119,12 +100,7 @@ class DuckChatContextualBottomSheetFactoryImpl @Inject constructor() : DuckChatC
             fileDownloader = fileDownloader,
             downloadCallback = downloadCallback,
             downloadsFileActions = downloadsFileActions,
-            duckChat = duckChatInternal,
             aiChatDownloadFeature = aiChatDownloadFeature,
-            fileChooserIntentBuilder = fileChooserIntentBuilder,
-            cameraHardwareChecker = cameraHardwareChecker,
-            externalCameraLauncher = externalCameraLauncher,
-            globalActivityStarter = globalActivityStarter,
         )
     }
 }
