@@ -16,72 +16,53 @@
 
 package com.duckduckgo.app.global.view
 
-import android.content.Context
-import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.fire.ManualDataClearing
-import com.duckduckgo.app.firebutton.FireButtonStore
-import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
-import com.duckduckgo.app.settings.db.SettingsDataStore
-import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
-import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
+/**
+ * Provider for creating Fire dialog instances.
+ * Returns the appropriate dialog variant based on feature flag (Simple or Granular).
+ */
 interface FireDialogProvider {
-    fun createFireDialog(context: Context): FireDialog
+    /**
+     * Creates a Fire dialog instance.
+     * @param onShowListener Optional callback invoked when dialog is shown
+     * @param onCancelListener Optional callback invoked when dialog is canceled
+     * @param onClearStartedListener Optional callback invoked when data clearing starts
+     * @return Instance of FireDialog (either Simple or Granular variant)
+     */
+    suspend fun createFireDialog(
+        onShowListener: (() -> Unit)? = null,
+        onCancelListener: (() -> Unit)? = null,
+        onClearStartedListener: (() -> Unit)? = null
+    ): FireDialog
 }
 
 @ContributesBinding(scope = AppScope::class)
 @SingleInstanceIn(scope = AppScope::class)
-class FireDialogLauncherImpl @Inject constructor() : FireDialogProvider {
+class FireDialogProviderImpl @Inject constructor(
+    private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
+    private val dispatcherProvider: DispatcherProvider,
+) : FireDialogProvider {
 
-    @Inject
-    lateinit var clearDataAction: ClearDataAction
+    override suspend fun createFireDialog(
+        onShowListener: (() -> Unit)?,
+        onCancelListener: (() -> Unit)?,
+        onClearStartedListener: (() -> Unit)?
+    ): FireDialog {
+        val isGranularMode = withContext(dispatcherProvider.io()) {
+            androidBrowserConfigFeature.moreGranularDataClearingOptions().isEnabled()
+        }
 
-    @Inject
-    lateinit var dataClearing: ManualDataClearing
-
-    @Inject
-    lateinit var androidBrowserConfigFeature: AndroidBrowserConfigFeature
-
-    @Inject
-    lateinit var pixel: Pixel
-
-    @Inject
-    lateinit var settingsDataStore: SettingsDataStore
-
-    @Inject
-    lateinit var userEventsStore: UserEventsStore
-
-    @AppCoroutineScope
-    @Inject
-    lateinit var appCoroutineScope: CoroutineScope
-
-    @Inject
-    lateinit var dispatcherProvider: DispatcherProvider
-
-    @Inject
-    lateinit var fireButtonStore: FireButtonStore
-
-    @Inject
-    lateinit var appBuildConfig: AppBuildConfig
-
-    override fun createFireDialog(context: Context): FireDialog = FireDialog(
-        context = context,
-        clearDataAction = clearDataAction,
-        dataClearing = dataClearing,
-        androidBrowserConfigFeature = androidBrowserConfigFeature,
-        pixel = pixel,
-        settingsDataStore = settingsDataStore,
-        userEventsStore = userEventsStore,
-        appCoroutineScope = appCoroutineScope,
-        dispatcherProvider = dispatcherProvider,
-        fireButtonStore = fireButtonStore,
-        appBuildConfig = appBuildConfig,
-    )
+        return if (isGranularMode) {
+            GranularFireDialog.newInstance()
+        } else {
+            LegacyFireDialog.newInstance()
+        }
+    }
 }

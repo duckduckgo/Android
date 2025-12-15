@@ -19,8 +19,7 @@ package com.duckduckgo.app.global.view
 import androidx.fragment.app.FragmentManager
 
 /**
- * Common interface for Fire dialog variants (Simple and Granular).
- * Both implementations are BottomSheetDialogFragments that allow users to clear browsing data.
+ * Common interface for Fire dialog variants (Legacy and Granular).
  */
 interface FireDialog {
     /**
@@ -28,23 +27,5 @@ interface FireDialog {
      * @param fragmentManager The FragmentManager to use for showing the dialog
      * @param tag Optional tag for the fragment transaction
      */
-    fun show(fragmentManager: FragmentManager, tag: String?)
-
-    /**
-     * Sets a listener to be called when the dialog is shown.
-     * @param listener Callback invoked when dialog becomes visible
-     */
-    fun setOnShowListener(listener: () -> Unit)
-
-    /**
-     * Sets a listener to be called when the dialog is canceled/dismissed.
-     * @param listener Callback invoked when dialog is dismissed without clearing data
-     */
-    fun setOnCancelListener(listener: () -> Unit)
-
-    /**
-     * Sets a listener to be called when data clearing operation starts.
-     * @param listener Callback invoked when user confirms data clearing
-     */
-    fun setOnClearStartedListener(listener: () -> Unit)
+    fun show(fragmentManager: FragmentManager, tag: String? = "fire_dialog")
 }

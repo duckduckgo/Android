@@ -51,7 +51,6 @@ import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.setAndPropagateUpFitsSystemWindows
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.mobile.android.R as CommonR
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -66,13 +65,8 @@ import javax.inject.Inject
 private const val ANIMATION_MAX_SPEED = 1.4f
 private const val ANIMATION_SPEED_INCREMENT = 0.15f
 
-/**
- * Simple Fire dialog that clears all data without granular options.
- * This is the legacy behavior shown when moreGranularDataClearingOptions feature flag is disabled.
- */
 @InjectWith(FragmentScope::class)
-class SimpleFireDialog : BottomSheetDialogFragment(), FireDialog {
-
+class LegacyFireDialog : BottomSheetDialogFragment(), FireDialog {
     @AppCoroutineScope
     @Inject
     lateinit var appCoroutineScope: CoroutineScope
@@ -177,18 +171,6 @@ class SimpleFireDialog : BottomSheetDialogFragment(), FireDialog {
         super.show(fragmentManager, tag)
     }
 
-    override fun setOnShowListener(listener: () -> Unit) {
-        onShowListener = listener
-    }
-
-    override fun setOnCancelListener(listener: () -> Unit) {
-        onCancelListener = listener
-    }
-
-    override fun setOnClearStartedListener(listener: () -> Unit) {
-        onClearStartedListener = listener
-    }
-
     private fun setupLayout() {
         binding.apply {
             clearAllOption.setOnClickListener {
@@ -232,7 +214,7 @@ class SimpleFireDialog : BottomSheetDialogFragment(), FireDialog {
         binding.fireAnimationView.apply {
             setAnimation(settingsDataStore.selectedFireAnimation.resId)
             setAndPropagateUpFitsSystemWindows(false)
-            setRenderMode(RenderMode.SOFTWARE)
+            renderMode = RenderMode.SOFTWARE
             enableMergePathsForKitKatAndAbove(true)
         }
     }
@@ -310,8 +292,8 @@ class SimpleFireDialog : BottomSheetDialogFragment(), FireDialog {
     }
 
     companion object {
-        fun newInstance(): SimpleFireDialog {
-            return SimpleFireDialog()
+        fun newInstance(): LegacyFireDialog {
+            return LegacyFireDialog()
         }
     }
 }
