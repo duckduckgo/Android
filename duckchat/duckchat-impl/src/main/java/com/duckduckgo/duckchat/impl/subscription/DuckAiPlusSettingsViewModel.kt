@@ -64,6 +64,7 @@ class DuckAiPlusSettingsViewModel @Inject constructor(
     data class ViewState(
         val settingState: SettingState = Hidden,
         val isDuckAiEnabled: Boolean = true,
+        val isDuckAiPaidSettingsFeatureEnabled: Boolean = false,
     ) {
 
         sealed class SettingState {
@@ -102,6 +103,7 @@ class DuckAiPlusSettingsViewModel @Inject constructor(
                         it.copy(
                             settingState = state,
                             isDuckAiEnabled = isDuckAiEnabled,
+                            isDuckAiPaidSettingsFeatureEnabled = true,
                         )
                     }
                 }.launchIn(viewModelScope)
