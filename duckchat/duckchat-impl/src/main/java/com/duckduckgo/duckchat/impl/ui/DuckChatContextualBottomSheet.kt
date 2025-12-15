@@ -97,6 +97,7 @@ class DuckChatContextualBottomSheet(
 
     private var pendingFileDownload: PendingFileDownload? = null
     private val downloadMessagesJob = ConflatedJob()
+    private var isExpanded = false
 
     override fun getTheme(): Int {
         return R.style.DuckChatBottomSheetDialogTheme
@@ -116,7 +117,39 @@ class DuckChatContextualBottomSheet(
     }
 
     private fun configureViews(binding: BottomSheetDuckAiContextualBinding) {
-        (dialog as BottomSheetDialog).behavior.state = BottomSheetBehavior.STATE_COLLAPSED
+        val bottomSheetDialog = dialog as? BottomSheetDialog
+        bottomSheetDialog?.let {
+            it.behavior.state = BottomSheetBehavior.STATE_COLLAPSED
+            // Set up callback to prevent collapsing after expansion
+            it.behavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
+                override fun onStateChanged(bottomSheet: View, newState: Int) {
+                    // Prevent collapsing after expansion - only allow expanded or hidden/dismissed states
+                    if (isExpanded && newState == BottomSheetBehavior.STATE_COLLAPSED) {
+                        // If already expanded, prevent collapsing - force back to expanded
+                        // Use post to avoid infinite loop
+                        bottomSheet.post {
+                            it.behavior.state = BottomSheetBehavior.STATE_EXPANDED
+                        }
+                    }
+                    if (newState == BottomSheetBehavior.STATE_EXPANDED) {
+                        isExpanded = true
+                        // Set skipCollapsed to prevent dragging back to collapsed state
+                        it.behavior.skipCollapsed = true
+                        it.behavior.isDraggable = true
+                    }
+                }
+
+                override fun onSlide(bottomSheet: View, slideOffset: Float) {
+                    // Prevent sliding to collapsed state if already expanded
+                    if (isExpanded && slideOffset < 0.5f) {
+                        // If trying to collapse, keep it expanded
+                        bottomSheet.post {
+                            it.behavior.state = BottomSheetBehavior.STATE_EXPANDED
+                        }
+                    }
+                }
+            })
+        }
         configureDialogButtons(binding)
     }
 
@@ -127,14 +160,20 @@ class DuckChatContextualBottomSheet(
         binding.actionSend.setOnClickListener {
             expandSheet()
         }
-        binding.inputField.onFocusChangeListener
+        binding.inputField.onFocusChangeListener = View.OnFocusChangeListener { _, hasFocus ->
+            if (hasFocus) {
+                expandSheet()
+            }
+        }
     }
 
     private fun expandSheet() {
         inputControls.gone()
         promptsList.gone()
-        (dialog as BottomSheetDialog).behavior.state = BottomSheetBehavior.STATE_EXPANDED
-        (dialog as BottomSheetDialog).behavior.isDraggable = true
+        val bottomSheetDialog = dialog as? BottomSheetDialog
+        bottomSheetDialog?.let {
+            it.behavior.state = BottomSheetBehavior.STATE_EXPANDED
+        }
     }
 
     override fun onViewCreated(

@@ -202,7 +202,8 @@
         <WebView
             android:id="@+id/simpleWebview"
             android:layout_width="match_parent"
-            android:layout_height="800dp" />
+            android:layout_height="800dp"
+            android:layout_marginBottom="@dimen/keyline_4"/>
 
     </FrameLayout>
 
