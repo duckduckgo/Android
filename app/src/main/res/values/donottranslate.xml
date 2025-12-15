@@ -89,8 +89,8 @@
         <item quantity="other" instruction="Placeholder is the number of tabs">Close all %d tabs</item>
     </plurals>
     <string name="fireDialogOptionDataDescriptionNoHistory">May sign you out of accounts.</string>
+    <string name="fireDialogOptionDataDescriptionNoSites">None</string>
     <plurals name="fireDialogOptionDataDescription" tools:ignore="ImpliedQuantity">
-        <item quantity="zero">None</item>
         <item quantity="one">Delete from 1 site. May sign you out of accounts.</item>
         <item quantity="other" instruction="Placeholder is the number of tabs">Delete from %d sites. May sign you out of accounts.</item>
     </plurals>
