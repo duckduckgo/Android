@@ -18,7 +18,6 @@ package com.duckduckgo.duckchat.impl.ui
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.app.Dialog
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.os.Environment
@@ -90,6 +89,7 @@ class DuckChatContextualBottomSheet(
 
     internal lateinit var simpleWebview: WebView
     internal lateinit var inputControls: View
+    internal lateinit var promptsList: View
 
     private val viewModel: DuckChatWebViewViewModel by lazy {
         ViewModelProvider(this, viewModelFactory)[DuckChatWebViewViewModel::class.java]
@@ -102,31 +102,39 @@ class DuckChatContextualBottomSheet(
         return R.style.DuckChatBottomSheetDialogTheme
     }
 
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val dialog = super.onCreateDialog(savedInstanceState) as BottomSheetDialog
-        // Ensure BottomSheet is draggable so the drag handle appears
-        dialog.behavior.isDraggable = true
-        dialog.behavior.state = BottomSheetBehavior.STATE_COLLAPSED
-        return dialog
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
         val binding = BottomSheetDuckAiContextualBinding.inflate(inflater, container, false)
-        simpleWebview = binding.simpleWebview // Initialize simpleWebview from the binding
-        inputControls = binding.inputModeWidgetCard // Initialize simpleWebview from the binding
-        configureDialogButtons(binding)
+        simpleWebview = binding.simpleWebview
+        inputControls = binding.inputModeWidgetCard
+        promptsList = binding.contextualModePrompts
+        configureViews(binding)
         return binding.root
     }
 
+    private fun configureViews(binding: BottomSheetDuckAiContextualBinding) {
+        (dialog as BottomSheetDialog).behavior.state = BottomSheetBehavior.STATE_COLLAPSED
+        configureDialogButtons(binding)
+    }
+
     private fun configureDialogButtons(binding: BottomSheetDuckAiContextualBinding) {
-        binding.actionSend.setOnClickListener {
-            inputControls.gone()
-            (dialog as BottomSheetDialog).behavior.state = BottomSheetBehavior.STATE_EXPANDED
+        binding.contextualClose.setOnClickListener {
+            dismiss()
         }
+        binding.actionSend.setOnClickListener {
+            expandSheet()
+        }
+        binding.inputField.onFocusChangeListener
+    }
+
+    private fun expandSheet() {
+        inputControls.gone()
+        promptsList.gone()
+        (dialog as BottomSheetDialog).behavior.state = BottomSheetBehavior.STATE_EXPANDED
+        (dialog as BottomSheetDialog).behavior.isDraggable = true
     }
 
     override fun onViewCreated(

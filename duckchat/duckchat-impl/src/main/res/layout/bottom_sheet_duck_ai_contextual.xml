@@ -28,6 +28,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:paddingTop="@dimen/keyline_4"
+        android:layout_marginBottom="@dimen/keyline_4"
         android:paddingHorizontal="@dimen/keyline_2">
 
         <View
@@ -85,7 +86,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:layout_marginTop="@dimen/keyline_4"
         android:paddingHorizontal="@dimen/keyline_4"
         android:paddingTop="@dimen/keyline_4"
         android:paddingBottom="@dimen/keyline_3">
@@ -107,7 +107,7 @@
         android:id="@+id/inputModeWidgetCard"
         style="@style/Widget.DuckDuckGo.OmnibarCardView"
         android:layout_width="match_parent"
-        android:layout_height="150dp"
+        android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/keyline_4"
         android:layout_marginTop="@dimen/keyline_2"
         android:layout_marginBottom="@dimen/keyline_4"
@@ -150,14 +150,15 @@
 
                 <ImageView
                     android:id="@+id/inputFieldVoiceInputButton"
-                    android:layout_width="@dimen/toolbarIcon"
-                    android:layout_height="@dimen/toolbarIcon"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
                     android:layout_gravity="top"
                     android:background="@drawable/selectable_item_rounded_corner_background"
                     android:gravity="center"
                     android:importantForAccessibility="no"
                     android:scaleType="center"
                     android:visibility="gone"
+                    android:layout_margin="@dimen/keyline_1"
                     app:srcCompat="@drawable/ic_microphone_24"
                     tools:visibility="visible" />
 
@@ -186,6 +187,7 @@
                 android:importantForAccessibility="no"
                 android:scaleType="centerInside"
                 android:src="@drawable/ic_arrow_up_24"
+                android:layout_margin="@dimen/keyline_1"
                 app:tint="?attr/daxColorWhite" />
 
         </LinearLayout>
