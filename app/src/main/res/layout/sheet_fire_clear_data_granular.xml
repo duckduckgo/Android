@@ -28,22 +28,27 @@
         android:visibility="gone"
         app:lottie_loop="false" />
 
-    <LinearLayout
+    <androidx.core.widget.NestedScrollView
         android:id="@+id/fireDialogRootView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/rounded_top_corners_bottom_sheet_background"
-        android:orientation="vertical">
+        android:fillViewport="true">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="vertical"
-            android:layout_marginTop="@dimen/keyline_4"
-            android:paddingStart="@dimen/keyline_5"
-            android:paddingEnd="@dimen/keyline_5"
-            android:paddingBottom="@dimen/keyline_5">
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:layout_marginTop="@dimen/keyline_4"
+                android:paddingStart="@dimen/keyline_5"
+                android:paddingEnd="@dimen/keyline_5"
+                android:paddingBottom="@dimen/keyline_5">
 
             <ImageView
                 android:id="@+id/fireIcon"
@@ -154,7 +159,9 @@
                 app:daxButtonSize="large"
                 android:text="@string/fireCancel" />
 
+            </LinearLayout>
+
         </LinearLayout>
 
-    </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
 </FrameLayout>
