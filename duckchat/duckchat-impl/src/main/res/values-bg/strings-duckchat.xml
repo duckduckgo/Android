@@ -90,6 +90,4 @@
     <string name="duckAiHideAiGeneratedImagesDescription">Филтрира в резултатите от търсенето изображенията, генерирани от изкуствен интелект</string>
 
     <!-- Duck AI Tabs Mode Toggle -->
-    <string name="duckAiFullScreenModeTitle">Режим на раздели на Duck.ai</string>
-    <string name="duckAiFullScreenModeDescription">Показване на новите чатове на Duck.ai като раздели в браузъра</string>
 </resources>

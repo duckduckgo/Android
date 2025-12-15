@@ -90,6 +90,4 @@
     <string name="duckAiHideAiGeneratedImagesDescription">Vaizdų paieškos rezultatuose nepalieka Di sukurtų vaizdų</string>
 
     <!-- Duck AI Tabs Mode Toggle -->
-    <string name="duckAiFullScreenModeTitle">„Duck.ai“ skirtukų režimas</string>
-    <string name="duckAiFullScreenModeDescription">Rodyti naujus „Duck.ai“ pokalbius kaip skirtukus naršyklėje</string>
 </resources>

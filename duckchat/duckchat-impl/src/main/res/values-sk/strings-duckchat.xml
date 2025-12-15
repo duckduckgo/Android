@@ -90,6 +90,4 @@
     <string name="duckAiHideAiGeneratedImagesDescription">Odstraňuje obrázky vytvorené umelou inteligenciou z výsledkov vyhľadávania obrázkov</string>
 
     <!-- Duck AI Tabs Mode Toggle -->
-    <string name="duckAiFullScreenModeTitle">Režim kariet Duck.ai</string>
-    <string name="duckAiFullScreenModeDescription">Zobraziť nové Duck.ai čety ako karty v prehliadači</string>
 </resources>

@@ -90,6 +90,4 @@
     <string name="duckAiHideAiGeneratedImagesDescription">Filtruje obrazy generowane przez AI z wyników wyszukiwania obrazów</string>
 
     <!-- Duck AI Tabs Mode Toggle -->
-    <string name="duckAiFullScreenModeTitle">Tryb kart Duck.ai</string>
-    <string name="duckAiFullScreenModeDescription">Pokazuj nowe czaty Duck.ai jako karty w przeglądarce</string>
 </resources>

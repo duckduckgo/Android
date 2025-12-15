@@ -76,8 +76,7 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
             duckChat.observeCosmeticInputScreenUserSettingEnabled(),
             duckChat.observeInputScreenUserSettingEnabled(),
             flowOf(duckChatFeature.showHideAiGeneratedImages().isEnabled()).flowOn(dispatcherProvider.io()),
-            flowOf(duckChatFeature.fullscreenModeToggle().isEnabled()).flowOn(dispatcherProvider.io()),
-        ) { isDuckChatUserEnabled, cosmeticInputScreenEnabled, isInputScreenEnabled, showHideAiGeneratedImagesOption, fullscreenModeToggle ->
+        ) { isDuckChatUserEnabled, cosmeticInputScreenEnabled, isInputScreenEnabled, showHideAiGeneratedImagesOption ->
             ViewState(
                 isDuckChatUserEnabled = isDuckChatUserEnabled,
                 isInputScreenEnabled = cosmeticInputScreenEnabled ?: isInputScreenEnabled,
@@ -85,7 +84,6 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
                 shouldShowInputScreenToggle = isDuckChatUserEnabled && duckChat.isInputScreenFeatureAvailable(),
                 isSearchSectionVisible = isSearchSectionVisible(duckChatActivityParams),
                 isHideGeneratedImagesOptionVisible = showHideAiGeneratedImagesOption,
-                shouldShowFullScreenModeToggle = duckChat.isDuckChatFullScreenModeFeatureAvailable() && fullscreenModeToggle,
                 isFullScreenModeEnabled = duckChat.isDuckChatFullScreenModeEnabled(),
             )
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ViewState())
@@ -103,17 +101,6 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
         data object OpenShortcutSettings : Command()
 
         data object LaunchFeedback : Command()
-    }
-
-    fun onDuckChatUserEnabledToggled(checked: Boolean) {
-        viewModelScope.launch {
-            if (checked) {
-                pixel.fire(DuckChatPixelName.DUCK_CHAT_USER_ENABLED)
-            } else {
-                pixel.fire(DuckChatPixelName.DUCK_CHAT_USER_DISABLED)
-            }
-            duckChat.setEnableDuckChatUserSetting(checked)
-        }
     }
 
     fun onShowDuckChatInMenuToggled(checked: Boolean) {

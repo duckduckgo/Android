@@ -90,6 +90,4 @@
     <string name="duckAiHideAiGeneratedImagesDescription">Filtrerer ut AI-genererte bilder fra bildesøkresultater</string>
 
     <!-- Duck AI Tabs Mode Toggle -->
-    <string name="duckAiFullScreenModeTitle">Fanemodus for Duck.ai</string>
-    <string name="duckAiFullScreenModeDescription">Vis nye Duck.ai-chatter som faner i nettleseren</string>
 </resources>
