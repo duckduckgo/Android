@@ -18,6 +18,7 @@ package com.duckduckgo.duckchat.impl.ui
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.Dialog
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.os.Environment
@@ -53,7 +54,6 @@ import com.duckduckgo.duckchat.impl.feature.AIChatDownloadFeature
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper.Companion.DUCK_CHAT_FEATURE_NAME
 import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewFragment.Companion.KEY_DUCK_AI_URL
-import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewFragment.Companion.PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
@@ -102,6 +102,14 @@ class DuckChatContextualBottomSheet(
         return R.style.DuckChatBottomSheetDialogTheme
     }
 
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        val dialog = super.onCreateDialog(savedInstanceState) as BottomSheetDialog
+        // Ensure BottomSheet is draggable so the drag handle appears
+        dialog.behavior.isDraggable = true
+        dialog.behavior.state = BottomSheetBehavior.STATE_COLLAPSED
+        return dialog
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -110,13 +118,8 @@ class DuckChatContextualBottomSheet(
         val binding = BottomSheetDuckAiContextualBinding.inflate(inflater, container, false)
         simpleWebview = binding.simpleWebview // Initialize simpleWebview from the binding
         inputControls = binding.inputModeWidgetCard // Initialize simpleWebview from the binding
-        configureViews(binding)
-        return binding.root
-    }
-
-    private fun configureViews(binding: BottomSheetDuckAiContextualBinding) {
-        (dialog as BottomSheetDialog).behavior.state = BottomSheetBehavior.STATE_COLLAPSED
         configureDialogButtons(binding)
+        return binding.root
     }
 
     private fun configureDialogButtons(binding: BottomSheetDuckAiContextualBinding) {
