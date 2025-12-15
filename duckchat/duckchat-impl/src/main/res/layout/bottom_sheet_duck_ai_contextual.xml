@@ -101,30 +101,6 @@
             android:drawablePadding="@dimen/keyline_2"
             android:text="@string/duckAIContextualPromptSummarize"/>
 
-        <com.duckduckgo.common.ui.view.text.DaxTextView
-            android:id="@+id/contextualPromptExplain"
-            android:layout_marginTop="@dimen/keyline_2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="@dimen/keyline_2"
-            app:typography="body2_bold"
-            android:background="@drawable/duck_ai_prompt_background"
-            android:drawableStart="@drawable/ic_arrow_down_right_16"
-            android:drawablePadding="@dimen/keyline_2"
-            android:text="@string/duckAIContextualPromptExplain"/>
-
-        <com.duckduckgo.common.ui.view.text.DaxTextView
-            android:id="@+id/contextualPromptSuggest"
-            android:layout_marginTop="@dimen/keyline_2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="@dimen/keyline_2"
-            app:typography="body2_bold"
-            android:background="@drawable/duck_ai_prompt_background"
-            android:drawableStart="@drawable/ic_arrow_down_right_16"
-            android:drawablePadding="@dimen/keyline_2"
-            android:text="@string/duckAIContextualPromptSuggest"/>
-
     </LinearLayout>
 
     <com.google.android.material.card.MaterialCardView
