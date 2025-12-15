@@ -17,7 +17,6 @@
 package com.duckduckgo.app.global.view
 
 import android.net.Uri
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import app.cash.turbine.test
 import com.duckduckgo.app.fire.ManualDataClearing
 import com.duckduckgo.app.fire.store.FireDataStore
@@ -27,6 +26,8 @@ import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.view.GranularFireDialogViewModel.Command
 import com.duckduckgo.app.pixels.AppPixelName.FIRE_DIALOG_ANIMATION
 import com.duckduckgo.app.pixels.AppPixelName.FIRE_DIALOG_CLEAR_PRESSED
+import com.duckduckgo.app.pixels.AppPixelName.PRODUCT_TELEMETRY_SURFACE_DATA_CLEARING
+import com.duckduckgo.app.pixels.AppPixelName.PRODUCT_TELEMETRY_SURFACE_DATA_CLEARING_DAILY
 import com.duckduckgo.app.settings.clear.FireAnimation
 import com.duckduckgo.app.settings.clear.FireClearOption
 import com.duckduckgo.app.settings.db.SettingsDataStore
@@ -48,17 +49,14 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.time.LocalDateTime
 
 class GranularFireDialogViewModelTest {
-
-    @get:Rule
-    @Suppress("unused")
-    var instantTaskExecutorRule = InstantTaskExecutorRule()
-
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
@@ -279,7 +277,7 @@ class GranularFireDialogViewModelTest {
         testee.viewState.test {
             val state = awaitItem()
 
-            assertEquals(2, state.siteCount) // Only example.com and test.com
+            assertEquals(2, state.siteCount)
 
             cancelAndConsumeRemainingEvents()
         }
@@ -346,10 +344,53 @@ class GranularFireDialogViewModelTest {
         coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
 
         verify(mockPixel).enqueueFire(FIRE_DIALOG_CLEAR_PRESSED)
+        verify(mockPixel).enqueueFire(PRODUCT_TELEMETRY_SURFACE_DATA_CLEARING)
         verify(mockPixel).enqueueFire(
             pixel = FIRE_DIALOG_ANIMATION,
             parameters = mapOf(FIRE_ANIMATION to Pixel.PixelValues.FIRE_ANIMATION_INFERNO),
         )
+    }
+
+    @Test
+    fun `when delete clicked for first time then daily pixel is fired and timestamp is stored`() = runTest {
+        whenever(mockFireButtonStore.lastEventSendTime).thenReturn(null)
+        testee = createViewModel()
+
+        testee.onDeleteClicked()
+
+        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        verify(mockFireButtonStore).storeLastFireButtonClearEventTime(any())
+        verify(mockPixel).enqueueFire(PRODUCT_TELEMETRY_SURFACE_DATA_CLEARING_DAILY)
+    }
+
+    @Test
+    fun `when delete clicked on same day then daily pixel is not fired again`() = runTest {
+        val today = "2025-12-15"
+        whenever(mockFireButtonStore.lastEventSendTime).thenReturn(today)
+        testee = createViewModel()
+
+        testee.onDeleteClicked()
+
+        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        verify(mockPixel).enqueueFire(FIRE_DIALOG_CLEAR_PRESSED)
+        verify(mockPixel).enqueueFire(PRODUCT_TELEMETRY_SURFACE_DATA_CLEARING)
+        verify(mockPixel, never()).enqueueFire(PRODUCT_TELEMETRY_SURFACE_DATA_CLEARING_DAILY)
+    }
+
+    @Test
+    fun `when delete clicked on different day then daily pixel is fired and timestamp is updated`() = runTest {
+        val yesterday = "2025-12-14"
+        whenever(mockFireButtonStore.lastEventSendTime).thenReturn(yesterday)
+        testee = createViewModel()
+
+        testee.onDeleteClicked()
+
+        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        verify(mockFireButtonStore).storeLastFireButtonClearEventTime(any())
+        verify(mockPixel).enqueueFire(PRODUCT_TELEMETRY_SURFACE_DATA_CLEARING_DAILY)
     }
 
     @Test
@@ -446,22 +487,19 @@ class GranularFireDialogViewModelTest {
 
             coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
 
-            // Verify pixels are fired
             verify(mockPixel).enqueueFire(FIRE_DIALOG_CLEAR_PRESSED)
+            verify(mockPixel).enqueueFire(PRODUCT_TELEMETRY_SURFACE_DATA_CLEARING)
             verify(mockPixel).enqueueFire(
                 pixel = FIRE_DIALOG_ANIMATION,
                 parameters = mapOf(FIRE_ANIMATION to Pixel.PixelValues.FIRE_ANIMATION_INFERNO),
             )
 
-            // Verify animation command
             assertEquals(Command.PlayAnimation, awaitItem())
 
-            // Verify data operations
             verify(mockFireButtonStore).incrementFireButtonUseCount()
             verify(mockUserEventsStore).registerUserEvent(UserEventKey.FIRE_BUTTON_EXECUTED)
             verify(mockDataClearing).clearDataUsingManualFireOptions()
 
-            // Verify completion command
             assertEquals(Command.ClearingComplete, awaitItem())
 
             cancelAndConsumeRemainingEvents()
