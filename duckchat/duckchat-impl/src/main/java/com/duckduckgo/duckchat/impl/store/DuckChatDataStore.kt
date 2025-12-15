@@ -29,6 +29,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.di.DuckChat
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_AI_INPUT_SCREEN_COSMETIC_SETTING
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_AI_INPUT_SCREEN_USER_SETTING
+import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_CHAT_CONTEXTUAL_MODE_SETTING
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_CHAT_FULLSCREEN_MODE_SETTING
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_CHAT_LAST_SESSION_TIMESTAMP
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_CHAT_OPENED
@@ -61,6 +62,10 @@ interface DuckChatDataStore {
     suspend fun setShowInBrowserMenu(showDuckChat: Boolean)
 
     suspend fun setShowInAddressBar(showDuckChat: Boolean)
+
+    suspend fun setFullScreenModeUserSetting(enabled: Boolean)
+
+    suspend fun setContextualModeUserSetting(enabled: Boolean)
 
     suspend fun setShowInVoiceSearch(showToggle: Boolean)
 
@@ -123,6 +128,7 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
         val DUCK_CHAT_LAST_SESSION_TIMESTAMP = longPreferencesKey(name = "DUCK_CHAT_LAST_SESSION_TIMESTAMP")
         val DUCK_CHAT_SESSION_DELTA_TIMESTAMP = longPreferencesKey(name = "DUCK_CHAT_SESSION_DELTA_TIMESTAMP")
         val DUCK_CHAT_FULLSCREEN_MODE_SETTING = booleanPreferencesKey(name = "DUCK_CHAT_FULLSCREEN_MODE_SETTING")
+        val DUCK_CHAT_CONTEXTUAL_MODE_SETTING = booleanPreferencesKey(name = "DUCK_CHAT_CONTEXTUAL_MODE_SETTING")
     }
 
     private fun Preferences.defaultShowInAddressBar(): Boolean =
@@ -197,6 +203,14 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
         store.edit { prefs -> prefs[DUCK_AI_INPUT_SCREEN_COSMETIC_SETTING] = enabled }
     }
 
+    override suspend fun setFullScreenModeUserSetting(enabled: Boolean) {
+        store.edit { prefs -> prefs[DUCK_CHAT_FULLSCREEN_MODE_SETTING] = enabled }
+    }
+
+    override suspend fun setContextualModeUserSetting(enabled: Boolean) {
+        store.edit { prefs -> prefs[DUCK_CHAT_CONTEXTUAL_MODE_SETTING] = enabled }
+    }
+
     override suspend fun setShowInBrowserMenu(showDuckChat: Boolean) {
         store.edit { prefs -> prefs[DUCK_CHAT_SHOW_IN_MENU] = showDuckChat }
     }
@@ -225,10 +239,6 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
 
     override suspend fun isInputScreenUserSettingEnabled(): Boolean = store.data.firstOrNull()?.let {
         it[DUCK_AI_INPUT_SCREEN_USER_SETTING]
-    } ?: false
-
-    override suspend fun isFullScreenUserSettingEnabled(): Boolean = store.data.firstOrNull()?.let {
-        it[DUCK_CHAT_FULLSCREEN_MODE_SETTING]
     } ?: false
 
     override suspend fun isCosmeticInputScreenUserSettingEnabled(): Boolean = store.data.firstOrNull()?.let {

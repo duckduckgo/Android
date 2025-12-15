@@ -81,6 +81,11 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
             updateWidgets()
         }
 
+    private val userEnabledDuckChatContextualModeListener =
+        CompoundButton.OnCheckedChangeListener { _, isChecked ->
+            viewModel.onDuckChatContextualModeToggled(isChecked)
+        }
+
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
 

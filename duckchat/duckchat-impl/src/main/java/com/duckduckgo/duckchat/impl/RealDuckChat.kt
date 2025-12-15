@@ -85,6 +85,11 @@ interface DuckChatInternal : DuckChat {
     suspend fun setShowInAddressBarUserSetting(showDuckChat: Boolean)
 
     /**
+     * Set user setting to determine whether DuckChat should be shown in contextual mode.
+     */
+    suspend fun setContextualModeUserSetting(enabled: Boolean)
+
+    /**
      * Set user setting to determine whether the Input Mode toggle should be shown on the voice search screen.
      */
     suspend fun setShowInVoiceSearchUserSetting(showToggle: Boolean)
@@ -186,6 +191,11 @@ interface DuckChatInternal : DuckChat {
      * Returns whether dedicated Duck.ai full screen mode is enabled (its feature flag is enabled).
      */
     fun isDuckChatFullScreenModeEnabled(): Boolean
+
+    /**
+     * Returns whether dedicated Duck.ai contextual mode is enabled by the user and the feature flag is enabled.
+     */
+    fun isDuckChatContextualModeEnabled(): Boolean
 
     /**
      * Checks whether DuckChat is enabled based on remote config flag.
@@ -349,6 +359,13 @@ class RealDuckChat @Inject constructor(
             duckChatFeatureRepository.setShowInAddressBar(showDuckChat)
             cacheUserSettings()
         }
+
+    override suspend fun setContextualModeUserSetting(enabled: Boolean) {
+        withContext(dispatchers.io()) {
+            duckChatFeatureRepository.setContextualModeUserSetting(enabled)
+            cacheUserSettings()
+        }
+    }
 
     override suspend fun setShowInVoiceSearchUserSetting(showToggle: Boolean) =
         withContext(dispatchers.io()) {

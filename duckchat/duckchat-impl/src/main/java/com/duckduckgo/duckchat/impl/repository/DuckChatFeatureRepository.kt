@@ -37,6 +37,10 @@ interface DuckChatFeatureRepository {
 
     suspend fun setShowInAddressBar(showDuckChat: Boolean)
 
+    suspend fun setFullScreenModeUserSetting(enabled: Boolean)
+
+    suspend fun setContextualModeUserSetting(enabled: Boolean)
+
     suspend fun setShowInVoiceSearch(showToggle: Boolean)
 
     fun observeDuckChatUserEnabled(): Flow<Boolean>
@@ -96,6 +100,10 @@ class RealDuckChatFeatureRepository @Inject constructor(
 
     override suspend fun setShowInAddressBar(showDuckChat: Boolean) {
         duckChatDataStore.setShowInAddressBar(showDuckChat)
+    }
+
+    override suspend fun setContextualModeUserSetting(enabled: Boolean) {
+        duckChatDataStore.setContextualModeUserSetting(enabled)
     }
 
     override suspend fun setShowInVoiceSearch(showToggle: Boolean) {
