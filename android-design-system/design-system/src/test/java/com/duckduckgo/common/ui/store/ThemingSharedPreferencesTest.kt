@@ -16,6 +16,7 @@
 
 package com.duckduckgo.common.ui.store
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -30,6 +31,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
 
+@SuppressLint("DenyListedApi")
 @RunWith(AndroidJUnit4::class)
 @Config(manifest = Config.NONE)
 class ThemingSharedPreferencesTest {
@@ -170,7 +172,7 @@ class ThemingSharedPreferencesTest {
     }
 
     @Test
-    fun whenSavedValueIsNullAndSystemInLightModeThenThemeFromReturnsLight() {
+    fun whenSavedValueIsNullAndSystemInLightModeThenThemeFromReturnsSystemDefault() {
         val mapper = ThemingSharedPreferences.ThemePrefsMapper()
 
         val result = mapper.themeFrom(
@@ -179,11 +181,11 @@ class ThemingSharedPreferencesTest {
             isInNightMode = false,
         )
 
-        assertEquals(DuckDuckGoTheme.LIGHT, result)
+        assertEquals(DuckDuckGoTheme.SYSTEM_DEFAULT, result)
     }
 
     @Test
-    fun whenSavedValueIsNullAndSystemInDarkModeThenThemeFromReturnsDark() {
+    fun whenSavedValueIsNullAndSystemInDarkModeThenThemeFromReturnsSystemDefault() {
         val mapper = ThemingSharedPreferences.ThemePrefsMapper()
 
         val result = mapper.themeFrom(
@@ -192,7 +194,7 @@ class ThemingSharedPreferencesTest {
             isInNightMode = true,
         )
 
-        assertEquals(DuckDuckGoTheme.DARK, result)
+        assertEquals(DuckDuckGoTheme.SYSTEM_DEFAULT, result)
     }
 
     @Test
