@@ -68,6 +68,8 @@ class RealCardsListRemoteMessagePixelHelperTest {
         primaryAction = Action.Dismiss,
         type = CardItemType.TWO_LINE_LIST_ITEM,
         placeholder = Content.Placeholder.DDG_ANNOUNCE,
+        matchingRules = emptyList(),
+        exclusionRules = emptyList(),
     )
 
     @Before
