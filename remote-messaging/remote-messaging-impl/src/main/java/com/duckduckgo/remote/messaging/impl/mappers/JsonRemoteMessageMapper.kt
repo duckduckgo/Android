@@ -185,6 +185,8 @@ private fun List<JsonListItem>?.toListItems(actionMappers: Set<MessageActionMapp
             placeholder = jsonItem.placeholder.asPlaceholder(),
             primaryAction = jsonItem.primaryAction?.toAction(actionMappers)
                 ?: throw IllegalStateException("CardItem primaryAction cannot be null"),
+            matchingRules = jsonItem.matchingRules,
+            exclusionRules = jsonItem.exclusionRules,
         )
     } ?: emptyList()
 }

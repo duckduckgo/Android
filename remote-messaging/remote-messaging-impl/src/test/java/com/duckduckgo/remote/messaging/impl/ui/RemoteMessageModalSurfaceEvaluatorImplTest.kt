@@ -285,6 +285,8 @@ class RemoteMessageModalSurfaceEvaluatorImplTest {
                             titleText = "Card 1",
                             descriptionText = "Description 1",
                             primaryAction = Action.Dismiss,
+                            matchingRules = emptyList(),
+                            exclusionRules = emptyList(),
                         ),
                     ),
                 ),
