@@ -62,7 +62,6 @@ class RemoteMessagingConfigJsonMapperTest {
 
     @Test
     fun whenValidJsonParsedThenMessagesMappedIntoRemoteConfig() = runTest {
-        fakeFeatureToggles.self().setRawStoredState(State(enable = false))
         fakeFeatureToggles.remoteMessageModalSurface().setRawStoredState(State(enable = false))
         val result = getConfigFromJson("json/remote_messaging_config.json")
 
@@ -135,7 +134,6 @@ class RemoteMessagingConfigJsonMapperTest {
 
     @Test
     fun whenValidJsonParsedThenRulesMappedIntoRemoteConfig() = runTest {
-        fakeFeatureToggles.self().setRawStoredState(State(enable = false))
         fakeFeatureToggles.remoteMessageModalSurface().setRawStoredState(State(enable = false))
         val result = getConfigFromJson("json/remote_messaging_config.json")
 
@@ -167,7 +165,6 @@ class RemoteMessagingConfigJsonMapperTest {
 
     @Test
     fun whenJsonMessagesHaveUnknownTypesThenMessagesNotMappedIntoConfig() = runTest {
-        fakeFeatureToggles.self().setRawStoredState(State(enable = false))
         fakeFeatureToggles.remoteMessageModalSurface().setRawStoredState(State(enable = false))
         val result = getConfigFromJson("json/remote_messaging_config_unsupported_items.json")
 
@@ -180,7 +177,6 @@ class RemoteMessagingConfigJsonMapperTest {
 
     @Test
     fun whenJsonMessagesHaveUnknownTypesThenRulesMappedIntoConfig() = runTest {
-        fakeFeatureToggles.self().setRawStoredState(State(enable = false))
         fakeFeatureToggles.remoteMessageModalSurface().setRawStoredState(State(enable = false))
         val result = getConfigFromJson("json/remote_messaging_config_unsupported_items.json")
 
@@ -199,7 +195,6 @@ class RemoteMessagingConfigJsonMapperTest {
 
     @Test
     fun whenJsonMessagesMalformedOrMissingInformationThenMessagesNotParsedIntoConfig() = runTest {
-        fakeFeatureToggles.self().setRawStoredState(State(enable = false))
         fakeFeatureToggles.remoteMessageModalSurface().setRawStoredState(State(enable = false))
         val result = getConfigFromJson("json/remote_messaging_config_malformed.json")
 
@@ -223,7 +218,6 @@ class RemoteMessagingConfigJsonMapperTest {
 
     @Test
     fun whenJsonMatchingAttributesMalformedThenParsedAsUnknownIntoConfig() = runTest {
-        fakeFeatureToggles.self().setRawStoredState(State(enable = false))
         fakeFeatureToggles.remoteMessageModalSurface().setRawStoredState(State(enable = false))
         val result = getConfigFromJson("json/remote_messaging_config_malformed.json")
 
@@ -240,7 +234,6 @@ class RemoteMessagingConfigJsonMapperTest {
 
     @Test
     fun whenUnknownMatchingAttributeDoesNotProvideFallbackThenFallbackIsNull() = runTest {
-        fakeFeatureToggles.self().setRawStoredState(State(enable = false))
         fakeFeatureToggles.remoteMessageModalSurface().setRawStoredState(State(enable = false))
         val result = getConfigFromJson("json/remote_messaging_config_malformed.json")
 
@@ -253,7 +246,6 @@ class RemoteMessagingConfigJsonMapperTest {
 
     @Test
     fun whenRemoteMessageModalSurfaceEnabledAndCardListMessageThenMessagesMappedIntoRemoteConfig() = runTest {
-        fakeFeatureToggles.self().setRawStoredState(State(enable = true))
         fakeFeatureToggles.remoteMessageModalSurface().setRawStoredState(State(enable = true))
         val result = getConfigFromJson("json/remote_messaging_config_cardslist.json")
 
@@ -327,7 +319,6 @@ class RemoteMessagingConfigJsonMapperTest {
 
     @Test
     fun whenRemoteMessageModalSurfaceDisabledAndCardListMessageThenCardListMessageNotMappedIntoRemoteConfig() = runTest {
-        fakeFeatureToggles.self().setRawStoredState(State(enable = false))
         fakeFeatureToggles.remoteMessageModalSurface().setRawStoredState(State(enable = false))
         val result = getConfigFromJson("json/remote_messaging_config_cardslist.json")
 

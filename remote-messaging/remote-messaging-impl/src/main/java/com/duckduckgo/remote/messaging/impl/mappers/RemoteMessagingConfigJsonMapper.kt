@@ -38,7 +38,7 @@ class RemoteMessagingConfigJsonMapper(
         logcat(INFO) { "RMF: messages parsed $messages ${Thread.currentThread().name}" }
 
         val updatedMessages: List<RemoteMessage> =
-            if (!remoteMessagingFeatureToggles.self().isEnabled() || !remoteMessagingFeatureToggles.remoteMessageModalSurface().isEnabled()) {
+            if (!remoteMessagingFeatureToggles.remoteMessageModalSurface().isEnabled()) {
                 messages.mapNotNull { message ->
                     if (message.surfaces.isEmpty() || message.surfaces.contains(Surface.NEW_TAB_PAGE)) message else null
                 }

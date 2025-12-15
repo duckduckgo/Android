@@ -66,7 +66,7 @@ class RemoteMessageModalSurfaceEvaluatorImpl @Inject constructor(
 
     private suspend fun evaluate() {
         withContext(dispatchers.io()) {
-            if (!remoteMessagingFeatureToggles.self().isEnabled() || !remoteMessagingFeatureToggles.remoteMessageModalSurface().isEnabled()) {
+            if (!remoteMessagingFeatureToggles.remoteMessageModalSurface().isEnabled()) {
                 return@withContext
             }
 
