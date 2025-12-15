@@ -28,6 +28,7 @@ import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN_US
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_FREE_TRIAL_OFFER_US
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PLAN_US
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
+import com.duckduckgo.subscriptions.impl.model.Entitlement
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.Reload
@@ -217,6 +218,7 @@ class SubscriptionWebViewViewModelTest {
             SubscriptionOffer(
                 planId = MONTHLY_PLAN_US,
                 offerId = null,
+                tier = "plus",
                 pricingPhases = listOf(
                     PricingPhase(
                         priceAmount = 1.toBigDecimal(),
@@ -225,11 +227,12 @@ class SubscriptionWebViewViewModelTest {
                         billingPeriod = "P1M",
                     ),
                 ),
-                features = setOf(SubscriptionsConstants.NETP),
+                entitlements = setOf(Entitlement("plus", SubscriptionsConstants.NETP)),
             ),
             SubscriptionOffer(
                 planId = YEARLY_PLAN_US,
                 offerId = null,
+                tier = "plus",
                 pricingPhases = listOf(
                     PricingPhase(
                         priceAmount = 10.toBigDecimal(),
@@ -238,7 +241,7 @@ class SubscriptionWebViewViewModelTest {
                         billingPeriod = "P1Y",
                     ),
                 ),
-                features = setOf(SubscriptionsConstants.NETP),
+                entitlements = setOf(Entitlement("plus", SubscriptionsConstants.NETP)),
             ),
         )
         whenever(subscriptionsManager.getSubscriptionOffer()).thenReturn(testSubscriptionOfferList)
@@ -287,6 +290,7 @@ class SubscriptionWebViewViewModelTest {
             SubscriptionOffer(
                 planId = MONTHLY_PLAN_US,
                 offerId = null,
+                tier = "plus",
                 pricingPhases = listOf(
                     PricingPhase(
                         priceAmount = 1.toBigDecimal(),
@@ -295,11 +299,12 @@ class SubscriptionWebViewViewModelTest {
                         billingPeriod = "P1M",
                     ),
                 ),
-                features = setOf(SubscriptionsConstants.NETP),
+                entitlements = setOf(Entitlement("plus", SubscriptionsConstants.NETP)),
             ),
             SubscriptionOffer(
                 planId = YEARLY_PLAN_US,
                 offerId = null,
+                tier = "plus",
                 pricingPhases = listOf(
                     PricingPhase(
                         priceAmount = 10.toBigDecimal(),
@@ -308,7 +313,7 @@ class SubscriptionWebViewViewModelTest {
                         billingPeriod = "P1Y",
                     ),
                 ),
-                features = setOf(SubscriptionsConstants.NETP),
+                entitlements = setOf(Entitlement("plus", SubscriptionsConstants.NETP)),
             ),
         )
         privacyProFeature.allowPurchase().setRawStoredState(Toggle.State(enable = false))
@@ -337,6 +342,7 @@ class SubscriptionWebViewViewModelTest {
             SubscriptionOffer(
                 planId = MONTHLY_PLAN_US,
                 offerId = null,
+                tier = "plus",
                 pricingPhases = listOf(
                     PricingPhase(
                         priceAmount = 1.toBigDecimal(),
@@ -345,11 +351,12 @@ class SubscriptionWebViewViewModelTest {
                         billingPeriod = "P1M",
                     ),
                 ),
-                features = setOf(SubscriptionsConstants.NETP),
+                entitlements = setOf(Entitlement("plus", SubscriptionsConstants.NETP)),
             ),
             SubscriptionOffer(
                 planId = YEARLY_PLAN_US,
                 offerId = null,
+                tier = "plus",
                 pricingPhases = listOf(
                     PricingPhase(
                         priceAmount = 1.toBigDecimal(),
@@ -358,11 +365,12 @@ class SubscriptionWebViewViewModelTest {
                         billingPeriod = "P1Y",
                     ),
                 ),
-                features = setOf(SubscriptionsConstants.NETP),
+                entitlements = setOf(Entitlement("plus", SubscriptionsConstants.NETP)),
             ),
             SubscriptionOffer(
                 planId = MONTHLY_PLAN_US,
                 offerId = MONTHLY_FREE_TRIAL_OFFER_US,
+                tier = "plus",
                 pricingPhases = listOf(
                     PricingPhase(
                         priceAmount = 1.toBigDecimal(),
@@ -377,11 +385,12 @@ class SubscriptionWebViewViewModelTest {
                         billingPeriod = "P1W",
                     ),
                 ),
-                features = setOf(SubscriptionsConstants.NETP),
+                entitlements = setOf(Entitlement("plus", SubscriptionsConstants.NETP)),
             ),
             SubscriptionOffer(
                 planId = YEARLY_PLAN_US,
                 offerId = YEARLY_FREE_TRIAL_OFFER_US,
+                tier = "plus",
                 pricingPhases = listOf(
                     PricingPhase(
                         priceAmount = 1.toBigDecimal(),
@@ -396,7 +405,7 @@ class SubscriptionWebViewViewModelTest {
                         billingPeriod = "P1W",
                     ),
                 ),
-                features = setOf(SubscriptionsConstants.NETP),
+                entitlements = setOf(Entitlement("plus", SubscriptionsConstants.NETP)),
             ),
         )
         whenever(subscriptionsManager.getSubscriptionOffer()).thenReturn(testSubscriptionOfferList)
@@ -424,6 +433,7 @@ class SubscriptionWebViewViewModelTest {
             SubscriptionOffer(
                 planId = MONTHLY_PLAN_US,
                 offerId = null,
+                tier = "plus",
                 pricingPhases = listOf(
                     PricingPhase(
                         priceAmount = 1.toBigDecimal(),
@@ -432,11 +442,12 @@ class SubscriptionWebViewViewModelTest {
                         billingPeriod = "P1M",
                     ),
                 ),
-                features = setOf(SubscriptionsConstants.NETP),
+                entitlements = setOf(Entitlement("plus", SubscriptionsConstants.NETP)),
             ),
             SubscriptionOffer(
                 planId = YEARLY_PLAN_US,
                 offerId = null,
+                tier = "plus",
                 pricingPhases = listOf(
                     PricingPhase(
                         priceAmount = 10.toBigDecimal(),
@@ -445,11 +456,12 @@ class SubscriptionWebViewViewModelTest {
                         billingPeriod = "P1Y",
                     ),
                 ),
-                features = setOf(SubscriptionsConstants.NETP),
+                entitlements = setOf(Entitlement("plus", SubscriptionsConstants.NETP)),
             ),
             SubscriptionOffer(
                 planId = MONTHLY_PLAN_US,
                 offerId = MONTHLY_FREE_TRIAL_OFFER_US,
+                tier = "plus",
                 pricingPhases = listOf(
                     PricingPhase(
                         priceAmount = 1.toBigDecimal(),
@@ -464,11 +476,12 @@ class SubscriptionWebViewViewModelTest {
                         billingPeriod = "P1W",
                     ),
                 ),
-                features = setOf(SubscriptionsConstants.NETP),
+                entitlements = setOf(Entitlement("plus", SubscriptionsConstants.NETP)),
             ),
             SubscriptionOffer(
                 planId = YEARLY_PLAN_US,
                 offerId = YEARLY_FREE_TRIAL_OFFER_US,
+                tier = "plus",
                 pricingPhases = listOf(
                     PricingPhase(
                         priceAmount = 10.toBigDecimal(),
@@ -483,7 +496,7 @@ class SubscriptionWebViewViewModelTest {
                         billingPeriod = "P1W",
                     ),
                 ),
-                features = setOf(SubscriptionsConstants.NETP),
+                entitlements = setOf(Entitlement("plus", SubscriptionsConstants.NETP)),
             ),
         )
         whenever(subscriptionsManager.getSubscriptionOffer()).thenReturn(testSubscriptionOfferList)
@@ -921,6 +934,7 @@ class SubscriptionWebViewViewModelTest {
             SubscriptionOffer(
                 planId = MONTHLY_PLAN_US,
                 offerId = null,
+                tier = "plus",
                 pricingPhases = listOf(
                     PricingPhase(
                         priceAmount = 1.toBigDecimal(),
@@ -929,11 +943,12 @@ class SubscriptionWebViewViewModelTest {
                         billingPeriod = "P1M",
                     ),
                 ),
-                features = setOf(SubscriptionsConstants.NETP),
+                entitlements = setOf(Entitlement("plus", SubscriptionsConstants.NETP)),
             ),
             SubscriptionOffer(
                 planId = YEARLY_PLAN_US,
                 offerId = null,
+                tier = "plus",
                 pricingPhases = listOf(
                     PricingPhase(
                         priceAmount = 10.toBigDecimal(),
@@ -942,7 +957,7 @@ class SubscriptionWebViewViewModelTest {
                         billingPeriod = "P1Y",
                     ),
                 ),
-                features = setOf(SubscriptionsConstants.NETP),
+                entitlements = setOf(Entitlement("plus", SubscriptionsConstants.NETP)),
             ),
         )
         whenever(subscriptionsManager.getSubscriptionOffer()).thenReturn(testSubscriptionOfferList)
@@ -993,6 +1008,7 @@ class SubscriptionWebViewViewModelTest {
             SubscriptionOffer(
                 planId = MONTHLY_PLAN_US,
                 offerId = null,
+                tier = "plus",
                 pricingPhases = listOf(
                     PricingPhase(
                         priceAmount = 1.toBigDecimal(),
@@ -1001,11 +1017,12 @@ class SubscriptionWebViewViewModelTest {
                         billingPeriod = "P1M",
                     ),
                 ),
-                features = setOf(SubscriptionsConstants.NETP),
+                entitlements = setOf(Entitlement("plus", SubscriptionsConstants.NETP)),
             ),
             SubscriptionOffer(
                 planId = YEARLY_PLAN_US,
                 offerId = null,
+                tier = "plus",
                 pricingPhases = listOf(
                     PricingPhase(
                         priceAmount = 10.toBigDecimal(),
@@ -1014,7 +1031,7 @@ class SubscriptionWebViewViewModelTest {
                         billingPeriod = "P1Y",
                     ),
                 ),
-                features = setOf(SubscriptionsConstants.NETP),
+                entitlements = setOf(Entitlement("plus", SubscriptionsConstants.NETP)),
             ),
         )
         privacyProFeature.allowPurchase().setRawStoredState(Toggle.State(enable = false))
@@ -1042,6 +1059,7 @@ class SubscriptionWebViewViewModelTest {
             SubscriptionOffer(
                 planId = MONTHLY_PLAN_US,
                 offerId = null,
+                tier = "plus",
                 pricingPhases = listOf(
                     PricingPhase(
                         priceAmount = 1.toBigDecimal(),
@@ -1050,11 +1068,15 @@ class SubscriptionWebViewViewModelTest {
                         billingPeriod = "P1M",
                     ),
                 ),
-                features = setOf(SubscriptionsConstants.NETP, SubscriptionsConstants.ITR),
+                entitlements = setOf(
+                    Entitlement("plus", SubscriptionsConstants.NETP),
+                    Entitlement("plus", SubscriptionsConstants.ITR),
+                ),
             ),
             SubscriptionOffer(
                 planId = YEARLY_PLAN_US,
                 offerId = null,
+                tier = "plus",
                 pricingPhases = listOf(
                     PricingPhase(
                         priceAmount = 10.toBigDecimal(),
@@ -1063,7 +1085,10 @@ class SubscriptionWebViewViewModelTest {
                         billingPeriod = "P1Y",
                     ),
                 ),
-                features = setOf(SubscriptionsConstants.NETP, SubscriptionsConstants.ITR),
+                entitlements = setOf(
+                    Entitlement("plus", SubscriptionsConstants.NETP),
+                    Entitlement("plus", SubscriptionsConstants.ITR),
+                ),
             ),
         )
         whenever(subscriptionsManager.getSubscriptionOffer()).thenReturn(testSubscriptionOfferList)

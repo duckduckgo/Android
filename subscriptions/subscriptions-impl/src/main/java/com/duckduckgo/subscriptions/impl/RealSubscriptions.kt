@@ -244,9 +244,6 @@ interface PrivacyProFeature {
     fun refreshSubscriptionPlanFeatures(): Toggle
 
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun useClientWithCacheForFeatures(): Toggle
-
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun supportsAlternateStripePaymentFlow(): Toggle
 
     @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.TRUE)
@@ -279,7 +276,7 @@ interface PrivacyProFeature {
      * The flag is exposed to FE via getFeatureConfig.
      */
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun useGetSubscriptionTierOptions(): Toggle
+    fun tierMessagingEnabled(): Toggle
 }
 
 @ContributesBinding(AppScope::class)

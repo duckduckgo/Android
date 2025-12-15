@@ -1088,7 +1088,7 @@ class SubscriptionMessagingInterfaceTest {
     private fun givenUseGetSubscriptionTierOptions(enabled: Boolean) {
         val toggle = mock<com.duckduckgo.feature.toggles.api.Toggle>()
         whenever(toggle.isEnabled()).thenReturn(enabled)
-        whenever(privacyProFeature.useGetSubscriptionTierOptions()).thenReturn(toggle)
+        whenever(privacyProFeature.tierMessagingEnabled()).thenReturn(toggle)
     }
 
     private fun checkEquals(expected: JsRequestResponse, actual: JsRequestResponse) {

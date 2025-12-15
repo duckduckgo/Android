@@ -323,7 +323,11 @@ class SubscriptionWebViewViewModel @Inject constructor(
         }
     }
 
-    private fun getSubscriptionTierOptions(featureName: String, method: String, id: String) {
+    private fun getSubscriptionTierOptions(
+        featureName: String,
+        method: String,
+        id: String,
+    ) {
         suspend fun sendTierOptionJson(optionsJson: SubscriptionTierOptionsJson) {
             val response = JsCallbackData(
                 featureName = featureName,
@@ -344,7 +348,10 @@ class SubscriptionWebViewViewModel @Inject constructor(
                 when {
                     subscriptionOffers.keys.containsAll(listOf(MONTHLY_FREE_TRIAL_OFFER_US, YEARLY_FREE_TRIAL_OFFER_US)) &&
                         subscriptionsManager.isFreeTrialEligible() -> {
+                        val tier = subscriptionOffers.getValue(MONTHLY_FREE_TRIAL_OFFER_US).tier
+                            .takeUnless { it.isNullOrBlank() } ?: subscriptionOffers.getValue(YEARLY_FREE_TRIAL_OFFER_US).tier
                         createSubscriptionTierOptions(
+                            tier,
                             monthlyOffer = subscriptionOffers.getValue(MONTHLY_FREE_TRIAL_OFFER_US),
                             yearlyOffer = subscriptionOffers.getValue(YEARLY_FREE_TRIAL_OFFER_US),
                         )
@@ -352,21 +359,30 @@ class SubscriptionWebViewViewModel @Inject constructor(
 
                     subscriptionOffers.keys.containsAll(listOf(MONTHLY_FREE_TRIAL_OFFER_ROW, YEARLY_FREE_TRIAL_OFFER_ROW)) &&
                         subscriptionsManager.isFreeTrialEligible() -> {
+                        val tier = subscriptionOffers.getValue(MONTHLY_FREE_TRIAL_OFFER_ROW).tier
+                            .takeUnless { it.isNullOrBlank() } ?: subscriptionOffers.getValue(YEARLY_FREE_TRIAL_OFFER_ROW).tier
                         createSubscriptionTierOptions(
+                            tier,
                             monthlyOffer = subscriptionOffers.getValue(MONTHLY_FREE_TRIAL_OFFER_ROW),
                             yearlyOffer = subscriptionOffers.getValue(YEARLY_FREE_TRIAL_OFFER_ROW),
                         )
                     }
 
                     subscriptionOffers.keys.containsAll(listOf(MONTHLY_PLAN_US, YEARLY_PLAN_US)) -> {
+                        val tier = subscriptionOffers.getValue(MONTHLY_PLAN_US).tier
+                            .takeUnless { it.isNullOrBlank() } ?: subscriptionOffers.getValue(YEARLY_PLAN_US).tier
                         createSubscriptionTierOptions(
+                            tier,
                             monthlyOffer = subscriptionOffers.getValue(MONTHLY_PLAN_US),
                             yearlyOffer = subscriptionOffers.getValue(YEARLY_PLAN_US),
                         )
                     }
 
                     subscriptionOffers.keys.containsAll(listOf(MONTHLY_PLAN_ROW, YEARLY_PLAN_ROW)) -> {
+                        val tier = subscriptionOffers.getValue(MONTHLY_PLAN_ROW).tier
+                            .takeUnless { it.isNullOrBlank() } ?: subscriptionOffers.getValue(YEARLY_PLAN_ROW).tier
                         createSubscriptionTierOptions(
+                            tier,
                             monthlyOffer = subscriptionOffers.getValue(MONTHLY_PLAN_ROW),
                             yearlyOffer = subscriptionOffers.getValue(YEARLY_PLAN_ROW),
                         )
@@ -383,20 +399,19 @@ class SubscriptionWebViewViewModel @Inject constructor(
     }
 
     private suspend fun createSubscriptionTierOptions(
+        productTier: String,
         monthlyOffer: SubscriptionOffer,
         yearlyOffer: SubscriptionOffer,
     ): SubscriptionTierOptionsJson {
-        // For now, all offers are grouped under a single "plus" tier
-        // TODO: update this when new Tiers are supported
-        val tierFeatures = monthlyOffer.features.map { featureName ->
+        val tierFeatures = monthlyOffer.entitlements.map { entitlement ->
             TierFeatureJson(
-                product = featureName,
-                name = TIER_PLUS,
+                product = entitlement.product,
+                name = entitlement.name,
             )
         }
 
         val product = ProductJson(
-            tier = TIER_PLUS, // TODO: update this when new Tiers are supported
+            tier = productTier,
             features = tierFeatures,
             options = listOf(
                 createOptionsJson(yearlyOffer, YEARLY.lowercase()),
@@ -556,8 +571,5 @@ class SubscriptionWebViewViewModel @Inject constructor(
         const val PURCHASE_COMPLETED_SUBSCRIPTION_NAME = "onPurchaseUpdate"
         const val PURCHASE_COMPLETED_JSON = """{ type: "completed" }"""
         const val PURCHASE_CANCELED_JSON = """{ type: "canceled" }"""
-
-        // Tier constants - placeholder values until v2 API is available
-        private const val TIER_PLUS = "plus"
     }
 }
