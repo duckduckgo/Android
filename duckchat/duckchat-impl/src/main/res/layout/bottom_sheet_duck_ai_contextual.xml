@@ -26,13 +26,15 @@
         android:id="@+id/contextualModeButtons"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:paddingTop="@dimen/keyline_4"
+        android:paddingHorizontal="@dimen/keyline_2">
 
-        <com.google.android.material.bottomsheet.BottomSheetDragHandleView
+        <View
             android:id="@+id/contextualDragHandle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_width="32dp"
+            android:layout_height="4dp"
+            android:background="@drawable/duck_ai_prompt_background"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -56,7 +58,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/contextualDragHandle"
-            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginTop="@dimen/keyline_4"
             android:gravity="center"
             app:typography="h2"
             android:drawableStart="@drawable/ic_duck_ai_color_24"
@@ -83,6 +85,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
+        android:layout_marginTop="@dimen/keyline_4"
         android:paddingHorizontal="@dimen/keyline_4"
         android:paddingTop="@dimen/keyline_4"
         android:paddingBottom="@dimen/keyline_3">
