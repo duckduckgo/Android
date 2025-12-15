@@ -68,7 +68,6 @@ class DuckChatSettingsViewModelTest {
             whenever(duckChat.observeShowInAddressBarUserSetting()).thenReturn(flowOf(false))
             whenever(duckChat.observeCosmeticInputScreenUserSettingEnabled()).thenReturn(flowOf(null))
             whenever(duckChat.observeInputScreenUserSettingEnabled()).thenReturn(flowOf(false))
-            whenever(duckChat.observeFullscreenModeUserSetting()).thenReturn(flowOf(false))
             whenever(duckChat.isDuckChatFullScreenModeFeatureAvailable()).thenReturn(false)
             testee = DuckChatSettingsViewModel(
                 duckChatActivityParams = DuckChatSettingsNoParams,
@@ -541,47 +540,6 @@ class DuckChatSettingsViewModelTest {
             testee.viewState.test {
                 val state = awaitItem()
                 assertFalse(state.isSearchSectionVisible)
-            }
-        }
-
-    @Test
-    fun `duck full screen mode - when user has setting enabled, then emit enabled`() =
-        runTest {
-            whenever(duckChat.observeFullscreenModeUserSetting()).thenReturn(flowOf(true))
-            whenever(duckChat.isDuckChatFullScreenModeEnabled()).thenReturn(true)
-            testee = DuckChatSettingsViewModel(
-                duckChatActivityParams = DuckChatSettingsNoParams,
-                duckChat = duckChat,
-                pixel = mockPixel,
-                inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
-                settingsPageFeature = settingsPageFeature,
-                dispatcherProvider = coroutineRule.testDispatcherProvider,
-                duckChatFeature = duckChatFeature,
-            )
-
-            testee.viewState.test {
-                val state = awaitItem()
-                assertTrue(state.isFullScreenModeEnabled)
-            }
-        }
-
-    @Test
-    fun `duck full screen mode - when user has setting disabled, then emit enabled`() =
-        runTest {
-            whenever(duckChat.observeFullscreenModeUserSetting()).thenReturn(flowOf(false))
-            testee = DuckChatSettingsViewModel(
-                duckChatActivityParams = DuckChatSettingsNoParams,
-                duckChat = duckChat,
-                pixel = mockPixel,
-                inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
-                settingsPageFeature = settingsPageFeature,
-                dispatcherProvider = coroutineRule.testDispatcherProvider,
-                duckChatFeature = duckChatFeature,
-            )
-
-            testee.viewState.test {
-                val state = awaitItem()
-                assertFalse(state.isFullScreenModeEnabled)
             }
         }
 

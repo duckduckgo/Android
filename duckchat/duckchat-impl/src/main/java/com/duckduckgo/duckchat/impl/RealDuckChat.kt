@@ -105,11 +105,6 @@ interface DuckChatInternal : DuckChat {
     fun observeShowInAddressBarUserSetting(): Flow<Boolean>
 
     /**
-     * Observes whether Duck.ai full screen mode is enabled or disabled.
-     */
-    fun observeFullscreenModeUserSetting(): Flow<Boolean>
-
-    /**
      * Observes whether the Input Mode toggle should be shown on the voice search screen based on user settings only.
      */
     fun observeShowInVoiceSearchUserSetting(): Flow<Boolean>
@@ -381,8 +376,6 @@ class RealDuckChat @Inject constructor(
     override fun observeShowInBrowserMenuUserSetting(): Flow<Boolean> = duckChatFeatureRepository.observeShowInBrowserMenu()
 
     override fun observeShowInAddressBarUserSetting(): Flow<Boolean> = duckChatFeatureRepository.observeShowInAddressBar()
-
-    override fun observeFullscreenModeUserSetting(): Flow<Boolean> = duckChatFeatureRepository.observeFullscreenModeEnabled()
 
     override fun observeShowInVoiceSearchUserSetting(): Flow<Boolean> = duckChatFeatureRepository.observeShowInVoiceSearch()
 

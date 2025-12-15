@@ -30,7 +30,6 @@ import com.duckduckgo.subscriptions.api.SubscriptionStatus.INACTIVE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.UNKNOWN
 import com.duckduckgo.subscriptions.api.Subscriptions
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -58,7 +57,6 @@ class DuckChatWebViewViewModelTest {
     @Before
     fun setup() {
         whenever(subscriptions.getSubscriptionStatusFlow()).thenReturn(subscriptionStatusFlow)
-        whenever(duckChat.observeFullscreenModeUserSetting()).thenReturn(flowOf(true))
         viewModel = DuckChatWebViewViewModel(subscriptions, duckChat)
     }
 
