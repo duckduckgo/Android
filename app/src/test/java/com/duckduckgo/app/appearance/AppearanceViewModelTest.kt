@@ -472,6 +472,52 @@ internal class AppearanceViewModelTest {
         }
     }
 
+    @Test
+    fun whenSystemDefaultThemeIsLightAndUserSelectsLightThenUpdatePreference() =
+        runTest {
+            // Given: System default is set, but system is in light mode, so the effective theme is LIGHT
+            // However, the stored preference is still SYSTEM_DEFAULT
+            whenever(mockThemeSettingsDataStore.theme).thenReturn(DuckDuckGoTheme.LIGHT)
+            whenever(mockThemeSettingsDataStore.isCurrentlySelected(DuckDuckGoTheme.LIGHT)).thenReturn(false)
+            initializeViewModel()
+
+            testee.commands().test {
+                // When: User explicitly selects LIGHT theme (wants to lock it to light, not follow system)
+                testee.onThemeSelected(DuckDuckGoTheme.LIGHT)
+
+                // Then: Preference is updated to LIGHT and pixel is fired
+                verify(mockThemeSettingsDataStore).theme = DuckDuckGoTheme.LIGHT
+                verify(mockPixel).fire(AppPixelName.SETTINGS_THEME_TOGGLED_LIGHT)
+
+                assertEquals(Command.UpdateTheme, awaitItem())
+
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun whenSystemDefaultThemeIsDarkAndUserSelectsDarkThenUpdatePreference() =
+        runTest {
+            // Given: System default is set, but system is in dark mode, so the effective theme is DARK
+            // However, the stored preference is still SYSTEM_DEFAULT
+            whenever(mockThemeSettingsDataStore.theme).thenReturn(DuckDuckGoTheme.DARK)
+            whenever(mockThemeSettingsDataStore.isCurrentlySelected(DuckDuckGoTheme.DARK)).thenReturn(false)
+            initializeViewModel()
+
+            testee.commands().test {
+                // When: User explicitly selects DARK theme (wants to lock it to dark, not follow system)
+                testee.onThemeSelected(DuckDuckGoTheme.DARK)
+
+                // Then: Preference is updated to DARK and pixel is fired
+                verify(mockThemeSettingsDataStore).theme = DuckDuckGoTheme.DARK
+                verify(mockPixel).fire(AppPixelName.SETTINGS_THEME_TOGGLED_DARK)
+
+                assertEquals(Command.UpdateTheme, awaitItem())
+
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
     private fun givenThemeSelected(theme: DuckDuckGoTheme) {
         whenever(mockThemeSettingsDataStore.theme).thenReturn(theme)
         whenever(mockThemeSettingsDataStore.isCurrentlySelected(theme)).thenReturn(true)
