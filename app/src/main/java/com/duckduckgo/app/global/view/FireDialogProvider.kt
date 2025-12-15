@@ -60,9 +60,17 @@ class FireDialogProviderImpl @Inject constructor(
         }
 
         return if (isGranularMode) {
-            GranularFireDialog.newInstance()
+            GranularFireDialog.newInstance(
+                onShowListener = onShowListener,
+                onCancelListener = onCancelListener,
+                onClearStartedListener = onClearStartedListener,
+            )
         } else {
-            LegacyFireDialog.newInstance()
+            LegacyFireDialog.newInstance(
+                onShowListener = onShowListener,
+                onCancelListener = onCancelListener,
+                onClearStartedListener = onClearStartedListener,
+            )
         }
     }
 }

@@ -20,6 +20,7 @@ import android.animation.Animator
 import android.animation.ValueAnimator
 import android.app.Dialog
 import android.content.Context
+import android.content.DialogInterface
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
@@ -162,7 +163,7 @@ class LegacyFireDialog : BottomSheetDialogFragment(), FireDialog {
         onShowListener?.invoke()
     }
 
-    override fun onCancel(dialog: android.content.DialogInterface) {
+    override fun onCancel(dialog: DialogInterface) {
         super.onCancel(dialog)
         onCancelListener?.invoke()
     }
@@ -182,6 +183,7 @@ class LegacyFireDialog : BottomSheetDialogFragment(), FireDialog {
                 onClearOptionClicked()
             }
             cancelOption.setOnClickListener {
+                onCancelListener?.invoke()
                 dismiss()
             }
 
@@ -314,8 +316,16 @@ class LegacyFireDialog : BottomSheetDialogFragment(), FireDialog {
     }
 
     companion object {
-        fun newInstance(): LegacyFireDialog {
-            return LegacyFireDialog()
+        fun newInstance(
+            onShowListener: (() -> Unit)?,
+            onCancelListener: (() -> Unit)?,
+            onClearStartedListener: (() -> Unit)?
+        ): LegacyFireDialog {
+            return LegacyFireDialog().apply {
+                this.onShowListener = onShowListener
+                this.onCancelListener = onCancelListener
+                this.onClearStartedListener = onClearStartedListener
+            }
         }
     }
 }
