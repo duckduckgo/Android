@@ -19,18 +19,23 @@ package com.duckduckgo.sync.impl.ui
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
+import android.widget.ImageView
 import androidx.activity.addCallback
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.view.button.DaxButtonGhost
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.show
-import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.mobile.android.databinding.IncludeDefaultToolbarBinding
 import com.duckduckgo.sync.impl.R
+import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.databinding.ActivityConnectSyncBinding
+import com.duckduckgo.sync.impl.databinding.ActivityConnectSyncNewBinding
 import com.duckduckgo.sync.impl.ui.EnterCodeActivity.Companion.Code.CONNECT_CODE
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.FinishWithError
@@ -39,15 +44,21 @@ import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.ReadTextCode
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.ShowError
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.ShowMessage
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.ViewState
+import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeView
 import com.duckduckgo.sync.impl.ui.setup.EnterCodeContract
 import com.duckduckgo.sync.impl.ui.setup.EnterCodeContract.EnterCodeContractOutput
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
 class SyncConnectActivity : DuckDuckGoActivity() {
-    private val binding: ActivityConnectSyncBinding by viewBinding()
+
+    @Inject
+    lateinit var syncFeature: SyncFeature
+
+    private lateinit var binding: ConnectSyncBinding
     private val viewModel: SyncConnectViewModel by bindViewModel()
 
     private val enterCodeLauncher = registerForActivityResult(
@@ -60,6 +71,15 @@ class SyncConnectActivity : DuckDuckGoActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        binding = if (syncFeature.useNewActivityConnectSyncLayout().isEnabled()) {
+            val viewBinding = ActivityConnectSyncNewBinding.inflate(layoutInflater)
+            ConnectSyncBinding.NewBinding(viewBinding)
+        } else {
+            val viewBinding = ActivityConnectSyncBinding.inflate(layoutInflater)
+            ConnectSyncBinding.OldBinding(viewBinding)
+        }
+
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
 
@@ -164,5 +184,29 @@ class SyncConnectActivity : DuckDuckGoActivity() {
         }
 
         private const val SOURCE_INTENT_KEY = "source"
+    }
+}
+
+private sealed interface ConnectSyncBinding {
+    val root: View
+    val includeToolbar: IncludeDefaultToolbarBinding
+    val qrCodeReader: SyncBarcodeView
+    val qrCodeImageView: ImageView
+    val copyCodeButton: DaxButtonGhost
+
+    data class OldBinding(private val binding: ActivityConnectSyncBinding) : ConnectSyncBinding {
+        override val root: View get() = binding.root
+        override val includeToolbar: IncludeDefaultToolbarBinding get() = binding.includeToolbar
+        override val qrCodeReader: SyncBarcodeView get() = binding.qrCodeReader
+        override val qrCodeImageView: ImageView get() = binding.qrCodeImageView
+        override val copyCodeButton: DaxButtonGhost get() = binding.copyCodeButton
+    }
+
+    data class NewBinding(private val binding: ActivityConnectSyncNewBinding) : ConnectSyncBinding {
+        override val root: View get() = binding.root
+        override val includeToolbar: IncludeDefaultToolbarBinding get() = binding.includeToolbar
+        override val qrCodeReader: SyncBarcodeView get() = binding.qrCodeReader
+        override val qrCodeImageView: ImageView get() = binding.qrCodeImageView
+        override val copyCodeButton: DaxButtonGhost get() = binding.copyCodeButton
     }
 }
