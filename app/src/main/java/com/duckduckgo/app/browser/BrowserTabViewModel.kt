@@ -3211,6 +3211,8 @@ class BrowserTabViewModel @Inject constructor(
         command.value = LaunchTabSwitcher
 
         pixel.fire(AppPixelName.TAB_MANAGER_CLICKED)
+        pixel.fire(AppPixelName.PRODUCT_TELEMETRY_SURFACE_TAB_MANAGER_CLICKED)
+        pixel.fire(AppPixelName.PRODUCT_TELEMETRY_SURFACE_TAB_MANAGER_CLICKED_DAILY, type = Daily())
         fireDailyLaunchPixel()
 
         when (viewMode) {
@@ -4324,6 +4326,10 @@ class BrowserTabViewModel @Inject constructor(
             }
             hasUserSeenHistoryIAM = false
             lastAutoCompleteState?.searchResults?.suggestions?.let { suggestions ->
+                if (suggestions.isNotEmpty()) {
+                    pixel.fire(DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_AUTOCOMPLETE_DISPLAYED)
+                    pixel.fire(DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_AUTOCOMPLETE_DISPLAYED_DAILY, type = Daily())
+                }
                 if (suggestions.any { it is AutoCompleteBookmarkSuggestion && it.isFavorite }) {
                     pixel.fire(AppPixelName.AUTOCOMPLETE_DISPLAYED_LOCAL_FAVORITE)
                 }
@@ -4549,7 +4555,6 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onBookmarksMenuItemClicked() {
-        pixel.fire(AppPixelName.MENU_ACTION_BOOKMARKS_PRESSED.pixelName)
         launchBookmarksActivity()
     }
 
@@ -4586,6 +4591,11 @@ class BrowserTabViewModel @Inject constructor(
 
     fun onDynamicLogoClicked(url: String) {
         command.value = Command.ShowSerpEasterEggLogo(url)
+    }
+
+    fun sendKeyboardFocusedPixel() {
+        pixel.fire(DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_KEYBOARD_USAGE)
+        pixel.fire(DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_KEYBOARD_USAGE_DAILY, type = Daily())
     }
 
     private fun trackersCount(): String =

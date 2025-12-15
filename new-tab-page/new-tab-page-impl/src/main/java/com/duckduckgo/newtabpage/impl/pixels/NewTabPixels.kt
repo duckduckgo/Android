@@ -92,6 +92,8 @@ class RealNewTabPixels @Inject constructor(
             }
             pixel.fire(NewTabPixelNames.NEW_TAB_DISPLAYED)
             pixel.fire(pixel = NewTabPixelNames.NEW_TAB_DISPLAYED_UNIQUE, type = Daily(), parameters = paramsMap)
+            pixel.fire(pixel = NewTabPixelNames.PRODUCT_SURFACE_TELEMETRY_NEW_TAB_DISPLAYED)
+            pixel.fire(pixel = NewTabPixelNames.PRODUCT_SURFACE_TELEMETRY_NEW_TAB_DISPLAYED_DAILY, type = Daily())
         }
     }
 

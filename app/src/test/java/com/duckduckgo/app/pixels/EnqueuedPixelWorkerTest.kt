@@ -105,10 +105,17 @@ class EnqueuedPixelWorkerTest {
         enqueuedPixelWorker.onStart(lifecycleOwner)
 
         verify(pixel, never()).fire(AppPixelName.APP_LAUNCH)
+        verify(pixel, never()).fire(AppPixelName.PRODUCT_TELEMETRY_SURFACE_DAU)
+        verify(pixel, never()).fire(
+            pixel = eq(AppPixelName.PRODUCT_TELEMETRY_SURFACE_DAU_DAILY),
+            type = eq(Pixel.PixelType.Daily()),
+            parameters = any(),
+            encodedParameters = any(),
+        )
     }
 
     @Test
-    fun whenOnStartAndAppLaunchThenSendAppLaunchPixel() {
+    fun whenOnStartAndAppLaunchThenSendAppLaunchPixels() {
         whenever(unsentForgetAllPixelStore.pendingPixelCountClearData).thenReturn(1)
         whenever(webViewVersionProvider.getMajorVersion()).thenReturn("91")
         whenever(defaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
@@ -124,6 +131,8 @@ class EnqueuedPixelWorkerTest {
                 Pixel.PixelParameter.IS_DUCKDUCKGO_PACKAGE to "false",
             ),
         )
+        verify(pixel).fire(AppPixelName.PRODUCT_TELEMETRY_SURFACE_DAU)
+        verify(pixel).fire(AppPixelName.PRODUCT_TELEMETRY_SURFACE_DAU_DAILY, type = Pixel.PixelType.Daily())
     }
 
     @Test
@@ -331,7 +340,10 @@ class EnqueuedPixelWorkerTest {
         verify(unsentForgetAllPixelStore).resetCount()
     }
 
-    private fun setupRemoteConfig(browserEnabled: Boolean, collectFullWebViewVersionEnabled: Boolean) {
+    private fun setupRemoteConfig(
+        browserEnabled: Boolean,
+        collectFullWebViewVersionEnabled: Boolean,
+    ) {
         androidBrowserConfigFeature.self().setRawStoredState(State(enable = browserEnabled))
         androidBrowserConfigFeature.collectFullWebViewVersion().setRawStoredState(State(enable = collectFullWebViewVersionEnabled))
     }

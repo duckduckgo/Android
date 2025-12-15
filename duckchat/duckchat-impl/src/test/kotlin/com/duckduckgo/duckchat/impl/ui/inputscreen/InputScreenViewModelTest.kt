@@ -145,6 +145,15 @@ class InputScreenViewModelTest {
         }
 
     @Test
+    fun `when initialized with search query and autocomplete enabled then send autocomplete pixels`() =
+        runTest {
+            createViewModel("search query")
+
+            verify(pixel).fire(DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_AUTOCOMPLETE_DISPLAYED)
+            verify(pixel).fire(DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_AUTOCOMPLETE_DISPLAYED_DAILY, type = Daily())
+        }
+
+    @Test
     fun `when initialized with empty text and autocomplete enabled then autocomplete suggestions should be hidden`() =
         runTest {
             val viewModel = createViewModel("")
@@ -2024,5 +2033,16 @@ class InputScreenViewModelTest {
             viewModel.onChatSubmitted(query)
 
             assertEquals(SubmitSearch(duckChatURL), viewModel.command.value)
+        }
+
+    @Test
+    fun `when sendKeyboardFocusedPixel then fire both keyboard usage pixels`() =
+        runTest {
+            val viewModel = createViewModel()
+
+            viewModel.sendKeyboardFocusedPixel()
+
+            verify(pixel).fire(DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_KEYBOARD_USAGE)
+            verify(pixel).fire(DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_KEYBOARD_USAGE_DAILY, type = Daily())
         }
 }
