@@ -16,52 +16,43 @@
 
 package com.duckduckgo.pir.impl.dashboard.messaging.handlers
 
-import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.common.utils.DispatcherProvider
+import android.content.Context
+import android.content.Intent
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
+import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebMessages
-import com.duckduckgo.pir.impl.dashboard.messaging.model.PirWebMessageResponse
-import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback
+import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebMessages.OPEN_SEND_FEEDBACK_MODAL
+import com.duckduckgo.subscriptions.api.PrivacyProFeedbackScreens.PrivacyProFeedbackScreenWithParams
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.PIR_DASHBOARD
 import com.squareup.anvil.annotations.ContributesMultibinding
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 import logcat.logcat
 import javax.inject.Inject
 
-/**
- * Handles the getFeatureConfig message from Web which is used to retrieve the client capabilities.
- */
 @ContributesMultibinding(
     scope = ActivityScope::class,
     boundType = PirWebJsMessageHandler::class,
 )
-class PirWebGetFeatureConfigMessageHandler @Inject constructor(
-    private val dispatcherProvider: DispatcherProvider,
-    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
-    private val privacyProUnifiedFeedback: PrivacyProUnifiedFeedback,
+class PirOpenSendFeedbackModalMessageHandler @Inject constructor(
+    private val globalActivityStarter: GlobalActivityStarter,
+    private val context: Context,
 ) : PirWebJsMessageHandler() {
-
-    override val message: PirDashboardWebMessages = PirDashboardWebMessages.GET_FEATURE_CONFIG
-
     override fun process(
         jsMessage: JsMessage,
         jsMessaging: JsMessaging,
         jsMessageCallback: JsMessageCallback?,
     ) {
-        logcat { "PIR-WEB: PirWebGetFeatureConfigMessageHandler: process $jsMessage" }
-
-        appCoroutineScope.launch(dispatcherProvider.io()) {
-            val useUnifiedFeedback = privacyProUnifiedFeedback.shouldUseUnifiedFeedback(PIR_DASHBOARD)
-            jsMessaging.sendResponse(
-                jsMessage = jsMessage,
-                response = PirWebMessageResponse.GetFeatureConfigResponse(
-                    useUnifiedFeedback = useUnifiedFeedback,
-                ),
-            )
-        }
+        logcat { "PIR-WEB: PirOpenSendFeedbackModalMessageHandler: process $jsMessage" }
+        val intent = globalActivityStarter.startIntent(
+            context,
+            PrivacyProFeedbackScreenWithParams(feedbackSource = PIR_DASHBOARD),
+        )
+        intent?.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        context.startActivity(intent)
     }
+
+    override val message: PirDashboardWebMessages
+        get() = OPEN_SEND_FEEDBACK_MODAL
 }

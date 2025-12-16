@@ -23,6 +23,7 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.DDG_SETTINGS
+import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.PIR_DASHBOARD
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.SUBSCRIPTION_SETTINGS
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.VPN_EXCLUDED_APPS
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.VPN_MANAGEMENT
@@ -105,6 +106,11 @@ class SubscriptionFeedbackViewModel @Inject constructor(
                     when (source) {
                         VPN_MANAGEMENT, VPN_EXCLUDED_APPS -> {
                             newMetadata = newMetadata.copy(category = VPN)
+                            FeedbackSubCategory(newMetadata.category!!.asTitle())
+                        }
+
+                        PIR_DASHBOARD -> {
+                            newMetadata = newMetadata.copy(category = PIR)
                             FeedbackSubCategory(newMetadata.category!!.asTitle())
                         }
 
@@ -363,7 +369,7 @@ class SubscriptionFeedbackViewModel @Inject constructor(
 
                 is FeedbackSubCategory -> {
                     val autoAssignedCategory = when (currentFeedbackMetadata.source) {
-                        SUBSCRIPTION_SETTINGS, VPN_MANAGEMENT, VPN_EXCLUDED_APPS -> true
+                        SUBSCRIPTION_SETTINGS, VPN_MANAGEMENT, VPN_EXCLUDED_APPS, PIR_DASHBOARD -> true
                         else -> false
                     }
                     val previousState =
