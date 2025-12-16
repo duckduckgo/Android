@@ -62,7 +62,7 @@ class MaliciousSiteModule {
             RoomDatabaseConfig(
                 migrations = ALL_MIGRATIONS.toList(),
                 fallbackToDestructiveMigration = true,
-                executor = Custom(queryPoolSize = 1, transactionPoolSize = 4),
+                executor = Custom(queryPoolSize = 4, transactionPoolSize = 1),
             ),
         )
     }
