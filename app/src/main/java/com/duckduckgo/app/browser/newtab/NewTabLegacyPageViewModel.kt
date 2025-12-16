@@ -171,6 +171,7 @@ class NewTabLegacyPageViewModel @AssistedInject constructor(
     // We only want to show New Tab when the Home CTAs from Onboarding has finished
     // https://app.asana.com/0/1157893581871903/1207769731595075/f
     private fun isHomeOnboardingComplete(): Boolean {
+        // TODO: Use here isOnboardingComplete() from OnboardingFlowChecker.
         val noBrowserCtaExperiment = extendedOnboardingFeatureToggles.noBrowserCtas().isEnabled()
         return dismissedCtaDao.exists(CtaId.DAX_END) ||
             noBrowserCtaExperiment ||
