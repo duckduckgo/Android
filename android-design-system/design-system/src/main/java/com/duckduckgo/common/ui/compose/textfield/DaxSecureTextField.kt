@@ -34,10 +34,7 @@ import androidx.compose.material3.TextFieldLabelPosition
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.SolidColor
@@ -64,6 +61,10 @@ import com.duckduckgo.mobile.android.R
  * It's a single line text field that obscures the input by default, with an option to toggle visibility.
  *
  * @param state The state of the text field that is used to read and write the text and selection.
+ * @param isPasswordVisible Boolean flag indicating whether the password is currently visible or obscured.
+ * You should manage this state and update it accordingly when [onShowHidePasswordIconClick] is called.
+ * @param onShowHidePasswordIconClick Callback for when the show/hide password icon is clicked by the user.
+ * You should update the [isPasswordVisible] state accordingly.
  * @param modifier Optional [Modifier] for this text field. Can be used request focus via [Modifier.focusRequester] for example.
  * @param label Optional label/hint text to display inside the text field when it's empty or above the text field when it has text or is focused.
  * @param inputMode Input mode for the text field, such as editable, read-only or disabled. See [DaxTextFieldInputMode] for details.
@@ -82,6 +83,8 @@ import com.duckduckgo.mobile.android.R
 @Composable
 fun DaxSecureTextField(
     state: TextFieldState,
+    isPasswordVisible: Boolean,
+    onShowHidePasswordIconClick: () -> Unit,
     modifier: Modifier = Modifier,
     label: String? = null,
     inputMode: DaxTextFieldInputMode = DaxTextFieldInputMode.Editable,
@@ -92,7 +95,7 @@ fun DaxSecureTextField(
 ) {
     // needed by the OutlinedTextField container
     val internalInteractionSource = interactionSource ?: remember { MutableInteractionSource() }
-    var isPasswordVisible by remember { mutableStateOf(false) }
+    val daxTextFieldColors = daxTextFieldColors()
 
     // combine the password visibility toggle icon with any provided trailing icon
     val trailingIconCombined: @Composable (() -> Unit)? = {
@@ -106,7 +109,7 @@ fun DaxSecureTextField(
                     },
                 ),
                 contentDescription = null,
-                onClick = { isPasswordVisible = !isPasswordVisible },
+                onClick = onShowHidePasswordIconClick,
                 enabled = inputMode == DaxTextFieldInputMode.Editable || inputMode == DaxTextFieldInputMode.ReadOnly,
             )
 
@@ -129,7 +132,7 @@ fun DaxSecureTextField(
             ),
         ),
     ) {
-        CompositionLocalProvider(LocalTextSelectionColors provides daxTextFieldColors().textSelectionColors) {
+        CompositionLocalProvider(LocalTextSelectionColors provides daxTextFieldColors.textSelectionColors) {
             // need to use BasicSecureTextField over OutlinedSecureTextField as the latter does not support readOnly mode
             BasicSecureTextField(
                 state = state,
@@ -166,8 +169,10 @@ fun DaxSecureTextField(
                     ),
                 enabled = inputMode == DaxTextFieldInputMode.Editable || inputMode == DaxTextFieldInputMode.ReadOnly,
                 readOnly = inputMode == DaxTextFieldInputMode.ReadOnly || inputMode == DaxTextFieldInputMode.Disabled,
-                textStyle = DuckDuckGoTheme.typography.body1.asTextStyle,
-                cursorBrush = SolidColor(daxTextFieldColors().cursorColor),
+                textStyle = DuckDuckGoTheme.typography.body1.asTextStyle.copy(
+                    color = DuckDuckGoTheme.textColors.primary,
+                ),
+                cursorBrush = SolidColor(daxTextFieldColors.cursorColor),
                 keyboardOptions = keyboardOptions,
                 interactionSource = internalInteractionSource,
                 textObfuscationMode = if (isPasswordVisible) {
@@ -210,14 +215,14 @@ fun DaxSecureTextField(
                         null
                     },
                     isError = !error.isNullOrBlank(),
-                    colors = daxTextFieldColors(),
+                    colors = daxTextFieldColors,
                     contentPadding = OutlinedTextFieldDefaults.contentPadding(),
                     container = {
                         OutlinedTextFieldDefaults.Container(
                             enabled = inputMode == DaxTextFieldInputMode.Editable || inputMode == DaxTextFieldInputMode.ReadOnly,
                             isError = !error.isNullOrBlank(),
                             interactionSource = internalInteractionSource,
-                            colors = daxTextFieldColors(),
+                            colors = daxTextFieldColors,
                             shape = DuckDuckGoTheme.shapes.small,
                         )
                     },
@@ -244,6 +249,8 @@ private fun DaxSecureTextFieldEmptyPreview() {
         DaxSecureTextField(
             state = TextFieldState(),
             label = "Enter password",
+            isPasswordVisible = false,
+            onShowHidePasswordIconClick = {},
         )
     }
 }
@@ -251,11 +258,27 @@ private fun DaxSecureTextFieldEmptyPreview() {
 @PreviewFontScale
 @PreviewLightDark
 @Composable
-private fun DaxSecureTextFieldWithTextPreview() {
+private fun DaxSecureTextFieldWithPlainTextPreview() {
     DaxSecureTextFieldPreviewBox {
         DaxSecureTextField(
             state = TextFieldState(initialText = "SecurePassword123"),
             label = "Enter password",
+            isPasswordVisible = true,
+            onShowHidePasswordIconClick = {},
+        )
+    }
+}
+
+@PreviewFontScale
+@PreviewLightDark
+@Composable
+private fun DaxSecureTextFieldWithObscureTextPreview() {
+    DaxSecureTextFieldPreviewBox {
+        DaxSecureTextField(
+            state = TextFieldState(initialText = "SecurePassword123"),
+            label = "Enter password",
+            isPasswordVisible = false,
+            onShowHidePasswordIconClick = {},
         )
     }
 }
@@ -266,6 +289,8 @@ private fun DaxSecureTextFieldNoLabelPreview() {
     DaxSecureTextFieldPreviewBox {
         DaxSecureTextField(
             state = TextFieldState(initialText = "SecurePassword123"),
+            isPasswordVisible = false,
+            onShowHidePasswordIconClick = {},
         )
     }
 }
@@ -276,6 +301,8 @@ private fun DaxSecureTextFieldEditablePreview() {
     DaxSecureTextFieldPreviewBox {
         DaxSecureTextField(
             state = TextFieldState(initialText = "SecurePassword123"),
+            isPasswordVisible = false,
+            onShowHidePasswordIconClick = {},
             label = "Enter password",
             inputMode = DaxTextFieldInputMode.Editable,
         )
@@ -288,6 +315,8 @@ private fun DaxSecureTextFieldDisabledPreview() {
     DaxSecureTextFieldPreviewBox {
         DaxSecureTextField(
             state = TextFieldState(initialText = "SecurePassword123"),
+            isPasswordVisible = false,
+            onShowHidePasswordIconClick = {},
             label = "Enter password",
             inputMode = DaxTextFieldInputMode.Disabled,
         )
@@ -300,6 +329,8 @@ private fun DaxSecureTextFieldNonEditablePreview() {
     DaxSecureTextFieldPreviewBox {
         DaxSecureTextField(
             state = TextFieldState(initialText = "SecurePassword123"),
+            isPasswordVisible = false,
+            onShowHidePasswordIconClick = {},
             label = "Read only password",
             inputMode = DaxTextFieldInputMode.ReadOnly,
         )
@@ -312,6 +343,8 @@ private fun DaxSecureTextFieldWithErrorPreview() {
     DaxSecureTextFieldPreviewBox {
         DaxSecureTextField(
             state = TextFieldState(initialText = "weak"),
+            isPasswordVisible = false,
+            onShowHidePasswordIconClick = {},
             label = "Enter password",
             error = "Password must be at least 8 characters",
         )
@@ -324,6 +357,8 @@ private fun DaxSecureTextFieldWithTrailingIconPreview() {
     DaxSecureTextFieldPreviewBox {
         DaxSecureTextField(
             state = TextFieldState(initialText = "SecurePassword123"),
+            isPasswordVisible = false,
+            onShowHidePasswordIconClick = {},
             label = "Enter password",
             trailingIcon = {
                 DaxTextFieldTrailingIconScope.DaxTextFieldTrailingIcon(
@@ -342,6 +377,8 @@ private fun DaxSecureTextFieldEmptyWithTrailingIconPreview() {
     DaxSecureTextFieldPreviewBox {
         DaxSecureTextField(
             state = TextFieldState(),
+            isPasswordVisible = false,
+            onShowHidePasswordIconClick = {},
             label = "Enter password",
             trailingIcon = {
                 DaxTextFieldTrailingIconScope.DaxTextFieldTrailingIcon(
@@ -360,6 +397,8 @@ private fun DaxSecureTextFieldErrorWithTrailingIconPreview() {
     DaxSecureTextFieldPreviewBox {
         DaxSecureTextField(
             state = TextFieldState(initialText = "weak"),
+            isPasswordVisible = false,
+            onShowHidePasswordIconClick = {},
             label = "Enter password",
             error = "Password must contain uppercase, lowercase, and numbers",
             trailingIcon = {

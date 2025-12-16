@@ -318,8 +318,12 @@ class ComponentTextInputFragment : Fragment() {
         // Editable password that fits in one line
         view.setupThemedComposeView(id = com.duckduckgo.common.ui.internal.R.id.compose_text_input_6, isDarkTheme = isDarkTheme) {
             val state = rememberTextFieldState("Loremipsumolor")
+            var isPasswordVisible by remember { mutableStateOf(false) }
+
             DaxSecureTextField(
                 state = state,
+                isPasswordVisible = isPasswordVisible,
+                onShowHidePasswordIconClick = { isPasswordVisible = !isPasswordVisible },
                 label = "Editable password that fits in one line",
             )
         }
@@ -330,8 +334,12 @@ class ComponentTextInputFragment : Fragment() {
                 "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do " +
                     "eiusmod tempor incididunt ut labore.",
             )
+            var isPasswordVisible by remember { mutableStateOf(false) }
+
             DaxSecureTextField(
                 state = state,
+                isPasswordVisible = isPasswordVisible,
+                onShowHidePasswordIconClick = { isPasswordVisible = !isPasswordVisible },
                 label = "Editable password that doesn't fit in one line",
             )
         }
@@ -342,8 +350,12 @@ class ComponentTextInputFragment : Fragment() {
                 "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do " +
                     "eiusmod tempor incididunt ut labore.",
             )
+            var isPasswordVisible by remember { mutableStateOf(false) }
+
             DaxSecureTextField(
                 state = state,
+                isPasswordVisible = isPasswordVisible,
+                onShowHidePasswordIconClick = { isPasswordVisible = !isPasswordVisible },
                 label = "Non-editable password",
                 inputMode = DaxTextFieldInputMode.ReadOnly,
             )
@@ -355,8 +367,12 @@ class ComponentTextInputFragment : Fragment() {
                 "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do " +
                     "eiusmod tempor incididunt ut labore.",
             )
+            var isPasswordVisible by remember { mutableStateOf(false) }
+
             DaxSecureTextField(
                 state = state,
+                isPasswordVisible = isPasswordVisible,
+                onShowHidePasswordIconClick = { isPasswordVisible = !isPasswordVisible },
                 label = "Non-editable password with icon",
                 trailingIcon = {
                     DaxTextFieldTrailingIconScope.DaxTextFieldTrailingIcon(
@@ -407,8 +423,12 @@ class ComponentTextInputFragment : Fragment() {
         // Disabled password
         view.setupThemedComposeView(id = com.duckduckgo.common.ui.internal.R.id.compose_text_input_24, isDarkTheme = isDarkTheme) {
             val state = rememberTextFieldState("This password input is disabled")
+            var isPasswordVisible by remember { mutableStateOf(false) }
+
             DaxSecureTextField(
                 state = state,
+                isPasswordVisible = isPasswordVisible,
+                onShowHidePasswordIconClick = { isPasswordVisible = !isPasswordVisible },
                 label = "Disabled password",
                 inputMode = DaxTextFieldInputMode.Disabled,
             )
