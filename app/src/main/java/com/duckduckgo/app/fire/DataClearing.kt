@@ -48,7 +48,7 @@ class DataClearing @Inject constructor(
     private val dataClearerTimeKeeper: BackgroundTimeKeeper,
 ) : ManualDataClearing, AutomaticDataClearing {
 
-    override suspend fun clearDataUsingManualFireOptions(shouldRestartProcess: Boolean, wasAppUsedSinceLastClear: Boolean) {
+    override suspend fun clearDataUsingManualFireOptions(shouldRestartIfRequired: Boolean, wasAppUsedSinceLastClear: Boolean) {
         val options = fireDataStore.getManualClearOptions()
         performGranularClear(
             options = options,
@@ -58,7 +58,7 @@ class DataClearing @Inject constructor(
         clearDataAction.setAppUsedSinceLastClearFlag(wasAppUsedSinceLastClear)
 
         val wasDataCleared = options.contains(FireClearOption.DATA) || options.contains(FireClearOption.DUCKAI_CHATS)
-        if (shouldRestartProcess && wasDataCleared) {
+        if (shouldRestartIfRequired && wasDataCleared) {
             clearDataAction.killAndRestartProcess(notifyDataCleared = false)
         }
     }

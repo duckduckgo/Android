@@ -554,10 +554,8 @@ open class BrowserActivity : DuckDuckGoActivity() {
             logcat(INFO) { "Clearing everything as a result of $PERFORM_FIRE_ON_ENTRY_EXTRA flag being set" }
             appCoroutineScope.launch(dispatcherProvider.io()) {
                 if (androidBrowserConfigFeature.moreGranularDataClearingOptions().isEnabled()) {
-                    // Use new granular clearing - will automatically clear and restart
-                    dataClearing.clearDataUsingManualFireOptions(shouldRestartProcess = true)
+                    dataClearing.clearDataUsingManualFireOptions(shouldRestartIfRequired = true)
                 } else {
-                    // Use legacy clearing
                     clearDataAction.clearTabsAndAllDataAsync(appInForeground = true, shouldFireDataClearPixel = true)
                     clearDataAction.setAppUsedSinceLastClearFlag(false)
                     clearDataAction.killAndRestartProcess(notifyDataCleared = false)

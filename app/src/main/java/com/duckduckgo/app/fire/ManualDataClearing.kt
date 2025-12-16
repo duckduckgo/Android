@@ -22,8 +22,8 @@ package com.duckduckgo.app.fire
 interface ManualDataClearing {
     /**
      * Clears data when user requests data clearing using the FireDialog.
-     * @param shouldRestartProcess whether to restart the app process after clearing data
+     * @param shouldRestartIfRequired whether to restart the app process after clearing data, if required (when data or chats cleared)
      * @param wasAppUsedSinceLastClear whether the app was used since the last data clear
      */
-    suspend fun clearDataUsingManualFireOptions(shouldRestartProcess: Boolean = false, wasAppUsedSinceLastClear: Boolean = false)
+    suspend fun clearDataUsingManualFireOptions(shouldRestartIfRequired: Boolean = false, wasAppUsedSinceLastClear: Boolean = false)
 }
