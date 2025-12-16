@@ -30,6 +30,7 @@ import android.webkit.WebSettings
 import android.webkit.WebView
 import androidx.annotation.AnyThread
 import androidx.core.content.ContextCompat
+import androidx.core.view.doOnLayout
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.app.tabs.BrowserNav
@@ -90,6 +91,7 @@ class DuckChatContextualBottomSheet(
     internal lateinit var simpleWebview: WebView
     internal lateinit var inputControls: View
     internal lateinit var promptsList: View
+    internal lateinit var webViewContainer: View
 
     private val viewModel: DuckChatWebViewViewModel by lazy {
         ViewModelProvider(this, viewModelFactory)[DuckChatWebViewViewModel::class.java]
@@ -112,6 +114,7 @@ class DuckChatContextualBottomSheet(
         simpleWebview = binding.simpleWebview
         inputControls = binding.inputModeWidgetCard
         promptsList = binding.contextualModePrompts
+        webViewContainer = binding.contextualWebViewContainer
         configureViews(binding)
         return binding.root
     }
@@ -119,7 +122,15 @@ class DuckChatContextualBottomSheet(
     private fun configureViews(binding: BottomSheetDuckAiContextualBinding) {
         val bottomSheetDialog = dialog as? BottomSheetDialog
         bottomSheetDialog?.let {
+            it.behavior.isFitToContents = false
+            it.behavior.expandedOffset = 0
             it.behavior.state = BottomSheetBehavior.STATE_COLLAPSED
+            binding.root.doOnLayout {
+                val peekHeight = calculatePeekHeight(binding)
+                if (peekHeight > 0) {
+                    bottomSheetDialog.behavior.peekHeight = peekHeight
+                }
+            }
             // Set up callback to prevent collapsing after expansion
             it.behavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
                 override fun onStateChanged(bottomSheet: View, newState: Int) {
@@ -150,6 +161,7 @@ class DuckChatContextualBottomSheet(
     private fun expandSheet() {
         inputControls.gone()
         promptsList.gone()
+        webViewContainer.visibility = View.VISIBLE
         val bottomSheetDialog = dialog as? BottomSheetDialog
         bottomSheetDialog?.let {
             it.behavior.state = BottomSheetBehavior.STATE_EXPANDED
@@ -322,6 +334,21 @@ class DuckChatContextualBottomSheet(
 
     override fun cancelDownload() {
         // NOOP
+    }
+
+    private fun calculatePeekHeight(binding: BottomSheetDuckAiContextualBinding): Int {
+        val headerHeight = viewHeightWithMargins(binding.contextualModeButtons)
+        val promptsHeight = viewHeightWithMargins(binding.contextualModePrompts)
+        val inputHeight = viewHeightWithMargins(binding.inputModeWidgetCard)
+        val rootPadding = binding.root.paddingTop + binding.root.paddingBottom
+        return (headerHeight + promptsHeight + inputHeight + rootPadding).coerceAtLeast(0)
+    }
+
+    private fun viewHeightWithMargins(view: View): Int {
+        val layoutParams = view.layoutParams as? ViewGroup.MarginLayoutParams
+        val verticalMargins = (layoutParams?.topMargin ?: 0) + (layoutParams?.bottomMargin ?: 0)
+        val baseHeight = if (view.height > 0) view.height else view.measuredHeight
+        return baseHeight + verticalMargins
     }
 
     private fun launchDownloadMessagesJob() {

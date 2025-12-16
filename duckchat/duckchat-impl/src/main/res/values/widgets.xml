@@ -24,7 +24,6 @@
         <item name="behavior_skipCollapsed">false</item>
         <item name="behavior_hideable">true</item>
         <item name="behavior_draggable">true</item>
-        <item name="behavior_peekHeight">300dp</item>
     </style>
 
 </resources>
