@@ -53,6 +53,9 @@ class ModalSurfaceViewModel @Inject constructor(
         if (messageType == Content.MessageType.CARDS_LIST) {
             lastRemoteMessageIdSeen = messageId
             _viewState.value = ViewState(messageId = messageId, showCardsListView = true)
+        } else {
+            lastRemoteMessageIdSeen = messageId
+            _viewState.value = ViewState(messageId = messageId, showCardsListView = false)
         }
     }
 

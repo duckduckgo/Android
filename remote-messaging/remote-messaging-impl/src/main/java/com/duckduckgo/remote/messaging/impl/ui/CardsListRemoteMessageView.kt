@@ -95,7 +95,7 @@ class CardsListRemoteMessageView @JvmOverloads constructor(
     private val conflatedStateJob = ConflatedJob()
     private val conflatedCommandJob = ConflatedJob()
 
-    var listener: CardsListRemoteMessageListener? = null
+    var listener: RemoteMessageDismissListener? = null
     var messageId: String? = null
 
     override fun onAttachedToWindow() {
@@ -243,9 +243,5 @@ class CardsListRemoteMessageView @JvmOverloads constructor(
         context?.let {
             globalActivityStarter.start(it, DeeplinkActivityParams(screenName = screen, jsonArguments = payload), null)
         }
-    }
-
-    interface CardsListRemoteMessageListener {
-        fun onDismiss()
     }
 }

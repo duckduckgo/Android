@@ -24,4 +24,10 @@
         android:layout_height="match_parent"
         android:visibility="gone"/>
 
+    <com.duckduckgo.remote.messaging.impl.newtab.RemoteMessageView
+        android:id="@+id/remoteMessageView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"/>
+
 </FrameLayout>

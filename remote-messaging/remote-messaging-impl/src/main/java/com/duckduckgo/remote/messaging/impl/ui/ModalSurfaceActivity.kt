@@ -35,7 +35,7 @@ import kotlinx.coroutines.flow.onEach
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(ModalSurfaceActivityFromMessageId::class)
-class ModalSurfaceActivity : DuckDuckGoActivity(), CardsListRemoteMessageView.CardsListRemoteMessageListener {
+class ModalSurfaceActivity : DuckDuckGoActivity(), RemoteMessageDismissListener {
 
     private val viewModel: ModalSurfaceViewModel by bindViewModel()
     private val binding: ActivityModalSurfaceBinding by viewBinding()
@@ -76,6 +76,9 @@ class ModalSurfaceActivity : DuckDuckGoActivity(), CardsListRemoteMessageView.Ca
             binding.cardsListRemoteMessageView.messageId = viewState.messageId
             binding.cardsListRemoteMessageView.listener = this
             binding.cardsListRemoteMessageView.show()
+        } else {
+            binding.remoteMessageView.listener = this
+            binding.remoteMessageView.show()
         }
     }
 

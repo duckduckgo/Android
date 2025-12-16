@@ -64,6 +64,7 @@ import com.duckduckgo.remote.messaging.impl.newtab.RemoteMessageViewModel.Comman
 import com.duckduckgo.remote.messaging.impl.newtab.RemoteMessageViewModel.Command.SharePromoLinkRMF
 import com.duckduckgo.remote.messaging.impl.newtab.RemoteMessageViewModel.Command.SubmitUrl
 import com.duckduckgo.remote.messaging.impl.newtab.RemoteMessageViewModel.ViewState
+import com.duckduckgo.remote.messaging.impl.ui.RemoteMessageDismissListener
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -103,6 +104,8 @@ class RemoteMessageView @JvmOverloads constructor(
         ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[RemoteMessageViewModel::class.java]
     }
 
+    var listener: RemoteMessageDismissListener? = null
+
     private val conflatedStateJob = ConflatedJob()
     private val conflatedCommandJob = ConflatedJob()
 
@@ -134,6 +137,9 @@ class RemoteMessageView @JvmOverloads constructor(
             showRemoteMessage(viewState.message, viewState.newMessage)
         } else {
             binding.messageCta.gone()
+            if (viewState.newMessage) {
+                listener?.onDismiss()
+            }
         }
     }
 
