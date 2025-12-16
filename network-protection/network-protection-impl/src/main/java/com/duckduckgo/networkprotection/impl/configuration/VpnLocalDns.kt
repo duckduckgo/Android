@@ -16,8 +16,9 @@
 
 package com.duckduckgo.networkprotection.impl.configuration
 
-import com.duckduckgo.di.scopes.VpnScope
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.networkprotection.impl.VpnRemoteFeatures
+import com.duckduckgo.networkprotection.impl.configuration.VPNExcludedDomainsFallback.DnsEntry
 import com.squareup.anvil.annotations.ContributesTo
 import com.squareup.moshi.Moshi
 import dagger.Module
@@ -27,18 +28,14 @@ import logcat.asLog
 import logcat.logcat
 import okhttp3.Dns
 import java.net.InetAddress
-import javax.inject.Qualifier
 
 interface VpnLocalDns : Dns
-
-internal const val CONTROLLER_NETP_DUCKDUCKGO_COM = "controller.netp.duckduckgo.com"
-private const val VPN_EUN_CONTROLLER = "20.93.77.32"
-private const val VPN_USE_CONTROLLER = "20.253.26.112"
 
 private class VpnLocalDnsImpl(
     private val vpnRemoteFeatures: VpnRemoteFeatures,
     moshi: Moshi,
     private val defaultDns: Dns,
+    private val excludeDomainsFallback: VPNExcludedDomainsFallback,
 ) : VpnLocalDns {
 
     private val adapter = moshi.adapter(LocalDnsSettings::class.java)
@@ -51,12 +48,9 @@ private class VpnLocalDnsImpl(
         getRemoteDnsEntries()
     }
 
-    private val fallbackDomains: Map<String, List<DnsEntry>> = mapOf(
-        CONTROLLER_NETP_DUCKDUCKGO_COM to listOf(
-            DnsEntry(VPN_USE_CONTROLLER, "use"),
-            DnsEntry(VPN_EUN_CONTROLLER, "eun"),
-        ),
-    )
+    private val fallbackDomains: Map<String, List<DnsEntry>> by lazy {
+        excludeDomainsFallback.getFallback()
+    }
 
     override fun lookup(hostname: String): List<InetAddress> {
         logcat { "Lookup for $hostname" }
@@ -109,33 +103,19 @@ private class VpnLocalDnsImpl(
     private data class LocalDnsSettings(
         val domains: Map<String, List<DnsEntry>>,
     )
-
-    private data class DnsEntry(
-        val address: String,
-        val region: String,
-    )
 }
 
-@ContributesTo(VpnScope::class)
+@ContributesTo(AppScope::class)
 @Module
 object VpnLocalDnsModule {
-    @Retention(AnnotationRetention.BINARY)
-    @Qualifier
-    private annotation class InternalApi
 
     @Provides
-    @SingleInstanceIn(VpnScope::class)
+    @SingleInstanceIn(AppScope::class)
     fun provideVpnLocalDns(
         vpnRemoteFeatures: VpnRemoteFeatures,
         moshi: Moshi,
-        @InternalApi defaultDns: Dns,
-    ): VpnLocalDns {
-        return VpnLocalDnsImpl(vpnRemoteFeatures, moshi, defaultDns)
-    }
-
-    @Provides
-    @InternalApi
-    fun provideDefaultDns(): Dns {
-        return Dns.SYSTEM
+        excludeDomainsFallback: VPNExcludedDomainsFallback,
+    ): Dns {
+        return VpnLocalDnsImpl(vpnRemoteFeatures, moshi, Dns.SYSTEM, excludeDomainsFallback)
     }
 }
