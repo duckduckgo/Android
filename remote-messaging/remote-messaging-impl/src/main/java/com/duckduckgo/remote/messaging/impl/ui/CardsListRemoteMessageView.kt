@@ -142,6 +142,7 @@ class CardsListRemoteMessageView @JvmOverloads constructor(
             binding.headerImage.setImageResource(it.placeholder.drawable(true))
             binding.headerTitle.text = it.titleText
             binding.actionButton.text = it.primaryActionText
+            viewModel.onMessageShown()
         }
     }
 
