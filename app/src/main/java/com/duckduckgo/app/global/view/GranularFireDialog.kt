@@ -197,7 +197,9 @@ class GranularFireDialog : BottomSheetDialogFragment(), FireDialog {
             .onEach { command ->
                 when (command) {
                     is Command.PlayAnimation -> {
-                        playAnimation()
+                        if (animationEnabled()) {
+                            playAnimation()
+                        }
                     }
                     is Command.ClearingComplete -> {
                         onClearingComplete()
