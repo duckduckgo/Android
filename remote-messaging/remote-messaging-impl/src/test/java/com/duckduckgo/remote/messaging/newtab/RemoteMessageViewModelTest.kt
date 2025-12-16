@@ -74,13 +74,15 @@ class RemoteMessageViewModelTest {
     }
 
     @Test
-    fun whenViewModelInitialisedWithMessageAndModalSurfaceThenViewStateEmitInitStateWithNoMessageToShow() = runTest {
+    fun whenViewModelInitialisedWithMessageAndModalSurfaceThenViewStateEmitInitStateCorrectMessageToShow() = runTest {
         val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList(), listOf(Surface.MODAL))
         whenever(remoteMessageModel.getActiveMessages()).thenReturn(flowOf(remoteMessage))
         testee.onStart(mockLifecycleOwner)
         testee.viewState.test {
             expectMostRecentItem().also {
-                assertFalse(it.newMessage)
+                assertTrue(it.newMessage)
+                assertTrue(it.message?.id == remoteMessage.id)
+                assertTrue(it.message?.content == remoteMessage.content)
             }
         }
     }

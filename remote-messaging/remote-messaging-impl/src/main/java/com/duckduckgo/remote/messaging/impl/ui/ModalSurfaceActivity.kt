@@ -71,18 +71,20 @@ class ModalSurfaceActivity : DuckDuckGoActivity(), RemoteMessageDismissListener 
     }
 
     private fun render(viewState: ModalSurfaceViewModel.ViewState?) {
-        if (viewState == null) return
-
-        if (viewState.showCardsListView) {
-            binding.remoteMessageView.gone()
-            binding.cardsListRemoteMessageView.messageId = viewState.messageId
-            binding.cardsListRemoteMessageView.listener = this
-            binding.cardsListRemoteMessageView.show()
-        } else {
-            // RemoteMessageView fetches the active message from RemoteMessageModel, so no messageId is needed
-            binding.cardsListRemoteMessageView.gone()
-            binding.remoteMessageView.listener = this
-            binding.remoteMessageView.show()
+        when (viewState) {
+            is ModalSurfaceViewModel.ViewState.CardsList -> {
+                binding.remoteMessageView.gone()
+                binding.cardsListRemoteMessageView.messageId = viewState.messageId
+                binding.cardsListRemoteMessageView.listener = this
+                binding.cardsListRemoteMessageView.show()
+            }
+            is ModalSurfaceViewModel.ViewState.Message -> {
+                // RemoteMessageView fetches the active message from RemoteMessageModel, so no messageId is needed
+                binding.cardsListRemoteMessageView.gone()
+                binding.remoteMessageView.listener = this
+                binding.remoteMessageView.show()
+            }
+            null -> { }
         }
     }
 

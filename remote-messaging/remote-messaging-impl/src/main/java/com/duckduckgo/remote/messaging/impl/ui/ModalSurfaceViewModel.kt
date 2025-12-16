@@ -51,10 +51,11 @@ class ModalSurfaceViewModel @Inject constructor(
         val messageType = activityParams.messageType
 
         lastRemoteMessageIdSeen = messageId
-        _viewState.value = ViewState(
-            messageId = messageId,
-            showCardsListView = messageType == Content.MessageType.CARDS_LIST,
-        )
+        _viewState.value = if (messageType == Content.MessageType.CARDS_LIST) {
+            ViewState.CardsList(messageId)
+        } else {
+            ViewState.Message
+        }
     }
 
     fun onDismiss() {
@@ -64,29 +65,32 @@ class ModalSurfaceViewModel @Inject constructor(
     }
 
     fun onBackPressed() {
-        val currentState = _viewState.value
-        if (currentState?.showCardsListView != true) {
-            // If not showing CardsListView, just dismiss without pixel
-            viewModelScope.launch {
-                _command.send(Command.DismissMessage)
+        when (_viewState.value) {
+            is ViewState.CardsList -> {
+                viewModelScope.launch {
+                    val customParams = mapOf(
+                        PARAM_NAME_DISMISS_TYPE to PARAM_VALUE_BACK_BUTTON_OR_GESTURE,
+                    )
+                    lastRemoteMessageIdSeen?.let {
+                        cardsListPixelHelper.dismissCardsListMessage(it, customParams)
+                    }
+                    _command.send(Command.DismissMessage)
+                }
             }
-            return
-        }
-
-        viewModelScope.launch {
-            val customParams = mapOf(
-                PARAM_NAME_DISMISS_TYPE to PARAM_VALUE_BACK_BUTTON_OR_GESTURE,
-            )
-            lastRemoteMessageIdSeen?.let {
-                cardsListPixelHelper.dismissCardsListMessage(it, customParams)
+            is ViewState.Message, null -> {
+                viewModelScope.launch {
+                    _command.send(Command.DismissMessage)
+                }
             }
-            _command.send(Command.DismissMessage)
         }
     }
 
-    data class ViewState(val messageId: String, val showCardsListView: Boolean)
+    sealed class ViewState {
+        data class CardsList(val messageId: String) : ViewState()
+        data object Message : ViewState()
+    }
 
     sealed class Command {
-        object DismissMessage : Command()
+        data object DismissMessage : Command()
     }
 }

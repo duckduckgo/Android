@@ -56,7 +56,7 @@ class ModalSurfaceViewModelTest {
     }
 
     @Test
-    fun whenInitialiseCalledWithCardsListMessageTypeThenViewStateShowsCardsListView() = runTest {
+    fun whenInitialiseCalledWithCardsListMessageTypeThenViewStateIsCardsList() = runTest {
         val messageId = "test-message-id"
         val params = ModalSurfaceActivityFromMessageId(
             messageId = messageId,
@@ -69,16 +69,15 @@ class ModalSurfaceViewModelTest {
             viewModel.onInitialise(params)
 
             val viewState = awaitItem()
-            assertNotNull(viewState)
-            assertEquals(messageId, viewState?.messageId)
-            assertTrue(viewState?.showCardsListView == true)
+            assertTrue(viewState is ModalSurfaceViewModel.ViewState.CardsList)
+            assertEquals(messageId, (viewState as ModalSurfaceViewModel.ViewState.CardsList).messageId)
 
             cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun whenInitialiseCalledWithNonCardsListMessageTypeThenViewStateRemainsNull() = runTest {
+    fun whenInitialiseCalledWithNonCardsListMessageTypeThenViewStateIsMessage() = runTest {
         val messageId = "test-message-id"
         val params = ModalSurfaceActivityFromMessageId(
             messageId = messageId,
@@ -86,9 +85,13 @@ class ModalSurfaceViewModelTest {
         )
 
         viewModel.viewState.test {
+            assertNull(awaitItem()) // Initial state
+
             viewModel.onInitialise(params)
 
-            assertNull(awaitItem())
+            val viewState = awaitItem()
+            assertTrue(viewState is ModalSurfaceViewModel.ViewState.Message)
+
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -106,14 +109,14 @@ class ModalSurfaceViewModelTest {
     }
 
     @Test
-    fun whenOnBackPressedWithCardsListViewShownThenDismissMessageCommandEmittedAndPixelFired() = runTest {
+    fun whenOnBackPressedWithCardsListShownThenDismissMessageCommandEmittedAndPixelFired() = runTest {
         val messageId = "test-message-id"
         val params = ModalSurfaceActivityFromMessageId(
             messageId = messageId,
             messageType = Content.MessageType.CARDS_LIST,
         )
 
-        // Initialize with CARDS_LIST to set showCardsListView = true
+        // Initialize with CARDS_LIST to set ViewState.CardsList
         viewModel.onInitialise(params)
 
         viewModel.commands.test {
@@ -134,15 +137,22 @@ class ModalSurfaceViewModelTest {
     }
 
     @Test
-    fun whenOnBackPressedWithCardsListViewNotShownThenDismissMessageCommandEmittedWithoutPixel() = runTest {
-        // Don't initialize or initialize with non-CARDS_LIST type, so showCardsListView = false
+    fun whenOnBackPressedWithMessageViewShownThenDismissMessageCommandEmittedWithoutPixel() = runTest {
+        val params = ModalSurfaceActivityFromMessageId(
+            messageId = "test-message-id",
+            messageType = Content.MessageType.SMALL,
+        )
+
+        // Initialize with non-CARDS_LIST type to set ViewState.Message
+        viewModel.onInitialise(params)
+
         viewModel.commands.test {
             viewModel.onBackPressed()
 
             val command = awaitItem()
             assertTrue(command is ModalSurfaceViewModel.Command.DismissMessage)
 
-            // Verify pixel helper was NOT called
+            // Verify pixel helper was NOT called for Message view
             verifyNoInteractions(cardsListPixelHelper)
 
             cancelAndIgnoreRemainingEvents()
@@ -150,9 +160,9 @@ class ModalSurfaceViewModelTest {
     }
 
     @Test
-    fun whenOnBackPressedWithCardsListViewButNoMessageIdThenDismissMessageCommandEmittedWithoutPixel() = runTest {
-        // This tests an edge case where viewState might be set but lastRemoteMessageIdSeen is null
-        // In the current implementation, this shouldn't happen, but it's good to verify the null-safe behavior
+    fun whenOnBackPressedWithNoViewStateThenDismissMessageCommandEmittedWithoutPixel() = runTest {
+        // This tests an edge case where viewState is null and lastRemoteMessageIdSeen is null
+        // Verifies the null-safe behavior
         viewModel.commands.test {
             viewModel.onBackPressed()
 
