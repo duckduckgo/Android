@@ -123,14 +123,6 @@ class DuckChatContextualBottomSheet(
             // Set up callback to prevent collapsing after expansion
             it.behavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
                 override fun onStateChanged(bottomSheet: View, newState: Int) {
-                    // Prevent collapsing after expansion - only allow expanded or hidden/dismissed states
-                    if (isExpanded && newState == BottomSheetBehavior.STATE_COLLAPSED) {
-                        // If already expanded, prevent collapsing - force back to expanded
-                        // Use post to avoid infinite loop
-                        bottomSheet.post {
-                            it.behavior.state = BottomSheetBehavior.STATE_EXPANDED
-                        }
-                    }
                     if (newState == BottomSheetBehavior.STATE_EXPANDED) {
                         isExpanded = true
                         // Set skipCollapsed to prevent dragging back to collapsed state
@@ -140,13 +132,6 @@ class DuckChatContextualBottomSheet(
                 }
 
                 override fun onSlide(bottomSheet: View, slideOffset: Float) {
-                    // Prevent sliding to collapsed state if already expanded
-                    if (isExpanded && slideOffset < 0.5f) {
-                        // If trying to collapse, keep it expanded
-                        bottomSheet.post {
-                            it.behavior.state = BottomSheetBehavior.STATE_EXPANDED
-                        }
-                    }
                 }
             })
         }
@@ -159,11 +144,6 @@ class DuckChatContextualBottomSheet(
         }
         binding.actionSend.setOnClickListener {
             expandSheet()
-        }
-        binding.inputField.onFocusChangeListener = View.OnFocusChangeListener { _, hasFocus ->
-            if (hasFocus) {
-                expandSheet()
-            }
         }
     }
 

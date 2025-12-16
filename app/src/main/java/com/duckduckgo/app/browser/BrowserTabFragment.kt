@@ -277,7 +277,6 @@ import com.duckduckgo.common.utils.extensions.hideKeyboard
 import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.common.utils.extensions.showKeyboard
 import com.duckduckgo.common.utils.extensions.websiteFromGeoLocationsApiOrigin
-import com.duckduckgo.common.utils.keyboardVisibilityFlow
 import com.duckduckgo.common.utils.playstore.PlayStoreUtils
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.FragmentScope
@@ -4988,15 +4987,15 @@ class BrowserTabFragment :
     }
 
     private fun configureBrowserTabKeyboardListener() {
-        binding.root.rootView.keyboardVisibilityFlow()
-            .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
-            .distinctUntilChanged()
-            .onEach { isVisible ->
-                if (isVisible) {
-                    viewModel.sendKeyboardFocusedPixel()
-                }
-            }
-            .launchIn(lifecycleScope)
+        // binding.root.rootView.keyboardVisibilityFlow()
+        //     .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
+        //     .distinctUntilChanged()
+        //     .onEach { isVisible ->
+        //         if (isVisible) {
+        //             viewModel.sendKeyboardFocusedPixel()
+        //         }
+        //     }
+        //     .launchIn(lifecycleScope)
     }
 }
 

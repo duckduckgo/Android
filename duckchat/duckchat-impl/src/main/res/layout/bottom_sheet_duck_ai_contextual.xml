@@ -14,19 +14,21 @@
   ~ limitations under the License.
   -->
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/inputModeWidgetLayout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:layout_height="wrap_content">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/contextualModeButtons"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         android:paddingTop="@dimen/keyline_4"
         android:layout_marginBottom="@dimen/keyline_4"
         android:paddingHorizontal="@dimen/keyline_2">
@@ -81,10 +83,21 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <FrameLayout
+        android:id="@+id/contextualModeInputSpacer"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/contextualModeButtons"
+        android:layout_width="match_parent"
+        android:layout_height="0dp" />
+
     <LinearLayout
         android:id="@+id/contextualModePrompts"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/contextualModeInputSpacer"
         android:orientation="vertical"
         android:paddingHorizontal="@dimen/keyline_4"
         android:paddingTop="@dimen/keyline_4"
@@ -108,6 +121,10 @@
         style="@style/Widget.DuckDuckGo.OmnibarCardView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/contextualModePrompts"
+        app:layout_constraintBottom_toBottomOf="parent"
         android:layout_marginHorizontal="@dimen/keyline_4"
         android:layout_marginTop="@dimen/keyline_2"
         android:layout_marginBottom="@dimen/keyline_4"
@@ -195,8 +212,22 @@
     </com.google.android.material.card.MaterialCardView>
 
     <FrameLayout
+        android:id="@+id/contextualModeBottomSpacer"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/inputModeWidgetCard"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="0dp"/>
+
+    <FrameLayout
+        android:id="@+id/contextualWebViewContainer"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         android:minHeight="800dp">
 
         <WebView
@@ -208,4 +239,4 @@
     </FrameLayout>
 
 
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
