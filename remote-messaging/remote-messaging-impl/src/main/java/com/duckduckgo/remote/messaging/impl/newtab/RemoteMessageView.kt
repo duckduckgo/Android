@@ -137,7 +137,7 @@ class RemoteMessageView @JvmOverloads constructor(
             showRemoteMessage(viewState.message, viewState.newMessage)
         } else {
             binding.messageCta.gone()
-            if (viewState.newMessage) {
+            if (viewState.dismissed) {
                 listener?.onDismiss()
             }
         }

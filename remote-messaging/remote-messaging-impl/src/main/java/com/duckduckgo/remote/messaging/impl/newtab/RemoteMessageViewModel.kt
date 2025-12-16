@@ -64,6 +64,7 @@ class RemoteMessageViewModel @Inject constructor(
     data class ViewState(
         val message: RemoteMessage? = null,
         val newMessage: Boolean = false,
+        val dismissed: Boolean = false,
     )
 
     sealed class Command {
@@ -102,6 +103,7 @@ class RemoteMessageViewModel @Inject constructor(
                 .onEach { message ->
                     withContext(dispatchers.main()) {
                         val newMessage = message?.id != lastRemoteMessageSeen?.id
+                        val dismissed = newMessage && message == null && lastRemoteMessageSeen != null
                         if (newMessage) {
                             lastRemoteMessageSeen = message
                         }
@@ -110,6 +112,7 @@ class RemoteMessageViewModel @Inject constructor(
                             viewState.value.copy(
                                 message = message,
                                 newMessage = newMessage,
+                                dismissed = dismissed,
                             ),
                         )
                     }
