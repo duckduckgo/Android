@@ -93,7 +93,10 @@ class WebViewDataManager @Inject constructor(
         clearFormData(webView)
         clearAuthentication(webView)
         clearExternalCookies()
-        clearWebViewDirectories(settingsDataStore.clearDuckAiData)
+        val shouldClearDuckAiData = withContext(dispatcherProvider.io()) {
+            settingsDataStore.clearDuckAiData
+        }
+        clearWebViewDirectories(shouldClearDuckAiData)
     }
 
     override suspend fun clearData(
@@ -200,7 +203,7 @@ class WebViewDataManager @Inject constructor(
      *
      *  the excluded directories above are to avoid clearing unnecessary cookies and because localStorage is cleared using clearWebStorage
      */
-    private suspend fun clearWebViewDirectories(shouldClearDuckAiData: Boolean) {
+    private suspend fun clearWebViewDirectories(shouldClearDuckAiData: Boolean) = withContext(dispatcherProvider.io()) {
         val dataDir = context.applicationInfo.dataDir
         fileDeleter.deleteContents(File(dataDir, "app_webview"), listOf("Default", "Cookies"))
 
