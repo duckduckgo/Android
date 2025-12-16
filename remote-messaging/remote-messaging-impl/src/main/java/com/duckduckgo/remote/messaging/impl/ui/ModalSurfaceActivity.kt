@@ -45,9 +45,15 @@ class ModalSurfaceActivity : DuckDuckGoActivity(), RemoteMessageDismissListener 
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
+        setupToolbar()
         initialise()
         setupObservers()
         setupBackNavigationHandler()
+    }
+
+    private fun setupToolbar() {
+        setSupportActionBar(binding.includeToolbar.toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
     override fun onDismiss() {
@@ -73,6 +79,7 @@ class ModalSurfaceActivity : DuckDuckGoActivity(), RemoteMessageDismissListener 
     private fun render(viewState: ModalSurfaceViewModel.ViewState?) {
         when (viewState) {
             is ModalSurfaceViewModel.ViewState.CardsList -> {
+                binding.includeToolbar.root.gone()
                 binding.remoteMessageView.gone()
                 binding.cardsListRemoteMessageView.messageId = viewState.messageId
                 binding.cardsListRemoteMessageView.listener = this
@@ -80,12 +87,18 @@ class ModalSurfaceActivity : DuckDuckGoActivity(), RemoteMessageDismissListener 
             }
             is ModalSurfaceViewModel.ViewState.Message -> {
                 // RemoteMessageView fetches the active message from RemoteMessageModel, so no messageId is needed
+                binding.includeToolbar.root.show()
                 binding.cardsListRemoteMessageView.gone()
                 binding.remoteMessageView.listener = this
                 binding.remoteMessageView.show()
             }
             null -> { }
         }
+    }
+
+    override fun onSupportNavigateUp(): Boolean {
+        viewModel.onBackPressed()
+        return true
     }
 
     private fun processCommand(command: Command) {

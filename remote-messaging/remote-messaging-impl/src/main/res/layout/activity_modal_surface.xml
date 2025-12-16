@@ -14,20 +14,32 @@
   ~ limitations under the License.
   -->
 
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
-    <com.duckduckgo.remote.messaging.impl.ui.CardsListRemoteMessageView
-        android:id="@+id/cardsListRemoteMessageView"
+    <include
+        android:id="@+id/includeToolbar"
+        layout="@layout/include_default_toolbar"
+        android:visibility="gone" />
+
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:visibility="gone"/>
+        android:layout_height="match_parent">
 
-    <com.duckduckgo.remote.messaging.impl.newtab.RemoteMessageView
-        android:id="@+id/remoteMessageView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:visibility="gone"/>
+        <com.duckduckgo.remote.messaging.impl.ui.CardsListRemoteMessageView
+            android:id="@+id/cardsListRemoteMessageView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone" />
 
-</FrameLayout>
+        <com.duckduckgo.remote.messaging.impl.newtab.RemoteMessageView
+            android:id="@+id/remoteMessageView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone" />
+
+    </FrameLayout>
+
+</LinearLayout>
