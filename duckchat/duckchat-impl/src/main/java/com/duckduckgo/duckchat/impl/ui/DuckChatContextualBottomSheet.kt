@@ -31,6 +31,7 @@ import android.webkit.WebView
 import androidx.annotation.AnyThread
 import androidx.core.content.ContextCompat
 import androidx.core.view.doOnLayout
+import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.app.tabs.BrowserNav
@@ -122,7 +123,6 @@ class DuckChatContextualBottomSheet(
     private fun configureViews(binding: BottomSheetDuckAiContextualBinding) {
         val bottomSheetDialog = dialog as? BottomSheetDialog
         bottomSheetDialog?.let {
-            it.behavior.isFitToContents = false
             it.behavior.expandedOffset = 0
             it.behavior.state = BottomSheetBehavior.STATE_COLLAPSED
             binding.root.doOnLayout {
@@ -132,19 +132,27 @@ class DuckChatContextualBottomSheet(
                 }
             }
             // Set up callback to prevent collapsing after expansion
-            it.behavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
-                override fun onStateChanged(bottomSheet: View, newState: Int) {
-                    if (newState == BottomSheetBehavior.STATE_EXPANDED) {
-                        isExpanded = true
-                        // Set skipCollapsed to prevent dragging back to collapsed state
-                        it.behavior.skipCollapsed = true
-                        it.behavior.isDraggable = true
+            it.behavior.addBottomSheetCallback(
+                object : BottomSheetBehavior.BottomSheetCallback() {
+                    override fun onStateChanged(
+                        bottomSheet: View,
+                        newState: Int,
+                    ) {
+                        if (newState == BottomSheetBehavior.STATE_EXPANDED) {
+                            isExpanded = true
+                            // Set skipCollapsed to prevent dragging back to collapsed state
+                            it.behavior.skipCollapsed = true
+                            it.behavior.isDraggable = true
+                        }
                     }
-                }
 
-                override fun onSlide(bottomSheet: View, slideOffset: Float) {
-                }
-            })
+                    override fun onSlide(
+                        bottomSheet: View,
+                        slideOffset: Float,
+                    ) {
+                    }
+                },
+            )
         }
         configureDialogButtons(binding)
     }
@@ -155,6 +163,13 @@ class DuckChatContextualBottomSheet(
         }
         binding.actionSend.setOnClickListener {
             expandSheet()
+        }
+        binding.inputField.setOnFocusChangeListener { _, hasFocus ->
+            binding.contextualModeInputSpacer.isVisible = hasFocus
+            val bottomSheetDialog = dialog as? BottomSheetDialog
+            bottomSheetDialog?.let {
+                it.behavior.state = BottomSheetBehavior.STATE_EXPANDED
+            }
         }
     }
 
