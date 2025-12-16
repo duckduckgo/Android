@@ -47,6 +47,7 @@ dependencies {
     implementation project(path: ':survey-api')
     implementation project(path: ':modal-coordinator-api')
 
+    implementation AndroidX.room.runtime
     implementation KotlinX.coroutines.core
     androidTestImplementation (KotlinX.coroutines.test) {
         // https://github.com/Kotlin/kotlinx.coroutines/issues/2023

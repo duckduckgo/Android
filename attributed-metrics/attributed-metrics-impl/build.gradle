@@ -43,6 +43,7 @@ dependencies {
     api AndroidX.dataStore.preferences
 
     // Room
+    implementation AndroidX.room.runtime
     ksp AndroidX.room.compiler
 
     implementation "com.squareup.logcat:logcat:_"

@@ -46,6 +46,7 @@ android {
 dependencies {
     implementation project(path: ':common-utils')
     implementation project(path: ':feature-toggles-api')
+    implementation AndroidX.room.runtime
     ksp AndroidX.room.compiler
     implementation Google.dagger
 

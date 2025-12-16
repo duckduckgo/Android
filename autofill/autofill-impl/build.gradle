@@ -80,6 +80,7 @@ dependencies {
     implementation AndroidX.work.runtimeKtx
     implementation AndroidX.biometric
 
+    implementation AndroidX.room.runtime
     ksp AndroidX.room.compiler
 
     implementation "net.zetetic:sqlcipher-android:_"

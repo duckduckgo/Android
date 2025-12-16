@@ -47,6 +47,7 @@ dependencies {
     implementation project(path: ':anvil-annotations')
 
     implementation AndroidX.appCompat
+    implementation AndroidX.room.runtime
     implementation Google.android.material
     implementation AndroidX.constraintLayout
     implementation AndroidX.core.ktx
