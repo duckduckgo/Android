@@ -52,7 +52,6 @@ dependencies {
     implementation AndroidX.core.ktx
     implementation AndroidX.work.runtimeKtx
     implementation AndroidX.room.runtime
-    implementation AndroidX.room.ktx
 
     // Testing dependencies
     testImplementation project(path: ':common-test')

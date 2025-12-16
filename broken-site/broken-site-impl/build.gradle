@@ -74,7 +74,6 @@ dependencies {
     // Room
     implementation AndroidX.room.runtime
     implementation AndroidX.room.rxJava2
-    implementation AndroidX.room.ktx
 
     implementation Square.retrofit2.converter.moshi
     implementation Square.okHttp3.okHttp

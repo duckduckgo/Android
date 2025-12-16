@@ -44,7 +44,6 @@ dependencies {
     // Room
     implementation AndroidX.room.runtime
     implementation AndroidX.room.rxJava2
-    implementation AndroidX.room.ktx
     ksp AndroidX.room.compiler
     testImplementation AndroidX.room.testing
 

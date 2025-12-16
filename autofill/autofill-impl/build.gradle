@@ -81,7 +81,6 @@ dependencies {
     implementation AndroidX.biometric
 
     ksp AndroidX.room.compiler
-    implementation AndroidX.room.ktx
 
     implementation "net.zetetic:sqlcipher-android:_"
     implementation "com.facebook.shimmer:shimmer:_"

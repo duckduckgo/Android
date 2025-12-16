@@ -44,7 +44,6 @@ dependencies {
     implementation AndroidX.appCompat
     implementation AndroidX.core.ktx
     implementation Google.dagger
-    implementation AndroidX.room.ktx
     implementation Google.android.material
     implementation Square.retrofit2.converter.moshi
 

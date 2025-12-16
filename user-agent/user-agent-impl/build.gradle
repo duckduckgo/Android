@@ -37,7 +37,6 @@ dependencies {
     implementation project(':statistics-api')
     implementation project(':user-agent-store')
 
-    implementation AndroidX.room.ktx
     implementation AndroidX.appCompat
     implementation Google.android.material
     implementation AndroidX.constraintLayout
@@ -50,7 +49,6 @@ dependencies {
 
     // Room
     implementation AndroidX.room.runtime
-    implementation AndroidX.room.ktx
     testImplementation AndroidX.room.testing
     ksp AndroidX.room.compiler
 

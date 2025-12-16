@@ -52,7 +52,6 @@ dependencies {
     implementation Google.dagger
 
     // Room
-    implementation AndroidX.room.ktx
     ksp AndroidX.room.compiler
 
     // WorkManager

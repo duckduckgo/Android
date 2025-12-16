@@ -57,7 +57,6 @@ dependencies {
     implementation AndroidX.core.ktx
     implementation AndroidX.room.runtime
     implementation AndroidX.room.rxJava2
-    implementation AndroidX.room.ktx
     implementation AndroidX.work.runtimeKtx
 
     // Testing dependencies

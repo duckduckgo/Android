@@ -50,7 +50,6 @@ dependencies {
     implementation Google.dagger
     implementation AndroidX.core.ktx
     implementation AndroidX.room.runtime
-    implementation AndroidX.room.ktx
 
     // Testing dependencies
     testImplementation project(path: ':common-test')

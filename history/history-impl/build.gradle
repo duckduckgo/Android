@@ -44,7 +44,6 @@ dependencies {
     implementation "com.squareup.logcat:logcat:_"
     implementation AndroidX.room.runtime
     implementation AndroidX.room.rxJava2
-    implementation AndroidX.room.ktx
 
     implementation Square.moshi
 

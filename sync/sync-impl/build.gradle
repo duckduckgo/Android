@@ -81,7 +81,6 @@ dependencies {
 
     // Room
     implementation AndroidX.room.runtime
-    implementation AndroidX.room.ktx
 
     // Testing dependencies
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"

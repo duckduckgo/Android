@@ -61,7 +61,6 @@ dependencies {
     // Room
     implementation AndroidX.room.runtime
     implementation AndroidX.room.rxJava2
-    implementation AndroidX.room.ktx
     // need access to Dagger annotations
     implementation Google.dagger
     ksp AndroidX.room.compiler

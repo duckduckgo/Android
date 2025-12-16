@@ -46,7 +46,6 @@ dependencies {
     implementation project(path: ':di')
     ksp AndroidX.room.compiler
     implementation AndroidX.room.runtime
-    implementation AndroidX.room.ktx
 
     implementation KotlinX.coroutines.android
     implementation AndroidX.core.ktx

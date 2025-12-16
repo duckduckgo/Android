@@ -30,7 +30,6 @@ dependencies {
     implementation "com.squareup.moshi:moshi-kotlin:_"
     implementation "com.squareup.moshi:moshi-adapters:_"
     implementation AndroidX.room.runtime
-    implementation AndroidX.room.ktx
 
     implementation project(':voice-search-api')
 
