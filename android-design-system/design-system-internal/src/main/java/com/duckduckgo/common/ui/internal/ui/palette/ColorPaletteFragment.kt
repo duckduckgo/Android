@@ -184,7 +184,7 @@ class ColorPaletteFragment : Fragment() {
             DaxColorAttributeListItem(
                 text = "Primary Icon",
                 dotColors = DaxColorDotColors(
-                    fillColor = DuckDuckGoTheme.textColors.primary,
+                    fillColor = DuckDuckGoTheme.colors.icons.primary,
                     strokeColor = DuckDuckGoTheme.colors.backgrounds.backgroundInverted,
                 ),
             )
