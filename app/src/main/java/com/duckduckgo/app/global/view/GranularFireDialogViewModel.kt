@@ -89,7 +89,10 @@ class GranularFireDialogViewModel @Inject constructor(
     private val _siteCount = MutableStateFlow(0)
     private val _isHistoryEnabled = MutableStateFlow(false)
     private val _chatClearingEnabled = MutableStateFlow(false)
-    private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
+    
+    // Capacity set to 3 to handle the onDeleteClicked() command burst:
+    // OnClearStarted -> PlayAnimation -> ClearingComplete
+    private val command = Channel<Command>(3, BufferOverflow.DROP_OLDEST)
 
     val viewState: StateFlow<ViewState> = combine(
         tabRepository.flowTabs,
