@@ -34,6 +34,7 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_ANIMATION
 import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.common.utils.DateProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.api.DuckChat
@@ -50,9 +51,6 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.time.Instant
-import java.time.ZoneOffset
-import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
 @ContributesViewModel(FragmentScope::class)
@@ -67,6 +65,7 @@ class GranularFireDialogViewModel @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val duckChat: DuckChat,
     private val navigationHistory: NavigationHistory,
+    private val dateProvider: DateProvider,
 ) : ViewModel() {
 
     data class ViewState(
@@ -166,17 +165,12 @@ class GranularFireDialogViewModel @Inject constructor(
     }
 
     private fun trySendDailyDeleteClicked() {
-        val now = getUtcIsoLocalDate()
+        val now = dateProvider.getUtcIsoLocalDate()
         val timestamp = fireButtonStore.lastEventSendTime
 
         if (timestamp == null || now > timestamp) {
             fireButtonStore.storeLastFireButtonClearEventTime(now)
             pixel.enqueueFire(AppPixelName.PRODUCT_TELEMETRY_SURFACE_DATA_CLEARING_DAILY)
         }
-    }
-
-    private fun getUtcIsoLocalDate(): String {
-        // returns YYYY-MM-dd
-        return Instant.now().atOffset(ZoneOffset.UTC).format(DateTimeFormatter.ISO_LOCAL_DATE)
     }
 }

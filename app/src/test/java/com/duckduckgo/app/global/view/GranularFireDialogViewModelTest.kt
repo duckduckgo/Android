@@ -36,6 +36,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_ANIMATION
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.utils.DateProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.history.api.HistoryEntry
@@ -72,6 +73,7 @@ class GranularFireDialogViewModelTest {
     private val mockDispatcherProvider: DispatcherProvider = mock()
     private val mockDuckChat: DuckChat = mock()
     private val mockNavigationHistory: NavigationHistory = mock()
+    private val mockDateProvider: DateProvider = mock()
 
     private val tabsFlow = MutableStateFlow<List<TabEntity>>(emptyList())
     private val selectedOptionsFlow = MutableStateFlow<Set<FireClearOption>>(emptySet())
@@ -83,6 +85,7 @@ class GranularFireDialogViewModelTest {
         whenever(mockDispatcherProvider.io()).thenReturn(coroutineTestRule.testDispatcherProvider.io())
         whenever(mockSettingsDataStore.selectedFireAnimation).thenReturn(FireAnimation.HeroFire)
         whenever(mockSettingsDataStore.fireAnimationEnabled).thenReturn(true)
+        whenever(mockDateProvider.getUtcIsoLocalDate()).thenReturn("2025-12-15")
 
         runTest {
             whenever(mockDuckChat.wasOpenedBefore()).thenReturn(false)
@@ -102,6 +105,7 @@ class GranularFireDialogViewModelTest {
         dispatcherProvider = mockDispatcherProvider,
         duckChat = mockDuckChat,
         navigationHistory = mockNavigationHistory,
+        dateProvider = mockDateProvider,
     )
 
     @Test
@@ -353,7 +357,9 @@ class GranularFireDialogViewModelTest {
 
     @Test
     fun `when delete clicked for first time then daily pixel is fired and timestamp is stored`() = runTest {
+        val today = "2025-12-15"
         whenever(mockFireButtonStore.lastEventSendTime).thenReturn(null)
+        whenever(mockDateProvider.getUtcIsoLocalDate()).thenReturn(today)
         testee = createViewModel()
 
         testee.onDeleteClicked()
@@ -368,6 +374,7 @@ class GranularFireDialogViewModelTest {
     fun `when delete clicked on same day then daily pixel is not fired again`() = runTest {
         val today = "2025-12-15"
         whenever(mockFireButtonStore.lastEventSendTime).thenReturn(today)
+        whenever(mockDateProvider.getUtcIsoLocalDate()).thenReturn(today)
         testee = createViewModel()
 
         testee.onDeleteClicked()
@@ -382,7 +389,9 @@ class GranularFireDialogViewModelTest {
     @Test
     fun `when delete clicked on different day then daily pixel is fired and timestamp is updated`() = runTest {
         val yesterday = "2025-12-14"
+        val today = "2025-12-15"
         whenever(mockFireButtonStore.lastEventSendTime).thenReturn(yesterday)
+        whenever(mockDateProvider.getUtcIsoLocalDate()).thenReturn(today)
         testee = createViewModel()
 
         testee.onDeleteClicked()

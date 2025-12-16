@@ -53,6 +53,7 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.setAndPropagateUpFitsSystemWindows
 import com.duckduckgo.common.ui.view.show
+import com.duckduckgo.common.utils.DateProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -61,9 +62,6 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import java.time.Instant
-import java.time.ZoneOffset
-import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 import com.duckduckgo.mobile.android.R as CommonR
 import com.google.android.material.R as MaterialR
@@ -97,6 +95,9 @@ class LegacyFireDialog : BottomSheetDialogFragment(), FireDialog {
 
     @Inject
     lateinit var appBuildConfig: AppBuildConfig
+
+    @Inject
+    lateinit var dateProvider: DateProvider
 
     private var _binding: SheetFireClearDataBinding? = null
     private val binding get() = _binding!!
@@ -296,18 +297,13 @@ class LegacyFireDialog : BottomSheetDialogFragment(), FireDialog {
     }
 
     private fun trySendDailyClearOptionClicked() {
-        val now = getUtcIsoLocalDate()
+        val now = dateProvider.getUtcIsoLocalDate()
         val timestamp = fireButtonStore.lastEventSendTime
 
         if (timestamp == null || now > timestamp) {
             fireButtonStore.storeLastFireButtonClearEventTime(now)
             pixel.enqueueFire(AppPixelName.PRODUCT_TELEMETRY_SURFACE_DATA_CLEARING_DAILY)
         }
-    }
-
-    private fun getUtcIsoLocalDate(): String {
-        // returns YYYY-MM-dd
-        return Instant.now().atOffset(ZoneOffset.UTC).format(DateTimeFormatter.ISO_LOCAL_DATE)
     }
 
     private sealed class FireDialogClearAllEvent {
