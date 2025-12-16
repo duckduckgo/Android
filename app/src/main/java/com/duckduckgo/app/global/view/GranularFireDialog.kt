@@ -89,10 +89,6 @@ class GranularFireDialog : BottomSheetDialogFragment(), FireDialog {
     private var _binding: SheetFireClearDataGranularBinding? = null
     private val binding get() = _binding!!
 
-    private var onShowListener: (() -> Unit)? = null
-    private var onCancelListener: (() -> Unit)? = null
-    private var onClearStartedListener: (() -> Unit)? = null
-
     private val accelerateAnimatorUpdateListener = object : ValueAnimator.AnimatorUpdateListener {
         override fun onAnimationUpdate(animation: ValueAnimator) {
             binding.fireAnimationView.let {
@@ -151,12 +147,12 @@ class GranularFireDialog : BottomSheetDialogFragment(), FireDialog {
 
     override fun onStart() {
         super.onStart()
-        onShowListener?.invoke()
+        viewModel.onShow()
     }
 
     override fun onCancel(dialog: DialogInterface) {
         super.onCancel(dialog)
-        onCancelListener?.invoke()
+        viewModel.onCancel()
     }
 
     override fun onDestroyView() {
@@ -171,13 +167,12 @@ class GranularFireDialog : BottomSheetDialogFragment(), FireDialog {
     private fun setupLayout() {
         binding.apply {
             deleteButton.setOnClickListener {
-                onClearStartedListener?.invoke()
                 hideClearDataOptions()
                 viewModel.onDeleteClicked()
             }
 
             cancelButton.setOnClickListener {
-                onCancelListener?.invoke()
+                viewModel.onCancel()
                 dismiss()
             }
         }
@@ -206,6 +201,21 @@ class GranularFireDialog : BottomSheetDialogFragment(), FireDialog {
                     }
                     is Command.ClearingComplete -> {
                         onClearingComplete()
+                    }
+                    is Command.OnShow -> {
+                        parentFragmentManager.setFragmentResult(FireDialog.REQUEST_KEY, android.os.Bundle().apply {
+                            putString(FireDialog.RESULT_KEY_EVENT, FireDialog.EVENT_ON_SHOW)
+                        })
+                    }
+                    is Command.OnCancel -> {
+                        parentFragmentManager.setFragmentResult(FireDialog.REQUEST_KEY, android.os.Bundle().apply {
+                            putString(FireDialog.RESULT_KEY_EVENT, FireDialog.EVENT_ON_CANCEL)
+                        })
+                    }
+                    is Command.OnClearStarted -> {
+                        parentFragmentManager.setFragmentResult(FireDialog.REQUEST_KEY, android.os.Bundle().apply {
+                            putString(FireDialog.RESULT_KEY_EVENT, FireDialog.EVENT_ON_CLEAR_STARTED)
+                        })
                     }
                 }
             }
@@ -351,16 +361,8 @@ class GranularFireDialog : BottomSheetDialogFragment(), FireDialog {
     }
 
     companion object {
-        fun newInstance(
-            onShowListener: (() -> Unit)?,
-            onCancelListener: (() -> Unit)?,
-            onClearStartedListener: (() -> Unit)?,
-        ): GranularFireDialog {
-            return GranularFireDialog().apply {
-                this.onShowListener = onShowListener
-                this.onCancelListener = onCancelListener
-                this.onClearStartedListener = onClearStartedListener
-            }
+        fun newInstance(): GranularFireDialog {
+            return GranularFireDialog()
         }
     }
 }

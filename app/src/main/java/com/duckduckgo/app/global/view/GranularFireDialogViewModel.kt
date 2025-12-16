@@ -81,6 +81,9 @@ class GranularFireDialogViewModel @Inject constructor(
     sealed class Command {
         data object PlayAnimation : Command()
         data object ClearingComplete : Command()
+        data object OnShow : Command()
+        data object OnCancel : Command()
+        data object OnClearStarted : Command()
     }
 
     private val _siteCount = MutableStateFlow(0)
@@ -140,8 +143,21 @@ class GranularFireDialogViewModel @Inject constructor(
         }
     }
 
+    fun onShow() {
+        viewModelScope.launch {
+            command.send(Command.OnShow)
+        }
+    }
+
+    fun onCancel() {
+        viewModelScope.launch {
+            command.send(Command.OnCancel)
+        }
+    }
+
     fun onDeleteClicked() {
         viewModelScope.launch {
+            command.send(Command.OnClearStarted)
             trySendDailyDeleteClicked()
             pixel.enqueueFire(FIRE_DIALOG_CLEAR_PRESSED)
             pixel.enqueueFire(PRODUCT_TELEMETRY_SURFACE_DATA_CLEARING)

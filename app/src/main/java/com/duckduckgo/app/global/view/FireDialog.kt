@@ -20,6 +20,9 @@ import androidx.fragment.app.FragmentManager
 
 /**
  * Common interface for Fire dialog variants (Legacy and Granular).
+ *
+ * To receive lifecycle events from the dialog, use FragmentManager.setFragmentResultListener
+ * with REQUEST_KEY and check RESULT_KEY_EVENT for the event type.
  */
 interface FireDialog {
     /**
@@ -28,4 +31,12 @@ interface FireDialog {
      * @param tag Optional tag for the fragment transaction
      */
     fun show(fragmentManager: FragmentManager, tag: String? = "fire_dialog")
+
+    companion object {
+        const val REQUEST_KEY = "FireDialogRequestKey"
+        const val RESULT_KEY_EVENT = "event"
+        const val EVENT_ON_SHOW = "onShow"
+        const val EVENT_ON_CANCEL = "onCancel"
+        const val EVENT_ON_CLEAR_STARTED = "onClearStarted"
+    }
 }

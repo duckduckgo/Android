@@ -412,6 +412,7 @@ class GranularFireDialogViewModelTest {
 
             coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
 
+            assertEquals(Command.OnClearStarted, awaitItem())
             assertEquals(Command.PlayAnimation, awaitItem())
             assertEquals(Command.ClearingComplete, awaitItem())
 
@@ -429,6 +430,7 @@ class GranularFireDialogViewModelTest {
 
             coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
 
+            assertEquals(Command.OnClearStarted, awaitItem())
             assertEquals(Command.ClearingComplete, awaitItem())
 
             cancelAndConsumeRemainingEvents()
@@ -477,6 +479,7 @@ class GranularFireDialogViewModelTest {
 
             coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
 
+            awaitItem() // Skip OnClearStarted
             awaitItem() // Skip PlayAnimation
 
             assertEquals(Command.ClearingComplete, awaitItem())
@@ -503,6 +506,7 @@ class GranularFireDialogViewModelTest {
                 parameters = mapOf(FIRE_ANIMATION to Pixel.PixelValues.FIRE_ANIMATION_INFERNO),
             )
 
+            assertEquals(Command.OnClearStarted, awaitItem())
             assertEquals(Command.PlayAnimation, awaitItem())
 
             verify(mockFireButtonStore).incrementFireButtonUseCount()
@@ -510,6 +514,36 @@ class GranularFireDialogViewModelTest {
             verify(mockDataClearing).clearDataUsingManualFireOptions()
 
             assertEquals(Command.ClearingComplete, awaitItem())
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when onShow called then OnShow command is sent`() = runTest {
+        testee = createViewModel()
+
+        testee.commands().test {
+            testee.onShow()
+
+            coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+
+            assertEquals(Command.OnShow, awaitItem())
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when onCancel called then OnCancel command is sent`() = runTest {
+        testee = createViewModel()
+
+        testee.commands().test {
+            testee.onCancel()
+
+            coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+
+            assertEquals(Command.OnCancel, awaitItem())
 
             cancelAndConsumeRemainingEvents()
         }

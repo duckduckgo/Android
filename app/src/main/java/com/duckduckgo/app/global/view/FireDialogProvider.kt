@@ -27,20 +27,17 @@ import javax.inject.Inject
 /**
  * Provider for creating Fire dialog instances.
  * Returns the appropriate dialog variant based on feature flag (Simple or Granular).
+ *
+ * To receive lifecycle events from the dialog (onShow, onCancel, onClearStarted),
+ * use FragmentManager.setFragmentResultListener with the appropriate REQUEST_KEY
+ * from GranularFireDialog or LegacyFireDialog.
  */
 interface FireDialogProvider {
     /**
      * Creates a Fire dialog instance.
-     * @param onShowListener Optional callback invoked when dialog is shown
-     * @param onCancelListener Optional callback invoked when dialog is canceled
-     * @param onClearStartedListener Optional callback invoked when data clearing starts
      * @return Instance of FireDialog (either Simple or Granular variant)
      */
-    suspend fun createFireDialog(
-        onShowListener: (() -> Unit)? = null,
-        onCancelListener: (() -> Unit)? = null,
-        onClearStartedListener: (() -> Unit)? = null,
-    ): FireDialog
+    suspend fun createFireDialog(): FireDialog
 }
 
 @ContributesBinding(scope = AppScope::class)
@@ -50,27 +47,15 @@ class FireDialogProviderImpl @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
 ) : FireDialogProvider {
 
-    override suspend fun createFireDialog(
-        onShowListener: (() -> Unit)?,
-        onCancelListener: (() -> Unit)?,
-        onClearStartedListener: (() -> Unit)?,
-    ): FireDialog {
+    override suspend fun createFireDialog(): FireDialog {
         val isGranularMode = withContext(dispatcherProvider.io()) {
             androidBrowserConfigFeature.moreGranularDataClearingOptions().isEnabled()
         }
 
         return if (isGranularMode) {
-            GranularFireDialog.newInstance(
-                onShowListener = onShowListener,
-                onCancelListener = onCancelListener,
-                onClearStartedListener = onClearStartedListener,
-            )
+            GranularFireDialog.newInstance()
         } else {
-            LegacyFireDialog.newInstance(
-                onShowListener = onShowListener,
-                onCancelListener = onCancelListener,
-                onClearStartedListener = onClearStartedListener,
-            )
+            LegacyFireDialog.newInstance()
         }
     }
 }

@@ -102,10 +102,6 @@ class LegacyFireDialog : BottomSheetDialogFragment(), FireDialog {
     private var _binding: SheetFireClearDataBinding? = null
     private val binding get() = _binding!!
 
-    private var onShowListener: (() -> Unit)? = null
-    private var onCancelListener: (() -> Unit)? = null
-    private var onClearStartedListener: (() -> Unit)? = null
-
     private val accelerateAnimatorUpdateListener = object : ValueAnimator.AnimatorUpdateListener {
         override fun onAnimationUpdate(animation: ValueAnimator) {
             binding.fireAnimationView.let {
@@ -161,12 +157,16 @@ class LegacyFireDialog : BottomSheetDialogFragment(), FireDialog {
 
     override fun onStart() {
         super.onStart()
-        onShowListener?.invoke()
+        parentFragmentManager.setFragmentResult(FireDialog.REQUEST_KEY, Bundle().apply {
+            putString(FireDialog.RESULT_KEY_EVENT, FireDialog.EVENT_ON_SHOW)
+        })
     }
 
     override fun onCancel(dialog: DialogInterface) {
         super.onCancel(dialog)
-        onCancelListener?.invoke()
+        parentFragmentManager.setFragmentResult(FireDialog.REQUEST_KEY, Bundle().apply {
+            putString(FireDialog.RESULT_KEY_EVENT, FireDialog.EVENT_ON_CANCEL)
+        })
     }
 
     override fun onDestroyView() {
@@ -184,7 +184,9 @@ class LegacyFireDialog : BottomSheetDialogFragment(), FireDialog {
                 onClearOptionClicked()
             }
             cancelOption.setOnClickListener {
-                onCancelListener?.invoke()
+                parentFragmentManager.setFragmentResult(FireDialog.REQUEST_KEY, Bundle().apply {
+                    putString(FireDialog.RESULT_KEY_EVENT, FireDialog.EVENT_ON_CANCEL)
+                })
                 dismiss()
             }
 
@@ -239,7 +241,9 @@ class LegacyFireDialog : BottomSheetDialogFragment(), FireDialog {
         if (animationEnabled()) {
             playAnimation()
         }
-        onClearStartedListener?.invoke()
+        parentFragmentManager.setFragmentResult(FireDialog.REQUEST_KEY, Bundle().apply {
+            putString(FireDialog.RESULT_KEY_EVENT, FireDialog.EVENT_ON_CLEAR_STARTED)
+        })
 
         appCoroutineScope.launch(dispatcherProvider.io()) {
             fireButtonStore.incrementFireButtonUseCount()
@@ -312,16 +316,8 @@ class LegacyFireDialog : BottomSheetDialogFragment(), FireDialog {
     }
 
     companion object {
-        fun newInstance(
-            onShowListener: (() -> Unit)?,
-            onCancelListener: (() -> Unit)?,
-            onClearStartedListener: (() -> Unit)?,
-        ): LegacyFireDialog {
-            return LegacyFireDialog().apply {
-                this.onShowListener = onShowListener
-                this.onCancelListener = onCancelListener
-                this.onClearStartedListener = onClearStartedListener
-            }
+        fun newInstance(): LegacyFireDialog {
+            return LegacyFireDialog()
         }
     }
 }
