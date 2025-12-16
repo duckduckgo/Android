@@ -39,6 +39,7 @@ import com.duckduckgo.lint.ui.ColorAttributeInXmlDetector.Companion.INVALID_COLO
 import com.duckduckgo.lint.ui.DaxButtonStylingDetector.Companion.INVALID_DAX_BUTTON_PROPERTY
 import com.duckduckgo.lint.ui.DaxTextColorUsageDetector.Companion.INVALID_DAX_TEXT_COLOR_USAGE
 import com.duckduckgo.lint.ui.DaxTextFieldTrailingIconDetector.Companion.INVALID_DAX_TEXT_FIELD_TRAILING_ICON_USAGE
+import com.duckduckgo.lint.ui.DaxSecureTextFieldTrailingIconDetector.Companion.INVALID_DAX_SECURE_TEXT_FIELD_TRAILING_ICON_USAGE
 import com.duckduckgo.lint.ui.DaxTextViewStylingDetector.Companion.INVALID_DAX_TEXT_VIEW_PROPERTY
 import com.duckduckgo.lint.ui.DeprecatedAndroidWidgetsUsedInXmlDetector.Companion.DEPRECATED_WIDGET_IN_XML
 import com.duckduckgo.lint.ui.MissingDividerDetector.Companion.MISSING_HORIZONTAL_DIVIDER
@@ -88,6 +89,7 @@ class DuckDuckGoIssueRegistry : IssueRegistry() {
             NO_SET_CONTENT_USAGE,
             INVALID_DAX_TEXT_COLOR_USAGE,
             INVALID_DAX_TEXT_FIELD_TRAILING_ICON_USAGE,
+            INVALID_DAX_SECURE_TEXT_FIELD_TRAILING_ICON_USAGE,
 
         ).plus(WebViewCompatApisUsageDetector.issues)
 
