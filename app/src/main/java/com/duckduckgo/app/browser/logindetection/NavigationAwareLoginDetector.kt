@@ -68,7 +68,14 @@ class NextPageLoginDetection constructor(
     private var gpcRefreshed = false
 
     private var urlToCheck: String? = null
-    private var authDetectedHosts = mutableListOf<String>()
+    /**
+     * Using a LinkedHashSet to:
+     * 1. Prevent duplicate entries (Set behavior)
+     * 2. Maintain insertion order for potential eviction of oldest entries
+     *
+     * This prevents unbounded memory growth while maintaining login detection accuracy.
+     */
+    private var authDetectedHosts = linkedSetOf<String>()
     private var loginDetectionJob: Job? = null
 
     override fun onEvent(navigationEvent: NavigationEvent) {
@@ -112,7 +119,7 @@ class NextPageLoginDetection constructor(
                 when (val loginResult = detectLogin(loginUrlCandidate)) {
                     is LoginResult.AuthFlow -> {
                         logcat(VERBOSE) { "LoginDetectionDelegate AuthFlow" }
-                        authDetectedHosts.add(loginResult.authLoginDomain)
+                        addAuthDetectedHost(loginResult.authLoginDomain)
                     }
                     is LoginResult.TwoFactorAuthFlow -> {
                         logcat(VERBOSE) { "LoginDetectionDelegate TwoFactorAuthFlow" }
@@ -150,7 +157,7 @@ class NextPageLoginDetection constructor(
             is WebNavigationStateChange.NewPage -> {
                 val baseHost = navigationStateChange.url.toUri().baseHost ?: return
                 if (authDetectedHosts.any { baseHost.contains(it) }) {
-                    authDetectedHosts.add(baseHost)
+                    addAuthDetectedHost(baseHost)
                 } else {
                     authDetectedHosts.clear()
                 }
@@ -182,7 +189,7 @@ class NextPageLoginDetection constructor(
 
         val validUrl = Uri.parse(navigationEvent.url).getValidUrl() ?: return
         if (validUrl.isOAuthUrl() || validUrl.isSSOUrl() || authDetectedHosts.any { validUrl.baseHost.contains(it) }) {
-            authDetectedHosts.add(validUrl.baseHost)
+            addAuthDetectedHost(validUrl.baseHost)
             logcat { "LoginDetectionDelegate Auth domain added $authDetectedHosts" }
         }
 
@@ -222,7 +229,24 @@ class NextPageLoginDetection constructor(
         data object Unknown : LoginResult()
     }
 
+    /**
+     * Adds a host to the auth detected hosts set with a maximum size limit.
+     * When the maximum size is reached, the oldest entry is removed.
+     */
+    private fun addAuthDetectedHost(host: String) {
+        // Remove oldest entries if we've reached the maximum size
+        while (authDetectedHosts.size >= MAX_AUTH_DETECTED_HOSTS) {
+            authDetectedHosts.iterator().next().let { oldest ->
+                authDetectedHosts.remove(oldest)
+            }
+        }
+        authDetectedHosts.add(host)
+    }
+
     companion object {
         private const val NAVIGATION_EVENT_GRACE_PERIOD = 1_000L
+        // Maximum number of auth detected hosts to track
+        // This prevents unbounded memory growth during extended browsing sessions
+        private const val MAX_AUTH_DETECTED_HOSTS = 50
     }
 }

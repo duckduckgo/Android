@@ -48,8 +48,14 @@ class RealHttpErrorPixels @Inject constructor(
 ) : HttpErrorPixels {
 
     private val preferences: SharedPreferences by lazy { context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE) }
-    private val pixel5xxKeys: MutableSet<String> by lazy {
-        preferences.getStringSet(PIXEL_5XX_KEYS_SET, mutableSetOf()) ?: mutableSetOf()
+
+    /**
+     * Returns a copy of the pixel 5xx keys from SharedPreferences.
+     * Note: getStringSet() returns a reference to the internal set which must not be modified directly.
+     * Always use this method to get a safe copy for modification.
+     */
+    private fun getPixel5xxKeysCopy(): MutableSet<String> {
+        return preferences.getStringSet(PIXEL_5XX_KEYS_SET, mutableSetOf())?.toMutableSet() ?: mutableSetOf()
     }
 
     override fun updateCountPixel(httpErrorPixelName: HttpErrorPixelName) {
@@ -78,7 +84,7 @@ class RealHttpErrorPixels @Inject constructor(
 
         val pixelPrefKey = "${httpErrorPixelName.pixelName}|$statusCode|$pProVpnConnected|$externalVpnConnected|$webViewFullVersion|_count"
 
-        val updatedSet = pixel5xxKeys
+        val updatedSet = getPixel5xxKeysCopy()
         updatedSet.add(pixelPrefKey)
         val count = preferences.getInt(pixelPrefKey, 0)
         preferences.edit {
@@ -114,8 +120,8 @@ class RealHttpErrorPixels @Inject constructor(
         }
 
         val now = Instant.now().toEpochMilli()
-        val updatedSet = pixel5xxKeys
-        updatedSet.forEach { pixelKey ->
+        val pixelKeys = getPixel5xxKeysCopy()
+        pixelKeys.forEach { pixelKey ->
             val count = preferences.getInt(pixelKey, 0)
             if (count != 0) {
                 val timestamp = preferences.getLong("${pixelKey}_timestamp", 0L)
