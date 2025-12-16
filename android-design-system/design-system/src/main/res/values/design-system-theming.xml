@@ -90,6 +90,8 @@
         <item name="daxExpandableMenuItemStyle">@style/Widget.DuckDuckGo.DaxExpandableItem</item>
     </style>
 
+    <style name="Theme.DuckDuckGo.App" parent="Theme.DuckDuckGo.Light" />
+
     <style name="Theme.DuckDuckGo" parent="Base.Theme.DuckDuckGo">
 
         <item name="colorPrimary">?attr/daxColorBackground</item>
