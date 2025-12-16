@@ -24,6 +24,7 @@ import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
@@ -73,10 +74,13 @@ class ModalSurfaceActivity : DuckDuckGoActivity(), RemoteMessageDismissListener 
         if (viewState == null) return
 
         if (viewState.showCardsListView) {
+            binding.remoteMessageView.gone()
             binding.cardsListRemoteMessageView.messageId = viewState.messageId
             binding.cardsListRemoteMessageView.listener = this
             binding.cardsListRemoteMessageView.show()
         } else {
+            // RemoteMessageView fetches the active message from RemoteMessageModel, so no messageId is needed
+            binding.cardsListRemoteMessageView.gone()
             binding.remoteMessageView.listener = this
             binding.remoteMessageView.show()
         }

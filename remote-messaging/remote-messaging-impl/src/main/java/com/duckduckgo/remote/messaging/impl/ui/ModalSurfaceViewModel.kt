@@ -50,13 +50,11 @@ class ModalSurfaceViewModel @Inject constructor(
         val messageId = activityParams?.messageId ?: return
         val messageType = activityParams.messageType
 
-        if (messageType == Content.MessageType.CARDS_LIST) {
-            lastRemoteMessageIdSeen = messageId
-            _viewState.value = ViewState(messageId = messageId, showCardsListView = true)
-        } else {
-            lastRemoteMessageIdSeen = messageId
-            _viewState.value = ViewState(messageId = messageId, showCardsListView = false)
-        }
+        lastRemoteMessageIdSeen = messageId
+        _viewState.value = ViewState(
+            messageId = messageId,
+            showCardsListView = messageType == Content.MessageType.CARDS_LIST,
+        )
     }
 
     fun onDismiss() {
