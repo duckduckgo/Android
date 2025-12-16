@@ -3,6 +3,7 @@ package com.duckduckgo.subscriptions.impl.feedback
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.DDG_SETTINGS
+import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.PIR_DASHBOARD
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.SUBSCRIPTION_SETTINGS
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.VPN_EXCLUDED_APPS
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.VPN_MANAGEMENT
@@ -166,6 +167,28 @@ class SubscriptionFeedbackViewModelTest {
             verify(pixelSender).reportPproFeedbackActionsScreenShown(
                 mapOf(
                     "source" to "vpnExcludedApps",
+                ),
+            )
+        }
+    }
+
+    @Test
+    fun whenFeedbackIsOpenedFromPIRDashboardThenShowActionScreenAndEmitImpression() = runTest {
+        viewModel.viewState().test {
+            viewModel.allowUserToChooseReportType(source = PIR_DASHBOARD)
+
+            expectMostRecentItem().assertViewStateMoveForward(
+                expectedPreviousFragmentState = null,
+                expectedCurrentFragmentState = FeedbackAction,
+                FeedbackMetadata(
+                    source = PIR_DASHBOARD,
+                ),
+            )
+
+            cancelAndConsumeRemainingEvents()
+            verify(pixelSender).reportPproFeedbackActionsScreenShown(
+                mapOf(
+                    "source" to "pir",
                 ),
             )
         }
@@ -368,6 +391,34 @@ class SubscriptionFeedbackViewModelTest {
         }
 
     @Test
+    fun whenReportProblemIsSelectedViaPIRDashboardThenShowPIRSubCategoryScreenAndEmitImpression() =
+        runTest {
+            viewModel.viewState().test {
+                viewModel.allowUserToChooseReportType(source = PIR_DASHBOARD)
+                viewModel.onReportTypeSelected(reportType = REPORT_PROBLEM)
+
+                expectMostRecentItem().assertViewStateMoveForward(
+                    expectedPreviousFragmentState = FeedbackAction,
+                    expectedCurrentFragmentState = FeedbackSubCategory(R.string.feedbackCategoryPir),
+                    FeedbackMetadata(
+                        source = PIR_DASHBOARD,
+                        reportType = REPORT_PROBLEM,
+                        category = PIR, // Automatically set category
+                    ),
+                )
+
+                cancelAndConsumeRemainingEvents()
+                verify(pixelSender).reportPproFeedbackSubcategoryScreenShown(
+                    mapOf(
+                        "source" to "pir",
+                        "reportType" to "reportIssue",
+                        "category" to "pir",
+                    ),
+                )
+            }
+        }
+
+    @Test
     fun whenCategoriesArePassedAsParamThenStringValuesShouldAlignSpec() = runTest {
         assertEquals("subscription", SUBS_AND_PAYMENTS.asParams())
         assertEquals("vpn", VPN.asParams())
@@ -478,6 +529,36 @@ class SubscriptionFeedbackViewModelTest {
                     "reportType" to "reportIssue",
                     "category" to "subscription",
                     "subcategory" to "otp",
+                ),
+            )
+        }
+    }
+
+    @Test
+    fun whenPirSubcategorySelectedFromPIRDashboardThenShowSubmitScreenAndEmitImpression() = runTest {
+        viewModel.viewState().test {
+            viewModel.allowUserToChooseReportType(source = PIR_DASHBOARD)
+            viewModel.onReportTypeSelected(reportType = REPORT_PROBLEM)
+            viewModel.onSubcategorySelected(SubscriptionFeedbackPirSubCategory.SCAN_STUCK)
+
+            expectMostRecentItem().assertViewStateMoveForward(
+                expectedPreviousFragmentState = FeedbackSubCategory(R.string.feedbackCategoryPir),
+                expectedCurrentFragmentState = FeedbackSubmit(R.string.feedbackSubCategoryPirScanStuck),
+                FeedbackMetadata(
+                    source = PIR_DASHBOARD,
+                    reportType = REPORT_PROBLEM,
+                    category = PIR,
+                    subCategory = SubscriptionFeedbackPirSubCategory.SCAN_STUCK,
+                ),
+            )
+
+            cancelAndConsumeRemainingEvents()
+            verify(pixelSender).reportPproFeedbackSubmitScreenShown(
+                mapOf(
+                    "source" to "pir",
+                    "reportType" to "reportIssue",
+                    "category" to "pir",
+                    "subcategory" to "scanStuck",
                 ),
             )
         }
@@ -714,6 +795,25 @@ class SubscriptionFeedbackViewModelTest {
     }
 
     @Test
+    fun whenMoveBackFromSubCategoryActionViaPIRDashboardThenUpdateViewState() = runTest {
+        viewModel.viewState().test {
+            viewModel.allowUserToChooseReportType(source = PIR_DASHBOARD) // Show action
+            viewModel.onReportTypeSelected(REPORT_PROBLEM) // Show subcategory
+
+            viewModel.handleBackPress()
+
+            expectMostRecentItem().assertViewStateMoveBack(
+                expectedPreviousFragmentState = null,
+                expectedCurrentFragmentState = FeedbackAction, // Back to action
+                FeedbackMetadata(
+                    source = PIR_DASHBOARD,
+                    category = PIR, // Retain category
+                ),
+            )
+        }
+    }
+
+    @Test
     fun whenMoveBackFromCategoryActionThenUpdateViewState() = runTest {
         viewModel.viewState().test {
             viewModel.allowUserToChooseFeedbackType() // Show general
@@ -882,6 +982,27 @@ class SubscriptionFeedbackViewModelTest {
     }
 
     @Test
+    fun whenMoveBackFromSubmitActionViaPIRDashboardThenUpdateViewState() = runTest {
+        viewModel.viewState().test {
+            viewModel.allowUserToChooseReportType(source = PIR_DASHBOARD) // Show action
+            viewModel.onReportTypeSelected(REPORT_PROBLEM) // Show subcategory
+            viewModel.onSubcategorySelected(SubscriptionFeedbackPirSubCategory.SCAN_STUCK) // Show submit
+
+            viewModel.handleBackPress()
+
+            expectMostRecentItem().assertViewStateMoveBack(
+                expectedPreviousFragmentState = FeedbackAction,
+                expectedCurrentFragmentState = FeedbackSubCategory(R.string.feedbackCategoryPir),
+                FeedbackMetadata(
+                    source = PIR_DASHBOARD,
+                    reportType = REPORT_PROBLEM,
+                    category = PIR, // Retain category
+                ),
+            )
+        }
+    }
+
+    @Test
     fun whenMoveBackFromSubmitActionViaSubscriptionsThenUpdateViewState() = runTest {
         viewModel.viewState().test {
             viewModel.allowUserToChooseReportType(source = SUBSCRIPTION_SETTINGS) // Show action
@@ -1032,6 +1153,29 @@ class SubscriptionFeedbackViewModelTest {
         verify(pixelSender).sendPproReportIssue(
             mapOf(
                 "source" to "settings",
+                "category" to "pir",
+                "subcategory" to "removalStuck",
+                "description" to "Test",
+                "customMetadata" to "PIR encoded metadata",
+                "appName" to "",
+                "appPackage" to "",
+            ),
+        )
+    }
+
+    @Test
+    fun whenPIRIssueSubmittedFromPIRDashboardThenSendReportIssuePixel() = runTest {
+        viewModel.allowUserToChooseReportType(PIR_DASHBOARD)
+        viewModel.onReportTypeSelected(REPORT_PROBLEM)
+        viewModel.onSubcategorySelected(SubscriptionFeedbackPirSubCategory.REMOVAL_STUCK)
+        viewModel.onSubmitFeedback("Test")
+
+        viewModel.commands().test {
+            assertEquals(FeedbackCompleted, expectMostRecentItem())
+        }
+        verify(pixelSender).sendPproReportIssue(
+            mapOf(
+                "source" to "pir",
                 "category" to "pir",
                 "subcategory" to "removalStuck",
                 "description" to "Test",
