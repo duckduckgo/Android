@@ -319,7 +319,7 @@ class LegacyFireDialog : BottomSheetDialogFragment(), FireDialog {
         fun newInstance(
             onShowListener: (() -> Unit)?,
             onCancelListener: (() -> Unit)?,
-            onClearStartedListener: (() -> Unit)?
+            onClearStartedListener: (() -> Unit)?,
         ): LegacyFireDialog {
             return LegacyFireDialog().apply {
                 this.onShowListener = onShowListener

@@ -120,12 +120,14 @@ class GranularFireDialogViewModel @Inject constructor(
         viewModelScope.launch(dispatcherProvider.io()) {
             val historyEnabled = navigationHistory.isHistoryUserEnabled()
             if (historyEnabled) {
+                _isHistoryEnabled.update { true }
                 navigationHistory.getHistory().collect { historyEntries ->
                     val uniqueDomains = historyEntries.mapNotNull { it.url.host }.toSet()
                     _siteCount.update { uniqueDomains.size }
                 }
+            } else {
+                _isHistoryEnabled.update { false }
             }
-            _isHistoryEnabled.update { historyEnabled }
         }
     }
 

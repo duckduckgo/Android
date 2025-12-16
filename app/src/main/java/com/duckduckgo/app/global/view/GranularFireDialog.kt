@@ -351,7 +351,7 @@ class GranularFireDialog : BottomSheetDialogFragment(), FireDialog {
         fun newInstance(
             onShowListener: (() -> Unit)?,
             onCancelListener: (() -> Unit)?,
-            onClearStartedListener: (() -> Unit)?
+            onClearStartedListener: (() -> Unit)?,
         ): GranularFireDialog {
             return GranularFireDialog().apply {
                 this.onShowListener = onShowListener
