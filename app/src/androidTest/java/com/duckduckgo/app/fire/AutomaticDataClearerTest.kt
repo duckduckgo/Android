@@ -21,6 +21,7 @@ package com.duckduckgo.app.fire
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.annotation.UiThreadTest
 import androidx.test.platform.app.InstrumentationRegistry
+import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
 import androidx.work.WorkRequest
 import com.duckduckgo.app.fire.store.FireDataStore
@@ -40,6 +41,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
+import org.mockito.kotlin.argThat
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
@@ -830,7 +832,7 @@ class AutomaticDataClearerTest {
         // Wait for coroutine to complete
         coroutineTestRule.testDispatcher.scheduler.advanceUntilIdle()
 
-        verify(mockWorkManager, never()).enqueue(any<WorkRequest>())
+        verify(mockWorkManager, never()).enqueue(argThat<List<WorkRequest>> { size == 1 && first() is OneTimeWorkRequest })
     }
 
     @Test
@@ -844,7 +846,7 @@ class AutomaticDataClearerTest {
         // Wait for coroutine to complete
         coroutineTestRule.testDispatcher.scheduler.advanceUntilIdle()
 
-        verify(mockWorkManager, never()).enqueue(any<WorkRequest>())
+        verify(mockWorkManager, never()).enqueue(argThat<List<WorkRequest>> { size == 1 && first() is OneTimeWorkRequest })
     }
 
     @Test
@@ -858,7 +860,7 @@ class AutomaticDataClearerTest {
         // Wait for coroutine to complete
         coroutineTestRule.testDispatcher.scheduler.advanceUntilIdle()
 
-        verify(mockWorkManager).enqueue(any<WorkRequest>())
+        verify(mockWorkManager).enqueue(argThat<List<WorkRequest>> { size == 1 && first() is OneTimeWorkRequest })
     }
 
     @Test
@@ -872,7 +874,7 @@ class AutomaticDataClearerTest {
         // Wait for coroutine to complete
         coroutineTestRule.testDispatcher.scheduler.advanceUntilIdle()
 
-        verify(mockWorkManager, never()).enqueue(any<WorkRequest>())
+        verify(mockWorkManager, never()).enqueue(argThat<List<WorkRequest>> { size == 1 && first() is OneTimeWorkRequest })
     }
 
     @Test
@@ -886,7 +888,7 @@ class AutomaticDataClearerTest {
         // Wait for coroutine to complete
         coroutineTestRule.testDispatcher.scheduler.advanceUntilIdle()
 
-        verify(mockWorkManager, never()).enqueue(any<WorkRequest>())
+        verify(mockWorkManager, never()).enqueue(argThat<List<WorkRequest>> { size == 1 && first() is OneTimeWorkRequest })
     }
 
     @Test
@@ -900,6 +902,6 @@ class AutomaticDataClearerTest {
         // Wait for coroutine to complete
         coroutineTestRule.testDispatcher.scheduler.advanceUntilIdle()
 
-        verify(mockWorkManager).enqueue(any<WorkRequest>())
+        verify(mockWorkManager).enqueue(argThat<List<WorkRequest>> { size == 1 && first() is OneTimeWorkRequest })
     }
 }
