@@ -26,6 +26,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
+import com.duckduckgo.app.fire.store.FireDataStore
 import com.duckduckgo.app.global.ApplicationClearDataState
 import com.duckduckgo.app.global.ApplicationClearDataState.FINISHED
 import com.duckduckgo.app.global.ApplicationClearDataState.INITIALIZING
@@ -74,6 +75,7 @@ class AutomaticDataClearer @Inject constructor(
     private val dataClearerTimeKeeper: BackgroundTimeKeeper,
     private val dataClearerForegroundAppRestartPixel: DataClearerForegroundAppRestartPixel,
     private val dispatchers: DispatcherProvider,
+    private val fireDataStore: FireDataStore,
 ) : DataClearer, BrowserLifecycleObserver, CoroutineScope {
 
     private val clearJob: Job = Job()
@@ -171,13 +173,24 @@ class AutomaticDataClearer @Inject constructor(
             withContext(dispatchers.io()) {
                 settingsDataStore.appBackgroundedTimestamp = timeNow
 
-                val clearWhenOption = settingsDataStore.automaticallyClearWhenOption
-                val clearWhatOption = settingsDataStore.automaticallyClearWhatOption
+                if (androidBrowserConfigFeature.moreGranularDataClearingOptions().isEnabled()) {
+                    val clearWhenOption = fireDataStore.getAutomaticallyClearWhenOption()
+                    val clearOptions = fireDataStore.getAutomaticClearOptions()
 
-                if (clearWhatOption == ClearWhatOption.CLEAR_NONE || clearWhenOption == ClearWhenOption.APP_EXIT_ONLY) {
-                    logcat { "No background timer required for current configuration: $clearWhatOption / $clearWhenOption" }
+                    if (clearOptions.isEmpty() || clearWhenOption == ClearWhenOption.APP_EXIT_ONLY) {
+                        logcat { "No background timer required for current configuration: $clearOptions / $clearWhenOption" }
+                    } else {
+                        scheduleBackgroundTimerToTriggerClear(clearWhenOption.durationMilliseconds())
+                    }
                 } else {
-                    scheduleBackgroundTimerToTriggerClear(clearWhenOption.durationMilliseconds())
+                    val clearWhenOption = settingsDataStore.automaticallyClearWhenOption
+                    val clearWhatOption = settingsDataStore.automaticallyClearWhatOption
+
+                    if (clearWhatOption == ClearWhatOption.CLEAR_NONE || clearWhenOption == ClearWhenOption.APP_EXIT_ONLY) {
+                        logcat { "No background timer required for current configuration: $clearWhatOption / $clearWhenOption" }
+                    } else {
+                        scheduleBackgroundTimerToTriggerClear(clearWhenOption.durationMilliseconds())
+                    }
                 }
             }
         }
@@ -187,7 +200,7 @@ class AutomaticDataClearer @Inject constructor(
         runBlocking(dispatchers.io()) {
             // the app does not have any activity in CREATED state we kill the process
             val shouldKillProcess = if (androidBrowserConfigFeature.moreGranularDataClearingOptions().isEnabled()) {
-                dataClearing.shouldKillProcessAfterAutomaticDataClearing()
+                dataClearing.isAutomaticDataClearingOptionSelected()
             } else {
                 settingsDataStore.automaticallyClearWhatOption != ClearWhatOption.CLEAR_NONE
             }

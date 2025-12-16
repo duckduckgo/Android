@@ -131,7 +131,7 @@ class DataClearing @Inject constructor(
         return enoughTimePassed
     }
 
-    override suspend fun shouldKillProcessAfterAutomaticDataClearing(): Boolean {
+    override suspend fun isAutomaticDataClearingOptionSelected(): Boolean {
         return fireDataStore.getAutomaticClearOptions().isNotEmpty()
     }
 

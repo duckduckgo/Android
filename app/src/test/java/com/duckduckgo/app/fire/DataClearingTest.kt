@@ -490,10 +490,10 @@ class DataClearingTest {
     }
 
     @Test
-    fun whenAutomaticClearOptionsConfigured_thenShouldKillProcessAfterAutomaticDataClearing() = runTest {
+    fun whenAutomaticClearOptionsConfigured_thenIsAutomaticDataClearingOptionSelected() = runTest {
         configureAutomaticOptions(setOf(FireClearOption.DATA))
 
-        val result = testee.shouldKillProcessAfterAutomaticDataClearing()
+        val result = testee.isAutomaticDataClearingOptionSelected()
 
         assertTrue(result)
     }
@@ -502,25 +502,25 @@ class DataClearingTest {
     fun whenNoAutomaticClearOptionsConfigured_thenShouldNotKillProcessOnExit() = runTest {
         configureAutomaticOptions(emptySet())
 
-        val result = testee.shouldKillProcessAfterAutomaticDataClearing()
+        val result = testee.isAutomaticDataClearingOptionSelected()
 
         assertFalse(result)
     }
 
     @Test
-    fun whenAutomaticClearOptionsConfiguredWithTabsOnly_thenShouldKillProcessAfterAutomaticDataClearing() = runTest {
+    fun whenAutomaticClearOptionsConfiguredWithTabsOnly_thenIsAutomaticDataClearingOptionSelected() = runTest {
         configureAutomaticOptions(setOf(FireClearOption.TABS))
 
-        val result = testee.shouldKillProcessAfterAutomaticDataClearing()
+        val result = testee.isAutomaticDataClearingOptionSelected()
 
         assertTrue(result)
     }
 
     @Test
-    fun whenAutomaticClearOptionsConfiguredWithMultipleOptions_thenShouldKillProcessAfterAutomaticDataClearing() = runTest {
+    fun whenAutomaticClearOptionsConfiguredWithMultipleOptions_thenIsAutomaticDataClearingOptionSelected() = runTest {
         configureAutomaticOptions(setOf(FireClearOption.TABS, FireClearOption.DATA, FireClearOption.DUCKAI_CHATS))
 
-        val result = testee.shouldKillProcessAfterAutomaticDataClearing()
+        val result = testee.isAutomaticDataClearingOptionSelected()
 
         assertTrue(result)
     }

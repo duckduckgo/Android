@@ -43,9 +43,9 @@ interface AutomaticDataClearing {
     ): Boolean
 
     /**
-     * Determines whether the process should be killed after automatic data-clearing.
+     * Checks if the user has selected any automatic data clearing option.
      *
      * @return true if process should be killed on exit, false otherwise
      */
-    suspend fun shouldKillProcessAfterAutomaticDataClearing(): Boolean
+    suspend fun isAutomaticDataClearingOptionSelected(): Boolean
 }
