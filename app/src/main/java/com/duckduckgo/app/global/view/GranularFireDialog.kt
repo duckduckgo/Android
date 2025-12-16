@@ -264,6 +264,10 @@ class GranularFireDialog : BottomSheetDialogFragment(), FireDialog {
 
     private fun onClearingComplete() {
         isClearingComplete = true
+        // Add accelerator listener when clearing finishes to speed up remaining animation
+        if (animationEnabled() && !isAnimationComplete) {
+            binding.fireAnimationView.addAnimatorUpdateListener(accelerateAnimatorUpdateListener)
+        }
         checkIfShouldRestart()
     }
 
@@ -325,7 +329,6 @@ class GranularFireDialog : BottomSheetDialogFragment(), FireDialog {
 
     private fun onAnimationComplete() {
         isAnimationComplete = true
-        binding.fireAnimationView.addAnimatorUpdateListener(accelerateAnimatorUpdateListener)
         checkIfShouldRestart()
     }
 
