@@ -29,6 +29,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat.Type
 import androidx.core.view.WindowInsetsControllerCompat
@@ -113,6 +114,7 @@ class GranularFireDialog : BottomSheetDialogFragment(), FireDialog {
         return BottomSheetDialog(requireContext(), CommonR.style.Widget_DuckDuckGo_FireDialog)
     }
 
+    @Suppress("DEPRECATION")
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -131,9 +133,9 @@ class GranularFireDialog : BottomSheetDialogFragment(), FireDialog {
         configureBottomSheet()
         observeViewModel()
 
-        if (appBuildConfig.sdkInt == Build.VERSION_CODES.O) {
-            dialog?.window?.navigationBarColor = requireContext().resources.getColor(CommonR.color.translucentDark, null)
-        } else if (appBuildConfig.sdkInt > Build.VERSION_CODES.O && appBuildConfig.sdkInt < Build.VERSION_CODES.R) {
+        if (appBuildConfig.sdkInt == 26) {
+            dialog?.window?.navigationBarColor = ContextCompat.getColor(requireContext(), CommonR.color.translucentDark)
+        } else if (appBuildConfig.sdkInt in 27..<30) {
             dialog?.window?.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
         }
 
