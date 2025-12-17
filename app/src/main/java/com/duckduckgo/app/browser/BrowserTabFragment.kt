@@ -1465,7 +1465,12 @@ class BrowserTabFragment :
             Intent(Intent.ACTION_VIEW).apply {
                 data = Uri.parse(url)
             }
-        startActivity(intent)
+
+        if (requireActivity().packageManager.resolveActivity(intent, 0) != null) {
+            startActivity(intent)
+        } else {
+            showToast(R.string.unableToOpenLink)
+        }
     }
 
     private fun launchPopupMenu(
