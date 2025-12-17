@@ -18,6 +18,7 @@ package com.duckduckgo.duckchat.impl.ui
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.Dialog
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.os.Environment
@@ -30,8 +31,11 @@ import android.webkit.WebSettings
 import android.webkit.WebView
 import androidx.annotation.AnyThread
 import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.doOnLayout
 import androidx.core.view.isVisible
+import androidx.core.view.updatePadding
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.app.tabs.BrowserNav
@@ -102,8 +106,23 @@ class DuckChatContextualBottomSheet(
     private val downloadMessagesJob = ConflatedJob()
     private var isExpanded = false
 
-    override fun getTheme(): Int {
-        return R.style.DuckChatBottomSheetDialogTheme
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        // Set up BottomSheetDialog
+        val bottomSheetDialog = BottomSheetDialog(requireContext(), R.style.DuckChatBottomSheetDialogTheme)
+
+        bottomSheetDialog.window?.let {
+            ViewCompat.setOnApplyWindowInsetsListener(it.decorView) { view, insets ->
+                val imeBottom = insets.getInsets(WindowInsetsCompat.Type.ime()).bottom
+                val systemBottom = insets.getInsets(WindowInsetsCompat.Type.systemBars()).bottom
+                val extraMargin = (imeBottom).coerceAtLeast(0)
+
+                view.updatePadding(bottom = extraMargin)
+                insets
+            }
+            ViewCompat.requestApplyInsets(it.decorView)
+        }
+
+        return bottomSheetDialog
     }
 
     override fun onCreateView(
@@ -124,7 +143,7 @@ class DuckChatContextualBottomSheet(
         val bottomSheetDialog = dialog as? BottomSheetDialog
         bottomSheetDialog?.let {
             it.behavior.expandedOffset = 0
-            it.behavior.state = BottomSheetBehavior.STATE_COLLAPSED
+            it.behavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
             binding.root.doOnLayout {
                 val peekHeight = calculatePeekHeight(binding)
                 if (peekHeight > 0) {
@@ -165,10 +184,11 @@ class DuckChatContextualBottomSheet(
             expandSheet()
         }
         binding.inputField.setOnFocusChangeListener { _, hasFocus ->
-            binding.contextualModeInputSpacer.isVisible = hasFocus
             val bottomSheetDialog = dialog as? BottomSheetDialog
             bottomSheetDialog?.let {
                 it.behavior.state = BottomSheetBehavior.STATE_EXPANDED
+                binding.contextualModeInputSpacer.isVisible = hasFocus
+                binding.contextualModeInputBottomSpacer.isVisible = hasFocus
             }
         }
     }
