@@ -86,12 +86,12 @@
     <string name="fireDialogDeleteButton">Delete</string>
     <plurals name="fireDialogOptionTabsDescription" tools:ignore="ImpliedQuantity">
         <item quantity="one">Close 1 tab</item>
-        <item quantity="other" instruction="Placeholder is the number of tabs">Close all %d tabs</item>
+        <item quantity="other" instruction="Placeholder is the number of tabs">Close all %1$d tabs</item>
     </plurals>
     <string name="fireDialogOptionDataDescriptionNoHistory">May sign you out of accounts.</string>
     <string name="fireDialogOptionDataDescriptionNoSites">None</string>
     <plurals name="fireDialogOptionDataDescription" tools:ignore="ImpliedQuantity">
         <item quantity="one">Delete from 1 site. May sign you out of accounts.</item>
-        <item quantity="other" instruction="Placeholder is the number of tabs">Delete from %d sites. May sign you out of accounts.</item>
+        <item quantity="other" instruction="Placeholder is the number of tabs">Delete from %1$d sites. May sign you out of accounts.</item>
     </plurals>
 </resources>
