@@ -1,0 +1,52 @@
+// Widget pixels
+{
+    "m_duckai_only_widget_added": {
+        "description": "Triggered when a Duck AI widget (pinned shortcut) is added on home screen",
+        "owners": ["anikiki"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "atb"]
+    },
+    "m_search_and_favorites_widget_added": {
+        "description": "Triggered when a Search and Favorites widget is added on home screen",
+        "owners": ["anikiki"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "atb"]
+    },
+    "m_search_and_favorites_widget_deleted": {
+        "description": "Triggered when a Search and Favorites widget is removed from home screen",
+        "owners": ["anikiki"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "atb"]
+    },
+    "m_search_widget_added": {
+        "description": "Triggered when a Simple Search widget is added on home screen",
+        "owners": ["anikiki"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "atb"]
+    },
+    "m_search_widget_deleted": {
+        "description": "Triggered when a Simple Search widget is removed from home screen",
+        "owners": ["anikiki"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "atb"]
+    },
+    "m_search_only_widget_added": {
+        "description": "Triggered when a Search Only (no AI) widget is added on home screen",
+        "owners": ["anikiki"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "atb"]
+    },
+    "m_search_only_widget_deleted": {
+        "description": "Triggered when a Search Only (no AI) widget is removed from home screen",
+        "owners": ["anikiki"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "atb"]
+    }
+}
