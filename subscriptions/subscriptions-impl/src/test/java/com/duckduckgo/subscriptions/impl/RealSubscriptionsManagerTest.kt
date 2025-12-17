@@ -813,6 +813,8 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             subscriptionPurchaseWideEvent,
             tokenRefreshWideEvent,
             subscriptionSwitchWideEvent,
+            freeTrialConversionWideEvent,
+            subscriptionRestoreWideEvent,
         )
 
         manager.currentPurchaseState.test {
