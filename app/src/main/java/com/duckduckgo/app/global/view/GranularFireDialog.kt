@@ -21,7 +21,6 @@ import android.animation.ValueAnimator
 import android.app.Dialog
 import android.content.Context
 import android.content.DialogInterface
-import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.provider.Settings.Global.ANIMATOR_DURATION_SCALE
@@ -142,7 +141,7 @@ class GranularFireDialog : BottomSheetDialogFragment(), FireDialog {
         removeTopPadding()
         addBottomPaddingToButtons()
 
-        if (animationEnabled()) {
+        if (isAnimationEnabled()) {
             configureFireAnimationView()
         }
     }
@@ -199,7 +198,7 @@ class GranularFireDialog : BottomSheetDialogFragment(), FireDialog {
             .onEach { command ->
                 when (command) {
                     is Command.PlayAnimation -> {
-                        if (animationEnabled()) {
+                        if (isAnimationEnabled()) {
                             playAnimation()
                         }
                     }
@@ -288,7 +287,7 @@ class GranularFireDialog : BottomSheetDialogFragment(), FireDialog {
     private fun onClearingComplete() {
         isClearingComplete = true
         // Add accelerator listener when clearing finishes to speed up remaining animation
-        if (animationEnabled() && !isAnimationComplete) {
+        if (isAnimationEnabled() && !isAnimationComplete) {
             binding.fireAnimationView.addAnimatorUpdateListener(accelerateAnimatorUpdateListener)
         }
         checkIfShouldRestart()
@@ -321,9 +320,9 @@ class GranularFireDialog : BottomSheetDialogFragment(), FireDialog {
         }
     }
 
-    private fun animationEnabled() = settingsDataStore.fireAnimationEnabled && animatorDurationEnabled()
+    private fun isAnimationEnabled() = settingsDataStore.fireAnimationEnabled && isAnimatorDurationEnabled()
 
-    private fun animatorDurationEnabled(): Boolean {
+    private fun isAnimatorDurationEnabled(): Boolean {
         val animatorScale = Settings.Global.getFloat(requireContext().contentResolver, ANIMATOR_DURATION_SCALE, 1.0f)
         return animatorScale != 0.0f
     }
@@ -361,10 +360,10 @@ class GranularFireDialog : BottomSheetDialogFragment(), FireDialog {
 
     @Synchronized
     private fun checkIfShouldRestart() {
-        val shouldRestart = if (animationEnabled()) {
-            isAnimationComplete && isClearingComplete
+        val shouldRestart = if (isAnimationEnabled()) {
+            isAnimationComplete && isClearingComplete && viewModel.viewState.value.shouldRestartAfterClearing
         } else {
-            isClearingComplete
+            isClearingComplete && viewModel.viewState.value.shouldRestartAfterClearing
         }
 
         if (shouldRestart && !hasRestarted) {

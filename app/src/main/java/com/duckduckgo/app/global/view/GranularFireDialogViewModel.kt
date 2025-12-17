@@ -76,6 +76,8 @@ class GranularFireDialogViewModel @Inject constructor(
         val isDuckChatClearingEnabled: Boolean = false,
     ) {
         val isDeleteButtonEnabled: Boolean = selectedOptions.isNotEmpty()
+        val shouldRestartAfterClearing: Boolean =
+            selectedOptions.contains(FireClearOption.DATA) || selectedOptions.contains(FireClearOption.DUCKAI_CHATS)
     }
 
     sealed class Command {
