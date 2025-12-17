@@ -867,6 +867,8 @@ class BrowserTabFragment :
 
     private var automaticFireproofDialog: DaxAlertDialog? = null
 
+    private var duckChatContextualSheet: DuckChatContextualBottomSheet? = null
+
     private var webShareRequest =
         registerForActivityResult(WebShareChooser()) {
             contentScopeScripts.onResponse(it)
@@ -3131,10 +3133,10 @@ class BrowserTabFragment :
     }
 
     private fun showDuckChatBottomSheet() {
-        // InputBottomSheetFragment().show(getParentFragmentManager(), "")
-
-        val duckChatContextualSheet = duckChatContextualBottomSheetFactory.create()
-        duckChatContextualSheet.show(childFragmentManager, DuckChatContextualBottomSheet.TAG)
+        if (duckChatContextualSheet == null){
+            duckChatContextualSheet = duckChatContextualBottomSheetFactory.create()
+        }
+        duckChatContextualSheet?.show(childFragmentManager, DuckChatContextualBottomSheet.TAG)
     }
 
     private fun configureOmnibarTextInput() {

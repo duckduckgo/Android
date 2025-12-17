@@ -96,6 +96,15 @@ class DuckChatContextualBottomSheet(
     private val duckChat: DuckChat,
 ) : BottomSheetDialogFragment(), DownloadConfirmationDialogListener {
 
+    // this will go in the viewmodel
+    private enum class SheetMode {
+        INPUT,
+        WEBVIEW
+    }
+
+    private var sheetMode = SheetMode.INPUT
+    private var lastUrl: String? = null
+
     private var _binding: BottomSheetDuckAiContextualBinding? = null
     private val binding get() = _binding!!
 
@@ -108,6 +117,7 @@ class DuckChatContextualBottomSheet(
     private var isExpanded = false
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        logcat { "Duck.ai Contextual: onCreateDialog" }
         val bottomSheetDialog = BottomSheetDialog(requireContext(), R.style.DuckChatBottomSheetDialogTheme)
 
         bottomSheetDialog.window?.let {
@@ -132,6 +142,7 @@ class DuckChatContextualBottomSheet(
                         newState: Int,
                     ) {
                         if (newState == BottomSheetBehavior.STATE_EXPANDED) {
+                            logcat { "Duck.ai Contextual: STATE_EXPANDED" }
                             it.behavior.skipCollapsed = true
                             it.behavior.isDraggable = true
                             isExpanded = true
@@ -150,11 +161,18 @@ class DuckChatContextualBottomSheet(
         return bottomSheetDialog
     }
 
+    override fun onDestroyView() {
+        logcat { "Duck.ai Contextual: onDestroyView" }
+        super.onDestroyView()
+        _binding = null
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
+        logcat { "Duck.ai Contextual: onCreateView" }
         _binding = BottomSheetDuckAiContextualBinding.inflate(inflater, container, false)
         configureViews(binding)
         return binding.root
@@ -175,7 +193,10 @@ class DuckChatContextualBottomSheet(
 
     private fun configureDialogButtons(binding: BottomSheetDuckAiContextualBinding) {
         binding.contextualClose.setOnClickListener {
-            dismiss()
+            val bottomSheetDialog = dialog as? BottomSheetDialog
+            bottomSheetDialog?.let {
+                bottomSheetDialog.behavior.state = BottomSheetBehavior.STATE_HIDDEN
+            }
         }
         binding.actionSend.setOnClickListener { showDuckAi() }
     }
@@ -186,6 +207,8 @@ class DuckChatContextualBottomSheet(
             val url = duckChat.getDuckChatUrl(prompt, true)
             binding.simpleWebview.loadUrl(url)
         }
+
+        sheetMode = SheetMode.WEBVIEW
 
         hideKeyboard(binding.inputField)
         binding.inputModeWidgetCard.gone()
@@ -200,15 +223,26 @@ class DuckChatContextualBottomSheet(
         }
     }
 
+    fun restoreWebState() {
+        binding.inputModeWidgetCard.gone()
+        binding.contextualModePrompts.gone()
+        binding.contextualWebViewContainer.show()
+        binding.simpleWebview.show()
+        (dialog as? BottomSheetDialog)?.behavior?.state = BottomSheetBehavior.STATE_EXPANDED
+    }
+
+    override fun onStart() {
+        super.onStart()
+    }
+
     override fun onViewCreated(
         view: View,
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
+        logcat { "Duck.ai Contextual: onViewCreated" }
 
         configureDialogButtons(binding)
-
-        val url = arguments?.getString(KEY_DUCK_AI_URL) ?: "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5"
 
         binding.simpleWebview.let {
             it.webViewClient = webViewClient
@@ -295,9 +329,12 @@ class DuckChatContextualBottomSheet(
             )
         }
 
-        url.let {
-            binding.simpleWebview.loadUrl(it)
+        if (sheetMode == SheetMode.WEBVIEW){
+            restoreWebState()
         }
+
+        val url = arguments?.getString(KEY_DUCK_AI_URL) ?: "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5"
+        binding.simpleWebview.loadUrl(url)
 
         observeViewModel()
         launchDownloadMessagesJob()
@@ -432,6 +469,5 @@ class DuckChatContextualBottomSheet(
         private const val CUSTOM_UA =
             "Mozilla/5.0 (Linux; Android 16) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/124.0.0.0 Mobile DuckDuckGo/5 Safari/537.36"
         private const val PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE = 200
-        private const val TOP_OFFSET_DP = 140f
     }
 }
