@@ -205,19 +205,28 @@ class GranularFireDialog : BottomSheetDialogFragment(), FireDialog {
                         onClearingComplete()
                     }
                     is Command.OnShow -> {
-                        parentFragmentManager.setFragmentResult(FireDialog.REQUEST_KEY, android.os.Bundle().apply {
-                            putString(FireDialog.RESULT_KEY_EVENT, FireDialog.EVENT_ON_SHOW)
-                        })
+                        parentFragmentManager.setFragmentResult(
+                            FireDialog.REQUEST_KEY,
+                            android.os.Bundle().apply {
+                                putString(FireDialog.RESULT_KEY_EVENT, FireDialog.EVENT_ON_SHOW)
+                            },
+                        )
                     }
                     is Command.OnCancel -> {
-                        parentFragmentManager.setFragmentResult(FireDialog.REQUEST_KEY, android.os.Bundle().apply {
-                            putString(FireDialog.RESULT_KEY_EVENT, FireDialog.EVENT_ON_CANCEL)
-                        })
+                        parentFragmentManager.setFragmentResult(
+                            FireDialog.REQUEST_KEY,
+                            android.os.Bundle().apply {
+                                putString(FireDialog.RESULT_KEY_EVENT, FireDialog.EVENT_ON_CANCEL)
+                            },
+                        )
                     }
                     is Command.OnClearStarted -> {
-                        parentFragmentManager.setFragmentResult(FireDialog.REQUEST_KEY, android.os.Bundle().apply {
-                            putString(FireDialog.RESULT_KEY_EVENT, FireDialog.EVENT_ON_CLEAR_STARTED)
-                        })
+                        parentFragmentManager.setFragmentResult(
+                            FireDialog.REQUEST_KEY,
+                            android.os.Bundle().apply {
+                                putString(FireDialog.RESULT_KEY_EVENT, FireDialog.EVENT_ON_CLEAR_STARTED)
+                            },
+                        )
                     }
                 }
             }

@@ -157,16 +157,22 @@ class LegacyFireDialog : BottomSheetDialogFragment(), FireDialog {
 
     override fun onStart() {
         super.onStart()
-        parentFragmentManager.setFragmentResult(FireDialog.REQUEST_KEY, Bundle().apply {
-            putString(FireDialog.RESULT_KEY_EVENT, FireDialog.EVENT_ON_SHOW)
-        })
+        parentFragmentManager.setFragmentResult(
+            FireDialog.REQUEST_KEY,
+            Bundle().apply {
+                putString(FireDialog.RESULT_KEY_EVENT, FireDialog.EVENT_ON_SHOW)
+            },
+        )
     }
 
     override fun onCancel(dialog: DialogInterface) {
         super.onCancel(dialog)
-        parentFragmentManager.setFragmentResult(FireDialog.REQUEST_KEY, Bundle().apply {
-            putString(FireDialog.RESULT_KEY_EVENT, FireDialog.EVENT_ON_CANCEL)
-        })
+        parentFragmentManager.setFragmentResult(
+            FireDialog.REQUEST_KEY,
+            Bundle().apply {
+                putString(FireDialog.RESULT_KEY_EVENT, FireDialog.EVENT_ON_CANCEL)
+            },
+        )
     }
 
     override fun onDestroyView() {
@@ -184,9 +190,12 @@ class LegacyFireDialog : BottomSheetDialogFragment(), FireDialog {
                 onClearOptionClicked()
             }
             cancelOption.setOnClickListener {
-                parentFragmentManager.setFragmentResult(FireDialog.REQUEST_KEY, Bundle().apply {
-                    putString(FireDialog.RESULT_KEY_EVENT, FireDialog.EVENT_ON_CANCEL)
-                })
+                parentFragmentManager.setFragmentResult(
+                    FireDialog.REQUEST_KEY,
+                    Bundle().apply {
+                        putString(FireDialog.RESULT_KEY_EVENT, FireDialog.EVENT_ON_CANCEL)
+                    },
+                )
                 dismiss()
             }
 
@@ -241,9 +250,12 @@ class LegacyFireDialog : BottomSheetDialogFragment(), FireDialog {
         if (animationEnabled()) {
             playAnimation()
         }
-        parentFragmentManager.setFragmentResult(FireDialog.REQUEST_KEY, Bundle().apply {
-            putString(FireDialog.RESULT_KEY_EVENT, FireDialog.EVENT_ON_CLEAR_STARTED)
-        })
+        parentFragmentManager.setFragmentResult(
+            FireDialog.REQUEST_KEY,
+            Bundle().apply {
+                putString(FireDialog.RESULT_KEY_EVENT, FireDialog.EVENT_ON_CLEAR_STARTED)
+            },
+        )
 
         appCoroutineScope.launch(dispatcherProvider.io()) {
             fireButtonStore.incrementFireButtonUseCount()
