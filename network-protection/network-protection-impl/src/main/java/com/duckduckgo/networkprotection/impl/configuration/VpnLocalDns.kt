@@ -31,7 +31,7 @@ import java.net.InetAddress
 
 interface VpnLocalDns : Dns
 
-private class VpnLocalDnsImpl(
+class VpnLocalDnsImpl(
     private val vpnRemoteFeatures: VpnRemoteFeatures,
     moshi: Moshi,
     private val defaultDns: Dns,
