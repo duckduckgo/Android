@@ -396,7 +396,7 @@ class RealSubscriptionsManager @Inject constructor(
                     }
 
                     is PurchaseState.Failure -> {
-                        subscriptionPurchaseWideEvent.onPurchaseFailed(it.errorType)
+                        subscriptionPurchaseWideEvent.onBillingFlowPurchaseFailure(it.errorType)
                         subscriptionSwitchWideEvent.onSwitchFailed(it.errorType)
                         _currentPurchaseState.emit(CurrentPurchase.Failure(it.errorType))
                     }
