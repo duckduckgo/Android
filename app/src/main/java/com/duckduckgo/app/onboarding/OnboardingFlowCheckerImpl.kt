@@ -18,8 +18,8 @@ package com.duckduckgo.app.onboarding
 
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
+import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.UserStageStore
-import com.duckduckgo.app.onboarding.store.daxOnboardingActive
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -44,11 +44,10 @@ class OnboardingFlowCheckerImpl @Inject constructor(
         //  See https://app.asana.com/1/137249556945/project/414730916066338/task/1212406513605392
         return withContext(dispatcher.io()) {
             val noBrowserCtaExperiment = extendedOnboardingFeatureToggles.noBrowserCtas().isEnabled()
-            dismissedCtaDao.exists(CtaId.DAX_END) ||
-                noBrowserCtaExperiment ||
+            noBrowserCtaExperiment ||
                 settingsDataStore.hideTips ||
                 dismissedCtaDao.exists(CtaId.ADD_WIDGET) ||
-                !userStageStore.daxOnboardingActive()
+                userStageStore.getUserAppStage() == AppStage.ESTABLISHED
         }
     }
 }

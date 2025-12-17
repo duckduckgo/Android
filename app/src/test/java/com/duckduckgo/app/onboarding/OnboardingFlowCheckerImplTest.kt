@@ -61,20 +61,7 @@ class OnboardingFlowCheckerImplTest {
     }
 
     @Test
-    fun whenDaxEndCtaIsDismissedThenOnboardingIsComplete() = runTest {
-        whenever(dismissedCtaDao.exists(CtaId.DAX_END)).thenReturn(true)
-        whenever(noBrowserCtasToggle.isEnabled()).thenReturn(false)
-        whenever(settingsDataStore.hideTips).thenReturn(false)
-        whenever(dismissedCtaDao.exists(CtaId.ADD_WIDGET)).thenReturn(false)
-
-        val result = testee.isOnboardingComplete()
-
-        assertTrue(result)
-    }
-
-    @Test
     fun whenNoBrowserCtasExperimentIsEnabledThenOnboardingIsComplete() = runTest {
-        whenever(dismissedCtaDao.exists(CtaId.DAX_END)).thenReturn(false)
         whenever(noBrowserCtasToggle.isEnabled()).thenReturn(true)
         whenever(settingsDataStore.hideTips).thenReturn(false)
         whenever(dismissedCtaDao.exists(CtaId.ADD_WIDGET)).thenReturn(false)
@@ -86,7 +73,6 @@ class OnboardingFlowCheckerImplTest {
 
     @Test
     fun whenHideTipsIsTrueThenOnboardingIsComplete() = runTest {
-        whenever(dismissedCtaDao.exists(CtaId.DAX_END)).thenReturn(false)
         whenever(noBrowserCtasToggle.isEnabled()).thenReturn(false)
         whenever(settingsDataStore.hideTips).thenReturn(true)
         whenever(dismissedCtaDao.exists(CtaId.ADD_WIDGET)).thenReturn(false)
@@ -98,7 +84,6 @@ class OnboardingFlowCheckerImplTest {
 
     @Test
     fun whenAddWidgetCtaIsDismissedThenOnboardingIsComplete() = runTest {
-        whenever(dismissedCtaDao.exists(CtaId.DAX_END)).thenReturn(false)
         whenever(noBrowserCtasToggle.isEnabled()).thenReturn(false)
         whenever(settingsDataStore.hideTips).thenReturn(false)
         whenever(dismissedCtaDao.exists(CtaId.ADD_WIDGET)).thenReturn(true)
@@ -109,8 +94,7 @@ class OnboardingFlowCheckerImplTest {
     }
 
     @Test
-    fun whenDaxOnboardingNotActiveThenOnboardingIsComplete() = runTest {
-        whenever(dismissedCtaDao.exists(CtaId.DAX_END)).thenReturn(false)
+    fun whenAppStageIsEstablishedThenOnboardingIsComplete() = runTest {
         whenever(noBrowserCtasToggle.isEnabled()).thenReturn(false)
         whenever(settingsDataStore.hideTips).thenReturn(false)
         whenever(dismissedCtaDao.exists(CtaId.ADD_WIDGET)).thenReturn(false)
@@ -122,8 +106,31 @@ class OnboardingFlowCheckerImplTest {
     }
 
     @Test
+    fun whenAppStageIsNewThenOnboardingIsNotComplete() = runTest {
+        whenever(noBrowserCtasToggle.isEnabled()).thenReturn(false)
+        whenever(settingsDataStore.hideTips).thenReturn(false)
+        whenever(dismissedCtaDao.exists(CtaId.ADD_WIDGET)).thenReturn(false)
+        whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.NEW)
+
+        val result = testee.isOnboardingComplete()
+
+        assertFalse(result)
+    }
+
+    @Test
+    fun whenAppStageIsDaxOnboardingThenOnboardingIsNotComplete() = runTest {
+        whenever(noBrowserCtasToggle.isEnabled()).thenReturn(false)
+        whenever(settingsDataStore.hideTips).thenReturn(false)
+        whenever(dismissedCtaDao.exists(CtaId.ADD_WIDGET)).thenReturn(false)
+        whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
+
+        val result = testee.isOnboardingComplete()
+
+        assertFalse(result)
+    }
+
+    @Test
     fun whenNoCompletionConditionsAreMetThenOnboardingIsNotComplete() = runTest {
-        whenever(dismissedCtaDao.exists(CtaId.DAX_END)).thenReturn(false)
         whenever(noBrowserCtasToggle.isEnabled()).thenReturn(false)
         whenever(settingsDataStore.hideTips).thenReturn(false)
         whenever(dismissedCtaDao.exists(CtaId.ADD_WIDGET)).thenReturn(false)
@@ -135,7 +142,6 @@ class OnboardingFlowCheckerImplTest {
 
     @Test
     fun whenMultipleCompletionConditionsAreMetThenOnboardingIsComplete() = runTest {
-        whenever(dismissedCtaDao.exists(CtaId.DAX_END)).thenReturn(true)
         whenever(noBrowserCtasToggle.isEnabled()).thenReturn(true)
         whenever(settingsDataStore.hideTips).thenReturn(true)
         whenever(dismissedCtaDao.exists(CtaId.ADD_WIDGET)).thenReturn(true)
