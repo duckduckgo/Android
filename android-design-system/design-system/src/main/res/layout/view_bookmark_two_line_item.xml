@@ -35,12 +35,13 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:background="@drawable/list_item_image_circular_background">
 
-        <ImageView
+        <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/leadingIcon"
             android:layout_width="@dimen/listItemImageMediumSize"
             android:layout_height="@dimen/listItemImageMediumSize"
             android:layout_gravity="center"
-            android:importantForAccessibility="no" />
+            android:importantForAccessibility="no"
+            app:shapeAppearanceOverlay="@style/ShapeAppearance.DuckDuckGo.VerySmallComponent" />
 
     </FrameLayout>
 
