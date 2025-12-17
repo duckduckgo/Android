@@ -19,7 +19,7 @@ jobs:
           is-pinned: true
 
       - name: Find Asana Task ID
-        if: ${{ github.event.pull_request.base.ref == 'develop' }}
+        if: ${{ github.event.pull_request.base.ref == 'develop' && github.event.pull_request.draft == false }}
         id: find-asana-task
         uses: duckduckgo/native-github-asana-sync@v2.0
         with:
