@@ -251,7 +251,7 @@ class GranularFireDialog : BottomSheetDialogFragment(), FireDialog {
                         state.siteCount,
                     )
                 } else {
-                    getString(com.duckduckgo.app.browser.R.string.fireDialogOptionDataDescriptionNoSites)
+                    getString(com.duckduckgo.app.browser.R.string.fireDialogOptionDescriptionNothingToDelete)
                 }
             } else {
                 getString(com.duckduckgo.app.browser.R.string.fireDialogOptionDataDescriptionNoHistory)
