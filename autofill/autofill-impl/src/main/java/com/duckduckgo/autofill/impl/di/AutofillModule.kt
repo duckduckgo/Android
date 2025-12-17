@@ -113,7 +113,6 @@ class AutofillModule {
             AutofillEngagementDatabase::class.java,
             "autofill_engagement.db",
             config = RoomDatabaseConfig(
-                fallbackToDestructiveMigration = true,
                 migrations = AutofillEngagementDatabase.ALL_MIGRATIONS,
             ),
         )
@@ -126,7 +125,6 @@ class AutofillModule {
             DomainTargetAppsDatabase::class.java,
             "autofill_domain_target_apps.db",
             config = RoomDatabaseConfig(
-                fallbackToDestructiveMigration = true,
                 migrations = DomainTargetAppsDatabase.ALL_MIGRATIONS,
             ),
         )
