@@ -33,7 +33,6 @@ import androidx.annotation.AnyThread
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.doOnLayout
 import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
 import androidx.lifecycle.ViewModelProvider
@@ -42,9 +41,11 @@ import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.makeSnackbarWithNoBottomInset
+import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.FragmentViewModelFactory
+import com.duckduckgo.common.utils.extensions.showKeyboard
 import com.duckduckgo.downloads.api.DOWNLOAD_SNACKBAR_DELAY
 import com.duckduckgo.downloads.api.DOWNLOAD_SNACKBAR_LENGTH
 import com.duckduckgo.downloads.api.DownloadCommand
@@ -76,6 +77,7 @@ import kotlinx.coroutines.withContext
 import logcat.logcat
 import org.json.JSONObject
 import java.io.File
+import kotlin.math.roundToInt
 
 class DuckChatContextualBottomSheet(
     private val viewModelFactory: FragmentViewModelFactory,
@@ -142,65 +144,42 @@ class DuckChatContextualBottomSheet(
     private fun configureViews(binding: BottomSheetDuckAiContextualBinding) {
         val bottomSheetDialog = dialog as? BottomSheetDialog
         bottomSheetDialog?.let {
-            it.behavior.expandedOffset = 0
-            it.behavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
-            binding.root.doOnLayout {
-                val peekHeight = calculatePeekHeight(binding)
-                if (peekHeight > 0) {
-                    bottomSheetDialog.behavior.peekHeight = peekHeight
-                }
-            }
-            // Set up callback to prevent collapsing after expansion
-            it.behavior.addBottomSheetCallback(
-                object : BottomSheetBehavior.BottomSheetCallback() {
-                    override fun onStateChanged(
-                        bottomSheet: View,
-                        newState: Int,
-                    ) {
-                        if (newState == BottomSheetBehavior.STATE_EXPANDED) {
-                            isExpanded = true
-                            // Set skipCollapsed to prevent dragging back to collapsed state
-                            it.behavior.skipCollapsed = true
-                            it.behavior.isDraggable = true
-                        }
-                    }
-
-                    override fun onSlide(
-                        bottomSheet: View,
-                        slideOffset: Float,
-                    ) {
-                    }
-                },
-            )
+            val topOffsetPx = (TOP_OFFSET_DP * resources.displayMetrics.density).roundToInt()
+            it.behavior.expandedOffset = topOffsetPx
+            it.behavior.isHideable = true
+            it.behavior.skipCollapsed = true
+            it.behavior.isDraggable = true
+            it.behavior.state = BottomSheetBehavior.STATE_EXPANDED
         }
         configureDialogButtons(binding)
+        focusInput(binding)
     }
 
     private fun configureDialogButtons(binding: BottomSheetDuckAiContextualBinding) {
         binding.contextualClose.setOnClickListener {
             dismiss()
         }
-        binding.actionSend.setOnClickListener {
-            expandSheet()
-        }
+        binding.actionSend.setOnClickListener { showDuckAi() }
         binding.inputField.setOnFocusChangeListener { _, hasFocus ->
             val bottomSheetDialog = dialog as? BottomSheetDialog
             bottomSheetDialog?.let {
                 it.behavior.state = BottomSheetBehavior.STATE_EXPANDED
                 binding.contextualModeInputSpacer.isVisible = hasFocus
-                binding.contextualModeInputBottomSpacer.isVisible = hasFocus
             }
         }
     }
 
-    private fun expandSheet() {
+    private fun focusInput(binding: BottomSheetDuckAiContextualBinding) {
+        binding.inputField.post {
+            binding.inputField.requestFocus()
+            requireActivity().showKeyboard(binding.inputField)
+        }
+    }
+
+    private fun showDuckAi() {
         inputControls.gone()
         promptsList.gone()
-        webViewContainer.visibility = View.VISIBLE
-        val bottomSheetDialog = dialog as? BottomSheetDialog
-        bottomSheetDialog?.let {
-            it.behavior.state = BottomSheetBehavior.STATE_EXPANDED
-        }
+        webViewContainer.show()
     }
 
     override fun onViewCreated(
@@ -433,5 +412,6 @@ class DuckChatContextualBottomSheet(
         private const val CUSTOM_UA =
             "Mozilla/5.0 (Linux; Android 16) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/124.0.0.0 Mobile DuckDuckGo/5 Safari/537.36"
         private const val PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE = 200
+        private const val TOP_OFFSET_DP = 60f
     }
 }
