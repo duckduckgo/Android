@@ -33,7 +33,7 @@ import androidx.annotation.AnyThread
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.isVisible
+import androidx.core.view.doOnLayout
 import androidx.core.view.updatePadding
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -45,7 +45,6 @@ import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.FragmentViewModelFactory
-import com.duckduckgo.common.utils.extensions.showKeyboard
 import com.duckduckgo.downloads.api.DOWNLOAD_SNACKBAR_DELAY
 import com.duckduckgo.downloads.api.DOWNLOAD_SNACKBAR_LENGTH
 import com.duckduckgo.downloads.api.DownloadCommand
@@ -77,7 +76,6 @@ import kotlinx.coroutines.withContext
 import logcat.logcat
 import org.json.JSONObject
 import java.io.File
-import kotlin.math.roundToInt
 
 class DuckChatContextualBottomSheet(
     private val viewModelFactory: FragmentViewModelFactory,
@@ -95,10 +93,8 @@ class DuckChatContextualBottomSheet(
     private val aiChatDownloadFeature: AIChatDownloadFeature,
 ) : BottomSheetDialogFragment(), DownloadConfirmationDialogListener {
 
-    internal lateinit var simpleWebview: WebView
-    internal lateinit var inputControls: View
-    internal lateinit var promptsList: View
-    internal lateinit var webViewContainer: View
+    private var _binding: BottomSheetDuckAiContextualBinding? = null
+    private val binding get() = _binding!!
 
     private val viewModel: DuckChatWebViewViewModel by lazy {
         ViewModelProvider(this, viewModelFactory)[DuckChatWebViewViewModel::class.java]
@@ -106,7 +102,6 @@ class DuckChatContextualBottomSheet(
 
     private var pendingFileDownload: PendingFileDownload? = null
     private val downloadMessagesJob = ConflatedJob()
-    private var isExpanded = false
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         // Set up BottomSheetDialog
@@ -119,11 +114,37 @@ class DuckChatContextualBottomSheet(
                 val extraMargin = (imeBottom).coerceAtLeast(0)
 
                 view.updatePadding(bottom = extraMargin)
+
+                binding.contextualWebViewContainer.updatePadding(bottom = extraMargin)
+                binding.simpleWebview.updatePadding(bottom = extraMargin)
                 insets
             }
             ViewCompat.requestApplyInsets(it.decorView)
         }
 
+        bottomSheetDialog.let {
+            // Set up callback to prevent collapsing after expansion
+            it.behavior.addBottomSheetCallback(
+                object : BottomSheetBehavior.BottomSheetCallback() {
+                    override fun onStateChanged(
+                        bottomSheet: View,
+                        newState: Int,
+                    ) {
+                        if (newState == BottomSheetBehavior.STATE_EXPANDED) {
+                            // Set skipCollapsed to prevent dragging back to collapsed state
+                            it.behavior.skipCollapsed = true
+                            it.behavior.isDraggable = true
+                        }
+                    }
+
+                    override fun onSlide(
+                        bottomSheet: View,
+                        slideOffset: Float,
+                    ) {
+                    }
+                },
+            )
+        }
         return bottomSheetDialog
     }
 
@@ -132,11 +153,7 @@ class DuckChatContextualBottomSheet(
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        val binding = BottomSheetDuckAiContextualBinding.inflate(inflater, container, false)
-        simpleWebview = binding.simpleWebview
-        inputControls = binding.inputModeWidgetCard
-        promptsList = binding.contextualModePrompts
-        webViewContainer = binding.contextualWebViewContainer
+        _binding = BottomSheetDuckAiContextualBinding.inflate(inflater, container, false)
         configureViews(binding)
         return binding.root
     }
@@ -144,15 +161,14 @@ class DuckChatContextualBottomSheet(
     private fun configureViews(binding: BottomSheetDuckAiContextualBinding) {
         val bottomSheetDialog = dialog as? BottomSheetDialog
         bottomSheetDialog?.let {
-            val topOffsetPx = (TOP_OFFSET_DP * resources.displayMetrics.density).roundToInt()
-            it.behavior.expandedOffset = topOffsetPx
-            it.behavior.isHideable = true
-            it.behavior.skipCollapsed = true
-            it.behavior.isDraggable = true
-            it.behavior.state = BottomSheetBehavior.STATE_EXPANDED
+            binding.root.doOnLayout {
+                val peekHeight = calculatePeekHeight(binding)
+                if (peekHeight > 0) {
+                    bottomSheetDialog.behavior.peekHeight = peekHeight
+                    bottomSheetDialog.behavior.state == BottomSheetBehavior.STATE_COLLAPSED
+                }
+            }
         }
-        configureDialogButtons(binding)
-        focusInput(binding)
     }
 
     private fun configureDialogButtons(binding: BottomSheetDuckAiContextualBinding) {
@@ -160,26 +176,18 @@ class DuckChatContextualBottomSheet(
             dismiss()
         }
         binding.actionSend.setOnClickListener { showDuckAi() }
-        binding.inputField.setOnFocusChangeListener { _, hasFocus ->
-            val bottomSheetDialog = dialog as? BottomSheetDialog
-            bottomSheetDialog?.let {
-                it.behavior.state = BottomSheetBehavior.STATE_EXPANDED
-                binding.contextualModeInputSpacer.isVisible = hasFocus
-            }
-        }
-    }
-
-    private fun focusInput(binding: BottomSheetDuckAiContextualBinding) {
-        binding.inputField.post {
-            binding.inputField.requestFocus()
-            requireActivity().showKeyboard(binding.inputField)
-        }
     }
 
     private fun showDuckAi() {
-        inputControls.gone()
-        promptsList.gone()
-        webViewContainer.show()
+        binding.inputModeWidgetCard.gone()
+        binding.contextualModePrompts.gone()
+        binding.contextualWebViewContainer.show()
+        val bottomSheetDialog = dialog as? BottomSheetDialog
+        bottomSheetDialog?.let {
+            binding.root.doOnLayout {
+                bottomSheetDialog.behavior.state = BottomSheetBehavior.STATE_EXPANDED
+            }
+        }
     }
 
     override fun onViewCreated(
@@ -188,9 +196,11 @@ class DuckChatContextualBottomSheet(
     ) {
         super.onViewCreated(view, savedInstanceState)
 
+        configureDialogButtons(binding)
+
         val url = arguments?.getString(KEY_DUCK_AI_URL) ?: "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5"
 
-        simpleWebview.let {
+        binding.simpleWebview.let {
             it.webViewClient = webViewClient
             it.webChromeClient = object : WebChromeClient() {
                 override fun onCreateWindow(
@@ -203,7 +213,7 @@ class DuckChatContextualBottomSheet(
                     val newWindowUrl = resultMsg?.data?.getString("url")
                     if (newWindowUrl != null) {
                         if (viewModel.handleOnSameWebView(newWindowUrl)) {
-                            simpleWebview.loadUrl(newWindowUrl)
+                            binding.simpleWebview.loadUrl(newWindowUrl)
                         } else {
                             startActivity(browserNav.openInNewTab(requireContext(), newWindowUrl))
                         }
@@ -276,7 +286,7 @@ class DuckChatContextualBottomSheet(
         }
 
         url.let {
-            simpleWebview.loadUrl(it)
+            binding.simpleWebview.loadUrl(it)
         }
 
         observeViewModel()
@@ -383,16 +393,16 @@ class DuckChatContextualBottomSheet(
 
     @SuppressLint("WrongConstant")
     private fun downloadStarted(command: DownloadCommand.ShowDownloadStartedMessage) {
-        simpleWebview.makeSnackbarWithNoBottomInset(getString(command.messageId, command.fileName), DOWNLOAD_SNACKBAR_LENGTH)?.show()
+        binding.simpleWebview.makeSnackbarWithNoBottomInset(getString(command.messageId, command.fileName), DOWNLOAD_SNACKBAR_LENGTH)?.show()
     }
 
     private fun downloadFailed(command: DownloadCommand.ShowDownloadFailedMessage) {
-        val downloadFailedSnackbar = simpleWebview.makeSnackbarWithNoBottomInset(getString(command.messageId), Snackbar.LENGTH_LONG)
-        simpleWebview.postDelayed({ downloadFailedSnackbar.show() }, DOWNLOAD_SNACKBAR_DELAY)
+        val downloadFailedSnackbar = binding.simpleWebview.makeSnackbarWithNoBottomInset(getString(command.messageId), Snackbar.LENGTH_LONG)
+        binding.simpleWebview.postDelayed({ downloadFailedSnackbar.show() }, DOWNLOAD_SNACKBAR_DELAY)
     }
 
     private fun downloadSucceeded(command: DownloadCommand.ShowDownloadSuccessMessage) {
-        val downloadSucceededSnackbar = simpleWebview.makeSnackbarWithNoBottomInset(
+        val downloadSucceededSnackbar = binding.simpleWebview.makeSnackbarWithNoBottomInset(
             getString(command.messageId, command.fileName),
             Snackbar.LENGTH_LONG,
         )
@@ -404,7 +414,7 @@ class DuckChatContextualBottomSheet(
                     }
                 }
             }
-        simpleWebview.postDelayed({ downloadSucceededSnackbar.show() }, DOWNLOAD_SNACKBAR_DELAY)
+        binding.simpleWebview.postDelayed({ downloadSucceededSnackbar.show() }, DOWNLOAD_SNACKBAR_DELAY)
     }
 
     companion object {
@@ -412,6 +422,6 @@ class DuckChatContextualBottomSheet(
         private const val CUSTOM_UA =
             "Mozilla/5.0 (Linux; Android 16) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/124.0.0.0 Mobile DuckDuckGo/5 Safari/537.36"
         private const val PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE = 200
-        private const val TOP_OFFSET_DP = 60f
+        private const val TOP_OFFSET_DP = 140f
     }
 }
