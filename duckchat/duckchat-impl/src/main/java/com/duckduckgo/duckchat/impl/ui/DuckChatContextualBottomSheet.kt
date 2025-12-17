@@ -54,6 +54,7 @@ import com.duckduckgo.downloads.api.DownloadStateListener
 import com.duckduckgo.downloads.api.DownloadsFileActions
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
+import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.databinding.BottomSheetDuckAiContextualBinding
 import com.duckduckgo.duckchat.impl.feature.AIChatDownloadFeature
@@ -92,6 +93,7 @@ class DuckChatContextualBottomSheet(
     private val downloadCallback: DownloadStateListener,
     private val downloadsFileActions: DownloadsFileActions,
     private val aiChatDownloadFeature: AIChatDownloadFeature,
+    private val duckChat: DuckChat,
 ) : BottomSheetDialogFragment(), DownloadConfirmationDialogListener {
 
     private var _binding: BottomSheetDuckAiContextualBinding? = null
@@ -179,6 +181,12 @@ class DuckChatContextualBottomSheet(
     }
 
     private fun showDuckAi() {
+        val prompt = binding.inputField.text.toString()
+        if (prompt.isNotEmpty()) {
+            val url = duckChat.getDuckChatUrl(prompt, true)
+            binding.simpleWebview.loadUrl(url)
+        }
+
         hideKeyboard(binding.inputField)
         binding.inputModeWidgetCard.gone()
         binding.contextualModePrompts.gone()

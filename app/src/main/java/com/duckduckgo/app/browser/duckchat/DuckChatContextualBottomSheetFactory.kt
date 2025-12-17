@@ -25,6 +25,7 @@ import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.downloads.api.DownloadStateListener
 import com.duckduckgo.downloads.api.DownloadsFileActions
 import com.duckduckgo.downloads.api.FileDownloader
+import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.feature.AIChatDownloadFeature
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
 import com.duckduckgo.duckchat.impl.ui.DuckChatContextualBottomSheet
@@ -86,6 +87,9 @@ class DuckChatContextualBottomSheetFactoryImpl @Inject constructor() : DuckChatC
     @Inject
     lateinit var aiChatDownloadFeature: AIChatDownloadFeature
 
+    @Inject
+    lateinit var duckChat: DuckChat
+
     override fun create(): DuckChatContextualBottomSheet {
         return DuckChatContextualBottomSheet(
             viewModelFactory = viewModelFactory,
@@ -101,6 +105,7 @@ class DuckChatContextualBottomSheetFactoryImpl @Inject constructor() : DuckChatC
             downloadCallback = downloadCallback,
             downloadsFileActions = downloadsFileActions,
             aiChatDownloadFeature = aiChatDownloadFeature,
+            duckChat = duckChat,
         )
     }
 }
