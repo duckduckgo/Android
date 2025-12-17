@@ -1,4 +1,4 @@
-name: 'Pull Request opened -> Comment on task and add it to Android Release Board'
+name: 'Pull Request opened -> Comment on task and add it to Android Release Board TEst '
 
 on:
   pull_request:
