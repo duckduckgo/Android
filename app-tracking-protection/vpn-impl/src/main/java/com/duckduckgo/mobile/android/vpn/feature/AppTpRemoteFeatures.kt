@@ -94,6 +94,126 @@ interface AppTpRemoteFeatures {
     @DefaultValue(DefaultFeatureValue.FALSE)
     fun atpTdsExperiment010(): Toggle
 
+    @DefaultValue(DefaultFeatureValue.FALSE)
+    fun atpTdsExperiment011(): Toggle
+
+    @DefaultValue(DefaultFeatureValue.FALSE)
+    fun atpTdsExperiment012(): Toggle
+
+    @DefaultValue(DefaultFeatureValue.FALSE)
+    fun atpTdsExperiment013(): Toggle
+
+    @DefaultValue(DefaultFeatureValue.FALSE)
+    fun atpTdsExperiment014(): Toggle
+
+    @DefaultValue(DefaultFeatureValue.FALSE)
+    fun atpTdsExperiment015(): Toggle
+
+    @DefaultValue(DefaultFeatureValue.FALSE)
+    fun atpTdsExperiment016(): Toggle
+
+    @DefaultValue(DefaultFeatureValue.FALSE)
+    fun atpTdsExperiment017(): Toggle
+
+    @DefaultValue(DefaultFeatureValue.FALSE)
+    fun atpTdsExperiment018(): Toggle
+
+    @DefaultValue(DefaultFeatureValue.FALSE)
+    fun atpTdsExperiment019(): Toggle
+
+    @DefaultValue(DefaultFeatureValue.FALSE)
+    fun atpTdsExperiment020(): Toggle
+
+    @DefaultValue(DefaultFeatureValue.FALSE)
+    fun atpTdsExperiment021(): Toggle
+
+    @DefaultValue(DefaultFeatureValue.FALSE)
+    fun atpTdsExperiment022(): Toggle
+
+    @DefaultValue(DefaultFeatureValue.FALSE)
+    fun atpTdsExperiment023(): Toggle
+
+    @DefaultValue(DefaultFeatureValue.FALSE)
+    fun atpTdsExperiment024(): Toggle
+
+    @DefaultValue(DefaultFeatureValue.FALSE)
+    fun atpTdsExperiment025(): Toggle
+
+    @DefaultValue(DefaultFeatureValue.FALSE)
+    fun atpTdsExperiment026(): Toggle
+
+    @DefaultValue(DefaultFeatureValue.FALSE)
+    fun atpTdsExperiment027(): Toggle
+
+    @DefaultValue(DefaultFeatureValue.FALSE)
+    fun atpTdsExperiment028(): Toggle
+
+    @DefaultValue(DefaultFeatureValue.FALSE)
+    fun atpTdsExperiment029(): Toggle
+
+    @DefaultValue(DefaultFeatureValue.FALSE)
+    fun atpTdsExperiment030(): Toggle
+
+    @DefaultValue(DefaultFeatureValue.FALSE)
+    fun atpTdsExperiment031(): Toggle
+
+    @DefaultValue(DefaultFeatureValue.FALSE)
+    fun atpTdsExperiment032(): Toggle
+
+    @DefaultValue(DefaultFeatureValue.FALSE)
+    fun atpTdsExperiment033(): Toggle
+
+    @DefaultValue(DefaultFeatureValue.FALSE)
+    fun atpTdsExperiment034(): Toggle
+
+    @DefaultValue(DefaultFeatureValue.FALSE)
+    fun atpTdsExperiment035(): Toggle
+
+    @DefaultValue(DefaultFeatureValue.FALSE)
+    fun atpTdsExperiment036(): Toggle
+
+    @DefaultValue(DefaultFeatureValue.FALSE)
+    fun atpTdsExperiment037(): Toggle
+
+    @DefaultValue(DefaultFeatureValue.FALSE)
+    fun atpTdsExperiment038(): Toggle
+
+    @DefaultValue(DefaultFeatureValue.FALSE)
+    fun atpTdsExperiment039(): Toggle
+
+    @DefaultValue(DefaultFeatureValue.FALSE)
+    fun atpTdsExperiment040(): Toggle
+
+    @DefaultValue(DefaultFeatureValue.FALSE)
+    fun atpTdsExperiment041(): Toggle
+
+    @DefaultValue(DefaultFeatureValue.FALSE)
+    fun atpTdsExperiment042(): Toggle
+
+    @DefaultValue(DefaultFeatureValue.FALSE)
+    fun atpTdsExperiment043(): Toggle
+
+    @DefaultValue(DefaultFeatureValue.FALSE)
+    fun atpTdsExperiment044(): Toggle
+
+    @DefaultValue(DefaultFeatureValue.FALSE)
+    fun atpTdsExperiment045(): Toggle
+
+    @DefaultValue(DefaultFeatureValue.FALSE)
+    fun atpTdsExperiment046(): Toggle
+
+    @DefaultValue(DefaultFeatureValue.FALSE)
+    fun atpTdsExperiment047(): Toggle
+
+    @DefaultValue(DefaultFeatureValue.FALSE)
+    fun atpTdsExperiment048(): Toggle
+
+    @DefaultValue(DefaultFeatureValue.FALSE)
+    fun atpTdsExperiment049(): Toggle
+
+    @DefaultValue(DefaultFeatureValue.FALSE)
+    fun atpTdsExperiment050(): Toggle
+
     enum class Cohorts(override val cohortName: String) : CohortName {
         CONTROL("control"),
         TREATMENT("treatment"),
@@ -194,43 +314,43 @@ class AppTpTDSPixelsPlugin @Inject constructor(private val inventory: FeatureTog
                 metric = "selectedRemoveTrackingProtectionFeature",
                 value = "1",
                 toggle = activeToggle,
-                conversionWindow = (0..5).map { ConversionWindow(lowerWindow = 0, upperWindow = it) },
+                conversionWindow = (0..7).map { ConversionWindow(lowerWindow = 0, upperWindow = it) },
             ),
             MetricsPixel(
                 metric = "selectedDisableProtection",
                 value = "1",
                 toggle = activeToggle,
-                conversionWindow = (0..5).map { ConversionWindow(lowerWindow = 0, upperWindow = it) },
+                conversionWindow = (0..7).map { ConversionWindow(lowerWindow = 0, upperWindow = it) },
             ),
             MetricsPixel(
                 metric = "selectedDisableAppProtection",
                 value = "1",
                 toggle = activeToggle,
-                conversionWindow = (0..5).map { ConversionWindow(lowerWindow = 0, upperWindow = it) },
+                conversionWindow = (0..7).map { ConversionWindow(lowerWindow = 0, upperWindow = it) },
             ),
             MetricsPixel(
                 metric = "protectionDisabledAppFromDetail",
                 value = "1",
                 toggle = activeToggle,
-                conversionWindow = (0..5).map { ConversionWindow(lowerWindow = 0, upperWindow = it) },
+                conversionWindow = (0..7).map { ConversionWindow(lowerWindow = 0, upperWindow = it) },
             ),
             MetricsPixel(
                 metric = "protectionDisabledAppFromAll",
                 value = "1",
                 toggle = activeToggle,
-                conversionWindow = (0..5).map { ConversionWindow(lowerWindow = 0, upperWindow = it) },
+                conversionWindow = (0..7).map { ConversionWindow(lowerWindow = 0, upperWindow = it) },
             ),
             MetricsPixel(
                 metric = "disabledProtectionForApp",
                 value = "1",
                 toggle = activeToggle,
-                conversionWindow = (0..5).map { ConversionWindow(lowerWindow = 0, upperWindow = it) },
+                conversionWindow = (0..7).map { ConversionWindow(lowerWindow = 0, upperWindow = it) },
             ),
             MetricsPixel(
                 metric = "didFailToDownloadTDS",
                 value = "1",
                 toggle = activeToggle,
-                conversionWindow = (0..5).map { ConversionWindow(lowerWindow = 0, upperWindow = it) },
+                conversionWindow = (0..7).map { ConversionWindow(lowerWindow = 0, upperWindow = it) },
             ),
         )
     }

@@ -43,6 +43,7 @@
     <string name="browserMenuRunningInDDG">DuckDuckGo\'da Çalışıyor</string>
     <string name="browserMenuSetAsDefaultBrowser">Varsayılan tarayıcı olarak ayarla</string>
     <string name="browserMenuNewChat">Yeni Sohbet</string>
+    <string name="browserMenuNewAIChat">Yeni Yapay Zeka Sohbeti</string>
     <string name="browserMenuChatHistory">Sohbet Geçmişi</string>
     <string name="browserMenuChatSettings">Duck.ai Ayarları</string>
     <string name="browserMenuVPN">VPN</string>

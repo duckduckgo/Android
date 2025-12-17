@@ -1389,7 +1389,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                                 "rollout": {
                                     "steps": [
                                         {
-                                            "percent": ${rolloutThreshold - 1.0}
+                                            "percent": ${(rolloutThreshold - 1.0).coerceAtLeast(0.0)}
                                         }
                                     ]
                                 }
@@ -3483,7 +3483,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                             "rollout": {
                                 "steps": [
                                     {
-                                        "percent": ${rolloutThreshold - 1}
+                                        "percent": ${(rolloutThreshold - 1).coerceAtLeast(0.0)}
                                     }
                                 ]
                             },
@@ -3573,7 +3573,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                             "rollout": {
                                 "steps": [
                                     {
-                                        "percent": ${rolloutThreshold - 1}
+                                        "percent": ${(rolloutThreshold - 1).coerceAtLeast(0.0)}
                                     }
                                 ]
                             },
@@ -4674,7 +4674,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                             "rollout": {
                                 "steps": [
                                     {
-                                        "percent": ${rolloutThreshold - 1}
+                                        "percent": ${(rolloutThreshold - 1).coerceAtLeast(0.0)}
                                     }
                                 ]
                             },

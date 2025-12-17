@@ -1,0 +1,40 @@
+// Wide event pixel for Input Screen onboarding flow monitoring
+// https://app.asana.com/1/137249556945/project/488551667048375/task/1212175606684353
+{
+    "wide_input-screen-onboarding": {
+        "description": "User enables Input Screen during onboarding",
+        "owners": ["joshliebe"],
+        "triggers": ["other"],
+        "suffixes": ["daily_count_short", "form_factor"],
+        "parameters": [
+            "widePixelPlatform",
+            "widePixelType",
+            "widePixelSampleRate",
+            "widePixelFeatureStatus",
+            "widePixelAppVersion",
+            "widePixelAppName",
+            "widePixelFormFactor",
+            "widePixelDevMode",
+            {
+                "key": "context.name",
+                "description": "Entry point to the Input Screen onboarding flow.",
+                "enum": ["onboarding"]
+            },
+            {
+                "key": "feature.name",
+                "description": "Feature identifier for this wide pixel",
+                "enum": ["input-screen-onboarding"]
+            },
+            {
+                "key": "feature.data.ext.reinstallUser",
+                "description": "true if the user tapped 'I've been here before', false otherwise",
+                "enum": ["true", "false"]
+            },
+            {
+                "key": "feature.data.ext.enabled",
+                "description": "true if the Input Screen is enabled, false otherwise. Only present on CANCELLED events.",
+                "enum": ["true", "false"]
+            }
+        ]
+    }
+}

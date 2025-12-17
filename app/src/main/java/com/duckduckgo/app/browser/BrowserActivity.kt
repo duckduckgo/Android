@@ -20,6 +20,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.Intent.EXTRA_TEXT
+import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -353,6 +354,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         }
         configureOnBackPressedListener()
         showNewAddressBarOptionChoiceScreen()
+        checkForLanscapeOrientation()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -758,7 +760,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 when (settingsDataStore.omnibarType) {
                     OmnibarType.SINGLE_TOP -> null
                     OmnibarType.SINGLE_BOTTOM -> currentTab?.getOmnibar()?.omnibarView?.toolbar ?: binding.fragmentContainer
-                    OmnibarType.SPLIT -> currentTab?.getBottomNavigationBar() ?: binding.fragmentContainer
+                    OmnibarType.SPLIT -> currentTab?.navigationBar ?: binding.fragmentContainer
                 }
             DefaultSnackbar(
                 parentView = binding.fragmentContainer,
@@ -1007,6 +1009,13 @@ open class BrowserActivity : DuckDuckGoActivity() {
     override fun onAttachFragment(fragment: androidx.fragment.app.Fragment) {
         super.onAttachFragment(fragment)
         hideMockupOmnibar()
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            viewModel.sendPixelEventForLandscapeOrientation()
+        }
     }
 
     private fun hideMockupOmnibar() {
@@ -1470,6 +1479,12 @@ open class BrowserActivity : DuckDuckGoActivity() {
                     omnibarToolbarMockupBottomBinding.mockOmniBarContainerShadow.addBottomShadow()
                 }
             }
+        }
+    }
+
+    private fun checkForLanscapeOrientation() {
+        if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            viewModel.sendPixelEventForLandscapeOrientation()
         }
     }
 }

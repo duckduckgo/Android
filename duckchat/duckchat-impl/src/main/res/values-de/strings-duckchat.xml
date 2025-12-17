@@ -88,4 +88,8 @@
     <!-- Duck AI Hide Generated Images Settings Option -->
     <string name="duckAiHideAiGeneratedImagesTitle">AI-generierte Bilder ausblenden</string>
     <string name="duckAiHideAiGeneratedImagesDescription">Filtert KI-generierte Bilder aus den Ergebnissen der Bildersuche</string>
+
+    <!-- Duck AI Tabs Mode Toggle -->
+    <string name="duckAiFullScreenModeTitle">Duck.ai Tabs-Modus</string>
+    <string name="duckAiFullScreenModeDescription">Neue Duck.ai-Chats als Tabs im Browser anzeigen</string>
 </resources>

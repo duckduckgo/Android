@@ -43,6 +43,7 @@
     <string name="browserMenuRunningInDDG">Käynnissä DuckDuckGossa</string>
     <string name="browserMenuSetAsDefaultBrowser">Aseta oletusselaimeksi</string>
     <string name="browserMenuNewChat">Uusi keskustelu</string>
+    <string name="browserMenuNewAIChat">Uusi AI Chat</string>
     <string name="browserMenuChatHistory">Keskusteluhistoria</string>
     <string name="browserMenuChatSettings">Duck.ai-asetukset</string>
     <string name="browserMenuVPN">VPN</string>

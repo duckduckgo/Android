@@ -64,6 +64,7 @@ import com.duckduckgo.subscriptions.impl.repository.Account
 import com.duckduckgo.subscriptions.impl.repository.AuthRepository
 import com.duckduckgo.subscriptions.impl.repository.RefreshToken
 import com.duckduckgo.subscriptions.impl.repository.Subscription
+import com.duckduckgo.subscriptions.impl.repository.isActive
 import com.duckduckgo.subscriptions.impl.repository.isActiveOrWaiting
 import com.duckduckgo.subscriptions.impl.repository.isExpired
 import com.duckduckgo.subscriptions.impl.repository.toProductList
@@ -75,7 +76,9 @@ import com.duckduckgo.subscriptions.impl.services.SubscriptionsService
 import com.duckduckgo.subscriptions.impl.services.ValidateTokenResponse
 import com.duckduckgo.subscriptions.impl.services.toEntitlements
 import com.duckduckgo.subscriptions.impl.wideevents.AuthTokenRefreshWideEvent
+import com.duckduckgo.subscriptions.impl.wideevents.FreeTrialConversionWideEvent
 import com.duckduckgo.subscriptions.impl.wideevents.SubscriptionPurchaseWideEvent
+import com.duckduckgo.subscriptions.impl.wideevents.SubscriptionRestoreWideEvent
 import com.duckduckgo.subscriptions.impl.wideevents.SubscriptionSwitchWideEvent
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.JsonDataException
@@ -299,6 +302,8 @@ class RealSubscriptionsManager @Inject constructor(
     private val subscriptionPurchaseWideEvent: SubscriptionPurchaseWideEvent,
     private val tokenRefreshWideEvent: AuthTokenRefreshWideEvent,
     private val subscriptionSwitchWideEvent: SubscriptionSwitchWideEvent,
+    private val freeTrialConversionWideEvent: FreeTrialConversionWideEvent,
+    private val subscriptionRestoreWideEvent: SubscriptionRestoreWideEvent,
 ) : SubscriptionsManager {
     private val adapter = Moshi.Builder().build().adapter(ResponseError::class.java)
 
@@ -379,6 +384,8 @@ class RealSubscriptionsManager @Inject constructor(
                         checkPurchase(it.packageName, it.purchaseToken)
                     }
                     is PurchaseState.Canceled -> {
+                        subscriptionPurchaseWideEvent.onPurchaseCancelledByUser()
+                        subscriptionSwitchWideEvent.onUserCancelled()
                         _currentPurchaseState.emit(CurrentPurchase.Canceled)
                         if (removeExpiredSubscriptionOnCancelledPurchase) {
                             if (subscriptionStatus().isExpired()) {
@@ -386,6 +393,12 @@ class RealSubscriptionsManager @Inject constructor(
                             }
                             removeExpiredSubscriptionOnCancelledPurchase = false
                         }
+                    }
+
+                    is PurchaseState.Failure -> {
+                        subscriptionPurchaseWideEvent.onBillingFlowPurchaseFailure(it.errorType)
+                        subscriptionSwitchWideEvent.onSwitchFailed(it.errorType)
+                        _currentPurchaseState.emit(CurrentPurchase.Failure(it.errorType))
                     }
 
                     else -> {
@@ -529,20 +542,14 @@ class RealSubscriptionsManager @Inject constructor(
             val currentPurchaseToken = playBillingManager.getLatestPurchaseToken()
 
             if (currentPurchaseToken == null) {
-                val errorMessage = "No current purchase token found for switch"
-                logcat { "Subs: Cannot switch plan - $errorMessage" }
-                subscriptionSwitchWideEvent.onSwitchFailed(errorMessage)
-                _currentPurchaseState.emit(CurrentPurchase.Failure(errorMessage))
+                _currentPurchaseState.emit(CurrentPurchase.Failure("No current purchase token found for switch"))
                 return@withContext
             }
 
             // Get account details for external ID
             val account = authRepository.getAccount()
             if (account == null) {
-                val errorMessage = "No account found for switch"
-                logcat { "Subs: Cannot switch plan - $errorMessage" }
-                subscriptionSwitchWideEvent.onSwitchFailed(errorMessage)
-                _currentPurchaseState.emit(CurrentPurchase.Failure(errorMessage))
+                _currentPurchaseState.emit(CurrentPurchase.Failure("No account found for switch"))
                 return@withContext
             }
 
@@ -722,6 +729,9 @@ class RealSubscriptionsManager @Inject constructor(
 
                 subscriptionSwitchWideEvent.onSwitchConfirmationSuccess()
                 subscriptionPurchaseWideEvent.onPurchaseConfirmationSuccess()
+                if (subscription.activeOffers.contains(ActiveOfferType.TRIAL)) {
+                    freeTrialConversionWideEvent.onFreeTrialStarted(subscription.productId)
+                }
             } else {
                 handlePurchaseFailed()
             }
@@ -898,9 +908,9 @@ class RealSubscriptionsManager @Inject constructor(
     override suspend fun refreshSubscriptionData() {
         val subscription = subscriptionsService.subscription()
 
-        val oldStatus =
+        val oldSubscription =
             try {
-                authRepository.getSubscription()?.status
+                authRepository.getSubscription()
             } catch (_: Exception) {
                 null
             }
@@ -917,10 +927,20 @@ class RealSubscriptionsManager @Inject constructor(
             ),
         )
 
-        subscriptionPurchaseWideEvent.onSubscriptionUpdated(oldStatus = oldStatus, newStatus = subscription.status.toStatus())
-        subscriptionSwitchWideEvent.onSubscriptionUpdated(oldStatus = oldStatus, newStatus = subscription.status.toStatus())
+        val newStatus = subscription.status.toStatus()
+        val isSubscriptionActive = newStatus.isActive()
+        val wasFreeTrial = oldSubscription?.activeOffers?.contains(ActiveOfferType.TRIAL) == true
+        val isFreeTrial = subscription.activeOffers.any { it.type.toActiveOfferType() == ActiveOfferType.TRIAL }
 
-        _subscriptionStatus.emit(subscription.status.toStatus())
+        subscriptionPurchaseWideEvent.onSubscriptionUpdated(oldStatus = oldSubscription?.status, newStatus = newStatus)
+        subscriptionSwitchWideEvent.onSubscriptionUpdated(oldStatus = oldSubscription?.status, newStatus = newStatus)
+        freeTrialConversionWideEvent.onSubscriptionRefreshed(
+            wasFreeTrial = wasFreeTrial,
+            isFreeTrial = isFreeTrial,
+            isSubscriptionActive = isSubscriptionActive,
+        )
+
+        _subscriptionStatus.emit(newStatus)
     }
 
     private fun validateTokens(tokens: TokenPair, jwks: String): ValidatedTokenPair {
@@ -1006,7 +1026,7 @@ class RealSubscriptionsManager @Inject constructor(
                     }
 
                     is StoreLoginResult.Failure -> {
-                        RecoverSubscriptionResult.Failure("")
+                        RecoverSubscriptionResult.Failure(message = "Store login error: ${storeLoginResult.javaClass.simpleName}")
                     }
                 }
             } else {
@@ -1044,6 +1064,18 @@ class RealSubscriptionsManager @Inject constructor(
     sealed class RecoverSubscriptionResult {
         data class Success(val subscription: Subscription) : RecoverSubscriptionResult()
         data class Failure(val message: String) : RecoverSubscriptionResult()
+    }
+
+    private suspend fun recoverSubscriptionFromStoreOnPurchaseAttempt() {
+        subscriptionRestoreWideEvent.onGooglePlayRestoreFlowStartedOnPurchaseAttempt()
+        when (val result = recoverSubscriptionFromStore()) {
+            is RecoverSubscriptionResult.Success -> {
+                subscriptionRestoreWideEvent.onGooglePlayRestoreSuccess()
+            }
+            is RecoverSubscriptionResult.Failure -> {
+                subscriptionRestoreWideEvent.onGooglePlayRestoreFailure(error = result.message)
+            }
+        }
     }
 
     private suspend fun activePlanIds(): List<String> =
@@ -1136,13 +1168,13 @@ class RealSubscriptionsManager @Inject constructor(
             subscriptionPurchaseWideEvent.onSubscriptionRefreshSuccess()
 
             if (!isSignedIn()) {
-                recoverSubscriptionFromStore()
+                recoverSubscriptionFromStoreOnPurchaseAttempt()
             } else {
                 authRepository.getSubscription()?.run {
                     if (status.isExpired() && platform == "google") {
                         // re-authenticate in case previous subscription was bought using different google account
                         val accountId = authRepository.getAccount()?.externalId
-                        recoverSubscriptionFromStore()
+                        recoverSubscriptionFromStoreOnPurchaseAttempt()
                         removeExpiredSubscriptionOnCancelledPurchase =
                             accountId != null && accountId != authRepository.getAccount()?.externalId
                     }

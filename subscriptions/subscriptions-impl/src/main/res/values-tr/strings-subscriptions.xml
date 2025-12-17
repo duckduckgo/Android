@@ -160,10 +160,6 @@
     <string name="feedbackSubmitVpnDisclaimer">"Yukarıda girilen ayrıntılara ek olarak, geri bildiriminizle birlikte bazı anonimleştirilmiş bilgiler gönderiyoruz:\n\n• Bazı tarayıcı özelliklerinin etkin olup olmadığı\n• Toplu uygulama tanılama (ör. hata kodları)\n\nGönder'e tıklayarak, DuckDuckGo'nun uygulamayı geliştirmek için gönderilen bilgileri kullanabileceğini kabul ediyorsunuz."</string>
     <string name="feedbackSubmitVpnSubmit">Gönder</string>
     <string name="feedbackSubmitCompletedMessage">Teşekkür Ederiz! Geri bildirim gönderildi.</string>
-    <string name="feedbackSubmitFailedMessage">Bir hata oluştu</string>
-
-    <string name="feedbackSubmitEmailByLine">Bu sorunla ilgili olarak sizinle iletişime geçmemizi istiyorsanız bir e-posta adresi sağlayın (tüm sorunlara yanıt veremeyebiliriz):</string>
-    <string name="feedbackSubmitEmailHint">E-posta (isteğe bağlı)</string>
 
     <string name="feedbackSubmitGeneralDescriptionHint">Lütfen bize geri bildirimlerinizi iletin…</string>
     <string name="feedbackSubmitFeatureRequestDescriptionHint">Hangi özelliği görmek istersiniz?</string>

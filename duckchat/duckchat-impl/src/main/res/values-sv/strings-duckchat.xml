@@ -88,4 +88,8 @@
     <!-- Duck AI Hide Generated Images Settings Option -->
     <string name="duckAiHideAiGeneratedImagesTitle">Dölj AI-genererade bilder</string>
     <string name="duckAiHideAiGeneratedImagesDescription">Filtrerar bort AI-genererade bilder från bildsökningsresultaten</string>
+
+    <!-- Duck AI Tabs Mode Toggle -->
+    <string name="duckAiFullScreenModeTitle">Flikläge för Duck.ai</string>
+    <string name="duckAiFullScreenModeDescription">Visa nya Duck.ai-chattar som flikar i webbläsaren</string>
 </resources>

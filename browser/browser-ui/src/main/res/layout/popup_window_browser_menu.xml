@@ -100,7 +100,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:iconDrawable="@drawable/ic_ai_chat_add_16"
-                app:primaryText="@string/browserMenuNewChat" />
+                app:primaryText="@string/browserMenuNewAIChat" />
 
             <com.duckduckgo.common.ui.view.MenuItemView
                 android:id="@+id/includeDuckChatMenuItem"

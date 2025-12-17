@@ -127,7 +127,7 @@ class RealOptOut24HourSubmissionSuccessRateReporterTest {
             brokerUrl = testBroker1.url,
             optOutSuccessRate = 0.5,
         )
-        verify(mockPirRepository).setCustomStatsPixelsLastSentMs(now - twentyFourHours)
+        verify(mockPirRepository).setCustomStatsPixelsLastSentMs(now)
     }
 
     @Test
@@ -173,7 +173,7 @@ class RealOptOut24HourSubmissionSuccessRateReporterTest {
             brokerUrl = testBroker1.url,
             optOutSuccessRate = 0.75,
         )
-        verify(mockPirRepository).setCustomStatsPixelsLastSentMs(now - twentyFourHours)
+        verify(mockPirRepository).setCustomStatsPixelsLastSentMs(now)
     }
 
     @Test
@@ -278,7 +278,7 @@ class RealOptOut24HourSubmissionSuccessRateReporterTest {
             brokerUrl = testBroker2.url,
             optOutSuccessRate = 0.8,
         )
-        verify(mockPirRepository).setCustomStatsPixelsLastSentMs(now - twentyFourHours)
+        verify(mockPirRepository).setCustomStatsPixelsLastSentMs(now)
     }
 
     @Test
@@ -330,7 +330,7 @@ class RealOptOut24HourSubmissionSuccessRateReporterTest {
             brokerUrl = eq(testBroker2.url),
             optOutSuccessRate = any(),
         )
-        verify(mockPirRepository).setCustomStatsPixelsLastSentMs(now - twentyFourHours)
+        verify(mockPirRepository).setCustomStatsPixelsLastSentMs(now)
     }
 
     @Test
@@ -357,14 +357,13 @@ class RealOptOut24HourSubmissionSuccessRateReporterTest {
         toTest.attemptFirePixel()
 
         verify(mockPirPixelSender, never()).reportBrokerCustomStateOptOutSubmitRate(any(), any())
-        verify(mockPirRepository).setCustomStatsPixelsLastSentMs(now - twentyFourHours)
+        verify(mockPirRepository).setCustomStatsPixelsLastSentMs(now)
     }
 
     @Test
     fun whenShouldFirePixelThenUsesCorrectDateRange() = runTest {
         val startDate = baseTime
         val now = baseTime + twentyFourHours + oneHour
-        val expectedEndDate = now - twentyFourHours
         val jobRecord = createOptOutJobRecord(
             extractedProfileId = 1L,
             brokerName = testBroker1.name,
@@ -388,9 +387,9 @@ class RealOptOut24HourSubmissionSuccessRateReporterTest {
         verify(mockOptOutSubmitRateCalculator).calculateOptOutSubmitRate(
             allActiveOptOutJobsForBroker = eq(listOf(jobRecord)),
             startDateMs = eq(startDate),
-            endDateMs = eq(expectedEndDate),
+            endDateMs = eq(now - twentyFourHours),
         )
-        verify(mockPirRepository).setCustomStatsPixelsLastSentMs(expectedEndDate)
+        verify(mockPirRepository).setCustomStatsPixelsLastSentMs(now)
     }
 
     @Test
@@ -442,7 +441,7 @@ class RealOptOut24HourSubmissionSuccessRateReporterTest {
             brokerUrl = testBroker2.url,
             optOutSuccessRate = 0.9,
         )
-        verify(mockPirRepository).setCustomStatsPixelsLastSentMs(now - twentyFourHours)
+        verify(mockPirRepository).setCustomStatsPixelsLastSentMs(now)
     }
 
     @Test
@@ -540,7 +539,7 @@ class RealOptOut24HourSubmissionSuccessRateReporterTest {
             brokerUrl = eq(testBroker2.url),
             optOutSuccessRate = any(),
         )
-        verify(mockPirRepository).setCustomStatsPixelsLastSentMs(now - twentyFourHours)
+        verify(mockPirRepository).setCustomStatsPixelsLastSentMs(now)
     }
 
     private fun createOptOutJobRecord(

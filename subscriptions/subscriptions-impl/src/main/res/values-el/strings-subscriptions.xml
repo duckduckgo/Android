@@ -160,10 +160,6 @@
     <string name="feedbackSubmitVpnDisclaimer">"Εκτός από τις λεπτομέρειες που καταχωρήθηκαν παραπάνω, στέλνουμε κάποιες ανώνυμες πληροφορίες με τα σχόλιά σας:\n\n• Εάν κάποιες λειτουργίες του προγράμματος περιήγησης είναι ενεργές\n• Συγκεντρωτικά διαγνωστικά της εφαρμογής (π.χ. κωδικοί σφάλματος)\n\nΚάνοντας κλικ στην επιλογή Υποβολή, συμφωνείτε ότι το DuckDuckGo μπορεί να χρησιμοποιήσει τις πληροφορίες που υποβάλλονται για βελτίωση της εφαρμογής."</string>
     <string name="feedbackSubmitVpnSubmit">Υποβολή</string>
     <string name="feedbackSubmitCompletedMessage">Σας ευχαριστούμε! Το σχόλιο υποβλήθηκε.</string>
-    <string name="feedbackSubmitFailedMessage">Κάτι πήγε λάθος</string>
-
-    <string name="feedbackSubmitEmailByLine">Παρέχετε ένα email αν θέλετε να επικοινωνήσουμε μαζί σας για το θέμα αυτό (ίσως δεν είμαστε σε θέση να απαντήσουμε σε όλα τα θέματα):</string>
-    <string name="feedbackSubmitEmailHint">Email (προαιρετικό)</string>
 
     <string name="feedbackSubmitGeneralDescriptionHint">Στείλτε μας τα σχόλιά σας...</string>
     <string name="feedbackSubmitFeatureRequestDescriptionHint">Ποιες λειτουργίες θα θέλατε να δείτε;</string>

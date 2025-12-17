@@ -36,6 +36,7 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import logcat.logcat
 import javax.inject.Inject
 
 @ContributesBinding(AppScope::class, boundType = OmnibarEntryConverter::class)
@@ -70,6 +71,7 @@ class QueryUrlConverter @Inject constructor(
             is QueryOrigin.FromAutocomplete -> queryOrigin.isNav
             is QueryOrigin.FromUser, QueryOrigin.FromBookmark -> {
                 if (useUrlPredictor && queryUrlPredictor.isReady()) {
+                    logcat { "Using urlPredictor" }
                     var queryClassification = queryUrlPredictor.classify(input = searchQuery)
 
                     if (extractUrlFromQuery) {

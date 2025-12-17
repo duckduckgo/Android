@@ -182,8 +182,12 @@ class InputModeWidget @JvmOverloads constructor(
         }
     }
 
-    fun init() {
+    fun initOnSearch() {
         onSearchSelected?.invoke()
+    }
+
+    fun initOnChat() {
+        onChatSelected?.invoke()
     }
 
     fun clearInputFocus() {

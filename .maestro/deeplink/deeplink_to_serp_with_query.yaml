@@ -1,11 +1,15 @@
 appId: com.duckduckgo.mobile.android
-name: "ReleaseTest: Deeplink to SERP with search query"
+name: "Navigation Test: Navigate to SERP with duck scheme query"
 tags:
-  - releaseTest
+  - navigationTest
 ---
 - retry:
     maxRetries: 3
     commands:
+      - launchApp:
+          clearState: true
+          stopApp: true
+      - runFlow: ../shared/skip_all_onboarding.yaml
       - openLink:
           link: duck://https://duckduckgo.com?q=why%20use%20duckduckgo
 

@@ -146,7 +146,6 @@ class RemoteMessageView @JvmOverloads constructor(
             is LaunchScreen -> launchScreen(command.screen, command.payload)
             is SharePromoLinkRMF -> launchSharePromoRMFPageChooser(command.url, command.shareTitle)
             is SubmitUrl -> submitUrl(command.url)
-            is Command.SubmitUrlInContext -> submitUrl(command.url)
             is Command.LaunchDefaultCredentialProvider -> launchDefaultCredentialProvider()
         }
     }

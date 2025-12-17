@@ -69,15 +69,10 @@ class ThemingSharedPreferences @Inject constructor(
             isInNightMode: Boolean,
         ) =
             when (value) {
+                THEME_SYSTEM_DEFAULT -> DuckDuckGoTheme.SYSTEM_DEFAULT
                 THEME_LIGHT -> DuckDuckGoTheme.LIGHT
-
                 THEME_DARK -> DuckDuckGoTheme.DARK
-
-                else -> if (isInNightMode) {
-                    DuckDuckGoTheme.DARK
-                } else {
-                    DuckDuckGoTheme.LIGHT
-                }
+                else -> defValue
             }
     }
 

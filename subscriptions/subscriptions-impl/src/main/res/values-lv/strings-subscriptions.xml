@@ -160,10 +160,6 @@
     <string name="feedbackSubmitVpnDisclaimer">"Papildus iepriekš ievadītajai informācijai mēs kopā ar tavām atsauksmēm nosūtām anonimizētu informāciju:\n\n• Vai ir aktīvas noteiktas pārlūkprogrammas funkcijas\n• Apkopoti lietotnes diagnostikas dati (piemēram, kļūdu kodi)\n\nNoklikšķinot uz Iesniegt, tu piekrīti, ka DuckDuckGo var izmantot iesniegto informāciju, lai uzlabotu lietotni."</string>
     <string name="feedbackSubmitVpnSubmit">Iesniegt</string>
     <string name="feedbackSubmitCompletedMessage">Paldies! Tava atsauksme ir iesniegta.</string>
-    <string name="feedbackSubmitFailedMessage">Kaut kas notika nepareizi</string>
-
-    <string name="feedbackSubmitEmailByLine">Norādi savu e-pasta adresi, ja vēlies, lai mēs ar tevi sazināmies par šo problēmu (iespējams, nevarēsim reaģēt uz visām problēmām):</string>
-    <string name="feedbackSubmitEmailHint">E-pasta adrese (neobligāti)</string>
 
     <string name="feedbackSubmitGeneralDescriptionHint">Lūdzu, sniedz atsauksmes…</string>
     <string name="feedbackSubmitFeatureRequestDescriptionHint">Kādu funkciju tu vēlētos redzēt?</string>

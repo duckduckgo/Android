@@ -88,4 +88,8 @@
     <!-- Duck AI Hide Generated Images Settings Option -->
     <string name="duckAiHideAiGeneratedImagesTitle">Skrij slike, ki jih ustvari umetna inteligenca</string>
     <string name="duckAiHideAiGeneratedImagesDescription">Iz rezultatov iskanja slik odstrani slike, ki jih je ustvarila umetna inteligenca</string>
+
+    <!-- Duck AI Tabs Mode Toggle -->
+    <string name="duckAiFullScreenModeTitle">Način zavihkov Duck.ai</string>
+    <string name="duckAiFullScreenModeDescription">Prikaži nove klepete Duck.ai kot zavihke v brskalniku</string>
 </resources>

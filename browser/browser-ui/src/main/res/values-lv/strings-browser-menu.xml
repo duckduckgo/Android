@@ -43,6 +43,7 @@
     <string name="browserMenuRunningInDDG">Darbojas programmā DuckDuckGo</string>
     <string name="browserMenuSetAsDefaultBrowser">Iestatīt kā noklusējuma pārlūku</string>
     <string name="browserMenuNewChat">Jauna tērzēšanas saruna</string>
+    <string name="browserMenuNewAIChat">Jauns MI tērzēšanas rīks</string>
     <string name="browserMenuChatHistory">Tērzēšanas sarunu vēsture</string>
     <string name="browserMenuChatSettings">Duck.ai iestatījumi</string>
     <string name="browserMenuVPN">VPN</string>

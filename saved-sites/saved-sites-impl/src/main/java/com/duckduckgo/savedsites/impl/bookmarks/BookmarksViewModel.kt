@@ -139,9 +139,15 @@ class BookmarksViewModel @Inject constructor(
         viewModelScope.launch(dispatcherProvider.io()) {
             syncEngine.triggerSync(FEATURE_READ)
         }
+        pixel.fire(SavedSitesPixelName.MENU_ACTION_BOOKMARKS_PRESSED.pixelName)
         pixel.fire(
             SavedSitesPixelName.MENU_ACTION_BOOKMARKS_PRESSED_DAILY.pixelName,
             parameters = mapOf(SavedSitesPixelParameters.SORT_MODE to bookmarksDataStore.getSortingMode().name),
+            type = Daily(),
+        )
+        pixel.fire(SavedSitesPixelName.PRODUCT_TELEMETRY_SURFACE_BOOKMARKS_OPENED.pixelName)
+        pixel.fire(
+            SavedSitesPixelName.PRODUCT_TELEMETRY_SURFACE_BOOKMARKS_OPENED_DAILY.pixelName,
             type = Daily(),
         )
     }

@@ -25,6 +25,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Parcelable;
+import android.os.SystemClock;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
@@ -48,12 +49,14 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.adapter.StatefulAdapter;
 import androidx.viewpager2.widget.ViewPager2;
 
+import com.duckduckgo.app.browser.BuildConfig;
 import com.duckduckgo.app.browser.tabs.TabManager;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -287,11 +290,21 @@ public abstract class FragmentStateAdapter extends RecyclerView.Adapter<Fragment
 
     @Override
     public final void onViewAttachedToWindow(@NonNull final FragmentViewHolder holder) {
+        long startTime = SystemClock.elapsedRealtime();
         if (shouldPlaceFragmentInViewHolder(holder.getBindingAdapterPosition())) {
             placeFragmentInViewHolder(holder);
             gcFragments();
         }
+        if (BuildConfig.DEBUG) {
+            long duration = SystemClock.elapsedRealtime() - startTime;
+            LogcatKt.logcat("TabPerf",
+                    LogPriority.DEBUG, () -> String.format(Locale.getDefault(),
+                            "[TabCreation] onViewAttachedToWindow completed in %dms (itemId: %d)",
+                            duration, holder.getItemId())
+            );
+        }
     }
+
 
     /**
      * @param holder that has been bound to a Fragment in the {@link #onBindViewHolder} stage.

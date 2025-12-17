@@ -16,14 +16,25 @@
 
 package com.duckduckgo.app.statistics.pixels
 
-import androidx.annotation.VisibleForTesting
-import androidx.annotation.VisibleForTesting.Companion.PACKAGE_PRIVATE
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
+import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin
+import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin.PixelParameter
+import com.duckduckgo.di.scopes.AppScope
+import com.squareup.anvil.annotations.ContributesMultibinding
+import javax.inject.Inject
 
-@VisibleForTesting(otherwise = PACKAGE_PRIVATE)
 enum class StatisticsPixelName(override val pixelName: String) : PixelName {
     BROWSER_DAILY_ACTIVE_FEATURE_STATE("m_browser_feature_daily_active_user_d"),
     RETENTION_SEGMENTS("m_retention_segments"),
 
     ATB_PRE_INITIALIZER_PLUGIN_TIMEOUT("timeout_atb_pre_initializer_plugin"),
+}
+
+@ContributesMultibinding(AppScope::class)
+class AtbInitializerPluginPixelParamRemovalPlugin @Inject constructor() : PixelParamRemovalPlugin {
+    override fun names(): List<Pair<String, Set<PixelParameter>>> {
+        return listOf(
+            StatisticsPixelName.ATB_PRE_INITIALIZER_PLUGIN_TIMEOUT.pixelName to PixelParameter.removeAtb(),
+        )
+    }
 }

@@ -1220,7 +1220,7 @@ class BrowserWebViewClientTest {
 
     @UiThreadTest
     @Test
-    fun whenPageLoadsThenFireUriLoadedPixel() {
+    fun whenNonSERPPageLoadsThenFireUriLoadedPixel() {
         val mockWebView = getImmediatelyInvokedMockWebView()
 
         whenever(mockWebView.settings).thenReturn(mock())
@@ -1230,7 +1230,37 @@ class BrowserWebViewClientTest {
         testee.onPageStarted(mockWebView, EXAMPLE_URL, null)
         testee.onPageFinished(mockWebView, EXAMPLE_URL)
 
-        mockUriLoadedManager.sendUriLoadedPixel()
+        verify(mockUriLoadedManager).sendUriLoadedPixels(false)
+    }
+
+    @UiThreadTest
+    @Test
+    fun whenDDGNonSERPPageLoadsThenFireUriLoadedPixel() {
+        val mockWebView = getImmediatelyInvokedMockWebView()
+
+        whenever(mockWebView.settings).thenReturn(mock())
+        whenever(mockWebView.safeCopyBackForwardList()).thenReturn(TestBackForwardList())
+        whenever(mockWebView.progress).thenReturn(100)
+
+        testee.onPageStarted(mockWebView, DDG_URL, null)
+        testee.onPageFinished(mockWebView, DDG_URL)
+
+        verify(mockUriLoadedManager).sendUriLoadedPixels(false)
+    }
+
+    @UiThreadTest
+    @Test
+    fun whenSERPPageLoadsThenFireUriLoadedPixel() {
+        val mockWebView = getImmediatelyInvokedMockWebView()
+
+        whenever(mockWebView.settings).thenReturn(mock())
+        whenever(mockWebView.safeCopyBackForwardList()).thenReturn(TestBackForwardList())
+        whenever(mockWebView.progress).thenReturn(100)
+
+        testee.onPageStarted(mockWebView, EXAMPLE_SERP_URL, null)
+        testee.onPageFinished(mockWebView, EXAMPLE_SERP_URL)
+
+        verify(mockUriLoadedManager).sendUriLoadedPixels(false)
     }
 
     private class TestWebView(
@@ -1329,5 +1359,7 @@ class BrowserWebViewClientTest {
 
     companion object {
         const val EXAMPLE_URL = "https://example.com"
+        const val DDG_URL = "https://duckduckgo.com"
+        const val EXAMPLE_SERP_URL = "https://duckduckgo.com/?q=test"
     }
 }

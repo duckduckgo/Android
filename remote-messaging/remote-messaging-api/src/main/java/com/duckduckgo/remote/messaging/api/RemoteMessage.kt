@@ -106,6 +106,7 @@ sealed class Content(val messageType: MessageType) {
         IMAGE_AI("ImageAI"),
         RADAR("Radar"),
         KEY_IMPORT("KeyImport"),
+        SPLIT_BAR_SETTINGS("SplitBarSettings"),
         ;
 
         companion object {

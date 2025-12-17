@@ -18,7 +18,8 @@ package com.duckduckgo.app.statistics
 
 import androidx.lifecycle.testing.TestLifecycleOwner
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
-import com.duckduckgo.app.statistics.pixels.AtbInitializationPluginPixelSender
+import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.StatisticsPixelName
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.plugins.PluginPoint
@@ -29,6 +30,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
@@ -49,7 +51,7 @@ class AtbInitializerTest {
     private var atbInitializerListener = FakeAtbInitializerListener()
     private val lifecycleOwner = TestLifecycleOwner()
 
-    private val pixelSender: AtbInitializationPluginPixelSender = mock()
+    private val pixel: Pixel = mock()
 
     private val listeners = object : PluginPoint<AtbInitializerListener> {
         override fun getPlugins(): Collection<AtbInitializerListener> {
@@ -81,7 +83,7 @@ class AtbInitializerTest {
             statisticsUpdater,
             emptyListeners,
             coroutineRule.testDispatcherProvider,
-            pixelSender = pixelSender,
+            pixel = pixel,
         )
 
         testee.onPrivacyConfigDownloaded()
@@ -108,7 +110,7 @@ class AtbInitializerTest {
         testee.onPrivacyConfigDownloaded()
         advanceUntilIdle()
 
-        verify(pixelSender).pluginTimedOut(any())
+        verifyPluginTimeoutPixelFires()
     }
 
     @Test
@@ -117,7 +119,7 @@ class AtbInitializerTest {
         testee.onPrivacyConfigDownloaded()
         advanceUntilIdle()
 
-        verify(pixelSender, never()).pluginTimedOut(any())
+        verifyPluginTimeoutPixelNeverFires()
     }
 
     @Test
@@ -155,7 +157,7 @@ class AtbInitializerTest {
             statisticsUpdater,
             listeners,
             coroutineRule.testDispatcherProvider,
-            pixelSender = pixelSender,
+            pixel = pixel,
         )
     }
 
@@ -167,7 +169,25 @@ class AtbInitializerTest {
             statisticsUpdater,
             listeners,
             coroutineRule.testDispatcherProvider,
-            pixelSender = pixelSender,
+            pixel = pixel,
+        )
+    }
+
+    private fun verifyPluginTimeoutPixelFires() {
+        verify(pixel).fire(
+            pixel = eq(StatisticsPixelName.ATB_PRE_INITIALIZER_PLUGIN_TIMEOUT),
+            parameters = eq(mapOf("plugin" to "FakeAtbInitializerListener")),
+            encodedParameters = any(),
+            type = any(),
+        )
+    }
+
+    private fun verifyPluginTimeoutPixelNeverFires() {
+        verify(pixel, never()).fire(
+            pixel = eq(StatisticsPixelName.ATB_PRE_INITIALIZER_PLUGIN_TIMEOUT),
+            parameters = any(),
+            encodedParameters = any(),
+            type = any(),
         )
     }
 }

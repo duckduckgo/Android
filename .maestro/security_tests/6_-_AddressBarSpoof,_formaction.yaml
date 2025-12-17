@@ -16,6 +16,8 @@ tags:
 
             - tapOn: "run"
             # Should do nothing - the navigation should be prevented.
+            - tapOn:
+                id: "omnibarTextInput"
             - copyTextFrom:
                 id: "omnibarTextInput"
             - assertTrue: ${maestro.copiedText == "https://privacy-test-pages.site/security/address-bar-spoofing/spoof-form-action.html"}

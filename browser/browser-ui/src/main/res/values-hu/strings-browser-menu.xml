@@ -43,6 +43,7 @@
     <string name="browserMenuRunningInDDG">Futtatás a DuckDuckGo-ban</string>
     <string name="browserMenuSetAsDefaultBrowser">Beállítás alapértelmezett böngészőként</string>
     <string name="browserMenuNewChat">Új csevegés</string>
+    <string name="browserMenuNewAIChat">Új AI-csevegés</string>
     <string name="browserMenuChatHistory">Csevegési előzmények</string>
     <string name="browserMenuChatSettings">A Duck.ai beállításai</string>
     <string name="browserMenuVPN">VPN</string>

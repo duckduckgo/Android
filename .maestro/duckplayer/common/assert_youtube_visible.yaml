@@ -8,7 +8,7 @@ appId: com.duckduckgo.mobile.android
 
 # Wait for video to load
 - assertVisible:
-      text: "https://m.youtube.com/watch?v=3ml7yeKBUhc"
+      text: ".*m.youtube.com.*"
 
 - assertNotVisible:
       text: "duck://player/.*"

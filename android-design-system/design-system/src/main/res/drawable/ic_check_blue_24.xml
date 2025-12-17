@@ -24,5 +24,5 @@
       android:fillColor="?attr/daxColorAccentBlue"/>
   <path
       android:pathData="M16.775,9.214c0.296,0.29 0.3,0.765 0.011,1.06l-4.494,4.589c-0.785,0.8 -2.074,0.8 -2.859,0l-2.219,-2.265a0.75,0.75 0,0 1,1.072 -1.05l2.219,2.265c0.196,0.2 0.519,0.2 0.715,0l4.494,-4.588a0.75,0.75 0,0 1,1.061 -0.01Z"
-      android:fillColor="#fff"/>
+      android:fillColor="?attr/daxColorAccentContentPrimary"/>
 </vector>

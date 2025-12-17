@@ -59,12 +59,14 @@ tags:
 - extendedWaitUntil:
     visible:
       id: "omnibarTextInput"
-      text: "https://www.eff.org/"
+      text: ".*eff.org.*"
     timeout: 10000
 
 # verify that tapping on a favorite opens the web page (SERP in this case)
 - tapOn:
     id: "omnibarTextInput"
+- tapOn:
+    id: "clearTextButton"
 - tapOn:
     id: "quickAccessFavicon"
     childOf:

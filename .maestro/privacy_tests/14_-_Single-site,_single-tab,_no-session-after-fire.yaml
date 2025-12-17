@@ -50,15 +50,16 @@ tags:
                 text: "convert.ad-company.site"
             - action: back
             - action: back
-            - longPressOn:
+            - tapOn:
                 id: "omnibarTextInput"
-            - tapOn: "Copy"
+            - copyTextFrom:
+                id: "omnibarTextInput"
             - action: back
             - runFlow: ../shared/browser_screen/click_on_fire_button.yaml
             - tapOn: "Clear Tabs and Data"
-            - longPressOn:
+            - tapOn:
                 id: "omnibarTextInput"
-            - tapOn: "Paste"
+            - pasteText
             - pressKey: Enter
             - assertVisible:
                 text: "Publisher site"

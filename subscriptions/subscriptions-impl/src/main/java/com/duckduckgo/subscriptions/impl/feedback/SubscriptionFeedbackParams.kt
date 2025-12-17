@@ -18,6 +18,7 @@ package com.duckduckgo.subscriptions.impl.feedback
 
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.DDG_SETTINGS
+import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.PIR_DASHBOARD
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.SUBSCRIPTION_SETTINGS
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.UNKNOWN
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.VPN_EXCLUDED_APPS
@@ -103,6 +104,7 @@ internal fun PrivacyProFeedbackSource.asParams(): String {
         SUBSCRIPTION_SETTINGS -> "ppro"
         VPN_MANAGEMENT -> "vpn"
         VPN_EXCLUDED_APPS -> "vpnExcludedApps"
+        PIR_DASHBOARD -> "pir"
         UNKNOWN -> "unknown"
     }
 }

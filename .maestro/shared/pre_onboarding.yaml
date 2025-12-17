@@ -12,7 +12,10 @@ appId: com.duckduckgo.mobile.android
 - tapOn: "choose your browser"
 - tapOn: "cancel"
 - assertVisible:
-      text: ".*where should I put your address bar?.*"
+    text: ".*where should I put your address bar?.*"
+- tapOn: "next"
+- assertVisible:
+    text: ".*want easy access to private AI chat?.*"
 - tapOn: "next"
 - assertVisible:
     text: ".*Try a search!.*"

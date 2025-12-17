@@ -25,7 +25,11 @@ import javax.inject.Inject
 interface FireButtonStore {
     val fireButttonUseCount: Int
 
+    val lastEventSendTime: String?
+
     fun incrementFireButtonUseCount()
+
+    fun storeLastFireButtonClearEventTime(time: String)
 }
 
 @ContributesBinding(AppScope::class)
@@ -40,6 +44,9 @@ class RealFireButtonStore @Inject constructor(
     override val fireButttonUseCount: Int
         get() = preferences.getInt(KEY_FIREBUTTON_USE_COUNT, 0)
 
+    override val lastEventSendTime: String?
+        get() = preferences.getString(KEY_FIRE_BUTTON_LAST_CLEAR_EVENT_TIME, null)
+
     override fun incrementFireButtonUseCount() {
         val currentCount = fireButttonUseCount
         preferences.edit {
@@ -47,8 +54,15 @@ class RealFireButtonStore @Inject constructor(
         }
     }
 
+    override fun storeLastFireButtonClearEventTime(time: String) {
+        preferences.edit {
+            putString(KEY_FIRE_BUTTON_LAST_CLEAR_EVENT_TIME, time)
+        }
+    }
+
     companion object {
         const val FILENAME = "com.duckduckgo.app.firebutton"
         const val KEY_FIREBUTTON_USE_COUNT = "FIREBUTTON_USE_COUNT"
+        const val KEY_FIRE_BUTTON_LAST_CLEAR_EVENT_TIME = "FIREBUTTON_LAST_CLEAR_EVENT_TIME"
     }
 }

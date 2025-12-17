@@ -23,6 +23,7 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.DDG_SETTINGS
+import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.PIR_DASHBOARD
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.SUBSCRIPTION_SETTINGS
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.VPN_EXCLUDED_APPS
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.VPN_MANAGEMENT
@@ -39,7 +40,6 @@ import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackSubsSubCat
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackSubsSubCategory.OTHER
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.Command.FeedbackCancelled
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.Command.FeedbackCompleted
-import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.Command.FeedbackFailed
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.Command.ShowHelpPages
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.Command.ShowSupportPage
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.FeedbackFragmentState.FeedbackAction
@@ -67,7 +67,6 @@ class SubscriptionFeedbackViewModel @Inject constructor(
     private val pixelSender: PrivacyProUnifiedFeedbackPixelSender,
     private val feedbackCustomMetadataProvider: FeedbackCustomMetadataProvider,
     private val feedbackHelpUrlProvider: FeedbackHelpUrlProvider,
-    private val supportInbox: SubscriptionSupportInbox,
 ) : ViewModel() {
     private val viewState = MutableStateFlow(ViewState())
     private val command = Channel<Command>(1, DROP_OLDEST)
@@ -107,6 +106,11 @@ class SubscriptionFeedbackViewModel @Inject constructor(
                     when (source) {
                         VPN_MANAGEMENT, VPN_EXCLUDED_APPS -> {
                             newMetadata = newMetadata.copy(category = VPN)
+                            FeedbackSubCategory(newMetadata.category!!.asTitle())
+                        }
+
+                        PIR_DASHBOARD -> {
+                            newMetadata = newMetadata.copy(category = PIR)
                             FeedbackSubCategory(newMetadata.category!!.asTitle())
                         }
 
@@ -180,7 +184,6 @@ class SubscriptionFeedbackViewModel @Inject constructor(
 
     fun onSubmitFeedback(
         description: String,
-        email: String? = null,
     ) {
         viewModelScope.launch {
             val metadata = viewState.value.feedbackMetadata.copy(
@@ -199,18 +202,8 @@ class SubscriptionFeedbackViewModel @Inject constructor(
                 }
 
                 REPORT_PROBLEM -> {
-                    if (!email.isNullOrBlank()) {
-                        sendFeedbackToInbox(email, metadata)
-                    } else {
-                        true
-                    }.also { completeFeedback ->
-                        if (completeFeedback) {
-                            sendReportIssuePixel(metadata)
-                            command.send(FeedbackCompleted)
-                        } else {
-                            command.send(FeedbackFailed)
-                        }
-                    }
+                    sendReportIssuePixel(metadata)
+                    command.send(FeedbackCompleted)
                 }
 
                 null -> {} // Do nothing
@@ -232,26 +225,6 @@ class SubscriptionFeedbackViewModel @Inject constructor(
                 ),
             ),
         )
-    }
-
-    private suspend fun sendFeedbackToInbox(
-        email: String,
-        metadata: FeedbackMetadata,
-    ): Boolean {
-        return with(metadata) {
-            supportInbox.sendFeedback(
-                email = email,
-                source = source!!,
-                category = category!!,
-                subCategory = subCategory,
-                description = description,
-                appName = appName,
-                appPackage = appPackageName,
-                customMetadata = feedbackCustomMetadataProvider.getCustomMetadata(
-                    category!!,
-                ),
-            )
-        }
     }
 
     private fun sendFeatureRequestPixel(metadata: FeedbackMetadata) {
@@ -396,7 +369,7 @@ class SubscriptionFeedbackViewModel @Inject constructor(
 
                 is FeedbackSubCategory -> {
                     val autoAssignedCategory = when (currentFeedbackMetadata.source) {
-                        SUBSCRIPTION_SETTINGS, VPN_MANAGEMENT, VPN_EXCLUDED_APPS -> true
+                        SUBSCRIPTION_SETTINGS, VPN_MANAGEMENT, VPN_EXCLUDED_APPS, PIR_DASHBOARD -> true
                         else -> false
                     }
                     val previousState =
@@ -532,7 +505,6 @@ class SubscriptionFeedbackViewModel @Inject constructor(
     }
 
     sealed class Command {
-        data object FeedbackFailed : Command()
         data object FeedbackCompleted : Command()
         data object FeedbackCancelled : Command()
         data class ShowHelpPages(val url: String) : Command()

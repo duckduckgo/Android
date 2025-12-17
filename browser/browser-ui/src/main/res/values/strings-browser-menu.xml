@@ -42,6 +42,7 @@
     <string name="browserMenuRunningInDDG">Running in DuckDuckGo</string>
     <string name="browserMenuSetAsDefaultBrowser">Set As Default Browser</string>
     <string name="browserMenuNewChat">New Chat</string>
+    <string name="browserMenuNewAIChat">New AI Chat</string>
     <string name="browserMenuChatHistory">Chat History</string>
     <string name="browserMenuChatSettings">Duck.ai Settings</string>
     <string name="browserMenuVPN">VPN</string>

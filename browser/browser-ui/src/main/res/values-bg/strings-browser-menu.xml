@@ -43,6 +43,7 @@
     <string name="browserMenuRunningInDDG">Работи в DuckDuckGo</string>
     <string name="browserMenuSetAsDefaultBrowser">Задаване като браузър по подразбиране</string>
     <string name="browserMenuNewChat">Нов чат</string>
+    <string name="browserMenuNewAIChat">AI Chat</string>
     <string name="browserMenuChatHistory">История на чата</string>
     <string name="browserMenuChatSettings">Настройки на Duck.ai</string>
     <string name="browserMenuVPN">VPN</string>

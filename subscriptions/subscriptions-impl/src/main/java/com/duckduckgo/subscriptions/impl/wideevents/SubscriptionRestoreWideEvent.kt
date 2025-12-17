@@ -1,0 +1,136 @@
+/*
+ * Copyright (c) 2025 DuckDuckGo
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.duckduckgo.subscriptions.impl.wideevents
+
+import com.duckduckgo.app.statistics.wideevents.CleanupPolicy
+import com.duckduckgo.app.statistics.wideevents.FlowStatus
+import com.duckduckgo.app.statistics.wideevents.WideEventClient
+import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.subscriptions.impl.PrivacyProFeature
+import com.squareup.anvil.annotations.ContributesBinding
+import dagger.Lazy
+import dagger.SingleInstanceIn
+import kotlinx.coroutines.withContext
+import javax.inject.Inject
+
+interface SubscriptionRestoreWideEvent {
+    suspend fun onEmailRestoreFlowStarted()
+    suspend fun onGooglePlayRestoreFlowStarted()
+    suspend fun onGooglePlayRestoreFlowStartedOnPurchaseAttempt()
+
+    suspend fun onEmailRestoreSuccess()
+    suspend fun onGooglePlayRestoreSuccess()
+    suspend fun onGooglePlayRestoreFailure(error: String)
+}
+
+@SingleInstanceIn(AppScope::class)
+@ContributesBinding(AppScope::class)
+class SubscriptionRestoreWideEventImpl @Inject constructor(
+    private val wideEventClient: WideEventClient,
+    private val privacyProFeature: Lazy<PrivacyProFeature>,
+    private val dispatchers: DispatcherProvider,
+) : SubscriptionRestoreWideEvent {
+
+    private var cachedFlowId: Long? = null
+
+    override suspend fun onEmailRestoreFlowStarted() {
+        if (!isFeatureEnabled()) return
+        onRestoreFlowStarted(restorePlatform = RESTORE_PLATFORM_EMAIL_ADDRESS, purchaseAttempt = false)
+    }
+
+    override suspend fun onGooglePlayRestoreFlowStarted() {
+        if (!isFeatureEnabled()) return
+        onRestoreFlowStarted(restorePlatform = RESTORE_PLATFORM_GOOGLE_PLAY, purchaseAttempt = false)
+    }
+
+    override suspend fun onGooglePlayRestoreFlowStartedOnPurchaseAttempt() {
+        if (!isFeatureEnabled()) return
+        onRestoreFlowStarted(restorePlatform = RESTORE_PLATFORM_GOOGLE_PLAY, purchaseAttempt = true)
+    }
+
+    override suspend fun onEmailRestoreSuccess() {
+        if (!isFeatureEnabled()) return
+        val wideEventId = getCurrentWideEventId() ?: return
+
+        wideEventClient.intervalEnd(wideEventId, key = INTERVAL_RESTORE_LATENCY)
+        wideEventClient.flowFinish(wideEventId, status = FlowStatus.Success)
+        cachedFlowId = null
+    }
+
+    override suspend fun onGooglePlayRestoreSuccess() {
+        if (!isFeatureEnabled()) return
+        val wideEventId = getCurrentWideEventId() ?: return
+
+        wideEventClient.intervalEnd(wideEventId, key = INTERVAL_RESTORE_LATENCY)
+        wideEventClient.flowFinish(wideEventId, status = FlowStatus.Success)
+        cachedFlowId = null
+    }
+
+    override suspend fun onGooglePlayRestoreFailure(error: String) {
+        if (!isFeatureEnabled()) return
+        val wideEventId = getCurrentWideEventId() ?: return
+
+        wideEventClient.flowFinish(wideEventId, status = FlowStatus.Failure(reason = error))
+        cachedFlowId = null
+    }
+
+    private suspend fun onRestoreFlowStarted(restorePlatform: String, purchaseAttempt: Boolean) {
+        getCurrentWideEventId()?.let { wideEventId ->
+            wideEventClient.flowFinish(wideEventId = wideEventId, status = FlowStatus.Unknown)
+        }
+
+        val flowId = wideEventClient
+            .flowStart(
+                name = SUBSCRIPTION_RESTORE_FEATURE_NAME,
+                cleanupPolicy = CleanupPolicy.OnProcessStart(ignoreIfIntervalTimeoutPresent = true),
+                metadata = mapOf(
+                    KEY_RESTORE_PLATFORM to restorePlatform,
+                    KEY_IS_PURCHASE_ATTEMPT to purchaseAttempt.toString(),
+                ),
+            )
+            .getOrNull() ?: return
+
+        wideEventClient.intervalStart(wideEventId = flowId, key = INTERVAL_RESTORE_LATENCY)
+
+        cachedFlowId = flowId
+    }
+
+    private suspend fun isFeatureEnabled(): Boolean = withContext(dispatchers.io()) {
+        privacyProFeature.get().sendSubscriptionRestoreWideEvent().isEnabled()
+    }
+
+    private suspend fun getCurrentWideEventId(): Long? {
+        if (cachedFlowId == null) {
+            cachedFlowId = wideEventClient
+                .getFlowIds(SUBSCRIPTION_RESTORE_FEATURE_NAME)
+                .getOrNull()
+                ?.lastOrNull()
+        }
+
+        return cachedFlowId
+    }
+
+    private companion object {
+        const val SUBSCRIPTION_RESTORE_FEATURE_NAME = "subscription-restore"
+        const val INTERVAL_RESTORE_LATENCY = "restore_latency_ms_bucketed"
+        const val KEY_RESTORE_PLATFORM = "restore_platform"
+        const val KEY_IS_PURCHASE_ATTEMPT = "is_purchase_attempt"
+        const val RESTORE_PLATFORM_GOOGLE_PLAY = "google_play"
+        const val RESTORE_PLATFORM_EMAIL_ADDRESS = "email_address"
+    }
+}

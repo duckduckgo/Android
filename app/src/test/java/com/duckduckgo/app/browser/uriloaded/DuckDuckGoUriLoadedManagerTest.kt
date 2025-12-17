@@ -24,7 +24,13 @@ import kotlinx.coroutines.test.TestScope
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.kotlin.*
+import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.reset
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 
 class DuckDuckGoUriLoadedManagerTest {
 
@@ -47,7 +53,7 @@ class DuckDuckGoUriLoadedManagerTest {
         whenever(mockUriLoadedKillSwitch.isEnabled()).thenReturn(true)
 
         initialize()
-        testee.sendUriLoadedPixel()
+        testee.sendUriLoadedPixels(isDuckDuckGoUrl = false)
 
         verify(mockPixel).fire(AppPixelName.URI_LOADED)
     }
@@ -57,7 +63,7 @@ class DuckDuckGoUriLoadedManagerTest {
         whenever(mockUriLoadedKillSwitch.isEnabled()).thenReturn(false)
 
         initialize()
-        testee.sendUriLoadedPixel()
+        testee.sendUriLoadedPixels(isDuckDuckGoUrl = false)
 
         verify(mockPixel, never()).fire(AppPixelName.URI_LOADED)
     }
@@ -68,7 +74,7 @@ class DuckDuckGoUriLoadedManagerTest {
 
         whenever(mockUriLoadedKillSwitch.isEnabled()).thenReturn(true)
         testee.onPrivacyConfigDownloaded()
-        testee.sendUriLoadedPixel()
+        testee.sendUriLoadedPixels(isDuckDuckGoUrl = false)
 
         verify(mockPixel).fire(AppPixelName.URI_LOADED)
 
@@ -76,9 +82,45 @@ class DuckDuckGoUriLoadedManagerTest {
 
         whenever(mockUriLoadedKillSwitch.isEnabled()).thenReturn(false)
         testee.onPrivacyConfigDownloaded()
-        testee.sendUriLoadedPixel()
+        testee.sendUriLoadedPixels(isDuckDuckGoUrl = false)
 
         verify(mockPixel, never()).fire(AppPixelName.URI_LOADED)
+    }
+
+    @Test
+    fun whenSendUriLoadedPixelsWithDuckDuckGoUrlThenSerpPixelsAreFired() {
+        whenever(mockUriLoadedKillSwitch.isEnabled()).thenReturn(true)
+
+        initialize()
+        testee.sendUriLoadedPixels(isDuckDuckGoUrl = true)
+
+        verify(mockPixel).fire(AppPixelName.PRODUCT_TELEMETRY_SURFACE_SERP_LOADED)
+        verify(mockPixel).fire(AppPixelName.PRODUCT_TELEMETRY_SURFACE_SERP_LOADED_DAILY, type = Pixel.PixelType.Daily())
+        verify(mockPixel, never()).fire(AppPixelName.PRODUCT_TELEMETRY_SURFACE_WEBSITE_LOADED)
+        verify(mockPixel, never()).fire(
+            pixel = eq(AppPixelName.PRODUCT_TELEMETRY_SURFACE_WEBSITE_LOADED_DAILY),
+            parameters = any(),
+            encodedParameters = any(),
+            type = any(),
+        )
+    }
+
+    @Test
+    fun whenSendUriLoadedPixelsWithNonDuckDuckGoUrlThenWebsitePixelsAreFired() {
+        whenever(mockUriLoadedKillSwitch.isEnabled()).thenReturn(true)
+
+        initialize()
+        testee.sendUriLoadedPixels(isDuckDuckGoUrl = false)
+
+        verify(mockPixel).fire(AppPixelName.PRODUCT_TELEMETRY_SURFACE_WEBSITE_LOADED)
+        verify(mockPixel).fire(AppPixelName.PRODUCT_TELEMETRY_SURFACE_WEBSITE_LOADED_DAILY, type = Pixel.PixelType.Daily())
+        verify(mockPixel, never()).fire(AppPixelName.PRODUCT_TELEMETRY_SURFACE_SERP_LOADED)
+        verify(mockPixel, never()).fire(
+            pixel = eq(AppPixelName.PRODUCT_TELEMETRY_SURFACE_SERP_LOADED_DAILY),
+            parameters = any(),
+            encodedParameters = any(),
+            type = any(),
+        )
     }
 
     private fun initialize() {

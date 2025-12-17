@@ -9,7 +9,7 @@
 
     <application
         android:largeHeap="true"
-        android:theme="@style/Theme.DuckDuckGo.Light">
+        android:theme="@style/Theme.DuckDuckGo.App">
 
         <!-- This is the Worker Service where VPN workers need to bind into -->
         <service

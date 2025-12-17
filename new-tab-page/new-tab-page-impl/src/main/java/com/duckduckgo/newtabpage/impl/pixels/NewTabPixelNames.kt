@@ -28,6 +28,8 @@ enum class NewTabPixelNames(override val pixelName: String) : Pixel.PixelName {
     SECTION_REARRANGED("m_new_tab_page_customize_section_reordered"),
     NEW_TAB_DISPLAYED("m_new_tab_page_displayed"),
     NEW_TAB_DISPLAYED_UNIQUE("m_new_tab_page_displayed_unique"),
+    PRODUCT_SURFACE_TELEMETRY_NEW_TAB_DISPLAYED("m_product_telemetry_surface_usage_new_tab_page"),
+    PRODUCT_SURFACE_TELEMETRY_NEW_TAB_DISPLAYED_DAILY("m_product_telemetry_surface_usage_new_tab_page_daily"),
 }
 
 object NewTabPixelParameters {

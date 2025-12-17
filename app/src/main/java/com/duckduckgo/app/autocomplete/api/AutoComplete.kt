@@ -22,7 +22,6 @@ import androidx.core.net.toUri
 import com.duckduckgo.app.autocomplete.AutocompleteTabsFeature
 import com.duckduckgo.app.autocomplete.impl.AutoCompletePixelNames
 import com.duckduckgo.app.autocomplete.impl.AutoCompleteRepository
-import com.duckduckgo.app.autocomplete.impl.AutocompletePixelParams
 import com.duckduckgo.app.browser.UriString
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.onboarding.store.AppStage
@@ -134,10 +133,9 @@ class AutoCompleteApi constructor(
             val bookmarksFavoritesTabsAndHistory = combineBookmarksFavoritesTabsAndHistory(bookmarks, favorites, tabs, historyResults)
             val topHits = getTopHits(bookmarksFavoritesTabsAndHistory, searchResults)
             val filteredBookmarksFavoritesTabsAndHistory = filterBookmarksAndTabsAndHistory(bookmarksFavoritesTabsAndHistory, topHits)
-            val middleSectionSearchResults = makeSearchResultsNotAllowedInTopHits(searchResults)
-            val distinctSearchResults = getDistinctSearchResults(middleSectionSearchResults, topHits, filteredBookmarksFavoritesTabsAndHistory)
+            val middleSectionSearchResults = getMiddleSearchResults(searchResults, topHits, filteredBookmarksFavoritesTabsAndHistory)
 
-            val searchSuggestions = (topHits + distinctSearchResults + filteredBookmarksFavoritesTabsAndHistory).distinctBy {
+            val searchSuggestions = (topHits + middleSectionSearchResults + filteredBookmarksFavoritesTabsAndHistory).distinctBy {
                 Pair(it.phrase, it::class.java)
             }
             if (searchSuggestions.isNotEmpty() && deviceAppResults.isNotEmpty()) {
@@ -202,6 +200,18 @@ class AutoCompleteApi constructor(
         return bookmarksAndFavoritesAndTabsAndHistory
             .filter { suggestion -> topHits.none { it.phrase == suggestion.phrase } }
             .take(maxBottomSection)
+    }
+
+    private fun getMiddleSearchResults(
+        searchResults: List<AutoCompleteSearchSuggestion>,
+        topHits: List<AutoCompleteSuggestion>,
+        filteredBookmarksAndTabsAndHistory: List<AutoCompleteSuggestion>,
+    ): List<AutoCompleteSearchSuggestion> {
+        val middleSectionSearchResults = makeSearchResultsNotAllowedInTopHits(searchResults)
+        val distinctSearchResults = getDistinctSearchResults(middleSectionSearchResults, topHits, filteredBookmarksAndTabsAndHistory)
+        return distinctSearchResults
+            .filter { suggestion -> topHits.none { it.phrase == suggestion.phrase && it::class.isInstance(suggestion) } }
+            .take(MAX_SEARCH_SUGGESTIONS)
     }
 
     private fun makeSearchResultsNotAllowedInTopHits(searchResults: List<AutoCompleteSearchSuggestion>): List<AutoCompleteSearchSuggestion> {
@@ -293,7 +303,7 @@ class AutoCompleteApi constructor(
         val hasFavoriteResults = suggestions.any { it is AutoCompleteBookmarkSuggestion && it.isFavorite }
         val hasHistoryResults = suggestions.any { it is AutoCompleteHistorySuggestion || it is AutoCompleteHistorySearchSuggestion }
         val hasSwitchToTabResults = suggestions.any { it is AutoCompleteSwitchToTabSuggestion }
-        val params = mutableMapOf(
+        val params = mapOf(
             PixelParameter.SHOWED_BOOKMARKS to hasBookmarkResults.toString(),
             PixelParameter.SHOWED_FAVORITES to hasFavoriteResults.toString(),
             PixelParameter.BOOKMARK_CAPABLE to hasBookmarks.toString(),
@@ -332,11 +342,6 @@ class AutoCompleteApi constructor(
             }
 
             else -> return
-        }
-
-        if (suggestion is AutoCompleteSearchSuggestion) {
-            val clickedSearchSuggestionIndex = suggestions.filter { it is AutoCompleteSearchSuggestion }.indexOf(suggestion)
-            params[AutocompletePixelParams.PARAM_SEARCH_SUGGESTION_INDEX] = clickedSearchSuggestionIndex.toString()
         }
 
         pixel.fire(pixelName, params)
@@ -588,6 +593,7 @@ class AutoCompleteApi constructor(
 
     private companion object {
         private const val MAX_RESULTS_PER_GROUP_WITH_INSTALLED_APPS = 4
+        private const val MAX_SEARCH_SUGGESTIONS = 5
     }
 }
 

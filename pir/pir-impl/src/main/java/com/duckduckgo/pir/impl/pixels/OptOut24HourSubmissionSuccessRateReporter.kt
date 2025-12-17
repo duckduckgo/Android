@@ -75,8 +75,8 @@ class RealOptOut24HourSubmissionSuccessRateReporter @Inject constructor(
                     }
                 }
 
-                logcat { "PIR-CUSTOM-STATS: Updating last send date to $endDate" }
-                pirRepository.setCustomStatsPixelsLastSentMs(endDate)
+                logcat { "PIR-CUSTOM-STATS: Updating last send date to $now" }
+                pirRepository.setCustomStatsPixelsLastSentMs(now)
             }
         }
     }

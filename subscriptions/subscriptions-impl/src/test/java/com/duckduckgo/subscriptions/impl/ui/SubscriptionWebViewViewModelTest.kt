@@ -9,6 +9,8 @@ import com.duckduckgo.feature.toggles.api.FakeToggleStore
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.networkprotection.api.NetworkProtectionAccessState
 import com.duckduckgo.networkprotection.api.NetworkProtectionScreens.NetworkProtectionManagementScreenNoParams
+import com.duckduckgo.pir.api.PirFeature
+import com.duckduckgo.pir.api.dashboard.PirFeatureState
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.EXPIRED
@@ -67,12 +69,14 @@ class SubscriptionWebViewViewModelTest {
     private val subscriptionsChecker: SubscriptionsChecker = mock()
     private val pixelSender: SubscriptionPixelSender = mock()
     private val privacyProFeature = FakeFeatureToggleFactory.create(PrivacyProFeature::class.java, FakeToggleStore())
+    private val pirFeature: PirFeature = mock()
 
     private lateinit var viewModel: SubscriptionWebViewViewModel
 
     @Before
     fun setup() = runTest {
         whenever(networkProtectionAccessState.getScreenForCurrentState()).thenReturn(NetworkProtectionManagementScreenNoParams)
+        whenever(pirFeature.getPirFeatureState()).thenReturn(PirFeatureState.DISABLED)
         viewModel = SubscriptionWebViewViewModel(
             coroutineTestRule.testDispatcherProvider,
             subscriptionsManager,
@@ -80,6 +84,7 @@ class SubscriptionWebViewViewModelTest {
             networkProtectionAccessState,
             pixelSender,
             privacyProFeature,
+            pirFeature,
         )
         givenSubscriptionStatus(UNKNOWN)
     }
@@ -571,8 +576,9 @@ class SubscriptionWebViewViewModelTest {
     }
 
     @Test
-    fun whenFeatureSelectedAndFeatureIsPirThenCommandSent() = runTest {
+    fun whenFeatureSelectedAndFeatureIsPirAndPirDisabledThenCommandSent() = runTest {
         givenSubscriptionStatus(EXPIRED)
+        whenever(pirFeature.getPirFeatureState()).thenReturn(PirFeatureState.DISABLED)
         viewModel.commands().test {
             viewModel.processJsCallbackMessage(
                 "test",
@@ -581,6 +587,81 @@ class SubscriptionWebViewViewModelTest {
                 JSONObject("""{"feature":"${SubscriptionsConstants.PIR}"}"""),
             )
             assertTrue(awaitItem() is Command.GoToPIR)
+        }
+    }
+
+    @Test
+    fun whenFeatureSelectedAndFeatureIsPirAndPirNotAvailableThenCommandSent() = runTest {
+        givenSubscriptionStatus(EXPIRED)
+        whenever(pirFeature.getPirFeatureState()).thenReturn(PirFeatureState.NOT_AVAILABLE)
+        viewModel.commands().test {
+            viewModel.processJsCallbackMessage(
+                "test",
+                "featureSelected",
+                null,
+                JSONObject("""{"feature":"${SubscriptionsConstants.PIR}"}"""),
+            )
+            assertTrue(awaitItem() is Command.GoToPIR)
+        }
+    }
+
+    @Test
+    fun whenFeatureSelectedAndFeatureIsPirAndPirEnabledThenCommandSent() = runTest {
+        givenSubscriptionStatus(EXPIRED)
+        whenever(pirFeature.getPirFeatureState()).thenReturn(PirFeatureState.ENABLED)
+        viewModel.commands().test {
+            viewModel.processJsCallbackMessage(
+                "test",
+                "featureSelected",
+                null,
+                JSONObject("""{"feature":"${SubscriptionsConstants.PIR}"}"""),
+            )
+            assertTrue(awaitItem() is Command.GoToPIRDashboard)
+        }
+    }
+
+    @Test
+    fun whenFeatureSelectedAndFeatureIsLegacyPirAndPirDisabledThenCommandSent() = runTest {
+        givenSubscriptionStatus(EXPIRED)
+        whenever(pirFeature.getPirFeatureState()).thenReturn(PirFeatureState.DISABLED)
+        viewModel.commands().test {
+            viewModel.processJsCallbackMessage(
+                "test",
+                "featureSelected",
+                null,
+                JSONObject("""{"feature":"${SubscriptionsConstants.LEGACY_FE_PIR}"}"""),
+            )
+            assertTrue(awaitItem() is Command.GoToPIR)
+        }
+    }
+
+    @Test
+    fun whenFeatureSelectedAndFeatureIsLegacyPirAndPirNotAvailableThenCommandSent() = runTest {
+        givenSubscriptionStatus(EXPIRED)
+        whenever(pirFeature.getPirFeatureState()).thenReturn(PirFeatureState.NOT_AVAILABLE)
+        viewModel.commands().test {
+            viewModel.processJsCallbackMessage(
+                "test",
+                "featureSelected",
+                null,
+                JSONObject("""{"feature":"${SubscriptionsConstants.LEGACY_FE_PIR}"}"""),
+            )
+            assertTrue(awaitItem() is Command.GoToPIR)
+        }
+    }
+
+    @Test
+    fun whenFeatureSelectedAndFeatureIsLegacyPirAndPirEnabledThenCommandSent() = runTest {
+        givenSubscriptionStatus(EXPIRED)
+        whenever(pirFeature.getPirFeatureState()).thenReturn(PirFeatureState.ENABLED)
+        viewModel.commands().test {
+            viewModel.processJsCallbackMessage(
+                "test",
+                "featureSelected",
+                null,
+                JSONObject("""{"feature":"${SubscriptionsConstants.LEGACY_FE_PIR}"}"""),
+            )
+            assertTrue(awaitItem() is Command.GoToPIRDashboard)
         }
     }
 
@@ -706,8 +787,25 @@ class SubscriptionWebViewViewModelTest {
     }
 
     @Test
-    fun whenFeatureSelectedAndFeatureIsPirAndInPurchaseFlowThenPixelIsSent() = runTest {
+    fun whenFeatureSelectedAndFeatureIsPirAndInPurchaseFlowAndPirDisabledThenPixelIsSent() = runTest {
         givenSubscriptionStatus(AUTO_RENEWABLE)
+        whenever(pirFeature.getPirFeatureState()).thenReturn(PirFeatureState.DISABLED)
+        whenever(subscriptionsManager.currentPurchaseState).thenReturn(flowOf(CurrentPurchase.Success))
+        viewModel.start()
+
+        viewModel.processJsCallbackMessage(
+            featureName = "test",
+            method = "featureSelected",
+            id = null,
+            data = JSONObject("""{"feature":"${SubscriptionsConstants.PIR}"}"""),
+        )
+        verify(pixelSender).reportOnboardingPirClick()
+    }
+
+    @Test
+    fun whenFeatureSelectedAndFeatureIsPirAndInPurchaseFlowAndPirEnabledThenPixelIsSent() = runTest {
+        givenSubscriptionStatus(AUTO_RENEWABLE)
+        whenever(pirFeature.getPirFeatureState()).thenReturn(PirFeatureState.ENABLED)
         whenever(subscriptionsManager.currentPurchaseState).thenReturn(flowOf(CurrentPurchase.Success))
         viewModel.start()
 
