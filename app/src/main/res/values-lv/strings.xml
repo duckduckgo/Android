@@ -213,6 +213,40 @@
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Fire Button</string>
     <string name="dataClearingActivityTitle">Datu notīrīšana</string>
+    <string name="dataClearingDescription">Tavu datu dzēšana var palīdzēt aizsargāt tavu privātumu tiešsaistē. Izmanto Fire Button, lai manuāli notīrītu datus, vai arī iestatītu automātisku notīrīšanu.</string>
+    <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
+        <item quantity="zero">%1$d vietas izslēgtas no tīrīšanas</item>
+        <item quantity="one">%1$d vieta izslēgta no tīrīšanas</item>
+        <item quantity="other">%1$d vietas izslēgtas no tīrīšanas</item>
+    </plurals>
+    <string name="dataClearingAutomaticClearingOn">Ieslēgts</string>
+    <string name="dataClearingAutomaticClearingOff">Izslēgts</string>
+    <string name="dataClearingClearBrowsingData">Izdzēst pārlūkošanas datus</string>
+    <string name="dataClearingAutomaticDataClearing">Automātiskā datu dzēšana</string>
+    <string name="dataClearingAutomaticallyClearDataToggle">Automātiski notīrīt datus</string>
+    <string name="dataClearingAutomaticTabsOptionDescription">Aizvērt visas atvērtās cilnes</string>
+    <string name="dataClearingAutomaticDataOptionDescription">Dzēs visus vietnes datus, tostarp apmeklētās vietnes. Var izrakstīt tevi no kontiem.</string>
+    <string name="dataClearingAutomaticChatsOptionDescription">Dzēs visas tērzēšanas sarunas, ieskaitot piespraustās tērzēšanas</string>
+
+    <!-- Fire Dialog Granular Options -->
+    <string name="fireDialogTitle">Izvēlies, ko dzēst</string>
+    <string name="dataClearingOptionTabs">Cilnes</string>
+    <string name="dataClearingOptionData">Sīkfaili un vietnes dati</string>
+    <string name="dataClearingDuckAiChats">Duck.ai tērzēšanas</string>
+    <string name="fireDialogOptionDuckAiChatsDescription">Dzēst visas tērzēšanas sarunas</string>
+    <string name="fireDialogDeleteButton">Dzēst</string>
+    <plurals name="fireDialogOptionTabsDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="zero">Aizvērt visas %1$d cilnes</item>
+        <item quantity="one">Aizvērt cilni</item>
+        <item quantity="other">Aizvērt visas %1$d cilnes</item>
+    </plurals>
+    <string name="fireDialogOptionDataDescriptionNoHistory">Var izrakstīt tevi no kontiem.</string>
+    <string name="fireDialogOptionDescriptionNothingToDelete">Nav</string>
+    <plurals name="fireDialogOptionDataDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="zero">Dzēst no %1$d vietnēm. Var izrakstīt tevi no kontiem.</item>
+        <item quantity="one">Dzēst no 1 vietnes. Var izrakstīt tevi no kontiem.</item>
+        <item quantity="other">Dzēst no %1$d vietnēm. Var izrakstīt tevi no kontiem.</item>
+    </plurals>
 
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Atļaujas</string>

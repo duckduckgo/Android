@@ -212,6 +212,37 @@
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Tűz gomb</string>
     <string name="dataClearingActivityTitle">Adattörlés</string>
+    <string name="dataClearingDescription">Az adatok törlése segíthet az online adatvédelemben. A Fire Button segítségével manuálisan törölhetők az adatok, illetve beállítható automatikus törlés is.</string>
+    <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
+        <item quantity="one">%1$d webhely kizárva a törlésből</item>
+        <item quantity="other">%1$d webhely kizárva a törlésből</item>
+    </plurals>
+    <string name="dataClearingAutomaticClearingOn">Be</string>
+    <string name="dataClearingAutomaticClearingOff">Ki</string>
+    <string name="dataClearingClearBrowsingData">Böngészési adatok törlése</string>
+    <string name="dataClearingAutomaticDataClearing">Automatikus adattörlés</string>
+    <string name="dataClearingAutomaticallyClearDataToggle">Adatok automatikus törlése</string>
+    <string name="dataClearingAutomaticTabsOptionDescription">Összes megnyitott lap bezárása</string>
+    <string name="dataClearingAutomaticDataOptionDescription">Összes webhelyadat törlése, beleértve a meglátogatott webhelyeket is. Fiókokból való kijelentkezést eredményezhet.</string>
+    <string name="dataClearingAutomaticChatsOptionDescription">Az összes csevegés törlése, beleértve a kitűzött csevegéseket is</string>
+
+    <!-- Fire Dialog Granular Options -->
+    <string name="fireDialogTitle">Törlendő elemek kiválasztása</string>
+    <string name="dataClearingOptionTabs">Lapok</string>
+    <string name="dataClearingOptionData">Sütik és webhelyadatok</string>
+    <string name="dataClearingDuckAiChats">Duck.ai-csevegések</string>
+    <string name="fireDialogOptionDuckAiChatsDescription">Minden csevegés törlése</string>
+    <string name="fireDialogDeleteButton">Törlés</string>
+    <plurals name="fireDialogOptionTabsDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Lap bezárása</item>
+        <item quantity="other">Mind a(z) %1$d lap bezárása</item>
+    </plurals>
+    <string name="fireDialogOptionDataDescriptionNoHistory">Fiókokból való kijelentkezést eredményezhet.</string>
+    <string name="fireDialogOptionDescriptionNothingToDelete">Nincs</string>
+    <plurals name="fireDialogOptionDataDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Törlés 1 webhelyről. Fiókokból való kijelentkezést eredményezhet.</item>
+        <item quantity="other">Törlés %1$d webhelyről. Fiókokból való kijelentkezést eredményezhet.</item>
+    </plurals>
 
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Engedélyek</string>

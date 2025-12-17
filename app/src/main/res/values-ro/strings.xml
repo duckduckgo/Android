@@ -213,6 +213,40 @@
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Butonul Foc</string>
     <string name="dataClearingActivityTitle">Ștergerea datelor</string>
+    <string name="dataClearingDescription">Ștergerea datelor poate ajuta la protejarea confidențialității online. Folosește Fire Button pentru a șterge datele manual sau configurează ștergerea automată.</string>
+    <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
+        <item quantity="one">%1$d site exclus de la ștergere</item>
+        <item quantity="few">%1$d site-uri excluse de la ștergere</item>
+        <item quantity="other">%1$d site-uri excluse de la ștergere</item>
+    </plurals>
+    <string name="dataClearingAutomaticClearingOn">Activat</string>
+    <string name="dataClearingAutomaticClearingOff">Dezactivat</string>
+    <string name="dataClearingClearBrowsingData">Șterge datele de navigare</string>
+    <string name="dataClearingAutomaticDataClearing">Ștergerea automată a datelor</string>
+    <string name="dataClearingAutomaticallyClearDataToggle">Șterge automat datele</string>
+    <string name="dataClearingAutomaticTabsOptionDescription">Închide toate filele deschise</string>
+    <string name="dataClearingAutomaticDataOptionDescription">Șterge toate datele privind site-urile, inclusiv site-urile vizitate. S-ar putea să fii deconectat de la conturi.</string>
+    <string name="dataClearingAutomaticChatsOptionDescription">Șterge toate chaturile, inclusiv pe cele fixate</string>
+
+    <!-- Fire Dialog Granular Options -->
+    <string name="fireDialogTitle">Alege ce să ștergi</string>
+    <string name="dataClearingOptionTabs">File</string>
+    <string name="dataClearingOptionData">Date privind modulele cookie și site-ul</string>
+    <string name="dataClearingDuckAiChats">Chaturi Duck.ai</string>
+    <string name="fireDialogOptionDuckAiChatsDescription">Șterge toate chaturile</string>
+    <string name="fireDialogDeleteButton">Ștergere</string>
+    <plurals name="fireDialogOptionTabsDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Închide fila</item>
+        <item quantity="few">Închide toate cele %1$d file</item>
+        <item quantity="other">Închide toate cele %1$d de file</item>
+    </plurals>
+    <string name="fireDialogOptionDataDescriptionNoHistory">S-ar putea să fii deconectat de la conturi.</string>
+    <string name="fireDialogOptionDescriptionNothingToDelete">Niciuna</string>
+    <plurals name="fireDialogOptionDataDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Șterge de pe un site. S-ar putea să fii deconectat de la conturi.</item>
+        <item quantity="few">Șterge de pe %1$d site-uri. S-ar putea să fii deconectat de la conturi.</item>
+        <item quantity="other">Șterge de pe %1$d de site-uri. S-ar putea să fii deconectat de la conturi.</item>
+    </plurals>
 
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Permisiuni</string>

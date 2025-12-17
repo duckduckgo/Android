@@ -212,6 +212,37 @@
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Fire Button</string>
     <string name="dataClearingActivityTitle">Andmete kustutamine</string>
+    <string name="dataClearingDescription">Andmete kustutamine aitab kaitsta sinu privaatsust veebis. Andmete käsitsi kustutamiseks kasuta nuppu Fire Button või seadista automaatne kustutamine.</string>
+    <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
+        <item quantity="one">%1$d sait välistati kustutamisest</item>
+        <item quantity="other">%1$d saiti välistati kustutamisest</item>
+    </plurals>
+    <string name="dataClearingAutomaticClearingOn">Sees</string>
+    <string name="dataClearingAutomaticClearingOff">Väljas</string>
+    <string name="dataClearingClearBrowsingData">Kustuta sirvimisandmed</string>
+    <string name="dataClearingAutomaticDataClearing">Automaatne andmete kustutamine</string>
+    <string name="dataClearingAutomaticallyClearDataToggle">Kustuta andmed automaatselt</string>
+    <string name="dataClearingAutomaticTabsOptionDescription">Sule kõik avatud vahekaardid</string>
+    <string name="dataClearingAutomaticDataOptionDescription">Kustuta kõik saidi andmed, sealhulgas külastatud saidid. Võib sind kontodelt välja logida.</string>
+    <string name="dataClearingAutomaticChatsOptionDescription">Kustuta kõik vestlused, sh kinnitatud vestlused</string>
+
+    <!-- Fire Dialog Granular Options -->
+    <string name="fireDialogTitle">Vali, mida kustutada</string>
+    <string name="dataClearingOptionTabs">Vahelehed</string>
+    <string name="dataClearingOptionData">Küpsised ja saidi andmed</string>
+    <string name="dataClearingDuckAiChats">Duck.ai vestlused</string>
+    <string name="fireDialogOptionDuckAiChatsDescription">Kustuta kõik vestlused</string>
+    <string name="fireDialogDeleteButton">Kustuta</string>
+    <plurals name="fireDialogOptionTabsDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Sule vahekaart</item>
+        <item quantity="other">Sule kõik %1$d vahekaarti</item>
+    </plurals>
+    <string name="fireDialogOptionDataDescriptionNoHistory">Võib sind kontodelt välja logida.</string>
+    <string name="fireDialogOptionDescriptionNothingToDelete">Puudub</string>
+    <plurals name="fireDialogOptionDataDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Kustuta %1$d saidilt. Võib sind kontodelt välja logida.</item>
+        <item quantity="other">Kustuta %1$d saidilt. Võib sind kontodelt välja logida.</item>
+    </plurals>
 
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Load</string>

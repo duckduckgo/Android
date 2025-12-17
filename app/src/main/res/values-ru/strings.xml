@@ -214,6 +214,43 @@
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Кнопка «Тревога»</string>
     <string name="dataClearingActivityTitle">Очистка данных</string>
+    <string name="dataClearingDescription">Удаление данных способствует конфиденциальности онлайн. Данные можно стирать автоматически или вручную с помощью кнопки Fire Button.</string>
+    <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
+        <item quantity="one">%1$d сайт исключен из очистки</item>
+        <item quantity="few">%1$d сайта исключено из очистки</item>
+        <item quantity="many">%1$d сайтов исключено из очистки</item>
+        <item quantity="other">Исключено из очистки: %1$d</item>
+    </plurals>
+    <string name="dataClearingAutomaticClearingOn">вкл.</string>
+    <string name="dataClearingAutomaticClearingOff">Выкл</string>
+    <string name="dataClearingClearBrowsingData">Стереть данные браузера</string>
+    <string name="dataClearingAutomaticDataClearing">Автоматическая очистка данных</string>
+    <string name="dataClearingAutomaticallyClearDataToggle">Автоудаление данных</string>
+    <string name="dataClearingAutomaticTabsOptionDescription">Закрыть все открытые вкладки.</string>
+    <string name="dataClearingAutomaticDataOptionDescription">Удалить все данные сайтов, включая историю посещений. Операция может сопровождаться выходом из учетных записей.</string>
+    <string name="dataClearingAutomaticChatsOptionDescription">Удалить все чаты, включая закрепленные.</string>
+
+    <!-- Fire Dialog Granular Options -->
+    <string name="fireDialogTitle">Выбрать, что удалить</string>
+    <string name="dataClearingOptionTabs">Вкладки</string>
+    <string name="dataClearingOptionData">Куки-файлы и данные сайтов</string>
+    <string name="dataClearingDuckAiChats">Чаты Duck.ai</string>
+    <string name="fireDialogOptionDuckAiChatsDescription">Удалить все чаты</string>
+    <string name="fireDialogDeleteButton">Удалить</string>
+    <plurals name="fireDialogOptionTabsDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Закрыть вкладку</item>
+        <item quantity="few">Закрыть все %1$d вкладки</item>
+        <item quantity="many">Закрыть все %1$d вкладок</item>
+        <item quantity="other">Закрыть все вкладки (%1$d)</item>
+    </plurals>
+    <string name="fireDialogOptionDataDescriptionNoHistory">Операция может сопровождаться выходом из учетных записей.</string>
+    <string name="fireDialogOptionDescriptionNothingToDelete">Ничего</string>
+    <plurals name="fireDialogOptionDataDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Данные будут удалены с 1 сайта. Операция может сопровождаться выходом из учетных записей.</item>
+        <item quantity="few">Данные будут удалены с %1$d сайтов. Операция может сопровождаться выходом из учетных записей.</item>
+        <item quantity="many">Данные будут удалены с %1$d сайтов. Операция может сопровождаться выходом из учетных записей.</item>
+        <item quantity="other">Данные будут удалены с сайтов (%1$d). Операция может сопровождаться выходом из учетных записей.</item>
+    </plurals>
 
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Разрешения</string>

@@ -212,6 +212,37 @@
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Κουμπί Φωτιά</string>
     <string name="dataClearingActivityTitle">Διαγραφή δεδομένων</string>
+    <string name="dataClearingDescription">Η διαγραφή των δεδομένων σας μπορεί να βοηθήσει στην προστασία του απορρήτου σας στο διαδίκτυο. Χρησιμοποιήστε το Fire Button για να διαγράψετε τα δεδομένα μη αυτόματα ή για να ρυθμίσετε την αυτόματη εκκαθάριση.</string>
+    <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
+        <item quantity="one">%1$d ιστότοπος εξαιρέθηκε από την εκκαθάριση</item>
+        <item quantity="other">%1$d ιστότοποι εξαιρέθηκαν από την εκκαθάριση</item>
+    </plurals>
+    <string name="dataClearingAutomaticClearingOn">Ενεργό</string>
+    <string name="dataClearingAutomaticClearingOff">Κλειστό</string>
+    <string name="dataClearingClearBrowsingData">Εκκαθάριση δεδομένων περιήγησης</string>
+    <string name="dataClearingAutomaticDataClearing">Αυτόματη εκκαθάριση δεδομένων</string>
+    <string name="dataClearingAutomaticallyClearDataToggle">Αυτόματη απαλοιφή δεδομένων</string>
+    <string name="dataClearingAutomaticTabsOptionDescription">Κλείσιμο όλων των ανοιχτών καρτελών</string>
+    <string name="dataClearingAutomaticDataOptionDescription">Διαγράψτε όλα τα δεδομένα των ιστοτόπων, συμπεριλαμβανομένων των ιστοτόπων που επισκεφτήκατε. Μπορεί να σας αποσυνδέσει από τους λογαριασμούς.</string>
+    <string name="dataClearingAutomaticChatsOptionDescription">Διαγραφή όλων των συνομιλιών, συμπεριλαμβανομένων των καρφιτσωμένων συνομιλιών</string>
+
+    <!-- Fire Dialog Granular Options -->
+    <string name="fireDialogTitle">Επιλέξτε τι να διαγράψετε</string>
+    <string name="dataClearingOptionTabs">Καρτέλες</string>
+    <string name="dataClearingOptionData">Cookie και δεδομένα ιστότοπου</string>
+    <string name="dataClearingDuckAiChats">Συνομιλίες Duck.ai</string>
+    <string name="fireDialogOptionDuckAiChatsDescription">Διαγραφή όλων των συνομιλιών</string>
+    <string name="fireDialogDeleteButton">Διαγραφή</string>
+    <plurals name="fireDialogOptionTabsDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Κλείσιμο καρτέλας</item>
+        <item quantity="other">Κλείσιμο και των %1$d καρτελών</item>
+    </plurals>
+    <string name="fireDialogOptionDataDescriptionNoHistory">Μπορεί να σας αποσυνδέσει από τους λογαριασμούς.</string>
+    <string name="fireDialogOptionDescriptionNothingToDelete">Κανένα</string>
+    <plurals name="fireDialogOptionDataDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Διαγραφή από 1 ιστότοπο. Μπορεί να σας αποσυνδέσει από τους λογαριασμούς.</item>
+        <item quantity="other">Διαγραφή από %1$d ιστότοπους. Μπορεί να σας αποσυνδέσει από τους λογαριασμούς.</item>
+    </plurals>
 
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Δικαιώματα</string>

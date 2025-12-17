@@ -214,6 +214,43 @@
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Fire Button</string>
     <string name="dataClearingActivityTitle">Brisanje podataka</string>
+    <string name="dataClearingDescription">Brisanje podataka može pomoći u zaštiti tvoje privatnosti na mreži. Pomoću Fire Buttona ručno izbriši podatke ili postavi automatsko brisanje.</string>
+    <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
+        <item quantity="one">%1$d lokacija isključena iz brisanja</item>
+        <item quantity="few">%1$d lokacije isključene iz brisanja</item>
+        <item quantity="many">%1$d lokacija isključenih iz brisanja</item>
+        <item quantity="other">%1$d lokacija isključenih iz brisanja</item>
+    </plurals>
+    <string name="dataClearingAutomaticClearingOn">Uključeno</string>
+    <string name="dataClearingAutomaticClearingOff">Isključeno</string>
+    <string name="dataClearingClearBrowsingData">Izbriši podatke o pregledavanju</string>
+    <string name="dataClearingAutomaticDataClearing">Automatsko brisanje podataka</string>
+    <string name="dataClearingAutomaticallyClearDataToggle">Automatsko brisanje podataka</string>
+    <string name="dataClearingAutomaticTabsOptionDescription">Zatvori sve otvorene kartice</string>
+    <string name="dataClearingAutomaticDataOptionDescription">Izbriši sve podatke mrežne lokacije, uključujući posjećene mrežne lokacije. Možda će te odjaviti s računa.</string>
+    <string name="dataClearingAutomaticChatsOptionDescription">Izbriši sve razgovore, uključujući prikvačene razgovore</string>
+
+    <!-- Fire Dialog Granular Options -->
+    <string name="fireDialogTitle">Odaberi što želiš izbrisati</string>
+    <string name="dataClearingOptionTabs">Kartice</string>
+    <string name="dataClearingOptionData">Kolačići i podaci mrežne lokacije</string>
+    <string name="dataClearingDuckAiChats">Duck.ai čavrljanja</string>
+    <string name="fireDialogOptionDuckAiChatsDescription">Izbriši sve čavrljanja</string>
+    <string name="fireDialogDeleteButton">Izbriši</string>
+    <plurals name="fireDialogOptionTabsDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Zatvori karticu</item>
+        <item quantity="few">Zatvori sve %1$d kartice</item>
+        <item quantity="many">Zatvori svih %1$d kartica</item>
+        <item quantity="other">Zatvori svih %1$d kartica</item>
+    </plurals>
+    <string name="fireDialogOptionDataDescriptionNoHistory">Možda će te odjaviti s računa.</string>
+    <string name="fireDialogOptionDescriptionNothingToDelete">Nijedno</string>
+    <plurals name="fireDialogOptionDataDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Izbriši s %1$d mrežne lokacije. Možda će te odjaviti s računa.</item>
+        <item quantity="few">Izbriši s %1$d mrežne lokacije. Možda će te odjaviti s računa.</item>
+        <item quantity="many">Izbriši s %1$d mrežnih lokacija. Možda će te odjaviti s računa.</item>
+        <item quantity="other">Izbriši s %1$d mrežnih lokacija. Možda će te odjaviti s računa.</item>
+    </plurals>
 
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Dozvole</string>
