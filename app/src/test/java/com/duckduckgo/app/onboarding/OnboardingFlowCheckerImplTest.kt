@@ -18,38 +18,50 @@ package com.duckduckgo.app.onboarding
 
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
+import com.duckduckgo.app.onboarding.store.AppStage
+import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.Toggle
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
 class OnboardingFlowCheckerImplTest {
 
+    @get:Rule
+    var coroutineTestRule = CoroutineTestRule()
+
     private val dismissedCtaDao: DismissedCtaDao = mock()
     private val extendedOnboardingFeatureToggles: ExtendedOnboardingFeatureToggles = mock()
     private val settingsDataStore: SettingsDataStore = mock()
+    private val userStageStore: UserStageStore = mock()
     private val noBrowserCtasToggle: Toggle = mock()
 
     private lateinit var testee: OnboardingFlowCheckerImpl
 
     @Before
-    fun setup() {
+    fun setup() = runTest {
         whenever(extendedOnboardingFeatureToggles.noBrowserCtas()).thenReturn(noBrowserCtasToggle)
+        whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
 
         testee = OnboardingFlowCheckerImpl(
             dismissedCtaDao = dismissedCtaDao,
             extendedOnboardingFeatureToggles = extendedOnboardingFeatureToggles,
             settingsDataStore = settingsDataStore,
+            userStageStore = userStageStore,
+            dispatcher = coroutineTestRule.testDispatcherProvider,
         )
     }
 
     @Test
-    fun whenDaxEndCtaIsDismissedThenOnboardingIsComplete() {
+    fun whenDaxEndCtaIsDismissedThenOnboardingIsComplete() = runTest {
         whenever(dismissedCtaDao.exists(CtaId.DAX_END)).thenReturn(true)
         whenever(noBrowserCtasToggle.isEnabled()).thenReturn(false)
         whenever(settingsDataStore.hideTips).thenReturn(false)
@@ -61,7 +73,7 @@ class OnboardingFlowCheckerImplTest {
     }
 
     @Test
-    fun whenNoBrowserCtasExperimentIsEnabledThenOnboardingIsComplete() {
+    fun whenNoBrowserCtasExperimentIsEnabledThenOnboardingIsComplete() = runTest {
         whenever(dismissedCtaDao.exists(CtaId.DAX_END)).thenReturn(false)
         whenever(noBrowserCtasToggle.isEnabled()).thenReturn(true)
         whenever(settingsDataStore.hideTips).thenReturn(false)
@@ -73,7 +85,7 @@ class OnboardingFlowCheckerImplTest {
     }
 
     @Test
-    fun whenHideTipsIsTrueThenOnboardingIsComplete() {
+    fun whenHideTipsIsTrueThenOnboardingIsComplete() = runTest {
         whenever(dismissedCtaDao.exists(CtaId.DAX_END)).thenReturn(false)
         whenever(noBrowserCtasToggle.isEnabled()).thenReturn(false)
         whenever(settingsDataStore.hideTips).thenReturn(true)
@@ -85,7 +97,7 @@ class OnboardingFlowCheckerImplTest {
     }
 
     @Test
-    fun whenAddWidgetCtaIsDismissedThenOnboardingIsComplete() {
+    fun whenAddWidgetCtaIsDismissedThenOnboardingIsComplete() = runTest {
         whenever(dismissedCtaDao.exists(CtaId.DAX_END)).thenReturn(false)
         whenever(noBrowserCtasToggle.isEnabled()).thenReturn(false)
         whenever(settingsDataStore.hideTips).thenReturn(false)
@@ -97,7 +109,20 @@ class OnboardingFlowCheckerImplTest {
     }
 
     @Test
-    fun whenNoCompletionConditionsAreMetThenOnboardingIsNotComplete() {
+    fun whenDaxOnboardingNotActiveThenOnboardingIsComplete() = runTest {
+        whenever(dismissedCtaDao.exists(CtaId.DAX_END)).thenReturn(false)
+        whenever(noBrowserCtasToggle.isEnabled()).thenReturn(false)
+        whenever(settingsDataStore.hideTips).thenReturn(false)
+        whenever(dismissedCtaDao.exists(CtaId.ADD_WIDGET)).thenReturn(false)
+        whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.ESTABLISHED)
+
+        val result = testee.isOnboardingComplete()
+
+        assertTrue(result)
+    }
+
+    @Test
+    fun whenNoCompletionConditionsAreMetThenOnboardingIsNotComplete() = runTest {
         whenever(dismissedCtaDao.exists(CtaId.DAX_END)).thenReturn(false)
         whenever(noBrowserCtasToggle.isEnabled()).thenReturn(false)
         whenever(settingsDataStore.hideTips).thenReturn(false)
@@ -109,7 +134,7 @@ class OnboardingFlowCheckerImplTest {
     }
 
     @Test
-    fun whenMultipleCompletionConditionsAreMetThenOnboardingIsComplete() {
+    fun whenMultipleCompletionConditionsAreMetThenOnboardingIsComplete() = runTest {
         whenever(dismissedCtaDao.exists(CtaId.DAX_END)).thenReturn(true)
         whenever(noBrowserCtasToggle.isEnabled()).thenReturn(true)
         whenever(settingsDataStore.hideTips).thenReturn(true)
