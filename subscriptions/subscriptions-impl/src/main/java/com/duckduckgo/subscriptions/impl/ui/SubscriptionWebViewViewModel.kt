@@ -26,6 +26,8 @@ import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.networkprotection.api.NetworkProtectionAccessState
+import com.duckduckgo.pir.api.PirFeature
+import com.duckduckgo.pir.api.dashboard.PirFeatureState.ENABLED
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.impl.CurrentPurchase
 import com.duckduckgo.subscriptions.impl.JSONObjectAdapter
@@ -87,6 +89,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
     private val networkProtectionAccessState: NetworkProtectionAccessState,
     private val pixelSender: SubscriptionPixelSender,
     private val privacyProFeature: PrivacyProFeature,
+    private val pirFeature: PirFeature,
 ) : ViewModel() {
 
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
@@ -193,7 +196,13 @@ class SubscriptionWebViewViewModel @Inject constructor(
             val commandToSend = when (feature) {
                 NETP, LEGACY_FE_NETP -> networkProtectionAccessState.getScreenForCurrentState()?.let { GoToNetP(it) }
                 ITR, LEGACY_FE_ITR, ROW_ITR -> GoToITR
-                PIR, LEGACY_FE_PIR -> GoToPIR
+                PIR, LEGACY_FE_PIR -> {
+                    if (pirFeature.getPirFeatureState() == ENABLED) {
+                        GoToPIRDashboard
+                    } else {
+                        GoToPIR
+                    }
+                }
                 DUCK_AI -> GoToDuckAI
                 else -> null
             }
@@ -201,7 +210,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
                 when (commandToSend) {
                     GoToITR -> pixelSender.reportOnboardingIdtrClick()
                     is GoToNetP -> pixelSender.reportOnboardingVpnClick()
-                    GoToPIR -> pixelSender.reportOnboardingPirClick()
+                    GoToPIR, GoToPIRDashboard -> pixelSender.reportOnboardingPirClick()
                     GoToDuckAI -> pixelSender.reportOnboardingDuckAiClick()
                     else -> {} // no-op
                 }
@@ -431,6 +440,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
         data object RestoreSubscription : Command()
         data object GoToITR : Command()
         data object GoToPIR : Command()
+        data object GoToPIRDashboard : Command()
         data class GoToNetP(val activityParams: ActivityParams) : Command()
         data object GoToDuckAI : Command()
         data object Reload : Command()
