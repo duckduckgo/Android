@@ -87,8 +87,3 @@ fulladleModuleConfig {
 tasks.register('androidTestsBuild') {
     dependsOn 'assembleDebugAndroidTest'
 }
-
-// global exclusion to avoid "listenablefuture" being dragged from multiple places
-configurations.all {
-    exclude(group: "com.google.guava", module: "listenablefuture")
-}

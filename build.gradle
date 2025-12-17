@@ -159,6 +159,13 @@ subprojects {
                 }
             }
         }
+        resolutionStrategy.dependencySubstitution {
+            // Use Guava (which already bundles ListenableFuture) everywhere a bare listenablefuture is requested.
+            // Note: refreshVersions placeholders ("_") are not resolved in substitutions, so pin the version explicitly.
+            substitute(module("com.google.guava:listenablefuture"))
+                    .using(module("com.google.guava:guava:33.4.0-jre"))
+                    .because("Use guava’s bundled ListenableFuture to avoid duplicate classes")
+        }
     }
 }
 

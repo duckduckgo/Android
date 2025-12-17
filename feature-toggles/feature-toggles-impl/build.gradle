@@ -64,10 +64,6 @@ dependencies {
     coreLibraryDesugaring Android.tools.desugarJdkLibs
 }
 
-configurations.all {
-    exclude(group: "com.google.guava", module: "listenablefuture")
-}
-
 tasks.register('androidTestsBuild') {
     dependsOn 'assembleDebugAndroidTest'
 }
