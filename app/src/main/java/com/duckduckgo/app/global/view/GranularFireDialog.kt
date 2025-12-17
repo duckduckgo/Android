@@ -174,7 +174,6 @@ class GranularFireDialog : BottomSheetDialogFragment(), FireDialog {
 
             cancelButton.setOnClickListener {
                 viewModel.onCancel()
-                dismiss()
             }
         }
     }
@@ -220,6 +219,7 @@ class GranularFireDialog : BottomSheetDialogFragment(), FireDialog {
                                 putString(FireDialog.RESULT_KEY_EVENT, FireDialog.EVENT_ON_CANCEL)
                             },
                         )
+                        dismiss()
                     }
                     is Command.OnClearStarted -> {
                         parentFragmentManager.setFragmentResult(
