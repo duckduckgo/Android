@@ -99,7 +99,7 @@ class DuckChatContextualBottomSheet(
     // this will go in the viewmodel
     private enum class SheetMode {
         INPUT,
-        WEBVIEW
+        WEBVIEW,
     }
 
     private var sheetMode = SheetMode.INPUT
@@ -329,7 +329,7 @@ class DuckChatContextualBottomSheet(
             )
         }
 
-        if (sheetMode == SheetMode.WEBVIEW){
+        if (sheetMode == SheetMode.WEBVIEW) {
             restoreWebState()
         }
 
