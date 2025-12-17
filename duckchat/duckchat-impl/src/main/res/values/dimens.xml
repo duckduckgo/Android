@@ -21,4 +21,5 @@
     <dimen name="inputScreenMarginHorizontal">0dp</dimen>
     <dimen name="inputScreenAutocompleteListBottomSpace">64dp</dimen>
     <dimen name="inputScreenContentSeparatorHeight">0.5dp</dimen>
+    <dimen name="contextualBottomSheetTopOffset">80dp</dimen>
 </resources>

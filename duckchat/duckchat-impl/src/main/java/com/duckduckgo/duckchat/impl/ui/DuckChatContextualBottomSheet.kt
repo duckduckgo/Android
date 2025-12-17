@@ -102,6 +102,7 @@ class DuckChatContextualBottomSheet(
 
     private var pendingFileDownload: PendingFileDownload? = null
     private val downloadMessagesJob = ConflatedJob()
+    private var isExpanded = false
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         // Set up BottomSheetDialog
@@ -109,21 +110,20 @@ class DuckChatContextualBottomSheet(
 
         bottomSheetDialog.window?.let {
             ViewCompat.setOnApplyWindowInsetsListener(it.decorView) { view, insets ->
-                val imeBottom = insets.getInsets(WindowInsetsCompat.Type.ime()).bottom
-                val systemBottom = insets.getInsets(WindowInsetsCompat.Type.systemBars()).bottom
-                val extraMargin = (imeBottom).coerceAtLeast(0)
+                logcat { "Duck.ai Contextual: setOnApplyWindowInsetsListener" }
+                if (!isExpanded) {
+                    val imeBottom = insets.getInsets(WindowInsetsCompat.Type.ime()).bottom
+                    val systemBottom = insets.getInsets(WindowInsetsCompat.Type.systemBars()).bottom
+                    val extraMargin = (systemBottom).coerceAtLeast(0)
 
-                view.updatePadding(bottom = extraMargin)
-
-                binding.contextualWebViewContainer.updatePadding(bottom = extraMargin)
-                binding.simpleWebview.updatePadding(bottom = extraMargin)
+                    view.updatePadding(bottom = extraMargin)
+                }
                 insets
             }
             ViewCompat.requestApplyInsets(it.decorView)
         }
 
         bottomSheetDialog.let {
-            // Set up callback to prevent collapsing after expansion
             it.behavior.addBottomSheetCallback(
                 object : BottomSheetBehavior.BottomSheetCallback() {
                     override fun onStateChanged(
@@ -131,9 +131,10 @@ class DuckChatContextualBottomSheet(
                         newState: Int,
                     ) {
                         if (newState == BottomSheetBehavior.STATE_EXPANDED) {
-                            // Set skipCollapsed to prevent dragging back to collapsed state
                             it.behavior.skipCollapsed = true
                             it.behavior.isDraggable = true
+                            isExpanded = true
+                            binding.simpleWebview.show()
                         }
                     }
 
@@ -184,6 +185,7 @@ class DuckChatContextualBottomSheet(
         binding.contextualWebViewContainer.show()
         val bottomSheetDialog = dialog as? BottomSheetDialog
         bottomSheetDialog?.let {
+            bottomSheetDialog.window?.decorView?.updatePadding(bottom = 0)
             binding.root.doOnLayout {
                 bottomSheetDialog.behavior.state = BottomSheetBehavior.STATE_EXPANDED
             }
