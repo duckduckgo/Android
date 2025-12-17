@@ -45,6 +45,7 @@ import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.FragmentViewModelFactory
+import com.duckduckgo.common.utils.extensions.hideKeyboard
 import com.duckduckgo.downloads.api.DOWNLOAD_SNACKBAR_DELAY
 import com.duckduckgo.downloads.api.DOWNLOAD_SNACKBAR_LENGTH
 import com.duckduckgo.downloads.api.DownloadCommand
@@ -105,16 +106,14 @@ class DuckChatContextualBottomSheet(
     private var isExpanded = false
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        // Set up BottomSheetDialog
         val bottomSheetDialog = BottomSheetDialog(requireContext(), R.style.DuckChatBottomSheetDialogTheme)
 
         bottomSheetDialog.window?.let {
             ViewCompat.setOnApplyWindowInsetsListener(it.decorView) { view, insets ->
-                logcat { "Duck.ai Contextual: setOnApplyWindowInsetsListener" }
                 if (!isExpanded) {
                     val imeBottom = insets.getInsets(WindowInsetsCompat.Type.ime()).bottom
                     val systemBottom = insets.getInsets(WindowInsetsCompat.Type.systemBars()).bottom
-                    val extraMargin = (systemBottom).coerceAtLeast(0)
+                    val extraMargin = (imeBottom - systemBottom).coerceAtLeast(0)
 
                     view.updatePadding(bottom = extraMargin)
                 }
@@ -180,6 +179,7 @@ class DuckChatContextualBottomSheet(
     }
 
     private fun showDuckAi() {
+        hideKeyboard(binding.inputField)
         binding.inputModeWidgetCard.gone()
         binding.contextualModePrompts.gone()
         binding.contextualWebViewContainer.show()
