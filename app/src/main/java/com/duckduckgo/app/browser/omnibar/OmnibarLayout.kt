@@ -18,8 +18,6 @@ package com.duckduckgo.app.browser.omnibar
 
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
-import android.content.ClipData
-import android.content.ClipboardManager
 import android.content.Context
 import android.graphics.Color
 import android.os.Build
@@ -39,7 +37,6 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.ContextCompat
@@ -588,16 +585,6 @@ class OmnibarLayout @JvmOverloads constructor(
         }
         newCustomTabToolbarContainer.customTabInnerContainer.setOnClickListener {
             cancelCustomTabAnimations()
-        }
-        newCustomTabToolbarContainer.customTabInnerContainer.setOnLongClickListener {
-            val domainText = newCustomTabToolbarContainer.customTabDomain.text.toString()
-            if (domainText.isNotEmpty()) {
-                val clipboardManager = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                val clipData = ClipData.newPlainText("URL", viewModel.viewState.value.url)
-                clipboardManager.setPrimaryClip(clipData)
-                Toast.makeText(context, "URL copied to clipboard", Toast.LENGTH_SHORT).show()
-            }
-            true
         }
         trackersAnimation.setOnClickListener {
             cancelAddressBarAnimations()
