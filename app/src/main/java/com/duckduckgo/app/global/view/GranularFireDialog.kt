@@ -208,7 +208,7 @@ class GranularFireDialog : BottomSheetDialogFragment(), FireDialog {
                     is Command.OnShow -> {
                         parentFragmentManager.setFragmentResult(
                             FireDialog.REQUEST_KEY,
-                            android.os.Bundle().apply {
+                            Bundle().apply {
                                 putString(FireDialog.RESULT_KEY_EVENT, FireDialog.EVENT_ON_SHOW)
                             },
                         )
@@ -216,7 +216,7 @@ class GranularFireDialog : BottomSheetDialogFragment(), FireDialog {
                     is Command.OnCancel -> {
                         parentFragmentManager.setFragmentResult(
                             FireDialog.REQUEST_KEY,
-                            android.os.Bundle().apply {
+                            Bundle().apply {
                                 putString(FireDialog.RESULT_KEY_EVENT, FireDialog.EVENT_ON_CANCEL)
                             },
                         )
@@ -224,7 +224,7 @@ class GranularFireDialog : BottomSheetDialogFragment(), FireDialog {
                     is Command.OnClearStarted -> {
                         parentFragmentManager.setFragmentResult(
                             FireDialog.REQUEST_KEY,
-                            android.os.Bundle().apply {
+                            Bundle().apply {
                                 putString(FireDialog.RESULT_KEY_EVENT, FireDialog.EVENT_ON_CLEAR_STARTED)
                             },
                         )

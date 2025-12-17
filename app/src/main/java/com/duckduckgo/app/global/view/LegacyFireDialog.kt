@@ -21,7 +21,6 @@ import android.animation.ValueAnimator
 import android.app.Dialog
 import android.content.Context
 import android.content.DialogInterface
-import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.provider.Settings.Global.ANIMATOR_DURATION_SCALE
@@ -29,6 +28,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat.Type
 import androidx.core.view.WindowInsetsControllerCompat
@@ -141,9 +141,9 @@ class LegacyFireDialog : BottomSheetDialogFragment(), FireDialog {
         setupLayout()
         configureBottomSheet()
 
-        if (appBuildConfig.sdkInt == Build.VERSION_CODES.O) {
-            dialog?.window?.navigationBarColor = requireContext().resources.getColor(CommonR.color.translucentDark, null)
-        } else if (appBuildConfig.sdkInt > Build.VERSION_CODES.O && appBuildConfig.sdkInt < Build.VERSION_CODES.R) {
+        if (appBuildConfig.sdkInt == 26) {
+            dialog?.window?.navigationBarColor = ContextCompat.getColor(requireContext(), CommonR.color.translucentDark)
+        } else if (appBuildConfig.sdkInt in 27..<30) {
             dialog?.window?.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
         }
 
