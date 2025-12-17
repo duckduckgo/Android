@@ -106,7 +106,7 @@ interface DuckChatFeature {
     /**
      * @return `true` when the new fullscreen mode is enabled
      */
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun fullscreenMode(): Toggle
 
     /**
