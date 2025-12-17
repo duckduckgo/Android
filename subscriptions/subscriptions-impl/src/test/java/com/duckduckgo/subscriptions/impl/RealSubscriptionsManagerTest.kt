@@ -40,6 +40,7 @@ import com.duckduckgo.subscriptions.impl.auth2.TokenPair
 import com.duckduckgo.subscriptions.impl.billing.PlayBillingManager
 import com.duckduckgo.subscriptions.impl.billing.PurchaseState
 import com.duckduckgo.subscriptions.impl.billing.PurchaseState.Canceled
+import com.duckduckgo.subscriptions.impl.billing.PurchaseState.Failure
 import com.duckduckgo.subscriptions.impl.billing.PurchaseState.Purchased
 import com.duckduckgo.subscriptions.impl.billing.SubscriptionReplacementMode
 import com.duckduckgo.subscriptions.impl.model.Entitlement
@@ -784,6 +785,43 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         manager.currentPurchaseState.test {
             flowTest.emit(Canceled)
             assertTrue(awaitItem() is CurrentPurchase.Canceled)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenPurchaseFailedThenEmitFailure() = runTest {
+        val flowTest: MutableSharedFlow<PurchaseState> = MutableSharedFlow()
+        whenever(playBillingManager.purchaseState).thenReturn(flowTest)
+
+        val manager = RealSubscriptionsManager(
+            authService,
+            subscriptionsService,
+            authRepository,
+            playBillingManager,
+            emailManager,
+            context,
+            TestScope(),
+            coroutineRule.testDispatcherProvider,
+            pixelSender,
+            { privacyProFeature },
+            authClient,
+            authJwtValidator,
+            pkceGenerator,
+            timeProvider,
+            backgroundTokenRefresh,
+            subscriptionPurchaseWideEvent,
+            tokenRefreshWideEvent,
+            subscriptionSwitchWideEvent,
+            freeTrialConversionWideEvent,
+            subscriptionRestoreWideEvent,
+        )
+
+        manager.currentPurchaseState.test {
+            flowTest.emit(Failure("BILLING_UNAVAILABLE"))
+            val result = awaitItem()
+            assertTrue(result is CurrentPurchase.Failure)
+            assertEquals("BILLING_UNAVAILABLE", (result as CurrentPurchase.Failure).message)
             cancelAndConsumeRemainingEvents()
         }
     }
