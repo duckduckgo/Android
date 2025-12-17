@@ -360,15 +360,19 @@ class GranularFireDialog : BottomSheetDialogFragment(), FireDialog {
 
     @Synchronized
     private fun checkIfShouldRestart() {
-        val shouldRestart = if (isAnimationEnabled()) {
-            isAnimationComplete && isClearingComplete && viewModel.viewState.value.shouldRestartAfterClearing
+        val allTasksComplete = if (isAnimationEnabled()) {
+            isAnimationComplete && isClearingComplete
         } else {
-            isClearingComplete && viewModel.viewState.value.shouldRestartAfterClearing
+            isClearingComplete
         }
 
-        if (shouldRestart && !hasRestarted) {
+        if (allTasksComplete && !hasRestarted) {
             hasRestarted = true
-            clearDataAction.killAndRestartProcess(notifyDataCleared = false, enableTransitionAnimation = false)
+            if (viewModel.viewState.value.shouldRestartAfterClearing) {
+                clearDataAction.killAndRestartProcess(notifyDataCleared = false, enableTransitionAnimation = false)
+            } else {
+                dismiss()
+            }
         }
     }
 
