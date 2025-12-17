@@ -44,7 +44,6 @@ import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.WARN
 import logcat.logcat
@@ -197,7 +196,7 @@ class AutomaticDataClearer @Inject constructor(
     }
 
     override fun onExit() {
-        launch (dispatchers.io()) {
+        launch(dispatchers.io()) {
             // the app does not have any activity in CREATED state we kill the process
             val shouldKillProcess = if (androidBrowserConfigFeature.moreGranularDataClearingOptions().isEnabled()) {
                 dataClearing.isAutomaticDataClearingOptionSelected()
