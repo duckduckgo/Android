@@ -185,7 +185,7 @@ class AutomaticDataClearer @Inject constructor(
 
             when (clearWhat) {
                 ClearWhatOption.CLEAR_TABS_ONLY -> {
-                    clearDataAction.clearTabsAsync(true)
+                    clearDataAction.clearTabsOnly(true)
 
                     logcat { "Notifying listener that clearing has finished" }
                     postDataClearerState(FINISHED)

@@ -81,7 +81,7 @@ class DataClearingWorker(
 
         when (clearWhat) {
             ClearWhatOption.CLEAR_NONE -> logcat(WARN) { "Automatically clear data invoked, but set to clear nothing" }
-            ClearWhatOption.CLEAR_TABS_ONLY -> clearDataAction.clearTabsAsync(appInForeground = false)
+            ClearWhatOption.CLEAR_TABS_ONLY -> clearDataAction.clearTabsOnly(appInForeground = false)
             ClearWhatOption.CLEAR_TABS_AND_DATA -> clearEverything()
         }
     }

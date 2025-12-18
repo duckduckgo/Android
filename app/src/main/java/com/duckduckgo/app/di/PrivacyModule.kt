@@ -17,7 +17,6 @@
 package com.duckduckgo.app.di
 
 import android.content.Context
-import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.app.browser.WebDataManager
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
 import com.duckduckgo.app.browser.favicon.FaviconManager
@@ -79,7 +78,6 @@ object PrivacyModule {
         cookieManager: DuckDuckGoCookieManager,
         appCacheClearer: AppCacheClearer,
         thirdPartyCookieManager: ThirdPartyCookieManager,
-        adClickManager: AdClickManager,
         fireproofWebsiteRepository: FireproofWebsiteRepository,
         sitePermissionsManager: SitePermissionsManager,
         deviceSyncState: DeviceSyncState,
@@ -98,7 +96,6 @@ object PrivacyModule {
             cookieManager,
             appCacheClearer,
             thirdPartyCookieManager,
-            adClickManager,
             fireproofWebsiteRepository,
             sitePermissionsManager,
             deviceSyncState,
