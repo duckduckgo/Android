@@ -52,20 +52,28 @@ class PixelParamRemovalInterceptor @Inject constructor(
     }
 
     override fun intercept(chain: Interceptor.Chain): Response {
-        val request = chain.request().newBuilder()
-        val pixel = chain.request().url.pathSegments.last()
-        val url = chain.request().url.newBuilder().apply {
-            val atbs = pixels.filter { it.second.contains(ATB) }.map { it.first }
-            val versions = pixels.filter { it.second.contains(APP_VERSION) }.map { it.first }
-            if (atbs.any { pixel.startsWith(it) }) {
+        val originalRequest = chain.request()
+        val pixel = originalRequest.url.pathSegments.last()
+
+        val atbs = pixels.filter { it.second.contains(ATB) }.map { it.first }
+        val versions = pixels.filter { it.second.contains(APP_VERSION) }.map { it.first }
+        val shouldRemoveAtb = atbs.any { pixel.startsWith(it) }
+        val shouldRemoveVersion = versions.any { pixel.startsWith(it) }
+
+        if (!shouldRemoveAtb && !shouldRemoveVersion) {
+            return chain.proceed(originalRequest)
+        }
+
+        val url = originalRequest.url.newBuilder().apply {
+            if (shouldRemoveAtb) {
                 removeAllQueryParameters(AppUrl.ParamKey.ATB)
             }
-            if (versions.any { pixel.startsWith(it) }) {
+            if (shouldRemoveVersion) {
                 removeAllQueryParameters(Pixel.PixelParameter.APP_VERSION)
             }
         }.build()
 
-        return chain.proceed(request.url(url).build())
+        return chain.proceed(originalRequest.newBuilder().url(url).build())
     }
 
     override fun getInterceptor(): Interceptor {
