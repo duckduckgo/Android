@@ -6,6 +6,8 @@ on:
 
 jobs:
   process-internal-pr:
+    # Only run when the PR author is the one triggering the event
+    if: ${{ github.actor == github.event.pull_request.user.login }}
     runs-on: ubuntu-latest
     permissions:
       issues: write
