@@ -26,7 +26,6 @@ import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.customtabs.CustomTabActivity
 import com.duckduckgo.app.dispatchers.IntentDispatcherViewModel.ViewState
 import com.duckduckgo.common.ui.DuckDuckGoActivity
-import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import kotlinx.coroutines.flow.collectLatest
@@ -53,8 +52,7 @@ class IntentDispatcherActivity : DuckDuckGoActivity() {
             }
         }
 
-        val surfaceColor = getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorToolbar)
-        viewModel.onIntentReceived(intent, surfaceColor, isExternal = true)
+        viewModel.onIntentReceived(intent, isExternal = true)
     }
 
     private fun dispatch(viewState: ViewState) {
@@ -67,7 +65,7 @@ class IntentDispatcherActivity : DuckDuckGoActivity() {
         }
     }
 
-    private fun showCustomTab(intentText: String?, toolbarColor: Int, isExternal: Boolean) {
+    private fun showCustomTab(intentText: String?, toolbarColor: Int?, isExternal: Boolean) {
         // As customizations we only support the toolbar color at the moment.
         startActivity(
             CustomTabActivity.intent(
