@@ -24,3 +24,27 @@ jobs:
           submodules: recursive
           token: ${{ secrets.GT_DAXMOBILE }}
           ref: ${{ github.event.inputs.ref }}
+
+      - name: Security Internal Maestro run
+        id: maestro-run
+        uses: mobile-dev-inc/action-maestro-cloud@v1.9.8
+        timeout-minutes: 120
+        with:
+          api-key: ${{ secrets.ROBIN_API_KEY }}
+          project-id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
+          name: internalSecurityTest_${{ github.sha }}
+          timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
+          android-api-level: 30
+          workspace: .maestro
+          app-binary-id: 5271fc31aeb41d56444422885cf9bd22e2d27386
+          include-tags: securityTestInternal
+
+      - name: Analyze Maestro Flow Results
+        if: always()
+        id: analyze-maestro
+        uses: ./.github/actions/maestro-flow-analyzer
+        with:
+          flow_results_json: ${{ steps.maestro-run.outputs.MAESTRO_CLOUD_FLOW_RESULTS }}
+          console_url: ${{ steps.maestro-run.outputs.MAESTRO_CLOUD_CONSOLE_URL }}
+          upload_status: ${{ steps.maestro-run.outputs.MAESTRO_CLOUD_UPLOAD_STATUS }}
+          app_binary_id: ${{ steps.maestro-run.outputs.MAESTRO_CLOUD_APP_BINARY_ID }}
