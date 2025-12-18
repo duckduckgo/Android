@@ -60,10 +60,10 @@
     <string name="undoSnackbarAction">Vrátit</string>
     <!-- Trackers blocked animation-->
     <plurals name="trackersBlockedAnimationMessage" tools:ignore="ImpliedQuantity">
-        <item quantity="one">Tracker je zablokovaný</item>
-        <item quantity="few">Trackery jsou zablokované</item>
-        <item quantity="many">Trackery jsou zablokované</item>
-        <item quantity="other">Trackery jsou zablokované</item>
+        <item quantity="one">Tracker</item>
+        <item quantity="few">Trackery</item>
+        <item quantity="many">Trackery</item>
+        <item quantity="other">Trackery</item>
     </plurals>
 
     <!-- Downloading files -->

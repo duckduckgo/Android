@@ -60,10 +60,10 @@
     <string name="undoSnackbarAction">Prekliči spremembe</string>
     <!-- Trackers blocked animation-->
     <plurals name="trackersBlockedAnimationMessage" tools:ignore="ImpliedQuantity">
-        <item quantity="one">Blokiran sledilnik</item>
-        <item quantity="two">Blokirana sledilnika</item>
-        <item quantity="few">Blokirani sledilniki</item>
-        <item quantity="other">Blokiranih sledilnikov</item>
+        <item quantity="one">Sledilnik</item>
+        <item quantity="two">Sledilnika</item>
+        <item quantity="few">Sledilniki</item>
+        <item quantity="other">Sledilnikov</item>
     </plurals>
 
     <!-- Downloading files -->

@@ -60,10 +60,10 @@
     <string name="undoSnackbarAction">Cofnij</string>
     <!-- Trackers blocked animation-->
     <plurals name="trackersBlockedAnimationMessage" tools:ignore="ImpliedQuantity">
-        <item quantity="one">Zablokowano mechanizm śledzący</item>
-        <item quantity="few">Zablokowano mechanizmy śledzące</item>
-        <item quantity="many">Zablokowano mechanizmy śledzące</item>
-        <item quantity="other">Zablokowano mechanizmy śledzące</item>
+        <item quantity="one">śledzący</item>
+        <item quantity="few">śledzące</item>
+        <item quantity="many">śledzące</item>
+        <item quantity="other">śledzące</item>
     </plurals>
 
     <!-- Downloading files -->

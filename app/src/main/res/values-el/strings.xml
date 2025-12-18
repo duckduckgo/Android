@@ -60,8 +60,8 @@
     <string name="undoSnackbarAction">Αναίρεση</string>
     <!-- Trackers blocked animation-->
     <plurals name="trackersBlockedAnimationMessage" tools:ignore="ImpliedQuantity">
-        <item quantity="one">Αποκλεισμένη εφαρμογή παρακολούθησης</item>
-        <item quantity="other">Αποκλεισμένες εφαρμογές παρακολούθησης</item>
+        <item quantity="one">Ιχνηλάτης</item>
+        <item quantity="other">Ιχνηλάτης</item>
     </plurals>
 
     <!-- Downloading files -->
