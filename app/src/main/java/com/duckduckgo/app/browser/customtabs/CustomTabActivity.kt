@@ -108,8 +108,19 @@ class CustomTabActivity : DuckDuckGoActivity() {
     }
 
     companion object {
-        fun intent(context: Context, flags: Int, text: String?, toolbarColor: Int, isExternal: Boolean): Intent {
-            return Intent(context, CustomTabActivity::class.java).apply {
+        fun intent(
+            context: Context,
+            originalIntent: Intent?,
+            flags: Int,
+            text: String?,
+            toolbarColor: Int,
+            isExternal: Boolean,
+        ): Intent {
+            // Preserve Custom Tabs extras from the original caller intent (e.g., session binder),
+            // while still routing to our CustomTabActivity implementation.
+            val base = originalIntent?.let { Intent(it) } ?: Intent()
+            return base.apply {
+                setClass(context, CustomTabActivity::class.java)
                 addFlags(flags)
                 putExtra(CustomTabsIntent.EXTRA_TOOLBAR_COLOR, toolbarColor)
                 putExtra(Intent.EXTRA_TEXT, text)
