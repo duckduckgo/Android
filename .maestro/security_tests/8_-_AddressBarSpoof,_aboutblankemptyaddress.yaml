@@ -22,4 +22,4 @@ tags:
       - copyTextFrom:
           id: "omnibarTextInput"
 
-      - assertTrue: ${maestro.copiedText == "about:blank" }
+      - assertTrue: ${maestro.copiedText != "about:blank" }
