@@ -105,6 +105,7 @@ import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapters.PolymorphicJsonAdapterFactory
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -225,7 +226,8 @@ class PirEndToEndTest {
 
         fakeTimeProvider = FakeCurrentTimeProvider(initialTimeMs = 1700000000000L)
         dispatcherProvider = AndroidTestDispatcherProvider()
-        testScope = CoroutineScope(dispatcherProvider.computation())
+        @Suppress("NoHardcodedCoroutineDispatcher")
+        testScope = CoroutineScope(Dispatchers.Default)
 
         databaseFactory = TestPirSecureStorageDatabaseFactory(context)
         fakePirDataStore = FakePirDataStore()

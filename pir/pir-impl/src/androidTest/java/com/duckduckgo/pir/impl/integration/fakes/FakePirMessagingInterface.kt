@@ -29,7 +29,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import org.json.JSONArray
 import org.json.JSONObject
 
 /**
@@ -106,129 +105,126 @@ class FakePirMessagingInterface(moshi: Moshi) : JsMessaging {
     }
 
     private fun createSuccessResponseJson(action: BrokerAction): JSONObject {
-        // TODO Use JSON string / snippets like with fake-broker.json
         val successJson = when (action) {
-            is BrokerAction.Navigate -> JSONObject().apply {
-                put("actionID", action.id)
-                put("actionType", "navigate")
-                put(
-                    "response",
-                    JSONObject().apply {
-                        put("url", action.url)
-                    },
-                )
+            is BrokerAction.Navigate -> """
+                {
+                    "actionID": "${action.id}",
+                    "actionType": "navigate",
+                    "response": {
+                        "url": "${action.url}"
+                    }
+                }
+            """.trimIndent()
+
+            is BrokerAction.Extract -> {
+                val responseJson = if (nextExtractResponseEmpty) {
+                    nextExtractResponseEmpty = false
+                    "[]"
+                } else {
+                    """
+                    [
+                        {
+                            "name": "John Doe",
+                            "fullName": "John Doe",
+                            "age": "33",
+                            "profileUrl": "https://www.fake-broker.com/John-Doe/NY/New-York/abc123",
+                            "identifier": "abc123",
+                            "email": "john.doe@example.com",
+                            "phoneNumbers": ["+1-555-0101"],
+                            "relatives": ["Jane Doe"],
+                            "alternativeNames": ["J. Doe"],
+                            "addresses": [
+                                {
+                                    "city": "New York",
+                                    "state": "NY",
+                                    "fullAddress": "123 Main St, New York, NY 10001"
+                                }
+                            ]
+                        }
+                    ]
+                """
+                }
+                """
+                {
+                    "actionID": "${action.id}",
+                    "actionType": "extract",
+                    "response": $responseJson
+                }
+                """.trimIndent()
             }
 
-            is BrokerAction.Extract -> JSONObject().apply {
-                put("actionID", action.id)
-                put("actionType", "extract")
-                if (nextExtractResponseEmpty) {
-                    // Return empty array for confirmation scan (profile removed)
-                    put("response", JSONArray())
-                    nextExtractResponseEmpty = false
-                } else {
-                    put(
-                        "response",
-                        JSONArray().apply {
-                            put(
-                                JSONObject().apply {
-                                    put("name", "John Doe")
-                                    put("fullName", "John Doe")
-                                    put("age", "33")
-                                    put("profileUrl", "https://www.fake-broker.com/John-Doe/NY/New-York/abc123")
-                                    put("identifier", "abc123")
-                                    put("email", "john.doe@example.com")
-                                    put("phoneNumbers", JSONArray(listOf("+1-555-0101")))
-                                    put("relatives", JSONArray(listOf("Jane Doe")))
-                                    put("alternativeNames", JSONArray(listOf("J. Doe")))
-                                    put(
-                                        "addresses",
-                                        JSONArray().apply {
-                                            put(
-                                                JSONObject().apply {
-                                                    put("city", "New York")
-                                                    put("state", "NY")
-                                                    put("fullAddress", "123 Main St, New York, NY 10001")
-                                                },
-                                            )
-                                        },
-                                    )
-                                },
-                            )
-                        },
-                    )
+            is BrokerAction.FillForm -> """
+                {
+                    "actionID": "${action.id}",
+                    "actionType": "fillForm"
+                }
+            """.trimIndent()
+
+            is BrokerAction.Click -> """
+                {
+                    "actionID": "${action.id}",
+                    "actionType": "click"
+                }
+            """.trimIndent()
+
+            is BrokerAction.GetCaptchaInfo -> """
+                {
+                    "actionID": "${action.id}",
+                    "actionType": "getCaptchaInfo",
+                    "response": {
+                        "siteKey": "fake-site-key",
+                        "url": "https://fake-captcha-url.com",
+                        "type": "recaptcha"
+                    }
+                }
+            """.trimIndent()
+
+            is BrokerAction.SolveCaptcha -> """
+                {
+                    "actionID": "${action.id}",
+                    "actionType": "solveCaptcha",
+                    "response": {
+                        "callback": {
+                            "eval": "console.log('fake captcha callback');"
+                        }
+                    }
+                }
+            """.trimIndent()
+
+            is BrokerAction.Expectation -> """
+                {
+                    "actionID": "${action.id}",
+                    "actionType": "expectation"
+                }
+            """.trimIndent()
+
+            is BrokerAction.EmailConfirmation -> """
+                {
+                    "actionID": "${action.id}",
+                    "actionType": "emailConfirmation"
+                }
+            """.trimIndent()
+
+            is BrokerAction.Condition -> """
+                {
+                    "actionID": "${action.id}",
+                    "actionType": "condition",
+                    "response": {
+                        "actions": []
+                    }
+                }
+            """.trimIndent()
+        }
+
+        return JSONObject(
+            """
+            {
+                "result": {
+                    "success": $successJson
                 }
             }
-
-            is BrokerAction.FillForm -> JSONObject().apply {
-                put("actionID", action.id)
-                put("actionType", "fillForm")
-            }
-
-            is BrokerAction.Click -> JSONObject().apply {
-                put("actionID", action.id)
-                put("actionType", "click")
-            }
-
-            is BrokerAction.GetCaptchaInfo -> JSONObject().apply {
-                put("actionID", action.id)
-                put("actionType", "getCaptchaInfo")
-                put(
-                    "response",
-                    JSONObject().apply {
-                        put("siteKey", "fake-site-key")
-                        put("url", "https://fake-captcha-url.com")
-                        put("type", "recaptcha")
-                    },
-                )
-            }
-
-            is BrokerAction.SolveCaptcha -> JSONObject().apply {
-                put("actionID", action.id)
-                put("actionType", "solveCaptcha")
-                put(
-                    "response",
-                    JSONObject().apply {
-                        put(
-                            "callback",
-                            JSONObject().apply {
-                                put("eval", "console.log('fake captcha callback');")
-                            },
-                        )
-                    },
-                )
-            }
-
-            is BrokerAction.Expectation -> JSONObject().apply {
-                put("actionID", action.id)
-                put("actionType", "expectation")
-            }
-
-            is BrokerAction.EmailConfirmation -> JSONObject().apply {
-                put("actionID", action.id)
-                put("actionType", "emailConfirmation")
-            }
-
-            is BrokerAction.Condition -> JSONObject().apply {
-                put("actionID", action.id)
-                put("actionType", "condition")
-                put(
-                    "response",
-                    JSONObject().apply {
-                        put("actions", JSONArray())
-                    },
-                )
-            }
-        }
-
-        return JSONObject().apply {
-            put(
-                "result",
-                JSONObject().apply {
-                    put("success", successJson)
-                },
-            )
-        }
+            """.trimIndent(),
+        )
     }
 
     override val context: String = PIRScriptConstants.SCRIPT_CONTEXT_NAME
