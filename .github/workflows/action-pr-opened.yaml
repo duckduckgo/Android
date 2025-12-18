@@ -21,7 +21,7 @@ jobs:
           is-pinned: true
 
       - name: Find Asana Task ID
-        if: ${{ github.event.pull_request.base.ref == 'develop' && github.event.pull_request.draft == false }}
+        if: ${{ github.event.pull_request.base.ref == 'develop' }}
         id: find-asana-task
         uses: duckduckgo/native-github-asana-sync@v2.0
         with:
@@ -30,7 +30,7 @@ jobs:
           action: 'find-asana-task-id'
 
       - name: Add task to Asana project section
-        if: ${{ steps.find-asana-task.outcome == 'success' && steps.find-asana-task.outputs.asanaTaskId != '' }}
+        if: ${{ steps.find-asana-task.outcome == 'success' }}
         uses: duckduckgo/native-github-asana-sync@v2.0
         with:
           asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
