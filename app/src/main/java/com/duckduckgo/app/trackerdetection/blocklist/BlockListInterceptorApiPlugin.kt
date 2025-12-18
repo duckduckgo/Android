@@ -50,36 +50,40 @@ class BlockListInterceptorApiPlugin @Inject constructor(
         moshi.adapter(Types.newParameterizedType(Map::class.java, String::class.java, String::class.java))
     }
     override fun intercept(chain: Chain): Response {
-        val request = chain.request().newBuilder()
+        val originalRequest = chain.request()
 
-        val tdsRequired = chain.request().tag(Invocation::class.java)
+        val tdsRequired = originalRequest.tag(Invocation::class.java)
             ?.method()
             ?.isAnnotationPresent(TdsRequired::class.java) == true
 
-        return if (tdsRequired) {
-            val activeExperiment = runBlocking {
-                inventory.activeTdsFlag().also { it?.enroll() }
-            }
+        if (!tdsRequired) {
+            return chain.proceed(originalRequest)
+        }
 
-            activeExperiment?.let {
-                val config = activeExperiment.getSettings()?.let {
-                    runCatching {
-                        jsonAdapter.fromJson(it)
-                    }.getOrDefault(emptyMap())
-                } ?: emptyMap()
-                val path = when {
-                    runBlocking { activeExperiment.isEnrolledAndEnabled(TREATMENT) } -> config["treatmentUrl"]
-                    runBlocking { activeExperiment.isEnrolledAndEnabled(CONTROL) } -> config["controlUrl"]
-                    else -> config["nextUrl"]
-                } ?: return chain.proceed(request.build())
-                chain.proceed(request.url("$TDS_BASE_URL$path").build()).also { response ->
-                    if (!response.isSuccessful) {
-                        pixel.fire(BLOCKLIST_TDS_FAILURE, mapOf("code" to response.code.toString()))
-                    }
-                }
-            } ?: chain.proceed(request.build())
-        } else {
-            chain.proceed(request.build())
+        val activeExperiment = runBlocking {
+            inventory.activeTdsFlag().also { it?.enroll() }
+        }
+
+        if (activeExperiment == null) {
+            return chain.proceed(originalRequest)
+        }
+
+        val config = activeExperiment.getSettings()?.let {
+            runCatching {
+                jsonAdapter.fromJson(it)
+            }.getOrDefault(emptyMap())
+        } ?: emptyMap()
+
+        val path = when {
+            runBlocking { activeExperiment.isEnrolledAndEnabled(TREATMENT) } -> config["treatmentUrl"]
+            runBlocking { activeExperiment.isEnrolledAndEnabled(CONTROL) } -> config["controlUrl"]
+            else -> config["nextUrl"]
+        } ?: return chain.proceed(originalRequest)
+
+        return chain.proceed(originalRequest.newBuilder().url("$TDS_BASE_URL$path").build()).also { response ->
+            if (!response.isSuccessful) {
+                pixel.fire(BLOCKLIST_TDS_FAILURE, mapOf("code" to response.code.toString()))
+            }
         }
     }
 

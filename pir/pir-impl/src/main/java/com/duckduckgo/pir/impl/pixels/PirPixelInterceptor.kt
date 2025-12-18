@@ -32,20 +32,18 @@ class PirPixelInterceptor @Inject constructor(
     private val appBuildConfig: AppBuildConfig,
 ) : PixelInterceptorPlugin, Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
-        val request = chain.request().newBuilder()
-        val pixel = chain.request().url.pathSegments.last()
+        val originalRequest = chain.request()
+        val pixel = originalRequest.url.pathSegments.last()
 
-        val url = if (ALLOWLIST.any { prefix -> pixel.startsWith(prefix) }) {
-            chain.request().url.newBuilder()
-                .addQueryParameter(
-                    KEY_MANUFACTURER,
-                    appBuildConfig.manufacturer,
-                ).build()
+        return if (ALLOWLIST.any { prefix -> pixel.startsWith(prefix) }) {
+            val newUrl = originalRequest.url.newBuilder()
+                .addQueryParameter(KEY_MANUFACTURER, appBuildConfig.manufacturer)
+                .build()
+            val newRequest = originalRequest.newBuilder().url(newUrl).build()
+            chain.proceed(newRequest)
         } else {
-            chain.request().url
+            chain.proceed(originalRequest)
         }
-
-        return chain.proceed(request.url(url).build())
     }
 
     override fun getInterceptor(): Interceptor = this
