@@ -92,9 +92,11 @@ interface BrowserTrackersAnimatorHelper {
      * Cancel a running animation.
      *
      * @param omnibarViews are the views that should become visible after canceling the running animation.
+     * @param shieldViews are the shield views that should become visible after canceling the running animation.
      */
     fun cancelAnimations(
         omnibarViews: List<View>,
+        shieldViews: List<View> = emptyList(),
     )
 
     /**

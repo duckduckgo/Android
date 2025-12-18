@@ -62,6 +62,7 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
     private lateinit var cookieScene: ViewGroup
     private lateinit var cookieViewBackground: View
     private var cookieCosmeticHide: Boolean = false
+    private var currentShieldViews: List<View> = emptyList()
 
     private var enqueueCookiesAnimation = false
     private var isCookiesAnimationRunning = false
@@ -146,6 +147,8 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
     ) {
         if (isCookiesAnimationRunning || addressBarTrackersAnimator.isAnimationRunning) return
 
+        currentShieldViews = shieldViews
+
         addressBarTrackersAnimator.startAnimation(
             context = context,
             sceneRoot = sceneRoot,
@@ -164,7 +167,7 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
             },
         )
         sceneRoot.setOnClickListener {
-            cancelAnimations(omnibarViews)
+            cancelAnimations(omnibarViews, shieldViews)
         }
     }
 
@@ -202,12 +205,14 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
 
     override fun cancelAnimations(
         omnibarViews: List<View>,
+        shieldViews: List<View>,
     ) {
         conflatedJob.cancel()
         addressBarTrackersAnimator.cancelAnimation()
         stopTrackersAnimation()
         stopCookiesAnimation()
         omnibarViews.forEach { it.alpha = 1f }
+        shieldViews.forEach { it.alpha = 1f }
     }
 
     private fun tryToStartCookiesAnimation(
@@ -236,7 +241,7 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         }
 
         hasCookiesAnimationBeenCanceled = false
-        val allOmnibarViews: List<View> = (omnibarViews).filterNotNull().toList()
+        val allOmnibarViews: List<View> = omnibarViews
         cookieView.show()
         cookieView.alpha = 0F
         if (theme.isLightModeEnabled()) {
@@ -416,6 +421,7 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
             TransitionManager.go(firstScene)
         }
         shieldAnimation?.alpha = 1f
+        currentShieldViews.forEach { it.alpha = 1f }
         cookieViewBackground.alpha = 0f
         cookieScene.gone()
         cookieView.gone()
