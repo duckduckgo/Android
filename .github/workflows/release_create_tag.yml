@@ -42,6 +42,34 @@ jobs:
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
 
+      - name: Get LGC
+        id: get_lgc_tag
+        run: |
+          output=$(git tag -l "nightly-*" --sort=-refname | head -n 1)
+          echo "lgc_tag=$output" >> $GITHUB_OUTPUT
+
+      - name: Check for production release on LGC commit
+        id: check_production_release
+        run: |
+          lgc_commit=$(git rev-list -n 1 ${{ steps.get_lgc_tag.outputs.lgc_tag }})
+          
+          all_tags=$(git tag --points-at $lgc_commit)
+          
+          # Find production release tag (X.Y.Z format only)
+          release_tag=$(echo "$all_tags" | grep -E "^[0-9]+\.[0-9]+\.[0-9]+$" | head -n 1 || true)
+          
+          if [ -n "$release_tag" ]; then
+            echo "::error::LGC commit already has production release: $release_tag"
+            exit 1
+          fi
+
+      - name: Checkout LGC tag
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.get_lgc_tag.outputs.lgc_tag }}
+          submodules: recursive
+          fetch-depth: 0
+
       - name: Use fastlane lane to create and push tagged release
         id: create_git_tag
         run: |        
