@@ -5,9 +5,6 @@ on:
     - cron: '0 2 * * *' # run at 2 AM UTC
   workflow_dispatch:
 
-env:
-  GH_TOKEN: ${{ secrets.GT_DAXMOBILE }}
-
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
