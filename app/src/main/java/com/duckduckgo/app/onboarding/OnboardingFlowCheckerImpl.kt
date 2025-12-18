@@ -18,11 +18,15 @@ package com.duckduckgo.app.onboarding
 
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
+import com.duckduckgo.app.onboarding.store.AppStage
+import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
@@ -31,13 +35,19 @@ class OnboardingFlowCheckerImpl @Inject constructor(
     private val dismissedCtaDao: DismissedCtaDao,
     private val extendedOnboardingFeatureToggles: ExtendedOnboardingFeatureToggles,
     private val settingsDataStore: SettingsDataStore,
+    private val userStageStore: UserStageStore,
+    private val dispatcher: DispatcherProvider,
 ) : OnboardingFlowChecker {
 
-    override fun isOnboardingComplete(): Boolean {
-        val noBrowserCtaExperiment = extendedOnboardingFeatureToggles.noBrowserCtas().isEnabled()
-        return dismissedCtaDao.exists(CtaId.DAX_END) ||
+    override suspend fun isOnboardingComplete(): Boolean {
+        // TODO Consider adding allOnboardingCtasShown() in the future.
+        //  See https://app.asana.com/1/137249556945/project/414730916066338/task/1212406513605392
+        return withContext(dispatcher.io()) {
+            val noBrowserCtaExperiment = extendedOnboardingFeatureToggles.noBrowserCtas().isEnabled()
             noBrowserCtaExperiment ||
-            settingsDataStore.hideTips ||
-            dismissedCtaDao.exists(CtaId.ADD_WIDGET)
+                settingsDataStore.hideTips ||
+                dismissedCtaDao.exists(CtaId.ADD_WIDGET) ||
+                userStageStore.getUserAppStage() == AppStage.ESTABLISHED
+        }
     }
 }

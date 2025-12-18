@@ -17,5 +17,5 @@
 package com.duckduckgo.app.onboarding
 
 interface OnboardingFlowChecker {
-    fun isOnboardingComplete(): Boolean
+    suspend fun isOnboardingComplete(): Boolean
 }
