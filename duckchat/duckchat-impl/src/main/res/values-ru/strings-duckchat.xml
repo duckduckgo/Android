@@ -90,6 +90,4 @@
     <string name="duckAiHideAiGeneratedImagesDescription">Исключает из результатов поиска изображения, созданные нейросетью</string>
 
     <!-- Duck AI Tabs Mode Toggle -->
-    <string name="duckAiFullScreenModeTitle">Режим вкладок Duck.ai</string>
-    <string name="duckAiFullScreenModeDescription">Показывать новые чаты Duck.ai как вкладки браузера</string>
 </resources>

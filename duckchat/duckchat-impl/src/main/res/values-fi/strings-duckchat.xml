@@ -90,6 +90,4 @@
     <string name="duckAiHideAiGeneratedImagesDescription">Suodattaa pois tekoälyn luomat kuvat kuvahaun tuloksista</string>
 
     <!-- Duck AI Tabs Mode Toggle -->
-    <string name="duckAiFullScreenModeTitle">Duck.ai-välilehtitila</string>
-    <string name="duckAiFullScreenModeDescription">Näytä uudet Duck.ai-keskustelut selaimen välilehtinä</string>
 </resources>

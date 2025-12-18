@@ -90,6 +90,4 @@
     <string name="duckAiHideAiGeneratedImagesDescription">Filtrē MI radītus attēlus no attēlu meklēšanas rezultātiem</string>
 
     <!-- Duck AI Tabs Mode Toggle -->
-    <string name="duckAiFullScreenModeTitle">Duck.ai cilņu režīms</string>
-    <string name="duckAiFullScreenModeDescription">Rādīt jaunas Duck.ai tērzēšanas kā cilnes pārlūkprogrammā</string>
 </resources>

@@ -90,6 +90,4 @@
     <string name="duckAiHideAiGeneratedImagesDescription">Filtrira slike generirane umjetnom inteligencijom iz rezultata pretraživanja slika</string>
 
     <!-- Duck AI Tabs Mode Toggle -->
-    <string name="duckAiFullScreenModeTitle">Način rada s Duck.ai karticama</string>
-    <string name="duckAiFullScreenModeDescription">Prikaži nova Duck.ai čavrljanja kao kartice u pregledniku</string>
 </resources>

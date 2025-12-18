@@ -90,6 +90,4 @@
     <string name="duckAiHideAiGeneratedImagesDescription">Iz rezultatov iskanja slik odstrani slike, ki jih je ustvarila umetna inteligenca</string>
 
     <!-- Duck AI Tabs Mode Toggle -->
-    <string name="duckAiFullScreenModeTitle">Način zavihkov Duck.ai</string>
-    <string name="duckAiFullScreenModeDescription">Prikaži nove klepete Duck.ai kot zavihke v brskalniku</string>
 </resources>

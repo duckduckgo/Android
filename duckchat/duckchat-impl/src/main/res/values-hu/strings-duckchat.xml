@@ -90,6 +90,4 @@
     <string name="duckAiHideAiGeneratedImagesDescription">Kiszűri az AI által generált képeket a képkeresési találatokból</string>
 
     <!-- Duck AI Tabs Mode Toggle -->
-    <string name="duckAiFullScreenModeTitle">Duck.ai lap mód</string>
-    <string name="duckAiFullScreenModeDescription">Az új Duck.ai-csevegések megjelenítése böngészőlapként</string>
 </resources>

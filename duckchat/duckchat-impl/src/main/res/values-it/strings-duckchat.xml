@@ -90,6 +90,4 @@
     <string name="duckAiHideAiGeneratedImagesDescription">Filtra le immagini generate dall\'intelligenza artificiale dai risultati di ricerca delle immagini</string>
 
     <!-- Duck AI Tabs Mode Toggle -->
-    <string name="duckAiFullScreenModeTitle">Modalità schede Duck.ai</string>
-    <string name="duckAiFullScreenModeDescription">Mostra le nuove chat di Duck.ai come schede nel browser</string>
 </resources>

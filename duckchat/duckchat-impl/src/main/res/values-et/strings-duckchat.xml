@@ -90,6 +90,4 @@
     <string name="duckAiHideAiGeneratedImagesDescription">Eemaldab tehisintellekti loodud pildid pildiotsingu tulemustest</string>
 
     <!-- Duck AI Tabs Mode Toggle -->
-    <string name="duckAiFullScreenModeTitle">Duck.ai vahekaardirežiim</string>
-    <string name="duckAiFullScreenModeDescription">Kuva uued Duck.ai vestlused brauseris vahekaartidena</string>
 </resources>

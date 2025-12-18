@@ -89,6 +89,4 @@
     <string name="duckAiHideAiGeneratedImagesDescription">Filters out AI-generated images from image search results</string>
 
     <!-- Duck AI Tabs Mode Toggle -->
-    <string name="duckAiFullScreenModeTitle">Duck.ai Tabs Mode</string>
-    <string name="duckAiFullScreenModeDescription">Show new Duck.ai Chats as tabs in the browser</string>
 </resources>

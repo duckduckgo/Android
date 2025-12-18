@@ -62,8 +62,6 @@ interface DuckChatDataStore {
 
     suspend fun setShowInAddressBar(showDuckChat: Boolean)
 
-    suspend fun setFullScreenModeUserSetting(enabled: Boolean)
-
     suspend fun setShowInVoiceSearch(showToggle: Boolean)
 
     fun observeDuckChatUserEnabled(): Flow<Boolean>
@@ -78,19 +76,17 @@ interface DuckChatDataStore {
 
     fun observeShowInAddressBar(): Flow<Boolean>
 
-    fun observeFullscreenMode(): Flow<Boolean>
-
     fun observeShowInVoiceSearch(): Flow<Boolean>
 
     suspend fun isDuckChatUserEnabled(): Boolean
 
     suspend fun isInputScreenUserSettingEnabled(): Boolean
 
+    suspend fun isFullScreenUserSettingEnabled(): Boolean
+
     suspend fun getShowInBrowserMenu(): Boolean
 
     suspend fun getShowInAddressBar(): Boolean
-
-    suspend fun isFullScreenUserSettingEnabled(): Boolean
 
     suspend fun getShowInVoiceSearch(): Boolean
 
@@ -201,10 +197,6 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
         store.edit { prefs -> prefs[DUCK_AI_INPUT_SCREEN_COSMETIC_SETTING] = enabled }
     }
 
-    override suspend fun setFullScreenModeUserSetting(enabled: Boolean) {
-        store.edit { prefs -> prefs[DUCK_CHAT_FULLSCREEN_MODE_SETTING] = enabled }
-    }
-
     override suspend fun setShowInBrowserMenu(showDuckChat: Boolean) {
         store.edit { prefs -> prefs[DUCK_CHAT_SHOW_IN_MENU] = showDuckChat }
     }
@@ -227,14 +219,16 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
 
     override fun observeShowInAddressBar(): Flow<Boolean> = duckChatShowInAddressBar
 
-    override fun observeFullscreenMode(): Flow<Boolean> = store.data.map { it[DUCK_CHAT_FULLSCREEN_MODE_SETTING] ?: false }
-
     override fun observeShowInVoiceSearch(): Flow<Boolean> = duckChatShowInVoiceSearch
 
     override suspend fun isDuckChatUserEnabled(): Boolean = store.data.firstOrNull()?.let { it[DUCK_CHAT_USER_ENABLED] } ?: true
 
     override suspend fun isInputScreenUserSettingEnabled(): Boolean = store.data.firstOrNull()?.let {
         it[DUCK_AI_INPUT_SCREEN_USER_SETTING]
+    } ?: false
+
+    override suspend fun isFullScreenUserSettingEnabled(): Boolean = store.data.firstOrNull()?.let {
+        it[DUCK_CHAT_FULLSCREEN_MODE_SETTING]
     } ?: false
 
     override suspend fun isCosmeticInputScreenUserSettingEnabled(): Boolean = store.data.firstOrNull()?.let {
@@ -244,8 +238,6 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
     override suspend fun getShowInBrowserMenu(): Boolean = store.data.firstOrNull()?.let { it[DUCK_CHAT_SHOW_IN_MENU] } ?: true
 
     override suspend fun getShowInAddressBar(): Boolean = store.data.firstOrNull()?.defaultShowInAddressBar() ?: true
-
-    override suspend fun isFullScreenUserSettingEnabled(): Boolean = store.data.firstOrNull()?.let { it[DUCK_CHAT_FULLSCREEN_MODE_SETTING] } ?: false
 
     override suspend fun getShowInVoiceSearch(): Boolean = store.data.firstOrNull()?.let { it[DUCK_CHAT_SHOW_IN_VOICE_SEARCH] } ?: true
 
