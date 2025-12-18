@@ -24,6 +24,7 @@ import kotlinx.coroutines.Dispatchers
  * A dispatcher provider for Android instrumentation tests.
  * Uses real Android dispatchers which is required for components like WebView that need the actual main looper.
  */
+@Suppress("NoHardcodedCoroutineDispatcher")
 class AndroidTestDispatcherProvider : DispatcherProvider {
     override fun main(): CoroutineDispatcher = Dispatchers.Main
     override fun io(): CoroutineDispatcher = Dispatchers.IO
