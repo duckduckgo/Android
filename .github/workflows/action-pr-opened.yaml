@@ -1,20 +1,38 @@
-name: Asana Integration after Pull Request submitted
+name: 'Pull Request opened -> Comment on task and add it to Android Release Board'
 
 on:
   pull_request:
-    types: [opened, reopened]
+    types: [opened, reopened, edited]
 
 jobs:
   process-internal-pr:
-    name: Process internal Pull Request, adding PR link to Asana task if present
     runs-on: ubuntu-latest
     permissions:
       issues: write
     steps:
-      - name: Add comment in Asana task
+      - name: Add comment with PR link in Asana task
         uses: duckduckgo/native-github-asana-sync@v2.0
         with:
           asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           trigger-phrase: "Task/Issue URL:"
           action: 'add-asana-comment'
           is-pinned: true
+
+      - name: Find Asana Task ID
+        if: ${{ github.event.pull_request.base.ref == 'develop' && github.event.pull_request.draft == false }}
+        id: find-asana-task
+        uses: duckduckgo/native-github-asana-sync@v2.0
+        with:
+          asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          trigger-phrase: "Task/Issue URL:"
+          action: 'find-asana-task-id'
+
+      - name: Add task to Asana project section
+        if: ${{ steps.find-asana-task.outcome == 'success' && steps.find-asana-task.outputs.asanaTaskId != '' }}
+        uses: duckduckgo/native-github-asana-sync@v2.0
+        with:
+          asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          asana-project: ${{ vars.GH_ANDROID_RELEASE_BOARD_PROJECT_ID }}
+          asana-section: ${{ vars.GH_ANDROID_RELEASE_BOARD_PR_SECTION_ID }}
+          asana-task-id: ${{ steps.find-asana-task.outputs.asanaTaskId }}
+          action: 'add-task-asana-project'
