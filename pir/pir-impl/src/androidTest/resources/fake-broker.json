@@ -4,6 +4,7 @@
   "version": "0.7.0",
   "addedDatetime": 1692572400000,
   "optOutUrl": "https://fake-broker.com/optout",
+  "newUnknownProperty": "should-be-ignored",
   "steps": [
     {
       "stepType": "scan",
@@ -12,7 +13,8 @@
         {
           "actionType": "navigate",
           "id": "a1b2c3d4-1111-2222-3333-444455556666",
-          "url": "https://www.fake-broker.com/${firstName}-${lastName}/${state|stateFull}/${city}"
+          "url": "https://www.fake-broker.com/${firstName}-${lastName}/${state|stateFull}/${city}",
+          "newUnknownProperty": "should-be-ignored"
         },
         {
           "actionType": "extract",

@@ -18,6 +18,7 @@ package com.duckduckgo.pir.impl.integration
 
 import android.content.Context
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.pir.impl.callbacks.PirCallbacks
@@ -104,7 +105,6 @@ import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapters.PolymorphicJsonAdapterFactory
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -128,6 +128,7 @@ import org.junit.runner.RunWith
  * 7. Email Confirmation
  * 8. Confirmation/Maintenance scan
  */
+@LargeTest
 @RunWith(AndroidJUnit4::class)
 class PirEndToEndTest {
 
@@ -224,7 +225,7 @@ class PirEndToEndTest {
 
         fakeTimeProvider = FakeCurrentTimeProvider(initialTimeMs = 1700000000000L)
         dispatcherProvider = AndroidTestDispatcherProvider()
-        testScope = CoroutineScope(Dispatchers.Default)
+        testScope = CoroutineScope(dispatcherProvider.computation())
 
         databaseFactory = TestPirSecureStorageDatabaseFactory(context)
         fakePirDataStore = FakePirDataStore()

@@ -40,6 +40,8 @@ class FakePirMessagingInterface(moshi: Moshi) : JsMessaging {
     private val requestAdapter = moshi.adapter(PirScriptRequestParams::class.java)
 
     private var jsMessageCallback: JsMessageCallback? = null
+
+    @Suppress("NoHardcodedCoroutineDispatcher")
     private val scope = CoroutineScope(Dispatchers.Default)
 
     // Track all actions that were pushed to the JS layer
@@ -104,6 +106,7 @@ class FakePirMessagingInterface(moshi: Moshi) : JsMessaging {
     }
 
     private fun createSuccessResponseJson(action: BrokerAction): JSONObject {
+        // TODO Use JSON string / snippets like with fake-broker.json
         val successJson = when (action) {
             is BrokerAction.Navigate -> JSONObject().apply {
                 put("actionID", action.id)
