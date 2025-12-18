@@ -17,6 +17,7 @@
 package com.duckduckgo.app.global.shortcut
 
 import android.app.TaskStackBuilder
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ShortcutInfo
@@ -102,6 +103,20 @@ class AppShortcutCreator @Inject constructor(
 
             val shortcutManager = context.getSystemService(ShortcutManager::class.java)
             kotlin.runCatching { shortcutManager.dynamicShortcuts = shortcutList }
+        }
+    }
+
+    fun refreshPinnedShortcuts(activeLauncherComponent: String) {
+        appCoroutineScope.launch {
+            val shortcutManager = context.getSystemService(ShortcutManager::class.java)
+            val updatedShortcuts = shortcutManager.pinnedShortcuts.map {
+                ShortcutInfo.Builder(context, it.id)
+                    .setActivity(ComponentName(context, activeLauncherComponent))
+                    .build()
+            }
+            kotlin.runCatching {
+                shortcutManager.updateShortcuts(updatedShortcuts)
+            }
         }
     }
 
