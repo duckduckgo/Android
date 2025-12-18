@@ -107,7 +107,7 @@ class AppShortcutCreator @Inject constructor(
     }
 
     fun refreshPinnedShortcuts(activeLauncherComponent: String) {
-        appCoroutineScope.launch {
+        appCoroutineScope.launch(dispatchers.io()) {
             val shortcutManager = context.getSystemService(ShortcutManager::class.java)
             val updatedShortcuts = shortcutManager.pinnedShortcuts.map {
                 ShortcutInfo.Builder(context, it.id)

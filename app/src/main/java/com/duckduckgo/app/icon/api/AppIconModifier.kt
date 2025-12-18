@@ -96,7 +96,6 @@ class AppIconModifier @Inject constructor(
         disable(context, newIcon)
         enable(context, newIcon)
 
-
         appShortcutCreator.refreshPinnedShortcuts(newIcon.componentName)
         appShortcutCreator.refreshAppShortcuts()
     }
