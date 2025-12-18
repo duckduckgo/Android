@@ -37,8 +37,6 @@ interface DuckChatFeatureRepository {
 
     suspend fun setShowInAddressBar(showDuckChat: Boolean)
 
-    suspend fun setFullScreenModeUserSetting(enabled: Boolean)
-
     suspend fun setContextualModeUserSetting(enabled: Boolean)
 
     suspend fun setShowInVoiceSearch(showToggle: Boolean)

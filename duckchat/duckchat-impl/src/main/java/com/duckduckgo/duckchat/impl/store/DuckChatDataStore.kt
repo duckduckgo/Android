@@ -241,6 +241,10 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
         it[DUCK_AI_INPUT_SCREEN_USER_SETTING]
     } ?: false
 
+    override suspend fun isFullScreenUserSettingEnabled(): Boolean = store.data.firstOrNull()?.let {
+        it[DUCK_CHAT_FULLSCREEN_MODE_SETTING]
+    } ?: false
+
     override suspend fun isCosmeticInputScreenUserSettingEnabled(): Boolean = store.data.firstOrNull()?.let {
         it[DUCK_AI_INPUT_SCREEN_COSMETIC_SETTING]
     } ?: false
