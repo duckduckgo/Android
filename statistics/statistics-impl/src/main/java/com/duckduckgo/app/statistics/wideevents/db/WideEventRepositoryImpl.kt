@@ -90,11 +90,13 @@ class WideEventRepositoryImpl @Inject constructor(
 
     override suspend fun getActiveWideEventIds(): List<Long> = wideEventDao.getActiveWideEventIds()
 
+    override suspend fun getCompletedWideEventIds(): List<Long> = wideEventDao.getCompletedWideEventIds()
+
     override suspend fun getActiveWideEventIdsByName(eventName: String): List<Long> = wideEventDao.getActiveWideEventIdsByName(eventName)
 
     override suspend fun deleteWideEvent(eventId: Long): Boolean = wideEventDao.deleteWideEvent(eventId) > 0
 
-    override fun getCompletedWideEventIdsFlow(): Flow<Set<Long>> = wideEventDao.getCompletedWideEventIdsFlow().map { it.toSet() }
+    override fun hasCompletedWideEvents(): Flow<Boolean> = wideEventDao.hasCompletedWideEvents()
 
     override suspend fun getWideEvents(ids: Set<Long>): List<WideEventRepository.WideEvent> {
         if (ids.isEmpty()) return emptyList()

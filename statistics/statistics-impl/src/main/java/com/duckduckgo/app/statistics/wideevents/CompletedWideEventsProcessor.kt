@@ -34,8 +34,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.conflate
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -64,11 +63,11 @@ class CompletedWideEventsProcessor @Inject constructor(
                 if (!isFeatureEnabled()) return@runCatching
 
                 wideEventRepository
-                    .getCompletedWideEventIdsFlow()
-                    .conflate()
-                    .collect { ids ->
+                    .hasCompletedWideEvents()
+                    .filter { it }
+                    .collect {
                         try {
-                            processCompletedWideEvents(ids)
+                            processCompletedWideEvents()
                         } catch (e: Exception) {
                             logcat { "Failed to process completed wide events: ${e.stackTraceToString()}" }
                             scheduleRetry()
@@ -81,16 +80,9 @@ class CompletedWideEventsProcessor @Inject constructor(
     suspend fun processCompletedWideEvents() {
         if (!isFeatureEnabled()) return
 
-        wideEventRepository
-            .getCompletedWideEventIdsFlow()
-            .first()
-            .let { processCompletedWideEvents(wideEventIds = it) }
-    }
-
-    private suspend fun processCompletedWideEvents(wideEventIds: Set<Long>) {
         mutex.withLock {
             // Process events in chunks to avoid querying too many events at once.
-            wideEventIds.chunked(100).forEach { idsChunk ->
+            wideEventRepository.getCompletedWideEventIds().chunked(100).forEach { idsChunk ->
                 wideEventRepository.getWideEvents(idsChunk.toSet()).forEach { event ->
                     wideEventSender.sendWideEvent(event)
                     wideEventRepository.deleteWideEvent(event.id)
