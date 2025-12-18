@@ -24,10 +24,10 @@ import com.duckduckgo.common.utils.checkMainThread
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.sync.api.engine.DeletableDataManager
+import com.duckduckgo.sync.api.engine.DeletableType
 import com.duckduckgo.sync.api.engine.SyncDeletionRequest
 import com.duckduckgo.sync.api.engine.SyncDeletionResponse
 import com.duckduckgo.sync.api.engine.SyncErrorResponse
-import com.duckduckgo.sync.api.engine.SyncableType
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -45,7 +45,7 @@ class DuckChatSyncDataManager @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : DeletableDataManager {
 
-    override fun getType(): SyncableType = SyncableType.DUCK_AI_CHATS
+    override fun getType(): DeletableType = DeletableType.DUCK_AI_CHATS
 
     override fun getDeletions(): SyncDeletionRequest? {
         if (appBuildConfig.isInternalBuild()) checkMainThread()
@@ -83,7 +83,7 @@ class DuckChatSyncDataManager @Inject constructor(
         logcat { "DuckChat-Sync: need to inform sync of duck ai chat deletion with timestamp: $deletionTimestamp" }
 
         return SyncDeletionRequest(
-            type = SyncableType.DUCK_AI_CHATS,
+            type = DeletableType.DUCK_AI_CHATS,
             untilTimestamp = deletionTimestamp,
         )
     }

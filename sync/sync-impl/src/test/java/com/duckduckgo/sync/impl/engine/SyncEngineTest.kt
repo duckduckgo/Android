@@ -19,6 +19,8 @@ package com.duckduckgo.sync.impl.engine
 import com.duckduckgo.common.test.FileUtilities
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.sync.api.engine.*
+import com.duckduckgo.sync.api.engine.DeletableType
+import com.duckduckgo.sync.api.engine.DeletableType.DUCK_AI_CHATS
 import com.duckduckgo.sync.api.engine.ModifiedSince.FirstSync
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.ACCOUNT_CREATION
@@ -29,7 +31,6 @@ import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.DATA_CHANGE
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.FEATURE_READ
 import com.duckduckgo.sync.api.engine.SyncableType.BOOKMARKS
 import com.duckduckgo.sync.api.engine.SyncableType.CREDENTIALS
-import com.duckduckgo.sync.api.engine.SyncableType.DUCK_AI_CHATS
 import com.duckduckgo.sync.api.engine.SyncableType.SETTINGS
 import com.duckduckgo.sync.impl.API_CODE
 import com.duckduckgo.sync.impl.API_CODE.TOO_MANY_REQUESTS_1
@@ -621,7 +622,7 @@ internal class SyncEngineTest {
     }
 
     @Test
-    fun whenDeletionsExistThenTheyAreProcessedAndTypesExcludedFromChanges() {
+    fun whenDeletionsAndChangesExistThenBothAreProcessed() {
         val deletionRequest = givenDeletions(DUCK_AI_CHATS, "2024-01-01T00:00:00.000Z")
         givenDeletionSuccess(deletionRequest)
 
@@ -631,23 +632,6 @@ internal class SyncEngineTest {
         syncEngine.triggerSync(APP_OPEN)
 
         // Verify deletion processed
-        verify(syncApiClient).delete(deletionRequest)
-        // Verify BOOKMARKS changes processed (DUCK_AI_CHATS excluded)
-        verify(syncApiClient).patch(bookmarksChanges)
-        verify(syncStateRepository).updateSyncState(SUCCESS)
-    }
-
-    @Test
-    fun whenTypeAHasDeletionsAndTypeBHasChangesThenBothAreProcessed() {
-        val deletionRequest = givenDeletions(DUCK_AI_CHATS, "2024-01-01T00:00:00.000Z")
-        givenDeletionSuccess(deletionRequest)
-
-        val bookmarksChanges = givenChangesForType(BOOKMARKS, "{}", ModifiedSince.Timestamp("2021-01-01T00:00:00.000Z"))
-        givenPatchSuccess()
-
-        syncEngine.triggerSync(APP_OPEN)
-
-        // Verify DUCK_AI_CHATS deletion processed
         verify(syncApiClient).delete(deletionRequest)
         // Verify BOOKMARKS changes processed
         verify(syncApiClient).patch(bookmarksChanges)
@@ -877,7 +861,7 @@ internal class SyncEngineTest {
             .thenReturn(listOf(FakeSyncableDataProvider(fakeChanges = SyncChangesRequest.empty())))
     }
 
-    private fun givenDeletions(type: SyncableType, untilTimestamp: String): SyncDeletionRequest {
+    private fun givenDeletions(type: DeletableType, untilTimestamp: String): SyncDeletionRequest {
         val deletionRequest = SyncDeletionRequest(type, untilTimestamp)
         val deletionManager = FakeDeletableDataManager(type, deletionRequest)
         whenever(deletableDataManagerPlugins.getPlugins()).thenReturn(listOf(deletionManager))

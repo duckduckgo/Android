@@ -193,7 +193,10 @@ interface DuckChatInternal : DuckChat {
      */
     fun isDuckChatFeatureEnabled(): Boolean
 
-    fun isChatSyncEnabled(): Boolean
+    /**
+     * Returns whether chat sync feature is enabled.
+     */
+    fun isChatSyncFeatureEnabled(): Boolean
 
     /**
      * This method takes a [url] and returns `true` or `false`.
@@ -367,7 +370,8 @@ class RealDuckChat @Inject constructor(
     override fun isInputScreenFeatureAvailable(): Boolean = duckAiInputScreen
 
     override fun isDuckChatFeatureEnabled(): Boolean = isDuckChatFeatureEnabled
-    override fun isChatSyncEnabled(): Boolean = isChatSyncFeatureEnabled
+
+    override fun isChatSyncFeatureEnabled(): Boolean = isChatSyncFeatureEnabled
 
     override fun isDuckChatFullScreenModeFeatureAvailable(): Boolean = duckChatFeature.fullscreenMode().isEnabled()
 

@@ -1154,21 +1154,21 @@ class RealDuckChatTest {
     }
 
     @Test
-    fun `when isDuckChatSyncFeatureEnabled returns true then isChatSyncEnabled returns true`() = runTest {
+    fun `when isDuckChatSyncFeatureEnabled returns true then isChatSyncFeatureEnabled returns true`() = runTest {
         whenever(mockDeviceSyncState.isDuckChatSyncFeatureEnabled()).thenReturn(true)
 
         testee.onPrivacyConfigDownloaded()
 
-        assertTrue(testee.isChatSyncEnabled())
+        assertTrue(testee.isChatSyncFeatureEnabled())
     }
 
     @Test
-    fun `when isDuckChatSyncFeatureEnabled returns false then isChatSyncEnabled returns false`() = runTest {
+    fun `when isDuckChatSyncFeatureEnabled returns false then isChatSyncFeatureEnabled returns false`() = runTest {
         whenever(mockDeviceSyncState.isDuckChatSyncFeatureEnabled()).thenReturn(false)
 
         testee.onPrivacyConfigDownloaded()
 
-        assertFalse(testee.isChatSyncEnabled())
+        assertFalse(testee.isChatSyncFeatureEnabled())
     }
 
     companion object {

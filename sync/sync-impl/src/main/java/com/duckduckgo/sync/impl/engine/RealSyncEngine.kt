@@ -131,12 +131,12 @@ class RealSyncEngine @Inject constructor(
             syncPixels.fireDailySuccessRatePixel()
             syncPixels.fireDailyPixel()
 
-            // If there are changes and deletions, process deletions first
-            val deletedTypes = processDeletions()
+            // Process deletions first (DeletableTypes)
+            processDeletions()
 
-            // Then process changes, excluding types that had deletions
-            logcat(INFO) { "Sync-Engine: processing changes for types without deletions" }
-            val changes = getChanges().filter { it.type !in deletedTypes }
+            // Then process changes (SyncableTypes)
+            logcat(INFO) { "Sync-Engine: processing changes" }
+            val changes = getChanges()
             performFirstSync(changes.filter { it.isFirstSync() })
             performRegularSync(changes.filter { !it.isFirstSync() })
 
@@ -250,15 +250,14 @@ class RealSyncEngine @Inject constructor(
             }
         }
     }
-    private fun processDeletions(): Set<SyncableType> {
+    private fun processDeletions() {
         val deletions = getDeletionRequests()
         if (deletions.isEmpty()) {
-            return emptySet()
+            return
         }
 
         logcat(INFO) { "Sync-Engine: processing ${deletions.size} deletions" }
 
-        val processedTypes = mutableSetOf<SyncableType>()
         deletions.forEach { (request, manager) ->
             logcat { "Sync-Engine: processing deletion for ${request.type}" }
             when (val result = syncApiClient.delete(request)) {
@@ -273,11 +272,9 @@ class RealSyncEngine @Inject constructor(
                     }.getOrElse { error ->
                         logcat { "Sync-Engine: error notifying deletable data manager of deletion success: $error" }
                     }
-                    processedTypes.add(request.type)
                 }
             }
         }
-        return processedTypes
     }
 
     private fun persistChanges(

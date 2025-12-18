@@ -22,10 +22,10 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.sync.api.engine.DeletableType
 import com.duckduckgo.sync.api.engine.FeatureSyncError
 import com.duckduckgo.sync.api.engine.SyncDeletionResponse
 import com.duckduckgo.sync.api.engine.SyncErrorResponse
-import com.duckduckgo.sync.api.engine.SyncableType
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
@@ -64,7 +64,7 @@ class DuckChatSyncDataManagerTest {
 
     @Test
     fun whenGetTypeThenReturnsDuckAiChats() {
-        assertEquals(SyncableType.DUCK_AI_CHATS, testee.getType())
+        assertEquals(DeletableType.DUCK_AI_CHATS, testee.getType())
     }
 
     @Test
@@ -81,7 +81,7 @@ class DuckChatSyncDataManagerTest {
 
         val result = testee.getDeletions()
 
-        assertEquals(SyncableType.DUCK_AI_CHATS, result?.type)
+        assertEquals(DeletableType.DUCK_AI_CHATS, result?.type)
         assertEquals("2025-01-01T12:00:00Z", result?.untilTimestamp)
     }
 
@@ -96,7 +96,7 @@ class DuckChatSyncDataManagerTest {
     @Test
     fun whenOnSuccessWithTimestampThenRepositoryIsCalledToClearTimestamp() = runTest {
         val response = SyncDeletionResponse(
-            type = SyncableType.DUCK_AI_CHATS,
+            type = DeletableType.DUCK_AI_CHATS,
             untilTimestamp = "2025-01-01T12:00:00Z",
         )
 
@@ -108,7 +108,7 @@ class DuckChatSyncDataManagerTest {
     @Test
     fun whenOnSuccessWithoutTimestampThenRepositoryIsNotCalled() = runTest {
         val response = SyncDeletionResponse(
-            type = SyncableType.DUCK_AI_CHATS,
+            type = DeletableType.DUCK_AI_CHATS,
             untilTimestamp = null,
         )
 
@@ -120,7 +120,7 @@ class DuckChatSyncDataManagerTest {
     @Test
     fun whenOnErrorThenRepositoryIsNotCalled() = runTest {
         val error = SyncErrorResponse(
-            type = SyncableType.DUCK_AI_CHATS,
+            type = DeletableType.DUCK_AI_CHATS,
             featureSyncError = FeatureSyncError.INVALID_REQUEST,
         )
 
