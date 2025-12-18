@@ -49,6 +49,7 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import logcat.logcat
 import javax.inject.Inject
 
@@ -288,8 +289,10 @@ class FireButtonActivity : DuckDuckGoActivity() {
     }
 
     private fun launchFireDialog() {
-        val dialog = fireDialogProvider.createFireDialog(context = this)
-        dialog.show()
+        lifecycleScope.launch {
+            val dialog = fireDialogProvider.createFireDialog()
+            dialog.show(supportFragmentManager)
+        }
     }
 
     companion object {

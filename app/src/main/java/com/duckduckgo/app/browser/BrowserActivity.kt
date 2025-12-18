@@ -81,6 +81,7 @@ import com.duckduckgo.app.global.intentText
 import com.duckduckgo.app.global.rating.PromptCount
 import com.duckduckgo.app.global.sanitize
 import com.duckduckgo.app.global.view.ClearDataAction
+import com.duckduckgo.app.global.view.FireDialog
 import com.duckduckgo.app.global.view.FireDialogProvider
 import com.duckduckgo.app.global.view.renderIfChanged
 import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPage
@@ -346,6 +347,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         // LiveData observers are restarted on each showWebContent() call; we want to subscribe to
         // flows only once, so a separate initialization is necessary
         configureFlowCollectors()
+        setupFireDialogListener()
 
         viewModel.viewState
             .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
@@ -394,6 +396,24 @@ open class BrowserActivity : DuckDuckGoActivity() {
                             onMoveToTabRequested(it)
                         }
                     }
+                }
+            }
+        }
+    }
+
+    private fun setupFireDialogListener() {
+        supportFragmentManager.setFragmentResultListener(FireDialog.REQUEST_KEY, this) { _, bundle ->
+            when (bundle.getString(FireDialog.RESULT_KEY_EVENT)) {
+                FireDialog.EVENT_ON_SHOW -> {
+                    currentTab?.onFireDialogVisibilityChanged(isVisible = true)
+                }
+                FireDialog.EVENT_ON_CANCEL -> {
+                    pixel.fire(FIRE_DIALOG_CANCEL)
+                    currentTab?.onFireDialogVisibilityChanged(isVisible = false)
+                }
+                FireDialog.EVENT_ON_CLEAR_STARTED -> {
+                    isDataClearingInProgress = true
+                    removeObservers()
                 }
             }
         }
@@ -801,17 +821,10 @@ open class BrowserActivity : DuckDuckGoActivity() {
         val params = mapOf(PixelParameter.FROM_FOCUSED_NTP to launchedFromFocusedNtp.toString())
         pixel.fire(AppPixelName.FORGET_ALL_PRESSED_BROWSING, params)
 
-        val dialog = fireDialogProvider.createFireDialog(context = this)
-        dialog.setOnShowListener { currentTab?.onFireDialogVisibilityChanged(isVisible = true) }
-        dialog.setOnCancelListener {
-            pixel.fire(FIRE_DIALOG_CANCEL)
-            currentTab?.onFireDialogVisibilityChanged(isVisible = false)
+        lifecycleScope.launch {
+            val dialog = fireDialogProvider.createFireDialog()
+            dialog.show(supportFragmentManager)
         }
-        dialog.clearStarted = {
-            isDataClearingInProgress = true
-            removeObservers()
-        }
-        dialog.show()
     }
 
     fun launchSettings() {

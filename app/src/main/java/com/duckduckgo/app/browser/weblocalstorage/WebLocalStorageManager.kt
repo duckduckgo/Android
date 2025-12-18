@@ -71,39 +71,9 @@ class DuckDuckGoWebLocalStorageManager @Inject constructor(
     private var matchingRegex = emptyList<String>()
 
     override suspend fun clearWebLocalStorage() = withContext(dispatcherProvider.io()) {
-        val settings = androidBrowserConfigFeature.webLocalStorage().getSettings()
-        val webLocalStorageSettings = webLocalStorageSettingsJsonParser.parseJson(settings)
-
-        val fireproofedDomains = fireproofWebsiteRepository.fireproofWebsitesSync().map { it.domain }
-
-        domains = webLocalStorageSettings.domains.list + fireproofedDomains
-        keysToDelete = webLocalStorageSettings.keysToDelete.list
-        matchingRegex = webLocalStorageSettings.matchingRegex.list
-
-        logcat { "WebLocalStorageManager: Allowed domains: $domains" }
-        logcat { "WebLocalStorageManager: Keys to delete: $keysToDelete" }
-        logcat { "WebLocalStorageManager: Matching regex: $matchingRegex" }
-
-        val db = databaseProvider.get()
-        db.iterator().use { iterator ->
-            iterator.seekToFirst()
-
-            while (iterator.hasNext()) {
-                val entry = iterator.next()
-                val key = String(entry.key, StandardCharsets.UTF_8)
-
-                val domainForMatchingAllowedKey = getDomainForMatchingAllowedKey(key)
-                if (domainForMatchingAllowedKey == null) {
-                    db.delete(entry.key)
-                    logcat { "WebLocalStorageManager: Deleted key: $key" }
-                } else if (settingsDataStore.clearDuckAiData && DUCKDUCKGO_DOMAINS.contains(domainForMatchingAllowedKey)) {
-                    if (keysToDelete.any { key.endsWith(it) }) {
-                        db.delete(entry.key)
-                        logcat { "WebLocalStorageManager: Deleted key: $key" }
-                    }
-                }
-            }
-        }
+        val shouldClearBrowserData = true // As per legacy behavior, we always clear browser data
+        val shouldClearDuckAiData = settingsDataStore.clearDuckAiData
+        clearWebLocalStorage(shouldClearBrowserData, shouldClearDuckAiData)
     }
 
     override suspend fun clearWebLocalStorage(

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 DuckDuckGo
+ * Copyright (c) 2025 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,248 +16,27 @@
 
 package com.duckduckgo.app.global.view
 
-import android.animation.Animator
-import android.animation.ValueAnimator
-import android.annotation.SuppressLint
-import android.content.Context
-import android.os.Build
-import android.os.Bundle
-import android.provider.Settings
-import android.provider.Settings.Global.ANIMATOR_DURATION_SCALE
-import android.view.LayoutInflater
-import android.view.View
-import android.view.WindowManager
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat.Type
-import androidx.core.view.WindowInsetsControllerCompat
-import androidx.core.view.updatePadding
-import com.airbnb.lottie.RenderMode
-import com.duckduckgo.app.browser.databinding.SheetFireClearDataBinding
-import com.duckduckgo.app.fire.ManualDataClearing
-import com.duckduckgo.app.firebutton.FireButtonStore
-import com.duckduckgo.app.global.events.db.UserEventKey
-import com.duckduckgo.app.global.events.db.UserEventsStore
-import com.duckduckgo.app.global.view.FireDialog.FireDialogClearAllEvent.AnimationFinished
-import com.duckduckgo.app.global.view.FireDialog.FireDialogClearAllEvent.ClearAllDataFinished
-import com.duckduckgo.app.pixels.AppPixelName
-import com.duckduckgo.app.pixels.AppPixelName.FIRE_DIALOG_ANIMATION
-import com.duckduckgo.app.pixels.AppPixelName.FIRE_DIALOG_CLEAR_PRESSED
-import com.duckduckgo.app.pixels.AppPixelName.PRODUCT_TELEMETRY_SURFACE_DATA_CLEARING
-import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
-import com.duckduckgo.app.settings.clear.getPixelValue
-import com.duckduckgo.app.settings.db.SettingsDataStore
-import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_ANIMATION
-import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import com.duckduckgo.common.ui.view.gone
-import com.duckduckgo.common.ui.view.setAndPropagateUpFitsSystemWindows
-import com.duckduckgo.common.ui.view.show
-import com.duckduckgo.common.utils.DispatcherProvider
-import com.google.android.material.bottomsheet.BottomSheetBehavior
-import com.google.android.material.bottomsheet.BottomSheetDialog
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
-import java.time.Instant
-import java.time.ZoneOffset
-import java.time.format.DateTimeFormatter
-import com.duckduckgo.mobile.android.R as CommonR
-import com.google.android.material.R as MaterialR
+import androidx.fragment.app.FragmentManager
 
-private const val ANIMATION_MAX_SPEED = 1.4f
-private const val ANIMATION_SPEED_INCREMENT = 0.15f
+/**
+ * Common interface for Fire dialog variants (Legacy and Granular).
+ *
+ * To receive lifecycle events from the dialog, use FragmentManager.setFragmentResultListener
+ * with REQUEST_KEY and check RESULT_KEY_EVENT for the event type.
+ */
+interface FireDialog {
+    /**
+     * Shows the Fire dialog.
+     * @param fragmentManager The FragmentManager to use for showing the dialog
+     * @param tag Optional tag for the fragment transaction
+     */
+    fun show(fragmentManager: FragmentManager, tag: String? = "fire_dialog")
 
-@SuppressLint("NoBottomSheetDialog")
-class FireDialog(
-    context: Context,
-    private val clearDataAction: ClearDataAction,
-    private val dataClearing: ManualDataClearing,
-    private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
-    private val pixel: Pixel,
-    private val settingsDataStore: SettingsDataStore,
-    private val userEventsStore: UserEventsStore,
-    private val appCoroutineScope: CoroutineScope,
-    private val dispatcherProvider: DispatcherProvider,
-    private val fireButtonStore: FireButtonStore,
-    private val appBuildConfig: AppBuildConfig,
-) : BottomSheetDialog(context, CommonR.style.Widget_DuckDuckGo_FireDialog) {
-
-    private lateinit var binding: SheetFireClearDataBinding
-
-    var clearStarted: (() -> Unit) = {}
-
-    private val accelerateAnimatorUpdateListener = object : ValueAnimator.AnimatorUpdateListener {
-        override fun onAnimationUpdate(animation: ValueAnimator) {
-            binding.fireAnimationView.speed += ANIMATION_SPEED_INCREMENT
-            if (binding.fireAnimationView.speed > ANIMATION_MAX_SPEED) {
-                binding.fireAnimationView.removeUpdateListener(this)
-            }
-        }
-    }
-    private var canRestart = !animationEnabled()
-    private var onClearDataOptionsDismissed: () -> Unit = {}
-
-    init {
-        val inflater = LayoutInflater.from(context)
-        binding = SheetFireClearDataBinding.inflate(inflater)
-        setContentView(binding.root)
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        binding.clearAllOption.setOnClickListener {
-            onClearOptionClicked()
-        }
-        binding.cancelOption.setOnClickListener {
-            cancel()
-        }
-
-        if (settingsDataStore.clearDuckAiData) {
-            binding.clearAllOption.setPrimaryText(context.getString(com.duckduckgo.app.browser.R.string.fireClearAllPlusDuckChats))
-        }
-
-        if (appBuildConfig.sdkInt == Build.VERSION_CODES.O) {
-            window?.navigationBarColor = context.resources.getColor(CommonR.color.translucentDark, null)
-        } else if (appBuildConfig.sdkInt > Build.VERSION_CODES.O && appBuildConfig.sdkInt < Build.VERSION_CODES.R) {
-            window?.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
-        }
-
-        removeTopPadding()
-        addBottomPaddingToButtons()
-
-        if (animationEnabled()) {
-            configureFireAnimationView()
-        }
-        behavior.state = BottomSheetBehavior.STATE_EXPANDED
-    }
-
-    private fun removeTopPadding() {
-        findViewById<View>(MaterialR.id.design_bottom_sheet)?.apply {
-            ViewCompat.setOnApplyWindowInsetsListener(this) { view, insets ->
-                view.updatePadding(top = 0)
-                insets
-            }
-        }
-    }
-
-    private fun addBottomPaddingToButtons() {
-        binding.fireDialogRootView.apply {
-            ViewCompat.setOnApplyWindowInsetsListener(this) { view, insets ->
-                view.updatePadding(bottom = insets.getInsets(Type.systemBars()).bottom)
-                insets
-            }
-        }
-    }
-
-    private fun configureFireAnimationView() {
-        binding.fireAnimationView.setAnimation(settingsDataStore.selectedFireAnimation.resId)
-        /**
-         * BottomSheetDialog wraps provided Layout into a CoordinatorLayout.
-         * We need to set FitsSystemWindows false programmatically to all parents in order to render layout and animation full screen
-         */
-        binding.fireAnimationView.setAndPropagateUpFitsSystemWindows(false)
-        binding.fireAnimationView.setRenderMode(RenderMode.SOFTWARE)
-        binding.fireAnimationView.enableMergePathsForKitKatAndAbove(true)
-    }
-
-    private fun onClearOptionClicked() {
-        trySendDailyClearOptionClicked()
-        pixel.enqueueFire(FIRE_DIALOG_CLEAR_PRESSED)
-        pixel.enqueueFire(PRODUCT_TELEMETRY_SURFACE_DATA_CLEARING)
-        pixel.enqueueFire(
-            pixel = FIRE_DIALOG_ANIMATION,
-            parameters = mapOf(FIRE_ANIMATION to settingsDataStore.selectedFireAnimation.getPixelValue()),
-        )
-        hideClearDataOptions()
-        if (animationEnabled()) {
-            playAnimation()
-        }
-        clearStarted()
-
-        appCoroutineScope.launch(dispatcherProvider.io()) {
-            fireButtonStore.incrementFireButtonUseCount()
-            userEventsStore.registerUserEvent(UserEventKey.FIRE_BUTTON_EXECUTED)
-
-            if (androidBrowserConfigFeature.moreGranularDataClearingOptions().isEnabled()) {
-                dataClearing.clearDataUsingManualFireOptions()
-            } else {
-                clearDataAction.clearTabsAndAllDataAsync(appInForeground = true, shouldFireDataClearPixel = true)
-                clearDataAction.setAppUsedSinceLastClearFlag(false)
-            }
-            onFireDialogClearAllEvent(ClearAllDataFinished)
-        }
-    }
-
-    private fun animationEnabled() = settingsDataStore.fireAnimationEnabled && animatorDurationEnabled()
-
-    private fun animatorDurationEnabled(): Boolean {
-        val animatorScale = Settings.Global.getFloat(context.contentResolver, ANIMATOR_DURATION_SCALE, 1.0f)
-        return animatorScale != 0.0f
-    }
-
-    private fun playAnimation() {
-        window?.apply {
-            WindowInsetsControllerCompat(this, binding.root).apply {
-                isAppearanceLightStatusBars = false
-                isAppearanceLightNavigationBars = false
-            }
-        }
-        setCancelable(false)
-        setCanceledOnTouchOutside(false)
-        binding.fireAnimationView.show()
-        binding.fireAnimationView.playAnimation()
-        binding.fireAnimationView.addAnimatorListener(
-            object : Animator.AnimatorListener {
-                override fun onAnimationRepeat(animation: Animator) {}
-                override fun onAnimationCancel(animation: Animator) {}
-                override fun onAnimationStart(animation: Animator) {}
-                override fun onAnimationEnd(animation: Animator) {
-                    onFireDialogClearAllEvent(AnimationFinished)
-                }
-            },
-        )
-    }
-
-    private fun hideClearDataOptions() {
-        binding.fireDialogRootView.gone()
-        onClearDataOptionsDismissed()
-        /*
-         * Avoid calling callback twice when view is detached.
-         * We handle this callback here to ensure pixel is sent before process restarts
-         */
-        onClearDataOptionsDismissed = {}
-    }
-
-    @Synchronized
-    private fun onFireDialogClearAllEvent(event: FireDialogClearAllEvent) {
-        if (!canRestart) {
-            canRestart = true
-            if (event is ClearAllDataFinished) {
-                binding.fireAnimationView.addAnimatorUpdateListener(accelerateAnimatorUpdateListener)
-            }
-        } else {
-            // Both clearing and animation are done, now restart
-            clearDataAction.killAndRestartProcess(notifyDataCleared = false, enableTransitionAnimation = false)
-        }
-    }
-
-    private fun trySendDailyClearOptionClicked() {
-        val now = getUtcIsoLocalDate()
-        val timestamp = fireButtonStore.lastEventSendTime
-
-        if (timestamp == null || now > timestamp) {
-            fireButtonStore.storeLastFireButtonClearEventTime(now)
-            pixel.enqueueFire(AppPixelName.PRODUCT_TELEMETRY_SURFACE_DATA_CLEARING_DAILY)
-        }
-    }
-
-    private fun getUtcIsoLocalDate(): String {
-        // returns YYYY-MM-dd
-        return Instant.now().atOffset(ZoneOffset.UTC).format(DateTimeFormatter.ISO_LOCAL_DATE)
-    }
-
-    private sealed class FireDialogClearAllEvent {
-        data object AnimationFinished : FireDialogClearAllEvent()
-        data object ClearAllDataFinished : FireDialogClearAllEvent()
+    companion object {
+        const val REQUEST_KEY = "FireDialogRequestKey"
+        const val RESULT_KEY_EVENT = "event"
+        const val EVENT_ON_SHOW = "onShow"
+        const val EVENT_ON_CANCEL = "onCancel"
+        const val EVENT_ON_CLEAR_STARTED = "onClearStarted"
     }
 }

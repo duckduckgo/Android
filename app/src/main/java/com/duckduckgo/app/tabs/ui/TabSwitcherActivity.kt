@@ -617,8 +617,10 @@ class TabSwitcherActivity :
     }
 
     private fun onFireButtonClicked() {
-        val dialog = fireDialogProvider.createFireDialog(context = this)
-        dialog.show()
+        lifecycleScope.launch {
+            val dialog = fireDialogProvider.createFireDialog()
+            dialog.show(supportFragmentManager)
+        }
     }
 
     override fun onNewTabRequested(fromOverflowMenu: Boolean) {
