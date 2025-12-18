@@ -214,6 +214,6 @@ jobs:
 
       - name: Create tag
         run: |
-          TAG_NAME="nightly-$(date -u +'%Y-%m-%dT%H%M%S')"
+          TAG_NAME="LGC-$(date -u +'%Y-%m-%dT%H%M%S')"
           git tag "$TAG_NAME" ${{ github.sha }}
           git push origin "$TAG_NAME"
