@@ -170,20 +170,41 @@ class ClearPersonalDataActionTest {
 
     @Test
     fun whenClearTabsOnlyCalledThenTabsAndSessionsCleared() = runTest {
-        testee.clearTabsOnly(appInForeground = false)
+        testee.clearTabsAsync(appInForeground = false)
         verify(mockTabRepository).deleteAll()
     }
 
     @Test
-    fun whenClearTabsOnlyCalledWithAppInForegroundThenAppUsedFlagSetToTrue() = runTest {
-        testee.clearTabsOnly(appInForeground = true)
+    fun whenClearTabsAsyncCalledWithAppInForegroundThenAppUsedFlagSetToTrue() = runTest {
+        testee.clearTabsAsync(appInForeground = true)
         verify(mockSettingsDataStore).appUsedSinceLastClear = true
     }
 
     @Test
-    fun whenClearTabsOnlyCalledWithAppNotInForegroundThenAppUsedFlagSetToFalse() = runTest {
-        testee.clearTabsOnly(appInForeground = false)
+    fun whenClearTabsAsyncCalledWithAppNotInForegroundThenAppUsedFlagSetToFalse() = runTest {
+        testee.clearTabsAsync(appInForeground = false)
         verify(mockSettingsDataStore).appUsedSinceLastClear = false
+    }
+
+    @Test
+    fun whenClearTabsOnlyCalledThenTabsCleared() = runTest {
+        testee.clearTabsOnly()
+        verify(mockTabRepository).deleteAll()
+    }
+
+    @Test
+    fun whenClearTabsOnlyCalledThenNoBrowserDataCleared() = runTest {
+        testee.clearTabsOnly()
+        verify(mockDataManager, never()).clearData(any(), any())
+        verify(mockDataManager, never()).clearData(any(), any(), any(), any())
+        verifyNoInteractions(mockAppCacheClearer)
+        verifyNoInteractions(mockCookieManager)
+        verifyNoInteractions(mockThirdPartyCookieManager)
+        verifyNoInteractions(mockSitePermissionsManager)
+        verifyNoInteractions(mockNavigationHistory)
+        verifyNoInteractions(mockWebTrackersBlockedRepository)
+        verifyNoInteractions(mockPrivacyProtectionsPopupDataClearer)
+        verifyNoInteractions(mockClearingUnsentForgetAllPixelStore)
     }
 
     @Test

@@ -75,6 +75,7 @@ import com.duckduckgo.app.downloads.DownloadsScreens.DownloadsScreenNoParams
 import com.duckduckgo.app.feedback.ui.common.FeedbackActivity
 import com.duckduckgo.app.fire.DataClearer
 import com.duckduckgo.app.fire.DataClearerForegroundAppRestartPixel
+import com.duckduckgo.app.fire.ManualDataClearing
 import com.duckduckgo.app.global.ApplicationClearDataState
 import com.duckduckgo.app.global.intentText
 import com.duckduckgo.app.global.rating.PromptCount
@@ -85,6 +86,7 @@ import com.duckduckgo.app.global.view.renderIfChanged
 import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPage
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.FIRE_DIALOG_CANCEL
+import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
@@ -141,7 +143,13 @@ open class BrowserActivity : DuckDuckGoActivity() {
     lateinit var settingsDataStore: SettingsDataStore
 
     @Inject
-    lateinit var clearPersonalDataAction: ClearDataAction
+    lateinit var clearDataAction: ClearDataAction
+
+    @Inject
+    lateinit var dataClearing: ManualDataClearing
+
+    @Inject
+    lateinit var androidBrowserConfigFeature: AndroidBrowserConfigFeature
 
     @Inject
     lateinit var dataClearer: DataClearer
@@ -545,9 +553,13 @@ open class BrowserActivity : DuckDuckGoActivity() {
         if (intent.getBooleanExtra(PERFORM_FIRE_ON_ENTRY_EXTRA, false)) {
             logcat(INFO) { "Clearing everything as a result of $PERFORM_FIRE_ON_ENTRY_EXTRA flag being set" }
             appCoroutineScope.launch(dispatcherProvider.io()) {
-                clearPersonalDataAction.clearTabsAndAllDataAsync(appInForeground = true, shouldFireDataClearPixel = true)
-                clearPersonalDataAction.setAppUsedSinceLastClearFlag(false)
-                clearPersonalDataAction.killAndRestartProcess(notifyDataCleared = false)
+                if (androidBrowserConfigFeature.moreGranularDataClearingOptions().isEnabled()) {
+                    dataClearing.clearDataUsingManualFireOptions(shouldRestartIfRequired = true)
+                } else {
+                    clearDataAction.clearTabsAndAllDataAsync(appInForeground = true, shouldFireDataClearPixel = true)
+                    clearDataAction.setAppUsedSinceLastClearFlag(false)
+                    clearDataAction.killAndRestartProcess(notifyDataCleared = false)
+                }
             }
 
             return

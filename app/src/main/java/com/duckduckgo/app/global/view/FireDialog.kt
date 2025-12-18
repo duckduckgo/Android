@@ -33,6 +33,7 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.updatePadding
 import com.airbnb.lottie.RenderMode
 import com.duckduckgo.app.browser.databinding.SheetFireClearDataBinding
+import com.duckduckgo.app.fire.ManualDataClearing
 import com.duckduckgo.app.firebutton.FireButtonStore
 import com.duckduckgo.app.global.events.db.UserEventKey
 import com.duckduckgo.app.global.events.db.UserEventsStore
@@ -42,6 +43,7 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.FIRE_DIALOG_ANIMATION
 import com.duckduckgo.app.pixels.AppPixelName.FIRE_DIALOG_CLEAR_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.PRODUCT_TELEMETRY_SURFACE_DATA_CLEARING
+import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.clear.getPixelValue
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -67,7 +69,9 @@ private const val ANIMATION_SPEED_INCREMENT = 0.15f
 @SuppressLint("NoBottomSheetDialog")
 class FireDialog(
     context: Context,
-    private val clearPersonalDataAction: ClearDataAction,
+    private val clearDataAction: ClearDataAction,
+    private val dataClearing: ManualDataClearing,
+    private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
     private val pixel: Pixel,
     private val settingsDataStore: SettingsDataStore,
     private val userEventsStore: UserEventsStore,
@@ -173,8 +177,13 @@ class FireDialog(
         appCoroutineScope.launch(dispatcherProvider.io()) {
             fireButtonStore.incrementFireButtonUseCount()
             userEventsStore.registerUserEvent(UserEventKey.FIRE_BUTTON_EXECUTED)
-            clearPersonalDataAction.clearTabsAndAllDataAsync(appInForeground = true, shouldFireDataClearPixel = true)
-            clearPersonalDataAction.setAppUsedSinceLastClearFlag(false)
+
+            if (androidBrowserConfigFeature.moreGranularDataClearingOptions().isEnabled()) {
+                dataClearing.clearDataUsingManualFireOptions()
+            } else {
+                clearDataAction.clearTabsAndAllDataAsync(appInForeground = true, shouldFireDataClearPixel = true)
+                clearDataAction.setAppUsedSinceLastClearFlag(false)
+            }
             onFireDialogClearAllEvent(ClearAllDataFinished)
         }
     }
@@ -227,7 +236,8 @@ class FireDialog(
                 binding.fireAnimationView.addAnimatorUpdateListener(accelerateAnimatorUpdateListener)
             }
         } else {
-            clearPersonalDataAction.killAndRestartProcess(notifyDataCleared = false, enableTransitionAnimation = false)
+            // Both clearing and animation are done, now restart
+            clearDataAction.killAndRestartProcess(notifyDataCleared = false, enableTransitionAnimation = false)
         }
     }
 
