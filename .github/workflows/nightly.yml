@@ -190,3 +190,20 @@ jobs:
           asana-section: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_BLOCKER_SECTION_ID }}
           asana-task-id: ${{ steps.create-failure-task.outputs.taskId }}
           action: 'add-task-asana-project'
+
+  tag_lgc_when_successful:
+    name: Tag last good commit when successful
+    runs-on: ubuntu-24.04 #https://github.com/actions/runner-images/issues/6709
+    needs: [ code_formatting, unit_tests, lint, android_tests ]
+    if: ${{ success() }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Create tag
+        run: |
+          TAG_NAME="nightly-$(date -u +'%Y-%m-%dT%H%M%S')"
+          git tag "$TAG_NAME" ${{ github.sha }}
+          git push origin "$TAG_NAME"
