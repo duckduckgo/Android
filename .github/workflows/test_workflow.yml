@@ -73,9 +73,8 @@ jobs:
           asana-section: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
           asana-task-name: GH Workflow - Maestro run issue (test_workflow)
           asana-task-description: |
-            Run: https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
-            Console: ${{ github.event.inputs.console_url }}
-            Status: ${{ steps.analyze-maestro.outputs.flow_summary_status }}
-            Summary:
+            **Run:** https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
+            **Console:** ${{ github.event.inputs.console_url }}
+            **Summary:**
             ${{ steps.analyze-maestro.outputs.flow_summary_message }}
           action: 'create-asana-task'
