@@ -48,12 +48,12 @@ class FakePirDetachedWebViewProvider : PirDetachedWebViewProvider {
         // WebView must be created on the main thread
         if (Looper.myLooper() == Looper.getMainLooper()) {
             // Already on main thread
-            webViewRef.set(createWebViewInternal(context, onPageLoaded, onPageLoadFailed))
+            webViewRef.set(createWebViewInternal(context, onPageLoaded))
             latch.countDown()
         } else {
             // Need to create on main thread
             InstrumentationRegistry.getInstrumentation().runOnMainSync {
-                webViewRef.set(createWebViewInternal(context, onPageLoaded, onPageLoadFailed))
+                webViewRef.set(createWebViewInternal(context, onPageLoaded))
                 latch.countDown()
             }
         }
@@ -72,11 +72,11 @@ class FakePirDetachedWebViewProvider : PirDetachedWebViewProvider {
         val latch = CountDownLatch(1)
 
         if (Looper.myLooper() == Looper.getMainLooper()) {
-            configureWebView(webView, onPageLoaded, onPageLoadFailed)
+            configureWebView(webView, onPageLoaded)
             latch.countDown()
         } else {
             InstrumentationRegistry.getInstrumentation().runOnMainSync {
-                configureWebView(webView, onPageLoaded, onPageLoadFailed)
+                configureWebView(webView, onPageLoaded)
                 latch.countDown()
             }
         }
@@ -89,10 +89,9 @@ class FakePirDetachedWebViewProvider : PirDetachedWebViewProvider {
     private fun createWebViewInternal(
         context: Context,
         onPageLoaded: (String?) -> Unit,
-        onPageLoadFailed: (String?) -> Unit,
     ): WebView {
         return WebView(context).apply {
-            configureWebView(this, onPageLoaded, onPageLoadFailed)
+            configureWebView(this, onPageLoaded)
         }
     }
 
@@ -100,7 +99,6 @@ class FakePirDetachedWebViewProvider : PirDetachedWebViewProvider {
     private fun configureWebView(
         webView: WebView,
         onPageLoaded: (String?) -> Unit,
-        onPageLoadFailed: (String?) -> Unit,
     ) {
         webView.settings.javaScriptEnabled = true
         webView.webViewClient = object : WebViewClient() {

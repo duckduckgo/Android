@@ -20,6 +20,7 @@ import android.content.Context
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry
+import com.duckduckgo.common.utils.DefaultDispatcherProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.pir.impl.callbacks.PirCallbacks
 import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStepActions
@@ -48,7 +49,6 @@ import com.duckduckgo.pir.impl.email.PirEmailConfirmation
 import com.duckduckgo.pir.impl.email.PirEmailConfirmationJobsRunner
 import com.duckduckgo.pir.impl.email.RealPirEmailConfirmation
 import com.duckduckgo.pir.impl.email.RealPirEmailConfirmationJobsRunner
-import com.duckduckgo.pir.impl.integration.fakes.AndroidTestDispatcherProvider
 import com.duckduckgo.pir.impl.integration.fakes.FakeCurrentTimeProvider
 import com.duckduckgo.pir.impl.integration.fakes.FakeDbpService
 import com.duckduckgo.pir.impl.integration.fakes.FakeEventHandlerPluginPoint
@@ -110,6 +110,7 @@ import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -225,7 +226,7 @@ class PirEndToEndTest {
             .build()
 
         fakeTimeProvider = FakeCurrentTimeProvider(initialTimeMs = 1700000000000L)
-        dispatcherProvider = AndroidTestDispatcherProvider()
+        dispatcherProvider = DefaultDispatcherProvider()
         @Suppress("NoHardcodedCoroutineDispatcher")
         testScope = CoroutineScope(Dispatchers.Default)
 
@@ -419,7 +420,7 @@ class PirEndToEndTest {
 
         // Verify: No scan job for removed broker
         val removedBrokerScanJob = scanJobRecords.find { it.brokerName == removedBrokerName }
-        assertTrue("Removed broker should not have scan job", removedBrokerScanJob == null)
+        assertNull("Removed broker should not have scan job", removedBrokerScanJob)
 
         // Verify: Correct scan and opt-out actions (without email) were pushed to FakePirMessagingInterface for active broker only
         assertCorrectActionsWerePushedToJsLayer(
