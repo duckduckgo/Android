@@ -141,13 +141,16 @@ runs:
 
         summary_lines=("Status: ${final_status}" "${summary_lines[@]}")
         summary_message=$(printf "%s\n" "${summary_lines[@]}")
+        if [ -z "$summary_message" ]; then
+          summary_message="Status: ${final_status} (no additional details captured)"
+        fi
 
         echo "Final determined status: $final_status"
+        echo "Summary message:"
+        echo "$summary_message"
         echo "flow_summary_status=$final_status" >> "$GITHUB_OUTPUT"
-        if [ -n "$summary_message" ]; then
-          {
-            echo "flow_summary_message<<'EOF'"
-            echo "$summary_message"
-            echo "EOF"
-          } >> "$GITHUB_OUTPUT"
-        fi
+        {
+          echo "flow_summary_message<<'EOF'"
+          echo "$summary_message"
+          echo "EOF"
+        } >> "$GITHUB_OUTPUT"
