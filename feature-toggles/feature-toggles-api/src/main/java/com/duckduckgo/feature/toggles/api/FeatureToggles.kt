@@ -27,6 +27,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
 import org.apache.commons.math3.distribution.EnumeratedIntegerDistribution
@@ -449,7 +450,7 @@ internal class ToggleImpl constructor(
 
         // when flow collection is cancelled/closed, run the unsubscribe to avoid leaking the listener
         awaitClose { unsubscribe() }
-    }.flowOn(Dispatchers.IO)
+    }.conflate().flowOn(Dispatchers.IO)
 
     private fun enrollInternal(force: Boolean = false): Boolean {
         // if the Toggle is not enabled, then we don't enroll
