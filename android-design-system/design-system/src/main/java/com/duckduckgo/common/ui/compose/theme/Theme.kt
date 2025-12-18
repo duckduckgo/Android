@@ -41,7 +41,7 @@ object DuckDuckGoTheme {
         @ReadOnlyComposable
         get() = colors.text
 
-    val iconColors: DuckDuckGoIconColors
+    val iconColors: DuckDuckGoIconsColors
         @Composable
         @ReadOnlyComposable
         get() = colors.icons

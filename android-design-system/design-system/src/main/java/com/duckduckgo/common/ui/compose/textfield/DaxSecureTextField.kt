@@ -260,7 +260,7 @@ internal fun DaxSecureTextField(
                             DaxText(
                                 text = error,
                                 style = DuckDuckGoTheme.typography.caption,
-                                color = DuckDuckGoTheme.colors.destructive,
+                                color = DuckDuckGoTheme.textColors.destructive,
                             )
                         }
                     } else {
@@ -469,7 +469,7 @@ private fun DaxSecureTextFieldPreviewBox(
     content: @Composable () -> Unit,
 ) {
     DuckDuckGoTheme {
-        PreviewBox(backgroundColor = DuckDuckGoTheme.colors.background) {
+        PreviewBox {
             content()
         }
     }
