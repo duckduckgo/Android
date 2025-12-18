@@ -29,6 +29,8 @@ import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
+import kotlin.collections.chunked
+import kotlin.collections.toSet
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @ContributesMultibinding(AppScope::class)
@@ -47,20 +49,18 @@ class CompletedWideEventsProcessor @Inject constructor(
                 wideEventRepository
                     .getCompletedWideEventIdsFlow()
                     .conflate()
-                    .collect { ids ->
-                        // Process events in chunks to avoid querying too many events at once.
-                        ids.chunked(100).forEach { idsChunk ->
-                            processCompletedWideEvents(idsChunk.toSet())
-                        }
-                    }
+                    .collect { ids -> processCompletedWideEvents(ids) }
             }
         }
     }
 
     private suspend fun processCompletedWideEvents(wideEventIds: Set<Long>) {
-        wideEventRepository.getWideEvents(wideEventIds).forEach { event ->
-            wideEventSender.sendWideEvent(event)
-            wideEventRepository.deleteWideEvent(event.id)
+        // Process events in chunks to avoid querying too many events at once.
+        wideEventIds.chunked(100).forEach { idsChunk ->
+            wideEventRepository.getWideEvents(idsChunk.toSet()).forEach { event ->
+                wideEventSender.sendWideEvent(event)
+                wideEventRepository.deleteWideEvent(event.id)
+            }
         }
     }
 
