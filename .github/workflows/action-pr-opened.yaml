@@ -2,7 +2,7 @@ name: 'Pull Request opened -> Comment on task and add it to Android Release Boar
 
 on:
   pull_request:
-    types: [opened, reopened, edited]
+    types: [opened, reopened]
 
 jobs:
   process-internal-pr:
