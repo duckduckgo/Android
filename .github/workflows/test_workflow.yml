@@ -7,6 +7,26 @@ on:
       ref:
         description: 'This is an example of an input'
         required: true
+      flow_results_json:
+        description: 'Maestro flow results JSON to feed the analyzer'
+        required: true
+        default: '[{"status":"SUCCESS"}]'
+      console_url:
+        description: 'Optional console URL for logging / tasks'
+        required: false
+        default: ''
+      upload_status:
+        description: 'Optional upload status for logging'
+        required: false
+        default: 'SUCCESS'
+      app_binary_id:
+        description: 'Optional app binary ID for logging'
+        required: false
+        default: '123412412'
+      treat_canceled_as_failure:
+        description: 'Treat CANCELED flows as failures (true/false)'
+        required: false
+        default: 'false'
 
 env:
   ASANA_PAT: ${{ secrets.ASANA_ACCESS_TOKEN }}
@@ -25,29 +45,16 @@ jobs:
           token: ${{ secrets.GT_DAXMOBILE }}
           ref: ${{ github.event.inputs.ref }}
 
-      - name: Security Internal Maestro run
-        id: maestro-run
-        uses: mobile-dev-inc/action-maestro-cloud@v1.9.8
-        timeout-minutes: 120
-        with:
-          api-key: ${{ secrets.ROBIN_API_KEY }}
-          project-id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
-          name: internalSecurityTest_${{ github.sha }}
-          timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
-          android-api-level: 30
-          workspace: .maestro
-          app-binary-id: 5271fc31aeb41d56444422885cf9bd22e2d27386
-          include-tags: securityTestInternal
-
       - name: Analyze Maestro Flow Results
         if: always()
         id: analyze-maestro
         uses: ./.github/actions/maestro-flow-analyzer
         with:
-          flow_results_json: ${{ steps.maestro-run.outputs.MAESTRO_CLOUD_FLOW_RESULTS }}
-          console_url: ${{ steps.maestro-run.outputs.MAESTRO_CLOUD_CONSOLE_URL }}
-          upload_status: ${{ steps.maestro-run.outputs.MAESTRO_CLOUD_UPLOAD_STATUS }}
-          app_binary_id: ${{ steps.maestro-run.outputs.MAESTRO_CLOUD_APP_BINARY_ID }}
+          flow_results_json: ${{ github.event.inputs.flow_results_json }}
+          console_url: ${{ github.event.inputs.console_url }}
+          upload_status: ${{ github.event.inputs.upload_status }}
+          app_binary_id: ${{ github.event.inputs.app_binary_id }}
+          treat_canceled_as_failure: ${{ github.event.inputs.treat_canceled_as_failure }}
 
       - name: Show analyzer output
         if: always()
@@ -67,7 +74,7 @@ jobs:
           asana-task-name: GH Workflow - Maestro run issue (test_workflow)
           asana-task-description: |
             Run: https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
-            Console: ${{ steps.maestro-run.outputs.MAESTRO_CLOUD_CONSOLE_URL }}
+            Console: ${{ github.event.inputs.console_url }}
             Status: ${{ steps.analyze-maestro.outputs.flow_summary_status }}
             Summary:
             ${{ steps.analyze-maestro.outputs.flow_summary_message }}
