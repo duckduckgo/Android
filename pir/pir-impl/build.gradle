@@ -111,3 +111,6 @@ android {
     }
 }
 
+tasks.register('androidTestsBuild') {
+    dependsOn 'assembleDebugAndroidTest'
+}
