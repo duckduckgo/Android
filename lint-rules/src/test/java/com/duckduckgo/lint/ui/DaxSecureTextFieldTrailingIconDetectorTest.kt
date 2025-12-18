@@ -107,6 +107,11 @@ class DaxSecureTextFieldTrailingIconDetectorTest {
             ) {
                 // Implementation
             }
+            
+            @Composable
+            fun SomeComposable(){
+                // Implementation
+            }
         }
         """.trimIndent()
     ).indented()
@@ -149,6 +154,46 @@ class DaxSecureTextFieldTrailingIconDetectorTest {
                                     painter = painterResource(0),
                                     contentDescription = "Copy"
                                 )
+                            }
+                        )
+                    }
+                    """.trimIndent()
+                ).indented(),
+                composeStubs,
+                textFieldStateStub,
+                daxSecureTextFieldStub,
+                painterStub
+            )
+            .allowCompilationErrors()
+            .issues(INVALID_DAX_SECURE_TEXT_FIELD_TRAILING_ICON_USAGE)
+            .skipTestModes(TestMode.WHITESPACE, TestMode.REORDER_ARGUMENTS)
+            .run()
+            .expectClean()
+    }
+
+    @Test
+    fun whenComposableFromDaxTextFieldTrailingIconScopeUsedThenNoWarning() {
+        lint()
+            .files(
+                TestFiles.kt(
+                    """
+                    package com.example.test
+
+                    import androidx.compose.foundation.text.input.TextFieldState
+                    import androidx.compose.runtime.Composable
+                    import androidx.compose.ui.res.painterResource
+                    import com.duckduckgo.common.ui.compose.textfield.DaxSecureTextField
+                    import com.duckduckgo.common.ui.compose.textfield.DaxTextFieldTrailingIconScope.DaxTextFieldTrailingIcon
+
+                    @Composable
+                    fun TestScreen() {
+                        DaxSecureTextField(
+                            state = TextFieldState(),
+                            isPasswordVisible = false,
+                            onShowHidePasswordIconClick = {},
+                            label = "Enter password",
+                            trailingIcon = {
+                                SomeComposable()
                             }
                         )
                     }
@@ -282,7 +327,8 @@ class DaxSecureTextFieldTrailingIconDetectorTest {
             .run()
             .expect(
                 """
-                src/com/example/test/test.kt:16: Warning: Use DaxTextFieldTrailingIcon instead of arbitrary composables for the trailingIcon parameter to maintain design system consistency.
+                src/com/example/test/test.kt:16: Warning: Use composables from DaxTextFieldTrailingIconScope instead of arbitrary composables 
+                for the trailingIcon parameter to maintain design system consistency.
 
                 Example:
                 DaxSecureTextField(
@@ -349,7 +395,8 @@ class DaxSecureTextFieldTrailingIconDetectorTest {
             .run()
             .expect(
                 """
-                src/com/example/test/test.kt:17: Warning: Use DaxTextFieldTrailingIcon instead of arbitrary composables for the trailingIcon parameter to maintain design system consistency.
+                src/com/example/test/test.kt:17: Warning: Use composables from DaxTextFieldTrailingIconScope instead of arbitrary composables 
+                for the trailingIcon parameter to maintain design system consistency.
 
                 Example:
                 DaxSecureTextField(
@@ -441,7 +488,8 @@ class DaxSecureTextFieldTrailingIconDetectorTest {
             .run()
             .expect(
                 """
-                src/com/example/test/test.kt:30: Warning: Use DaxTextFieldTrailingIcon instead of arbitrary composables for the trailingIcon parameter to maintain design system consistency.
+                src/com/example/test/test.kt:30: Warning: Use composables from DaxTextFieldTrailingIconScope instead of arbitrary composables 
+                for the trailingIcon parameter to maintain design system consistency.
 
                 Example:
                 DaxSecureTextField(
@@ -535,7 +583,8 @@ class DaxSecureTextFieldTrailingIconDetectorTest {
             .run()
             .expect(
                 """
-                src/com/example/test/test.kt:18: Warning: Use DaxTextFieldTrailingIcon instead of arbitrary composables for the trailingIcon parameter to maintain design system consistency.
+                src/com/example/test/test.kt:18: Warning: Use composables from DaxTextFieldTrailingIconScope instead of arbitrary composables 
+                for the trailingIcon parameter to maintain design system consistency.
 
                 Example:
                 DaxSecureTextField(

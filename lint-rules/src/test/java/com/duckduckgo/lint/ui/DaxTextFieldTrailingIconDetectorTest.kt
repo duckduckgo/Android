@@ -64,7 +64,7 @@ class DaxTextFieldTrailingIconDetectorTest {
             enabled: Boolean = true,
             content: @Composable () -> Unit
         ) {}
-        """.trimIndent()
+        """.trimIndent(),
     ).indented()
 
     private val textFieldStateStub = TestFiles.kotlin(
@@ -72,7 +72,7 @@ class DaxTextFieldTrailingIconDetectorTest {
         package androidx.compose.foundation.text.input
 
         class TextFieldState(initialText: String = "")
-        """.trimIndent()
+        """.trimIndent(),
     ).indented()
 
     private val daxTextFieldStub = TestFiles.kotlin(
@@ -105,8 +105,13 @@ class DaxTextFieldTrailingIconDetectorTest {
             ) {
                 // Implementation
             }
+            
+            @Composable
+            fun SomeComposable(){
+                // Implementation
+            }
         }
-        """.trimIndent()
+        """.trimIndent(),
     ).indented()
 
     private val painterStub = TestFiles.kotlin(
@@ -118,7 +123,7 @@ class DaxTextFieldTrailingIconDetectorTest {
 
         @Composable
         fun painterResource(id: Int): Painter = object : Painter {}
-        """.trimIndent()
+        """.trimIndent(),
     ).indented()
 
     @Test
@@ -148,12 +153,50 @@ class DaxTextFieldTrailingIconDetectorTest {
                             }
                         )
                     }
-                    """.trimIndent()
+                    """.trimIndent(),
                 ).indented(),
                 composeStubs,
                 textFieldStateStub,
                 daxTextFieldStub,
-                painterStub
+                painterStub,
+            )
+            .allowCompilationErrors()
+            .issues(INVALID_DAX_TEXT_FIELD_TRAILING_ICON_USAGE)
+            .skipTestModes(TestMode.WHITESPACE, TestMode.REORDER_ARGUMENTS)
+            .run()
+            .expectClean()
+    }
+
+    @Test
+    fun whenValidComposableFromDaxTextFieldTrailingIconScopeUsedThenNoWarning() {
+        lint()
+            .files(
+                TestFiles.kt(
+                    """
+                    package com.example.test
+
+                    import androidx.compose.foundation.text.input.TextFieldState
+                    import androidx.compose.runtime.Composable
+                    import androidx.compose.ui.res.painterResource
+                    import com.duckduckgo.common.ui.compose.textfield.DaxTextField
+                    import com.duckduckgo.common.ui.compose.textfield.DaxTextFieldTrailingIconScope.DaxTextFieldTrailingIcon
+
+                    @Composable
+                    fun TestScreen() {
+                        DaxTextField(
+                            state = TextFieldState(),
+                            label = "Enter text",
+                            trailingIcon = {
+                                SomeComposable()
+                            }
+                        )
+                    }
+                    """.trimIndent(),
+                ).indented(),
+                composeStubs,
+                textFieldStateStub,
+                daxTextFieldStub,
+                painterStub,
             )
             .allowCompilationErrors()
             .issues(INVALID_DAX_TEXT_FIELD_TRAILING_ICON_USAGE)
@@ -188,12 +231,12 @@ class DaxTextFieldTrailingIconDetectorTest {
                             }
                         )
                     }
-                    """.trimIndent()
+                    """.trimIndent(),
                 ).indented(),
                 composeStubs,
                 textFieldStateStub,
                 daxTextFieldStub,
-                painterStub
+                painterStub,
             )
             .allowCompilationErrors()
             .issues(INVALID_DAX_TEXT_FIELD_TRAILING_ICON_USAGE)
@@ -221,11 +264,11 @@ class DaxTextFieldTrailingIconDetectorTest {
                             label = "Enter text"
                         )
                     }
-                    """.trimIndent()
+                    """.trimIndent(),
                 ).indented(),
                 composeStubs,
                 textFieldStateStub,
-                daxTextFieldStub
+                daxTextFieldStub,
             )
             .allowCompilationErrors()
             .issues(INVALID_DAX_TEXT_FIELD_TRAILING_ICON_USAGE)
@@ -260,19 +303,20 @@ class DaxTextFieldTrailingIconDetectorTest {
                             }
                         )
                     }
-                    """.trimIndent()
+                    """.trimIndent(),
                 ).indented(),
                 composeStubs,
                 textFieldStateStub,
                 daxTextFieldStub,
-                painterStub
+                painterStub,
             )
             .allowCompilationErrors()
             .issues(INVALID_DAX_TEXT_FIELD_TRAILING_ICON_USAGE)
             .run()
             .expect(
                 """
-                src/com/example/test/test.kt:14: Warning: Use DaxTextFieldTrailingIcon instead of arbitrary composables for the trailingIcon parameter to maintain design system consistency.
+                src/com/example/test/test.kt:14: Warning: Use composables from DaxTextFieldTrailingIconScope instead of arbitrary composables 
+                for the trailingIcon parameter to maintain design system consistency.
 
                 Example:
                 DaxTextField(
@@ -289,7 +333,7 @@ class DaxTextFieldTrailingIconDetectorTest {
                         trailingIcon = {
                                        ^
                 0 errors, 1 warnings
-                """.trimIndent()
+                """.trimIndent(),
             )
     }
 
@@ -323,19 +367,20 @@ class DaxTextFieldTrailingIconDetectorTest {
                             }
                         )
                     }
-                    """.trimIndent()
+                    """.trimIndent(),
                 ).indented(),
                 composeStubs,
                 textFieldStateStub,
                 daxTextFieldStub,
-                painterStub
+                painterStub,
             )
             .allowCompilationErrors()
             .issues(INVALID_DAX_TEXT_FIELD_TRAILING_ICON_USAGE)
             .run()
             .expect(
                 """
-                src/com/example/test/test.kt:15: Warning: Use DaxTextFieldTrailingIcon instead of arbitrary composables for the trailingIcon parameter to maintain design system consistency.
+                src/com/example/test/test.kt:15: Warning: Use composables from DaxTextFieldTrailingIconScope instead of arbitrary composables 
+                for the trailingIcon parameter to maintain design system consistency.
 
                 Example:
                 DaxTextField(
@@ -352,7 +397,7 @@ class DaxTextFieldTrailingIconDetectorTest {
                         trailingIcon = {
                                        ^
                 0 errors, 1 warnings
-                """.trimIndent()
+                """.trimIndent(),
             )
     }
 
@@ -406,12 +451,12 @@ class DaxTextFieldTrailingIconDetectorTest {
                             }
                         )
                     }
-                    """.trimIndent()
+                    """.trimIndent(),
                 ).indented(),
                 composeStubs,
                 textFieldStateStub,
                 daxTextFieldStub,
-                painterStub
+                painterStub,
             )
             .allowCompilationErrors()
             .issues(INVALID_DAX_TEXT_FIELD_TRAILING_ICON_USAGE)
@@ -419,7 +464,8 @@ class DaxTextFieldTrailingIconDetectorTest {
             .run()
             .expect(
                 """
-                src/com/example/test/test.kt:26: Warning: Use DaxTextFieldTrailingIcon instead of arbitrary composables for the trailingIcon parameter to maintain design system consistency.
+                src/com/example/test/test.kt:26: Warning: Use composables from DaxTextFieldTrailingIconScope instead of arbitrary composables 
+                for the trailingIcon parameter to maintain design system consistency.
 
                 Example:
                 DaxTextField(
@@ -436,7 +482,7 @@ class DaxTextFieldTrailingIconDetectorTest {
                         trailingIcon = {
                                        ^
                 0 errors, 1 warnings
-                """.trimIndent()
+                """.trimIndent(),
             )
     }
 
@@ -456,11 +502,11 @@ class DaxTextFieldTrailingIconDetectorTest {
                     fun TestScreen() {
                         DaxTextField(state = TextFieldState())
                     }
-                    """.trimIndent()
+                    """.trimIndent(),
                 ).indented(),
                 composeStubs,
                 textFieldStateStub,
-                daxTextFieldStub
+                daxTextFieldStub,
             )
             .allowCompilationErrors()
             .issues(INVALID_DAX_TEXT_FIELD_TRAILING_ICON_USAGE)
@@ -494,18 +540,19 @@ class DaxTextFieldTrailingIconDetectorTest {
                             }
                         )
                     }
-                    """.trimIndent()
+                    """.trimIndent(),
                 ).indented(),
                 composeStubs,
                 textFieldStateStub,
-                daxTextFieldStub
+                daxTextFieldStub,
             )
             .allowCompilationErrors()
             .issues(INVALID_DAX_TEXT_FIELD_TRAILING_ICON_USAGE)
             .run()
             .expect(
                 """
-                src/com/example/test/test.kt:16: Warning: Use DaxTextFieldTrailingIcon instead of arbitrary composables for the trailingIcon parameter to maintain design system consistency.
+                src/com/example/test/test.kt:16: Warning: Use composables from DaxTextFieldTrailingIconScope instead of arbitrary composables 
+                for the trailingIcon parameter to maintain design system consistency.
 
                 Example:
                 DaxTextField(
@@ -522,7 +569,7 @@ class DaxTextFieldTrailingIconDetectorTest {
                         trailingIcon = {
                                        ^
                 0 errors, 1 warnings
-                """.trimIndent()
+                """.trimIndent(),
             )
     }
 }

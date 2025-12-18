@@ -91,20 +91,22 @@ fun DaxTextField(
     interactionSource: MutableInteractionSource? = null,
     trailingIcon: (@Composable DaxTextFieldTrailingIconScope.() -> Unit)? = null,
 ) {
+    val daxTextFieldColors = daxTextFieldColors()
+
     // override is needed as TextField uses MaterialTheme.typography internally for animating the label text style
     MaterialTheme(
         typography = Typography(
             bodySmall = DuckDuckGoTheme.typography.caption.asTextStyle.copy(
                 fontFamily = FontFamily.Default,
-                color = DuckDuckGoTheme.colors.text.secondary,
+                color = DuckDuckGoTheme.textColors.secondary,
             ),
             bodyLarge = DuckDuckGoTheme.typography.body1.asTextStyle.copy(
                 fontFamily = FontFamily.Default,
-                color = DuckDuckGoTheme.colors.text.secondary,
+                color = DuckDuckGoTheme.textColors.secondary,
             ),
         ),
     ) {
-        CompositionLocalProvider(LocalTextSelectionColors provides daxTextFieldColors().textSelectionColors) {
+        CompositionLocalProvider(LocalTextSelectionColors provides daxTextFieldColors.textSelectionColors) {
             OutlinedTextField(
                 state = state,
                 modifier = modifier
@@ -163,7 +165,7 @@ fun DaxTextField(
                 lineLimits = lineLimits.toLineLimits(),
                 inputTransformation = inputTransformation,
                 interactionSource = interactionSource,
-                colors = daxTextFieldColors(),
+                colors = daxTextFieldColors,
             )
         }
     }
@@ -248,6 +250,10 @@ object DaxTextFieldTrailingIconScope {
             )
         }
     }
+
+    @Composable
+    fun SomeComposable() {
+    }
 }
 
 @Stable
@@ -299,10 +305,10 @@ enum class DaxTextFieldInputMode {
 
 @Composable
 internal fun daxTextFieldColors(): TextFieldColors = OutlinedTextFieldDefaults.colors(
-    focusedTextColor = DuckDuckGoTheme.colors.text.primary,
-    unfocusedTextColor = DuckDuckGoTheme.colors.text.primary,
-    disabledTextColor = DuckDuckGoTheme.colors.text.primary,
-    errorTextColor = DuckDuckGoTheme.colors.text.primary,
+    focusedTextColor = DuckDuckGoTheme.textColors.primary,
+    unfocusedTextColor = DuckDuckGoTheme.textColors.primary,
+    disabledTextColor = DuckDuckGoTheme.textColors.primary,
+    errorTextColor = DuckDuckGoTheme.textColors.primary,
     focusedContainerColor = Transparent,
     unfocusedContainerColor = Transparent,
     disabledContainerColor = Transparent,
@@ -312,39 +318,39 @@ internal fun daxTextFieldColors(): TextFieldColors = OutlinedTextFieldDefaults.c
     disabledBorderColor = DuckDuckGoTheme.colors.textField.borders,
     errorBorderColor = DuckDuckGoTheme.colors.destructive,
     focusedLabelColor = DuckDuckGoTheme.colors.accentBlue,
-    unfocusedLabelColor = DuckDuckGoTheme.colors.text.secondary,
-    disabledLabelColor = DuckDuckGoTheme.colors.text.secondary,
+    unfocusedLabelColor = DuckDuckGoTheme.textColors.secondary,
+    disabledLabelColor = DuckDuckGoTheme.textColors.secondary,
     errorLabelColor = DuckDuckGoTheme.colors.destructive,
-    focusedTrailingIconColor = DuckDuckGoTheme.colors.icons.primary,
-    unfocusedTrailingIconColor = DuckDuckGoTheme.colors.icons.primary,
-    disabledTrailingIconColor = DuckDuckGoTheme.colors.icons.primary,
+    focusedTrailingIconColor = DuckDuckGoTheme.iconColors.primary,
+    unfocusedTrailingIconColor = DuckDuckGoTheme.iconColors.primary,
+    disabledTrailingIconColor = DuckDuckGoTheme.iconColors.primary,
     errorTrailingIconColor = DuckDuckGoTheme.colors.destructive,
     focusedSupportingTextColor = DuckDuckGoTheme.colors.destructive,
     unfocusedSupportingTextColor = DuckDuckGoTheme.colors.destructive,
     disabledSupportingTextColor = DuckDuckGoTheme.colors.destructive,
     errorSupportingTextColor = DuckDuckGoTheme.colors.destructive,
     cursorColor = DuckDuckGoTheme.colors.accentBlue,
-    errorCursorColor = DuckDuckGoTheme.colors.destructive,
+    errorCursorColor = DuckDuckGoTheme.colors.accentBlue,
     selectionColors = TextSelectionColors(
         handleColor = DuckDuckGoTheme.colors.accentBlue,
         backgroundColor = DuckDuckGoTheme.colors.accentBlue.copy(alpha = DaxTextFieldDefaults.ALPHA_DISABLED),
     ),
-    focusedLeadingIconColor = DuckDuckGoTheme.colors.icons.primary,
-    unfocusedLeadingIconColor = DuckDuckGoTheme.colors.icons.primary,
-    disabledLeadingIconColor = DuckDuckGoTheme.colors.icons.primary,
+    focusedLeadingIconColor = DuckDuckGoTheme.iconColors.primary,
+    unfocusedLeadingIconColor = DuckDuckGoTheme.iconColors.primary,
+    disabledLeadingIconColor = DuckDuckGoTheme.iconColors.primary,
     errorLeadingIconColor = DuckDuckGoTheme.colors.destructive,
-    focusedPrefixColor = DuckDuckGoTheme.colors.text.secondary,
-    unfocusedPrefixColor = DuckDuckGoTheme.colors.text.secondary,
-    disabledPrefixColor = DuckDuckGoTheme.colors.text.secondary,
-    errorPrefixColor = DuckDuckGoTheme.colors.text.secondary,
-    focusedSuffixColor = DuckDuckGoTheme.colors.text.secondary,
-    unfocusedSuffixColor = DuckDuckGoTheme.colors.text.secondary,
-    disabledSuffixColor = DuckDuckGoTheme.colors.text.secondary,
-    errorSuffixColor = DuckDuckGoTheme.colors.text.secondary,
-    focusedPlaceholderColor = DuckDuckGoTheme.colors.text.secondary,
-    unfocusedPlaceholderColor = DuckDuckGoTheme.colors.text.secondary,
-    disabledPlaceholderColor = DuckDuckGoTheme.colors.text.secondary,
-    errorPlaceholderColor = DuckDuckGoTheme.colors.text.secondary,
+    focusedPrefixColor = DuckDuckGoTheme.textColors.secondary,
+    unfocusedPrefixColor = DuckDuckGoTheme.textColors.secondary,
+    disabledPrefixColor = DuckDuckGoTheme.textColors.secondary,
+    errorPrefixColor = DuckDuckGoTheme.textColors.secondary,
+    focusedSuffixColor = DuckDuckGoTheme.textColors.secondary,
+    unfocusedSuffixColor = DuckDuckGoTheme.textColors.secondary,
+    disabledSuffixColor = DuckDuckGoTheme.textColors.secondary,
+    errorSuffixColor = DuckDuckGoTheme.textColors.secondary,
+    focusedPlaceholderColor = DuckDuckGoTheme.textColors.secondary,
+    unfocusedPlaceholderColor = DuckDuckGoTheme.textColors.secondary,
+    disabledPlaceholderColor = DuckDuckGoTheme.textColors.secondary,
+    errorPlaceholderColor = DuckDuckGoTheme.textColors.secondary,
 )
 
 @PreviewLightDark

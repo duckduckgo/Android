@@ -38,6 +38,11 @@ class DaxTextFieldTrailingIconDetector : Detector(), SourceCodeScanner {
     override fun createUastHandler(context: JavaContext): UElementHandler = DaxTextFieldCallHandler(context)
 
     internal class DaxTextFieldCallHandler(private val context: JavaContext) : UElementHandler() {
+
+        private val validTrailingIconMembers: List<String> by lazy {
+            getTrailingIconScopeMembers()
+        }
+
         override fun visitCallExpression(node: UCallExpression) {
             val methodName = node.methodName
 
@@ -59,12 +64,23 @@ class DaxTextFieldTrailingIconDetector : Detector(), SourceCodeScanner {
             }
         }
 
+        private fun getTrailingIconScopeMembers(): List<String> {
+            val scopeClass = context.evaluator.findClass(TRAILING_ICON_SCOPE_CLASS)
+                ?: return emptyList()
+
+            return scopeClass.methods
+                .filter { !it.isConstructor }
+                .mapNotNull { it.name }
+        }
+
         private fun isInvalidComposable(argument: org.jetbrains.uast.UExpression): Boolean {
             val source = argument.sourcePsi?.text ?: return false
 
-            // Only DaxTextFieldTrailingIcon should be used in the trailingIcon parameter
-            // If the source doesn't contain it, then it's invalid
-            return !source.contains("DaxTextFieldTrailingIcon")
+            // Check if the source contains any of the valid trailing icon members
+            // If the scope class couldn't be resolved, fall back to allowing the usage
+            if (validTrailingIconMembers.isEmpty()) return false
+
+            return validTrailingIconMembers.none { member -> source.contains(member) }
         }
 
         private fun reportInvalidComposableUsage(arg: org.jetbrains.uast.UExpression) {
@@ -77,12 +93,16 @@ class DaxTextFieldTrailingIconDetector : Detector(), SourceCodeScanner {
     }
 
     companion object {
+        private const val TRAILING_ICON_SCOPE_CLASS =
+            "com.duckduckgo.common.ui.compose.textfield.DaxTextFieldTrailingIconScope"
+
         val INVALID_DAX_TEXT_FIELD_TRAILING_ICON_USAGE = Issue
             .create(
                 id = "InvalidDaxTextFieldTrailingIconUsage",
-                briefDescription = "DaxTextField trailingIcon parameter should use DaxTextFieldTrailingIcon",
+                briefDescription = "DaxTextField trailingIcon parameter should only use composables from DaxTextFieldTrailingIconScope",
                 explanation = """
-                    Use DaxTextFieldTrailingIcon instead of arbitrary composables for the trailingIcon parameter to maintain design system consistency.
+                    Use composables from DaxTextFieldTrailingIconScope instead of arbitrary composables 
+                    for the trailingIcon parameter to maintain design system consistency.
 
                     Example:
                     DaxTextField(

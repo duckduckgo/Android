@@ -34,7 +34,10 @@ import androidx.compose.material3.TextFieldLabelPosition
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.SolidColor
@@ -61,6 +64,55 @@ import com.duckduckgo.mobile.android.R
  * It's a single line text field that obscures the input by default, with an option to toggle visibility.
  *
  * @param state The state of the text field that is used to read and write the text and selection.
+ * @param modifier Optional [Modifier] for this text field. Can be used request focus via [Modifier.focusRequester] for example.
+ * @param label Optional label/hint text to display inside the text field when it's empty or above the text field when it has text or is focused.
+ * @param inputMode Input mode for the text field, such as editable, read-only or disabled. See [DaxTextFieldInputMode] for details.
+ * @param error Optional error message to display below the text field. If provided, the text field will be styled to indicate an error.
+ * @param keyboardOptions Software keyboard options that contains configuration such as [KeyboardType] and [ImeAction].
+ * See [DaxTextFieldDefaults.TextKeyboardOptions], [DaxTextFieldDefaults.IpAddressKeyboardOptions] and
+ * [DaxTextFieldDefaults.UrlKeyboardOptions] for examples.
+ * @param interactionSource Optional interaction source for observing and emitting interaction events.
+ * You can use this to observe focus, pressed, hover and drag events.
+ * @param trailingIcon Optional trailing icon composable to display at the end of the text field.
+ * Use [DaxTextFieldTrailingIconScope.DaxTextFieldTrailingIcon] to create the icon.
+ *
+ * Asana Task: https://app.asana.com/1/137249556945/project/1202857801505092/task/1212213756433276?focus=true
+ * Figma reference: https://www.figma.com/design/BOHDESHODUXK7wSRNBOHdu/%F0%9F%A4%96-Android-Components?m=auto&node-id=3202-5150
+ */
+@Composable
+fun DaxSecureTextField(
+    state: TextFieldState,
+    modifier: Modifier = Modifier,
+    label: String? = null,
+    inputMode: DaxTextFieldInputMode = DaxTextFieldInputMode.Editable,
+    error: String? = null,
+    keyboardOptions: KeyboardOptions = DaxTextFieldDefaults.PasswordKeyboardOptions,
+    interactionSource: MutableInteractionSource? = null,
+    trailingIcon: (@Composable DaxTextFieldTrailingIconScope.() -> Unit)? = null,
+) {
+    var isPasswordVisible by remember { mutableStateOf(false) }
+
+    DaxSecureTextField(
+        state = state,
+        isPasswordVisible = isPasswordVisible,
+        onShowHidePasswordIconClick = {
+            isPasswordVisible = !isPasswordVisible
+        },
+        modifier = modifier,
+        label = label,
+        inputMode = inputMode,
+        error = error,
+        keyboardOptions = keyboardOptions,
+        interactionSource = interactionSource,
+        trailingIcon = trailingIcon,
+    )
+}
+
+/**
+ * Text field component for the DuckDuckGo design system for entering passwords and other sensitive information.
+ * It's a single line text field that obscures the input by default, with an option to toggle visibility.
+ *
+ * @param state The state of the text field that is used to read and write the text and selection.
  * @param isPasswordVisible Boolean flag indicating whether the password is currently visible or obscured.
  * You should manage this state and update it accordingly when [onShowHidePasswordIconClick] is called.
  * @param onShowHidePasswordIconClick Callback for when the show/hide password icon is clicked by the user.
@@ -81,7 +133,7 @@ import com.duckduckgo.mobile.android.R
  * Figma reference: https://www.figma.com/design/BOHDESHODUXK7wSRNBOHdu/%F0%9F%A4%96-Android-Components?m=auto&node-id=3202-5150
  */
 @Composable
-fun DaxSecureTextField(
+internal fun DaxSecureTextField(
     state: TextFieldState,
     isPasswordVisible: Boolean,
     onShowHidePasswordIconClick: () -> Unit,

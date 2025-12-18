@@ -536,6 +536,40 @@
             app:platformType="view"/>
 
         <com.duckduckgo.common.ui.view.text.DaxTextInput
+            android:id="@+id/outlinedinputtext41"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_2"
+            android:hint="Non-editable text with end icon in error state"
+            android:text="Non-editable text with end icon in error state."
+            app:clickable="true"
+            app:endIcon="@drawable/ic_copy_24"
+            app:type="single_line" />
+
+        <com.duckduckgo.common.ui.internal.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_4"
+            app:platformType="compose"/>
+
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/compose_text_input_41"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"/>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="32dp"/>
+
+        <com.duckduckgo.common.ui.internal.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            app:platformType="view"/>
+
+        <com.duckduckgo.common.ui.view.text.DaxTextInput
             android:id="@+id/outlinedinputtext22"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
