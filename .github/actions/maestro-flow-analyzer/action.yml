@@ -150,7 +150,7 @@ runs:
         echo "$summary_message"
         echo "flow_summary_status=$final_status" >> "$GITHUB_OUTPUT"
         {
-          echo "flow_summary_message<<'EOF'"
+          echo "flow_summary_message<<EOF"
           echo "$summary_message"
           echo "EOF"
         } >> "$GITHUB_OUTPUT"
