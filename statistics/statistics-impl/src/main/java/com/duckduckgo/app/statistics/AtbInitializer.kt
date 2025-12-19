@@ -20,7 +20,7 @@ import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.anvil.annotations.ContributesPluginPoint
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
-import com.duckduckgo.app.statistics.api.StatisticsUpdater
+import com.duckduckgo.app.statistics.api.StatisticsRequester
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.StatisticsPixelName.ATB_PRE_INITIALIZER_PLUGIN_TIMEOUT
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
@@ -50,7 +50,7 @@ import javax.inject.Inject
 class AtbInitializer @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val statisticsDataStore: StatisticsDataStore,
-    private val statisticsUpdater: StatisticsUpdater,
+    private val statisticsUpdater: StatisticsRequester,
     private val listeners: PluginPoint<AtbInitializerListener>,
     private val dispatcherProvider: DispatcherProvider,
     private val pixel: Pixel,

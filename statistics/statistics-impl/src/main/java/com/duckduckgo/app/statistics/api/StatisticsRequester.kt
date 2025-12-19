@@ -17,6 +17,8 @@
 package com.duckduckgo.app.statistics.api
 
 import android.annotation.SuppressLint
+import androidx.annotation.VisibleForTesting
+import androidx.annotation.VisibleForTesting.Companion.PACKAGE_PRIVATE
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.model.Atb
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
@@ -26,6 +28,7 @@ import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.experiments.api.VariantManager
 import com.squareup.anvil.annotations.ContributesBinding
+import dagger.SingleInstanceIn
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -35,13 +38,8 @@ import logcat.LogPriority.WARN
 import logcat.logcat
 import javax.inject.Inject
 
-interface StatisticsUpdater {
-    fun initializeAtb()
-    fun refreshSearchRetentionAtb()
-    fun refreshAppRetentionAtb()
-}
-
 @ContributesBinding(AppScope::class)
+@SingleInstanceIn(AppScope::class)
 class StatisticsRequester @Inject constructor(
     private val store: StatisticsDataStore,
     private val service: StatisticsService,
@@ -57,7 +55,8 @@ class StatisticsRequester @Inject constructor(
      * consume referer data
      */
     @SuppressLint("CheckResult")
-    override fun initializeAtb() {
+    @VisibleForTesting(otherwise = PACKAGE_PRIVATE)
+    fun initializeAtb() {
         logcat(INFO) { "Initializing ATB" }
 
         if (store.hasInstallationStatistics) {
@@ -135,8 +134,40 @@ class StatisticsRequester @Inject constructor(
         }
     }
 
+    override fun refreshDuckAiRetentionAtb() {
+        val atb = store.atb
+
+        if (atb == null) {
+            initializeAtb()
+            return
+        }
+
+        appCoroutineScope.launch(dispatchers.io()) {
+            val fullAtb = atb.formatWithVariant(variantManager.getVariantKey())
+            val oldDuckAiAtb = store.duckaiRetentionAtb ?: atb.version
+
+            service
+                .updateDuckAiAtb(
+                    atb = fullAtb,
+                    retentionAtb = oldDuckAiAtb,
+                    email = emailSignInState(),
+                )
+                .subscribeOn(Schedulers.io())
+                .subscribe(
+                    {
+                        logcat(VERBOSE) { "Duck.ai atb refresh succeeded, latest atb is ${it.version}" }
+                        store.duckaiRetentionAtb = it.version
+                        storeUpdateVersionIfPresent(it)
+                        plugins.getPlugins().forEach { plugin -> plugin.onDuckAiRetentionAtbRefreshed(oldDuckAiAtb, it.version) }
+                    },
+                    { logcat(VERBOSE) { "Duck.ai atb refresh failed with error ${it.localizedMessage}" } },
+                )
+        }
+    }
+
     @SuppressLint("CheckResult")
-    override fun refreshAppRetentionAtb() {
+    @VisibleForTesting(otherwise = PACKAGE_PRIVATE)
+    fun refreshAppRetentionAtb() {
         val atb = store.atb
 
         if (atb == null) {
