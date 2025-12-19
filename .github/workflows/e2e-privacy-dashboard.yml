@@ -98,7 +98,7 @@ jobs:
           asana-task-name: E2E Tests Failure - Ad Click (Privacy Dashboard)
           asana-task-description: |
             Run: https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
-            Console: ${{ steps.analyze-maestro-ad-click.outputs.MAESTRO_CLOUD_CONSOLE_URL }}
+            Console: ${{ steps.maestro-ad-click.outputs.MAESTRO_CLOUD_CONSOLE_URL }}
             Summary:
             ${{ steps.analyze-maestro-ad-click.outputs.flow_summary_message }}
           action: 'create-asana-task'
