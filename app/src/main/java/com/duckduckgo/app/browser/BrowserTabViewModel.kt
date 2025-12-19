@@ -483,7 +483,6 @@ class BrowserTabViewModel @Inject constructor(
     private val duckChatJSHelper: DuckChatJSHelper,
     private val tabManager: TabManager,
     private val addressDisplayFormatter: AddressDisplayFormatter,
-    private val serpEasterEggLogosToggles: SerpEasterEggLogosToggles,
     private val nonHttpAppLinkChecker: NonHttpAppLinkChecker,
     private val externalIntentProcessingState: ExternalIntentProcessingState,
     private val vpnMenuStateProvider: VpnMenuStateProvider,
@@ -1975,12 +1974,10 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private fun evaluateSerpLogoState(url: String?) {
-        if (serpEasterEggLogosToggles.feature().isEnabled()) {
-            if (url != null && duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
-                command.value = ExtractSerpLogo(url)
-            } else {
-                omnibarViewState.value = currentOmnibarViewState().copy(serpLogo = null)
-            }
+        if (url != null && duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
+            command.value = ExtractSerpLogo(url)
+        } else {
+            omnibarViewState.value = currentOmnibarViewState().copy(serpLogo = null)
         }
     }
 
