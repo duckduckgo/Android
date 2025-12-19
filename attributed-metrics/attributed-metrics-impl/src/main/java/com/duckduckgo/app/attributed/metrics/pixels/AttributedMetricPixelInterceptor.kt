@@ -37,7 +37,10 @@ class AttributedMetricPixelInterceptor @Inject constructor() : Interceptor, Pixe
         var url = chain.request().url
         val pixel = chain.request().url.pathSegments.last()
         if (pixel.startsWith(ATTRIBUTED_METRICS_PIXEL_PREFIX)) {
-            url = url.toUrl().toString().replace("android_${DeviceInfo.FormFactor.PHONE.description}", "android").toHttpUrl()
+            url = url.toUrl().toString()
+                .replace("android_${DeviceInfo.FormFactor.PHONE.description}", "android")
+                .replace("android_${DeviceInfo.FormFactor.TABLET.description}", "android")
+                .toHttpUrl()
             logcat(tag = "AttributedMetrics") {
                 "Pixel renamed to: $url"
             }
