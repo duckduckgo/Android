@@ -121,14 +121,15 @@ class FakePirMessagingInterface(moshi: Moshi) : JsMessaging {
                     nextExtractResponseEmpty = false
                     "[]"
                 } else {
+                    val uniqueId = action.id.hashCode().toString().takeLast(8)
                     """
                     [
                         {
                             "name": "John Doe",
                             "fullName": "John Doe",
                             "age": "33",
-                            "profileUrl": "https://www.fake-broker.com/John-Doe/NY/New-York/abc123",
-                            "identifier": "abc123",
+                            "profileUrl": "https://fake-broker.com/profile/$uniqueId",
+                            "identifier": "$uniqueId",
                             "email": "john.doe@example.com",
                             "phoneNumbers": ["+1-555-0101"],
                             "relatives": ["Jane Doe"],
