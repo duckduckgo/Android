@@ -3551,6 +3551,24 @@ class BrowserTabViewModel @Inject constructor(
         return false
     }
 
+    override fun onWebViewRequestedFocus() {
+        // WebView uses this callback for things like `window.focus()` on a popup window.
+        // We only allow it to switch tabs when the currently-selected tab is the opener of this tab,
+        // to avoid background tabs stealing focus.
+        if (isActiveTab()) return
+
+        viewModelScope.launch(dispatchers.io()) {
+            val currentSelectedTabId = tabRepository.getSelectedTab()?.tabId
+            val mySourceTabId = tabRepository.getTab(tabId)?.sourceTabId
+
+            if (currentSelectedTabId != null && mySourceTabId != null && currentSelectedTabId == mySourceTabId) {
+                withContext(dispatchers.main()) {
+                    command.value = com.duckduckgo.app.browser.commands.Command.SwitchToTab(tabId)
+                }
+            }
+        }
+    }
+
     override fun onReceivedError(
         errorType: WebViewErrorResponse,
         url: String,

@@ -54,6 +54,11 @@ class BrowserChromeClient @Inject constructor(
 
     private var customView: View? = null
 
+    override fun onRequestFocus(view: WebView?) {
+        super.onRequestFocus(view)
+        webViewClientListener?.onWebViewRequestedFocus()
+    }
+
     override fun onShowCustomView(
         view: View,
         callback: CustomViewCallback?,

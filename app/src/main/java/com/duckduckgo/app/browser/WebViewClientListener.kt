@@ -183,4 +183,11 @@ interface WebViewClientListener {
         webViewNavigationState: WebViewNavigationState,
         activeExperiments: List<Toggle>,
     )
+
+    /**
+     * Called when web content requests focus for this WebView (e.g. via `window.focus()` on a popup window).
+     *
+     * Default no-op to avoid forcing all implementers to care about focus requests.
+     */
+    fun onWebViewRequestedFocus() {}
 }

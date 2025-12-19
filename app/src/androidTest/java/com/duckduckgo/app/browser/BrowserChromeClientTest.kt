@@ -144,6 +144,13 @@ class BrowserChromeClientTest {
         verifyNoInteractions(mockWebViewClientListener)
     }
 
+    @UiThreadTest
+    @Test
+    fun whenOnRequestFocusThenNotifyListener() {
+        testee.onRequestFocus(webView)
+        verify(mockWebViewClientListener).onWebViewRequestedFocus()
+    }
+
     @Test
     fun whenOnReceivedIconThenIconReceived() {
         val bitmap: Bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.RGB_565)
