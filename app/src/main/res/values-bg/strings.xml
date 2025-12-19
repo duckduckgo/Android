@@ -72,6 +72,7 @@
     <string name="options">Опции</string>
     <string name="shareLink">Споделяне на връзка</string>
     <string name="copyUrl">Копиране на адреса на връзката</string>
+    <string name="urlCopiedToClipboard">URL адресът е копиран в клипборда</string>
 
     <!-- Find in page -->
     <string name="nextSearchTermDescription">Намери следващ</string>
