@@ -66,8 +66,6 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
         val shouldShowInputScreenToggle: Boolean = false,
         val isSearchSectionVisible: Boolean = true,
         val isHideGeneratedImagesOptionVisible: Boolean = false,
-        val shouldShowContextualModeToggle: Boolean = false,
-        val isContextualModeEnabled: Boolean = false,
     )
 
     val viewState =
@@ -76,8 +74,7 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
             duckChat.observeCosmeticInputScreenUserSettingEnabled(),
             duckChat.observeInputScreenUserSettingEnabled(),
             flowOf(duckChatFeature.showHideAiGeneratedImages().isEnabled()).flowOn(dispatcherProvider.io()),
-            flowOf(duckChatFeature.contextualMode().isEnabled()).flowOn(dispatcherProvider.io()),
-        ) { isDuckChatUserEnabled, cosmeticInputScreenEnabled, isInputScreenEnabled, showHideAiGeneratedImagesOption, contextualModeToggle ->
+        ) { isDuckChatUserEnabled, cosmeticInputScreenEnabled, isInputScreenEnabled, showHideAiGeneratedImagesOption ->
             ViewState(
                 isDuckChatUserEnabled = isDuckChatUserEnabled,
                 isInputScreenEnabled = cosmeticInputScreenEnabled ?: isInputScreenEnabled,
@@ -85,8 +82,6 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
                 shouldShowInputScreenToggle = isDuckChatUserEnabled && duckChat.isInputScreenFeatureAvailable(),
                 isSearchSectionVisible = isSearchSectionVisible(duckChatActivityParams),
                 isHideGeneratedImagesOptionVisible = showHideAiGeneratedImagesOption,
-                shouldShowContextualModeToggle = duckChat.isDuckChatContextualModeFeatureAvailable() && contextualModeToggle,
-                isContextualModeEnabled = duckChat.isDuckChatContextualModeEnabled(),
             )
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ViewState())
 
@@ -209,12 +204,6 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
     fun duckAiInputScreenShareFeedbackClicked() {
         viewModelScope.launch {
             commandChannel.send(Command.LaunchFeedback)
-        }
-    }
-
-    fun onDuckChatContextualModeToggled(checked: Boolean) {
-        viewModelScope.launch {
-            duckChat.setContextualModeUserSetting(checked)
         }
     }
 

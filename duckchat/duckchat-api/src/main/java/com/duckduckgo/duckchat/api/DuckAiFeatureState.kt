@@ -83,9 +83,4 @@ interface DuckAiFeatureState {
      * Indicates whether Duck.ai should be open in Contextual mode
      */
     val showContextualMode: StateFlow<Boolean>
-
-    /**
-     * Indicates whether the Contextual mode toggle is visible or not
-     */
-    val showContextualModeToggle: StateFlow<Boolean>
 }

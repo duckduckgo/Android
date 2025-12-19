@@ -81,11 +81,6 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
             updateWidgets()
         }
 
-    private val userEnabledDuckChatContextualModeListener =
-        CompoundButton.OnCheckedChangeListener { _, isChecked ->
-            viewModel.onDuckChatContextualModeToggled(isChecked)
-        }
-
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
 
@@ -194,10 +189,6 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
         binding.duckAiInputScreenWithAiContainer.setOnClickListener {
             viewModel.onDuckAiInputScreenWithAiSelected()
         }
-
-        binding.duckAiContextualMode.isVisible = viewState.shouldShowContextualModeToggle
-        binding.duckAiContextualMode.updatePadding(left = offset)
-        binding.duckAiContextualMode.quietlySetIsChecked(viewState.isContextualModeEnabled, userEnabledDuckChatContextualModeListener)
     }
 
     private fun renderSearchSettingsSection(viewState: ViewState) {
