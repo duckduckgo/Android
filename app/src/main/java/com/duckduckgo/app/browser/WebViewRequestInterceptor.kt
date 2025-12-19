@@ -354,7 +354,15 @@ class WebViewRequestInterceptor(
             if (surrogate.responseAvailable) {
                 logcat { "Surrogate found for ${request.url}" }
                 webViewClientListener?.surrogateDetected(surrogate)
-                return WebResourceResponse(surrogate.mimeType, "UTF-8", surrogate.jsFunction.byteInputStream())
+                return WebResourceResponse(surrogate.mimeType, "UTF-8", surrogate.jsFunction.byteInputStream()).apply {
+                    // Ensure surrogate responses remain embeddable under COEP (required for SharedArrayBuffer / crossOriginIsolated).
+                    // Without these, COEP-enabled pages can treat injected surrogate resources as non-CORP and block them.
+                    responseHeaders = mapOf(
+                        "Cross-Origin-Resource-Policy" to "cross-origin",
+                        "Access-Control-Allow-Origin" to "*",
+                        "X-Content-Type-Options" to "nosniff",
+                    )
+                }
             }
         }
 
