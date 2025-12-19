@@ -88,7 +88,6 @@ class IntentDispatcherViewModel @Inject constructor(
                 val customTabRequested = hasSession && !isEmailProtectionLink && !isDuckDuckGoUrl && !isSyncPairingUrl
 
                 logcat { "Intent $intent received. Has extra session=$hasSession. Intent text=$intentText. Toolbar color=$toolbarColor" }
-                logcat(tag = "RadoiuC") { "Intent received with toolbar color: $toolbarColor" }
 
                 customTabDetector.setCustomTab(false)
                 _viewState.emit(
