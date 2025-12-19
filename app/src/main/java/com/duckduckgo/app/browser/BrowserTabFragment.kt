@@ -4957,6 +4957,24 @@ class BrowserTabFragment :
         webView?.loadUrl("${webView?.url.orEmpty()}$roomParameters")
     }
 
+    override fun permissionsGrantedForMediaCapture(
+        origin: String,
+        grantedResources: Array<String>,
+    ) {
+        val hasMediaCapture =
+            grantedResources.contains(PermissionRequest.RESOURCE_VIDEO_CAPTURE) ||
+                grantedResources.contains(PermissionRequest.RESOURCE_AUDIO_CAPTURE)
+        if (!hasMediaCapture) return
+
+        val currentHost = webView?.url?.toUri()?.host
+        val originHost = origin.toUri().host
+        if (currentHost != null && originHost != null && currentHost != originHost) return
+
+        // The permission grant is an explicit user action; allow the page to start its camera preview
+        // even if it relies on autoplay/implicit play() without an extra gesture.
+        webView?.safeSettings?.mediaPlaybackRequiresUserGesture = false
+    }
+
     fun onTabSwipedAway() {
         viewModel.onTabSwipedAway()
     }

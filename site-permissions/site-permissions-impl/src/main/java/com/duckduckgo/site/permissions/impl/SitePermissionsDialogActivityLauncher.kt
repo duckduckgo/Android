@@ -458,6 +458,10 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
     private fun grantPermissions() {
         val permissions = permissionsHandledAutomatically.toTypedArray() + permissionsHandledByUser
         try {
+            if (permissions.contains(PermissionRequest.RESOURCE_VIDEO_CAPTURE) || permissions.contains(PermissionRequest.RESOURCE_AUDIO_CAPTURE)) {
+                // Notify before granting so WebView settings can be adjusted before JS resumes.
+                permissionsGrantedListener.permissionsGrantedForMediaCapture(siteURL, permissions)
+            }
             sitePermissionRequest.grant(permissions)
         } catch (e: IllegalStateException) {
             // IllegalStateException is thrown when grant() or deny() have been called already.

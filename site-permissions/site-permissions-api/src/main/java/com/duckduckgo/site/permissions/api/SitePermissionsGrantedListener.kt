@@ -22,4 +22,20 @@ interface SitePermissionsGrantedListener {
 
     /** Loads embedded room url when permission is granted */
     fun permissionsGrantedOnWhereby()
+
+    /**
+     * Called when the user grants media capture permissions (camera and/or microphone) for a site.
+     *
+     * This can be used by the browser to perform additional per-tab adjustments that unblock expected
+     * in-page flows (e.g., starting a camera preview) after an explicit user permission grant.
+     *
+     * @param origin The requesting origin as a string (e.g., "https://example.com")
+     * @param grantedResources The granted WebView PermissionRequest resources (e.g., RESOURCE_VIDEO_CAPTURE)
+     */
+    fun permissionsGrantedForMediaCapture(
+        origin: String,
+        grantedResources: Array<String>,
+    ) {
+        // default no-op
+    }
 }
