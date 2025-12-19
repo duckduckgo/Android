@@ -2234,13 +2234,25 @@ class BrowserTabFragment :
             }
 
             is Command.HandleNonHttpAppLink -> {
-                openExternalDialog(
-                    intent = it.nonHttpAppLink.intent,
-                    fallbackUrl = it.nonHttpAppLink.fallbackUrl,
-                    fallbackIntent = it.nonHttpAppLink.fallbackIntent,
-                    useFirstActivityFound = false,
-                    headers = it.headers,
-                )
+                if (isActiveCustomTab() && isLaunchedFromExternalApp) {
+                    // For external Custom Tabs, non-HTTP(s) schemes are frequently used as auth callbacks
+                    // back into the originating app. Prompting here can break the flow and cause the app
+                    // to restart/loop the login process.
+                    launchNonHttpAppLinkFromExternalCustomTab(
+                        intent = it.nonHttpAppLink.intent,
+                        fallbackUrl = it.nonHttpAppLink.fallbackUrl,
+                        fallbackIntent = it.nonHttpAppLink.fallbackIntent,
+                        headers = it.headers,
+                    )
+                } else {
+                    openExternalDialog(
+                        intent = it.nonHttpAppLink.intent,
+                        fallbackUrl = it.nonHttpAppLink.fallbackUrl,
+                        fallbackIntent = it.nonHttpAppLink.fallbackIntent,
+                        useFirstActivityFound = false,
+                        headers = it.headers,
+                    )
+                }
             }
 
             is Command.ExtractUrlFromCloakedAmpLink -> {
@@ -2752,6 +2764,50 @@ class BrowserTabFragment :
                 }
             } else {
                 launchDialogForIntent(it, pm, intent, activities, useFirstActivityFound, viewModel.linkOpenedInNewTab())
+            }
+        }
+    }
+
+    private fun launchNonHttpAppLinkFromExternalCustomTab(
+        intent: Intent,
+        fallbackUrl: String? = null,
+        fallbackIntent: Intent? = null,
+        headers: Map<String, String> = emptyMap(),
+    ) {
+        // Only act if the fragment is still active; avoids launching from background tabs.
+        if (!isActiveCustomTab()) return
+
+        context?.let { context ->
+            val pm = context.packageManager
+            val activities = pm.queryIntentActivities(intent, 0)
+
+            when {
+                activities.isEmpty() -> {
+                    when {
+                        fallbackIntent != null -> {
+                            runCatching { context.startActivity(fallbackIntent) }
+                                .onFailure { showToast(R.string.unableToOpenLink) }
+                        }
+
+                        fallbackUrl != null -> {
+                            webView?.loadUrl(fallbackUrl, headers)
+                        }
+
+                        else -> showToast(R.string.unableToOpenLink)
+                    }
+                }
+
+                activities.size == 1 -> {
+                    runCatching { context.startActivity(intent) }
+                        .onFailure { showToast(R.string.unableToOpenLink) }
+                }
+
+                else -> {
+                    val title = getString(R.string.openExternalApp)
+                    val chooser = Intent.createChooser(intent, title)
+                    runCatching { context.startActivity(chooser) }
+                        .onFailure { showToast(R.string.unableToOpenLink) }
+                }
             }
         }
     }
