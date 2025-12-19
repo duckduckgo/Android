@@ -9,6 +9,7 @@ import com.duckduckgo.app.browser.DuckDuckGoUrlDetectorImpl
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrowserPrompts
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command
+import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.CopyUrlToClipboard
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.LaunchInputScreen
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState.Search
@@ -2464,6 +2465,46 @@ class OmnibarLayoutViewModelTest {
             val viewState = awaitItem()
             assertEquals("about:blank", viewState.omnibarText)
             assertTrue(viewState.updateOmnibarText)
+        }
+    }
+
+    @Test
+    fun whenCustomTabUrlLongClickedWithValidUrlThenCopyUrlToClipboardCommandSent() = runTest {
+        givenSiteLoaded(RANDOM_URL)
+
+        testee.onCustomTabUrlLongClicked()
+
+        testee.commands().test {
+            val command = awaitItem()
+            assertTrue(command is Command.CopyUrlToClipboard)
+            assertEquals(RANDOM_URL, (command as Command.CopyUrlToClipboard).url)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenCustomTabUrlLongClickedWithEmptyUrlThenNoCommandSent() = runTest {
+        givenSiteLoaded(EMPTY_URL)
+
+        testee.onCustomTabUrlLongClicked()
+
+        testee.commands().test {
+            expectNoEvents()
+        }
+    }
+
+    @Test
+    fun whenCustomTabUrlLongClickedThenCommandContainsCurrentViewStateUrl() = runTest {
+        val expectedUrl = "https://example.com/test"
+        givenSiteLoaded(expectedUrl)
+
+        testee.onCustomTabUrlLongClicked()
+
+        testee.commands().test {
+            val command = awaitItem()
+            assertTrue(command is Command.CopyUrlToClipboard)
+            assertEquals(expectedUrl, (command as Command.CopyUrlToClipboard).url)
+            cancelAndIgnoreRemainingEvents()
         }
     }
 }

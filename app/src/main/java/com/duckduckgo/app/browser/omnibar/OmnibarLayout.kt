@@ -18,6 +18,8 @@ package com.duckduckgo.app.browser.omnibar
 
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Context
 import android.graphics.Color
 import android.os.Build
@@ -37,6 +39,7 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.ContextCompat
@@ -586,6 +589,10 @@ class OmnibarLayout @JvmOverloads constructor(
         duckAISidebar.setOnClickListener {
             omnibarItemPressedListener?.onDuckAISidebarButtonPressed()
         }
+        newCustomTabToolbarContainer.customTabInnerContainer.setOnLongClickListener {
+            viewModel.onCustomTabUrlLongClicked()
+            true
+        }
     }
 
     override fun setLogoClickListener(logoClickListener: LogoClickListener) {
@@ -722,7 +729,18 @@ class OmnibarLayout @JvmOverloads constructor(
                     200,
                 )
             }
+
+            is Command.CopyUrlToClipboard -> {
+                copyUrlToClipboardAndShowToast(command)
+            }
         }
+    }
+
+    private fun copyUrlToClipboardAndShowToast(command: Command.CopyUrlToClipboard) {
+        val clipboardManager = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        val clipData = ClipData.newPlainText("URL", command.url)
+        clipboardManager.setPrimaryClip(clipData)
+        Toast.makeText(context, R.string.urlCopiedToClipboard, Toast.LENGTH_SHORT).show()
     }
 
     private fun moveCaretToFront() {
