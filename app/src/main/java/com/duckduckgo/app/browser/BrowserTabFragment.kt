@@ -1736,7 +1736,7 @@ class BrowserTabFragment :
                     val wasActive = isActiveTab
                     isActiveTab = it.tabId == tabId
                     if (wasActive && !isActiveTab) {
-                        logcat(tag = "RadoiuC") { "Tab $tabId is newly inactive" }
+                        logcat { "Tab $tabId is newly inactive" }
 
                         // want to ensure that we aren't offering to inject credentials from an inactive tab
                         hideDialogWithTag(CredentialAutofillPickerDialog.TAG)
