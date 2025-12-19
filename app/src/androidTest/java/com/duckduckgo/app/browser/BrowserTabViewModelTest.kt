@@ -681,7 +681,7 @@ class BrowserTabViewModelTest {
             whenever(mockDuckAiFeatureState.showInputScreen).thenReturn(mockDuckAiFeatureStateInputScreenFlow)
             whenever(mockDuckAiFeatureState.showInputScreenAutomaticallyOnNewTab).thenReturn(mockDuckAiFeatureStateInputScreenOpenAutomaticallyFlow)
             whenever(mockDuckAiFeatureState.showFullScreenMode).thenReturn(mockDuckAiFeatureStateFullScreenModeFlow)
-            whenever(mockDuckAiFeatureState.showFullScreenModeToggle).thenReturn(mockDuckAiContextualModeFlow)
+            whenever(mockDuckAiFeatureState.showContextualMode).thenReturn(mockDuckAiContextualModeFlow)
             whenever(mockExternalIntentProcessingState.hasPendingTabLaunch).thenReturn(mockHasPendingTabLaunchFlow)
             whenever(mockExternalIntentProcessingState.hasPendingDuckAiOpen).thenReturn(mockHasPendingDuckAiOpenFlow)
             whenever(mockVpnMenuStateProvider.getVpnMenuState()).thenReturn(flowOf(VpnMenuState.Hidden))

@@ -3110,12 +3110,6 @@ class BrowserTabFragment :
                 }
 
                 override fun onDuckChatButtonPressed() {
-                    showDuckChatBottomSheet()
-
-                    if (!duckAiFeatureState.showInputScreen.value) {
-                        pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_LEGACY_OMNIBAR_AICHAT_BUTTON_PRESSED)
-                        pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_LEGACY_OMNIBAR_AICHAT_BUTTON_PRESSED_DAILY, type = Daily())
-                    }
                     val hasFocus = omnibar.omnibarTextInput.hasFocus()
                     val isNtp = omnibar.viewMode == ViewMode.NewTab
                     onOmnibarDuckChatPressed(query = omnibar.getText(), hasFocus = hasFocus, isNtp = isNtp)

@@ -4466,28 +4466,31 @@ class BrowserTabViewModel @Inject constructor(
             command.value = HideKeyboardForChat
         }
 
-        if (duckAiFeatureState.showFullScreenModeToggle.value && !isNtp) {
-            command.value = Command.ShowDuckAIContextualMode
-            return
-        }
-
         if (!duckAiFeatureState.showInputScreen.value) {
             pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_LEGACY_OMNIBAR_AICHAT_BUTTON_PRESSED)
             pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_LEGACY_OMNIBAR_AICHAT_BUTTON_PRESSED_DAILY, type = Daily())
         }
 
-        if (duckAiFeatureState.showFullScreenMode.value) {
-            val url = when {
-                hasFocus && isNtp && query.isNullOrBlank() -> duckChat.getDuckChatUrl(query ?: "", false)
-                hasFocus -> duckChat.getDuckChatUrl(query ?: "", true)
-                else -> duckChat.getDuckChatUrl(query ?: "", false)
+        when {
+            duckAiFeatureState.showContextualMode.value && !isNtp -> {
+                command.value = Command.ShowDuckAIContextualMode
             }
-            onUserSubmittedQuery(url)
-        } else {
-            when {
-                hasFocus && isNtp && query.isNullOrBlank() -> duckChat.openDuckChat()
-                hasFocus -> duckChat.openDuckChatWithAutoPrompt(query ?: "")
-                else -> duckChat.openDuckChat()
+
+            duckAiFeatureState.showFullScreenMode.value -> {
+                val url = when {
+                    hasFocus && isNtp && query.isNullOrBlank() -> duckChat.getDuckChatUrl(query ?: "", false)
+                    hasFocus -> duckChat.getDuckChatUrl(query ?: "", true)
+                    else -> duckChat.getDuckChatUrl(query ?: "", false)
+                }
+                onUserSubmittedQuery(url)
+            }
+
+            else -> {
+                when {
+                    hasFocus && isNtp && query.isNullOrBlank() -> duckChat.openDuckChat()
+                    hasFocus -> duckChat.openDuckChatWithAutoPrompt(query ?: "")
+                    else -> duckChat.openDuckChat()
+                }
             }
         }
     }
