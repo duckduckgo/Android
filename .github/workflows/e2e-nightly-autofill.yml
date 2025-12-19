@@ -93,7 +93,11 @@ jobs:
           asana-project: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
           asana-section: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
           asana-task-name: E2E Tests Failure - Autofill Critical Path
-          asana-task-description: Autofill critical path Maestro tests failed. See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
+          asana-task-description: |
+            Run: https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
+            Console: ${{ steps.maestro-critical-path.outputs.MAESTRO_CLOUD_CONSOLE_URL }}
+            Summary:
+            ${{ steps.analyze-maestro-critical-path.outputs.flow_summary_message }}
           action: 'create-asana-task'
 
       - name: Autofill web flows
@@ -133,7 +137,11 @@ jobs:
           asana-project: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
           asana-section: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
           asana-task-name: E2E Tests Failure - Autofill Web Flows
-          asana-task-description: Autofill web flows Maestro tests failed. See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
+          asana-task-description: |
+            Run: https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
+            Console: ${{ steps.maestro-web-flows.outputs.MAESTRO_CLOUD_CONSOLE_URL }}
+            Summary:
+            ${{ steps.analyze-maestro-web-flows.outputs.flow_summary_message }}
           action: 'create-asana-task'
 
       - name: Create Asana task when workflow failed
@@ -144,6 +152,6 @@ jobs:
           asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana-project: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
           asana-section: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
-          asana-task-name: GH Workflow Failure - Autofill Critical Path (Nightly)
+          asana-task-name: GH Workflow Failure - Autofill Critical Path End to End Tests (Nightly)
           asana-task-description: Workflow execution has failed. See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
           action: 'create-asana-task'

@@ -1,8 +1,6 @@
-name: Omnibar End-to-End tests
+name: 'End to End Tests - Security Internal'
 
 on:
-  schedule:
-    - cron: '0 7 * * *' # run at 7 AM UTC
   workflow_dispatch:
 
 concurrency:
@@ -12,7 +10,7 @@ concurrency:
 jobs:
   instrumentation_tests:
     runs-on: ubuntu-latest
-    name: End-to-End tests
+    name: Security Internal End-to-End tests
 
     steps:
       - name: Checkout repository
@@ -49,26 +47,26 @@ jobs:
         with:
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
 
-      - name: Assemble the project
-        run: ./gradlew assemblePlayRelease -Pforce-default-variant -Pskip-onboarding -x lint
+      - name: Assemble internal release APK
+        run: ./gradlew assembleInternalRelease -Pforce-default-variant -Pskip-onboarding
 
       - name: Move APK to new folder
         if: always()
-        run: find . -name "*.apk"  -exec mv '{}' apk/playRelease.apk \;
+        run: find . -name "*internal-release*.apk" -exec mv '{}' apk/internal.apk \;
 
-      - name: Omnibar Maestro run
+      - name: Security Internal Maestro run
         id: maestro-run
         uses: mobile-dev-inc/action-maestro-cloud@v1.9.8
         timeout-minutes: 120
         with:
           api-key: ${{ secrets.ROBIN_API_KEY }}
           project-id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
-          name: omnibar_${{ github.sha }}
+          name: internalSecurityTest_${{ github.sha }}
           timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
-          app-file: apk/playRelease.apk
-          android-api-level: 34
+          app-file: apk/internal.apk
+          android-api-level: 30
           workspace: .maestro
-          include-tags: omnibarTest
+          include-tags: securityTestInternal
 
       - name: Analyze Maestro Flow Results
         if: always()
@@ -80,13 +78,33 @@ jobs:
           upload_status: ${{ steps.maestro-run.outputs.MAESTRO_CLOUD_UPLOAD_STATUS }}
           app_binary_id: ${{ steps.maestro-run.outputs.MAESTRO_CLOUD_APP_BINARY_ID }}
 
-      - name: Create Asana task when workflow failed
-        if: ${{ failure() }}
-        uses: honeycombio/gha-create-asana-task@main
+      - name: Show analyzer output
+        if: always()
+        run: echo "flow_summary_status=${{ steps.analyze-maestro.outputs.flow_summary_status }}"
+
+      - name: Create Asana task when Maestro tests failed
+        if: always() && steps.analyze-maestro.outputs.flow_summary_status == 'failure'
+        id: create-maestro-failure-task
+        uses: duckduckgo/native-github-asana-sync@v2.0
         with:
-          asana-secret: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          asana-workspace-id: ${{ secrets.GH_ASANA_WORKSPACE_ID }}
-          asana-project-id: ${{ secrets.GH_ASANA_AOR_PROJECT_ID }}
-          asana-section-id: ${{ secrets.GH_ASANA_INCOMING_ID }}
-          asana-task-name: GH Workflow Failure - Omnibar E2E tests
-          asana-task-description: The Omnibar end-to-end workflow has failed. See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
+          asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          asana-project: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
+          asana-section: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
+          asana-task-name: E2E Tests Failure - Security
+          asana-task-description: |
+            Run: https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
+            Console: ${{ steps.maestro-run.outputs.MAESTRO_CLOUD_CONSOLE_URL }}
+            Summary:
+            ${{ steps.analyze-maestro.outputs.flow_summary_message }}
+          action: 'create-asana-task'
+
+      - name: Create Asana task when workflow failed
+        if: ${{ failure() && steps.analyze-maestro.outputs.flow_summary_status != 'failure' }}
+        uses: duckduckgo/native-github-asana-sync@v2.0
+        with:
+          asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          asana-project: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
+          asana-section: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
+          asana-task-name: GH Workflow Failure - Security End to End Tests
+          asana-task-description: The Security end-to-end workflow has failed. See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
+          action: 'create-asana-task'
