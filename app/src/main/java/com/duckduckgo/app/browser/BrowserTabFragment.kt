@@ -1759,6 +1759,15 @@ class BrowserTabFragment :
 
                         // want to ensure that we aren't offering to inject credentials from an inactive tab
                         hideDialogWithTag(CredentialAutofillPickerDialog.TAG)
+
+                        // In Custom Tabs, new windows are implemented as a fragment back stack.
+                        // When a popup window calls `window.close()`, WebView stops loading for that window before
+                        // this callback reaches us, which can leave the UI on a "dead"/blank WebView.
+                        // Selecting the source tab in the repository makes this fragment inactive; if we're currently
+                        // visible and there's a back stack entry, pop back to the opener fragment immediately.
+                        if (isActiveCustomTab() && parentFragmentManager.backStackEntryCount > 0) {
+                            (activity as? CustomTabActivity)?.supportFragmentManager?.popBackStack()
+                        }
                     }
                 }
             },
