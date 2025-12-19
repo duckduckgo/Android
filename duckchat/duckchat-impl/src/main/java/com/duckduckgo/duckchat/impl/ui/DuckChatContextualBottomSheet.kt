@@ -103,7 +103,6 @@ class DuckChatContextualBottomSheet(
     }
 
     private var sheetMode = SheetMode.INPUT
-    private var lastUrl: String? = null
 
     private var _binding: BottomSheetDuckAiContextualBinding? = null
     private val binding get() = _binding!!
@@ -144,7 +143,6 @@ class DuckChatContextualBottomSheet(
                         if (newState == BottomSheetBehavior.STATE_EXPANDED) {
                             logcat { "Duck.ai Contextual: STATE_EXPANDED" }
                             it.behavior.skipCollapsed = true
-                            it.behavior.isDraggable = true
                             isExpanded = true
                             binding.simpleWebview.show()
                         }
@@ -185,7 +183,7 @@ class DuckChatContextualBottomSheet(
                 val peekHeight = calculatePeekHeight(binding)
                 if (peekHeight > 0) {
                     bottomSheetDialog.behavior.peekHeight = peekHeight
-                    bottomSheetDialog.behavior.state == BottomSheetBehavior.STATE_COLLAPSED
+                    bottomSheetDialog.behavior.state = BottomSheetBehavior.STATE_COLLAPSED
                 }
             }
         }

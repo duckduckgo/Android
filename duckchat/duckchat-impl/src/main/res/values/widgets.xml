@@ -23,7 +23,6 @@
     <style name="DuckChatBottomSheetStyle" parent="Widget.MaterialComponents.BottomSheet.Modal">
         <item name="behavior_skipCollapsed">false</item>
         <item name="behavior_hideable">true</item>
-        <item name="behavior_draggable">false</item>
         <item name="behavior_expandedOffset">80dp</item>
     </style>
 
