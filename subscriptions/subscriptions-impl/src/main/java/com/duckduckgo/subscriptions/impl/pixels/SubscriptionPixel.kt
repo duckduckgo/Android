@@ -278,6 +278,7 @@ object SubscriptionPixelParameter {
     const val ERROR_TYPE = "errorType"
     const val REASON = "reason"
     const val OS_VERSION = "os_version"
+    const val PETAL = "petal"
 }
 
 internal val PixelType.pixelNameSuffix: String
