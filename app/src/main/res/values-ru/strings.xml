@@ -74,6 +74,7 @@
     <string name="options">Параметры</string>
     <string name="shareLink">Поделиться ссылкой</string>
     <string name="copyUrl">Скопировать ссылку</string>
+    <string name="urlCopiedToClipboard">URL скопирован в буфер обмена</string>
 
     <!-- Find in page -->
     <string name="nextSearchTermDescription">Найти следующий</string>
