@@ -70,6 +70,7 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
 
     private val conflatedJob = ConflatedJob()
     private val coroutineScope = CoroutineScope(SupervisorJob() + dispatcherProvider.main())
+    private val runningCookieAnimators = mutableListOf<Animator>()
 
     lateinit var firstScene: Scene
     lateinit var secondScene: Scene
@@ -211,6 +212,7 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         addressBarTrackersAnimator.cancelAnimation()
         stopTrackersAnimation()
         stopCookiesAnimation()
+        enqueueCookiesAnimation = false
         omnibarViews.forEach { it.alpha = 1f }
         shieldViews.forEach { it.alpha = 1f }
     }
@@ -230,6 +232,11 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         omnibarViews: List<View>,
     ) {
         if (omnibarViews.any { it.id == R.id.customTabDomain }) return // Do not show cookies animation in custom tabs
+
+        // Cancel any running animators before starting new ones
+        runningCookieAnimators.forEach { it.cancel() }
+        runningCookieAnimators.clear()
+
         isCookiesAnimationRunning = true
 
         if (cookieCosmeticHide) {
@@ -280,6 +287,7 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
                                                 listener?.onAnimationFinished()
                                             },
                                         )
+                                        runningCookieAnimators.add(this)
                                         start()
                                     }
                                 } else {
@@ -288,6 +296,7 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
                                 }
                             },
                         )
+                        runningCookieAnimators.add(this)
                         start()
                     }
                 }
@@ -306,6 +315,7 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
                     if (!hasCookiesAnimationBeenCanceled) {
                         AnimatorSet().apply {
                             play(commonAddressBarAnimationHelper.animateViewsIn(allOmnibarViews))
+                            runningCookieAnimators.add(this)
                             start()
                         }
                         cookieScene.gone()
@@ -347,6 +357,7 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
                     cookieView.playAnimation()
                 },
             )
+            runningCookieAnimators.add(this)
             start()
         }
     }
@@ -417,13 +428,30 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         if (!::cookieViewBackground.isInitialized || !::cookieView.isInitialized) return
 
         hasCookiesAnimationBeenCanceled = true
-        if (this::firstScene.isInitialized) {
-            TransitionManager.go(firstScene)
+        isCookiesAnimationRunning = false
+
+        // Cancel all running animators
+        runningCookieAnimators.forEach { animator ->
+            animator.cancel()
+            animator.removeAllListeners()
         }
+        runningCookieAnimators.clear()
+
+        // Cancel cookie view animations
+        cookieView.cancelAnimation()
+        cookieView.removeAllAnimatorListeners()
+
+        // End any ongoing transitions without triggering new ones
+        if (::cookieScene.isInitialized) {
+            TransitionManager.endTransitions(cookieScene)
+            cookieScene.gone()
+        }
+
+        // Reset view states directly without triggering transitions
         shieldAnimation?.alpha = 1f
         currentShieldViews.forEach { it.alpha = 1f }
         cookieViewBackground.alpha = 0f
-        cookieScene.gone()
+        cookieView.alpha = 0f
         cookieView.gone()
     }
 
