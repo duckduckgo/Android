@@ -427,10 +427,7 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
     private fun stopCookiesAnimation() {
         if (!::cookieViewBackground.isInitialized || !::cookieView.isInitialized) return
 
-        hasCookiesAnimationBeenCanceled = true
-        isCookiesAnimationRunning = false
-
-        // Cancel all running animators
+        // Always cancel any pending animators and transitions to prevent glimpses
         runningCookieAnimators.forEach { animator ->
             animator.cancel()
             animator.removeAllListeners()
@@ -446,6 +443,14 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
             TransitionManager.endTransitions(cookieScene)
             cookieScene.gone()
         }
+
+        // If animation was already stopped by user, skip redundant state updates
+        if (hasCookiesAnimationBeenCanceled && !isCookiesAnimationRunning) {
+            return
+        }
+
+        hasCookiesAnimationBeenCanceled = true
+        isCookiesAnimationRunning = false
 
         // Reset view states directly without triggering transitions
         shieldAnimation?.alpha = 1f
