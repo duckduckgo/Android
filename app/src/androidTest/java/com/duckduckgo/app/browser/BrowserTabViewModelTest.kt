@@ -600,7 +600,6 @@ class BrowserTabViewModelTest {
         }
     }
 
-    private val mockSerpEasterEggLogoToggles: SerpEasterEggLogosToggles = mock()
     private val mockAddressBarTrackersAnimationManager: AddressBarTrackersAnimationManager = mock()
 
     private val nonHttpAppLinkChecker: NonHttpAppLinkChecker = mock()
@@ -697,7 +696,6 @@ class BrowserTabViewModelTest {
             whenever(mockExternalIntentProcessingState.hasPendingTabLaunch).thenReturn(mockHasPendingTabLaunchFlow)
             whenever(mockExternalIntentProcessingState.hasPendingDuckAiOpen).thenReturn(mockHasPendingDuckAiOpenFlow)
             whenever(mockVpnMenuStateProvider.getVpnMenuState()).thenReturn(flowOf(VpnMenuState.Hidden))
-            whenever(mockSerpEasterEggLogoToggles.feature()).thenReturn(mockDisabledToggle)
             whenever(nonHttpAppLinkChecker.isPermitted(anyOrNull())).thenReturn(true)
             remoteMessagingModel = givenRemoteMessagingModel(mockRemoteMessagingRepository, mockPixel, coroutineRule.testDispatcherProvider)
             runBlocking { whenever(mockAddressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(false) }
@@ -861,7 +859,6 @@ class BrowserTabViewModelTest {
                 tabManager = tabManager,
                 addressDisplayFormatter = mockAddressDisplayFormatter,
                 autoCompleteSettings = mockAutoCompleteSettings,
-                serpEasterEggLogosToggles = mockSerpEasterEggLogoToggles,
                 nonHttpAppLinkChecker = nonHttpAppLinkChecker,
                 externalIntentProcessingState = mockExternalIntentProcessingState,
                 vpnMenuStateProvider = mockVpnMenuStateProvider,
@@ -7688,8 +7685,7 @@ class BrowserTabViewModelTest {
         }
 
     @Test
-    fun whenEvaluateSerpLogoStateCalledWithDuckDuckGoUrlAndFeatureEnabledThenExtractSerpLogoCommandIssued() {
-        whenever(mockSerpEasterEggLogoToggles.feature()).thenReturn(mockEnabledToggle)
+    fun whenEvaluateSerpLogoStateCalledWithDuckDuckGoUrlThenExtractSerpLogoCommandIssued() {
         whenever(mockDuckAiFeatureState.showFullScreenMode).thenReturn(mockDuckAiFullScreenMode)
         val ddgUrl = "https://duckduckgo.com/?q=test"
         val webViewNavState = WebViewNavigationState(mockStack, 100)
@@ -7705,25 +7701,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenEvaluateSerpLogoStateCalledWithDuckDuckGoUrlAndFeatureDisabledThenExtractSerpLogoCommandNotIssued() {
-        whenever(mockSerpEasterEggLogoToggles.feature()).thenReturn(mockDisabledToggle)
-        whenever(mockDuckAiFeatureState.showFullScreenMode).thenReturn(mockDuckAiFullScreenMode)
-
-        val ddgUrl = "https://duckduckgo.com/?q=test"
-        val webViewNavState = WebViewNavigationState(mockStack, 100)
-
-        testee.pageFinished(mockWebView, webViewNavState, ddgUrl)
-
-        val commands = commandCaptor.allValues
-        assertFalse(
-            "ExtractSerpLogo command should NOT be issued when SERP logos feature is disabled",
-            commands.any { it is Command.ExtractSerpLogo },
-        )
-    }
-
-    @Test
-    fun whenEvaluateSerpLogoStateCalledWithNonDuckDuckGoUrlAndFeatureEnabledThenExtractSerpLogoCommandNotIssued() {
-        whenever(mockSerpEasterEggLogoToggles.feature()).thenReturn(mockEnabledToggle)
+    fun whenEvaluateSerpLogoStateCalledWithNonDuckDuckGoUrlThenExtractSerpLogoCommandNotIssued() {
         whenever(mockDuckAiFeatureState.showFullScreenMode).thenReturn(mockDuckAiFullScreenMode)
 
         val nonDdgUrl = "https://example.com/search?q=test"
@@ -7739,8 +7717,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenEvaluateSerpLogoStateCalledWithNonDuckDuckGoUrlAndFeatureEnabledThenSerpLogoIsCleared() {
-        whenever(mockSerpEasterEggLogoToggles.feature()).thenReturn(mockEnabledToggle)
+    fun whenEvaluateSerpLogoStateCalledWithNonDuckDuckGoUrlThenSerpLogoIsCleared() {
         whenever(mockDuckAiFeatureState.showFullScreenMode).thenReturn(mockDuckAiFullScreenMode)
         val nonDdgUrl = "https://example.com/search?q=test"
         val webViewNavState = WebViewNavigationState(mockStack, 100)
