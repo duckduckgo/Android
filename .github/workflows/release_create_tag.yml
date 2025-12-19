@@ -45,7 +45,7 @@ jobs:
       - name: Get LGC
         id: get_lgc_tag
         run: |
-          output=$(git tag -l "nightly-*" --sort=-refname | head -n 1)
+          output=$(git tag -l "LGC-*" --sort=-refname | head -n 1)
           echo "lgc_tag=$output" >> $GITHUB_OUTPUT
 
       - name: Check for production release on LGC commit
