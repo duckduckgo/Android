@@ -1,0 +1,151 @@
+{
+  "name": "FakeBroker",
+  "url": "fake-broker.com",
+  "version": "0.7.0",
+  "addedDatetime": 1692572400000,
+  "optOutUrl": "https://fake-broker.com/optout",
+  "newUnknownProperty": "should-be-ignored",
+  "steps": [
+    {
+      "stepType": "scan",
+      "scanType": "templatedUrl",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "id": "a1b2c3d4-1111-2222-3333-444455556666",
+          "url": "https://www.fake-broker.com/${firstName}-${lastName}/${state|stateFull}/${city}",
+          "newUnknownProperty": "should-be-ignored"
+        },
+        {
+          "actionType": "extract",
+          "id": "b2c3d4e5-2222-3333-4444-555566667777",
+          "selector": "div[role='listitem']",
+          "noResultsSelector": ".no_results_container",
+          "profile": {
+            "name": {
+              "selector": "h3",
+              "beforeText": ","
+            },
+            "age": {
+              "selector": "h3",
+              "afterText": ","
+            },
+            "addressCityState": {
+              "selector": ".//div[contains(text(), 'Reside')]",
+              "afterText": "Resides in"
+            },
+            "addressCityStateList": {
+              "selector": ".//div[span[text() = 'Lived In']]",
+              "afterText": "Lived In",
+              "separator": ","
+            },
+            "relativesList": {
+              "selector": ".//div[span[text() = 'Related To']]/a",
+              "findElements": true
+            },
+            "alternativeNamesList": {
+              "selector": ".//div[span[text() = 'Also known as']]",
+              "afterText": "Also known as"
+            },
+            "profileUrl": {
+              "selector": "a",
+              "identifierType": "path",
+              "identifier": "https://www.fake-broker.com/${firstName}-${lastName}/${state|stateFull}/${city|hyphenated}/${id}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "stepType": "optOut",
+      "optOutType": "formOptOut",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "id": "c3d4e5f6-3333-4444-5555-666677778888",
+          "url": "https://www.fake-broker.com/optout"
+        },
+        {
+          "actionType": "expectation",
+          "id": "d4e5f6a7-4444-5555-6666-777788889999",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "#g-recaptcha",
+              "parent": ".optout_container"
+            }
+          ]
+        },
+        {
+          "actionType": "fillForm",
+          "id": "e5f6a7b8-5555-6666-7777-88889999aaaa",
+          "selector": ".optout_container",
+          "elements": [
+            {
+              "type": "email",
+              "selector": ".//input[@name='email']"
+            },
+            {
+              "type": "profileUrl",
+              "selector": ".//input[@name='url']"
+            }
+          ]
+        },
+        {
+          "actionType": "getCaptchaInfo",
+          "id": "f6a7b8c9-6666-7777-8888-9999aaaabbbb",
+          "selector": "#g-recaptcha"
+        },
+        {
+          "actionType": "solveCaptcha",
+          "id": "a7b8c9d0-7777-8888-9999-aaaabbbbcccc",
+          "selector": "#g-recaptcha"
+        },
+        {
+          "actionType": "click",
+          "id": "b8c9d0e1-8888-9999-aaaa-bbbbccccdddd",
+          "elements": [
+            {
+              "type": "button",
+              "selector": ".responsive-button"
+            }
+          ]
+        },
+        {
+          "actionType": "expectation",
+          "id": "c9d0e1f2-9999-aaaa-bbbb-ccccddddeeee",
+          "expectations": [
+            {
+              "type": "text",
+              "selector": "body",
+              "expect": "Please check your inbox for a confirmation email"
+            }
+          ]
+        },
+        {
+          "actionType": "emailConfirmation",
+          "id": "d0e1f2a3-aaaa-bbbb-cccc-ddddeeeeffff",
+          "pollingTime": 30
+        },
+        {
+          "actionType": "expectation",
+          "id": "e1f2a3b4-bbbb-cccc-dddd-eeeeffff0000",
+          "expectations": [
+            {
+              "type": "text",
+              "selector": "body",
+              "expect": "We've received your request to remove"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "schedulingConfig": {
+    "retryError": 48,
+    "confirmOptOutScan": 72,
+    "maintenanceScan": 120,
+    "maxAttempts": -1
+  },
+  "removedAt": null
+}
