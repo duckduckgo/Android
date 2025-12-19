@@ -16,24 +16,26 @@
 
 package com.duckduckgo.common.ui.compose.text
 
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.takeOrElse
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewLightDark
-import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTextStyle
 import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
-import com.duckduckgo.common.ui.compose.theme.asTextStyle
 import com.duckduckgo.common.ui.compose.tools.PreviewBox
 import com.duckduckgo.common.ui.compose.tools.PreviewBoxInverted
 
 /**
  * Base text component for the DuckDuckGo design system.
  *
- * @param color The text color. Should use colors from [DuckDuckGoTheme.textColors] for consistency
- * with the design system (e.g., [DuckDuckGoTheme.textColors.primary], [DuckDuckGoTheme.textColors.secondary]).
+ * @param color The text color. Should use colors from [DuckDuckGoTheme.colors.text] for consistency
+ * with the design system (e.g., [DuckDuckGoTheme.colors.text.primary], [DuckDuckGoTheme.colors.text.secondary]).
  * A lint rule will warn if arbitrary colors are used.
  *
  * Asana Task: https://app.asana.com/1/137249556945/project/1202857801505092/task/1211634956773768
@@ -43,16 +45,17 @@ import com.duckduckgo.common.ui.compose.tools.PreviewBoxInverted
 fun DaxText(
     text: String,
     modifier: Modifier = Modifier,
-    style: DuckDuckGoTextStyle = DuckDuckGoTheme.typography.body1,
-    color: Color = DuckDuckGoTheme.textColors.primary,
+    color: Color = Color.Unspecified,
+    style: TextStyle = LocalTextStyle.current,
     textAlign: TextAlign? = null,
     overflow: TextOverflow = TextOverflow.Ellipsis,
     maxLines: Int = Int.MAX_VALUE,
 ) {
+    val textColor = color.takeOrElse { style.color.takeOrElse { LocalContentColor.current } }
     Text(
         text = text,
-        color = color,
-        style = style.asTextStyle,
+        color = textColor,
+        style = style,
         textAlign = textAlign,
         overflow = overflow,
         maxLines = maxLines,
@@ -170,7 +173,7 @@ private fun DaxTextColorPrimaryPreview() {
     PreviewBox {
         DaxText(
             text = "Primary Color",
-            color = DuckDuckGoTheme.textColors.primary,
+            color = DuckDuckGoTheme.colors.text.primary,
         )
     }
 }
@@ -181,7 +184,7 @@ private fun DaxTextColorPrimaryInvertedPreview() {
     PreviewBoxInverted {
         DaxText(
             text = "Primary Inverted",
-            color = DuckDuckGoTheme.textColors.primaryInverted,
+            color = DuckDuckGoTheme.colors.text.primaryInverted,
         )
     }
 }
@@ -192,7 +195,7 @@ private fun DaxTextColorSecondaryPreview() {
     PreviewBox {
         DaxText(
             text = "Secondary Color",
-            color = DuckDuckGoTheme.textColors.secondary,
+            color = DuckDuckGoTheme.colors.text.secondary,
         )
     }
 }
@@ -203,7 +206,7 @@ private fun DaxTextColorSecondaryInvertedPreview() {
     PreviewBoxInverted {
         DaxText(
             text = "Secondary Inverted",
-            color = DuckDuckGoTheme.textColors.secondaryInverted,
+            color = DuckDuckGoTheme.colors.text.secondaryInverted,
         )
     }
 }
@@ -214,7 +217,7 @@ private fun DaxTextColorTertiaryPreview() {
     PreviewBox {
         DaxText(
             text = "Tertiary Color",
-            color = DuckDuckGoTheme.textColors.tertiary,
+            color = DuckDuckGoTheme.colors.text.tertiary,
         )
     }
 }
@@ -225,7 +228,7 @@ private fun DaxTextColorDisabledPreview() {
     PreviewBox {
         DaxText(
             text = "Disabled Color",
-            color = DuckDuckGoTheme.textColors.disabled,
+            color = DuckDuckGoTheme.colors.text.disabled,
         )
     }
 }

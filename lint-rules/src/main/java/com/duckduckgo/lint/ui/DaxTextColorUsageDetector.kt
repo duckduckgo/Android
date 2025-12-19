@@ -53,7 +53,7 @@ class DaxTextColorUsageDetector : Detector(), SourceCodeScanner {
                 parameterName == "color"
             } ?: return // No color parameter provided, using default is fine
 
-            // Check if the color argument comes from DuckDuckGoTheme.textColors
+            // Check if the color argument comes from DuckDuckGoTheme.colors.text
             val isFromTextColors = isFromDuckDuckGoTextColors(colorArgument)
 
             if (!isFromTextColors) {
@@ -64,13 +64,13 @@ class DaxTextColorUsageDetector : Detector(), SourceCodeScanner {
         private fun isFromDuckDuckGoTextColors(argument: org.jetbrains.uast.UExpression): Boolean {
             val source = argument.sourcePsi?.text ?: return false
 
-            // Check if the source contains DuckDuckGoTheme.textColors or theme.textColors
+            // Check if the source contains DuckDuckGoTheme.colors.text or theme.colors.text
             // This covers cases like:
-            // - DuckDuckGoTheme.textColors.primary
-            // - theme.textColors.secondary
-            return source.contains("DuckDuckGoTheme.textColors") ||
-                   source.contains("theme.textColors") ||
-                   source.contains(".textColors.")
+            // - DuckDuckGoTheme.colors.text.primary
+            // - theme.colors.text.secondary
+            return source.contains("DuckDuckGoTheme.colors.text") ||
+                   source.contains("theme.colors.text") ||
+                   source.contains(".colors.text")
         }
 
         private fun reportInvalidColorUsage(colorArgument: org.jetbrains.uast.UExpression) {
@@ -86,13 +86,13 @@ class DaxTextColorUsageDetector : Detector(), SourceCodeScanner {
         val INVALID_DAX_TEXT_COLOR_USAGE = Issue
             .create(
                 id = "InvalidDaxTextColorUsage",
-                briefDescription = "DaxText color parameter should use DuckDuckGoTheme.textColors",
+                briefDescription = "DaxText color parameter should use DuckDuckGoTheme.colors.text colors",
                 explanation = """
-                    Use DuckDuckGoTheme.textColors instead of arbitrary Color values to maintain design system consistency and theme support.
+                    Use DuckDuckGoTheme.colors.text instead of arbitrary Color values to maintain design system consistency and theme support.
 
                     Examples:
-                    • DuckDuckGoTheme.textColors.primary
-                    • DuckDuckGoTheme.textColors.secondary
+                    • DuckDuckGoTheme.colors.text.primary
+                    • DuckDuckGoTheme.colors.text.secondary
 
                     For one-off cases requiring custom colors, use good judgement or consider raising it in the Android Design System AOR.
                 """.trimIndent(),

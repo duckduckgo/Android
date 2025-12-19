@@ -32,7 +32,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -41,9 +40,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import com.duckduckgo.common.ui.compose.text.DaxText
-import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTextStyle
 import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
-import com.duckduckgo.common.ui.compose.theme.asTextStyle
 import com.duckduckgo.mobile.android.R
 
 /**
@@ -110,11 +107,10 @@ private fun DaxActionTitleBottomSheetDialog(
     contentColor: Color = DaxActionBottomSheetDefaults.contentColor,
     style: TextStyle = DaxActionBottomSheetDefaults.style,
 ) {
-    val daxStyle = remember(style) { DuckDuckGoTextStyle(style) }
     DaxText(
         text = text,
         color = contentColor,
-        style = daxStyle,
+        style = style,
         modifier = modifier
             .padding(DaxActionBottomSheetDefaults.sheetActionTitleContentPadding),
     )
@@ -123,7 +119,7 @@ private fun DaxActionTitleBottomSheetDialog(
 object DaxActionBottomSheetDefaults {
     internal val style: TextStyle
         @Composable
-        get() = DuckDuckGoTheme.typography.body1.asTextStyle
+        get() = DuckDuckGoTheme.typography.body1
 
     internal val contentColor: Color
         @Composable

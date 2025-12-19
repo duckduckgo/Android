@@ -151,7 +151,7 @@ class ColorPaletteFragment : Fragment() {
             DaxColorAttributeListItem(
                 text = "Primary Text",
                 dotColors = DaxColorDotColors(
-                    fillColor = DuckDuckGoTheme.textColors.primary,
+                    fillColor = DuckDuckGoTheme.colors.text.primary,
                     strokeColor = DuckDuckGoTheme.colors.backgrounds.backgroundInverted,
                 ),
             )
@@ -162,7 +162,7 @@ class ColorPaletteFragment : Fragment() {
             DaxColorAttributeListItem(
                 text = "Secondary Text",
                 dotColors = DaxColorDotColors(
-                    fillColor = DuckDuckGoTheme.textColors.secondary,
+                    fillColor = DuckDuckGoTheme.colors.text.secondary,
                     strokeColor = DuckDuckGoTheme.colors.backgrounds.backgroundInverted,
                 ),
             )
@@ -173,7 +173,7 @@ class ColorPaletteFragment : Fragment() {
             DaxColorAttributeListItem(
                 text = "Text Disabled",
                 dotColors = DaxColorDotColors(
-                    fillColor = DuckDuckGoTheme.textColors.disabled,
+                    fillColor = DuckDuckGoTheme.colors.text.disabled,
                     strokeColor = DuckDuckGoTheme.colors.backgrounds.backgroundInverted,
                 ),
             )

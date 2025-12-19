@@ -19,7 +19,9 @@ package com.duckduckgo.common.ui.compose.theme
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.material3.ColorScheme
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ProvideTextStyle
 import androidx.compose.material3.Shapes
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -35,16 +37,6 @@ object DuckDuckGoTheme {
         @Composable
         @ReadOnlyComposable
         get() = LocalDuckDuckGoColors.current
-
-    val textColors: DuckDuckGoTextColors
-        @Composable
-        @ReadOnlyComposable
-        get() = colors.text
-
-    val iconColors: DuckDuckGoIconsColors
-        @Composable
-        @ReadOnlyComposable
-        get() = colors.icons
 
     val shapes
         @Composable
@@ -188,7 +180,17 @@ fun DuckDuckGoTheme(
             colorScheme = debugColors(),
             typography = debugTypography(),
             shapes = debugShapes,
-            content = content,
+            content = {
+                ProvideTextStyle(
+                    LocalDuckDuckGoTypography.current.body1,
+                    content = {
+                        CompositionLocalProvider(
+                            LocalContentColor provides colors.text.primary,
+                            content = content,
+                        )
+                    },
+                )
+            },
         )
     }
 }

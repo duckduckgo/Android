@@ -52,7 +52,6 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import com.duckduckgo.common.ui.compose.text.DaxText
 import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
 import com.duckduckgo.common.ui.compose.theme.Transparent
-import com.duckduckgo.common.ui.compose.theme.asTextStyle
 import com.duckduckgo.common.ui.compose.tools.PreviewBox
 import com.duckduckgo.mobile.android.R
 
@@ -96,13 +95,13 @@ fun DaxTextField(
     // override is needed as TextField uses MaterialTheme.typography internally for animating the label text style
     MaterialTheme(
         typography = Typography(
-            bodySmall = DuckDuckGoTheme.typography.caption.asTextStyle.copy(
+            bodySmall = DuckDuckGoTheme.typography.caption.copy(
                 fontFamily = FontFamily.Default,
-                color = DuckDuckGoTheme.textColors.secondary,
+                color = DuckDuckGoTheme.colors.text.secondary,
             ),
-            bodyLarge = DuckDuckGoTheme.typography.body1.asTextStyle.copy(
+            bodyLarge = DuckDuckGoTheme.typography.body1.copy(
                 fontFamily = FontFamily.Default,
-                color = DuckDuckGoTheme.textColors.secondary,
+                color = DuckDuckGoTheme.colors.text.secondary,
             ),
         ),
     ) {
@@ -142,7 +141,7 @@ fun DaxTextField(
                     null
                 },
                 labelPosition = TextFieldLabelPosition.Attached(),
-                textStyle = DuckDuckGoTheme.typography.body1.asTextStyle,
+                textStyle = DuckDuckGoTheme.typography.body1,
                 trailingIcon = trailingIcon?.let {
                     {
                         DaxTextFieldTrailingIconScope.it()
@@ -155,7 +154,7 @@ fun DaxTextField(
                         DaxText(
                             text = error,
                             style = DuckDuckGoTheme.typography.caption,
-                            color = DuckDuckGoTheme.textColors.destructive,
+                            color = DuckDuckGoTheme.colors.text.destructive,
                         )
                     }
                 } else {
@@ -246,7 +245,7 @@ object DaxTextFieldTrailingIconScope {
             Icon(
                 painter = painter,
                 contentDescription = contentDescription,
-                tint = DuckDuckGoTheme.iconColors.primary,
+                tint = DuckDuckGoTheme.colors.icons.primary,
             )
         }
     }
@@ -301,10 +300,10 @@ enum class DaxTextFieldInputMode {
 
 @Composable
 internal fun daxTextFieldColors(): TextFieldColors = OutlinedTextFieldDefaults.colors(
-    focusedTextColor = DuckDuckGoTheme.textColors.primary,
-    unfocusedTextColor = DuckDuckGoTheme.textColors.primary,
-    disabledTextColor = DuckDuckGoTheme.textColors.primary,
-    errorTextColor = DuckDuckGoTheme.textColors.primary,
+    focusedTextColor = DuckDuckGoTheme.colors.text.primary,
+    unfocusedTextColor = DuckDuckGoTheme.colors.text.primary,
+    disabledTextColor = DuckDuckGoTheme.colors.text.primary,
+    errorTextColor = DuckDuckGoTheme.colors.text.primary,
     focusedContainerColor = Transparent,
     unfocusedContainerColor = Transparent,
     disabledContainerColor = Transparent,
@@ -312,41 +311,41 @@ internal fun daxTextFieldColors(): TextFieldColors = OutlinedTextFieldDefaults.c
     focusedBorderColor = DuckDuckGoTheme.colors.brand.accentBlue,
     unfocusedBorderColor = DuckDuckGoTheme.colors.textField.borders,
     disabledBorderColor = DuckDuckGoTheme.colors.textField.borders,
-    errorBorderColor = DuckDuckGoTheme.textColors.destructive,
+    errorBorderColor = DuckDuckGoTheme.colors.text.destructive,
     focusedLabelColor = DuckDuckGoTheme.colors.brand.accentBlue,
-    unfocusedLabelColor = DuckDuckGoTheme.textColors.secondary,
-    disabledLabelColor = DuckDuckGoTheme.textColors.secondary,
-    errorLabelColor = DuckDuckGoTheme.textColors.destructive,
-    focusedTrailingIconColor = DuckDuckGoTheme.iconColors.primary,
-    unfocusedTrailingIconColor = DuckDuckGoTheme.iconColors.primary,
-    disabledTrailingIconColor = DuckDuckGoTheme.iconColors.primary,
-    errorTrailingIconColor = DuckDuckGoTheme.textColors.destructive,
-    focusedSupportingTextColor = DuckDuckGoTheme.textColors.destructive,
-    unfocusedSupportingTextColor = DuckDuckGoTheme.textColors.destructive,
-    disabledSupportingTextColor = DuckDuckGoTheme.textColors.destructive,
-    errorSupportingTextColor = DuckDuckGoTheme.textColors.destructive,
+    unfocusedLabelColor = DuckDuckGoTheme.colors.text.secondary,
+    disabledLabelColor = DuckDuckGoTheme.colors.text.secondary,
+    errorLabelColor = DuckDuckGoTheme.colors.text.destructive,
+    focusedTrailingIconColor = DuckDuckGoTheme.colors.icons.primary,
+    unfocusedTrailingIconColor = DuckDuckGoTheme.colors.icons.primary,
+    disabledTrailingIconColor = DuckDuckGoTheme.colors.icons.primary,
+    errorTrailingIconColor = DuckDuckGoTheme.colors.text.destructive,
+    focusedSupportingTextColor = DuckDuckGoTheme.colors.text.destructive,
+    unfocusedSupportingTextColor = DuckDuckGoTheme.colors.text.destructive,
+    disabledSupportingTextColor = DuckDuckGoTheme.colors.text.destructive,
+    errorSupportingTextColor = DuckDuckGoTheme.colors.text.destructive,
     cursorColor = DuckDuckGoTheme.colors.brand.accentBlue,
-    errorCursorColor = DuckDuckGoTheme.textColors.primary,
+    errorCursorColor = DuckDuckGoTheme.colors.text.primary,
     selectionColors = TextSelectionColors(
         handleColor = DuckDuckGoTheme.colors.brand.accentBlue,
         backgroundColor = DuckDuckGoTheme.colors.brand.accentBlue.copy(alpha = DaxTextFieldDefaults.ALPHA_DISABLED),
     ),
-    focusedLeadingIconColor = DuckDuckGoTheme.iconColors.primary,
-    unfocusedLeadingIconColor = DuckDuckGoTheme.iconColors.primary,
-    disabledLeadingIconColor = DuckDuckGoTheme.iconColors.primary,
-    errorLeadingIconColor = DuckDuckGoTheme.textColors.destructive,
-    focusedPrefixColor = DuckDuckGoTheme.textColors.secondary,
-    unfocusedPrefixColor = DuckDuckGoTheme.textColors.secondary,
-    disabledPrefixColor = DuckDuckGoTheme.textColors.secondary,
-    errorPrefixColor = DuckDuckGoTheme.textColors.secondary,
-    focusedSuffixColor = DuckDuckGoTheme.textColors.secondary,
-    unfocusedSuffixColor = DuckDuckGoTheme.textColors.secondary,
-    disabledSuffixColor = DuckDuckGoTheme.textColors.secondary,
-    errorSuffixColor = DuckDuckGoTheme.textColors.secondary,
-    focusedPlaceholderColor = DuckDuckGoTheme.textColors.secondary,
-    unfocusedPlaceholderColor = DuckDuckGoTheme.textColors.secondary,
-    disabledPlaceholderColor = DuckDuckGoTheme.textColors.secondary,
-    errorPlaceholderColor = DuckDuckGoTheme.textColors.secondary,
+    focusedLeadingIconColor = DuckDuckGoTheme.colors.icons.primary,
+    unfocusedLeadingIconColor = DuckDuckGoTheme.colors.icons.primary,
+    disabledLeadingIconColor = DuckDuckGoTheme.colors.icons.primary,
+    errorLeadingIconColor = DuckDuckGoTheme.colors.text.destructive,
+    focusedPrefixColor = DuckDuckGoTheme.colors.text.secondary,
+    unfocusedPrefixColor = DuckDuckGoTheme.colors.text.secondary,
+    disabledPrefixColor = DuckDuckGoTheme.colors.text.secondary,
+    errorPrefixColor = DuckDuckGoTheme.colors.text.secondary,
+    focusedSuffixColor = DuckDuckGoTheme.colors.text.secondary,
+    unfocusedSuffixColor = DuckDuckGoTheme.colors.text.secondary,
+    disabledSuffixColor = DuckDuckGoTheme.colors.text.secondary,
+    errorSuffixColor = DuckDuckGoTheme.colors.text.secondary,
+    focusedPlaceholderColor = DuckDuckGoTheme.colors.text.secondary,
+    unfocusedPlaceholderColor = DuckDuckGoTheme.colors.text.secondary,
+    disabledPlaceholderColor = DuckDuckGoTheme.colors.text.secondary,
+    errorPlaceholderColor = DuckDuckGoTheme.colors.text.secondary,
 )
 
 @PreviewLightDark
