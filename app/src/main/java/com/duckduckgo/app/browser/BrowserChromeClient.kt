@@ -29,6 +29,7 @@ import android.webkit.PermissionRequest
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
 import android.webkit.WebView
+import androidx.core.net.toUri
 import com.duckduckgo.app.browser.navigation.safeCopyBackForwardList
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
@@ -36,11 +37,14 @@ import com.duckduckgo.common.utils.DefaultDispatcherProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.LocationPermissionRequest
+import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissionQueryResponse.Granted
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import logcat.LogPriority.INFO
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
+import java.lang.ref.WeakReference
 import javax.inject.Inject
 
 class BrowserChromeClient @Inject constructor(
@@ -51,6 +55,8 @@ class BrowserChromeClient @Inject constructor(
 ) : WebChromeClient() {
 
     var webViewClientListener: WebViewClientListener? = null
+
+    private var webViewRef: WeakReference<WebView>? = null
 
     private var customView: View? = null
 
@@ -78,6 +84,7 @@ class BrowserChromeClient @Inject constructor(
         webView: WebView,
         newProgress: Int,
     ) {
+        webViewRef = WeakReference(webView)
         // We want to use webView.progress rather than newProgress because the former gives you the overall progress of the new site
         // and the latter gives you the progress of the current main request being loaded and one site could have several redirects.
         logcat { "onProgressChanged ${webView.url}, ${webView.progress}" }
@@ -149,6 +156,18 @@ class BrowserChromeClient @Inject constructor(
         logcat { "Permissions: permission requested ${request.resources.asList()}" }
         webViewClientListener?.getCurrentTabId()?.let { tabId ->
             appCoroutineScope.launch(coroutineDispatcher.io()) {
+                val origin = request.origin.toString()
+
+                // If media capture has already been granted for this tab/site, the SitePermissionsManager may auto-accept the WebView
+                // request with no user interaction. In that case, we must lift the WebView autoplay-gesture requirement before the
+                // permission is granted so camera previews that rely on implicit play()/autoplay don't render blank.
+                val alreadyGrantedMediaCapture = isMediaCaptureAlreadyGranted(origin, tabId, request.resources)
+                if (alreadyGrantedMediaCapture) {
+                    withContext(coroutineDispatcher.main()) {
+                        allowMediaPlaybackWithoutGestureForOrigin(origin)
+                    }
+                }
+
                 val permissionsAllowedToAsk = sitePermissionsManager.getSitePermissions(tabId, request)
                 if (permissionsAllowedToAsk.userHandled.isNotEmpty()) {
                     logcat { "Permissions: permission requested not user handled" }
@@ -156,6 +175,41 @@ class BrowserChromeClient @Inject constructor(
                 }
             }
         }
+    }
+
+    private suspend fun isMediaCaptureAlreadyGranted(
+        origin: String,
+        tabId: String,
+        resources: Array<String>,
+    ): Boolean {
+        if (resources.none { it == PermissionRequest.RESOURCE_VIDEO_CAPTURE || it == PermissionRequest.RESOURCE_AUDIO_CAPTURE }) return false
+
+        val cameraGranted =
+            if (resources.contains(PermissionRequest.RESOURCE_VIDEO_CAPTURE)) {
+                sitePermissionsManager.getPermissionsQueryResponse(origin, tabId, "camera") == Granted
+            } else {
+                false
+            }
+
+        val microphoneGranted =
+            if (resources.contains(PermissionRequest.RESOURCE_AUDIO_CAPTURE)) {
+                sitePermissionsManager.getPermissionsQueryResponse(origin, tabId, "microphone") == Granted
+            } else {
+                false
+            }
+
+        return cameraGranted || microphoneGranted
+    }
+
+    private fun allowMediaPlaybackWithoutGestureForOrigin(origin: String) {
+        val webView = webViewRef?.get() ?: return
+
+        val currentHost = webView.url?.toUri()?.host
+        val originHost = origin.toUri().host
+        if (currentHost != null && originHost != null && currentHost != originHost) return
+
+        // Setting is per-WebView; BrowserWebViewClient will restore the default on next navigation.
+        webView.settings.mediaPlaybackRequiresUserGesture = false
     }
 
     override fun onGeolocationPermissionsShowPrompt(
