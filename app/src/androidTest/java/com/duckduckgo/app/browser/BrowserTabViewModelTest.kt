@@ -457,6 +457,8 @@ class BrowserTabViewModelTest {
 
     private val mockDuckAiFeatureStateFullScreenModeFlow = MutableStateFlow(false)
 
+    private val mockDuckAiContextualModeFlow = MutableStateFlow(false)
+
     private val mockExternalIntentProcessingState: ExternalIntentProcessingState = mock()
 
     private val mockVpnMenuStateProvider: VpnMenuStateProvider = mock()
@@ -679,6 +681,7 @@ class BrowserTabViewModelTest {
             whenever(mockDuckAiFeatureState.showInputScreen).thenReturn(mockDuckAiFeatureStateInputScreenFlow)
             whenever(mockDuckAiFeatureState.showInputScreenAutomaticallyOnNewTab).thenReturn(mockDuckAiFeatureStateInputScreenOpenAutomaticallyFlow)
             whenever(mockDuckAiFeatureState.showFullScreenMode).thenReturn(mockDuckAiFeatureStateFullScreenModeFlow)
+            whenever(mockDuckAiFeatureState.showFullScreenModeToggle).thenReturn(mockDuckAiContextualModeFlow)
             whenever(mockExternalIntentProcessingState.hasPendingTabLaunch).thenReturn(mockHasPendingTabLaunchFlow)
             whenever(mockExternalIntentProcessingState.hasPendingDuckAiOpen).thenReturn(mockHasPendingDuckAiOpenFlow)
             whenever(mockVpnMenuStateProvider.getVpnMenuState()).thenReturn(flowOf(VpnMenuState.Hidden))
@@ -8342,5 +8345,34 @@ class BrowserTabViewModelTest {
 
         verify(mockWebViewCompatWrapper).postMessage(eq(mockWebView), eq(mockReplyProxy1), eq(blobUrl))
         verify(mockWebViewCompatWrapper, never()).postMessage(eq(mockWebView), eq(mockReplyProxy2), eq(blobUrl))
+    }
+
+    @Test
+    fun whenOnDuckChatOmnibarButtonClickedAndContextualModeEnabledAndNotNTPThenCommandSent() = runTest {
+        mockDuckAiContextualModeFlow.emit(true)
+
+        testee.onDuckChatOmnibarButtonClicked(query = "example", hasFocus = false, isNtp = false)
+
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        assertTrue(commandCaptor.lastValue is Command.ShowDuckAIContextualMode)
+    }
+
+    @Test
+    fun whenOnDuckChatOmnibarButtonClickedAndContextualModeEnabledAndNTPThenContextualNotCalled() = runTest {
+        val duckAIUrl = "https://duckduckgo.com/?q=test"
+
+        mockDuckAiContextualModeFlow.emit(true)
+        mockDuckAiFeatureStateFullScreenModeFlow.emit(true)
+
+        whenever(mockDuckChat.getDuckChatUrl(any(), any())).thenReturn(duckAIUrl)
+        whenever(mockOmnibarConverter.convertQueryToUrl(duckAIUrl, null)).thenReturn(duckAIUrl)
+
+        testee.onDuckChatOmnibarButtonClicked(query = "example", hasFocus = false, isNtp = true)
+
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        val command = commandCaptor.lastValue as Navigate
+        assertEquals(duckAIUrl, command.url)
+
+        verify(mockDuckChat, never()).openDuckChat()
     }
 }
