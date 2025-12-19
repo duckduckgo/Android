@@ -60,8 +60,8 @@
     <string name="undoSnackbarAction">Ongedaan maken</string>
     <!-- Trackers blocked animation-->
     <plurals name="trackersBlockedAnimationMessage" tools:ignore="ImpliedQuantity">
-        <item quantity="one">Tracker geblokkeerd</item>
-        <item quantity="other">Trackers geblokkeerd</item>
+        <item quantity="one">Tracker</item>
+        <item quantity="other">Trackers</item>
     </plurals>
 
     <!-- Downloading files -->

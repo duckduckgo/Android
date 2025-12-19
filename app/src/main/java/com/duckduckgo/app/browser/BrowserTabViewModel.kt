@@ -60,7 +60,7 @@ import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.ShouldLaunchPrivacy
 import com.duckduckgo.app.browser.WebViewErrorResponse.LOADING
 import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
-import com.duckduckgo.app.browser.animations.AddressBarTrackersAnimationFeatureToggle
+import com.duckduckgo.app.browser.animations.AddressBarTrackersAnimationManager
 import com.duckduckgo.app.browser.api.OmnibarRepository
 import com.duckduckgo.app.browser.applinks.AppLinksHandler
 import com.duckduckgo.app.browser.camera.CameraHardwareChecker
@@ -488,7 +488,7 @@ class BrowserTabViewModel @Inject constructor(
     private val externalIntentProcessingState: ExternalIntentProcessingState,
     private val vpnMenuStateProvider: VpnMenuStateProvider,
     private val webViewCompatWrapper: WebViewCompatWrapper,
-    private val addressBarTrackersAnimationFeatureToggle: AddressBarTrackersAnimationFeatureToggle,
+    private val addressBarTrackersAnimationManager: AddressBarTrackersAnimationManager,
     private val autoconsentPixelManager: AutoconsentPixelManager,
     private val omnibarRepository: OmnibarRepository,
     private val contentScopeScriptsSubscriptionEventPluginPoint: PluginPoint<ContentScopeScriptsSubscriptionEventPlugin>,
@@ -686,6 +686,10 @@ class BrowserTabViewModel @Inject constructor(
         fireproofDialogsEventHandler.event.observeForever(fireproofDialogEventObserver)
         navigationAwareLoginDetector.loginEventLiveData.observeForever(loginDetectionObserver)
         showPulseAnimation.observeForever(fireButtonAnimation)
+
+        viewModelScope.launch {
+            addressBarTrackersAnimationManager.fetchFeatureState()
+        }
 
         tabRepository.childClosedTabs
             .onEach { closedTab ->
@@ -4531,10 +4535,13 @@ class BrowserTabViewModel @Inject constructor(
             } else {
                 autoconsentPixelManager.fireDailyPixel(AutoConsentPixel.AUTOCONSENT_ANIMATION_SHOWN_DAILY)
             }
-            if (addressBarTrackersAnimationFeatureToggle.feature().isEnabled() && trackersCount().isNotEmpty()) {
-                command.postValue(Command.EnqueueCookiesAnimation(isCosmetic))
-            } else {
-                command.postValue(ShowAutoconsentAnimation(isCosmetic))
+            // TODO remove launch once address bar trackers animation is enabled permanently
+            viewModelScope.launch {
+                if (addressBarTrackersAnimationManager.isFeatureEnabled() && trackersCount().isNotEmpty()) {
+                    command.postValue(Command.EnqueueCookiesAnimation(isCosmetic))
+                } else {
+                    command.postValue(ShowAutoconsentAnimation(isCosmetic))
+                }
             }
         }
     }

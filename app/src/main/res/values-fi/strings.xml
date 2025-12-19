@@ -60,8 +60,8 @@
     <string name="undoSnackbarAction">Kumoa</string>
     <!-- Trackers blocked animation-->
     <plurals name="trackersBlockedAnimationMessage" tools:ignore="ImpliedQuantity">
-        <item quantity="one">seurantatoiminto estetty</item>
-        <item quantity="other">seurantatoimintoa estetty</item>
+        <item quantity="one">trackeri estetty</item>
+        <item quantity="other">trackereita estetty</item>
     </plurals>
 
     <!-- Downloading files -->

@@ -60,10 +60,10 @@
     <string name="undoSnackbarAction">Anuliuoti</string>
     <!-- Trackers blocked animation-->
     <plurals name="trackersBlockedAnimationMessage" tools:ignore="ImpliedQuantity">
-        <item quantity="one">Sekimo priemonė užblokuota</item>
-        <item quantity="few">Sekimo priemonės užblokuotos</item>
-        <item quantity="many">Sekimo priemonės užblokuotos</item>
-        <item quantity="other">Sekimo priemonių užblokuota</item>
+        <item quantity="one">Sekimo priemonė</item>
+        <item quantity="few">Sekimo priemonės</item>
+        <item quantity="many">Sekimo priemonės</item>
+        <item quantity="other">Sekimo priemonių</item>
     </plurals>
 
     <!-- Downloading files -->

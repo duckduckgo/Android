@@ -60,8 +60,8 @@
     <string name="undoSnackbarAction">Deshacer</string>
     <!-- Trackers blocked animation-->
     <plurals name="trackersBlockedAnimationMessage" tools:ignore="ImpliedQuantity">
-        <item quantity="one">Rastreador bloqueado</item>
-        <item quantity="other">Rastreadores bloqueados</item>
+        <item quantity="one">Rastreador</item>
+        <item quantity="other">Rastreadores</item>
     </plurals>
 
     <!-- Downloading files -->

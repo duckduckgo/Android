@@ -60,8 +60,8 @@
     <string name="undoSnackbarAction">Återställ</string>
     <!-- Trackers blocked animation-->
     <plurals name="trackersBlockedAnimationMessage" tools:ignore="ImpliedQuantity">
-        <item quantity="one">Spårare har blockerats</item>
-        <item quantity="other">Spårare har blockerats</item>
+        <item quantity="one">Spårare</item>
+        <item quantity="other">Spårare</item>
     </plurals>
 
     <!-- Downloading files -->
