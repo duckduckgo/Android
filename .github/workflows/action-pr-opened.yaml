@@ -2,7 +2,7 @@ name: 'Pull Request opened -> Comment on task and add it to Android Release Boar
 
 on:
   pull_request:
-    types: [opened, reopened, edited]
+    types: [opened, reopened, edited, ready_for_review]
 
 jobs:
   process-internal-pr:
@@ -11,7 +11,7 @@ jobs:
       issues: write
     steps:
       - name: Add comment with PR link in Asana task
-        if: ${{ github.actor == github.event.pull_request.user.login }}
+        if: ${{ github.actor == github.event.pull_request.user.login && ( github.event.action == 'opened' || github.event.action == 'reopened') }}
         uses: duckduckgo/native-github-asana-sync@v2.0
         with:
           asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
