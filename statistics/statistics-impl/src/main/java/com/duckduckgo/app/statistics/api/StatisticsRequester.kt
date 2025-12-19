@@ -40,7 +40,8 @@ import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
-class StatisticsRequester @Inject constructor(
+// this class is open so that we can mock it in tests
+open class StatisticsRequester @Inject constructor(
     private val store: StatisticsDataStore,
     private val service: StatisticsService,
     private val variantManager: VariantManager,
