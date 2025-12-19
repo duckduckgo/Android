@@ -2924,11 +2924,27 @@ class BrowserTabViewModelTest {
         }
 
     @Test
-    fun whenCloseCurrentTabSelectedThenTabDeletedFromRepository() =
+    fun whenCloseCurrentTabSelectedAndNotInCustomTabThenTabDeletedFromRepository() =
         runTest {
+            testee.setIsCustomTab(false)
             givenOneActiveTabSelected()
             testee.closeCurrentTab()
+            verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
             verify(mockTabRepository).deleteTabAndSelectSource(selectedTabLiveData.value!!.tabId)
+            val command = commandCaptor.allValues.find { it is Command.NavigateBackInCustomTab }
+            assertNull(command)
+        }
+
+    @Test
+    fun whenCloseCurrentTabAndCustomTabAndCustomTabScreenEmitNavigateBackInCustomTabCommand() =
+        runTest {
+            testee.setIsCustomTab(true)
+            testee.closeCurrentTab()
+            verify(mockTabRepository, never()).deleteTabAndSelectSource(any())
+            verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+            val command = commandCaptor.allValues.find { it is Command.NavigateBackInCustomTab }
+            assertNotNull(command)
+            assertTrue(command is Command.NavigateBackInCustomTab)
         }
 
     @Test
