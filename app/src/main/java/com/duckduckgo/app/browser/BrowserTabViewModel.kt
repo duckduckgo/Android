@@ -4466,6 +4466,16 @@ class BrowserTabViewModel @Inject constructor(
             command.value = HideKeyboardForChat
         }
 
+        if (duckAiFeatureState.showFullScreenModeToggle.value) {
+            command.value = Command.ShowDuckAIContextualMode
+            return
+        }
+
+        if (!duckAiFeatureState.showInputScreen.value) {
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_LEGACY_OMNIBAR_AICHAT_BUTTON_PRESSED)
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_LEGACY_OMNIBAR_AICHAT_BUTTON_PRESSED_DAILY, type = Daily())
+        }
+
         if (duckAiFeatureState.showFullScreenMode.value) {
             val url = when {
                 hasFocus && isNtp && query.isNullOrBlank() -> duckChat.getDuckChatUrl(query ?: "", false)
