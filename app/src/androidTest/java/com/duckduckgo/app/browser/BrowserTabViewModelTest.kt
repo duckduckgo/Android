@@ -65,7 +65,7 @@ import com.duckduckgo.app.browser.WebViewErrorResponse.BAD_URL
 import com.duckduckgo.app.browser.WebViewErrorResponse.LOADING
 import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
-import com.duckduckgo.app.browser.animations.AddressBarTrackersAnimationFeatureToggle
+import com.duckduckgo.app.browser.animations.AddressBarTrackersAnimationManager
 import com.duckduckgo.app.browser.api.OmnibarRepository
 import com.duckduckgo.app.browser.applinks.AppLinksHandler
 import com.duckduckgo.app.browser.camera.CameraHardwareChecker
@@ -601,7 +601,7 @@ class BrowserTabViewModelTest {
     }
 
     private val mockSerpEasterEggLogoToggles: SerpEasterEggLogosToggles = mock()
-    private val mockAddressBarTrackersAnimationFeatureToggle: AddressBarTrackersAnimationFeatureToggle = mock()
+    private val mockAddressBarTrackersAnimationManager: AddressBarTrackersAnimationManager = mock()
 
     private val nonHttpAppLinkChecker: NonHttpAppLinkChecker = mock()
 
@@ -700,7 +700,7 @@ class BrowserTabViewModelTest {
             whenever(mockSerpEasterEggLogoToggles.feature()).thenReturn(mockDisabledToggle)
             whenever(nonHttpAppLinkChecker.isPermitted(anyOrNull())).thenReturn(true)
             remoteMessagingModel = givenRemoteMessagingModel(mockRemoteMessagingRepository, mockPixel, coroutineRule.testDispatcherProvider)
-            whenever(mockAddressBarTrackersAnimationFeatureToggle.feature()).thenReturn(mockDisabledToggle)
+            runBlocking { whenever(mockAddressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(false) }
 
             ctaViewModel =
                 CtaViewModel(
@@ -866,7 +866,7 @@ class BrowserTabViewModelTest {
                 externalIntentProcessingState = mockExternalIntentProcessingState,
                 vpnMenuStateProvider = mockVpnMenuStateProvider,
                 webViewCompatWrapper = mockWebViewCompatWrapper,
-                addressBarTrackersAnimationFeatureToggle = mockAddressBarTrackersAnimationFeatureToggle,
+                addressBarTrackersAnimationManager = mockAddressBarTrackersAnimationManager,
                 autoconsentPixelManager = mockAutoconsentPixelManager,
                 omnibarRepository = mockOmnibarFeatureRepository,
                 contentScopeScriptsSubscriptionEventPluginPoint = fakeContentScopeScriptsSubscriptionEventPluginPoint,
@@ -6835,7 +6835,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenAutoConsentPopupHandledWithFeatureToggleEnabledAndTrackersBlockedThenEnqueueCookiesAnimation() {
-        whenever(mockAddressBarTrackersAnimationFeatureToggle.feature()).thenReturn(mockEnabledToggle)
+        runBlocking { whenever(mockAddressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(true) }
 
         testee.browserViewState.value =
             testee.browserViewState.value?.copy(
@@ -6857,7 +6857,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenAutoConsentPopupHandledWithFeatureToggleDisabledThenShowAutoconsentAnimation() {
-        whenever(mockAddressBarTrackersAnimationFeatureToggle.feature()).thenReturn(mockDisabledToggle)
+        runBlocking { whenever(mockAddressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(false) }
 
         testee.browserViewState.value =
             testee.browserViewState.value?.copy(
@@ -6873,7 +6873,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenAutoConsentPopupHandledWithFeatureToggleEnabledButNoTrackersThenShowAutoconsentAnimation() {
-        whenever(mockAddressBarTrackersAnimationFeatureToggle.feature()).thenReturn(mockEnabledToggle)
+        runBlocking { whenever(mockAddressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(true) }
 
         testee.browserViewState.value =
             testee.browserViewState.value?.copy(
