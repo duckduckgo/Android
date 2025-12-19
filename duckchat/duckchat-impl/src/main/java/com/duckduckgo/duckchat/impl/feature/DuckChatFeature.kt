@@ -136,4 +136,10 @@ interface DuckChatFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun sendInputScreenOnboardingWideEvent(): Toggle
+
+    /**
+     * @return `true` when the contextual mode is enabled
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun contextualMode(): Toggle
 }

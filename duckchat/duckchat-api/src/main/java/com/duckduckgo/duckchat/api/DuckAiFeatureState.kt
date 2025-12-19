@@ -78,4 +78,9 @@ interface DuckAiFeatureState {
      * Indicates whether the FullScreen mode toggle is visible or not
      */
     val showFullScreenModeToggle: StateFlow<Boolean>
+
+    /**
+     * Indicates whether Duck.ai should be open in Contextual mode
+     */
+    val showContextualMode: StateFlow<Boolean>
 }

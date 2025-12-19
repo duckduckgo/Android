@@ -62,6 +62,8 @@ interface DuckChatDataStore {
 
     suspend fun setShowInAddressBar(showDuckChat: Boolean)
 
+    suspend fun setFullScreenModeUserSetting(enabled: Boolean)
+
     suspend fun setShowInVoiceSearch(showToggle: Boolean)
 
     fun observeDuckChatUserEnabled(): Flow<Boolean>
@@ -195,6 +197,10 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
 
     override suspend fun setCosmeticInputScreenUserSetting(enabled: Boolean) {
         store.edit { prefs -> prefs[DUCK_AI_INPUT_SCREEN_COSMETIC_SETTING] = enabled }
+    }
+
+    override suspend fun setFullScreenModeUserSetting(enabled: Boolean) {
+        store.edit { prefs -> prefs[DUCK_CHAT_FULLSCREEN_MODE_SETTING] = enabled }
     }
 
     override suspend fun setShowInBrowserMenu(showDuckChat: Boolean) {
