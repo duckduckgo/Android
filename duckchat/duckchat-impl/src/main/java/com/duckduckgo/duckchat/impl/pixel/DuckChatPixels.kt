@@ -17,6 +17,7 @@
 package com.duckduckgo.duckchat.impl.pixel
 
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin
@@ -120,16 +121,24 @@ class RealDuckChatPixels @Inject constructor(
     private val duckChatFeatureRepository: DuckChatFeatureRepository,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
+    private val statisticsUpdater: StatisticsUpdater,
 ) : DuckChatPixels {
 
     override fun sendReportMetricPixel(reportMetric: ReportMetric) {
         appCoroutineScope.launch(dispatcherProvider.io()) {
+            var refreshAtb = false
             val sessionParams = mapOf(
                 DuckChatPixelParameters.DELTA_TIMESTAMP_PARAMETERS to duckChatFeatureRepository.sessionDeltaInMinutes().toString(),
             )
             val (pixelName, params) = when (reportMetric) {
-                USER_DID_SUBMIT_PROMPT -> DUCK_CHAT_SEND_PROMPT_ONGOING_CHAT to sessionParams
-                USER_DID_SUBMIT_FIRST_PROMPT -> DUCK_CHAT_START_NEW_CONVERSATION to sessionParams
+                USER_DID_SUBMIT_PROMPT -> {
+                    refreshAtb = true
+                    DUCK_CHAT_SEND_PROMPT_ONGOING_CHAT to sessionParams
+                }
+                USER_DID_SUBMIT_FIRST_PROMPT -> {
+                    refreshAtb = true
+                    DUCK_CHAT_START_NEW_CONVERSATION to sessionParams
+                }
                 USER_DID_OPEN_HISTORY -> DUCK_CHAT_OPEN_HISTORY to sessionParams
                 USER_DID_SELECT_FIRST_HISTORY_ITEM -> DUCK_CHAT_OPEN_MOST_RECENT_HISTORY_CHAT to sessionParams
                 USER_DID_CREATE_NEW_CHAT -> DUCK_CHAT_START_NEW_CONVERSATION_BUTTON_CLICKED to sessionParams
@@ -138,6 +147,9 @@ class RealDuckChatPixels @Inject constructor(
 
             withContext(dispatcherProvider.main()) {
                 pixel.fire(pixelName, parameters = params)
+                if (refreshAtb) {
+                    statisticsUpdater.refreshDuckAiRetentionAtb()
+                }
             }
         }
     }
