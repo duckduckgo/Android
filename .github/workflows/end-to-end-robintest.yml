@@ -64,6 +64,7 @@ jobs:
         run: find . -name "*internal-release*.apk" -exec mv '{}' apk/internal.apk \;
 
       - name: Onboarding flows
+        id: maestro-onboarding
         uses: mobile-dev-inc/action-maestro-cloud@v1.9.8
         timeout-minutes: 120
         with:
@@ -76,7 +77,18 @@ jobs:
           workspace: .maestro
           include-tags: onboardingTest
 
+      - name: Analyze Maestro Flow Results (Onboarding)
+        if: always()
+        id: analyze-maestro-onboarding
+        uses: ./.github/actions/maestro-flow-analyzer
+        with:
+          flow_results_json: ${{ steps.maestro-onboarding.outputs.MAESTRO_CLOUD_FLOW_RESULTS }}
+          console_url: ${{ steps.maestro-onboarding.outputs.MAESTRO_CLOUD_CONSOLE_URL }}
+          upload_status: ${{ steps.maestro-onboarding.outputs.MAESTRO_CLOUD_UPLOAD_STATUS }}
+          app_binary_id: ${{ steps.maestro-onboarding.outputs.MAESTRO_CLOUD_APP_BINARY_ID }}
+
       - name: Deeplink tests
+        id: maestro-deeplink
         uses: mobile-dev-inc/action-maestro-cloud@v1.9.8
         timeout-minutes: 120
         with:
@@ -89,7 +101,18 @@ jobs:
           workspace: .maestro
           include-tags: navigationTest
 
+      - name: Analyze Maestro Flow Results (Deeplink)
+        if: always()
+        id: analyze-maestro-deeplink
+        uses: ./.github/actions/maestro-flow-analyzer
+        with:
+          flow_results_json: ${{ steps.maestro-deeplink.outputs.MAESTRO_CLOUD_FLOW_RESULTS }}
+          console_url: ${{ steps.maestro-deeplink.outputs.MAESTRO_CLOUD_CONSOLE_URL }}
+          upload_status: ${{ steps.maestro-deeplink.outputs.MAESTRO_CLOUD_UPLOAD_STATUS }}
+          app_binary_id: ${{ steps.maestro-deeplink.outputs.MAESTRO_CLOUD_APP_BINARY_ID }}
+
       - name: Ad click detection flows
+        id: maestro-ad-click
         uses: mobile-dev-inc/action-maestro-cloud@v1.9.8
         timeout-minutes: 120
         with:
@@ -102,8 +125,19 @@ jobs:
           workspace: .maestro
           include-tags: adClickTest
 
+      - name: Analyze Maestro Flow Results (Ad Click)
+        if: always()
+        id: analyze-maestro-ad-click
+        uses: ./.github/actions/maestro-flow-analyzer
+        with:
+          flow_results_json: ${{ steps.maestro-ad-click.outputs.MAESTRO_CLOUD_FLOW_RESULTS }}
+          console_url: ${{ steps.maestro-ad-click.outputs.MAESTRO_CLOUD_CONSOLE_URL }}
+          upload_status: ${{ steps.maestro-ad-click.outputs.MAESTRO_CLOUD_UPLOAD_STATUS }}
+          app_binary_id: ${{ steps.maestro-ad-click.outputs.MAESTRO_CLOUD_APP_BINARY_ID }}
+
       - name: Privacy Tests
         if: always()
+        id: maestro-privacy
         uses: mobile-dev-inc/action-maestro-cloud@v1.9.8
         timeout-minutes: 120
         with:
@@ -116,8 +150,19 @@ jobs:
           workspace: .maestro
           include-tags: privacyTest
 
+      - name: Analyze Maestro Flow Results (Privacy)
+        if: always()
+        id: analyze-maestro-privacy
+        uses: ./.github/actions/maestro-flow-analyzer
+        with:
+          flow_results_json: ${{ steps.maestro-privacy.outputs.MAESTRO_CLOUD_FLOW_RESULTS }}
+          console_url: ${{ steps.maestro-privacy.outputs.MAESTRO_CLOUD_CONSOLE_URL }}
+          upload_status: ${{ steps.maestro-privacy.outputs.MAESTRO_CLOUD_UPLOAD_STATUS }}
+          app_binary_id: ${{ steps.maestro-privacy.outputs.MAESTRO_CLOUD_APP_BINARY_ID }}
+
       - name: Internal Privacy Tests
         if: always()
+        id: maestro-internal-privacy
         uses: mobile-dev-inc/action-maestro-cloud@v1.9.7
         timeout-minutes: 120
         with:
@@ -130,8 +175,19 @@ jobs:
           workspace: .maestro
           include-tags: privacyTestInternal
 
+      - name: Analyze Maestro Flow Results (Internal Privacy)
+        if: always()
+        id: analyze-maestro-internal-privacy
+        uses: ./.github/actions/maestro-flow-analyzer
+        with:
+          flow_results_json: ${{ steps.maestro-internal-privacy.outputs.MAESTRO_CLOUD_FLOW_RESULTS }}
+          console_url: ${{ steps.maestro-internal-privacy.outputs.MAESTRO_CLOUD_CONSOLE_URL }}
+          upload_status: ${{ steps.maestro-internal-privacy.outputs.MAESTRO_CLOUD_UPLOAD_STATUS }}
+          app_binary_id: ${{ steps.maestro-internal-privacy.outputs.MAESTRO_CLOUD_APP_BINARY_ID }}
+
       - name: Security Tests
         if: always()
+        id: maestro-security
         uses: mobile-dev-inc/action-maestro-cloud@v1.9.8
         timeout-minutes: 120
         with:
@@ -144,9 +200,20 @@ jobs:
           workspace: .maestro
           include-tags: securityTest
 
+      - name: Analyze Maestro Flow Results (Security)
+        if: always()
+        id: analyze-maestro-security
+        uses: ./.github/actions/maestro-flow-analyzer
+        with:
+          flow_results_json: ${{ steps.maestro-security.outputs.MAESTRO_CLOUD_FLOW_RESULTS }}
+          console_url: ${{ steps.maestro-security.outputs.MAESTRO_CLOUD_CONSOLE_URL }}
+          upload_status: ${{ steps.maestro-security.outputs.MAESTRO_CLOUD_UPLOAD_STATUS }}
+          app_binary_id: ${{ steps.maestro-security.outputs.MAESTRO_CLOUD_APP_BINARY_ID }}
+
       ## This workflow will be deleted once we close the https://app.asana.com/1/137249556945/project/1211724162604201/task/1212015085457815?focus=true task
       - name: Internal Security Tests
         if: always()
+        id: maestro-internal-security
         uses: mobile-dev-inc/action-maestro-cloud@v1.9.8
         timeout-minutes: 120
         with:
@@ -159,8 +226,19 @@ jobs:
           workspace: .maestro
           include-tags: securityTestInternal
 
+      - name: Analyze Maestro Flow Results (Internal Security)
+        if: always()
+        id: analyze-maestro-internal-security
+        uses: ./.github/actions/maestro-flow-analyzer
+        with:
+          flow_results_json: ${{ steps.maestro-internal-security.outputs.MAESTRO_CLOUD_FLOW_RESULTS }}
+          console_url: ${{ steps.maestro-internal-security.outputs.MAESTRO_CLOUD_CONSOLE_URL }}
+          upload_status: ${{ steps.maestro-internal-security.outputs.MAESTRO_CLOUD_UPLOAD_STATUS }}
+          app_binary_id: ${{ steps.maestro-internal-security.outputs.MAESTRO_CLOUD_APP_BINARY_ID }}
+
       - name: Release Tests
         if: always()
+        id: maestro-release
         uses: mobile-dev-inc/action-maestro-cloud@v1.9.8
         timeout-minutes: 120
         with:
@@ -173,8 +251,19 @@ jobs:
           workspace: .maestro
           include-tags: releaseTest
 
+      - name: Analyze Maestro Flow Results (Release Tests)
+        if: always()
+        id: analyze-maestro-release
+        uses: ./.github/actions/maestro-flow-analyzer
+        with:
+          flow_results_json: ${{ steps.maestro-release.outputs.MAESTRO_CLOUD_FLOW_RESULTS }}
+          console_url: ${{ steps.maestro-release.outputs.MAESTRO_CLOUD_CONSOLE_URL }}
+          upload_status: ${{ steps.maestro-release.outputs.MAESTRO_CLOUD_UPLOAD_STATUS }}
+          app_binary_id: ${{ steps.maestro-release.outputs.MAESTRO_CLOUD_APP_BINARY_ID }}
+
       - name: Notifications permissions Android 13+
         if: always()
+        id: maestro-notification-permissions
         uses: mobile-dev-inc/action-maestro-cloud@v1.9.8
         timeout-minutes: 120
         with:
@@ -186,6 +275,16 @@ jobs:
           android-api-level: 33
           workspace: .maestro
           include-tags: permissionsTest
+
+      - name: Analyze Maestro Flow Results (Notification Permissions)
+        if: always()
+        id: analyze-maestro-notification-permissions
+        uses: ./.github/actions/maestro-flow-analyzer
+        with:
+          flow_results_json: ${{ steps.maestro-notification-permissions.outputs.MAESTRO_CLOUD_FLOW_RESULTS }}
+          console_url: ${{ steps.maestro-notification-permissions.outputs.MAESTRO_CLOUD_CONSOLE_URL }}
+          upload_status: ${{ steps.maestro-notification-permissions.outputs.MAESTRO_CLOUD_UPLOAD_STATUS }}
+          app_binary_id: ${{ steps.maestro-notification-permissions.outputs.MAESTRO_CLOUD_APP_BINARY_ID }}
 
       - name: Create Asana task when workflow failed
         if: ${{ failure() }}

@@ -89,54 +89,14 @@ jobs:
           include-tags: ${{ github.event.inputs.test-tag }}
 
       - name: Analyze Maestro Flow Results
-        id: analyze-flow-results
         if: always()
-        run: |
-          echo "Console URL: ${{ steps.release-tests.outputs.MAESTRO_CLOUD_CONSOLE_URL }}"
-          echo "Upload Status: ${{ steps.release-tests.outputs.MAESTRO_CLOUD_UPLOAD_STATUS }}"
-          echo "App Binary ID: ${{ steps.release-tests.outputs.MAESTRO_CLOUD_APP_BINARY_ID }}"
-          
-          flow_results_json='${{ steps.release-tests.outputs.MAESTRO_CLOUD_FLOW_RESULTS }}'
-          echo "Raw Flow Results JSON: $flow_results_json"
-          
-          # Default to success, change if issues are found
-          final_status="success" 
-
-          # Check for empty or invalid JSON (though Maestro action should provide valid JSON)
-          if ! echo "$flow_results_json" | jq -e . > /dev/null 2>&1; then
-            echo "::warning::MAESTRO_CLOUD_FLOW_RESULTS is not valid JSON or is empty."
-            final_status="unknown_format"
-          else
-            # Check for any flow with status "ERROR"
-            if echo "$flow_results_json" | jq -e '.[] | select(.status=="ERROR")' > /dev/null; then
-              echo "::error::At least one Maestro flow has status: ERROR."
-              final_status="failure"
-            fi
-
-            # Check for any flow with status "CANCELED"
-            # You might decide if CANCELED flows also mean the overall status is a failure for your release
-            if echo "$flow_results_json" | jq -e '.[] | select(.status=="CANCELED")' > /dev/null; then
-              echo "::warning::At least one Maestro flow has status: CANCELED."
-              # If any canceled flow makes the whole thing a failure:
-              if [ "$final_status" != "failure" ]; then # Don't override if already a critical failure
-                 final_status="canceled_present" # Or treat as "failure" if preferred
-              fi
-            fi
-
-            # If after all checks, final_status is still "success", it means no "ERROR" or "CANCELED"
-            if [ "$final_status" == "success" ]; then
-                # Additional check: ensure there's at least one flow and it's not empty array if that's a concern
-                if echo "$flow_results_json" | jq -e '. | length > 0' > /dev/null; then
-                    echo "All flows appear to be successful (no ERROR or CANCELED statuses found that are treated as errors)."
-                else
-                    echo "::warning::MAESTRO_CLOUD_FLOW_RESULTS is an empty array. No flows reported."
-                    final_status="empty_results" # Or "success" if empty results are acceptable
-                fi
-            fi
-          fi
-
-          echo "Final determined status: $final_status"
-          echo "flow_summary_status=$final_status" >> $GITHUB_OUTPUT
+        id: analyze-flow-results
+        uses: ./.github/actions/maestro-flow-analyzer
+        with:
+          flow_results_json: ${{ steps.release-tests.outputs.MAESTRO_CLOUD_FLOW_RESULTS }}
+          console_url: ${{ steps.release-tests.outputs.MAESTRO_CLOUD_CONSOLE_URL }}
+          upload_status: ${{ steps.release-tests.outputs.MAESTRO_CLOUD_UPLOAD_STATUS }}
+          app_binary_id: ${{ steps.release-tests.outputs.MAESTRO_CLOUD_APP_BINARY_ID }}
 
       - name: Access Outputs (for debugging)
         if: always()
@@ -144,7 +104,8 @@ jobs:
           echo "Console URL: ${{ steps.release-tests.outputs.MAESTRO_CLOUD_CONSOLE_URL }}"
           echo 'Flow Results (JSON): ${{ steps.release-tests.outputs.MAESTRO_CLOUD_FLOW_RESULTS }}'
           echo "Release Tests Step Conclusion: ${{ steps.release-tests.conclusion }}" # From Maestro action itself
-          echo "Analyzed Flow Summary Status: ${{ steps.analyze-flow-results.outputs.flow_summary_status }}" # From our script
+          echo "Analyzed Flow Summary Status: ${{ steps.analyze-flow-results.outputs.flow_summary_status }}" # From analyzer action
+          printf "Analyzed Flow Summary Message:\n%s\n" "${{ steps.analyze-flow-results.outputs.flow_summary_message }}"
 
       - name: Notify Mattermost - Maestro Tests ALL SUCCEEDED
         # Condition 1: Our script says success

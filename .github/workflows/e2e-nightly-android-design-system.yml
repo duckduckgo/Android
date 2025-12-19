@@ -1,4 +1,4 @@
-name: Sync Feature Critical Path End-to-End tests
+name: 'End to End Tests - Android Design System (Nightly)'
 
 on:
   schedule:
@@ -12,7 +12,7 @@ concurrency:
 jobs:
   instrumentation_tests:
     runs-on: ubuntu-latest
-    name: Sync Feature Critical Path End-to-End tests
+    name: End-to-End tests
 
     steps:
       - name: Checkout repository
@@ -25,13 +25,6 @@ jobs:
         with:
           java-version-file: .github/.java-version
           distribution: 'adopt'
-
-      - name: Create test account for Sync and return the recovery code
-        uses: duckduckgo/sync_crypto/action@main
-        id: sync-recovery-code
-        with:
-          debug: true
-          no-teardown: false # Turn this to true so the account is not deleted after the test
 
       - name: Create folder
         if: always()
@@ -52,32 +45,28 @@ jobs:
           destination-path: $HOME/jenkins_static/com.duckduckgo.mobile.android/
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v5
-        with:
-          cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
+        uses: gradle/actions/setup-gradle@v3
 
-      - name: Assemble internal release APK
-        run: ./gradlew assembleInternalRelease -Pforce-default-variant -Psync-disable-auth-requirement -x lint
+      - name: Assemble the project
+        run: ./gradlew assembleInternalRelease -Pforce-default-variant
 
       - name: Move APK to new folder
         if: always()
         run: find . -name "*.apk"  -exec mv '{}' apk/release.apk \;
 
-      - name: Sync Flows
+      - name: ADS Preview Flows
         id: maestro-run
         uses: mobile-dev-inc/action-maestro-cloud@v1.9.8
         timeout-minutes: 120
         with:
           api-key: ${{ secrets.ROBIN_API_KEY }}
           project-id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
-          name: sync_${{ github.sha }}
+          name: androidDesignSystem_${{ github.sha }}
           timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
           app-file: apk/release.apk
           android-api-level: 30
           workspace: .maestro
-          include-tags: syncCriticalPathTest
-          env: |
-            CODE=${{ steps.sync-recovery-code.outputs.recovery-code }}
+          include-tags: androidDesignSystemTest
 
       - name: Analyze Maestro Flow Results
         if: always()
@@ -89,24 +78,34 @@ jobs:
           upload_status: ${{ steps.maestro-run.outputs.MAESTRO_CLOUD_UPLOAD_STATUS }}
           app_binary_id: ${{ steps.maestro-run.outputs.MAESTRO_CLOUD_APP_BINARY_ID }}
 
+      - name: Show analyzer output
+        if: always()
+        run: echo "flow_summary_status=${{ steps.analyze-maestro.outputs.flow_summary_status }}"
+
+      - name: Create Asana task when Maestro tests failed
+        if: always() && steps.analyze-maestro.outputs.flow_summary_status == 'failure'
+        id: create-maestro-web-failure-task
+        uses: duckduckgo/native-github-asana-sync@v2.0
+        with:
+          asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          asana-project: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
+          asana-section: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
+          asana-task-name: E2E Tests Failure - Android Design System
+          asana-task-description: |
+            Run: https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
+            Console: ${{ github.event.inputs.console_url }}
+            Summary:
+            ${{ steps.analyze-maestro.outputs.flow_summary_message }}
+          action: 'create-asana-task'
+
       - name: Create Asana task when workflow failed
-        if: ${{ failure() }}
+        if: ${{ failure() && steps.analyze-maestro-critical-path.outputs.flow_summary_status != 'failure' && steps.analyze-maestro-web-flows.outputs.flow_summary_status != 'failure' }}
         id: create-failure-task
         uses: duckduckgo/native-github-asana-sync@v2.0
         with:
           asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana-project: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
           asana-section: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
-          asana-task-name: GH Workflow Failure - Android Sync Critical Path E2E Flows (Robin)
-          asana-task-description: The Android Sync Critical Path Flows E2E workflow has failed. See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
+          asana-task-name: GH Workflow Failure - Autofill Critical Path (Nightly)
+          asana-task-description: Workflow execution has failed. See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
           action: 'create-asana-task'
-
-      - name: Add Asana task to Browser Sync & Backup project
-        if: ${{ failure() }}
-        uses: duckduckgo/native-github-asana-sync@v2.0
-        with:
-          asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          asana-project: ${{ vars.GH_BROWSER_SYNC_BACKUP_PROJECT_ID }}
-          asana-section: ${{ vars.GGH_BROWSER_SYNC_BACKUP_PROJECT_TRIAGE_SECTION_ID }}
-          asana-task-id: ${{ steps.create-failure-task.outputs.taskId }}
-          action: 'add-task-asana-project'

@@ -68,6 +68,7 @@ jobs:
 
       - name: Duck Player Tests
         if: always()
+        id: maestro-run
         uses: mobile-dev-inc/action-maestro-cloud@v1.9.7
         timeout-minutes: 120
         with:
@@ -79,6 +80,16 @@ jobs:
           android-api-level: 34
           workspace: .maestro
           include-tags: duckplayer
+
+      - name: Analyze Maestro Flow Results
+        if: always()
+        id: analyze-maestro
+        uses: ./.github/actions/maestro-flow-analyzer
+        with:
+          flow_results_json: ${{ steps.maestro-run.outputs.MAESTRO_CLOUD_FLOW_RESULTS }}
+          console_url: ${{ steps.maestro-run.outputs.MAESTRO_CLOUD_CONSOLE_URL }}
+          upload_status: ${{ steps.maestro-run.outputs.MAESTRO_CLOUD_UPLOAD_STATUS }}
+          app_binary_id: ${{ steps.maestro-run.outputs.MAESTRO_CLOUD_APP_BINARY_ID }}
 
       - name: Create Asana task when workflow failed
         if: ${{ failure() && github.event_name != 'workflow_dispatch' }}

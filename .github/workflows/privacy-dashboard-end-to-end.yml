@@ -60,6 +60,7 @@ jobs:
         run: find . -name "*.apk"  -exec mv '{}' apk/release.apk \;
 
       - name: Ad click detection flows
+        id: maestro-ad-click
         uses: mobile-dev-inc/action-maestro-cloud@v1.9.8
         timeout-minutes: 120
         with:
@@ -72,8 +73,19 @@ jobs:
           workspace: .maestro
           include-tags: adClickTest
 
+      - name: Analyze Maestro Flow Results (Ad Click)
+        if: always()
+        id: analyze-maestro-ad-click
+        uses: ./.github/actions/maestro-flow-analyzer
+        with:
+          flow_results_json: ${{ steps.maestro-ad-click.outputs.MAESTRO_CLOUD_FLOW_RESULTS }}
+          console_url: ${{ steps.maestro-ad-click.outputs.MAESTRO_CLOUD_CONSOLE_URL }}
+          upload_status: ${{ steps.maestro-ad-click.outputs.MAESTRO_CLOUD_UPLOAD_STATUS }}
+          app_binary_id: ${{ steps.maestro-ad-click.outputs.MAESTRO_CLOUD_APP_BINARY_ID }}
+
       - name: Privacy Tests
         if: always()
+        id: maestro-privacy-tests
         uses: mobile-dev-inc/action-maestro-cloud@v1.9.8
         timeout-minutes: 120
         with:
@@ -84,3 +96,13 @@ jobs:
           app-file: apk/release.apk
           workspace: .maestro
           include-tags: privacyTest
+
+      - name: Analyze Maestro Flow Results (Privacy Tests)
+        if: always()
+        id: analyze-maestro-privacy-tests
+        uses: ./.github/actions/maestro-flow-analyzer
+        with:
+          flow_results_json: ${{ steps.maestro-privacy-tests.outputs.MAESTRO_CLOUD_FLOW_RESULTS }}
+          console_url: ${{ steps.maestro-privacy-tests.outputs.MAESTRO_CLOUD_CONSOLE_URL }}
+          upload_status: ${{ steps.maestro-privacy-tests.outputs.MAESTRO_CLOUD_UPLOAD_STATUS }}
+          app_binary_id: ${{ steps.maestro-privacy-tests.outputs.MAESTRO_CLOUD_APP_BINARY_ID }}
