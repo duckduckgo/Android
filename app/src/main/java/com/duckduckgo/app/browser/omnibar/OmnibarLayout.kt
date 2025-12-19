@@ -18,8 +18,6 @@ package com.duckduckgo.app.browser.omnibar
 
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
-import android.content.ClipData
-import android.content.ClipboardManager
 import android.content.Context
 import android.graphics.Color
 import android.os.Build
@@ -78,6 +76,7 @@ import com.duckduckgo.app.browser.omnibar.Omnibar.TextListener
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.LaunchInputScreen
+import com.duckduckgo.app.clipboard.ClipboardInteractor
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.MoveCaretToFront
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.StartCookiesAnimation
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.StartTrackersAnimation
@@ -204,6 +203,9 @@ class OmnibarLayout @JvmOverloads constructor(
 
     @Inject
     lateinit var omnibarRepository: OmnibarRepository
+
+    @Inject
+    lateinit var clipboardInteractor: ClipboardInteractor
 
     private var previousTransitionState: TransitionState? = null
 
@@ -737,10 +739,10 @@ class OmnibarLayout @JvmOverloads constructor(
     }
 
     private fun copyUrlToClipboardAndShowToast(command: Command.CopyUrlToClipboard) {
-        val clipboardManager = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-        val clipData = ClipData.newPlainText("URL", command.url)
-        clipboardManager.setPrimaryClip(clipData)
-        Toast.makeText(context, R.string.urlCopiedToClipboard, Toast.LENGTH_SHORT).show()
+        val notificationShownAutomatically = clipboardInteractor.copyToClipboard(toCopy = command.url, isSensitive = false)
+        if (!notificationShownAutomatically) {
+            Toast.makeText(context, R.string.urlCopiedToClipboard, Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun moveCaretToFront() {
