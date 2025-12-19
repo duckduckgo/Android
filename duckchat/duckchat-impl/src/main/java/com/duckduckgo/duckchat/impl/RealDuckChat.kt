@@ -734,7 +734,6 @@ class RealDuckChat @Inject constructor(
 
             val showContextualMode = isDuckChatFeatureEnabled && isDuckChatUserEnabled && duckChatFeature.contextualMode().isEnabled()
             _showContextualMode.emit(showContextualMode)
-
         }
 
     companion object {
