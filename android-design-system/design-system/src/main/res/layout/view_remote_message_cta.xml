@@ -58,7 +58,7 @@
             android:id="@+id/topIllustration"
             android:layout_width="@dimen/messageCtaIllustrationSize"
             android:layout_height="@dimen/messageCtaIllustrationSize"
-            android:layout_marginTop="@dimen/keyline_2"
+            android:layout_marginTop="@dimen/keyline_4"
             android:scaleType="center"
             android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
