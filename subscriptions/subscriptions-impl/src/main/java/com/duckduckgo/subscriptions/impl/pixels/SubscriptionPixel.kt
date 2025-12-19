@@ -33,7 +33,7 @@ enum class SubscriptionPixel(
     SUBSCRIPTION_ACTIVE(
         baseName = "m_privacy-pro_app_subscription_active",
         type = Daily(),
-        includedParameters = setOf(ATB, APP_VERSION),
+        includedParameters = setOf(APP_VERSION),
     ),
     OFFER_SCREEN_SHOWN(
         baseName = "m_privacy-pro_offer_screen_impression",
@@ -277,6 +277,7 @@ enum class SubscriptionPixel(
 object SubscriptionPixelParameter {
     const val ERROR_TYPE = "errorType"
     const val REASON = "reason"
+    const val OS_VERSION = "os_version"
 }
 
 internal val PixelType.pixelNameSuffix: String
