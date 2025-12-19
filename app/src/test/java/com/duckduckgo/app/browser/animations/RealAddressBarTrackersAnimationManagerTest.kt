@@ -16,41 +16,43 @@
 
 package com.duckduckgo.app.browser.animations
 
+import android.annotation.SuppressLint
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.feature.toggles.api.FakeToggleStore
+import com.duckduckgo.feature.toggles.api.FeatureToggles
+import com.duckduckgo.feature.toggles.api.Toggle.State
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.times
-import org.mockito.kotlin.verify
-import org.mockito.kotlin.whenever
 
-class AddressBarTrackersAnimationManagerTest {
+@SuppressLint("DenyListedApi")
+class RealAddressBarTrackersAnimationManagerTest {
 
     @get:Rule
     var coroutinesTestRule = CoroutineTestRule()
 
-    private val mockFeatureToggle: AddressBarTrackersAnimationFeatureToggle = mock()
-    private val mockToggle: Toggle = mock()
-
-    private lateinit var testee: AddressBarTrackersAnimationManager
+    private lateinit var fakeFeatureToggle: AddressBarTrackersAnimationFeatureToggle
+    private lateinit var testee: RealAddressBarTrackersAnimationManager
 
     @Before
     fun setup() {
-        whenever(mockFeatureToggle.feature()).thenReturn(mockToggle)
-        testee = AddressBarTrackersAnimationManager(
-            addressBarTrackersAnimationFeatureToggle = mockFeatureToggle,
+        fakeFeatureToggle = FeatureToggles.Builder(
+            FakeToggleStore(),
+            featureName = "addressBarTrackersAnimation",
+        ).build().create(AddressBarTrackersAnimationFeatureToggle::class.java)
+
+        testee = RealAddressBarTrackersAnimationManager(
+            addressBarTrackersAnimationFeatureToggle = fakeFeatureToggle,
             dispatcherProvider = coroutinesTestRule.testDispatcherProvider,
         )
     }
 
     @Test
     fun whenFeatureEnabledThenIsFeatureEnabledReturnsTrue() = runTest {
-        whenever(mockToggle.isEnabled()).thenReturn(true)
+        fakeFeatureToggle.feature().setRawStoredState(State(enable = true))
 
         val result = testee.isFeatureEnabled()
 
@@ -59,7 +61,7 @@ class AddressBarTrackersAnimationManagerTest {
 
     @Test
     fun whenFeatureDisabledThenIsFeatureEnabledReturnsFalse() = runTest {
-        whenever(mockToggle.isEnabled()).thenReturn(false)
+        fakeFeatureToggle.feature().setRawStoredState(State(enable = false))
 
         val result = testee.isFeatureEnabled()
 
@@ -68,34 +70,39 @@ class AddressBarTrackersAnimationManagerTest {
 
     @Test
     fun whenFetchFeatureStateCalledThenCachesFeatureState() = runTest {
-        whenever(mockToggle.isEnabled()).thenReturn(true)
+        fakeFeatureToggle.feature().setRawStoredState(State(enable = true))
 
         testee.fetchFeatureState()
 
-        // Calling isFeatureEnabled should use cached value, not call isEnabled again
-        testee.isFeatureEnabled()
-        verify(mockToggle, times(1)).isEnabled()
+        // Change the toggle state after fetching
+        fakeFeatureToggle.feature().setRawStoredState(State(enable = false))
+
+        // Should return cached value (true), not the new value (false)
+        val result = testee.isFeatureEnabled()
+        assertTrue(result)
     }
 
     @Test
     fun whenIsFeatureEnabledCalledMultipleTimesThenUseCachedValue() = runTest {
-        whenever(mockToggle.isEnabled()).thenReturn(true)
+        fakeFeatureToggle.feature().setRawStoredState(State(enable = true))
 
-        testee.isFeatureEnabled()
-        testee.isFeatureEnabled()
-        testee.isFeatureEnabled()
+        // First call caches the value
+        assertTrue(testee.isFeatureEnabled())
 
-        // Should only call isEnabled once due to caching
-        verify(mockToggle, times(1)).isEnabled()
+        // Change the toggle state
+        fakeFeatureToggle.feature().setRawStoredState(State(enable = false))
+
+        // Subsequent calls should return cached value
+        assertTrue(testee.isFeatureEnabled())
+        assertTrue(testee.isFeatureEnabled())
     }
 
     @Test
     fun whenIsFeatureEnabledCalledWithoutFetchThenFetchesAndCaches() = runTest {
-        whenever(mockToggle.isEnabled()).thenReturn(false)
+        fakeFeatureToggle.feature().setRawStoredState(State(enable = false))
 
         val result = testee.isFeatureEnabled()
 
         assertFalse(result)
-        verify(mockToggle, times(1)).isEnabled()
     }
 }
