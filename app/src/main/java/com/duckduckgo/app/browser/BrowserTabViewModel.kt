@@ -1317,8 +1317,12 @@ class BrowserTabViewModel @Inject constructor(
         }
 
     override fun closeCurrentTab() {
-        viewModelScope.launch {
-            removeCurrentTabFromRepository()
+        if (isCustomTabScreen) {
+            command.value = Command.NavigateBackInCustomTab
+        } else {
+            viewModelScope.launch {
+                removeCurrentTabFromRepository()
+            }
         }
     }
 

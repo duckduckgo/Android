@@ -1736,7 +1736,7 @@ class BrowserTabFragment :
                     val wasActive = isActiveTab
                     isActiveTab = it.tabId == tabId
                     if (wasActive && !isActiveTab) {
-                        logcat { "Tab $tabId is newly inactive" }
+                        logcat(tag = "RadoiuC") { "Tab $tabId is newly inactive" }
 
                         // want to ensure that we aren't offering to inject credentials from an inactive tab
                         hideDialogWithTag(CredentialAutofillPickerDialog.TAG)
@@ -2078,6 +2078,12 @@ class BrowserTabFragment :
 
             is Command.LaunchNewTab -> {
                 browserActivity?.launchNewTab()
+            }
+
+            is Command.NavigateBackInCustomTab -> {
+                if (isActiveCustomTab() && parentFragmentManager.backStackEntryCount > 0) {
+                    parentFragmentManager.popBackStack()
+                }
             }
 
             is Command.ShowSavedSiteAddedConfirmation -> savedSiteAdded(it.savedSiteChangedViewState)
