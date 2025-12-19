@@ -61,7 +61,7 @@
     <!-- Trackers blocked animation-->
     <plurals name="trackersBlockedAnimationMessage" tools:ignore="ImpliedQuantity">
         <item quantity="one">Ιχνηλάτης</item>
-        <item quantity="other">Ιχνηλάτης</item>
+        <item quantity="other">Ιχνηλάτες</item>
     </plurals>
 
     <!-- Downloading files -->
