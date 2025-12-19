@@ -27,7 +27,9 @@ import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.feature.toggles.api.Toggle.State.CohortName
 import com.duckduckgo.feature.toggles.api.internal.CachedToggleStore
 import com.duckduckgo.feature.toggles.internal.api.FeatureTogglesCallback
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -140,6 +142,38 @@ class FeatureTogglesTest {
             assertFalse(awaitItem())
             expectNoEvents()
         }
+    }
+
+    @Test
+    fun whenMultipleObserversSubscribeToEnabledThenAllReceiveUpdates() = runTest {
+        val firstObserverReady = CompletableDeferred<Unit>()
+        val secondObserverReady = CompletableDeferred<Unit>()
+        val toggle = feature.enabledByDefault()
+
+        val firstJob = launch {
+            toggle.enabled().test {
+                assertTrue(awaitItem())
+                firstObserverReady.complete(Unit)
+                assertFalse(awaitItem())
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+        val secondJob = launch {
+            toggle.enabled().test {
+                assertTrue(awaitItem())
+                secondObserverReady.complete(Unit)
+                assertFalse(awaitItem())
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+        firstObserverReady.await()
+        secondObserverReady.await()
+        toggle.setRawStoredState(Toggle.State(enable = false))
+
+        firstJob.join()
+        secondJob.join()
     }
 
     @Test
