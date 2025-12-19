@@ -23,6 +23,7 @@ import com.duckduckgo.app.attributed.metrics.api.AttributedMetricClient
 import com.duckduckgo.app.attributed.metrics.api.AttributedMetricConfig
 import com.duckduckgo.app.attributed.metrics.api.MetricBucket
 import com.duckduckgo.app.attributed.metrics.store.AttributedMetricsDateUtils
+import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.browser.api.install.AppInstall
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
@@ -49,6 +50,7 @@ class RetentionWeekAttributedMetricTest {
     private val attributedMetricConfig: AttributedMetricConfig = mock()
     private val appInstall: AppInstall = mock()
     private val dateUtils: AttributedMetricsDateUtils = mock()
+    private val defaultBrowserDetector: DefaultBrowserDetector = mock()
     private val retentionToggle = FakeFeatureToggleFactory.create(AttributedMetricsConfigFeature::class.java)
 
     private lateinit var testee: RetentionWeekAttributedMetric
@@ -75,6 +77,7 @@ class RetentionWeekAttributedMetricTest {
             appInstall = appInstall,
             dateUtils = dateUtils,
             attributedMetricConfig = attributedMetricConfig,
+            defaultBrowserDetector = defaultBrowserDetector,
         )
     }
 
@@ -225,6 +228,26 @@ class RetentionWeekAttributedMetricTest {
         val version = testee.getMetricParameters()["version"]
 
         assertEquals("0", version)
+    }
+
+    @Test
+    fun whenIsDefaultBrowserThenReturnDefaultBrowserTrue() = runTest {
+        givenDaysSinceInstalled(7)
+        whenever(defaultBrowserDetector.isDefaultBrowser()).thenReturn(true)
+
+        val defaultBrowser = testee.getMetricParameters()["default_browser"]
+
+        assertEquals("true", defaultBrowser)
+    }
+
+    @Test
+    fun whenIsNotDefaultBrowserThenReturnDefaultBrowserFalse() = runTest {
+        givenDaysSinceInstalled(7)
+        whenever(defaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
+
+        val defaultBrowser = testee.getMetricParameters()["default_browser"]
+
+        assertEquals("false", defaultBrowser)
     }
 
     private fun givenDaysSinceInstalled(days: Int) {

@@ -21,6 +21,7 @@ import com.duckduckgo.app.attributed.metrics.api.AttributedMetricClient
 import com.duckduckgo.app.attributed.metrics.api.AttributedMetricConfig
 import com.duckduckgo.app.attributed.metrics.api.MetricBucket
 import com.duckduckgo.app.attributed.metrics.store.AttributedMetricsDateUtils
+import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.api.AtbLifecyclePlugin
 import com.duckduckgo.browser.api.install.AppInstall
@@ -46,6 +47,7 @@ class RetentionWeekAttributedMetric @Inject constructor(
     private val attributedMetricClient: AttributedMetricClient,
     private val dateUtils: AttributedMetricsDateUtils,
     private val attributedMetricConfig: AttributedMetricConfig,
+    private val defaultBrowserDetector: DefaultBrowserDetector,
 ) : AttributedMetric, AtbLifecyclePlugin {
 
     companion object {
@@ -100,6 +102,7 @@ class RetentionWeekAttributedMetric @Inject constructor(
         if (week == -1) return emptyMap()
 
         val params = mutableMapOf(
+            "default_browser" to defaultBrowserDetector.isDefaultBrowser().toString(),
             "count" to bucketValue(getWeekSinceInstall()).toString(),
             "version" to bucketConfig.await().version.toString(),
         )
