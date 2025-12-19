@@ -586,6 +586,12 @@ class OmnibarLayout @JvmOverloads constructor(
         duckAISidebar.setOnClickListener {
             omnibarItemPressedListener?.onDuckAISidebarButtonPressed()
         }
+        newCustomTabToolbarContainer.customTabInnerContainer.setOnClickListener {
+            cancelCustomTabAnimations()
+        }
+        trackersAnimation.setOnClickListener {
+            cancelAddressBarAnimations()
+        }
     }
 
     override fun setLogoClickListener(logoClickListener: LogoClickListener) {
@@ -1035,6 +1041,12 @@ class OmnibarLayout @JvmOverloads constructor(
     private fun cancelAddressBarAnimations() {
         if (this::animatorHelper.isInitialized) {
             animatorHelper.cancelAnimations(omnibarViews())
+        }
+    }
+
+    private fun cancelCustomTabAnimations() {
+        if (this::animatorHelper.isInitialized) {
+            animatorHelper.cancelAnimations(customTabViews())
         }
     }
 
