@@ -1079,8 +1079,9 @@ class OmnibarLayoutViewModel @Inject constructor(
 
     fun onCustomTabUrlLongClicked() {
         viewModelScope.launch {
-            if (_viewState.value.url.isNotEmpty()) {
-                command.send(Command.CopyUrlToClipboard(_viewState.value.url))
+            val url = _viewState.value.url
+            if (url.isNotEmpty()) {
+                command.send(Command.CopyUrlToClipboard(url))
             }
         }
     }
