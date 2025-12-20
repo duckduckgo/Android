@@ -31,8 +31,10 @@ import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
+import javax.inject.Named
 
 @ContributesBinding(AppScope::class)
+@Named("pixel")
 class PixelWideEventSender @Inject constructor(
     private val wideEventFeature: WideEventFeature,
     private val dispatchers: DispatcherProvider,
