@@ -89,5 +89,8 @@
     <string name="duckAiHideAiGeneratedImagesTitle">Dölj AI-genererade bilder</string>
     <string name="duckAiHideAiGeneratedImagesDescription">Filtrerar bort AI-genererade bilder från bildsökningsresultaten</string>
 
-    <!-- Duck AI Tabs Mode Toggle -->
+    <!-- Duck AI Paid Settings -->
+    <string name="duck_ai_paid_settings_enable_in_settings">Aktivera i inställningarna för AI-funktioner</string>
+    <string name="duck_ai_paid_settings_manage_in_settings">Hantera i inställningarna för AI-funktioner</string>
+    <string name="duck_ai_paid_settings_manage_secondary">Konfigurera Duck.ai i inställningarna för AI-funktioner.</string>
 </resources>

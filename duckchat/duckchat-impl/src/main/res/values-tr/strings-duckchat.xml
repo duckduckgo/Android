@@ -89,5 +89,8 @@
     <string name="duckAiHideAiGeneratedImagesTitle">Yapay Zeka Tarafından Oluşturulan Görselleri Gizle</string>
     <string name="duckAiHideAiGeneratedImagesDescription">Görsel arama sonuçlarından yapay zeka tarafından üretilmiş görselleri filtreler</string>
 
-    <!-- Duck AI Tabs Mode Toggle -->
+    <!-- Duck AI Paid Settings -->
+    <string name="duck_ai_paid_settings_enable_in_settings">AI Özellikleri Ayarlarında etkinleştir</string>
+    <string name="duck_ai_paid_settings_manage_in_settings">AI Özellikleri Ayarlarında Yönet</string>
+    <string name="duck_ai_paid_settings_manage_secondary">AI Özellikleri ayarlarından Duck.ai\'ı yapılandırın.</string>
 </resources>

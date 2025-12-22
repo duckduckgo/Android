@@ -89,5 +89,8 @@
     <string name="duckAiHideAiGeneratedImagesTitle">Piilota tekoälyn luomat kuvat</string>
     <string name="duckAiHideAiGeneratedImagesDescription">Suodattaa pois tekoälyn luomat kuvat kuvahaun tuloksista</string>
 
-    <!-- Duck AI Tabs Mode Toggle -->
+    <!-- Duck AI Paid Settings -->
+    <string name="duck_ai_paid_settings_enable_in_settings">Ota käyttöön tekoälyominaisuuksien asetuksissa</string>
+    <string name="duck_ai_paid_settings_manage_in_settings">Hallinnoi tekoälyominaisuuksien asetuksissa</string>
+    <string name="duck_ai_paid_settings_manage_secondary">Määritä Duck.ai tekoälyominaisuuksien asetuksissa.</string>
 </resources>

@@ -89,5 +89,8 @@
     <string name="duckAiHideAiGeneratedImagesTitle">Verberg AI-gegenereerde afbeeldingen.</string>
     <string name="duckAiHideAiGeneratedImagesDescription">Filtert AI-gegenereerde afbeeldingen uit de zoekresultaten van afbeeldingen.</string>
 
-    <!-- Duck AI Tabs Mode Toggle -->
+    <!-- Duck AI Paid Settings -->
+    <string name="duck_ai_paid_settings_enable_in_settings">Inschakelen in de instellingen voor AI-functies</string>
+    <string name="duck_ai_paid_settings_manage_in_settings">Beheren in de instellingen voor AI-functies</string>
+    <string name="duck_ai_paid_settings_manage_secondary">Configureer Duck.ai in de instellingen voor AI-functies.</string>
 </resources>

@@ -89,5 +89,8 @@
     <string name="duckAiHideAiGeneratedImagesTitle">Ascunde imaginile generate de IA</string>
     <string name="duckAiHideAiGeneratedImagesDescription">Filtrează imaginile generate de IA din rezultatele căutării de imagini</string>
 
-    <!-- Duck AI Tabs Mode Toggle -->
+    <!-- Duck AI Paid Settings -->
+    <string name="duck_ai_paid_settings_enable_in_settings">Activează în setările funcțiilor IA</string>
+    <string name="duck_ai_paid_settings_manage_in_settings">Gestionează în setările funcțiilor IA</string>
+    <string name="duck_ai_paid_settings_manage_secondary">Configurează Duck.ai în setările funcțiilor IA.</string>
 </resources>
