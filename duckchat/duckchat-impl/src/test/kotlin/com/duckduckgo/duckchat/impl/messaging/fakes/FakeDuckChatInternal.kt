@@ -35,7 +35,6 @@ class FakeDuckChatInternal(
     private val enableDuckChatUserSetting = MutableStateFlow(enabled)
     private val showInBrowserMenuUserSetting = MutableStateFlow(false)
     private val showInAddressBarUserSetting = MutableStateFlow(false)
-    private val fullscreenModeUserSetting = MutableStateFlow(false)
     private val showInVoiceSearchUserSetting = MutableStateFlow(false)
     private val _chatState = MutableStateFlow(ChatState.READY)
     private val _inputScreenBottomBarEnabled = MutableStateFlow(false)
@@ -87,10 +86,6 @@ class FakeDuckChatInternal(
         showInAddressBarUserSetting.value = showDuckChat
     }
 
-    override suspend fun setFullScreenModeUserSetting(enabled: Boolean) {
-        fullscreenModeUserSetting.value = enabled
-    }
-
     override suspend fun setShowInVoiceSearchUserSetting(showToggle: Boolean) {
         showInVoiceSearchUserSetting.value = showToggle
     }
@@ -100,8 +95,6 @@ class FakeDuckChatInternal(
     override fun observeShowInBrowserMenuUserSetting(): Flow<Boolean> = showInBrowserMenuUserSetting
 
     override fun observeShowInAddressBarUserSetting(): Flow<Boolean> = showInAddressBarUserSetting
-
-    override fun observeFullscreenModeUserSetting(): Flow<Boolean> = fullscreenModeUserSetting
 
     override fun observeShowInVoiceSearchUserSetting(): Flow<Boolean> = showInVoiceSearchUserSetting
 
