@@ -24,10 +24,14 @@
                 "key": "feature.data.ext.free_trial_plan",
                 "description": "The base plan ID of the free trial product activated",
                 "enum": [
-                    "ddg-privacy-pro-monthly-renews-us",
-                    "ddg-privacy-pro-monthly-renews-row",
-                    "ddg-privacy-pro-yearly-renews-us",
-                    "ddg-privacy-pro-yearly-renews-row",
+                    "ddg-privacy.pro.monthly.renews.us",
+                    "ddg.privacy.pro.monthly.renews.row",
+                    "ddg.privacy.pro.yearly.renews.us",
+                    "ddg.privacy.pro.yearly.renews.row",
+                    "ddg-privacy.pro.sandbox.monthly.renews.us",
+                    "ddg.privacy.pro.sandbox.monthly.renews.row",
+                    "ddg.privacy.pro.sandbox.yearly.renews.us",
+                    "ddg.privacy.pro.sandbox.yearly.renews.row"
                 ]
             },
             {
