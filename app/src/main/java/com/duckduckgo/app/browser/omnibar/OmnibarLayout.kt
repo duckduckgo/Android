@@ -744,19 +744,15 @@ class OmnibarLayout @JvmOverloads constructor(
             }
 
             OmnibarLayoutViewModel.LeadingIconState.Dax -> {
-                if (serpEasterEggLogosToggles.feature().isEnabled()) {
-                    with(daxIcon) {
-                        setOnClickListener(null)
-                        show()
-                        Glide
-                            .with(this)
-                            .load(CommonR.drawable.ic_ddg_logo)
-                            .transition(withCrossFade())
-                            .placeholder(daxIcon.drawable)
-                            .into(this)
-                    }
-                } else {
-                    daxIcon.show()
+                with(daxIcon) {
+                    setOnClickListener(null)
+                    show()
+                    Glide
+                        .with(this)
+                        .load(CommonR.drawable.ic_ddg_logo)
+                        .transition(withCrossFade())
+                        .placeholder(daxIcon.drawable)
+                        .into(this)
                 }
                 shieldIcon.gone()
                 searchIcon.gone()

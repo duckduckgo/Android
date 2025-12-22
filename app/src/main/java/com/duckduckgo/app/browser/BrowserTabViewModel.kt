@@ -350,7 +350,6 @@ import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.savedsites.impl.SavedSitesPixelName
 import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment.DeleteBookmarkListener
 import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment.EditSavedSiteListener
-import com.duckduckgo.serp.logos.api.SerpEasterEggLogosToggles
 import com.duckduckgo.serp.logos.api.SerpLogo
 import com.duckduckgo.settings.api.SerpSettingsFeature
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
@@ -483,7 +482,6 @@ class BrowserTabViewModel @Inject constructor(
     private val duckChatJSHelper: DuckChatJSHelper,
     private val tabManager: TabManager,
     private val addressDisplayFormatter: AddressDisplayFormatter,
-    private val serpEasterEggLogosToggles: SerpEasterEggLogosToggles,
     private val nonHttpAppLinkChecker: NonHttpAppLinkChecker,
     private val externalIntentProcessingState: ExternalIntentProcessingState,
     private val vpnMenuStateProvider: VpnMenuStateProvider,
@@ -1975,12 +1973,10 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private fun evaluateSerpLogoState(url: String?) {
-        if (serpEasterEggLogosToggles.feature().isEnabled()) {
-            if (url != null && duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
-                command.value = ExtractSerpLogo(url)
-            } else {
-                omnibarViewState.value = currentOmnibarViewState().copy(serpLogo = null)
-            }
+        if (url != null && duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
+            command.value = ExtractSerpLogo(url)
+        } else {
+            omnibarViewState.value = currentOmnibarViewState().copy(serpLogo = null)
         }
     }
 
