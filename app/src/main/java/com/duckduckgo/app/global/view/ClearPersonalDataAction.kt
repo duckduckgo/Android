@@ -32,7 +32,6 @@ import com.duckduckgo.common.utils.DefaultDispatcherProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.cookies.api.DuckDuckGoCookieManager
 import com.duckduckgo.history.api.NavigationHistory
-import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupDataClearer
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
 import com.duckduckgo.sync.api.DeviceSyncState
@@ -105,7 +104,6 @@ class ClearPersonalDataAction(
     private val sitePermissionsManager: SitePermissionsManager,
     private val deviceSyncState: DeviceSyncState,
     private val savedSitesRepository: SavedSitesRepository,
-    private val privacyProtectionsPopupDataClearer: PrivacyProtectionsPopupDataClearer,
     private val navigationHistory: NavigationHistory,
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
     private val webTrackersBlockedRepository: WebTrackersBlockedRepository,
@@ -135,8 +133,6 @@ class ClearPersonalDataAction(
             if (!deviceSyncState.isUserSignedInOnDevice()) {
                 savedSitesRepository.pruneDeleted()
             }
-
-            privacyProtectionsPopupDataClearer.clearPersonalData()
 
             clearTabsAsync(appInForeground)
 
@@ -176,8 +172,6 @@ class ClearPersonalDataAction(
             if (!deviceSyncState.isUserSignedInOnDevice()) {
                 savedSitesRepository.pruneDeleted()
             }
-
-            privacyProtectionsPopupDataClearer.clearPersonalData()
 
             webTrackersBlockedRepository.deleteAll()
 

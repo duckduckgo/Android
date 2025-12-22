@@ -313,9 +313,6 @@ import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreenParam
 import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreenParams.PrivacyDashboardPrimaryScreen
 import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreenParams.PrivacyDashboardToggleReportScreen
 import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreenResult
-import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopup
-import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupFactory
-import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupViewState
 import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
@@ -529,9 +526,6 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var downloadConfirmation: DownloadConfirmation
-
-    @Inject
-    lateinit var privacyProtectionsPopupFactory: PrivacyProtectionsPopupFactory
 
     @Inject
     lateinit var appLinksSnackBarConfigurator: AppLinksSnackBarConfigurator
@@ -889,8 +883,6 @@ class BrowserTabFragment :
     // see discussion in https://github.com/duckduckgo/Android/pull/4027#discussion_r1433373625
     private val jsOrientationHandler = JsOrientationHandler()
 
-    private lateinit var privacyProtectionsPopup: PrivacyProtectionsPopup
-
     private val inputScreenLauncher =
         registerForActivityResult(StartActivityForResult()) { result ->
             val data = result.data
@@ -1043,7 +1035,6 @@ class BrowserTabFragment :
         configureSwipeRefresh()
         configureAutoComplete()
         configureNewTab()
-        initPrivacyProtectionsPopup()
         createPopupMenu()
 
         configureNavigationBar()
@@ -1509,16 +1500,6 @@ class BrowserTabFragment :
                 }
             }
         }
-    }
-
-    private fun initPrivacyProtectionsPopup() {
-        privacyProtectionsPopup =
-            privacyProtectionsPopupFactory.createPopup(
-                anchor = omnibar.shieldIcon,
-            )
-        privacyProtectionsPopup.events
-            .onEach(viewModel::onPrivacyProtectionsPopupUiEvent)
-            .launchIn(lifecycleScope)
     }
 
     private fun getDaxDialogFromActivity(): Fragment? = activity?.supportFragmentManager?.findFragmentByTag(DAX_DIALOG_DIALOG_TAG)
@@ -4023,7 +4004,6 @@ class BrowserTabFragment :
 
         renderer.renderHomeCta()
         recreatePopupMenu()
-        privacyProtectionsPopup.onConfigurationChanged()
         viewModel.onConfigurationChanged()
     }
 
@@ -4491,12 +4471,8 @@ class BrowserTabFragment :
                  * haven't changed between the time trackers animation was emitted, and the time it'll
                  * be started
                  */
-                val privacyProtectionsPopupVisible =
-                    lastSeenBrowserViewState
-                        ?.privacyProtectionsPopupViewState is PrivacyProtectionsPopupViewState.Visible
                 if (
                     lastSeenOmnibarViewState?.isEditing != true &&
-                    !privacyProtectionsPopupVisible &&
                     lastSeenBrowserViewState?.browserShowing == true &&
                     lastSeenBrowserViewState?.maliciousSiteBlocked == false
                 ) {
@@ -4583,7 +4559,6 @@ class BrowserTabFragment :
                 popupMenu.render(browseMenuState)
 
                 renderFullscreenMode(viewState)
-                privacyProtectionsPopup.setViewState(viewState.privacyProtectionsPopupViewState)
 
                 val bookmark =
                     viewModel.browserViewState.value

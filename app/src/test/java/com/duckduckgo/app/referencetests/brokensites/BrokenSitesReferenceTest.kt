@@ -45,7 +45,6 @@ import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.PrivacyConfig
 import com.duckduckgo.privacy.config.api.PrivacyConfigData
 import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
-import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupExperimentExternalPixels
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.runBlocking
@@ -91,10 +90,6 @@ class BrokenSitesReferenceTest(private val testCase: TestCase) {
     private val mockUserAllowListRepository: UserAllowListRepository = mock()
 
     private val networkProtectionState: NetworkProtectionState = mock()
-
-    private val privacyProtectionsPopupExperimentExternalPixels: PrivacyProtectionsPopupExperimentExternalPixels = mock {
-        runBlocking { whenever(mock.getPixelParams()).thenReturn(emptyMap()) }
-    }
 
     private val webViewVersionProvider: WebViewVersionProvider = mock()
     private lateinit var testBlockListFeature: TestBlockListFeature
@@ -158,7 +153,6 @@ class BrokenSitesReferenceTest(private val testCase: TestCase) {
             mock(),
             mock(),
             mock(),
-            privacyProtectionsPopupExperimentExternalPixels,
             networkProtectionState,
             webViewVersionProvider,
             ampLinks = mock(),
