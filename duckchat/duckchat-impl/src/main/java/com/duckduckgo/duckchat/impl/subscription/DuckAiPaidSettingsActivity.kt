@@ -45,11 +45,12 @@ import com.duckduckgo.duckchat.impl.subscription.DuckAiPaidSettingsViewModel.Com
 import com.duckduckgo.duckchat.impl.subscription.DuckAiPaidSettingsViewModel.Command.OpenDuckAi
 import com.duckduckgo.duckchat.impl.subscription.DuckAiPaidSettingsViewModel.Command.OpenDuckChatSettings
 import com.duckduckgo.duckchat.impl.subscription.DuckAiPaidSettingsViewModel.ViewState
-import com.duckduckgo.mobile.android.R
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
+import com.duckduckgo.duckchat.impl.R as DuckChatR
+import com.duckduckgo.mobile.android.R as CommonR
 
 object DuckAiPaidSettingsNoParams : GlobalActivityStarter.ActivityParams
 
@@ -74,7 +75,7 @@ class DuckAiPaidSettingsActivity : DuckDuckGoActivity() {
 
         override fun updateDrawState(ds: TextPaint) {
             super.updateDrawState(ds)
-            ds.color = getColorFromAttr(R.attr.daxColorAccentBlue)
+            ds.color = getColorFromAttr(CommonR.attr.daxColorAccentBlue)
             ds.isUnderlineText = false
         }
     }
@@ -113,6 +114,12 @@ class DuckAiPaidSettingsActivity : DuckDuckGoActivity() {
 
     private fun renderViewState(viewState: ViewState) {
         with(binding) {
+            if (viewState.isDuckAiPaidSettingsFeatureEnabled) {
+                duckAiPaidSettingsIcon.setImageResource(DuckChatR.drawable.duckai_128)
+            } else {
+                duckAiPaidSettingsIcon.setImageResource(DuckChatR.drawable.duckai_ddg_128)
+            }
+
             statusIndicator.setStatus(viewState.isDuckAIEnabled)
             duckAiPaidSettingsOpenDuckAi.isVisible = viewState.isDuckAIEnabled
             duckAiPaidSettingsEnableInSettings.isVisible = true

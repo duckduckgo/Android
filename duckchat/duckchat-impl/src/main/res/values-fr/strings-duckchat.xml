@@ -89,5 +89,8 @@
     <string name="duckAiHideAiGeneratedImagesTitle">Masquer les images générées par l\'IA</string>
     <string name="duckAiHideAiGeneratedImagesDescription">Filtre les images générées par l\'IA des résultats de recherche d\'images</string>
 
-    <!-- Duck AI Tabs Mode Toggle -->
+    <!-- Duck AI Paid Settings -->
+    <string name="duck_ai_paid_settings_enable_in_settings">Activer dans les réglages des fonctionnalités d\'IA</string>
+    <string name="duck_ai_paid_settings_manage_in_settings">Gérer dans les réglages des fonctionnalités d\'IA</string>
+    <string name="duck_ai_paid_settings_manage_secondary">Configurez Duck.ai dans les réglages des fonctionnalités d\'IA.</string>
 </resources>

@@ -89,5 +89,8 @@
     <string name="duckAiHideAiGeneratedImagesTitle">AI-generierte Bilder ausblenden</string>
     <string name="duckAiHideAiGeneratedImagesDescription">Filtert KI-generierte Bilder aus den Ergebnissen der Bildersuche</string>
 
-    <!-- Duck AI Tabs Mode Toggle -->
+    <!-- Duck AI Paid Settings -->
+    <string name="duck_ai_paid_settings_enable_in_settings">In Einstellungen für KI-Funktionen aktivieren</string>
+    <string name="duck_ai_paid_settings_manage_in_settings">In Einstellungen für KI-Funktionen verwalten</string>
+    <string name="duck_ai_paid_settings_manage_secondary">Konfiguriere Duck.ai in den Einstellungen für KI-Funktionen.</string>
 </resources>

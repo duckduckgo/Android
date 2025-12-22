@@ -89,5 +89,8 @@
     <string name="duckAiHideAiGeneratedImagesTitle">Скрыть ИИ-картинки</string>
     <string name="duckAiHideAiGeneratedImagesDescription">Исключает из результатов поиска изображения, созданные нейросетью</string>
 
-    <!-- Duck AI Tabs Mode Toggle -->
+    <!-- Duck AI Paid Settings -->
+    <string name="duck_ai_paid_settings_enable_in_settings">Посетить «Настройки функций ИИ»</string>
+    <string name="duck_ai_paid_settings_manage_in_settings">Настроить функции ИИ</string>
+    <string name="duck_ai_paid_settings_manage_secondary">Параметры Duck.ai можно задать в разделе «Настройки функций ИИ».</string>
 </resources>
