@@ -92,4 +92,9 @@
     <!-- Duck AI Tabs Mode Toggle -->
     <string name="duckAiFullScreenModeTitle">Duck.ai cilņu režīms</string>
     <string name="duckAiFullScreenModeDescription">Rādīt jaunas Duck.ai tērzēšanas kā cilnes pārlūkprogrammā</string>
+
+    <!-- Duck AI Paid Settings -->
+    <string name="duck_ai_paid_settings_enable_in_settings">Ieslēgt MI funkciju iestatījumos</string>
+    <string name="duck_ai_paid_settings_manage_in_settings">Pārvaldīt MI funkciju iestatījumos</string>
+    <string name="duck_ai_paid_settings_manage_secondary">Konfigurē Duck.ai MI funkciju iestatījumos.</string>
 </resources>

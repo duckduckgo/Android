@@ -92,4 +92,9 @@
     <!-- Duck AI Tabs Mode Toggle -->
     <string name="duckAiFullScreenModeTitle">Način zavihkov Duck.ai</string>
     <string name="duckAiFullScreenModeDescription">Prikaži nove klepete Duck.ai kot zavihke v brskalniku</string>
+
+    <!-- Duck AI Paid Settings -->
+    <string name="duck_ai_paid_settings_enable_in_settings">Omogočite v nastavitvah funkcij umetne inteligence</string>
+    <string name="duck_ai_paid_settings_manage_in_settings">Upravljajte v nastavitvah funkcij umetne inteligence</string>
+    <string name="duck_ai_paid_settings_manage_secondary">Konfigurirajte Duck.ai v nastavitvah funkcij umetne inteligence.</string>
 </resources>

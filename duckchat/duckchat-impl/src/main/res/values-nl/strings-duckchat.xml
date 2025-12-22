@@ -92,4 +92,9 @@
     <!-- Duck AI Tabs Mode Toggle -->
     <string name="duckAiFullScreenModeTitle">Tabbladmodus Duck.ai </string>
     <string name="duckAiFullScreenModeDescription">Toon nieuwe Duck.ai-chats als tabbladen in de browser</string>
+
+    <!-- Duck AI Paid Settings -->
+    <string name="duck_ai_paid_settings_enable_in_settings">Inschakelen in de instellingen voor AI-functies</string>
+    <string name="duck_ai_paid_settings_manage_in_settings">Beheren in de instellingen voor AI-functies</string>
+    <string name="duck_ai_paid_settings_manage_secondary">Configureer Duck.ai in de instellingen voor AI-functies.</string>
 </resources>
