@@ -146,7 +146,7 @@ class RealPirDashboardMaintenanceScanDataProvider @Inject constructor(
                 val schedulingConfig = schedulingConfigMap[it.brokerName] ?: return@getBrokerMatches 0L
                 it.getNextRunMillis(schedulingConfig, nextRunFromOptOutDataMap[it.brokerName], startDate, endDate)
             },
-        )
+        ).distinctBy { it.broker.name }
 
         return DashboardScanDetails(
             dateInMillis = allValidBrokerMatches.firstOrNull()?.dateInMillis ?: 0L,
