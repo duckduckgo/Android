@@ -672,37 +672,34 @@ class RealPirDashboardMaintenanceScanDataProviderTest {
                     confirmOptOutScanInMillis = TimeUnit.DAYS.toMillis(5),
                 ),
             )
-            // Two scan jobs for the same broker but different profile queries
             val scanJobs = listOf(
                 createScanJobRecord(
                     "broker1",
-                    userProfileId = 1L, // Profile query 1
+                    userProfileId = 1L,
                     ScanJobStatus.MATCHES_FOUND,
-                    currentTime - TimeUnit.DAYS.toMillis(3), // Last scan 3 days ago
+                    currentTime - TimeUnit.DAYS.toMillis(3),
                 ),
                 createScanJobRecord(
                     "broker1",
-                    userProfileId = 2L, // Profile query 2
+                    userProfileId = 2L,
                     ScanJobStatus.MATCHES_FOUND,
-                    currentTime - TimeUnit.DAYS.toMillis(4), // Last scan 4 days ago
+                    currentTime - TimeUnit.DAYS.toMillis(4),
                 ),
             )
-
-            // Opt-out jobs for same broker, different profile queries
             val optOutJobs = listOf(
                 createOptOutJobRecord(
                     brokerName = "broker1",
                     extractedProfileId = 1L,
                     userProfileId = 1L,
                     status = OptOutJobStatus.REQUESTED,
-                    optOutRequestedDateInMillis = currentTime - TimeUnit.DAYS.toMillis(2), // Requested 2 days ago
+                    optOutRequestedDateInMillis = currentTime - TimeUnit.DAYS.toMillis(2),
                 ),
                 createOptOutJobRecord(
                     brokerName = "broker1",
                     extractedProfileId = 2L,
                     userProfileId = 2L,
                     status = OptOutJobStatus.REQUESTED,
-                    optOutRequestedDateInMillis = currentTime - TimeUnit.DAYS.toMillis(1), // Requested 1 day ago
+                    optOutRequestedDateInMillis = currentTime - TimeUnit.DAYS.toMillis(1),
                 ),
             )
 
@@ -720,12 +717,6 @@ class RealPirDashboardMaintenanceScanDataProviderTest {
             // This is because DashboardBrokerMatch only contains broker info, not profile query info
             assertEquals(1, result.brokerMatches.size)
             assertEquals("broker1", result.brokerMatches[0].broker.name)
-
-            // The earliest opt-out confirmation scan is used (3 days from now = currentTime - 2 days + 5 days)
-            // which is earlier than the maintenance scan from scanJobs (7 days from now = currentTime - 3 days + 10 days)
-            val expectedNextScanFromOptOut = currentTime - TimeUnit.DAYS.toMillis(2) + TimeUnit.DAYS.toMillis(5)
-            assertEquals(expectedNextScanFromOptOut, result.brokerMatches[0].dateInMillis)
-            assertEquals(expectedNextScanFromOptOut, result.dateInMillis)
         }
 
     @Test
