@@ -92,4 +92,9 @@
     <!-- Duck AI Tabs Mode Toggle -->
     <string name="duckAiFullScreenModeTitle">Modo de pestañas de Duck.ai</string>
     <string name="duckAiFullScreenModeDescription">Mostrar los nuevos chats de Duck.ai como pestañas en el navegador</string>
+
+    <!-- Duck AI Paid Settings -->
+    <string name="duck_ai_paid_settings_enable_in_settings">Habilitar en la configuración de funciones de IA</string>
+    <string name="duck_ai_paid_settings_manage_in_settings">Administrar en la configuración de funciones de IA</string>
+    <string name="duck_ai_paid_settings_manage_secondary">Configura Duck.ai en los ajustes de funciones de IA.</string>
 </resources>

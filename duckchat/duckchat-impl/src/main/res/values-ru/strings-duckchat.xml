@@ -92,4 +92,9 @@
     <!-- Duck AI Tabs Mode Toggle -->
     <string name="duckAiFullScreenModeTitle">Режим вкладок Duck.ai</string>
     <string name="duckAiFullScreenModeDescription">Показывать новые чаты Duck.ai как вкладки браузера</string>
+
+    <!-- Duck AI Paid Settings -->
+    <string name="duck_ai_paid_settings_enable_in_settings">Посетить «Настройки функций ИИ»</string>
+    <string name="duck_ai_paid_settings_manage_in_settings">Настроить функции ИИ</string>
+    <string name="duck_ai_paid_settings_manage_secondary">Параметры Duck.ai можно задать в разделе «Настройки функций ИИ».</string>
 </resources>

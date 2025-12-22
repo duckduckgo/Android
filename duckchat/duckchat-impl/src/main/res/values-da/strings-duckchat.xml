@@ -92,4 +92,9 @@
     <!-- Duck AI Tabs Mode Toggle -->
     <string name="duckAiFullScreenModeTitle">Duck.ai fanetilstand</string>
     <string name="duckAiFullScreenModeDescription">Vis nye Duck.ai-chats som faner i browseren</string>
+
+    <!-- Duck AI Paid Settings -->
+    <string name="duck_ai_paid_settings_enable_in_settings">Aktivér i indstillinger for AI-funktioner</string>
+    <string name="duck_ai_paid_settings_manage_in_settings">Administrer i indstillinger for AI-funktioner</string>
+    <string name="duck_ai_paid_settings_manage_secondary">Konfigurer Duck.ai i indstillingerne for AI-funktioner.</string>
 </resources>

@@ -92,4 +92,9 @@
     <!-- Duck AI Tabs Mode Toggle -->
     <string name="duckAiFullScreenModeTitle">Modo de separadores Duck.ai</string>
     <string name="duckAiFullScreenModeDescription">Mostrar os novos Duck.ai Chats como separadores no navegador</string>
+
+    <!-- Duck AI Paid Settings -->
+    <string name="duck_ai_paid_settings_enable_in_settings">Ativar nas definições das Funcionalidades de IA</string>
+    <string name="duck_ai_paid_settings_manage_in_settings">Gerir nas definições das Funcionalidades de IA</string>
+    <string name="duck_ai_paid_settings_manage_secondary">Configura o Duck.ai nas definições de Funcionalidades de IA.</string>
 </resources>

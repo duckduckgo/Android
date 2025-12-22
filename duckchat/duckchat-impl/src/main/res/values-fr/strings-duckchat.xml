@@ -92,4 +92,9 @@
     <!-- Duck AI Tabs Mode Toggle -->
     <string name="duckAiFullScreenModeTitle">Mode onglets Duck.ai</string>
     <string name="duckAiFullScreenModeDescription">Afficher les nouveaux chats Duck.ai sous forme d\'onglets dans le navigateur</string>
+
+    <!-- Duck AI Paid Settings -->
+    <string name="duck_ai_paid_settings_enable_in_settings">Activer dans les réglages des fonctionnalités d\'IA</string>
+    <string name="duck_ai_paid_settings_manage_in_settings">Gérer dans les réglages des fonctionnalités d\'IA</string>
+    <string name="duck_ai_paid_settings_manage_secondary">Configurez Duck.ai dans les réglages des fonctionnalités d\'IA.</string>
 </resources>
