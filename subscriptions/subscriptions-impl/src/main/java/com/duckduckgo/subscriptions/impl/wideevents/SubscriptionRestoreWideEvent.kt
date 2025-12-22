@@ -120,6 +120,7 @@ class SubscriptionRestoreWideEventImpl @Inject constructor(
     private suspend fun onRestoreFlowStarted(restorePlatform: String, purchaseAttempt: Boolean, flowEntryPoint: String?) {
         getCurrentWideEventId()?.let { wideEventId ->
             wideEventClient.flowFinish(wideEventId = wideEventId, status = FlowStatus.Unknown)
+            cachedFlowId = null
         }
 
         val flowId = wideEventClient
