@@ -169,7 +169,7 @@ class SubscriptionRestoreWideEventImpl @Inject constructor(
         const val PATH_ACTIVATE_BY_EMAIL_OTP = "/subscriptions/activation-flow/this-device/activate-by-email/otp"
 
         const val STEP_ACTIVATION_FLOW_STARTED = "activation_flow_started"
-        const val STEP_EMAIL_INPUT = "email_input"
+        const val STEP_EMAIL_INPUT = "email_address_input"
         const val STEP_ONE_TIME_PASSWORD_INPUT = "one_time_password_input"
     }
 }

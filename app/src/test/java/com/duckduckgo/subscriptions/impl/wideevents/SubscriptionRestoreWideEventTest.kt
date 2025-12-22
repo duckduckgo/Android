@@ -239,7 +239,7 @@ class SubscriptionRestoreWideEventTest {
         )
         advanceUntilIdle()
 
-        verify(wideEventClient).flowStep(wideEventId = 100L, stepName = "email_input")
+        verify(wideEventClient).flowStep(wideEventId = 100L, stepName = "email_address_input")
     }
 
     @Test
