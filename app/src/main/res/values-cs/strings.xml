@@ -74,6 +74,7 @@
     <string name="options">Možnosti</string>
     <string name="shareLink">Sdílet odkaz</string>
     <string name="copyUrl">Kopírovat adresu odkazu</string>
+    <string name="urlCopiedToClipboard">Adresa URL se zkopírovala do schránky</string>
 
     <!-- Find in page -->
     <string name="nextSearchTermDescription">Najít další</string>
