@@ -98,6 +98,7 @@ import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Purchas
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionsWebViewActivityWithParams.ToolbarConfig
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionsWebViewActivityWithParams.ToolbarConfig.CustomTitle
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionsWebViewActivityWithParams.ToolbarConfig.DaxPrivacyPro
+import com.duckduckgo.subscriptions.impl.wideevents.SubscriptionRestoreWideEvent
 import com.duckduckgo.user.agent.api.UserAgentProvider
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.cancellable
@@ -182,6 +183,9 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
     @Inject
     lateinit var privacyProFeature: PrivacyProFeature
 
+    @Inject
+    lateinit var subscriptionRestoreWideEvent: SubscriptionRestoreWideEvent
+
     private val viewModel: SubscriptionWebViewViewModel by bindViewModel()
 
     private val binding: ActivitySubscriptionsWebviewBinding by viewBinding()
@@ -252,6 +256,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
                 specialUrlDetector = specialUrlDetector,
                 context = this,
                 onRenderProcessCrash = ::recoverFromRenderProcessCrash,
+                subscriptionRestoreWideEvent = subscriptionRestoreWideEvent,
             )
             it.settings.apply {
                 userAgentString = CUSTOM_UA

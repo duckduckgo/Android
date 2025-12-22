@@ -17,6 +17,7 @@
 package com.duckduckgo.subscriptions.impl.wideevents
 
 import android.annotation.SuppressLint
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.statistics.wideevents.CleanupPolicy
 import com.duckduckgo.app.statistics.wideevents.FlowStatus
 import com.duckduckgo.app.statistics.wideevents.WideEventClient
@@ -24,12 +25,17 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.subscriptions.impl.PrivacyProFeature
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.RunWith
 import org.mockito.kotlin.*
 
+@OptIn(ExperimentalCoroutinesApi::class)
+@RunWith(AndroidJUnit4::class)
 class SubscriptionRestoreWideEventTest {
     @get:Rule
     val coroutineRule = CoroutineTestRule()
@@ -51,6 +57,7 @@ class SubscriptionRestoreWideEventTest {
                 wideEventClient = wideEventClient,
                 privacyProFeature = { privacyProFeature },
                 dispatchers = coroutineRule.testDispatcherProvider,
+                coroutineScope = coroutineRule.testScope,
             )
     }
 
@@ -59,10 +66,11 @@ class SubscriptionRestoreWideEventTest {
         whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any()))
             .thenReturn(Result.success(123L))
 
-        subscriptionRestoreWideEvent.onEmailRestoreFlowStarted()
+        subscriptionRestoreWideEvent.onEmailRestoreFlowStarted(isOriginWeb = false)
 
         verify(wideEventClient).flowStart(
             name = "subscription-restore",
+            flowEntryPoint = "funnel_appsettings_android",
             cleanupPolicy = CleanupPolicy.OnProcessStart(ignoreIfIntervalTimeoutPresent = true),
             metadata = mapOf(
                 "restore_platform" to "email_address",
@@ -77,10 +85,11 @@ class SubscriptionRestoreWideEventTest {
         whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any()))
             .thenReturn(Result.success(456L))
 
-        subscriptionRestoreWideEvent.onGooglePlayRestoreFlowStarted()
+        subscriptionRestoreWideEvent.onGooglePlayRestoreFlowStarted(isOriginWeb = false)
 
         verify(wideEventClient).flowStart(
             name = "subscription-restore",
+            flowEntryPoint = "funnel_appsettings_android",
             cleanupPolicy = CleanupPolicy.OnProcessStart(ignoreIfIntervalTimeoutPresent = true),
             metadata = mapOf(
                 "restore_platform" to "google_play",
@@ -113,7 +122,7 @@ class SubscriptionRestoreWideEventTest {
         whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any()))
             .thenReturn(Result.success(100L))
 
-        subscriptionRestoreWideEvent.onEmailRestoreFlowStarted()
+        subscriptionRestoreWideEvent.onEmailRestoreFlowStarted(isOriginWeb = false)
         subscriptionRestoreWideEvent.onEmailRestoreSuccess()
 
         verify(wideEventClient).intervalEnd(wideEventId = 100L, key = "restore_latency_ms_bucketed")
@@ -125,7 +134,7 @@ class SubscriptionRestoreWideEventTest {
         whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any()))
             .thenReturn(Result.success(200L))
 
-        subscriptionRestoreWideEvent.onGooglePlayRestoreFlowStarted()
+        subscriptionRestoreWideEvent.onGooglePlayRestoreFlowStarted(isOriginWeb = false)
         subscriptionRestoreWideEvent.onGooglePlayRestoreSuccess()
 
         verify(wideEventClient).intervalEnd(wideEventId = 200L, key = "restore_latency_ms_bucketed")
@@ -137,7 +146,7 @@ class SubscriptionRestoreWideEventTest {
         whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any()))
             .thenReturn(Result.success(300L))
 
-        subscriptionRestoreWideEvent.onGooglePlayRestoreFlowStarted()
+        subscriptionRestoreWideEvent.onGooglePlayRestoreFlowStarted(isOriginWeb = false)
         subscriptionRestoreWideEvent.onGooglePlayRestoreFailure("some-error")
 
         verify(wideEventClient).flowFinish(
@@ -152,8 +161,8 @@ class SubscriptionRestoreWideEventTest {
             .thenReturn(Result.success(1L))
             .thenReturn(Result.success(2L))
 
-        subscriptionRestoreWideEvent.onEmailRestoreFlowStarted()
-        subscriptionRestoreWideEvent.onGooglePlayRestoreFlowStarted()
+        subscriptionRestoreWideEvent.onEmailRestoreFlowStarted(isOriginWeb = false)
+        subscriptionRestoreWideEvent.onGooglePlayRestoreFlowStarted(isOriginWeb = false)
 
         verify(wideEventClient).flowFinish(wideEventId = 1L, status = FlowStatus.Unknown)
     }
@@ -186,8 +195,8 @@ class SubscriptionRestoreWideEventTest {
     fun `feature disabled results in no interactions`() = runTest {
         privacyProFeature.sendSubscriptionRestoreWideEvent().setRawStoredState(Toggle.State(false))
 
-        subscriptionRestoreWideEvent.onEmailRestoreFlowStarted()
-        subscriptionRestoreWideEvent.onGooglePlayRestoreFlowStarted()
+        subscriptionRestoreWideEvent.onEmailRestoreFlowStarted(isOriginWeb = false)
+        subscriptionRestoreWideEvent.onGooglePlayRestoreFlowStarted(isOriginWeb = false)
         subscriptionRestoreWideEvent.onGooglePlayRestoreFlowStartedOnPurchaseAttempt()
         subscriptionRestoreWideEvent.onEmailRestoreSuccess()
         subscriptionRestoreWideEvent.onGooglePlayRestoreSuccess()
@@ -201,9 +210,84 @@ class SubscriptionRestoreWideEventTest {
         whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any()))
             .thenReturn(Result.failure(RuntimeException("error")))
 
-        subscriptionRestoreWideEvent.onEmailRestoreFlowStarted()
+        subscriptionRestoreWideEvent.onEmailRestoreFlowStarted(isOriginWeb = false)
 
         verify(wideEventClient).flowStart(any(), anyOrNull(), any(), any())
         verify(wideEventClient, never()).intervalStart(any(), any(), any())
+    }
+
+    @Test
+    fun `onSubscriptionWebViewUrlChanged records activation flow started step`() = runTest {
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any()))
+            .thenReturn(Result.success(100L))
+
+        subscriptionRestoreWideEvent.onEmailRestoreFlowStarted(isOriginWeb = false)
+        subscriptionRestoreWideEvent.onSubscriptionWebViewUrlChanged("https://duckduckgo.com/subscriptions/activation-flow")
+        advanceUntilIdle()
+
+        verify(wideEventClient).flowStep(wideEventId = 100L, stepName = "activation_flow_started")
+    }
+
+    @Test
+    fun `onSubscriptionWebViewUrlChanged records email input step`() = runTest {
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any()))
+            .thenReturn(Result.success(100L))
+
+        subscriptionRestoreWideEvent.onEmailRestoreFlowStarted(isOriginWeb = false)
+        subscriptionRestoreWideEvent.onSubscriptionWebViewUrlChanged(
+            "https://duckduckgo.com/subscriptions/activation-flow/this-device/activate-by-email",
+        )
+        advanceUntilIdle()
+
+        verify(wideEventClient).flowStep(wideEventId = 100L, stepName = "email_address_input")
+    }
+
+    @Test
+    fun `onSubscriptionWebViewUrlChanged records one time password input step`() = runTest {
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any()))
+            .thenReturn(Result.success(100L))
+
+        subscriptionRestoreWideEvent.onEmailRestoreFlowStarted(isOriginWeb = false)
+        subscriptionRestoreWideEvent.onSubscriptionWebViewUrlChanged(
+            "https://duckduckgo.com/subscriptions/activation-flow/this-device/activate-by-email/otp",
+        )
+        advanceUntilIdle()
+
+        verify(wideEventClient).flowStep(wideEventId = 100L, stepName = "one_time_password_input")
+    }
+
+    @Test
+    fun `onSubscriptionWebViewUrlChanged ignores query parameters when matching path`() = runTest {
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any()))
+            .thenReturn(Result.success(100L))
+
+        subscriptionRestoreWideEvent.onEmailRestoreFlowStarted(isOriginWeb = false)
+        subscriptionRestoreWideEvent.onSubscriptionWebViewUrlChanged("https://duckduckgo.com/subscriptions/activation-flow?token=abc&ref=xyz")
+        advanceUntilIdle()
+
+        verify(wideEventClient).flowStep(wideEventId = 100L, stepName = "activation_flow_started")
+    }
+
+    @Test
+    fun `onSubscriptionWebViewUrlChanged does not record step for unmatched URL`() = runTest {
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any()))
+            .thenReturn(Result.success(100L))
+
+        subscriptionRestoreWideEvent.onEmailRestoreFlowStarted(isOriginWeb = false)
+        subscriptionRestoreWideEvent.onSubscriptionWebViewUrlChanged("https://duckduckgo.com/some/other/path")
+        advanceUntilIdle()
+
+        verify(wideEventClient, never()).flowStep(any(), any(), any(), any())
+    }
+
+    @Test
+    fun `onSubscriptionWebViewUrlChanged does nothing without active flow`() = runTest {
+        whenever(wideEventClient.getFlowIds(any()))
+            .thenReturn(Result.success(emptyList()))
+
+        subscriptionRestoreWideEvent.onSubscriptionWebViewUrlChanged("https://duckduckgo.com/subscriptions/activation-flow")
+        advanceUntilIdle()
+
+        verify(wideEventClient, never()).flowStep(any(), any(), any(), any())
     }
 }
