@@ -56,7 +56,6 @@ import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.navigation.safeCopyBackForwardList
 import com.duckduckgo.app.browser.pageloadpixel.PageLoadedHandler
 import com.duckduckgo.app.browser.pageloadpixel.firstpaint.PagePaintedHandler
-import com.duckduckgo.app.browser.print.PrintInjector
 import com.duckduckgo.app.browser.trafficquality.AndroidFeaturesHeaderPlugin
 import com.duckduckgo.app.browser.trafficquality.CustomHeaderAllowedChecker
 import com.duckduckgo.app.browser.trafficquality.remote.AndroidFeaturesHeaderProvider
@@ -137,7 +136,6 @@ class BrowserWebViewClientTest {
     private val webResourceRequest: WebResourceRequest = mock()
     private val webResourceError: WebResourceError = mock()
     private val ampLinks: AmpLinks = mock()
-    private val printInjector: PrintInjector = mock()
     private val internalTestUserChecker: InternalTestUserChecker = mock()
     private val adClickManager: AdClickManager = mock()
     private val autoconsent: Autoconsent = mock()
@@ -192,7 +190,6 @@ class BrowserWebViewClientTest {
                     coroutinesTestRule.testDispatcherProvider,
                     browserAutofillConfigurator,
                     ampLinks,
-                    printInjector,
                     internalTestUserChecker,
                     adClickManager,
                     autoconsent,
@@ -1180,28 +1177,6 @@ class BrowserWebViewClientTest {
 
         testee.onPageFinished(mockWebView, EXAMPLE_URL)
         verifyNoInteractions(listener)
-    }
-
-    @Test
-    fun whenOnPageFinishedCalledThenPrintInjectorInjected() {
-        val mockWebView = getImmediatelyInvokedMockWebView()
-        whenever(mockWebView.progress).thenReturn(100)
-        whenever(mockWebView.settings).thenReturn(mock())
-        whenever(mockWebView.safeCopyBackForwardList()).thenReturn(TestBackForwardList())
-
-        testee.onPageFinished(mockWebView, EXAMPLE_URL)
-        verify(printInjector).injectPrint(mockWebView)
-    }
-
-    @Test
-    fun whenOnPageFinishedBeforeCompleteThenPrintInjectorNotInjected() {
-        val mockWebView = getImmediatelyInvokedMockWebView()
-        whenever(mockWebView.progress).thenReturn(10)
-        whenever(mockWebView.settings).thenReturn(mock())
-        whenever(mockWebView.safeCopyBackForwardList()).thenReturn(TestBackForwardList())
-
-        testee.onPageFinished(mockWebView, EXAMPLE_URL)
-        verifyNoInteractions(printInjector)
     }
 
     @Test

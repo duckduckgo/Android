@@ -58,7 +58,6 @@ import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.navigation.safeCopyBackForwardList
 import com.duckduckgo.app.browser.pageloadpixel.PageLoadedHandler
 import com.duckduckgo.app.browser.pageloadpixel.firstpaint.PagePaintedHandler
-import com.duckduckgo.app.browser.print.PrintInjector
 import com.duckduckgo.app.browser.trafficquality.AndroidFeaturesHeaderPlugin
 import com.duckduckgo.app.browser.uriloaded.UriLoadedManager
 import com.duckduckgo.app.di.AppCoroutineScope
@@ -111,7 +110,6 @@ class BrowserWebViewClient @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val browserAutofillConfigurator: BrowserAutofill.Configurator,
     private val ampLinks: AmpLinks,
-    private val printInjector: PrintInjector,
     private val internalTestUserChecker: InternalTestUserChecker,
     private val adClickManager: AdClickManager,
     private val autoconsent: Autoconsent,
@@ -538,7 +536,6 @@ class BrowserWebViewClient @Inject constructor(
                 pageFinished(webView, WebViewNavigationState(navigationList), url)
             }
             flushCookies()
-            printInjector.injectPrint(webView)
 
             url?.let {
                 val uri = url.toUri()

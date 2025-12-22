@@ -3991,6 +3991,12 @@ class BrowserTabViewModel @Inject constructor(
                 }
             }
 
+            PRINT_FEATURE_NAME -> {
+                if (method == "print") {
+                    printFromWebView()
+                }
+            }
+
             else -> {}
         }
     }
@@ -4610,6 +4616,8 @@ class BrowserTabViewModel @Inject constructor(
         private const val CLIENT_SIDE_HIT_KEY = "clientSideHit"
 
         private const val ABOUT_BLANK = "about:blank"
+
+        private const val PRINT_FEATURE_NAME = "print"
 
         // https://www.iso.org/iso-3166-country-codes.html
         private val PRINT_LETTER_FORMAT_COUNTRIES_ISO3166_2 =

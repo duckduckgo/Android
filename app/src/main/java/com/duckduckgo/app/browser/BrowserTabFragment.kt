@@ -151,7 +151,6 @@ import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.browser.omnibar.QueryOrigin
 import com.duckduckgo.app.browser.print.PrintDocumentAdapterFactory
-import com.duckduckgo.app.browser.print.PrintInjector
 import com.duckduckgo.app.browser.remotemessage.SharePromoLinkRMFBroadCastReceiver
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
@@ -488,9 +487,6 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var voiceSearchLauncher: VoiceSearchLauncher
-
-    @Inject
-    lateinit var printInjector: PrintInjector
 
     @Inject
     lateinit var credentialAutofillDialogFactory: CredentialAutofillDialogFactory
@@ -3306,7 +3302,6 @@ class BrowserTabFragment :
                 )
             }
             configureWebViewForAutofill(it)
-            printInjector.addJsInterface(it) { viewModel.printFromWebView() }
             autoconsent.addJsInterface(it, autoconsentCallback)
             contentScopeScripts.register(
                 it,
