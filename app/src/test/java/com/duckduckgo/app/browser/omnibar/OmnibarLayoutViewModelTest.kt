@@ -1990,7 +1990,6 @@ class OmnibarLayoutViewModelTest {
         }
     }
 
-
     @Test
     fun whenNavigationChangeThenLeadingIconStateNotUpdatedWithLogo() = runTest {
         initializeViewModel()
