@@ -146,7 +146,7 @@ class RealPirDashboardMaintenanceScanDataProvider @Inject constructor(
                 val schedulingConfig = schedulingConfigMap[it.brokerName] ?: return@getBrokerMatches 0L
                 it.getNextRunMillis(schedulingConfig, nextRunFromOptOutDataMap[it.brokerName], startDate, endDate)
             },
-        ).distinctBy { it.broker.name }
+        )
 
         return DashboardScanDetails(
             dateInMillis = allValidBrokerMatches.firstOrNull()?.dateInMillis ?: 0L,
@@ -255,7 +255,9 @@ class RealPirDashboardMaintenanceScanDataProvider @Inject constructor(
         }
 
         val mirrorValidScanJobs = validScansJobs.getMirrorSites()
-        return (validScansJobs + mirrorValidScanJobs).sortedBy { it.dateInMillis }
+        return (validScansJobs + mirrorValidScanJobs)
+            .sortedBy { it.dateInMillis }
+            .distinctBy { it.broker.name }
     }
 
     private suspend fun List<DashboardBrokerMatch>.getMirrorSites(): List<DashboardBrokerMatch> {

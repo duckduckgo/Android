@@ -267,6 +267,39 @@ class RealPirDashboardMaintenanceScanDataProviderTest {
     }
 
     @Test
+    fun whenScanJobsExistForSameBrokerButDifferentProfileQueriesThenGetLastScanDetailsReturnsOneBrokerMatch() =
+        runTest {
+            // Given - same broker with two different profile queries (userProfileId)
+            val activeBrokers = listOf(createBroker("broker1"))
+            val scanJobs = listOf(
+                createScanJobRecord(
+                    "broker1",
+                    userProfileId = 1L,
+                    ScanJobStatus.MATCHES_FOUND,
+                    currentTime - TimeUnit.DAYS.toMillis(2),
+                ),
+                createScanJobRecord(
+                    "broker1",
+                    userProfileId = 2L,
+                    ScanJobStatus.MATCHES_FOUND,
+                    currentTime - TimeUnit.DAYS.toMillis(3),
+                ),
+            )
+
+            whenever(mockPirRepository.getAllActiveBrokerObjects()).thenReturn(activeBrokers)
+            whenever(mockPirRepository.getAllBrokerOptOutUrls()).thenReturn(emptyMap())
+            whenever(mockPirSchedulingRepository.getAllValidScanJobRecords()).thenReturn(scanJobs)
+            whenever(mockPirRepository.getAllMirrorSites()).thenReturn(emptyList())
+
+            // When
+            val result = testee.getLastScanDetails()
+
+            // Then - Returns only ONE broker match per broker, regardless of how many profile queries exist
+            assertEquals(1, result.brokerMatches.size)
+            assertEquals("broker1", result.brokerMatches[0].broker.name)
+        }
+
+    @Test
     fun whenNoScheduledScanJobsExistThenGetNextScanDetailsReturnsEmptyDetails() = runTest {
         // Given
         setupForEmptyBrokersAndJobs()
