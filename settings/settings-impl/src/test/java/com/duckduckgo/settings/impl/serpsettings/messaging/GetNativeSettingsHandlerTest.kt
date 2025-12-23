@@ -94,7 +94,7 @@ class GetNativeSettingsHandlerTest {
     }
 
     @Test
-    fun `when settings are null then returns empty JSONObject`() = runTest {
+    fun `when settings are null then returns noNativeSettings true`() = runTest {
         fakeSerpSettingsFeature.storeSerpSettings().setRawStoredState(Toggle.State(enable = true))
         fakeDataStore.reset()
         val jsMessage = createJsMessage()
@@ -110,13 +110,14 @@ class GetNativeSettingsHandlerTest {
         assertEquals(jsMessage.featureName, response.featureName)
         assertEquals(jsMessage.method, response.method)
         assertEquals(jsMessage.id, response.id)
-        assertEquals(0, response.params.length())
+        assertEquals(1, response.params.length())
+        assertEquals(true, response.params.getBoolean("noNativeSettings"))
     }
 
     @Test
-    fun `when settings are empty string then returns empty JSONObject`() = runTest {
+    fun `when settings are empty JSON object then returns empty JSONObject`() = runTest {
         fakeSerpSettingsFeature.storeSerpSettings().setRawStoredState(Toggle.State(enable = true))
-        fakeDataStore.setSerpSettings("")
+        fakeDataStore.setSerpSettings("{}")
         val jsMessage = createJsMessage()
 
         handler.getJsMessageHandler().process(
@@ -191,6 +192,31 @@ class GetNativeSettingsHandlerTest {
         assertEquals(1, fakeJsMessaging.getResponseCount())
         val response = fakeJsMessaging.getLastResponse()!!
         assertEquals("test-id", response.id)
+    }
+
+    @Test
+    fun `returns noNativeSettings true until settings are stored`() = runTest {
+        fakeSerpSettingsFeature.storeSerpSettings().setRawStoredState(Toggle.State(enable = true))
+        fakeDataStore.reset()
+        val jsMessage = createJsMessage()
+
+        // First call - no settings stored yet
+        handler.getJsMessageHandler().process(jsMessage, fakeJsMessaging, null)
+        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        val firstResponse = fakeJsMessaging.getLastResponse()!!
+        assertEquals(true, firstResponse.params.getBoolean("noNativeSettings"))
+
+        // Settings are now stored
+        fakeDataStore.setSerpSettings("""{"isDuckAiEnabled":"true"}""")
+
+        // Second call - settings exist
+        handler.getJsMessageHandler().process(jsMessage, fakeJsMessaging, null)
+        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        val secondResponse = fakeJsMessaging.getLastResponse()!!
+        assertEquals(false, secondResponse.params.optBoolean("noNativeSettings", false))
+        assertEquals("true", secondResponse.params.getString("isDuckAiEnabled"))
     }
 
     private fun createJsMessage(): JsMessage {
