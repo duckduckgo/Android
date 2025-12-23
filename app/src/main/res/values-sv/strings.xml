@@ -72,6 +72,7 @@
     <string name="options">Alternativ</string>
     <string name="shareLink">Dela länk</string>
     <string name="copyUrl">Kopia länkadress</string>
+    <string name="urlCopiedToClipboard">URL har kopierats till urklipp</string>
 
     <!-- Find in page -->
     <string name="nextSearchTermDescription">Hitta nästa</string>
