@@ -26,6 +26,7 @@ import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.APP_SETTINGS_G
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.APP_SETTINGS_IDTR_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.APP_SETTINGS_PIR_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.APP_SETTINGS_RESTORE_PURCHASE_CLICK
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.AUTH_V1_SIGN_IN_ATTEMPT
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.AUTH_V2_INVALID_REFRESH_TOKEN_DETECTED
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.AUTH_V2_INVALID_REFRESH_TOKEN_RECOVERED
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.AUTH_V2_INVALID_REFRESH_TOKEN_SIGNED_OUT
@@ -114,6 +115,7 @@ interface SubscriptionPixelSender {
     fun reportAuthV2TokenValidationError()
     fun reportAuthV2TokenStoreError()
     fun reportSubscriptionsWebViewRenderProcessCrash(isRepeated: Boolean)
+    fun reportAuthV1SignInAttempt()
 }
 
 @ContributesBinding(AppScope::class)
@@ -278,6 +280,10 @@ class SubscriptionPixelSenderImpl @Inject constructor(
 
     override fun reportSubscriptionsWebViewRenderProcessCrash(isRepeated: Boolean) {
         fire(SUBSCRIPTION_WEBVIEW_RENDER_PROCESS_CRASH, mapOf("is_repeated" to isRepeated.toString()))
+    }
+
+    override fun reportAuthV1SignInAttempt() {
+        fire(AUTH_V1_SIGN_IN_ATTEMPT)
     }
 
     private fun fire(pixel: SubscriptionPixel, params: Map<String, String> = emptyMap()) {
