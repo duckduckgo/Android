@@ -16,13 +16,20 @@
 
 package com.duckduckgo.serp.logos.impl.ui
 
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.view.View
 import androidx.activity.SystemBarStyle
 import androidx.activity.enableEdgeToEdge
 import androidx.core.view.ViewCompat
+import androidx.core.view.isVisible
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
@@ -36,12 +43,15 @@ import com.duckduckgo.navigation.api.getActivityParams
 import com.duckduckgo.serp.logos.api.SerpLogoScreens.EasterEggLogoScreen
 import com.duckduckgo.serp.logos.impl.R
 import com.duckduckgo.serp.logos.impl.databinding.ActivitySerpEasterEggLogoBinding
-import kotlin.jvm.java
+import com.duckduckgo.serp.logos.impl.ui.SerpEasterEggLogoViewModel.ViewState
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(EasterEggLogoScreen::class, screenName = "easterEggLogo")
 class SerpEasterEggLogoActivity : DuckDuckGoActivity() {
 
+    private val viewModel: SerpEasterEggLogoViewModel by bindViewModel()
     private lateinit var binding: ActivitySerpEasterEggLogoBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -57,6 +67,9 @@ class SerpEasterEggLogoActivity : DuckDuckGoActivity() {
 
         val logoUrl = params.logoUrl
         val transitionName = params.transitionName
+
+        viewModel.setLogoUrl(logoUrl)
+        observeViewModel()
 
         ViewCompat.setTransitionName(binding.enlargedLogoImage, transitionName)
 
@@ -88,11 +101,16 @@ class SerpEasterEggLogoActivity : DuckDuckGoActivity() {
                     ): Boolean {
                         supportStartPostponedEnterTransition()
 
-                        binding.closeIcon.animate()
-                            .alpha(1f)
-                            .setStartDelay(150)
-                            .setDuration(150)
-                            .start()
+                        AnimatorSet().apply {
+                            playTogether(
+                                ObjectAnimator.ofFloat(binding.discoveryText, View.ALPHA, 1f),
+                                ObjectAnimator.ofFloat(binding.closeIcon, View.ALPHA, 1f),
+                                ObjectAnimator.ofFloat(binding.favouriteButton, View.ALPHA, 1f),
+                            )
+                            startDelay = 150
+                            duration = 150
+                            start()
+                        }
 
                         return false
                     }
@@ -103,6 +121,28 @@ class SerpEasterEggLogoActivity : DuckDuckGoActivity() {
         binding.root.setOnClickListener {
             animateBackgroundDimFadeOut()
             supportFinishAfterTransition()
+        }
+
+        binding.favouriteButton.setOnClickListener {
+            viewModel.onFavouriteButtonClicked()
+        }
+    }
+
+    private fun observeViewModel() {
+        viewModel.viewState
+            .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+            .onEach { renderViewState(it) }
+            .launchIn(lifecycleScope)
+    }
+
+    private fun renderViewState(viewState: ViewState) {
+        with(binding) {
+            favouriteButton.isVisible = viewState.isSetFavouriteEnabled
+            favouriteButton.text = if (viewState.isFavourite) {
+                getString(R.string.serpLogoResetToDefault)
+            } else {
+                getString(R.string.serpLogoSetAsFavourite)
+            }
         }
     }
 

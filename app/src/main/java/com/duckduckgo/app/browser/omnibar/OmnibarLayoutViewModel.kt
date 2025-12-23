@@ -68,6 +68,7 @@ import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.ENABLED
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels
 import com.duckduckgo.serp.logos.api.SerpEasterEggLogosToggles
 import com.duckduckgo.serp.logos.api.SerpLogo
+import com.duckduckgo.serp.logos.api.SerpLogos
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
@@ -110,11 +111,14 @@ class OmnibarLayoutViewModel @Inject constructor(
     private val serpEasterEggLogosToggles: SerpEasterEggLogosToggles,
     private val androidBrowserToggles: AndroidBrowserConfigFeature,
     private val addressBarTrackersAnimationManager: AddressBarTrackersAnimationManager,
+    private val serpLogos: SerpLogos,
 ) : ViewModel() {
 
     private val isSplitOmnibarEnabled = settingsDataStore.omnibarType == OmnibarType.SPLIT
 
     private var handleAboutBlankEnabled: Boolean = false
+    private var favouriteSerpEasterEggLogoUrl: String? = null
+    private var isSetFavouriteEasterEggLogoFeatureEnabled: Boolean = false
 
     private val _viewState = MutableStateFlow(
         ViewState(
@@ -306,6 +310,42 @@ class OmnibarLayoutViewModel @Inject constructor(
                 )
                 pixel.fire(pixel = AppPixelName.ADDRESS_BAR_NTP_FOCUSED, parameters = params)
             }.launchIn(viewModelScope)
+
+        combine(
+            serpEasterEggLogosToggles.setFavourite().enabled(),
+            serpLogos.favouriteSerpEasterEggLogoUrlFlow,
+        ) { isSetFavouriteEasterEggLogoFeatureEnabled, favouriteSerpEasterEggLogoUrl ->
+            this.isSetFavouriteEasterEggLogoFeatureEnabled = isSetFavouriteEasterEggLogoFeatureEnabled
+            this.favouriteSerpEasterEggLogoUrl = favouriteSerpEasterEggLogoUrl
+            val currentUrl = _viewState.value.url
+
+            // TODO we should be able to remove isDuckDuckGoQueryUrl once we remove the feature toggle.
+            // It's here only as a fallback if we turn the feature off and then back on again
+            if (isSetFavouriteEasterEggLogoFeatureEnabled && duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(currentUrl)) {
+                _viewState.update {
+                    it.copy(
+                        leadingIconState = resolveLeadingIconState(
+                            viewMode = it.viewMode,
+                            hasFocus = it.hasFocus,
+                            url = it.url,
+                            serpLogoUrl = favouriteSerpEasterEggLogoUrl,
+                        ),
+                    )
+                }
+            } else if (favouriteSerpEasterEggLogoUrl != null) {
+                _viewState.update {
+                    it.copy(
+                        leadingIconState = resolveLeadingIconState(
+                            viewMode = it.viewMode,
+                            hasFocus = it.hasFocus,
+                            url = it.url,
+                            serpLogoUrl = null,
+                        ),
+                    )
+                }
+            }
+        }.flowOn(dispatcherProvider.io())
+            .launchIn(viewModelScope)
     }
 
     fun onFindInPageRequested() {
@@ -391,9 +431,16 @@ class OmnibarLayoutViewModel @Inject constructor(
                     it.omnibarText
                 }
 
-                val currentLogoUrl = when (val previousState = it.previousLeadingIconState) {
-                    is EasterEggLogo -> previousState.logoUrl
-                    else -> null
+                val currentLogoUrl = if (isSetFavouriteEasterEggLogoFeatureEnabled) {
+                    getCurrentSerpLogoUrl(
+                        currentUrl = it.url,
+                        leadingIconState = it.previousLeadingIconState,
+                    )
+                } else {
+                    when (val previousState = it.previousLeadingIconState) {
+                        is EasterEggLogo -> previousState.logoUrl
+                        else -> null
+                    }
                 }
 
                 it.copy(
@@ -451,26 +498,47 @@ class OmnibarLayoutViewModel @Inject constructor(
         url: String,
         logoUrl: String?,
     ): LeadingIconState {
+        return resolveLeadingIconState(
+            viewMode = viewMode,
+            hasFocus = hasFocus,
+            url = url,
+            serpLogoUrl = logoUrl,
+        )
+    }
+
+    private fun resolveLeadingIconState(
+        viewMode: ViewMode,
+        hasFocus: Boolean,
+        url: String,
+        serpLogoUrl: String?,
+    ): LeadingIconState {
         return when (viewMode) {
             Error, SSLWarning, MaliciousSiteWarning -> Globe
             NewTab -> Search
             else -> {
-                if (hasFocus) {
-                    Search
-                } else if (logoUrl != null) {
-                    EasterEggLogo(logoUrl = logoUrl, serpUrl = url)
-                } else if (shouldShowDaxIcon(url)) {
-                    Dax
-                } else if (shouldShowDuckPlayerIcon(url)) {
-                    DuckPlayer
-                } else {
-                    if (url.isEmpty()) {
-                        Search
-                    } else {
-                        PrivacyShield
+                when {
+                    hasFocus -> Search
+                    serpLogoUrl != null -> {
+                        EasterEggLogo(logoUrl = serpLogoUrl, serpUrl = url, isFavourite = serpLogoUrl == favouriteSerpEasterEggLogoUrl)
                     }
+                    shouldShowDaxIcon(url) -> Dax
+                    shouldShowDuckPlayerIcon(url) -> DuckPlayer
+                    url.isEmpty() -> Search
+                    else -> PrivacyShield
                 }
             }
+        }
+    }
+
+    private fun getCurrentSerpLogoUrl(
+        currentUrl: String,
+        leadingIconState: LeadingIconState?,
+    ): String? {
+        val isDuckDuckGoQueryUrl = duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(currentUrl)
+        return when {
+            favouriteSerpEasterEggLogoUrl != null && isDuckDuckGoQueryUrl -> favouriteSerpEasterEggLogoUrl
+            leadingIconState is EasterEggLogo && isDuckDuckGoQueryUrl -> leadingIconState.logoUrl
+            else -> null
         }
     }
 
@@ -558,6 +626,17 @@ class OmnibarLayoutViewModel @Inject constructor(
                 else -> {
                     val scrollingEnabled = viewMode != NewTab
                     val hasFocus = _viewState.value.hasFocus
+                    val currentLogoUrl = if (isSetFavouriteEasterEggLogoFeatureEnabled) {
+                        getCurrentSerpLogoUrl(
+                            currentUrl = _viewState.value.url,
+                            leadingIconState = _viewState.value.leadingIconState,
+                        )
+                    } else {
+                        when (val leadingIconState = _viewState.value.leadingIconState) {
+                            is EasterEggLogo -> leadingIconState.logoUrl
+                            else -> null
+                        }
+                    }
                     _viewState.update {
                         it.copy(
                             viewMode = viewMode,
@@ -807,11 +886,17 @@ class OmnibarLayoutViewModel @Inject constructor(
 
     private fun onExternalLoadingStateChanged(loadingState: LoadingViewState) {
         logcat { "Omnibar: onExternalLoadingStateChanged $loadingState" }
-        val currentLogoUrl = when (val leadingIconState = _viewState.value.leadingIconState) {
-            is EasterEggLogo -> leadingIconState.logoUrl
-            else -> null
+        val currentLogoUrl = if (isSetFavouriteEasterEggLogoFeatureEnabled) {
+            getCurrentSerpLogoUrl(
+                currentUrl = loadingState.url,
+                leadingIconState = _viewState.value.leadingIconState,
+            )
+        } else {
+            when (val leadingIconState = _viewState.value.leadingIconState) {
+                is EasterEggLogo -> leadingIconState.logoUrl
+                else -> null
+            }
         }
-
         _viewState.update {
             it.copy(
                 url = loadingState.url,

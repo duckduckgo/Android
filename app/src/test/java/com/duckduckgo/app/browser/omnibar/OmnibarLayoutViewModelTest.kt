@@ -43,6 +43,7 @@ import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels
 import com.duckduckgo.serp.logos.api.SerpEasterEggLogosToggles
 import com.duckduckgo.serp.logos.api.SerpLogo
+import com.duckduckgo.serp.logos.impl.store.FavouriteSerpLogoDataStore
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -100,6 +101,8 @@ class OmnibarLayoutViewModelTest {
         }
     }
     private val serpEasterEggLogosToggles: SerpEasterEggLogosToggles = mock()
+    private val favouriteSerpLogoDataStore: FavouriteSerpLogoDataStore = mock()
+    private val favouriteLogoFlow = MutableStateFlow<String?>(null)
 
     private val androidBrowserToggles: AndroidBrowserConfigFeature = mock()
     private val addressBarTrackersAnimationManager: AddressBarTrackersAnimationManager = mock()
@@ -125,6 +128,10 @@ class OmnibarLayoutViewModelTest {
         whenever(duckAiFeatureState.showInputScreen).thenReturn(duckAiShowInputScreenFlow)
         whenever(androidBrowserToggles.handleAboutBlank()).thenReturn(mock())
         whenever(androidBrowserToggles.handleAboutBlank().isEnabled()).thenReturn(false)
+        whenever(favouriteSerpLogoDataStore.favouriteSerpEasterEggLogoUrlFlow).thenReturn(favouriteLogoFlow)
+        whenever(serpEasterEggLogosToggles.setFavourite()).thenReturn(mock())
+        whenever(serpEasterEggLogosToggles.setFavourite().isEnabled()).thenReturn(false)
+        whenever(serpEasterEggLogosToggles.setFavourite().enabled()).thenReturn(flowOf(false))
         runBlocking {
             whenever(addressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(false)
         }
@@ -172,6 +179,7 @@ class OmnibarLayoutViewModelTest {
             serpEasterEggLogosToggles = serpEasterEggLogosToggles,
             androidBrowserToggles = androidBrowserToggles,
             addressBarTrackersAnimationManager = addressBarTrackersAnimationManager,
+            favouriteSerpLogoDataStore = favouriteSerpLogoDataStore,
         )
     }
 
@@ -2378,6 +2386,162 @@ class OmnibarLayoutViewModelTest {
             val viewState = awaitItem()
             assertEquals("about:blank", viewState.omnibarText)
             assertTrue(viewState.updateOmnibarText)
+        }
+    }
+
+    // Favourite Logo Tests
+
+    @Test
+    fun whenFavouriteLogoSetAndOnDdgUrlThenFavouriteLogoShown() = runTest {
+        val favouriteLogoUrl = "https://example.com/favourite-logo.png"
+        whenever(serpEasterEggLogosToggles.setFavourite().isEnabled()).thenReturn(true)
+        whenever(serpEasterEggLogosToggles.setFavourite().enabled()).thenReturn(flowOf(true))
+        favouriteLogoFlow.value = favouriteLogoUrl
+        initializeViewModel()
+
+        givenSiteLoaded(SERP_URL)
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertTrue(viewState.leadingIconState is LeadingIconState.EasterEggLogo)
+            val easterEggState = viewState.leadingIconState as LeadingIconState.EasterEggLogo
+            assertEquals(favouriteLogoUrl, easterEggState.logoUrl)
+        }
+    }
+
+    @Test
+    fun whenFavouriteLogoSetButNotOnDdgUrlThenPrivacyShieldShown() = runTest {
+        val favouriteLogoUrl = "https://example.com/favourite-logo.png"
+        whenever(serpEasterEggLogosToggles.setFavourite().isEnabled()).thenReturn(true)
+        whenever(serpEasterEggLogosToggles.setFavourite().enabled()).thenReturn(flowOf(true))
+        favouriteLogoFlow.value = favouriteLogoUrl
+        initializeViewModel()
+
+        givenSiteLoaded(RANDOM_URL)
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertTrue(viewState.leadingIconState is LeadingIconState.PrivacyShield)
+        }
+    }
+
+    @Test
+    fun whenFavouriteLogoSetButFeatureToggleDisabledThenDaxIconShown() = runTest {
+        val favouriteLogoUrl = "https://example.com/favourite-logo.png"
+        whenever(serpEasterEggLogosToggles.setFavourite().isEnabled()).thenReturn(false)
+        favouriteLogoFlow.value = favouriteLogoUrl
+        initializeViewModel()
+
+        givenSiteLoaded(SERP_URL)
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertTrue(viewState.leadingIconState is LeadingIconState.Dax)
+        }
+    }
+
+    @Test
+    fun whenFavouriteLogoSetAndSerpEasterEggAlsoExistsThenFavouriteTakesPriority() = runTest {
+        val favouriteLogoUrl = "https://example.com/favourite-logo.png"
+        val serpEasterEggUrl = "https://example.com/serp-easter-egg.png"
+        whenever(serpEasterEggLogosToggles.setFavourite().isEnabled()).thenReturn(true)
+        whenever(serpEasterEggLogosToggles.setFavourite().enabled()).thenReturn(flowOf(true))
+        favouriteLogoFlow.value = favouriteLogoUrl
+        initializeViewModel()
+
+        givenSiteLoaded(SERP_URL)
+
+        // SERP returns an Easter Egg logo
+        val omnibarViewState = OmnibarViewState(
+            omnibarText = QUERY,
+            serpLogo = SerpLogo.EasterEgg(serpEasterEggUrl),
+            isEditing = false,
+        )
+        testee.onExternalStateChange(StateChange.OmnibarStateChange(omnibarViewState))
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertTrue(viewState.leadingIconState is LeadingIconState.EasterEggLogo)
+            val easterEggState = viewState.leadingIconState as LeadingIconState.EasterEggLogo
+            // Favourite should take priority over SERP Easter Egg
+            assertEquals(favouriteLogoUrl, easterEggState.logoUrl)
+        }
+    }
+
+    @Test
+    fun whenNoFavouriteLogoSetThenDaxIconShownOnDdgUrl() = runTest {
+        whenever(serpEasterEggLogosToggles.setFavourite().isEnabled()).thenReturn(true)
+        whenever(serpEasterEggLogosToggles.setFavourite().enabled()).thenReturn(flowOf(true))
+        favouriteLogoFlow.value = null
+        initializeViewModel()
+
+        givenSiteLoaded(SERP_URL)
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertTrue(viewState.leadingIconState is LeadingIconState.Dax)
+        }
+    }
+
+    @Test
+    fun whenFeatureEnabledAndNoFavouriteSetAndSerpEasterEggReceivedThenEasterEggShown() = runTest {
+        val serpEasterEggUrl = "https://example.com/serp-easter-egg.png"
+        whenever(serpEasterEggLogosToggles.setFavourite().isEnabled()).thenReturn(true)
+        whenever(serpEasterEggLogosToggles.setFavourite().enabled()).thenReturn(flowOf(true))
+        favouriteLogoFlow.value = null
+        initializeViewModel()
+
+        givenSiteLoaded(SERP_URL)
+
+        // SERP returns an Easter Egg logo
+        val omnibarViewState = OmnibarViewState(
+            omnibarText = QUERY,
+            serpLogo = SerpLogo.EasterEgg(serpEasterEggUrl),
+            isEditing = false,
+        )
+        testee.onExternalStateChange(StateChange.OmnibarStateChange(omnibarViewState))
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertTrue(viewState.leadingIconState is LeadingIconState.EasterEggLogo)
+            val easterEggState = viewState.leadingIconState as LeadingIconState.EasterEggLogo
+            assertEquals(serpEasterEggUrl, easterEggState.logoUrl)
+        }
+    }
+
+    @Test
+    fun whenEasterEggLogoSetAndViewModeChangesToBrowserThenEasterEggPreserved() = runTest {
+        val serpEasterEggUrl = "https://example.com/serp-easter-egg.png"
+        whenever(serpEasterEggLogosToggles.setFavourite().isEnabled()).thenReturn(true)
+        whenever(serpEasterEggLogosToggles.setFavourite().enabled()).thenReturn(flowOf(true))
+        favouriteLogoFlow.value = null
+        initializeViewModel()
+
+        givenSiteLoaded(SERP_URL)
+
+        // SERP returns an Easter Egg logo
+        val omnibarViewState = OmnibarViewState(
+            omnibarText = QUERY,
+            serpLogo = SerpLogo.EasterEgg(serpEasterEggUrl),
+            isEditing = false,
+        )
+        testee.onExternalStateChange(StateChange.OmnibarStateChange(omnibarViewState))
+
+        // Verify Easter Egg is shown
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertTrue(viewState.leadingIconState is LeadingIconState.EasterEggLogo)
+        }
+
+        // Now view mode changes to Browser
+        testee.onViewModeChanged(ViewMode.Browser(null))
+
+        // Easter Egg should still be preserved
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertTrue(viewState.leadingIconState is LeadingIconState.EasterEggLogo)
+            val easterEggState = viewState.leadingIconState as LeadingIconState.EasterEggLogo
+            assertEquals(serpEasterEggUrl, easterEggState.logoUrl)
         }
     }
 }
