@@ -874,12 +874,36 @@ class OmnibarLayoutViewModel @Inject constructor(
                             logoUrl = omnibarViewState.serpLogo.logoUrl,
                         )
 
-                        SerpLogo.Normal, null -> getLeadingIconState(
+                        SerpLogo.Normal -> getLeadingIconState(
                             viewMode = _viewState.value.viewMode,
                             hasFocus = omnibarViewState.isEditing,
                             url = _viewState.value.url,
                             logoUrl = null,
                         )
+
+                        null -> {
+                            if (isSetFavouriteEasterEggLogoFeatureEnabled) {
+                                // serpLogo is null - preserve existing Easter Egg if present
+                                val currentLogoUrl = getCurrentSerpLogoUrl(
+                                    currentUrl = _viewState.value.url,
+                                    leadingIconState = _viewState.value.leadingIconState,
+                                )
+                                getLeadingIconState(
+                                    viewMode = _viewState.value.viewMode,
+                                    hasFocus = omnibarViewState.isEditing,
+                                    url = _viewState.value.url,
+                                    logoUrl = currentLogoUrl,
+                                )
+                            } else {
+                                // previous behaviour for null
+                                getLeadingIconState(
+                                    viewMode = _viewState.value.viewMode,
+                                    hasFocus = omnibarViewState.isEditing,
+                                    url = _viewState.value.url,
+                                    logoUrl = null,
+                                )
+                            }
+                        }
                     },
                 )
             }
