@@ -68,6 +68,7 @@ import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.ENABLED
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels
 import com.duckduckgo.serp.logos.api.SerpEasterEggLogosToggles
 import com.duckduckgo.serp.logos.api.SerpLogo
+import com.duckduckgo.serp.logos.impl.store.FavouriteSerpLogoDataStore
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
@@ -110,11 +111,14 @@ class OmnibarLayoutViewModel @Inject constructor(
     private val serpEasterEggLogosToggles: SerpEasterEggLogosToggles,
     private val androidBrowserToggles: AndroidBrowserConfigFeature,
     private val addressBarTrackersAnimationManager: AddressBarTrackersAnimationManager,
+    private val favouriteSerpLogoDataStore: FavouriteSerpLogoDataStore,
 ) : ViewModel() {
 
     private val isSplitOmnibarEnabled = settingsDataStore.omnibarType == OmnibarType.SPLIT
 
     private var handleAboutBlankEnabled: Boolean = false
+    private var favouriteLogoUrl: String? = null
+    private var isSetFavouriteEnabled: Boolean = false
 
     private val _viewState = MutableStateFlow(
         ViewState(
@@ -306,6 +310,28 @@ class OmnibarLayoutViewModel @Inject constructor(
                 )
                 pixel.fire(pixel = AppPixelName.ADDRESS_BAR_NTP_FOCUSED, parameters = params)
             }.launchIn(viewModelScope)
+
+        combine(
+            serpEasterEggLogosToggles.setFavourite().enabled(),
+            favouriteSerpLogoDataStore.favouriteLogo,
+        ) { isEnabled, url ->
+            isSetFavouriteEnabled = isEnabled
+            favouriteLogoUrl = url
+            // Trigger state update if we're on a DDG URL
+            if (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(_viewState.value.url)) {
+                _viewState.update {
+                    it.copy(
+                        leadingIconState = resolveLeadingIconState(
+                            viewMode = it.viewMode,
+                            hasFocus = it.hasFocus,
+                            url = it.url,
+                            serpLogoUrl = null,
+                        ),
+                    )
+                }
+            }
+        }.flowOn(dispatcherProvider.io())
+            .launchIn(viewModelScope)
     }
 
     fun onFindInPageRequested() {
@@ -451,26 +477,52 @@ class OmnibarLayoutViewModel @Inject constructor(
         url: String,
         logoUrl: String?,
     ): LeadingIconState {
+        return resolveLeadingIconState(
+            viewMode = viewMode,
+            hasFocus = hasFocus,
+            url = url,
+            serpLogoUrl = logoUrl,
+        )
+    }
+
+    private fun resolveLeadingIconState(
+        viewMode: ViewMode,
+        hasFocus: Boolean,
+        url: String,
+        serpLogoUrl: String?,
+    ): LeadingIconState {
         return when (viewMode) {
             Error, SSLWarning, MaliciousSiteWarning -> Globe
             NewTab -> Search
             else -> {
-                if (hasFocus) {
-                    Search
-                } else if (logoUrl != null) {
-                    EasterEggLogo(logoUrl = logoUrl, serpUrl = url)
-                } else if (shouldShowDaxIcon(url)) {
-                    Dax
-                } else if (shouldShowDuckPlayerIcon(url)) {
-                    DuckPlayer
-                } else {
-                    if (url.isEmpty()) {
-                        Search
-                    } else {
-                        PrivacyShield
+                when {
+                    hasFocus -> Search
+                    // Priority 1: Favourite logo (only on DDG URLs when enabled)
+                    isSetFavouriteEnabled &&
+                        favouriteLogoUrl != null &&
+                        duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url) -> {
+                        EasterEggLogo(logoUrl = favouriteLogoUrl!!, serpUrl = url)
                     }
+                    // Priority 2: SERP Easter Egg from search
+                    serpLogoUrl != null -> {
+                        EasterEggLogo(logoUrl = serpLogoUrl, serpUrl = url)
+                    }
+                    // Priority 3: Dax icon for DDG URLs
+                    shouldShowDaxIcon(url) -> Dax
+                    // Priority 4: DuckPlayer icon
+                    shouldShowDuckPlayerIcon(url) -> DuckPlayer
+                    // Default
+                    url.isEmpty() -> Search
+                    else -> PrivacyShield
                 }
             }
+        }
+    }
+
+    private fun getCurrentSerpLogoUrl(): String? {
+        return when (val state = _viewState.value.leadingIconState) {
+            is EasterEggLogo -> state.logoUrl
+            else -> null
         }
     }
 
