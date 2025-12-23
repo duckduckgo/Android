@@ -646,7 +646,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                                 viewMode = viewMode,
                                 hasFocus = hasFocus,
                                 url = _viewState.value.url,
-                                logoUrl = null,
+                                logoUrl = currentLogoUrl,
                             ),
                             scrollingEnabled = scrollingEnabled,
                             showVoiceSearch = shouldShowVoiceSearch(
