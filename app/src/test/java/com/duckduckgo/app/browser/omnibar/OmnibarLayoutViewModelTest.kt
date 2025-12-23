@@ -2544,4 +2544,78 @@ class OmnibarLayoutViewModelTest {
             assertEquals(serpEasterEggUrl, easterEggState.logoUrl)
         }
     }
+
+    @Test
+    fun whenSerpLogoIsNullThenExistingEasterEggPreserved() = runTest {
+        val serpEasterEggUrl = "https://example.com/serp-easter-egg.png"
+        initializeViewModel()
+
+        givenSiteLoaded(SERP_URL)
+
+        // First, set an Easter Egg logo
+        val omnibarViewStateWithLogo = OmnibarViewState(
+            omnibarText = QUERY,
+            serpLogo = SerpLogo.EasterEgg(serpEasterEggUrl),
+            isEditing = false,
+        )
+        testee.onExternalStateChange(StateChange.OmnibarStateChange(omnibarViewStateWithLogo))
+
+        // Verify Easter Egg is shown
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertTrue(viewState.leadingIconState is LeadingIconState.EasterEggLogo)
+        }
+
+        // Now send an update with serpLogo = null (simulating pending extraction)
+        val omnibarViewStateWithNullLogo = OmnibarViewState(
+            omnibarText = QUERY,
+            serpLogo = null,
+            isEditing = false,
+        )
+        testee.onExternalStateChange(StateChange.OmnibarStateChange(omnibarViewStateWithNullLogo))
+
+        // Easter Egg should still be preserved
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertTrue(viewState.leadingIconState is LeadingIconState.EasterEggLogo)
+            val easterEggState = viewState.leadingIconState as LeadingIconState.EasterEggLogo
+            assertEquals(serpEasterEggUrl, easterEggState.logoUrl)
+        }
+    }
+
+    @Test
+    fun whenSerpLogoIsNormalThenEasterEggCleared() = runTest {
+        val serpEasterEggUrl = "https://example.com/serp-easter-egg.png"
+        initializeViewModel()
+
+        givenSiteLoaded(SERP_URL)
+
+        // First, set an Easter Egg logo
+        val omnibarViewStateWithLogo = OmnibarViewState(
+            omnibarText = QUERY,
+            serpLogo = SerpLogo.EasterEgg(serpEasterEggUrl),
+            isEditing = false,
+        )
+        testee.onExternalStateChange(StateChange.OmnibarStateChange(omnibarViewStateWithLogo))
+
+        // Verify Easter Egg is shown
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertTrue(viewState.leadingIconState is LeadingIconState.EasterEggLogo)
+        }
+
+        // Now send an update with serpLogo = Normal (explicitly no Easter Egg)
+        val omnibarViewStateWithNormalLogo = OmnibarViewState(
+            omnibarText = QUERY,
+            serpLogo = SerpLogo.Normal,
+            isEditing = false,
+        )
+        testee.onExternalStateChange(StateChange.OmnibarStateChange(omnibarViewStateWithNormalLogo))
+
+        // Easter Egg should be cleared, showing Dax
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertTrue(viewState.leadingIconState is LeadingIconState.Dax)
+        }
+    }
 }
