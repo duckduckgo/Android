@@ -277,11 +277,6 @@ import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc.Companion.GPC_HEA
 import com.duckduckgo.privacy.dashboard.api.PrivacyProtectionTogglePlugin
 import com.duckduckgo.privacy.dashboard.api.PrivacyToggleOrigin
 import com.duckduckgo.privacy.dashboard.api.ui.ToggleReports
-import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupExperimentExternalPixels
-import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupManager
-import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupUiEvent
-import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupViewState
-import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsToggleUsageListener
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
 import com.duckduckgo.savedsites.api.SavedSitesRepository
@@ -542,18 +537,9 @@ class BrowserTabViewModelTest {
             on { it.isEnabled() } doReturn false
         }
 
-    private val mockPrivacyProtectionsPopupManager: PrivacyProtectionsPopupManager = mock()
-
-    private val mockPrivacyProtectionsToggleUsageListener: PrivacyProtectionsToggleUsageListener = mock()
-
     private val subscriptions: Subscriptions = mock()
 
     private val refreshPixelSender: RefreshPixelSender = mock()
-
-    private val privacyProtectionsPopupExperimentExternalPixels: PrivacyProtectionsPopupExperimentExternalPixels =
-        mock {
-            runBlocking { whenever(mock.getPixelParams()).thenReturn(emptyMap()) }
-        }
 
     private val mockFaviconFetchingPrompt: FaviconsFetchingPrompt = mock()
     private val mockSSLCertificatesFeature: SSLCertificatesFeature = mock()
@@ -737,7 +723,6 @@ class BrowserTabViewModelTest {
             whenever(mockContentBlocking.isAnException(anyString())).thenReturn(false)
             whenever(fireproofDialogsEventHandler.event).thenReturn(fireproofDialogsEventHandlerLiveData)
             whenever(cameraHardwareChecker.hasCameraHardware()).thenReturn(true)
-            whenever(mockPrivacyProtectionsPopupManager.viewState).thenReturn(flowOf(PrivacyProtectionsPopupViewState.Gone))
             whenever(mockAppBuildConfig.buildType).thenReturn("debug")
             whenever(mockDuckPlayer.observeUserPreferences()).thenReturn(flowOf(UserPreferences(false, AlwaysAsk)))
             whenever(mockAdditionalDefaultBrowserPrompts.showSetAsDefaultPopupMenuItem).thenReturn(
@@ -820,9 +805,6 @@ class BrowserTabViewModelTest {
                 sitePermissionsManager = mockSitePermissionsManager,
                 cameraHardwareChecker = cameraHardwareChecker,
                 androidBrowserConfig = fakeAndroidConfigBrowserFeature,
-                privacyProtectionsPopupManager = mockPrivacyProtectionsPopupManager,
-                privacyProtectionsToggleUsageListener = mockPrivacyProtectionsToggleUsageListener,
-                privacyProtectionsPopupExperimentExternalPixels = privacyProtectionsPopupExperimentExternalPixels,
                 faviconsFetchingPrompt = mockFaviconFetchingPrompt,
                 subscriptions = subscriptions,
                 sslCertificatesFeature = mockSSLCertificatesFeature,
@@ -5550,69 +5532,6 @@ class BrowserTabViewModelTest {
         }
 
     @Test
-    fun whenPrivacyProtectionMenuClickedThenListenerIsInvoked() =
-        runTest {
-            loadUrl("http://www.example.com/home.html")
-            testee.onPrivacyProtectionMenuClicked()
-            verify(mockPrivacyProtectionsToggleUsageListener).onPrivacyProtectionsToggleUsed()
-        }
-
-    @Test
-    fun whenPageIsChangedThenPrivacyProtectionsPopupManagerIsNotified() =
-        runTest {
-            updateUrl(
-                originalUrl = "example.com",
-                currentUrl = "example2.com",
-                isBrowserShowing = true,
-            )
-
-            verify(mockPrivacyProtectionsPopupManager).onPageLoaded(
-                url = "example2.com",
-                httpErrorCodes = emptyList(),
-                hasBrowserError = false,
-            )
-        }
-
-    @Test
-    fun whenPageIsChangedWithWebViewErrorResponseThenPrivacyProtectionsPopupManagerIsNotified() =
-        runTest {
-            testee.onReceivedError(BAD_URL, "example2.com")
-
-            updateUrl(
-                originalUrl = "example.com",
-                currentUrl = "example2.com",
-                isBrowserShowing = true,
-            )
-
-            verify(mockPrivacyProtectionsPopupManager).onPageLoaded(
-                url = "example2.com",
-                httpErrorCodes = emptyList(),
-                hasBrowserError = true,
-            )
-        }
-
-    @Test
-    fun whenPageIsChangedWithHttpErrorThenPrivacyProtectionsPopupManagerIsNotified() =
-        runTest {
-            val siteCaptor = argumentCaptor<Site>()
-            whenever(mockSiteHttpErrorHandler.assignErrorsAndClearCache(siteCaptor.capture())).then {
-                siteCaptor.lastValue.onHttpErrorDetected(404)
-            }
-
-            updateUrl(
-                originalUrl = "example.com",
-                currentUrl = "example2.com",
-                isBrowserShowing = true,
-            )
-
-            verify(mockPrivacyProtectionsPopupManager).onPageLoaded(
-                url = "example2.com",
-                httpErrorCodes = listOf(404),
-                hasBrowserError = false,
-            )
-        }
-
-    @Test
     fun whenPageIsChangedWithHttpError400ThenUpdateCountPixelCalledForWebViewReceivedHttpError400Daily() =
         runTest {
             testee.recordHttpErrorCode(statusCode = 400, url = "example2.com")
@@ -5638,15 +5557,6 @@ class BrowserTabViewModelTest {
         }
 
     @Test
-    fun whenPrivacyProtectionsPopupUiEventIsReceivedThenItIsPassedToPrivacyProtectionsPopupManager() =
-        runTest {
-            PrivacyProtectionsPopupUiEvent.entries.forEach { event ->
-                testee.onPrivacyProtectionsPopupUiEvent(event)
-                verify(mockPrivacyProtectionsPopupManager).onUiEvent(event)
-            }
-        }
-
-    @Test
     fun whenRefreshIsTriggeredByUserThenIncrementRefreshCount() =
         runTest {
             val url = exampleUrl
@@ -5657,25 +5567,6 @@ class BrowserTabViewModelTest {
 
             testee.onRefreshRequested(triggeredByUser = true)
             verify(mockBrokenSitePrompt).pageRefreshed(url.toUri())
-        }
-
-    @Test
-    fun whenRefreshIsTriggeredByUserThenPrivacyProtectionsPopupManagerIsNotifiedWithTopPosition() =
-        runTest {
-            testee.onRefreshRequested(triggeredByUser = false)
-            verify(mockPrivacyProtectionsPopupManager, never()).onPageRefreshTriggeredByUser(isOmnibarAtTheTop = true)
-            testee.onRefreshRequested(triggeredByUser = true)
-            verify(mockPrivacyProtectionsPopupManager).onPageRefreshTriggeredByUser(isOmnibarAtTheTop = true)
-        }
-
-    @Test
-    fun whenRefreshIsTriggeredByUserThenPrivacyProtectionsPopupManagerIsNotifiedWithBottomPosition() =
-        runTest {
-            whenever(mockSettingsDataStore.omnibarType).thenReturn(OmnibarType.SINGLE_BOTTOM)
-            testee.onRefreshRequested(triggeredByUser = false)
-            verify(mockPrivacyProtectionsPopupManager, never()).onPageRefreshTriggeredByUser(isOmnibarAtTheTop = false)
-            testee.onRefreshRequested(triggeredByUser = true)
-            verify(mockPrivacyProtectionsPopupManager).onPageRefreshTriggeredByUser(isOmnibarAtTheTop = false)
         }
 
     @Test
@@ -5695,20 +5586,16 @@ class BrowserTabViewModelTest {
     @Test
     fun whenPrivacyProtectionsAreToggledThenCorrectPixelsAreSent() =
         runTest {
-            val params = mapOf("test_key" to "test_value")
-            whenever(privacyProtectionsPopupExperimentExternalPixels.getPixelParams()).thenReturn(params)
             whenever(mockUserAllowListRepository.isDomainInUserAllowList("www.example.com")).thenReturn(false)
             loadUrl("http://www.example.com/home.html")
             testee.onPrivacyProtectionMenuClicked()
             whenever(mockUserAllowListRepository.isDomainInUserAllowList("www.example.com")).thenReturn(true)
             testee.onPrivacyProtectionMenuClicked()
 
-            verify(mockPixel).fire(AppPixelName.BROWSER_MENU_ALLOWLIST_ADD, params, type = Count)
-            verify(mockPixel).fire(AppPixelName.BROWSER_MENU_ALLOWLIST_REMOVE, params, type = Count)
+            verify(mockPixel).fire(AppPixelName.BROWSER_MENU_ALLOWLIST_ADD, type = Count)
+            verify(mockPixel).fire(AppPixelName.BROWSER_MENU_ALLOWLIST_REMOVE, type = Count)
             assertEquals(1, protectionTogglePlugin.toggleOff)
             assertEquals(1, protectionTogglePlugin.toggleOn)
-            verify(privacyProtectionsPopupExperimentExternalPixels).tryReportProtectionsToggledFromBrowserMenu(protectionsEnabled = false)
-            verify(privacyProtectionsPopupExperimentExternalPixels).tryReportProtectionsToggledFromBrowserMenu(protectionsEnabled = true)
         }
 
     @Test

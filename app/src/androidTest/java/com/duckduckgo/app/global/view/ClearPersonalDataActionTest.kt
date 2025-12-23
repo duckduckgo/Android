@@ -30,7 +30,6 @@ import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.api.WebTrackersBlockedRepository
 import com.duckduckgo.cookies.api.DuckDuckGoCookieManager
 import com.duckduckgo.history.api.NavigationHistory
-import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupDataClearer
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
 import com.duckduckgo.sync.api.DeviceSyncState
@@ -60,7 +59,6 @@ class ClearPersonalDataActionTest {
     private val mockDeviceSyncState: DeviceSyncState = mock()
     private val mockSavedSitesRepository: SavedSitesRepository = mock()
     private val mockSitePermissionsManager: SitePermissionsManager = mock()
-    private val mockPrivacyProtectionsPopupDataClearer: PrivacyProtectionsPopupDataClearer = mock()
     private val mockNavigationHistory: NavigationHistory = mock()
     private val mockWebTrackersBlockedRepository: WebTrackersBlockedRepository = mock()
 
@@ -80,7 +78,6 @@ class ClearPersonalDataActionTest {
             fireproofWebsiteRepository = mockFireproofWebsiteRepository,
             deviceSyncState = mockDeviceSyncState,
             savedSitesRepository = mockSavedSitesRepository,
-            privacyProtectionsPopupDataClearer = mockPrivacyProtectionsPopupDataClearer,
             sitePermissionsManager = mockSitePermissionsManager,
             navigationHistory = mockNavigationHistory,
             webTrackersBlockedRepository = mockWebTrackersBlockedRepository,
@@ -145,12 +142,6 @@ class ClearPersonalDataActionTest {
     }
 
     @Test
-    fun whenClearCalledThenPrivacyProtectionsPopupDataClearerIsInvoked() = runTest {
-        testee.clearTabsAndAllDataAsync(appInForeground = false, shouldFireDataClearPixel = false)
-        verify(mockPrivacyProtectionsPopupDataClearer).clearPersonalData()
-    }
-
-    @Test
     fun whenClearCalledThenWebTrackersAreCleared() = runTest {
         testee.clearTabsAndAllDataAsync(appInForeground = false, shouldFireDataClearPixel = false)
         verify(mockWebTrackersBlockedRepository).deleteAll()
@@ -203,7 +194,6 @@ class ClearPersonalDataActionTest {
         verifyNoInteractions(mockSitePermissionsManager)
         verifyNoInteractions(mockNavigationHistory)
         verifyNoInteractions(mockWebTrackersBlockedRepository)
-        verifyNoInteractions(mockPrivacyProtectionsPopupDataClearer)
         verifyNoInteractions(mockClearingUnsentForgetAllPixelStore)
     }
 
@@ -254,12 +244,6 @@ class ClearPersonalDataActionTest {
         whenever(mockDeviceSyncState.isUserSignedInOnDevice()).thenReturn(false)
         testee.clearBrowserDataOnly(shouldFireDataClearPixel = false)
         verify(mockSavedSitesRepository).pruneDeleted()
-    }
-
-    @Test
-    fun whenClearBrowserDataOnlyCalledThenPrivacyProtectionsPopupDataClearerIsInvoked() = runTest {
-        testee.clearBrowserDataOnly(shouldFireDataClearPixel = false)
-        verify(mockPrivacyProtectionsPopupDataClearer).clearPersonalData()
     }
 
     @Test
