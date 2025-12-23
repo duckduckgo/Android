@@ -612,6 +612,10 @@ class OmnibarLayoutViewModel @Inject constructor(
                 else -> {
                     val scrollingEnabled = viewMode != NewTab
                     val hasFocus = _viewState.value.hasFocus
+                    val currentLogoUrl = when (val leadingIconState = _viewState.value.leadingIconState) {
+                        is EasterEggLogo -> leadingIconState.logoUrl
+                        else -> null
+                    }
                     _viewState.update {
                         it.copy(
                             viewMode = viewMode,
@@ -619,7 +623,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                                 viewMode = viewMode,
                                 hasFocus = hasFocus,
                                 url = _viewState.value.url,
-                                logoUrl = null,
+                                logoUrl = currentLogoUrl,
                             ),
                             scrollingEnabled = scrollingEnabled,
                             showVoiceSearch = shouldShowVoiceSearch(
