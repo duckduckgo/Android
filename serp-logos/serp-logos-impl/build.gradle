@@ -42,8 +42,11 @@ dependencies {
 
     implementation "com.squareup.logcat:logcat:_"
 
+    implementation AndroidX.dataStore.preferences
+
     testImplementation Testing.junit4
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
+    testImplementation CashApp.turbine
     testImplementation project(':common-test')
     testImplementation(KotlinX.coroutines.test) {
         // https://github.com/Kotlin/kotlinx.coroutines/issues/2023
