@@ -110,7 +110,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extensions.hideKeyboard
 import com.duckduckgo.common.utils.playstore.PlayStoreUtils
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.duckchat.api.DuckAiFeatureState
+import com.duckduckgo.duckchat.api.RevengeAIFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.viewmodel.DuckChatSharedViewModel
 import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewFragment
@@ -192,7 +192,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
     lateinit var duckChat: DuckChat
 
     @Inject
-    lateinit var duckAiFeatureState: DuckAiFeatureState
+    lateinit var duckAiFeatureState: RevengeAIFeatureState
 
     @Inject
     lateinit var syncUrlIdentifier: SyncUrlIdentifier
@@ -619,7 +619,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         if (intent.getBooleanExtra(OPEN_DUCK_CHAT, false)) {
             isDuckChatVisible = true
             if (duckAiFeatureState.showInputScreenAutomaticallyOnNewTab.value) {
-                externalIntentProcessingState.onIntentRequestToOpenDuckAi()
+                externalIntentProcessingState.onIntentRequestToOpenRevengeAI()
             }
             val duckChatSessionActive = intent.getBooleanExtra(DUCK_CHAT_SESSION_ACTIVE, false)
             viewModel.openDuckChat(intent.getStringExtra(DUCK_CHAT_URL), duckChatSessionActive, withTransition = duckAiShouldAnimate)
@@ -847,10 +847,10 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     fun closeDuckChat() {
         isDuckChatVisible = false
-        externalIntentProcessingState.onDuckAiClosed()
+        externalIntentProcessingState.onRevengeAIClosed()
         val fragment = duckAiFragment
         if (fragment?.isVisible == true) {
-            animateDuckAiFragmentOut {
+            animateRevengeAIFragmentOut {
                 val transaction = supportFragmentManager.beginTransaction()
                 transaction.hide(fragment)
                 transaction.commitAllowingStateLoss() // allow state loss in case the transition finishes after onSaveInstanceState
@@ -904,13 +904,13 @@ open class BrowserActivity : DuckDuckGoActivity() {
         // If the fragment was already visible but needs to be force-reloaded, we don't want to animate it in again.
         if (!wasFragmentVisible) {
             if (withTransition) {
-                animateDuckAiFragmentIn()
+                animateRevengeAIFragmentIn()
             } else {
-                showDuckAiFragmentImmediately()
+                showRevengeAIFragmentImmediately()
             }
         } else if (!binding.duckAiFragmentContainer.isVisible) {
             // in case of lost fragment manager state, ensure the container is visible and show it immediately if not
-            showDuckAiFragmentImmediately()
+            showRevengeAIFragmentImmediately()
         }
     }
 
@@ -927,13 +927,13 @@ open class BrowserActivity : DuckDuckGoActivity() {
         transaction.commit()
 
         if (withTransition) {
-            animateDuckAiFragmentIn()
+            animateRevengeAIFragmentIn()
         } else {
-            showDuckAiFragmentImmediately()
+            showRevengeAIFragmentImmediately()
         }
     }
 
-    private fun showDuckAiFragmentImmediately() {
+    private fun showRevengeAIFragmentImmediately() {
         val duckAiContainer = binding.duckAiFragmentContainer
         duckAiContainer.isVisible = true
         duckAiContainer.alpha = 1f
@@ -943,7 +943,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         browserContainer.alpha = 0f
     }
 
-    private fun animateDuckAiFragmentIn() {
+    private fun animateRevengeAIFragmentIn() {
         val duckAiContainer = binding.duckAiFragmentContainer
         duckAiContainer.isVisible = true
         val browserContainer = if (swipingTabsFeature.isEnabled) binding.tabPager else binding.fragmentContainer
@@ -952,7 +952,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         browserContainer.slideAndFadeOutToLeft()
     }
 
-    private fun animateDuckAiFragmentOut(onComplete: () -> Unit) {
+    private fun animateRevengeAIFragmentOut(onComplete: () -> Unit) {
         val duckAiContainer = binding.duckAiFragmentContainer
         val browserContainer = if (swipingTabsFeature.isEnabled) binding.tabPager else binding.fragmentContainer
 

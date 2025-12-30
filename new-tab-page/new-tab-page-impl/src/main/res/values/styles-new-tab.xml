@@ -16,7 +16,7 @@
 
 <resources>
     <style name="Widget.App.ExtendedFloatingActionButton" parent="Widget.MaterialComponents.ExtendedFloatingActionButton.Icon">
-        <item name="shapeAppearanceOverlay">@style/ShapeAppearance.DuckDuckGo.MediumComponent</item>
+        <item name="shapeAppearanceOverlay">@style/ShapeAppearance.Revenge.MediumComponent</item>
     </style>
     <style name="ThemeOverlay.App.FloatingActionButton" parent="">
         <item name="colorSecondary">@color/gray70</item>

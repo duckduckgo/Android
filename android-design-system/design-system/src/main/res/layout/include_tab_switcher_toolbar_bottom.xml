@@ -2,7 +2,7 @@
 
 
 <!--
-  ~ Copyright (c) 2022 DuckDuckGo
+  ~ Copyright (c) 2022 Revenge
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -37,6 +37,6 @@
         android:background="?attr/daxColorToolbar"
         android:theme="@style/TabSwitcher.Widget.Toolbar"
         app:buttonGravity="center_vertical"
-        app:popupTheme="@style/Widget.DuckDuckGo.PopUpOverflowMenu" />
+        app:popupTheme="@style/Widget.Revenge.PopUpOverflowMenu" />
 
 </com.google.android.material.appbar.AppBarLayout>

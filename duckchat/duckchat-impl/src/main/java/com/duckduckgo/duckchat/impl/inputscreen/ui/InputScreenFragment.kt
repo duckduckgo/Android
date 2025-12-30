@@ -471,7 +471,7 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
                         is VoiceSearchLauncher.VoiceRecognitionResult.SearchResult -> {
                             viewModel.onSearchSubmitted(result.query)
                         }
-                        is VoiceSearchLauncher.VoiceRecognitionResult.DuckAiResult -> {
+                        is VoiceSearchLauncher.VoiceRecognitionResult.RevengeAIResult -> {
                             viewModel.onChatSubmitted(result.query)
                         }
                     }

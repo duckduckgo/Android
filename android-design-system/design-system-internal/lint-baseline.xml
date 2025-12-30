@@ -1802,9 +1802,9 @@
     </issue>
 
     <issue
-        id="InvalidDaxTextColorUsage"
-        message="Use DuckDuckGoTheme.textColors instead of arbitrary Color values to maintain design system consistency and theme support.&#xA;&#xA;Examples:&#xA;• DuckDuckGoTheme.textColors.primary&#xA;• DuckDuckGoTheme.textColors.secondary&#xA;&#xA;For one-off cases requiring custom colors, use good judgement or consider raising it in the Android Design System AOR."
-        errorLine1="                color = DuckDuckGoTheme.colors.destructive,"
+        id="InvalidRevengeTextColorUsage"
+        message="Use RevengeTheme.textColors instead of arbitrary Color values to maintain design system consistency and theme support.&#xA;&#xA;Examples:&#xA;• RevengeTheme.textColors.primary&#xA;• RevengeTheme.textColors.secondary&#xA;&#xA;For one-off cases requiring custom colors, use good judgement or consider raising it in the Android Design System AOR."
+        errorLine1="                color = RevengeTheme.colors.destructive,"
         errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/common/ui/internal/ui/typography/TypographyFragment.kt"

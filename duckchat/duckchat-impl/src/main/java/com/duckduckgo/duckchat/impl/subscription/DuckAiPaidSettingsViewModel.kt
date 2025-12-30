@@ -40,7 +40,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @ContributesViewModel(ActivityScope::class)
-class DuckAiPaidSettingsViewModel @Inject constructor(
+class RevengeAIPaidSettingsViewModel @Inject constructor(
     private val pixel: Pixel,
     dispatchers: DispatcherProvider,
     private val duckChat: DuckChatInternal,
@@ -49,14 +49,14 @@ class DuckAiPaidSettingsViewModel @Inject constructor(
 
     data class ViewState(
         val isDuckAIEnabled: Boolean = true,
-        val isDuckAiPaidSettingsFeatureEnabled: Boolean = false,
+        val isRevengeAIPaidSettingsFeatureEnabled: Boolean = false,
     )
 
     private val _viewState = MutableStateFlow<ViewState?>(null)
     val viewState = _viewState.asStateFlow()
 
     sealed class Command {
-        data object OpenDuckAi : Command()
+        data object OpenRevengeAI : Command()
         data object OpenDuckChatSettings : Command()
         data class LaunchLearnMoreWebPage(
             val url: String = "https://duckduckgo.com/duckduckgo-help-pages/privacy-pro/",
@@ -74,11 +74,11 @@ class DuckAiPaidSettingsViewModel @Inject constructor(
             val isFeatureEnabled = duckChatFeature.duckAiPaidSettingsStatus().isEnabled()
             if (isFeatureEnabled) {
                 duckChat.observeEnableDuckChatUserSetting()
-                    .onEach { isDuckAiEnabled ->
+                    .onEach { isRevengeAIEnabled ->
                         _viewState.update {
                             ViewState(
-                                isDuckAIEnabled = isDuckAiEnabled,
-                                isDuckAiPaidSettingsFeatureEnabled = true,
+                                isDuckAIEnabled = isRevengeAIEnabled,
+                                isRevengeAIPaidSettingsFeatureEnabled = true,
                             )
                         }
                     }
@@ -93,9 +93,9 @@ class DuckAiPaidSettingsViewModel @Inject constructor(
         }
     }
 
-    fun onOpenDuckAiSelected() {
+    fun onOpenRevengeAISelected() {
         viewModelScope.launch {
-            _commands.send(Command.OpenDuckAi)
+            _commands.send(Command.OpenRevengeAI)
             pixel.fire(DUCK_CHAT_PAID_OPEN_DUCK_AI_CLICKED)
         }
     }

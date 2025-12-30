@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Copyright (c) 2021 DuckDuckGo
+  ~ Copyright (c) 2021 Revenge
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -62,7 +62,7 @@
     <string name="searchbar_searchhint_default" translatable="false">Search</string>
     <string name="searchbar_upaction_content_description_default" translatable="false">Navigate up</string>
 
-    <!-- Duck.ai updates - O-A -->
-    <string name="duckAIUpdateTitle">Duck.ai PoC</string>
+    <!-- RevengeAI updates - O-A -->
+    <string name="duckAIUpdateTitle">RevengeAI PoC</string>
     <string name="duckAIUpdateMessage">This feature is in active development, intended for feedback purposes.</string>
 </resources>

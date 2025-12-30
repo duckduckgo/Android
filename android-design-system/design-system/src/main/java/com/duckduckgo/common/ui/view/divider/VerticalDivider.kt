@@ -37,7 +37,7 @@ class VerticalDivider @JvmOverloads constructor(
                 attrs,
                 R.styleable.VerticalDivider,
                 0,
-                R.style.Widget_DuckDuckGo_VerticalDivider,
+                R.style.Widget_Revenge_VerticalDivider,
             )
 
         val defaultPadding = typedArray.getBoolean(R.styleable.VerticalDivider_defaultPadding, false)

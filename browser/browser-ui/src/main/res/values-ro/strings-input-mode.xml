@@ -19,5 +19,5 @@
 <resources>
     <!-- Input Mode Tab Layout -->
     <string name="input_mode_search_tab">Căutare</string>
-    <string name="input_mode_chat_tab">Duck.ai</string>
+    <string name="input_mode_chat_tab">Revenge AI</string>
 </resources>

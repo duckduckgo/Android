@@ -821,7 +821,7 @@ class SubscriptionMessagingInterfaceTest {
         givenInterfaceIsRegistered()
         givenSubscriptionMessaging(enabled = true)
         givenAuthV2(enabled = true)
-        givenDuckAiPlus(enabled = true)
+        givenRevengeAIPlus(enabled = true)
         givenStripeSupported(enabled = true)
 
         val expected = JsRequestResponse.Success(
@@ -829,7 +829,7 @@ class SubscriptionMessagingInterfaceTest {
             featureName = "useSubscription",
             method = "getFeatureConfig",
             id = "myId",
-            result = JSONObject("""{"useSubscriptionsAuthV2":true,"usePaidDuckAi":true,"useAlternateStripePaymentFlow":true}"""),
+            result = JSONObject("""{"useSubscriptionsAuthV2":true,"usePaidRevengeAI":true,"useAlternateStripePaymentFlow":true}"""),
         )
 
         val message = """
@@ -851,7 +851,7 @@ class SubscriptionMessagingInterfaceTest {
         givenInterfaceIsRegistered()
         givenSubscriptionMessaging(enabled = true)
         givenAuthV2(enabled = false)
-        givenDuckAiPlus(enabled = true)
+        givenRevengeAIPlus(enabled = true)
         givenStripeSupported(enabled = true)
 
         val expected = JsRequestResponse.Success(
@@ -859,7 +859,7 @@ class SubscriptionMessagingInterfaceTest {
             featureName = "useSubscription",
             method = "getFeatureConfig",
             id = "myId",
-            result = JSONObject("""{"useSubscriptionsAuthV2":false,"usePaidDuckAi":true,"useAlternateStripePaymentFlow":true}"""),
+            result = JSONObject("""{"useSubscriptionsAuthV2":false,"usePaidRevengeAI":true,"useAlternateStripePaymentFlow":true}"""),
         )
 
         val message = """
@@ -881,7 +881,7 @@ class SubscriptionMessagingInterfaceTest {
         givenInterfaceIsRegistered()
         givenSubscriptionMessaging(enabled = true)
         givenAuthV2(enabled = true)
-        givenDuckAiPlus(enabled = false)
+        givenRevengeAIPlus(enabled = false)
         givenStripeSupported(enabled = true)
 
         val expected = JsRequestResponse.Success(
@@ -889,7 +889,7 @@ class SubscriptionMessagingInterfaceTest {
             featureName = "useSubscription",
             method = "getFeatureConfig",
             id = "myId",
-            result = JSONObject("""{"useSubscriptionsAuthV2":true,"usePaidDuckAi":false,"useAlternateStripePaymentFlow":true}"""),
+            result = JSONObject("""{"useSubscriptionsAuthV2":true,"usePaidRevengeAI":false,"useAlternateStripePaymentFlow":true}"""),
         )
 
         val message = """
@@ -985,7 +985,7 @@ class SubscriptionMessagingInterfaceTest {
         whenever(privacyProFeature.enableSubscriptionFlowsV2()).thenReturn(v2SubscriptionFlow)
     }
 
-    private fun givenDuckAiPlus(enabled: Boolean) {
+    private fun givenRevengeAIPlus(enabled: Boolean) {
         val duckAiPlusToggle = mock<com.duckduckgo.feature.toggles.api.Toggle>()
         whenever(duckAiPlusToggle.isEnabled()).thenReturn(enabled)
         whenever(privacyProFeature.duckAiPlus()).thenReturn(duckAiPlusToggle)

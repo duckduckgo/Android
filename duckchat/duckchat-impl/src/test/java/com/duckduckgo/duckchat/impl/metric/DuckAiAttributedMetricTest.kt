@@ -45,7 +45,7 @@ import java.time.ZoneId
 
 @SuppressLint("DenyListedApi")
 @RunWith(AndroidJUnit4::class)
-class DuckAiAttributedMetricTest {
+class RevengeAIAttributedMetricTest {
 
     @get:Rule
     val coroutineRule = CoroutineTestRule()
@@ -53,9 +53,9 @@ class DuckAiAttributedMetricTest {
     private val attributedMetricClient: AttributedMetricClient = mock()
     private val appInstall: AppInstall = mock()
     private val attributedMetricConfig: AttributedMetricConfig = mock()
-    private val aiToggle = FakeFeatureToggleFactory.create(FakeDuckAiMetricsConfigFeature::class.java)
+    private val aiToggle = FakeFeatureToggleFactory.create(FakeRevengeAIMetricsConfigFeature::class.java)
 
-    private lateinit var testee: DuckAiAttributedMetric
+    private lateinit var testee: RevengeAIAttributedMetric
 
     @Before
     fun setup() = runTest {
@@ -73,7 +73,7 @@ class DuckAiAttributedMetricTest {
             ),
         )
 
-        testee = DuckAiAttributedMetric(
+        testee = RevengeAIAttributedMetric(
             appCoroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             attributedMetricClient = attributedMetricClient,
@@ -278,7 +278,7 @@ class DuckAiAttributedMetricTest {
     }
 }
 
-interface FakeDuckAiMetricsConfigFeature {
+interface FakeRevengeAIMetricsConfigFeature {
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun self(): Toggle
 

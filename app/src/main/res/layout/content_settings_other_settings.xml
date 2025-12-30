@@ -88,7 +88,7 @@
     </LinearLayout>
 
     <include
-        android:id="@+id/includeDuckChatSetting"
+        android:id="@+id/includeRevengeChatSetting"
         layout="@layout/view_settings_item_duck_chat" />
 
 </LinearLayout>

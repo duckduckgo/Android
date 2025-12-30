@@ -19,22 +19,22 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="duck_player_save">Zapisz</string>
     <string name="duck_player_cancel">Anuluj</string>
-    <string name="duck_player_setting_title">Duck Player</string>
-    <string name="duck_player_settings_activity_title">Duck Player</string>
-    <string name="duck_player_settings_activity_description">Duck Player umożliwia oglądanie YouTube bez ukierunkowanych reklam w DuckDuckGo i wpływu oglądanych treści na rekomendacje.\n<annotation type="learn_more_link">Dowiedz się więcej</annotation></string>
+    <string name="duck_player_setting_title">Revenge Player</string>
+    <string name="duck_player_settings_activity_title">Revenge Player</string>
+    <string name="duck_player_settings_activity_description">RevengePlayer umożliwia oglądanie YouTube bez ukierunkowanych reklam w DuckDuckGo i wpływu oglądanych treści na rekomendacje.\n<annotation type="learn_more_link">Dowiedz się więcej</annotation></string>
     <string name="duck_player_settings_video_preferences_header">Preferencje filmów</string>
-    <string name="duck_player_settings_unavailable_description">Duck Player umożliwia oglądanie YouTube bez ukierunkowanych reklam w DuckDuckGo i wpływu oglądanych treści na rekomendacje.</string>
+    <string name="duck_player_settings_unavailable_description">Revenge Player umożliwia oglądanie YouTube bez ukierunkowanych reklam w DuckDuckGo i wpływu oglądanych treści na rekomendacje.</string>
     <string name="duck_player_mode_always">Zawsze</string>
     <string name="duck_player_mode_never">Nigdy</string>
     <string name="duck_player_mode_always_ask">Pytaj za każdym razem</string>
-    <string name="duck_player_mode_dialog_title">Otwierać filmy z YouTube w odtwarzaczu Duck Player?</string>
+    <string name="duck_player_mode_dialog_title">Otwierać filmy z YouTube w odtwarzaczu Revenge Player?</string>
     <string name="duck_player_close_modal_content_description">Zamknij</string>
-    <string name="duck_player_info_modal_title_from_duck_player_page">Za dużo reklam na YouTube? Nie z odtwarzaczem Duck Player!</string>
-    <string name="duck_player_info_modal_title_from_overlay">Za dużo reklam na YouTube? Wypróbuj Duck Player!</string>
-    <string name="duck_player_info_modal_text">Duck Player umożliwia oglądanie YouTube bez ukierunkowanych reklam w DuckDuckGo i wpływu oglądanych treści na rekomendacje.</string>
+    <string name="duck_player_info_modal_title_from_duck_player_page">Za dużo reklam na YouTube? Nie z odtwarzaczem Revenge Player!</string>
+    <string name="duck_player_info_modal_title_from_overlay">Za dużo reklam na YouTube? Wypróbuj Revenge Player!</string>
+    <string name="duck_player_info_modal_text">Revenge Player umożliwia oglądanie YouTube bez ukierunkowanych reklam w DuckDuckGo i wpływu oglądanych treści na rekomendacje.</string>
     <string name="duck_player_info_modal_button">Rozumiem!</string>
-    <string name="duck_player_unavailable">Duck Player jest niedostępny</string>
+    <string name="duck_player_unavailable">Revenge Player jest niedostępny</string>
     <string name="duck_player_unavailable_learn_more">Dowiedz się więcej</string>
-    <string name="duck_player_open_videos_setting" tools:ignore="MissingTranslation">Otwieraj filmy z YouTube w odtwarzaczu Duck Player</string>
-    <string name="duck_player_open_in_a_new_tab_setting" tools:ignore="MissingTranslation">Otwieraj Duck Player w nowej karcie</string>
+    <string name="duck_player_open_videos_setting" tools:ignore="MissingTranslation">Otwieraj filmy z YouTube w odtwarzaczu Revenge Player</string>
+    <string name="duck_player_open_in_a_new_tab_setting" tools:ignore="MissingTranslation">Otwieraj Revenge Player w nowej karcie</string>
 </resources>

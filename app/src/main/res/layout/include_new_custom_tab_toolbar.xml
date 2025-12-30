@@ -35,7 +35,7 @@
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/customToolbarContainer"
-        style="@style/Widget.DuckDuckGo.CustomToolbarCardView"
+        style="@style/Widget.Revenge.CustomToolbarCardView"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="1"

@@ -33,7 +33,7 @@ import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.duckchat.api.DuckAiFeatureState
+import com.duckduckgo.duckchat.api.RevengeAIFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksActivity
 import com.squareup.anvil.annotations.ContributesTo
@@ -78,7 +78,7 @@ class AppShortcutCreator @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val appBuildConfig: AppBuildConfig,
     private val duckChat: DuckChat,
-    private val duckAiFeatureState: DuckAiFeatureState,
+    private val duckAiFeatureState: RevengeAIFeatureState,
     private val dispatchers: DispatcherProvider,
 ) {
 

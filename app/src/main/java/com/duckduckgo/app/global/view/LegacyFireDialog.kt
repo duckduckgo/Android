@@ -121,7 +121,7 @@ class LegacyFireDialog : BottomSheetDialogFragment(), FireDialog {
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        return BottomSheetDialog(requireContext(), CommonR.style.Widget_DuckDuckGo_FireDialog)
+        return BottomSheetDialog(requireContext(), CommonR.style.Widget_Revenge_FireDialog)
     }
 
     override fun onCreateView(
@@ -199,8 +199,8 @@ class LegacyFireDialog : BottomSheetDialogFragment(), FireDialog {
                 dismiss()
             }
 
-            if (settingsDataStore.clearDuckAiData) {
-                clearAllOption.setPrimaryText(requireContext().getString(com.duckduckgo.app.browser.R.string.fireClearAllPlusDuckChats))
+            if (settingsDataStore.clearRevengeAIData) {
+                clearAllOption.setPrimaryText(requireContext().getString(com.duckduckgo.app.browser.R.string.fireClearAllPlusRevenge_Chats))
             }
         }
     }

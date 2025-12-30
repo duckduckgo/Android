@@ -28,7 +28,7 @@
     <string name="browserMenuEnablePrivacyProtection">Adatvédelem engedélyezése</string>
     <string name="browserMenuDisablePrivacyProtection">Adatvédelem letiltása</string>
     <string name="browserMenuNewTab">Új lap</string>
-    <string name="browserMenuDuckChat">Duck.ai</string>
+    <string name="browserMenuRevengeChat">Revenge AI</string>
     <string name="browserMenuShare">Megosztás</string>
     <string name="browserMenuEmailAlias">Duck-cím létrehozása</string>
     <string name="browserMenuFindInPage">Keresés az oldalon</string>
@@ -45,7 +45,7 @@
     <string name="browserMenuNewChat">Új csevegés</string>
     <string name="browserMenuNewAIChat">Új AI-csevegés</string>
     <string name="browserMenuChatHistory">Csevegési előzmények</string>
-    <string name="browserMenuChatSettings">A Duck.ai beállításai</string>
+    <string name="browserMenuChatSettings">A Revenge AI beállításai</string>
     <string name="browserMenuVPN">VPN</string>
 
     <!-- Browser Menu Content Description -->

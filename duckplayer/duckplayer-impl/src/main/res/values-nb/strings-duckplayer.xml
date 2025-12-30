@@ -19,22 +19,22 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="duck_player_save">Lagre</string>
     <string name="duck_player_cancel">Avbryt</string>
-    <string name="duck_player_setting_title">Duck Player</string>
-    <string name="duck_player_settings_activity_title">Duck Player</string>
-    <string name="duck_player_settings_activity_description">Med Duck Player kan du se på YouTube uten målrettede annonser i DuckDuckGo. Det du ser på, påvirker ikke anbefalingene du får.\n<annotation type="learn_more_link">Les mer</annotation></string>
+    <string name="duck_player_setting_title">Revenge Player</string>
+    <string name="duck_player_settings_activity_title">Revenge Player</string>
+    <string name="duck_player_settings_activity_description">Med RevengePlayer kan du se på YouTube uten målrettede annonser i DuckDuckGo. Det du ser på, påvirker ikke anbefalingene du får.\n<annotation type="learn_more_link">Les mer</annotation></string>
     <string name="duck_player_settings_video_preferences_header">Videoinnstillinger</string>
-    <string name="duck_player_settings_unavailable_description">Med Duck Player kan du se på YouTube uten målrettede annonser i DuckDuckGo. Det du ser på, påvirker ikke anbefalingene du får.</string>
+    <string name="duck_player_settings_unavailable_description">Med Revenge Player kan du se på YouTube uten målrettede annonser i DuckDuckGo. Det du ser på, påvirker ikke anbefalingene du får.</string>
     <string name="duck_player_mode_always">Alltid</string>
     <string name="duck_player_mode_never">Aldri</string>
     <string name="duck_player_mode_always_ask">Spør hver gang</string>
-    <string name="duck_player_mode_dialog_title">Vil du åpne YouTube-videoer i Duck Player?</string>
+    <string name="duck_player_mode_dialog_title">Vil du åpne YouTube-videoer i Revenge Player?</string>
     <string name="duck_player_close_modal_content_description">Lukk</string>
-    <string name="duck_player_info_modal_title_from_duck_player_page">Drukner du i annonser på YouTube? Ikke med Duck Player!</string>
-    <string name="duck_player_info_modal_title_from_overlay">Drukner du i annonser på YouTube? Prøv Duck Player!</string>
-    <string name="duck_player_info_modal_text">Med Duck Player kan du se på YouTube uten målrettede annonser i DuckDuckGo. Det du ser på, påvirker ikke anbefalingene du får.</string>
+    <string name="duck_player_info_modal_title_from_duck_player_page">Drukner du i annonser på YouTube? Ikke med Revenge Player!</string>
+    <string name="duck_player_info_modal_title_from_overlay">Drukner du i annonser på YouTube? Prøv Revenge Player!</string>
+    <string name="duck_player_info_modal_text">Med Revenge Player kan du se på YouTube uten målrettede annonser i DuckDuckGo. Det du ser på, påvirker ikke anbefalingene du får.</string>
     <string name="duck_player_info_modal_button">Skjønner!</string>
-    <string name="duck_player_unavailable">Duck Player er utilgjengelig</string>
+    <string name="duck_player_unavailable">Revenge Player er utilgjengelig</string>
     <string name="duck_player_unavailable_learn_more">Finn ut mer</string>
-    <string name="duck_player_open_videos_setting" tools:ignore="MissingTranslation">Åpne YouTube-videoer i Duck Player</string>
-    <string name="duck_player_open_in_a_new_tab_setting" tools:ignore="MissingTranslation">Åpne Duck Player i en ny fane</string>
+    <string name="duck_player_open_videos_setting" tools:ignore="MissingTranslation">Åpne YouTube-videoer i Revenge Player</string>
+    <string name="duck_player_open_in_a_new_tab_setting" tools:ignore="MissingTranslation">Åpne Revenge Player i en ny fane</string>
 </resources>

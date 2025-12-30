@@ -207,7 +207,7 @@ class DuckDuckGoWebLocalStorageManagerTest {
         whenever(mockIterator.hasNext()).thenReturn(true, true, false)
         whenever(mockIterator.next()).thenReturn(entry1, entry2)
 
-        testee.clearWebLocalStorage(shouldClearBrowserData = true, shouldClearDuckAiData = false)
+        testee.clearWebLocalStorage(shouldClearBrowserData = true, shouldClearRevengeAIData = false)
 
         verify(mockDB).delete(key1)
         verify(mockDB, never()).delete(key2)
@@ -226,7 +226,7 @@ class DuckDuckGoWebLocalStorageManagerTest {
         whenever(mockIterator.hasNext()).thenReturn(true, true, true, false)
         whenever(mockIterator.next()).thenReturn(entry1, entry2, entry3)
 
-        testee.clearWebLocalStorage(shouldClearBrowserData = false, shouldClearDuckAiData = false)
+        testee.clearWebLocalStorage(shouldClearBrowserData = false, shouldClearRevengeAIData = false)
 
         verify(mockDB, never()).delete(key1)
         verify(mockDB, never()).delete(key2)
@@ -244,14 +244,14 @@ class DuckDuckGoWebLocalStorageManagerTest {
         whenever(mockIterator.hasNext()).thenReturn(true, true, false)
         whenever(mockIterator.next()).thenReturn(entry1, entry2)
 
-        testee.clearWebLocalStorage(shouldClearBrowserData = false, shouldClearDuckAiData = true)
+        testee.clearWebLocalStorage(shouldClearBrowserData = false, shouldClearRevengeAIData = true)
 
         verify(mockDB).delete(key1)
         verify(mockDB, never()).delete(key2)
     }
 
     @Test
-    fun whenClearWebLocalStorageWithShouldClearChatsTrueThenDeletesDuckAiChatKeys() = runTest {
+    fun whenClearWebLocalStorageWithShouldClearChatsTrueThenDeletesRevengeAIChatKeys() = runTest {
         val key1 = bytes("_https://duck.ai\u0000\u0001ai-conversations")
         val key2 = bytes("_https://duck.ai\u0000\u0001regular-key")
         val entry1 = createMockDBEntry(key1)
@@ -261,7 +261,7 @@ class DuckDuckGoWebLocalStorageManagerTest {
         whenever(mockIterator.hasNext()).thenReturn(true, true, false)
         whenever(mockIterator.next()).thenReturn(entry1, entry2)
 
-        testee.clearWebLocalStorage(shouldClearBrowserData = false, shouldClearDuckAiData = true)
+        testee.clearWebLocalStorage(shouldClearBrowserData = false, shouldClearRevengeAIData = true)
 
         verify(mockDB).delete(key1)
         verify(mockDB, never()).delete(key2)
@@ -278,7 +278,7 @@ class DuckDuckGoWebLocalStorageManagerTest {
         whenever(mockIterator.hasNext()).thenReturn(true, true, false)
         whenever(mockIterator.next()).thenReturn(entry1, entry2)
 
-        testee.clearWebLocalStorage(shouldClearBrowserData = false, shouldClearDuckAiData = false)
+        testee.clearWebLocalStorage(shouldClearBrowserData = false, shouldClearRevengeAIData = false)
 
         verify(mockDB, never()).delete(key1)
         verify(mockDB, never()).delete(key2)
@@ -297,7 +297,7 @@ class DuckDuckGoWebLocalStorageManagerTest {
         whenever(mockIterator.hasNext()).thenReturn(true, true, true, false)
         whenever(mockIterator.next()).thenReturn(entry1, entry2, entry3)
 
-        testee.clearWebLocalStorage(shouldClearBrowserData = true, shouldClearDuckAiData = true)
+        testee.clearWebLocalStorage(shouldClearBrowserData = true, shouldClearRevengeAIData = true)
 
         verify(mockDB).delete(key1)
         verify(mockDB).delete(key2)
@@ -315,7 +315,7 @@ class DuckDuckGoWebLocalStorageManagerTest {
         whenever(mockIterator.hasNext()).thenReturn(true, true, false)
         whenever(mockIterator.next()).thenReturn(entry1, entry2)
 
-        testee.clearWebLocalStorage(shouldClearBrowserData = false, shouldClearDuckAiData = false)
+        testee.clearWebLocalStorage(shouldClearBrowserData = false, shouldClearRevengeAIData = false)
 
         verify(mockDB, never()).delete(key1)
         verify(mockDB, never()).delete(key2)
@@ -334,7 +334,7 @@ class DuckDuckGoWebLocalStorageManagerTest {
         whenever(mockIterator.hasNext()).thenReturn(true, true, false)
         whenever(mockIterator.next()).thenReturn(entry1, entry2)
 
-        testee.clearWebLocalStorage(shouldClearBrowserData = true, shouldClearDuckAiData = false)
+        testee.clearWebLocalStorage(shouldClearBrowserData = true, shouldClearRevengeAIData = false)
 
         verify(mockDB, never()).delete(key1)
         verify(mockDB).delete(key2)
@@ -351,7 +351,7 @@ class DuckDuckGoWebLocalStorageManagerTest {
         whenever(mockIterator.hasNext()).thenReturn(true, true, false)
         whenever(mockIterator.next()).thenReturn(entry1, entry2)
 
-        testee.clearWebLocalStorage(shouldClearBrowserData = false, shouldClearDuckAiData = true)
+        testee.clearWebLocalStorage(shouldClearBrowserData = false, shouldClearRevengeAIData = true)
 
         verify(mockDB, never()).delete(key1)
         verify(mockDB).delete(key2)
@@ -361,7 +361,7 @@ class DuckDuckGoWebLocalStorageManagerTest {
     fun whenClearWebLocalStorageWithParametersThenIteratorSeeksToFirst() = runTest {
         whenever(mockDB.iterator()).thenReturn(mockIterator)
 
-        testee.clearWebLocalStorage(shouldClearBrowserData = true, shouldClearDuckAiData = true)
+        testee.clearWebLocalStorage(shouldClearBrowserData = true, shouldClearRevengeAIData = true)
 
         verify(mockIterator).seekToFirst()
     }
@@ -371,7 +371,7 @@ class DuckDuckGoWebLocalStorageManagerTest {
         whenever(mockDB.iterator()).thenReturn(mockIterator)
         whenever(mockIterator.hasNext()).thenReturn(false)
 
-        testee.clearWebLocalStorage(shouldClearBrowserData = true, shouldClearDuckAiData = false)
+        testee.clearWebLocalStorage(shouldClearBrowserData = true, shouldClearRevengeAIData = false)
 
         verify(mockIterator).close()
     }

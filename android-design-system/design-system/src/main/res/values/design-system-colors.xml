@@ -1,5 +1,5 @@
 <!--
-  ~ Copyright (c) 2021 DuckDuckGo
+  ~ Copyright (c) 2021 Revenge
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 <resources>
 
     <!-- Design System Theme Agnostic Reference Colors
-        daxColorDim - Dim color behind some dialogs / Dax Dialog
+        daxColorDim - Dim color behind some dialogs / Revenge Dialog
         daxColorWhite - Brand White
         daxColorBlack - Brand Black
         -->
@@ -249,7 +249,7 @@
     <!-- Legacy Raw -->
     <color name="translucentDark">#b000</color>
 
-    <color name="ic_launcher_red_background">#DE5833</color>
+    <color name="ic_launcher_red_background">#000000</color>
     <color name="ic_launcher_white_background">#FFFFFF</color>
     <color name="ic_launcher_gold_background">#EEA849</color>
     <color name="ic_launcher_silhouette_background">#222222</color>

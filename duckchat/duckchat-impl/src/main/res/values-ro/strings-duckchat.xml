@@ -17,7 +17,7 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="duck_chat_title">Duck.ai</string>
+    <string name="duck_chat_title">Revenge AI</string>
     <string name="duck_chat_download_finished_action_name">Deschide</string>
     <string name="duck_chat_cannot_open_file_error_message">Nu se poate deschide fișierul. Caută o aplicație compatibilă.</string>
 
@@ -39,14 +39,14 @@
     <!-- Settings -->
     <string name="duck_chat_ai_features_title">Caracteristici AI</string>
     <string name="duck_chat_settings_activity_description">Funcțiile IA ale DuckDuckGo sunt private și opționale.Datele tale nu sunt folosite pentru a antrena IA.\n<annotation type="learn_more_link">Află mai multe</annotation></string>
-    <string name="duck_chat_enable_duck_ai_setting">Duck.ai</string>
+    <string name="duck_chat_enable_duck_ai_setting">Revenge AI</string>
     <string name="duck_chat_enable_duck_ai_setting_description">Discută în privat cu modele AI populare de la entități externe</string>
     <string name="duck_chat_visibility_setting">Meniu browser</string>
     <string name="duck_chat_address_bar_visibility_setting">Bara de adrese</string>
     <string name="duck_chat_assist_settings_title">Setări Search Assist</string>
     <string name="duck_chat_assist_settings_description">Alege cât de des vrei să apară răspunsurile asistate de IA în căutările tale</string>
-    <string name="duck_ai_shortcut_settings_title">Comenzi rapide Duck.ai</string>
-    <string name="duck_ai_shortcut_settings_description">Alege ce comenzi rapide Duck.ai dorești să afișezi</string>
+    <string name="duck_ai_shortcut_settings_title">Comenzi rapide Revenge AI</string>
+    <string name="duck_ai_shortcut_settings_description">Alege ce comenzi rapide Revenge AI dorești să afișezi</string>
 
     <!-- Duck AI Voice Search Shortcut Setting -->
     <string name="duckAiVoiceSearchVisibilitySetting">Căutare vocală</string>
@@ -55,18 +55,18 @@
     <string name="input_screen_search_hint">Caută sau introdu adresa</string>
     <string name="input_screen_chat_hint">Întreabă în mod privat</string>
     <string name="input_screen_user_pref_without_ai">Doar căutare</string>
-    <string name="input_screen_user_pref_with_ai">Caută pe Duck.ai</string>
-    <string name="input_screen_user_pref_description">Încearcă noua opțiune de a adresa o întrebare către Duck.ai direct din bara de adrese. <annotation type="share_feedback">Trimite feedback</annotation></string>
+    <string name="input_screen_user_pref_with_ai">Caută pe Revenge AI</string>
+    <string name="input_screen_user_pref_description">Încearcă noua opțiune de a adresa o întrebare către RevengeAI direct din bara de adrese. <annotation type="share_feedback">Trimite feedback</annotation></string>
 
-    <!-- Duck.ai Pro settings -->
-    <string name="duck_ai_paid_settings_title">Duck.ai</string>
-    <string name="duck_ai_paid_settings_page_title">Duck.ai</string>
+    <!-- Revenge AI Pro settings -->
+    <string name="duck_ai_paid_settings_title">Revenge AI</string>
+    <string name="duck_ai_paid_settings_page_title">Revenge AI</string>
     <string name="duck_ai_paid_settings_page_description"><![CDATA[Fă chat în privat cu modele AI exclusive pentru abonați.\n<a href=\"\">Află mai multe</a>]]></string>
-    <string name="duck_ai_paid_settings_open_duck_ai">Deschide Duck.ai</string>
+    <string name="duck_ai_paid_settings_open_duck_ai">Deschide Revenge AI</string>
     <string name="duck_ai_paid_settings_learn_more_title">Află mai multe</string>
 
     <!-- AutoComplete -->
-    <string name="autocompleteDuckAiPrompt">Întreabă Duck.ai</string>
+    <string name="autocompleteRevengeAIPrompt">Întreabă Revenge AI</string>
     <string name="autocompleteDeviceAppNotFound">Aplicația nu a fost găsită</string>
 
     <!-- New Address Bar Option Bottom Sheet Dialog -->
@@ -76,7 +76,7 @@
     <string name="newAddressBarOptionBottomSheetDialogGhostButton">Nu acum</string>
     <string name="newAddressBarOptionBottomSheetDialogFooter">Ajustează din Setări &gt; Funcții IA.</string>
     <string name="newAddressBarOptionBottomSheetDialogSearchOnly">Doar căutare</string>
-    <string name="newAddressBarOptionBottomSheetDialogSearchAndDuckAi">Caută pe Duck.ai</string>
+    <string name="newAddressBarOptionBottomSheetDialogSearchAndRevengeAI">Caută pe Revenge AI</string>
     <string name="newAddressBarOptionBottomSheetDialogHeader">Opțiunea bară de adrese</string>
 
     <!-- Duck AI SERP Settings Title -->
@@ -92,5 +92,5 @@
     <!-- Duck AI Paid Settings -->
     <string name="duck_ai_paid_settings_enable_in_settings">Activează în setările funcțiilor IA</string>
     <string name="duck_ai_paid_settings_manage_in_settings">Gestionează în setările funcțiilor IA</string>
-    <string name="duck_ai_paid_settings_manage_secondary">Configurează Duck.ai în setările funcțiilor IA.</string>
+    <string name="duck_ai_paid_settings_manage_secondary">Configurează Revenge AI în setările funcțiilor IA.</string>
 </resources>

@@ -42,7 +42,7 @@ import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeature
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
-import com.duckduckgo.duckchat.api.DuckAiFeatureState
+import com.duckduckgo.duckchat.api.RevengeAIFeatureState
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import junit.framework.TestCase
@@ -94,8 +94,8 @@ class BrowserViewModelTest {
 
     @Mock private lateinit var mockAdditionalDefaultBrowserPrompts: AdditionalDefaultBrowserPrompts
 
-    @Mock private lateinit var mockDuckAIFeatureState: DuckAiFeatureState
-    private val mockDuckAiFullScreenMode = MutableStateFlow(false)
+    @Mock private lateinit var mockDuckAIFeatureState: RevengeAIFeatureState
+    private val mockRevengeAIFullScreenMode = MutableStateFlow(false)
 
     private val fakeShowOnAppLaunchFeatureToggle = FakeFeatureToggleFactory.create(ShowOnAppLaunchFeature::class.java)
 
@@ -124,7 +124,7 @@ class BrowserViewModelTest {
         runTest {
             whenever(mockTabRepository.add()).thenReturn(TAB_ID)
             whenever(mockOmnibarEntryConverter.convertQueryToUrl(any(), any(), any(), any())).then { it.arguments.first() }
-            whenever(mockDuckAIFeatureState.showFullScreenMode).thenReturn(mockDuckAiFullScreenMode)
+            whenever(mockDuckAIFeatureState.showFullScreenMode).thenReturn(mockRevengeAIFullScreenMode)
         }
     }
 
@@ -667,7 +667,7 @@ class BrowserViewModelTest {
     private suspend fun initSuspendTestee() {
         whenever(mockTabRepository.add()).thenReturn(TAB_ID)
         whenever(mockOmnibarEntryConverter.convertQueryToUrl(any(), any(), any(), any())).then { it.arguments.first() }
-        whenever(mockDuckAIFeatureState.showFullScreenMode).thenReturn(mockDuckAiFullScreenMode)
+        whenever(mockDuckAIFeatureState.showFullScreenMode).thenReturn(mockRevengeAIFullScreenMode)
 
         testee = BrowserViewModel(
             tabRepository = mockTabRepository,

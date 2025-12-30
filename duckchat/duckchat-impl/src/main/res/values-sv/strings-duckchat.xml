@@ -17,7 +17,7 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="duck_chat_title">Duck.ai</string>
+    <string name="duck_chat_title">Revenge AI</string>
     <string name="duck_chat_download_finished_action_name">Öppna</string>
     <string name="duck_chat_cannot_open_file_error_message">Det går inte att öppna filen. Sök efter en kompatibel app.</string>
 
@@ -39,14 +39,14 @@
     <!-- Settings -->
     <string name="duck_chat_ai_features_title">AI-funktioner</string>
     <string name="duck_chat_settings_activity_description">DuckDuckGos AI-funktioner är privata och valfria.\nDina data används inte för att träna AI.\n<annotation type="learn_more_link">Läs mer</annotation></string>
-    <string name="duck_chat_enable_duck_ai_setting">Duck.ai</string>
+    <string name="duck_chat_enable_duck_ai_setting">Revenge AI</string>
     <string name="duck_chat_enable_duck_ai_setting_description">Chatta privat med populära AI-modeller från tredje part</string>
     <string name="duck_chat_visibility_setting">Webbläsarmeny</string>
     <string name="duck_chat_address_bar_visibility_setting">Adressfält</string>
     <string name="duck_chat_assist_settings_title">Inställningar för Search Assist</string>
     <string name="duck_chat_assist_settings_description">Välj hur ofta du vill att AI-assisterade svar ska visas i dina sökningar</string>
-    <string name="duck_ai_shortcut_settings_title">Duck.ai-genvägar</string>
-    <string name="duck_ai_shortcut_settings_description">Välj vilka Duck.ai-genvägar du vill visa</string>
+    <string name="duck_ai_shortcut_settings_title">Revenge AI-genvägar</string>
+    <string name="duck_ai_shortcut_settings_description">Välj vilka Revenge AI-genvägar du vill visa</string>
 
     <!-- Duck AI Voice Search Shortcut Setting -->
     <string name="duckAiVoiceSearchVisibilitySetting">Röstsökning</string>
@@ -55,18 +55,18 @@
     <string name="input_screen_search_hint">Sök eller ange adress</string>
     <string name="input_screen_chat_hint">Fråga privat</string>
     <string name="input_screen_user_pref_without_ai">Sök endast</string>
-    <string name="input_screen_user_pref_with_ai">Sök &amp; Duck.ai</string>
-    <string name="input_screen_user_pref_description">Prova den nya funktionen att fråga Duck.ai direkt från adressfältet. <annotation type="share_feedback">Berätta vad du tycker</annotation></string>
+    <string name="input_screen_user_pref_with_ai">Sök &amp; Revenge AI</string>
+    <string name="input_screen_user_pref_description">Prova den nya funktionen att fråga RevengeAI direkt från adressfältet. <annotation type="share_feedback">Berätta vad du tycker</annotation></string>
 
-    <!-- Duck.ai Pro settings -->
-    <string name="duck_ai_paid_settings_title">Duck.ai</string>
-    <string name="duck_ai_paid_settings_page_title">Duck.ai</string>
+    <!-- Revenge AI Pro settings -->
+    <string name="duck_ai_paid_settings_title">Revenge AI</string>
+    <string name="duck_ai_paid_settings_page_title">Revenge AI</string>
     <string name="duck_ai_paid_settings_page_description"><![CDATA[Chatta privat med AI-modeller för prenumeranter.\n<a href=\"\">Läs mer</a>]]></string>
-    <string name="duck_ai_paid_settings_open_duck_ai">Öppna Duck.ai</string>
+    <string name="duck_ai_paid_settings_open_duck_ai">Öppna Revenge AI</string>
     <string name="duck_ai_paid_settings_learn_more_title">Läs mer</string>
 
     <!-- AutoComplete -->
-    <string name="autocompleteDuckAiPrompt">Fråga Duck.ai</string>
+    <string name="autocompleteRevengeAIPrompt">Fråga Revenge AI</string>
     <string name="autocompleteDeviceAppNotFound">Appen kunde inte hittas</string>
 
     <!-- New Address Bar Option Bottom Sheet Dialog -->
@@ -76,7 +76,7 @@
     <string name="newAddressBarOptionBottomSheetDialogGhostButton">Inte nu</string>
     <string name="newAddressBarOptionBottomSheetDialogFooter">Justera i Inställningar &gt; AI-funktioner.</string>
     <string name="newAddressBarOptionBottomSheetDialogSearchOnly">Sök endast</string>
-    <string name="newAddressBarOptionBottomSheetDialogSearchAndDuckAi">Sök &amp; Duck.ai</string>
+    <string name="newAddressBarOptionBottomSheetDialogSearchAndRevengeAI">Sök &amp; Revenge AI</string>
     <string name="newAddressBarOptionBottomSheetDialogHeader">Alternativ för adressfält</string>
 
     <!-- Duck AI SERP Settings Title -->
@@ -92,5 +92,5 @@
     <!-- Duck AI Paid Settings -->
     <string name="duck_ai_paid_settings_enable_in_settings">Aktivera i inställningarna för AI-funktioner</string>
     <string name="duck_ai_paid_settings_manage_in_settings">Hantera i inställningarna för AI-funktioner</string>
-    <string name="duck_ai_paid_settings_manage_secondary">Konfigurera Duck.ai i inställningarna för AI-funktioner.</string>
+    <string name="duck_ai_paid_settings_manage_secondary">Konfigurera Revenge AI i inställningarna för AI-funktioner.</string>
 </resources>

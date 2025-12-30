@@ -20,7 +20,7 @@ import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.duckchat.api.DuckAiFeatureState
+import com.duckduckgo.duckchat.api.RevengeAIFeatureState
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -44,7 +44,7 @@ interface InputScreenSessionUsageMetric {
 @SingleInstanceIn(scope = AppScope::class)
 class InputScreenSessionUsageMetricImpl @Inject constructor(
     private val pixel: Pixel,
-    private val duckAiFeatureState: DuckAiFeatureState,
+    private val duckAiFeatureState: RevengeAIFeatureState,
 ) : MainProcessLifecycleObserver, InputScreenSessionUsageMetric {
 
     private companion object {

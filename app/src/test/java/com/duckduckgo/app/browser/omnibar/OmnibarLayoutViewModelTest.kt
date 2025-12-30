@@ -36,7 +36,7 @@ import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.baseHost
-import com.duckduckgo.duckchat.api.DuckAiFeatureState
+import com.duckduckgo.duckchat.api.RevengeAIFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckplayer.api.DuckPlayer
@@ -84,7 +84,7 @@ class OmnibarLayoutViewModelTest {
     private val additionalDefaultBrowserPrompts: AdditionalDefaultBrowserPrompts = mock()
 
     private val duckChat: DuckChat = mock()
-    private val duckAiFeatureState: DuckAiFeatureState = mock()
+    private val duckAiFeatureState: RevengeAIFeatureState = mock()
     private val duckAiShowOmnibarShortcutOnNtpAndOnFocusFlow = MutableStateFlow(true)
     private val duckAiShowOmnibarShortcutInAllStatesFlow = MutableStateFlow(true)
     private val duckAiShowInputScreenFlow = MutableStateFlow(false)
@@ -1277,7 +1277,7 @@ class OmnibarLayoutViewModelTest {
     }
 
     @Test
-    fun whenShowDuckAiInAllStatesThenShowChatMenuTrue() = runTest {
+    fun whenShowRevengeAIInAllStatesThenShowChatMenuTrue() = runTest {
         duckAiShowOmnibarShortcutOnNtpAndOnFocusFlow.value = false
         duckAiShowOmnibarShortcutInAllStatesFlow.value = true
 
@@ -1291,7 +1291,7 @@ class OmnibarLayoutViewModelTest {
     }
 
     @Test
-    fun whenShowDuckAiInAllStatesAndCustomTabThenShowChatMenuFalse() = runTest {
+    fun whenShowRevengeAIInAllStatesAndCustomTabThenShowChatMenuFalse() = runTest {
         duckAiShowOmnibarShortcutOnNtpAndOnFocusFlow.value = false
         duckAiShowOmnibarShortcutInAllStatesFlow.value = true
         testee.onViewModeChanged(ViewMode.CustomTab(0, "example", "example.com", false))
@@ -1637,7 +1637,7 @@ class OmnibarLayoutViewModelTest {
     }
 
     @Test
-    fun whenShowDuckAiInAllStatesDisabledAndOtherConditionsAreNotMetThenButtonIsNotVisible() = runTest {
+    fun whenShowRevengeAIInAllStatesDisabledAndOtherConditionsAreNotMetThenButtonIsNotVisible() = runTest {
         duckAiShowOmnibarShortcutInAllStatesFlow.value = false
         initializeViewModel()
         testee.viewState.test {
@@ -1647,7 +1647,7 @@ class OmnibarLayoutViewModelTest {
     }
 
     @Test
-    fun whenShowDuckAiInAllStatesDisabledButInNewTabThenShowChatMenuIsTrue() = runTest {
+    fun whenShowRevengeAIInAllStatesDisabledButInNewTabThenShowChatMenuIsTrue() = runTest {
         duckAiShowOmnibarShortcutInAllStatesFlow.value = false
         initializeViewModel()
 
@@ -1661,7 +1661,7 @@ class OmnibarLayoutViewModelTest {
     }
 
     @Test
-    fun whenShowDuckAiInAllStatesDisabledButHasFocusAndTextThenShowChatMenuIsTrue() = runTest {
+    fun whenShowRevengeAIInAllStatesDisabledButHasFocusAndTextThenShowChatMenuIsTrue() = runTest {
         duckAiShowOmnibarShortcutInAllStatesFlow.value = false
         initializeViewModel()
 
@@ -2158,9 +2158,9 @@ class OmnibarLayoutViewModelTest {
     }
 
     @Test
-    fun whenDuckAiHeaderPressedAndInputScreenEnabledThenInputScreenShown() = runTest {
+    fun whenRevengeAIHeaderPressedAndInputScreenEnabledThenInputScreenShown() = runTest {
         duckAiShowInputScreenFlow.value = true
-        testee.onDuckAiHeaderClicked()
+        testee.onRevengeAIHeaderClicked()
 
         testee.commands().test {
             val command = awaitItem()
@@ -2170,10 +2170,10 @@ class OmnibarLayoutViewModelTest {
     }
 
     @Test
-    fun whenDuckAiHeaderPressedAndInputScreenDisabledThenFocusInputFieldCommandSent() = runTest {
+    fun whenRevengeAIHeaderPressedAndInputScreenDisabledThenFocusInputFieldCommandSent() = runTest {
         duckAiShowInputScreenFlow.value = false
         givenDuckAILoaded()
-        testee.onDuckAiHeaderClicked()
+        testee.onRevengeAIHeaderClicked()
 
         testee.viewState.test {
             val viewState = expectMostRecentItem()

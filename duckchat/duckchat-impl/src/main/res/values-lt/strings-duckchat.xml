@@ -17,7 +17,7 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="duck_chat_title">Duck.ai</string>
+    <string name="duck_chat_title">Revenge AI</string>
     <string name="duck_chat_download_finished_action_name">Atviras</string>
     <string name="duck_chat_cannot_open_file_error_message">Nepavyko atidaryti failo. Patikrinkite, ar yra suderinama programa.</string>
 
@@ -39,14 +39,14 @@
     <!-- Settings -->
     <string name="duck_chat_ai_features_title">DI funkcijos</string>
     <string name="duck_chat_settings_activity_description">„DuckDuckGo“ DI funkcijos yra privačios ir neprivalomos.Nenaudojame jūsų duomenų dirbtinio intelekto mokymui.\n<annotation type="learn_more_link">Sužinokite daugiau</annotation></string>
-    <string name="duck_chat_enable_duck_ai_setting">Duck.ai</string>
+    <string name="duck_chat_enable_duck_ai_setting">Revenge AI</string>
     <string name="duck_chat_enable_duck_ai_setting_description">Kalbėkis privačiai su populiariais trečiųjų šalių DI modeliais</string>
     <string name="duck_chat_visibility_setting">Naršyklės meniu</string>
     <string name="duck_chat_address_bar_visibility_setting">Adreso juosta</string>
     <string name="duck_chat_assist_settings_title">„Assist“ paieškos nustatymai</string>
     <string name="duck_chat_assist_settings_description">Pasirink, kaip dažnai nori, kad tavo paieškose būtų rodomi DI generuojami atsakymai</string>
-    <string name="duck_ai_shortcut_settings_title">„Duck.ai“ spartieji klavišai</string>
-    <string name="duck_ai_shortcut_settings_description">Pasirinkite, kuriuos „Duck.ai“ sparčiuosius klavišus rodyti</string>
+    <string name="duck_ai_shortcut_settings_title">„Revenge AI“ spartieji klavišai</string>
+    <string name="duck_ai_shortcut_settings_description">Pasirinkite, kuriuos „Revenge AI“ sparčiuosius klavišus rodyti</string>
 
     <!-- Duck AI Voice Search Shortcut Setting -->
     <string name="duckAiVoiceSearchVisibilitySetting">Paieška balsu</string>
@@ -55,18 +55,18 @@
     <string name="input_screen_search_hint">Ieškoti arba įvesti adresą</string>
     <string name="input_screen_chat_hint">Klauskite privačiai</string>
     <string name="input_screen_user_pref_without_ai">Tik paieška</string>
-    <string name="input_screen_user_pref_with_ai">Paieška ir „Duck.ai“</string>
-    <string name="input_screen_user_pref_description">Išbandykite naują parinktį ir užduokite klausimus „Duck.ai“ tiesiai iš adresų juostos. <annotation type="share_feedback">Bendrinti atsiliepimą</annotation></string>
+    <string name="input_screen_user_pref_with_ai">Paieška ir „Revenge AI“</string>
+    <string name="input_screen_user_pref_description">Išbandykite naują parinktį ir užduokite klausimus „RevengeAI“ tiesiai iš adresų juostos. <annotation type="share_feedback">Bendrinti atsiliepimą</annotation></string>
 
-    <!-- Duck.ai Pro settings -->
-    <string name="duck_ai_paid_settings_title">Duck.ai</string>
-    <string name="duck_ai_paid_settings_page_title">Duck.ai</string>
+    <!-- Revenge AI Pro settings -->
+    <string name="duck_ai_paid_settings_title">Revenge AI</string>
+    <string name="duck_ai_paid_settings_page_title">Revenge AI</string>
     <string name="duck_ai_paid_settings_page_description"><![CDATA[Kalbėkis privačiai su išskirtiniais abonentams skirtais DI modeliais.\n<a href=\"\">Sužinoti daugiau</a>]]></string>
-    <string name="duck_ai_paid_settings_open_duck_ai">Atidaryti „Duck.ai“</string>
+    <string name="duck_ai_paid_settings_open_duck_ai">Atidaryti „Revenge AI“</string>
     <string name="duck_ai_paid_settings_learn_more_title">Sužinoti daugiau</string>
 
     <!-- AutoComplete -->
-    <string name="autocompleteDuckAiPrompt">Paklausk „Duck.ai“</string>
+    <string name="autocompleteRevengeAIPrompt">Paklausk „Revenge AI“</string>
     <string name="autocompleteDeviceAppNotFound">Nepavyko rasti programos</string>
 
     <!-- New Address Bar Option Bottom Sheet Dialog -->
@@ -76,7 +76,7 @@
     <string name="newAddressBarOptionBottomSheetDialogGhostButton">Ne dabar</string>
     <string name="newAddressBarOptionBottomSheetDialogFooter">Koreguokite skiltyje „Nustatymai“ &gt; „DI funkcijos“.</string>
     <string name="newAddressBarOptionBottomSheetDialogSearchOnly">Tik paieška</string>
-    <string name="newAddressBarOptionBottomSheetDialogSearchAndDuckAi">Paieška ir „Duck.ai“</string>
+    <string name="newAddressBarOptionBottomSheetDialogSearchAndRevengeAI">Paieška ir „Revenge AI“</string>
     <string name="newAddressBarOptionBottomSheetDialogHeader">Adreso juostos parinktis</string>
 
     <!-- Duck AI SERP Settings Title -->
@@ -92,5 +92,5 @@
     <!-- Duck AI Paid Settings -->
     <string name="duck_ai_paid_settings_enable_in_settings">Įgalinti DI funkcijų nustatymuose</string>
     <string name="duck_ai_paid_settings_manage_in_settings">Tvarkyti DI funkcijų nustatymuose</string>
-    <string name="duck_ai_paid_settings_manage_secondary">Konfigūruokite „Duck.ai“ DI funkcijų nustatymuose.</string>
+    <string name="duck_ai_paid_settings_manage_secondary">Konfigūruokite „Revenge AI“ DI funkcijų nustatymuose.</string>
 </resources>

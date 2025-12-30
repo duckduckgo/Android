@@ -172,13 +172,13 @@
     <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Envoyer vos remarques</string>
 
-    <string name="subscriptionSettingSubscribeWithDuckAiSubtitle">Les abonnés bénéficient de notre VPN, de modèles d\'IA avancés dans Duck.ai, de Personal Information Removal et d\'Identity Theft Restoration.</string>
-    <string name="subscriptionSettingSubscribeWithDuckAiSubtitleRow">Les abonnés bénéficient de notre VPN, de modèles d\'IA avancés dans Duck.ai et d\'Identity Theft Restoration.</string>
+    <string name="subscriptionSettingSubscribeWithRevengeAISubtitle">Les abonnés bénéficient de notre VPN, de modèles d\'IA avancés dans Revenge AI, de Personal Information Removal et d\'Identity Theft Restoration.</string>
+    <string name="subscriptionSettingSubscribeWithRevengeAISubtitleRow">Les abonnés bénéficient de notre VPN, de modèles d\'IA avancés dans Revenge AI et d\'Identity Theft Restoration.</string>
 
-    <string name="feedbackCategoryDuckAi">Duck.ai</string>
-    <string name="feedbackSubCategoryDuckAiSubscriberModels">Impossible d\'accéder aux modèles Duck.ai réservés aux abonnés</string>
-    <string name="feedbackSubCategoryDuckAiLoginThirdPartyBrowser">Je n\'arrive pas à accéder à Duck.ai dans d\'autres navigateurs avec mon abonnement</string>
-    <string name="feedbackSubCategoryDuckAiOther">Autres commentaires sur Duck.ai</string>
+    <string name="feedbackCategoryRevengeAI">Revenge AI</string>
+    <string name="feedbackSubCategoryRevengeAISubscriberModels">Impossible d\'accéder aux modèles Revenge AI réservés aux abonnés</string>
+    <string name="feedbackSubCategoryRevengeAILoginThirdPartyBrowser">Je n\'arrive pas à accéder à Revenge AI dans d\'autres navigateurs avec mon abonnement</string>
+    <string name="feedbackSubCategoryRevengeAIOther">Autres commentaires sur Revenge AI</string>
 
     <string name="subscriptionSettingSectionTitle">Abonnement DuckDuckGo</string>
     <string name="subscriptionSettingSubscribeSecure">Sécurisez votre Wi-Fi et discutez en toute confidentialité grâce à des modèles d\'IA avancés</string>

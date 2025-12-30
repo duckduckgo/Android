@@ -41,7 +41,7 @@ import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.common.utils.extensions.toBinaryString
-import com.duckduckgo.duckchat.api.DuckAiFeatureState
+import com.duckduckgo.duckchat.api.RevengeAIFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.inputscreen.ui.InputScreenConfigResolver
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command
@@ -124,7 +124,7 @@ class InputScreenViewModel @AssistedInject constructor(
     private val voiceSearchAvailability: VoiceSearchAvailability,
     private val autoCompleteSettings: AutoCompleteSettings,
     private val duckChat: DuckChat,
-    private val duckAiFeatureState: DuckAiFeatureState,
+    private val duckAiFeatureState: RevengeAIFeatureState,
     private val pixel: Pixel,
     private val sessionStore: InputScreenSessionStore,
     private val inputScreenDiscoveryFunnel: InputScreenDiscoveryFunnel,
@@ -306,7 +306,7 @@ class InputScreenViewModel @AssistedInject constructor(
                     is AutoCompleteHistorySearchSuggestion -> onUserSubmittedQuery(suggestion.phrase)
                     is AutoCompleteSwitchToTabSuggestion -> onUserSwitchedToTab(suggestion.tabId)
                     is AutoCompleteInAppMessageSuggestion -> return@withContext
-                    is AutoCompleteSuggestion.AutoCompleteDuckAIPrompt -> onUserTappedDuckAiPromptAutocomplete(suggestion.phrase)
+                    is AutoCompleteSuggestion.AutoCompleteDuckAIPrompt -> onUserTappedRevengeAIPromptAutocomplete(suggestion.phrase)
                     is AutoCompleteSuggestion.AutoCompleteDeviceAppSuggestion -> {
                         command.value = Command.LaunchDeviceApplication(suggestion)
                     }
@@ -323,7 +323,7 @@ class InputScreenViewModel @AssistedInject constructor(
         command.value = SwitchToTab(tabId)
     }
 
-    private fun onUserTappedDuckAiPromptAutocomplete(prompt: String) {
+    private fun onUserTappedRevengeAIPromptAutocomplete(prompt: String) {
         command.value = Command.SubmitChat(prompt)
         appCoroutineScope.launch(dispatchers.io()) {
             val params = mapOf(DuckChatPixelParameters.WAS_USED_BEFORE to duckChat.wasOpenedBefore().toBinaryString())
@@ -430,10 +430,10 @@ class InputScreenViewModel @AssistedInject constructor(
                 }
             }
 
-            val wasDuckAiOpenedBefore = duckChat.wasOpenedBefore()
+            val wasRevengeAIOpenedBefore = duckChat.wasOpenedBefore()
             val params =
                 mapOf(
-                    DuckChatPixelParameters.WAS_USED_BEFORE to wasDuckAiOpenedBefore.toBinaryString(),
+                    DuckChatPixelParameters.WAS_USED_BEFORE to wasRevengeAIOpenedBefore.toBinaryString(),
                     DuckChatPixelParameters.TEXT_LENGTH_BUCKET to query.length.toQueryLengthBucket(),
                 )
             pixel.fire(pixel = DUCK_CHAT_EXPERIMENTAL_OMNIBAR_PROMPT_SUBMITTED, parameters = params)

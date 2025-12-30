@@ -20,7 +20,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.duckchat.api.DuckAiFeatureState
+import com.duckduckgo.duckchat.api.RevengeAIFeatureState
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
@@ -29,9 +29,9 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @ContributesViewModel(ActivityScope::class)
-class DuckAiShortcutSettingsViewModel @Inject constructor(
+class RevengeAIShortcutSettingsViewModel @Inject constructor(
     private val duckChat: DuckChatInternal,
-    duckAiFeatureState: DuckAiFeatureState,
+    duckAiFeatureState: RevengeAIFeatureState,
 ) : ViewModel() {
 
     data class ViewState(

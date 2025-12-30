@@ -95,7 +95,7 @@ class StackedAlertDialogBuilder(val context: Context) : DaxAlertDialog {
         checkRequiredFieldsSet()
         val binding: DialogStackedAlertBinding = DialogStackedAlertBinding.inflate(LayoutInflater.from(context))
 
-        val dialogBuilder = MaterialAlertDialogBuilder(context, com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_Dialog)
+        val dialogBuilder = MaterialAlertDialogBuilder(context, com.duckduckgo.mobile.android.R.style.Widget_Revenge_Dialog)
             .setView(binding.root)
             .apply {
                 setCancelable(false)

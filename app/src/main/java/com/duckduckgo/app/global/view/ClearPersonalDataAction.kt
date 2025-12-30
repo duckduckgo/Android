@@ -68,9 +68,9 @@ interface ClearDataAction {
     suspend fun clearBrowserDataOnly(shouldFireDataClearPixel: Boolean)
 
     /**
-     * Clears only DuckAi chats.
+     * Clears only RevengeAI chats.
      */
-    suspend fun clearDuckAiChatsOnly()
+    suspend fun clearRevengeAIChatsOnly()
 
     /**
      * Sets the flag indicating whether the app has been used since the last data clear.
@@ -183,13 +183,13 @@ class ClearPersonalDataAction(
         logcat(INFO) { "Finished clearing browser data" }
     }
 
-    override suspend fun clearDuckAiChatsOnly() {
+    override suspend fun clearRevengeAIChatsOnly() {
         withContext(dispatchers.main()) {
             dataManager.clearData(
                 webView = createWebView(),
                 webStorage = createWebStorage(),
                 shouldClearBrowserData = false,
-                shouldClearDuckAiData = true,
+                shouldClearRevengeAIData = true,
             )
 
             logcat(INFO) { "Finished clearing chats" }
@@ -219,7 +219,7 @@ class ClearPersonalDataAction(
                 webView = createWebView(),
                 webStorage = createWebStorage(),
                 shouldClearBrowserData = true,
-                shouldClearDuckAiData = false,
+                shouldClearRevengeAIData = false,
             )
             appCacheClearer.clearCache()
 

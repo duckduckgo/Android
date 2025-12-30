@@ -35,7 +35,7 @@
 
             <com.duckduckgo.common.ui.view.InfoPanel
                 android:id="@+id/netP_alert"
-                style="@style/Widget.DuckDuckGo.InfoPanel"
+                style="@style/Widget.Revenge.InfoPanel"
                 android:layout_margin="16dp"
                 android:visibility="gone"
                 app:panelBackground="@drawable/info_panel_alert_background"

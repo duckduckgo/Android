@@ -17,12 +17,12 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/emptyGridViewContainer"
-    style="@style/Widget.DuckDuckGo.SearchWidgetEmptyFavoritesHintContainer"
+    style="@style/Widget.Revenge.SearchWidgetEmptyFavoritesHintContainer"
     tools:ignore="DeprecatedWidgetInXml">
 
     <TextView
         android:id="@+id/noFavoritesText"
-        style="@style/Widget.DuckDuckGo.SearchWidgetEmptyFavoritesHint"
+        style="@style/Widget.Revenge.SearchWidgetEmptyFavoritesHint"
         android:text="@string/searchWidgetEmtpyFavoritesHint"
         android:textColor="@color/black60" />
 

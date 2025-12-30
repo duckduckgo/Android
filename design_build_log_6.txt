@@ -1,0 +1,166 @@
+Configuration on demand is an incubating feature.
+Calculating task graph as configuration cache cannot be reused because directory '.' has changed.
+> Task :buildSrc:checkKotlinGradlePluginConfigurationErrors
+> Task :buildSrc:compileKotlin UP-TO-DATE
+> Task :buildSrc:compileJava NO-SOURCE
+> Task :buildSrc:compileGroovy NO-SOURCE
+> Task :buildSrc:processResources NO-SOURCE
+> Task :buildSrc:classes UP-TO-DATE
+> Task :buildSrc:jar UP-TO-DATE
+
+> Configure project :ad-click-impl
+WARNING: The option setting 'android.experimental.lint.version=8.13.2' is experimental.
+
+> Configure project :
+android-reporting plugin is deprecated and is set to be removed in AGP 9.0
+
+> Configure project :app
+Signing properties not found, release artifacts will not be signed.
+
+> Task :di:preBuild UP-TO-DATE
+> Task :common-utils:preBuild UP-TO-DATE
+> Task :design-system:preBuild UP-TO-DATE
+> Task :di:preDebugBuild UP-TO-DATE
+> Task :common-utils:preDebugBuild UP-TO-DATE
+> Task :internal-features-api:preBuild UP-TO-DATE
+> Task :design-system:preDebugBuild UP-TO-DATE
+> Task :internal-features-api:preDebugBuild UP-TO-DATE
+> Task :anvil-annotations:checkKotlinGradlePluginConfigurationErrors
+> Task :feature-toggles-api:checkKotlinGradlePluginConfigurationErrors
+> Task :privacy-config-api:checkKotlinGradlePluginConfigurationErrors
+> Task :app-build-config-api:checkKotlinGradlePluginConfigurationErrors
+> Task :feature-toggles-internal-api:checkKotlinGradlePluginConfigurationErrors
+> Task :experiments-api:checkKotlinGradlePluginConfigurationErrors
+> Task :common-utils:writeDebugAarMetadata UP-TO-DATE
+> Task :app-build-config-api:processResources NO-SOURCE
+> Task :di:writeDebugAarMetadata UP-TO-DATE
+> Task :feature-toggles-api:processResources NO-SOURCE
+> Task :design-system:mergeDebugJniLibFolders UP-TO-DATE
+> Task :anvil-annotations:processResources NO-SOURCE
+> Task :feature-toggles-internal-api:processResources NO-SOURCE
+> Task :design-system:mergeDebugNativeLibs NO-SOURCE
+> Task :experiments-api:processResources NO-SOURCE
+> Task :internal-features-api:writeDebugAarMetadata UP-TO-DATE
+> Task :common-utils:checkKotlinGradlePluginConfigurationErrors
+> Task :privacy-config-api:processResources NO-SOURCE
+> Task :anvil-compiler:checkKotlinGradlePluginConfigurationErrors
+> Task :common-utils:generateDebugResValues UP-TO-DATE
+> Task :app-build-config-api:compileKotlin UP-TO-DATE
+> Task :common-utils:processDebugNavigationResources UP-TO-DATE
+> Task :feature-toggles-internal-api:compileKotlin UP-TO-DATE
+> Task :experiments-api:compileKotlin UP-TO-DATE
+> Task :design-system:stripDebugDebugSymbols NO-SOURCE
+> Task :app-build-config-api:compileJava NO-SOURCE
+> Task :common-utils:generateDebugResources UP-TO-DATE
+> Task :di:generateDebugResValues UP-TO-DATE
+> Task :di:generateDebugResources UP-TO-DATE
+> Task :design-system:copyDebugJniLibsProjectAndLocalJars UP-TO-DATE
+> Task :app-build-config-api:classes UP-TO-DATE
+> Task :common-utils:packageDebugResources UP-TO-DATE
+> Task :experiments-api:compileJava NO-SOURCE
+> Task :feature-toggles-internal-api:compileJava NO-SOURCE
+> Task :di:checkKotlinGradlePluginConfigurationErrors
+> Task :feature-toggles-internal-api:classes UP-TO-DATE
+> Task :experiments-api:classes UP-TO-DATE
+> Task :di:processDebugNavigationResources UP-TO-DATE
+> Task :di:packageDebugResources UP-TO-DATE
+> Task :di:javaPreCompileDebug UP-TO-DATE
+> Task :di:dataBindingMergeDependencyArtifactsDebug UP-TO-DATE
+> Task :common-utils:dataBindingMergeDependencyArtifactsDebug UP-TO-DATE
+> Task :design-system:checkKotlinGradlePluginConfigurationErrors
+> Task :common-utils:javaPreCompileDebug UP-TO-DATE
+> Task :experiments-api:jar UP-TO-DATE
+> Task :common-utils:parseDebugLocalResources UP-TO-DATE
+> Task :design-system:generateDebugResValues UP-TO-DATE
+> Task :feature-toggles-internal-api:jar UP-TO-DATE
+> Task :design-system:processDebugNavigationResources UP-TO-DATE
+> Task :app-build-config-api:jar UP-TO-DATE
+> Task :design-system:generateDebugResources UP-TO-DATE
+> Task :di:parseDebugLocalResources UP-TO-DATE
+> Task :internal-features-api:dataBindingMergeDependencyArtifactsDebug UP-TO-DATE
+> Task :internal-features-api:generateDebugResValues UP-TO-DATE
+> Task :internal-features-api:processDebugNavigationResources UP-TO-DATE
+> Task :di:generateDebugRFile UP-TO-DATE
+> Task :internal-features-api:javaPreCompileDebug UP-TO-DATE
+> Task :common-utils:generateDebugRFile UP-TO-DATE
+> Task :internal-features-api:checkKotlinGradlePluginConfigurationErrors
+> Task :internal-features-api:generateDebugResources UP-TO-DATE
+> Task :design-system:packageDebugResources UP-TO-DATE
+> Task :design-system:extractDeepLinksForAarDebug UP-TO-DATE
+> Task :design-system:javaPreCompileDebug UP-TO-DATE
+> Task :feature-toggles-api:compileKotlin UP-TO-DATE
+> Task :design-system:mergeDebugShaders UP-TO-DATE
+> Task :design-system:prepareLintJarForPublish UP-TO-DATE
+> Task :design-system:parseDebugLocalResources UP-TO-DATE
+> Task :design-system:prepareDebugArtProfile UP-TO-DATE
+> Task :feature-toggles-api:compileJava NO-SOURCE
+> Task :internal-features-api:packageDebugResources UP-TO-DATE
+> Task :design-system:processDebugManifest UP-TO-DATE
+> Task :feature-toggles-api:classes UP-TO-DATE
+> Task :design-system:writeDebugAarMetadata UP-TO-DATE
+> Task :design-system:generateDebugRFile UP-TO-DATE
+> Task :design-system:compileDebugShaders NO-SOURCE
+> Task :design-system:generateDebugAssets UP-TO-DATE
+> Task :design-system:checkDebugAarMetadata UP-TO-DATE
+> Task :design-system:mergeDebugAssets UP-TO-DATE
+> Task :internal-features-api:parseDebugLocalResources UP-TO-DATE
+> Task :design-system:dataBindingMergeDependencyArtifactsDebug UP-TO-DATE
+> Task :feature-toggles-api:jar UP-TO-DATE
+> Task :privacy-config-api:compileKotlin UP-TO-DATE
+> Task :internal-features-api:generateDebugRFile UP-TO-DATE
+> Task :di:dataBindingGenBaseClassesDebug UP-TO-DATE
+> Task :internal-features-api:dataBindingGenBaseClassesDebug UP-TO-DATE
+> Task :privacy-config-api:compileJava NO-SOURCE
+> Task :privacy-config-api:classes UP-TO-DATE
+> Task :privacy-config-api:jar UP-TO-DATE
+> Task :anvil-annotations:compileKotlin UP-TO-DATE
+> Task :internal-features-api:compileDebugKotlin UP-TO-DATE
+> Task :common-utils:dataBindingGenBaseClassesDebug UP-TO-DATE
+> Task :internal-features-api:compileDebugJavaWithJavac NO-SOURCE
+> Task :anvil-annotations:compileJava NO-SOURCE
+> Task :anvil-annotations:classes UP-TO-DATE
+> Task :anvil-annotations:jar UP-TO-DATE
+> Task :internal-features-api:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :di:compileDebugKotlin UP-TO-DATE
+> Task :di:compileDebugJavaWithJavac NO-SOURCE
+> Task :di:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :anvil-compiler:kspKotlin UP-TO-DATE
+> Task :anvil-compiler:processResources UP-TO-DATE
+> Task :design-system:dataBindingGenBaseClassesDebug UP-TO-DATE
+> Task :anvil-compiler:compileKotlin UP-TO-DATE
+> Task :anvil-compiler:compileJava NO-SOURCE
+> Task :anvil-compiler:classes UP-TO-DATE
+> Task :anvil-compiler:jar UP-TO-DATE
+> Task :common-utils:kspDebugKotlin UP-TO-DATE
+> Task :common-utils:compileDebugKotlin UP-TO-DATE
+> Task :common-utils:compileDebugJavaWithJavac NO-SOURCE
+> Task :common-utils:bundleLibCompileToJarDebug UP-TO-DATE
+
+> Task :design-system:compileDebugKotlin FAILED
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/DaxDialog.kt:106:24 Unresolved reference: Widget_Revenge_DaxDialogFragment
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/LottieDaxDialog.kt:94:24 Unresolved reference: Widget_Revenge_DaxDialogFragment
+
+[Incubating] Problems report is available at: file:///Users/muftimehedi/StudioProjects/revenge-browser/build/reports/problems/problems-report.html
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':design-system:compileDebugKotlin'.
+> A failure occurred while executing org.jetbrains.kotlin.compilerRunner.GradleCompilerRunnerWithWorkers$GradleKotlinCompilerWorkAction
+   > Compilation error. See log for more details
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+> Get more help at https://help.gradle.org.
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/8.13/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD FAILED in 9s
+87 actionable tasks: 13 executed, 74 up-to-date
+Configuration cache entry stored.

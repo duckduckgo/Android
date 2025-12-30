@@ -74,7 +74,7 @@ class DataClearingTest {
 
         verify(mockClearDataAction).clearTabsOnly()
         verify(mockClearDataAction, never()).clearBrowserDataOnly(any())
-        verify(mockClearDataAction, never()).clearDuckAiChatsOnly()
+        verify(mockClearDataAction, never()).clearRevengeAIChatsOnly()
         verify(mockClearDataAction).setAppUsedSinceLastClearFlag(true)
         verify(mockClearDataAction, never()).killAndRestartProcess(any(), any())
     }
@@ -87,7 +87,7 @@ class DataClearingTest {
 
         verify(mockClearDataAction, never()).clearTabsOnly()
         verify(mockClearDataAction).clearBrowserDataOnly(true)
-        verify(mockClearDataAction, never()).clearDuckAiChatsOnly()
+        verify(mockClearDataAction, never()).clearRevengeAIChatsOnly()
         verify(mockClearDataAction).setAppUsedSinceLastClearFlag(true)
         verify(mockClearDataAction, never()).killAndRestartProcess(any(), any())
     }
@@ -100,20 +100,20 @@ class DataClearingTest {
 
         verify(mockClearDataAction).clearTabsOnly()
         verify(mockClearDataAction).clearBrowserDataOnly(true)
-        verify(mockClearDataAction, never()).clearDuckAiChatsOnly()
+        verify(mockClearDataAction, never()).clearRevengeAIChatsOnly()
         verify(mockClearDataAction).setAppUsedSinceLastClearFlag(true)
         verify(mockClearDataAction, never()).killAndRestartProcess(any(), any())
     }
 
     @Test
-    fun whenManualClearWithDuckAiChatsOnly_thenClearChatsAndSetFlag() = runTest {
+    fun whenManualClearWithRevengeAIChatsOnly_thenClearChatsAndSetFlag() = runTest {
         configureManualOptions(setOf(FireClearOption.DUCKAI_CHATS))
 
         testee.clearDataUsingManualFireOptions(shouldRestartIfRequired = false, wasAppUsedSinceLastClear = true)
 
         verify(mockClearDataAction, never()).clearTabsOnly()
         verify(mockClearDataAction, never()).clearBrowserDataOnly(any())
-        verify(mockClearDataAction).clearDuckAiChatsOnly()
+        verify(mockClearDataAction).clearRevengeAIChatsOnly()
         verify(mockClearDataAction).setAppUsedSinceLastClearFlag(true)
         verify(mockClearDataAction, never()).killAndRestartProcess(any(), any())
     }
@@ -126,7 +126,7 @@ class DataClearingTest {
 
         verify(mockClearDataAction).clearTabsOnly()
         verify(mockClearDataAction).clearBrowserDataOnly(true)
-        verify(mockClearDataAction).clearDuckAiChatsOnly()
+        verify(mockClearDataAction).clearRevengeAIChatsOnly()
         verify(mockClearDataAction).setAppUsedSinceLastClearFlag(true)
         verify(mockClearDataAction, never()).killAndRestartProcess(any(), any())
     }
@@ -139,7 +139,7 @@ class DataClearingTest {
 
         verify(mockClearDataAction, never()).clearTabsOnly()
         verify(mockClearDataAction, never()).clearBrowserDataOnly(any())
-        verify(mockClearDataAction, never()).clearDuckAiChatsOnly()
+        verify(mockClearDataAction, never()).clearRevengeAIChatsOnly()
         verify(mockClearDataAction).setAppUsedSinceLastClearFlag(true)
         verify(mockClearDataAction, never()).killAndRestartProcess(any(), any())
     }
@@ -152,7 +152,7 @@ class DataClearingTest {
 
         verify(mockClearDataAction, never()).clearTabsOnly()
         verify(mockClearDataAction, never()).clearBrowserDataOnly(any())
-        verify(mockClearDataAction, never()).clearDuckAiChatsOnly()
+        verify(mockClearDataAction, never()).clearRevengeAIChatsOnly()
         verify(mockClearDataAction).setAppUsedSinceLastClearFlag(true)
         verify(mockClearDataAction, never()).killAndRestartProcess(any(), any())
     }
@@ -192,12 +192,12 @@ class DataClearingTest {
     }
 
     @Test
-    fun whenManualClearWithDuckAiChatsAndShouldRestartProcess_thenRestartProcess() = runTest {
+    fun whenManualClearWithRevengeAIChatsAndShouldRestartProcess_thenRestartProcess() = runTest {
         configureManualOptions(setOf(FireClearOption.DUCKAI_CHATS))
 
         testee.clearDataUsingManualFireOptions(shouldRestartIfRequired = true, wasAppUsedSinceLastClear = false)
 
-        verify(mockClearDataAction).clearDuckAiChatsOnly()
+        verify(mockClearDataAction).clearRevengeAIChatsOnly()
         verify(mockClearDataAction).setAppUsedSinceLastClearFlag(false)
         verify(mockClearDataAction).killAndRestartProcess(notifyDataCleared = false)
     }
@@ -211,7 +211,7 @@ class DataClearingTest {
         assertFalse(result)
         verify(mockClearDataAction).clearTabsOnly()
         verify(mockClearDataAction, never()).clearBrowserDataOnly(any())
-        verify(mockClearDataAction, never()).clearDuckAiChatsOnly()
+        verify(mockClearDataAction, never()).clearRevengeAIChatsOnly()
         verify(mockClearDataAction).setAppUsedSinceLastClearFlag(false)
         verify(mockClearDataAction, never()).killProcess()
     }
@@ -279,25 +279,25 @@ class DataClearingTest {
     }
 
     @Test
-    fun whenAutomaticClearWithDuckAiChatsAndKillProcessIfNeeded_thenClearChatsAndKillProcess() = runTest {
+    fun whenAutomaticClearWithRevengeAIChatsAndKillProcessIfNeeded_thenClearChatsAndKillProcess() = runTest {
         configureAutomaticOptions(setOf(FireClearOption.DUCKAI_CHATS))
 
         val result = testee.clearDataUsingAutomaticFireOptions(killProcessIfNeeded = true)
 
         assertFalse(result)
-        verify(mockClearDataAction).clearDuckAiChatsOnly()
+        verify(mockClearDataAction).clearRevengeAIChatsOnly()
         verify(mockClearDataAction).setAppUsedSinceLastClearFlag(false)
         verify(mockClearDataAction).killProcess()
     }
 
     @Test
-    fun whenAutomaticClearWithDuckAiChatsAndNoKillProcess_thenClearChatsAndReturnTrue() = runTest {
+    fun whenAutomaticClearWithRevengeAIChatsAndNoKillProcess_thenClearChatsAndReturnTrue() = runTest {
         configureAutomaticOptions(setOf(FireClearOption.DUCKAI_CHATS))
 
         val result = testee.clearDataUsingAutomaticFireOptions(killProcessIfNeeded = false)
 
         assertTrue(result)
-        verify(mockClearDataAction).clearDuckAiChatsOnly()
+        verify(mockClearDataAction).clearRevengeAIChatsOnly()
         verify(mockClearDataAction).setAppUsedSinceLastClearFlag(true)
         verify(mockClearDataAction, never()).killProcess()
     }
@@ -311,7 +311,7 @@ class DataClearingTest {
         assertFalse(result)
         verify(mockClearDataAction).clearTabsOnly()
         verify(mockClearDataAction).clearBrowserDataOnly(false)
-        verify(mockClearDataAction).clearDuckAiChatsOnly()
+        verify(mockClearDataAction).clearRevengeAIChatsOnly()
         verify(mockClearDataAction).setAppUsedSinceLastClearFlag(false)
         verify(mockClearDataAction).killProcess()
     }
@@ -325,7 +325,7 @@ class DataClearingTest {
         assertFalse(result)
         verify(mockClearDataAction, never()).clearTabsOnly()
         verify(mockClearDataAction, never()).clearBrowserDataOnly(any())
-        verify(mockClearDataAction, never()).clearDuckAiChatsOnly()
+        verify(mockClearDataAction, never()).clearRevengeAIChatsOnly()
         verify(mockClearDataAction).setAppUsedSinceLastClearFlag(false)
         verify(mockClearDataAction, never()).killProcess()
     }
@@ -339,7 +339,7 @@ class DataClearingTest {
         assertFalse(result)
         verify(mockClearDataAction, never()).clearTabsOnly()
         verify(mockClearDataAction, never()).clearBrowserDataOnly(any())
-        verify(mockClearDataAction, never()).clearDuckAiChatsOnly()
+        verify(mockClearDataAction, never()).clearRevengeAIChatsOnly()
         verify(mockClearDataAction).setAppUsedSinceLastClearFlag(true)
         verify(mockClearDataAction, never()).killProcess()
     }

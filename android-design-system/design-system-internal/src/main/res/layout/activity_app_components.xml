@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Copyright (c) 2021 DuckDuckGo
+  ~ Copyright (c) 2021 Revenge
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -29,13 +29,13 @@
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:theme="@style/Widget.DuckDuckGo.ToolbarTheme"
+        android:theme="@style/Widget.Revenge.ToolbarTheme"
         android:translationZ="@dimen/keyline_1">
 
         <com.google.android.material.appbar.CollapsingToolbarLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:theme="@style/Widget.DuckDuckGo.ToolbarTheme"
+            android:theme="@style/Widget.Revenge.ToolbarTheme"
             android:background="?attr/daxColorToolbar"
             app:layout_scrollFlags="scroll|exitUntilCollapsed">
 

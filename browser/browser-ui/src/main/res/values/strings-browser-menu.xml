@@ -27,7 +27,7 @@
     <string name="browserMenuEnablePrivacyProtection">Enable Privacy Protection</string>
     <string name="browserMenuDisablePrivacyProtection">Disable Privacy Protection</string>
     <string name="browserMenuNewTab">New Tab</string>
-    <string name="browserMenuDuckChat">Duck.ai</string>
+    <string name="browserMenuRevengeChat">Revenge AI</string>
     <string name="browserMenuShare">Share</string>
     <string name="browserMenuEmailAlias">Generate Duck Address</string>
     <string name="browserMenuFindInPage">Find in Page</string>
@@ -44,7 +44,7 @@
     <string name="browserMenuNewChat">New Chat</string>
     <string name="browserMenuNewAIChat">New AI Chat</string>
     <string name="browserMenuChatHistory">Chat History</string>
-    <string name="browserMenuChatSettings">Duck.ai Settings</string>
+    <string name="browserMenuChatSettings">Revenge AI Settings</string>
     <string name="browserMenuVPN">VPN</string>
 
     <!-- Browser Menu Content Description -->

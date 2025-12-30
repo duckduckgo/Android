@@ -171,13 +171,13 @@
     <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Send Feedback</string>
 
-    <string name="subscriptionSettingSubscribeWithDuckAiSubtitle">Subscribers get our VPN, advanced AI models in Duck.ai, Personal Information Removal, and Identity Theft Restoration.</string>
-    <string name="subscriptionSettingSubscribeWithDuckAiSubtitleRow">Subscribers get our VPN, advanced AI models in Duck.ai, and Identity Theft Restoration.</string>
+    <string name="subscriptionSettingSubscribeWithRevengeAISubtitle">Subscribers get our VPN, advanced AI models in Revenge AI, Personal Information Removal, and Identity Theft Restoration.</string>
+    <string name="subscriptionSettingSubscribeWithRevengeAISubtitleRow">Subscribers get our VPN, advanced AI models in Revenge AI, and Identity Theft Restoration.</string>
 
-    <string name="feedbackCategoryDuckAi">Duck.ai</string>
-    <string name="feedbackSubCategoryDuckAiSubscriberModels">Unable to access the subscriber-only Duck.ai models</string>
-    <string name="feedbackSubCategoryDuckAiLoginThirdPartyBrowser">Can\'t access Duck.ai with my subscription in other browsers</string>
-    <string name="feedbackSubCategoryDuckAiOther">Other Duck.ai feedback</string>
+    <string name="feedbackCategoryRevengeAI">Revenge AI</string>
+    <string name="feedbackSubCategoryRevengeAISubscriberModels">Unable to access the subscriber-only Revenge AI models</string>
+    <string name="feedbackSubCategoryRevengeAILoginThirdPartyBrowser">Can\'t access Revenge AI with my subscription in other browsers</string>
+    <string name="feedbackSubCategoryRevengeAIOther">Other Revenge AI feedback</string>
 
     <string name="subscriptionSettingSectionTitle">DuckDuckGo Subscription</string>
     <string name="subscriptionSettingSubscribeSecure">Secure your Wi-Fi, and chat privately with advanced AI models</string>

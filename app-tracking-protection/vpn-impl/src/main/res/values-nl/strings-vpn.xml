@@ -113,7 +113,7 @@
     <string name="atp_OnboardingContinue">Doorgaan</string>
     <string name="atp_OnboardingMaybeLater">Later misschien</string>
 
-    <!-- App Tracking Protection Dax Onboarding -->
+    <!-- App Tracking Protection Revenge Onboarding -->
     <string name="atp_daxOnboardingIntroTitle">Bescherming tegen app-tracking</string>
     <string name="atp_daxOnboardingIntroMessage" formatted="false">Via meer dan 96% van de populaire gratis apps kunnen andere bedrijven je volgen, zelfs als je je telefoon niet gebruikt. App Tracking Protection detecteert en blokkeert deze trackingpogingen.</string>
     <string name="atp_daxOnboardingPermissionTitle">Hoe werkt het?</string>

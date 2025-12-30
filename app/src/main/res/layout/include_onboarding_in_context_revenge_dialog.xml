@@ -25,13 +25,13 @@
     tools:alpha="1">
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/onboardingDaxDialogContainer"
+        android:id="@+id/onboardingRevengeDialogContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:clipChildren="false">
 
         <ImageView
-            android:id="@+id/onboardingDaxDialogBackground"
+            android:id="@+id/onboardingRevengeDialogBackground"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:scaleType="centerCrop"
@@ -51,7 +51,7 @@
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/daxDialogDismissButton"
-            style="@style/Widget.DuckDuckGo.FloatingActionButton.Circular"
+            style="@style/Widget.Revenge.FloatingActionButton.Circular"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/keyline_0"
@@ -85,7 +85,7 @@
 
                 <LinearLayout
                     android:id="@+id/onboardingDialogContent"
-                    style="@style/Widget.DuckDuckGo.DaxDialog.Content"
+                    style="@style/Widget.Revenge.RevengeDialog.Content"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
@@ -95,7 +95,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="@dimen/keyline_1"
-                        android:text="@string/onboardingEndDaxDialogTitle"
+                        android:text="@string/onboardingEndRevengeDialogTitle"
                         app:typography="h2" />
 
                     <FrameLayout
@@ -111,7 +111,7 @@
 
                         <com.duckduckgo.common.ui.view.TypeAnimationTextView
                             android:id="@+id/dialogTextCta"
-                            style="@style/Typography.DuckDuckGo.Body1"
+                            style="@style/Typography.Revenge.Body1"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:clickable="true"
@@ -165,7 +165,7 @@
                         android:id="@+id/daxBubbleDialogTitle"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/onboardingSitesSuggestionsDaxDialogTitle"
+                        android:text="@string/onboardingSitesSuggestionsRevengeDialogTitle"
                         app:typography="h2" />
 
                     <FrameLayout
@@ -178,14 +178,14 @@
                             android:id="@+id/suggestionsHiddenTextCta"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="@string/onboardingSitesDaxDialogDescription"
+                            android:text="@string/onboardingSitesRevengeDialogDescription"
                             android:visibility="invisible"
                             app:typography="body1"
                             tools:visibility="visible" />
 
                         <com.duckduckgo.common.ui.view.TypeAnimationTextView
                             android:id="@+id/suggestionsDialogTextCta"
-                            style="@style/Typography.DuckDuckGo.Body1"
+                            style="@style/Typography.Revenge.Body1"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:clickable="true"
@@ -200,7 +200,7 @@
                         android:layout_marginTop="@dimen/keyline_2"
                         android:alpha="0"
                         android:gravity="start|center_vertical"
-                        android:text="@string/onboardingSitesDaxDialogOption1"
+                        android:text="@string/onboardingSitesRevengeDialogOption1"
                         app:icon="@drawable/ic_globe_16"
                         tools:alpha="1" />
 
@@ -211,7 +211,7 @@
                         android:layout_marginTop="-4dp"
                         android:alpha="0"
                         android:gravity="start|center_vertical"
-                        android:text="@string/onboardingSitesDaxDialogOption2"
+                        android:text="@string/onboardingSitesRevengeDialogOption2"
                         app:icon="@drawable/ic_globe_16"
                         tools:alpha="1" />
 
@@ -222,7 +222,7 @@
                         android:layout_marginTop="-4dp"
                         android:alpha="0"
                         android:gravity="start|center_vertical"
-                        android:text="@string/onboardingSitesDaxDialogOption3"
+                        android:text="@string/onboardingSitesRevengeDialogOption3"
                         app:icon="@drawable/ic_globe_16"
                         tools:alpha="1" />
 
@@ -233,7 +233,7 @@
                         android:layout_marginTop="-4dp"
                         android:alpha="0"
                         android:gravity="start|center_vertical"
-                        android:text="@string/onboardingSitesDaxDialogOption4"
+                        android:text="@string/onboardingSitesRevengeDialogOption4"
                         app:icon="@drawable/ic_wand_16"
                         tools:alpha="1" />
 

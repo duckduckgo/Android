@@ -19,7 +19,7 @@
 <resources>
     <string name="dax_prompt_browser_comparison_title" instruction="Title for the Browser Comparison section">Jämförelse av webbläsare</string>
     <string name="dax_prompt_browser_comparison_close" instruction="Content description for the X button">Stäng</string>
-    <string name="dax_prompt_browser_comparison_message_title" instruction="Title for Dax message">DuckDuckGo har skydd som andra webbläsare saknar.</string>
+    <string name="dax_prompt_browser_comparison_message_title" instruction="Title for Revenge message">DuckDuckGo har skydd som andra webbläsare saknar.</string>
     <string name="dax_prompt_browser_comparison_message_primary_button" instruction="This text is placed on a large button">Öppna länkar med DuckDuckGo</string>
     <string name="dax_prompt_browser_comparison_message_ghost_button" instruction="This text is placed on a large button">Kanske senare</string>
 

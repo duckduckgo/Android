@@ -33,7 +33,7 @@
         android:src="@drawable/ic_tab_24" />
 
     <!--
-         Below TextViews aren't a DaxTextView, special case for the Tabs icon.
+         Below TextViews aren't a RevengeTextView, special case for the Tabs icon.
          They also uses DP instead of SP, because the background icon can't resize to accommodate
          different font sizes.
          The "∞" character is separated into its own view because the horizontal center-line

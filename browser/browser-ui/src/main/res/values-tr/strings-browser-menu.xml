@@ -28,7 +28,7 @@
     <string name="browserMenuEnablePrivacyProtection">Gizlilik Korumasını Etkinleştir</string>
     <string name="browserMenuDisablePrivacyProtection">Gizlilik Korumasını Devre Dışı Bırak</string>
     <string name="browserMenuNewTab">Yeni Sekme</string>
-    <string name="browserMenuDuckChat">Duck.ai</string>
+    <string name="browserMenuRevengeChat">Revenge AI</string>
     <string name="browserMenuShare">Paylaş</string>
     <string name="browserMenuEmailAlias">Duck Address Oluştur</string>
     <string name="browserMenuFindInPage">Sayfada bul</string>
@@ -45,7 +45,7 @@
     <string name="browserMenuNewChat">Yeni Sohbet</string>
     <string name="browserMenuNewAIChat">Yeni Yapay Zeka Sohbeti</string>
     <string name="browserMenuChatHistory">Sohbet Geçmişi</string>
-    <string name="browserMenuChatSettings">Duck.ai Ayarları</string>
+    <string name="browserMenuChatSettings">Revenge AI Ayarları</string>
     <string name="browserMenuVPN">VPN</string>
 
     <!-- Browser Menu Content Description -->

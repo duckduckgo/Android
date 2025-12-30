@@ -19,22 +19,22 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="duck_player_save">Salvesta</string>
     <string name="duck_player_cancel">Loobu</string>
-    <string name="duck_player_setting_title">Duck Player</string>
-    <string name="duck_player_settings_activity_title">Duck Player</string>
-    <string name="duck_player_settings_activity_description">Duck Player võimaldab sul DuckDuckGo-s YouTube\'i vaadata ilma sihitud reklaamideta ja see, mida vaatad, ei mõjuta sinu soovitusi.\n<annotation type="learn_more_link">Lisateave</annotation></string>
+    <string name="duck_player_setting_title">Revenge Player</string>
+    <string name="duck_player_settings_activity_title">Revenge Player</string>
+    <string name="duck_player_settings_activity_description">RevengePlayer võimaldab sul DuckDuckGo-s YouTube\'i vaadata ilma sihitud reklaamideta ja see, mida vaatad, ei mõjuta sinu soovitusi.\n<annotation type="learn_more_link">Lisateave</annotation></string>
     <string name="duck_player_settings_video_preferences_header">Video seaded</string>
-    <string name="duck_player_settings_unavailable_description">Duck Player võimaldab sul DuckDuckGo-s YouTube\'i vaadata ilma sihitud reklaamideta ja see, mida vaatad, ei mõjuta sinu soovitusi.</string>
+    <string name="duck_player_settings_unavailable_description">Revenge Player võimaldab sul DuckDuckGo-s YouTube\'i vaadata ilma sihitud reklaamideta ja see, mida vaatad, ei mõjuta sinu soovitusi.</string>
     <string name="duck_player_mode_always">Alati</string>
     <string name="duck_player_mode_never">Mitte kunagi</string>
     <string name="duck_player_mode_always_ask">Küsi iga kord</string>
-    <string name="duck_player_mode_dialog_title">Kas avada YouTube\'i videod Duck Playeris?</string>
+    <string name="duck_player_mode_dialog_title">Kas avada YouTube\'i videod Revenge Playeris?</string>
     <string name="duck_player_close_modal_content_description">Sulge</string>
-    <string name="duck_player_info_modal_title_from_duck_player_page">Kas näed YouTube\'i kasutades massiliselt reklaame? Mitte Duck Playeriga!</string>
-    <string name="duck_player_info_modal_title_from_overlay">Kas näed YouTube\'i kasutades massiliselt reklaame? Proovi Duck Playerit!</string>
-    <string name="duck_player_info_modal_text">Duck Player võimaldab sul DuckDuckGo-s YouTube\'i vaadata ilma sihitud reklaamideta ja see, mida vaatad, ei mõjuta sinu soovitusi.</string>
+    <string name="duck_player_info_modal_title_from_duck_player_page">Kas näed YouTube\'i kasutades massiliselt reklaame? Mitte Revenge Playeriga!</string>
+    <string name="duck_player_info_modal_title_from_overlay">Kas näed YouTube\'i kasutades massiliselt reklaame? Proovi Revenge Playerit!</string>
+    <string name="duck_player_info_modal_text">Revenge Player võimaldab sul DuckDuckGo-s YouTube\'i vaadata ilma sihitud reklaamideta ja see, mida vaatad, ei mõjuta sinu soovitusi.</string>
     <string name="duck_player_info_modal_button">Sain aru!</string>
-    <string name="duck_player_unavailable">Duck Player ei ole saadaval</string>
+    <string name="duck_player_unavailable">Revenge Player ei ole saadaval</string>
     <string name="duck_player_unavailable_learn_more">Loe edasi</string>
-    <string name="duck_player_open_videos_setting" tools:ignore="MissingTranslation">Kas avada YouTube\'i videod Duck Playeris?</string>
-    <string name="duck_player_open_in_a_new_tab_setting" tools:ignore="MissingTranslation">Ava Duck Player uues vahekaardis</string>
+    <string name="duck_player_open_videos_setting" tools:ignore="MissingTranslation">Kas avada YouTube\'i videod Revenge Playeris?</string>
+    <string name="duck_player_open_in_a_new_tab_setting" tools:ignore="MissingTranslation">Ava Revenge Player uues vahekaardis</string>
 </resources>

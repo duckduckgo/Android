@@ -23,7 +23,7 @@ import android.view.WindowInsets
 import androidx.activity.result.ActivityResultCaller
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.duckchat.api.DuckAiFeatureState
+import com.duckduckgo.duckchat.api.RevengeAIFeatureState
 import com.duckduckgo.voice.api.VoiceSearchLauncher.Event
 import com.duckduckgo.voice.api.VoiceSearchLauncher.Event.VoiceSearchDisabled
 import com.duckduckgo.voice.api.VoiceSearchLauncher.Source
@@ -57,7 +57,7 @@ class RealVoiceSearchActivityLauncher @Inject constructor(
     private val activityResultLauncherWrapper: ActivityResultLauncherWrapper,
     private val voiceSearchRepository: VoiceSearchRepository,
     private val permissionRequest: VoiceSearchPermissionDialogsLauncher,
-    private val duckAiFeatureState: DuckAiFeatureState,
+    private val duckAiFeatureState: RevengeAIFeatureState,
 ) : VoiceSearchActivityLauncher {
 
     companion object {
@@ -97,7 +97,7 @@ class RealVoiceSearchActivityLauncher @Inject constructor(
                         voiceSearchRepository.resetVoiceSearchDismissed()
                         val recognitionResult = when (mode) {
                             VoiceSearchMode.SEARCH -> VoiceRecognitionResult.SearchResult(data)
-                            VoiceSearchMode.DUCK_AI -> VoiceRecognitionResult.DuckAiResult(data)
+                            VoiceSearchMode.DUCK_AI -> VoiceRecognitionResult.RevengeAIResult(data)
                         }
                         onEvent(Event.VoiceRecognitionSuccess(recognitionResult))
                     } else {

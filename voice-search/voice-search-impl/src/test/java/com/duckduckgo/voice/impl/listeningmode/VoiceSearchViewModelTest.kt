@@ -247,7 +247,7 @@ class VoiceSearchViewModelTest {
     }
 
     @Test
-    fun whenUpdateSelectedModeWithDuckAiThenUseDuckAiMode() = runTest {
+    fun whenUpdateSelectedModeWithRevengeAIThenUseRevengeAIMode() = runTest {
         testee.updateSelectedMode(VoiceSearchMode.DUCK_AI)
 
         testee.viewState().test {

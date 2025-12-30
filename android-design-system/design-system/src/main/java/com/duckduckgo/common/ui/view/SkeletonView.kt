@@ -24,7 +24,7 @@ import com.duckduckgo.mobile.android.R
 class SkeletonView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int = R.style.Widget_DuckDuckGo_SkeletonView,
+    defStyleAttr: Int = R.style.Widget_Revenge_SkeletonView,
 ) : AppCompatTextView(context, attrs, defStyleAttr) {
 
     init {
@@ -32,7 +32,7 @@ class SkeletonView @JvmOverloads constructor(
             attrs,
             R.styleable.SkeletonView,
             0,
-            R.style.Widget_DuckDuckGo_SkeletonView,
+            R.style.Widget_Revenge_SkeletonView,
         ).apply {
             background = getDrawable(R.styleable.SkeletonView_android_background)
             recycle()

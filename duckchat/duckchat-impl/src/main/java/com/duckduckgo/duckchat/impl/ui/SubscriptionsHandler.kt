@@ -36,7 +36,7 @@ class SubscriptionsHandler @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
 ) {
 
-    private val defaultDuckAiSubscriptionPurchase = SubscriptionPurchase(featurePage = DUCK_AI_FEATURE_PAGE)
+    private val defaultRevengeAISubscriptionPurchase = SubscriptionPurchase(featurePage = DUCK_AI_FEATURE_PAGE)
 
     fun handleSubscriptionsFeature(
         featureName: String,
@@ -73,9 +73,9 @@ class SubscriptionsHandler @Inject constructor(
                         data?.getString(MESSAGE_PARAM_ORIGIN_KEY)
                             .takeUnless { it.isNullOrBlank() }
                             ?.let { nonEmptyOrigin ->
-                                defaultDuckAiSubscriptionPurchase.copy(origin = nonEmptyOrigin)
-                            } ?: defaultDuckAiSubscriptionPurchase
-                    }.getOrDefault(defaultDuckAiSubscriptionPurchase)
+                                defaultRevengeAISubscriptionPurchase.copy(origin = nonEmptyOrigin)
+                            } ?: defaultRevengeAISubscriptionPurchase
+                    }.getOrDefault(defaultRevengeAISubscriptionPurchase)
 
                     withContext(dispatcherProvider.main()) {
                         globalActivityStarter.start(context, subscriptionParams)

@@ -172,13 +172,13 @@
     <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Отправить отзыв</string>
 
-    <string name="subscriptionSettingSubscribeWithDuckAiSubtitle">Подписка открывает доступ к VPN, продвинутым моделям ИИ в Duck.ai, а также функциям удаления личной информации и восстановления после кражи данных.</string>
-    <string name="subscriptionSettingSubscribeWithDuckAiSubtitleRow">Подписка открывает доступ к VPN, продвинутым моделям ИИ в Duck.ai и функции восстановления после кражи данных.</string>
+    <string name="subscriptionSettingSubscribeWithRevengeAISubtitle">Подписка открывает доступ к VPN, продвинутым моделям ИИ в Revenge AI, а также функциям удаления личной информации и восстановления после кражи данных.</string>
+    <string name="subscriptionSettingSubscribeWithRevengeAISubtitleRow">Подписка открывает доступ к VPN, продвинутым моделям ИИ в Revenge AI и функции восстановления после кражи данных.</string>
 
-    <string name="feedbackCategoryDuckAi">Duck.ai</string>
-    <string name="feedbackSubCategoryDuckAiSubscriberModels">Нет доступа к моделям Duck.ai, предоставляемым только по подписке</string>
-    <string name="feedbackSubCategoryDuckAiLoginThirdPartyBrowser">Не могу воспользоваться Duck.ai по подписке в других браузерах</string>
-    <string name="feedbackSubCategoryDuckAiOther">Другие отзывы о Duck.ai</string>
+    <string name="feedbackCategoryRevengeAI">Revenge AI</string>
+    <string name="feedbackSubCategoryRevengeAISubscriberModels">Нет доступа к моделям Revenge AI, предоставляемым только по подписке</string>
+    <string name="feedbackSubCategoryRevengeAILoginThirdPartyBrowser">Не могу воспользоваться Revenge AI по подписке в других браузерах</string>
+    <string name="feedbackSubCategoryRevengeAIOther">Другие отзывы о Revenge AI</string>
 
     <string name="subscriptionSettingSectionTitle">Подписка DuckDuckGo</string>
     <string name="subscriptionSettingSubscribeSecure">Безопасный Wi-Fi и приватные чаты с продвинутыми моделями ИИ</string>

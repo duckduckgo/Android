@@ -18,7 +18,7 @@ package com.duckduckgo.duckchat.impl.ui.settings
 
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.duckchat.api.DuckAiFeatureState
+import com.duckduckgo.duckchat.api.RevengeAIFeatureState
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
@@ -32,16 +32,16 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
-class DuckAiShortcutSettingsViewModelTest {
+class RevengeAIShortcutSettingsViewModelTest {
 
     @get:Rule
     @Suppress("unused")
     val coroutineRule = CoroutineTestRule()
 
-    private lateinit var testee: DuckAiShortcutSettingsViewModel
+    private lateinit var testee: RevengeAIShortcutSettingsViewModel
 
     private val duckChat: DuckChatInternal = mock()
-    private val duckAiFeatureState: DuckAiFeatureState = mock()
+    private val duckAiFeatureState: RevengeAIFeatureState = mock()
     private val showVoiceSearchToggleFlow = MutableStateFlow(false)
 
     @Before
@@ -50,13 +50,13 @@ class DuckAiShortcutSettingsViewModelTest {
         whenever(duckChat.observeShowInAddressBarUserSetting()).thenReturn(flowOf(false))
         whenever(duckChat.observeShowInVoiceSearchUserSetting()).thenReturn(flowOf(false))
         whenever(duckAiFeatureState.showVoiceSearchToggle).thenReturn(showVoiceSearchToggleFlow)
-        testee = DuckAiShortcutSettingsViewModel(duckChat, duckAiFeatureState)
+        testee = RevengeAIShortcutSettingsViewModel(duckChat, duckAiFeatureState)
     }
 
     @Test
     fun whenViewModelIsCreatedAndShowInBrowserIsEnabledThenEmitEnabled() = runTest {
         whenever(duckChat.observeShowInBrowserMenuUserSetting()).thenReturn(flowOf(true))
-        testee = DuckAiShortcutSettingsViewModel(duckChat, duckAiFeatureState)
+        testee = RevengeAIShortcutSettingsViewModel(duckChat, duckAiFeatureState)
 
         testee.viewState.test {
             assertTrue(awaitItem().showInBrowserMenu)
@@ -66,7 +66,7 @@ class DuckAiShortcutSettingsViewModelTest {
     @Test
     fun whenViewModelIsCreatedAndShowInBrowserIsDisabledThenEmitDisabled() = runTest {
         whenever(duckChat.observeShowInBrowserMenuUserSetting()).thenReturn(flowOf(false))
-        testee = DuckAiShortcutSettingsViewModel(duckChat, duckAiFeatureState)
+        testee = RevengeAIShortcutSettingsViewModel(duckChat, duckAiFeatureState)
 
         testee.viewState.test {
             assertFalse(awaitItem().showInBrowserMenu)
@@ -76,7 +76,7 @@ class DuckAiShortcutSettingsViewModelTest {
     @Test
     fun whenViewModelIsCreatedAndShowInAddressBarIsEnabledThenEmitEnabled() = runTest {
         whenever(duckChat.observeShowInAddressBarUserSetting()).thenReturn(flowOf(true))
-        testee = DuckAiShortcutSettingsViewModel(duckChat, duckAiFeatureState)
+        testee = RevengeAIShortcutSettingsViewModel(duckChat, duckAiFeatureState)
 
         testee.viewState.test {
             assertTrue(awaitItem().showInAddressBar)
@@ -85,7 +85,7 @@ class DuckAiShortcutSettingsViewModelTest {
 
     @Test
     fun whenViewModelIsCreatedAndShowInAddressBarIsDisabledThenEmitDisabled() = runTest {
-        testee = DuckAiShortcutSettingsViewModel(duckChat, duckAiFeatureState)
+        testee = RevengeAIShortcutSettingsViewModel(duckChat, duckAiFeatureState)
 
         testee.viewState.test {
             assertFalse(awaitItem().showInAddressBar)
@@ -95,7 +95,7 @@ class DuckAiShortcutSettingsViewModelTest {
     @Test
     fun whenViewModelIsCreatedAndShowInVoiceSearchIsEnabledThenEmitEnabled() = runTest {
         whenever(duckChat.observeShowInVoiceSearchUserSetting()).thenReturn(flowOf(true))
-        testee = DuckAiShortcutSettingsViewModel(duckChat, duckAiFeatureState)
+        testee = RevengeAIShortcutSettingsViewModel(duckChat, duckAiFeatureState)
 
         testee.viewState.test {
             assertTrue(awaitItem().showInVoiceSearch)
@@ -104,7 +104,7 @@ class DuckAiShortcutSettingsViewModelTest {
 
     @Test
     fun whenViewModelIsCreatedAndShowInVoiceSearchIsDisabledThenEmitDisabled() = runTest {
-        testee = DuckAiShortcutSettingsViewModel(duckChat, duckAiFeatureState)
+        testee = RevengeAIShortcutSettingsViewModel(duckChat, duckAiFeatureState)
 
         testee.viewState.test {
             assertFalse(awaitItem().showInVoiceSearch)
@@ -114,7 +114,7 @@ class DuckAiShortcutSettingsViewModelTest {
     @Test
     fun whenAddressBarEntryPointEnabledTogglesShown() = runTest {
         whenever(duckChat.isAddressBarEntryPointEnabled()).thenReturn(true)
-        testee = DuckAiShortcutSettingsViewModel(duckChat, duckAiFeatureState)
+        testee = RevengeAIShortcutSettingsViewModel(duckChat, duckAiFeatureState)
 
         testee.viewState.test {
             val state = awaitItem()
@@ -126,7 +126,7 @@ class DuckAiShortcutSettingsViewModelTest {
     @Test
     fun whenAddressBarEntryPointDisabledThenToggleHidden() = runTest {
         whenever(duckChat.isAddressBarEntryPointEnabled()).thenReturn(false)
-        testee = DuckAiShortcutSettingsViewModel(duckChat, duckAiFeatureState)
+        testee = RevengeAIShortcutSettingsViewModel(duckChat, duckAiFeatureState)
 
         testee.viewState.test {
             val state = awaitItem()
@@ -137,7 +137,7 @@ class DuckAiShortcutSettingsViewModelTest {
     @Test
     fun whenVoiceSearchEntryPointEnabledThenToggleShown() = runTest {
         whenever(duckChat.isVoiceSearchEntryPointEnabled()).thenReturn(true)
-        testee = DuckAiShortcutSettingsViewModel(duckChat, duckAiFeatureState)
+        testee = RevengeAIShortcutSettingsViewModel(duckChat, duckAiFeatureState)
 
         testee.viewState.test {
             val state = awaitItem()
@@ -149,7 +149,7 @@ class DuckAiShortcutSettingsViewModelTest {
     @Test
     fun whenVoiceSearchEntryPointDisabledThenToggleHidden() = runTest {
         whenever(duckChat.isVoiceSearchEntryPointEnabled()).thenReturn(false)
-        testee = DuckAiShortcutSettingsViewModel(duckChat, duckAiFeatureState)
+        testee = RevengeAIShortcutSettingsViewModel(duckChat, duckAiFeatureState)
 
         testee.viewState.test {
             val state = awaitItem()

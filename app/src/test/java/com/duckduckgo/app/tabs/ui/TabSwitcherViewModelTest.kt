@@ -57,7 +57,7 @@ import com.duckduckgo.common.test.blockingObserve
 import com.duckduckgo.common.ui.DuckDuckGoTheme
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeature
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
-import com.duckduckgo.duckchat.api.DuckAiFeatureState
+import com.duckduckgo.duckchat.api.RevengeAIFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
@@ -120,7 +120,7 @@ class TabSwitcherViewModelTest {
 
     private val duckChatMock: DuckChat = mock()
 
-    private val duckAiFeatureStateMock: DuckAiFeatureState = mock()
+    private val duckAiFeatureStateMock: RevengeAIFeatureState = mock()
 
     private val faviconManager: FaviconManager = mock()
 
@@ -139,7 +139,7 @@ class TabSwitcherViewModelTest {
     private val swipingTabsFeature = FakeFeatureToggleFactory.create(SwipingTabsFeature::class.java)
     private val swipingTabsFeatureProvider = SwipingTabsFeatureProvider(swipingTabsFeature)
 
-    private val mockDuckAiFeatureStateFullScreenModeFlow = MutableStateFlow(false)
+    private val mockRevengeAIFeatureStateFullScreenModeFlow = MutableStateFlow(false)
 
     private lateinit var testee: TabSwitcherViewModel
 
@@ -163,7 +163,7 @@ class TabSwitcherViewModelTest {
         whenever(mockTabSwitcherPrefsDataStore.isTrackersAnimationInfoTileHidden()).thenReturn(flowOf(false))
         whenever(statisticsDataStore.variant).thenReturn("")
         whenever(mockTabRepository.flowDeletableTabs).thenReturn(repoDeletableTabs.consumeAsFlow())
-        whenever(duckAiFeatureStateMock.showFullScreenMode).thenReturn(mockDuckAiFeatureStateFullScreenModeFlow)
+        whenever(duckAiFeatureStateMock.showFullScreenMode).thenReturn(mockRevengeAIFeatureStateFullScreenModeFlow)
         runBlocking {
             whenever(mockTabRepository.add()).thenReturn("TAB_ID")
             whenever(mockWebTrackersBlockedAppRepository.getTrackerCountForLast7Days()).thenReturn(0)
@@ -867,7 +867,7 @@ class TabSwitcherViewModelTest {
 
     @Test
     fun `when Duck Chat menu item clicked and fullscreen mode enabled then new tab created and screen closed`() = runTest {
-        mockDuckAiFeatureStateFullScreenModeFlow.emit(true)
+        mockRevengeAIFeatureStateFullScreenModeFlow.emit(true)
 
         whenever(duckChatMock.wasOpenedBefore()).thenReturn(false)
 

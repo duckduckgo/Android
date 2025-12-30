@@ -152,6 +152,6 @@ class RealSubscriptionsJSHelper @Inject constructor(
         private const val PAYMENT_PLATFORM = "paymentPlatform"
         private const val STATUS = "status"
         private const val ACCESS_TOKEN = "accessToken"
-        private const val USE_PAID_DUCK_AI = "usePaidDuckAi"
+        private const val USE_PAID_DUCK_AI = "usePaidRevengeAI"
     }
 }

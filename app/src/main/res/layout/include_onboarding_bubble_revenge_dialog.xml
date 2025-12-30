@@ -36,7 +36,7 @@
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/daxDialogDismissButton"
-        style="@style/Widget.DuckDuckGo.FloatingActionButton.Circular"
+        style="@style/Widget.Revenge.FloatingActionButton.Circular"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="68dp"
@@ -80,7 +80,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:typography="h2"
-                    tools:text="@string/onboardingSearchDaxDialogTitle" />
+                    tools:text="@string/onboardingSearchRevengeDialogTitle" />
 
                 <FrameLayout
                     android:layout_width="match_parent"
@@ -93,12 +93,12 @@
                         android:layout_height="wrap_content"
                         android:visibility="invisible"
                         app:typography="body1"
-                        tools:text="@string/onboardingBubbleExperimentSearchDaxDialogDescription"
+                        tools:text="@string/onboardingBubbleExperimentSearchRevengeDialogDescription"
                         tools:visibility="visible" />
 
                     <com.duckduckgo.common.ui.view.TypeAnimationTextView
                         android:id="@+id/dialogTextCta"
-                        style="@style/Typography.DuckDuckGo.Body1"
+                        style="@style/Typography.Revenge.Body1"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:clickable="true"
@@ -123,7 +123,7 @@
                     android:layout_marginTop="@dimen/keyline_2"
                     android:alpha="0"
                     android:gravity="start|center_vertical"
-                    android:text="@string/onboardingSearchDaxDialogOption1"
+                    android:text="@string/onboardingSearchRevengeDialogOption1"
                     app:icon="@drawable/ic_find_search_16"
                     tools:alpha="1" />
 
@@ -134,7 +134,7 @@
                     android:layout_marginTop="-4dp"
                     android:alpha="0"
                     android:gravity="start|center_vertical"
-                    android:text="@string/onboardingSearchDaxDialogOption2"
+                    android:text="@string/onboardingSearchRevengeDialogOption2"
                     app:icon="@drawable/ic_find_search_16"
                     tools:alpha="1" />
 
@@ -145,7 +145,7 @@
                     android:layout_marginTop="-4dp"
                     android:alpha="0"
                     android:gravity="start|center_vertical"
-                    android:text="@string/onboardingSearchDaxDialogOption3"
+                    android:text="@string/onboardingSearchRevengeDialogOption3"
                     app:icon="@drawable/ic_find_search_16"
                     tools:alpha="1" />
 
@@ -156,7 +156,7 @@
                     android:layout_marginTop="-4dp"
                     android:alpha="0"
                     android:gravity="start|center_vertical"
-                    android:text="@string/onboardingSearchDaxDialogOption4"
+                    android:text="@string/onboardingSearchRevengeDialogOption4"
                     app:icon="@drawable/ic_wand_16"
                     tools:alpha="1" />
 

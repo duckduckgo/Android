@@ -24,7 +24,7 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.duckchat.api.DuckAiFeatureState
+import com.duckduckgo.duckchat.api.RevengeAIFeatureState
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
@@ -53,7 +53,7 @@ class InputScreenRetentionMonitorTest {
             produceFile = { temporaryFolder.newFile("temp.preferences_pb") },
         )
 
-    private val mockDuckAiFeatureState: DuckAiFeatureState = mock()
+    private val mockRevengeAIFeatureState: RevengeAIFeatureState = mock()
     private val mockPixel: Pixel = mock()
     private val mockLifecycleOwner: LifecycleOwner = mock()
     private val mockTimeProvider: TimeProvider = mock()
@@ -64,12 +64,12 @@ class InputScreenRetentionMonitorTest {
 
     @Before
     fun setup() {
-        whenever(mockDuckAiFeatureState.showInputScreen).thenReturn(showInputScreenFlow)
+        whenever(mockRevengeAIFeatureState.showInputScreen).thenReturn(showInputScreenFlow)
 
         testee = InputScreenRetentionMonitor(
             coroutineScope = coroutineTestRule.testScope,
             retentionMonitorDataStore = testDataStore,
-            duckAiFeatureState = mockDuckAiFeatureState,
+            duckAiFeatureState = mockRevengeAIFeatureState,
             pixel = mockPixel,
             timeProvider = mockTimeProvider,
         )

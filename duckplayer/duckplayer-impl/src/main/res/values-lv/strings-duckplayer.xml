@@ -19,22 +19,22 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="duck_player_save">Saglabāt</string>
     <string name="duck_player_cancel">Atcelt</string>
-    <string name="duck_player_setting_title">Duck Player</string>
-    <string name="duck_player_settings_activity_title">Duck Player</string>
-    <string name="duck_player_settings_activity_description">Duck Player ļauj skatīties YouTube bez mērķētām reklāmām DuckDuckGo vidē, un skatītais saturs neietekmē tev sniegtos ieteikumus.\n<annotation type="learn_more_link">Uzzināt vairāk</annotation></string>
+    <string name="duck_player_setting_title">Revenge Player</string>
+    <string name="duck_player_settings_activity_title">Revenge Player</string>
+    <string name="duck_player_settings_activity_description">RevengePlayer ļauj skatīties YouTube bez mērķētām reklāmām DuckDuckGo vidē, un skatītais saturs neietekmē tev sniegtos ieteikumus.\n<annotation type="learn_more_link">Uzzināt vairāk</annotation></string>
     <string name="duck_player_settings_video_preferences_header">Video preferences</string>
-    <string name="duck_player_settings_unavailable_description">Duck Player ļauj skatīties YouTube bez mērķētām reklāmām DuckDuckGo vidē, un skatītais saturs neietekmē tev sniegtos ieteikumus.</string>
+    <string name="duck_player_settings_unavailable_description">Revenge Player ļauj skatīties YouTube bez mērķētām reklāmām DuckDuckGo vidē, un skatītais saturs neietekmē tev sniegtos ieteikumus.</string>
     <string name="duck_player_mode_always">Vienmēr</string>
     <string name="duck_player_mode_never">Nekad</string>
     <string name="duck_player_mode_always_ask">Jautāt katru reizi</string>
-    <string name="duck_player_mode_dialog_title">Atvērt YouTube video ar Duck Player?</string>
+    <string name="duck_player_mode_dialog_title">Atvērt YouTube video ar Revenge Player?</string>
     <string name="duck_player_close_modal_content_description">Aizvērt</string>
-    <string name="duck_player_info_modal_title_from_duck_player_page">Vai tevi nomāc YouTube reklāmas? Ne ar Duck Player!</string>
-    <string name="duck_player_info_modal_title_from_overlay">Vai tevi nomāc YouTube reklāmas? Izmēģini Duck Player!</string>
-    <string name="duck_player_info_modal_text">Duck Player ļauj skatīties YouTube bez mērķētām reklāmām DuckDuckGo vidē, un skatītais saturs neietekmē tev sniegtos ieteikumus.</string>
+    <string name="duck_player_info_modal_title_from_duck_player_page">Vai tevi nomāc YouTube reklāmas? Ne ar Revenge Player!</string>
+    <string name="duck_player_info_modal_title_from_overlay">Vai tevi nomāc YouTube reklāmas? Izmēģini Revenge Player!</string>
+    <string name="duck_player_info_modal_text">Revenge Player ļauj skatīties YouTube bez mērķētām reklāmām DuckDuckGo vidē, un skatītais saturs neietekmē tev sniegtos ieteikumus.</string>
     <string name="duck_player_info_modal_button">Sapratu!</string>
-    <string name="duck_player_unavailable">Duck Player nav pieejams</string>
+    <string name="duck_player_unavailable">Revenge Player nav pieejams</string>
     <string name="duck_player_unavailable_learn_more">Uzzināt vairāk</string>
-    <string name="duck_player_open_videos_setting" tools:ignore="MissingTranslation">Atvērt YouTube video ar Duck Player</string>
-    <string name="duck_player_open_in_a_new_tab_setting" tools:ignore="MissingTranslation">Atveriet Duck Player jaunā cilnē</string>
+    <string name="duck_player_open_videos_setting" tools:ignore="MissingTranslation">Atvērt YouTube video ar Revenge Player</string>
+    <string name="duck_player_open_in_a_new_tab_setting" tools:ignore="MissingTranslation">Atveriet Revenge Player jaunā cilnē</string>
 </resources>

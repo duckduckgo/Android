@@ -85,7 +85,7 @@ import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.common.utils.extensions.showKeyboard
 import com.duckduckgo.common.utils.text.TextChangedWatcher
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.duckchat.api.DuckAiFeatureState
+import com.duckduckgo.duckchat.api.RevengeAIFeatureState
 import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityParams
 import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityResultCodes
 import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityResultParams
@@ -153,7 +153,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
     private lateinit var omnibarDivider: View
 
     @Inject
-    lateinit var duckAiFeatureState: DuckAiFeatureState
+    lateinit var duckAiFeatureState: RevengeAIFeatureState
 
     private val inputScreenLauncher =
         registerForActivityResult(StartActivityForResult()) { result ->
@@ -211,7 +211,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         configureTextInput()
         configureQuickAccessGrid()
         configureVoiceSearch()
-        configureDuckAi()
+        configureRevengeAI()
 
         if (savedInstanceState == null) {
             intent?.let {
@@ -423,8 +423,8 @@ class SystemSearchActivity : DuckDuckGoActivity() {
                     is VoiceSearchLauncher.VoiceRecognitionResult.SearchResult -> {
                         viewModel.onVoiceSearchResult(result.query)
                     }
-                    is VoiceSearchLauncher.VoiceRecognitionResult.DuckAiResult -> {
-                        viewModel.onDuckAiRequested(result.query)
+                    is VoiceSearchLauncher.VoiceRecognitionResult.RevengeAIResult -> {
+                        viewModel.onRevengeAIRequested(result.query)
                     }
                 }
             } else if (it is VoiceSearchLauncher.Event.VoiceSearchDisabled) {
@@ -437,9 +437,9 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         }
     }
 
-    fun configureDuckAi() {
+    fun configureRevengeAI() {
         duckAi.setOnClickListener {
-            viewModel.onDuckAiRequested(omnibarTextInput.text.toString())
+            viewModel.onRevengeAIRequested(omnibarTextInput.text.toString())
         }
     }
 
@@ -494,7 +494,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
     private fun renderOmnibarState(viewState: SystemSearchViewModel.OmnibarViewState) {
         voiceSearch.isVisible = viewState.isVoiceSearchButtonVisible
         clearTextButton.isVisible = viewState.isClearButtonVisible
-        duckAi.isVisible = viewState.isDuckAiButtonVisible
+        duckAi.isVisible = viewState.isRevengeAIButtonVisible
         omnibarDivider.isVisible = viewState.isButtonDividerVisible
     }
 

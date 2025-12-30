@@ -1,0 +1,71 @@
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/app/src/main/java/com/duckduckgo/app/browser/BrowserTabFragment.kt:659:46 Unresolved reference: includeOnboardingDaxDialogBubble
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/app/src/main/java/com/duckduckgo/app/browser/BrowserTabFragment.kt:662:25 Unresolved reference: includeOnboardingInContextDaxDialog
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/app/src/main/java/com/duckduckgo/app/cta/ui/Cta.kt:126:17 Unresolved reference: includeOnboardingInContextDaxDialog
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/app/src/main/java/com/duckduckgo/app/cta/ui/Cta.kt:140:33 Unresolved reference: includeOnboardingInContextDaxDialog
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/app/src/main/java/com/duckduckgo/app/cta/ui/Cta.kt:143:17 Unresolved reference: includeOnboardingInContextDaxDialog
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/app/src/main/java/com/duckduckgo/app/cta/ui/Cta.kt:144:17 Unresolved reference: includeOnboardingInContextDaxDialog
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/app/src/main/java/com/duckduckgo/app/cta/ui/Cta.kt:145:33 Variable expected
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/app/src/main/java/com/duckduckgo/app/cta/ui/Cta.kt:146:33 Variable expected
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/app/src/main/java/com/duckduckgo/app/cta/ui/Cta.kt:149:45 Variable expected
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/app/src/main/java/com/duckduckgo/app/cta/ui/Cta.kt:153:34 Variable expected
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/app/src/main/java/com/duckduckgo/app/cta/ui/Cta.kt:154:34 Variable expected
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/app/src/main/java/com/duckduckgo/app/cta/ui/Cta.kt:158:36 Variable expected
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/app/src/main/java/com/duckduckgo/app/cta/ui/Cta.kt:159:36 Variable expected
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/app/src/main/java/com/duckduckgo/app/cta/ui/Cta.kt:163:24 Variable expected
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/app/src/main/java/com/duckduckgo/app/cta/ui/Cta.kt:171:22 Variable expected
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/app/src/main/java/com/duckduckgo/app/cta/ui/Cta.kt:177:22 Variable expected
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/app/src/main/java/com/duckduckgo/app/cta/ui/Cta.kt:179:21 Unresolved reference: includeOnboardingInContextDaxDialog
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/app/src/main/java/com/duckduckgo/app/cta/ui/Cta.kt:180:21 Unresolved reference: includeOnboardingInContextDaxDialog
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/app/src/main/java/com/duckduckgo/app/cta/ui/Cta.kt:181:21 Unresolved reference: includeOnboardingInContextDaxDialog
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/app/src/main/java/com/duckduckgo/app/cta/ui/Cta.kt:195:18 Unresolved reference: onboardingSerpDaxDialogDescription
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/app/src/main/java/com/duckduckgo/app/cta/ui/Cta.kt:196:18 Unresolved reference: onboardingSerpDaxDialogButton
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/app/src/main/java/com/duckduckgo/app/cta/ui/Cta.kt:235:18 Unresolved reference: onboardingTrackersBlockedDaxDialogButton
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/app/src/main/java/com/duckduckgo/app/cta/ui/Cta.kt:393:18 Unresolved reference: onboardingFireButtonDaxDialogDescription
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/app/src/main/java/com/duckduckgo/app/cta/ui/Cta.kt:394:18 Unresolved reference: onboardingFireButtonDaxDialogOkButton
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/app/src/main/java/com/duckduckgo/app/cta/ui/Cta.kt:415:61 Unresolved reference: onboardingFireButtonDaxDialogOkButton
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/app/src/main/java/com/duckduckgo/app/cta/ui/Cta.kt:431:18 Unresolved reference: onboardingSitesDaxDialogDescription
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/app/src/main/java/com/duckduckgo/app/cta/ui/Cta.kt:450:37 Unresolved reference: includeOnboardingInContextDaxDialog
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/app/src/main/java/com/duckduckgo/app/cta/ui/Cta.kt:453:21 Unresolved reference: includeOnboardingInContextDaxDialog
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/app/src/main/java/com/duckduckgo/app/cta/ui/Cta.kt:454:21 Unresolved reference: includeOnboardingInContextDaxDialog
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/app/src/main/java/com/duckduckgo/app/cta/ui/Cta.kt:455:48 Variable expected
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/app/src/main/java/com/duckduckgo/app/cta/ui/Cta.kt:456:48 Variable expected
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/app/src/main/java/com/duckduckgo/app/cta/ui/Cta.kt:458:62 Unresolved reference: includeOnboardingInContextDaxDialog
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/app/src/main/java/com/duckduckgo/app/cta/ui/Cta.kt:495:18 Unresolved reference: onboardingEndDaxDialogDescription
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/app/src/main/java/com/duckduckgo/app/cta/ui/Cta.kt:496:18 Unresolved reference: onboardingEndDaxDialogButton
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/app/src/main/java/com/duckduckgo/app/cta/ui/Cta.kt:753:38 Unresolved reference: includeOnboardingDaxDialogBubble
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/app/src/main/java/com/duckduckgo/app/cta/ui/Cta.kt:770:26 Unresolved reference: onboardingSearchDaxDialogTitle
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/app/src/main/java/com/duckduckgo/app/cta/ui/Cta.kt:771:32 Unresolved reference: onboardingSearchDaxDialogDescription
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/app/src/main/java/com/duckduckgo/app/cta/ui/Cta.kt:785:26 Unresolved reference: onboardingSitesDaxDialogTitle
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/app/src/main/java/com/duckduckgo/app/cta/ui/Cta.kt:786:32 Unresolved reference: onboardingSitesDaxDialogDescription
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/app/src/main/java/com/duckduckgo/app/cta/ui/Cta.kt:800:26 Unresolved reference: onboardingEndDaxDialogTitle
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/app/src/main/java/com/duckduckgo/app/cta/ui/Cta.kt:801:32 Unresolved reference: onboardingEndDaxDialogDescription
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/app/src/main/java/com/duckduckgo/app/cta/ui/Cta.kt:802:31 Unresolved reference: onboardingEndDaxDialogButton
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/app/src/main/java/com/duckduckgo/app/cta/ui/CtaViewModel.kt:257:46 Unresolved reference: onboardingPrivacyProDaxDialogTitle
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/app/src/main/java/com/duckduckgo/app/cta/ui/CtaViewModel.kt:258:52 Unresolved reference: onboardingPrivacyProDaxDialogDescription
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/app/src/main/java/com/duckduckgo/app/cta/ui/CtaViewModel.kt:260:30 Unresolved reference: onboardingPrivacyProDaxDialogFreeTrialOkButton
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/app/src/main/java/com/duckduckgo/app/cta/ui/CtaViewModel.kt:262:30 Unresolved reference: onboardingPrivacyProDaxDialogOkButton
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/app/src/main/java/com/duckduckgo/app/firebutton/FireButtonActivity.kt:145:81 Unresolved reference: fireClearAllPlusDuckChats
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/app/src/main/java/com/duckduckgo/app/firebutton/FireButtonActivity.kt:146:83 Unresolved reference: settingsClearDataActionPlusDuckChatsSecondaryText
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/app/src/main/java/com/duckduckgo/app/global/view/LegacyFireDialog.kt:203:110 Unresolved reference: fireClearAllPlusDuckChats
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/app/src/main/java/com/duckduckgo/app/onboarding/store/OnboardingStoreImpl.kt:45:48 Unresolved reference: onboardingSearchDaxDialogOption1English
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/app/src/main/java/com/duckduckgo/app/onboarding/store/OnboardingStoreImpl.kt:47:48 Unresolved reference: onboardingSearchDaxDialogOption1
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/app/src/main/java/com/duckduckgo/app/onboarding/store/OnboardingStoreImpl.kt:54:48 Unresolved reference: onboardingSearchDaxDialogOption2US
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/app/src/main/java/com/duckduckgo/app/onboarding/store/OnboardingStoreImpl.kt:56:48 Unresolved reference: onboardingSearchDaxDialogOption2
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/app/src/main/java/com/duckduckgo/app/onboarding/store/OnboardingStoreImpl.kt:60:48 Unresolved reference: onboardingSearchDaxDialogOption2US
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/app/src/main/java/com/duckduckgo/app/onboarding/store/OnboardingStoreImpl.kt:62:48 Unresolved reference: onboardingSearchDaxDialogOption2
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/app/src/main/java/com/duckduckgo/app/onboarding/store/OnboardingStoreImpl.kt:66:57 Unresolved reference: onboardingSearchDaxDialogOption4
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/app/src/main/java/com/duckduckgo/app/onboarding/store/OnboardingStoreImpl.kt:159:57 Unresolved reference: onboardingSitesDaxDialogOption4
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/app/src/main/java/com/duckduckgo/app/onboarding/ui/page/WelcomePage.kt:201:57 Unresolved reference: preOnboardingDaxDialog1Title
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/app/src/main/java/com/duckduckgo/app/onboarding/ui/page/WelcomePage.kt:206:86 Unresolved reference: preOnboardingDaxDialog1Button
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/app/src/main/java/com/duckduckgo/app/onboarding/ui/page/WelcomePage.kt:209:88 Unresolved reference: preOnboardingDaxDialog1SecondaryButton
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/app/src/main/java/com/duckduckgo/app/onboarding/ui/page/WelcomePage.kt:223:57 Unresolved reference: preOnboardingDaxDialog1Title
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/app/src/main/java/com/duckduckgo/app/onboarding/ui/page/WelcomePage.kt:228:86 Unresolved reference: preOnboardingDaxDialog1Button
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/app/src/main/java/com/duckduckgo/app/onboarding/ui/page/WelcomePage.kt:246:57 Unresolved reference: preOnboardingDaxDialog2Title
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/app/src/main/java/com/duckduckgo/app/onboarding/ui/page/WelcomePage.kt:254:86 Unresolved reference: preOnboardingDaxDialog2Button
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/app/src/main/java/com/duckduckgo/app/onboarding/ui/page/WelcomePage.kt:272:64 Unresolved reference: preOnboardingDaxDialog3Title
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/app/src/main/java/com/duckduckgo/app/onboarding/ui/page/WelcomePage.kt:274:71 Unresolved reference: preOnboardingDaxDialog3Text
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/app/src/main/java/com/duckduckgo/app/onboarding/ui/page/WelcomePage.kt:279:86 Unresolved reference: preOnboardingDaxDialog3Button
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/app/src/main/java/com/duckduckgo/app/onboarding/ui/page/WelcomePage.kt:282:88 Unresolved reference: preOnboardingDaxDialog3SecondaryButton
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/app/src/main/java/com/duckduckgo/app/settings/SettingsActivity.kt:249:13 Unresolved reference: includeDuckChatSetting
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/app/src/main/java/com/duckduckgo/app/settings/SettingsActivity.kt:362:23 Unresolved reference: includeDuckChatSetting
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/app/src/main/java/com/duckduckgo/app/settings/SettingsActivity.kt:364:23 Unresolved reference: includeDuckChatSetting

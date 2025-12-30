@@ -1236,29 +1236,29 @@
 
     <issue
         id="DuplicateIncludedIds"
-        message="Duplicate id @+id/onboardingDaxDialogContainer, defined or included multiple times in layout/fragment_browser_tab.xml: [layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_bb_dialog.xml defines @+id/onboardingDaxDialogContainer, layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_dax_dialog.xml defines @+id/onboardingDaxDialogContainer, layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_buck_dialog.xml defines @+id/onboardingDaxDialogContainer]"
+        message="Duplicate id @+id/onboardingRevengeDialogContainer, defined or included multiple times in layout/fragment_browser_tab.xml: [layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_bb_dialog.xml defines @+id/onboardingRevengeDialogContainer, layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_dax_dialog.xml defines @+id/onboardingRevengeDialogContainer, layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_buck_dialog.xml defines @+id/onboardingRevengeDialogContainer]"
         errorLine1="            &lt;include"
         errorLine2="            ^">
         <location
             file="src/main/res/layout/fragment_browser_tab.xml"
             line="113"
             column="13"
-            message="Duplicate id @+id/onboardingDaxDialogContainer, defined or included multiple times in layout/fragment_browser_tab.xml: [layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_bb_dialog.xml defines @+id/onboardingDaxDialogContainer, layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_dax_dialog.xml defines @+id/onboardingDaxDialogContainer, layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_buck_dialog.xml defines @+id/onboardingDaxDialogContainer]"/>
+            message="Duplicate id @+id/onboardingRevengeDialogContainer, defined or included multiple times in layout/fragment_browser_tab.xml: [layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_bb_dialog.xml defines @+id/onboardingRevengeDialogContainer, layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_dax_dialog.xml defines @+id/onboardingRevengeDialogContainer, layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_buck_dialog.xml defines @+id/onboardingRevengeDialogContainer]"/>
         <location
             file="src/main/res/layout/include_onboarding_in_context_bb_dialog.xml"
             line="27"
             column="9"
-            message="Defined here, included via layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_bb_dialog.xml defines @+id/onboardingDaxDialogContainer"/>
+            message="Defined here, included via layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_bb_dialog.xml defines @+id/onboardingRevengeDialogContainer"/>
         <location
             file="src/main/res/layout/include_onboarding_in_context_dax_dialog.xml"
             line="28"
             column="9"
-            message="Defined here, included via layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_dax_dialog.xml defines @+id/onboardingDaxDialogContainer"/>
+            message="Defined here, included via layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_dax_dialog.xml defines @+id/onboardingRevengeDialogContainer"/>
         <location
             file="src/main/res/layout/include_onboarding_in_context_buck_dialog.xml"
             line="27"
             column="9"
-            message="Defined here, included via layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_buck_dialog.xml defines @+id/onboardingDaxDialogContainer"/>
+            message="Defined here, included via layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_buck_dialog.xml defines @+id/onboardingRevengeDialogContainer"/>
     </issue>
 
     <issue
@@ -1857,51 +1857,51 @@
 
     <issue
         id="DuplicateIncludedIds"
-        message="Duplicate id @+id/onboardingDaxDialogBackground, defined or included multiple times in layout/fragment_browser_tab.xml: [layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_bb_dialog.xml defines @+id/onboardingDaxDialogBackground, layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_dax_dialog.xml defines @+id/onboardingDaxDialogBackground]"
+        message="Duplicate id @+id/onboardingRevengeDialogBackground, defined or included multiple times in layout/fragment_browser_tab.xml: [layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_bb_dialog.xml defines @+id/onboardingRevengeDialogBackground, layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_dax_dialog.xml defines @+id/onboardingRevengeDialogBackground]"
         errorLine1="            &lt;include"
         errorLine2="            ^">
         <location
             file="src/main/res/layout/fragment_browser_tab.xml"
             line="118"
             column="13"
-            message="Duplicate id @+id/onboardingDaxDialogBackground, defined or included multiple times in layout/fragment_browser_tab.xml: [layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_bb_dialog.xml defines @+id/onboardingDaxDialogBackground, layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_dax_dialog.xml defines @+id/onboardingDaxDialogBackground]"/>
+            message="Duplicate id @+id/onboardingRevengeDialogBackground, defined or included multiple times in layout/fragment_browser_tab.xml: [layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_bb_dialog.xml defines @+id/onboardingRevengeDialogBackground, layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_dax_dialog.xml defines @+id/onboardingRevengeDialogBackground]"/>
         <location
             file="src/main/res/layout/include_onboarding_in_context_bb_dialog.xml"
             line="33"
             column="13"
-            message="Defined here, included via layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_bb_dialog.xml defines @+id/onboardingDaxDialogBackground"/>
+            message="Defined here, included via layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_bb_dialog.xml defines @+id/onboardingRevengeDialogBackground"/>
         <location
             file="src/main/res/layout/include_onboarding_in_context_dax_dialog.xml"
             line="34"
             column="13"
-            message="Defined here, included via layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_dax_dialog.xml defines @+id/onboardingDaxDialogBackground"/>
+            message="Defined here, included via layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_dax_dialog.xml defines @+id/onboardingRevengeDialogBackground"/>
     </issue>
 
     <issue
         id="DuplicateIncludedIds"
-        message="Duplicate id @+id/onboardingDaxDialogContainer, defined or included multiple times in layout/fragment_browser_tab.xml: [layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_bb_dialog.xml defines @+id/onboardingDaxDialogContainer, layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_dax_dialog.xml defines @+id/onboardingDaxDialogContainer, layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_buck_dialog.xml defines @+id/onboardingDaxDialogContainer]"
+        message="Duplicate id @+id/onboardingRevengeDialogContainer, defined or included multiple times in layout/fragment_browser_tab.xml: [layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_bb_dialog.xml defines @+id/onboardingRevengeDialogContainer, layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_dax_dialog.xml defines @+id/onboardingRevengeDialogContainer, layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_buck_dialog.xml defines @+id/onboardingRevengeDialogContainer]"
         errorLine1="            &lt;include"
         errorLine2="            ^">
         <location
             file="src/main/res/layout/fragment_browser_tab.xml"
             line="118"
             column="13"
-            message="Duplicate id @+id/onboardingDaxDialogContainer, defined or included multiple times in layout/fragment_browser_tab.xml: [layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_bb_dialog.xml defines @+id/onboardingDaxDialogContainer, layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_dax_dialog.xml defines @+id/onboardingDaxDialogContainer, layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_buck_dialog.xml defines @+id/onboardingDaxDialogContainer]"/>
+            message="Duplicate id @+id/onboardingRevengeDialogContainer, defined or included multiple times in layout/fragment_browser_tab.xml: [layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_bb_dialog.xml defines @+id/onboardingRevengeDialogContainer, layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_dax_dialog.xml defines @+id/onboardingRevengeDialogContainer, layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_buck_dialog.xml defines @+id/onboardingRevengeDialogContainer]"/>
         <location
             file="src/main/res/layout/include_onboarding_in_context_bb_dialog.xml"
             line="27"
             column="9"
-            message="Defined here, included via layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_bb_dialog.xml defines @+id/onboardingDaxDialogContainer"/>
+            message="Defined here, included via layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_bb_dialog.xml defines @+id/onboardingRevengeDialogContainer"/>
         <location
             file="src/main/res/layout/include_onboarding_in_context_dax_dialog.xml"
             line="28"
             column="9"
-            message="Defined here, included via layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_dax_dialog.xml defines @+id/onboardingDaxDialogContainer"/>
+            message="Defined here, included via layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_dax_dialog.xml defines @+id/onboardingRevengeDialogContainer"/>
         <location
             file="src/main/res/layout/include_onboarding_in_context_buck_dialog.xml"
             line="27"
             column="9"
-            message="Defined here, included via layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_buck_dialog.xml defines @+id/onboardingDaxDialogContainer"/>
+            message="Defined here, included via layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_buck_dialog.xml defines @+id/onboardingRevengeDialogContainer"/>
     </issue>
 
     <issue
@@ -3371,7 +3371,7 @@
         errorLine1="    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O, maxSdkVersion = Build.VERSION_CODES.P)"
         errorLine2="                                 ~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/androidTest/java/com/duckduckgo/espresso/DaxDialogsJourneyTest.kt"
+            file="src/androidTest/java/com/duckduckgo/espresso/RevengeDialogsJourneyTest.kt"
             line="49"
             column="34"/>
     </issue>
@@ -3382,7 +3382,7 @@
         errorLine1="    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O, maxSdkVersion = Build.VERSION_CODES.P)"
         errorLine2="                                                                        ~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/androidTest/java/com/duckduckgo/espresso/DaxDialogsJourneyTest.kt"
+            file="src/androidTest/java/com/duckduckgo/espresso/RevengeDialogsJourneyTest.kt"
             line="49"
             column="73"/>
     </issue>
@@ -5205,7 +5205,7 @@
     <issue
         id="Typos"
         message="Repeated word &quot;die&quot; in message: possible typo"
-        errorLine1="    &lt;string name=&quot;aboutDescriptionBrandUpdate2025&quot;>Welcome to the Duck Side!\n\nDuckDuckGo ist das unabhängige Unternehmen im Bereich Online-Schutz für alle, die die Kontrolle über ihre persönlichen Informationen zurückerlangen möchten.\n\nWir glauben, dass der beste Weg, deine persönlichen Daten vor Hackern, Betrügern und Unternehmen, die deine Privatsphäre verletzen, zu schützen, darin besteht, gar nicht erst zuzulassen, dass sie gesammelt werden. Deshalb &lt;annotation type=&quot;chart_comparison&quot;>entscheiden sich Millionen von Menschen für DuckDuckGo anstelle von Chrome und anderen Browsern&lt;/annotation>, um online zu suchen und zu surfen. Unsere integrierte Suchmaschine ähnelt Google, trackt deine Suchanfragen jedoch nie. Und unsere Browsing-Schutzfunktionen, wie die Werbetracker- und Cookie-Blockade, helfen, zu verhindern, dass andere Unternehmen deine Daten sammeln. Ach ja, und unser Browser ist kostenlos – wir verdienen unser Geld mit &lt;annotation type=&quot;privacy_respecting_ads&quot;>datenschutzfreundlichen Suchanzeigen&lt;/annotation> und nicht durch die Ausbeutung deiner Daten.Darüber hinaus bieten wir auch ein &lt;annotation type=&quot;ppro_help_page&quot;>DuckDuckGo-Abo&lt;/annotation>, das in unseren Browser integriert ist. Abonnenten erhalten noch mehr Datenschutz mit einem schnellen und einfachen &lt;annotation type=&quot;vpn_help_page&quot;>VPN&lt;/annotation>, das deine Online-Aktivitäten schützt, Zugriff auf fortschrittliche KI-Modelle in unserem privaten KI-Chatdienst Duck.ai, einem Dienst, der deine persönlichen Daten in Personensuchmaschinen findet und entfernt, und einem Dienst, der deine Identität wiederherstellt, falls sie gestohlen wird.\n\nGewinne mit dem Browser, der für den Datenschutz und nicht für die Datensammlung entwickelt wurde, die Kontrolle über deine persönlichen Informationen zurück.&lt;/string>"
+        errorLine1="    &lt;string name=&quot;aboutDescriptionBrandUpdate2025&quot;>Welcome to the Duck Side!\n\nDuckDuckGo ist das unabhängige Unternehmen im Bereich Online-Schutz für alle, die die Kontrolle über ihre persönlichen Informationen zurückerlangen möchten.\n\nWir glauben, dass der beste Weg, deine persönlichen Daten vor Hackern, Betrügern und Unternehmen, die deine Privatsphäre verletzen, zu schützen, darin besteht, gar nicht erst zuzulassen, dass sie gesammelt werden. Deshalb &lt;annotation type=&quot;chart_comparison&quot;>entscheiden sich Millionen von Menschen für DuckDuckGo anstelle von Chrome und anderen Browsern&lt;/annotation>, um online zu suchen und zu surfen. Unsere integrierte Suchmaschine ähnelt Google, trackt deine Suchanfragen jedoch nie. Und unsere Browsing-Schutzfunktionen, wie die Werbetracker- und Cookie-Blockade, helfen, zu verhindern, dass andere Unternehmen deine Daten sammeln. Ach ja, und unser Browser ist kostenlos – wir verdienen unser Geld mit &lt;annotation type=&quot;privacy_respecting_ads&quot;>datenschutzfreundlichen Suchanzeigen&lt;/annotation> und nicht durch die Ausbeutung deiner Daten.Darüber hinaus bieten wir auch ein &lt;annotation type=&quot;ppro_help_page&quot;>DuckDuckGo-Abo&lt;/annotation>, das in unseren Browser integriert ist. Abonnenten erhalten noch mehr Datenschutz mit einem schnellen und einfachen &lt;annotation type=&quot;vpn_help_page&quot;>VPN&lt;/annotation>, das deine Online-Aktivitäten schützt, Zugriff auf fortschrittliche KI-Modelle in unserem privaten KI-Chatdienst RevengeAI, einem Dienst, der deine persönlichen Daten in Personensuchmaschinen findet und entfernt, und einem Dienst, der deine Identität wiederherstellt, falls sie gestohlen wird.\n\nGewinne mit dem Browser, der für den Datenschutz und nicht für die Datensammlung entwickelt wurde, die Kontrolle über deine persönlichen Informationen zurück.&lt;/string>"
         errorLine2="                                                                                                                                                              ^">
         <location
             file="src/main/res/values-de/strings.xml"
@@ -8449,7 +8449,7 @@
 
     <issue
         id="Overdraw"
-        message="Possible overdraw: Root element paints background `@color/white` with a theme that also paints a background (inferred theme is `@style/Theme.DuckDuckGo.Light`)"
+        message="Possible overdraw: Root element paints background `@color/white` with a theme that also paints a background (inferred theme is `@style/Theme.Revenge.Light`)"
         errorLine1="    android:background=&quot;@color/white&quot;"
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -8460,7 +8460,7 @@
 
     <issue
         id="Overdraw"
-        message="Possible overdraw: Root element paints background `@drawable/cookies_text_background` with a theme that also paints a background (inferred theme is `@style/Theme.DuckDuckGo.Light`)"
+        message="Possible overdraw: Root element paints background `@drawable/cookies_text_background` with a theme that also paints a background (inferred theme is `@style/Theme.Revenge.Light`)"
         errorLine1="    android:background=&quot;@drawable/cookies_text_background&quot;"
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -8471,7 +8471,7 @@
 
     <issue
         id="Overdraw"
-        message="Possible overdraw: Root element paints background `@color/white` with a theme that also paints a background (inferred theme is `@style/Theme.DuckDuckGo.Light`)"
+        message="Possible overdraw: Root element paints background `@color/white` with a theme that also paints a background (inferred theme is `@style/Theme.Revenge.Light`)"
         errorLine1="    android:background=&quot;@color/white&quot;"
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -8482,7 +8482,7 @@
 
     <issue
         id="Overdraw"
-        message="Possible overdraw: Root element paints background `@drawable/cookies_text_background` with a theme that also paints a background (inferred theme is `@style/Theme.DuckDuckGo.Light`)"
+        message="Possible overdraw: Root element paints background `@drawable/cookies_text_background` with a theme that also paints a background (inferred theme is `@style/Theme.Revenge.Light`)"
         errorLine1="             android:background=&quot;@drawable/cookies_text_background&quot;"
         errorLine2="             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -8493,7 +8493,7 @@
 
     <issue
         id="Overdraw"
-        message="Possible overdraw: Root element paints background `@drawable/cookies_text_background` with a theme that also paints a background (inferred theme is `@style/Theme.DuckDuckGo.Light`)"
+        message="Possible overdraw: Root element paints background `@drawable/cookies_text_background` with a theme that also paints a background (inferred theme is `@style/Theme.Revenge.Light`)"
         errorLine1="    android:background=&quot;@drawable/cookies_text_background&quot;>"
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -8504,7 +8504,7 @@
 
     <issue
         id="Overdraw"
-        message="Possible overdraw: Root element paints background `?attr/daxColorBackground` with a theme that also paints a background (inferred theme is `@style/Theme.DuckDuckGo.Light`)"
+        message="Possible overdraw: Root element paints background `?attr/daxColorBackground` with a theme that also paints a background (inferred theme is `@style/Theme.Revenge.Light`)"
         errorLine1="    android:background=&quot;?attr/daxColorBackground&quot;"
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -8515,7 +8515,7 @@
 
     <issue
         id="Overdraw"
-        message="Possible overdraw: Root element paints background `?daxColorToolbar` with a theme that also paints a background (inferred theme is `@style/Theme.DuckDuckGo.Light`)"
+        message="Possible overdraw: Root element paints background `?daxColorToolbar` with a theme that also paints a background (inferred theme is `@style/Theme.Revenge.Light`)"
         errorLine1="    android:background=&quot;?daxColorToolbar&quot;"
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -8526,7 +8526,7 @@
 
     <issue
         id="Overdraw"
-        message="Possible overdraw: Root element paints background `?daxColorToolbar` with a theme that also paints a background (inferred theme is `@style/Theme.DuckDuckGo.Light`)"
+        message="Possible overdraw: Root element paints background `?daxColorToolbar` with a theme that also paints a background (inferred theme is `@style/Theme.Revenge.Light`)"
         errorLine1="    android:background=&quot;?daxColorToolbar&quot;"
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -8548,7 +8548,7 @@
 
     <issue
         id="Overdraw"
-        message="Possible overdraw: Root element paints background `@drawable/popup_menu_bg` with a theme that also paints a background (inferred theme is `@style/Theme.DuckDuckGo.Light`)"
+        message="Possible overdraw: Root element paints background `@drawable/popup_menu_bg` with a theme that also paints a background (inferred theme is `@style/Theme.Revenge.Light`)"
         errorLine1="    android:background=&quot;@drawable/popup_menu_bg&quot;>"
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -8559,7 +8559,7 @@
 
     <issue
         id="Overdraw"
-        message="Possible overdraw: Root element paints background `@drawable/popup_menu_bg` with a theme that also paints a background (inferred theme is `@style/Theme.DuckDuckGo.Light`)"
+        message="Possible overdraw: Root element paints background `@drawable/popup_menu_bg` with a theme that also paints a background (inferred theme is `@style/Theme.Revenge.Light`)"
         errorLine1="    android:background=&quot;@drawable/popup_menu_bg&quot;"
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -8570,7 +8570,7 @@
 
     <issue
         id="Overdraw"
-        message="Possible overdraw: Root element paints background `@drawable/popup_menu_bg` with a theme that also paints a background (inferred theme is `@style/Theme.DuckDuckGo.Light`)"
+        message="Possible overdraw: Root element paints background `@drawable/popup_menu_bg` with a theme that also paints a background (inferred theme is `@style/Theme.Revenge.Light`)"
         errorLine1="    android:background=&quot;@drawable/popup_menu_bg&quot;"
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -8581,7 +8581,7 @@
 
     <issue
         id="Overdraw"
-        message="Possible overdraw: Root element paints background `@drawable/popup_menu_bg` with a theme that also paints a background (inferred theme is `@style/Theme.DuckDuckGo.Light`)"
+        message="Possible overdraw: Root element paints background `@drawable/popup_menu_bg` with a theme that also paints a background (inferred theme is `@style/Theme.Revenge.Light`)"
         errorLine1="    android:background=&quot;@drawable/popup_menu_bg&quot;"
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -8592,7 +8592,7 @@
 
     <issue
         id="Overdraw"
-        message="Possible overdraw: Root element paints background `@drawable/popup_menu_bg` with a theme that also paints a background (inferred theme is `@style/Theme.DuckDuckGo.Light`)"
+        message="Possible overdraw: Root element paints background `@drawable/popup_menu_bg` with a theme that also paints a background (inferred theme is `@style/Theme.Revenge.Light`)"
         errorLine1="              android:background=&quot;@drawable/popup_menu_bg&quot;>"
         errorLine2="              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -8603,7 +8603,7 @@
 
     <issue
         id="Overdraw"
-        message="Possible overdraw: Root element paints background `@drawable/popup_menu_bg` with a theme that also paints a background (inferred theme is `@style/Theme.DuckDuckGo.Light`)"
+        message="Possible overdraw: Root element paints background `@drawable/popup_menu_bg` with a theme that also paints a background (inferred theme is `@style/Theme.Revenge.Light`)"
         errorLine1="    android:background=&quot;@drawable/popup_menu_bg&quot;"
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -8614,7 +8614,7 @@
 
     <issue
         id="Overdraw"
-        message="Possible overdraw: Root element paints background `@drawable/popup_menu_bg` with a theme that also paints a background (inferred theme is `@style/Theme.DuckDuckGo.Light`)"
+        message="Possible overdraw: Root element paints background `@drawable/popup_menu_bg` with a theme that also paints a background (inferred theme is `@style/Theme.Revenge.Light`)"
         errorLine1="    android:background=&quot;@drawable/popup_menu_bg&quot;"
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -8625,7 +8625,7 @@
 
     <issue
         id="Overdraw"
-        message="Possible overdraw: Root element paints background `@drawable/popup_menu_bg` with a theme that also paints a background (inferred theme is `@style/Theme.DuckDuckGo.Light`)"
+        message="Possible overdraw: Root element paints background `@drawable/popup_menu_bg` with a theme that also paints a background (inferred theme is `@style/Theme.Revenge.Light`)"
         errorLine1="              android:background=&quot;@drawable/popup_menu_bg&quot;>"
         errorLine2="              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -8636,7 +8636,7 @@
 
     <issue
         id="Overdraw"
-        message="Possible overdraw: Root element paints background `@drawable/popup_menu_bg` with a theme that also paints a background (inferred theme is `@style/Theme.DuckDuckGo.Light`)"
+        message="Possible overdraw: Root element paints background `@drawable/popup_menu_bg` with a theme that also paints a background (inferred theme is `@style/Theme.Revenge.Light`)"
         errorLine1="              android:background=&quot;@drawable/popup_menu_bg&quot;>"
         errorLine2="              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -8647,7 +8647,7 @@
 
     <issue
         id="Overdraw"
-        message="Possible overdraw: Root element paints background `@drawable/popup_menu_bg` with a theme that also paints a background (inferred theme is `@style/Theme.DuckDuckGo.Light`)"
+        message="Possible overdraw: Root element paints background `@drawable/popup_menu_bg` with a theme that also paints a background (inferred theme is `@style/Theme.Revenge.Light`)"
         errorLine1="    android:background=&quot;@drawable/popup_menu_bg&quot;>"
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -8658,7 +8658,7 @@
 
     <issue
         id="Overdraw"
-        message="Possible overdraw: Root element paints background `?attr/preferredNavigationBarColor` with a theme that also paints a background (inferred theme is `@style/Theme.DuckDuckGo.Light`)"
+        message="Possible overdraw: Root element paints background `?attr/preferredNavigationBarColor` with a theme that also paints a background (inferred theme is `@style/Theme.Revenge.Light`)"
         errorLine1="    android:background=&quot;?attr/preferredNavigationBarColor&quot;"
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -8669,7 +8669,7 @@
 
     <issue
         id="Overdraw"
-        message="Possible overdraw: Root element paints background `?attr/preferredNavigationBarColor` with a theme that also paints a background (inferred theme is `@style/Theme.DuckDuckGo.Light`)"
+        message="Possible overdraw: Root element paints background `?attr/preferredNavigationBarColor` with a theme that also paints a background (inferred theme is `@style/Theme.Revenge.Light`)"
         errorLine1="    android:background=&quot;?attr/preferredNavigationBarColor&quot;"
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -8680,7 +8680,7 @@
 
     <issue
         id="Overdraw"
-        message="Possible overdraw: Root element paints background `?attr/daxColorBrowserOverlay` with a theme that also paints a background (inferred theme is `@style/Theme.DuckDuckGo.Light`)"
+        message="Possible overdraw: Root element paints background `?attr/daxColorBrowserOverlay` with a theme that also paints a background (inferred theme is `@style/Theme.Revenge.Light`)"
         errorLine1="    android:background=&quot;?attr/daxColorBrowserOverlay&quot; />"
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -8691,7 +8691,7 @@
 
     <issue
         id="Overdraw"
-        message="Possible overdraw: Root element paints background `?attr/daxColorBackground` with a theme that also paints a background (inferred theme is `@style/Theme.DuckDuckGo.Light`)"
+        message="Possible overdraw: Root element paints background `?attr/daxColorBackground` with a theme that also paints a background (inferred theme is `@style/Theme.Revenge.Light`)"
         errorLine1="    android:background=&quot;?attr/daxColorBackground&quot;>"
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -8702,7 +8702,7 @@
 
     <issue
         id="Overdraw"
-        message="Possible overdraw: Root element paints background `@drawable/selectable_item_experimental_background` with a theme that also paints a background (inferred theme is `@style/Theme.DuckDuckGo.Light`)"
+        message="Possible overdraw: Root element paints background `@drawable/selectable_item_experimental_background` with a theme that also paints a background (inferred theme is `@style/Theme.Revenge.Light`)"
         errorLine1="    android:background=&quot;@drawable/selectable_item_experimental_background&quot;"
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -8713,7 +8713,7 @@
 
     <issue
         id="Overdraw"
-        message="Possible overdraw: Root element paints background `?attr/daxColorBackground` with a theme that also paints a background (inferred theme is `@style/Theme.DuckDuckGo.Light`)"
+        message="Possible overdraw: Root element paints background `?attr/daxColorBackground` with a theme that also paints a background (inferred theme is `@style/Theme.Revenge.Light`)"
         errorLine1="    android:background=&quot;?attr/daxColorBackground&quot;>"
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -8724,7 +8724,7 @@
 
     <issue
         id="Overdraw"
-        message="Possible overdraw: Root element paints background `?attr/daxColorBackground` with a theme that also paints a background (inferred theme is `@style/Theme.DuckDuckGo.Light`)"
+        message="Possible overdraw: Root element paints background `?attr/daxColorBackground` with a theme that also paints a background (inferred theme is `@style/Theme.Revenge.Light`)"
         errorLine1="    android:background=&quot;?attr/daxColorBackground&quot;>"
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -9712,8 +9712,8 @@
 
     <issue
         id="UnusedResources"
-        message="The resource `R.string.onboardingDaxText` appears to be unused"
-        errorLine1="    &lt;string name=&quot;onboardingDaxText&quot;>&lt;![CDATA[The Internet can be kinda creepy.&lt;br/>&lt;br/>Not to worry! Searching and browsing privately is easier than you think.]]&gt;&lt;/string>"
+        message="The resource `R.string.onboardingRevengeText` appears to be unused"
+        errorLine1="    &lt;string name=&quot;onboardingRevengeText&quot;>&lt;![CDATA[The Internet can be kinda creepy.&lt;br/>&lt;br/>Not to worry! Searching and browsing privately is easier than you think.]]&gt;&lt;/string>"
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
@@ -10273,8 +10273,8 @@
 
     <issue
         id="UnusedResources"
-        message="The resource `R.string.onboardingFireButtonDaxDialogCancelButton` appears to be unused"
-        errorLine1="    &lt;string name=&quot;onboardingFireButtonDaxDialogCancelButton&quot;>Skip&lt;/string>"
+        message="The resource `R.string.onboardingFireButtonRevengeDialogCancelButton` appears to be unused"
+        errorLine1="    &lt;string name=&quot;onboardingFireButtonRevengeDialogCancelButton&quot;>Skip&lt;/string>"
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
@@ -10284,8 +10284,8 @@
 
     <issue
         id="UnusedResources"
-        message="The resource `R.string.onboardingInContextEndDaxDialogDescription` appears to be unused"
-        errorLine1="    &lt;string name=&quot;onboardingInContextEndDaxDialogDescription&quot;>Remember: every time you browse with me a creepy ad loses its wings. 👌&lt;/string>"
+        message="The resource `R.string.onboardingInContextEndRevengeDialogDescription` appears to be unused"
+        errorLine1="    &lt;string name=&quot;onboardingInContextEndRevengeDialogDescription&quot;>Remember: every time you browse with me a creepy ad loses its wings. 👌&lt;/string>"
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
@@ -10295,8 +10295,8 @@
 
     <issue
         id="UnusedResources"
-        message="The resource `R.string.onboardingPrivacyProDaxDialogCancelButton` appears to be unused"
-        errorLine1="    &lt;string name=&quot;onboardingPrivacyProDaxDialogCancelButton&quot;>Skip&lt;/string>"
+        message="The resource `R.string.onboardingPrivacyProRevengeDialogCancelButton` appears to be unused"
+        errorLine1="    &lt;string name=&quot;onboardingPrivacyProRevengeDialogCancelButton&quot;>Skip&lt;/string>"
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
@@ -10703,7 +10703,7 @@
     <issue
         id="TypographyEllipsis"
         message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
-        errorLine1="    &lt;string name=&quot;onboardingPrivacyProDaxDialogTitle&quot;>Åh, før jeg glemmer det...&lt;/string>"
+        errorLine1="    &lt;string name=&quot;onboardingPrivacyProRevengeDialogTitle&quot;>Åh, før jeg glemmer det...&lt;/string>"
         errorLine2="                                                      ~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-da/strings.xml"
@@ -10714,7 +10714,7 @@
     <issue
         id="TypographyEllipsis"
         message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
-        errorLine1="    &lt;string name=&quot;onboardingPrivacyProDaxDialogTitle&quot;>Oh, bevor ich es vergesse ...&lt;/string>"
+        errorLine1="    &lt;string name=&quot;onboardingPrivacyProRevengeDialogTitle&quot;>Oh, bevor ich es vergesse ...&lt;/string>"
         errorLine2="                                                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-de/strings.xml"
@@ -10725,7 +10725,7 @@
     <issue
         id="TypographyEllipsis"
         message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
-        errorLine1="    &lt;string name=&quot;onboardingPrivacyProDaxDialogTitle&quot;>Πριν το ξεχάσω...&lt;/string>"
+        errorLine1="    &lt;string name=&quot;onboardingPrivacyProRevengeDialogTitle&quot;>Πριν το ξεχάσω...&lt;/string>"
         errorLine2="                                                      ~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-el/strings.xml"
@@ -10736,7 +10736,7 @@
     <issue
         id="TypographyEllipsis"
         message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
-        errorLine1="    &lt;string name=&quot;onboardingPrivacyProDaxDialogTitle&quot;>Ja enne kui ma unustan...&lt;/string>"
+        errorLine1="    &lt;string name=&quot;onboardingPrivacyProRevengeDialogTitle&quot;>Ja enne kui ma unustan...&lt;/string>"
         errorLine2="                                                      ~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-et/strings.xml"
@@ -10747,7 +10747,7 @@
     <issue
         id="TypographyEllipsis"
         message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
-        errorLine1="    &lt;string name=&quot;onboardingPrivacyProDaxDialogTitle&quot;>Ai niin...&lt;/string>"
+        errorLine1="    &lt;string name=&quot;onboardingPrivacyProRevengeDialogTitle&quot;>Ai niin...&lt;/string>"
         errorLine2="                                                      ~~~~~~~~~~">
         <location
             file="src/main/res/values-fi/strings.xml"
@@ -10758,7 +10758,7 @@
     <issue
         id="TypographyEllipsis"
         message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
-        errorLine1="    &lt;string name=&quot;onboardingPrivacyProDaxDialogTitle&quot;>Ó, mielőtt elfelejtem...&lt;/string>"
+        errorLine1="    &lt;string name=&quot;onboardingPrivacyProRevengeDialogTitle&quot;>Ó, mielőtt elfelejtem...&lt;/string>"
         errorLine2="                                                      ~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-hu/strings.xml"
@@ -10769,7 +10769,7 @@
     <issue
         id="TypographyEllipsis"
         message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
-        errorLine1="    &lt;string name=&quot;onboardingPrivacyProDaxDialogTitle&quot;>Oh, prima che me ne dimentichi...&lt;/string>"
+        errorLine1="    &lt;string name=&quot;onboardingPrivacyProRevengeDialogTitle&quot;>Oh, prima che me ne dimentichi...&lt;/string>"
         errorLine2="                                                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-it/strings.xml"
@@ -10780,7 +10780,7 @@
     <issue
         id="TypographyEllipsis"
         message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
-        errorLine1="    &lt;string name=&quot;onboardingPrivacyProDaxDialogTitle&quot;>Oh, voordat ik het vergeet...&lt;/string>"
+        errorLine1="    &lt;string name=&quot;onboardingPrivacyProRevengeDialogTitle&quot;>Oh, voordat ik het vergeet...&lt;/string>"
         errorLine2="                                                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-nl/strings.xml"
@@ -10791,7 +10791,7 @@
     <issue
         id="TypographyEllipsis"
         message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
-        errorLine1="    &lt;string name=&quot;onboardingPrivacyProDaxDialogTitle&quot;>Innan jag glömmer det ...&lt;/string>"
+        errorLine1="    &lt;string name=&quot;onboardingPrivacyProRevengeDialogTitle&quot;>Innan jag glömmer det ...&lt;/string>"
         errorLine2="                                                      ~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-sv/strings.xml"
@@ -10802,7 +10802,7 @@
     <issue
         id="TypographyEllipsis"
         message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
-        errorLine1="    &lt;string name=&quot;onboardingPrivacyProDaxDialogTitle&quot;>Ah, unutmadan...&lt;/string>"
+        errorLine1="    &lt;string name=&quot;onboardingPrivacyProRevengeDialogTitle&quot;>Ah, unutmadan...&lt;/string>"
         errorLine2="                                                      ~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-tr/strings.xml"
@@ -10813,7 +10813,7 @@
     <issue
         id="TypographyEllipsis"
         message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
-        errorLine1="    &lt;string name=&quot;onboardingPrivacyProDaxDialogTitle&quot;>Ak, pirms es aizmirsu...&lt;/string>"
+        errorLine1="    &lt;string name=&quot;onboardingPrivacyProRevengeDialogTitle&quot;>Ak, pirms es aizmirsu...&lt;/string>"
         errorLine2="                                                      ~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-lv/strings.xml"
@@ -10824,7 +10824,7 @@
     <issue
         id="TypographyEllipsis"
         message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
-        errorLine1="    &lt;string name=&quot;onboardingPrivacyProDaxDialogTitle&quot;>Oh, înainte să uit...&lt;/string>"
+        errorLine1="    &lt;string name=&quot;onboardingPrivacyProRevengeDialogTitle&quot;>Oh, înainte să uit...&lt;/string>"
         errorLine2="                                                      ~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-ro/strings.xml"
@@ -10835,7 +10835,7 @@
     <issue
         id="TypographyEllipsis"
         message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
-        errorLine1="    &lt;string name=&quot;onboardingPrivacyProDaxDialogTitle&quot;>Než to zapomenu...&lt;/string>"
+        errorLine1="    &lt;string name=&quot;onboardingPrivacyProRevengeDialogTitle&quot;>Než to zapomenu...&lt;/string>"
         errorLine2="                                                      ~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-cs/strings.xml"
@@ -10846,7 +10846,7 @@
     <issue
         id="TypographyEllipsis"
         message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
-        errorLine1="    &lt;string name=&quot;onboardingPrivacyProDaxDialogTitle&quot;>Oh, prije nego zaboravim...&lt;/string>"
+        errorLine1="    &lt;string name=&quot;onboardingPrivacyProRevengeDialogTitle&quot;>Oh, prije nego zaboravim...&lt;/string>"
         errorLine2="                                                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-hr/strings.xml"
@@ -10857,7 +10857,7 @@
     <issue
         id="TypographyEllipsis"
         message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
-        errorLine1="    &lt;string name=&quot;onboardingPrivacyProDaxDialogTitle&quot;>Oi, kol nepamiršau...&lt;/string>"
+        errorLine1="    &lt;string name=&quot;onboardingPrivacyProRevengeDialogTitle&quot;>Oi, kol nepamiršau...&lt;/string>"
         errorLine2="                                                      ~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-lt/strings.xml"
@@ -10868,7 +10868,7 @@
     <issue
         id="TypographyEllipsis"
         message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
-        errorLine1="    &lt;string name=&quot;onboardingPrivacyProDaxDialogTitle&quot;>Кстати, пока не забыл...&lt;/string>"
+        errorLine1="    &lt;string name=&quot;onboardingPrivacyProRevengeDialogTitle&quot;>Кстати, пока не забыл...&lt;/string>"
         errorLine2="                                                      ~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-ru/strings.xml"
@@ -10879,7 +10879,7 @@
     <issue
         id="TypographyEllipsis"
         message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
-        errorLine1="    &lt;string name=&quot;onboardingPrivacyProDaxDialogTitle&quot;>Oh, preden pozabim ...&lt;/string>"
+        errorLine1="    &lt;string name=&quot;onboardingPrivacyProRevengeDialogTitle&quot;>Oh, preden pozabim ...&lt;/string>"
         errorLine2="                                                      ~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-sl/strings.xml"
@@ -10998,7 +10998,7 @@
 
     <issue
         id="ClickableViewAccessibility"
-        message="Custom view ``DaxTextInput`` has `setOnTouchListener` called on it but does not override `performClick`"
+        message="Custom view ``RevengeTextInput`` has `setOnTouchListener` called on it but does not override `performClick`"
         errorLine1="                brokenSiteInput.setOnTouchListener(LayoutScrollingTouchListener(rootScrollView, brokenSiteInput.y.toInt()))"
         errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -11009,7 +11009,7 @@
 
     <issue
         id="ClickableViewAccessibility"
-        message="Custom view ``DaxTextInput`` has `setOnTouchListener` called on it but does not override `performClick`"
+        message="Custom view ``RevengeTextInput`` has `setOnTouchListener` called on it but does not override `performClick`"
         errorLine1="                openEndedFeedback.setOnTouchListener(LayoutScrollingTouchListener(rootScrollView, openEndedFeedback.y.toInt()))"
         errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -11042,7 +11042,7 @@
 
     <issue
         id="ClickableViewAccessibility"
-        message="Custom view ``DaxTextInput`` has `setOnTouchListener` called on it but does not override `performClick`"
+        message="Custom view ``RevengeTextInput`` has `setOnTouchListener` called on it but does not override `performClick`"
         errorLine1="                binding.openEndedFeedback.setOnTouchListener(LayoutScrollingTouchListener(rootScrollView, openEndedFeedback.y.toInt()))"
         errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location

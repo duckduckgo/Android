@@ -62,7 +62,7 @@ class NewAddressBarOptionBottomSheetDialog(
     private val binding: BottomSheetNewAddressBarOptionBinding =
         BottomSheetNewAddressBarOptionBinding.inflate(LayoutInflater.from(context))
 
-    private var searchAndDuckAiSelected = true
+    private var searchAndRevengeAISelected = true
     private var originalOrientation: Int = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
 
     private var lottieTask: LottieTask<LottieComposition>? = null
@@ -94,7 +94,7 @@ class NewAddressBarOptionBottomSheetDialog(
         setupSelectionLogic()
 
         binding.newAddressBarOptionBottomSheetDialogPrimaryButton.setOnClickListener {
-            val selection = if (searchAndDuckAiSelected) SEARCH_AND_AI else SEARCH_ONLY
+            val selection = if (searchAndRevengeAISelected) SEARCH_AND_AI else SEARCH_ONLY
             newAddressBarCallback?.onConfirmed(selection)
             restoreOrientation()
             dismiss()
@@ -124,15 +124,15 @@ class NewAddressBarOptionBottomSheetDialog(
         updateSelectionState()
 
         binding.newAddressBarOptionBottomSheetDialogSearchOnlyButton.setOnClickListener {
-            if (searchAndDuckAiSelected) {
-                searchAndDuckAiSelected = false
+            if (searchAndRevengeAISelected) {
+                searchAndRevengeAISelected = false
                 updateSelectionState()
             }
         }
 
-        binding.newAddressBarOptionBottomSheetDialogSearchAndDuckAiButton.setOnClickListener {
-            if (!searchAndDuckAiSelected) {
-                searchAndDuckAiSelected = true
+        binding.newAddressBarOptionBottomSheetDialogSearchAndRevengeAIButton.setOnClickListener {
+            if (!searchAndRevengeAISelected) {
+                searchAndRevengeAISelected = true
                 updateSelectionState()
             }
         }
@@ -140,11 +140,11 @@ class NewAddressBarOptionBottomSheetDialog(
 
     private fun updateSelectionState() {
         binding.newAddressBarOptionBottomSheetDialogSearchOnlyButton.isSelected =
-            !searchAndDuckAiSelected
-        binding.searchOnlyCheckbox.isChecked = !searchAndDuckAiSelected
-        binding.searchOnlyCheckbox.isEnabled = !searchAndDuckAiSelected
+            !searchAndRevengeAISelected
+        binding.searchOnlyCheckbox.isChecked = !searchAndRevengeAISelected
+        binding.searchOnlyCheckbox.isEnabled = !searchAndRevengeAISelected
         binding.newAddressBarOptionBottomSheetDialogSearchOnlyButton.background =
-            if (!searchAndDuckAiSelected) {
+            if (!searchAndRevengeAISelected) {
                 ContextCompat.getDrawable(
                     context,
                     R.drawable.background_new_address_bar_option_selected,
@@ -153,12 +153,12 @@ class NewAddressBarOptionBottomSheetDialog(
                 ContextCompat.getDrawable(context, R.drawable.background_new_address_bar_option)
             }
 
-        binding.newAddressBarOptionBottomSheetDialogSearchAndDuckAiButton.isSelected =
-            searchAndDuckAiSelected
-        binding.searchAndDuckAiCheckbox.isChecked = searchAndDuckAiSelected
-        binding.searchAndDuckAiCheckbox.isEnabled = searchAndDuckAiSelected
-        binding.newAddressBarOptionBottomSheetDialogSearchAndDuckAiButton.background =
-            if (searchAndDuckAiSelected) {
+        binding.newAddressBarOptionBottomSheetDialogSearchAndRevengeAIButton.isSelected =
+            searchAndRevengeAISelected
+        binding.searchAndRevengeAICheckbox.isChecked = searchAndRevengeAISelected
+        binding.searchAndRevengeAICheckbox.isEnabled = searchAndRevengeAISelected
+        binding.newAddressBarOptionBottomSheetDialogSearchAndRevengeAIButton.background =
+            if (searchAndRevengeAISelected) {
                 ContextCompat.getDrawable(
                     context,
                     R.drawable.background_new_address_bar_option_selected,

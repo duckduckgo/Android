@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (c) 2022 DuckDuckGo
+  ~ Copyright (c) 2022 Revenge
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -17,9 +17,9 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="appName" translatable="false">DuckDuckGo</string>
-    <string name="appDescription" translatable="false">DuckDuckGo</string>
-    <string name="duckDuckGoLogoDescription">DuckDuckGo logo</string>
+    <string name="appName" translatable="false">Revenge</string>
+    <string name="appDescription" translatable="false">Revenge</string>
+    <string name="duckDuckGoLogoDescription">Revenge logo</string>
     <string name="duckDuckGoProtectionPrivacyPeaceTagLine">Kaitse Privaatsus Meelerahu.</string>
     <string name="yes">Jah</string>
     <string name="no">Ei</string>
@@ -28,15 +28,15 @@
     <string name="search">Otsing</string>
 
     <!-- Onboarding Activity -->
-    <string name="onboardingDefaultBrowserDescription">Avage sätted, et DuckDuckGo abil iga kord otsida ja sirvida.</string>
-    <string name="onboardingDefaultBrowserTitle">Muuda DuckDuckGo oma vaikimisi brauseriks</string>
+    <string name="onboardingDefaultBrowserDescription">Avage sätted, et Revenge abil iga kord otsida ja sirvida.</string>
+    <string name="onboardingDefaultBrowserTitle">Muuda Revenge oma vaikimisi brauseriks</string>
 
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Rakenduse vaikeseadete ekraani ei saa käivitada</string>
     <string name="setAsDefaultBrowser">Määrake vaikebrauseriks</string>
     <string name="defaultBrowserMaybeLater">Võib-olla hiljem</string>
     <string name="defaultBrowserDescriptionNoDefault">Avage linke igal ajal, rahuliku meelega.</string>
-    <string name="defaultBrowserInstructions">Valige DuckDuckGo ja koputage valikut <font color="#678fff">Alati</font>.</string>
+    <string name="defaultBrowserInstructions">Valige Revenge ja koputage valikut <font color="#678fff">Alati</font>.</string>
 
     <!-- Browser Activity -->
     <string name="browserPopupMenu">Brauseri menüü</string>
@@ -90,11 +90,11 @@
     <!-- Opening external apps -->
     <string name="openExternalApp">Ava väline rakendus</string>
     <string name="launchingExternalApp">Ava teises rakenduses</string>
-    <string name="confirmOpenExternalApp">Kas soovite selle sisu vaatamiseks lahkuda DuckDuckGo\'st?</string>
+    <string name="confirmOpenExternalApp">Kas soovite selle sisu vaatamiseks lahkuda Revenge\'st?</string>
     <string name="unableToOpenLink">Seda tüüpi linki ei saa avada</string>
 
     <!-- Tabs -->
-    <string name="homeTab" translatable="false">DuckDuckGo</string>
+    <string name="homeTab" translatable="false">Revenge</string>
     <string name="tabActivityTitle">Vahelehed</string>
     <string name="tabsMenuItem">Vahelehed</string>
     <string name="newTabMenuItem">Uus vaheleht</string>
@@ -119,7 +119,7 @@
     <!-- Fire -->
     <string name="fireMenu">Kustuta andmed</string>
     <string name="fireClearAll">Kustuta vahekaardid ja andmed</string>
-    <string name="fireClearAllPlusDuckChats">Kustuta vahekaardid, andmed ja Duck.ai vestlused</string>
+    <string name="fireClearAllPlusRevenge_Chats">Kustuta vahekaardid, andmed ja Revenge AI vestlused</string>
     <string name="fireCancel">Tühista</string>
     <string name="fireDataCleared">Andmed on kustutatud</string>
 
@@ -129,7 +129,7 @@
     <string name="settingsHeadingProtections">Kaitsed</string>
     <string name="settingsHeadingAppearance">Välimus</string>
     <string name="settingsHeadingAbout">Teave</string>
-    <string name="settingsAboutDuckduckgo">DuckDuckGo teave</string>
+    <string name="settingsAboutDuckduckgo">Revenge teave</string>
     <string name="settingsVersion">Versioon</string>
     <string name="leaveFeedback">Jaga tagasisidet</string>
     <string name="leaveFeedbackNew">Saada tagasisidet</string>
@@ -159,12 +159,12 @@
     <string name="settingsAddWidget">Lisa vidin avakuvale</string>
     <string name="settingsAddressBarPosition">Määra aadressiriba asukoht</string>
     <string name="settingsEnableVoiceSearch">Luba privaatne häälotsing</string>
-    <string name="settingsDDGOnOtherPlatforms">DuckDuckGo muudel platvormidel</string>
-    <string name="settingsDuckAi">AI funktsioonid</string>
+    <string name="settingsDDGOnOtherPlatforms">Revenge muudel platvormidel</string>
+    <string name="settingsRevengeAI">AI funktsioonid</string>
 
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">Privaatne otsing</string>
-    <string name="privateSearchDescription">DuckDuckGo Private Search on sinu vaikeotsimootor, mille abil saad veebis otsida ilma, et sind jälgitaks.</string>
+    <string name="privateSearchDescription">Revenge Private Search on sinu vaikeotsimootor, mille abil saad veebis otsida ilma, et sind jälgitaks.</string>
     <string name="privateSearchMoreSearchSettingsPrimaryText">Rohkem otsingu seadeid</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Kohanda oma otsingukeelt, piirkonda ja muud</string>
     <string name="privateSearchMoreSearchSettingsTitle">Rohkem otsinguseadeid</string>
@@ -183,7 +183,7 @@
     <string name="webTrackingProtectionActivityTitle">Veebijälgimise kaitse</string>
     <string name="webTrackingProtectionLearnMoreTitle">Veebijälgimise kaitse</string>
     <string name="webTrackingProtectionTitle">Veebijälgimise kaitse</string>
-    <string name="webTrackingProtectionExplanationDescription"><![CDATA[DuckDuckGo brauser pakub jälgimiskaitseid, mis on alati aktiivsed.\n<a href=\"\">Loe edasi</a>]]></string>
+    <string name="webTrackingProtectionExplanationDescription"><![CDATA[Revenge brauser pakub jälgimiskaitseid, mis on alati aktiivsed.\n<a href=\"\">Loe edasi</a>]]></string>
     <string name="webTrackingProtectionExplanationTitle">Kuidas me sind kaitseme</string>
     <string name="webTrackingProtectionThirdPartyTrackersTitle">Blokeerib kolmanda poole jälgurid</string>
     <string name="webTrackingProtectionThirdPartyTrackersDescription">Aitab blokeerida kolmanda poole küpsiseid, mis jälgivad sind lehelt lehele, takistades kolmanda poole jälgijate laadimist.</string>
@@ -228,7 +228,7 @@
     <string name="settingsAutomaticallyClearWhatOptionNone">Puudub</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Vahelehed</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Vahelehed ja andmed</string>
-    <string name="settingsAutomaticallyClearWhatOptionTabsAndDataAndChats">Vahekaardid, andmed ja Duck.ai vestlused</string>
+    <string name="settingsAutomaticallyClearWhatOptionTabsAndDataAndChats">Vahekaardid, andmed ja Revenge AI vestlused</string>
 
     <string name="settingsAutomaticallyClearWhen">Kustuta…</string>
     <string name="settingsAutomaticallyClearWhenDialogTitle">Kustuta…</string>
@@ -238,16 +238,16 @@
     <string name="settingsAutomaticallyClearWhenAppExit15Minutes">Rakendusest väljumisel, 15-minutilise passiivsuse järel</string>
     <string name="settingsAutomaticallyClearWhenAppExit30Minutes">Rakendusest väljumisel, 30-minutilise passiivsuse järel</string>
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Rakendusest väljumisel, 1-tunnise passiivsuse järel</string>
-    <string name="settingsClearAiDataTitle">Tühjenda Duck.ai vestlused</string>
-    <string name="settingsClearAiDataDeleteMessage">Fire Button kustutab ka Duck.ai ajaloo, sealhulgas kinnitatud vestlused.</string>
+    <string name="settingsClearAiDataTitle">Tühjenda Revenge AI vestlused</string>
+    <string name="settingsClearAiDataDeleteMessage">Fire Button kustutab ka Revenge AI ajaloo, sealhulgas kinnitatud vestlused.</string>
     <string name="settingsClearDataActionSecondaryText">Kustutab kõik vahekaardid ja andmed kõigi saitide kohta, mida sa pole tulekindlaks teinud.</string>
-    <string name="settingsClearDataActionPlusDuckChatsSecondaryText">Kustutab kõik vahekaardid, Duck.ai vestlused ja andmed kõigi saitide kohta, mida sa pole tulekindlaks teinud.</string>
+    <string name="settingsClearDataActionPlusRevenge_ChatsSecondaryText">Kustutab kõik vahekaardid, Revenge AI vestlused ja andmed kõigi saitide kohta, mida sa pole tulekindlaks teinud.</string>
 
     <!-- About Activity -->
-    <string name="aboutActivityTitle">DuckDuckGo\'st</string>
+    <string name="aboutActivityTitle">Revenge\'st</string>
     <string name="aboutActivityTitleNew">Teave</string>
     <string name="aboutHeaderNewTagLine">Kaitse Privaatsus Meelerahu.</string>
-    <string name="aboutDescriptionBrandUpdate2025">Tere tulemast Pardi poolele!\n\nDuckDuckGo on sõltumatu veebikaitseettevõte kõikidele, kes tahavad oma isikliku teabe üle kontrolli tagasi saada.\n\nUsume, et parim viis teie isikuandmete kaitsmiseks häkkerite, petturite ja eraelu puutumatust rikkuvate ettevõtete eest on nende kogumise täielik vältimine. Seetõttu valivad miljonid inimesed <annotation type="chart_comparison">DuckDuckGo Chrome\'i ja teiste brauserite asemel</annotation>, et otsida ja sirvida internetis. Meie sisseehitatud otsingumootor on nagu Google, kuid ei jälgi kunagi teie otsinguid. Ja meie sirvimiskaitsed, nagu reklaamijälgijate ja küpsiste blokeerimine, aitavad takistada teistel ettevõtetel teie andmeid kogumast. Oh, ja meie brauser on tasuta — teenime raha <annotation type="privacy_respecting_ads">privaatsust austavate otsingureklaamidega</annotation>, mitte teie andmeid ära kasutades.\n\nLisaks pakume ka <annotation type="ppro_help_page">DuckDuckGo tellimust</annotation>, mis on integreeritud meie brauserisse. Tellijad saavad veelgi tõhusama privaatsuse kaitse kiire ja lihtsa <annotation type="vpn_help_page">VPN-iga</annotation>, mis aitab kaitsta sinu veebitegevust, juurdepääsu täiustatud tehisintellekti mudelitele meie privaatses tehisintellekti vestlusteenuses Duck.ai, teenuse, mis otsib ja eemaldab sinu isikuandmeid inimesteotsingu saitidelt, ning teenuse, mis taastab sinu identiteedi, kui see varastatakse.\n\nVõtke tagasi kontroll oma isikuandmete üle brauseriga, mis on loodud andmete kaitsmiseks ja mitte nende kogumiseks.</string>
+    <string name="aboutDescriptionBrandUpdate2025">Tere tulemast Pardi poolele!\n\nRevenge on sõltumatu veebikaitseettevõte kõikidele, kes tahavad oma isikliku teabe üle kontrolli tagasi saada.\n\nUsume, et parim viis teie isikuandmete kaitsmiseks häkkerite, petturite ja eraelu puutumatust rikkuvate ettevõtete eest on nende kogumise täielik vältimine. Seetõttu valivad miljonid inimesed <annotation type="chart_comparison">Revenge Chrome\'i ja teiste brauserite asemel</annotation>, et otsida ja sirvida internetis. Meie sisseehitatud otsingumootor on nagu Google, kuid ei jälgi kunagi teie otsinguid. Ja meie sirvimiskaitsed, nagu reklaamijälgijate ja küpsiste blokeerimine, aitavad takistada teistel ettevõtetel teie andmeid kogumast. Oh, ja meie brauser on tasuta — teenime raha <annotation type="privacy_respecting_ads">privaatsust austavate otsingureklaamidega</annotation>, mitte teie andmeid ära kasutades.\n\nLisaks pakume ka <annotation type="ppro_help_page">Revenge tellimust</annotation>, mis on integreeritud meie brauserisse. Tellijad saavad veelgi tõhusama privaatsuse kaitse kiire ja lihtsa <annotation type="vpn_help_page">VPN-iga</annotation>, mis aitab kaitsta sinu veebitegevust, juurdepääsu täiustatud tehisintellekti mudelitele meie privaatses tehisintellekti vestlusteenuses Revenge AI, teenuse, mis otsib ja eemaldab sinu isikuandmeid inimesteotsingu saitidelt, ning teenuse, mis taastab sinu identiteedi, kui see varastatakse.\n\nVõtke tagasi kontroll oma isikuandmete üle brauseriga, mis on loodud andmete kaitsmiseks ja mitte nende kogumiseks.</string>
     <string name="no_suggestions">Ettepanekud puuduvad</string>
 
     <!-- Broken Site Activity -->
@@ -258,7 +258,7 @@
     <string name="brokenSiteProtectionsOnBannerMessage">Abi võib olla kaitsefunktsioonide väljalülitamisest.</string>
 
     <!-- Widget -->
-    <string name="searchWidgetTextHint">DuckDuckGo otsing</string>
+    <string name="searchWidgetTextHint">Revenge otsing</string>
 
     <!-- Favorites widget -->
     <string name="addFavoriteMenuTitleHighlighted">👋 Lisa lemmik</string>
@@ -271,7 +271,7 @@
     <string name="searchWidgetEmtpyFavoritesCta">Lisa lemmik</string>
     <string name="widgetConfigurationActivityTitle">Vidina konfiguratsioon</string>
     <string name="favoritesWidgetLabel">Otsing ja lemmikud</string>
-    <string name="searchWidgetLabel">Otsing ja Duck.ai</string>
+    <string name="searchWidgetLabel">Otsing ja Revenge AI</string>
 
     <!-- Home Screen Shortcuts -->
 
@@ -283,7 +283,7 @@
     <string name="surveyCtaLaunchButton">Vastake küsitlusele</string>
     <string name="surveyCtaDismissButton">Ei, aitäh</string>
     <string name="surveyActivityTitle">Kasutajaküsitlus</string>
-    <string name="surveyTitle">DuckDuckGo küsitlus</string>
+    <string name="surveyTitle">Revenge küsitlus</string>
     <string name="surveyDismissContentDescription">Loobu küsitlusest</string>
     <string name="surveyLoadingErrorTitle">Oh ei!</string>
     <string name="surveyLoadingErrorText">Meie küsitlust praegu laadida ei õnnestunud.\nPalun proovige hiljem uuesti.</string>
@@ -298,14 +298,14 @@
     <string name="addWidgetInstruction1Label">1</string>
     <string name="addWidgetInstruction1">Vajuta pikalt avakuval ja ava vidinate menüü.</string>
     <string name="addWidgetInstruction2Label">2</string>
-    <string name="addWidgetInstruction2">Leia vidin DuckDuckGo.</string>
+    <string name="addWidgetInstruction2">Leia vidin Revenge.</string>
     <string name="addWidgetInstruction3Label">3</string>
     <string name="addWidgetInstruction3">Lohista vidin oma avakuvale.</string>
     <string name="addWidgetInstructionsButtonGoHome">Minge avakuvale</string>
     <string name="addWidgetInstructionsButtonClose">Sulge</string>
 
     <!-- App Enjoyment / Rating / Feedback -->
-    <string name="appEnjoymentDialogTitle">Kas teile meeldib DuckDuckGo?</string>
+    <string name="appEnjoymentDialogTitle">Kas teile meeldib Revenge?</string>
     <string name="appEnjoymentDialogMessage">Meile meeldiks teada, mida sa arvad.</string>
     <string name="appEnjoymentDialogPositiveButton">Mulle meeldib see</string>
     <string name="appEnjoymentDialogNegativeButton">See vajab tööd</string>
@@ -327,15 +327,15 @@
 
     <!-- Clear Notification -->
     <string name="clearNotificationTitle">Seadistatud on andmete käsitsi kustutamine</string>
-    <string name="clearNotificationDescription">Kohandage DuckDuckGo sirvimisandmete automaatseks kustutamiseks pärast igat seanssi.</string>
+    <string name="clearNotificationDescription">Kohandage Revenge sirvimisandmete automaatseks kustutamiseks pärast igat seanssi.</string>
 
     <!-- Privacy Protection Notification -->
     <string name="privacyProtectionNotificationDefaultTitle">Kaitseme teie privaatsust</string>
     <string name="privacyProtectionNotificationReportTitle">Teie privaatsusaruanne</string>
-    <string name="privacyProtectionNotificationDefaultDescription">Rakenduse DuckDuckGo kasutamine kaitseb teie andmeid, blokeerides jälgijaid ja krüpteerides ühendusi.</string>
-    <string name="privacyProtectionNotificationUpgadeDescription" instruction="Placeholder is a the number of connections we have protected">Kaitsesite oma andmeid, krüptides DuckDuckGo kasutamise ajal %1$d krüptimata ühendust.</string>
-    <string name="privacyProtectionNotificationTrackerDescription" instruction="Placeholder is the numer of trackers blocked">Kaitsesite oma andmeid, blokeerides DuckDuckGo kasutamise ajal %1$d jälitajat.</string>
-    <string name="privacyProtectionNotificationBothDescription" instruction="%1$d is the number of trackers blocked and %2$d is the number of unencrypted connections">Kaitsesite oma andmeid, blokeerides DuckDuckGo kasutamise ajal %1$d jälitaja ja turvates %2$d krüptimata ühendust.</string>
+    <string name="privacyProtectionNotificationDefaultDescription">Rakenduse Revenge kasutamine kaitseb teie andmeid, blokeerides jälgijaid ja krüpteerides ühendusi.</string>
+    <string name="privacyProtectionNotificationUpgadeDescription" instruction="Placeholder is a the number of connections we have protected">Kaitsesite oma andmeid, krüptides Revenge kasutamise ajal %1$d krüptimata ühendust.</string>
+    <string name="privacyProtectionNotificationTrackerDescription" instruction="Placeholder is the numer of trackers blocked">Kaitsesite oma andmeid, blokeerides Revenge kasutamise ajal %1$d jälitajat.</string>
+    <string name="privacyProtectionNotificationBothDescription" instruction="%1$d is the number of trackers blocked and %2$d is the number of unencrypted connections">Kaitsesite oma andmeid, blokeerides Revenge kasutamise ajal %1$d jälitaja ja turvates %2$d krüptimata ühendust.</string>
     <string name="privacyProtectionNotificationLaunchButton">Jätka sirvimist</string>
 
     <!-- Authentication -->
@@ -347,7 +347,7 @@
     <string name="authenticationDialogPasswordHint">Parool</string>
 
     <!-- User-facing label for when a user selects text and might want to search for that text -->
-    <string name="systemTextSearchMessage">DuckDuckGo otsing</string>
+    <string name="systemTextSearchMessage">Revenge otsing</string>
 
     <!-- App feedback disambiguation -->
     <string name="feedbackActivityTitle">Jaga tagasisidet</string>
@@ -366,8 +366,8 @@
     <string name="websiteNotLoadingTitleShort">Veebisaidi laadimisega seotud probleemid</string>
     <string name="websiteNotLoadingSubtitle">Milline veebisait on katki?</string>
 
-    <string name="searchNotGoodEnoughTitleLong">DuckDuckGo otsing pole piisavalt hea</string>
-    <string name="searchNotGoodEnoughTitleShort">DuckDuckGo otsingu probleemid</string>
+    <string name="searchNotGoodEnoughTitleLong">Revenge otsing pole piisavalt hea</string>
+    <string name="searchNotGoodEnoughTitleShort">Revenge otsingu probleemid</string>
     <string name="searchNotGoodEnoughSubtitle">Millist otsingufunktsiooni saame lisada või täiustada?</string>
     <string name="searchNotGoodEnoughSubReasonTechnicalSearches">Programmeerimine / tehniline otsing</string>
     <string name="searchNotGoodEnoughSubReasonGoogleLayout">Paigutus peaks olema rohkem nagu Google</string>
@@ -427,8 +427,8 @@
 
     <!-- System Search-->
     <string name="systemSearchAppNotFound">Rakendust ei leitud</string>
-    <string name="systemSearchOnboardingThanks">Aitäh, et valisite DuckDuckGo!\nMeie brauseri kasutamine aitab teid kaitsta häkkerite, petturite ja andmenäljaste ettevõtete eest.</string>
-    <string name="systemSearchOnboardingFeaturesIntroText">Peale selle DuckDuckGo rakendus:</string>
+    <string name="systemSearchOnboardingThanks">Aitäh, et valisite Revenge!\nMeie brauseri kasutamine aitab teid kaitsta häkkerite, petturite ja andmenäljaste ettevõtete eest.</string>
+    <string name="systemSearchOnboardingFeaturesIntroText">Peale selle Revenge rakendus:</string>
     <string name="systemSearchOnboardingFeatureOneText">Blokeerib ebaturvalised jälgijad.</string>
     <string name="systemSearchOnboardingFeatureTwoText">Sunnib krüpteerima veebisaite.</string>
     <string name="systemSearchOnboardingFeatureThreeText">Kustutab andmed ühe puudutusega.</string>
@@ -436,18 +436,18 @@
     <string name="systemSearchOnboardingButtonLess">Peida</string>
     <string name="systemSearchOnboardingButtonOk">Sain aru</string>
 
-    <!-- Dax Dialog -->
+    <!-- Revenge Dialog -->
     <string name="daxDialogHighFive">Viska viis!</string>
     <string name="daxDialogGotIt">Sain aru</string>
 
-    <!-- AppTP Retention Experiment Dax Dialog -->
+    <!-- AppTP Retention Experiment Revenge Dialog -->
     <string name="daxDialogAppTpRetentionText"><![CDATA[Nüüd blokeerite jälgurid kogu veebis 🎉<br/><br/>Ma saan blokeerida ka teie teistes rakendustes peidus olevad jälgurid, isegi kui te oma telefoni ei kasuta.]]></string>
     <string name="daxDialogAppTpRetentionPrimaryButtonText">Luba App Tracking Protection</string>
     <string name="daxDialogAppTpRetentionSecondaryButtonText">Mitte praegu</string>
 
     <!-- New Onboarding Experience -->
-    <string name="onboardingWelcomeTitle">"Tere tulemast DuckDuckGo kasutajaks!"</string>
-    <string name="onboardingDaxText"><![CDATA[Internet võib olla üsna jube.<br/><br/>Ärge muretsege! Privaatselt otsimine ja sirvimine on lihtsam kui arvate.]]></string>
+    <string name="onboardingWelcomeTitle">"Tere tulemast Revenge kasutajaks!"</string>
+    <string name="onboardingRevengeText"><![CDATA[Internet võib olla üsna jube.<br/><br/>Ärge muretsege! Privaatselt otsimine ja sirvimine on lihtsam kui arvate.]]></string>
     <string name="onboardingLetsDoItButton">Teeme ära!</string>
     <string name="daxNonSerpCtaText"><![CDATA[Kui puudutate ja kerite, siis mina blokeerin tüütud jälgijad. <br/><br/>Edasi — jätkake sirvimist!]]></string>
     <string name="daxMainNetworkCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Ettevaatust! Ma ei saa takistada %1$s nägemast sinu tegevust %2$s&lt;br/&gt;&lt;br/&gt;Kuid sirvi koos minuga ja ma saan vähendada seda, mida %3$s sinust üldiselt teab, blokeerides tema jälitajad paljudel teistel lehtedel.</string>
@@ -535,7 +535,7 @@
     <string name="dosErrorMessage">Ühendus on katkestatud. See veebileht võib kahjustada sinu seadet.</string>
 
     <!-- Precise Location -->
-    <string name="preciseLocationSystemDialogTitle">Kas lubada seadme asukoht DuckDuckGo privaatses brauseris?</string>
+    <string name="preciseLocationSystemDialogTitle">Kas lubada seadme asukoht Revenge privaatses brauseris?</string>
     <string name="preciseLocationSystemDialogSubtitle" instruction="%1$s and %2$s are both the name of the website requesting the location">%1$s küsib sinu seadme asukohta. Kõigepealt pead lubama rakendusel saata oma seadme asukoht, seejärel saab %2$s küsida luba.</string>
     <string name="preciseLocationSystemDialogAllow">Luba</string>
     <string name="preciseLocationSystemDialogDeny">Võib-olla hiljem</string>
@@ -547,7 +547,7 @@
     <string name="preciseLocationSiteDialogAllowOnce">Ainult selle seansi jaoks</string>
     <string name="preciseLocationSiteDialogDenyAlways">Keela alati</string>
     <string name="preciseLocationSiteDialogDenyOnce">Keela selle seansi jaoks</string>
-    <string name="preciseLocationFeatureDescription">Saidid, mida sa külastad, võivad küsida sinu seadme asukohta. Nad ei saa sellele ligipääsu enne, kui oled andnud selgesõnalise loa. DuckDuckGo kasutab sinu asukohta alati anonüümselt, et edastada kohaliku otsingu tulemused.</string>
+    <string name="preciseLocationFeatureDescription">Saidid, mida sa külastad, võivad küsida sinu seadme asukohta. Nad ei saa sellele ligipääsu enne, kui oled andnud selgesõnalise loa. Revenge kasutab sinu asukohta alati anonüümselt, et edastada kohaliku otsingu tulemused.</string>
     <string name="preciseLocationToggleText">Saidid võivad küsida minu asukohta</string>
     <string name="preciseLocationEmptyListHint">Ühelegi veebisaidile ei ole antud luba asukohale juurdepääsuks</string>
     <string name="preciseLocationNoSystemPermission">Haldamaks asukohale juurdepääsu lubasid, mille sa oled üksikutele saitidele andnud, luba asukoht selle rakenduse jaoks Androidi seadetes.</string>
@@ -563,7 +563,7 @@
 
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Üleilmne privaatsuskontroll (Global Privacy Control (GPC))</string>
-    <string name="globalPrivacyControlDescription"><![CDATA[DuckDuckGo blokeerib automaatselt paljud jälitajad. Üleilmse privaatsuskontrolli (GPC) abil saate paluda osalevatel veebisaitidel piirata teie isikuandmete müümist või jagamist teiste ettevõtetega. <u><a href=\"\">Loe edasi</a><u/>]]></string>
+    <string name="globalPrivacyControlDescription"><![CDATA[Revenge blokeerib automaatselt paljud jälitajad. Üleilmse privaatsuskontrolli (GPC) abil saate paluda osalevatel veebisaitidel piirata teie isikuandmete müümist või jagamist teiste ettevõtetega. <u><a href=\"\">Loe edasi</a><u/>]]></string>
     <string name="globalPrivacyControlSetting">Üleilmne privaatsuskontroll (Global Privacy Control (GPC))</string>
     <string name="globalPrivacyControlToggle">Üleilmne privaatsuskontroll (Global Privacy Control (GPC))</string>
     <string name="disabled">Keelatud</string>
@@ -599,11 +599,11 @@
     <string name="settingsAccessibility">Hõlpsus</string>
     <string name="accessibilityActivityTitle">Hõlpsus</string>
     <string name="accessibilityFontSizeTitle">Teksti suurus</string>
-    <string name="accessibilityFontSizeHint">Lohista liugurit, kuni saad seda mugavalt lugeda. DuckDuckGo\'s kuvatavad veebisaidid kohanduvad sellega.</string>
+    <string name="accessibilityFontSizeHint">Lohista liugurit, kuni saad seda mugavalt lugeda. Revenge\'s kuvatavad veebisaidid kohanduvad sellega.</string>
     <string name="accessibilityForceZoomTitle">Jõusta lehe käsitsi suumimine</string>
     <string name="accessibilityForceZoomSubtitle">Sõrmedega suumimine töötab kõigil veebisaitidel, ka neil, mis seda tavaliselt takistavad</string>
     <string name="accessibilityTextSizeOverrideTitle">Halda teksti suurust</string>
-    <string name="accessibilityTextSizeOverrideSubtitle">DuckDuckGo\'s kuvatavate veebisaitide teksti reguleeritakse alloleva sätte järgi</string>
+    <string name="accessibilityTextSizeOverrideSubtitle">Revenge\'s kuvatavate veebisaitide teksti reguleeritakse alloleva sätte järgi</string>
 
     <!-- Privacy Policy -->
     <string name="settingsPrivacyPolicyDuckduckgo">Privaatsuspoliitika</string>
@@ -672,7 +672,7 @@
     <string name="tabSelectedIndicator">Valitud vahekaardi indikaator</string>
     <string name="tabNotSelectedIndicator">Indikaator, et vahekaart pole valitud</string>
 
-    <string name="shareMultipleLinksTitle" tools:ignore="MissingInstruction">%1$d linki DuckDuckGo\'st</string>
+    <string name="shareMultipleLinksTitle" tools:ignore="MissingInstruction">%1$d linki Revenge\'st</string>
     <plurals name="shareLinksMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
         <item quantity="one">Jaga linki</item>
         <item quantity="other">Jaga linke %1$d</item>
@@ -733,7 +733,7 @@
     </plurals>
 
     <!-- Private voice search -->
-    <string name="accessibilityVoiceSearchSubtitle">Lisa aadressiribale privaatse häälotsingu valik. Heli ei salvestata ega jagata kellegagi, sealhulgas DuckDuckGoga.</string>
+    <string name="accessibilityVoiceSearchSubtitle">Lisa aadressiribale privaatse häälotsingu valik. Heli ei salvestata ega jagata kellegagi, sealhulgas Revengega.</string>
     <string name="accessibilityVoiceSearchTitle">Privaatne häälotsing</string>
 
     <!-- Uploading an image from the camera or choosing to use existing image -->
@@ -741,8 +741,8 @@
     <string name="imageCaptureCameraGalleryDisambiguationTitle">Laadi pilt üles</string>
     <string name="imageCaptureCameraGalleryDisambiguationGalleryOption">Vali fail</string>
     <string name="imageCaptureCameraGalleryDisambiguationCameraOption">Tee pilt</string>
-    <string name="imageCaptureCameraPermissionDeniedTitle">Luba DuckDuckGo’l küsida juurdepääsu selle seadme kaamerale</string>
-    <string name="imageCaptureCameraPermissionDeniedMessage">Saidid saavad sinu kaamerat kasutada ainult siis, kui lubad DuckDuckGo’l küsida sellele juurdepääsu.</string>
+    <string name="imageCaptureCameraPermissionDeniedTitle">Luba Revenge’l küsida juurdepääsu selle seadme kaamerale</string>
+    <string name="imageCaptureCameraPermissionDeniedMessage">Saidid saavad sinu kaamerat kasutada ainult siis, kui lubad Revenge’l küsida sellele juurdepääsu.</string>
     <string name="imageCaptureCameraPermissionDeniedPositiveButton">Ava sätted</string>
     <string name="imageCaptureCameraPermissionDeniedNegativeButton">Loobu</string>
 
@@ -756,53 +756,53 @@
     <string name="sslErrorHeadline" instruction="Placeholder is domain with certificate issues">Selle saidi sertifikaat on vale. Võimalik, et lood ühenduse serveriga, mis teeskleb olevat %1$s ja see võib sinu konfidentsiaalse teabe ohtu seada.</string>
     <string name="sslErrorLeaveCTA">Lahku sellelt saidilt</string>
     <string name="sslErrorAdvancedCTA">Täiustatud</string>
-    <string name="sslErrorExpandedHeadline">DuckDuckGo hoiatab sind, kui veebisaidil on vale sertifikaat.</string>
+    <string name="sslErrorExpandedHeadline">Revenge hoiatab sind, kui veebisaidil on vale sertifikaat.</string>
     <string name="sslErrorExpandedCTA"><![CDATA[<u>Nõustu riskiga ja külasta saiti</u>]]></string>
     <string name="sslErrorExpiredMessage" instruction="Placeholder is domain with certificate issues">%1$s turvasertifikaat on aegunud. Võimalik, et veebisait on valesti konfigureeritud, ründaja on sinu ühenduse ohtu seadnud või sinu süsteemi kell on vale.</string>
     <string name="sslErrorWrongHostMessage" instruction="Placeholder is domain with certificate issues">%1$s turvasertifikaat ei ühti *.%2$s. Võimalik, et veebisait on valesti konfigureeritud, ründaja on sinu ühenduse ohtu seadnud või sinu süsteemi kell on vale.</string>
     <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">Sinu seadme operatsioonisüsteem ei usalda %1$s turvasertifikaati. Võimalik, et veebisait on valesti konfigureeritud, ründaja on sinu ühenduse ohtu seadnud või sinu süsteemi kell on vale.</string>
 
     <!-- Extended Onboarding-->
-    <string name="preOnboardingDaxDialog1Title"><![CDATA[Tere!<br/><br/>Kas oled valmis kasutama kiiremat brauserit, mis hoiab sind kaitstud?]]></string>
-    <string name="preOnboardingDaxDialog1Button">Teeme ära!</string>
-    <string name="preOnboardingDaxDialog1SecondaryButton">Olen siin varem olnud</string>
-    <string name="preOnboardingDaxDialog2Title">Kaitsed aktiveeritud!</string>
-    <string name="preOnboardingDaxDialog2Button">Vali oma brauser</string>
-    <string name="preOnboardingDaxDialog3Title"><![CDATA[Sain aru! Jätan muud näpunäited vahele.]]></string>
-    <string name="preOnboardingDaxDialog3Text"><![CDATA[Tuletame meelde, et nupu <b>Fire Button</b> 🔥 abil saate kustutada kõik oma vahekaardid, ajaloo ja sirvimisandmed kahe puudutusega]]></string>
-    <string name="preOnboardingDaxDialog3SecondaryButton">Näita õpetust</string>
+    <string name="preOnboardingRevengeDialog1Title"><![CDATA[Tere!<br/><br/>Kas oled valmis kasutama kiiremat brauserit, mis hoiab sind kaitstud?]]></string>
+    <string name="preOnboardingRevengeDialog1Button">Teeme ära!</string>
+    <string name="preOnboardingRevengeDialog1SecondaryButton">Olen siin varem olnud</string>
+    <string name="preOnboardingRevengeDialog2Title">Kaitsed aktiveeritud!</string>
+    <string name="preOnboardingRevengeDialog2Button">Vali oma brauser</string>
+    <string name="preOnboardingRevengeDialog3Title"><![CDATA[Sain aru! Jätan muud näpunäited vahele.]]></string>
+    <string name="preOnboardingRevengeDialog3Text"><![CDATA[Tuletame meelde, et nupu <b>Fire Button</b> 🔥 abil saate kustutada kõik oma vahekaardid, ajaloo ja sirvimisandmed kahe puudutusega]]></string>
+    <string name="preOnboardingRevengeDialog3SecondaryButton">Näita õpetust</string>
     <string name="preOnboardingComparisonChartItem1">Otsi vaikimisi privaatselt</string>
     <string name="preOnboardingComparisonChartItem2">Blokeeri kolmanda poole jälgurid</string>
     <string name="preOnboardingComparisonChartItem3">Blokeeri küpsiste hüpikaknad</string>
     <string name="preOnboardingComparisonChartItem4">Blokeeri suunatud reklaamid</string>
     <string name="preOnboardingComparisonChartItem5">Kustuta sirvimisandmed ühe nupuga</string>
-    <string name="preOnboardingDaxDialog3Button">Alusta sirvimist</string>
+    <string name="preOnboardingRevengeDialog3Button">Alusta sirvimist</string>
     <string name="preOnboardingAddressBarTitle">Kuhu soovid oma aadressiriba paigutada?</string>
     <string name="preOnboardingAddressBarOkButton">Järgmine</string>
     <string name="highlightsPreOnboardingAddressBarOption1Title">Üles (vaikimisi)</string>
     <string name="highlightsPreOnboardingAddressBarOption1Description">Kergesti märgatav</string>
     <string name="highlightsPreOnboardingAddressBarOption2Title">All</string>
     <string name="highlightsPreOnboardingAddressBarOption2Description">Kergesti ligipääsetav</string>
-    <string name="onboardingSearchDaxDialogTitle">Proovige otsingut!</string>
-    <string name="onboardingSearchDaxDialogDescription">Sinu DuckDuckGo otsingud on alati privaatsed.</string>
-    <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">"kuidas öelda part inglise keeles"</string>
-    <string name="onboardingSearchDaxDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">"kuidas öelda part hispaania keeles"</string>
+    <string name="onboardingSearchRevengeDialogTitle">Proovige otsingut!</string>
+    <string name="onboardingSearchRevengeDialogDescription">Sinu Revenge otsingud on alati privaatsed.</string>
+    <string name="onboardingSearchRevengeDialogOption1" instruction="translate &apos;duck&apos; too.">"kuidas öelda part inglise keeles"</string>
+    <string name="onboardingSearchRevengeDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">"kuidas öelda part hispaania keeles"</string>
     <string name="onboardingSearchQueryOption1">kuidas öelda part inglise keeles</string>
     <string name="onboardingSearchQueryOption1English">kuidas öelda part hispaania keeles</string>
-    <string name="onboardingSearchDaxDialogOption2">Avatari näitlejad</string>
-    <string name="onboardingSearchDaxDialogOption2US">Mighty Ducks näitlejad</string>
-    <string name="onboardingSearchDaxDialogOption3">kohalik ilm</string>
-    <string name="onboardingSearchDaxDialogOption4">Üllata mind!</string>
+    <string name="onboardingSearchRevengeDialogOption2">Avatari näitlejad</string>
+    <string name="onboardingSearchRevengeDialogOption2US">Mighty Ducks näitlejad</string>
+    <string name="onboardingSearchRevengeDialogOption3">kohalik ilm</string>
+    <string name="onboardingSearchRevengeDialogOption4">Üllata mind!</string>
     <string name="onboardingSearchQueryOption4">pardipojad</string>
-    <string name="onboardingSitesDaxDialogTitle">Proovi külastada saiti!</string>
-    <string name="onboardingSitesDaxDialogDescription">Ma blokeerin jälgijaid, et nad ei saaks sind luurata.</string>
-    <string name="onboardingSitesDaxDialogOption1">espn.com</string>
-    <string name="onboardingSitesDaxDialogOption2">yahoo.com</string>
-    <string name="onboardingSitesDaxDialogOption3">ebay.com</string>
-    <string name="onboardingSitesDaxDialogOption4">Üllata mind!</string>
-    <string name="onboardingSerpDaxDialogDescription"><![CDATA[See on <b>DuckDuckGo Search</b>! Privaatne. Kiire. Vähem reklaame.]]></string>
-    <string name="onboardingSerpDaxDialogButton">Sain aru!</string>
-    <string name="onboardingSitesSuggestionsDaxDialogTitle">Järgmisena proovi mõnda saiti külastada!</string>
+    <string name="onboardingSitesRevengeDialogTitle">Proovi külastada saiti!</string>
+    <string name="onboardingSitesRevengeDialogDescription">Ma blokeerin jälgijaid, et nad ei saaks sind luurata.</string>
+    <string name="onboardingSitesRevengeDialogOption1">espn.com</string>
+    <string name="onboardingSitesRevengeDialogOption2">yahoo.com</string>
+    <string name="onboardingSitesRevengeDialogOption3">ebay.com</string>
+    <string name="onboardingSitesRevengeDialogOption4">Üllata mind!</string>
+    <string name="onboardingSerpRevengeDialogDescription"><![CDATA[See on <b>Revenge Search</b>! Privaatne. Kiire. Vähem reklaame.]]></string>
+    <string name="onboardingSerpRevengeDialogButton">Sain aru!</string>
+    <string name="onboardingSitesSuggestionsRevengeDialogTitle">Järgmisena proovi mõnda saiti külastada!</string>
     <plurals name="onboardingTrackersBlockedDialogDescription">
         <item quantity="one"><![CDATA[ ja <b>veel %1$d teine</b> üritas sind siin jälgida. Ma blokeerisin need!<br/><br/>☝️ Lisateabe saamiseks vajuta kilbile.]]></item>
         <item quantity="other"><![CDATA[ ja <b>veel %1$d teist</b> üritasid sind siin jälgida. Ma blokeerisin need!<br/><br/>☝️ Lisateabe saamiseks vajuta kilbile.]]></item>
@@ -811,19 +811,19 @@
         <item quantity="one"><![CDATA[ üritas sind siin jälgida. Ma blokeerisin selle!<br/><br/>☝️ Lisateabe saamiseks vajuta kilbile. ️]]></item>
         <item quantity="other"><![CDATA[ üritasid sind siin jälgida. Ma blokeerisin need!<br/><br/>☝️ Lisateabe saamiseks vajuta kilbile.]]></item>
     </plurals>
-    <string name="onboardingTrackersBlockedDaxDialogButton">Sain aru!</string>
-    <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Tühjendage oma sirvimistegevus hetkega <b>Fire Button</b> abil.<br/><br/>Proovige! 🔥]]></string>
-    <string name="onboardingFireButtonDaxDialogOkButton">Proovi seda</string>
-    <string name="onboardingFireButtonDaxDialogCancelButton">Jäta vahele</string>
-    <string name="onboardingEndDaxDialogTitle">"Sa saad hakkama!"</string>
-    <string name="onboardingEndDaxDialogDescription">Pea meeles: iga kord kui minuga sirvid, kaotab jube reklaam oma tiivad.</string>
-    <string name="onboardingInContextEndDaxDialogDescription">Pea meeles: iga kord kui minuga sirvid, kaotab jube reklaam oma tiivad. 👌</string>
-    <string name="onboardingEndDaxDialogButton">Viska viis!</string>
-    <string name="onboardingPrivacyProDaxDialogTitle">Ja enne kui ma unustan...</string>
-    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo-l on ka <b>valikuline tasuline tellimus</b>, mis sisaldab turvalist <b>VPN-i</b> ja <b>täiustatud privaatset tehisintellekti</b>.]]></string>
-    <string name="onboardingPrivacyProDaxDialogOkButton">Loe edasi</string>
-    <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Proovi tasuta!</string>
-    <string name="onboardingPrivacyProDaxDialogCancelButton">Jäta vahele</string>
+    <string name="onboardingTrackersBlockedRevengeDialogButton">Sain aru!</string>
+    <string name="onboardingFireButtonRevengeDialogDescription"><![CDATA[Tühjendage oma sirvimistegevus hetkega <b>Fire Button</b> abil.<br/><br/>Proovige! 🔥]]></string>
+    <string name="onboardingFireButtonRevengeDialogOkButton">Proovi seda</string>
+    <string name="onboardingFireButtonRevengeDialogCancelButton">Jäta vahele</string>
+    <string name="onboardingEndRevengeDialogTitle">"Sa saad hakkama!"</string>
+    <string name="onboardingEndRevengeDialogDescription">Pea meeles: iga kord kui minuga sirvid, kaotab jube reklaam oma tiivad.</string>
+    <string name="onboardingInContextEndRevengeDialogDescription">Pea meeles: iga kord kui minuga sirvid, kaotab jube reklaam oma tiivad. 👌</string>
+    <string name="onboardingEndRevengeDialogButton">Viska viis!</string>
+    <string name="onboardingPrivacyProRevengeDialogTitle">Ja enne kui ma unustan...</string>
+    <string name="onboardingPrivacyProRevengeDialogDescription"><![CDATA[Revenge-l on ka <b>valikuline tasuline tellimus</b>, mis sisaldab turvalist <b>VPN-i</b> ja <b>täiustatud privaatset tehisintellekti</b>.]]></string>
+    <string name="onboardingPrivacyProRevengeDialogOkButton">Loe edasi</string>
+    <string name="onboardingPrivacyProRevengeDialogFreeTrialOkButton">Proovi tasuta!</string>
+    <string name="onboardingPrivacyProRevengeDialogCancelButton">Jäta vahele</string>
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Kas soovite lihtsat juurdepääsu privaatsele AI-vestlusele?</string>
@@ -844,23 +844,23 @@
     <string name="showOnAppLaunchOptionSpecificPage">Konkreetne lehekülg</string>
 
     <!-- Privacy Dashboard -->
-    <string name="brokenSiteSubmittedReportMessage">Aitäh! Sinu aruanne aitab muuta DuckDuckGo kõigi jaoks paremaks!</string>
+    <string name="brokenSiteSubmittedReportMessage">Aitäh! Sinu aruanne aitab muuta Revenge kõigi jaoks paremaks!</string>
 
     <!--    Default Browser Bottom Sheet Dialog -->
-    <string name="defaultBrowserBottomSheetDialogTitle">Laske DuckDuckGo\'l kaitsta rohkem seda, mida te veebis teete</string>
-    <string name="defaultBrowserBottomSheetDialogSubTitle">Vaheta oma vaikebrauserit, et lingid avaneksid DuckDuckGos.</string>
+    <string name="defaultBrowserBottomSheetDialogTitle">Laske Revenge\'l kaitsta rohkem seda, mida te veebis teete</string>
+    <string name="defaultBrowserBottomSheetDialogSubTitle">Vaheta oma vaikebrauserit, et lingid avaneksid Revenges.</string>
     <string name="defaultBrowserBottomSheetDialogGhostButton" instruction="This text appears on a button">Mitte praegu</string>
 
     <!-- Default Browser message -->
-    <string name="newTabPageDefaultBrowserMessageHeading">DuckDuckGo ei ole sinu vaikebrauser. Saa rohkem kaitset.</string>
+    <string name="newTabPageDefaultBrowserMessageHeading">Revenge ei ole sinu vaikebrauser. Saa rohkem kaitset.</string>
     <string name="newTabPageDefaultBrowserMessagePrimaryCta" instruction="This text appears on a button">Määra vaikebrauseriks</string>
     <string name="newTabPageDefaultBrowserMessageSecondaryCta" instruction="This text appears on a button">Ära enam küsi</string>
 
     <!-- Threat protection -->
     <string name="maliciousSiteTitle">Hoiatus: see sait võib olla turvaoht</string>
-    <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo blokeeris selle saidi, kuna see võib levitada pahavara, mis on loodud teie seadme kahjustamiseks või teie isikuandmete varastamiseks.\n<a href=\"\">Vaata lähemalt</a>]]></string>
+    <string name="maliciousSiteMalwareHeadline"><![CDATA[Revenge blokeeris selle saidi, kuna see võib levitada pahavara, mis on loodud teie seadme kahjustamiseks või teie isikuandmete varastamiseks.\n<a href=\"\">Vaata lähemalt</a>]]></string>
     <string name="maliciousSitePhishingHeadline"><![CDATA[See veebisait võib imiteerida seaduslikku veebisaiti, et sinult välja petta isiklikke andmeid, näiteks paroole või krediitkaardi numbreid.\n<a href=\"\">Vaata lähemalt</a>]]></string>
-    <string name="maliciousSiteScamHeadline"><![CDATA[DuckDuckGo blokeeris selle lehe, kuna see võib püüda teid petta või manipuleerida tegema rahaülekandeid, ostma võltsitud kaupu või installima pahavara valel ettekäändel.\n<a href=\"\">Vaata lähemalt</a>]]></string>
+    <string name="maliciousSiteScamHeadline"><![CDATA[Revenge blokeeris selle lehe, kuna see võib püüda teid petta või manipuleerida tegema rahaülekandeid, ostma võltsitud kaupu või installima pahavara valel ettekäändel.\n<a href=\"\">Vaata lähemalt</a>]]></string>
     <string name="maliciousSiteLeaveCTA">Lahku sellelt saidilt</string>
     <string name="maliciousSiteAdvancedCTA">Täiustatud</string>
     <string name="maliciousSiteExpandedHeadline"><![CDATA[Kui arvate, et see veebisait on turvaline, võite <a href=\"\">teatada veast</a>. Võite siiski külastada veebisaiti omal vastutusel.]]></string>
@@ -872,7 +872,7 @@
     <string name="maliciousSiteSettingLearnMore"><annotation type="learn_more_link">Lisateave</annotation></string>
     <string name="maliciousSiteSettingDisabled">Selle funktsiooni keelamine võib teie andmed ohtu seada.</string>
     <string name="threatProtectionTitle">Kaitse ohtude eest</string>
-    <string name="threatProtectionDescription">DuckDuckGo täiustatud kaitsed peatavad levinud ohud, hoides samal ajal su ühenduse turvalisena.</string>
+    <string name="threatProtectionDescription">Revenge täiustatud kaitsed peatavad levinud ohud, hoides samal ajal su ühenduse turvalisena.</string>
     <string name="smarterEncryptionTitle">Smarter Encryption</string>
     <string name="smarterEncryptionDescription"><![CDATA[Võimaluse korral uuendab lingid automaatselt HTTPS-ile.<br><a href=\"\">Loe edasi</a>]]></string>
     <string name="scamBlockerTitle">Pettuste blokeerija</string>
@@ -884,7 +884,7 @@
     <string name="experimentHomeScreenWidgetBottomSheetDialogSubTitle">Kiire ja hõlpsa juurdepääsu tagamiseks lisage meie meie otsinguvidin avakuvale.</string>
     <string name="experimentHomeScreenWidgetBottomSheetDialogPrimaryButton">Lisage vidin</string>
     <string name="experimentHomeScreenWidgetBottomSheetDialogGhostButton">Mitte praegu</string>
-    <string name="experimentHomeScreenWidgetBottomSheetDialogSearchText">DuckDuckGo otsing</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSearchText">Revenge otsing</string>
 
     <!-- Change under remote feature flag: Widget as a Protection -->
     <string name="settingsAddHomeWidgetTitle">Avakuva vidin</string>
@@ -901,8 +901,8 @@
 
     <!-- Widgets -->
     <string name="searchOnlyWidgetLabel" instruction="Label for the search-only widget">Ainult otsi</string>
-    <string name="searchOnlyWidgetDescription" instruction="Description for the search-only widget">Käivita kiiresti privaatne otsing DuckDuckGo\'ga.</string>
-    <string name="searchWidgetDescription" instruction="Description for the search widget, which may include Duck.ai and voice search">Otsi privaatselt DuckDuckGo\'ga või küsi Duck.ai käest. Häälotsing ja Duck.ai on saadaval, kui need on lubatud.</string>
-    <string name="searchAndFavoritesWidgetDescription" instruction="Description for the search and favorites widget">Otsi või külasta oma lemmiksaite privaatselt ühe puudutusega. Häälotsing ja Duck.ai on saadaval, kui need on lubatud.</string>
-    <string name="duckAiOnlyPinShortcutLabel" instruction="Label for the Duck.ai pinned shortcut. Should be Duck.ai in all languages">Duck.ai</string>
+    <string name="searchOnlyWidgetDescription" instruction="Description for the search-only widget">Käivita kiiresti privaatne otsing Revenge\'ga.</string>
+    <string name="searchWidgetDescription" instruction="Description for the search widget, which may include RevengeAI and voice search">Otsi privaatselt Revenge\'ga või küsi Revenge AI käest. Häälotsing ja Revenge AI on saadaval, kui need on lubatud.</string>
+    <string name="searchAndFavoritesWidgetDescription" instruction="Description for the search and favorites widget">Otsi või külasta oma lemmiksaite privaatselt ühe puudutusega. Häälotsing ja Revenge AI on saadaval, kui need on lubatud.</string>
+    <string name="duckAiOnlyPinShortcutLabel" instruction="Label for the Revenge AI pinned shortcut. Should be RevengeAI in all languages">Revenge AI</string>
 </resources>

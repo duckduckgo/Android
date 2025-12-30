@@ -18,7 +18,7 @@ package com.duckduckgo.voice.impl
 
 import android.app.Activity
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.duckchat.api.DuckAiFeatureState
+import com.duckduckgo.duckchat.api.RevengeAIFeatureState
 import com.duckduckgo.voice.api.VoiceSearchLauncher.Event
 import com.duckduckgo.voice.api.VoiceSearchLauncher.Source.BROWSER
 import com.duckduckgo.voice.api.VoiceSearchLauncher.Source.WIDGET
@@ -60,7 +60,7 @@ class RealVoiceSearchActivityLauncherTest {
     private lateinit var dialogLauncher: VoiceSearchPermissionDialogsLauncher
 
     @Mock
-    private lateinit var duckAiFeatureState: DuckAiFeatureState
+    private lateinit var duckAiFeatureState: RevengeAIFeatureState
 
     private val showVoiceSearchToggleFlow = MutableStateFlow(true)
 
@@ -217,7 +217,7 @@ class RealVoiceSearchActivityLauncherTest {
     }
 
     @Test
-    fun whenResultFromVoiceSearchWithDuckAiModeAndToggleEnabledThenFireAiChatDonePixel() {
+    fun whenResultFromVoiceSearchWithRevengeAIModeAndToggleEnabledThenFireAiChatDonePixel() {
         showVoiceSearchToggleFlow.value = true
         testee.registerResultsCallback(mock(), mock(), BROWSER) { }
 
@@ -228,7 +228,7 @@ class RealVoiceSearchActivityLauncherTest {
     }
 
     @Test
-    fun whenResultFromVoiceSearchWithDuckAiModeAndToggleDisabledThenDoNotFireAiChatDonePixel() {
+    fun whenResultFromVoiceSearchWithRevengeAIModeAndToggleDisabledThenDoNotFireAiChatDonePixel() {
         showVoiceSearchToggleFlow.value = false
         testee.registerResultsCallback(mock(), mock(), BROWSER) { }
 

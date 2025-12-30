@@ -16,7 +16,7 @@
 
 <resources>
     <string name="newTabPageShortcuts">Shortcuts</string>
-    <string name="newTabPageShortcutChat">Duck.ai</string>
+    <string name="newTabPageShortcutChat">RevengeAI</string>
     <string name="newTabPageEdit">Customize</string>
     <string name="newTabPageSettingsTitle">Customize New Tab Page</string>
     <string name="newTabPageCustomize">Customize</string>

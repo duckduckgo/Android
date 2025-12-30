@@ -23,7 +23,7 @@ import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.messaging.fakes.FakeDuckChatInternal
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_PAID_OPEN_DUCK_AI_CLICKED
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_PAID_SETTINGS_OPENED
-import com.duckduckgo.duckchat.impl.subscription.DuckAiPaidSettingsViewModel.Command
+import com.duckduckgo.duckchat.impl.subscription.RevengeAIPaidSettingsViewModel.Command
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import kotlinx.coroutines.test.runTest
@@ -37,7 +37,7 @@ import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 
-class DuckAiPaidSettingsViewModelTest {
+class RevengeAIPaidSettingsViewModelTest {
 
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
@@ -46,14 +46,14 @@ class DuckAiPaidSettingsViewModelTest {
     private val fakeDuckChatInternal = FakeDuckChatInternal(enabled = true)
     private val duckChatFeature = FakeFeatureToggleFactory.create(DuckChatFeature::class.java)
 
-    private lateinit var testee: DuckAiPaidSettingsViewModel
+    private lateinit var testee: RevengeAIPaidSettingsViewModel
 
     @Before
     fun setUp() {
         @Suppress("DenyListedApi")
         duckChatFeature.duckAiPaidSettingsStatus().setRawStoredState(State(enable = true))
 
-        testee = DuckAiPaidSettingsViewModel(
+        testee = RevengeAIPaidSettingsViewModel(
             pixel = mockPixel,
             dispatchers = coroutineTestRule.testDispatcherProvider,
             duckChat = fakeDuckChatInternal,
@@ -75,16 +75,16 @@ class DuckAiPaidSettingsViewModelTest {
     }
 
     @Test
-    fun `when onOpenDuckAiSelected is called then OpenDuckAi command is emitted`() = runTest {
+    fun `when onOpenRevengeAISelected is called then OpenRevengeAI command is emitted`() = runTest {
         testee.commands.test {
-            testee.onOpenDuckAiSelected()
-            assertEquals(Command.OpenDuckAi, awaitItem())
+            testee.onOpenRevengeAISelected()
+            assertEquals(Command.OpenRevengeAI, awaitItem())
         }
     }
 
     @Test
-    fun `when onOpenDuckAiSelected is called then pixel is fired`() = runTest {
-        testee.onOpenDuckAiSelected()
+    fun `when onOpenRevengeAISelected is called then pixel is fired`() = runTest {
+        testee.onOpenRevengeAISelected()
         verify(mockPixel).fire(DUCK_CHAT_PAID_OPEN_DUCK_AI_CLICKED)
     }
 
@@ -111,7 +111,7 @@ class DuckAiPaidSettingsViewModelTest {
         @Suppress("DenyListedApi")
         featureToggle.duckAiPaidSettingsStatus().setRawStoredState(State(enable = true))
 
-        val viewModel = DuckAiPaidSettingsViewModel(
+        val viewModel = RevengeAIPaidSettingsViewModel(
             pixel = mockPixel,
             dispatchers = coroutineTestRule.testDispatcherProvider,
             duckChat = enabledFakeDuckChat,
@@ -131,7 +131,7 @@ class DuckAiPaidSettingsViewModelTest {
         @Suppress("DenyListedApi")
         featureToggle.duckAiPaidSettingsStatus().setRawStoredState(State(enable = true))
 
-        val viewModel = DuckAiPaidSettingsViewModel(
+        val viewModel = RevengeAIPaidSettingsViewModel(
             pixel = mockPixel,
             dispatchers = coroutineTestRule.testDispatcherProvider,
             duckChat = disabledFakeDuckChat,
@@ -151,7 +151,7 @@ class DuckAiPaidSettingsViewModelTest {
         @Suppress("DenyListedApi")
         featureToggle.duckAiPaidSettingsStatus().setRawStoredState(State(enable = false))
 
-        val viewModel = DuckAiPaidSettingsViewModel(
+        val viewModel = RevengeAIPaidSettingsViewModel(
             pixel = mockPixel,
             dispatchers = coroutineTestRule.testDispatcherProvider,
             duckChat = disabledFakeDuckChat,
@@ -172,13 +172,13 @@ class DuckAiPaidSettingsViewModelTest {
     }
 
     @Test
-    fun `when feature is enabled then isDuckAiPaidSettingsFeatureEnabled is true`() = runTest {
+    fun `when feature is enabled then isRevengeAIPaidSettingsFeatureEnabled is true`() = runTest {
         val enabledFakeDuckChat = FakeDuckChatInternal(enabled = true)
         val featureToggle = FakeFeatureToggleFactory.create(DuckChatFeature::class.java)
         @Suppress("DenyListedApi")
         featureToggle.duckAiPaidSettingsStatus().setRawStoredState(State(enable = true))
 
-        val viewModel = DuckAiPaidSettingsViewModel(
+        val viewModel = RevengeAIPaidSettingsViewModel(
             pixel = mockPixel,
             dispatchers = coroutineTestRule.testDispatcherProvider,
             duckChat = enabledFakeDuckChat,
@@ -187,7 +187,7 @@ class DuckAiPaidSettingsViewModelTest {
 
         viewModel.viewState.test {
             val state = expectMostRecentItem()
-            assertTrue(state!!.isDuckAiPaidSettingsFeatureEnabled)
+            assertTrue(state!!.isRevengeAIPaidSettingsFeatureEnabled)
         }
     }
 }

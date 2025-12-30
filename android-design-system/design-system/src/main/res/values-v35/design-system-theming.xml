@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <!--
-  ~ Copyright (c) 2024 DuckDuckGo
+  ~ Copyright (c) 2024 Revenge
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@
 
 <resources>
 
-    <style name="Platform.Theme.DuckDuckGo" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+    <style name="Platform.Theme.Revenge" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="android:windowLightStatusBar">?attr/preferDarkStatusBarIcons</item>
         <item name="android:windowLightNavigationBar">?attr/preferDarkNavigationBarIcons</item>
         <item name="android:statusBarColor">?attr/preferredStatusBarColor</item>

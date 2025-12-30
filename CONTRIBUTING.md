@@ -1,6 +1,6 @@
-# Contributing to DuckDuckGo
+# Contributing to Revenge
 
-Thank you for taking the time to contribute to DuckDuckGo! :sparkles:
+Thank you for taking the time to contribute to Revenge! :sparkles:
 
 We are pleased to open up the project to you - our community. How can you contribute?
 
@@ -24,7 +24,7 @@ When a new issue is opened, we will label it as:
 * under investigation: our team will investigate the issue
 
 After our team has investigated each issue, we will label them as:
-* Will fix: issue will be fixed internally by DuckDuckGo
+* Will fix: issue will be fixed internally by Revenge
 * [help wanted](https://github.com/duckduckgo/Android/issues?q=is%3Aissue+is%3Aopen+label%3A%22help+wanted%22): community contributions are welcome
 * Won't fix: issue will be closed without a fix
 

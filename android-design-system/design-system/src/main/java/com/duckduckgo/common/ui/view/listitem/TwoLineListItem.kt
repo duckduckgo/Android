@@ -68,7 +68,7 @@ class TwoLineListItem @JvmOverloads constructor(
             attrs,
             R.styleable.TwoLineListItem,
             0,
-            R.style.Widget_DuckDuckGo_TwoLineListItem,
+            R.style.Widget_Revenge_TwoLineListItem,
         ).apply {
             setPrimaryText(getString(R.styleable.TwoLineListItem_primaryText))
             setSecondaryText(getString(R.styleable.TwoLineListItem_secondaryText))

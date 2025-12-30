@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Copyright (c) 2022 DuckDuckGo
+  ~ Copyright (c) 2022 Revenge
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -181,7 +181,7 @@
         <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
             android:layout_height="wrap_content"
             android:layout_width="match_parent"
-            app:primaryText="Dax Dialogs"
+            app:primaryText="Revenge Dialogs"
             android:layout_marginTop="16dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />

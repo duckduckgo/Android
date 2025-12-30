@@ -212,7 +212,7 @@ class ClearPersonalDataActionTest {
     @Test
     fun whenClearBrowserDataOnlyCalledThenDataManagerClearsDataWithCorrectFlags() = runTest {
         testee.clearBrowserDataOnly(shouldFireDataClearPixel = false)
-        verify(mockDataManager).clearData(any(), any(), shouldClearBrowserData = eq(true), shouldClearDuckAiData = eq(false))
+        verify(mockDataManager).clearData(any(), any(), shouldClearBrowserData = eq(true), shouldClearRevengeAIData = eq(false))
     }
 
     @Test
@@ -271,9 +271,9 @@ class ClearPersonalDataActionTest {
     }
 
     @Test
-    fun whenClearDuckAiChatsOnlyCalledThenDataManagerClearsDataWithCorrectFlagsAndInteractions() = runTest {
-        testee.clearDuckAiChatsOnly()
-        verify(mockDataManager).clearData(any(), any(), shouldClearBrowserData = eq(false), shouldClearDuckAiData = eq(true))
+    fun whenClearRevengeAIChatsOnlyCalledThenDataManagerClearsDataWithCorrectFlagsAndInteractions() = runTest {
+        testee.clearRevengeAIChatsOnly()
+        verify(mockDataManager).clearData(any(), any(), shouldClearBrowserData = eq(false), shouldClearRevengeAIData = eq(true))
         verifyNoInteractions(mockTabRepository)
         verifyNoInteractions(mockAppCacheClearer)
         verifyNoInteractions(mockCookieManager)

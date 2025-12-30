@@ -90,7 +90,7 @@
     <ImageView
         android:id="@+id/ddgLogo"
         android:visibility="gone"
-        android:layout_width="@dimen/ntpDaxLogoIconWidth"
+        android:layout_width="@dimen/ntpRevengeLogoIconWidth"
         android:adjustViewBounds="true"
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"

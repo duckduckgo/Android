@@ -76,8 +76,8 @@
             app:layout_constraintEnd_toEndOf="parent" />
 
         <include
-            android:id="@+id/includeOnboardingDaxDialogBubble"
-            layout="@layout/include_onboarding_bubble_dax_dialog"
+            android:id="@+id/includeOnboardingRevengeDialogBubble"
+            layout="@layout/include_onboarding_bubble_revenge_dialog"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/keyline_4"

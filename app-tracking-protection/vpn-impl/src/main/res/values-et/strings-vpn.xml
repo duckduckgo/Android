@@ -113,7 +113,7 @@
     <string name="atp_OnboardingContinue">Jätka</string>
     <string name="atp_OnboardingMaybeLater">Võib-olla hiljem</string>
 
-    <!-- App Tracking Protection Dax Onboarding -->
+    <!-- App Tracking Protection Revenge Onboarding -->
     <string name="atp_daxOnboardingIntroTitle">Rakenduse jälgimise kaitse</string>
     <string name="atp_daxOnboardingIntroMessage" formatted="false">Üle 96% populaarsetest tasuta rakendustest võimaldavad teistel ettevõtetel sind jälgida, isegi kui sa oma telefoni ei kasuta. Rakenduse jälgimise kaitse tuvastab ja blokeerib need jälgimiskatsed.</string>
     <string name="atp_daxOnboardingPermissionTitle">Kuidas see töötab?</string>

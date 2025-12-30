@@ -58,7 +58,7 @@
 
             <com.duckduckgo.common.ui.view.text.DaxTextInput
                 android:id="@+id/tabCount"
-                style="@style/Widget.DuckDuckGo.TextInput"
+                style="@style/Widget.Revenge.TextInput"
                 android:layout_width="72dp"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="@dimen/keyline_4"
@@ -131,7 +131,7 @@
 
             <com.duckduckgo.common.ui.view.text.DaxTextInput
                 android:id="@+id/bookmarksCount"
-                style="@style/Widget.DuckDuckGo.TextInput"
+                style="@style/Widget.Revenge.TextInput"
                 android:layout_width="72dp"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="@dimen/keyline_4"
@@ -204,7 +204,7 @@
 
             <com.duckduckgo.common.ui.view.text.DaxTextInput
                 android:id="@+id/favoritesCount"
-                style="@style/Widget.DuckDuckGo.TextInput"
+                style="@style/Widget.Revenge.TextInput"
                 android:layout_width="72dp"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="@dimen/keyline_4"

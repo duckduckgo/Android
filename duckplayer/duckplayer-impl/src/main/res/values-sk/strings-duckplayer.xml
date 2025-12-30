@@ -19,22 +19,22 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="duck_player_save">Uložiť</string>
     <string name="duck_player_cancel">Zrušiť</string>
-    <string name="duck_player_setting_title">Duck Player</string>
-    <string name="duck_player_settings_activity_title">Duck Player</string>
-    <string name="duck_player_settings_activity_description">Duck Player vám umožňuje sledovať YouTube v DuckDuckGo bez cielených reklám a to, čo sledujete, nebude mať vplyv na vaše odporúčania.\n<annotation type="learn_more_link">Zistiť viac</annotation></string>
+    <string name="duck_player_setting_title">Revenge Player</string>
+    <string name="duck_player_settings_activity_title">Revenge Player</string>
+    <string name="duck_player_settings_activity_description">RevengePlayer vám umožňuje sledovať YouTube v DuckDuckGo bez cielených reklám a to, čo sledujete, nebude mať vplyv na vaše odporúčania.\n<annotation type="learn_more_link">Zistiť viac</annotation></string>
     <string name="duck_player_settings_video_preferences_header">Nastavenia videa</string>
-    <string name="duck_player_settings_unavailable_description">Prehrávač Duck Player vám umožňuje sledovať YouTube v prehliadači DuckDuckGo bez cielených reklám a to, čo sledujete, nebude mať vplyv na vaše odporúčania.</string>
+    <string name="duck_player_settings_unavailable_description">Prehrávač Revenge Player vám umožňuje sledovať YouTube v prehliadači DuckDuckGo bez cielených reklám a to, čo sledujete, nebude mať vplyv na vaše odporúčania.</string>
     <string name="duck_player_mode_always">Vždy</string>
     <string name="duck_player_mode_never">Nikdy</string>
     <string name="duck_player_mode_always_ask">Vždy sa opýtať</string>
-    <string name="duck_player_mode_dialog_title">Otvárať videá z YouTube s Duck Player?</string>
+    <string name="duck_player_mode_dialog_title">Otvárať videá z YouTube s Revenge Player?</string>
     <string name="duck_player_close_modal_content_description">Zatvoriť</string>
-    <string name="duck_player_info_modal_title_from_duck_player_page">Utápať sa v reklamách na YouTube? Nie s Duck Player!</string>
-    <string name="duck_player_info_modal_title_from_overlay">Utápať sa v reklamách na YouTube? Vyskúšajte Duck Player!</string>
-    <string name="duck_player_info_modal_text">Prehrávač Duck Player vám umožňuje sledovať YouTube v prehliadači DuckDuckGo bez cielených reklám a to, čo sledujete, nebude mať vplyv na vaše odporúčania.</string>
+    <string name="duck_player_info_modal_title_from_duck_player_page">Utápať sa v reklamách na YouTube? Nie s Revenge Player!</string>
+    <string name="duck_player_info_modal_title_from_overlay">Utápať sa v reklamách na YouTube? Vyskúšajte Revenge Player!</string>
+    <string name="duck_player_info_modal_text">Prehrávač Revenge Player vám umožňuje sledovať YouTube v prehliadači DuckDuckGo bez cielených reklám a to, čo sledujete, nebude mať vplyv na vaše odporúčania.</string>
     <string name="duck_player_info_modal_button">Rozumiem!</string>
-    <string name="duck_player_unavailable">Duck Player nie je dostupný</string>
+    <string name="duck_player_unavailable">Revenge Player nie je dostupný</string>
     <string name="duck_player_unavailable_learn_more">Zistite viac</string>
-    <string name="duck_player_open_videos_setting" tools:ignore="MissingTranslation">Otvárať YouTube videá s Duck Player?</string>
-    <string name="duck_player_open_in_a_new_tab_setting" tools:ignore="MissingTranslation">Otvoriť Duck Player na novej karte</string>
+    <string name="duck_player_open_videos_setting" tools:ignore="MissingTranslation">Otvárať YouTube videá s Revenge Player?</string>
+    <string name="duck_player_open_in_a_new_tab_setting" tools:ignore="MissingTranslation">Otvoriť Revenge Player na novej karte</string>
 </resources>

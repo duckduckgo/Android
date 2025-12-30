@@ -104,7 +104,7 @@ interface SettingsDataStore {
      * When false, the preference may be updated if business rules change (via feature flags).
      */
     var urlPreferenceSetByUser: Boolean
-    var clearDuckAiData: Boolean
+    var clearRevengeAIData: Boolean
 
     /**
      * Check if a value has been set to the URL display preference.
@@ -263,7 +263,7 @@ class SettingsSharedPreferences @Inject constructor(
         get() = preferences.getBoolean(URL_PREFERENCE_SET_BY_USER, false)
         set(value) = preferences.edit { putBoolean(URL_PREFERENCE_SET_BY_USER, value) }
 
-    override var clearDuckAiData: Boolean
+    override var clearRevengeAIData: Boolean
         get() = preferences.getBoolean(KEY_CLEAR_DUCK_AI_DATA, false)
         set(enabled) = preferences.edit { putBoolean(KEY_CLEAR_DUCK_AI_DATA, enabled) }
 

@@ -167,7 +167,7 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
         }
     }
 
-    fun onDuckAiHideAiGeneratedImagesClicked() {
+    fun onRevengeAIHideAiGeneratedImagesClicked() {
         viewModelScope.launch {
             commandChannel.send(
                 OpenLink(
@@ -179,13 +179,13 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
         }
     }
 
-    fun onDuckAiShortcutsClicked() {
+    fun onRevengeAIShortcutsClicked() {
         viewModelScope.launch {
             commandChannel.send(OpenShortcutSettings)
         }
     }
 
-    fun onDuckAiInputScreenWithoutAiSelected() {
+    fun onRevengeAIInputScreenWithoutAiSelected() {
         viewModelScope.launch {
             pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_ADDRESS_BAR_SETTING_OFF)
             inputScreenDiscoveryFunnel.onInputScreenDisabled()
@@ -193,7 +193,7 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
         }
     }
 
-    fun onDuckAiInputScreenWithAiSelected() {
+    fun onRevengeAIInputScreenWithAiSelected() {
         viewModelScope.launch {
             pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_ADDRESS_BAR_SETTING_ON)
             inputScreenDiscoveryFunnel.onInputScreenEnabled()

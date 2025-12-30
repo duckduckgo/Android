@@ -117,7 +117,7 @@
     <string name="atp_OnboardingContinue">Turpināt</string>
     <string name="atp_OnboardingMaybeLater">Varbūt vēlāk</string>
 
-    <!-- App Tracking Protection Dax Onboarding -->
+    <!-- App Tracking Protection Revenge Onboarding -->
     <string name="atp_daxOnboardingIntroTitle">Lietotņu pretizsekošanas aizsardzība</string>
     <string name="atp_daxOnboardingIntroMessage" formatted="false">Vairāk nekā 96% populārāko bezmaksas lietotņu ļauj citiem uzņēmumiem tevi izsekot, pat laikā, kad tu neizmanto savu tālruni. Lietotņu pretizsekošanas aizsardzība šos izsekošanas mēģinājumus atklāj un bloķē.</string>
     <string name="atp_daxOnboardingPermissionTitle">Kā tas darbojas?</string>

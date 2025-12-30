@@ -22,7 +22,7 @@ import androidx.datastore.preferences.core.edit
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.duckchat.api.DuckAiFeatureState
+import com.duckduckgo.duckchat.api.RevengeAIFeatureState
 import com.duckduckgo.duckchat.impl.inputscreen.ui.metrics.discovery.InputScreenDiscoveryFunnelStep.FeatureEnabled
 import com.duckduckgo.duckchat.impl.inputscreen.ui.metrics.discovery.InputScreenDiscoveryFunnelStep.FullyConverted
 import com.duckduckgo.duckchat.impl.inputscreen.ui.metrics.discovery.InputScreenDiscoveryFunnelStep.OmnibarInteracted
@@ -38,7 +38,7 @@ import kotlinx.coroutines.sync.withLock
 import javax.inject.Inject
 
 interface InputScreenDiscoveryFunnel {
-    fun onDuckAiSettingsSeen()
+    fun onRevengeAISettingsSeen()
     fun onInputScreenEnabled()
     fun onInputScreenDisabled()
     fun onInputScreenOpened()
@@ -51,12 +51,12 @@ class InputScreenDiscoveryFunnelImpl @Inject constructor(
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     @InputScreenDiscoveryFunnelStore private val dataStore: DataStore<Preferences>,
     private val pixel: Pixel,
-    private val duckAiFeatureState: DuckAiFeatureState,
+    private val duckAiFeatureState: RevengeAIFeatureState,
 ) : InputScreenDiscoveryFunnel {
 
     private val stepProcessingMutex = Mutex()
 
-    override fun onDuckAiSettingsSeen() {
+    override fun onRevengeAISettingsSeen() {
         if (!duckAiFeatureState.showInputScreen.value) {
             onStep(SettingsSeen)
         }

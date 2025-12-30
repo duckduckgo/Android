@@ -39,12 +39,12 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
 import com.duckduckgo.duckchat.impl.R.string
-import com.duckduckgo.duckchat.impl.databinding.ActivityDuckAiPaidSettingsBinding
-import com.duckduckgo.duckchat.impl.subscription.DuckAiPaidSettingsViewModel.Command
-import com.duckduckgo.duckchat.impl.subscription.DuckAiPaidSettingsViewModel.Command.LaunchLearnMoreWebPage
-import com.duckduckgo.duckchat.impl.subscription.DuckAiPaidSettingsViewModel.Command.OpenDuckAi
-import com.duckduckgo.duckchat.impl.subscription.DuckAiPaidSettingsViewModel.Command.OpenDuckChatSettings
-import com.duckduckgo.duckchat.impl.subscription.DuckAiPaidSettingsViewModel.ViewState
+import com.duckduckgo.duckchat.impl.databinding.ActivityRevengeAiPaidSettingsBinding
+import com.duckduckgo.duckchat.impl.subscription.RevengeAIPaidSettingsViewModel.Command
+import com.duckduckgo.duckchat.impl.subscription.RevengeAIPaidSettingsViewModel.Command.LaunchLearnMoreWebPage
+import com.duckduckgo.duckchat.impl.subscription.RevengeAIPaidSettingsViewModel.Command.OpenRevengeAI
+import com.duckduckgo.duckchat.impl.subscription.RevengeAIPaidSettingsViewModel.Command.OpenDuckChatSettings
+import com.duckduckgo.duckchat.impl.subscription.RevengeAIPaidSettingsViewModel.ViewState
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -52,18 +52,18 @@ import javax.inject.Inject
 import com.duckduckgo.duckchat.impl.R as DuckChatR
 import com.duckduckgo.mobile.android.R as CommonR
 
-object DuckAiPaidSettingsNoParams : GlobalActivityStarter.ActivityParams
+object RevengeAIPaidSettingsNoParams : GlobalActivityStarter.ActivityParams
 
 @InjectWith(ActivityScope::class)
-@ContributeToActivityStarter(DuckAiPaidSettingsNoParams::class)
-class DuckAiPaidSettingsActivity : DuckDuckGoActivity() {
+@ContributeToActivityStarter(RevengeAIPaidSettingsNoParams::class)
+class RevengeAIPaidSettingsActivity : DuckDuckGoActivity() {
 
     @Inject lateinit var globalActivityStarter: GlobalActivityStarter
 
     @Inject lateinit var duckChat: DuckChat
 
-    private val viewModel: DuckAiPaidSettingsViewModel by bindViewModel()
-    private val binding: ActivityDuckAiPaidSettingsBinding by viewBinding()
+    private val viewModel: RevengeAIPaidSettingsViewModel by bindViewModel()
+    private val binding: ActivityRevengeAiPaidSettingsBinding by viewBinding()
 
     private val toolbar
         get() = binding.includeToolbar.toolbar
@@ -92,8 +92,8 @@ class DuckAiPaidSettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun configureUiEventHandlers() {
-        binding.duckAiPaidSettingsOpenDuckAi.setOnClickListener {
-            viewModel.onOpenDuckAiSelected()
+        binding.duckAiPaidSettingsOpenRevengeAI.setOnClickListener {
+            viewModel.onOpenRevengeAISelected()
         }
         binding.duckAiPaidSettingsEnableInSettings.setOnClickListener {
             viewModel.onEnableInSettingsSelected()
@@ -114,14 +114,14 @@ class DuckAiPaidSettingsActivity : DuckDuckGoActivity() {
 
     private fun renderViewState(viewState: ViewState) {
         with(binding) {
-            if (viewState.isDuckAiPaidSettingsFeatureEnabled) {
+            if (viewState.isRevengeAIPaidSettingsFeatureEnabled) {
                 duckAiPaidSettingsIcon.setImageResource(DuckChatR.drawable.duckai_128)
             } else {
                 duckAiPaidSettingsIcon.setImageResource(DuckChatR.drawable.duckai_ddg_128)
             }
 
             statusIndicator.setStatus(viewState.isDuckAIEnabled)
-            duckAiPaidSettingsOpenDuckAi.isVisible = viewState.isDuckAIEnabled
+            duckAiPaidSettingsOpenRevengeAI.isVisible = viewState.isDuckAIEnabled
             duckAiPaidSettingsEnableInSettings.isVisible = true
             duckAiPaidSettingsEnableInSettings.setPrimaryText(
                 if (viewState.isDuckAIEnabled) {
@@ -147,7 +147,7 @@ class DuckAiPaidSettingsActivity : DuckDuckGoActivity() {
                 globalActivityStarter.start(this, WebViewActivityWithParams(command.url, getString(command.titleId)), options)
             }
 
-            OpenDuckAi -> {
+            OpenRevengeAI -> {
                 duckChat.openDuckChat()
             }
 

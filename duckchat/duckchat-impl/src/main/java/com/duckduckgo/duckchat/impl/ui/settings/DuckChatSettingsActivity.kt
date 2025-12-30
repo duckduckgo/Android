@@ -109,7 +109,7 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
         observeViewModel()
 
         pixel.fire(DUCK_CHAT_SETTINGS_DISPLAYED)
-        inputScreenDiscoveryFunnel.onDuckAiSettingsSeen()
+        inputScreenDiscoveryFunnel.onRevengeAISettingsSeen()
     }
 
     private fun observeViewModel() {
@@ -125,7 +125,7 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun renderViewState(viewState: ViewState) {
-        binding.userEnabledDuckChatToggle.quietlySetIsChecked(viewState.isDuckChatUserEnabled, userEnabledDuckChatToggleListener)
+        binding.userEnabledRevengeChatToggle.quietlySetIsChecked(viewState.isDuckChatUserEnabled, userEnabledDuckChatToggleListener)
 
         // align content with the main Duck.ai toggle's text
         val offset =
@@ -178,23 +178,23 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
 
         binding.duckAiShortcuts.isVisible = viewState.shouldShowShortcuts
         binding.duckAiShortcuts.setOnClickListener {
-            viewModel.onDuckAiShortcutsClicked()
+            viewModel.onRevengeAIShortcutsClicked()
         }
 
         renderSearchSettingsSection(viewState)
 
         binding.duckAiInputScreenWithoutAiContainer.setOnClickListener {
-            viewModel.onDuckAiInputScreenWithoutAiSelected()
+            viewModel.onRevengeAIInputScreenWithoutAiSelected()
         }
         binding.duckAiInputScreenWithAiContainer.setOnClickListener {
-            viewModel.onDuckAiInputScreenWithAiSelected()
+            viewModel.onRevengeAIInputScreenWithAiSelected()
         }
     }
 
     private fun renderSearchSettingsSection(viewState: ViewState) {
         with(binding) {
             if (viewState.isSearchSectionVisible) {
-                with(showDuckChatSearchSettingsLink) {
+                with(showRevengeChatSearchSettingsLink) {
                     isVisible = true
                     setOnClickListener {
                         viewModel.duckChatSearchAISettingsClicked()
@@ -207,7 +207,7 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
                     with(duckAiHideAiGeneratedImagesLink) {
                         isVisible = true
                         setOnClickListener {
-                            viewModel.onDuckAiHideAiGeneratedImagesClicked()
+                            viewModel.onRevengeAIHideAiGeneratedImagesClicked()
                         }
                     }
                 } else {
@@ -217,7 +217,7 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
             } else {
                 divider2.isGone = true
                 searchSettingsSectionHeader.isGone = true
-                showDuckChatSearchSettingsLink.isGone = true
+                showRevengeChatSearchSettingsLink.isGone = true
                 duckAiHideAiGeneratedImagesLink.isGone = true
             }
         }
@@ -249,7 +249,7 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
             }
 
             is DuckChatSettingsViewModel.Command.OpenShortcutSettings -> {
-                val intent = Intent(this, DuckAiShortcutSettingsActivity::class.java)
+                val intent = Intent(this, RevengeAIShortcutSettingsActivity::class.java)
                 startActivity(intent)
             }
 

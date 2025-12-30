@@ -36,23 +36,23 @@ import javax.inject.Inject
     boundType = AttributeMatcherPlugin::class,
 )
 @SingleInstanceIn(AppScope::class)
-class RMFDaysSinceDuckAiUsedMatchingAttribute @Inject constructor(
+class RMFDaysSinceRevengeAIUsedMatchingAttribute @Inject constructor(
     private val duckChatFeatureRepository: DuckChatFeatureRepository,
 ) : JsonToMatchingAttributeMapper, AttributeMatcherPlugin {
     override suspend fun evaluate(matchingAttribute: MatchingAttribute): Boolean? {
         return when (matchingAttribute) {
-            is DaysSinceDuckAiUsedMatchingAttribute -> {
-                return if (matchingAttribute == DaysSinceDuckAiUsedMatchingAttribute()) {
+            is DaysSinceRevengeAIUsedMatchingAttribute -> {
+                return if (matchingAttribute == DaysSinceRevengeAIUsedMatchingAttribute()) {
                     false
                 } else {
-                    val lastDuckAiSessionTimestamp = duckChatFeatureRepository.lastSessionTimestamp()
-                    // If lastDuckAiSessionTimestamp is 0, Duck AI was never used, so no matching criteria should match
-                    if (lastDuckAiSessionTimestamp == 0L) {
+                    val lastRevengeAISessionTimestamp = duckChatFeatureRepository.lastSessionTimestamp()
+                    // If lastRevengeAISessionTimestamp is 0, Duck AI was never used, so no matching criteria should match
+                    if (lastRevengeAISessionTimestamp == 0L) {
                         return false
                     }
 
                     val now = System.currentTimeMillis()
-                    val daysSinceUsed = TimeUnit.MILLISECONDS.toDays(now - lastDuckAiSessionTimestamp).toInt()
+                    val daysSinceUsed = TimeUnit.MILLISECONDS.toDays(now - lastRevengeAISessionTimestamp).toInt()
                     if (!matchingAttribute.value.isDefaultValue()) {
                         matchingAttribute.value == daysSinceUsed
                     } else {
@@ -75,9 +75,9 @@ class RMFDaysSinceDuckAiUsedMatchingAttribute @Inject constructor(
         jsonMatchingAttribute: JsonMatchingAttribute,
     ): MatchingAttribute? {
         return when (key) {
-            DaysSinceDuckAiUsedMatchingAttribute.KEY -> {
+            DaysSinceRevengeAIUsedMatchingAttribute.KEY -> {
                 try {
-                    DaysSinceDuckAiUsedMatchingAttribute(
+                    DaysSinceRevengeAIUsedMatchingAttribute(
                         min = jsonMatchingAttribute.min.toIntOrDefault(-1),
                         max = jsonMatchingAttribute.max.toIntOrDefault(-1),
                         value = jsonMatchingAttribute.value.toIntOrDefault(-1),
@@ -92,13 +92,13 @@ class RMFDaysSinceDuckAiUsedMatchingAttribute @Inject constructor(
     }
 }
 
-internal data class DaysSinceDuckAiUsedMatchingAttribute(
+internal data class DaysSinceRevengeAIUsedMatchingAttribute(
     val min: Int = -1,
     val max: Int = -1,
     val value: Int = -1,
 ) : MatchingAttribute {
     companion object {
-        const val KEY = "daysSinceDuckAiUsed"
+        const val KEY = "daysSinceRevengeAIUsed"
     }
 }
 

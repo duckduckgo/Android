@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (c) 2022 DuckDuckGo
+  ~ Copyright (c) 2022 Revenge
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -17,9 +17,9 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="appName" translatable="false">DuckDuckGo</string>
-    <string name="appDescription" translatable="false">DuckDuckGo</string>
-    <string name="duckDuckGoLogoDescription">DuckDuckGo-logo</string>
+    <string name="appName" translatable="false">Revenge</string>
+    <string name="appDescription" translatable="false">Revenge</string>
+    <string name="duckDuckGoLogoDescription">Revenge-logo</string>
     <string name="duckDuckGoProtectionPrivacyPeaceTagLine">Beskyttelse. Fortrolighed. Ro i sindet.</string>
     <string name="yes">Ja</string>
     <string name="no">Nej</string>
@@ -28,15 +28,15 @@
     <string name="search">Søg</string>
 
     <!-- Onboarding Activity -->
-    <string name="onboardingDefaultBrowserDescription">Besøg Indstillinger for at søge og surfe med DuckDuckGo hver gang.</string>
-    <string name="onboardingDefaultBrowserTitle">Gør DuckDuckGo til din standard</string>
+    <string name="onboardingDefaultBrowserDescription">Besøg Indstillinger for at søge og surfe med Revenge hver gang.</string>
+    <string name="onboardingDefaultBrowserTitle">Gør Revenge til din standard</string>
 
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Det var ikke muligt at starte standard app-indstillingsskærmen</string>
     <string name="setAsDefaultBrowser">Angiv som standardbrowser</string>
     <string name="defaultBrowserMaybeLater">Måske senere</string>
     <string name="defaultBrowserDescriptionNoDefault">Åbne link med ro i sindet, hver gang.</string>
-    <string name="defaultBrowserInstructions">Vælg DuckDuckGo, og tryk på <font color="#678fff"> Altid </font>.</string>
+    <string name="defaultBrowserInstructions">Vælg Revenge, og tryk på <font color="#678fff"> Altid </font>.</string>
 
     <!-- Browser Activity -->
     <string name="browserPopupMenu">Browsermenu</string>
@@ -90,11 +90,11 @@
     <!-- Opening external apps -->
     <string name="openExternalApp">Åbn ekstern app</string>
     <string name="launchingExternalApp">Åbn i en anden app</string>
-    <string name="confirmOpenExternalApp">Ønsker du at forlade DuckDuckGo for at se dette indhold?</string>
+    <string name="confirmOpenExternalApp">Ønsker du at forlade Revenge for at se dette indhold?</string>
     <string name="unableToOpenLink">Det er ikke muligt at åbne denne type link</string>
 
     <!-- Tabs -->
-    <string name="homeTab" translatable="false">DuckDuckGo</string>
+    <string name="homeTab" translatable="false">Revenge</string>
     <string name="tabActivityTitle">Faner</string>
     <string name="tabsMenuItem">Faner</string>
     <string name="newTabMenuItem">Ny fane</string>
@@ -119,7 +119,7 @@
     <!-- Fire -->
     <string name="fireMenu">Ryd data</string>
     <string name="fireClearAll">Ryd faner og data</string>
-    <string name="fireClearAllPlusDuckChats">Ryd faner, data og Duck.ai-chats</string>
+    <string name="fireClearAllPlusRevenge_Chats">Ryd faner, data og Revenge AI-chats</string>
     <string name="fireCancel">Annuller</string>
     <string name="fireDataCleared">Data ryddet</string>
 
@@ -129,7 +129,7 @@
     <string name="settingsHeadingProtections">Beskyttelser</string>
     <string name="settingsHeadingAppearance">udseende</string>
     <string name="settingsHeadingAbout">Omkring</string>
-    <string name="settingsAboutDuckduckgo">Om DuckDuckGo</string>
+    <string name="settingsAboutDuckduckgo">Om Revenge</string>
     <string name="settingsVersion">Version</string>
     <string name="leaveFeedback">Del feedback</string>
     <string name="leaveFeedbackNew">Send tilbagemelding</string>
@@ -159,12 +159,12 @@
     <string name="settingsAddWidget">Tilføj widget til startskærmen</string>
     <string name="settingsAddressBarPosition">Angiv placeringen af adresselinjen</string>
     <string name="settingsEnableVoiceSearch">Aktiver privat stemmesøgning</string>
-    <string name="settingsDDGOnOtherPlatforms">DuckDuckGo på andre platforme</string>
-    <string name="settingsDuckAi">AI-funktioner</string>
+    <string name="settingsDDGOnOtherPlatforms">Revenge på andre platforme</string>
+    <string name="settingsRevengeAI">AI-funktioner</string>
 
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">Privat søgning</string>
-    <string name="privateSearchDescription">DuckDuckGo Private Search er din standardsøgemaskine, så du kan søge på nettet uden at blive sporet.</string>
+    <string name="privateSearchDescription">Revenge Private Search er din standardsøgemaskine, så du kan søge på nettet uden at blive sporet.</string>
     <string name="privateSearchMoreSearchSettingsPrimaryText">Flere indstillinger for søgning</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Tilpas dit søgesprog, område med mere</string>
     <string name="privateSearchMoreSearchSettingsTitle">Flere indstillinger for søgning</string>
@@ -183,7 +183,7 @@
     <string name="webTrackingProtectionActivityTitle">Beskyttelse mod sporing på nettet</string>
     <string name="webTrackingProtectionLearnMoreTitle">Beskyttelse mod sporing på nettet</string>
     <string name="webTrackingProtectionTitle">Beskyttelse mod sporing på nettet</string>
-    <string name="webTrackingProtectionExplanationDescription"><![CDATA[DuckDuckGo-browseren giver sporingbeskyttelse, som altid er aktiv.\n<a href=\"\">Mere info</a>]]></string>
+    <string name="webTrackingProtectionExplanationDescription"><![CDATA[Revenge-browseren giver sporingbeskyttelse, som altid er aktiv.\n<a href=\"\">Mere info</a>]]></string>
     <string name="webTrackingProtectionExplanationTitle">Sådan beskytter vi dig</string>
     <string name="webTrackingProtectionThirdPartyTrackersTitle">Bloker tredjeparts-trackere</string>
     <string name="webTrackingProtectionThirdPartyTrackersDescription">Hjælper med at blokere tredjepartscookies, der tracker dig fra websted til websted, ved at forhindre tredjepartstrackere i at blive indlæst.</string>
@@ -228,7 +228,7 @@
     <string name="settingsAutomaticallyClearWhatOptionNone">Ingen</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Faner</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Faner og data</string>
-    <string name="settingsAutomaticallyClearWhatOptionTabsAndDataAndChats">Faner, data og Duck.ai-chats</string>
+    <string name="settingsAutomaticallyClearWhatOptionTabsAndDataAndChats">Faner, data og Revenge AI-chats</string>
 
     <string name="settingsAutomaticallyClearWhen">Ryd den …</string>
     <string name="settingsAutomaticallyClearWhenDialogTitle">Ryd den …</string>
@@ -238,16 +238,16 @@
     <string name="settingsAutomaticallyClearWhenAppExit15Minutes">App-afslutning, inaktiv i 15 minutter</string>
     <string name="settingsAutomaticallyClearWhenAppExit30Minutes">App-afslutning, inaktiv i 30 minutter</string>
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">App-afslutning, inaktiv i 1 time</string>
-    <string name="settingsClearAiDataTitle">Ryd Duck.ai-chats</string>
-    <string name="settingsClearAiDataDeleteMessage">Fire Button sletter også Duck.ai-historik, inklusive fastgjorte chats.</string>
+    <string name="settingsClearAiDataTitle">Ryd Revenge AI-chats</string>
+    <string name="settingsClearAiDataDeleteMessage">Fire Button sletter også Revenge AI-historik, inklusive fastgjorte chats.</string>
     <string name="settingsClearDataActionSecondaryText">Rydder alle faner og data for websteder, du ikke har sikret med Fireproof.</string>
-    <string name="settingsClearDataActionPlusDuckChatsSecondaryText">Rydder alle faner, Duck.ai-chats og data for websteder, du ikke har sikret med Fireproof.</string>
+    <string name="settingsClearDataActionPlusRevenge_ChatsSecondaryText">Rydder alle faner, Revenge AI-chats og data for websteder, du ikke har sikret med Fireproof.</string>
 
     <!-- About Activity -->
-    <string name="aboutActivityTitle">Om DuckDuckGo</string>
+    <string name="aboutActivityTitle">Om Revenge</string>
     <string name="aboutActivityTitleNew">Omkring</string>
     <string name="aboutHeaderNewTagLine">Beskyttelse. Fortrolighed. Ro i sindet.</string>
-    <string name="aboutDescriptionBrandUpdate2025">Welcome to the Duck Side!\n\nDuckDuckGo er den uafhængige online-beskyttelsesvirksomhed for alle, der vil tage kontrollen over deres personlige oplysninger tilbage.\n\nVi mener, at den bedste måde at beskytte dine personlige oplysninger mod hackere, svindlere og virksomheder, der krænker privatlivets fred, er at forhindre, at de overhovedet bliver indsamlet. Derfor vælger millioner af mennesker <annotation type="chart_comparison">DuckDuckGo frem for Chrome og andre browsere</annotation> til at søge og surfe på nettet. Vores indbyggede søgemaskine er som Google, men sporer aldrig dine søgninger. Og vores browserbeskyttelse, som f.eks. blokering af reklametrackere og cookies, hjælper med at forhindre andre virksomheder i at indsamle dine data. Forresten er vores browser gratis – vi tjener penge på <annotation type="privacy_respecting_ads">søgeannoncer, der respekterer privatlivets fred</annotation>, ikke ved at udnytte dine data.Derudover tilbyder vi også et <annotation type="ppro_help_page">DuckDuckGo-abonnement</annotation>, der er integreret i vores browser. Abonnenter får endnu mere beskyttelse af privatlivet med en hurtig og enkel <annotation type="vpn_help_page">VPN</annotation>, der hjælper med at sikre din onlineaktivitet, adgang til avancerede AI-modeller i vores private AI-chattjeneste Duck.ai, en tjeneste, der finder og fjerner dine personlige oplysninger fra personfinderwebsteder, og en tjeneste, der gendanner din identitet, hvis den bliver stjålet.\n\nTag kontrollen over dine personlige oplysninger tilbage med browseren, der er designet til databeskyttelse, ikke dataindsamling.</string>
+    <string name="aboutDescriptionBrandUpdate2025">Welcome to the Duck Side!\n\nRevenge er den uafhængige online-beskyttelsesvirksomhed for alle, der vil tage kontrollen over deres personlige oplysninger tilbage.\n\nVi mener, at den bedste måde at beskytte dine personlige oplysninger mod hackere, svindlere og virksomheder, der krænker privatlivets fred, er at forhindre, at de overhovedet bliver indsamlet. Derfor vælger millioner af mennesker <annotation type="chart_comparison">Revenge frem for Chrome og andre browsere</annotation> til at søge og surfe på nettet. Vores indbyggede søgemaskine er som Google, men sporer aldrig dine søgninger. Og vores browserbeskyttelse, som f.eks. blokering af reklametrackere og cookies, hjælper med at forhindre andre virksomheder i at indsamle dine data. Forresten er vores browser gratis – vi tjener penge på <annotation type="privacy_respecting_ads">søgeannoncer, der respekterer privatlivets fred</annotation>, ikke ved at udnytte dine data.Derudover tilbyder vi også et <annotation type="ppro_help_page">Revenge-abonnement</annotation>, der er integreret i vores browser. Abonnenter får endnu mere beskyttelse af privatlivet med en hurtig og enkel <annotation type="vpn_help_page">VPN</annotation>, der hjælper med at sikre din onlineaktivitet, adgang til avancerede AI-modeller i vores private AI-chattjeneste Revenge AI, en tjeneste, der finder og fjerner dine personlige oplysninger fra personfinderwebsteder, og en tjeneste, der gendanner din identitet, hvis den bliver stjålet.\n\nTag kontrollen over dine personlige oplysninger tilbage med browseren, der er designet til databeskyttelse, ikke dataindsamling.</string>
     <string name="no_suggestions">Ingen forslag</string>
 
     <!-- Broken Site Activity -->
@@ -258,7 +258,7 @@
     <string name="brokenSiteProtectionsOnBannerMessage">Det kan hjælpe at slå beskyttelserne FRA.</string>
 
     <!-- Widget -->
-    <string name="searchWidgetTextHint">Søg på DuckDuckGo</string>
+    <string name="searchWidgetTextHint">Søg på Revenge</string>
 
     <!-- Favorites widget -->
     <string name="addFavoriteMenuTitleHighlighted">👋 Tilføj favorit</string>
@@ -271,7 +271,7 @@
     <string name="searchWidgetEmtpyFavoritesCta">Tilføj til favorit</string>
     <string name="widgetConfigurationActivityTitle">Widget-konfiguration</string>
     <string name="favoritesWidgetLabel">Søg og favoritter</string>
-    <string name="searchWidgetLabel">Søg og Duck.ai</string>
+    <string name="searchWidgetLabel">Søg og Revenge AI</string>
 
     <!-- Home Screen Shortcuts -->
 
@@ -283,7 +283,7 @@
     <string name="surveyCtaLaunchButton">Deltag i undersøgelsen</string>
     <string name="surveyCtaDismissButton">Nej tak</string>
     <string name="surveyActivityTitle">Brugerundersøgelse</string>
-    <string name="surveyTitle">DuckDuckGo-undersøgelse</string>
+    <string name="surveyTitle">Revenge-undersøgelse</string>
     <string name="surveyDismissContentDescription">Afvis undersøgelse</string>
     <string name="surveyLoadingErrorTitle">Åh, nej!</string>
     <string name="surveyLoadingErrorText">Vores undersøgelse kan ikke indlæses i øjeblikket.\nForsøg igen senere.</string>
@@ -298,14 +298,14 @@
     <string name="addWidgetInstruction1Label">1</string>
     <string name="addWidgetInstruction1">Tryk længe på din startskærm, og åbn derefter menuen widgets.</string>
     <string name="addWidgetInstruction2Label">2</string>
-    <string name="addWidgetInstruction2">Find widget\'en DuckDuckGo.</string>
+    <string name="addWidgetInstruction2">Find widget\'en Revenge.</string>
     <string name="addWidgetInstruction3Label">3</string>
     <string name="addWidgetInstruction3">Træk widget\'en til din startskærm.</string>
     <string name="addWidgetInstructionsButtonGoHome">Gå til startskærmen</string>
     <string name="addWidgetInstructionsButtonClose">Luk</string>
 
     <!-- App Enjoyment / Rating / Feedback -->
-    <string name="appEnjoymentDialogTitle">Nyder du DuckDuckGo?</string>
+    <string name="appEnjoymentDialogTitle">Nyder du Revenge?</string>
     <string name="appEnjoymentDialogMessage">Vi vil rigtig gerne vide, hvad du synes.</string>
     <string name="appEnjoymentDialogPositiveButton">Jeg kan godt lide den</string>
     <string name="appEnjoymentDialogNegativeButton">Den skal forbedres</string>
@@ -327,15 +327,15 @@
 
     <!-- Clear Notification -->
     <string name="clearNotificationTitle">Datarydning indstillet til manuel</string>
-    <string name="clearNotificationDescription">Tilpas DuckDuckGo til automatisk at rydde browserdata efter hver session.</string>
+    <string name="clearNotificationDescription">Tilpas Revenge til automatisk at rydde browserdata efter hver session.</string>
 
     <!-- Privacy Protection Notification -->
     <string name="privacyProtectionNotificationDefaultTitle">Vi beskytter dit privatliv</string>
     <string name="privacyProtectionNotificationReportTitle">Din privatlivsrapport</string>
-    <string name="privacyProtectionNotificationDefaultDescription">Brug af DuckDuckGo-appen beskytter dine data ved at blokere trackere og kryptere forbindelser.</string>
-    <string name="privacyProtectionNotificationUpgadeDescription" instruction="Placeholder is a the number of connections we have protected">Du beskyttede dine data ved at sikre %1$d ukrypterede forbindelser, mens du bruger DuckDuckGo.</string>
-    <string name="privacyProtectionNotificationTrackerDescription" instruction="Placeholder is the numer of trackers blocked">Du beskyttede dine data ved at blokere %1$d trackere, mens du bruger DuckDuckGo.</string>
-    <string name="privacyProtectionNotificationBothDescription" instruction="%1$d is the number of trackers blocked and %2$d is the number of unencrypted connections">Du beskyttede dine data ved at blokere %1$d trackere og sikre %2$d ukrypterede forbindelser, mens du bruger DuckDuckGo.</string>
+    <string name="privacyProtectionNotificationDefaultDescription">Brug af Revenge-appen beskytter dine data ved at blokere trackere og kryptere forbindelser.</string>
+    <string name="privacyProtectionNotificationUpgadeDescription" instruction="Placeholder is a the number of connections we have protected">Du beskyttede dine data ved at sikre %1$d ukrypterede forbindelser, mens du bruger Revenge.</string>
+    <string name="privacyProtectionNotificationTrackerDescription" instruction="Placeholder is the numer of trackers blocked">Du beskyttede dine data ved at blokere %1$d trackere, mens du bruger Revenge.</string>
+    <string name="privacyProtectionNotificationBothDescription" instruction="%1$d is the number of trackers blocked and %2$d is the number of unencrypted connections">Du beskyttede dine data ved at blokere %1$d trackere og sikre %2$d ukrypterede forbindelser, mens du bruger Revenge.</string>
     <string name="privacyProtectionNotificationLaunchButton">Genoptag surfing</string>
 
     <!-- Authentication -->
@@ -347,7 +347,7 @@
     <string name="authenticationDialogPasswordHint">Adgangskode</string>
 
     <!-- User-facing label for when a user selects text and might want to search for that text -->
-    <string name="systemTextSearchMessage">Søg på DuckDuckGo</string>
+    <string name="systemTextSearchMessage">Søg på Revenge</string>
 
     <!-- App feedback disambiguation -->
     <string name="feedbackActivityTitle">Del feedback</string>
@@ -366,8 +366,8 @@
     <string name="websiteNotLoadingTitleShort">Problemer med indlæsning af websted</string>
     <string name="websiteNotLoadingSubtitle">Hvilket websted er ødelagt?</string>
 
-    <string name="searchNotGoodEnoughTitleLong">DuckDuckGo-søgningen er ikke god nok</string>
-    <string name="searchNotGoodEnoughTitleShort">DuckDuckGo-søgeproblemer</string>
+    <string name="searchNotGoodEnoughTitleLong">Revenge-søgningen er ikke god nok</string>
+    <string name="searchNotGoodEnoughTitleShort">Revenge-søgeproblemer</string>
     <string name="searchNotGoodEnoughSubtitle">Hvilken søgefunktion kan vi tilføje eller forbedre?</string>
     <string name="searchNotGoodEnoughSubReasonTechnicalSearches">Programmering/teknisk søgning</string>
     <string name="searchNotGoodEnoughSubReasonGoogleLayout">Layoutet bør være mere som Google</string>
@@ -427,8 +427,8 @@
 
     <!-- System Search-->
     <string name="systemSearchAppNotFound">Appen kunne ikke findes</string>
-    <string name="systemSearchOnboardingThanks">Tak, fordi du valgte DuckDuckGo!\nNår du bruger vores browser, er du bedre beskyttet mod hackere, svindlere og datahungrende virksomheder.</string>
-    <string name="systemSearchOnboardingFeaturesIntroText">DuckDuckGo-appen kan også:</string>
+    <string name="systemSearchOnboardingThanks">Tak, fordi du valgte Revenge!\nNår du bruger vores browser, er du bedre beskyttet mod hackere, svindlere og datahungrende virksomheder.</string>
+    <string name="systemSearchOnboardingFeaturesIntroText">Revenge-appen kan også:</string>
     <string name="systemSearchOnboardingFeatureOneText">Blokerer farlige trackere.</string>
     <string name="systemSearchOnboardingFeatureTwoText">Gennemtvinger kryptering på websteder.</string>
     <string name="systemSearchOnboardingFeatureThreeText">Rydder data med et enkelt klik.</string>
@@ -436,18 +436,18 @@
     <string name="systemSearchOnboardingButtonLess">Skjul</string>
     <string name="systemSearchOnboardingButtonOk">Forstået</string>
 
-    <!-- Dax Dialog -->
+    <!-- Revenge Dialog -->
     <string name="daxDialogHighFive">Giv mig fem!</string>
     <string name="daxDialogGotIt">Forstået</string>
 
-    <!-- AppTP Retention Experiment Dax Dialog -->
+    <!-- AppTP Retention Experiment Revenge Dialog -->
     <string name="daxDialogAppTpRetentionText"><![CDATA[Du blokerer nu trackere på tværs af internettet 🎉<br/><br/>Jeg kan også blokere trackere, der gemmer sig i dine andre apps, selv når du ikke bruger din telefon.]]></string>
     <string name="daxDialogAppTpRetentionPrimaryButtonText">Aktiver App Tracking Protection</string>
     <string name="daxDialogAppTpRetentionSecondaryButtonText">Ikke nu</string>
 
     <!-- New Onboarding Experience -->
-    <string name="onboardingWelcomeTitle">"Velkommen til DuckDuckGo!"</string>
-    <string name="onboardingDaxText"><![CDATA[Internettet kan være ret uhyggeligt.<br/><br/>Bare rolig! Det er lettere at søge og browse privat, end du tror.]]></string>
+    <string name="onboardingWelcomeTitle">"Velkommen til Revenge!"</string>
+    <string name="onboardingRevengeText"><![CDATA[Internettet kan være ret uhyggeligt.<br/><br/>Bare rolig! Det er lettere at søge og browse privat, end du tror.]]></string>
     <string name="onboardingLetsDoItButton">Lad os gøre det!</string>
     <string name="daxNonSerpCtaText"><![CDATA[Når du trykker og ruller, blokerer jeg irriterende trackere. <br/><br/>Gå videre - fortsæt med at browse!]]></string>
     <string name="daxMainNetworkCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Bemærk! Jeg kan ikke forhindre %1$s i at se din aktivitet på %2$s.&lt;br/&gt;&lt;br/&gt;Men gennemsøg sammen med mig, så kan jeg reducere det, som %3$s kender til dig samlet set ved at blokere vedkommendes trackere på mange andre sider.</string>
@@ -535,7 +535,7 @@
     <string name="dosErrorMessage">Forbindelse blev afbrudt. Dette websted kan være skadeligt for din enhed.</string>
 
     <!-- Precise Location -->
-    <string name="preciseLocationSystemDialogTitle">Vil du aktivere enhedsplacering for DuckDuckGo-databeskyttelsesbrowser?</string>
+    <string name="preciseLocationSystemDialogTitle">Vil du aktivere enhedsplacering for Revenge-databeskyttelsesbrowser?</string>
     <string name="preciseLocationSystemDialogSubtitle" instruction="%1$s and %2$s are both the name of the website requesting the location">%1$s anmoder om din enhedsplacering. Du skal først give tilladelse til, at appen kan sende din enhedsplacering, hvorefter %2$s kan bede om tilladelse.</string>
     <string name="preciseLocationSystemDialogAllow">Aktiver</string>
     <string name="preciseLocationSystemDialogDeny">Måske senere</string>
@@ -547,7 +547,7 @@
     <string name="preciseLocationSiteDialogAllowOnce">Kun for denne session</string>
     <string name="preciseLocationSiteDialogDenyAlways">Afvis altid</string>
     <string name="preciseLocationSiteDialogDenyOnce">Afvis for denne session</string>
-    <string name="preciseLocationFeatureDescription">Websteder, du besøger, kan bede om at få kendskab til din enhedsplacering. De kan ikke få adgang til den, før du udtrykkeligt giver tilladelse. DuckDuckGo bruger kun din placering anonymt til at levere lokale søgeresultater.</string>
+    <string name="preciseLocationFeatureDescription">Websteder, du besøger, kan bede om at få kendskab til din enhedsplacering. De kan ikke få adgang til den, før du udtrykkeligt giver tilladelse. Revenge bruger kun din placering anonymt til at levere lokale søgeresultater.</string>
     <string name="preciseLocationToggleText">Websteder kan bede om min placering</string>
     <string name="preciseLocationEmptyListHint">Ingen websteder har tilladelse til at få adgang til placering</string>
     <string name="preciseLocationNoSystemPermission">For at administrere de tilladelser til placeringsadgang, du har givet til individuelle websteder, skal du aktivere placering for denne app under Android-indstillinger.</string>
@@ -563,7 +563,7 @@
 
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Global Privacy Control (GPC)</string>
-    <string name="globalPrivacyControlDescription"><![CDATA[DuckDuckGo blokerer automatisk mange trackere. Med Global Privacy Control (GPC) kan du også bede deltagende websteder om at begrænse salg eller deling af dine personoplysninger med andre virksomheder. <u><a href=\"\">Få mere at vide</a><u/>]]></string>
+    <string name="globalPrivacyControlDescription"><![CDATA[Revenge blokerer automatisk mange trackere. Med Global Privacy Control (GPC) kan du også bede deltagende websteder om at begrænse salg eller deling af dine personoplysninger med andre virksomheder. <u><a href=\"\">Få mere at vide</a><u/>]]></string>
     <string name="globalPrivacyControlSetting">Global Privacy Control (GPC)</string>
     <string name="globalPrivacyControlToggle">Global Privacy Control (GPC)</string>
     <string name="disabled">Deaktiveret</string>
@@ -599,11 +599,11 @@
     <string name="settingsAccessibility">Tilgængelighed</string>
     <string name="accessibilityActivityTitle">Tilgængelighed</string>
     <string name="accessibilityFontSizeTitle">Tekststørrelse</string>
-    <string name="accessibilityFontSizeHint">Træk skyderen, indtil du nemt kan læse dette. Websteder, som du ser i DuckDuckGo, tilpasser sig dette.</string>
+    <string name="accessibilityFontSizeHint">Træk skyderen, indtil du nemt kan læse dette. Websteder, som du ser i Revenge, tilpasser sig dette.</string>
     <string name="accessibilityForceZoomTitle">Håndhæv manuel sidezoom</string>
     <string name="accessibilityForceZoomSubtitle">Knib og zoom på ethvert websted, også dem, der ellers ville forhindre det</string>
     <string name="accessibilityTextSizeOverrideTitle">Administrer tekststørrelse</string>
-    <string name="accessibilityTextSizeOverrideSubtitle">Tekst på websteder, du ser i DuckDuckGo, justeres, så den matcher indstillingen nedenfor</string>
+    <string name="accessibilityTextSizeOverrideSubtitle">Tekst på websteder, du ser i Revenge, justeres, så den matcher indstillingen nedenfor</string>
 
     <!-- Privacy Policy -->
     <string name="settingsPrivacyPolicyDuckduckgo">Privatlivspolitik</string>
@@ -672,7 +672,7 @@
     <string name="tabSelectedIndicator">Indikator for valgt fane</string>
     <string name="tabNotSelectedIndicator">Indikator for ikke-valgt fane</string>
 
-    <string name="shareMultipleLinksTitle" tools:ignore="MissingInstruction">%1$d links fra DuckDuckGo</string>
+    <string name="shareMultipleLinksTitle" tools:ignore="MissingInstruction">%1$d links fra Revenge</string>
     <plurals name="shareLinksMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
         <item quantity="one">Del link</item>
         <item quantity="other">Del %1$d links</item>
@@ -733,7 +733,7 @@
     </plurals>
 
     <!-- Private voice search -->
-    <string name="accessibilityVoiceSearchSubtitle">Tilføj privat stemmesøgningsmulighed til adresselinjen Lyden bliver ikke gemt eller delt med nogen, heller ikke DuckDuckGo.</string>
+    <string name="accessibilityVoiceSearchSubtitle">Tilføj privat stemmesøgningsmulighed til adresselinjen Lyden bliver ikke gemt eller delt med nogen, heller ikke Revenge.</string>
     <string name="accessibilityVoiceSearchTitle">Privat stemmesøgning</string>
 
     <!-- Uploading an image from the camera or choosing to use existing image -->
@@ -741,8 +741,8 @@
     <string name="imageCaptureCameraGalleryDisambiguationTitle">Upload et billede</string>
     <string name="imageCaptureCameraGalleryDisambiguationGalleryOption">Vælg fil</string>
     <string name="imageCaptureCameraGalleryDisambiguationCameraOption">Tag et billede</string>
-    <string name="imageCaptureCameraPermissionDeniedTitle">Tillad DuckDuckGo at bede om adgang til kameraet på denne enhed</string>
-    <string name="imageCaptureCameraPermissionDeniedMessage">Websteder kan kun bruge dit kamera, hvis du giver DuckDuckGo tilladelse til at bede om adgang.</string>
+    <string name="imageCaptureCameraPermissionDeniedTitle">Tillad Revenge at bede om adgang til kameraet på denne enhed</string>
+    <string name="imageCaptureCameraPermissionDeniedMessage">Websteder kan kun bruge dit kamera, hvis du giver Revenge tilladelse til at bede om adgang.</string>
     <string name="imageCaptureCameraPermissionDeniedPositiveButton">Åbn indstillinger</string>
     <string name="imageCaptureCameraPermissionDeniedNegativeButton">Annuller</string>
 
@@ -756,53 +756,53 @@
     <string name="sslErrorHeadline" instruction="Placeholder is domain with certificate issues">Certifikatet for dette websted er ugyldigt. Du opretter muligvis forbindelse til en server, der foregiver at være %1$s, hvilket kan bringe dine fortrolige oplysninger i fare.</string>
     <string name="sslErrorLeaveCTA">Forlad dette websted</string>
     <string name="sslErrorAdvancedCTA">Avanceret</string>
-    <string name="sslErrorExpandedHeadline">DuckDuckGo advarer dig, når en hjemmeside har et ugyldigt certifikat.</string>
+    <string name="sslErrorExpandedHeadline">Revenge advarer dig, når en hjemmeside har et ugyldigt certifikat.</string>
     <string name="sslErrorExpandedCTA"><![CDATA[<u>Accepter risiko og besøg webstedet</u>]]></string>
     <string name="sslErrorExpiredMessage" instruction="Placeholder is domain with certificate issues">Sikkerhedscertifikatet for %1$s er udløbet. Det er muligt, at webstedet er forkert konfigureret, at en angriber har kompromitteret din forbindelse, eller at dit systemur er forkert.</string>
     <string name="sslErrorWrongHostMessage" instruction="Placeholder is domain with certificate issues">Sikkerhedscertifikatet for %1$s matcher ikke *.%2$s. Det er muligt, at webstedet er forkert konfigureret, eller at en angriber har kompromitteret din forbindelse, eller at dit systemur er forkert.</string>
     <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">Enhedens operativsystem har ikke tillid til sikkerhedscertifikatet for %1$s. Det er muligt, at webstedet er forkert konfigureret, eller at en angriber har kompromitteret din forbindelse, eller at dit systemur er forkert.</string>
 
     <!-- Extended Onboarding-->
-    <string name="preOnboardingDaxDialog1Title"><![CDATA[Hej<br/><br/>Er du klar til en hurtigere browser, der holder dig beskyttet?]]></string>
-    <string name="preOnboardingDaxDialog1Button">Lad os gøre det!</string>
-    <string name="preOnboardingDaxDialog1SecondaryButton">Jeg har været her før</string>
-    <string name="preOnboardingDaxDialog2Title">Beskyttelse aktiveret!</string>
-    <string name="preOnboardingDaxDialog2Button">Vælg din browser</string>
-    <string name="preOnboardingDaxDialog3Title"><![CDATA[Forstået! Jeg springer de andre tips over.]]></string>
-    <string name="preOnboardingDaxDialog3Text"><![CDATA[Husk: Du kan slette alle dine faner, historik og browserdata med to tryk på <b>Fire Button</b> 🔥]]></string>
-    <string name="preOnboardingDaxDialog3SecondaryButton">Vis vejledning</string>
+    <string name="preOnboardingRevengeDialog1Title"><![CDATA[Hej<br/><br/>Er du klar til en hurtigere browser, der holder dig beskyttet?]]></string>
+    <string name="preOnboardingRevengeDialog1Button">Lad os gøre det!</string>
+    <string name="preOnboardingRevengeDialog1SecondaryButton">Jeg har været her før</string>
+    <string name="preOnboardingRevengeDialog2Title">Beskyttelse aktiveret!</string>
+    <string name="preOnboardingRevengeDialog2Button">Vælg din browser</string>
+    <string name="preOnboardingRevengeDialog3Title"><![CDATA[Forstået! Jeg springer de andre tips over.]]></string>
+    <string name="preOnboardingRevengeDialog3Text"><![CDATA[Husk: Du kan slette alle dine faner, historik og browserdata med to tryk på <b>Fire Button</b> 🔥]]></string>
+    <string name="preOnboardingRevengeDialog3SecondaryButton">Vis vejledning</string>
     <string name="preOnboardingComparisonChartItem1">Søg fortroligt som standard</string>
     <string name="preOnboardingComparisonChartItem2">Bloker tredjeparts-trackere</string>
     <string name="preOnboardingComparisonChartItem3">Bloker pop op-vinduer om cookies</string>
     <string name="preOnboardingComparisonChartItem4">Bloker målrettede annoncer</string>
     <string name="preOnboardingComparisonChartItem5">Slet browsingdata med én knap</string>
-    <string name="preOnboardingDaxDialog3Button">Start søgning</string>
+    <string name="preOnboardingRevengeDialog3Button">Start søgning</string>
     <string name="preOnboardingAddressBarTitle">Hvor skal jeg placere din adresselinje?</string>
     <string name="preOnboardingAddressBarOkButton">Næste</string>
     <string name="highlightsPreOnboardingAddressBarOption1Title">Top (standard)</string>
     <string name="highlightsPreOnboardingAddressBarOption1Description">Let at se</string>
     <string name="highlightsPreOnboardingAddressBarOption2Title">Nederst</string>
     <string name="highlightsPreOnboardingAddressBarOption2Description">Let at komme til</string>
-    <string name="onboardingSearchDaxDialogTitle">Prøv at søge!</string>
-    <string name="onboardingSearchDaxDialogDescription">Dine DuckDuckGo-søgninger er altid private.</string>
-    <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">"hvordan siger man and på engelsk"</string>
-    <string name="onboardingSearchDaxDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">"hvordan siger man \"and\" på spansk"</string>
+    <string name="onboardingSearchRevengeDialogTitle">Prøv at søge!</string>
+    <string name="onboardingSearchRevengeDialogDescription">Dine Revenge-søgninger er altid private.</string>
+    <string name="onboardingSearchRevengeDialogOption1" instruction="translate &apos;duck&apos; too.">"hvordan siger man and på engelsk"</string>
+    <string name="onboardingSearchRevengeDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">"hvordan siger man \"and\" på spansk"</string>
     <string name="onboardingSearchQueryOption1">hvordan siger man and på engelsk</string>
     <string name="onboardingSearchQueryOption1English">hvordan siger man \"and\" på spansk</string>
-    <string name="onboardingSearchDaxDialogOption2">skuespillere i avatar</string>
-    <string name="onboardingSearchDaxDialogOption2US">mighty ducks film</string>
-    <string name="onboardingSearchDaxDialogOption3">lokalt vejr</string>
-    <string name="onboardingSearchDaxDialogOption4">Overrask mig!</string>
+    <string name="onboardingSearchRevengeDialogOption2">skuespillere i avatar</string>
+    <string name="onboardingSearchRevengeDialogOption2US">mighty ducks film</string>
+    <string name="onboardingSearchRevengeDialogOption3">lokalt vejr</string>
+    <string name="onboardingSearchRevengeDialogOption4">Overrask mig!</string>
     <string name="onboardingSearchQueryOption4">ællinger</string>
-    <string name="onboardingSitesDaxDialogTitle">Prøv at besøge en hjemmeside!</string>
-    <string name="onboardingSitesDaxDialogDescription">Jeg blokerer trackere, så de ikke kan udspionere dig.</string>
-    <string name="onboardingSitesDaxDialogOption1">espn.com</string>
-    <string name="onboardingSitesDaxDialogOption2">yahoo.com</string>
-    <string name="onboardingSitesDaxDialogOption3">ebay.com</string>
-    <string name="onboardingSitesDaxDialogOption4">Overrask mig!</string>
-    <string name="onboardingSerpDaxDialogDescription"><![CDATA[Det er <b>DuckDuckGo Search</b>! Privat. Hurtig. Færre annoncer.]]></string>
-    <string name="onboardingSerpDaxDialogButton">Forstået</string>
-    <string name="onboardingSitesSuggestionsDaxDialogTitle">Prøv nu at besøge en hjemmeside!</string>
+    <string name="onboardingSitesRevengeDialogTitle">Prøv at besøge en hjemmeside!</string>
+    <string name="onboardingSitesRevengeDialogDescription">Jeg blokerer trackere, så de ikke kan udspionere dig.</string>
+    <string name="onboardingSitesRevengeDialogOption1">espn.com</string>
+    <string name="onboardingSitesRevengeDialogOption2">yahoo.com</string>
+    <string name="onboardingSitesRevengeDialogOption3">ebay.com</string>
+    <string name="onboardingSitesRevengeDialogOption4">Overrask mig!</string>
+    <string name="onboardingSerpRevengeDialogDescription"><![CDATA[Det er <b>Revenge Search</b>! Privat. Hurtig. Færre annoncer.]]></string>
+    <string name="onboardingSerpRevengeDialogButton">Forstået</string>
+    <string name="onboardingSitesSuggestionsRevengeDialogTitle">Prøv nu at besøge en hjemmeside!</string>
     <plurals name="onboardingTrackersBlockedDialogDescription">
         <item quantity="one"><![CDATA[ og <b>%1$d anden</b> forsøgte at spore dig her. Jeg blokerede dem!<br/><br/>☝️ Tryk på skjoldet for at få flere oplysninger.️]]></item>
         <item quantity="other"><![CDATA[ og <b>%1$d andre</b> forsøgte at spore dig her. Jeg blokerede dem!<br/><br/>☝️ Tryk på skjoldet for at få flere oplysninger.️]]></item>
@@ -811,19 +811,19 @@
         <item quantity="one"><![CDATA[ prøvede at spore dig her. Jeg blokerede dem!<br/><br/>☝️ Tryk på skjoldet for at få flere oplysninger.️]]></item>
         <item quantity="other"><![CDATA[ prøvede at spore dig her. Jeg blokerede dem!<br/><br/>☝️ Tryk på skjoldet for at få flere oplysninger.️]]></item>
     </plurals>
-    <string name="onboardingTrackersBlockedDaxDialogButton">Forstået</string>
-    <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Ryd øjeblikkeligt din browseraktivitet med <b>Fire Button</b>.<br/><br/>Prøv det! 🔥]]></string>
-    <string name="onboardingFireButtonDaxDialogOkButton">Prøv det</string>
-    <string name="onboardingFireButtonDaxDialogCancelButton">Spring over</string>
-    <string name="onboardingEndDaxDialogTitle">"Du har forstået det!"</string>
-    <string name="onboardingEndDaxDialogDescription">Husk: hver gang du browser med mig, mister en uhyggelig annonce sine vinger.</string>
-    <string name="onboardingInContextEndDaxDialogDescription">Husk: hver gang du browser med mig, mister en uhyggelig annonce sine vinger. 👌</string>
-    <string name="onboardingEndDaxDialogButton">Giv mig fem!</string>
-    <string name="onboardingPrivacyProDaxDialogTitle">Åh, før jeg glemmer det...</string>
-    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo har også et <b>valgfrit betalt abonnement</b> med en sikker <b>VPN</b> og <b>avanceret, privat AI</b>.]]></string>
-    <string name="onboardingPrivacyProDaxDialogOkButton">Mere info</string>
-    <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Prøv gratis!</string>
-    <string name="onboardingPrivacyProDaxDialogCancelButton">Spring over</string>
+    <string name="onboardingTrackersBlockedRevengeDialogButton">Forstået</string>
+    <string name="onboardingFireButtonRevengeDialogDescription"><![CDATA[Ryd øjeblikkeligt din browseraktivitet med <b>Fire Button</b>.<br/><br/>Prøv det! 🔥]]></string>
+    <string name="onboardingFireButtonRevengeDialogOkButton">Prøv det</string>
+    <string name="onboardingFireButtonRevengeDialogCancelButton">Spring over</string>
+    <string name="onboardingEndRevengeDialogTitle">"Du har forstået det!"</string>
+    <string name="onboardingEndRevengeDialogDescription">Husk: hver gang du browser med mig, mister en uhyggelig annonce sine vinger.</string>
+    <string name="onboardingInContextEndRevengeDialogDescription">Husk: hver gang du browser med mig, mister en uhyggelig annonce sine vinger. 👌</string>
+    <string name="onboardingEndRevengeDialogButton">Giv mig fem!</string>
+    <string name="onboardingPrivacyProRevengeDialogTitle">Åh, før jeg glemmer det...</string>
+    <string name="onboardingPrivacyProRevengeDialogDescription"><![CDATA[Revenge har også et <b>valgfrit betalt abonnement</b> med en sikker <b>VPN</b> og <b>avanceret, privat AI</b>.]]></string>
+    <string name="onboardingPrivacyProRevengeDialogOkButton">Mere info</string>
+    <string name="onboardingPrivacyProRevengeDialogFreeTrialOkButton">Prøv gratis!</string>
+    <string name="onboardingPrivacyProRevengeDialogCancelButton">Spring over</string>
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Vil du have nem adgang til privat AI-chat?</string>
@@ -844,23 +844,23 @@
     <string name="showOnAppLaunchOptionSpecificPage">Specifik side</string>
 
     <!-- Privacy Dashboard -->
-    <string name="brokenSiteSubmittedReportMessage">Tak! Din rapport hjælper med at gøre DuckDuckGo bedre for alle!</string>
+    <string name="brokenSiteSubmittedReportMessage">Tak! Din rapport hjælper med at gøre Revenge bedre for alle!</string>
 
     <!--    Default Browser Bottom Sheet Dialog -->
-    <string name="defaultBrowserBottomSheetDialogTitle">Lad DuckDuckGo beskytte mere af det, du foretager dig online</string>
-    <string name="defaultBrowserBottomSheetDialogSubTitle">Skift din standardbrowser, så links åbner i DuckDuckGo.</string>
+    <string name="defaultBrowserBottomSheetDialogTitle">Lad Revenge beskytte mere af det, du foretager dig online</string>
+    <string name="defaultBrowserBottomSheetDialogSubTitle">Skift din standardbrowser, så links åbner i Revenge.</string>
     <string name="defaultBrowserBottomSheetDialogGhostButton" instruction="This text appears on a button">Ikke nu</string>
 
     <!-- Default Browser message -->
-    <string name="newTabPageDefaultBrowserMessageHeading">DuckDuckGo er ikke din standardbrowser. Få mere beskyttelse.</string>
+    <string name="newTabPageDefaultBrowserMessageHeading">Revenge er ikke din standardbrowser. Få mere beskyttelse.</string>
     <string name="newTabPageDefaultBrowserMessagePrimaryCta" instruction="This text appears on a button">Angiv som standard</string>
     <string name="newTabPageDefaultBrowserMessageSecondaryCta" instruction="This text appears on a button">Spørg ikke igen</string>
 
     <!-- Threat protection -->
     <string name="maliciousSiteTitle">Advarsel: Dette websted kan udgøre en sikkerhedsrisiko</string>
-    <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo har blokeret denne side, fordi den muligvis distribuerer malware, der er designet til at kompromittere din enhed eller stjæle dine personlige oplysninger.\n<a href=\"\">Få mere at vide</a>]]></string>
+    <string name="maliciousSiteMalwareHeadline"><![CDATA[Revenge har blokeret denne side, fordi den muligvis distribuerer malware, der er designet til at kompromittere din enhed eller stjæle dine personlige oplysninger.\n<a href=\"\">Få mere at vide</a>]]></string>
     <string name="maliciousSitePhishingHeadline"><![CDATA[Dette websted efterligner muligvis et legitimt websted for at narre dig til at give personlige oplysninger, såsom adgangskoder eller kreditkortnumre.\n<a href=\"\">Få mere at vide</a>]]></string>
-    <string name="maliciousSiteScamHeadline"><![CDATA[DuckDuckGo har blokeret denne side, fordi den muligvis forsøger at bedrage eller manipulere dig til at overføre penge, købe forfalskede varer eller installere malware under falske forudsætninger.\n<a href=\"\">Få mere at vide</a>]]></string>
+    <string name="maliciousSiteScamHeadline"><![CDATA[Revenge har blokeret denne side, fordi den muligvis forsøger at bedrage eller manipulere dig til at overføre penge, købe forfalskede varer eller installere malware under falske forudsætninger.\n<a href=\"\">Få mere at vide</a>]]></string>
     <string name="maliciousSiteLeaveCTA">Forlad dette websted</string>
     <string name="maliciousSiteAdvancedCTA">Avanceret</string>
     <string name="maliciousSiteExpandedHeadline"><![CDATA[Hvis du mener, at dette websted er sikkert, kan du <a href=\"\">anmelde en fejl</a>. Du kan stadig besøge webstedet på eget ansvar.]]></string>
@@ -872,7 +872,7 @@
     <string name="maliciousSiteSettingLearnMore"><annotation type="learn_more_link">Få mere at vide</annotation></string>
     <string name="maliciousSiteSettingDisabled">Deaktivering af denne funktion kan bringe dine oplysninger i fare.</string>
     <string name="threatProtectionTitle">Trusselsbeskyttelse</string>
-    <string name="threatProtectionDescription">DuckDuckGos forbedrede beskyttelser stopper almindelige trusler, mens de holder din forbindelse sikker.</string>
+    <string name="threatProtectionDescription">Revenges forbedrede beskyttelser stopper almindelige trusler, mens de holder din forbindelse sikker.</string>
     <string name="smarterEncryptionTitle">Smarter Encryption</string>
     <string name="smarterEncryptionDescription"><![CDATA[Opgraderer automatisk links til HTTPS, når det er muligt.<br><a href=\"\">Mere info</a>]]></string>
     <string name="scamBlockerTitle">Blokering af svindel</string>
@@ -884,7 +884,7 @@
     <string name="experimentHomeScreenWidgetBottomSheetDialogSubTitle">Tilføj vores søgewidget på startskærmbilledet for hurtig og nem adgang.</string>
     <string name="experimentHomeScreenWidgetBottomSheetDialogPrimaryButton">Tilføj widget</string>
     <string name="experimentHomeScreenWidgetBottomSheetDialogGhostButton">Ikke nu</string>
-    <string name="experimentHomeScreenWidgetBottomSheetDialogSearchText">Søg på DuckDuckGo</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSearchText">Søg på Revenge</string>
 
     <!-- Change under remote feature flag: Widget as a Protection -->
     <string name="settingsAddHomeWidgetTitle">Startskærmswidget</string>
@@ -901,8 +901,8 @@
 
     <!-- Widgets -->
     <string name="searchOnlyWidgetLabel" instruction="Label for the search-only widget">Kun søgning</string>
-    <string name="searchOnlyWidgetDescription" instruction="Description for the search-only widget">Start hurtigt en privat søgning med DuckDuckGo.</string>
-    <string name="searchWidgetDescription" instruction="Description for the search widget, which may include Duck.ai and voice search">Søg privat med DuckDuckGo, eller spørg Duck.ai. Stemmesøgning og Duck.ai er tilgængelige, hvis de er aktiveret.</string>
-    <string name="searchAndFavoritesWidgetDescription" instruction="Description for the search and favorites widget">Søg eller besøg dine yndlingssider privat med ét tryk. Stemmesøgning og Duck.ai er tilgængelige, hvis de er aktiveret.</string>
-    <string name="duckAiOnlyPinShortcutLabel" instruction="Label for the Duck.ai pinned shortcut. Should be Duck.ai in all languages">Duck.ai</string>
+    <string name="searchOnlyWidgetDescription" instruction="Description for the search-only widget">Start hurtigt en privat søgning med Revenge.</string>
+    <string name="searchWidgetDescription" instruction="Description for the search widget, which may include RevengeAI and voice search">Søg privat med Revenge, eller spørg Revenge AI. Stemmesøgning og Revenge AI er tilgængelige, hvis de er aktiveret.</string>
+    <string name="searchAndFavoritesWidgetDescription" instruction="Description for the search and favorites widget">Søg eller besøg dine yndlingssider privat med ét tryk. Stemmesøgning og Revenge AI er tilgængelige, hvis de er aktiveret.</string>
+    <string name="duckAiOnlyPinShortcutLabel" instruction="Label for the Revenge AI pinned shortcut. Should be RevengeAI in all languages">Revenge AI</string>
 </resources>

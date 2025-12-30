@@ -172,13 +172,13 @@
     <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Wyślij opinię</string>
 
-    <string name="subscriptionSettingSubscribeWithDuckAiSubtitle">Subskrybenci otrzymują VPN, zaawansowane modele sztucznej inteligencji w Duck.ai, usługi Personal Information Removal oraz Identity Theft Restoration.</string>
-    <string name="subscriptionSettingSubscribeWithDuckAiSubtitleRow">Subskrybenci otrzymują usługi VPN oraz Identity Theft Restoration i zaawansowane modele sztucznej inteligencji w Duck.ai.</string>
+    <string name="subscriptionSettingSubscribeWithRevengeAISubtitle">Subskrybenci otrzymują VPN, zaawansowane modele sztucznej inteligencji w Revenge AI, usługi Personal Information Removal oraz Identity Theft Restoration.</string>
+    <string name="subscriptionSettingSubscribeWithRevengeAISubtitleRow">Subskrybenci otrzymują usługi VPN oraz Identity Theft Restoration i zaawansowane modele sztucznej inteligencji w Revenge AI.</string>
 
-    <string name="feedbackCategoryDuckAi">Duck.ai</string>
-    <string name="feedbackSubCategoryDuckAiSubscriberModels">Nie można uzyskać dostępu do modeli Duck.ai dostępnych wyłącznie dla subskrybentów</string>
-    <string name="feedbackSubCategoryDuckAiLoginThirdPartyBrowser">Nie można uzyskać dostępu do Duck.ai przy użyciu mojej subskrypcji w innych przeglądarkach</string>
-    <string name="feedbackSubCategoryDuckAiOther">Inne opinie o Duck.ai</string>
+    <string name="feedbackCategoryRevengeAI">Revenge AI</string>
+    <string name="feedbackSubCategoryRevengeAISubscriberModels">Nie można uzyskać dostępu do modeli Revenge AI dostępnych wyłącznie dla subskrybentów</string>
+    <string name="feedbackSubCategoryRevengeAILoginThirdPartyBrowser">Nie można uzyskać dostępu do Revenge AI przy użyciu mojej subskrypcji w innych przeglądarkach</string>
+    <string name="feedbackSubCategoryRevengeAIOther">Inne opinie o Revenge AI</string>
 
     <string name="subscriptionSettingSectionTitle">Subskrypcja DuckDuckGo</string>
     <string name="subscriptionSettingSubscribeSecure">Zabezpiecz Wi-Fi i czatuj prywatnie z zaawansowanymi modelami AI</string>

@@ -32,7 +32,7 @@ class DuckChatEnabledContentScopeScriptsSubscriptionEventPlugin @Inject construc
     override fun getSubscriptionEventData(): SubscriptionEventData =
         SubscriptionEventData(
             featureName = "serpSettings",
-            subscriptionName = "nativeDuckAiSettingChanged",
+            subscriptionName = "nativeRevengeAISettingChanged",
             params = JSONObject().apply {
                 put("enabled", duckChat.isEnabled())
             },

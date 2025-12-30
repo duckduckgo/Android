@@ -28,7 +28,7 @@
     <string name="browserMenuEnablePrivacyProtection">Iespējot privātuma aizsardzību</string>
     <string name="browserMenuDisablePrivacyProtection">Atspējot privātuma aizsardzību</string>
     <string name="browserMenuNewTab">Jauna cilne</string>
-    <string name="browserMenuDuckChat">Duck.ai</string>
+    <string name="browserMenuRevengeChat">Revenge AI</string>
     <string name="browserMenuShare">Kopīgot</string>
     <string name="browserMenuEmailAlias">Izveidot Duck adresi</string>
     <string name="browserMenuFindInPage">Atrast lapā</string>
@@ -45,7 +45,7 @@
     <string name="browserMenuNewChat">Jauna tērzēšanas saruna</string>
     <string name="browserMenuNewAIChat">Jauns MI tērzēšanas rīks</string>
     <string name="browserMenuChatHistory">Tērzēšanas sarunu vēsture</string>
-    <string name="browserMenuChatSettings">Duck.ai iestatījumi</string>
+    <string name="browserMenuChatSettings">Revenge AI iestatījumi</string>
     <string name="browserMenuVPN">VPN</string>
 
     <!-- Browser Menu Content Description -->

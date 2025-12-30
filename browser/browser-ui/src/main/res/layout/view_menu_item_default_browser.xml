@@ -13,7 +13,7 @@
     to bleed by 12 dp, so we're applying 12dp on the parent and 12dp on contents. -->
 
     <LinearLayout
-        style="@style/Widget.DuckDuckGo.MenuItemView"
+        style="@style/Widget.Revenge.MenuItemView"
         android:background="@drawable/background_default_browser_menu_item"
         android:paddingHorizontal="12dp">
 

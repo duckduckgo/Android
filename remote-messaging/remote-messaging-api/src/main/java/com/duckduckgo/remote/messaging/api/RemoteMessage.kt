@@ -101,7 +101,7 @@ sealed class Content(val messageType: MessageType) {
         MAC_AND_WINDOWS("NewForMacAndWindows"),
         PRIVACY_SHIELD("PrivacyShield"),
         DUCK_AI_OLD("Duck.ai"),
-        DUCK_AI("DuckAi"),
+        DUCK_AI("RevengeAI"),
         VISUAL_DESIGN_UPDATE("VisualDesignUpdate"),
         IMAGE_AI("ImageAI"),
         RADAR("Radar"),

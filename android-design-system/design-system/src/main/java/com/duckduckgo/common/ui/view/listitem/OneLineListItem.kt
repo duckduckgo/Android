@@ -70,7 +70,7 @@ class OneLineListItem @JvmOverloads constructor(
             attrs,
             R.styleable.OneLineListItem,
             0,
-            R.style.Widget_DuckDuckGo_OneLineListItem,
+            R.style.Widget_Revenge_OneLineListItem,
         ).apply {
 
             setPrimaryText(getString(R.styleable.OneLineListItem_primaryText))

@@ -121,7 +121,7 @@
     <string name="atp_OnboardingContinue">Pokračovať</string>
     <string name="atp_OnboardingMaybeLater">Možno neskôr</string>
 
-    <!-- App Tracking Protection Dax Onboarding -->
+    <!-- App Tracking Protection Revenge Onboarding -->
     <string name="atp_daxOnboardingIntroTitle">Ochrana pred sledovaním činnosti v aplikáciách</string>
     <string name="atp_daxOnboardingIntroMessage" formatted="false">Viac ako 96 % populárnych bezplatných aplikácií umožňuje iným spoločnostiam sledovať vás, aj keď telefón nepoužívate. Ochrana pred sledovaním aplikácií tieto pokusy o sledovanie rozpozná a zablokuje.</string>
     <string name="atp_daxOnboardingPermissionTitle">Ako to funguje?</string>

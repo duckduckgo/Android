@@ -73,7 +73,7 @@
                 tools:secondaryText="test test test" />
 
             <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
-                android:id="@+id/clearDuckAiDataSetting"
+                android:id="@+id/clearRevengeAIDataSetting"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:primaryText="@string/settingsClearAiDataTitle"

@@ -1,0 +1,244 @@
+Configuration on demand is an incubating feature.
+Calculating task graph as configuration cache cannot be reused because directory '.' has changed.
+> Task :buildSrc:checkKotlinGradlePluginConfigurationErrors
+> Task :buildSrc:compileKotlin UP-TO-DATE
+> Task :buildSrc:compileJava NO-SOURCE
+> Task :buildSrc:compileGroovy NO-SOURCE
+> Task :buildSrc:processResources NO-SOURCE
+> Task :buildSrc:classes UP-TO-DATE
+> Task :buildSrc:jar UP-TO-DATE
+
+> Configure project :ad-click-impl
+WARNING: The option setting 'android.experimental.lint.version=8.13.2' is experimental.
+
+> Configure project :app
+Signing properties not found, release artifacts will not be signed.
+
+> Configure project :
+android-reporting plugin is deprecated and is set to be removed in AGP 9.0
+
+> Task :design-system:preBuild UP-TO-DATE
+> Task :common-utils:preBuild UP-TO-DATE
+> Task :di:preBuild UP-TO-DATE
+> Task :common-utils:preDebugBuild UP-TO-DATE
+> Task :di:preDebugBuild UP-TO-DATE
+> Task :internal-features-api:preBuild UP-TO-DATE
+> Task :design-system:preDebugBuild UP-TO-DATE
+> Task :internal-features-api:preDebugBuild UP-TO-DATE
+> Task :privacy-config-api:checkKotlinGradlePluginConfigurationErrors
+> Task :feature-toggles-internal-api:checkKotlinGradlePluginConfigurationErrors
+> Task :app-build-config-api:checkKotlinGradlePluginConfigurationErrors
+> Task :feature-toggles-api:checkKotlinGradlePluginConfigurationErrors
+> Task :anvil-annotations:checkKotlinGradlePluginConfigurationErrors
+> Task :internal-features-api:writeDebugAarMetadata UP-TO-DATE
+> Task :experiments-api:checkKotlinGradlePluginConfigurationErrors
+> Task :privacy-config-api:processResources NO-SOURCE
+> Task :di:writeDebugAarMetadata UP-TO-DATE
+> Task :common-utils:writeDebugAarMetadata UP-TO-DATE
+> Task :app-build-config-api:processResources NO-SOURCE
+> Task :design-system:mergeDebugJniLibFolders UP-TO-DATE
+> Task :feature-toggles-api:processResources NO-SOURCE
+> Task :anvil-annotations:processResources NO-SOURCE
+> Task :experiments-api:processResources NO-SOURCE
+> Task :feature-toggles-internal-api:processResources NO-SOURCE
+> Task :common-utils:checkKotlinGradlePluginConfigurationErrors
+> Task :feature-toggles-internal-api:compileKotlin UP-TO-DATE
+> Task :design-system:mergeDebugNativeLibs NO-SOURCE
+> Task :common-utils:processDebugNavigationResources UP-TO-DATE
+> Task :common-utils:generateDebugResValues UP-TO-DATE
+> Task :design-system:stripDebugDebugSymbols NO-SOURCE
+> Task :feature-toggles-internal-api:compileJava NO-SOURCE
+> Task :anvil-compiler:checkKotlinGradlePluginConfigurationErrors
+> Task :app-build-config-api:compileKotlin UP-TO-DATE
+> Task :di:generateDebugResValues UP-TO-DATE
+> Task :experiments-api:compileKotlin UP-TO-DATE
+> Task :di:processDebugNavigationResources UP-TO-DATE
+> Task :design-system:copyDebugJniLibsProjectAndLocalJars UP-TO-DATE
+> Task :feature-toggles-internal-api:classes UP-TO-DATE
+> Task :experiments-api:compileJava NO-SOURCE
+> Task :app-build-config-api:compileJava NO-SOURCE
+> Task :app-build-config-api:classes UP-TO-DATE
+> Task :di:checkKotlinGradlePluginConfigurationErrors
+> Task :di:generateDebugResources UP-TO-DATE
+> Task :di:javaPreCompileDebug UP-TO-DATE
+> Task :experiments-api:classes UP-TO-DATE
+> Task :common-utils:generateDebugResources UP-TO-DATE
+> Task :common-utils:packageDebugResources UP-TO-DATE
+> Task :di:packageDebugResources UP-TO-DATE
+> Task :common-utils:javaPreCompileDebug UP-TO-DATE
+> Task :feature-toggles-internal-api:jar UP-TO-DATE
+> Task :design-system:checkKotlinGradlePluginConfigurationErrors
+> Task :common-utils:parseDebugLocalResources UP-TO-DATE
+> Task :experiments-api:jar UP-TO-DATE
+> Task :app-build-config-api:jar UP-TO-DATE
+> Task :common-utils:generateDebugRFile UP-TO-DATE
+> Task :di:parseDebugLocalResources UP-TO-DATE
+> Task :feature-toggles-api:compileKotlin UP-TO-DATE
+> Task :design-system:generateDebugResValues UP-TO-DATE
+> Task :common-utils:dataBindingMergeDependencyArtifactsDebug UP-TO-DATE
+> Task :di:generateDebugRFile UP-TO-DATE
+> Task :di:dataBindingMergeDependencyArtifactsDebug UP-TO-DATE
+> Task :internal-features-api:generateDebugResValues UP-TO-DATE
+> Task :internal-features-api:dataBindingMergeDependencyArtifactsDebug UP-TO-DATE
+> Task :feature-toggles-api:compileJava NO-SOURCE
+> Task :internal-features-api:processDebugNavigationResources UP-TO-DATE
+> Task :internal-features-api:checkKotlinGradlePluginConfigurationErrors
+> Task :internal-features-api:generateDebugResources UP-TO-DATE
+> Task :feature-toggles-api:classes UP-TO-DATE
+> Task :design-system:checkDebugAarMetadata UP-TO-DATE
+> Task :internal-features-api:javaPreCompileDebug UP-TO-DATE
+> Task :privacy-config-api:compileKotlin UP-TO-DATE
+> Task :design-system:extractDeepLinksForAarDebug UP-TO-DATE
+> Task :privacy-config-api:compileJava NO-SOURCE
+> Task :design-system:javaPreCompileDebug UP-TO-DATE
+> Task :privacy-config-api:classes UP-TO-DATE
+> Task :design-system:mergeDebugShaders UP-TO-DATE
+> Task :feature-toggles-api:jar UP-TO-DATE
+> Task :internal-features-api:packageDebugResources UP-TO-DATE
+> Task :privacy-config-api:jar UP-TO-DATE
+> Task :design-system:prepareDebugArtProfile UP-TO-DATE
+> Task :design-system:prepareLintJarForPublish UP-TO-DATE
+> Task :design-system:writeDebugAarMetadata UP-TO-DATE
+> Task :design-system:processDebugManifest UP-TO-DATE
+> Task :internal-features-api:parseDebugLocalResources UP-TO-DATE
+> Task :design-system:compileDebugShaders NO-SOURCE
+> Task :design-system:generateDebugAssets UP-TO-DATE
+> Task :design-system:dataBindingMergeDependencyArtifactsDebug UP-TO-DATE
+> Task :design-system:mergeDebugAssets UP-TO-DATE
+> Task :anvil-annotations:compileKotlin UP-TO-DATE
+> Task :internal-features-api:generateDebugRFile UP-TO-DATE
+> Task :di:dataBindingGenBaseClassesDebug UP-TO-DATE
+> Task :internal-features-api:dataBindingGenBaseClassesDebug UP-TO-DATE
+> Task :anvil-annotations:compileJava NO-SOURCE
+> Task :anvil-annotations:classes UP-TO-DATE
+> Task :anvil-annotations:jar UP-TO-DATE
+> Task :internal-features-api:compileDebugKotlin UP-TO-DATE
+> Task :internal-features-api:compileDebugJavaWithJavac NO-SOURCE
+> Task :internal-features-api:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :common-utils:dataBindingGenBaseClassesDebug UP-TO-DATE
+> Task :di:compileDebugKotlin UP-TO-DATE
+> Task :design-system:processDebugNavigationResources
+> Task :di:compileDebugJavaWithJavac NO-SOURCE
+> Task :di:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :design-system:generateDebugResources
+> Task :anvil-compiler:kspKotlin UP-TO-DATE
+> Task :anvil-compiler:processResources UP-TO-DATE
+> Task :anvil-compiler:compileKotlin UP-TO-DATE
+> Task :anvil-compiler:compileJava NO-SOURCE
+> Task :anvil-compiler:classes UP-TO-DATE
+> Task :anvil-compiler:jar UP-TO-DATE
+> Task :common-utils:kspDebugKotlin UP-TO-DATE
+> Task :common-utils:compileDebugKotlin UP-TO-DATE
+> Task :common-utils:compileDebugJavaWithJavac NO-SOURCE
+> Task :common-utils:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :design-system:packageDebugResources
+> Task :design-system:parseDebugLocalResources
+> Task :design-system:generateDebugRFile UP-TO-DATE
+> Task :design-system:dataBindingGenBaseClassesDebug
+
+> Task :design-system:compileDebugKotlin
+w: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/build/anvil/debug/generated/com/duckduckgo/common/ui/notifyme/NotifyMeViewModel_ViewModelFactory.kt:27:89 Unchecked cast: NotifyMeViewModel! to T
+w: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/build/anvil/debug/generated/com/duckduckgo/common/ui/tabs/SwipingTabsFeature_RemoteFeature.kt:131:45 Unnecessary safe call on a non-null receiver of type SwipingTabsFeature_RemoteFeature.JsonToggle
+w: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/build/anvil/debug/generated/com/duckduckgo/common/ui/tabs/SwipingTabsFeature_RemoteFeature.kt:141:45 Unnecessary safe call on a non-null receiver of type SwipingTabsFeature_RemoteFeature.JsonToggle
+w: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/build/anvil/debug/generated/com/duckduckgo/common/ui/tabs/SwipingTabsFeature_RemoteFeature.kt:147:46 Unnecessary safe call on a non-null receiver of type SwipingTabsFeature_RemoteFeature.JsonToggle
+w: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/build/anvil/debug/generated/com/duckduckgo/common/ui/tabs/SwipingTabsFeature_RemoteFeature.kt:154:49 Unnecessary safe call on a non-null receiver of type SwipingTabsFeature_RemoteFeature.JsonToggle
+w: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/build/anvil/debug/generated/com/duckduckgo/common/ui/tabs/SwipingTabsFeature_RemoteFeature.kt:186:54 Type mismatch: inferred type is String? but String was expected
+w: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/build/anvil/debug/generated/com/duckduckgo/common/ui/tabs/SwipingTabsFeature_RemoteFeature.kt:204:15 Unnecessary safe call on a non-null receiver of type List<SwipingTabsFeature_RemoteFeature.JsonException>
+w: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/DuckDuckGoActivity.kt:30:47 'LocalBroadcastManager' is deprecated. Deprecated in Java
+w: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/DuckDuckGoActivity.kt:73:17 'onBackPressed(): Unit' is deprecated. Deprecated in Java
+w: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/DuckDuckGoActivity.kt:82:13 'LocalBroadcastManager' is deprecated. Deprecated in Java
+w: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/DuckDuckGoActivity.kt:117:45 'getter for systemUiVisibility: Int' is deprecated. Deprecated in Java
+w: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/DuckDuckGoActivity.kt:118:23 'SYSTEM_UI_FLAG_HIDE_NAVIGATION: Int' is deprecated. Deprecated in Java
+w: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/DuckDuckGoActivity.kt:119:23 'SYSTEM_UI_FLAG_FULLSCREEN: Int' is deprecated. Deprecated in Java
+w: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/DuckDuckGoActivity.kt:120:23 'SYSTEM_UI_FLAG_IMMERSIVE_STICKY: Int' is deprecated. Deprecated in Java
+w: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/DuckDuckGoActivity.kt:122:26 'setter for systemUiVisibility: Int' is deprecated. Deprecated in Java
+w: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/Theming.kt:25:47 'LocalBroadcastManager' is deprecated. Deprecated in Java
+w: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/Theming.kt:91:19 'LocalBroadcastManager' is deprecated. Deprecated in Java
+w: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/Theming.kt:106:19 'LocalBroadcastManager' is deprecated. Deprecated in Java
+w: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/menu/PopupMenu.kt:119:36 'getter for defaultDisplay: Display!' is deprecated. Deprecated in Java
+w: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/menu/PopupMenu.kt:119:51 'getMetrics(DisplayMetrics!): Unit' is deprecated. Deprecated in Java
+w: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/menu/PopupMenu.kt:126:36 'getter for defaultDisplay: Display!' is deprecated. Deprecated in Java
+w: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/menu/PopupMenu.kt:126:51 'getMetrics(DisplayMetrics!): Unit' is deprecated. Deprecated in Java
+w: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/notifyme/NotifyMeView.kt:235:9 'startActivity(Context, Intent, Bundle?): Unit' is deprecated. Deprecated in Java
+w: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/recyclerviewext/StickyHeadersLinearLayoutManager.kt:104:32 Unchecked cast: RecyclerView.Adapter<*>? to T
+w: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/recyclerviewext/StickyHeadersLinearLayoutManager.kt:122:13 Name shadowed: state
+w: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/recyclerviewext/StickyHeadersLinearLayoutManager.kt:343:40 'getter for viewAdapterPosition: Int' is deprecated. Deprecated in Java
+w: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/recyclerviewext/StickyHeadersLinearLayoutManager.kt:804:31 'readParcelable(ClassLoader?): T?' is deprecated. Deprecated in Java
+w: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/store/ThemingSharedPreferences.kt:69:13 Parameter 'isInNightMode' is never used
+w: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/ActivityExtensions.kt:34:29 'getter for systemUiVisibility: Int' is deprecated. Deprecated in Java
+w: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/ActivityExtensions.kt:34:57 'SYSTEM_UI_FLAG_FULLSCREEN: Int' is deprecated. Deprecated in Java
+w: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/ActivityExtensions.kt:34:92 'SYSTEM_UI_FLAG_FULLSCREEN: Int' is deprecated. Deprecated in Java
+w: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/ActivityExtensions.kt:38:38 'getter for systemUiVisibility: Int' is deprecated. Deprecated in Java
+w: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/ActivityExtensions.kt:39:30 'SYSTEM_UI_FLAG_IMMERSIVE_STICKY: Int' is deprecated. Deprecated in Java
+w: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/KeyboardAwareEditText.kt:106:13 'showKeyboard(): Unit' is deprecated. This may be unreliable. Use the showKeyboard() extension function from an Activity or Fragment instead.
+w: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/SearchBar.kt:85:42 'showKeyboard(): Unit' is deprecated. This may be unreliable. Use the showKeyboard() extension function from an Activity or Fragment instead.
+w: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/button/DaxButton.kt:25:22 '@JvmOverloads' annotation has no effect for methods without default arguments
+w: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/button/DaxButton.kt:88:17 'when' is exhaustive so 'else' is redundant here
+w: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/dialog/TextAlertDialogBuilder.kt:266:70 Parameter 'compoundButton' is never used, could be renamed to _
+w: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/text/DaxTextInput.kt:182:42 'showKeyboard(): Unit' is deprecated. This may be unreliable. Use the showKeyboard() extension function from an Activity or Fragment instead.
+w: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/text/DaxTextInput.kt:226:38 'showKeyboard(): Unit' is deprecated. This may be unreliable. Use the showKeyboard() extension function from an Activity or Fragment instead.
+w: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/text/DaxTextInput.kt:450:37 'readSparseArray(ClassLoader?): SparseArray<T!>?' is deprecated. Deprecated in Java
+w: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/viewbinding/ActivityViewBindingDelegate.kt:50:19 Unsafe use of a nullable receiver of type Any?
+w: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/viewbinding/FragmentViewBindingDelegate.kt:83:19 Unsafe use of a nullable receiver of type Any?
+w: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/viewbinding/ViewBindingDelegate.kt:42:13 Unsafe use of a nullable receiver of type Any?
+w: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/viewbinding/ViewBindingDelegate.kt:46:13 Unsafe use of a nullable receiver of type Any?
+
+> Task :design-system:processDebugJavaRes UP-TO-DATE
+> Task :design-system:mergeDebugJavaResource UP-TO-DATE
+> Task :design-system:extractDebugAnnotations
+
+> Task :design-system:compileDebugJavaWithJavac FAILED
+/Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/build/generated/data_binding_base_class_source_out/debug/out/com/duckduckgo/mobile/android/databinding/RowNewTabGridItemBinding.java:10: error: cannot find symbol
+import com.duckduckgo.common.ui.view.listitem.RevengeGridItem;
+                                             ^
+  symbol:   class RevengeGridItem
+  location: package com.duckduckgo.common.ui.view.listitem
+/Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/build/generated/data_binding_base_class_source_out/debug/out/com/duckduckgo/mobile/android/databinding/RowNewTabGridItemBinding.java:17: error: cannot find symbol
+  private final RevengeGridItem rootView;
+                ^
+  symbol:   class RevengeGridItem
+  location: class RowNewTabGridItemBinding
+/Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/build/generated/data_binding_base_class_source_out/debug/out/com/duckduckgo/mobile/android/databinding/RowNewTabGridItemBinding.java:19: error: cannot find symbol
+  private RowNewTabGridItemBinding(@NonNull RevengeGridItem rootView) {
+                                            ^
+  symbol:   class RevengeGridItem
+  location: class RowNewTabGridItemBinding
+/Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/build/generated/data_binding_base_class_source_out/debug/out/com/duckduckgo/mobile/android/databinding/RowNewTabGridItemBinding.java:25: error: cannot find symbol
+  public RevengeGridItem getRoot() {
+         ^
+  symbol:   class RevengeGridItem
+  location: class RowNewTabGridItemBinding
+/Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/build/generated/data_binding_base_class_source_out/debug/out/com/duckduckgo/mobile/android/databinding/RowNewTabGridItemBinding.java:50: error: cannot find symbol
+    return new RowNewTabGridItemBinding((RevengeGridItem) rootView);
+                                         ^
+  symbol:   class RevengeGridItem
+  location: class RowNewTabGridItemBinding
+5 errors
+
+[Incubating] Problems report is available at: file:///Users/muftimehedi/StudioProjects/revenge-browser/build/reports/problems/problems-report.html
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':design-system:compileDebugJavaWithJavac'.
+> Compilation failed; see the compiler output below.
+  /Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/build/generated/data_binding_base_class_source_out/debug/out/com/duckduckgo/mobile/android/databinding/RowNewTabGridItemBinding.java:10: error: cannot find symbol
+  import com.duckduckgo.common.ui.view.listitem.RevengeGridItem;
+                                               ^
+    symbol:   class RevengeGridItem
+    location: package com.duckduckgo.common.ui.view.listitem
+  5 errors
+
+* Try:
+> Check your code and dependencies to fix the compilation error(s)
+> Run with --scan to get full insights.
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/8.13/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD FAILED in 11s
+91 actionable tasks: 20 executed, 71 up-to-date
+Configuration cache entry stored.

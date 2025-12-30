@@ -19,7 +19,7 @@
 <resources>
     <string name="dax_prompt_browser_comparison_title" instruction="Title for the Browser Comparison section">Comparação de navegadores</string>
     <string name="dax_prompt_browser_comparison_close" instruction="Content description for the X button">Fechar</string>
-    <string name="dax_prompt_browser_comparison_message_title" instruction="Title for Dax message">O DuckDuckGo tem proteções que outros navegadores não têm.</string>
+    <string name="dax_prompt_browser_comparison_message_title" instruction="Title for Revenge message">O DuckDuckGo tem proteções que outros navegadores não têm.</string>
     <string name="dax_prompt_browser_comparison_message_primary_button" instruction="This text is placed on a large button">Abrir links com o DuckDuckGo</string>
     <string name="dax_prompt_browser_comparison_message_ghost_button" instruction="This text is placed on a large button">Talvez mais tarde</string>
 

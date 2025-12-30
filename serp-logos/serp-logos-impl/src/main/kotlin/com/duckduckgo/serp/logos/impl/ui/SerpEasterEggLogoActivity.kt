@@ -47,7 +47,7 @@ class SerpEasterEggLogoActivity : DuckDuckGoActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge(navigationBarStyle = SystemBarStyle.dark(Color.TRANSPARENT))
         super.onCreate(savedInstanceState)
-        setTheme(R.style.Theme_DuckDuckGo_DynamicLogo)
+        setTheme(R.style.Theme_Revenge_DynamicLogo)
         binding = ActivitySerpEasterEggLogoBinding.inflate(layoutInflater)
         setContentView(binding.root)
         supportPostponeEnterTransition()

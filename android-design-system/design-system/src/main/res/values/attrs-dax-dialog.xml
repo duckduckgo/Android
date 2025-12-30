@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Copyright (c) 2024 DuckDuckGo
+  ~ Copyright (c) 2024 Revenge
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -26,13 +26,13 @@
     <attr name="arrowOffsetStart" format="dimension" />
     <attr name="arrowOffsetEnd" format="dimension" />
 
-    <!-- DaxBubbleCardView-->
-    <declare-styleable name="DaxBubbleCardView">
+    <!-- RevengeBubbleCardView-->
+    <declare-styleable name="RevengeBubbleCardView">
         <attr name="edgePosition"/>
     </declare-styleable>
 
-    <!-- DaxOnboardingBubbleCardView-->
-    <declare-styleable name="DaxOnboardingBubbleCardView">
+    <!-- RevengeOnboardingBubbleCardView-->
+    <declare-styleable name="RevengeOnboardingBubbleCardView">
         <attr name="edgePosition" />
         <attr name="arrowHeight" />
         <attr name="arrowOffsetStart" />

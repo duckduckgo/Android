@@ -20,7 +20,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".subscription.DuckAiPaidSettingsActivity">
+    tools:context=".subscription.RevengeAIPaidSettingsActivity">
 
     <include
         android:id="@+id/includeToolbar"
@@ -83,7 +83,7 @@
                 android:layout_marginTop="@dimen/keyline_6" />
 
             <com.duckduckgo.common.ui.view.listitem.OneLineListItem
-                android:id="@+id/duckAiPaidSettingsOpenDuckAi"
+                android:id="@+id/duckAiPaidSettingsOpenRevengeAI"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/keyline_2"

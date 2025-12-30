@@ -23,7 +23,7 @@ import com.duckduckgo.app.browser.viewstate.BrowserViewState
 import com.duckduckgo.browser.ui.browsermenu.BrowserMenuViewState
 import com.duckduckgo.browser.ui.browsermenu.VpnMenuState
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.duckchat.api.DuckAiFeatureState
+import com.duckduckgo.duckchat.api.RevengeAIFeatureState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
@@ -44,7 +44,7 @@ class RealBrowserMenuViewStateFactoryTest {
     var instantTaskExecutorRule = InstantTaskExecutorRule()
 
     @Mock
-    private var duckAiFeatureStateMock: DuckAiFeatureState = mock()
+    private var duckAiFeatureStateMock: RevengeAIFeatureState = mock()
     private val fullscreenModeFlow = MutableStateFlow(false)
 
     private lateinit var testee: RealBrowserMenuViewStateFactory
@@ -91,7 +91,7 @@ class RealBrowserMenuViewStateFactoryTest {
         val omnibarViewMode = ViewMode.DuckAI
 
         val result = testee.create(omnibarViewMode = omnibarViewMode, viewState = browserViewState, customTabsMode = false)
-        val viewState = result as BrowserMenuViewState.DuckAi
+        val viewState = result as BrowserMenuViewState.RevengeAI
 
         assertFalse(viewState.canPrintPage)
         assertFalse(viewState.canPrintPage)

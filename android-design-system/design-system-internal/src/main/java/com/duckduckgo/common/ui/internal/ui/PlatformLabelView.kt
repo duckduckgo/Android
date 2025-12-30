@@ -37,7 +37,7 @@ class PlatformLabelView @JvmOverloads constructor(
     init {
         val paddingStart = resources.getDimensionPixelSize(R.dimen.keyline_4)
         setPaddingRelative(paddingStart, 0, 0, 0)
-        setTextAppearance(R.style.Typography_DuckDuckGo_Caption_AllCaps)
+        setTextAppearance(R.style.Typography_Revenge_Caption_AllCaps)
         setTextColor(ContextCompat.getColorStateList(context, R.color.secondary_text_color_selector))
 
         context.withStyledAttributes(

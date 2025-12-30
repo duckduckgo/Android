@@ -35,30 +35,30 @@ constructor(
         val typedArray =
             context.obtainStyledAttributes(
                 attrs,
-                R.styleable.DaxTextView,
+                R.styleable.RevengeTextView,
                 0,
                 0,
             )
 
-        val typography = if (typedArray.hasValue(R.styleable.DaxTextView_typography)) {
-            Typography.from(typedArray.getInt(R.styleable.DaxTextView_typography, 0))
+        val typography = if (typedArray.hasValue(R.styleable.RevengeTextView_typography)) {
+            Typography.from(typedArray.getInt(R.styleable.RevengeTextView_typography, 0))
         } else {
             Body1
         }
 
         setTypography(typography)
 
-        val hasType = typedArray.hasValue(R.styleable.DaxTextView_textType)
-        val hasTextColor = typedArray.hasValue(R.styleable.DaxTextView_android_textColor)
+        val hasType = typedArray.hasValue(R.styleable.RevengeTextView_textType)
+        val hasTextColor = typedArray.hasValue(R.styleable.RevengeTextView_android_textColor)
 
         when {
             hasType -> {
-                val textType = TextType.from(typedArray.getInt(R.styleable.DaxTextView_textType, 0))
+                val textType = TextType.from(typedArray.getInt(R.styleable.RevengeTextView_textType, 0))
                 setTextColorStateList(textType)
             }
 
             hasTextColor -> {
-                val colorStateList = TypedArrayUtils.getColorStateList(context, typedArray, R.styleable.DaxTextView_android_textColor)
+                val colorStateList = TypedArrayUtils.getColorStateList(context, typedArray, R.styleable.RevengeTextView_android_textColor)
                 if (colorStateList != null) {
                     setTextColor(colorStateList)
                 } else {
@@ -126,20 +126,20 @@ constructor(
 
             fun getTextAppearanceStyle(typography: Typography): Int {
                 return when (typography) {
-                    Title -> R.style.Typography_DuckDuckGo_Title
-                    H1 -> R.style.Typography_DuckDuckGo_H1
-                    H2 -> R.style.Typography_DuckDuckGo_H2
-                    H3 -> R.style.Typography_DuckDuckGo_H3
-                    H4 -> R.style.Typography_DuckDuckGo_H4
-                    H5 -> R.style.Typography_DuckDuckGo_H5
-                    Body1 -> R.style.Typography_DuckDuckGo_Body1
-                    Body1Bold -> R.style.Typography_DuckDuckGo_Body1_Bold
-                    Body1Mono -> R.style.Typography_DuckDuckGo_Body1_Mono
-                    Body2 -> R.style.Typography_DuckDuckGo_Body2
-                    Body2Bold -> R.style.Typography_DuckDuckGo_Body2_Bold
-                    Button -> R.style.Typography_DuckDuckGo_Button
-                    Caption -> R.style.Typography_DuckDuckGo_Caption
-                    CaptionAllCaps -> R.style.Typography_DuckDuckGo_Caption_AllCaps
+                    Title -> R.style.Typography_Revenge_Title
+                    H1 -> R.style.Typography_Revenge_H1
+                    H2 -> R.style.Typography_Revenge_H2
+                    H3 -> R.style.Typography_Revenge_H3
+                    H4 -> R.style.Typography_Revenge_H4
+                    H5 -> R.style.Typography_Revenge_H5
+                    Body1 -> R.style.Typography_Revenge_Body1
+                    Body1Bold -> R.style.Typography_Revenge_Body1_Bold
+                    Body1Mono -> R.style.Typography_Revenge_Body1_Mono
+                    Body2 -> R.style.Typography_Revenge_Body2
+                    Body2Bold -> R.style.Typography_Revenge_Body2_Bold
+                    Button -> R.style.Typography_Revenge_Button
+                    Caption -> R.style.Typography_Revenge_Caption
+                    CaptionAllCaps -> R.style.Typography_Revenge_Caption_AllCaps
                 }
             }
         }

@@ -208,10 +208,10 @@ class FakeSettingsDataStore :
         return store.containsKey("isFullUrlEnabled")
     }
 
-    override var clearDuckAiData: Boolean
-        get() = store["clearDuckAiData"] as Boolean? ?: false
+    override var clearRevengeAIData: Boolean
+        get() = store["clearRevengeAIData"] as Boolean? ?: false
         set(value) {
-            store["clearDuckAiData"] = value
+            store["clearRevengeAIData"] = value
         }
 
     override fun isCurrentlySelected(clearWhatOption: ClearWhatOption): Boolean {

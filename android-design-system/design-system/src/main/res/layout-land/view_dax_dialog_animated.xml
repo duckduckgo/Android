@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Copyright (c) 2022 DuckDuckGo
+  ~ Copyright (c) 2022 Revenge
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -68,7 +68,7 @@
             android:id="@+id/cardView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            style="@style/Widget.DuckDuckGo.DaxDialog.Outline"
+            style="@style/Widget.Revenge.RevengeDialog.Outline"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -76,7 +76,7 @@
 
             <LinearLayout
                 android:id="@+id/cardContainer"
-                style="@style/Widget.DuckDuckGo.DaxDialog.Content"
+                style="@style/Widget.Revenge.RevengeDialog.Content"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">

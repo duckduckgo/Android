@@ -41,7 +41,7 @@
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/omniBarContainerMockup"
-            style="@style/Widget.DuckDuckGo.OmnibarCardView"
+            style="@style/Widget.Revenge.OmnibarCardView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:cardElevation="0dp">

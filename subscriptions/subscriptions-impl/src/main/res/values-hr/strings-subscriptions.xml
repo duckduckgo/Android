@@ -172,13 +172,13 @@
     <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Pošalji povratnu informaciju</string>
 
-    <string name="subscriptionSettingSubscribeWithDuckAiSubtitle">Pretplatnici dobivaju naš VPN, napredne AI modele u usluzi Duck.ai, uslugu Personal Information Removal (uklanjanje osobnih podataka) te uslugu Identity Theft Restoration (oporavak od krađe identiteta).</string>
-    <string name="subscriptionSettingSubscribeWithDuckAiSubtitleRow">Pretplatnici dobivaju naš VPN, napredne AI modele u Duck.ai te usluge Personal Information Removal (uklanjanje osobnih podataka) i Identity Theft Restoration (oporavak od krađe identiteta).</string>
+    <string name="subscriptionSettingSubscribeWithRevengeAISubtitle">Pretplatnici dobivaju naš VPN, napredne AI modele u usluzi Revenge AI, uslugu Personal Information Removal (uklanjanje osobnih podataka) te uslugu Identity Theft Restoration (oporavak od krađe identiteta).</string>
+    <string name="subscriptionSettingSubscribeWithRevengeAISubtitleRow">Pretplatnici dobivaju naš VPN, napredne AI modele u Revenge AI te usluge Personal Information Removal (uklanjanje osobnih podataka) i Identity Theft Restoration (oporavak od krađe identiteta).</string>
 
-    <string name="feedbackCategoryDuckAi">Duck.ai</string>
-    <string name="feedbackSubCategoryDuckAiSubscriberModels">Nije moguće pristupiti modelima Duck.ai koji su dostupni samo pretplatnicima</string>
-    <string name="feedbackSubCategoryDuckAiLoginThirdPartyBrowser">U drugim preglednicima ne mogu pristupiti usluzi Duck.ai s mojom pretplatom</string>
-    <string name="feedbackSubCategoryDuckAiOther">Ostale povratne informacije o Duck.ai</string>
+    <string name="feedbackCategoryRevengeAI">Revenge AI</string>
+    <string name="feedbackSubCategoryRevengeAISubscriberModels">Nije moguće pristupiti modelima Revenge AI koji su dostupni samo pretplatnicima</string>
+    <string name="feedbackSubCategoryRevengeAILoginThirdPartyBrowser">U drugim preglednicima ne mogu pristupiti usluzi Revenge AI s mojom pretplatom</string>
+    <string name="feedbackSubCategoryRevengeAIOther">Ostale povratne informacije o Revenge AI</string>
 
     <string name="subscriptionSettingSectionTitle">DuckDuckGo pretplata</string>
     <string name="subscriptionSettingSubscribeSecure">Osiguraj svoj Wi-Fi i privatno čavrljaj s naprednim AI modelima</string>

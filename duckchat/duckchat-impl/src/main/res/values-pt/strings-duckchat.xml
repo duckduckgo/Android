@@ -17,7 +17,7 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="duck_chat_title">Duck.ai</string>
+    <string name="duck_chat_title">Revenge AI</string>
     <string name="duck_chat_download_finished_action_name">Abrir</string>
     <string name="duck_chat_cannot_open_file_error_message">Não é possível abrir o ficheiro. Verificar se a aplicação é compatível.</string>
 
@@ -39,14 +39,14 @@
     <!-- Settings -->
     <string name="duck_chat_ai_features_title">Funcionalidades de IA</string>
     <string name="duck_chat_settings_activity_description">As funcionalidades de IA do DuckDuckGo são privadas e opcionais.Os teus dados não são utilizados para treinar a IA.\n<annotation type="learn_more_link">Sabe mais</annotation></string>
-    <string name="duck_chat_enable_duck_ai_setting">Duck.ai</string>
+    <string name="duck_chat_enable_duck_ai_setting">Revenge AI</string>
     <string name="duck_chat_enable_duck_ai_setting_description">Conversa em privado com modelos de IA populares de terceiros</string>
     <string name="duck_chat_visibility_setting">Menu do navegador</string>
     <string name="duck_chat_address_bar_visibility_setting">Barra de endereço</string>
     <string name="duck_chat_assist_settings_title">Definições do Assist de pesquisa</string>
     <string name="duck_chat_assist_settings_description">Escolhe a frequência com que queres que as respostas assistidas por IA apareçam nas suas pesquisas</string>
-    <string name="duck_ai_shortcut_settings_title">Atalhos Duck.ai</string>
-    <string name="duck_ai_shortcut_settings_description">Escolhe os atalhos do Duck.ai a apresentar</string>
+    <string name="duck_ai_shortcut_settings_title">Atalhos Revenge AI</string>
+    <string name="duck_ai_shortcut_settings_description">Escolhe os atalhos do Revenge AI a apresentar</string>
 
     <!-- Duck AI Voice Search Shortcut Setting -->
     <string name="duckAiVoiceSearchVisibilitySetting">Pesquisa por voz</string>
@@ -55,18 +55,18 @@
     <string name="input_screen_search_hint">Pesquisar ou inserir endereço</string>
     <string name="input_screen_chat_hint">Perguntar em privado</string>
     <string name="input_screen_user_pref_without_ai">Pesquisar apenas</string>
-    <string name="input_screen_user_pref_with_ai">Pesquisa e Duck.ai</string>
-    <string name="input_screen_user_pref_description">Utiliza a nova opção para perguntar diretamente ao Duck.ai na barra de endereço. <annotation type="share_feedback">Partilhar comentários</annotation></string>
+    <string name="input_screen_user_pref_with_ai">Pesquisa e Revenge AI</string>
+    <string name="input_screen_user_pref_description">Utiliza a nova opção para perguntar diretamente ao RevengeAI na barra de endereço. <annotation type="share_feedback">Partilhar comentários</annotation></string>
 
-    <!-- Duck.ai Pro settings -->
-    <string name="duck_ai_paid_settings_title">Duck.ai</string>
-    <string name="duck_ai_paid_settings_page_title">Duck.ai</string>
+    <!-- Revenge AI Pro settings -->
+    <string name="duck_ai_paid_settings_title">Revenge AI</string>
+    <string name="duck_ai_paid_settings_page_title">Revenge AI</string>
     <string name="duck_ai_paid_settings_page_description"><![CDATA[Conversa em privado com modelos de IA exclusivos para subscritores.\n<a href=\"\">Sabe mais</a>]]></string>
-    <string name="duck_ai_paid_settings_open_duck_ai">Abrir Duck.ai</string>
+    <string name="duck_ai_paid_settings_open_duck_ai">Abrir Revenge AI</string>
     <string name="duck_ai_paid_settings_learn_more_title">Saiba mais</string>
 
     <!-- AutoComplete -->
-    <string name="autocompleteDuckAiPrompt">Pergunta ao Duck.ai</string>
+    <string name="autocompleteRevengeAIPrompt">Pergunta ao Revenge AI</string>
     <string name="autocompleteDeviceAppNotFound">Não foi possível encontrar a aplicação</string>
 
     <!-- New Address Bar Option Bottom Sheet Dialog -->
@@ -76,7 +76,7 @@
     <string name="newAddressBarOptionBottomSheetDialogGhostButton">Agora não</string>
     <string name="newAddressBarOptionBottomSheetDialogFooter">Ajusta-as em Definições &gt; Funcionalidades de IA.</string>
     <string name="newAddressBarOptionBottomSheetDialogSearchOnly">Pesquisar apenas</string>
-    <string name="newAddressBarOptionBottomSheetDialogSearchAndDuckAi">Pesquisa e Duck.ai</string>
+    <string name="newAddressBarOptionBottomSheetDialogSearchAndRevengeAI">Pesquisa e Revenge AI</string>
     <string name="newAddressBarOptionBottomSheetDialogHeader">Opção da barra de endereço</string>
 
     <!-- Duck AI SERP Settings Title -->
@@ -92,5 +92,5 @@
     <!-- Duck AI Paid Settings -->
     <string name="duck_ai_paid_settings_enable_in_settings">Ativar nas definições das Funcionalidades de IA</string>
     <string name="duck_ai_paid_settings_manage_in_settings">Gerir nas definições das Funcionalidades de IA</string>
-    <string name="duck_ai_paid_settings_manage_secondary">Configura o Duck.ai nas definições de Funcionalidades de IA.</string>
+    <string name="duck_ai_paid_settings_manage_secondary">Configura o Revenge AI nas definições de Funcionalidades de IA.</string>
 </resources>

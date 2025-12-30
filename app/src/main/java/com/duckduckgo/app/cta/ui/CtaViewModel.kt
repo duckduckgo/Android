@@ -254,12 +254,12 @@ class CtaViewModel @Inject constructor(
 
             // Privacy Pro
             canShowPrivacyProCta() -> {
-                val titleRes: Int = R.string.onboardingPrivacyProDaxDialogTitle
-                val descriptionRes: Int = R.string.onboardingPrivacyProDaxDialogDescription
+                val titleRes: Int = R.string.onboardingPrivacyProRevengeDialogTitle
+                val descriptionRes: Int = R.string.onboardingPrivacyProRevengeDialogDescription
                 val primaryCtaRes: Int = if (freeTrialCopyAvailable()) {
-                    R.string.onboardingPrivacyProDaxDialogFreeTrialOkButton
+                    R.string.onboardingPrivacyProRevengeDialogFreeTrialOkButton
                 } else {
-                    R.string.onboardingPrivacyProDaxDialogOkButton
+                    R.string.onboardingPrivacyProRevengeDialogOkButton
                 }
 
                 DaxBubbleCta.DaxPrivacyProCta(onboardingStore, appInstallStore, titleRes, descriptionRes, primaryCtaRes)

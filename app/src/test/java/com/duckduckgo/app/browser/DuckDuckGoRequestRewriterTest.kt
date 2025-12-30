@@ -59,7 +59,7 @@ class DuckDuckGoRequestRewriterTest {
         whenever(mockAppReferrerDataStore.installedFromEuAuction).thenReturn(false)
         whenever(duckChat.isEnabled()).thenReturn(true)
 
-        androidBrowserConfigFeature.hideDuckAiInSerpKillSwitch().setRawStoredState(State(true))
+        androidBrowserConfigFeature.hideRevengeAIInSerpKillSwitch().setRawStoredState(State(true))
 
         testee = DuckDuckGoRequestRewriter(
             DuckDuckGoUrlDetectorImpl(),
@@ -117,9 +117,9 @@ class DuckDuckGoRequestRewriterTest {
     }
 
     @Test
-    fun whenDuckAiIsDisabledThenHideSerpDuckChat() {
+    fun whenRevengeAIIsDisabledThenHideSerpDuckChat() {
         whenever(duckChat.isEnabled()).thenReturn(false)
-        androidBrowserConfigFeature.hideDuckAiInSerpKillSwitch().setRawStoredState(State(true))
+        androidBrowserConfigFeature.hideRevengeAIInSerpKillSwitch().setRawStoredState(State(true))
         testee.addCustomQueryParams(builder)
 
         val uri = builder.build()
@@ -128,9 +128,9 @@ class DuckDuckGoRequestRewriterTest {
     }
 
     @Test
-    fun whenDuckAiIsDisabledAndKillSwitchedThenDoNotHideSerpDuckChat() {
+    fun whenRevengeAIIsDisabledAndKillSwitchedThenDoNotHideSerpDuckChat() {
         whenever(duckChat.isEnabled()).thenReturn(false)
-        androidBrowserConfigFeature.hideDuckAiInSerpKillSwitch().setRawStoredState(State(false))
+        androidBrowserConfigFeature.hideRevengeAIInSerpKillSwitch().setRawStoredState(State(false))
         testee.addCustomQueryParams(builder)
 
         val uri = builder.build()
@@ -138,9 +138,9 @@ class DuckDuckGoRequestRewriterTest {
     }
 
     @Test
-    fun whenDuckAiIsEnabledThenDoNotHideSerpDuckChat() {
+    fun whenRevengeAIIsEnabledThenDoNotHideSerpDuckChat() {
         whenever(duckChat.isEnabled()).thenReturn(true)
-        androidBrowserConfigFeature.hideDuckAiInSerpKillSwitch().setRawStoredState(State(true))
+        androidBrowserConfigFeature.hideRevengeAIInSerpKillSwitch().setRawStoredState(State(true))
         testee.addCustomQueryParams(builder)
 
         val uri = builder.build()
@@ -148,9 +148,9 @@ class DuckDuckGoRequestRewriterTest {
     }
 
     @Test
-    fun whenDuckAiIsEnabledAndKillSwitchedThenDoNotHideSerpDuckChat() {
+    fun whenRevengeAIIsEnabledAndKillSwitchedThenDoNotHideSerpDuckChat() {
         whenever(duckChat.isEnabled()).thenReturn(true)
-        androidBrowserConfigFeature.hideDuckAiInSerpKillSwitch().setRawStoredState(State(false))
+        androidBrowserConfigFeature.hideRevengeAIInSerpKillSwitch().setRawStoredState(State(false))
         testee.addCustomQueryParams(builder)
 
         val uri = builder.build()
@@ -158,10 +158,10 @@ class DuckDuckGoRequestRewriterTest {
     }
 
     @Test
-    fun whenSerpSettingsSyncIsEnabledThenDoNotHideDuckAi() {
+    fun whenSerpSettingsSyncIsEnabledThenDoNotHideRevengeAI() {
         serpSettingsFeature.storeSerpSettings().setRawStoredState(State(true))
         whenever(duckChat.isEnabled()).thenReturn(false)
-        androidBrowserConfigFeature.hideDuckAiInSerpKillSwitch().setRawStoredState(State(true))
+        androidBrowserConfigFeature.hideRevengeAIInSerpKillSwitch().setRawStoredState(State(true))
 
         testee.addCustomQueryParams(builder)
 

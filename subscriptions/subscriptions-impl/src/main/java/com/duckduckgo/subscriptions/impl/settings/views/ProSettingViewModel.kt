@@ -24,7 +24,7 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ViewScope
-import com.duckduckgo.subscriptions.api.Product.DuckAiPlus
+import com.duckduckgo.subscriptions.api.Product.RevengeAIPlus
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.UNKNOWN
 import com.duckduckgo.subscriptions.impl.PrivacyProFeature
@@ -110,7 +110,7 @@ class ProSettingViewModel @Inject constructor(
 
                     val duckAiEnabled = privacyProFeature.duckAiPlus().isEnabled()
                     val duckAiAvailable = duckAiEnabled && offer?.features?.any { feature ->
-                        feature == DuckAiPlus.value
+                        feature == RevengeAIPlus.value
                     } ?: false
 
                     viewState.value.copy(

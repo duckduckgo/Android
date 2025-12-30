@@ -43,7 +43,7 @@ import com.duckduckgo.browser.api.autocomplete.AutoCompleteFactory
 import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.InstantSchedulersRule
-import com.duckduckgo.duckchat.api.DuckAiFeatureState
+import com.duckduckgo.duckchat.api.RevengeAIFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.savedsites.api.SavedSitesRepository
@@ -82,7 +82,7 @@ class SystemSearchViewModelTest {
     private val mockAutoCompleteSettings: AutoCompleteSettings = mock()
     private val mockHistory: NavigationHistory = mock()
     private val mockDuckChat: DuckChat = mock()
-    private val mockDuckAiFeatureState: DuckAiFeatureState = mock()
+    private val mockRevengeAIFeatureState: RevengeAIFeatureState = mock()
     private val mockVoiceSearchAvailability: VoiceSearchAvailability = mock()
 
     private val commandObserver: Observer<Command> = mock()
@@ -98,10 +98,10 @@ class SystemSearchViewModelTest {
         whenever(mocksavedSitesRepository.getFavorites()).thenReturn(flowOf(emptyList())) // Ensure initial favorites is empty for most tests
         doReturn(true).whenever(mockAutoCompleteSettings).autoCompleteSuggestionsEnabled
         whenever(mockVoiceSearchAvailability.isVoiceSearchAvailable).thenReturn(false)
-        whenever(mockDuckAiFeatureState.showOmnibarShortcutOnNtpAndOnFocus).thenReturn(MutableStateFlow(false))
+        whenever(mockRevengeAIFeatureState.showOmnibarShortcutOnNtpAndOnFocus).thenReturn(MutableStateFlow(false))
 
         testee = SystemSearchViewModel(
-            mockDuckAiFeatureState,
+            mockRevengeAIFeatureState,
             mockVoiceSearchAvailability,
             mockDuckChat,
             mockUserStageStore,
@@ -417,7 +417,7 @@ class SystemSearchViewModelTest {
         whenever(mocksavedSitesRepository.getFavorites()).thenReturn(flowOf(listOf(savedSite)))
         // Re-initialize testee to pick up the new mock value for getFavorites()
         testee = SystemSearchViewModel(
-            mockDuckAiFeatureState,
+            mockRevengeAIFeatureState,
             mockVoiceSearchAvailability,
             mockDuckChat,
             mockUserStageStore,
@@ -450,7 +450,7 @@ class SystemSearchViewModelTest {
         whenever(mocksavedSitesRepository.getFavorites()).thenReturn(flowOf(listOf(savedSite)))
         // Re-initialize testee to pick up the new mock value for getFavorites()
         testee = SystemSearchViewModel(
-            mockDuckAiFeatureState,
+            mockRevengeAIFeatureState,
             mockVoiceSearchAvailability,
             mockDuckChat,
             mockUserStageStore,
@@ -517,7 +517,7 @@ class SystemSearchViewModelTest {
         whenever(mocksavedSitesRepository.getFavorites()).thenReturn(flowOf(listOf(savedSite)))
         // Re-initialize testee to pick up the new mock value for getFavorites()
         testee = SystemSearchViewModel(
-            mockDuckAiFeatureState,
+            mockRevengeAIFeatureState,
             mockVoiceSearchAvailability,
             mockDuckChat,
             mockUserStageStore,
@@ -612,77 +612,77 @@ class SystemSearchViewModelTest {
     }
 
     @Test
-    fun onDuckAiTappedThenDuckChatOpenedWithQuery() {
+    fun onRevengeAITappedThenDuckChatOpenedWithQuery() {
         val query = "What is DuckDuckGo?"
-        testee.onDuckAiRequested(query)
+        testee.onRevengeAIRequested(query)
         verify(mockDuckChat).openDuckChatWithAutoPrompt(query)
     }
 
     @Test
-    fun whenQueryIsEmptyAndVoiceSearchDisabledAndDuckAiDisabledThenOmnibarViewStateIsCorrect() = runTest {
+    fun whenQueryIsEmptyAndVoiceSearchDisabledAndRevengeAIDisabledThenOmnibarViewStateIsCorrect() = runTest {
         whenever(mockVoiceSearchAvailability.isVoiceSearchAvailable).thenReturn(false)
-        (mockDuckAiFeatureState.showOmnibarShortcutOnNtpAndOnFocus as MutableStateFlow).value = false
+        (mockRevengeAIFeatureState.showOmnibarShortcutOnNtpAndOnFocus as MutableStateFlow).value = false
         testee.queryFlow.value = ""
         testee.omnibarViewState.test {
             val viewState = awaitItem()
             assertFalse(viewState.isVoiceSearchButtonVisible)
-            assertFalse(viewState.isDuckAiButtonVisible)
+            assertFalse(viewState.isRevengeAIButtonVisible)
             assertFalse(viewState.isClearButtonVisible)
             assertFalse(viewState.isButtonDividerVisible)
         }
     }
 
     @Test
-    fun whenQueryIsNotEmptyAndVoiceSearchEnabledAndDuckAiEnabledThenOmnibarViewStateIsCorrect() = runTest {
+    fun whenQueryIsNotEmptyAndVoiceSearchEnabledAndRevengeAIEnabledThenOmnibarViewStateIsCorrect() = runTest {
         whenever(mockVoiceSearchAvailability.isVoiceSearchAvailable).thenReturn(true)
-        (mockDuckAiFeatureState.showOmnibarShortcutOnNtpAndOnFocus as MutableStateFlow).value = true
+        (mockRevengeAIFeatureState.showOmnibarShortcutOnNtpAndOnFocus as MutableStateFlow).value = true
         testee.queryFlow.value = "query"
         testee.omnibarViewState.test {
             val viewState = awaitItem()
             assertTrue(viewState.isVoiceSearchButtonVisible)
-            assertTrue(viewState.isDuckAiButtonVisible)
+            assertTrue(viewState.isRevengeAIButtonVisible)
             assertTrue(viewState.isClearButtonVisible)
             assertTrue(viewState.isButtonDividerVisible)
         }
     }
 
     @Test
-    fun whenQueryIsNotEmptyAndVoiceSearchDisabledAndDuckAiEnabledThenOmnibarViewStateIsCorrect() = runTest {
+    fun whenQueryIsNotEmptyAndVoiceSearchDisabledAndRevengeAIEnabledThenOmnibarViewStateIsCorrect() = runTest {
         whenever(mockVoiceSearchAvailability.isVoiceSearchAvailable).thenReturn(false)
-        (mockDuckAiFeatureState.showOmnibarShortcutOnNtpAndOnFocus as MutableStateFlow).value = true
+        (mockRevengeAIFeatureState.showOmnibarShortcutOnNtpAndOnFocus as MutableStateFlow).value = true
         testee.queryFlow.value = "query"
         testee.omnibarViewState.test {
             val viewState = awaitItem()
             assertFalse(viewState.isVoiceSearchButtonVisible)
-            assertTrue(viewState.isDuckAiButtonVisible)
+            assertTrue(viewState.isRevengeAIButtonVisible)
             assertTrue(viewState.isClearButtonVisible)
             assertTrue(viewState.isButtonDividerVisible)
         }
     }
 
     @Test
-    fun whenQueryIsEmptyAndVoiceSearchEnabledAndDuckAiEnabledThenOmnibarViewStateIsCorrect() = runTest {
+    fun whenQueryIsEmptyAndVoiceSearchEnabledAndRevengeAIEnabledThenOmnibarViewStateIsCorrect() = runTest {
         whenever(mockVoiceSearchAvailability.isVoiceSearchAvailable).thenReturn(true)
-        (mockDuckAiFeatureState.showOmnibarShortcutOnNtpAndOnFocus as MutableStateFlow).value = true
+        (mockRevengeAIFeatureState.showOmnibarShortcutOnNtpAndOnFocus as MutableStateFlow).value = true
         testee.queryFlow.value = ""
         testee.omnibarViewState.test {
             val viewState = awaitItem()
             assertTrue(viewState.isVoiceSearchButtonVisible)
-            assertTrue(viewState.isDuckAiButtonVisible)
+            assertTrue(viewState.isRevengeAIButtonVisible)
             assertFalse(viewState.isClearButtonVisible)
             assertTrue(viewState.isButtonDividerVisible)
         }
     }
 
     @Test
-    fun whenQueryIsNotEmptyAndVoiceSearchEnabledAndDuckAiDisabledThenOmnibarViewStateIsCorrect() = runTest {
+    fun whenQueryIsNotEmptyAndVoiceSearchEnabledAndRevengeAIDisabledThenOmnibarViewStateIsCorrect() = runTest {
         whenever(mockVoiceSearchAvailability.isVoiceSearchAvailable).thenReturn(true)
-        (mockDuckAiFeatureState.showOmnibarShortcutOnNtpAndOnFocus as MutableStateFlow).value = false
+        (mockRevengeAIFeatureState.showOmnibarShortcutOnNtpAndOnFocus as MutableStateFlow).value = false
         testee.queryFlow.value = "query"
         testee.omnibarViewState.test {
             val viewState = awaitItem()
             assertTrue(viewState.isVoiceSearchButtonVisible)
-            assertFalse(viewState.isDuckAiButtonVisible)
+            assertFalse(viewState.isRevengeAIButtonVisible)
             assertTrue(viewState.isClearButtonVisible)
             assertFalse(viewState.isButtonDividerVisible)
         }
@@ -691,7 +691,7 @@ class SystemSearchViewModelTest {
     @Test
     fun `when launched from search only widget and duck ai enabled then duck ai button not visible`() = runTest {
         whenever(mockVoiceSearchAvailability.isVoiceSearchAvailable).thenReturn(true)
-        (mockDuckAiFeatureState.showOmnibarShortcutOnNtpAndOnFocus as MutableStateFlow).value = true
+        (mockRevengeAIFeatureState.showOmnibarShortcutOnNtpAndOnFocus as MutableStateFlow).value = true
         testee.queryFlow.value = "query"
 
         testee.setLaunchedFromSearchOnlyWidget(true)
@@ -699,7 +699,7 @@ class SystemSearchViewModelTest {
         testee.omnibarViewState.test {
             val viewState = awaitItem()
             assertTrue(viewState.isVoiceSearchButtonVisible)
-            assertFalse(viewState.isDuckAiButtonVisible)
+            assertFalse(viewState.isRevengeAIButtonVisible)
             assertTrue(viewState.isClearButtonVisible)
             assertFalse(viewState.isButtonDividerVisible)
         }
@@ -708,7 +708,7 @@ class SystemSearchViewModelTest {
     @Test
     fun `when not launched from search only widget and duck ai enabled then duck ai button visible`() = runTest {
         whenever(mockVoiceSearchAvailability.isVoiceSearchAvailable).thenReturn(true)
-        (mockDuckAiFeatureState.showOmnibarShortcutOnNtpAndOnFocus as MutableStateFlow).value = true
+        (mockRevengeAIFeatureState.showOmnibarShortcutOnNtpAndOnFocus as MutableStateFlow).value = true
         testee.queryFlow.value = "query"
 
         testee.setLaunchedFromSearchOnlyWidget(false)
@@ -716,7 +716,7 @@ class SystemSearchViewModelTest {
         testee.omnibarViewState.test {
             val viewState = awaitItem()
             assertTrue(viewState.isVoiceSearchButtonVisible)
-            assertTrue(viewState.isDuckAiButtonVisible)
+            assertTrue(viewState.isRevengeAIButtonVisible)
             assertTrue(viewState.isClearButtonVisible)
             assertTrue(viewState.isButtonDividerVisible)
         }
@@ -725,7 +725,7 @@ class SystemSearchViewModelTest {
     @Test
     fun `when launched from search only widget and duck ai disabled then duck ai button not visible`() = runTest {
         whenever(mockVoiceSearchAvailability.isVoiceSearchAvailable).thenReturn(true)
-        (mockDuckAiFeatureState.showOmnibarShortcutOnNtpAndOnFocus as MutableStateFlow).value = false
+        (mockRevengeAIFeatureState.showOmnibarShortcutOnNtpAndOnFocus as MutableStateFlow).value = false
         testee.queryFlow.value = "query"
 
         testee.setLaunchedFromSearchOnlyWidget(true)
@@ -733,7 +733,7 @@ class SystemSearchViewModelTest {
         testee.omnibarViewState.test {
             val viewState = awaitItem()
             assertTrue(viewState.isVoiceSearchButtonVisible)
-            assertFalse(viewState.isDuckAiButtonVisible)
+            assertFalse(viewState.isRevengeAIButtonVisible)
             assertTrue(viewState.isClearButtonVisible)
             assertFalse(viewState.isButtonDividerVisible)
         }
@@ -742,7 +742,7 @@ class SystemSearchViewModelTest {
     @Test
     fun `when launched from search only widget and query empty then duck ai button not visible`() = runTest {
         whenever(mockVoiceSearchAvailability.isVoiceSearchAvailable).thenReturn(true)
-        (mockDuckAiFeatureState.showOmnibarShortcutOnNtpAndOnFocus as MutableStateFlow).value = true
+        (mockRevengeAIFeatureState.showOmnibarShortcutOnNtpAndOnFocus as MutableStateFlow).value = true
         testee.queryFlow.value = ""
 
         testee.setLaunchedFromSearchOnlyWidget(true)
@@ -750,7 +750,7 @@ class SystemSearchViewModelTest {
         testee.omnibarViewState.test {
             val viewState = awaitItem()
             assertTrue(viewState.isVoiceSearchButtonVisible)
-            assertFalse(viewState.isDuckAiButtonVisible)
+            assertFalse(viewState.isRevengeAIButtonVisible)
             assertFalse(viewState.isClearButtonVisible)
             assertFalse(viewState.isButtonDividerVisible)
         }
@@ -759,7 +759,7 @@ class SystemSearchViewModelTest {
     @Test
     fun `when reset view state then search only widget state preserved`() = runTest {
         whenever(mockVoiceSearchAvailability.isVoiceSearchAvailable).thenReturn(true)
-        (mockDuckAiFeatureState.showOmnibarShortcutOnNtpAndOnFocus as MutableStateFlow).value = true
+        (mockRevengeAIFeatureState.showOmnibarShortcutOnNtpAndOnFocus as MutableStateFlow).value = true
 
         // Set search-only widget state
         testee.setLaunchedFromSearchOnlyWidget(true)
@@ -771,7 +771,7 @@ class SystemSearchViewModelTest {
         testee.omnibarViewState.test {
             val viewState = awaitItem()
             assertTrue(viewState.isVoiceSearchButtonVisible)
-            assertFalse(viewState.isDuckAiButtonVisible) // Should still be false due to search-only widget
+            assertFalse(viewState.isRevengeAIButtonVisible) // Should still be false due to search-only widget
             assertFalse(viewState.isClearButtonVisible) // Should be false due to reset
             assertFalse(viewState.isButtonDividerVisible)
         }

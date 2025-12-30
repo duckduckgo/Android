@@ -107,27 +107,27 @@ class DaxTextInput @JvmOverloads constructor(
     init {
         context.obtainStyledAttributes(
             attrs,
-            R.styleable.DaxTextInput,
+            R.styleable.RevengeTextInput,
             0,
             com.google.android.material.R.style.Widget_MaterialComponents_TextInputEditText_OutlinedBox,
         ).apply {
-            text = getString(R.styleable.DaxTextInput_android_text).orEmpty()
-            getDrawable(R.styleable.DaxTextInput_endIcon)?.let {
-                setupEndIconDrawable(it, getString(R.styleable.DaxTextInput_endIconContentDescription).orEmpty())
+            text = getString(R.styleable.RevengeTextInput_android_text).orEmpty()
+            getDrawable(R.styleable.RevengeTextInput_endIcon)?.let {
+                setupEndIconDrawable(it, getString(R.styleable.RevengeTextInput_endIconContentDescription).orEmpty())
             }
 
             // This needs to be done after we know that the view has the end icon set
-            isClickable = getBoolean(R.styleable.DaxTextInput_clickable, false)
-            isEditable = getBoolean(R.styleable.DaxTextInput_editable, true)
-            binding.internalInputLayout.setHintWithoutAnimation(getString(R.styleable.DaxTextInput_android_hint))
+            isClickable = getBoolean(R.styleable.RevengeTextInput_clickable, false)
+            isEditable = getBoolean(R.styleable.RevengeTextInput_editable, true)
+            binding.internalInputLayout.setHintWithoutAnimation(getString(R.styleable.RevengeTextInput_android_hint))
 
             val inputType = getInputType()
             setupInputMode(inputType)
 
-            val minLines = getInt(R.styleable.DaxTextInput_android_minLines, 1)
+            val minLines = getInt(R.styleable.RevengeTextInput_android_minLines, 1)
             setMinLines(inputType, minLines)
 
-            truncated = getBoolean(R.styleable.DaxTextInput_singleLineTextTruncated, false)
+            truncated = getBoolean(R.styleable.RevengeTextInput_singleLineTextTruncated, false)
             setSingleLineTextTruncation(truncated)
 
             context.obtainStyledAttributes(attrs, intArrayOf(attr.imeOptions)).apply {
@@ -135,11 +135,11 @@ class DaxTextInput @JvmOverloads constructor(
                 recycle()
             }
 
-            if (getBoolean(R.styleable.DaxTextInput_capitalizeKeyboard, false)) {
+            if (getBoolean(R.styleable.RevengeTextInput_capitalizeKeyboard, false)) {
                 binding.internalEditText.inputType = binding.internalEditText.inputType or InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS
             }
 
-            val enabled = getBoolean(R.styleable.DaxTextInput_android_enabled, true)
+            val enabled = getBoolean(R.styleable.RevengeTextInput_android_enabled, true)
             isEnabled = enabled
 
             setFocusListener()
@@ -422,7 +422,7 @@ class DaxTextInput @JvmOverloads constructor(
     }
 
     private fun TypedArray.getInputType(): Type {
-        val inputTypeInt = getInt(R.styleable.DaxTextInput_type, INPUT_TYPE_MULTI_LINE.value)
+        val inputTypeInt = getInt(R.styleable.RevengeTextInput_type, INPUT_TYPE_MULTI_LINE.value)
         return Type.values().firstOrNull { it.value == inputTypeInt } ?: INPUT_TYPE_MULTI_LINE
     }
 

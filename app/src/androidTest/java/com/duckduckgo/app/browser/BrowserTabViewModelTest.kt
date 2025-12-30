@@ -240,7 +240,7 @@ import com.duckduckgo.contentscopescripts.api.ContentScopeScriptsSubscriptionEve
 import com.duckduckgo.downloads.api.DownloadStateListener
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
-import com.duckduckgo.duckchat.api.DuckAiFeatureState
+import com.duckduckgo.duckchat.api.RevengeAIFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
 import com.duckduckgo.duckchat.impl.helper.NativeAction
@@ -448,13 +448,13 @@ class BrowserTabViewModelTest {
 
     private val mockDuckPlayer: DuckPlayer = mock()
 
-    private val mockDuckAiFeatureState: DuckAiFeatureState = mock()
+    private val mockRevengeAIFeatureState: RevengeAIFeatureState = mock()
 
-    private val mockDuckAiFeatureStateInputScreenFlow = MutableStateFlow(false)
+    private val mockRevengeAIFeatureStateInputScreenFlow = MutableStateFlow(false)
 
-    private val mockDuckAiFeatureStateInputScreenOpenAutomaticallyFlow = MutableStateFlow(false)
+    private val mockRevengeAIFeatureStateInputScreenOpenAutomaticallyFlow = MutableStateFlow(false)
 
-    private val mockDuckAiFeatureStateFullScreenModeFlow = MutableStateFlow(false)
+    private val mockRevengeAIFeatureStateFullScreenModeFlow = MutableStateFlow(false)
 
     private val mockExternalIntentProcessingState: ExternalIntentProcessingState = mock()
 
@@ -462,7 +462,7 @@ class BrowserTabViewModelTest {
 
     private val mockHasPendingTabLaunchFlow = MutableStateFlow(false)
 
-    private val mockHasPendingDuckAiOpenFlow = MutableStateFlow(false)
+    private val mockHasPendingRevengeAIOpenFlow = MutableStateFlow(false)
 
     private val mockAppBuildConfig: AppBuildConfig = mock()
 
@@ -603,8 +603,8 @@ class BrowserTabViewModelTest {
 
     private val mockDeviceAppLookup: DeviceAppLookup = mock()
 
-    private val mockDuckAiFullScreenMode = MutableStateFlow(false)
-    private val mockDuckAiFullScreenModeEnabled = MutableStateFlow(true)
+    private val mockRevengeAIFullScreenMode = MutableStateFlow(false)
+    private val mockRevengeAIFullScreenModeEnabled = MutableStateFlow(true)
 
     private lateinit var fakeContentScopeScriptsSubscriptionEventPluginPoint: FakeContentScopeScriptsSubscriptionEventPluginPoint
     private var serpSettingsFeature = FakeFeatureToggleFactory.create(SerpSettingsFeature::class.java)
@@ -674,12 +674,12 @@ class BrowserTabViewModelTest {
             whenever(mockSitePermissionsManager.hasSitePermanentPermission(any(), any())).thenReturn(false)
             whenever(mockToggleReports.shouldPrompt()).thenReturn(false)
             whenever(subscriptions.isEligible()).thenReturn(false)
-            whenever(mockDuckAiFeatureState.showPopupMenuShortcut).thenReturn(MutableStateFlow(false))
-            whenever(mockDuckAiFeatureState.showInputScreen).thenReturn(mockDuckAiFeatureStateInputScreenFlow)
-            whenever(mockDuckAiFeatureState.showInputScreenAutomaticallyOnNewTab).thenReturn(mockDuckAiFeatureStateInputScreenOpenAutomaticallyFlow)
-            whenever(mockDuckAiFeatureState.showFullScreenMode).thenReturn(mockDuckAiFeatureStateFullScreenModeFlow)
+            whenever(mockRevengeAIFeatureState.showPopupMenuShortcut).thenReturn(MutableStateFlow(false))
+            whenever(mockRevengeAIFeatureState.showInputScreen).thenReturn(mockRevengeAIFeatureStateInputScreenFlow)
+            whenever(mockRevengeAIFeatureState.showInputScreenAutomaticallyOnNewTab).thenReturn(mockRevengeAIFeatureStateInputScreenOpenAutomaticallyFlow)
+            whenever(mockRevengeAIFeatureState.showFullScreenMode).thenReturn(mockRevengeAIFeatureStateFullScreenModeFlow)
             whenever(mockExternalIntentProcessingState.hasPendingTabLaunch).thenReturn(mockHasPendingTabLaunchFlow)
-            whenever(mockExternalIntentProcessingState.hasPendingDuckAiOpen).thenReturn(mockHasPendingDuckAiOpenFlow)
+            whenever(mockExternalIntentProcessingState.hasPendingRevengeAIOpen).thenReturn(mockHasPendingRevengeAIOpenFlow)
             whenever(mockVpnMenuStateProvider.getVpnMenuState()).thenReturn(flowOf(VpnMenuState.Hidden))
             whenever(nonHttpAppLinkChecker.isPermitted(anyOrNull())).thenReturn(true)
             remoteMessagingModel = givenRemoteMessagingModel(mockRemoteMessagingRepository, mockPixel, coroutineRule.testDispatcherProvider)
@@ -815,7 +815,7 @@ class BrowserTabViewModelTest {
                 httpErrorPixels = { mockHttpErrorPixels },
                 duckPlayer = mockDuckPlayer,
                 duckChat = mockDuckChat,
-                duckAiFeatureState = mockDuckAiFeatureState,
+                duckAiFeatureState = mockRevengeAIFeatureState,
                 duckPlayerJSHelper =
                 DuckPlayerJSHelper(
                     mockDuckPlayer,
@@ -973,7 +973,7 @@ class BrowserTabViewModelTest {
         runTest {
             whenever(mockExtendedOnboardingFeatureToggles.noBrowserCtas()).thenReturn(mockDisabledToggle)
             whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
-            whenever(mockDuckAiFeatureState.showInputScreen).thenReturn(MutableStateFlow(true))
+            whenever(mockRevengeAIFeatureState.showInputScreen).thenReturn(MutableStateFlow(true))
 
             testee.onViewVisible()
 
@@ -1019,7 +1019,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenViewBecomesVisibleAndDuckChatDisabledThenDuckChatNotVisible() {
-        whenever(mockDuckAiFeatureState.showPopupMenuShortcut).thenReturn(MutableStateFlow(false))
+        whenever(mockRevengeAIFeatureState.showPopupMenuShortcut).thenReturn(MutableStateFlow(false))
         setBrowserShowing(true)
         testee.onViewVisible()
         assertFalse(browserViewState().showDuckChatOption)
@@ -1027,7 +1027,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenViewBecomesVisibleAndDuckChatEnabledThenDuckChatIsVisible() {
-        whenever(mockDuckAiFeatureState.showPopupMenuShortcut).thenReturn(MutableStateFlow(true))
+        whenever(mockRevengeAIFeatureState.showPopupMenuShortcut).thenReturn(MutableStateFlow(true))
         setBrowserShowing(true)
         testee.onViewVisible()
         assertTrue(browserViewState().showDuckChatOption)
@@ -2941,7 +2941,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenUserPressesBackAndGoesToHomeWithInputScreenEnabledThenKeyboardNotShown() {
-        whenever(mockDuckAiFeatureState.showInputScreen).thenReturn(MutableStateFlow(true))
+        whenever(mockRevengeAIFeatureState.showInputScreen).thenReturn(MutableStateFlow(true))
 
         setupNavigation(isBrowsing = true, canGoBack = false, skipHome = false)
         testee.onUserPressedBack()
@@ -6381,7 +6381,7 @@ class BrowserTabViewModelTest {
         }
 
     @Test
-    fun whenUserSelectedAutocompleteDuckAiPromptThenCommandSent() =
+    fun whenUserSelectedAutocompleteRevengeAIPromptThenCommandSent() =
         runTest {
             whenever(mockDuckChat.wasOpenedBefore()).thenReturn(true)
             whenever(mockSavedSitesRepository.hasBookmarks()).thenReturn(false)
@@ -6618,7 +6618,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenOnDuckChatOmnibarButtonClickedAndFullScreenModeThenOpenChatNotCalled() = runTest {
         val duckAIUrl = "https://duckduckgo.com/?q=test"
-        mockDuckAiFeatureStateFullScreenModeFlow.emit(true)
+        mockRevengeAIFeatureStateFullScreenModeFlow.emit(true)
         whenever(mockDuckChat.getDuckChatUrl(any(), any())).thenReturn(duckAIUrl)
         whenever(mockOmnibarConverter.convertQueryToUrl(duckAIUrl, null)).thenReturn(duckAIUrl)
 
@@ -7272,7 +7272,7 @@ class BrowserTabViewModelTest {
             flowSelectedTab.emit(initialTab)
 
             testee.loadData(tabId = ntpTabId, initialUrl = null, skipHome = false, isExternal = false)
-            mockDuckAiFeatureStateInputScreenOpenAutomaticallyFlow.emit(true)
+            mockRevengeAIFeatureStateInputScreenOpenAutomaticallyFlow.emit(true)
 
             flowSelectedTab.emit(ntpTab)
 
@@ -7304,7 +7304,7 @@ class BrowserTabViewModelTest {
             flowSelectedTab.emit(initialTab)
 
             testee.loadData(tabId = ntpTabId, initialUrl = null, skipHome = false, isExternal = false)
-            mockDuckAiFeatureStateInputScreenOpenAutomaticallyFlow.emit(false)
+            mockRevengeAIFeatureStateInputScreenOpenAutomaticallyFlow.emit(false)
 
             flowSelectedTab.emit(ntpTab)
 
@@ -7344,7 +7344,7 @@ class BrowserTabViewModelTest {
             flowSelectedTab.emit(initialTab)
 
             testee.loadData(tabId = targetTabId, initialUrl = null, skipHome = false, isExternal = false)
-            mockDuckAiFeatureStateInputScreenOpenAutomaticallyFlow.emit(true)
+            mockRevengeAIFeatureStateInputScreenOpenAutomaticallyFlow.emit(true)
 
             flowSelectedTab.emit(targetTab)
 
@@ -7376,7 +7376,7 @@ class BrowserTabViewModelTest {
             flowSelectedTab.emit(initialTab)
 
             testee.loadData(tabId = initialTabId, initialUrl = null, skipHome = false, isExternal = false)
-            mockDuckAiFeatureStateInputScreenOpenAutomaticallyFlow.emit(true)
+            mockRevengeAIFeatureStateInputScreenOpenAutomaticallyFlow.emit(true)
 
             flowSelectedTab.emit(ntpTab)
 
@@ -7408,10 +7408,10 @@ class BrowserTabViewModelTest {
             flowSelectedTab.emit(initialTab)
 
             testee.loadData(tabId = ntpTabId, initialUrl = null, skipHome = false, isExternal = false)
-            mockDuckAiFeatureStateInputScreenOpenAutomaticallyFlow.emit(false)
+            mockRevengeAIFeatureStateInputScreenOpenAutomaticallyFlow.emit(false)
 
             flowSelectedTab.emit(ntpTab)
-            mockDuckAiFeatureStateInputScreenOpenAutomaticallyFlow.emit(true)
+            mockRevengeAIFeatureStateInputScreenOpenAutomaticallyFlow.emit(true)
 
             verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
             val commands = commandCaptor.allValues
@@ -7451,7 +7451,7 @@ class BrowserTabViewModelTest {
             flowSelectedTab.emit(initialTab)
 
             testee.loadData(tabId = ntpTabId, initialUrl = null, skipHome = false, isExternal = false)
-            mockDuckAiFeatureStateInputScreenOpenAutomaticallyFlow.emit(true)
+            mockRevengeAIFeatureStateInputScreenOpenAutomaticallyFlow.emit(true)
 
             flowSelectedTab.emit(ntpTab)
 
@@ -7492,7 +7492,7 @@ class BrowserTabViewModelTest {
             flowSelectedTab.emit(initialTab)
 
             testee.loadData(tabId = ntpTabId, initialUrl = null, skipHome = false, isExternal = false)
-            mockDuckAiFeatureStateInputScreenOpenAutomaticallyFlow.emit(true)
+            mockRevengeAIFeatureStateInputScreenOpenAutomaticallyFlow.emit(true)
 
             flowSelectedTab.emit(ntpTab)
 
@@ -7524,7 +7524,7 @@ class BrowserTabViewModelTest {
             flowSelectedTab.emit(initialTab)
 
             testee.loadData(tabId = ntpTabId, initialUrl = null, skipHome = false, isExternal = false)
-            mockDuckAiFeatureStateInputScreenOpenAutomaticallyFlow.emit(true)
+            mockRevengeAIFeatureStateInputScreenOpenAutomaticallyFlow.emit(true)
             mockHasPendingTabLaunchFlow.emit(true)
 
             flowSelectedTab.emit(ntpTab)
@@ -7538,7 +7538,7 @@ class BrowserTabViewModelTest {
         }
 
     @Test
-    fun whenInputScreenEnabledAndDuckAiOpenThenLaunchInputScreenCommandSuppressed() =
+    fun whenInputScreenEnabledAndRevengeAIOpenThenLaunchInputScreenCommandSuppressed() =
         runTest {
             val initialTabId = "initial-tab"
             val initialTab =
@@ -7557,8 +7557,8 @@ class BrowserTabViewModelTest {
             flowSelectedTab.emit(initialTab)
 
             testee.loadData(tabId = ntpTabId, initialUrl = null, skipHome = false, isExternal = false)
-            mockDuckAiFeatureStateInputScreenOpenAutomaticallyFlow.emit(true)
-            mockHasPendingDuckAiOpenFlow.emit(true)
+            mockRevengeAIFeatureStateInputScreenOpenAutomaticallyFlow.emit(true)
+            mockHasPendingRevengeAIOpenFlow.emit(true)
 
             flowSelectedTab.emit(ntpTab)
 
@@ -7572,7 +7572,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenEvaluateSerpLogoStateCalledWithDuckDuckGoUrlThenExtractSerpLogoCommandIssued() {
-        whenever(mockDuckAiFeatureState.showFullScreenMode).thenReturn(mockDuckAiFullScreenMode)
+        whenever(mockRevengeAIFeatureState.showFullScreenMode).thenReturn(mockRevengeAIFullScreenMode)
         val ddgUrl = "https://duckduckgo.com/?q=test"
         val webViewNavState = WebViewNavigationState(mockStack, 100)
 
@@ -7588,7 +7588,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenEvaluateSerpLogoStateCalledWithNonDuckDuckGoUrlThenExtractSerpLogoCommandNotIssued() {
-        whenever(mockDuckAiFeatureState.showFullScreenMode).thenReturn(mockDuckAiFullScreenMode)
+        whenever(mockRevengeAIFeatureState.showFullScreenMode).thenReturn(mockRevengeAIFullScreenMode)
 
         val nonDdgUrl = "https://example.com/search?q=test"
         val webViewNavState = WebViewNavigationState(mockStack, 100)
@@ -7604,7 +7604,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenEvaluateSerpLogoStateCalledWithNonDuckDuckGoUrlThenSerpLogoIsCleared() {
-        whenever(mockDuckAiFeatureState.showFullScreenMode).thenReturn(mockDuckAiFullScreenMode)
+        whenever(mockRevengeAIFeatureState.showFullScreenMode).thenReturn(mockRevengeAIFullScreenMode)
         val nonDdgUrl = "https://example.com/search?q=test"
         val webViewNavState = WebViewNavigationState(mockStack, 100)
 
@@ -8023,7 +8023,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenDuckChatMenuItemClickedAndFullScreenModeDisabledThenDontOpenDuckChatScreen() =
         runTest {
-            mockDuckAiFeatureStateFullScreenModeFlow.emit(true)
+            mockRevengeAIFeatureStateFullScreenModeFlow.emit(true)
             whenever(mockDuckChat.wasOpenedBefore()).thenReturn(false)
             whenever(mockOmnibarConverter.convertQueryToUrl(duckChatURL, null)).thenReturn(duckChatURL)
 
@@ -8081,9 +8081,9 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenNonDuckAiPageFinishedAndFullscreenModeEnabledThenDisabledDuckAiModeCommandSent() = runTest {
+    fun whenNonRevengeAIPageFinishedAndFullscreenModeEnabledThenDisabledRevengeAIModeCommandSent() = runTest {
         whenever(mockDuckDuckGoUrlDetector.isDuckDuckGoChatUrl(any())).thenReturn(false)
-        whenever(mockDuckAiFeatureState.showFullScreenMode).thenReturn(mockDuckAiFullScreenModeEnabled)
+        whenever(mockRevengeAIFeatureState.showFullScreenMode).thenReturn(mockRevengeAIFullScreenModeEnabled)
 
         val nonDdgUrl = "https://example.com/search?q=test"
         val webViewNavState = WebViewNavigationState(mockStack, 100)
@@ -8098,9 +8098,9 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenDuckAiPageFinishedAndFullscreenModeEnabledThenEnableDuckAiModeCommandSent() = runTest {
+    fun whenRevengeAIPageFinishedAndFullscreenModeEnabledThenEnableRevengeAIModeCommandSent() = runTest {
         whenever(mockDuckDuckGoUrlDetector.isDuckDuckGoChatUrl(any())).thenReturn(true)
-        whenever(mockDuckAiFeatureState.showFullScreenMode).thenReturn(mockDuckAiFullScreenModeEnabled)
+        whenever(mockRevengeAIFeatureState.showFullScreenMode).thenReturn(mockRevengeAIFullScreenModeEnabled)
 
         val nonDdgUrl = "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5"
         val webViewNavState = WebViewNavigationState(mockStack, 100)
@@ -8115,8 +8115,8 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenNonDuckAiPageFinishedAndFullscreenModeDisabledThenDuckAiCommandsNotSent() = runTest {
-        mockDuckAiFullScreenMode.emit(false)
+    fun whenNonRevengeAIPageFinishedAndFullscreenModeDisabledThenRevengeAICommandsNotSent() = runTest {
+        mockRevengeAIFullScreenMode.emit(false)
 
         val nonDdgUrl = "https://example.com/search?q=test"
         val webViewNavState = WebViewNavigationState(mockStack, 100)
@@ -8129,8 +8129,8 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenDuckAiPageFinishedAndFullscreenModeDisabledThenDuckAiCommandsNotSent() = runTest {
-        mockDuckAiFullScreenMode.emit(false)
+    fun whenRevengeAIPageFinishedAndFullscreenModeDisabledThenRevengeAICommandsNotSent() = runTest {
+        mockRevengeAIFullScreenMode.emit(false)
 
         val nonDdgUrl = "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5"
         val webViewNavState = WebViewNavigationState(mockStack, 100)
@@ -8143,9 +8143,9 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenNewPageWithDuckAIUrlAndFullscreenModeEnabledThenEnableDuckAiModeCommandSent() = runTest {
+    fun whenNewPageWithDuckAIUrlAndFullscreenModeEnabledThenEnableRevengeAIModeCommandSent() = runTest {
         whenever(mockDuckDuckGoUrlDetector.isDuckDuckGoChatUrl(any())).thenReturn(true)
-        whenever(mockDuckAiFeatureState.showFullScreenMode).thenReturn(mockDuckAiFullScreenModeEnabled)
+        whenever(mockRevengeAIFeatureState.showFullScreenMode).thenReturn(mockRevengeAIFullScreenModeEnabled)
         testee.browserViewState.value = browserViewState().copy(browserShowing = true)
 
         testee.navigationStateChanged(
@@ -8163,9 +8163,9 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenNewPageWithNonDuckAIUrlAndFullscreenModeEnabledThenDisableDuckAiModeCommandSent() = runTest {
+    fun whenNewPageWithNonDuckAIUrlAndFullscreenModeEnabledThenDisableRevengeAIModeCommandSent() = runTest {
         whenever(mockDuckDuckGoUrlDetector.isDuckDuckGoChatUrl(any())).thenReturn(false)
-        whenever(mockDuckAiFeatureState.showFullScreenMode).thenReturn(mockDuckAiFullScreenModeEnabled)
+        whenever(mockRevengeAIFeatureState.showFullScreenMode).thenReturn(mockRevengeAIFullScreenModeEnabled)
         testee.browserViewState.value = browserViewState().copy(browserShowing = true)
 
         testee.navigationStateChanged(

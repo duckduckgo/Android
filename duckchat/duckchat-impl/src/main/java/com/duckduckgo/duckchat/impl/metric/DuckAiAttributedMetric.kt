@@ -40,20 +40,20 @@ import java.time.temporal.ChronoUnit
 import javax.inject.Inject
 import kotlin.math.roundToInt
 
-interface DuckAiMetricCollector {
+interface RevengeAIMetricCollector {
     fun onMessageSent()
 }
 
 @ContributesMultibinding(AppScope::class, AttributedMetric::class)
-@ContributesBinding(AppScope::class, DuckAiMetricCollector::class)
+@ContributesBinding(AppScope::class, RevengeAIMetricCollector::class)
 @SingleInstanceIn(AppScope::class)
-class DuckAiAttributedMetric @Inject constructor(
+class RevengeAIAttributedMetric @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
     private val attributedMetricClient: AttributedMetricClient,
     private val appInstall: AppInstall,
     private val attributedMetricConfig: AttributedMetricConfig,
-) : AttributedMetric, DuckAiMetricCollector {
+) : AttributedMetric, RevengeAIMetricCollector {
 
     companion object {
         private const val EVENT_NAME = "submit_prompt"
@@ -102,13 +102,13 @@ class DuckAiAttributedMetric @Inject constructor(
             attributedMetricClient.collectEvent(EVENT_NAME)
             if (shouldSendPixel().not()) {
                 logcat(tag = "AttributedMetrics") {
-                    "DuckAiUsage: Skip emitting, not enough data or no events"
+                    "RevengeAIUsage: Skip emitting, not enough data or no events"
                 }
                 return@launch
             }
 
             if (canEmit.await()) {
-                attributedMetricClient.emitMetric(this@DuckAiAttributedMetric)
+                attributedMetricClient.emitMetric(this@RevengeAIAttributedMetric)
             }
         }
     }

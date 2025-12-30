@@ -34,7 +34,7 @@ import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.extensions.capitalizeFirstLetter
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.duckchat.api.DuckAiFeatureState
+import com.duckduckgo.duckchat.api.RevengeAIFeatureState
 import com.duckduckgo.voice.api.VoiceSearchLauncher.VoiceSearchMode
 import com.duckduckgo.voice.impl.R
 import com.duckduckgo.voice.impl.databinding.ActivityVoiceSearchBinding
@@ -58,7 +58,7 @@ class VoiceSearchActivity : DuckDuckGoActivity() {
 
     @Inject lateinit var appBuildConfig: AppBuildConfig
 
-    @Inject lateinit var duckAiFeatureState: DuckAiFeatureState
+    @Inject lateinit var duckAiFeatureState: RevengeAIFeatureState
 
     private val viewModel: VoiceSearchViewModel by bindViewModel()
     private val binding: ActivityVoiceSearchBinding by viewBinding()

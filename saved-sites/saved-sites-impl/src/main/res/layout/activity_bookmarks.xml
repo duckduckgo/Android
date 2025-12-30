@@ -29,7 +29,7 @@
         android:id="@+id/appBarLayoutSorting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:theme="@style/Widget.DuckDuckGo.ToolbarTheme">
+        android:theme="@style/Widget.Revenge.ToolbarTheme">
 
         <FrameLayout
             android:layout_width="match_parent"
@@ -41,8 +41,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 android:background="?attr/daxColorToolbar"
-                android:theme="@style/Widget.DuckDuckGo.ToolbarTheme"
-                app:popupTheme="@style/Widget.DuckDuckGo.PopUpOverflowMenu">
+                android:theme="@style/Widget.Revenge.ToolbarTheme"
+                app:popupTheme="@style/Widget.Revenge.PopUpOverflowMenu">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/toolbarItemsContainer"
@@ -143,7 +143,7 @@
         android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:theme="@style/Widget.DuckDuckGo.ToolbarTheme">
+        android:theme="@style/Widget.Revenge.ToolbarTheme">
 
         <FrameLayout
             android:layout_width="match_parent"
@@ -155,8 +155,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 android:background="?attr/daxColorToolbar"
-                android:theme="@style/Widget.DuckDuckGo.ToolbarTheme"
-                app:popupTheme="@style/Widget.DuckDuckGo.PopUpOverflowMenu" />
+                android:theme="@style/Widget.Revenge.ToolbarTheme"
+                app:popupTheme="@style/Widget.Revenge.PopUpOverflowMenu" />
 
             <com.duckduckgo.common.ui.view.SearchBarView
                 android:id="@+id/searchBar"

@@ -26,8 +26,8 @@ import javax.inject.Inject
 
 @ContributesMultibinding(scope = ActivityScope::class)
 @PriorityKey(350)
-class DuckAiPlusSettings @Inject constructor() : ProSettingsPlugin {
+class RevengeAIPlusSettings @Inject constructor() : ProSettingsPlugin {
     override fun getView(context: Context): View {
-        return DuckAiPlusSettingsView(context)
+        return RevengeAIPlusSettingsView(context)
     }
 }

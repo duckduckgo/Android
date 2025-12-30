@@ -1,7 +1,7 @@
 <merge xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:theme="@style/Widget.DuckDuckGo.ToolbarTheme">
+    android:theme="@style/Widget.Revenge.ToolbarTheme">
 
     <View
         android:id="@+id/backgroundLayer"
@@ -15,7 +15,7 @@
 
     <com.duckduckgo.browser.ui.inputmode.InputModeTabLayout
         android:id="@+id/inputModeSwitch"
-        style="@style/Widget.DuckDuckGo.TabLayout.Rounded"
+        style="@style/Widget.Revenge.TabLayout.Rounded"
         android:layout_width="wrap_content"
         android:layout_height="@dimen/inputModeSwitchHeight"
         android:layout_marginTop="@dimen/keyline_2"
@@ -31,7 +31,7 @@
             android:layout="@layout/view_search_tab_indicator" />
 
         <com.google.android.material.tabs.TabItem
-            android:id="@+id/tabDuckAi"
+            android:id="@+id/tabRevengeAI"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout="@layout/view_chat_tab_indicator" />
@@ -75,7 +75,7 @@
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/inputModeWidgetCard"
-            style="@style/Widget.DuckDuckGo.OmnibarCardView"
+            style="@style/Widget.Revenge.OmnibarCardView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             app:cardElevation="0dp"

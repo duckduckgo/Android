@@ -172,13 +172,13 @@
     <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Saada tagasisidet</string>
 
-    <string name="subscriptionSettingSubscribeWithDuckAiSubtitle">Tellijad saavad meie VPN-i, täiustatud tehisintellekti mudelid Duck.ai-s ja teenused Personal Information Removal ning Identity Theft Restoration.</string>
-    <string name="subscriptionSettingSubscribeWithDuckAiSubtitleRow">Tellijad saavad meie VPN-i, täiustatud tehisintellekti mudelid Duck.ai-s ja teenuse Identity Theft Restoration.</string>
+    <string name="subscriptionSettingSubscribeWithRevengeAISubtitle">Tellijad saavad meie VPN-i, täiustatud tehisintellekti mudelid Revenge AI-s ja teenused Personal Information Removal ning Identity Theft Restoration.</string>
+    <string name="subscriptionSettingSubscribeWithRevengeAISubtitleRow">Tellijad saavad meie VPN-i, täiustatud tehisintellekti mudelid Revenge AI-s ja teenuse Identity Theft Restoration.</string>
 
-    <string name="feedbackCategoryDuckAi">Duck.ai</string>
-    <string name="feedbackSubCategoryDuckAiSubscriberModels">Ei pääse ainult tellijatele mõeldud Duck.ai mudelitele ligi</string>
-    <string name="feedbackSubCategoryDuckAiLoginThirdPartyBrowser">Ei pääse Duck.ai-le teistes brauserites oma tellimusega ligi</string>
-    <string name="feedbackSubCategoryDuckAiOther">Muu Duck.ai tagasiside</string>
+    <string name="feedbackCategoryRevengeAI">Revenge AI</string>
+    <string name="feedbackSubCategoryRevengeAISubscriberModels">Ei pääse ainult tellijatele mõeldud Revenge AI mudelitele ligi</string>
+    <string name="feedbackSubCategoryRevengeAILoginThirdPartyBrowser">Ei pääse Revenge AI-le teistes brauserites oma tellimusega ligi</string>
+    <string name="feedbackSubCategoryRevengeAIOther">Muu Revenge AI tagasiside</string>
 
     <string name="subscriptionSettingSectionTitle">DuckDuckGo tellimus</string>
     <string name="subscriptionSettingSubscribeSecure">Muuda oma Wi-Fi turvaliseks ja vestle privaatselt täiustatud tehisintellekti mudelitega</string>

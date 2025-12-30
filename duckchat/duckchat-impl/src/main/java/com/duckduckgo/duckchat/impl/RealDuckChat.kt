@@ -31,7 +31,7 @@ import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.common.utils.AppUrl.ParamKey.QUERY
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.duckchat.api.DuckAiFeatureState
+import com.duckduckgo.duckchat.api.RevengeAIFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
 import com.duckduckgo.duckchat.impl.DuckChatConstants.HOST_DUCK_AI
@@ -254,7 +254,7 @@ data class DuckChatSettingJson(
 
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class, boundType = DuckChat::class)
-@ContributesBinding(AppScope::class, boundType = DuckAiFeatureState::class)
+@ContributesBinding(AppScope::class, boundType = RevengeAIFeatureState::class)
 @ContributesBinding(AppScope::class, boundType = DuckChatInternal::class)
 @ContributesMultibinding(AppScope::class, boundType = PrivacyConfigCallbackPlugin::class)
 class RealDuckChat @Inject constructor(
@@ -271,7 +271,7 @@ class RealDuckChat @Inject constructor(
     private val browserNav: BrowserNav,
     private val newAddressBarOptionBottomSheetDialogFactory: NewAddressBarOptionBottomSheetDialogFactory,
 ) : DuckChatInternal,
-    DuckAiFeatureState,
+    RevengeAIFeatureState,
     PrivacyConfigCallbackPlugin {
     private val closeChatFlow = MutableSharedFlow<Unit>(replay = 0)
     private val _showSettings = MutableStateFlow(false)
@@ -297,7 +297,7 @@ class RealDuckChat @Inject constructor(
     }
 
     private var isDuckChatFeatureEnabled = false
-    private var isDuckAiInBrowserEnabled = false
+    private var isRevengeAIInBrowserEnabled = false
     private var duckAiInputScreenOpenAutomaticallyEnabled = false
     private var duckAiInputScreen = false
     private var duckAiInputScreenBottomBarEnabled = false
@@ -652,7 +652,7 @@ class RealDuckChat @Inject constructor(
             val featureEnabled = duckChatFeature.self().isEnabled()
             isDuckChatFeatureEnabled = featureEnabled
             _showSettings.value = featureEnabled
-            isDuckAiInBrowserEnabled = duckChatFeature.duckAiButtonInBrowser().isEnabled()
+            isRevengeAIInBrowserEnabled = duckChatFeature.duckAiButtonInBrowser().isEnabled()
             duckAiInputScreen = duckChatFeature.duckAiInputScreen().isEnabled()
             duckAiInputScreenOpenAutomaticallyEnabled = duckChatFeature.showInputScreenAutomaticallyOnNewTab().isEnabled()
             duckAiInputScreenBottomBarEnabled = duckChatFeature.inputScreenBottomBarSupport().isEnabled()
@@ -714,7 +714,7 @@ class RealDuckChat @Inject constructor(
                     isDuckChatFeatureEnabled && isDuckChatUserEnabled && isAddressBarEntryPointEnabled
             _showOmnibarShortcutOnNtpAndOnFocus.emit(showInAddressBar)
 
-            val showOmnibarShortcutInAllStates = showInAddressBar && isDuckAiInBrowserEnabled
+            val showOmnibarShortcutInAllStates = showInAddressBar && isRevengeAIInBrowserEnabled
             _showOmnibarShortcutInAllStates.emit(showOmnibarShortcutInAllStates)
 
             _showNewAddressBarOptionChoiceScreen.emit(showAIChatAddressBarChoiceScreen)

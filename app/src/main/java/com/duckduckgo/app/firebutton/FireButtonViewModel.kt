@@ -28,7 +28,7 @@ import com.duckduckgo.app.settings.clear.getPixelValue
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.duckchat.api.DuckAiFeatureState
+import com.duckduckgo.duckchat.api.RevengeAIFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
@@ -47,7 +47,7 @@ class FireButtonViewModel @Inject constructor(
     private val fireAnimationLoader: FireAnimationLoader,
     private val pixel: Pixel,
     private val duckChat: DuckChat,
-    private val duckAiFeatureState: DuckAiFeatureState,
+    private val duckAiFeatureState: RevengeAIFeatureState,
 ) : ViewModel() {
 
     data class ViewState(
@@ -56,9 +56,9 @@ class FireButtonViewModel @Inject constructor(
             ClearWhenOption.APP_EXIT_ONLY,
         ),
         val selectedFireAnimation: FireAnimation = FireAnimation.HeroFire,
-        val clearDuckAiData: Boolean = false,
-        val showClearDuckAiDataSetting: Boolean = false,
-        val clerDataWithDuckAiChats: Boolean = false,
+        val clearRevengeAIData: Boolean = false,
+        val showClearRevengeAIDataSetting: Boolean = false,
+        val clerDataWithRevengeAIChats: Boolean = false,
     )
 
     data class AutomaticallyClearData(
@@ -71,7 +71,7 @@ class FireButtonViewModel @Inject constructor(
         data object LaunchFireproofWebsites : Command()
         data class ShowClearWhatDialog(
             val option: ClearWhatOption,
-            val clearDuckAi: Boolean,
+            val clearRevengeAI: Boolean,
         ) : Command()
 
         data class ShowClearWhenDialog(val option: ClearWhenOption) : Command()
@@ -96,8 +96,8 @@ class FireButtonViewModel @Inject constructor(
                         automaticallyClearWhenEnabled,
                     ),
                     selectedFireAnimation = settingsDataStore.selectedFireAnimation,
-                    clearDuckAiData = settingsDataStore.clearDuckAiData,
-                    showClearDuckAiDataSetting = duckChat.wasOpenedBefore() && duckAiFeatureState.showClearDuckAIChatHistory.value,
+                    clearRevengeAIData = settingsDataStore.clearRevengeAIData,
+                    showClearRevengeAIDataSetting = duckChat.wasOpenedBefore() && duckAiFeatureState.showClearDuckAIChatHistory.value,
                 ),
             )
         }
@@ -117,7 +117,7 @@ class FireButtonViewModel @Inject constructor(
             command.send(
                 Command.ShowClearWhatDialog(
                     viewState.value.automaticallyClearData.clearWhatOption,
-                    viewState.value.clearDuckAiData,
+                    viewState.value.clearRevengeAIData,
                 ),
             )
         }
@@ -197,15 +197,15 @@ class FireButtonViewModel @Inject constructor(
         pixel.fire(pixelName)
     }
 
-    fun onClearDuckAiDataToggled(enabled: Boolean) {
-        if (settingsDataStore.clearDuckAiData == enabled) {
-            logcat(VERBOSE) { "User selected same thing they already have set: clearDuckAiData=$enabled; no need to do anything else" }
+    fun onClearRevengeAIDataToggled(enabled: Boolean) {
+        if (settingsDataStore.clearRevengeAIData == enabled) {
+            logcat(VERBOSE) { "User selected same thing they already have set: clearRevengeAIData=$enabled; no need to do anything else" }
             return
         }
 
-        settingsDataStore.clearDuckAiData = enabled
+        settingsDataStore.clearRevengeAIData = enabled
         viewModelScope.launch {
-            viewState.emit(currentViewState().copy(clearDuckAiData = enabled))
+            viewState.emit(currentViewState().copy(clearRevengeAIData = enabled))
         }
 
         if (enabled) {

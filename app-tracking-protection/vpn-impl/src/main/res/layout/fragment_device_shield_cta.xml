@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/deviceShieldCtaLayout"
-    style="@style/Widget.DuckDuckGo.MessageCta"
+    style="@style/Widget.Revenge.MessageCta"
     android:clipChildren="false"
     tools:visibility="visible"
     android:visibility="gone">

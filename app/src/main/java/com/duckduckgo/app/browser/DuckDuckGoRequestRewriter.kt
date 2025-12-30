@@ -43,7 +43,7 @@ class DuckDuckGoRequestRewriter(
     private val serpSettingsFeature: SerpSettingsFeature,
 ) : RequestRewriter {
 
-    private val hideDuckAiSerpKillSwitch by lazy { androidConfigFeatures.hideDuckAiInSerpKillSwitch().isEnabled() }
+    private val hideRevengeAISerpKillSwitch by lazy { androidConfigFeatures.hideRevengeAIInSerpKillSwitch().isEnabled() }
 
     override fun rewriteRequestWithCustomQueryParams(request: Uri): Uri {
         val builder = Uri.Builder()
@@ -84,7 +84,7 @@ class DuckDuckGoRequestRewriter(
         builder.appendQueryParameter(ParamKey.HIDE_SERP, ParamValue.HIDE_SERP)
         if (!serpSettingsFeature.storeSerpSettings().isEnabled()) {
             // Once serpSettingsSync feature is permanently enabled this can be removed.
-            if (!duckChat.isEnabled() && hideDuckAiSerpKillSwitch) {
+            if (!duckChat.isEnabled() && hideRevengeAISerpKillSwitch) {
                 builder.appendQueryParameter(ParamKey.HIDE_DUCK_AI, ParamValue.HIDE_DUCK_AI)
             }
         }

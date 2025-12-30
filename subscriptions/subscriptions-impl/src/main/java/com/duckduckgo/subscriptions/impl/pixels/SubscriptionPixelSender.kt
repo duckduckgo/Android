@@ -92,7 +92,7 @@ interface SubscriptionPixelSender {
     fun reportOnboardingVpnClick()
     fun reportOnboardingPirClick()
     fun reportOnboardingIdtrClick()
-    fun reportOnboardingDuckAiClick()
+    fun reportOnboardingRevengeAIClick()
     fun reportSubscriptionSettingsShown()
     fun reportAppSettingsPirClick()
     fun reportAppSettingsIdtrClick()
@@ -203,7 +203,7 @@ class SubscriptionPixelSenderImpl @Inject constructor(
     override fun reportOnboardingIdtrClick() =
         fire(ONBOARDING_IDTR_CLICK)
 
-    override fun reportOnboardingDuckAiClick() =
+    override fun reportOnboardingRevengeAIClick() =
         fire(ONBOARDING_DUCK_AI_CLICK)
 
     override fun reportSubscriptionSettingsShown() =

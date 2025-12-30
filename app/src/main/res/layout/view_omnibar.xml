@@ -21,7 +21,7 @@
     android:id="@+id/appBarLayout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:theme="@style/Widget.DuckDuckGo.ToolbarTheme"
+    android:theme="@style/Widget.Revenge.ToolbarTheme"
     tools:parentTag="androidx.coordinatorlayout.widget.CoordinatorLayout">
 
     <LinearLayout
@@ -66,7 +66,7 @@
                 app:layout_constraintEnd_toStartOf="@id/iconsContainer"
                 app:layout_constraintStart_toEndOf="@id/duckAiSidebar"
                 app:layout_constraintTop_toTopOf="parent"
-                app:popupTheme="@style/Widget.DuckDuckGo.PopUpOverflowMenu">
+                app:popupTheme="@style/Widget.Revenge.PopUpOverflowMenu">
 
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/omniBarContainerShadow"
@@ -80,7 +80,7 @@
 
                     <com.google.android.material.card.MaterialCardView
                         android:id="@+id/omniBarContainer"
-                        style="@style/Widget.DuckDuckGo.OmnibarCardView"
+                        style="@style/Widget.Revenge.OmnibarCardView"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         app:cardElevation="0dp"

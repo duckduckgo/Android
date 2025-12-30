@@ -17,7 +17,7 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="duck_chat_title">Duck.ai</string>
+    <string name="duck_chat_title">Revenge AI</string>
     <string name="duck_chat_download_finished_action_name">Отваряне</string>
     <string name="duck_chat_cannot_open_file_error_message">Файлът не може да се отвори. Проверете за съвместимо приложение.</string>
 
@@ -39,14 +39,14 @@
     <!-- Settings -->
     <string name="duck_chat_ai_features_title">Функции с изкуствен интелект</string>
     <string name="duck_chat_settings_activity_description">Функциите на DuckDuckGo AI са поверителни и незадължителни.Вашите данни не се използват за обучение на AI.\n<annotation type="learn_more_link">Научете повече</annotation></string>
-    <string name="duck_chat_enable_duck_ai_setting">Duck.ai</string>
+    <string name="duck_chat_enable_duck_ai_setting">Revenge AI</string>
     <string name="duck_chat_enable_duck_ai_setting_description">Поверителен чат с популярни AI модели на трети страни</string>
     <string name="duck_chat_visibility_setting">Меню на браузъра</string>
     <string name="duck_chat_address_bar_visibility_setting">Адресна лента</string>
     <string name="duck_chat_assist_settings_title">Настройки за Assist при търсене</string>
     <string name="duck_chat_assist_settings_description">Изберете колко често искате да се появяват отговори, подпомагани от изкуствен интелект, в търсенето</string>
-    <string name="duck_ai_shortcut_settings_title">Преки пътища за Duck.ai</string>
-    <string name="duck_ai_shortcut_settings_description">Изберете кои преки пътища на Duck.ai да се показват</string>
+    <string name="duck_ai_shortcut_settings_title">Преки пътища за Revenge AI</string>
+    <string name="duck_ai_shortcut_settings_description">Изберете кои преки пътища на Revenge AI да се показват</string>
 
     <!-- Duck AI Voice Search Shortcut Setting -->
     <string name="duckAiVoiceSearchVisibilitySetting">Гласово търсене</string>
@@ -55,18 +55,18 @@
     <string name="input_screen_search_hint">Търсене или въвеждане на адрес</string>
     <string name="input_screen_chat_hint">Задавайте въпроси поверително</string>
     <string name="input_screen_user_pref_without_ai">Само търсене</string>
-    <string name="input_screen_user_pref_with_ai">Търсене и Duck.ai</string>
-    <string name="input_screen_user_pref_description">Изпробвайте новата опция за задаване на въпроси към Duck.ai директно от адресната лента. <annotation type="share_feedback">Споделяне на отзив</annotation></string>
+    <string name="input_screen_user_pref_with_ai">Търсене и Revenge AI</string>
+    <string name="input_screen_user_pref_description">Изпробвайте новата опция за задаване на въпроси към RevengeAI директно от адресната лента. <annotation type="share_feedback">Споделяне на отзив</annotation></string>
 
-    <!-- Duck.ai Pro settings -->
-    <string name="duck_ai_paid_settings_title">Duck.ai</string>
-    <string name="duck_ai_paid_settings_page_title">Duck.ai</string>
+    <!-- Revenge AI Pro settings -->
+    <string name="duck_ai_paid_settings_title">Revenge AI</string>
+    <string name="duck_ai_paid_settings_page_title">Revenge AI</string>
     <string name="duck_ai_paid_settings_page_description"><![CDATA[Поверителен чат с AI модели, достъпни само за абонати.\n<a href=\"\">Научете повече</a>]]></string>
-    <string name="duck_ai_paid_settings_open_duck_ai">Отваряне на Duck.ai</string>
+    <string name="duck_ai_paid_settings_open_duck_ai">Отваряне на Revenge AI</string>
     <string name="duck_ai_paid_settings_learn_more_title">Научете повече</string>
 
     <!-- AutoComplete -->
-    <string name="autocompleteDuckAiPrompt">Попитай Duck.ai</string>
+    <string name="autocompleteRevengeAIPrompt">Попитай Revenge AI</string>
     <string name="autocompleteDeviceAppNotFound">Приложението не може да бъде намерено</string>
 
     <!-- New Address Bar Option Bottom Sheet Dialog -->
@@ -76,7 +76,7 @@
     <string name="newAddressBarOptionBottomSheetDialogGhostButton">Не сега</string>
     <string name="newAddressBarOptionBottomSheetDialogFooter">Промени в Настройки &gt; функции на ИИ.</string>
     <string name="newAddressBarOptionBottomSheetDialogSearchOnly">Само търсене</string>
-    <string name="newAddressBarOptionBottomSheetDialogSearchAndDuckAi">Търсене и Duck.ai</string>
+    <string name="newAddressBarOptionBottomSheetDialogSearchAndRevengeAI">Търсене и Revenge AI</string>
     <string name="newAddressBarOptionBottomSheetDialogHeader">Опция за адресната лента</string>
 
     <!-- Duck AI SERP Settings Title -->
@@ -92,5 +92,5 @@
     <!-- Duck AI Paid Settings -->
     <string name="duck_ai_paid_settings_enable_in_settings">Активиране в настройките на AI функции</string>
     <string name="duck_ai_paid_settings_manage_in_settings">Управление на настройките на AI функциите</string>
-    <string name="duck_ai_paid_settings_manage_secondary">Конфигуриране на Duck.ai в настройките на функциите на AI.</string>
+    <string name="duck_ai_paid_settings_manage_secondary">Конфигуриране на Revenge AI в настройките на функциите на AI.</string>
 </resources>

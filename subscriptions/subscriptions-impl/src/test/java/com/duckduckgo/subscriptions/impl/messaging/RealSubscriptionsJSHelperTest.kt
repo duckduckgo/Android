@@ -227,17 +227,17 @@ class RealSubscriptionsJSHelperTest {
     }
 
     @Test
-    fun whenGetFeatureConfigRequestThenReturnJsCallbackDataWithUsePaidDuckAiFlag() = runTest {
+    fun whenGetFeatureConfigRequestThenReturnJsCallbackDataWithUsePaidRevengeAIFlag() = runTest {
         val method = "getFeatureConfig"
         val id = "123"
-        val usePaidDuckAi = true
+        val usePaidRevengeAI = true
 
-        privacyProFeature.duckAiPlus().setRawStoredState(com.duckduckgo.feature.toggles.api.Toggle.State(usePaidDuckAi))
+        privacyProFeature.duckAiPlus().setRawStoredState(com.duckduckgo.feature.toggles.api.Toggle.State(usePaidRevengeAI))
 
         val result = testee.processJsCallbackMessage(featureName, method, id, null)
 
         val jsonPayload = JSONObject().apply {
-            put("usePaidDuckAi", usePaidDuckAi)
+            put("usePaidRevengeAI", usePaidRevengeAI)
         }
 
         val expected = JsCallbackData(jsonPayload, featureName, method, id)
@@ -249,17 +249,17 @@ class RealSubscriptionsJSHelperTest {
     }
 
     @Test
-    fun whenGetFeatureConfigRequestWithDisabledFlagThenReturnJsCallbackDataWithUsePaidDuckAiFalse() = runTest {
+    fun whenGetFeatureConfigRequestWithDisabledFlagThenReturnJsCallbackDataWithUsePaidRevengeAIFalse() = runTest {
         val method = "getFeatureConfig"
         val id = "123"
-        val usePaidDuckAi = false
+        val usePaidRevengeAI = false
 
-        privacyProFeature.duckAiPlus().setRawStoredState(com.duckduckgo.feature.toggles.api.Toggle.State(usePaidDuckAi))
+        privacyProFeature.duckAiPlus().setRawStoredState(com.duckduckgo.feature.toggles.api.Toggle.State(usePaidRevengeAI))
 
         val result = testee.processJsCallbackMessage(featureName, method, id, null)
 
         val jsonPayload = JSONObject().apply {
-            put("usePaidDuckAi", usePaidDuckAi)
+            put("usePaidRevengeAI", usePaidRevengeAI)
         }
 
         val expected = JsCallbackData(jsonPayload, featureName, method, id)

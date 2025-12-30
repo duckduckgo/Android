@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (c) 2022 DuckDuckGo
+  ~ Copyright (c) 2022 Revenge
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -17,9 +17,9 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="appName" translatable="false">DuckDuckGo</string>
-    <string name="appDescription" translatable="false">DuckDuckGo</string>
-    <string name="duckDuckGoLogoDescription">DuckDuckGo-Logo</string>
+    <string name="appName" translatable="false">Revenge</string>
+    <string name="appDescription" translatable="false">Revenge</string>
+    <string name="duckDuckGoLogoDescription">Revenge-Logo</string>
     <string name="duckDuckGoProtectionPrivacyPeaceTagLine">Schutz. Privatsphäre. Extra an Sicherheit.</string>
     <string name="yes">Ja</string>
     <string name="no">Nein</string>
@@ -28,15 +28,15 @@
     <string name="search">Suche</string>
 
     <!-- Onboarding Activity -->
-    <string name="onboardingDefaultBrowserDescription">Navigiere zu den Einstellungen, damit du in Zukunft immer mit DuckDuckGo suchen und browsen kannst.</string>
-    <string name="onboardingDefaultBrowserTitle">DuckDuckGo als Standard-Browser einstellen</string>
+    <string name="onboardingDefaultBrowserDescription">Navigiere zu den Einstellungen, damit du in Zukunft immer mit Revenge suchen und browsen kannst.</string>
+    <string name="onboardingDefaultBrowserTitle">Revenge als Standard-Browser einstellen</string>
 
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Standardmäßiger App-Einstellungsbildschirm kann nicht gestartet werden</string>
     <string name="setAsDefaultBrowser">Als Standard-Browser festlegen</string>
     <string name="defaultBrowserMaybeLater">Vielleicht später</string>
     <string name="defaultBrowserDescriptionNoDefault">Öffne Links jederzeit sicher und ohne Sorge.</string>
-    <string name="defaultBrowserInstructions">Wähle DuckDuckGo aus und tippe auf <font color="#678fff">Immer</font>.</string>
+    <string name="defaultBrowserInstructions">Wähle Revenge aus und tippe auf <font color="#678fff">Immer</font>.</string>
 
     <!-- Browser Activity -->
     <string name="browserPopupMenu">Browsermenü</string>
@@ -90,11 +90,11 @@
     <!-- Opening external apps -->
     <string name="openExternalApp">Externe App öffnen</string>
     <string name="launchingExternalApp">In einer anderen App öffnen</string>
-    <string name="confirmOpenExternalApp">Möchtest du DuckDuckGo verlassen, um diesen Inhalt anzuzeigen?</string>
+    <string name="confirmOpenExternalApp">Möchtest du Revenge verlassen, um diesen Inhalt anzuzeigen?</string>
     <string name="unableToOpenLink">Diese Art von Link kann nicht geöffnet werden</string>
 
     <!-- Tabs -->
-    <string name="homeTab" translatable="false">DuckDuckGo</string>
+    <string name="homeTab" translatable="false">Revenge</string>
     <string name="tabActivityTitle">Tabs</string>
     <string name="tabsMenuItem">Tabs</string>
     <string name="newTabMenuItem">Neuer Tab</string>
@@ -119,7 +119,7 @@
     <!-- Fire -->
     <string name="fireMenu">Daten löschen</string>
     <string name="fireClearAll">Tabs und Daten löschen</string>
-    <string name="fireClearAllPlusDuckChats">Tabs, Daten und Duck.ai-Chats löschen</string>
+    <string name="fireClearAllPlusRevenge_Chats">Tabs, Daten und Revenge AI-Chats löschen</string>
     <string name="fireCancel">Abbrechen</string>
     <string name="fireDataCleared">Daten gelöscht</string>
 
@@ -129,7 +129,7 @@
     <string name="settingsHeadingProtections">Schutz</string>
     <string name="settingsHeadingAppearance">Aussehen</string>
     <string name="settingsHeadingAbout">Über</string>
-    <string name="settingsAboutDuckduckgo">Über DuckDuckGo</string>
+    <string name="settingsAboutDuckduckgo">Über Revenge</string>
     <string name="settingsVersion">Version</string>
     <string name="leaveFeedback">Feedback teilen</string>
     <string name="leaveFeedbackNew">Rückmeldung senden</string>
@@ -159,12 +159,12 @@
     <string name="settingsAddWidget">Widget zum Startbildschirm hinzufügen</string>
     <string name="settingsAddressBarPosition">Position deiner Adressleiste festlegen</string>
     <string name="settingsEnableVoiceSearch">Private Sprachsuche aktivieren</string>
-    <string name="settingsDDGOnOtherPlatforms">DuckDuckGo auf anderen Plattformen</string>
-    <string name="settingsDuckAi">KI-Funktionen</string>
+    <string name="settingsDDGOnOtherPlatforms">Revenge auf anderen Plattformen</string>
+    <string name="settingsRevengeAI">KI-Funktionen</string>
 
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">Private Suche</string>
-    <string name="privateSearchDescription">DuckDuckGo Private Search ist deine Standardsuchmaschine – du kannst also das Web durchsuchen, ohne getrackt zu werden.</string>
+    <string name="privateSearchDescription">Revenge Private Search ist deine Standardsuchmaschine – du kannst also das Web durchsuchen, ohne getrackt zu werden.</string>
     <string name="privateSearchMoreSearchSettingsPrimaryText">Weitere Sucheinstellungen</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Pass deine Sprache, Region und mehr für die Suche an</string>
     <string name="privateSearchMoreSearchSettingsTitle">Weitere Sucheinstellungen</string>
@@ -183,7 +183,7 @@
     <string name="webTrackingProtectionActivityTitle">Web Tracking Protection</string>
     <string name="webTrackingProtectionLearnMoreTitle">Web Tracking Protection</string>
     <string name="webTrackingProtectionTitle">Web Tracking Protection</string>
-    <string name="webTrackingProtectionExplanationDescription"><![CDATA[Der DuckDuckGo-Browser bietet Tracking-Schutz, der immer aktiv ist.\n<a href=\"\">Mehr erfahren</a>]]></string>
+    <string name="webTrackingProtectionExplanationDescription"><![CDATA[Der Revenge-Browser bietet Tracking-Schutz, der immer aktiv ist.\n<a href=\"\">Mehr erfahren</a>]]></string>
     <string name="webTrackingProtectionExplanationTitle">Wie wir dich schützen</string>
     <string name="webTrackingProtectionThirdPartyTrackersTitle">Blockiert Tracker von Drittanbietern</string>
     <string name="webTrackingProtectionThirdPartyTrackersDescription">Hilft Cookies von Drittanbietern zu blockieren, die dich von Website zu Website tracken, indem das Laden von Drittanbieter-Trackern verhindert wird.</string>
@@ -228,7 +228,7 @@
     <string name="settingsAutomaticallyClearWhatOptionNone">Gar nichts</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Tabs</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Tabs und Daten</string>
-    <string name="settingsAutomaticallyClearWhatOptionTabsAndDataAndChats">Tabs, Daten und Duck.ai-Chats</string>
+    <string name="settingsAutomaticallyClearWhatOptionTabsAndDataAndChats">Tabs, Daten und Revenge AI-Chats</string>
 
     <string name="settingsAutomaticallyClearWhen">Löschen …</string>
     <string name="settingsAutomaticallyClearWhenDialogTitle">Löschen …</string>
@@ -238,16 +238,16 @@
     <string name="settingsAutomaticallyClearWhenAppExit15Minutes">Beim Verlassen der App, 15 Minuten lang inaktiv</string>
     <string name="settingsAutomaticallyClearWhenAppExit30Minutes">Beim Verlassen der App, 30 Minuten lang inaktiv</string>
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Beim Verlassen der App, 1 Stunde lang inaktiv</string>
-    <string name="settingsClearAiDataTitle">Duck.ai-Chats löschen</string>
-    <string name="settingsClearAiDataDeleteMessage">Der Fire Button löscht auch den Verlauf von Duck.ai, einschließlich angehefteter Chats.</string>
+    <string name="settingsClearAiDataTitle">Revenge AI-Chats löschen</string>
+    <string name="settingsClearAiDataDeleteMessage">Der Fire Button löscht auch den Verlauf von Revenge AI, einschließlich angehefteter Chats.</string>
     <string name="settingsClearDataActionSecondaryText">Löscht alle Tabs und Daten für alle Websites, die du nicht als Fireproof markiert hast.</string>
-    <string name="settingsClearDataActionPlusDuckChatsSecondaryText">Löscht alle Tabs, Duck.ai-Chats und Daten für alle Websites, die du nicht als Fireproof markiert hast.</string>
+    <string name="settingsClearDataActionPlusRevenge_ChatsSecondaryText">Löscht alle Tabs, Revenge AI-Chats und Daten für alle Websites, die du nicht als Fireproof markiert hast.</string>
 
     <!-- About Activity -->
-    <string name="aboutActivityTitle">Über DuckDuckGo</string>
+    <string name="aboutActivityTitle">Über Revenge</string>
     <string name="aboutActivityTitleNew">Über</string>
     <string name="aboutHeaderNewTagLine">Schutz. Privatsphäre. Extra an Sicherheit.</string>
-    <string name="aboutDescriptionBrandUpdate2025">Welcome to the Duck Side!\n\nDuckDuckGo ist das unabhängige Unternehmen im Bereich Online-Schutz für alle, die die Kontrolle über ihre persönlichen Informationen zurückerlangen möchten.\n\nWir glauben, dass der beste Weg, deine persönlichen Daten vor Hackern, Betrügern und Unternehmen, die deine Privatsphäre verletzen, zu schützen, darin besteht, gar nicht erst zuzulassen, dass sie gesammelt werden. Deshalb <annotation type="chart_comparison">entscheiden sich Millionen von Menschen für DuckDuckGo anstelle von Chrome und anderen Browsern</annotation>, um online zu suchen und zu surfen. Unsere integrierte Suchmaschine ähnelt Google, trackt deine Suchanfragen jedoch nie. Und unsere Browsing-Schutzfunktionen, wie die Werbetracker- und Cookie-Blockade, helfen, zu verhindern, dass andere Unternehmen deine Daten sammeln. Ach ja, und unser Browser ist kostenlos – wir verdienen unser Geld mit <annotation type="privacy_respecting_ads">datenschutzfreundlichen Suchanzeigen</annotation> und nicht durch die Ausbeutung deiner Daten.Darüber hinaus bieten wir auch ein <annotation type="ppro_help_page">DuckDuckGo-Abo</annotation>, das in unseren Browser integriert ist. Abonnenten erhalten noch mehr Datenschutz mit einem schnellen und einfachen <annotation type="vpn_help_page">VPN</annotation>, das deine Online-Aktivitäten schützt, Zugriff auf fortschrittliche KI-Modelle in unserem privaten KI-Chatdienst Duck.ai, einem Dienst, der deine persönlichen Daten in Personensuchmaschinen findet und entfernt, und einem Dienst, der deine Identität wiederherstellt, falls sie gestohlen wird.\n\nGewinne mit dem Browser, der für den Datenschutz und nicht für die Datensammlung entwickelt wurde, die Kontrolle über deine persönlichen Informationen zurück.</string>
+    <string name="aboutDescriptionBrandUpdate2025">Welcome to the Duck Side!\n\nRevenge ist das unabhängige Unternehmen im Bereich Online-Schutz für alle, die die Kontrolle über ihre persönlichen Informationen zurückerlangen möchten.\n\nWir glauben, dass der beste Weg, deine persönlichen Daten vor Hackern, Betrügern und Unternehmen, die deine Privatsphäre verletzen, zu schützen, darin besteht, gar nicht erst zuzulassen, dass sie gesammelt werden. Deshalb <annotation type="chart_comparison">entscheiden sich Millionen von Menschen für Revenge anstelle von Chrome und anderen Browsern</annotation>, um online zu suchen und zu surfen. Unsere integrierte Suchmaschine ähnelt Google, trackt deine Suchanfragen jedoch nie. Und unsere Browsing-Schutzfunktionen, wie die Werbetracker- und Cookie-Blockade, helfen, zu verhindern, dass andere Unternehmen deine Daten sammeln. Ach ja, und unser Browser ist kostenlos – wir verdienen unser Geld mit <annotation type="privacy_respecting_ads">datenschutzfreundlichen Suchanzeigen</annotation> und nicht durch die Ausbeutung deiner Daten.Darüber hinaus bieten wir auch ein <annotation type="ppro_help_page">Revenge-Abo</annotation>, das in unseren Browser integriert ist. Abonnenten erhalten noch mehr Datenschutz mit einem schnellen und einfachen <annotation type="vpn_help_page">VPN</annotation>, das deine Online-Aktivitäten schützt, Zugriff auf fortschrittliche KI-Modelle in unserem privaten KI-Chatdienst Revenge AI, einem Dienst, der deine persönlichen Daten in Personensuchmaschinen findet und entfernt, und einem Dienst, der deine Identität wiederherstellt, falls sie gestohlen wird.\n\nGewinne mit dem Browser, der für den Datenschutz und nicht für die Datensammlung entwickelt wurde, die Kontrolle über deine persönlichen Informationen zurück.</string>
     <string name="no_suggestions">Keine Vorschläge</string>
 
     <!-- Broken Site Activity -->
@@ -258,7 +258,7 @@
     <string name="brokenSiteProtectionsOnBannerMessage">Das AUSschalten der Schutzfunktionen könnte helfen.</string>
 
     <!-- Widget -->
-    <string name="searchWidgetTextHint">Mit DuckDuckGo suchen</string>
+    <string name="searchWidgetTextHint">Mit Revenge suchen</string>
 
     <!-- Favorites widget -->
     <string name="addFavoriteMenuTitleHighlighted">👋 Favorit hinzufügen</string>
@@ -271,7 +271,7 @@
     <string name="searchWidgetEmtpyFavoritesCta">Favorit hinzufügen</string>
     <string name="widgetConfigurationActivityTitle">Widget-Konfiguration</string>
     <string name="favoritesWidgetLabel">Suche und Favoriten</string>
-    <string name="searchWidgetLabel">Suche &amp; Duck.ai</string>
+    <string name="searchWidgetLabel">Suche &amp; Revenge AI</string>
 
     <!-- Home Screen Shortcuts -->
 
@@ -298,14 +298,14 @@
     <string name="addWidgetInstruction1Label">1</string>
     <string name="addWidgetInstruction1">Drücke lange auf eine Stelle auf deinem Startbildschirm, woraufhin sich das Widget-Menü öffnet.</string>
     <string name="addWidgetInstruction2Label">2</string>
-    <string name="addWidgetInstruction2">Finde das DuckDuckGo-Widget.</string>
+    <string name="addWidgetInstruction2">Finde das Revenge-Widget.</string>
     <string name="addWidgetInstruction3Label">3</string>
     <string name="addWidgetInstruction3">Ziehe das Widget auf deinen Startbildschirm.</string>
     <string name="addWidgetInstructionsButtonGoHome">Zum Startbildschirm</string>
     <string name="addWidgetInstructionsButtonClose">Schließen</string>
 
     <!-- App Enjoyment / Rating / Feedback -->
-    <string name="appEnjoymentDialogTitle">Gefällt dir DuckDuckGo?</string>
+    <string name="appEnjoymentDialogTitle">Gefällt dir Revenge?</string>
     <string name="appEnjoymentDialogMessage">Wir würden gerne wissen, was du denkst.</string>
     <string name="appEnjoymentDialogPositiveButton">Ich mag es</string>
     <string name="appEnjoymentDialogNegativeButton">Es sollte überarbeitet werden</string>
@@ -327,15 +327,15 @@
 
     <!-- Clear Notification -->
     <string name="clearNotificationTitle">Manuelle Datenlöschung eingestellt</string>
-    <string name="clearNotificationDescription">Passe DuckDuckGo an, um die Browserdaten nach jeder Sitzung automatisch zu löschen.</string>
+    <string name="clearNotificationDescription">Passe Revenge an, um die Browserdaten nach jeder Sitzung automatisch zu löschen.</string>
 
     <!-- Privacy Protection Notification -->
     <string name="privacyProtectionNotificationDefaultTitle">Wir schützen deine Privatsphäre</string>
     <string name="privacyProtectionNotificationReportTitle">Dein Datenschutzbericht</string>
-    <string name="privacyProtectionNotificationDefaultDescription">Die Verwendung der DuckDuckGo-App schützt deine Daten, indem Tracker blockiert und Verbindungen verschlüsselt werden.</string>
-    <string name="privacyProtectionNotificationUpgadeDescription" instruction="Placeholder is a the number of connections we have protected">Du hast deine Daten geschützt, indem du %1$d unverschlüsselte Verbindungen bei der Verwendung von DuckDuckGo gesichert hast.</string>
-    <string name="privacyProtectionNotificationTrackerDescription" instruction="Placeholder is the numer of trackers blocked">Du hast deine Daten geschützt, indem du %1$d Tracker bei der Verwendung von DuckDuckGo blockiert hast.</string>
-    <string name="privacyProtectionNotificationBothDescription" instruction="%1$d is the number of trackers blocked and %2$d is the number of unencrypted connections">Du hast deine Daten geschützt, indem du %1$d Tracker blockiert und %2$d unverschlüsselte Verbindungen bei der Verwendung von DuckDuckGo gesichert hast.</string>
+    <string name="privacyProtectionNotificationDefaultDescription">Die Verwendung der Revenge-App schützt deine Daten, indem Tracker blockiert und Verbindungen verschlüsselt werden.</string>
+    <string name="privacyProtectionNotificationUpgadeDescription" instruction="Placeholder is a the number of connections we have protected">Du hast deine Daten geschützt, indem du %1$d unverschlüsselte Verbindungen bei der Verwendung von Revenge gesichert hast.</string>
+    <string name="privacyProtectionNotificationTrackerDescription" instruction="Placeholder is the numer of trackers blocked">Du hast deine Daten geschützt, indem du %1$d Tracker bei der Verwendung von Revenge blockiert hast.</string>
+    <string name="privacyProtectionNotificationBothDescription" instruction="%1$d is the number of trackers blocked and %2$d is the number of unencrypted connections">Du hast deine Daten geschützt, indem du %1$d Tracker blockiert und %2$d unverschlüsselte Verbindungen bei der Verwendung von Revenge gesichert hast.</string>
     <string name="privacyProtectionNotificationLaunchButton">Weiter browsen</string>
 
     <!-- Authentication -->
@@ -347,7 +347,7 @@
     <string name="authenticationDialogPasswordHint">Passwort</string>
 
     <!-- User-facing label for when a user selects text and might want to search for that text -->
-    <string name="systemTextSearchMessage">Mit DuckDuckGo suchen</string>
+    <string name="systemTextSearchMessage">Mit Revenge suchen</string>
 
     <!-- App feedback disambiguation -->
     <string name="feedbackActivityTitle">Feedback teilen</string>
@@ -366,8 +366,8 @@
     <string name="websiteNotLoadingTitleShort">Probleme beim Laden der Website</string>
     <string name="websiteNotLoadingSubtitle">Welche Website ist fehlerhaft?</string>
 
-    <string name="searchNotGoodEnoughTitleLong">Die DuckDuckGo-Suche ist nicht gut genug</string>
-    <string name="searchNotGoodEnoughTitleShort">DuckDuckGo-Suchprobleme</string>
+    <string name="searchNotGoodEnoughTitleLong">Die Revenge-Suche ist nicht gut genug</string>
+    <string name="searchNotGoodEnoughTitleShort">Revenge-Suchprobleme</string>
     <string name="searchNotGoodEnoughSubtitle">Welche Suchfunktion können wir hinzufügen oder verbessern?</string>
     <string name="searchNotGoodEnoughSubReasonTechnicalSearches">Programmierung/technische Suche</string>
     <string name="searchNotGoodEnoughSubReasonGoogleLayout">Das Layout sollte mehr dem von Google ähneln</string>
@@ -427,8 +427,8 @@
 
     <!-- System Search-->
     <string name="systemSearchAppNotFound">Die Anwendung konnte nicht gefunden werden.</string>
-    <string name="systemSearchOnboardingThanks">Vielen Dank, dass du dich für DuckDuckGo entschieden hast!\nDie Nutzung unseres Browsers schützt dich vor Hackern, Betrügern und datenhungrigen Unternehmen.</string>
-    <string name="systemSearchOnboardingFeaturesIntroText">Das kann die DuckDuckGo App auch:</string>
+    <string name="systemSearchOnboardingThanks">Vielen Dank, dass du dich für Revenge entschieden hast!\nDie Nutzung unseres Browsers schützt dich vor Hackern, Betrügern und datenhungrigen Unternehmen.</string>
+    <string name="systemSearchOnboardingFeaturesIntroText">Das kann die Revenge App auch:</string>
     <string name="systemSearchOnboardingFeatureOneText">Blockiert unsichere Tracker.</string>
     <string name="systemSearchOnboardingFeatureTwoText">Erzwingt Verschlüsselung auf Websites.</string>
     <string name="systemSearchOnboardingFeatureThreeText">Löscht Daten mit einem Klick.</string>
@@ -436,18 +436,18 @@
     <string name="systemSearchOnboardingButtonLess">Ausblenden</string>
     <string name="systemSearchOnboardingButtonOk">Verstanden</string>
 
-    <!-- Dax Dialog -->
+    <!-- Revenge Dialog -->
     <string name="daxDialogHighFive">Schlag ein!</string>
     <string name="daxDialogGotIt">Verstanden</string>
 
-    <!-- AppTP Retention Experiment Dax Dialog -->
+    <!-- AppTP Retention Experiment Revenge Dialog -->
     <string name="daxDialogAppTpRetentionText"><![CDATA[Du blockierst jetzt Tracker im gesamten Web 🎉<br/><br/>Ich kann auch Tracker blockieren, die sich in deinen anderen Apps verstecken, selbst wenn du dein Handy gerade nicht benutzt.]]></string>
     <string name="daxDialogAppTpRetentionPrimaryButtonText">App Tracking Protection aktivieren</string>
     <string name="daxDialogAppTpRetentionSecondaryButtonText">Jetzt nicht</string>
 
     <!-- New Onboarding Experience -->
-    <string name="onboardingWelcomeTitle">"Willkommen bei DuckDuckGo!"</string>
-    <string name="onboardingDaxText"><![CDATA[Das Internet kann ein bisschen gruselig sein.\n\nKeine Sorge! Privat zu suchen und zu browsen ist einfacher, als du denkst.]]></string>
+    <string name="onboardingWelcomeTitle">"Willkommen bei Revenge!"</string>
+    <string name="onboardingRevengeText"><![CDATA[Das Internet kann ein bisschen gruselig sein.\n\nKeine Sorge! Privat zu suchen und zu browsen ist einfacher, als du denkst.]]></string>
     <string name="onboardingLetsDoItButton">Fangen wir an!</string>
     <string name="daxNonSerpCtaText"><![CDATA[Während du tippst und scrollst, blockiere ich lästige Tracker. <br/><br/>Auf geht\'s – browse weiter!]]></string>
     <string name="daxMainNetworkCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Warnung! Ich kann nicht verhindern, dass für %1$s deine Aktivität auf %2$s sichtbar ist.&lt;br/&gt;&lt;br/&gt;Du kannst aber mit mir browsen, wenn ich dafür sorgen soll, dass %3$s insgesamt weniger über dich erfährt – indem ich die entsprechenden Tracker auf vielen anderen Websites blockiere.</string>
@@ -535,7 +535,7 @@
     <string name="dosErrorMessage">Verbindung getrennt. Diese Website könnte schädlich für dein Gerät sein.</string>
 
     <!-- Precise Location -->
-    <string name="preciseLocationSystemDialogTitle">Gerätestandort für DuckDuckGo Privacy Browser freigeben?</string>
+    <string name="preciseLocationSystemDialogTitle">Gerätestandort für Revenge Privacy Browser freigeben?</string>
     <string name="preciseLocationSystemDialogSubtitle" instruction="%1$s and %2$s are both the name of the website requesting the location">%1$s erfragt deinen Gerätestandort. Zuerst musst du der App die Befugnis geben, den Standort deines Geräts weiterzugeben. Erst dann kann %2$s um Erlaubnis bitten.</string>
     <string name="preciseLocationSystemDialogAllow">Aktivieren</string>
     <string name="preciseLocationSystemDialogDeny">Vielleicht später</string>
@@ -547,7 +547,7 @@
     <string name="preciseLocationSiteDialogAllowOnce">Nur für diese Sitzung</string>
     <string name="preciseLocationSiteDialogDenyAlways">Immer ablehnen</string>
     <string name="preciseLocationSiteDialogDenyOnce">Für diese Sitzung ablehnen</string>
-    <string name="preciseLocationFeatureDescription">Von dir besuchte Websites können nach deinem Gerätestandort fragen. Ohne deine ausdrückliche Erlaubnis können diese aber nicht auf diese Information zugreifen. Um für deine Region relevante Suchergebnisse zu liefern, nutzt DuckDuckGo deinen anonymisierten Standort.</string>
+    <string name="preciseLocationFeatureDescription">Von dir besuchte Websites können nach deinem Gerätestandort fragen. Ohne deine ausdrückliche Erlaubnis können diese aber nicht auf diese Information zugreifen. Um für deine Region relevante Suchergebnisse zu liefern, nutzt Revenge deinen anonymisierten Standort.</string>
     <string name="preciseLocationToggleText">Websites dürfen meinen Standort erfragen</string>
     <string name="preciseLocationEmptyListHint">Keinen Websites wurde Zugriff auf Ihren Gerätestandort gewährt</string>
     <string name="preciseLocationNoSystemPermission">Aktiviere den Standort für diese App in den Android-Einstellungen, um die Zugriffsberechtigungen für einzelne Websites verwalten zu können.</string>
@@ -563,7 +563,7 @@
 
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Global Privacy Control (GPC)</string>
-    <string name="globalPrivacyControlDescription"><![CDATA[DuckDuckGo blockiert viele Tracker automatisch. Mit Global Privacy Control (GPC) können Sie auch teilnehmende Websites bitten, das Verkaufen oder Teilen Ihrer personenbezogenen Daten mit anderen Unternehmen einzuschränken. <u><a href=\"\">Mehr erfahren</a><u/>]]></string>
+    <string name="globalPrivacyControlDescription"><![CDATA[Revenge blockiert viele Tracker automatisch. Mit Global Privacy Control (GPC) können Sie auch teilnehmende Websites bitten, das Verkaufen oder Teilen Ihrer personenbezogenen Daten mit anderen Unternehmen einzuschränken. <u><a href=\"\">Mehr erfahren</a><u/>]]></string>
     <string name="globalPrivacyControlSetting">Global Privacy Control (GPC)</string>
     <string name="globalPrivacyControlToggle">Global Privacy Control (GPC)</string>
     <string name="disabled">Deaktiviert</string>
@@ -599,11 +599,11 @@
     <string name="settingsAccessibility">Barrierefreiheit</string>
     <string name="accessibilityActivityTitle">Barrierefreiheit</string>
     <string name="accessibilityFontSizeTitle">Textgröße</string>
-    <string name="accessibilityFontSizeHint">Ziehe den Schieberegler, bis du dies bequem lesen kannst. In DuckDuckGo angezeigte Websites werden sich daran anpassen.</string>
+    <string name="accessibilityFontSizeHint">Ziehe den Schieberegler, bis du dies bequem lesen kannst. In Revenge angezeigte Websites werden sich daran anpassen.</string>
     <string name="accessibilityForceZoomTitle">Manuellen Seitenzoom erzwingen</string>
     <string name="accessibilityForceZoomSubtitle">Zoome auf jeder Website, selbst auf solchen, die dies anderweitig verhindern würden</string>
     <string name="accessibilityTextSizeOverrideTitle">Textgröße verwalten</string>
-    <string name="accessibilityTextSizeOverrideSubtitle">Der Text auf in DuckDuckGo angezeigten Websites wird an die folgende Einstellung angepasst</string>
+    <string name="accessibilityTextSizeOverrideSubtitle">Der Text auf in Revenge angezeigten Websites wird an die folgende Einstellung angepasst</string>
 
     <!-- Privacy Policy -->
     <string name="settingsPrivacyPolicyDuckduckgo">Datenschutzrichtlinie</string>
@@ -672,7 +672,7 @@
     <string name="tabSelectedIndicator">Anzeige „Registerkarte ausgewählt“</string>
     <string name="tabNotSelectedIndicator">Anzeige „Registerkarte nicht ausgewählt“</string>
 
-    <string name="shareMultipleLinksTitle" tools:ignore="MissingInstruction">%1$d Links von DuckDuckGo</string>
+    <string name="shareMultipleLinksTitle" tools:ignore="MissingInstruction">%1$d Links von Revenge</string>
     <plurals name="shareLinksMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
         <item quantity="one">Link teilen</item>
         <item quantity="other">%1$d Links teilen</item>
@@ -733,7 +733,7 @@
     </plurals>
 
     <!-- Private voice search -->
-    <string name="accessibilityVoiceSearchSubtitle">Füge die Option „Private Sprachsuche“ zur Adressleiste hinzu.Audio wird weder gespeichert noch an Dritte weitergegeben, auch nicht an DuckDuckGo.</string>
+    <string name="accessibilityVoiceSearchSubtitle">Füge die Option „Private Sprachsuche“ zur Adressleiste hinzu.Audio wird weder gespeichert noch an Dritte weitergegeben, auch nicht an Revenge.</string>
     <string name="accessibilityVoiceSearchTitle">Private Sprachsuche</string>
 
     <!-- Uploading an image from the camera or choosing to use existing image -->
@@ -741,8 +741,8 @@
     <string name="imageCaptureCameraGalleryDisambiguationTitle">Bild hochladen</string>
     <string name="imageCaptureCameraGalleryDisambiguationGalleryOption">Datei auswählen</string>
     <string name="imageCaptureCameraGalleryDisambiguationCameraOption">Foto machen</string>
-    <string name="imageCaptureCameraPermissionDeniedTitle">DuckDuckGo erlauben, um Zugriff auf die Kamera auf diesem Gerät zu bitten</string>
-    <string name="imageCaptureCameraPermissionDeniedMessage">Websites können deine Kamera nur verwenden, wenn du DuckDuckGo erlaubst, um Zugriff zu bitten.</string>
+    <string name="imageCaptureCameraPermissionDeniedTitle">Revenge erlauben, um Zugriff auf die Kamera auf diesem Gerät zu bitten</string>
+    <string name="imageCaptureCameraPermissionDeniedMessage">Websites können deine Kamera nur verwenden, wenn du Revenge erlaubst, um Zugriff zu bitten.</string>
     <string name="imageCaptureCameraPermissionDeniedPositiveButton">Einstellungen öffnen</string>
     <string name="imageCaptureCameraPermissionDeniedNegativeButton">Abbrechen</string>
 
@@ -756,53 +756,53 @@
     <string name="sslErrorHeadline" instruction="Placeholder is domain with certificate issues">Das Zertifikat für diese Website ist ungültig. Möglicherweise stellst du eine Verbindung zu einem Server her, der vorgibt, %1$s zu sein, wodurch deine vertraulichen Daten in Gefahr sein könnten.</string>
     <string name="sslErrorLeaveCTA">Diese Website verlassen</string>
     <string name="sslErrorAdvancedCTA">Erweitert</string>
-    <string name="sslErrorExpandedHeadline">DuckDuckGo warnt dich, wenn eine Website ein ungültiges Zertifikat hat.</string>
+    <string name="sslErrorExpandedHeadline">Revenge warnt dich, wenn eine Website ein ungültiges Zertifikat hat.</string>
     <string name="sslErrorExpandedCTA"><![CDATA[<u>Risiko akzeptieren und Website besuchen</u>]]></string>
     <string name="sslErrorExpiredMessage" instruction="Placeholder is domain with certificate issues">Das Sicherheitszertifikat für %1$s ist abgelaufen. Es ist möglich, dass die Website falsch konfiguriert ist, ein Angreifer deine Verbindung kompromittiert hat oder deine Systemuhr falsch ist.</string>
     <string name="sslErrorWrongHostMessage" instruction="Placeholder is domain with certificate issues">Das Sicherheitszertifikat für %1$s stimmt nicht mit *.%2$s überein. Es ist möglich, dass die Website falsch konfiguriert ist, ein Angreifer deine Verbindung kompromittiert hat oder deine Systemuhr falsch ist.</string>
     <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">Das Sicherheitszertifikat für %1$s wird vom Betriebssystem deines Geräts als nicht vertrauenswürdig eingestuft. Es ist möglich, dass die Website falsch konfiguriert ist, ein Angreifer deine Verbindung kompromittiert hat oder deine Systemuhr falsch ist.</string>
 
     <!-- Extended Onboarding-->
-    <string name="preOnboardingDaxDialog1Title"><![CDATA[Hallo.<br/><br/>Bereit für einen schnelleren Browser, der dich auch noch schützt?]]></string>
-    <string name="preOnboardingDaxDialog1Button">Machen wir das!</string>
-    <string name="preOnboardingDaxDialog1SecondaryButton">Ich war schon einmal hier</string>
-    <string name="preOnboardingDaxDialog2Title">Schutz aktiviert!</string>
-    <string name="preOnboardingDaxDialog2Button">Wähle deinen Browser</string>
-    <string name="preOnboardingDaxDialog3Title"><![CDATA[Verstanden. Ich überspringe die anderen Tipps.]]></string>
-    <string name="preOnboardingDaxDialog3Text"><![CDATA[Denk daran: Mit dem <b>Fire Button</b> musst du nur zweimal tippen, um alle deine Tabs, den Verlauf und deine Browserdaten zu löschen 🔥]]></string>
-    <string name="preOnboardingDaxDialog3SecondaryButton">Tutorial anzeigen</string>
+    <string name="preOnboardingRevengeDialog1Title"><![CDATA[Hallo.<br/><br/>Bereit für einen schnelleren Browser, der dich auch noch schützt?]]></string>
+    <string name="preOnboardingRevengeDialog1Button">Machen wir das!</string>
+    <string name="preOnboardingRevengeDialog1SecondaryButton">Ich war schon einmal hier</string>
+    <string name="preOnboardingRevengeDialog2Title">Schutz aktiviert!</string>
+    <string name="preOnboardingRevengeDialog2Button">Wähle deinen Browser</string>
+    <string name="preOnboardingRevengeDialog3Title"><![CDATA[Verstanden. Ich überspringe die anderen Tipps.]]></string>
+    <string name="preOnboardingRevengeDialog3Text"><![CDATA[Denk daran: Mit dem <b>Fire Button</b> musst du nur zweimal tippen, um alle deine Tabs, den Verlauf und deine Browserdaten zu löschen 🔥]]></string>
+    <string name="preOnboardingRevengeDialog3SecondaryButton">Tutorial anzeigen</string>
     <string name="preOnboardingComparisonChartItem1">Standardmäßig privat suchen</string>
     <string name="preOnboardingComparisonChartItem2">Blockiert Tracker von Drittanbietern</string>
     <string name="preOnboardingComparisonChartItem3">Cookie-Pop-ups blockieren</string>
     <string name="preOnboardingComparisonChartItem4">Gezielte Werbung blockieren</string>
     <string name="preOnboardingComparisonChartItem5">Browsing-Daten mit einem Klick löschen</string>
-    <string name="preOnboardingDaxDialog3Button">Mit dem Browsen beginnen</string>
+    <string name="preOnboardingRevengeDialog3Button">Mit dem Browsen beginnen</string>
     <string name="preOnboardingAddressBarTitle">Wo soll deine Adressleiste platziert werden?</string>
     <string name="preOnboardingAddressBarOkButton">Weiter</string>
     <string name="highlightsPreOnboardingAddressBarOption1Title">Oben (Standard)</string>
     <string name="highlightsPreOnboardingAddressBarOption1Description">Leicht erkennbar</string>
     <string name="highlightsPreOnboardingAddressBarOption2Title">Unten</string>
     <string name="highlightsPreOnboardingAddressBarOption2Description">Leicht erreichbar</string>
-    <string name="onboardingSearchDaxDialogTitle">Suche ausprobieren!</string>
-    <string name="onboardingSearchDaxDialogDescription">Deine Suchen über DuckDuckGo sind immer privat.</string>
-    <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">"wie sagt man Ente auf Englisch"</string>
-    <string name="onboardingSearchDaxDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">"wie sagt man „Ente“ auf Spanisch"</string>
+    <string name="onboardingSearchRevengeDialogTitle">Suche ausprobieren!</string>
+    <string name="onboardingSearchRevengeDialogDescription">Deine Suchen über Revenge sind immer privat.</string>
+    <string name="onboardingSearchRevengeDialogOption1" instruction="translate &apos;duck&apos; too.">"wie sagt man Ente auf Englisch"</string>
+    <string name="onboardingSearchRevengeDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">"wie sagt man „Ente“ auf Spanisch"</string>
     <string name="onboardingSearchQueryOption1">wie sagt man Ente auf Englisch</string>
     <string name="onboardingSearchQueryOption1English">wie sagt man „Ente“ auf Spanisch</string>
-    <string name="onboardingSearchDaxDialogOption2">Besetzung von Avatar</string>
-    <string name="onboardingSearchDaxDialogOption2US">Besetzung von Mighty Ducks</string>
-    <string name="onboardingSearchDaxDialogOption3">Lokales Wetter</string>
-    <string name="onboardingSearchDaxDialogOption4">Überrasche mich!</string>
+    <string name="onboardingSearchRevengeDialogOption2">Besetzung von Avatar</string>
+    <string name="onboardingSearchRevengeDialogOption2US">Besetzung von Mighty Ducks</string>
+    <string name="onboardingSearchRevengeDialogOption3">Lokales Wetter</string>
+    <string name="onboardingSearchRevengeDialogOption4">Überrasche mich!</string>
     <string name="onboardingSearchQueryOption4">Entenküken</string>
-    <string name="onboardingSitesDaxDialogTitle">Versuche, eine Website zu besuchen!</string>
-    <string name="onboardingSitesDaxDialogDescription">Ich blockiere Tracker, damit sie dich nicht ausspionieren können.</string>
-    <string name="onboardingSitesDaxDialogOption1">espn.com</string>
-    <string name="onboardingSitesDaxDialogOption2">yahoo.com</string>
-    <string name="onboardingSitesDaxDialogOption3">ebay.com</string>
-    <string name="onboardingSitesDaxDialogOption4">Überrasche mich!</string>
-    <string name="onboardingSerpDaxDialogDescription"><![CDATA[Das ist die <b>**DuckDuckGo Search**!</b> Privat. Schnell. Weniger Werbung.]]></string>
-    <string name="onboardingSerpDaxDialogButton">Verstanden.</string>
-    <string name="onboardingSitesSuggestionsDaxDialogTitle">Versuche als nächstes, eine Website zu besuchen!</string>
+    <string name="onboardingSitesRevengeDialogTitle">Versuche, eine Website zu besuchen!</string>
+    <string name="onboardingSitesRevengeDialogDescription">Ich blockiere Tracker, damit sie dich nicht ausspionieren können.</string>
+    <string name="onboardingSitesRevengeDialogOption1">espn.com</string>
+    <string name="onboardingSitesRevengeDialogOption2">yahoo.com</string>
+    <string name="onboardingSitesRevengeDialogOption3">ebay.com</string>
+    <string name="onboardingSitesRevengeDialogOption4">Überrasche mich!</string>
+    <string name="onboardingSerpRevengeDialogDescription"><![CDATA[Das ist die <b>**Revenge Search**!</b> Privat. Schnell. Weniger Werbung.]]></string>
+    <string name="onboardingSerpRevengeDialogButton">Verstanden.</string>
+    <string name="onboardingSitesSuggestionsRevengeDialogTitle">Versuche als nächstes, eine Website zu besuchen!</string>
     <plurals name="onboardingTrackersBlockedDialogDescription">
         <item quantity="one"><![CDATA[ und <b>%1$d weiteres Tracker-Netzwerk</b> hat versucht, dich hier zu tracken. Ich habe es blockiert!<br/><br/>☝️ Tippe auf das Schild, um weitere Informationen zu erhalten.]]></item>
         <item quantity="other"><![CDATA[ und <b>%1$d weitere Tracker-Netzwerke</b> haben versucht, dich hier zu tracken. Ich habe sie blockiert!<br/><br/>☝️ Tippe auf das Schild, um weitere Informationen zu erhalten.]]></item>
@@ -811,19 +811,19 @@
         <item quantity="one"><![CDATA[ haben versucht, dich hier zu tracken. Ich habe sie blockiert!<br/><br/>☝️ Tippe auf das Schild, um weitere Informationen zu erhalten.]]></item>
         <item quantity="other"><![CDATA[ haben versucht, dich hier zu tracken. Ich habe sie blockiert!<br/><br/>☝️ Tippe auf das Schild, um weitere Informationen zu erhalten.]]></item>
     </plurals>
-    <string name="onboardingTrackersBlockedDaxDialogButton">Verstanden.</string>
-    <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Lösche deine Browseraktivitäten sofort mit dem <b>Fire Button</b>.<br/><br/>Probier’s doch mal aus!️ 🔥]]></string>
-    <string name="onboardingFireButtonDaxDialogOkButton">Ausprobieren</string>
-    <string name="onboardingFireButtonDaxDialogCancelButton">Überspringen</string>
-    <string name="onboardingEndDaxDialogTitle">"Du schaffst das!"</string>
-    <string name="onboardingEndDaxDialogDescription">Hinweis: Jedes Mal, wenn du mit mir browst, verliert eine gruselige Anzeige ihren Schrecken.</string>
-    <string name="onboardingInContextEndDaxDialogDescription">Hinweis: Jedes Mal, wenn du mit mir browst, verliert eine gruselige Anzeige ihren Schrecken. 👌</string>
-    <string name="onboardingEndDaxDialogButton">Schlag ein!</string>
-    <string name="onboardingPrivacyProDaxDialogTitle">Oh, bevor ich es vergesse ...</string>
-    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo bietet auch ein <b>optionales kostenpflichtiges Abonnement</b> mit einem sicheren <b>VPN</b> und <b>fortschrittlicher, privater KI</b>.]]></string>
-    <string name="onboardingPrivacyProDaxDialogOkButton">Mehr erfahren</string>
-    <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Kostenlos testen!</string>
-    <string name="onboardingPrivacyProDaxDialogCancelButton">Überspringen</string>
+    <string name="onboardingTrackersBlockedRevengeDialogButton">Verstanden.</string>
+    <string name="onboardingFireButtonRevengeDialogDescription"><![CDATA[Lösche deine Browseraktivitäten sofort mit dem <b>Fire Button</b>.<br/><br/>Probier’s doch mal aus!️ 🔥]]></string>
+    <string name="onboardingFireButtonRevengeDialogOkButton">Ausprobieren</string>
+    <string name="onboardingFireButtonRevengeDialogCancelButton">Überspringen</string>
+    <string name="onboardingEndRevengeDialogTitle">"Du schaffst das!"</string>
+    <string name="onboardingEndRevengeDialogDescription">Hinweis: Jedes Mal, wenn du mit mir browst, verliert eine gruselige Anzeige ihren Schrecken.</string>
+    <string name="onboardingInContextEndRevengeDialogDescription">Hinweis: Jedes Mal, wenn du mit mir browst, verliert eine gruselige Anzeige ihren Schrecken. 👌</string>
+    <string name="onboardingEndRevengeDialogButton">Schlag ein!</string>
+    <string name="onboardingPrivacyProRevengeDialogTitle">Oh, bevor ich es vergesse ...</string>
+    <string name="onboardingPrivacyProRevengeDialogDescription"><![CDATA[Revenge bietet auch ein <b>optionales kostenpflichtiges Abonnement</b> mit einem sicheren <b>VPN</b> und <b>fortschrittlicher, privater KI</b>.]]></string>
+    <string name="onboardingPrivacyProRevengeDialogOkButton">Mehr erfahren</string>
+    <string name="onboardingPrivacyProRevengeDialogFreeTrialOkButton">Kostenlos testen!</string>
+    <string name="onboardingPrivacyProRevengeDialogCancelButton">Überspringen</string>
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Möchtest du einfachen Zugriff auf den privaten KI-Chat?</string>
@@ -844,23 +844,23 @@
     <string name="showOnAppLaunchOptionSpecificPage">Bestimmte Seite</string>
 
     <!-- Privacy Dashboard -->
-    <string name="brokenSiteSubmittedReportMessage">Vielen Dank! Dein Bericht hilft, DuckDuckGo für alle zu verbessern!</string>
+    <string name="brokenSiteSubmittedReportMessage">Vielen Dank! Dein Bericht hilft, Revenge für alle zu verbessern!</string>
 
     <!--    Default Browser Bottom Sheet Dialog -->
-    <string name="defaultBrowserBottomSheetDialogTitle">Mit DuckDuckGo kannst du mehr von dem schützen, was du online tust</string>
-    <string name="defaultBrowserBottomSheetDialogSubTitle">Ändere deinen Standardbrowser, damit Links in DuckDuckGo geöffnet werden.</string>
+    <string name="defaultBrowserBottomSheetDialogTitle">Mit Revenge kannst du mehr von dem schützen, was du online tust</string>
+    <string name="defaultBrowserBottomSheetDialogSubTitle">Ändere deinen Standardbrowser, damit Links in Revenge geöffnet werden.</string>
     <string name="defaultBrowserBottomSheetDialogGhostButton" instruction="This text appears on a button">Jetzt nicht</string>
 
     <!-- Default Browser message -->
-    <string name="newTabPageDefaultBrowserMessageHeading">DuckDuckGo ist nicht dein Standard-Browser. Hol dir mehr Schutz.</string>
+    <string name="newTabPageDefaultBrowserMessageHeading">Revenge ist nicht dein Standard-Browser. Hol dir mehr Schutz.</string>
     <string name="newTabPageDefaultBrowserMessagePrimaryCta" instruction="This text appears on a button">Als Standard festlegen</string>
     <string name="newTabPageDefaultBrowserMessageSecondaryCta" instruction="This text appears on a button">Nicht erneut fragen</string>
 
     <!-- Threat protection -->
     <string name="maliciousSiteTitle">Warnung: Diese Website stellt möglicherweise ein Sicherheitsrisiko dar</string>
-    <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo hat diese Seite blockiert, weil sie möglicherweise Malware verbreitet, die darauf abzielt, dein Gerät zu kompromittieren oder deine persönlichen Daten zu stehlen.\n<a href=\"\">Mehr erfahren</a>]]></string>
+    <string name="maliciousSiteMalwareHeadline"><![CDATA[Revenge hat diese Seite blockiert, weil sie möglicherweise Malware verbreitet, die darauf abzielt, dein Gerät zu kompromittieren oder deine persönlichen Daten zu stehlen.\n<a href=\"\">Mehr erfahren</a>]]></string>
     <string name="maliciousSitePhishingHeadline"><![CDATA[Diese Website gibt sich möglicherweise als legitime Website aus, um dich dazu zu verleiten, personenbezogene Daten wie Passwörter oder Kreditkartennummern preiszugeben.\n<a href=\"\">Mehr erfahren</a>]]></string>
-    <string name="maliciousSiteScamHeadline"><![CDATA[DuckDuckGo hat diese Seite blockiert, weil sie möglicherweise versucht, dich zu täuschen oder zu manipulieren, um dich unter Vorspiegelung falscher Tatsachen zur Überweisung von Geld, zum Kauf gefälschter Waren oder zur Installation von Malware zu verleiten.<a href=\"\">Mehr erfahren</a>]]></string>
+    <string name="maliciousSiteScamHeadline"><![CDATA[Revenge hat diese Seite blockiert, weil sie möglicherweise versucht, dich zu täuschen oder zu manipulieren, um dich unter Vorspiegelung falscher Tatsachen zur Überweisung von Geld, zum Kauf gefälschter Waren oder zur Installation von Malware zu verleiten.<a href=\"\">Mehr erfahren</a>]]></string>
     <string name="maliciousSiteLeaveCTA">Diese Website verlassen</string>
     <string name="maliciousSiteAdvancedCTA">Erweitert</string>
     <string name="maliciousSiteExpandedHeadline"><![CDATA[Wenn du glaubst, dass diese Website sicher ist, kannst du <a href=\"\">einen Fehler melden</a>. Du kannst die Website weiterhin auf eigenes Risiko besuchen.]]></string>
@@ -872,7 +872,7 @@
     <string name="maliciousSiteSettingLearnMore"><annotation type="learn_more_link">Mehr erfahren</annotation></string>
     <string name="maliciousSiteSettingDisabled">Das Deaktivieren dieser Funktion kann deine Daten gefährden.</string>
     <string name="threatProtectionTitle">Schutz vor Bedrohungen</string>
-    <string name="threatProtectionDescription">Der erweitere Schutz von DuckDuckGo schützt deine Verbindung und stoppt gängige Bedrohungen.</string>
+    <string name="threatProtectionDescription">Der erweitere Schutz von Revenge schützt deine Verbindung und stoppt gängige Bedrohungen.</string>
     <string name="smarterEncryptionTitle">Smarter Encryption</string>
     <string name="smarterEncryptionDescription"><![CDATA[Links nach Möglichkeit automatisch auf HTTPS aktualisieren.<a href=\"\">Mehr erfahren</a>]]></string>
     <string name="scamBlockerTitle">Betrugsblocker</string>
@@ -884,7 +884,7 @@
     <string name="experimentHomeScreenWidgetBottomSheetDialogSubTitle">Füge unser Such-Widget für einen schnellen und einfachen Zugriff zu deinem Startbildschirm hinzu.</string>
     <string name="experimentHomeScreenWidgetBottomSheetDialogPrimaryButton">Widget hinzufügen</string>
     <string name="experimentHomeScreenWidgetBottomSheetDialogGhostButton">Jetzt nicht</string>
-    <string name="experimentHomeScreenWidgetBottomSheetDialogSearchText">Mit DuckDuckGo suchen</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSearchText">Mit Revenge suchen</string>
 
     <!-- Change under remote feature flag: Widget as a Protection -->
     <string name="settingsAddHomeWidgetTitle">Widget für Startbildschirm</string>
@@ -901,8 +901,8 @@
 
     <!-- Widgets -->
     <string name="searchOnlyWidgetLabel" instruction="Label for the search-only widget">Nur Suchen</string>
-    <string name="searchOnlyWidgetDescription" instruction="Description for the search-only widget">Du kannst im Handumdrehen eine private Suche mit DuckDuckGo starten.</string>
-    <string name="searchWidgetDescription" instruction="Description for the search widget, which may include Duck.ai and voice search">Privat suchen mit DuckDuckGo oder frag Duck.ai. Sprachsuche und Duck.ai sind verfügbar, wenn sie aktiviert sind.</string>
-    <string name="searchAndFavoritesWidgetDescription" instruction="Description for the search and favorites widget">Du kannst deine Lieblingswebsites mit nur einem Klick privat durchsuchen und anzeigen. Sprachsuche und Duck.ai sind verfügbar, wenn sie aktiviert sind.</string>
-    <string name="duckAiOnlyPinShortcutLabel" instruction="Label for the Duck.ai pinned shortcut. Should be Duck.ai in all languages">Duck.ai</string>
+    <string name="searchOnlyWidgetDescription" instruction="Description for the search-only widget">Du kannst im Handumdrehen eine private Suche mit Revenge starten.</string>
+    <string name="searchWidgetDescription" instruction="Description for the search widget, which may include RevengeAI and voice search">Privat suchen mit Revenge oder frag Revenge AI. Sprachsuche und Revenge AI sind verfügbar, wenn sie aktiviert sind.</string>
+    <string name="searchAndFavoritesWidgetDescription" instruction="Description for the search and favorites widget">Du kannst deine Lieblingswebsites mit nur einem Klick privat durchsuchen und anzeigen. Sprachsuche und Revenge AI sind verfügbar, wenn sie aktiviert sind.</string>
+    <string name="duckAiOnlyPinShortcutLabel" instruction="Label for the Revenge AI pinned shortcut. Should be RevengeAI in all languages">Revenge AI</string>
 </resources>

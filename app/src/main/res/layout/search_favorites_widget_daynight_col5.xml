@@ -17,7 +17,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/widgetContainer"
-    style="@style/Widget.DuckDuckGo.SearchWidgetContainer"
+    style="@style/Widget.Revenge.SearchWidgetContainer"
     android:background="@drawable/search_widget_favorites_daynight_background"
     tools:ignore="DeprecatedWidgetInXml">
 
@@ -31,12 +31,12 @@
 
         <GridView
             android:id="@+id/emptyfavoritesGrid"
-            style="@style/Widget.DuckDuckGo.SearchWidgetFavoritesGrid"
+            style="@style/Widget.Revenge.SearchWidgetFavoritesGrid"
             android:numColumns="5" />
 
         <GridView
             android:id="@+id/favoritesGrid"
-            style="@style/Widget.DuckDuckGo.SearchWidgetFavoritesGrid"
+            style="@style/Widget.Revenge.SearchWidgetFavoritesGrid"
             android:numColumns="5" />
 
         <include layout="@layout/search_favorites_widget_empty_hint_daylight" />

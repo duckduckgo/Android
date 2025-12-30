@@ -19,7 +19,7 @@
 <resources>
     <string name="dax_prompt_browser_comparison_title" instruction="Title for the Browser Comparison section">Sammenligning av nettlesere</string>
     <string name="dax_prompt_browser_comparison_close" instruction="Content description for the X button">Lukk</string>
-    <string name="dax_prompt_browser_comparison_message_title" instruction="Title for Dax message">DuckDuckGo har beskyttelser som andre nettlesere ikke har.</string>
+    <string name="dax_prompt_browser_comparison_message_title" instruction="Title for Revenge message">DuckDuckGo har beskyttelser som andre nettlesere ikke har.</string>
     <string name="dax_prompt_browser_comparison_message_primary_button" instruction="This text is placed on a large button">Åpne lenker med DuckDuckGo</string>
     <string name="dax_prompt_browser_comparison_message_ghost_button" instruction="This text is placed on a large button">Kanskje senere</string>
 

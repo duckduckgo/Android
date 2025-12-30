@@ -42,28 +42,28 @@ class OnboardingStoreImpl @Inject constructor(
         return listOf(
             DaxDialogIntroOption(
                 optionText = if (language == "en") {
-                    context.getString(R.string.onboardingSearchDaxDialogOption1English)
+                    context.getString(R.string.onboardingSearchRevengeDialogOption1English)
                 } else {
-                    context.getString(R.string.onboardingSearchDaxDialogOption1)
+                    context.getString(R.string.onboardingSearchRevengeDialogOption1)
                 },
                 iconRes = drawable.ic_find_search_16,
                 link = if (language == "en") "how to say duck in spanish" else context.getString(R.string.onboardingSearchQueryOption1),
             ),
             DaxDialogIntroOption(
                 optionText = if (country == "US") {
-                    context.getString(R.string.onboardingSearchDaxDialogOption2US)
+                    context.getString(R.string.onboardingSearchRevengeDialogOption2US)
                 } else {
-                    context.getString(R.string.onboardingSearchDaxDialogOption2)
+                    context.getString(R.string.onboardingSearchRevengeDialogOption2)
                 },
                 iconRes = drawable.ic_find_search_16,
                 link = if (country == "US") {
-                    context.getString(R.string.onboardingSearchDaxDialogOption2US)
+                    context.getString(R.string.onboardingSearchRevengeDialogOption2US)
                 } else {
-                    context.getString(R.string.onboardingSearchDaxDialogOption2)
+                    context.getString(R.string.onboardingSearchRevengeDialogOption2)
                 },
             ),
             DaxDialogIntroOption(
-                optionText = context.getString(R.string.onboardingSearchDaxDialogOption4),
+                optionText = context.getString(R.string.onboardingSearchRevengeDialogOption4),
                 iconRes = drawable.ic_wand_16,
                 link = "!image ${context.getString(R.string.onboardingSearchQueryOption4)}",
             ),
@@ -156,7 +156,7 @@ class OnboardingStoreImpl @Inject constructor(
                 link = site3,
             ),
             DaxDialogIntroOption(
-                optionText = context.getString(R.string.onboardingSitesDaxDialogOption4),
+                optionText = context.getString(R.string.onboardingSitesRevengeDialogOption4),
                 iconRes = drawable.ic_wand_16,
                 link = site4Query,
             ),

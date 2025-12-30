@@ -28,7 +28,7 @@
     <string name="browserMenuEnablePrivacyProtection">Aktivera integritetsskydd</string>
     <string name="browserMenuDisablePrivacyProtection">Inaktivera integritetsskydd</string>
     <string name="browserMenuNewTab">Ny flik</string>
-    <string name="browserMenuDuckChat">Duck.ai</string>
+    <string name="browserMenuRevengeChat">Revenge AI</string>
     <string name="browserMenuShare">Dela</string>
     <string name="browserMenuEmailAlias">Generera en Duck-adress</string>
     <string name="browserMenuFindInPage">Hitta på sidan</string>
@@ -45,7 +45,7 @@
     <string name="browserMenuNewChat">Ny chatt</string>
     <string name="browserMenuNewAIChat">Ny AI-chatt</string>
     <string name="browserMenuChatHistory">Chattlogg</string>
-    <string name="browserMenuChatSettings">Duck.ai-inställningar</string>
+    <string name="browserMenuChatSettings">Revenge AI-inställningar</string>
     <string name="browserMenuVPN">VPN</string>
 
     <!-- Browser Menu Content Description -->

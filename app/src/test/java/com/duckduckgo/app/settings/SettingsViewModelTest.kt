@@ -32,7 +32,7 @@ import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.duckchat.api.DuckAiFeatureState
+import com.duckduckgo.duckchat.api.RevengeAIFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
@@ -100,7 +100,7 @@ class SettingsViewModelTest {
 
     private val mockWidgetCapabilities: WidgetCapabilities = mock()
 
-    private val mockDuckAiFeatureState: DuckAiFeatureState = mock()
+    private val mockRevengeAIFeatureState: RevengeAIFeatureState = mock()
     private val duckAiShowSettingsFlow = MutableStateFlow(false)
 
     private val fakePostCtaExperienceToggles = FakeFeatureToggleFactory.create(PostCtaExperienceToggles::class.java)
@@ -111,7 +111,7 @@ class SettingsViewModelTest {
         whenever(appTrackingProtectionMock.isRunning()).thenReturn(true)
         whenever(autofillCapabilityCheckerMock.canAccessCredentialManagementScreen()).thenReturn(true)
         whenever(subscriptionsMock.isEligible()).thenReturn(true)
-        whenever(mockDuckAiFeatureState.showSettings).thenReturn(duckAiShowSettingsFlow)
+        whenever(mockRevengeAIFeatureState.showSettings).thenReturn(duckAiShowSettingsFlow)
 
         testee = SettingsViewModel(
             defaultWebBrowserCapability = defaultWebBrowserCapabilityMock,
@@ -125,7 +125,7 @@ class SettingsViewModelTest {
             subscriptions = subscriptionsMock,
             duckPlayer = duckPlayerMock,
             duckChat = duckChatMock,
-            duckAiFeatureState = mockDuckAiFeatureState,
+            duckAiFeatureState = mockRevengeAIFeatureState,
             voiceSearchAvailability = voiceSearchAvailabilityMock,
             privacyProUnifiedFeedback = privacyProUnifiedFeedbackMock,
             settingsPixelDispatcher = settingsPixelDispatcherMock,

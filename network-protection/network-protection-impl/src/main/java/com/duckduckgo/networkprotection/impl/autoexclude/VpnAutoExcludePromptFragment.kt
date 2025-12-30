@@ -71,7 +71,7 @@ class VpnAutoExcludePromptFragment : BottomSheetDialogFragment() {
         ViewModelProvider(this, viewModelFactory)[VpnAutoExcludePromptViewModel::class.java]
     }
 
-    override fun getTheme(): Int = com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_BottomSheetDialogCollapsed
+    override fun getTheme(): Int = com.duckduckgo.mobile.android.R.style.Widget_Revenge_BottomSheetDialogCollapsed
 
     override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this)

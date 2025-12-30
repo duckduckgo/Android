@@ -172,13 +172,13 @@
     <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Изпратете отзив</string>
 
-    <string name="subscriptionSettingSubscribeWithDuckAiSubtitle">Абонатите получават VPN и усъвършенствани AI модели в Duck.ai. Personal Information Removal и Identity Theft Restoration.</string>
-    <string name="subscriptionSettingSubscribeWithDuckAiSubtitleRow">Абонатите получават VPN, усъвършенствани AI модели в Duck.ai и Identity Theft Restoration.</string>
+    <string name="subscriptionSettingSubscribeWithRevengeAISubtitle">Абонатите получават VPN и усъвършенствани AI модели в Revenge AI. Personal Information Removal и Identity Theft Restoration.</string>
+    <string name="subscriptionSettingSubscribeWithRevengeAISubtitleRow">Абонатите получават VPN, усъвършенствани AI модели в Revenge AI и Identity Theft Restoration.</string>
 
-    <string name="feedbackCategoryDuckAi">Duck.ai</string>
-    <string name="feedbackSubCategoryDuckAiSubscriberModels">Няма достъп до моделите на Duck.ai, достъпни само за абонати</string>
-    <string name="feedbackSubCategoryDuckAiLoginThirdPartyBrowser">Не мога да вляза в Duck.ai с абонамента си в други браузъри.</string>
-    <string name="feedbackSubCategoryDuckAiOther">Други отзиви за Duck.ai</string>
+    <string name="feedbackCategoryRevengeAI">Revenge AI</string>
+    <string name="feedbackSubCategoryRevengeAISubscriberModels">Няма достъп до моделите на Revenge AI, достъпни само за абонати</string>
+    <string name="feedbackSubCategoryRevengeAILoginThirdPartyBrowser">Не мога да вляза в Revenge AI с абонамента си в други браузъри.</string>
+    <string name="feedbackSubCategoryRevengeAIOther">Други отзиви за Revenge AI</string>
 
     <string name="subscriptionSettingSectionTitle">Абонамент за DuckDuckGo</string>
     <string name="subscriptionSettingSubscribeSecure">Сигурна Wi-Fi мрежа и поверителен чат с усъвършенствани AI модели</string>

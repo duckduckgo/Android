@@ -90,7 +90,7 @@ class FireButtonActivity : DuckDuckGoActivity() {
             automaticallyClearWhatSetting.setClickListener { viewModel.onAutomaticallyClearWhatClicked() }
             automaticallyClearWhenSetting.setClickListener { viewModel.onAutomaticallyClearWhenClicked() }
             selectedFireAnimationSetting.setClickListener { viewModel.userRequestedToChangeFireAnimation() }
-            clearDuckAiDataSetting.setOnCheckedChangeListener { _, isChecked -> viewModel.onClearDuckAiDataToggled(isChecked) }
+            clearRevengeAIDataSetting.setOnCheckedChangeListener { _, isChecked -> viewModel.onClearRevengeAIDataToggled(isChecked) }
             clearDataAction.setClickListener { viewModel.onClearDataActionClicked() }
         }
     }
@@ -100,10 +100,10 @@ class FireButtonActivity : DuckDuckGoActivity() {
             .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
             .onEach { viewState ->
                 viewState.let {
-                    updateAutomaticClearDataOptions(it.automaticallyClearData, it.clearDuckAiData)
+                    updateAutomaticClearDataOptions(it.automaticallyClearData, it.clearRevengeAIData)
                     updateSelectedFireAnimation(it.selectedFireAnimation)
-                    updateClearDuckAiDataSetting(it.clearDuckAiData, it.showClearDuckAiDataSetting)
-                    updateClearDataAction(it.clearDuckAiData)
+                    updateClearRevengeAIDataSetting(it.clearRevengeAIData, it.showClearRevengeAIDataSetting)
+                    updateClearDataAction(it.clearRevengeAIData)
                 }
             }.launchIn(lifecycleScope)
 
@@ -115,9 +115,9 @@ class FireButtonActivity : DuckDuckGoActivity() {
 
     private fun updateAutomaticClearDataOptions(
         automaticallyClearData: AutomaticallyClearData,
-        clearDuckAiData: Boolean,
+        clearRevengeAIData: Boolean,
     ) {
-        val clearWhatSubtitle = getString(automaticallyClearData.clearWhatOption.nameStringResourceId(clearDuckAiData))
+        val clearWhatSubtitle = getString(automaticallyClearData.clearWhatOption.nameStringResourceId(clearRevengeAIData))
         binding.automaticallyClearWhatSetting.setSecondaryText(clearWhatSubtitle)
 
         val clearWhenSubtitle = getString(automaticallyClearData.clearWhenOption.nameStringResourceId())
@@ -132,18 +132,18 @@ class FireButtonActivity : DuckDuckGoActivity() {
         binding.selectedFireAnimationSetting.setSecondaryText(subtitle)
     }
 
-    private fun updateClearDuckAiDataSetting(
+    private fun updateClearRevengeAIDataSetting(
         enabled: Boolean,
         isVisible: Boolean,
     ) {
-        binding.clearDuckAiDataSetting.setIsChecked(enabled)
-        binding.clearDuckAiDataSetting.visibility = if (isVisible) View.VISIBLE else View.GONE
+        binding.clearRevengeAIDataSetting.setIsChecked(enabled)
+        binding.clearRevengeAIDataSetting.visibility = if (isVisible) View.VISIBLE else View.GONE
     }
 
-    private fun updateClearDataAction(clearDuckAiData: Boolean) {
-        if (clearDuckAiData) {
-            binding.clearDataAction.setPrimaryText(resources.getString(R.string.fireClearAllPlusDuckChats))
-            binding.clearDataAction.setSecondaryText(resources.getString(R.string.settingsClearDataActionPlusDuckChatsSecondaryText))
+    private fun updateClearDataAction(clearRevengeAIData: Boolean) {
+        if (clearRevengeAIData) {
+            binding.clearDataAction.setPrimaryText(resources.getString(R.string.fireClearAllPlusRevenge_Chats))
+            binding.clearDataAction.setSecondaryText(resources.getString(R.string.settingsClearDataActionPlusRevenge_ChatsSecondaryText))
         } else {
             binding.clearDataAction.setPrimaryText(resources.getString(R.string.fireClearAll))
             binding.clearDataAction.setSecondaryText(resources.getString(R.string.settingsClearDataActionSecondaryText))
@@ -153,7 +153,7 @@ class FireButtonActivity : DuckDuckGoActivity() {
     private fun processCommand(it: Command) {
         when (it) {
             is Command.LaunchFireproofWebsites -> launchFireproofWebsites()
-            is Command.ShowClearWhatDialog -> launchAutomaticallyClearWhatDialog(it.option, it.clearDuckAi)
+            is Command.ShowClearWhatDialog -> launchAutomaticallyClearWhatDialog(it.option, it.clearRevengeAI)
             is Command.ShowClearWhenDialog -> launchAutomaticallyClearWhenDialog(it.option)
             is Command.LaunchFireAnimationSettings -> launchFireAnimationSelector(it.animation)
             is Command.LaunchFireDialog -> launchFireDialog()
@@ -161,11 +161,11 @@ class FireButtonActivity : DuckDuckGoActivity() {
     }
 
     @StringRes
-    private fun ClearWhatOption.nameStringResourceId(clearDuckAi: Boolean): Int {
+    private fun ClearWhatOption.nameStringResourceId(clearRevengeAI: Boolean): Int {
         return when (this) {
             ClearWhatOption.CLEAR_NONE -> R.string.settingsAutomaticallyClearWhatOptionNone
             ClearWhatOption.CLEAR_TABS_ONLY -> R.string.settingsAutomaticallyClearWhatOptionTabs
-            ClearWhatOption.CLEAR_TABS_AND_DATA -> if (clearDuckAi) {
+            ClearWhatOption.CLEAR_TABS_AND_DATA -> if (clearRevengeAI) {
                 R.string.settingsAutomaticallyClearWhatOptionTabsAndDataAndChats
             } else {
                 R.string.settingsAutomaticallyClearWhatOptionTabsAndData
@@ -192,7 +192,7 @@ class FireButtonActivity : DuckDuckGoActivity() {
 
     private fun launchAutomaticallyClearWhatDialog(
         option: ClearWhatOption,
-        clearDuckAi: Boolean,
+        clearRevengeAI: Boolean,
     ) {
         val currentOption = option.getOptionIndex()
         RadioListAlertDialogBuilder(this)
@@ -201,7 +201,7 @@ class FireButtonActivity : DuckDuckGoActivity() {
                 listOf(
                     R.string.settingsAutomaticallyClearWhatOptionNone,
                     R.string.settingsAutomaticallyClearWhatOptionTabs,
-                    if (clearDuckAi) {
+                    if (clearRevengeAI) {
                         R.string.settingsAutomaticallyClearWhatOptionTabsAndDataAndChats
                     } else {
                         R.string.settingsAutomaticallyClearWhatOptionTabsAndData

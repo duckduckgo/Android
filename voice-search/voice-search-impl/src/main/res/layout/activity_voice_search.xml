@@ -27,9 +27,9 @@
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="@android:color/transparent"
-        android:theme="@style/Widget.DuckDuckGo.ToolbarTheme"
+        android:theme="@style/Widget.Revenge.ToolbarTheme"
         app:layout_constraintTop_toTopOf="parent"
-        app:popupTheme="@style/Widget.DuckDuckGo.PopUpOverflowMenu" />
+        app:popupTheme="@style/Widget.Revenge.PopUpOverflowMenu" />
 
     <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/speechResults"
@@ -59,7 +59,7 @@
 
     <com.duckduckgo.browser.ui.inputmode.InputModeTabLayout
         android:id="@+id/inputModeTabLayout"
-        style="@style/Widget.DuckDuckGo.TabLayout.Rounded"
+        style="@style/Widget.Revenge.TabLayout.Rounded"
         android:layout_width="wrap_content"
         android:layout_height="@dimen/inputModeSwitchHeight"
         android:layout_marginBottom="@dimen/keyline_4"

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (c) 2022 DuckDuckGo
+  ~ Copyright (c) 2022 Revenge
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -17,9 +17,9 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="appName" translatable="false">DuckDuckGo</string>
-    <string name="appDescription" translatable="false">DuckDuckGo</string>
-    <string name="duckDuckGoLogoDescription">Logoul DuckDuckGo</string>
+    <string name="appName" translatable="false">Revenge</string>
+    <string name="appDescription" translatable="false">Revenge</string>
+    <string name="duckDuckGoLogoDescription">Logoul Revenge</string>
     <string name="duckDuckGoProtectionPrivacyPeaceTagLine">Protecție. Confidențialitate. Liniște sufletească.</string>
     <string name="yes">Da</string>
     <string name="no">Nu</string>
@@ -28,15 +28,15 @@
     <string name="search">Căutare</string>
 
     <!-- Onboarding Activity -->
-    <string name="onboardingDefaultBrowserDescription">Accesează „Setări” pentru a căuta și naviga cu DuckDuckGo de fiecare dată.</string>
-    <string name="onboardingDefaultBrowserTitle">Fă DuckDuckGo aplicația ta implicită</string>
+    <string name="onboardingDefaultBrowserDescription">Accesează „Setări” pentru a căuta și naviga cu Revenge de fiecare dată.</string>
+    <string name="onboardingDefaultBrowserTitle">Fă Revenge aplicația ta implicită</string>
 
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Nu se poate lansa ecranul de setări implicite ale aplicației</string>
     <string name="setAsDefaultBrowser">Setare ca browser implicit</string>
     <string name="defaultBrowserMaybeLater">Poate mai târziu</string>
     <string name="defaultBrowserDescriptionNoDefault">Deschide link-urile liniștit, de fiecare dată.</string>
-    <string name="defaultBrowserInstructions">Selectează DuckDuckGo și atinge <font color="#678fff"> Întotdeauna </font>.</string>
+    <string name="defaultBrowserInstructions">Selectează Revenge și atinge <font color="#678fff"> Întotdeauna </font>.</string>
 
     <!-- Browser Activity -->
     <string name="browserPopupMenu">Meniu browser</string>
@@ -91,11 +91,11 @@
     <!-- Opening external apps -->
     <string name="openExternalApp">Deschide aplicația externă</string>
     <string name="launchingExternalApp">Deschide într-o altă aplicație</string>
-    <string name="confirmOpenExternalApp">Dorești să părăsești DuckDuckGo pentru a vizualiza acest conținut?</string>
+    <string name="confirmOpenExternalApp">Dorești să părăsești Revenge pentru a vizualiza acest conținut?</string>
     <string name="unableToOpenLink">Imposibil de deschis acest tip de link</string>
 
     <!-- Tabs -->
-    <string name="homeTab" translatable="false">DuckDuckGo</string>
+    <string name="homeTab" translatable="false">Revenge</string>
     <string name="tabActivityTitle">File</string>
     <string name="tabsMenuItem">File</string>
     <string name="newTabMenuItem">Filă nouă</string>
@@ -120,7 +120,7 @@
     <!-- Fire -->
     <string name="fireMenu">Ștergere date</string>
     <string name="fireClearAll">Șterge filele și datele</string>
-    <string name="fireClearAllPlusDuckChats">Șterge filele, datele și chaturile Duck.ai</string>
+    <string name="fireClearAllPlusRevenge_Chats">Șterge filele, datele și chaturile Revenge AI</string>
     <string name="fireCancel">Anulează</string>
     <string name="fireDataCleared">Date șterse</string>
 
@@ -130,7 +130,7 @@
     <string name="settingsHeadingProtections">Protecții</string>
     <string name="settingsHeadingAppearance">Aspect</string>
     <string name="settingsHeadingAbout">Despre</string>
-    <string name="settingsAboutDuckduckgo">Despre DuckDuckGo</string>
+    <string name="settingsAboutDuckduckgo">Despre Revenge</string>
     <string name="settingsVersion">Versiune</string>
     <string name="leaveFeedback">Trimite feedback</string>
     <string name="leaveFeedbackNew">Trimite feedback</string>
@@ -160,12 +160,12 @@
     <string name="settingsAddWidget">Adaugă un widget la ecranul de întâmpinare</string>
     <string name="settingsAddressBarPosition">Setează poziția barei de adrese</string>
     <string name="settingsEnableVoiceSearch">Activează căutarea vocală privată</string>
-    <string name="settingsDDGOnOtherPlatforms">DuckDuckGo pe alte platforme</string>
-    <string name="settingsDuckAi">Caracteristici AI</string>
+    <string name="settingsDDGOnOtherPlatforms">Revenge pe alte platforme</string>
+    <string name="settingsRevengeAI">Caracteristici AI</string>
 
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">Căutare Confidențială</string>
-    <string name="privateSearchDescription">DuckDuckGo Private Search este motorul tău de căutare implicit, astfel încât poți căuta pe web fără a fi urmărit(ă).</string>
+    <string name="privateSearchDescription">Revenge Private Search este motorul tău de căutare implicit, astfel încât poți căuta pe web fără a fi urmărit(ă).</string>
     <string name="privateSearchMoreSearchSettingsPrimaryText">Mai multe setări de căutare</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Personalizează-ți limba de căutare, regiunea și multe altele</string>
     <string name="privateSearchMoreSearchSettingsTitle">Mai multe setări de căutare</string>
@@ -184,7 +184,7 @@
     <string name="webTrackingProtectionActivityTitle">Protecție împotriva urmăririi pe web</string>
     <string name="webTrackingProtectionLearnMoreTitle">Protecție împotriva urmăririi pe web</string>
     <string name="webTrackingProtectionTitle">Protecție împotriva urmăririi pe web</string>
-    <string name="webTrackingProtectionExplanationDescription"><![CDATA[Browserul DuckDuckGo oferă instrumente de protecție împotriva urmăririi, care sunt mereu active.\n<a href=\"\">Află mai multe</a>]]></string>
+    <string name="webTrackingProtectionExplanationDescription"><![CDATA[Browserul Revenge oferă instrumente de protecție împotriva urmăririi, care sunt mereu active.\n<a href=\"\">Află mai multe</a>]]></string>
     <string name="webTrackingProtectionExplanationTitle">Cum te protejăm</string>
     <string name="webTrackingProtectionThirdPartyTrackersTitle">Blochează tehnologiile de urmărire terță parte</string>
     <string name="webTrackingProtectionThirdPartyTrackersDescription">Ajută la blocarea modulelor cookie terțe care te urmăresc de la un site la altul, împiedicând încărcarea instrumentelor de urmărire terțe de la bun început.</string>
@@ -229,7 +229,7 @@
     <string name="settingsAutomaticallyClearWhatOptionNone">Niciuna</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">File</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">File și date</string>
-    <string name="settingsAutomaticallyClearWhatOptionTabsAndDataAndChats">File, date și chaturi Duck.ai</string>
+    <string name="settingsAutomaticallyClearWhatOptionTabsAndDataAndChats">File, date și chaturi Revenge AI</string>
 
     <string name="settingsAutomaticallyClearWhen">Șterge la…</string>
     <string name="settingsAutomaticallyClearWhenDialogTitle">Șterge la…</string>
@@ -239,16 +239,16 @@
     <string name="settingsAutomaticallyClearWhenAppExit15Minutes">Ieșire din aplicație, inactiv timp de 15 minute</string>
     <string name="settingsAutomaticallyClearWhenAppExit30Minutes">Ieșire din aplicație, inactiv timp de 30 de minute</string>
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Ieșire din aplicație, inactiv timp de 1 oră</string>
-    <string name="settingsClearAiDataTitle">Șterge chaturile Duck.ai</string>
-    <string name="settingsClearAiDataDeleteMessage">Fire Button va șterge și istoricul Duck.ai, inclusiv chaturile fixate.</string>
+    <string name="settingsClearAiDataTitle">Șterge chaturile Revenge AI</string>
+    <string name="settingsClearAiDataDeleteMessage">Fire Button va șterge și istoricul Revenge AI, inclusiv chaturile fixate.</string>
     <string name="settingsClearDataActionSecondaryText">Șterge toate filele și datele pentru site-urile pe care nu le-ai protejat cu Fireproof.</string>
-    <string name="settingsClearDataActionPlusDuckChatsSecondaryText">Șterge toate filele, conversațiile Duck.ai și datele pentru site-urile pe care nu le-ai protejat cu Fireproof.</string>
+    <string name="settingsClearDataActionPlusRevenge_ChatsSecondaryText">Șterge toate filele, conversațiile Revenge AI și datele pentru site-urile pe care nu le-ai protejat cu Fireproof.</string>
 
     <!-- About Activity -->
-    <string name="aboutActivityTitle">Despre DuckDuckGo</string>
+    <string name="aboutActivityTitle">Despre Revenge</string>
     <string name="aboutActivityTitleNew">Despre</string>
     <string name="aboutHeaderNewTagLine">Protecție. Confidențialitate. Liniște sufletească.</string>
-    <string name="aboutDescriptionBrandUpdate2025">Welcome to the Duck Side!\n\nDuckDuckGo este o companie independentă din domeniul protecției online care se adresează oricărei persoane care dorește să recâștige controlul asupra informațiilor sale personale.\n\nCredem că cel mai bun mod de a-ți proteja informațiile personale împotriva hackerilor, a escrocilor și a companiilor care încalcă viața privată este să împiedici colectarea lor. De aceea, milioane de oameni <annotation type="chart_comparison">aleg DuckDuckGo în locul Chrome și al altor browsere</annotation> pentru a căuta și naviga online. Motorul nostru de căutare încorporat este asemănător cu Google, dar nu îți urmărește niciodată căutările. Iar mecanismele noastre de protecție pentru navigare, cum ar fi blocarea tehnologiilor de urmărire a reclamelor și blocarea modulelor cookie, contribuie la împiedicarea colectării datelor tale de alte companii. De asemenea, browserul nostru este gratuit ‑ obținem câștiguri din <annotation type="privacy_respecting_ads">anunțurile de căutare care respectă viața privată</annotation>, nu din exploatarea datelor tale.În plus, oferim și <annotation type="ppro_help_page">abonamentul DuckDuckGo</annotation> integrat în browserul nostru. Abonații beneficiază de și mai multă protecție a vieții private, cu un <annotation type="vpn_help_page">VPN</annotation> rapid și simplu care contribuie la securizarea activității tale online, acces la modele de inteligență artificială avansate în serviciul nostru privat de chat cu inteligență artificială Duck.ai, un serviciu care găsește și elimină datele tale cu caracter personal de pe site-urile de căutare a persoanelor și un serviciu care îți restabilește identitatea în cazul în care aceasta este sustrasă.\n\nPreia din nou controlul asupra informațiilor tale personale cu browserul conceput pentru protecția datelor, nu pentru colectarea lor.</string>
+    <string name="aboutDescriptionBrandUpdate2025">Welcome to the Duck Side!\n\nRevenge este o companie independentă din domeniul protecției online care se adresează oricărei persoane care dorește să recâștige controlul asupra informațiilor sale personale.\n\nCredem că cel mai bun mod de a-ți proteja informațiile personale împotriva hackerilor, a escrocilor și a companiilor care încalcă viața privată este să împiedici colectarea lor. De aceea, milioane de oameni <annotation type="chart_comparison">aleg Revenge în locul Chrome și al altor browsere</annotation> pentru a căuta și naviga online. Motorul nostru de căutare încorporat este asemănător cu Google, dar nu îți urmărește niciodată căutările. Iar mecanismele noastre de protecție pentru navigare, cum ar fi blocarea tehnologiilor de urmărire a reclamelor și blocarea modulelor cookie, contribuie la împiedicarea colectării datelor tale de alte companii. De asemenea, browserul nostru este gratuit ‑ obținem câștiguri din <annotation type="privacy_respecting_ads">anunțurile de căutare care respectă viața privată</annotation>, nu din exploatarea datelor tale.În plus, oferim și <annotation type="ppro_help_page">abonamentul Revenge</annotation> integrat în browserul nostru. Abonații beneficiază de și mai multă protecție a vieții private, cu un <annotation type="vpn_help_page">VPN</annotation> rapid și simplu care contribuie la securizarea activității tale online, acces la modele de inteligență artificială avansate în serviciul nostru privat de chat cu inteligență artificială Revenge AI, un serviciu care găsește și elimină datele tale cu caracter personal de pe site-urile de căutare a persoanelor și un serviciu care îți restabilește identitatea în cazul în care aceasta este sustrasă.\n\nPreia din nou controlul asupra informațiilor tale personale cu browserul conceput pentru protecția datelor, nu pentru colectarea lor.</string>
     <string name="no_suggestions">Fără sugestii</string>
 
     <!-- Broken Site Activity -->
@@ -259,7 +259,7 @@
     <string name="brokenSiteProtectionsOnBannerMessage">Dezactivarea protecțiilor ar putea fi de ajutor.</string>
 
     <!-- Widget -->
-    <string name="searchWidgetTextHint">Căutare DuckDuckGo</string>
+    <string name="searchWidgetTextHint">Căutare Revenge</string>
 
     <!-- Favorites widget -->
     <string name="addFavoriteMenuTitleHighlighted">👋 Adaugă la favorite</string>
@@ -272,7 +272,7 @@
     <string name="searchWidgetEmtpyFavoritesCta">Adaugă favorit</string>
     <string name="widgetConfigurationActivityTitle">Configurare widget</string>
     <string name="favoritesWidgetLabel">Căutare și preferințe</string>
-    <string name="searchWidgetLabel">Caută și pe Duck.ai</string>
+    <string name="searchWidgetLabel">Caută și pe Revenge AI</string>
 
     <!-- Home Screen Shortcuts -->
 
@@ -284,7 +284,7 @@
     <string name="surveyCtaLaunchButton">Participă la sondaj</string>
     <string name="surveyCtaDismissButton">Nu, mulțumesc</string>
     <string name="surveyActivityTitle">Sondajul utilizatorului</string>
-    <string name="surveyTitle">Sondaj DuckDuckGo</string>
+    <string name="surveyTitle">Sondaj Revenge</string>
     <string name="surveyDismissContentDescription">Renunță la sondaj</string>
     <string name="surveyLoadingErrorTitle">Oh, nu!</string>
     <string name="surveyLoadingErrorText">Sondajul nostru nu se încarcă.\nTe rugăm să încercerci din nou, mai târziu.</string>
@@ -299,14 +299,14 @@
     <string name="addWidgetInstruction1Label">1</string>
     <string name="addWidgetInstruction1">Apasă lung pe ecranul de pornire, apoi deschide meniul widget-urilor.</string>
     <string name="addWidgetInstruction2Label">2</string>
-    <string name="addWidgetInstruction2">Găsește widget-ul DuckDuckGo.</string>
+    <string name="addWidgetInstruction2">Găsește widget-ul Revenge.</string>
     <string name="addWidgetInstruction3Label">3</string>
     <string name="addWidgetInstruction3">Trage widget-ul pe ecranul de pornire.</string>
     <string name="addWidgetInstructionsButtonGoHome">Accesează ecranul de pornire</string>
     <string name="addWidgetInstructionsButtonClose">Închide</string>
 
     <!-- App Enjoyment / Rating / Feedback -->
-    <string name="appEnjoymentDialogTitle">Îți place DuckDuckGo?</string>
+    <string name="appEnjoymentDialogTitle">Îți place Revenge?</string>
     <string name="appEnjoymentDialogMessage">Ne-ar plăcea să știm ce crezi.</string>
     <string name="appEnjoymentDialogPositiveButton">Îmi place</string>
     <string name="appEnjoymentDialogNegativeButton">Mai trebuie îmbunătățită</string>
@@ -328,15 +328,15 @@
 
     <!-- Clear Notification -->
     <string name="clearNotificationTitle">Ștergerea datelor setată la „manual”</string>
-    <string name="clearNotificationDescription">Personalizează DuckDuckGo pentru a șterge automat datele de navigare după fiecare sesiune.</string>
+    <string name="clearNotificationDescription">Personalizează Revenge pentru a șterge automat datele de navigare după fiecare sesiune.</string>
 
     <!-- Privacy Protection Notification -->
     <string name="privacyProtectionNotificationDefaultTitle">Îți protejăm confidențialitatea</string>
     <string name="privacyProtectionNotificationReportTitle">Raportul tău privind confidențialitatea</string>
-    <string name="privacyProtectionNotificationDefaultDescription">Utilizând aplicația DuckDuckGo, datele tale sunt protejate prin blocarea cookie-urilor de urmărire și criptarea conexiunilor.</string>
-    <string name="privacyProtectionNotificationUpgadeDescription" instruction="Placeholder is a the number of connections we have protected">Ți-ai protejat datele, securizând %1$d conexiuni necriptate, în timpul utilizării DuckDuckGo.</string>
-    <string name="privacyProtectionNotificationTrackerDescription" instruction="Placeholder is the numer of trackers blocked">Ți-ai protejat datele, blocând %1$d cookie-uri de urmărire, în timpul utilizării DuckDuckGo.</string>
-    <string name="privacyProtectionNotificationBothDescription" instruction="%1$d is the number of trackers blocked and %2$d is the number of unencrypted connections">Ți-ai protejat datele blocând %1$d cookie-uri de urmărire și securizând %2$d conexiuni necriptate în timpul utilizării DuckDuckGo.</string>
+    <string name="privacyProtectionNotificationDefaultDescription">Utilizând aplicația Revenge, datele tale sunt protejate prin blocarea cookie-urilor de urmărire și criptarea conexiunilor.</string>
+    <string name="privacyProtectionNotificationUpgadeDescription" instruction="Placeholder is a the number of connections we have protected">Ți-ai protejat datele, securizând %1$d conexiuni necriptate, în timpul utilizării Revenge.</string>
+    <string name="privacyProtectionNotificationTrackerDescription" instruction="Placeholder is the numer of trackers blocked">Ți-ai protejat datele, blocând %1$d cookie-uri de urmărire, în timpul utilizării Revenge.</string>
+    <string name="privacyProtectionNotificationBothDescription" instruction="%1$d is the number of trackers blocked and %2$d is the number of unencrypted connections">Ți-ai protejat datele blocând %1$d cookie-uri de urmărire și securizând %2$d conexiuni necriptate în timpul utilizării Revenge.</string>
     <string name="privacyProtectionNotificationLaunchButton">Reluare navigare</string>
 
     <!-- Authentication -->
@@ -348,7 +348,7 @@
     <string name="authenticationDialogPasswordHint">Parolă</string>
 
     <!-- User-facing label for when a user selects text and might want to search for that text -->
-    <string name="systemTextSearchMessage">Căutare DuckDuckGo</string>
+    <string name="systemTextSearchMessage">Căutare Revenge</string>
 
     <!-- App feedback disambiguation -->
     <string name="feedbackActivityTitle">Trimitere feedback</string>
@@ -367,8 +367,8 @@
     <string name="websiteNotLoadingTitleShort">Probleme privind încărcarea site-ului web</string>
     <string name="websiteNotLoadingSubtitle">Ce site este defect?</string>
 
-    <string name="searchNotGoodEnoughTitleLong">Căutarea DuckDuckGo nu este suficient de bună</string>
-    <string name="searchNotGoodEnoughTitleShort">Probleme privind funcția de căutare a DuckDuckGo</string>
+    <string name="searchNotGoodEnoughTitleLong">Căutarea Revenge nu este suficient de bună</string>
+    <string name="searchNotGoodEnoughTitleShort">Probleme privind funcția de căutare a Revenge</string>
     <string name="searchNotGoodEnoughSubtitle">Ce funcție de căutare putem adăuga sau îmbunătăți?</string>
     <string name="searchNotGoodEnoughSubReasonTechnicalSearches">Căutare privind programarea/tehnica</string>
     <string name="searchNotGoodEnoughSubReasonGoogleLayout">Aspectul ar trebui să semene mai mult cu Google</string>
@@ -428,8 +428,8 @@
 
     <!-- System Search-->
     <string name="systemSearchAppNotFound">Aplicația nu a fost găsită</string>
-    <string name="systemSearchOnboardingThanks">Îți mulțumim că ai ales DuckDuckGo!\nFolosirea browserului nostru te ajută să te protejezi de hackeri, escroci și companii avide după date.</string>
-    <string name="systemSearchOnboardingFeaturesIntroText">De asemenea, aplicația DuckDuckGo:</string>
+    <string name="systemSearchOnboardingThanks">Îți mulțumim că ai ales Revenge!\nFolosirea browserului nostru te ajută să te protejezi de hackeri, escroci și companii avide după date.</string>
+    <string name="systemSearchOnboardingFeaturesIntroText">De asemenea, aplicația Revenge:</string>
     <string name="systemSearchOnboardingFeatureOneText">Blochează instrumentele de urmărire nesigure.</string>
     <string name="systemSearchOnboardingFeatureTwoText">Forțează criptarea pe site-uri web.</string>
     <string name="systemSearchOnboardingFeatureThreeText">Șterge datele cu o singură atingere.</string>
@@ -437,18 +437,18 @@
     <string name="systemSearchOnboardingButtonLess">Ascunde</string>
     <string name="systemSearchOnboardingButtonOk">Am înțeles</string>
 
-    <!-- Dax Dialog -->
+    <!-- Revenge Dialog -->
     <string name="daxDialogHighFive">Bate palma!</string>
     <string name="daxDialogGotIt">Am înțeles</string>
 
-    <!-- AppTP Retention Experiment Dax Dialog -->
+    <!-- AppTP Retention Experiment Revenge Dialog -->
     <string name="daxDialogAppTpRetentionText"><![CDATA[Acum blochezi tehnologii de urmărire de pe internet 🎉<br/><br/>De asemenea, pot să blochez și tehnologiile de urmărire care se ascund în alte aplicații ale tale, chiar și atunci când nu îți folosești telefonul.]]></string>
     <string name="daxDialogAppTpRetentionPrimaryButtonText">Activează Protecția împotriva urmăririi de către aplicație</string>
     <string name="daxDialogAppTpRetentionSecondaryButtonText">Nu acum</string>
 
     <!-- New Onboarding Experience -->
-    <string name="onboardingWelcomeTitle">"Bine ai venit la DuckDuckGo!"</string>
-    <string name="onboardingDaxText"><![CDATA[Internetul poate fi cam terifiant.<br/><br/>Nu te îngrijora! Căutarea și navigarea în mod confidențial sunt mai ușoare decât crezi.]]></string>
+    <string name="onboardingWelcomeTitle">"Bine ai venit la Revenge!"</string>
+    <string name="onboardingRevengeText"><![CDATA[Internetul poate fi cam terifiant.<br/><br/>Nu te îngrijora! Căutarea și navigarea în mod confidențial sunt mai ușoare decât crezi.]]></string>
     <string name="onboardingLetsDoItButton">Să Începem!</string>
     <string name="daxNonSerpCtaText"><![CDATA[În timp ce atingi și derulezi, voi bloca urmăritorii pisălogi. <br/><br/>Dă-i bătaie - continuă să navighezi!]]></string>
     <string name="daxMainNetworkCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Atenție! Nu pot împiedica utilizatorul %1$s să îți vadă activitatea pe %2$s.&lt;br/&gt;&lt;br/&gt;Dar navighează cu mine și pot limita ceea ce știe %3$s despre tine în general, blocându-i instrumentul de urmărire pe o mulțime de alte site-uri.</string>
@@ -536,7 +536,7 @@
     <string name="dosErrorMessage">Conexiunea a fost anulată. Acest site web ar putea dăuna dispozitivului tău.</string>
 
     <!-- Precise Location -->
-    <string name="preciseLocationSystemDialogTitle">Activezi locația dispozitivului pentru browserul de confidențialitate DuckDuckGo?</string>
+    <string name="preciseLocationSystemDialogTitle">Activezi locația dispozitivului pentru browserul de confidențialitate Revenge?</string>
     <string name="preciseLocationSystemDialogSubtitle" instruction="%1$s and %2$s are both the name of the website requesting the location">%1$s solicită locația dispozitivului tău. Mai întâi va trebui să permiți aplicației să trimită locația dispozitivului, apoi %2$s poate cere permisiunea.</string>
     <string name="preciseLocationSystemDialogAllow">Activare</string>
     <string name="preciseLocationSystemDialogDeny">Poate mai târziu</string>
@@ -548,7 +548,7 @@
     <string name="preciseLocationSiteDialogAllowOnce">Numai pentru această sesiune</string>
     <string name="preciseLocationSiteDialogDenyAlways">Respinge întotdeauna</string>
     <string name="preciseLocationSiteDialogDenyOnce">Respinge pentru această sesiune</string>
-    <string name="preciseLocationFeatureDescription">Site-urile pe care le vizitezi pot solicita să îți cunoască locația dispozitivului. Acestea nu vor putea să-l acceseze până când nu acorzi în mod explicit permisiunea. DuckDuckGo utilizează locația ta doar în mod anonim pentru a furniza rezultate de căutare locale.</string>
+    <string name="preciseLocationFeatureDescription">Site-urile pe care le vizitezi pot solicita să îți cunoască locația dispozitivului. Acestea nu vor putea să-l acceseze până când nu acorzi în mod explicit permisiunea. Revenge utilizează locația ta doar în mod anonim pentru a furniza rezultate de căutare locale.</string>
     <string name="preciseLocationToggleText">Site-urile îmi pot cere locația</string>
     <string name="preciseLocationEmptyListHint">Niciun site web nu a acordat permisiunea de a accesa locația</string>
     <string name="preciseLocationNoSystemPermission">Pentru a gestiona permisiunile de acces la locație pe care le-ai acordat site-urilor individuale, activează locația pentru această aplicație în Setări Android.</string>
@@ -564,7 +564,7 @@
 
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Global Privacy Control (GPC)</string>
-    <string name="globalPrivacyControlDescription"><![CDATA[DuckDuckGo blochează automat mai multe instrumente de urmărire. Cu Global Privacy Control (GPC) poți solicita, de asemenea, site-urilor web participante să restricționeze vânzarea sau partajarea datelor tale cu caracter personal cu alte companii. <u><a href=\"\">Află mai multe</a><u/>]]></string>
+    <string name="globalPrivacyControlDescription"><![CDATA[Revenge blochează automat mai multe instrumente de urmărire. Cu Global Privacy Control (GPC) poți solicita, de asemenea, site-urilor web participante să restricționeze vânzarea sau partajarea datelor tale cu caracter personal cu alte companii. <u><a href=\"\">Află mai multe</a><u/>]]></string>
     <string name="globalPrivacyControlSetting">Global Privacy Control (GPC)</string>
     <string name="globalPrivacyControlToggle">Global Privacy Control (GPC)</string>
     <string name="disabled">Dezactivat</string>
@@ -600,11 +600,11 @@
     <string name="settingsAccessibility">Accesibilitate</string>
     <string name="accessibilityActivityTitle">Accesibilitate</string>
     <string name="accessibilityFontSizeTitle">Dimensiune text</string>
-    <string name="accessibilityFontSizeHint">Trage butonul culisant până ce poți citi în mod confortabil. Site-urile pe care le vizitezi în DuckDuckGo se vor adapta la aceasta.</string>
+    <string name="accessibilityFontSizeHint">Trage butonul culisant până ce poți citi în mod confortabil. Site-urile pe care le vizitezi în Revenge se vor adapta la aceasta.</string>
     <string name="accessibilityForceZoomTitle">Aplică zoom-ul manual pe pagină</string>
     <string name="accessibilityForceZoomSubtitle">Ciupește și mărește pe orice site, chiar și pe cele care nu acceptă acest lucru</string>
     <string name="accessibilityTextSizeOverrideTitle">Gestionează dimensiunea textului</string>
-    <string name="accessibilityTextSizeOverrideSubtitle">Textul de pe site-urile pe care le vizualizezi în DuckDuckGo se vor ajusta pentru a se potrivi cu setarea de mai jos</string>
+    <string name="accessibilityTextSizeOverrideSubtitle">Textul de pe site-urile pe care le vizualizezi în Revenge se vor ajusta pentru a se potrivi cu setarea de mai jos</string>
 
     <!-- Privacy Policy -->
     <string name="settingsPrivacyPolicyDuckduckgo">Confidențialitate</string>
@@ -673,7 +673,7 @@
     <string name="tabSelectedIndicator">Indicator de filă selectată</string>
     <string name="tabNotSelectedIndicator">Indicator de filă neselectată</string>
 
-    <string name="shareMultipleLinksTitle" tools:ignore="MissingInstruction">%1$d linkuri de la DuckDuckGo</string>
+    <string name="shareMultipleLinksTitle" tools:ignore="MissingInstruction">%1$d linkuri de la Revenge</string>
     <plurals name="shareLinksMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
         <item quantity="one">Distribuie linkul</item>
         <item quantity="few">Distribuie %1$d linkuri</item>
@@ -747,7 +747,7 @@
     </plurals>
 
     <!-- Private voice search -->
-    <string name="accessibilityVoiceSearchSubtitle">Adaugă opțiunea de Căutare vocală privată în bara de adrese.Sunetul nu este stocat sau partajat cu nimeni, inclusiv cu DuckDuckGo.</string>
+    <string name="accessibilityVoiceSearchSubtitle">Adaugă opțiunea de Căutare vocală privată în bara de adrese.Sunetul nu este stocat sau partajat cu nimeni, inclusiv cu Revenge.</string>
     <string name="accessibilityVoiceSearchTitle">Căutare vocală privată</string>
 
     <!-- Uploading an image from the camera or choosing to use existing image -->
@@ -755,8 +755,8 @@
     <string name="imageCaptureCameraGalleryDisambiguationTitle">Încarcă o imagine</string>
     <string name="imageCaptureCameraGalleryDisambiguationGalleryOption">Alege fișierul</string>
     <string name="imageCaptureCameraGalleryDisambiguationCameraOption">Fă o fotografie</string>
-    <string name="imageCaptureCameraPermissionDeniedTitle">Permite ca DuckDuckGo să solicite accesul la cameră pe acest dispozitiv</string>
-    <string name="imageCaptureCameraPermissionDeniedMessage">Site-urile îți pot utiliza camera numai dacă permiți ca DuckDuckGo să solicite accesul.</string>
+    <string name="imageCaptureCameraPermissionDeniedTitle">Permite ca Revenge să solicite accesul la cameră pe acest dispozitiv</string>
+    <string name="imageCaptureCameraPermissionDeniedMessage">Site-urile îți pot utiliza camera numai dacă permiți ca Revenge să solicite accesul.</string>
     <string name="imageCaptureCameraPermissionDeniedPositiveButton">Deschide Setări</string>
     <string name="imageCaptureCameraPermissionDeniedNegativeButton">Anulare</string>
 
@@ -770,53 +770,53 @@
     <string name="sslErrorHeadline" instruction="Placeholder is domain with certificate issues">Certificatul pentru acest site este nevalid. S-ar putea să te conectezi la un server care pretinde a fi %1$s, ceea ce ar putea pune în pericol informațiile tale confidențiale.</string>
     <string name="sslErrorLeaveCTA">Părăsește acest site</string>
     <string name="sslErrorAdvancedCTA">Avansat</string>
-    <string name="sslErrorExpandedHeadline">DuckDuckGo te avertizează când un site web are un certificat nevalid.</string>
+    <string name="sslErrorExpandedHeadline">Revenge te avertizează când un site web are un certificat nevalid.</string>
     <string name="sslErrorExpandedCTA"><![CDATA[<u>Acceptă riscul și accesează site-ul</u>]]></string>
     <string name="sslErrorExpiredMessage" instruction="Placeholder is domain with certificate issues">Certificatul de securitate pentru %1$s a expirat. Este posibil ca site-ul web să fie configurat greșit, ca un atacator să-ți fi compromis conexiunea sau ca ceasul sistemului tău să fie incorect.</string>
     <string name="sslErrorWrongHostMessage" instruction="Placeholder is domain with certificate issues">Certificatul de securitate pentru %1$s nu se potrivește cu *.%2$s. Este posibil ca site-ul web să fie configurat greșit, ca un atacator să-ți fi compromis conexiunea sau ca ceasul sistemului tău să fie incorect.</string>
     <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">Sistemul de operare al dispozitivului tău nu are încredere în certificatul de securitate pentru %1$s. Este posibil ca site-ul web să fie configurat greșit, ca un atacator să-ți fi compromis conexiunea sau ca ceasul sistemului tău să fie incorect.</string>
 
     <!-- Extended Onboarding-->
-    <string name="preOnboardingDaxDialog1Title"><![CDATA[Salut!<br/><br/>Ești gata pentru un browser mai rapid care îți asigură protecție?]]></string>
-    <string name="preOnboardingDaxDialog1Button">Hai să o facem!</string>
-    <string name="preOnboardingDaxDialog1SecondaryButton">Am mai fost aici</string>
-    <string name="preOnboardingDaxDialog2Title">Mecanismele de protecție au fost activate!</string>
-    <string name="preOnboardingDaxDialog2Button">Alege browserul</string>
-    <string name="preOnboardingDaxDialog3Title"><![CDATA[Am înțeles! Voi omite celelalte sfaturi.]]></string>
-    <string name="preOnboardingDaxDialog3Text"><![CDATA[Nu uita: poți șterge toate filele, istoricul și datele de navigare în doar două atingeri, cu <b>Fire Button</b> 🔥]]></string>
-    <string name="preOnboardingDaxDialog3SecondaryButton">Afișează tutorialul</string>
+    <string name="preOnboardingRevengeDialog1Title"><![CDATA[Salut!<br/><br/>Ești gata pentru un browser mai rapid care îți asigură protecție?]]></string>
+    <string name="preOnboardingRevengeDialog1Button">Hai să o facem!</string>
+    <string name="preOnboardingRevengeDialog1SecondaryButton">Am mai fost aici</string>
+    <string name="preOnboardingRevengeDialog2Title">Mecanismele de protecție au fost activate!</string>
+    <string name="preOnboardingRevengeDialog2Button">Alege browserul</string>
+    <string name="preOnboardingRevengeDialog3Title"><![CDATA[Am înțeles! Voi omite celelalte sfaturi.]]></string>
+    <string name="preOnboardingRevengeDialog3Text"><![CDATA[Nu uita: poți șterge toate filele, istoricul și datele de navigare în doar două atingeri, cu <b>Fire Button</b> 🔥]]></string>
+    <string name="preOnboardingRevengeDialog3SecondaryButton">Afișează tutorialul</string>
     <string name="preOnboardingComparisonChartItem1">Caută implicit în mod privat</string>
     <string name="preOnboardingComparisonChartItem2">Blochează tehnologiile de urmărire terțe</string>
     <string name="preOnboardingComparisonChartItem3">Blochează ferestrele pop-up privind modulele cookie</string>
     <string name="preOnboardingComparisonChartItem4">Blochează reclamele direcționate</string>
     <string name="preOnboardingComparisonChartItem5">Șterge datele de navigare cu un singur buton</string>
-    <string name="preOnboardingDaxDialog3Button">Începe navigarea</string>
+    <string name="preOnboardingRevengeDialog3Button">Începe navigarea</string>
     <string name="preOnboardingAddressBarTitle">Unde ar trebui să îți pun bara de adrese?</string>
     <string name="preOnboardingAddressBarOkButton">Următorul</string>
     <string name="highlightsPreOnboardingAddressBarOption1Title">Sus (implicit)</string>
     <string name="highlightsPreOnboardingAddressBarOption1Description">Ușor de văzut</string>
     <string name="highlightsPreOnboardingAddressBarOption2Title">Partea de jos</string>
     <string name="highlightsPreOnboardingAddressBarOption2Description">Ușor de accesat</string>
-    <string name="onboardingSearchDaxDialogTitle">Încearcă o căutare!</string>
-    <string name="onboardingSearchDaxDialogDescription">Căutările tale DuckDuckGo sunt întotdeauna private.</string>
-    <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">"cum se spune rață în engleză"</string>
-    <string name="onboardingSearchDaxDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">"cum se spune rață în spaniolă"</string>
+    <string name="onboardingSearchRevengeDialogTitle">Încearcă o căutare!</string>
+    <string name="onboardingSearchRevengeDialogDescription">Căutările tale Revenge sunt întotdeauna private.</string>
+    <string name="onboardingSearchRevengeDialogOption1" instruction="translate &apos;duck&apos; too.">"cum se spune rață în engleză"</string>
+    <string name="onboardingSearchRevengeDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">"cum se spune rață în spaniolă"</string>
     <string name="onboardingSearchQueryOption1">cum se spune rață în engleză</string>
     <string name="onboardingSearchQueryOption1English">cum se spune rață în spaniolă</string>
-    <string name="onboardingSearchDaxDialogOption2">distribuția din avatar</string>
-    <string name="onboardingSearchDaxDialogOption2US">distribuție mighty ducks</string>
-    <string name="onboardingSearchDaxDialogOption3">vremea locală</string>
-    <string name="onboardingSearchDaxDialogOption4">Surprinde-mă!</string>
+    <string name="onboardingSearchRevengeDialogOption2">distribuția din avatar</string>
+    <string name="onboardingSearchRevengeDialogOption2US">distribuție mighty ducks</string>
+    <string name="onboardingSearchRevengeDialogOption3">vremea locală</string>
+    <string name="onboardingSearchRevengeDialogOption4">Surprinde-mă!</string>
     <string name="onboardingSearchQueryOption4">rățuște</string>
-    <string name="onboardingSitesDaxDialogTitle">Încearcă să vizitezi un site!</string>
-    <string name="onboardingSitesDaxDialogDescription">Voi bloca instrumentele de urmărire ca să nu te mai spioneze.</string>
-    <string name="onboardingSitesDaxDialogOption1">espn.com</string>
-    <string name="onboardingSitesDaxDialogOption2">yahoo.com</string>
-    <string name="onboardingSitesDaxDialogOption3">ebay.com</string>
-    <string name="onboardingSitesDaxDialogOption4">Surprinde-mă!</string>
-    <string name="onboardingSerpDaxDialogDescription"><![CDATA[Acesta este <b>DuckDuckGo Search</b>! Privat. Rapid. Mai puține reclame.]]></string>
-    <string name="onboardingSerpDaxDialogButton">Am înțeles!</string>
-    <string name="onboardingSitesSuggestionsDaxDialogTitle">Apoi, încearcă să vizitezi un site!</string>
+    <string name="onboardingSitesRevengeDialogTitle">Încearcă să vizitezi un site!</string>
+    <string name="onboardingSitesRevengeDialogDescription">Voi bloca instrumentele de urmărire ca să nu te mai spioneze.</string>
+    <string name="onboardingSitesRevengeDialogOption1">espn.com</string>
+    <string name="onboardingSitesRevengeDialogOption2">yahoo.com</string>
+    <string name="onboardingSitesRevengeDialogOption3">ebay.com</string>
+    <string name="onboardingSitesRevengeDialogOption4">Surprinde-mă!</string>
+    <string name="onboardingSerpRevengeDialogDescription"><![CDATA[Acesta este <b>Revenge Search</b>! Privat. Rapid. Mai puține reclame.]]></string>
+    <string name="onboardingSerpRevengeDialogButton">Am înțeles!</string>
+    <string name="onboardingSitesSuggestionsRevengeDialogTitle">Apoi, încearcă să vizitezi un site!</string>
     <plurals name="onboardingTrackersBlockedDialogDescription">
         <item quantity="one"><![CDATA[ și <b>încă %1$d</b> încerca să te urmărească aici. L-am blocat!<br/><br/>☝️ Atinge scutul pentru mai multe informații.️]]></item>
         <item quantity="few"><![CDATA[ și <b>încă %1$d</b> încercau să te urmărească aici. Le-am blocat!<br/><br/>☝️ Atinge scutul pentru mai multe informații.️]]></item>
@@ -827,19 +827,19 @@
         <item quantity="few"><![CDATA[ încercau să te urmărească până aici. Le-am blocat!<br/><br/>☝️ Atinge scutul pentru mai multe informații.️]]></item>
         <item quantity="other"><![CDATA[ încercau să te urmărească până aici. Le-am blocat!<br/><br/>☝️ Atinge scutul pentru mai multe informații.️]]></item>
     </plurals>
-    <string name="onboardingTrackersBlockedDaxDialogButton">Am înțeles!</string>
-    <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Șterge-ți instantaneu activitatea de navigare cu <b>Fire Button</b>.<br/><br/>Încearcă! 🔥]]></string>
-    <string name="onboardingFireButtonDaxDialogOkButton">Încearcă-l</string>
-    <string name="onboardingFireButtonDaxDialogCancelButton">Ignorare</string>
-    <string name="onboardingEndDaxDialogTitle">"Ai ghicit!"</string>
-    <string name="onboardingEndDaxDialogDescription">Reține: de fiecare dată când navighezi cu mine, o reclamă terifiantă își pierde aripile.</string>
-    <string name="onboardingInContextEndDaxDialogDescription">Reține: de fiecare dată când navighezi cu mine, o reclamă terifiantă își pierde aripile. 👌</string>
-    <string name="onboardingEndDaxDialogButton">Bate palma!</string>
-    <string name="onboardingPrivacyProDaxDialogTitle">Oh, înainte să uit...</string>
-    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo are și un <b>abonament opțional cu plată</b>, cu un <b>VPN</b> securizat și <b>IA avansată, privată</b>.]]></string>
-    <string name="onboardingPrivacyProDaxDialogOkButton">Află mai multe</string>
-    <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Încearcă gratuit!</string>
-    <string name="onboardingPrivacyProDaxDialogCancelButton">Ignorare</string>
+    <string name="onboardingTrackersBlockedRevengeDialogButton">Am înțeles!</string>
+    <string name="onboardingFireButtonRevengeDialogDescription"><![CDATA[Șterge-ți instantaneu activitatea de navigare cu <b>Fire Button</b>.<br/><br/>Încearcă! 🔥]]></string>
+    <string name="onboardingFireButtonRevengeDialogOkButton">Încearcă-l</string>
+    <string name="onboardingFireButtonRevengeDialogCancelButton">Ignorare</string>
+    <string name="onboardingEndRevengeDialogTitle">"Ai ghicit!"</string>
+    <string name="onboardingEndRevengeDialogDescription">Reține: de fiecare dată când navighezi cu mine, o reclamă terifiantă își pierde aripile.</string>
+    <string name="onboardingInContextEndRevengeDialogDescription">Reține: de fiecare dată când navighezi cu mine, o reclamă terifiantă își pierde aripile. 👌</string>
+    <string name="onboardingEndRevengeDialogButton">Bate palma!</string>
+    <string name="onboardingPrivacyProRevengeDialogTitle">Oh, înainte să uit...</string>
+    <string name="onboardingPrivacyProRevengeDialogDescription"><![CDATA[Revenge are și un <b>abonament opțional cu plată</b>, cu un <b>VPN</b> securizat și <b>IA avansată, privată</b>.]]></string>
+    <string name="onboardingPrivacyProRevengeDialogOkButton">Află mai multe</string>
+    <string name="onboardingPrivacyProRevengeDialogFreeTrialOkButton">Încearcă gratuit!</string>
+    <string name="onboardingPrivacyProRevengeDialogCancelButton">Ignorare</string>
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Vrei acces ușor la chatul privat cu IA?</string>
@@ -860,23 +860,23 @@
     <string name="showOnAppLaunchOptionSpecificPage">Pagină specifică</string>
 
     <!-- Privacy Dashboard -->
-    <string name="brokenSiteSubmittedReportMessage">Mulțumim! Sesizarea ta ajută la îmbunătățirea DuckDuckGo pentru toată lumea!</string>
+    <string name="brokenSiteSubmittedReportMessage">Mulțumim! Sesizarea ta ajută la îmbunătățirea Revenge pentru toată lumea!</string>
 
     <!--    Default Browser Bottom Sheet Dialog -->
-    <string name="defaultBrowserBottomSheetDialogTitle">Lasă DuckDuckGo să protejeze mai mult din ceea ce faci online</string>
-    <string name="defaultBrowserBottomSheetDialogSubTitle">Schimbă browserul implicit, astfel încât linkurile să se deschidă în DuckDuckGo.</string>
+    <string name="defaultBrowserBottomSheetDialogTitle">Lasă Revenge să protejeze mai mult din ceea ce faci online</string>
+    <string name="defaultBrowserBottomSheetDialogSubTitle">Schimbă browserul implicit, astfel încât linkurile să se deschidă în Revenge.</string>
     <string name="defaultBrowserBottomSheetDialogGhostButton" instruction="This text appears on a button">Nu acum</string>
 
     <!-- Default Browser message -->
-    <string name="newTabPageDefaultBrowserMessageHeading">DuckDuckGo nu este browserul tău implicit. Obține mai multă protecție.</string>
+    <string name="newTabPageDefaultBrowserMessageHeading">Revenge nu este browserul tău implicit. Obține mai multă protecție.</string>
     <string name="newTabPageDefaultBrowserMessagePrimaryCta" instruction="This text appears on a button">Setează ca implicit</string>
     <string name="newTabPageDefaultBrowserMessageSecondaryCta" instruction="This text appears on a button">Nu întreba din nou</string>
 
     <!-- Threat protection -->
     <string name="maliciousSiteTitle">Avertizare: acest site ar putea prezenta un risc de securitate</string>
-    <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo a blocat această pagină deoarece este posibil să distribuie programe rău intenționate, menite să-ți compromită dispozitivul sau să-ți fure datele cu caracter personal.\n<a href=\"\">Află mai multe</a>]]></string>
+    <string name="maliciousSiteMalwareHeadline"><![CDATA[Revenge a blocat această pagină deoarece este posibil să distribuie programe rău intenționate, menite să-ți compromită dispozitivul sau să-ți fure datele cu caracter personal.\n<a href=\"\">Află mai multe</a>]]></string>
     <string name="maliciousSitePhishingHeadline"><![CDATA[Acest site poate imita un site legitim pentru a te induce în eroare să furnizezi informații personale, cum ar fi parole sau numere de carduri de credit.\n<a href=\"\">Află mai multe</a>]]></string>
-    <string name="maliciousSiteScamHeadline"><![CDATA[DuckDuckGo a blocat această pagină deoarece ar putea încerca să te înșele sau să te manipuleze pentru a transfera bani, a cumpăra bunuri contrafăcute sau a instala programe rău intenționate (malware) sub pretexte false.\n<a href=\"\">Află mai multe</a>]]></string>
+    <string name="maliciousSiteScamHeadline"><![CDATA[Revenge a blocat această pagină deoarece ar putea încerca să te înșele sau să te manipuleze pentru a transfera bani, a cumpăra bunuri contrafăcute sau a instala programe rău intenționate (malware) sub pretexte false.\n<a href=\"\">Află mai multe</a>]]></string>
     <string name="maliciousSiteLeaveCTA">Părăsește acest site</string>
     <string name="maliciousSiteAdvancedCTA">Avansat</string>
     <string name="maliciousSiteExpandedHeadline"><![CDATA[Dacă crezi că acest site este sigur, poți <a href=\"\">să raportezi o eroare</a>. Poți vizita în continuare site-ul pe propriul risc.]]></string>
@@ -888,7 +888,7 @@
     <string name="maliciousSiteSettingLearnMore"><annotation type="learn_more_link">Află mai multe</annotation></string>
     <string name="maliciousSiteSettingDisabled">Dezactivarea acestei funcții poate genera riscuri privind informațiile tale.</string>
     <string name="threatProtectionTitle">Protecție împotriva amenințărilor</string>
-    <string name="threatProtectionDescription">Protecțiile îmbunătățite oferite de DuckDuckGo stopează amenințările comune, menținându-ți în același timp conexiunea securizată.</string>
+    <string name="threatProtectionDescription">Protecțiile îmbunătățite oferite de Revenge stopează amenințările comune, menținându-ți în același timp conexiunea securizată.</string>
     <string name="smarterEncryptionTitle">Criptare inteligentă</string>
     <string name="smarterEncryptionDescription"><![CDATA[Actualizează automat linkurile la HTTPS, oricând este posibil.<br><a href=\"\">Află mai multe</a>]]></string>
     <string name="scamBlockerTitle">Instrument de blocare a înșelătoriilor</string>
@@ -900,7 +900,7 @@
     <string name="experimentHomeScreenWidgetBottomSheetDialogSubTitle">Adăugă widget-ul de căutare la ecranul de pornire, pentru acces rapid și ușor.</string>
     <string name="experimentHomeScreenWidgetBottomSheetDialogPrimaryButton">Adaugă widget</string>
     <string name="experimentHomeScreenWidgetBottomSheetDialogGhostButton">Nu acum</string>
-    <string name="experimentHomeScreenWidgetBottomSheetDialogSearchText">Căutare DuckDuckGo</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSearchText">Căutare Revenge</string>
 
     <!-- Change under remote feature flag: Widget as a Protection -->
     <string name="settingsAddHomeWidgetTitle">Widget pe ecranul de pornire</string>
@@ -917,8 +917,8 @@
 
     <!-- Widgets -->
     <string name="searchOnlyWidgetLabel" instruction="Label for the search-only widget">Doar căutare</string>
-    <string name="searchOnlyWidgetDescription" instruction="Description for the search-only widget">Lansează rapid o căutare privată cu DuckDuckGo.</string>
-    <string name="searchWidgetDescription" instruction="Description for the search widget, which may include Duck.ai and voice search">Caută în mod privat cu DuckDuckGo sau întreabă Duck.ai. Căutarea vocală și Duck.ai sunt disponibile dacă sunt activate.</string>
-    <string name="searchAndFavoritesWidgetDescription" instruction="Description for the search and favorites widget">Caută sau vizitează site-urile preferate în mod privat, cu o singură atingere. Căutarea vocală și Duck.ai sunt disponibile dacă sunt activate.</string>
-    <string name="duckAiOnlyPinShortcutLabel" instruction="Label for the Duck.ai pinned shortcut. Should be Duck.ai in all languages">Duck.ai</string>
+    <string name="searchOnlyWidgetDescription" instruction="Description for the search-only widget">Lansează rapid o căutare privată cu Revenge.</string>
+    <string name="searchWidgetDescription" instruction="Description for the search widget, which may include RevengeAI and voice search">Caută în mod privat cu Revenge sau întreabă Revenge AI. Căutarea vocală și Revenge AI sunt disponibile dacă sunt activate.</string>
+    <string name="searchAndFavoritesWidgetDescription" instruction="Description for the search and favorites widget">Caută sau vizitează site-urile preferate în mod privat, cu o singură atingere. Căutarea vocală și Revenge AI sunt disponibile dacă sunt activate.</string>
+    <string name="duckAiOnlyPinShortcutLabel" instruction="Label for the Revenge AI pinned shortcut. Should be RevengeAI in all languages">Revenge AI</string>
 </resources>

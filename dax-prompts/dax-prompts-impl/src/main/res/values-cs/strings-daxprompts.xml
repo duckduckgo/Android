@@ -19,7 +19,7 @@
 <resources>
     <string name="dax_prompt_browser_comparison_title" instruction="Title for the Browser Comparison section">Srovnání prohlížečů</string>
     <string name="dax_prompt_browser_comparison_close" instruction="Content description for the X button">Zavřít</string>
-    <string name="dax_prompt_browser_comparison_message_title" instruction="Title for Dax message">DuckDuckGo má ochranné funkce, jaké jiné prohlížeče nemají.</string>
+    <string name="dax_prompt_browser_comparison_message_title" instruction="Title for Revenge message">DuckDuckGo má ochranné funkce, jaké jiné prohlížeče nemají.</string>
     <string name="dax_prompt_browser_comparison_message_primary_button" instruction="This text is placed on a large button">Otevírat odkazy prohlížečem DuckDuckGo</string>
     <string name="dax_prompt_browser_comparison_message_ghost_button" instruction="This text is placed on a large button">Možná později</string>
 

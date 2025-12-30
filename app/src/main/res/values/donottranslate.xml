@@ -20,7 +20,7 @@
     <string name="trackersOverviewEmpty">No tracking requests were blocked from loading on this page. If a company\'s requests are loaded, it can allow them to profile you.</string>
 
     <!-- Sasquatch -->
-    <string name="webViewErrorTitle">DuckDuckGo can\'t load this page</string>
+    <string name="webViewErrorTitle">Revenge can\'t load this page</string>
     <string name="webViewErrorNoConnection">The internet connection appears to be offline.</string>
     <string name="webViewErrorBadUrl">A server with the specified hostname could not be found.</string>
     <string name="webViewErrorSslProtocol"><![CDATA[The certificate for this server is invalid. You might be connecting to a server that is pretending to be <b>%1$s</b> which could put your confidential information at risk.]]></string>
@@ -31,14 +31,14 @@
 
     <!-- Content capture for upload -->
     <string name="audioCaptureSoundRecorderUnavailable">Could not access sound recorder</string>
-    <string name="audioCaptureSoundRecorderPermissionDeniedTitle">Allow DuckDuckGo to ask for sound recorder access on this device</string>
-    <string name="audioCaptureSoundRecorderPermissionDeniedMessage">Sites can only use the sound recorder if you allow DuckDuckGo to ask for access.</string>
+    <string name="audioCaptureSoundRecorderPermissionDeniedTitle">Allow Revenge to ask for sound recorder access on this device</string>
+    <string name="audioCaptureSoundRecorderPermissionDeniedMessage">Sites can only use the sound recorder if you allow Revenge to ask for access.</string>
 
     <!-- Force Dark Mode -->
     <string name="appearanceNightModeTitle">Force Websites To Use Dark Theme</string>
     <string name="appearanceNightModeSecondary">Supported sites will use a darker theme when the app is in dark mode</string>
     <string name="appearanceNightModeDialogTitle">Relaunch app?</string>
-    <string name="appearanceNightModeDialogMessage">This will take effect for new tabs or after relaunching DuckDuckGo.</string>
+    <string name="appearanceNightModeDialogMessage">This will take effect for new tabs or after relaunching Revenge.</string>
     <string name="appearanceNightModeDialogPrimaryCTA">Relaunch Now</string>
     <string name="appearanceNightModeDialogSecondaryCTA">Dismiss</string>
 
@@ -47,21 +47,21 @@
     <string name="newTabPageShortcutSettings">Settings</string>
 
     <!-- Indonesia message -->
-    <string name="newTabPageIndonesiaMessageHeading">DuckDuckGo Blocked in Indonesia</string>
+    <string name="newTabPageIndonesiaMessageHeading">Revenge Blocked in Indonesia</string>
     <string name="newTabPageIndonesiaMessageBody">The government may be blocking access to duckduckgo.com on this network provider, which could affect this app\'s functionality. Other providers may not be affected.</string>
     <string name="newTabPageIndonesiaMessageCta">Okay</string>
 
     <!-- Skip Onboarding (not user-facing) -->
-    <string name="skipOnboarding">Skip Onboarding</string>"
+    <string name="skipOnboarding">Skip Onboarding</string>
 
     <!-- Trackers blocked animation-->
     <string name="trackerBlockedInTheLast7days" instruction="Placeholder is 1 tracker blocked" >&lt;b&gt;%1$s tracker blocked &lt;/b&gt; in the last 7 days</string>
 
     <!-- Browser tab -->
-    <string name="browserDuckPlayerShortUrl">Duck Player</string>
+    <string name="browserDuckPlayerShortUrl">Revenge Player</string>
 
-    <!-- DuckChat -->
-    <string name="duckChatMenuItem">@string/duck_chat_title</string>
+    <!-- Revenge Chat -->
+    <string name="revengeChatMenuItem">@string/duck_chat_title</string>
 
     <!-- ADS -->
     <string name="ads_demo_activity_title" translatable="false">Android Design System Demo</string>
@@ -81,8 +81,8 @@
     <string name="fireDialogTitle">Choose What To Delete</string>
     <string name="fireDialogOptionTabs">Tabs</string>
     <string name="fireDialogOptionData">Cookies and Site Data</string>
-    <string name="fireDialogOptionDuckAiChats">Duck.ai Chats</string>
-    <string name="fireDialogOptionDuckAiChatsDescription">Delete all chats</string>
+    <string name="fireDialogOptionRevengeAIChats">Revenge AI Chats</string>
+    <string name="fireDialogOptionRevengeAIChatsDescription">Delete all chats</string>
     <string name="fireDialogDeleteButton">Delete</string>
     <plurals name="fireDialogOptionTabsDescription" tools:ignore="ImpliedQuantity">
         <item quantity="one">Close 1 tab</item>

@@ -187,7 +187,7 @@ class TextAlertDialogBuilder(val context: Context) : DaxAlertDialog {
             binding.textAlertDialogCheckBox.show()
         }
 
-        val dialogBuilder = MaterialAlertDialogBuilder(context, R.style.Widget_DuckDuckGo_Dialog)
+        val dialogBuilder = MaterialAlertDialogBuilder(context, R.style.Widget_Revenge_Dialog)
             .setView(binding.root)
             .setCancelable(isCancellable)
             .apply {

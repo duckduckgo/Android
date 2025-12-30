@@ -28,19 +28,19 @@ import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
-class RMFDaysSinceDuckAiUsedMatchingAttributeTest {
+class RMFDaysSinceRevengeAIUsedMatchingAttributeTest {
 
-    private lateinit var matcher: RMFDaysSinceDuckAiUsedMatchingAttribute
+    private lateinit var matcher: RMFDaysSinceRevengeAIUsedMatchingAttribute
     private val mockRepository: DuckChatFeatureRepository = mock()
 
     @Before
     fun setup() {
-        matcher = RMFDaysSinceDuckAiUsedMatchingAttribute(mockRepository)
+        matcher = RMFDaysSinceRevengeAIUsedMatchingAttribute(mockRepository)
     }
 
     @Test
     fun whenAttributeIsDefaultThenReturnsFalse() = runTest {
-        val attribute = DaysSinceDuckAiUsedMatchingAttribute()
+        val attribute = DaysSinceRevengeAIUsedMatchingAttribute()
 
         val result = matcher.evaluate(attribute)
 
@@ -49,7 +49,7 @@ class RMFDaysSinceDuckAiUsedMatchingAttributeTest {
 
     @Test
     fun whenExactValueMatchesThenReturnsTrue() = runTest {
-        val attribute = DaysSinceDuckAiUsedMatchingAttribute(value = 5)
+        val attribute = DaysSinceRevengeAIUsedMatchingAttribute(value = 5)
         val fiveDaysAgo = System.currentTimeMillis() - (5 * 24 * 60 * 60 * 1000L)
         whenever(mockRepository.lastSessionTimestamp()).thenReturn(fiveDaysAgo)
 
@@ -60,7 +60,7 @@ class RMFDaysSinceDuckAiUsedMatchingAttributeTest {
 
     @Test
     fun whenExactValueDoesNotMatchThenReturnsFalse() = runTest {
-        val attribute = DaysSinceDuckAiUsedMatchingAttribute(value = 5)
+        val attribute = DaysSinceRevengeAIUsedMatchingAttribute(value = 5)
         val threeDaysAgo = System.currentTimeMillis() - (3 * 24 * 60 * 60 * 1000L)
         whenever(mockRepository.lastSessionTimestamp()).thenReturn(threeDaysAgo)
 
@@ -71,7 +71,7 @@ class RMFDaysSinceDuckAiUsedMatchingAttributeTest {
 
     @Test
     fun whenValueIsInRangeThenReturnsTrue() = runTest {
-        val attribute = DaysSinceDuckAiUsedMatchingAttribute(min = 5, max = 10)
+        val attribute = DaysSinceRevengeAIUsedMatchingAttribute(min = 5, max = 10)
         val sevenDaysAgo = System.currentTimeMillis() - (7 * 24 * 60 * 60 * 1000L)
         whenever(mockRepository.lastSessionTimestamp()).thenReturn(sevenDaysAgo)
 
@@ -82,7 +82,7 @@ class RMFDaysSinceDuckAiUsedMatchingAttributeTest {
 
     @Test
     fun whenValueIsEqualToMinThenReturnsTrue() = runTest {
-        val attribute = DaysSinceDuckAiUsedMatchingAttribute(min = 5, max = 10)
+        val attribute = DaysSinceRevengeAIUsedMatchingAttribute(min = 5, max = 10)
         val fiveDaysAgo = System.currentTimeMillis() - (5 * 24 * 60 * 60 * 1000L)
         whenever(mockRepository.lastSessionTimestamp()).thenReturn(fiveDaysAgo)
 
@@ -93,7 +93,7 @@ class RMFDaysSinceDuckAiUsedMatchingAttributeTest {
 
     @Test
     fun whenValueIsEqualToMaxThenReturnsTrue() = runTest {
-        val attribute = DaysSinceDuckAiUsedMatchingAttribute(min = 5, max = 10)
+        val attribute = DaysSinceRevengeAIUsedMatchingAttribute(min = 5, max = 10)
         val tenDaysAgo = System.currentTimeMillis() - (10 * 24 * 60 * 60 * 1000L)
         whenever(mockRepository.lastSessionTimestamp()).thenReturn(tenDaysAgo)
 
@@ -104,7 +104,7 @@ class RMFDaysSinceDuckAiUsedMatchingAttributeTest {
 
     @Test
     fun whenValueIsBelowMinThenReturnsFalse() = runTest {
-        val attribute = DaysSinceDuckAiUsedMatchingAttribute(min = 5, max = 10)
+        val attribute = DaysSinceRevengeAIUsedMatchingAttribute(min = 5, max = 10)
         val threeDaysAgo = System.currentTimeMillis() - (3 * 24 * 60 * 60 * 1000L)
         whenever(mockRepository.lastSessionTimestamp()).thenReturn(threeDaysAgo)
 
@@ -115,7 +115,7 @@ class RMFDaysSinceDuckAiUsedMatchingAttributeTest {
 
     @Test
     fun whenValueIsAboveMaxThenReturnsFalse() = runTest {
-        val attribute = DaysSinceDuckAiUsedMatchingAttribute(min = 5, max = 10)
+        val attribute = DaysSinceRevengeAIUsedMatchingAttribute(min = 5, max = 10)
         val twelveDaysAgo = System.currentTimeMillis() - (12 * 24 * 60 * 60 * 1000L)
         whenever(mockRepository.lastSessionTimestamp()).thenReturn(twelveDaysAgo)
 
@@ -126,7 +126,7 @@ class RMFDaysSinceDuckAiUsedMatchingAttributeTest {
 
     @Test
     fun whenOnlyMinIsSetAndValueIsAboveMinThenReturnsTrue() = runTest {
-        val attribute = DaysSinceDuckAiUsedMatchingAttribute(min = 5)
+        val attribute = DaysSinceRevengeAIUsedMatchingAttribute(min = 5)
         val tenDaysAgo = System.currentTimeMillis() - (10 * 24 * 60 * 60 * 1000L)
         whenever(mockRepository.lastSessionTimestamp()).thenReturn(tenDaysAgo)
 
@@ -137,7 +137,7 @@ class RMFDaysSinceDuckAiUsedMatchingAttributeTest {
 
     @Test
     fun whenOnlyMinIsSetAndValueIsBelowMinThenReturnsFalse() = runTest {
-        val attribute = DaysSinceDuckAiUsedMatchingAttribute(min = 5)
+        val attribute = DaysSinceRevengeAIUsedMatchingAttribute(min = 5)
         val threeDaysAgo = System.currentTimeMillis() - (3 * 24 * 60 * 60 * 1000L)
         whenever(mockRepository.lastSessionTimestamp()).thenReturn(threeDaysAgo)
 
@@ -148,7 +148,7 @@ class RMFDaysSinceDuckAiUsedMatchingAttributeTest {
 
     @Test
     fun whenOnlyMaxIsSetAndValueIsBelowMaxThenReturnsTrue() = runTest {
-        val attribute = DaysSinceDuckAiUsedMatchingAttribute(max = 10)
+        val attribute = DaysSinceRevengeAIUsedMatchingAttribute(max = 10)
         val fiveDaysAgo = System.currentTimeMillis() - (5 * 24 * 60 * 60 * 1000L)
         whenever(mockRepository.lastSessionTimestamp()).thenReturn(fiveDaysAgo)
 
@@ -159,7 +159,7 @@ class RMFDaysSinceDuckAiUsedMatchingAttributeTest {
 
     @Test
     fun whenOnlyMaxIsSetAndValueIsAboveMaxThenReturnsFalse() = runTest {
-        val attribute = DaysSinceDuckAiUsedMatchingAttribute(max = 10)
+        val attribute = DaysSinceRevengeAIUsedMatchingAttribute(max = 10)
         val fifteenDaysAgo = System.currentTimeMillis() - (15 * 24 * 60 * 60 * 1000L)
         whenever(mockRepository.lastSessionTimestamp()).thenReturn(fifteenDaysAgo)
 
@@ -181,45 +181,45 @@ class RMFDaysSinceDuckAiUsedMatchingAttributeTest {
     fun whenMappingValidJsonWithValueThenReturnsAttribute() {
         val json = JsonMatchingAttribute(value = 5)
 
-        val result = matcher.map(DaysSinceDuckAiUsedMatchingAttribute.KEY, json)
+        val result = matcher.map(DaysSinceRevengeAIUsedMatchingAttribute.KEY, json)
 
-        assertEquals(DaysSinceDuckAiUsedMatchingAttribute(value = 5), result)
+        assertEquals(DaysSinceRevengeAIUsedMatchingAttribute(value = 5), result)
     }
 
     @Test
     fun whenMappingValidJsonWithRangeThenReturnsAttribute() {
         val json = JsonMatchingAttribute(min = 5, max = 10)
 
-        val result = matcher.map(DaysSinceDuckAiUsedMatchingAttribute.KEY, json)
+        val result = matcher.map(DaysSinceRevengeAIUsedMatchingAttribute.KEY, json)
 
-        assertEquals(DaysSinceDuckAiUsedMatchingAttribute(min = 5, max = 10), result)
+        assertEquals(DaysSinceRevengeAIUsedMatchingAttribute(min = 5, max = 10), result)
     }
 
     @Test
     fun whenMappingJsonWithDoubleThenConvertsToInt() {
         val json = JsonMatchingAttribute(value = 5.0)
 
-        val result = matcher.map(DaysSinceDuckAiUsedMatchingAttribute.KEY, json)
+        val result = matcher.map(DaysSinceRevengeAIUsedMatchingAttribute.KEY, json)
 
-        assertEquals(DaysSinceDuckAiUsedMatchingAttribute(value = 5), result)
+        assertEquals(DaysSinceRevengeAIUsedMatchingAttribute(value = 5), result)
     }
 
     @Test
     fun whenMappingJsonWithLongThenConvertsToInt() {
         val json = JsonMatchingAttribute(value = 5L)
 
-        val result = matcher.map(DaysSinceDuckAiUsedMatchingAttribute.KEY, json)
+        val result = matcher.map(DaysSinceRevengeAIUsedMatchingAttribute.KEY, json)
 
-        assertEquals(DaysSinceDuckAiUsedMatchingAttribute(value = 5), result)
+        assertEquals(DaysSinceRevengeAIUsedMatchingAttribute(value = 5), result)
     }
 
     @Test
     fun whenMappingJsonWithNullValuesThenReturnsDefaultAttribute() {
         val json = JsonMatchingAttribute(value = null, min = null, max = null)
 
-        val result = matcher.map(DaysSinceDuckAiUsedMatchingAttribute.KEY, json)
+        val result = matcher.map(DaysSinceRevengeAIUsedMatchingAttribute.KEY, json)
 
-        assertEquals(DaysSinceDuckAiUsedMatchingAttribute(), result)
+        assertEquals(DaysSinceRevengeAIUsedMatchingAttribute(), result)
     }
 
     @Test
@@ -233,7 +233,7 @@ class RMFDaysSinceDuckAiUsedMatchingAttributeTest {
 
     @Test
     fun whenLastSessionTimestampIsZeroThenReturnsFalse() = runTest {
-        val attribute = DaysSinceDuckAiUsedMatchingAttribute(value = 0)
+        val attribute = DaysSinceRevengeAIUsedMatchingAttribute(value = 0)
         whenever(mockRepository.lastSessionTimestamp()).thenReturn(0L)
 
         val result = matcher.evaluate(attribute)
@@ -243,7 +243,7 @@ class RMFDaysSinceDuckAiUsedMatchingAttributeTest {
 
     @Test
     fun whenLastSessionTimestampIsZeroWithRangeThenReturnsFalse() = runTest {
-        val attribute = DaysSinceDuckAiUsedMatchingAttribute(min = 0, max = 10)
+        val attribute = DaysSinceRevengeAIUsedMatchingAttribute(min = 0, max = 10)
         whenever(mockRepository.lastSessionTimestamp()).thenReturn(0L)
 
         val result = matcher.evaluate(attribute)
@@ -253,7 +253,7 @@ class RMFDaysSinceDuckAiUsedMatchingAttributeTest {
 
     @Test
     fun whenLastSessionTimestampIsNonZeroWithZeroDaysThenReturnsTrue() = runTest {
-        val attribute = DaysSinceDuckAiUsedMatchingAttribute(value = 0)
+        val attribute = DaysSinceRevengeAIUsedMatchingAttribute(value = 0)
         // Used within the last 12 hours (less than 1 day)
         val twelveHoursAgo = System.currentTimeMillis() - (12 * 60 * 60 * 1000L)
         whenever(mockRepository.lastSessionTimestamp()).thenReturn(twelveHoursAgo)

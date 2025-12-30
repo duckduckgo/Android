@@ -172,13 +172,13 @@
     <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Trimite feedback</string>
 
-    <string name="subscriptionSettingSubscribeWithDuckAiSubtitle">Abonații beneficiază de VPN, modele avansate de IA în Duck.ai, Personal Information Removal și Identity Theft Restoration.</string>
-    <string name="subscriptionSettingSubscribeWithDuckAiSubtitleRow">Abonații beneficiază de VPN, modele avansate de inteligență artificială în Duck.ai și Identity Theft Restoration.</string>
+    <string name="subscriptionSettingSubscribeWithRevengeAISubtitle">Abonații beneficiază de VPN, modele avansate de IA în Revenge AI, Personal Information Removal și Identity Theft Restoration.</string>
+    <string name="subscriptionSettingSubscribeWithRevengeAISubtitleRow">Abonații beneficiază de VPN, modele avansate de inteligență artificială în Revenge AI și Identity Theft Restoration.</string>
 
-    <string name="feedbackCategoryDuckAi">Duck.ai</string>
-    <string name="feedbackSubCategoryDuckAiSubscriberModels">Nu se pot accesa modelele Duck.ai disponibile doar pentru abonați</string>
-    <string name="feedbackSubCategoryDuckAiLoginThirdPartyBrowser">Nu pot accesa Duck.ai cu abonamentul meu în alte browsere</string>
-    <string name="feedbackSubCategoryDuckAiOther">Alt feedback privind Duck.ai</string>
+    <string name="feedbackCategoryRevengeAI">Revenge AI</string>
+    <string name="feedbackSubCategoryRevengeAISubscriberModels">Nu se pot accesa modelele Revenge AI disponibile doar pentru abonați</string>
+    <string name="feedbackSubCategoryRevengeAILoginThirdPartyBrowser">Nu pot accesa Revenge AI cu abonamentul meu în alte browsere</string>
+    <string name="feedbackSubCategoryRevengeAIOther">Alt feedback privind Revenge AI</string>
 
     <string name="subscriptionSettingSectionTitle">Abonament DuckDuckGo</string>
     <string name="subscriptionSettingSubscribeSecure">Asigură-ți rețeaua Wi-Fi și discută în privat cu modele avansate de IA</string>

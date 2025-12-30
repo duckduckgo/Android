@@ -17,7 +17,7 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="duck_chat_title">Duck.ai</string>
+    <string name="duck_chat_title">Revenge AI</string>
     <string name="duck_chat_download_finished_action_name">Atvērt</string>
     <string name="duck_chat_cannot_open_file_error_message">Nevar atvērt failu. Pārbaudīt saderīgu lietotni.</string>
 
@@ -39,14 +39,14 @@
     <!-- Settings -->
     <string name="duck_chat_ai_features_title">Mākslīgā intelekta funkcijas</string>
     <string name="duck_chat_settings_activity_description">DuckDuckGo MI funkcijas ir privātas un nav obligātas.Tavi dati netiek izmantoti mākslīgā intelekta apmācībai.\n<annotation type="learn_more_link">Uzzini vairāk</annotation></string>
-    <string name="duck_chat_enable_duck_ai_setting">Duck.ai</string>
+    <string name="duck_chat_enable_duck_ai_setting">Revenge AI</string>
     <string name="duck_chat_enable_duck_ai_setting_description">Privāti tērzē ar populāriem trešo personu mākslīgā intelekta modeļiem</string>
     <string name="duck_chat_visibility_setting">Pārlūka izvēlne</string>
     <string name="duck_chat_address_bar_visibility_setting">Adreses josla</string>
     <string name="duck_chat_assist_settings_title">Meklēšanas Assist iestatījumi</string>
     <string name="duck_chat_assist_settings_description">Izvēlies, cik bieži tu vēlies, lai MI atbalstītās atbildes parādītos tavos meklējumos.</string>
-    <string name="duck_ai_shortcut_settings_title">Duck.ai īsceļi</string>
-    <string name="duck_ai_shortcut_settings_description">Izvēlies, kurus Duck.ai īsceļus parādīt</string>
+    <string name="duck_ai_shortcut_settings_title">Revenge AI īsceļi</string>
+    <string name="duck_ai_shortcut_settings_description">Izvēlies, kurus Revenge AI īsceļus parādīt</string>
 
     <!-- Duck AI Voice Search Shortcut Setting -->
     <string name="duckAiVoiceSearchVisibilitySetting">Balss meklēšana</string>
@@ -55,18 +55,18 @@
     <string name="input_screen_search_hint">Meklē vai ievadi adresi</string>
     <string name="input_screen_chat_hint">Pajautāt privāti</string>
     <string name="input_screen_user_pref_without_ai">Meklēt tikai</string>
-    <string name="input_screen_user_pref_with_ai">Meklēšana &amp; Duck.ai</string>
-    <string name="input_screen_user_pref_description">Izmēģini jauno iespēju jautāt Duck.ai tieši no adreses joslas. <annotation type="share_feedback">Dalies ar atsauksmi</annotation></string>
+    <string name="input_screen_user_pref_with_ai">Meklēšana &amp; Revenge AI</string>
+    <string name="input_screen_user_pref_description">Izmēģini jauno iespēju jautāt RevengeAI tieši no adreses joslas. <annotation type="share_feedback">Dalies ar atsauksmi</annotation></string>
 
-    <!-- Duck.ai Pro settings -->
-    <string name="duck_ai_paid_settings_title">Duck.ai</string>
-    <string name="duck_ai_paid_settings_page_title">Duck.ai</string>
+    <!-- Revenge AI Pro settings -->
+    <string name="duck_ai_paid_settings_title">Revenge AI</string>
+    <string name="duck_ai_paid_settings_page_title">Revenge AI</string>
     <string name="duck_ai_paid_settings_page_description"><![CDATA[Privāti tērzē ar abonentiem ekskluzīviem mākslīgā intelekta modeļiem.\n<a href=\"\">Uzzināt vairāk</a>]]></string>
-    <string name="duck_ai_paid_settings_open_duck_ai">Atver Duck.ai</string>
+    <string name="duck_ai_paid_settings_open_duck_ai">Atver Revenge AI</string>
     <string name="duck_ai_paid_settings_learn_more_title">Uzzināt vairāk</string>
 
     <!-- AutoComplete -->
-    <string name="autocompleteDuckAiPrompt">Pajautā Duck.ai</string>
+    <string name="autocompleteRevengeAIPrompt">Pajautā Revenge AI</string>
     <string name="autocompleteDeviceAppNotFound">Lietojumprogrammu nevarēja atrast</string>
 
     <!-- New Address Bar Option Bottom Sheet Dialog -->
@@ -76,7 +76,7 @@
     <string name="newAddressBarOptionBottomSheetDialogGhostButton">Ne tagad</string>
     <string name="newAddressBarOptionBottomSheetDialogFooter">Pielāgo iestatījumos &gt; MI funkcijas.</string>
     <string name="newAddressBarOptionBottomSheetDialogSearchOnly">Meklēt tikai</string>
-    <string name="newAddressBarOptionBottomSheetDialogSearchAndDuckAi">Meklēšana &amp; Duck.ai</string>
+    <string name="newAddressBarOptionBottomSheetDialogSearchAndRevengeAI">Meklēšana &amp; Revenge AI</string>
     <string name="newAddressBarOptionBottomSheetDialogHeader">Adreses joslas opcija</string>
 
     <!-- Duck AI SERP Settings Title -->
@@ -92,5 +92,5 @@
     <!-- Duck AI Paid Settings -->
     <string name="duck_ai_paid_settings_enable_in_settings">Ieslēgt MI funkciju iestatījumos</string>
     <string name="duck_ai_paid_settings_manage_in_settings">Pārvaldīt MI funkciju iestatījumos</string>
-    <string name="duck_ai_paid_settings_manage_secondary">Konfigurē Duck.ai MI funkciju iestatījumos.</string>
+    <string name="duck_ai_paid_settings_manage_secondary">Konfigurē Revenge AI MI funkciju iestatījumos.</string>
 </resources>

@@ -20,7 +20,7 @@ import com.duckduckgo.browser.api.autocomplete.AutoCompleteFactory
 import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.extensions.toBinaryString
-import com.duckduckgo.duckchat.api.DuckAiFeatureState
+import com.duckduckgo.duckchat.api.RevengeAIFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.inputscreen.ui.InputScreenConfigResolver
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command
@@ -88,7 +88,7 @@ class InputScreenViewModelTest {
     private val inputScreenConfigResolver: InputScreenConfigResolver = mock()
     private val omnibarRepository: OmnibarRepository = mock()
 
-    private val duckAiFeatureState: DuckAiFeatureState = mock()
+    private val duckAiFeatureState: RevengeAIFeatureState = mock()
     private val fullScreenModeDisabledFlow = MutableStateFlow(false)
     private val fullScreenModeEnabledFlow = MutableStateFlow(true)
     private val duckChatURL = "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5"

@@ -403,7 +403,7 @@ class SubscriptionFeedbackViewModel @Inject constructor(
             VPN -> R.string.feedbackCategoryVpn
             PIR -> R.string.feedbackCategoryPir
             ITR -> R.string.feedbackCategoryItr
-            DUCK_AI -> R.string.feedbackCategoryDuckAi
+            DUCK_AI -> R.string.feedbackCategoryRevengeAI
         }
     }
 
@@ -454,11 +454,11 @@ class SubscriptionFeedbackViewModel @Inject constructor(
                 }
             }
 
-            is SubscriptionFeedbackDuckAiSubCategory -> {
+            is SubscriptionFeedbackRevengeAISubCategory -> {
                 when (this) {
-                    SubscriptionFeedbackDuckAiSubCategory.ACCESS_SUBSCRIPTION_MODELS -> R.string.feedbackSubCategoryDuckAiSubscriberModels
-                    SubscriptionFeedbackDuckAiSubCategory.LOGIN_THIRD_PARTY_BROWSER -> R.string.feedbackSubCategoryDuckAiLoginThirdPartyBrowser
-                    SubscriptionFeedbackDuckAiSubCategory.OTHER -> R.string.feedbackSubCategoryDuckAiOther
+                    SubscriptionFeedbackRevengeAISubCategory.ACCESS_SUBSCRIPTION_MODELS -> R.string.feedbackSubCategoryRevengeAISubscriberModels
+                    SubscriptionFeedbackRevengeAISubCategory.LOGIN_THIRD_PARTY_BROWSER -> R.string.feedbackSubCategoryRevengeAILoginThirdPartyBrowser
+                    SubscriptionFeedbackRevengeAISubCategory.OTHER -> R.string.feedbackSubCategoryRevengeAIOther
                 }
             }
 

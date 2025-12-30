@@ -28,7 +28,7 @@
     <string name="browserMenuEnablePrivacyProtection">Включить защиту конфиденциальности</string>
     <string name="browserMenuDisablePrivacyProtection">Отключить защиту конфиденциальности</string>
     <string name="browserMenuNewTab">Новая вкладка</string>
-    <string name="browserMenuDuckChat">Duck.ai</string>
+    <string name="browserMenuRevengeChat">Revenge AI</string>
     <string name="browserMenuShare">Поделиться</string>
     <string name="browserMenuEmailAlias">Создать адрес Duck</string>
     <string name="browserMenuFindInPage">Найти на странице</string>
@@ -45,7 +45,7 @@
     <string name="browserMenuNewChat">Запустить чат</string>
     <string name="browserMenuNewAIChat">Запустить AI Chat</string>
     <string name="browserMenuChatHistory">История чата</string>
-    <string name="browserMenuChatSettings">Настройки Duck.ai</string>
+    <string name="browserMenuChatSettings">Настройки Revenge AI</string>
     <string name="browserMenuVPN">VPN</string>
 
     <!-- Browser Menu Content Description -->

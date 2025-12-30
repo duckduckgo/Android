@@ -31,7 +31,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        android:theme="@style/Widget.DuckDuckGo.ToolbarTheme">
+        android:theme="@style/Widget.Revenge.ToolbarTheme">
 
         <LinearLayout
             android:id="@+id/rootContainer"
@@ -56,7 +56,7 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:popupTheme="@style/Widget.DuckDuckGo.PopUpOverflowMenu">
+                    app:popupTheme="@style/Widget.Revenge.PopUpOverflowMenu">
 
                     <com.google.android.material.card.MaterialCardView
                         android:id="@+id/omniBarContainerShadow"
@@ -69,7 +69,7 @@
 
                         <com.google.android.material.card.MaterialCardView
                             android:id="@+id/omniBarContainer"
-                            style="@style/Widget.DuckDuckGo.OmnibarCardView"
+                            style="@style/Widget.Revenge.OmnibarCardView"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             app:cardElevation="0dp"
@@ -276,7 +276,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        android:theme="@style/Widget.DuckDuckGo.ToolbarTheme">
+        android:theme="@style/Widget.Revenge.ToolbarTheme">
 
         <LinearLayout
             android:id="@+id/rootContainerBottom"
@@ -301,7 +301,7 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:popupTheme="@style/Widget.DuckDuckGo.PopUpOverflowMenu">
+                    app:popupTheme="@style/Widget.Revenge.PopUpOverflowMenu">
 
                     <com.google.android.material.card.MaterialCardView
                         android:id="@+id/omniBarContainerShadowBottom"
@@ -314,7 +314,7 @@
 
                         <com.google.android.material.card.MaterialCardView
                             android:id="@+id/omniBarContainerBottom"
-                            style="@style/Widget.DuckDuckGo.OmnibarCardView"
+                            style="@style/Widget.Revenge.OmnibarCardView"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             app:cardElevation="0dp"

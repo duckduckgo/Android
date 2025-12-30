@@ -113,7 +113,7 @@
     <string name="atp_OnboardingContinue">Folytatás</string>
     <string name="atp_OnboardingMaybeLater">Talán később</string>
 
-    <!-- App Tracking Protection Dax Onboarding -->
+    <!-- App Tracking Protection Revenge Onboarding -->
     <string name="atp_daxOnboardingIntroTitle">Alkalmazáskövetés elleni védelem</string>
     <string name="atp_daxOnboardingIntroMessage" formatted="false">A népszerű ingyenes alkalmazások több mint 96%-a lehetővé teszi más cégeknek, hogy nyomon kövessenek, még akkor is, ha éppen nem használod a telefont. Az alkalmazáskövetés elleni védelem felismeri és blokkolja ezeket a követési kísérleteket.</string>
     <string name="atp_daxOnboardingPermissionTitle">Hogyan működik?</string>

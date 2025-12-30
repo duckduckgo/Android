@@ -28,7 +28,7 @@
     <string name="browserMenuEnablePrivacyProtection">Įjungti privatumo apsaugą</string>
     <string name="browserMenuDisablePrivacyProtection">Išjungti privatumo apsaugą</string>
     <string name="browserMenuNewTab">Nauja kortelė</string>
-    <string name="browserMenuDuckChat">Duck.ai</string>
+    <string name="browserMenuRevengeChat">Revenge AI</string>
     <string name="browserMenuShare">Bendrinti</string>
     <string name="browserMenuEmailAlias">Sukurkite „Duck“ adresą</string>
     <string name="browserMenuFindInPage">Rasti puslapyje</string>
@@ -45,7 +45,7 @@
     <string name="browserMenuNewChat">Naujas pokalbis</string>
     <string name="browserMenuNewAIChat">Naujas DI pokalbis</string>
     <string name="browserMenuChatHistory">Pokalbių istorija</string>
-    <string name="browserMenuChatSettings">„Duck.ai“ nustatymai</string>
+    <string name="browserMenuChatSettings">„Revenge AI“ nustatymai</string>
     <string name="browserMenuVPN">VPN</string>
 
     <!-- Browser Menu Content Description -->

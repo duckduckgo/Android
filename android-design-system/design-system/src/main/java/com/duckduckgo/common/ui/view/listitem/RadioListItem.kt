@@ -53,7 +53,7 @@ class RadioListItem @JvmOverloads constructor(
             attrs,
             R.styleable.RadioListItem,
             0,
-            R.style.Widget_DuckDuckGo_TwoLineListItem,
+            R.style.Widget_Revenge_TwoLineListItem,
         ).apply {
             if (hasValue(R.styleable.RadioListItem_android_minHeight)) {
                 binding.itemContainer.minHeight =

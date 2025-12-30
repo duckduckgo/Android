@@ -293,7 +293,7 @@
         errorLine1="            com.google.android.material.R.style.Widget_MaterialComponents_TextInputEditText_OutlinedBox,"
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/java/com/duckduckgo/common/ui/view/text/DaxTextInput.kt"
+            file="src/main/java/com/duckduckgo/common/ui/view/text/RevengeTextInput.kt"
             line="112"
             column="13"/>
     </issue>

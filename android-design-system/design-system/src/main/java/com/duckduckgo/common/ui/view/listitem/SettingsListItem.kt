@@ -54,7 +54,7 @@ class SettingsListItem @JvmOverloads constructor(
             attrs,
             R.styleable.SettingsListItem,
             0,
-            R.style.Widget_DuckDuckGo_OneLineListItem,
+            R.style.Widget_Revenge_OneLineListItem,
         ).apply {
 
             primaryText.text = getString(R.styleable.SettingsListItem_primaryText)

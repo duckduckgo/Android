@@ -172,13 +172,13 @@
     <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Lähetä palautetta</string>
 
-    <string name="subscriptionSettingSubscribeWithDuckAiSubtitle">Tilaajat saavat VPN:n ja edistyneet tekoälymallit Duck.ai:ssa, Personal Information Removalin ja Identity Theft Restorationin.</string>
-    <string name="subscriptionSettingSubscribeWithDuckAiSubtitleRow">Tilaajat saavat VPN:n, edistyneet tekoälymallit Duck.ai:ssa ja Identity Theft Restorationin.</string>
+    <string name="subscriptionSettingSubscribeWithRevengeAISubtitle">Tilaajat saavat VPN:n ja edistyneet tekoälymallit Revenge AI:ssa, Personal Information Removalin ja Identity Theft Restorationin.</string>
+    <string name="subscriptionSettingSubscribeWithRevengeAISubtitleRow">Tilaajat saavat VPN:n, edistyneet tekoälymallit Revenge AI:ssa ja Identity Theft Restorationin.</string>
 
-    <string name="feedbackCategoryDuckAi">Duck.ai</string>
-    <string name="feedbackSubCategoryDuckAiSubscriberModels">En voi käyttää tilaajille tarkoitettuja Duck.ai-malleja.</string>
-    <string name="feedbackSubCategoryDuckAiLoginThirdPartyBrowser">En voi käyttää Duck.ai:ta muissa selaimissa tilauksellani.</string>
-    <string name="feedbackSubCategoryDuckAiOther">Muu Duck.ai -palaute</string>
+    <string name="feedbackCategoryRevengeAI">Revenge AI</string>
+    <string name="feedbackSubCategoryRevengeAISubscriberModels">En voi käyttää tilaajille tarkoitettuja Revenge AI-malleja.</string>
+    <string name="feedbackSubCategoryRevengeAILoginThirdPartyBrowser">En voi käyttää Revenge AI:ta muissa selaimissa tilauksellani.</string>
+    <string name="feedbackSubCategoryRevengeAIOther">Muu Revenge AI -palaute</string>
 
     <string name="subscriptionSettingSectionTitle">DuckDuckGo-tilaus</string>
     <string name="subscriptionSettingSubscribeSecure">Suojaa WiFi-yhteytesi ja keskustele yksityisesti edistyneiden tekoälymallien kanssa</string>

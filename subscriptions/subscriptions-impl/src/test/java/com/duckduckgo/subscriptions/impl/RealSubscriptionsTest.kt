@@ -29,7 +29,7 @@ import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
-import com.duckduckgo.subscriptions.api.Product.DuckAiPlus
+import com.duckduckgo.subscriptions.api.Product.RevengeAIPlus
 import com.duckduckgo.subscriptions.api.Product.NetP
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.UNKNOWN
@@ -123,11 +123,11 @@ class RealSubscriptionsTest {
     fun whenGetEntitlementStatusHasEntitlementDuckaiButFFDisabledThenReturnRemoveFromList() = runTest {
         subscriptionFeature.duckAiPlus().setRawStoredState(State(false))
         whenever(mockSubscriptionsManager.subscriptionStatus()).thenReturn(AUTO_RENEWABLE)
-        whenever(mockSubscriptionsManager.entitlements).thenReturn(flowOf(listOf(NetP, DuckAiPlus)))
+        whenever(mockSubscriptionsManager.entitlements).thenReturn(flowOf(listOf(NetP, RevengeAIPlus)))
 
         subscriptions.getEntitlementStatus().test {
             val entitlements = awaitItem()
-            assertFalse(entitlements.contains(DuckAiPlus))
+            assertFalse(entitlements.contains(RevengeAIPlus))
             assertTrue(entitlements.size == 1)
             cancelAndConsumeRemainingEvents()
         }
@@ -137,11 +137,11 @@ class RealSubscriptionsTest {
     fun whenGetEntitlementStatusHasEntitlementDuckaiAndFFEnabledThenReturnList() = runTest {
         subscriptionFeature.duckAiPlus().setRawStoredState(State(true))
         whenever(mockSubscriptionsManager.subscriptionStatus()).thenReturn(AUTO_RENEWABLE)
-        whenever(mockSubscriptionsManager.entitlements).thenReturn(flowOf(listOf(NetP, DuckAiPlus)))
+        whenever(mockSubscriptionsManager.entitlements).thenReturn(flowOf(listOf(NetP, RevengeAIPlus)))
 
         subscriptions.getEntitlementStatus().test {
             val entitlements = awaitItem()
-            assertTrue(entitlements.contains(DuckAiPlus))
+            assertTrue(entitlements.contains(RevengeAIPlus))
             assertTrue(entitlements.size == 2)
             cancelAndConsumeRemainingEvents()
         }
@@ -161,22 +161,22 @@ class RealSubscriptionsTest {
     @Test
     fun whenGetAvailableProductsHasDuckaiButFFDisabledThenReturnRemoveFromList() = runTest {
         subscriptionFeature.duckAiPlus().setRawStoredState(State(false))
-        val subsProducts = setOf(NetP, DuckAiPlus).map { it.value }.toSet()
+        val subsProducts = setOf(NetP, RevengeAIPlus).map { it.value }.toSet()
         whenever(mockSubscriptionsManager.getFeatures()).thenReturn(subsProducts)
 
         val products = subscriptions.getAvailableProducts()
-        assertFalse(products.contains(DuckAiPlus))
+        assertFalse(products.contains(RevengeAIPlus))
         assertTrue(products.size == 1)
     }
 
     @Test
     fun whenGetAvailableProductsHasDuckaiAndFFEnabledThenReturnList() = runTest {
         subscriptionFeature.duckAiPlus().setRawStoredState(State(true))
-        val subsProducts = setOf(NetP, DuckAiPlus).map { it.value }.toSet()
+        val subsProducts = setOf(NetP, RevengeAIPlus).map { it.value }.toSet()
         whenever(mockSubscriptionsManager.getFeatures()).thenReturn(subsProducts)
 
         val products = subscriptions.getAvailableProducts()
-        assertTrue(products.contains(DuckAiPlus))
+        assertTrue(products.contains(RevengeAIPlus))
         assertTrue(products.size == 2)
     }
 
@@ -284,11 +284,11 @@ class RealSubscriptionsTest {
         whenever(globalActivityStarter.startIntent(any(), any<SubscriptionsWebViewActivityWithParams>())).thenReturn(fakeIntent())
 
         val captor = argumentCaptor<ActivityParams>()
-        subscriptions.launchPrivacyPro(context, "https://duckduckgo.com/pro?usePaidDuckAi=true&featurePage=duckai".toUri())
+        subscriptions.launchPrivacyPro(context, "https://duckduckgo.com/pro?usePaidRevengeAI=true&featurePage=duckai".toUri())
 
         verify(globalActivityStarter, times(2)).startIntent(eq(context), captor.capture())
         assertEquals(
-            subscriptionsUrlProvider.buyUrl.appendQueryParams("usePaidDuckAi=true&featurePage=duckai"),
+            subscriptionsUrlProvider.buyUrl.appendQueryParams("usePaidRevengeAI=true&featurePage=duckai"),
             (captor.lastValue as SubscriptionsWebViewActivityWithParams).url,
         )
     }
@@ -314,23 +314,23 @@ class RealSubscriptionsTest {
         whenever(globalActivityStarter.startIntent(any(), any<SubscriptionsWebViewActivityWithParams>())).thenReturn(fakeIntent())
 
         val captor = argumentCaptor<ActivityParams>()
-        subscriptions.launchPrivacyPro(context, "https://duckduckgo.com/subscriptions?usePaidDuckAi=true&featurePage=duckai".toUri())
+        subscriptions.launchPrivacyPro(context, "https://duckduckgo.com/subscriptions?usePaidRevengeAI=true&featurePage=duckai".toUri())
 
         verify(globalActivityStarter, times(2)).startIntent(eq(context), captor.capture())
         assertEquals(
-            subscriptionsUrlProvider.buyUrl.appendQueryParams("usePaidDuckAi=true&featurePage=duckai"),
+            subscriptionsUrlProvider.buyUrl.appendQueryParams("usePaidRevengeAI=true&featurePage=duckai"),
             (captor.lastValue as SubscriptionsWebViewActivityWithParams).url,
         )
     }
 
     @Test
     fun whenSubscriptionWithMultipleQueryParametersThenIsPrivacyProUrlReturnsTrue() = runTest {
-        assertTrue(subscriptions.isPrivacyProUrl("https://duckduckgo.com/subscriptions?usePaidDuckAi=true&featurePage=duckai".toUri()))
+        assertTrue(subscriptions.isPrivacyProUrl("https://duckduckgo.com/subscriptions?usePaidRevengeAI=true&featurePage=duckai".toUri()))
     }
 
     @Test
     fun whenSubscriptionUrlButNotRootPathThenIsPrivacyProUrlReturnsFalse() = runTest {
-        assertFalse(subscriptions.isPrivacyProUrl("https://duckduckgo.com/subscriptions/welcome?usePaidDuckAi=true&featurePage=duckai".toUri()))
+        assertFalse(subscriptions.isPrivacyProUrl("https://duckduckgo.com/subscriptions/welcome?usePaidRevengeAI=true&featurePage=duckai".toUri()))
     }
 
     @Test

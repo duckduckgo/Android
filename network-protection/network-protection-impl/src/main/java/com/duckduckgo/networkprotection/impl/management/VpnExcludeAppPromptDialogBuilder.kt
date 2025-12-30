@@ -105,7 +105,7 @@ class VpnExcludeAppPromptDialogBuilder(val context: Context) : DaxAlertDialog {
             )
         }
 
-        val dialogBuilder = MaterialAlertDialogBuilder(context, R.style.Widget_DuckDuckGo_Dialog)
+        val dialogBuilder = MaterialAlertDialogBuilder(context, R.style.Widget_Revenge_Dialog)
             .setView(binding.root)
             .apply {
                 setCancelable(false)

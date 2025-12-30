@@ -74,7 +74,7 @@ import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.duckchat.api.DuckAiFeatureState
+import com.duckduckgo.duckchat.api.RevengeAIFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.DISABLED_WIH_HELP_LINK
@@ -116,7 +116,7 @@ class SettingsViewModel @Inject constructor(
     private val subscriptions: Subscriptions,
     private val duckPlayer: DuckPlayer,
     private val duckChat: DuckChat,
-    private val duckAiFeatureState: DuckAiFeatureState,
+    private val duckAiFeatureState: RevengeAIFeatureState,
     private val voiceSearchAvailability: VoiceSearchAvailability,
     private val privacyProUnifiedFeedback: PrivacyProUnifiedFeedback,
     private val settingsPixelDispatcher: SettingsPixelDispatcher,
@@ -181,8 +181,8 @@ class SettingsViewModel @Inject constructor(
         pixel.fire(PRODUCT_TELEMETRY_SURFACE_SETTINGS_OPENED)
         pixel.fire(PRODUCT_TELEMETRY_SURFACE_SETTINGS_OPENED_DAILY, type = Pixel.PixelType.Daily())
 
-        duckAiFeatureState.showSettings.onEach { showDuckAiSettings ->
-            viewState.update { it.copy(isDuckChatEnabled = showDuckAiSettings) }
+        duckAiFeatureState.showSettings.onEach { showRevengeAISettings ->
+            viewState.update { it.copy(isDuckChatEnabled = showRevengeAISettings) }
         }.launchIn(viewModelScope)
     }
 

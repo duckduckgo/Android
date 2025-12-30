@@ -44,7 +44,7 @@ class InfoPanel : FrameLayout {
     ) : this(
         context,
         attrs,
-        R.style.Widget_DuckDuckGo_InfoPanel,
+        R.style.Widget_Revenge_InfoPanel,
     )
 
     constructor(

@@ -105,7 +105,7 @@
 
             <ImageView
                 android:id="@+id/ddgLogo"
-                android:layout_width="@dimen/ntpDaxLogoIconWidth"
+                android:layout_width="@dimen/ntpRevengeLogoIconWidth"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/homeTabDdgLogoTopMargin"
                 android:adjustViewBounds="true"

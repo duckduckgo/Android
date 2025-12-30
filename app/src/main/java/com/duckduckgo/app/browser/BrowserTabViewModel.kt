@@ -313,7 +313,7 @@ import com.duckduckgo.downloads.api.DownloadCommand
 import com.duckduckgo.downloads.api.DownloadStateListener
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
-import com.duckduckgo.duckchat.api.DuckAiFeatureState
+import com.duckduckgo.duckchat.api.RevengeAIFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
 import com.duckduckgo.duckchat.impl.helper.NativeAction
@@ -458,7 +458,7 @@ class BrowserTabViewModel @Inject constructor(
     private val httpErrorPixels: Lazy<HttpErrorPixels>,
     private val duckPlayer: DuckPlayer,
     private val duckChat: DuckChat,
-    private val duckAiFeatureState: DuckAiFeatureState,
+    private val duckAiFeatureState: RevengeAIFeatureState,
     private val duckPlayerJSHelper: DuckPlayerJSHelper,
     private val refreshPixelSender: RefreshPixelSender,
     private val privacyProtectionTogglePlugin: PluginPoint<PrivacyProtectionTogglePlugin>,
@@ -780,8 +780,8 @@ class BrowserTabViewModel @Inject constructor(
             }.flowOn(dispatchers.main()) // don't use the immediate dispatcher so that the tabId field has a chance to initialize
             .onEach {
                 val hasPendingTabLaunch = externalIntentProcessingState.hasPendingTabLaunch.value
-                val hasPendingDuckAiOpen = externalIntentProcessingState.hasPendingDuckAiOpen.value
-                if (!hasPendingTabLaunch && !hasPendingDuckAiOpen) {
+                val hasPendingRevengeAIOpen = externalIntentProcessingState.hasPendingRevengeAIOpen.value
+                if (!hasPendingTabLaunch && !hasPendingRevengeAIOpen) {
                     // whenever an event fires, so the user switched to a new tab page, launch the input screen
                     command.value = LaunchInputScreen
                 }
@@ -1001,7 +1001,7 @@ class BrowserTabViewModel @Inject constructor(
                     is AutoCompleteHistorySearchSuggestion -> onUserSubmittedQuery(suggestion.phrase, FromAutocomplete(isNav = false))
                     is AutoCompleteSwitchToTabSuggestion -> onUserSwitchedToTab(suggestion.tabId)
                     is AutoCompleteInAppMessageSuggestion -> return@withContext
-                    is AutoCompleteSuggestion.AutoCompleteDuckAIPrompt -> onUserTappedDuckAiPromptAutocomplete(suggestion.phrase)
+                    is AutoCompleteSuggestion.AutoCompleteDuckAIPrompt -> onUserTappedRevengeAIPromptAutocomplete(suggestion.phrase)
                     is AutoCompleteSuggestion.AutoCompleteDeviceAppSuggestion -> {
                         // no-op, installed apps search is disabled in tabs
                     }
@@ -4410,7 +4410,7 @@ class BrowserTabViewModel @Inject constructor(
         command.value = Command.SwitchToTab(tabId)
     }
 
-    private fun onUserTappedDuckAiPromptAutocomplete(prompt: String) {
+    private fun onUserTappedRevengeAIPromptAutocomplete(prompt: String) {
         command.value = Command.SubmitChat(prompt)
 
         viewModelScope.launch {

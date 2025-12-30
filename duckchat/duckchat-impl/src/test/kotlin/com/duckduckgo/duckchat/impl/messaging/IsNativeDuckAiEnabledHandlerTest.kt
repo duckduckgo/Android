@@ -33,18 +33,18 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class IsNativeDuckAiEnabledHandlerTest {
+class IsNativeRevengeAIEnabledHandlerTest {
 
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
     private val fakeDuckChat = FakeDuckChat(enabled = true)
     private val serpSettingsFeature = FakeFeatureToggleFactory.create(SerpSettingsFeature::class.java)
-    private lateinit var handler: IsNativeDuckAiEnabledHandler
+    private lateinit var handler: IsNativeRevengeAIEnabledHandler
 
     @Before
     fun setUp() {
-        handler = IsNativeDuckAiEnabledHandler(
+        handler = IsNativeRevengeAIEnabledHandler(
             duckChat = fakeDuckChat,
         )
     }
@@ -62,10 +62,10 @@ class IsNativeDuckAiEnabledHandlerTest {
     }
 
     @Test
-    fun `only contains isNativeDuckAiEnabled method`() {
+    fun `only contains isNativeRevengeAIEnabled method`() {
         val methods = handler.getJsMessageHandler().methods
         assertEquals(1, methods.size)
-        assertEquals("isNativeDuckAiEnabled", methods[0])
+        assertEquals("isNativeRevengeAIEnabled", methods[0])
     }
 
     @Test
@@ -78,7 +78,7 @@ class IsNativeDuckAiEnabledHandlerTest {
         val jsMessage = JsMessage(
             context = "test",
             featureName = "serpSettings",
-            method = "isNativeDuckAiEnabled",
+            method = "isNativeRevengeAIEnabled",
             id = null,
             params = JSONObject(),
         )
@@ -100,7 +100,7 @@ class IsNativeDuckAiEnabledHandlerTest {
         val jsMessage = JsMessage(
             context = "test",
             featureName = "serpSettings",
-            method = "isNativeDuckAiEnabled",
+            method = "isNativeRevengeAIEnabled",
             id = "test-id",
             params = JSONObject(),
         )
@@ -113,7 +113,7 @@ class IsNativeDuckAiEnabledHandlerTest {
         val response = fakeJsMessaging.getLastResponse()!!
         assertEquals("test-id", response.id)
         assertEquals("serpSettings", response.featureName)
-        assertEquals("isNativeDuckAiEnabled", response.method)
+        assertEquals("isNativeRevengeAIEnabled", response.method)
         assertEquals(true, response.params.getBoolean("enabled"))
     }
 }

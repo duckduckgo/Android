@@ -37,7 +37,7 @@ class HorizontalDivider @JvmOverloads constructor(
                 attrs,
                 R.styleable.HorizontalDivider,
                 0,
-                R.style.Widget_DuckDuckGo_HorizontalDivider,
+                R.style.Widget_Revenge_HorizontalDivider,
             )
 
         val isFullWidth = typedArray.getBoolean(R.styleable.HorizontalDivider_fullWidth, true)

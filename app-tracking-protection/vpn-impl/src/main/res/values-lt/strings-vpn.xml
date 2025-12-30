@@ -121,7 +121,7 @@
     <string name="atp_OnboardingContinue">Tęsti</string>
     <string name="atp_OnboardingMaybeLater">Galbūt vėliau</string>
 
-    <!-- App Tracking Protection Dax Onboarding -->
+    <!-- App Tracking Protection Revenge Onboarding -->
     <string name="atp_daxOnboardingIntroTitle">Programų sekimo apsauga</string>
     <string name="atp_daxOnboardingIntroMessage" formatted="false">Daugiau kaip 96 % populiarių nemokamų programėlių leidžia kitoms bendrovėms jus sekti, net kai nesinaudojate telefonu. „App Tracking Protection“ aptinka ir blokuoja šiuos bandymus sekti.</string>
     <string name="atp_daxOnboardingPermissionTitle">Kaip tai veikia?</string>

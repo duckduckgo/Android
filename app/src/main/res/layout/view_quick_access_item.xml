@@ -39,7 +39,7 @@
             android:layout_height="match_parent"
             android:padding="@dimen/keyline_2"
             android:layout_gravity="center"
-            app:shapeAppearanceOverlay="@style/Widget.DuckDuckGo.FavouritesItemFavicon"
+            app:shapeAppearanceOverlay="@style/Widget.Revenge.FavouritesItemFavicon"
             android:importantForAccessibility="no" />
 
     </com.google.android.material.card.MaterialCardView>

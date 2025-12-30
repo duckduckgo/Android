@@ -30,13 +30,13 @@ import org.json.JSONObject
 import javax.inject.Inject
 
 /**
- * Handles the isNativeDuckAiEnabled message from SERP to query Duck.ai toggle state.
+ * Handles the isNativeRevengeAIEnabled message from SERP to query Duck.ai toggle state.
  *
  * Purpose: SERP hides its Duck.ai toggle when in native browser and queries
  * native state instead, making native settings the single source of truth.
  */
 @ContributesMultibinding(AppScope::class)
-class IsNativeDuckAiEnabledHandler @Inject constructor(
+class IsNativeRevengeAIEnabledHandler @Inject constructor(
     private val duckChat: DuckChat,
 ) : ContentScopeJsMessageHandlersPlugin {
 
@@ -65,6 +65,6 @@ class IsNativeDuckAiEnabledHandler @Inject constructor(
 
             override val allowedDomains: List<String> = listOf(AppUrl.Url.HOST)
             override val featureName: String = "serpSettings"
-            override val methods: List<String> = listOf("isNativeDuckAiEnabled")
+            override val methods: List<String> = listOf("isNativeRevengeAIEnabled")
         }
 }

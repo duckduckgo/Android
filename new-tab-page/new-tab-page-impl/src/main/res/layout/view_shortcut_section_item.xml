@@ -25,7 +25,7 @@
 
     <FrameLayout
         android:id="@+id/quickAccessFaviconCard"
-        style="@style/Widget.DuckDuckGo.GridCard"
+        style="@style/Widget.Revenge.GridCard"
         android:layout_width="@dimen/gridItemImageSize"
         android:layout_height="@dimen/gridItemImageSize"
         android:layout_gravity="center_horizontal">

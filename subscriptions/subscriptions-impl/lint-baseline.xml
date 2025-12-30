@@ -2984,7 +2984,7 @@
 
     <issue
         id="ClickableViewAccessibility"
-        message="Custom view ``DaxTextView`` has `setOnTouchListener` called on it but does not override `performClick`"
+        message="Custom view ``RevengeTextView`` has `setOnTouchListener` called on it but does not override `performClick`"
         errorLine1="        binding.subscriptionGet.setOnTouchListener(null)"
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location

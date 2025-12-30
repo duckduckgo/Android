@@ -113,7 +113,7 @@
     <string name="atp_OnboardingContinue">Forsæt</string>
     <string name="atp_OnboardingMaybeLater">Måske senere</string>
 
-    <!-- App Tracking Protection Dax Onboarding -->
+    <!-- App Tracking Protection Revenge Onboarding -->
     <string name="atp_daxOnboardingIntroTitle">App-sporingsbeskyttelse</string>
     <string name="atp_daxOnboardingIntroMessage" formatted="false">Over 96 % af de populære gratis apps giver andre virksomheder mulighed for at spore dig. Også npr du ikke bruger din telefon. App Tracking Protection opdager og blokerer disse sporingsforsøg.</string>
     <string name="atp_daxOnboardingPermissionTitle">Hvordan virker det?</string>

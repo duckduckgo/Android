@@ -2,7 +2,7 @@
 
 
 <!--
-  ~ Copyright (c) 2022 DuckDuckGo
+  ~ Copyright (c) 2022 Revenge
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -23,16 +23,16 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:outlineProvider="none"
-    android:theme="@style/Widget.DuckDuckGo.ToolbarTheme">
+    android:theme="@style/Widget.Revenge.ToolbarTheme">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="?attr/daxColorToolbar"
-        android:theme="@style/Widget.DuckDuckGo.ToolbarTheme"
+        android:theme="@style/Widget.Revenge.ToolbarTheme"
         app:buttonGravity="center_vertical"
-        app:popupTheme="@style/Widget.DuckDuckGo.PopUpOverflowMenu" />
+        app:popupTheme="@style/Widget.Revenge.PopUpOverflowMenu" />
 
     <View
         android:id="@+id/topBrowserOutlineStroke"

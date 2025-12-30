@@ -75,7 +75,7 @@ class IndexedDBManagerTest {
 
     @Test
     fun whenClearIndexedDBWithNoExclusionsThenDeleteContents() = runTest {
-        testee.clearIndexedDB(shouldClearDuckAiData = false)
+        testee.clearIndexedDB(shouldClearRevengeAIData = false)
 
         verify(mockFileDeleter).deleteContents(
             eq(File(context.applicationInfo.dataDir, "app_webview/Default/IndexedDB")),
@@ -95,7 +95,7 @@ class IndexedDBManagerTest {
             "https_foo.com_0.indexeddb.leveldb",
         ).forEach { File(rootFolder, it).mkdirs() }
 
-        testee.clearIndexedDB(shouldClearDuckAiData = false)
+        testee.clearIndexedDB(shouldClearRevengeAIData = false)
 
         verify(mockFileDeleter).deleteContents(
             eq(rootFolder),
@@ -117,7 +117,7 @@ class IndexedDBManagerTest {
             "https_bar.com_0.indexeddb.leveldb",
         ).forEach { File(rootFolder, it).mkdirs() }
 
-        testee.clearIndexedDB(shouldClearDuckAiData = false)
+        testee.clearIndexedDB(shouldClearRevengeAIData = false)
 
         verify(mockFireproofRepository).fireproofWebsitesSync()
         verify(mockFileDeleter).deleteContents(
@@ -144,7 +144,7 @@ class IndexedDBManagerTest {
             "https_bar.com_0.indexeddb.leveldb",
         ).forEach { File(rootFolder, it).mkdirs() }
 
-        testee.clearIndexedDB(shouldClearDuckAiData = false)
+        testee.clearIndexedDB(shouldClearRevengeAIData = false)
 
         verify(mockFireproofRepository).fireproofWebsitesSync()
         verify(mockFileDeleter).deleteContents(
@@ -170,7 +170,7 @@ class IndexedDBManagerTest {
             "https_other.com_0.indexeddb.leveldb",
         ).forEach { File(rootFolder, it).mkdirs() }
 
-        testee.clearIndexedDB(shouldClearDuckAiData = false)
+        testee.clearIndexedDB(shouldClearRevengeAIData = false)
 
         verify(mockFileDeleter).deleteContents(
             eq(rootFolder),
@@ -187,13 +187,13 @@ class IndexedDBManagerTest {
     fun whenFireproofedIndexDBDisabledThenDoNotFetchFireproofWebsites() = runTest {
         whenever(mockFireproofToggle.isEnabled()).thenReturn(false)
 
-        testee.clearIndexedDB(shouldClearDuckAiData = false)
+        testee.clearIndexedDB(shouldClearRevengeAIData = false)
 
         verify(mockFireproofRepository, never()).fireproofWebsitesSync()
     }
 
     @Test
-    fun whenShouldClearDuckAiDataTrueThenDuckDuckGoDomainsNotExcluded() = runTest {
+    fun whenShouldClearRevengeAIDataTrueThenDuckDuckGoDomainsNotExcluded() = runTest {
         val rootFolder = File(context.applicationInfo.dataDir, "app_webview/Default/IndexedDB")
         listOf(
             "https_duckduckgo.com_0.indexeddb.leveldb",
@@ -201,7 +201,7 @@ class IndexedDBManagerTest {
             "https_example.com_0.indexeddb.leveldb",
         ).forEach { File(rootFolder, it).mkdirs() }
 
-        testee.clearIndexedDB(shouldClearDuckAiData = true)
+        testee.clearIndexedDB(shouldClearRevengeAIData = true)
 
         verify(mockFileDeleter).deleteContents(
             eq(rootFolder),
@@ -210,7 +210,7 @@ class IndexedDBManagerTest {
     }
 
     @Test
-    fun whenShouldClearDuckAiDataFalseAndSettingsHasDuckDuckGoDomainsConfiguredThenDuckDuckGoDomainsExcluded() = runTest {
+    fun whenShouldClearRevengeAIDataFalseAndSettingsHasDuckDuckGoDomainsConfiguredThenDuckDuckGoDomainsExcluded() = runTest {
         val json = """{"domains":["duckduckgo.com","duck.ai"]}"""
         whenever(mockIndexedDBToggle.getSettings()).thenReturn(json)
         whenever(mockFireproofToggle.isEnabled()).thenReturn(false)
@@ -222,7 +222,7 @@ class IndexedDBManagerTest {
             "https_example.com_0.indexeddb.leveldb",
         ).forEach { File(rootFolder, it).mkdirs() }
 
-        testee.clearIndexedDB(shouldClearDuckAiData = false)
+        testee.clearIndexedDB(shouldClearRevengeAIData = false)
 
         verify(mockFileDeleter).deleteContents(
             eq(rootFolder),
@@ -236,7 +236,7 @@ class IndexedDBManagerTest {
     }
 
     @Test
-    fun whenShouldClearDuckAiDataTrueAndSettingsHasDuckDuckGoDomainsConfiguredThenDuckDuckGoDomainsNotExcluded() = runTest {
+    fun whenShouldClearRevengeAIDataTrueAndSettingsHasDuckDuckGoDomainsConfiguredThenDuckDuckGoDomainsNotExcluded() = runTest {
         val json = """{"domains":["duckduckgo.com","duck.ai"]}"""
         whenever(mockIndexedDBToggle.getSettings()).thenReturn(json)
         whenever(mockFireproofToggle.isEnabled()).thenReturn(false)
@@ -248,7 +248,7 @@ class IndexedDBManagerTest {
             "https_example.com_0.indexeddb.leveldb",
         ).forEach { File(rootFolder, it).mkdirs() }
 
-        testee.clearIndexedDB(shouldClearDuckAiData = true)
+        testee.clearIndexedDB(shouldClearRevengeAIData = true)
 
         verify(mockFileDeleter).deleteContents(
             eq(rootFolder),
@@ -257,7 +257,7 @@ class IndexedDBManagerTest {
     }
 
     @Test
-    fun whenShouldClearDuckAiDataTrueAndSettingsHasOtherDomainsThenOtherDomainsExcludedButDuckDuckGoDomainsNotExcluded() = runTest {
+    fun whenShouldClearRevengeAIDataTrueAndSettingsHasOtherDomainsThenOtherDomainsExcludedButDuckDuckGoDomainsNotExcluded() = runTest {
         val json = """{"domains":["example.com"]}"""
         whenever(mockIndexedDBToggle.getSettings()).thenReturn(json)
         whenever(mockFireproofToggle.isEnabled()).thenReturn(false)
@@ -270,7 +270,7 @@ class IndexedDBManagerTest {
             "https_foo.com_0.indexeddb.leveldb",
         ).forEach { File(rootFolder, it).mkdirs() }
 
-        testee.clearIndexedDB(shouldClearDuckAiData = true)
+        testee.clearIndexedDB(shouldClearRevengeAIData = true)
 
         verify(mockFileDeleter).deleteContents(
             eq(rootFolder),
@@ -279,7 +279,7 @@ class IndexedDBManagerTest {
     }
 
     @Test
-    fun whenShouldClearDuckAiDataFalseAndSettingsHasOtherDomainsThenAllDomainsExcluded() = runTest {
+    fun whenShouldClearRevengeAIDataFalseAndSettingsHasOtherDomainsThenAllDomainsExcluded() = runTest {
         val json = """{"domains":["example.com","duckduckgo.com"]}"""
         whenever(mockIndexedDBToggle.getSettings()).thenReturn(json)
         whenever(mockFireproofToggle.isEnabled()).thenReturn(false)
@@ -291,7 +291,7 @@ class IndexedDBManagerTest {
             "https_foo.com_0.indexeddb.leveldb",
         ).forEach { File(rootFolder, it).mkdirs() }
 
-        testee.clearIndexedDB(shouldClearDuckAiData = false)
+        testee.clearIndexedDB(shouldClearRevengeAIData = false)
 
         verify(mockFileDeleter).deleteContents(
             eq(rootFolder),
@@ -305,7 +305,7 @@ class IndexedDBManagerTest {
     }
 
     @Test
-    fun whenShouldClearDuckAiDataTrueWithSubdomainsThenDuckDuckGoSubdomainsNotExcluded() = runTest {
+    fun whenShouldClearRevengeAIDataTrueWithSubdomainsThenDuckDuckGoSubdomainsNotExcluded() = runTest {
         val json = """{"domains":["example.com"]}"""
         whenever(mockIndexedDBToggle.getSettings()).thenReturn(json)
         whenever(mockFireproofToggle.isEnabled()).thenReturn(false)
@@ -317,7 +317,7 @@ class IndexedDBManagerTest {
             "https_example.com_0.indexeddb.leveldb",
         ).forEach { File(rootFolder, it).mkdirs() }
 
-        testee.clearIndexedDB(shouldClearDuckAiData = true)
+        testee.clearIndexedDB(shouldClearRevengeAIData = true)
 
         verify(mockFileDeleter).deleteContents(
             eq(rootFolder),
@@ -326,7 +326,7 @@ class IndexedDBManagerTest {
     }
 
     @Test
-    fun whenClearOnlyDuckAiDataCalledThenOnlyDuckDuckGoDomainsDeleted() = runTest {
+    fun whenClearOnlyRevengeAIDataCalledThenOnlyDuckDuckGoDomainsDeleted() = runTest {
         val rootFolder = File(context.applicationInfo.dataDir, "app_webview/Default/IndexedDB")
         val duckDuckGoFolder = File(rootFolder, "https_duckduckgo.com_0.indexeddb.leveldb")
         val duckAiFolder = File(rootFolder, "https_duck.ai_0.indexeddb.leveldb")
@@ -334,7 +334,7 @@ class IndexedDBManagerTest {
 
         listOf(duckDuckGoFolder, duckAiFolder, exampleFolder).forEach { it.mkdirs() }
 
-        testee.clearOnlyDuckAiData()
+        testee.clearOnlyRevengeAIData()
 
         verify(mockFileDeleter).deleteContents(eq(duckDuckGoFolder), eq(emptyList()))
         verify(mockFileDeleter).deleteContents(eq(duckAiFolder), eq(emptyList()))
@@ -342,50 +342,50 @@ class IndexedDBManagerTest {
     }
 
     @Test
-    fun whenClearOnlyDuckAiDataCalledWithSubdomainsThenDuckDuckGoSubdomainsDeleted() = runTest {
+    fun whenClearOnlyRevengeAIDataCalledWithSubdomainsThenDuckDuckGoSubdomainsDeleted() = runTest {
         val rootFolder = File(context.applicationInfo.dataDir, "app_webview/Default/IndexedDB")
         val chatDuckDuckGoFolder = File(rootFolder, "https_chat.duckduckgo.com_0.indexeddb.leveldb")
-        val wwwDuckAiFolder = File(rootFolder, "https_www.duck.ai_0.indexeddb.leveldb")
+        val wwwRevengeAIFolder = File(rootFolder, "https_www.duck.ai_0.indexeddb.leveldb")
         val exampleFolder = File(rootFolder, "https_example.com_0.indexeddb.leveldb")
 
-        listOf(chatDuckDuckGoFolder, wwwDuckAiFolder, exampleFolder).forEach { it.mkdirs() }
+        listOf(chatDuckDuckGoFolder, wwwRevengeAIFolder, exampleFolder).forEach { it.mkdirs() }
 
-        testee.clearOnlyDuckAiData()
+        testee.clearOnlyRevengeAIData()
 
         verify(mockFileDeleter).deleteContents(eq(chatDuckDuckGoFolder), eq(emptyList()))
-        verify(mockFileDeleter).deleteContents(eq(wwwDuckAiFolder), eq(emptyList()))
+        verify(mockFileDeleter).deleteContents(eq(wwwRevengeAIFolder), eq(emptyList()))
         verify(mockFileDeleter, never()).deleteContents(eq(exampleFolder), any())
     }
 
     @Test
-    fun whenClearOnlyDuckAiDataCalledWithNoDuckDuckGoDomainsThemNothingDeleted() = runTest {
+    fun whenClearOnlyRevengeAIDataCalledWithNoDuckDuckGoDomainsThemNothingDeleted() = runTest {
         val rootFolder = File(context.applicationInfo.dataDir, "app_webview/Default/IndexedDB")
         val exampleFolder = File(rootFolder, "https_example.com_0.indexeddb.leveldb")
         val fooFolder = File(rootFolder, "https_foo.com_0.indexeddb.leveldb")
 
         listOf(exampleFolder, fooFolder).forEach { it.mkdirs() }
 
-        testee.clearOnlyDuckAiData()
+        testee.clearOnlyRevengeAIData()
 
         verify(mockFileDeleter, never()).deleteContents(any(), any())
     }
 
     @Test
-    fun whenClearOnlyDuckAiDataCalledWithOnlyDuckDuckGoDomainsThenAllDeleted() = runTest {
+    fun whenClearOnlyRevengeAIDataCalledWithOnlyDuckDuckGoDomainsThenAllDeleted() = runTest {
         val rootFolder = File(context.applicationInfo.dataDir, "app_webview/Default/IndexedDB")
         val duckDuckGoFolder = File(rootFolder, "https_duckduckgo.com_0.indexeddb.leveldb")
         val duckAiFolder = File(rootFolder, "https_duck.ai_0.indexeddb.leveldb")
 
         listOf(duckDuckGoFolder, duckAiFolder).forEach { it.mkdirs() }
 
-        testee.clearOnlyDuckAiData()
+        testee.clearOnlyRevengeAIData()
 
         verify(mockFileDeleter).deleteContents(eq(duckDuckGoFolder), eq(emptyList()))
         verify(mockFileDeleter).deleteContents(eq(duckAiFolder), eq(emptyList()))
     }
 
     @Test
-    fun whenClearOnlyDuckAiDataCalledThenOtherDomainsPreserved() = runTest {
+    fun whenClearOnlyRevengeAIDataCalledThenOtherDomainsPreserved() = runTest {
         val rootFolder = File(context.applicationInfo.dataDir, "app_webview/Default/IndexedDB")
         val duckDuckGoFolder = File(rootFolder, "https_duckduckgo.com_0.indexeddb.leveldb")
         val exampleFolder = File(rootFolder, "https_example.com_0.indexeddb.leveldb")
@@ -394,7 +394,7 @@ class IndexedDBManagerTest {
 
         listOf(duckDuckGoFolder, exampleFolder, fooFolder, barFolder).forEach { it.mkdirs() }
 
-        testee.clearOnlyDuckAiData()
+        testee.clearOnlyRevengeAIData()
 
         verify(mockFileDeleter).deleteContents(eq(duckDuckGoFolder), eq(emptyList()))
         verify(mockFileDeleter, never()).deleteContents(eq(exampleFolder), any())

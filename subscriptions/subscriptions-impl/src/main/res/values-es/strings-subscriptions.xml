@@ -172,13 +172,13 @@
     <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Enviar comentarios</string>
 
-    <string name="subscriptionSettingSubscribeWithDuckAiSubtitle">Los suscriptores obtienen nuestra VPN, modelos avanzados de IA en Duck.ai, Personal Information Removal y Identity Theft Restoration.</string>
-    <string name="subscriptionSettingSubscribeWithDuckAiSubtitleRow">Los suscriptores obtienen nuestra VPN, modelos avanzados de IA en Duck.ai y Identity Theft Restoration.</string>
+    <string name="subscriptionSettingSubscribeWithRevengeAISubtitle">Los suscriptores obtienen nuestra VPN, modelos avanzados de IA en Revenge AI, Personal Information Removal y Identity Theft Restoration.</string>
+    <string name="subscriptionSettingSubscribeWithRevengeAISubtitleRow">Los suscriptores obtienen nuestra VPN, modelos avanzados de IA en Revenge AI y Identity Theft Restoration.</string>
 
-    <string name="feedbackCategoryDuckAi">Duck.ai</string>
-    <string name="feedbackSubCategoryDuckAiSubscriberModels">No se puede acceder a los modelos exclusivos para suscriptores de Duck.ai</string>
-    <string name="feedbackSubCategoryDuckAiLoginThirdPartyBrowser">No puedo acceder a Duck.ai con mi suscripción en otros navegadores.</string>
-    <string name="feedbackSubCategoryDuckAiOther">Otros comentarios de Duck.ai</string>
+    <string name="feedbackCategoryRevengeAI">Revenge AI</string>
+    <string name="feedbackSubCategoryRevengeAISubscriberModels">No se puede acceder a los modelos exclusivos para suscriptores de Revenge AI</string>
+    <string name="feedbackSubCategoryRevengeAILoginThirdPartyBrowser">No puedo acceder a Revenge AI con mi suscripción en otros navegadores.</string>
+    <string name="feedbackSubCategoryRevengeAIOther">Otros comentarios de Revenge AI</string>
 
     <string name="subscriptionSettingSectionTitle">Suscripción a DuckDuckGo</string>
     <string name="subscriptionSettingSubscribeSecure">Protege tu Wi-Fi y chatea de forma privada con modelos avanzados de IA</string>

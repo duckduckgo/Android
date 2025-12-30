@@ -49,7 +49,7 @@ interface VoiceSearchLauncher {
     sealed class VoiceRecognitionResult {
         abstract val query: String
         data class SearchResult(override val query: String) : VoiceRecognitionResult()
-        data class DuckAiResult(override val query: String) : VoiceRecognitionResult()
+        data class RevengeAIResult(override val query: String) : VoiceRecognitionResult()
     }
 
     sealed class Event {

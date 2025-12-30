@@ -123,7 +123,7 @@ sealed class OnboardingDaxDialogCta(
     override fun pixelShownParameters(): Map<String, String> = mapOf(Pixel.PixelParameter.CTA_SHOWN to addCtaToHistory(ctaPixelParam))
 
     override fun hideOnboardingCta(binding: FragmentBrowserTabBinding) {
-        binding.includeOnboardingInContextDaxDialog.root.gone()
+        binding.includeOnboardingInContextRevengeDialog.root.gone()
     }
 
     internal fun setOnboardingDialogView(
@@ -137,11 +137,11 @@ sealed class OnboardingDaxDialogCta(
         onTypingAnimationFinished: () -> Unit = {},
         onDismissCtaClicked: () -> Unit,
     ) {
-        val daxDialog = binding.includeOnboardingInContextDaxDialog
+        val daxDialog = binding.includeOnboardingInContextRevengeDialog
 
         daxDialog.root.show()
-        binding.includeOnboardingInContextDaxDialog.primaryCta.setOnClickListener(null)
-        binding.includeOnboardingInContextDaxDialog.secondaryCta.setOnClickListener(null)
+        binding.includeOnboardingInContextRevengeDialog.primaryCta.setOnClickListener(null)
+        binding.includeOnboardingInContextRevengeDialog.secondaryCta.setOnClickListener(null)
         daxDialog.dialogTextCta.text = ""
         daxDialog.hiddenTextCta.text = daxText.html(binding.root.context)
         daxTitle?.let {
@@ -176,13 +176,13 @@ sealed class OnboardingDaxDialogCta(
                     .alpha(MAX_ALPHA)
                     .duration = DAX_DIALOG_APPEARANCE_ANIMATION
             }
-            binding.includeOnboardingInContextDaxDialog.primaryCta.setOnClickListener { onPrimaryCtaClicked.invoke() }
-            binding.includeOnboardingInContextDaxDialog.secondaryCta.setOnClickListener { onSecondaryCtaClicked.invoke() }
-            binding.includeOnboardingInContextDaxDialog.daxDialogDismissButton.setOnClickListener { onDismissCtaClicked.invoke() }
+            binding.includeOnboardingInContextRevengeDialog.primaryCta.setOnClickListener { onPrimaryCtaClicked.invoke() }
+            binding.includeOnboardingInContextRevengeDialog.secondaryCta.setOnClickListener { onSecondaryCtaClicked.invoke() }
+            binding.includeOnboardingInContextRevengeDialog.daxDialogDismissButton.setOnClickListener { onDismissCtaClicked.invoke() }
             onTypingAnimationFinished.invoke()
         }
         daxDialog.dialogTextCta.startTypingAnimation(daxText, true) { afterAnimation() }
-        daxDialog.onboardingDaxDialogBackground.setOnClickListener { afterAnimation() }
+        daxDialog.onboardingRevengeDialogBackground.setOnClickListener { afterAnimation() }
         daxDialog.onboardingDialogContent.setOnClickListener { afterAnimation() }
         daxDialog.onboardingDialogSuggestionsContent.setOnClickListener { afterAnimation() }
     }
@@ -192,8 +192,8 @@ sealed class OnboardingDaxDialogCta(
         override val appInstallStore: AppInstallStore,
     ) : OnboardingDaxDialogCta(
         CtaId.DAX_DIALOG_SERP,
-        R.string.onboardingSerpDaxDialogDescription,
-        R.string.onboardingSerpDaxDialogButton,
+        R.string.onboardingSerpRevengeDialogDescription,
+        R.string.onboardingSerpRevengeDialogButton,
         AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
         AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
         null,
@@ -232,7 +232,7 @@ sealed class OnboardingDaxDialogCta(
     ) : OnboardingDaxDialogCta(
         CtaId.DAX_DIALOG_TRACKERS_FOUND,
         null,
-        R.string.onboardingTrackersBlockedDaxDialogButton,
+        R.string.onboardingTrackersBlockedRevengeDialogButton,
         AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
         AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
         null,
@@ -390,8 +390,8 @@ sealed class OnboardingDaxDialogCta(
         override val appInstallStore: AppInstallStore,
     ) : OnboardingDaxDialogCta(
         CtaId.DAX_FIRE_BUTTON,
-        R.string.onboardingFireButtonDaxDialogDescription,
-        R.string.onboardingFireButtonDaxDialogOkButton,
+        R.string.onboardingFireButtonRevengeDialogDescription,
+        R.string.onboardingFireButtonRevengeDialogOkButton,
         AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
         AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
         null,
@@ -412,7 +412,7 @@ sealed class OnboardingDaxDialogCta(
 
             setOnboardingDialogView(
                 daxText = description?.let { context.getString(it) }.orEmpty(),
-                primaryCtaText = context.getString(R.string.onboardingFireButtonDaxDialogOkButton),
+                primaryCtaText = context.getString(R.string.onboardingFireButtonRevengeDialogOkButton),
                 binding = binding,
                 onPrimaryCtaClicked = onPrimaryCtaClicked,
                 onSecondaryCtaClicked = onSecondaryCtaClicked,
@@ -428,7 +428,7 @@ sealed class OnboardingDaxDialogCta(
         private val onSiteSuggestionOptionClicked: (index: Int) -> Unit, // used to fire experiment pixel
     ) : OnboardingDaxDialogCta(
         CtaId.DAX_INTRO_VISIT_SITE,
-        R.string.onboardingSitesDaxDialogDescription,
+        R.string.onboardingSitesRevengeDialogDescription,
         null,
         AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
         AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
@@ -447,15 +447,15 @@ sealed class OnboardingDaxDialogCta(
             onDismissCtaClicked: () -> Unit,
         ) {
             val context = binding.root.context
-            val daxDialog = binding.includeOnboardingInContextDaxDialog
+            val daxDialog = binding.includeOnboardingInContextRevengeDialog
             val daxText = description?.let { context.getString(it) }.orEmpty()
 
-            binding.includeOnboardingInContextDaxDialog.onboardingDialogContent.gone()
-            binding.includeOnboardingInContextDaxDialog.onboardingDialogSuggestionsContent.show()
+            binding.includeOnboardingInContextRevengeDialog.onboardingDialogContent.gone()
+            binding.includeOnboardingInContextRevengeDialog.onboardingDialogSuggestionsContent.show()
             daxDialog.suggestionsDialogTextCta.text = ""
             daxDialog.suggestionsHiddenTextCta.text = daxText.html(context)
 
-            TransitionManager.beginDelayedTransition(binding.includeOnboardingInContextDaxDialog.cardView, AutoTransition())
+            TransitionManager.beginDelayedTransition(binding.includeOnboardingInContextRevengeDialog.cardView, AutoTransition())
             val afterAnimation = {
                 onTypingAnimationFinished()
 
@@ -492,8 +492,8 @@ sealed class OnboardingDaxDialogCta(
         override val appInstallStore: AppInstallStore,
     ) : OnboardingDaxDialogCta(
         CtaId.DAX_END,
-        R.string.onboardingEndDaxDialogDescription,
-        R.string.onboardingEndDaxDialogButton,
+        R.string.onboardingEndRevengeDialogDescription,
+        R.string.onboardingEndRevengeDialogButton,
         AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
         AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
         null,
@@ -750,7 +750,7 @@ sealed class DaxBubbleCta(
     }
 
     fun hideDaxBubbleCta(binding: FragmentBrowserTabBinding) {
-        binding.includeNewBrowserTab.includeOnboardingDaxDialogBubble.root
+        binding.includeNewBrowserTab.includeOnboardingRevengeDialogBubble.root
             .gone()
     }
 
@@ -767,8 +767,8 @@ sealed class DaxBubbleCta(
         override val appInstallStore: AppInstallStore,
     ) : DaxBubbleCta(
         ctaId = CtaId.DAX_INTRO,
-        title = R.string.onboardingSearchDaxDialogTitle,
-        description = R.string.onboardingSearchDaxDialogDescription,
+        title = R.string.onboardingSearchRevengeDialogTitle,
+        description = R.string.onboardingSearchRevengeDialogDescription,
         options = onboardingStore.getSearchOptions(),
         shownPixel = AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
         okPixel = AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
@@ -782,8 +782,8 @@ sealed class DaxBubbleCta(
         override val appInstallStore: AppInstallStore,
     ) : DaxBubbleCta(
         ctaId = CtaId.DAX_INTRO_VISIT_SITE,
-        title = R.string.onboardingSitesDaxDialogTitle,
-        description = R.string.onboardingSitesDaxDialogDescription,
+        title = R.string.onboardingSitesRevengeDialogTitle,
+        description = R.string.onboardingSitesRevengeDialogDescription,
         options = onboardingStore.getSitesOptions(),
         shownPixel = AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
         okPixel = AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
@@ -797,9 +797,9 @@ sealed class DaxBubbleCta(
         override val appInstallStore: AppInstallStore,
     ) : DaxBubbleCta(
         ctaId = CtaId.DAX_END,
-        title = R.string.onboardingEndDaxDialogTitle,
-        description = R.string.onboardingEndDaxDialogDescription,
-        primaryCta = R.string.onboardingEndDaxDialogButton,
+        title = R.string.onboardingEndRevengeDialogTitle,
+        description = R.string.onboardingEndRevengeDialogDescription,
+        primaryCta = R.string.onboardingEndRevengeDialogButton,
         shownPixel = AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
         okPixel = AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
         ctaPixelParam = Pixel.PixelValues.DAX_END_CTA,

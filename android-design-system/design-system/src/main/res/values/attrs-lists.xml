@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Copyright (c) 2021 DuckDuckGo
+  ~ Copyright (c) 2021 Revenge
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -116,7 +116,7 @@
         <enum name="placeholder" value="1" />
         <enum name="shortcut" value="2" />
     </attr>
-    <declare-styleable name="DaxGridItem">
+    <declare-styleable name="RevengeGridItem">
         <attr name="primaryText"/>
         <attr name="leadingIcon"/>
         <attr name="gridItemType"/>

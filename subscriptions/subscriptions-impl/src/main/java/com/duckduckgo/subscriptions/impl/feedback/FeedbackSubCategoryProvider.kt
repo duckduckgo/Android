@@ -38,7 +38,7 @@ class RealFeedbackSubCategoryProvider @Inject constructor() : FeedbackSubCategor
             SUBS_AND_PAYMENTS -> getSubsSubCategories()
             PIR -> getPirSubCategories()
             ITR -> getItrSubCategories()
-            DUCK_AI -> getDuckAiSubCategories()
+            DUCK_AI -> getRevengeAISubCategories()
         }
     }
 
@@ -79,11 +79,11 @@ class RealFeedbackSubCategoryProvider @Inject constructor() : FeedbackSubCategor
         )
     }
 
-    private fun getDuckAiSubCategories(): Map<Int, SubscriptionFeedbackSubCategory> {
+    private fun getRevengeAISubCategories(): Map<Int, SubscriptionFeedbackSubCategory> {
         return mapOf(
-            R.string.feedbackSubCategoryDuckAiSubscriberModels to SubscriptionFeedbackDuckAiSubCategory.ACCESS_SUBSCRIPTION_MODELS,
-            R.string.feedbackSubCategoryDuckAiLoginThirdPartyBrowser to SubscriptionFeedbackDuckAiSubCategory.LOGIN_THIRD_PARTY_BROWSER,
-            R.string.feedbackSubCategoryDuckAiOther to SubscriptionFeedbackDuckAiSubCategory.OTHER,
+            R.string.feedbackSubCategoryRevengeAISubscriberModels to SubscriptionFeedbackRevengeAISubCategory.ACCESS_SUBSCRIPTION_MODELS,
+            R.string.feedbackSubCategoryRevengeAILoginThirdPartyBrowser to SubscriptionFeedbackRevengeAISubCategory.LOGIN_THIRD_PARTY_BROWSER,
+            R.string.feedbackSubCategoryRevengeAIOther to SubscriptionFeedbackRevengeAISubCategory.OTHER,
         )
     }
 }

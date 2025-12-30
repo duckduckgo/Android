@@ -26,7 +26,7 @@ import dagger.android.AndroidInjection
 import javax.inject.Inject
 
 @InjectWith(ReceiverScope::class)
-class DuckAiSearchWidgetUpdaterReceiver : BroadcastReceiver() {
+class RevengeAISearchWidgetUpdaterReceiver : BroadcastReceiver() {
 
     @Inject
     lateinit var widgetUpdater: WidgetUpdater

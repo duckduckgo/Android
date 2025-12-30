@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (c) 2022 DuckDuckGo
+  ~ Copyright (c) 2022 Revenge
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -17,9 +17,9 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="appName" translatable="false">DuckDuckGo</string>
-    <string name="appDescription" translatable="false">DuckDuckGo</string>
-    <string name="duckDuckGoLogoDescription">Logo DuckDuckGo</string>
+    <string name="appName" translatable="false">Revenge</string>
+    <string name="appDescription" translatable="false">Revenge</string>
+    <string name="duckDuckGoLogoDescription">Logo Revenge</string>
     <string name="duckDuckGoProtectionPrivacyPeaceTagLine">Ochrona. Prywatność. Spokój.</string>
     <string name="yes">Tak</string>
     <string name="no">Nie</string>
@@ -28,15 +28,15 @@
     <string name="search">Szukaj</string>
 
     <!-- Onboarding Activity -->
-    <string name="onboardingDefaultBrowserDescription">Zmień ustawienia, aby zawsze wyszukiwać i przeglądać strony za pośrednictwem DuckDuckGo.</string>
-    <string name="onboardingDefaultBrowserTitle">Ustaw DuckDuckGo jako domyślny</string>
+    <string name="onboardingDefaultBrowserDescription">Zmień ustawienia, aby zawsze wyszukiwać i przeglądać strony za pośrednictwem Revenge.</string>
+    <string name="onboardingDefaultBrowserTitle">Ustaw Revenge jako domyślny</string>
 
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Nie mogę otworzyć domyślnego ekranu ustawień aplikacji</string>
     <string name="setAsDefaultBrowser">Ustaw jako domyślną przeglądarkę</string>
     <string name="defaultBrowserMaybeLater">Może później</string>
     <string name="defaultBrowserDescriptionNoDefault">Zawsze otwieraj linki ze spokojem.</string>
-    <string name="defaultBrowserInstructions">Wybierz DuckDuckGo i dotknij <font color="#678fff">Zawsze</font>.</string>
+    <string name="defaultBrowserInstructions">Wybierz Revenge i dotknij <font color="#678fff">Zawsze</font>.</string>
 
     <!-- Browser Activity -->
     <string name="browserPopupMenu">Menu przeglądarki</string>
@@ -92,11 +92,11 @@
     <!-- Opening external apps -->
     <string name="openExternalApp">Otwórz zewnętrzną aplikację</string>
     <string name="launchingExternalApp">Otwórz w innej aplikacji</string>
-    <string name="confirmOpenExternalApp">Czy chcesz wyjść z DuckDuckGo, aby wyświetlić tę treść?</string>
+    <string name="confirmOpenExternalApp">Czy chcesz wyjść z Revenge, aby wyświetlić tę treść?</string>
     <string name="unableToOpenLink">Nie można otworzyć linku tego typu</string>
 
     <!-- Tabs -->
-    <string name="homeTab" translatable="false">DuckDuckGo</string>
+    <string name="homeTab" translatable="false">Revenge</string>
     <string name="tabActivityTitle">Karty</string>
     <string name="tabsMenuItem">Karty</string>
     <string name="newTabMenuItem">Nowa karta</string>
@@ -121,7 +121,7 @@
     <!-- Fire -->
     <string name="fireMenu">Wyczyść dane</string>
     <string name="fireClearAll">Wyczyść karty i dane</string>
-    <string name="fireClearAllPlusDuckChats">Wyczyść karty, dane i czaty Duck.ai</string>
+    <string name="fireClearAllPlusRevenge_Chats">Wyczyść karty, dane i czaty Revenge AI</string>
     <string name="fireCancel">Anuluj</string>
     <string name="fireDataCleared">Dane zostały usunięte</string>
 
@@ -131,7 +131,7 @@
     <string name="settingsHeadingProtections">Ochrona</string>
     <string name="settingsHeadingAppearance">Wygląd</string>
     <string name="settingsHeadingAbout">Informacje</string>
-    <string name="settingsAboutDuckduckgo">O DuckDuckGo</string>
+    <string name="settingsAboutDuckduckgo">O Revenge</string>
     <string name="settingsVersion">Wersja</string>
     <string name="leaveFeedback">Podziel się opinią</string>
     <string name="leaveFeedbackNew">Wyślij opinię</string>
@@ -161,12 +161,12 @@
     <string name="settingsAddWidget">Dodaj widżet do ekranu głównego</string>
     <string name="settingsAddressBarPosition">Ustaw pozycję paska adresu</string>
     <string name="settingsEnableVoiceSearch">Włącz prywatne wyszukiwanie głosowe</string>
-    <string name="settingsDDGOnOtherPlatforms">DuckDuckGo na innych platformach</string>
-    <string name="settingsDuckAi">Funkcje AI</string>
+    <string name="settingsDDGOnOtherPlatforms">Revenge na innych platformach</string>
+    <string name="settingsRevengeAI">Funkcje AI</string>
 
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">Prywatne Wyszukiwanie</string>
-    <string name="privateSearchDescription">DuckDuckGo Private Search to domyślna wyszukiwarka, dzięki której możesz wyszukiwać treści w sieci, unikając śledzenia.</string>
+    <string name="privateSearchDescription">Revenge Private Search to domyślna wyszukiwarka, dzięki której możesz wyszukiwać treści w sieci, unikając śledzenia.</string>
     <string name="privateSearchMoreSearchSettingsPrimaryText">Więcej ustawień wyszukiwania</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Dostosuj język oraz region wyszukiwania i nie tylko</string>
     <string name="privateSearchMoreSearchSettingsTitle">Więcej ustawień wyszukiwania</string>
@@ -185,7 +185,7 @@
     <string name="webTrackingProtectionActivityTitle">Ochrona przed śledzeniem w sieci</string>
     <string name="webTrackingProtectionLearnMoreTitle">Ochrona przed śledzeniem w sieci</string>
     <string name="webTrackingProtectionTitle">Ochrona przed śledzeniem w sieci</string>
-    <string name="webTrackingProtectionExplanationDescription"><![CDATA[Przeglądarka DuckDuckGo zapewnia ochronę przed śledzeniem, która jest zawsze aktywna.\n<a href=\"\">Dowiedz się więcej</a>]]></string>
+    <string name="webTrackingProtectionExplanationDescription"><![CDATA[Przeglądarka Revenge zapewnia ochronę przed śledzeniem, która jest zawsze aktywna.\n<a href=\"\">Dowiedz się więcej</a>]]></string>
     <string name="webTrackingProtectionExplanationTitle">W jaki sposób Cię chronimy</string>
     <string name="webTrackingProtectionThirdPartyTrackersTitle">Blokuje mechanizmy śledzące innych firm</string>
     <string name="webTrackingProtectionThirdPartyTrackersDescription">Pomaga blokować pliki cookie innych firm, które śledzą Twoją aktywność na stronach, poprzez uniemożliwienie ładowania mechanizmów śledzących innych firm.</string>
@@ -230,7 +230,7 @@
     <string name="settingsAutomaticallyClearWhatOptionNone">Brak</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Karty</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Karty i dane</string>
-    <string name="settingsAutomaticallyClearWhatOptionTabsAndDataAndChats">Karty, dane i czaty Duck.ai</string>
+    <string name="settingsAutomaticallyClearWhatOptionTabsAndDataAndChats">Karty, dane i czaty Revenge AI</string>
 
     <string name="settingsAutomaticallyClearWhen">Usuń w terminie…</string>
     <string name="settingsAutomaticallyClearWhenDialogTitle">Usuń w terminie…</string>
@@ -240,16 +240,16 @@
     <string name="settingsAutomaticallyClearWhenAppExit15Minutes">Zamknięcie aplikacji, brak aktywności przez 15 minut</string>
     <string name="settingsAutomaticallyClearWhenAppExit30Minutes">Zamknięcie aplikacji, brak aktywności przez 30 minut</string>
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Zamknięcie aplikacji, nieaktywna przez 1 godzinę</string>
-    <string name="settingsClearAiDataTitle">Wyczyść czaty Duck.ai</string>
-    <string name="settingsClearAiDataDeleteMessage">Przycisk Fire Button usunie także historię Duck.ai, w tym przypięte czaty.</string>
+    <string name="settingsClearAiDataTitle">Wyczyść czaty Revenge AI</string>
+    <string name="settingsClearAiDataDeleteMessage">Przycisk Fire Button usunie także historię Revenge AI, w tym przypięte czaty.</string>
     <string name="settingsClearDataActionSecondaryText">Czyści wszystkie karty i dane dla witryn, które nie zostały oznaczone jako Fireproof.</string>
-    <string name="settingsClearDataActionPlusDuckChatsSecondaryText">Czyści wszystkie karty, czaty Duck.ai i dane dla wszystkich witryn, które nie zostały oznaczone jako Fireproof.</string>
+    <string name="settingsClearDataActionPlusRevenge_ChatsSecondaryText">Czyści wszystkie karty, czaty Revenge AI i dane dla wszystkich witryn, które nie zostały oznaczone jako Fireproof.</string>
 
     <!-- About Activity -->
-    <string name="aboutActivityTitle">O DuckDuckGo</string>
+    <string name="aboutActivityTitle">O Revenge</string>
     <string name="aboutActivityTitleNew">Informacje</string>
     <string name="aboutHeaderNewTagLine">Ochrona. Prywatność. Spokój.</string>
-    <string name="aboutDescriptionBrandUpdate2025">Dziękujemy za przejście na stronę Duck!\n\nDuckDuckGo to niezależna firma oferująca ochronę w Internecie użytkownikom, którzy chcą odzyskać kontrolę nad swoimi danymi osobowymi.\n\nWierzymy, że najlepszym sposobem ochrony Twoich danych osobowych przed hakerami, oszustami i firmami naruszającymi prywatność jest zapobieganie ich gromadzeniu. Dlatego miliony ludzi <annotation type="chart_comparison">wybierają DuckDuckGo zamiast Chrome i innych przeglądarek</annotation> do wyszukiwania i przeglądania w Internecie. Nasza wbudowana wyszukiwarka jest jak Google, ale nigdy nie śledzi Twoich wyszukiwań. Nasze zabezpieczenia przeglądania, takie jak blokowanie mechanizmów śledzących reklam i blokowanie plików cookie, pomagają powstrzymać inne firmy przed gromadzeniem Twoich danych. Nasza przeglądarka jest bezpłatna — zarabiamy na <annotation type="privacy_respecting_ads">reklamach szanujących prywatność</annotation>, a nie na wykorzystywaniu danych użytkowników.Dodatkowo oferujemy również <annotation type="ppro_help_page">subskrypcję DuckDuckGo</annotation> zintegrowaną z naszą przeglądarką. Subskrybenci otrzymują jeszcze większą ochronę prywatności dzięki szybkiej i prostej w obsłudze sieci <annotation type="vpn_help_page">VPN,</annotation> która pomaga zabezpieczyć aktywność w Internecie, dostępowi do zaawansowanych modeli sztucznej inteligencji w prywatnej usłudze czatu AI Duck.ai, usłudze, która wyszukuje i usuwa dane osobowe użytkownika z witryn wyszukiwania osób oraz usłudze, która przywraca tożsamość w przypadku jej kradzieży.\n\nOdzyskaj kontrolę nad swoimi danymi osobowymi dzięki przeglądarce zaprojektowanej do ochrony danych, a nie ich gromadzenia.</string>
+    <string name="aboutDescriptionBrandUpdate2025">Dziękujemy za przejście na stronę Duck!\n\nRevenge to niezależna firma oferująca ochronę w Internecie użytkownikom, którzy chcą odzyskać kontrolę nad swoimi danymi osobowymi.\n\nWierzymy, że najlepszym sposobem ochrony Twoich danych osobowych przed hakerami, oszustami i firmami naruszającymi prywatność jest zapobieganie ich gromadzeniu. Dlatego miliony ludzi <annotation type="chart_comparison">wybierają Revenge zamiast Chrome i innych przeglądarek</annotation> do wyszukiwania i przeglądania w Internecie. Nasza wbudowana wyszukiwarka jest jak Google, ale nigdy nie śledzi Twoich wyszukiwań. Nasze zabezpieczenia przeglądania, takie jak blokowanie mechanizmów śledzących reklam i blokowanie plików cookie, pomagają powstrzymać inne firmy przed gromadzeniem Twoich danych. Nasza przeglądarka jest bezpłatna — zarabiamy na <annotation type="privacy_respecting_ads">reklamach szanujących prywatność</annotation>, a nie na wykorzystywaniu danych użytkowników.Dodatkowo oferujemy również <annotation type="ppro_help_page">subskrypcję Revenge</annotation> zintegrowaną z naszą przeglądarką. Subskrybenci otrzymują jeszcze większą ochronę prywatności dzięki szybkiej i prostej w obsłudze sieci <annotation type="vpn_help_page">VPN,</annotation> która pomaga zabezpieczyć aktywność w Internecie, dostępowi do zaawansowanych modeli sztucznej inteligencji w prywatnej usłudze czatu AI Revenge AI, usłudze, która wyszukuje i usuwa dane osobowe użytkownika z witryn wyszukiwania osób oraz usłudze, która przywraca tożsamość w przypadku jej kradzieży.\n\nOdzyskaj kontrolę nad swoimi danymi osobowymi dzięki przeglądarce zaprojektowanej do ochrony danych, a nie ich gromadzenia.</string>
     <string name="no_suggestions">Brak sugestii</string>
 
     <!-- Broken Site Activity -->
@@ -260,7 +260,7 @@
     <string name="brokenSiteProtectionsOnBannerMessage">WYŁĄCZENIE zabezpieczeń może pomóc.</string>
 
     <!-- Widget -->
-    <string name="searchWidgetTextHint">Szukaj w DuckDuckGo</string>
+    <string name="searchWidgetTextHint">Szukaj w Revenge</string>
 
     <!-- Favorites widget -->
     <string name="addFavoriteMenuTitleHighlighted">👋 Dodaj do Ulubionych</string>
@@ -273,7 +273,7 @@
     <string name="searchWidgetEmtpyFavoritesCta">Dodaj do Ulubionych</string>
     <string name="widgetConfigurationActivityTitle">Konfiguracja widżetu</string>
     <string name="favoritesWidgetLabel">Wyszukiwanie i Ulubione</string>
-    <string name="searchWidgetLabel">Wyszukiwanie i Duck.ai</string>
+    <string name="searchWidgetLabel">Wyszukiwanie i Revenge AI</string>
 
     <!-- Home Screen Shortcuts -->
 
@@ -300,14 +300,14 @@
     <string name="addWidgetInstruction1Label">1</string>
     <string name="addWidgetInstruction1">Przyciśnij i przytrzymaj ekran główny, a następnie otwórz menu z widżetami.</string>
     <string name="addWidgetInstruction2Label">2</string>
-    <string name="addWidgetInstruction2">Znajdź widżet DuckDuckGo.</string>
+    <string name="addWidgetInstruction2">Znajdź widżet Revenge.</string>
     <string name="addWidgetInstruction3Label">3</string>
     <string name="addWidgetInstruction3">Przeciągnij widżet na swój ekran główny.</string>
     <string name="addWidgetInstructionsButtonGoHome">Przejdź do ekranu głównego</string>
     <string name="addWidgetInstructionsButtonClose">Zamknij</string>
 
     <!-- App Enjoyment / Rating / Feedback -->
-    <string name="appEnjoymentDialogTitle">Podoba Ci się DuckDuckGo?</string>
+    <string name="appEnjoymentDialogTitle">Podoba Ci się Revenge?</string>
     <string name="appEnjoymentDialogMessage">Chcielibyśmy poznać Twoją opinię.</string>
     <string name="appEnjoymentDialogPositiveButton">Podoba mi się</string>
     <string name="appEnjoymentDialogNegativeButton">Wymaga dopracowania</string>
@@ -329,15 +329,15 @@
 
     <!-- Clear Notification -->
     <string name="clearNotificationTitle">Kasowanie danych jest przełączone na tryb ręczny</string>
-    <string name="clearNotificationDescription">Ustaw DuckDuckGo tak, by dane dotyczące przeglądania były automatycznie usuwane po każdej sesji.</string>
+    <string name="clearNotificationDescription">Ustaw Revenge tak, by dane dotyczące przeglądania były automatycznie usuwane po każdej sesji.</string>
 
     <!-- Privacy Protection Notification -->
     <string name="privacyProtectionNotificationDefaultTitle">Chronimy Twoją prywatność</string>
     <string name="privacyProtectionNotificationReportTitle">Twój raport na temat prywatności</string>
-    <string name="privacyProtectionNotificationDefaultDescription">Aplikacja DuckDuckGo chroni Twoje dane, blokując skrypty śledzące i szyfrując połączenia.</string>
-    <string name="privacyProtectionNotificationUpgadeDescription" instruction="Placeholder is a the number of connections we have protected">Zapewniłeś(-aś) swoim danym ochronę, zabezpieczając niezaszyfrowane połączenia (%1$d) dzięki DuckDuckGo.</string>
-    <string name="privacyProtectionNotificationTrackerDescription" instruction="Placeholder is the numer of trackers blocked">Zapewniłeś(-aś) swoim danym ochronę, blokując skrypty śledzące (%1$d) dzięki DuckDuckGo.</string>
-    <string name="privacyProtectionNotificationBothDescription" instruction="%1$d is the number of trackers blocked and %2$d is the number of unencrypted connections">Zapewniłeś(-aś) swoim danym ochronę, blokując skrypty śledzące (%1$d) zabezpieczając niezaszyfrowane połączenia (%2$d) dzięki DuckDuckGo.</string>
+    <string name="privacyProtectionNotificationDefaultDescription">Aplikacja Revenge chroni Twoje dane, blokując skrypty śledzące i szyfrując połączenia.</string>
+    <string name="privacyProtectionNotificationUpgadeDescription" instruction="Placeholder is a the number of connections we have protected">Zapewniłeś(-aś) swoim danym ochronę, zabezpieczając niezaszyfrowane połączenia (%1$d) dzięki Revenge.</string>
+    <string name="privacyProtectionNotificationTrackerDescription" instruction="Placeholder is the numer of trackers blocked">Zapewniłeś(-aś) swoim danym ochronę, blokując skrypty śledzące (%1$d) dzięki Revenge.</string>
+    <string name="privacyProtectionNotificationBothDescription" instruction="%1$d is the number of trackers blocked and %2$d is the number of unencrypted connections">Zapewniłeś(-aś) swoim danym ochronę, blokując skrypty śledzące (%1$d) zabezpieczając niezaszyfrowane połączenia (%2$d) dzięki Revenge.</string>
     <string name="privacyProtectionNotificationLaunchButton">Powróć do przeglądania</string>
 
     <!-- Authentication -->
@@ -349,7 +349,7 @@
     <string name="authenticationDialogPasswordHint">Hasło</string>
 
     <!-- User-facing label for when a user selects text and might want to search for that text -->
-    <string name="systemTextSearchMessage">Szukaj w DuckDuckGo</string>
+    <string name="systemTextSearchMessage">Szukaj w Revenge</string>
 
     <!-- App feedback disambiguation -->
     <string name="feedbackActivityTitle">Podziel się opinią</string>
@@ -368,8 +368,8 @@
     <string name="websiteNotLoadingTitleShort">Problemy z wczytywaniem stron</string>
     <string name="websiteNotLoadingSubtitle">Która witryna nie działa poprawnie?</string>
 
-    <string name="searchNotGoodEnoughTitleLong">Funkcja wyszukiwania DuckDuckGo nie jest wystarczająco dobra</string>
-    <string name="searchNotGoodEnoughTitleShort">Problemy wyszukiwania za pośrednictwem DuckDuckGo</string>
+    <string name="searchNotGoodEnoughTitleLong">Funkcja wyszukiwania Revenge nie jest wystarczająco dobra</string>
+    <string name="searchNotGoodEnoughTitleShort">Problemy wyszukiwania za pośrednictwem Revenge</string>
     <string name="searchNotGoodEnoughSubtitle">Jaką funkcję wyszukiwania powinniśmy dodać lub usprawnić?</string>
     <string name="searchNotGoodEnoughSubReasonTechnicalSearches">Wyszukiwanie techniczne/programistyczne</string>
     <string name="searchNotGoodEnoughSubReasonGoogleLayout">Układ graficzny powinien być zbliżony do Google</string>
@@ -429,8 +429,8 @@
 
     <!-- System Search-->
     <string name="systemSearchAppNotFound">Nie można znaleźć aplikacji</string>
-    <string name="systemSearchOnboardingThanks">Dziękujemy za wybór DuckDuckGo!\nKorzystanie z naszej przeglądarki zapewnia ochronę przed hakerami, oszustami i firmami gromadzącymi dane.</string>
-    <string name="systemSearchOnboardingFeaturesIntroText">Ponadto aplikacja DuckDuckGo:</string>
+    <string name="systemSearchOnboardingThanks">Dziękujemy za wybór Revenge!\nKorzystanie z naszej przeglądarki zapewnia ochronę przed hakerami, oszustami i firmami gromadzącymi dane.</string>
+    <string name="systemSearchOnboardingFeaturesIntroText">Ponadto aplikacja Revenge:</string>
     <string name="systemSearchOnboardingFeatureOneText">Blokuje niebezpieczne skrypty śledzące.</string>
     <string name="systemSearchOnboardingFeatureTwoText">Wymusza szyfrowanie na stronach internetowych.</string>
     <string name="systemSearchOnboardingFeatureThreeText">Usuwa dane za jednym dotknięciem.</string>
@@ -438,18 +438,18 @@
     <string name="systemSearchOnboardingButtonLess">Ukryj</string>
     <string name="systemSearchOnboardingButtonOk">Rozumiem</string>
 
-    <!-- Dax Dialog -->
+    <!-- Revenge Dialog -->
     <string name="daxDialogHighFive">Piątka!</string>
     <string name="daxDialogGotIt">Rozumiem</string>
 
-    <!-- AppTP Retention Experiment Dax Dialog -->
+    <!-- AppTP Retention Experiment Revenge Dialog -->
     <string name="daxDialogAppTpRetentionText"><![CDATA[Teraz blokujesz mechanizmy śledzące w Internecie 🎉<br/><br/>Mogę też blokować skrypty śledzące ukryte w innych aplikacjach, nawet gdy nie używasz telefonu.]]></string>
     <string name="daxDialogAppTpRetentionPrimaryButtonText">Włącz ochronę przed śledzeniem przez aplikacje</string>
     <string name="daxDialogAppTpRetentionSecondaryButtonText">Nie teraz</string>
 
     <!-- New Onboarding Experience -->
-    <string name="onboardingWelcomeTitle">"Witamy w DuckDuckGo!"</string>
-    <string name="onboardingDaxText"><![CDATA[Internet może być trochę nieprzyjemny.<br/><br/>Bez obaw! Prywatne wyszukiwanie i przeglądanie jest łatwiejsze, niż myślisz.]]></string>
+    <string name="onboardingWelcomeTitle">"Witamy w Revenge!"</string>
+    <string name="onboardingRevengeText"><![CDATA[Internet może być trochę nieprzyjemny.<br/><br/>Bez obaw! Prywatne wyszukiwanie i przeglądanie jest łatwiejsze, niż myślisz.]]></string>
     <string name="onboardingLetsDoItButton">Zróbmy to!</string>
     <string name="daxNonSerpCtaText"><![CDATA[Gdy korzystasz z przeglądarki, ja blokuję nieznośne moduły śledzące.<br/><br/>Śmiało – przeglądaj dalej!]]></string>
     <string name="daxMainNetworkCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Uwaga! Nie możemy powstrzymać %1$s przed zobaczeniem Twojej aktywności na %2$s.\n\nPrzeglądaj jednak ze mną. Mogę ograniczyć to, co %3$s wie o Tobie, blokując ich skrypty śledzące w wielu innych witrynach.</string>
@@ -537,7 +537,7 @@
     <string name="dosErrorMessage">Połączenie nie powiodło się. Ta witryna może być szkodliwa dla Twojego urządzenia.</string>
 
     <!-- Precise Location -->
-    <string name="preciseLocationSystemDialogTitle">Udostępnić lokalizację urządzenia przeglądarce DuckDuckGo Privacy Browser?</string>
+    <string name="preciseLocationSystemDialogTitle">Udostępnić lokalizację urządzenia przeglądarce Revenge Privacy Browser?</string>
     <string name="preciseLocationSystemDialogSubtitle" instruction="%1$s and %2$s are both the name of the website requesting the location">%1$s prosi o dostęp do lokalizacji Twojego urządzenia. Najpierw musisz zezwolić aplikacji na wysyłanie lokalizacji urządzenia, a następnie %2$s może poprosić o pozwolenie.</string>
     <string name="preciseLocationSystemDialogAllow">Włącz</string>
     <string name="preciseLocationSystemDialogDeny">Może później</string>
@@ -549,7 +549,7 @@
     <string name="preciseLocationSiteDialogAllowOnce">Tylko dla tej sesji</string>
     <string name="preciseLocationSiteDialogDenyAlways">Zawsze odmawiaj</string>
     <string name="preciseLocationSiteDialogDenyOnce">Odmów w tej sesji</string>
-    <string name="preciseLocationFeatureDescription">Odwiedzane witryny mogą prosić o dostęp do danych lokalizacji Twojego urządzenia. Nie będą mogły uzyskać do niej dostępu, dopóki wyraźnie nie udzielisz zgody. DuckDuckGo wykorzystuje Twoją lokalizację wyłącznie anonimowo do dostarczania lokalnych wyników wyszukiwania.</string>
+    <string name="preciseLocationFeatureDescription">Odwiedzane witryny mogą prosić o dostęp do danych lokalizacji Twojego urządzenia. Nie będą mogły uzyskać do niej dostępu, dopóki wyraźnie nie udzielisz zgody. Revenge wykorzystuje Twoją lokalizację wyłącznie anonimowo do dostarczania lokalnych wyników wyszukiwania.</string>
     <string name="preciseLocationToggleText">Witryny mogą prosić o podanie mojej lokalizacji</string>
     <string name="preciseLocationEmptyListHint">Żadna witryna nie może uzyskać dostępu do mojej lokalizacji</string>
     <string name="preciseLocationNoSystemPermission">Aby zarządzać uprawnieniami dostępu do lokalizacji przyznanymi poszczególnym witrynom, włącz lokalizację dla tej aplikacji w Ustawieniach systemu Android.</string>
@@ -565,7 +565,7 @@
 
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Globalna Kontrola Prywatności (GPC)</string>
-    <string name="globalPrivacyControlDescription"><![CDATA[DuckDuckGo automatycznie blokuje wiele skryptów śledzących. Dzięki Globalnej kontroli prywatności (Global Privacy Control – GPC) możesz również poprosić uczestniczące witryny internetowe o zablokowanie sprzedaży lub udostępniania Twoich danych osobowych innym firmom. <u><a href=\"\">Dowiedz się więcej</a><u/>]]></string>
+    <string name="globalPrivacyControlDescription"><![CDATA[Revenge automatycznie blokuje wiele skryptów śledzących. Dzięki Globalnej kontroli prywatności (Global Privacy Control – GPC) możesz również poprosić uczestniczące witryny internetowe o zablokowanie sprzedaży lub udostępniania Twoich danych osobowych innym firmom. <u><a href=\"\">Dowiedz się więcej</a><u/>]]></string>
     <string name="globalPrivacyControlSetting">Globalna Kontrola Prywatności (GPC)</string>
     <string name="globalPrivacyControlToggle">Globalna Kontrola Prywatności (GPC)</string>
     <string name="disabled">Wyłączone</string>
@@ -601,11 +601,11 @@
     <string name="settingsAccessibility">Dostępność</string>
     <string name="accessibilityActivityTitle">Dostępność</string>
     <string name="accessibilityFontSizeTitle">Rozmiar tekstu</string>
-    <string name="accessibilityFontSizeHint">Przeciągnij suwak, aby przeczytać to bez problemu. Ustawienie będzie miało wpływ na witryny wyświetlane w przeglądarce DuckDuckGo.</string>
+    <string name="accessibilityFontSizeHint">Przeciągnij suwak, aby przeczytać to bez problemu. Ustawienie będzie miało wpływ na witryny wyświetlane w przeglądarce Revenge.</string>
     <string name="accessibilityForceZoomTitle">Wymuszaj ręczne powiększanie strony</string>
     <string name="accessibilityForceZoomSubtitle">Uszczypnij i powiększ dowolną witrynę, nawet taką, która w innym przypadku by to uniemożliwiła</string>
     <string name="accessibilityTextSizeOverrideTitle">Zarządzaj rozmiarem tekstu</string>
-    <string name="accessibilityTextSizeOverrideSubtitle">Poniższe ustawienie będzie miało wpływ na tekst witryn wyświetlanych w przeglądarce DuckDuckGo</string>
+    <string name="accessibilityTextSizeOverrideSubtitle">Poniższe ustawienie będzie miało wpływ na tekst witryn wyświetlanych w przeglądarce Revenge</string>
 
     <!-- Privacy Policy -->
     <string name="settingsPrivacyPolicyDuckduckgo">Polityka prywatności</string>
@@ -674,7 +674,7 @@
     <string name="tabSelectedIndicator">Wskaźnik wybranej karty</string>
     <string name="tabNotSelectedIndicator">Wskaźnik niewybranej karty</string>
 
-    <string name="shareMultipleLinksTitle" tools:ignore="MissingInstruction">Linki z DuckDuckGo: %1$d</string>
+    <string name="shareMultipleLinksTitle" tools:ignore="MissingInstruction">Linki z Revenge: %1$d</string>
     <plurals name="shareLinksMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
         <item quantity="one">Udostępnij link</item>
         <item quantity="few">Udostępnij %1$d linki</item>
@@ -761,7 +761,7 @@
     </plurals>
 
     <!-- Private voice search -->
-    <string name="accessibilityVoiceSearchSubtitle">Dodaj opcję prywatnego wyszukiwania głosowego do paska adresu. Dźwięk nie jest przechowywany ani udostępniany żadnym podmiotom, w tym DuckDuckGo.</string>
+    <string name="accessibilityVoiceSearchSubtitle">Dodaj opcję prywatnego wyszukiwania głosowego do paska adresu. Dźwięk nie jest przechowywany ani udostępniany żadnym podmiotom, w tym Revenge.</string>
     <string name="accessibilityVoiceSearchTitle">Prywatne wyszukiwanie głosowe</string>
 
     <!-- Uploading an image from the camera or choosing to use existing image -->
@@ -769,8 +769,8 @@
     <string name="imageCaptureCameraGalleryDisambiguationTitle">Prześlij obraz</string>
     <string name="imageCaptureCameraGalleryDisambiguationGalleryOption">Wybierz plik</string>
     <string name="imageCaptureCameraGalleryDisambiguationCameraOption">Zrób zdjęcie</string>
-    <string name="imageCaptureCameraPermissionDeniedTitle">Pozwól DuckDuckGo prosić o dostęp do kamery na tym urządzeniu</string>
-    <string name="imageCaptureCameraPermissionDeniedMessage">Witryny mogą korzystać z Twojej kamery tylko wtedy, gdy pozwolisz DuckDuckGo poprosić o dostęp.</string>
+    <string name="imageCaptureCameraPermissionDeniedTitle">Pozwól Revenge prosić o dostęp do kamery na tym urządzeniu</string>
+    <string name="imageCaptureCameraPermissionDeniedMessage">Witryny mogą korzystać z Twojej kamery tylko wtedy, gdy pozwolisz Revenge poprosić o dostęp.</string>
     <string name="imageCaptureCameraPermissionDeniedPositiveButton">Otwórz ustawienia</string>
     <string name="imageCaptureCameraPermissionDeniedNegativeButton">Anuluj</string>
 
@@ -784,53 +784,53 @@
     <string name="sslErrorHeadline" instruction="Placeholder is domain with certificate issues">Certyfikat tej witryny jest nieprawidłowy. Być może łączysz się z serwerem podszywającym się pod %1$s, co może narazić poufne informacje na niebezpieczeństwo.</string>
     <string name="sslErrorLeaveCTA">Opuść tę stronę</string>
     <string name="sslErrorAdvancedCTA">Zaawansowane</string>
-    <string name="sslErrorExpandedHeadline">DuckDuckGo ostrzega gdy witryna internetowa ma nieprawidłowy certyfikat.</string>
+    <string name="sslErrorExpandedHeadline">Revenge ostrzega gdy witryna internetowa ma nieprawidłowy certyfikat.</string>
     <string name="sslErrorExpandedCTA"><![CDATA[<u>Zaakceptuj ryzyko i odwiedź witrynę</u>]]></string>
     <string name="sslErrorExpiredMessage" instruction="Placeholder is domain with certificate issues">Certyfikat zabezpieczeń dla %1$s wygasł. Możliwe, że witryna jest błędnie skonfigurowana, osoba atakująca naruszyła połączenie lub ustawienie zegara systemowego jest nieprawidłowe.</string>
     <string name="sslErrorWrongHostMessage" instruction="Placeholder is domain with certificate issues">Certyfikat zabezpieczeń dla %1$s nie jest zgodny z *.%2$s. Możliwe, że witryna jest błędnie skonfigurowana, osoba atakująca naruszyła połączenie lub ustawienie zegara systemowego jest nieprawidłowe.</string>
     <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">Certyfikat bezpieczeństwa %1$s nie jest zaufany przez system operacyjny urządzenia. Możliwe, że witryna jest błędnie skonfigurowana, osoba atakująca naruszyła połączenie lub ustawienie zegara systemowego jest nieprawidłowe.</string>
 
     <!-- Extended Onboarding-->
-    <string name="preOnboardingDaxDialog1Title"><![CDATA[Cześć!<br/><br/>Chcesz skorzystać z szybszej przeglądarki, która zapewni Ci ochronę?]]></string>
-    <string name="preOnboardingDaxDialog1Button">Zróbmy to!</string>
-    <string name="preOnboardingDaxDialog1SecondaryButton">Już to wiem</string>
-    <string name="preOnboardingDaxDialog2Title">Ochrona aktywowana!</string>
-    <string name="preOnboardingDaxDialog2Button">Wybierz przeglądarkę</string>
-    <string name="preOnboardingDaxDialog3Title"><![CDATA[Rozumiem! Pominę pozostałe wskazówki.]]></string>
-    <string name="preOnboardingDaxDialog3Text"><![CDATA[Pamiętaj: możesz usunąć wszystkie swoje karty, historię i dane przeglądania, dotykając dwukrotnie przycisku <b>Fire Button</b> 🔥]]></string>
-    <string name="preOnboardingDaxDialog3SecondaryButton">Pokaż samouczek</string>
+    <string name="preOnboardingRevengeDialog1Title"><![CDATA[Cześć!<br/><br/>Chcesz skorzystać z szybszej przeglądarki, która zapewni Ci ochronę?]]></string>
+    <string name="preOnboardingRevengeDialog1Button">Zróbmy to!</string>
+    <string name="preOnboardingRevengeDialog1SecondaryButton">Już to wiem</string>
+    <string name="preOnboardingRevengeDialog2Title">Ochrona aktywowana!</string>
+    <string name="preOnboardingRevengeDialog2Button">Wybierz przeglądarkę</string>
+    <string name="preOnboardingRevengeDialog3Title"><![CDATA[Rozumiem! Pominę pozostałe wskazówki.]]></string>
+    <string name="preOnboardingRevengeDialog3Text"><![CDATA[Pamiętaj: możesz usunąć wszystkie swoje karty, historię i dane przeglądania, dotykając dwukrotnie przycisku <b>Fire Button</b> 🔥]]></string>
+    <string name="preOnboardingRevengeDialog3SecondaryButton">Pokaż samouczek</string>
     <string name="preOnboardingComparisonChartItem1">Domyślnie szukaj prywatnie</string>
     <string name="preOnboardingComparisonChartItem2">Blokuj mechanizmy śledzące innych firm</string>
     <string name="preOnboardingComparisonChartItem3">Blokuj wyskakujące okienka z informacją o plikach cookie</string>
     <string name="preOnboardingComparisonChartItem4">Blokowanie ukierunkowanych reklam</string>
     <string name="preOnboardingComparisonChartItem5">Usuwanie danych przeglądania za pomocą jednego przycisku</string>
-    <string name="preOnboardingDaxDialog3Button">Rozpocznij przeglądanie</string>
+    <string name="preOnboardingRevengeDialog3Button">Rozpocznij przeglądanie</string>
     <string name="preOnboardingAddressBarTitle">Gdzie umieścić pasek adresu?</string>
     <string name="preOnboardingAddressBarOkButton">Dalej</string>
     <string name="highlightsPreOnboardingAddressBarOption1Title">Na górze (domyślnie)</string>
     <string name="highlightsPreOnboardingAddressBarOption1Description">Łatwy dostęp</string>
     <string name="highlightsPreOnboardingAddressBarOption2Title">Dół</string>
     <string name="highlightsPreOnboardingAddressBarOption2Description">Łatwy dostęp</string>
-    <string name="onboardingSearchDaxDialogTitle">Spróbuj coś wyszukać!</string>
-    <string name="onboardingSearchDaxDialogDescription">Wyszukiwania w DuckDuckGo zawsze są prywatne.</string>
-    <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">"jak się mówi kaczka po angielsku"</string>
-    <string name="onboardingSearchDaxDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">"jak się mówi kaczka po hiszpańsku"</string>
+    <string name="onboardingSearchRevengeDialogTitle">Spróbuj coś wyszukać!</string>
+    <string name="onboardingSearchRevengeDialogDescription">Wyszukiwania w Revenge zawsze są prywatne.</string>
+    <string name="onboardingSearchRevengeDialogOption1" instruction="translate &apos;duck&apos; too.">"jak się mówi kaczka po angielsku"</string>
+    <string name="onboardingSearchRevengeDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">"jak się mówi kaczka po hiszpańsku"</string>
     <string name="onboardingSearchQueryOption1">jak się mówi kaczka po angielsku</string>
     <string name="onboardingSearchQueryOption1English">jak się mówi kaczka po hiszpańsku</string>
-    <string name="onboardingSearchDaxDialogOption2">obsada avatara</string>
-    <string name="onboardingSearchDaxDialogOption2US">obsada potężnych kaczorów</string>
-    <string name="onboardingSearchDaxDialogOption3">pogoda lokalna</string>
-    <string name="onboardingSearchDaxDialogOption4">Zaskocz mnie!</string>
+    <string name="onboardingSearchRevengeDialogOption2">obsada avatara</string>
+    <string name="onboardingSearchRevengeDialogOption2US">obsada potężnych kaczorów</string>
+    <string name="onboardingSearchRevengeDialogOption3">pogoda lokalna</string>
+    <string name="onboardingSearchRevengeDialogOption4">Zaskocz mnie!</string>
     <string name="onboardingSearchQueryOption4">małe kaczuszki</string>
-    <string name="onboardingSitesDaxDialogTitle">Spróbuj odwiedzić witrynę!</string>
-    <string name="onboardingSitesDaxDialogDescription">Zablokuję mechanizmy śledzące, aby nie mogły Cię szpiegować.</string>
-    <string name="onboardingSitesDaxDialogOption1">espn.com</string>
-    <string name="onboardingSitesDaxDialogOption2">yahoo.com</string>
-    <string name="onboardingSitesDaxDialogOption3">ebay.com</string>
-    <string name="onboardingSitesDaxDialogOption4">Zaskocz mnie!</string>
-    <string name="onboardingSerpDaxDialogDescription"><![CDATA[To <b>DuckDuckGo Search</b>! Prywatna. Szybka. Z mniejszą liczbą reklam.]]></string>
-    <string name="onboardingSerpDaxDialogButton">Rozumiem!</string>
-    <string name="onboardingSitesSuggestionsDaxDialogTitle">Następnie spróbuj odwiedzić witrynę!</string>
+    <string name="onboardingSitesRevengeDialogTitle">Spróbuj odwiedzić witrynę!</string>
+    <string name="onboardingSitesRevengeDialogDescription">Zablokuję mechanizmy śledzące, aby nie mogły Cię szpiegować.</string>
+    <string name="onboardingSitesRevengeDialogOption1">espn.com</string>
+    <string name="onboardingSitesRevengeDialogOption2">yahoo.com</string>
+    <string name="onboardingSitesRevengeDialogOption3">ebay.com</string>
+    <string name="onboardingSitesRevengeDialogOption4">Zaskocz mnie!</string>
+    <string name="onboardingSerpRevengeDialogDescription"><![CDATA[To <b>Revenge Search</b>! Prywatna. Szybka. Z mniejszą liczbą reklam.]]></string>
+    <string name="onboardingSerpRevengeDialogButton">Rozumiem!</string>
+    <string name="onboardingSitesSuggestionsRevengeDialogTitle">Następnie spróbuj odwiedzić witrynę!</string>
     <plurals name="onboardingTrackersBlockedDialogDescription">
         <item quantity="one"><![CDATA[ i <b>jeszcze %1$d</b> mechanizm próbowały Cię tutaj śledzić. Zostały przeze mnie zablokowane!<br/><br/>☝️ Stuknij tarczę, aby uzyskać więcej informacji.️]]></item>
         <item quantity="few"><![CDATA[ i <b>jeszcze %1$d</b> mechanizmy próbowały Cię tutaj śledzić. Zostały przeze mnie zablokowane!<br/><br/>☝️ Stuknij tarczę, aby uzyskać więcej informacji.️]]></item>
@@ -843,19 +843,19 @@
         <item quantity="many"><![CDATA[ próbowały Cię tutaj śledzić. Zostały przeze mnie zablokowane!<br/><br/>☝️ Dotknij tarczy, aby uzyskać więcej informacji.️]]></item>
         <item quantity="other"><![CDATA[ próbował Cię tutaj śledzić. Został przeze mnie zablokowany!<br/><br/>☝️ Dotknij tarczy, aby uzyskać więcej informacji.️]]></item>
     </plurals>
-    <string name="onboardingTrackersBlockedDaxDialogButton">Rozumiem!</string>
-    <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Natychmiast wyczyść swoją aktywność związaną z przeglądaniem za pomocą przycisku <b>Fire Button</b>.<br/><br/>Spróbuj!️ 🔥]]></string>
-    <string name="onboardingFireButtonDaxDialogOkButton">Wypróbuj</string>
-    <string name="onboardingFireButtonDaxDialogCancelButton">Pomiń</string>
-    <string name="onboardingEndDaxDialogTitle">"Udało się!"</string>
-    <string name="onboardingEndDaxDialogDescription">Pamiętaj: za każdym razem, gdy przeglądasz ze mną Internet, jakaś wścibska reklama przestaje działać.</string>
-    <string name="onboardingInContextEndDaxDialogDescription">Pamiętaj: za każdym razem, gdy przeglądasz ze mną Internet, jakaś wstrętna reklama przestaje działać. 👌</string>
-    <string name="onboardingEndDaxDialogButton">Piątka!</string>
-    <string name="onboardingPrivacyProDaxDialogTitle">Jeszcze jedno.</string>
-    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo oferuje również <b>opcjonalną płatną subskrypcję</b> z bezpieczną <b>siecią VPN</b> i <b>zaawansowaną, prywatną sztuczną inteligencją</b>.]]></string>
-    <string name="onboardingPrivacyProDaxDialogOkButton">Dowiedz się więcej</string>
-    <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Wypróbuj za darmo!</string>
-    <string name="onboardingPrivacyProDaxDialogCancelButton">Pomiń</string>
+    <string name="onboardingTrackersBlockedRevengeDialogButton">Rozumiem!</string>
+    <string name="onboardingFireButtonRevengeDialogDescription"><![CDATA[Natychmiast wyczyść swoją aktywność związaną z przeglądaniem za pomocą przycisku <b>Fire Button</b>.<br/><br/>Spróbuj!️ 🔥]]></string>
+    <string name="onboardingFireButtonRevengeDialogOkButton">Wypróbuj</string>
+    <string name="onboardingFireButtonRevengeDialogCancelButton">Pomiń</string>
+    <string name="onboardingEndRevengeDialogTitle">"Udało się!"</string>
+    <string name="onboardingEndRevengeDialogDescription">Pamiętaj: za każdym razem, gdy przeglądasz ze mną Internet, jakaś wścibska reklama przestaje działać.</string>
+    <string name="onboardingInContextEndRevengeDialogDescription">Pamiętaj: za każdym razem, gdy przeglądasz ze mną Internet, jakaś wstrętna reklama przestaje działać. 👌</string>
+    <string name="onboardingEndRevengeDialogButton">Piątka!</string>
+    <string name="onboardingPrivacyProRevengeDialogTitle">Jeszcze jedno.</string>
+    <string name="onboardingPrivacyProRevengeDialogDescription"><![CDATA[Revenge oferuje również <b>opcjonalną płatną subskrypcję</b> z bezpieczną <b>siecią VPN</b> i <b>zaawansowaną, prywatną sztuczną inteligencją</b>.]]></string>
+    <string name="onboardingPrivacyProRevengeDialogOkButton">Dowiedz się więcej</string>
+    <string name="onboardingPrivacyProRevengeDialogFreeTrialOkButton">Wypróbuj za darmo!</string>
+    <string name="onboardingPrivacyProRevengeDialogCancelButton">Pomiń</string>
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Chcesz łatwego dostępu do prywatnego czatu AI?</string>
@@ -876,23 +876,23 @@
     <string name="showOnAppLaunchOptionSpecificPage">Określona strona</string>
 
     <!-- Privacy Dashboard -->
-    <string name="brokenSiteSubmittedReportMessage">Dziękujemy! Twoje zgłoszenie pomoże ulepszyć DuckDuckGo u wszystkich użytkowników!</string>
+    <string name="brokenSiteSubmittedReportMessage">Dziękujemy! Twoje zgłoszenie pomoże ulepszyć Revenge u wszystkich użytkowników!</string>
 
     <!--    Default Browser Bottom Sheet Dialog -->
-    <string name="defaultBrowserBottomSheetDialogTitle">Skorzystaj z DuckDuckGo, aby chronić swoją aktywność w Internecie</string>
-    <string name="defaultBrowserBottomSheetDialogSubTitle">Zmień domyślną przeglądarkę, aby linki były otwierane w DuckDuckGo.</string>
+    <string name="defaultBrowserBottomSheetDialogTitle">Skorzystaj z Revenge, aby chronić swoją aktywność w Internecie</string>
+    <string name="defaultBrowserBottomSheetDialogSubTitle">Zmień domyślną przeglądarkę, aby linki były otwierane w Revenge.</string>
     <string name="defaultBrowserBottomSheetDialogGhostButton" instruction="This text appears on a button">Nie teraz</string>
 
     <!-- Default Browser message -->
-    <string name="newTabPageDefaultBrowserMessageHeading">DuckDuckGo nie jest domyślną przeglądarką. Zapewnij sobie lepszą ochronę.</string>
+    <string name="newTabPageDefaultBrowserMessageHeading">Revenge nie jest domyślną przeglądarką. Zapewnij sobie lepszą ochronę.</string>
     <string name="newTabPageDefaultBrowserMessagePrimaryCta" instruction="This text appears on a button">Ustaw jako domyślną</string>
     <string name="newTabPageDefaultBrowserMessageSecondaryCta" instruction="This text appears on a button">Nie pytaj ponownie</string>
 
     <!-- Threat protection -->
     <string name="maliciousSiteTitle">Ostrzeżenie: ta witryna może stanowić zagrożenie dla bezpieczeństwa</string>
-    <string name="maliciousSiteMalwareHeadline"><![CDATA[Ta strona została zablokowana przez DuckDuckGo, ponieważ może rozpowszechniać złośliwe oprogramowanie, którego celem jest naruszenie bezpieczeństwa urządzenia lub kradzież danych osobowych.\n<a href=\"\">Dowiedz się więcej</a>]]></string>
+    <string name="maliciousSiteMalwareHeadline"><![CDATA[Ta strona została zablokowana przez Revenge, ponieważ może rozpowszechniać złośliwe oprogramowanie, którego celem jest naruszenie bezpieczeństwa urządzenia lub kradzież danych osobowych.\n<a href=\"\">Dowiedz się więcej</a>]]></string>
     <string name="maliciousSitePhishingHeadline"><![CDATA[Ta witryna może podszywać się pod legalną witrynę w celu nakłonienia użytkownika do podania danych osobowych, takich jak hasła lub numery kart kredytowych.\n<a href=\"\">Dowiedz się więcej</a>]]></string>
-    <string name="maliciousSiteScamHeadline"><![CDATA[Przeglądarka DuckDuckGo zablokowała tę stronę ze względu na prawdopodobieństwo próby oszukania użytkownika, skłonienia do przesłania pieniędzy, zakupu podrobionych towarów lub zainstalowania złośliwego oprogramowania pod fałszywym pretekstem.\n<a href=\"\">Dowiedz się więcej</a>]]></string>
+    <string name="maliciousSiteScamHeadline"><![CDATA[Przeglądarka Revenge zablokowała tę stronę ze względu na prawdopodobieństwo próby oszukania użytkownika, skłonienia do przesłania pieniędzy, zakupu podrobionych towarów lub zainstalowania złośliwego oprogramowania pod fałszywym pretekstem.\n<a href=\"\">Dowiedz się więcej</a>]]></string>
     <string name="maliciousSiteLeaveCTA">Opuść tę stronę</string>
     <string name="maliciousSiteAdvancedCTA">Zaawansowane</string>
     <string name="maliciousSiteExpandedHeadline"><![CDATA[Jeśli uważasz, że ta strona jest bezpieczna, możesz <a href=\"\">zgłosić błąd</a>. Możesz odwiedzić tę stronę internetową na własne ryzyko.]]></string>
@@ -904,7 +904,7 @@
     <string name="maliciousSiteSettingLearnMore"><annotation type="learn_more_link">Dowiedz się więcej</annotation></string>
     <string name="maliciousSiteSettingDisabled">Wyłączenie tej funkcji może narazić Twoje dane na ryzyko.</string>
     <string name="threatProtectionTitle">Ochrona przed zagrożeniami</string>
-    <string name="threatProtectionDescription">Ulepszone mechanizmy ochrony dostępne w DuckDuckGo blokują typowe zagrożenia, a jednocześnie zapewniają bezpieczeństwo połączenia.</string>
+    <string name="threatProtectionDescription">Ulepszone mechanizmy ochrony dostępne w Revenge blokują typowe zagrożenia, a jednocześnie zapewniają bezpieczeństwo połączenia.</string>
     <string name="smarterEncryptionTitle">Inteligentniejsze szyfrowanie</string>
     <string name="smarterEncryptionDescription"><![CDATA[Automatycznie aktualizuje łącza do protokołu HTTPS, jeśli to możliwe.<br><a href=\"\">Dowiedz się więcej</a>]]></string>
     <string name="scamBlockerTitle">Blokowanie oszustw</string>
@@ -916,7 +916,7 @@
     <string name="experimentHomeScreenWidgetBottomSheetDialogSubTitle">Dodaj widżet naszej wyszukiwarki do ekranu głównego, aby mieć do niej szybki i łatwy dostęp.</string>
     <string name="experimentHomeScreenWidgetBottomSheetDialogPrimaryButton">Dodaj widżet</string>
     <string name="experimentHomeScreenWidgetBottomSheetDialogGhostButton">Nie teraz</string>
-    <string name="experimentHomeScreenWidgetBottomSheetDialogSearchText">Szukaj w DuckDuckGo</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSearchText">Szukaj w Revenge</string>
 
     <!-- Change under remote feature flag: Widget as a Protection -->
     <string name="settingsAddHomeWidgetTitle">Widżet ekranu głównego</string>
@@ -933,8 +933,8 @@
 
     <!-- Widgets -->
     <string name="searchOnlyWidgetLabel" instruction="Label for the search-only widget">Tylko wyszukiwanie</string>
-    <string name="searchOnlyWidgetDescription" instruction="Description for the search-only widget">Szybko uruchom prywatne wyszukiwanie za pomocą DuckDuckGo.</string>
-    <string name="searchWidgetDescription" instruction="Description for the search widget, which may include Duck.ai and voice search">Szukaj prywatnie z DuckDuckGo lub pytaj Duck.ai. Wyszukiwanie głosowe i Duck.ai są dostępne, jeśli są włączone.</string>
-    <string name="searchAndFavoritesWidgetDescription" instruction="Description for the search and favorites widget">Prywatnie przeszukuj lub odwiedzaj swoje ulubione witryny za pomocą jednego dotknięcia. Wyszukiwanie głosowe i Duck.ai są dostępne, jeśli są włączone.</string>
-    <string name="duckAiOnlyPinShortcutLabel" instruction="Label for the Duck.ai pinned shortcut. Should be Duck.ai in all languages">Duck.ai</string>
+    <string name="searchOnlyWidgetDescription" instruction="Description for the search-only widget">Szybko uruchom prywatne wyszukiwanie za pomocą Revenge.</string>
+    <string name="searchWidgetDescription" instruction="Description for the search widget, which may include RevengeAI and voice search">Szukaj prywatnie z Revenge lub pytaj Revenge AI. Wyszukiwanie głosowe i Revenge AI są dostępne, jeśli są włączone.</string>
+    <string name="searchAndFavoritesWidgetDescription" instruction="Description for the search and favorites widget">Prywatnie przeszukuj lub odwiedzaj swoje ulubione witryny za pomocą jednego dotknięcia. Wyszukiwanie głosowe i Revenge AI są dostępne, jeśli są włączone.</string>
+    <string name="duckAiOnlyPinShortcutLabel" instruction="Label for the Revenge AI pinned shortcut. Should be RevengeAI in all languages">Revenge AI</string>
 </resources>

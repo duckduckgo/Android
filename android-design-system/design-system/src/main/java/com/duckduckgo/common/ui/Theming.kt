@@ -68,16 +68,16 @@ fun AppCompatActivity.applyTheme(theme: DuckDuckGoTheme): BroadcastReceiver? {
 fun AppCompatActivity.getThemeId(theme: DuckDuckGoTheme): Int {
     return when (theme) {
         SYSTEM_DEFAULT -> getSystemDefaultTheme()
-        DARK -> R.style.Theme_DuckDuckGo_Dark
-        else -> R.style.Theme_DuckDuckGo_Light
+        DARK -> R.style.Theme_Revenge_Dark
+        else -> R.style.Theme_Revenge_Light
     }
 }
 
 private fun Context.getSystemDefaultTheme(): Int {
     return if (isInNightMode()) {
-        R.style.Theme_DuckDuckGo_Dark
+        R.style.Theme_Revenge_Dark
     } else {
-        R.style.Theme_DuckDuckGo_Light
+        R.style.Theme_Revenge_Light
     }
 }
 

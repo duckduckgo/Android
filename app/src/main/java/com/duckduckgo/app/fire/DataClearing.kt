@@ -147,7 +147,7 @@ class DataClearing @Inject constructor(
 
         val shouldClearTabs = FireClearOption.TABS in options
         val shouldClearData = FireClearOption.DATA in options
-        val shouldClearDuckAiChats = FireClearOption.DUCKAI_CHATS in options
+        val shouldClearRevengeAIChats = FireClearOption.DUCKAI_CHATS in options
 
         if (shouldClearTabs) {
             clearDataAction.clearTabsOnly()
@@ -157,8 +157,8 @@ class DataClearing @Inject constructor(
             clearDataAction.clearBrowserDataOnly(shouldFireDataClearPixel)
         }
 
-        if (shouldClearDuckAiChats) {
-            clearDataAction.clearDuckAiChatsOnly()
+        if (shouldClearRevengeAIChats) {
+            clearDataAction.clearRevengeAIChatsOnly()
         }
 
         logcat { "Granular clear completed" }

@@ -19,7 +19,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.settings.DuckAiShortcutSettingsActivity">
+    tools:context=".ui.settings.RevengeAIShortcutSettingsActivity">
 
     <include
         android:id="@+id/includeToolbar"
@@ -37,7 +37,7 @@
             android:paddingBottom="@dimen/keyline_5">
 
             <com.duckduckgo.common.ui.view.listitem.OneLineListItem
-                android:id="@+id/show_duck_ai_in_menu_toggle"
+                android:id="@+id/showRevengeAIInMenuToggle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
@@ -45,14 +45,14 @@
                 app:showSwitch="true" />
 
             <com.duckduckgo.common.ui.view.listitem.OneLineListItem
-                android:id="@+id/show_duck_ai_in_address_bar_toggle"
+                android:id="@+id/showRevengeAIInAddressBarToggle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:primaryText="@string/duck_chat_address_bar_visibility_setting"
                 app:showSwitch="true" />
 
             <com.duckduckgo.common.ui.view.listitem.OneLineListItem
-                android:id="@+id/show_duck_ai_in_voice_search_toggle"
+                android:id="@+id/showRevengeAIInVoiceSearchToggle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:primaryText="@string/duckAiVoiceSearchVisibilitySetting"

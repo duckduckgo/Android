@@ -65,7 +65,7 @@ class SerpSettingsPrefsDataStoreTest {
 
     @Test
     fun whenSetSerpSettingsThenStoreProvidedSettings() = runTest {
-        val settings = """{"isDuckAiEnabled":true,"duckAiTitle":"Duck.AI"}"""
+        val settings = """{"isRevengeAIEnabled":true,"duckAiTitle":"Duck.AI"}"""
 
         testee.setSerpSettings(settings)
 

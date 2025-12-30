@@ -113,7 +113,7 @@
     <string name="atp_OnboardingContinue">Jatka</string>
     <string name="atp_OnboardingMaybeLater">Ehkä myöhemmin</string>
 
-    <!-- App Tracking Protection Dax Onboarding -->
+    <!-- App Tracking Protection Revenge Onboarding -->
     <string name="atp_daxOnboardingIntroTitle">Sovellusten seurantasuojaus</string>
     <string name="atp_daxOnboardingIntroMessage" formatted="false">Yli 96 % suosituista ilmaisista sovelluksista antaa muiden yritysten seurata sinua myös silloin, kun et käytä puhelinta. App Tracking Protection tunnistaa ja estää nämä seurantayritykset.</string>
     <string name="atp_daxOnboardingPermissionTitle">Kuinka se toimii?</string>

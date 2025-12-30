@@ -79,14 +79,14 @@ class SubscriptionFeedbackCategoryFragment : SubscriptionFeedbackFragment(R.layo
         binding.categoryPir.setOnClickListener {
             listener.onUserClickedCategory(PIR)
         }
-        binding.categoryDuckAi.setOnClickListener {
+        binding.categoryRevengeAI.setOnClickListener {
             listener.onUserClickedCategory(DUCK_AI)
         }
 
         lifecycleScope.launch {
-            val duckAiAvailable = isDuckAiAvailable()
+            val duckAiAvailable = isRevengeAIAvailable()
             withStarted {
-                binding.categoryDuckAi.isVisible = duckAiAvailable
+                binding.categoryRevengeAI.isVisible = duckAiAvailable
             }
         }
 
@@ -103,9 +103,9 @@ class SubscriptionFeedbackCategoryFragment : SubscriptionFeedbackFragment(R.layo
         return (pirFeature.getPirFeatureState() == PirFeatureState.ENABLED || subscription.productId in listOf(MONTHLY_PLAN_US, YEARLY_PLAN_US))
     }
 
-    private suspend fun isDuckAiAvailable(): Boolean = withContext(dispatcherProvider.io()) {
-        val isDuckAiEnabled = subscriptionFeature.duckAiPlus().isEnabled()
-        isDuckAiEnabled && authRepository.getEntitlements().toProductList().any { it == Product.DuckAiPlus }
+    private suspend fun isRevengeAIAvailable(): Boolean = withContext(dispatcherProvider.io()) {
+        val isRevengeAIEnabled = subscriptionFeature.duckAiPlus().isEnabled()
+        isRevengeAIEnabled && authRepository.getEntitlements().toProductList().any { it == Product.RevengeAIPlus }
     }
 
     interface Listener {

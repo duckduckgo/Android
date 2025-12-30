@@ -198,15 +198,15 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
                     binding.daxDialogCta.descriptionCta.gone()
                     binding.daxDialogCta.secondaryCta.show()
 
-                    val ctaText = it.getString(R.string.preOnboardingDaxDialog1Title)
+                    val ctaText = it.getString(R.string.preOnboardingRevengeDialog1Title)
                     binding.daxDialogCta.hiddenTextCta.text = ctaText.html(it)
                     binding.daxDialogCta.daxDialogContentImage.gone()
                     afterAnimation = {
                         binding.daxDialogCta.dialogTextCta.finishAnimation()
-                        binding.daxDialogCta.primaryCta.text = it.getString(R.string.preOnboardingDaxDialog1Button)
+                        binding.daxDialogCta.primaryCta.text = it.getString(R.string.preOnboardingRevengeDialog1Button)
                         binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked(INITIAL_REINSTALL_USER) }
                         binding.daxDialogCta.primaryCta.animate().alpha(MAX_ALPHA).duration = ANIMATION_DURATION
-                        binding.daxDialogCta.secondaryCta.text = it.getString(R.string.preOnboardingDaxDialog1SecondaryButton)
+                        binding.daxDialogCta.secondaryCta.text = it.getString(R.string.preOnboardingRevengeDialog1SecondaryButton)
                         binding.daxDialogCta.secondaryCta.setOnClickListener { viewModel.onSecondaryCtaClicked(INITIAL_REINSTALL_USER) }
                         binding.daxDialogCta.secondaryCta.animate().alpha(MAX_ALPHA).duration = ANIMATION_DURATION
                     }
@@ -220,12 +220,12 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
                     binding.daxDialogCta.descriptionCta.gone()
                     binding.daxDialogCta.secondaryCta.gone()
 
-                    val ctaText = it.getString(R.string.preOnboardingDaxDialog1Title)
+                    val ctaText = it.getString(R.string.preOnboardingRevengeDialog1Title)
                     binding.daxDialogCta.hiddenTextCta.text = ctaText.html(it)
                     binding.daxDialogCta.daxDialogContentImage.gone()
                     afterAnimation = {
                         binding.daxDialogCta.dialogTextCta.finishAnimation()
-                        binding.daxDialogCta.primaryCta.text = it.getString(R.string.preOnboardingDaxDialog1Button)
+                        binding.daxDialogCta.primaryCta.text = it.getString(R.string.preOnboardingRevengeDialog1Button)
                         binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked(INITIAL) }
                         binding.daxDialogCta.primaryCta.animate().alpha(MAX_ALPHA).duration = ANIMATION_DURATION
                     }
@@ -243,7 +243,7 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
                     binding.daxDialogCta.progressBar.show()
                     binding.daxDialogCta.progressBar.max = maxPages
                     binding.daxDialogCta.progressBar.progress = 1
-                    val ctaText = it.getString(R.string.preOnboardingDaxDialog2Title)
+                    val ctaText = it.getString(R.string.preOnboardingRevengeDialog2Title)
                     binding.daxDialogCta.hiddenTextCta.text = ctaText.html(it)
                     binding.daxDialogCta.primaryCta.alpha = MIN_ALPHA
                     binding.daxDialogCta.comparisonChart.root.show()
@@ -251,7 +251,7 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
 
                     afterAnimation = {
                         binding.daxDialogCta.dialogTextCta.finishAnimation()
-                        binding.daxDialogCta.primaryCta.text = it.getString(R.string.preOnboardingDaxDialog2Button)
+                        binding.daxDialogCta.primaryCta.text = it.getString(R.string.preOnboardingRevengeDialog2Button)
                         binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked(COMPARISON_CHART) }
                         binding.daxDialogCta.primaryCta.animate().alpha(MAX_ALPHA).duration = ANIMATION_DURATION
                         binding.daxDialogCta.comparisonChart.root.animate().alpha(MAX_ALPHA).duration = ANIMATION_DURATION
@@ -269,17 +269,17 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
 
                     TransitionManager.beginDelayedTransition(binding.daxDialogCta.cardView, AutoTransition())
 
-                    val ctaDialog3Text = it.getString(R.string.preOnboardingDaxDialog3Title)
+                    val ctaDialog3Text = it.getString(R.string.preOnboardingRevengeDialog3Title)
                     binding.daxDialogCta.hiddenTextCta.text = ctaDialog3Text.html(it)
-                    val ctaDialog3Description = it.getString(R.string.preOnboardingDaxDialog3Text)
+                    val ctaDialog3Description = it.getString(R.string.preOnboardingRevengeDialog3Text)
                     binding.daxDialogCta.descriptionCta.text = ctaDialog3Description.html(it)
                     afterAnimation = {
                         binding.daxDialogCta.dialogTextCta.finishAnimation()
                         binding.daxDialogCta.descriptionCta.animate().alpha(MAX_ALPHA).duration = ANIMATION_DURATION
-                        binding.daxDialogCta.primaryCta.text = it.getString(R.string.preOnboardingDaxDialog3Button)
+                        binding.daxDialogCta.primaryCta.text = it.getString(R.string.preOnboardingRevengeDialog3Button)
                         binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked(SKIP_ONBOARDING_OPTION) }
                         binding.daxDialogCta.primaryCta.animate().alpha(MAX_ALPHA).duration = ANIMATION_DURATION
-                        binding.daxDialogCta.secondaryCta.text = it.getString(R.string.preOnboardingDaxDialog3SecondaryButton)
+                        binding.daxDialogCta.secondaryCta.text = it.getString(R.string.preOnboardingRevengeDialog3SecondaryButton)
                         binding.daxDialogCta.secondaryCta.setOnClickListener { viewModel.onSecondaryCtaClicked(SKIP_ONBOARDING_OPTION) }
                         binding.daxDialogCta.secondaryCta.animate().alpha(MAX_ALPHA).duration = ANIMATION_DURATION
                     }

@@ -152,7 +152,7 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
             attrs,
             R.styleable.FavouritesNewTabSectionView,
             0,
-            R.style.Widget_DuckDuckGo_FavouritesNewTabSection,
+            R.style.Widget_Revenge_FavouritesNewTabSection,
         ).apply {
             isExpandable = getBoolean(R.styleable.FavouritesNewTabSectionView_isExpandable, true)
             showPlaceholders = getBoolean(R.styleable.FavouritesNewTabSectionView_showPlaceholders, true)

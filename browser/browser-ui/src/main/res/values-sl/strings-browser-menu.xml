@@ -28,7 +28,7 @@
     <string name="browserMenuEnablePrivacyProtection">Omogoči zaščito zasebnosti</string>
     <string name="browserMenuDisablePrivacyProtection">Onemogoči zaščito zasebnosti</string>
     <string name="browserMenuNewTab">Nov zavihek</string>
-    <string name="browserMenuDuckChat">Duck.ai</string>
+    <string name="browserMenuRevengeChat">Revenge AI</string>
     <string name="browserMenuShare">Deli</string>
     <string name="browserMenuEmailAlias">Ustvari naslov Duck Address</string>
     <string name="browserMenuFindInPage">Najdi na strani</string>
@@ -45,7 +45,7 @@
     <string name="browserMenuNewChat">Nov klepet</string>
     <string name="browserMenuNewAIChat">Novi klepet z umetno inteligenco</string>
     <string name="browserMenuChatHistory">Zgodovina klepeta</string>
-    <string name="browserMenuChatSettings">Nastavitve Duck.ai</string>
+    <string name="browserMenuChatSettings">Nastavitve Revenge AI</string>
     <string name="browserMenuVPN">VPN</string>
 
     <!-- Browser Menu Content Description -->

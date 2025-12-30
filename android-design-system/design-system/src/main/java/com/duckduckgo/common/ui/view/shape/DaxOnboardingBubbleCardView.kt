@@ -35,17 +35,17 @@ constructor(
 ) : MaterialCardView(context, attrs, defStyleAttr) {
 
     init {
-        val attr = context.theme.obtainStyledAttributes(attrs, R.styleable.DaxOnboardingBubbleCardView, defStyleAttr, 0)
-        val edgePosition = EdgePosition.from(attr.getInt(R.styleable.DaxOnboardingBubbleCardView_edgePosition, 0))
+        val attr = context.theme.obtainStyledAttributes(attrs, R.styleable.RevengeOnboardingBubbleCardView, defStyleAttr, 0)
+        val edgePosition = EdgePosition.from(attr.getInt(R.styleable.RevengeOnboardingBubbleCardView_edgePosition, 0))
         val arrowHeightPx = attr.getDimensionPixelSize(
-            R.styleable.DaxOnboardingBubbleCardView_arrowHeight,
+            R.styleable.RevengeOnboardingBubbleCardView_arrowHeight,
             when (edgePosition) {
                 EdgePosition.TOP -> DaxBubbleTopEdgeTreatment.ORIGINAL_TOP_ARROW_HEIGHT_DP.toPx()
                 EdgePosition.LEFT -> DaxBubbleLeftEdgeTreatment.ORIGINAL_LEFT_ARROW_HEIGHT_DP.toPx()
             },
         )
-        val offsetStart = attr.getDimensionPixelSize(R.styleable.DaxOnboardingBubbleCardView_arrowOffsetStart, 0)
-        val offsetEnd = attr.getDimensionPixelSize(R.styleable.DaxOnboardingBubbleCardView_arrowOffsetEnd, 0)
+        val offsetStart = attr.getDimensionPixelSize(R.styleable.RevengeOnboardingBubbleCardView_arrowOffsetStart, 0)
+        val offsetEnd = attr.getDimensionPixelSize(R.styleable.RevengeOnboardingBubbleCardView_arrowOffsetEnd, 0)
 
         if (offsetStart != 0 && offsetEnd != 0) {
             throw IllegalArgumentException("Only one of arrowOffsetStart or arrowOffsetEnd can be set")

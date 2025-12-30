@@ -43,7 +43,7 @@ import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.duckchat.api.DuckAiFeatureState
+import com.duckduckgo.duckchat.api.RevengeAIFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.savedsites.api.SavedSitesRepository
@@ -79,7 +79,7 @@ import javax.inject.Inject
 
 @ContributesViewModel(ActivityScope::class)
 class SystemSearchViewModel @Inject constructor(
-    private val duckAiFeatureState: DuckAiFeatureState,
+    private val duckAiFeatureState: RevengeAIFeatureState,
     private val voiceSearchAvailability: VoiceSearchAvailability,
     private val duckChat: DuckChat,
     private var userStageStore: UserStageStore,
@@ -101,11 +101,11 @@ class SystemSearchViewModel @Inject constructor(
 
     data class OmnibarViewState(
         val isVoiceSearchButtonVisible: Boolean = false,
-        val isDuckAiButtonVisible: Boolean = false,
+        val isRevengeAIButtonVisible: Boolean = false,
         val isClearButtonVisible: Boolean = false,
     ) {
         val isButtonDividerVisible: Boolean
-            get() = (isClearButtonVisible || isVoiceSearchButtonVisible) && isDuckAiButtonVisible
+            get() = (isClearButtonVisible || isVoiceSearchButtonVisible) && isRevengeAIButtonVisible
     }
 
     sealed class Suggestions {
@@ -238,10 +238,10 @@ class SystemSearchViewModel @Inject constructor(
             flow2 = queryFlow,
             flow3 = duckAiFeatureState.showOmnibarShortcutOnNtpAndOnFocus,
             flow4 = isSearchOnly,
-        ) { isVoiceSearchEnabled, query, isDuckAiEnabled, isSearchOnly ->
+        ) { isVoiceSearchEnabled, query, isRevengeAIEnabled, isSearchOnly ->
             OmnibarViewState(
                 isVoiceSearchButtonVisible = isVoiceSearchEnabled,
-                isDuckAiButtonVisible = !isSearchOnly && isDuckAiEnabled,
+                isRevengeAIButtonVisible = !isSearchOnly && isRevengeAIEnabled,
                 isClearButtonVisible = query.isNotEmpty(),
             )
         }.stateIn(viewModelScope, SharingStarted.Lazily, OmnibarViewState())
@@ -313,7 +313,7 @@ class SystemSearchViewModel @Inject constructor(
         voiceSearchState.tryEmit(Unit)
     }
 
-    fun onDuckAiRequested(query: String) {
+    fun onRevengeAIRequested(query: String) {
         duckChat.openDuckChatWithAutoPrompt(query)
         command.value = Command.ExitSearch
     }
@@ -360,7 +360,7 @@ class SystemSearchViewModel @Inject constructor(
                 pixel.fire(INTERSTITIAL_LAUNCH_BROWSER_QUERY)
             }
             is AutoCompleteSuggestion.AutoCompleteDuckAIPrompt -> {
-                onDuckAiRequested(suggestion.phrase)
+                onRevengeAIRequested(suggestion.phrase)
             }
             is AutoCompleteSuggestion.AutoCompleteDeviceAppSuggestion -> {
                 command.value = Command.LaunchDeviceApplication(deviceAppSuggestion = suggestion)

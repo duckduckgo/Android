@@ -18,7 +18,7 @@ package com.duckduckgo.duckchat.api
 
 import kotlinx.coroutines.flow.StateFlow
 
-interface DuckAiFeatureState {
+interface RevengeAIFeatureState {
     /**
      * Indicates whether the Duck AI settings should be available from the main settings screen.
      */

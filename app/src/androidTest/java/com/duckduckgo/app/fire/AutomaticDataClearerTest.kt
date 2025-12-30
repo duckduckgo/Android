@@ -709,7 +709,7 @@ class AutomaticDataClearerTest {
     }
 
     @Test
-    fun whenGranularFeatureEnabledAndDuckAiChatsAndNotFreshLaunch_thenClearChatsAndRestart() = runTest {
+    fun whenGranularFeatureEnabledAndRevengeAIChatsAndNotFreshLaunch_thenClearChatsAndRestart() = runTest {
         enableGranularFeature()
         configureShouldClearAutomatically(true)
         configureAppUsedSinceLastClear()

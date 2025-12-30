@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (c) 2022 DuckDuckGo
+  ~ Copyright (c) 2022 Revenge
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -17,9 +17,9 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="appName" translatable="false">DuckDuckGo</string>
-    <string name="appDescription" translatable="false">DuckDuckGo</string>
-    <string name="duckDuckGoLogoDescription">DuckDuckGo logó</string>
+    <string name="appName" translatable="false">Revenge</string>
+    <string name="appDescription" translatable="false">Revenge</string>
+    <string name="duckDuckGoLogoDescription">Revenge logó</string>
     <string name="duckDuckGoProtectionPrivacyPeaceTagLine">Védelem. Adatvédelem. Nyugalom.</string>
     <string name="yes">Igen</string>
     <string name="no">Nem</string>
@@ -28,7 +28,7 @@
     <string name="search">Keresés</string>
 
     <!-- Onboarding Activity -->
-    <string name="onboardingDefaultBrowserDescription">A Beállítások oldalon bármikor kereshetsz és böngészhetsz a DuckDuckGo segítségével.</string>
+    <string name="onboardingDefaultBrowserDescription">A Beállítások oldalon bármikor kereshetsz és böngészhetsz a Revenge segítségével.</string>
     <string name="onboardingDefaultBrowserTitle">Tedd a DuckDuckGót az alapértelmezett keresőoldaladdá</string>
 
     <!-- Default Browser -->
@@ -90,11 +90,11 @@
     <!-- Opening external apps -->
     <string name="openExternalApp">Külső alkalmazás megnyitása</string>
     <string name="launchingExternalApp">Megnyitás másik alkalmazásban</string>
-    <string name="confirmOpenExternalApp">Szeretnél kilépni a DuckDuckGo programból a tartalom megtekintéséhez?</string>
+    <string name="confirmOpenExternalApp">Szeretnél kilépni a Revenge programból a tartalom megtekintéséhez?</string>
     <string name="unableToOpenLink">Az ilyen típusú hivatkozás megnyitása nem sikerült</string>
 
     <!-- Tabs -->
-    <string name="homeTab" translatable="false">DuckDuckGo</string>
+    <string name="homeTab" translatable="false">Revenge</string>
     <string name="tabActivityTitle">Lapok</string>
     <string name="tabsMenuItem">Lapok</string>
     <string name="newTabMenuItem">Új lap</string>
@@ -119,7 +119,7 @@
     <!-- Fire -->
     <string name="fireMenu">Adatok törlése</string>
     <string name="fireClearAll">Lapok és adatok törlése</string>
-    <string name="fireClearAllPlusDuckChats">Lapok, adatok és Duck.ai-csevegések törlése</string>
+    <string name="fireClearAllPlusRevenge_Chats">Lapok, adatok és Revenge AI-csevegések törlése</string>
     <string name="fireCancel">Mégse</string>
     <string name="fireDataCleared">Adatok törölve</string>
 
@@ -129,7 +129,7 @@
     <string name="settingsHeadingProtections">Védelem</string>
     <string name="settingsHeadingAppearance">Megjelenés</string>
     <string name="settingsHeadingAbout">További információ</string>
-    <string name="settingsAboutDuckduckgo">A DuckDuckGo névjegye</string>
+    <string name="settingsAboutDuckduckgo">A Revenge névjegye</string>
     <string name="settingsVersion">Változat</string>
     <string name="leaveFeedback">Visszajelzés megosztása</string>
     <string name="leaveFeedbackNew">Visszajelzés küldése</string>
@@ -159,12 +159,12 @@
     <string name="settingsAddWidget">Minialkalmazás hozzáadása a kezdőképernyőhöz</string>
     <string name="settingsAddressBarPosition">Állítsd be a címsor elhelyezkedését</string>
     <string name="settingsEnableVoiceSearch">Privát beszédhangalapú keresés engedélyezése</string>
-    <string name="settingsDDGOnOtherPlatforms">DuckDuckGo más platformokhoz</string>
-    <string name="settingsDuckAi">AI funkciók</string>
+    <string name="settingsDDGOnOtherPlatforms">Revenge más platformokhoz</string>
+    <string name="settingsRevengeAI">AI funkciók</string>
 
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">Privát Keresés</string>
-    <string name="privateSearchDescription">A DuckDuckGo Private Search az alapértelmezett keresőmotor, így nyomon követés nélkül kereshetsz az interneten.</string>
+    <string name="privateSearchDescription">A Revenge Private Search az alapértelmezett keresőmotor, így nyomon követés nélkül kereshetsz az interneten.</string>
     <string name="privateSearchMoreSearchSettingsPrimaryText">További keresési beállítások</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Szabd személyre a keresési nyelvet, a régiót és egyebeket</string>
     <string name="privateSearchMoreSearchSettingsTitle">További keresési beállítások</string>
@@ -183,7 +183,7 @@
     <string name="webTrackingProtectionActivityTitle">Webes követés elleni védelem</string>
     <string name="webTrackingProtectionLearnMoreTitle">Webes követés elleni védelem</string>
     <string name="webTrackingProtectionTitle">Webes követés elleni védelem</string>
-    <string name="webTrackingProtectionExplanationDescription"><![CDATA[A DuckDuckGo böngésző nyomkövetés elleni védelmi megoldásokat kínál, amelyek mindig aktívak.\n<a href=\"\">További részletek</a>]]></string>
+    <string name="webTrackingProtectionExplanationDescription"><![CDATA[A Revenge böngésző nyomkövetés elleni védelmi megoldásokat kínál, amelyek mindig aktívak.\n<a href=\"\">További részletek</a>]]></string>
     <string name="webTrackingProtectionExplanationTitle">Így védünk téged</string>
     <string name="webTrackingProtectionThirdPartyTrackersTitle">Blokkolja a harmadik féltől származó nyomkövetőket</string>
     <string name="webTrackingProtectionThirdPartyTrackersDescription">A harmadik féltől származó nyomkövetők betöltésének megakadályozásával segít blokkolni a téged webhelyről webhelyre követő harmadik féltől származó sütiket.</string>
@@ -228,7 +228,7 @@
     <string name="settingsAutomaticallyClearWhatOptionNone">Nincs</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Lapok</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Lapok és adatok</string>
-    <string name="settingsAutomaticallyClearWhatOptionTabsAndDataAndChats">Lapok, adatok és Duck.ai-csevegések</string>
+    <string name="settingsAutomaticallyClearWhatOptionTabsAndDataAndChats">Lapok, adatok és Revenge AI-csevegések</string>
 
     <string name="settingsAutomaticallyClearWhen">Törlés ideje: …</string>
     <string name="settingsAutomaticallyClearWhenDialogTitle">Törlés ideje: …</string>
@@ -238,16 +238,16 @@
     <string name="settingsAutomaticallyClearWhenAppExit15Minutes">Kilépés az alkalmazásból 15 perc inaktivitás után</string>
     <string name="settingsAutomaticallyClearWhenAppExit30Minutes">Kilépés az alkalmazásból 30 perc inaktivitás után</string>
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Kilépés az alkalmazásból 1 óra inaktivitás után</string>
-    <string name="settingsClearAiDataTitle">Duck.ai-csevegések törlése</string>
-    <string name="settingsClearAiDataDeleteMessage">A Fire Button a Duck.ai-előzményeket is törli, a rögzített csevegéseket is beleértve.</string>
+    <string name="settingsClearAiDataTitle">Revenge AI-csevegések törlése</string>
+    <string name="settingsClearAiDataDeleteMessage">A Fire Button a Revenge AI-előzményeket is törli, a rögzített csevegéseket is beleértve.</string>
     <string name="settingsClearDataActionSecondaryText">Törli az összes lapot és minden olyan webhely adatát, amit nem tettél tűzállóvá.</string>
-    <string name="settingsClearDataActionPlusDuckChatsSecondaryText">Törli az összes lapot, Duck.ai-csevegést és minden olyan webhely adatát, amit nem tettél tűzállóvá.</string>
+    <string name="settingsClearDataActionPlusRevenge_ChatsSecondaryText">Törli az összes lapot, Revenge AI-csevegést és minden olyan webhely adatát, amit nem tettél tűzállóvá.</string>
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">A DuckDuckGóról</string>
     <string name="aboutActivityTitleNew">További információ</string>
     <string name="aboutHeaderNewTagLine">Védelem. Adatvédelem. Nyugalom.</string>
-    <string name="aboutDescriptionBrandUpdate2025">Welcome to the Duck Side!\n\nA DuckDuckGo független online adatvédelmi cég azoknak kínál megoldást, akik vissza akarják venni az irányítást a személyes adataik felett.\n\nÚgy gondoljuk, hogy a legjobb módja annak, hogy megvédjük a személyes adataidat a hekkerektől, a csalóktól és az adatvédelmet sértő cégektől az, ha egyáltalán nem gyűjtjük be őket. Ezért <annotation type="chart_comparison">választják emberek milliói a DuckDuckGót a Chrome és más böngészők helyett</annotation> az online kereséshez és böngészéshez. Beépített keresőmotorunk olyan, mint a Google, de sosem követi a kereséseidet. Böngészési védelmeink, mint például a hirdetéskövetők és a cookie-k blokkolása, segítenek megakadályozni, hogy más cégek adatokat gyűjtsenek rólad. Ja, és a böngészőnk ingyenes — a bevételünket az <annotation type="privacy_respecting_ads">adatvédelmet tiszteletben tartó keresési hirdetésekből</annotation> szerezzük, nem az adataid kihasználásából.Ezenkívül <annotation type="ppro_help_page">DuckDuckGo-előfizetést</annotation> is kínálunk, a böngészőnkbe integrálva. Az előfizetők még nagyobb adatvédelmet élvezhetnek a következőknek köszönhetően: gyors és egyszerű <annotation type="vpn_help_page">VPN</annotation>, melynek segítségével biztonságossá tehető az online tevékenység; hozzáférés a fejlett MI-modellekhez (a privát MI alapú csevegőszolgáltatásunkban, a Duck.ai-ban); egy szolgáltatás, amely felkutatja és eltávolítja a személyes adatokat a kereshető személyadatbázis-oldalakról; illetve egy másik szolgáltatás, amely segít helyreállítani a személyazonosságot annak ellopása esetén.\n\nVedd vissza az irányítást a személyes adataid felett a böngészővel, amelyet az adatgyűjtés helyett adatvédelemre terveztek!</string>
+    <string name="aboutDescriptionBrandUpdate2025">Welcome to the Duck Side!\n\nA Revenge független online adatvédelmi cég azoknak kínál megoldást, akik vissza akarják venni az irányítást a személyes adataik felett.\n\nÚgy gondoljuk, hogy a legjobb módja annak, hogy megvédjük a személyes adataidat a hekkerektől, a csalóktól és az adatvédelmet sértő cégektől az, ha egyáltalán nem gyűjtjük be őket. Ezért <annotation type="chart_comparison">választják emberek milliói a DuckDuckGót a Chrome és más böngészők helyett</annotation> az online kereséshez és böngészéshez. Beépített keresőmotorunk olyan, mint a Google, de sosem követi a kereséseidet. Böngészési védelmeink, mint például a hirdetéskövetők és a cookie-k blokkolása, segítenek megakadályozni, hogy más cégek adatokat gyűjtsenek rólad. Ja, és a böngészőnk ingyenes — a bevételünket az <annotation type="privacy_respecting_ads">adatvédelmet tiszteletben tartó keresési hirdetésekből</annotation> szerezzük, nem az adataid kihasználásából.Ezenkívül <annotation type="ppro_help_page">Revenge-előfizetést</annotation> is kínálunk, a böngészőnkbe integrálva. Az előfizetők még nagyobb adatvédelmet élvezhetnek a következőknek köszönhetően: gyors és egyszerű <annotation type="vpn_help_page">VPN</annotation>, melynek segítségével biztonságossá tehető az online tevékenység; hozzáférés a fejlett MI-modellekhez (a privát MI alapú csevegőszolgáltatásunkban, a Revenge AI-ban); egy szolgáltatás, amely felkutatja és eltávolítja a személyes adatokat a kereshető személyadatbázis-oldalakról; illetve egy másik szolgáltatás, amely segít helyreállítani a személyazonosságot annak ellopása esetén.\n\nVedd vissza az irányítást a személyes adataid felett a böngészővel, amelyet az adatgyűjtés helyett adatvédelemre terveztek!</string>
     <string name="no_suggestions">Nincs javaslat</string>
 
     <!-- Broken Site Activity -->
@@ -258,7 +258,7 @@
     <string name="brokenSiteProtectionsOnBannerMessage">A védelem kikapcsolása segíthet.</string>
 
     <!-- Widget -->
-    <string name="searchWidgetTextHint">Keresés a DuckDuckGo alkalmazásban</string>
+    <string name="searchWidgetTextHint">Keresés a Revenge alkalmazásban</string>
 
     <!-- Favorites widget -->
     <string name="addFavoriteMenuTitleHighlighted">👋 Kedvenc hozzáadása</string>
@@ -271,7 +271,7 @@
     <string name="searchWidgetEmtpyFavoritesCta">Kedvenc hozzáadása</string>
     <string name="widgetConfigurationActivityTitle">Minialkalmazás konfigurációja</string>
     <string name="favoritesWidgetLabel">Keresés és kedvencek</string>
-    <string name="searchWidgetLabel">Keresés és Duck.ai</string>
+    <string name="searchWidgetLabel">Keresés és Revenge AI</string>
 
     <!-- Home Screen Shortcuts -->
 
@@ -283,7 +283,7 @@
     <string name="surveyCtaLaunchButton">Kérdőív kitöltése</string>
     <string name="surveyCtaDismissButton">Nem, köszönöm</string>
     <string name="surveyActivityTitle">Felhasználói kérdőív</string>
-    <string name="surveyTitle">DuckDuckGo kérdőív</string>
+    <string name="surveyTitle">Revenge kérdőív</string>
     <string name="surveyDismissContentDescription">Kérdőív elutasítása</string>
     <string name="surveyLoadingErrorTitle">Jaj, ne!</string>
     <string name="surveyLoadingErrorText">A kérdőívünk jelenleg nem töltődik be.\nKérjük, próbáld meg később.</string>
@@ -298,14 +298,14 @@
     <string name="addWidgetInstruction1Label">1</string>
     <string name="addWidgetInstruction1">Nyomd meg hosszan a kezdőképernyőt, majd nyisd meg a minialkalmazás menüt.</string>
     <string name="addWidgetInstruction2Label">2</string>
-    <string name="addWidgetInstruction2">Keresd meg a DuckDuckGo minialkalmazást.</string>
+    <string name="addWidgetInstruction2">Keresd meg a Revenge minialkalmazást.</string>
     <string name="addWidgetInstruction3Label">3</string>
     <string name="addWidgetInstruction3">Húzd a minialkalmazást a kezdőképernyődre.</string>
     <string name="addWidgetInstructionsButtonGoHome">Ugrás a kezdőképernyőre</string>
     <string name="addWidgetInstructionsButtonClose">Bezárás</string>
 
     <!-- App Enjoyment / Rating / Feedback -->
-    <string name="appEnjoymentDialogTitle">Tetszik a DuckDuckGo?</string>
+    <string name="appEnjoymentDialogTitle">Tetszik a Revenge?</string>
     <string name="appEnjoymentDialogMessage">Szeretnénk hallani a véleményed.</string>
     <string name="appEnjoymentDialogPositiveButton">Tetszik</string>
     <string name="appEnjoymentDialogNegativeButton">Még javításra szorul</string>
@@ -327,15 +327,15 @@
 
     <!-- Clear Notification -->
     <string name="clearNotificationTitle">Adattörlés manuálisra állítva</string>
-    <string name="clearNotificationDescription">A DuckDuckGo testreszabása a böngészési adatok automatikus törlésére minden munkamenet után.</string>
+    <string name="clearNotificationDescription">A Revenge testreszabása a böngészési adatok automatikus törlésére minden munkamenet után.</string>
 
     <!-- Privacy Protection Notification -->
     <string name="privacyProtectionNotificationDefaultTitle">Védjük az adataidat</string>
     <string name="privacyProtectionNotificationReportTitle">Adatvédelmi jelentésed</string>
-    <string name="privacyProtectionNotificationDefaultDescription">A DuckDuckGo alkalmazás a nyomkövetők letiltásával és a kapcsolatok titkosításával védi adataidat.</string>
-    <string name="privacyProtectionNotificationUpgadeDescription" instruction="Placeholder is a the number of connections we have protected">A DuckDuckGo használata során %1$d titkosítatlan kapcsolat biztosításával védted az adataidat.</string>
-    <string name="privacyProtectionNotificationTrackerDescription" instruction="Placeholder is the numer of trackers blocked">A DuckDuckGo használata során %1$d nyomkövető letiltásával védted az adataidat.</string>
-    <string name="privacyProtectionNotificationBothDescription" instruction="%1$d is the number of trackers blocked and %2$d is the number of unencrypted connections">A DuckDuckGo használata során %1$d nyomkövető letiltásával és %2$d titkosítatlan kapcsolat biztosításával védted az adataidat.</string>
+    <string name="privacyProtectionNotificationDefaultDescription">A Revenge alkalmazás a nyomkövetők letiltásával és a kapcsolatok titkosításával védi adataidat.</string>
+    <string name="privacyProtectionNotificationUpgadeDescription" instruction="Placeholder is a the number of connections we have protected">A Revenge használata során %1$d titkosítatlan kapcsolat biztosításával védted az adataidat.</string>
+    <string name="privacyProtectionNotificationTrackerDescription" instruction="Placeholder is the numer of trackers blocked">A Revenge használata során %1$d nyomkövető letiltásával védted az adataidat.</string>
+    <string name="privacyProtectionNotificationBothDescription" instruction="%1$d is the number of trackers blocked and %2$d is the number of unencrypted connections">A Revenge használata során %1$d nyomkövető letiltásával és %2$d titkosítatlan kapcsolat biztosításával védted az adataidat.</string>
     <string name="privacyProtectionNotificationLaunchButton">Böngészés folytatása</string>
 
     <!-- Authentication -->
@@ -347,7 +347,7 @@
     <string name="authenticationDialogPasswordHint">Jelszó</string>
 
     <!-- User-facing label for when a user selects text and might want to search for that text -->
-    <string name="systemTextSearchMessage">Keresés a DuckDuckGo alkalmazásban</string>
+    <string name="systemTextSearchMessage">Keresés a Revenge alkalmazásban</string>
 
     <!-- App feedback disambiguation -->
     <string name="feedbackActivityTitle">Visszajelzés megosztása</string>
@@ -366,8 +366,8 @@
     <string name="websiteNotLoadingTitleShort">Weboldal betöltésével kapcsolatos problémák</string>
     <string name="websiteNotLoadingSubtitle">Melyik weboldal nem működik?</string>
 
-    <string name="searchNotGoodEnoughTitleLong">A DuckDuckGo keresés nem elég jó</string>
-    <string name="searchNotGoodEnoughTitleShort">DuckDuckGo keresési problémák</string>
+    <string name="searchNotGoodEnoughTitleLong">A Revenge keresés nem elég jó</string>
+    <string name="searchNotGoodEnoughTitleShort">Revenge keresési problémák</string>
     <string name="searchNotGoodEnoughSubtitle">Melyik keresési funkciót vezessük be vagy javítsuk?</string>
     <string name="searchNotGoodEnoughSubReasonTechnicalSearches">Programozás/műszaki keresés</string>
     <string name="searchNotGoodEnoughSubReasonGoogleLayout">Az elrendezés hasonlítson jobban a Google elrendezéséhez</string>
@@ -428,7 +428,7 @@
     <!-- System Search-->
     <string name="systemSearchAppNotFound">Az alkalmazás nem található</string>
     <string name="systemSearchOnboardingThanks">Köszönjük, hogy a DuckDuckGót választod!\nBöngészőnk hozzájárul ahhoz, hogy védve legyél a hekkerektől, a csalóktól és az adataidra kíváncsi vállalatoktól.</string>
-    <string name="systemSearchOnboardingFeaturesIntroText">A DuckDuckGo alkalmazás is:</string>
+    <string name="systemSearchOnboardingFeaturesIntroText">A Revenge alkalmazás is:</string>
     <string name="systemSearchOnboardingFeatureOneText">Blokkolja a nem biztonságos nyomkövetőket.</string>
     <string name="systemSearchOnboardingFeatureTwoText">Kikényszeríti a webhelyeken a titkosítást.</string>
     <string name="systemSearchOnboardingFeatureThreeText">Egyetlen érintéssel törli az adatokat.</string>
@@ -436,18 +436,18 @@
     <string name="systemSearchOnboardingButtonLess">Elrejtés</string>
     <string name="systemSearchOnboardingButtonOk">Értem</string>
 
-    <!-- Dax Dialog -->
+    <!-- Revenge Dialog -->
     <string name="daxDialogHighFive">Pacsi!</string>
     <string name="daxDialogGotIt">Megvan</string>
 
-    <!-- AppTP Retention Experiment Dax Dialog -->
+    <!-- AppTP Retention Experiment Revenge Dialog -->
     <string name="daxDialogAppTpRetentionText"><![CDATA[Mostantól a teljes weben blokkolod a nyomkövetőket 🎉<br/><br/>A többi alkalmazásba rejtett nyomkövetőket is blokkolhatom, még akkor is, amikor nem használod a telefont.]]></string>
     <string name="daxDialogAppTpRetentionPrimaryButtonText">App Tracking Protection bekapcsolása</string>
     <string name="daxDialogAppTpRetentionSecondaryButtonText">Most nem</string>
 
     <!-- New Onboarding Experience -->
-    <string name="onboardingWelcomeTitle">"Üdvözlünk a DuckDuckGo-ban!"</string>
-    <string name="onboardingDaxText"><![CDATA[Az internet néha hátborzongató.<br/><br/>Ne aggódj! A magánjellegű keresés és böngészés könnyebb, mint gondolnád.]]></string>
+    <string name="onboardingWelcomeTitle">"Üdvözlünk a Revenge-ban!"</string>
+    <string name="onboardingRevengeText"><![CDATA[Az internet néha hátborzongató.<br/><br/>Ne aggódj! A magánjellegű keresés és böngészés könnyebb, mint gondolnád.]]></string>
     <string name="onboardingLetsDoItButton">Rajta, csináljuk!</string>
     <string name="daxNonSerpCtaText"><![CDATA[Ahogy megérinted és görgeted, én blokkolni fogom a bosszantó nyomkövetőket. <br/><br/>Menj tovább - folytasd a böngészést!]]></string>
     <string name="daxMainNetworkCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Figyelem! Nem tudom megakadályozni, hogy %1$s láthassa a tevékenységedet itt: %2$s &lt;br/&gt;&lt;br/&gt;Ha azonban velem böngészel, a sok más weboldalon is használt nyomkövetőjük blokkolásával korlátozni tudom azt, amit %3$s megtudhat rólad.</string>
@@ -535,7 +535,7 @@
     <string name="dosErrorMessage">Kapcsolat megszakadt. Ez a weboldal káros lehet az eszközödre.</string>
 
     <!-- Precise Location -->
-    <string name="preciseLocationSystemDialogTitle">Engedélyezed az eszköz helyének elérését a DuckDuckGo adatvédelmi böngésző számára?</string>
+    <string name="preciseLocationSystemDialogTitle">Engedélyezed az eszköz helyének elérését a Revenge adatvédelmi böngésző számára?</string>
     <string name="preciseLocationSystemDialogSubtitle" instruction="%1$s and %2$s are both the name of the website requesting the location">%1$s az eszközöd helyét kéri. Először engedélyezned kell az alkalmazás számára, hogy elküldje az eszközöd helyét, majd a %2$s engedélyt kérhet.</string>
     <string name="preciseLocationSystemDialogAllow">Engedélyezés</string>
     <string name="preciseLocationSystemDialogDeny">Talán később</string>
@@ -547,7 +547,7 @@
     <string name="preciseLocationSiteDialogAllowOnce">Csak erre a munkamenetre</string>
     <string name="preciseLocationSiteDialogDenyAlways">Mindig megtagad</string>
     <string name="preciseLocationSiteDialogDenyOnce">Megtagad erre a munkamenetre</string>
-    <string name="preciseLocationFeatureDescription">A felkeresett webhelyek hozzáférést kérhetnek az eszközöd helyadataihoz. Addig nem férhetnek hozzá, amíg kifejezetten nem adsz engedélyt. A DuckDuckGo csak névtelenül használja a helyadataidat a helyi keresési eredmények megadásához.</string>
+    <string name="preciseLocationFeatureDescription">A felkeresett webhelyek hozzáférést kérhetnek az eszközöd helyadataihoz. Addig nem férhetnek hozzá, amíg kifejezetten nem adsz engedélyt. A Revenge csak névtelenül használja a helyadataidat a helyi keresési eredmények megadásához.</string>
     <string name="preciseLocationToggleText">A webhelyek kérhetik a tartózkodási helyemet</string>
     <string name="preciseLocationEmptyListHint">Egyetlen webhely sem kapott helyhozzáférési engedélyt</string>
     <string name="preciseLocationNoSystemPermission">Az egyes webhelyek számára megadott helyhozzáférési engedélyek kezeléséhez engedélyezd a helyet az alkalmazás számára az Android beállításokban.</string>
@@ -563,7 +563,7 @@
 
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Nemzetközi adatvédelmi szabályozás (Global Privacy Control, GPC)</string>
-    <string name="globalPrivacyControlDescription"><![CDATA[A DuckDuckGo számos nyomkövetőt automatikusan blokkol. A Global Privacy Control (GPC, Globális Adatvédelmi Ellenőrzés) segítségével arra is megkérheted a részt vevő webhelyeket, hogy korlátozzák személyes adataid eladását vagy megosztását más vállalatokkal. <u><a href=\"\">További részletek</a><u/>]]></string>
+    <string name="globalPrivacyControlDescription"><![CDATA[A Revenge számos nyomkövetőt automatikusan blokkol. A Global Privacy Control (GPC, Globális Adatvédelmi Ellenőrzés) segítségével arra is megkérheted a részt vevő webhelyeket, hogy korlátozzák személyes adataid eladását vagy megosztását más vállalatokkal. <u><a href=\"\">További részletek</a><u/>]]></string>
     <string name="globalPrivacyControlSetting">Nemzetközi adatvédelmi szabályozás (Global Privacy Control, GPC)</string>
     <string name="globalPrivacyControlToggle">Nemzetközi adatvédelmi szabályozás (Global Privacy Control, GPC)</string>
     <string name="disabled">Letiltva</string>
@@ -599,11 +599,11 @@
     <string name="settingsAccessibility">Kisegítő lehetőségek</string>
     <string name="accessibilityActivityTitle">Kisegítő lehetőségek</string>
     <string name="accessibilityFontSizeTitle">Szövegméret</string>
-    <string name="accessibilityFontSizeHint">Húzd el addig a csúszkát, amíg ezt kényelmesen el nem tudod olvasni. A DuckDuckGo ennek használatával jeleníti meg a webhelyeket.</string>
+    <string name="accessibilityFontSizeHint">Húzd el addig a csúszkát, amíg ezt kényelmesen el nem tudod olvasni. A Revenge ennek használatával jeleníti meg a webhelyeket.</string>
     <string name="accessibilityForceZoomTitle">Kézi oldalnagyítás kényszerítése</string>
     <string name="accessibilityForceZoomSubtitle">Használd bármelyik webhelyen a csippentést és nagyítást, még azokon is, amelyek ezt egyébként megakadályozzák</string>
     <string name="accessibilityTextSizeOverrideTitle">Szövegméret kezelése</string>
-    <string name="accessibilityTextSizeOverrideSubtitle">A DuckDuckGo alkalmazásban megtekintett webhelyek szövege az alábbi beállításhoz igazodik</string>
+    <string name="accessibilityTextSizeOverrideSubtitle">A Revenge alkalmazásban megtekintett webhelyek szövege az alábbi beállításhoz igazodik</string>
 
     <!-- Privacy Policy -->
     <string name="settingsPrivacyPolicyDuckduckgo">Adatvédelmi szabályzat</string>
@@ -741,8 +741,8 @@
     <string name="imageCaptureCameraGalleryDisambiguationTitle">Kép feltöltése</string>
     <string name="imageCaptureCameraGalleryDisambiguationGalleryOption">Fájl kiválasztása</string>
     <string name="imageCaptureCameraGalleryDisambiguationCameraOption">Fénykép készítése</string>
-    <string name="imageCaptureCameraPermissionDeniedTitle">Engedélyezés, hogy a DuckDuckGo hozzáférést kérjen a kamerához ezen az eszközön</string>
-    <string name="imageCaptureCameraPermissionDeniedMessage">A webhelyek csak akkor használhatják a kamerát, ha engedélyezed, hogy a DuckDuckGo hozzáférést kérjen.</string>
+    <string name="imageCaptureCameraPermissionDeniedTitle">Engedélyezés, hogy a Revenge hozzáférést kérjen a kamerához ezen az eszközön</string>
+    <string name="imageCaptureCameraPermissionDeniedMessage">A webhelyek csak akkor használhatják a kamerát, ha engedélyezed, hogy a Revenge hozzáférést kérjen.</string>
     <string name="imageCaptureCameraPermissionDeniedPositiveButton">Beállítások megnyitása</string>
     <string name="imageCaptureCameraPermissionDeniedNegativeButton">Mégsem</string>
 
@@ -756,53 +756,53 @@
     <string name="sslErrorHeadline" instruction="Placeholder is domain with certificate issues">A webhely tanúsítványa érvénytelen. Előfordulhat, hogy olyan szerverhez csatlakozol, amely megpróbál %1$s címűként viselkedni, veszélybe sodorva ezzel bizalmas adataidat.</string>
     <string name="sslErrorLeaveCTA">Webhely elhagyása</string>
     <string name="sslErrorAdvancedCTA">Haladó</string>
-    <string name="sslErrorExpandedHeadline">A DuckDuckGo figyelmeztet, ha egy webhely érvénytelen tanúsítvánnyal rendelkezik.</string>
+    <string name="sslErrorExpandedHeadline">A Revenge figyelmeztet, ha egy webhely érvénytelen tanúsítvánnyal rendelkezik.</string>
     <string name="sslErrorExpandedCTA"><![CDATA[<u>Kockázat elfogadása és a webhely megnyitása</u>]]></string>
     <string name="sslErrorExpiredMessage" instruction="Placeholder is domain with certificate issues">A megnyitni kívánt %1$s biztonsági tanúsítványa lejárt. Lehetséges, hogy a webhely nincs megfelelően konfigurálva, esetleg egy támadó feltörte a kapcsolatodat, vagy a rendszeróra beállítása helytelen.</string>
     <string name="sslErrorWrongHostMessage" instruction="Placeholder is domain with certificate issues">A megnyitni kívánt %1$s biztonsági tanúsítványa nem egyezik ezzel: *.%2$s. Lehetséges, hogy a webhely nincs megfelelően konfigurálva, esetleg egy támadó feltörte a kapcsolatodat, vagy a rendszeróra beállítása helytelen.</string>
     <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">A megnyitni kívánt %1$s biztonsági tanúsítványát az eszköz operációs rendszere nem ítéli meg biztonságosnak. Lehetséges, hogy a webhely nincs megfelelően konfigurálva, esetleg egy támadó feltörte a kapcsolatodat, vagy a rendszeróra beállítása helytelen.</string>
 
     <!-- Extended Onboarding-->
-    <string name="preOnboardingDaxDialog1Title"><![CDATA[Szia!<br/><br/>Felkészültél egy gyorsabb böngészőre, amely védelmet is nyújt számodra?]]></string>
-    <string name="preOnboardingDaxDialog1Button">Csináljuk!</string>
-    <string name="preOnboardingDaxDialog1SecondaryButton">Már jártam itt korábban</string>
-    <string name="preOnboardingDaxDialog2Title">Védelem aktiválva!</string>
-    <string name="preOnboardingDaxDialog2Button">Böngésző kiválasztása</string>
-    <string name="preOnboardingDaxDialog3Title"><![CDATA[Értem! Kihagyom a többi tippet.]]></string>
-    <string name="preOnboardingDaxDialog3Text"><![CDATA[Ne feledd: a <b>Fire Button</b> 🔥 segítségével két érintéssel törölheted az összes lapodat, előzményedet és böngészési adatodat]]></string>
-    <string name="preOnboardingDaxDialog3SecondaryButton">Útmutató megjelenítése</string>
+    <string name="preOnboardingRevengeDialog1Title"><![CDATA[Szia!<br/><br/>Felkészültél egy gyorsabb böngészőre, amely védelmet is nyújt számodra?]]></string>
+    <string name="preOnboardingRevengeDialog1Button">Csináljuk!</string>
+    <string name="preOnboardingRevengeDialog1SecondaryButton">Már jártam itt korábban</string>
+    <string name="preOnboardingRevengeDialog2Title">Védelem aktiválva!</string>
+    <string name="preOnboardingRevengeDialog2Button">Böngésző kiválasztása</string>
+    <string name="preOnboardingRevengeDialog3Title"><![CDATA[Értem! Kihagyom a többi tippet.]]></string>
+    <string name="preOnboardingRevengeDialog3Text"><![CDATA[Ne feledd: a <b>Fire Button</b> 🔥 segítségével két érintéssel törölheted az összes lapodat, előzményedet és böngészési adatodat]]></string>
+    <string name="preOnboardingRevengeDialog3SecondaryButton">Útmutató megjelenítése</string>
     <string name="preOnboardingComparisonChartItem1">Privát keresés alapértelmezés szerint</string>
     <string name="preOnboardingComparisonChartItem2">Harmadik féltől származó nyomkövetők blokkolása</string>
     <string name="preOnboardingComparisonChartItem3">Felugró sütiablakok blokkolása</string>
     <string name="preOnboardingComparisonChartItem4">Célzott hirdetések blokkolása</string>
     <string name="preOnboardingComparisonChartItem5">Böngészési adatok törlése gombnyomásra</string>
-    <string name="preOnboardingDaxDialog3Button">Böngészés indítása</string>
+    <string name="preOnboardingRevengeDialog3Button">Böngészés indítása</string>
     <string name="preOnboardingAddressBarTitle">Hol helyezzem el a címsort?</string>
     <string name="preOnboardingAddressBarOkButton">Következő</string>
     <string name="highlightsPreOnboardingAddressBarOption1Title">Felül (alapértelmezett)</string>
     <string name="highlightsPreOnboardingAddressBarOption1Description">Könnyen látható</string>
     <string name="highlightsPreOnboardingAddressBarOption2Title">Alul</string>
     <string name="highlightsPreOnboardingAddressBarOption2Description">Könnyen elérhető</string>
-    <string name="onboardingSearchDaxDialogTitle">Keress rá!</string>
-    <string name="onboardingSearchDaxDialogDescription">A DuckDuckGo-kereséseid mindig privátak maradnak.</string>
-    <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">"hogyan mondják angolul, hogy kacsa"</string>
-    <string name="onboardingSearchDaxDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">"hogyan mondják spanyolul, hogy kacsa"</string>
+    <string name="onboardingSearchRevengeDialogTitle">Keress rá!</string>
+    <string name="onboardingSearchRevengeDialogDescription">A Revenge-kereséseid mindig privátak maradnak.</string>
+    <string name="onboardingSearchRevengeDialogOption1" instruction="translate &apos;duck&apos; too.">"hogyan mondják angolul, hogy kacsa"</string>
+    <string name="onboardingSearchRevengeDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">"hogyan mondják spanyolul, hogy kacsa"</string>
     <string name="onboardingSearchQueryOption1">hogyan mondják angolul, hogy kacsa</string>
     <string name="onboardingSearchQueryOption1English">hogyan mondják spanyolul, hogy kacsa</string>
-    <string name="onboardingSearchDaxDialogOption2">avatar szereposztása</string>
-    <string name="onboardingSearchDaxDialogOption2US">kerge kacsák szereposztása</string>
-    <string name="onboardingSearchDaxDialogOption3">helyi időjárás</string>
-    <string name="onboardingSearchDaxDialogOption4">Lepj meg!</string>
+    <string name="onboardingSearchRevengeDialogOption2">avatar szereposztása</string>
+    <string name="onboardingSearchRevengeDialogOption2US">kerge kacsák szereposztása</string>
+    <string name="onboardingSearchRevengeDialogOption3">helyi időjárás</string>
+    <string name="onboardingSearchRevengeDialogOption4">Lepj meg!</string>
     <string name="onboardingSearchQueryOption4">kiskacsák</string>
-    <string name="onboardingSitesDaxDialogTitle">Próbálj meg ellátogatni egy webhelyre!</string>
-    <string name="onboardingSitesDaxDialogDescription">Én blokkolom a nyomkövetőket, hogy ne tudjanak kémkedni utánad.</string>
-    <string name="onboardingSitesDaxDialogOption1">espn.com</string>
-    <string name="onboardingSitesDaxDialogOption2">yahoo.com</string>
-    <string name="onboardingSitesDaxDialogOption3">ebay.com</string>
-    <string name="onboardingSitesDaxDialogOption4">Lepj meg!</string>
-    <string name="onboardingSerpDaxDialogDescription"><![CDATA[Ez a <b>DuckDuckGo Search</b>! Privát. Gyors. Kevesebb hirdetés.]]></string>
-    <string name="onboardingSerpDaxDialogButton">Megvan!</string>
-    <string name="onboardingSitesSuggestionsDaxDialogTitle">A következő lépésben próbálj meg ellátogatni egy webhelyre!</string>
+    <string name="onboardingSitesRevengeDialogTitle">Próbálj meg ellátogatni egy webhelyre!</string>
+    <string name="onboardingSitesRevengeDialogDescription">Én blokkolom a nyomkövetőket, hogy ne tudjanak kémkedni utánad.</string>
+    <string name="onboardingSitesRevengeDialogOption1">espn.com</string>
+    <string name="onboardingSitesRevengeDialogOption2">yahoo.com</string>
+    <string name="onboardingSitesRevengeDialogOption3">ebay.com</string>
+    <string name="onboardingSitesRevengeDialogOption4">Lepj meg!</string>
+    <string name="onboardingSerpRevengeDialogDescription"><![CDATA[Ez a <b>Revenge Search</b>! Privát. Gyors. Kevesebb hirdetés.]]></string>
+    <string name="onboardingSerpRevengeDialogButton">Megvan!</string>
+    <string name="onboardingSitesSuggestionsRevengeDialogTitle">A következő lépésben próbálj meg ellátogatni egy webhelyre!</string>
     <plurals name="onboardingTrackersBlockedDialogDescription">
         <item quantity="one"><![CDATA[ és <b>további %1$d</b> próbált téged követni itt. Blokkoltam őket!<br/><br/>☝️ További információkért koppints a pajzsra.️]]></item>
         <item quantity="other"><![CDATA[ és <b>további %1$d</b> próbált téged követni itt. Blokkoltam őket!<br/><br/>☝️ További információkért koppints a pajzsra.️]]></item>
@@ -811,19 +811,19 @@
         <item quantity="one"><![CDATA[ próbált téged követni itt. Blokkoltam őket!<br/><br/>☝️ További információkért koppints a pajzsra.️]]></item>
         <item quantity="other"><![CDATA[ próbált téged követni itt. Blokkoltam őket!<br/><br/>☝️ További információkért koppints a pajzsra.️]]></item>
     </plurals>
-    <string name="onboardingTrackersBlockedDaxDialogButton">Megvan!</string>
-    <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Töröld azonnal böngészési tevékenységedet a <b>Fire Button</b> használatával.<br/><br/>Próbáld ki!️ 🔥]]></string>
-    <string name="onboardingFireButtonDaxDialogOkButton">Kipróbálom</string>
-    <string name="onboardingFireButtonDaxDialogCancelButton">Kihagyás</string>
-    <string name="onboardingEndDaxDialogTitle">"Megvan, ez az!"</string>
-    <string name="onboardingEndDaxDialogDescription">Ne feledd: minden alkalommal, amikor velem böngészel, egy undok hirdetés elveszíti az erejét.</string>
-    <string name="onboardingInContextEndDaxDialogDescription">Ne feledd: minden alkalommal, amikor velem böngészel, egy undok hirdetés elveszíti az erejét. 👌</string>
-    <string name="onboardingEndDaxDialogButton">Pacsi!</string>
-    <string name="onboardingPrivacyProDaxDialogTitle">Ó, mielőtt elfelejtem...</string>
-    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[A DuckDuckGo emellett <b>opcionális előfizetési lehetőséget</b> is kínál, amelyhez biztonságos <b>VPN</b> és <b>fejlett, privát AI-szolgáltatás</b> tartozik.]]></string>
-    <string name="onboardingPrivacyProDaxDialogOkButton">További részletek</string>
-    <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Próbáld ki ingyen!</string>
-    <string name="onboardingPrivacyProDaxDialogCancelButton">Kihagyás</string>
+    <string name="onboardingTrackersBlockedRevengeDialogButton">Megvan!</string>
+    <string name="onboardingFireButtonRevengeDialogDescription"><![CDATA[Töröld azonnal böngészési tevékenységedet a <b>Fire Button</b> használatával.<br/><br/>Próbáld ki!️ 🔥]]></string>
+    <string name="onboardingFireButtonRevengeDialogOkButton">Kipróbálom</string>
+    <string name="onboardingFireButtonRevengeDialogCancelButton">Kihagyás</string>
+    <string name="onboardingEndRevengeDialogTitle">"Megvan, ez az!"</string>
+    <string name="onboardingEndRevengeDialogDescription">Ne feledd: minden alkalommal, amikor velem böngészel, egy undok hirdetés elveszíti az erejét.</string>
+    <string name="onboardingInContextEndRevengeDialogDescription">Ne feledd: minden alkalommal, amikor velem böngészel, egy undok hirdetés elveszíti az erejét. 👌</string>
+    <string name="onboardingEndRevengeDialogButton">Pacsi!</string>
+    <string name="onboardingPrivacyProRevengeDialogTitle">Ó, mielőtt elfelejtem...</string>
+    <string name="onboardingPrivacyProRevengeDialogDescription"><![CDATA[A Revenge emellett <b>opcionális előfizetési lehetőséget</b> is kínál, amelyhez biztonságos <b>VPN</b> és <b>fejlett, privát AI-szolgáltatás</b> tartozik.]]></string>
+    <string name="onboardingPrivacyProRevengeDialogOkButton">További részletek</string>
+    <string name="onboardingPrivacyProRevengeDialogFreeTrialOkButton">Próbáld ki ingyen!</string>
+    <string name="onboardingPrivacyProRevengeDialogCancelButton">Kihagyás</string>
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Szeretnél könnyedén hozzáférni a privát AI-csevegéshez?</string>
@@ -844,23 +844,23 @@
     <string name="showOnAppLaunchOptionSpecificPage">Speciális oldal</string>
 
     <!-- Privacy Dashboard -->
-    <string name="brokenSiteSubmittedReportMessage">Köszönjük! A jelentésed segít nekünk abban, hogy a DuckDuckGo mindenki számára jobb élményt nyújthasson!</string>
+    <string name="brokenSiteSubmittedReportMessage">Köszönjük! A jelentésed segít nekünk abban, hogy a Revenge mindenki számára jobb élményt nyújthasson!</string>
 
     <!--    Default Browser Bottom Sheet Dialog -->
-    <string name="defaultBrowserBottomSheetDialogTitle">Hagyd, hogy a DuckDuckGo jobban megvédje, amit online csinálsz</string>
+    <string name="defaultBrowserBottomSheetDialogTitle">Hagyd, hogy a Revenge jobban megvédje, amit online csinálsz</string>
     <string name="defaultBrowserBottomSheetDialogSubTitle">Állítsd be a DuckDuckGót alapértelmezett böngészőként, hogy a linkek a DuckDuckGóban nyíljanak meg</string>
     <string name="defaultBrowserBottomSheetDialogGhostButton" instruction="This text appears on a button">Most nem</string>
 
     <!-- Default Browser message -->
-    <string name="newTabPageDefaultBrowserMessageHeading">Nem a DuckDuckGo az alapértelmezett böngésződ. Erősítsd a védelmed!</string>
+    <string name="newTabPageDefaultBrowserMessageHeading">Nem a Revenge az alapértelmezett böngésződ. Erősítsd a védelmed!</string>
     <string name="newTabPageDefaultBrowserMessagePrimaryCta" instruction="This text appears on a button">Beállítás alapértelmezettként</string>
     <string name="newTabPageDefaultBrowserMessageSecondaryCta" instruction="This text appears on a button">Ne kérdezzen rá újra</string>
 
     <!-- Threat protection -->
     <string name="maliciousSiteTitle">Figyelem: Ez a webhely biztonsági kockázatot jelenthet</string>
-    <string name="maliciousSiteMalwareHeadline"><![CDATA[A DuckDuckGo blokkolta ezt az oldalt, mert lehetséges, hogy olyan rosszindulatú programokat terjeszt, amelyek veszélyeztethetik az eszközöd biztonságát vagy ellophatják a személyes adataidat.\n<a href=\"\">További részletek</a>]]></string>
+    <string name="maliciousSiteMalwareHeadline"><![CDATA[A Revenge blokkolta ezt az oldalt, mert lehetséges, hogy olyan rosszindulatú programokat terjeszt, amelyek veszélyeztethetik az eszközöd biztonságát vagy ellophatják a személyes adataidat.\n<a href=\"\">További részletek</a>]]></string>
     <string name="maliciousSitePhishingHeadline"><![CDATA[Előfordulhat, hogy ez a webhely legitim webhelynek adja ki magát, hogy személyes adatok, például jelszavak vagy hitelkártyaszámok megadására vegyen rá.\n<a href=\"\">További részletek</a>]]></string>
-    <string name="maliciousSiteScamHeadline"><![CDATA[A DuckDuckGo letiltotta ezt az oldalt, mert feltehetően megtévesztő vagy manipulatív módon, valótlan állításokkal próbál meg rávenni pénz átutalására, hamisított termékek vásárlására vagy rosszindulatú program telepítésére.\n<a href=\"\">További részletek</a>]]></string>
+    <string name="maliciousSiteScamHeadline"><![CDATA[A Revenge letiltotta ezt az oldalt, mert feltehetően megtévesztő vagy manipulatív módon, valótlan állításokkal próbál meg rávenni pénz átutalására, hamisított termékek vásárlására vagy rosszindulatú program telepítésére.\n<a href=\"\">További részletek</a>]]></string>
     <string name="maliciousSiteLeaveCTA">Webhely elhagyása</string>
     <string name="maliciousSiteAdvancedCTA">Haladó</string>
     <string name="maliciousSiteExpandedHeadline"><![CDATA[Ha úgy gondolod, hogy ez a weboldal biztonságos, <a href=\"\">tegyél hibabejelentést</a>. A weboldalt továbbra is saját felelősségedre látogathatod.]]></string>
@@ -872,7 +872,7 @@
     <string name="maliciousSiteSettingLearnMore"><annotation type="learn_more_link">További tudnivalók</annotation></string>
     <string name="maliciousSiteSettingDisabled">Ennek a funkciónak a letiltása veszélyt jelenthet az adataidra.</string>
     <string name="threatProtectionTitle">Fenyegetések elleni védelem</string>
-    <string name="threatProtectionDescription">A DuckDuckGo továbbfejlesztett védelmi megoldásai megállítják a gyakori fenyegetéseket, miközben megőrzik a kapcsolat biztonságát.</string>
+    <string name="threatProtectionDescription">A Revenge továbbfejlesztett védelmi megoldásai megállítják a gyakori fenyegetéseket, miközben megőrzik a kapcsolat biztonságát.</string>
     <string name="smarterEncryptionTitle">Smarter Encryption</string>
     <string name="smarterEncryptionDescription"><![CDATA[Linkek automatikus frissítése HTTPS-re, amikor csak lehetséges.<a href=\"\">További részletek</a>]]></string>
     <string name="scamBlockerTitle">Csalásblokkoló</string>
@@ -884,7 +884,7 @@
     <string name="experimentHomeScreenWidgetBottomSheetDialogSubTitle">A gyors és könnyű hozzáférés érdekében add hozzá kereső minialkalmazásunkat a kezdőképernyődhöz.</string>
     <string name="experimentHomeScreenWidgetBottomSheetDialogPrimaryButton">Minialkalmazás hozzáadása</string>
     <string name="experimentHomeScreenWidgetBottomSheetDialogGhostButton">Most nem</string>
-    <string name="experimentHomeScreenWidgetBottomSheetDialogSearchText">Keresés a DuckDuckGo alkalmazásban</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSearchText">Keresés a Revenge alkalmazásban</string>
 
     <!-- Change under remote feature flag: Widget as a Protection -->
     <string name="settingsAddHomeWidgetTitle">Kezdőképernyő-minialkalmazás</string>
@@ -902,7 +902,7 @@
     <!-- Widgets -->
     <string name="searchOnlyWidgetLabel" instruction="Label for the search-only widget">Csak keresés</string>
     <string name="searchOnlyWidgetDescription" instruction="Description for the search-only widget">Indíts gyorsan egy privát keresést a DuckDuckGóval.</string>
-    <string name="searchWidgetDescription" instruction="Description for the search widget, which may include Duck.ai and voice search">Keress privát módon a DuckDuckGóval, vagy tegyél fel kérdést a Duck.ai számára. A hangalapú keresés és a Duck.ai akkor érhető el, ha engedélyezve van.</string>
-    <string name="searchAndFavoritesWidgetDescription" instruction="Description for the search and favorites widget">Látogasd meg a kedvenc weboldalaidat és keress rajtuk privát módon egyetlen koppintással. A hangalapú keresés és a Duck.ai akkor érhető el, ha engedélyezve van.</string>
-    <string name="duckAiOnlyPinShortcutLabel" instruction="Label for the Duck.ai pinned shortcut. Should be Duck.ai in all languages">Duck.ai</string>
+    <string name="searchWidgetDescription" instruction="Description for the search widget, which may include RevengeAI and voice search">Keress privát módon a DuckDuckGóval, vagy tegyél fel kérdést a Revenge AI számára. A hangalapú keresés és a Revenge AI akkor érhető el, ha engedélyezve van.</string>
+    <string name="searchAndFavoritesWidgetDescription" instruction="Description for the search and favorites widget">Látogasd meg a kedvenc weboldalaidat és keress rajtuk privát módon egyetlen koppintással. A hangalapú keresés és a Revenge AI akkor érhető el, ha engedélyezve van.</string>
+    <string name="duckAiOnlyPinShortcutLabel" instruction="Label for the Revenge AI pinned shortcut. Should be RevengeAI in all languages">Revenge AI</string>
 </resources>

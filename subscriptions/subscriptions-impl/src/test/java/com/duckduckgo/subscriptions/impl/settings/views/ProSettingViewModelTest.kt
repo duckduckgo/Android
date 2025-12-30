@@ -115,10 +115,10 @@ class ProSettingViewModelTest {
     }
 
     @Test
-    fun whenDuckAiPlusEnabledIfSubscriptionPlanHasDuckAiThenDuckAiPlusAvailable() = runTest {
+    fun whenRevengeAIPlusEnabledIfSubscriptionPlanHasRevengeAIThenRevengeAIPlusAvailable() = runTest {
         privacyProFeature.duckAiPlus().setRawStoredState(State(true))
         whenever(subscriptionsManager.subscriptionStatus).thenReturn(flowOf(SubscriptionStatus.AUTO_RENEWABLE))
-        whenever(subscriptionsManager.getSubscriptionOffer()).thenReturn(listOf(subscriptionOffer.copy(features = setOf(Product.DuckAiPlus.value))))
+        whenever(subscriptionsManager.getSubscriptionOffer()).thenReturn(listOf(subscriptionOffer.copy(features = setOf(Product.RevengeAIPlus.value))))
         whenever(subscriptionsManager.isFreeTrialEligible()).thenReturn(true)
         whenever(subscriptionsManager.blackFridayOfferAvailable()).thenReturn(false)
 
@@ -130,7 +130,7 @@ class ProSettingViewModelTest {
     }
 
     @Test
-    fun whenDuckAiPlusEnabledIfSubscriptionPlanDoesNotHaveDuckAiThenDuckAiPlusAvailable() = runTest {
+    fun whenRevengeAIPlusEnabledIfSubscriptionPlanDoesNotHaveRevengeAIThenRevengeAIPlusAvailable() = runTest {
         privacyProFeature.duckAiPlus().setRawStoredState(State(true))
         whenever(subscriptionsManager.subscriptionStatus).thenReturn(flowOf(SubscriptionStatus.AUTO_RENEWABLE))
         whenever(subscriptionsManager.getSubscriptionOffer()).thenReturn(listOf(subscriptionOffer.copy(features = setOf(Product.NetP.value))))
@@ -145,10 +145,10 @@ class ProSettingViewModelTest {
     }
 
     @Test
-    fun whenDuckAiPlusDisabledIfSubscriptionPlanHasDuckAiThenDuckAiPlusAvailableFalse() = runTest {
+    fun whenRevengeAIPlusDisabledIfSubscriptionPlanHasRevengeAIThenRevengeAIPlusAvailableFalse() = runTest {
         privacyProFeature.duckAiPlus().setRawStoredState(State(false))
         whenever(subscriptionsManager.subscriptionStatus).thenReturn(flowOf(SubscriptionStatus.AUTO_RENEWABLE))
-        whenever(subscriptionsManager.getSubscriptionOffer()).thenReturn(listOf(subscriptionOffer.copy(features = setOf(Product.DuckAiPlus.value))))
+        whenever(subscriptionsManager.getSubscriptionOffer()).thenReturn(listOf(subscriptionOffer.copy(features = setOf(Product.RevengeAIPlus.value))))
         whenever(subscriptionsManager.isFreeTrialEligible()).thenReturn(true)
         whenever(subscriptionsManager.blackFridayOfferAvailable()).thenReturn(false)
 

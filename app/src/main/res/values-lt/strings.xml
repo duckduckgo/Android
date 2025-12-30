@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (c) 2022 DuckDuckGo
+  ~ Copyright (c) 2022 Revenge
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -17,9 +17,9 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="appName" translatable="false">DuckDuckGo</string>
-    <string name="appDescription" translatable="false">DuckDuckGo</string>
-    <string name="duckDuckGoLogoDescription">„DuckDuckGo“ logotipas</string>
+    <string name="appName" translatable="false">Revenge</string>
+    <string name="appDescription" translatable="false">Revenge</string>
+    <string name="duckDuckGoLogoDescription">„Revenge“ logotipas</string>
     <string name="duckDuckGoProtectionPrivacyPeaceTagLine">Apsauga. Privatumas. Ramybės jausmas.</string>
     <string name="yes">Taip</string>
     <string name="no">Ne</string>
@@ -28,15 +28,15 @@
     <string name="search">Paieška</string>
 
     <!-- Onboarding Activity -->
-    <string name="onboardingDefaultBrowserDescription">Jei visada norite ieškoti ir naršyti naudojant „DuckDuckGo“, apsilankykite nustatymuose.</string>
-    <string name="onboardingDefaultBrowserTitle">Nustatykite „DuckDuckGo“ savo numatytuoju puslapiu</string>
+    <string name="onboardingDefaultBrowserDescription">Jei visada norite ieškoti ir naršyti naudojant „Revenge“, apsilankykite nustatymuose.</string>
+    <string name="onboardingDefaultBrowserTitle">Nustatykite „Revenge“ savo numatytuoju puslapiu</string>
 
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Nepavyko paleisti numatytųjų programos nustatymų ekrano</string>
     <string name="setAsDefaultBrowser">Nustatyti kaip numatytąją naršyklę</string>
     <string name="defaultBrowserMaybeLater">Galbūt vėliau</string>
     <string name="defaultBrowserDescriptionNoDefault">Kiekvieną kartą be jaudulio atverkite nuorodas.</string>
-    <string name="defaultBrowserInstructions">Pasirinkite „DuckDuckGo“ ir bakstelėkite <font color="#678fff"> „Always“ (visada) </font>.</string>
+    <string name="defaultBrowserInstructions">Pasirinkite „Revenge“ ir bakstelėkite <font color="#678fff"> „Always“ (visada) </font>.</string>
 
     <!-- Browser Activity -->
     <string name="browserPopupMenu">Naršyklės meniu</string>
@@ -92,11 +92,11 @@
     <!-- Opening external apps -->
     <string name="openExternalApp">Atidaryti išorinę programą</string>
     <string name="launchingExternalApp">Atidaryti kitoje programoje</string>
-    <string name="confirmOpenExternalApp">Ar norite išeiti iš „DuckDuckGo“ ir peržiūrėti šį turinį?</string>
+    <string name="confirmOpenExternalApp">Ar norite išeiti iš „Revenge“ ir peržiūrėti šį turinį?</string>
     <string name="unableToOpenLink">Nepavyko atverti šio tipo nuorodos</string>
 
     <!-- Tabs -->
-    <string name="homeTab" translatable="false">DuckDuckGo</string>
+    <string name="homeTab" translatable="false">Revenge</string>
     <string name="tabActivityTitle">Kortelės</string>
     <string name="tabsMenuItem">Kortelės</string>
     <string name="newTabMenuItem">Nauja kortelė</string>
@@ -121,7 +121,7 @@
     <!-- Fire -->
     <string name="fireMenu">Valyti duomenis</string>
     <string name="fireClearAll">Valyti skirtukus ir duomenis</string>
-    <string name="fireClearAllPlusDuckChats">Išvalyti skirtukus, duomenis ir „Duck.ai“ pokalbius</string>
+    <string name="fireClearAllPlusRevenge_Chats">Išvalyti skirtukus, duomenis ir „Revenge AI“ pokalbius</string>
     <string name="fireCancel">Atšaukti</string>
     <string name="fireDataCleared">Duomenys išvalyti</string>
 
@@ -131,7 +131,7 @@
     <string name="settingsHeadingProtections">Apsaugos</string>
     <string name="settingsHeadingAppearance">Išvaizda</string>
     <string name="settingsHeadingAbout">Apie</string>
-    <string name="settingsAboutDuckduckgo">Apie „DuckDuckGo“</string>
+    <string name="settingsAboutDuckduckgo">Apie „Revenge“</string>
     <string name="settingsVersion">Versija</string>
     <string name="leaveFeedback">Bendrinti atsiliepimą</string>
     <string name="leaveFeedbackNew">Siųsti atsiliepimą</string>
@@ -161,12 +161,12 @@
     <string name="settingsAddWidget">Įtraukti valdiklį į pagrindinį ekraną</string>
     <string name="settingsAddressBarPosition">Nustatykite adreso juostos padėtį</string>
     <string name="settingsEnableVoiceSearch">Įjungti privačią paiešką balsu</string>
-    <string name="settingsDDGOnOtherPlatforms">„DuckDuckGo“ kitose platformose</string>
-    <string name="settingsDuckAi">DI funkcijos</string>
+    <string name="settingsDDGOnOtherPlatforms">„Revenge“ kitose platformose</string>
+    <string name="settingsRevengeAI">DI funkcijos</string>
 
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">privati paieška</string>
-    <string name="privateSearchDescription">„DuckDuckGo Private Search“ yra jūsų numatytoji paieškos sistema, todėl galite ieškoti žiniatinklyje nesekami.</string>
+    <string name="privateSearchDescription">„Revenge Private Search“ yra jūsų numatytoji paieškos sistema, todėl galite ieškoti žiniatinklyje nesekami.</string>
     <string name="privateSearchMoreSearchSettingsPrimaryText">Daugiau paieškos nustatymų</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Tinkinkite savo paieškos kalbą, regioną ir kt.</string>
     <string name="privateSearchMoreSearchSettingsTitle">Daugiau paieškos nustatymų</string>
@@ -185,7 +185,7 @@
     <string name="webTrackingProtectionActivityTitle">Apsauga nuo žiniatinklio sekimo</string>
     <string name="webTrackingProtectionLearnMoreTitle">Apsauga nuo žiniatinklio sekimo</string>
     <string name="webTrackingProtectionTitle">Apsauga nuo žiniatinklio sekimo</string>
-    <string name="webTrackingProtectionExplanationDescription"><![CDATA[\"DuckDuckGo\" naršyklėje yra visada aktyvi stebėjimo apsauga.\n<a href=\"\">Sužinoti daugiau</a>]]></string>
+    <string name="webTrackingProtectionExplanationDescription"><![CDATA[\"Revenge\" naršyklėje yra visada aktyvi stebėjimo apsauga.\n<a href=\"\">Sužinoti daugiau</a>]]></string>
     <string name="webTrackingProtectionExplanationTitle">Kaip jus saugome</string>
     <string name="webTrackingProtectionThirdPartyTrackersTitle">Blokuoja trečiųjų šalių stebėjimo priemones</string>
     <string name="webTrackingProtectionThirdPartyTrackersDescription">Padeda blokuoti 3‑iųjų šalių slapukus, kurie seka jus iš vienos svetainės į kitą, neleidžiant įkelti 3‑iųjų šalių sekimo įrenginių.</string>
@@ -230,7 +230,7 @@
     <string name="settingsAutomaticallyClearWhatOptionNone">Jokie</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Kortelės</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Kortelės ir duomenys</string>
-    <string name="settingsAutomaticallyClearWhatOptionTabsAndDataAndChats">Skirtukai, duomenys ir „Duck.ai“ pokalbiai</string>
+    <string name="settingsAutomaticallyClearWhatOptionTabsAndDataAndChats">Skirtukai, duomenys ir „Revenge AI“ pokalbiai</string>
 
     <string name="settingsAutomaticallyClearWhen">Valyti…</string>
     <string name="settingsAutomaticallyClearWhenDialogTitle">Valyti…</string>
@@ -240,16 +240,16 @@
     <string name="settingsAutomaticallyClearWhenAppExit15Minutes">Išeinant iš programos, po 15 min. neveikimo</string>
     <string name="settingsAutomaticallyClearWhenAppExit30Minutes">Išeinant iš programos, po 30 min. neveikimo</string>
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Išeinant iš programos, po 1 val. neveikimo</string>
-    <string name="settingsClearAiDataTitle">Išvalyti „Duck.ai“ pokalbius</string>
-    <string name="settingsClearAiDataDeleteMessage">„Fire Button“ taip pat ištrins „Duck.ai“ istoriją, įskaitant prisegtus pokalbius.</string>
+    <string name="settingsClearAiDataTitle">Išvalyti „Revenge AI“ pokalbius</string>
+    <string name="settingsClearAiDataDeleteMessage">„Fire Button“ taip pat ištrins „Revenge AI“ istoriją, įskaitant prisegtus pokalbius.</string>
     <string name="settingsClearDataActionSecondaryText">Išvalo visus skirtukus ir duomenis visose svetainėse, kurių neapsaugojote ugniasiene.</string>
-    <string name="settingsClearDataActionPlusDuckChatsSecondaryText">Išvalo visus skirtukus, „Duck.ai“ pokalbius ir duomenis visose svetainėse, kurių neapsaugojote ugniasiene.</string>
+    <string name="settingsClearDataActionPlusRevenge_ChatsSecondaryText">Išvalo visus skirtukus, „Revenge AI“ pokalbius ir duomenis visose svetainėse, kurių neapsaugojote ugniasiene.</string>
 
     <!-- About Activity -->
-    <string name="aboutActivityTitle">Apie „DuckDuckGo“</string>
+    <string name="aboutActivityTitle">Apie „Revenge“</string>
     <string name="aboutActivityTitleNew">Apie</string>
     <string name="aboutHeaderNewTagLine">Apsauga. Privatumas. Ramybės jausmas.</string>
-    <string name="aboutDescriptionBrandUpdate2025">Sveiki atvykę į „Duck Side“!\n\n„DuckDuckGo“ yra nepriklausoma interneto apsaugos bendrovė, skirta visiems, norintiems susigrąžinti savo asmeninės informacijos kontrolę.\n\nManome, kad geriausias būdas apsaugoti jūsų asmeninę informaciją nuo įsilaužėlių, sukčių ir į privatumą pasikėsinančių įmonių – visiškai sustabdyti jos rinkimą. Štai kodėl milijonai žmonių <annotation type="chart_comparison">pasirenka „DuckDuckGo“, o ne „Chrome“ ir kitas naršykles</annotation> ieškoti ir naršyti internete. Mūsų integruota paieškos sistema yra kaip „Google“, bet niekada nestebi jūsų paieškų. O mūsų naršymo apsaugos priemonės, tokios kaip skelbimų sekimo ir slapukų blokavimas, padeda neleisti kitoms įmonėms rinkti jūsų duomenų. O, ir mūsų naršyklė nemokama – mes uždirbame pinigus iš <annotation type="privacy_respecting_ads">privatumo paisančių paieškos skelbimų</annotation>, o ne išnaudodami jūsų duomenis.Be to, mes taip pat siūlome <annotation type="ppro_help_page">„DuckDuckGo“ prenumeratą</annotation>, integruotą į mūsų naršyklę. Prenumeratoriai gauna dar daugiau privatumo apsaugos su greitu ir paprastu naudoti <annotation type="vpn_help_page">VPN</annotation>, kuris padeda apsaugoti naršymą internete, prieigą prie pažangių DI modelių mūsų privačioje DI pokalbių paslaugoje „Duck.ai“, paslaugą, kuri randa ir pašalina asmeninę informaciją iš žmonių paieškos svetainių, ir paslaugą, kuri atkuria tapatybę, jei ji būtų pavogta.\n\nSusigrąžinkite savo asmeninės informacijos kontrolę naudodami naršyklę, sukurtą duomenų apsaugai, o ne jų rinkimui.</string>
+    <string name="aboutDescriptionBrandUpdate2025">Sveiki atvykę į „Duck Side“!\n\n„Revenge“ yra nepriklausoma interneto apsaugos bendrovė, skirta visiems, norintiems susigrąžinti savo asmeninės informacijos kontrolę.\n\nManome, kad geriausias būdas apsaugoti jūsų asmeninę informaciją nuo įsilaužėlių, sukčių ir į privatumą pasikėsinančių įmonių – visiškai sustabdyti jos rinkimą. Štai kodėl milijonai žmonių <annotation type="chart_comparison">pasirenka „Revenge“, o ne „Chrome“ ir kitas naršykles</annotation> ieškoti ir naršyti internete. Mūsų integruota paieškos sistema yra kaip „Google“, bet niekada nestebi jūsų paieškų. O mūsų naršymo apsaugos priemonės, tokios kaip skelbimų sekimo ir slapukų blokavimas, padeda neleisti kitoms įmonėms rinkti jūsų duomenų. O, ir mūsų naršyklė nemokama – mes uždirbame pinigus iš <annotation type="privacy_respecting_ads">privatumo paisančių paieškos skelbimų</annotation>, o ne išnaudodami jūsų duomenis.Be to, mes taip pat siūlome <annotation type="ppro_help_page">„Revenge“ prenumeratą</annotation>, integruotą į mūsų naršyklę. Prenumeratoriai gauna dar daugiau privatumo apsaugos su greitu ir paprastu naudoti <annotation type="vpn_help_page">VPN</annotation>, kuris padeda apsaugoti naršymą internete, prieigą prie pažangių DI modelių mūsų privačioje DI pokalbių paslaugoje „Revenge AI“, paslaugą, kuri randa ir pašalina asmeninę informaciją iš žmonių paieškos svetainių, ir paslaugą, kuri atkuria tapatybę, jei ji būtų pavogta.\n\nSusigrąžinkite savo asmeninės informacijos kontrolę naudodami naršyklę, sukurtą duomenų apsaugai, o ne jų rinkimui.</string>
     <string name="no_suggestions">Pasiūlymų nėra</string>
 
     <!-- Broken Site Activity -->
@@ -260,7 +260,7 @@
     <string name="brokenSiteProtectionsOnBannerMessage">Gali padėti apsaugos priemonių išjungimas.</string>
 
     <!-- Widget -->
-    <string name="searchWidgetTextHint">Ieškoti „DuckDuckGo“</string>
+    <string name="searchWidgetTextHint">Ieškoti „Revenge“</string>
 
     <!-- Favorites widget -->
     <string name="addFavoriteMenuTitleHighlighted">👋 Pridėti mėgstamą</string>
@@ -273,7 +273,7 @@
     <string name="searchWidgetEmtpyFavoritesCta">Pridėti mėgstamą</string>
     <string name="widgetConfigurationActivityTitle">Valdiklio konfigūracija</string>
     <string name="favoritesWidgetLabel">Paieška ir mėgstamiausi</string>
-    <string name="searchWidgetLabel">Paieška ir „Duck.ai“</string>
+    <string name="searchWidgetLabel">Paieška ir „Revenge AI“</string>
 
     <!-- Home Screen Shortcuts -->
 
@@ -285,7 +285,7 @@
     <string name="surveyCtaLaunchButton">Dalyvauti apklausoje</string>
     <string name="surveyCtaDismissButton">Ne, dėkoju</string>
     <string name="surveyActivityTitle">Naudotojų apklausa</string>
-    <string name="surveyTitle">„DuckDuckGo“ apklausa</string>
+    <string name="surveyTitle">„Revenge“ apklausa</string>
     <string name="surveyDismissContentDescription">Išjungti apklausą</string>
     <string name="surveyLoadingErrorTitle">Ak, ne!</string>
     <string name="surveyLoadingErrorText">Mūsų apklausa šiuo metu neįkeliama.\nBandykite dar kartą vėliau.</string>
@@ -300,14 +300,14 @@
     <string name="addWidgetInstruction1Label">1</string>
     <string name="addWidgetInstruction1">Ilgai spauskite ant pagrindinio ekrano, paskui atidarykite valdiklių meniu.</string>
     <string name="addWidgetInstruction2Label">2</string>
-    <string name="addWidgetInstruction2">Raskite „DuckDuckGo“ valdiklį.</string>
+    <string name="addWidgetInstruction2">Raskite „Revenge“ valdiklį.</string>
     <string name="addWidgetInstruction3Label">3</string>
     <string name="addWidgetInstruction3">Nuvilkite valdiklį į pagrindinį ekraną.</string>
     <string name="addWidgetInstructionsButtonGoHome">Pereikite į pagrindinį ekraną</string>
     <string name="addWidgetInstructionsButtonClose">Uždaryti</string>
 
     <!-- App Enjoyment / Rating / Feedback -->
-    <string name="appEnjoymentDialogTitle">Jums patinka „DuckDuckGo?</string>
+    <string name="appEnjoymentDialogTitle">Jums patinka „Revenge?</string>
     <string name="appEnjoymentDialogMessage">Norėtume sužinoti jūsų nuomonę.</string>
     <string name="appEnjoymentDialogPositiveButton">Man patinka</string>
     <string name="appEnjoymentDialogNegativeButton">Reikia patobulinti</string>
@@ -329,15 +329,15 @@
 
     <!-- Clear Notification -->
     <string name="clearNotificationTitle">Duomenų valymas nustatytas į rankinį</string>
-    <string name="clearNotificationDescription">Tinkinkite „DuckDuckGo“ automatiškai išvalyti naršymo duomenis po kiekvieno seanso.</string>
+    <string name="clearNotificationDescription">Tinkinkite „Revenge“ automatiškai išvalyti naršymo duomenis po kiekvieno seanso.</string>
 
     <!-- Privacy Protection Notification -->
     <string name="privacyProtectionNotificationDefaultTitle">Mes saugome jūsų privatumą</string>
     <string name="privacyProtectionNotificationReportTitle">Jūsų privatumo ataskaita</string>
-    <string name="privacyProtectionNotificationDefaultDescription">Naudodamiesi „DuckDuckGo“ saugote savo duomenų privatumą blokuodami sekiklius ir šifruodami ryšius.</string>
-    <string name="privacyProtectionNotificationUpgadeDescription" instruction="Placeholder is a the number of connections we have protected">Apsaugokite duomenis naudojant „DuckDuckGo“, apsaugodami %1$d nešifruotus ryšius „DuckDuckGo“.</string>
-    <string name="privacyProtectionNotificationTrackerDescription" instruction="Placeholder is the numer of trackers blocked">Naudojant „DuckDuckGo“ apsaugojote duomenis blokuodami %1$d sekiklius (-ių).</string>
-    <string name="privacyProtectionNotificationBothDescription" instruction="%1$d is the number of trackers blocked and %2$d is the number of unencrypted connections">Naudojant „DuckDuckGo“ apsaugojote duomenis blokuodami %1$d sekiklius (-ių) ir apsaugodami %2$d nešifruotus (-ų) ryšius (-ių).</string>
+    <string name="privacyProtectionNotificationDefaultDescription">Naudodamiesi „Revenge“ saugote savo duomenų privatumą blokuodami sekiklius ir šifruodami ryšius.</string>
+    <string name="privacyProtectionNotificationUpgadeDescription" instruction="Placeholder is a the number of connections we have protected">Apsaugokite duomenis naudojant „Revenge“, apsaugodami %1$d nešifruotus ryšius „Revenge“.</string>
+    <string name="privacyProtectionNotificationTrackerDescription" instruction="Placeholder is the numer of trackers blocked">Naudojant „Revenge“ apsaugojote duomenis blokuodami %1$d sekiklius (-ių).</string>
+    <string name="privacyProtectionNotificationBothDescription" instruction="%1$d is the number of trackers blocked and %2$d is the number of unencrypted connections">Naudojant „Revenge“ apsaugojote duomenis blokuodami %1$d sekiklius (-ių) ir apsaugodami %2$d nešifruotus (-ų) ryšius (-ių).</string>
     <string name="privacyProtectionNotificationLaunchButton">Tęsti naršymą</string>
 
     <!-- Authentication -->
@@ -349,7 +349,7 @@
     <string name="authenticationDialogPasswordHint">Slaptažodis</string>
 
     <!-- User-facing label for when a user selects text and might want to search for that text -->
-    <string name="systemTextSearchMessage">Ieškoti „DuckDuckGo“</string>
+    <string name="systemTextSearchMessage">Ieškoti „Revenge“</string>
 
     <!-- App feedback disambiguation -->
     <string name="feedbackActivityTitle">Bendrinti atsiliepimą</string>
@@ -368,8 +368,8 @@
     <string name="websiteNotLoadingTitleShort">Problemos kraunantis svetainei</string>
     <string name="websiteNotLoadingSubtitle">Kuri svetainė neveikia?</string>
 
-    <string name="searchNotGoodEnoughTitleLong">„DuckDuckGo“ paieška nepakankamai gera</string>
-    <string name="searchNotGoodEnoughTitleShort">Problemos paieškai naudojant „DuckDuckGo“</string>
+    <string name="searchNotGoodEnoughTitleLong">„Revenge“ paieška nepakankamai gera</string>
+    <string name="searchNotGoodEnoughTitleShort">Problemos paieškai naudojant „Revenge“</string>
     <string name="searchNotGoodEnoughSubtitle">Kokią paieškos funkciją galime pridėti arba patobulinti?</string>
     <string name="searchNotGoodEnoughSubReasonTechnicalSearches">Programavimas / techninė paieška</string>
     <string name="searchNotGoodEnoughSubReasonGoogleLayout">Išdėstymas turėtų būti panašesnis į „Google“</string>
@@ -429,8 +429,8 @@
 
     <!-- System Search-->
     <string name="systemSearchAppNotFound">Nepavyko rasti programos</string>
-    <string name="systemSearchOnboardingThanks">Ačiū, kad pasirinkote „DuckDuckGo“!\nNaudodami mūsų naršyklę galite apsisaugoti nuo įsilaužėlių, sukčių ir duomenų trokštančių įmonių.</string>
-    <string name="systemSearchOnboardingFeaturesIntroText">„DuckDuckGo“ programėlė taip pat:</string>
+    <string name="systemSearchOnboardingThanks">Ačiū, kad pasirinkote „Revenge“!\nNaudodami mūsų naršyklę galite apsisaugoti nuo įsilaužėlių, sukčių ir duomenų trokštančių įmonių.</string>
+    <string name="systemSearchOnboardingFeaturesIntroText">„Revenge“ programėlė taip pat:</string>
     <string name="systemSearchOnboardingFeatureOneText">Blokuoja nesaugias stebėjimo priemones.</string>
     <string name="systemSearchOnboardingFeatureTwoText">Priverstinis tinklalapių šifravimas.</string>
     <string name="systemSearchOnboardingFeatureThreeText">Išvalo duomenis vienu bakstelėjimu.</string>
@@ -438,18 +438,18 @@
     <string name="systemSearchOnboardingButtonLess">Slėpti</string>
     <string name="systemSearchOnboardingButtonOk">Supratau</string>
 
-    <!-- Dax Dialog -->
+    <!-- Revenge Dialog -->
     <string name="daxDialogHighFive">Duok penkis!</string>
     <string name="daxDialogGotIt">Supratau</string>
 
-    <!-- AppTP Retention Experiment Dax Dialog -->
+    <!-- AppTP Retention Experiment Revenge Dialog -->
     <string name="daxDialogAppTpRetentionText"><![CDATA[Dabar blokuojate sekimo įrenginius internete 🎉<br/><br/>Taip pat galiu blokuoti kitose programėlėse pasislėpusius sekimo įrenginius, net kai nenaudojate telefono.]]></string>
     <string name="daxDialogAppTpRetentionPrimaryButtonText">Įjungti apsaugą nuo programėlių sekimo</string>
     <string name="daxDialogAppTpRetentionSecondaryButtonText">Ne dabar</string>
 
     <!-- New Onboarding Experience -->
-    <string name="onboardingWelcomeTitle">"Sveiki atvykę į „DuckDuckGo“!"</string>
-    <string name="onboardingDaxText"><![CDATA[Internetas gali būti bauginantis.<br/><br/>Nesijaudinkite! Ieškoti ir naršyti privačiai yra lengviau, nei manote.]]></string>
+    <string name="onboardingWelcomeTitle">"Sveiki atvykę į „Revenge“!"</string>
+    <string name="onboardingRevengeText"><![CDATA[Internetas gali būti bauginantis.<br/><br/>Nesijaudinkite! Ieškoti ir naršyti privačiai yra lengviau, nei manote.]]></string>
     <string name="onboardingLetsDoItButton">Pasiekime tai!</string>
     <string name="daxNonSerpCtaText"><![CDATA[Bakstelėjus ir slenkant, bus blokuojami įkyrūs sekimo įrenginiai. <br/><br/>Pirmyn – naršykite toliau!]]></string>
     <string name="daxMainNetworkCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Būk atidus! Negaliu neleisti %1$s matyti tavo veiklos %2$s &lt;br/&gt;&lt;br/&gt;Tačiau naršyk kartu su manimi ir aš sumažinsiu informacijos, kurią %3$s žino apie tave, kiekį užblokuodamas stebėjimo priemones kitose svetainėse.</string>
@@ -537,7 +537,7 @@
     <string name="dosErrorMessage">Prisijungimas nutrauktas. Ši svetainė gali pakenkti jūsų įrenginiui.</string>
 
     <!-- Precise Location -->
-    <string name="preciseLocationSystemDialogTitle">Įgalinti įrenginio vietą „DuckDuckGo“ privatumo naršyklėje?</string>
+    <string name="preciseLocationSystemDialogTitle">Įgalinti įrenginio vietą „Revenge“ privatumo naršyklėje?</string>
     <string name="preciseLocationSystemDialogSubtitle" instruction="%1$s and %2$s are both the name of the website requesting the location">%1$s prašo jūsų įrenginio vietos. Pirmiausia turėsite leisti programai siųsti jūsų įrenginio vietą, tuomet %2$s gali prašyti leidimo.</string>
     <string name="preciseLocationSystemDialogAllow">Įjungti</string>
     <string name="preciseLocationSystemDialogDeny">Galbūt vėliau</string>
@@ -549,7 +549,7 @@
     <string name="preciseLocationSiteDialogAllowOnce">Tik šiam seansui</string>
     <string name="preciseLocationSiteDialogDenyAlways">Visada atsisakyti</string>
     <string name="preciseLocationSiteDialogDenyOnce">Atsisakyti šiam seansui</string>
-    <string name="preciseLocationFeatureDescription">Svetainės, kuriose lankotės, gali prašyti jūsų įrenginio vietos. Jos negalės jo pasiekti, kol duosite leidimą. „DuckDuckGo“ jūsų vietą naudoja tik anonimiškai, kad pateiktų vietinės paieškos rezultatus.</string>
+    <string name="preciseLocationFeatureDescription">Svetainės, kuriose lankotės, gali prašyti jūsų įrenginio vietos. Jos negalės jo pasiekti, kol duosite leidimą. „Revenge“ jūsų vietą naudoja tik anonimiškai, kad pateiktų vietinės paieškos rezultatus.</string>
     <string name="preciseLocationToggleText">Svetainės gali prašyti mano vietos</string>
     <string name="preciseLocationEmptyListHint">Jokios svetainės nesuteikė leidimo pasiekti vietą</string>
     <string name="preciseLocationNoSystemPermission">Norėdami tvarkyti vietos prieigos leidimus, kuriuos suteikėte atskiroms svetainėms, „Android“ nustatymuose šiai programai įjunkite vietą.</string>
@@ -565,7 +565,7 @@
 
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Visuotinė privatumo kontrolė (VPK)</string>
-    <string name="globalPrivacyControlDescription"><![CDATA[„DuckDuckGo“ automatiškai blokuoja daugelį stebėjimo priemonių. Pasirinkę visuotinę privatumo kontrolę (VPK), taip pat galite paprašyti dalyvaujančių svetainių apriboti jūsų asmeninių duomenų prekybą ir bendrinimą su kitomis įmonėmis. <u><a href=\"\">Sužinoti daugiau</a><u/>]]></string>
+    <string name="globalPrivacyControlDescription"><![CDATA[„Revenge“ automatiškai blokuoja daugelį stebėjimo priemonių. Pasirinkę visuotinę privatumo kontrolę (VPK), taip pat galite paprašyti dalyvaujančių svetainių apriboti jūsų asmeninių duomenų prekybą ir bendrinimą su kitomis įmonėmis. <u><a href=\"\">Sužinoti daugiau</a><u/>]]></string>
     <string name="globalPrivacyControlSetting">Visuotinė privatumo kontrolė (VPK)</string>
     <string name="globalPrivacyControlToggle">Visuotinė privatumo kontrolė (VPK)</string>
     <string name="disabled">Išjungta</string>
@@ -601,11 +601,11 @@
     <string name="settingsAccessibility">Pritaikymas neįgaliems</string>
     <string name="accessibilityActivityTitle">Pritaikymas neįgaliems</string>
     <string name="accessibilityFontSizeTitle">Teksto dydis</string>
-    <string name="accessibilityFontSizeHint">Slinkite slinkiklį, kol bus patogu skaityti. „DuckDuckGo“ rodomos svetainės prisitaikys pagal šį nustatymą.</string>
+    <string name="accessibilityFontSizeHint">Slinkite slinkiklį, kol bus patogu skaityti. „Revenge“ rodomos svetainės prisitaikys pagal šį nustatymą.</string>
     <string name="accessibilityForceZoomTitle">Įjunkite rankinį puslapio priartinimą</string>
     <string name="accessibilityForceZoomSubtitle">Suimkite ir priartinkite bet kurioje svetainėje, net ir tose, kur neleistų</string>
     <string name="accessibilityTextSizeOverrideTitle">Tvarkyti teksto dydį</string>
-    <string name="accessibilityTextSizeOverrideSubtitle">„DuckDuckGo“ tekstas peržiūrimose svetainėse prisitaikys atitinkamai pagal žemiau pateiktą nustatymą</string>
+    <string name="accessibilityTextSizeOverrideSubtitle">„Revenge“ tekstas peržiūrimose svetainėse prisitaikys atitinkamai pagal žemiau pateiktą nustatymą</string>
 
     <!-- Privacy Policy -->
     <string name="settingsPrivacyPolicyDuckduckgo">Privatumo politika</string>
@@ -674,7 +674,7 @@
     <string name="tabSelectedIndicator">Pasirinkto skirtuko indikatorius</string>
     <string name="tabNotSelectedIndicator">Nepasirinkto skirtuko indikatorius</string>
 
-    <string name="shareMultipleLinksTitle" tools:ignore="MissingInstruction">%1$d nuorodų iš „DuckDuckGo“</string>
+    <string name="shareMultipleLinksTitle" tools:ignore="MissingInstruction">%1$d nuorodų iš „Revenge“</string>
     <plurals name="shareLinksMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
         <item quantity="one">Bendrinti nuorodą</item>
         <item quantity="few">Bendrinti %1$d nuorodas</item>
@@ -761,7 +761,7 @@
     </plurals>
 
     <!-- Private voice search -->
-    <string name="accessibilityVoiceSearchSubtitle">Adreso juostoje pridėkite privačios paieškos balsu parinktį. Garso įrašai nesaugomi ir jais su niekuo nesidalijama, įskaitant „DuckDuckGo“.</string>
+    <string name="accessibilityVoiceSearchSubtitle">Adreso juostoje pridėkite privačios paieškos balsu parinktį. Garso įrašai nesaugomi ir jais su niekuo nesidalijama, įskaitant „Revenge“.</string>
     <string name="accessibilityVoiceSearchTitle">Privati paieška balsu</string>
 
     <!-- Uploading an image from the camera or choosing to use existing image -->
@@ -769,8 +769,8 @@
     <string name="imageCaptureCameraGalleryDisambiguationTitle">Įkelti vaizdą</string>
     <string name="imageCaptureCameraGalleryDisambiguationGalleryOption">Pasirinkti failą</string>
     <string name="imageCaptureCameraGalleryDisambiguationCameraOption">Padaryti nuotrauką</string>
-    <string name="imageCaptureCameraPermissionDeniedTitle">Leisti „DuckDuckGo“ prašyti prieigos prie kameros šiame įrenginyje</string>
-    <string name="imageCaptureCameraPermissionDeniedMessage">Svetainės gali naudoti jūsų kamerą tik tada, jei leisite „DuckDuckGo“ prašyti prieigos.</string>
+    <string name="imageCaptureCameraPermissionDeniedTitle">Leisti „Revenge“ prašyti prieigos prie kameros šiame įrenginyje</string>
+    <string name="imageCaptureCameraPermissionDeniedMessage">Svetainės gali naudoti jūsų kamerą tik tada, jei leisite „Revenge“ prašyti prieigos.</string>
     <string name="imageCaptureCameraPermissionDeniedPositiveButton">Atidaryti nustatymus</string>
     <string name="imageCaptureCameraPermissionDeniedNegativeButton">Atšaukti</string>
 
@@ -784,53 +784,53 @@
     <string name="sslErrorHeadline" instruction="Placeholder is domain with certificate issues">Šios svetainės sertifikatas negalioja. Galbūt jungiatės prie serverio, kuris apsimeta %1$s, o tai gali kelti pavojų jūsų konfidencialiai informacijai.</string>
     <string name="sslErrorLeaveCTA">Išeiti iš šios svetainės</string>
     <string name="sslErrorAdvancedCTA">Išplėstinė</string>
-    <string name="sslErrorExpandedHeadline">„DuckDuckGo“ įspėja jus, kai svetainėje yra netinkamas sertifikatas.</string>
+    <string name="sslErrorExpandedHeadline">„Revenge“ įspėja jus, kai svetainėje yra netinkamas sertifikatas.</string>
     <string name="sslErrorExpandedCTA"><![CDATA[<u>Priimti riziką ir apsilankyti svetainėje</u>]]></string>
     <string name="sslErrorExpiredMessage" instruction="Placeholder is domain with certificate issues">%1$s saugumo sertifikato galiojimas yra pasibaigęs. Gali būti, kad svetainė neteisingai sukonfigūruota arba atakos vykdytojas pakenkė jūsų ryšiui arba kad jūsų sistemos laikrodžio rodomas laikas yra neteisingas.</string>
     <string name="sslErrorWrongHostMessage" instruction="Placeholder is domain with certificate issues">%1$s saugos sertifikatas neatitinka *.%2$s. Gali būti, kad svetainė neteisingai sukonfigūruota arba atakos vykdytojas pakenkė jūsų ryšiui arba kad jūsų sistemos laikrodžio rodomas laikas yra neteisingas.</string>
     <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">%1$s saugos sertifikatu nepasitiki jūsų įrenginio operacinė sistema. Gali būti, kad svetainė neteisingai sukonfigūruota arba atakos vykdytojas pakenkė jūsų ryšiui arba kad jūsų sistemos laikrodžio rodomas laikas yra neteisingas.</string>
 
     <!-- Extended Onboarding-->
-    <string name="preOnboardingDaxDialog1Title"><![CDATA[Sveiki.<br/><br/>Pasiruošę greitesnei naršyklei, kuri jus apsaugo?]]></string>
-    <string name="preOnboardingDaxDialog1Button">Padarykime tai!</string>
-    <string name="preOnboardingDaxDialog1SecondaryButton">Aš jau čia buvau.</string>
-    <string name="preOnboardingDaxDialog2Title">Apsaugos priemonės įjungtos!</string>
-    <string name="preOnboardingDaxDialog2Button">Pasirinkite naršyklę</string>
-    <string name="preOnboardingDaxDialog3Title"><![CDATA[Supratau! Praleisiu kitus patarimus.]]></string>
-    <string name="preOnboardingDaxDialog3Text"><![CDATA[Atminkite: visus skirtukus, istoriją ir naršymo duomenis galite ištrinti dviem <b>„Fire Button“</b> 🔥 bakstelėjimais.]]></string>
-    <string name="preOnboardingDaxDialog3SecondaryButton">Rodyti mokymo priemonę</string>
+    <string name="preOnboardingRevengeDialog1Title"><![CDATA[Sveiki.<br/><br/>Pasiruošę greitesnei naršyklei, kuri jus apsaugo?]]></string>
+    <string name="preOnboardingRevengeDialog1Button">Padarykime tai!</string>
+    <string name="preOnboardingRevengeDialog1SecondaryButton">Aš jau čia buvau.</string>
+    <string name="preOnboardingRevengeDialog2Title">Apsaugos priemonės įjungtos!</string>
+    <string name="preOnboardingRevengeDialog2Button">Pasirinkite naršyklę</string>
+    <string name="preOnboardingRevengeDialog3Title"><![CDATA[Supratau! Praleisiu kitus patarimus.]]></string>
+    <string name="preOnboardingRevengeDialog3Text"><![CDATA[Atminkite: visus skirtukus, istoriją ir naršymo duomenis galite ištrinti dviem <b>„Fire Button“</b> 🔥 bakstelėjimais.]]></string>
+    <string name="preOnboardingRevengeDialog3SecondaryButton">Rodyti mokymo priemonę</string>
     <string name="preOnboardingComparisonChartItem1">Vykdykite paiešką privačiai pagal numatytąjį nustatymą</string>
     <string name="preOnboardingComparisonChartItem2">Blokuoja trečiųjų šalių stebėjimo priemones</string>
     <string name="preOnboardingComparisonChartItem3">Blokuoti slapukų iššokančiuosius langus</string>
     <string name="preOnboardingComparisonChartItem4">Blokuoti tikslines reklamas</string>
     <string name="preOnboardingComparisonChartItem5">Vienu mygtuku ištrink naršymo duomenis</string>
-    <string name="preOnboardingDaxDialog3Button">Pradėti naršyti</string>
+    <string name="preOnboardingRevengeDialog3Button">Pradėti naršyti</string>
     <string name="preOnboardingAddressBarTitle">Kur turėčiau nustatyti jūsų adreso juostą?</string>
     <string name="preOnboardingAddressBarOkButton">Kitas</string>
     <string name="highlightsPreOnboardingAddressBarOption1Title">Viršuje (numatytasis nustatymas)</string>
     <string name="highlightsPreOnboardingAddressBarOption1Description">Lengva pamatyti</string>
     <string name="highlightsPreOnboardingAddressBarOption2Title">Apačia</string>
     <string name="highlightsPreOnboardingAddressBarOption2Description">Lengvai pasiekiama</string>
-    <string name="onboardingSearchDaxDialogTitle">Išmėgink paiešką!</string>
-    <string name="onboardingSearchDaxDialogDescription">Jūsų „DuckDuckGo“ paieškos visada yra privačios.</string>
-    <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">"kaip pasakyti antis anglų kalba"</string>
-    <string name="onboardingSearchDaxDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">"kaip pasakyti antis ispanų kalba"</string>
+    <string name="onboardingSearchRevengeDialogTitle">Išmėgink paiešką!</string>
+    <string name="onboardingSearchRevengeDialogDescription">Jūsų „Revenge“ paieškos visada yra privačios.</string>
+    <string name="onboardingSearchRevengeDialogOption1" instruction="translate &apos;duck&apos; too.">"kaip pasakyti antis anglų kalba"</string>
+    <string name="onboardingSearchRevengeDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">"kaip pasakyti antis ispanų kalba"</string>
     <string name="onboardingSearchQueryOption1">kaip pasakyti antis anglų kalba</string>
     <string name="onboardingSearchQueryOption1English">kaip pasakyti antis ispanų kalba</string>
-    <string name="onboardingSearchDaxDialogOption2">įsikūnijimo aktoriai</string>
-    <string name="onboardingSearchDaxDialogOption2US">mighty ducks aktoriai</string>
-    <string name="onboardingSearchDaxDialogOption3">vietinis oras</string>
-    <string name="onboardingSearchDaxDialogOption4">Nustebink mane!</string>
+    <string name="onboardingSearchRevengeDialogOption2">įsikūnijimo aktoriai</string>
+    <string name="onboardingSearchRevengeDialogOption2US">mighty ducks aktoriai</string>
+    <string name="onboardingSearchRevengeDialogOption3">vietinis oras</string>
+    <string name="onboardingSearchRevengeDialogOption4">Nustebink mane!</string>
     <string name="onboardingSearchQueryOption4">kūdikių ančiukai</string>
-    <string name="onboardingSitesDaxDialogTitle">Pabandyk apsilankyti svetainėje!</string>
-    <string name="onboardingSitesDaxDialogDescription">Užblokuosiu stebėjimo priemones, kad jos negalėtų tavęs šnipinėti.</string>
-    <string name="onboardingSitesDaxDialogOption1">espn.com</string>
-    <string name="onboardingSitesDaxDialogOption2">yahoo.com</string>
-    <string name="onboardingSitesDaxDialogOption3">ebay.com</string>
-    <string name="onboardingSitesDaxDialogOption4">Nustebink mane!</string>
-    <string name="onboardingSerpDaxDialogDescription"><![CDATA[Tai „<b>DuckDuckGo Search</b>“! Privati. Sparti. Mažiau reklamų.]]></string>
-    <string name="onboardingSerpDaxDialogButton">Supratau!</string>
-    <string name="onboardingSitesSuggestionsDaxDialogTitle">Pabandyk apsilankyti svetainėje!</string>
+    <string name="onboardingSitesRevengeDialogTitle">Pabandyk apsilankyti svetainėje!</string>
+    <string name="onboardingSitesRevengeDialogDescription">Užblokuosiu stebėjimo priemones, kad jos negalėtų tavęs šnipinėti.</string>
+    <string name="onboardingSitesRevengeDialogOption1">espn.com</string>
+    <string name="onboardingSitesRevengeDialogOption2">yahoo.com</string>
+    <string name="onboardingSitesRevengeDialogOption3">ebay.com</string>
+    <string name="onboardingSitesRevengeDialogOption4">Nustebink mane!</string>
+    <string name="onboardingSerpRevengeDialogDescription"><![CDATA[Tai „<b>Revenge Search</b>“! Privati. Sparti. Mažiau reklamų.]]></string>
+    <string name="onboardingSerpRevengeDialogButton">Supratau!</string>
+    <string name="onboardingSitesSuggestionsRevengeDialogTitle">Pabandyk apsilankyti svetainėje!</string>
     <plurals name="onboardingTrackersBlockedDialogDescription">
         <item quantity="one"><![CDATA[ ir dar <b>%1$d žmogus </b> bandė jus stebėti čia. Aš juos užblokavau!<br/><br/>☝️ Palieskite skydą, kad gautumėte daugiau informacijos.️]]></item>
         <item quantity="few"><![CDATA[ ir dar <b>%1$d žmonės</b> bandė jus stebėti čia. Aš juos užblokavau!<br/><br/>☝️ Palieskite skydą, kad gautumėte daugiau informacijos.️]]></item>
@@ -843,19 +843,19 @@
         <item quantity="many"><![CDATA[ bandė jus stebėti čia. Aš juos užblokavau!<br/><br/>☝️ Bakstelėkite skydą, kad gautumėte daugiau informacijos.️]]></item>
         <item quantity="other"><![CDATA[ bandė jus stebėti čia. Aš juos užblokavau!<br/><br/>☝️ Bakstelėkite skydą, kad gautumėte daugiau informacijos.️]]></item>
     </plurals>
-    <string name="onboardingTrackersBlockedDaxDialogButton">Supratau!</string>
-    <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Akimirksniu išvalykite naršymo veiklą naudodami <b>Fire Button</b>.<br/><br/>Išbandykite!️ 🔥]]></string>
-    <string name="onboardingFireButtonDaxDialogOkButton">Išbandykite</string>
-    <string name="onboardingFireButtonDaxDialogCancelButton">Praleisti</string>
-    <string name="onboardingEndDaxDialogTitle">"Atlikote!"</string>
-    <string name="onboardingEndDaxDialogDescription">Įsidėmėk: kiekvieną kartą, kai naršai su manimi, bauginantis skelbimas praranda galią.</string>
-    <string name="onboardingInContextEndDaxDialogDescription">Įsidėmėkite: kiekvieną kartą, kai naršai su manimi, bauginantis skelbimas praranda galią. 👌</string>
-    <string name="onboardingEndDaxDialogButton">Duok penkis!</string>
-    <string name="onboardingPrivacyProDaxDialogTitle">Oi, kol nepamiršau...</string>
-    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[„DuckDuckGo“ taip pat turi <b>pasirenkamą mokamą prenumeratą</b> su saugiu <b>VPN</b> ir <b>pažangiu, privačiu dirbtiniu intelektu</b>.]]></string>
-    <string name="onboardingPrivacyProDaxDialogOkButton">Sužinoti daugiau</string>
-    <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Išbandyk nemokamai!</string>
-    <string name="onboardingPrivacyProDaxDialogCancelButton">Praleisti</string>
+    <string name="onboardingTrackersBlockedRevengeDialogButton">Supratau!</string>
+    <string name="onboardingFireButtonRevengeDialogDescription"><![CDATA[Akimirksniu išvalykite naršymo veiklą naudodami <b>Fire Button</b>.<br/><br/>Išbandykite!️ 🔥]]></string>
+    <string name="onboardingFireButtonRevengeDialogOkButton">Išbandykite</string>
+    <string name="onboardingFireButtonRevengeDialogCancelButton">Praleisti</string>
+    <string name="onboardingEndRevengeDialogTitle">"Atlikote!"</string>
+    <string name="onboardingEndRevengeDialogDescription">Įsidėmėk: kiekvieną kartą, kai naršai su manimi, bauginantis skelbimas praranda galią.</string>
+    <string name="onboardingInContextEndRevengeDialogDescription">Įsidėmėkite: kiekvieną kartą, kai naršai su manimi, bauginantis skelbimas praranda galią. 👌</string>
+    <string name="onboardingEndRevengeDialogButton">Duok penkis!</string>
+    <string name="onboardingPrivacyProRevengeDialogTitle">Oi, kol nepamiršau...</string>
+    <string name="onboardingPrivacyProRevengeDialogDescription"><![CDATA[„Revenge“ taip pat turi <b>pasirenkamą mokamą prenumeratą</b> su saugiu <b>VPN</b> ir <b>pažangiu, privačiu dirbtiniu intelektu</b>.]]></string>
+    <string name="onboardingPrivacyProRevengeDialogOkButton">Sužinoti daugiau</string>
+    <string name="onboardingPrivacyProRevengeDialogFreeTrialOkButton">Išbandyk nemokamai!</string>
+    <string name="onboardingPrivacyProRevengeDialogCancelButton">Praleisti</string>
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Norite lengvos prieigos prie privačių DI pokalbių?</string>
@@ -876,23 +876,23 @@
     <string name="showOnAppLaunchOptionSpecificPage">Konkretus puslapis</string>
 
     <!-- Privacy Dashboard -->
-    <string name="brokenSiteSubmittedReportMessage">Dėkojame! Jūsų pateikta informacija padeda tobulinti „DuckDuckGo“ visiems!</string>
+    <string name="brokenSiteSubmittedReportMessage">Dėkojame! Jūsų pateikta informacija padeda tobulinti „Revenge“ visiems!</string>
 
     <!--    Default Browser Bottom Sheet Dialog -->
-    <string name="defaultBrowserBottomSheetDialogTitle">Leiskite „DuckDuckGo“ apsaugoti daugiau jūsų veiklos internete</string>
-    <string name="defaultBrowserBottomSheetDialogSubTitle">Pakeiskite numatytąją naršyklę, kad nuorodos atsidarytų su „DuckDuckGo“.</string>
+    <string name="defaultBrowserBottomSheetDialogTitle">Leiskite „Revenge“ apsaugoti daugiau jūsų veiklos internete</string>
+    <string name="defaultBrowserBottomSheetDialogSubTitle">Pakeiskite numatytąją naršyklę, kad nuorodos atsidarytų su „Revenge“.</string>
     <string name="defaultBrowserBottomSheetDialogGhostButton" instruction="This text appears on a button">Ne dabar</string>
 
     <!-- Default Browser message -->
-    <string name="newTabPageDefaultBrowserMessageHeading">„DuckDuckGo“ nėra numatytoji naršyklė. Gauk daugiau apsaugos.</string>
+    <string name="newTabPageDefaultBrowserMessageHeading">„Revenge“ nėra numatytoji naršyklė. Gauk daugiau apsaugos.</string>
     <string name="newTabPageDefaultBrowserMessagePrimaryCta" instruction="This text appears on a button">Nustatyti kaip numatytąjį</string>
     <string name="newTabPageDefaultBrowserMessageSecondaryCta" instruction="This text appears on a button">Neklausk dar kartą</string>
 
     <!-- Threat protection -->
     <string name="maliciousSiteTitle">Įspėjimas: ši svetainė gali kelti saugumo riziką</string>
-    <string name="maliciousSiteMalwareHeadline"><![CDATA[„DuckDuckGo“ užblokavo šį puslapį, nes jame gali būti platinama kenkėjiška programinė įranga, kuria siekiama pakenkti jūsų įrenginiui arba pavogti jūsų asmeninę informaciją.\n<a href=\"\">Sužinokite daugiau</a>]]></string>
+    <string name="maliciousSiteMalwareHeadline"><![CDATA[„Revenge“ užblokavo šį puslapį, nes jame gali būti platinama kenkėjiška programinė įranga, kuria siekiama pakenkti jūsų įrenginiui arba pavogti jūsų asmeninę informaciją.\n<a href=\"\">Sužinokite daugiau</a>]]></string>
     <string name="maliciousSitePhishingHeadline"><![CDATA[Ši svetainė gali apsimesti teisėta svetaine, siekiant apgauti jus pateikti asmeninę informaciją, pvz., slaptažodžius ar kredito kortelių numerius.\n<a href=\"\">Sužinokite daugiau</a>]]></string>
-    <string name="maliciousSiteScamHeadline"><![CDATA[„DuckDuckGo“ užblokavo šį puslapį, nes jis gali bandyti apgauti ar manipuliuoti tavimi, siekdamas, kad pervestum pinigus, pirktum padirbtas prekes arba įdiegtum kenkėjiškas programas prisidengiant melagingais pretekstais.\n<a href=\"\">Sužinokite daugiau</a>]]></string>
+    <string name="maliciousSiteScamHeadline"><![CDATA[„Revenge“ užblokavo šį puslapį, nes jis gali bandyti apgauti ar manipuliuoti tavimi, siekdamas, kad pervestum pinigus, pirktum padirbtas prekes arba įdiegtum kenkėjiškas programas prisidengiant melagingais pretekstais.\n<a href=\"\">Sužinokite daugiau</a>]]></string>
     <string name="maliciousSiteLeaveCTA">Išeiti iš šios svetainės</string>
     <string name="maliciousSiteAdvancedCTA">Išplėstinė</string>
     <string name="maliciousSiteExpandedHeadline"><![CDATA[Jei manote, kad ši svetainė yra saugi, galite <a href=\"\">pranešti apie klaidą</a>. Vis dar galite apsilankyti svetainėje savo rizika.]]></string>
@@ -904,7 +904,7 @@
     <string name="maliciousSiteSettingLearnMore"><annotation type="learn_more_link">Sužinokite daugiau</annotation></string>
     <string name="maliciousSiteSettingDisabled">Išjungus šią funkciją, gali kilti pavojus jūsų informacijai.</string>
     <string name="threatProtectionTitle">Grėsmių apsauga</string>
-    <string name="threatProtectionDescription">„DuckDuckGo“ patobulintos apsaugos priemonės sustabdo įprastas grėsmes ir užtikrina tavo ryšio saugumą.</string>
+    <string name="threatProtectionDescription">„Revenge“ patobulintos apsaugos priemonės sustabdo įprastas grėsmes ir užtikrina tavo ryšio saugumą.</string>
     <string name="smarterEncryptionTitle">Išmanesnis šifravimas</string>
     <string name="smarterEncryptionDescription"><![CDATA[Automatiškai atnaujina saitus į HTTPS, kai tik įmanoma.<a href=\"\">Sužinoti daugiau</a>]]></string>
     <string name="scamBlockerTitle">Sukčiavimo blokavimo įrankis</string>
@@ -916,7 +916,7 @@
     <string name="experimentHomeScreenWidgetBottomSheetDialogSubTitle">Pridėkite mūsų paieškos valdiklį prie pagrindinio ekrano, kad galėtumėte greitai ir lengvai jį pasiekti.</string>
     <string name="experimentHomeScreenWidgetBottomSheetDialogPrimaryButton">Pridėti valdiklį</string>
     <string name="experimentHomeScreenWidgetBottomSheetDialogGhostButton">Ne dabar</string>
-    <string name="experimentHomeScreenWidgetBottomSheetDialogSearchText">Ieškoti „DuckDuckGo“</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSearchText">Ieškoti „Revenge“</string>
 
     <!-- Change under remote feature flag: Widget as a Protection -->
     <string name="settingsAddHomeWidgetTitle">Pagrindinio ekrano valdiklis</string>
@@ -933,8 +933,8 @@
 
     <!-- Widgets -->
     <string name="searchOnlyWidgetLabel" instruction="Label for the search-only widget">Tik paieška</string>
-    <string name="searchOnlyWidgetDescription" instruction="Description for the search-only widget">Greitai pradėkite privačią paiešką naudodami „DuckDuckGo“.</string>
-    <string name="searchWidgetDescription" instruction="Description for the search widget, which may include Duck.ai and voice search">Ieškokite privačiai naudodami „DuckDuckGo“ arba paklauskite „Duck.ai“. Jei įjungta, galima naudotis paieška balsu ir „Duck.ai“.</string>
-    <string name="searchAndFavoritesWidgetDescription" instruction="Description for the search and favorites widget">Ieškokite arba lankykitės savo mėgstamose svetainėse privačiai vienu spustelėjimu. Jei įjungta, galima naudotis paieška balsu ir „Duck.ai“.</string>
-    <string name="duckAiOnlyPinShortcutLabel" instruction="Label for the Duck.ai pinned shortcut. Should be Duck.ai in all languages">Duck.ai</string>
+    <string name="searchOnlyWidgetDescription" instruction="Description for the search-only widget">Greitai pradėkite privačią paiešką naudodami „Revenge“.</string>
+    <string name="searchWidgetDescription" instruction="Description for the search widget, which may include RevengeAI and voice search">Ieškokite privačiai naudodami „Revenge“ arba paklauskite „Revenge AI“. Jei įjungta, galima naudotis paieška balsu ir „Revenge AI“.</string>
+    <string name="searchAndFavoritesWidgetDescription" instruction="Description for the search and favorites widget">Ieškokite arba lankykitės savo mėgstamose svetainėse privačiai vienu spustelėjimu. Jei įjungta, galima naudotis paieška balsu ir „Revenge AI“.</string>
+    <string name="duckAiOnlyPinShortcutLabel" instruction="Label for the Revenge AI pinned shortcut. Should be RevengeAI in all languages">Revenge AI</string>
 </resources>

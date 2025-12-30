@@ -172,13 +172,13 @@
     <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Αποστολή σχολίου</string>
 
-    <string name="subscriptionSettingSubscribeWithDuckAiSubtitle">Οι συνδρομητές αποκτούν το VPN μας, προηγμένα μοντέλα τεχνητής νοημοσύνης στο Duck.ai, το Personal Information Removal και το Identity Theft Restoration.</string>
-    <string name="subscriptionSettingSubscribeWithDuckAiSubtitleRow">Οι συνδρομητές αποκτούν το VPN μας, προηγμένα μοντέλα τεχνητής νοημοσύνης στο Duck.ai και το Identity Theft Restoration.</string>
+    <string name="subscriptionSettingSubscribeWithRevengeAISubtitle">Οι συνδρομητές αποκτούν το VPN μας, προηγμένα μοντέλα τεχνητής νοημοσύνης στο Revenge AI, το Personal Information Removal και το Identity Theft Restoration.</string>
+    <string name="subscriptionSettingSubscribeWithRevengeAISubtitleRow">Οι συνδρομητές αποκτούν το VPN μας, προηγμένα μοντέλα τεχνητής νοημοσύνης στο Revenge AI και το Identity Theft Restoration.</string>
 
-    <string name="feedbackCategoryDuckAi">Duck.ai</string>
-    <string name="feedbackSubCategoryDuckAiSubscriberModels">Δεν είναι δυνατή η πρόσβαση στα μοντέλα Duck.ai μόνο για συνδρομητές</string>
-    <string name="feedbackSubCategoryDuckAiLoginThirdPartyBrowser">Δεν μπορώ να αποκτήσω πρόσβαση στο Duck.ai με τη συνδρομή μου σε άλλα προγράμματα περιήγησης</string>
-    <string name="feedbackSubCategoryDuckAiOther">Άλλα σχόλια για το Duck.ai</string>
+    <string name="feedbackCategoryRevengeAI">Revenge AI</string>
+    <string name="feedbackSubCategoryRevengeAISubscriberModels">Δεν είναι δυνατή η πρόσβαση στα μοντέλα Revenge AI μόνο για συνδρομητές</string>
+    <string name="feedbackSubCategoryRevengeAILoginThirdPartyBrowser">Δεν μπορώ να αποκτήσω πρόσβαση στο Revenge AI με τη συνδρομή μου σε άλλα προγράμματα περιήγησης</string>
+    <string name="feedbackSubCategoryRevengeAIOther">Άλλα σχόλια για το Revenge AI</string>
 
     <string name="subscriptionSettingSectionTitle">Συνδρομή DuckDuckGo</string>
     <string name="subscriptionSettingSubscribeSecure">Ασφαλίστε το Wi-Fi σας και συνομιλήστε ιδιωτικά με προηγμένα μοντέλα τεχνητής νοημοσύνης</string>

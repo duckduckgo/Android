@@ -28,7 +28,7 @@
     <string name="browserMenuEnablePrivacyProtection">Ενεργοποίηση Προστασίας προσωπικών δεδομένων</string>
     <string name="browserMenuDisablePrivacyProtection">Απενεργοποίηση Προστασίας προσωπικών δεδομένων</string>
     <string name="browserMenuNewTab">Νέα καρτέλα</string>
-    <string name="browserMenuDuckChat">Duck.ai</string>
+    <string name="browserMenuRevengeChat">Revenge AI</string>
     <string name="browserMenuShare">Κοινή χρήση</string>
     <string name="browserMenuEmailAlias">Δημιουργήστε Duck Address</string>
     <string name="browserMenuFindInPage">Εύρεση στη σελίδα</string>
@@ -45,7 +45,7 @@
     <string name="browserMenuNewChat">Νέα συνομιλία</string>
     <string name="browserMenuNewAIChat">Νέο AI Chat</string>
     <string name="browserMenuChatHistory">Ιστορικό συνομιλίας</string>
-    <string name="browserMenuChatSettings">Ρυθμίσεις Duck.ai</string>
+    <string name="browserMenuChatSettings">Ρυθμίσεις Revenge AI</string>
     <string name="browserMenuVPN">VPN</string>
 
     <!-- Browser Menu Content Description -->

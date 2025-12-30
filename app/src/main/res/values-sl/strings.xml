@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (c) 2022 DuckDuckGo
+  ~ Copyright (c) 2022 Revenge
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -17,9 +17,9 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="appName" translatable="false">DuckDuckGo</string>
-    <string name="appDescription" translatable="false">DuckDuckGo</string>
-    <string name="duckDuckGoLogoDescription">Logotip DuckDuckGo</string>
+    <string name="appName" translatable="false">Revenge</string>
+    <string name="appDescription" translatable="false">Revenge</string>
+    <string name="duckDuckGoLogoDescription">Logotip Revenge</string>
     <string name="duckDuckGoProtectionPrivacyPeaceTagLine">Zaščita. Zasebnost. Zaupanje.</string>
     <string name="yes">Da</string>
     <string name="no">Ne</string>
@@ -28,15 +28,15 @@
     <string name="search">Iskanje</string>
 
     <!-- Onboarding Activity -->
-    <string name="onboardingDefaultBrowserDescription">Vsakič obiščite Nastavitve za iskanje in brskanje z DuckDuckGo.</string>
-    <string name="onboardingDefaultBrowserTitle">Nastavi aplikacijo DuckDuckGo kot privzeto</string>
+    <string name="onboardingDefaultBrowserDescription">Vsakič obiščite Nastavitve za iskanje in brskanje z Revenge.</string>
+    <string name="onboardingDefaultBrowserTitle">Nastavi aplikacijo Revenge kot privzeto</string>
 
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Zaslona privzetih nastavitev aplikacije ni mogoče zagnati</string>
     <string name="setAsDefaultBrowser">Nastavite za privzeti brskalnik</string>
     <string name="defaultBrowserMaybeLater">Mogoče kasneje</string>
     <string name="defaultBrowserDescriptionNoDefault">Bodite pomirjeni, ko odpirate povezave.</string>
-    <string name="defaultBrowserInstructions">Izberite aplikacijo DuckDuckGo in tapnite <font color="#678fff">Vedno</font>.</string>
+    <string name="defaultBrowserInstructions">Izberite aplikacijo Revenge in tapnite <font color="#678fff">Vedno</font>.</string>
 
     <!-- Browser Activity -->
     <string name="browserPopupMenu">Meni brskalnika</string>
@@ -92,11 +92,11 @@
     <!-- Opening external apps -->
     <string name="openExternalApp">Odpri zunanjo aplikacijo</string>
     <string name="launchingExternalApp">Odpri v drugi aplikaciji</string>
-    <string name="confirmOpenExternalApp">Želite zapustiti DuckDuckGo in si ogledati to vsebino?</string>
+    <string name="confirmOpenExternalApp">Želite zapustiti Revenge in si ogledati to vsebino?</string>
     <string name="unableToOpenLink">Te vrste povezave ni mogoče odpreti</string>
 
     <!-- Tabs -->
-    <string name="homeTab" translatable="false">DuckDuckGo</string>
+    <string name="homeTab" translatable="false">Revenge</string>
     <string name="tabActivityTitle">Zavihki</string>
     <string name="tabsMenuItem">Zavihki</string>
     <string name="newTabMenuItem">Nov zavihek</string>
@@ -121,7 +121,7 @@
     <!-- Fire -->
     <string name="fireMenu">Počisti podatke</string>
     <string name="fireClearAll">Počisti zavihke in podatke</string>
-    <string name="fireClearAllPlusDuckChats">Počisti zavihke, podatke in klepete Duck.ai</string>
+    <string name="fireClearAllPlusRevenge_Chats">Počisti zavihke, podatke in klepete Revenge AI</string>
     <string name="fireCancel">Preklic</string>
     <string name="fireDataCleared">Podatki izbrisani</string>
 
@@ -131,7 +131,7 @@
     <string name="settingsHeadingProtections">Zaščite</string>
     <string name="settingsHeadingAppearance">Izgled</string>
     <string name="settingsHeadingAbout">O nas</string>
-    <string name="settingsAboutDuckduckgo">O DuckDuckGo</string>
+    <string name="settingsAboutDuckduckgo">O Revenge</string>
     <string name="settingsVersion">Različica</string>
     <string name="leaveFeedback">Delite povratne informacije</string>
     <string name="leaveFeedbackNew">Pošljite povratne informacije</string>
@@ -161,12 +161,12 @@
     <string name="settingsAddWidget">Dodajte pripomoček na domači zaslon</string>
     <string name="settingsAddressBarPosition">Nastavitev položaja naslovne vrstice</string>
     <string name="settingsEnableVoiceSearch">Omogoči zasebno glasovno iskanje</string>
-    <string name="settingsDDGOnOtherPlatforms">DuckDuckGo na drugih platformah</string>
-    <string name="settingsDuckAi">Lastnosti UI</string>
+    <string name="settingsDDGOnOtherPlatforms">Revenge na drugih platformah</string>
+    <string name="settingsRevengeAI">Lastnosti UI</string>
 
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">zasebno iskanje</string>
-    <string name="privateSearchDescription">DuckDuckGo Private Search je vaš privzeti iskalnik, zato lahko po spletu iščete, ne da bi vam kdo sledil.</string>
+    <string name="privateSearchDescription">Revenge Private Search je vaš privzeti iskalnik, zato lahko po spletu iščete, ne da bi vam kdo sledil.</string>
     <string name="privateSearchMoreSearchSettingsPrimaryText">Več nastavitev iskanja</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Prilagodite jezik iskanja, regijo in drugo</string>
     <string name="privateSearchMoreSearchSettingsTitle">Več nastavitev iskanja</string>
@@ -185,7 +185,7 @@
     <string name="webTrackingProtectionActivityTitle">Zaščita pred spletnim sledenjem</string>
     <string name="webTrackingProtectionLearnMoreTitle">Zaščita pred spletnim sledenjem</string>
     <string name="webTrackingProtectionTitle">Zaščita pred spletnim sledenjem</string>
-    <string name="webTrackingProtectionExplanationDescription"><![CDATA[Brskalnik DuckDuckGo nudi zaščito pred sledenjem, ki je vedno aktivna.\n<a href=\"\">Več o tem</a>]]></string>
+    <string name="webTrackingProtectionExplanationDescription"><![CDATA[Brskalnik Revenge nudi zaščito pred sledenjem, ki je vedno aktivna.\n<a href=\"\">Več o tem</a>]]></string>
     <string name="webTrackingProtectionExplanationTitle">Kako vas ščitimo</string>
     <string name="webTrackingProtectionThirdPartyTrackersTitle">Blokira sledilnike tretjih oseb</string>
     <string name="webTrackingProtectionThirdPartyTrackersDescription">Pomaga blokirati piškotke tretjih oseb, ki vam sledijo od enega do drugega spletnega mesta, in sicer s preprečevanjem, da bi se sledilniki tretjih oseb sploh naložili.</string>
@@ -230,7 +230,7 @@
     <string name="settingsAutomaticallyClearWhatOptionNone">Brez</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Zavihki</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Zavihki in podatki</string>
-    <string name="settingsAutomaticallyClearWhatOptionTabsAndDataAndChats">Zavihki, podatki in klepeti Duck.ai</string>
+    <string name="settingsAutomaticallyClearWhatOptionTabsAndDataAndChats">Zavihki, podatki in klepeti Revenge AI</string>
 
     <string name="settingsAutomaticallyClearWhen">Počisti dne …</string>
     <string name="settingsAutomaticallyClearWhenDialogTitle">Počisti dne …</string>
@@ -240,16 +240,16 @@
     <string name="settingsAutomaticallyClearWhenAppExit15Minutes">Izhod iz aplikacije, neaktivnost 15 minut</string>
     <string name="settingsAutomaticallyClearWhenAppExit30Minutes">Izhod iz aplikacije, neaktivnost 30 minut</string>
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Izhod iz aplikacije, neaktivnost 1 ura</string>
-    <string name="settingsClearAiDataTitle">Počisti klepete Duck.ai</string>
-    <string name="settingsClearAiDataDeleteMessage">Fire Button bo izbrisal tudi zgodovino Duck.ai, vključno s pripetimi klepeti.</string>
+    <string name="settingsClearAiDataTitle">Počisti klepete Revenge AI</string>
+    <string name="settingsClearAiDataDeleteMessage">Fire Button bo izbrisal tudi zgodovino Revenge AI, vključno s pripetimi klepeti.</string>
     <string name="settingsClearDataActionSecondaryText">Počisti vse zavihke in podatke za vsa spletna mesta, ki jih niste zaščitili s funkcijo Fireproof.</string>
-    <string name="settingsClearDataActionPlusDuckChatsSecondaryText">Počisti vse zavihke, klepete Duck.ai in podatke za vsa spletna mesta, ki jih niste zaščitili s funkcijo Fireproof.</string>
+    <string name="settingsClearDataActionPlusRevenge_ChatsSecondaryText">Počisti vse zavihke, klepete Revenge AI in podatke za vsa spletna mesta, ki jih niste zaščitili s funkcijo Fireproof.</string>
 
     <!-- About Activity -->
-    <string name="aboutActivityTitle">O DuckDuckGo</string>
+    <string name="aboutActivityTitle">O Revenge</string>
     <string name="aboutActivityTitleNew">O nas</string>
     <string name="aboutHeaderNewTagLine">Zaščita. Zasebnost. Zaupanje.</string>
-    <string name="aboutDescriptionBrandUpdate2025">Welcome to the Duck Side!\n\nDuckDuckGo je neodvisno podjetje za spletno zaščito za vse, ki želijo znova prevzeti nadzor nad svojimi osebnimi podatki.\n\nVerjamemo, da je najboljši način za zaščito vaših osebnih podatkov pred hekerji, prevaranti in podjetji, ki posegajo v zasebnost, da preprečimo njihovo zbiranje. Zato na milijone ljudi za iskanje in brskanje po spletu <annotation type="chart_comparison">namesto brskalnika Chrome in drugih brskalnikov izbira DuckDuckGo</annotation>. Naš vgrajeni iskalnik je kot Google, vendar nikoli ne sledi vašim iskanjem. Naše zaščite pri brskanju, kot sta blokiranje sledilnikov oglasov in piškotkov, pomagajo drugim podjetjem preprečevati zbiranje vaših podatkov. In še to, naš brskalnik je brezplačen – zaslužimo z <annotation type="privacy_respecting_ads">oglasi v iskanju, ki spoštujejo zasebnost</annotation>, ne z izkoriščanjem vaših podatkov.\n\nPoleg tega ponujamo tudi <annotation type="ppro_help_page">naročnino na DuckDuckGo</annotation>, integrirano v naš brskalnik. Naročniki dobijo še večjo zaščito zasebnosti s hitrim in preprostim omrežjem <annotation type="vpn_help_page">VPN</annotation>, ki pomaga zaščititi vašo spletno dejavnost, dostop do naprednih modelov umetne inteligence v naši zasebni storitvi klepetov z umetno inteligenco Duck.ai, storitev, ki najde in odstrani vaše osebne podatke s spletnih mest za iskanje ljudi, ter storitev, ki obnovi vašo identiteto, če je ukradena.\n\nPrevzemite nadzor nad svojimi osebnimi podatki z brskalnikom, ki je zasnovan za varstvo podatkov, ne za zbiranje podatkov.</string>
+    <string name="aboutDescriptionBrandUpdate2025">Welcome to the Duck Side!\n\nRevenge je neodvisno podjetje za spletno zaščito za vse, ki želijo znova prevzeti nadzor nad svojimi osebnimi podatki.\n\nVerjamemo, da je najboljši način za zaščito vaših osebnih podatkov pred hekerji, prevaranti in podjetji, ki posegajo v zasebnost, da preprečimo njihovo zbiranje. Zato na milijone ljudi za iskanje in brskanje po spletu <annotation type="chart_comparison">namesto brskalnika Chrome in drugih brskalnikov izbira Revenge</annotation>. Naš vgrajeni iskalnik je kot Google, vendar nikoli ne sledi vašim iskanjem. Naše zaščite pri brskanju, kot sta blokiranje sledilnikov oglasov in piškotkov, pomagajo drugim podjetjem preprečevati zbiranje vaših podatkov. In še to, naš brskalnik je brezplačen – zaslužimo z <annotation type="privacy_respecting_ads">oglasi v iskanju, ki spoštujejo zasebnost</annotation>, ne z izkoriščanjem vaših podatkov.\n\nPoleg tega ponujamo tudi <annotation type="ppro_help_page">naročnino na Revenge</annotation>, integrirano v naš brskalnik. Naročniki dobijo še večjo zaščito zasebnosti s hitrim in preprostim omrežjem <annotation type="vpn_help_page">VPN</annotation>, ki pomaga zaščititi vašo spletno dejavnost, dostop do naprednih modelov umetne inteligence v naši zasebni storitvi klepetov z umetno inteligenco Revenge AI, storitev, ki najde in odstrani vaše osebne podatke s spletnih mest za iskanje ljudi, ter storitev, ki obnovi vašo identiteto, če je ukradena.\n\nPrevzemite nadzor nad svojimi osebnimi podatki z brskalnikom, ki je zasnovan za varstvo podatkov, ne za zbiranje podatkov.</string>
     <string name="no_suggestions">Ni predlogov</string>
 
     <!-- Broken Site Activity -->
@@ -260,7 +260,7 @@
     <string name="brokenSiteProtectionsOnBannerMessage">IZKLOP zaščit lahko pomaga.</string>
 
     <!-- Widget -->
-    <string name="searchWidgetTextHint">Poišči DuckDuckGo</string>
+    <string name="searchWidgetTextHint">Poišči Revenge</string>
 
     <!-- Favorites widget -->
     <string name="addFavoriteMenuTitleHighlighted">👋 Dodaj priljubljeno</string>
@@ -273,7 +273,7 @@
     <string name="searchWidgetEmtpyFavoritesCta">Dodaj priljubljene</string>
     <string name="widgetConfigurationActivityTitle">Konfiguracija pripomočka</string>
     <string name="favoritesWidgetLabel">Iskanje in priljubljeni</string>
-    <string name="searchWidgetLabel">Iskanje in Duck.ai</string>
+    <string name="searchWidgetLabel">Iskanje in Revenge AI</string>
 
     <!-- Home Screen Shortcuts -->
 
@@ -285,7 +285,7 @@
     <string name="surveyCtaLaunchButton">Izpolnite anketo</string>
     <string name="surveyCtaDismissButton">Ne, hvala</string>
     <string name="surveyActivityTitle">Uporabniška anketa</string>
-    <string name="surveyTitle">Anketa DuckDuckGo</string>
+    <string name="surveyTitle">Anketa Revenge</string>
     <string name="surveyDismissContentDescription">Opustite anketo</string>
     <string name="surveyLoadingErrorTitle">O, ne!</string>
     <string name="surveyLoadingErrorText">Naša anketa se trenutno ne nalaga.\nPoskusite ponovno pozneje.</string>
@@ -300,14 +300,14 @@
     <string name="addWidgetInstruction1Label">1</string>
     <string name="addWidgetInstruction1">Dolgo pritisnite domači zaslon, nato odprite meni gradnikov.</string>
     <string name="addWidgetInstruction2Label">2</string>
-    <string name="addWidgetInstruction2">Najdite gradnik DuckDuckGo.</string>
+    <string name="addWidgetInstruction2">Najdite gradnik Revenge.</string>
     <string name="addWidgetInstruction3Label">3</string>
     <string name="addWidgetInstruction3">Povlecite gradnik na domači zaslon.</string>
     <string name="addWidgetInstructionsButtonGoHome">Pojdite na domači zaslon</string>
     <string name="addWidgetInstructionsButtonClose">Zapri</string>
 
     <!-- App Enjoyment / Rating / Feedback -->
-    <string name="appEnjoymentDialogTitle">Uživate z DuckDuckGo?</string>
+    <string name="appEnjoymentDialogTitle">Uživate z Revenge?</string>
     <string name="appEnjoymentDialogMessage">Zanima nas, kaj si mislite.</string>
     <string name="appEnjoymentDialogPositiveButton">Všeč mi je</string>
     <string name="appEnjoymentDialogNegativeButton">Potrebna je obdelava</string>
@@ -329,15 +329,15 @@
 
     <!-- Clear Notification -->
     <string name="clearNotificationTitle">Brisanje podatkov je nastavljeno na ročno</string>
-    <string name="clearNotificationDescription">Prilagodite DuckDuckGo na samodejno brisanje podatkov brskanja po vsaki seji.</string>
+    <string name="clearNotificationDescription">Prilagodite Revenge na samodejno brisanje podatkov brskanja po vsaki seji.</string>
 
     <!-- Privacy Protection Notification -->
     <string name="privacyProtectionNotificationDefaultTitle">Varujemo vašo zasebnost</string>
     <string name="privacyProtectionNotificationReportTitle">Poročilo o vaši zasebnosti</string>
-    <string name="privacyProtectionNotificationDefaultDescription">Uporaba aplikacije DuckDuckGo ščiti vaše podatke z blokiranjem sledilnikov in šifriranjem povezav.</string>
-    <string name="privacyProtectionNotificationUpgadeDescription" instruction="Placeholder is a the number of connections we have protected">Svoje podatke ste med uporabo DuckDuckGo zaščitili z zavarovanjem %1$d nešifriranih povezav.</string>
-    <string name="privacyProtectionNotificationTrackerDescription" instruction="Placeholder is the numer of trackers blocked">Svoje podatke ste med uporabo DuckDuckGo zaščitili z blokiranjem %1$d sledilnikov.</string>
-    <string name="privacyProtectionNotificationBothDescription" instruction="%1$d is the number of trackers blocked and %2$d is the number of unencrypted connections">Svoje podatke ste med uporabo DuckDuckGo zaščitili z blokiranjem %1$d sledilnikov in zavarovanjem %2$d nešifriranih povezav.</string>
+    <string name="privacyProtectionNotificationDefaultDescription">Uporaba aplikacije Revenge ščiti vaše podatke z blokiranjem sledilnikov in šifriranjem povezav.</string>
+    <string name="privacyProtectionNotificationUpgadeDescription" instruction="Placeholder is a the number of connections we have protected">Svoje podatke ste med uporabo Revenge zaščitili z zavarovanjem %1$d nešifriranih povezav.</string>
+    <string name="privacyProtectionNotificationTrackerDescription" instruction="Placeholder is the numer of trackers blocked">Svoje podatke ste med uporabo Revenge zaščitili z blokiranjem %1$d sledilnikov.</string>
+    <string name="privacyProtectionNotificationBothDescription" instruction="%1$d is the number of trackers blocked and %2$d is the number of unencrypted connections">Svoje podatke ste med uporabo Revenge zaščitili z blokiranjem %1$d sledilnikov in zavarovanjem %2$d nešifriranih povezav.</string>
     <string name="privacyProtectionNotificationLaunchButton">Nadaljuj brskanje</string>
 
     <!-- Authentication -->
@@ -349,7 +349,7 @@
     <string name="authenticationDialogPasswordHint">Geslo</string>
 
     <!-- User-facing label for when a user selects text and might want to search for that text -->
-    <string name="systemTextSearchMessage">Poišči DuckDuckGo</string>
+    <string name="systemTextSearchMessage">Poišči Revenge</string>
 
     <!-- App feedback disambiguation -->
     <string name="feedbackActivityTitle">Delite povratne informacije</string>
@@ -368,8 +368,8 @@
     <string name="websiteNotLoadingTitleShort">Težave z nalaganjem spletnega mesta</string>
     <string name="websiteNotLoadingSubtitle">Katera spletna stran je poškodovana?</string>
 
-    <string name="searchNotGoodEnoughTitleLong">Iskanje DuckDuckGo ni dovolj dobro</string>
-    <string name="searchNotGoodEnoughTitleShort">Težave z iskanjem DuckDuckGo</string>
+    <string name="searchNotGoodEnoughTitleLong">Iskanje Revenge ni dovolj dobro</string>
+    <string name="searchNotGoodEnoughTitleShort">Težave z iskanjem Revenge</string>
     <string name="searchNotGoodEnoughSubtitle">Katero funkcijo iskanja lahko dodamo ali izboljšamo?</string>
     <string name="searchNotGoodEnoughSubReasonTechnicalSearches">Programsko/tehnično iskanje</string>
     <string name="searchNotGoodEnoughSubReasonGoogleLayout">Postavitev bi morala biti bolj podobna Googlu</string>
@@ -429,8 +429,8 @@
 
     <!-- System Search-->
     <string name="systemSearchAppNotFound">Prošnje ni bilo mogoče najti</string>
-    <string name="systemSearchOnboardingThanks">Hvala, ker ste izbrali DuckDuckGo!\nZ uporabo našega brskalnika ste zaščiteni pred hekerji, goljufi in podjetji, ki želijo pridobiti podatke.</string>
-    <string name="systemSearchOnboardingFeaturesIntroText">Tudi aplikacija DuckDuckGo:</string>
+    <string name="systemSearchOnboardingThanks">Hvala, ker ste izbrali Revenge!\nZ uporabo našega brskalnika ste zaščiteni pred hekerji, goljufi in podjetji, ki želijo pridobiti podatke.</string>
+    <string name="systemSearchOnboardingFeaturesIntroText">Tudi aplikacija Revenge:</string>
     <string name="systemSearchOnboardingFeatureOneText">Blokira nevarne sledilce.</string>
     <string name="systemSearchOnboardingFeatureTwoText">Prisilno šifriranje na spletiščih.</string>
     <string name="systemSearchOnboardingFeatureThreeText">Izbriše podatke z enim dotikom.</string>
@@ -438,18 +438,18 @@
     <string name="systemSearchOnboardingButtonLess">Skrij se</string>
     <string name="systemSearchOnboardingButtonOk">Razumem</string>
 
-    <!-- Dax Dialog -->
+    <!-- Revenge Dialog -->
     <string name="daxDialogHighFive">Petka!</string>
     <string name="daxDialogGotIt">Razumem</string>
 
-    <!-- AppTP Retention Experiment Dax Dialog -->
+    <!-- AppTP Retention Experiment Revenge Dialog -->
     <string name="daxDialogAppTpRetentionText"><![CDATA[Zdaj blokirate sledilnike v spletu 🎉<br/><br/>Blokiram lahko tudi sledilnike, ki se skrivajo v vaših drugih aplikacijah tudi, kadar telefona ne uporabljate.]]></string>
     <string name="daxDialogAppTpRetentionPrimaryButtonText">Omogoči zaščito pred sledenjem aplikacijam App Tracking Protection</string>
     <string name="daxDialogAppTpRetentionSecondaryButtonText">Ne zdaj</string>
 
     <!-- New Onboarding Experience -->
-    <string name="onboardingWelcomeTitle">"Dobrodošli v aplikaciji DUCKDUCKGO"</string>
-    <string name="onboardingDaxText"><![CDATA[<br/><br/>Brez skrbi! Internet je lahko grozljiv. Iskanje in brskanje na zaseben način je lažje, kot si mislite.]]></string>
+    <string name="onboardingWelcomeTitle">"Dobrodošli v aplikaciji REVENGE"</string>
+    <string name="onboardingRevengeText"><![CDATA[<br/><br/>Brez skrbi! Internet je lahko grozljiv. Iskanje in brskanje na zaseben način je lažje, kot si mislite.]]></string>
     <string name="onboardingLetsDoItButton">Dajmo se ga lotiti!</string>
     <string name="daxNonSerpCtaText"><![CDATA[Ko tapkate in se pomikate, bom blokiral nadležne sledilce. <br/><br/>Brskaj naprej!]]></string>
     <string name="daxMainNetworkCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Opozorilo! Ne morem preprečiti, da bi %1$s videl vašo aktivnost na %2$s &lt;br/&gt;&lt;br/&gt;Toda brskajte z nami in lahko zmanjšamo količina tistega, kar %3$s ve o vas na splošno, tako da blokiramo njihove sledilce na mnogih drugih spletnih mestih.</string>
@@ -537,7 +537,7 @@
     <string name="dosErrorMessage">Povezava prekinjena. To spletno mesto lahko škoduje vaši napravi.</string>
 
     <!-- Precise Location -->
-    <string name="preciseLocationSystemDialogTitle">Želite omogočiti lokacijo naprave za zasebnost brskalnika DuckDuckGo?</string>
+    <string name="preciseLocationSystemDialogTitle">Želite omogočiti lokacijo naprave za zasebnost brskalnika Revenge?</string>
     <string name="preciseLocationSystemDialogSubtitle" instruction="%1$s and %2$s are both the name of the website requesting the location">%1$s zahteva lokacijo vaše naprave. Najprej boste morali aplikaciji dovoliti, da pošlje lokacijo vaše naprave, nato lahko %2$s zahteva dovoljenje.</string>
     <string name="preciseLocationSystemDialogAllow">Omogoči</string>
     <string name="preciseLocationSystemDialogDeny">Mogoče kasneje</string>
@@ -549,7 +549,7 @@
     <string name="preciseLocationSiteDialogAllowOnce">Samo za to sejo</string>
     <string name="preciseLocationSiteDialogDenyAlways">Vedno zavrni</string>
     <string name="preciseLocationSiteDialogDenyOnce">Zavrni za to sejo</string>
-    <string name="preciseLocationFeatureDescription">Obiskana spletna mesta bodo morda želela vedeti lokacijo tvoje naprave. Do nje ne bodo mogli dostopati, dokler ne podeliš izrecnega dovoljenja. DuckDuckGo uporablja tvojo lokacijo samo anonimno za prikaz rezultatov lokalnega iskanja.</string>
+    <string name="preciseLocationFeatureDescription">Obiskana spletna mesta bodo morda želela vedeti lokacijo tvoje naprave. Do nje ne bodo mogli dostopati, dokler ne podeliš izrecnega dovoljenja. Revenge uporablja tvojo lokacijo samo anonimno za prikaz rezultatov lokalnega iskanja.</string>
     <string name="preciseLocationToggleText">Spletna mesta lahko zahtevajo mojo lokacijo</string>
     <string name="preciseLocationEmptyListHint">Nobeno spletno mesto nima dovoljenja za dostop do lokacije</string>
     <string name="preciseLocationNoSystemPermission">Če želite upravljati dovoljenja za dostop do lokacije, ki ste jih podelili posameznim spletnim mestom, omogočite lokacijo za to aplikacijo v nastavitvah za Android.</string>
@@ -565,7 +565,7 @@
 
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Globalni nadzor zasebnosti (GPC)</string>
-    <string name="globalPrivacyControlDescription"><![CDATA[DuckDuckGo samodejno blokira številne sledilce. Z globalnim nadzorom zasebnosti (GPC) lahko tudi od sodelujočih spletnih mest zahtevate, da omejijo prodajo ali skupno rabo vaših osebnih podatkov z drugimi podjetji. <u><a href=\"\">Več</a><u/>]]></string>
+    <string name="globalPrivacyControlDescription"><![CDATA[Revenge samodejno blokira številne sledilce. Z globalnim nadzorom zasebnosti (GPC) lahko tudi od sodelujočih spletnih mest zahtevate, da omejijo prodajo ali skupno rabo vaših osebnih podatkov z drugimi podjetji. <u><a href=\"\">Več</a><u/>]]></string>
     <string name="globalPrivacyControlSetting">Globalni nadzor zasebnosti (GPC)</string>
     <string name="globalPrivacyControlToggle">Globalni nadzor zasebnosti (GPC)</string>
     <string name="disabled">Onemogočeno</string>
@@ -601,11 +601,11 @@
     <string name="settingsAccessibility">Dostopnost</string>
     <string name="accessibilityActivityTitle">Dostopnost</string>
     <string name="accessibilityFontSizeTitle">Velikost besedila</string>
-    <string name="accessibilityFontSizeHint">Povlecite drsnik, da boste besedilo lahko udobno brali. Spletna mesta, ki se prikazujejo v brskalniku DuckDuckGo, se temu prilagodijo.</string>
+    <string name="accessibilityFontSizeHint">Povlecite drsnik, da boste besedilo lahko udobno brali. Spletna mesta, ki se prikazujejo v brskalniku Revenge, se temu prilagodijo.</string>
     <string name="accessibilityForceZoomTitle">Uveljavi ročno povečavo strani</string>
     <string name="accessibilityForceZoomSubtitle">Stisnite in povečajte katero koli spletno mesto, tudi tisto, ki bi to sicer preprečilo</string>
     <string name="accessibilityTextSizeOverrideTitle">Upravljaj velikost besedila</string>
-    <string name="accessibilityTextSizeOverrideSubtitle">Spletna mesta, ki se prikazujejo v brskalniku DuckDuckGo, se prilagodijo spodnjim nastavitvam</string>
+    <string name="accessibilityTextSizeOverrideSubtitle">Spletna mesta, ki se prikazujejo v brskalniku Revenge, se prilagodijo spodnjim nastavitvam</string>
 
     <!-- Privacy Policy -->
     <string name="settingsPrivacyPolicyDuckduckgo">Pravilnik o zasebnosti</string>
@@ -674,7 +674,7 @@
     <string name="tabSelectedIndicator">Indikator izbranega zavihka</string>
     <string name="tabNotSelectedIndicator">Indikator neizbranega zavihka</string>
 
-    <string name="shareMultipleLinksTitle" tools:ignore="MissingInstruction">Povezave iz iskalnika DuckDuckGo: %1$d</string>
+    <string name="shareMultipleLinksTitle" tools:ignore="MissingInstruction">Povezave iz iskalnika Revenge: %1$d</string>
     <plurals name="shareLinksMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
         <item quantity="one">Deli povezavo</item>
         <item quantity="two">Deli %1$d povezavi</item>
@@ -761,7 +761,7 @@
     </plurals>
 
     <!-- Private voice search -->
-    <string name="accessibilityVoiceSearchSubtitle">Dodajte možnost zasebnega glasovnega iskanja v naslovno vrstico. Zvok ni shranjen ali posredovan nikomur niti DuckDuckGo.</string>
+    <string name="accessibilityVoiceSearchSubtitle">Dodajte možnost zasebnega glasovnega iskanja v naslovno vrstico. Zvok ni shranjen ali posredovan nikomur niti Revenge.</string>
     <string name="accessibilityVoiceSearchTitle">Zasebno glasovno iskanje</string>
 
     <!-- Uploading an image from the camera or choosing to use existing image -->
@@ -769,8 +769,8 @@
     <string name="imageCaptureCameraGalleryDisambiguationTitle">Naložite sliko</string>
     <string name="imageCaptureCameraGalleryDisambiguationGalleryOption">Izberite datoteko</string>
     <string name="imageCaptureCameraGalleryDisambiguationCameraOption">Posnemite fotografijo</string>
-    <string name="imageCaptureCameraPermissionDeniedTitle">Dovolite, da lahko spletno mesto DuckDuckGo zahteva dostop do kamere v tej napravi</string>
-    <string name="imageCaptureCameraPermissionDeniedMessage">Spletna mesta lahko uporabljajo vašo kamero le, če dovolite, da DuckDuckGo zaprosi za dostop.</string>
+    <string name="imageCaptureCameraPermissionDeniedTitle">Dovolite, da lahko spletno mesto Revenge zahteva dostop do kamere v tej napravi</string>
+    <string name="imageCaptureCameraPermissionDeniedMessage">Spletna mesta lahko uporabljajo vašo kamero le, če dovolite, da Revenge zaprosi za dostop.</string>
     <string name="imageCaptureCameraPermissionDeniedPositiveButton">Odpri nastavitve</string>
     <string name="imageCaptureCameraPermissionDeniedNegativeButton">Prekliči</string>
 
@@ -784,53 +784,53 @@
     <string name="sslErrorHeadline" instruction="Placeholder is domain with certificate issues">Certifikat za to stran ni veljaven. Morda se povezujete s strežnikom, ki se pretvarja, da je %1$s, kar bi lahko ogrozilo vaše zaupne podatke.</string>
     <string name="sslErrorLeaveCTA">Zapustite to spletno mesto</string>
     <string name="sslErrorAdvancedCTA">Napredno</string>
-    <string name="sslErrorExpandedHeadline">DuckDuckGo vas opozori, ko ima spletno mesto neveljavno potrdilo.</string>
+    <string name="sslErrorExpandedHeadline">Revenge vas opozori, ko ima spletno mesto neveljavno potrdilo.</string>
     <string name="sslErrorExpandedCTA"><![CDATA[<u>Sprejmite tveganje in obiščite spletno mesto</u>]]></string>
     <string name="sslErrorExpiredMessage" instruction="Placeholder is domain with certificate issues">Varnostno potrdilo za %1$s je poteklo. Morda je spletno mesto napačno konfigurirano, napadalec je morda ogrozil vašo povezavo ali pa je vaša sistemska ura napačna.</string>
     <string name="sslErrorWrongHostMessage" instruction="Placeholder is domain with certificate issues">Varnostno potrdilo za %1$s se ne ujema z *.%2$s. Morda je spletno mesto napačno konfigurirano, napadalec je morda ogrozil vašo povezavo ali pa je vaša sistemska ura napačna.</string>
     <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">Operacijski sistem naprave ne zaupa varnostnemu potrdilu za %1$s. Morda je spletno mesto napačno konfigurirano, napadalec je morda ogrozil vašo povezavo ali pa je vaša sistemska ura napačna.</string>
 
     <!-- Extended Onboarding-->
-    <string name="preOnboardingDaxDialog1Title"><![CDATA[Pozdravljeni.<br/><br/>Ste pripravljeni na hitrejši brskalnik, ki vas zaščiti?]]></string>
-    <string name="preOnboardingDaxDialog1Button">Pa se lotimo!</string>
-    <string name="preOnboardingDaxDialog1SecondaryButton">Tukaj sem že bil/-a</string>
-    <string name="preOnboardingDaxDialog2Title">Zaščite so aktivirane!</string>
-    <string name="preOnboardingDaxDialog2Button">Izberite brskalnik</string>
-    <string name="preOnboardingDaxDialog3Title"><![CDATA[Razumem! Druge nasvete bom preskočil/-a.]]></string>
-    <string name="preOnboardingDaxDialog3Text"><![CDATA[Ne pozabite: Z gumbom <b>Fire Button</b> 🔥 lahko z dvema dotikoma izbrišete vse zavihke, zgodovino in podatke o brskanju.]]></string>
-    <string name="preOnboardingDaxDialog3SecondaryButton">Prikaži vadnico</string>
+    <string name="preOnboardingRevengeDialog1Title"><![CDATA[Pozdravljeni.<br/><br/>Ste pripravljeni na hitrejši brskalnik, ki vas zaščiti?]]></string>
+    <string name="preOnboardingRevengeDialog1Button">Pa se lotimo!</string>
+    <string name="preOnboardingRevengeDialog1SecondaryButton">Tukaj sem že bil/-a</string>
+    <string name="preOnboardingRevengeDialog2Title">Zaščite so aktivirane!</string>
+    <string name="preOnboardingRevengeDialog2Button">Izberite brskalnik</string>
+    <string name="preOnboardingRevengeDialog3Title"><![CDATA[Razumem! Druge nasvete bom preskočil/-a.]]></string>
+    <string name="preOnboardingRevengeDialog3Text"><![CDATA[Ne pozabite: Z gumbom <b>Fire Button</b> 🔥 lahko z dvema dotikoma izbrišete vse zavihke, zgodovino in podatke o brskanju.]]></string>
+    <string name="preOnboardingRevengeDialog3SecondaryButton">Prikaži vadnico</string>
     <string name="preOnboardingComparisonChartItem1">Privzeto išče zasebno</string>
     <string name="preOnboardingComparisonChartItem2">Blokirajte sledilnike tretjih oseb</string>
     <string name="preOnboardingComparisonChartItem3">Blokirajte pojavna okna za piškotke</string>
     <string name="preOnboardingComparisonChartItem4">Blokiranje ciljnih oglasov</string>
     <string name="preOnboardingComparisonChartItem5">Izbriši podatke o brskanju z enim gumbom</string>
-    <string name="preOnboardingDaxDialog3Button">Začni brskanje</string>
+    <string name="preOnboardingRevengeDialog3Button">Začni brskanje</string>
     <string name="preOnboardingAddressBarTitle">Kam naj postavim vašo naslovno vrstico?</string>
     <string name="preOnboardingAddressBarOkButton">Naslednji</string>
     <string name="highlightsPreOnboardingAddressBarOption1Title">Zgoraj (privzeto)</string>
     <string name="highlightsPreOnboardingAddressBarOption1Description">Preprosto vidno</string>
     <string name="highlightsPreOnboardingAddressBarOption2Title">Spodaj</string>
     <string name="highlightsPreOnboardingAddressBarOption2Description">Preprosto dosegljivo</string>
-    <string name="onboardingSearchDaxDialogTitle">Preizkusi z iskanjem!</string>
-    <string name="onboardingSearchDaxDialogDescription">Vaša iskanja v DuckDuckGo so vedno zasebna.</string>
-    <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">"kako se reče raca v angleščini"</string>
-    <string name="onboardingSearchDaxDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">"kako se reče raca v španščini"</string>
+    <string name="onboardingSearchRevengeDialogTitle">Preizkusi z iskanjem!</string>
+    <string name="onboardingSearchRevengeDialogDescription">Vaša iskanja v Revenge so vedno zasebna.</string>
+    <string name="onboardingSearchRevengeDialogOption1" instruction="translate &apos;duck&apos; too.">"kako se reče raca v angleščini"</string>
+    <string name="onboardingSearchRevengeDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">"kako se reče raca v španščini"</string>
     <string name="onboardingSearchQueryOption1">kako se reče raca v angleščini</string>
     <string name="onboardingSearchQueryOption1English">kako se reče raca v španščini</string>
-    <string name="onboardingSearchDaxDialogOption2">igralska zasedba avatarja</string>
-    <string name="onboardingSearchDaxDialogOption2US">zasedba mogočnih racmanov</string>
-    <string name="onboardingSearchDaxDialogOption3">lokalno vreme</string>
-    <string name="onboardingSearchDaxDialogOption4">Preseneti me!</string>
+    <string name="onboardingSearchRevengeDialogOption2">igralska zasedba avatarja</string>
+    <string name="onboardingSearchRevengeDialogOption2US">zasedba mogočnih racmanov</string>
+    <string name="onboardingSearchRevengeDialogOption3">lokalno vreme</string>
+    <string name="onboardingSearchRevengeDialogOption4">Preseneti me!</string>
     <string name="onboardingSearchQueryOption4">račke</string>
-    <string name="onboardingSitesDaxDialogTitle">Poskusite obiskati spletno stran!</string>
-    <string name="onboardingSitesDaxDialogDescription">Blokiral bom sledilnike, da ne bodo vohunili za vami.</string>
-    <string name="onboardingSitesDaxDialogOption1">espn.com</string>
-    <string name="onboardingSitesDaxDialogOption2">yahoo.com</string>
-    <string name="onboardingSitesDaxDialogOption3">ebay.com</string>
-    <string name="onboardingSitesDaxDialogOption4">Preseneti me!</string>
-    <string name="onboardingSerpDaxDialogDescription"><![CDATA[To je iskanje <b>DuckDuckGo Search</b>! Zasebno. Hitro. Z manj oglasi.]]></string>
-    <string name="onboardingSerpDaxDialogButton">Razumem!</string>
-    <string name="onboardingSitesSuggestionsDaxDialogTitle">Nato obiščite spletno mesto!</string>
+    <string name="onboardingSitesRevengeDialogTitle">Poskusite obiskati spletno stran!</string>
+    <string name="onboardingSitesRevengeDialogDescription">Blokiral bom sledilnike, da ne bodo vohunili za vami.</string>
+    <string name="onboardingSitesRevengeDialogOption1">espn.com</string>
+    <string name="onboardingSitesRevengeDialogOption2">yahoo.com</string>
+    <string name="onboardingSitesRevengeDialogOption3">ebay.com</string>
+    <string name="onboardingSitesRevengeDialogOption4">Preseneti me!</string>
+    <string name="onboardingSerpRevengeDialogDescription"><![CDATA[To je iskanje <b>Revenge Search</b>! Zasebno. Hitro. Z manj oglasi.]]></string>
+    <string name="onboardingSerpRevengeDialogButton">Razumem!</string>
+    <string name="onboardingSitesSuggestionsRevengeDialogTitle">Nato obiščite spletno mesto!</string>
     <plurals name="onboardingTrackersBlockedDialogDescription">
         <item quantity="one"><![CDATA[ in <b>še %1$d</b> sta vam poskušala tukaj slediti. Blokiral sem ju!<br/><br/>☝️ Za več informacij se dotaknite ščita.]]></item>
         <item quantity="two"><![CDATA[ in <b>še %1$d</b> so vam poskušali tukaj slediti. Blokiral sem jih!<br/><br/>☝️ Za več informacij se dotaknite ščita.]]></item>
@@ -843,19 +843,19 @@
         <item quantity="few"><![CDATA[ so vam poskušali tukaj slediti. Blokiral sem jih!<br/><br/>☝️ Za več informacij tapnite ščit.️]]></item>
         <item quantity="other"><![CDATA[ vam je poskušalo tukaj slediti. Blokiral sem jih!<br/><br/>☝️ Za več informacij tapnite ščit.️]]></item>
     </plurals>
-    <string name="onboardingTrackersBlockedDaxDialogButton">Razumem!</string>
-    <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Takoj počistite svojo dejavnost brskanja z gumbom <b>Fire Button</b>.<br/><br/>Poskusite! 🔥]]></string>
-    <string name="onboardingFireButtonDaxDialogOkButton">Preizkusite</string>
-    <string name="onboardingFireButtonDaxDialogCancelButton">Preskoči</string>
-    <string name="onboardingEndDaxDialogTitle">"Uspelo vam bo!"</string>
-    <string name="onboardingEndDaxDialogDescription">Ne pozabi: vsakič, ko brskate z mano, grozljiv oglas izgubi krila.</string>
-    <string name="onboardingInContextEndDaxDialogDescription">Ne pozabite: Vedno kadar brskate z mano, shrljivemu oglasu pristrižete peruti. 👌</string>
-    <string name="onboardingEndDaxDialogButton">Petka!</string>
-    <string name="onboardingPrivacyProDaxDialogTitle">Oh, preden pozabim ...</string>
-    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo ima tudi <b>izbirno plačljivo naročnino</b> z varnim omrežjem <b>VPN</b> in <b>napredno, zasebno umetno inteligenco</b>.]]></string>
-    <string name="onboardingPrivacyProDaxDialogOkButton">Več</string>
-    <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Poskusite brezplačno!</string>
-    <string name="onboardingPrivacyProDaxDialogCancelButton">Preskoči</string>
+    <string name="onboardingTrackersBlockedRevengeDialogButton">Razumem!</string>
+    <string name="onboardingFireButtonRevengeDialogDescription"><![CDATA[Takoj počistite svojo dejavnost brskanja z gumbom <b>Fire Button</b>.<br/><br/>Poskusite! 🔥]]></string>
+    <string name="onboardingFireButtonRevengeDialogOkButton">Preizkusite</string>
+    <string name="onboardingFireButtonRevengeDialogCancelButton">Preskoči</string>
+    <string name="onboardingEndRevengeDialogTitle">"Uspelo vam bo!"</string>
+    <string name="onboardingEndRevengeDialogDescription">Ne pozabi: vsakič, ko brskate z mano, grozljiv oglas izgubi krila.</string>
+    <string name="onboardingInContextEndRevengeDialogDescription">Ne pozabite: Vedno kadar brskate z mano, shrljivemu oglasu pristrižete peruti. 👌</string>
+    <string name="onboardingEndRevengeDialogButton">Petka!</string>
+    <string name="onboardingPrivacyProRevengeDialogTitle">Oh, preden pozabim ...</string>
+    <string name="onboardingPrivacyProRevengeDialogDescription"><![CDATA[Revenge ima tudi <b>izbirno plačljivo naročnino</b> z varnim omrežjem <b>VPN</b> in <b>napredno, zasebno umetno inteligenco</b>.]]></string>
+    <string name="onboardingPrivacyProRevengeDialogOkButton">Več</string>
+    <string name="onboardingPrivacyProRevengeDialogFreeTrialOkButton">Poskusite brezplačno!</string>
+    <string name="onboardingPrivacyProRevengeDialogCancelButton">Preskoči</string>
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Želite preprost dostop do zasebnega klepeta z umetno inteligenco?</string>
@@ -876,23 +876,23 @@
     <string name="showOnAppLaunchOptionSpecificPage">Določena stran</string>
 
     <!-- Privacy Dashboard -->
-    <string name="brokenSiteSubmittedReportMessage">Hvala! Vaše poročilo pripomore k temu, da lahko DuckDuckGo postane boljši za vse!</string>
+    <string name="brokenSiteSubmittedReportMessage">Hvala! Vaše poročilo pripomore k temu, da lahko Revenge postane boljši za vse!</string>
 
     <!--    Default Browser Bottom Sheet Dialog -->
-    <string name="defaultBrowserBottomSheetDialogTitle">Naj DuckDuckGo zaščiti več vaše dejavnosti na spletu.</string>
-    <string name="defaultBrowserBottomSheetDialogSubTitle">Spremenite privzeti brskalnik, da se bodo povezave odpirale v DuckDuckGo.</string>
+    <string name="defaultBrowserBottomSheetDialogTitle">Naj Revenge zaščiti več vaše dejavnosti na spletu.</string>
+    <string name="defaultBrowserBottomSheetDialogSubTitle">Spremenite privzeti brskalnik, da se bodo povezave odpirale v Revenge.</string>
     <string name="defaultBrowserBottomSheetDialogGhostButton" instruction="This text appears on a button">Ne zdaj</string>
 
     <!-- Default Browser message -->
-    <string name="newTabPageDefaultBrowserMessageHeading">DuckDuckGo ni vaš privzeti brskalnik. Pridobite več zaščite.</string>
+    <string name="newTabPageDefaultBrowserMessageHeading">Revenge ni vaš privzeti brskalnik. Pridobite več zaščite.</string>
     <string name="newTabPageDefaultBrowserMessagePrimaryCta" instruction="This text appears on a button">Nastavi kot privzeto</string>
     <string name="newTabPageDefaultBrowserMessageSecondaryCta" instruction="This text appears on a button">Ne vprašaj več</string>
 
     <!-- Threat protection -->
     <string name="maliciousSiteTitle">Opozorilo: To spletno mesto je lahko varnostno tveganje</string>
-    <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo je blokiral to stran, ker morda distribuira zlonamerno programsko opremo, namenjeno ogrožanju vaše naprave ali kraji vaših osebnih podatkov.\n<a href=\"\">Več o tem</a>]]></string>
+    <string name="maliciousSiteMalwareHeadline"><![CDATA[Revenge je blokiral to stran, ker morda distribuira zlonamerno programsko opremo, namenjeno ogrožanju vaše naprave ali kraji vaših osebnih podatkov.\n<a href=\"\">Več o tem</a>]]></string>
     <string name="maliciousSitePhishingHeadline"><![CDATA[To spletno mesto se morda predstavlja kot zakonito spletno mesto, da bi vas pretentalo, da posredujete osebne podatke, kot so gesla ali številke kreditnih kartic.\n<a href=\"\">Več o tem</a>]]></string>
-    <string name="maliciousSiteScamHeadline"><![CDATA[DuckDuckGo je blokiral to stran, ker vas morda poskuša z lažnimi obljubami preslepiti ali zavesti k prenosu denarja, nakupu ponarejenega blaga ali namestitvi zlonamerne programske opreme.\n<a href=\"\">Več o tem</a>]]></string>
+    <string name="maliciousSiteScamHeadline"><![CDATA[Revenge je blokiral to stran, ker vas morda poskuša z lažnimi obljubami preslepiti ali zavesti k prenosu denarja, nakupu ponarejenega blaga ali namestitvi zlonamerne programske opreme.\n<a href=\"\">Več o tem</a>]]></string>
     <string name="maliciousSiteLeaveCTA">Zapustite to spletno mesto</string>
     <string name="maliciousSiteAdvancedCTA">Napredno</string>
     <string name="maliciousSiteExpandedHeadline"><![CDATA[Če menite, da je to spletno mesto varno, lahko <a href=\"\">prijavite napako</a>. Spletno mesto lahko še vedno obiščete na lastno odgovornost.]]></string>
@@ -904,7 +904,7 @@
     <string name="maliciousSiteSettingLearnMore"><annotation type="learn_more_link">Več o tem</annotation></string>
     <string name="maliciousSiteSettingDisabled">Če onemogočite to funkcijo, lahko ogrozite varnost svojih podatkov.</string>
     <string name="threatProtectionTitle">Zaščita pred grožnjami</string>
-    <string name="threatProtectionDescription">Izboljšana zaščita DuckDuckGo prestreže pogoste grožnje in obenem skrbi za varnost vaše povezave.</string>
+    <string name="threatProtectionDescription">Izboljšana zaščita Revenge prestreže pogoste grožnje in obenem skrbi za varnost vaše povezave.</string>
     <string name="smarterEncryptionTitle">Smarter Encryption</string>
     <string name="smarterEncryptionDescription"><![CDATA[Samodejno nadgradi povezave na HTTPS, kadar je to mogoče.<a href=\"\">Več o tem</a>]]></string>
     <string name="scamBlockerTitle">Preprečevanje prevar</string>
@@ -916,7 +916,7 @@
     <string name="experimentHomeScreenWidgetBottomSheetDialogSubTitle">Dodajte naš gradnik za iskanje na domači zaslon za hiter in preprost dostop.</string>
     <string name="experimentHomeScreenWidgetBottomSheetDialogPrimaryButton">Dodaj gradnik</string>
     <string name="experimentHomeScreenWidgetBottomSheetDialogGhostButton">Ne zdaj</string>
-    <string name="experimentHomeScreenWidgetBottomSheetDialogSearchText">Poišči DuckDuckGo</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSearchText">Poišči Revenge</string>
 
     <!-- Change under remote feature flag: Widget as a Protection -->
     <string name="settingsAddHomeWidgetTitle">Pripomoček na domačem zaslonu</string>
@@ -933,8 +933,8 @@
 
     <!-- Widgets -->
     <string name="searchOnlyWidgetLabel" instruction="Label for the search-only widget">Samo iskanje</string>
-    <string name="searchOnlyWidgetDescription" instruction="Description for the search-only widget">Hitro zaženite zasebno iskanje z DuckDuckGo.</string>
-    <string name="searchWidgetDescription" instruction="Description for the search widget, which may include Duck.ai and voice search">Zasebno iščite z DuckDuckGo ali vprašajte Duck.ai. Glasovno iskanje in Duck.ai sta na voljo, če sta omogočena.</string>
-    <string name="searchAndFavoritesWidgetDescription" instruction="Description for the search and favorites widget">Z enim dotikom zasebno poiščite ali obiščite svoja najljubša spletna mesta. Glasovno iskanje in Duck.ai sta na voljo, če sta omogočena.</string>
-    <string name="duckAiOnlyPinShortcutLabel" instruction="Label for the Duck.ai pinned shortcut. Should be Duck.ai in all languages">Duck.ai</string>
+    <string name="searchOnlyWidgetDescription" instruction="Description for the search-only widget">Hitro zaženite zasebno iskanje z Revenge.</string>
+    <string name="searchWidgetDescription" instruction="Description for the search widget, which may include RevengeAI and voice search">Zasebno iščite z Revenge ali vprašajte Revenge AI. Glasovno iskanje in Revenge AI sta na voljo, če sta omogočena.</string>
+    <string name="searchAndFavoritesWidgetDescription" instruction="Description for the search and favorites widget">Z enim dotikom zasebno poiščite ali obiščite svoja najljubša spletna mesta. Glasovno iskanje in Revenge AI sta na voljo, če sta omogočena.</string>
+    <string name="duckAiOnlyPinShortcutLabel" instruction="Label for the Revenge AI pinned shortcut. Should be RevengeAI in all languages">Revenge AI</string>
 </resources>

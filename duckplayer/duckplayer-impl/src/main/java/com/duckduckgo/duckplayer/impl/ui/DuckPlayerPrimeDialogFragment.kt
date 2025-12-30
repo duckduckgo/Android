@@ -64,7 +64,7 @@ class DuckPlayerPrimeDialogFragment : DialogFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setStyle(STYLE_NO_TITLE, com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_DialogFullScreen)
+        setStyle(STYLE_NO_TITLE, com.duckduckgo.mobile.android.R.style.Widget_Revenge_DialogFullScreen)
     }
     override fun onStart() {
         super.onStart()

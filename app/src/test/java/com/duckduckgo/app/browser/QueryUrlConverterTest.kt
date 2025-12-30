@@ -78,7 +78,7 @@ class QueryUrlConverterTest {
         whenever(variantManager.getVariantKey()).thenReturn("")
         whenever(duckChat.isEnabled()).thenReturn(true)
         whenever(queryUrlPredictor.isReady()).thenReturn(true)
-        androidBrowserConfigFeature.hideDuckAiInSerpKillSwitch().setRawStoredState(State(true))
+        androidBrowserConfigFeature.hideRevengeAIInSerpKillSwitch().setRawStoredState(State(true))
     }
 
     @Test

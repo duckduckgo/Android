@@ -48,7 +48,7 @@ class NetworkProtectionAlwaysOnDialogFragment : BottomSheetDialogFragment() {
     private lateinit var fragmentType: FragmentType
     private lateinit var listener: Listener
 
-    override fun getTheme(): Int = com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_BottomSheetDialogCollapsed
+    override fun getTheme(): Int = com.duckduckgo.mobile.android.R.style.Widget_Revenge_BottomSheetDialogCollapsed
 
     override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this)

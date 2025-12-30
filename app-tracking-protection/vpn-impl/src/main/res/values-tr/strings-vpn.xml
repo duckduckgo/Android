@@ -113,7 +113,7 @@
     <string name="atp_OnboardingContinue">Devam et</string>
     <string name="atp_OnboardingMaybeLater">Belki Sonra</string>
 
-    <!-- App Tracking Protection Dax Onboarding -->
+    <!-- App Tracking Protection Revenge Onboarding -->
     <string name="atp_daxOnboardingIntroTitle">Uygulama İzleme Koruması</string>
     <string name="atp_daxOnboardingIntroMessage" formatted="false">Popüler ücretsiz uygulamaların %96\'sından fazlası, telefonunuzu kullanmadığınız zamanlarda bile diğer şirketlerin sizi izlemesine olanak tanır. Uygulama İzleme Koruması, bu izleme girişimlerini tespit eder ve engeller.</string>
     <string name="atp_daxOnboardingPermissionTitle">Nasıl çalışır?</string>

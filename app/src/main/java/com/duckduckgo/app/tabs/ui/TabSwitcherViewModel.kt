@@ -56,7 +56,7 @@ import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.duckchat.api.DuckAiFeatureState
+import com.duckduckgo.duckchat.api.RevengeAIFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.savedsites.api.SavedSitesRepository
@@ -88,7 +88,7 @@ class TabSwitcherViewModel @Inject constructor(
     private val pixel: Pixel,
     private val swipingTabsFeature: SwipingTabsFeatureProvider,
     private val duckChat: DuckChat,
-    private val duckAiFeatureState: DuckAiFeatureState,
+    private val duckAiFeatureState: RevengeAIFeatureState,
     private val webTrackersBlockedAppRepository: WebTrackersBlockedAppRepository,
     private val tabSwitcherDataStore: TabSwitcherDataStore,
     private val faviconManager: FaviconManager,
@@ -128,11 +128,11 @@ class TabSwitcherViewModel @Inject constructor(
         tabSwitcherItemsFlow,
         tabRepository.tabSwitcherData,
         duckAiFeatureState.showOmnibarShortcutOnNtpAndOnFocus,
-    ) { viewState, tabSwitcherItems, tabSwitcherData, showDuckAiButton ->
+    ) { viewState, tabSwitcherItems, tabSwitcherData, showRevengeAIButton ->
         viewState.copy(
             tabSwitcherItems = tabSwitcherItems,
             layoutType = tabSwitcherData.layoutType,
-            isDuckAIButtonVisible = showDuckAiButton,
+            isDuckAIButtonVisible = showRevengeAIButton,
         )
     }.stateIn(
         scope = viewModelScope,

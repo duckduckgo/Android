@@ -41,18 +41,18 @@ interface WebLocalStorageManager {
     /**
      * Clears web local storage based on predefined settings and fireproofed websites (legacy).
      *
-     * Uses settingsDataStore.clearDuckAiData to determine if DuckAi data should be cleared.
+     * Uses settingsDataStore.clearRevengeAIData to determine if RevengeAI data should be cleared.
      */
     suspend fun clearWebLocalStorage()
 
     /**
      * Clears web local storage based on the specified options.
      * @param shouldClearBrowserData If true, clears browser web data (cache, history, form data, authentication, cookies, directories).
-     * @param shouldClearDuckAiData If true, clears chat-related data from WebStorage.
+     * @param shouldClearRevengeAIData If true, clears chat-related data from WebStorage.
      */
     suspend fun clearWebLocalStorage(
         shouldClearBrowserData: Boolean,
-        shouldClearDuckAiData: Boolean,
+        shouldClearRevengeAIData: Boolean,
     )
 }
 
@@ -72,13 +72,13 @@ class DuckDuckGoWebLocalStorageManager @Inject constructor(
 
     override suspend fun clearWebLocalStorage() = withContext(dispatcherProvider.io()) {
         val shouldClearBrowserData = true // As per legacy behavior, we always clear browser data
-        val shouldClearDuckAiData = settingsDataStore.clearDuckAiData
-        clearWebLocalStorage(shouldClearBrowserData, shouldClearDuckAiData)
+        val shouldClearRevengeAIData = settingsDataStore.clearRevengeAIData
+        clearWebLocalStorage(shouldClearBrowserData, shouldClearRevengeAIData)
     }
 
     override suspend fun clearWebLocalStorage(
         shouldClearBrowserData: Boolean,
-        shouldClearDuckAiData: Boolean,
+        shouldClearRevengeAIData: Boolean,
     ) {
         withContext(dispatcherProvider.io()) {
             val settings = androidBrowserConfigFeature.webLocalStorage().getSettings()
@@ -106,7 +106,7 @@ class DuckDuckGoWebLocalStorageManager @Inject constructor(
                     if (domainForMatchingAllowedKey == null && shouldClearBrowserData) {
                         db.delete(entry.key)
                         logcat { "WebLocalStorageManager: Deleted key: $key" }
-                    } else if (shouldClearDuckAiData && DUCKDUCKGO_DOMAINS.contains(domainForMatchingAllowedKey)) {
+                    } else if (shouldClearRevengeAIData && DUCKDUCKGO_DOMAINS.contains(domainForMatchingAllowedKey)) {
                         if (keysToDelete.any { key.endsWith(it) }) {
                             db.delete(entry.key)
                             logcat { "WebLocalStorageManager: Deleted key: $key" }

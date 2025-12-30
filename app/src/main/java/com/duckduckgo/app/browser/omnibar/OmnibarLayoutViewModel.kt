@@ -61,7 +61,7 @@ import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extractDomain
 import com.duckduckgo.di.scopes.FragmentScope
-import com.duckduckgo.duckchat.api.DuckAiFeatureState
+import com.duckduckgo.duckchat.api.RevengeAIFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.ENABLED
@@ -103,7 +103,7 @@ class OmnibarLayoutViewModel @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val additionalDefaultBrowserPrompts: AdditionalDefaultBrowserPrompts,
     private val duckChat: DuckChat,
-    private val duckAiFeatureState: DuckAiFeatureState,
+    private val duckAiFeatureState: RevengeAIFeatureState,
     private val addressDisplayFormatter: AddressDisplayFormatter,
     private val settingsDataStore: SettingsDataStore,
     private val urlDisplayRepository: UrlDisplayRepository,
@@ -158,7 +158,7 @@ class OmnibarLayoutViewModel @Inject constructor(
         }
     }
 
-    private val showDuckAiButton = combine(
+    private val showRevengeAIButton = combine(
         _viewState,
         duckAiFeatureState.showOmnibarShortcutOnNtpAndOnFocus,
         duckAiFeatureState.showOmnibarShortcutInAllStates,
@@ -282,9 +282,9 @@ class OmnibarLayoutViewModel @Inject constructor(
             }
         }.launchIn(viewModelScope)
 
-        showDuckAiButton.onEach { showDuckAiButton ->
+        showRevengeAIButton.onEach { showRevengeAIButton ->
             _viewState.update {
-                it.copy(showChatMenu = showDuckAiButton)
+                it.copy(showChatMenu = showRevengeAIButton)
             }
         }.launchIn(viewModelScope)
 
@@ -366,8 +366,8 @@ class OmnibarLayoutViewModel @Inject constructor(
                     ),
                     updateOmnibarText = shouldUpdateOmnibarText,
                     omnibarText = omnibarText,
-                    showDuckAIHeader = shouldShowDuckAiHeader(_viewState.value.viewMode, true),
-                    showDuckAISidebar = shouldShowDuckAiHeader(_viewState.value.viewMode, true),
+                    showDuckAIHeader = shouldShowRevengeAIHeader(_viewState.value.viewMode, true),
+                    showDuckAISidebar = shouldShowRevengeAIHeader(_viewState.value.viewMode, true),
                 )
             }
         } else {
@@ -420,8 +420,8 @@ class OmnibarLayoutViewModel @Inject constructor(
                     ),
                     updateOmnibarText = shouldUpdateOmnibarText,
                     omnibarText = omnibarText,
-                    showDuckAIHeader = shouldShowDuckAiHeader(_viewState.value.viewMode, false),
-                    showDuckAISidebar = shouldShowDuckAiHeader(_viewState.value.viewMode, false),
+                    showDuckAIHeader = shouldShowRevengeAIHeader(_viewState.value.viewMode, false),
+                    showDuckAISidebar = shouldShowRevengeAIHeader(_viewState.value.viewMode, false),
                 )
             }
 
@@ -503,11 +503,11 @@ class OmnibarLayoutViewModel @Inject constructor(
         }
     }
 
-    private fun shouldShowDuckAiHeader(
+    private fun shouldShowRevengeAIHeader(
         viewMode: ViewMode,
         hasFocus: Boolean,
     ): Boolean {
-        logcat { "Omnibar: shouldShowDuckAiHeader $viewMode, focus: $hasFocus" }
+        logcat { "Omnibar: shouldShowRevengeAIHeader $viewMode, focus: $hasFocus" }
         return if (viewMode == ViewMode.DuckAI) {
             !hasFocus
         } else {
@@ -549,8 +549,8 @@ class OmnibarLayoutViewModel @Inject constructor(
                             isLoading = false,
                             omnibarText = "",
                             updateOmnibarText = true,
-                            showDuckAIHeader = shouldShowDuckAiHeader(viewMode, hasFocus),
-                            showDuckAISidebar = shouldShowDuckAiHeader(viewMode, hasFocus),
+                            showDuckAIHeader = shouldShowRevengeAIHeader(viewMode, hasFocus),
+                            showDuckAISidebar = shouldShowRevengeAIHeader(viewMode, hasFocus),
                         )
                     }
                 }
@@ -576,8 +576,8 @@ class OmnibarLayoutViewModel @Inject constructor(
                                 urlLoaded = _viewState.value.url,
                             ),
                             showShadows = false,
-                            showDuckAIHeader = shouldShowDuckAiHeader(viewMode, hasFocus),
-                            showDuckAISidebar = shouldShowDuckAiHeader(viewMode, hasFocus),
+                            showDuckAIHeader = shouldShowRevengeAIHeader(viewMode, hasFocus),
+                            showDuckAISidebar = shouldShowRevengeAIHeader(viewMode, hasFocus),
                         )
                     }
                 }
@@ -1005,7 +1005,7 @@ class OmnibarLayoutViewModel @Inject constructor(
         }
     }
 
-    fun onDuckAiHeaderClicked() {
+    fun onRevengeAIHeaderClicked() {
         if (duckAiFeatureState.showInputScreen.value) {
             onTextInputClickCatcherClicked()
         } else {

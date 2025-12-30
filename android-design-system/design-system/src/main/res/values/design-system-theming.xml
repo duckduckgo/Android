@@ -1,5 +1,5 @@
 <!--
-  ~ Copyright (c) 2022 DuckDuckGo
+  ~ Copyright (c) 2022 Revenge
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -23,76 +23,76 @@
     <attr name="preferredNavigationBarColor" format="color" />
 
     <!-- The platform theme is where OS version specific flags are used. -->
-    <style name="Platform.Theme.DuckDuckGo" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+    <style name="Platform.Theme.Revenge" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="android:windowLightStatusBar">?attr/preferDarkStatusBarIcons</item>
         <item name="preferDarkNavigationBarIcons">false</item>
         <item name="preferredNavigationBarColor">?attr/daxColorBlack</item>
     </style>
 
-    <!--  Our base theme, Base.Theme.DuckDuckGo,
+    <!--  Our base theme, Base.Theme.Revenge,
     is where we override or define default styles for views and text appearance attributes. -->
-    <style name="Base.Theme.DuckDuckGo" parent="Platform.Theme.DuckDuckGo">
+    <style name="Base.Theme.Revenge" parent="Platform.Theme.Revenge">
 
-        <item name="textAppearanceTitle">@style/Typography.DuckDuckGo.Title</item>
-        <item name="textAppearanceH1">@style/Typography.DuckDuckGo.H1</item>
-        <item name="textAppearanceH2">@style/Typography.DuckDuckGo.H2</item>
-        <item name="textAppearanceH3">@style/Typography.DuckDuckGo.H3</item>
-        <item name="textAppearanceH4">@style/Typography.DuckDuckGo.H4</item>
-        <item name="textAppearanceH5">@style/Typography.DuckDuckGo.H5</item>
-        <item name="textAppearanceButton">@style/Typography.DuckDuckGo.Button</item>
-        <item name="textAppearanceCaption">@style/Typography.DuckDuckGo.Caption</item>
+        <item name="textAppearanceTitle">@style/Typography.Revenge.Title</item>
+        <item name="textAppearanceH1">@style/Typography.Revenge.H1</item>
+        <item name="textAppearanceH2">@style/Typography.Revenge.H2</item>
+        <item name="textAppearanceH3">@style/Typography.Revenge.H3</item>
+        <item name="textAppearanceH4">@style/Typography.Revenge.H4</item>
+        <item name="textAppearanceH5">@style/Typography.Revenge.H5</item>
+        <item name="textAppearanceButton">@style/Typography.Revenge.Button</item>
+        <item name="textAppearanceCaption">@style/Typography.Revenge.Caption</item>
 
         <!-- Shape -->
-        <item name="shapeAppearanceSmallComponent">@style/ShapeAppearance.DuckDuckGo.SmallComponent</item>
-        <item name="shapeAppearanceMediumComponent">@style/ShapeAppearance.DuckDuckGo.MediumComponent</item>
-        <item name="shapeAppearanceLargeComponent">@style/ShapeAppearance.DuckDuckGo.LargeComponent</item>
+        <item name="shapeAppearanceSmallComponent">@style/ShapeAppearance.Revenge.SmallComponent</item>
+        <item name="shapeAppearanceMediumComponent">@style/ShapeAppearance.Revenge.MediumComponent</item>
+        <item name="shapeAppearanceLargeComponent">@style/ShapeAppearance.Revenge.LargeComponent</item>
 
         <!-- Android Components -->
-        <item name="actionOverflowMenuStyle">@style/Widget.DuckDuckGo.PopUpOverflowMenu</item>
-        <item name="actionOverflowButtonStyle">@style/Widget.DuckDuckGo.OverflowButton</item>
-        <item name="popupMenuStyle">@style/Widget.DuckDuckGo.PopupMenu</item>
-        <item name="bottomSheetDialogTheme">@style/Widget.DuckDuckGo.BottomSheetDialog</item>
-        <item name="tabStyle">@style/Widget.DuckDuckGo.TabLayout</item>
-        <item name="radioButtonStyle">@style/Widget.DuckDuckGo.RadioButton</item>
-        <item name="checkboxStyle">@style/Widget.DuckDuckGo.CheckBox</item>
-        <item name="extendedFloatingActionButtonStyle">@style/Widget.DuckDuckGo.ExtendedFloatingActionButton</item>
-        <item name="floatingActionButtonStyle">@style/Widget.DuckDuckGo.FloatingActionButton</item>
-        <item name="sliderStyle">@style/Widget.DuckDuckGo.Slider</item>
-        <item name="switchStyle">@style/Widget.DuckDuckGo.v3.Switch</item>
-        <item name="snackbarStyle">@style/Widget.DuckDuckGo.Snackbar</item>
-        <item name="snackbarButtonStyle">@style/Widget.DuckDuckGo.SnackbarButton</item>
-        <item name="snackbarTextViewStyle">@style/Widget.DuckDuckGo.SnackbarText</item>
-        <item name="android:datePickerDialogTheme">@style/Widget.DuckDuckGo.DatePicker</item>
-        <item name="android:timePickerDialogTheme">@style/Widget.DuckDuckGo.TimePicker</item>
-        <item name="alertDialogTheme">@style/Widget.DuckDuckGo.LegacyDialog</item>
-        <item name="android:alertDialogTheme">@style/Widget.DuckDuckGo.LegacyDialog</item>
-        <item name="materialAlertDialogTheme">@style/Widget.DuckDuckGo.Dialog</item>
-        <item name="materialButtonStyle">@style/Widget.DuckDuckGo.DaxButton.TextButton.Primary</item>
-        <item name="materialButtonOutlinedStyle">@style/Widget.DuckDuckGo.DaxButton.Secondary</item>
-        <item name="borderlessButtonStyle">@style/Widget.DuckDuckGo.DaxButton.Ghost</item>
-        <item name="materialCardViewStyle">@style/Widget.DuckDuckGo.CardView</item>
-        <item name="materialDividerStyle">@style/Widget.DuckDuckGo.ListDivider</item>
+        <item name="actionOverflowMenuStyle">@style/Widget.Revenge.PopUpOverflowMenu</item>
+        <item name="actionOverflowButtonStyle">@style/Widget.Revenge.OverflowButton</item>
+        <item name="popupMenuStyle">@style/Widget.Revenge.PopupMenu</item>
+        <item name="bottomSheetDialogTheme">@style/Widget.Revenge.BottomSheetDialog</item>
+        <item name="tabStyle">@style/Widget.Revenge.TabLayout</item>
+        <item name="radioButtonStyle">@style/Widget.Revenge.RadioButton</item>
+        <item name="checkboxStyle">@style/Widget.Revenge.CheckBox</item>
+        <item name="extendedFloatingActionButtonStyle">@style/Widget.Revenge.ExtendedFloatingActionButton</item>
+        <item name="floatingActionButtonStyle">@style/Widget.Revenge.FloatingActionButton</item>
+        <item name="sliderStyle">@style/Widget.Revenge.Slider</item>
+        <item name="switchStyle">@style/Widget.Revenge.v3.Switch</item>
+        <item name="snackbarStyle">@style/Widget.Revenge.Snackbar</item>
+        <item name="snackbarButtonStyle">@style/Widget.Revenge.SnackbarButton</item>
+        <item name="snackbarTextViewStyle">@style/Widget.Revenge.SnackbarText</item>
+        <item name="android:datePickerDialogTheme">@style/Widget.Revenge.DatePicker</item>
+        <item name="android:timePickerDialogTheme">@style/Widget.Revenge.TimePicker</item>
+        <item name="alertDialogTheme">@style/Widget.Revenge.LegacyDialog</item>
+        <item name="android:alertDialogTheme">@style/Widget.Revenge.LegacyDialog</item>
+        <item name="materialAlertDialogTheme">@style/Widget.Revenge.Dialog</item>
+        <item name="materialButtonStyle">@style/Widget.Revenge.RevengeButton.TextButton.Primary</item>
+        <item name="materialButtonOutlinedStyle">@style/Widget.Revenge.RevengeButton.Secondary</item>
+        <item name="borderlessButtonStyle">@style/Widget.Revenge.RevengeButton.Ghost</item>
+        <item name="materialCardViewStyle">@style/Widget.Revenge.CardView</item>
+        <item name="materialDividerStyle">@style/Widget.Revenge.ListDivider</item>
 
         <!-- Design System Components -->
-        <item name="daxButtonPrimary">@style/Widget.DuckDuckGo.DaxButton.TextButton.Primary</item>
-        <item name="daxButtonSecondary">@style/Widget.DuckDuckGo.DaxButton.Secondary</item>
-        <item name="daxButtonDestructive">@style/Widget.DuckDuckGo.DaxButton.TextButton.Destructive</item>
-        <item name="daxButtonGhost">@style/Widget.DuckDuckGo.DaxButton.Ghost</item>
-        <item name="daxButtonGhostDestructive">@style/Widget.DuckDuckGo.DaxButton.DestructiveGhost</item>
-        <item name="daxButtonGhostAlt">@style/Widget.DuckDuckGo.DaxButton.DestructiveGhostAlt</item>
+        <item name="daxButtonPrimary">@style/Widget.Revenge.RevengeButton.TextButton.Primary</item>
+        <item name="daxButtonSecondary">@style/Widget.Revenge.RevengeButton.Secondary</item>
+        <item name="daxButtonDestructive">@style/Widget.Revenge.RevengeButton.TextButton.Destructive</item>
+        <item name="daxButtonGhost">@style/Widget.Revenge.RevengeButton.Ghost</item>
+        <item name="daxButtonGhostDestructive">@style/Widget.Revenge.RevengeButton.DestructiveGhost</item>
+        <item name="daxButtonGhostAlt">@style/Widget.Revenge.RevengeButton.DestructiveGhostAlt</item>
 
-        <item name="twoLineListItemStyle">@style/Widget.DuckDuckGo.TwoLineListItem</item>
-        <item name="oneLineListItemStyle">@style/Widget.DuckDuckGo.OneLineListItem</item>
+        <item name="twoLineListItemStyle">@style/Widget.Revenge.TwoLineListItem</item>
+        <item name="oneLineListItemStyle">@style/Widget.Revenge.OneLineListItem</item>
 
-        <item name="cardViewStyle">@style/Widget.DuckDuckGo.CardView</item>
-        <item name="daxSwitchStyle">@style/Widget.DuckDuckGo.v3.Switch</item>
+        <item name="cardViewStyle">@style/Widget.Revenge.CardView</item>
+        <item name="daxSwitchStyle">@style/Widget.Revenge.v3.Switch</item>
 
-        <item name="daxExpandableMenuItemStyle">@style/Widget.DuckDuckGo.DaxExpandableItem</item>
+        <item name="daxExpandableMenuItemStyle">@style/Widget.Revenge.RevengeExpandableItem</item>
     </style>
 
-    <style name="Theme.DuckDuckGo.App" parent="Theme.DuckDuckGo.Light" />
+    <style name="Theme.Revenge.App" parent="Theme.Revenge.Light" />
 
-    <style name="Theme.DuckDuckGo" parent="Base.Theme.DuckDuckGo">
+    <style name="Theme.Revenge" parent="Base.Theme.Revenge">
 
         <item name="colorPrimary">?attr/daxColorBackground</item>
         <item name="colorPrimaryDark">?attr/daxColorSurface</item>
@@ -149,7 +149,7 @@
     </style>
 
     <!-- The app theme will mostly contain values for colour attributes -->
-    <style name="Theme.DuckDuckGo.Dark" parent="Theme.DuckDuckGo">
+    <style name="Theme.Revenge.Dark" parent="Theme.Revenge">
         <item name="android:isLightTheme" tools:ignore="NewApi">false</item>
         <item name="preferDarkStatusBarIcons">false</item>
         <item name="preferDarkNavigationBarIcons">false</item>
@@ -285,7 +285,7 @@
         <item name="daxColorInputModeIndicatorShadow">@color/black</item>
     </style>
 
-    <style name="Theme.DuckDuckGo.Light" parent="Theme.DuckDuckGo">
+    <style name="Theme.Revenge.Light" parent="Theme.Revenge">
         <item name="android:isLightTheme" tools:ignore="NewApi">true</item>
         <item name="preferDarkStatusBarIcons">true</item>
         <item name="preferDarkNavigationBarIcons">true</item>
@@ -422,7 +422,7 @@
         <item name="daxColorInputModeIndicatorShadow">@color/gray60</item>
     </style>
 
-    <style name="Theme.DuckDuckGo.Survey" parent="Theme.DuckDuckGo.Light">
+    <style name="Theme.Revenge.Survey" parent="Theme.Revenge.Light">
         <item name="android:windowBackground">@color/translucentDark</item>
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowIsTranslucent">true</item>
@@ -436,16 +436,16 @@
         <item name="daxColorPrimaryIcon">@color/white</item>
     </style>
 
-    <style name="Theme.DuckDuckGo.SplashScreen" parent="Theme.DuckDuckGo.Splash">
+    <style name="Theme.Revenge.SplashScreen" parent="Theme.Revenge.Splash">
         <item name="android:statusBarColor">@color/gray0</item>
         <item name="android:windowLightStatusBar">true</item>
         <item name="android:navigationBarColor">@color/gray0</item>
 
         <item name="windowSplashScreenBackground">@color/gray0</item>
-        <item name="postSplashScreenTheme">@style/Theme.DuckDuckGo.Light</item>
+        <item name="postSplashScreenTheme">@style/Theme.Revenge.Light</item>
     </style>
 
-    <style name="Theme.DuckDuckGo.Splash" parent="Theme.SplashScreen">
+    <style name="Theme.Revenge.Splash" parent="Theme.SplashScreen">
         <item name="windowSplashScreenAnimatedIcon">@drawable/ic_dax_splash_screen_icon</item>
     </style>
 
@@ -458,27 +458,27 @@
         <item name="android:backgroundDimEnabled">false</item>
     </style>
 
-    <style name="ShapeAppearance.DuckDuckGo.VerySmallComponent" parent="ShapeAppearance.MaterialComponents.SmallComponent">
+    <style name="ShapeAppearance.Revenge.VerySmallComponent" parent="ShapeAppearance.MaterialComponents.SmallComponent">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">@dimen/verySmallShapeCornerRadius</item>
     </style>
 
-    <style name="ShapeAppearance.DuckDuckGo.SmallComponent" parent="ShapeAppearance.MaterialComponents.SmallComponent">
+    <style name="ShapeAppearance.Revenge.SmallComponent" parent="ShapeAppearance.MaterialComponents.SmallComponent">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">@dimen/smallShapeCornerRadius</item>
     </style>
 
-    <style name="ShapeAppearance.DuckDuckGo.MediumComponent" parent="ShapeAppearance.MaterialComponents.MediumComponent">
+    <style name="ShapeAppearance.Revenge.MediumComponent" parent="ShapeAppearance.MaterialComponents.MediumComponent">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">@dimen/mediumShapeCornerRadius</item>
     </style>
 
-    <style name="ShapeAppearance.DuckDuckGo.LargeComponent" parent="ShapeAppearance.MaterialComponents.LargeComponent">
+    <style name="ShapeAppearance.Revenge.LargeComponent" parent="ShapeAppearance.MaterialComponents.LargeComponent">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">@dimen/largeShapeCornerRadius</item>
     </style>
 
-    <style name="TabSwitcher.Widget.Toolbar" parent="Widget.DuckDuckGo.ToolbarTheme">
+    <style name="TabSwitcher.Widget.Toolbar" parent="Widget.Revenge.ToolbarTheme">
         <item name="actionButtonStyle">@style/TabSwitcher.ActionButton</item>
         <item name="android:actionButtonStyle">@style/TabSwitcher.ActionButton</item>
     </style>

@@ -172,13 +172,13 @@
     <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Geri Bildirim gönder</string>
 
-    <string name="subscriptionSettingSubscribeWithDuckAiSubtitle">Aboneler VPN ve Duck.ai\'dski gelişmiş yapay zeka modellerinden yararlanır. Personal Information Removal ve Identity Theft Restoration.</string>
-    <string name="subscriptionSettingSubscribeWithDuckAiSubtitleRow">Aboneler VPN, Duck.ai\'daki gelişmiş yapay zeka modelleri ve Identity Theft Restoration hizmetlerimizden yararlanır.</string>
+    <string name="subscriptionSettingSubscribeWithRevengeAISubtitle">Aboneler VPN ve Revenge AI\'dski gelişmiş yapay zeka modellerinden yararlanır. Personal Information Removal ve Identity Theft Restoration.</string>
+    <string name="subscriptionSettingSubscribeWithRevengeAISubtitleRow">Aboneler VPN, Revenge AI\'daki gelişmiş yapay zeka modelleri ve Identity Theft Restoration hizmetlerimizden yararlanır.</string>
 
-    <string name="feedbackCategoryDuckAi">Duck.ai</string>
-    <string name="feedbackSubCategoryDuckAiSubscriberModels">Abonelere özel Duck.ai modellerine erişilemiyor.</string>
-    <string name="feedbackSubCategoryDuckAiLoginThirdPartyBrowser">Aboneliğimle diğer tarayıcılarda Duck.ai\'a erişemiyorum.</string>
-    <string name="feedbackSubCategoryDuckAiOther">Diğer Duck.ai geri bildirimleri</string>
+    <string name="feedbackCategoryRevengeAI">Revenge AI</string>
+    <string name="feedbackSubCategoryRevengeAISubscriberModels">Abonelere özel Revenge AI modellerine erişilemiyor.</string>
+    <string name="feedbackSubCategoryRevengeAILoginThirdPartyBrowser">Aboneliğimle diğer tarayıcılarda Revenge AI\'a erişemiyorum.</string>
+    <string name="feedbackSubCategoryRevengeAIOther">Diğer Revenge AI geri bildirimleri</string>
 
     <string name="subscriptionSettingSectionTitle">DuckDuckGo Aboneliği</string>
     <string name="subscriptionSettingSubscribeSecure">Wi-Fi bağlantınızı güvence altına alın ve gelişmiş yapay zeka modelleriyle gizlice sohbet edin</string>

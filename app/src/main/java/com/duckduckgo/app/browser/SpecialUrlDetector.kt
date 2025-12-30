@@ -30,7 +30,7 @@ import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType
 import com.duckduckgo.app.browser.applinks.ExternalAppIntentFlagsFeature
 import com.duckduckgo.app.browser.duckchat.AIChatQueryDetectionFeature
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
-import com.duckduckgo.duckchat.api.DuckAiFeatureState
+import com.duckduckgo.duckchat.api.RevengeAIFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.privacy.config.api.AmpLinkType
@@ -50,7 +50,7 @@ class SpecialUrlDetectorImpl(
     private val externalAppIntentFlagsFeature: ExternalAppIntentFlagsFeature,
     private val duckPlayer: DuckPlayer,
     private val duckChat: DuckChat,
-    private val duckAiFeatureState: DuckAiFeatureState,
+    private val duckAiFeatureState: RevengeAIFeatureState,
     private val aiChatQueryDetectionFeature: AIChatQueryDetectionFeature,
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
 ) : SpecialUrlDetector {

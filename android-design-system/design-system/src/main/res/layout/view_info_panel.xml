@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Copyright (c) 2018 DuckDuckGo
+  ~ Copyright (c) 2018 Revenge
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
                                                    xmlns:app="http://schemas.android.com/apk/res-auto"
                                                    xmlns:tools="http://schemas.android.com/tools"
-                                                   style="@style/Widget.DuckDuckGo.InfoPanel"
+                                                   style="@style/Widget.Revenge.InfoPanel"
                                                    android:id="@+id/item_container"
                                                    android:orientation="horizontal"
                                                    android:padding="@dimen/keyline_4">

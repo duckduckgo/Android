@@ -34,7 +34,7 @@ import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.di.scopes.FragmentScope
-import com.duckduckgo.mobile.android.R.style.Theme_DuckDuckGo_Light
+import com.duckduckgo.mobile.android.R.style.Theme_Revenge_Light
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.databinding.FragmentCreateAccountBinding
@@ -68,7 +68,7 @@ class SyncSetupDeepLinkFragment : DuckDuckGoFragment() {
         (activity as? AppCompatActivity)?.supportActionBar?.hide()
 
         if (appTheme.isLightModeEnabled() && syncFeature.canOverrideThemeSyncSetup().isEnabled()) {
-            val themeAwareInflater = inflater.cloneInContext(ContextThemeWrapper(requireContext(), Theme_DuckDuckGo_Light))
+            val themeAwareInflater = inflater.cloneInContext(ContextThemeWrapper(requireContext(), Theme_Revenge_Light))
             return themeAwareInflater.inflate(R.layout.fragment_create_account, container, false)
         } else {
             return inflater.inflate(R.layout.fragment_create_account, container, false)

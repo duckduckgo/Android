@@ -18,7 +18,7 @@ ext {
 
 android {
     defaultConfig {
-        applicationId "com.duckduckgo.mobile.android"
+        applicationId "com.revenge.mobile.android"
 
         minSdk min_sdk
         targetSdk target_sdk
@@ -26,7 +26,7 @@ android {
         versionCode buildVersionCode()
         versionName buildVersionName()
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        archivesBaseName = "duckduckgo-$versionName"
+        archivesBaseName = "revenge-$versionName"
         vectorDrawables.useSupportLibrary = true
         javaCompileOptions {
             annotationProcessorOptions {
@@ -612,7 +612,7 @@ tasks.register('releaseTestLocal', Exec) {
 }
 
 tasks.register('releaseTestCloud', Exec) {
-    commandLine 'maestro', 'cloud', '--include-tags', 'releaseTest', "build/outputs/apk/play/release/duckduckgo-${buildVersionName()}-play-release.apk", '../.maestro'
+    commandLine 'maestro', 'cloud', '--include-tags', 'releaseTest', "build/outputs/apk/play/release/revenge-${buildVersionName()}-play-release.apk", '../.maestro'
     dependsOn 'assemblePlayReleaseDefaultVariant'
 }
 

@@ -33,8 +33,8 @@ constructor(
 ) : MaterialCardView(context, attrs, defStyleAttr) {
 
     init {
-        val attr = context.theme.obtainStyledAttributes(attrs, R.styleable.DaxBubbleCardView, defStyleAttr, 0)
-        val edgePosition = EdgePosition.from(attr.getInt(R.styleable.DaxBubbleCardView_edgePosition, 0))
+        val attr = context.theme.obtainStyledAttributes(attrs, R.styleable.RevengeBubbleCardView, defStyleAttr, 0)
+        val edgePosition = EdgePosition.from(attr.getInt(R.styleable.RevengeBubbleCardView_edgePosition, 0))
 
         val cornderRadius = resources.getDimension(R.dimen.mediumShapeCornerRadius)
         val cornerSize = resources.getDimension(R.dimen.daxBubbleDialogEdge)

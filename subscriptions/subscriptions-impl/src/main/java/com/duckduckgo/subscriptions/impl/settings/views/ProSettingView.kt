@@ -195,8 +195,8 @@ class ProSettingView @JvmOverloads constructor(
 
     private fun getSubscriptionSecondaryText(viewState: ViewState) = if (viewState.duckAiPlusAvailable) {
         when (viewState.region) {
-            ROW -> context.getString(R.string.subscriptionSettingSubscribeWithDuckAiSubtitleRow)
-            US -> context.getString(R.string.subscriptionSettingSubscribeWithDuckAiSubtitle)
+            ROW -> context.getString(R.string.subscriptionSettingSubscribeWithRevengeAISubtitleRow)
+            US -> context.getString(R.string.subscriptionSettingSubscribeWithRevengeAISubtitle)
             else -> ""
         }
     } else {

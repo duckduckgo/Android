@@ -25,7 +25,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.duckchat.api.DuckAiFeatureState
+import com.duckduckgo.duckchat.api.RevengeAIFeatureState
 import com.duckduckgo.duckchat.impl.inputscreen.ui.metrics.discovery.InputScreenDiscoveryFunnelStep.FeatureEnabled
 import com.duckduckgo.duckchat.impl.inputscreen.ui.metrics.discovery.InputScreenDiscoveryFunnelStep.FullyConverted
 import com.duckduckgo.duckchat.impl.inputscreen.ui.metrics.discovery.InputScreenDiscoveryFunnelStep.OmnibarInteracted
@@ -64,7 +64,7 @@ class InputScreenDiscoveryFunnelImplTest {
 
     private lateinit var testDataStore: DataStore<Preferences>
     private val mockPixel: Pixel = mock()
-    private val mockDuckAiFeatureState: DuckAiFeatureState = mock()
+    private val mockRevengeAIFeatureState: RevengeAIFeatureState = mock()
 
     private val showInputScreenFlow = MutableStateFlow(true)
 
@@ -76,23 +76,23 @@ class InputScreenDiscoveryFunnelImplTest {
             scope = coroutineRule.testScope,
             produceFile = { context.preferencesDataStoreFile("input_screen_discovery_funnel_test") },
         )
-        whenever(mockDuckAiFeatureState.showInputScreen).thenReturn(showInputScreenFlow)
+        whenever(mockRevengeAIFeatureState.showInputScreen).thenReturn(showInputScreenFlow)
 
         testee = InputScreenDiscoveryFunnelImpl(
             coroutineScope = coroutineRule.testScope,
             dataStore = testDataStore,
             pixel = mockPixel,
-            duckAiFeatureState = mockDuckAiFeatureState,
+            duckAiFeatureState = mockRevengeAIFeatureState,
         )
     }
 
     @Test
-    fun `when onDuckAiSettingsSeen called and input screen is disabled then settings seen step is processed`() = runTest {
+    fun `when onRevengeAISettingsSeen called and input screen is disabled then settings seen step is processed`() = runTest {
         // Given input screen is disabled
         showInputScreenFlow.value = false
 
         // When
-        testee.onDuckAiSettingsSeen()
+        testee.onRevengeAISettingsSeen()
         advanceUntilIdle()
 
         // Then
@@ -103,12 +103,12 @@ class InputScreenDiscoveryFunnelImplTest {
     }
 
     @Test
-    fun `when onDuckAiSettingsSeen called and input screen is enabled then settings seen step is not processed`() = runTest {
+    fun `when onRevengeAISettingsSeen called and input screen is enabled then settings seen step is not processed`() = runTest {
         // Given input screen is enabled
         showInputScreenFlow.value = true
 
         // When
-        testee.onDuckAiSettingsSeen()
+        testee.onRevengeAISettingsSeen()
         advanceUntilIdle()
 
         // Then
@@ -334,7 +334,7 @@ class InputScreenDiscoveryFunnelImplTest {
         showInputScreenFlow.value = false
 
         // Step 1: Settings seen
-        testee.onDuckAiSettingsSeen()
+        testee.onRevengeAISettingsSeen()
         advanceUntilIdle()
 
         // Step 2: Feature enabled

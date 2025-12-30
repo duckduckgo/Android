@@ -56,12 +56,12 @@
         <item name="backgroundTint">@android:color/transparent</item>
     </style>
 
-    <style name="Widget.DuckDuckGo.FavouritesNewTabSection">
+    <style name="Widget.Revenge.FavouritesNewTabSection">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">match_parent</item>
         <item name="isExpandable">true</item>
     </style>
-    <style name="Widget.DuckDuckGo.FavouritesItemFavicon">
+    <style name="Widget.Revenge.FavouritesItemFavicon">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">@dimen/smallShapeCornerRadius</item>
     </style>

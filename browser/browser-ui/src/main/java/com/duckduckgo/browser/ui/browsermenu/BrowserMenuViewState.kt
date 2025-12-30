@@ -60,7 +60,7 @@ sealed class BrowserMenuViewState {
         val vpnMenuState: VpnMenuState = VpnMenuState.Hidden,
         val showAutofill: Boolean = false,
     ) : BrowserMenuViewState()
-    data class DuckAi(
+    data class RevengeAI(
         val canPrintPage: Boolean = false,
         val canReportSite: Boolean = false,
         val showAutofill: Boolean = false,

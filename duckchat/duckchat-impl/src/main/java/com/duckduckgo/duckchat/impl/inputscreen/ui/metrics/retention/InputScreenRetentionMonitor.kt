@@ -26,7 +26,7 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.duckchat.api.DuckAiFeatureState
+import com.duckduckgo.duckchat.api.RevengeAIFeatureState
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
@@ -49,7 +49,7 @@ import javax.inject.Inject
 class InputScreenRetentionMonitor @Inject constructor(
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     @InputScreenRetentionMonitorStore private val retentionMonitorDataStore: DataStore<Preferences>,
-    private val duckAiFeatureState: DuckAiFeatureState,
+    private val duckAiFeatureState: RevengeAIFeatureState,
     private val pixel: Pixel,
     private val timeProvider: TimeProvider,
 ) : MainProcessLifecycleObserver {

@@ -58,7 +58,7 @@ class ManuallyDisableAppProtectionDialog : DialogFragment() {
         val reportCTA = rootView.findViewById<Button>(R.id.netp_disable_dialog_action_report)
         val skipCTA = rootView.findViewById<Button>(R.id.netp_disable_dialog_action_skip)
 
-        val alertDialog = MaterialAlertDialogBuilder(requireActivity(), com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_Dialog)
+        val alertDialog = MaterialAlertDialogBuilder(requireActivity(), com.duckduckgo.mobile.android.R.style.Widget_Revenge_Dialog)
             .setView(rootView)
 
         validateBundleArguments()

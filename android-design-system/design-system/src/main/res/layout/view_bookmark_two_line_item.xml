@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Copyright (c) 2024 DuckDuckGo
+  ~ Copyright (c) 2024 Revenge
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -41,7 +41,7 @@
             android:layout_height="@dimen/listItemImageMediumSize"
             android:layout_gravity="center"
             android:importantForAccessibility="no"
-            app:shapeAppearanceOverlay="@style/ShapeAppearance.DuckDuckGo.VerySmallComponent" />
+            app:shapeAppearanceOverlay="@style/ShapeAppearance.Revenge.VerySmallComponent" />
 
     </FrameLayout>
 

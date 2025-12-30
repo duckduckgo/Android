@@ -103,7 +103,7 @@ class TypewriterDaxDialog : DialogFragment(R.layout.view_dax_dialog), DaxDialog 
     }
 
     override fun getTheme(): Int {
-        return R.style.Widget_DuckDuckGo_DaxDialogFragment
+        return R.style.Widget_Revenge_RevengeDialogFragment
     }
 
     override fun onStart() {

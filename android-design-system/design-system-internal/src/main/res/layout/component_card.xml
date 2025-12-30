@@ -29,7 +29,7 @@
         android:id="@+id/daxBubbleLabel"
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
-        app:primaryText="Dax Dialog Card"/>
+        app:primaryText="Revenge Dialog Card"/>
 
     <com.duckduckgo.common.ui.view.shape.DaxBubbleCardView
         android:id="@+id/daxBubbleCardView"

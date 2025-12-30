@@ -49,20 +49,20 @@ class SearchWidgetConfigurator @Inject constructor(
 
         logcat { "SearchWidgetConfigurator voiceSearchEnabled=$voiceSearchEnabled, duckAiEnabled=$duckAiEnabled, searchOnly=$fromSearchOnlyWidget" }
 
-        val showDuckAi = !fromSearchOnlyWidget && duckAiEnabled
+        val showRevengeAI = !fromSearchOnlyWidget && duckAiEnabled
         withContext(dispatcherProvider.main()) {
             remoteViews.setViewVisibility(R.id.voiceSearch, if (voiceSearchEnabled) View.VISIBLE else View.GONE)
-            remoteViews.setViewVisibility(R.id.duckAi, if (showDuckAi) View.VISIBLE else View.GONE)
-            remoteViews.setViewVisibility(R.id.separator, if (voiceSearchEnabled && showDuckAi) View.VISIBLE else View.GONE)
-            remoteViews.setViewVisibility(R.id.search, if (!voiceSearchEnabled && !showDuckAi) View.VISIBLE else View.GONE)
+            remoteViews.setViewVisibility(R.id.duckAi, if (showRevengeAI) View.VISIBLE else View.GONE)
+            remoteViews.setViewVisibility(R.id.separator, if (voiceSearchEnabled && showRevengeAI) View.VISIBLE else View.GONE)
+            remoteViews.setViewVisibility(R.id.search, if (!voiceSearchEnabled && !showRevengeAI) View.VISIBLE else View.GONE)
 
             if (voiceSearchEnabled) {
                 val pendingIntent = buildVoiceSearchPendingIntent(context, fromFavWidget, fromSearchOnlyWidget)
                 remoteViews.setOnClickPendingIntent(R.id.voiceSearch, pendingIntent)
             }
 
-            if (showDuckAi) {
-                val pendingIntent = buildDuckAiPendingIntent(context)
+            if (showRevengeAI) {
+                val pendingIntent = buildRevengeAIPendingIntent(context)
                 remoteViews.setOnClickPendingIntent(R.id.duckAi, pendingIntent)
             }
         }
@@ -87,7 +87,7 @@ class SearchWidgetConfigurator @Inject constructor(
         return PendingIntent.getActivity(context, requestCode, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
     }
 
-    private fun buildDuckAiPendingIntent(
+    private fun buildRevengeAIPendingIntent(
         context: Context,
     ): PendingIntent {
         val intent = BrowserActivity.intent(context, openDuckChat = true, duckChatSessionActive = true).also { it.action = Intent.ACTION_VIEW }

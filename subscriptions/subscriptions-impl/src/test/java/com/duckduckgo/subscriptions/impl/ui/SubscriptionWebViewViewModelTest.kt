@@ -666,7 +666,7 @@ class SubscriptionWebViewViewModelTest {
     }
 
     @Test
-    fun whenFeatureSelectedAndFeatureIsDuckAiThenCommandSent() = runTest {
+    fun whenFeatureSelectedAndFeatureIsRevengeAIThenCommandSent() = runTest {
         givenSubscriptionStatus(EXPIRED)
         viewModel.commands().test {
             viewModel.processJsCallbackMessage(
@@ -832,7 +832,7 @@ class SubscriptionWebViewViewModelTest {
     }
 
     @Test
-    fun whenFeatureSelectedAndFeatureIsDuckAiAndInPurchaseFlowThenPixelIsSent() = runTest {
+    fun whenFeatureSelectedAndFeatureIsRevengeAIAndInPurchaseFlowThenPixelIsSent() = runTest {
         givenSubscriptionStatus(AUTO_RENEWABLE)
         whenever(subscriptionsManager.currentPurchaseState).thenReturn(flowOf(CurrentPurchase.Success))
         viewModel.start()
@@ -843,11 +843,11 @@ class SubscriptionWebViewViewModelTest {
             id = null,
             data = JSONObject("""{"feature":"${SubscriptionsConstants.DUCK_AI}"}"""),
         )
-        verify(pixelSender).reportOnboardingDuckAiClick()
+        verify(pixelSender).reportOnboardingRevengeAIClick()
     }
 
     @Test
-    fun whenFeatureSelectedAndFeatureIsDuckAiAndNotInPurchaseFlowThenPixelIsNotSent() = runTest {
+    fun whenFeatureSelectedAndFeatureIsRevengeAIAndNotInPurchaseFlowThenPixelIsNotSent() = runTest {
         givenSubscriptionStatus(AUTO_RENEWABLE)
 
         viewModel.processJsCallbackMessage(

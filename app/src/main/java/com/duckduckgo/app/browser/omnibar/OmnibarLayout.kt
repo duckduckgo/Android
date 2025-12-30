@@ -114,7 +114,7 @@ import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.common.utils.extensions.replaceTextChangedListener
 import com.duckduckgo.common.utils.text.TextChangedWatcher
 import com.duckduckgo.di.scopes.FragmentScope
-import com.duckduckgo.duckchat.api.DuckAiFeatureState
+import com.duckduckgo.duckchat.api.RevengeAIFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.serp.logos.api.SerpEasterEggLogosToggles
@@ -175,7 +175,7 @@ class OmnibarLayout @JvmOverloads constructor(
     lateinit var duckChat: DuckChat
 
     @Inject
-    lateinit var duckAiFeatureState: DuckAiFeatureState
+    lateinit var duckAiFeatureState: RevengeAIFeatureState
 
     @Inject
     lateinit var dispatchers: DispatcherProvider
@@ -577,7 +577,7 @@ class OmnibarLayout @JvmOverloads constructor(
             omnibarItemPressedListener?.onBackButtonPressed()
         }
         duckAIHeader.setOnClickListener {
-            viewModel.onDuckAiHeaderClicked()
+            viewModel.onRevengeAIHeaderClicked()
         }
         duckAISidebar.setOnClickListener {
             omnibarItemPressedListener?.onDuckAISidebarButtonPressed()
@@ -595,7 +595,7 @@ class OmnibarLayout @JvmOverloads constructor(
             }
 
             is ViewMode.DuckAI -> {
-                renderDuckAiMode(viewState)
+                renderRevengeAIMode(viewState)
             }
 
             else -> {
@@ -886,8 +886,8 @@ class OmnibarLayout @JvmOverloads constructor(
         omnibarTextInput.hint = context.getString(R.string.search)
     }
 
-    private fun renderDuckAiMode(viewState: ViewState) {
-        logcat { "Omnibar: renderDuckAiMode $viewState" }
+    private fun renderRevengeAIMode(viewState: ViewState) {
+        logcat { "Omnibar: renderRevengeAIMode $viewState" }
         renderTabIcon(viewState)
         renderOmnibarText(viewState)
         pageLoadingIndicator.isVisible = viewState.isLoading

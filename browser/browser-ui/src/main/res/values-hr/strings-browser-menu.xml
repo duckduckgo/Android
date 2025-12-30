@@ -28,7 +28,7 @@
     <string name="browserMenuEnablePrivacyProtection">Omogući zaštitu privatnosti</string>
     <string name="browserMenuDisablePrivacyProtection">Onemogući zaštitu privatnosti</string>
     <string name="browserMenuNewTab">Nova kartica</string>
-    <string name="browserMenuDuckChat">Duck.ai</string>
+    <string name="browserMenuRevengeChat">Revenge AI</string>
     <string name="browserMenuShare">Podijeli</string>
     <string name="browserMenuEmailAlias">Generiraj Duck Address</string>
     <string name="browserMenuFindInPage">Pronađi na stranici</string>
@@ -45,7 +45,7 @@
     <string name="browserMenuNewChat">Novo čavrljanje</string>
     <string name="browserMenuNewAIChat">Nova opcija AI čavrljanja</string>
     <string name="browserMenuChatHistory">Povijest čavrljanja</string>
-    <string name="browserMenuChatSettings">Postavke usluge Duck.ai</string>
+    <string name="browserMenuChatSettings">Postavke usluge Revenge AI</string>
     <string name="browserMenuVPN">VPN</string>
 
     <!-- Browser Menu Content Description -->

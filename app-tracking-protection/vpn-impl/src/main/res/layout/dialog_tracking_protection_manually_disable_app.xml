@@ -20,7 +20,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    style="@style/Widget.DuckDuckGo.Dialog.Content">
+    style="@style/Widget.Revenge.Dialog.Content">
 
     <androidx.core.widget.NestedScrollView
         android:id="@+id/trackingProtectionScrollView"

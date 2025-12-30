@@ -28,7 +28,7 @@
     <string name="browserMenuEnablePrivacyProtection">Povolit ochranu soukromí</string>
     <string name="browserMenuDisablePrivacyProtection">Zakázat ochranu soukromí</string>
     <string name="browserMenuNewTab">Nová karta</string>
-    <string name="browserMenuDuckChat">Duck.ai</string>
+    <string name="browserMenuRevengeChat">Revenge AI</string>
     <string name="browserMenuShare">Sdílet</string>
     <string name="browserMenuEmailAlias">Vygenerovat adresu Duck</string>
     <string name="browserMenuFindInPage">Vyhledávání na stránce</string>
@@ -45,7 +45,7 @@
     <string name="browserMenuNewChat">Nový chat</string>
     <string name="browserMenuNewAIChat">Nový AI Chat</string>
     <string name="browserMenuChatHistory">Historie chatu</string>
-    <string name="browserMenuChatSettings">Nastavení Duck.ai</string>
+    <string name="browserMenuChatSettings">Nastavení Revenge AI</string>
     <string name="browserMenuVPN">VPN</string>
 
     <!-- Browser Menu Content Description -->

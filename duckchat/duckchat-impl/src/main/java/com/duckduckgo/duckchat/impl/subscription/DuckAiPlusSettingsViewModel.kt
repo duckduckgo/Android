@@ -26,10 +26,10 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
-import com.duckduckgo.duckchat.impl.subscription.DuckAiPlusSettingsViewModel.ViewState.SettingState
-import com.duckduckgo.duckchat.impl.subscription.DuckAiPlusSettingsViewModel.ViewState.SettingState.Disabled
-import com.duckduckgo.duckchat.impl.subscription.DuckAiPlusSettingsViewModel.ViewState.SettingState.Hidden
-import com.duckduckgo.subscriptions.api.Product.DuckAiPlus
+import com.duckduckgo.duckchat.impl.subscription.RevengeAIPlusSettingsViewModel.ViewState.SettingState
+import com.duckduckgo.duckchat.impl.subscription.RevengeAIPlusSettingsViewModel.ViewState.SettingState.Disabled
+import com.duckduckgo.duckchat.impl.subscription.RevengeAIPlusSettingsViewModel.ViewState.SettingState.Hidden
+import com.duckduckgo.subscriptions.api.Product.RevengeAIPlus
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.Subscriptions
 import kotlinx.coroutines.channels.BufferOverflow
@@ -48,7 +48,7 @@ import javax.inject.Inject
 
 @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
 @ContributesViewModel(ViewScope::class)
-class DuckAiPlusSettingsViewModel @Inject constructor(
+class RevengeAIPlusSettingsViewModel @Inject constructor(
     private val subscriptions: Subscriptions,
     private val dispatcherProvider: DispatcherProvider,
     private val duckChat: DuckChatInternal,
@@ -56,15 +56,15 @@ class DuckAiPlusSettingsViewModel @Inject constructor(
 ) : ViewModel(), DefaultLifecycleObserver {
 
     sealed class Command {
-        data object OpenDuckAiPlusSettings : Command()
+        data object OpenRevengeAIPlusSettings : Command()
     }
 
     private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
     internal fun commands(): Flow<Command> = command.receiveAsFlow()
     data class ViewState(
         val settingState: SettingState = Hidden,
-        val isDuckAiEnabled: Boolean = true,
-        val isDuckAiPaidSettingsFeatureEnabled: Boolean = false,
+        val isRevengeAIEnabled: Boolean = true,
+        val isRevengeAIPaidSettingsFeatureEnabled: Boolean = false,
     ) {
 
         sealed class SettingState {
@@ -78,8 +78,8 @@ class DuckAiPlusSettingsViewModel @Inject constructor(
     private val _viewState = MutableStateFlow(ViewState())
     val viewState = _viewState.asStateFlow()
 
-    fun onDuckAiClicked() {
-        sendCommand(Command.OpenDuckAiPlusSettings)
+    fun onRevengeAIClicked() {
+        sendCommand(Command.OpenRevengeAIPlusSettings)
     }
 
     override fun onCreate(owner: LifecycleOwner) {
@@ -92,36 +92,36 @@ class DuckAiPlusSettingsViewModel @Inject constructor(
                 combine(
                     subscriptions.getEntitlementStatus().map { entitlements ->
                         entitlements.any { product ->
-                            product == DuckAiPlus
+                            product == RevengeAIPlus
                         }
                     },
                     duckChat.observeEnableDuckChatUserSetting(),
-                ) { hasValidEntitlement, isDuckAiEnabled ->
+                ) { hasValidEntitlement, isRevengeAIEnabled ->
                     val subscriptionStatus = subscriptions.getSubscriptionStatus()
-                    val state = getDuckAiProState(hasValidEntitlement, subscriptionStatus)
+                    val state = getRevengeAIProState(hasValidEntitlement, subscriptionStatus)
                     _viewState.update {
                         it.copy(
                             settingState = state,
-                            isDuckAiEnabled = isDuckAiEnabled,
-                            isDuckAiPaidSettingsFeatureEnabled = true,
+                            isRevengeAIEnabled = isRevengeAIEnabled,
+                            isRevengeAIPaidSettingsFeatureEnabled = true,
                         )
                     }
                 }.launchIn(viewModelScope)
             } else {
                 subscriptions.getEntitlementStatus().map { entitlements ->
                     entitlements.any { product ->
-                        product == DuckAiPlus
+                        product == RevengeAIPlus
                     }
                 }.onEach { hasValidEntitlement ->
                     val subscriptionStatus = subscriptions.getSubscriptionStatus()
-                    val state = getDuckAiProState(hasValidEntitlement, subscriptionStatus)
+                    val state = getRevengeAIProState(hasValidEntitlement, subscriptionStatus)
                     _viewState.update { it.copy(settingState = state) }
                 }.launchIn(viewModelScope)
             }
         }
     }
 
-    private suspend fun getDuckAiProState(
+    private suspend fun getRevengeAIProState(
         hasValidEntitlement: Boolean,
         subscriptionStatus: SubscriptionStatus,
     ): SettingState {
@@ -131,7 +131,7 @@ class DuckAiPlusSettingsViewModel @Inject constructor(
             SubscriptionStatus.EXPIRED,
             SubscriptionStatus.WAITING,
             -> {
-                if (isDuckAiProAvailable()) {
+                if (isRevengeAIProAvailable()) {
                     Disabled
                 } else {
                     Hidden
@@ -151,10 +151,10 @@ class DuckAiPlusSettingsViewModel @Inject constructor(
         }
     }
 
-    private suspend fun isDuckAiProAvailable(): Boolean {
+    private suspend fun isRevengeAIProAvailable(): Boolean {
         return subscriptions.getAvailableProducts()
             .any { availableProduct ->
-                availableProduct == DuckAiPlus
+                availableProduct == RevengeAIPlus
             }
     }
 

@@ -19,7 +19,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.settings.DuckChatSettingsActivity">
+    tools:context=".ui.settings.RevengeChatSettingsActivity">
 
     <include
         android:id="@+id/includeToolbar"
@@ -73,7 +73,7 @@
                 android:id="@+id/divider"/>
 
             <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
-                android:id="@+id/userEnabledDuckChatToggle"
+                android:id="@+id/userEnabledRevengeChatToggle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:leadingIcon="@drawable/ic_ai_chat_24"
@@ -219,7 +219,7 @@
                 app:primaryText="@string/duckAiSearchSettingsSectionHeader" />
 
             <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
-                android:id="@+id/showDuckChatSearchSettingsLink"
+                android:id="@+id/showRevengeChatSearchSettingsLink"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:primaryText="@string/duck_chat_assist_settings_title"

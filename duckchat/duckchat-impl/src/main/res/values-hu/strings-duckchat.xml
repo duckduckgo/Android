@@ -17,7 +17,7 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="duck_chat_title">Duck.ai</string>
+    <string name="duck_chat_title">Revenge AI</string>
     <string name="duck_chat_download_finished_action_name">Megnyitás</string>
     <string name="duck_chat_cannot_open_file_error_message">A fájl nem nyitható meg. Keress kompatibilis alkalmazást.</string>
 
@@ -39,14 +39,14 @@
     <!-- Settings -->
     <string name="duck_chat_ai_features_title">AI funkciók</string>
     <string name="duck_chat_settings_activity_description">A DuckDuckGo AI-funkciói privátak és opcionálisak.\nAz adataidat nem használjuk fel az AI tanítására.\n<annotation type="learn_more_link">További részletek</annotation></string>
-    <string name="duck_chat_enable_duck_ai_setting">Duck.ai</string>
+    <string name="duck_chat_enable_duck_ai_setting">Revenge AI</string>
     <string name="duck_chat_enable_duck_ai_setting_description">Privát csevegés harmadik féltől származó népszerű AI-modellekkel</string>
     <string name="duck_chat_visibility_setting">Böngészési menü</string>
     <string name="duck_chat_address_bar_visibility_setting">Címsor</string>
     <string name="duck_chat_assist_settings_title">Keresési asszisztens beállításai</string>
     <string name="duck_chat_assist_settings_description">Válaszd ki, milyen gyakran szeretnél mesterséges intelligenciával generált válaszokat látni a kereséseid során</string>
-    <string name="duck_ai_shortcut_settings_title">Duck.ai-gyorsparancsok</string>
-    <string name="duck_ai_shortcut_settings_description">Válaszd ki a megjelenítendő Duck.ai-gyorsparancsokat</string>
+    <string name="duck_ai_shortcut_settings_title">Revenge AI-gyorsparancsok</string>
+    <string name="duck_ai_shortcut_settings_description">Válaszd ki a megjelenítendő Revenge AI-gyorsparancsokat</string>
 
     <!-- Duck AI Voice Search Shortcut Setting -->
     <string name="duckAiVoiceSearchVisibilitySetting">Beszédhangalapú keresés</string>
@@ -55,18 +55,18 @@
     <string name="input_screen_search_hint">Keresés vagy cím megadása</string>
     <string name="input_screen_chat_hint">Kérdezz privátban</string>
     <string name="input_screen_user_pref_without_ai">Csak keresés</string>
-    <string name="input_screen_user_pref_with_ai">Keresés és Duck.ai</string>
-    <string name="input_screen_user_pref_description">Próbáld ki azt az új lehetőséget, hogy közvetlenül a címsorban tehetsz fel kérdéseket a Duck.ai számára. <annotation type="share_feedback">Visszajelzés küldése</annotation></string>
+    <string name="input_screen_user_pref_with_ai">Keresés és Revenge AI</string>
+    <string name="input_screen_user_pref_description">Próbáld ki azt az új lehetőséget, hogy közvetlenül a címsorban tehetsz fel kérdéseket a RevengeAI számára. <annotation type="share_feedback">Visszajelzés küldése</annotation></string>
 
-    <!-- Duck.ai Pro settings -->
-    <string name="duck_ai_paid_settings_title">Duck.ai</string>
-    <string name="duck_ai_paid_settings_page_title">Duck.ai</string>
+    <!-- Revenge AI Pro settings -->
+    <string name="duck_ai_paid_settings_title">Revenge AI</string>
+    <string name="duck_ai_paid_settings_page_title">Revenge AI</string>
     <string name="duck_ai_paid_settings_page_description"><![CDATA[Privát csevegés a csak előfizetőknek szánt AI-modellekkel.\n<a href=\"\">További részletek</a>]]></string>
-    <string name="duck_ai_paid_settings_open_duck_ai">Duck.ai megnyitása</string>
+    <string name="duck_ai_paid_settings_open_duck_ai">Revenge AI megnyitása</string>
     <string name="duck_ai_paid_settings_learn_more_title">További részletek</string>
 
     <!-- AutoComplete -->
-    <string name="autocompleteDuckAiPrompt">Duck.ai kérdezése</string>
+    <string name="autocompleteRevengeAIPrompt">Revenge AI kérdezése</string>
     <string name="autocompleteDeviceAppNotFound">Az alkalmazás nem található</string>
 
     <!-- New Address Bar Option Bottom Sheet Dialog -->
@@ -76,7 +76,7 @@
     <string name="newAddressBarOptionBottomSheetDialogGhostButton">Most nem</string>
     <string name="newAddressBarOptionBottomSheetDialogFooter">Állítsd be a Beállítások &gt; AI-funkciók menüpontban.</string>
     <string name="newAddressBarOptionBottomSheetDialogSearchOnly">Csak keresés</string>
-    <string name="newAddressBarOptionBottomSheetDialogSearchAndDuckAi">Keresés és Duck.ai</string>
+    <string name="newAddressBarOptionBottomSheetDialogSearchAndRevengeAI">Keresés és Revenge AI</string>
     <string name="newAddressBarOptionBottomSheetDialogHeader">Címsorbeállítás</string>
 
     <!-- Duck AI SERP Settings Title -->
@@ -92,5 +92,5 @@
     <!-- Duck AI Paid Settings -->
     <string name="duck_ai_paid_settings_enable_in_settings">Engedélyezés az AI-funkciók beállításaiban</string>
     <string name="duck_ai_paid_settings_manage_in_settings">Kezelés az AI-funkciók beállításaiban</string>
-    <string name="duck_ai_paid_settings_manage_secondary">A Duck.ai az AI-funkciók beállításaiban konfigurálható.</string>
+    <string name="duck_ai_paid_settings_manage_secondary">A Revenge AI az AI-funkciók beállításaiban konfigurálható.</string>
 </resources>

@@ -464,12 +464,12 @@ class RealDuckChatTest {
     }
 
     @Test
-    fun whenUriHostIsDuckAiThenIsDuckChatUrlReturnsTrue() {
+    fun whenUriHostIsRevengeAIThenIsDuckChatUrlReturnsTrue() {
         assertTrue(testee.isDuckChatUrl("https://duck.ai".toUri()))
     }
 
     @Test
-    fun whenUriStringIsDuckAiThenIsDuckChatUrlReturnsTrue() {
+    fun whenUriStringIsRevengeAIThenIsDuckChatUrlReturnsTrue() {
         assertTrue(testee.isDuckChatUrl("duck.ai".toUri()))
     }
 

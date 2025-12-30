@@ -31,11 +31,11 @@ import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.di.scopes.ViewScope
-import com.duckduckgo.duckchat.impl.databinding.ViewDuckAiSettingsBinding
-import com.duckduckgo.duckchat.impl.subscription.DuckAiPlusSettingsViewModel.Command
-import com.duckduckgo.duckchat.impl.subscription.DuckAiPlusSettingsViewModel.Command.OpenDuckAiPlusSettings
-import com.duckduckgo.duckchat.impl.subscription.DuckAiPlusSettingsViewModel.ViewState
-import com.duckduckgo.duckchat.impl.subscription.DuckAiPlusSettingsViewModel.ViewState.SettingState
+import com.duckduckgo.duckchat.impl.databinding.ViewRevengeAiSettingsBinding
+import com.duckduckgo.duckchat.impl.subscription.RevengeAIPlusSettingsViewModel.Command
+import com.duckduckgo.duckchat.impl.subscription.RevengeAIPlusSettingsViewModel.Command.OpenRevengeAIPlusSettings
+import com.duckduckgo.duckchat.impl.subscription.RevengeAIPlusSettingsViewModel.ViewState
+import com.duckduckgo.duckchat.impl.subscription.RevengeAIPlusSettingsViewModel.ViewState.SettingState
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.coroutines.flow.launchIn
@@ -44,7 +44,7 @@ import javax.inject.Inject
 import com.duckduckgo.duckchat.impl.R as DuckChatR
 
 @InjectWith(ViewScope::class)
-class DuckAiPlusSettingsView @JvmOverloads constructor(
+class RevengeAIPlusSettingsView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
@@ -59,10 +59,10 @@ class DuckAiPlusSettingsView @JvmOverloads constructor(
     @Inject
     lateinit var dispatchers: DispatcherProvider
 
-    private val binding: ViewDuckAiSettingsBinding by viewBinding()
+    private val binding: ViewRevengeAiSettingsBinding by viewBinding()
 
-    private val viewModel: DuckAiPlusSettingsViewModel by lazy {
-        ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[DuckAiPlusSettingsViewModel::class.java]
+    private val viewModel: RevengeAIPlusSettingsViewModel by lazy {
+        ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[RevengeAIPlusSettingsViewModel::class.java]
     }
 
     private var job: ConflatedJob = ConflatedJob()
@@ -92,39 +92,39 @@ class DuckAiPlusSettingsView @JvmOverloads constructor(
     }
 
     private fun renderView(viewState: ViewState) {
-        with(binding.duckAiSettings) {
+        with(binding.revengeAiSettings) {
             when (viewState.settingState) {
                 is SettingState.Enabled -> {
-                    isVisible = true
-                    setStatus(isOn = viewState.isDuckAiEnabled)
-                    if (viewState.isDuckAiPaidSettingsFeatureEnabled) {
+                    this.isVisible = true
+                    setStatus(isOn = viewState.isRevengeAIEnabled)
+                    if (viewState.isRevengeAIPaidSettingsFeatureEnabled) {
                         setLeadingIconResource(DuckChatR.drawable.ic_duckduckgo_ai_color_24)
                     } else {
                         setLeadingIconResource(com.duckduckgo.mobile.android.R.drawable.ic_ai_chat_color_24)
                     }
-                    isClickable = true
-                    setClickListener { viewModel.onDuckAiClicked() }
+                    this.isClickable = true
+                    setClickListener { viewModel.onRevengeAIClicked() }
                 }
                 SettingState.Disabled -> {
-                    isVisible = true
-                    isClickable = false
+                    this.isVisible = true
+                    this.isClickable = false
                     setStatus(isOn = false)
                     setClickListener(null)
-                    if (viewState.isDuckAiPaidSettingsFeatureEnabled) {
+                    if (viewState.isRevengeAIPaidSettingsFeatureEnabled) {
                         setLeadingIconResource(DuckChatR.drawable.ic_duckduckgo_ai_grayscale_color_24)
                     } else {
                         setLeadingIconResource(com.duckduckgo.mobile.android.R.drawable.ic_ai_chat_grayscale_color_24)
                     }
                 }
-                SettingState.Hidden -> isGone = true
+                SettingState.Hidden -> this.isGone = true
             }
         }
     }
 
     private fun processCommands(command: Command) {
         when (command) {
-            is OpenDuckAiPlusSettings -> {
-                globalActivityStarter.start(context, DuckAiPaidSettingsNoParams)
+            is OpenRevengeAIPlusSettings -> {
+                globalActivityStarter.start(context, RevengeAIPaidSettingsNoParams)
             }
         }
     }

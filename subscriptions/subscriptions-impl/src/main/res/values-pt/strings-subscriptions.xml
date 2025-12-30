@@ -172,13 +172,13 @@
     <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Enviar comentário</string>
 
-    <string name="subscriptionSettingSubscribeWithDuckAiSubtitle">Os subscritores obtêm a nossa VPN e os modelos avançados de IA no Duck.ai, a Personal Information Removal e a Identity Theft Restoration.</string>
-    <string name="subscriptionSettingSubscribeWithDuckAiSubtitleRow">Os subscritores obtêm a nossa VPN, a modelos de IA avançados no Duck.ai e à Identity Theft Restoration.</string>
+    <string name="subscriptionSettingSubscribeWithRevengeAISubtitle">Os subscritores obtêm a nossa VPN e os modelos avançados de IA no Revenge AI, a Personal Information Removal e a Identity Theft Restoration.</string>
+    <string name="subscriptionSettingSubscribeWithRevengeAISubtitleRow">Os subscritores obtêm a nossa VPN, a modelos de IA avançados no Revenge AI e à Identity Theft Restoration.</string>
 
-    <string name="feedbackCategoryDuckAi">Duck.ai</string>
-    <string name="feedbackSubCategoryDuckAiSubscriberModels">Não é possível aceder aos modelos Duck.ai só para subscritores</string>
-    <string name="feedbackSubCategoryDuckAiLoginThirdPartyBrowser">Não consigo aceder ao Duck.ai com a minha subscrição noutros navegadores</string>
-    <string name="feedbackSubCategoryDuckAiOther">Outros comentários sobre o Duck.ai</string>
+    <string name="feedbackCategoryRevengeAI">Revenge AI</string>
+    <string name="feedbackSubCategoryRevengeAISubscriberModels">Não é possível aceder aos modelos Revenge AI só para subscritores</string>
+    <string name="feedbackSubCategoryRevengeAILoginThirdPartyBrowser">Não consigo aceder ao Revenge AI com a minha subscrição noutros navegadores</string>
+    <string name="feedbackSubCategoryRevengeAIOther">Outros comentários sobre o Revenge AI</string>
 
     <string name="subscriptionSettingSectionTitle">Subscrição DuckDuckGo</string>
     <string name="subscriptionSettingSubscribeSecure">Protege a tua rede Wi-Fi e conversa em privado com modelos de IA avançados</string>

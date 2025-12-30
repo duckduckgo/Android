@@ -28,7 +28,7 @@
     <string name="browserMenuEnablePrivacyProtection">Ota yksityisyyden suoja käyttöön</string>
     <string name="browserMenuDisablePrivacyProtection">Poista yksityisyyden suoja käytöstä</string>
     <string name="browserMenuNewTab">Uusi välilehti</string>
-    <string name="browserMenuDuckChat">Duck.ai</string>
+    <string name="browserMenuRevengeChat">Revenge AI</string>
     <string name="browserMenuShare">Jaa</string>
     <string name="browserMenuEmailAlias">Luo Duck Address</string>
     <string name="browserMenuFindInPage">Etsi sivulta</string>
@@ -45,7 +45,7 @@
     <string name="browserMenuNewChat">Uusi keskustelu</string>
     <string name="browserMenuNewAIChat">Uusi AI Chat</string>
     <string name="browserMenuChatHistory">Keskusteluhistoria</string>
-    <string name="browserMenuChatSettings">Duck.ai-asetukset</string>
+    <string name="browserMenuChatSettings">Revenge AI-asetukset</string>
     <string name="browserMenuVPN">VPN</string>
 
     <!-- Browser Menu Content Description -->

@@ -22,7 +22,7 @@ import com.duckduckgo.duckchat.impl.ChatState.HIDE
 import com.duckduckgo.duckchat.impl.ChatState.SHOW
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.ReportMetric
-import com.duckduckgo.duckchat.impl.metric.DuckAiMetricCollector
+import com.duckduckgo.duckchat.impl.metric.RevengeAIMetricCollector
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatDataStore
 import com.duckduckgo.js.messaging.api.JsCallbackData
@@ -55,7 +55,7 @@ class RealDuckChatJSHelper @Inject constructor(
     private val duckChat: DuckChatInternal,
     private val duckChatPixels: DuckChatPixels,
     private val dataStore: DuckChatDataStore,
-    private val duckAiMetricCollector: DuckAiMetricCollector,
+    private val duckAiMetricCollector: RevengeAIMetricCollector,
 ) : DuckChatJSHelper {
     override suspend fun processJsCallbackMessage(
         featureName: String,

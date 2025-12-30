@@ -23,7 +23,7 @@ import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.ui.DuckDuckGoActivity
-import com.duckduckgo.duckchat.api.DuckAiFeatureState
+import com.duckduckgo.duckchat.api.RevengeAIFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -46,7 +46,7 @@ class NewAddressBarOptionManagerTest {
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
     @Mock
-    private var duckAiFeatureStateMock: DuckAiFeatureState = mock()
+    private var duckAiFeatureStateMock: RevengeAIFeatureState = mock()
 
     @Mock
     private var userStageStoreMock: UserStageStore = mock()

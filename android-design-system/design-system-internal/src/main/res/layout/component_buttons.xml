@@ -36,7 +36,7 @@
         <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:primaryText="Dax Buttons" />
+            app:primaryText="Revenge Buttons" />
 
         <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
             android:id="@+id/dax_button_primary"

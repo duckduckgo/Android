@@ -7,7 +7,7 @@
         errorLine1="        assertFalse(testDataStore.data.first().contains(DUCK_CHAT_USER_PREFERENCES))"
         errorLine2="                    ~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/test/kotlin/com/duckduckgo/duckchat/impl/store/SharedPreferencesDuckChatDataStoreTest.kt"
+            file="src/test/kotlin/com/duckduckgo/duckchat/impl/store/SharedPreferencesRevengeChatDataStoreTest.kt"
             line="76"
             column="21"/>
     </issue>
@@ -18,7 +18,7 @@
         errorLine1="        assertEquals(newPreferences, testDataStore.data.first()[DUCK_CHAT_USER_PREFERENCES])"
         errorLine2="                                     ~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/test/kotlin/com/duckduckgo/duckchat/impl/store/SharedPreferencesDuckChatDataStoreTest.kt"
+            file="src/test/kotlin/com/duckduckgo/duckchat/impl/store/SharedPreferencesRevengeChatDataStoreTest.kt"
             line="93"
             column="38"/>
     </issue>
@@ -29,7 +29,7 @@
         errorLine1="        assertFalse(testDataStore.data.first().contains(DUCK_CHAT_USER_PREFERENCES))"
         errorLine2="                    ~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/test/kotlin/com/duckduckgo/duckchat/impl/store/SharedPreferencesDuckChatDataStoreTest.kt"
+            file="src/test/kotlin/com/duckduckgo/duckchat/impl/store/SharedPreferencesRevengeChatDataStoreTest.kt"
             line="100"
             column="21"/>
     </issue>
@@ -40,7 +40,7 @@
         errorLine1="        if (Intent(inputAction).resolveActivity(packageManager) == null) {"
         errorLine2="                                ~~~~~~~~~~~~~~~">
         <location
-            file="src/main/java/com/duckduckgo/duckchat/impl/ui/DuckChatWebViewActivity.kt"
+            file="src/main/java/com/duckduckgo/duckchat/impl/ui/RevengeChatWebViewActivity.kt"
             line="365"
             column="33"/>
     </issue>
@@ -51,7 +51,7 @@
         errorLine1="        if (Intent(inputAction).resolveActivity(requireActivity().packageManager) == null) {"
         errorLine2="                                ~~~~~~~~~~~~~~~">
         <location
-            file="src/main/java/com/duckduckgo/duckchat/impl/ui/DuckChatWebViewFragment.kt"
+            file="src/main/java/com/duckduckgo/duckchat/impl/ui/RevengeChatWebViewFragment.kt"
             line="391"
             column="33"/>
     </issue>

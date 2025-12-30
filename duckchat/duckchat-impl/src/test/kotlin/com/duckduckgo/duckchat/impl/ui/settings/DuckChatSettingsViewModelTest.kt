@@ -123,30 +123,30 @@ class DuckChatSettingsViewModelTest {
         }
 
     @Test
-    fun `when onDuckAiInputScreenWithAiSelected selected then set user setting`() =
+    fun `when onRevengeAIInputScreenWithAiSelected selected then set user setting`() =
         runTest {
-            testee.onDuckAiInputScreenWithAiSelected()
+            testee.onRevengeAIInputScreenWithAiSelected()
             verify(duckChat).setInputScreenUserSetting(true)
         }
 
     @Test
-    fun `when onDuckAiInputScreenWithoutAiSelected selected then set user setting`() =
+    fun `when onRevengeAIInputScreenWithoutAiSelected selected then set user setting`() =
         runTest {
-            testee.onDuckAiInputScreenWithoutAiSelected()
+            testee.onRevengeAIInputScreenWithoutAiSelected()
             verify(duckChat).setInputScreenUserSetting(false)
         }
 
     @Test
-    fun `when onDuckAiInputScreenWithAiSelected then discovery funnel onInputScreenEnabled is called`() =
+    fun `when onRevengeAIInputScreenWithAiSelected then discovery funnel onInputScreenEnabled is called`() =
         runTest {
-            testee.onDuckAiInputScreenWithAiSelected()
+            testee.onRevengeAIInputScreenWithAiSelected()
             verify(mockInputScreenDiscoveryFunnel).onInputScreenEnabled()
         }
 
     @Test
-    fun `when onDuckAiInputScreenWithoutAiSelected then discovery funnel onInputScreenDisabled is called`() =
+    fun `when onRevengeAIInputScreenWithoutAiSelected then discovery funnel onInputScreenDisabled is called`() =
         runTest {
-            testee.onDuckAiInputScreenWithoutAiSelected()
+            testee.onRevengeAIInputScreenWithoutAiSelected()
             verify(mockInputScreenDiscoveryFunnel).onInputScreenDisabled()
         }
 
@@ -426,16 +426,16 @@ class DuckChatSettingsViewModelTest {
         }
 
     @Test
-    fun `when onDuckAiInputScreenWithAiSelected true then on pixel fired`() =
+    fun `when onRevengeAIInputScreenWithAiSelected true then on pixel fired`() =
         runTest {
-            testee.onDuckAiInputScreenWithAiSelected()
+            testee.onRevengeAIInputScreenWithAiSelected()
             verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_ADDRESS_BAR_SETTING_ON)
         }
 
     @Test
-    fun `when onDuckAiInputScreenWithoutAiSelected false then off pixel fired`() =
+    fun `when onRevengeAIInputScreenWithoutAiSelected false then off pixel fired`() =
         runTest {
-            testee.onDuckAiInputScreenWithoutAiSelected()
+            testee.onRevengeAIInputScreenWithoutAiSelected()
             verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_ADDRESS_BAR_SETTING_OFF)
         }
 
@@ -470,7 +470,7 @@ class DuckChatSettingsViewModelTest {
     @Test
     fun `when Duck ai shortcuts clicked, then dispatch launch command`() =
         runTest {
-            testee.onDuckAiShortcutsClicked()
+            testee.onRevengeAIShortcutsClicked()
 
             testee.commands.test {
                 val command = awaitItem()
@@ -572,16 +572,16 @@ class DuckChatSettingsViewModelTest {
         }
 
     @Test
-    fun `when onDuckAiHideAiGeneratedImagesClicked then pixel is fired`() =
+    fun `when onRevengeAIHideAiGeneratedImagesClicked then pixel is fired`() =
         runTest {
-            testee.onDuckAiHideAiGeneratedImagesClicked()
+            testee.onRevengeAIHideAiGeneratedImagesClicked()
             verify(mockPixel).fire(DuckChatPixelName.SERP_SETTINGS_OPEN_HIDE_AI_GENERATED_IMAGES)
         }
 
     @Test
-    fun `when onDuckAiHideAiGeneratedImagesClicked then OpenLink command with correct link is emitted`() =
+    fun `when onRevengeAIHideAiGeneratedImagesClicked then OpenLink command with correct link is emitted`() =
         runTest {
-            testee.onDuckAiHideAiGeneratedImagesClicked()
+            testee.onRevengeAIHideAiGeneratedImagesClicked()
 
             testee.commands.test {
                 val command = awaitItem()

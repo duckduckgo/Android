@@ -81,7 +81,7 @@ class UpdateNativeSettingsHandlerTest {
     @Test
     fun `when feature flag is disabled then settings are not stored`() = runTest {
         fakeSerpSettingsFeature.storeSerpSettings().setRawStoredState(Toggle.State(enable = false))
-        val settingsJson = """{"isDuckAiEnabled":true,"duckAiTitle":"Duck.AI"}"""
+        val settingsJson = """{"isRevengeAIEnabled":true,"duckAiTitle":"Duck.AI"}"""
         val jsMessage = createJsMessage(JSONObject(settingsJson))
 
         handler.getJsMessageHandler().process(
@@ -97,7 +97,7 @@ class UpdateNativeSettingsHandlerTest {
     @Test
     fun `when valid settings provided then stores them as JSON string`() = runTest {
         fakeSerpSettingsFeature.storeSerpSettings().setRawStoredState(Toggle.State(enable = true))
-        val settingsJson = """{"isDuckAiEnabled":true,"duckAiTitle":"Duck.AI"}"""
+        val settingsJson = """{"isRevengeAIEnabled":true,"duckAiTitle":"Duck.AI"}"""
         val jsMessage = createJsMessage(JSONObject(settingsJson))
 
         handler.getJsMessageHandler().process(
@@ -131,7 +131,7 @@ class UpdateNativeSettingsHandlerTest {
     fun `when settings updated multiple times then stores latest settings`() = runTest {
         fakeSerpSettingsFeature.storeSerpSettings().setRawStoredState(Toggle.State(enable = true))
 
-        val firstSettings = """{"isDuckAiEnabled":true}"""
+        val firstSettings = """{"isRevengeAIEnabled":true}"""
         handler.getJsMessageHandler().process(
             jsMessage = createJsMessage(JSONObject(firstSettings)),
             jsMessaging = fakeJsMessaging,
@@ -139,7 +139,7 @@ class UpdateNativeSettingsHandlerTest {
         )
         coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
 
-        val secondSettings = """{"isDuckAiEnabled":false,"newSetting":"value"}"""
+        val secondSettings = """{"isRevengeAIEnabled":false,"newSetting":"value"}"""
         handler.getJsMessageHandler().process(
             jsMessage = createJsMessage(JSONObject(secondSettings)),
             jsMessaging = fakeJsMessaging,

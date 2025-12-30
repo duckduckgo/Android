@@ -211,7 +211,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
                     GoToITR -> pixelSender.reportOnboardingIdtrClick()
                     is GoToNetP -> pixelSender.reportOnboardingVpnClick()
                     GoToPIR, GoToPIRDashboard -> pixelSender.reportOnboardingPirClick()
-                    GoToDuckAI -> pixelSender.reportOnboardingDuckAiClick()
+                    GoToDuckAI -> pixelSender.reportOnboardingRevengeAIClick()
                     else -> {} // no-op
                 }
             }

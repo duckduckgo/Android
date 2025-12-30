@@ -172,18 +172,18 @@ class ExternalIntentProcessingStateTest {
     }
 
     @Test
-    fun `when initialized then hasPendingDuckAiOpen is false`() = runTest {
-        testee.hasPendingDuckAiOpen.test {
+    fun `when initialized then hasPendingRevengeAIOpen is false`() = runTest {
+        testee.hasPendingRevengeAIOpen.test {
             assertFalse(awaitItem())
             cancelAndConsumeRemainingEvents()
         }
     }
 
     @Test
-    fun `when onIntentRequestToOpenDuckAi called then hasPendingDuckAiOpen is true`() = runTest {
-        testee.hasPendingDuckAiOpen.test {
+    fun `when onIntentRequestToOpenRevengeAI called then hasPendingRevengeAIOpen is true`() = runTest {
+        testee.hasPendingRevengeAIOpen.test {
             assertFalse(awaitItem())
-            testee.onIntentRequestToOpenDuckAi()
+            testee.onIntentRequestToOpenRevengeAI()
 
             assertTrue(awaitItem())
             cancelAndConsumeRemainingEvents()
@@ -191,13 +191,13 @@ class ExternalIntentProcessingStateTest {
     }
 
     @Test
-    fun `when onDuckAiClosed called then hasPendingDuckAiOpen is false`() = runTest {
-        testee.onIntentRequestToOpenDuckAi()
+    fun `when onRevengeAIClosed called then hasPendingRevengeAIOpen is false`() = runTest {
+        testee.onIntentRequestToOpenRevengeAI()
 
-        testee.hasPendingDuckAiOpen.test {
+        testee.hasPendingRevengeAIOpen.test {
             assertTrue(awaitItem())
 
-            testee.onDuckAiClosed()
+            testee.onRevengeAIClosed()
 
             assertFalse(awaitItem())
             cancelAndConsumeRemainingEvents()

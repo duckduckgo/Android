@@ -66,7 +66,7 @@ import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.duckchat.api.DuckAiFeatureState
+import com.duckduckgo.duckchat.api.RevengeAIFeatureState
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 import kotlinx.coroutines.CoroutineScope
@@ -107,7 +107,7 @@ class BrowserViewModel @Inject constructor(
     private val showOnAppLaunchOptionHandler: ShowOnAppLaunchOptionHandler,
     private val additionalDefaultBrowserPrompts: AdditionalDefaultBrowserPrompts,
     private val swipingTabsFeature: SwipingTabsFeatureProvider,
-    private val duckAiFeatureState: DuckAiFeatureState,
+    private val duckAiFeatureState: RevengeAIFeatureState,
 ) : ViewModel(), CoroutineScope {
 
     override val coroutineContext: CoroutineContext

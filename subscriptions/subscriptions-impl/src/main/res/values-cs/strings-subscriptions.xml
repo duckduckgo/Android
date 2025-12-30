@@ -172,13 +172,13 @@
     <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Odeslat zpětnou vazbu</string>
 
-    <string name="subscriptionSettingSubscribeWithDuckAiSubtitle">Předplatitelé získají naši VPN, pokročilé modely AI ve funkci Duck.ai, službu Personal Information Removal a Identity Theft Restoration.</string>
-    <string name="subscriptionSettingSubscribeWithDuckAiSubtitleRow">Předplatitelé získají naši VPN, pokročilé modely umělé inteligence ve funkci Duck.ai a službu Identity Theft Restoration.</string>
+    <string name="subscriptionSettingSubscribeWithRevengeAISubtitle">Předplatitelé získají naši VPN, pokročilé modely AI ve funkci Revenge AI, službu Personal Information Removal a Identity Theft Restoration.</string>
+    <string name="subscriptionSettingSubscribeWithRevengeAISubtitleRow">Předplatitelé získají naši VPN, pokročilé modely umělé inteligence ve funkci Revenge AI a službu Identity Theft Restoration.</string>
 
-    <string name="feedbackCategoryDuckAi">Duck.ai</string>
-    <string name="feedbackSubCategoryDuckAiSubscriberModels">Nemám přístup k modelům Duck.ai, které jsou jen pro předplatitele</string>
-    <string name="feedbackSubCategoryDuckAiLoginThirdPartyBrowser">Nemám se svým předplatným přístup k Duck.ai v jiných prohlížečích</string>
-    <string name="feedbackSubCategoryDuckAiOther">Další zpětná vazba k Duck.ai</string>
+    <string name="feedbackCategoryRevengeAI">Revenge AI</string>
+    <string name="feedbackSubCategoryRevengeAISubscriberModels">Nemám přístup k modelům Revenge AI, které jsou jen pro předplatitele</string>
+    <string name="feedbackSubCategoryRevengeAILoginThirdPartyBrowser">Nemám se svým předplatným přístup k Revenge AI v jiných prohlížečích</string>
+    <string name="feedbackSubCategoryRevengeAIOther">Další zpětná vazba k Revenge AI</string>
 
     <string name="subscriptionSettingSectionTitle">Předplatné DuckDuckGo</string>
     <string name="subscriptionSettingSubscribeSecure">Zabezpeč si Wi-Fi a chatuj soukromě s pokročilými modely AI</string>

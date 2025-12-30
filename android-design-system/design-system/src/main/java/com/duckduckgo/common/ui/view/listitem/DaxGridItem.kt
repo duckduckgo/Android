@@ -45,17 +45,17 @@ class DaxGridItem @JvmOverloads constructor(
     init {
         context.obtainStyledAttributes(
             attrs,
-            R.styleable.DaxGridItem,
+            R.styleable.RevengeGridItem,
             0,
             0,
         ).apply {
-            setPrimaryText(getString(R.styleable.DaxGridItem_primaryText))
-            if (hasValue(R.styleable.DaxGridItem_leadingIcon)) {
-                setLeadingIconDrawable(getDrawable(R.styleable.DaxGridItem_leadingIcon)!!)
+            setPrimaryText(getString(R.styleable.RevengeGridItem_primaryText))
+            if (hasValue(R.styleable.RevengeGridItem_leadingIcon)) {
+                setLeadingIconDrawable(getDrawable(R.styleable.RevengeGridItem_leadingIcon)!!)
             }
 
-            if (hasValue(R.styleable.DaxGridItem_gridItemType)) {
-                val itemType = GridItemType.from(getInt(R.styleable.DaxGridItem_gridItemType, 0))
+            if (hasValue(R.styleable.RevengeGridItem_gridItemType)) {
+                val itemType = GridItemType.from(getInt(R.styleable.RevengeGridItem_gridItemType, 0))
                 setItemType(itemType)
             } else {
                 setItemType(Favicon)

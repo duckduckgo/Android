@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Copyright (c) 2022 DuckDuckGo
+  ~ Copyright (c) 2022 Revenge
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -24,14 +24,14 @@
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/internal_input_layout"
-        style="@style/Widget.DuckDuckGo.TextInput"
+        style="@style/Widget.Revenge.TextInput"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:endIconMode="none">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/internal_edit_text"
-            style="@style/Widget.DuckDuckGo.TextInputText"
+            style="@style/Widget.Revenge.TextInputText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="top"

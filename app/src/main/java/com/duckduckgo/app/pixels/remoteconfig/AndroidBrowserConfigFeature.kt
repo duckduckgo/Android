@@ -151,7 +151,7 @@ interface AndroidBrowserConfigFeature {
     fun handleIntentScheme(): Toggle
 
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun hideDuckAiInSerpKillSwitch(): Toggle
+    fun hideRevengeAIInSerpKillSwitch(): Toggle
 
     /**
      * Kill switch for intent resolution validation in SpecialUrlDetector

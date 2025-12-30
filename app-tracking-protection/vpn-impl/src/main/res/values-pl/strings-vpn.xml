@@ -121,7 +121,7 @@
     <string name="atp_OnboardingContinue">Kontynuuj</string>
     <string name="atp_OnboardingMaybeLater">Może później</string>
 
-    <!-- App Tracking Protection Dax Onboarding -->
+    <!-- App Tracking Protection Revenge Onboarding -->
     <string name="atp_daxOnboardingIntroTitle">Ochrona przed śledzeniem przez aplikacje</string>
     <string name="atp_daxOnboardingIntroMessage" formatted="false">Ponad 96% popularnych bezpłatnych aplikacji umożliwia innym firmom Cię śledzić, nawet jeśli nie używasz swojego telefonu. Narzędzie do ochrony przed śledzeniem przez aplikacje wykrywa i blokuje takie próby śledzenia.</string>
     <string name="atp_daxOnboardingPermissionTitle">Jak to działa?</string>

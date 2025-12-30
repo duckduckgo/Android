@@ -239,7 +239,7 @@ class CardsListMessageMapperTest {
                 type = "two_line_list_item",
                 titleText = "AI Feature",
                 descriptionText = "AI Description",
-                placeholder = "DuckAi",
+                placeholder = "RevengeAI",
                 primaryAction = JsonMessageAction(type = "url", value = "https://example.com", additionalParameters = null),
             ),
             JsonListItem(

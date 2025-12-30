@@ -36,7 +36,7 @@ import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.subscriptions.api.Product
-import com.duckduckgo.subscriptions.api.Product.DuckAiPlus
+import com.duckduckgo.subscriptions.api.Product.RevengeAIPlus
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.PRIVACY_PRO_ETLD
@@ -83,7 +83,7 @@ class RealSubscriptions @Inject constructor(
         return subscriptionsManager.entitlements.map { list ->
             withContext(dispatcherProvider.io()) {
                 if (subscriptionsFeature.get().duckAiPlus().isEnabled().not()) {
-                    list.filterNot { entitlement -> entitlement == DuckAiPlus }
+                    list.filterNot { entitlement -> entitlement == RevengeAIPlus }
                 } else {
                     list
                 }
@@ -112,7 +112,7 @@ class RealSubscriptions @Inject constructor(
             .let {
                 withContext(dispatcherProvider.io()) {
                     if (subscriptionsFeature.get().duckAiPlus().isEnabled().not()) {
-                        it.filterNot { feature -> feature == DuckAiPlus }
+                        it.filterNot { feature -> feature == RevengeAIPlus }
                     } else {
                         it
                     }

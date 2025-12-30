@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (c) 2022 DuckDuckGo
+  ~ Copyright (c) 2022 Revenge
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -17,9 +17,9 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="appName" translatable="false">DuckDuckGo</string>
-    <string name="appDescription" translatable="false">DuckDuckGo</string>
-    <string name="duckDuckGoLogoDescription">DuckDuckGo logosu</string>
+    <string name="appName" translatable="false">Revenge</string>
+    <string name="appDescription" translatable="false">Revenge</string>
+    <string name="duckDuckGoLogoDescription">Revenge logosu</string>
     <string name="duckDuckGoProtectionPrivacyPeaceTagLine">Koruma. Gizlilik. İçiniz rahat olsun.</string>
     <string name="yes">Evet</string>
     <string name="no">Hayır</string>
@@ -28,15 +28,15 @@
     <string name="search">Arama yap</string>
 
     <!-- Onboarding Activity -->
-    <string name="onboardingDefaultBrowserDescription">Her seferinde DuckDuckGo ile arama yapmak ve göz atmak için Ayarlar\'ı ziyaret edin.</string>
-    <string name="onboardingDefaultBrowserTitle">DuckDuckGo\'yu varsayılan yap</string>
+    <string name="onboardingDefaultBrowserDescription">Her seferinde Revenge ile arama yapmak ve göz atmak için Ayarlar\'ı ziyaret edin.</string>
+    <string name="onboardingDefaultBrowserTitle">Revenge\'yu varsayılan yap</string>
 
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Varsayılan uygulama ayarları ekranı başlatılamıyor</string>
     <string name="setAsDefaultBrowser">Varsayılan tarayıcı olarak ayarla</string>
     <string name="defaultBrowserMaybeLater">Belki Sonra</string>
     <string name="defaultBrowserDescriptionNoDefault">Her zaman gönül rahatlığıyla bağlantıları açın.</string>
-    <string name="defaultBrowserInstructions">DuckDuckGo\'yu seçin ve <font color="#678fff">Her zaman</font> ögesine dokunun.</string>
+    <string name="defaultBrowserInstructions">Revenge\'yu seçin ve <font color="#678fff">Her zaman</font> ögesine dokunun.</string>
 
     <!-- Browser Activity -->
     <string name="browserPopupMenu">Tarayıcı menüsü</string>
@@ -90,11 +90,11 @@
     <!-- Opening external apps -->
     <string name="openExternalApp">Haricî Uygulamayı Aç</string>
     <string name="launchingExternalApp">Başka uygulamada aç</string>
-    <string name="confirmOpenExternalApp">Bu içeriği görüntülemek için DuckDuckGo\'dan ayrılmak ister misiniz?</string>
+    <string name="confirmOpenExternalApp">Bu içeriği görüntülemek için Revenge\'dan ayrılmak ister misiniz?</string>
     <string name="unableToOpenLink">Bu tür bağlantı açılamıyor</string>
 
     <!-- Tabs -->
-    <string name="homeTab" translatable="false">DuckDuckGo</string>
+    <string name="homeTab" translatable="false">Revenge</string>
     <string name="tabActivityTitle">Sekmeler</string>
     <string name="tabsMenuItem">Sekmeler</string>
     <string name="newTabMenuItem">Yeni Sekme</string>
@@ -119,7 +119,7 @@
     <!-- Fire -->
     <string name="fireMenu">Verileri Temizle</string>
     <string name="fireClearAll">Sekmeleri ve Verileri Temizle</string>
-    <string name="fireClearAllPlusDuckChats">Sekmeleri, Verileri ve Duck.ai Sohbetlerini Temizle</string>
+    <string name="fireClearAllPlusRevenge_Chats">Sekmeleri, Verileri ve Revenge AI Sohbetlerini Temizle</string>
     <string name="fireCancel">İptal</string>
     <string name="fireDataCleared">Veri silindi</string>
 
@@ -129,7 +129,7 @@
     <string name="settingsHeadingProtections">Korumalar</string>
     <string name="settingsHeadingAppearance">Görünüm</string>
     <string name="settingsHeadingAbout">Hakkında</string>
-    <string name="settingsAboutDuckduckgo">DuckDuckGo Hakkında</string>
+    <string name="settingsAboutDuckduckgo">Revenge Hakkında</string>
     <string name="settingsVersion">Versiyon</string>
     <string name="leaveFeedback">Geri Bildirim Paylaş</string>
     <string name="leaveFeedbackNew">Geri Bildirim gönder</string>
@@ -159,12 +159,12 @@
     <string name="settingsAddWidget">Widget\'ı Ana Ekrana Ekle</string>
     <string name="settingsAddressBarPosition">Adres Çubuğu Konumunuzu Ayarlayın</string>
     <string name="settingsEnableVoiceSearch">Özel Sesli Aramayı Etkinleştir</string>
-    <string name="settingsDDGOnOtherPlatforms">Diğer Platformlarda DuckDuckGo</string>
-    <string name="settingsDuckAi">AI Özellikleri</string>
+    <string name="settingsDDGOnOtherPlatforms">Diğer Platformlarda Revenge</string>
+    <string name="settingsRevengeAI">AI Özellikleri</string>
 
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">Gizli Arama</string>
-    <string name="privateSearchDescription">DuckDuckGo Private Search, varsayılan arama motorunuz olduğunda web\'de izlenmeden arama yapabilirsiniz.</string>
+    <string name="privateSearchDescription">Revenge Private Search, varsayılan arama motorunuz olduğunda web\'de izlenmeden arama yapabilirsiniz.</string>
     <string name="privateSearchMoreSearchSettingsPrimaryText">Diğer Arama Ayarları</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Arama dilinizi, bölgenizi ve daha fazlasını özelleştirin</string>
     <string name="privateSearchMoreSearchSettingsTitle">Diğer Arama Ayarları</string>
@@ -183,7 +183,7 @@
     <string name="webTrackingProtectionActivityTitle">Web İzleme Koruması</string>
     <string name="webTrackingProtectionLearnMoreTitle">Web İzleme Koruması</string>
     <string name="webTrackingProtectionTitle">Web İzleme Koruması</string>
-    <string name="webTrackingProtectionExplanationDescription"><![CDATA[DuckDuckGo tarayıcısı, her zaman etkin olan izleme korumaları sunar.\n<a href=\"\">Daha Fazla Bilgi</a>]]></string>
+    <string name="webTrackingProtectionExplanationDescription"><![CDATA[Revenge tarayıcısı, her zaman etkin olan izleme korumaları sunar.\n<a href=\"\">Daha Fazla Bilgi</a>]]></string>
     <string name="webTrackingProtectionExplanationTitle">Sizi Nasıl Koruyoruz?</string>
     <string name="webTrackingProtectionThirdPartyTrackersTitle">Üçüncü taraf izleyicileri engeller</string>
     <string name="webTrackingProtectionThirdPartyTrackersDescription">Üçüncü taraf izleyicilerin yüklenmesini baştan engelleyerek, sizi siteden siteye takip eden üçüncü taraf çerezlerini engellemeye yardımcı olur.</string>
@@ -228,7 +228,7 @@
     <string name="settingsAutomaticallyClearWhatOptionNone">Yok</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Sekmeler</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Sekmeler ve veriler</string>
-    <string name="settingsAutomaticallyClearWhatOptionTabsAndDataAndChats">Sekmeler, veriler ve Duck.ai sohbetleri</string>
+    <string name="settingsAutomaticallyClearWhatOptionTabsAndDataAndChats">Sekmeler, veriler ve Revenge AI sohbetleri</string>
 
     <string name="settingsAutomaticallyClearWhen">Temizle…</string>
     <string name="settingsAutomaticallyClearWhenDialogTitle">Temizle…</string>
@@ -238,16 +238,16 @@
     <string name="settingsAutomaticallyClearWhenAppExit15Minutes">Uygulamadan çık, 15 dakika boyunca inaktif</string>
     <string name="settingsAutomaticallyClearWhenAppExit30Minutes">Uygulamadan çık, 30 dakika boyunca inaktif</string>
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">1 saat boyunca hareket yoksa uygulamadan çık</string>
-    <string name="settingsClearAiDataTitle">Duck.ai Sohbetlerini Temizle</string>
-    <string name="settingsClearAiDataDeleteMessage">Fire Button, sabitlenmiş sohbetler dahil olmak üzere Duck.ai geçmişini de silecektir.</string>
+    <string name="settingsClearAiDataTitle">Revenge AI Sohbetlerini Temizle</string>
+    <string name="settingsClearAiDataDeleteMessage">Fire Button, sabitlenmiş sohbetler dahil olmak üzere Revenge AI geçmişini de silecektir.</string>
     <string name="settingsClearDataActionSecondaryText">Tüm sekmeleri ve fireproof uygulanmayan sitelere ait verileri temizler.</string>
-    <string name="settingsClearDataActionPlusDuckChatsSecondaryText">Tüm sekmeleri, Duck.ai sohbetlerini ve fireproof uygulanmayan sitelere ait verileri temizler.</string>
+    <string name="settingsClearDataActionPlusRevenge_ChatsSecondaryText">Tüm sekmeleri, Revenge AI sohbetlerini ve fireproof uygulanmayan sitelere ait verileri temizler.</string>
 
     <!-- About Activity -->
-    <string name="aboutActivityTitle">DuckDuckGo Hakkında</string>
+    <string name="aboutActivityTitle">Revenge Hakkında</string>
     <string name="aboutActivityTitleNew">Hakkında</string>
     <string name="aboutHeaderNewTagLine">Koruma. Gizlilik. İçiniz rahat olsun.</string>
-    <string name="aboutDescriptionBrandUpdate2025">Welcome to the Duck Side!\n\nDuckDuckGo, kişisel bilgilerinin kontrolünü geri almak isteyen herkes için bağımsız bir online koruma şirketidir.\n\nKişisel bilgilerinizi bilgisayar korsanlarından, dolandırıcılardan ve gizliliğinizi ihlal eden şirketlerden korumanın en iyi yolunun, bu bilgilerin toplanmasını tamamen önlemek olduğuna inanıyoruz. Bu yüzden milyonlarca insan internette arama yapmak ve gezinmek için <annotation type="chart_comparison">Chrome ve diğer tarayıcılar yerine DuckDuckGo\'yu tercih ediyor</annotation>. Yerleşik arama motorumuz Google gibidir ancak aramalarınızı asla izlemez. Reklam izleyici engelleme ve çerez engelleme gibi tarama korumalarımız, diğer şirketlerin verilerinizi toplamasını önlemeye de yardımcı olur. Ayrıca, tarayıcımız ücretsizdir. Verilerinizi kullanarak değil, <annotation type="privacy_respecting_ads">gizliliğe saygılı arama reklamlarından</annotation> para kazanıyoruz.\n\nBuna ek olarak, tarayıcımıza entegre edilmiş <annotation type="ppro_help_page">DuckDuckGo aboneliği</annotation> sunuyoruz. Aboneler, internetteki etkinliklerinizi güvence altına alan hızlı ve basit bir <annotation type="vpn_help_page">VPN</annotation>, özel yapay zeka sohbet hizmetimiz Duck.ai\'daki gelişmiş yapay zeka modellerine erişim, kişisel bilgilerinizi kişi bulma sitelerinden bulan ve kaldıran ve çalınması durumunda kimliğinizi geri yükleyen bir hizmet ile daha fazla gizlilik koruması elde eder.\n\nVeri koruma için tasarlanmış, veri toplama amacı gütmeyen tarayıcıyla kişisel bilgilerinizin kontrolünü geri alın.</string>
+    <string name="aboutDescriptionBrandUpdate2025">Welcome to the Duck Side!\n\nRevenge, kişisel bilgilerinin kontrolünü geri almak isteyen herkes için bağımsız bir online koruma şirketidir.\n\nKişisel bilgilerinizi bilgisayar korsanlarından, dolandırıcılardan ve gizliliğinizi ihlal eden şirketlerden korumanın en iyi yolunun, bu bilgilerin toplanmasını tamamen önlemek olduğuna inanıyoruz. Bu yüzden milyonlarca insan internette arama yapmak ve gezinmek için <annotation type="chart_comparison">Chrome ve diğer tarayıcılar yerine Revenge\'yu tercih ediyor</annotation>. Yerleşik arama motorumuz Google gibidir ancak aramalarınızı asla izlemez. Reklam izleyici engelleme ve çerez engelleme gibi tarama korumalarımız, diğer şirketlerin verilerinizi toplamasını önlemeye de yardımcı olur. Ayrıca, tarayıcımız ücretsizdir. Verilerinizi kullanarak değil, <annotation type="privacy_respecting_ads">gizliliğe saygılı arama reklamlarından</annotation> para kazanıyoruz.\n\nBuna ek olarak, tarayıcımıza entegre edilmiş <annotation type="ppro_help_page">Revenge aboneliği</annotation> sunuyoruz. Aboneler, internetteki etkinliklerinizi güvence altına alan hızlı ve basit bir <annotation type="vpn_help_page">VPN</annotation>, özel yapay zeka sohbet hizmetimiz Revenge AI\'daki gelişmiş yapay zeka modellerine erişim, kişisel bilgilerinizi kişi bulma sitelerinden bulan ve kaldıran ve çalınması durumunda kimliğinizi geri yükleyen bir hizmet ile daha fazla gizlilik koruması elde eder.\n\nVeri koruma için tasarlanmış, veri toplama amacı gütmeyen tarayıcıyla kişisel bilgilerinizin kontrolünü geri alın.</string>
     <string name="no_suggestions">Öneri yok</string>
 
     <!-- Broken Site Activity -->
@@ -258,7 +258,7 @@
     <string name="brokenSiteProtectionsOnBannerMessage">Korumaları KAPALI duruma getirmek yardımcı olabilir.</string>
 
     <!-- Widget -->
-    <string name="searchWidgetTextHint">DuckDuckGo\'da Ara</string>
+    <string name="searchWidgetTextHint">Revenge\'da Ara</string>
 
     <!-- Favorites widget -->
     <string name="addFavoriteMenuTitleHighlighted">👋 Favori Ekle</string>
@@ -271,7 +271,7 @@
     <string name="searchWidgetEmtpyFavoritesCta">Favori Ekle</string>
     <string name="widgetConfigurationActivityTitle">Widget Yapılandırması</string>
     <string name="favoritesWidgetLabel">Arama ve Favoriler</string>
-    <string name="searchWidgetLabel">Arama ve Duck.ai</string>
+    <string name="searchWidgetLabel">Arama ve Revenge AI</string>
 
     <!-- Home Screen Shortcuts -->
 
@@ -283,7 +283,7 @@
     <string name="surveyCtaLaunchButton">Ankete katıl</string>
     <string name="surveyCtaDismissButton">Hayır Teşekkürler</string>
     <string name="surveyActivityTitle">Kullanıcı Anketi</string>
-    <string name="surveyTitle">DuckDuckGo Anketi</string>
+    <string name="surveyTitle">Revenge Anketi</string>
     <string name="surveyDismissContentDescription">Anketi kapat</string>
     <string name="surveyLoadingErrorTitle">Olamaz!</string>
     <string name="surveyLoadingErrorText">Anketimiz şu anda yüklenemiyor.\nLütfen daha sonra tekrar deneyin.</string>
@@ -298,14 +298,14 @@
     <string name="addWidgetInstruction1Label">1</string>
     <string name="addWidgetInstruction1">Ana ekranınıza uzun basıp widget\'lar menüsünü açın.</string>
     <string name="addWidgetInstruction2Label">2</string>
-    <string name="addWidgetInstruction2">DuckDuckGo widget\'ını bulun.</string>
+    <string name="addWidgetInstruction2">Revenge widget\'ını bulun.</string>
     <string name="addWidgetInstruction3Label">3</string>
     <string name="addWidgetInstruction3">Widget\'ı ana ekranınıza sürükleyin.</string>
     <string name="addWidgetInstructionsButtonGoHome">Ana Ekrana Git</string>
     <string name="addWidgetInstructionsButtonClose">Kapat</string>
 
     <!-- App Enjoyment / Rating / Feedback -->
-    <string name="appEnjoymentDialogTitle">DuckDuckGo\'yu sevdiniz mi?</string>
+    <string name="appEnjoymentDialogTitle">Revenge\'yu sevdiniz mi?</string>
     <string name="appEnjoymentDialogMessage">Düşüncelerinizi öğrenmek isteriz.</string>
     <string name="appEnjoymentDialogPositiveButton">Sevdim</string>
     <string name="appEnjoymentDialogNegativeButton">Üzerinde Çalışılmalı</string>
@@ -327,15 +327,15 @@
 
     <!-- Clear Notification -->
     <string name="clearNotificationTitle">Veri temizleme manuel olarak ayarlandı</string>
-    <string name="clearNotificationDescription">Her oturumdan sonra tarama verilerini otomatik olarak temizlemek için DuckDuckGo\'yu özelleştirin.</string>
+    <string name="clearNotificationDescription">Her oturumdan sonra tarama verilerini otomatik olarak temizlemek için Revenge\'yu özelleştirin.</string>
 
     <!-- Privacy Protection Notification -->
     <string name="privacyProtectionNotificationDefaultTitle">Gizliliğinizi koruyoruz</string>
     <string name="privacyProtectionNotificationReportTitle">Gizlilik Raporunuz</string>
-    <string name="privacyProtectionNotificationDefaultDescription">DuckDuckGo uygulamasını kullanmak, izleyicileri engelleyerek ve bağlantıları şifreleyerek verilerinizi korur.</string>
-    <string name="privacyProtectionNotificationUpgadeDescription" instruction="Placeholder is a the number of connections we have protected">DuckDuckGo kullanırken %1$d şifrelenmemiş bağlantıyı güvenli hâle getirerek verilerinizi korudunuz.</string>
-    <string name="privacyProtectionNotificationTrackerDescription" instruction="Placeholder is the numer of trackers blocked">DuckDuckGo kullanırken %1$d izleyiciyi engelleyerek verilerinizi korudunuz.</string>
-    <string name="privacyProtectionNotificationBothDescription" instruction="%1$d is the number of trackers blocked and %2$d is the number of unencrypted connections">DuckDuckGo kullanırken %1$d izleyiciyi engelleyerek ve %2$d şifrelenmemiş bağlantıyı güvenceye alarak verilerinizi korudunuz.</string>
+    <string name="privacyProtectionNotificationDefaultDescription">Revenge uygulamasını kullanmak, izleyicileri engelleyerek ve bağlantıları şifreleyerek verilerinizi korur.</string>
+    <string name="privacyProtectionNotificationUpgadeDescription" instruction="Placeholder is a the number of connections we have protected">Revenge kullanırken %1$d şifrelenmemiş bağlantıyı güvenli hâle getirerek verilerinizi korudunuz.</string>
+    <string name="privacyProtectionNotificationTrackerDescription" instruction="Placeholder is the numer of trackers blocked">Revenge kullanırken %1$d izleyiciyi engelleyerek verilerinizi korudunuz.</string>
+    <string name="privacyProtectionNotificationBothDescription" instruction="%1$d is the number of trackers blocked and %2$d is the number of unencrypted connections">Revenge kullanırken %1$d izleyiciyi engelleyerek ve %2$d şifrelenmemiş bağlantıyı güvenceye alarak verilerinizi korudunuz.</string>
     <string name="privacyProtectionNotificationLaunchButton">Taramayı Sürdür</string>
 
     <!-- Authentication -->
@@ -347,7 +347,7 @@
     <string name="authenticationDialogPasswordHint">Parola</string>
 
     <!-- User-facing label for when a user selects text and might want to search for that text -->
-    <string name="systemTextSearchMessage">DuckDuckGo\'da Ara</string>
+    <string name="systemTextSearchMessage">Revenge\'da Ara</string>
 
     <!-- App feedback disambiguation -->
     <string name="feedbackActivityTitle">Geri Bildirim Paylaş</string>
@@ -366,8 +366,8 @@
     <string name="websiteNotLoadingTitleShort">Web sitesi yükleme Sorunları</string>
     <string name="websiteNotLoadingSubtitle">Hangi web sitesi hatalı?</string>
 
-    <string name="searchNotGoodEnoughTitleLong">DuckDuckGo arama özelliği yeterince iyi değil</string>
-    <string name="searchNotGoodEnoughTitleShort">DuckDuckGo Arama Sorunları</string>
+    <string name="searchNotGoodEnoughTitleLong">Revenge arama özelliği yeterince iyi değil</string>
+    <string name="searchNotGoodEnoughTitleShort">Revenge Arama Sorunları</string>
     <string name="searchNotGoodEnoughSubtitle">Hangi arama özelliğini ekleyebilir veya geliştirebiliriz?</string>
     <string name="searchNotGoodEnoughSubReasonTechnicalSearches">Programlama/teknik arama</string>
     <string name="searchNotGoodEnoughSubReasonGoogleLayout">Düzen daha çok Google gibi olmalı</string>
@@ -427,8 +427,8 @@
 
     <!-- System Search-->
     <string name="systemSearchAppNotFound">Uygulama bulunamadı</string>
-    <string name="systemSearchOnboardingThanks">DuckDuckGo\'yu seçtiğiniz için teşekkürler!\nTarayıcımızı kullanmak, bilgisayar korsanlarından, dolandırıcılardan ve verilerinizi toplamak isteyen şirketlerden korunmanıza yardımcı olur.</string>
-    <string name="systemSearchOnboardingFeaturesIntroText">DuckDuckGo uygulaması ayrıca:</string>
+    <string name="systemSearchOnboardingThanks">Revenge\'yu seçtiğiniz için teşekkürler!\nTarayıcımızı kullanmak, bilgisayar korsanlarından, dolandırıcılardan ve verilerinizi toplamak isteyen şirketlerden korunmanıza yardımcı olur.</string>
+    <string name="systemSearchOnboardingFeaturesIntroText">Revenge uygulaması ayrıca:</string>
     <string name="systemSearchOnboardingFeatureOneText">Güvenli olmayan izleyicileri engeller.</string>
     <string name="systemSearchOnboardingFeatureTwoText">Web sitelerinde şifrelemeyi zorunlu kılar.</string>
     <string name="systemSearchOnboardingFeatureThreeText">Tek dokunuşla verileri temizler.</string>
@@ -436,18 +436,18 @@
     <string name="systemSearchOnboardingButtonLess">Gizle</string>
     <string name="systemSearchOnboardingButtonOk">Anladım</string>
 
-    <!-- Dax Dialog -->
+    <!-- Revenge Dialog -->
     <string name="daxDialogHighFive">Çak Bir Beşlik!</string>
     <string name="daxDialogGotIt">Anladım</string>
 
-    <!-- AppTP Retention Experiment Dax Dialog -->
+    <!-- AppTP Retention Experiment Revenge Dialog -->
     <string name="daxDialogAppTpRetentionText"><![CDATA[Artık web genelinde izleyicileri engelliyorsunuz 🎉<br/><br/>Telefonunuzu kullanmadığınız zamanlarda bile diğer uygulamalarınızda gizlenen izleyicileri de engelleyebilirim.]]></string>
     <string name="daxDialogAppTpRetentionPrimaryButtonText">Uygulama İzleme Korumasını Etkinleştir</string>
     <string name="daxDialogAppTpRetentionSecondaryButtonText">Şimdi Değil</string>
 
     <!-- New Onboarding Experience -->
-    <string name="onboardingWelcomeTitle">"DuckDuckGo'ya Hoş Geldiniz!"</string>
-    <string name="onboardingDaxText"><![CDATA[İnternet biraz ürkütücü olabilir.<br/><br/>Endişelenmeyin! Özel olarak arama yapmak ve sitelere göz atmak düşündüğünüzden daha kolaydır.]]></string>
+    <string name="onboardingWelcomeTitle">"Revenge'ya Hoş Geldiniz!"</string>
+    <string name="onboardingRevengeText"><![CDATA[İnternet biraz ürkütücü olabilir.<br/><br/>Endişelenmeyin! Özel olarak arama yapmak ve sitelere göz atmak düşündüğünüzden daha kolaydır.]]></string>
     <string name="onboardingLetsDoItButton">Hadi Başlayalım!</string>
     <string name="daxNonSerpCtaText"><![CDATA[Siz gezintinize devam ederken sinir bozucu izleyicileri engelleyeceğim. <br/><br/>Hadi, gezinmeye devam edin!]]></string>
     <string name="daxMainNetworkCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Dikkat! %2$s üzerindeki etkinliğinizin %1$s tarafından görülmesini önleyemiyorum&lt;br/&gt;&lt;br/&gt;Ama benimle gezinirseniz diğer birçok sitedeki izleyicisini engelleyerek %3$s tarafından sizinle ilgili olarak toplanan bilgilerin miktarını genel anlamda azaltabilirim.</string>
@@ -535,7 +535,7 @@
     <string name="dosErrorMessage">Bağlantı iptal edildi. Bu web sitesi cihazınıza zarar verebilir.</string>
 
     <!-- Precise Location -->
-    <string name="preciseLocationSystemDialogTitle">DuckDuckGo Gizlilik Tarayıcısı için cihaz konumu etkinleştirilsin mi?</string>
+    <string name="preciseLocationSystemDialogTitle">Revenge Gizlilik Tarayıcısı için cihaz konumu etkinleştirilsin mi?</string>
     <string name="preciseLocationSystemDialogSubtitle" instruction="%1$s and %2$s are both the name of the website requesting the location">%1$s cihazınızın konumunu öğrenmek istiyor. %2$s tarafından izin istenebilmesi için ilk olarak uygulamanın cihazınızın konumunu göndermesine izin vermeniz gerekir.</string>
     <string name="preciseLocationSystemDialogAllow">Etkinleştir</string>
     <string name="preciseLocationSystemDialogDeny">Belki Sonra</string>
@@ -547,7 +547,7 @@
     <string name="preciseLocationSiteDialogAllowOnce">Yalnızca Bu Oturum için</string>
     <string name="preciseLocationSiteDialogDenyAlways">Her Zaman Reddet</string>
     <string name="preciseLocationSiteDialogDenyOnce">Bu Oturum için Reddet</string>
-    <string name="preciseLocationFeatureDescription">Ziyaret ettiğiniz siteler cihazınızın konumunu öğrenmek isteyebilir. Ancak siz açıkça izin vermediğiniz takdirde konumunuza erişemezler. DuckDuckGo, konumunuzu yalnızca yerel arama sonuçları sunmak için anonim olarak kullanır.</string>
+    <string name="preciseLocationFeatureDescription">Ziyaret ettiğiniz siteler cihazınızın konumunu öğrenmek isteyebilir. Ancak siz açıkça izin vermediğiniz takdirde konumunuza erişemezler. Revenge, konumunuzu yalnızca yerel arama sonuçları sunmak için anonim olarak kullanır.</string>
     <string name="preciseLocationToggleText">Siteler Konumumu Sorabilir</string>
     <string name="preciseLocationEmptyListHint">Hiçbir web sitesine konuma erişim izni verilmedi</string>
     <string name="preciseLocationNoSystemPermission">Web sitelerine verdiğiniz konuma erişim izinlerini yönetmek üzere Android Ayarları\'ndan bu uygulama için konumu etkinleştirin.</string>
@@ -563,7 +563,7 @@
 
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Küresel Gizlilik Kontrolü (GPC)</string>
-    <string name="globalPrivacyControlDescription"><![CDATA[DuckDuckGo birçok izleyiciyi otomatik olarak engeller. Küresel Gizlilik Kontrolü (GPC) ile, katılımcı web sitelerinden kişisel verilerinizin satışını veya diğer şirketlerle paylaşımını kısıtlamalarını da isteyebilirsiniz. <u><a href=\"\">Daha Fazla Bilgi</a><u/>]]></string>
+    <string name="globalPrivacyControlDescription"><![CDATA[Revenge birçok izleyiciyi otomatik olarak engeller. Küresel Gizlilik Kontrolü (GPC) ile, katılımcı web sitelerinden kişisel verilerinizin satışını veya diğer şirketlerle paylaşımını kısıtlamalarını da isteyebilirsiniz. <u><a href=\"\">Daha Fazla Bilgi</a><u/>]]></string>
     <string name="globalPrivacyControlSetting">Küresel Gizlilik Kontrolü (GPC)</string>
     <string name="globalPrivacyControlToggle">Küresel Gizlilik Kontrolü (GPC)</string>
     <string name="disabled">Devre Dışı</string>
@@ -599,11 +599,11 @@
     <string name="settingsAccessibility">Erişilebilirlik</string>
     <string name="accessibilityActivityTitle">Erişilebilirlik</string>
     <string name="accessibilityFontSizeTitle">Metin Boyutu</string>
-    <string name="accessibilityFontSizeHint">Bu yazıyı rahatça okuyabilene kadar kaydırıcıyı sürükleyin. DuckDuckGo\'da görüntülediğiniz web siteleri bu boyuta ayarlanır.</string>
+    <string name="accessibilityFontSizeHint">Bu yazıyı rahatça okuyabilene kadar kaydırıcıyı sürükleyin. Revenge\'da görüntülediğiniz web siteleri bu boyuta ayarlanır.</string>
     <string name="accessibilityForceZoomTitle">Manuel sayfa yakınlaştırmasını gerektir</string>
     <string name="accessibilityForceZoomSubtitle">Bunu engelleyecek olan sitelerde bile sıkıştırıp yakınlaştırın</string>
     <string name="accessibilityTextSizeOverrideTitle">Metin boyutunu yönet</string>
-    <string name="accessibilityTextSizeOverrideSubtitle">DuckDuckGo\'da görüntülediğiniz web sitelerindeki metinler aşağıdaki ayar ile eşleşecek şekilde ayarlanır</string>
+    <string name="accessibilityTextSizeOverrideSubtitle">Revenge\'da görüntülediğiniz web sitelerindeki metinler aşağıdaki ayar ile eşleşecek şekilde ayarlanır</string>
 
     <!-- Privacy Policy -->
     <string name="settingsPrivacyPolicyDuckduckgo">Gizlilik Politikası</string>
@@ -672,7 +672,7 @@
     <string name="tabSelectedIndicator">Seçili sekme göstergesi</string>
     <string name="tabNotSelectedIndicator">Seçili olmayan sekme göstergesi</string>
 
-    <string name="shareMultipleLinksTitle" tools:ignore="MissingInstruction">DuckDuckGo\'dan %1$d bağlantı</string>
+    <string name="shareMultipleLinksTitle" tools:ignore="MissingInstruction">Revenge\'dan %1$d bağlantı</string>
     <plurals name="shareLinksMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
         <item quantity="one">Bağlantıyı Paylaş</item>
         <item quantity="other">%1$d Bağlantıyı Paylaş</item>
@@ -733,7 +733,7 @@
     </plurals>
 
     <!-- Private voice search -->
-    <string name="accessibilityVoiceSearchSubtitle">Adres çubuğuna Gizli Sesli Arama seçeneğini ekleyin. Ses kaydı depolanmaz veya DuckDuckGo dâhil olmak üzere kimseyle paylaşılmaz.</string>
+    <string name="accessibilityVoiceSearchSubtitle">Adres çubuğuna Gizli Sesli Arama seçeneğini ekleyin. Ses kaydı depolanmaz veya Revenge dâhil olmak üzere kimseyle paylaşılmaz.</string>
     <string name="accessibilityVoiceSearchTitle">Özel Sesli Arama</string>
 
     <!-- Uploading an image from the camera or choosing to use existing image -->
@@ -741,8 +741,8 @@
     <string name="imageCaptureCameraGalleryDisambiguationTitle">Bir resim yükle</string>
     <string name="imageCaptureCameraGalleryDisambiguationGalleryOption">Dosya Seç</string>
     <string name="imageCaptureCameraGalleryDisambiguationCameraOption">Fotoğraf Çek</string>
-    <string name="imageCaptureCameraPermissionDeniedTitle">DuckDuckGo\'nun bu cihazda kamera erişimi istemesine izin ver</string>
-    <string name="imageCaptureCameraPermissionDeniedMessage">Siteler kameranızı yalnızca DuckDuckGo\'nun erişim istemesine izin verirseniz kullanabilir.</string>
+    <string name="imageCaptureCameraPermissionDeniedTitle">Revenge\'nun bu cihazda kamera erişimi istemesine izin ver</string>
+    <string name="imageCaptureCameraPermissionDeniedMessage">Siteler kameranızı yalnızca Revenge\'nun erişim istemesine izin verirseniz kullanabilir.</string>
     <string name="imageCaptureCameraPermissionDeniedPositiveButton">Ayarları Aç</string>
     <string name="imageCaptureCameraPermissionDeniedNegativeButton">Vazgeç</string>
 
@@ -756,53 +756,53 @@
     <string name="sslErrorHeadline" instruction="Placeholder is domain with certificate issues">Bu sitenin sertifikası geçersiz. %1$s gibi görünen ve gizli bilgilerinizi riske atabilecek bir sunucuya bağlanıyor olabilirsiniz.</string>
     <string name="sslErrorLeaveCTA">Bu Siteden Ayrılın</string>
     <string name="sslErrorAdvancedCTA">Gelişmiş</string>
-    <string name="sslErrorExpandedHeadline">DuckDuckGo, bir web sitesinin sertifikası geçersiz olduğunda sizi uyarır.</string>
+    <string name="sslErrorExpandedHeadline">Revenge, bir web sitesinin sertifikası geçersiz olduğunda sizi uyarır.</string>
     <string name="sslErrorExpandedCTA"><![CDATA[<u>Riski Kabul Edin ve Siteyi Ziyaret Edin</u>]]></string>
     <string name="sslErrorExpiredMessage" instruction="Placeholder is domain with certificate issues">%1$s için güvenlik sertifikasının süresi doldu. Web sitesi yanlış yapılandırılmış, bir saldırgan bağlantınızı tehlikeye atmış veya sistem saatiniz yanlış ayarlanmış olabilir.</string>
     <string name="sslErrorWrongHostMessage" instruction="Placeholder is domain with certificate issues">%1$s için güvenlik sertifikası eşleşmiyor *.%2$s. Web sitesi yanlış yapılandırılmış, bir saldırgan bağlantınızı tehlikeye atmış veya sistem saatiniz yanlış ayarlanmış olabilir.</string>
     <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">Cihazınızın işletim sistemi, %1$s güvenlik sertifikasına güvenmiyor. Web sitesi yanlış yapılandırılmış, bir saldırgan bağlantınızı tehlikeye atmış veya sistem saatiniz yanlış ayarlanmış olabilir.</string>
 
     <!-- Extended Onboarding-->
-    <string name="preOnboardingDaxDialog1Title"><![CDATA[Merhaba.<br/><br/>Sizi koruyan daha hızlı bir tarayıcıya hazır mısınız?]]></string>
-    <string name="preOnboardingDaxDialog1Button">Hadi başlayalım!</string>
-    <string name="preOnboardingDaxDialog1SecondaryButton">Daha önce buradaydım</string>
-    <string name="preOnboardingDaxDialog2Title">Korumalar etkinleştirildi!</string>
-    <string name="preOnboardingDaxDialog2Button">Tarayıcınızı Seçin</string>
-    <string name="preOnboardingDaxDialog3Title"><![CDATA[Anladım! Diğer ipuçlarını atlayacağım.]]></string>
-    <string name="preOnboardingDaxDialog3Text"><![CDATA[Unutmayın: <b>Fire Button</b> 🔥 ile tüm sekmelerinizi, geçmişinizi ve tarama verilerinizi iki dokunuşla silebilirsiniz]]></string>
-    <string name="preOnboardingDaxDialog3SecondaryButton">Eğitimi Göster</string>
+    <string name="preOnboardingRevengeDialog1Title"><![CDATA[Merhaba.<br/><br/>Sizi koruyan daha hızlı bir tarayıcıya hazır mısınız?]]></string>
+    <string name="preOnboardingRevengeDialog1Button">Hadi başlayalım!</string>
+    <string name="preOnboardingRevengeDialog1SecondaryButton">Daha önce buradaydım</string>
+    <string name="preOnboardingRevengeDialog2Title">Korumalar etkinleştirildi!</string>
+    <string name="preOnboardingRevengeDialog2Button">Tarayıcınızı Seçin</string>
+    <string name="preOnboardingRevengeDialog3Title"><![CDATA[Anladım! Diğer ipuçlarını atlayacağım.]]></string>
+    <string name="preOnboardingRevengeDialog3Text"><![CDATA[Unutmayın: <b>Fire Button</b> 🔥 ile tüm sekmelerinizi, geçmişinizi ve tarama verilerinizi iki dokunuşla silebilirsiniz]]></string>
+    <string name="preOnboardingRevengeDialog3SecondaryButton">Eğitimi Göster</string>
     <string name="preOnboardingComparisonChartItem1">Varsayılan olarak gizli arama yapın</string>
     <string name="preOnboardingComparisonChartItem2">Üçüncü taraf izleyicileri engelleyin</string>
     <string name="preOnboardingComparisonChartItem3">Çerez açılır pencerelerini engelle</string>
     <string name="preOnboardingComparisonChartItem4">Hedefli reklamları engelleyin</string>
     <string name="preOnboardingComparisonChartItem5">Tarama verilerini tek bir düğmeyle silin</string>
-    <string name="preOnboardingDaxDialog3Button">Gezinmeye Başla</string>
+    <string name="preOnboardingRevengeDialog3Button">Gezinmeye Başla</string>
     <string name="preOnboardingAddressBarTitle">Adres çubuğu nereye yerleştirilsin?</string>
     <string name="preOnboardingAddressBarOkButton">Sonraki</string>
     <string name="highlightsPreOnboardingAddressBarOption1Title">Üst (Varsayılan)</string>
     <string name="highlightsPreOnboardingAddressBarOption1Description">Görmesi kolay</string>
     <string name="highlightsPreOnboardingAddressBarOption2Title">Alt</string>
     <string name="highlightsPreOnboardingAddressBarOption2Description">Ulaşması kolay</string>
-    <string name="onboardingSearchDaxDialogTitle">Bir şeyler arayın!</string>
-    <string name="onboardingSearchDaxDialogDescription">DuckDuckGo aramalarınız her zaman gizlidir.</string>
-    <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">"ingilizcede ördek nasıl denir"</string>
-    <string name="onboardingSearchDaxDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">"ispanyolcada ördek nasıl denir"</string>
+    <string name="onboardingSearchRevengeDialogTitle">Bir şeyler arayın!</string>
+    <string name="onboardingSearchRevengeDialogDescription">Revenge aramalarınız her zaman gizlidir.</string>
+    <string name="onboardingSearchRevengeDialogOption1" instruction="translate &apos;duck&apos; too.">"ingilizcede ördek nasıl denir"</string>
+    <string name="onboardingSearchRevengeDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">"ispanyolcada ördek nasıl denir"</string>
     <string name="onboardingSearchQueryOption1">ingilizcede ördek nasıl denir</string>
     <string name="onboardingSearchQueryOption1English">ispanyolcada ördek nasıl denir</string>
-    <string name="onboardingSearchDaxDialogOption2">avatar oyuncu kadrosu</string>
-    <string name="onboardingSearchDaxDialogOption2US">mighty ducks oyuncu kadrosu</string>
-    <string name="onboardingSearchDaxDialogOption3">yerel hava durumu</string>
-    <string name="onboardingSearchDaxDialogOption4">Şaşırt beni!</string>
+    <string name="onboardingSearchRevengeDialogOption2">avatar oyuncu kadrosu</string>
+    <string name="onboardingSearchRevengeDialogOption2US">mighty ducks oyuncu kadrosu</string>
+    <string name="onboardingSearchRevengeDialogOption3">yerel hava durumu</string>
+    <string name="onboardingSearchRevengeDialogOption4">Şaşırt beni!</string>
     <string name="onboardingSearchQueryOption4">ördek yavruları</string>
-    <string name="onboardingSitesDaxDialogTitle">Bir siteyi ziyaret etmeyi deneyin!</string>
-    <string name="onboardingSitesDaxDialogDescription">Sizi gözetlemelerini önlemek için izleyicileri engelleyeceğim.</string>
-    <string name="onboardingSitesDaxDialogOption1">espn.com</string>
-    <string name="onboardingSitesDaxDialogOption2">yahoo.com</string>
-    <string name="onboardingSitesDaxDialogOption3">ebay.com</string>
-    <string name="onboardingSitesDaxDialogOption4">Şaşırt beni!</string>
-    <string name="onboardingSerpDaxDialogDescription"><![CDATA[<b>DuckDuckGo Search</b> işte bu! Özel. Hızlı. Daha az reklam.]]></string>
-    <string name="onboardingSerpDaxDialogButton">Anladım!</string>
-    <string name="onboardingSitesSuggestionsDaxDialogTitle">Sonra, bir siteyi ziyaret etmeyi deneyin!</string>
+    <string name="onboardingSitesRevengeDialogTitle">Bir siteyi ziyaret etmeyi deneyin!</string>
+    <string name="onboardingSitesRevengeDialogDescription">Sizi gözetlemelerini önlemek için izleyicileri engelleyeceğim.</string>
+    <string name="onboardingSitesRevengeDialogOption1">espn.com</string>
+    <string name="onboardingSitesRevengeDialogOption2">yahoo.com</string>
+    <string name="onboardingSitesRevengeDialogOption3">ebay.com</string>
+    <string name="onboardingSitesRevengeDialogOption4">Şaşırt beni!</string>
+    <string name="onboardingSerpRevengeDialogDescription"><![CDATA[<b>Revenge Search</b> işte bu! Özel. Hızlı. Daha az reklam.]]></string>
+    <string name="onboardingSerpRevengeDialogButton">Anladım!</string>
+    <string name="onboardingSitesSuggestionsRevengeDialogTitle">Sonra, bir siteyi ziyaret etmeyi deneyin!</string>
     <plurals name="onboardingTrackersBlockedDialogDescription">
         <item quantity="one"><![CDATA[ ve <b>%1$d site daha</b> sizi burada takip etmeye çalışıyordu. Onları engelledim!<br/><br/>☝️ Daha fazla bilgi için kalkana dokunun.️]]></item>
         <item quantity="other"><![CDATA[ ve <b>%1$d site daha</b> sizi burada takip etmeye çalışıyordu. Onları engelledim!<br/><br/>☝️ Daha fazla bilgi için kalkana dokunun.️]]></item>
@@ -811,19 +811,19 @@
         <item quantity="one"><![CDATA[ sizi burada takip etmeye çalışıyordu. Onları engelledim!<br/><br/>☝️ Daha fazla bilgi için kalkana dokunun.️]]></item>
         <item quantity="other"><![CDATA[ sizi burada takip etmeye çalışıyordu. Onları engelledim!<br/><br/>☝️ Daha fazla bilgi için kalkana dokunun.️]]></item>
     </plurals>
-    <string name="onboardingTrackersBlockedDaxDialogButton">Anladım!</string>
-    <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[<b>Fire Button</b> ile göz atma etkinliğinizi anında temizleyin.<br/><br/>Hemen deneyin!️ 🔥]]></string>
-    <string name="onboardingFireButtonDaxDialogOkButton">Deneyin</string>
-    <string name="onboardingFireButtonDaxDialogCancelButton">Atla</string>
-    <string name="onboardingEndDaxDialogTitle">"İşte bu kadar!"</string>
-    <string name="onboardingEndDaxDialogDescription">Unutmayın: İnterneti benimle ne kadar çok gezerseniz rahatsız edici reklamları da o kadar az görürsünüz.</string>
-    <string name="onboardingInContextEndDaxDialogDescription">Unutmayın: İnterneti benimle ne kadar çok gezerseniz rahatsız edici reklamları da o kadar az görürsünüz. 👌</string>
-    <string name="onboardingEndDaxDialogButton">Çak Bir Beşlik!</string>
-    <string name="onboardingPrivacyProDaxDialogTitle">Ah, unutmadan...</string>
-    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo\'nun ayrıca güvenli bir <b>VPN</b> ve <b>gelişmiş, gizli yapay zeka</b> içeren <b>isteğe bağlı ücretli bir aboneliği</b> var.]]></string>
-    <string name="onboardingPrivacyProDaxDialogOkButton">Daha Fazla Bilgi</string>
-    <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Ücretsiz deneyin!</string>
-    <string name="onboardingPrivacyProDaxDialogCancelButton">Atla</string>
+    <string name="onboardingTrackersBlockedRevengeDialogButton">Anladım!</string>
+    <string name="onboardingFireButtonRevengeDialogDescription"><![CDATA[<b>Fire Button</b> ile göz atma etkinliğinizi anında temizleyin.<br/><br/>Hemen deneyin!️ 🔥]]></string>
+    <string name="onboardingFireButtonRevengeDialogOkButton">Deneyin</string>
+    <string name="onboardingFireButtonRevengeDialogCancelButton">Atla</string>
+    <string name="onboardingEndRevengeDialogTitle">"İşte bu kadar!"</string>
+    <string name="onboardingEndRevengeDialogDescription">Unutmayın: İnterneti benimle ne kadar çok gezerseniz rahatsız edici reklamları da o kadar az görürsünüz.</string>
+    <string name="onboardingInContextEndRevengeDialogDescription">Unutmayın: İnterneti benimle ne kadar çok gezerseniz rahatsız edici reklamları da o kadar az görürsünüz. 👌</string>
+    <string name="onboardingEndRevengeDialogButton">Çak Bir Beşlik!</string>
+    <string name="onboardingPrivacyProRevengeDialogTitle">Ah, unutmadan...</string>
+    <string name="onboardingPrivacyProRevengeDialogDescription"><![CDATA[Revenge\'nun ayrıca güvenli bir <b>VPN</b> ve <b>gelişmiş, gizli yapay zeka</b> içeren <b>isteğe bağlı ücretli bir aboneliği</b> var.]]></string>
+    <string name="onboardingPrivacyProRevengeDialogOkButton">Daha Fazla Bilgi</string>
+    <string name="onboardingPrivacyProRevengeDialogFreeTrialOkButton">Ücretsiz deneyin!</string>
+    <string name="onboardingPrivacyProRevengeDialogCancelButton">Atla</string>
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Gizli AI sohbetine daha kolay erişmek ister misiniz?</string>
@@ -844,23 +844,23 @@
     <string name="showOnAppLaunchOptionSpecificPage">Belirli Bir Sayfa</string>
 
     <!-- Privacy Dashboard -->
-    <string name="brokenSiteSubmittedReportMessage">Teşekkür ederiz! Raporunuz DuckDuckGo\'yu herkes için daha iyi hale getirmeye yardımcı oluyor!</string>
+    <string name="brokenSiteSubmittedReportMessage">Teşekkür ederiz! Raporunuz Revenge\'yu herkes için daha iyi hale getirmeye yardımcı oluyor!</string>
 
     <!--    Default Browser Bottom Sheet Dialog -->
-    <string name="defaultBrowserBottomSheetDialogTitle">DuckDuckGo\'nun internette yaptıklarınızın daha fazlasını korumasına izin verin</string>
-    <string name="defaultBrowserBottomSheetDialogSubTitle">Bağlantıların DuckDuckGo\'da açılması için varsayılan tarayıcınızı değiştirin.</string>
+    <string name="defaultBrowserBottomSheetDialogTitle">Revenge\'nun internette yaptıklarınızın daha fazlasını korumasına izin verin</string>
+    <string name="defaultBrowserBottomSheetDialogSubTitle">Bağlantıların Revenge\'da açılması için varsayılan tarayıcınızı değiştirin.</string>
     <string name="defaultBrowserBottomSheetDialogGhostButton" instruction="This text appears on a button">Şimdi Değil</string>
 
     <!-- Default Browser message -->
-    <string name="newTabPageDefaultBrowserMessageHeading">DuckDuckGo varsayılan tarayıcınız değil. Daha fazla koruma elde edin.</string>
+    <string name="newTabPageDefaultBrowserMessageHeading">Revenge varsayılan tarayıcınız değil. Daha fazla koruma elde edin.</string>
     <string name="newTabPageDefaultBrowserMessagePrimaryCta" instruction="This text appears on a button">Varsayılan Olarak Ayarla</string>
     <string name="newTabPageDefaultBrowserMessageSecondaryCta" instruction="This text appears on a button">Bir Daha Sorma</string>
 
     <!-- Threat protection -->
     <string name="maliciousSiteTitle">Uyarı: Bu site bir güvenlik riski oluşturabilir</string>
-    <string name="maliciousSiteMalwareHeadline"><![CDATA[Cihazınızı tehlikeye atmak veya kişisel bilgilerinizi çalmak için tasarlanmış kötü amaçlı yazılım dağıtıyor olabileceğinden, DuckDuckGo bu sayfayı engelledi. <a href=\"\">Daha fazla bilgi</a>]]></string>
+    <string name="maliciousSiteMalwareHeadline"><![CDATA[Cihazınızı tehlikeye atmak veya kişisel bilgilerinizi çalmak için tasarlanmış kötü amaçlı yazılım dağıtıyor olabileceğinden, Revenge bu sayfayı engelledi. <a href=\"\">Daha fazla bilgi</a>]]></string>
     <string name="maliciousSitePhishingHeadline"><![CDATA[Bu web sitesi, şifre veya kredi kartı numarası gibi kişisel bilgilerinizi vermeniz için sizi kandırmak amacıyla meşru bir siteyi taklit ediyor olabilir.\n<a href=\"\">Daha fazla bilgi</a>]]></string>
-    <string name="maliciousSiteScamHeadline"><![CDATA[DuckDuckGo, sizi yanlış iddialarla para transfer etmeye, sahte ürünler satın almaya veya kötü amaçlı yazılım yüklemenizi sağlamaya çalışıyor olabileceği için bu sayfayı engelledi.\n<a href=\"\">Daha fazla bilgi</a>]]></string>
+    <string name="maliciousSiteScamHeadline"><![CDATA[Revenge, sizi yanlış iddialarla para transfer etmeye, sahte ürünler satın almaya veya kötü amaçlı yazılım yüklemenizi sağlamaya çalışıyor olabileceği için bu sayfayı engelledi.\n<a href=\"\">Daha fazla bilgi</a>]]></string>
     <string name="maliciousSiteLeaveCTA">Bu Siteden Ayrılın</string>
     <string name="maliciousSiteAdvancedCTA">Gelişmiş</string>
     <string name="maliciousSiteExpandedHeadline"><![CDATA[Bu web sitesinin güvenli olduğuna inanıyorsanız <a href=\"\">bir hata bildirebilirsiniz</a>. Riski göze alabiliyorsanız web sitesini yine de ziyaret edebilirsiniz.]]></string>
@@ -872,7 +872,7 @@
     <string name="maliciousSiteSettingLearnMore"><annotation type="learn_more_link">Daha Fazla Bilgi</annotation></string>
     <string name="maliciousSiteSettingDisabled">Bu özelliği devre dışı bırakmak bilgilerinizi riske atabilir.</string>
     <string name="threatProtectionTitle">Tehdit Koruması</string>
-    <string name="threatProtectionDescription">DuckDuckGo\'nun gelişmiş korumaları, bağlantıyı güvende tutarken yaygın tehditleri durdurur.</string>
+    <string name="threatProtectionDescription">Revenge\'nun gelişmiş korumaları, bağlantıyı güvende tutarken yaygın tehditleri durdurur.</string>
     <string name="smarterEncryptionTitle">Smarter Encryption</string>
     <string name="smarterEncryptionDescription"><![CDATA[Mümkün olduğunda bağlantıları otomatik olarak HTTPS\'ye yükseltir.<a href=\"\">Daha Fazla Bilgi</a>]]></string>
     <string name="scamBlockerTitle">Dolandırıcılık Engelleyici</string>
@@ -884,7 +884,7 @@
     <string name="experimentHomeScreenWidgetBottomSheetDialogSubTitle">Hızlı ve kolay erişim için arama widget\'ımızı ana ekranınıza ekleyin.</string>
     <string name="experimentHomeScreenWidgetBottomSheetDialogPrimaryButton">Widget Ekle</string>
     <string name="experimentHomeScreenWidgetBottomSheetDialogGhostButton">Şimdi Değil</string>
-    <string name="experimentHomeScreenWidgetBottomSheetDialogSearchText">DuckDuckGo\'da Ara</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSearchText">Revenge\'da Ara</string>
 
     <!-- Change under remote feature flag: Widget as a Protection -->
     <string name="settingsAddHomeWidgetTitle">Ana Ekran Widget\'ı</string>
@@ -901,8 +901,8 @@
 
     <!-- Widgets -->
     <string name="searchOnlyWidgetLabel" instruction="Label for the search-only widget">Yalnızca Arama</string>
-    <string name="searchOnlyWidgetDescription" instruction="Description for the search-only widget">DuckDuckGo ile hızlıca gizli bir arama başlatın.</string>
-    <string name="searchWidgetDescription" instruction="Description for the search widget, which may include Duck.ai and voice search">DuckDuckGo ile gizli arama yapın veya Duck.ai\'a sorun. Etkinleştirildiğinde Sesli Arama ve Duck.ai kullanılabilir.</string>
-    <string name="searchAndFavoritesWidgetDescription" instruction="Description for the search and favorites widget">Tek dokunuşla favori sitelerinizi gizlice arayın veya ziyaret edin. Etkinleştirildiğinde Sesli Arama ve Duck.ai kullanılabilir.</string>
-    <string name="duckAiOnlyPinShortcutLabel" instruction="Label for the Duck.ai pinned shortcut. Should be Duck.ai in all languages">Duck.ai</string>
+    <string name="searchOnlyWidgetDescription" instruction="Description for the search-only widget">Revenge ile hızlıca gizli bir arama başlatın.</string>
+    <string name="searchWidgetDescription" instruction="Description for the search widget, which may include RevengeAI and voice search">Revenge ile gizli arama yapın veya Revenge AI\'a sorun. Etkinleştirildiğinde Sesli Arama ve Revenge AI kullanılabilir.</string>
+    <string name="searchAndFavoritesWidgetDescription" instruction="Description for the search and favorites widget">Tek dokunuşla favori sitelerinizi gizlice arayın veya ziyaret edin. Etkinleştirildiğinde Sesli Arama ve Revenge AI kullanılabilir.</string>
+    <string name="duckAiOnlyPinShortcutLabel" instruction="Label for the Revenge AI pinned shortcut. Should be RevengeAI in all languages">Revenge AI</string>
 </resources>

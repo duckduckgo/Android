@@ -44,7 +44,7 @@
 
         <FrameLayout
             android:id="@+id/cardContainer"
-            style="@style/Widget.DuckDuckGo.DaxDialog.Content"
+            style="@style/Widget.Revenge.RevengeDialog.Content"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
@@ -55,12 +55,12 @@
                 android:paddingBottom="@dimen/keyline_1"
                 android:visibility="invisible"
                 app:typography="body1"
-                tools:text="@string/onboardingDaxText"
+                tools:text="@string/onboardingRevengeText"
                 tools:visibility="visible" />
 
             <com.duckduckgo.common.ui.view.TypeAnimationTextView
                 android:id="@+id/dialogTextCta"
-                style="@style/Typography.DuckDuckGo.Body1"
+                style="@style/Typography.Revenge.Body1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:clickable="true"

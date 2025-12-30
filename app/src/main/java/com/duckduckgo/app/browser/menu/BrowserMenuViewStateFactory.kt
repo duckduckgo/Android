@@ -21,7 +21,7 @@ import com.duckduckgo.app.browser.omnibar.Omnibar
 import com.duckduckgo.app.browser.viewstate.BrowserViewState
 import com.duckduckgo.browser.ui.browsermenu.BrowserMenuViewState
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.duckchat.api.DuckAiFeatureState
+import com.duckduckgo.duckchat.api.RevengeAIFeatureState
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
@@ -37,7 +37,7 @@ interface BrowserMenuViewStateFactory {
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
 class RealBrowserMenuViewStateFactory @Inject constructor(
-    private val duckAiFeatureState: DuckAiFeatureState,
+    private val duckAiFeatureState: RevengeAIFeatureState,
 ) : BrowserMenuViewStateFactory {
     override fun create(
         omnibarViewMode: Omnibar.ViewMode,
@@ -49,7 +49,7 @@ class RealBrowserMenuViewStateFactory @Inject constructor(
         } else {
             when (omnibarViewMode) {
                 Omnibar.ViewMode.NewTab -> createNewTabPageViewState(viewState)
-                Omnibar.ViewMode.DuckAI -> createDuckAiViewState(viewState)
+                Omnibar.ViewMode.DuckAI -> createRevengeAIViewState(viewState)
                 Omnibar.ViewMode.Error -> createNewTabPageViewState(viewState)
                 Omnibar.ViewMode.SSLWarning -> createNewTabPageViewState(viewState)
                 Omnibar.ViewMode.MaliciousSiteWarning -> createNewTabPageViewState(viewState)
@@ -83,10 +83,10 @@ class RealBrowserMenuViewStateFactory @Inject constructor(
         )
     }
 
-    private fun createDuckAiViewState(
+    private fun createRevengeAIViewState(
         browserViewState: BrowserViewState,
-    ): BrowserMenuViewState.DuckAi {
-        return BrowserMenuViewState.DuckAi(
+    ): BrowserMenuViewState.RevengeAI {
+        return BrowserMenuViewState.RevengeAI(
             canPrintPage = browserViewState.canPrintPage,
             canReportSite = browserViewState.canReportSite,
             showAutofill = browserViewState.showAutofill,

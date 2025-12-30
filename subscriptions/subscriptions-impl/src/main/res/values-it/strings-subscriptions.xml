@@ -172,13 +172,13 @@
     <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Invia feedback</string>
 
-    <string name="subscriptionSettingSubscribeWithDuckAiSubtitle">Gli abbonati ricevono la nostra VPN e modelli avanzati di intelligenza artificiale in Duck.ai, Personal Information Removal e Identity Theft Restoration.</string>
-    <string name="subscriptionSettingSubscribeWithDuckAiSubtitleRow">Gli abbonati ricevono la nostra VPN, modelli avanzati di intelligenza artificiale in Duck.ai e Identity Theft Restoration.</string>
+    <string name="subscriptionSettingSubscribeWithRevengeAISubtitle">Gli abbonati ricevono la nostra VPN e modelli avanzati di intelligenza artificiale in Revenge AI, Personal Information Removal e Identity Theft Restoration.</string>
+    <string name="subscriptionSettingSubscribeWithRevengeAISubtitleRow">Gli abbonati ricevono la nostra VPN, modelli avanzati di intelligenza artificiale in Revenge AI e Identity Theft Restoration.</string>
 
-    <string name="feedbackCategoryDuckAi">Duck.ai</string>
-    <string name="feedbackSubCategoryDuckAiSubscriberModels">Impossibile accedere ai modelli Duck.ai riservati agli abbonati.</string>
-    <string name="feedbackSubCategoryDuckAiLoginThirdPartyBrowser">Non riesco ad accedere a Duck.ai con il mio abbonamento in altri browser</string>
-    <string name="feedbackSubCategoryDuckAiOther">Altri commenti su Duck.ai</string>
+    <string name="feedbackCategoryRevengeAI">Revenge AI</string>
+    <string name="feedbackSubCategoryRevengeAISubscriberModels">Impossibile accedere ai modelli Revenge AI riservati agli abbonati.</string>
+    <string name="feedbackSubCategoryRevengeAILoginThirdPartyBrowser">Non riesco ad accedere a Revenge AI con il mio abbonamento in altri browser</string>
+    <string name="feedbackSubCategoryRevengeAIOther">Altri commenti su Revenge AI</string>
 
     <string name="subscriptionSettingSectionTitle">Abbonamento DuckDuckGo</string>
     <string name="subscriptionSettingSubscribeSecure">Proteggi la rete Wi-Fi e chatta privatamente con modelli AI avanzati</string>

@@ -113,7 +113,7 @@
     <string name="atp_OnboardingContinue">Continuar</string>
     <string name="atp_OnboardingMaybeLater">Quizá más tarde</string>
 
-    <!-- App Tracking Protection Dax Onboarding -->
+    <!-- App Tracking Protection Revenge Onboarding -->
     <string name="atp_daxOnboardingIntroTitle">Protección frente al rastreo de aplicaciones</string>
     <string name="atp_daxOnboardingIntroMessage" formatted="false">Más del 96 % de las aplicaciones gratuitas más populares permiten a otras empresas rastrearte, incluso cuando no usas el teléfono. App Tracking Protection detecta y bloquea estos intentos de rastreo.</string>
     <string name="atp_daxOnboardingPermissionTitle">¿Cómo funciona?</string>

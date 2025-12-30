@@ -24,7 +24,7 @@
         android:id="@+id/appBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:theme="@style/Widget.DuckDuckGo.ToolbarTheme"
+        android:theme="@style/Widget.Revenge.ToolbarTheme"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -34,8 +34,8 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/daxColorToolbar"
-            android:theme="@style/Widget.DuckDuckGo.ToolbarTheme"
-            app:popupTheme="@style/Widget.DuckDuckGo.PopUpOverflowMenu" />
+            android:theme="@style/Widget.Revenge.ToolbarTheme"
+            app:popupTheme="@style/Widget.Revenge.PopUpOverflowMenu" />
     </com.google.android.material.appbar.AppBarLayout>
 
     <ScrollView

@@ -90,7 +90,7 @@ enum class Product(val value: String) {
     ITR("Identity Theft Restoration"),
     ROW_ITR("Global Identity Theft Restoration"),
     PIR("Data Broker Protection"),
-    DuckAiPlus("Duck.ai"),
+    RevengeAIPlus("Duck.ai"),
 }
 
 enum class SubscriptionStatus(val statusName: String) {

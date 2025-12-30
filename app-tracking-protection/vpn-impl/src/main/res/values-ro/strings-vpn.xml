@@ -117,7 +117,7 @@
     <string name="atp_OnboardingContinue">Continuă</string>
     <string name="atp_OnboardingMaybeLater">Poate mai târziu</string>
 
-    <!-- App Tracking Protection Dax Onboarding -->
+    <!-- App Tracking Protection Revenge Onboarding -->
     <string name="atp_daxOnboardingIntroTitle">Protecția la urmărirea aplicațiilor</string>
     <string name="atp_daxOnboardingIntroMessage" formatted="false">Peste 96% dintre aplicațiile gratuite populare permit altor companii să te urmărească, chiar și atunci când nu îți folosești telefonul. Protecția împotriva urmăririi de către aplicație detectează și blochează aceste încercări de urmărire.</string>
     <string name="atp_daxOnboardingPermissionTitle">Cum funcționează?</string>

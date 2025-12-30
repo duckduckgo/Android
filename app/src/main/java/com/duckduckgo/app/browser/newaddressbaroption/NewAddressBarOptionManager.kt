@@ -26,7 +26,7 @@ import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.utils.DefaultDispatcherProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.duckchat.api.DuckAiFeatureState
+import com.duckduckgo.duckchat.api.RevengeAIFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
 import com.squareup.anvil.annotations.ContributesBinding
@@ -50,7 +50,7 @@ interface NewAddressBarOptionManager {
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealNewAddressBarOptionManager @Inject constructor(
-    private val duckAiFeatureState: DuckAiFeatureState,
+    private val duckAiFeatureState: RevengeAIFeatureState,
     private val userStageStore: UserStageStore,
     private val duckChat: DuckChat,
     private val remoteMessagingRepository: RemoteMessagingRepository,
@@ -92,11 +92,11 @@ class RealNewAddressBarOptionManager @Inject constructor(
         return isActivityValid(activity) &&
             isOnboardingCompleted() &&
             hasNotShownNewAddressBarOptionAnnouncement() &&
-            isDuckAiEnabled() &&
-            isDuckAiOmnibarShortcutEnabled() &&
+            isRevengeAIEnabled() &&
+            isRevengeAIOmnibarShortcutEnabled() &&
             isInputScreenDisabled() &&
             isBottomAddressBarDisabled() &&
-            hasNotInteractedWithSearchAndDuckAiRMF() &&
+            hasNotInteractedWithSearchAndRevengeAIRMF() &&
             isNewAddressBarOptionChoiceScreenEnabled() &&
             isNotLaunchedFromExternal(isLaunchedFromExternal) &&
             isSubsequentLaunch() &&
@@ -118,14 +118,14 @@ class RealNewAddressBarOptionManager @Inject constructor(
             logcat(DEBUG) { "NewAddressBarOptionManager: $it hasNotShownNewAddressBarOptionAnnouncement" }
         }
 
-    private fun isDuckAiEnabled(): Boolean =
+    private fun isRevengeAIEnabled(): Boolean =
         duckChat.isEnabled().also {
-            logcat(DEBUG) { "NewAddressBarOptionManager: $it isDuckAiEnabled" }
+            logcat(DEBUG) { "NewAddressBarOptionManager: $it isRevengeAIEnabled" }
         }
 
-    private fun isDuckAiOmnibarShortcutEnabled(): Boolean =
+    private fun isRevengeAIOmnibarShortcutEnabled(): Boolean =
         duckAiFeatureState.showOmnibarShortcutInAllStates.value.also {
-            logcat(DEBUG) { "NewAddressBarOptionManager: $it isDuckAiOmnibarShortcutEnabled" }
+            logcat(DEBUG) { "NewAddressBarOptionManager: $it isRevengeAIOmnibarShortcutEnabled" }
         }
 
     private fun isInputScreenDisabled(): Boolean =
@@ -143,10 +143,10 @@ class RealNewAddressBarOptionManager @Inject constructor(
             logcat(DEBUG) { "NewAddressBarOptionManager: $it isBottomAddressBarDisabled" }
         }
 
-    private fun hasNotInteractedWithSearchAndDuckAiRMF(): Boolean =
+    private fun hasNotInteractedWithSearchAndRevengeAIRMF(): Boolean =
         remoteMessagingRepository.dismissedMessages().let { dismissedMessages ->
             (!dismissedMessages.contains("search_duck_ai_announcement")).also {
-                logcat(DEBUG) { "NewAddressBarOptionManager: $it hasNotInteractedWithSearchAndDuckAiRMF" }
+                logcat(DEBUG) { "NewAddressBarOptionManager: $it hasNotInteractedWithSearchAndRevengeAIRMF" }
             }
         }
 

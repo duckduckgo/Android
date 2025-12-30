@@ -17,23 +17,23 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/quickAccessFaviconContainer"
-    style="@style/Widget.DuckDuckGo.SearchWidgetFavoriteContainer"
+    style="@style/Widget.Revenge.SearchWidgetFavoriteContainer"
     android:orientation="vertical"
     tools:ignore="DeprecatedWidgetInXml">
 
     <ImageView
         android:id="@+id/quickAccessFavicon"
-        style="@style/Widget.DuckDuckGo.SearchWidgetFavoriteFavicon"
+        style="@style/Widget.Revenge.SearchWidgetFavoriteFavicon"
         android:background="@drawable/search_widget_favorite_favicon_daynight_background" />
 
     <ImageView
         android:id="@+id/placeholderFavicon"
-        style="@style/Widget.DuckDuckGo.SearchWidgetFavoritePlaceholderFavicon"
+        style="@style/Widget.Revenge.SearchWidgetFavoritePlaceholderFavicon"
         android:background="@drawable/search_empty_widget_favorite_favicon_daynight_background" />
 
     <TextView
         android:id="@+id/quickAccessTitle"
-        style="@style/Widget.DuckDuckGo.SearchWidgetFavoriteTitle"
+        style="@style/Widget.Revenge.SearchWidgetFavoriteTitle"
         tools:text="Super long favorite title" />
 
 </LinearLayout>

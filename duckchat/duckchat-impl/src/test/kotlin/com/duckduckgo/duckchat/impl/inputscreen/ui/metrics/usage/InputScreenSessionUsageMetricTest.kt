@@ -18,7 +18,7 @@ package com.duckduckgo.duckchat.impl.inputscreen.ui.metrics.usage
 
 import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.duckchat.api.DuckAiFeatureState
+import com.duckduckgo.duckchat.api.RevengeAIFeatureState
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.junit.Before
@@ -31,7 +31,7 @@ import org.mockito.kotlin.whenever
 class InputScreenSessionUsageMetricTest {
 
     private val pixel: Pixel = mock()
-    private val duckAiFeatureState: DuckAiFeatureState = mock()
+    private val duckAiFeatureState: RevengeAIFeatureState = mock()
     private val lifecycleOwner: LifecycleOwner = mock()
     private val showInputScreenFlow = MutableStateFlow(true)
 

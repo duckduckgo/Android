@@ -172,13 +172,13 @@
     <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Odoslať spätnú väzbu</string>
 
-    <string name="subscriptionSettingSubscribeWithDuckAiSubtitle">Predplatitelia získajú našu VPN, pokročilé modely umelej inteligencie v Duck.ai, Personal Information Removal a Identity Theft Restoration.</string>
-    <string name="subscriptionSettingSubscribeWithDuckAiSubtitleRow">Predplatitelia získajú našu VPN, pokročilé modely umelej inteligencie v Duck.ai a službu Identity Theft Restoration.</string>
+    <string name="subscriptionSettingSubscribeWithRevengeAISubtitle">Predplatitelia získajú našu VPN, pokročilé modely umelej inteligencie v Revenge AI, Personal Information Removal a Identity Theft Restoration.</string>
+    <string name="subscriptionSettingSubscribeWithRevengeAISubtitleRow">Predplatitelia získajú našu VPN, pokročilé modely umelej inteligencie v Revenge AI a službu Identity Theft Restoration.</string>
 
-    <string name="feedbackCategoryDuckAi">Duck.ai</string>
-    <string name="feedbackSubCategoryDuckAiSubscriberModels">Nepodarilo sa získať prístup k modelom Duck.ai, ktoré sú určené výhradne pre predplatiteľov.</string>
-    <string name="feedbackSubCategoryDuckAiLoginThirdPartyBrowser">Nemôžem sa s mojím predplatným dostať na Duck.ai v iných prehliadačoch.</string>
-    <string name="feedbackSubCategoryDuckAiOther">Ďalšie pripomienky Duck.ai</string>
+    <string name="feedbackCategoryRevengeAI">Revenge AI</string>
+    <string name="feedbackSubCategoryRevengeAISubscriberModels">Nepodarilo sa získať prístup k modelom Revenge AI, ktoré sú určené výhradne pre predplatiteľov.</string>
+    <string name="feedbackSubCategoryRevengeAILoginThirdPartyBrowser">Nemôžem sa s mojím predplatným dostať na Revenge AI v iných prehliadačoch.</string>
+    <string name="feedbackSubCategoryRevengeAIOther">Ďalšie pripomienky Revenge AI</string>
 
     <string name="subscriptionSettingSectionTitle">Predplatné DuckDuckGo</string>
     <string name="subscriptionSettingSubscribeSecure">Zabezpeč si Wi-Fi a chatuj súkromne s pokročilými modelmi umelej inteligencie</string>

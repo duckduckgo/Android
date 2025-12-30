@@ -34,7 +34,7 @@
 
     <com.duckduckgo.common.ui.view.InfoPanel
         android:id="@+id/exclusion_item_header_banner"
-        style="@style/Widget.DuckDuckGo.InfoPanel"
+        style="@style/Widget.Revenge.InfoPanel"
         android:layout_margin="@dimen/keyline_4"
         app:panelBackground="@drawable/info_panel_alert_background"
         app:panelDrawable="@drawable/ic_exclamation_yellow_16" />

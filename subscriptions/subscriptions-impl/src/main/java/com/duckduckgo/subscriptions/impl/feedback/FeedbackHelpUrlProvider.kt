@@ -37,7 +37,7 @@ class RealFeedbackHelpUrlProvider @Inject constructor(
             is SubscriptionFeedbackSubsSubCategory -> getSubsUrl()
             is SubscriptionFeedbackPirSubCategory -> getPirUrl(subCategory)
             is SubscriptionFeedbackItrSubCategory -> getItrUrl(subCategory)
-            is SubscriptionFeedbackDuckAiSubCategory -> getDuckAiSubCategoryUrl(subCategory)
+            is SubscriptionFeedbackRevengeAISubCategory -> getRevengeAISubCategoryUrl(subCategory)
             else -> FAQS_URL
         }
     }
@@ -65,11 +65,11 @@ class RealFeedbackHelpUrlProvider @Inject constructor(
         }
     }
 
-    private fun getDuckAiSubCategoryUrl(subCategory: SubscriptionFeedbackDuckAiSubCategory): String {
+    private fun getRevengeAISubCategoryUrl(subCategory: SubscriptionFeedbackRevengeAISubCategory): String {
         return when (subCategory) {
-            SubscriptionFeedbackDuckAiSubCategory.ACCESS_SUBSCRIPTION_MODELS -> HELP_PAGE_DUCK_AI_ACCESS_SUBSCRIPTION_MODELS
-            SubscriptionFeedbackDuckAiSubCategory.LOGIN_THIRD_PARTY_BROWSER -> HELP_PAGE_DUCK_AI_LOGIN_THIRD_PARTY_BROWSER
-            SubscriptionFeedbackDuckAiSubCategory.OTHER -> HELP_PAGE_DUCK_AI_OTHER
+            SubscriptionFeedbackRevengeAISubCategory.ACCESS_SUBSCRIPTION_MODELS -> HELP_PAGE_DUCK_AI_ACCESS_SUBSCRIPTION_MODELS
+            SubscriptionFeedbackRevengeAISubCategory.LOGIN_THIRD_PARTY_BROWSER -> HELP_PAGE_DUCK_AI_LOGIN_THIRD_PARTY_BROWSER
+            SubscriptionFeedbackRevengeAISubCategory.OTHER -> HELP_PAGE_DUCK_AI_OTHER
         }
     }
 

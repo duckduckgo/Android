@@ -121,7 +121,7 @@
     <string name="atp_OnboardingContinue">Продолжить</string>
     <string name="atp_OnboardingMaybeLater">Позже</string>
 
-    <!-- App Tracking Protection Dax Onboarding -->
+    <!-- App Tracking Protection Revenge Onboarding -->
     <string name="atp_daxOnboardingIntroTitle">Блокировка отслеживания приложениями</string>
     <string name="atp_daxOnboardingIntroMessage" formatted="false">Более 96% популярных бесплатных приложений позволяют другим компаниям отслеживать вас, даже когда вы не пользуетесь телефоном. Защита от слежки выявляет и блокирует подобные действия.</string>
     <string name="atp_daxOnboardingPermissionTitle">Как это работает?</string>

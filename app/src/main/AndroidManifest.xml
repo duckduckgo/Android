@@ -39,7 +39,7 @@
         android:roundIcon="${appIconRound}"
         android:dataExtractionRules="@xml/backup_rules_android_12_upwards"
         android:fullBackupContent="@xml/backup_rules_android_11_and_older"
-        android:theme="@style/Theme.DuckDuckGo.App"
+        android:theme="@style/Theme.Revenge.App"
         android:requestLegacyExternalStorage="true"
         tools:ignore="GoogleAppIndexingWarning,UnusedAttribute">
         <meta-data
@@ -88,14 +88,14 @@
             android:icon="${appIcon}"
             android:label="@string/appName"
             android:roundIcon="${appIconRound}"
-            android:theme="@style/Theme.DuckDuckGo.SplashScreen">
+            android:theme="@style/Theme.Revenge.SplashScreen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>
         </activity>
 
         <activity-alias
-            android:name="com.duckduckgo.app.launch.Launcher"
+            android:name="com.revenge.app.launch.Launcher"
             android:enabled="true"
             android:exported="true"
             android:icon="${appIcon}"
@@ -110,7 +110,7 @@
         </activity-alias>
 
         <activity-alias
-            android:name="com.duckduckgo.app.launch.LauncherPink"
+            android:name="com.revenge.app.launch.LauncherPink"
             android:enabled="false"
             android:exported="true"
             android:icon="@mipmap/ic_launcher_pink"
@@ -125,7 +125,7 @@
         </activity-alias>
 
         <activity-alias
-            android:name="com.duckduckgo.app.launch.LauncherBlue"
+            android:name="com.revenge.app.launch.LauncherBlue"
             android:enabled="false"
             android:exported="true"
             android:icon="@mipmap/ic_launcher_blue"
@@ -140,7 +140,7 @@
         </activity-alias>
 
         <activity-alias
-            android:name="com.duckduckgo.app.launch.LauncherBlack"
+            android:name="com.revenge.app.launch.LauncherBlack"
             android:enabled="false"
             android:exported="true"
             android:icon="@mipmap/ic_launcher_black"
@@ -155,7 +155,7 @@
         </activity-alias>
 
         <activity-alias
-            android:name="com.duckduckgo.app.launch.LauncherGold"
+            android:name="com.revenge.app.launch.LauncherGold"
             android:enabled="false"
             android:exported="true"
             android:icon="@mipmap/ic_launcher_gold"
@@ -170,7 +170,7 @@
         </activity-alias>
 
         <activity-alias
-            android:name="com.duckduckgo.app.launch.LauncherGreen"
+            android:name="com.revenge.app.launch.LauncherGreen"
             android:enabled="false"
             android:exported="true"
             android:icon="@mipmap/ic_launcher_green"
@@ -185,7 +185,7 @@
         </activity-alias>
 
         <activity-alias
-            android:name="com.duckduckgo.app.launch.LauncherPurple"
+            android:name="com.revenge.app.launch.LauncherPurple"
             android:enabled="false"
             android:exported="true"
             android:icon="@mipmap/ic_launcher_purple"
@@ -200,7 +200,7 @@
         </activity-alias>
 
         <activity-alias
-            android:name="com.duckduckgo.app.launch.LauncherSilhoutte"
+            android:name="com.revenge.app.launch.LauncherSilhoutte"
             android:enabled="false"
             android:exported="true"
             android:icon="@mipmap/ic_launcher_silhouette"
@@ -223,7 +223,7 @@
             android:exported="true"
             android:label="@string/appName"
             android:roundIcon="${appIconRound}"
-            android:theme="@style/Theme.DuckDuckGo.SplashScreen"
+            android:theme="@style/Theme.Revenge.SplashScreen"
             android:launchMode="singleTask"
             android:stateNotNeeded="true">
 
@@ -372,12 +372,12 @@
             android:exported="false"
             android:label="@string/surveyActivityTitle"
             android:parentActivityName=".BrowserActivity"
-            android:theme="@style/Theme.DuckDuckGo.Survey" />
+            android:theme="@style/Theme.Revenge.Survey" />
         <activity
             android:name="com.duckduckgo.app.widget.ui.AddWidgetInstructionsActivity"
             android:exported="false"
             android:label="@string/addWidgetInstructionsActivityTitle"
-            android:theme="@style/Theme.DuckDuckGo.Survey" />
+            android:theme="@style/Theme.Revenge.Survey" />
         <activity
             android:name="com.duckduckgo.app.about.AboutDuckDuckGoActivity"
             android:exported="false"
@@ -391,7 +391,7 @@
         <activity
             android:name="com.duckduckgo.app.fire.FireActivity"
             android:exported="false"
-            android:theme="@style/Theme.DuckDuckGo.Dark"
+            android:theme="@style/Theme.Revenge.Dark"
             android:process="@string/fireProcessName" />
         <activity
             android:name="com.duckduckgo.app.icon.ui.ChangeIconActivity"
@@ -469,7 +469,7 @@
             android:exported="false"
             android:label="@string/widgetConfigurationActivityTitle"
             android:roundIcon="${appIconRound}"
-            android:theme="@style/Theme.DuckDuckGo.SplashScreen">
+            android:theme="@style/Theme.Revenge.SplashScreen">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
             </intent-filter>

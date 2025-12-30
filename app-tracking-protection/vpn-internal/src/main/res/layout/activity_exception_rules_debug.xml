@@ -42,7 +42,7 @@
 
             <com.duckduckgo.common.ui.view.InfoPanel
                 android:id="@+id/exclusionListAppsWithIssuesLabel"
-                style="@style/Widget.DuckDuckGo.InfoPanel"
+                style="@style/Widget.Revenge.InfoPanel"
                 app:panelBackground="@drawable/info_panel_alert_background"
                 app:panelDrawable="@drawable/ic_exclamation_yellow_16"
                 app:panelText="@string/exceptionRulesPanelTitle"

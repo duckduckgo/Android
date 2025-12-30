@@ -172,13 +172,13 @@
     <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Send tilbagemelding</string>
 
-    <string name="subscriptionSettingSubscribeWithDuckAiSubtitle">Abonnenter får vores VPN og avancerede AI-modeller i Duck.ai, Personal Information Removal og Identity Theft Restoration.</string>
-    <string name="subscriptionSettingSubscribeWithDuckAiSubtitleRow">Abonnenter får vores VPN, avancerede AI-modeller i Duck.ai og Identity Theft Restoration.</string>
+    <string name="subscriptionSettingSubscribeWithRevengeAISubtitle">Abonnenter får vores VPN og avancerede AI-modeller i Revenge AI, Personal Information Removal og Identity Theft Restoration.</string>
+    <string name="subscriptionSettingSubscribeWithRevengeAISubtitleRow">Abonnenter får vores VPN, avancerede AI-modeller i Revenge AI og Identity Theft Restoration.</string>
 
-    <string name="feedbackCategoryDuckAi">Duck.ai</string>
-    <string name="feedbackSubCategoryDuckAiSubscriberModels">Kan ikke tilgå Duck.ai-modellerne kun for abonnenter.</string>
-    <string name="feedbackSubCategoryDuckAiLoginThirdPartyBrowser">Kan ikke få adgang til Duck.ai med mit abonnement i andre browsere</string>
-    <string name="feedbackSubCategoryDuckAiOther">Anden Duck.ai-feedback</string>
+    <string name="feedbackCategoryRevengeAI">Revenge AI</string>
+    <string name="feedbackSubCategoryRevengeAISubscriberModels">Kan ikke tilgå Revenge AI-modellerne kun for abonnenter.</string>
+    <string name="feedbackSubCategoryRevengeAILoginThirdPartyBrowser">Kan ikke få adgang til Revenge AI med mit abonnement i andre browsere</string>
+    <string name="feedbackSubCategoryRevengeAIOther">Anden Revenge AI-feedback</string>
 
     <string name="subscriptionSettingSectionTitle">DuckDuckGo-abonnement</string>
     <string name="subscriptionSettingSubscribeSecure">Beskyt dit Wi-Fi, og chat privat med avancerede AI-modeller</string>

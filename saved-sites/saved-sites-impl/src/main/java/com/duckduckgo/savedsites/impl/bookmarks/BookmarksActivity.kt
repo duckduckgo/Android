@@ -788,7 +788,7 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
         anchor: View,
         bookmarkFolder: BookmarkFolder,
     ) {
-        val wrapper = ContextThemeWrapper(this, com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_PopupMenu)
+        val wrapper = ContextThemeWrapper(this, com.duckduckgo.mobile.android.R.style.Widget_Revenge_PopupMenu)
         val popup = androidx.appcompat.widget.PopupMenu(wrapper, anchor)
         popup.menuInflater.inflate(R.menu.bookmark_folder_popup_menu, popup.menu)
 
@@ -815,7 +815,7 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
         anchor: View,
         bookmark: SavedSite.Bookmark,
     ) {
-        val wrapper = ContextThemeWrapper(this, com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_PopupMenu)
+        val wrapper = ContextThemeWrapper(this, com.duckduckgo.mobile.android.R.style.Widget_Revenge_PopupMenu)
         val popup = androidx.appcompat.widget.PopupMenu(wrapper, anchor)
         popup.menuInflater.inflate(R.menu.bookmark_popup_menu, popup.menu)
 

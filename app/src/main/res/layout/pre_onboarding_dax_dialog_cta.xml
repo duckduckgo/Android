@@ -104,7 +104,7 @@
 
                     <com.duckduckgo.common.ui.view.TypeAnimationTextView
                         android:id="@+id/dialogTextCta"
-                        style="@style/Typography.DuckDuckGo.H2"
+                        style="@style/Typography.Revenge.H2"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:clickable="true"
@@ -262,7 +262,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/keyline_0"
                     android:alpha="0"
-                    android:text="@string/preOnboardingDaxDialog1SecondaryButton"
+                    android:text="@string/preOnboardingRevengeDialog1SecondaryButton"
                     app:daxButtonSize="large"
                     tools:alpha="1" />
 

@@ -47,7 +47,7 @@
                 app:srcCompat="@drawable/widget_promo_light"
                 tools:ignore="ContentDescription" />
 
-            <!-- Using TextView instead of DaxTextView as the text color has to be the same regardless
+            <!-- Using TextView instead of RevengeTextView as the text color has to be the same regardless
              of the Theme. This text is placed on top of an image that is always light colored -->
             <TextView
                 android:layout_width="140dp"

@@ -17,7 +17,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/widgetSearchBarContainer"
-    style="@style/Widget.DuckDuckGo.SearchWithFavoritesWidgetSearchBarContainer"
+    style="@style/Widget.Revenge.SearchWithFavoritesWidgetSearchBarContainer"
     android:background="@drawable/search_widget_background_light"
     android:gravity="center_vertical"
     android:orientation="horizontal"
@@ -25,14 +25,14 @@
 
     <ImageView
         android:id="@+id/logo"
-        style="@style/Widget.DuckDuckGo.SearchWidgetDDGLogo"
+        style="@style/Widget.Revenge.SearchWidgetDDGLogo"
         android:layout_gravity="center_vertical"
         android:src="@drawable/ic_ddg_logo"
         tools:ignore="ContentDescription" />
 
     <TextView
         android:id="@+id/searchInputBox"
-        style="@style/Widget.DuckDuckGo.SearchWidgetInputBox"
+        style="@style/Widget.Revenge.SearchWidgetInputBox"
         android:layout_width="0dp"
         android:layout_weight="1"
         android:ellipsize="end"
@@ -42,28 +42,28 @@
 
     <ImageView
         android:id="@+id/voiceSearch"
-        style="@style/Widget.DuckDuckGo.SearchWidgetSearchIcon"
+        style="@style/Widget.Revenge.SearchWidgetSearchIcon"
         android:src="@drawable/ic_microphone_light"
         android:visibility="gone"
         tools:ignore="ContentDescription" />
 
     <ImageView
         android:id="@+id/separator"
-        style="@style/Widget.DuckDuckGo.SearchWidgetSearchIcon"
+        style="@style/Widget.Revenge.SearchWidgetSearchIcon"
         android:src="@drawable/ic_vertical_separator_light"
         android:visibility="gone"
         tools:ignore="ContentDescription" />
 
     <ImageView
         android:id="@+id/duckAi"
-        style="@style/Widget.DuckDuckGo.SearchWidgetSearchIcon"
+        style="@style/Widget.Revenge.SearchWidgetSearchIcon"
         android:src="@drawable/ic_duck_ai_24_light"
         android:visibility="gone"
         tools:ignore="ContentDescription" />
 
     <ImageView
         android:id="@+id/search"
-        style="@style/Widget.DuckDuckGo.SearchWidgetSearchIcon"
+        style="@style/Widget.Revenge.SearchWidgetSearchIcon"
         android:src="@drawable/ic_find_search_24_light"
         android:visibility="visible"
         tools:ignore="ContentDescription" />

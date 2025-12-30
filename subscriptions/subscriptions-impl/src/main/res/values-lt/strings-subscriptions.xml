@@ -172,13 +172,13 @@
     <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Siųsti atsiliepimą</string>
 
-    <string name="subscriptionSettingSubscribeWithDuckAiSubtitle">Prenumeratoriai gauna mūsų VPN, pažangius dirbtinio intelekto modelius „Duck.ai“, asmens duomenų šalinimas ir tapatybės vagystės duomenų atkūrimas.</string>
-    <string name="subscriptionSettingSubscribeWithDuckAiSubtitleRow">Prenumeratoriai gauna mūsų VPN, pažangius dirbtinio intelekto modelius „Duck.ai“ platformoje ir tapatybės vagystės atkūrimo paslaugą.</string>
+    <string name="subscriptionSettingSubscribeWithRevengeAISubtitle">Prenumeratoriai gauna mūsų VPN, pažangius dirbtinio intelekto modelius „Revenge AI“, asmens duomenų šalinimas ir tapatybės vagystės duomenų atkūrimas.</string>
+    <string name="subscriptionSettingSubscribeWithRevengeAISubtitleRow">Prenumeratoriai gauna mūsų VPN, pažangius dirbtinio intelekto modelius „Revenge AI“ platformoje ir tapatybės vagystės atkūrimo paslaugą.</string>
 
-    <string name="feedbackCategoryDuckAi">Duck.ai</string>
-    <string name="feedbackSubCategoryDuckAiSubscriberModels">Nepavyksta pasiekti tik prenumeratoriams skirtų „Duck.ai“ modelių.</string>
-    <string name="feedbackSubCategoryDuckAiLoginThirdPartyBrowser">Negaliu pasiekti „Duck.ai“ su savo prenumerata kitose naršyklėse.</string>
-    <string name="feedbackSubCategoryDuckAiOther">Kiti „Duck.ai“ atsiliepimai</string>
+    <string name="feedbackCategoryRevengeAI">Revenge AI</string>
+    <string name="feedbackSubCategoryRevengeAISubscriberModels">Nepavyksta pasiekti tik prenumeratoriams skirtų „Revenge AI“ modelių.</string>
+    <string name="feedbackSubCategoryRevengeAILoginThirdPartyBrowser">Negaliu pasiekti „Revenge AI“ su savo prenumerata kitose naršyklėse.</string>
+    <string name="feedbackSubCategoryRevengeAIOther">Kiti „Revenge AI“ atsiliepimai</string>
 
     <string name="subscriptionSettingSectionTitle">„DuckDuckGo“ prenumerata</string>
     <string name="subscriptionSettingSubscribeSecure">Apsaugok savo Wi-Fi ir kalbėkis privačiai su pažangiais DI modeliais</string>

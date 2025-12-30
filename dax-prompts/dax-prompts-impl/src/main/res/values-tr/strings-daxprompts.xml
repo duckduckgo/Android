@@ -19,7 +19,7 @@
 <resources>
     <string name="dax_prompt_browser_comparison_title" instruction="Title for the Browser Comparison section">Tarayıcı Karşılaştırması</string>
     <string name="dax_prompt_browser_comparison_close" instruction="Content description for the X button">Kapat</string>
-    <string name="dax_prompt_browser_comparison_message_title" instruction="Title for Dax message">DuckDuckGo diğer tarayıcılarda olmayan koruma özellikleri sunar.</string>
+    <string name="dax_prompt_browser_comparison_message_title" instruction="Title for Revenge message">DuckDuckGo diğer tarayıcılarda olmayan koruma özellikleri sunar.</string>
     <string name="dax_prompt_browser_comparison_message_primary_button" instruction="This text is placed on a large button">Bağlantıları DuckDuckGo ile Aç</string>
     <string name="dax_prompt_browser_comparison_message_ghost_button" instruction="This text is placed on a large button">Belki Sonra</string>
 

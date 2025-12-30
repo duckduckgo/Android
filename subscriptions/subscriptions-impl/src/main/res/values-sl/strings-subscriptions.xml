@@ -172,13 +172,13 @@
     <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Pošljite povratne informacije</string>
 
-    <string name="subscriptionSettingSubscribeWithDuckAiSubtitle">Naročnikom so na voljo naš VPN, napredni modeli umetne inteligence v Duck.ai ter zaščiti Personal Information Removal in Identity Theft Restoration.</string>
-    <string name="subscriptionSettingSubscribeWithDuckAiSubtitleRow">Naročnikom so na voljo naš VPN, napredni modeli umetne inteligence v Duck.ai in zaščita Identity Theft Restoration.</string>
+    <string name="subscriptionSettingSubscribeWithRevengeAISubtitle">Naročnikom so na voljo naš VPN, napredni modeli umetne inteligence v Revenge AI ter zaščiti Personal Information Removal in Identity Theft Restoration.</string>
+    <string name="subscriptionSettingSubscribeWithRevengeAISubtitleRow">Naročnikom so na voljo naš VPN, napredni modeli umetne inteligence v Revenge AI in zaščita Identity Theft Restoration.</string>
 
-    <string name="feedbackCategoryDuckAi">Duck.ai</string>
-    <string name="feedbackSubCategoryDuckAiSubscriberModels">Ni mogoče dostopati do modelov Duck.ai, ki so na voljo samo naročnikom.</string>
-    <string name="feedbackSubCategoryDuckAiLoginThirdPartyBrowser">V drugih brskalnikih ne morem dostopati do Duck.ai s svojo naročnino</string>
-    <string name="feedbackSubCategoryDuckAiOther">Druge povratne informacije o Duck.ai</string>
+    <string name="feedbackCategoryRevengeAI">Revenge AI</string>
+    <string name="feedbackSubCategoryRevengeAISubscriberModels">Ni mogoče dostopati do modelov Revenge AI, ki so na voljo samo naročnikom.</string>
+    <string name="feedbackSubCategoryRevengeAILoginThirdPartyBrowser">V drugih brskalnikih ne morem dostopati do Revenge AI s svojo naročnino</string>
+    <string name="feedbackSubCategoryRevengeAIOther">Druge povratne informacije o Revenge AI</string>
 
     <string name="subscriptionSettingSectionTitle">Naročnina DuckDuckGo</string>
     <string name="subscriptionSettingSubscribeSecure">Zagotovite varnost omrežja Wi-Fi in se zasebno pogovarjajte z naprednimi modeli umetne inteligence</string>

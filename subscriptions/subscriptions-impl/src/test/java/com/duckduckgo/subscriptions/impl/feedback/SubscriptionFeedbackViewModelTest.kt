@@ -468,9 +468,9 @@ class SubscriptionFeedbackViewModelTest {
         assertEquals("advisorUnhelpful", SubscriptionFeedbackItrSubCategory.UNHELPFUL.asParams())
         assertEquals("somethingElse", SubscriptionFeedbackItrSubCategory.OTHER.asParams())
 
-        assertEquals("accessSubscriptionModels", SubscriptionFeedbackDuckAiSubCategory.ACCESS_SUBSCRIPTION_MODELS.asParams())
-        assertEquals("loginThirdPartyBrowser", SubscriptionFeedbackDuckAiSubCategory.LOGIN_THIRD_PARTY_BROWSER.asParams())
-        assertEquals("somethingElse", SubscriptionFeedbackDuckAiSubCategory.OTHER.asParams())
+        assertEquals("accessSubscriptionModels", SubscriptionFeedbackRevengeAISubCategory.ACCESS_SUBSCRIPTION_MODELS.asParams())
+        assertEquals("loginThirdPartyBrowser", SubscriptionFeedbackRevengeAISubCategory.LOGIN_THIRD_PARTY_BROWSER.asParams())
+        assertEquals("somethingElse", SubscriptionFeedbackRevengeAISubCategory.OTHER.asParams())
     }
 
     @Test
@@ -587,7 +587,7 @@ class SubscriptionFeedbackViewModelTest {
     }
 
     @Test
-    fun whenCategorySelectedIsDuckAithenShowDuckAiSubcategoriesScreenAndImpression() = runTest {
+    fun whenCategorySelectedIsRevengeAIthenShowRevengeAISubcategoriesScreenAndImpression() = runTest {
         viewModel.viewState().test {
             viewModel.allowUserToChooseReportType(source = DDG_SETTINGS)
             viewModel.onReportTypeSelected(reportType = REPORT_PROBLEM)
@@ -595,7 +595,7 @@ class SubscriptionFeedbackViewModelTest {
 
             expectMostRecentItem().assertViewStateMoveForward(
                 expectedPreviousFragmentState = FeedbackCategory(R.string.feedbackActionReportIssue),
-                expectedCurrentFragmentState = FeedbackSubCategory(R.string.feedbackCategoryDuckAi),
+                expectedCurrentFragmentState = FeedbackSubCategory(R.string.feedbackCategoryRevengeAI),
                 FeedbackMetadata(
                     source = DDG_SETTINGS,
                     reportType = REPORT_PROBLEM,
@@ -833,7 +833,7 @@ class SubscriptionFeedbackViewModelTest {
     }
 
     @Test
-    fun whenMoveBackFromSubCategoryActionDuckAiCategoryThenUpdateViewState() = runTest {
+    fun whenMoveBackFromSubCategoryActionRevengeAICategoryThenUpdateViewState() = runTest {
         viewModel.viewState().test {
             viewModel.allowUserToChooseFeedbackType() // Show general
             viewModel.onProFeedbackSelected() // show action

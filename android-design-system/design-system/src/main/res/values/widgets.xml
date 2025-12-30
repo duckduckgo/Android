@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Copyright (c) 2021 DuckDuckGo
+  ~ Copyright (c) 2021 Revenge
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -19,13 +19,13 @@
     <style name="Widget"/>
     <style name="ThemeOverlay"/>
 
-    <style name="Widget.DuckDuckGo"/>
-    <style name="ThemeOverlay.DuckDuckGo"/>
+    <style name="Widget.Revenge"/>
+    <style name="ThemeOverlay.Revenge"/>
 
     <!-- Styles for Android System Components -->
 
     <!-- Toolbar -->
-    <style name="Widget.DuckDuckGo.ToolbarTheme" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
+    <style name="Widget.Revenge.ToolbarTheme" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
         <item name="colorControlNormal">?attr/daxColorPrimaryIcon</item>
         <item name="android:textColorPrimary">?attr/daxColorPrimaryText</item>
         <item name="colorControlHighlight">?attr/daxColorRipple</item>
@@ -35,48 +35,48 @@
         <item name="android:colorForeground">?attr/daxColorRipple</item>
     </style>
 
-    <style name="Widget.DuckDuckGo.PopUpOverflowMenu" parent="@style/Widget.MaterialComponents.PopupMenu.Overflow">
+    <style name="Widget.Revenge.PopUpOverflowMenu" parent="@style/Widget.MaterialComponents.PopupMenu.Overflow">
         <item name="android:popupBackground">@drawable/popup_menu_bg</item>
     </style>
 
-    <style name="Widget.DuckDuckGo.OverflowButton" parent="@style/Widget.AppCompat.ActionButton.Overflow">
+    <style name="Widget.Revenge.OverflowButton" parent="@style/Widget.AppCompat.ActionButton.Overflow">
         <item name="srcCompat">@drawable/ic_menu_vertical_24</item>
         <item name="android:src">@drawable/ic_menu_vertical_24</item>
     </style>
 
-    <style name="Widget.DuckDuckGo.PopUpMenuCheckBox" parent="@style/Widget.MaterialComponents.PopupMenu.Overflow">
+    <style name="Widget.Revenge.PopUpMenuCheckBox" parent="@style/Widget.MaterialComponents.PopupMenu.Overflow">
         <item name="colorAccent">?attr/daxColorAccentBlue</item>
         <item name="android:textColorSecondary">?attr/daxColorPrimaryIcon</item>
     </style>
 
     <!-- Tabs -->
-    <style name="Widget.DuckDuckGo.TabLayout" parent="Widget.MaterialComponents.TabLayout">
+    <style name="Widget.Revenge.TabLayout" parent="Widget.MaterialComponents.TabLayout">
         <item name="tabTextAppearance">@style/TextAppearance.MaterialComponents.Button</item>
     </style>
 
-    <style name="Widget.DuckDuckGo.AutoCompleteTextView" parent="Widget.AppCompat.AutoCompleteTextView">
+    <style name="Widget.Revenge.AutoCompleteTextView" parent="Widget.AppCompat.AutoCompleteTextView">
         <item name="android:textCursorDrawable">@drawable/text_cursor</item>
         <item name="android:textColorHint">?attr/daxColorSecondaryText</item>
         <item name="android:fontFamily">sans-serif-medium</item>
     </style>
 
     <!-- Snackbar -->
-    <style name="Widget.DuckDuckGo.Snackbar" parent="Widget.MaterialComponents.Snackbar">
+    <style name="Widget.Revenge.Snackbar" parent="Widget.MaterialComponents.Snackbar">
         <item name="actionTextColorAlpha">1</item>
         <item name="backgroundTint">?attr/daxColorSurface</item>
     </style>
 
-    <style name="Widget.DuckDuckGo.SnackbarButton" parent="Widget.MaterialComponents.Button.TextButton.Snackbar">
+    <style name="Widget.Revenge.SnackbarButton" parent="Widget.MaterialComponents.Button.TextButton.Snackbar">
         <item name="android:textColor">?attr/daxColorAccentBlue</item>
         <item name="android:textAppearance">?attr/textAppearanceButton</item>
     </style>
 
-    <style name="Widget.DuckDuckGo.SnackbarText" parent="Widget.MaterialComponents.Snackbar.TextView">
+    <style name="Widget.Revenge.SnackbarText" parent="Widget.MaterialComponents.Snackbar.TextView">
         <item name="android:textColor">?attr/daxColorPrimaryText</item>
         <item name="android:textAppearance">?attr/textAppearanceBody2</item>
     </style>
 
-    <style name="Widget.DuckDuckGo.PopupMenu" parent="Widget.MaterialComponents.PopupMenu">
+    <style name="Widget.Revenge.PopupMenu" parent="Widget.MaterialComponents.PopupMenu">
         <item name="android:textColor">?daxColorPrimaryText</item>
         <item name="android:itemBackground">?attr/selectableItemBackground</item>
         <item name="android:popupBackground">@drawable/popup_menu_bg</item>
@@ -85,7 +85,7 @@
         <item name="textAppearanceSmallPopupMenu">?attr/textAppearanceBody1</item>
     </style>
 
-    <style name="Widget.DuckDuckGo.PopupMenuItem" parent="Typography.DuckDuckGo.Body1">
+    <style name="Widget.Revenge.PopupMenuItem" parent="Typography.Revenge.Body1">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">@dimen/popupMenuItemHeight</item>
         <item name="android:paddingEnd">@dimen/keyline_4</item>
@@ -96,7 +96,7 @@
         <item name="android:background">?attr/selectableItemBackground</item>
     </style>
 
-    <style name="Widget.DuckDuckGo.PopupMenuHorizontalDivider">
+    <style name="Widget.Revenge.PopupMenuHorizontalDivider">
         <item name="android:layout_marginStart">@dimen/keyline_5</item>
         <item name="android:layout_marginTop">@dimen/keyline_1</item>
         <item name="android:layout_marginEnd">@dimen/keyline_5</item>
@@ -104,7 +104,7 @@
         <item name="defaultPadding">false</item>
     </style>
 
-    <style name="Widget.DuckDuckGo.NavigationalIcon">
+    <style name="Widget.Revenge.NavigationalIcon">
         <item name="android:background">@drawable/ripple_rectangle_rounded</item>
         <item name="android:layout_width">@dimen/popupMenuNavigationItemSize</item>
         <item name="android:layout_height">@dimen/popupMenuNavigationItemSize</item>
@@ -113,7 +113,7 @@
     <!-- Styles for App Components -->
 
     <!-- Menus -->
-    <style name="Widget.DuckDuckGo.MenuItemView">
+    <style name="Widget.Revenge.MenuItemView">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:paddingStart">@dimen/keyline_5</item>
@@ -124,25 +124,25 @@
     </style>
 
     <!-- SkeletonView -->
-    <style name="Widget.DuckDuckGo.SkeletonView">
+    <style name="Widget.Revenge.SkeletonView">
         <item name="android:background">@drawable/background_skeleton_ui</item>
     </style>
 
     <!-- Info Panel -->
-    <style name="Widget.DuckDuckGo.InfoPanel">
+    <style name="Widget.Revenge.InfoPanel">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
     </style>
 
     <!-- Buttons -->
-    <style name="Widget.DuckDuckGo.DaxButton.TextButton" parent="Widget.MaterialComponents.Button.TextButton">
+    <style name="Widget.Revenge.RevengeButton.TextButton" parent="Widget.MaterialComponents.Button.TextButton">
         <item name="android:textAppearance">?attr/textAppearanceButton</item>
         <item name="shapeAppearance">?shapeAppearanceSmallComponent</item>
         <item name="iconPadding">@dimen/keyline_2</item>
         <item name="cornerRadius">@dimen/mediumShapeCornerRadius</item>
     </style>
 
-    <style name="Widget.DuckDuckGo.DaxButton.TextButton.Primary">
+    <style name="Widget.Revenge.RevengeButton.TextButton.Primary">
         <item name="android:textColor">@color/button_primary_text_color_selector</item>
         <item name="backgroundTint">@color/button_primary_container_selector</item>
         <item name="rippleColor">@color/button_primary_ripple_selector</item>
@@ -150,7 +150,7 @@
         <item name="cornerRadius">@dimen/mediumShapeCornerRadius</item>
     </style>
 
-    <style name="Widget.DuckDuckGo.DaxButton.TextButton.Destructive">
+    <style name="Widget.Revenge.RevengeButton.TextButton.Destructive">
         <item name="android:textColor">@color/button_primary_text_color_selector</item>
         <item name="backgroundTint">@color/button_destructive_container_selector</item>
         <item name="rippleColor">@color/button_destructive_ripple_selector</item>
@@ -158,7 +158,7 @@
         <item name="cornerRadius">@dimen/mediumShapeCornerRadius</item>
     </style>
 
-    <style name="Widget.DuckDuckGo.DaxButton.Secondary" parent="Widget.MaterialComponents.Button.OutlinedButton">
+    <style name="Widget.Revenge.RevengeButton.Secondary" parent="Widget.MaterialComponents.Button.OutlinedButton">
         <item name="android:textColor">@color/button_secondary_text_color_selector</item>
         <item name="shapeAppearance">?attr/shapeAppearanceSmallComponent</item>
         <item name="strokeColor">@color/button_secondary_stroke_selector</item>
@@ -168,7 +168,7 @@
         <item name="cornerRadius">@dimen/mediumShapeCornerRadius</item>
     </style>
 
-    <style name="Widget.DuckDuckGo.DaxButton.Ghost" parent="Widget.MaterialComponents.Button.TextButton">
+    <style name="Widget.Revenge.RevengeButton.Ghost" parent="Widget.MaterialComponents.Button.TextButton">
         <item name="android:textColor">@color/button_secondary_text_color_selector</item>
         <item name="backgroundTint">@color/button_ghost_container_selector</item>
         <item name="rippleColor">@color/button_ghost_ripple_selector</item>
@@ -177,7 +177,7 @@
         <item name="cornerRadius">@dimen/mediumShapeCornerRadius</item>
     </style>
 
-    <style name="Widget.DuckDuckGo.DaxButton.DestructiveGhost" parent="Widget.MaterialComponents.Button.TextButton">
+    <style name="Widget.Revenge.RevengeButton.DestructiveGhost" parent="Widget.MaterialComponents.Button.TextButton">
         <item name="android:textColor">@color/button_destructive_ghost_text_color_selector</item>
         <item name="backgroundTint">@color/button_destructive_ghost_container_selector</item>
         <item name="rippleColor">@color/button_desctructive_ghost_ripple_selector</item>
@@ -186,7 +186,7 @@
         <item name="cornerRadius">@dimen/mediumShapeCornerRadius</item>
     </style>
 
-    <style name="Widget.DuckDuckGo.DaxButton.DestructiveGhostAlt" parent="Widget.MaterialComponents.Button.TextButton">
+    <style name="Widget.Revenge.RevengeButton.DestructiveGhostAlt" parent="Widget.MaterialComponents.Button.TextButton">
         <item name="android:textColor">@color/button_ghost_alt_text_color_selector</item>
         <item name="backgroundTint">@color/button_ghost_alt_container_selector</item>
         <item name="rippleColor">@color/button_ghost_alt_ripple_selector</item>
@@ -195,73 +195,73 @@
         <item name="cornerRadius">@dimen/mediumShapeCornerRadius</item>
     </style>
 
-    <style name="Widget.DuckDuckGo.IconButton">
+    <style name="Widget.Revenge.IconButton">
         <item name="android:background">@drawable/background_icon_button</item>
         <item name="android:padding">@dimen/keyline_5</item>
         <item name="cornerRadius">@dimen/mediumShapeCornerRadius</item>
     </style>
 
-    <style name="Widget.DuckDuckGo.RadioButton" parent="Widget.MaterialComponents.CompoundButton.RadioButton">
+    <style name="Widget.Revenge.RadioButton" parent="Widget.MaterialComponents.CompoundButton.RadioButton">
         <item name="android:textColor">?attr/daxColorPrimaryText</item>
         <item name="buttonTint">@color/radio_button_tint</item>
         <item name="android:padding">@dimen/keyline_3</item>
         <item name="android:textAppearance">?attr/textAppearanceBody1</item>
     </style>
 
-    <style name="Widget.DuckDuckGo.CheckBox" parent="Widget.MaterialComponents.CompoundButton.CheckBox">
+    <style name="Widget.Revenge.CheckBox" parent="Widget.MaterialComponents.CompoundButton.CheckBox">
         <item name="android:textColor">?attr/daxColorPrimaryText</item>
         <item name="buttonTint">@color/radio_button_tint</item>
         <item name="android:textAppearance">?attr/textAppearanceBody1</item>
         <item name="android:paddingStart">@dimen/keyline_2</item>
     </style>
 
-    <style name="Widget.DuckDuckGo.ExtendedFloatingActionButton" parent="Widget.MaterialComponents.ExtendedFloatingActionButton">
+    <style name="Widget.Revenge.ExtendedFloatingActionButton" parent="Widget.MaterialComponents.ExtendedFloatingActionButton">
         <item name="backgroundTint">?attr/daxColorFabPrimaryContainer</item>
         <item name="iconTint">?attr/daxColorFabPrimaryIcon</item>
         <item name="android:textColor">?attr/daxColorFabPrimaryText</item>
-        <item name="shapeAppearanceOverlay">@style/Widget.DuckDuckGo.ExtendedFloatingActionButton.Overlay</item>
+        <item name="shapeAppearanceOverlay">@style/Widget.Revenge.ExtendedFloatingActionButton.Overlay</item>
         <item name="android:height">@dimen/fabHeight</item>
         <item name="rippleColor">@color/fab_primary_ripple_selector</item>
     </style>
 
-    <style name="Widget.DuckDuckGo.ExtendedFloatingActionButton.Overlay">
+    <style name="Widget.Revenge.ExtendedFloatingActionButton.Overlay">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">@dimen/keyline_4</item>
     </style>
 
-    <style name="Widget.DuckDuckGo.FloatingActionButton" parent="Widget.MaterialComponents.FloatingActionButton">
+    <style name="Widget.Revenge.FloatingActionButton" parent="Widget.MaterialComponents.FloatingActionButton">
         <item name="backgroundTint">?attr/daxColorFabSecondaryContainer</item>
         <item name="tint">?attr/daxColorFabSecondaryIcon</item>
-        <item name="shapeAppearanceOverlay">@style/Widget.DuckDuckGo.FloatingActionButton.Overlay</item>
+        <item name="shapeAppearanceOverlay">@style/Widget.Revenge.FloatingActionButton.Overlay</item>
         <item name="fabSize">mini</item>
         <item name="elevation">9dp</item>
         <item name="rippleColor">@color/fab_secondary_ripple_selector</item>
     </style>
 
-    <style name="Widget.DuckDuckGo.FloatingActionButton.Overlay">
+    <style name="Widget.Revenge.FloatingActionButton.Overlay">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">@dimen/keyline_3</item>
     </style>
 
-    <style name="Widget.DuckDuckGo.FloatingActionButton.Circular" parent="Widget.MaterialComponents.FloatingActionButton">
+    <style name="Widget.Revenge.FloatingActionButton.Circular" parent="Widget.MaterialComponents.FloatingActionButton">
         <item name="shapeAppearanceOverlay">@style/ShapeAppearanceOverlay.MaterialComponents.FloatingActionButton</item>
     </style>
 
     <!-- List Items -->
-    <style name="Widget.DuckDuckGo.OneLineListItem">
+    <style name="Widget.Revenge.OneLineListItem">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:minHeight">@dimen/oneLineItemHeight</item>
     </style>
 
-    <style name="Widget.DuckDuckGo.TwoLineListItem">
+    <style name="Widget.Revenge.TwoLineListItem">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:minHeight">@dimen/twoLineItemHeight</item>
     </style>
 
     <!-- SearchBarView -->
-    <style name="Widget.DuckDuckGo.SearchBarView">
+    <style name="Widget.Revenge.SearchBarView">
         <item name="android:background">@drawable/omnibar_field_background</item>
         <item name="android:layout_margin">@dimen/keyline_2</item>
         <item name="clearActionContentDescription">
@@ -274,7 +274,7 @@
     </style>
 
     <!-- MessageCta -->
-    <style name="Widget.DuckDuckGo.MessageCta">
+    <style name="Widget.Revenge.MessageCta">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="cardElevation">4dp</item>
@@ -283,12 +283,12 @@
     </style>
 
     <!-- Dialogs -->
-    <style name="Widget.DuckDuckGo.Dialog" parent="@style/ThemeOverlay.MaterialComponents.MaterialAlertDialog">
-        <item name="shapeAppearanceOverlay">@style/Widget.DuckDuckGo.DialogCorners</item>
+    <style name="Widget.Revenge.Dialog" parent="@style/ThemeOverlay.MaterialComponents.MaterialAlertDialog">
+        <item name="shapeAppearanceOverlay">@style/Widget.Revenge.DialogCorners</item>
         <item name="colorOnSurface">?attr/daxColorSurface</item>
     </style>
 
-    <style name="Widget.DuckDuckGo.LegacyDialog" parent="Theme.AppCompat.Light.Dialog.Alert">
+    <style name="Widget.Revenge.LegacyDialog" parent="Theme.AppCompat.Light.Dialog.Alert">
         <item name="android:textColor">?attr/daxColorPrimaryText</item>
         <item name="android:textColorPrimary">?attr/daxColorPrimaryText</item>
         <item name="android:textColorSecondary">?attr/daxColorSecondaryText</item>
@@ -296,17 +296,17 @@
         <item name="colorAccent">?attr/daxColorAccentBlue</item>
         <item name="android:textColorAlertDialogListItem">?attr/daxColorPrimaryText</item>
         <item name="textColorAlertDialogListItem">?attr/daxColorPrimaryText</item>
-        <item name="android:buttonBarButtonStyle">@style/Widget.DuckDuckGo.LegacyDialogButtonStyle</item>
-        <item name="buttonBarNegativeButtonStyle">@style/Widget.DuckDuckGo.LegacyDialogButtonStyle</item>
-        <item name="buttonBarPositiveButtonStyle">@style/Widget.DuckDuckGo.LegacyDialogButtonStyle</item>
-        <item name="buttonBarNeutralButtonStyle">@style/Widget.DuckDuckGo.LegacyDialogButtonStyle</item>
+        <item name="android:buttonBarButtonStyle">@style/Widget.Revenge.LegacyDialogButtonStyle</item>
+        <item name="buttonBarNegativeButtonStyle">@style/Widget.Revenge.LegacyDialogButtonStyle</item>
+        <item name="buttonBarPositiveButtonStyle">@style/Widget.Revenge.LegacyDialogButtonStyle</item>
+        <item name="buttonBarNeutralButtonStyle">@style/Widget.Revenge.LegacyDialogButtonStyle</item>
     </style>
 
-    <style name="Widget.DuckDuckGo.DatePicker" parent="Theme.AppCompat.Light.Dialog.Alert">
-        <item name="android:buttonBarButtonStyle">@style/Widget.DuckDuckGo.LegacyDialogButtonStyle</item>
-        <item name="buttonBarNegativeButtonStyle">@style/Widget.DuckDuckGo.LegacyDialogButtonStyle</item>
-        <item name="buttonBarPositiveButtonStyle">@style/Widget.DuckDuckGo.LegacyDialogButtonStyle</item>
-        <item name="buttonBarNeutralButtonStyle">@style/Widget.DuckDuckGo.LegacyDialogButtonStyle</item>
+    <style name="Widget.Revenge.DatePicker" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="android:buttonBarButtonStyle">@style/Widget.Revenge.LegacyDialogButtonStyle</item>
+        <item name="buttonBarNegativeButtonStyle">@style/Widget.Revenge.LegacyDialogButtonStyle</item>
+        <item name="buttonBarPositiveButtonStyle">@style/Widget.Revenge.LegacyDialogButtonStyle</item>
+        <item name="buttonBarNeutralButtonStyle">@style/Widget.Revenge.LegacyDialogButtonStyle</item>
         <item name="colorAccent">?attr/daxColorAccentBlue</item>
         <item name="colorControlActivated">?attr/daxColorAccentBlue</item>
         <item name="colorControlHighlight">?attr/daxColorAccentBlue</item>
@@ -314,11 +314,11 @@
         <item name="android:textColorSecondaryInverse">?daxColorPrimaryInvertedText</item>
     </style>
 
-    <style name="Widget.DuckDuckGo.TimePicker" parent="Theme.AppCompat.Light.Dialog.Alert">
-        <item name="android:buttonBarButtonStyle">@style/Widget.DuckDuckGo.LegacyDialogButtonStyle</item>
-        <item name="buttonBarNegativeButtonStyle">@style/Widget.DuckDuckGo.LegacyDialogButtonStyle</item>
-        <item name="buttonBarPositiveButtonStyle">@style/Widget.DuckDuckGo.LegacyDialogButtonStyle</item>
-        <item name="buttonBarNeutralButtonStyle">@style/Widget.DuckDuckGo.LegacyDialogButtonStyle</item>
+    <style name="Widget.Revenge.TimePicker" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="android:buttonBarButtonStyle">@style/Widget.Revenge.LegacyDialogButtonStyle</item>
+        <item name="buttonBarNegativeButtonStyle">@style/Widget.Revenge.LegacyDialogButtonStyle</item>
+        <item name="buttonBarPositiveButtonStyle">@style/Widget.Revenge.LegacyDialogButtonStyle</item>
+        <item name="buttonBarNeutralButtonStyle">@style/Widget.Revenge.LegacyDialogButtonStyle</item>
         <item name="colorAccent">?attr/daxColorAccentBlue</item>
         <item name="colorControlActivated">?attr/daxColorAccentBlue</item>
         <item name="colorControlHighlight">?attr/daxColorAccentBlue</item>
@@ -326,34 +326,34 @@
         <item name="android:textColorSecondaryInverse">?daxColorPrimaryInvertedText</item>
     </style>
 
-    <style name="Widget.DuckDuckGo.LegacyDialogButtonStyle" parent="Widget.AppCompat.Button.ButtonBar.AlertDialog">
+    <style name="Widget.Revenge.LegacyDialogButtonStyle" parent="Widget.AppCompat.Button.ButtonBar.AlertDialog">
         <item name="android:textColor">?attr/daxColorAccentBlue</item>
     </style>
 
-    <style name="Widget.DuckDuckGo.DialogCorners">
+    <style name="Widget.Revenge.DialogCorners">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">@dimen/dialogBorderRadius</item>
     </style>
 
-    <style name="Widget.DuckDuckGo.Dialog.Content">
+    <style name="Widget.Revenge.Dialog.Content">
         <item name="android:paddingTop">@dimen/keyline_5</item>
         <item name="android:paddingBottom">@dimen/dialogContentPaddingBottom</item>
         <item name="android:paddingStart">@dimen/keyline_5</item>
         <item name="android:paddingEnd">@dimen/keyline_5</item>
     </style>
 
-    <style name="Widget.DuckDuckGo.DialogFullScreen">
+    <style name="Widget.Revenge.DialogFullScreen">
         <item name="android:windowIsFloating">false</item>
     </style>
 
-    <!-- Dax Dialog -->
-    <style name="Widget.DuckDuckGo.DaxDialogFragment" parent="android:Theme.DeviceDefault.Light.NoActionBar">
+    <!-- Revenge Dialog -->
+    <style name="Widget.Revenge.RevengeDialogFragment" parent="android:Theme.DeviceDefault.Light.NoActionBar">
         <item name="android:windowTranslucentStatus">true</item>
     </style>
 
-    <style name="Widget.DuckDuckGo.DaxDialog"/>
+    <style name="Widget.Revenge.RevengeDialog"/>
 
-    <style name="Widget.DuckDuckGo.DaxDialog.Outline">
+    <style name="Widget.Revenge.RevengeDialog.Outline">
         <item name="cardCornerRadius">@dimen/largeShapeCornerRadius</item>
         <item name="android:backgroundTint">?attr/daxColorSurface</item>
         <item name="android:layout_marginStart">@dimen/keyline_4</item>
@@ -361,7 +361,7 @@
         <item name="android:layout_marginBottom">@dimen/keyline_4</item>
     </style>
 
-    <style name="Widget.DuckDuckGo.DaxDialog.Content">
+    <style name="Widget.Revenge.RevengeDialog.Content">
         <item name="android:paddingTop">@dimen/daxDialogContentPaddingTop</item>
         <item name="android:paddingBottom">@dimen/dialogContentPaddingBottom</item>
         <item name="android:paddingStart">@dimen/dialogContentPaddingStart</item>
@@ -369,7 +369,7 @@
     </style>
 
     <!-- Text Input -->
-    <style name="Widget.DuckDuckGo.SearchInput" parent="@style/Typography.DuckDuckGo.Body1">
+    <style name="Widget.Revenge.SearchInput" parent="@style/Typography.Revenge.Body1">
         <item name="android:textColor">?attr/daxColorPrimaryText</item>
         <item name="android:textColorHint">?attr/daxColorSecondaryText</item>
         <item name="android:selectAllOnFocus">true</item>
@@ -380,53 +380,53 @@
         <item name="android:textCursorDrawable">@drawable/text_cursor</item>
     </style>
 
-    <style name="Widget.DuckDuckGo.TextInput" parent="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
-        <item name="shapeAppearance">@style/ShapeAppearance.DuckDuckGo.SmallComponent</item>
+    <style name="Widget.Revenge.TextInput" parent="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <item name="shapeAppearance">@style/ShapeAppearance.Revenge.SmallComponent</item>
         <item name="boxStrokeColor">@color/text_input_box_color_selector</item>
         <item name="endIconTint">?attr/daxColorPrimaryIcon</item>
         <item name="hintTextColor">@color/text_input_hint_color_selector</item>
         <item name="android:textColorHint">@color/text_input_hint_color_selector</item>
-        <item name="android:theme">@style/Widget.DuckDuckGo.TextInputCursor</item>
+        <item name="android:theme">@style/Widget.Revenge.TextInputCursor</item>
         <item name="errorIconDrawable">@null</item>
     </style>
 
-    <style name="Widget.DuckDuckGo.TextInputText">
-        <item name="android:textAppearance">@style/Typography.DuckDuckGo.Body1</item>
+    <style name="Widget.Revenge.TextInputText">
+        <item name="android:textAppearance">@style/Typography.Revenge.Body1</item>
         <item name="android:textColor">?attr/daxColorPrimaryText</item>
     </style>
 
     <!-- The color of the cursor comes from the theme, not the widget itself -->
-    <style name="Widget.DuckDuckGo.TextInputCursor">
+    <style name="Widget.Revenge.TextInputCursor">
         <item name="android:colorControlActivated">?attr/daxColorAccentBlue</item>
         <item name="colorControlActivated">?attr/daxColorAccentBlue</item>
         <item name="android:colorPrimary">?attr/daxColorAccentBlue</item>
         <item name="colorPrimary">?attr/daxColorAccentBlue</item>
     </style>
 
-    <style name="Widget.DuckDuckGo.RoundedDialog" parent="@style/ThemeOverlay.MaterialComponents.MaterialAlertDialog">
-        <item name="shapeAppearanceOverlay">@style/Widget.DuckDuckGo.DialogCorners</item>
+    <style name="Widget.Revenge.RoundedDialog" parent="@style/ThemeOverlay.MaterialComponents.MaterialAlertDialog">
+        <item name="shapeAppearanceOverlay">@style/Widget.Revenge.DialogCorners</item>
     </style>
 
     <!-- Bottom Sheet -->
-    <style name="Widget.DuckDuckGo.BottomSheetDialog" parent="ThemeOverlay.MaterialComponents.BottomSheetDialog">
-        <item name="bottomSheetStyle">@style/Widget.DuckDuckGo.ModalBottomSheetStyle</item>
+    <style name="Widget.Revenge.BottomSheetDialog" parent="ThemeOverlay.MaterialComponents.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/Widget.Revenge.ModalBottomSheetStyle</item>
     </style>
 
-    <style name="Widget.DuckDuckGo.ModalBottomSheetStyle" parent="Widget.MaterialComponents.BottomSheet.Modal">
-        <item name="shapeAppearanceOverlay">@style/Widget.DuckDuckGo.BottomSheetDialogCorners</item>
+    <style name="Widget.Revenge.ModalBottomSheetStyle" parent="Widget.MaterialComponents.BottomSheet.Modal">
+        <item name="shapeAppearanceOverlay">@style/Widget.Revenge.BottomSheetDialogCorners</item>
         <item name="android:backgroundTint">?attr/daxColorSurface</item>
     </style>
 
-    <style name="Widget.DuckDuckGo.BottomSheetDialogCollapsed" parent="ThemeOverlay.MaterialComponents.BottomSheetDialog">
-        <item name="bottomSheetStyle">@style/Widget.DuckDuckGo.ModalBottomSheetCollapsedStyle</item>
+    <style name="Widget.Revenge.BottomSheetDialogCollapsed" parent="ThemeOverlay.MaterialComponents.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/Widget.Revenge.ModalBottomSheetCollapsedStyle</item>
     </style>
 
-    <style name="Widget.DuckDuckGo.ModalBottomSheetCollapsedStyle" parent="Widget.MaterialComponents.BottomSheet.Modal">
+    <style name="Widget.Revenge.ModalBottomSheetCollapsedStyle" parent="Widget.MaterialComponents.BottomSheet.Modal">
         <item name="backgroundTint">@android:color/transparent</item>
         <item name="behavior_skipCollapsed">true</item>
     </style>
 
-    <style name="Widget.DuckDuckGo.BottomSheetDialogCorners">
+    <style name="Widget.Revenge.BottomSheetDialogCorners">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSizeTopRight">@dimen/dialogBorderRadius</item>
         <item name="cornerSizeTopLeft">@dimen/dialogBorderRadius</item>
@@ -435,14 +435,14 @@
     </style>
 
     <!-- Switches -->
-    <style name="Widget.DuckDuckGo.v3.Switch" parent="Widget.Material3.CompoundButton.MaterialSwitch">
+    <style name="Widget.Revenge.v3.Switch" parent="Widget.Material3.CompoundButton.MaterialSwitch">
         <item name="trackTint">@color/switch_track_tint</item>
         <item name="thumbTint">@color/switch_thumb_tint</item>
         <item name="android:thumb">@drawable/switch_thumb</item>
     </style>
 
     <!-- Slider -->
-    <style name="Widget.DuckDuckGo.Slider" parent="Widget.MaterialComponents.Slider">
+    <style name="Widget.Revenge.Slider" parent="Widget.MaterialComponents.Slider">
         <item name="trackHeight">@dimen/sliderTrackHeight</item>
         <item name="trackColorInactive">?attr/daxColorSliderTrackInactive</item>
         <item name="trackColorActive">?attr/daxColorSliderActive</item>
@@ -450,44 +450,44 @@
     </style>
 
     <!-- Dividers -->
-    <style name="Widget.DuckDuckGo.HorizontalDivider">
+    <style name="Widget.Revenge.HorizontalDivider">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">@dimen/horizontalDividerHeight</item>
         <item name="android:background">?attr/daxColorLines</item>
     </style>
 
-    <style name="Widget.DuckDuckGo.VerticalDivider">
+    <style name="Widget.Revenge.VerticalDivider">
         <item name="android:layout_width">@dimen/verticalDividerWidth</item>
         <item name="android:layout_height">match_parent</item>
         <item name="android:background">?attr/daxColorContainer</item>
     </style>
 
-    <style name="Widget.DuckDuckGo.ListDivider" parent="Widget.MaterialComponents.MaterialDivider">
+    <style name="Widget.Revenge.ListDivider" parent="Widget.MaterialComponents.MaterialDivider">
         <item name="dividerColor">?attr/daxColorLines</item>
         <item name="dividerThickness">@dimen/horizontalDividerHeight</item>
     </style>
 
     <!-- Cards -->
-    <style name="Widget.DuckDuckGo.CardView" parent="Widget.MaterialComponents.CardView">
+    <style name="Widget.Revenge.CardView" parent="Widget.MaterialComponents.CardView">
         <item name="cardBackgroundColor">?attr/daxColorWindow</item>
-        <item name="shapeAppearance">@style/ShapeAppearance.DuckDuckGo.MediumComponent</item>
+        <item name="shapeAppearance">@style/ShapeAppearance.Revenge.MediumComponent</item>
     </style>
 
-    <style name="Widget.DuckDuckGo.OmnibarCardView" parent="Widget.MaterialComponents.CardView">
+    <style name="Widget.Revenge.OmnibarCardView" parent="Widget.MaterialComponents.CardView">
         <item name="cardBackgroundColor">?attr/daxColorWindow</item>
         <item name="cardCornerRadius">@dimen/largeShapeCornerRadius</item>
     </style>
 
-    <style name="Widget.DuckDuckGo.CustomToolbarCardView" parent="Widget.MaterialComponents.CardView">
+    <style name="Widget.Revenge.CustomToolbarCardView" parent="Widget.MaterialComponents.CardView">
         <item name="cardBackgroundColor">?attr/daxColorSurface</item>
         <item name="cardCornerRadius">@dimen/largeShapeCornerRadius</item>
     </style>
 
-    <style name="Widget.DuckDuckGo.TabCardView" parent="Widget.MaterialComponents.CardView">
+    <style name="Widget.Revenge.TabCardView" parent="Widget.MaterialComponents.CardView">
         <item name="cardBackgroundColor">?attr/daxColorWindow</item>
     </style>
 
-    <style name="Widget.DuckDuckGo.GridCard">
+    <style name="Widget.Revenge.GridCard">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:background">@drawable/selectable_rounded_surface_ripple</item>
@@ -495,7 +495,7 @@
     </style>
 
     <!-- Expandable Menu Item Items -->
-    <style name="Widget.DuckDuckGo.DaxExpandableItem">
+    <style name="Widget.Revenge.RevengeExpandableItem">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
     </style>
@@ -503,21 +503,21 @@
     <!-- Styles for Feature Specific Widgets -->
 
     <!-- Fire Dialog -->
-    <style name="Widget.DuckDuckGo.FireDialog" parent="@style/Theme.Design.BottomSheetDialog">
+    <style name="Widget.Revenge.FireDialog" parent="@style/Theme.Design.BottomSheetDialog">
         <item name="android:windowIsFloating">false</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
         <item name="enableEdgeToEdge">true</item>
         <item name="android:enforceNavigationBarContrast" tools:targetApi="q">false</item>
-        <item name="bottomSheetStyle">@style/Widget.DuckDuckGo.FireDialogStyle</item>
+        <item name="bottomSheetStyle">@style/Widget.Revenge.FireDialogStyle</item>
     </style>
 
-    <style name="Widget.DuckDuckGo.FireDialogStyle" parent="@style/Widget.Design.BottomSheet.Modal">
+    <style name="Widget.Revenge.FireDialogStyle" parent="@style/Widget.Design.BottomSheet.Modal">
         <item name="android:background">@android:color/transparent</item>
     </style>
 
     <!-- Search Widget -->
-    <style name="Widget.DuckDuckGo.SearchWidgetFavoriteContainer">
+    <style name="Widget.Revenge.SearchWidgetFavoriteContainer">
         <item name="android:layout_width">@dimen/searchWidgetFavoriteItemContainerWidth</item>
         <item name="android:layout_height">@dimen/searchWidgetFavoriteItemContainerHeight</item>
         <item name="android:gravity">center</item>
@@ -525,7 +525,7 @@
         <item name="android:colorBackground">@color/white</item>
     </style>
 
-    <style name="Widget.DuckDuckGo.SearchWidgetFavoriteFavicon">
+    <style name="Widget.Revenge.SearchWidgetFavoriteFavicon">
         <item name="android:layout_width">@dimen/searchWidgetFavoritesGridItemFavicon</item>
         <item name="android:layout_height">@dimen/searchWidgetFavoritesGridItemFavicon</item>
         <item name="android:layout_gravity">center_horizontal|top</item>
@@ -534,7 +534,7 @@
         <item name="android:elevation">2dp</item>
     </style>
 
-    <style name="Widget.DuckDuckGo.SearchWidgetFavoritePlaceholderFavicon">
+    <style name="Widget.Revenge.SearchWidgetFavoritePlaceholderFavicon">
         <item name="android:layout_width">@dimen/searchWidgetFavoritesGridItemFavicon</item>
         <item name="android:layout_height">@dimen/searchWidgetFavoritesGridItemFavicon</item>
         <item name="android:layout_gravity">center_horizontal|top</item>
@@ -543,7 +543,7 @@
         <item name="android:visibility">gone</item>
     </style>
 
-    <style name="Widget.DuckDuckGo.SearchEmptyWidgetFavoriteFavicon">
+    <style name="Widget.Revenge.SearchEmptyWidgetFavoriteFavicon">
         <item name="android:layout_width">@dimen/searchWidgetFavoritesGridItemFavicon</item>
         <item name="android:layout_height">@dimen/searchWidgetFavoritesGridItemFavicon</item>
         <item name="android:layout_gravity">center_horizontal|top</item>
@@ -551,7 +551,7 @@
         <item name="android:padding">12dp</item>
     </style>
 
-    <style name="Widget.DuckDuckGo.SearchWidgetFavoriteTitle">
+    <style name="Widget.Revenge.SearchWidgetFavoriteTitle">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:gravity">center</item>
@@ -564,7 +564,7 @@
         <item name="android:paddingEnd">6dp</item>
     </style>
 
-    <style name="Widget.DuckDuckGo.SearchWidgetContainer">
+    <style name="Widget.Revenge.SearchWidgetContainer">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:orientation">vertical</item>
@@ -576,7 +576,7 @@
         <item name="android:layout_marginBottom">4dp</item>
     </style>
 
-    <style name="Widget.DuckDuckGo.SearchWidgetSearchBarContainer">
+    <style name="Widget.Revenge.SearchWidgetSearchBarContainer">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">@dimen/searchWidgetSearchBarHeight</item>
         <item name="android:orientation">horizontal</item>
@@ -587,7 +587,7 @@
         <item name="android:elevation">2dp</item>
     </style>
 
-    <style name="Widget.DuckDuckGo.SearchWithFavoritesWidgetSearchBarContainer">
+    <style name="Widget.Revenge.SearchWithFavoritesWidgetSearchBarContainer">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">@dimen/searchWidgetSearchBarHeight</item>
         <item name="android:orientation">horizontal</item>
@@ -600,13 +600,13 @@
         <item name="android:layout_marginEnd">@dimen/searchWidgetSearchBarSideMargin</item>
     </style>
 
-    <style name="Widget.DuckDuckGo.SearchWidgetDDGLogo">
+    <style name="Widget.Revenge.SearchWidgetDDGLogo">
         <item name="android:layout_width">24dp</item>
         <item name="android:layout_height">24dp</item>
         <item name="android:layout_centerVertical">true</item>
     </style>
 
-    <style name="Widget.DuckDuckGo.SearchWidgetInputBox">
+    <style name="Widget.Revenge.SearchWidgetInputBox">
         <item name="android:layout_width">0dp</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_centerVertical">true</item>
@@ -617,13 +617,13 @@
         <item name="android:paddingEnd">10dp</item>
     </style>
 
-    <style name="Widget.DuckDuckGo.SearchWidgetSearchIcon">
+    <style name="Widget.Revenge.SearchWidgetSearchIcon">
         <item name="android:layout_width">24dp</item>
         <item name="android:layout_height">24dp</item>
         <item name="android:layout_centerVertical">true</item>
     </style>
 
-    <style name="Widget.DuckDuckGo.SearchWidgetFavoritesGrid">
+    <style name="Widget.Revenge.SearchWidgetFavoritesGrid">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">match_parent</item>
         <item name="android:layout_marginTop">@dimen/searchWidgetFavoritesTopMargin</item>
@@ -635,7 +635,7 @@
         <item name="android:listSelector">#00000000</item>
     </style>
 
-    <style name="Widget.DuckDuckGo.SearchWidgetEmptyFavoritesHintContainer">
+    <style name="Widget.Revenge.SearchWidgetEmptyFavoritesHintContainer">
         <item name="android:layout_marginTop">16dp</item>
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">match_parent</item>
@@ -644,7 +644,7 @@
         <item name="android:visibility">invisible</item>
     </style>
 
-    <style name="Widget.DuckDuckGo.SearchWidgetEmptyFavoritesHint">
+    <style name="Widget.Revenge.SearchWidgetEmptyFavoritesHint">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_marginStart">24dp</item>
@@ -656,7 +656,7 @@
         <item name="android:textColor">@color/emptyFavoriteDescriptionTextColor</item>
     </style>
 
-    <style name="Widget.DuckDuckGo.SearchWidgetEmptyFavoritesAction">
+    <style name="Widget.Revenge.SearchWidgetEmptyFavoritesAction">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textStyle">bold</item>
@@ -667,7 +667,7 @@
         <item name="android:textColor">@color/emptyFavoriteActionTextColor</item>
     </style>
 
-    <style name="Widget.DuckDuckGo.CheckListItem">
+    <style name="Widget.Revenge.CheckListItem">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:minHeight">@dimen/checkListItemHeight</item>

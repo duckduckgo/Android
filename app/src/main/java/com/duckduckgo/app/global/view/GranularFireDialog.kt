@@ -110,7 +110,7 @@ class GranularFireDialog : BottomSheetDialogFragment(), FireDialog {
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        return BottomSheetDialog(requireContext(), CommonR.style.Widget_DuckDuckGo_FireDialog)
+        return BottomSheetDialog(requireContext(), CommonR.style.Widget_Revenge_FireDialog)
     }
 
     @Suppress("DEPRECATION")

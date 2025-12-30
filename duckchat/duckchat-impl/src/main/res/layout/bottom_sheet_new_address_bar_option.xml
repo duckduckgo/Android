@@ -171,7 +171,7 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/newAddressBarOptionBottomSheetDialogSearchAndDuckAiButton"
+                android:id="@+id/newAddressBarOptionBottomSheetDialogSearchAndRevengeAIButton"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
                 android:background="@drawable/background_new_address_bar_option_selected"
@@ -179,18 +179,18 @@
                 android:focusable="true">
 
                 <com.duckduckgo.common.ui.view.text.DaxTextView
-                    android:id="@+id/searchAndDuckAiText"
+                    android:id="@+id/searchAndRevengeAIText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/keyline_4"
-                    android:text="@string/newAddressBarOptionBottomSheetDialogSearchAndDuckAi"
+                    android:text="@string/newAddressBarOptionBottomSheetDialogSearchAndRevengeAI"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     app:typography="body1" />
 
                 <com.google.android.material.checkbox.MaterialCheckBox
-                    android:id="@+id/searchAndDuckAiCheckbox"
+                    android:id="@+id/searchAndRevengeAICheckbox"
                     android:layout_width="@dimen/keyline_5"
                     android:layout_height="@dimen/keyline_5"
                     android:layout_marginEnd="@dimen/keyline_4"

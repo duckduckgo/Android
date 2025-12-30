@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (c) 2022 DuckDuckGo
+  ~ Copyright (c) 2022 Revenge
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -17,9 +17,9 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="appName" translatable="false">DuckDuckGo</string>
-    <string name="appDescription" translatable="false">DuckDuckGo</string>
-    <string name="duckDuckGoLogoDescription">DuckDuckGo logotips</string>
+    <string name="appName" translatable="false">Revenge</string>
+    <string name="appDescription" translatable="false">Revenge</string>
+    <string name="duckDuckGoLogoDescription">Revenge logotips</string>
     <string name="duckDuckGoProtectionPrivacyPeaceTagLine">Aizsardzība. Privātums. Sirds miers.</string>
     <string name="yes">Jā</string>
     <string name="no">Nē</string>
@@ -28,15 +28,15 @@
     <string name="search">Meklēt</string>
 
     <!-- Onboarding Activity -->
-    <string name="onboardingDefaultBrowserDescription">Atver iestatījumu sadaļu, lai katru reizi meklētu un pārlūkotu ar DuckDuckGo.</string>
-    <string name="onboardingDefaultBrowserTitle">Padarīt DuckDuckGo par noklusējumu</string>
+    <string name="onboardingDefaultBrowserDescription">Atver iestatījumu sadaļu, lai katru reizi meklētu un pārlūkotu ar Revenge.</string>
+    <string name="onboardingDefaultBrowserTitle">Padarīt Revenge par noklusējumu</string>
 
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Nevar palaist lietotnes noklusējuma iestatījumu ekrānu</string>
     <string name="setAsDefaultBrowser">Iestatīt kā noklusējuma pārlūku</string>
     <string name="defaultBrowserMaybeLater">Varbūt vēlāk</string>
     <string name="defaultBrowserDescriptionNoDefault">Katru reizi atver saites bez raizēm.</string>
-    <string name="defaultBrowserInstructions">Atlasi DuckDuckGo un pieskaries <font color="#678fff">Vienmēr</font>.</string>
+    <string name="defaultBrowserInstructions">Atlasi Revenge un pieskaries <font color="#678fff">Vienmēr</font>.</string>
 
     <!-- Browser Activity -->
     <string name="browserPopupMenu">Pārlūka izvēlne</string>
@@ -91,11 +91,11 @@
     <!-- Opening external apps -->
     <string name="openExternalApp">Atvērt ārējo lietotni</string>
     <string name="launchingExternalApp">Atvērt citā lietotnē</string>
-    <string name="confirmOpenExternalApp">Vai vēlies iziet no DuckDuckGo, lai skatītu šo saturu?</string>
+    <string name="confirmOpenExternalApp">Vai vēlies iziet no Revenge, lai skatītu šo saturu?</string>
     <string name="unableToOpenLink">Nevar atvērt šāda veida saites</string>
 
     <!-- Tabs -->
-    <string name="homeTab" translatable="false">DuckDuckGo</string>
+    <string name="homeTab" translatable="false">Revenge</string>
     <string name="tabActivityTitle">Cilnes</string>
     <string name="tabsMenuItem">Cilnes</string>
     <string name="newTabMenuItem">Jauna cilne</string>
@@ -120,7 +120,7 @@
     <!-- Fire -->
     <string name="fireMenu">Notīrīt datus</string>
     <string name="fireClearAll">Notīrīt cilnes un datus</string>
-    <string name="fireClearAllPlusDuckChats">Notīrīt cilnes, datus un Duck.ai tērzēšanas sarunas</string>
+    <string name="fireClearAllPlusRevenge_Chats">Notīrīt cilnes, datus un Revenge AI tērzēšanas sarunas</string>
     <string name="fireCancel">Atcelt</string>
     <string name="fireDataCleared">Dati ir notīrīti</string>
 
@@ -130,7 +130,7 @@
     <string name="settingsHeadingProtections">Aizsardzība</string>
     <string name="settingsHeadingAppearance">Izskats</string>
     <string name="settingsHeadingAbout">Par</string>
-    <string name="settingsAboutDuckduckgo">Par DuckDuckGo</string>
+    <string name="settingsAboutDuckduckgo">Par Revenge</string>
     <string name="settingsVersion">Versija</string>
     <string name="leaveFeedback">Kopīgot atsauksmi</string>
     <string name="leaveFeedbackNew">Sūtīt atsauksmi</string>
@@ -160,12 +160,12 @@
     <string name="settingsAddWidget">Pievienot logrīku sākuma ekrānam</string>
     <string name="settingsAddressBarPosition">Iestati adreses joslas pozīciju</string>
     <string name="settingsEnableVoiceSearch">Iespējo privātu balss meklēšanu</string>
-    <string name="settingsDDGOnOtherPlatforms">DuckDuckGo citās platformās</string>
-    <string name="settingsDuckAi">Mākslīgā intelekta funkcijas</string>
+    <string name="settingsDDGOnOtherPlatforms">Revenge citās platformās</string>
+    <string name="settingsRevengeAI">Mākslīgā intelekta funkcijas</string>
 
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">Privāta meklēšana</string>
-    <string name="privateSearchDescription">DuckDuckGo Private Search ir tava noklusējuma meklētājprogramma, tāpēc vari meklēt tīmeklī, netiekot izsekotam.</string>
+    <string name="privateSearchDescription">Revenge Private Search ir tava noklusējuma meklētājprogramma, tāpēc vari meklēt tīmeklī, netiekot izsekotam.</string>
     <string name="privateSearchMoreSearchSettingsPrimaryText">Vairāk meklēšanas iestatījumu</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Pielāgo savu meklēšanas valodu, reģionu un citus iestatījumus</string>
     <string name="privateSearchMoreSearchSettingsTitle">Vairāk meklēšanas iestatījumu</string>
@@ -184,7 +184,7 @@
     <string name="webTrackingProtectionActivityTitle">Tīmekļa izsekošanas aizsardzība</string>
     <string name="webTrackingProtectionLearnMoreTitle">Tīmekļa izsekošanas aizsardzība</string>
     <string name="webTrackingProtectionTitle">Tīmekļa izsekošanas aizsardzība</string>
-    <string name="webTrackingProtectionExplanationDescription"><![CDATA[DuckDuckGo pārlūkprogramma nodrošina izsekošanas aizsardzības, kas vienmēr ir aktīvas.\n<a href=\"\">Uzzināt vairāk</a>]]></string>
+    <string name="webTrackingProtectionExplanationDescription"><![CDATA[Revenge pārlūkprogramma nodrošina izsekošanas aizsardzības, kas vienmēr ir aktīvas.\n<a href=\"\">Uzzināt vairāk</a>]]></string>
     <string name="webTrackingProtectionExplanationTitle">Kā mēs tevi aizsargājam</string>
     <string name="webTrackingProtectionThirdPartyTrackersTitle">Bloķē trešo pušu izsekotājus</string>
     <string name="webTrackingProtectionThirdPartyTrackersDescription">Palīdz bloķēt trešo pušu sīkfailus, kas izseko tevi no vietnes uz vietni un neļauj ielādēt trešo pušu izsekotājus.</string>
@@ -229,7 +229,7 @@
     <string name="settingsAutomaticallyClearWhatOptionNone">Nav</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Cilnes</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Cilnes un dati</string>
-    <string name="settingsAutomaticallyClearWhatOptionTabsAndDataAndChats">Cilnes, dati un Duck.ai tērzēšanas</string>
+    <string name="settingsAutomaticallyClearWhatOptionTabsAndDataAndChats">Cilnes, dati un Revenge AI tērzēšanas</string>
 
     <string name="settingsAutomaticallyClearWhen">Notīrīt…</string>
     <string name="settingsAutomaticallyClearWhenDialogTitle">Notīrīt…</string>
@@ -239,16 +239,16 @@
     <string name="settingsAutomaticallyClearWhenAppExit15Minutes">Iziešana no lietotnes, neaktīva 15 minūtes</string>
     <string name="settingsAutomaticallyClearWhenAppExit30Minutes">Iziešana no lietotnes, neaktīva 30 minūtes</string>
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Iziešana no lietotnes, neaktīva 1 stundu</string>
-    <string name="settingsClearAiDataTitle">Notīrīt Duck.ai tērzēšanas sarunas</string>
-    <string name="settingsClearAiDataDeleteMessage">Fire Button izdzēsīs arī Duck.ai vēsturi, ieskaitot piespraustās tērzēšanas.</string>
+    <string name="settingsClearAiDataTitle">Notīrīt Revenge AI tērzēšanas sarunas</string>
+    <string name="settingsClearAiDataDeleteMessage">Fire Button izdzēsīs arī Revenge AI vēsturi, ieskaitot piespraustās tērzēšanas.</string>
     <string name="settingsClearDataActionSecondaryText">Notīra visas cilnes un datus par visām vietnēm, kuras neesi iestatījis Fireproof.</string>
-    <string name="settingsClearDataActionPlusDuckChatsSecondaryText">Notīra visas cilnes, Duck.ai tērzēšanas sarunas un datus par visām vietnēm, kurās neesi iestatījis Fireproof.</string>
+    <string name="settingsClearDataActionPlusRevenge_ChatsSecondaryText">Notīra visas cilnes, Revenge AI tērzēšanas sarunas un datus par visām vietnēm, kurās neesi iestatījis Fireproof.</string>
 
     <!-- About Activity -->
-    <string name="aboutActivityTitle">Par DuckDuckGo</string>
+    <string name="aboutActivityTitle">Par Revenge</string>
     <string name="aboutActivityTitleNew">Par</string>
     <string name="aboutHeaderNewTagLine">Aizsardzība. Privātums. Sirds miers.</string>
-    <string name="aboutDescriptionBrandUpdate2025">Laipni lūgti Duck pusē!\n\nDuckDuckGo ir neatkarīgs tiešsaistes aizsardzības uzņēmums ikvienam, kurš vēlas atgūt kontroli pār savu personisko informāciju.\n\nMēs uzskatām, ka labākais veids, kā aizsargāt savu personisko informāciju no hakeriem, krāpniekiem un privātumu apdraudošiem uzņēmumiem, ir to neievākt vispār. Tāpēc miljoniem cilvēku <annotation type="chart_comparison">izvēlas DuckDuckGo, nevis Chrome un citas pārlūkprogrammas</annotation> meklēšanai un pārlūkošanai tiešsaistē. Mūsu iebūvētā meklētājprogramma ir līdzīga Google, taču tā neizsekotavus meklēšanas vaicājumus. Mūsu pārlūkošanas aizsardzība, piemēram, reklāmu izsekotāju bloķēšana un sīkfailu bloķēšana neļauj citiem uzņēmumiem ievākt tavus datus. Turklāt mūsu pārlūkprogramma ir bezmaksas — mēs pelnām ar <annotation type="privacy_respecting_ads">meklēšanas laikā rādītām reklāmām, kas ievēro privātumu</annotation>, nevis izmantojot tavus datus.Turklāt mēs piedāvājam arī <annotation type="ppro_help_page">DuckDuckGo abonementu</annotation>, kas ir integrēts mūsu pārlūkprogrammā. Abonenti saņem vēl lielāku privātuma aizsardzību ar ātru un vienkāršu <annotation type="vpn_help_page">VPN</annotation>, kas palīdz pasargāt tavas darbības tiešsaistē, piekļuvi uzlabotiem MI modeļiem mūsu privātajā MI tērzēšanas pakalpojumā Duck.ai, pakalpojumu, kas atrod un izdzēš tavu personisko informāciju no cilvēku meklētāju vietnēm, un pakalpojumu, kas atjauno tavu identitāti, ja tā tiek nozagta.\n\nAtgūsti kontroli pār savu personisko informāciju ar pārlūkprogrammu, kas paredzēta datu aizsardzībai, nevis datu apkopošanai.</string>
+    <string name="aboutDescriptionBrandUpdate2025">Laipni lūgti Duck pusē!\n\nRevenge ir neatkarīgs tiešsaistes aizsardzības uzņēmums ikvienam, kurš vēlas atgūt kontroli pār savu personisko informāciju.\n\nMēs uzskatām, ka labākais veids, kā aizsargāt savu personisko informāciju no hakeriem, krāpniekiem un privātumu apdraudošiem uzņēmumiem, ir to neievākt vispār. Tāpēc miljoniem cilvēku <annotation type="chart_comparison">izvēlas Revenge, nevis Chrome un citas pārlūkprogrammas</annotation> meklēšanai un pārlūkošanai tiešsaistē. Mūsu iebūvētā meklētājprogramma ir līdzīga Google, taču tā neizsekotavus meklēšanas vaicājumus. Mūsu pārlūkošanas aizsardzība, piemēram, reklāmu izsekotāju bloķēšana un sīkfailu bloķēšana neļauj citiem uzņēmumiem ievākt tavus datus. Turklāt mūsu pārlūkprogramma ir bezmaksas — mēs pelnām ar <annotation type="privacy_respecting_ads">meklēšanas laikā rādītām reklāmām, kas ievēro privātumu</annotation>, nevis izmantojot tavus datus.Turklāt mēs piedāvājam arī <annotation type="ppro_help_page">Revenge abonementu</annotation>, kas ir integrēts mūsu pārlūkprogrammā. Abonenti saņem vēl lielāku privātuma aizsardzību ar ātru un vienkāršu <annotation type="vpn_help_page">VPN</annotation>, kas palīdz pasargāt tavas darbības tiešsaistē, piekļuvi uzlabotiem MI modeļiem mūsu privātajā MI tērzēšanas pakalpojumā Revenge AI, pakalpojumu, kas atrod un izdzēš tavu personisko informāciju no cilvēku meklētāju vietnēm, un pakalpojumu, kas atjauno tavu identitāti, ja tā tiek nozagta.\n\nAtgūsti kontroli pār savu personisko informāciju ar pārlūkprogrammu, kas paredzēta datu aizsardzībai, nevis datu apkopošanai.</string>
     <string name="no_suggestions">Nav ieteikumu</string>
 
     <!-- Broken Site Activity -->
@@ -259,7 +259,7 @@
     <string name="brokenSiteProtectionsOnBannerMessage">Aizsardzības IZSLĒGŠANA var palīdzēt.</string>
 
     <!-- Widget -->
-    <string name="searchWidgetTextHint">Meklēt DuckDuckGo</string>
+    <string name="searchWidgetTextHint">Meklēt Revenge</string>
 
     <!-- Favorites widget -->
     <string name="addFavoriteMenuTitleHighlighted">👋 Pievienot izlasei</string>
@@ -272,7 +272,7 @@
     <string name="searchWidgetEmtpyFavoritesCta">Pievienot izlases vienumu</string>
     <string name="widgetConfigurationActivityTitle">Logrīka konfigurācija</string>
     <string name="favoritesWidgetLabel">Meklēšana un izlase</string>
-    <string name="searchWidgetLabel">Meklēšana un Duck.ai</string>
+    <string name="searchWidgetLabel">Meklēšana un Revenge AI</string>
 
     <!-- Home Screen Shortcuts -->
 
@@ -284,7 +284,7 @@
     <string name="surveyCtaLaunchButton">Piedalīties aptaujā</string>
     <string name="surveyCtaDismissButton">Nē, paldies</string>
     <string name="surveyActivityTitle">Lietotāju aptauja</string>
-    <string name="surveyTitle">DUCKDUCKGO APTAUJA</string>
+    <string name="surveyTitle">REVENGE APTAUJA</string>
     <string name="surveyDismissContentDescription">Nerādīt aptauju</string>
     <string name="surveyLoadingErrorTitle">Ak, vai!</string>
     <string name="surveyLoadingErrorText">Mūsu aptauju pašlaik nevar ielādēt.\nLūdzu, vēlāk pamēģini vēlreiz.</string>
@@ -299,14 +299,14 @@
     <string name="addWidgetInstruction1Label">1</string>
     <string name="addWidgetInstruction1">Ilgi nospied sākuma ekrānā, pēc tam atver logrīku izvēlni.</string>
     <string name="addWidgetInstruction2Label">2</string>
-    <string name="addWidgetInstruction2">Atrodi DuckDuckGo logrīku.</string>
+    <string name="addWidgetInstruction2">Atrodi Revenge logrīku.</string>
     <string name="addWidgetInstruction3Label">3</string>
     <string name="addWidgetInstruction3">Velc logrīku uz sākuma ekrānu.</string>
     <string name="addWidgetInstructionsButtonGoHome">Doties uz sākuma ekrānu</string>
     <string name="addWidgetInstructionsButtonClose">Aizvērt</string>
 
     <!-- App Enjoyment / Rating / Feedback -->
-    <string name="appEnjoymentDialogTitle">Vai tev patīk DuckDuckGo?</string>
+    <string name="appEnjoymentDialogTitle">Vai tev patīk Revenge?</string>
     <string name="appEnjoymentDialogMessage">Mēs labprāt uzzinātu tavas domas.</string>
     <string name="appEnjoymentDialogPositiveButton">Man patīk</string>
     <string name="appEnjoymentDialogNegativeButton">Nepieciešami uzlabojumi</string>
@@ -328,15 +328,15 @@
 
     <!-- Clear Notification -->
     <string name="clearNotificationTitle">Datu notīrīšana ir iestatīta uz manuālu notīrīšanu</string>
-    <string name="clearNotificationDescription">Pielāgo DuckDuckGo, lai pēc katras sesijas automātiski notīrītu pārlūkošanas datus.</string>
+    <string name="clearNotificationDescription">Pielāgo Revenge, lai pēc katras sesijas automātiski notīrītu pārlūkošanas datus.</string>
 
     <!-- Privacy Protection Notification -->
     <string name="privacyProtectionNotificationDefaultTitle">Mēs aizsargājam tavu privātumu</string>
     <string name="privacyProtectionNotificationReportTitle">Tavs privātuma ziņojums</string>
-    <string name="privacyProtectionNotificationDefaultDescription">Izmantojot lietotni DuckDuckGo, tavi dati tiek aizsargāti, bloķējot izsekotājus un šifrējot savienojumus.</string>
-    <string name="privacyProtectionNotificationUpgadeDescription" instruction="Placeholder is a the number of connections we have protected">DuckDuckGo izmantošanas laikā tu aizsargāji savus datus, nodrošinot %1$d nešifrētos savienojumus.</string>
-    <string name="privacyProtectionNotificationTrackerDescription" instruction="Placeholder is the numer of trackers blocked">DuckDuckGo izmantošanas laikā tu aizsargāji savus datus, bloķējot %1$d izsekotājus.</string>
-    <string name="privacyProtectionNotificationBothDescription" instruction="%1$d is the number of trackers blocked and %2$d is the number of unencrypted connections">DuckDuckGo izmantošanas laikā tu aizsargāji savus datus, bloķējot %1$d izsekotājus un nodrošinot %2$d nešifrētos savienojumus.</string>
+    <string name="privacyProtectionNotificationDefaultDescription">Izmantojot lietotni Revenge, tavi dati tiek aizsargāti, bloķējot izsekotājus un šifrējot savienojumus.</string>
+    <string name="privacyProtectionNotificationUpgadeDescription" instruction="Placeholder is a the number of connections we have protected">Revenge izmantošanas laikā tu aizsargāji savus datus, nodrošinot %1$d nešifrētos savienojumus.</string>
+    <string name="privacyProtectionNotificationTrackerDescription" instruction="Placeholder is the numer of trackers blocked">Revenge izmantošanas laikā tu aizsargāji savus datus, bloķējot %1$d izsekotājus.</string>
+    <string name="privacyProtectionNotificationBothDescription" instruction="%1$d is the number of trackers blocked and %2$d is the number of unencrypted connections">Revenge izmantošanas laikā tu aizsargāji savus datus, bloķējot %1$d izsekotājus un nodrošinot %2$d nešifrētos savienojumus.</string>
     <string name="privacyProtectionNotificationLaunchButton">Atsākt pārlūkošanu</string>
 
     <!-- Authentication -->
@@ -348,7 +348,7 @@
     <string name="authenticationDialogPasswordHint">Parole</string>
 
     <!-- User-facing label for when a user selects text and might want to search for that text -->
-    <string name="systemTextSearchMessage">Meklēt DuckDuckGo</string>
+    <string name="systemTextSearchMessage">Meklēt Revenge</string>
 
     <!-- App feedback disambiguation -->
     <string name="feedbackActivityTitle">Kopīgot atsauksmi</string>
@@ -367,8 +367,8 @@
     <string name="websiteNotLoadingTitleShort">Vietņu ielādes problēmas</string>
     <string name="websiteNotLoadingSubtitle">Kura vietne ir bojāta?</string>
 
-    <string name="searchNotGoodEnoughTitleLong">DuckDuckGo meklētājs nav pietiekami labs</string>
-    <string name="searchNotGoodEnoughTitleShort">DuckDuckGo meklēšanas problēmas</string>
+    <string name="searchNotGoodEnoughTitleLong">Revenge meklētājs nav pietiekami labs</string>
+    <string name="searchNotGoodEnoughTitleShort">Revenge meklēšanas problēmas</string>
     <string name="searchNotGoodEnoughSubtitle">Kuru meklēšanas funkciju mēs varam pievienot vai uzlabot?</string>
     <string name="searchNotGoodEnoughSubReasonTechnicalSearches">Programmēšana/tehniskā meklēšana</string>
     <string name="searchNotGoodEnoughSubReasonGoogleLayout">Izkārtojumam vajadzētu vairāk līdzināties Google izkārtojumam</string>
@@ -428,8 +428,8 @@
 
     <!-- System Search-->
     <string name="systemSearchAppNotFound">Lietojumprogrammu nevarēja atrast</string>
-    <string name="systemSearchOnboardingThanks">Paldies, ka izvēlējies DuckDuckGo!\nMūsu pārlūkprogrammas izmantošana palīdz aizsargāt tevi no hakeriem, krāpniekiem un uzņēmumiem, kas alkst pēc personu datiem.</string>
-    <string name="systemSearchOnboardingFeaturesIntroText">Tāpat DuckDuckGo lietotne:</string>
+    <string name="systemSearchOnboardingThanks">Paldies, ka izvēlējies Revenge!\nMūsu pārlūkprogrammas izmantošana palīdz aizsargāt tevi no hakeriem, krāpniekiem un uzņēmumiem, kas alkst pēc personu datiem.</string>
+    <string name="systemSearchOnboardingFeaturesIntroText">Tāpat Revenge lietotne:</string>
     <string name="systemSearchOnboardingFeatureOneText">Bloķē nedrošus izsekotājus.</string>
     <string name="systemSearchOnboardingFeatureTwoText">Veic piespiedu šifrēšanu vietnēs.</string>
     <string name="systemSearchOnboardingFeatureThreeText">Notīra datus ar vienu pieskārienu.</string>
@@ -437,18 +437,18 @@
     <string name="systemSearchOnboardingButtonLess">Paslēpt</string>
     <string name="systemSearchOnboardingButtonOk">Sapratu</string>
 
-    <!-- Dax Dialog -->
+    <!-- Revenge Dialog -->
     <string name="daxDialogHighFive">Dod pieci!</string>
     <string name="daxDialogGotIt">Sapratu</string>
 
-    <!-- AppTP Retention Experiment Dax Dialog -->
+    <!-- AppTP Retention Experiment Revenge Dialog -->
     <string name="daxDialogAppTpRetentionText"><![CDATA[Tagad tu bloķē izsekotājus visā tīmeklī 🎉<br/><br/>Es varu bloķēt arī citās lietotnēs paslēptus izsekotājus – pat laikā, kad tu tālruni neizmanto.]]></string>
     <string name="daxDialogAppTpRetentionPrimaryButtonText">Iespējot Lietotņu pretizsekošanas aizsardzību</string>
     <string name="daxDialogAppTpRetentionSecondaryButtonText">Ne tagad</string>
 
     <!-- New Onboarding Experience -->
-    <string name="onboardingWelcomeTitle">"Laipni lūdzam DuckDuckGo!"</string>
-    <string name="onboardingDaxText"><![CDATA[Internets var būt diezgan “mežonīgs”.\n\nBet neuztraucies! Meklēt un pārlūkot privātā režīmā ir vieglāk, nekā tu domā.]]></string>
+    <string name="onboardingWelcomeTitle">"Laipni lūdzam Revenge!"</string>
+    <string name="onboardingRevengeText"><![CDATA[Internets var būt diezgan “mežonīgs”.\n\nBet neuztraucies! Meklēt un pārlūkot privātā režīmā ir vieglāk, nekā tu domā.]]></string>
     <string name="onboardingLetsDoItButton">Aiziet!</string>
     <string name="daxNonSerpCtaText"><![CDATA[Tev pieskaroties un ritinot, es bloķēšu uzmācīgos izsekotājus. <br/><br/>Aiziet! Turpini pārlūkot!]]></string>
     <string name="daxMainNetworkCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Mazs brīdinājums! Es nevaru liegt %1$s skatīt tavas darbības domēnā %2$s &lt;br/&gt;&lt;br/&gt;Taču pārlūko kopā ar mani, jo es varu ierobežot to, ko %3$s zina par tevi kopumā, bloķējot viņu izsekotājus daudzās citās vietnēs.</string>
@@ -536,7 +536,7 @@
     <string name="dosErrorMessage">Savienojums pārtraukts. Šī vietne var kaitēt tavai ierīcei.</string>
 
     <!-- Precise Location -->
-    <string name="preciseLocationSystemDialogTitle">Vai iespējot ierīces atrašanās vietu DuckDuckGo privātuma pārlūkprogrammai?</string>
+    <string name="preciseLocationSystemDialogTitle">Vai iespējot ierīces atrašanās vietu Revenge privātuma pārlūkprogrammai?</string>
     <string name="preciseLocationSystemDialogSubtitle" instruction="%1$s and %2$s are both the name of the website requesting the location">%1$s pieprasa tavas ierīces atrašanās vietu. Vispirms tev ir jāatļauj lietotnei nosūtīt tavas ierīces atrašanās vietu, pēc tam %2$s var pieprasīt atļauju.</string>
     <string name="preciseLocationSystemDialogAllow">Iespējot</string>
     <string name="preciseLocationSystemDialogDeny">Varbūt vēlāk</string>
@@ -548,7 +548,7 @@
     <string name="preciseLocationSiteDialogAllowOnce">Tikai šai sesijai</string>
     <string name="preciseLocationSiteDialogDenyAlways">Vienmēr aizliegt</string>
     <string name="preciseLocationSiteDialogDenyOnce">Aizliegt šai sesijai</string>
-    <string name="preciseLocationFeatureDescription">Apmeklētās vietnes var prasīt atklāt tavas ierīces atrašanās vietu. Tās nevarēs tai piekļūt, ja tu skaidri nepiešķirsi atļauju. DuckDuckGo izmanto tavu atrašanās vietu tikai anonīmi, lai nodrošinātu lokālās meklēšanas rezultātus.</string>
+    <string name="preciseLocationFeatureDescription">Apmeklētās vietnes var prasīt atklāt tavas ierīces atrašanās vietu. Tās nevarēs tai piekļūt, ja tu skaidri nepiešķirsi atļauju. Revenge izmanto tavu atrašanās vietu tikai anonīmi, lai nodrošinātu lokālās meklēšanas rezultātus.</string>
     <string name="preciseLocationToggleText">Vietnes var pieprasīt manu atrašanās vietu</string>
     <string name="preciseLocationEmptyListHint">Nevienai vietnei nav piešķirta atļauja piekļūt atrašanās vietai</string>
     <string name="preciseLocationNoSystemPermission">Lai pārvaldītu savas atsevišķām vietnēm piešķirtās atrašanās vietas piekļuves atļaujas, šai lietotnei iespējo atrašanās vietu Android iestatījumos.</string>
@@ -564,7 +564,7 @@
 
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Globālā privātuma kontrole (GPC)</string>
-    <string name="globalPrivacyControlDescription"><![CDATA[DuckDuckGo automātiski bloķē daudzus izsekotājus. Izmantojot globālo privātuma kontroli (GPC), vari arī lūgt iesaistītajām vietnēm ierobežot savu personas datu pārdošanu vai kopīgošanu ar citiem uzņēmumiem. <u><a href=\"\">Uzzini vairāk</a><u/>]]></string>
+    <string name="globalPrivacyControlDescription"><![CDATA[Revenge automātiski bloķē daudzus izsekotājus. Izmantojot globālo privātuma kontroli (GPC), vari arī lūgt iesaistītajām vietnēm ierobežot savu personas datu pārdošanu vai kopīgošanu ar citiem uzņēmumiem. <u><a href=\"\">Uzzini vairāk</a><u/>]]></string>
     <string name="globalPrivacyControlSetting">Globālā privātuma kontrole (GPC)</string>
     <string name="globalPrivacyControlToggle">Globālā privātuma kontrole (GPC)</string>
     <string name="disabled">Atspējots</string>
@@ -600,11 +600,11 @@
     <string name="settingsAccessibility">Pieejamība</string>
     <string name="accessibilityActivityTitle">Pieejamība</string>
     <string name="accessibilityFontSizeTitle">Burtu izmērs</string>
-    <string name="accessibilityFontSizeHint">Velc slīdni, līdz vari šo ērti izlasīt. Vietnes tavā DuckDuckGo tam pielāgosies.</string>
+    <string name="accessibilityFontSizeHint">Velc slīdni, līdz vari šo ērti izlasīt. Vietnes tavā Revenge tam pielāgosies.</string>
     <string name="accessibilityForceZoomTitle">Ieviest manuālu lapas tālummaiņu</string>
     <string name="accessibilityForceZoomSubtitle">Savelc un tuvini jebkurā vietnē, pat tajās, kas parasti to neļautu</string>
     <string name="accessibilityTextSizeOverrideTitle">Pārvaldīt teksta lielumu</string>
-    <string name="accessibilityTextSizeOverrideSubtitle">Teksts vietnēs, kuras skati pakalpojumā DuckDuckGo, tiks pielāgots, lai atbilstu tālāk norādītajam iestatījumam</string>
+    <string name="accessibilityTextSizeOverrideSubtitle">Teksts vietnēs, kuras skati pakalpojumā Revenge, tiks pielāgots, lai atbilstu tālāk norādītajam iestatījumam</string>
 
     <!-- Privacy Policy -->
     <string name="settingsPrivacyPolicyDuckduckgo">Privātuma politika</string>
@@ -673,7 +673,7 @@
     <string name="tabSelectedIndicator">Atlasītās cilnes indikators</string>
     <string name="tabNotSelectedIndicator">Nav atlasīts cilnes indikators</string>
 
-    <string name="shareMultipleLinksTitle" tools:ignore="MissingInstruction">%1$d saites no DuckDuckGo</string>
+    <string name="shareMultipleLinksTitle" tools:ignore="MissingInstruction">%1$d saites no Revenge</string>
     <plurals name="shareLinksMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
         <item quantity="zero">Kopīgot %1$d saites</item>
         <item quantity="one">Kopīgot saiti</item>
@@ -747,7 +747,7 @@
     </plurals>
 
     <!-- Private voice search -->
-    <string name="accessibilityVoiceSearchSubtitle">Pievienot adreses joslai opciju \"Privātā meklēšana ar balsi\". Audioieraksti netiek saglabāti un kopīgoti ar citiem, pat ne ar DuckDuckGo.</string>
+    <string name="accessibilityVoiceSearchSubtitle">Pievienot adreses joslai opciju \"Privātā meklēšana ar balsi\". Audioieraksti netiek saglabāti un kopīgoti ar citiem, pat ne ar Revenge.</string>
     <string name="accessibilityVoiceSearchTitle">Privātā balss meklēšana</string>
 
     <!-- Uploading an image from the camera or choosing to use existing image -->
@@ -755,8 +755,8 @@
     <string name="imageCaptureCameraGalleryDisambiguationTitle">Augšupielādēt attēlu</string>
     <string name="imageCaptureCameraGalleryDisambiguationGalleryOption">Izvēlēties failu</string>
     <string name="imageCaptureCameraGalleryDisambiguationCameraOption">Uzņemt foto</string>
-    <string name="imageCaptureCameraPermissionDeniedTitle">Atļaut DuckDuckGo pieprasīt piekļuvi kamerai šajā ierīcē</string>
-    <string name="imageCaptureCameraPermissionDeniedMessage">Vietnes var izmantot tavu kameru tikai tad, ja tu atļauj DuckDuckGo prasīt piekļuvi.</string>
+    <string name="imageCaptureCameraPermissionDeniedTitle">Atļaut Revenge pieprasīt piekļuvi kamerai šajā ierīcē</string>
+    <string name="imageCaptureCameraPermissionDeniedMessage">Vietnes var izmantot tavu kameru tikai tad, ja tu atļauj Revenge prasīt piekļuvi.</string>
     <string name="imageCaptureCameraPermissionDeniedPositiveButton">Atvērt iestatījumus</string>
     <string name="imageCaptureCameraPermissionDeniedNegativeButton">Atcelt</string>
 
@@ -770,53 +770,53 @@
     <string name="sslErrorHeadline" instruction="Placeholder is domain with certificate issues">Šīs vietnes sertifikāts nav derīgs. Tu, iespējams, izveido savienojumu ar serveri, kas izliekas par %1$s un var pakļaut riskam tavu konfidenciālo informāciju.</string>
     <string name="sslErrorLeaveCTA">Pamest šo vietni</string>
     <string name="sslErrorAdvancedCTA">Detalizēti</string>
-    <string name="sslErrorExpandedHeadline">DuckDuckGo brīdina tevi, ja vietnei ir nederīgs sertifikāts.</string>
+    <string name="sslErrorExpandedHeadline">Revenge brīdina tevi, ja vietnei ir nederīgs sertifikāts.</string>
     <string name="sslErrorExpandedCTA"><![CDATA[<u>Pieņemt risku un apmeklēt vietni</u>]]></string>
     <string name="sslErrorExpiredMessage" instruction="Placeholder is domain with certificate issues">%1$s drošības sertifikāta derīguma termiņš ir beidzies. Iespējams, ka vietne ir nepareizi konfigurēta, ka tavu savienojumu ir apdraudējis kāds uzbrucējs vai ka tavas sistēmas pulkstenis ir nepareizs.</string>
     <string name="sslErrorWrongHostMessage" instruction="Placeholder is domain with certificate issues">%1$s drošības sertifikāts neatbilst *.%2$s. Iespējams, ka vietne ir nepareizi konfigurēta, ka tavu savienojumu ir apdraudējis kāds uzbrucējs vai ka tavas sistēmas pulkstenis ir nepareizs.</string>
     <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">Tavas ierīces operētājsistēma neuzticas %1$s drošības sertifikātam. Iespējams, ka vietne ir nepareizi konfigurēta, ka tavu savienojumu ir apdraudējis kāds uzbrucējs vai ka tavas sistēmas pulkstenis ir nepareizs.</string>
 
     <!-- Extended Onboarding-->
-    <string name="preOnboardingDaxDialog1Title"><![CDATA[Sveiks.<br/><br/>Vai esi gatavs ātrākai pārlūkprogrammai, kas tevi aizsargā?]]></string>
-    <string name="preOnboardingDaxDialog1Button">Aiziet!</string>
-    <string name="preOnboardingDaxDialog1SecondaryButton">Es jau esmu bijis/-usi šeit agrāk</string>
-    <string name="preOnboardingDaxDialog2Title">Aizsardzība ir aktivizēta!</string>
-    <string name="preOnboardingDaxDialog2Button">Izvēlies pārlūku</string>
-    <string name="preOnboardingDaxDialog3Title"><![CDATA[Sapratu! Es izlaidīšu pārējos padomus.]]></string>
-    <string name="preOnboardingDaxDialog3Text"><![CDATA[Atceries: tu vari dzēst visas savas cilnes, vēsturi un pārlūkošanas datus ar diviem pieskārieniem, izmantojot <b>Fire Button</b> 🔥]]></string>
-    <string name="preOnboardingDaxDialog3SecondaryButton">Parādīt pamācību</string>
+    <string name="preOnboardingRevengeDialog1Title"><![CDATA[Sveiks.<br/><br/>Vai esi gatavs ātrākai pārlūkprogrammai, kas tevi aizsargā?]]></string>
+    <string name="preOnboardingRevengeDialog1Button">Aiziet!</string>
+    <string name="preOnboardingRevengeDialog1SecondaryButton">Es jau esmu bijis/-usi šeit agrāk</string>
+    <string name="preOnboardingRevengeDialog2Title">Aizsardzība ir aktivizēta!</string>
+    <string name="preOnboardingRevengeDialog2Button">Izvēlies pārlūku</string>
+    <string name="preOnboardingRevengeDialog3Title"><![CDATA[Sapratu! Es izlaidīšu pārējos padomus.]]></string>
+    <string name="preOnboardingRevengeDialog3Text"><![CDATA[Atceries: tu vari dzēst visas savas cilnes, vēsturi un pārlūkošanas datus ar diviem pieskārieniem, izmantojot <b>Fire Button</b> 🔥]]></string>
+    <string name="preOnboardingRevengeDialog3SecondaryButton">Parādīt pamācību</string>
     <string name="preOnboardingComparisonChartItem1">Meklē privāti pēc noklusējuma</string>
     <string name="preOnboardingComparisonChartItem2">Bloķē trešo pušu izsekotājus</string>
     <string name="preOnboardingComparisonChartItem3">Bloķē sīkfailu uznirstošos logus</string>
     <string name="preOnboardingComparisonChartItem4">Bloķē mērķtiecīgas reklāmas</string>
     <string name="preOnboardingComparisonChartItem5">Dzēst pārlūkošanas datus ar vienu pogu</string>
-    <string name="preOnboardingDaxDialog3Button">Sākt pārlūkošanu</string>
+    <string name="preOnboardingRevengeDialog3Button">Sākt pārlūkošanu</string>
     <string name="preOnboardingAddressBarTitle">Kur novietot adreses joslu?</string>
     <string name="preOnboardingAddressBarOkButton">Nākamais</string>
     <string name="highlightsPreOnboardingAddressBarOption1Title">Augšpusē (pēc noklusējuma)</string>
     <string name="highlightsPreOnboardingAddressBarOption1Description">Viegli pamanāma</string>
     <string name="highlightsPreOnboardingAddressBarOption2Title">Apakšā</string>
     <string name="highlightsPreOnboardingAddressBarOption2Description">Viegli pieejama</string>
-    <string name="onboardingSearchDaxDialogTitle">Izmēģini meklēt!</string>
-    <string name="onboardingSearchDaxDialogDescription">Tavi DuckDuckGo meklējumi vienmēr ir privāti.</string>
-    <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">"kā angliski pateikt “pīle”"</string>
-    <string name="onboardingSearchDaxDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">"kā spāniski pateikt “pīle”"</string>
+    <string name="onboardingSearchRevengeDialogTitle">Izmēģini meklēt!</string>
+    <string name="onboardingSearchRevengeDialogDescription">Tavi Revenge meklējumi vienmēr ir privāti.</string>
+    <string name="onboardingSearchRevengeDialogOption1" instruction="translate &apos;duck&apos; too.">"kā angliski pateikt “pīle”"</string>
+    <string name="onboardingSearchRevengeDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">"kā spāniski pateikt “pīle”"</string>
     <string name="onboardingSearchQueryOption1">kā angliski pateikt “pīle”</string>
     <string name="onboardingSearchQueryOption1English">kā spāniski pateikt “pīle”</string>
-    <string name="onboardingSearchDaxDialogOption2">avatara aktieru sastāvs</string>
-    <string name="onboardingSearchDaxDialogOption2US">mighty ducks aktieri</string>
-    <string name="onboardingSearchDaxDialogOption3">vietējie laikapstākļi</string>
-    <string name="onboardingSearchDaxDialogOption4">Pārsteidz mani!</string>
+    <string name="onboardingSearchRevengeDialogOption2">avatara aktieru sastāvs</string>
+    <string name="onboardingSearchRevengeDialogOption2US">mighty ducks aktieri</string>
+    <string name="onboardingSearchRevengeDialogOption3">vietējie laikapstākļi</string>
+    <string name="onboardingSearchRevengeDialogOption4">Pārsteidz mani!</string>
     <string name="onboardingSearchQueryOption4">mazi pīlēni</string>
-    <string name="onboardingSitesDaxDialogTitle">Pamēģini apmeklēt kādu vietni!</string>
-    <string name="onboardingSitesDaxDialogDescription">Es nobloķēšu izsekotājus, lai tie nevarētu tevi izspiegot.</string>
-    <string name="onboardingSitesDaxDialogOption1">espn.com</string>
-    <string name="onboardingSitesDaxDialogOption2">yahoo.com</string>
-    <string name="onboardingSitesDaxDialogOption3">ebay.com</string>
-    <string name="onboardingSitesDaxDialogOption4">Pārsteidz mani!</string>
-    <string name="onboardingSerpDaxDialogDescription"><![CDATA[Tas ir <b>DuckDuckGo Search</b>! Privāti. Ātri. Mazāk reklāmu.]]></string>
-    <string name="onboardingSerpDaxDialogButton">Sapratu!</string>
-    <string name="onboardingSitesSuggestionsDaxDialogTitle">Tagad pamēģini atvērt kādu vietni!</string>
+    <string name="onboardingSitesRevengeDialogTitle">Pamēģini apmeklēt kādu vietni!</string>
+    <string name="onboardingSitesRevengeDialogDescription">Es nobloķēšu izsekotājus, lai tie nevarētu tevi izspiegot.</string>
+    <string name="onboardingSitesRevengeDialogOption1">espn.com</string>
+    <string name="onboardingSitesRevengeDialogOption2">yahoo.com</string>
+    <string name="onboardingSitesRevengeDialogOption3">ebay.com</string>
+    <string name="onboardingSitesRevengeDialogOption4">Pārsteidz mani!</string>
+    <string name="onboardingSerpRevengeDialogDescription"><![CDATA[Tas ir <b>Revenge Search</b>! Privāti. Ātri. Mazāk reklāmu.]]></string>
+    <string name="onboardingSerpRevengeDialogButton">Sapratu!</string>
+    <string name="onboardingSitesSuggestionsRevengeDialogTitle">Tagad pamēģini atvērt kādu vietni!</string>
     <plurals name="onboardingTrackersBlockedDialogDescription">
         <item quantity="zero"><![CDATA[ un <b>vēl %1$d</b> mēģināja tevi šeit izsekot. Es tos bloķēju!<br/><br/>☝️ Pieskaries vairogam, lai uzzinātu vairāk.️]]></item>
         <item quantity="one"><![CDATA[ un <b>vēl %1$d</b> mēģināja tevi šeit izsekot. Es tos bloķēju!<br/><br/>☝️ Pieskaries vairogam, lai uzzinātu vairāk.️]]></item>
@@ -827,19 +827,19 @@
         <item quantity="one"><![CDATA[ mēģināja tevi šeit izsekot. Es tos bloķēju!<br/><br/>☝️ Pieskaries vairogam, lai uzzinātu vairāk.]]></item>
         <item quantity="other"><![CDATA[ mēģināja tevi šeit izsekot. Es tos bloķēju!<br/><br/>☝️ Pieskaries vairogam, lai uzzinātu vairāk. ️]]></item>
     </plurals>
-    <string name="onboardingTrackersBlockedDaxDialogButton">Sapratu!</string>
-    <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Nekavējoties notīri savu pārlūkošanas vēsturi, izmantojot <b>Fire Button</b>.<br/><br/>Izmēģini! 🔥]]></string>
-    <string name="onboardingFireButtonDaxDialogOkButton">Izmēģini</string>
-    <string name="onboardingFireButtonDaxDialogCancelButton">Izlaist</string>
-    <string name="onboardingEndDaxDialogTitle">"Izdevās!"</string>
-    <string name="onboardingEndDaxDialogDescription">Atceries: katru reizi, kad pārlūkosi kopā ar mani, kaitinošās reklāmas zaudēs savu spēku!</string>
-    <string name="onboardingInContextEndDaxDialogDescription">Atceries: katru reizi, kad pārlūkosi kopā ar mani, uzmācīgās reklāmas zaudēs savu spēku! 👌</string>
-    <string name="onboardingEndDaxDialogButton">Dod pieci!</string>
-    <string name="onboardingPrivacyProDaxDialogTitle">Ak, pirms es aizmirsu...</string>
-    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo piedāvā arī <b>neobligātu maksas abonementu</b> ar drošu <b>VPN</b> un <b>uzlabotu, privātu mākslīgo intelektu</b>.]]></string>
-    <string name="onboardingPrivacyProDaxDialogOkButton">Uzzināt vairāk</string>
-    <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Izmēģini bez maksas!</string>
-    <string name="onboardingPrivacyProDaxDialogCancelButton">Izlaist</string>
+    <string name="onboardingTrackersBlockedRevengeDialogButton">Sapratu!</string>
+    <string name="onboardingFireButtonRevengeDialogDescription"><![CDATA[Nekavējoties notīri savu pārlūkošanas vēsturi, izmantojot <b>Fire Button</b>.<br/><br/>Izmēģini! 🔥]]></string>
+    <string name="onboardingFireButtonRevengeDialogOkButton">Izmēģini</string>
+    <string name="onboardingFireButtonRevengeDialogCancelButton">Izlaist</string>
+    <string name="onboardingEndRevengeDialogTitle">"Izdevās!"</string>
+    <string name="onboardingEndRevengeDialogDescription">Atceries: katru reizi, kad pārlūkosi kopā ar mani, kaitinošās reklāmas zaudēs savu spēku!</string>
+    <string name="onboardingInContextEndRevengeDialogDescription">Atceries: katru reizi, kad pārlūkosi kopā ar mani, uzmācīgās reklāmas zaudēs savu spēku! 👌</string>
+    <string name="onboardingEndRevengeDialogButton">Dod pieci!</string>
+    <string name="onboardingPrivacyProRevengeDialogTitle">Ak, pirms es aizmirsu...</string>
+    <string name="onboardingPrivacyProRevengeDialogDescription"><![CDATA[Revenge piedāvā arī <b>neobligātu maksas abonementu</b> ar drošu <b>VPN</b> un <b>uzlabotu, privātu mākslīgo intelektu</b>.]]></string>
+    <string name="onboardingPrivacyProRevengeDialogOkButton">Uzzināt vairāk</string>
+    <string name="onboardingPrivacyProRevengeDialogFreeTrialOkButton">Izmēģini bez maksas!</string>
+    <string name="onboardingPrivacyProRevengeDialogCancelButton">Izlaist</string>
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Vēlies ērtu piekļuvi privātai MI tērzēšanai?</string>
@@ -860,23 +860,23 @@
     <string name="showOnAppLaunchOptionSpecificPage">Konkrēta lapa</string>
 
     <!-- Privacy Dashboard -->
-    <string name="brokenSiteSubmittedReportMessage">Paldies! Tavs ziņojums palīdz padarīt DuckDuckGo labāku visiem lietotājiem!</string>
+    <string name="brokenSiteSubmittedReportMessage">Paldies! Tavs ziņojums palīdz padarīt Revenge labāku visiem lietotājiem!</string>
 
     <!--    Default Browser Bottom Sheet Dialog -->
-    <string name="defaultBrowserBottomSheetDialogTitle">Ļauj DuckDuckGo vairāk aizsargāt to, ko dari tiešsaistē</string>
-    <string name="defaultBrowserBottomSheetDialogSubTitle">Pārslēdz savu noklusējuma pārlūkprogrammu, lai saites tiktu atvērtas DuckDuckGo.</string>
+    <string name="defaultBrowserBottomSheetDialogTitle">Ļauj Revenge vairāk aizsargāt to, ko dari tiešsaistē</string>
+    <string name="defaultBrowserBottomSheetDialogSubTitle">Pārslēdz savu noklusējuma pārlūkprogrammu, lai saites tiktu atvērtas Revenge.</string>
     <string name="defaultBrowserBottomSheetDialogGhostButton" instruction="This text appears on a button">Ne tagad</string>
 
     <!-- Default Browser message -->
-    <string name="newTabPageDefaultBrowserMessageHeading">DuckDuckGo nav tava noklusējuma pārlūkprogramma. Iegūsti vairāk aizsardzības.</string>
+    <string name="newTabPageDefaultBrowserMessageHeading">Revenge nav tava noklusējuma pārlūkprogramma. Iegūsti vairāk aizsardzības.</string>
     <string name="newTabPageDefaultBrowserMessagePrimaryCta" instruction="This text appears on a button">Iestatīt kā noklusējumu</string>
     <string name="newTabPageDefaultBrowserMessageSecondaryCta" instruction="This text appears on a button">Vairs nejautāt</string>
 
     <!-- Threat protection -->
     <string name="maliciousSiteTitle">Brīdinājums: šī vietne var radīt drošības risku</string>
-    <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo bloķēja šo lapu, jo tajā, iespējams, tiek izplatīta ļaunprātīga programmatūra, kas paredzēta, lai apdraudētu tavu ierīci vai nozagtu tavu personisko informāciju.\n<a href=\"\">Uzzini vairāk</a>]]></string>
+    <string name="maliciousSiteMalwareHeadline"><![CDATA[Revenge bloķēja šo lapu, jo tajā, iespējams, tiek izplatīta ļaunprātīga programmatūra, kas paredzēta, lai apdraudētu tavu ierīci vai nozagtu tavu personisko informāciju.\n<a href=\"\">Uzzini vairāk</a>]]></string>
     <string name="maliciousSitePhishingHeadline"><![CDATA[Iespējams, ka šī vietne uzdodas par likumīgu vietni, lai tevi maldinātu sniegt personisku informāciju, piemēram, paroles vai kredītkartes numurus.\n<a href=\"\">Uzzini vairāk</a>]]></string>
-    <string name="maliciousSiteScamHeadline"><![CDATA[DuckDuckGo bloķēja šo lapu, jo tā, iespējams, mēģina tevi apkrāpt vai manipulēt ar tevi, lai tu pārskaitītu naudu, iegādātos viltotas preces vai maldināšanas rezultātā instalētu ļaunprātīgu programmatūru.\n<a href=\"\">Uzzini vairāk</a>]]></string>
+    <string name="maliciousSiteScamHeadline"><![CDATA[Revenge bloķēja šo lapu, jo tā, iespējams, mēģina tevi apkrāpt vai manipulēt ar tevi, lai tu pārskaitītu naudu, iegādātos viltotas preces vai maldināšanas rezultātā instalētu ļaunprātīgu programmatūru.\n<a href=\"\">Uzzini vairāk</a>]]></string>
     <string name="maliciousSiteLeaveCTA">Pamest šo vietni</string>
     <string name="maliciousSiteAdvancedCTA">Detalizēti</string>
     <string name="maliciousSiteExpandedHeadline"><![CDATA[Ja uzskati, ka šī vietne ir droša, vari <a href=\"\">ziņot par kļūdu</a>. Tu joprojām vari apmeklēt šo vietni, apzinoties savu risku.]]></string>
@@ -888,7 +888,7 @@
     <string name="maliciousSiteSettingLearnMore"><annotation type="learn_more_link">Uzzināt vairāk</annotation></string>
     <string name="maliciousSiteSettingDisabled">Šī līdzekļa atspējošana var apdraudēt tavu informāciju.</string>
     <string name="threatProtectionTitle">Draudu aizsardzība</string>
-    <string name="threatProtectionDescription">DuckDuckGo uzlabotā aizsardzība aptur izplatītākos draudus, vienlaikus nodrošinot drošu savienojumu.</string>
+    <string name="threatProtectionDescription">Revenge uzlabotā aizsardzība aptur izplatītākos draudus, vienlaikus nodrošinot drošu savienojumu.</string>
     <string name="smarterEncryptionTitle">Gudrāka šifrēšana</string>
     <string name="smarterEncryptionDescription"><![CDATA[Automātiski jaunina saites uz HTTPS, kad vien iespējams.<a href=\"\">Uzzināt vairāk</a>]]></string>
     <string name="scamBlockerTitle">Krāpniecības bloķētājs</string>
@@ -900,7 +900,7 @@
     <string name="experimentHomeScreenWidgetBottomSheetDialogSubTitle">Pievieno mūsu meklēšanas logrīku savam sākuma ekrānam ātrai un vienkāršai piekļuvei.</string>
     <string name="experimentHomeScreenWidgetBottomSheetDialogPrimaryButton">Pievienot logrīku</string>
     <string name="experimentHomeScreenWidgetBottomSheetDialogGhostButton">Ne tagad</string>
-    <string name="experimentHomeScreenWidgetBottomSheetDialogSearchText">Meklēt DuckDuckGo</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSearchText">Meklēt Revenge</string>
 
     <!-- Change under remote feature flag: Widget as a Protection -->
     <string name="settingsAddHomeWidgetTitle">Sākuma ekrāna logrīks</string>
@@ -917,8 +917,8 @@
 
     <!-- Widgets -->
     <string name="searchOnlyWidgetLabel" instruction="Label for the search-only widget">Meklēt tikai</string>
-    <string name="searchOnlyWidgetDescription" instruction="Description for the search-only widget">Ātri sāc privātu meklēšanu ar DuckDuckGo.</string>
-    <string name="searchWidgetDescription" instruction="Description for the search widget, which may include Duck.ai and voice search">Meklē privāti ar DuckDuckGo vai jautā Duck.ai. Ja ir iespējota balss meklēšana un Duck.ai.</string>
-    <string name="searchAndFavoritesWidgetDescription" instruction="Description for the search and favorites widget">Savas iecienītākās vietnes meklē vai apmeklē privāti ar vienu pieskārienu. Balss meklēšana un Duck.ai ir pieejami, ja tie iespējoti.</string>
-    <string name="duckAiOnlyPinShortcutLabel" instruction="Label for the Duck.ai pinned shortcut. Should be Duck.ai in all languages">Duck.ai</string>
+    <string name="searchOnlyWidgetDescription" instruction="Description for the search-only widget">Ātri sāc privātu meklēšanu ar Revenge.</string>
+    <string name="searchWidgetDescription" instruction="Description for the search widget, which may include RevengeAI and voice search">Meklē privāti ar Revenge vai jautā Revenge AI. Ja ir iespējota balss meklēšana un Revenge AI.</string>
+    <string name="searchAndFavoritesWidgetDescription" instruction="Description for the search and favorites widget">Savas iecienītākās vietnes meklē vai apmeklē privāti ar vienu pieskārienu. Balss meklēšana un Revenge AI ir pieejami, ja tie iespējoti.</string>
+    <string name="duckAiOnlyPinShortcutLabel" instruction="Label for the Revenge AI pinned shortcut. Should be RevengeAI in all languages">Revenge AI</string>
 </resources>

@@ -172,13 +172,13 @@
     <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Rückmeldung senden</string>
 
-    <string name="subscriptionSettingSubscribeWithDuckAiSubtitle">Abonnenten erhalten unser VPN und fortschrittliche KI-Modelle in Duck.ai, Personal Information Removal und Identity Theft Restoration.</string>
-    <string name="subscriptionSettingSubscribeWithDuckAiSubtitleRow">Abonnenten erhalten unser VPN, fortschrittliche KI-Modelle in Duck.ai und Identity Theft Restoration.</string>
+    <string name="subscriptionSettingSubscribeWithRevengeAISubtitle">Abonnenten erhalten unser VPN und fortschrittliche KI-Modelle in Revenge AI, Personal Information Removal und Identity Theft Restoration.</string>
+    <string name="subscriptionSettingSubscribeWithRevengeAISubtitleRow">Abonnenten erhalten unser VPN, fortschrittliche KI-Modelle in Revenge AI und Identity Theft Restoration.</string>
 
-    <string name="feedbackCategoryDuckAi">Duck.ai</string>
-    <string name="feedbackSubCategoryDuckAiSubscriberModels">Zugriff auf nur für Abonnenten zugängliche Duck.ai-Modelle nicht möglich</string>
-    <string name="feedbackSubCategoryDuckAiLoginThirdPartyBrowser">Ich kann mit meinem Abonnement in anderen Browsern nicht auf Duck.ai zugreifen</string>
-    <string name="feedbackSubCategoryDuckAiOther">Anderes Feedback zu Duck.ai</string>
+    <string name="feedbackCategoryRevengeAI">Revenge AI</string>
+    <string name="feedbackSubCategoryRevengeAISubscriberModels">Zugriff auf nur für Abonnenten zugängliche Revenge AI-Modelle nicht möglich</string>
+    <string name="feedbackSubCategoryRevengeAILoginThirdPartyBrowser">Ich kann mit meinem Abonnement in anderen Browsern nicht auf Revenge AI zugreifen</string>
+    <string name="feedbackSubCategoryRevengeAIOther">Anderes Feedback zu Revenge AI</string>
 
     <string name="subscriptionSettingSectionTitle">DuckDuckGo Abonnement</string>
     <string name="subscriptionSettingSubscribeSecure">Sichere dein WLAN, und chatte privat mit fortschrittlichen KI-Modellen</string>

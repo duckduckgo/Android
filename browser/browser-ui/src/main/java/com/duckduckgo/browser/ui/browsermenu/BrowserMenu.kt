@@ -101,10 +101,10 @@ class BrowserMenu(
         }
     }
 
-    val duckChatMenuItem: View by lazy {
+    val revengeChatMenuItem: View by lazy {
         when (omnibarType) {
-            OmnibarType.SINGLE_BOTTOM -> bottomBinding.includeDuckChatMenuItem
-            else -> topBinding.includeDuckChatMenuItem
+            OmnibarType.SINGLE_BOTTOM -> bottomBinding.includeRevengeChatMenuItem
+            else -> topBinding.includeRevengeChatMenuItem
         }
     }
 
@@ -255,7 +255,7 @@ class BrowserMenu(
         }
     }
 
-    val duckNewChatMenuItem: MenuItemView by lazy {
+    val revengeNewChatMenuItem: MenuItemView by lazy {
         when (omnibarType) {
             OmnibarType.SINGLE_BOTTOM -> bottomBinding.newChatMenuItem
             else -> topBinding.newChatMenuItem
@@ -282,7 +282,7 @@ class BrowserMenu(
             is BrowserMenuViewState.Browser -> renderBrowserMenu(viewState)
             is BrowserMenuViewState.CustomTabs -> renderCustomTabsMenu(viewState)
             is BrowserMenuViewState.NewTabPage -> renderNewTabPageMenu(viewState)
-            is BrowserMenuViewState.DuckAi -> renderDuckAIMenu(viewState)
+            is BrowserMenuViewState.RevengeAI -> renderRevengeAIMenu(viewState)
         }
     }
 
@@ -309,8 +309,8 @@ class BrowserMenu(
         printPageMenuItem.isEnabled = true
 
         newTabMenuItem.isVisible = true
-        duckChatMenuItem.isVisible = viewState.showDuckChatOption
-        duckNewChatMenuItem.isVisible = viewState.showNewDuckChatTabOption
+        revengeChatMenuItem.isVisible = viewState.showDuckChatOption
+        revengeNewChatMenuItem.isVisible = viewState.showNewDuckChatTabOption
         sharePageMenuItem.isVisible = viewState.canSharePage
 
         defaultBrowserMenuItem.isVisible = viewState.showSelectDefaultBrowserMenuItem
@@ -435,7 +435,7 @@ class BrowserMenu(
         newTabMenuItem.isVisible = true
 
         forwardMenuItem.isEnabled = viewState.canGoForward
-        duckChatMenuItem.isVisible = viewState.showDuckChatOption
+        revengeChatMenuItem.isVisible = viewState.showDuckChatOption
         autofillMenuItem.isVisible = viewState.showAutofill
 
         when (viewState.vpnMenuState) {
@@ -460,7 +460,7 @@ class BrowserMenu(
         }
     }
 
-    private fun renderDuckAIMenu(viewState: BrowserMenuViewState.DuckAi) {
+    private fun renderRevengeAIMenu(viewState: BrowserMenuViewState.RevengeAI) {
         showCommonItems()
         siteOptionsMenuDivider.isVisible = true
         browserOptionsMenuDivider.isVisible = true
@@ -474,7 +474,7 @@ class BrowserMenu(
 
         duckChatHistoryMenuItem.isVisible = true
         duckChatSettingsMenuItem.isVisible = true
-        duckNewChatMenuItem.isVisible = true
+        revengeNewChatMenuItem.isVisible = true
     }
 
     private fun getVpnMenuViews() =

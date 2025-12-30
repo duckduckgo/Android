@@ -26,16 +26,16 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.duckchat.impl.databinding.ActivityDuckAiShortcutSettingsBinding
-import com.duckduckgo.duckchat.impl.ui.settings.DuckAiShortcutSettingsViewModel.ViewState
+import com.duckduckgo.duckchat.impl.databinding.ActivityRevengeAiShortcutSettingsBinding
+import com.duckduckgo.duckchat.impl.ui.settings.RevengeAIShortcutSettingsViewModel.ViewState
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
 @InjectWith(ActivityScope::class)
-class DuckAiShortcutSettingsActivity : DuckDuckGoActivity() {
+class RevengeAIShortcutSettingsActivity : DuckDuckGoActivity() {
 
-    private val viewModel: DuckAiShortcutSettingsViewModel by bindViewModel()
-    private val binding: ActivityDuckAiShortcutSettingsBinding by viewBinding()
+    private val viewModel: RevengeAIShortcutSettingsViewModel by bindViewModel()
+    private val binding: ActivityRevengeAiShortcutSettingsBinding by viewBinding()
 
     private val menuToggleListener =
         CompoundButton.OnCheckedChangeListener { _, isChecked ->
@@ -70,16 +70,16 @@ class DuckAiShortcutSettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun renderViewState(viewState: ViewState) {
-        binding.showDuckAiInMenuToggle.apply {
-            quietlySetIsChecked(viewState.showInBrowserMenu, menuToggleListener)
+        binding.showRevengeAIInMenuToggle.apply {
+            this.quietlySetIsChecked(viewState.showInBrowserMenu, menuToggleListener)
         }
-        binding.showDuckAiInAddressBarToggle.apply {
-            isVisible = viewState.shouldShowAddressBarToggle
-            quietlySetIsChecked(viewState.showInAddressBar, addressBarToggleListener)
+        binding.showRevengeAIInAddressBarToggle.apply {
+            this.isVisible = viewState.shouldShowAddressBarToggle
+            this.quietlySetIsChecked(viewState.showInAddressBar, addressBarToggleListener)
         }
-        binding.showDuckAiInVoiceSearchToggle.apply {
-            isVisible = viewState.shouldShowVoiceSearchToggle
-            quietlySetIsChecked(viewState.showInVoiceSearch, voiceSearchToggleListener)
+        binding.showRevengeAIInVoiceSearchToggle.apply {
+            this.isVisible = viewState.shouldShowVoiceSearchToggle
+            this.quietlySetIsChecked(viewState.showInVoiceSearch, voiceSearchToggleListener)
         }
     }
 }

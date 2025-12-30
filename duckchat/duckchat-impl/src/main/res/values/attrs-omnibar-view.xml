@@ -21,7 +21,7 @@
         <!-- Bottom -->
         <enum name="bottom" value="1" />
     </attr>
-    <declare-styleable name="DuckChatOmnibarLayout">
+    <declare-styleable name="duckChatOmnibarLayout">
         <attr name="duckOmnibarPosition"/>
     </declare-styleable>
 

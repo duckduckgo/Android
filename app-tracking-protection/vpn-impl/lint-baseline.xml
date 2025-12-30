@@ -1711,7 +1711,7 @@
 
     <issue
         id="Overdraw"
-        message="Possible overdraw: Root element paints background `?attr/daxColorSurface` with a theme that also paints a background (inferred theme is `@style/Theme.DuckDuckGo.Light`)"
+        message="Possible overdraw: Root element paints background `?attr/daxColorSurface` with a theme that also paints a background (inferred theme is `@style/Theme.Revenge.Light`)"
         errorLine1="        android:background=&quot;?attr/daxColorSurface&quot;"
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -1722,7 +1722,7 @@
 
     <issue
         id="Overdraw"
-        message="Possible overdraw: Root element paints background `?attr/daxColorSurface` with a theme that also paints a background (inferred theme is `@style/Theme.DuckDuckGo.Light`)"
+        message="Possible overdraw: Root element paints background `?attr/daxColorSurface` with a theme that also paints a background (inferred theme is `@style/Theme.Revenge.Light`)"
         errorLine1="        android:background=&quot;?attr/daxColorSurface&quot;"
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -1733,7 +1733,7 @@
 
     <issue
         id="Overdraw"
-        message="Possible overdraw: Root element paints background `?attr/daxColorSurface` with a theme that also paints a background (inferred theme is `@style/Theme.DuckDuckGo.Light`)"
+        message="Possible overdraw: Root element paints background `?attr/daxColorSurface` with a theme that also paints a background (inferred theme is `@style/Theme.Revenge.Light`)"
         errorLine1="    android:background=&quot;?attr/daxColorSurface&quot;>"
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -1744,7 +1744,7 @@
 
     <issue
         id="Overdraw"
-        message="Possible overdraw: Root element paints background `?attr/selectableItemBackground` with a theme that also paints a background (inferred theme is `@style/Theme.DuckDuckGo.Light`)"
+        message="Possible overdraw: Root element paints background `?attr/selectableItemBackground` with a theme that also paints a background (inferred theme is `@style/Theme.Revenge.Light`)"
         errorLine1="    android:background=&quot;?attr/selectableItemBackground&quot;>"
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -1755,7 +1755,7 @@
 
     <issue
         id="Overdraw"
-        message="Possible overdraw: Root element paints background `?attr/selectableItemBackground` with a theme that also paints a background (inferred theme is `@style/Theme.DuckDuckGo.Light`)"
+        message="Possible overdraw: Root element paints background `?attr/selectableItemBackground` with a theme that also paints a background (inferred theme is `@style/Theme.Revenge.Light`)"
         errorLine1="    android:background=&quot;?attr/selectableItemBackground&quot;>"
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -1766,7 +1766,7 @@
 
     <issue
         id="Overdraw"
-        message="Possible overdraw: Root element paints background `?android:windowBackground` with a theme that also paints a background (inferred theme is `@style/Theme.DuckDuckGo.Light`)"
+        message="Possible overdraw: Root element paints background `?android:windowBackground` with a theme that also paints a background (inferred theme is `@style/Theme.Revenge.Light`)"
         errorLine1="    android:background=&quot;?android:windowBackground&quot;"
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -1777,7 +1777,7 @@
 
     <issue
         id="Overdraw"
-        message="Possible overdraw: Root element paints background `?selectableItemBackground` with a theme that also paints a background (inferred theme is `@style/Theme.DuckDuckGo.Light`)"
+        message="Possible overdraw: Root element paints background `?selectableItemBackground` with a theme that also paints a background (inferred theme is `@style/Theme.Revenge.Light`)"
         errorLine1="        android:background=&quot;?selectableItemBackground&quot;"
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location

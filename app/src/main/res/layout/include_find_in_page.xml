@@ -40,7 +40,7 @@
 
     <EditText
         android:id="@+id/findInPageInput"
-        style="@style/Widget.DuckDuckGo.SearchInput"
+        style="@style/Widget.Revenge.SearchInput"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="1"

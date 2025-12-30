@@ -36,7 +36,7 @@
 
         <ImageButton
             android:id="@+id/backMenuItem"
-            style="@style/Widget.DuckDuckGo.NavigationalIcon"
+            style="@style/Widget.Revenge.NavigationalIcon"
             android:layout_marginStart="@dimen/keyline_4"
             android:contentDescription="@string/browserMenuBack"
             app:srcCompat="@drawable/ic_arrow_left_24"
@@ -46,7 +46,7 @@
 
         <ImageButton
             android:id="@+id/forwardMenuItem"
-            style="@style/Widget.DuckDuckGo.NavigationalIcon"
+            style="@style/Widget.Revenge.NavigationalIcon"
             android:contentDescription="@string/browserMenuForward"
             app:srcCompat="@drawable/ic_arrow_right_24"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -56,7 +56,7 @@
 
         <ImageButton
             android:id="@+id/refreshMenuItem"
-            style="@style/Widget.DuckDuckGo.NavigationalIcon"
+            style="@style/Widget.Revenge.NavigationalIcon"
             android:layout_marginEnd="@dimen/keyline_4"
             android:contentDescription="@string/browserMenuRefresh"
             app:srcCompat="@drawable/ic_reload_24"
@@ -103,15 +103,15 @@
                 app:primaryText="@string/browserMenuNewAIChat" />
 
             <com.duckduckgo.common.ui.view.MenuItemView
-                android:id="@+id/includeDuckChatMenuItem"
+                android:id="@+id/includeRevengeChatMenuItem"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:iconDrawable="@drawable/ic_ai_chat_16"
-                app:primaryText="@string/browserMenuDuckChat" />
+                app:primaryText="@string/browserMenuRevengeChat" />
 
             <com.duckduckgo.common.ui.view.divider.HorizontalDivider
                 android:id="@+id/siteOptionsMenuDivider"
-                style="@style/Widget.DuckDuckGo.PopupMenuHorizontalDivider"
+                style="@style/Widget.Revenge.PopupMenuHorizontalDivider"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
@@ -142,7 +142,7 @@
 
             <com.duckduckgo.common.ui.view.divider.HorizontalDivider
                 android:id="@+id/browserOptionsMenuDivider"
-                style="@style/Widget.DuckDuckGo.PopupMenuHorizontalDivider"
+                style="@style/Widget.Revenge.PopupMenuHorizontalDivider"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
@@ -213,7 +213,7 @@
 
             <com.duckduckgo.common.ui.view.divider.HorizontalDivider
                 android:id="@+id/settingsMenuDivider"
-                style="@style/Widget.DuckDuckGo.PopupMenuHorizontalDivider"
+                style="@style/Widget.Revenge.PopupMenuHorizontalDivider"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
@@ -269,7 +269,7 @@
             <com.duckduckgo.common.ui.view.divider.HorizontalDivider
                 android:visibility="gone"
                 android:id="@+id/customTabsMenuDivider"
-                style="@style/Widget.DuckDuckGo.PopupMenuHorizontalDivider"
+                style="@style/Widget.Revenge.PopupMenuHorizontalDivider"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 

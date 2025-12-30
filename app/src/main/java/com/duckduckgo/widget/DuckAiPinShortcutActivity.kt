@@ -22,7 +22,7 @@ import javax.inject.Inject
  * Exists purely to be able to add the Duck.ai shortcut on the home screen from the widget picker.
  */
 @InjectWith(ActivityScope::class)
-class DuckAiPinShortcutActivity : DuckDuckGoActivity() {
+class RevengeAIPinShortcutActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var pixel: Pixel

@@ -31,7 +31,7 @@ constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
-    defStyleRes: Int = R.style.Widget_DuckDuckGo_MenuItemView,
+    defStyleRes: Int = R.style.Widget_Revenge_MenuItemView,
 ) : LinearLayout(context, attrs, defStyleAttr, defStyleRes) {
 
     private val binding: ViewMenuItemBinding by viewBinding()
@@ -45,7 +45,7 @@ constructor(
             attrs,
             R.styleable.MenuItemView,
             0,
-            R.style.Widget_DuckDuckGo_MenuItemView,
+            R.style.Widget_Revenge_MenuItemView,
         )
 
         val typography = if (attributes.hasValue(R.styleable.MenuItemView_typography)) {

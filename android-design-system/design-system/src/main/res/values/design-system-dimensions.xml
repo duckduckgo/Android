@@ -1,5 +1,5 @@
 <!--
-  ~ Copyright (c) 2021 DuckDuckGo
+  ~ Copyright (c) 2021 Revenge
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -37,7 +37,7 @@
     <!-- App Components -->
     <dimen name="changeAppIconSize">75dp</dimen>
     <dimen name="homeTabDdgLogoTopMargin">100dp</dimen>
-    <dimen name="ntpDaxLogoIconWidth">140dp</dimen>
+    <dimen name="ntpRevengeLogoIconWidth">140dp</dimen>
 
     <!-- Toolbar -->
     <dimen name="toolbarIconSize">24dp</dimen>
@@ -116,11 +116,11 @@
     <dimen name="dialogContentPaddingStart">@dimen/keyline_5</dimen>
     <dimen name="dialogContentPaddingEnd">@dimen/keyline_5</dimen>
 
-    <!-- Dax Dialog -->
+    <!-- Revenge Dialog -->
     <dimen name="daxDialogContentPaddingTop">20dp</dimen>
     <dimen name="daxDialogButtonSpacing">10dp</dimen>
 
-    <!-- Dax Bubble -->
+    <!-- Revenge Bubble -->
     <dimen name="daxBubbleDialogDistanceFromEdge">22dp</dimen>
     <dimen name="daxBubbleDialogEdge">9dp</dimen>
 

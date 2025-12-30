@@ -5,7 +5,7 @@
 
   <attr name="primaryButtonText" format="string"/>
 
-  <declare-styleable name="DaxExpandableMenuItem">
+  <declare-styleable name="RevengeExpandableMenuItem">
     <!--Exposed config for One Line List Item-->
     <attr name="primaryText"/>
     <attr name="primaryTextColorOverlay"/>

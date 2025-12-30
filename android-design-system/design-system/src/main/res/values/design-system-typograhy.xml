@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Copyright (c) 2021 DuckDuckGo
+  ~ Copyright (c) 2021 Revenge
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -17,91 +17,91 @@
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="NewApi">
 
     <style name="Typography"/>
-    <style name="Typography.DuckDuckGo">
+    <style name="Typography.Revenge">
         <item name="android:textStyle">normal</item>
         <item name="android:fontFamily">sans-serif</item>
     </style>
 
-    <style name="Typography.DuckDuckGo.Title">
+    <style name="Typography.Revenge.Title">
         <item name="android:textSize">32sp</item>
         <item name="android:lineSpacingExtra">4sp</item>
         <item name="android:lineHeight">36sp</item>
         <item name="android:textStyle">bold</item>
     </style>
 
-    <style name="Typography.DuckDuckGo.H1">
+    <style name="Typography.Revenge.H1">
         <item name="android:textSize">24sp</item>
         <item name="android:lineSpacingExtra">6sp</item>
         <item name="android:lineHeight">30sp</item>
         <item name="android:textStyle">bold</item>
     </style>
 
-    <style name="Typography.DuckDuckGo.H2">
+    <style name="Typography.Revenge.H2">
         <item name="android:textSize">20sp</item>
         <item name="android:lineSpacingExtra">4sp</item>
         <item name="android:lineHeight">24sp</item>
         <item name="android:fontFamily">sans-serif-medium</item>
     </style>
 
-    <style name="Typography.DuckDuckGo.H3">
+    <style name="Typography.Revenge.H3">
         <item name="android:textSize">16sp</item>
         <item name="android:lineSpacingExtra">5sp</item>
         <item name="android:lineHeight">21sp</item>
         <item name="android:fontFamily">sans-serif-medium</item>
     </style>
 
-    <style name="Typography.DuckDuckGo.H4">
+    <style name="Typography.Revenge.H4">
         <item name="android:textSize">14sp</item>
         <item name="android:lineSpacingExtra">6sp</item>
         <item name="android:lineHeight">20sp</item>
         <item name="android:fontFamily">sans-serif-medium</item>
     </style>
 
-    <style name="Typography.DuckDuckGo.H5">
+    <style name="Typography.Revenge.H5">
         <item name="android:textSize">13sp</item>
         <item name="android:lineSpacingExtra">3sp</item>
         <item name="android:lineHeight">16sp</item>
         <item name="android:fontFamily">sans-serif-medium</item>
     </style>
 
-    <style name="Typography.DuckDuckGo.Body1">
+    <style name="Typography.Revenge.Body1">
         <item name="android:textSize">16sp</item>
         <item name="android:lineSpacingExtra">4sp</item>
         <item name="android:lineHeight">20sp</item>
     </style>
 
-    <style name="Typography.DuckDuckGo.Body1.Bold">
+    <style name="Typography.Revenge.Body1.Bold">
         <item name="android:textStyle">bold</item>
     </style>
 
-    <style name="Typography.DuckDuckGo.Body1.Mono">
+    <style name="Typography.Revenge.Body1.Mono">
         <item name="android:fontFamily">@font/roboto_mono</item>
     </style>
 
-    <style name="Typography.DuckDuckGo.Body2">
+    <style name="Typography.Revenge.Body2">
         <item name="android:textSize">14sp</item>
         <item name="android:lineSpacingExtra">4sp</item>
         <item name="android:lineHeight">18sp</item>
     </style>
 
-    <style name="Typography.DuckDuckGo.Body2.Bold">
+    <style name="Typography.Revenge.Body2.Bold">
         <item name="android:textStyle">bold</item>
     </style>
 
-    <style name="Typography.DuckDuckGo.Button">
+    <style name="Typography.Revenge.Button">
         <item name="android:textSize">15sp</item>
         <item name="android:lineSpacingExtra">5sp</item>
         <item name="android:lineHeight">20sp</item>
         <item name="android:textStyle">bold</item>
     </style>
 
-    <style name="Typography.DuckDuckGo.Caption">
+    <style name="Typography.Revenge.Caption">
         <item name="android:textSize">12sp</item>
         <item name="android:lineSpacingExtra">4sp</item>
         <item name="android:lineHeight">16sp</item>
     </style>
 
-    <style name="Typography.DuckDuckGo.Caption.AllCaps">
+    <style name="Typography.Revenge.Caption.AllCaps">
         <item name="android:textAllCaps">true</item>
     </style>
 

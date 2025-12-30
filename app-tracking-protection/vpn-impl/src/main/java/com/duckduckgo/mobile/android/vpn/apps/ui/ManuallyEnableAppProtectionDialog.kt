@@ -56,7 +56,7 @@ class ManuallyEnableAppProtectionDialog : DialogFragment() {
         val enableCTA = rootView.findViewById<Button>(R.id.trackingProtectionExcludeAppDialogEnable)
         val skipCTA = rootView.findViewById<Button>(R.id.trackingProtectionExcludeAppDialogSkip)
 
-        val alertDialog = MaterialAlertDialogBuilder(requireActivity(), com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_Dialog)
+        val alertDialog = MaterialAlertDialogBuilder(requireActivity(), com.duckduckgo.mobile.android.R.style.Widget_Revenge_Dialog)
             .setView(rootView)
 
         validateBundleArguments()

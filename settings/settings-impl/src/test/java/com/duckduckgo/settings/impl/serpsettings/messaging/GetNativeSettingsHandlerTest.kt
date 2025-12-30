@@ -137,7 +137,7 @@ class GetNativeSettingsHandlerTest {
     @Test
     fun `when settings contain valid JSON then parses and returns JSONObject`() = runTest {
         fakeSerpSettingsFeature.storeSerpSettings().setRawStoredState(Toggle.State(enable = true))
-        val settingsJson = """{"isDuckAiEnabled":"true","duckAiTitle":"Duck.AI"}"""
+        val settingsJson = """{"isRevengeAIEnabled":"true","duckAiTitle":"Duck.AI"}"""
         fakeDataStore.setSerpSettings(settingsJson)
         val jsMessage = createJsMessage()
 
@@ -150,14 +150,14 @@ class GetNativeSettingsHandlerTest {
         assertEquals(jsMessage.id, response.id)
 
         assertEquals(2, response.params.length())
-        assertEquals(true, response.params.getBoolean("isDuckAiEnabled"))
+        assertEquals(true, response.params.getBoolean("isRevengeAIEnabled"))
         assertEquals("Duck.AI", response.params.getString("duckAiTitle"))
     }
 
     @Test
     fun `when id is null then no response is sent`() = runTest {
         fakeSerpSettingsFeature.storeSerpSettings().setRawStoredState(Toggle.State(enable = true))
-        fakeDataStore.setSerpSettings("""{"isDuckAiEnabled":"true"}""")
+        fakeDataStore.setSerpSettings("""{"isRevengeAIEnabled":"true"}""")
 
         val jsMessage = JsMessage(
             context = "test",
@@ -176,7 +176,7 @@ class GetNativeSettingsHandlerTest {
     @Test
     fun `when id is not null then response is sent`() = runTest {
         fakeSerpSettingsFeature.storeSerpSettings().setRawStoredState(Toggle.State(enable = true))
-        fakeDataStore.setSerpSettings("""{"isDuckAiEnabled":"true"}""")
+        fakeDataStore.setSerpSettings("""{"isRevengeAIEnabled":"true"}""")
 
         val jsMessage = JsMessage(
             context = "test",
@@ -208,7 +208,7 @@ class GetNativeSettingsHandlerTest {
         assertEquals(true, firstResponse.params.getBoolean("noNativeSettings"))
 
         // Settings are now stored
-        fakeDataStore.setSerpSettings("""{"isDuckAiEnabled":"true"}""")
+        fakeDataStore.setSerpSettings("""{"isRevengeAIEnabled":"true"}""")
 
         // Second call - settings exist
         handler.getJsMessageHandler().process(jsMessage, fakeJsMessaging, null)
@@ -216,7 +216,7 @@ class GetNativeSettingsHandlerTest {
 
         val secondResponse = fakeJsMessaging.getLastResponse()!!
         assertEquals(false, secondResponse.params.optBoolean("noNativeSettings", false))
-        assertEquals("true", secondResponse.params.getString("isDuckAiEnabled"))
+        assertEquals("true", secondResponse.params.getString("isRevengeAIEnabled"))
     }
 
     private fun createJsMessage(): JsMessage {

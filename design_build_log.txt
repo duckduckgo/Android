@@ -1,0 +1,458 @@
+Configuration on demand is an incubating feature.
+Calculating task graph as no cached configuration is available for tasks: :design-system:assembleDebug
+> Task :buildSrc:checkKotlinGradlePluginConfigurationErrors
+> Task :buildSrc:compileKotlin UP-TO-DATE
+> Task :buildSrc:compileJava NO-SOURCE
+> Task :buildSrc:compileGroovy NO-SOURCE
+> Task :buildSrc:processResources NO-SOURCE
+> Task :buildSrc:classes UP-TO-DATE
+> Task :buildSrc:jar UP-TO-DATE
+
+> Configure project :
+android-reporting plugin is deprecated and is set to be removed in AGP 9.0
+
+> Configure project :ad-click-impl
+WARNING: The option setting 'android.experimental.lint.version=8.13.2' is experimental.
+
+> Configure project :app
+Signing properties not found, release artifacts will not be signed.
+
+> Task :internal-features-api:preBuild UP-TO-DATE
+> Task :di:preBuild UP-TO-DATE
+> Task :design-system:preBuild UP-TO-DATE
+> Task :common-utils:preBuild UP-TO-DATE
+> Task :common-utils:preDebugBuild UP-TO-DATE
+> Task :internal-features-api:preDebugBuild UP-TO-DATE
+> Task :design-system:preDebugBuild UP-TO-DATE
+> Task :di:preDebugBuild UP-TO-DATE
+> Task :feature-toggles-internal-api:checkKotlinGradlePluginConfigurationErrors
+> Task :privacy-config-api:checkKotlinGradlePluginConfigurationErrors
+> Task :feature-toggles-api:checkKotlinGradlePluginConfigurationErrors
+> Task :anvil-annotations:checkKotlinGradlePluginConfigurationErrors
+> Task :experiments-api:checkKotlinGradlePluginConfigurationErrors
+> Task :app-build-config-api:checkKotlinGradlePluginConfigurationErrors
+> Task :anvil-annotations:processResources NO-SOURCE
+> Task :internal-features-api:writeDebugAarMetadata UP-TO-DATE
+> Task :di:writeDebugAarMetadata UP-TO-DATE
+> Task :privacy-config-api:processResources NO-SOURCE
+> Task :app-build-config-api:processResources NO-SOURCE
+> Task :design-system:mergeDebugJniLibFolders UP-TO-DATE
+> Task :feature-toggles-api:processResources NO-SOURCE
+> Task :feature-toggles-internal-api:processResources NO-SOURCE
+> Task :design-system:mergeDebugNativeLibs NO-SOURCE
+> Task :common-utils:writeDebugAarMetadata UP-TO-DATE
+> Task :experiments-api:processResources NO-SOURCE
+> Task :common-utils:checkKotlinGradlePluginConfigurationErrors
+> Task :anvil-compiler:checkKotlinGradlePluginConfigurationErrors
+> Task :common-utils:generateDebugResValues UP-TO-DATE
+> Task :common-utils:generateDebugResources UP-TO-DATE
+> Task :common-utils:processDebugNavigationResources UP-TO-DATE
+> Task :di:generateDebugResValues UP-TO-DATE
+> Task :di:processDebugNavigationResources UP-TO-DATE
+> Task :di:generateDebugResources UP-TO-DATE
+> Task :app-build-config-api:compileKotlin UP-TO-DATE
+> Task :di:checkKotlinGradlePluginConfigurationErrors
+> Task :experiments-api:compileKotlin UP-TO-DATE
+> Task :common-utils:packageDebugResources UP-TO-DATE
+> Task :di:javaPreCompileDebug UP-TO-DATE
+> Task :feature-toggles-internal-api:compileKotlin UP-TO-DATE
+> Task :app-build-config-api:compileJava NO-SOURCE
+> Task :app-build-config-api:classes UP-TO-DATE
+> Task :experiments-api:compileJava NO-SOURCE
+> Task :di:packageDebugResources UP-TO-DATE
+> Task :experiments-api:classes UP-TO-DATE
+> Task :di:parseDebugLocalResources UP-TO-DATE
+> Task :common-utils:parseDebugLocalResources UP-TO-DATE
+> Task :feature-toggles-internal-api:compileJava NO-SOURCE
+> Task :app-build-config-api:jar UP-TO-DATE
+> Task :di:dataBindingMergeDependencyArtifactsDebug UP-TO-DATE
+> Task :feature-toggles-internal-api:classes UP-TO-DATE
+> Task :common-utils:javaPreCompileDebug UP-TO-DATE
+> Task :experiments-api:jar UP-TO-DATE
+> Task :di:generateDebugRFile UP-TO-DATE
+> Task :common-utils:generateDebugRFile UP-TO-DATE
+> Task :design-system:checkKotlinGradlePluginConfigurationErrors
+> Task :design-system:processDebugNavigationResources UP-TO-DATE
+> Task :feature-toggles-internal-api:jar UP-TO-DATE
+> Task :design-system:generateDebugResValues UP-TO-DATE
+> Task :internal-features-api:dataBindingMergeDependencyArtifactsDebug UP-TO-DATE
+> Task :internal-features-api:generateDebugResValues UP-TO-DATE
+> Task :internal-features-api:processDebugNavigationResources UP-TO-DATE
+> Task :common-utils:dataBindingMergeDependencyArtifactsDebug UP-TO-DATE
+> Task :design-system:generateDebugResources UP-TO-DATE
+> Task :internal-features-api:generateDebugResources UP-TO-DATE
+> Task :internal-features-api:checkKotlinGradlePluginConfigurationErrors
+> Task :internal-features-api:javaPreCompileDebug UP-TO-DATE
+> Task :design-system:javaPreCompileDebug UP-TO-DATE
+> Task :feature-toggles-api:compileKotlin UP-TO-DATE
+> Task :design-system:mergeDebugShaders UP-TO-DATE
+> Task :internal-features-api:packageDebugResources UP-TO-DATE
+> Task :design-system:packageDebugResources UP-TO-DATE
+> Task :feature-toggles-api:compileJava NO-SOURCE
+> Task :di:dataBindingGenBaseClassesDebug UP-TO-DATE
+> Task :feature-toggles-api:classes UP-TO-DATE
+> Task :design-system:compileDebugShaders NO-SOURCE
+> Task :internal-features-api:parseDebugLocalResources UP-TO-DATE
+> Task :design-system:parseDebugLocalResources UP-TO-DATE
+> Task :feature-toggles-api:jar UP-TO-DATE
+> Task :internal-features-api:dataBindingGenBaseClassesDebug UP-TO-DATE
+> Task :design-system:dataBindingMergeDependencyArtifactsDebug UP-TO-DATE
+> Task :design-system:generateDebugAssets UP-TO-DATE
+> Task :internal-features-api:generateDebugRFile UP-TO-DATE
+> Task :design-system:generateDebugRFile UP-TO-DATE
+> Task :privacy-config-api:compileKotlin UP-TO-DATE
+> Task :design-system:mergeDebugAssets UP-TO-DATE
+> Task :privacy-config-api:compileJava NO-SOURCE
+> Task :internal-features-api:compileDebugKotlin UP-TO-DATE
+> Task :design-system:processDebugManifest UP-TO-DATE
+> Task :privacy-config-api:classes UP-TO-DATE
+> Task :design-system:stripDebugDebugSymbols NO-SOURCE
+> Task :common-utils:dataBindingGenBaseClassesDebug UP-TO-DATE
+> Task :internal-features-api:compileDebugJavaWithJavac NO-SOURCE
+> Task :privacy-config-api:jar UP-TO-DATE
+> Task :anvil-annotations:compileKotlin UP-TO-DATE
+> Task :di:compileDebugKotlin UP-TO-DATE
+> Task :internal-features-api:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :design-system:writeDebugAarMetadata UP-TO-DATE
+> Task :anvil-annotations:compileJava NO-SOURCE
+> Task :anvil-annotations:classes UP-TO-DATE
+> Task :anvil-annotations:jar UP-TO-DATE
+> Task :di:compileDebugJavaWithJavac NO-SOURCE
+> Task :di:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :design-system:prepareDebugArtProfile
+> Task :design-system:dataBindingGenBaseClassesDebug UP-TO-DATE
+> Task :design-system:copyDebugJniLibsProjectAndLocalJars
+> Task :anvil-compiler:kspKotlin UP-TO-DATE
+> Task :design-system:extractDeepLinksForAarDebug
+> Task :anvil-compiler:processResources UP-TO-DATE
+> Task :anvil-compiler:compileKotlin UP-TO-DATE
+> Task :anvil-compiler:compileJava NO-SOURCE
+> Task :anvil-compiler:classes UP-TO-DATE
+> Task :anvil-compiler:jar UP-TO-DATE
+> Task :common-utils:kspDebugKotlin UP-TO-DATE
+> Task :design-system:prepareLintJarForPublish
+> Task :common-utils:compileDebugKotlin UP-TO-DATE
+> Task :common-utils:compileDebugJavaWithJavac NO-SOURCE
+> Task :common-utils:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :design-system:checkDebugAarMetadata
+
+> Task :design-system:compileDebugKotlin FAILED
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/notifyme/NotifyMeView.kt:110:17 Cannot access class 'RevengeButtonPrimary'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/notifyme/NotifyMeView.kt:110:32 Unresolved reference: setOnClickListener
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/notifyme/NotifyMeView.kt:164:17 Cannot access class 'RevengeTextView'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/notifyme/NotifyMeView.kt:164:38 Unresolved reference: text
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/notifyme/NotifyMeView.kt:168:17 Cannot access class 'RevengeTextView'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/notifyme/NotifyMeView.kt:168:41 Unresolved reference: text
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/notifyme/NotifyMeView.kt:185:21 Cannot access class 'RevengeButtonPrimary'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/notifyme/NotifyMeView.kt:185:36 Unresolved reference: iconGravity
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/notifyme/NotifyMeView.kt:186:21 Cannot access class 'RevengeButtonPrimary'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/notifyme/NotifyMeView.kt:186:36 Unresolved reference. None of the following candidates is applicable because of receiver type mismatch: 
+public inline fun View.updateLayoutParams(block: ViewGroup.LayoutParams.() -> Unit): Unit defined in androidx.core.view
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/notifyme/NotifyMeView.kt:190:21 Cannot access class 'RevengeTextView'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/notifyme/NotifyMeView.kt:190:42 Unresolved reference: gravity
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/notifyme/NotifyMeView.kt:191:21 Cannot access class 'RevengeTextView'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/notifyme/NotifyMeView.kt:191:45 Unresolved reference: gravity
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/DaxDialog.kt:106:24 Unresolved reference: Widget_Revenge_DaxDialogFragment
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/DaxDialog.kt:140:13 Cannot access class 'RevengeTextView'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/DaxDialog.kt:140:22 Unresolved reference: setOnClickListener
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/DaxDialog.kt:146:13 Cannot access class 'RevengeButtonPrimary'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/DaxDialog.kt:146:24 Unresolved reference: setOnClickListener
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/DaxDialog.kt:152:13 Cannot access class 'RevengeButtonGhost'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/DaxDialog.kt:152:26 Unresolved reference: setOnClickListener
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/DaxDialog.kt:181:17 Cannot access class 'RevengeTextView'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/DaxDialog.kt:181:26 Unresolved reference: text
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/DaxDialog.kt:182:17 Cannot access class 'RevengeTextView'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/DaxDialog.kt:182:28 Unresolved reference: text
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/DaxDialog.kt:183:17 Cannot access class 'RevengeButtonPrimary'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/DaxDialog.kt:183:28 Unresolved reference: text
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/DaxDialog.kt:184:17 Cannot access class 'RevengeButtonGhost'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/DaxDialog.kt:184:30 Unresolved reference: text
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/DaxDialog.kt:185:17 Cannot access class 'RevengeButtonGhost'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/DaxDialog.kt:185:30 Unresolved reference: visibility
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/DaxDialog.kt:187:17 Cannot access class 'RevengeTextView'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/DaxDialog.kt:187:26 Unresolved reference: visibility
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/InfoPanel.kt:76:17 Cannot access class 'RevengeTextView'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/InfoPanel.kt:76:31 Unresolved reference: text
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/InfoPanel.kt:125:17 Cannot access class 'RevengeTextView'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/InfoPanel.kt:125:31 Cannot access class 'RevengeTextView'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/InfoPanel.kt:126:13 Unresolved reference: text
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/InfoPanel.kt:127:13 Unresolved reference: movementMethod
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/LottieDaxDialog.kt:94:24 Unresolved reference: Widget_Revenge_DaxDialogFragment
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/LottieDaxDialog.kt:131:13 Cannot access class 'RevengeTextView'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/LottieDaxDialog.kt:131:22 Unresolved reference: setOnClickListener
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/LottieDaxDialog.kt:137:13 Cannot access class 'RevengeButtonPrimary'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/LottieDaxDialog.kt:137:24 Unresolved reference: setOnClickListener
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/LottieDaxDialog.kt:143:13 Cannot access class 'RevengeButtonGhost'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/LottieDaxDialog.kt:143:26 Unresolved reference: setOnClickListener
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/LottieDaxDialog.kt:170:17 Cannot access class 'RevengeTextView'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/LottieDaxDialog.kt:170:27 Unresolved reference: text
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/LottieDaxDialog.kt:171:17 Cannot access class 'RevengeTextView'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/LottieDaxDialog.kt:171:33 Unresolved reference: text
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/LottieDaxDialog.kt:172:17 Cannot access class 'RevengeTextView'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/LottieDaxDialog.kt:172:26 Unresolved reference: text
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/LottieDaxDialog.kt:173:17 Cannot access class 'RevengeButtonPrimary'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/LottieDaxDialog.kt:173:28 Unresolved reference: text
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/LottieDaxDialog.kt:174:17 Cannot access class 'RevengeButtonGhost'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/LottieDaxDialog.kt:174:30 Unresolved reference: text
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/LottieDaxDialog.kt:175:17 Cannot access class 'RevengeButtonGhost'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/LottieDaxDialog.kt:175:30 Unresolved reference: visibility
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/LottieDaxDialog.kt:176:17 Cannot access class 'RevengeTextView'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/LottieDaxDialog.kt:176:26 Unresolved reference: visibility
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/MenuItemView.kt:57:17 Cannot access class 'RevengeTextView'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/MenuItemView.kt:57:23 Unresolved reference: setTypography
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/MenuItemView.kt:62:21 Cannot access class 'RevengeTextView'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/MenuItemView.kt:62:27 Unresolved reference: setTextColorStateList
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/MenuItemView.kt:65:17 Cannot access class 'RevengeTextView'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/MenuItemView.kt:65:23 Unresolved reference: text
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/MenuItemView.kt:77:17 Cannot access class 'RevengeTextView'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/MenuItemView.kt:77:23 Unresolved reference: text
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/MenuItemView.kt:82:17 Cannot access class 'RevengeTextView'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/MenuItemView.kt:82:23 Unresolved reference: text
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/MenuItemView.kt:91:51 Cannot access class 'RevengeTextView'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/MenuItemView.kt:91:57 Unresolved reference: text
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/MessageCta.kt:88:30 Cannot access class 'RevengeTextView'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/MessageCta.kt:88:43 Unresolved reference: text
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/MessageCta.kt:89:30 Cannot access class 'RevengeTextView'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/MessageCta.kt:89:46 Unresolved reference: text
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/MessageCta.kt:92:34 Cannot access class 'RevengeButtonGhost'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/MessageCta.kt:92:56 Unresolved reference. None of the following candidates is applicable because of receiver type mismatch: 
+public fun View.gone(): View defined in com.duckduckgo.common.ui.view in file ViewExtension.kt
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/MessageCta.kt:94:34 Cannot access class 'RevengeButtonGhost'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/MessageCta.kt:94:56 Unresolved reference: text
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/MessageCta.kt:95:34 Cannot access class 'RevengeButtonGhost'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/MessageCta.kt:95:56 Unresolved reference. None of the following candidates is applicable because of receiver type mismatch: 
+public fun View.show(): View defined in com.duckduckgo.common.ui.view in file ViewExtension.kt
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/MessageCta.kt:99:34 Cannot access class 'RevengeButtonPrimary'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/MessageCta.kt:99:54 Unresolved reference. None of the following candidates is applicable because of receiver type mismatch: 
+public fun View.gone(): View defined in com.duckduckgo.common.ui.view in file ViewExtension.kt
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/MessageCta.kt:101:34 Cannot access class 'RevengeButtonPrimary'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/MessageCta.kt:101:54 Unresolved reference: text
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/MessageCta.kt:103:38 Cannot access class 'RevengeButtonPrimary'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/MessageCta.kt:103:58 Unresolved reference: icon
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/MessageCta.kt:105:34 Cannot access class 'RevengeButtonPrimary'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/MessageCta.kt:105:54 Unresolved reference. None of the following candidates is applicable because of receiver type mismatch: 
+public fun View.show(): View defined in com.duckduckgo.common.ui.view in file ViewExtension.kt
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/MessageCta.kt:112:30 Cannot access class 'RevengeButtonPrimary'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/MessageCta.kt:112:50 Unresolved reference: setOnClickListener
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/MessageCta.kt:116:30 Cannot access class 'RevengeButtonGhost'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/MessageCta.kt:116:52 Unresolved reference: setOnClickListener
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/MessageCta.kt:142:29 Cannot access class 'RevengeTextView'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/MessageCta.kt:142:42 Unresolved reference: text
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/MessageCta.kt:143:29 Cannot access class 'RevengeTextView'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/MessageCta.kt:143:45 Unresolved reference: text
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/MessageCta.kt:144:29 Cannot access class 'RevengeButtonSecondary'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/MessageCta.kt:144:42 Unresolved reference: text
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/MessageCta.kt:158:29 Cannot access class 'RevengeButtonSecondary'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/MessageCta.kt:158:42 Unresolved reference: setOnClickListener
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/PopupMenuItemView.kt:69:21 Cannot access class 'RevengeTextView'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/PopupMenuItemView.kt:69:27 Unresolved reference: text
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/PopupMenuItemView.kt:76:17 Cannot access class 'RevengeTextView'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/PopupMenuItemView.kt:76:23 Unresolved reference: text
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/PopupMenuItemView.kt:81:17 Cannot access class 'RevengeTextView'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/PopupMenuItemView.kt:81:23 Unresolved reference: text
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/PopupMenuItemView.kt:85:17 Cannot access class 'RevengeTextView'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/PopupMenuItemView.kt:85:23 Unresolved reference: text
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/PopupMenuItemView.kt:91:32 Cannot access class 'RevengeTextView'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/PopupMenuItemView.kt:91:38 Unresolved reference: setTextColor
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/PopupMenuItemView.kt:92:36 Cannot access class 'RevengeTextView'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/PopupMenuItemView.kt:92:42 Unresolved reference: setTextColor
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/PopupMenuItemView.kt:97:51 Cannot access class 'RevengeTextView'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/PopupMenuItemView.kt:97:57 Unresolved reference: text
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/PopupMenuItemView.kt:102:49 Cannot access class 'RevengeTextView'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/PopupMenuItemView.kt:102:55 Unresolved reference: text
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/StatusIndicatorView.kt:53:25 Cannot access class 'RevengeTextView'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/StatusIndicatorView.kt:53:31 Unresolved reference: text
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/StatusIndicatorView.kt:57:25 Cannot access class 'RevengeTextView'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/StatusIndicatorView.kt:57:31 Unresolved reference: text
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/StatusIndicatorView.kt:61:25 Cannot access class 'RevengeTextView'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/StatusIndicatorView.kt:61:31 Unresolved reference: text
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/button/DaxButton.kt:39:29 Unresolved reference: DaxButton
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/button/DaxButton.kt:44:62 Unresolved reference: DaxButton_daxButtonSize
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/button/DaxButton.kt:45:53 Unresolved reference: DaxButton_daxButtonSize
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/dialog/ActionBottomSheetDialog.kt:67:21 Cannot access class 'RevengeTextView'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/dialog/ActionBottomSheetDialog.kt:67:50 Unresolved reference: text
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/dialog/ActionBottomSheetDialog.kt:68:21 Cannot access class 'RevengeTextView'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/dialog/ActionBottomSheetDialog.kt:68:50 Unresolved reference. None of the following candidates is applicable because of receiver type mismatch: 
+public fun View.show(): View defined in com.duckduckgo.common.ui.view in file ViewExtension.kt
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/dialog/CustomAlertDialogBuilder.kt:136:21 Cannot access class 'RevengeTextView'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/dialog/CustomAlertDialogBuilder.kt:136:39 Unresolved reference. None of the following candidates is applicable because of receiver type mismatch: 
+public fun View.gone(): View defined in com.duckduckgo.common.ui.view in file ViewExtension.kt
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/dialog/CustomAlertDialogBuilder.kt:138:21 Cannot access class 'RevengeTextView'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/dialog/CustomAlertDialogBuilder.kt:138:39 Unresolved reference: text
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/dialog/CustomAlertDialogBuilder.kt:142:21 Cannot access class 'RevengeTextView'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/dialog/CustomAlertDialogBuilder.kt:142:41 Unresolved reference. None of the following candidates is applicable because of receiver type mismatch: 
+public fun View.gone(): View defined in com.duckduckgo.common.ui.view in file ViewExtension.kt
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/dialog/CustomAlertDialogBuilder.kt:144:21 Cannot access class 'RevengeTextView'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/dialog/CustomAlertDialogBuilder.kt:144:41 Unresolved reference: text
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/dialog/CustomAlertDialogBuilder.kt:148:21 Cannot access class 'RevengeButtonPrimary'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/dialog/CustomAlertDialogBuilder.kt:148:48 Unresolved reference. None of the following candidates is applicable because of receiver type mismatch: 
+public fun View.gone(): View defined in com.duckduckgo.common.ui.view in file ViewExtension.kt
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/dialog/CustomAlertDialogBuilder.kt:150:21 Cannot access class 'RevengeButtonPrimary'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/dialog/CustomAlertDialogBuilder.kt:150:48 Unresolved reference: text
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/dialog/CustomAlertDialogBuilder.kt:151:21 Cannot access class 'RevengeButtonPrimary'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/dialog/CustomAlertDialogBuilder.kt:151:48 Unresolved reference: setOnClickListener
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/dialog/CustomAlertDialogBuilder.kt:158:21 Cannot access class 'RevengeButtonGhost'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/dialog/CustomAlertDialogBuilder.kt:158:48 Unresolved reference. None of the following candidates is applicable because of receiver type mismatch: 
+public fun View.gone(): View defined in com.duckduckgo.common.ui.view in file ViewExtension.kt
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/dialog/CustomAlertDialogBuilder.kt:160:21 Cannot access class 'RevengeButtonGhost'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/dialog/CustomAlertDialogBuilder.kt:160:48 Unresolved reference: text
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/dialog/CustomAlertDialogBuilder.kt:161:21 Cannot access class 'RevengeButtonGhost'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/dialog/CustomAlertDialogBuilder.kt:161:48 Unresolved reference: setOnClickListener
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/dialog/PromoBottomSheetDialog.kt:53:17 Cannot access class 'RevengeButtonPrimary'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/dialog/PromoBottomSheetDialog.kt:53:47 Unresolved reference: setOnClickListener
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/dialog/PromoBottomSheetDialog.kt:58:17 Cannot access class 'RevengeButtonGhost'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/dialog/PromoBottomSheetDialog.kt:58:49 Unresolved reference: setOnClickListener
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/dialog/PromoBottomSheetDialog.kt:70:21 Cannot access class 'RevengeTextView'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/dialog/PromoBottomSheetDialog.kt:70:43 Unresolved reference: text
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/dialog/PromoBottomSheetDialog.kt:71:21 Cannot access class 'RevengeTextView'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/dialog/PromoBottomSheetDialog.kt:71:43 Unresolved reference. None of the following candidates is applicable because of receiver type mismatch: 
+public fun View.show(): View defined in com.duckduckgo.common.ui.view in file ViewExtension.kt
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/dialog/PromoBottomSheetDialog.kt:74:17 Cannot access class 'RevengeTextView'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/dialog/PromoBottomSheetDialog.kt:74:41 Unresolved reference: text
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/dialog/PromoBottomSheetDialog.kt:75:17 Cannot access class 'RevengeButtonPrimary'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/dialog/PromoBottomSheetDialog.kt:75:47 Unresolved reference: text
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/dialog/PromoBottomSheetDialog.kt:76:17 Cannot access class 'RevengeButtonGhost'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/dialog/PromoBottomSheetDialog.kt:76:49 Unresolved reference: text
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/dialog/RadioListAlertDialogBuilder.kt:167:17 Cannot access class 'RevengeTextView'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/dialog/RadioListAlertDialogBuilder.kt:167:38 Unresolved reference: text
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/dialog/RadioListAlertDialogBuilder.kt:170:21 Cannot access class 'RevengeTextView'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/dialog/RadioListAlertDialogBuilder.kt:170:44 Unresolved reference. None of the following candidates is applicable because of receiver type mismatch: 
+public fun View.gone(): View defined in com.duckduckgo.common.ui.view in file ViewExtension.kt
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/dialog/RadioListAlertDialogBuilder.kt:172:21 Cannot access class 'RevengeTextView'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/dialog/RadioListAlertDialogBuilder.kt:172:44 Unresolved reference: text
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/dialog/StackedAlertDialogBuilder.kt:135:17 Cannot access class 'RevengeTextView'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/dialog/StackedAlertDialogBuilder.kt:135:41 Unresolved reference: text
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/dialog/StackedAlertDialogBuilder.kt:138:21 Cannot access class 'RevengeTextView'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/dialog/StackedAlertDialogBuilder.kt:138:46 Unresolved reference. None of the following candidates is applicable because of receiver type mismatch: 
+public fun View.gone(): View defined in com.duckduckgo.common.ui.view in file ViewExtension.kt
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/dialog/StackedAlertDialogBuilder.kt:140:21 Cannot access class 'RevengeTextView'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/dialog/StackedAlertDialogBuilder.kt:140:46 Unresolved reference: text
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/dialog/TextAlertDialogBuilder.kt:227:17 Cannot access class 'RevengeTextView'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/dialog/TextAlertDialogBuilder.kt:227:38 Unresolved reference: text
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/dialog/TextAlertDialogBuilder.kt:230:21 Cannot access class 'RevengeTextView'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/dialog/TextAlertDialogBuilder.kt:230:44 Unresolved reference. None of the following candidates is applicable because of receiver type mismatch: 
+public fun View.gone(): View defined in com.duckduckgo.common.ui.view in file ViewExtension.kt
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/dialog/TextAlertDialogBuilder.kt:232:21 Cannot access class 'RevengeTextView'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/dialog/TextAlertDialogBuilder.kt:232:44 Unresolved reference: text
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/dialog/TextAlertDialogBuilder.kt:234:25 Cannot access class 'RevengeTextView'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/dialog/TextAlertDialogBuilder.kt:234:48 Unresolved reference: movementMethod
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/listitem/BookmarksListItem.kt:40:17 Type mismatch: inferred type is RevengeTextView but DaxTextView was expected
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/listitem/BookmarksListItem.kt:40:25 Cannot access class 'RevengeTextView'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/listitem/BookmarksListItem.kt:43:17 Type mismatch: inferred type is RevengeTextView but DaxTextView was expected
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/listitem/BookmarksListItem.kt:43:25 Cannot access class 'RevengeTextView'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/listitem/BookmarksListItem.kt:53:17 Type mismatch: inferred type is RevengeSwitch but DaxSwitch was expected
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/listitem/BookmarksListItem.kt:53:25 Cannot access class 'RevengeSwitch'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/listitem/DaxGridItem.kt:48:25 Unresolved reference: DaxGridItem
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/listitem/DaxGridItem.kt:52:50 Unresolved reference: DaxGridItem_primaryText
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/listitem/DaxGridItem.kt:53:38 Unresolved reference: DaxGridItem_leadingIcon
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/listitem/DaxGridItem.kt:54:64 Unresolved reference: DaxGridItem_leadingIcon
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/listitem/DaxGridItem.kt:57:38 Unresolved reference: DaxGridItem_gridItemType
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/listitem/DaxGridItem.kt:58:69 Unresolved reference: DaxGridItem_gridItemType
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/listitem/DaxGridItem.kt:69:17 Cannot access class 'RevengeTextView'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/listitem/DaxGridItem.kt:69:34 Unresolved reference: text
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/listitem/DaxGridItem.kt:74:17 Cannot access class 'RevengeTextView'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/listitem/DaxGridItem.kt:74:34 Unresolved reference: text
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/listitem/DaxGridItem.kt:107:17 Cannot access class 'RevengeTextView'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/listitem/DaxGridItem.kt:107:34 Unresolved reference: alpha
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/listitem/DaxGridItem.kt:111:17 Cannot access class 'RevengeTextView'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/listitem/DaxGridItem.kt:111:34 Unresolved reference: alpha
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/listitem/DaxGridItem.kt:126:17 Cannot access class 'RevengeTextView'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/listitem/DaxGridItem.kt:126:34 Unresolved reference. None of the following candidates is applicable because of receiver type mismatch: 
+public fun View.gone(): View defined in com.duckduckgo.common.ui.view in file ViewExtension.kt
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/listitem/DaxGridItem.kt:134:17 Cannot access class 'RevengeTextView'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/listitem/DaxGridItem.kt:134:34 Unresolved reference. None of the following candidates is applicable because of receiver type mismatch: 
+public fun View.show(): View defined in com.duckduckgo.common.ui.view in file ViewExtension.kt
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/listitem/DaxGridItem.kt:142:17 Cannot access class 'RevengeTextView'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/listitem/DaxGridItem.kt:142:34 Unresolved reference. None of the following candidates is applicable because of receiver type mismatch: 
+public fun View.show(): View defined in com.duckduckgo.common.ui.view in file ViewExtension.kt
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/listitem/OneLineListItem.kt:41:17 Type mismatch: inferred type is RevengeTextView but DaxTextView was expected
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/listitem/OneLineListItem.kt:41:25 Cannot access class 'RevengeTextView'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/listitem/OneLineListItem.kt:54:17 Type mismatch: inferred type is RevengeSwitch but DaxSwitch was expected
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/listitem/OneLineListItem.kt:54:25 Cannot access class 'RevengeSwitch'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/listitem/RadioListItem.kt:43:17 Type mismatch: inferred type is RevengeTextView but DaxTextView was expected
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/listitem/RadioListItem.kt:43:25 Cannot access class 'RevengeTextView'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/listitem/RadioListItem.kt:45:17 Type mismatch: inferred type is RevengeTextView but DaxTextView was expected
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/listitem/RadioListItem.kt:45:25 Cannot access class 'RevengeTextView'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/listitem/RadioListItem.kt:67:21 Cannot access class 'RevengeTextView'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/listitem/RadioListItem.kt:67:33 Unresolved reference: text
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/listitem/RadioListItem.kt:70:25 Cannot access class 'RevengeTextView'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/listitem/RadioListItem.kt:70:39 Unresolved reference: text
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/listitem/RadioListItem.kt:72:25 Cannot access class 'RevengeTextView'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/listitem/RadioListItem.kt:72:39 Unresolved reference. None of the following candidates is applicable because of receiver type mismatch: 
+public fun View.gone(): View defined in com.duckduckgo.common.ui.view in file ViewExtension.kt
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/listitem/RadioListItem.kt:76:25 Cannot access class 'RevengeTextView'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/listitem/RadioListItem.kt:76:37 Unresolved reference: setTextColor
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/listitem/RadioListItem.kt:80:25 Cannot access class 'RevengeTextView'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/listitem/RadioListItem.kt:80:39 Unresolved reference: setTextColor
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/listitem/RadioListItem.kt:84:25 Cannot access class 'RevengeTextView'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/listitem/RadioListItem.kt:84:37 Unresolved reference: text
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/listitem/RadioListItem.kt:86:25 Cannot access class 'RevengeTextView'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/listitem/RadioListItem.kt:86:37 Unresolved reference. None of the following candidates is applicable because of receiver type mismatch: 
+public fun View.gone(): View defined in com.duckduckgo.common.ui.view in file ViewExtension.kt
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/listitem/RadioListItem.kt:126:17 Cannot access class 'RevengeTextView'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/listitem/RadioListItem.kt:126:29 Unresolved reference: text
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/listitem/RadioListItem.kt:127:17 Cannot access class 'RevengeTextView'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/listitem/RadioListItem.kt:127:29 Unresolved reference. None of the following candidates is applicable because of receiver type mismatch: 
+public fun View.show(): View defined in com.duckduckgo.common.ui.view in file ViewExtension.kt
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/listitem/SectionHeaderListItem.kt:41:21 Cannot access class 'RevengeTextView'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/listitem/SectionHeaderListItem.kt:41:39 Unresolved reference: text
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/listitem/SectionHeaderListItem.kt:53:21 Cannot access class 'RevengeTextView'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/listitem/SectionHeaderListItem.kt:53:39 Unresolved reference: text
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/listitem/SectionHeaderListItem.kt:54:21 Cannot access class 'RevengeTextView'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/listitem/SectionHeaderListItem.kt:54:39 Unresolved reference: setTextColor
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/listitem/SectionHeaderListItem.kt:69:17 Cannot access class 'RevengeTextView'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/listitem/SectionHeaderListItem.kt:69:35 Unresolved reference: text
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/listitem/SectionHeaderListItem.kt:75:17 Cannot access class 'RevengeTextView'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/listitem/SectionHeaderListItem.kt:75:35 Unresolved reference: text
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/listitem/SettingsListItem.kt:44:17 Type mismatch: inferred type is RevengeTextView but DaxTextView was expected
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/listitem/SettingsListItem.kt:44:25 Cannot access class 'RevengeTextView'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/listitem/TwoLineListItem.kt:41:17 Type mismatch: inferred type is RevengeTextView but DaxTextView was expected
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/listitem/TwoLineListItem.kt:41:25 Cannot access class 'RevengeTextView'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/listitem/TwoLineListItem.kt:44:17 Type mismatch: inferred type is RevengeTextView but DaxTextView was expected
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/listitem/TwoLineListItem.kt:44:25 Cannot access class 'RevengeTextView'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/listitem/TwoLineListItem.kt:54:17 Type mismatch: inferred type is RevengeSwitch but DaxSwitch was expected
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/listitem/TwoLineListItem.kt:54:25 Cannot access class 'RevengeSwitch'. Check your module classpath for missing or conflicting dependencies
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/shape/DaxBubbleCardView.kt:36:76 Unresolved reference: DaxBubbleCardView
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/shape/DaxBubbleCardView.kt:37:70 Unresolved reference: DaxBubbleCardView_edgePosition
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/shape/DaxOnboardingBubbleCardView.kt:38:76 Unresolved reference: DaxOnboardingBubbleCardView
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/shape/DaxOnboardingBubbleCardView.kt:39:70 Unresolved reference: DaxOnboardingBubbleCardView_edgePosition
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/shape/DaxOnboardingBubbleCardView.kt:41:25 Unresolved reference: DaxOnboardingBubbleCardView_arrowHeight
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/shape/DaxOnboardingBubbleCardView.kt:47:66 Unresolved reference: DaxOnboardingBubbleCardView_arrowOffsetStart
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/shape/DaxOnboardingBubbleCardView.kt:48:64 Unresolved reference: DaxOnboardingBubbleCardView_arrowOffsetEnd
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/text/DaxTextInput.kt:110:25 Unresolved reference: DaxTextInput
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/text/DaxTextInput.kt:114:42 Unresolved reference: DaxTextInput_android_text
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/text/DaxTextInput.kt:115:37 Unresolved reference: DaxTextInput_endIcon
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/text/DaxTextInput.kt:116:64 Unresolved reference: DaxTextInput_endIconContentDescription
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/text/DaxTextInput.kt:120:50 Unresolved reference: DaxTextInput_clickable
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/text/DaxTextInput.kt:121:49 Unresolved reference: DaxTextInput_editable
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/text/DaxTextInput.kt:122:87 Unresolved reference: DaxTextInput_android_hint
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/text/DaxTextInput.kt:127:47 Unresolved reference: DaxTextInput_android_minLines
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/text/DaxTextInput.kt:130:48 Unresolved reference: DaxTextInput_singleLineTextTruncated
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/text/DaxTextInput.kt:138:40 Unresolved reference: DaxTextInput_capitalizeKeyboard
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/text/DaxTextInput.kt:142:50 Unresolved reference: DaxTextInput_android_enabled
+e: file:///Users/muftimehedi/StudioProjects/revenge-browser/android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/view/text/DaxTextInput.kt:425:47 Unresolved reference: DaxTextInput_type
+
+[Incubating] Problems report is available at: file:///Users/muftimehedi/StudioProjects/revenge-browser/build/reports/problems/problems-report.html
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':design-system:compileDebugKotlin'.
+> A failure occurred while executing org.jetbrains.kotlin.compilerRunner.GradleCompilerRunnerWithWorkers$GradleKotlinCompilerWorkAction
+   > Compilation error. See log for more details
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+> Get more help at https://help.gradle.org.
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/8.13/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD FAILED in 14s
+87 actionable tasks: 18 executed, 69 up-to-date
+Configuration cache entry stored.

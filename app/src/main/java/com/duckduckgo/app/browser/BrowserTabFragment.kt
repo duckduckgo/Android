@@ -288,7 +288,7 @@ import com.duckduckgo.downloads.api.DownloadConfirmationDialogListener
 import com.duckduckgo.downloads.api.DownloadsFileActions
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
-import com.duckduckgo.duckchat.api.DuckAiFeatureState
+import com.duckduckgo.duckchat.api.RevengeAIFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.inputscreen.BrowserAndInputScreenTransitionProvider
 import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityParams
@@ -558,7 +558,7 @@ class BrowserTabFragment :
     lateinit var duckChat: DuckChat
 
     @Inject
-    lateinit var duckAiFeatureState: DuckAiFeatureState
+    lateinit var duckAiFeatureState: RevengeAIFeatureState
 
     @Inject
     lateinit var webViewCapabilityChecker: WebViewCapabilityChecker
@@ -656,10 +656,10 @@ class BrowserTabFragment :
         get() = binding.sslErrorWarningLayout
 
     private val daxDialogIntroBubble
-        get() = binding.includeNewBrowserTab.includeOnboardingDaxDialogBubble
+        get() = binding.includeNewBrowserTab.includeOnboardingRevengeDialogBubble
 
     private val daxDialogInContext
-        get() = binding.includeOnboardingInContextDaxDialog
+        get() = binding.includeOnboardingInContextRevengeDialog
 
     // Optimization to prevent against excessive work generating WebView previews; an existing job will be cancelled if a new one is launched
     private var bitmapGeneratorJob: Job? = null
@@ -938,7 +938,7 @@ class BrowserTabFragment :
                             userEnteredQuery(result.query)
                         }
 
-                        is VoiceSearchLauncher.VoiceRecognitionResult.DuckAiResult -> {
+                        is VoiceSearchLauncher.VoiceRecognitionResult.RevengeAIResult -> {
                             duckChat.openDuckChatWithAutoPrompt(result.query)
                         }
                     }
@@ -1356,7 +1356,7 @@ class BrowserTabFragment :
             onMenuItemClicked(newTabMenuItem) {
                 viewModel.onNewTabMenuItemClicked()
             }
-            onMenuItemClicked(duckChatMenuItem) {
+            onMenuItemClicked(revengeChatMenuItem) {
                 activity?.currentFocus?.let {
                     it.hideKeyboard()
                     it.clearFocus()
@@ -1424,7 +1424,7 @@ class BrowserTabFragment :
             onMenuItemClicked(vpnMenuItem) {
                 viewModel.onVpnMenuClicked()
             }
-            onMenuItemClicked(duckNewChatMenuItem) {
+            onMenuItemClicked(revengeNewChatMenuItem) {
                 viewModel.openNewDuckChat(omnibar.viewMode)
             }
             onMenuItemClicked(duckChatHistoryMenuItem) {
@@ -2439,13 +2439,13 @@ class BrowserTabFragment :
     }
 
     private fun setOnboardingDialogBackgroundRes(backgroundRes: Int) {
-        daxDialogInContext.onboardingDaxDialogBackground.setImageResource(backgroundRes)
+        daxDialogInContext.onboardingRevengeDialogBackground.setImageResource(backgroundRes)
     }
 
     private fun setOnboardingDialogBackgroundColor(
         @ColorRes colorRes: Int,
     ) {
-        daxDialogInContext.onboardingDaxDialogContainer.setBackgroundColor(getColor(requireContext(), colorRes))
+        daxDialogInContext.onboardingRevengeDialogContainer.setBackgroundColor(getColor(requireContext(), colorRes))
     }
 
     private fun showRemoveSearchSuggestionDialog(suggestion: AutoCompleteSuggestion) {

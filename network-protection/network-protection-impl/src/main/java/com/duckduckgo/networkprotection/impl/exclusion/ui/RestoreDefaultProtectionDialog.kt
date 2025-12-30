@@ -49,7 +49,7 @@ class RestoreDefaultProtectionDialog : DialogFragment() {
         val restoreCTA = rootView.findViewById<Button>(R.id.restore_default_dialog_action_restore)
         val cancelCTA = rootView.findViewById<Button>(R.id.restore_default_dialog_action_cancel)
 
-        val alertDialog = MaterialAlertDialogBuilder(requireActivity(), com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_Dialog)
+        val alertDialog = MaterialAlertDialogBuilder(requireActivity(), com.duckduckgo.mobile.android.R.style.Widget_Revenge_Dialog)
             .setView(rootView)
 
         isCancelable = false

@@ -28,7 +28,7 @@
     <string name="browserMenuEnablePrivacyProtection">Activează protecția confidențialității</string>
     <string name="browserMenuDisablePrivacyProtection">Dezactivează protecția confidențialității</string>
     <string name="browserMenuNewTab">Filă nouă</string>
-    <string name="browserMenuDuckChat">Duck.ai</string>
+    <string name="browserMenuRevengeChat">Revenge AI</string>
     <string name="browserMenuShare">Trimite…</string>
     <string name="browserMenuEmailAlias">Generează Duck Address</string>
     <string name="browserMenuFindInPage">Caută în pagină</string>
@@ -45,7 +45,7 @@
     <string name="browserMenuNewChat">Chat nou</string>
     <string name="browserMenuNewAIChat">Chat AI nou</string>
     <string name="browserMenuChatHistory">Istoricul chaturilor</string>
-    <string name="browserMenuChatSettings">Setări Duck.ai</string>
+    <string name="browserMenuChatSettings">Setări Revenge AI</string>
     <string name="browserMenuVPN">VPN</string>
 
     <!-- Browser Menu Content Description -->
