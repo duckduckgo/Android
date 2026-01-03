@@ -69,6 +69,8 @@ import com.duckduckgo.duckchat.impl.inputscreen.wideevents.InputScreenOnboarding
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -91,6 +93,9 @@ class WelcomePageViewModel @Inject constructor(
 ) : ViewModel() {
     private val _commands = Channel<Command>(1, DROP_OLDEST)
     val commands: Flow<Command> = _commands.receiveAsFlow()
+
+    private val _viewState = MutableStateFlow<PreOnboardingDialogType?>(null)
+    val viewState = _viewState.asStateFlow()
 
     private var defaultAddressBarPosition: Boolean = true
     private var inputScreenSelected: Boolean = true
@@ -137,13 +142,13 @@ class WelcomePageViewModel @Inject constructor(
         when (currentDialog) {
             INITIAL_REINSTALL_USER -> {
                 viewModelScope.launch {
-                    _commands.send(ShowComparisonChart)
+                    emitStateCommand(ShowComparisonChart, COMPARISON_CHART)
                 }
             }
 
             INITIAL -> {
                 viewModelScope.launch {
-                    _commands.send(ShowComparisonChart)
+                    emitStateCommand(ShowComparisonChart, COMPARISON_CHART)
                 }
             }
 
@@ -156,7 +161,7 @@ class WelcomePageViewModel @Inject constructor(
                                 _commands.send(ShowDefaultBrowserDialog(intent))
                             } else {
                                 pixel.fire(AppPixelName.DEFAULT_BROWSER_DIALOG_NOT_SHOWN)
-                                _commands.send(ShowAddressBarPositionDialog)
+                                emitStateCommand(ShowAddressBarPositionDialog, ADDRESS_BAR_POSITION)
                             }
                             false
                         } else {
@@ -184,7 +189,7 @@ class WelcomePageViewModel @Inject constructor(
                         pixel.fire(PREONBOARDING_BOTTOM_ADDRESS_BAR_SELECTED_UNIQUE)
                     }
                     if (androidBrowserConfigFeature.showInputScreenOnboarding().isEnabled()) {
-                        _commands.send(Command.ShowInputScreenDialog)
+                        emitStateCommand(Command.ShowInputScreenDialog, INPUT_SCREEN)
                     } else {
                         _commands.send(Finish)
                     }
@@ -212,7 +217,7 @@ class WelcomePageViewModel @Inject constructor(
             INITIAL_REINSTALL_USER -> {
                 viewModelScope.launch {
                     reinstallUser = true
-                    _commands.send(ShowSkipOnboardingOption)
+                    emitStateCommand(ShowSkipOnboardingOption, SKIP_ONBOARDING_OPTION)
                     pixel.fire(PREONBOARDING_SKIP_ONBOARDING_PRESSED)
                 }
             }
@@ -227,7 +232,7 @@ class WelcomePageViewModel @Inject constructor(
 
             SKIP_ONBOARDING_OPTION -> {
                 viewModelScope.launch {
-                    _commands.send(ShowComparisonChart)
+                    emitStateCommand(ShowComparisonChart, COMPARISON_CHART)
                     pixel.fire(PREONBOARDING_RESUME_ONBOARDING_PRESSED)
                 }
             }
@@ -311,6 +316,8 @@ class WelcomePageViewModel @Inject constructor(
 
     fun loadDaxDialog() {
         viewModelScope.launch {
+            if (_viewState.value != null) return@launch
+
             if (isAppReinstall()) {
                 _commands.send(ShowInitialReinstallUserDialog)
             } else {
@@ -323,4 +330,9 @@ class WelcomePageViewModel @Inject constructor(
         withContext(dispatchers.io()) {
             appBuildConfig.isAppReinstall()
         }
+
+    private suspend fun emitStateCommand(command: Command, type: PreOnboardingDialogType) {
+        _viewState.value = type
+        _commands.send(command)
+    }
 }
