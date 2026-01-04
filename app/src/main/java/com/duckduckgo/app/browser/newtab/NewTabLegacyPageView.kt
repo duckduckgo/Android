@@ -132,6 +132,11 @@ class NewTabLegacyPageView @JvmOverloads constructor(
         conflatedCommandJob += viewModel.commands()
             .onEach { processCommands(it) }
             .launchIn(findViewTreeLifecycleOwner()?.lifecycleScope!!)
+
+        binding.game1.setOnClickListener { viewModel.onGameSelected("https://play2048.co/") }
+        binding.game2.setOnClickListener { viewModel.onGameSelected("https://www.google.com/logos/2010/pacman10-i.html") }
+        binding.game3.setOnClickListener { viewModel.onGameSelected("https://patorjk.com/games/snake/") }
+        binding.game4.setOnClickListener { viewModel.onGameSelected("https://tetris.com/play-tetris") }
     }
 
     override fun onDetachedFromWindow() {
@@ -178,6 +183,7 @@ class NewTabLegacyPageView @JvmOverloads constructor(
             is SharePromoLinkRMF -> launchSharePromoRMFPageChooser(command.url, command.shareTitle)
             is SubmitUrl -> submitUrl(command.url)
             is LaunchDefaultCredentialProvider -> launchDefaultCredentialProvider()
+            is NewTabLegacyPageViewModel.Command.LaunchGame -> submitUrl(command.url)
         }
     }
 

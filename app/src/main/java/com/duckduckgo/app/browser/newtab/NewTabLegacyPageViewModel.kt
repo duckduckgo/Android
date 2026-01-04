@@ -112,6 +112,8 @@ class NewTabLegacyPageViewModel @AssistedInject constructor(
             val payload: String,
         ) : Command()
 
+        data class LaunchGame(val url: String) : Command()
+
         data object LaunchDefaultCredentialProvider : Command()
     }
 
@@ -226,6 +228,12 @@ class NewTabLegacyPageViewModel @AssistedInject constructor(
     fun onLowPriorityMessagePrimaryButtonClicked() {
         viewModelScope.launch {
             lowPriorityMessagingModel.getPrimaryButtonCommand()?.let { command.send(it) }
+        }
+    }
+
+    fun onGameSelected(url: String) {
+        viewModelScope.launch {
+            command.send(Command.LaunchGame(url))
         }
     }
 
