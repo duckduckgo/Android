@@ -167,10 +167,14 @@ class SiteMonitor(
     }
 
     override fun privacyProtection(): PrivacyShield {
+        val isUserAllowListed = domain?.let { userAllowListRepository.isDomainInUserAllowList(it) } ?: false
         userAllowList = domain?.let { isAllowListed(it) } ?: false
+
         if (maliciousSiteStatus != null) return MALICIOUS
         if (duckPlayer.isDuckPlayerUri(url)) return UNKNOWN
-        if (userAllowList || !isHttps) return UNPROTECTED
+
+        // Only show UNPROTECTED for user-initiated allowlist, not remote config exceptions
+        if (isUserAllowListed || !isHttps) return UNPROTECTED
 
         if (!fullSiteDetailsAvailable) {
             logcat(INFO) { "Shield: not fullSiteDetailsAvailable for $domain" }

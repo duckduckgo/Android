@@ -18,6 +18,7 @@ package com.duckduckgo.app.browser.omnibar
 
 import android.view.MotionEvent.ACTION_UP
 import android.webkit.URLUtil
+import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
@@ -60,6 +61,7 @@ import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extractDomain
+import com.duckduckgo.common.utils.isLocalUrl
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
@@ -463,6 +465,9 @@ class OmnibarLayoutViewModel @Inject constructor(
                     Dax
                 } else if (shouldShowDuckPlayerIcon(url)) {
                     DuckPlayer
+                } else if (isLocalUrl(url)) {
+                    // Show globe icon for localhost and private network addresses
+                    Globe
                 } else {
                     if (url.isEmpty()) {
                         Search
@@ -471,6 +476,14 @@ class OmnibarLayoutViewModel @Inject constructor(
                     }
                 }
             }
+        }
+    }
+
+    private fun isLocalUrl(url: String): Boolean {
+        return try {
+            url.toUri().isLocalUrl
+        } catch (e: Exception) {
+            false
         }
     }
 
