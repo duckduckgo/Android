@@ -1,6 +1,9 @@
 package com.duckduckgo.subscriptions.impl.repository
 
+import android.annotation.SuppressLint
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.EXPIRED
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.GRACE_PERIOD
@@ -8,6 +11,8 @@ import com.duckduckgo.subscriptions.api.SubscriptionStatus.INACTIVE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.NOT_AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.UNKNOWN
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.WAITING
+import com.duckduckgo.subscriptions.impl.PrivacyProFeature
+import com.duckduckgo.subscriptions.impl.model.Entitlement
 import com.duckduckgo.subscriptions.impl.serp_promo.FakeSerpPromo
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
@@ -15,13 +20,20 @@ import org.junit.Rule
 import org.junit.Test
 import java.time.Instant
 
+@SuppressLint("DenyListedApi")
 class RealAuthRepositoryTest {
     @get:Rule
     val coroutineRule = CoroutineTestRule()
 
     private val authStore = FakeSubscriptionsDataStore()
     private val serpPromo = FakeSerpPromo()
-    private val authRepository: AuthRepository = RealAuthRepository(authStore, coroutineRule.testDispatcherProvider, serpPromo)
+    private val privacyProFeature = FakeFeatureToggleFactory.create(PrivacyProFeature::class.java)
+    private val authRepository: AuthRepository = RealAuthRepository(
+        authStore,
+        coroutineRule.testDispatcherProvider,
+        serpPromo,
+        dagger.Lazy { privacyProFeature },
+    )
 
     @Test
     fun whenClearAccountThenClearData() = runTest {
@@ -137,6 +149,7 @@ class RealAuthRepositoryTest {
             FakeSubscriptionsDataStore(supportEncryption = false),
             coroutineRule.testDispatcherProvider,
             serpPromo,
+            dagger.Lazy { privacyProFeature },
         )
         assertFalse(repository.canSupportEncryption())
     }
@@ -214,5 +227,115 @@ class RealAuthRepositoryTest {
         authRepository.removeLocalPurchasedAt()
 
         assertNull(authStore.localPurchasedAt)
+    }
+
+    @Test
+    fun whenSetFeaturesV2AndStoredValueIsNullThenSaveJson() = runTest {
+        authStore.subscriptionEntitlements = null
+
+        authRepository.setFeaturesV2(
+            basePlanId = "plan1",
+            features = setOf(
+                Entitlement(name = "plus", product = "Network Protection"),
+                Entitlement(name = "plus", product = "Data Broker Protection"),
+            ),
+        )
+
+        assertNotNull(authStore.subscriptionEntitlements)
+        assertTrue(authStore.subscriptionEntitlements!!.contains("plan1"))
+        assertTrue(authStore.subscriptionEntitlements!!.contains("Network Protection"))
+        assertTrue(authStore.subscriptionEntitlements!!.contains("Data Broker Protection"))
+    }
+
+    @Test
+    fun whenSetFeaturesV2AndStoredValueIsNotNullThenUpdateJson() = runTest {
+        authStore.subscriptionEntitlements = """{"plan1":[{"name":"plus","product":"Network Protection"}]}"""
+
+        authRepository.setFeaturesV2(
+            basePlanId = "plan2",
+            features = setOf(Entitlement(name = "plus", product = "Data Broker Protection")),
+        )
+
+        assertNotNull(authStore.subscriptionEntitlements)
+        assertTrue(authStore.subscriptionEntitlements!!.contains("plan1"))
+        assertTrue(authStore.subscriptionEntitlements!!.contains("plan2"))
+    }
+
+    @Test
+    fun whenGetFeaturesV2ThenReturnsCorrectValue() = runTest {
+        authStore.subscriptionEntitlements = """{"plan1":[
+            |{"name":"plus","product":"Network Protection"}
+            |,{"name":"plus","product":"Data Broker Protection"}
+            |]}
+        """.trimMargin()
+
+        val result = authRepository.getFeaturesV2(basePlanId = "plan1")
+
+        assertEquals(2, result.size)
+        assertTrue(result.contains(Entitlement(name = "plus", product = "Network Protection")))
+        assertTrue(result.contains(Entitlement(name = "plus", product = "Data Broker Protection")))
+    }
+
+    @Test
+    fun whenGetFeaturesV2AndBasePlanNotFoundThenReturnEmptySet() = runTest {
+        authStore.subscriptionEntitlements = """{"plan1":[
+            |{"name":"plus","product":"Network Protection"}
+            |]}
+        """.trimMargin()
+
+        val result = authRepository.getFeaturesV2(basePlanId = "plan2")
+
+        assertEquals(emptySet<Entitlement>(), result)
+    }
+
+    @Test
+    fun whenGetFeaturesAndTierFlagOnThenReturnV2ProductNames() = runTest {
+        privacyProFeature.tierMessagingEnabled().setRawStoredState(Toggle.State(enable = true))
+        authStore.subscriptionEntitlements = """{"plan1":[
+            |{"name":"plus","product":"Network Protection"},
+            |{"name":"plus","product":"Data Broker Protection"}
+            |]}
+        """.trimMargin()
+        authStore.subscriptionFeatures = """{"plan1":["Old Feature"]}"""
+
+        val result = authRepository.getFeatures(basePlanId = "plan1")
+
+        assertEquals(setOf("Network Protection", "Data Broker Protection"), result)
+    }
+
+    @Test
+    fun whenGetFeaturesAndTierFlagOnAndV2EmptyThenFallbackToV1() = runTest {
+        privacyProFeature.tierMessagingEnabled().setRawStoredState(Toggle.State(enable = true))
+        authStore.subscriptionEntitlements = null
+        authStore.subscriptionFeatures = """{"plan1":["feature1","feature2"]}"""
+
+        val result = authRepository.getFeatures(basePlanId = "plan1")
+
+        // When flag is ON and v2 is empty, fallback to v1 for smooth runtime flag transitions
+        assertEquals(setOf("feature1", "feature2"), result)
+    }
+
+    @Test
+    fun whenGetFeaturesAndTierFlagOnAndV2EmptyForPlanThenFallbackToV1() = runTest {
+        privacyProFeature.tierMessagingEnabled().setRawStoredState(Toggle.State(enable = true))
+        authStore.subscriptionEntitlements = """{"plan2":[{"name":"plus","product":"Network Protection"}]}"""
+        authStore.subscriptionFeatures = """{"plan1":["feature1","feature2"]}"""
+
+        val result = authRepository.getFeatures(basePlanId = "plan1")
+
+        // When flag is ON and v2 is empty for this plan, fallback to v1 for smooth runtime flag transitions
+        assertEquals(setOf("feature1", "feature2"), result)
+    }
+
+    @Test
+    fun whenGetFeaturesAndTierFlagOffThenReturnV1Features() = runTest {
+        privacyProFeature.tierMessagingEnabled().setRawStoredState(Toggle.State(enable = false))
+        authStore.subscriptionEntitlements = """{"plan1":[{"name":"plus","product":"Network Protection"}]}"""
+        authStore.subscriptionFeatures = """{"plan1":["feature1","feature2"]}"""
+
+        val result = authRepository.getFeatures(basePlanId = "plan1")
+
+        // When flag is OFF, should use v1 storage only
+        assertEquals(setOf("feature1", "feature2"), result)
     }
 }
