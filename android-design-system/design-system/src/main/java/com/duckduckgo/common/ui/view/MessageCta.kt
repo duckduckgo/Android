@@ -19,6 +19,7 @@ package com.duckduckgo.common.ui.view
 import android.content.Context
 import android.os.Build
 import android.util.AttributeSet
+import android.util.Log
 import android.widget.FrameLayout
 import androidx.annotation.DrawableRes
 import androidx.annotation.RawRes
@@ -26,6 +27,8 @@ import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.text.HtmlCompat
 import androidx.core.view.isVisible
 import com.airbnb.lottie.LottieAnimationView
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade
 import com.duckduckgo.common.ui.view.MessageCta.MessageType.REMOTE_MESSAGE
 import com.duckduckgo.common.ui.view.MessageCta.MessageType.REMOTE_PROMO_MESSAGE
 import com.duckduckgo.common.ui.viewbinding.viewBinding
@@ -77,6 +80,8 @@ class MessageCta : FrameLayout {
     }
 
     private fun setRemoteMessage(message: Message) {
+
+        Log.d("RadoiuC", "Set remote message: $message")
         binding.remoteMessage.root.show()
         binding.promoRemoteMessage.root.gone()
 
@@ -84,6 +89,8 @@ class MessageCta : FrameLayout {
             drawableRes = message.topIllustration,
             animationRes = message.topAnimation,
         )
+
+        configureRemoteMessageImage(message.imageUrl)
 
         remoteMessageBinding.messageTitle.text = HtmlCompat.fromHtml(message.title, HtmlCompat.FROM_HTML_MODE_LEGACY)
         remoteMessageBinding.messageSubtitle.text = HtmlCompat.fromHtml(message.subtitle, HtmlCompat.FROM_HTML_MODE_LEGACY)
@@ -118,7 +125,10 @@ class MessageCta : FrameLayout {
         }
     }
 
-    private fun configureTopIllustration(@DrawableRes drawableRes: Int?, @RawRes animationRes: Int?) {
+    private fun configureTopIllustration(
+        @DrawableRes drawableRes: Int?,
+        @RawRes animationRes: Int?
+    ) {
         with(remoteMessageBinding) {
             if (animationRes != null) {
                 topIllustration.gone()
@@ -131,6 +141,26 @@ class MessageCta : FrameLayout {
             } else {
                 topIllustration.gone()
                 topIllustrationAnimated.gone()
+            }
+        }
+    }
+
+    private fun configureRemoteMessageImage(imageUrl: String?) {
+        with(remoteMessageBinding) {
+            if (!imageUrl.isNullOrEmpty()) {
+                Log.d("RadoiuC", "RMF: loading image $imageUrl")
+                Glide
+                    .with(topImage)
+                    .load(imageUrl)
+                    .centerCrop()
+                    .transition(withCrossFade())
+                    .into(topImage)
+                topImage.show()
+                topIllustrationAnimated.gone()
+                topIllustration.gone()
+            } else {
+                Log.d("RadoiuC", "RMF: no image")
+                topImage.gone()
             }
         }
     }
@@ -183,13 +213,14 @@ class MessageCta : FrameLayout {
         }
     }
 
-    data class Message(
+    data class Message constructor(
         @DrawableRes val topIllustration: Int? = null,
         @DrawableRes val middleIllustration: Int? = null,
         @RawRes val topAnimation: Int? = null,
         val title: String = "",
         val subtitle: String = "",
         val action: String = "",
+        val imageUrl: String? = null,
         val actionIcon: Int? = null,
         val action2: String = "",
         val promoAction: String = "",

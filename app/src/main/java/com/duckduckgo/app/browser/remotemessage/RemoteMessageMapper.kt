@@ -46,6 +46,7 @@ fun RemoteMessage.asMessage(isLightModeEnabled: Boolean): Message? {
             title = content.titleText,
             subtitle = content.descriptionText,
             messageType = MessageType.REMOTE_MESSAGE,
+            imageUrl = content.imageUrl
         )
         is BigSingleAction -> Message(
             topIllustration = content.placeholder.drawable(isLightModeEnabled),
@@ -53,6 +54,7 @@ fun RemoteMessage.asMessage(isLightModeEnabled: Boolean): Message? {
             subtitle = content.descriptionText,
             action = content.primaryActionText,
             messageType = MessageType.REMOTE_MESSAGE,
+            imageUrl = content.imageUrl
         )
         is BigTwoActions -> Message(
             topIllustration = content.placeholder.drawable(isLightModeEnabled),
@@ -61,12 +63,14 @@ fun RemoteMessage.asMessage(isLightModeEnabled: Boolean): Message? {
             action = content.primaryActionText,
             action2 = content.secondaryActionText,
             messageType = MessageType.REMOTE_MESSAGE,
+            imageUrl = content.imageUrl
         )
         is Medium -> Message(
             topIllustration = content.placeholder.drawable(isLightModeEnabled),
             title = content.titleText,
             subtitle = content.descriptionText,
             messageType = MessageType.REMOTE_MESSAGE,
+            imageUrl = content.imageUrl
         )
         is PromoSingleAction -> Message(
             middleIllustration = content.placeholder.drawable(isLightModeEnabled),
@@ -74,6 +78,7 @@ fun RemoteMessage.asMessage(isLightModeEnabled: Boolean): Message? {
             subtitle = content.descriptionText,
             promoAction = content.actionText,
             messageType = MessageType.REMOTE_PROMO_MESSAGE,
+            imageUrl = content.imageUrl
         )
         else -> null
     }

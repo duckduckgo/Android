@@ -54,6 +54,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import logcat.logcat
 
 @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
 class NewTabLegacyPageViewModel @AssistedInject constructor(
@@ -71,7 +72,7 @@ class NewTabLegacyPageViewModel @AssistedInject constructor(
     private val appTrackingProtection: AppTrackingProtection,
 ) : ViewModel(), DefaultLifecycleObserver {
 
-    data class ViewState(
+    data class ViewState constructor(
         private val showDaxLogo: Boolean,
         private val appTpEnabled: Boolean = false,
         val message: RemoteMessage? = null,
@@ -91,7 +92,7 @@ class NewTabLegacyPageViewModel @AssistedInject constructor(
         val hasContent = isLoadingContent || (shouldShowLogo || hasContentThatDisplacesHomeLogo || appTpEnabled || hasLowPriorityMessage)
     }
 
-    private data class ViewStateSnapshot(
+    private data class ViewStateSnapshot constructor(
         val favourites: List<Favorite>,
         val remoteMessage: RemoteMessage?,
     )
@@ -130,6 +131,7 @@ class NewTabLegacyPageViewModel @AssistedInject constructor(
                 .combine(
                     remoteMessagingModel.getActiveMessages()
                         .map { message ->
+                            logcat(tag = "RadoiuC") { "Active messages: $message surface: ${message?.surfaces}" }
                             if (message?.surfaces?.contains(Surface.NEW_TAB_PAGE) == true) message else null
                         },
                 ) { favorites, activeMessage ->

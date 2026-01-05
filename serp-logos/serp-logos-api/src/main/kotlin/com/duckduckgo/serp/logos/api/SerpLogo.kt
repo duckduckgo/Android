@@ -17,6 +17,6 @@
 package com.duckduckgo.serp.logos.api
 
 sealed class SerpLogo {
-    data class EasterEgg(val logoUrl: String) : SerpLogo()
+    data class EasterEgg constructor(val logoUrl: String) : SerpLogo()
     data object Normal : SerpLogo()
 }

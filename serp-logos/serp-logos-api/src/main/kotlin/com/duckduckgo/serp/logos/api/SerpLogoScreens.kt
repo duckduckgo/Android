@@ -26,7 +26,7 @@ sealed class SerpLogoScreens {
      * @param logoUrl The URL of the logo to be displayed
      * @param transitionName The transition name for the logo image, used for shared element transitions
      */
-    data class EasterEggLogoScreen(
+    data class EasterEggLogoScreen constructor(
         val logoUrl: String,
         val transitionName: String,
     ) : ActivityParams
