@@ -73,16 +73,18 @@ val Uri.isLocalUrl: Boolean
     get() {
         val host = this.host?.lowercase() ?: return false
         if (host == "localhost") return true
-        if (host.startsWith("127.")) return true
 
         val ipv4Parts = host.split(".")
-        if (ipv4Parts.size == 4) {
-            val firstOctet = ipv4Parts[0].toIntOrNull() ?: return false
-            val secondOctet = ipv4Parts[1].toIntOrNull() ?: return false
-            if (firstOctet == 10) return true
-            if (firstOctet == 172 && secondOctet in 16..31) return true
-            if (firstOctet == 192 && secondOctet == 168) return true
-        }
+        if (ipv4Parts.size != 4) return false
+
+        val octets = ipv4Parts.mapNotNull { it.toIntOrNull() }
+        if (octets.size != 4 || octets.any { it !in 0..255 }) return false
+
+        val (first, second) = octets
+        if (first == 127) return true
+        if (first == 10) return true
+        if (first == 172 && second in 16..31) return true
+        if (first == 192 && second == 168) return true
 
         return false
     }
