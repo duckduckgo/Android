@@ -34,6 +34,7 @@ import com.duckduckgo.remote.messaging.api.Content.Placeholder.KEY_IMPORT
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.MAC_AND_WINDOWS
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.PRIVACY_SHIELD
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.RADAR
+import com.duckduckgo.remote.messaging.api.Content.Placeholder.SPLIT_BAR_SETTINGS
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.VISUAL_DESIGN_UPDATE
 import com.duckduckgo.remote.messaging.api.Content.PromoSingleAction
 import com.duckduckgo.remote.messaging.api.Content.Small
@@ -78,7 +79,7 @@ fun RemoteMessage.asMessage(isLightModeEnabled: Boolean): Message? {
     }
 }
 
-private fun Placeholder.drawable(isLightModeEnabled: Boolean): Int {
+fun Placeholder.drawable(isLightModeEnabled: Boolean): Int {
     return when (this) {
         ANNOUNCE -> R.drawable.ic_announce
         DDG_ANNOUNCE -> R.drawable.ic_ddg_announce
@@ -96,5 +97,6 @@ private fun Placeholder.drawable(isLightModeEnabled: Boolean): Int {
         IMAGE_AI -> R.drawable.ic_image_ai
         RADAR -> R.drawable.ic_radar
         KEY_IMPORT -> R.drawable.ic_key_import
+        SPLIT_BAR_SETTINGS -> R.drawable.ic_split_bar_mobile_settings
     }
 }

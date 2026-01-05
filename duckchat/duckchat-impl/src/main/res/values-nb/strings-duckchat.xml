@@ -89,7 +89,8 @@
     <string name="duckAiHideAiGeneratedImagesTitle">Skjul AI-genererte bilder</string>
     <string name="duckAiHideAiGeneratedImagesDescription">Filtrerer ut AI-genererte bilder fra bildesøkresultater</string>
 
-    <!-- Duck AI Tabs Mode Toggle -->
-    <string name="duckAiFullScreenModeTitle">Fanemodus for Duck.ai</string>
-    <string name="duckAiFullScreenModeDescription">Vis nye Duck.ai-chatter som faner i nettleseren</string>
+    <!-- Duck AI Paid Settings -->
+    <string name="duck_ai_paid_settings_enable_in_settings">Aktiver i innstillingene for AI-funksjoner</string>
+    <string name="duck_ai_paid_settings_manage_in_settings">Administrer i innstillingene for AI-funksjoner</string>
+    <string name="duck_ai_paid_settings_manage_secondary">Konfigurer Duck.ai i innstillingene for AI-funksjoner.</string>
 </resources>

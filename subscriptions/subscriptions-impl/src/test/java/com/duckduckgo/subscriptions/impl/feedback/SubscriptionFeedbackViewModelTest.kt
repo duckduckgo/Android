@@ -3,6 +3,7 @@ package com.duckduckgo.subscriptions.impl.feedback
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.DDG_SETTINGS
+import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.PIR_DASHBOARD
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.SUBSCRIPTION_SETTINGS
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.VPN_EXCLUDED_APPS
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.VPN_MANAGEMENT
@@ -17,7 +18,6 @@ import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackReportType
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackReportType.REQUEST_FEATURE
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.Command.FeedbackCancelled
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.Command.FeedbackCompleted
-import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.Command.FeedbackFailed
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.Command.ShowHelpPages
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.Command.ShowSupportPage
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.FeedbackFragmentState.FeedbackAction
@@ -28,12 +28,9 @@ import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.FeedbackMetadata
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackVpnSubCategory.BROWSER_CRASH_FREEZE
 import com.duckduckgo.subscriptions.impl.feedback.pixels.PrivacyProUnifiedFeedbackPixelSender
-import com.duckduckgo.subscriptions.impl.services.FeedbackBody
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
-import org.junit.Assert.assertNotNull
-import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -41,7 +38,6 @@ import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
-import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -56,7 +52,6 @@ class SubscriptionFeedbackViewModelTest {
     @Mock
     private lateinit var feedbackHelpUrlProvider: FeedbackHelpUrlProvider
 
-    private lateinit var supportInbox: FakeSubscriptionSupportInbox
     private lateinit var customMetadataProvider: FakeCustomMetadataProvider
     private lateinit var viewModel: SubscriptionFeedbackViewModel
 
@@ -64,12 +59,10 @@ class SubscriptionFeedbackViewModelTest {
     fun setUp() {
         MockitoAnnotations.openMocks(this)
         customMetadataProvider = FakeCustomMetadataProvider()
-        supportInbox = FakeSubscriptionSupportInbox()
         viewModel = SubscriptionFeedbackViewModel(
             pixelSender,
             customMetadataProvider,
             feedbackHelpUrlProvider,
-            supportInbox,
         )
     }
 
@@ -174,6 +167,28 @@ class SubscriptionFeedbackViewModelTest {
             verify(pixelSender).reportPproFeedbackActionsScreenShown(
                 mapOf(
                     "source" to "vpnExcludedApps",
+                ),
+            )
+        }
+    }
+
+    @Test
+    fun whenFeedbackIsOpenedFromPIRDashboardThenShowActionScreenAndEmitImpression() = runTest {
+        viewModel.viewState().test {
+            viewModel.allowUserToChooseReportType(source = PIR_DASHBOARD)
+
+            expectMostRecentItem().assertViewStateMoveForward(
+                expectedPreviousFragmentState = null,
+                expectedCurrentFragmentState = FeedbackAction,
+                FeedbackMetadata(
+                    source = PIR_DASHBOARD,
+                ),
+            )
+
+            cancelAndConsumeRemainingEvents()
+            verify(pixelSender).reportPproFeedbackActionsScreenShown(
+                mapOf(
+                    "source" to "pir",
                 ),
             )
         }
@@ -376,6 +391,34 @@ class SubscriptionFeedbackViewModelTest {
         }
 
     @Test
+    fun whenReportProblemIsSelectedViaPIRDashboardThenShowPIRSubCategoryScreenAndEmitImpression() =
+        runTest {
+            viewModel.viewState().test {
+                viewModel.allowUserToChooseReportType(source = PIR_DASHBOARD)
+                viewModel.onReportTypeSelected(reportType = REPORT_PROBLEM)
+
+                expectMostRecentItem().assertViewStateMoveForward(
+                    expectedPreviousFragmentState = FeedbackAction,
+                    expectedCurrentFragmentState = FeedbackSubCategory(R.string.feedbackCategoryPir),
+                    FeedbackMetadata(
+                        source = PIR_DASHBOARD,
+                        reportType = REPORT_PROBLEM,
+                        category = PIR, // Automatically set category
+                    ),
+                )
+
+                cancelAndConsumeRemainingEvents()
+                verify(pixelSender).reportPproFeedbackSubcategoryScreenShown(
+                    mapOf(
+                        "source" to "pir",
+                        "reportType" to "reportIssue",
+                        "category" to "pir",
+                    ),
+                )
+            }
+        }
+
+    @Test
     fun whenCategoriesArePassedAsParamThenStringValuesShouldAlignSpec() = runTest {
         assertEquals("subscription", SUBS_AND_PAYMENTS.asParams())
         assertEquals("vpn", VPN.asParams())
@@ -486,6 +529,36 @@ class SubscriptionFeedbackViewModelTest {
                     "reportType" to "reportIssue",
                     "category" to "subscription",
                     "subcategory" to "otp",
+                ),
+            )
+        }
+    }
+
+    @Test
+    fun whenPirSubcategorySelectedFromPIRDashboardThenShowSubmitScreenAndEmitImpression() = runTest {
+        viewModel.viewState().test {
+            viewModel.allowUserToChooseReportType(source = PIR_DASHBOARD)
+            viewModel.onReportTypeSelected(reportType = REPORT_PROBLEM)
+            viewModel.onSubcategorySelected(SubscriptionFeedbackPirSubCategory.SCAN_STUCK)
+
+            expectMostRecentItem().assertViewStateMoveForward(
+                expectedPreviousFragmentState = FeedbackSubCategory(R.string.feedbackCategoryPir),
+                expectedCurrentFragmentState = FeedbackSubmit(R.string.feedbackSubCategoryPirScanStuck),
+                FeedbackMetadata(
+                    source = PIR_DASHBOARD,
+                    reportType = REPORT_PROBLEM,
+                    category = PIR,
+                    subCategory = SubscriptionFeedbackPirSubCategory.SCAN_STUCK,
+                ),
+            )
+
+            cancelAndConsumeRemainingEvents()
+            verify(pixelSender).reportPproFeedbackSubmitScreenShown(
+                mapOf(
+                    "source" to "pir",
+                    "reportType" to "reportIssue",
+                    "category" to "pir",
+                    "subcategory" to "scanStuck",
                 ),
             )
         }
@@ -722,6 +795,25 @@ class SubscriptionFeedbackViewModelTest {
     }
 
     @Test
+    fun whenMoveBackFromSubCategoryActionViaPIRDashboardThenUpdateViewState() = runTest {
+        viewModel.viewState().test {
+            viewModel.allowUserToChooseReportType(source = PIR_DASHBOARD) // Show action
+            viewModel.onReportTypeSelected(REPORT_PROBLEM) // Show subcategory
+
+            viewModel.handleBackPress()
+
+            expectMostRecentItem().assertViewStateMoveBack(
+                expectedPreviousFragmentState = null,
+                expectedCurrentFragmentState = FeedbackAction, // Back to action
+                FeedbackMetadata(
+                    source = PIR_DASHBOARD,
+                    category = PIR, // Retain category
+                ),
+            )
+        }
+    }
+
+    @Test
     fun whenMoveBackFromCategoryActionThenUpdateViewState() = runTest {
         viewModel.viewState().test {
             viewModel.allowUserToChooseFeedbackType() // Show general
@@ -890,6 +982,27 @@ class SubscriptionFeedbackViewModelTest {
     }
 
     @Test
+    fun whenMoveBackFromSubmitActionViaPIRDashboardThenUpdateViewState() = runTest {
+        viewModel.viewState().test {
+            viewModel.allowUserToChooseReportType(source = PIR_DASHBOARD) // Show action
+            viewModel.onReportTypeSelected(REPORT_PROBLEM) // Show subcategory
+            viewModel.onSubcategorySelected(SubscriptionFeedbackPirSubCategory.SCAN_STUCK) // Show submit
+
+            viewModel.handleBackPress()
+
+            expectMostRecentItem().assertViewStateMoveBack(
+                expectedPreviousFragmentState = FeedbackAction,
+                expectedCurrentFragmentState = FeedbackSubCategory(R.string.feedbackCategoryPir),
+                FeedbackMetadata(
+                    source = PIR_DASHBOARD,
+                    reportType = REPORT_PROBLEM,
+                    category = PIR, // Retain category
+                ),
+            )
+        }
+    }
+
+    @Test
     fun whenMoveBackFromSubmitActionViaSubscriptionsThenUpdateViewState() = runTest {
         viewModel.viewState().test {
             viewModel.allowUserToChooseReportType(source = SUBSCRIPTION_SETTINGS) // Show action
@@ -929,6 +1042,9 @@ class SubscriptionFeedbackViewModelTest {
         viewModel.onReportTypeSelected(REQUEST_FEATURE) // Show submit
         viewModel.onSubmitFeedback("Test")
 
+        viewModel.commands().test {
+            assertEquals(FeedbackCompleted, expectMostRecentItem())
+        }
         verify(pixelSender).sendPproFeatureRequest(
             mapOf(
                 "source" to "settings",
@@ -944,6 +1060,9 @@ class SubscriptionFeedbackViewModelTest {
         viewModel.onReportTypeSelected(GENERAL_FEEDBACK) // Show submit
         viewModel.onSubmitFeedback("Test")
 
+        viewModel.commands().test {
+            assertEquals(FeedbackCompleted, expectMostRecentItem())
+        }
         verify(pixelSender).sendPproGeneralFeedback(
             mapOf(
                 "source" to "settings",
@@ -960,6 +1079,9 @@ class SubscriptionFeedbackViewModelTest {
         viewModel.onSubcategorySelected(SubscriptionFeedbackSubsSubCategory.OTHER)
         viewModel.onSubmitFeedback("Test")
 
+        viewModel.commands().test {
+            assertEquals(FeedbackCompleted, expectMostRecentItem())
+        }
         verify(pixelSender).sendPproReportIssue(
             mapOf(
                 "source" to "ppro",
@@ -980,6 +1102,9 @@ class SubscriptionFeedbackViewModelTest {
         viewModel.onSubcategorySelected(SubscriptionFeedbackVpnSubCategory.CANNOT_CONNECT_TO_LOCAL_DEVICE)
         viewModel.onSubmitFeedback("Test")
 
+        viewModel.commands().test {
+            assertEquals(FeedbackCompleted, expectMostRecentItem())
+        }
         verify(pixelSender).sendPproReportIssue(
             mapOf(
                 "source" to "vpn",
@@ -998,6 +1123,9 @@ class SubscriptionFeedbackViewModelTest {
         viewModel.allowUserToReportAppIssue("test", "com.test")
         viewModel.onSubmitFeedback("Test")
 
+        viewModel.commands().test {
+            assertEquals(FeedbackCompleted, expectMostRecentItem())
+        }
         verify(pixelSender).sendPproReportIssue(
             mapOf(
                 "source" to "vpnExcludedApps",
@@ -1019,9 +1147,35 @@ class SubscriptionFeedbackViewModelTest {
         viewModel.onSubcategorySelected(SubscriptionFeedbackPirSubCategory.REMOVAL_STUCK)
         viewModel.onSubmitFeedback("Test")
 
+        viewModel.commands().test {
+            assertEquals(FeedbackCompleted, expectMostRecentItem())
+        }
         verify(pixelSender).sendPproReportIssue(
             mapOf(
                 "source" to "settings",
+                "category" to "pir",
+                "subcategory" to "removalStuck",
+                "description" to "Test",
+                "customMetadata" to "PIR encoded metadata",
+                "appName" to "",
+                "appPackage" to "",
+            ),
+        )
+    }
+
+    @Test
+    fun whenPIRIssueSubmittedFromPIRDashboardThenSendReportIssuePixel() = runTest {
+        viewModel.allowUserToChooseReportType(PIR_DASHBOARD)
+        viewModel.onReportTypeSelected(REPORT_PROBLEM)
+        viewModel.onSubcategorySelected(SubscriptionFeedbackPirSubCategory.REMOVAL_STUCK)
+        viewModel.onSubmitFeedback("Test")
+
+        viewModel.commands().test {
+            assertEquals(FeedbackCompleted, expectMostRecentItem())
+        }
+        verify(pixelSender).sendPproReportIssue(
+            mapOf(
+                "source" to "pir",
                 "category" to "pir",
                 "subcategory" to "removalStuck",
                 "description" to "Test",
@@ -1040,6 +1194,9 @@ class SubscriptionFeedbackViewModelTest {
         viewModel.onSubcategorySelected(SubscriptionFeedbackItrSubCategory.UNHELPFUL)
         viewModel.onSubmitFeedback("Test")
 
+        viewModel.commands().test {
+            assertEquals(FeedbackCompleted, expectMostRecentItem())
+        }
         verify(pixelSender).sendPproReportIssue(
             mapOf(
                 "source" to "settings",
@@ -1051,98 +1208,6 @@ class SubscriptionFeedbackViewModelTest {
                 "appPackage" to "",
             ),
         )
-    }
-
-    @Test
-    fun whenSubscriptionFeedbackWithEmailSucceedsThenSendBothToSupportInboxAndPixel() = runTest {
-        viewModel.allowUserToChooseReportType(SUBSCRIPTION_SETTINGS)
-        viewModel.onReportTypeSelected(REPORT_PROBLEM)
-        viewModel.onCategorySelected(category = SUBS_AND_PAYMENTS)
-        viewModel.onSubcategorySelected(SubscriptionFeedbackSubsSubCategory.OTHER)
-        viewModel.onSubmitFeedback("Test", "test@mail.com")
-
-        verify(pixelSender).sendPproReportIssue(
-            mapOf(
-                "source" to "ppro",
-                "category" to "subscription",
-                "subcategory" to "somethingElse",
-                "description" to "Test",
-                "customMetadata" to "SUBS_AND_PAYMENTS encoded metadata",
-                "appName" to "",
-                "appPackage" to "",
-            ),
-        )
-
-        assertNotNull(supportInbox.getLastSentFeedback())
-        assertEquals(
-            FeedbackBody(
-                userEmail = "test@mail.com",
-                platform = "android",
-                feedbackSource = "ppro",
-                problemCategory = "subscription",
-                customMetadata = "SUBS_AND_PAYMENTS raw metadata",
-                feedbackText = "Test",
-                appName = null,
-                appPackage = null,
-                problemSubCategory = "somethingElse",
-            ),
-            supportInbox.getLastSentFeedback(),
-        )
-        viewModel.commands().test {
-            assertEquals(FeedbackCompleted, expectMostRecentItem())
-        }
-    }
-
-    @Test
-    fun whenSubscriptionFeedbackWithEmailFailsThenSendNothingAndShowFailed() = runTest {
-        supportInbox.setSendFeedbackResult(false)
-        viewModel.allowUserToChooseReportType(SUBSCRIPTION_SETTINGS)
-        viewModel.onReportTypeSelected(REPORT_PROBLEM)
-        viewModel.onCategorySelected(SUBS_AND_PAYMENTS)
-        viewModel.onSubcategorySelected(SubscriptionFeedbackSubsSubCategory.OTHER)
-        viewModel.onSubmitFeedback("Test", "test@mail.com")
-
-        verify(pixelSender, never()).sendPproReportIssue(
-            mapOf(
-                "source" to "ppro",
-                "category" to "subscription",
-                "subcategory" to "somethingElse",
-                "description" to "Test",
-                "customMetadata" to "SUBS_AND_PAYMENTS encoded metadata",
-                "appName" to "",
-                "appPackage" to "",
-            ),
-        )
-
-        viewModel.commands().test {
-            assertEquals(FeedbackFailed, expectMostRecentItem())
-        }
-    }
-
-    @Test
-    fun whenSubscriptionFeedbackWithBlankEmailThenSendPixelOnly() = runTest {
-        viewModel.allowUserToChooseReportType(SUBSCRIPTION_SETTINGS)
-        viewModel.onReportTypeSelected(REPORT_PROBLEM)
-        viewModel.onCategorySelected(SUBS_AND_PAYMENTS)
-        viewModel.onSubcategorySelected(SubscriptionFeedbackSubsSubCategory.OTHER)
-        viewModel.onSubmitFeedback("Test", "     ")
-
-        verify(pixelSender).sendPproReportIssue(
-            mapOf(
-                "source" to "ppro",
-                "category" to "subscription",
-                "subcategory" to "somethingElse",
-                "description" to "Test",
-                "customMetadata" to "SUBS_AND_PAYMENTS encoded metadata",
-                "appName" to "",
-                "appPackage" to "",
-            ),
-        )
-
-        assertNull(supportInbox.getLastSentFeedback())
-        viewModel.commands().test {
-            assertEquals(FeedbackCompleted, expectMostRecentItem())
-        }
     }
 
     private fun SubscriptionFeedbackViewModel.ViewState.assertViewStateMoveForward(

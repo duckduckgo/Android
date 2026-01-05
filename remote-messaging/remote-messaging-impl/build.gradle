@@ -63,6 +63,10 @@ dependencies {
     implementation Google.dagger
     implementation AndroidX.room.ktx
     implementation AndroidX.core.ktx
+    implementation AndroidX.recyclerView
+    implementation AndroidX.appCompat
+    implementation Google.android.material
+    implementation AndroidX.constraintLayout
 
     // ViewModel
     implementation AndroidX.lifecycle.runtime.ktx

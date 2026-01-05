@@ -20,6 +20,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.Intent.EXTRA_TEXT
+import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -74,16 +75,19 @@ import com.duckduckgo.app.downloads.DownloadsScreens.DownloadsScreenNoParams
 import com.duckduckgo.app.feedback.ui.common.FeedbackActivity
 import com.duckduckgo.app.fire.DataClearer
 import com.duckduckgo.app.fire.DataClearerForegroundAppRestartPixel
+import com.duckduckgo.app.fire.ManualDataClearing
 import com.duckduckgo.app.global.ApplicationClearDataState
 import com.duckduckgo.app.global.intentText
 import com.duckduckgo.app.global.rating.PromptCount
 import com.duckduckgo.app.global.sanitize
 import com.duckduckgo.app.global.view.ClearDataAction
+import com.duckduckgo.app.global.view.FireDialog
 import com.duckduckgo.app.global.view.FireDialogProvider
 import com.duckduckgo.app.global.view.renderIfChanged
 import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPage
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.FIRE_DIALOG_CANCEL
+import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
@@ -140,7 +144,13 @@ open class BrowserActivity : DuckDuckGoActivity() {
     lateinit var settingsDataStore: SettingsDataStore
 
     @Inject
-    lateinit var clearPersonalDataAction: ClearDataAction
+    lateinit var clearDataAction: ClearDataAction
+
+    @Inject
+    lateinit var dataClearing: ManualDataClearing
+
+    @Inject
+    lateinit var androidBrowserConfigFeature: AndroidBrowserConfigFeature
 
     @Inject
     lateinit var dataClearer: DataClearer
@@ -337,6 +347,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         // LiveData observers are restarted on each showWebContent() call; we want to subscribe to
         // flows only once, so a separate initialization is necessary
         configureFlowCollectors()
+        setupFireDialogListener()
 
         viewModel.viewState
             .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
@@ -353,6 +364,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         }
         configureOnBackPressedListener()
         showNewAddressBarOptionChoiceScreen()
+        checkForLanscapeOrientation()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -384,6 +396,24 @@ open class BrowserActivity : DuckDuckGoActivity() {
                             onMoveToTabRequested(it)
                         }
                     }
+                }
+            }
+        }
+    }
+
+    private fun setupFireDialogListener() {
+        supportFragmentManager.setFragmentResultListener(FireDialog.REQUEST_KEY, this) { _, bundle ->
+            when (bundle.getString(FireDialog.RESULT_KEY_EVENT)) {
+                FireDialog.EVENT_ON_SHOW -> {
+                    currentTab?.onFireDialogVisibilityChanged(isVisible = true)
+                }
+                FireDialog.EVENT_ON_CANCEL -> {
+                    pixel.fire(FIRE_DIALOG_CANCEL)
+                    currentTab?.onFireDialogVisibilityChanged(isVisible = false)
+                }
+                FireDialog.EVENT_ON_CLEAR_STARTED -> {
+                    isDataClearingInProgress = true
+                    removeObservers()
                 }
             }
         }
@@ -543,9 +573,13 @@ open class BrowserActivity : DuckDuckGoActivity() {
         if (intent.getBooleanExtra(PERFORM_FIRE_ON_ENTRY_EXTRA, false)) {
             logcat(INFO) { "Clearing everything as a result of $PERFORM_FIRE_ON_ENTRY_EXTRA flag being set" }
             appCoroutineScope.launch(dispatcherProvider.io()) {
-                clearPersonalDataAction.clearTabsAndAllDataAsync(appInForeground = true, shouldFireDataClearPixel = true)
-                clearPersonalDataAction.setAppUsedSinceLastClearFlag(false)
-                clearPersonalDataAction.killAndRestartProcess(notifyDataCleared = false)
+                if (androidBrowserConfigFeature.moreGranularDataClearingOptions().isEnabled()) {
+                    dataClearing.clearDataUsingManualFireOptions(shouldRestartIfRequired = true)
+                } else {
+                    clearDataAction.clearTabsAndAllDataAsync(appInForeground = true, shouldFireDataClearPixel = true)
+                    clearDataAction.setAppUsedSinceLastClearFlag(false)
+                    clearDataAction.killAndRestartProcess(notifyDataCleared = false)
+                }
             }
 
             return
@@ -787,17 +821,10 @@ open class BrowserActivity : DuckDuckGoActivity() {
         val params = mapOf(PixelParameter.FROM_FOCUSED_NTP to launchedFromFocusedNtp.toString())
         pixel.fire(AppPixelName.FORGET_ALL_PRESSED_BROWSING, params)
 
-        val dialog = fireDialogProvider.createFireDialog(context = this)
-        dialog.setOnShowListener { currentTab?.onFireDialogVisibilityChanged(isVisible = true) }
-        dialog.setOnCancelListener {
-            pixel.fire(FIRE_DIALOG_CANCEL)
-            currentTab?.onFireDialogVisibilityChanged(isVisible = false)
+        lifecycleScope.launch {
+            val dialog = fireDialogProvider.createFireDialog()
+            dialog.show(supportFragmentManager)
         }
-        dialog.clearStarted = {
-            isDataClearingInProgress = true
-            removeObservers()
-        }
-        dialog.show()
     }
 
     fun launchSettings() {
@@ -1007,6 +1034,13 @@ open class BrowserActivity : DuckDuckGoActivity() {
     override fun onAttachFragment(fragment: androidx.fragment.app.Fragment) {
         super.onAttachFragment(fragment)
         hideMockupOmnibar()
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            viewModel.sendPixelEventForLandscapeOrientation()
+        }
     }
 
     private fun hideMockupOmnibar() {
@@ -1470,6 +1504,12 @@ open class BrowserActivity : DuckDuckGoActivity() {
                     omnibarToolbarMockupBottomBinding.mockOmniBarContainerShadow.addBottomShadow()
                 }
             }
+        }
+    }
+
+    private fun checkForLanscapeOrientation() {
+        if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            viewModel.sendPixelEventForLandscapeOrientation()
         }
     }
 }

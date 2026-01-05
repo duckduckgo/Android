@@ -61,7 +61,6 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.PulseAnimation
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.SmoothProgressAnimator
-import com.duckduckgo.app.browser.animations.AddressBarTrackersAnimationFeatureToggle
 import com.duckduckgo.app.browser.api.OmnibarRepository
 import com.duckduckgo.app.browser.customtabs.CustomTabPixelNames
 import com.duckduckgo.app.browser.databinding.IncludeCustomTabToolbarBinding
@@ -96,7 +95,6 @@ import com.duckduckgo.app.browser.omnibar.model.Decoration.PrivacyShieldChanged
 import com.duckduckgo.app.browser.omnibar.model.Decoration.QueueCookiesAnimation
 import com.duckduckgo.app.browser.omnibar.model.StateChange
 import com.duckduckgo.app.global.view.renderIfChanged
-import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentManager
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType
@@ -186,9 +184,6 @@ class OmnibarLayout @JvmOverloads constructor(
     lateinit var omnibarAnimationManager: OmnibarAnimationManager
 
     @Inject
-    lateinit var onboardingDesignExperimentManager: OnboardingDesignExperimentManager
-
-    @Inject
     lateinit var serpLogos: SerpLogos
 
     @Inject
@@ -196,9 +191,6 @@ class OmnibarLayout @JvmOverloads constructor(
 
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
-
-    @Inject
-    lateinit var addressBarTrackersAnimationFeatureToggle: AddressBarTrackersAnimationFeatureToggle
 
     @Inject
     lateinit var settingsDataStore: SettingsDataStore
@@ -213,7 +205,7 @@ class OmnibarLayout @JvmOverloads constructor(
     }
 
     private val pulseAnimation: PulseAnimation by lazy {
-        PulseAnimation(lifecycleOwner, onboardingDesignExperimentManager)
+        PulseAnimation(lifecycleOwner)
     }
 
     private var omnibarTextListener: TextListener? = null
@@ -642,29 +634,14 @@ class OmnibarLayout @JvmOverloads constructor(
             if (Build.VERSION.SDK_INT < 28) {
                 omnibarCardShadow.cardElevation = 2f.toPx(context)
             }
-
-            shieldIconPulseAnimationContainer.updateLayoutParams {
-                (this as MarginLayoutParams).apply {
-                    if (addressBarTrackersAnimationFeatureToggle.feature().isEnabled()) {
-                        // TODO when the animation is made permanent we should add this adjustment to the actual layout
-                        marginStart = 1.toPx()
-                    }
-                }
-            }
         } else {
             // When omnibar is at the bottom, we're adding an additional space at the top
             omnibarCardShadow.updateLayoutParams {
-                (this as MarginLayoutParams).apply {
-                    topMargin = omnibarCardMarginBottom
-                    bottomMargin = omnibarCardMarginTop
-                }
+                flipOmnibarMargins()
             }
 
             iconsContainer.updateLayoutParams {
-                (this as MarginLayoutParams).apply {
-                    topMargin = omnibarCardMarginBottom
-                    bottomMargin = omnibarCardMarginTop
-                }
+                flipOmnibarMargins()
             }
 
             duckAISidebar.updateLayoutParams {
@@ -675,14 +652,7 @@ class OmnibarLayout @JvmOverloads constructor(
             }
 
             shieldIconPulseAnimationContainer.updateLayoutParams {
-                (this as MarginLayoutParams).apply {
-                    topMargin = omnibarCardMarginBottom
-                    bottomMargin = omnibarCardMarginTop
-                    if (addressBarTrackersAnimationFeatureToggle.feature().isEnabled()) {
-                        // TODO when the animation is made permanent we should add this adjustment to the actual layout
-                        marginStart = 1.toPx()
-                    }
-                }
+                flipOmnibarMargins()
             }
 
             shieldIconPulseAnimationContainer.setPadding(
@@ -714,7 +684,7 @@ class OmnibarLayout @JvmOverloads constructor(
             }
 
             is StartTrackersAnimation -> {
-                startTrackersAnimation(command.entities, command.isCustomTab)
+                startTrackersAnimation(command.entities, command.isCustomTab, command.isAddressBarTrackersAnimationEnabled)
             }
 
             is LaunchInputScreen -> {
@@ -774,19 +744,15 @@ class OmnibarLayout @JvmOverloads constructor(
             }
 
             OmnibarLayoutViewModel.LeadingIconState.Dax -> {
-                if (serpEasterEggLogosToggles.feature().isEnabled()) {
-                    with(daxIcon) {
-                        setOnClickListener(null)
-                        show()
-                        Glide
-                            .with(this)
-                            .load(CommonR.drawable.ic_ddg_logo)
-                            .transition(withCrossFade())
-                            .placeholder(daxIcon.drawable)
-                            .into(this)
-                    }
-                } else {
-                    daxIcon.show()
+                with(daxIcon) {
+                    setOnClickListener(null)
+                    show()
+                    Glide
+                        .with(this)
+                        .load(CommonR.drawable.ic_ddg_logo)
+                        .transition(withCrossFade())
+                        .placeholder(daxIcon.drawable)
+                        .into(this)
                 }
                 shieldIcon.gone()
                 searchIcon.gone()
@@ -902,6 +868,15 @@ class OmnibarLayout @JvmOverloads constructor(
         }
 
         isScrollingEnabled = viewState.scrollingEnabled
+
+        if (viewState.isAddressBarTrackersAnimationEnabled) {
+            shieldIconPulseAnimationContainer.updateLayoutParams {
+                (this as MarginLayoutParams).apply {
+                    // TODO when the animation is made permanent we should add this adjustment to the actual layout
+                    marginStart = 1.toPx()
+                }
+            }
+        }
 
         renderTabIcon(viewState)
         renderPulseAnimation(viewState)
@@ -1049,9 +1024,13 @@ class OmnibarLayout @JvmOverloads constructor(
         }
     }
 
-    private fun startTrackersAnimation(events: List<Entity>?, isCustomTab: Boolean) {
+    private fun startTrackersAnimation(
+        events: List<Entity>?,
+        isCustomTab: Boolean,
+        isAddressBarTrackersAnimationEnabled: Boolean,
+    ) {
         if (!isCustomTab) {
-            if (addressBarTrackersAnimationFeatureToggle.feature().isEnabled()) {
+            if (isAddressBarTrackersAnimationEnabled) {
                 animatorHelper.startAddressBarTrackersAnimation(
                     context = context,
                     addressBarTrackersBlockedAnimationShieldIcon = addressBarTrackersBlockedAnimationShieldIcon,
@@ -1078,7 +1057,7 @@ class OmnibarLayout @JvmOverloads constructor(
                 Pair(customTabToolbarColor, null)
             }
 
-            if (addressBarTrackersAnimationFeatureToggle.feature().isEnabled()) {
+            if (isAddressBarTrackersAnimationEnabled) {
                 animatorHelper.startAddressBarTrackersAnimation(
                     context = context,
                     addressBarTrackersBlockedAnimationShieldIcon = newCustomTabToolbarContainer.addressBarTrackersBlockedAnimationShieldIcon,
@@ -1144,10 +1123,7 @@ class OmnibarLayout @JvmOverloads constructor(
                 if (!customTabToolbar.isVisible) {
                     if (omnibarRepository.omnibarType == OmnibarType.SINGLE_BOTTOM) {
                         newCustomTabToolbarContainer.customTabToolbar.updateLayoutParams {
-                            (this as MarginLayoutParams).apply {
-                                topMargin = omnibarCardMarginBottom
-                                bottomMargin = omnibarCardMarginTop
-                            }
+                            flipOmnibarMargins()
                         }
                     }
 
@@ -1221,6 +1197,17 @@ class OmnibarLayout @JvmOverloads constructor(
                     browserMenuImageView.setColorFilter(foregroundColor)
                 }
             }
+        }
+    }
+
+    /**
+     * Flip the top and bottom margins of the toolbar layout params.
+     * Used when the omnibar is positioned at the bottom.
+     */
+    private fun ViewGroup.LayoutParams.flipOmnibarMargins() {
+        (this as MarginLayoutParams).apply {
+            topMargin = omnibarCardMarginBottom
+            bottomMargin = omnibarCardMarginTop
         }
     }
 

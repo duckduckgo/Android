@@ -45,8 +45,6 @@ import com.duckduckgo.privacy.dashboard.impl.di.JsonModule
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardCustomTabPixelNames
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels.*
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.GoBack
-import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupExperimentExternalPixels
-import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsToggleUsageListener
 import com.nhaarman.mockitokotlin2.mock
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -88,10 +86,6 @@ class PrivacyDashboardHybridViewModelTest {
     private val mockUserBrowserProperties: UserBrowserProperties = mock()
 
     private val pixel = mock<Pixel>()
-    private val privacyProtectionsToggleUsageListener: PrivacyProtectionsToggleUsageListener = mock()
-    private val privacyProtectionsPopupExperimentExternalPixels: PrivacyProtectionsPopupExperimentExternalPixels = mock {
-        runBlocking { whenever(mock.getPixelParams()).thenReturn(emptyMap()) }
-    }
 
     private val brokenSiteSender: BrokenSiteSender = mock()
     private val protectionTogglePlugin = FakePrivacyProtectionTogglePlugin()
@@ -111,8 +105,6 @@ class PrivacyDashboardHybridViewModelTest {
             protectionStatusViewStateMapper = AppProtectionStatusViewStateMapper(contentBlocking, unprotectedTemporary),
             privacyDashboardPayloadAdapter = AppPrivacyDashboardPayloadAdapter(moshi = JsonModule.moshi(Moshi.Builder().build())),
             autoconsentStatusViewStateMapper = CookiePromptManagementStatusViewStateMapper(),
-            protectionsToggleUsageListener = privacyProtectionsToggleUsageListener,
-            privacyProtectionsPopupExperimentExternalPixels = privacyProtectionsPopupExperimentExternalPixels,
             userBrowserProperties = mockUserBrowserProperties,
             brokenSiteSender = brokenSiteSender,
             privacyProtectionTogglePlugin = pluginPoint,
@@ -169,36 +161,6 @@ class PrivacyDashboardHybridViewModelTest {
             userAllowListRepository.addDomainToUserAllowList(site.domain!!)
             assertTrue(awaitItem().userChangedValues)
         }
-    }
-
-    @Test
-    fun whenOnPrivacyProtectionClickedThenListenerIsNotified() = runTest {
-        val site = site(siteAllowed = false)
-        testee.onSiteChanged(site)
-
-        testee.onPrivacyProtectionsClicked(privacyProtectionsClickedPayload(isProtected = false))
-
-        verify(privacyProtectionsToggleUsageListener).onPrivacyProtectionsToggleUsed()
-    }
-
-    @Test
-    fun whenPrivacyProtectionsPopupExperimentParamsArePresentThenTheyShouldBeIncludedInPixels() = runTest {
-        val params = mapOf("test_key" to "test_value")
-        whenever(privacyProtectionsPopupExperimentExternalPixels.getPixelParams()).thenReturn(params)
-        val site = site(siteAllowed = false)
-        testee.onSiteChanged(site)
-        testee.onPrivacyProtectionsClicked(privacyProtectionsClickedPayload(isProtected = false))
-        testee.onPrivacyProtectionsClicked(privacyProtectionsClickedPayload(isProtected = true))
-        coroutineRule.testScope.advanceUntilIdle()
-
-        verify(pixel).fire(PRIVACY_DASHBOARD_OPENED, params, type = Count)
-        verify(privacyProtectionsPopupExperimentExternalPixels).tryReportPrivacyDashboardOpened()
-        verify(pixel).fire(PRIVACY_DASHBOARD_ALLOWLIST_ADD, params, type = Count)
-        assertEquals(1, protectionTogglePlugin.toggleOff)
-        verify(privacyProtectionsPopupExperimentExternalPixels).tryReportProtectionsToggledFromPrivacyDashboard(protectionsEnabled = false)
-        verify(pixel).fire(PRIVACY_DASHBOARD_ALLOWLIST_REMOVE, params, type = Count)
-        verify(privacyProtectionsPopupExperimentExternalPixels).tryReportProtectionsToggledFromPrivacyDashboard(protectionsEnabled = true)
-        assertEquals(1, protectionTogglePlugin.toggleOn)
     }
 
     @Test

@@ -160,10 +160,6 @@
     <string name="feedbackSubmitVpnDisclaimer">"Ud over de oplysninger, der er angivet ovenfor, sender vi nogle anonymiserede oplysninger med din feedback:\n\n• Om nogle browserfunktioner er aktive\n• Samlet app-diagnostik (f.eks. fejlkoder)\n\nVed at klikke på Send accepterer du, at DuckDuckGo kan bruge de indsendte oplysninger til at forbedre appen."</string>
     <string name="feedbackSubmitVpnSubmit">Indsend</string>
     <string name="feedbackSubmitCompletedMessage">Mange tak! Feedback sendt.</string>
-    <string name="feedbackSubmitFailedMessage">Noget gik galt</string>
-
-    <string name="feedbackSubmitEmailByLine">Angiv en e-mailadresse, hvis du gerne vil have, at vi kontakter dig angående dette problem (vi kan muligvis ikke svare på alle problemer):</string>
-    <string name="feedbackSubmitEmailHint">Emailadresse (valgfrit)</string>
 
     <string name="feedbackSubmitGeneralDescriptionHint">Giv os feedback...</string>
     <string name="feedbackSubmitFeatureRequestDescriptionHint">Hvilken funktion kunne du tænke dig at se?</string>

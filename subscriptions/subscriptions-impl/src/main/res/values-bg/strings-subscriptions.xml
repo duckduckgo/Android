@@ -160,10 +160,6 @@
     <string name="feedbackSubmitVpnDisclaimer">"Освен въведените по-горе данни заедно с Вашия отзив изпращаме някои анонимизирани данни:\n\n• Дали някои функции на браузъра са активни\n• Обобщена диагностика на приложението (напр. кодове за грешки)\n\nС натискането на бутона Подаване приемате, че DuckDuckGo може да използва подадената информация за подобряване на приложението."</string>
     <string name="feedbackSubmitVpnSubmit">Изпрати</string>
     <string name="feedbackSubmitCompletedMessage">Благодарим ви! Отзивът ви е изпратен.</string>
-    <string name="feedbackSubmitFailedMessage">Възникна някаква грешка</string>
-
-    <string name="feedbackSubmitEmailByLine">Посочете имейл, ако искате да се свържем с Вас относно този проблем (може да не успеем да изпратим отговор за всички проблеми):</string>
-    <string name="feedbackSubmitEmailHint">Имейл (по избор)</string>
 
     <string name="feedbackSubmitGeneralDescriptionHint">Моля, споделете своето мнение…</string>
     <string name="feedbackSubmitFeatureRequestDescriptionHint">Каква функция бихте искали да въведем?</string>

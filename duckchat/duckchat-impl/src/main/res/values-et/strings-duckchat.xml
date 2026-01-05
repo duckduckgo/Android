@@ -89,7 +89,8 @@
     <string name="duckAiHideAiGeneratedImagesTitle">Peida AI loodud pildid</string>
     <string name="duckAiHideAiGeneratedImagesDescription">Eemaldab tehisintellekti loodud pildid pildiotsingu tulemustest</string>
 
-    <!-- Duck AI Tabs Mode Toggle -->
-    <string name="duckAiFullScreenModeTitle">Duck.ai vahekaardirežiim</string>
-    <string name="duckAiFullScreenModeDescription">Kuva uued Duck.ai vestlused brauseris vahekaartidena</string>
+    <!-- Duck AI Paid Settings -->
+    <string name="duck_ai_paid_settings_enable_in_settings">Luba tehisintellekti funktsioonide seadetes</string>
+    <string name="duck_ai_paid_settings_manage_in_settings">Halda tehisintellekti funktsioonide seadetes</string>
+    <string name="duck_ai_paid_settings_manage_secondary">Konfigureerige Duck.ai tehisintellekti funktsioonide seadetes.</string>
 </resources>

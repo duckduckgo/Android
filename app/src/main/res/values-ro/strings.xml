@@ -60,9 +60,9 @@
     <string name="undoSnackbarAction">Anulează</string>
     <!-- Trackers blocked animation-->
     <plurals name="trackersBlockedAnimationMessage" tools:ignore="ImpliedQuantity">
-        <item quantity="one">Instrument de urmărire blocat</item>
-        <item quantity="few">Instrumente de urmărire blocate</item>
-        <item quantity="other">Instrumente de urmărire blocate</item>
+        <item quantity="one">Tracker</item>
+        <item quantity="few">Trackere</item>
+        <item quantity="other">Trackere</item>
     </plurals>
 
     <!-- Downloading files -->
@@ -841,9 +841,6 @@
     <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Încearcă gratuit!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Ignorare</string>
 
-    <!-- Bubble BB & Buck experiment-->
-    <string name="onboardingBubbleExperimentSearchDaxDialogDescription">Căutările tale DuckDuckGo sunt întotdeauna anonime.</string>
-
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Vrei acces ușor la chatul privat cu IA?</string>
     <string name="preOnboardingInputScreenButton">Următorul</string>
@@ -910,30 +907,6 @@
 
     <!-- Section in main app settings -->
     <string name="settingsHeadingCompleteSetup">Finalizează configurarea</string>
-
-    <!-- Buck Onboarding Experiment -->
-    <string name="highlightsPreOnboardingDaxDialog1TitleBuck">Salut!</string>
-    <string name="highlightsPreOnboardingDaxDialog1DescriptionBuck">Ești gata pentru un browser mai rapid care îți asigură protecția?</string>
-    <string name="highlightsPreOnboardingDaxDialog2TitleBuck"><![CDATA[<b>Mecanismele de protecție</b> <i>au fost activate!</i>]]></string>
-
-    <!-- BB Onboarding Experiment -->
-    <string name="highlightsPreOnboardingDaxDialog1TitleBb"><![CDATA[Salut!<br/>Ești gata pentru un browser mai rapid care îți asigură protecție?]]></string>
-
-    <string name="bbOnboardingFireButtonDaxDialogTitle"><![CDATA[Șterge-ți instantaneu activitatea de navigare cu <font color=\"#F05C2B\">Fire Button</font>]]></string>
-    <string name="bbOnboardingFireButtonDaxDialogDescription">Încearcă!️</string>
-
-    <plurals name="bbOnboardingTrackersBlockedDialogTitle">
-        <item quantity="one"><![CDATA[ și încă %1$d încercau să te urmărească aici. <font color=\"#F05C2B\">I-am blocat!</font>]]></item>
-        <item quantity="few"><![CDATA[ și încă %1$d încercau să te urmărească aici. <font color=\"#F05C2B\">I-am blocat!</font>]]></item>
-        <item quantity="other"><![CDATA[ și încă %1$d încercau să te urmărească aici. <font color=\"#F05C2B\">I-am blocat!</font>]]></item>
-    </plurals>
-    <plurals name="bbOnboardingTrackersBlockedZeroDialogTitle" tools:ignore="ImpliedQuantity">
-        <item quantity="one"><![CDATA[ încerca să te urmărească aici. <font color=\"#F05C2B\">L-am blocat!</font>]]></item>
-        <item quantity="few"><![CDATA[ încercau să te urmărească aici. <font color=\"#F05C2B\">I-am blocat!</font>]]></item>
-        <item quantity="other"><![CDATA[ încercau să te urmărească aici. <font color=\"#F05C2B\">I-am blocat!</font>]]></item>
-    </plurals>
-
-    <string name="bbOnboardingTrackersBlockedDialogDescription">☝️Atinge scutul pentru mai multe informații.️</string>
 
     <!--TabSwitcher Trackers Animation-->
     <string name="showTrackerCountInTabSwitcher">Afișează numărul de tehnologii de urmărire în comutatorul de file</string>

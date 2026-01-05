@@ -570,7 +570,7 @@ class BrowserWebViewClient @Inject constructor(
                                 navigationHistory.saveToHistory(url, navigationList.currentItem?.title)
                             }
                         }
-                        uriLoadedManager.sendUriLoadedPixel()
+                        uriLoadedManager.sendUriLoadedPixels(duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url))
 
                         start = null
                     }

@@ -90,6 +90,8 @@
         <item name="daxExpandableMenuItemStyle">@style/Widget.DuckDuckGo.DaxExpandableItem</item>
     </style>
 
+    <style name="Theme.DuckDuckGo.App" parent="Theme.DuckDuckGo.Light" />
+
     <style name="Theme.DuckDuckGo" parent="Base.Theme.DuckDuckGo">
 
         <item name="colorPrimary">?attr/daxColorBackground</item>
@@ -454,6 +456,11 @@
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowIsFloating">true</item>
         <item name="android:backgroundDimEnabled">false</item>
+    </style>
+
+    <style name="ShapeAppearance.DuckDuckGo.VerySmallComponent" parent="ShapeAppearance.MaterialComponents.SmallComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">@dimen/verySmallShapeCornerRadius</item>
     </style>
 
     <style name="ShapeAppearance.DuckDuckGo.SmallComponent" parent="ShapeAppearance.MaterialComponents.SmallComponent">

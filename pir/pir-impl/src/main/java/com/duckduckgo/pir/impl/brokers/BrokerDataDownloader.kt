@@ -79,6 +79,7 @@ class RealBrokerDataDownloader @Inject constructor(
                 if (entry.isDirectory) {
                     outputFile.mkdirs()
                 } else {
+                    outputFile.parentFile?.mkdirs()
                     FileOutputStream(outputFile).use { outputStream ->
                         zipInputStream.copyTo(outputStream)
                     }

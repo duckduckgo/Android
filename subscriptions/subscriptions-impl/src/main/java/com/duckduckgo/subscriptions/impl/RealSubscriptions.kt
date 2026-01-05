@@ -244,9 +244,6 @@ interface PrivacyProFeature {
     fun refreshSubscriptionPlanFeatures(): Toggle
 
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun useClientWithCacheForFeatures(): Toggle
-
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun supportsAlternateStripePaymentFlow(): Toggle
 
     @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.TRUE)
@@ -259,7 +256,7 @@ interface PrivacyProFeature {
     fun sendSubscriptionSwitchWideEvent(): Toggle
 
     @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.TRUE)
-    fun useSubscriptionSupport(): Toggle
+    fun sendSubscriptionRestoreWideEvent(): Toggle
 
     @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.INTERNAL)
     fun supportsSwitchSubscription(): Toggle
@@ -272,6 +269,14 @@ interface PrivacyProFeature {
 
     @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.TRUE)
     fun sendFreeTrialConversionWideEvent(): Toggle
+
+    /**
+     * When enabled, the native app will respond to the getSubscriptionTierOptions message
+     * with the new tier-based payload structure supporting Plus/Pro tiers.
+     * The flag is exposed to FE via getFeatureConfig.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun tierMessagingEnabled(): Toggle
 }
 
 @ContributesBinding(AppScope::class)

@@ -19,9 +19,6 @@ package com.duckduckgo.app.global.view
 import android.content.Context
 import android.webkit.WebStorage
 import android.webkit.WebView
-import androidx.annotation.UiThread
-import androidx.annotation.WorkerThread
-import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.app.browser.WebDataManager
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
 import com.duckduckgo.app.fire.AppCacheClearer
@@ -35,7 +32,6 @@ import com.duckduckgo.common.utils.DefaultDispatcherProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.cookies.api.DuckDuckGoCookieManager
 import com.duckduckgo.history.api.NavigationHistory
-import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupDataClearer
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
 import com.duckduckgo.sync.api.DeviceSyncState
@@ -44,17 +40,54 @@ import logcat.LogPriority.INFO
 import logcat.logcat
 
 interface ClearDataAction {
-
-    @WorkerThread
-    suspend fun clearTabsAsync(appInForeground: Boolean)
-
+    /**
+     * Clears tabs and all browser data (legacy full clear).
+     * @param appInForeground whether the app is in foreground
+     * @param shouldFireDataClearPixel whether to fire the data clear pixel
+     */
     suspend fun clearTabsAndAllDataAsync(
         appInForeground: Boolean,
         shouldFireDataClearPixel: Boolean,
     ): Unit?
 
+    /**
+     * Clears tabs and associated data.
+     * @param appInForeground whether the app is in foreground
+     */
+    suspend fun clearTabsAsync(appInForeground: Boolean)
+
+    /**
+     * Clears tabs and associated data.
+     */
+    suspend fun clearTabsOnly()
+
+    /**
+     * Clears browser data except tabs and chats.
+     * @param shouldFireDataClearPixel whether to fire the data clear pixel
+     */
+    suspend fun clearBrowserDataOnly(shouldFireDataClearPixel: Boolean)
+
+    /**
+     * Clears only DuckAi chats.
+     */
+    suspend fun clearDuckAiChatsOnly()
+
+    /**
+     * Sets the flag indicating whether the app has been used since the last data clear.
+     * @param appUsedSinceLastClear true if the app has been used since the last clear, false otherwise
+     */
     suspend fun setAppUsedSinceLastClearFlag(appUsedSinceLastClear: Boolean)
+
+    /**
+     * Kills the current process.
+     */
     fun killProcess()
+
+    /**
+     * Kills and restarts the current process.
+     * @param notifyDataCleared whether to notify that data has been cleared
+     * @param enableTransitionAnimation whether to enable transition animation during restart
+     */
     fun killAndRestartProcess(notifyDataCleared: Boolean, enableTransitionAnimation: Boolean = true)
 }
 
@@ -67,12 +100,10 @@ class ClearPersonalDataAction(
     private val cookieManager: DuckDuckGoCookieManager,
     private val appCacheClearer: AppCacheClearer,
     private val thirdPartyCookieManager: ThirdPartyCookieManager,
-    private val adClickManager: AdClickManager,
     private val fireproofWebsiteRepository: FireproofWebsiteRepository,
     private val sitePermissionsManager: SitePermissionsManager,
     private val deviceSyncState: DeviceSyncState,
     private val savedSitesRepository: SavedSitesRepository,
-    private val privacyProtectionsPopupDataClearer: PrivacyProtectionsPopupDataClearer,
     private val navigationHistory: NavigationHistory,
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
     private val webTrackersBlockedRepository: WebTrackersBlockedRepository,
@@ -103,8 +134,6 @@ class ClearPersonalDataAction(
                 savedSitesRepository.pruneDeleted()
             }
 
-            privacyProtectionsPopupDataClearer.clearPersonalData()
-
             clearTabsAsync(appInForeground)
 
             webTrackersBlockedRepository.deleteAll()
@@ -112,37 +141,90 @@ class ClearPersonalDataAction(
             navigationHistory.clearHistory()
         }
 
-        withContext(dispatchers.main()) {
-            clearDataAsync(shouldFireDataClearPixel)
-        }
+        clearDataAsync(shouldFireDataClearPixel)
 
         logcat(INFO) { "Finished clearing everything" }
     }
 
-    @WorkerThread
     override suspend fun clearTabsAsync(appInForeground: Boolean) {
         withContext(dispatchers.io()) {
-            logcat(INFO) { "Clearing tabs" }
-            dataManager.clearWebViewSessions()
             tabRepository.deleteAll()
-            adClickManager.clearAll()
             setAppUsedSinceLastClearFlag(appInForeground)
             logcat { "Finished clearing tabs" }
         }
     }
 
-    @UiThread
-    private suspend fun clearDataAsync(shouldFireDataClearPixel: Boolean) {
-        logcat(INFO) { "Clearing data" }
+    override suspend fun clearTabsOnly() {
+        withContext(dispatchers.io()) {
+            tabRepository.deleteAll()
+            logcat { "Finished clearing tabs" }
+        }
+    }
 
-        if (shouldFireDataClearPixel) {
-            clearingStore.incrementCount()
+    override suspend fun clearBrowserDataOnly(shouldFireDataClearPixel: Boolean) {
+        withContext(dispatchers.io()) {
+            val fireproofDomains = fireproofWebsiteRepository.fireproofWebsitesSync().map { it.domain }
+            cookieManager.flush()
+            sitePermissionsManager.clearAllButFireproof(fireproofDomains)
+            thirdPartyCookieManager.clearAllData()
+
+            // https://app.asana.com/0/69071770703008/1204375817149200/f
+            if (!deviceSyncState.isUserSignedInOnDevice()) {
+                savedSitesRepository.pruneDeleted()
+            }
+
+            webTrackersBlockedRepository.deleteAll()
+
+            navigationHistory.clearHistory()
         }
 
-        dataManager.clearData(createWebView(), createWebStorage())
-        appCacheClearer.clearCache()
+        clearDataGranularlyAsync(shouldFireDataClearPixel)
 
-        logcat(INFO) { "Finished clearing data" }
+        logcat(INFO) { "Finished clearing browser data" }
+    }
+
+    override suspend fun clearDuckAiChatsOnly() {
+        withContext(dispatchers.main()) {
+            dataManager.clearData(
+                webView = createWebView(),
+                webStorage = createWebStorage(),
+                shouldClearBrowserData = false,
+                shouldClearDuckAiData = true,
+            )
+
+            logcat(INFO) { "Finished clearing chats" }
+        }
+    }
+
+    private suspend fun clearDataAsync(shouldFireDataClearPixel: Boolean) {
+        withContext(dispatchers.main()) {
+            if (shouldFireDataClearPixel) {
+                clearingStore.incrementCount()
+            }
+
+            dataManager.clearData(createWebView(), createWebStorage())
+            appCacheClearer.clearCache()
+
+            logcat(INFO) { "Finished clearing data" }
+        }
+    }
+
+    private suspend fun clearDataGranularlyAsync(shouldFireDataClearPixel: Boolean) {
+        withContext(dispatchers.main()) {
+            if (shouldFireDataClearPixel) {
+                clearingStore.incrementCount()
+            }
+
+            dataManager.clearData(
+                webView = createWebView(),
+                webStorage = createWebStorage(),
+                shouldClearBrowserData = true,
+                shouldClearDuckAiData = false,
+            )
+            appCacheClearer.clearCache()
+
+            logcat(INFO) { "Finished clearing data" }
+        }
     }
 
     private fun createWebView(): WebView {

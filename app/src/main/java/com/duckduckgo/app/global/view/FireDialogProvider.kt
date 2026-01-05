@@ -16,72 +16,46 @@
 
 package com.duckduckgo.app.global.view
 
-import android.content.Context
-import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.firebutton.FireButtonStore
-import com.duckduckgo.app.global.events.db.UserEventsStore
-import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentManager
-import com.duckduckgo.app.settings.clear.OnboardingExperimentFireAnimationHelper
-import com.duckduckgo.app.settings.db.SettingsDataStore
-import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
-import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
+/**
+ * Provider for creating Fire dialog instances.
+ * Returns the appropriate dialog variant based on feature flag (Simple or Granular).
+ *
+ * To receive lifecycle events from the dialog (onShow, onCancel, onClearStarted),
+ * use FragmentManager.setFragmentResultListener with the appropriate REQUEST_KEY
+ * from GranularFireDialog or LegacyFireDialog.
+ */
 interface FireDialogProvider {
-    fun createFireDialog(context: Context): FireDialog
+    /**
+     * Creates a Fire dialog instance.
+     * @return Instance of FireDialog (either Simple or Granular variant)
+     */
+    suspend fun createFireDialog(): FireDialog
 }
 
 @ContributesBinding(scope = AppScope::class)
 @SingleInstanceIn(scope = AppScope::class)
-class FireDialogLauncherImpl @Inject constructor() : FireDialogProvider {
+class FireDialogProviderImpl @Inject constructor(
+    private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
+    private val dispatcherProvider: DispatcherProvider,
+) : FireDialogProvider {
 
-    @Inject
-    lateinit var clearPersonalDataAction: ClearDataAction
+    override suspend fun createFireDialog(): FireDialog {
+        val isGranularMode = withContext(dispatcherProvider.io()) {
+            androidBrowserConfigFeature.moreGranularDataClearingOptions().isEnabled()
+        }
 
-    @Inject
-    lateinit var pixel: Pixel
-
-    @Inject
-    lateinit var settingsDataStore: SettingsDataStore
-
-    @Inject
-    lateinit var userEventsStore: UserEventsStore
-
-    @AppCoroutineScope
-    @Inject
-    lateinit var appCoroutineScope: CoroutineScope
-
-    @Inject
-    lateinit var dispatcherProvider: DispatcherProvider
-
-    @Inject
-    lateinit var fireButtonStore: FireButtonStore
-
-    @Inject
-    lateinit var appBuildConfig: AppBuildConfig
-
-    @Inject
-    lateinit var onboardingDesignExperimentManager: OnboardingDesignExperimentManager
-
-    @Inject
-    lateinit var onboardingExperimentFireAnimationHelper: OnboardingExperimentFireAnimationHelper
-
-    override fun createFireDialog(context: Context): FireDialog = FireDialog(
-        context = context,
-        clearPersonalDataAction = clearPersonalDataAction,
-        pixel = pixel,
-        settingsDataStore = settingsDataStore,
-        userEventsStore = userEventsStore,
-        appCoroutineScope = appCoroutineScope,
-        dispatcherProvider = dispatcherProvider,
-        fireButtonStore = fireButtonStore,
-        appBuildConfig = appBuildConfig,
-        onboardingDesignExperimentManager = onboardingDesignExperimentManager,
-        onboardingExperimentFireAnimationHelper = onboardingExperimentFireAnimationHelper,
-    )
+        return if (isGranularMode) {
+            GranularFireDialog.newInstance()
+        } else {
+            LegacyFireDialog.newInstance()
+        }
+    }
 }

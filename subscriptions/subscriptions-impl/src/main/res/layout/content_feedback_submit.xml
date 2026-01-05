@@ -41,21 +41,6 @@
             app:type="form_mode" />
 
         <com.duckduckgo.common.ui.view.text.DaxTextView
-            android:id="@+id/feedbackSubmitEmailByLine"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/keyline_4"
-            android:text="@string/feedbackSubmitEmailByLine" />
-
-        <com.duckduckgo.common.ui.view.text.DaxTextInput
-            android:id="@+id/feedbackSubmitEmail"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/keyline_2"
-            android:hint="@string/feedbackSubmitEmailHint"
-            app:type="single_line" />
-
-        <com.duckduckgo.common.ui.view.text.DaxTextView
             android:id="@+id/feedbackSubmitContactSupportByLine"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

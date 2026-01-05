@@ -25,6 +25,8 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.pir.api.PirFeature
+import com.duckduckgo.pir.api.dashboard.PirFeatureState
 import com.duckduckgo.subscriptions.api.Product
 import com.duckduckgo.subscriptions.impl.PrivacyProFeature
 import com.duckduckgo.subscriptions.impl.R
@@ -54,6 +56,9 @@ class SubscriptionFeedbackCategoryFragment : SubscriptionFeedbackFragment(R.layo
 
     @Inject
     lateinit var dispatcherProvider: DispatcherProvider
+
+    @Inject
+    lateinit var pirFeature: PirFeature
 
     override fun onViewCreated(
         view: View,
@@ -95,7 +100,7 @@ class SubscriptionFeedbackCategoryFragment : SubscriptionFeedbackFragment(R.layo
 
     private suspend fun isPirCategoryAvailable(): Boolean {
         val subscription = authRepository.getSubscription() ?: return false
-        return subscription.productId in listOf(MONTHLY_PLAN_US, YEARLY_PLAN_US)
+        return (pirFeature.getPirFeatureState() == PirFeatureState.ENABLED || subscription.productId in listOf(MONTHLY_PLAN_US, YEARLY_PLAN_US))
     }
 
     private suspend fun isDuckAiAvailable(): Boolean = withContext(dispatcherProvider.io()) {

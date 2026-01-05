@@ -23,6 +23,7 @@ import androidx.work.ListenableWorker.Result.success
 import androidx.work.WorkerParameters
 import com.duckduckgo.anvil.annotations.ContributesWorker
 import com.duckduckgo.app.global.view.ClearDataAction
+import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -47,6 +48,12 @@ class DataClearingWorker(
     lateinit var clearDataAction: ClearDataAction
 
     @Inject
+    lateinit var dataClearing: AutomaticDataClearing
+
+    @Inject
+    lateinit var androidBrowserConfigFeature: AndroidBrowserConfigFeature
+
+    @Inject
     lateinit var dispatchers: DispatcherProvider
 
     @WorkerThread
@@ -58,7 +65,14 @@ class DataClearingWorker(
 
         settingsDataStore.lastExecutedJobId = id.toString()
 
-        clearData(settingsDataStore.automaticallyClearWhatOption)
+        withContext(dispatchers.io()) {
+            if (androidBrowserConfigFeature.moreGranularDataClearingOptions().isEnabled()) {
+                // Use new granular clearing - will automatically kill the process
+                dataClearing.clearDataUsingAutomaticFireOptions()
+            } else {
+                clearData(settingsDataStore.automaticallyClearWhatOption)
+            }
+        }
 
         logcat(INFO) { "Clear data job finished; returning SUCCESS" }
         return success()
@@ -87,8 +101,8 @@ class DataClearingWorker(
     }
 
     private suspend fun clearEverything() {
-        logcat(INFO) { "App is in background, so just outright killing the process" }
         withContext(dispatchers.main()) {
+            // Use legacy clearing
             clearDataAction.clearTabsAndAllDataAsync(appInForeground = false, shouldFireDataClearPixel = false)
             clearDataAction.setAppUsedSinceLastClearFlag(false)
 

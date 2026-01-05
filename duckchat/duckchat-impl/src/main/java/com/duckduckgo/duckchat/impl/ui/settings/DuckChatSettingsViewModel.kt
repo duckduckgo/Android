@@ -66,8 +66,6 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
         val shouldShowInputScreenToggle: Boolean = false,
         val isSearchSectionVisible: Boolean = true,
         val isHideGeneratedImagesOptionVisible: Boolean = false,
-        val shouldShowFullScreenModeToggle: Boolean = false,
-        val isFullScreenModeEnabled: Boolean = false,
     )
 
     val viewState =
@@ -76,8 +74,7 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
             duckChat.observeCosmeticInputScreenUserSettingEnabled(),
             duckChat.observeInputScreenUserSettingEnabled(),
             flowOf(duckChatFeature.showHideAiGeneratedImages().isEnabled()).flowOn(dispatcherProvider.io()),
-            flowOf(duckChatFeature.fullscreenModeToggle().isEnabled()).flowOn(dispatcherProvider.io()),
-        ) { isDuckChatUserEnabled, cosmeticInputScreenEnabled, isInputScreenEnabled, showHideAiGeneratedImagesOption, fullscreenModeToggle ->
+        ) { isDuckChatUserEnabled, cosmeticInputScreenEnabled, isInputScreenEnabled, showHideAiGeneratedImagesOption ->
             ViewState(
                 isDuckChatUserEnabled = isDuckChatUserEnabled,
                 isInputScreenEnabled = cosmeticInputScreenEnabled ?: isInputScreenEnabled,
@@ -85,8 +82,6 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
                 shouldShowInputScreenToggle = isDuckChatUserEnabled && duckChat.isInputScreenFeatureAvailable(),
                 isSearchSectionVisible = isSearchSectionVisible(duckChatActivityParams),
                 isHideGeneratedImagesOptionVisible = showHideAiGeneratedImagesOption,
-                shouldShowFullScreenModeToggle = duckChat.isDuckChatFullScreenModeFeatureAvailable() && fullscreenModeToggle,
-                isFullScreenModeEnabled = duckChat.isDuckChatFullScreenModeEnabled(),
             )
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ViewState())
 
@@ -209,12 +204,6 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
     fun duckAiInputScreenShareFeedbackClicked() {
         viewModelScope.launch {
             commandChannel.send(Command.LaunchFeedback)
-        }
-    }
-
-    fun onDuckChatFullscreenModeToggled(checked: Boolean) {
-        viewModelScope.launch {
-            duckChat.setFullScreenModeUserSetting(checked)
         }
     }
 

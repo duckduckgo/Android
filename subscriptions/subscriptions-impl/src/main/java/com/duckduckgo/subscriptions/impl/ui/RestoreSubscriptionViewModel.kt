@@ -36,6 +36,7 @@ import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.Command
 import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.Command.RestoreFromEmail
 import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.Command.SubscriptionNotFound
 import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.Command.Success
+import com.duckduckgo.subscriptions.impl.wideevents.SubscriptionRestoreWideEvent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
@@ -57,6 +58,7 @@ class RestoreSubscriptionViewModel @Inject constructor(
     private val pixelSender: SubscriptionPixelSender,
     private val authClient: AuthClient,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+    private val subscriptionRestoreWideEvent: SubscriptionRestoreWideEvent,
 ) : ViewModel() {
 
     private val command = Channel<Command>(1, DROP_OLDEST)
@@ -77,19 +79,22 @@ class RestoreSubscriptionViewModel @Inject constructor(
             .launchIn(viewModelScope)
     }
 
-    fun restoreFromStore() {
+    fun restoreFromStore(isOriginWeb: Boolean) {
         pixelSender.reportActivateSubscriptionRestorePurchaseClick()
         viewModelScope.launch(dispatcherProvider.io()) {
-            when (val subscription = subscriptionsManager.recoverSubscriptionFromStore()) {
+            subscriptionRestoreWideEvent.onGooglePlayRestoreFlowStarted(isOriginWeb)
+            when (val restoreResult = subscriptionsManager.recoverSubscriptionFromStore()) {
                 is RecoverSubscriptionResult.Success -> {
                     subscriptionsChecker.runChecker()
                     pixelSender.reportRestoreUsingStoreSuccess()
                     pixelSender.reportSubscriptionActivated()
+                    subscriptionRestoreWideEvent.onGooglePlayRestoreSuccess()
                     command.send(Success)
                 }
 
                 is RecoverSubscriptionResult.Failure -> {
-                    when (subscription.message) {
+                    subscriptionRestoreWideEvent.onGooglePlayRestoreFailure(error = restoreResult.message)
+                    when (restoreResult.message) {
                         SUBSCRIPTION_NOT_FOUND_ERROR -> {
                             if (subscriptionStatus.isExpired()) {
                                 subscriptionsManager.signOut()
@@ -108,15 +113,17 @@ class RestoreSubscriptionViewModel @Inject constructor(
         }
     }
 
-    fun restoreFromEmail() {
+    fun restoreFromEmail(isOriginWeb: Boolean) {
         pixelSender.reportActivateSubscriptionEnterEmailClick()
         viewModelScope.launch {
+            subscriptionRestoreWideEvent.onEmailRestoreFlowStarted(isOriginWeb)
             command.send(RestoreFromEmail)
         }
         warmUpJwksCache()
     }
 
     fun onSubscriptionRestoredFromEmail() = viewModelScope.launch {
+        subscriptionRestoreWideEvent.onEmailRestoreSuccess()
         if (subscriptionStatus.isExpired()) {
             command.send(FinishAndGoToSubscriptionSettings)
         } else {

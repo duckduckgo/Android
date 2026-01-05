@@ -89,7 +89,8 @@
     <string name="duckAiHideAiGeneratedImagesTitle">Skrýt obrázky vygenerované umělou inteligencí</string>
     <string name="duckAiHideAiGeneratedImagesDescription">Odstraní obrázky vytvořené umělou inteligencí z výsledků vyhledávání obrázků</string>
 
-    <!-- Duck AI Tabs Mode Toggle -->
-    <string name="duckAiFullScreenModeTitle">Režim karet Duck.ai</string>
-    <string name="duckAiFullScreenModeDescription">Zobrazovat nové chaty Duck.ai jako karty v prohlížeči</string>
+    <!-- Duck AI Paid Settings -->
+    <string name="duck_ai_paid_settings_enable_in_settings">Povolit v nastavení funkcí AI</string>
+    <string name="duck_ai_paid_settings_manage_in_settings">Spravovat v nastavení funkcí AI</string>
+    <string name="duck_ai_paid_settings_manage_secondary">Nakonfiguruj Duck.ai v nastavení funkcí AI.</string>
 </resources>

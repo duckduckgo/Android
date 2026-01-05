@@ -45,12 +45,6 @@ interface SubscriptionsService {
         @Body confirmationBody: ConfirmationBody,
     ): ConfirmationResponse
 
-    @AuthRequired
-    @POST("https://subscriptions.duckduckgo.com/api/feedback")
-    suspend fun feedback(
-        @Body feedbackBody: FeedbackBody,
-    ): FeedbackResponse
-
     @GET("https://subscriptions.duckduckgo.com/api/products/{sku}/features")
     suspend fun features(@Path("sku") sku: String): FeaturesResponse
 }
@@ -92,22 +86,6 @@ data class ConfirmationEntitlement(
 fun List<ConfirmationEntitlement>.toEntitlements(): List<Entitlement> {
     return this.map { Entitlement(it.name, it.product) }
 }
-
-data class FeedbackBody(
-    val userEmail: String,
-    val platform: String = "android",
-    val feedbackSource: String,
-    val problemCategory: String,
-    val customMetadata: String?,
-    val feedbackText: String?,
-    val appName: String?,
-    val appPackage: String?,
-    val problemSubCategory: String?,
-)
-
-data class FeedbackResponse(
-    val message: String,
-)
 
 data class FeaturesResponse(
     val features: List<String>,

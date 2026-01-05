@@ -20,7 +20,16 @@ import com.duckduckgo.feature.toggles.api.Toggle.FeatureName
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.feature.toggles.api.Toggle.State.Cohort
 import com.duckduckgo.feature.toggles.api.Toggle.State.CohortName
+import com.duckduckgo.feature.toggles.api.internal.CachedToggleStore
+import com.duckduckgo.feature.toggles.api.internal.CachedToggleStore.Listener
 import com.duckduckgo.feature.toggles.internal.api.FeatureTogglesCallback
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.conflate
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.launch
 import org.apache.commons.math3.distribution.EnumeratedIntegerDistribution
 import java.lang.reflect.Method
 import java.lang.reflect.Proxy
@@ -119,7 +128,7 @@ class FeatureToggles private constructor(
             }.getOrNull() != null
 
             return ToggleImpl(
-                store = store,
+                store = if (store is CachedToggleStore) store else CachedToggleStore(store),
                 key = getToggleNameForMethod(method),
                 defaultValue = resolvedDefaultValue,
                 isInternalAlwaysEnabled = isInternalAlwaysEnabledAnnotated,
@@ -171,6 +180,41 @@ interface Toggle {
      * @return `true` when the first enrolment is done, `false` in any other subsequent call
      */
     suspend fun enroll(): Boolean
+
+    /**
+     * Returns a cold [Flow] of [Boolean] values representing whether this toggle is enabled.
+     *
+     * ### Behavior
+     * - When a collector starts, the current toggle value is emitted immediately.
+     * - Subsequent emissions occur whenever the underlying [store] writes a new [State].
+     * - The flow is cold: a listener is only registered while it is being collected.
+     * - When collection is cancelled or completed, the registered listener is automatically unregistered.
+     *
+     * ### Thread-safety
+     * Emissions are delivered on the coroutine context where the flow is collected.
+     * Multiple collectors will each register their own listener instance.
+     *
+     * ### Example
+     * ```
+     * viewModelScope.launch {
+     *     toggle.enabled()
+     *         .distinctUntilChanged()
+     *         .collect { enabled ->
+     *             if (enabled) {
+     *                 showOnboarding()
+     *             } else {
+     *                 showLoading()
+     *             }
+     *         }
+     * }
+     * ```
+     *
+     * Note: When not context is specified, [Dispatchers.IO] will be used
+     *
+     * @return a cold [Flow] that emits the current enabled state and any subsequent changes
+     *         until the collector is cancelled.
+     */
+    fun enabled(): Flow<Boolean>
 
     /**
      * This method
@@ -385,6 +429,28 @@ internal class ToggleImpl constructor(
     override suspend fun enroll(): Boolean {
         return enrollInternal()
     }
+
+    override fun enabled(): Flow<Boolean> = callbackFlow {
+        // emit current value when someone starts collecting
+        trySend(isEnabled())
+
+        val unsubscribe = when (val s = store) {
+            is CachedToggleStore -> {
+                s.setListener(
+                    object : Listener {
+                        override fun onToggleStored(newValue: State) {
+                            // emit value just stored
+                            launch { trySend(isEnabled()) }
+                        }
+                    },
+                )
+            }
+            else -> { -> Unit }
+        }
+
+        // when flow collection is cancelled/closed, run the unsubscribe to avoid leaking the listener
+        awaitClose { unsubscribe() }
+    }.conflate().flowOn(Dispatchers.IO)
 
     private fun enrollInternal(force: Boolean = false): Boolean {
         // if the Toggle is not enabled, then we don't enroll

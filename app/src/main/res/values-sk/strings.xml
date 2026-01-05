@@ -60,10 +60,10 @@
     <string name="undoSnackbarAction">Vrátenie späť</string>
     <!-- Trackers blocked animation-->
     <plurals name="trackersBlockedAnimationMessage" tools:ignore="ImpliedQuantity">
-        <item quantity="one">sledovanie je blokované</item>
-        <item quantity="few">sledovania sú blokované</item>
-        <item quantity="many">sledovaní je blokovaných</item>
-        <item quantity="other">sledovaní je blokovaných</item>
+        <item quantity="one">Sledovanie</item>
+        <item quantity="few">Sledovania</item>
+        <item quantity="many">Sledovaní</item>
+        <item quantity="other">Sledovaní</item>
     </plurals>
 
     <!-- Downloading files -->
@@ -857,9 +857,6 @@
     <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Vyskúšaj zadarmo!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Preskočiť</string>
 
-    <!-- Bubble BB & Buck experiment-->
-    <string name="onboardingBubbleExperimentSearchDaxDialogDescription">Vyhľadávania v službe DuckDuckGo sú vždy anonymné.</string>
-
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Chceš jednoduchší prístup k súkromnému AI chatu?</string>
     <string name="preOnboardingInputScreenButton">Ďalšie</string>
@@ -926,32 +923,6 @@
 
     <!-- Section in main app settings -->
     <string name="settingsHeadingCompleteSetup">Dokonči svoje nastavenie</string>
-
-    <!-- Buck Onboarding Experiment -->
-    <string name="highlightsPreOnboardingDaxDialog1TitleBuck">Dobrý deň.</string>
-    <string name="highlightsPreOnboardingDaxDialog1DescriptionBuck">Ste pripravení na rýchlejší prehliadač, ktorý vás ochráni?</string>
-    <string name="highlightsPreOnboardingDaxDialog2TitleBuck"><![CDATA[<b>Ochrany</b> <i>boli aktivované!</i>]]></string>
-
-    <!-- BB Onboarding Experiment -->
-    <string name="highlightsPreOnboardingDaxDialog1TitleBb"><![CDATA[Ahoj!<br/>Si pripravený/-á na rýchlejší prehliadač, ktorý ťa ochráni?]]></string>
-
-    <string name="bbOnboardingFireButtonDaxDialogTitle"><![CDATA[Ihneď vymaž svoju aktivitu pri prehliadaní pomocou <font color=\"#F05C2B\">Fire Button</font>.]]></string>
-    <string name="bbOnboardingFireButtonDaxDialogDescription">Vyskúšaj to!️</string>
-
-    <plurals name="bbOnboardingTrackersBlockedDialogTitle">
-        <item quantity="one"><![CDATA[ a %1$d ďalší sa ťa tu pokúšal sledovať. <font color=\"#F05C2B\">Zablokoval som ho!</font>]]></item>
-        <item quantity="few"><![CDATA[ a %1$d ďalšie sa ťa tu pokúšali sledovať. <font color=\"#F05C2B\">Zablokoval som ich!</font>]]></item>
-        <item quantity="many"><![CDATA[ a %1$d ďalších sa ťa tu pokúšalo sledovať. <font color=\"#F05C2B\">Zablokoval som ich!</font>]]></item>
-        <item quantity="other"><![CDATA[ a %1$d ďalších sa ťa tu pokúšalo sledovať. <font color=\"#F05C2B\">Zablokoval som ich!</font>]]></item>
-    </plurals>
-    <plurals name="bbOnboardingTrackersBlockedZeroDialogTitle" tools:ignore="ImpliedQuantity">
-        <item quantity="one"><![CDATA[ sa ťa tu pokúšal sledovať. <font color=\"#F05C2B\">Zablokoval som ho!</font>]]></item>
-        <item quantity="few"><![CDATA[ sa ťa tu pokúšali sledovať. <font color=\"#F05C2B\">Zablokoval som ich!</font>]]></item>
-        <item quantity="many"><![CDATA[ sa ťa tu pokúšalo sledovať. <font color=\"#F05C2B\">Zablokoval som ich!</font>]]></item>
-        <item quantity="other"><![CDATA[ sa ťa tu pokúšalo sledovať. <font color=\"#F05C2B\">Zablokoval som ich!</font>]]></item>
-    </plurals>
-
-    <string name="bbOnboardingTrackersBlockedDialogDescription">☝️Ťukni na štít pre viac informácií.️</string>
 
     <!--TabSwitcher Trackers Animation-->
     <string name="showTrackerCountInTabSwitcher">Zobraziť počet sledovačov v prepínači kariet</string>

@@ -19,13 +19,20 @@
 package com.duckduckgo.app.notification.model
 
 import androidx.test.platform.app.InstrumentationRegistry
+import com.duckduckgo.app.fire.AutomaticDataClearing
 import com.duckduckgo.app.notification.db.NotificationDao
+import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
@@ -33,19 +40,33 @@ import org.mockito.kotlin.whenever
 
 class ClearDataNotificationTest {
 
+    @get:Rule
+    var coroutineRule = CoroutineTestRule()
+
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
     private val notificationsDao: NotificationDao = mock()
     private val settingsDataStore: SettingsDataStore = mock()
+    private val automaticDataClearing: AutomaticDataClearing = mock()
+    private val androidBrowserConfigFeature = FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
+    private val dispatcherProvider: DispatcherProvider = coroutineRule.testDispatcherProvider
 
     private lateinit var testee: ClearDataNotification
 
     @Before
     fun before() {
-        testee = ClearDataNotification(context, notificationsDao, settingsDataStore)
+        testee = ClearDataNotification(
+            context,
+            notificationsDao,
+            settingsDataStore,
+            automaticDataClearing,
+            androidBrowserConfigFeature,
+            dispatcherProvider,
+        )
     }
 
     @Test
     fun whenNotificationNotSeenAndOptionNotSetThenCanShowIsTrue() = runTest {
+        givenFeatureFlagDisabled()
         whenever(notificationsDao.exists(any())).thenReturn(false)
         whenever(settingsDataStore.automaticallyClearWhatOption).thenReturn(ClearWhatOption.CLEAR_NONE)
         assertTrue(testee.canShow())
@@ -53,6 +74,7 @@ class ClearDataNotificationTest {
 
     @Test
     fun whenNotificationNotSeenButOptionAlreadySetThenCanShowIsFalse() = runTest {
+        givenFeatureFlagDisabled()
         whenever(notificationsDao.exists(any())).thenReturn(false)
         whenever(settingsDataStore.automaticallyClearWhatOption).thenReturn(ClearWhatOption.CLEAR_TABS_ONLY)
         assertFalse(testee.canShow())
@@ -60,8 +82,40 @@ class ClearDataNotificationTest {
 
     @Test
     fun whenNotificationAlreadySeenAndOptionNotSetThenCanShowIsFalse() = runTest {
+        givenFeatureFlagDisabled()
         whenever(notificationsDao.exists(any())).thenReturn(true)
         whenever(settingsDataStore.automaticallyClearWhatOption).thenReturn(ClearWhatOption.CLEAR_NONE)
         assertFalse(testee.canShow())
+    }
+
+    @Test
+    fun whenFeatureFlagEnabledAndNotificationNotSeenAndNoAutomaticClearOptionThenCanShowIsTrue() = runTest {
+        givenFeatureFlagEnabled()
+        whenever(notificationsDao.exists(any())).thenReturn(false)
+        whenever(automaticDataClearing.isAutomaticDataClearingOptionSelected()).thenReturn(false)
+        assertTrue(testee.canShow())
+    }
+
+    @Test
+    fun whenFeatureFlagEnabledAndNotificationNotSeenButAutomaticClearOptionSetThenCanShowIsFalse() = runTest {
+        givenFeatureFlagEnabled()
+        whenever(notificationsDao.exists(any())).thenReturn(false)
+        whenever(automaticDataClearing.isAutomaticDataClearingOptionSelected()).thenReturn(true)
+        assertFalse(testee.canShow())
+    }
+
+    @Test
+    fun whenFeatureFlagEnabledAndNotificationAlreadySeenThenCanShowIsFalse() = runTest {
+        givenFeatureFlagEnabled()
+        whenever(notificationsDao.exists(any())).thenReturn(true)
+        assertFalse(testee.canShow())
+    }
+
+    private fun givenFeatureFlagEnabled() {
+        androidBrowserConfigFeature.moreGranularDataClearingOptions().setRawStoredState(Toggle.State(true))
+    }
+
+    private fun givenFeatureFlagDisabled() {
+        androidBrowserConfigFeature.moreGranularDataClearingOptions().setRawStoredState(Toggle.State(false))
     }
 }

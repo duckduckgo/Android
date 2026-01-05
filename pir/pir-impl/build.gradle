@@ -77,6 +77,15 @@ dependencies {
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }
 
+    // AndroidTest dependencies (no mockito - use real implementations or manual fakes for Android instrumentation tests)
+    androidTestImplementation Testing.junit4
+    androidTestImplementation AndroidX.test.ext.junit
+    androidTestImplementation AndroidX.test.runner
+    androidTestImplementation project(path: ':common-test')
+    androidTestImplementation(KotlinX.coroutines.test) {
+        exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
+    }
+
     coreLibraryDesugaring Android.tools.desugarJdkLibs
 }
 
@@ -102,3 +111,6 @@ android {
     }
 }
 
+tasks.register('androidTestsBuild') {
+    dependsOn 'assembleDebugAndroidTest'
+}

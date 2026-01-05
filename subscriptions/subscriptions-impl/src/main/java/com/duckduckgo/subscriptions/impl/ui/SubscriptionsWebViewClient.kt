@@ -24,11 +24,13 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import com.duckduckgo.app.browser.SpecialUrlDetector
+import com.duckduckgo.subscriptions.impl.wideevents.SubscriptionRestoreWideEvent
 
 class SubscriptionsWebViewClient(
     private val specialUrlDetector: SpecialUrlDetector,
     private val context: Context,
     private val onRenderProcessCrash: () -> Boolean,
+    private val subscriptionRestoreWideEvent: SubscriptionRestoreWideEvent,
 ) : WebViewClient() {
 
     override fun shouldOverrideUrlLoading(
@@ -62,4 +64,14 @@ class SubscriptionsWebViewClient(
         view: WebView?,
         detail: RenderProcessGoneDetail?,
     ): Boolean = onRenderProcessCrash()
+
+    override fun doUpdateVisitedHistory(
+        view: WebView?,
+        url: String?,
+        isReload: Boolean,
+    ) {
+        if (url != null) {
+            subscriptionRestoreWideEvent.onSubscriptionWebViewUrlChanged(url)
+        }
+    }
 }

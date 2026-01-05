@@ -60,10 +60,10 @@
     <string name="undoSnackbarAction">Отменить</string>
     <!-- Trackers blocked animation-->
     <plurals name="trackersBlockedAnimationMessage" tools:ignore="ImpliedQuantity">
-        <item quantity="one">трекер заблокирован</item>
-        <item quantity="few">трекера заблокировано</item>
-        <item quantity="many">трекеров заблокировано</item>
-        <item quantity="other">трекера заблокировано</item>
+        <item quantity="one">трекер</item>
+        <item quantity="few">трекера</item>
+        <item quantity="many">трекеров</item>
+        <item quantity="other">трекера</item>
     </plurals>
 
     <!-- Downloading files -->
@@ -857,9 +857,6 @@
     <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Ознакомление бесплатное!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Пропустить</string>
 
-    <!-- Bubble BB & Buck experiment-->
-    <string name="onboardingBubbleExperimentSearchDaxDialogDescription">Ваши поисковые запросы в DuckDuckGo всегда анонимны.</string>
-
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Нужен удобный доступ к приватному чату с ИИ?</string>
     <string name="preOnboardingInputScreenButton">Далее</string>
@@ -926,32 +923,6 @@
 
     <!-- Section in main app settings -->
     <string name="settingsHeadingCompleteSetup">Завершение настройки</string>
-
-    <!-- Buck Onboarding Experiment -->
-    <string name="highlightsPreOnboardingDaxDialog1TitleBuck">Привет!</string>
-    <string name="highlightsPreOnboardingDaxDialog1DescriptionBuck">Быстрый и надежный браузер заказывали?</string>
-    <string name="highlightsPreOnboardingDaxDialog2TitleBuck"><![CDATA[<b>Защита</b> <i>включена!</i>]]></string>
-
-    <!-- BB Onboarding Experiment -->
-    <string name="highlightsPreOnboardingDaxDialog1TitleBb"><![CDATA[Привет!<br/>Быстрый и надежный браузер заказывали?]]></string>
-
-    <string name="bbOnboardingFireButtonDaxDialogTitle"><![CDATA[Кнопка <font color=\"#F05C2B\">Fire Button</font> моментально стирает данные о посещении сайтов]]></string>
-    <string name="bbOnboardingFireButtonDaxDialogDescription">Попробуйте!️</string>
-
-    <plurals name="bbOnboardingTrackersBlockedDialogTitle">
-        <item quantity="one"><![CDATA[ и еще %1$d сервис пытались вести за вами слежку, <font color=\"#F05C2B\">но мы их заблокировали</font>!]]></item>
-        <item quantity="few"><![CDATA[ и еще %1$d сервиса пытались вести за вами слежку, <font color=\"#F05C2B\">но мы их заблокировали</font>!]]></item>
-        <item quantity="many"><![CDATA[ и еще %1$d сервисов пытались вести за вами слежку, <font color=\"#F05C2B\">но мы их заблокировали</font>!]]></item>
-        <item quantity="other"><![CDATA[ и другие сервисы (%1$d) пытались вести за вами слежку, <font color=\"#F05C2B\">но мы их заблокировали</font>!]]></item>
-    </plurals>
-    <plurals name="bbOnboardingTrackersBlockedZeroDialogTitle" tools:ignore="ImpliedQuantity">
-        <item quantity="one"><![CDATA[ пытался вести за вами слежку, <font color=\"#F05C2B\">но мы его заблокировали</font>!]]></item>
-        <item quantity="few"><![CDATA[ пытались вести за вами слежку, <font color=\"#F05C2B\">но мы их заблокировали</font>!]]></item>
-        <item quantity="many"><![CDATA[ пытались вести за вами слежку, <font color=\"#F05C2B\">но мы их заблокировали</font>!]]></item>
-        <item quantity="other"><![CDATA[ пытались вести за вами слежку, <font color=\"#F05C2B\">но мы их заблокировали</font>!]]></item>
-    </plurals>
-
-    <string name="bbOnboardingTrackersBlockedDialogDescription">☝️ Нажмите на щит, чтобы узнать подробности.️</string>
 
     <!--TabSwitcher Trackers Animation-->
     <string name="showTrackerCountInTabSwitcher">Показывать счетчик трекеров в переключателе вкладок</string>

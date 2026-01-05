@@ -32,20 +32,25 @@ import com.duckduckgo.mobile.android.R
  */
 @Immutable
 data class DuckDuckGoColors(
+    val backgrounds: DuckDuckGoBackgroundColors,
+    val text: DuckDuckGoTextColors,
+    val brand: DuckDuckGoBrandColors,
+    val icons: DuckDuckGoIconsColors,
+    val infoPanel: DuckDuckGoInfoPanelColors,
+    val textField: DuckDuckGoTextFieldColors,
+    val system: DuckDuckGoSystemColors,
+    val isDark: Boolean, // TODO we'll need to do an exploration into using the app pref for Theme switching
+)
+
+@Immutable
+data class DuckDuckGoBackgroundColors(
     val background: Color,
     val backgroundInverted: Color,
     val surface: Color,
+    val surfaceTransparent: Color,
+    val window: Color,
     val container: Color,
     val containerDisabled: Color,
-    val window: Color,
-    val destructive: Color,
-    val lines: Color,
-    val accentContentPrimary: Color,
-    val accentBlue: Color,
-    val accentYellow: Color,
-    val ripple: Color,
-    val text: DuckDuckGoTextColors,
-    val isDark: Boolean, // TODO we'll need to do an exploration into using the app pref for Theme switching
 )
 
 @Immutable
@@ -55,9 +60,48 @@ data class DuckDuckGoTextColors(
     val secondary: Color,
     val secondaryInverted: Color,
     val tertiary: Color,
+    val destructive: Color,
     val disabled: Color,
     val logoTitle: Color,
     val omnibarHighlight: Color,
+)
+
+@Immutable
+data class DuckDuckGoTextFieldColors(
+    val borders: Color,
+)
+
+@Immutable
+data class DuckDuckGoBrandColors(
+    val accentBlue: Color,
+    val accentYellow: Color,
+    val accentBrand50: Color,
+    val accentBrand20: Color,
+)
+
+@Immutable
+data class DuckDuckGoIconsColors(
+    val primary: Color,
+    val secondary: Color,
+    val white: Color,
+    val destructive: Color,
+    val text: Color,
+)
+
+@Immutable
+data class DuckDuckGoInfoPanelColors(
+    val backgroundBlue: Color,
+    val backgroundYellow: Color,
+)
+
+@Immutable
+data class DuckDuckGoSystemColors(
+    val lines: Color,
+    val switchTrackOff: Color,
+    val switchThumb: Color,
+    val sliderTrackInactive: Color,
+    val textInputEnabledOutline: Color,
+    val touchFeedback: Color,
 )
 
 @SuppressLint("ComposeCompositionLocalUsage")
@@ -84,6 +128,7 @@ val Black = Color(0xFF000000)
 
 //region White color variants
 val White84 = Color(0xD6FFFFFF)
+val White78 = Color(0xC7FFFFFF)
 val White60 = Color(0x99FFFFFF)
 val White48 = Color(0x7AFFFFFF)
 val White40 = Color(0x66FFFFFF)

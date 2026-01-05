@@ -344,61 +344,6 @@
 
     <issue
         id="HardcodedText"
-        message="Hardcoded string &quot;Primary buck&quot;, should use `@string` resource"
-        errorLine1="            android:text=&quot;Primary buck&quot;"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/component_buttons.xml"
-            line="275"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="HardcodedText"
-        message="Hardcoded string &quot;Secondary buck&quot;, should use `@string` resource"
-        errorLine1="            android:text=&quot;Secondary buck&quot;"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/component_buttons.xml"
-            line="286"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="HardcodedText"
-        message="Hardcoded string &quot;Primary BB&quot;, should use `@string` resource"
-        errorLine1="            android:text=&quot;Primary BB&quot;"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/component_buttons.xml"
-            line="300"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="HardcodedText"
-        message="Hardcoded string &quot;Secondary BB&quot;, should use `@string` resource"
-        errorLine1="            android:text=&quot;Secondary BB&quot;"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/component_buttons.xml"
-            line="312"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="HardcodedText"
-        message="Hardcoded string &quot;Option BB&quot;, should use `@string` resource"
-        errorLine1="            android:text=&quot;Option BB&quot;"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/component_buttons.xml"
-            line="324"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="HardcodedText"
         message="Hardcoded string &quot;Primary&quot;, should use `@string` resource"
         errorLine1="                android:text=&quot;Primary&quot;/>"
         errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~">

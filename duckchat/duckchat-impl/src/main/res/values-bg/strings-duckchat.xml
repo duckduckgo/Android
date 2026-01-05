@@ -89,7 +89,8 @@
     <string name="duckAiHideAiGeneratedImagesTitle">Скриване на изображения, генерирани от изкуствен интелект</string>
     <string name="duckAiHideAiGeneratedImagesDescription">Филтрира в резултатите от търсенето изображенията, генерирани от изкуствен интелект</string>
 
-    <!-- Duck AI Tabs Mode Toggle -->
-    <string name="duckAiFullScreenModeTitle">Режим на раздели на Duck.ai</string>
-    <string name="duckAiFullScreenModeDescription">Показване на новите чатове на Duck.ai като раздели в браузъра</string>
+    <!-- Duck AI Paid Settings -->
+    <string name="duck_ai_paid_settings_enable_in_settings">Активиране в настройките на AI функции</string>
+    <string name="duck_ai_paid_settings_manage_in_settings">Управление на настройките на AI функциите</string>
+    <string name="duck_ai_paid_settings_manage_secondary">Конфигуриране на Duck.ai в настройките на функциите на AI.</string>
 </resources>

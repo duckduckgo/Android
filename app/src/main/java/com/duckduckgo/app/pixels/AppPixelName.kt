@@ -249,7 +249,6 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     MENU_ACTION_REFRESH_PRESSED("m_nav_r_p"),
     MENU_ACTION_NEW_TAB_PRESSED_FROM_SERP("m_new_tab_open_from_serp"),
     MENU_ACTION_NEW_TAB_PRESSED_FROM_SITE("m_new_tab_open_from_website"),
-    MENU_ACTION_BOOKMARKS_PRESSED("m_navigation_menu_bookmarks"),
     MENU_ACTION_NAVIGATE_FORWARD_PRESSED("m_nav_nf_p"),
     MENU_ACTION_NAVIGATE_BACK_PRESSED("m_nav_nb_p"),
     MENU_ACTION_ADD_BOOKMARK_PRESSED("m_nav_ab_p"),
@@ -267,7 +266,6 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     MENU_ACTION_APP_LINKS_OPEN_PRESSED("m_nav_app_links_open_menu_item_pressed"),
     MENU_ACTION_DOWNLOADS_PRESSED("m_nav_downloads_menu_item_pressed"),
     MENU_ACTION_AUTOFILL_PRESSED("m_nav_autofill_menu_item_pressed"),
-    MENU_ACTION_VPN_PRESSED("m_nav_vpn_menu_item_pressed"),
 
     FIREPROOF_WEBSITE_ADDED("m_fw_a"),
     FIREPROOF_WEBSITE_REMOVE("m_fw_r"),
@@ -427,6 +425,23 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     SITE_NOT_WORKING_SHOWN("m_site-not-working_shown"),
 
     URI_LOADED("m_uri_loaded"),
+
+    PRODUCT_TELEMETRY_SURFACE_SERP_LOADED("m_product_telemetry_surface_usage_serp"),
+    PRODUCT_TELEMETRY_SURFACE_SERP_LOADED_DAILY("m_product_telemetry_surface_usage_serp_daily"),
+    PRODUCT_TELEMETRY_SURFACE_WEBSITE_LOADED("m_product_telemetry_surface_usage_website"),
+    PRODUCT_TELEMETRY_SURFACE_WEBSITE_LOADED_DAILY("m_product_telemetry_surface_usage_website_daily"),
+    PRODUCT_TELEMETRY_SURFACE_LANDSCAPE_ORIENTATION_USED("m_product_telemetry_surface_usage_landscape"),
+    PRODUCT_TELEMETRY_SURFACE_LANDSCAPE_ORIENTATION_USED_DAILY("m_product_telemetry_surface_usage_landscape_daily"),
+    PRODUCT_TELEMETRY_SURFACE_TAB_MANAGER_CLICKED("m_product_telemetry_surface_usage_tab_manager"),
+    PRODUCT_TELEMETRY_SURFACE_TAB_MANAGER_CLICKED_DAILY("m_product_telemetry_surface_usage_tab_manager_daily"),
+    PRODUCT_TELEMETRY_SURFACE_DATA_CLEARING("m_product_telemetry_surface_usage_data_clearing"),
+    PRODUCT_TELEMETRY_SURFACE_DATA_CLEARING_DAILY("m_product_telemetry_surface_usage_data_clearing_daily"),
+    PRODUCT_TELEMETRY_SURFACE_MENU_OPENED("m_product_telemetry_surface_usage_menu"),
+    PRODUCT_TELEMETRY_SURFACE_MENU_OPENED_DAILY("m_product_telemetry_surface_usage_menu_daily"),
+    PRODUCT_TELEMETRY_SURFACE_SETTINGS_OPENED("m_product_telemetry_surface_usage_settings"),
+    PRODUCT_TELEMETRY_SURFACE_SETTINGS_OPENED_DAILY("m_product_telemetry_surface_usage_settings_daily"),
+    PRODUCT_TELEMETRY_SURFACE_DAU("m_product_telemetry_surface_usage_dau"),
+    PRODUCT_TELEMETRY_SURFACE_DAU_DAILY("m_product_telemetry_surface_usage_dau_daily"),
 
     ERROR_PAGE_SHOWN("m_errorpageshown"),
 

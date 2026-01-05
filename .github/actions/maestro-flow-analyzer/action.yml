@@ -1,0 +1,156 @@
+name: Maestro Flow Analyzer
+description: Parse Maestro Cloud flow results JSON and emit a summary status
+
+inputs:
+  flow_results_json:
+    description: Raw MAESTRO_CLOUD_FLOW_RESULTS JSON array
+    required: true
+  console_url:
+    description: Maestro console URL (optional, for logging)
+    required: false
+    default: ''
+  upload_status:
+    description: Maestro upload status (optional, for logging)
+    required: false
+    default: ''
+  app_binary_id:
+    description: Maestro app binary ID (optional, for logging)
+    required: false
+    default: ''
+  treat_canceled_as_failure:
+    description: Treat CANCELED flows as failures (true/false)
+    required: false
+    default: 'false'
+
+outputs:
+  flow_summary_status:
+    description: Derived status (success, failure, canceled_present, empty_results, unknown_format)
+    value: ${{ steps.analyze.outputs.flow_summary_status }}
+  flow_summary_message:
+    description: Human-readable summary suitable for task descriptions (multi-line)
+    value: ${{ steps.analyze.outputs.flow_summary_message }}
+
+runs:
+  using: composite
+  steps:
+    - name: Analyze Maestro flow results
+      id: analyze
+      shell: bash
+      env:
+        FLOW_RESULTS_JSON: ${{ inputs.flow_results_json }}
+        CONSOLE_URL: ${{ inputs.console_url }}
+        UPLOAD_STATUS: ${{ inputs.upload_status }}
+        APP_BINARY_ID: ${{ inputs.app_binary_id }}
+        TREAT_CANCELED_AS_FAILURE: ${{ inputs.treat_canceled_as_failure }}
+      run: |
+        set -eo pipefail
+
+        echo "Console URL: ${CONSOLE_URL}"
+        echo "Upload Status: ${UPLOAD_STATUS}"
+        echo "App Binary ID: ${APP_BINARY_ID}"
+
+        flow_results_json="${FLOW_RESULTS_JSON}"
+        echo "Raw Flow Results JSON: ${flow_results_json}"
+        final_status="success"
+        summary_lines=()
+
+        if [ -n "${UPLOAD_STATUS}" ]; then
+          upload_status_upper=$(echo "${UPLOAD_STATUS}" | tr '[:lower:]' '[:upper:]')
+          case "$upload_status_upper" in
+            SUCCESS)
+              :
+              ;;
+            ERROR|STOPPED|CANCELED|WARNING|PENDING|PREPARING|INSTALLING|RUNNING)
+              summary_lines+=("Upload status: ${upload_status_upper}")
+              if [ "$final_status" = "success" ]; then
+                final_status="failure"
+              fi
+              ;;
+            *)
+              summary_lines+=("Upload status: ${upload_status_upper}")
+              ;;
+          esac
+        fi
+
+        if ! echo "$flow_results_json" | jq -e . > /dev/null 2>&1; then
+          echo "::warning::MAESTRO_CLOUD_FLOW_RESULTS is not valid JSON or is empty."
+          final_status="unknown_format"
+          summary_lines+=("Results JSON invalid or empty.")
+        else
+          if echo "$flow_results_json" | jq -e '. | length > 0' > /dev/null; then
+            :
+          else
+            echo "::warning::MAESTRO_CLOUD_FLOW_RESULTS is an empty array. No flows reported."
+            final_status="empty_results"
+            summary_lines+=("No flows reported.")
+          fi
+
+          if echo "$flow_results_json" | jq -e '.[] | select(.status=="ERROR")' > /dev/null; then
+            echo "::error::At least one Maestro flow has status: ERROR."
+            final_status="failure"
+            error_count=$(echo "$flow_results_json" | jq '[.[] | select(.status=="ERROR")] | length')
+            error_lines=$(echo "$flow_results_json" | jq -r '
+              [.[] | select(.status=="ERROR") |
+                {
+                  name: (.name // .flowName // .id // "unknown"),
+                  error: (
+                    (try (.errors // []) catch []) as $errs |
+                    ( ($errs | length) > 0 )
+                    | if . then ($errs | map(tostring) | join(" | ")) else "Unknown error" end
+                  )
+                }
+              ]
+              | .[0:3]
+              | map("Flow: \(.name)\nError: \(.error)")
+              | .[]
+            ')
+            summary_lines+=("Errors found: ${error_count}")
+            while IFS= read -r line; do
+              summary_lines+=("$line")
+            done <<< "$error_lines"
+          fi
+
+          if echo "$flow_results_json" | jq -e '.[] | select(.status=="CANCELED")' > /dev/null; then
+            echo "::warning::At least one Maestro flow has status: CANCELED."
+            if echo "$TREAT_CANCELED_AS_FAILURE" | grep -qi '^true$'; then
+              final_status="failure"
+              canceled_count=$(echo "$flow_results_json" | jq '[.[] | select(.status=="CANCELED")] | length')
+              canceled_names=$(echo "$flow_results_json" | jq -r '[.[] | select(.status=="CANCELED") | (.name // .flowName // .id // "unknown")] | .[0:5] | join(", ")')
+              summary_lines+=("Canceled treated as failure: ${canceled_count}")
+              summary_lines+=("Flows: ${canceled_names}")
+            elif [ "$final_status" != "failure" ]; then
+              final_status="canceled_present"
+              canceled_count=$(echo "$flow_results_json" | jq '[.[] | select(.status=="CANCELED")] | length')
+              canceled_names=$(echo "$flow_results_json" | jq -r '[.[] | select(.status=="CANCELED") | (.name // .flowName // .id // "unknown")] | .[0:5] | join(", ")')
+              summary_lines+=("Canceled present (not treated as failure): ${canceled_count}")
+              summary_lines+=("Flows: ${canceled_names}")
+            fi
+          fi
+
+          if [ "$final_status" == "success" ]; then
+            if echo "$flow_results_json" | jq -e '. | length > 0' > /dev/null; then
+                echo "All flows appear to be successful (no ERROR or CANCELED statuses found that are treated as errors)."
+                summary_lines+=("All flows successful.")
+            else
+                echo "::warning::MAESTRO_CLOUD_FLOW_RESULTS is an empty array. No flows reported."
+                final_status="empty_results"
+                summary_lines+=("No flows reported.")
+            fi
+          fi
+        fi
+
+        summary_lines=("Status: ${final_status}" "${summary_lines[@]}")
+        summary_message=$(printf "%s\n" "${summary_lines[@]}")
+        if [ -z "$summary_message" ]; then
+          summary_message="Status: ${final_status} (no additional details captured)"
+        fi
+
+        echo "Final determined status: $final_status"
+        echo "Summary message:"
+        echo "$summary_message"
+        echo "flow_summary_status=$final_status" >> "$GITHUB_OUTPUT"
+        {
+          echo "flow_summary_message<<EOF"
+          echo "$summary_message"
+          echo "EOF"
+        } >> "$GITHUB_OUTPUT"

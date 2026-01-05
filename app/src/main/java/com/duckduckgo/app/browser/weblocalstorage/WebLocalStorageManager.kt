@@ -38,7 +38,22 @@ import java.nio.charset.StandardCharsets
 import javax.inject.Inject
 
 interface WebLocalStorageManager {
+    /**
+     * Clears web local storage based on predefined settings and fireproofed websites (legacy).
+     *
+     * Uses settingsDataStore.clearDuckAiData to determine if DuckAi data should be cleared.
+     */
     suspend fun clearWebLocalStorage()
+
+    /**
+     * Clears web local storage based on the specified options.
+     * @param shouldClearBrowserData If true, clears browser web data (cache, history, form data, authentication, cookies, directories).
+     * @param shouldClearDuckAiData If true, clears chat-related data from WebStorage.
+     */
+    suspend fun clearWebLocalStorage(
+        shouldClearBrowserData: Boolean,
+        shouldClearDuckAiData: Boolean,
+    )
 }
 
 @ContributesBinding(AppScope::class)
@@ -56,35 +71,46 @@ class DuckDuckGoWebLocalStorageManager @Inject constructor(
     private var matchingRegex = emptyList<String>()
 
     override suspend fun clearWebLocalStorage() = withContext(dispatcherProvider.io()) {
-        val settings = androidBrowserConfigFeature.webLocalStorage().getSettings()
-        val webLocalStorageSettings = webLocalStorageSettingsJsonParser.parseJson(settings)
+        val shouldClearBrowserData = true // As per legacy behavior, we always clear browser data
+        val shouldClearDuckAiData = settingsDataStore.clearDuckAiData
+        clearWebLocalStorage(shouldClearBrowserData, shouldClearDuckAiData)
+    }
 
-        val fireproofedDomains = fireproofWebsiteRepository.fireproofWebsitesSync().map { it.domain }
+    override suspend fun clearWebLocalStorage(
+        shouldClearBrowserData: Boolean,
+        shouldClearDuckAiData: Boolean,
+    ) {
+        withContext(dispatcherProvider.io()) {
+            val settings = androidBrowserConfigFeature.webLocalStorage().getSettings()
+            val webLocalStorageSettings = webLocalStorageSettingsJsonParser.parseJson(settings)
 
-        domains = webLocalStorageSettings.domains.list + fireproofedDomains
-        keysToDelete = webLocalStorageSettings.keysToDelete.list
-        matchingRegex = webLocalStorageSettings.matchingRegex.list
+            val fireproofedDomains = fireproofWebsiteRepository.fireproofWebsitesSync().map { it.domain }
 
-        logcat { "WebLocalStorageManager: Allowed domains: $domains" }
-        logcat { "WebLocalStorageManager: Keys to delete: $keysToDelete" }
-        logcat { "WebLocalStorageManager: Matching regex: $matchingRegex" }
+            domains = webLocalStorageSettings.domains.list + fireproofedDomains
+            keysToDelete = webLocalStorageSettings.keysToDelete.list
+            matchingRegex = webLocalStorageSettings.matchingRegex.list
 
-        val db = databaseProvider.get()
-        db.iterator().use { iterator ->
-            iterator.seekToFirst()
+            logcat { "WebLocalStorageManager: Allowed domains: $domains" }
+            logcat { "WebLocalStorageManager: Keys to delete: $keysToDelete" }
+            logcat { "WebLocalStorageManager: Matching regex: $matchingRegex" }
 
-            while (iterator.hasNext()) {
-                val entry = iterator.next()
-                val key = String(entry.key, StandardCharsets.UTF_8)
+            val db = databaseProvider.get()
+            db.iterator().use { iterator ->
+                iterator.seekToFirst()
 
-                val domainForMatchingAllowedKey = getDomainForMatchingAllowedKey(key)
-                if (domainForMatchingAllowedKey == null) {
-                    db.delete(entry.key)
-                    logcat { "WebLocalStorageManager: Deleted key: $key" }
-                } else if (settingsDataStore.clearDuckAiData && DUCKDUCKGO_DOMAINS.contains(domainForMatchingAllowedKey)) {
-                    if (keysToDelete.any { key.endsWith(it) }) {
+                while (iterator.hasNext()) {
+                    val entry = iterator.next()
+                    val key = String(entry.key, StandardCharsets.UTF_8)
+
+                    val domainForMatchingAllowedKey = getDomainForMatchingAllowedKey(key)
+                    if (domainForMatchingAllowedKey == null && shouldClearBrowserData) {
                         db.delete(entry.key)
                         logcat { "WebLocalStorageManager: Deleted key: $key" }
+                    } else if (shouldClearDuckAiData && DUCKDUCKGO_DOMAINS.contains(domainForMatchingAllowedKey)) {
+                        if (keysToDelete.any { key.endsWith(it) }) {
+                            db.delete(entry.key)
+                            logcat { "WebLocalStorageManager: Deleted key: $key" }
+                        }
                     }
                 }
             }

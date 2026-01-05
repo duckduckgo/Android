@@ -60,7 +60,7 @@ import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.ShouldLaunchPrivacy
 import com.duckduckgo.app.browser.WebViewErrorResponse.LOADING
 import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
-import com.duckduckgo.app.browser.animations.AddressBarTrackersAnimationFeatureToggle
+import com.duckduckgo.app.browser.animations.AddressBarTrackersAnimationManager
 import com.duckduckgo.app.browser.api.OmnibarRepository
 import com.duckduckgo.app.browser.applinks.AppLinksHandler
 import com.duckduckgo.app.browser.camera.CameraHardwareChecker
@@ -134,9 +134,7 @@ import com.duckduckgo.app.browser.commands.Command.SendEmail
 import com.duckduckgo.app.browser.commands.Command.SendResponseToJs
 import com.duckduckgo.app.browser.commands.Command.SendSms
 import com.duckduckgo.app.browser.commands.Command.SetBrowserBackground
-import com.duckduckgo.app.browser.commands.Command.SetBrowserBackgroundColor
 import com.duckduckgo.app.browser.commands.Command.SetOnboardingDialogBackground
-import com.duckduckgo.app.browser.commands.Command.SetOnboardingDialogBackgroundColor
 import com.duckduckgo.app.browser.commands.Command.ShareLink
 import com.duckduckgo.app.browser.commands.Command.ShowAppLinkPrompt
 import com.duckduckgo.app.browser.commands.Command.ShowAutoconsentAnimation
@@ -245,7 +243,6 @@ import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.global.model.domain
 import com.duckduckgo.app.global.model.domainMatchesUrl
 import com.duckduckgo.app.location.data.LocationPermissionType
-import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentManager
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_BANNER_DISMISSED
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_BANNER_SHOWN
@@ -341,10 +338,6 @@ import com.duckduckgo.privacy.dashboard.api.PrivacyProtectionTogglePlugin
 import com.duckduckgo.privacy.dashboard.api.PrivacyToggleOrigin
 import com.duckduckgo.privacy.dashboard.api.ui.DashboardOpener
 import com.duckduckgo.privacy.dashboard.api.ui.ToggleReports
-import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupExperimentExternalPixels
-import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupManager
-import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupUiEvent
-import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsToggleUsageListener
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite
@@ -353,7 +346,6 @@ import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.savedsites.impl.SavedSitesPixelName
 import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment.DeleteBookmarkListener
 import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment.EditSavedSiteListener
-import com.duckduckgo.serp.logos.api.SerpEasterEggLogosToggles
 import com.duckduckgo.serp.logos.api.SerpLogo
 import com.duckduckgo.settings.api.SerpSettingsFeature
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
@@ -407,8 +399,6 @@ import java.net.URISyntaxException
 import java.util.Locale
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
-import kotlin.time.Duration.Companion.milliseconds
-import com.duckduckgo.mobile.android.R as CommonR
 
 private const val SCAM_PROTECTION_REPORT_ERROR_URL = "https://duckduckgo.com/malicious-site-protection/report-error?url="
 
@@ -458,9 +448,6 @@ class BrowserTabViewModel @Inject constructor(
     private val sitePermissionsManager: SitePermissionsManager,
     private val cameraHardwareChecker: CameraHardwareChecker,
     private val androidBrowserConfig: AndroidBrowserConfigFeature,
-    private val privacyProtectionsPopupManager: PrivacyProtectionsPopupManager,
-    private val privacyProtectionsToggleUsageListener: PrivacyProtectionsToggleUsageListener,
-    private val privacyProtectionsPopupExperimentExternalPixels: PrivacyProtectionsPopupExperimentExternalPixels,
     private val faviconsFetchingPrompt: FaviconsFetchingPrompt,
     private val subscriptions: Subscriptions,
     private val sslCertificatesFeature: SSLCertificatesFeature,
@@ -488,13 +475,11 @@ class BrowserTabViewModel @Inject constructor(
     private val duckChatJSHelper: DuckChatJSHelper,
     private val tabManager: TabManager,
     private val addressDisplayFormatter: AddressDisplayFormatter,
-    private val onboardingDesignExperimentManager: OnboardingDesignExperimentManager,
-    private val serpEasterEggLogosToggles: SerpEasterEggLogosToggles,
     private val nonHttpAppLinkChecker: NonHttpAppLinkChecker,
     private val externalIntentProcessingState: ExternalIntentProcessingState,
     private val vpnMenuStateProvider: VpnMenuStateProvider,
     private val webViewCompatWrapper: WebViewCompatWrapper,
-    private val addressBarTrackersAnimationFeatureToggle: AddressBarTrackersAnimationFeatureToggle,
+    private val addressBarTrackersAnimationManager: AddressBarTrackersAnimationManager,
     private val autoconsentPixelManager: AutoconsentPixelManager,
     private val omnibarRepository: OmnibarRepository,
     private val contentScopeScriptsSubscriptionEventPluginPoint: PluginPoint<ContentScopeScriptsSubscriptionEventPlugin>,
@@ -693,6 +678,10 @@ class BrowserTabViewModel @Inject constructor(
         navigationAwareLoginDetector.loginEventLiveData.observeForever(loginDetectionObserver)
         showPulseAnimation.observeForever(fireButtonAnimation)
 
+        viewModelScope.launch {
+            addressBarTrackersAnimationManager.fetchFeatureState()
+        }
+
         tabRepository.childClosedTabs
             .onEach { closedTab ->
                 if (this@BrowserTabViewModel::tabId.isInitialized && tabId == closedTab) {
@@ -758,11 +747,6 @@ class BrowserTabViewModel @Inject constructor(
                 }.flowOn(dispatchers.io())
                 .launchIn(viewModelScope)
         }
-
-        privacyProtectionsPopupManager.viewState
-            .onEach { popupViewState ->
-                browserViewState.value = currentBrowserViewState().copy(privacyProtectionsPopupViewState = popupViewState)
-            }.launchIn(viewModelScope)
 
         duckPlayer
             .observeUserPreferences()
@@ -976,15 +960,6 @@ class BrowserTabViewModel @Inject constructor(
             viewModelScope.launch {
                 val cta = refreshCta()
                 showOrHideKeyboard(cta)
-                if (onboardingDesignExperimentManager.isBuckEnrolledAndEnabled()) {
-                    when (cta) {
-                        is DaxBubbleCta.DaxIntroSearchOptionsCta -> {
-                            // Let the keyboard show before showing the animation, using insets were problematic
-                            delay(750.milliseconds)
-                            buckTryASearchAnimationEnabled.value = true
-                        }
-                    }
-                }
             }
         } else {
             command.value = HideKeyboard
@@ -1118,9 +1093,6 @@ class BrowserTabViewModel @Inject constructor(
             -> {
                 if (!ctaViewModel.isSuggestedSearchOption(query)) {
                     pixel.fire(ONBOARDING_SEARCH_CUSTOM, type = Unique())
-                    viewModelScope.launch {
-                        onboardingDesignExperimentManager.fireSearchOrNavCustomPixel()
-                    }
                 }
             }
 
@@ -1408,9 +1380,6 @@ class BrowserTabViewModel @Inject constructor(
             site?.uri?.let {
                 brokenSitePrompt.pageRefreshed(it)
             }
-            privacyProtectionsPopupManager.onPageRefreshTriggeredByUser(
-                isOmnibarAtTheTop = settingsDataStore.omnibarType != OmnibarType.SINGLE_BOTTOM,
-            )
         }
     }
 
@@ -1751,11 +1720,6 @@ class BrowserTabViewModel @Inject constructor(
         isLinkOpenedInNewTab = false
 
         automaticSavedLoginsMonitor.clearAutoSavedLoginId(tabId)
-
-        site?.run {
-            val hasBrowserError = currentBrowserViewState().browserError != OMITTED
-            privacyProtectionsPopupManager.onPageLoaded(url, httpErrorCodeEvents, hasBrowserError)
-        }
     }
 
     private fun cleanupBlobDownloadReplyProxyMaps() {
@@ -1983,22 +1947,16 @@ class BrowserTabViewModel @Inject constructor(
             navigationStateChanged(webViewNavigationState)
             url?.let { prefetchFavicon(url) }
 
-            viewModelScope.launch {
-                onboardingDesignExperimentManager.onWebPageFinishedLoading(url)
-            }
-
             evaluateDuckAIPage(url)
             evaluateSerpLogoState(url)
         }
     }
 
     private fun evaluateSerpLogoState(url: String?) {
-        if (serpEasterEggLogosToggles.feature().isEnabled()) {
-            if (url != null && duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
-                command.value = ExtractSerpLogo(url)
-            } else {
-                omnibarViewState.value = currentOmnibarViewState().copy(serpLogo = null)
-            }
+        if (url != null && duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
+            command.value = ExtractSerpLogo(url)
+        } else {
+            omnibarViewState.value = currentOmnibarViewState().copy(serpLogo = null)
         }
     }
 
@@ -2619,8 +2577,6 @@ class BrowserTabViewModel @Inject constructor(
                 performToggleReportCheck()
                 addToAllowList(domain, clickedFromCustomTab)
             }
-
-            privacyProtectionsToggleUsageListener.onPrivacyProtectionsToggleUsed()
         }
     }
 
@@ -2636,13 +2592,11 @@ class BrowserTabViewModel @Inject constructor(
         domain: String,
         clickedFromCustomTab: Boolean,
     ) {
-        val pixelParams = privacyProtectionsPopupExperimentExternalPixels.getPixelParams()
         if (clickedFromCustomTab) {
             pixel.fire(CustomTabPixelNames.CUSTOM_TABS_MENU_DISABLE_PROTECTIONS_ALLOW_LIST_ADD)
         } else {
-            pixel.fire(AppPixelName.BROWSER_MENU_ALLOWLIST_ADD, pixelParams, type = Count)
+            pixel.fire(AppPixelName.BROWSER_MENU_ALLOWLIST_ADD, type = Count)
         }
-        privacyProtectionsPopupExperimentExternalPixels.tryReportProtectionsToggledFromBrowserMenu(protectionsEnabled = false)
         userAllowListRepository.addDomainToUserAllowList(domain)
         privacyProtectionTogglePlugin.getPlugins().forEach {
             it.onToggleOff(PrivacyToggleOrigin.MENU)
@@ -2656,13 +2610,11 @@ class BrowserTabViewModel @Inject constructor(
         domain: String,
         clickedFromCustomTab: Boolean,
     ) {
-        val pixelParams = privacyProtectionsPopupExperimentExternalPixels.getPixelParams()
         if (clickedFromCustomTab) {
             pixel.fire(CustomTabPixelNames.CUSTOM_TABS_MENU_DISABLE_PROTECTIONS_ALLOW_LIST_REMOVE)
         } else {
-            pixel.fire(AppPixelName.BROWSER_MENU_ALLOWLIST_REMOVE, pixelParams, type = Count)
+            pixel.fire(AppPixelName.BROWSER_MENU_ALLOWLIST_REMOVE, type = Count)
         }
-        privacyProtectionsPopupExperimentExternalPixels.tryReportProtectionsToggledFromBrowserMenu(protectionsEnabled = true)
         userAllowListRepository.removeDomainFromUserAllowList(domain)
         privacyProtectionTogglePlugin.getPlugins().forEach {
             it.onToggleOn(PrivacyToggleOrigin.MENU)
@@ -2803,10 +2755,6 @@ class BrowserTabViewModel @Inject constructor(
         } else {
             command.value = NavigationCommand.Refresh
         }
-    }
-
-    fun onPrivacyProtectionsPopupUiEvent(event: PrivacyProtectionsPopupUiEvent) {
-        privacyProtectionsPopupManager.onUiEvent(event)
     }
 
     private fun initializeViewStates() {
@@ -2988,7 +2936,6 @@ class BrowserTabViewModel @Inject constructor(
         val cta = ctaViewState.value?.cta ?: return
         viewModelScope.launch(dispatchers.io()) {
             ctaViewModel.onCtaShown(cta)
-            onboardingDesignExperimentManager.fireInContextDialogShownPixel(cta)
         }
     }
 
@@ -3234,6 +3181,8 @@ class BrowserTabViewModel @Inject constructor(
         command.value = LaunchTabSwitcher
 
         pixel.fire(AppPixelName.TAB_MANAGER_CLICKED)
+        pixel.fire(AppPixelName.PRODUCT_TELEMETRY_SURFACE_TAB_MANAGER_CLICKED)
+        pixel.fire(AppPixelName.PRODUCT_TELEMETRY_SURFACE_TAB_MANAGER_CLICKED_DAILY, type = Daily())
         fireDailyLaunchPixel()
 
         when (viewMode) {
@@ -4307,9 +4256,6 @@ class BrowserTabViewModel @Inject constructor(
         }
         val cta = currentCtaViewState().cta
         if (cta is OnboardingDaxDialogCta.DaxFireButtonCta) {
-            viewModelScope.launch {
-                onboardingDesignExperimentManager.fireFireButtonClickedFromOnboardingPixel()
-            }
             onUserDismissedCta(cta)
             command.value = HideOnboardingDaxDialog(cta as OnboardingDaxDialogCta)
         }
@@ -4350,6 +4296,10 @@ class BrowserTabViewModel @Inject constructor(
             }
             hasUserSeenHistoryIAM = false
             lastAutoCompleteState?.searchResults?.suggestions?.let { suggestions ->
+                if (suggestions.isNotEmpty()) {
+                    pixel.fire(DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_AUTOCOMPLETE_DISPLAYED)
+                    pixel.fire(DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_AUTOCOMPLETE_DISPLAYED_DAILY, type = Daily())
+                }
                 if (suggestions.any { it is AutoCompleteBookmarkSuggestion && it.isFavorite }) {
                     pixel.fire(AppPixelName.AUTOCOMPLETE_DISPLAYED_LOCAL_FAVORITE)
                 }
@@ -4442,43 +4392,11 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun setBrowserBackground(lightModeEnabled: Boolean) {
-        when {
-            onboardingDesignExperimentManager.isBuckEnrolledAndEnabled() -> {
-                command.value = SetBrowserBackgroundColor(getBuckOnboardingExperimentBackgroundColor(lightModeEnabled))
-            }
-
-            onboardingDesignExperimentManager.isBbEnrolledAndEnabled() -> {
-                // TODO if BB wins the we should rename the function to SetBubbleDialogBackground
-                command.value = Command.SetBubbleDialogBackground(getBBBackgroundResource(lightModeEnabled))
-            }
-
-            else -> {
-                command.value = SetBrowserBackground(getBackgroundResource(lightModeEnabled))
-            }
-        }
+        command.value = SetBrowserBackground(getBackgroundResource(lightModeEnabled))
     }
 
-    private fun getBuckOnboardingExperimentBackgroundColor(lightModeEnabled: Boolean): Int =
-        if (lightModeEnabled) {
-            CommonR.color.buckYellow
-        } else {
-            CommonR.color.buckLightBlue
-        }
-
     fun setOnboardingDialogBackground(lightModeEnabled: Boolean) {
-        when {
-            onboardingDesignExperimentManager.isBuckEnrolledAndEnabled() -> {
-                command.value = SetOnboardingDialogBackgroundColor(getBuckOnboardingExperimentBackgroundColor(lightModeEnabled))
-            }
-
-            onboardingDesignExperimentManager.isBbEnrolledAndEnabled() -> {
-                command.value = SetOnboardingDialogBackground(getBBBackgroundResource(lightModeEnabled))
-            }
-
-            else -> {
-                command.value = SetOnboardingDialogBackground(getBackgroundResource(lightModeEnabled))
-            }
-        }
+        command.value = SetOnboardingDialogBackground(getBackgroundResource(lightModeEnabled))
     }
 
     private fun getBackgroundResource(lightModeEnabled: Boolean): Int =
@@ -4486,13 +4404,6 @@ class BrowserTabViewModel @Inject constructor(
             R.drawable.onboarding_background_bitmap_light
         } else {
             R.drawable.onboarding_background_bitmap_dark
-        }
-
-    private fun getBBBackgroundResource(lightModeEnabled: Boolean): Int =
-        if (lightModeEnabled) {
-            R.drawable.onboarding_background_bb_bitmap_light
-        } else {
-            R.drawable.onboarding_background_bb_bitmap_dark
         }
 
     private fun onUserSwitchedToTab(tabId: String) {
@@ -4572,26 +4483,15 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onVpnMenuClicked() {
-        val vpnMenuState = currentBrowserViewState().vpnMenuState
-        val statusParam = when (vpnMenuState) {
-            VpnMenuState.NotSubscribed -> {
-                command.value = LaunchPrivacyPro("https://duckduckgo.com/pro?origin=funnel_appmenu_android".toUri())
-                "pill"
-            }
-
-            VpnMenuState.NotSubscribedNoPill -> {
-                command.value = LaunchPrivacyPro("https://duckduckgo.com/pro?origin=funnel_appmenu_android".toUri())
-                "no_pill"
-            }
-
+        when (currentBrowserViewState().vpnMenuState) {
             is VpnMenuState.Subscribed -> {
                 command.value = LaunchVpnManagement
-                "subscribed"
             }
-
-            VpnMenuState.Hidden -> "" // Should not happen as menu item should not be visible
+            VpnMenuState.Hidden -> {} // Should not happen as menu item should not be visible
+            else -> {
+                command.value = LaunchPrivacyPro("https://duckduckgo.com/pro?origin=funnel_appmenu_android".toUri())
+            }
         }
-        pixel.fire(AppPixelName.MENU_ACTION_VPN_PRESSED, mapOf(PixelParameter.STATUS to statusParam))
     }
 
     fun onAutoConsentPopUpHandled(isCosmetic: Boolean) {
@@ -4601,10 +4501,13 @@ class BrowserTabViewModel @Inject constructor(
             } else {
                 autoconsentPixelManager.fireDailyPixel(AutoConsentPixel.AUTOCONSENT_ANIMATION_SHOWN_DAILY)
             }
-            if (addressBarTrackersAnimationFeatureToggle.feature().isEnabled() && trackersCount().isNotEmpty()) {
-                command.postValue(Command.EnqueueCookiesAnimation(isCosmetic))
-            } else {
-                command.postValue(ShowAutoconsentAnimation(isCosmetic))
+            // TODO remove launch once address bar trackers animation is enabled permanently
+            viewModelScope.launch {
+                if (addressBarTrackersAnimationManager.isFeatureEnabled() && trackersCount().isNotEmpty()) {
+                    command.postValue(Command.EnqueueCookiesAnimation(isCosmetic))
+                } else {
+                    command.postValue(ShowAutoconsentAnimation(isCosmetic))
+                }
             }
         }
     }
@@ -4614,7 +4517,6 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onBookmarksMenuItemClicked() {
-        pixel.fire(AppPixelName.MENU_ACTION_BOOKMARKS_PRESSED.pixelName)
         launchBookmarksActivity()
     }
 
@@ -4631,27 +4533,18 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onOmnibarPrivacyShieldButtonPressed() {
-        if (currentCtaViewState().cta is OnboardingDaxDialogCta.DaxTrackersBlockedCta) {
-            viewModelScope.launch {
-                onboardingDesignExperimentManager.firePrivacyDashClickedFromOnboardingPixel()
-            }
-        }
+        // No-op: experiment pixel tracking removed
     }
 
     fun onUserSelectedOnboardingDialogOption(
         cta: Cta,
         index: Int?,
     ) {
-        if (index == null) return
-        viewModelScope.launch {
-            onboardingDesignExperimentManager.fireOptionSelectedPixel(cta, index)
-        }
+        // No-op: experiment pixel tracking removed
     }
 
     fun onUserSelectedOnboardingSiteSuggestionOption(index: Int) {
-        viewModelScope.launch {
-            onboardingDesignExperimentManager.fireSiteSuggestionOptionSelectedPixel(index)
-        }
+        // No-op: experiment pixel tracking removed
     }
 
     fun onLogoReceived(serpLogo: SerpLogo) {
@@ -4660,6 +4553,11 @@ class BrowserTabViewModel @Inject constructor(
 
     fun onDynamicLogoClicked(url: String) {
         command.value = Command.ShowSerpEasterEggLogo(url)
+    }
+
+    fun sendKeyboardFocusedPixel() {
+        pixel.fire(DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_KEYBOARD_USAGE)
+        pixel.fire(DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_KEYBOARD_USAGE_DAILY, type = Daily())
     }
 
     private fun trackersCount(): String =

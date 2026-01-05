@@ -160,10 +160,6 @@
     <string name="feedbackSubmitVpnDisclaimer">"Osim gore unesenih pojedinosti, šaljemo neke anonimizirane podatke s tvojim povratnim informacijama:\n\n • Jesu li neke značajke preglednika aktivne\n • Objedinjena dijagnostika aplikacije (npr. kodovi pogrešaka)\n\nKlikom \"Pošalji\" slažeš se da DuckDuckGo može koristiti poslane podatke za poboljšanje aplikacije."</string>
     <string name="feedbackSubmitVpnSubmit">Pošalji</string>
     <string name="feedbackSubmitCompletedMessage">Hvala! Povratne informacije su poslane.</string>
-    <string name="feedbackSubmitFailedMessage">Nešto nije bilo kako treba</string>
-
-    <string name="feedbackSubmitEmailByLine">Navedi adresu e-pošte ako želiš da te kontaktiramo u vezi s tim problemom (možda nećemo moći reagirati na sve probleme):</string>
-    <string name="feedbackSubmitEmailHint">Adresa e-pošte (neobavezno)</string>
 
     <string name="feedbackSubmitGeneralDescriptionHint">Pruži nam svoje povratne informacije…</string>
     <string name="feedbackSubmitFeatureRequestDescriptionHint">Koju bi značajku želio vidjeti?</string>

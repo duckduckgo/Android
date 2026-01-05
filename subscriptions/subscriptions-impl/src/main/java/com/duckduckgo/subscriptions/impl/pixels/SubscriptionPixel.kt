@@ -256,6 +256,11 @@ enum class SubscriptionPixel(
         types = setOf(Count, Daily()),
         includedParameters = setOf(APP_VERSION),
     ),
+    AUTH_V1_SIGN_IN_ATTEMPT(
+        baseName = "subscription_auth_v1_sign_in_attempt",
+        types = setOf(Count, Daily()),
+        includedParameters = setOf(APP_VERSION),
+    ),
     ;
 
     constructor(

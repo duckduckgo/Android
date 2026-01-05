@@ -19,8 +19,7 @@ package com.duckduckgo.networkprotection.impl.config
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.networkprotection.impl.VpnRemoteFeatures
-import com.duckduckgo.networkprotection.impl.configuration.CONTROLLER_NETP_DUCKDUCKGO_COM
-import com.duckduckgo.networkprotection.impl.configuration.VpnLocalDns
+import com.duckduckgo.networkprotection.impl.configuration.VPNExcludedDomainsFallback
 import com.duckduckgo.networkprotection.impl.exclusion.NetPExclusionListRepository
 import com.duckduckgo.networkprotection.impl.exclusion.systemapps.SystemAppsExclusionRepository
 import com.duckduckgo.networkprotection.impl.settings.NetPSettingsLocalConfig
@@ -28,6 +27,7 @@ import com.duckduckgo.networkprotection.impl.settings.NetpVpnSettingsDataStore
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.withContext
 import logcat.logcat
+import okhttp3.Dns
 import java.net.Inet4Address
 import java.net.InetAddress
 import javax.inject.Inject
@@ -58,7 +58,8 @@ class RealNetPDefaultConfigProvider @Inject constructor(
     private val systemAppsExclusionRepository: SystemAppsExclusionRepository,
     private val netpVpnSettingsDataStore: NetpVpnSettingsDataStore,
     private val vpnRemoteFeatures: VpnRemoteFeatures,
-    private val vpnLocalDns: VpnLocalDns,
+    private val dns: Dns,
+    private val excludedDomainsFallback: VPNExcludedDomainsFallback,
 ) : NetPDefaultConfigProvider {
     override suspend fun exclusionList(): Set<String> {
         return mutableSetOf<String>().apply {
@@ -72,13 +73,14 @@ class RealNetPDefaultConfigProvider @Inject constructor(
 
         return@withContext if (netPSettingsLocalConfig.vpnExcludeLocalNetworkRoutes().isEnabled()) {
             val routes = if (isLocalDnsEnabled) {
-                // get the controller IPs
-                val controllerIPs = vpnLocalDns.lookup(CONTROLLER_NETP_DUCKDUCKGO_COM)
-                    .filterIsInstance<Inet4Address>()
+                // get the all excluded IPs from excluded domains
+                val excludedDomainIps = excludedDomainsFallback.getFallback().keys.map {
+                    dns.lookup(it)
+                }.flatten().filterIsInstance<Inet4Address>()
                     .mapNotNull { it.hostAddress }
                     .associateWith { 32 }
 
-                val excludedRanges = WgVpnRoutes.vpnDefaultExcludedRoutes + controllerIPs
+                val excludedRanges = WgVpnRoutes.vpnDefaultExcludedRoutes + excludedDomainIps
                 logcat { "Generating VPN routes dynamically, excluded ranges: $excludedRanges" }
 
                 WgVpnRoutes().generateVpnRoutes(excludedRanges)
@@ -92,13 +94,14 @@ class RealNetPDefaultConfigProvider @Inject constructor(
             }
         } else {
             val routes = if (isLocalDnsEnabled) {
-                // get the controller IPs
-                val controllerIPs = vpnLocalDns.lookup(CONTROLLER_NETP_DUCKDUCKGO_COM)
-                    .filterIsInstance<Inet4Address>()
+                // get the all excluded IPs from excluded domains
+                val excludedDomainIps = excludedDomainsFallback.getFallback().keys.map {
+                    dns.lookup(it)
+                }.flatten().filterIsInstance<Inet4Address>()
                     .mapNotNull { it.hostAddress }
                     .associateWith { 32 }
 
-                val excludedRanges = WgVpnRoutes.vpnExcludedSpecialRoutes + controllerIPs
+                val excludedRanges = WgVpnRoutes.vpnExcludedSpecialRoutes + excludedDomainIps
                 logcat { "Generating VPN routes dynamically, excluded ranges: $excludedRanges" }
 
                 WgVpnRoutes().generateVpnRoutes(excludedRanges)

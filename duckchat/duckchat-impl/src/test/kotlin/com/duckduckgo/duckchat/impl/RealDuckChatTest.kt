@@ -35,13 +35,13 @@ import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBa
 import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarOptionBottomSheetDialogFactory
 import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarSelection.SEARCH_AND_AI
 import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarSelection.SEARCH_ONLY
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_CANCELLED
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_CONFIRMED
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_DISPLAYED
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_NOT_NOW
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelParameters.NEW_ADDRESS_BAR_SELECTION
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
-import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewActivityWithParams
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.navigation.api.GlobalActivityStarter
@@ -102,7 +102,9 @@ class RealDuckChatTest {
         whenever(mockDuckChatFeatureRepository.shouldShowInVoiceSearch()).thenReturn(false)
         whenever(mockDuckChatFeatureRepository.isDuckChatUserEnabled()).thenReturn(true)
         whenever(mockDuckChatFeatureRepository.isInputScreenUserSettingEnabled()).thenReturn(true)
+        whenever(mockDuckChatFeatureRepository.isFullScreenModeUserSettingEnabled()).thenReturn(true)
         whenever(mockDuckChatFeatureRepository.sessionDeltaInMinutes()).thenReturn(10L)
+        whenever(mockDuckChatFeatureRepository.lastSessionTimestamp()).thenReturn(0L)
         whenever(mockContext.getString(any())).thenReturn("Duck.ai")
         duckChatFeature.self().setRawStoredState(State(enable = true))
         duckChatFeature.duckAiInputScreen().setRawStoredState(State(enable = true))
@@ -127,8 +129,9 @@ class RealDuckChatTest {
         )
         coroutineRule.testScope.advanceUntilIdle()
 
-        whenever(mockGlobalActivityStarter.startIntent(any(), any<DuckChatWebViewActivityWithParams>())).thenReturn(mockIntent)
         whenever(mockNewAddressBarOptionBottomSheetDialogFactory.create(any(), any(), any())).thenReturn(mockNewAddressBarOptionBottomSheetDialog)
+        whenever(mockBrowserNav.openDuckChat(any(), any(), any())).thenReturn(mockIntent)
+        whenever(mockBrowserNav.closeDuckChat(any())).thenReturn(mockIntent)
     }
 
     @Test
@@ -292,96 +295,94 @@ class RealDuckChatTest {
     }
 
     @Test
-    fun whenOpenDuckChatCalledThenActivityStarted() = runTest {
+    fun whenOpenDuckChatCalledThenOpenDuckChat() = runTest {
         testee.openDuckChat()
-        verify(mockGlobalActivityStarter).startIntent(
+
+        verify(mockBrowserNav).openDuckChat(
             mockContext,
-            DuckChatWebViewActivityWithParams(
-                url = "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5",
-            ),
+            hasSessionActive = false,
+            duckChatUrl = "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5",
         )
-        verify(mockContext).startActivity(any())
+        verify(mockContext).startActivity(mockIntent)
         verify(mockDuckChatFeatureRepository).registerOpened()
     }
 
     @Test
-    fun whenOpenDuckChatCalledAndPoCIsDisabledThenPoCWebViewActivityNotStarted() = runTest {
-        whenever(
-            mockGlobalActivityStarter.startIntent(
-                mockContext,
-                DuckChatWebViewActivityWithParams(
-                    url = "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5",
-                ),
-            ),
-        ).thenReturn(Intent())
+    fun whenOpenDuckChatCalledWithActiveSessionThenHasSessionActiveIsTrue() = runTest {
+        val thirtyMinutesAgo = System.currentTimeMillis() - (30 * 60 * 1000L)
+        whenever(mockDuckChatFeatureRepository.lastSessionTimestamp()).thenReturn(thirtyMinutesAgo)
 
         testee.openDuckChat()
 
-        val intentCaptor = argumentCaptor<Intent>()
-        verify(mockContext).startActivity(intentCaptor.capture())
-        assertNull(intentCaptor.firstValue.component?.className)
+        verify(mockBrowserNav).openDuckChat(
+            mockContext,
+            hasSessionActive = true,
+            duckChatUrl = "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5",
+        )
+        verify(mockContext).startActivity(mockIntent)
+        verify(mockDuckChatFeatureRepository).registerOpened()
     }
 
     @Test
-    fun whenOpenDuckChatCalledWithQueryThenActivityStartedWithQuery() = runTest {
+    fun whenOpenDuckChatCalledWithQueryThenDuckChatOpenedWithQuery() = runTest {
         testee.openDuckChatWithPrefill(query = "example")
-        verify(mockGlobalActivityStarter).startIntent(
+
+        verify(mockBrowserNav).openDuckChat(
             mockContext,
-            DuckChatWebViewActivityWithParams(
-                url = "https://duckduckgo.com/?q=example&ia=chat&duckai=5",
-            ),
+            hasSessionActive = false,
+            duckChatUrl = "https://duckduckgo.com/?q=example&ia=chat&duckai=5",
         )
-        verify(mockContext).startActivity(any())
+        verify(mockContext).startActivity(mockIntent)
         verify(mockDuckChatFeatureRepository).registerOpened()
     }
 
     @Test
-    fun whenOpenDuckChatCalledWithBangQueryThenActivityStartedWithBangQuery() = runTest {
+    fun whenOpenDuckChatCalledWithBangQueryThenDuckChatOpenedWithBangQuery() = runTest {
         duckChatFeature.self().setRawStoredState(State(enable = true, settings = SETTINGS_JSON))
         duckChatFeature.keepSession().setRawStoredState(State(enable = false))
         testee.onPrivacyConfigDownloaded()
 
         testee.openDuckChatWithPrefill(query = "example !ai")
-        verify(mockGlobalActivityStarter).startIntent(
+
+        verify(mockBrowserNav).openDuckChat(
             mockContext,
-            DuckChatWebViewActivityWithParams(
-                url = "https://duckduckgo.com/?q=example&bang=true&ia=chat&duckai=5",
-            ),
+            hasSessionActive = false,
+            duckChatUrl = "https://duckduckgo.com/?q=example&bang=true&ia=chat&duckai=5",
         )
-        verify(mockContext).startActivity(any())
+        verify(mockContext).startActivity(mockIntent)
         verify(mockDuckChatFeatureRepository).registerOpened()
     }
 
     @Test
-    fun whenOpenDuckChatCalledWithNonAiBangQueryThenActivityStartedWithBangStrippedQuery() = runTest {
+    fun whenOpenDuckChatCalledWithNonAiBangQueryThenDuckChatOpenedWithBangStrippedQuery() = runTest {
         duckChatFeature.self().setRawStoredState(State(enable = true, settings = SETTINGS_JSON))
         duckChatFeature.keepSession().setRawStoredState(State(enable = false))
         testee.onPrivacyConfigDownloaded()
 
         testee.openDuckChatWithPrefill(query = "example !g")
-        verify(mockGlobalActivityStarter).startIntent(
+
+        verify(mockBrowserNav).openDuckChat(
             mockContext,
-            DuckChatWebViewActivityWithParams(
-                url = "https://duckduckgo.com/?q=example&ia=chat&duckai=5",
-            ),
+            hasSessionActive = false,
+            duckChatUrl = "https://duckduckgo.com/?q=example&ia=chat&duckai=5",
         )
-        verify(mockContext).startActivity(any())
+        verify(mockContext).startActivity(mockIntent)
         verify(mockDuckChatFeatureRepository).registerOpened()
     }
 
     @Test
-    fun whenOpenDuckChatCalledWithBangsButNoQueryThenActivityStartedWithoutPrompt() = runTest {
+    fun whenOpenDuckChatCalledWithBangsButNoQueryThenDuckChatOpenedWithoutPrompt() = runTest {
         duckChatFeature.self().setRawStoredState(State(enable = true, settings = SETTINGS_JSON))
         testee.onPrivacyConfigDownloaded()
 
         testee.openDuckChatWithPrefill(query = "!ai !image")
-        verify(mockGlobalActivityStarter).startIntent(
+
+        verify(mockBrowserNav).openDuckChat(
             mockContext,
-            DuckChatWebViewActivityWithParams(
-                url = "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5",
-            ),
+            hasSessionActive = false,
+            duckChatUrl = "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5",
         )
-        verify(mockContext).startActivity(any())
+        verify(mockContext).startActivity(mockIntent)
         verify(mockDuckChatFeatureRepository).registerOpened()
     }
 
@@ -418,16 +419,25 @@ class RealDuckChatTest {
     }
 
     @Test
-    fun whenOpenDuckChatCalledWithQueryAndAutoPromptThenActivityStartedWithQueryAndAutoPrompt() = runTest {
+    fun whenOpenDuckChatCalledWithQueryAndAutoPromptThenDuckChatOpenedWithQueryAndAutoPrompt() = runTest {
         testee.openDuckChatWithAutoPrompt(query = "example")
-        verify(mockGlobalActivityStarter).startIntent(
+
+        verify(mockBrowserNav).openDuckChat(
             mockContext,
-            DuckChatWebViewActivityWithParams(
-                url = "https://duckduckgo.com/?q=example&prompt=1&ia=chat&duckai=5",
-            ),
+            hasSessionActive = false,
+            duckChatUrl = "https://duckduckgo.com/?q=example&prompt=1&ia=chat&duckai=5",
         )
-        verify(mockContext).startActivity(any())
+        verify(mockContext).startActivity(mockIntent)
         verify(mockDuckChatFeatureRepository).registerOpened()
+    }
+
+    @Test
+    fun whenDuckChatCalledThenFireOpenDuckChatPixels() = runTest {
+        testee.openDuckChat()
+
+        verify(mockPixel).fire(pixel = DuckChatPixelName.DUCK_CHAT_OPEN, parameters = mapOf("delta-timestamp-minutes" to "10"))
+        verify(mockPixel).fire(DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_DUCK_AI_OPEN)
+        verify(mockPixel).fire(DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_DUCK_AI_OPEN_DAILY, type = Pixel.PixelType.Daily())
     }
 
     @Test
@@ -500,20 +510,10 @@ class RealDuckChatTest {
 
     @Test
     fun whenCloseDuckChatCalledThenOnCloseIsInvoked() = runTest {
-        val testLifecycleOwner = TestLifecycleOwner(initialState = CREATED)
-
-        var onCloseCalled = false
-        testee.observeCloseEvent(testLifecycleOwner) {
-            onCloseCalled = true
-        }
-
-        testLifecycleOwner.currentState = Lifecycle.State.STARTED
-
         testee.closeDuckChat()
 
-        advanceUntilIdle()
-
-        assertTrue(onCloseCalled)
+        verify(mockBrowserNav).closeDuckChat(mockContext)
+        verify(mockContext).startActivity(mockIntent)
     }
 
     @Test

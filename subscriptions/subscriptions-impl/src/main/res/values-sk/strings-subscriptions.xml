@@ -160,10 +160,6 @@
     <string name="feedbackSubmitVpnDisclaimer">"Okrem vyššie uvedených údajov posielame spolu s tvojou spätnou väzbou aj niektoré anonymizované informácie:\n\n- Či sú niektoré funkcie prehliadača aktívne\n- Súhrnná diagnostika aplikácie (napr. kódy chýb)\n\nKliknutím na tlačidlo Odoslať súhlasíš s tým, že DuckDuckGo môže použiť odoslané informácie na zlepšenie aplikácie."</string>
     <string name="feedbackSubmitVpnSubmit">Odoslať</string>
     <string name="feedbackSubmitCompletedMessage">Ďakujeme! Spätná väzba bola odoslaná</string>
-    <string name="feedbackSubmitFailedMessage">Vyskytla sa chyba</string>
-
-    <string name="feedbackSubmitEmailByLine">Uveď e-mail, ak chceš, aby sme ťa v súvislosti s týmto problémom kontaktovali (nemusíme byť schopní odpovedať na všetky problémy):</string>
-    <string name="feedbackSubmitEmailHint">E-mail (nepovinné)</string>
 
     <string name="feedbackSubmitGeneralDescriptionHint">Prosím, daj nám svoju spätnú väzbu...</string>
     <string name="feedbackSubmitFeatureRequestDescriptionHint">Akú funkciu by si chcel/-a?</string>

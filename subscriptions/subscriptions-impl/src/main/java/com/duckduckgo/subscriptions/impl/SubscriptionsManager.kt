@@ -57,6 +57,7 @@ import com.duckduckgo.subscriptions.impl.billing.PurchaseState
 import com.duckduckgo.subscriptions.impl.billing.RetryPolicy
 import com.duckduckgo.subscriptions.impl.billing.SubscriptionReplacementMode
 import com.duckduckgo.subscriptions.impl.billing.retry
+import com.duckduckgo.subscriptions.impl.model.Entitlement
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionFailureErrorType
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.AccessToken
@@ -78,6 +79,7 @@ import com.duckduckgo.subscriptions.impl.services.toEntitlements
 import com.duckduckgo.subscriptions.impl.wideevents.AuthTokenRefreshWideEvent
 import com.duckduckgo.subscriptions.impl.wideevents.FreeTrialConversionWideEvent
 import com.duckduckgo.subscriptions.impl.wideevents.SubscriptionPurchaseWideEvent
+import com.duckduckgo.subscriptions.impl.wideevents.SubscriptionRestoreWideEvent
 import com.duckduckgo.subscriptions.impl.wideevents.SubscriptionSwitchWideEvent
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.JsonDataException
@@ -114,7 +116,10 @@ import kotlin.time.Duration.Companion.milliseconds
 
 interface SubscriptionsManager {
     /**
-     * Returns available purchase options retrieved from Play Store
+     * Returns available purchase options retrieved from Play Store.
+     * Works seamlessly regardless of whether tierMessagingEnabled flag is on or off.
+     * When flag is off, entitlements are constructed from legacy feature strings with default tier "plus".
+     * When flag is on, actual entitlements and tier information from the API are used.
      */
     suspend fun getSubscriptionOffer(): List<SubscriptionOffer>
 
@@ -302,6 +307,7 @@ class RealSubscriptionsManager @Inject constructor(
     private val tokenRefreshWideEvent: AuthTokenRefreshWideEvent,
     private val subscriptionSwitchWideEvent: SubscriptionSwitchWideEvent,
     private val freeTrialConversionWideEvent: FreeTrialConversionWideEvent,
+    private val subscriptionRestoreWideEvent: SubscriptionRestoreWideEvent,
 ) : SubscriptionsManager {
     private val adapter = Moshi.Builder().build().adapter(ResponseError::class.java)
 
@@ -382,6 +388,8 @@ class RealSubscriptionsManager @Inject constructor(
                         checkPurchase(it.packageName, it.purchaseToken)
                     }
                     is PurchaseState.Canceled -> {
+                        subscriptionPurchaseWideEvent.onPurchaseCancelledByUser()
+                        subscriptionSwitchWideEvent.onUserCancelled()
                         _currentPurchaseState.emit(CurrentPurchase.Canceled)
                         if (removeExpiredSubscriptionOnCancelledPurchase) {
                             if (subscriptionStatus().isExpired()) {
@@ -389,6 +397,12 @@ class RealSubscriptionsManager @Inject constructor(
                             }
                             removeExpiredSubscriptionOnCancelledPurchase = false
                         }
+                    }
+
+                    is PurchaseState.Failure -> {
+                        subscriptionPurchaseWideEvent.onBillingFlowPurchaseFailure(it.errorType)
+                        subscriptionSwitchWideEvent.onSwitchFailed(it.errorType)
+                        _currentPurchaseState.emit(CurrentPurchase.Failure(it.errorType))
                     }
 
                     else -> {
@@ -532,20 +546,14 @@ class RealSubscriptionsManager @Inject constructor(
             val currentPurchaseToken = playBillingManager.getLatestPurchaseToken()
 
             if (currentPurchaseToken == null) {
-                val errorMessage = "No current purchase token found for switch"
-                logcat { "Subs: Cannot switch plan - $errorMessage" }
-                subscriptionSwitchWideEvent.onSwitchFailed(errorMessage)
-                _currentPurchaseState.emit(CurrentPurchase.Failure(errorMessage))
+                _currentPurchaseState.emit(CurrentPurchase.Failure("No current purchase token found for switch"))
                 return@withContext
             }
 
             // Get account details for external ID
             val account = authRepository.getAccount()
             if (account == null) {
-                val errorMessage = "No account found for switch"
-                logcat { "Subs: Cannot switch plan - $errorMessage" }
-                subscriptionSwitchWideEvent.onSwitchFailed(errorMessage)
-                _currentPurchaseState.emit(CurrentPurchase.Failure(errorMessage))
+                _currentPurchaseState.emit(CurrentPurchase.Failure("No account found for switch"))
                 return@withContext
             }
 
@@ -759,7 +767,7 @@ class RealSubscriptionsManager @Inject constructor(
         val subscription = authRepository.getSubscription()
 
         return if (subscription != null) {
-            getFeaturesInternal(subscription.productId)
+            getEntitlementsForPlan(subscription.productId).map { it.product }.toSet()
         } else {
             emptySet()
         }
@@ -1022,7 +1030,7 @@ class RealSubscriptionsManager @Inject constructor(
                     }
 
                     is StoreLoginResult.Failure -> {
-                        RecoverSubscriptionResult.Failure("")
+                        RecoverSubscriptionResult.Failure(message = "Store login error: ${storeLoginResult.javaClass.simpleName}")
                     }
                 }
             } else {
@@ -1062,6 +1070,18 @@ class RealSubscriptionsManager @Inject constructor(
         data class Failure(val message: String) : RecoverSubscriptionResult()
     }
 
+    private suspend fun recoverSubscriptionFromStoreOnPurchaseAttempt() {
+        subscriptionRestoreWideEvent.onGooglePlayRestoreFlowStartedOnPurchaseAttempt()
+        when (val result = recoverSubscriptionFromStore()) {
+            is RecoverSubscriptionResult.Success -> {
+                subscriptionRestoreWideEvent.onGooglePlayRestoreSuccess()
+            }
+            is RecoverSubscriptionResult.Failure -> {
+                subscriptionRestoreWideEvent.onGooglePlayRestoreFailure(error = result.message)
+            }
+        }
+    }
+
     private suspend fun activePlanIds(): List<String> =
         if (isLaunchedRow()) {
             listOf(YEARLY_PLAN_US, MONTHLY_PLAN_US, YEARLY_PLAN_ROW, MONTHLY_PLAN_ROW)
@@ -1086,20 +1106,39 @@ class RealSubscriptionsManager @Inject constructor(
                         )
                     }
 
-                    val features = getFeaturesInternal(offer.basePlanId)
+                    val entitlements = getEntitlementsForPlan(offer.basePlanId)
 
-                    if (features.isEmpty()) return@let emptyList()
+                    if (entitlements.isEmpty()) return@let emptyList()
 
                     SubscriptionOffer(
                         planId = offer.basePlanId,
+                        tier = "plus", // Temporary placeholder until we have support multiple tiers
                         pricingPhases = pricingPhases,
                         offerId = offer.offerId,
-                        features = features,
+                        entitlements = entitlements,
                     )
                 }
             }
 
-    private suspend fun getFeaturesInternal(planId: String): Set<String> {
+    /**
+     * Returns entitlements for a plan, working seamlessly regardless of flag state.
+     * When tierMessagingEnabled is ON: Uses actual entitlements from V2 API, with fallback to legacy.
+     * When tierMessagingEnabled is OFF: Converts legacy features to entitlements with default tier "plus".
+     */
+    private suspend fun getEntitlementsForPlan(planId: String): Set<Entitlement> {
+        if (privacyProFeature.get().tierMessagingEnabled().isEnabled()) {
+            val v2Entitlements = authRepository.getFeaturesV2(planId)
+            if (v2Entitlements.isNotEmpty()) {
+                return v2Entitlements
+            }
+            // Fallback to legacy features for smooth runtime flag transitions
+        }
+        return getLegacyFeatures(planId).map { feature ->
+            Entitlement(name = "plus", product = feature) // Temporary name placeholder until we have support multiple tiers
+        }.toSet()
+    }
+
+    private suspend fun getLegacyFeatures(planId: String): Set<String> {
         return if (privacyProFeature.get().featuresApi().isEnabled()) {
             authRepository.getFeatures(planId)
         } else {
@@ -1152,13 +1191,13 @@ class RealSubscriptionsManager @Inject constructor(
             subscriptionPurchaseWideEvent.onSubscriptionRefreshSuccess()
 
             if (!isSignedIn()) {
-                recoverSubscriptionFromStore()
+                recoverSubscriptionFromStoreOnPurchaseAttempt()
             } else {
                 authRepository.getSubscription()?.run {
                     if (status.isExpired() && platform == "google") {
                         // re-authenticate in case previous subscription was bought using different google account
                         val accountId = authRepository.getAccount()?.externalId
-                        recoverSubscriptionFromStore()
+                        recoverSubscriptionFromStoreOnPurchaseAttempt()
                         removeExpiredSubscriptionOnCancelledPurchase =
                             accountId != null && accountId != authRepository.getAccount()?.externalId
                     }
@@ -1426,9 +1465,16 @@ sealed class CurrentPurchase {
 data class SubscriptionOffer(
     val planId: String,
     val offerId: String?,
+    val tier: String,
     val pricingPhases: List<PricingPhase>,
-    val features: Set<String>,
-)
+    val entitlements: Set<Entitlement>,
+) {
+    /**
+     * Returns the set of feature/product names from entitlements.
+     * Provided for backward compatibility with code that used the legacy features set.
+     */
+    val features: Set<String> get() = entitlements.map { it.product }.toSet()
+}
 
 data class PricingPhase(
     val priceAmount: BigDecimal,

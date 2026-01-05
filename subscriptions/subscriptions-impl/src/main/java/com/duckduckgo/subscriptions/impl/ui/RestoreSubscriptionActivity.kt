@@ -88,10 +88,10 @@ class RestoreSubscriptionActivity : DuckDuckGoActivity() {
         binding.restoreSubscriptionGooglePlayTitle.setOnClickListener(null)
 
         binding.restoreSubscriptionEmailLayout.setOnClickListener {
-            viewModel.restoreFromEmail()
+            viewModel.restoreFromEmail(isOriginWeb)
         }
         binding.restoreSubscriptionGooglePlayLayout.setOnClickListener {
-            viewModel.restoreFromStore()
+            viewModel.restoreFromStore(isOriginWeb)
         }
     }
 

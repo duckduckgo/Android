@@ -89,7 +89,8 @@
     <string name="duckAiHideAiGeneratedImagesTitle">Slėpti DI generuotus vaizdus</string>
     <string name="duckAiHideAiGeneratedImagesDescription">Vaizdų paieškos rezultatuose nepalieka Di sukurtų vaizdų</string>
 
-    <!-- Duck AI Tabs Mode Toggle -->
-    <string name="duckAiFullScreenModeTitle">„Duck.ai“ skirtukų režimas</string>
-    <string name="duckAiFullScreenModeDescription">Rodyti naujus „Duck.ai“ pokalbius kaip skirtukus naršyklėje</string>
+    <!-- Duck AI Paid Settings -->
+    <string name="duck_ai_paid_settings_enable_in_settings">Įgalinti DI funkcijų nustatymuose</string>
+    <string name="duck_ai_paid_settings_manage_in_settings">Tvarkyti DI funkcijų nustatymuose</string>
+    <string name="duck_ai_paid_settings_manage_secondary">Konfigūruokite „Duck.ai“ DI funkcijų nustatymuose.</string>
 </resources>

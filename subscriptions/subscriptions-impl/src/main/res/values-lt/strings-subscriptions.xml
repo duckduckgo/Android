@@ -160,10 +160,6 @@
     <string name="feedbackSubmitVpnDisclaimer">"Be pirmiau įvestos informacijos, kartu su jūsų atsiliepimais siunčiame anoniminę informaciją:\n\n• Ar kai kurios naršyklės funkcijos yra aktyvios\n• Apibendrinta programėlės diagnostika (pvz., klaidų kodai)\n\nSpausdami „Pateikti“ sutinkate, kad „DuckDuckGo“ gali naudoti pateiktą informaciją programėlei tobulinti."</string>
     <string name="feedbackSubmitVpnSubmit">Pateikti</string>
     <string name="feedbackSubmitCompletedMessage">Dėkojame! Atsiliepimas pateiktas.</string>
-    <string name="feedbackSubmitFailedMessage">Įvyko klaida</string>
-
-    <string name="feedbackSubmitEmailByLine">Pateikite el. paštą, jei norėtumėte, kad susisiektume su jumis dėl šios problemos (galbūt negalėsime atsakyti į visas problemas):</string>
-    <string name="feedbackSubmitEmailHint">El. paštas (neprivaloma)</string>
 
     <string name="feedbackSubmitGeneralDescriptionHint">Pateikite mums savo atsiliepimą...</string>
     <string name="feedbackSubmitFeatureRequestDescriptionHint">Kokią funkciją norėtumėte pamatyti?</string>

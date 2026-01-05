@@ -73,7 +73,6 @@ import androidx.core.text.HtmlCompat
 import androidx.core.text.HtmlCompat.FROM_HTML_MODE_LEGACY
 import androidx.core.text.toSpannable
 import androidx.core.view.ViewCompat
-import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
 import androidx.fragment.app.DialogFragment
@@ -184,7 +183,6 @@ import com.duckduckgo.app.cta.ui.Cta
 import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.cta.ui.DaxBubbleCta
 import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxDialogIntroOption
-import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxIntroVisitSiteOptionsCta
 import com.duckduckgo.app.cta.ui.HomePanelCta
 import com.duckduckgo.app.cta.ui.HomePanelCta.AddWidgetAutoOnboardingExperiment
 import com.duckduckgo.app.cta.ui.OnboardingDaxDialogCta
@@ -196,7 +194,6 @@ import com.duckduckgo.app.global.model.orderedTrackerBlockedEntities
 import com.duckduckgo.app.global.view.NonDismissibleBehavior
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
 import com.duckduckgo.app.global.view.renderIfChanged
-import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentManager
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.db.SettingsDataStore
@@ -279,6 +276,7 @@ import com.duckduckgo.common.utils.extensions.hideKeyboard
 import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.common.utils.extensions.showKeyboard
 import com.duckduckgo.common.utils.extensions.websiteFromGeoLocationsApiOrigin
+import com.duckduckgo.common.utils.keyboardVisibilityFlow
 import com.duckduckgo.common.utils.playstore.PlayStoreUtils
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.FragmentScope
@@ -315,9 +313,6 @@ import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreenParam
 import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreenParams.PrivacyDashboardPrimaryScreen
 import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreenParams.PrivacyDashboardToggleReportScreen
 import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreenResult
-import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopup
-import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupFactory
-import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupViewState
 import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
@@ -361,8 +356,6 @@ import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Provider
 import kotlin.coroutines.CoroutineContext
-import kotlin.time.Duration.Companion.seconds
-import com.duckduckgo.mobile.android.R as CommonR
 
 @InjectWith(FragmentScope::class)
 class BrowserTabFragment :
@@ -535,9 +528,6 @@ class BrowserTabFragment :
     lateinit var downloadConfirmation: DownloadConfirmation
 
     @Inject
-    lateinit var privacyProtectionsPopupFactory: PrivacyProtectionsPopupFactory
-
-    @Inject
     lateinit var appLinksSnackBarConfigurator: AppLinksSnackBarConfigurator
 
     @Inject
@@ -575,9 +565,6 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var swipingTabsFeature: SwipingTabsFeatureProvider
-
-    @Inject
-    lateinit var onboardingDesignExperimentManager: OnboardingDesignExperimentManager
 
     @Inject
     lateinit var browserAndInputScreenTransitionProvider: BrowserAndInputScreenTransitionProvider
@@ -671,20 +658,8 @@ class BrowserTabFragment :
     private val daxDialogIntroBubble
         get() = binding.includeNewBrowserTab.includeOnboardingDaxDialogBubble
 
-    private val buckDialogIntroBubble
-        get() = binding.includeNewBrowserTab.includeOnboardingBuckDialogBubble
-
-    private val bbDialogIntroBubble
-        get() = binding.includeNewBrowserTab.includeOnboardingBBDialogBubble
-
     private val daxDialogInContext
         get() = binding.includeOnboardingInContextDaxDialog
-
-    private val buckDialogInContext
-        get() = binding.includeOnboardingInContextBuckDialog
-
-    private val bbDialogInContext
-        get() = binding.includeOnboardingInContextBBDialog
 
     // Optimization to prevent against excessive work generating WebView previews; an existing job will be cancelled if a new one is launched
     private var bitmapGeneratorJob: Job? = null
@@ -908,8 +883,6 @@ class BrowserTabFragment :
     // see discussion in https://github.com/duckduckgo/Android/pull/4027#discussion_r1433373625
     private val jsOrientationHandler = JsOrientationHandler()
 
-    private lateinit var privacyProtectionsPopup: PrivacyProtectionsPopup
-
     private val inputScreenLauncher =
         registerForActivityResult(StartActivityForResult()) { result ->
             val data = result.data
@@ -964,6 +937,7 @@ class BrowserTabFragment :
                             omnibar.setText(result.query)
                             userEnteredQuery(result.query)
                         }
+
                         is VoiceSearchLauncher.VoiceRecognitionResult.DuckAiResult -> {
                             duckChat.openDuckChatWithAutoPrompt(result.query)
                         }
@@ -1061,11 +1035,11 @@ class BrowserTabFragment :
         configureSwipeRefresh()
         configureAutoComplete()
         configureNewTab()
-        initPrivacyProtectionsPopup()
         createPopupMenu()
 
         configureNavigationBar()
         configureOmnibar()
+        configureBrowserTabKeyboardListener()
 
         if (savedInstanceState == null) {
             viewModel.setIsCustomTab(tabDisplayedInCustomTabScreen)
@@ -1482,10 +1456,18 @@ class BrowserTabFragment :
             Intent(Intent.ACTION_VIEW).apply {
                 data = Uri.parse(url)
             }
-        startActivity(intent)
+
+        if (requireActivity().packageManager.resolveActivity(intent, 0) != null) {
+            startActivity(intent)
+        } else {
+            showToast(R.string.unableToOpenLink)
+        }
     }
 
-    private fun launchPopupMenu(anchorToNavigationBar: Boolean, addExtraDelay: Boolean = false) {
+    private fun launchPopupMenu(
+        anchorToNavigationBar: Boolean,
+        addExtraDelay: Boolean = false,
+    ) {
         val isFocusedNtp = omnibar.viewMode == ViewMode.NewTab && omnibar.getText().isEmpty() && omnibar.omnibarTextInput.hasFocus()
         val delay = if (addExtraDelay) POPUP_MENU_DELAY * 2 else POPUP_MENU_DELAY
         // small delay added to let keyboard disappear and avoid jarring transition
@@ -1513,19 +1495,11 @@ class BrowserTabFragment :
                 } else {
                     val params = mapOf(PixelParameter.FROM_FOCUSED_NTP to isFocusedNtp.toString())
                     pixel.fire(AppPixelName.MENU_ACTION_POPUP_OPENED.pixelName, params)
+                    pixel.fire(AppPixelName.PRODUCT_TELEMETRY_SURFACE_MENU_OPENED.pixelName)
+                    pixel.fire(AppPixelName.PRODUCT_TELEMETRY_SURFACE_MENU_OPENED_DAILY.pixelName, type = Daily())
                 }
             }
         }
-    }
-
-    private fun initPrivacyProtectionsPopup() {
-        privacyProtectionsPopup =
-            privacyProtectionsPopupFactory.createPopup(
-                anchor = omnibar.shieldIcon,
-            )
-        privacyProtectionsPopup.events
-            .onEach(viewModel::onPrivacyProtectionsPopupUiEvent)
-            .launchIn(lifecycleScope)
     }
 
     private fun getDaxDialogFromActivity(): Fragment? = activity?.supportFragmentManager?.findFragmentByTag(DAX_DIALOG_DIALOG_TAG)
@@ -1672,13 +1646,6 @@ class BrowserTabFragment :
         )
 
         viewModel.ctaViewState.observe(viewLifecycleOwner, ctaViewStateObserver)
-
-        viewModel.buckTryASearchAnimationEnabled
-            .onEach {
-                if (it) {
-                    renderer.renderBuckOnboardingTryASearchAnimation()
-                }
-            }.launchIn(lifecycleScope)
 
         viewModel.command.observe(
             viewLifecycleOwner,
@@ -2376,7 +2343,6 @@ class BrowserTabFragment :
 
             is Command.SetBrowserBackground -> setBrowserBackgroundRes(it.backgroundRes)
             is Command.SetBrowserBackgroundColor -> setNewTabBackgroundColor(it.colorRes)
-            is Command.SetBubbleDialogBackground -> setBubbleDialogBackground(it.backgroundRes)
             is Command.SetOnboardingDialogBackground -> setOnboardingDialogBackgroundRes(it.backgroundRes)
             is Command.SetOnboardingDialogBackgroundColor -> setOnboardingDialogBackgroundColor(it.colorRes)
             is Command.LaunchFireDialogFromOnboardingDialog -> {
@@ -2472,26 +2438,14 @@ class BrowserTabFragment :
         newBrowserTab.newTabLayout.setBackgroundColor(getColor(requireContext(), colorRes))
     }
 
-    private fun setBubbleDialogBackground(backgroundRes: Int) {
-        newBrowserTab.includeOnboardingBBDialogBubble.root.setBackgroundResource(backgroundRes)
-    }
-
     private fun setOnboardingDialogBackgroundRes(backgroundRes: Int) {
-        if (onboardingDesignExperimentManager.isBbEnrolledAndEnabled()) {
-            bbDialogInContext.onboardingDaxDialogBackground.setImageResource(backgroundRes)
-        } else {
-            daxDialogInContext.onboardingDaxDialogBackground.setImageResource(backgroundRes)
-        }
+        daxDialogInContext.onboardingDaxDialogBackground.setImageResource(backgroundRes)
     }
 
     private fun setOnboardingDialogBackgroundColor(
         @ColorRes colorRes: Int,
     ) {
-        if (onboardingDesignExperimentManager.isBuckEnrolledAndEnabled()) {
-            buckDialogInContext.root.setBackgroundColor(getColor(requireContext(), colorRes))
-        } else {
-            daxDialogInContext.onboardingDaxDialogContainer.setBackgroundColor(getColor(requireContext(), colorRes))
-        }
+        daxDialogInContext.onboardingDaxDialogContainer.setBackgroundColor(getColor(requireContext(), colorRes))
     }
 
     private fun showRemoveSearchSuggestionDialog(suggestion: AutoCompleteSuggestion) {
@@ -3239,13 +3193,11 @@ class BrowserTabFragment :
 
     @SuppressLint("SetJavaScriptEnabled")
     private fun configureWebView() {
-        if (!onboardingDesignExperimentManager.isBuckEnrolledAndEnabled()) {
-            binding.daxDialogOnboardingCtaContent.layoutTransition = LayoutTransition()
-            binding.daxDialogOnboardingCtaContent.layoutTransition.enableTransitionType(LayoutTransition.CHANGING)
+        binding.daxDialogOnboardingCtaContent.layoutTransition = LayoutTransition()
+        binding.daxDialogOnboardingCtaContent.layoutTransition.enableTransitionType(LayoutTransition.CHANGING)
 
-            if (swipingTabsFeature.isEnabled) {
-                binding.daxDialogOnboardingCtaContent.layoutTransition.setAnimateParentHierarchy(false)
-            }
+        if (swipingTabsFeature.isEnabled) {
+            binding.daxDialogOnboardingCtaContent.layoutTransition.setAnimateParentHierarchy(false)
         }
 
         val webViewLayout = R.layout.include_duckduckgo_browser_webview
@@ -3410,19 +3362,7 @@ class BrowserTabFragment :
     }
 
     private fun hideOnboardingDaxDialog(onboardingCta: OnboardingDaxDialogCta) {
-        when {
-            onboardingDesignExperimentManager.isBuckEnrolledAndEnabled() -> {
-                onboardingCta.hideBuckOnboardingCta(binding)
-            }
-
-            onboardingDesignExperimentManager.isBbEnrolledAndEnabled() -> {
-                onboardingCta.hideBBOnboardingCta(binding)
-            }
-
-            else -> {
-                onboardingCta.hideOnboardingCta(binding)
-            }
-        }
+        onboardingCta.hideOnboardingCta(binding)
     }
 
     private fun hideBrokenSitePromptCta(brokenSitePromptDialogCta: BrokenSitePromptDialogCta) {
@@ -3432,27 +3372,12 @@ class BrowserTabFragment :
     private fun hideOnboardingDaxBubbleCta(daxBubbleCta: DaxBubbleCta) {
         daxBubbleCta.hideDaxBubbleCta(binding)
         hideDaxBubbleCta()
-        if (onboardingDesignExperimentManager.isBuckEnrolledAndEnabled()) {
-            when (daxBubbleCta) {
-                is DaxBubbleCta.DaxIntroSearchOptionsCta -> hideBuckMagnifyingGlassAnimation()
-                is DaxBubbleCta.DaxEndCta -> hideBuckEndAnimation()
-                else -> Unit
-            }
-        }
         renderer.showNewTab()
         showKeyboard()
     }
 
     private fun hideDaxBubbleCta() {
-        if (onboardingDesignExperimentManager.isBuckEnrolledAndEnabled()) {
-            newBrowserTab.newTabLayout.setBackgroundColor(
-                requireContext().getColorFromAttr(CommonR.attr.daxColorSurface),
-            )
-        } else {
-            newBrowserTab.browserBackground.setImageResource(0)
-        }
-        buckDialogIntroBubble.root.gone()
-        bbDialogIntroBubble.root.gone()
+        newBrowserTab.browserBackground.setImageResource(0)
         daxDialogIntroBubble.root.gone()
     }
 
@@ -4079,7 +4004,6 @@ class BrowserTabFragment :
 
         renderer.renderHomeCta()
         recreatePopupMenu()
-        privacyProtectionsPopup.onConfigurationChanged()
         viewModel.onConfigurationChanged()
     }
 
@@ -4547,12 +4471,8 @@ class BrowserTabFragment :
                  * haven't changed between the time trackers animation was emitted, and the time it'll
                  * be started
                  */
-                val privacyProtectionsPopupVisible =
-                    lastSeenBrowserViewState
-                        ?.privacyProtectionsPopupViewState is PrivacyProtectionsPopupViewState.Visible
                 if (
                     lastSeenOmnibarViewState?.isEditing != true &&
-                    !privacyProtectionsPopupVisible &&
                     lastSeenBrowserViewState?.browserShowing == true &&
                     lastSeenBrowserViewState?.maliciousSiteBlocked == false
                 ) {
@@ -4639,7 +4559,6 @@ class BrowserTabFragment :
                 popupMenu.render(browseMenuState)
 
                 renderFullscreenMode(viewState)
-                privacyProtectionsPopup.setViewState(viewState.privacyProtectionsPopupViewState)
 
                 val bookmark =
                     viewModel.browserViewState.value
@@ -4712,9 +4631,6 @@ class BrowserTabFragment :
 
                     viewState.isOnboardingCompleteInNewTabPage && !viewState.isErrorShowing -> {
                         hideDaxBubbleCta()
-                        if (onboardingDesignExperimentManager.isBuckEnrolledAndEnabled()) {
-                            hideBuckEndAnimation()
-                        }
                         showNewTab()
                     }
                 }
@@ -4733,57 +4649,18 @@ class BrowserTabFragment :
         private fun showDaxOnboardingBubbleCta(configuration: DaxBubbleCta) {
             hideNewTab()
             configuration.apply {
-                when {
-                    onboardingDesignExperimentManager.isBuckEnrolledAndEnabled() -> {
-                        showBuckCta(binding = buckDialogIntroBubble, configuration = configuration) {
-                            setOnOptionClicked(
-                                onboardingExperimentEnabled = true,
-                                configuration = configuration,
-                            ) { option, index ->
-                                userEnteredQuery(option.link)
-                                viewModel.onUserSelectedOnboardingDialogOption(configuration, index)
-                            }
-                        }
-                    }
-
-                    onboardingDesignExperimentManager.isBbEnrolledAndEnabled() -> {
-                        showBBCta(binding = bbDialogIntroBubble, configuration = configuration) {
-                            setOnOptionClicked(
-                                onboardingExperimentEnabled = true,
-                                configuration = configuration,
-                            ) { option, index ->
-                                userEnteredQuery(option.link)
-                                viewModel.onUserSelectedOnboardingDialogOption(configuration, index)
-                            }
-                        }
-                    }
-
-                    else -> {
-                        showCta(daxDialogIntroBubble.daxCtaContainer) {
-                            setOnOptionClicked(
-                                onboardingExperimentEnabled = onboardingDesignExperimentManager.isModifiedControlEnrolledAndEnabled(),
-                                configuration = configuration,
-                            ) { option, index ->
-                                userEnteredQuery(option.link)
-                                viewModel.onUserSelectedOnboardingDialogOption(configuration, index)
-                            }
-                        }
+                showCta(daxDialogIntroBubble.daxCtaContainer) {
+                    setOnOptionClicked(
+                        onboardingExperimentEnabled = false,
+                        configuration = configuration,
+                    ) { option, index ->
+                        userEnteredQuery(option.link)
+                        viewModel.onUserSelectedOnboardingDialogOption(configuration, index)
                     }
                 }
 
                 setOnPrimaryCtaClicked {
-                    if (onboardingDesignExperimentManager.isBuckEnrolledAndEnabled() && configuration is DaxBubbleCta.DaxEndCta) {
-                        newBrowserTab.buckEndAnimation.isGone = true
-                        viewModel.onUserClickCtaOkButton(configuration)
-                    } else if (onboardingDesignExperimentManager.isBbEnrolledAndEnabled() && configuration is DaxBubbleCta.DaxEndCta) {
-                        configuration.hideBBEndCta(
-                            onAnimationEnd = {
-                                viewModel.onUserClickCtaOkButton(configuration)
-                            },
-                        )
-                    } else {
-                        viewModel.onUserClickCtaOkButton(configuration)
-                    }
+                    viewModel.onUserClickCtaOkButton(configuration)
                 }
                 setOnSecondaryCtaClicked {
                     viewModel.onUserClickCtaSecondaryButton(configuration)
@@ -4791,31 +4668,6 @@ class BrowserTabFragment :
 
                 setOnDismissCtaClicked {
                     viewModel.onUserClickCtaDismissButton(configuration)
-                }
-            }
-
-            if (onboardingDesignExperimentManager.isBuckEnrolledAndEnabled()) {
-                if (configuration is DaxIntroVisitSiteOptionsCta) {
-                    hideBuckMagnifyingGlassAnimation()
-                    if (context?.resources?.getBoolean(R.bool.show_wing_animation) == true) {
-                        lifecycleScope.launch {
-                            with(newBrowserTab.wingAnimation) {
-                                delay(2.5.seconds)
-                                show()
-                                playAnimation()
-                            }
-                        }
-                    }
-                }
-
-                if (configuration is DaxBubbleCta.DaxEndCta) {
-                    lifecycleScope.launch {
-                        with(newBrowserTab.buckEndAnimation) {
-                            delay(500)
-                            isVisible = true
-                            playAnimation()
-                        }
-                    }
                 }
             }
 
@@ -4978,12 +4830,8 @@ class BrowserTabFragment :
         }
 
         private fun hideDaxCta() {
-            if (onboardingDesignExperimentManager.isBuckEnrolledAndEnabled()) {
-                buckDialogInContext.root.gone()
-            } else {
-                daxDialogInContext.dialogTextCta.cancelAnimation()
-                daxDialogInContext.daxCtaContainer.gone()
-            }
+            daxDialogInContext.dialogTextCta.cancelAnimation()
+            daxDialogInContext.daxCtaContainer.gone()
         }
 
         fun renderHomeCta() {
@@ -5013,21 +4861,6 @@ class BrowserTabFragment :
             (activity as? DuckDuckGoActivity)?.toggleFullScreen()
             binding.focusDummy.requestFocus()
         }
-
-        fun renderBuckOnboardingTryASearchAnimation() {
-            newBrowserTab.buckMagnifyingGlassAnimation.isVisible = true
-            newBrowserTab.buckMagnifyingGlassAnimation.playAnimation()
-        }
-    }
-
-    private fun hideBuckMagnifyingGlassAnimation() {
-        newBrowserTab.buckMagnifyingGlassAnimation.isGone = true
-    }
-
-    private fun hideBuckEndAnimation() {
-        newBrowserTab.buckEndAnimation.isGone = true
-        val backgroundColor = requireActivity().getColorFromAttr(attrColor = CommonR.attr.daxColorBackground)
-        newBrowserTab.newTabLayout.setBackgroundColor(backgroundColor)
     }
 
     private fun launchPrint(
@@ -5121,6 +4954,18 @@ class BrowserTabFragment :
             params = EasterEggLogoScreen(logoUrl = logoUrl, transitionName = logoUrl),
             options = activityOptions,
         )
+    }
+
+    private fun configureBrowserTabKeyboardListener() {
+        binding.root.rootView.keyboardVisibilityFlow()
+            .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
+            .distinctUntilChanged()
+            .onEach { isVisible ->
+                if (isVisible) {
+                    viewModel.sendKeyboardFocusedPixel()
+                }
+            }
+            .launchIn(lifecycleScope)
     }
 }
 

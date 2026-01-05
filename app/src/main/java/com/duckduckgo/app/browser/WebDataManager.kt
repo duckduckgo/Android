@@ -22,11 +22,11 @@ import android.webkit.WebView
 import com.duckduckgo.anrs.api.CrashLogger
 import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
 import com.duckduckgo.app.browser.indexeddb.IndexedDBManager
-import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.weblocalstorage.WebLocalStorageManager
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.file.FileDeleter
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
+import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -45,19 +45,31 @@ import java.io.File
 import javax.inject.Inject
 
 interface WebDataManager {
+    /**
+     * Clears all web data from the provided WebView and WebStorage (legacy full clear).
+     */
     suspend fun clearData(
         webView: WebView,
         webStorage: WebStorage,
     )
 
-    fun clearWebViewSessions()
+    /**
+     * Clears web data from the provided WebView and WebStorage based on the specified options.
+     * @param shouldClearBrowserData If true, clears browser web data (cache, history, form data, authentication, cookies, directories).
+     * @param shouldClearDuckAiData If true, clears chat-related data from WebStorage.
+     */
+    suspend fun clearData(
+        webView: WebView,
+        webStorage: WebStorage,
+        shouldClearBrowserData: Boolean,
+        shouldClearDuckAiData: Boolean,
+    )
 }
 
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
 class WebViewDataManager @Inject constructor(
     private val context: Context,
-    private val webViewSessionStorage: WebViewSessionStorage,
     private val cookieManager: DuckDuckGoCookieManager,
     private val fileDeleter: FileDeleter,
     private val webViewHttpAuthStore: WebViewHttpAuthStore,
@@ -68,6 +80,7 @@ class WebViewDataManager @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
     private val appBuildConfig: AppBuildConfig,
+    private val settingsDataStore: SettingsDataStore,
 ) : WebDataManager {
 
     override suspend fun clearData(
@@ -76,11 +89,36 @@ class WebViewDataManager @Inject constructor(
     ) {
         clearWebViewCache(webView)
         clearHistory(webView)
-        clearWebStorage(webStorage)
+        clearEntireWebStorage(webStorage)
         clearFormData(webView)
         clearAuthentication(webView)
         clearExternalCookies()
-        clearWebViewDirectories()
+        val shouldClearDuckAiData = withContext(dispatcherProvider.io()) {
+            settingsDataStore.clearDuckAiData
+        }
+        clearWebViewDirectories(shouldClearDuckAiData)
+    }
+
+    override suspend fun clearData(
+        webView: WebView,
+        webStorage: WebStorage,
+        shouldClearBrowserData: Boolean,
+        shouldClearDuckAiData: Boolean,
+    ) {
+        clearWebStorageGranularly(webStorage, shouldClearBrowserData, shouldClearDuckAiData)
+
+        if (shouldClearBrowserData) {
+            clearWebViewCache(webView)
+            clearHistory(webView)
+            clearFormData(webView)
+            clearAuthentication(webView)
+            clearExternalCookies()
+            clearWebViewDirectories(false)
+        }
+
+        if (shouldClearDuckAiData) {
+            clearOnlyDuckAiWebViewDirectories()
+        }
     }
 
     private fun clearWebViewCache(webView: WebView) {
@@ -91,20 +129,51 @@ class WebViewDataManager @Inject constructor(
         webView.clearHistory()
     }
 
-    private suspend fun clearWebStorage(webStorage: WebStorage) = withContext(dispatcherProvider.io()) {
-        if (androidBrowserConfigFeature.webLocalStorage().isEnabled()) {
-            kotlin.runCatching {
-                webLocalStorageManager.clearWebLocalStorage()
-            }.onFailure { e ->
-                logcat(ERROR) { "WebDataManager: Could not selectively clear web storage: ${e.asLog()}" }
-                if (appBuildConfig.isInternalBuild()) {
-                    sendCrashPixel(e)
+    private suspend fun clearEntireWebStorage(webStorage: WebStorage) {
+        withContext(dispatcherProvider.io()) {
+            if (androidBrowserConfigFeature.webLocalStorage().isEnabled()) {
+                kotlin.runCatching {
+                    webLocalStorageManager.clearWebLocalStorage()
+                }.onFailure { e ->
+                    logcat(ERROR) { "WebDataManager: Could not selectively clear web storage: ${e.asLog()}" }
+                    if (appBuildConfig.isInternalBuild()) {
+                        sendCrashPixel(e)
+                    }
+                    // fallback, if we crash we delete everything
+                    deleteAllData(webStorage)
                 }
-                // fallback, if we crash we delete everything
+            } else {
                 deleteAllData(webStorage)
             }
-        } else {
-            deleteAllData(webStorage)
+        }
+    }
+
+    private suspend fun clearWebStorageGranularly(
+        webStorage: WebStorage,
+        shouldClearBrowserData: Boolean,
+        shouldClearDuckAiData: Boolean,
+    ) {
+        withContext(dispatcherProvider.io()) {
+            if (androidBrowserConfigFeature.webLocalStorage().isEnabled()) {
+                kotlin.runCatching {
+                    webLocalStorageManager.clearWebLocalStorage(shouldClearBrowserData, shouldClearDuckAiData)
+                }.onFailure { e ->
+                    logcat(ERROR) { "WebDataManager: Could not selectively clear web storage: ${e.asLog()}" }
+                    if (appBuildConfig.isInternalBuild()) {
+                        sendCrashPixel(e)
+                    }
+                    if (shouldClearBrowserData) {
+                        // fallback, if we crash we delete everything
+                        deleteAllData(webStorage)
+                    }
+                }
+            } else {
+                if (shouldClearBrowserData) {
+                    deleteAllData(webStorage)
+                } else {
+                    // No-op when shouldClearData is false
+                }
+            }
         }
     }
 
@@ -134,7 +203,7 @@ class WebViewDataManager @Inject constructor(
      *
      *  the excluded directories above are to avoid clearing unnecessary cookies and because localStorage is cleared using clearWebStorage
      */
-    private suspend fun clearWebViewDirectories() {
+    private suspend fun clearWebViewDirectories(shouldClearDuckAiData: Boolean) = withContext(dispatcherProvider.io()) {
         val dataDir = context.applicationInfo.dataDir
         fileDeleter.deleteContents(File(dataDir, "app_webview"), listOf("Default", "Cookies"))
 
@@ -146,7 +215,7 @@ class WebViewDataManager @Inject constructor(
         }
         if (androidBrowserConfigFeature.indexedDB().isEnabled()) {
             runCatching {
-                indexedDBManager.clearIndexedDB()
+                indexedDBManager.clearIndexedDB(shouldClearDuckAiData)
             }.onSuccess {
                 excludedDirectories.add("IndexedDB")
             }.onFailure { t ->
@@ -156,6 +225,23 @@ class WebViewDataManager @Inject constructor(
         fileDeleter.deleteContents(File(dataDir, "app_webview/Default"), excludedDirectories)
     }
 
+    /**
+     * Clears only DuckAI-related WebView directories.
+     * All other website data is preserved.
+     */
+    private suspend fun clearOnlyDuckAiWebViewDirectories() {
+        withContext(dispatcherProvider.io()) {
+            // Clear DuckAI data from IndexedDB
+            if (androidBrowserConfigFeature.indexedDB().isEnabled()) {
+                runCatching {
+                    indexedDBManager.clearOnlyDuckAiData()
+                }.onFailure { t ->
+                    logcat(WARN) { "Failed to clear DuckAI data from IndexedDB: ${t.asLog()}" }
+                }
+            }
+        }
+    }
+
     private suspend fun clearAuthentication(webView: WebView) {
         webViewHttpAuthStore.clearHttpAuthUsernamePassword(webView)
         webViewHttpAuthStore.cleanHttpAuthDatabase()
@@ -163,9 +249,5 @@ class WebViewDataManager @Inject constructor(
 
     private suspend fun clearExternalCookies() {
         cookieManager.removeExternalCookies()
-    }
-
-    override fun clearWebViewSessions() {
-        webViewSessionStorage.deleteAllSessions()
     }
 }

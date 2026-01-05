@@ -37,8 +37,6 @@ interface DuckChatFeatureRepository {
 
     suspend fun setShowInAddressBar(showDuckChat: Boolean)
 
-    suspend fun setFullScreenModeUserSetting(enabled: Boolean)
-
     suspend fun setShowInVoiceSearch(showToggle: Boolean)
 
     fun observeDuckChatUserEnabled(): Flow<Boolean>
@@ -51,19 +49,17 @@ interface DuckChatFeatureRepository {
 
     fun observeShowInAddressBar(): Flow<Boolean>
 
-    fun observeFullscreenModeEnabled(): Flow<Boolean>
-
     fun observeShowInVoiceSearch(): Flow<Boolean>
 
     suspend fun isDuckChatUserEnabled(): Boolean
 
     suspend fun isInputScreenUserSettingEnabled(): Boolean
 
+    suspend fun isFullScreenModeUserSettingEnabled(): Boolean
+
     suspend fun shouldShowInBrowserMenu(): Boolean
 
     suspend fun shouldShowInAddressBar(): Boolean
-
-    suspend fun isFullScreenModeUserSettingEnabled(): Boolean
 
     suspend fun shouldShowInVoiceSearch(): Boolean
 
@@ -102,10 +98,6 @@ class RealDuckChatFeatureRepository @Inject constructor(
         duckChatDataStore.setShowInAddressBar(showDuckChat)
     }
 
-    override suspend fun setFullScreenModeUserSetting(enabled: Boolean) {
-        duckChatDataStore.setFullScreenModeUserSetting(enabled)
-    }
-
     override suspend fun setShowInVoiceSearch(showToggle: Boolean) {
         duckChatDataStore.setShowInVoiceSearch(showToggle)
     }
@@ -120,19 +112,17 @@ class RealDuckChatFeatureRepository @Inject constructor(
 
     override fun observeShowInAddressBar(): Flow<Boolean> = duckChatDataStore.observeShowInAddressBar()
 
-    override fun observeFullscreenModeEnabled(): Flow<Boolean> = duckChatDataStore.observeFullscreenMode()
-
     override fun observeShowInVoiceSearch(): Flow<Boolean> = duckChatDataStore.observeShowInVoiceSearch()
 
     override suspend fun isDuckChatUserEnabled(): Boolean = duckChatDataStore.isDuckChatUserEnabled()
 
     override suspend fun isInputScreenUserSettingEnabled(): Boolean = duckChatDataStore.isInputScreenUserSettingEnabled()
 
+    override suspend fun isFullScreenModeUserSettingEnabled(): Boolean = duckChatDataStore.isFullScreenUserSettingEnabled()
+
     override suspend fun shouldShowInBrowserMenu(): Boolean = duckChatDataStore.getShowInBrowserMenu()
 
     override suspend fun shouldShowInAddressBar(): Boolean = duckChatDataStore.getShowInAddressBar()
-
-    override suspend fun isFullScreenModeUserSettingEnabled(): Boolean = duckChatDataStore.isFullScreenUserSettingEnabled()
 
     override suspend fun shouldShowInVoiceSearch(): Boolean = duckChatDataStore.getShowInVoiceSearch()
 

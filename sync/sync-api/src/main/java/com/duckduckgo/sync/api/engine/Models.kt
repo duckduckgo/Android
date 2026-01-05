@@ -60,6 +60,26 @@ data class SyncChangesResponse(
     }
 }
 
+/**
+ * Represents a request to delete a syncable type
+ * @param type The type of syncable data to delete.
+ * @param untilTimestamp An optional timestamp to indicate that only items modified before this timestamp should be deleted.
+ */
+data class SyncDeletionRequest(
+    val type: SyncableType,
+    val untilTimestamp: String? = null,
+)
+
+/**
+ * Represents a response to a sync deletion request.
+ * @param type The type of syncable data that was deleted.
+ * @param untilTimestamp The timestamp provided in @[SyncDeletionRequest] indicating the last modified timestamp up until which deletions should be performed.
+ */
+data class SyncDeletionResponse(
+    val type: SyncableType,
+    val untilTimestamp: String? = null,
+)
+
 data class SyncErrorResponse(
     val type: SyncableType,
     val featureSyncError: FeatureSyncError,

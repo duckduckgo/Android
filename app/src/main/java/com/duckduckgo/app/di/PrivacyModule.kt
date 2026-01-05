@@ -17,7 +17,6 @@
 package com.duckduckgo.app.di
 
 import android.content.Context
-import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.app.browser.WebDataManager
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
 import com.duckduckgo.app.browser.favicon.FaviconManager
@@ -48,7 +47,6 @@ import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.cookies.api.DuckDuckGoCookieManager
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.history.api.NavigationHistory
-import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupDataClearer
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
 import com.duckduckgo.sync.api.DeviceSyncState
@@ -79,12 +77,10 @@ object PrivacyModule {
         cookieManager: DuckDuckGoCookieManager,
         appCacheClearer: AppCacheClearer,
         thirdPartyCookieManager: ThirdPartyCookieManager,
-        adClickManager: AdClickManager,
         fireproofWebsiteRepository: FireproofWebsiteRepository,
         sitePermissionsManager: SitePermissionsManager,
         deviceSyncState: DeviceSyncState,
         savedSitesRepository: SavedSitesRepository,
-        privacyProtectionsPopupDataClearer: PrivacyProtectionsPopupDataClearer,
         navigationHistory: NavigationHistory,
         dispatcherProvider: DispatcherProvider,
         webTrackingRepository: WebTrackersBlockedRepository,
@@ -98,12 +94,10 @@ object PrivacyModule {
             cookieManager,
             appCacheClearer,
             thirdPartyCookieManager,
-            adClickManager,
             fireproofWebsiteRepository,
             sitePermissionsManager,
             deviceSyncState,
             savedSitesRepository,
-            privacyProtectionsPopupDataClearer,
             navigationHistory,
             dispatcherProvider,
             webTrackingRepository,
