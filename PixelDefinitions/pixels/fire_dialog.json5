@@ -1,0 +1,9 @@
+{
+    "m_fire_dialog_shown": {
+        "description": "The fire dialog is shown",
+        "owners": ["0nko"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "atb"]
+    }
+}
