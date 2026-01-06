@@ -26,6 +26,7 @@ import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.view.GranularFireDialogViewModel.Command
 import com.duckduckgo.app.pixels.AppPixelName.FIRE_DIALOG_ANIMATION
 import com.duckduckgo.app.pixels.AppPixelName.FIRE_DIALOG_CLEAR_PRESSED
+import com.duckduckgo.app.pixels.AppPixelName.FIRE_DIALOG_SHOWN
 import com.duckduckgo.app.pixels.AppPixelName.PRODUCT_TELEMETRY_SURFACE_DATA_CLEARING
 import com.duckduckgo.app.pixels.AppPixelName.PRODUCT_TELEMETRY_SURFACE_DATA_CLEARING_DAILY
 import com.duckduckgo.app.settings.clear.FireAnimation
@@ -532,6 +533,17 @@ class GranularFireDialogViewModelTest {
 
             cancelAndConsumeRemainingEvents()
         }
+    }
+
+    @Test
+    fun `when onShow called then FIRE_DIALOG_SHOWN pixel is fired`() = runTest {
+        testee = createViewModel()
+
+        testee.onShow()
+
+        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        verify(mockPixel).fire(FIRE_DIALOG_SHOWN)
     }
 
     @Test
