@@ -151,6 +151,8 @@ class GranularFireDialogViewModel @Inject constructor(
     fun onShow() {
         viewModelScope.launch {
             command.send(Command.OnShow)
+
+            pixel.fire(AppPixelName.FIRE_DIALOG_SHOWN)
         }
     }
 
