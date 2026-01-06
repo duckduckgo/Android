@@ -6,6 +6,14 @@
         "triggers": ["other"],
         "suffixes": ["daily_count_short", "form_factor"],
         "parameters": ["appVersion", "atb"],
-        "expires": "2026-01-05"
+        "expires": "2026-02-27"
+    },
+    "m_custom_tabs_dax_clicked": {
+      "description": "When a user clicks the 'Dax logo' on the custom tab, the pixel is fired.",
+      "owners": ["0nko"],
+      "triggers": ["other"],
+      "suffixes": ["daily_count_short", "form_factor"],
+      "parameters": ["appVersion", "atb"],
+      "expires": "2026-02-27"
     }
 }
