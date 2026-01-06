@@ -182,6 +182,8 @@ class LegacyFireDialog : BottomSheetDialogFragment(), FireDialog {
 
     override fun show(fragmentManager: FragmentManager, tag: String?) {
         super.show(fragmentManager, tag)
+
+        pixel.enqueueFire(AppPixelName.FIRE_DIALOG_SHOWN)
     }
 
     private fun setupLayout() {

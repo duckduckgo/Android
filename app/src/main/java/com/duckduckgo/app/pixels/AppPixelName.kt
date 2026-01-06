@@ -293,6 +293,7 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     FIRE_DIALOG_CLEAR_PRESSED("m_fd_p"),
     FIRE_DIALOG_CANCEL("m_fd_c"),
     FIRE_DIALOG_ANIMATION("m_fd_a"),
+    FIRE_DIALOG_SHOWN("m_fire_dialog_shown"),
 
     FIRE_ANIMATION_SETTINGS_OPENED("m_fas_o"),
     FIRE_ANIMATION_NEW_SELECTED("m_fas_s"),
