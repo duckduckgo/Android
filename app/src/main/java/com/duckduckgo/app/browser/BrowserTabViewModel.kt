@@ -184,6 +184,8 @@ import com.duckduckgo.app.browser.logindetection.FireproofDialogsEventHandler.Ev
 import com.duckduckgo.app.browser.logindetection.LoginDetected
 import com.duckduckgo.app.browser.logindetection.NavigationAwareLoginDetector
 import com.duckduckgo.app.browser.logindetection.NavigationEvent
+import com.duckduckgo.app.browser.menu.BrowserMenuDisplayRepository
+import com.duckduckgo.app.browser.menu.BrowserMenuDisplayState
 import com.duckduckgo.app.browser.menu.VpnMenuStateProvider
 import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
@@ -440,6 +442,7 @@ class BrowserTabViewModel @Inject constructor(
     private val downloadCallback: DownloadStateListener,
     private val settingsDataStore: SettingsDataStore,
     private val urlDisplayRepository: UrlDisplayRepository,
+    private val browserMenuDisplayRepository: BrowserMenuDisplayRepository,
     private val autofillCapabilityChecker: AutofillCapabilityChecker,
     private val adClickManager: AdClickManager,
     private val autofillFireproofDialogSuppressor: AutofillFireproofDialogSuppressor,
@@ -597,6 +600,13 @@ class BrowserTabViewModel @Inject constructor(
             scope = viewModelScope,
             started = SharingStarted.Eagerly,
             initialValue = true,
+        )
+
+    private val browserMenuState = browserMenuDisplayRepository.browserMenuState
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.Eagerly,
+            initialValue = BrowserMenuDisplayState(hasOption = false, isEnabled = false),
         )
 
     private val fireproofWebsitesObserver =
@@ -794,6 +804,12 @@ class BrowserTabViewModel @Inject constructor(
         isFullUrlEnabled
             .onEach {
                 command.value = Command.RefreshOmnibar
+            }
+            .launchIn(viewModelScope)
+
+        browserMenuState
+            .onEach { state ->
+                browserViewState.value = currentBrowserViewState().copy(useBottomSheetMenu = state.hasOption && state.isEnabled)
             }
             .launchIn(viewModelScope)
     }

@@ -111,6 +111,8 @@ import com.duckduckgo.app.browser.logindetection.LoginDetected
 import com.duckduckgo.app.browser.logindetection.NavigationAwareLoginDetector
 import com.duckduckgo.app.browser.logindetection.NavigationEvent
 import com.duckduckgo.app.browser.logindetection.NavigationEvent.LoginAttempt
+import com.duckduckgo.app.browser.menu.BrowserMenuDisplayRepository
+import com.duckduckgo.app.browser.menu.BrowserMenuDisplayState
 import com.duckduckgo.app.browser.menu.VpnMenuStateProvider
 import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
@@ -436,6 +438,7 @@ class BrowserTabViewModelTest {
 
     private val mockSettingsDataStore: SettingsDataStore = mock()
     private val mockUrlDisplayRepository: UrlDisplayRepository = mock()
+    private val mockBrowserMenuDisplayRepository: BrowserMenuDisplayRepository = mock()
 
     private val mockAutoCompleteSettings: AutoCompleteSettings = mock()
 
@@ -666,6 +669,8 @@ class BrowserTabViewModelTest {
             whenever(mockSettingsDataStore.automaticFireproofSetting).thenReturn(AutomaticFireproofSetting.ASK_EVERY_TIME)
             whenever(mockSettingsDataStore.omnibarType).thenReturn(OmnibarType.SINGLE_TOP)
             whenever(mockUrlDisplayRepository.isFullUrlEnabled).then { isFullSiteAddressEnabledFlow }
+            whenever(mockBrowserMenuDisplayRepository.browserMenuState)
+                .thenReturn(flowOf(BrowserMenuDisplayState(hasOption = false, isEnabled = false)))
             whenever(mockSSLCertificatesFeature.allowBypass()).thenReturn(mockEnabledToggle)
             whenever(subscriptions.shouldLaunchPrivacyProForUrl(any())).thenReturn(false)
             whenever(mockDuckDuckGoUrlDetector.isDuckDuckGoUrl(any())).thenReturn(false)
@@ -801,6 +806,7 @@ class BrowserTabViewModelTest {
                 trackingParameters = mockTrackingParameters,
                 settingsDataStore = mockSettingsDataStore,
                 urlDisplayRepository = mockUrlDisplayRepository,
+                browserMenuDisplayRepository = mockBrowserMenuDisplayRepository,
                 adClickManager = mockAdClickManager,
                 autofillCapabilityChecker = autofillCapabilityChecker,
                 autofillFireproofDialogSuppressor = autofillFireproofDialogSuppressor,

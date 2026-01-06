@@ -21,6 +21,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.webkit.WebViewFeature
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.api.OmnibarRepository
+import com.duckduckgo.app.browser.menu.BrowserMenuDisplayRepository
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.browser.urldisplay.UrlDisplayRepository
 import com.duckduckgo.app.icon.api.AppIcon
@@ -55,6 +56,7 @@ class AppearanceViewModel @Inject constructor(
     private val themingDataStore: ThemingDataStore,
     private val settingsDataStore: SettingsDataStore,
     private val urlDisplayRepository: UrlDisplayRepository,
+    private val browserMenuDisplayRepository: BrowserMenuDisplayRepository,
     private val pixel: Pixel,
     private val dispatcherProvider: DispatcherProvider,
     private val tabSwitcherDataStore: TabSwitcherDataStore,
@@ -69,6 +71,8 @@ class AppearanceViewModel @Inject constructor(
         val omnibarType: OmnibarType = OmnibarType.SINGLE_TOP,
         val isFullUrlEnabled: Boolean = true,
         val isTrackersCountInTabSwitcherEnabled: Boolean = true,
+        val hasExperimentalBrowserMenuOption: Boolean = false,
+        val useBottomSheetMenuEnabled: Boolean = false,
         val shouldShowSplitOmnibarSettings: Boolean = false,
     )
 
@@ -101,11 +105,14 @@ class AppearanceViewModel @Inject constructor(
     fun viewState() = combine(
         viewState,
         urlDisplayRepository.isFullUrlEnabled,
+        browserMenuDisplayRepository.browserMenuState,
         tabSwitcherDataStore.isTrackersAnimationInfoTileHidden(),
-    ) { currentViewState, isFullUrlEnabled, isTrackersAnimationTileHidden ->
+    ) { currentViewState, isFullUrlEnabled, browserMenuState, isTrackersAnimationTileHidden ->
         currentViewState.copy(
             isTrackersCountInTabSwitcherEnabled = !isTrackersAnimationTileHidden,
             isFullUrlEnabled = isFullUrlEnabled,
+            hasExperimentalBrowserMenuOption = browserMenuState.hasOption,
+            useBottomSheetMenuEnabled = browserMenuState.isEnabled,
         )
     }.stateIn(viewModelScope, SharingStarted.Lazily, viewState.value)
 
@@ -192,6 +199,12 @@ class AppearanceViewModel @Inject constructor(
 
             val params = mapOf(Pixel.PixelParameter.IS_ENABLED to checked.toString())
             pixel.fire(AppPixelName.SETTINGS_APPEARANCE_IS_TRACKER_COUNT_IN_TAB_SWITCHER_TOGGLED, params)
+        }
+    }
+
+    fun onUseBottomSheetMenuChanged(checked: Boolean) {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            browserMenuDisplayRepository.setExperimentalMenuEnabled(checked)
         }
     }
 }

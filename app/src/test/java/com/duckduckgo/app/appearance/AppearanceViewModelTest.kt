@@ -22,6 +22,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.app.appearance.AppearanceViewModel.Command
 import com.duckduckgo.app.browser.api.OmnibarRepository
+import com.duckduckgo.app.browser.menu.BrowserMenuDisplayRepository
+import com.duckduckgo.app.browser.menu.BrowserMenuDisplayState
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.browser.urldisplay.UrlDisplayRepository
 import com.duckduckgo.app.icon.api.AppIcon
@@ -69,6 +71,9 @@ internal class AppearanceViewModelTest {
     private lateinit var mockUrlDisplayRepository: UrlDisplayRepository
 
     @Mock
+    private lateinit var mockBrowserMenuDisplayRepository: BrowserMenuDisplayRepository
+
+    @Mock
     private lateinit var mockPixel: Pixel
 
     @Mock
@@ -90,6 +95,8 @@ internal class AppearanceViewModelTest {
         whenever(mockAppSettingsDataStore.selectedFireAnimation).thenReturn(FireAnimation.HeroFire)
         whenever(mockAppSettingsDataStore.omnibarType).thenReturn(OmnibarType.SINGLE_TOP)
         whenever(mockUrlDisplayRepository.isFullUrlEnabled).thenReturn(flowOf(true))
+        whenever(mockBrowserMenuDisplayRepository.browserMenuState)
+            .thenReturn(flowOf(BrowserMenuDisplayState(hasOption = false, isEnabled = false)))
         whenever(mockTabSwitcherDataStore.isTrackersAnimationInfoTileHidden()).thenReturn(flowOf(false))
         whenever(mockOmnibarFeatureRepository.isSplitOmnibarAvailable).thenReturn(false)
 
@@ -102,6 +109,7 @@ internal class AppearanceViewModelTest {
                 mockThemeSettingsDataStore,
                 mockAppSettingsDataStore,
                 mockUrlDisplayRepository,
+                mockBrowserMenuDisplayRepository,
                 mockPixel,
                 coroutineTestRule.testDispatcherProvider,
                 mockTabSwitcherDataStore,

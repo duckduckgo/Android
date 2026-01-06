@@ -929,6 +929,9 @@
     <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Hide</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Keep</string>
 
+    <!--Bottom Sheet Menu-->
+    <string name="useBottomSheetMenuTitle">Experimental Browser Menu</string>
+
     <!-- Widgets -->
     <string name="searchOnlyWidgetLabel" instruction="Label for the search-only widget">Search Only</string>
     <string name="searchOnlyWidgetDescription" instruction="Description for the search-only widget">Quickly launch a private search with DuckDuckGo.</string>

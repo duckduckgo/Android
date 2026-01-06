@@ -245,7 +245,8 @@ import com.duckduckgo.browser.api.ui.BrowserScreens.PrivateSearchScreenNoParams
 import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.browser.api.webviewcompat.WebViewCompatWrapper
 import com.duckduckgo.browser.ui.autocomplete.BrowserAutoCompleteSuggestionsAdapter
-import com.duckduckgo.browser.ui.browsermenu.BrowserMenu
+import com.duckduckgo.browser.ui.browsermenu.BrowserMenuBottomSheet
+import com.duckduckgo.browser.ui.browsermenu.BrowserPopupMenu
 import com.duckduckgo.browser.ui.browsermenu.VpnMenuState
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.DuckDuckGoFragment
@@ -609,7 +610,8 @@ class BrowserTabFragment :
 
     private val skipHome get() = requireArguments().getBoolean(SKIP_HOME_ARG)
 
-    private lateinit var popupMenu: BrowserMenu
+    private var popupMenu: BrowserPopupMenu? = null
+    private var bottomSheetMenu: BrowserMenuBottomSheet? = null
     private lateinit var ctaBottomSheet: PromoBottomSheetDialog
     private lateinit var widgetBottomSheetDialog: AlternativeHomeScreenWidgetBottomSheetDialog
     private val widgetBottomSheetDialogJob: ConflatedJob = ConflatedJob()
@@ -908,10 +910,7 @@ class BrowserTabFragment :
 
                 InputScreenActivityResultCodes.MENU_REQUESTED -> {
                     val isSplitOmnibarEnabled = omnibarRepository.omnibarType == OmnibarType.SPLIT
-                    launchPopupMenu(
-                        anchorToNavigationBar = isSplitOmnibarEnabled,
-                        addExtraDelay = isSplitOmnibarEnabled,
-                    )
+                    launchBrowserMenu(addExtraDelay = isSplitOmnibarEnabled)
                 }
 
                 InputScreenActivityResultCodes.TAB_SWITCHER_REQUESTED -> {
@@ -1047,7 +1046,7 @@ class BrowserTabFragment :
         configureSwipeRefresh()
         configureAutoComplete()
         configureNewTab()
-        createPopupMenu()
+        createBrowserMenu()
 
         configureNavigationBar()
         configureOmnibar()
@@ -1335,19 +1334,55 @@ class BrowserTabFragment :
         }
     }
 
-    private fun recreatePopupMenu() {
-        popupMenu.dismiss()
-        createPopupMenu()
+    private fun recreateBrowserMenu() {
+        popupMenu?.dismiss()
+        bottomSheetMenu?.dismiss()
+        createBrowserMenu()
     }
 
-    private fun createPopupMenu() {
-        popupMenu =
-            BrowserMenu(
-                context = requireContext(),
-                layoutInflater = layoutInflater,
-                omnibarType = omnibar.omnibarType,
-            )
-        popupMenu.apply {
+    private fun createBrowserMenu() {
+        val useBottomSheetMenu = viewModel.browserViewState.value?.useBottomSheetMenu ?: false
+        if (useBottomSheetMenu) {
+            createBottomSheetMenu()
+        } else {
+            createPopupMenuClassic()
+        }
+    }
+
+    private fun renderBrowserMenu(viewState: BrowserViewState) {
+        val browseMenuState = browserMenuViewStateFactory.create(
+            omnibarViewMode = omnibar.viewMode,
+            viewState = viewState,
+            customTabsMode = tabDisplayedInCustomTabScreen,
+        )
+        logcat { "BrowserMenu: viewMode ${omnibar.viewMode} render browseMenuState $browseMenuState" }
+        val useBottomSheetMenu = viewModel.browserViewState.value?.useBottomSheetMenu ?: false
+        if (useBottomSheetMenu) {
+            bottomSheetMenu?.render(viewState = browseMenuState)
+        } else {
+            popupMenu?.render(viewState = browseMenuState)
+        }
+    }
+
+    private fun launchBrowserMenu(addExtraDelay: Boolean = false) {
+        val useBottomSheetMenu = viewModel.browserViewState.value?.useBottomSheetMenu ?: false
+        if (useBottomSheetMenu && bottomSheetMenu != null) {
+            bottomSheetMenu?.show()
+        } else if (!useBottomSheetMenu && popupMenu != null) {
+            val isSplitOmnibarEnabled = omnibarRepository.omnibarType == OmnibarType.SPLIT
+            launchPopupMenu(anchorToNavigationBar = isSplitOmnibarEnabled, addExtraDelay = addExtraDelay)
+        } else {
+            logcat { "Want to show browser menu without any view initialized" }
+        }
+    }
+
+    private fun createPopupMenuClassic() {
+        popupMenu = BrowserPopupMenu(
+            context = requireContext(),
+            layoutInflater = layoutInflater,
+            omnibarType = omnibar.omnibarType,
+        )
+        popupMenu?.apply {
             onMenuItemClicked(forwardMenuItem) {
                 onForwardArrowClicked()
             }
@@ -1449,6 +1484,105 @@ class BrowserTabFragment :
         }
     }
 
+    private fun createBottomSheetMenu() {
+        bottomSheetMenu = BrowserMenuBottomSheet(context = requireContext())
+        bottomSheetMenu?.apply {
+            forwardMenuItem.setOnClickListener {
+                dismiss()
+                onForwardArrowClicked()
+            }
+            refreshMenuItem.setOnClickListener {
+                dismiss()
+                viewModel.onRefreshRequested(triggeredByUser = true)
+                if (isActiveCustomTab()) {
+                    viewModel.fireCustomTabRefreshPixel()
+                } else {
+                    viewModel.handleMenuRefreshAction()
+                }
+            }
+            newTabMenuItem.setOnClickListener {
+                dismiss()
+                viewModel.onNewTabMenuItemClicked()
+            }
+            bookmarksMenuItem.setOnClickListener {
+                dismiss()
+                viewModel.onBookmarksMenuItemClicked()
+            }
+            fireproofWebsiteMenuItem.setOnClickListener {
+                dismiss()
+                viewModel.onFireproofWebsiteMenuClicked()
+            }
+            addBookmarksMenuItem.setOnClickListener {
+                dismiss()
+                viewModel.onBookmarkMenuClicked()
+            }
+            findInPageMenuItem.setOnClickListener {
+                dismiss()
+                pixel.fire(AppPixelName.MENU_ACTION_FIND_IN_PAGE_PRESSED)
+                viewModel.onFindInPageSelected()
+            }
+            privacyProtectionMenuItem.setOnClickListener {
+                dismiss()
+                viewModel.onPrivacyProtectionMenuClicked(isActiveCustomTab())
+            }
+            brokenSiteMenuItem.setOnClickListener {
+                dismiss()
+                pixel.fire(AppPixelName.MENU_ACTION_REPORT_BROKEN_SITE_PRESSED)
+                viewModel.onBrokenSiteSelected()
+            }
+            settingsMenuItem.setOnClickListener {
+                dismiss()
+                pixel.fire(AppPixelName.MENU_ACTION_SETTINGS_PRESSED)
+                browserActivity?.launchSettings()
+            }
+            changeBrowserModeMenuItem.setOnClickListener {
+                dismiss()
+                viewModel.onChangeBrowserModeClicked()
+            }
+            sharePageMenuItem.setOnClickListener {
+                dismiss()
+                pixel.fire(AppPixelName.MENU_ACTION_SHARE_PRESSED)
+                viewModel.onShareSelected()
+            }
+            addToHomeMenuItem.setOnClickListener {
+                dismiss()
+                pixel.fire(AppPixelName.MENU_ACTION_ADD_TO_HOME_PRESSED)
+                viewModel.onPinPageToHomeSelected()
+            }
+            printPageMenuItem.setOnClickListener {
+                dismiss()
+                viewModel.onPrintSelected()
+            }
+            autofillMenuItem.setOnClickListener {
+                dismiss()
+                pixel.fire(AppPixelName.MENU_ACTION_AUTOFILL_PRESSED)
+                viewModel.onAutofillMenuSelected()
+            }
+            createAliasMenuItem.setOnClickListener {
+                dismiss()
+                viewModel.consumeAliasAndCopyToClipboard()
+            }
+            downloadsMenuItem.setOnClickListener {
+                dismiss()
+                pixel.fire(AppPixelName.MENU_ACTION_DOWNLOADS_PRESSED)
+                browserActivity?.launchDownloads()
+            }
+            vpnMenuItem.setOnClickListener {
+                dismiss()
+                viewModel.onVpnMenuClicked()
+            }
+            newDuckChatTabMenuItem.setOnClickListener {
+                dismiss()
+                viewModel.openNewDuckChat(omnibar.viewMode)
+            }
+            duckChatHistoryMenuItem.setOnClickListener {
+                dismiss()
+                pixel.fire(DuckChatPixelName.DUCK_CHAT_SETTINGS_SIDEBAR_TAPPED)
+                viewModel.openDuckChatSidebar()
+            }
+        }
+    }
+
     private fun onForwardArrowClicked() {
         pixel.fire(AppPixelName.MENU_ACTION_NAVIGATE_FORWARD_PRESSED)
         viewModel.onUserPressedForward()
@@ -1495,9 +1629,9 @@ class BrowserTabFragment :
                 }
                 if (anchorToNavigationBar) {
                     val anchorView = browserNavigationBarIntegration.navigationBarView.popupMenuAnchor
-                    popupMenu.showAnchoredView(requireActivity(), binding.rootView, anchorView)
+                    popupMenu?.showAnchoredView(requireActivity(), binding.rootView, anchorView)
                 } else {
-                    popupMenu.show(binding.rootView, omnibar.toolbar)
+                    popupMenu?.show(binding.rootView, omnibar.toolbar)
                 }
                 viewModel.onPopupMenuLaunched()
                 if (isActiveCustomTab()) {
@@ -1814,7 +1948,7 @@ class BrowserTabFragment :
             viewState = browserViewState,
             customTabsMode = tabDisplayedInCustomTabScreen,
         )
-        popupMenu.render(browseMenuState)
+        popupMenu?.render(browseMenuState)
         omnibar.setViewMode(ViewMode.DuckAI)
     }
 
@@ -2381,7 +2515,7 @@ class BrowserTabFragment :
             is Command.ShowAutoconsentAnimation -> showAutoconsentAnimation(it.isCosmetic)
 
             is Command.LaunchPopupMenu -> {
-                launchPopupMenu(it.anchorToNavigationBar)
+                launchBrowserMenu()
                 hideKeyboard()
             }
 
@@ -4074,7 +4208,7 @@ class BrowserTabFragment :
         super.onConfigurationChanged(newConfig)
 
         renderer.renderHomeCta()
-        recreatePopupMenu()
+        recreateBrowserMenu()
         viewModel.onConfigurationChanged()
     }
 
@@ -4093,7 +4227,8 @@ class BrowserTabFragment :
         logcat { "Duck.ai: onDestroy" }
         dismissAppLinkSnackBar()
         supervisorJob.cancel()
-        if (::popupMenu.isInitialized) popupMenu.dismiss()
+        popupMenu?.dismiss()
+        bottomSheetMenu?.dismiss()
         widgetBottomSheetDialogJob?.cancel()
         loginDetectionDialog?.dismiss()
         automaticFireproofDialog?.dismiss()
@@ -4623,13 +4758,8 @@ class BrowserTabFragment :
 
                 browserNavigationBarIntegration.configureFireButtonHighlight(highlighted = viewState.fireButton.isHighlighted())
 
-                val browseMenuState = browserMenuViewStateFactory.create(
-                    omnibarViewMode = omnibar.viewMode,
-                    viewState = viewState,
-                    customTabsMode = tabDisplayedInCustomTabScreen,
-                )
-                logcat { "BrowserMenu: viewMode ${omnibar.viewMode} render browseMenuState $browseMenuState" }
-                popupMenu.render(browseMenuState)
+                recreateBrowserMenu()
+                renderBrowserMenu(viewState)
 
                 renderFullscreenMode(viewState)
 

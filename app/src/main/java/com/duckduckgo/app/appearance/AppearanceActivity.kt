@@ -100,6 +100,11 @@ class AppearanceActivity : DuckDuckGoActivity() {
             viewModel.onShowTrackersCountInTabSwitcherChanged(isChecked)
         }
 
+    private val useBottomSheetMenuToggleListener =
+        CompoundButton.OnCheckedChangeListener { _, isChecked ->
+            viewModel.onUseBottomSheetMenuChanged(isChecked)
+        }
+
     private val changeIconFlow =
         registerForActivityResult(ChangeIconContract()) { resultOk ->
             if (resultOk) {
@@ -172,6 +177,11 @@ class AppearanceActivity : DuckDuckGoActivity() {
                     binding.showTrackersCountInTabSwitcher.quietlySetIsChecked(
                         viewState.isTrackersCountInTabSwitcherEnabled,
                         showTrackersCountInTabSwitcher,
+                    )
+                    binding.useBottomSheetMenuSetting.isVisible = viewState.hasExperimentalBrowserMenuOption
+                    binding.useBottomSheetMenuSetting.quietlySetIsChecked(
+                        viewState.useBottomSheetMenuEnabled,
+                        useBottomSheetMenuToggleListener,
                     )
                     configureOmnibarSettings(it)
                 }
