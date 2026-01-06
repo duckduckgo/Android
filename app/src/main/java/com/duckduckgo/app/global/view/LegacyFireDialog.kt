@@ -104,7 +104,7 @@ class LegacyFireDialog : BottomSheetDialogFragment(), FireDialog {
 
     private val accelerateAnimatorUpdateListener = object : ValueAnimator.AnimatorUpdateListener {
         override fun onAnimationUpdate(animation: ValueAnimator) {
-            binding.fireAnimationView.let {
+            _binding?.fireAnimationView?.let {
                 it.speed += ANIMATION_SPEED_INCREMENT
                 if (it.speed > ANIMATION_MAX_SPEED) {
                     it.removeUpdateListener(this)
@@ -301,13 +301,12 @@ class LegacyFireDialog : BottomSheetDialogFragment(), FireDialog {
 
     @Synchronized
     private fun onFireDialogClearAllEvent(event: FireDialogClearAllEvent) {
-        if (!canRestart) {
+        if (!canRestart && _binding != null) {
             canRestart = true
             if (event is FireDialogClearAllEvent.ClearAllDataFinished) {
                 binding.fireAnimationView.addAnimatorUpdateListener(accelerateAnimatorUpdateListener)
             }
         } else {
-            // Both clearing and animation are done, now restart
             clearDataAction.killAndRestartProcess(notifyDataCleared = false, enableTransitionAnimation = false)
         }
     }
