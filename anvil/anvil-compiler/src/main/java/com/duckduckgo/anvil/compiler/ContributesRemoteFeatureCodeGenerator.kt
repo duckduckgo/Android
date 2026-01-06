@@ -431,13 +431,34 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
 
                     val exceptions = parseExceptions(feature.exceptions)
 
+                    // v6: Parse parent-level targets
+                    val parentTargets = feature.targets.map { target ->
+                        Toggle.State.Target(
+                            variantKey = target.variantKey,
+                            localeCountry = target.localeCountry,
+                            localeLanguage = target.localeLanguage,
+                            isReturningUser = target.isReturningUser,
+                            isPrivacyProEligible = target.isPrivacyProEligible,
+                            minSdkVersion = target.minSdkVersion,
+                        )
+                    }
+
+                    // v6: Get previous state to preserve rollout threshold
+                    val previousSelfState = this.feature.get().invokeMethod("self").getRawStoredState()
+                    val previousRolloutThreshold = previousSelfState?.rolloutThreshold
+
                     val isEnabled = (feature.state == "enabled") || (appBuildConfig.flavor == %T && feature.state == "internal")
                     this.feature.get().invokeMethod("self").setRawStoredState(
                         Toggle.State(
                             remoteEnableState = isEnabled,
-                            enable = isEnabled,
+                            enable = previousSelfState?.enable ?: isEnabled,
                             minSupportedVersion = feature.minSupportedVersion,
-                            targets = emptyList(),
+                            // v6: Parent-level rollout support
+                            rollout = feature.rollout?.steps?.map { it.percent },
+                            rolloutThreshold = previousRolloutThreshold,
+                            // v6: Parent-level targets support
+                            targets = parentTargets,
+                            // v6: Cohorts parsed but not functionally supported at parent level
                             cohorts = emptyList(),
                             settings = feature.settings?.toString(),
                             exceptions = exceptions,
@@ -836,6 +857,23 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                             )
                             .build(),
                     )
+                    // v6: Parent-level rollout support
+                    .addParameter(
+                        "rollout",
+                        FqName("JsonToggleRollout").asClassName(module).copy(nullable = true),
+                    )
+                    // v6: Parent-level targets support
+                    .addParameter(
+                        "targets",
+                        List::class.asClassName().parameterizedBy(FqName("JsonToggleTarget").asClassName(module)),
+                    )
+                    // v6: Parent-level description (informational only)
+                    .addParameter("description", String::class.asClassName().copy(nullable = true))
+                    // v6: Parent-level cohorts (parsed but not functionally supported)
+                    .addParameter(
+                        "cohorts",
+                        List::class.asClassName().parameterizedBy(FqName("JsonToggleCohort").asClassName(module)),
+                    )
                     .build(),
             )
             // properties that match params to generate data class
@@ -868,6 +906,29 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                         ).copy(nullable = true),
                     )
                     .initializer("features")
+                    .build(),
+            )
+            // v6: Parent-level rollout
+            .addProperty(
+                PropertySpec
+                    .builder("rollout", FqName("JsonToggleRollout").asClassName(module).copy(nullable = true))
+                    .initializer("rollout")
+                    .build(),
+            )
+            // v6: Parent-level targets
+            .addProperty(
+                PropertySpec
+                    .builder("targets", List::class.asClassName().parameterizedBy(FqName("JsonToggleTarget").asClassName(module)))
+                    .initializer("targets")
+                    .build(),
+            )
+            // v6: Parent-level description
+            .addProperty(PropertySpec.builder("description", String::class.asClassName().copy(nullable = true)).initializer("description").build())
+            // v6: Parent-level cohorts (parsed but not functionally supported)
+            .addProperty(
+                PropertySpec
+                    .builder("cohorts", List::class.asClassName().parameterizedBy(FqName("JsonToggleCohort").asClassName(module)))
+                    .initializer("cohorts")
                     .build(),
             )
             .build()
