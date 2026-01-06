@@ -34,6 +34,8 @@ import com.duckduckgo.remote.messaging.impl.mappers.RemoteMessagingConfigJsonMap
 import com.duckduckgo.remote.messaging.impl.matchers.AndroidAppAttributeMatcher
 import com.duckduckgo.remote.messaging.impl.matchers.DeviceAttributeMatcher
 import com.duckduckgo.remote.messaging.impl.matchers.UserAttributeMatcher
+import com.duckduckgo.remote.messaging.impl.network.GlideRemoteMessageImagePrefetcher
+import com.duckduckgo.remote.messaging.impl.network.RemoteMessageImagePrefetcher
 import com.duckduckgo.remote.messaging.impl.network.RemoteMessagingService
 import com.duckduckgo.remote.messaging.store.LocalRemoteMessagingConfigRepository
 import com.duckduckgo.remote.messaging.store.RemoteMessagesDao
@@ -59,6 +61,15 @@ object DomainModule {
     ): RemoteMessagingConfigDownloader {
         return RealRemoteMessagingConfigDownloader(remoteConfig, remoteMessagingConfigProcessor)
     }
+
+    @Provides
+    @SingleInstanceIn(AppScope::class)
+    fun provideImagePrefetcher(
+        context: Context,
+        dispatcherProvider: DispatcherProvider,
+    ): RemoteMessageImagePrefetcher {
+        return GlideRemoteMessageImagePrefetcher(context, dispatcherProvider)
+    }
 }
 
 @Module
@@ -73,12 +84,14 @@ object DataSourceModule {
         remoteMessagingRepository: RemoteMessagingRepository,
         remoteMessagingConfigMatcher: RemoteMessagingConfigMatcher,
         remoteMessagingFeatureToggles: RemoteMessagingFeatureToggles,
+        remoteMessageImagePrefetcher: RemoteMessageImagePrefetcher,
     ): RemoteMessagingConfigProcessor {
         return RealRemoteMessagingConfigProcessor(
             remoteMessagingConfigJsonMapper,
             remoteMessagingConfigRepository,
             remoteMessagingRepository,
             remoteMessagingConfigMatcher,
+            remoteMessageImagePrefetcher,
             remoteMessagingFeatureToggles,
         )
     }
