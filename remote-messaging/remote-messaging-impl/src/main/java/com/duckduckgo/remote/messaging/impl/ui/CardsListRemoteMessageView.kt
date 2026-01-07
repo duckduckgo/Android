@@ -37,7 +37,6 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.common.ui.view.gone
-import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
@@ -155,7 +154,7 @@ class CardsListRemoteMessageView @JvmOverloads constructor(
                 binding.remoteImage.show()
             } else {
                 binding.headerImage.setImageResource(it.placeholder.drawable(true))
-                binding.remoteImage.hide()
+                binding.remoteImage.gone()
                 binding.headerImage.show()
             }
             binding.headerTitle.text = it.titleText

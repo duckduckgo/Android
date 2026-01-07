@@ -41,14 +41,13 @@
         android:layout_height="wrap_content"
         android:importantForAccessibility="no"
         android:visibility="gone"
-        app:layout_constraintBottom_toTopOf="@id/headerTitle"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/closeButton"
         tools:src="@drawable/ic_ddg_announce" />
 
     <ImageView
-        android:id="@+id/remote_image"
+        android:id="@+id/remoteImage"
         android:layout_width="240dp"
         android:layout_height="240dp"
         android:visibility="gone"
@@ -60,8 +59,9 @@
         android:id="@+id/illustrationBarrier"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        app:barrierAllowsGoneWidgets="false"
         app:barrierDirection="bottom"
-        app:constraint_referenced_ids="headerImage,remote_image" />
+        app:constraint_referenced_ids="headerImage,remoteImage" />
 
     <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/headerTitle"
