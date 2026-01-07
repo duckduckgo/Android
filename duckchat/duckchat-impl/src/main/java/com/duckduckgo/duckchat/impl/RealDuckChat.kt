@@ -41,7 +41,6 @@ import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBa
 import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarOptionBottomSheetDialogFactory
 import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarSelection
 import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarSelection.SEARCH_AND_AI
-import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_CANCELLED
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_CONFIRMED
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_DISPLAYED
@@ -534,9 +533,9 @@ class RealDuckChat @Inject constructor(
             duckChatFeatureRepository.registerOpened()
 
             withContext(dispatchers.main()) {
-                pixel.fire(DuckChatPixelName.DUCK_CHAT_OPEN, parameters = params)
-                pixel.fire(DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_DUCK_AI_OPEN)
-                pixel.fire(DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_DUCK_AI_OPEN_DAILY, type = Pixel.PixelType.Daily())
+                // pixel.fire(DuckChatPixelName.DUCK_CHAT_OPEN, parameters = params)
+                // pixel.fire(DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_DUCK_AI_OPEN)
+                // pixel.fire(DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_DUCK_AI_OPEN_DAILY, type = Pixel.PixelType.Daily())
                 logcat { "Duck.ai: restoring Duck.ai session $url hasSessionActive $hasSessionActive" }
                 openDuckChatSession(url, hasSessionActive)
             }

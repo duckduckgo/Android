@@ -16,6 +16,10 @@
 
 package com.duckduckgo.duckchat.impl.helper
 
+import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.common.utils.ConflatedJob
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.ChatState
 import com.duckduckgo.duckchat.impl.ChatState.HIDE
@@ -23,12 +27,19 @@ import com.duckduckgo.duckchat.impl.ChatState.SHOW
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.ReportMetric
 import com.duckduckgo.duckchat.impl.metric.DuckAiMetricCollector
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelParameters
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
+import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
 import com.duckduckgo.duckchat.impl.store.DuckChatDataStore
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.squareup.anvil.annotations.ContributesBinding
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import logcat.logcat
 import org.json.JSONObject
 import java.util.regex.Pattern
 import javax.inject.Inject
@@ -56,18 +67,39 @@ class RealDuckChatJSHelper @Inject constructor(
     private val duckChatPixels: DuckChatPixels,
     private val dataStore: DuckChatDataStore,
     private val duckAiMetricCollector: DuckAiMetricCollector,
+    private val duckChatFeatureRepository: DuckChatFeatureRepository,
+    @AppCoroutineScope private val coroutineScope: CoroutineScope,
+    private val dispatcherProvider: DispatcherProvider,
+    private val pixel: Pixel,
 ) : DuckChatJSHelper {
+    private val registerOpenedJob = ConflatedJob()
+
     override suspend fun processJsCallbackMessage(
         featureName: String,
         method: String,
         id: String?,
         data: JSONObject?,
-    ): JsCallbackData? =
-        when (method) {
+    ): JsCallbackData? {
+        fun registerDuckChatIsOpenDebounced(windowMs: Long = 500L) {
+            // we debounced because METHOD_GET_AI_CHAT_NATIVE_HANDOFF_DATA can be called more than once
+            // in some cases, eg. when opening duck.ai with query already
+            registerOpenedJob += coroutineScope.launch(dispatcherProvider.io()) {
+                delay(windowMs)
+                logcat { "aitor called $method $featureName" }
+                duckChatFeatureRepository.registerOpened()
+                val sessionDelta = duckChatFeatureRepository.sessionDeltaInMinutes()
+                val params = mapOf(DuckChatPixelParameters.DELTA_TIMESTAMP_PARAMETERS to sessionDelta.toString())
+                pixel.fire(DuckChatPixelName.DUCK_CHAT_OPEN, parameters = params)
+                pixel.fire(DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_DUCK_AI_OPEN)
+                pixel.fire(DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_DUCK_AI_OPEN_DAILY, type = Pixel.PixelType.Daily())
+            }
+        }
+
+        return when (method) {
             METHOD_GET_AI_CHAT_NATIVE_HANDOFF_DATA ->
                 id?.let {
                     getAIChatNativeHandoffData(featureName, method, it)
-                }
+                }.also { registerDuckChatIsOpenDebounced() }
 
             METHOD_GET_AI_CHAT_NATIVE_CONFIG_VALUES ->
                 id?.let {
@@ -128,6 +160,7 @@ class RealDuckChatJSHelper @Inject constructor(
 
             else -> null
         }
+    }
 
     override fun onNativeAction(action: NativeAction): SubscriptionEventData {
         val subscriptionName = when (action) {
