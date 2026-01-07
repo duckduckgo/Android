@@ -255,9 +255,9 @@ class RealPirDashboardMaintenanceScanDataProviderTest {
         // Then
         assertEquals(2, result.brokerMatches.size) // Only scans within 8 days
         assertEquals(
-            currentTime - TimeUnit.DAYS.toMillis(5),
+            currentTime - TimeUnit.DAYS.toMillis(2),
             result.dateInMillis,
-        ) // Earliest scan within range
+        ) // Most recent scan within range
 
         val broker1Match = result.brokerMatches.find { it.broker.name == "broker1" }!!
         assertEquals(currentTime - TimeUnit.DAYS.toMillis(2), broker1Match.dateInMillis)
@@ -295,8 +295,10 @@ class RealPirDashboardMaintenanceScanDataProviderTest {
             val result = testee.getLastScanDetails()
 
             // Then - Returns only ONE broker match per broker, regardless of how many profile queries exist
+            // and keeps the most recent (latest) scan date for getLastScanDetails
             assertEquals(1, result.brokerMatches.size)
             assertEquals("broker1", result.brokerMatches[0].broker.name)
+            assertEquals(currentTime - TimeUnit.DAYS.toMillis(2), result.brokerMatches[0].dateInMillis)
         }
 
     @Test
