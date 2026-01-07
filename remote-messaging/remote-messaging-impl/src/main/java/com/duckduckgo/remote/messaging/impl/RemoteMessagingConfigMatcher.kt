@@ -76,13 +76,13 @@ class RemoteMessagingConfigMatcher(
                 val itemMatching = if (cardItem.matchingRules.isEmpty()) {
                     EvaluationResult.Match
                 } else {
-                    cardItem.matchingRules.evaluateMatchingRules(message.id, rules)
+                    cardItem.matchingRules.evaluateMatchingRules(cardItem.id, rules)
                 }
 
                 val itemExclusion = if (cardItem.exclusionRules.isEmpty()) {
                     EvaluationResult.Fail
                 } else {
-                    cardItem.exclusionRules.evaluateExclusionRules(message.id, rules)
+                    cardItem.exclusionRules.evaluateExclusionRules(cardItem.id, rules)
                 }
 
                 itemMatching == EvaluationResult.Match && itemExclusion == EvaluationResult.Fail
