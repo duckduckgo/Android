@@ -24,11 +24,11 @@ import com.duckduckgo.app.onboarding.OnboardingFlowChecker
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.modalcoordinator.api.ModalEvaluator
-import com.duckduckgo.modalcoordinator.api.ModalEvaluatorCompletionStore
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
 import com.duckduckgo.remote.messaging.api.Surface
 import com.duckduckgo.remote.messaging.impl.RemoteMessagingFeatureToggles
+import com.duckduckgo.remote.messaging.impl.store.ModalSurfaceStore
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
@@ -51,7 +51,7 @@ interface RemoteMessageModalSurfaceEvaluator
 class RemoteMessageModalSurfaceEvaluatorImpl @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val remoteMessagingRepository: RemoteMessagingRepository,
-    private val modalEvaluatorCompletionStore: ModalEvaluatorCompletionStore,
+    private val modalSurfaceStore: ModalSurfaceStore,
     private val globalActivityStarter: GlobalActivityStarter,
     private val dispatchers: DispatcherProvider,
     private val applicationContext: Context,
@@ -80,6 +80,12 @@ class RemoteMessageModalSurfaceEvaluatorImpl @Inject constructor(
                 ?: return@withContext ModalEvaluator.EvaluationResult.Skipped
 
             if (message.surfaces.contains(Surface.MODAL)) {
+                // Skip if this message was already shown
+                val lastShownMessageId = modalSurfaceStore.getLastShownRemoteMessageId()
+                if (lastShownMessageId == message.id) {
+                    return@withContext ModalEvaluator.EvaluationResult.Skipped
+                }
+
                 val intent = globalActivityStarter.startIntent(
                     applicationContext,
                     ModalSurfaceActivityFromMessageId(message.id, message.content.messageType),
@@ -91,8 +97,9 @@ class RemoteMessageModalSurfaceEvaluatorImpl @Inject constructor(
                     applicationContext.startActivity(intent)
                 }
 
-                // Clear timestamp as the modal will be shown
-                modalEvaluatorCompletionStore.clearBackgroundTimestamp()
+                // Record this message as shown, and clear background timestamp
+                modalSurfaceStore.recordLastShownRemoteMessageId(message.id)
+                modalSurfaceStore.clearBackgroundTimestamp()
 
                 return@withContext ModalEvaluator.EvaluationResult.CompletedWithAction
             }
@@ -102,7 +109,7 @@ class RemoteMessageModalSurfaceEvaluatorImpl @Inject constructor(
     }
 
     private suspend fun hasMetBackgroundTimeThreshold(): Boolean {
-        val backgroundTimestamp = modalEvaluatorCompletionStore.getBackgroundedTimestamp() ?: return false
+        val backgroundTimestamp = modalSurfaceStore.getBackgroundedTimestamp() ?: return false
 
         // Using elapsed real time as this is how it's saved in the data store.
         val currentTimestamp = SystemClock.elapsedRealtime()

@@ -24,8 +24,6 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertFalse
-import org.junit.Assert.assertNotNull
-import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -76,29 +74,6 @@ class ModalEvaluatorCompletionStoreImplTest {
     }
 
     @Test
-    fun whenInitializedThenBackgroundedTimestampIsNull() = runTest {
-        assertNull(testee.getBackgroundedTimestamp())
-    }
-
-    @Test
-    fun whenBackgroundedTimestampRecordedThenValueIsRetrieved() = runTest {
-        testee.recordBackgroundedTimestamp()
-
-        val timestamp = testee.getBackgroundedTimestamp()
-        assertNotNull(timestamp)
-    }
-
-    @Test
-    fun whenBackgroundedTimestampClearedThenValueIsNull() = runTest {
-        testee.recordBackgroundedTimestamp()
-        assertNotNull(testee.getBackgroundedTimestamp())
-
-        testee.clearBackgroundTimestamp()
-
-        assertNull(testee.getBackgroundedTimestamp())
-    }
-
-    @Test
     fun whenMultipleCompletionsRecordedThenOnlyLatestMatters() = runTest {
         testee.recordCompletion()
         assertTrue(testee.isBlockedBy24HourWindow())
@@ -108,31 +83,5 @@ class ModalEvaluatorCompletionStoreImplTest {
 
         // Should still be blocked
         assertTrue(testee.isBlockedBy24HourWindow())
-    }
-
-    @Test
-    fun whenBackgroundedTimestampRecordedMultipleTimesThenLatestValueIsStored() = runTest {
-        testee.recordBackgroundedTimestamp()
-        val firstTimestamp = testee.getBackgroundedTimestamp()
-        assertNotNull(firstTimestamp)
-
-        // Small delay to ensure different timestamp
-        Thread.sleep(10)
-
-        testee.recordBackgroundedTimestamp()
-        val secondTimestamp = testee.getBackgroundedTimestamp()
-        assertNotNull(secondTimestamp)
-
-        // Second timestamp should be greater than or equal to first
-        assertTrue(secondTimestamp!! >= firstTimestamp!!)
-    }
-
-    @Test
-    fun whenClearBackgroundTimestampCalledWithoutRecordingThenNoError() = runTest {
-        assertNull(testee.getBackgroundedTimestamp())
-
-        testee.clearBackgroundTimestamp()
-
-        assertNull(testee.getBackgroundedTimestamp())
     }
 }

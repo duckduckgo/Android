@@ -25,7 +25,6 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.modalcoordinator.api.ModalEvaluator
-import com.duckduckgo.modalcoordinator.api.ModalEvaluatorCompletionStore
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.remote.messaging.api.Action
 import com.duckduckgo.remote.messaging.api.CardItem
@@ -35,6 +34,7 @@ import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
 import com.duckduckgo.remote.messaging.api.Surface
 import com.duckduckgo.remote.messaging.impl.RemoteMessagingFeatureToggles
+import com.duckduckgo.remote.messaging.impl.store.ModalSurfaceStore
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -56,7 +56,7 @@ class RemoteMessageModalSurfaceEvaluatorImplTest {
     var coroutinesTestRule = CoroutineTestRule()
 
     private val mockRemoteMessagingRepository: RemoteMessagingRepository = mock()
-    private val mockCompletionStore: ModalEvaluatorCompletionStore = mock()
+    private val mockModalSurfaceStore: ModalSurfaceStore = mock()
     private val mockGlobalActivityStarter: GlobalActivityStarter = mock()
     private val mockApplicationContext: Context = mock()
     private var fakeRemoteMessagingFeatureToggles: RemoteMessagingFeatureToggles = FakeFeatureToggleFactory.create(
@@ -77,7 +77,7 @@ class RemoteMessageModalSurfaceEvaluatorImplTest {
         testee = RemoteMessageModalSurfaceEvaluatorImpl(
             appCoroutineScope = coroutinesTestRule.testScope,
             remoteMessagingRepository = mockRemoteMessagingRepository,
-            modalEvaluatorCompletionStore = mockCompletionStore,
+            modalSurfaceStore = mockModalSurfaceStore,
             globalActivityStarter = mockGlobalActivityStarter,
             dispatchers = coroutinesTestRule.testDispatcherProvider,
             applicationContext = mockApplicationContext,
@@ -128,7 +128,7 @@ class RemoteMessageModalSurfaceEvaluatorImplTest {
     fun whenBackgroundTimeThresholdNotMetThenEvaluationIsSkipped() = runTest {
         givenFeatureTogglesEnabled()
         whenever(mockOnboardingFlowChecker.isOnboardingComplete()).thenReturn(true)
-        whenever(mockCompletionStore.getBackgroundedTimestamp()).thenReturn(null)
+        whenever(mockModalSurfaceStore.getBackgroundedTimestamp()).thenReturn(null)
 
         val result = testee.evaluate()
 
@@ -167,6 +167,7 @@ class RemoteMessageModalSurfaceEvaluatorImplTest {
         givenFeatureTogglesEnabled()
         givenOnboardingComplete()
         givenBackgroundThresholdMet()
+        givenNoLastShownMessageId()
         val message = createRemoteMessage(surfaces = listOf(Surface.MODAL))
         whenever(mockRemoteMessagingRepository.message()).thenReturn(message)
         whenever(mockGlobalActivityStarter.startIntent(any(), any<GlobalActivityStarter.ActivityParams>())).thenReturn(null)
@@ -182,6 +183,7 @@ class RemoteMessageModalSurfaceEvaluatorImplTest {
         givenFeatureTogglesEnabled()
         givenOnboardingComplete()
         givenBackgroundThresholdMet()
+        givenNoLastShownMessageId()
         val message = createRemoteMessage(surfaces = listOf(Surface.MODAL))
         whenever(mockRemoteMessagingRepository.message()).thenReturn(message)
         whenever(mockGlobalActivityStarter.startIntent(any(), any<GlobalActivityStarter.ActivityParams>())).thenReturn(mockIntent)
@@ -195,17 +197,69 @@ class RemoteMessageModalSurfaceEvaluatorImplTest {
     }
 
     @Test
+    fun whenMessageWasAlreadyShownThenEvaluationIsSkipped() = runTest {
+        givenFeatureTogglesEnabled()
+        givenOnboardingComplete()
+        givenBackgroundThresholdMet()
+        val messageId = "test-message-id"
+        val message = createRemoteMessage(id = messageId, surfaces = listOf(Surface.MODAL))
+        whenever(mockRemoteMessagingRepository.message()).thenReturn(message)
+        whenever(mockModalSurfaceStore.getLastShownRemoteMessageId()).thenReturn(messageId)
+
+        val result = testee.evaluate()
+
+        assertEquals(ModalEvaluator.EvaluationResult.Skipped, result)
+        verify(mockGlobalActivityStarter, never()).startIntent(any(), any<GlobalActivityStarter.ActivityParams>())
+    }
+
+    @Test
+    fun whenDifferentMessageIdThenMessageIsShown() = runTest {
+        givenFeatureTogglesEnabled()
+        givenOnboardingComplete()
+        givenBackgroundThresholdMet()
+        val previousMessageId = "old-message-id"
+        val newMessageId = "new-message-id"
+        val message = createRemoteMessage(id = newMessageId, surfaces = listOf(Surface.MODAL))
+        whenever(mockRemoteMessagingRepository.message()).thenReturn(message)
+        whenever(mockModalSurfaceStore.getLastShownRemoteMessageId()).thenReturn(previousMessageId)
+        whenever(mockGlobalActivityStarter.startIntent(any(), any<GlobalActivityStarter.ActivityParams>())).thenReturn(mockIntent)
+
+        val result = testee.evaluate()
+
+        assertEquals(ModalEvaluator.EvaluationResult.CompletedWithAction, result)
+        coroutinesTestRule.testScope.testScheduler.advanceUntilIdle()
+        verify(mockApplicationContext).startActivity(mockIntent)
+    }
+
+    @Test
+    fun whenMessageIsShownThenMessageIdIsRecorded() = runTest {
+        givenFeatureTogglesEnabled()
+        givenOnboardingComplete()
+        givenBackgroundThresholdMet()
+        givenNoLastShownMessageId()
+        val messageId = "test-message-id"
+        val message = createRemoteMessage(id = messageId, surfaces = listOf(Surface.MODAL))
+        whenever(mockRemoteMessagingRepository.message()).thenReturn(message)
+        whenever(mockGlobalActivityStarter.startIntent(any(), any<GlobalActivityStarter.ActivityParams>())).thenReturn(mockIntent)
+
+        testee.evaluate()
+
+        verify(mockModalSurfaceStore).recordLastShownRemoteMessageId(messageId)
+    }
+
+    @Test
     fun whenBackgroundThresholdMetThenTimestampIsCleared() = runTest {
         givenFeatureTogglesEnabled()
         givenOnboardingComplete()
         givenBackgroundThresholdMet()
+        givenNoLastShownMessageId()
         val message = createRemoteMessage(surfaces = listOf(Surface.MODAL))
         whenever(mockRemoteMessagingRepository.message()).thenReturn(message)
         whenever(mockGlobalActivityStarter.startIntent(any(), any<GlobalActivityStarter.ActivityParams>())).thenReturn(mockIntent)
 
         testee.evaluate()
 
-        verify(mockCompletionStore).clearBackgroundTimestamp()
+        verify(mockModalSurfaceStore).clearBackgroundTimestamp()
     }
 
     @Test
@@ -214,12 +268,12 @@ class RemoteMessageModalSurfaceEvaluatorImplTest {
         givenOnboardingComplete()
         // Set background timestamp to just 1 hour ago (threshold is 4 hours)
         val oneHourAgo = SystemClock.elapsedRealtime() - (1 * 60 * 60 * 1000L)
-        whenever(mockCompletionStore.getBackgroundedTimestamp()).thenReturn(oneHourAgo)
+        whenever(mockModalSurfaceStore.getBackgroundedTimestamp()).thenReturn(oneHourAgo)
 
         val result = testee.evaluate()
 
         assertEquals(ModalEvaluator.EvaluationResult.Skipped, result)
-        verify(mockCompletionStore, never()).clearBackgroundTimestamp()
+        verify(mockModalSurfaceStore, never()).clearBackgroundTimestamp()
     }
 
     @Test
@@ -227,6 +281,7 @@ class RemoteMessageModalSurfaceEvaluatorImplTest {
         givenFeatureTogglesEnabled()
         givenOnboardingComplete()
         givenBackgroundThresholdMet()
+        givenNoLastShownMessageId()
         val message = createRemoteMessage(surfaces = listOf(Surface.MODAL, Surface.NEW_TAB_PAGE))
         whenever(mockRemoteMessagingRepository.message()).thenReturn(message)
         whenever(mockGlobalActivityStarter.startIntent(any(), any<GlobalActivityStarter.ActivityParams>())).thenReturn(mockIntent)
@@ -260,7 +315,11 @@ class RemoteMessageModalSurfaceEvaluatorImplTest {
     private suspend fun givenBackgroundThresholdMet() {
         // Set background timestamp to 5 hours ago (threshold is 4 hours)
         val fiveHoursAgo = SystemClock.elapsedRealtime() - (5 * 60 * 60 * 1000L)
-        whenever(mockCompletionStore.getBackgroundedTimestamp()).thenReturn(fiveHoursAgo)
+        whenever(mockModalSurfaceStore.getBackgroundedTimestamp()).thenReturn(fiveHoursAgo)
+    }
+
+    private suspend fun givenNoLastShownMessageId() {
+        whenever(mockModalSurfaceStore.getLastShownRemoteMessageId()).thenReturn(null)
     }
 
     private fun createRemoteMessage(

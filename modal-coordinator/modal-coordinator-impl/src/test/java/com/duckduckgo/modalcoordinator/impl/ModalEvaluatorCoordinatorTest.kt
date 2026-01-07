@@ -20,7 +20,7 @@ import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.modalcoordinator.api.ModalEvaluator
-import com.duckduckgo.modalcoordinator.api.ModalEvaluatorCompletionStore
+import com.duckduckgo.modalcoordinator.impl.store.ModalEvaluatorCompletionStore
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -143,14 +143,6 @@ class ModalEvaluatorCoordinatorTest {
         // Low priority (10) should not be evaluated because mid completed
         verify(lowPriorityEvaluator, never()).evaluate()
         verify(mockCompletionStore).recordCompletion()
-    }
-
-    @Test
-    fun whenOnStopCalledThenBackgroundedTimestampIsRecorded() = runTest {
-        testee.onStop(mockLifecycleOwner)
-        coroutinesTestRule.testScope.testScheduler.advanceUntilIdle()
-
-        verify(mockCompletionStore).recordBackgroundedTimestamp()
     }
 
     @Test

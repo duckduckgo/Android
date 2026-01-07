@@ -23,7 +23,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.modalcoordinator.api.ModalEvaluator
-import com.duckduckgo.modalcoordinator.api.ModalEvaluatorCompletionStore
+import com.duckduckgo.modalcoordinator.impl.store.ModalEvaluatorCompletionStore
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
@@ -60,13 +60,6 @@ class ModalEvaluatorCoordinator @Inject constructor(
         super.onResume(owner)
         appCoroutineScope.launch(dispatchers.io()) {
             coordinateEvaluation()
-        }
-    }
-
-    override fun onStop(owner: LifecycleOwner) {
-        super.onStop(owner)
-        appCoroutineScope.launch(dispatchers.io()) {
-            completionStore.recordBackgroundedTimestamp()
         }
     }
 

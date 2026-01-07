@@ -16,20 +16,31 @@
 
 package com.duckduckgo.modalcoordinator.impl.store
 
-import android.os.SystemClock
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.longPreferencesKey
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.modalcoordinator.api.ModalEvaluatorCompletionStore
 import com.duckduckgo.modalcoordinator.impl.di.ModalEvaluatorCompletion
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
+
+interface ModalEvaluatorCompletionStore {
+    /**
+     * Records completion timestamp for any evaluator
+     */
+    suspend fun recordCompletion()
+
+    /**
+     * Checks if evaluator is blocked by 24-hour window due to a modal being shown.
+     * @return true if blocked (within 24 hours of last completion)
+     */
+    suspend fun isBlockedBy24HourWindow(): Boolean
+}
 
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
@@ -53,27 +64,6 @@ class ModalEvaluatorCompletionStoreImpl @Inject constructor(
         }
     }
 
-    override suspend fun getBackgroundedTimestamp(): Long? {
-        return withContext(dispatchers.io()) {
-            val key = getKeyBackgroundedTimestamp()
-            store.data.firstOrNull()?.get(key)
-        }
-    }
-
-    override suspend fun clearBackgroundTimestamp() {
-        withContext(dispatchers.io()) {
-            val key = getKeyBackgroundedTimestamp()
-            store.edit { it.remove(key) }
-        }
-    }
-
-    override suspend fun recordBackgroundedTimestamp() {
-        withContext(dispatchers.io()) {
-            val key = getKeyBackgroundedTimestamp()
-            store.edit { it[key] = SystemClock.elapsedRealtime() }
-        }
-    }
-
     private suspend fun getLastCompletionTimestamp(): Long? {
         return store.data.firstOrNull()?.get(getKeyCompletionTimestamp())
     }
@@ -82,13 +72,8 @@ class ModalEvaluatorCompletionStoreImpl @Inject constructor(
         return longPreferencesKey(KEY_NAME_COMPLETION_TIMESTAMP)
     }
 
-    private fun getKeyBackgroundedTimestamp(): Preferences.Key<Long> {
-        return longPreferencesKey(KEY_NAME_BACKGROUNDED_TIMESTAMP)
-    }
-
     companion object {
         private const val KEY_NAME_COMPLETION_TIMESTAMP = "modal_evaluator_completion_timestamp"
-        private const val KEY_NAME_BACKGROUNDED_TIMESTAMP = "modal_evaluator_backgrounded_timestamp"
         private const val TWENTY_FOUR_HOURS_MILLIS = 24 * 60 * 60 * 1000L
     }
 }

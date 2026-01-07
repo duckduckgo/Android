@@ -68,6 +68,7 @@ dependencies {
     implementation AndroidX.appCompat
     implementation Google.android.material
     implementation AndroidX.constraintLayout
+    api AndroidX.dataStore.preferences
 
     // ViewModel
     implementation AndroidX.lifecycle.runtime.ktx
