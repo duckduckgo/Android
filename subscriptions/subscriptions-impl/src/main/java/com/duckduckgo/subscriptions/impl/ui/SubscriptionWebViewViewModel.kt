@@ -45,6 +45,8 @@ import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_FREE_TRI
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_FREE_TRIAL_OFFER_US
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN_ROW
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN_US
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PRO_PLAN_ROW
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PRO_PLAN_US
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.NETP
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.PIR
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.PLATFORM
@@ -54,6 +56,8 @@ import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_FREE_TRIA
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_FREE_TRIAL_OFFER_US
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PLAN_ROW
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PLAN_US
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PRO_PLAN_ROW
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PRO_PLAN_US
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionFailureErrorType
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
@@ -78,6 +82,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import logcat.logcat
 import org.json.JSONObject
 import javax.inject.Inject
 
@@ -335,6 +340,9 @@ class SubscriptionWebViewViewModel @Inject constructor(
                 id = id,
                 params = JSONObject(tierJsonAdapter.toJson(optionsJson)),
             )
+            logcat {
+                "getSubscriptionTierOptions: JSON Response ${response.params}"
+            }
             command.send(SendResponseToJs(response))
         }
 
@@ -345,51 +353,68 @@ class SubscriptionWebViewViewModel @Inject constructor(
 
             val subscriptionTierOptions = if (privacyProFeature.allowPurchase().isEnabled()) {
                 val subscriptionOffers = subscriptionsManager.getSubscriptionOffer().associateBy { it.offerId ?: it.planId }
-                when {
+                val isFreeTrialEligible = subscriptionsManager.isFreeTrialEligible()
+
+                val products = mutableListOf<ProductJson>()
+                // Check for Plus tier products (with free trial priority)
+                val plusProduct = when {
                     subscriptionOffers.keys.containsAll(listOf(MONTHLY_FREE_TRIAL_OFFER_US, YEARLY_FREE_TRIAL_OFFER_US)) &&
-                        subscriptionsManager.isFreeTrialEligible() -> {
-                        val tier = subscriptionOffers.getValue(MONTHLY_FREE_TRIAL_OFFER_US).tier
-                            .takeUnless { it.isNullOrBlank() } ?: subscriptionOffers.getValue(YEARLY_FREE_TRIAL_OFFER_US).tier
-                        createSubscriptionTierOptions(
-                            tier,
+                        isFreeTrialEligible -> {
+                        buildProductForTier(
                             monthlyOffer = subscriptionOffers.getValue(MONTHLY_FREE_TRIAL_OFFER_US),
                             yearlyOffer = subscriptionOffers.getValue(YEARLY_FREE_TRIAL_OFFER_US),
                         )
                     }
 
                     subscriptionOffers.keys.containsAll(listOf(MONTHLY_FREE_TRIAL_OFFER_ROW, YEARLY_FREE_TRIAL_OFFER_ROW)) &&
-                        subscriptionsManager.isFreeTrialEligible() -> {
-                        val tier = subscriptionOffers.getValue(MONTHLY_FREE_TRIAL_OFFER_ROW).tier
-                            .takeUnless { it.isNullOrBlank() } ?: subscriptionOffers.getValue(YEARLY_FREE_TRIAL_OFFER_ROW).tier
-                        createSubscriptionTierOptions(
-                            tier,
+                        isFreeTrialEligible -> {
+                        buildProductForTier(
                             monthlyOffer = subscriptionOffers.getValue(MONTHLY_FREE_TRIAL_OFFER_ROW),
                             yearlyOffer = subscriptionOffers.getValue(YEARLY_FREE_TRIAL_OFFER_ROW),
                         )
                     }
 
                     subscriptionOffers.keys.containsAll(listOf(MONTHLY_PLAN_US, YEARLY_PLAN_US)) -> {
-                        val tier = subscriptionOffers.getValue(MONTHLY_PLAN_US).tier
-                            .takeUnless { it.isNullOrBlank() } ?: subscriptionOffers.getValue(YEARLY_PLAN_US).tier
-                        createSubscriptionTierOptions(
-                            tier,
+                        buildProductForTier(
                             monthlyOffer = subscriptionOffers.getValue(MONTHLY_PLAN_US),
                             yearlyOffer = subscriptionOffers.getValue(YEARLY_PLAN_US),
                         )
                     }
 
                     subscriptionOffers.keys.containsAll(listOf(MONTHLY_PLAN_ROW, YEARLY_PLAN_ROW)) -> {
-                        val tier = subscriptionOffers.getValue(MONTHLY_PLAN_ROW).tier
-                            .takeUnless { it.isNullOrBlank() } ?: subscriptionOffers.getValue(YEARLY_PLAN_ROW).tier
-                        createSubscriptionTierOptions(
-                            tier,
+                        buildProductForTier(
                             monthlyOffer = subscriptionOffers.getValue(MONTHLY_PLAN_ROW),
                             yearlyOffer = subscriptionOffers.getValue(YEARLY_PLAN_ROW),
                         )
                     }
 
-                    else -> defaultOptions
+                    else -> null
                 }
+                plusProduct?.let { products.add(it) }
+
+                // Check for Pro tier products (gated by feature flag)
+                val proProduct = if (privacyProFeature.allowProTierPurchase().isEnabled()) {
+                    when {
+                        subscriptionOffers.keys.containsAll(listOf(MONTHLY_PRO_PLAN_US, YEARLY_PRO_PLAN_US)) -> {
+                            buildProductForTier(
+                                monthlyOffer = subscriptionOffers.getValue(MONTHLY_PRO_PLAN_US),
+                                yearlyOffer = subscriptionOffers.getValue(YEARLY_PRO_PLAN_US),
+                            )
+                        }
+                        subscriptionOffers.keys.containsAll(listOf(MONTHLY_PRO_PLAN_ROW, YEARLY_PRO_PLAN_ROW)) -> {
+                            buildProductForTier(
+                                monthlyOffer = subscriptionOffers.getValue(MONTHLY_PRO_PLAN_ROW),
+                                yearlyOffer = subscriptionOffers.getValue(YEARLY_PRO_PLAN_ROW),
+                            )
+                        }
+                        else -> null
+                    }
+                } else {
+                    null
+                }
+                proProduct?.let { products.add(it) }
+
+                SubscriptionTierOptionsJson(products = products)
             } else {
                 defaultOptions
             }
@@ -398,11 +423,12 @@ class SubscriptionWebViewViewModel @Inject constructor(
         }
     }
 
-    private suspend fun createSubscriptionTierOptions(
-        productTier: String,
+    private suspend fun buildProductForTier(
         monthlyOffer: SubscriptionOffer,
         yearlyOffer: SubscriptionOffer,
-    ): SubscriptionTierOptionsJson {
+    ): ProductJson {
+        val tier = monthlyOffer.tier.takeUnless { it.isBlank() } ?: yearlyOffer.tier
+
         val tierFeatures = monthlyOffer.entitlements.map { entitlement ->
             TierFeatureJson(
                 product = entitlement.product,
@@ -410,17 +436,13 @@ class SubscriptionWebViewViewModel @Inject constructor(
             )
         }
 
-        val product = ProductJson(
-            tier = productTier,
+        return ProductJson(
+            tier = tier,
             features = tierFeatures,
             options = listOf(
                 createOptionsJson(yearlyOffer, YEARLY.lowercase()),
                 createOptionsJson(monthlyOffer, MONTHLY.lowercase()),
             ),
-        )
-
-        return SubscriptionTierOptionsJson(
-            products = listOf(product),
         )
     }
 

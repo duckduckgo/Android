@@ -26,6 +26,8 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.subscriptions.impl.SubscriptionTier
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.ADVANCED_SUBSCRIPTION
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.BASIC_SUBSCRIPTION
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.LIST_OF_PRODUCTS
 import com.duckduckgo.subscriptions.impl.billing.BillingError.ERROR
@@ -216,7 +218,8 @@ class RealPlayBillingManager @Inject constructor(
             connect()
         }
 
-        val productDetails = products.find { it.productId == BASIC_SUBSCRIPTION }
+        val subscriptionProduct = SubscriptionTier.fromPlanId(planId).productId
+        val productDetails = products.find { it.productId == subscriptionProduct }
 
         val offerToken = productDetails
             ?.subscriptionOfferDetails
@@ -275,7 +278,9 @@ class RealPlayBillingManager @Inject constructor(
             return@withContext
         }
 
-        val productDetails = products.find { it.productId == BASIC_SUBSCRIPTION }
+        val subscriptionProduct = SubscriptionTier.fromPlanId(newPlanId).productId
+
+        val productDetails = products.find { it.productId == subscriptionProduct }
 
         val offerToken = productDetails
             ?.subscriptionOfferDetails
@@ -384,8 +389,9 @@ class RealPlayBillingManager @Inject constructor(
     }
 
     override fun getLatestPurchaseToken(): String? {
+        // TODO milestone4: en deferred (user downgrade), check if purchaseState is PURCHASED
         val activePurchases = purchases.filter { purchase: Purchase ->
-            purchase.products.contains(BASIC_SUBSCRIPTION) &&
+            (purchase.products.contains(BASIC_SUBSCRIPTION) || purchase.products.contains(ADVANCED_SUBSCRIPTION)) &&
                 purchase.purchaseState == Purchase.PurchaseState.PURCHASED
         }
 

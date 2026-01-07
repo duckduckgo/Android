@@ -275,6 +275,9 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
             }
         }
 
+        logcat {
+            "SubscriptionsWebViewActivity: Loading subscriptions webview with URL: ${params.url}"
+        }
         binding.webview.loadUrl(params.url)
 
         viewModel.start()

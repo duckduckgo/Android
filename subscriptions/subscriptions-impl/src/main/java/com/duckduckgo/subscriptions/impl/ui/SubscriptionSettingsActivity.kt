@@ -35,6 +35,7 @@ import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.mobile.android.R
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.subscriptions.api.ActiveOfferType
 import com.duckduckgo.subscriptions.api.PrivacyProFeedbackScreens.PrivacyProFeedbackScreenWithParams
@@ -44,6 +45,10 @@ import com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.EXPIRED
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.INACTIVE
 import com.duckduckgo.subscriptions.impl.R.*
+import com.duckduckgo.subscriptions.impl.SubscriptionTier.PLUS
+import com.duckduckgo.subscriptions.impl.SubscriptionTier.PRO
+import com.duckduckgo.subscriptions.impl.SubscriptionTier.UNKNOWN
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.ADVANCED_SUBSCRIPTION
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.BASIC_SUBSCRIPTION
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.FAQS_URL
 import com.duckduckgo.subscriptions.impl.databinding.ActivitySubscriptionSettingsBinding
@@ -129,6 +134,14 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
             goToPurchasePage()
         }
 
+        binding.viewAllPlansTop.setClickListener {
+            goToPlansPage()
+        }
+
+        binding.upgradeToProContainer.setOnClickListener {
+            goToUpgradeToProPage()
+        }
+
         binding.privacyPolicy.setOnClickListener {
             goToPrivacyPolicy()
         }
@@ -170,6 +183,28 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
             binding.changePlan.isVisible = true
             binding.subscriptionActiveStatusContainer.isVisible = true
             binding.subscriptionExpiredStatusContainer.isVisible = false
+
+            if (viewState.isProTierEnabled) {
+                val tier = viewState.subscriptionTier
+
+                binding.tierPill.isVisible = true
+                binding.viewAllPlansTop.isVisible = true
+                when (tier) {
+                    PRO -> {
+                        binding.tierPill.setImageResource(R.drawable.ic_pro_pill)
+                    }
+
+                    PLUS -> {
+                        binding.tierPill.setImageResource(R.drawable.ic_plus_pill)
+                        binding.upgradeToProContainer.isVisible = true
+                    }
+
+                    UNKNOWN -> {
+                        // In case of unknown tier, we hide the pill
+                        binding.tierPill.gone()
+                    }
+                }
+            }
 
             // Show switch plan option if available (Android only)
             if (viewState.switchPlanAvailable && viewState.platform.lowercase() == "google") {
@@ -233,7 +268,12 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
                 else -> {
                     binding.changePlan.setClickListener {
                         pixelSender.reportSubscriptionSettingsChangePlanOrBillingClick()
-                        val url = String.format(URL, BASIC_SUBSCRIPTION, applicationContext.packageName)
+                        val productSKU = if (viewState.subscriptionTier == PRO) {
+                            ADVANCED_SUBSCRIPTION
+                        } else {
+                            BASIC_SUBSCRIPTION
+                        }
+                        val url = String.format(URL, productSKU, applicationContext.packageName)
                         val intent = Intent(Intent.ACTION_VIEW)
                         intent.setData(Uri.parse(url))
                         startActivity(intent)
@@ -339,6 +379,24 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
             context = this,
             params = SubscriptionsWebViewActivityWithParams(
                 url = subscriptionsUrlProvider.buyUrl,
+            ),
+        )
+    }
+
+    private fun goToPlansPage() {
+        globalActivityStarter.start(
+            context = this,
+            params = SubscriptionsWebViewActivityWithParams(
+                url = subscriptionsUrlProvider.plansUrl,
+            ),
+        )
+    }
+
+    private fun goToUpgradeToProPage() {
+        globalActivityStarter.start(
+            context = this,
+            params = SubscriptionsWebViewActivityWithParams(
+                url = subscriptionsUrlProvider.upgradeToProUrl,
             ),
         )
     }

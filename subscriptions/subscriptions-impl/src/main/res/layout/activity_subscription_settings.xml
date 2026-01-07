@@ -105,12 +105,43 @@
                     app:textType="secondary"
                     app:typography="body2" />
 
+                <ImageView
+                    android:id="@+id/tierPill"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/keyline_2"
+                    tools:src="@drawable/ic_pro_pill"
+                    android:visibility="gone"
+                    tools:visibility="visible" />
+
             </LinearLayout>
 
             <com.duckduckgo.common.ui.view.divider.HorizontalDivider
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/keyline_4" />
+
+            <LinearLayout
+                android:id="@+id/upgradeToProContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:leadingIcon="@drawable/ic_ai_chat_advanced"
+                    app:primaryText="@string/subscriptionsProUpgradeTitle"
+                    app:primaryTextColorOverlay="?attr/daxColorAccentBlue"
+                    app:secondaryTextColorOverlay="?attr/daxColorPrimaryText"
+                    app:secondaryText="@string/subscriptionsProUpgradeMessage" />
+
+                <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+            </LinearLayout>
 
             <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
                 android:id="@+id/activateOnOtherDevices"
@@ -144,7 +175,15 @@
             <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:primaryText="@string/subscriptionSettingSectionSubscription" />
+                app:primaryText="@string/subscriptionSettingSectionManageSubscription" />
+
+            <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+                android:id="@+id/viewAllPlansTop"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:primaryText="@string/subscriptionSettingViewAllPlans"
+                tools:visibility="visible" />
 
             <com.duckduckgo.common.ui.view.listitem.OneLineListItem
                 android:id="@+id/switchPlan"
@@ -159,7 +198,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:visibility="gone"
-                app:primaryText="@string/subscriptionSettingManagePlan"
+                app:primaryText="@string/subscriptionSettingUpdatePaymentOrCancel"
                 tools:secondaryText="Your monthly subscription renews on April 20, 2027."
                 tools:visibility="visible" />
 
