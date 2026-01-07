@@ -16,17 +16,32 @@
 
 package com.duckduckgo.subscriptions.impl
 
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.LIST_OF_PLUS_PLANS
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.LIST_OF_PRO_PLANS
+
 object SubscriptionsConstants {
 
     // List of subscriptions
     const val BASIC_SUBSCRIPTION = "ddg_privacy_pro"
-    val LIST_OF_PRODUCTS = listOf(BASIC_SUBSCRIPTION)
+    const val ADVANCED_SUBSCRIPTION = "ddg_subscription_pro"
+    val LIST_OF_PRODUCTS = listOf(BASIC_SUBSCRIPTION, ADVANCED_SUBSCRIPTION)
 
     // List of plans
     const val YEARLY_PLAN_US = "ddg-privacy-pro-yearly-renews-us"
     const val MONTHLY_PLAN_US = "ddg-privacy-pro-monthly-renews-us"
     const val YEARLY_PLAN_ROW = "ddg-privacy-pro-yearly-renews-row"
     const val MONTHLY_PLAN_ROW = "ddg-privacy-pro-monthly-renews-row"
+
+    val LIST_OF_PLUS_PLANS =
+        listOf(YEARLY_PLAN_US, MONTHLY_PLAN_US, YEARLY_PLAN_ROW, MONTHLY_PLAN_ROW)
+
+    const val YEARLY_PRO_PLAN_US = "ddg-subscription-pro-sandbox-yearly-renews-us"
+    const val MONTHLY_PRO_PLAN_US = "ddg-subscription-pro-sandbox-monthly-renews-us"
+    const val YEARLY_PRO_PLAN_ROW = "ddg-subscription-pro-sandbox-yearly-renews-row"
+    const val MONTHLY_PRO_PLAN_ROW = "ddg-subscription-pro-sandbox-monthly-renews-row"
+
+    val LIST_OF_PRO_PLANS =
+        listOf(YEARLY_PRO_PLAN_US, MONTHLY_PRO_PLAN_US, YEARLY_PRO_PLAN_ROW, MONTHLY_PRO_PLAN_ROW)
 
     // List of offers
     const val MONTHLY_FREE_TRIAL_OFFER_US = "ddg-privacy-pro-freetrial-monthly-renews-us"
@@ -61,4 +76,29 @@ object SubscriptionsConstants {
     const val FEATURE_PAGE_QUERY_PARAM_KEY = "featurePage"
     const val PRIVACY_PRO_PATH = "pro"
     const val PRIVACY_SUBSCRIPTIONS_PATH = "subscriptions"
+}
+
+enum class SubscriptionTier(val value: String) {
+    PLUS("plus"),
+    PRO("pro"),
+    UNKNOWN("unknown"),
+    ;
+
+    val productId: String
+        get() = when (this) {
+            PLUS -> SubscriptionsConstants.BASIC_SUBSCRIPTION
+            PRO -> SubscriptionsConstants.ADVANCED_SUBSCRIPTION
+            UNKNOWN -> SubscriptionsConstants.BASIC_SUBSCRIPTION // fallback to basic
+        }
+
+    companion object {
+        private val PLAN_TO_TIER: Map<SubscriptionTier, List<String>> = mapOf(
+            PLUS to LIST_OF_PLUS_PLANS,
+            PRO to LIST_OF_PRO_PLANS,
+        )
+
+        fun fromPlanId(planId: String): SubscriptionTier {
+            return PLAN_TO_TIER.entries.find { it.value.contains(planId) }?.key ?: UNKNOWN
+        }
+    }
 }
