@@ -94,6 +94,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
 
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
     private val jsonAdapter: JsonAdapter<SubscriptionOptionsJson> = moshi.adapter(SubscriptionOptionsJson::class.java)
+    private val tierJsonAdapter: JsonAdapter<SubscriptionTierOptionsJson> = moshi.adapter(SubscriptionTierOptionsJson::class.java)
 
     private val command = Channel<Command>(1, DROP_OLDEST)
     internal fun commands(): Flow<Command> = command.receiveAsFlow()
@@ -148,6 +149,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
             "backToSettings" -> backToSettings()
             "backToSettingsActivateSuccess" -> backToSettingsActiveSuccess()
             "getSubscriptionOptions" -> id?.let { getSubscriptionOptions(featureName, method, it) }
+            "getSubscriptionTierOptions" -> id?.let { getSubscriptionTierOptions(featureName, method, it) }
             "subscriptionSelected" -> subscriptionSelected(data)
             "activateSubscription" -> activateSubscription()
             "featureSelected" -> data?.let { featureSelected(data) }
@@ -321,6 +323,107 @@ class SubscriptionWebViewViewModel @Inject constructor(
         }
     }
 
+    private fun getSubscriptionTierOptions(
+        featureName: String,
+        method: String,
+        id: String,
+    ) {
+        suspend fun sendTierOptionJson(optionsJson: SubscriptionTierOptionsJson) {
+            val response = JsCallbackData(
+                featureName = featureName,
+                method = method,
+                id = id,
+                params = JSONObject(tierJsonAdapter.toJson(optionsJson)),
+            )
+            command.send(SendResponseToJs(response))
+        }
+
+        viewModelScope.launch(dispatcherProvider.io()) {
+            val defaultOptions = SubscriptionTierOptionsJson(
+                products = emptyList(),
+            )
+
+            val subscriptionTierOptions = if (privacyProFeature.allowPurchase().isEnabled()) {
+                val subscriptionOffers = subscriptionsManager.getSubscriptionOffer().associateBy { it.offerId ?: it.planId }
+                when {
+                    subscriptionOffers.keys.containsAll(listOf(MONTHLY_FREE_TRIAL_OFFER_US, YEARLY_FREE_TRIAL_OFFER_US)) &&
+                        subscriptionsManager.isFreeTrialEligible() -> {
+                        val tier = subscriptionOffers.getValue(MONTHLY_FREE_TRIAL_OFFER_US).tier
+                            .takeUnless { it.isNullOrBlank() } ?: subscriptionOffers.getValue(YEARLY_FREE_TRIAL_OFFER_US).tier
+                        createSubscriptionTierOptions(
+                            tier,
+                            monthlyOffer = subscriptionOffers.getValue(MONTHLY_FREE_TRIAL_OFFER_US),
+                            yearlyOffer = subscriptionOffers.getValue(YEARLY_FREE_TRIAL_OFFER_US),
+                        )
+                    }
+
+                    subscriptionOffers.keys.containsAll(listOf(MONTHLY_FREE_TRIAL_OFFER_ROW, YEARLY_FREE_TRIAL_OFFER_ROW)) &&
+                        subscriptionsManager.isFreeTrialEligible() -> {
+                        val tier = subscriptionOffers.getValue(MONTHLY_FREE_TRIAL_OFFER_ROW).tier
+                            .takeUnless { it.isNullOrBlank() } ?: subscriptionOffers.getValue(YEARLY_FREE_TRIAL_OFFER_ROW).tier
+                        createSubscriptionTierOptions(
+                            tier,
+                            monthlyOffer = subscriptionOffers.getValue(MONTHLY_FREE_TRIAL_OFFER_ROW),
+                            yearlyOffer = subscriptionOffers.getValue(YEARLY_FREE_TRIAL_OFFER_ROW),
+                        )
+                    }
+
+                    subscriptionOffers.keys.containsAll(listOf(MONTHLY_PLAN_US, YEARLY_PLAN_US)) -> {
+                        val tier = subscriptionOffers.getValue(MONTHLY_PLAN_US).tier
+                            .takeUnless { it.isNullOrBlank() } ?: subscriptionOffers.getValue(YEARLY_PLAN_US).tier
+                        createSubscriptionTierOptions(
+                            tier,
+                            monthlyOffer = subscriptionOffers.getValue(MONTHLY_PLAN_US),
+                            yearlyOffer = subscriptionOffers.getValue(YEARLY_PLAN_US),
+                        )
+                    }
+
+                    subscriptionOffers.keys.containsAll(listOf(MONTHLY_PLAN_ROW, YEARLY_PLAN_ROW)) -> {
+                        val tier = subscriptionOffers.getValue(MONTHLY_PLAN_ROW).tier
+                            .takeUnless { it.isNullOrBlank() } ?: subscriptionOffers.getValue(YEARLY_PLAN_ROW).tier
+                        createSubscriptionTierOptions(
+                            tier,
+                            monthlyOffer = subscriptionOffers.getValue(MONTHLY_PLAN_ROW),
+                            yearlyOffer = subscriptionOffers.getValue(YEARLY_PLAN_ROW),
+                        )
+                    }
+
+                    else -> defaultOptions
+                }
+            } else {
+                defaultOptions
+            }
+
+            sendTierOptionJson(subscriptionTierOptions)
+        }
+    }
+
+    private suspend fun createSubscriptionTierOptions(
+        productTier: String,
+        monthlyOffer: SubscriptionOffer,
+        yearlyOffer: SubscriptionOffer,
+    ): SubscriptionTierOptionsJson {
+        val tierFeatures = monthlyOffer.entitlements.map { entitlement ->
+            TierFeatureJson(
+                product = entitlement.product,
+                name = entitlement.name,
+            )
+        }
+
+        val product = ProductJson(
+            tier = productTier,
+            features = tierFeatures,
+            options = listOf(
+                createOptionsJson(yearlyOffer, YEARLY.lowercase()),
+                createOptionsJson(monthlyOffer, MONTHLY.lowercase()),
+            ),
+        )
+
+        return SubscriptionTierOptionsJson(
+            products = listOf(product),
+        )
+    }
+
     private suspend fun createSubscriptionOptions(
         monthlyOffer: SubscriptionOffer,
         yearlyOffer: SubscriptionOffer,
@@ -411,6 +514,23 @@ class SubscriptionWebViewViewModel @Inject constructor(
     )
 
     data class FeatureJson(val name: String)
+
+    // New tier-based data classes for getSubscriptionTierOptions
+    data class SubscriptionTierOptionsJson(
+        val platform: String = PLATFORM,
+        val products: List<ProductJson>,
+    )
+
+    data class ProductJson(
+        val tier: String,
+        val features: List<TierFeatureJson>,
+        val options: List<OptionsJson>,
+    )
+
+    data class TierFeatureJson(
+        val product: String,
+        val name: String,
+    )
 
     enum class OfferType(val type: String) {
         FREE_TRIAL("freeTrial"),

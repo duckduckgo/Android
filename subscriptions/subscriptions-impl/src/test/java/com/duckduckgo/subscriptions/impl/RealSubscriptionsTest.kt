@@ -36,6 +36,7 @@ import com.duckduckgo.subscriptions.api.SubscriptionStatus.UNKNOWN
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.WAITING
 import com.duckduckgo.subscriptions.impl.internal.DefaultSubscriptionsBaseUrl
 import com.duckduckgo.subscriptions.impl.internal.RealSubscriptionsUrlProvider
+import com.duckduckgo.subscriptions.impl.model.Entitlement
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionsWebViewActivityWithParams
 import kotlinx.coroutines.flow.flowOf
@@ -76,8 +77,9 @@ class RealSubscriptionsTest {
         SubscriptionOffer(
             planId = "test",
             offerId = null,
+            tier = "plus",
             pricingPhases = emptyList(),
-            features = setOf(SubscriptionsConstants.NETP),
+            entitlements = setOf(Entitlement("plus", SubscriptionsConstants.NETP)),
         ),
     )
 

@@ -29,6 +29,7 @@ import com.duckduckgo.subscriptions.api.SubscriptionStatus.INACTIVE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.NOT_AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.UNKNOWN
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.WAITING
+import com.duckduckgo.subscriptions.impl.PrivacyProFeature
 import com.duckduckgo.subscriptions.impl.model.Entitlement
 import com.duckduckgo.subscriptions.impl.serp_promo.SerpPromo
 import com.duckduckgo.subscriptions.impl.store.SubscriptionsDataStore
@@ -64,6 +65,8 @@ interface AuthRepository {
     suspend fun canSupportEncryption(): Boolean
     suspend fun setFeatures(basePlanId: String, features: Set<String>)
     suspend fun getFeatures(basePlanId: String): Set<String>
+    suspend fun setFeaturesV2(basePlanId: String, features: Set<Entitlement>)
+    suspend fun getFeaturesV2(basePlanId: String): Set<Entitlement>
     suspend fun isFreeTrialActive(): Boolean
     suspend fun registerLocalPurchasedAt()
     suspend fun getLocalPurchasedAt(): Long?
@@ -79,8 +82,9 @@ object AuthRepositoryModule {
         dispatcherProvider: DispatcherProvider,
         sharedPreferencesProvider: SharedPreferencesProvider,
         serpPromo: SerpPromo,
+        privacyProFeature: dagger.Lazy<PrivacyProFeature>,
     ): AuthRepository {
-        return RealAuthRepository(SubscriptionsEncryptedDataStore(sharedPreferencesProvider), dispatcherProvider, serpPromo)
+        return RealAuthRepository(SubscriptionsEncryptedDataStore(sharedPreferencesProvider), dispatcherProvider, serpPromo, privacyProFeature)
     }
 }
 
@@ -88,6 +92,7 @@ internal class RealAuthRepository constructor(
     private val subscriptionsDataStore: SubscriptionsDataStore,
     private val dispatcherProvider: DispatcherProvider,
     private val serpPromo: SerpPromo,
+    private val privacyProFeature: dagger.Lazy<PrivacyProFeature>,
 ) : AuthRepository {
 
     private val moshi = Builder().build()
@@ -99,6 +104,12 @@ internal class RealAuthRepository constructor(
             Set::class.java,
         )
         moshi.adapter<Map<String, Set<String>>>(type)
+    }
+
+    private val featuresV2Adapter by lazy {
+        val entitlementSetType = Types.newParameterizedType(Set::class.java, Entitlement::class.java)
+        val mapType = Types.newParameterizedType(Map::class.java, String::class.java, entitlementSetType)
+        moshi.adapter<Map<String, Set<Entitlement>>>(mapType)
     }
 
     private inline fun <reified T> Moshi.listToJson(list: List<T>): String {
@@ -228,8 +239,34 @@ internal class RealAuthRepository constructor(
     }
 
     override suspend fun getFeatures(basePlanId: String): Set<String> = withContext(dispatcherProvider.io()) {
-        subscriptionsDataStore.subscriptionFeatures
+        if (privacyProFeature.get().tierMessagingEnabled().isEnabled()) {
+            // When flag is ON, try v2 first
+            val v2Features = getFeaturesV2(basePlanId)
+            if (v2Features.isNotEmpty()) {
+                return@withContext v2Features.map { it.product }.toSet()
+            }
+            // Fallback to v1 for smooth runtime flag transitions (until fetcher runs on next app start)
+        }
+        // Use v1 storage
+        return@withContext subscriptionsDataStore.subscriptionFeatures
             ?.let(featuresAdapter::fromJson)
+            ?.get(basePlanId) ?: emptySet()
+    }
+
+    override suspend fun setFeaturesV2(
+        basePlanId: String,
+        features: Set<Entitlement>,
+    ) = withContext(dispatcherProvider.io()) {
+        val featuresMap = subscriptionsDataStore.subscriptionEntitlements
+            ?.let(featuresV2Adapter::fromJson)
+            ?.toMutableMap() ?: mutableMapOf()
+        featuresMap[basePlanId] = features
+        subscriptionsDataStore.subscriptionEntitlements = featuresV2Adapter.toJson(featuresMap)
+    }
+
+    override suspend fun getFeaturesV2(basePlanId: String): Set<Entitlement> = withContext(dispatcherProvider.io()) {
+        subscriptionsDataStore.subscriptionEntitlements
+            ?.let(featuresV2Adapter::fromJson)
             ?.get(basePlanId) ?: emptySet()
     }
 

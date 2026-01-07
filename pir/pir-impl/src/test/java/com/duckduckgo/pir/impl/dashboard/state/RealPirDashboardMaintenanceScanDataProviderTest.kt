@@ -22,6 +22,7 @@ import com.duckduckgo.pir.impl.models.AddressCityState
 import com.duckduckgo.pir.impl.models.Broker
 import com.duckduckgo.pir.impl.models.ExtractedProfile
 import com.duckduckgo.pir.impl.models.MirrorSite
+import com.duckduckgo.pir.impl.models.ProfileQuery
 import com.duckduckgo.pir.impl.models.scheduling.BrokerSchedulingConfig
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.OptOutJobRecord
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.OptOutJobRecord.OptOutJobStatus
@@ -105,23 +106,120 @@ class RealPirDashboardMaintenanceScanDataProviderTest {
             ),
         )
 
+        val validProfileQueries = listOf(createProfileQuery(id = 1L))
+
         whenever(mockPirRepository.getAllExtractedProfiles()).thenReturn(extractedProfiles)
         whenever(mockPirRepository.getAllActiveBrokerObjects()).thenReturn(activeBrokers)
         whenever(mockPirRepository.getAllBrokerOptOutUrls()).thenReturn(emptyMap())
         whenever(mockPirSchedulingRepository.getAllValidOptOutJobRecords()).thenReturn(optOutJobs)
         whenever(mockPirRepository.getAllMirrorSites()).thenReturn(emptyList())
+        whenever(mockPirRepository.getValidUserProfileQueries()).thenReturn(validProfileQueries)
 
         // When
         val result = testee.getInProgressOptOuts()
 
         // Then
-        assertEquals(2, result.size) // Only profile 1 should be in progress
+        assertEquals(2, result.size) // Only profile 1 and 3 should be in progress (not removed)
         assertEquals("John Doe", result[0].extractedProfile.name)
         assertEquals(currentTime - 1000, result[0].optOutSubmittedDateInMillis)
         assertEquals(0L, result[0].optOutRemovedDateInMillis)
         assertEquals("Joe Smith", result[1].extractedProfile.name)
         assertEquals(0L, result[1].optOutSubmittedDateInMillis)
         assertEquals(0L, result[0].optOutRemovedDateInMillis)
+    }
+
+    @Test
+    fun whenProfileQueryIsDeprecatedThenGetInProgressOptOutsFiltersItOut() = runTest {
+        // Given
+        val extractedProfiles = listOf(
+            createExtractedProfile(dbId = 1L, brokerName = "broker1", name = "John Doe", profileQueryId = 1L),
+            createExtractedProfile(dbId = 2L, brokerName = "broker1", name = "Jane Smith", profileQueryId = 2L),
+            createExtractedProfile(dbId = 3L, brokerName = "broker1", name = "Joe Smith", profileQueryId = 3L),
+        )
+        val activeBrokers = listOf(createBroker("broker1"))
+        val optOutJobs = listOf(
+            createOptOutJobRecord(
+                extractedProfileId = 1L,
+                status = OptOutJobStatus.REQUESTED,
+                optOutRequestedDateInMillis = currentTime - 1000,
+                optOutRemovedDateInMillis = 0L,
+            ),
+            createOptOutJobRecord(
+                extractedProfileId = 2L,
+                status = OptOutJobStatus.REQUESTED,
+                optOutRequestedDateInMillis = currentTime - 2000,
+                optOutRemovedDateInMillis = 0L,
+            ),
+            createOptOutJobRecord(
+                extractedProfileId = 3L,
+                status = OptOutJobStatus.REQUESTED,
+                optOutRequestedDateInMillis = currentTime - 3000,
+                optOutRemovedDateInMillis = 0L,
+            ),
+        )
+        // Only profile queries 1 and 3 are valid (non-deprecated), profile query 2 is deprecated
+        val validProfileQueries = listOf(
+            createProfileQuery(id = 1L),
+            createProfileQuery(id = 3L),
+        )
+
+        whenever(mockPirRepository.getAllExtractedProfiles()).thenReturn(extractedProfiles)
+        whenever(mockPirRepository.getAllActiveBrokerObjects()).thenReturn(activeBrokers)
+        whenever(mockPirRepository.getAllBrokerOptOutUrls()).thenReturn(emptyMap())
+        whenever(mockPirSchedulingRepository.getAllValidOptOutJobRecords()).thenReturn(optOutJobs)
+        whenever(mockPirRepository.getAllMirrorSites()).thenReturn(emptyList())
+        whenever(mockPirRepository.getValidUserProfileQueries()).thenReturn(validProfileQueries)
+
+        // When
+        val result = testee.getInProgressOptOuts()
+
+        // Then - profile 2 (Jane Smith) should be filtered out because its profile query is deprecated
+        assertEquals(2, result.size)
+        assertEquals("John Doe", result[0].extractedProfile.name)
+        assertEquals("Joe Smith", result[1].extractedProfile.name)
+    }
+
+    @Test
+    fun whenProfileQueryIsDeprecatedThenGetRemovedOptOutsIncludesIt() = runTest {
+        // Given - getRemovedOptOuts should include results for deprecated profile queries
+        val extractedProfiles = listOf(
+            createExtractedProfile(dbId = 1L, brokerName = "broker1", name = "John Doe", profileQueryId = 1L),
+            createExtractedProfile(dbId = 2L, brokerName = "broker1", name = "Jane Smith", profileQueryId = 2L),
+        )
+        val activeBrokers = listOf(createBroker("broker1"))
+        val optOutJobs = listOf(
+            createOptOutJobRecord(
+                extractedProfileId = 1L,
+                status = OptOutJobStatus.REMOVED,
+                optOutRequestedDateInMillis = currentTime - 2000,
+                optOutRemovedDateInMillis = currentTime - 500,
+            ),
+            createOptOutJobRecord(
+                extractedProfileId = 2L,
+                status = OptOutJobStatus.REMOVED,
+                optOutRequestedDateInMillis = currentTime - 3000,
+                optOutRemovedDateInMillis = currentTime - 1000,
+            ),
+        )
+        // Only profile query 1 is valid (non-deprecated), profile query 2 is deprecated
+        val validProfileQueries = listOf(createProfileQuery(id = 1L))
+
+        whenever(mockPirRepository.getAllExtractedProfiles()).thenReturn(extractedProfiles)
+        whenever(mockPirRepository.getAllActiveBrokerObjects()).thenReturn(activeBrokers)
+        whenever(mockPirRepository.getAllBrokerOptOutUrls()).thenReturn(emptyMap())
+        whenever(mockPirSchedulingRepository.getAllValidOptOutJobRecords()).thenReturn(optOutJobs)
+        whenever(mockPirRepository.getAllMirrorSites()).thenReturn(emptyList())
+        whenever(mockPirRepository.getValidUserProfileQueries()).thenReturn(validProfileQueries)
+
+        // When
+        val result = testee.getRemovedOptOuts()
+
+        // Then - both should be included since getRemovedOptOuts includes deprecated profile queries
+        assertEquals(2, result.size)
+        val johnDoeResult = result.find { it.result.extractedProfile.name == "John Doe" }!!
+        assertEquals(currentTime - 500, johnDoeResult.result.optOutRemovedDateInMillis)
+        val janeSmithResult = result.find { it.result.extractedProfile.name == "Jane Smith" }!!
+        assertEquals(currentTime - 1000, janeSmithResult.result.optOutRemovedDateInMillis)
     }
 
     @Test
@@ -180,11 +278,14 @@ class RealPirDashboardMaintenanceScanDataProviderTest {
             "broker2" to "https://broker2.com/optout",
         )
 
+        val validProfileQueries = listOf(createProfileQuery(id = 1L))
+
         whenever(mockPirRepository.getAllExtractedProfiles()).thenReturn(extractedProfiles)
         whenever(mockPirRepository.getAllActiveBrokerObjects()).thenReturn(activeBrokers)
         whenever(mockPirRepository.getAllBrokerOptOutUrls()).thenReturn(brokerOptOutUrls)
         whenever(mockPirSchedulingRepository.getAllValidOptOutJobRecords()).thenReturn(optOutJobs)
         whenever(mockPirRepository.getAllMirrorSites()).thenReturn(emptyList())
+        whenever(mockPirRepository.getValidUserProfileQueries()).thenReturn(validProfileQueries)
 
         // When
         val result = testee.getRemovedOptOuts()
@@ -828,6 +929,7 @@ class RealPirDashboardMaintenanceScanDataProviderTest {
         whenever(mockPirRepository.getAllBrokerOptOutUrls()).thenReturn(emptyMap())
         whenever(mockPirSchedulingRepository.getAllValidOptOutJobRecords()).thenReturn(emptyList())
         whenever(mockPirRepository.getAllMirrorSites()).thenReturn(emptyList())
+        whenever(mockPirRepository.getValidUserProfileQueries()).thenReturn(emptyList())
     }
 
     private suspend fun setupForEmptyBrokersAndJobs() {
@@ -891,6 +993,7 @@ class RealPirDashboardMaintenanceScanDataProviderTest {
         dbId: Long,
         brokerName: String,
         name: String,
+        profileQueryId: Long = 1L,
         age: String = "30",
         addresses: List<AddressCityState> = emptyList(),
         alternativeNames: List<String> = emptyList(),
@@ -900,7 +1003,7 @@ class RealPirDashboardMaintenanceScanDataProviderTest {
     ): ExtractedProfile {
         return ExtractedProfile(
             dbId = dbId,
-            profileQueryId = 1L,
+            profileQueryId = profileQueryId,
             brokerName = brokerName,
             name = name,
             alternativeNames = alternativeNames,
@@ -943,6 +1046,25 @@ class RealPirDashboardMaintenanceScanDataProviderTest {
             confirmOptOutScanInMillis = confirmOptOutScanInMillis,
             maintenanceScanInMillis = maintenanceScanInMillis,
             maxAttempts = maxAttempts,
+        )
+    }
+
+    private fun createProfileQuery(
+        id: Long,
+        firstName: String = "John",
+        lastName: String = "Doe",
+    ): ProfileQuery {
+        return ProfileQuery(
+            id = id,
+            firstName = firstName,
+            lastName = lastName,
+            city = "New York",
+            state = "NY",
+            addresses = emptyList(),
+            birthYear = 1990,
+            fullName = "$firstName $lastName",
+            age = 34,
+            deprecated = false,
         )
     }
 }

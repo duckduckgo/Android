@@ -2066,6 +2066,12 @@ class BrowserTabFragment :
                 browserActivity?.launchNewTab()
             }
 
+            is Command.NavigateBackInCustomTab -> {
+                if (isActiveCustomTab() && parentFragmentManager.backStackEntryCount > 0) {
+                    parentFragmentManager.popBackStack()
+                }
+            }
+
             is Command.ShowSavedSiteAddedConfirmation -> savedSiteAdded(it.savedSiteChangedViewState)
             is Command.ShowEditSavedSiteDialog -> editSavedSite(it.savedSiteChangedViewState)
             is Command.DeleteFavoriteConfirmation ->
