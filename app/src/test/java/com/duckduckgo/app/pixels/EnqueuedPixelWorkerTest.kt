@@ -30,7 +30,6 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.customtabs.api.CustomTabDetector
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
-import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupExperimentExternalPixels
 import com.duckduckgo.verifiedinstallation.IsVerifiedPlayStoreInstall
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -52,7 +51,6 @@ class EnqueuedPixelWorkerTest {
     private val customTabDetector: CustomTabDetector = mock()
     private val androidBrowserConfigFeature = FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
     private val isVerifiedPlayStoreInstall: IsVerifiedPlayStoreInstall = mock()
-    private val privacyProtectionsPopupExperimentExternalPixels = FakePrivacyProtectionsPopupExperimentExternalPixels()
     private val appBuildConfig: AppBuildConfig = mock()
 
     private lateinit var enqueuedPixelWorker: EnqueuedPixelWorker
@@ -67,7 +65,6 @@ class EnqueuedPixelWorkerTest {
             defaultBrowserDetector,
             customTabDetector,
             androidBrowserConfigFeature,
-            privacyProtectionsPopupExperimentExternalPixels,
             isVerifiedPlayStoreInstall,
             appBuildConfig,
             appCoroutineScope = coroutineRule.testScope,
@@ -278,27 +275,6 @@ class EnqueuedPixelWorkerTest {
     }
 
     @Test
-    fun whenSendingAppLaunchPixelThenIncludePrivacyProtectionsPopupExperimentParams() {
-        whenever(unsentForgetAllPixelStore.pendingPixelCountClearData).thenReturn(1)
-        whenever(webViewVersionProvider.getMajorVersion()).thenReturn("91")
-        whenever(defaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
-        privacyProtectionsPopupExperimentExternalPixels.params = mapOf("test_key" to "test_value")
-
-        enqueuedPixelWorker.onCreate(lifecycleOwner)
-        enqueuedPixelWorker.onStart(lifecycleOwner)
-
-        verify(pixel).fire(
-            AppPixelName.APP_LAUNCH,
-            mapOf(
-                Pixel.PixelParameter.WEBVIEW_VERSION to "91",
-                Pixel.PixelParameter.DEFAULT_BROWSER to "false",
-                Pixel.PixelParameter.IS_DUCKDUCKGO_PACKAGE to "false",
-                "test_key" to "test_value",
-            ),
-        )
-    }
-
-    @Test
     fun whenOnStartAndVerifiedAppLaunchThenSendVerifiedAppLaunchPixel() {
         whenever(isVerifiedPlayStoreInstall.invoke()).thenReturn(true)
         whenever(unsentForgetAllPixelStore.pendingPixelCountClearData).thenReturn(1)
@@ -347,18 +323,4 @@ class EnqueuedPixelWorkerTest {
         androidBrowserConfigFeature.self().setRawStoredState(State(enable = browserEnabled))
         androidBrowserConfigFeature.collectFullWebViewVersion().setRawStoredState(State(enable = collectFullWebViewVersionEnabled))
     }
-}
-
-private class FakePrivacyProtectionsPopupExperimentExternalPixels : PrivacyProtectionsPopupExperimentExternalPixels {
-    var params: Map<String, String> = emptyMap()
-
-    override suspend fun getPixelParams(): Map<String, String> = params
-
-    override fun tryReportPrivacyDashboardOpened() = throw UnsupportedOperationException()
-
-    override fun tryReportProtectionsToggledFromPrivacyDashboard(protectionsEnabled: Boolean) = throw UnsupportedOperationException()
-
-    override fun tryReportProtectionsToggledFromBrowserMenu(protectionsEnabled: Boolean) = throw UnsupportedOperationException()
-
-    override fun tryReportProtectionsToggledFromBrokenSiteReport(protectionsEnabled: Boolean) = throw UnsupportedOperationException()
 }

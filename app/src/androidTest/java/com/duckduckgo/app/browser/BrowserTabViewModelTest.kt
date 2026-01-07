@@ -277,18 +277,12 @@ import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc.Companion.GPC_HEA
 import com.duckduckgo.privacy.dashboard.api.PrivacyProtectionTogglePlugin
 import com.duckduckgo.privacy.dashboard.api.PrivacyToggleOrigin
 import com.duckduckgo.privacy.dashboard.api.ui.ToggleReports
-import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupExperimentExternalPixels
-import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupManager
-import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupUiEvent
-import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupViewState
-import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsToggleUsageListener
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.savedsites.impl.SavedSitesPixelName
-import com.duckduckgo.serp.logos.api.SerpEasterEggLogosToggles
 import com.duckduckgo.serp.logos.api.SerpLogo
 import com.duckduckgo.settings.api.SerpSettingsFeature
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
@@ -543,18 +537,9 @@ class BrowserTabViewModelTest {
             on { it.isEnabled() } doReturn false
         }
 
-    private val mockPrivacyProtectionsPopupManager: PrivacyProtectionsPopupManager = mock()
-
-    private val mockPrivacyProtectionsToggleUsageListener: PrivacyProtectionsToggleUsageListener = mock()
-
     private val subscriptions: Subscriptions = mock()
 
     private val refreshPixelSender: RefreshPixelSender = mock()
-
-    private val privacyProtectionsPopupExperimentExternalPixels: PrivacyProtectionsPopupExperimentExternalPixels =
-        mock {
-            runBlocking { whenever(mock.getPixelParams()).thenReturn(emptyMap()) }
-        }
 
     private val mockFaviconFetchingPrompt: FaviconsFetchingPrompt = mock()
     private val mockSSLCertificatesFeature: SSLCertificatesFeature = mock()
@@ -600,7 +585,6 @@ class BrowserTabViewModelTest {
         }
     }
 
-    private val mockSerpEasterEggLogoToggles: SerpEasterEggLogosToggles = mock()
     private val mockAddressBarTrackersAnimationManager: AddressBarTrackersAnimationManager = mock()
 
     private val nonHttpAppLinkChecker: NonHttpAppLinkChecker = mock()
@@ -697,7 +681,6 @@ class BrowserTabViewModelTest {
             whenever(mockExternalIntentProcessingState.hasPendingTabLaunch).thenReturn(mockHasPendingTabLaunchFlow)
             whenever(mockExternalIntentProcessingState.hasPendingDuckAiOpen).thenReturn(mockHasPendingDuckAiOpenFlow)
             whenever(mockVpnMenuStateProvider.getVpnMenuState()).thenReturn(flowOf(VpnMenuState.Hidden))
-            whenever(mockSerpEasterEggLogoToggles.feature()).thenReturn(mockDisabledToggle)
             whenever(nonHttpAppLinkChecker.isPermitted(anyOrNull())).thenReturn(true)
             remoteMessagingModel = givenRemoteMessagingModel(mockRemoteMessagingRepository, mockPixel, coroutineRule.testDispatcherProvider)
             runBlocking { whenever(mockAddressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(false) }
@@ -740,7 +723,6 @@ class BrowserTabViewModelTest {
             whenever(mockContentBlocking.isAnException(anyString())).thenReturn(false)
             whenever(fireproofDialogsEventHandler.event).thenReturn(fireproofDialogsEventHandlerLiveData)
             whenever(cameraHardwareChecker.hasCameraHardware()).thenReturn(true)
-            whenever(mockPrivacyProtectionsPopupManager.viewState).thenReturn(flowOf(PrivacyProtectionsPopupViewState.Gone))
             whenever(mockAppBuildConfig.buildType).thenReturn("debug")
             whenever(mockDuckPlayer.observeUserPreferences()).thenReturn(flowOf(UserPreferences(false, AlwaysAsk)))
             whenever(mockAdditionalDefaultBrowserPrompts.showSetAsDefaultPopupMenuItem).thenReturn(
@@ -823,9 +805,6 @@ class BrowserTabViewModelTest {
                 sitePermissionsManager = mockSitePermissionsManager,
                 cameraHardwareChecker = cameraHardwareChecker,
                 androidBrowserConfig = fakeAndroidConfigBrowserFeature,
-                privacyProtectionsPopupManager = mockPrivacyProtectionsPopupManager,
-                privacyProtectionsToggleUsageListener = mockPrivacyProtectionsToggleUsageListener,
-                privacyProtectionsPopupExperimentExternalPixels = privacyProtectionsPopupExperimentExternalPixels,
                 faviconsFetchingPrompt = mockFaviconFetchingPrompt,
                 subscriptions = subscriptions,
                 sslCertificatesFeature = mockSSLCertificatesFeature,
@@ -861,7 +840,6 @@ class BrowserTabViewModelTest {
                 tabManager = tabManager,
                 addressDisplayFormatter = mockAddressDisplayFormatter,
                 autoCompleteSettings = mockAutoCompleteSettings,
-                serpEasterEggLogosToggles = mockSerpEasterEggLogoToggles,
                 nonHttpAppLinkChecker = nonHttpAppLinkChecker,
                 externalIntentProcessingState = mockExternalIntentProcessingState,
                 vpnMenuStateProvider = mockVpnMenuStateProvider,
@@ -2924,11 +2902,27 @@ class BrowserTabViewModelTest {
         }
 
     @Test
-    fun whenCloseCurrentTabSelectedThenTabDeletedFromRepository() =
+    fun whenCloseCurrentTabSelectedAndNotInCustomTabThenTabDeletedFromRepository() =
         runTest {
+            testee.setIsCustomTab(false)
             givenOneActiveTabSelected()
             testee.closeCurrentTab()
+            verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
             verify(mockTabRepository).deleteTabAndSelectSource(selectedTabLiveData.value!!.tabId)
+            val command = commandCaptor.allValues.find { it is Command.NavigateBackInCustomTab }
+            assertNull(command)
+        }
+
+    @Test
+    fun whenCloseCurrentTabAndCustomTabAndCustomTabScreenEmitNavigateBackInCustomTabCommand() =
+        runTest {
+            testee.setIsCustomTab(true)
+            testee.closeCurrentTab()
+            verify(mockTabRepository, never()).deleteTabAndSelectSource(any())
+            verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+            val command = commandCaptor.allValues.find { it is Command.NavigateBackInCustomTab }
+            assertNotNull(command)
+            assertTrue(command is Command.NavigateBackInCustomTab)
         }
 
     @Test
@@ -5554,69 +5548,6 @@ class BrowserTabViewModelTest {
         }
 
     @Test
-    fun whenPrivacyProtectionMenuClickedThenListenerIsInvoked() =
-        runTest {
-            loadUrl("http://www.example.com/home.html")
-            testee.onPrivacyProtectionMenuClicked()
-            verify(mockPrivacyProtectionsToggleUsageListener).onPrivacyProtectionsToggleUsed()
-        }
-
-    @Test
-    fun whenPageIsChangedThenPrivacyProtectionsPopupManagerIsNotified() =
-        runTest {
-            updateUrl(
-                originalUrl = "example.com",
-                currentUrl = "example2.com",
-                isBrowserShowing = true,
-            )
-
-            verify(mockPrivacyProtectionsPopupManager).onPageLoaded(
-                url = "example2.com",
-                httpErrorCodes = emptyList(),
-                hasBrowserError = false,
-            )
-        }
-
-    @Test
-    fun whenPageIsChangedWithWebViewErrorResponseThenPrivacyProtectionsPopupManagerIsNotified() =
-        runTest {
-            testee.onReceivedError(BAD_URL, "example2.com")
-
-            updateUrl(
-                originalUrl = "example.com",
-                currentUrl = "example2.com",
-                isBrowserShowing = true,
-            )
-
-            verify(mockPrivacyProtectionsPopupManager).onPageLoaded(
-                url = "example2.com",
-                httpErrorCodes = emptyList(),
-                hasBrowserError = true,
-            )
-        }
-
-    @Test
-    fun whenPageIsChangedWithHttpErrorThenPrivacyProtectionsPopupManagerIsNotified() =
-        runTest {
-            val siteCaptor = argumentCaptor<Site>()
-            whenever(mockSiteHttpErrorHandler.assignErrorsAndClearCache(siteCaptor.capture())).then {
-                siteCaptor.lastValue.onHttpErrorDetected(404)
-            }
-
-            updateUrl(
-                originalUrl = "example.com",
-                currentUrl = "example2.com",
-                isBrowserShowing = true,
-            )
-
-            verify(mockPrivacyProtectionsPopupManager).onPageLoaded(
-                url = "example2.com",
-                httpErrorCodes = listOf(404),
-                hasBrowserError = false,
-            )
-        }
-
-    @Test
     fun whenPageIsChangedWithHttpError400ThenUpdateCountPixelCalledForWebViewReceivedHttpError400Daily() =
         runTest {
             testee.recordHttpErrorCode(statusCode = 400, url = "example2.com")
@@ -5642,15 +5573,6 @@ class BrowserTabViewModelTest {
         }
 
     @Test
-    fun whenPrivacyProtectionsPopupUiEventIsReceivedThenItIsPassedToPrivacyProtectionsPopupManager() =
-        runTest {
-            PrivacyProtectionsPopupUiEvent.entries.forEach { event ->
-                testee.onPrivacyProtectionsPopupUiEvent(event)
-                verify(mockPrivacyProtectionsPopupManager).onUiEvent(event)
-            }
-        }
-
-    @Test
     fun whenRefreshIsTriggeredByUserThenIncrementRefreshCount() =
         runTest {
             val url = exampleUrl
@@ -5661,25 +5583,6 @@ class BrowserTabViewModelTest {
 
             testee.onRefreshRequested(triggeredByUser = true)
             verify(mockBrokenSitePrompt).pageRefreshed(url.toUri())
-        }
-
-    @Test
-    fun whenRefreshIsTriggeredByUserThenPrivacyProtectionsPopupManagerIsNotifiedWithTopPosition() =
-        runTest {
-            testee.onRefreshRequested(triggeredByUser = false)
-            verify(mockPrivacyProtectionsPopupManager, never()).onPageRefreshTriggeredByUser(isOmnibarAtTheTop = true)
-            testee.onRefreshRequested(triggeredByUser = true)
-            verify(mockPrivacyProtectionsPopupManager).onPageRefreshTriggeredByUser(isOmnibarAtTheTop = true)
-        }
-
-    @Test
-    fun whenRefreshIsTriggeredByUserThenPrivacyProtectionsPopupManagerIsNotifiedWithBottomPosition() =
-        runTest {
-            whenever(mockSettingsDataStore.omnibarType).thenReturn(OmnibarType.SINGLE_BOTTOM)
-            testee.onRefreshRequested(triggeredByUser = false)
-            verify(mockPrivacyProtectionsPopupManager, never()).onPageRefreshTriggeredByUser(isOmnibarAtTheTop = false)
-            testee.onRefreshRequested(triggeredByUser = true)
-            verify(mockPrivacyProtectionsPopupManager).onPageRefreshTriggeredByUser(isOmnibarAtTheTop = false)
         }
 
     @Test
@@ -5699,20 +5602,16 @@ class BrowserTabViewModelTest {
     @Test
     fun whenPrivacyProtectionsAreToggledThenCorrectPixelsAreSent() =
         runTest {
-            val params = mapOf("test_key" to "test_value")
-            whenever(privacyProtectionsPopupExperimentExternalPixels.getPixelParams()).thenReturn(params)
             whenever(mockUserAllowListRepository.isDomainInUserAllowList("www.example.com")).thenReturn(false)
             loadUrl("http://www.example.com/home.html")
             testee.onPrivacyProtectionMenuClicked()
             whenever(mockUserAllowListRepository.isDomainInUserAllowList("www.example.com")).thenReturn(true)
             testee.onPrivacyProtectionMenuClicked()
 
-            verify(mockPixel).fire(AppPixelName.BROWSER_MENU_ALLOWLIST_ADD, params, type = Count)
-            verify(mockPixel).fire(AppPixelName.BROWSER_MENU_ALLOWLIST_REMOVE, params, type = Count)
+            verify(mockPixel).fire(AppPixelName.BROWSER_MENU_ALLOWLIST_ADD, type = Count)
+            verify(mockPixel).fire(AppPixelName.BROWSER_MENU_ALLOWLIST_REMOVE, type = Count)
             assertEquals(1, protectionTogglePlugin.toggleOff)
             assertEquals(1, protectionTogglePlugin.toggleOn)
-            verify(privacyProtectionsPopupExperimentExternalPixels).tryReportProtectionsToggledFromBrowserMenu(protectionsEnabled = false)
-            verify(privacyProtectionsPopupExperimentExternalPixels).tryReportProtectionsToggledFromBrowserMenu(protectionsEnabled = true)
         }
 
     @Test
@@ -7688,8 +7587,7 @@ class BrowserTabViewModelTest {
         }
 
     @Test
-    fun whenEvaluateSerpLogoStateCalledWithDuckDuckGoUrlAndFeatureEnabledThenExtractSerpLogoCommandIssued() {
-        whenever(mockSerpEasterEggLogoToggles.feature()).thenReturn(mockEnabledToggle)
+    fun whenEvaluateSerpLogoStateCalledWithDuckDuckGoUrlThenExtractSerpLogoCommandIssued() {
         whenever(mockDuckAiFeatureState.showFullScreenMode).thenReturn(mockDuckAiFullScreenMode)
         val ddgUrl = "https://duckduckgo.com/?q=test"
         val webViewNavState = WebViewNavigationState(mockStack, 100)
@@ -7705,25 +7603,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenEvaluateSerpLogoStateCalledWithDuckDuckGoUrlAndFeatureDisabledThenExtractSerpLogoCommandNotIssued() {
-        whenever(mockSerpEasterEggLogoToggles.feature()).thenReturn(mockDisabledToggle)
-        whenever(mockDuckAiFeatureState.showFullScreenMode).thenReturn(mockDuckAiFullScreenMode)
-
-        val ddgUrl = "https://duckduckgo.com/?q=test"
-        val webViewNavState = WebViewNavigationState(mockStack, 100)
-
-        testee.pageFinished(mockWebView, webViewNavState, ddgUrl)
-
-        val commands = commandCaptor.allValues
-        assertFalse(
-            "ExtractSerpLogo command should NOT be issued when SERP logos feature is disabled",
-            commands.any { it is Command.ExtractSerpLogo },
-        )
-    }
-
-    @Test
-    fun whenEvaluateSerpLogoStateCalledWithNonDuckDuckGoUrlAndFeatureEnabledThenExtractSerpLogoCommandNotIssued() {
-        whenever(mockSerpEasterEggLogoToggles.feature()).thenReturn(mockEnabledToggle)
+    fun whenEvaluateSerpLogoStateCalledWithNonDuckDuckGoUrlThenExtractSerpLogoCommandNotIssued() {
         whenever(mockDuckAiFeatureState.showFullScreenMode).thenReturn(mockDuckAiFullScreenMode)
 
         val nonDdgUrl = "https://example.com/search?q=test"
@@ -7739,8 +7619,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenEvaluateSerpLogoStateCalledWithNonDuckDuckGoUrlAndFeatureEnabledThenSerpLogoIsCleared() {
-        whenever(mockSerpEasterEggLogoToggles.feature()).thenReturn(mockEnabledToggle)
+    fun whenEvaluateSerpLogoStateCalledWithNonDuckDuckGoUrlThenSerpLogoIsCleared() {
         whenever(mockDuckAiFeatureState.showFullScreenMode).thenReturn(mockDuckAiFullScreenMode)
         val nonDdgUrl = "https://example.com/search?q=test"
         val webViewNavState = WebViewNavigationState(mockStack, 100)

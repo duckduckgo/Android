@@ -48,7 +48,6 @@ interface RequestDataViewStateMapper {
 @ContributesBinding(AppScope::class)
 class AppSiteRequestDataViewStateMapper @Inject constructor() : RequestDataViewStateMapper {
 
-    private val publicSuffixDatabase = PublicSuffixDatabase()
     private val allowedCategories = listOf(
         "Analytics",
         "Advertising",
@@ -123,6 +122,6 @@ class AppSiteRequestDataViewStateMapper @Inject constructor() : RequestDataViewS
     private fun toTldPlusOne(url: String): String? {
         val urlAdDomain = UriString.host(url)
         if (urlAdDomain.isNullOrEmpty()) return urlAdDomain
-        return kotlin.runCatching { publicSuffixDatabase.getEffectiveTldPlusOne(urlAdDomain) }.getOrNull()
+        return kotlin.runCatching { PublicSuffixDatabase.get().getEffectiveTldPlusOne(urlAdDomain) }.getOrNull()
     }
 }

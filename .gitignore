@@ -106,3 +106,6 @@ report
 # Pixel processing results
 PixelDefinitions/pixel_processing_results/*
 PixelDefinitions/node_modules/
+
+# LLM
+.claude/settings.local.json

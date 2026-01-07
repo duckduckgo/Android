@@ -13,5 +13,13 @@
                 "enum": ["true", "false"]
             }
         ]
+    },
+    "subscription_auth_v1_sign_in_attempt": {
+        "description": "Fired when subscription frontend initiates sign-in using auth v1 token.",
+        "owners": ["lmac012"],
+        "triggers": ["other"],
+        "suffixes": ["daily_count_short", "form_factor"],
+        "parameters": ["appVersion"],
+        "expires": "2026-02-01"
     }
 }

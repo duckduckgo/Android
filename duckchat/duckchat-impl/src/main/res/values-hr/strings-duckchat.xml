@@ -89,5 +89,8 @@
     <string name="duckAiHideAiGeneratedImagesTitle">Sakrij slike generirane umjetnom inteligencijom</string>
     <string name="duckAiHideAiGeneratedImagesDescription">Filtrira slike generirane umjetnom inteligencijom iz rezultata pretraživanja slika</string>
 
-    <!-- Duck AI Tabs Mode Toggle -->
+    <!-- Duck AI Paid Settings -->
+    <string name="duck_ai_paid_settings_enable_in_settings">Omogući u postavkama AI značajki</string>
+    <string name="duck_ai_paid_settings_manage_in_settings">Upravljaj u postavkama AI značajki</string>
+    <string name="duck_ai_paid_settings_manage_secondary">Konfigurirajte Duck.ai u postavkama AI značajki.</string>
 </resources>

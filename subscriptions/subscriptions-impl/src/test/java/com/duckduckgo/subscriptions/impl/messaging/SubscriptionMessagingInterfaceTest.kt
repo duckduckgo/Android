@@ -475,6 +475,46 @@ class SubscriptionMessagingInterfaceTest {
     }
 
     @Test
+    fun `when process and get subscription tier options message if feature name does not match do nothing`() = runTest {
+        givenInterfaceIsRegistered()
+
+        val message = """
+            {"context":"subscriptionPages","featureName":"test","method":"getSubscriptionTierOptions","id":"id","params":{}}
+        """.trimIndent()
+
+        messagingInterface.process(message, "duckduckgo-android-messaging-secret")
+
+        assertEquals(0, callback.counter)
+    }
+
+    @Test
+    fun `when process and get subscription tier options message then callback called`() = runTest {
+        givenInterfaceIsRegistered()
+
+        val message = """
+            {"context":"subscriptionPages","featureName":"useSubscription","method":"getSubscriptionTierOptions","id":"id","params":{}}
+        """.trimIndent()
+
+        messagingInterface.process(message, "duckduckgo-android-messaging-secret")
+
+        assertEquals(1, callback.counter)
+    }
+
+    @Test
+    fun `when process and get subscription tier options message and no id then callback still called`() = runTest {
+        givenInterfaceIsRegistered()
+
+        val message = """
+            {"context":"subscriptionPages","featureName":"useSubscription","method":"getSubscriptionTierOptions","params":{}}
+        """.trimIndent()
+
+        messagingInterface.process(message, "duckduckgo-android-messaging-secret")
+
+        assertEquals(1, callback.counter)
+        assertNull(callback.id)
+    }
+
+    @Test
     fun `when process and subscription selected message if feature name does not match do nothing`() = runTest {
         givenInterfaceIsRegistered()
 
@@ -823,13 +863,16 @@ class SubscriptionMessagingInterfaceTest {
         givenAuthV2(enabled = true)
         givenDuckAiPlus(enabled = true)
         givenStripeSupported(enabled = true)
+        givenUseGetSubscriptionTierOptions(enabled = false)
 
         val expected = JsRequestResponse.Success(
             context = "subscriptionPages",
             featureName = "useSubscription",
             method = "getFeatureConfig",
             id = "myId",
-            result = JSONObject("""{"useSubscriptionsAuthV2":true,"usePaidDuckAi":true,"useAlternateStripePaymentFlow":true}"""),
+            result = JSONObject(
+                """{"useSubscriptionsAuthV2":true,"usePaidDuckAi":true,"useAlternateStripePaymentFlow":true,"useGetSubscriptionTierOptions":false}""",
+            ),
         )
 
         val message = """
@@ -853,13 +896,18 @@ class SubscriptionMessagingInterfaceTest {
         givenAuthV2(enabled = false)
         givenDuckAiPlus(enabled = true)
         givenStripeSupported(enabled = true)
+        givenUseGetSubscriptionTierOptions(enabled = false)
 
         val expected = JsRequestResponse.Success(
             context = "subscriptionPages",
             featureName = "useSubscription",
             method = "getFeatureConfig",
             id = "myId",
-            result = JSONObject("""{"useSubscriptionsAuthV2":false,"usePaidDuckAi":true,"useAlternateStripePaymentFlow":true}"""),
+            result = JSONObject(
+                """
+                {"useSubscriptionsAuthV2":false,"usePaidDuckAi":true,"useAlternateStripePaymentFlow":true,"useGetSubscriptionTierOptions":false}
+                """.trimIndent(),
+            ),
         )
 
         val message = """
@@ -883,13 +931,53 @@ class SubscriptionMessagingInterfaceTest {
         givenAuthV2(enabled = true)
         givenDuckAiPlus(enabled = false)
         givenStripeSupported(enabled = true)
+        givenUseGetSubscriptionTierOptions(enabled = false)
 
         val expected = JsRequestResponse.Success(
             context = "subscriptionPages",
             featureName = "useSubscription",
             method = "getFeatureConfig",
             id = "myId",
-            result = JSONObject("""{"useSubscriptionsAuthV2":true,"usePaidDuckAi":false,"useAlternateStripePaymentFlow":true}"""),
+            result = JSONObject(
+                """
+                {"useSubscriptionsAuthV2":true,"usePaidDuckAi":false,"useAlternateStripePaymentFlow":true,"useGetSubscriptionTierOptions":false}
+                """.trimIndent(),
+            ),
+        )
+
+        val message = """
+            {"context":"subscriptionPages","featureName":"useSubscription","method":"getFeatureConfig","id":"myId","params":{}}
+        """.trimIndent()
+
+        messagingInterface.process(message, "duckduckgo-android-messaging-secret")
+
+        val captor = argumentCaptor<JsRequestResponse>()
+        verify(jsMessageHelper).sendJsResponse(captor.capture(), eq(CALLBACK_NAME), eq(SECRET), eq(webView))
+        val jsMessage = captor.firstValue
+
+        assertTrue(jsMessage is JsRequestResponse.Success)
+        checkEquals(expected, jsMessage)
+    }
+
+    @Test
+    fun `when process and get feature config and tier options enabled then return response with tier options true`() = runTest {
+        givenInterfaceIsRegistered()
+        givenSubscriptionMessaging(enabled = true)
+        givenAuthV2(enabled = true)
+        givenDuckAiPlus(enabled = true)
+        givenStripeSupported(enabled = true)
+        givenUseGetSubscriptionTierOptions(enabled = true)
+
+        val expected = JsRequestResponse.Success(
+            context = "subscriptionPages",
+            featureName = "useSubscription",
+            method = "getFeatureConfig",
+            id = "myId",
+            result = JSONObject(
+                """
+                {"useSubscriptionsAuthV2":true,"usePaidDuckAi":true,"useAlternateStripePaymentFlow":true,"useGetSubscriptionTierOptions":true}
+                """.trimIndent(),
+            ),
         )
 
         val message = """
@@ -995,6 +1083,12 @@ class SubscriptionMessagingInterfaceTest {
         val stripeSupportedToggle = mock<com.duckduckgo.feature.toggles.api.Toggle>()
         whenever(stripeSupportedToggle.isEnabled()).thenReturn(enabled)
         whenever(privacyProFeature.supportsAlternateStripePaymentFlow()).thenReturn(stripeSupportedToggle)
+    }
+
+    private fun givenUseGetSubscriptionTierOptions(enabled: Boolean) {
+        val toggle = mock<com.duckduckgo.feature.toggles.api.Toggle>()
+        whenever(toggle.isEnabled()).thenReturn(enabled)
+        whenever(privacyProFeature.tierMessagingEnabled()).thenReturn(toggle)
     }
 
     private fun checkEquals(expected: JsRequestResponse, actual: JsRequestResponse) {

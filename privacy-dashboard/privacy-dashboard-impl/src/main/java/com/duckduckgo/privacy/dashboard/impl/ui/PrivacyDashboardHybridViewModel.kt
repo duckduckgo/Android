@@ -51,8 +51,6 @@ import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.OpenURL
 import com.duckduckgo.privacy.dashboard.impl.ui.ScreenKind.BREAKAGE_FORM
 import com.duckduckgo.privacy.dashboard.impl.ui.ScreenKind.PRIMARY_SCREEN
-import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupExperimentExternalPixels
-import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsToggleUsageListener
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -91,8 +89,6 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
     private val protectionStatusViewStateMapper: ProtectionStatusViewStateMapper,
     private val privacyDashboardPayloadAdapter: PrivacyDashboardPayloadAdapter,
     private val autoconsentStatusViewStateMapper: AutoconsentStatusViewStateMapper,
-    private val protectionsToggleUsageListener: PrivacyProtectionsToggleUsageListener,
-    private val privacyProtectionsPopupExperimentExternalPixels: PrivacyProtectionsPopupExperimentExternalPixels,
     private val userBrowserProperties: UserBrowserProperties,
     private val toggleReports: ToggleReports,
     private val brokenSiteSender: BrokenSiteSender,
@@ -234,15 +230,13 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            val pixelParams = privacyProtectionsPopupExperimentExternalPixels.getPixelParams()
-            pixel.fire(PRIVACY_DASHBOARD_OPENED, pixelParams, type = Count)
+            pixel.fire(PRIVACY_DASHBOARD_OPENED, type = Count)
             pixel.fire(
                 pixel = PRIVACY_DASHBOARD_FIRST_TIME_OPENED,
                 parameters = mapOf("daysSinceInstall" to userBrowserProperties.daysSinceInstalled().toString(), "from_onboarding" to "false"),
                 type = Unique(),
             )
         }
-        privacyProtectionsPopupExperimentExternalPixels.tryReportPrivacyDashboardOpened()
 
         site.filterNotNull()
             .onEach(::updateSite)
@@ -313,12 +307,9 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
         viewModelScope.launch(dispatcher.io()) {
             val event = privacyDashboardPayloadAdapter.onPrivacyProtectionsClicked(payload) ?: return@launch
 
-            protectionsToggleUsageListener.onPrivacyProtectionsToggleUsed()
-
             delay(CLOSE_ON_PROTECTIONS_TOGGLE_DELAY)
 
             currentViewState().siteViewState.domain?.let { domain ->
-                val pixelParams = privacyProtectionsPopupExperimentExternalPixels.getPixelParams()
                 if (event.isProtected) {
                     userAllowListRepository.removeDomainFromUserAllowList(domain)
                     if (dashboardOpenedFromCustomTab) {
@@ -332,7 +323,7 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
                             else -> null
                         }
                         pixelName?.let {
-                            pixel.fire(it, pixelParams, type = Count)
+                            pixel.fire(it, type = Count)
                             val origin = if (it == PRIVACY_DASHBOARD_ALLOWLIST_REMOVE) {
                                 PrivacyToggleOrigin.DASHBOARD
                             } else {
@@ -361,7 +352,7 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
                             else -> null
                         }
                         pixelName?.let { it ->
-                            pixel.fire(it, pixelParams, type = Count)
+                            pixel.fire(it, type = Count)
                             val origin = if (it == PRIVACY_DASHBOARD_ALLOWLIST_ADD) {
                                 PrivacyToggleOrigin.DASHBOARD
                             } else {
@@ -373,7 +364,6 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
                         }
                     }
                 }
-                privacyProtectionsPopupExperimentExternalPixels.tryReportProtectionsToggledFromPrivacyDashboard(event.isProtected)
             }
         }
     }

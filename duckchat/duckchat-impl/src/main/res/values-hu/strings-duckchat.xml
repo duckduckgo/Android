@@ -89,5 +89,8 @@
     <string name="duckAiHideAiGeneratedImagesTitle">AI által generált képek elrejtése</string>
     <string name="duckAiHideAiGeneratedImagesDescription">Kiszűri az AI által generált képeket a képkeresési találatokból</string>
 
-    <!-- Duck AI Tabs Mode Toggle -->
+    <!-- Duck AI Paid Settings -->
+    <string name="duck_ai_paid_settings_enable_in_settings">Engedélyezés az AI-funkciók beállításaiban</string>
+    <string name="duck_ai_paid_settings_manage_in_settings">Kezelés az AI-funkciók beállításaiban</string>
+    <string name="duck_ai_paid_settings_manage_secondary">A Duck.ai az AI-funkciók beállításaiban konfigurálható.</string>
 </resources>

@@ -59,8 +59,8 @@ class GetNativeSettingsHandler @Inject constructor(
                         val settingsString = serpSettingsDataStore.getSerpSettings()
 
                         val settingsJsonObject = if (settingsString.isNullOrEmpty()) {
-                            // Return an empty JSON object if no settings are stored
-                            JSONObject()
+                            // Return noNativeSettings: true until settings have been updated by FE
+                            JSONObject().put(KEY_NO_NATIVE_SETTINGS, true)
                         } else {
                             JSONObject(settingsString)
                         }
@@ -86,5 +86,6 @@ class GetNativeSettingsHandler @Inject constructor(
 
     companion object {
         private const val GET_NATIVE_SETTINGS_METHOD_NAME = "getNativeSettings"
+        private const val KEY_NO_NATIVE_SETTINGS = "noNativeSettings"
     }
 }

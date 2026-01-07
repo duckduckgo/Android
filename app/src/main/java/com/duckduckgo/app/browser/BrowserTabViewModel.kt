@@ -338,10 +338,6 @@ import com.duckduckgo.privacy.dashboard.api.PrivacyProtectionTogglePlugin
 import com.duckduckgo.privacy.dashboard.api.PrivacyToggleOrigin
 import com.duckduckgo.privacy.dashboard.api.ui.DashboardOpener
 import com.duckduckgo.privacy.dashboard.api.ui.ToggleReports
-import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupExperimentExternalPixels
-import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupManager
-import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupUiEvent
-import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsToggleUsageListener
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite
@@ -350,7 +346,6 @@ import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.savedsites.impl.SavedSitesPixelName
 import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment.DeleteBookmarkListener
 import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment.EditSavedSiteListener
-import com.duckduckgo.serp.logos.api.SerpEasterEggLogosToggles
 import com.duckduckgo.serp.logos.api.SerpLogo
 import com.duckduckgo.settings.api.SerpSettingsFeature
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
@@ -453,9 +448,6 @@ class BrowserTabViewModel @Inject constructor(
     private val sitePermissionsManager: SitePermissionsManager,
     private val cameraHardwareChecker: CameraHardwareChecker,
     private val androidBrowserConfig: AndroidBrowserConfigFeature,
-    private val privacyProtectionsPopupManager: PrivacyProtectionsPopupManager,
-    private val privacyProtectionsToggleUsageListener: PrivacyProtectionsToggleUsageListener,
-    private val privacyProtectionsPopupExperimentExternalPixels: PrivacyProtectionsPopupExperimentExternalPixels,
     private val faviconsFetchingPrompt: FaviconsFetchingPrompt,
     private val subscriptions: Subscriptions,
     private val sslCertificatesFeature: SSLCertificatesFeature,
@@ -483,7 +475,6 @@ class BrowserTabViewModel @Inject constructor(
     private val duckChatJSHelper: DuckChatJSHelper,
     private val tabManager: TabManager,
     private val addressDisplayFormatter: AddressDisplayFormatter,
-    private val serpEasterEggLogosToggles: SerpEasterEggLogosToggles,
     private val nonHttpAppLinkChecker: NonHttpAppLinkChecker,
     private val externalIntentProcessingState: ExternalIntentProcessingState,
     private val vpnMenuStateProvider: VpnMenuStateProvider,
@@ -756,11 +747,6 @@ class BrowserTabViewModel @Inject constructor(
                 }.flowOn(dispatchers.io())
                 .launchIn(viewModelScope)
         }
-
-        privacyProtectionsPopupManager.viewState
-            .onEach { popupViewState ->
-                browserViewState.value = currentBrowserViewState().copy(privacyProtectionsPopupViewState = popupViewState)
-            }.launchIn(viewModelScope)
 
         duckPlayer
             .observeUserPreferences()
@@ -1321,8 +1307,12 @@ class BrowserTabViewModel @Inject constructor(
         }
 
     override fun closeCurrentTab() {
-        viewModelScope.launch {
-            removeCurrentTabFromRepository()
+        if (isCustomTabScreen) {
+            command.value = Command.NavigateBackInCustomTab
+        } else {
+            viewModelScope.launch {
+                removeCurrentTabFromRepository()
+            }
         }
     }
 
@@ -1394,9 +1384,6 @@ class BrowserTabViewModel @Inject constructor(
             site?.uri?.let {
                 brokenSitePrompt.pageRefreshed(it)
             }
-            privacyProtectionsPopupManager.onPageRefreshTriggeredByUser(
-                isOmnibarAtTheTop = settingsDataStore.omnibarType != OmnibarType.SINGLE_BOTTOM,
-            )
         }
     }
 
@@ -1737,11 +1724,6 @@ class BrowserTabViewModel @Inject constructor(
         isLinkOpenedInNewTab = false
 
         automaticSavedLoginsMonitor.clearAutoSavedLoginId(tabId)
-
-        site?.run {
-            val hasBrowserError = currentBrowserViewState().browserError != OMITTED
-            privacyProtectionsPopupManager.onPageLoaded(url, httpErrorCodeEvents, hasBrowserError)
-        }
     }
 
     private fun cleanupBlobDownloadReplyProxyMaps() {
@@ -1975,12 +1957,10 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private fun evaluateSerpLogoState(url: String?) {
-        if (serpEasterEggLogosToggles.feature().isEnabled()) {
-            if (url != null && duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
-                command.value = ExtractSerpLogo(url)
-            } else {
-                omnibarViewState.value = currentOmnibarViewState().copy(serpLogo = null)
-            }
+        if (url != null && duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
+            command.value = ExtractSerpLogo(url)
+        } else {
+            omnibarViewState.value = currentOmnibarViewState().copy(serpLogo = null)
         }
     }
 
@@ -2601,8 +2581,6 @@ class BrowserTabViewModel @Inject constructor(
                 performToggleReportCheck()
                 addToAllowList(domain, clickedFromCustomTab)
             }
-
-            privacyProtectionsToggleUsageListener.onPrivacyProtectionsToggleUsed()
         }
     }
 
@@ -2618,13 +2596,11 @@ class BrowserTabViewModel @Inject constructor(
         domain: String,
         clickedFromCustomTab: Boolean,
     ) {
-        val pixelParams = privacyProtectionsPopupExperimentExternalPixels.getPixelParams()
         if (clickedFromCustomTab) {
             pixel.fire(CustomTabPixelNames.CUSTOM_TABS_MENU_DISABLE_PROTECTIONS_ALLOW_LIST_ADD)
         } else {
-            pixel.fire(AppPixelName.BROWSER_MENU_ALLOWLIST_ADD, pixelParams, type = Count)
+            pixel.fire(AppPixelName.BROWSER_MENU_ALLOWLIST_ADD, type = Count)
         }
-        privacyProtectionsPopupExperimentExternalPixels.tryReportProtectionsToggledFromBrowserMenu(protectionsEnabled = false)
         userAllowListRepository.addDomainToUserAllowList(domain)
         privacyProtectionTogglePlugin.getPlugins().forEach {
             it.onToggleOff(PrivacyToggleOrigin.MENU)
@@ -2638,13 +2614,11 @@ class BrowserTabViewModel @Inject constructor(
         domain: String,
         clickedFromCustomTab: Boolean,
     ) {
-        val pixelParams = privacyProtectionsPopupExperimentExternalPixels.getPixelParams()
         if (clickedFromCustomTab) {
             pixel.fire(CustomTabPixelNames.CUSTOM_TABS_MENU_DISABLE_PROTECTIONS_ALLOW_LIST_REMOVE)
         } else {
-            pixel.fire(AppPixelName.BROWSER_MENU_ALLOWLIST_REMOVE, pixelParams, type = Count)
+            pixel.fire(AppPixelName.BROWSER_MENU_ALLOWLIST_REMOVE, type = Count)
         }
-        privacyProtectionsPopupExperimentExternalPixels.tryReportProtectionsToggledFromBrowserMenu(protectionsEnabled = true)
         userAllowListRepository.removeDomainFromUserAllowList(domain)
         privacyProtectionTogglePlugin.getPlugins().forEach {
             it.onToggleOn(PrivacyToggleOrigin.MENU)
@@ -2785,10 +2759,6 @@ class BrowserTabViewModel @Inject constructor(
         } else {
             command.value = NavigationCommand.Refresh
         }
-    }
-
-    fun onPrivacyProtectionsPopupUiEvent(event: PrivacyProtectionsPopupUiEvent) {
-        privacyProtectionsPopupManager.onUiEvent(event)
     }
 
     private fun initializeViewStates() {

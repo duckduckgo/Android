@@ -28,6 +28,7 @@ import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN_US
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_FREE_TRIAL_OFFER_US
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PLAN_US
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
+import com.duckduckgo.subscriptions.impl.model.Entitlement
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.Reload
@@ -35,6 +36,7 @@ import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Compani
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.PurchaseStateView
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.PurchaseStateView.Success
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.SubscriptionOptionsJson
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.SubscriptionTierOptionsJson
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -64,6 +66,7 @@ class SubscriptionWebViewViewModelTest {
 
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
     private val jsonAdapter: JsonAdapter<SubscriptionOptionsJson> = moshi.adapter(SubscriptionOptionsJson::class.java)
+    private val tierJsonAdapter: JsonAdapter<SubscriptionTierOptionsJson> = moshi.adapter(SubscriptionTierOptionsJson::class.java)
     private val subscriptionsManager: SubscriptionsManager = mock()
     private val networkProtectionAccessState: NetworkProtectionAccessState = mock()
     private val subscriptionsChecker: SubscriptionsChecker = mock()
@@ -215,6 +218,7 @@ class SubscriptionWebViewViewModelTest {
             SubscriptionOffer(
                 planId = MONTHLY_PLAN_US,
                 offerId = null,
+                tier = "plus",
                 pricingPhases = listOf(
                     PricingPhase(
                         priceAmount = 1.toBigDecimal(),
@@ -223,11 +227,12 @@ class SubscriptionWebViewViewModelTest {
                         billingPeriod = "P1M",
                     ),
                 ),
-                features = setOf(SubscriptionsConstants.NETP),
+                entitlements = setOf(Entitlement("plus", SubscriptionsConstants.NETP)),
             ),
             SubscriptionOffer(
                 planId = YEARLY_PLAN_US,
                 offerId = null,
+                tier = "plus",
                 pricingPhases = listOf(
                     PricingPhase(
                         priceAmount = 10.toBigDecimal(),
@@ -236,7 +241,7 @@ class SubscriptionWebViewViewModelTest {
                         billingPeriod = "P1Y",
                     ),
                 ),
-                features = setOf(SubscriptionsConstants.NETP),
+                entitlements = setOf(Entitlement("plus", SubscriptionsConstants.NETP)),
             ),
         )
         whenever(subscriptionsManager.getSubscriptionOffer()).thenReturn(testSubscriptionOfferList)
@@ -285,6 +290,7 @@ class SubscriptionWebViewViewModelTest {
             SubscriptionOffer(
                 planId = MONTHLY_PLAN_US,
                 offerId = null,
+                tier = "plus",
                 pricingPhases = listOf(
                     PricingPhase(
                         priceAmount = 1.toBigDecimal(),
@@ -293,11 +299,12 @@ class SubscriptionWebViewViewModelTest {
                         billingPeriod = "P1M",
                     ),
                 ),
-                features = setOf(SubscriptionsConstants.NETP),
+                entitlements = setOf(Entitlement("plus", SubscriptionsConstants.NETP)),
             ),
             SubscriptionOffer(
                 planId = YEARLY_PLAN_US,
                 offerId = null,
+                tier = "plus",
                 pricingPhases = listOf(
                     PricingPhase(
                         priceAmount = 10.toBigDecimal(),
@@ -306,7 +313,7 @@ class SubscriptionWebViewViewModelTest {
                         billingPeriod = "P1Y",
                     ),
                 ),
-                features = setOf(SubscriptionsConstants.NETP),
+                entitlements = setOf(Entitlement("plus", SubscriptionsConstants.NETP)),
             ),
         )
         privacyProFeature.allowPurchase().setRawStoredState(Toggle.State(enable = false))
@@ -335,6 +342,7 @@ class SubscriptionWebViewViewModelTest {
             SubscriptionOffer(
                 planId = MONTHLY_PLAN_US,
                 offerId = null,
+                tier = "plus",
                 pricingPhases = listOf(
                     PricingPhase(
                         priceAmount = 1.toBigDecimal(),
@@ -343,11 +351,12 @@ class SubscriptionWebViewViewModelTest {
                         billingPeriod = "P1M",
                     ),
                 ),
-                features = setOf(SubscriptionsConstants.NETP),
+                entitlements = setOf(Entitlement("plus", SubscriptionsConstants.NETP)),
             ),
             SubscriptionOffer(
                 planId = YEARLY_PLAN_US,
                 offerId = null,
+                tier = "plus",
                 pricingPhases = listOf(
                     PricingPhase(
                         priceAmount = 1.toBigDecimal(),
@@ -356,11 +365,12 @@ class SubscriptionWebViewViewModelTest {
                         billingPeriod = "P1Y",
                     ),
                 ),
-                features = setOf(SubscriptionsConstants.NETP),
+                entitlements = setOf(Entitlement("plus", SubscriptionsConstants.NETP)),
             ),
             SubscriptionOffer(
                 planId = MONTHLY_PLAN_US,
                 offerId = MONTHLY_FREE_TRIAL_OFFER_US,
+                tier = "plus",
                 pricingPhases = listOf(
                     PricingPhase(
                         priceAmount = 1.toBigDecimal(),
@@ -375,11 +385,12 @@ class SubscriptionWebViewViewModelTest {
                         billingPeriod = "P1W",
                     ),
                 ),
-                features = setOf(SubscriptionsConstants.NETP),
+                entitlements = setOf(Entitlement("plus", SubscriptionsConstants.NETP)),
             ),
             SubscriptionOffer(
                 planId = YEARLY_PLAN_US,
                 offerId = YEARLY_FREE_TRIAL_OFFER_US,
+                tier = "plus",
                 pricingPhases = listOf(
                     PricingPhase(
                         priceAmount = 1.toBigDecimal(),
@@ -394,7 +405,7 @@ class SubscriptionWebViewViewModelTest {
                         billingPeriod = "P1W",
                     ),
                 ),
-                features = setOf(SubscriptionsConstants.NETP),
+                entitlements = setOf(Entitlement("plus", SubscriptionsConstants.NETP)),
             ),
         )
         whenever(subscriptionsManager.getSubscriptionOffer()).thenReturn(testSubscriptionOfferList)
@@ -422,6 +433,7 @@ class SubscriptionWebViewViewModelTest {
             SubscriptionOffer(
                 planId = MONTHLY_PLAN_US,
                 offerId = null,
+                tier = "plus",
                 pricingPhases = listOf(
                     PricingPhase(
                         priceAmount = 1.toBigDecimal(),
@@ -430,11 +442,12 @@ class SubscriptionWebViewViewModelTest {
                         billingPeriod = "P1M",
                     ),
                 ),
-                features = setOf(SubscriptionsConstants.NETP),
+                entitlements = setOf(Entitlement("plus", SubscriptionsConstants.NETP)),
             ),
             SubscriptionOffer(
                 planId = YEARLY_PLAN_US,
                 offerId = null,
+                tier = "plus",
                 pricingPhases = listOf(
                     PricingPhase(
                         priceAmount = 10.toBigDecimal(),
@@ -443,11 +456,12 @@ class SubscriptionWebViewViewModelTest {
                         billingPeriod = "P1Y",
                     ),
                 ),
-                features = setOf(SubscriptionsConstants.NETP),
+                entitlements = setOf(Entitlement("plus", SubscriptionsConstants.NETP)),
             ),
             SubscriptionOffer(
                 planId = MONTHLY_PLAN_US,
                 offerId = MONTHLY_FREE_TRIAL_OFFER_US,
+                tier = "plus",
                 pricingPhases = listOf(
                     PricingPhase(
                         priceAmount = 1.toBigDecimal(),
@@ -462,11 +476,12 @@ class SubscriptionWebViewViewModelTest {
                         billingPeriod = "P1W",
                     ),
                 ),
-                features = setOf(SubscriptionsConstants.NETP),
+                entitlements = setOf(Entitlement("plus", SubscriptionsConstants.NETP)),
             ),
             SubscriptionOffer(
                 planId = YEARLY_PLAN_US,
                 offerId = YEARLY_FREE_TRIAL_OFFER_US,
+                tier = "plus",
                 pricingPhases = listOf(
                     PricingPhase(
                         priceAmount = 10.toBigDecimal(),
@@ -481,7 +496,7 @@ class SubscriptionWebViewViewModelTest {
                         billingPeriod = "P1W",
                     ),
                 ),
-                features = setOf(SubscriptionsConstants.NETP),
+                entitlements = setOf(Entitlement("plus", SubscriptionsConstants.NETP)),
             ),
         )
         whenever(subscriptionsManager.getSubscriptionOffer()).thenReturn(testSubscriptionOfferList)
@@ -910,6 +925,188 @@ class SubscriptionWebViewViewModelTest {
             viewModel.onSubscriptionRestored()
             val result = awaitItem()
             assertTrue(result is Reload)
+        }
+    }
+
+    @Test
+    fun whenGetSubscriptionTierOptionsAndOfferExistsThenSendCommandWithTierData() = runTest {
+        val testSubscriptionOfferList = listOf(
+            SubscriptionOffer(
+                planId = MONTHLY_PLAN_US,
+                offerId = null,
+                tier = "plus",
+                pricingPhases = listOf(
+                    PricingPhase(
+                        priceAmount = 1.toBigDecimal(),
+                        priceCurrency = Currency.getInstance("USD"),
+                        formattedPrice = "$1",
+                        billingPeriod = "P1M",
+                    ),
+                ),
+                entitlements = setOf(Entitlement("plus", SubscriptionsConstants.NETP)),
+            ),
+            SubscriptionOffer(
+                planId = YEARLY_PLAN_US,
+                offerId = null,
+                tier = "plus",
+                pricingPhases = listOf(
+                    PricingPhase(
+                        priceAmount = 10.toBigDecimal(),
+                        priceCurrency = Currency.getInstance("USD"),
+                        formattedPrice = "$10",
+                        billingPeriod = "P1Y",
+                    ),
+                ),
+                entitlements = setOf(Entitlement("plus", SubscriptionsConstants.NETP)),
+            ),
+        )
+        whenever(subscriptionsManager.getSubscriptionOffer()).thenReturn(testSubscriptionOfferList)
+        privacyProFeature.allowPurchase().setRawStoredState(Toggle.State(enable = true))
+
+        viewModel.commands().test {
+            viewModel.processJsCallbackMessage("test", "getSubscriptionTierOptions", "id", JSONObject("{}"))
+            val result = awaitItem()
+            assertTrue(result is Command.SendResponseToJs)
+            val response = (result as Command.SendResponseToJs).data
+
+            val params = tierJsonAdapter.fromJson(response.params.toString())
+            assertEquals("id", response.id)
+            assertEquals("test", response.featureName)
+            assertEquals("getSubscriptionTierOptions", response.method)
+            assertNotNull(params?.products)
+            assertEquals(1, params?.products?.size)
+            assertEquals("plus", params?.products?.first()?.tier)
+            assertEquals(YEARLY_PLAN_US, params?.products?.first()?.options?.first()?.id)
+            assertEquals(MONTHLY_PLAN_US, params?.products?.first()?.options?.last()?.id)
+        }
+    }
+
+    @Test
+    fun whenGetSubscriptionTierOptionsAndNoOfferThenSendCommandWithEmptyProducts() = runTest {
+        privacyProFeature.allowPurchase().setRawStoredState(Toggle.State(enable = true))
+        whenever(subscriptionsManager.getSubscriptionOffer()).thenReturn(emptyList())
+
+        viewModel.commands().test {
+            viewModel.processJsCallbackMessage("test", "getSubscriptionTierOptions", "id", JSONObject("{}"))
+
+            val result = awaitItem()
+            assertTrue(result is Command.SendResponseToJs)
+
+            val response = (result as Command.SendResponseToJs).data
+            assertEquals("id", response.id)
+            assertEquals("test", response.featureName)
+            assertEquals("getSubscriptionTierOptions", response.method)
+
+            val params = tierJsonAdapter.fromJson(response.params.toString())!!
+            assertEquals(0, params.products.size)
+        }
+    }
+
+    @Test
+    fun whenGetSubscriptionTierOptionsAndToggleOffThenSendCommandWithEmptyProducts() = runTest {
+        val testSubscriptionOfferList = listOf(
+            SubscriptionOffer(
+                planId = MONTHLY_PLAN_US,
+                offerId = null,
+                tier = "plus",
+                pricingPhases = listOf(
+                    PricingPhase(
+                        priceAmount = 1.toBigDecimal(),
+                        priceCurrency = Currency.getInstance("USD"),
+                        formattedPrice = "$1",
+                        billingPeriod = "P1M",
+                    ),
+                ),
+                entitlements = setOf(Entitlement("plus", SubscriptionsConstants.NETP)),
+            ),
+            SubscriptionOffer(
+                planId = YEARLY_PLAN_US,
+                offerId = null,
+                tier = "plus",
+                pricingPhases = listOf(
+                    PricingPhase(
+                        priceAmount = 10.toBigDecimal(),
+                        priceCurrency = Currency.getInstance("USD"),
+                        formattedPrice = "$10",
+                        billingPeriod = "P1Y",
+                    ),
+                ),
+                entitlements = setOf(Entitlement("plus", SubscriptionsConstants.NETP)),
+            ),
+        )
+        privacyProFeature.allowPurchase().setRawStoredState(Toggle.State(enable = false))
+        whenever(subscriptionsManager.getSubscriptionOffer()).thenReturn(testSubscriptionOfferList)
+
+        viewModel.commands().test {
+            viewModel.processJsCallbackMessage("test", "getSubscriptionTierOptions", "id", JSONObject("{}"))
+
+            val result = awaitItem()
+            assertTrue(result is Command.SendResponseToJs)
+
+            val response = (result as Command.SendResponseToJs).data
+            assertEquals("id", response.id)
+            assertEquals("test", response.featureName)
+            assertEquals("getSubscriptionTierOptions", response.method)
+
+            val params = tierJsonAdapter.fromJson(response.params.toString())!!
+            assertEquals(0, params.products.size)
+        }
+    }
+
+    @Test
+    fun whenGetSubscriptionTierOptionsThenFeaturesAreMappedCorrectly() = runTest {
+        val testSubscriptionOfferList = listOf(
+            SubscriptionOffer(
+                planId = MONTHLY_PLAN_US,
+                offerId = null,
+                tier = "plus",
+                pricingPhases = listOf(
+                    PricingPhase(
+                        priceAmount = 1.toBigDecimal(),
+                        priceCurrency = Currency.getInstance("USD"),
+                        formattedPrice = "$1",
+                        billingPeriod = "P1M",
+                    ),
+                ),
+                entitlements = setOf(
+                    Entitlement("plus", SubscriptionsConstants.NETP),
+                    Entitlement("plus", SubscriptionsConstants.ITR),
+                ),
+            ),
+            SubscriptionOffer(
+                planId = YEARLY_PLAN_US,
+                offerId = null,
+                tier = "plus",
+                pricingPhases = listOf(
+                    PricingPhase(
+                        priceAmount = 10.toBigDecimal(),
+                        priceCurrency = Currency.getInstance("USD"),
+                        formattedPrice = "$10",
+                        billingPeriod = "P1Y",
+                    ),
+                ),
+                entitlements = setOf(
+                    Entitlement("plus", SubscriptionsConstants.NETP),
+                    Entitlement("plus", SubscriptionsConstants.ITR),
+                ),
+            ),
+        )
+        whenever(subscriptionsManager.getSubscriptionOffer()).thenReturn(testSubscriptionOfferList)
+        privacyProFeature.allowPurchase().setRawStoredState(Toggle.State(enable = true))
+
+        viewModel.commands().test {
+            viewModel.processJsCallbackMessage("test", "getSubscriptionTierOptions", "id", JSONObject("{}"))
+            val result = awaitItem()
+            assertTrue(result is Command.SendResponseToJs)
+            val response = (result as Command.SendResponseToJs).data
+
+            val params = tierJsonAdapter.fromJson(response.params.toString())
+            val features = params?.products?.first()?.features
+            assertNotNull(features)
+            assertEquals(2, features?.size)
+            assertTrue(features?.all { it.name == "plus" } == true)
+            assertTrue(features?.any { it.product == SubscriptionsConstants.NETP } == true)
+            assertTrue(features?.any { it.product == SubscriptionsConstants.ITR } == true)
         }
     }
 
