@@ -23,15 +23,4 @@
             column="21"/>
     </issue>
 
-    <issue
-        id="DenyListedApi"
-        message="Use com.duckduckgo.data.store.api.SharedPreferencesProvider instead"
-        errorLine1="                context.getSharedPreferences(name, mode)"
-        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/com/duckduckgo/vpn/internal/flipper/PreferencesFlipperPlugin.kt"
-            line="167"
-            column="17"/>
-    </issue>
-
 </issues>
