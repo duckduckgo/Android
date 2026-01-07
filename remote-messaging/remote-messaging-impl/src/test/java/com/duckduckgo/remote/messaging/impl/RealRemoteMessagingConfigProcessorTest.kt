@@ -21,6 +21,7 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
+import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
 import com.duckduckgo.remote.messaging.fixtures.JsonRemoteMessageOM.aJsonRemoteMessagingConfig
 import com.duckduckgo.remote.messaging.fixtures.RemoteMessagingConfigOM.aRemoteMessagingConfig
@@ -152,7 +153,7 @@ class RealRemoteMessagingConfigProcessorTest {
 
     @Test
     fun whenEvaluatedMessageThenPrefetchImageAndSetActiveMessage() = runTest {
-        val evaluatedMessage = mock<com.duckduckgo.remote.messaging.api.RemoteMessage>()
+        val evaluatedMessage = mock<RemoteMessage>()
         whenever(remoteMessagingConfigRepository.get()).thenReturn(
             aRemoteMessagingConfig(version = 0L),
         )
@@ -166,7 +167,6 @@ class RealRemoteMessagingConfigProcessorTest {
 
     @Test
     fun whenSkipProcessingThenDoNotSetActiveMessage() = runTest {
-        val evaluatedMessage = mock<com.duckduckgo.remote.messaging.api.RemoteMessage>()
         whenever(remoteMessagingConfigRepository.get()).thenReturn(
             aRemoteMessagingConfig(version = 0L),
         )
