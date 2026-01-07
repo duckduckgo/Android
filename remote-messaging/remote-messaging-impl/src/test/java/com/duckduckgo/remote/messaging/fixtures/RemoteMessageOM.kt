@@ -46,10 +46,12 @@ object RemoteMessageOM {
         titleText: String = "title",
         descriptionText: String = "description",
         placeholder: Placeholder = ANNOUNCE,
+        imageUrl: String? = null,
     ) = Content.Medium(
         titleText = titleText,
         descriptionText = descriptionText,
         placeholder = placeholder,
+        imageUrl = imageUrl,
     )
 
     fun bigSingleActionContent(
@@ -58,12 +60,14 @@ object RemoteMessageOM {
         placeholder: Placeholder = ANNOUNCE,
         primaryActionText: String = "Action1",
         primaryAction: Action = urlAction(),
+        imageUrl: String? = null,
     ) = Content.BigSingleAction(
         titleText = titleText,
         descriptionText = descriptionText,
         placeholder = placeholder,
         primaryActionText = primaryActionText,
         primaryAction = primaryAction,
+        imageUrl = imageUrl,
     )
 
     fun bigTwoActionsContent(
@@ -74,6 +78,7 @@ object RemoteMessageOM {
         primaryAction: Action = urlAction(),
         secondaryActionText: String = "Action2",
         secondaryAction: Action = urlAction(),
+        imageUrl: String? = null,
     ) = Content.BigTwoActions(
         titleText = titleText,
         descriptionText = descriptionText,
@@ -82,6 +87,7 @@ object RemoteMessageOM {
         primaryAction = primaryAction,
         secondaryActionText = secondaryActionText,
         secondaryAction = secondaryAction,
+        imageUrl = imageUrl,
     )
 
     fun promoSingleActionContent(
@@ -90,12 +96,14 @@ object RemoteMessageOM {
         placeholder: Placeholder = MAC_AND_WINDOWS,
         actionText: String = "Action",
         action: Action = urlAction(),
+        imageUrl: String? = null,
     ) = Content.PromoSingleAction(
         titleText = titleText,
         descriptionText = descriptionText,
         placeholder = placeholder,
         actionText = actionText,
         action = action,
+        imageUrl = imageUrl,
     )
 
     fun cardsListContent(
@@ -122,6 +130,7 @@ object RemoteMessageOM {
                 primaryAction = urlAction(),
             ),
         ),
+        imageUrl: String? = null,
     ) = Content.CardsList(
         titleText = titleText,
         descriptionText = descriptionText,
@@ -129,6 +138,7 @@ object RemoteMessageOM {
         primaryActionText = primaryActionText,
         primaryAction = primaryAction,
         listItems = listItems,
+        imageUrl = imageUrl,
     )
 
     fun aSmallMessage(

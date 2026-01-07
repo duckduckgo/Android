@@ -62,7 +62,7 @@ class GlideRemoteMessageImagePrefetcher(
 
     private fun Content.getImageUrl(): String? {
         return when (this) {
-            is Content.Small -> this.imageUrl
+            is Content.Small -> null
             is Content.Medium -> this.imageUrl
             is Content.BigSingleAction -> this.imageUrl
             is Content.BigTwoActions -> this.imageUrl

@@ -47,17 +47,13 @@ enum class Surface(val jsonValue: String) {
 }
 
 sealed class Content(val messageType: MessageType) {
-    data class Small(
-        val titleText: String,
-        val descriptionText: String,
-        val imageUrl: String? = null
-    ) : Content(SMALL)
+    data class Small(val titleText: String, val descriptionText: String) : Content(SMALL)
 
     data class Medium(
         val titleText: String,
         val descriptionText: String,
         val placeholder: Placeholder,
-        val imageUrl: String? = null
+        val imageUrl: String? = null,
     ) : Content(MEDIUM)
 
     data class BigSingleAction(
@@ -66,7 +62,7 @@ sealed class Content(val messageType: MessageType) {
         val placeholder: Placeholder,
         val primaryActionText: String,
         val primaryAction: Action,
-        val imageUrl: String? = null
+        val imageUrl: String? = null,
     ) : Content(BIG_SINGLE_ACTION)
 
     data class BigTwoActions(
@@ -77,7 +73,7 @@ sealed class Content(val messageType: MessageType) {
         val primaryAction: Action,
         val secondaryActionText: String,
         val secondaryAction: Action,
-        val imageUrl: String? = null
+        val imageUrl: String? = null,
     ) : Content(BIG_TWO_ACTION)
 
     data class PromoSingleAction(
@@ -86,7 +82,7 @@ sealed class Content(val messageType: MessageType) {
         val placeholder: Placeholder,
         val actionText: String,
         val action: Action,
-        val imageUrl: String? = null
+        val imageUrl: String? = null,
     ) : Content(PROMO_SINGLE_ACTION)
 
     data class CardsList(
@@ -96,7 +92,7 @@ sealed class Content(val messageType: MessageType) {
         val primaryActionText: String,
         val primaryAction: Action,
         val listItems: List<CardItem>,
-        val imageUrl: String? = null
+        val imageUrl: String? = null,
     ) : Content(MessageType.CARDS_LIST)
 
     enum class MessageType {
@@ -135,7 +131,7 @@ sealed class Content(val messageType: MessageType) {
 sealed class Action(
     val actionType: String,
     open val value: String,
-    open val additionalParameters: Map<String, String>?
+    open val additionalParameters: Map<String, String>?,
 ) {
     data class Url(override val value: String) : Action(URL.jsonValue, value, null)
     data class UrlInContext(override val value: String) : Action(JsonActionType.URL_IN_CONTEXT.jsonValue, value, null)

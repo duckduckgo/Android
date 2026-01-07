@@ -47,7 +47,6 @@ private val smallMapper: (JsonContent, Set<MessageActionMapperPlugin>) -> Conten
     Small(
         titleText = jsonContent.titleText.failIfEmpty(),
         descriptionText = jsonContent.descriptionText.failIfEmpty(),
-        imageUrl = jsonContent.imageUrl
     )
 }
 
@@ -56,7 +55,7 @@ private val mediumMapper: (JsonContent, Set<MessageActionMapperPlugin>) -> Conte
         titleText = jsonContent.titleText.failIfEmpty(),
         descriptionText = jsonContent.descriptionText.failIfEmpty(),
         placeholder = jsonContent.placeholder.asPlaceholder(),
-        imageUrl = jsonContent.imageUrl
+        imageUrl = jsonContent.imageUrl,
     )
 }
 
@@ -67,7 +66,7 @@ private val bigMessageSingleActionMapper: (JsonContent, Set<MessageActionMapperP
         placeholder = jsonContent.placeholder.asPlaceholder(),
         primaryActionText = jsonContent.primaryActionText.failIfEmpty(),
         primaryAction = jsonContent.primaryAction!!.toAction(actionMappers),
-        imageUrl = jsonContent.imageUrl
+        imageUrl = jsonContent.imageUrl,
     )
 }
 
@@ -80,7 +79,7 @@ private val bigMessageTwoActionMapper: (JsonContent, Set<MessageActionMapperPlug
         primaryAction = jsonContent.primaryAction!!.toAction(actionMappers),
         secondaryActionText = jsonContent.secondaryActionText.failIfEmpty(),
         secondaryAction = jsonContent.secondaryAction!!.toAction(actionMappers),
-        imageUrl = jsonContent.imageUrl
+        imageUrl = jsonContent.imageUrl,
     )
 }
 
@@ -91,7 +90,7 @@ private val promoSingleActionMapper: (JsonContent, Set<MessageActionMapperPlugin
         placeholder = jsonContent.placeholder.asPlaceholder(),
         actionText = jsonContent.actionText.failIfEmpty(),
         action = jsonContent.action!!.toAction(actionMappers),
-        imageUrl = jsonContent.imageUrl
+        imageUrl = jsonContent.imageUrl,
     )
 }
 
@@ -103,7 +102,7 @@ private val cardsListMapper: (JsonContent, Set<MessageActionMapperPlugin>) -> Co
         primaryActionText = jsonContent.primaryActionText.failIfEmpty(),
         primaryAction = jsonContent.primaryAction!!.toAction(actionMappers),
         listItems = jsonContent.listItems.toListItems(actionMappers),
-        imageUrl = jsonContent.imageUrl
+        imageUrl = jsonContent.imageUrl,
     )
 }
 
