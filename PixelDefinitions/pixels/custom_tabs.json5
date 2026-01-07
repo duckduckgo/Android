@@ -5,7 +5,7 @@
         "owners": ["0nko"],
         "triggers": ["other"],
         "suffixes": ["daily_count_short", "form_factor"],
-        "parameters": ["appVersion", "atb"],
+        "parameters": ["appVersion"],
         "expires": "2026-02-27"
     },
     "m_custom_tabs_dax_clicked": {
@@ -13,7 +13,7 @@
         "owners": ["0nko"],
         "triggers": ["other"],
         "suffixes": ["daily_count_short", "form_factor"],
-        "parameters": ["appVersion", "atb"],
+        "parameters": ["appVersion"],
         "expires": "2026-02-27"
     }
 }
