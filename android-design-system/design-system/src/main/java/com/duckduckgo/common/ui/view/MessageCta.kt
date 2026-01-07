@@ -19,7 +19,6 @@ package com.duckduckgo.common.ui.view
 import android.content.Context
 import android.os.Build
 import android.util.AttributeSet
-import android.util.Log
 import android.widget.FrameLayout
 import androidx.annotation.DrawableRes
 import androidx.annotation.RawRes
@@ -80,18 +79,14 @@ class MessageCta : FrameLayout {
     }
 
     private fun setRemoteMessage(message: Message) {
-
-        Log.d("RadoiuC", "Set remote message: $message")
         binding.remoteMessage.root.show()
         binding.promoRemoteMessage.root.gone()
 
         configureTopIllustration(
+            imageUrl = message.imageUrl,
             drawableRes = message.topIllustration,
             animationRes = message.topAnimation,
         )
-
-        configureRemoteMessageImage(message.imageUrl)
-
         remoteMessageBinding.messageTitle.text = HtmlCompat.fromHtml(message.title, HtmlCompat.FROM_HTML_MODE_LEGACY)
         remoteMessageBinding.messageSubtitle.text = HtmlCompat.fromHtml(message.subtitle, HtmlCompat.FROM_HTML_MODE_LEGACY)
 
@@ -126,41 +121,43 @@ class MessageCta : FrameLayout {
     }
 
     private fun configureTopIllustration(
+        imageUrl: String?,
         @DrawableRes drawableRes: Int?,
-        @RawRes animationRes: Int?
+        @RawRes animationRes: Int?,
     ) {
         with(remoteMessageBinding) {
-            if (animationRes != null) {
-                topIllustration.gone()
-                topIllustrationAnimated.setAnimation(animationRes)
-                topIllustrationAnimated.show()
-            } else if (drawableRes != null) {
-                topIllustrationAnimated.gone()
-                topIllustration.setImageDrawable(AppCompatResources.getDrawable(context, drawableRes))
-                topIllustration.show()
-            } else {
-                topIllustration.gone()
-                topIllustrationAnimated.gone()
-            }
-        }
-    }
+            when {
+                imageUrl != null -> {
+                    Glide
+                        .with(topImage)
+                        .load(imageUrl)
+                        .centerCrop()
+                        .transition(withCrossFade())
+                        .into(topImage)
+                    topImage.show()
+                    topIllustration.gone()
+                    topIllustrationAnimated.gone()
+                }
 
-    private fun configureRemoteMessageImage(imageUrl: String?) {
-        with(remoteMessageBinding) {
-            if (!imageUrl.isNullOrEmpty()) {
-                Log.d("RadoiuC", "RMF: loading image $imageUrl")
-                Glide
-                    .with(topImage)
-                    .load(imageUrl)
-                    .centerCrop()
-                    .transition(withCrossFade())
-                    .into(topImage)
-                topImage.show()
-                topIllustrationAnimated.gone()
-                topIllustration.gone()
-            } else {
-                Log.d("RadoiuC", "RMF: no image")
-                topImage.gone()
+                animationRes != null -> {
+                    topIllustration.gone()
+                    topImage.gone()
+                    topIllustrationAnimated.setAnimation(animationRes)
+                    topIllustrationAnimated.show()
+                }
+
+                drawableRes != null -> {
+                    topImage.gone()
+                    topIllustrationAnimated.gone()
+                    topIllustration.setImageDrawable(AppCompatResources.getDrawable(context, drawableRes))
+                    topIllustration.show()
+                }
+
+                else -> {
+                    topImage.gone()
+                    topIllustration.gone()
+                    topIllustrationAnimated.gone()
+                }
             }
         }
     }
@@ -213,7 +210,7 @@ class MessageCta : FrameLayout {
         }
     }
 
-    data class Message constructor(
+    data class Message(
         @DrawableRes val topIllustration: Int? = null,
         @DrawableRes val middleIllustration: Int? = null,
         @RawRes val topAnimation: Int? = null,
