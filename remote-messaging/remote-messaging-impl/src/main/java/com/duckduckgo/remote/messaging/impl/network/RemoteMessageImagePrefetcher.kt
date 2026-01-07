@@ -50,7 +50,8 @@ class GlideRemoteMessageImagePrefetcher(
                 Glide.with(context)
                     .load(imageUrl)
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
-                    .preload()
+                    .submit()
+                    .get()
 
                 logcat(tag = "RadoiuC") { "Successfully prefetched image: $imageUrl" }
             }.onFailure { error ->
