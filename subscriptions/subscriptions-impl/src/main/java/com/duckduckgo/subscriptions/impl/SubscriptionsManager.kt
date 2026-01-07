@@ -35,10 +35,12 @@ import com.duckduckgo.subscriptions.api.SubscriptionStatus.NOT_AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.UNKNOWN
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.WAITING
 import com.duckduckgo.subscriptions.impl.RealSubscriptionsManager.RecoverSubscriptionResult
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.ADVANCED_SUBSCRIPTION
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.BASIC_SUBSCRIPTION
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.LEGACY_FE_ITR
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.LEGACY_FE_NETP
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.LEGACY_FE_PIR
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.LIST_OF_PRO_PLANS
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN_ROW
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN_US
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.NETP
@@ -548,6 +550,8 @@ class RealSubscriptionsManager @Inject constructor(
             val currentPurchaseToken = playBillingManager.getLatestPurchaseToken()
 
             if (currentPurchaseToken == null) {
+                val errorMessage = "No current purchase token found for switch"
+                logcat { "Subs: Cannot switch plan - $errorMessage" }
                 _currentPurchaseState.emit(CurrentPurchase.Failure("No current purchase token found for switch"))
                 return@withContext
             }
@@ -555,6 +559,8 @@ class RealSubscriptionsManager @Inject constructor(
             // Get account details for external ID
             val account = authRepository.getAccount()
             if (account == null) {
+                val errorMessage = "No account found for switch"
+                logcat { "Subs: Cannot switch plan - $errorMessage" }
                 _currentPurchaseState.emit(CurrentPurchase.Failure("No account found for switch"))
                 return@withContext
             }
@@ -1088,18 +1094,34 @@ class RealSubscriptionsManager @Inject constructor(
     }
 
     private suspend fun activePlanIds(): List<String> =
-        if (isLaunchedRow()) {
-            listOf(YEARLY_PLAN_US, MONTHLY_PLAN_US, YEARLY_PLAN_ROW, MONTHLY_PLAN_ROW)
-        } else {
-            listOf(YEARLY_PLAN_US, MONTHLY_PLAN_US)
+        buildList {
+            addAll(listOf(YEARLY_PLAN_US, MONTHLY_PLAN_US))
+            if (isLaunchedRow()) {
+                addAll(listOf(YEARLY_PLAN_ROW, MONTHLY_PLAN_ROW))
+            }
+            if (privacyProFeature.get().allowProTierPurchase().isEnabled()) {
+                addAll(LIST_OF_PRO_PLANS)
+            }
         }
 
     override suspend fun getSubscriptionOffer(): List<SubscriptionOffer> =
         playBillingManager.products
-            .find { it.productId == BASIC_SUBSCRIPTION }
-            ?.subscriptionOfferDetails
-            .orEmpty()
-            .filter { activePlanIds().contains(it.basePlanId) }
+            .filter {
+                if (privacyProFeature.get().allowProTierPurchase().isEnabled()) {
+                    it.productId == BASIC_SUBSCRIPTION || it.productId == ADVANCED_SUBSCRIPTION
+                } else {
+                    it.productId == BASIC_SUBSCRIPTION
+                }
+            }
+            .flatMap {
+                logcat {
+                    "Subs: Found product ${it.productId} with ${it.subscriptionOfferDetails?.map { Pair(it.basePlanId, it.offerId) }} offers"
+                }
+                it.subscriptionOfferDetails.orEmpty()
+            }
+            .filter {
+                activePlanIds().contains(it.basePlanId)
+            }
             .let { availablePlans ->
                 availablePlans.map { offer ->
                     val pricingPhases = offer.pricingPhases.pricingPhaseList.map { phase ->
@@ -1117,11 +1139,15 @@ class RealSubscriptionsManager @Inject constructor(
 
                     SubscriptionOffer(
                         planId = offer.basePlanId,
-                        tier = "plus", // Temporary placeholder until we have support multiple tiers
+                        tier = SubscriptionTier.fromPlanId(offer.basePlanId).value,
                         pricingPhases = pricingPhases,
                         offerId = offer.offerId,
                         entitlements = entitlements,
                     )
+                }.also {
+                    logcat {
+                        "Subs: Subscription offers after mapping: $it"
+                    }
                 }
             }
 
@@ -1134,13 +1160,24 @@ class RealSubscriptionsManager @Inject constructor(
         if (privacyProFeature.get().tierMessagingEnabled().isEnabled()) {
             val v2Entitlements = authRepository.getFeaturesV2(planId)
             if (v2Entitlements.isNotEmpty()) {
-                return v2Entitlements
+                return v2Entitlements.also {
+                    logcat {
+                        "Subs: getEntitlementsForPlan return v2 entitlements: $it for planId: $planId"
+                    }
+                }
             }
             // Fallback to legacy features for smooth runtime flag transitions
         }
+        logcat {
+            "Subs: getEntitlementsForPlan fallback to legacy features for planId: $planId"
+        }
         return getLegacyFeatures(planId).map { feature ->
             Entitlement(name = "plus", product = feature) // Temporary name placeholder until we have support multiple tiers
-        }.toSet()
+        }.toSet().also {
+            logcat {
+                "Subs: getEntitlementsForPlan return v1 entitlements: $it for planId: $planId"
+            }
+        }
     }
 
     private suspend fun getLegacyFeatures(planId: String): Set<String> {

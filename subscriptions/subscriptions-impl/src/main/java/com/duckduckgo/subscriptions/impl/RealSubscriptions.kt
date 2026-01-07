@@ -278,6 +278,9 @@ interface PrivacyProFeature {
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun tierMessagingEnabled(): Toggle
 
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun allowProTierPurchase(): Toggle
+
     /**
      * When enabled, a VPN reminder notification will be scheduled for day 2 of the free trial.
      */

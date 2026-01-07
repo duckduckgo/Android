@@ -24,6 +24,14 @@
     <!-- Black Friday offer-->
     <string name="subscriptionSettingBlackFridayOffer">Save 40% on First Year</string>
 
+    <!-- Pro tier changes -->
+    <string name="feedbackSubCategorySubsUnableToAccessProFeatures">Unable to access Plus or Pro tier features</string>
+    <string name="subscriptionsProUpgradeTitle">Upgrade to Pro</string>
+    <string name="subscriptionsProUpgradeMessage">Unlock more powerful AI</string>
+    <string name="subscriptionSettingSectionManageSubscription">Manage Subscription</string>
+    <string name="subscriptionSettingViewAllPlans">View All Plans</string>
+    <string name="subscriptionSettingUpdatePaymentOrCancel">Update Payments or Cancel</string>
+
     <!-- VPN Reminder Notification -->
     <string name="vpnReminderNotificationChannelName">VPN Reminders</string>
     <string name="vpnReminderNotificationTitle">Don\'t forget to set up your VPN</string>

@@ -28,6 +28,8 @@ import com.duckduckgo.subscriptions.api.ActiveOfferType
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.SUBSCRIPTION_SETTINGS
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
+import com.duckduckgo.subscriptions.impl.PrivacyProFeature
+import com.duckduckgo.subscriptions.impl.SubscriptionTier
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN_ROW
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN_US
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
@@ -50,6 +52,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import logcat.logcat
 import java.util.Date
 import javax.inject.Inject
 
@@ -59,6 +62,7 @@ class SubscriptionSettingsViewModel @Inject constructor(
     private val subscriptionsManager: SubscriptionsManager,
     private val pixelSender: SubscriptionPixelSender,
     private val privacyProUnifiedFeedback: PrivacyProUnifiedFeedback,
+    private val privacyProFeature: PrivacyProFeature,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     private val command = Channel<Command>(1, DROP_OLDEST)
@@ -84,6 +88,9 @@ class SubscriptionSettingsViewModel @Inject constructor(
     private suspend fun emitChanges() {
         val account = subscriptionsManager.getAccount() ?: return
         val subscription = subscriptionsManager.getSubscription() ?: return
+        logcat {
+            "SubscriptionSettingsViewModel: Subscription found with tier ${subscription.tier}"
+        }
 
         val formatter = DateFormat.getInstanceForSkeleton("ddMMMMyyyy")
         val date = formatter.format(Date(subscription.expiresOrRenewsAt))
@@ -110,6 +117,8 @@ class SubscriptionSettingsViewModel @Inject constructor(
                 activeOffers = subscription.activeOffers,
                 switchPlanAvailable = switchPlanAvailable,
                 savingsPercentage = savingsPercentage,
+                isProTierEnabled = privacyProFeature.allowProTierPurchase().isEnabled(),
+                subscriptionTier = subscription.tier,
             ),
         )
     }
@@ -189,6 +198,8 @@ class SubscriptionSettingsViewModel @Inject constructor(
             val activeOffers: List<ActiveOfferType>,
             val switchPlanAvailable: Boolean,
             val savingsPercentage: Int?,
+            val isProTierEnabled: Boolean,
+            val subscriptionTier: SubscriptionTier,
         ) : ViewState()
     }
 }
