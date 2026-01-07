@@ -432,7 +432,7 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                     val exceptions = parseExceptions(feature.exceptions)
 
                     // v6: Parse parent-level targets
-                    val parentTargets = feature.targets.map { target ->
+                    val parentTargets = feature.targets?.map { target ->
                         Toggle.State.Target(
                             variantKey = target.variantKey,
                             localeCountry = target.localeCountry,
@@ -441,7 +441,7 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                             isPrivacyProEligible = target.isPrivacyProEligible,
                             minSdkVersion = target.minSdkVersion,
                         )
-                    }
+                    } ?: emptyList()
 
                     // v6: Get previous state to preserve rollout threshold
                     val previousSelfState = this.feature.get().invokeMethod("self").getRawStoredState()
@@ -607,7 +607,7 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
     private fun createParseExceptions(module: ModuleDescriptor): FunSpec {
         return FunSpec.builder("parseExceptions")
             .addModifiers(KModifier.PRIVATE)
-            .addParameter("exceptions", List::class.asClassName().parameterizedBy(FqName("JsonException").asClassName(module)))
+            .addParameter("exceptions", List::class.asClassName().parameterizedBy(FqName("JsonException").asClassName(module)).copy(nullable = true))
             .addCode(
                 CodeBlock.builder()
                     .add(
@@ -762,18 +762,18 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                     )
                     .addParameter(
                         "targets",
-                        List::class.asClassName().parameterizedBy(FqName("JsonToggleTarget").asClassName(module)),
+                        List::class.asClassName().parameterizedBy(FqName("JsonToggleTarget").asClassName(module)).copy(nullable = true),
                     )
                     .addParameter(
                         "cohorts",
-                        List::class.asClassName().parameterizedBy(FqName("JsonToggleCohort").asClassName(module)),
+                        List::class.asClassName().parameterizedBy(FqName("JsonToggleCohort").asClassName(module)).copy(nullable = true),
                     )
                     .addParameter("settings", FqName("org.json.JSONObject").asClassName(module).copy(nullable = true))
                     .addParameter(
                         ParameterSpec
                             .builder(
                                 "exceptions",
-                                List::class.asClassName().parameterizedBy(FqName("JsonException").asClassName(module)),
+                                List::class.asClassName().parameterizedBy(FqName("JsonException").asClassName(module)).copy(nullable = true),
                             )
                             .build(),
                     )
@@ -799,13 +799,13 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
             )
             .addProperty(
                 PropertySpec
-                    .builder("targets", List::class.asClassName().parameterizedBy(FqName("JsonToggleTarget").asClassName(module)))
+                    .builder("targets", List::class.asClassName().parameterizedBy(FqName("JsonToggleTarget").asClassName(module)).copy(nullable = true))
                     .initializer("targets")
                     .build(),
             )
             .addProperty(
                 PropertySpec
-                    .builder("cohorts", List::class.asClassName().parameterizedBy(FqName("JsonToggleCohort").asClassName(module)))
+                    .builder("cohorts", List::class.asClassName().parameterizedBy(FqName("JsonToggleCohort").asClassName(module)).copy(nullable = true))
                     .initializer("cohorts")
                     .build(),
             )
@@ -818,7 +818,7 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
             .addProperty(
                 PropertySpec.builder(
                     "exceptions",
-                    List::class.asClassName().parameterizedBy(FqName("JsonException").asClassName(module)),
+                    List::class.asClassName().parameterizedBy(FqName("JsonException").asClassName(module)).copy(nullable = true),
                 ).initializer("exceptions")
                     .build(),
             )
@@ -842,7 +842,7 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                         ParameterSpec
                             .builder(
                                 "exceptions",
-                                List::class.asClassName().parameterizedBy(FqName("JsonException").asClassName(module)),
+                                List::class.asClassName().parameterizedBy(FqName("JsonException").asClassName(module)).copy(nullable = true),
                             )
                             .build(),
                     )
@@ -865,14 +865,14 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                     // v6: Parent-level targets support
                     .addParameter(
                         "targets",
-                        List::class.asClassName().parameterizedBy(FqName("JsonToggleTarget").asClassName(module)),
+                        List::class.asClassName().parameterizedBy(FqName("JsonToggleTarget").asClassName(module)).copy(nullable = true),
                     )
                     // v6: Parent-level description (informational only)
                     .addParameter("description", String::class.asClassName().copy(nullable = true))
                     // v6: Parent-level cohorts (parsed but not functionally supported)
                     .addParameter(
                         "cohorts",
-                        List::class.asClassName().parameterizedBy(FqName("JsonToggleCohort").asClassName(module)),
+                        List::class.asClassName().parameterizedBy(FqName("JsonToggleCohort").asClassName(module)).copy(nullable = true),
                     )
                     .build(),
             )
@@ -892,7 +892,7 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
             .addProperty(
                 PropertySpec.builder(
                     "exceptions",
-                    List::class.asClassName().parameterizedBy(FqName("JsonException").asClassName(module)),
+                    List::class.asClassName().parameterizedBy(FqName("JsonException").asClassName(module)).copy(nullable = true),
                 ).initializer("exceptions")
                     .build(),
             )
@@ -918,7 +918,7 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
             // v6: Parent-level targets
             .addProperty(
                 PropertySpec
-                    .builder("targets", List::class.asClassName().parameterizedBy(FqName("JsonToggleTarget").asClassName(module)))
+                    .builder("targets", List::class.asClassName().parameterizedBy(FqName("JsonToggleTarget").asClassName(module)).copy(nullable = true))
                     .initializer("targets")
                     .build(),
             )
@@ -927,7 +927,7 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
             // v6: Parent-level cohorts (parsed but not functionally supported)
             .addProperty(
                 PropertySpec
-                    .builder("cohorts", List::class.asClassName().parameterizedBy(FqName("JsonToggleCohort").asClassName(module)))
+                    .builder("cohorts", List::class.asClassName().parameterizedBy(FqName("JsonToggleCohort").asClassName(module)).copy(nullable = true))
                     .initializer("cohorts")
                     .build(),
             )
