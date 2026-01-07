@@ -67,6 +67,8 @@ sealed class Command {
         val query: String,
     ) : Command()
 
+    object NavigateBackInCustomTab : Command()
+
     data object LaunchNewTab : Command()
 
     data object ResetHistory : Command()
