@@ -693,6 +693,7 @@ class BrowserTabViewModelTest {
             whenever(nonHttpAppLinkChecker.isPermitted(anyOrNull())).thenReturn(true)
             remoteMessagingModel = givenRemoteMessagingModel(mockRemoteMessagingRepository, mockPixel, coroutineRule.testDispatcherProvider)
             runBlocking { whenever(mockAddressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(false) }
+            whenever(mockAddressBarTrackersAnimationManager.shouldShowAnimation(anyOrNull(), anyOrNull())).thenReturn(true)
 
             ctaViewModel =
                 CtaViewModel(
@@ -7688,6 +7689,15 @@ class BrowserTabViewModelTest {
         testee.pageFinished(mockWebView, webViewNavState, nonDdgUrl)
 
         assertNull("SERP logo should be cleared when navigating to non-DuckDuckGo URL", omnibarViewState().serpLogo)
+    }
+
+    @Test
+    fun whenOnStartTrackersAnimationCalledThenStartAddressBarTrackersAnimationCommandIssued() = runTest {
+        loadUrl("https://www.example.com")
+
+        testee.onStartTrackersAnimation()
+
+        assertCommandIssued<Command.StartAddressBarTrackersAnimation>()
     }
 
     private fun aCredential(): LoginCredentials = LoginCredentials(domain = null, username = null, password = null)

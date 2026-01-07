@@ -244,6 +244,7 @@ import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.global.model.domain
 import com.duckduckgo.app.global.model.domainMatchesUrl
+import com.duckduckgo.app.global.model.orderedTrackerBlockedEntities
 import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_BANNER_DISMISSED
@@ -581,6 +582,7 @@ class BrowserTabViewModel @Inject constructor(
                 siteHttpErrorHandler.assignErrorsAndClearCache(value)
             }
         }
+    private var lastAnimatedUrl: String? = null
     private lateinit var tabId: String
     private var webNavigationState: WebNavigationState? = null
     private var httpsUpgraded = false
@@ -1770,11 +1772,22 @@ class BrowserTabViewModel @Inject constructor(
     private suspend fun updateLoadingStatePrivacy(domain: String) {
         val privacyProtectionDisabled = isPrivacyProtectionDisabled(domain)
         withContext(dispatchers.main()) {
-            loadingViewState.value =
-                currentLoadingViewState().copy(
-                    trackersAnimationEnabled = !(privacyProtectionDisabled || currentBrowserViewState().maliciousSiteBlocked),
-                    url = site?.url ?: "",
-                )
+            if (addressBarTrackersAnimationManager.isFeatureEnabled()) {
+                val shouldShowAddressBarTrackersAnimation =
+                    addressBarTrackersAnimationManager.shouldShowAnimation(currentUrl = site?.url, lastAnimatedUrl = lastAnimatedUrl)
+                loadingViewState.value =
+                    currentLoadingViewState().copy(
+                        trackersAnimationEnabled = shouldShowAddressBarTrackersAnimation &&
+                            !(privacyProtectionDisabled || currentBrowserViewState().maliciousSiteBlocked),
+                        url = site?.url ?: "",
+                    )
+            } else {
+                loadingViewState.value =
+                    currentLoadingViewState().copy(
+                        trackersAnimationEnabled = !(privacyProtectionDisabled || currentBrowserViewState().maliciousSiteBlocked),
+                        url = site?.url ?: "",
+                    )
+            }
         }
     }
 
@@ -4592,6 +4605,13 @@ class BrowserTabViewModel @Inject constructor(
     fun sendKeyboardFocusedPixel() {
         pixel.fire(DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_KEYBOARD_USAGE)
         pixel.fire(DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_KEYBOARD_USAGE_DAILY, type = Daily())
+    }
+
+    fun onStartTrackersAnimation() {
+        lastAnimatedUrl = site?.url
+        val site = siteLiveData.value
+        val trackerEvents = site?.orderedTrackerBlockedEntities()
+        command.value = Command.StartAddressBarTrackersAnimation(trackerEvents)
     }
 
     private fun trackersCount(): String =
