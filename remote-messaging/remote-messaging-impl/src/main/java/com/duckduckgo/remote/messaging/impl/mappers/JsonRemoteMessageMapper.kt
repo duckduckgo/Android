@@ -135,7 +135,7 @@ private fun JsonRemoteMessage.map(
         )
         remoteMessage.localizeMessage(this.translations, locale)
     }.onFailure {
-        logcat(tag = "RadoiuC") { "RMF: error parsing message id=${this.id}: ${it.message}\n${it.stackTraceToString()}" }
+        logcat(ERROR) { "RMF: error parsing message id=${this.id}: ${it.message}\n${it.stackTraceToString()}" }
     }.getOrNull()
 }
 

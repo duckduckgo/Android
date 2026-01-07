@@ -33,7 +33,7 @@ import com.duckduckgo.remote.messaging.api.JsonActionType.PLAYSTORE
 import com.duckduckgo.remote.messaging.api.JsonActionType.SHARE
 import com.duckduckgo.remote.messaging.api.JsonActionType.URL
 
-data class RemoteMessage constructor(
+data class RemoteMessage(
     val id: String,
     val content: Content,
     val matchingRules: List<Int>,

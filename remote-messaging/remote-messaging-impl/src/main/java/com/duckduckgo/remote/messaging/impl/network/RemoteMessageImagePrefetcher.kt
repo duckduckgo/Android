@@ -39,13 +39,13 @@ class GlideRemoteMessageImagePrefetcher(
         val imageUrl = message?.content?.getImageUrl() ?: return
 
         if (imageUrl.isBlank()) {
-            logcat(tag = "RadoiuC") { "No image URL to prefetch for message: ${message.id}" }
+            logcat { "RMF: No image URL to prefetch for message: ${message.id}" }
             return
         }
 
         withContext(dispatcherProvider.io()) {
             runCatching {
-                logcat(tag = "RadoiuC") { "Prefetching image: $imageUrl for message: ${message.id}" }
+                logcat { "RMF: Prefetching image: $imageUrl for message: ${message.id}" }
 
                 Glide.with(context)
                     .load(imageUrl)
@@ -53,9 +53,9 @@ class GlideRemoteMessageImagePrefetcher(
                     .submit()
                     .get()
 
-                logcat(tag = "RadoiuC") { "Successfully prefetched image: $imageUrl" }
+                logcat { "RMF: Successfully prefetched image: $imageUrl" }
             }.onFailure { error ->
-                logcat(tag = "RadoiuC") { "Failed to prefetch image $imageUrl: ${error.message}" }
+                logcat { "RMF: Failed to prefetch image $imageUrl: ${error.message}" }
             }
         }
     }

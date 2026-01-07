@@ -56,11 +56,7 @@ class RealRemoteMessagingConfigProcessor(
 
         if (shouldProcess) {
             val config = remoteMessagingConfigJsonMapper.map(jsonRemoteMessagingConfig)
-            val message = remoteMessagingConfigMatcher.evaluate(config).also {
-                logcat(tag = "RadoiuC") {
-                    "evaluated message: $it"
-                }
-            }
+            val message = remoteMessagingConfigMatcher.evaluate(config)
 
             remoteMessageImagePrefetcher.prefetchImage(message)
             remoteMessagingConfigRepository.insert(RemoteMessagingConfig(version = jsonRemoteMessagingConfig.version))
