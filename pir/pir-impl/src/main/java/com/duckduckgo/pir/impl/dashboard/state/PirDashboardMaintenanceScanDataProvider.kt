@@ -94,13 +94,13 @@ class RealPirDashboardMaintenanceScanDataProvider @Inject constructor(
     private val pirSchedulingRepository: PirSchedulingRepository,
 ) : PirDashboardStateProvider(currentTimeProvider, pirRepository, pirSchedulingRepository), PirDashboardMaintenanceScanDataProvider {
     override suspend fun getInProgressOptOuts(): List<DashboardExtractedProfileResult> = withContext(dispatcherProvider.io()) {
-        return@withContext getAllExtractedProfileResults().filter {
+        return@withContext getAllExtractedProfileResults(includeResultsForDeprecatedProfileQueries = false).filter {
             it.optOutRemovedDateInMillis == null || it.optOutRemovedDateInMillis == 0L
         }
     }
 
     override suspend fun getRemovedOptOuts(): List<DashboardRemovedExtractedProfileResult> = withContext(dispatcherProvider.io()) {
-        val allRemovedExtractedProfiles = getAllExtractedProfileResults().filter {
+        val allRemovedExtractedProfiles = getAllExtractedProfileResults(includeResultsForDeprecatedProfileQueries = true).filter {
             it.optOutRemovedDateInMillis != null && it.optOutRemovedDateInMillis != 0L
         }
 
