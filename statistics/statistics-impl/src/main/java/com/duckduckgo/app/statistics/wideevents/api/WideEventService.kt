@@ -14,10 +14,17 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.statistics.wideevents
+package com.duckduckgo.app.statistics.wideevents.api
 
-import com.duckduckgo.app.statistics.wideevents.db.WideEventRepository
+import com.duckduckgo.anvil.annotations.ContributesNonCachingServiceApi
+import com.duckduckgo.common.utils.AppUrl
+import com.duckduckgo.di.scopes.AppScope
+import retrofit2.http.Body
+import retrofit2.http.POST
 
-interface WideEventSender {
-    suspend fun sendWideEvent(event: WideEventRepository.WideEvent)
+@ContributesNonCachingServiceApi(AppScope::class)
+interface WideEventService {
+
+    @POST("${AppUrl.Url.PIXEL}/e")
+    suspend fun sendWideEvent(@Body request: WideEventRequest)
 }
