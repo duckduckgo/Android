@@ -20,6 +20,7 @@ import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
+import android.graphics.drawable.Drawable
 import android.os.Build
 import android.text.Editable
 import android.transition.ChangeBounds
@@ -56,7 +57,11 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.airbnb.lottie.LottieAnimationView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.target.Target
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.PulseAnimation
 import com.duckduckgo.app.browser.R
@@ -117,6 +122,7 @@ import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.serp.logos.api.SerpEasterEggLogoAnimator
 import com.duckduckgo.serp.logos.api.SerpEasterEggLogosToggles
 import com.duckduckgo.serp.logos.api.SerpLogos
 import com.google.android.material.appbar.AppBarLayout
@@ -217,6 +223,7 @@ class OmnibarLayout @JvmOverloads constructor(
     private var lastViewMode: Mode? = null
     private var stateBuffer: MutableList<StateChange> = mutableListOf()
     private var customTabToolbarColor: Int = 0
+    private var lastAnimatedLogoUrl: String? = null
 
     private val omnibarCardShadow: MaterialCardView by lazy { findViewById(R.id.omniBarContainerShadow) }
     private val iconsContainer: View by lazy { findViewById(R.id.iconsContainer) }
@@ -752,6 +759,7 @@ class OmnibarLayout @JvmOverloads constructor(
                         .load(CommonR.drawable.ic_ddg_logo)
                         .transition(withCrossFade())
                         .placeholder(daxIcon.drawable)
+                        .listener(null) // Clear any previous listener from EasterEggLogo
                         .into(this)
                 }
                 shieldIcon.gone()
@@ -778,11 +786,13 @@ class OmnibarLayout @JvmOverloads constructor(
 
             is EasterEggLogo -> {
                 daxIcon.show()
+                val logoUrl = leadingIconState.logoUrl
                 Glide
                     .with(daxIcon)
-                    .load(leadingIconState.logoUrl)
+                    .load(logoUrl)
                     .placeholder(daxIcon.drawable)
                     .transition(withCrossFade())
+                    .listener(EasterEggLogoListener(leadingIconState, logoUrl))
                     .into(daxIcon)
                 daxIcon.setOnClickListener {
                     viewModel.onLogoClicked()
@@ -1458,5 +1468,42 @@ class OmnibarLayout @JvmOverloads constructor(
 
     override fun gone() {
         visibility = View.GONE
+    }
+
+    /**
+     * Glide listener for Easter Egg logos that plays a wiggle animation once the image loads.
+     * Only animates once per unique logo URL, and skips animation for favourite logos.
+     */
+    private inner class EasterEggLogoListener(
+        private val leadingIconState: EasterEggLogo,
+        private val logoUrl: String,
+    ) : RequestListener<Drawable> {
+
+        override fun onLoadFailed(
+            e: GlideException?,
+            model: Any?,
+            target: Target<Drawable>,
+            isFirstResource: Boolean,
+        ): Boolean = false
+
+        override fun onResourceReady(
+            resource: Drawable,
+            model: Any,
+            target: Target<Drawable>?,
+            dataSource: DataSource,
+            isFirstResource: Boolean,
+        ): Boolean {
+            if (!leadingIconState.isFavourite && logoUrl != lastAnimatedLogoUrl) {
+                lastAnimatedLogoUrl = logoUrl
+                daxIcon.postDelayed({
+                    SerpEasterEggLogoAnimator.playWiggle(daxIcon)
+                }, EASTER_EGG_ANIMATION_DELAY_MS)
+            }
+            return false
+        }
+    }
+
+    companion object {
+        private const val EASTER_EGG_ANIMATION_DELAY_MS = 1000L
     }
 }

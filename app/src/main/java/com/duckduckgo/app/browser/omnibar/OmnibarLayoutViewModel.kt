@@ -268,6 +268,7 @@ class OmnibarLayoutViewModel @Inject constructor(
         data class EasterEggLogo(
             val logoUrl: String,
             val serpUrl: String,
+            val isFavourite: Boolean = false,
         ) : LeadingIconState()
     }
 
@@ -501,11 +502,11 @@ class OmnibarLayoutViewModel @Inject constructor(
                     isSetFavouriteEnabled &&
                         favouriteLogoUrl != null &&
                         duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url) -> {
-                        EasterEggLogo(logoUrl = favouriteLogoUrl!!, serpUrl = url)
+                        EasterEggLogo(logoUrl = favouriteLogoUrl!!, serpUrl = url, isFavourite = true)
                     }
                     // Priority 2: SERP Easter Egg from search
                     serpLogoUrl != null -> {
-                        EasterEggLogo(logoUrl = serpLogoUrl, serpUrl = url)
+                        EasterEggLogo(logoUrl = serpLogoUrl, serpUrl = url, isFavourite = false)
                     }
                     // Priority 3: Dax icon for DDG URLs
                     shouldShowDaxIcon(url) -> Dax
