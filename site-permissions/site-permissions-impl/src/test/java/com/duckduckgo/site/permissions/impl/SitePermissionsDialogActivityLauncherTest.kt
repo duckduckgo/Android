@@ -25,11 +25,11 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.site.permissions.api.SitePermissionsGrantedListener
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissions
 import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.verifyNoMoreInteractions
 import com.nhaarman.mockitokotlin2.whenever
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Mockito.verifyNoInteractions
 
 @RunWith(AndroidJUnit4::class)
 class SitePermissionsDialogActivityLauncherTest {
@@ -72,7 +72,7 @@ class SitePermissionsDialogActivityLauncherTest {
             permissionsGrantedListener = permissionsGrantedListener,
         )
 
-        verifyNoInteractions(pixel)
+        verifyNoMoreInteractions(pixel)
     }
 
     @Test
@@ -96,7 +96,7 @@ class SitePermissionsDialogActivityLauncherTest {
             permissionsGrantedListener = permissionsGrantedListener,
         )
 
-        verifyNoInteractions(pixel)
+        verifyNoMoreInteractions(pixel)
     }
 }
 
