@@ -71,7 +71,7 @@ class NewTabLegacyPageViewModel @AssistedInject constructor(
     private val appTrackingProtection: AppTrackingProtection,
 ) : ViewModel(), DefaultLifecycleObserver {
 
-    data class ViewState constructor(
+    data class ViewState(
         private val showDaxLogo: Boolean,
         private val appTpEnabled: Boolean = false,
         val message: RemoteMessage? = null,
