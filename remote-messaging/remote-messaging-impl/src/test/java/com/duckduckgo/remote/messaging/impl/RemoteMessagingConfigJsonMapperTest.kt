@@ -289,6 +289,8 @@ class RemoteMessagingConfigJsonMapperTest {
                         primaryAction = Action.UrlInContext(
                             value = "https://duckduckgo.com/duckduckgo-help-pages/results/how-to-filter-out-ai-images-in-duckduckgo-search-results",
                         ),
+                        matchingRules = emptyList(),
+                        exclusionRules = emptyList(),
                     ),
                     CardItem(
                         id = "enhanced_scam_blocker",
@@ -299,6 +301,8 @@ class RemoteMessagingConfigJsonMapperTest {
                         primaryAction = Action.UrlInContext(
                             value = "https://spreadprivacy.com/scam-blocker/",
                         ),
+                        matchingRules = emptyList(),
+                        exclusionRules = emptyList(),
                     ),
                     CardItem(
                         id = "import_passwords",
@@ -307,6 +311,8 @@ class RemoteMessagingConfigJsonMapperTest {
                         descriptionText = "Use DuckDuckGo to manage passwords on apps and sites across your whole device.",
                         placeholder = Content.Placeholder.KEY_IMPORT,
                         primaryAction = Action.DefaultCredentialProvider,
+                        matchingRules = emptyList(),
+                        exclusionRules = emptyList(),
                     ),
                 ),
             ),

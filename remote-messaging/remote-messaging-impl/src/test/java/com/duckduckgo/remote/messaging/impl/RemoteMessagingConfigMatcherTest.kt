@@ -20,11 +20,17 @@ import androidx.room.Room
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.remote.messaging.api.Action
 import com.duckduckgo.remote.messaging.api.AttributeMatcherPlugin
+import com.duckduckgo.remote.messaging.api.CardItem
+import com.duckduckgo.remote.messaging.api.CardItemType
+import com.duckduckgo.remote.messaging.api.Content
 import com.duckduckgo.remote.messaging.api.MatchingAttribute
 import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
+import com.duckduckgo.remote.messaging.fixtures.RemoteMessageOM.aCardsListMessage
 import com.duckduckgo.remote.messaging.fixtures.RemoteMessageOM.aMediumMessage
 import com.duckduckgo.remote.messaging.fixtures.RemoteMessageOM.aSmallMessage
+import com.duckduckgo.remote.messaging.fixtures.RemoteMessageOM.cardsListContent
 import com.duckduckgo.remote.messaging.impl.models.*
 import com.duckduckgo.remote.messaging.impl.models.RemoteConfig
 import com.duckduckgo.remote.messaging.store.RemoteMessagingCohort
@@ -433,6 +439,254 @@ class RemoteMessagingConfigMatcherTest {
         )
 
         assertEquals(aMediumMessage(id = "message1", exclusionRules = rules(2)), message)
+    }
+
+    @Test
+    fun whenCardsListMessageWithNoRulesAndCardItemsWithNoRulesThenReturnsMessageWithAllItems() = runBlocking {
+        val cardItem1 = CardItem(
+            id = "item1",
+            type = CardItemType.TWO_LINE_LIST_ITEM,
+            titleText = "Card 1",
+            descriptionText = "Description 1",
+            placeholder = Content.Placeholder.DDG_ANNOUNCE,
+            primaryAction = Action.Dismiss,
+            matchingRules = emptyList(),
+            exclusionRules = emptyList(),
+        )
+        val cardItem2 = CardItem(
+            id = "item2",
+            type = CardItemType.TWO_LINE_LIST_ITEM,
+            titleText = "Card 2",
+            descriptionText = "Description 2",
+            placeholder = Content.Placeholder.RADAR,
+            primaryAction = Action.Dismiss,
+            matchingRules = emptyList(),
+            exclusionRules = emptyList(),
+        )
+        val cardsListContent = cardsListContent(listItems = listOf(cardItem1, cardItem2))
+        val message = aCardsListMessage(content = cardsListContent)
+
+        val result = testee.evaluate(
+            RemoteConfig(
+                messages = listOf(message),
+                rules = emptyList(),
+            ),
+        )
+
+        assertEquals(message, result)
+    }
+
+    @Test
+    fun whenCardsListMessageWithSomeCardItemsPassingRulesThenReturnsFilteredMessage() = runBlocking {
+        givenDeviceMatches(Api(max = 19))
+        val passingItem = CardItem(
+            id = "passing",
+            type = CardItemType.TWO_LINE_LIST_ITEM,
+            titleText = "Passing Card",
+            descriptionText = "Description",
+            placeholder = Content.Placeholder.DDG_ANNOUNCE,
+            primaryAction = Action.Dismiss,
+            matchingRules = rules(1),
+            exclusionRules = emptyList(),
+        )
+        val failingItem1 = CardItem(
+            id = "failing1",
+            type = CardItemType.TWO_LINE_LIST_ITEM,
+            titleText = "Failing Card 1",
+            descriptionText = "Description",
+            placeholder = Content.Placeholder.RADAR,
+            primaryAction = Action.Dismiss,
+            matchingRules = rules(2),
+            exclusionRules = emptyList(),
+        )
+        val failingItem2 = CardItem(
+            id = "failing2",
+            type = CardItemType.TWO_LINE_LIST_ITEM,
+            titleText = "Failing Card 2",
+            descriptionText = "Description",
+            placeholder = Content.Placeholder.IMAGE_AI,
+            primaryAction = Action.Dismiss,
+            matchingRules = rules(2),
+            exclusionRules = emptyList(),
+        )
+        val cardsListContent = cardsListContent(listItems = listOf(passingItem, failingItem1, failingItem2))
+        val message = aCardsListMessage(content = cardsListContent)
+
+        val result = testee.evaluate(
+            RemoteConfig(
+                messages = listOf(message),
+                rules = listOf(
+                    rule(id = 1, matchingAttributes = arrayOf(Api(max = 19))),
+                    rule(id = 2, matchingAttributes = arrayOf(Api(max = 15))),
+                ),
+            ),
+        )
+
+        val expectedContent = cardsListContent.copy(listItems = listOf(passingItem))
+        assertEquals(message.copy(content = expectedContent), result)
+    }
+
+    @Test
+    fun whenCardsListMessageWithAllCardItemsFailingRulesThenReturnsNull() = runBlocking {
+        givenDeviceMatches(Api(max = 19))
+        val failingItem1 = CardItem(
+            id = "failing1",
+            type = CardItemType.TWO_LINE_LIST_ITEM,
+            titleText = "Failing Card 1",
+            descriptionText = "Description",
+            placeholder = Content.Placeholder.DDG_ANNOUNCE,
+            primaryAction = Action.Dismiss,
+            matchingRules = rules(1),
+            exclusionRules = emptyList(),
+        )
+        val failingItem2 = CardItem(
+            id = "failing2",
+            type = CardItemType.TWO_LINE_LIST_ITEM,
+            titleText = "Failing Card 2",
+            descriptionText = "Description",
+            placeholder = Content.Placeholder.RADAR,
+            primaryAction = Action.Dismiss,
+            matchingRules = rules(1),
+            exclusionRules = emptyList(),
+        )
+        val cardsListContent = cardsListContent(listItems = listOf(failingItem1, failingItem2))
+        val message = aCardsListMessage(content = cardsListContent)
+
+        val result = testee.evaluate(
+            RemoteConfig(
+                messages = listOf(message),
+                rules = listOf(
+                    rule(id = 1, matchingAttributes = arrayOf(Api(max = 15))),
+                ),
+            ),
+        )
+
+        assertNull(result)
+    }
+
+    @Test
+    fun whenCardsListMessageWithCardItemsWithNoRulesThenReturnsAllItems() = runBlocking {
+        givenDeviceMatches(Api(max = 19))
+        val cardItem1 = CardItem(
+            id = "item1",
+            type = CardItemType.TWO_LINE_LIST_ITEM,
+            titleText = "Card 1",
+            descriptionText = "Description 1",
+            placeholder = Content.Placeholder.DDG_ANNOUNCE,
+            primaryAction = Action.Dismiss,
+            matchingRules = emptyList(),
+            exclusionRules = emptyList(),
+        )
+        val cardItem2 = CardItem(
+            id = "item2",
+            type = CardItemType.TWO_LINE_LIST_ITEM,
+            titleText = "Card 2",
+            descriptionText = "Description 2",
+            placeholder = Content.Placeholder.RADAR,
+            primaryAction = Action.Dismiss,
+            matchingRules = emptyList(),
+            exclusionRules = emptyList(),
+        )
+        val cardsListContent = cardsListContent(listItems = listOf(cardItem1, cardItem2))
+        val message = aCardsListMessage(content = cardsListContent, matchingRules = rules(1))
+
+        val result = testee.evaluate(
+            RemoteConfig(
+                messages = listOf(message),
+                rules = listOf(
+                    rule(id = 1, matchingAttributes = arrayOf(Api(max = 19))),
+                ),
+            ),
+        )
+
+        assertEquals(message, result)
+    }
+
+    @Test
+    fun whenCardsListMessageWithCardItemMatchingExclusionRuleThenItemFiltered() = runBlocking {
+        givenDeviceMatches(Api(max = 19), Locale(value = listOf("en-US")))
+        val passingItem = CardItem(
+            id = "passing",
+            type = CardItemType.TWO_LINE_LIST_ITEM,
+            titleText = "Passing Card",
+            descriptionText = "Description",
+            placeholder = Content.Placeholder.DDG_ANNOUNCE,
+            primaryAction = Action.Dismiss,
+            matchingRules = rules(1),
+            exclusionRules = rules(3),
+        )
+        val excludedItem = CardItem(
+            id = "excluded",
+            type = CardItemType.TWO_LINE_LIST_ITEM,
+            titleText = "Excluded Card",
+            descriptionText = "Description",
+            placeholder = Content.Placeholder.RADAR,
+            primaryAction = Action.Dismiss,
+            matchingRules = rules(1),
+            exclusionRules = rules(2),
+        )
+        val cardsListContent = cardsListContent(listItems = listOf(passingItem, excludedItem))
+        val message = aCardsListMessage(content = cardsListContent)
+
+        val result = testee.evaluate(
+            RemoteConfig(
+                messages = listOf(message),
+                rules = listOf(
+                    rule(id = 1, matchingAttributes = arrayOf(Api(max = 19))),
+                    rule(id = 2, matchingAttributes = arrayOf(Locale(value = listOf("en-US")))),
+                    rule(id = 3, matchingAttributes = arrayOf(EmailEnabled(value = true))),
+                ),
+            ),
+        )
+
+        val expectedContent = cardsListContent.copy(listItems = listOf(passingItem))
+        assertEquals(message.copy(content = expectedContent), result)
+    }
+
+    @Test
+    fun whenNonCardsListMessageThenReturnsMessageUnmodified() = runBlocking {
+        givenDeviceMatches(Api(max = 19))
+        val message = aMediumMessage(matchingRules = rules(1))
+
+        val result = testee.evaluate(
+            RemoteConfig(
+                messages = listOf(message),
+                rules = listOf(
+                    rule(id = 1, matchingAttributes = arrayOf(Api(max = 19))),
+                ),
+            ),
+        )
+
+        assertEquals(message, result)
+    }
+
+    @Test
+    fun whenCardsListMessageFailsOwnRulesThenReturnsNullWithoutCheckingCardItems() = runBlocking {
+        givenDeviceMatches(Api(max = 19))
+        val cardItem = CardItem(
+            id = "item1",
+            type = CardItemType.TWO_LINE_LIST_ITEM,
+            titleText = "Card 1",
+            descriptionText = "Description 1",
+            placeholder = Content.Placeholder.DDG_ANNOUNCE,
+            primaryAction = Action.Dismiss,
+            matchingRules = rules(1),
+            exclusionRules = emptyList(),
+        )
+        val cardsListContent = cardsListContent(listItems = listOf(cardItem))
+        val message = aCardsListMessage(content = cardsListContent, matchingRules = rules(2))
+
+        val result = testee.evaluate(
+            RemoteConfig(
+                messages = listOf(message),
+                rules = listOf(
+                    rule(id = 1, matchingAttributes = arrayOf(Api(max = 19))),
+                    rule(id = 2, matchingAttributes = arrayOf(Api(max = 15))),
+                ),
+            ),
+        )
+
+        assertNull(result)
     }
 
     private suspend fun givenDeviceMatches(

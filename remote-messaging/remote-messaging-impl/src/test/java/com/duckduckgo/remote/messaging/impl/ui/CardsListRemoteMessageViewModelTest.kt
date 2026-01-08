@@ -101,6 +101,8 @@ class CardsListRemoteMessageViewModelTest {
                     titleText = "Card 1",
                     descriptionText = "Description 1",
                     primaryAction = Action.Dismiss,
+                    matchingRules = emptyList(),
+                    exclusionRules = emptyList(),
                 ),
             ),
             primaryActionText = "Dismiss",
@@ -188,6 +190,8 @@ class CardsListRemoteMessageViewModelTest {
             titleText = "Card 1",
             descriptionText = "Description 1",
             primaryAction = Action.Dismiss,
+            matchingRules = emptyList(),
+            exclusionRules = emptyList(),
         )
         val cardItem2 = CardItem(
             id = "item2",
@@ -196,6 +200,8 @@ class CardsListRemoteMessageViewModelTest {
             titleText = "Card 2",
             descriptionText = "Description 2",
             primaryAction = Action.Dismiss,
+            matchingRules = emptyList(),
+            exclusionRules = emptyList(),
         )
         val cardsList = Content.CardsList(
             titleText = "Test Cards",
@@ -328,6 +334,8 @@ class CardsListRemoteMessageViewModelTest {
             primaryAction = itemAction,
             placeholder = Content.Placeholder.DDG_ANNOUNCE,
             type = CardItemType.TWO_LINE_LIST_ITEM,
+            matchingRules = emptyList(),
+            exclusionRules = emptyList(),
         )
         val expectedCommand = Command.LaunchPlayStore("com.example.app")
         whenever(commandActionMapper.asCommand(eq(itemAction))).thenReturn(expectedCommand)
@@ -352,6 +360,8 @@ class CardsListRemoteMessageViewModelTest {
             primaryAction = itemAction,
             placeholder = Content.Placeholder.DDG_ANNOUNCE,
             type = CardItemType.TWO_LINE_LIST_ITEM,
+            matchingRules = emptyList(),
+            exclusionRules = emptyList(),
         )
         val cardsList = Content.CardsList(
             titleText = "Test Cards",
@@ -399,6 +409,8 @@ class CardsListRemoteMessageViewModelTest {
             primaryAction = itemAction1,
             type = CardItemType.TWO_LINE_LIST_ITEM,
             placeholder = Content.Placeholder.DDG_ANNOUNCE,
+            matchingRules = emptyList(),
+            exclusionRules = emptyList(),
         )
         val cardItem2 = CardItem(
             id = "id2",
@@ -407,6 +419,8 @@ class CardsListRemoteMessageViewModelTest {
             primaryAction = itemAction2,
             type = CardItemType.TWO_LINE_LIST_ITEM,
             placeholder = Content.Placeholder.DDG_ANNOUNCE,
+            matchingRules = emptyList(),
+            exclusionRules = emptyList(),
         )
         val cardsList = Content.CardsList(
             titleText = "Test Cards",
@@ -456,6 +470,8 @@ class CardsListRemoteMessageViewModelTest {
             primaryAction = action,
             type = CardItemType.TWO_LINE_LIST_ITEM,
             placeholder = Content.Placeholder.DDG_ANNOUNCE,
+            matchingRules = emptyList(),
+            exclusionRules = emptyList(),
         )
         val cardsList = Content.CardsList(
             titleText = "Test Cards",
