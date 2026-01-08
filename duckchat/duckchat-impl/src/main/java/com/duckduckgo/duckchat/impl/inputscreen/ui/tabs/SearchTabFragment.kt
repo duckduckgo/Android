@@ -247,4 +247,9 @@ class SearchTabFragment : DuckDuckGoFragment(R.layout.fragment_search_tab) {
         val layoutManager = binding.autoCompleteSuggestionsList.layoutManager as LinearLayoutManager
         layoutManager.scrollToPositionWithOffset(position, offset)
     }
+
+    override fun onDestroyView() {
+        bottomBlurView = null
+        super.onDestroyView()
+    }
 }
