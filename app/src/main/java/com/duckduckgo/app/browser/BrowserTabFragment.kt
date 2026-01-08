@@ -4947,6 +4947,8 @@ class BrowserTabFragment :
     }
 
     private fun launchSerpEasterEggLogoActivity(logoUrl: String) {
+        omnibar.cancelEasterEggLogoAnimation()
+
         ViewCompat.setTransitionName(omnibar.daxIcon, logoUrl)
         val activityOptions =
             ActivityOptionsCompat
