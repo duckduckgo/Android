@@ -107,6 +107,8 @@ class InputScreenViewModelTest {
             whenever(voiceSearchAvailability.isVoiceSearchAvailable).thenReturn(true)
             whenever(omnibarRepository.omnibarType).thenReturn(OmnibarType.SINGLE_TOP)
             whenever(duckAiFeatureState.showFullScreenMode).thenReturn(fullScreenModeDisabledFlow)
+            whenever(inputScreenSessionStore.hasUsedSearchMode()).thenReturn(false)
+            whenever(inputScreenSessionStore.hasUsedChatMode()).thenReturn(false)
         }
 
     private fun createViewModel(currentOmnibarText: String = ""): InputScreenViewModel =
@@ -2044,5 +2046,60 @@ class InputScreenViewModelTest {
 
             verify(pixel).fire(DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_KEYBOARD_USAGE)
             verify(pixel).fire(DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_KEYBOARD_USAGE_DAILY, type = Daily())
+        }
+
+    @Test
+    fun `when userSelectedAutocomplete with DuckAI prompt and fullscreen disabled then SubmitChat command sent and openDuckChatWithAutoPrompt`() =
+        runTest {
+            whenever(duckAiFeatureState.showFullScreenMode).thenReturn(fullScreenModeDisabledFlow)
+
+            val viewModel = createViewModel()
+            val prompt = "prompt"
+
+            viewModel.userSelectedAutocomplete(AutoCompleteSuggestion.AutoCompleteDuckAIPrompt(prompt))
+
+            assertEquals(SubmitChat(prompt), viewModel.command.value)
+            verify(duckChat).openDuckChatWithAutoPrompt(prompt)
+        }
+
+    @Test
+    fun `when userSelectedAutocomplete with DuckAI prompt and fullscreen enabled then onChatSubmitted`() =
+        runTest {
+            whenever(duckAiFeatureState.showFullScreenMode).thenReturn(fullScreenModeEnabledFlow)
+
+            val viewModel = createViewModel()
+
+            viewModel.userSelectedAutocomplete(AutoCompleteSuggestion.AutoCompleteDuckAIPrompt("prompt"))
+
+            assertEquals(SubmitSearch(duckChatURL), viewModel.command.value)
+            verify(duckChat, never()).openDuckChatWithAutoPrompt(any())
+        }
+
+    @Test
+    fun `when userSelectedAutocomplete with DuckAI prompt and DuckAI was used before then pixel fired with was_used_before true`() =
+        runTest {
+            whenever(duckAiFeatureState.showFullScreenMode).thenReturn(fullScreenModeDisabledFlow)
+            whenever(duckChat.wasOpenedBefore()).thenReturn(true)
+
+            createViewModel().userSelectedAutocomplete(AutoCompleteSuggestion.AutoCompleteDuckAIPrompt("prompt"))
+
+            verify(pixel).fire(
+                DuckChatPixelName.DUCK_CHAT_OPEN_AUTOCOMPLETE_EXPERIMENTAL,
+                parameters = mapOf(DuckChatPixelParameters.WAS_USED_BEFORE to true.toBinaryString()),
+            )
+        }
+
+    @Test
+    fun `when userSelectedAutocomplete with DuckAI prompt and DuckAI was not used before then pixel fired with was_used_before false`() =
+        runTest {
+            whenever(duckAiFeatureState.showFullScreenMode).thenReturn(fullScreenModeDisabledFlow)
+            whenever(duckChat.wasOpenedBefore()).thenReturn(false)
+
+            createViewModel().userSelectedAutocomplete(AutoCompleteSuggestion.AutoCompleteDuckAIPrompt("prompt"))
+
+            verify(pixel).fire(
+                DuckChatPixelName.DUCK_CHAT_OPEN_AUTOCOMPLETE_EXPERIMENTAL,
+                parameters = mapOf(DuckChatPixelParameters.WAS_USED_BEFORE to false.toBinaryString()),
+            )
         }
 }
