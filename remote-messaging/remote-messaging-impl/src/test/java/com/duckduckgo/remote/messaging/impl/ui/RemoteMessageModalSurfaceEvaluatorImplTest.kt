@@ -213,6 +213,21 @@ class RemoteMessageModalSurfaceEvaluatorImplTest {
     }
 
     @Test
+    fun whenMessageWasAlreadyShownThenMessageIsDismissed() = runTest {
+        givenFeatureTogglesEnabled()
+        givenOnboardingComplete()
+        givenBackgroundThresholdMet()
+        val messageId = "test-message-id"
+        val message = createRemoteMessage(id = messageId, surfaces = listOf(Surface.MODAL))
+        whenever(mockRemoteMessagingRepository.message()).thenReturn(message)
+        whenever(mockModalSurfaceStore.getLastShownRemoteMessageId()).thenReturn(messageId)
+
+        testee.evaluate()
+
+        verify(mockRemoteMessagingRepository).dismissMessage(messageId)
+    }
+
+    @Test
     fun whenDifferentMessageIdThenMessageIsShown() = runTest {
         givenFeatureTogglesEnabled()
         givenOnboardingComplete()

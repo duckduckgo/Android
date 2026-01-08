@@ -83,6 +83,7 @@ class RemoteMessageModalSurfaceEvaluatorImpl @Inject constructor(
                 // Skip if this message was already shown
                 val lastShownMessageId = modalSurfaceStore.getLastShownRemoteMessageId()
                 if (lastShownMessageId == message.id) {
+                    remoteMessagingRepository.dismissMessage(lastShownMessageId)
                     return@withContext ModalEvaluator.EvaluationResult.Skipped
                 }
 
