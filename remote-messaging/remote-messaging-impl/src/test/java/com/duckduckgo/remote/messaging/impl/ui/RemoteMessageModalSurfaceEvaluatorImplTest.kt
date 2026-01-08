@@ -308,7 +308,7 @@ class RemoteMessageModalSurfaceEvaluatorImplTest {
         fakeRemoteMessagingFeatureToggles.remoteMessageModalSurface().setRawStoredState(State(true))
     }
 
-    private fun givenOnboardingComplete() {
+    private suspend fun givenOnboardingComplete() {
         whenever(mockOnboardingFlowChecker.isOnboardingComplete()).thenReturn(true)
     }
 
