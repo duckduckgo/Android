@@ -38,7 +38,7 @@ class GlideRemoteMessageImagePrefetcher(
     override suspend fun prefetchImage(message: RemoteMessage?) {
         val imageUrl = message?.content?.getImageUrl() ?: return
 
-        if (imageUrl.isBlank()) {
+        if (imageUrl.isEmpty()) {
             logcat { "RMF: No image URL to prefetch for message: ${message.id}" }
             return
         }

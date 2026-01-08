@@ -127,7 +127,7 @@ class MessageCta : FrameLayout {
     ) {
         with(remoteMessageBinding) {
             when {
-                imageUrl != null -> {
+                imageUrl.orEmpty().isNotEmpty() -> {
                     Glide
                         .with(topImage)
                         .load(imageUrl)
