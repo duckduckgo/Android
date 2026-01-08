@@ -37,7 +37,7 @@ jobs:
           distribution: 'adopt'
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
+        uses: gradle/actions/setup-gradle@v5
 
       - name: Run Code Formatting Checks
         run: ./gradlew spotlessCheck
@@ -59,7 +59,7 @@ jobs:
           distribution: 'adopt'
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
+        uses: gradle/actions/setup-gradle@v5
 
       - name: JVM tests
         run: ./gradlew jvm_tests
@@ -97,7 +97,7 @@ jobs:
           go-version: '1.18.3'
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
+        uses: gradle/actions/setup-gradle@v5
 
       - name: Lint
         run: ./gradlew lint
@@ -145,7 +145,7 @@ jobs:
         run: echo "$FLANK" > flank.json
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
+        uses: gradle/actions/setup-gradle@v5
 
       - name: Build
         run: ./gradlew androidTestsBuild

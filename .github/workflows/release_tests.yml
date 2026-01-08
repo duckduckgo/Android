@@ -54,7 +54,7 @@ jobs:
           destination-path: $HOME/jenkins_static/com.duckduckgo.mobile.android/
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
+        uses: gradle/actions/setup-gradle@v5
 
       - name: Assemble release APK
         run: ./gradlew assemblePlayRelease -Pforce-default-variant -Pskip-onboarding

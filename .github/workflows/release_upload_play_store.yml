@@ -35,7 +35,7 @@ jobs:
           ref: ${{ github.event.inputs.ref }}
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
+        uses: gradle/actions/setup-gradle@v5
 
       - name: Set up JDK version
         uses: actions/setup-java@v4
