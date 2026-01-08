@@ -257,6 +257,7 @@ class OmnibarLayoutViewModel @Inject constructor(
         data class LaunchInputScreen(val query: String) : Command()
         data class EasterEggLogoClicked(val url: String) : Command()
         data object FocusInputField : Command()
+        data object CancelEasterEggLogoAnimation : Command()
     }
 
     sealed class LeadingIconState {
@@ -268,6 +269,7 @@ class OmnibarLayoutViewModel @Inject constructor(
         data class EasterEggLogo(
             val logoUrl: String,
             val serpUrl: String,
+            val isFavourite: Boolean = false,
         ) : LeadingIconState()
     }
 
@@ -1125,6 +1127,12 @@ class OmnibarLayoutViewModel @Inject constructor(
             if (state is EasterEggLogo) {
                 command.send(Command.EasterEggLogoClicked(state.logoUrl))
             }
+        }
+    }
+
+    fun onCancelAddressBarAnimations() {
+        viewModelScope.launch {
+            command.send(Command.CancelEasterEggLogoAnimation)
         }
     }
 
