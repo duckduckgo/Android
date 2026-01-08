@@ -79,7 +79,7 @@ class ModalEvaluatorCoordinatorTest {
     @Test
     fun whenEvaluatorCompletesWithActionThenCompletionIsRecordedAndNoMoreEvaluatorsCalled() = runTest {
         whenever(mockCompletionStore.isBlockedBy24HourWindow()).thenReturn(false)
-        val evaluator1 = createMockEvaluator("first", 1, ModalEvaluator.EvaluationResult.CompletedWithAction)
+        val evaluator1 = createMockEvaluator("first", 1, ModalEvaluator.EvaluationResult.ModalShown)
         val evaluator2 = createMockEvaluator("second", 2, ModalEvaluator.EvaluationResult.Skipped)
         whenever(mockPluginPoint.getPlugins()).thenReturn(listOf(evaluator1, evaluator2))
 
@@ -95,7 +95,7 @@ class ModalEvaluatorCoordinatorTest {
     fun whenEvaluatorIsSkippedThenNextEvaluatorIsCalled() = runTest {
         whenever(mockCompletionStore.isBlockedBy24HourWindow()).thenReturn(false)
         val evaluator1 = createMockEvaluator("first", 1, ModalEvaluator.EvaluationResult.Skipped)
-        val evaluator2 = createMockEvaluator("second", 2, ModalEvaluator.EvaluationResult.CompletedWithAction)
+        val evaluator2 = createMockEvaluator("second", 2, ModalEvaluator.EvaluationResult.ModalShown)
         whenever(mockPluginPoint.getPlugins()).thenReturn(listOf(evaluator1, evaluator2))
 
         testee.onResume(mockLifecycleOwner)
@@ -126,7 +126,7 @@ class ModalEvaluatorCoordinatorTest {
         whenever(mockCompletionStore.isBlockedBy24HourWindow()).thenReturn(false)
         val lowPriorityEvaluator = createMockEvaluator("low", 10, ModalEvaluator.EvaluationResult.Skipped)
         val highPriorityEvaluator = createMockEvaluator("high", 1, ModalEvaluator.EvaluationResult.Skipped)
-        val midPriorityEvaluator = createMockEvaluator("mid", 5, ModalEvaluator.EvaluationResult.CompletedWithAction)
+        val midPriorityEvaluator = createMockEvaluator("mid", 5, ModalEvaluator.EvaluationResult.ModalShown)
 
         // Return in unsorted order
         whenever(mockPluginPoint.getPlugins()).thenReturn(
@@ -160,7 +160,7 @@ class ModalEvaluatorCoordinatorTest {
     fun whenMultipleEvaluatorsHaveSamePriorityThenBothAreEvaluatedInOrder() = runTest {
         whenever(mockCompletionStore.isBlockedBy24HourWindow()).thenReturn(false)
         val evaluator1 = createMockEvaluator("first", 1, ModalEvaluator.EvaluationResult.Skipped)
-        val evaluator2 = createMockEvaluator("second", 1, ModalEvaluator.EvaluationResult.CompletedWithAction)
+        val evaluator2 = createMockEvaluator("second", 1, ModalEvaluator.EvaluationResult.ModalShown)
         whenever(mockPluginPoint.getPlugins()).thenReturn(listOf(evaluator1, evaluator2))
 
         testee.onResume(mockLifecycleOwner)

@@ -289,7 +289,7 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
             defaultBrowserPromptsDataStore.storeShowSetAsDefaultMessageState(action.showMessage)
 
             return@withLock if (action.showMessageDialog) {
-                ModalEvaluator.EvaluationResult.CompletedWithAction
+                ModalEvaluator.EvaluationResult.ModalShown
             } else {
                 ModalEvaluator.EvaluationResult.Skipped
             }

@@ -190,7 +190,7 @@ class RemoteMessageModalSurfaceEvaluatorImplTest {
 
         val result = testee.evaluate()
 
-        assertEquals(ModalEvaluator.EvaluationResult.CompletedWithAction, result)
+        assertEquals(ModalEvaluator.EvaluationResult.ModalShown, result)
         coroutinesTestRule.testScope.testScheduler.advanceUntilIdle()
         verify(mockApplicationContext).startActivity(mockIntent)
         verify(mockIntent).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP)
@@ -241,7 +241,7 @@ class RemoteMessageModalSurfaceEvaluatorImplTest {
 
         val result = testee.evaluate()
 
-        assertEquals(ModalEvaluator.EvaluationResult.CompletedWithAction, result)
+        assertEquals(ModalEvaluator.EvaluationResult.ModalShown, result)
         coroutinesTestRule.testScope.testScheduler.advanceUntilIdle()
         verify(mockApplicationContext).startActivity(mockIntent)
     }
@@ -303,7 +303,7 @@ class RemoteMessageModalSurfaceEvaluatorImplTest {
 
         val result = testee.evaluate()
 
-        assertEquals(ModalEvaluator.EvaluationResult.CompletedWithAction, result)
+        assertEquals(ModalEvaluator.EvaluationResult.ModalShown, result)
         coroutinesTestRule.testScope.testScheduler.advanceUntilIdle()
         verify(mockApplicationContext).startActivity(mockIntent)
     }

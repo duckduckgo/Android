@@ -37,7 +37,7 @@ interface ModalEvaluator {
      * Evaluates whether this modal should be shown.
      * Called by coordinator only if not blocked by 24-hour window (cooldown period).
      *
-     * @return EvaluationResult indicating whether evaluation completed and if action was taken
+     * @return EvaluationResult indicating whether evaluation was completed and modal was shown/triggered or skipped
      */
     suspend fun evaluate(): EvaluationResult
 
@@ -47,7 +47,7 @@ interface ModalEvaluator {
     sealed class EvaluationResult {
 
         /** Evaluation completed and modal was shown/triggered */
-        object CompletedWithAction : EvaluationResult()
+        object ModalShown : EvaluationResult()
 
         /** Evaluation was skipped due to internal conditions. No modal was shown/triggered */
         object Skipped : EvaluationResult()

@@ -102,7 +102,7 @@ class RemoteMessageModalSurfaceEvaluatorImpl @Inject constructor(
                 modalSurfaceStore.recordLastShownRemoteMessageId(message.id)
                 modalSurfaceStore.clearBackgroundTimestamp()
 
-                return@withContext ModalEvaluator.EvaluationResult.CompletedWithAction
+                return@withContext ModalEvaluator.EvaluationResult.ModalShown
             }
 
             return@withContext ModalEvaluator.EvaluationResult.Skipped
