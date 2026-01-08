@@ -149,7 +149,7 @@ class GranularFireDialogViewModel @Inject constructor(
         }
     }
 
-    fun onShow(shouldFirePixel: Boolean) {
+    fun onShow() {
         viewModelScope.launch {
             command.send(Command.OnShow)
             if (!hasFiredDialogShownPixel) {
