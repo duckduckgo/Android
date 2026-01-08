@@ -56,6 +56,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.times
 import org.mockito.kotlin.whenever
 import java.time.LocalDateTime
 
@@ -520,7 +521,7 @@ class GranularFireDialogViewModelTest {
         testee = createViewModel()
 
         testee.commands().test {
-            testee.onShow()
+            testee.onShow(shouldFirePixel = true)
 
             assertEquals(Command.OnShow, awaitItem())
 
@@ -532,7 +533,7 @@ class GranularFireDialogViewModelTest {
     fun `when onShow called then FIRE_DIALOG_SHOWN pixel is fired`() = runTest {
         testee = createViewModel()
 
-        testee.onShow()
+        testee.onShow(shouldFirePixel = true)
 
         verify(mockPixel).fire(FIRE_DIALOG_SHOWN)
     }
