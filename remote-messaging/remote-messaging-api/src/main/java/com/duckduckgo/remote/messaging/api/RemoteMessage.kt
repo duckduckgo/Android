@@ -76,7 +76,7 @@ sealed class Content(val messageType: MessageType) {
         val imageUrl: String? = null,
     ) : Content(BIG_TWO_ACTION)
 
-    data class PromoSingleAction(
+    data class PromoSingleAction constructor(
         val titleText: String,
         val descriptionText: String,
         val placeholder: Placeholder,

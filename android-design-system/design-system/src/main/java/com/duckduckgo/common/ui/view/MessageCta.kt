@@ -170,11 +170,21 @@ class MessageCta : FrameLayout {
         promoMessageBinding.messageSubtitle.text = HtmlCompat.fromHtml(message.subtitle, 0)
         promoMessageBinding.actionButton.text = message.promoAction
 
-        if (message.middleIllustration == null) {
+        if (message.imageUrl.orEmpty().isNotEmpty()) {
+            Glide.with(promoMessageBinding.remoteImage)
+                .load(message.imageUrl)
+                .centerCrop()
+                .transition(withCrossFade())
+                .into(promoMessageBinding.remoteImage)
+            promoMessageBinding.remoteImage.show()
             promoMessageBinding.illustration.gone()
+        } else if (message.middleIllustration == null) {
+            promoMessageBinding.illustration.gone()
+            promoMessageBinding.remoteImage.gone()
         } else {
             val drawable = AppCompatResources.getDrawable(context, message.middleIllustration)
             promoMessageBinding.illustration.setImageDrawable(drawable)
+            promoMessageBinding.remoteImage.gone()
             promoMessageBinding.illustration.show()
         }
 
