@@ -356,9 +356,9 @@ class RealPirDashboardMaintenanceScanDataProviderTest {
         // Then
         assertEquals(2, result.brokerMatches.size) // Only scans within 8 days
         assertEquals(
-            currentTime - TimeUnit.DAYS.toMillis(5),
+            currentTime - TimeUnit.DAYS.toMillis(2),
             result.dateInMillis,
-        ) // Earliest scan within range
+        ) // Most recent scan within range
 
         val broker1Match = result.brokerMatches.find { it.broker.name == "broker1" }!!
         assertEquals(currentTime - TimeUnit.DAYS.toMillis(2), broker1Match.dateInMillis)
@@ -366,6 +366,41 @@ class RealPirDashboardMaintenanceScanDataProviderTest {
         val broker2Match = result.brokerMatches.find { it.broker.name == "broker2" }!!
         assertEquals(currentTime - TimeUnit.DAYS.toMillis(5), broker2Match.dateInMillis)
     }
+
+    @Test
+    fun whenScanJobsExistForSameBrokerButDifferentProfileQueriesThenGetLastScanDetailsReturnsOneBrokerMatch() =
+        runTest {
+            // Given - same broker with two different profile queries (userProfileId)
+            val activeBrokers = listOf(createBroker("broker1"))
+            val scanJobs = listOf(
+                createScanJobRecord(
+                    "broker1",
+                    userProfileId = 1L,
+                    ScanJobStatus.MATCHES_FOUND,
+                    currentTime - TimeUnit.DAYS.toMillis(2),
+                ),
+                createScanJobRecord(
+                    "broker1",
+                    userProfileId = 2L,
+                    ScanJobStatus.MATCHES_FOUND,
+                    currentTime - TimeUnit.DAYS.toMillis(3),
+                ),
+            )
+
+            whenever(mockPirRepository.getAllActiveBrokerObjects()).thenReturn(activeBrokers)
+            whenever(mockPirRepository.getAllBrokerOptOutUrls()).thenReturn(emptyMap())
+            whenever(mockPirSchedulingRepository.getAllValidScanJobRecords()).thenReturn(scanJobs)
+            whenever(mockPirRepository.getAllMirrorSites()).thenReturn(emptyList())
+
+            // When
+            val result = testee.getLastScanDetails()
+
+            // Then - Returns only ONE broker match per broker, regardless of how many profile queries exist
+            // and keeps the most recent (latest) scan date for getLastScanDetails
+            assertEquals(1, result.brokerMatches.size)
+            assertEquals("broker1", result.brokerMatches[0].broker.name)
+            assertEquals(currentTime - TimeUnit.DAYS.toMillis(2), result.brokerMatches[0].dateInMillis)
+        }
 
     @Test
     fun whenNoScheduledScanJobsExistThenGetNextScanDetailsReturnsEmptyDetails() = runTest {
@@ -760,6 +795,65 @@ class RealPirDashboardMaintenanceScanDataProviderTest {
         assertEquals(expectedNextScan, broker1Match.dateInMillis)
         assertEquals(expectedNextScan, result.dateInMillis)
     }
+
+    @Test
+    fun whenOptOutsExistForSameBrokerButDifferentProfileQueriesThenGetNextScanDetailsReturnsOneBrokerMatch() =
+        runTest {
+            // Given - same broker with two different profile queries (userProfileId)
+            val activeBrokers = listOf(createBroker("broker1"))
+            val schedulingConfigs = listOf(
+                createBrokerSchedulingConfig(
+                    "broker1",
+                    maintenanceScanInMillis = TimeUnit.DAYS.toMillis(10),
+                    confirmOptOutScanInMillis = TimeUnit.DAYS.toMillis(5),
+                ),
+            )
+            val scanJobs = listOf(
+                createScanJobRecord(
+                    "broker1",
+                    userProfileId = 1L,
+                    ScanJobStatus.MATCHES_FOUND,
+                    currentTime - TimeUnit.DAYS.toMillis(3),
+                ),
+                createScanJobRecord(
+                    "broker1",
+                    userProfileId = 2L,
+                    ScanJobStatus.MATCHES_FOUND,
+                    currentTime - TimeUnit.DAYS.toMillis(4),
+                ),
+            )
+            val optOutJobs = listOf(
+                createOptOutJobRecord(
+                    brokerName = "broker1",
+                    extractedProfileId = 1L,
+                    userProfileId = 1L,
+                    status = OptOutJobStatus.REQUESTED,
+                    optOutRequestedDateInMillis = currentTime - TimeUnit.DAYS.toMillis(2),
+                ),
+                createOptOutJobRecord(
+                    brokerName = "broker1",
+                    extractedProfileId = 2L,
+                    userProfileId = 2L,
+                    status = OptOutJobStatus.REQUESTED,
+                    optOutRequestedDateInMillis = currentTime - TimeUnit.DAYS.toMillis(1),
+                ),
+            )
+
+            whenever(mockPirSchedulingRepository.getAllValidOptOutJobRecords()).thenReturn(optOutJobs)
+            whenever(mockPirRepository.getAllActiveBrokerObjects()).thenReturn(activeBrokers)
+            whenever(mockPirRepository.getAllBrokerOptOutUrls()).thenReturn(emptyMap())
+            whenever(mockPirRepository.getAllBrokerSchedulingConfigs()).thenReturn(schedulingConfigs)
+            whenever(mockPirSchedulingRepository.getAllValidScanJobRecords()).thenReturn(scanJobs)
+            whenever(mockPirRepository.getAllMirrorSites()).thenReturn(emptyList())
+
+            // When
+            val result = testee.getNextScanDetails()
+
+            // Then - Returns only ONE broker match per broker, regardless of how many profile queries exist
+            // This is because DashboardBrokerMatch only contains broker info, not profile query info
+            assertEquals(1, result.brokerMatches.size)
+            assertEquals("broker1", result.brokerMatches[0].broker.name)
+        }
 
     @Test
     fun whenNoneInRangeThenGetNextScanDetailsReturnsEmpty() = runTest {
