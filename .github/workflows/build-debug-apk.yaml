@@ -52,7 +52,7 @@ jobs:
           go-version: '1.18.3'
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
+        uses: gradle/actions/setup-gradle@v5
 
       - name: Assemble the project
         env:

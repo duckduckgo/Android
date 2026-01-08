@@ -52,7 +52,7 @@ jobs:
           destination-path: $HOME/jenkins_static/com.duckduckgo.mobile.android/
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
+        uses: gradle/actions/setup-gradle@v5
 
       - name: Assemble internal release APK
         run: ./gradlew assembleInternalRelease -Pforce-default-variant -Psync-disable-auth-requirement -x lint

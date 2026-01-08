@@ -38,7 +38,7 @@ jobs:
           distribution: 'adopt'
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
+        uses: gradle/actions/setup-gradle@v5
 
       - name: Execute Gradle build
         run: ./gradlew dokkaHtmlMultiModule --no-configuration-cache # Dokka 1.8.20 is not compatible with configuration cache. 2.x is.
