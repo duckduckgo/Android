@@ -55,6 +55,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.times
 import org.mockito.kotlin.whenever
 import java.time.LocalDateTime
 
@@ -525,7 +526,7 @@ class GranularFireDialogViewModelTest {
         testee = createViewModel()
 
         testee.commands().test {
-            testee.onShow()
+            testee.onShow(shouldFirePixel = true)
 
             coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
 
@@ -539,11 +540,23 @@ class GranularFireDialogViewModelTest {
     fun `when onShow called then FIRE_DIALOG_SHOWN pixel is fired`() = runTest {
         testee = createViewModel()
 
-        testee.onShow()
+        testee.onShow(shouldFirePixel = true)
 
         coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
 
         verify(mockPixel).fire(FIRE_DIALOG_SHOWN)
+    }
+
+    @Test
+    fun `when onShow called multiple times then FIRE_DIALOG_SHOWN pixel is fired only once`() = runTest {
+        testee = createViewModel()
+
+        testee.onShow(shouldFirePixel = true)
+        testee.onShow(shouldFirePixel = true)
+
+        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        verify(mockPixel, times(1)).fire(FIRE_DIALOG_SHOWN)
     }
 
     @Test
