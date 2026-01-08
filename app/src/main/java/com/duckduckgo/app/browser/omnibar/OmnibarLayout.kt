@@ -1139,11 +1139,6 @@ class OmnibarLayout @JvmOverloads constructor(
                         customToolbarContainer.setCardBackgroundColor(secondaryToolbarColor)
                         browserMenuImageView.setColorFilter(foregroundColor)
 
-                        customToolbarContainer.setOnClickListener {
-                            pixel.fire(CustomTabPixelNames.CUSTOM_TABS_ADDRESS_BAR_CLICKED)
-                            pixel.fire(CustomTabPixelNames.CUSTOM_TABS_ADDRESS_BAR_CLICKED_DAILY, type = PixelType.Daily())
-                        }
-
                         animationBackgroundColor = calculateAnimationBackgroundColor(customTab.toolbarColor)
                     } else {
                         animationBackgroundColor = customTab.toolbarColor
@@ -1167,6 +1162,16 @@ class OmnibarLayout @JvmOverloads constructor(
 
                     customTabShieldIcon.setOnClickListener { _ ->
                         omnibarItemPressedListener?.onCustomTabPrivacyDashboardPressed()
+                    }
+
+                    customToolbarContainer.setOnClickListener {
+                        pixel.fire(CustomTabPixelNames.CUSTOM_TABS_ADDRESS_BAR_CLICKED)
+                        pixel.fire(CustomTabPixelNames.CUSTOM_TABS_ADDRESS_BAR_CLICKED_DAILY, type = PixelType.Daily())
+                    }
+
+                    daxIcon.setOnClickListener {
+                        pixel.fire(CustomTabPixelNames.CUSTOM_TABS_DAX_CLICKED)
+                        pixel.fire(CustomTabPixelNames.CUSTOM_TABS_DAX_CLICKED_DAILY, type = PixelType.Daily())
                     }
                 }
             }

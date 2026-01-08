@@ -18,16 +18,17 @@ package com.duckduckgo.remote.messaging.impl.ui
 
 import android.content.Context
 import android.content.Intent
-import androidx.lifecycle.LifecycleOwner
+import android.os.SystemClock
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.onboarding.OnboardingFlowChecker
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.modalcoordinator.api.ModalEvaluator
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
 import com.duckduckgo.remote.messaging.api.Surface
 import com.duckduckgo.remote.messaging.impl.RemoteMessagingFeatureToggles
+import com.duckduckgo.remote.messaging.impl.store.ModalSurfaceStore
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
@@ -40,7 +41,7 @@ interface RemoteMessageModalSurfaceEvaluator
 
 @ContributesMultibinding(
     scope = AppScope::class,
-    boundType = MainProcessLifecycleObserver::class,
+    boundType = ModalEvaluator::class,
 )
 @ContributesBinding(
     scope = AppScope::class,
@@ -50,41 +51,73 @@ interface RemoteMessageModalSurfaceEvaluator
 class RemoteMessageModalSurfaceEvaluatorImpl @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val remoteMessagingRepository: RemoteMessagingRepository,
+    private val modalSurfaceStore: ModalSurfaceStore,
     private val globalActivityStarter: GlobalActivityStarter,
     private val dispatchers: DispatcherProvider,
     private val applicationContext: Context,
     private val remoteMessagingFeatureToggles: RemoteMessagingFeatureToggles,
     private val onboardingFlowChecker: OnboardingFlowChecker,
-) : RemoteMessageModalSurfaceEvaluator, MainProcessLifecycleObserver {
+) : RemoteMessageModalSurfaceEvaluator, ModalEvaluator {
 
-    override fun onResume(owner: LifecycleOwner) {
-        super.onResume(owner)
-        appCoroutineScope.launch {
-            evaluate()
-        }
-    }
+    override val priority: Int = 1
+    override val evaluatorId: String = "remote_message_modal"
 
-    private suspend fun evaluate() {
-        withContext(dispatchers.io()) {
+    override suspend fun evaluate(): ModalEvaluator.EvaluationResult {
+        return withContext(dispatchers.io()) {
             if (!remoteMessagingFeatureToggles.remoteMessageModalSurface().isEnabled()) {
-                return@withContext
+                return@withContext ModalEvaluator.EvaluationResult.Skipped
             }
 
             if (!onboardingFlowChecker.isOnboardingComplete()) {
-                return@withContext
+                return@withContext ModalEvaluator.EvaluationResult.Skipped
             }
 
-            // TODO ANA: This is now called all the time. Update!
-            val message = remoteMessagingRepository.message() ?: return@withContext
+            if (!hasMetBackgroundTimeThreshold()) {
+                return@withContext ModalEvaluator.EvaluationResult.Skipped
+            }
+
+            val message = remoteMessagingRepository.message()
+                ?: return@withContext ModalEvaluator.EvaluationResult.Skipped
+
             if (message.surfaces.contains(Surface.MODAL)) {
+                // Skip if this message was already shown
+                val lastShownMessageId = modalSurfaceStore.getLastShownRemoteMessageId()
+                if (lastShownMessageId == message.id) {
+                    remoteMessagingRepository.dismissMessage(lastShownMessageId)
+                    return@withContext ModalEvaluator.EvaluationResult.Skipped
+                }
+
                 val intent = globalActivityStarter.startIntent(
                     applicationContext,
                     ModalSurfaceActivityFromMessageId(message.id, message.content.messageType),
-                ) ?: return@withContext
+                ) ?: return@withContext ModalEvaluator.EvaluationResult.Skipped
 
-                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
-                applicationContext.startActivity(intent)
+                // Launch activity in app scope to decouple from evaluation completion
+                appCoroutineScope.launch(dispatchers.main()) {
+                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
+                    applicationContext.startActivity(intent)
+                }
+
+                // Record this message as shown, and clear background timestamp
+                modalSurfaceStore.recordLastShownRemoteMessageId(message.id)
+                modalSurfaceStore.clearBackgroundTimestamp()
+
+                return@withContext ModalEvaluator.EvaluationResult.CompletedWithAction
             }
+
+            return@withContext ModalEvaluator.EvaluationResult.Skipped
         }
+    }
+
+    private suspend fun hasMetBackgroundTimeThreshold(): Boolean {
+        val backgroundTimestamp = modalSurfaceStore.getBackgroundedTimestamp() ?: return false
+
+        // Using elapsed real time as this is how it's saved in the data store.
+        val currentTimestamp = SystemClock.elapsedRealtime()
+        return (currentTimestamp - backgroundTimestamp) >= BACKGROUND_THRESHOLD_MILLIS
+    }
+
+    companion object {
+        private const val BACKGROUND_THRESHOLD_MILLIS = 4 * 60 * 60 * 1000L // 4 hours
     }
 }

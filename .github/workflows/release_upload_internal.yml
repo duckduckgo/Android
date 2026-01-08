@@ -2,7 +2,7 @@ name: Release to Internal and Firebase
 
 on:
   schedule:
-    - cron: '0 2 * * *' # run at 3 AM UTC
+    - cron: '15 2 * * *' # run at 2:15 AM UTC
   workflow_call:
   workflow_dispatch:
 
@@ -29,6 +29,9 @@ jobs:
         with:
           java-version-file: .github/.java-version
           distribution: 'adopt'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v5
 
       - name: Set up ruby env
         uses: ruby/setup-ruby@v1

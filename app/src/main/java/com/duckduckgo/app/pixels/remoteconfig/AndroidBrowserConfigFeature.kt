@@ -247,4 +247,14 @@ interface AndroidBrowserConfigFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun moreGranularDataClearingOptions(): Toggle
+
+    /**
+     * Controls the experimental browsing menu in appearance settings.
+     * @return `true` when the remote config has the global "experimentalBrowsingMenu" androidBrowserConfig
+     * sub-feature flag enabled
+     * If the remote feature is not present defaults to `false`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    @Toggle.InternalAlwaysEnabled
+    fun experimentalBrowsingMenu(): Toggle
 }

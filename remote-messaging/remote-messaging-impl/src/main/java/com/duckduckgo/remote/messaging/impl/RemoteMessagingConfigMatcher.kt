@@ -17,6 +17,7 @@
 package com.duckduckgo.remote.messaging.impl
 
 import com.duckduckgo.remote.messaging.api.AttributeMatcherPlugin
+import com.duckduckgo.remote.messaging.api.Content
 import com.duckduckgo.remote.messaging.api.MatchingAttribute
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
@@ -40,15 +41,61 @@ class RemoteMessagingConfigMatcher(
         val dismissedMessages = remoteMessagingRepository.dismissedMessages()
 
         remoteConfig.messages.filter { !dismissedMessages.contains(it.id) }.forEach { message ->
-            val matchingRules = if (message.matchingRules.isEmpty() && message.exclusionRules.isEmpty()) return message else message.matchingRules
+            val matchingRules = if (message.matchingRules.isEmpty() && message.exclusionRules.isEmpty()) {
+                val processed = filterCardsListMessage(message, rules)
+                if (processed != null) return processed
+                return@forEach
+            } else {
+                message.matchingRules
+            }
 
             val matchingResult = matchingRules.evaluateMatchingRules(message.id, rules)
             val excludeResult = message.exclusionRules.evaluateExclusionRules(message.id, rules)
 
-            if (matchingResult == EvaluationResult.Match && excludeResult == EvaluationResult.Fail) return message
+            if (matchingResult == EvaluationResult.Match && excludeResult == EvaluationResult.Fail) {
+                val processed = filterCardsListMessage(message, rules)
+                if (processed != null) return processed
+                return@forEach
+            }
         }
 
         return null
+    }
+
+    private suspend fun filterCardsListMessage(
+        message: RemoteMessage,
+        rules: List<Rule>,
+    ): RemoteMessage? {
+        val cardsList = message.content as? Content.CardsList ?: return message
+
+        val filteredItems = cardsList.listItems.filter { cardItem ->
+            if (cardItem.matchingRules.isEmpty() && cardItem.exclusionRules.isEmpty()) {
+                true
+            } else {
+                // Evaluate CardItem rules following the same logic as for remote message
+                val itemMatching = if (cardItem.matchingRules.isEmpty()) {
+                    EvaluationResult.Match
+                } else {
+                    cardItem.matchingRules.evaluateMatchingRules(cardItem.id, rules)
+                }
+
+                val itemExclusion = if (cardItem.exclusionRules.isEmpty()) {
+                    EvaluationResult.Fail
+                } else {
+                    cardItem.exclusionRules.evaluateExclusionRules(cardItem.id, rules)
+                }
+
+                itemMatching == EvaluationResult.Match && itemExclusion == EvaluationResult.Fail
+            }
+        }
+
+        if (filteredItems.isEmpty()) {
+            logcat(INFO) { "RMF: All CardItems filtered out for message ${message.id}. Nothing to display." }
+            return null
+        }
+
+        logcat(INFO) { "RMF: Filtered ${cardsList.listItems.size - filteredItems.size} CardItems for message ${message.id}." }
+        return message.copy(content = cardsList.copy(listItems = filteredItems))
     }
 
     private suspend fun Iterable<Int>.evaluateMatchingRules(

@@ -21,5 +21,20 @@
         "suffixes": ["daily_count_short", "form_factor"],
         "parameters": ["appVersion"],
         "expires": "2026-02-01"
+    },
+    "m_privacy-pro_app_subscription_active_d": {
+        "description": "Fired once daily on app start for an active subscription",
+        "owners": ["lmac012"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            "petal",
+            {
+                "key": "os_version",
+                "description": "OS version of the device",
+                "type": "integer"
+            }
+        ]
     }
 }

@@ -72,5 +72,11 @@
         "type": "string",
         "description": "Source from which voice search was launched",
         "enum": ["browser", "widget"]
+    },
+    "petal": {
+        "key": "petal",
+        "type": "string",
+        "description": "Signals the pixel processing pipeline",
+        "enum": ["true"]
     }
 }

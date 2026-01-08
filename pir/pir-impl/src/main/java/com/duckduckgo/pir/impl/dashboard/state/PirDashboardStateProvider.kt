@@ -33,9 +33,10 @@ abstract class PirDashboardStateProvider(
     private val pirRepository: PirRepository,
     private val pirSchedulingRepository: PirSchedulingRepository,
 ) {
-    suspend fun getAllExtractedProfileResults(): List<DashboardExtractedProfileResult> {
+    suspend fun getAllExtractedProfileResults(includeResultsForDeprecatedProfileQueries: Boolean): List<DashboardExtractedProfileResult> {
+        val nonDeprecatedProfileQueries = pirRepository.getValidUserProfileQueries().map { it.id }.toSet()
         val extractedProfiles = pirRepository.getAllExtractedProfiles().filter {
-            !it.deprecated
+            !it.deprecated && (includeResultsForDeprecatedProfileQueries || it.profileQueryId in nonDeprecatedProfileQueries)
         }
         val extractedProfilesFromBrokers = getAllExtractedProfileResultForBrokers(extractedProfiles)
         val extractedProfilesFromMirrorSites = extractedProfilesFromBrokers.getMirrorSites(

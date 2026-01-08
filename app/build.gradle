@@ -261,6 +261,9 @@ dependencies {
 	implementation project(":verified-installation-impl")
 	implementation project(":verified-installation-api")
 
+	implementation project(":modal-coordinator-impl")
+	implementation project(":modal-coordinator-api")
+
     implementation project(':navigation-api')
     implementation project(':navigation-impl')
 
@@ -532,10 +535,6 @@ dependencies {
 
     // Browser
     implementation "androidx.browser:browser:_"
-
-    // Flipper
-    internalImplementation "com.facebook.flipper:flipper:_"
-    internalImplementation "com.facebook.soloader:soloader:_"
 
     // Testing dependencies
     androidTestUtil AndroidX.test.orchestrator
