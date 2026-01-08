@@ -89,6 +89,7 @@ class SearchTabFragment : DuckDuckGoFragment(R.layout.fragment_search_tab) {
     }
 
     private var bottomBlurView: BottomBlurView? = null
+    private var bottomBlurLayoutListener: ViewTreeObserver.OnGlobalLayoutListener? = null
 
     private fun configureBottomBlur() {
         if (VERSION.SDK_INT >= 33 && inputScreenConfigResolver.useTopBar()) {
@@ -106,6 +107,11 @@ class SearchTabFragment : DuckDuckGoFragment(R.layout.fragment_search_tab) {
                     }
                 },
             )
+
+            bottomBlurLayoutListener = ViewTreeObserver.OnGlobalLayoutListener {
+                bottomBlurView?.invalidate()
+            }
+            binding.root.viewTreeObserver.addOnGlobalLayoutListener(bottomBlurLayoutListener)
         }
     }
 
@@ -174,7 +180,6 @@ class SearchTabFragment : DuckDuckGoFragment(R.layout.fragment_search_tab) {
         viewModel.autoCompleteSuggestionResults
             .onEach {
                 autoCompleteSuggestionsAdapter.updateData(it.query, it.suggestions)
-                bottomBlurView?.invalidate()
             }.launchIn(lifecycleScope)
 
         viewModel.searchTabCommand.observe(viewLifecycleOwner) {
@@ -249,6 +254,12 @@ class SearchTabFragment : DuckDuckGoFragment(R.layout.fragment_search_tab) {
     }
 
     override fun onDestroyView() {
+        bottomBlurLayoutListener?.let { listener ->
+            if (binding.root.viewTreeObserver.isAlive) {
+                binding.root.viewTreeObserver.removeOnGlobalLayoutListener(listener)
+            }
+        }
+        bottomBlurLayoutListener = null
         bottomBlurView = null
         super.onDestroyView()
     }
