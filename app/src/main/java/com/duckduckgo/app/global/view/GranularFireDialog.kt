@@ -102,7 +102,6 @@ class GranularFireDialog : BottomSheetDialogFragment(), FireDialog {
     private var hasRestarted = false
     private var isAnimationComplete = false
     private var isClearingComplete = false
-    private var shouldFireDialogShownPixel = true
 
     override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this)
@@ -127,7 +126,6 @@ class GranularFireDialog : BottomSheetDialogFragment(), FireDialog {
         super.onViewCreated(view, savedInstanceState)
 
         hasRestarted = false
-        shouldFireDialogShownPixel = savedInstanceState == null
 
         setupLayout()
         configureBottomSheet()
@@ -149,8 +147,7 @@ class GranularFireDialog : BottomSheetDialogFragment(), FireDialog {
 
     override fun onStart() {
         super.onStart()
-        viewModel.onShow(shouldFirePixel = shouldFireDialogShownPixel)
-        shouldFireDialogShownPixel = false
+        viewModel.onShow()
     }
 
     override fun onCancel(dialog: DialogInterface) {
