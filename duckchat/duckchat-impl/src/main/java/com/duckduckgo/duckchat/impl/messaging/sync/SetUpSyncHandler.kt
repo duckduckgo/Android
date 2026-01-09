@@ -21,8 +21,8 @@ import android.content.Intent
 import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.contentscopescripts.api.ContentScopeJsMessageHandlersPlugin
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.impl.DuckChatConstants
 import com.duckduckgo.duckchat.impl.DuckChatConstants.HOST_DUCK_AI
-import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessageHandler
@@ -34,7 +34,6 @@ import com.duckduckgo.sync.api.SyncActivityWithEmptyParams
 import com.squareup.anvil.annotations.ContributesMultibinding
 import logcat.LogPriority
 import logcat.logcat
-import org.json.JSONObject
 import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
@@ -54,7 +53,7 @@ class SetUpSyncHandler @Inject constructor(
 
                 logcat(LogPriority.WARN) { "DuckChat-Sync: ${jsMessage.method} called" }
 
-                val responder = JavaScriptResponder(jsMessaging, jsMessage, featureName)
+                val responder = SyncJsResponder(jsMessaging, jsMessage, featureName)
 
                 val setupError = validateSetupState()
                 if (setupError != null) {
@@ -83,28 +82,9 @@ class SetUpSyncHandler @Inject constructor(
                     HOST_DUCK_AI,
                 )
 
-            override val featureName: String = "aiChat"
+            override val featureName: String = DuckChatConstants.JS_MESSAGING_FEATURE_NAME
             override val methods: List<String> = listOf("sendToSyncSettings", "sendToSetupSync")
         }
-
-    private class JavaScriptResponder(
-        private val jsMessaging: JsMessaging,
-        private val jsMessage: JsMessage,
-        private val featureName: String,
-    ) {
-        fun sendError(error: String) {
-            val errorPayload = JSONObject().apply {
-                put("ok", false)
-                put("reason", error)
-            }
-            runCatching {
-                jsMessaging.onResponse(JsCallbackData(errorPayload, featureName, jsMessage.method, jsMessage.id!!))
-                logcat { "DuckChat-Sync: error: $error" }
-            }.onFailure { e ->
-                logcat(LogPriority.ERROR) { "DuckChat-Sync: failed to send error response: ${e.message}" }
-            }
-        }
-    }
 
     private companion object {
         private const val ERROR_SETUP_UNAVAILABLE = "setup unavailable"

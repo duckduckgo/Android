@@ -21,6 +21,7 @@ import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.contentscopescripts.api.ContentScopeJsMessageHandlersPlugin
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.impl.DuckChatConstants
 import com.duckduckgo.duckchat.impl.DuckChatConstants.HOST_DUCK_AI
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
 import com.duckduckgo.js.messaging.api.JsMessage
@@ -73,7 +74,7 @@ class SetAIChatHistoryEnabledHandler @Inject constructor(
                     HOST_DUCK_AI,
                 )
 
-            override val featureName: String = "aiChat"
+            override val featureName: String = DuckChatConstants.JS_MESSAGING_FEATURE_NAME
             override val methods: List<String> = listOf("setAIChatHistoryEnabled")
         }
 

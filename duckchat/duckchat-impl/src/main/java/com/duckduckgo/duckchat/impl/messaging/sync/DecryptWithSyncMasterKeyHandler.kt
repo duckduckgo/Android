@@ -20,8 +20,8 @@ import android.util.Base64
 import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.contentscopescripts.api.ContentScopeJsMessageHandlersPlugin
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.impl.DuckChatConstants
 import com.duckduckgo.duckchat.impl.DuckChatConstants.HOST_DUCK_AI
-import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessageHandler
@@ -53,7 +53,7 @@ class DecryptWithSyncMasterKeyHandler @Inject constructor(
 
                 logcat(LogPriority.WARN) { "DuckChat-Sync: ${jsMessage.method} called" }
 
-                val responder = JavaScriptResponder(jsMessaging, jsMessage, featureName)
+                val responder = SyncJsResponder(jsMessaging, jsMessage, featureName)
 
                 val syncError = validateSyncState()
                 if (syncError != null) {
@@ -96,7 +96,8 @@ class DecryptWithSyncMasterKeyHandler @Inject constructor(
                 logcat { "DuckChat-Sync: Decrypted data successfully" }
 
                 // send decrypted data back to JS
-                responder.sendSuccess(decryptedData)
+                val payload = JSONObject().apply { put(RESPONSE_KEY_DECRYPTED_DATA, decryptedData) }
+                responder.sendSuccess(payload)
             }
 
             private fun validateSyncState(): String? {
@@ -136,45 +137,12 @@ class DecryptWithSyncMasterKeyHandler @Inject constructor(
                 HOST_DUCK_AI,
             )
 
-            override val featureName: String = "aiChat"
+            override val featureName: String = DuckChatConstants.JS_MESSAGING_FEATURE_NAME
             override val methods: List<String> = listOf("decryptWithSyncMasterKey")
         }
 
-    private class JavaScriptResponder(
-        private val jsMessaging: JsMessaging,
-        private val jsMessage: JsMessage,
-        private val featureName: String,
-    ) {
-        fun sendSuccess(decryptedData: String) {
-            val payload = JSONObject().apply {
-                put("decryptedData", decryptedData)
-            }
-            val jsonPayload = JSONObject().apply {
-                put("ok", true)
-                put("payload", payload)
-            }
-            runCatching {
-                jsMessaging.onResponse(JsCallbackData(jsonPayload, featureName, jsMessage.method, jsMessage.id!!))
-            }.onFailure { e ->
-                logcat(LogPriority.ERROR) { "DuckChat-Sync: failed to send success response: ${e.message}" }
-            }
-        }
-
-        fun sendError(error: String) {
-            val errorPayload = JSONObject().apply {
-                put("ok", false)
-                put("reason", error)
-            }
-            runCatching {
-                jsMessaging.onResponse(JsCallbackData(errorPayload, featureName, jsMessage.method, jsMessage.id!!))
-                logcat { "DuckChat-Sync: error: $error" }
-            }.onFailure { e ->
-                logcat(LogPriority.ERROR) { "DuckChat-Sync: failed to send error response: ${e.message}" }
-            }
-        }
-    }
-
     private companion object {
+        private const val RESPONSE_KEY_DECRYPTED_DATA = "decryptedData"
         private const val ERROR_SYNC_DISABLED = "sync unavailable"
         private const val ERROR_SYNC_OFF = "sync off"
         private const val ERROR_INVALID_PARAMETERS = "invalid parameters"

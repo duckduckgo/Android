@@ -20,7 +20,7 @@ import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.browser.api.DuckAiChatDeletionListener
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
-import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -36,20 +36,20 @@ import javax.inject.Inject
 class DuckAiChatDeletionListenerImpl @Inject constructor(
     private val duckChatSyncRepository: DuckChatSyncRepository,
     private val duckChatFeatureRepository: DuckChatFeatureRepository,
-    private val dispatchers: DispatcherProvider,
+    private val currentTimeProvider: CurrentTimeProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : DuckAiChatDeletionListener, MainProcessLifecycleObserver {
 
     override fun onStop(owner: LifecycleOwner) {
-        val timestamp = System.currentTimeMillis()
-        appCoroutineScope.launch(dispatchers.io()) {
+        val timestamp = currentTimeProvider.currentTimeMillis()
+        appCoroutineScope.launch {
             duckChatFeatureRepository.setAppBackgroundTimestamp(timestamp)
         }
         logcat { "DuckChat-Sync: App went to background, stored timestamp: $timestamp" }
     }
 
     override fun onStart(owner: LifecycleOwner) {
-        appCoroutineScope.launch(dispatchers.io()) {
+        appCoroutineScope.launch {
             duckChatFeatureRepository.setAppBackgroundTimestamp(null)
         }
         logcat { "DuckChat-Sync: App came to foreground, cleared background timestamp" }
@@ -57,7 +57,7 @@ class DuckAiChatDeletionListenerImpl @Inject constructor(
 
     override suspend fun onDuckAiChatsDeleted() {
         val backgroundTimestamp = duckChatFeatureRepository.getAppBackgroundTimestamp()
-        val timestamp = backgroundTimestamp ?: System.currentTimeMillis()
+        val timestamp = backgroundTimestamp ?: currentTimeProvider.currentTimeMillis()
         logcat { "DuckChat-Sync: Duck AI chats deleted, using timestamp: $timestamp (background: ${backgroundTimestamp != null})" }
         duckChatSyncRepository.recordDuckAiChatsDeleted(timestamp)
     }
