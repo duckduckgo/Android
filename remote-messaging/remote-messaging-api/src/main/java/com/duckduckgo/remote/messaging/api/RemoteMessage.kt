@@ -171,6 +171,8 @@ data class CardItem(
     val descriptionText: String,
     val placeholder: Placeholder,
     val primaryAction: Action,
+    val matchingRules: List<Int>,
+    val exclusionRules: List<Int>,
 )
 
 enum class CardItemType(val jsonValue: String) {

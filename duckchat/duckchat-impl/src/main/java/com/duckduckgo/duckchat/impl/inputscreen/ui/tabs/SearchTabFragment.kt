@@ -26,6 +26,7 @@ import androidx.core.view.updatePadding
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion
@@ -87,22 +88,30 @@ class SearchTabFragment : DuckDuckGoFragment(R.layout.fragment_search_tab) {
         configureBottomBlur()
     }
 
+    private var bottomBlurView: BottomBlurView? = null
+    private var bottomBlurLayoutListener: ViewTreeObserver.OnGlobalLayoutListener? = null
+
     private fun configureBottomBlur() {
         if (VERSION.SDK_INT >= 33 && inputScreenConfigResolver.useTopBar()) {
             // TODO: Handle overscroll when blurring
             binding.autoCompleteSuggestionsList.overScrollMode = OVER_SCROLL_NEVER
 
-            val bottomBlurView = BottomBlurView(requireContext())
-            bottomBlurView.setTargetView(binding.autoCompleteSuggestionsList)
+            bottomBlurView = BottomBlurView(requireContext())
+            bottomBlurView?.setTargetView(binding.autoCompleteSuggestionsList)
             binding.bottomFadeContainer.addView(bottomBlurView)
 
-            ViewTreeObserver
-                .OnPreDrawListener {
-                    bottomBlurView.invalidate()
-                    true
-                }.also { listener ->
-                    bottomBlurView.viewTreeObserver.addOnPreDrawListener(listener)
-                }
+            binding.autoCompleteSuggestionsList.addOnScrollListener(
+                object : RecyclerView.OnScrollListener() {
+                    override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                        bottomBlurView?.invalidate()
+                    }
+                },
+            )
+
+            bottomBlurLayoutListener = ViewTreeObserver.OnGlobalLayoutListener {
+                bottomBlurView?.invalidate()
+            }
+            binding.root.viewTreeObserver.addOnGlobalLayoutListener(bottomBlurLayoutListener)
         }
     }
 
@@ -242,5 +251,16 @@ class SearchTabFragment : DuckDuckGoFragment(R.layout.fragment_search_tab) {
     ) {
         val layoutManager = binding.autoCompleteSuggestionsList.layoutManager as LinearLayoutManager
         layoutManager.scrollToPositionWithOffset(position, offset)
+    }
+
+    override fun onDestroyView() {
+        bottomBlurLayoutListener?.let { listener ->
+            if (binding.root.viewTreeObserver.isAlive) {
+                binding.root.viewTreeObserver.removeOnGlobalLayoutListener(listener)
+            }
+        }
+        bottomBlurLayoutListener = null
+        bottomBlurView = null
+        super.onDestroyView()
     }
 }

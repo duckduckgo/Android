@@ -22,6 +22,7 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.pir.impl.dashboard.state.PirDashboardInitialScanStateProvider.DashboardBrokerWithStatus
 import com.duckduckgo.pir.impl.dashboard.state.PirDashboardInitialScanStateProvider.DashboardBrokerWithStatus.Status.COMPLETED
 import com.duckduckgo.pir.impl.dashboard.state.PirDashboardInitialScanStateProvider.DashboardBrokerWithStatus.Status.IN_PROGRESS
+import com.duckduckgo.pir.impl.dashboard.state.PirDashboardInitialScanStateProvider.DashboardBrokerWithStatus.Status.NOT_STARTED
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.pir.impl.store.PirSchedulingRepository
 import com.squareup.anvil.annotations.ContributesBinding
@@ -110,6 +111,6 @@ class RealPirDashboardInitialScanStateProvider @Inject constructor(
     }
 
     override suspend fun getScanResults(): List<DashboardExtractedProfileResult> {
-        return getAllExtractedProfileResults()
+        return getAllExtractedProfileResults(includeResultsForDeprecatedProfileQueries = false)
     }
 }

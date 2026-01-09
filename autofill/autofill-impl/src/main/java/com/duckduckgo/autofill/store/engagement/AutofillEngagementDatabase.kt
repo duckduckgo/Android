@@ -34,7 +34,7 @@ abstract class AutofillEngagementDatabase : RoomDatabase() {
     abstract fun autofillEngagementDao(): AutofillEngagementDao
 
     companion object {
-        val ALL_MIGRATIONS = emptyArray<Migration>()
+        val ALL_MIGRATIONS = emptyList<Migration>()
     }
 }
 

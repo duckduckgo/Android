@@ -120,6 +120,8 @@ object RemoteMessageOM {
                 descriptionText = "Item Description 1",
                 placeholder = IMAGE_AI,
                 primaryAction = urlAction(),
+                matchingRules = emptyList(),
+                exclusionRules = emptyList(),
             ),
             CardItem(
                 id = "item2",
@@ -128,6 +130,8 @@ object RemoteMessageOM {
                 descriptionText = "Item Description 2",
                 placeholder = RADAR,
                 primaryAction = urlAction(),
+                matchingRules = emptyList(),
+                exclusionRules = emptyList(),
             ),
         ),
         imageUrl: String? = null,

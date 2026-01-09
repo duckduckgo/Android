@@ -325,4 +325,85 @@ class CardsListMessageMapperTest {
         assertEquals("Share this!", shareAction.value)
         assertEquals("Share Title", shareAction.title)
     }
+
+    @Test
+    fun whenCardsListMessageWithMatchingAndExclusionRulesThenMapCorrectly() {
+        val listItemsWithRules = listOf(
+            JsonListItem(
+                id = "item1",
+                type = "two_line_list_item",
+                titleText = "Feature One",
+                descriptionText = "First feature",
+                placeholder = "ImageAI",
+                primaryAction = JsonMessageAction(type = "url", value = "https://example.com/1", additionalParameters = null),
+                matchingRules = listOf(1, 2, 3),
+                exclusionRules = listOf(4, 5),
+            ),
+            JsonListItem(
+                id = "item2",
+                type = "two_line_list_item",
+                titleText = "Feature Two",
+                descriptionText = "Second feature",
+                placeholder = "Radar",
+                primaryAction = JsonMessageAction(type = "url", value = "https://example.com/2", additionalParameters = null),
+                matchingRules = listOf(6),
+                exclusionRules = emptyList(),
+            ),
+        )
+
+        val jsonMessages = listOf(
+            aJsonMessage(
+                id = "cards10",
+                content = cardsListJsonContent(listItems = listItemsWithRules),
+            ),
+        )
+
+        val remoteMessages = jsonMessages.mapToRemoteMessage(Locale.US, messageActionPlugins)
+
+        assertEquals(1, remoteMessages.size)
+        val content = remoteMessages.first().content as Content.CardsList
+        assertEquals(2, content.listItems.size)
+
+        val item1 = content.listItems[0]
+        assertEquals("item1", item1.id)
+        assertEquals(listOf(1, 2, 3), item1.matchingRules)
+        assertEquals(listOf(4, 5), item1.exclusionRules)
+
+        val item2 = content.listItems[1]
+        assertEquals("item2", item2.id)
+        assertEquals(listOf(6), item2.matchingRules)
+        assertEquals(emptyList<Int>(), item2.exclusionRules)
+    }
+
+    @Test
+    fun whenCardsListMessageWithoutRulesThenDefaultToEmptyLists() {
+        val listItemsWithoutRules = listOf(
+            JsonListItem(
+                id = "item1",
+                type = "two_line_list_item",
+                titleText = "Feature",
+                descriptionText = "Description",
+                placeholder = "ImageAI",
+                primaryAction = JsonMessageAction(type = "url", value = "https://example.com", additionalParameters = null),
+            ),
+        )
+
+        val jsonMessages = listOf(
+            aJsonMessage(
+                id = "cards11",
+                content = cardsListJsonContent(listItems = listItemsWithoutRules),
+            ),
+        )
+
+        val remoteMessages = jsonMessages.mapToRemoteMessage(Locale.US, messageActionPlugins)
+
+        assertEquals(1, remoteMessages.size)
+        val content = remoteMessages.first().content as Content.CardsList
+        assertEquals(1, content.listItems.size)
+
+        val item = content.listItems[0]
+        assertEquals("item1", item.id)
+        assertEquals(emptyList<Int>(), item.matchingRules)
+        assertEquals(emptyList<Int>(), item.exclusionRules)
+    }
 }

@@ -324,12 +324,16 @@ class InputScreenViewModel @AssistedInject constructor(
     }
 
     private fun onUserTappedDuckAiPromptAutocomplete(prompt: String) {
-        command.value = Command.SubmitChat(prompt)
         appCoroutineScope.launch(dispatchers.io()) {
             val params = mapOf(DuckChatPixelParameters.WAS_USED_BEFORE to duckChat.wasOpenedBefore().toBinaryString())
             pixel.fire(DuckChatPixelName.DUCK_CHAT_OPEN_AUTOCOMPLETE_EXPERIMENTAL, parameters = params)
         }
-        duckChat.openDuckChatWithAutoPrompt(prompt)
+        if (visibilityState.value.fullScreenMode) {
+            onChatSubmitted(prompt)
+        } else {
+            command.value = Command.SubmitChat(prompt)
+            duckChat.openDuckChatWithAutoPrompt(prompt)
+        }
     }
 
     fun userLongPressedAutocomplete(suggestion: AutoCompleteSuggestion) {

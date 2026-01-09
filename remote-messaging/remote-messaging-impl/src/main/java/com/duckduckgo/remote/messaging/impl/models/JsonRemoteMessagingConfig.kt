@@ -75,6 +75,8 @@ data class JsonListItem(
     val descriptionText: String,
     val placeholder: String = "",
     val primaryAction: JsonMessageAction?,
+    val matchingRules: List<Int> = emptyList(),
+    val exclusionRules: List<Int> = emptyList(),
 )
 
 @Suppress("ktlint:standard:class-naming")
