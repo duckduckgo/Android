@@ -179,7 +179,7 @@ class RemoteMessageModalSurfaceEvaluatorImplTest {
     }
 
     @Test
-    fun whenMessageHasModalSurfaceAndIntentAvailableThenActivityIsLaunchedAndCompletedWithAction() = runTest {
+    fun whenMessageHasModalSurfaceAndIntentAvailableThenActivityIsLaunchedAndModalShown() = runTest {
         givenFeatureTogglesEnabled()
         givenOnboardingComplete()
         givenBackgroundThresholdMet()
