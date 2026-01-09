@@ -47,13 +47,16 @@ fun RemoteMessage.asMessage(isLightModeEnabled: Boolean): Message? {
             subtitle = content.descriptionText,
             messageType = MessageType.REMOTE_MESSAGE,
         )
+
         is BigSingleAction -> Message(
             topIllustration = content.placeholder.drawable(isLightModeEnabled),
             title = content.titleText,
             subtitle = content.descriptionText,
             action = content.primaryActionText,
             messageType = MessageType.REMOTE_MESSAGE,
+            imageUrl = content.imageUrl,
         )
+
         is BigTwoActions -> Message(
             topIllustration = content.placeholder.drawable(isLightModeEnabled),
             title = content.titleText,
@@ -61,20 +64,26 @@ fun RemoteMessage.asMessage(isLightModeEnabled: Boolean): Message? {
             action = content.primaryActionText,
             action2 = content.secondaryActionText,
             messageType = MessageType.REMOTE_MESSAGE,
+            imageUrl = content.imageUrl,
         )
+
         is Medium -> Message(
             topIllustration = content.placeholder.drawable(isLightModeEnabled),
             title = content.titleText,
             subtitle = content.descriptionText,
             messageType = MessageType.REMOTE_MESSAGE,
+            imageUrl = content.imageUrl,
         )
+
         is PromoSingleAction -> Message(
             middleIllustration = content.placeholder.drawable(isLightModeEnabled),
             title = content.titleText,
             subtitle = content.descriptionText,
             promoAction = content.actionText,
             messageType = MessageType.REMOTE_PROMO_MESSAGE,
+            imageUrl = content.imageUrl,
         )
+
         else -> null
     }
 }
@@ -94,6 +103,7 @@ fun Placeholder.drawable(isLightModeEnabled: Boolean): Int {
         } else {
             R.drawable.ic_visual_design_update_artwork_dark
         }
+
         IMAGE_AI -> R.drawable.ic_image_ai
         RADAR -> R.drawable.ic_radar
         KEY_IMPORT -> R.drawable.ic_key_import
