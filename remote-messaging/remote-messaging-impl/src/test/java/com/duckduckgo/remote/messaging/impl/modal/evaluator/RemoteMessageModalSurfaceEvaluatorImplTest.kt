@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.remote.messaging.impl.modal
+package com.duckduckgo.remote.messaging.impl.modal.evaluator
 
 import android.annotation.SuppressLint
 import android.content.Context

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.remote.messaging.impl.modal
+package com.duckduckgo.remote.messaging.impl.modal.evaluator
 
 import android.content.Context
 import android.content.Intent
@@ -28,6 +28,7 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
 import com.duckduckgo.remote.messaging.api.Surface
 import com.duckduckgo.remote.messaging.impl.RemoteMessagingFeatureToggles
+import com.duckduckgo.remote.messaging.impl.modal.ModalSurfaceActivityFromMessageId
 import com.duckduckgo.remote.messaging.impl.store.ModalSurfaceStore
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding

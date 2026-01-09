@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.remote.messaging.impl.modal
+package com.duckduckgo.remote.messaging.impl.modal.evaluator
 
 import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.common.test.CoroutineTestRule
