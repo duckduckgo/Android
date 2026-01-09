@@ -17,7 +17,7 @@
 package com.duckduckgo.remote.messaging.impl.modal
 
 import com.duckduckgo.remote.messaging.api.Action
-import com.duckduckgo.remote.messaging.impl.modal.CardsListRemoteMessageViewModel.Command
+import com.duckduckgo.remote.messaging.impl.modal.cardslist.CardsListRemoteMessageViewModel.Command
 import com.duckduckgo.survey.api.SurveyParameterManager
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals

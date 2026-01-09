@@ -22,8 +22,9 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.remote.messaging.api.Content
-import com.duckduckgo.remote.messaging.impl.modal.RealCardsListRemoteMessagePixelHelper.Companion.PARAM_NAME_DISMISS_TYPE
-import com.duckduckgo.remote.messaging.impl.modal.RealCardsListRemoteMessagePixelHelper.Companion.PARAM_VALUE_BACK_BUTTON_OR_GESTURE
+import com.duckduckgo.remote.messaging.impl.modal.cardslist.CardsListRemoteMessagePixelHelper
+import com.duckduckgo.remote.messaging.impl.modal.cardslist.RealCardsListRemoteMessagePixelHelper.Companion.PARAM_NAME_DISMISS_TYPE
+import com.duckduckgo.remote.messaging.impl.modal.cardslist.RealCardsListRemoteMessagePixelHelper.Companion.PARAM_VALUE_BACK_BUTTON_OR_GESTURE
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow

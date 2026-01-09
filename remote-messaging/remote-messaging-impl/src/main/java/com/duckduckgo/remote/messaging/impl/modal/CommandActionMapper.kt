@@ -28,7 +28,7 @@ import com.duckduckgo.remote.messaging.api.Action.Share
 import com.duckduckgo.remote.messaging.api.Action.Survey
 import com.duckduckgo.remote.messaging.api.Action.Url
 import com.duckduckgo.remote.messaging.api.Action.UrlInContext
-import com.duckduckgo.remote.messaging.impl.modal.CardsListRemoteMessageViewModel.Command
+import com.duckduckgo.remote.messaging.impl.modal.cardslist.CardsListRemoteMessageViewModel.Command
 import com.duckduckgo.survey.api.SurveyParameterManager
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject

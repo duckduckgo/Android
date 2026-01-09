@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.remote.messaging.impl.modal
+package com.duckduckgo.remote.messaging.impl.modal.cardslist
 
 import android.annotation.SuppressLint
 import android.app.PendingIntent
@@ -46,16 +46,16 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter.DeeplinkActivityParam
 import com.duckduckgo.remote.messaging.impl.R
 import com.duckduckgo.remote.messaging.impl.databinding.ViewCardsListRemoteMessageBinding
 import com.duckduckgo.remote.messaging.impl.mappers.drawable
-import com.duckduckgo.remote.messaging.impl.modal.CardsListRemoteMessageViewModel.Command
-import com.duckduckgo.remote.messaging.impl.modal.CardsListRemoteMessageViewModel.Command.DismissMessage
-import com.duckduckgo.remote.messaging.impl.modal.CardsListRemoteMessageViewModel.Command.LaunchAppTPOnboarding
-import com.duckduckgo.remote.messaging.impl.modal.CardsListRemoteMessageViewModel.Command.LaunchDefaultBrowser
-import com.duckduckgo.remote.messaging.impl.modal.CardsListRemoteMessageViewModel.Command.LaunchDefaultCredentialProvider
-import com.duckduckgo.remote.messaging.impl.modal.CardsListRemoteMessageViewModel.Command.LaunchPlayStore
-import com.duckduckgo.remote.messaging.impl.modal.CardsListRemoteMessageViewModel.Command.LaunchScreen
-import com.duckduckgo.remote.messaging.impl.modal.CardsListRemoteMessageViewModel.Command.SharePromoLinkRMF
-import com.duckduckgo.remote.messaging.impl.modal.CardsListRemoteMessageViewModel.Command.SubmitUrl
-import com.duckduckgo.remote.messaging.impl.modal.CardsListRemoteMessageViewModel.Command.SubmitUrlInContext
+import com.duckduckgo.remote.messaging.impl.modal.cardslist.CardsListRemoteMessageViewModel.Command
+import com.duckduckgo.remote.messaging.impl.modal.cardslist.CardsListRemoteMessageViewModel.Command.DismissMessage
+import com.duckduckgo.remote.messaging.impl.modal.cardslist.CardsListRemoteMessageViewModel.Command.LaunchAppTPOnboarding
+import com.duckduckgo.remote.messaging.impl.modal.cardslist.CardsListRemoteMessageViewModel.Command.LaunchDefaultBrowser
+import com.duckduckgo.remote.messaging.impl.modal.cardslist.CardsListRemoteMessageViewModel.Command.LaunchDefaultCredentialProvider
+import com.duckduckgo.remote.messaging.impl.modal.cardslist.CardsListRemoteMessageViewModel.Command.LaunchPlayStore
+import com.duckduckgo.remote.messaging.impl.modal.cardslist.CardsListRemoteMessageViewModel.Command.LaunchScreen
+import com.duckduckgo.remote.messaging.impl.modal.cardslist.CardsListRemoteMessageViewModel.Command.SharePromoLinkRMF
+import com.duckduckgo.remote.messaging.impl.modal.cardslist.CardsListRemoteMessageViewModel.Command.SubmitUrl
+import com.duckduckgo.remote.messaging.impl.modal.cardslist.CardsListRemoteMessageViewModel.Command.SubmitUrlInContext
 import com.duckduckgo.remote.messaging.impl.newtab.SharePromoLinkBroadCastReceiver
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.coroutines.flow.launchIn
