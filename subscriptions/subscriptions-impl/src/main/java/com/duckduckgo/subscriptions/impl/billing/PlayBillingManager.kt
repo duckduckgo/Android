@@ -97,10 +97,14 @@ interface PlayBillingManager {
     )
 
     /**
-     * Gets the current purchase token from active purchases (queryPurchasesAsync)
-     * This is the preferred method over purchase history for getting current tokens
+     * Returns the most recent purchase token from active purchases via
+     * queryPurchasesAsync, which is preferred over purchase history for obtaining
+     * active purchase tokens.
+     *
+     * Ensures the billing client is connected and fetches updated purchase data
+     * from Google Play prior to returning the token.
      */
-    fun getLatestPurchaseToken(): String?
+    suspend fun getLatestPurchaseToken(): String?
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -383,7 +387,13 @@ class RealPlayBillingManager @Inject constructor(
         }
     }
 
-    override fun getLatestPurchaseToken(): String? {
+    override suspend fun getLatestPurchaseToken(): String? = withContext(dispatcherProvider.io()) {
+        if (!billingClient.ready) {
+            connect()
+        }
+        logcat { "Billing: Refreshing purchases before getting token" }
+        loadPurchases()
+
         val activePurchases = purchases.filter { purchase: Purchase ->
             purchase.products.contains(BASIC_SUBSCRIPTION) &&
                 purchase.purchaseState == Purchase.PurchaseState.PURCHASED
@@ -391,14 +401,7 @@ class RealPlayBillingManager @Inject constructor(
 
         val latestPurchase = activePurchases.maxByOrNull { it.purchaseTime }
 
-        return if (latestPurchase != null) {
-            val tokenPreview = latestPurchase.purchaseToken.take(10) + "..."
-            logcat { "Billing: Latest active purchase token preview: $tokenPreview" }
-            latestPurchase.purchaseToken
-        } else {
-            logcat { "Billing: No active purchase token found" }
-            null
-        }
+        return@withContext latestPurchase?.purchaseToken
     }
 }
 
