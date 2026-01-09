@@ -60,9 +60,9 @@
     <string name="undoSnackbarAction">Atsaukt</string>
     <!-- Trackers blocked animation-->
     <plurals name="trackersBlockedAnimationMessage" tools:ignore="ImpliedQuantity">
-        <item quantity="zero">Izsekotāji</item>
-        <item quantity="one">Izsekotājs</item>
-        <item quantity="other">Izsekotāji</item>
+        <item quantity="zero">Bloķētie izsekotāji</item>
+        <item quantity="one">Bloķētais izsekotājs</item>
+        <item quantity="other">Bloķētie izsekotāji</item>
     </plurals>
 
     <!-- Downloading files -->

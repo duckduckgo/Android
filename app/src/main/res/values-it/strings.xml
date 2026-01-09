@@ -60,8 +60,8 @@
     <string name="undoSnackbarAction">Annulla</string>
     <!-- Trackers blocked animation-->
     <plurals name="trackersBlockedAnimationMessage" tools:ignore="ImpliedQuantity">
-        <item quantity="one">Tracciamento</item>
-        <item quantity="other">Tracciamento</item>
+        <item quantity="one">Sistema di tracciamento bloccato</item>
+        <item quantity="other">Sistemi di tracciamento bloccati</item>
     </plurals>
 
     <!-- Downloading files -->
