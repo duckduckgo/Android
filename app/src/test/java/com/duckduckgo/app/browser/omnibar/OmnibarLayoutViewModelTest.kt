@@ -370,6 +370,7 @@ class OmnibarLayoutViewModelTest {
 
     @Test
     fun `when custom tab title updates, update view mode state`() = runTest {
+        isFullUrlEnabledFlow.value = false
         val expectedTitle = "newTitle"
         val initialUrl = "https://example.com/page"
         val expectedDomain = "example.com"
@@ -406,6 +407,7 @@ class OmnibarLayoutViewModelTest {
 
     @Test
     fun `when custom tab view mode changed and URL loaded then domain extracted from URL`() = runTest {
+        isFullUrlEnabledFlow.value = false
         val testUrl = "https://example.com/path/to/page"
         val expectedDomain = "example.com"
 
@@ -432,6 +434,7 @@ class OmnibarLayoutViewModelTest {
 
     @Test
     fun `when custom tab URL changes to different domain then domain is dynamically updated`() = runTest {
+        isFullUrlEnabledFlow.value = false
         val initialUrl = "https://example.com/page"
         val newUrl = "https://different.com/other"
         val expectedNewDomain = "different.com"
@@ -474,6 +477,7 @@ class OmnibarLayoutViewModelTest {
         val duckPlayerUrl = DUCK_PLAYER_URL
         val expectedDomain = "duck://player" // DuckPlayer URLs extract as "duck://player" (without the path)
 
+        isFullUrlEnabledFlow.value = false
         whenever(duckPlayer.getDuckPlayerState()).thenReturn(DuckPlayer.DuckPlayerState.ENABLED)
 
         testee.onViewModeChanged(ViewMode.CustomTab(100, "title", "example.com", showDuckPlayerIcon = false))
@@ -540,6 +544,111 @@ class OmnibarLayoutViewModelTest {
             val customTabMode = viewState.viewMode as ViewMode.CustomTab
             assertEquals(expectedDomain, customTabMode.domain)
             assertFalse(customTabMode.showDuckPlayerIcon)
+        }
+    }
+
+    @Test
+    fun whenCustomTabModeWithFullUrlEnabledThenDomainShowsFullUrl() = runTest {
+        val fullUrl = "https://example.com/page?param=value"
+        isFullUrlEnabledFlow.value = true
+
+        testee.onViewModeChanged(ViewMode.CustomTab(100, "title", "example.com", showDuckPlayerIcon = false))
+        testee.onExternalStateChange(
+            StateChange.LoadingStateChange(
+                LoadingViewState(
+                    isLoading = false,
+                    trackersAnimationEnabled = false,
+                    progress = 100,
+                    url = fullUrl,
+                ),
+            ),
+        )
+
+        testee.viewState.test {
+            val viewState = expectMostRecentItem()
+            assertTrue(viewState.viewMode is ViewMode.CustomTab)
+            val customTabMode = viewState.viewMode as ViewMode.CustomTab
+            assertEquals(fullUrl, customTabMode.domain)
+        }
+    }
+
+    @Test
+    fun whenCustomTabModeWithFullUrlDisabledThenDomainShowsShortUrl() = runTest {
+        val fullUrl = "https://example.com/page?param=value"
+        val expectedShortUrl = "example.com"
+        isFullUrlEnabledFlow.value = false
+
+        testee.onViewModeChanged(ViewMode.CustomTab(100, "title", "example.com", showDuckPlayerIcon = false))
+        testee.onExternalStateChange(
+            StateChange.LoadingStateChange(
+                LoadingViewState(
+                    isLoading = false,
+                    trackersAnimationEnabled = false,
+                    progress = 100,
+                    url = fullUrl,
+                ),
+            ),
+        )
+
+        testee.viewState.test {
+            val viewState = expectMostRecentItem()
+            assertTrue(viewState.viewMode is ViewMode.CustomTab)
+            val customTabMode = viewState.viewMode as ViewMode.CustomTab
+            assertEquals(expectedShortUrl, customTabMode.domain)
+        }
+    }
+
+    @Test
+    fun whenCustomTabTitleUpdatesWithFullUrlDisabledThenDomainStaysShort() = runTest {
+        val fullUrl = "https://example.com/page"
+        val expectedShortUrl = "example.com"
+        val newTitle = "New Page Title"
+        isFullUrlEnabledFlow.value = false
+
+        testee.onViewModeChanged(ViewMode.CustomTab(100, "old title", "example.com", showDuckPlayerIcon = false))
+        testee.onExternalStateChange(
+            StateChange.LoadingStateChange(
+                LoadingViewState(
+                    isLoading = false,
+                    trackersAnimationEnabled = false,
+                    progress = 100,
+                    url = fullUrl,
+                ),
+            ),
+        )
+
+        testee.viewState.test {
+            skipItems(1)
+            testee.onCustomTabTitleUpdate(ChangeCustomTabTitle(newTitle))
+            val viewState = awaitItem()
+            assertTrue(viewState.viewMode is ViewMode.CustomTab)
+            val customTabMode = viewState.viewMode as ViewMode.CustomTab
+            assertEquals(newTitle, customTabMode.title)
+            assertEquals(expectedShortUrl, customTabMode.domain)
+        }
+    }
+
+    @Test
+    fun whenCustomTabWithNullUrlThenDomainIsNull() = runTest {
+        isFullUrlEnabledFlow.value = false
+
+        testee.onViewModeChanged(ViewMode.CustomTab(100, "title", null, showDuckPlayerIcon = false))
+        testee.onExternalStateChange(
+            StateChange.LoadingStateChange(
+                LoadingViewState(
+                    isLoading = false,
+                    trackersAnimationEnabled = false,
+                    progress = 100,
+                    url = "",
+                ),
+            ),
+        )
+
+        testee.viewState.test {
+            val viewState = expectMostRecentItem()
+            assertTrue(viewState.viewMode is ViewMode.CustomTab)
+            val customTabMode = viewState.viewMode as ViewMode.CustomTab
+            assertEquals("", customTabMode.domain)
         }
     }
 
