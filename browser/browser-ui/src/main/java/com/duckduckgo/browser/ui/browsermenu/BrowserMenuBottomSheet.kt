@@ -43,18 +43,20 @@ class BrowserMenuBottomSheet(
 
     init {
         setContentView(binding.root)
-        behavior.apply {
-            isDraggable = true
-            isHideable = true
-            state = if (expandedByDefault) {
-                BottomSheetBehavior.STATE_EXPANDED
-            } else {
-                BottomSheetBehavior.STATE_COLLAPSED
-            }
-        }
 
         setOnShowListener { dialogInterface ->
             (dialogInterface as BottomSheetDialog).setRoundCorners()
+
+            behavior.apply {
+                isDraggable = true
+                isHideable = true
+                peekHeight = context.resources.displayMetrics.heightPixels / 2
+                state = if (expandedByDefault) {
+                    BottomSheetBehavior.STATE_EXPANDED
+                } else {
+                    BottomSheetBehavior.STATE_COLLAPSED
+                }
+            }
         }
 
         setOnCancelListener {
