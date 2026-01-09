@@ -24,10 +24,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.remote.messaging.api.CardItem
 import com.duckduckgo.remote.messaging.impl.databinding.ViewRemoteMessageEntryBinding
 import com.duckduckgo.remote.messaging.impl.mappers.drawable
-import com.duckduckgo.remote.messaging.impl.ui.ModalSurfaceAdapter.CardItemViewHolder
+import com.duckduckgo.remote.messaging.impl.ui.CardsListAdapter.CardItemViewHolder
 import javax.inject.Inject
 
-class ModalSurfaceAdapter @Inject constructor() : ListAdapter<CardItem, CardItemViewHolder>(ModalSurfaceDiffCallback()) {
+class CardsListAdapter @Inject constructor() : ListAdapter<CardItem, CardItemViewHolder>(ModalSurfaceDiffCallback()) {
 
     private lateinit var cardItemClickListener: CardItemClickListener
 

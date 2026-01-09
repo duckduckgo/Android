@@ -72,7 +72,7 @@ class CardsListRemoteMessageView @JvmOverloads constructor(
 ) : FrameLayout(context, attrs, defStyleAttr) {
 
     @Inject
-    lateinit var modalSurfaceAdapter: ModalSurfaceAdapter
+    lateinit var cardsListAdapter: CardsListAdapter
 
     @Inject
     lateinit var viewModelFactory: ViewViewModelFactory
@@ -125,8 +125,8 @@ class CardsListRemoteMessageView @JvmOverloads constructor(
     }
 
     private fun setupUi() {
-        modalSurfaceAdapter.setListener(viewModel)
-        binding.cardItemsRecyclerView.adapter = modalSurfaceAdapter
+        cardsListAdapter.setListener(viewModel)
+        binding.cardItemsRecyclerView.adapter = cardsListAdapter
 
         binding.closeButton.setOnClickListener {
             viewModel.onCloseButtonClicked()
@@ -138,7 +138,7 @@ class CardsListRemoteMessageView @JvmOverloads constructor(
 
     private fun render(viewState: CardsListRemoteMessageViewModel.ViewState?) {
         viewState?.cardsLists?.let {
-            modalSurfaceAdapter.submitList(it.listItems)
+            cardsListAdapter.submitList(it.listItems)
             binding.headerImage.setImageResource(it.placeholder.drawable(true))
             binding.headerTitle.text = it.titleText
             binding.actionButton.text = it.primaryActionText
