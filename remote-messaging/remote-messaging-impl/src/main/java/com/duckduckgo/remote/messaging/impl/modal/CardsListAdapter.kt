@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.remote.messaging.impl.ui
+package com.duckduckgo.remote.messaging.impl.modal
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -24,7 +24,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.remote.messaging.api.CardItem
 import com.duckduckgo.remote.messaging.impl.databinding.ViewRemoteMessageEntryBinding
 import com.duckduckgo.remote.messaging.impl.mappers.drawable
-import com.duckduckgo.remote.messaging.impl.ui.CardsListAdapter.CardItemViewHolder
+import com.duckduckgo.remote.messaging.impl.modal.CardsListAdapter.CardItemViewHolder
 import javax.inject.Inject
 
 class CardsListAdapter @Inject constructor() : ListAdapter<CardItem, CardItemViewHolder>(ModalSurfaceDiffCallback()) {
