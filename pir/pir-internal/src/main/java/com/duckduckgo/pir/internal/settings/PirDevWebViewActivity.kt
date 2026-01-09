@@ -69,8 +69,11 @@ class PirDevWebViewActivity : DuckDuckGoActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        pirOptOut.stop()
-        pirScan.stop()
+        when (params?.debugType) {
+            DebugType.SCAN -> pirScan.stop()
+            DebugType.OPT_OUT -> pirOptOut.stop()
+            else -> {}
+        }
     }
 }
 
