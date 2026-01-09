@@ -1343,7 +1343,8 @@ class BrowserTabFragment :
     private fun createBrowserMenu() {
         val useBottomSheetMenu = viewModel.browserViewState.value?.useBottomSheetMenu ?: false
         if (useBottomSheetMenu) {
-            createBottomSheetMenu()
+            val isFullyExpanded = viewModel.browserViewState.value?.bottomSheetMenuExpanded ?: false
+            createBottomSheetMenu(isFullyExpanded)
         } else {
             createPopupMenuClassic()
         }
@@ -1484,8 +1485,11 @@ class BrowserTabFragment :
         }
     }
 
-    private fun createBottomSheetMenu() {
-        bottomSheetMenu = BrowserMenuBottomSheet(context = requireContext())
+    private fun createBottomSheetMenu(isFullyExpanded: Boolean) {
+        bottomSheetMenu = BrowserMenuBottomSheet(
+            context = requireContext(),
+            expandedByDefault = isFullyExpanded,
+        )
         bottomSheetMenu?.apply {
             forwardMenuItem.setOnClickListener {
                 dismiss()

@@ -220,6 +220,12 @@ class FakeSettingsDataStore :
             store["useBottomSheetMenu"] = value
         }
 
+    override var useBottomSheetMenuExpanded: Boolean
+        get() = store["useBottomSheetMenuExpanded"] as Boolean? ?: false
+        set(value) {
+            store["useBottomSheetMenuExpanded"] = value
+        }
+
     override fun isCurrentlySelected(clearWhatOption: ClearWhatOption): Boolean {
         val currentlySelected = store["automaticallyClearWhatOption"] as ClearWhatOption?
         return currentlySelected == clearWhatOption

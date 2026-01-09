@@ -105,6 +105,11 @@ class AppearanceActivity : DuckDuckGoActivity() {
             viewModel.onUseBottomSheetMenuChanged(isChecked)
         }
 
+    private val useBottomSheetExpandedMenuToggleListener =
+        CompoundButton.OnCheckedChangeListener { _, isChecked ->
+            viewModel.onUseBottomSheetMenuExpandedByDefaultChanged(isChecked)
+        }
+
     private val changeIconFlow =
         registerForActivityResult(ChangeIconContract()) { resultOk ->
             if (resultOk) {
@@ -182,6 +187,11 @@ class AppearanceActivity : DuckDuckGoActivity() {
                     binding.useBottomSheetMenuSetting.quietlySetIsChecked(
                         viewState.useBottomSheetMenuEnabled,
                         useBottomSheetMenuToggleListener,
+                    )
+                    binding.useBottomSheetMenuExpandedSetting.isVisible = viewState.hasExperimentalBrowserMenuOption
+                    binding.useBottomSheetMenuExpandedSetting.quietlySetIsChecked(
+                        viewState.useBottomSheetMenuExpandedEnabled,
+                        useBottomSheetExpandedMenuToggleListener,
                     )
                     configureOmnibarSettings(it)
                 }

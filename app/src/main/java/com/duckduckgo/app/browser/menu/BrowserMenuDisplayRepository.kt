@@ -48,11 +48,19 @@ interface BrowserMenuDisplayRepository {
      * @param enabled true to enable the experimental menu, false to disable it
      */
     suspend fun setExperimentalMenuEnabled(enabled: Boolean)
+
+    /**
+     * Sets the experimental menu expanded by default state.
+     *
+     * @param enabled true to set the menu to be expanded by default, false otherwise
+     */
+    suspend fun setExperimentalMenuExpandedByDefault(enabled: Boolean)
 }
 
 data class BrowserMenuDisplayState(
     val hasOption: Boolean,
     val isEnabled: Boolean,
+    val isFullyExpandedByDefault: Boolean,
 )
 
 @ContributesBinding(
@@ -68,9 +76,21 @@ class RealBrowserMenuDisplayRepository @Inject constructor(
     private val refreshTrigger = MutableSharedFlow<Unit>(replay = 0)
     override val browserMenuState: Flow<BrowserMenuDisplayState> = flow {
         val isActivate = browserConfigFeature.experimentalBrowsingMenu().isEnabled()
-        emit(BrowserMenuDisplayState(hasOption = isActivate, isEnabled = browserMenuStore.useBottomSheetMenu))
+        emit(
+            BrowserMenuDisplayState(
+                hasOption = isActivate,
+                isEnabled = browserMenuStore.useBottomSheetMenu,
+                isFullyExpandedByDefault = browserMenuStore.useBottomSheetMenuExpanded,
+            ),
+        )
         refreshTrigger.collect {
-            emit(BrowserMenuDisplayState(hasOption = isActivate, isEnabled = browserMenuStore.useBottomSheetMenu))
+            emit(
+                BrowserMenuDisplayState(
+                    hasOption = isActivate,
+                    isEnabled = browserMenuStore.useBottomSheetMenu,
+                    isFullyExpandedByDefault = browserMenuStore.useBottomSheetMenuExpanded,
+                ),
+            )
         }
     }
         .distinctUntilChanged()
@@ -82,6 +102,11 @@ class RealBrowserMenuDisplayRepository @Inject constructor(
 
     override suspend fun setExperimentalMenuEnabled(enabled: Boolean) {
         browserMenuStore.useBottomSheetMenu = enabled
+        refreshTrigger.emit(Unit)
+    }
+
+    override suspend fun setExperimentalMenuExpandedByDefault(enabled: Boolean) {
+        browserMenuStore.useBottomSheetMenuExpanded = enabled
         refreshTrigger.emit(Unit)
     }
 }

@@ -492,7 +492,7 @@
                         android:layout_gravity="center"
                         android:contentDescription="@string/browserPopupMenu"
                         android:scaleType="center"
-                        android:src="@drawable/ic_menu_vertical_24" />
+                        android:src="@drawable/ic_menu_hamburger_24" />
 
                     <View
                         android:id="@+id/browserMenuHighlight"

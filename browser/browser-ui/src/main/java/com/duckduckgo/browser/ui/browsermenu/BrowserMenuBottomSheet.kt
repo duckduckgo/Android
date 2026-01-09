@@ -25,6 +25,7 @@ import androidx.core.view.children
 import androidx.core.view.isVisible
 import com.duckduckgo.browser.ui.R
 import com.duckduckgo.browser.ui.databinding.BottomSheetBrowserMenuBinding
+import com.duckduckgo.common.ui.setRoundCorners
 import com.duckduckgo.common.ui.view.MenuActionButtonView
 import com.duckduckgo.common.ui.view.MenuItemView
 import com.duckduckgo.common.ui.view.StatusIndicatorView
@@ -34,16 +35,26 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 
 @SuppressLint("NoBottomSheetDialog")
-class BrowserMenuBottomSheet(private val context: Context) : BottomSheetDialog(context) {
+class BrowserMenuBottomSheet(
+    private val context: Context,
+    private val expandedByDefault: Boolean = false,
+) : BottomSheetDialog(context) {
     private val binding = BottomSheetBrowserMenuBinding.inflate(LayoutInflater.from(context))
 
     init {
         setContentView(binding.root)
         behavior.apply {
-            skipCollapsed = true
             isDraggable = true
-            isHideable = false
-            state = BottomSheetBehavior.STATE_EXPANDED
+            isHideable = true
+            state = if (expandedByDefault) {
+                BottomSheetBehavior.STATE_EXPANDED
+            } else {
+                BottomSheetBehavior.STATE_COLLAPSED
+            }
+        }
+
+        setOnShowListener { dialogInterface ->
+            (dialogInterface as BottomSheetDialog).setRoundCorners()
         }
 
         setOnCancelListener {
