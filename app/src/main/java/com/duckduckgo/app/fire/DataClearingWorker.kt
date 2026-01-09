@@ -66,7 +66,7 @@ class DataClearingWorker(
         settingsDataStore.lastExecutedJobId = id.toString()
 
         withContext(dispatchers.io()) {
-            if (androidBrowserConfigFeature.moreGranularDataClearingOptions().isEnabled()) {
+            if (androidBrowserConfigFeature.improvedDataClearingOptions().isEnabled()) {
                 // Use new granular clearing - will automatically kill the process
                 dataClearing.clearDataUsingAutomaticFireOptions()
             } else {

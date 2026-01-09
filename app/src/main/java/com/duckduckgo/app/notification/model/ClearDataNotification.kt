@@ -61,7 +61,7 @@ class ClearDataNotification(
         }
 
         return withContext(dispatcherProvider.io()) {
-            if (androidBrowserConfigFeature.moreGranularDataClearingOptions().isEnabled()) {
+            if (androidBrowserConfigFeature.improvedDataClearingOptions().isEnabled()) {
                 if (automaticDataClearing.isAutomaticDataClearingOptionSelected()) {
                     logcat(VERBOSE) { "No need for notification, user already has automatic data clearing option set" }
                     return@withContext false
