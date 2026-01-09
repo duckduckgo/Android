@@ -76,7 +76,7 @@
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     app:menuActionLabel="@string/browserMenuNewChat"
-                    app:menuActionSrc="@drawable/ic_ai_chat_add_16" />
+                    app:menuActionSrc="@drawable/ic_ai_chat_add_24" />
 
                 <com.duckduckgo.common.ui.view.MenuActionButtonView
                     android:id="@+id/settingsMenuItem"
