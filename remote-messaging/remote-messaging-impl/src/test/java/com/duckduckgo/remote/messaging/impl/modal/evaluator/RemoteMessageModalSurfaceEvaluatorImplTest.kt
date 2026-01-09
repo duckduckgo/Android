@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.remote.messaging.impl.ui
+package com.duckduckgo.remote.messaging.impl.modal.evaluator
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -179,7 +179,7 @@ class RemoteMessageModalSurfaceEvaluatorImplTest {
     }
 
     @Test
-    fun whenMessageHasModalSurfaceAndIntentAvailableThenActivityIsLaunchedAndCompletedWithAction() = runTest {
+    fun whenMessageHasModalSurfaceAndIntentAvailableThenActivityIsLaunchedAndModalShown() = runTest {
         givenFeatureTogglesEnabled()
         givenOnboardingComplete()
         givenBackgroundThresholdMet()
@@ -190,7 +190,7 @@ class RemoteMessageModalSurfaceEvaluatorImplTest {
 
         val result = testee.evaluate()
 
-        assertEquals(ModalEvaluator.EvaluationResult.CompletedWithAction, result)
+        assertEquals(ModalEvaluator.EvaluationResult.ModalShown, result)
         coroutinesTestRule.testScope.testScheduler.advanceUntilIdle()
         verify(mockApplicationContext).startActivity(mockIntent)
         verify(mockIntent).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP)
@@ -241,7 +241,7 @@ class RemoteMessageModalSurfaceEvaluatorImplTest {
 
         val result = testee.evaluate()
 
-        assertEquals(ModalEvaluator.EvaluationResult.CompletedWithAction, result)
+        assertEquals(ModalEvaluator.EvaluationResult.ModalShown, result)
         coroutinesTestRule.testScope.testScheduler.advanceUntilIdle()
         verify(mockApplicationContext).startActivity(mockIntent)
     }
@@ -303,7 +303,7 @@ class RemoteMessageModalSurfaceEvaluatorImplTest {
 
         val result = testee.evaluate()
 
-        assertEquals(ModalEvaluator.EvaluationResult.CompletedWithAction, result)
+        assertEquals(ModalEvaluator.EvaluationResult.ModalShown, result)
         coroutinesTestRule.testScope.testScheduler.advanceUntilIdle()
         verify(mockApplicationContext).startActivity(mockIntent)
     }

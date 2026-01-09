@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.remote.messaging.impl.ui
+package com.duckduckgo.remote.messaging.impl.modal.cardslist
 
 import android.annotation.SuppressLint
 import android.app.PendingIntent
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.provider.Settings
 import android.util.AttributeSet
@@ -45,17 +46,17 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter.DeeplinkActivityParam
 import com.duckduckgo.remote.messaging.impl.R
 import com.duckduckgo.remote.messaging.impl.databinding.ViewCardsListRemoteMessageBinding
 import com.duckduckgo.remote.messaging.impl.mappers.drawable
+import com.duckduckgo.remote.messaging.impl.modal.cardslist.CardsListRemoteMessageViewModel.Command
+import com.duckduckgo.remote.messaging.impl.modal.cardslist.CardsListRemoteMessageViewModel.Command.DismissMessage
+import com.duckduckgo.remote.messaging.impl.modal.cardslist.CardsListRemoteMessageViewModel.Command.LaunchAppTPOnboarding
+import com.duckduckgo.remote.messaging.impl.modal.cardslist.CardsListRemoteMessageViewModel.Command.LaunchDefaultBrowser
+import com.duckduckgo.remote.messaging.impl.modal.cardslist.CardsListRemoteMessageViewModel.Command.LaunchDefaultCredentialProvider
+import com.duckduckgo.remote.messaging.impl.modal.cardslist.CardsListRemoteMessageViewModel.Command.LaunchPlayStore
+import com.duckduckgo.remote.messaging.impl.modal.cardslist.CardsListRemoteMessageViewModel.Command.LaunchScreen
+import com.duckduckgo.remote.messaging.impl.modal.cardslist.CardsListRemoteMessageViewModel.Command.SharePromoLinkRMF
+import com.duckduckgo.remote.messaging.impl.modal.cardslist.CardsListRemoteMessageViewModel.Command.SubmitUrl
+import com.duckduckgo.remote.messaging.impl.modal.cardslist.CardsListRemoteMessageViewModel.Command.SubmitUrlInContext
 import com.duckduckgo.remote.messaging.impl.newtab.SharePromoLinkBroadCastReceiver
-import com.duckduckgo.remote.messaging.impl.ui.CardsListRemoteMessageViewModel.Command
-import com.duckduckgo.remote.messaging.impl.ui.CardsListRemoteMessageViewModel.Command.DismissMessage
-import com.duckduckgo.remote.messaging.impl.ui.CardsListRemoteMessageViewModel.Command.LaunchAppTPOnboarding
-import com.duckduckgo.remote.messaging.impl.ui.CardsListRemoteMessageViewModel.Command.LaunchDefaultBrowser
-import com.duckduckgo.remote.messaging.impl.ui.CardsListRemoteMessageViewModel.Command.LaunchDefaultCredentialProvider
-import com.duckduckgo.remote.messaging.impl.ui.CardsListRemoteMessageViewModel.Command.LaunchPlayStore
-import com.duckduckgo.remote.messaging.impl.ui.CardsListRemoteMessageViewModel.Command.LaunchScreen
-import com.duckduckgo.remote.messaging.impl.ui.CardsListRemoteMessageViewModel.Command.SharePromoLinkRMF
-import com.duckduckgo.remote.messaging.impl.ui.CardsListRemoteMessageViewModel.Command.SubmitUrl
-import com.duckduckgo.remote.messaging.impl.ui.CardsListRemoteMessageViewModel.Command.SubmitUrlInContext
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -72,7 +73,7 @@ class CardsListRemoteMessageView @JvmOverloads constructor(
 ) : FrameLayout(context, attrs, defStyleAttr) {
 
     @Inject
-    lateinit var modalSurfaceAdapter: ModalSurfaceAdapter
+    lateinit var cardsListAdapter: CardsListAdapter
 
     @Inject
     lateinit var viewModelFactory: ViewViewModelFactory
@@ -125,8 +126,8 @@ class CardsListRemoteMessageView @JvmOverloads constructor(
     }
 
     private fun setupUi() {
-        modalSurfaceAdapter.setListener(viewModel)
-        binding.cardItemsRecyclerView.adapter = modalSurfaceAdapter
+        cardsListAdapter.setListener(viewModel)
+        binding.cardItemsRecyclerView.adapter = cardsListAdapter
 
         binding.closeButton.setOnClickListener {
             viewModel.onCloseButtonClicked()
@@ -138,7 +139,7 @@ class CardsListRemoteMessageView @JvmOverloads constructor(
 
     private fun render(viewState: CardsListRemoteMessageViewModel.ViewState?) {
         viewState?.cardsLists?.let {
-            modalSurfaceAdapter.submitList(it.listItems)
+            cardsListAdapter.submitList(it.listItems)
             binding.headerImage.setImageResource(it.placeholder.drawable(true))
             binding.headerTitle.text = it.titleText
             binding.actionButton.text = it.primaryActionText
@@ -183,7 +184,7 @@ class CardsListRemoteMessageView @JvmOverloads constructor(
         runCatching {
             val intent = if (appBuildConfig.sdkInt >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
                 Intent(Settings.ACTION_CREDENTIAL_PROVIDER).apply {
-                    data = android.net.Uri.parse("package:${context.packageName}")
+                    data = Uri.parse("package:${context.packageName}")
                 }
             } else {
                 Intent(Settings.ACTION_SETTINGS)

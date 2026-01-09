@@ -80,8 +80,8 @@ class ModalEvaluatorCoordinator @Inject constructor(
 
             // Start evaluation
             when (evaluator.evaluate()) {
-                is ModalEvaluator.EvaluationResult.CompletedWithAction -> {
-                    logcat { "ModalEvaluatorCoordinator: Evaluator '${evaluator.evaluatorId}' completed, record timestamp and stop" }
+                is ModalEvaluator.EvaluationResult.ModalShown -> {
+                    logcat { "ModalEvaluatorCoordinator: Evaluator '${evaluator.evaluatorId}' completed and modal shown, record timestamp and stop" }
                     completionStore.recordCompletion()
                     return@withLock
                 }

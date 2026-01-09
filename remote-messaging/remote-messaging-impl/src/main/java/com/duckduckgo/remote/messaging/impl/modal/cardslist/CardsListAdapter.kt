@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.remote.messaging.impl.ui
+package com.duckduckgo.remote.messaging.impl.modal.cardslist
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -24,18 +24,18 @@ import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.remote.messaging.api.CardItem
 import com.duckduckgo.remote.messaging.impl.databinding.ViewRemoteMessageEntryBinding
 import com.duckduckgo.remote.messaging.impl.mappers.drawable
-import com.duckduckgo.remote.messaging.impl.ui.ModalSurfaceAdapter.CardItemViewHolder
+import com.duckduckgo.remote.messaging.impl.modal.cardslist.CardsListAdapter.CardItemViewHolder
 import javax.inject.Inject
 
-class ModalSurfaceAdapter @Inject constructor() : ListAdapter<CardItem, CardItemViewHolder>(ModalSurfaceDiffCallback()) {
+class CardsListAdapter @Inject constructor() : ListAdapter<CardItem, CardItemViewHolder>(ModalSurfaceDiffCallback()) {
 
-    private lateinit var modalSurfaceListener: ModalSurfaceListener
+    private lateinit var cardItemClickListener: CardItemClickListener
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
     ): CardItemViewHolder {
-        return CardItemViewHolder(ViewRemoteMessageEntryBinding.inflate(LayoutInflater.from(parent.context), parent, false), modalSurfaceListener)
+        return CardItemViewHolder(ViewRemoteMessageEntryBinding.inflate(LayoutInflater.from(parent.context), parent, false), cardItemClickListener)
     }
 
     override fun onBindViewHolder(
@@ -47,7 +47,7 @@ class ModalSurfaceAdapter @Inject constructor() : ListAdapter<CardItem, CardItem
 
     class CardItemViewHolder(
         private val binding: ViewRemoteMessageEntryBinding,
-        private val listener: ModalSurfaceListener,
+        private val listener: CardItemClickListener,
     ) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: CardItem) {
@@ -60,8 +60,8 @@ class ModalSurfaceAdapter @Inject constructor() : ListAdapter<CardItem, CardItem
         }
     }
 
-    fun setListener(listener: ModalSurfaceListener) {
-        this.modalSurfaceListener = listener
+    fun setListener(listener: CardItemClickListener) {
+        this.cardItemClickListener = listener
     }
 
     private class ModalSurfaceDiffCallback : DiffUtil.ItemCallback<CardItem>() {

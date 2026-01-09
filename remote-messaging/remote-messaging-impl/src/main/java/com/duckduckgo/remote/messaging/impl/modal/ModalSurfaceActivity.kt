@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.remote.messaging.impl.ui
+package com.duckduckgo.remote.messaging.impl.modal
 
 import android.os.Bundle
 import androidx.activity.addCallback
@@ -29,7 +29,8 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.getActivityParams
 import com.duckduckgo.remote.messaging.impl.databinding.ActivityModalSurfaceBinding
-import com.duckduckgo.remote.messaging.impl.ui.ModalSurfaceViewModel.Command
+import com.duckduckgo.remote.messaging.impl.modal.ModalSurfaceViewModel.Command
+import com.duckduckgo.remote.messaging.impl.modal.cardslist.CardsListRemoteMessageView
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 

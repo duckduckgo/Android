@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.remote.messaging.impl.ui
+package com.duckduckgo.remote.messaging.impl.modal.cardslist
 
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope

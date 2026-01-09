@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.remote.messaging.impl.ui
+package com.duckduckgo.remote.messaging.impl.modal.cardslist
 
 import com.duckduckgo.remote.messaging.api.Action
-import com.duckduckgo.remote.messaging.impl.ui.CardsListRemoteMessageViewModel.Command
+import com.duckduckgo.remote.messaging.impl.modal.cardslist.CardsListRemoteMessageViewModel.Command
 import com.duckduckgo.survey.api.SurveyParameterManager
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals

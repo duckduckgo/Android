@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.remote.messaging.impl.ui
+package com.duckduckgo.remote.messaging.impl.modal.cardslist
 
 import com.duckduckgo.remote.messaging.api.CardItem
 
-interface ModalSurfaceListener {
+interface CardItemClickListener {
     fun onItemClicked(item: CardItem)
 }

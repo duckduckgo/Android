@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.remote.messaging.impl.ui
+package com.duckduckgo.remote.messaging.impl.modal.cardslist
 
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -26,7 +26,7 @@ import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.api.RemoteMessageModel
 import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
 import com.duckduckgo.remote.messaging.api.Surface
-import com.duckduckgo.remote.messaging.impl.ui.CardsListRemoteMessageViewModel.Command
+import com.duckduckgo.remote.messaging.impl.modal.cardslist.CardsListRemoteMessageViewModel.Command
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
@@ -35,6 +35,7 @@ import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -176,8 +177,8 @@ class CardsListRemoteMessageViewModelTest {
     fun whenOnMessageShownWithNullMessageThenNoPixelsFired() = runTest {
         viewModel.onMessageShown()
 
-        verify(remoteMessagingModel, org.mockito.kotlin.never()).onMessageShown(any())
-        verify(cardsListPixelHelper, org.mockito.kotlin.never()).fireCardItemShownPixel(any(), any())
+        verify(remoteMessagingModel, never()).onMessageShown(any())
+        verify(cardsListPixelHelper, never()).fireCardItemShownPixel(any(), any())
     }
 
     @Test

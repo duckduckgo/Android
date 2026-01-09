@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.remote.messaging.impl.ui
+package com.duckduckgo.remote.messaging.impl.modal.cardslist
 
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -25,9 +25,9 @@ import com.duckduckgo.remote.messaging.api.Content
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
 import com.duckduckgo.remote.messaging.api.Surface
+import com.duckduckgo.remote.messaging.impl.modal.cardslist.RealCardsListRemoteMessagePixelHelper.Companion.PARAM_NAME_DISMISS_TYPE
+import com.duckduckgo.remote.messaging.impl.modal.cardslist.RealCardsListRemoteMessagePixelHelper.Companion.PARAM_VALUE_CLOSE_BUTTON
 import com.duckduckgo.remote.messaging.impl.pixels.RemoteMessagingPixelName
-import com.duckduckgo.remote.messaging.impl.ui.RealCardsListRemoteMessagePixelHelper.Companion.PARAM_NAME_DISMISS_TYPE
-import com.duckduckgo.remote.messaging.impl.ui.RealCardsListRemoteMessagePixelHelper.Companion.PARAM_VALUE_CLOSE_BUTTON
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule

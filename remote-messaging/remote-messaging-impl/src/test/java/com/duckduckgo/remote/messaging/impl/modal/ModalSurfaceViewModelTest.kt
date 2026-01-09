@@ -14,11 +14,13 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.remote.messaging.impl.ui
+package com.duckduckgo.remote.messaging.impl.modal
 
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.remote.messaging.api.Content
+import com.duckduckgo.remote.messaging.impl.modal.cardslist.CardsListRemoteMessagePixelHelper
+import com.duckduckgo.remote.messaging.impl.modal.cardslist.RealCardsListRemoteMessagePixelHelper
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
