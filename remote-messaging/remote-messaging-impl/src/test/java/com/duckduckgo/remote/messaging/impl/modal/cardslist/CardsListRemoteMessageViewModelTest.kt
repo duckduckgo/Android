@@ -26,7 +26,6 @@ import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.api.RemoteMessageModel
 import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
 import com.duckduckgo.remote.messaging.api.Surface
-import com.duckduckgo.remote.messaging.impl.modal.CommandActionMapper
 import com.duckduckgo.remote.messaging.impl.modal.cardslist.CardsListRemoteMessageViewModel.Command
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
