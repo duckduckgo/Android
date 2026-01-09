@@ -143,7 +143,7 @@ class CardsListRemoteMessageView @JvmOverloads constructor(
     private fun render(viewState: CardsListRemoteMessageViewModel.ViewState?) {
         viewState?.cardsLists?.let {
             modalSurfaceAdapter.submitList(it.listItems)
-            if (it.imageUrl != null) {
+            if (it.imageUrl.orEmpty().isNotEmpty()) {
                 Glide
                     .with(binding.remoteImage)
                     .load(it.imageUrl)
