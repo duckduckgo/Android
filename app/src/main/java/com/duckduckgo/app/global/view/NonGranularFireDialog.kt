@@ -64,7 +64,6 @@ private const val ANIMATION_SPEED_INCREMENT = 0.15f
 
 /**
  * Non-granular Fire dialog with simple 2-button layout (Clear All and Cancel).
- * Uses the new data clearing API and ViewModel pattern.
  */
 @InjectWith(FragmentScope::class)
 class NonGranularFireDialog : BottomSheetDialogFragment(), FireDialog {
