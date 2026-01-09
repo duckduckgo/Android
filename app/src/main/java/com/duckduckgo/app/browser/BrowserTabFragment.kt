@@ -1368,7 +1368,13 @@ class BrowserTabFragment :
     private fun launchBrowserMenu(addExtraDelay: Boolean = false) {
         val useBottomSheetMenu = viewModel.browserViewState.value?.useBottomSheetMenu ?: false
         if (useBottomSheetMenu && bottomSheetMenu != null) {
-            bottomSheetMenu?.show()
+            val delay = if (addExtraDelay) POPUP_MENU_DELAY * 2 else POPUP_MENU_DELAY
+            // small delay added to let keyboard disappear and avoid jarring transition
+            binding.rootView.postDelayed(delay) {
+                if (isAdded) {
+                    bottomSheetMenu?.show()
+                }
+            }
         } else if (!useBottomSheetMenu && popupMenu != null) {
             val isSplitOmnibarEnabled = omnibarRepository.omnibarType == OmnibarType.SPLIT
             launchPopupMenu(anchorToNavigationBar = isSplitOmnibarEnabled, addExtraDelay = addExtraDelay)
