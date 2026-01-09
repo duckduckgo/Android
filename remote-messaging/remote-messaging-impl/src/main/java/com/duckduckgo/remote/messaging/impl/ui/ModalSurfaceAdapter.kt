@@ -29,13 +29,13 @@ import javax.inject.Inject
 
 class ModalSurfaceAdapter @Inject constructor() : ListAdapter<CardItem, CardItemViewHolder>(ModalSurfaceDiffCallback()) {
 
-    private lateinit var modalSurfaceListener: ModalSurfaceListener
+    private lateinit var cardItemClickListener: CardItemClickListener
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
     ): CardItemViewHolder {
-        return CardItemViewHolder(ViewRemoteMessageEntryBinding.inflate(LayoutInflater.from(parent.context), parent, false), modalSurfaceListener)
+        return CardItemViewHolder(ViewRemoteMessageEntryBinding.inflate(LayoutInflater.from(parent.context), parent, false), cardItemClickListener)
     }
 
     override fun onBindViewHolder(
@@ -47,7 +47,7 @@ class ModalSurfaceAdapter @Inject constructor() : ListAdapter<CardItem, CardItem
 
     class CardItemViewHolder(
         private val binding: ViewRemoteMessageEntryBinding,
-        private val listener: ModalSurfaceListener,
+        private val listener: CardItemClickListener,
     ) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: CardItem) {
@@ -60,8 +60,8 @@ class ModalSurfaceAdapter @Inject constructor() : ListAdapter<CardItem, CardItem
         }
     }
 
-    fun setListener(listener: ModalSurfaceListener) {
-        this.modalSurfaceListener = listener
+    fun setListener(listener: CardItemClickListener) {
+        this.cardItemClickListener = listener
     }
 
     private class ModalSurfaceDiffCallback : DiffUtil.ItemCallback<CardItem>() {

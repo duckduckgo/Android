@@ -18,6 +18,6 @@ package com.duckduckgo.remote.messaging.impl.ui
 
 import com.duckduckgo.remote.messaging.api.CardItem
 
-interface ModalSurfaceListener {
+interface CardItemClickListener {
     fun onItemClicked(item: CardItem)
 }

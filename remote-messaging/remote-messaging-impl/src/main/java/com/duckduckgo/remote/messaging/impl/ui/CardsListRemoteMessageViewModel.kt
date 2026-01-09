@@ -47,7 +47,7 @@ class CardsListRemoteMessageViewModel @Inject constructor(
     private val commandActionMapper: CommandActionMapper,
     private val dispatchers: DispatcherProvider,
     private val cardsListPixelHelper: CardsListRemoteMessagePixelHelper,
-) : ViewModel(), DefaultLifecycleObserver, ModalSurfaceListener {
+) : ViewModel(), DefaultLifecycleObserver, CardItemClickListener {
 
     private val _viewState = MutableStateFlow<ViewState?>(null)
     private val _command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
