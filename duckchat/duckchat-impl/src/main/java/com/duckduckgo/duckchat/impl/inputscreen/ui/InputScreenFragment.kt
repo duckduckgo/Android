@@ -123,6 +123,7 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
     private lateinit var inputScreenButtons: InputScreenButtons
 
     private var isKeyboardCurrentlyVisible: Boolean = false
+    private var keyboardHiddenByCommand: Boolean = false
     private var globalLayoutListener: ViewTreeObserver.OnGlobalLayoutListener? = null
 
     private val pageChangeCallback =
@@ -171,8 +172,11 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
                         logcat { "inputScreenLauncher: Keyboard shown (GlobalLayout)" }
                     } else {
                         logcat { "inputScreenLauncher: Keyboard hidden (GlobalLayout)" }
+                        if (!keyboardHiddenByCommand) {
+                            preserveDraftTextAndExit()
+                        }
+                        keyboardHiddenByCommand = false
                         inputModeWidget.clearInputFocus()
-                        exitInputScreen()
                     }
                 }
             }
@@ -245,10 +249,7 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
             viewLifecycleOwner,
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
-                    val query = inputModeWidget.text
-                    val data = Intent().putExtra(InputScreenActivityResultParams.CANCELED_DRAFT_PARAM, query)
-                    requireActivity().setResult(Activity.RESULT_CANCELED, data)
-                    exitInputScreen()
+                    preserveDraftTextAndExit()
                 }
             },
         )
@@ -259,6 +260,13 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         }
 
         viewModel.fireShownPixel()
+    }
+
+    private fun preserveDraftTextAndExit() {
+        val query = inputModeWidget.text
+        val data = Intent().putExtra(InputScreenActivityResultParams.CANCELED_DRAFT_PARAM, query)
+        requireActivity().setResult(Activity.RESULT_CANCELED, data)
+        exitInputScreen()
     }
 
     override fun onDestroyView() {
@@ -342,7 +350,11 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
             is SubmitSearch -> submitSearchQuery(command.query)
             is SubmitChat -> submitChatQuery(command.query)
             is ShowKeyboard -> showKeyboard(inputModeWidget.inputField)
-            is HideKeyboard -> hideKeyboard(inputModeWidget.inputField)
+            is HideKeyboard -> {
+                keyboardHiddenByCommand = true
+                hideKeyboard(inputModeWidget.inputField)
+            }
+
             is SetInputModeWidgetScrollPosition -> inputModeWidget.setScrollPosition(command.position, command.offset)
             is SetLogoProgress -> setLogoProgress(command.targetProgress)
             is AnimateLogoToProgress -> animateLogoToProgress(command.targetProgress)
@@ -472,6 +484,7 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
                         is VoiceSearchLauncher.VoiceRecognitionResult.SearchResult -> {
                             viewModel.onSearchSubmitted(result.query)
                         }
+
                         is VoiceSearchLauncher.VoiceRecognitionResult.DuckAiResult -> {
                             viewModel.onChatSubmitted(result.query)
                         }
