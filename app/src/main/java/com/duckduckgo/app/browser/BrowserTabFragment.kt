@@ -31,6 +31,7 @@ import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
 import android.content.res.Configuration
+import android.graphics.Rect
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -46,6 +47,7 @@ import android.view.MenuItem
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup.LayoutParams
+import android.view.ViewTreeObserver
 import android.webkit.PermissionRequest
 import android.webkit.SslErrorHandler
 import android.webkit.URLUtil
@@ -670,6 +672,9 @@ class BrowserTabFragment :
     private var webView: DuckDuckGoWebView? = null
     private var isWebViewGestureInProgress = false
 
+    private var isKeyboardCurrentlyVisible: Boolean = false
+    private var globalLayoutListener: ViewTreeObserver.OnGlobalLayoutListener? = null
+
     private val tabSwitcherActivityResult =
         registerForActivityResult(StartActivityForResult()) { result ->
             if (result.resultCode == RESULT_OK) {
@@ -973,6 +978,33 @@ class BrowserTabFragment :
         viewModel.handleExternalLaunch(isLaunchedFromExternalApp)
 
         observeSubscriptionEventDataChannel()
+    }
+
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
+        super.onViewCreated(view, savedInstanceState)
+        globalLayoutListener =
+            ViewTreeObserver.OnGlobalLayoutListener {
+                val r = Rect()
+                binding.root.getWindowVisibleDisplayFrame(r)
+                val screenHeight = binding.root.rootView.height
+                val keypadHeight = screenHeight - r.bottom
+
+                val previouslyVisible = isKeyboardCurrentlyVisible
+                isKeyboardCurrentlyVisible = keypadHeight > screenHeight * 0.15 // 15% of screen height
+
+                if (previouslyVisible != isKeyboardCurrentlyVisible) {
+                    if (isKeyboardCurrentlyVisible) {
+                        logcat { "BrowserTabFragment: Keyboard shown (GlobalLayout)" }
+                    } else {
+                        logcat { "BrowserTabFragment: Keyboard hidden (GlobalLayout)" }
+                        binding.focusDummy.requestFocus()
+                    }
+                }
+            }
+        binding.root.viewTreeObserver.addOnGlobalLayoutListener(globalLayoutListener)
     }
 
     private fun observeSubscriptionEventDataChannel() {
@@ -1580,6 +1612,10 @@ class BrowserTabFragment :
         webView?.stopNestedScroll()
         webView?.stopLoading()
         browserNavigationBarIntegration.onDestroyView()
+        globalLayoutListener?.let {
+            binding.root.viewTreeObserver.removeOnGlobalLayoutListener(it)
+        }
+        globalLayoutListener = null
         super.onDestroyView()
     }
 
