@@ -1000,7 +1000,9 @@ class BrowserTabFragment :
                         logcat { "BrowserTabFragment: Keyboard shown (GlobalLayout)" }
                     } else {
                         logcat { "BrowserTabFragment: Keyboard hidden (GlobalLayout)" }
-                        binding.focusDummy.requestFocus()
+                        if (omnibar.omnibarTextInput.isFocused) {
+                            binding.focusDummy.requestFocus()
+                        }
                     }
                 }
             }
