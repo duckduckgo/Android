@@ -170,12 +170,12 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
                 if (previouslyVisible != isKeyboardCurrentlyVisible) {
                     if (isKeyboardCurrentlyVisible) {
                         logcat { "inputScreenLauncher: Keyboard shown (GlobalLayout)" }
+                        keyboardHiddenByCommand = false
                     } else {
                         logcat { "inputScreenLauncher: Keyboard hidden (GlobalLayout)" }
                         if (!keyboardHiddenByCommand) {
                             preserveDraftTextAndExit()
                         }
-                        keyboardHiddenByCommand = false
                         inputModeWidget.clearInputFocus()
                     }
                 }
