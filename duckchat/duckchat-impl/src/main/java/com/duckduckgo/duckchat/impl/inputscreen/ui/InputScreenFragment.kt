@@ -172,6 +172,7 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
                     } else {
                         logcat { "inputScreenLauncher: Keyboard hidden (GlobalLayout)" }
                         inputModeWidget.clearInputFocus()
+                        exitInputScreen()
                     }
                 }
             }
