@@ -623,9 +623,7 @@ class RealPirSchedulingRepositoryTest {
         runTest {
             testee.clearAllData()
 
-            verify(mockJobSchedulingDao).deleteAllScanJobRecords()
-            verify(mockJobSchedulingDao).deleteAllOptOutJobRecords()
-            verify(mockJobSchedulingDao).deleteAllEmailConfirmationJobRecords()
+            verify(mockJobSchedulingDao).deleteAll()
         }
 
     // Edge cases

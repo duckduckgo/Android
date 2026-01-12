@@ -873,5 +873,6 @@ class RealPirRepositoryTest {
         verify(mockBrokerJsonDao).deleteAll()
         verify(mockExtractedProfileDao).deleteAllExtractedProfiles()
         verify(mockUserProfileDao).deleteAllProfiles()
+        verify(mockPirDataStore).reset()
     }
 }
