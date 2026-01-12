@@ -412,8 +412,6 @@ class GranularFireDialogViewModelTest {
         testee.commands().test {
             testee.onDeleteClicked()
 
-            coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
-
             assertEquals(Command.OnClearStarted, awaitItem())
             assertEquals(Command.PlayAnimation, awaitItem())
             assertEquals(Command.ClearingComplete, awaitItem())
@@ -429,8 +427,6 @@ class GranularFireDialogViewModelTest {
 
         testee.commands().test {
             testee.onDeleteClicked()
-
-            coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
 
             assertEquals(Command.OnClearStarted, awaitItem())
             assertEquals(Command.ClearingComplete, awaitItem())
@@ -479,8 +475,6 @@ class GranularFireDialogViewModelTest {
         testee.commands().test {
             testee.onDeleteClicked()
 
-            coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
-
             awaitItem() // Skip OnClearStarted
             awaitItem() // Skip PlayAnimation
 
@@ -528,8 +522,6 @@ class GranularFireDialogViewModelTest {
         testee.commands().test {
             testee.onShow()
 
-            coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
-
             assertEquals(Command.OnShow, awaitItem())
 
             cancelAndConsumeRemainingEvents()
@@ -542,8 +534,6 @@ class GranularFireDialogViewModelTest {
 
         testee.onShow()
 
-        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
-
         verify(mockPixel).fire(FIRE_DIALOG_SHOWN)
     }
 
@@ -554,8 +544,6 @@ class GranularFireDialogViewModelTest {
         testee.onShow()
         testee.onShow()
 
-        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
-
         verify(mockPixel, times(1)).fire(FIRE_DIALOG_SHOWN)
     }
 
@@ -565,8 +553,6 @@ class GranularFireDialogViewModelTest {
 
         testee.commands().test {
             testee.onCancel()
-
-            coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
 
             assertEquals(Command.OnCancel, awaitItem())
 
