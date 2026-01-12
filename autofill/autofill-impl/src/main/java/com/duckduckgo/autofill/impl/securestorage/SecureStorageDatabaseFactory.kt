@@ -17,7 +17,6 @@
 package com.duckduckgo.autofill.impl.securestorage
 
 import android.content.Context
-import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.store.db.ALL_MIGRATIONS
 import com.duckduckgo.autofill.store.db.SecureStorageDatabase
 import com.duckduckgo.data.store.api.DatabaseProvider
@@ -26,7 +25,6 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.library.loader.LibraryLoader
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import logcat.LogPriority.ERROR
@@ -47,7 +45,6 @@ interface SecureStorageDatabaseFactory {
 class RealSecureStorageDatabaseFactory @Inject constructor(
     private val context: Context,
     private val keyProvider: SecureStorageKeyProvider,
-    private val autofillFeature: AutofillFeature,
     private val databaseProvider: DatabaseProvider,
 ) : SecureStorageDatabaseFactory {
     private var _database: SecureStorageDatabase? = null
@@ -66,18 +63,7 @@ class RealSecureStorageDatabaseFactory @Inject constructor(
     }
 
     override suspend fun getDatabase(): SecureStorageDatabase? {
-        return if (autofillFeature.createAsyncPreferences().isEnabled()) {
-            getAsyncDatabase()
-        } else {
-            getDatabaseSynchronized()
-        }
-    }
-
-    @Synchronized
-    private fun getDatabaseSynchronized(): SecureStorageDatabase? {
-        return runBlocking {
-            getInnerDatabase()
-        }
+        return getAsyncDatabase()
     }
 
     private suspend fun getAsyncDatabase(): SecureStorageDatabase? {

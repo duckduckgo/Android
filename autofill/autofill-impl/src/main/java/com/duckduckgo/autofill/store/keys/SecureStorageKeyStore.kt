@@ -21,7 +21,6 @@ import android.content.SharedPreferences
 import androidx.core.content.edit
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
-import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.common.utils.DispatcherProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
@@ -57,7 +56,6 @@ class RealSecureStorageKeyStore constructor(
     private val context: Context,
     private val coroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
-    private val autofillFeature: AutofillFeature,
 ) : SecureStorageKeyStore {
 
     private val mutex: Mutex = Mutex()
@@ -67,10 +65,8 @@ class RealSecureStorageKeyStore constructor(
         }
     }
 
-    private val encryptedPreferencesSync: SharedPreferences? by lazy { encryptedPreferencesSync() }
-
     private suspend fun getEncryptedPreferences(): SharedPreferences? {
-        return if (autofillFeature.createAsyncPreferences().isEnabled()) encryptedPreferencesDeferred.await() else encryptedPreferencesSync
+        return encryptedPreferencesDeferred.await()
     }
 
     private suspend fun encryptedPreferencesAsync(): SharedPreferences? {
@@ -86,23 +82,6 @@ class RealSecureStorageKeyStore constructor(
                     EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM,
                 )
             }
-        } catch (e: Exception) {
-            null
-        }
-    }
-
-    @Synchronized
-    private fun encryptedPreferencesSync(): SharedPreferences? {
-        return try {
-            EncryptedSharedPreferences.create(
-                context,
-                FILENAME,
-                MasterKey.Builder(context)
-                    .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
-                    .build(),
-                EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-                EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM,
-            )
         } catch (e: Exception) {
             null
         }

@@ -17,7 +17,6 @@
 package com.duckduckgo.autofill.impl.securestorage.encryption
 
 import android.security.keystore.KeyProperties
-import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.impl.securestorage.SecureStorageException
 import com.duckduckgo.autofill.impl.securestorage.SecureStorageException.InternalSecureStorageException
 import com.duckduckgo.autofill.impl.securestorage.encryption.EncryptionHelper.EncryptedBytes
@@ -59,7 +58,6 @@ interface EncryptionHelper {
 
 @ContributesBinding(AppScope::class)
 class RealEncryptionHelper @Inject constructor(
-    private val autofillFeature: AutofillFeature,
     private val dispatcherProvider: DispatcherProvider,
 ) : EncryptionHelper {
     private val encryptionCipher = Cipher.getInstance(TRANSFORMATION)
@@ -72,19 +70,7 @@ class RealEncryptionHelper @Inject constructor(
         raw: ByteArray,
         key: Key,
     ): EncryptedBytes = withContext(dispatcherProvider.io()) {
-        return@withContext if (autofillFeature.createAsyncPreferences().isEnabled()) {
-            encryptAsync(raw, key)
-        } else {
-            encryptSync(raw, key)
-        }
-    }
-
-    @Synchronized
-    private fun encryptSync(
-        raw: ByteArray,
-        key: Key,
-    ): EncryptedBytes {
-        return innerEncrypt(raw, key)
+        return@withContext encryptAsync(raw, key)
     }
 
     private suspend fun encryptAsync(
@@ -115,19 +101,7 @@ class RealEncryptionHelper @Inject constructor(
         toDecrypt: EncryptedBytes,
         key: Key,
     ): ByteArray = withContext(dispatcherProvider.io()) {
-        return@withContext if (autofillFeature.createAsyncPreferences().isEnabled()) {
-            decryptAsync(toDecrypt, key)
-        } else {
-            decryptSync(toDecrypt, key)
-        }
-    }
-
-    @Synchronized
-    private fun decryptSync(
-        toDecrypt: EncryptedBytes,
-        key: Key,
-    ): ByteArray {
-        return innerDecrypt(toDecrypt, key)
+        decryptAsync(toDecrypt, key)
     }
 
     private suspend fun decryptAsync(
