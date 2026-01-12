@@ -983,9 +983,18 @@ class BrowserTabFragment :
 
     private fun resumeWebView() {
         logcat { "Resuming webview: $tabId" }
+
+        if (omnibar.viewMode == ViewMode.DuckAI) {
+            logcat { "Duck.ai: resume in Duck.ai mode" }
+            appCoroutineScope.launch(dispatchers.main()) {
+                delay(100)
+                webView?.onResume()
+                webView?.requestFocus()
+            }
+        }
+
         webView?.let { webView ->
             if (webView.isShown) {
-                webView.ensureVisible()
                 webView.onResume()
             } else if (swipingTabsFeature.isEnabled) {
                 // Sometimes a tab is brought back from the background but the WebView is not shown yet due to
@@ -1007,10 +1016,6 @@ class BrowserTabFragment :
         postDelayed(100) {
             if (swipingTabsFeature.isEnabled) {
                 wiggle()
-            }
-            if (omnibar.viewMode == ViewMode.DuckAI) {
-                wiggle()
-                requestLayout()
             }
         }
 
@@ -4019,11 +4024,13 @@ class BrowserTabFragment :
     }
 
     private fun resetWebView() {
+        logcat { "Duck.ai: resetWebView" }
         destroyWebView()
         configureWebView()
     }
 
     override fun onDestroy() {
+        logcat { "Duck.ai: onDestroy" }
         dismissAppLinkSnackBar()
         supervisorJob.cancel()
         if (::popupMenu.isInitialized) popupMenu.dismiss()
