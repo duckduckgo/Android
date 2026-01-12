@@ -35,7 +35,6 @@ import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBa
 import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarOptionBottomSheetDialogFactory
 import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarSelection.SEARCH_AND_AI
 import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarSelection.SEARCH_ONLY
-import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_CANCELLED
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_CONFIRMED
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_DISPLAYED
@@ -304,7 +303,6 @@ class RealDuckChatTest {
             duckChatUrl = "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5",
         )
         verify(mockContext).startActivity(mockIntent)
-        verify(mockDuckChatFeatureRepository).registerOpened()
     }
 
     @Test
@@ -320,7 +318,6 @@ class RealDuckChatTest {
             duckChatUrl = "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5",
         )
         verify(mockContext).startActivity(mockIntent)
-        verify(mockDuckChatFeatureRepository).registerOpened()
     }
 
     @Test
@@ -333,7 +330,6 @@ class RealDuckChatTest {
             duckChatUrl = "https://duckduckgo.com/?q=example&ia=chat&duckai=5",
         )
         verify(mockContext).startActivity(mockIntent)
-        verify(mockDuckChatFeatureRepository).registerOpened()
     }
 
     @Test
@@ -350,7 +346,6 @@ class RealDuckChatTest {
             duckChatUrl = "https://duckduckgo.com/?q=example&bang=true&ia=chat&duckai=5",
         )
         verify(mockContext).startActivity(mockIntent)
-        verify(mockDuckChatFeatureRepository).registerOpened()
     }
 
     @Test
@@ -367,7 +362,6 @@ class RealDuckChatTest {
             duckChatUrl = "https://duckduckgo.com/?q=example&ia=chat&duckai=5",
         )
         verify(mockContext).startActivity(mockIntent)
-        verify(mockDuckChatFeatureRepository).registerOpened()
     }
 
     @Test
@@ -383,7 +377,6 @@ class RealDuckChatTest {
             duckChatUrl = "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5",
         )
         verify(mockContext).startActivity(mockIntent)
-        verify(mockDuckChatFeatureRepository).registerOpened()
     }
 
     @Test
@@ -428,16 +421,6 @@ class RealDuckChatTest {
             duckChatUrl = "https://duckduckgo.com/?q=example&prompt=1&ia=chat&duckai=5",
         )
         verify(mockContext).startActivity(mockIntent)
-        verify(mockDuckChatFeatureRepository).registerOpened()
-    }
-
-    @Test
-    fun whenDuckChatCalledThenFireOpenDuckChatPixels() = runTest {
-        testee.openDuckChat()
-
-        verify(mockPixel).fire(pixel = DuckChatPixelName.DUCK_CHAT_OPEN, parameters = mapOf("delta-timestamp-minutes" to "10"))
-        verify(mockPixel).fire(DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_DUCK_AI_OPEN)
-        verify(mockPixel).fire(DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_DUCK_AI_OPEN_DAILY, type = Pixel.PixelType.Daily())
     }
 
     @Test

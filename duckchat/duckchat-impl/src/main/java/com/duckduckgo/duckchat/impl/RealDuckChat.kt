@@ -45,7 +45,6 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_NEW_ADDRES
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_CONFIRMED
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_DISPLAYED
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_NOT_NOW
-import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelParameters
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelParameters.NEW_ADDRESS_BAR_SELECTION
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
 import com.duckduckgo.navigation.api.GlobalActivityStarter
@@ -521,21 +520,13 @@ class RealDuckChat @Inject constructor(
     ) {
         val url = appendParameters(parameters, duckChatLink)
         appCoroutineScope.launch(dispatchers.io()) {
-            val sessionDelta = duckChatFeatureRepository.sessionDeltaInMinutes()
-            val params = mapOf(DuckChatPixelParameters.DELTA_TIMESTAMP_PARAMETERS to sessionDelta.toString())
-
             val hasSessionActive =
                 when {
                     forceNewSession -> false
                     else -> hasActiveSession()
                 }
 
-            duckChatFeatureRepository.registerOpened()
-
             withContext(dispatchers.main()) {
-                // pixel.fire(DuckChatPixelName.DUCK_CHAT_OPEN, parameters = params)
-                // pixel.fire(DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_DUCK_AI_OPEN)
-                // pixel.fire(DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_DUCK_AI_OPEN_DAILY, type = Pixel.PixelType.Daily())
                 logcat { "Duck.ai: restoring Duck.ai session $url hasSessionActive $hasSessionActive" }
                 openDuckChatSession(url, hasSessionActive)
             }
