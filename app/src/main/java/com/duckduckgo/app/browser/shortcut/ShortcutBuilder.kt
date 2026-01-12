@@ -19,17 +19,14 @@ package com.duckduckgo.app.browser.shortcut
 import android.app.PendingIntent
 import android.app.PendingIntent.FLAG_IMMUTABLE
 import android.app.PendingIntent.FLAG_UPDATE_CURRENT
-import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import androidx.core.content.pm.ShortcutInfoCompat
 import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.core.graphics.drawable.IconCompat
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.commands.Command
-import com.duckduckgo.app.icon.api.AppIcon
 import java.util.UUID
 import javax.inject.Inject
 
@@ -52,12 +49,6 @@ class ShortcutBuilder @Inject constructor() {
         return ShortcutInfoCompat.Builder(context, UUID.randomUUID().toString())
             .setShortLabel(homeShortcut.title)
             .setIntent(intent)
-            .apply {
-                val enabledAlias = context.getEnabledAlias()
-                if (enabledAlias != null) {
-                    setActivity(enabledAlias)
-                }
-            }
             .setIcon(icon)
             .build()
     }
@@ -81,18 +72,6 @@ class ShortcutBuilder @Inject constructor() {
         val pendingIntent = buildPendingIntent(context, homeShortcut.url, homeShortcut.title)
 
         ShortcutManagerCompat.requestPinShortcut(context, shortcutInfo, pendingIntent?.intentSender)
-    }
-
-    private fun Context.getEnabledAlias(): ComponentName? {
-        for (alias in AppIcon.entries) {
-            val component = ComponentName(this, alias.componentName)
-            val state = packageManager.getComponentEnabledSetting(component)
-
-            if (state == PackageManager.COMPONENT_ENABLED_STATE_ENABLED || state == PackageManager.COMPONENT_ENABLED_STATE_DEFAULT) {
-                return component
-            }
-        }
-        return null
     }
 
     companion object {
