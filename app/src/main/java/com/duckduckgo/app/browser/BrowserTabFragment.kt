@@ -982,12 +982,8 @@ class BrowserTabFragment :
     }
 
     private fun resumeWebView() {
-        logcat { "Duck.ai: Resuming webview: $tabId" }
+        logcat { "Resuming webview: $tabId" }
         webView?.let { webView ->
-            if (omnibar.viewMode == ViewMode.DuckAI) {
-                logcat { "Duck.ai: Resuming in Duck.ai mode" }
-                webView.wiggle()
-            }
             if (webView.isShown) {
                 webView.ensureVisible()
                 webView.onResume()
@@ -1010,12 +1006,12 @@ class BrowserTabFragment :
     private fun DuckDuckGoWebView.ensureVisible() =
         postDelayed(100) {
             if (swipingTabsFeature.isEnabled) {
-                // wiggle()
+                wiggle()
             }
-            // if (omnibar.viewMode == ViewMode.DuckAI) {
-            //     wiggle()
-            //     requestLayout()
-            // }
+            if (omnibar.viewMode == ViewMode.DuckAI) {
+                wiggle()
+                requestLayout()
+            }
         }
 
     // This is a hack to make sure the WebView content is always rendered when the fragment is resumed
@@ -1569,7 +1565,6 @@ class BrowserTabFragment :
     }
 
     override fun onPause() {
-        logcat { "Duck.ai: onPause" }
         dismissDownloadFragment()
         super.onPause()
     }
@@ -1746,7 +1741,6 @@ class BrowserTabFragment :
     }
 
     private fun showHome() {
-        logcat { "Duck.ai: showHome" }
         viewModel.onHomeShown()
         dismissAppLinkSnackBar()
         errorSnackbar.dismiss()
@@ -3986,7 +3980,6 @@ class BrowserTabFragment :
     }
 
     private fun onTabHidden() {
-        logcat { "Duck.ai: onTabHidden" }
         if (!isAdded) return
         viewModel.onViewHidden()
         downloadMessagesJob.cancel()
