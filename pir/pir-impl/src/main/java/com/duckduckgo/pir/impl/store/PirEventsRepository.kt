@@ -112,6 +112,7 @@ interface PirEventsRepository {
     fun getAllEmailConfirmationLogFlow(): Flow<List<PirEmailConfirmationLog>>
 
     suspend fun deleteAllEmailConfirmationsLogs()
+    suspend fun clearAllData()
 }
 
 @ContributesBinding(
@@ -134,7 +135,7 @@ class RealPirEventsRepository @Inject constructor(
     override suspend fun deleteAllScanResults() {
         withContext(dispatcherProvider.io()) {
             scanResultsDao()?.deleteAllScanCompletedBroker()
-            scanLogDao()?.deleteAllBrokerScanEvents()
+            scanLogDao()?.deleteAll()
         }
     }
 
@@ -164,7 +165,7 @@ class RealPirEventsRepository @Inject constructor(
 
     override suspend fun deleteEventLogs() {
         withContext(dispatcherProvider.io()) {
-            scanLogDao()?.deleteAllEventLogs()
+            scanLogDao()?.deleteAll()
         }
     }
 
@@ -256,8 +257,7 @@ class RealPirEventsRepository @Inject constructor(
     }
 
     override suspend fun deleteAllOptOutData(): Unit = withContext(dispatcherProvider.io()) {
-        optOutResultsDao()?.deleteAllOptOutActionLog()
-        optOutResultsDao()?.deleteAllOptOutCompletedBroker()
+        optOutResultsDao()?.deleteAll()
     }
 
     override suspend fun saveEmailConfirmationLog(
@@ -280,6 +280,15 @@ class RealPirEventsRepository @Inject constructor(
 
     override suspend fun deleteAllEmailConfirmationsLogs(): Unit = withContext(dispatcherProvider.io()) {
         emailConfirmationLogDao()?.deleteAllEmailConfirmationLogs()
+    }
+
+    override suspend fun clearAllData() {
+        withContext(dispatcherProvider.io()) {
+            scanResultsDao()?.deleteAllScanCompletedBroker()
+            scanLogDao()?.deleteAll()
+            optOutResultsDao()?.deleteAll()
+            emailConfirmationLogDao()?.deleteAllEmailConfirmationLogs()
+        }
     }
 
     private suspend fun prepareDatabase(): PirDatabase? {

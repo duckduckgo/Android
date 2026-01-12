@@ -864,4 +864,14 @@ class RealPirRepositoryTest {
         // Then
         verify(mockExtractedProfileDao).updateExtractedProfileDeprecated(extractedProfileId, true)
     }
+
+    @Test
+    fun whenClearAllDataThenDeleteAllTables() = runTest {
+        testee.clearAllData()
+
+        verify(mockBrokerDao).deleteAll()
+        verify(mockBrokerJsonDao).deleteAll()
+        verify(mockExtractedProfileDao).deleteAllExtractedProfiles()
+        verify(mockUserProfileDao).deleteAllProfiles()
+    }
 }

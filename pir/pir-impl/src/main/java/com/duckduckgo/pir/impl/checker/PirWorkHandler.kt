@@ -20,6 +20,7 @@ import android.content.Context
 import android.content.Intent
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.pir.impl.PirFeatureRemover
 import com.duckduckgo.pir.impl.PirRemoteFeatures
 import com.duckduckgo.pir.impl.optout.PirForegroundOptOutService
 import com.duckduckgo.pir.impl.scan.PirForegroundScanService
@@ -52,7 +53,7 @@ interface PirWorkHandler {
     /**
      * Cancels any ongoing PIR work, including foreground services and scheduled scans.
      */
-    fun cancelWork()
+    suspend fun cancelWork()
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -67,6 +68,7 @@ class RealPirWorkHandler @Inject constructor(
     private val context: Context,
     private val pirScanScheduler: PirScanScheduler,
     private val pirRepository: PirRepository,
+    private val pirFeatureRemover: PirFeatureRemover,
 ) : PirWorkHandler {
 
     override suspend fun canRunPir(): Flow<Boolean> {
@@ -91,12 +93,13 @@ class RealPirWorkHandler @Inject constructor(
         }
     }
 
-    override fun cancelWork() {
+    override suspend fun cancelWork() {
         // Stop any running foreground services
         context.stopService(Intent(context, PirForegroundScanService::class.java))
         context.stopService(Intent(context, PirForegroundOptOutService::class.java))
         // Cancel any running or scheduled workers
         pirScanScheduler.cancelScheduledScans(context)
+        pirFeatureRemover.removeFeature()
     }
 
     private fun isPirEnabled(

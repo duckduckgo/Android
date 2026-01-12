@@ -196,6 +196,8 @@ interface PirRepository {
 
     suspend fun setWeeklyStatLastSentMs(timeMs: Long)
 
+    suspend fun clearAllData()
+
     data class GeneratedEmailData(
         val emailAddress: String,
         val pattern: String,
@@ -736,6 +738,16 @@ class RealPirRepository(
     override suspend fun setWeeklyStatLastSentMs(timeMs: Long) {
         withContext(dispatcherProvider.io()) {
             pirDataStore.weeklyStatLastSentMs = timeMs
+        }
+    }
+
+    override suspend fun clearAllData() {
+        withContext(dispatcherProvider.io()) {
+            brokerJsonDao()?.deleteAll()
+            brokerDao()?.deleteAll()
+            extractedProfileDao()?.deleteAllExtractedProfiles()
+            userProfileDao()?.deleteAllProfiles()
+            pirDataStore.reset()
         }
     }
 

@@ -223,7 +223,7 @@ class PirDevScanActivity : DuckDuckGoActivity() {
                 repository.deleteAllUserProfilesQueries()
                 eventsRepository.deleteEventLogs()
                 eventsRepository.deleteAllOptOutData()
-                pirSchedulingRepository.deleteAllJobRecords()
+                pirSchedulingRepository.clearAllData()
                 eventsRepository.deleteAllEmailConfirmationsLogs()
             }
         }
