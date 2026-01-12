@@ -22,6 +22,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.impl.PirFeatureRemover
 import com.duckduckgo.pir.impl.PirRemoteFeatures
+import com.duckduckgo.pir.impl.notifications.PirNotificationManager
 import com.duckduckgo.pir.impl.optout.PirForegroundOptOutService
 import com.duckduckgo.pir.impl.scan.PirForegroundScanService
 import com.duckduckgo.pir.impl.scan.PirScanScheduler
@@ -69,6 +70,7 @@ class RealPirWorkHandler @Inject constructor(
     private val pirScanScheduler: PirScanScheduler,
     private val pirRepository: PirRepository,
     private val pirFeatureRemover: PirFeatureRemover,
+    private val pirNotificationManager: PirNotificationManager,
 ) : PirWorkHandler {
 
     override suspend fun canRunPir(): Flow<Boolean> {
@@ -100,6 +102,7 @@ class RealPirWorkHandler @Inject constructor(
         // Cancel any running or scheduled workers
         pirScanScheduler.cancelScheduledScans(context)
         pirFeatureRemover.removeFeature()
+        pirNotificationManager.cancelNotifications()
     }
 
     private fun isPirEnabled(
