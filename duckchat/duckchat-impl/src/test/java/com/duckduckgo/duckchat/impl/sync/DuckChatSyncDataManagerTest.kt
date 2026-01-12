@@ -20,6 +20,7 @@ import android.annotation.SuppressLint
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
+import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.sync.api.engine.DeletableType
@@ -45,6 +46,8 @@ class DuckChatSyncDataManagerTest {
 
     private val duckChatSyncRepository: DuckChatSyncRepository = mock()
 
+    private val duckChatFeatureRepository: DuckChatFeatureRepository = mock()
+
     private val appBuildConfig: AppBuildConfig = mock()
 
     private lateinit var testee: DuckChatSyncDataManager
@@ -52,9 +55,11 @@ class DuckChatSyncDataManagerTest {
     private val duckChatFeature = FakeFeatureToggleFactory.create(DuckChatFeature::class.java)
 
     @Before
-    fun setUp() {
+    fun setUp() = runTest {
+        whenever(duckChatFeatureRepository.isAIChatHistoryEnabled()).thenReturn(true)
         testee = DuckChatSyncDataManager(
             duckChatSyncRepository = duckChatSyncRepository,
+            duckChatFeatureRepository = duckChatFeatureRepository,
             dispatchers = coroutineTestRule.testDispatcherProvider,
             appBuildConfig = appBuildConfig,
             duckChatFeature = duckChatFeature,
@@ -75,8 +80,19 @@ class DuckChatSyncDataManagerTest {
     }
 
     @Test
+    fun whenGetDeletionsAndChatHistoryDisabledThenReturnsNull() = runTest {
+        duckChatFeature.supportsSyncChatsDeletion().setRawStoredState(Toggle.State(enable = true))
+        whenever(duckChatFeatureRepository.isAIChatHistoryEnabled()).thenReturn(false)
+
+        val result = testee.getDeletions()
+
+        assertNull(result)
+    }
+
+    @Test
     fun whenGetDeletionsAndFeatureEnabledWithTimestampThenReturnsDeletionRequest() = runTest {
         duckChatFeature.supportsSyncChatsDeletion().setRawStoredState(Toggle.State(enable = true))
+        whenever(duckChatFeatureRepository.isAIChatHistoryEnabled()).thenReturn(true)
         whenever(duckChatSyncRepository.getLastDuckAiChatDeletionTimestamp()).thenReturn("2025-01-01T12:00:00Z")
 
         val result = testee.getDeletions()
@@ -88,6 +104,7 @@ class DuckChatSyncDataManagerTest {
     @Test
     fun whenGetDeletionsAndFeatureEnabledWithoutTimestampThenReturnsNull() = runTest {
         duckChatFeature.supportsSyncChatsDeletion().setRawStoredState(Toggle.State(enable = true))
+        whenever(duckChatFeatureRepository.isAIChatHistoryEnabled()).thenReturn(true)
         whenever(duckChatSyncRepository.getLastDuckAiChatDeletionTimestamp()).thenReturn(null)
         val result = testee.getDeletions()
         assertNull(result)

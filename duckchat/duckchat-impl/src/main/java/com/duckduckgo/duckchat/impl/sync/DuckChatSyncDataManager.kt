@@ -23,6 +23,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.checkMainThread
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
+import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
 import com.duckduckgo.sync.api.engine.DeletableDataManager
 import com.duckduckgo.sync.api.engine.DeletableType
 import com.duckduckgo.sync.api.engine.SyncDeletionRequest
@@ -39,6 +40,7 @@ import javax.inject.Inject
 @ContributesMultibinding(scope = AppScope::class, boundType = DeletableDataManager::class)
 class DuckChatSyncDataManager @Inject constructor(
     private val duckChatSyncRepository: DuckChatSyncRepository,
+    private val duckChatFeatureRepository: DuckChatFeatureRepository,
     private val dispatchers: DispatcherProvider,
     private val appBuildConfig: AppBuildConfig,
     private val duckChatFeature: DuckChatFeature,
@@ -50,12 +52,17 @@ class DuckChatSyncDataManager @Inject constructor(
     override fun getDeletions(): SyncDeletionRequest? {
         if (appBuildConfig.isInternalBuild()) checkMainThread()
 
-        if (!duckChatFeature.supportsSyncChatsDeletion().isEnabled()) {
-            logcat { "DuckChat-Sync: Duck AI chat sync disabled, skipping deletion check" }
-            return null
-        }
-
         return runBlocking(dispatchers.io()) {
+            if (!duckChatFeature.supportsSyncChatsDeletion().isEnabled()) {
+                logcat { "DuckChat-Sync: Duck AI chat sync disabled, skipping deletion check" }
+                return@runBlocking null
+            }
+
+            if (!duckChatFeatureRepository.isAIChatHistoryEnabled()) {
+                logcat { "DuckChat-Sync: Chat history disabled, skipping deletion check" }
+                return@runBlocking null
+            }
+
             val deletionTimestamp = duckChatSyncRepository.getLastDuckAiChatDeletionTimestamp()
             formatRequest(deletionTimestamp)
         }

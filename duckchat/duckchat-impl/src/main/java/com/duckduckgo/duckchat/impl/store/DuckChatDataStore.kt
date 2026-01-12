@@ -29,7 +29,9 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.di.DuckChat
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_AI_INPUT_SCREEN_COSMETIC_SETTING
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_AI_INPUT_SCREEN_USER_SETTING
+import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_CHAT_BACKGROUND_TIMESTAMP
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_CHAT_FULLSCREEN_MODE_SETTING
+import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_CHAT_HISTORY_ENABLED
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_CHAT_LAST_SESSION_TIMESTAMP
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_CHAT_OPENED
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_CHAT_SESSION_DELTA_TIMESTAMP
@@ -103,6 +105,14 @@ interface DuckChatDataStore {
     suspend fun lastSessionTimestamp(): Long
 
     suspend fun sessionDeltaTimestamp(): Long
+
+    suspend fun setAppBackgroundTimestamp(timestamp: Long?)
+
+    suspend fun getAppBackgroundTimestamp(): Long?
+
+    suspend fun setAIChatHistoryEnabled(enabled: Boolean)
+
+    suspend fun isAIChatHistoryEnabled(): Boolean
 }
 
 @ContributesBinding(AppScope::class)
@@ -125,6 +135,8 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
         val DUCK_CHAT_LAST_SESSION_TIMESTAMP = longPreferencesKey(name = "DUCK_CHAT_LAST_SESSION_TIMESTAMP")
         val DUCK_CHAT_SESSION_DELTA_TIMESTAMP = longPreferencesKey(name = "DUCK_CHAT_SESSION_DELTA_TIMESTAMP")
         val DUCK_CHAT_FULLSCREEN_MODE_SETTING = booleanPreferencesKey(name = "DUCK_CHAT_FULLSCREEN_MODE_SETTING")
+        val DUCK_CHAT_BACKGROUND_TIMESTAMP = longPreferencesKey(name = "DUCK_CHAT_BACKGROUND_TIMESTAMP")
+        val DUCK_CHAT_HISTORY_ENABLED = booleanPreferencesKey(name = "DUCK_CHAT_HISTORY_ENABLED")
     }
 
     private fun Preferences.defaultShowInAddressBar(): Boolean =
@@ -278,4 +290,22 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
     override suspend fun lastSessionTimestamp(): Long = store.data.firstOrNull()?.let { it[DUCK_CHAT_LAST_SESSION_TIMESTAMP] } ?: 0L
 
     override suspend fun sessionDeltaTimestamp(): Long = store.data.firstOrNull()?.let { it[DUCK_CHAT_SESSION_DELTA_TIMESTAMP] } ?: 0L
+
+    override suspend fun setAppBackgroundTimestamp(timestamp: Long?) {
+        store.edit { prefs ->
+            if (timestamp == null) {
+                prefs.remove(DUCK_CHAT_BACKGROUND_TIMESTAMP)
+            } else {
+                prefs[DUCK_CHAT_BACKGROUND_TIMESTAMP] = timestamp
+            }
+        }
+    }
+
+    override suspend fun getAppBackgroundTimestamp(): Long? = store.data.firstOrNull()?.let { it[DUCK_CHAT_BACKGROUND_TIMESTAMP] }
+
+    override suspend fun setAIChatHistoryEnabled(enabled: Boolean) {
+        store.edit { prefs -> prefs[DUCK_CHAT_HISTORY_ENABLED] = enabled }
+    }
+
+    override suspend fun isAIChatHistoryEnabled(): Boolean = store.data.firstOrNull()?.let { it[DUCK_CHAT_HISTORY_ENABLED] } ?: false
 }
