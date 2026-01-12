@@ -18,14 +18,14 @@ package com.duckduckgo.sync.api.engine
 
 interface DeletableDataManager {
     /**
-     * Used by the SyncClient to get all the deletions from each syncable feature
+     * Used by the SyncClient to get all the deletions from each deletable feature
      */
     fun getDeletions(): SyncDeletionRequest? = null
 
     /**
-     * Which syncable data type this deletion is for
+     * Which deletable data type this deletion is for
      */
-    fun getType(): SyncableType
+    fun getType(): DeletableType
 
     /**
      * Called to notify that the deletion request was successful

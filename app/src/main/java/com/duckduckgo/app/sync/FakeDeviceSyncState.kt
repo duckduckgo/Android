@@ -32,5 +32,6 @@ import javax.inject.*
 class FakeDeviceSyncState @Inject constructor() : DeviceSyncState {
     override fun isFeatureEnabled(): Boolean = false
     override fun isUserSignedInOnDevice(): Boolean = false
+    override fun isDuckChatSyncFeatureEnabled(): Boolean = false
     override fun getAccountState(): SyncAccountState = SyncAccountState.SignedOut
 }
