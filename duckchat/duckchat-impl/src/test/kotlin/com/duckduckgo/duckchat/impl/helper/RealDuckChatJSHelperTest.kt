@@ -29,6 +29,7 @@ import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_TAP_KEYBOARD_RETURN_KE
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper.Companion.DUCK_CHAT_FEATURE_NAME
 import com.duckduckgo.duckchat.impl.metric.DuckAiMetricCollector
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
+import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
 import com.duckduckgo.duckchat.impl.store.DuckChatDataStore
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import kotlinx.coroutines.test.runTest
@@ -53,6 +54,7 @@ class RealDuckChatJSHelperTest {
     private val mockDataStore: DuckChatDataStore = mock()
     private val mockDuckChatPixels: DuckChatPixels = mock()
     private val mockDuckAiMetricCollector: DuckAiMetricCollector = mock()
+    private val mockDuckChatFeatureRepository: DuckChatFeatureRepository = mock()
 
     private val testee = RealDuckChatJSHelper(
         duckChat = mockDuckChat,

@@ -25,11 +25,14 @@ import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_SUBMIT_FIRST_PROMPT
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_SUBMIT_PROMPT
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_TAP_KEYBOARD_RETURN_KEY
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_KEYBOARD_RETURN_PRESSED
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_OPEN
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_OPEN_HISTORY
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_OPEN_MOST_RECENT_HISTORY_CHAT
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_SEND_PROMPT_ONGOING_CHAT
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_START_NEW_CONVERSATION
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_START_NEW_CONVERSATION_BUTTON_CLICKED
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_DUCK_AI_OPEN
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_DUCK_AI_OPEN_DAILY
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -38,6 +41,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -141,5 +145,41 @@ class RealDuckChatPixelsTest {
         advanceUntilIdle()
 
         verify(mockPixel).fire(DUCK_CHAT_KEYBOARD_RETURN_PRESSED, parameters = emptyMap())
+    }
+
+    @Test
+    fun `when reportOpen called then all pixels are sent`() = runTest {
+        val sessionDelta = 10L
+        whenever(mockDuckChatFeatureRepository.sessionDeltaInMinutes()).thenReturn(sessionDelta)
+
+        testee.reportOpen()
+
+        coroutineRule.testScope.advanceUntilIdle()
+
+        verify(mockDuckChatFeatureRepository).registerOpened()
+
+        val params = mapOf(DuckChatPixelParameters.DELTA_TIMESTAMP_PARAMETERS to sessionDelta.toString())
+        verify(mockPixel).fire(DUCK_CHAT_OPEN, parameters = params)
+        verify(mockPixel).fire(PRODUCT_TELEMETRY_SURFACE_DUCK_AI_OPEN)
+        verify(mockPixel).fire(PRODUCT_TELEMETRY_SURFACE_DUCK_AI_OPEN_DAILY, type = Pixel.PixelType.Daily())
+    }
+
+    @Test
+    fun `when reportOpen called twice quickly then only fires once`() = runTest {
+        val sessionDelta = 7L
+        whenever(mockDuckChatFeatureRepository.sessionDeltaInMinutes()).thenReturn(sessionDelta)
+
+        testee.reportOpen()
+        testee.reportOpen()
+
+        coroutineRule.testScope.testScheduler.advanceTimeBy(500)
+        coroutineRule.testScope.advanceUntilIdle()
+
+        val params = mapOf(DuckChatPixelParameters.DELTA_TIMESTAMP_PARAMETERS to sessionDelta.toString())
+
+        verify(mockDuckChatFeatureRepository, times(1)).registerOpened()
+        verify(mockPixel, times(1)).fire(DUCK_CHAT_OPEN, parameters = params)
+        verify(mockPixel, times(1)).fire(PRODUCT_TELEMETRY_SURFACE_DUCK_AI_OPEN)
+        verify(mockPixel, times(1)).fire(PRODUCT_TELEMETRY_SURFACE_DUCK_AI_OPEN_DAILY, type = Pixel.PixelType.Daily())
     }
 }
