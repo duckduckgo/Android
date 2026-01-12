@@ -119,5 +119,6 @@ interface BrokerDao {
         deleteAllBrokerScan()
         deleteAllBrokerOptOut()
         deleteAllMirrorSites()
+        deleteAllSchedulingConfig()
     }
 }

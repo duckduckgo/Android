@@ -135,7 +135,7 @@ class RealPirEventsRepository @Inject constructor(
     override suspend fun deleteAllScanResults() {
         withContext(dispatcherProvider.io()) {
             scanResultsDao()?.deleteAllScanCompletedBroker()
-            scanLogDao()?.deleteAll()
+            scanLogDao()?.deleteAllBrokerScanEvents()
         }
     }
 
