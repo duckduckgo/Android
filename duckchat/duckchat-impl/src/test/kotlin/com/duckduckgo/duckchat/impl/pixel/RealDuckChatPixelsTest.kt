@@ -163,23 +163,4 @@ class RealDuckChatPixelsTest {
         verify(mockPixel).fire(PRODUCT_TELEMETRY_SURFACE_DUCK_AI_OPEN)
         verify(mockPixel).fire(PRODUCT_TELEMETRY_SURFACE_DUCK_AI_OPEN_DAILY, type = Pixel.PixelType.Daily())
     }
-
-    @Test
-    fun `when reportOpen called twice quickly then only fires once`() = runTest {
-        val sessionDelta = 7L
-        whenever(mockDuckChatFeatureRepository.sessionDeltaInMinutes()).thenReturn(sessionDelta)
-
-        testee.reportOpen()
-        testee.reportOpen()
-
-        coroutineRule.testScope.testScheduler.advanceTimeBy(500)
-        coroutineRule.testScope.advanceUntilIdle()
-
-        val params = mapOf(DuckChatPixelParameters.DELTA_TIMESTAMP_PARAMETERS to sessionDelta.toString())
-
-        verify(mockDuckChatFeatureRepository, times(1)).registerOpened()
-        verify(mockPixel, times(1)).fire(DUCK_CHAT_OPEN, parameters = params)
-        verify(mockPixel, times(1)).fire(PRODUCT_TELEMETRY_SURFACE_DUCK_AI_OPEN)
-        verify(mockPixel, times(1)).fire(PRODUCT_TELEMETRY_SURFACE_DUCK_AI_OPEN_DAILY, type = Pixel.PixelType.Daily())
-    }
 }

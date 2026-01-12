@@ -18,7 +18,6 @@ package com.duckduckgo.duckchat.impl.pixel
 
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin
 import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin.PixelParameter
@@ -107,7 +106,6 @@ import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -125,8 +123,6 @@ class RealDuckChatPixels @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
 ) : DuckChatPixels {
-
-    private val registerOpenedJob = ConflatedJob()
 
     override fun sendReportMetricPixel(reportMetric: ReportMetric) {
         appCoroutineScope.launch(dispatcherProvider.io()) {
@@ -149,10 +145,7 @@ class RealDuckChatPixels @Inject constructor(
     }
 
     override fun reportOpen() {
-        // we debounced because METHOD_GET_AI_CHAT_NATIVE_HANDOFF_DATA can be called more than once
-        // in some cases, eg. when opening duck.ai with query already
-        registerOpenedJob += appCoroutineScope.launch(dispatcherProvider.io()) {
-            delay(OPEN_DEBOUNCE_MS)
+        appCoroutineScope.launch(dispatcherProvider.io()) {
             duckChatFeatureRepository.registerOpened()
             val sessionDelta = duckChatFeatureRepository.sessionDeltaInMinutes()
             val params = mapOf(DuckChatPixelParameters.DELTA_TIMESTAMP_PARAMETERS to sessionDelta.toString())
@@ -160,10 +153,6 @@ class RealDuckChatPixels @Inject constructor(
             pixel.fire(PRODUCT_TELEMETRY_SURFACE_DUCK_AI_OPEN)
             pixel.fire(PRODUCT_TELEMETRY_SURFACE_DUCK_AI_OPEN_DAILY, type = Pixel.PixelType.Daily())
         }
-    }
-
-    companion object {
-        private const val OPEN_DEBOUNCE_MS = 500L
     }
 }
 

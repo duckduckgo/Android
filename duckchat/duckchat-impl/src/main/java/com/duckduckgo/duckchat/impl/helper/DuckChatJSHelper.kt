@@ -16,6 +16,9 @@
 
 package com.duckduckgo.duckchat.impl.helper
 
+import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.common.utils.ConflatedJob
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.ChatState
 import com.duckduckgo.duckchat.impl.ChatState.HIDE
@@ -28,6 +31,9 @@ import com.duckduckgo.duckchat.impl.store.DuckChatDataStore
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.squareup.anvil.annotations.ContributesBinding
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.json.JSONObject
 import java.util.regex.Pattern
@@ -56,7 +62,11 @@ class RealDuckChatJSHelper @Inject constructor(
     private val duckChatPixels: DuckChatPixels,
     private val dataStore: DuckChatDataStore,
     private val duckAiMetricCollector: DuckAiMetricCollector,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+    private val dispatcherProvider: DispatcherProvider,
 ) : DuckChatJSHelper {
+
+    private val registerOpenedJob = ConflatedJob()
 
     override suspend fun processJsCallbackMessage(
         featureName: String,
@@ -64,11 +74,20 @@ class RealDuckChatJSHelper @Inject constructor(
         id: String?,
         data: JSONObject?,
     ): JsCallbackData? {
+        fun registerDuckChatIsOpenDebounced(windowMs: Long = 500L) {
+            // we debounced because METHOD_GET_AI_CHAT_NATIVE_HANDOFF_DATA can be called more than once
+            // in some cases, eg. when opening duck.ai with query already
+            registerOpenedJob += appCoroutineScope.launch(dispatcherProvider.io()) {
+                delay(windowMs)
+                duckChatPixels.reportOpen()
+            }
+        }
+
         return when (method) {
             METHOD_GET_AI_CHAT_NATIVE_HANDOFF_DATA ->
                 id?.let {
                     getAIChatNativeHandoffData(featureName, method, it)
-                }.also { duckChatPixels.reportOpen() }
+                }.also { registerDuckChatIsOpenDebounced() }
 
             METHOD_GET_AI_CHAT_NATIVE_CONFIG_VALUES ->
                 id?.let {
