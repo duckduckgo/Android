@@ -31,6 +31,8 @@ import com.duckduckgo.duckchat.impl.metric.DuckAiMetricCollector
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatDataStore
 import com.duckduckgo.js.messaging.api.JsCallbackData
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
@@ -39,11 +41,13 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
+@OptIn(ExperimentalCoroutinesApi::class)
 class RealDuckChatJSHelperTest {
 
     @get:Rule
@@ -59,6 +63,8 @@ class RealDuckChatJSHelperTest {
         dataStore = mockDataStore,
         duckChatPixels = mockDuckChatPixels,
         duckAiMetricCollector = mockDuckAiMetricCollector,
+        appCoroutineScope = coroutineRule.testScope,
+        dispatcherProvider = coroutineRule.testDispatcherProvider,
     )
 
     @Test
@@ -574,5 +580,32 @@ class RealDuckChatJSHelperTest {
 
         assertEquals("submitOpenSettingsAction", result.subscriptionName)
         assertEquals(DUCK_CHAT_FEATURE_NAME, result.featureName)
+    }
+
+    @Test
+    fun whenGetAIChatNativeHandoffDataThenReportOpenIsCalled() = runTest {
+        val featureName = "aiChat"
+        val method = "getAIChatNativeHandoffData"
+
+        testee.processJsCallbackMessage(featureName, method, null, null)
+
+        coroutineRule.testScope.testScheduler.advanceTimeBy(500)
+        coroutineRule.testScope.advanceUntilIdle()
+
+        verify(mockDuckChatPixels, times(1)).reportOpen()
+    }
+
+    @Test
+    fun whenGetAIChatNativeHandoffDataCalledTwiceThenReportOpenIsCalledOnlyOnce() = runTest {
+        val featureName = "aiChat"
+        val method = "getAIChatNativeHandoffData"
+
+        testee.processJsCallbackMessage(featureName, method, null, null)
+        testee.processJsCallbackMessage(featureName, method, null, null)
+
+        coroutineRule.testScope.testScheduler.advanceTimeBy(500)
+        coroutineRule.testScope.advanceUntilIdle()
+
+        verify(mockDuckChatPixels, times(1)).reportOpen()
     }
 }
