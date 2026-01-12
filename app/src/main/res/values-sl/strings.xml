@@ -214,6 +214,43 @@
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Gumb Fire Button</string>
     <string name="dataClearingActivityTitle">Počiščenje podatkov</string>
+    <string name="dataClearingDescription">Brisanje podatkov lahko pomaga zaščititi vašo zasebnost na spletu. Uporabite gumb Fire Button za ročno brisanje podatkov ali nastavite samodejno brisanje.</string>
+    <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
+        <item quantity="one">%1$d lokacija, izključena iz čiščenja</item>
+        <item quantity="two">%1$d lokaciji, izključeni iz čiščenja</item>
+        <item quantity="few">%1$d lokacije, izključene iz čiščenja</item>
+        <item quantity="other">%1$d lokacij, izključenih iz čiščenja</item>
+    </plurals>
+    <string name="dataClearingAutomaticClearingOn">Vključeno</string>
+    <string name="dataClearingAutomaticClearingOff">Izklopljeno</string>
+    <string name="dataClearingClearBrowsingData">Čiščenje podatkov o brskanju</string>
+    <string name="dataClearingAutomaticDataClearing">Samodejno čiščenje podatkov</string>
+    <string name="dataClearingAutomaticallyClearDataToggle">Samodejno počisti podatke</string>
+    <string name="dataClearingAutomaticTabsOptionDescription">Zaprite vse odprte zavihke</string>
+    <string name="dataClearingAutomaticDataOptionDescription">Izbrišite vse podatke o straneh, vključno z obiskanimi stranmi. Morda boste odjavljeni iz računov.</string>
+    <string name="dataClearingAutomaticChatsOptionDescription">Izbrišite vse klepete, vključno s pripetimi klepeti</string>
+
+    <!-- Fire Dialog Granular Options -->
+    <string name="fireDialogTitle">Izberite, kaj želite izbrisati</string>
+    <string name="dataClearingOptionTabs">Zavihki</string>
+    <string name="dataClearingOptionData">Piškotki in podatki spletnega mesta</string>
+    <string name="dataClearingDuckAiChats">Klepeti Duck.ai</string>
+    <string name="fireDialogOptionDuckAiChatsDescription">Izbriši vse klepete</string>
+    <string name="fireDialogDeleteButton">Izbriši</string>
+    <plurals name="fireDialogOptionTabsDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Zapri zavihek</item>
+        <item quantity="two">Zapri %1$d zavihka</item>
+        <item quantity="few">Zapri vse %1$d zavihke</item>
+        <item quantity="other">Zapri vseh %1$d zavihkov</item>
+    </plurals>
+    <string name="fireDialogOptionDataDescriptionNoHistory">Morda boste odjavljeni iz računov.</string>
+    <string name="fireDialogOptionDescriptionNothingToDelete">Brez</string>
+    <plurals name="fireDialogOptionDataDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Izbriši iz 1 strani. Morda boste odjavljeni iz računov.</item>
+        <item quantity="two">Izbriši iz %1$d strani. Morda boste odjavljeni iz računov.</item>
+        <item quantity="few">Izbriši iz %1$d strani. Morda boste odjavljeni iz računov.</item>
+        <item quantity="other">Izbriši iz %1$d strani. Morda boste odjavljeni iz računov.</item>
+    </plurals>
 
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Dovoljenja</string>

@@ -214,6 +214,43 @@
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Mygtukas „Fire“</string>
     <string name="dataClearingActivityTitle">Duomenų valymas</string>
+    <string name="dataClearingDescription">Ištrindamas duomenis gali padėti apsaugoti savo privatumą internete. Jei nori išvalyti duomenis rankiniu būdu, naudok „Fire Button“ arba nustatyk automatinį valymą.</string>
+    <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
+        <item quantity="one">%1$d vieta, kuriai netaikomas valymas</item>
+        <item quantity="few">%1$d vietos, kurioms netaikomas valymas</item>
+        <item quantity="many">%1$d vietos, kuriai netaikomas valymas</item>
+        <item quantity="other">%1$d vietų, kurioms netaikomas valymas</item>
+    </plurals>
+    <string name="dataClearingAutomaticClearingOn">Įjungti</string>
+    <string name="dataClearingAutomaticClearingOff">Išjungti</string>
+    <string name="dataClearingClearBrowsingData">Išvalyti naršymo duomenis</string>
+    <string name="dataClearingAutomaticDataClearing">Automatinis duomenų išvalymas</string>
+    <string name="dataClearingAutomaticallyClearDataToggle">Automatiškai valyti duomenis</string>
+    <string name="dataClearingAutomaticTabsOptionDescription">Uždaryti visus atidarytus skirtukus</string>
+    <string name="dataClearingAutomaticDataOptionDescription">Ištrinkite visus svetainės duomenis, įskaitant aplankytas svetaines. Gali jus atjungti nuo paskyrų.</string>
+    <string name="dataClearingAutomaticChatsOptionDescription">Ištrinti visus pokalbius, įskaitant prisegtus</string>
+
+    <!-- Fire Dialog Granular Options -->
+    <string name="fireDialogTitle">Pasirinkite, ką ištrinti</string>
+    <string name="dataClearingOptionTabs">Kortelės</string>
+    <string name="dataClearingOptionData">Slapukai ir svetainės duomenys</string>
+    <string name="dataClearingDuckAiChats">„Duck.ai“ pokalbiai</string>
+    <string name="fireDialogOptionDuckAiChatsDescription">Ištrinti visus pokalbius</string>
+    <string name="fireDialogDeleteButton">Trinti</string>
+    <plurals name="fireDialogOptionTabsDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Uždaryti skirtuką</item>
+        <item quantity="few">Uždaryti visus %1$d skirtukus</item>
+        <item quantity="many">Uždaryti visus %1$d skirtukus</item>
+        <item quantity="other">Uždaryti visus %1$d skirtukų</item>
+    </plurals>
+    <string name="fireDialogOptionDataDescriptionNoHistory">Gali jus atjungti nuo paskyrų.</string>
+    <string name="fireDialogOptionDescriptionNothingToDelete">Jokie</string>
+    <plurals name="fireDialogOptionDataDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Ištrinti iš 1 svetainės. Gali jus atjungti nuo paskyrų.</item>
+        <item quantity="few">Ištrinti iš %1$d svetainių. Gali jus atjungti nuo paskyrų.</item>
+        <item quantity="many">Ištrinti iš %1$d svetainės. Gali jus atjungti nuo paskyrų.</item>
+        <item quantity="other">Ištrinti iš %1$d svetainių. Gali jus atjungti nuo paskyrų.</item>
+    </plurals>
 
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Leidimai</string>

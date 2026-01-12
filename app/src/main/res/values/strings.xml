@@ -211,6 +211,37 @@
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Fire Button</string>
     <string name="dataClearingActivityTitle">Data Clearing</string>
+    <string name="dataClearingDescription">Deleting your data can help protect your privacy online. Use the Fire Button to clear data manually, or set up automatic clearing.</string>
+    <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
+        <item quantity="one">1 site excluded from clearing</item>
+        <item quantity="other" instruction="Placeholder is the number of sites excluded">%1$d sites excluded from clearing</item>
+    </plurals>
+    <string name="dataClearingAutomaticClearingOn">On</string>
+    <string name="dataClearingAutomaticClearingOff">Off</string>
+    <string name="dataClearingClearBrowsingData">Clear Browsing Data</string>
+    <string name="dataClearingAutomaticDataClearing">Automatic Data Clearing</string>
+    <string name="dataClearingAutomaticallyClearDataToggle">Automatically Clear Data</string>
+    <string name="dataClearingAutomaticTabsOptionDescription">Close all open tabs</string>
+    <string name="dataClearingAutomaticDataOptionDescription">Delete all site data, including visited sites. May sign you out of accounts.</string>
+    <string name="dataClearingAutomaticChatsOptionDescription">Delete all chats, including pinned chats</string>
+
+    <!-- Fire Dialog Granular Options -->
+    <string name="fireDialogTitle">Choose What To Delete</string>
+    <string name="dataClearingOptionTabs">Tabs</string>
+    <string name="dataClearingOptionData">Cookies and Site Data</string>
+    <string name="dataClearingDuckAiChats">Duck.ai Chats</string>
+    <string name="fireDialogOptionDuckAiChatsDescription">Delete all chats</string>
+    <string name="fireDialogDeleteButton">Delete</string>
+    <plurals name="fireDialogOptionTabsDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Close 1 tab</item>
+        <item quantity="other" instruction="Placeholder is the number of tabs">Close all %1$d tabs</item>
+    </plurals>
+    <string name="fireDialogOptionDataDescriptionNoHistory">May sign you out of accounts.</string>
+    <string name="fireDialogOptionDescriptionNothingToDelete">None</string>
+    <plurals name="fireDialogOptionDataDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Delete from 1 site. May sign you out of accounts.</item>
+        <item quantity="other" instruction="Placeholder is the number of tabs">Delete from %1$d sites. May sign you out of accounts.</item>
+    </plurals>
 
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Permissions</string>
