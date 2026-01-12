@@ -70,59 +70,31 @@ class RealEncryptionHelper @Inject constructor(
         raw: ByteArray,
         key: Key,
     ): EncryptedBytes = withContext(dispatcherProvider.io()) {
-        return@withContext encryptAsync(raw, key)
-    }
-
-    private suspend fun encryptAsync(
-        raw: ByteArray,
-        key: Key,
-    ): EncryptedBytes {
         encryptMutex.withLock {
-            return innerEncrypt(raw, key)
-        }
-    }
+            val encrypted = try {
+                encryptionCipher.init(Cipher.ENCRYPT_MODE, key)
+                encryptionCipher.doFinal(raw)
+            } catch (exception: Exception) {
+                throw InternalSecureStorageException(message = "Error occurred while encrypting data", cause = exception)
+            }
+            val iv = encryptionCipher.iv
 
-    private fun innerEncrypt(
-        raw: ByteArray,
-        key: Key,
-    ): EncryptedBytes {
-        val encrypted = try {
-            encryptionCipher.init(Cipher.ENCRYPT_MODE, key)
-            encryptionCipher.doFinal(raw)
-        } catch (exception: Exception) {
-            throw InternalSecureStorageException(message = "Error occurred while encrypting data", cause = exception)
+            EncryptedBytes(encrypted, iv)
         }
-        val iv = encryptionCipher.iv
-
-        return EncryptedBytes(encrypted, iv)
     }
 
     override suspend fun decrypt(
         toDecrypt: EncryptedBytes,
         key: Key,
     ): ByteArray = withContext(dispatcherProvider.io()) {
-        decryptAsync(toDecrypt, key)
-    }
-
-    private suspend fun decryptAsync(
-        toDecrypt: EncryptedBytes,
-        key: Key,
-    ): ByteArray {
         decryptMutex.withLock {
-            return innerDecrypt(toDecrypt, key)
-        }
-    }
-
-    private fun innerDecrypt(
-        toDecrypt: EncryptedBytes,
-        key: Key,
-    ): ByteArray {
-        return try {
-            val ivSpec = GCMParameterSpec(GCM_PARAM_SPEC_LENGTH, toDecrypt.iv)
-            decryptionCipher.init(Cipher.DECRYPT_MODE, key, ivSpec)
-            decryptionCipher.doFinal(toDecrypt.data)
-        } catch (exception: Exception) {
-            throw InternalSecureStorageException(message = "Error occurred while decrypting data", cause = exception)
+            try {
+                val ivSpec = GCMParameterSpec(GCM_PARAM_SPEC_LENGTH, toDecrypt.iv)
+                decryptionCipher.init(Cipher.DECRYPT_MODE, key, ivSpec)
+                decryptionCipher.doFinal(toDecrypt.data)
+            } catch (exception: Exception) {
+                throw InternalSecureStorageException(message = "Error occurred while decrypting data", cause = exception)
+            }
         }
     }
 

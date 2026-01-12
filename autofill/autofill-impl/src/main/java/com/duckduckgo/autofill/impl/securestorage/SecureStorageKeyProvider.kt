@@ -58,46 +58,30 @@ class RealSecureStorageKeyProvider @Inject constructor(
     private val l2KeyMutex = Mutex()
 
     override suspend fun getl1Key(): ByteArray {
-        return getl1KeyAsync()
-    }
-
-    private suspend fun getl1KeyAsync(): ByteArray {
         l1KeyMutex.withLock {
-            return innerGetL1Key()
-        }
-    }
-
-    private suspend fun innerGetL1Key(): ByteArray {
-        // If no key exists in the keystore, we generate a new one and store it
-        return if (secureStorageKeyRepository.getL1Key() == null) {
-            randomBytesGenerator.generateBytes(L1_PASSPHRASE_SIZE).also {
-                secureStorageKeyRepository.setL1Key(it)
+            // If no key exists in the keystore, we generate a new one and store it
+            return if (secureStorageKeyRepository.getL1Key() == null) {
+                randomBytesGenerator.generateBytes(L1_PASSPHRASE_SIZE).also {
+                    secureStorageKeyRepository.setL1Key(it)
+                }
+            } else {
+                secureStorageKeyRepository.getL1Key()!!
             }
-        } else {
-            secureStorageKeyRepository.getL1Key()!!
         }
     }
 
     override suspend fun getl2Key(): Key {
-        return getl2KeyAsync()
-    }
-
-    private suspend fun getl2KeyAsync(): Key {
-        return l2KeyMutex.withLock {
-            innerGetL2Key()
-        }
-    }
-
-    private suspend fun innerGetL2Key(): Key {
-        val userPassword = if (secureStorageKeyRepository.getPassword() == null) {
-            randomBytesGenerator.generateBytes(PASSWORD_SIZE).also {
-                secureStorageKeyRepository.setPassword(it)
+        l2KeyMutex.withLock {
+            val userPassword = if (secureStorageKeyRepository.getPassword() == null) {
+                randomBytesGenerator.generateBytes(PASSWORD_SIZE).also {
+                    secureStorageKeyRepository.setPassword(it)
+                }
+            } else {
+                secureStorageKeyRepository.getPassword()
             }
-        } else {
-            secureStorageKeyRepository.getPassword()
-        }
 
-        return getl2Key(userPassword!!.toByteString().base64())
+            return getl2Key(userPassword!!.toByteString().base64())
+        }
     }
 
     private suspend fun getl2Key(password: String): Key {

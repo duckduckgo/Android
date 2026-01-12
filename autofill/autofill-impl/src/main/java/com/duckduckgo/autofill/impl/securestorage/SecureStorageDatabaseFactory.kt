@@ -63,36 +63,28 @@ class RealSecureStorageDatabaseFactory @Inject constructor(
     }
 
     override suspend fun getDatabase(): SecureStorageDatabase? {
-        return getAsyncDatabase()
-    }
-
-    private suspend fun getAsyncDatabase(): SecureStorageDatabase? {
         _database?.let { return it }
-        return mutex.withLock {
-            getInnerDatabase()
-        }
-    }
+        mutex.withLock {
+            // If we have already the DB instance then let's use it
+            if (_database != null) {
+                return _database
+            }
 
-    private suspend fun getInnerDatabase(): SecureStorageDatabase? {
-        // If we have already the DB instance then let's use it
-        if (_database != null) {
-            return _database
-        }
-
-        // If we can't access the keystore, it means that L1Key will be null. We don't want to encrypt the db with a null key.
-        return if (keyProvider.canAccessKeyStore()) {
-            // At this point, we are guaranteed that if l1key is null, it's because it hasn't been generated yet. Else, we always use the one stored.
-            _database = databaseProvider.buildRoomDatabase(
-                SecureStorageDatabase::class.java,
-                "secure_storage_database_encrypted.db",
-                config = RoomDatabaseConfig(
-                    openHelperFactory = SupportOpenHelperFactory(keyProvider.getl1Key()),
-                    migrations = ALL_MIGRATIONS,
-                ),
-            )
-            _database
-        } else {
-            null
+            // If we can't access the keystore, it means that L1Key will be null. We don't want to encrypt the db with a null key.
+            return if (keyProvider.canAccessKeyStore()) {
+                // At this point, we are guaranteed that if l1key is null, it's because it hasn't been generated yet. Else, we always use the one stored.
+                _database = databaseProvider.buildRoomDatabase(
+                    SecureStorageDatabase::class.java,
+                    "secure_storage_database_encrypted.db",
+                    config = RoomDatabaseConfig(
+                        openHelperFactory = SupportOpenHelperFactory(keyProvider.getl1Key()),
+                        migrations = ALL_MIGRATIONS,
+                    ),
+                )
+                _database
+            } else {
+                null
+            }
         }
     }
 }

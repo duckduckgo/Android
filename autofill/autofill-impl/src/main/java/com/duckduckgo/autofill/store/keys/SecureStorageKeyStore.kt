@@ -61,30 +61,26 @@ class RealSecureStorageKeyStore constructor(
     private val mutex: Mutex = Mutex()
     private val encryptedPreferencesDeferred: Deferred<SharedPreferences?> by lazy {
         coroutineScope.async(dispatcherProvider.io()) {
-            encryptedPreferencesAsync()
+            try {
+                mutex.withLock {
+                    EncryptedSharedPreferences.create(
+                        context,
+                        FILENAME,
+                        MasterKey.Builder(context)
+                            .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+                            .build(),
+                        EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+                        EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM,
+                    )
+                }
+            } catch (e: Exception) {
+                null
+            }
         }
     }
 
     private suspend fun getEncryptedPreferences(): SharedPreferences? {
         return encryptedPreferencesDeferred.await()
-    }
-
-    private suspend fun encryptedPreferencesAsync(): SharedPreferences? {
-        return try {
-            mutex.withLock {
-                EncryptedSharedPreferences.create(
-                    context,
-                    FILENAME,
-                    MasterKey.Builder(context)
-                        .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
-                        .build(),
-                    EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-                    EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM,
-                )
-            }
-        } catch (e: Exception) {
-            null
-        }
     }
 
     override suspend fun updateKey(
