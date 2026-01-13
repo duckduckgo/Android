@@ -1343,8 +1343,7 @@ class BrowserTabFragment :
     private fun createBrowserMenu() {
         val useBottomSheetMenu = viewModel.browserViewState.value?.useBottomSheetMenu ?: false
         if (useBottomSheetMenu) {
-            val isFullyExpanded = viewModel.browserViewState.value?.bottomSheetMenuExpanded ?: false
-            createBottomSheetMenu(isFullyExpanded)
+            createBottomSheetMenu()
         } else {
             createPopupMenuClassic()
         }
@@ -1359,8 +1358,10 @@ class BrowserTabFragment :
         logcat { "BrowserMenu: viewMode ${omnibar.viewMode} render browseMenuState $browseMenuState" }
         val useBottomSheetMenu = viewModel.browserViewState.value?.useBottomSheetMenu ?: false
         if (useBottomSheetMenu) {
+            omnibar.configureBrowserMenuIcon(com.duckduckgo.mobile.android.R.drawable.ic_menu_hamburger_24)
             bottomSheetMenu?.render(viewState = browseMenuState)
         } else {
+            omnibar.configureBrowserMenuIcon(com.duckduckgo.mobile.android.R.drawable.ic_menu_vertical_24)
             popupMenu?.render(viewState = browseMenuState)
         }
     }
@@ -1491,12 +1492,13 @@ class BrowserTabFragment :
         }
     }
 
-    private fun createBottomSheetMenu(isFullyExpanded: Boolean) {
-        bottomSheetMenu = BrowserMenuBottomSheet(
-            context = requireContext(),
-            expandedByDefault = isFullyExpanded,
-        )
+    private fun createBottomSheetMenu() {
+        bottomSheetMenu = BrowserMenuBottomSheet(context = requireContext())
         bottomSheetMenu?.apply {
+            backMenuItem.setOnClickListener {
+                dismiss()
+                onBackArrowClicked()
+            }
             forwardMenuItem.setOnClickListener {
                 dismiss()
                 onForwardArrowClicked()

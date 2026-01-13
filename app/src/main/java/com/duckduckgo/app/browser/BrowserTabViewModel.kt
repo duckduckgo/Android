@@ -606,7 +606,7 @@ class BrowserTabViewModel @Inject constructor(
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.Eagerly,
-            initialValue = BrowserMenuDisplayState(hasOption = false, isEnabled = false, isFullyExpandedByDefault = false),
+            initialValue = BrowserMenuDisplayState(hasOption = false, isEnabled = false),
         )
 
     private val fireproofWebsitesObserver =
@@ -810,8 +810,7 @@ class BrowserTabViewModel @Inject constructor(
         browserMenuState
             .onEach { state ->
                 browserViewState.value = currentBrowserViewState().copy(
-                    useBottomSheetMenu = state.hasOption && (state.isEnabled || state.isFullyExpandedByDefault),
-                    bottomSheetMenuExpanded = state.isFullyExpandedByDefault,
+                    useBottomSheetMenu = state.hasOption && state.isEnabled,
                 )
             }
             .launchIn(viewModelScope)

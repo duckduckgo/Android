@@ -96,7 +96,7 @@ internal class AppearanceViewModelTest {
         whenever(mockAppSettingsDataStore.omnibarType).thenReturn(OmnibarType.SINGLE_TOP)
         whenever(mockUrlDisplayRepository.isFullUrlEnabled).thenReturn(flowOf(true))
         whenever(mockBrowserMenuDisplayRepository.browserMenuState)
-            .thenReturn(flowOf(BrowserMenuDisplayState(hasOption = false, isEnabled = false, isFullyExpandedByDefault = false)))
+            .thenReturn(flowOf(BrowserMenuDisplayState(hasOption = false, isEnabled = false)))
         whenever(mockTabSwitcherDataStore.isTrackersAnimationInfoTileHidden()).thenReturn(flowOf(false))
         whenever(mockOmnibarFeatureRepository.isSplitOmnibarAvailable).thenReturn(false)
 

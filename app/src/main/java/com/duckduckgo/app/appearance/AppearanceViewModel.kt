@@ -73,7 +73,6 @@ class AppearanceViewModel @Inject constructor(
         val isTrackersCountInTabSwitcherEnabled: Boolean = true,
         val hasExperimentalBrowserMenuOption: Boolean = false,
         val useBottomSheetMenuEnabled: Boolean = false,
-        val useBottomSheetMenuExpandedEnabled: Boolean = false,
         val shouldShowSplitOmnibarSettings: Boolean = false,
     )
 
@@ -114,7 +113,6 @@ class AppearanceViewModel @Inject constructor(
             isFullUrlEnabled = isFullUrlEnabled,
             hasExperimentalBrowserMenuOption = browserMenuState.hasOption,
             useBottomSheetMenuEnabled = browserMenuState.isEnabled,
-            useBottomSheetMenuExpandedEnabled = browserMenuState.isFullyExpandedByDefault,
         )
     }.stateIn(viewModelScope, SharingStarted.Lazily, viewState.value)
 
@@ -207,12 +205,6 @@ class AppearanceViewModel @Inject constructor(
     fun onUseBottomSheetMenuChanged(checked: Boolean) {
         viewModelScope.launch(dispatcherProvider.io()) {
             browserMenuDisplayRepository.setExperimentalMenuEnabled(checked)
-        }
-    }
-
-    fun onUseBottomSheetMenuExpandedByDefaultChanged(checked: Boolean) {
-        viewModelScope.launch(dispatcherProvider.io()) {
-            browserMenuDisplayRepository.setExperimentalMenuExpandedByDefault(checked)
         }
     }
 }

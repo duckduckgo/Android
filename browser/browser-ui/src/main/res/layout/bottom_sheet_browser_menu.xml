@@ -48,20 +48,20 @@
                 android:paddingBottom="@dimen/keyline_3">
 
                 <com.duckduckgo.common.ui.view.MenuActionButtonView
+                    android:id="@+id/backMenuItem"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    app:menuActionLabel="@string/browserMenuBack"
+                    app:menuActionSrc="@drawable/ic_arrow_left_24" />
+
+                <com.duckduckgo.common.ui.view.MenuActionButtonView
                     android:id="@+id/forwardMenuItem"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     app:menuActionLabel="@string/browserMenuForward"
                     app:menuActionSrc="@drawable/ic_arrow_right_24" />
-
-                <com.duckduckgo.common.ui.view.MenuActionButtonView
-                    android:id="@+id/refreshMenuItem"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    app:menuActionLabel="@string/browserMenuRefresh"
-                    app:menuActionSrc="@drawable/ic_reload_24" />
 
                 <com.duckduckgo.common.ui.view.MenuActionButtonView
                     android:id="@+id/newTabMenuItem"
@@ -129,6 +129,14 @@
                 android:layout_height="wrap_content"
                 app:iconDrawable="@drawable/ic_device_desktop_16"
                 app:primaryText="@string/browserMenuDesktopSite" />
+
+            <com.duckduckgo.common.ui.view.MenuItemView
+                android:id="@+id/refreshMenuItem"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                app:iconDrawable="@drawable/ic_reload_24"
+                app:primaryText="@string/browserMenuRefresh" />
 
             <com.duckduckgo.common.ui.view.divider.HorizontalDivider
                 android:id="@+id/librarySectionDivider"

@@ -670,7 +670,7 @@ class BrowserTabViewModelTest {
             whenever(mockSettingsDataStore.omnibarType).thenReturn(OmnibarType.SINGLE_TOP)
             whenever(mockUrlDisplayRepository.isFullUrlEnabled).then { isFullSiteAddressEnabledFlow }
             whenever(mockBrowserMenuDisplayRepository.browserMenuState)
-                .thenReturn(flowOf(BrowserMenuDisplayState(hasOption = false, isEnabled = false, isFullyExpandedByDefault = false)))
+                .thenReturn(flowOf(BrowserMenuDisplayState(hasOption = false, isEnabled = false)))
             whenever(mockSSLCertificatesFeature.allowBypass()).thenReturn(mockEnabledToggle)
             whenever(subscriptions.shouldLaunchPrivacyProForUrl(any())).thenReturn(false)
             whenever(mockDuckDuckGoUrlDetector.isDuckDuckGoUrl(any())).thenReturn(false)

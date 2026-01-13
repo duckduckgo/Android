@@ -304,16 +304,6 @@
                 app:showSwitch="true"
                 tools:visibility="visible" />
 
-            <com.duckduckgo.common.ui.view.listitem.OneLineListItem
-                android:id="@+id/useBottomSheetMenuExpandedSetting"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:visibility="gone"
-                app:primaryText="Experimental Browser Menu Expanded"
-                app:primaryTextTruncated="false"
-                app:showSwitch="true"
-                tools:visibility="visible" />
-
         </LinearLayout>
 
     </ScrollView>

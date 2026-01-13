@@ -37,7 +37,6 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 @SuppressLint("NoBottomSheetDialog")
 class BrowserMenuBottomSheet(
     private val context: Context,
-    private val expandedByDefault: Boolean = false,
 ) : BottomSheetDialog(context) {
     private val binding = BottomSheetBrowserMenuBinding.inflate(LayoutInflater.from(context))
 
@@ -51,11 +50,7 @@ class BrowserMenuBottomSheet(
                 isDraggable = true
                 isHideable = true
                 peekHeight = context.resources.displayMetrics.heightPixels / 2
-                state = if (expandedByDefault) {
-                    BottomSheetBehavior.STATE_EXPANDED
-                } else {
-                    BottomSheetBehavior.STATE_COLLAPSED
-                }
+                state = BottomSheetBehavior.STATE_COLLAPSED
             }
         }
 
@@ -70,11 +65,11 @@ class BrowserMenuBottomSheet(
     private val menuActionItemsContainer: LinearLayout
         get() = binding.menuActionItemsContainer
 
+    val backMenuItem: MenuActionButtonView
+        get() = binding.backMenuItem
+
     val forwardMenuItem: MenuActionButtonView
         get() = binding.forwardMenuItem
-
-    val refreshMenuItem: MenuActionButtonView
-        get() = binding.refreshMenuItem
 
     val newTabMenuItem: MenuActionButtonView
         get() = binding.newTabMenuItem
@@ -127,6 +122,9 @@ class BrowserMenuBottomSheet(
     val changeBrowserModeMenuItem: MenuItemView
         get() = binding.changeBrowsingModeMenuItem
 
+    val refreshMenuItem: MenuItemView
+        get() = binding.refreshMenuItem
+
     val brokenSiteMenuItem: MenuItemView
         get() = binding.reportBrokenSiteMenuItem
 
@@ -154,8 +152,9 @@ class BrowserMenuBottomSheet(
     }
 
     private fun renderBrowserMenu(viewState: BrowserMenuViewState.Browser) {
+        backMenuItem.isEnabled = viewState.canGoBack
         forwardMenuItem.isEnabled = viewState.canGoForward
-        refreshMenuItem.isEnabled = true
+        refreshMenuItem.isVisible = true
         newTabMenuItem.isEnabled = true
         newDuckChatTabMenuItem.isEnabled = true
         settingsMenuItem.isEnabled = true
@@ -222,8 +221,9 @@ class BrowserMenuBottomSheet(
     }
 
     private fun renderNewTabPageMenu(viewState: BrowserMenuViewState.NewTabPage) {
+        backMenuItem.isEnabled = false
         forwardMenuItem.isEnabled = viewState.canGoForward
-        refreshMenuItem.isEnabled = false
+        refreshMenuItem.isVisible = false
         newTabMenuItem.isEnabled = false
         newDuckChatTabMenuItem.isEnabled = true
         settingsMenuItem.isEnabled = true
@@ -240,8 +240,9 @@ class BrowserMenuBottomSheet(
     }
 
     private fun renderCustomTabsMenu(viewState: BrowserMenuViewState.CustomTabs) {
+        backMenuItem.isEnabled = viewState.canGoBack
         forwardMenuItem.isEnabled = viewState.canGoForward
-        refreshMenuItem.isEnabled = true
+        refreshMenuItem.isVisible = true
         newTabMenuItem.isEnabled = false
         newDuckChatTabMenuItem.isEnabled = false
         settingsMenuItem.isEnabled = false
@@ -283,8 +284,9 @@ class BrowserMenuBottomSheet(
     }
 
     private fun renderDuckAiMenu(viewState: BrowserMenuViewState.DuckAi) {
+        backMenuItem.isEnabled = false
         forwardMenuItem.isEnabled = false
-        refreshMenuItem.isEnabled = false
+        refreshMenuItem.isVisible = false
         newTabMenuItem.isEnabled = false
         newDuckChatTabMenuItem.isEnabled = true
         settingsMenuItem.isEnabled = true

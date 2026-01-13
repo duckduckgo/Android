@@ -18,6 +18,7 @@ package com.duckduckgo.app.browser.omnibar
 
 import android.view.View
 import android.widget.ImageView
+import androidx.annotation.DrawableRes
 import androidx.appcompat.widget.Toolbar
 import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.app.browser.databinding.IncludeFindInPageBinding
@@ -54,6 +55,7 @@ interface OmnibarView {
         expanded: Boolean,
         animate: Boolean,
     )
+    fun setMenuIcon(@DrawableRes resId: Int)
     fun show()
     fun gone()
 }
