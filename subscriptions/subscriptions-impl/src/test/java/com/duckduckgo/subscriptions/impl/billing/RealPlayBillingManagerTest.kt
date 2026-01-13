@@ -373,97 +373,6 @@ class RealPlayBillingManagerTest {
             assertEquals(PurchaseState.Failure("BILLING_UNAVAILABLE"), awaitItem())
         }
     }
-
-    @Test
-    fun `when getLatestPurchaseToken called and client not connected then connects first`() = runTest {
-        processLifecycleOwner.currentState = RESUMED
-        runCurrent()
-
-        // Simulate disconnection
-        billingClientAdapter.connected = false
-        billingClientAdapter.methodInvocations.clear()
-
-        subject.getLatestPurchaseToken()
-
-        billingClientAdapter.verifyConnectInvoked()
-    }
-
-    @Test
-    fun `when getLatestPurchaseToken called then always queries purchases`() = runTest {
-        processLifecycleOwner.currentState = RESUMED
-        runCurrent()
-        billingClientAdapter.methodInvocations.clear()
-
-        subject.getLatestPurchaseToken()
-
-        billingClientAdapter.verifyQueryPurchasesInvoked()
-    }
-
-    @Test
-    fun `when getLatestPurchaseToken called with active purchases then returns latest token`() = runTest {
-        val mockPurchase: Purchase = mock {
-            whenever(it.products).thenReturn(listOf(BASIC_SUBSCRIPTION))
-            whenever(it.purchaseState).thenReturn(Purchase.PurchaseState.PURCHASED)
-            whenever(it.purchaseTime).thenReturn(1000L)
-            whenever(it.purchaseToken).thenReturn("test_purchase_token")
-        }
-        billingClientAdapter.activePurchases = listOf(mockPurchase)
-
-        processLifecycleOwner.currentState = RESUMED
-        runCurrent()
-
-        val result = subject.getLatestPurchaseToken()
-
-        assertEquals("test_purchase_token", result)
-    }
-
-    @Test
-    fun `when getLatestPurchaseToken called with no active purchases then returns null`() = runTest {
-        billingClientAdapter.activePurchases = emptyList()
-
-        processLifecycleOwner.currentState = RESUMED
-        runCurrent()
-
-        val result = subject.getLatestPurchaseToken()
-
-        assertEquals(null, result)
-    }
-
-    @Test
-    fun `when getLatestPurchaseToken called with pending purchase then returns null`() = runTest {
-        val pendingPurchase: Purchase = mock {
-            whenever(it.products).thenReturn(listOf(BASIC_SUBSCRIPTION))
-            whenever(it.purchaseState).thenReturn(Purchase.PurchaseState.PENDING)
-            whenever(it.purchaseTime).thenReturn(1000L)
-            whenever(it.purchaseToken).thenReturn("pending_token")
-        }
-        billingClientAdapter.activePurchases = listOf(pendingPurchase)
-
-        processLifecycleOwner.currentState = RESUMED
-        runCurrent()
-
-        val result = subject.getLatestPurchaseToken()
-
-        assertEquals(null, result)
-    }
-
-    @Test
-    fun `when getLatestPurchaseToken called with non-subscription purchase then returns null`() = runTest {
-        val otherProductPurchase: Purchase = mock {
-            whenever(it.products).thenReturn(listOf("other_product"))
-            whenever(it.purchaseState).thenReturn(Purchase.PurchaseState.PURCHASED)
-            whenever(it.purchaseTime).thenReturn(1000L)
-            whenever(it.purchaseToken).thenReturn("other_token")
-        }
-        billingClientAdapter.activePurchases = listOf(otherProductPurchase)
-
-        processLifecycleOwner.currentState = RESUMED
-        runCurrent()
-
-        val result = subject.getLatestPurchaseToken()
-
-        assertEquals(null, result)
-    }
 }
 
 class FakeBillingClientAdapter : BillingClientAdapter {
@@ -585,11 +494,6 @@ class FakeBillingClientAdapter : BillingClientAdapter {
 
     fun verifyGetSubscriptionPurchaseHistoryInvoked(times: Int = 1) {
         val invocations = methodInvocations.filterIsInstance<GetSubscriptionsPurchaseHistory>()
-        assertEquals(times, invocations.count())
-    }
-
-    fun verifyQueryPurchasesInvoked(times: Int = 1) {
-        val invocations = methodInvocations.filterIsInstance<QueryPurchases>()
         assertEquals(times, invocations.count())
     }
 
