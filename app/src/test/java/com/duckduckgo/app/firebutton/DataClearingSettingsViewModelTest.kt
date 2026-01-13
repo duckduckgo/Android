@@ -22,10 +22,11 @@ import app.cash.turbine.test
 import com.duckduckgo.app.fire.FireAnimationLoader
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
+import com.duckduckgo.app.fire.store.FireDataStore
 import com.duckduckgo.app.firebutton.DataClearingSettingsViewModel.Command
 import com.duckduckgo.app.pixels.AppPixelName
-import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.clear.FireAnimation
+import com.duckduckgo.app.settings.clear.FireClearOption
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -61,17 +62,19 @@ internal class DataClearingSettingsViewModelTest {
     private val mockDuckChat: DuckChat = mock()
     private val mockDuckAiFeatureState: DuckAiFeatureState = mock()
     private val mockFireproofWebsiteRepository: FireproofWebsiteRepository = mock()
+    private val mockFireDataStore: FireDataStore = mock()
 
     private val duckAiShowClearDuckAIChatHistoryFlow = MutableStateFlow(false)
     private val fireproofWebsitesLiveData = MutableLiveData<List<FireproofWebsiteEntity>>(emptyList())
+    private val automaticClearOptionsFlow = MutableStateFlow<Set<FireClearOption>>(emptySet())
 
     @Before
     fun before() {
-        whenever(mockSettingsDataStore.automaticallyClearWhatOption).thenReturn(ClearWhatOption.CLEAR_NONE)
         whenever(mockSettingsDataStore.selectedFireAnimation).thenReturn(FireAnimation.HeroFire)
         whenever(mockSettingsDataStore.clearDuckAiData).thenReturn(false)
         whenever(mockDuckAiFeatureState.showClearDuckAIChatHistory).thenReturn(duckAiShowClearDuckAIChatHistoryFlow)
         whenever(mockFireproofWebsiteRepository.getFireproofWebsites()).thenReturn(fireproofWebsitesLiveData)
+        whenever(mockFireDataStore.getAutomaticClearOptionsFlow()).thenReturn(automaticClearOptionsFlow)
 
         runBlocking {
             whenever(mockDuckChat.wasOpenedBefore()).thenReturn(false)
@@ -84,6 +87,7 @@ internal class DataClearingSettingsViewModelTest {
             mockDuckChat,
             mockDuckAiFeatureState,
             mockFireproofWebsiteRepository,
+            mockFireDataStore,
         )
     }
 
@@ -114,6 +118,7 @@ internal class DataClearingSettingsViewModelTest {
             mockDuckChat,
             mockDuckAiFeatureState,
             mockFireproofWebsiteRepository,
+            mockFireDataStore,
         )
 
         testee.viewState.test {
@@ -135,6 +140,7 @@ internal class DataClearingSettingsViewModelTest {
             mockDuckChat,
             mockDuckAiFeatureState,
             mockFireproofWebsiteRepository,
+            mockFireDataStore,
         )
 
         testee.viewState.test {
@@ -156,6 +162,7 @@ internal class DataClearingSettingsViewModelTest {
             mockDuckChat,
             mockDuckAiFeatureState,
             mockFireproofWebsiteRepository,
+            mockFireDataStore,
         )
 
         testee.viewState.test {
@@ -167,16 +174,7 @@ internal class DataClearingSettingsViewModelTest {
 
     @Test
     fun whenInitialisedWithAutomaticClearingEnabledThenAutomaticallyClearingEnabledIsTrue() = runTest {
-        whenever(mockSettingsDataStore.automaticallyClearWhatOption).thenReturn(ClearWhatOption.CLEAR_TABS_AND_DATA)
-
-        testee = DataClearingSettingsViewModel(
-            mockSettingsDataStore,
-            mockFireAnimationLoader,
-            mockPixel,
-            mockDuckChat,
-            mockDuckAiFeatureState,
-            mockFireproofWebsiteRepository,
-        )
+        automaticClearOptionsFlow.value = setOf(FireClearOption.TABS, FireClearOption.DATA)
 
         testee.viewState.test {
             val value = awaitItem()
@@ -330,6 +328,7 @@ internal class DataClearingSettingsViewModelTest {
             mockDuckChat,
             mockDuckAiFeatureState,
             mockFireproofWebsiteRepository,
+            mockFireDataStore,
         )
 
         testee.viewState.test {

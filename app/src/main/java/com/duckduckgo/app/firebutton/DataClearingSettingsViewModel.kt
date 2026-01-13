@@ -22,8 +22,8 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.fire.FireAnimationLoader
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
+import com.duckduckgo.app.fire.store.FireDataStore
 import com.duckduckgo.app.pixels.AppPixelName
-import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.clear.FireAnimation
 import com.duckduckgo.app.settings.clear.getPixelValue
 import com.duckduckgo.app.settings.db.SettingsDataStore
@@ -51,6 +51,7 @@ class DataClearingSettingsViewModel @Inject constructor(
     private val duckChat: DuckChat,
     private val duckAiFeatureState: DuckAiFeatureState,
     fireproofWebsiteRepository: FireproofWebsiteRepository,
+    fireDataStore: FireDataStore,
 ) : ViewModel() {
 
     data class ViewState(
@@ -74,8 +75,12 @@ class DataClearingSettingsViewModel @Inject constructor(
     val viewState: Flow<ViewState> = combine(
         _viewState,
         fireproofWebsiteRepository.getFireproofWebsites().asFlow(),
-    ) { state, fireproofSites ->
-        state.copy(fireproofWebsitesCount = fireproofSites.size)
+        fireDataStore.getAutomaticClearOptionsFlow(),
+    ) { state, fireproofSites, automaticClearOptions ->
+        state.copy(
+            fireproofWebsitesCount = fireproofSites.size,
+            automaticallyClearingEnabled = automaticClearOptions.isNotEmpty(),
+        )
     }
 
     val commands: Flow<Command> = _commands.receiveAsFlow()
@@ -91,7 +96,6 @@ class DataClearingSettingsViewModel @Inject constructor(
                     selectedFireAnimation = settingsDataStore.selectedFireAnimation,
                     clearDuckAiData = settingsDataStore.clearDuckAiData,
                     showClearDuckAiDataSetting = duckChat.wasOpenedBefore() && duckAiFeatureState.showClearDuckAIChatHistory.value,
-                    automaticallyClearingEnabled = settingsDataStore.automaticallyClearWhatOption != ClearWhatOption.CLEAR_NONE,
                 )
             }
         }
