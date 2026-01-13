@@ -159,6 +159,7 @@ class SettingsViewModel @Inject constructor(
         data object LaunchWebTrackingProtectionScreen : Command()
         data object LaunchCookiePopupProtectionScreen : Command()
         data object LaunchFireButtonScreen : Command()
+        data object LaunchDataClearingSettingsScreen : Command()
         data object LaunchPermissionsScreen : Command()
         data object LaunchDuckChatScreen : Command()
         data object LaunchAppearanceScreen : Command()
@@ -368,7 +369,13 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun onFireButtonSettingClicked() {
-        viewModelScope.launch { command.send(LaunchFireButtonScreen) }
+        viewModelScope.launch(dispatcherProvider.io()) {
+            if (androidBrowserConfigFeature.improvedDataClearingOptions().isEnabled()) {
+                command.send(Command.LaunchDataClearingSettingsScreen)
+            } else {
+                command.send(LaunchFireButtonScreen)
+            }
+        }
         pixel.fire(SETTINGS_FIRE_BUTTON_PRESSED)
     }
 
