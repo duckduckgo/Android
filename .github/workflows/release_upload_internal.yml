@@ -47,10 +47,10 @@ jobs:
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
 
-      - name: Get latest tag
+      - name: Get latest release tag
         id: get_latest_tag
         run: |
-          output=$(git for-each-ref --sort=taggerdate --format='%(refname:short)' refs/tags | tail -n 1)
+          output=$(git for-each-ref --sort=taggerdate --format='%(refname:short)' refs/tags | grep -E "^[0-9]+\.[0-9]+\.[0-9]+(\.?[0-9]*-internal)?$" | tail -n 1)
           echo "Latest tag: $output"
           echo "latest_tag=$output" >> $GITHUB_OUTPUT
 
