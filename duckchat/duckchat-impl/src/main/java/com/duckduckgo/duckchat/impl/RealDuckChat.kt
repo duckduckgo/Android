@@ -177,11 +177,6 @@ interface DuckChatInternal : DuckChat {
     fun isInputScreenFeatureAvailable(): Boolean
 
     /**
-     * Returns whether dedicated Duck.ai full screen mode feature is available (its feature flag is enabled).
-     */
-    fun isDuckChatFullScreenModeFeatureAvailable(): Boolean
-
-    /**
      * Returns whether dedicated Duck.ai full screen mode is enabled (its feature flag is enabled).
      */
     fun isDuckChatFullScreenModeEnabled(): Boolean
@@ -370,8 +365,6 @@ class RealDuckChat @Inject constructor(
     override fun isDuckChatFeatureEnabled(): Boolean = isDuckChatFeatureEnabled
 
     override fun isChatSyncFeatureEnabled(): Boolean = isChatSyncFeatureEnabled
-
-    override fun isDuckChatFullScreenModeFeatureAvailable(): Boolean = duckChatFeature.fullscreenMode().isEnabled()
 
     override fun isDuckChatFullScreenModeEnabled(): Boolean = isFullscreenModeEnabled
 
