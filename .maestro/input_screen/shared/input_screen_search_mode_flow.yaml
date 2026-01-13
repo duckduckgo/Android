@@ -69,18 +69,17 @@ appId: com.duckduckgo.mobile.android
     childOf:
       id: "omnibarTextInput"
 
+# verify that favorites are shown when opening the Input Screen from a web page and autocomplete is suppressed
+- tapOn:
+    id: "omnibarTextInput"
+- assertNotVisible:
+    id: "autoCompleteSuggestionsList"
 # dismiss RMF card if it appears
 - tapOn:
     id: "close"
     childOf:
       id: "remoteMessage"
     optional: true
-
-# verify that favorites are shown when opening the Input Screen from a web page and autocomplete is suppressed
-- tapOn:
-    id: "omnibarTextInput"
-- assertNotVisible:
-    id: "autoCompleteSuggestionsList"
 - assertVisible:
     text: "reddit at DuckDuckGo"
     childOf:
