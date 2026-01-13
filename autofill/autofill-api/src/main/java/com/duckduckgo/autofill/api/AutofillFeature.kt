@@ -179,4 +179,7 @@ interface AutofillFeature {
 
     @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.TRUE)
     fun prioritizeDomainMatchesOnSearch(): Toggle
+
+    @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.FALSE)
+    fun useHarmony(): Toggle
 }
