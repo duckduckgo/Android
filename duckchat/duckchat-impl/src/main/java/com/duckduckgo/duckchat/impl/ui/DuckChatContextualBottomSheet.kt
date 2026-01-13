@@ -26,6 +26,7 @@ import android.os.Message
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE
 import android.webkit.WebChromeClient
 import android.webkit.WebSettings
 import android.webkit.WebView
@@ -119,8 +120,8 @@ class DuckChatContextualBottomSheet(
         logcat { "Duck.ai Contextual: onCreateDialog" }
         val bottomSheetDialog = BottomSheetDialog(requireContext(), R.style.DuckChatBottomSheetDialogTheme)
 
-        bottomSheetDialog.window?.let {
-            ViewCompat.setOnApplyWindowInsetsListener(it.decorView) { view, insets ->
+        bottomSheetDialog.window?.let { window ->
+            ViewCompat.setOnApplyWindowInsetsListener(window.decorView) { view, insets ->
                 if (!isExpanded) {
                     val imeBottom = insets.getInsets(WindowInsetsCompat.Type.ime()).bottom
                     val systemBottom = insets.getInsets(WindowInsetsCompat.Type.systemBars()).bottom
@@ -130,7 +131,7 @@ class DuckChatContextualBottomSheet(
                 }
                 insets
             }
-            ViewCompat.requestApplyInsets(it.decorView)
+            ViewCompat.requestApplyInsets(window.decorView)
         }
 
         bottomSheetDialog.let {
@@ -179,13 +180,8 @@ class DuckChatContextualBottomSheet(
     private fun configureViews(binding: BottomSheetDuckAiContextualBinding) {
         val bottomSheetDialog = dialog as? BottomSheetDialog
         bottomSheetDialog?.let {
-            binding.root.doOnLayout {
-                val peekHeight = calculatePeekHeight(binding)
-                if (peekHeight > 0) {
-                    bottomSheetDialog.behavior.peekHeight = peekHeight
-                    bottomSheetDialog.behavior.state = BottomSheetBehavior.STATE_COLLAPSED
-                }
-            }
+            bottomSheetDialog.behavior.isShouldRemoveExpandedCorners = false
+            bottomSheetDialog.behavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
         }
     }
 
@@ -214,7 +210,10 @@ class DuckChatContextualBottomSheet(
         binding.contextualWebViewContainer.show()
         val bottomSheetDialog = dialog as? BottomSheetDialog
         bottomSheetDialog?.let {
-            bottomSheetDialog.window?.decorView?.updatePadding(bottom = 0)
+            bottomSheetDialog.window?.let {
+                it.decorView.updatePadding(bottom = 0)
+                it.setSoftInputMode(SOFT_INPUT_ADJUST_RESIZE)
+            }
             binding.root.doOnLayout {
                 bottomSheetDialog.behavior.state = BottomSheetBehavior.STATE_EXPANDED
             }
