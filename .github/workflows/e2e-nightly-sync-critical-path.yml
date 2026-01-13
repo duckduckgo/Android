@@ -110,7 +110,7 @@ jobs:
           action: 'create-asana-task'
 
       - name: Add Asana task to Browser Sync & Backup project
-        if: ${{ failure() && create-maestro-failure-task.outputs.taskId != '' }}
+        if: ${{ failure() && steps.create-maestro-failure-task.outputs.taskId != '' }}
         uses: duckduckgo/native-github-asana-sync@v2.0
         with:
           asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
