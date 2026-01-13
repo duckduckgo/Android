@@ -44,6 +44,9 @@ import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
  * @param sheetGesturesEnabled Controls whether the bottom sheet can be interacted with via
  * touch gestures.
  * @param content The content of the bottom sheet.
+ *
+ * Asana Task: https://app.asana.com/1/137249556945/project/1202857801505092/task/1211659112661228
+ * Figma reference: https://www.figma.com/design/BOHDESHODUXK7wSRNBOHdu/%F0%9F%A4%96-Android-Components?node-id=6550-54079
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -82,7 +85,7 @@ object DaxBottomSheetDefaults {
         get() = DuckDuckGoTheme.colors.text.primary
 
     val scrimColor: Color
-        @Composable get() = Black.copy(alpha = .6f)
+        @Composable get() = Black.copy(alpha = .68f)
 
     val shape = RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp)
 }

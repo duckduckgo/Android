@@ -20,7 +20,6 @@ import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -49,83 +48,28 @@ import com.duckduckgo.mobile.android.R
  *
  * @param title The title text of the promo.
  * @param description The description text of the promo.
- * @param painter The image painter to be displayed in the promo.
+ * @param promoIcon The image painter to be displayed in the promo.
  * @param buttons The composable buttons to be displayed at the bottom of the promo.
  * @param onDismissRequest Callback invoked when the user tries to dismiss the bottom sheet.
  * @param modifier The [Modifier] to be applied to this bottom sheet.
  * @param sheetState The state of the bottom sheet.
  * @param sheetGesturesEnabled Controls whether the bottom sheet can be interacted with via
  * touch gestures.
+ *
+ * Asana Task: https://app.asana.com/1/137249556945/project/1202857801505092/task/1211659112661228
+ * Figma reference: https://www.figma.com/design/BOHDESHODUXK7wSRNBOHdu/%F0%9F%A4%96-Android-Components?node-id=6550-54079
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DaxPromoBottomSheetDialog(
     title: String?,
     description: String,
-    painter: Painter?,
+    promoIcon: Painter?,
     buttons: (@Composable RowScope.() -> Unit)?,
     onDismissRequest: () -> Unit,
     modifier: Modifier = Modifier,
     sheetState: SheetState = rememberModalBottomSheetState(),
     sheetGesturesEnabled: Boolean = true,
-) {
-    DaxPromoLayoutBottomSheetDialog(
-        content = {
-            if (title != null) {
-                DaxText(
-                    text = title,
-                    color = DuckDuckGoTheme.colors.text.primary,
-                    style = DuckDuckGoTheme.typography.h2,
-                )
-            }
-            DaxText(
-                text = description,
-                color = DuckDuckGoTheme.colors.text.primary,
-                style = DuckDuckGoTheme.typography.body1,
-            )
-        },
-        image = if (painter != null) {
-            {
-                Image(
-                    painter = painter,
-                    contentDescription = null,
-                    modifier = Modifier.size(size = DaxPromoBottomSheetDefaults.imageSize),
-                )
-            }
-        } else {
-            null
-        },
-        buttons = buttons,
-        onDismissRequest = onDismissRequest,
-        modifier = modifier,
-        sheetState = sheetState,
-        sheetGesturesEnabled = sheetGesturesEnabled,
-    )
-}
-
-/**
- * Dax Promo bottom sheet dialog layout for the DuckDuckGo design system that shows promotional content
- * anchored to the bottom of the screen.
- *
- * @param image The composable image to be displayed in the promo.
- * @param buttons The composable buttons to be displayed at the bottom of the promo.
- * @param onDismissRequest Callback invoked when the user tries to dismiss the bottom sheet.
- * @param modifier The [Modifier] to be applied to this bottom sheet.
- * @param sheetState The state of the bottom sheet.
- * @param sheetGesturesEnabled Controls whether the bottom sheet can be interacted with via
- * touch gestures.
- * @param content The content of the promo.
- */
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun DaxPromoLayoutBottomSheetDialog(
-    image: (@Composable () -> Unit)?,
-    buttons: (@Composable RowScope.() -> Unit)?,
-    onDismissRequest: () -> Unit,
-    modifier: Modifier = Modifier,
-    sheetState: SheetState = rememberModalBottomSheetState(),
-    sheetGesturesEnabled: Boolean = true,
-    content: @Composable ColumnScope.() -> Unit,
 ) {
     DaxBottomSheetDialog(
         onDismissRequest = onDismissRequest,
@@ -142,10 +86,29 @@ fun DaxPromoLayoutBottomSheetDialog(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.fillMaxWidth(),
                 ) {
-                    image?.invoke()
+                    if (promoIcon != null) {
+                        Image(
+                            painter = promoIcon,
+                            contentDescription = null,
+                            modifier = Modifier.size(size = DaxPromoBottomSheetDefaults.imageSize),
+                        )
+                    }
                     Column(
                         verticalArrangement = Arrangement.spacedBy(space = DaxPromoBottomSheetDefaults.contentSpacing),
-                        content = content,
+                        content = {
+                            if (title != null) {
+                                DaxText(
+                                    text = title,
+                                    color = DuckDuckGoTheme.colors.text.primary,
+                                    style = DuckDuckGoTheme.typography.h2,
+                                )
+                            }
+                            DaxText(
+                                text = description,
+                                color = DuckDuckGoTheme.colors.text.primary,
+                                style = DuckDuckGoTheme.typography.body1,
+                            )
+                        },
                     )
                 }
                 if (buttons != null) {
@@ -168,7 +131,7 @@ object DaxPromoBottomSheetDefaults {
     internal val sheetPadding = 24.dp
     internal val sheetVerticalGap = 16.dp
     internal val sheetHorizontalGap = 16.dp
-    internal val imageSize = 50.dp
+    internal val imageSize = 48.dp
     internal val contentSpacing = 8.dp
     internal val buttonSpacing = 8.dp
 }
@@ -186,7 +149,7 @@ private fun DaxPromoBottomSheetDialogPreview() {
             DaxPromoBottomSheetDialog(
                 title = "Title",
                 description = "Add our search widget to your home screen for quick access.",
-                painter = painterResource(R.drawable.ic_announce),
+                promoIcon = painterResource(R.drawable.ic_announce),
                 buttons = {
                     SmallGhostButton(text = "Button", onClick = {})
                     SmallPrimaryButton(text = "Button", onClick = {})
@@ -210,7 +173,7 @@ private fun DaxPromoBottomSheetDialogNoImagePreview() {
             DaxPromoBottomSheetDialog(
                 title = "Title",
                 description = "Add our search widget to your home screen for quick access.",
-                painter = null,
+                promoIcon = null,
                 buttons = {
                     SmallGhostButton(text = "Button", onClick = {})
                     SmallPrimaryButton(text = "Button", onClick = {})
@@ -234,7 +197,7 @@ private fun DaxPromoBottomSheetDialogNoImageAndTitlePreview() {
             DaxPromoBottomSheetDialog(
                 title = null,
                 description = "Add our search widget to your home screen for quick access.",
-                painter = null,
+                promoIcon = null,
                 buttons = {
                     SmallGhostButton(text = "Button", onClick = {})
                     SmallPrimaryButton(text = "Button", onClick = {})
@@ -258,7 +221,7 @@ private fun DaxPromoBottomSheetDialogNoButtonsPreview() {
             DaxPromoBottomSheetDialog(
                 title = "Title",
                 description = "Add our search widget to your home screen for quick access.",
-                painter = painterResource(R.drawable.ic_announce),
+                promoIcon = painterResource(R.drawable.ic_announce),
                 buttons = null,
                 onDismissRequest = {},
             )

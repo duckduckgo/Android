@@ -525,7 +525,7 @@ class DialogsFragment : Fragment() {
                             DaxPromoBottomSheetDialog(
                                 title = null,
                                 description = "Add our search widget to your home screen for quick, easy access.",
-                                painter = null,
+                                promoIcon = null,
                                 onDismissRequest = dismiss::invoke,
                                 buttons = {
                                     SmallGhostButton(text = "Button", onClick = dismiss::invoke)
@@ -581,7 +581,7 @@ class DialogsFragment : Fragment() {
                             DaxPromoBottomSheetDialog(
                                 title = "Title",
                                 description = "Add our search widget to your home screen for quick, easy access.",
-                                painter = null,
+                                promoIcon = null,
                                 onDismissRequest = dismiss::invoke,
                                 buttons = {
                                     SmallGhostButton(text = "Button", onClick = dismiss::invoke)
@@ -638,7 +638,7 @@ class DialogsFragment : Fragment() {
                             DaxPromoBottomSheetDialog(
                                 title = "Title",
                                 description = "Add our search widget to your home screen for quick, easy access.",
-                                painter = painterResource(CommonR.drawable.ic_bottom_sheet_promo_icon),
+                                promoIcon = painterResource(CommonR.drawable.ic_bottom_sheet_promo_icon),
                                 onDismissRequest = dismiss::invoke,
                                 buttons = {
                                     SmallGhostButton(text = "Button", onClick = dismiss::invoke)
