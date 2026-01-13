@@ -85,7 +85,7 @@ object DaxBottomSheetDefaults {
         get() = DuckDuckGoTheme.colors.text.primary
 
     val scrimColor: Color
-        @Composable get() = Black.copy(alpha = .68f)
+        @Composable get() = Black.copy(alpha = .6f)
 
     val shape = RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp)
 }
