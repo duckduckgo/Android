@@ -65,460 +65,102 @@ jobs:
 
       - name: Onboarding flows
         id: maestro-onboarding
-        uses: mobile-dev-inc/action-maestro-cloud@v1.9.8
+        uses: ./.github/actions/maestro-cloud-asana-reporter
         timeout-minutes: 120
         with:
-          api-key: ${{ secrets.ROBIN_API_KEY }}
-          project-id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
-          name: onboardingTest_${{ github.sha }}
-          timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
-          app-file: apk/release.apk
-          android-api-level: 30
-          workspace: .maestro
-          include-tags: onboardingTest
-
-      - name: Analyze Maestro Flow Results (Onboarding)
-        if: always()
-        id: analyze-maestro-onboarding
-        uses: ./.github/actions/maestro-flow-analyzer
-        with:
-          flow_results_json: ${{ steps.maestro-onboarding.outputs.MAESTRO_CLOUD_FLOW_RESULTS }}
-          console_url: ${{ steps.maestro-onboarding.outputs.MAESTRO_CLOUD_CONSOLE_URL }}
-          upload_status: ${{ steps.maestro-onboarding.outputs.MAESTRO_CLOUD_UPLOAD_STATUS }}
-          app_binary_id: ${{ steps.maestro-onboarding.outputs.MAESTRO_CLOUD_APP_BINARY_ID }}
-
-      - name: Create Asana task when Maestro tests failed
-        if: always() && steps.analyze-maestro-onboarding.outputs.flow_summary_status == 'failure'
-        id: create-maestro-onboarding-failure-task
-        uses: duckduckgo/native-github-asana-sync@v2.0
-        with:
-          asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          asana-project: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
-          asana-section: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
-          asana-task-name: E2E Tests Failure - Onboarding (Nightly)
-          asana-task-description: |
-            Run: https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
-            Console: ${{ steps.maestro-onboarding.outputs.MAESTRO_CLOUD_CONSOLE_URL }}
-            Summary:
-            ${{ steps.analyze-maestro-onboarding.outputs.flow_summary_message }}
-          action: 'create-asana-task'
-
-      - name: Adding as a release blocker
-        if: ${{ failure() && steps.create-maestro-onboarding-failure-task.outputs.taskId != '' }}
-        uses: duckduckgo/native-github-asana-sync@v2.0
-        with:
-          asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          asana-project: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_ID }}
-          asana-section: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_BLOCKER_SECTION_ID }}
-          asana-task-id: ${{ steps.create-maestro-onboarding-failure-task.outputs.taskId }}
-          action: 'add-task-asana-project'
+          maestro_test_name: onboardingTest_${{ github.sha }}
+          maestro_app_file: apk/release.apk
+          maestro_include_tags: onboardingTest
+          test_suite_name: Onboarding (Nightly)
+          is_release_blocker: 'true'
 
       - name: Deeplink tests
         id: maestro-deeplink
-        uses: mobile-dev-inc/action-maestro-cloud@v1.9.8
+        uses: ./.github/actions/maestro-cloud-asana-reporter
         timeout-minutes: 120
         with:
-          api-key: ${{ secrets.ROBIN_API_KEY }}
-          project-id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
-          name: navigationTest_${{ github.sha }}
-          timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
-          app-file: apk/release.apk
-          android-api-level: 30
-          workspace: .maestro
-          include-tags: navigationTest
-
-      - name: Analyze Maestro Flow Results (Deeplink)
-        if: always()
-        id: analyze-maestro-deeplink
-        uses: ./.github/actions/maestro-flow-analyzer
-        with:
-          flow_results_json: ${{ steps.maestro-deeplink.outputs.MAESTRO_CLOUD_FLOW_RESULTS }}
-          console_url: ${{ steps.maestro-deeplink.outputs.MAESTRO_CLOUD_CONSOLE_URL }}
-          upload_status: ${{ steps.maestro-deeplink.outputs.MAESTRO_CLOUD_UPLOAD_STATUS }}
-          app_binary_id: ${{ steps.maestro-deeplink.outputs.MAESTRO_CLOUD_APP_BINARY_ID }}
-
-      - name: Create Asana task when Maestro tests failed
-        if: always() && steps.analyze-maestro-deeplink.outputs.flow_summary_status == 'failure'
-        id: create-maestro-deeplink-failure-task
-        uses: duckduckgo/native-github-asana-sync@v2.0
-        with:
-          asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          asana-project: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
-          asana-section: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
-          asana-task-name: E2E Tests Failure - Deeplink (Nightly)
-          asana-task-description: |
-            Run: https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
-            Console: ${{ steps.maestro-deeplink.outputs.MAESTRO_CLOUD_CONSOLE_URL }}
-            Summary:
-            ${{ steps.analyze-maestro-deeplink.outputs.flow_summary_message }}
-          action: 'create-asana-task'
-
-      - name: Adding as a release blocker
-        if: ${{ failure() && steps.create-maestro-deeplink-failure-task.outputs.taskId != '' }}
-        uses: duckduckgo/native-github-asana-sync@v2.0
-        with:
-          asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          asana-project: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_ID }}
-          asana-section: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_BLOCKER_SECTION_ID }}
-          asana-task-id: ${{ steps.create-maestro-deeplink-failure-task.outputs.taskId }}
-          action: 'add-task-asana-project'
+          maestro_test_name: navigationTest_${{ github.sha }}
+          maestro_app_file: apk/release.apk
+          maestro_include_tags: navigationTest
+          test_suite_name: Deeplink (Nightly)
+          is_release_blocker: 'true'
 
       - name: Ad click detection flows
         id: maestro-ad-click
-        uses: mobile-dev-inc/action-maestro-cloud@v1.9.8
+        uses: ./.github/actions/maestro-cloud-asana-reporter
         timeout-minutes: 120
         with:
-          api-key: ${{ secrets.ROBIN_API_KEY }}
-          project-id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
-          name: adClickTest_${{ github.sha }}
-          timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
-          app-file: apk/release.apk
-          android-api-level: 30
-          workspace: .maestro
-          include-tags: adClickTest
-
-      - name: Analyze Maestro Flow Results (Ad Click)
-        if: always()
-        id: analyze-maestro-ad-click
-        uses: ./.github/actions/maestro-flow-analyzer
-        with:
-          flow_results_json: ${{ steps.maestro-ad-click.outputs.MAESTRO_CLOUD_FLOW_RESULTS }}
-          console_url: ${{ steps.maestro-ad-click.outputs.MAESTRO_CLOUD_CONSOLE_URL }}
-          upload_status: ${{ steps.maestro-ad-click.outputs.MAESTRO_CLOUD_UPLOAD_STATUS }}
-          app_binary_id: ${{ steps.maestro-ad-click.outputs.MAESTRO_CLOUD_APP_BINARY_ID }}
-
-      - name: Create Asana task when Maestro tests failed
-        if: always() && steps.analyze-maestro-ad-click.outputs.flow_summary_status == 'failure'
-        id: create-maestro-ad-click-failure-task
-        uses: duckduckgo/native-github-asana-sync@v2.0
-        with:
-          asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          asana-project: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
-          asana-section: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
-          asana-task-name: E2E Tests Failure - Ad Click (Nightly)
-          asana-task-description: |
-            Run: https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
-            Console: ${{ steps.maestro-ad-click.outputs.MAESTRO_CLOUD_CONSOLE_URL }}
-            Summary:
-            ${{ steps.analyze-maestro-ad-click.outputs.flow_summary_message }}
-          action: 'create-asana-task'
-
-      - name: Adding as a release blocker
-        if: ${{ failure() && steps.create-maestro-ad-click-failure-task.outputs.taskId != '' }}
-        uses: duckduckgo/native-github-asana-sync@v2.0
-        with:
-          asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          asana-project: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_ID }}
-          asana-section: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_BLOCKER_SECTION_ID }}
-          asana-task-id: ${{ steps.create-maestro-ad-click-failure-task.outputs.taskId }}
-          action: 'add-task-asana-project'
+          maestro_test_name: adClickTest_${{ github.sha }}
+          maestro_app_file: apk/release.apk
+          maestro_include_tags: adClickTest
+          test_suite_name: Ad Click (Nightly)
+          is_release_blocker: 'true'
 
       - name: Privacy Tests
-        if: always()
         id: maestro-privacy
-        uses: mobile-dev-inc/action-maestro-cloud@v1.9.8
+        uses: ./.github/actions/maestro-cloud-asana-reporter
         timeout-minutes: 120
         with:
-          api-key: ${{ secrets.ROBIN_API_KEY }}
-          project-id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
-          name: privacyTest_${{ github.sha }}
-          timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
-          app-file: apk/release.apk
-          android-api-level: 30
-          workspace: .maestro
-          include-tags: privacyTest
-
-      - name: Analyze Maestro Flow Results (Privacy)
-        if: always()
-        id: analyze-maestro-privacy
-        uses: ./.github/actions/maestro-flow-analyzer
-        with:
-          flow_results_json: ${{ steps.maestro-privacy.outputs.MAESTRO_CLOUD_FLOW_RESULTS }}
-          console_url: ${{ steps.maestro-privacy.outputs.MAESTRO_CLOUD_CONSOLE_URL }}
-          upload_status: ${{ steps.maestro-privacy.outputs.MAESTRO_CLOUD_UPLOAD_STATUS }}
-          app_binary_id: ${{ steps.maestro-privacy.outputs.MAESTRO_CLOUD_APP_BINARY_ID }}
-
-      - name: Create Asana task when Maestro tests failed
-        if: always() && steps.analyze-maestro-privacy.outputs.flow_summary_status == 'failure'
-        id: create-maestro-privacy-failure-task
-        uses: duckduckgo/native-github-asana-sync@v2.0
-        with:
-          asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          asana-project: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
-          asana-section: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
-          asana-task-name: E2E Tests Failure - Privacy (Nightly)
-          asana-task-description: |
-            Run: https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
-            Console: ${{ steps.maestro-privacy.outputs.MAESTRO_CLOUD_CONSOLE_URL }}
-            Summary:
-            ${{ steps.analyze-maestro-privacy.outputs.flow_summary_message }}
-          action: 'create-asana-task'
-
-      - name: Adding as a release blocker
-        if: ${{ failure() && steps.create-maestro-privacy-failure-task.outputs.taskId != '' }}
-        uses: duckduckgo/native-github-asana-sync@v2.0
-        with:
-          asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          asana-project: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_ID }}
-          asana-section: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_BLOCKER_SECTION_ID }}
-          asana-task-id: ${{ steps.create-maestro-privacy-failure-task.outputs.taskId }}
-          action: 'add-task-asana-project'
+          maestro_test_name: privacyTest_${{ github.sha }}
+          maestro_app_file: apk/release.apk
+          maestro_include_tags: privacyTest
+          test_suite_name: Privacy (Nightly)
+          is_release_blocker: 'true'
 
       - name: Internal Privacy Tests
-        if: always()
         id: maestro-internal-privacy
-        uses: mobile-dev-inc/action-maestro-cloud@v1.9.7
+        uses: ./.github/actions/maestro-cloud-asana-reporter
         timeout-minutes: 120
         with:
-          api-key: ${{ secrets.ROBIN_API_KEY }}
-          project-id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
-          name: internalPrivacyTest_${{ github.sha }}
-          timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
-          app-file: apk/internal.apk
-          android-api-level: 34
-          workspace: .maestro
-          include-tags: privacyTestInternal
-
-      - name: Analyze Maestro Flow Results (Internal Privacy)
-        if: always()
-        id: analyze-maestro-internal-privacy
-        uses: ./.github/actions/maestro-flow-analyzer
-        with:
-          flow_results_json: ${{ steps.maestro-internal-privacy.outputs.MAESTRO_CLOUD_FLOW_RESULTS }}
-          console_url: ${{ steps.maestro-internal-privacy.outputs.MAESTRO_CLOUD_CONSOLE_URL }}
-          upload_status: ${{ steps.maestro-internal-privacy.outputs.MAESTRO_CLOUD_UPLOAD_STATUS }}
-          app_binary_id: ${{ steps.maestro-internal-privacy.outputs.MAESTRO_CLOUD_APP_BINARY_ID }}
-
-      - name: Create Asana task when Maestro tests failed
-        if: always() && steps.analyze-maestro-internal-privacy.outputs.flow_summary_status == 'failure'
-        id: create-maestro-internal-privacy-failure-task
-        uses: duckduckgo/native-github-asana-sync@v2.0
-        with:
-          asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          asana-project: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
-          asana-section: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
-          asana-task-name: E2E Tests Failure - Internal Privacy (Nightly)
-          asana-task-description: |
-            Run: https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
-            Console: ${{ steps.maestro-internal-privacy.outputs.MAESTRO_CLOUD_CONSOLE_URL }}
-            Summary:
-            ${{ steps.analyze-maestro-internal-privacy.outputs.flow_summary_message }}
-          action: 'create-asana-task'
-
-      - name: Adding as a release blocker
-        if: ${{ failure() && steps.create-maestro-internal-privacy-failure-task.outputs.taskId != '' }}
-        uses: duckduckgo/native-github-asana-sync@v2.0
-        with:
-          asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          asana-project: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_ID }}
-          asana-section: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_BLOCKER_SECTION_ID }}
-          asana-task-id: ${{ steps.create-maestro-internal-privacy-failure-task.outputs.taskId }}
-          action: 'add-task-asana-project'
+          maestro_test_name: internalPrivacyTest_${{ github.sha }}
+          maestro_app_file: apk/internal.apk
+          maestro_include_tags: privacyTestInternal
+          test_suite_name: Internal Privacy (Nightly)
+          is_release_blocker: 'true'
 
       - name: Security Tests
-        if: always()
         id: maestro-security
-        uses: mobile-dev-inc/action-maestro-cloud@v1.9.8
+        uses: ./.github/actions/maestro-cloud-asana-reporter
         timeout-minutes: 120
         with:
-          api-key: ${{ secrets.ROBIN_API_KEY }}
-          project-id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
-          name: securityTest_${{ github.sha }}
-          timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
-          app-file: apk/release.apk
-          android-api-level: 30
-          workspace: .maestro
-          include-tags: securityTest
+          maestro_test_name: securityTest_${{ github.sha }}
+          maestro_app_file: apk/release.apk
+          maestro_include_tags: securityTest
+          test_suite_name: Security (Nightly)
+          is_release_blocker: 'true'
 
-      - name: Analyze Maestro Flow Results (Security)
-        if: always()
-        id: analyze-maestro-security
-        uses: ./.github/actions/maestro-flow-analyzer
-        with:
-          flow_results_json: ${{ steps.maestro-security.outputs.MAESTRO_CLOUD_FLOW_RESULTS }}
-          console_url: ${{ steps.maestro-security.outputs.MAESTRO_CLOUD_CONSOLE_URL }}
-          upload_status: ${{ steps.maestro-security.outputs.MAESTRO_CLOUD_UPLOAD_STATUS }}
-          app_binary_id: ${{ steps.maestro-security.outputs.MAESTRO_CLOUD_APP_BINARY_ID }}
-
-      - name: Create Asana task when Maestro tests failed
-        if: always() && steps.analyze-maestro-security.outputs.flow_summary_status == 'failure'
-        id: create-maestro-security-failure-task
-        uses: duckduckgo/native-github-asana-sync@v2.0
-        with:
-          asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          asana-project: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
-          asana-section: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
-          asana-task-name: E2E Tests Failure - Security (Nightly)
-          asana-task-description: |
-            Run: https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
-            Console: ${{ steps.maestro-security.outputs.MAESTRO_CLOUD_CONSOLE_URL }}
-            Summary:
-            ${{ steps.analyze-maestro-security.outputs.flow_summary_message }}
-          action: 'create-asana-task'
-
-      - name: Adding as a release blocker
-        if: ${{ failure() && steps.create-maestro-security-failure-task.outputs.taskId != '' }}
-        uses: duckduckgo/native-github-asana-sync@v2.0
-        with:
-          asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          asana-project: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_ID }}
-          asana-section: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_BLOCKER_SECTION_ID }}
-          asana-task-id: ${{ steps.create-maestro-security-failure-task.outputs.taskId }}
-          action: 'add-task-asana-project'
-
-      ## This workflow will be deleted once we close the https://app.asana.com/1/137249556945/project/1211724162604201/task/1212015085457815?focus=true task
       - name: Internal Security Tests
-        if: always()
         id: maestro-internal-security
-        uses: mobile-dev-inc/action-maestro-cloud@v1.9.8
+        uses: ./.github/actions/maestro-cloud-asana-reporter
         timeout-minutes: 120
         with:
-          api-key: ${{ secrets.ROBIN_API_KEY }}
-          project-id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
-          name: internalSecurityTest_${{ github.sha }}
-          timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
-          app-file: apk/internal.apk
-          android-api-level: 30
-          workspace: .maestro
-          include-tags: securityTestInternal
-
-      - name: Analyze Maestro Flow Results (Internal Security)
-        if: always()
-        id: analyze-maestro-internal-security
-        uses: ./.github/actions/maestro-flow-analyzer
-        with:
-          flow_results_json: ${{ steps.maestro-internal-security.outputs.MAESTRO_CLOUD_FLOW_RESULTS }}
-          console_url: ${{ steps.maestro-internal-security.outputs.MAESTRO_CLOUD_CONSOLE_URL }}
-          upload_status: ${{ steps.maestro-internal-security.outputs.MAESTRO_CLOUD_UPLOAD_STATUS }}
-          app_binary_id: ${{ steps.maestro-internal-security.outputs.MAESTRO_CLOUD_APP_BINARY_ID }}
-
-      - name: Create Asana task when Maestro tests failed
-        if: always() && steps.analyze-maestro-internal-security.outputs.flow_summary_status == 'failure'
-        id: create-maestro-internal-security-failure-task
-        uses: duckduckgo/native-github-asana-sync@v2.0
-        with:
-          asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          asana-project: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
-          asana-section: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
-          asana-task-name: E2E Tests Failure - Internal Security (Nightly)
-          asana-task-description: |
-            Run: https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
-            Console: ${{ steps.maestro-internal-security.outputs.MAESTRO_CLOUD_CONSOLE_URL }}
-            Summary:
-            ${{ steps.analyze-maestro-internal-security.outputs.flow_summary_message }}
-          action: 'create-asana-task'
-
-      - name: Adding as a release blocker
-        if: ${{ failure() && steps.create-maestro-internal-security-failure-task.outputs.taskId != '' }}
-        uses: duckduckgo/native-github-asana-sync@v2.0
-        with:
-          asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          asana-project: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_ID }}
-          asana-section: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_BLOCKER_SECTION_ID }}
-          asana-task-id: ${{ steps.create-maestro-internal-security-failure-task.outputs.taskId }}
-          action: 'add-task-asana-project'
+          maestro_test_name: internalSecurityTest_${{ github.sha }}
+          maestro_app_file: apk/internal.apk
+          maestro_include_tags: securityTestInternal
+          test_suite_name: Internal Security (Nightly)
+          is_release_blocker: 'true'
 
       - name: Release Tests
-        if: always()
         id: maestro-release
-        uses: mobile-dev-inc/action-maestro-cloud@v1.9.8
+        uses: ./.github/actions/maestro-cloud-asana-reporter
         timeout-minutes: 120
         with:
-          api-key: ${{ secrets.ROBIN_API_KEY }}
-          project-id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
-          name: releaseTest_${{ github.sha }}
-          timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
-          app-file: apk/release.apk
-          android-api-level: 30
-          workspace: .maestro
-          include-tags: releaseTest
-
-      - name: Analyze Maestro Flow Results (Release Tests)
-        if: always()
-        id: analyze-maestro-release
-        uses: ./.github/actions/maestro-flow-analyzer
-        with:
-          flow_results_json: ${{ steps.maestro-release.outputs.MAESTRO_CLOUD_FLOW_RESULTS }}
-          console_url: ${{ steps.maestro-release.outputs.MAESTRO_CLOUD_CONSOLE_URL }}
-          upload_status: ${{ steps.maestro-release.outputs.MAESTRO_CLOUD_UPLOAD_STATUS }}
-          app_binary_id: ${{ steps.maestro-release.outputs.MAESTRO_CLOUD_APP_BINARY_ID }}
-
-      - name: Create Asana task when Maestro tests failed
-        if: always() && steps.analyze-maestro-release.outputs.flow_summary_status == 'failure'
-        id: create-maestro-release-tests-failure-task
-        uses: duckduckgo/native-github-asana-sync@v2.0
-        with:
-          asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          asana-project: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
-          asana-section: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
-          asana-task-name: E2E Tests Failure - Release Tests (Nightly)
-          asana-task-description: |
-            Run: https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
-            Console: ${{ steps.maestro-release.outputs.MAESTRO_CLOUD_CONSOLE_URL }}
-            Summary:
-            ${{ steps.analyze-maestro-release.outputs.flow_summary_message }}
-          action: 'create-asana-task'
-
-      - name: Adding as a release blocker
-        if: ${{ failure() && steps.create-maestro-release-tests-failure-task.outputs.taskId != '' }}
-        uses: duckduckgo/native-github-asana-sync@v2.0
-        with:
-          asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          asana-project: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_ID }}
-          asana-section: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_BLOCKER_SECTION_ID }}
-          asana-task-id: ${{ steps.create-maestro-release-tests-failure-task.outputs.taskId }}
-          action: 'add-task-asana-project'
+          maestro_test_name: releaseTest_${{ github.sha }}
+          maestro_app_file: apk/release.apk
+          maestro_include_tags: releaseTest
+          test_suite_name: Release Tests (Nightly)
+          is_release_blocker: 'true'
 
       - name: Notifications permissions Android 13+
-        if: always()
         id: maestro-notification-permissions
-        uses: mobile-dev-inc/action-maestro-cloud@v1.9.8
+        uses: ./.github/actions/maestro-cloud-asana-reporter
         timeout-minutes: 120
         with:
-          api-key: ${{ secrets.ROBIN_API_KEY }}
-          project-id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
-          name: notificationPermissionTest_${{ github.sha }}
-          timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
-          app-file: apk/release.apk
-          android-api-level: 33
-          workspace: .maestro
-          include-tags: permissionsTest
-
-      - name: Analyze Maestro Flow Results (Notification Permissions)
-        if: always()
-        id: analyze-maestro-notification-permissions
-        uses: ./.github/actions/maestro-flow-analyzer
-        with:
-          flow_results_json: ${{ steps.maestro-notification-permissions.outputs.MAESTRO_CLOUD_FLOW_RESULTS }}
-          console_url: ${{ steps.maestro-notification-permissions.outputs.MAESTRO_CLOUD_CONSOLE_URL }}
-          upload_status: ${{ steps.maestro-notification-permissions.outputs.MAESTRO_CLOUD_UPLOAD_STATUS }}
-          app_binary_id: ${{ steps.maestro-notification-permissions.outputs.MAESTRO_CLOUD_APP_BINARY_ID }}
-
-      - name: Create Asana task when Maestro tests failed
-        if: always() && steps.analyze-maestro-notification-permissions.outputs.flow_summary_status == 'failure'
-        id: create-maestro-notification-permissions-tests-failure-task
-        uses: duckduckgo/native-github-asana-sync@v2.0
-        with:
-          asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          asana-project: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
-          asana-section: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
-          asana-task-name: E2E Tests Failure - Notification Permissions (Nightly)
-          asana-task-description: |
-            Run: https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
-            Console: ${{ steps.maestro-notification-permissions.outputs.MAESTRO_CLOUD_CONSOLE_URL }}
-            Summary:
-            ${{ steps.analyze-maestro-notification-permissions.outputs.flow_summary_message }}
-          action: 'create-asana-task'
-
-      - name: Adding as a release blocker
-        if: ${{ failure() && steps.create-maestro-notification-permissions-tests-failure-task.outputs.taskId != '' }}
-        uses: duckduckgo/native-github-asana-sync@v2.0
-        with:
-          asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          asana-project: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_ID }}
-          asana-section: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_BLOCKER_SECTION_ID }}
-          asana-task-id: ${{ steps.create-maestro-notification-permissions-tests-failure-task.outputs.taskId }}
-          action: 'add-task-asana-project'
+          maestro_test_name: notificationPermissionTest_${{ github.sha }}
+          maestro_app_file: apk/release.apk
+          maestro_include_tags: permissionsTest
+          test_suite_name: Notification Permissions (Nightly)
+          is_release_blocker: 'true'
 
       - name: Create Asana task when workflow failed
         if: ${{ failure() }}

@@ -59,90 +59,22 @@ jobs:
         if: always()
         run: find . -name "*.apk"  -exec mv '{}' apk/release.apk \;
 
-      - name: Ad click detection flows
+      - name: Run Ad Click Maestro Tests
         id: maestro-ad-click
-        uses: mobile-dev-inc/action-maestro-cloud@v1.9.8
+        uses: ./.github/actions/maestro-cloud-asana-reporter
         timeout-minutes: 120
         with:
-          api-key: ${{ secrets.ROBIN_API_KEY }}
-          project-id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
-          name: privacyDashboard_adClickTest_${{ github.sha }}
-          timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
-          app-file: apk/release.apk
-          android-api-level: 30
-          workspace: .maestro
-          include-tags: adClickTest
+          maestro_test_name: privacyDashboard_adClickTest_${{ github.sha }}
+          maestro_app_file: apk/release.apk
+          maestro_include_tags: adClickTest
+          test_suite_name: Ad Click (Privacy Dashboard)
 
-      - name: Analyze Maestro Flow Results (Ad Click)
-        if: always()
-        id: analyze-maestro-ad-click
-        uses: ./.github/actions/maestro-flow-analyzer
-        with:
-          flow_results_json: ${{ steps.maestro-ad-click.outputs.MAESTRO_CLOUD_FLOW_RESULTS }}
-          console_url: ${{ steps.maestro-ad-click.outputs.MAESTRO_CLOUD_CONSOLE_URL }}
-          upload_status: ${{ steps.maestro-ad-click.outputs.MAESTRO_CLOUD_UPLOAD_STATUS }}
-          app_binary_id: ${{ steps.maestro-ad-click.outputs.MAESTRO_CLOUD_APP_BINARY_ID }}
-
-      - name: Show analyzer output
-        if: always()
-        run: echo "flow_summary_status=${{ steps.analyze-maestro-ad-click.outputs.flow_summary_status }}"
-
-      - name: Create Asana task when Maestro tests failed (Ad Click)
-        if: always() && steps.analyze-maestro-ad-click.outputs.flow_summary_status == 'failure'
-        id: create-maestro-ad-click-failure-task
-        uses: duckduckgo/native-github-asana-sync@v2.0
-        with:
-          asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          asana-project: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
-          asana-section: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
-          asana-task-name: E2E Tests Failure - Ad Click (Privacy Dashboard)
-          asana-task-description: |
-            Run: https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
-            Console: ${{ steps.maestro-ad-click.outputs.MAESTRO_CLOUD_CONSOLE_URL }}
-            Summary:
-            ${{ steps.analyze-maestro-ad-click.outputs.flow_summary_message }}
-          action: 'create-asana-task'
-
-      - name: Privacy Tests
-        if: always()
+      - name: Run Privacy Maestro Tests
         id: maestro-privacy-tests
-        uses: mobile-dev-inc/action-maestro-cloud@v1.9.8
+        uses: ./.github/actions/maestro-cloud-asana-reporter
         timeout-minutes: 120
         with:
-          api-key: ${{ secrets.ROBIN_API_KEY }}
-          project-id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
-          name: privacyDashboard_privacyTest_${{ github.sha }}
-          timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
-          app-file: apk/release.apk
-          workspace: .maestro
-          include-tags: privacyTest
-
-      - name: Analyze Maestro Flow Results (Privacy Tests)
-        if: always()
-        id: analyze-maestro-privacy-tests
-        uses: ./.github/actions/maestro-flow-analyzer
-        with:
-          flow_results_json: ${{ steps.maestro-privacy-tests.outputs.MAESTRO_CLOUD_FLOW_RESULTS }}
-          console_url: ${{ steps.maestro-privacy-tests.outputs.MAESTRO_CLOUD_CONSOLE_URL }}
-          upload_status: ${{ steps.maestro-privacy-tests.outputs.MAESTRO_CLOUD_UPLOAD_STATUS }}
-          app_binary_id: ${{ steps.maestro-privacy-tests.outputs.MAESTRO_CLOUD_APP_BINARY_ID }}
-
-      - name: Show analyzer output
-        if: always()
-        run: echo "flow_summary_status=${{ steps.analyze-maestro-privacy-tests.outputs.flow_summary_status }}"
-
-      - name: Create Asana task when Maestro tests failed (Privacy Tests)
-        if: always() && steps.analyze-maestro-privacy-tests.outputs.flow_summary_status == 'failure'
-        id: create-maestro-privacy-tests-failure-task
-        uses: duckduckgo/native-github-asana-sync@v2.0
-        with:
-          asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          asana-project: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
-          asana-section: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
-          asana-task-name: E2E Tests Failure - Privacy Tests (Privacy Dashboard)
-          asana-task-description: |
-            Run: https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
-            Console: ${{ steps.maestro-privacy-tests.outputs.MAESTRO_CLOUD_CONSOLE_URL }}
-            Summary:
-            ${{ steps.analyze-maestro-privacy-tests.outputs.flow_summary_message }}
-          action: 'create-asana-task'
+          maestro_test_name: privacyDashboard_privacyTest_${{ github.sha }}
+          maestro_app_file: apk/release.apk
+          maestro_include_tags: privacyTest
+          test_suite_name: Privacy Tests (Privacy Dashboard)

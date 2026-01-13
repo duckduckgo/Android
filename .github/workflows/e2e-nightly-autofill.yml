@@ -56,96 +56,28 @@ jobs:
         if: always()
         run: find . -name "*.apk"  -exec mv '{}' apk/release.apk \;
 
-      - name: Autofill Critical Path E2E Flows
+      - name: Run Autofill Critical Path E2E Flows
         id: maestro-critical-path
-        uses: mobile-dev-inc/action-maestro-cloud@v1.9.8
+        uses: ./.github/actions/maestro-cloud-asana-reporter
         timeout-minutes: 120
         with:
-          api-key: ${{ secrets.ROBIN_API_KEY }}
-          project-id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
-          name: autofill_critical_path_${{ github.sha }}
-          timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
-          app-file: apk/release.apk
-          android-api-level: 34
-          workspace: .maestro
-          include-tags: autofillNoAuthTests
+          maestro_test_name: autofill_critical_path_${{ github.sha }}
+          maestro_app_file: apk/release.apk
+          maestro_include_tags: autofillNoAuthTests
+          test_suite_name: Autofill Critical Path
 
-      - name: Analyze Maestro Flow Results (Critical Path)
-        if: always()
-        id: analyze-maestro-critical-path
-        uses: ./.github/actions/maestro-flow-analyzer
-        with:
-          flow_results_json: ${{ steps.maestro-critical-path.outputs.MAESTRO_CLOUD_FLOW_RESULTS }}
-          console_url: ${{ steps.maestro-critical-path.outputs.MAESTRO_CLOUD_CONSOLE_URL }}
-          upload_status: ${{ steps.maestro-critical-path.outputs.MAESTRO_CLOUD_UPLOAD_STATUS }}
-          app_binary_id: ${{ steps.maestro-critical-path.outputs.MAESTRO_CLOUD_APP_BINARY_ID }}
-
-      - name: Show analyzer output
-        if: always()
-        run: echo "flow_summary_status=${{ steps.analyze-maestro-critical-path.outputs.flow_summary_status }}"
-
-      - name: Create Asana task when Maestro tests failed (Critical Path)
-        if: always() && steps.analyze-maestro-critical-path.outputs.flow_summary_status == 'failure'
-        id: create-maestro-critical-failure-task
-        uses: duckduckgo/native-github-asana-sync@v2.0
-        with:
-          asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          asana-project: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
-          asana-section: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
-          asana-task-name: E2E Tests Failure - Autofill Critical Path
-          asana-task-description: |
-            Run: https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
-            Console: ${{ steps.maestro-critical-path.outputs.MAESTRO_CLOUD_CONSOLE_URL }}
-            Summary:
-            ${{ steps.analyze-maestro-critical-path.outputs.flow_summary_message }}
-          action: 'create-asana-task'
-
-      - name: Autofill web flows
+      - name: Run Autofill Web Flows
         id: maestro-web-flows
-        uses: mobile-dev-inc/action-maestro-cloud@v1.9.8
+        uses: ./.github/actions/maestro-cloud-asana-reporter
         timeout-minutes: 120
         with:
-          api-key: ${{ secrets.ROBIN_API_KEY }}
-          project-id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
-          name: autofill_secondary_functionality_${{ github.sha }}
-          timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
-          app-file: apk/release.apk
-          android-api-level: 34
-          workspace: .maestro
-          include-tags: autofillBackfillingUsername,autofillPasswordGeneration
-
-      - name: Analyze Maestro Flow Results (Web Flows)
-        if: always()
-        id: analyze-maestro-web-flows
-        uses: ./.github/actions/maestro-flow-analyzer
-        with:
-          flow_results_json: ${{ steps.maestro-web-flows.outputs.MAESTRO_CLOUD_FLOW_RESULTS }}
-          console_url: ${{ steps.maestro-web-flows.outputs.MAESTRO_CLOUD_CONSOLE_URL }}
-          upload_status: ${{ steps.maestro-web-flows.outputs.MAESTRO_CLOUD_UPLOAD_STATUS }}
-          app_binary_id: ${{ steps.maestro-web-flows.outputs.MAESTRO_CLOUD_APP_BINARY_ID }}
-
-      - name: Show analyzer output
-        if: always()
-        run: echo "flow_summary_status=${{ steps.analyze-maestro-web-flows.outputs.flow_summary_status }}"
-
-      - name: Create Asana task when Maestro tests failed (Web Flows)
-        if: always() && steps.analyze-maestro-web-flows.outputs.flow_summary_status == 'failure'
-        id: create-maestro-web-failure-task
-        uses: duckduckgo/native-github-asana-sync@v2.0
-        with:
-          asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          asana-project: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
-          asana-section: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
-          asana-task-name: E2E Tests Failure - Autofill Web Flows
-          asana-task-description: |
-            Run: https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
-            Console: ${{ steps.maestro-web-flows.outputs.MAESTRO_CLOUD_CONSOLE_URL }}
-            Summary:
-            ${{ steps.analyze-maestro-web-flows.outputs.flow_summary_message }}
-          action: 'create-asana-task'
+          maestro_test_name: autofill_secondary_functionality_${{ github.sha }}
+          maestro_app_file: apk/release.apk
+          maestro_include_tags: autofillBackfillingUsername,autofillPasswordGeneration
+          test_suite_name: Autofill Web Flows
 
       - name: Create Asana task when workflow failed
-        if: ${{ failure() && steps.analyze-maestro-critical-path.outputs.flow_summary_status != 'failure' && steps.analyze-maestro-web-flows.outputs.flow_summary_status != 'failure' }}
+        if: ${{ failure() && steps.maestro-critical-path.outputs.flow_summary_status != 'failure' && steps.maestro-web-flows.outputs.flow_summary_status != 'failure' }}
         id: create-failure-task
         uses: duckduckgo/native-github-asana-sync@v2.0
         with:

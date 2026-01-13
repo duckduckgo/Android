@@ -56,58 +56,18 @@ jobs:
         if: always()
         run: find . -name "*.apk"  -exec mv '{}' apk/release.apk \;
 
-      - name: Custom Tabs Flows
-        id: maestro-run
-        uses: mobile-dev-inc/action-maestro-cloud@v1.9.8
+      - name: Run Custom Tabs Maestro Tests
+        id: maestro-cloud-asana
+        uses: ./.github/actions/maestro-cloud-asana-reporter
         timeout-minutes: 120
         with:
-          api-key: ${{ secrets.ROBIN_API_KEY }}
-          project-id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
-          name: customTabs_${{ github.sha }}
-          timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
-          app-file: apk/release.apk
-          android-api-level: 30
-          workspace: .maestro
-          include-tags: customTabsTest
-
-      - name: Analyze Maestro Flow Results
-        if: always()
-        id: analyze-maestro
-        uses: ./.github/actions/maestro-flow-analyzer
-        with:
-          flow_results_json: ${{ steps.maestro-run.outputs.MAESTRO_CLOUD_FLOW_RESULTS }}
-          console_url: ${{ steps.maestro-run.outputs.MAESTRO_CLOUD_CONSOLE_URL }}
-          upload_status: ${{ steps.maestro-run.outputs.MAESTRO_CLOUD_UPLOAD_STATUS }}
-          app_binary_id: ${{ steps.maestro-run.outputs.MAESTRO_CLOUD_APP_BINARY_ID }}
-
-      - name: Create Asana task when Maestro tests failed
-        if: always() && steps.analyze-maestro.outputs.flow_summary_status == 'failure'
-        id: create-maestro-failure-task
-        uses: duckduckgo/native-github-asana-sync@v2.0
-        with:
-          asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          asana-project: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
-          asana-section: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
-          asana-task-name: E2E Tests Failure - Custom Tabs
-          asana-task-description: |
-            Run: https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
-            Console: ${{ steps.maestro-run.outputs.MAESTRO_CLOUD_CONSOLE_URL }}
-            Summary:
-            ${{ steps.analyze-maestro.outputs.flow_summary_message }}
-          action: 'create-asana-task'
-
-      - name: Adding as a release blocker
-        if: ${{ failure() && steps.create-maestro-failure-task.outputs.taskId != '' }}
-        uses: duckduckgo/native-github-asana-sync@v2.0
-        with:
-          asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          asana-project: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_ID }}
-          asana-section: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_BLOCKER_SECTION_ID }}
-          asana-task-id: ${{ steps.create-maestro-failure-task.outputs.taskId }}
-          action: 'add-task-asana-project'
+          maestro_test_name: customTabs_${{ github.sha }}
+          maestro_app_file: apk/release.apk
+          maestro_include_tags: customTabsTest
+          test_suite_name: Custom Tabs
 
       - name: Create Asana task when workflow failed
-        if: ${{ failure() && steps.analyze-maestro.outputs.flow_summary_status != 'failure' }}
+        if: ${{ failure() && steps.maestro-cloud-asana.outputs.flow_summary_status != 'failure' }}
         id: create-failure-task
         uses: duckduckgo/native-github-asana-sync@v2.0
         with:
@@ -117,13 +77,3 @@ jobs:
           asana-task-name: GH Workflow Failure - Custom Tabs End to End Tests (Nightly)
           asana-task-description: Workflow execution has failed. See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
           action: 'create-asana-task'
-
-      - name: Adding as a release blocker
-        if: ${{ failure() && steps.create-failure-task.outputs.taskId != '' }}
-        uses: duckduckgo/native-github-asana-sync@v2.0
-        with:
-          asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          asana-project: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_ID }}
-          asana-section: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_BLOCKER_SECTION_ID }}
-          asana-task-id: ${{ steps.create-failure-task.outputs.taskId }}
-          action: 'add-task-asana-project'
