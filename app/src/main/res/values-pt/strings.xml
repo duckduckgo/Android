@@ -212,6 +212,37 @@
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Botão de proteção</string>
     <string name="dataClearingActivityTitle">Limpeza de Dados</string>
+    <string name="dataClearingDescription">Eliminar os teus dados pode ajudar a proteger a tua privacidade online. Utiliza o Fire Button para limpar dados manualmente ou configura a limpeza automática.</string>
+    <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
+        <item quantity="one">%1$d site excluído da limpeza</item>
+        <item quantity="other">%1$d sites excluídos da limpeza</item>
+    </plurals>
+    <string name="dataClearingAutomaticClearingOn">Ligado</string>
+    <string name="dataClearingAutomaticClearingOff">Desligado</string>
+    <string name="dataClearingClearBrowsingData">Limpar dados de navegação</string>
+    <string name="dataClearingAutomaticDataClearing">Limpeza automática de dados</string>
+    <string name="dataClearingAutomaticallyClearDataToggle">Limpar os dados automaticamente</string>
+    <string name="dataClearingAutomaticTabsOptionDescription">Fechar todos os separadores abertos</string>
+    <string name="dataClearingAutomaticDataOptionDescription">Eliminar todos os dados do site, incluindo sites visitados. Pode terminar a tua sessão nas contas.</string>
+    <string name="dataClearingAutomaticChatsOptionDescription">Eliminar todos os chats, incluindo os fixados</string>
+
+    <!-- Fire Dialog Granular Options -->
+    <string name="fireDialogTitle">Escolhe o que apagar</string>
+    <string name="dataClearingOptionTabs">Separadores</string>
+    <string name="dataClearingOptionData">Cookies e dados de sites</string>
+    <string name="dataClearingDuckAiChats">Chats Duck.ai</string>
+    <string name="fireDialogOptionDuckAiChatsDescription">Eliminar todas as conversas</string>
+    <string name="fireDialogDeleteButton">Eliminar</string>
+    <plurals name="fireDialogOptionTabsDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Fechar separador</item>
+        <item quantity="other">Fechar os %1$d separadores</item>
+    </plurals>
+    <string name="fireDialogOptionDataDescriptionNoHistory">Pode terminar a tua sessão nas contas.</string>
+    <string name="fireDialogOptionDescriptionNothingToDelete">Nenhum</string>
+    <plurals name="fireDialogOptionDataDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Eliminar de 1 site. Podes terminar a tua sessão nas contas.</item>
+        <item quantity="other">Eliminar de %1$d sites. Podes terminar a tua sessão nas contas.</item>
+    </plurals>
 
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Permissões</string>

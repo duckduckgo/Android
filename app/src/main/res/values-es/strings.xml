@@ -212,6 +212,37 @@
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Fire Button</string>
     <string name="dataClearingActivityTitle">Eliminación de datos</string>
+    <string name="dataClearingDescription">Eliminar tus datos puede ayudar a proteger tu privacidad en línea. Usa el Fire Button para borrar los datos manualmente o configura el borrado automático.</string>
+    <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
+        <item quantity="one">%1$d sitio excluido de la limpieza</item>
+        <item quantity="other">%1$d sitios excluidos de la limpieza</item>
+    </plurals>
+    <string name="dataClearingAutomaticClearingOn">Activado</string>
+    <string name="dataClearingAutomaticClearingOff">Desactivado</string>
+    <string name="dataClearingClearBrowsingData">Borrar datos de navegación</string>
+    <string name="dataClearingAutomaticDataClearing">Borrado automático de datos</string>
+    <string name="dataClearingAutomaticallyClearDataToggle">Borrar datos automáticamente</string>
+    <string name="dataClearingAutomaticTabsOptionDescription">Cierra todas las pestañas</string>
+    <string name="dataClearingAutomaticDataOptionDescription">Elimina todos los datos del sitio, incluidos los sitios visitados. Puede que cierre sesión en tus cuentas.</string>
+    <string name="dataClearingAutomaticChatsOptionDescription">Elimina todos los chats, incluidos los chats fijados</string>
+
+    <!-- Fire Dialog Granular Options -->
+    <string name="fireDialogTitle">Elige qué eliminar</string>
+    <string name="dataClearingOptionTabs">Pestañas</string>
+    <string name="dataClearingOptionData">Cookies y datos del sitio</string>
+    <string name="dataClearingDuckAiChats">Chats de Duck.ai</string>
+    <string name="fireDialogOptionDuckAiChatsDescription">Eliminar todos los chats</string>
+    <string name="fireDialogDeleteButton">Eliminar</string>
+    <plurals name="fireDialogOptionTabsDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Cerrar pestaña</item>
+        <item quantity="other">Cerrar todas las %1$d pestañas</item>
+    </plurals>
+    <string name="fireDialogOptionDataDescriptionNoHistory">Puede que cierre sesión en tus cuentas.</string>
+    <string name="fireDialogOptionDescriptionNothingToDelete">Ninguna</string>
+    <plurals name="fireDialogOptionDataDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Eliminar de 1 sitio. Puede que cierre sesión en tus cuentas.</item>
+        <item quantity="other">Eliminar de %1$d sitios. Puede que cierre sesión en tus cuentas.</item>
+    </plurals>
 
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Permisos</string>

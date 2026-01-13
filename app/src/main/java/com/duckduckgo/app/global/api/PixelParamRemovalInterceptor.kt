@@ -17,6 +17,7 @@
 package com.duckduckgo.app.global.api
 
 import com.duckduckgo.app.browser.WebViewPixelName
+import com.duckduckgo.app.browser.customtabs.CustomTabPixelNames
 import com.duckduckgo.app.browser.httperrors.HttpErrorPixelName
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.SITE_NOT_WORKING_SHOWN
@@ -147,6 +148,11 @@ object PixelInterceptorPixelsRequiringDataCleaning : PixelParamRemovalPlugin {
             NewTabPixelNames.PRODUCT_SURFACE_TELEMETRY_NEW_TAB_DISPLAYED_DAILY.pixelName to PixelParameter.removeAtb(),
             SavedSitesPixelName.PRODUCT_TELEMETRY_SURFACE_BOOKMARKS_OPENED.pixelName to PixelParameter.removeAtb(),
             SavedSitesPixelName.PRODUCT_TELEMETRY_SURFACE_BOOKMARKS_OPENED_DAILY.pixelName to PixelParameter.removeAtb(),
+            CustomTabPixelNames.CUSTOM_TABS_ADDRESS_BAR_CLICKED.pixelName to PixelParameter.removeAtb(),
+            CustomTabPixelNames.CUSTOM_TABS_ADDRESS_BAR_CLICKED_DAILY.pixelName to PixelParameter.removeAtb(),
+            CustomTabPixelNames.CUSTOM_TABS_DAX_CLICKED.pixelName to PixelParameter.removeAtb(),
+            CustomTabPixelNames.CUSTOM_TABS_DAX_CLICKED_DAILY.pixelName to PixelParameter.removeAtb(),
+            AppPixelName.FIRE_DIALOG_SHOWN.pixelName to PixelParameter.removeAtb(),
         )
     }
 }

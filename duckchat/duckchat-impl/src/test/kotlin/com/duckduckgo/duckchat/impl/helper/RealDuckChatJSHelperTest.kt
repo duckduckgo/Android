@@ -31,6 +31,8 @@ import com.duckduckgo.duckchat.impl.metric.DuckAiMetricCollector
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatDataStore
 import com.duckduckgo.js.messaging.api.JsCallbackData
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
@@ -39,11 +41,13 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
+@OptIn(ExperimentalCoroutinesApi::class)
 class RealDuckChatJSHelperTest {
 
     @get:Rule
@@ -59,6 +63,8 @@ class RealDuckChatJSHelperTest {
         dataStore = mockDataStore,
         duckChatPixels = mockDuckChatPixels,
         duckAiMetricCollector = mockDuckAiMetricCollector,
+        appCoroutineScope = coroutineRule.testScope,
+        dispatcherProvider = coroutineRule.testDispatcherProvider,
     )
 
     @Test
@@ -188,6 +194,7 @@ class RealDuckChatJSHelperTest {
             put("supportsImageUpload", false)
             put("supportsStandaloneMigration", false)
             put("supportsAIChatFullMode", false)
+            put("supportsAIChatSync", false)
         }
 
         val expected = JsCallbackData(jsonPayload, featureName, method, id)
@@ -219,6 +226,7 @@ class RealDuckChatJSHelperTest {
             put("supportsImageUpload", false)
             put("supportsStandaloneMigration", false)
             put("supportsAIChatFullMode", false)
+            put("supportsAIChatSync", false)
         }
 
         val expected = JsCallbackData(jsonPayload, featureName, method, id)
@@ -250,6 +258,7 @@ class RealDuckChatJSHelperTest {
             put("supportsImageUpload", false)
             put("supportsStandaloneMigration", false)
             put("supportsAIChatFullMode", true)
+            put("supportsAIChatSync", false)
         }
 
         val expected = JsCallbackData(jsonPayload, featureName, method, id)
@@ -280,6 +289,7 @@ class RealDuckChatJSHelperTest {
             put("supportsImageUpload", false)
             put("supportsStandaloneMigration", true)
             put("supportsAIChatFullMode", false)
+            put("supportsAIChatSync", false)
         }
 
         val expected = JsCallbackData(jsonPayload, featureName, method, id)
@@ -444,6 +454,35 @@ class RealDuckChatJSHelperTest {
             put("supportsImageUpload", true)
             put("supportsStandaloneMigration", false)
             put("supportsAIChatFullMode", false)
+            put("supportsAIChatSync", false)
+        }
+
+        assertEquals(expectedPayload.toString(), result!!.params.toString())
+    }
+
+    @Test
+    fun whenGetAIChatNativeConfigValuesAndChatSyncEnabledThenReturnJsCallbackDataWithSupportsAIChatSyncEnabled() = runTest {
+        val featureName = "aiChat"
+        val method = "getAIChatNativeConfigValues"
+        val id = "123"
+
+        whenever(mockDuckChat.isDuckChatFeatureEnabled()).thenReturn(true)
+        whenever(mockDuckChat.isDuckChatFullScreenModeEnabled()).thenReturn(false)
+        whenever(mockDuckChat.isChatSyncFeatureEnabled()).thenReturn(true)
+
+        val result = testee.processJsCallbackMessage(featureName, method, id, null)
+
+        val expectedPayload = JSONObject().apply {
+            put("platform", "android")
+            put("isAIChatHandoffEnabled", true)
+            put("supportsClosingAIChat", true)
+            put("supportsOpeningSettings", true)
+            put("supportsNativeChatInput", false)
+            put("supportsURLChatIDRestoration", false)
+            put("supportsImageUpload", false)
+            put("supportsStandaloneMigration", false)
+            put("supportsAIChatFullMode", false)
+            put("supportsAIChatSync", true)
         }
 
         assertEquals(expectedPayload.toString(), result!!.params.toString())
@@ -574,5 +613,32 @@ class RealDuckChatJSHelperTest {
 
         assertEquals("submitOpenSettingsAction", result.subscriptionName)
         assertEquals(DUCK_CHAT_FEATURE_NAME, result.featureName)
+    }
+
+    @Test
+    fun whenGetAIChatNativeHandoffDataThenReportOpenIsCalled() = runTest {
+        val featureName = "aiChat"
+        val method = "getAIChatNativeHandoffData"
+
+        testee.processJsCallbackMessage(featureName, method, null, null)
+
+        coroutineRule.testScope.testScheduler.advanceTimeBy(500)
+        coroutineRule.testScope.advanceUntilIdle()
+
+        verify(mockDuckChatPixels, times(1)).reportOpen()
+    }
+
+    @Test
+    fun whenGetAIChatNativeHandoffDataCalledTwiceThenReportOpenIsCalledOnlyOnce() = runTest {
+        val featureName = "aiChat"
+        val method = "getAIChatNativeHandoffData"
+
+        testee.processJsCallbackMessage(featureName, method, null, null)
+        testee.processJsCallbackMessage(featureName, method, null, null)
+
+        coroutineRule.testScope.testScheduler.advanceTimeBy(500)
+        coroutineRule.testScope.advanceUntilIdle()
+
+        verify(mockDuckChatPixels, times(1)).reportOpen()
     }
 }

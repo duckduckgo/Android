@@ -27,6 +27,7 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.navigation.api.getActivityParams
 import com.duckduckgo.pir.impl.optout.PirOptOut
+import com.duckduckgo.pir.impl.scan.PirScan
 import com.duckduckgo.pir.internal.databinding.ActivityPirInternalWebviewBinding
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -40,6 +41,9 @@ class PirDevWebViewActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var dispatcherProvider: DispatcherProvider
 
+    @Inject
+    lateinit var pirScan: PirScan
+
     private val binding: ActivityPirInternalWebviewBinding by viewBinding()
     private val params: PirDevWebViewResultsScreenParams?
         get() = intent.getActivityParams(PirDevWebViewResultsScreenParams::class.java)
@@ -47,10 +51,14 @@ class PirDevWebViewActivity : DuckDuckGoActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
-        val brokersToOptOut = params?.brokers
+        val brokers = params?.brokers
+        val debugType = params?.debugType ?: DebugType.OPT_OUT
         lifecycleScope.launch {
-            if (!brokersToOptOut.isNullOrEmpty()) {
-                pirOptOut.debugExecute(brokersToOptOut, binding.pirDevWebView).also {
+            if (!brokers.isNullOrEmpty()) {
+                when (debugType) {
+                    DebugType.SCAN -> pirScan.debugExecute(brokers, binding.pirDevWebView)
+                    DebugType.OPT_OUT -> pirOptOut.debugExecute(brokers, binding.pirDevWebView)
+                }.also {
                     finish()
                 }
             } else {
@@ -61,8 +69,20 @@ class PirDevWebViewActivity : DuckDuckGoActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        pirOptOut.stop()
+        when (params?.debugType) {
+            DebugType.SCAN -> pirScan.stop()
+            DebugType.OPT_OUT -> pirOptOut.stop()
+            else -> {}
+        }
     }
 }
 
-data class PirDevWebViewResultsScreenParams(val brokers: List<String>) : ActivityParams
+enum class DebugType {
+    SCAN,
+    OPT_OUT,
+}
+
+data class PirDevWebViewResultsScreenParams(
+    val brokers: List<String>,
+    val debugType: DebugType = DebugType.OPT_OUT,
+) : ActivityParams

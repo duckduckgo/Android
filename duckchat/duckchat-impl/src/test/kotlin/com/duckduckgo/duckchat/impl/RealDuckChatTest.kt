@@ -35,7 +35,6 @@ import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBa
 import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarOptionBottomSheetDialogFactory
 import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarSelection.SEARCH_AND_AI
 import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarSelection.SEARCH_ONLY
-import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_CANCELLED
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_CONFIRMED
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_DISPLAYED
@@ -46,6 +45,7 @@ import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
+import com.duckduckgo.sync.api.DeviceSyncState
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -92,6 +92,7 @@ class RealDuckChatTest {
     private val imageUploadFeature: AIChatImageUploadFeature = FakeFeatureToggleFactory.create(AIChatImageUploadFeature::class.java)
     private val mockNewAddressBarOptionBottomSheetDialogFactory: NewAddressBarOptionBottomSheetDialogFactory = mock()
     private val mockNewAddressBarOptionBottomSheetDialog: NewAddressBarOptionBottomSheetDialog = mock()
+    private val mockDeviceSyncState: DeviceSyncState = mock()
 
     private lateinit var testee: RealDuckChat
 
@@ -125,6 +126,7 @@ class RealDuckChatTest {
                 imageUploadFeature,
                 mockBrowserNav,
                 mockNewAddressBarOptionBottomSheetDialogFactory,
+                mockDeviceSyncState,
             ),
         )
         coroutineRule.testScope.advanceUntilIdle()
@@ -304,7 +306,6 @@ class RealDuckChatTest {
             duckChatUrl = "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5",
         )
         verify(mockContext).startActivity(mockIntent)
-        verify(mockDuckChatFeatureRepository).registerOpened()
     }
 
     @Test
@@ -320,7 +321,6 @@ class RealDuckChatTest {
             duckChatUrl = "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5",
         )
         verify(mockContext).startActivity(mockIntent)
-        verify(mockDuckChatFeatureRepository).registerOpened()
     }
 
     @Test
@@ -333,7 +333,6 @@ class RealDuckChatTest {
             duckChatUrl = "https://duckduckgo.com/?q=example&ia=chat&duckai=5",
         )
         verify(mockContext).startActivity(mockIntent)
-        verify(mockDuckChatFeatureRepository).registerOpened()
     }
 
     @Test
@@ -350,7 +349,6 @@ class RealDuckChatTest {
             duckChatUrl = "https://duckduckgo.com/?q=example&bang=true&ia=chat&duckai=5",
         )
         verify(mockContext).startActivity(mockIntent)
-        verify(mockDuckChatFeatureRepository).registerOpened()
     }
 
     @Test
@@ -367,7 +365,6 @@ class RealDuckChatTest {
             duckChatUrl = "https://duckduckgo.com/?q=example&ia=chat&duckai=5",
         )
         verify(mockContext).startActivity(mockIntent)
-        verify(mockDuckChatFeatureRepository).registerOpened()
     }
 
     @Test
@@ -383,7 +380,6 @@ class RealDuckChatTest {
             duckChatUrl = "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5",
         )
         verify(mockContext).startActivity(mockIntent)
-        verify(mockDuckChatFeatureRepository).registerOpened()
     }
 
     @Test
@@ -428,16 +424,6 @@ class RealDuckChatTest {
             duckChatUrl = "https://duckduckgo.com/?q=example&prompt=1&ia=chat&duckai=5",
         )
         verify(mockContext).startActivity(mockIntent)
-        verify(mockDuckChatFeatureRepository).registerOpened()
-    }
-
-    @Test
-    fun whenDuckChatCalledThenFireOpenDuckChatPixels() = runTest {
-        testee.openDuckChat()
-
-        verify(mockPixel).fire(pixel = DuckChatPixelName.DUCK_CHAT_OPEN, parameters = mapOf("delta-timestamp-minutes" to "10"))
-        verify(mockPixel).fire(DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_DUCK_AI_OPEN)
-        verify(mockPixel).fire(DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_DUCK_AI_OPEN_DAILY, type = Pixel.PixelType.Daily())
     }
 
     @Test
@@ -1148,6 +1134,24 @@ class RealDuckChatTest {
         assertTrue(testee.canHandleOnAiWebView("https://duck.ai/somepath/someotherpath?test=1"))
         assertTrue(testee.canHandleOnAiWebView("https://duck.ai"))
         assertTrue(testee.canHandleOnAiWebView("https://duckduckgo.com/revoke-duckai-access"))
+    }
+
+    @Test
+    fun `when isDuckChatSyncFeatureEnabled returns true then isChatSyncFeatureEnabled returns true`() = runTest {
+        whenever(mockDeviceSyncState.isDuckChatSyncFeatureEnabled()).thenReturn(true)
+
+        testee.onPrivacyConfigDownloaded()
+
+        assertTrue(testee.isChatSyncFeatureEnabled())
+    }
+
+    @Test
+    fun `when isDuckChatSyncFeatureEnabled returns false then isChatSyncFeatureEnabled returns false`() = runTest {
+        whenever(mockDeviceSyncState.isDuckChatSyncFeatureEnabled()).thenReturn(false)
+
+        testee.onPrivacyConfigDownloaded()
+
+        assertFalse(testee.isChatSyncFeatureEnabled())
     }
 
     companion object {

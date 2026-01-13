@@ -212,6 +212,37 @@
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Fire Button</string>
     <string name="dataClearingActivityTitle">Gegevens wissen</string>
+    <string name="dataClearingDescription">Het verwijderen van je gegevens kan helpen om je privacy online te beschermen. Gebruik de Fire Button om gegevens handmatig te verwijderen of stel in dat gegevens automatisch worden verwijderd.</string>
+    <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
+        <item quantity="one">%1$d locatie uitgesloten van gegevensverwijdering</item>
+        <item quantity="other">%1$d locaties uitgesloten van gegevensverwijdering</item>
+    </plurals>
+    <string name="dataClearingAutomaticClearingOn">Aan</string>
+    <string name="dataClearingAutomaticClearingOff">Uit</string>
+    <string name="dataClearingClearBrowsingData">Browsegegevens verwijderen</string>
+    <string name="dataClearingAutomaticDataClearing">Automatische gegevensverwijdering</string>
+    <string name="dataClearingAutomaticallyClearDataToggle">Gegevens automatisch wissen</string>
+    <string name="dataClearingAutomaticTabsOptionDescription">Alle open tabbladen sluiten</string>
+    <string name="dataClearingAutomaticDataOptionDescription">Verwijder alle sitegegevens, inclusief bezochte sites. Mogelijk word je uitgelegd bij accounts.</string>
+    <string name="dataClearingAutomaticChatsOptionDescription">Alle chats verwijderen, inclusief vastgezette chats</string>
+
+    <!-- Fire Dialog Granular Options -->
+    <string name="fireDialogTitle">Kies wat je wilt verwijderen</string>
+    <string name="dataClearingOptionTabs">Tabbladen</string>
+    <string name="dataClearingOptionData">Cookies en sitegegevens</string>
+    <string name="dataClearingDuckAiChats">Duck.ai chats</string>
+    <string name="fireDialogOptionDuckAiChatsDescription">Alle chats verwijderen</string>
+    <string name="fireDialogDeleteButton">Verwijderen</string>
+    <plurals name="fireDialogOptionTabsDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one">%1$d tabblad sluiten</item>
+        <item quantity="other">Alle %1$d tabbladen sluiten</item>
+    </plurals>
+    <string name="fireDialogOptionDataDescriptionNoHistory">Mogelijk word je uitgelegd bij accounts.</string>
+    <string name="fireDialogOptionDescriptionNothingToDelete">Geen</string>
+    <plurals name="fireDialogOptionDataDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Verwijder van 1 website. Je kan worden uitgelogd bij accounts.</item>
+        <item quantity="other">Verwijder van %1$d websites. Je kan worden uitgelogd bij accounts.</item>
+    </plurals>
 
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Toestemmingen</string>

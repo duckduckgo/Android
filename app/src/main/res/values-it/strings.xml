@@ -212,6 +212,37 @@
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Fire Button</string>
     <string name="dataClearingActivityTitle">Cancellazione dati</string>
+    <string name="dataClearingDescription">L\'eliminazione dei tuoi dati aiuta a proteggere la tua privacy online. Utilizza il Fire Button per eliminare i dati manualmente, o imposta la cancellazione automatica.</string>
+    <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
+        <item quantity="one">%1$d sito escluso dalla cancellazione</item>
+        <item quantity="other">%1$d siti esclusi dalla cancellazione</item>
+    </plurals>
+    <string name="dataClearingAutomaticClearingOn">On</string>
+    <string name="dataClearingAutomaticClearingOff">Disabilitato</string>
+    <string name="dataClearingClearBrowsingData">Cancella i dati di navigazione</string>
+    <string name="dataClearingAutomaticDataClearing">Cancellazione automatica dei dati</string>
+    <string name="dataClearingAutomaticallyClearDataToggle">Cancellazione automatica dei dati</string>
+    <string name="dataClearingAutomaticTabsOptionDescription">Chiudi tutte le schede aperte</string>
+    <string name="dataClearingAutomaticDataOptionDescription">Elimina tutti i dati del sito, inclusi i siti visitati. Potrebbe disconnetterti dagli account.</string>
+    <string name="dataClearingAutomaticChatsOptionDescription">Elimina tutte le chat, comprese quelle fissate</string>
+
+    <!-- Fire Dialog Granular Options -->
+    <string name="fireDialogTitle">Scegli cosa eliminare</string>
+    <string name="dataClearingOptionTabs">Schede</string>
+    <string name="dataClearingOptionData">Cookie e dati del sito</string>
+    <string name="dataClearingDuckAiChats">Chat di Duck.ai</string>
+    <string name="fireDialogOptionDuckAiChatsDescription">Elimina tutte le chat</string>
+    <string name="fireDialogDeleteButton">Elimina</string>
+    <plurals name="fireDialogOptionTabsDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Chiudi scheda</item>
+        <item quantity="other">Chiudi tutte le %1$d schede</item>
+    </plurals>
+    <string name="fireDialogOptionDataDescriptionNoHistory">Potrebbe disconnetterti dagli account.</string>
+    <string name="fireDialogOptionDescriptionNothingToDelete">Niente</string>
+    <plurals name="fireDialogOptionDataDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Elimina da 1 sito. Potrebbe disconnetterti dagli account.</item>
+        <item quantity="other">Elimina da %1$d siti. Potrebbe disconnetterti dagli account.</item>
+    </plurals>
 
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Autorizzazioni</string>

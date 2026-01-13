@@ -132,6 +132,8 @@ class FakeDuckChatInternal(
 
     override fun isDuckChatFeatureEnabled(): Boolean = true
 
+    override fun isChatSyncFeatureEnabled(): Boolean = true
+
     override fun canHandleOnAiWebView(url: String): Boolean = false
 
     override val inputScreenBottomBarEnabled: StateFlow<Boolean> = _inputScreenBottomBarEnabled

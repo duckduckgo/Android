@@ -938,7 +938,6 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onViewResumed() {
-        logcat { "Duck.ai: onViewResumed" }
         if (currentGlobalLayoutState() is Invalidated && currentBrowserViewState().browserShowing) {
             showErrorWithAction()
         }
@@ -1307,8 +1306,12 @@ class BrowserTabViewModel @Inject constructor(
         }
 
     override fun closeCurrentTab() {
-        viewModelScope.launch {
-            removeCurrentTabFromRepository()
+        if (isCustomTabScreen) {
+            command.value = Command.NavigateBackInCustomTab
+        } else {
+            viewModelScope.launch {
+                removeCurrentTabFromRepository()
+            }
         }
     }
 

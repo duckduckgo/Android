@@ -139,6 +139,26 @@
 
             </LinearLayout>
 
+            <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:primaryText="@string/pirDevDebugScanHeader" />
+
+            <Spinner
+                android:id="@+id/scanBrokers"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/keyline_4" />
+
+            <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+                android:id="@+id/debugScan"
+                android:layout_width="180dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="@string/pirDevDebugScan"
+                app:editable="true"
+                app:type="single_line" />
+
             <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
                 android:id="@+id/debugForceKill"
                 android:layout_width="180dp"

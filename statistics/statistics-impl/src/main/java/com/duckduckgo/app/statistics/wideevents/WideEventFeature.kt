@@ -31,4 +31,16 @@ interface WideEventFeature {
 
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun enqueueWideEventPixels(): Toggle
+
+    /**
+     * When enabled, wide events are sent as pixels.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun sendWideEventsViaPixels(): Toggle
+
+    /**
+     * When enabled, wide events are sent via dedicated POST endpoint.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun sendWideEventsViaPost(): Toggle
 }

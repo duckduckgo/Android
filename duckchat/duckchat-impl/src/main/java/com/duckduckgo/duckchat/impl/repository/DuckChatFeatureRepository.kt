@@ -70,6 +70,14 @@ interface DuckChatFeatureRepository {
     suspend fun lastSessionTimestamp(): Long
 
     suspend fun sessionDeltaInMinutes(): Long
+
+    suspend fun setAppBackgroundTimestamp(timestamp: Long?)
+
+    suspend fun getAppBackgroundTimestamp(): Long?
+
+    suspend fun setAIChatHistoryEnabled(enabled: Boolean)
+
+    suspend fun isAIChatHistoryEnabled(): Boolean
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -138,6 +146,18 @@ class RealDuckChatFeatureRepository @Inject constructor(
     override suspend fun lastSessionTimestamp(): Long = duckChatDataStore.lastSessionTimestamp()
 
     override suspend fun sessionDeltaInMinutes(): Long = duckChatDataStore.sessionDeltaTimestamp() / MS_TO_MINUTES
+
+    override suspend fun setAppBackgroundTimestamp(timestamp: Long?) {
+        duckChatDataStore.setAppBackgroundTimestamp(timestamp)
+    }
+
+    override suspend fun getAppBackgroundTimestamp(): Long? = duckChatDataStore.getAppBackgroundTimestamp()
+
+    override suspend fun setAIChatHistoryEnabled(enabled: Boolean) {
+        duckChatDataStore.setAIChatHistoryEnabled(enabled)
+    }
+
+    override suspend fun isAIChatHistoryEnabled(): Boolean = duckChatDataStore.isAIChatHistoryEnabled()
 
     private fun updateWidgets() {
         val intent = Intent(AppWidgetManager.ACTION_APPWIDGET_UPDATE)

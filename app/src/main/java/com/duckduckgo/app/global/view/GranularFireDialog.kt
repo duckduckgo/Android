@@ -34,7 +34,6 @@ import androidx.core.view.WindowInsetsCompat.Type
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
-import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -161,10 +160,6 @@ class GranularFireDialog : BottomSheetDialogFragment(), FireDialog {
         _binding = null
     }
 
-    override fun show(fragmentManager: FragmentManager, tag: String?) {
-        super.show(fragmentManager, tag)
-    }
-
     private fun setupLayout() {
         binding.apply {
             deleteButton.setOnClickListener {
@@ -251,7 +246,7 @@ class GranularFireDialog : BottomSheetDialogFragment(), FireDialog {
                         state.siteCount,
                     )
                 } else {
-                    getString(com.duckduckgo.app.browser.R.string.fireDialogOptionDataDescriptionNoSites)
+                    getString(com.duckduckgo.app.browser.R.string.fireDialogOptionDescriptionNothingToDelete)
                 }
             } else {
                 getString(com.duckduckgo.app.browser.R.string.fireDialogOptionDataDescriptionNoHistory)

@@ -73,7 +73,11 @@ interface SubscriptionPixelSender {
     fun reportSubscriptionActive()
     fun reportOfferScreenShown()
     fun reportOfferSubscribeClick()
-    fun reportPurchaseFailureOther(errorType: String, reason: String? = null)
+    fun reportPurchaseFailureOther(
+        errorType: String,
+        reason: String? = null,
+    )
+
     fun reportPurchaseFailureStore(errorType: String)
     fun reportPurchaseFailureBackend()
     fun reportPurchaseFailureAccountCreation()
@@ -125,7 +129,13 @@ class SubscriptionPixelSenderImpl @Inject constructor(
 ) : SubscriptionPixelSender {
 
     override fun reportSubscriptionActive() =
-        fire(SUBSCRIPTION_ACTIVE)
+        fire(
+            SUBSCRIPTION_ACTIVE,
+            mapOf(
+                SubscriptionPixelParameter.OS_VERSION to appBuildConfig.sdkInt.toString(),
+                SubscriptionPixelParameter.PETAL to "true",
+            ),
+        )
 
     override fun reportOfferScreenShown() =
         fire(OFFER_SCREEN_SHOWN)
@@ -133,7 +143,10 @@ class SubscriptionPixelSenderImpl @Inject constructor(
     override fun reportOfferSubscribeClick() =
         fire(OFFER_SUBSCRIBE_CLICK)
 
-    override fun reportPurchaseFailureOther(errorType: String, reason: String?) =
+    override fun reportPurchaseFailureOther(
+        errorType: String,
+        reason: String?,
+    ) =
         fire(
             PURCHASE_FAILURE_OTHER,
             mapOf(
@@ -286,7 +299,10 @@ class SubscriptionPixelSenderImpl @Inject constructor(
         fire(AUTH_V1_SIGN_IN_ATTEMPT)
     }
 
-    private fun fire(pixel: SubscriptionPixel, params: Map<String, String> = emptyMap()) {
+    private fun fire(
+        pixel: SubscriptionPixel,
+        params: Map<String, String> = emptyMap(),
+    ) {
         pixel.getPixelNames().forEach { (pixelType, pixelName) ->
             pixelSender.fire(pixelName = pixelName, type = pixelType, parameters = params)
         }

@@ -17,6 +17,7 @@
 package com.duckduckgo.pir.impl.scan
 
 import android.content.Context
+import android.webkit.WebView
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
@@ -69,6 +70,19 @@ interface PirScan {
         brokers: List<String>,
         context: Context,
         runType: RunType,
+    ): Result<Unit>
+
+    /**
+     * This method should only be used if we want to debug scan and pass in a specific [webView] which will allow us to see the run in action.
+     * Do not use this for non-debug scenarios.
+     * You DO NOT need to set any dispatcher to call this suspend function. It is already set to run on IO.
+     *
+     * @param brokers - List of broker names
+     * @param webView - attached/visible WebView in which we will run the scan.
+     */
+    suspend fun debugExecute(
+        brokers: List<String>,
+        webView: WebView,
     ): Result<Unit>
 
     /**
@@ -172,6 +186,60 @@ class RealPirScan @Inject constructor(
         }.awaitAll()
 
         completeScan(runType)
+        return@withContext Result.success(Unit)
+    }
+
+    override suspend fun debugExecute(
+        brokers: List<String>,
+        webView: WebView,
+    ): Result<Unit> = withContext(dispatcherProvider.io()) {
+        onJobStarted()
+        if (runners.isNotEmpty()) {
+            cleanPreviousRun()
+        }
+        // Multiple profile support (includes deprecated profiles as we need to process opt-out for them if there are extracted profiles)
+        val profileQueries = obtainProfiles()
+
+        logcat { "PIR-SCAN: Running debug scan for $brokers on profiles: $profileQueries on ${Thread.currentThread().name}" }
+
+        runners.add(
+            pirActionsRunnerFactory.create(
+                webView.context,
+                pirCssScriptLoader.getScript(),
+                RunType.MANUAL,
+            ),
+        )
+
+        val activeBrokers = repository.getAllActiveBrokerObjects().associateBy { it.name }
+
+        // Prepare a list of all broker steps that need to be run
+        val brokerScanSteps = brokers.mapNotNull { brokerName ->
+            val broker = activeBrokers[brokerName] ?: return@mapNotNull null
+            repository.getBrokerScanSteps(brokerName)?.run {
+                brokerStepsParser.parseStep(broker, this)
+            }
+        }.filter {
+            it.isNotEmpty()
+        }.flatten()
+
+        // Map broker steps with their associated profile queries
+        val allSteps = profileQueries.map { profileQuery ->
+            brokerScanSteps.map { scanStep ->
+                profileQuery to scanStep
+            }
+        }.flatten()
+
+        // Execute each step sequentially on the single runner
+        allSteps.forEach { (profileQuery, step) ->
+            logcat { "PIR-SCAN: Start thread=${Thread.currentThread().name}, profile=$profileQuery and step=$step" }
+            runners[0].startOn(webView, profileQuery, listOf(step))
+            runners[0].stop()
+            logcat { "PIR-SCAN: Finish thread=${Thread.currentThread().name}, profile=$profileQuery and step=$step" }
+        }
+
+        logcat { "PIR-SCAN: Debug scan completed for all profiles" }
+
+        onJobCompleted()
         return@withContext Result.success(Unit)
     }
 

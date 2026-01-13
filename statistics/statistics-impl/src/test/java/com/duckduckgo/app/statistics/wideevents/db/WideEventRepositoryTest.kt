@@ -30,6 +30,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -191,8 +192,8 @@ class WideEventRepositoryTest {
                 metadata = emptyMap(),
             )
 
-            val completedEventIds = wideEventRepository.getCompletedWideEventIdsFlow().first()
-            assertTrue(completedEventIds == setOf(eventId1, eventId4))
+            val completedEventIds = wideEventRepository.getCompletedWideEventIds()
+            assertTrue(completedEventIds.toSet() == setOf(eventId1, eventId4))
         }
 
     @Test
@@ -282,7 +283,8 @@ class WideEventRepositoryTest {
             )
 
             wideEventRepository.deleteWideEvent(completedEventId)
-            assertTrue(wideEventRepository.getCompletedWideEventIdsFlow().first().isEmpty())
+            assertFalse(wideEventRepository.hasCompletedWideEvents().first())
+            assertTrue(wideEventRepository.getCompletedWideEventIds().isEmpty())
             assertTrue(wideEventRepository.getActiveWideEventIdsByName("test_event") == listOf(activeEventId))
 
             wideEventRepository.deleteWideEvent(activeEventId)
