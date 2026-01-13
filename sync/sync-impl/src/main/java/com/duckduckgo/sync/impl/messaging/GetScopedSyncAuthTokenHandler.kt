@@ -28,6 +28,8 @@ import com.duckduckgo.sync.api.DeviceSyncState
 import com.duckduckgo.sync.api.DeviceSyncState.SyncAccountState.SignedIn
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.SyncApi
+import com.duckduckgo.sync.impl.pixels.SyncAccountOperation
+import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.store.SyncStore
 import com.squareup.anvil.annotations.ContributesMultibinding
 import logcat.LogPriority
@@ -40,6 +42,7 @@ class GetScopedSyncAuthTokenHandler @Inject constructor(
     private val syncApi: SyncApi,
     private val syncStore: SyncStore,
     private val deviceSyncState: DeviceSyncState,
+    private val syncPixels: SyncPixels,
 ) : ContentScopeJsMessageHandlersPlugin {
     override fun getJsMessageHandler(): JsMessageHandler =
         object : JsMessageHandler {
@@ -50,7 +53,7 @@ class GetScopedSyncAuthTokenHandler @Inject constructor(
             ) {
                 if (jsMessage.id.isNullOrEmpty()) return
 
-                logcat(LogPriority.WARN) { "DuckChat-Sync: ${jsMessage.method} called" }
+                logcat { "DuckChat-Sync: ${jsMessage.method} called" }
 
                 if (!deviceSyncState.isFeatureEnabled()) {
                     sendErrorResponse(jsMessaging, jsMessage, "sync unavailable")
@@ -87,6 +90,7 @@ class GetScopedSyncAuthTokenHandler @Inject constructor(
 
                     is Result.Error -> {
                         logcat(LogPriority.ERROR) { "DuckChat-Sync: rescope token failed: code=${result.code}, reason=${result.reason}" }
+                        syncPixels.fireSyncAccountErrorPixel(result, SyncAccountOperation.RESCOPE_TOKEN)
                         createErrorPayload(result.reason)
                     }
                 }

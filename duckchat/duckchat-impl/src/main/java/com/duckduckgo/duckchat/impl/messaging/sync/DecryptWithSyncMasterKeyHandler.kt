@@ -51,7 +51,7 @@ class DecryptWithSyncMasterKeyHandler @Inject constructor(
             ) {
                 if (jsMessage.id.isNullOrEmpty()) return
 
-                logcat(LogPriority.WARN) { "DuckChat-Sync: ${jsMessage.method} called" }
+                logcat { "DuckChat-Sync: ${jsMessage.method} called" }
 
                 val responder = SyncJsResponder(jsMessaging, jsMessage, featureName)
 

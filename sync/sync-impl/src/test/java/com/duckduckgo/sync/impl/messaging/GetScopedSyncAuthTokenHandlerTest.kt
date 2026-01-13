@@ -23,6 +23,8 @@ import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.sync.api.DeviceSyncState
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.SyncApi
+import com.duckduckgo.sync.impl.pixels.SyncAccountOperation
+import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.store.SyncStore
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
@@ -43,6 +45,7 @@ class GetScopedSyncAuthTokenHandlerTest {
     private val mockSyncApi: SyncApi = mock()
     private val mockSyncStore: SyncStore = mock()
     private val mockDeviceSyncState: DeviceSyncState = mock()
+    private val mockSyncPixels: SyncPixels = mock()
     private val mockJsMessaging: JsMessaging = mock()
 
     val callbackDataCaptor = argumentCaptor<JsCallbackData>()
@@ -55,6 +58,7 @@ class GetScopedSyncAuthTokenHandlerTest {
             syncApi = mockSyncApi,
             syncStore = mockSyncStore,
             deviceSyncState = mockDeviceSyncState,
+            syncPixels = mockSyncPixels,
         )
     }
 
@@ -182,6 +186,20 @@ class GetScopedSyncAuthTokenHandlerTest {
         verify(mockJsMessaging).onResponse(callbackDataCaptor.capture())
         val response = callbackDataCaptor.firstValue
         verifyErrorResponse(response.params, ERROR_REASON)
+    }
+
+    @Test
+    fun `when rescope token fails then error pixel is fired`() {
+        configureSyncEnabled()
+        configureSignedIn()
+        whenever(mockSyncStore.token).thenReturn(ORIGINAL_TOKEN)
+        val error = Result.Error(code = ERROR_CODE, reason = ERROR_REASON)
+        whenever(mockSyncApi.rescopeToken(ORIGINAL_TOKEN, SCOPE)).thenReturn(error)
+        val jsMessage = createJsMessage(TEST_MESSAGE_ID)
+
+        handler.getJsMessageHandler().process(jsMessage, mockJsMessaging, null)
+
+        verify(mockSyncPixels).fireSyncAccountErrorPixel(error, SyncAccountOperation.RESCOPE_TOKEN)
     }
 
     @Test
