@@ -938,7 +938,6 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onViewResumed() {
-        logcat { "Duck.ai: onViewResumed" }
         if (currentGlobalLayoutState() is Invalidated && currentBrowserViewState().browserShowing) {
             showErrorWithAction()
         }
