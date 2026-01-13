@@ -5,7 +5,7 @@ on:
     inputs:
       commit:
         description: 'Specific commit SHA to checkout (optional, defaults to latest)'
-        required: false
+        required: true
         type: string
   workflow_dispatch:
     inputs:
