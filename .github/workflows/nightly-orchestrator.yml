@@ -1,0 +1,65 @@
+name: Nightly
+
+on:
+  schedule:
+    - cron: '0 2 * * *' # run at 2 AM UTC
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  resolve-commit:
+    name: Resolve commit SHA
+    runs-on: android-large-runner
+    outputs:
+      commit_sha: ${{ steps.resolve.outputs.commit_sha }}
+    steps:
+      - name: Resolve commit SHA
+        id: resolve
+        run: |
+          echo "Using commit: ${{ github.sha }}"
+          echo "commit_sha=${{ github.sha }}" >> $GITHUB_OUTPUT
+
+  call-nightly:
+    needs: resolve-commit
+    uses: ./.github/workflows/nightly.yml
+    with:
+      commit: ${{ needs.resolve-commit.outputs.commit_sha }}
+    secrets: inherit
+
+  call-custom-tabs:
+    needs: [resolve-commit, call-nightly]
+    uses: ./.github/workflows/custom-tabs-nightly.yml
+    with:
+      commit: ${{ needs.resolve-commit.outputs.commit_sha }}
+    secrets: inherit
+
+  call-end-to-end:
+    needs: [resolve-commit, call-custom-tabs]
+    uses: ./.github/workflows/end-to-end-robintest.yml
+    with:
+      commit: ${{ needs.resolve-commit.outputs.commit_sha }}
+    secrets: inherit
+
+  call-privacy:
+    needs: [ resolve-commit, call-end-to-end ]
+    uses: ./.github/workflows/privacy.yml
+    with:
+      commit: ${{ needs.resolve-commit.outputs.commit_sha }}
+    secrets: inherit
+
+  call-update-content-scope:
+    needs: [ resolve-commit, call-privacy ]
+    uses: ./.github/workflows/update-content-scope.yml
+    with:
+      commit: ${{ needs.resolve-commit.outputs.commit_sha }}
+    secrets: inherit
+
+  call-update-ref-tests:
+    needs: [ resolve-commit, call-update-content-scope ]
+    uses: ./.github/workflows/update-ref-tests.yml
+    with:
+      commit: ${{ needs.resolve-commit.outputs.commit_sha }}
+    secrets: inherit
