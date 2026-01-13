@@ -25,9 +25,6 @@ import android.widget.Button
 import android.widget.Toast
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.ListItem
-import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -40,10 +37,9 @@ import androidx.fragment.app.Fragment
 import com.duckduckgo.common.ui.compose.buttons.LargeSecondaryButton
 import com.duckduckgo.common.ui.compose.buttons.SmallGhostButton
 import com.duckduckgo.common.ui.compose.buttons.SmallPrimaryButton
+import com.duckduckgo.common.ui.compose.listitem.DaxOneLineListItem
 import com.duckduckgo.common.ui.compose.sheets.DaxActionBottomSheetDialog
 import com.duckduckgo.common.ui.compose.sheets.DaxPromoBottomSheetDialog
-import com.duckduckgo.common.ui.compose.text.DaxText
-import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
 import com.duckduckgo.common.ui.internal.R
 import com.duckduckgo.common.ui.internal.ui.appComponentsViewModel
 import com.duckduckgo.common.ui.internal.ui.setupThemedComposeView
@@ -382,12 +378,6 @@ class DialogsFragment : Fragment() {
                     }
 
                     view.setupThemedComposeView(R.id.composeActionBottomSheetButton, isDarkTheme) {
-                        val colors = ListItemDefaults.colors(
-                            containerColor = DuckDuckGoTheme.colors.backgrounds.surface,
-                            headlineColor = DuckDuckGoTheme.colors.text.primary,
-                            leadingIconColor = DuckDuckGoTheme.colors.text.primary,
-                            trailingIconColor = DuckDuckGoTheme.colors.text.primary,
-                        )
                         val sheetState = rememberModalBottomSheetState()
                         val scope = rememberCoroutineScope()
                         var showBottomSheet by remember { mutableStateOf(false) }
@@ -409,16 +399,10 @@ class DialogsFragment : Fragment() {
                                 },
                                 content = {
                                     item {
-                                        ListItem(
-                                            headlineContent = { DaxText("Primary Item") },
-                                            colors = colors,
-                                        )
+                                        DaxOneLineListItem("Primary Item")
                                     }
                                     item {
-                                        ListItem(
-                                            headlineContent = { DaxText("Secondary Item") },
-                                            colors = colors,
-                                        )
+                                        DaxOneLineListItem("Secondary Item")
                                     }
                                 },
                             )
@@ -447,12 +431,6 @@ class DialogsFragment : Fragment() {
                     }
 
                     view.setupThemedComposeView(R.id.composeActionBottomSheetButtonWithTitle, isDarkTheme) {
-                        val colors = ListItemDefaults.colors(
-                            containerColor = DuckDuckGoTheme.colors.backgrounds.surface,
-                            headlineColor = DuckDuckGoTheme.colors.text.primary,
-                            leadingIconColor = DuckDuckGoTheme.colors.text.primary,
-                            trailingIconColor = DuckDuckGoTheme.colors.text.primary,
-                        )
                         val sheetState = rememberModalBottomSheetState()
                         val scope = rememberCoroutineScope()
                         var showBottomSheet by remember { mutableStateOf(false) }
@@ -466,6 +444,7 @@ class DialogsFragment : Fragment() {
                         if (showBottomSheet) {
                             DaxActionBottomSheetDialog(
                                 title = "Title",
+                                sheetState = sheetState,
                                 onDismissRequest = {
                                     scope.launch { sheetState.hide() }.invokeOnCompletion {
                                         if (!sheetState.isVisible) {
@@ -475,27 +454,25 @@ class DialogsFragment : Fragment() {
                                 },
                                 content = {
                                     item {
-                                        ListItem(
-                                            headlineContent = { DaxText("Primary Item") },
-                                            leadingContent = {
-                                                Icon(
+                                        DaxOneLineListItem(
+                                            text = "Primary Item",
+                                            leadingIcon = {
+                                                DaxListItemTrailingIcon(
                                                     painter = painterResource(CommonR.drawable.ic_add_24),
                                                     contentDescription = null,
                                                 )
                                             },
-                                            colors = colors,
                                         )
                                     }
                                     item {
-                                        ListItem(
-                                            headlineContent = { DaxText("Secondary Item") },
-                                            leadingContent = {
-                                                Icon(
+                                        DaxOneLineListItem(
+                                            text = "Secondary Item",
+                                            leadingIcon = {
+                                                DaxListItemTrailingIcon(
                                                     painter = painterResource(CommonR.drawable.ic_add_24),
                                                     contentDescription = null,
                                                 )
                                             },
-                                            colors = colors,
                                         )
                                     }
                                 },
@@ -530,8 +507,15 @@ class DialogsFragment : Fragment() {
                         val sheetState = rememberModalBottomSheetState()
                         val scope = rememberCoroutineScope()
                         var showBottomSheet by remember { mutableStateOf(false) }
+                        val dismiss = {
+                            scope.launch { sheetState.hide() }.invokeOnCompletion {
+                                if (!sheetState.isVisible) {
+                                    showBottomSheet = false
+                                }
+                            }
+                        }
                         LargeSecondaryButton(
-                            text = "Action Bottom Sheet with title and icons",
+                            text = "Promo Bottom Sheet",
                             onClick = {
                                 showBottomSheet = true
                             },
@@ -542,16 +526,10 @@ class DialogsFragment : Fragment() {
                                 title = null,
                                 description = "Add our search widget to your home screen for quick, easy access.",
                                 painter = null,
-                                onDismissRequest = {
-                                    scope.launch { sheetState.hide() }.invokeOnCompletion {
-                                        if (!sheetState.isVisible) {
-                                            showBottomSheet = false
-                                        }
-                                    }
-                                },
+                                onDismissRequest = dismiss::invoke,
                                 buttons = {
-                                    SmallGhostButton(text = "Button", onClick = { showBottomSheet = false })
-                                    SmallPrimaryButton(text = "Button", onClick = { showBottomSheet = false })
+                                    SmallGhostButton(text = "Button", onClick = dismiss::invoke)
+                                    SmallPrimaryButton(text = "Button", onClick = dismiss::invoke)
                                 },
                             )
                         }
@@ -585,6 +563,13 @@ class DialogsFragment : Fragment() {
                         val sheetState = rememberModalBottomSheetState()
                         val scope = rememberCoroutineScope()
                         var showBottomSheet by remember { mutableStateOf(false) }
+                        val dismiss = {
+                            scope.launch { sheetState.hide() }.invokeOnCompletion {
+                                if (!sheetState.isVisible) {
+                                    showBottomSheet = false
+                                }
+                            }
+                        }
                         LargeSecondaryButton(
                             text = "Promo Bottom Sheet with title",
                             onClick = {
@@ -597,16 +582,10 @@ class DialogsFragment : Fragment() {
                                 title = "Title",
                                 description = "Add our search widget to your home screen for quick, easy access.",
                                 painter = null,
-                                onDismissRequest = {
-                                    scope.launch { sheetState.hide() }.invokeOnCompletion {
-                                        if (!sheetState.isVisible) {
-                                            showBottomSheet = false
-                                        }
-                                    }
-                                },
+                                onDismissRequest = dismiss::invoke,
                                 buttons = {
-                                    SmallGhostButton(text = "Button", onClick = { showBottomSheet = false })
-                                    SmallPrimaryButton(text = "Button", onClick = { showBottomSheet = false })
+                                    SmallGhostButton(text = "Button", onClick = dismiss::invoke)
+                                    SmallPrimaryButton(text = "Button", onClick = dismiss::invoke)
                                 },
                             )
                         }
@@ -641,8 +620,15 @@ class DialogsFragment : Fragment() {
                         val sheetState = rememberModalBottomSheetState()
                         val scope = rememberCoroutineScope()
                         var showBottomSheet by remember { mutableStateOf(false) }
+                        val dismiss = {
+                            scope.launch { sheetState.hide() }.invokeOnCompletion {
+                                if (!sheetState.isVisible) {
+                                    showBottomSheet = false
+                                }
+                            }
+                        }
                         LargeSecondaryButton(
-                            text = "Promo Bottom Sheet with title",
+                            text = "Promo Bottom Sheet with image",
                             onClick = {
                                 showBottomSheet = true
                             },
@@ -653,16 +639,10 @@ class DialogsFragment : Fragment() {
                                 title = "Title",
                                 description = "Add our search widget to your home screen for quick, easy access.",
                                 painter = painterResource(CommonR.drawable.ic_bottom_sheet_promo_icon),
-                                onDismissRequest = {
-                                    scope.launch { sheetState.hide() }.invokeOnCompletion {
-                                        if (!sheetState.isVisible) {
-                                            showBottomSheet = false
-                                        }
-                                    }
-                                },
+                                onDismissRequest = dismiss::invoke,
                                 buttons = {
-                                    SmallGhostButton(text = "Button", onClick = { showBottomSheet = false })
-                                    SmallPrimaryButton(text = "Button", onClick = { showBottomSheet = false })
+                                    SmallGhostButton(text = "Button", onClick = dismiss::invoke)
+                                    SmallPrimaryButton(text = "Button", onClick = dismiss::invoke)
                                 },
                             )
                         }
