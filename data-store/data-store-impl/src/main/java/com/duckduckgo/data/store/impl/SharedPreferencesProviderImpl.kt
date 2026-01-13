@@ -16,6 +16,7 @@
 
 package com.duckduckgo.data.store.impl
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Context.MODE_PRIVATE
 import android.content.SharedPreferences
@@ -24,12 +25,14 @@ import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 import androidx.security.crypto.MasterKeys
 import com.duckduckgo.anrs.api.CrashLogger
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.frybits.harmony.getHarmonySharedPreferences
 import com.frybits.harmony.secure.getEncryptedHarmonySharedPreferences
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.Lazy
+import kotlinx.coroutines.withContext
 import logcat.LogPriority.WARN
 import logcat.logcat
 import javax.inject.Inject
@@ -39,8 +42,10 @@ private const val MIGRATED_TO_HARMONY = "migrated_to_harmony"
 @ContributesBinding(AppScope::class)
 class SharedPreferencesProviderImpl @Inject constructor(
     private val context: Context,
+    private val dispatcherProvider: DispatcherProvider,
     private val crashLogger: Lazy<CrashLogger>,
 ) : SharedPreferencesProvider {
+    @SuppressLint("DenyListedApi")
     override fun getSharedPreferences(name: String, multiprocess: Boolean, migrate: Boolean): SharedPreferences {
         val prefs = if (multiprocess) {
             if (migrate) {
@@ -62,6 +67,11 @@ class SharedPreferencesProviderImpl @Inject constructor(
         multiprocess: Boolean,
     ): SharedPreferences? {
         return runCatching { getEncryptedSharedPreferencesInternal(name, multiprocess) }.getOrNull()
+    }
+
+    override suspend fun getMigratedEncryptedSharedPreferences(name: String): SharedPreferences? {
+        logcat { "Migrate and return encrypted preferences to Harmony" }
+        return runCatching { SafeSharedPreferences(migrateEncryptedToHarmonyIfNecessary(name), crashLogger.get()) }.getOrNull()
     }
 
     private fun getEncryptedSharedPreferencesInternal(
@@ -114,6 +124,13 @@ class SharedPreferencesProviderImpl @Inject constructor(
                 is String -> {
                     destination.edit { putString(key, originalValue) }
                 }
+                is Set<*> -> {
+                    if (originalValue.all { it is String }) {
+                        destination.edit { putStringSet(key, originalValue.filterIsInstance<String>().toSet()) }
+                    } else {
+                        logcat(WARN) { "Could not migrate $key from $name preferences" }
+                    }
+                }
                 else -> logcat(WARN) { "Could not migrate $key from $name preferences" }
             }
         }
@@ -121,5 +138,63 @@ class SharedPreferencesProviderImpl @Inject constructor(
         destination.edit(commit = true) { putBoolean(MIGRATED_TO_HARMONY, true) }
 
         return destination
+    }
+
+    private suspend fun migrateEncryptedToHarmonyIfNecessary(name: String): SharedPreferences {
+        return withContext(dispatcherProvider.io()) {
+            val destination = context.getEncryptedHarmonySharedPreferences(
+                name,
+                masterKeyAlias = MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC),
+                prefKeyEncryptionScheme = EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+                prefValueEncryptionScheme = EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM,
+            )
+
+            if (destination.getBoolean(MIGRATED_TO_HARMONY, false)) return@withContext destination
+
+            val origin = EncryptedSharedPreferences.create(
+                context,
+                name,
+                MasterKey.Builder(context)
+                    .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+                    .build(),
+                EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+                EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM,
+            )
+            logcat { "Performing encrypted migration to Harmony" }
+
+            val contents = origin.all
+
+            contents.keys.forEach { key ->
+                when (val originalValue = contents[key]) {
+                    is Boolean -> {
+                        destination.edit { putBoolean(key, originalValue) }
+                    }
+                    is Long -> {
+                        destination.edit { putLong(key, originalValue) }
+                    }
+                    is Int -> {
+                        destination.edit { putInt(key, originalValue) }
+                    }
+                    is Float -> {
+                        destination.edit { putFloat(key, originalValue) }
+                    }
+                    is String -> {
+                        destination.edit { putString(key, originalValue) }
+                    }
+                    is Set<*> -> {
+                        if (originalValue.all { it is String }) {
+                            destination.edit { putStringSet(key, originalValue.filterIsInstance<String>().toSet()) }
+                        } else {
+                            logcat(WARN) { "Could not migrate $key from $name preferences" }
+                        }
+                    }
+                    else -> logcat(WARN) { "Could not migrate $key from $name preferences" }
+                }
+            }
+
+            destination.edit(commit = true) { putBoolean(MIGRATED_TO_HARMONY, true) }
+
+            return@withContext destination
+        }
     }
 }
