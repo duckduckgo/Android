@@ -109,20 +109,6 @@ class DuckChatSettingsViewModelTest {
         }
 
     @Test
-    fun whenShowDuckChatInAddressBarDisabledThenSetUserSetting() =
-        runTest {
-            testee.onShowDuckChatInAddressBarToggled(false)
-            verify(duckChat).setShowInAddressBarUserSetting(false)
-        }
-
-    @Test
-    fun whenShowDuckChatInAddressBarEnabledThenSetUserSetting() =
-        runTest {
-            testee.onShowDuckChatInAddressBarToggled(true)
-            verify(duckChat).setShowInAddressBarUserSetting(true)
-        }
-
-    @Test
     fun `when onDuckAiInputScreenWithAiSelected selected then set user setting`() =
         runTest {
             testee.onDuckAiInputScreenWithAiSelected()
@@ -451,20 +437,6 @@ class DuckChatSettingsViewModelTest {
         runTest {
             testee.onShowDuckChatInMenuToggled(false)
             verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_MENU_SETTING_OFF)
-        }
-
-    @Test
-    fun `when onShowDuckChatInAddressBarToggled true then on pixel fired`() =
-        runTest {
-            testee.onShowDuckChatInAddressBarToggled(true)
-            verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_SEARCHBAR_SETTING_ON)
-        }
-
-    @Test
-    fun `when onShowDuckChatInAddressBarToggled false then off pixel fired`() =
-        runTest {
-            testee.onShowDuckChatInAddressBarToggled(false)
-            verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_SEARCHBAR_SETTING_OFF)
         }
 
     @Test
