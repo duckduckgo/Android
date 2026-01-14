@@ -17,9 +17,11 @@
 package com.duckduckgo.common.ui.view
 
 import android.content.Context
+import android.graphics.drawable.Drawable
 import android.os.Build
 import android.util.AttributeSet
 import android.widget.FrameLayout
+import android.widget.ImageView
 import androidx.annotation.DrawableRes
 import androidx.annotation.RawRes
 import androidx.appcompat.content.res.AppCompatResources
@@ -27,7 +29,11 @@ import androidx.core.text.HtmlCompat
 import androidx.core.view.isVisible
 import com.airbnb.lottie.LottieAnimationView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.target.Target
 import com.duckduckgo.common.ui.view.MessageCta.MessageType.REMOTE_MESSAGE
 import com.duckduckgo.common.ui.view.MessageCta.MessageType.REMOTE_PROMO_MESSAGE
 import com.duckduckgo.common.ui.viewbinding.viewBinding
@@ -128,12 +134,7 @@ class MessageCta : FrameLayout {
         with(remoteMessageBinding) {
             when {
                 imageUrl.orEmpty().isNotEmpty() -> {
-                    Glide
-                        .with(topImage)
-                        .load(imageUrl)
-                        .centerCrop()
-                        .transition(withCrossFade())
-                        .into(topImage)
+                    loadImageUrl(topImage, imageUrl.orEmpty(), drawableRes)
                     topImage.show()
                     topIllustration.gone()
                     topIllustrationAnimated.gone()
@@ -149,8 +150,7 @@ class MessageCta : FrameLayout {
                 drawableRes != null -> {
                     topImage.gone()
                     topIllustrationAnimated.gone()
-                    topIllustration.setImageDrawable(AppCompatResources.getDrawable(context, drawableRes))
-                    topIllustration.show()
+                    loadImageDrawable(topIllustration, drawableRes)
                 }
 
                 else -> {
@@ -160,6 +160,57 @@ class MessageCta : FrameLayout {
                 }
             }
         }
+    }
+
+    private fun loadImageUrl(
+        topImage: ImageView,
+        imageUrl: String,
+        @DrawableRes drawableRes: Int?,
+    ) {
+        Glide
+            .with(topImage)
+            .load(imageUrl)
+            .apply {
+                if (drawableRes != null) {
+                    error(AppCompatResources.getDrawable(context, drawableRes))
+                }
+            }
+            .addListener(
+                object : RequestListener<Drawable> {
+                    override fun onLoadFailed(
+                        e: GlideException?,
+                        model: Any?,
+                        target: Target<Drawable?>,
+                        isFirstResource: Boolean,
+                    ): Boolean {
+                        if (drawableRes == null) {
+                            topImage.gone()
+                        }
+                        return false
+                    }
+
+                    override fun onResourceReady(
+                        resource: Drawable,
+                        model: Any,
+                        target: Target<Drawable?>?,
+                        dataSource: DataSource,
+                        isFirstResource: Boolean,
+                    ): Boolean {
+                        return false
+                    }
+                },
+            )
+            .centerCrop()
+            .transition(withCrossFade())
+            .into(topImage)
+    }
+
+    private fun loadImageDrawable(
+        topIllustration: ImageView,
+        @DrawableRes drawableRes: Int,
+    ) {
+        topIllustration.setImageDrawable(AppCompatResources.getDrawable(context, drawableRes))
+        topIllustration.show()
     }
 
     private fun setPromoMessage(message: Message) {

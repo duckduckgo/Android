@@ -148,6 +148,7 @@ class CardsListRemoteMessageView @JvmOverloads constructor(
                 Glide
                     .with(binding.remoteImage)
                     .load(it.imageUrl)
+                    .error(it.placeholder.drawable(true))
                     .centerCrop()
                     .transition(withCrossFade())
                     .into(binding.remoteImage)
