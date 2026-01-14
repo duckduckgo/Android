@@ -163,12 +163,12 @@ class MessageCta : FrameLayout {
     }
 
     private fun loadImageUrl(
-        topImage: ImageView,
+        imageView: ImageView,
         imageUrl: String,
         @DrawableRes drawableRes: Int?,
     ) {
         Glide
-            .with(topImage)
+            .with(imageView)
             .load(imageUrl)
             .apply {
                 if (drawableRes != null) {
@@ -184,7 +184,7 @@ class MessageCta : FrameLayout {
                         isFirstResource: Boolean,
                     ): Boolean {
                         if (drawableRes == null) {
-                            topImage.gone()
+                            imageView.gone()
                         }
                         return false
                     }
@@ -202,7 +202,7 @@ class MessageCta : FrameLayout {
             )
             .centerCrop()
             .transition(withCrossFade())
-            .into(topImage)
+            .into(imageView)
     }
 
     private fun loadImageDrawable(
@@ -222,11 +222,7 @@ class MessageCta : FrameLayout {
         promoMessageBinding.actionButton.text = message.promoAction
 
         if (message.imageUrl.orEmpty().isNotEmpty()) {
-            Glide.with(promoMessageBinding.remoteImage)
-                .load(message.imageUrl)
-                .centerCrop()
-                .transition(withCrossFade())
-                .into(promoMessageBinding.remoteImage)
+            loadImageUrl(promoMessageBinding.remoteImage, message.imageUrl.orEmpty(), message.middleIllustration)
             promoMessageBinding.remoteImage.show()
             promoMessageBinding.illustration.gone()
         } else if (message.middleIllustration == null) {

@@ -67,8 +67,8 @@
 
         <ImageView
             android:id="@+id/remoteImage"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:layout_marginTop="@dimen/keyline_3"
             android:layout_marginBottom="@dimen/keyline_2"
             android:visibility="gone"
