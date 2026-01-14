@@ -6,11 +6,11 @@
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"]
     },
-  "m_automatic_data_clearing_options_updated": {
-    "description": "The automatic data clearing options are updated",
-    "owners": ["0nko"],
-    "triggers": ["other"],
-    "suffixes": ["form_factor"],
-    "parameters": ["appVersion", "tabs", "data", "chats"]
-  }
+    "m_automatic_data_clearing_options_updated": {
+        "description": "The automatic data clearing options are updated",
+        "owners": ["0nko"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "tabs", "data", "chats"]
+    }
 }
