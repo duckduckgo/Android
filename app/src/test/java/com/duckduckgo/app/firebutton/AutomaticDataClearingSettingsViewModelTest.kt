@@ -223,45 +223,17 @@ internal class AutomaticDataClearingSettingsViewModelTest {
     }
 
     @Test
-    fun whenClearTabsToggledOnThenOptionIsAdded() = runTest {
-        testee.onClearTabsToggled(true)
+    fun whenOptionToggledOnThenOptionIsAdded() = runTest {
+        testee.onOptionToggled(FireClearOption.TABS, true)
 
         verify(mockFireDataStore).addAutomaticClearOption(FireClearOption.TABS)
     }
 
     @Test
-    fun whenClearTabsToggledOffThenOptionIsRemoved() = runTest {
-        testee.onClearTabsToggled(false)
-
-        verify(mockFireDataStore).removeAutomaticClearOption(FireClearOption.TABS)
-    }
-
-    @Test
-    fun whenClearDataToggledOnThenOptionIsAdded() = runTest {
-        testee.onClearDataToggled(true)
-
-        verify(mockFireDataStore).addAutomaticClearOption(FireClearOption.DATA)
-    }
-
-    @Test
-    fun whenClearDataToggledOffThenOptionIsRemoved() = runTest {
-        testee.onClearDataToggled(false)
+    fun whenOptionToggledOffThenOptionIsRemoved() = runTest {
+        testee.onOptionToggled(FireClearOption.DATA, false)
 
         verify(mockFireDataStore).removeAutomaticClearOption(FireClearOption.DATA)
-    }
-
-    @Test
-    fun whenClearDuckAiChatsToggledOnThenOptionIsAdded() = runTest {
-        testee.onClearDuckAiChatsToggled(true)
-
-        verify(mockFireDataStore).addAutomaticClearOption(FireClearOption.DUCKAI_CHATS)
-    }
-
-    @Test
-    fun whenClearDuckAiChatsToggledOffThenOptionIsRemoved() = runTest {
-        testee.onClearDuckAiChatsToggled(false)
-
-        verify(mockFireDataStore).removeAutomaticClearOption(FireClearOption.DUCKAI_CHATS)
     }
 
     @Test

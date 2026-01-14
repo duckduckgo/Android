@@ -31,6 +31,7 @@ import com.duckduckgo.app.firebutton.AutomaticDataClearingSettingsViewModel.Comm
 import com.duckduckgo.app.firebutton.AutomaticDataClearingSettingsViewModel.ViewState
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.clear.ClearWhenOption
+import com.duckduckgo.app.settings.clear.FireClearOption
 import com.duckduckgo.app.settings.clear.getClearWhenForIndex
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
@@ -93,13 +94,13 @@ class AutomaticDataClearingSettingsActivity : DuckDuckGoActivity() {
             optionsContainer.isVisible = viewState.automaticClearingEnabled
 
             clearTabsSetting.quietlySetIsChecked(viewState.clearTabs) { _, isChecked ->
-                viewModel.onClearTabsToggled(isChecked)
+                viewModel.onOptionToggled(FireClearOption.TABS, isChecked)
             }
             clearDataSetting.quietlySetIsChecked(viewState.clearData) { _, isChecked ->
-                viewModel.onClearDataToggled(isChecked)
+                viewModel.onOptionToggled(FireClearOption.DATA, isChecked)
             }
             clearDuckAiChatsSetting.quietlySetIsChecked(viewState.clearDuckAiChats) { _, isChecked ->
-                viewModel.onClearDuckAiChatsToggled(isChecked)
+                viewModel.onOptionToggled(FireClearOption.DUCKAI_CHATS, isChecked)
             }
             clearDuckAiChatsSetting.isVisible = viewState.showDuckAiChatsOption
 

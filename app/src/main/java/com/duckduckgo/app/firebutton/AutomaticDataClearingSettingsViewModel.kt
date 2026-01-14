@@ -84,55 +84,27 @@ class AutomaticDataClearingSettingsViewModel @Inject constructor(
     }
 
     private fun loadDuckChatState() {
-        viewModelScope.launch {
+        viewModelScope.launch(dispatcherProvider.io()) {
             duckChatWasOpenedBefore.value = duckChat.wasOpenedBefore()
         }
     }
 
     fun onAutomaticClearingToggled(enabled: Boolean) {
-        viewModelScope.launch {
-            withContext(dispatcherProvider.io()) {
-                if (enabled) {
-                    fireDataStore.setAutomaticClearOptions(setOf(FireClearOption.TABS, FireClearOption.DATA))
-                } else {
-                    fireDataStore.setAutomaticClearOptions(emptySet())
-                }
+        viewModelScope.launch(dispatcherProvider.io()) {
+            if (enabled) {
+                fireDataStore.setAutomaticClearOptions(setOf(FireClearOption.TABS, FireClearOption.DATA))
+            } else {
+                fireDataStore.setAutomaticClearOptions(emptySet())
             }
         }
     }
 
-    fun onClearTabsToggled(enabled: Boolean) {
-        viewModelScope.launch {
-            withContext(dispatcherProvider.io()) {
-                if (enabled) {
-                    fireDataStore.addAutomaticClearOption(FireClearOption.TABS)
-                } else {
-                    fireDataStore.removeAutomaticClearOption(FireClearOption.TABS)
-                }
-            }
-        }
-    }
-
-    fun onClearDataToggled(enabled: Boolean) {
-        viewModelScope.launch {
-            withContext(dispatcherProvider.io()) {
-                if (enabled) {
-                    fireDataStore.addAutomaticClearOption(FireClearOption.DATA)
-                } else {
-                    fireDataStore.removeAutomaticClearOption(FireClearOption.DATA)
-                }
-            }
-        }
-    }
-
-    fun onClearDuckAiChatsToggled(enabled: Boolean) {
-        viewModelScope.launch {
-            withContext(dispatcherProvider.io()) {
-                if (enabled) {
-                    fireDataStore.addAutomaticClearOption(FireClearOption.DUCKAI_CHATS)
-                } else {
-                    fireDataStore.removeAutomaticClearOption(FireClearOption.DUCKAI_CHATS)
-                }
+    fun onOptionToggled(option: FireClearOption, enabled: Boolean) {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            if (enabled) {
+                fireDataStore.addAutomaticClearOption(option)
+            } else {
+                fireDataStore.removeAutomaticClearOption(option)
             }
         }
     }
