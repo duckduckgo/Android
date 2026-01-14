@@ -100,6 +100,11 @@ class AppearanceActivity : DuckDuckGoActivity() {
             viewModel.onShowTrackersCountInTabSwitcherChanged(isChecked)
         }
 
+    private val showTrackersCountInAddressBar =
+        CompoundButton.OnCheckedChangeListener { _, isChecked ->
+            viewModel.onShowTrackersCountInAddressBarChanged(isChecked)
+        }
+
     private val changeIconFlow =
         registerForActivityResult(ChangeIconContract()) { resultOk ->
             if (resultOk) {
@@ -172,6 +177,12 @@ class AppearanceActivity : DuckDuckGoActivity() {
                     binding.showTrackersCountInTabSwitcher.quietlySetIsChecked(
                         viewState.isTrackersCountInTabSwitcherEnabled,
                         showTrackersCountInTabSwitcher,
+                    )
+                    binding.showTrackersCountInAddressBar.isVisible = viewState.shouldShowTrackersCountInAddressBar
+                    binding.trackersCountInAddressBarDivider.isVisible = viewState.shouldShowTrackersCountInAddressBar
+                    binding.showTrackersCountInAddressBar.quietlySetIsChecked(
+                        viewState.isTrackersCountInAddressBarEnabled,
+                        showTrackersCountInAddressBar,
                     )
                     configureOmnibarSettings(it)
                 }

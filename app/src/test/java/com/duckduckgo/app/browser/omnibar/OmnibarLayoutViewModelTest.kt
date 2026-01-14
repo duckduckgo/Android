@@ -2380,4 +2380,138 @@ class OmnibarLayoutViewModelTest {
             assertTrue(viewState.updateOmnibarText)
         }
     }
+
+    @Test
+    fun `when feature flag is enabled and user preference is enabled then viewState animation flag is true`() = runTest {
+        runBlocking {
+            whenever(addressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(true)
+        }
+        whenever(settingsDataStore.showTrackersCountInAddressBar).thenReturn(true)
+        initializeViewModel()
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertTrue(viewState.isAddressBarTrackersAnimationEnabled)
+        }
+    }
+
+    @Test
+    fun `when feature flag is enabled but user preference is disabled then viewState animation flag is false`() = runTest {
+        runBlocking {
+            whenever(addressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(true)
+        }
+        whenever(settingsDataStore.showTrackersCountInAddressBar).thenReturn(false)
+        initializeViewModel()
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertFalse(viewState.isAddressBarTrackersAnimationEnabled)
+        }
+    }
+
+    @Test
+    fun `when feature flag is disabled and user preference is enabled then viewState animation flag is false`() = runTest {
+        runBlocking {
+            whenever(addressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(false)
+        }
+        whenever(settingsDataStore.showTrackersCountInAddressBar).thenReturn(true)
+        initializeViewModel()
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertFalse(viewState.isAddressBarTrackersAnimationEnabled)
+        }
+    }
+
+    @Test
+    fun `when both feature flag and user preference are disabled then viewState animation flag is false`() = runTest {
+        runBlocking {
+            whenever(addressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(false)
+        }
+        whenever(settingsDataStore.showTrackersCountInAddressBar).thenReturn(false)
+        initializeViewModel()
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertFalse(viewState.isAddressBarTrackersAnimationEnabled)
+        }
+    }
+
+    @Test
+    fun `when trackers animation started with user preference enabled then command uses correct flag`() = runTest {
+        runBlocking {
+            whenever(addressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(true)
+        }
+        whenever(settingsDataStore.showTrackersCountInAddressBar).thenReturn(true)
+        initializeViewModel()
+
+        testee.onOmnibarFocusChanged(false, SERP_URL)
+        val trackers = givenSomeTrackers()
+        testee.onAnimationStarted(Decoration.LaunchTrackersAnimation(trackers))
+
+        testee.commands().test {
+            val command = awaitItem()
+            assertTrue(command is Command.StartTrackersAnimation)
+            assertTrue((command as Command.StartTrackersAnimation).isAddressBarTrackersAnimationEnabled)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when trackers animation started with user preference disabled then command uses correct flag`() = runTest {
+        runBlocking {
+            whenever(addressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(true)
+        }
+        whenever(settingsDataStore.showTrackersCountInAddressBar).thenReturn(false)
+        initializeViewModel()
+
+        testee.onOmnibarFocusChanged(false, SERP_URL)
+        val trackers = givenSomeTrackers()
+        testee.onAnimationStarted(Decoration.LaunchTrackersAnimation(trackers))
+
+        testee.commands().test {
+            val command = awaitItem()
+            assertTrue(command is Command.StartTrackersAnimation)
+            assertFalse((command as Command.StartTrackersAnimation).isAddressBarTrackersAnimationEnabled)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when trackers animation started with feature flag disabled then command uses correct flag`() = runTest {
+        runBlocking {
+            whenever(addressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(false)
+        }
+        whenever(settingsDataStore.showTrackersCountInAddressBar).thenReturn(true)
+        initializeViewModel()
+
+        testee.onOmnibarFocusChanged(false, SERP_URL)
+        val trackers = givenSomeTrackers()
+        testee.onAnimationStarted(Decoration.LaunchTrackersAnimation(trackers))
+
+        testee.commands().test {
+            val command = awaitItem()
+            assertTrue(command is Command.StartTrackersAnimation)
+            assertFalse((command as Command.StartTrackersAnimation).isAddressBarTrackersAnimationEnabled)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when viewState is accessed then animation flag reflects both feature flag and user preference`() = runTest {
+        runBlocking {
+            whenever(addressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(true)
+        }
+        whenever(settingsDataStore.showTrackersCountInAddressBar).thenReturn(true)
+        initializeViewModel()
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertTrue(viewState.isAddressBarTrackersAnimationEnabled)
+
+            // Verify it's actually combining both checks
+            verify(addressBarTrackersAnimationManager).isFeatureEnabled()
+            verify(settingsDataStore).showTrackersCountInAddressBar
+        }
+    }
 }

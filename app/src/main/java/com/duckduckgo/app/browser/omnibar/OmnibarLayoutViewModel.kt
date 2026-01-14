@@ -137,7 +137,8 @@ class OmnibarLayoutViewModel @Inject constructor(
             hasUnreadTabs = tabs.firstOrNull { !it.viewed } != null,
             showBrowserMenuHighlight = highlightOverflowMenu,
             viewMode = getViewMode(state),
-            isAddressBarTrackersAnimationEnabled = isAddressBarTrackersAnimationEnabled,
+            isAddressBarTrackersAnimationEnabled = isAddressBarTrackersAnimationEnabled &&
+                settingsDataStore.showTrackersCountInAddressBar,
         )
     }.flowOn(dispatcherProvider.io()).stateIn(viewModelScope, SharingStarted.Eagerly, _viewState.value)
 
@@ -903,7 +904,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                                 Command.StartTrackersAnimation(
                                     entities = decoration.entities,
                                     isCustomTab = viewState.value.viewMode is CustomTab,
-                                    isAddressBarTrackersAnimationEnabled = addressBarTrackersAnimationManager.isFeatureEnabled(),
+                                    isAddressBarTrackersAnimationEnabled = viewState.value.isAddressBarTrackersAnimationEnabled,
                                 ),
                             )
                         }

@@ -80,6 +80,9 @@ internal class AppearanceViewModelTest {
     @Mock
     private lateinit var mockOmnibarFeatureRepository: OmnibarRepository
 
+    @Mock
+    private lateinit var mockAddressBarTrackersAnimationManager: com.duckduckgo.app.browser.animations.AddressBarTrackersAnimationManager
+
     @SuppressLint("DenyListedApi")
     @Before
     fun before() {
@@ -92,6 +95,9 @@ internal class AppearanceViewModelTest {
         whenever(mockUrlDisplayRepository.isFullUrlEnabled).thenReturn(flowOf(true))
         whenever(mockTabSwitcherDataStore.isTrackersAnimationInfoTileHidden()).thenReturn(flowOf(false))
         whenever(mockOmnibarFeatureRepository.isSplitOmnibarAvailable).thenReturn(false)
+        runTest {
+            whenever(mockAddressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(false)
+        }
 
         initializeViewModel()
     }
@@ -105,6 +111,7 @@ internal class AppearanceViewModelTest {
                 mockPixel,
                 coroutineTestRule.testDispatcherProvider,
                 mockTabSwitcherDataStore,
+                mockAddressBarTrackersAnimationManager,
                 mockOmnibarFeatureRepository,
             )
     }
@@ -313,6 +320,143 @@ internal class AppearanceViewModelTest {
                 emptyMap(),
                 Pixel.PixelType.Count,
             )
+        }
+
+    @Test
+    fun `when tracker count in address bar is enabled then setting enabled`() =
+        runTest {
+            val enabled = true
+            testee.onShowTrackersCountInAddressBarChanged(enabled)
+            verify(mockAppSettingsDataStore).showTrackersCountInAddressBar = enabled
+            val params = mapOf(Pixel.PixelParameter.IS_ENABLED to enabled.toString())
+            verify(mockPixel).fire(
+                AppPixelName.SETTINGS_APPEARANCE_IS_TRACKER_COUNT_IN_ADDRESS_BAR_TOGGLED,
+                params,
+                emptyMap(),
+                Pixel.PixelType.Count,
+            )
+        }
+
+    @Test
+    fun `when tracker count in address bar is disabled then setting disabled`() =
+        runTest {
+            val enabled = false
+            testee.onShowTrackersCountInAddressBarChanged(enabled)
+            verify(mockAppSettingsDataStore).showTrackersCountInAddressBar = enabled
+            val params = mapOf(Pixel.PixelParameter.IS_ENABLED to enabled.toString())
+            verify(mockPixel).fire(
+                AppPixelName.SETTINGS_APPEARANCE_IS_TRACKER_COUNT_IN_ADDRESS_BAR_TOGGLED,
+                params,
+                emptyMap(),
+                Pixel.PixelType.Count,
+            )
+        }
+
+    @Test
+    fun `when address bar trackers animation feature is disabled then toggle should be hidden`() =
+        runTest {
+            whenever(mockAddressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(false)
+            initializeViewModel()
+
+            testee.viewState().test {
+                val value = expectMostRecentItem()
+                assertEquals(false, value.shouldShowTrackersCountInAddressBar)
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `when address bar trackers animation feature is enabled then toggle should be visible`() =
+        runTest {
+            whenever(mockAddressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(true)
+            initializeViewModel()
+
+            testee.viewState().test {
+                val value = expectMostRecentItem()
+                assertEquals(true, value.shouldShowTrackersCountInAddressBar)
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `when tracker count in address bar setting is stored then it persists correctly`() =
+        runTest {
+            whenever(mockAppSettingsDataStore.showTrackersCountInAddressBar).thenReturn(false)
+            initializeViewModel()
+
+            testee.viewState().test {
+                val value = expectMostRecentItem()
+                assertEquals(false, value.isTrackersCountInAddressBarEnabled)
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `when tracker count in address bar is enabled by default then viewState reflects it`() =
+        runTest {
+            whenever(mockAppSettingsDataStore.showTrackersCountInAddressBar).thenReturn(true)
+            initializeViewModel()
+
+            testee.viewState().test {
+                val value = expectMostRecentItem()
+                assertEquals(true, value.isTrackersCountInAddressBarEnabled)
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `when both feature flag and user preference are enabled then viewState shows both enabled`() =
+        runTest {
+            whenever(mockAddressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(true)
+            whenever(mockAppSettingsDataStore.showTrackersCountInAddressBar).thenReturn(true)
+            initializeViewModel()
+
+            testee.viewState().test {
+                val value = expectMostRecentItem()
+                assertEquals(true, value.shouldShowTrackersCountInAddressBar)
+                assertEquals(true, value.isTrackersCountInAddressBarEnabled)
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `when feature flag is enabled but user preference is disabled then toggle is visible but unchecked`() =
+        runTest {
+            whenever(mockAddressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(true)
+            whenever(mockAppSettingsDataStore.showTrackersCountInAddressBar).thenReturn(false)
+            initializeViewModel()
+
+            testee.viewState().test {
+                val value = expectMostRecentItem()
+                assertEquals(true, value.shouldShowTrackersCountInAddressBar) // Toggle visible
+                assertEquals(false, value.isTrackersCountInAddressBarEnabled) // But unchecked
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `when tracker count in address bar is changed then viewState updates`() =
+        runTest {
+            testee.onShowTrackersCountInAddressBarChanged(false)
+
+            testee.viewState().test {
+                val value = expectMostRecentItem()
+                assertEquals(false, value.isTrackersCountInAddressBarEnabled)
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `when tracker count in address bar is enabled then datastore is updated`() =
+        runTest {
+            testee.onShowTrackersCountInAddressBarChanged(true)
+
+            // Wait for coroutine to complete
+            testee.viewState().test {
+                awaitItem()
+                verify(mockAppSettingsDataStore).showTrackersCountInAddressBar = true
+                cancelAndConsumeRemainingEvents()
+            }
         }
 
     @Test
