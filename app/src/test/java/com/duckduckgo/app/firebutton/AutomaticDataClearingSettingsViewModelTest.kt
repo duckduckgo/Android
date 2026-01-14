@@ -259,6 +259,15 @@ internal class AutomaticDataClearingSettingsViewModelTest {
     }
 
     @Test
+    fun whenClearWhenClickedThenPixelIsFired() = runTest {
+        whenever(mockFireDataStore.getAutomaticallyClearWhenOption()).thenReturn(ClearWhenOption.APP_EXIT_ONLY)
+
+        testee.onClearWhenClicked()
+
+        verify(mockPixel).fire(AppPixelName.AUTOMATIC_CLEAR_DATA_WHEN_SHOWN)
+    }
+
+    @Test
     fun whenClearWhenOptionSelectedThenOptionIsSaved() = runTest {
         testee.onClearWhenOptionSelected(ClearWhenOption.APP_EXIT_OR_60_MINS)
 

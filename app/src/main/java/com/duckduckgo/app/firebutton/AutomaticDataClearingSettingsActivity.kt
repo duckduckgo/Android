@@ -151,7 +151,6 @@ class AutomaticDataClearingSettingsActivity : DuckDuckGoActivity() {
                 },
             )
             .show()
-        pixel.fire(AppPixelName.AUTOMATIC_CLEAR_DATA_WHEN_SHOWN)
     }
 
     companion object {

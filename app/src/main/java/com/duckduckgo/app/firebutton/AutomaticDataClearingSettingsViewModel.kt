@@ -125,6 +125,8 @@ class AutomaticDataClearingSettingsViewModel @Inject constructor(
 
     fun onClearWhenClicked() {
         viewModelScope.launch {
+            pixel.fire(AppPixelName.AUTOMATIC_CLEAR_DATA_WHEN_SHOWN)
+
             val currentOption = withContext(dispatcherProvider.io()) {
                 fireDataStore.getAutomaticallyClearWhenOption()
             }
