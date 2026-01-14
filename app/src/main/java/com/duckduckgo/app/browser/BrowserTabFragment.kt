@@ -1358,10 +1358,14 @@ class BrowserTabFragment :
         logcat { "BrowserMenu: viewMode ${omnibar.viewMode} render browseMenuState $browseMenuState" }
         val useBottomSheetMenu = viewModel.browserViewState.value?.useBottomSheetMenu ?: false
         if (useBottomSheetMenu) {
-            omnibar.configureBrowserMenuIcon(com.duckduckgo.mobile.android.R.drawable.ic_menu_hamburger_24)
+            val resId = com.duckduckgo.mobile.android.R.drawable.ic_menu_hamburger_24
+            omnibar.configureBrowserMenuIcon(resId)
+            browserNavigationBarIntegration.configureBrowserMenuIcon(resId)
             bottomSheetMenu?.render(viewState = browseMenuState)
         } else {
-            omnibar.configureBrowserMenuIcon(com.duckduckgo.mobile.android.R.drawable.ic_menu_vertical_24)
+            val resId = com.duckduckgo.mobile.android.R.drawable.ic_menu_vertical_24
+            omnibar.configureBrowserMenuIcon(resId)
+            browserNavigationBarIntegration.configureBrowserMenuIcon(resId)
             popupMenu?.render(viewState = browseMenuState)
         }
     }
@@ -1495,16 +1499,13 @@ class BrowserTabFragment :
     private fun createBottomSheetMenu() {
         bottomSheetMenu = BrowserMenuBottomSheet(context = requireContext())
         bottomSheetMenu?.apply {
-            backMenuItem.setOnClickListener {
-                dismiss()
+            onMenuItemClicked(backMenuItem) {
                 onBackArrowClicked()
             }
-            forwardMenuItem.setOnClickListener {
-                dismiss()
+            onMenuItemClicked(forwardMenuItem) {
                 onForwardArrowClicked()
             }
-            refreshMenuItem.setOnClickListener {
-                dismiss()
+            onMenuItemClicked(refreshMenuItem) {
                 viewModel.onRefreshRequested(triggeredByUser = true)
                 if (isActiveCustomTab()) {
                     viewModel.fireCustomTabRefreshPixel()
@@ -1512,85 +1513,83 @@ class BrowserTabFragment :
                     viewModel.handleMenuRefreshAction()
                 }
             }
-            newTabMenuItem.setOnClickListener {
-                dismiss()
+            onMenuItemClicked(newTabMenuItem) {
                 viewModel.onNewTabMenuItemClicked()
             }
-            bookmarksMenuItem.setOnClickListener {
-                dismiss()
+            onMenuItemClicked(bookmarksMenuItem) {
                 viewModel.onBookmarksMenuItemClicked()
             }
-            fireproofWebsiteMenuItem.setOnClickListener {
-                dismiss()
+            onMenuItemClicked(fireproofWebsiteMenuItem) {
                 viewModel.onFireproofWebsiteMenuClicked()
             }
-            addBookmarksMenuItem.setOnClickListener {
-                dismiss()
+            onMenuItemClicked(addBookmarksMenuItem) {
                 viewModel.onBookmarkMenuClicked()
             }
-            findInPageMenuItem.setOnClickListener {
-                dismiss()
+            onMenuItemClicked(findInPageMenuItem) {
                 pixel.fire(AppPixelName.MENU_ACTION_FIND_IN_PAGE_PRESSED)
                 viewModel.onFindInPageSelected()
             }
-            privacyProtectionMenuItem.setOnClickListener {
-                dismiss()
-                viewModel.onPrivacyProtectionMenuClicked(isActiveCustomTab())
+            onMenuItemClicked(privacyProtectionMenuItem) {
+                viewModel.onPrivacyProtectionMenuClicked(clickedFromCustomTab = isActiveCustomTab())
             }
-            brokenSiteMenuItem.setOnClickListener {
-                dismiss()
+            onMenuItemClicked(brokenSiteMenuItem) {
                 pixel.fire(AppPixelName.MENU_ACTION_REPORT_BROKEN_SITE_PRESSED)
                 viewModel.onBrokenSiteSelected()
             }
-            settingsMenuItem.setOnClickListener {
-                dismiss()
-                pixel.fire(AppPixelName.MENU_ACTION_SETTINGS_PRESSED)
-                browserActivity?.launchSettings()
-            }
-            changeBrowserModeMenuItem.setOnClickListener {
-                dismiss()
-                viewModel.onChangeBrowserModeClicked()
-            }
-            sharePageMenuItem.setOnClickListener {
-                dismiss()
-                pixel.fire(AppPixelName.MENU_ACTION_SHARE_PRESSED)
-                viewModel.onShareSelected()
-            }
-            addToHomeMenuItem.setOnClickListener {
-                dismiss()
-                pixel.fire(AppPixelName.MENU_ACTION_ADD_TO_HOME_PRESSED)
-                viewModel.onPinPageToHomeSelected()
-            }
-            printPageMenuItem.setOnClickListener {
-                dismiss()
-                viewModel.onPrintSelected()
-            }
-            autofillMenuItem.setOnClickListener {
-                dismiss()
-                pixel.fire(AppPixelName.MENU_ACTION_AUTOFILL_PRESSED)
-                viewModel.onAutofillMenuSelected()
-            }
-            createAliasMenuItem.setOnClickListener {
-                dismiss()
-                viewModel.consumeAliasAndCopyToClipboard()
-            }
-            downloadsMenuItem.setOnClickListener {
-                dismiss()
+            onMenuItemClicked(downloadsMenuItem) {
                 pixel.fire(AppPixelName.MENU_ACTION_DOWNLOADS_PRESSED)
                 browserActivity?.launchDownloads()
             }
-            vpnMenuItem.setOnClickListener {
-                dismiss()
+            onMenuItemClicked(settingsMenuItem) {
+                pixel.fire(AppPixelName.MENU_ACTION_SETTINGS_PRESSED)
+                browserActivity?.launchSettings()
+            }
+            onMenuItemClicked(changeBrowserModeMenuItem) {
+                viewModel.onChangeBrowserModeClicked()
+            }
+            onMenuItemClicked(defaultBrowserMenuItem) {
+                viewModel.onSetDefaultBrowserSelected()
+            }
+            onMenuItemClicked(sharePageMenuItem) {
+                pixel.fire(AppPixelName.MENU_ACTION_SHARE_PRESSED)
+                viewModel.onShareSelected()
+            }
+            onMenuItemClicked(addToHomeMenuItem) {
+                pixel.fire(AppPixelName.MENU_ACTION_ADD_TO_HOME_PRESSED)
+                viewModel.onPinPageToHomeSelected()
+            }
+            onMenuItemClicked(createAliasMenuItem) {
+                viewModel.consumeAliasAndCopyToClipboard()
+            }
+            onMenuItemClicked(openInAppMenuItem) {
+                pixel.fire(AppPixelName.MENU_ACTION_APP_LINKS_OPEN_PRESSED)
+                viewModel.openAppLink()
+            }
+            onMenuItemClicked(printPageMenuItem) {
+                viewModel.onPrintSelected()
+            }
+            onMenuItemClicked(autofillMenuItem) {
+                pixel.fire(AppPixelName.MENU_ACTION_AUTOFILL_PRESSED)
+                viewModel.onAutofillMenuSelected()
+            }
+            onMenuItemClicked(openInDdgBrowserMenuItem) {
+                viewModel.url?.let {
+                    launchCustomTabUrlInDdg(it)
+                    pixel.fire(CustomTabPixelNames.CUSTOM_TABS_OPEN_IN_DDG)
+                }
+            }
+            onMenuItemClicked(vpnMenuItem) {
                 viewModel.onVpnMenuClicked()
             }
-            newDuckChatTabMenuItem.setOnClickListener {
-                dismiss()
+            onMenuItemClicked(newDuckChatTabMenuItem) {
                 viewModel.openNewDuckChat(omnibar.viewMode)
             }
-            duckChatHistoryMenuItem.setOnClickListener {
-                dismiss()
+            onMenuItemClicked(duckChatHistoryMenuItem) {
                 pixel.fire(DuckChatPixelName.DUCK_CHAT_SETTINGS_SIDEBAR_TAPPED)
                 viewModel.openDuckChatSidebar()
+            }
+            onMenuItemClicked(duckChatSettingsMenuItem) {
+                viewModel.openDuckChatSettings()
             }
         }
     }

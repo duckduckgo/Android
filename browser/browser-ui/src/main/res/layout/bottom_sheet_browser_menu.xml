@@ -16,6 +16,7 @@
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical">
@@ -95,6 +96,10 @@
                 app:defaultPadding="true"
                 app:fullWidth="false" />
 
+            <include
+                android:id="@+id/includeDefaultBrowserMenuItem"
+                layout="@layout/view_menu_item_default_browser" />
+
             <com.duckduckgo.common.ui.view.MenuItemView
                 android:id="@+id/addBookmarksMenuItem"
                 android:layout_width="match_parent"
@@ -134,9 +139,17 @@
                 android:id="@+id/refreshMenuItem"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 app:iconDrawable="@drawable/ic_reload_24"
                 app:primaryText="@string/browserMenuRefresh" />
+
+            <com.duckduckgo.common.ui.view.MenuItemView
+                android:id="@+id/openInAppMenuItem"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                tools:visibility="visible"
+                app:iconDrawable="@drawable/ic_open_in_16"
+                app:primaryText="@string/browserMenuOpenAppLink" />
 
             <com.duckduckgo.common.ui.view.divider.HorizontalDivider
                 android:id="@+id/librarySectionDivider"
@@ -228,6 +241,43 @@
                 android:layout_height="wrap_content"
                 app:iconDrawable="@drawable/ic_print_16"
                 app:primaryText="@string/browserMenuPrint" />
+
+            <com.duckduckgo.common.ui.view.MenuItemView
+                android:id="@+id/chatSettings"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:iconDrawable="@drawable/ic_settings_ai_16"
+                app:primaryText="@string/browserMenuChatSettings"
+                tools:visibility="visible" />
+
+            <com.duckduckgo.common.ui.view.MenuItemView
+                android:id="@+id/openInDdgBrowserMenuItem"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:iconDrawable="@drawable/ic_open_in_16"
+                app:primaryText="@string/browserMenuOpenInDDG"
+                tools:visibility="visible" />
+
+            <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+                android:id="@+id/customTabsMenuDivider"
+                style="@style/Widget.DuckDuckGo.PopupMenuHorizontalDivider"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                tools:visibility="visible" />
+
+            <com.duckduckgo.common.ui.view.MenuItemView
+                android:id="@+id/runningInDdgBrowserMenuItem"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:textType="secondary"
+                app:typography="body2"
+                app:iconDrawable="@drawable/ic_dax_icon"
+                app:primaryText="@string/browserMenuRunningInDDG"
+                tools:visibility="visible" />
         </LinearLayout>
 
     </androidx.core.widget.NestedScrollView>

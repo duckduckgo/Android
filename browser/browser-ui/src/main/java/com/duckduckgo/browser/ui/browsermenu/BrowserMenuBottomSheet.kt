@@ -80,6 +80,9 @@ class BrowserMenuBottomSheet(
     val settingsMenuItem: MenuActionButtonView
         get() = binding.settingsMenuItem
 
+    val defaultBrowserMenuItem: View
+        get() = binding.includeDefaultBrowserMenuItem.defaultBrowserMenuItem
+
     val printPageMenuItem: MenuItemView
         get() = binding.printPageMenuItem
 
@@ -110,6 +113,9 @@ class BrowserMenuBottomSheet(
     val duckChatHistoryMenuItem: MenuItemView
         get() = binding.duckChatHistoryMenuItem
 
+    val duckChatSettingsMenuItem: MenuItemView
+        get() = binding.chatSettings
+
     val sharePageMenuItem: MenuItemView
         get() = binding.sharePageMenuItem
 
@@ -125,6 +131,15 @@ class BrowserMenuBottomSheet(
     val refreshMenuItem: MenuItemView
         get() = binding.refreshMenuItem
 
+    val openInAppMenuItem: MenuItemView
+        get() = binding.openInAppMenuItem
+
+    val openInDdgBrowserMenuItem: MenuItemView
+        get() = binding.openInDdgBrowserMenuItem
+
+    val runningInDdgBrowserMenuItem: MenuItemView
+        get() = binding.runningInDdgBrowserMenuItem
+
     val brokenSiteMenuItem: MenuItemView
         get() = binding.reportBrokenSiteMenuItem
 
@@ -136,6 +151,13 @@ class BrowserMenuBottomSheet(
             is BrowserMenuViewState.NewTabPage -> renderNewTabPageMenu(viewState)
             is BrowserMenuViewState.CustomTabs -> renderCustomTabsMenu(viewState)
             is BrowserMenuViewState.DuckAi -> renderDuckAiMenu(viewState)
+        }
+    }
+
+    fun onMenuItemClicked(view: View, onClick: () -> Unit) {
+        view.setOnClickListener {
+            onClick()
+            dismiss()
         }
     }
 
@@ -154,13 +176,17 @@ class BrowserMenuBottomSheet(
     private fun renderBrowserMenu(viewState: BrowserMenuViewState.Browser) {
         backMenuItem.isEnabled = viewState.canGoBack
         forwardMenuItem.isEnabled = viewState.canGoForward
-        refreshMenuItem.isVisible = true
         newTabMenuItem.isEnabled = true
         newDuckChatTabMenuItem.isEnabled = true
         settingsMenuItem.isEnabled = true
 
+        refreshMenuItem.isVisible = true
+        defaultBrowserMenuItem.isVisible = viewState.showSelectDefaultBrowserMenuItem
         printPageMenuItem.isVisible = viewState.canPrintPage
         sharePageMenuItem.isVisible = viewState.canSharePage
+        openInAppMenuItem.isVisible = viewState.hasPreviousAppLink
+        openInDdgBrowserMenuItem.isVisible = false
+        runningInDdgBrowserMenuItem.isVisible = false
 
         addBookmarksMenuItem.isVisible = viewState.canSaveSite
         val bookmarkLabel = context.getString(if (viewState.isBookmark) R.string.browserMenuEditBookmark else R.string.browserMenuAddBookmark)
@@ -177,7 +203,7 @@ class BrowserMenuBottomSheet(
         )
         fireproofWebsiteMenuItem.label(fireproofLabel)
         fireproofWebsiteMenuItem.setIcon(if (viewState.isFireproofWebsite) drawable.ic_fire_16 else drawable.ic_fireproof_solid_16)
-        duckChatHistoryMenuItem.isVisible = true
+        duckChatHistoryMenuItem.isVisible = false
 
         createAliasMenuItem.isVisible = viewState.isEmailSignedIn
 
@@ -218,38 +244,42 @@ class BrowserMenuBottomSheet(
         binding.librarySectionDivider.isVisible = true
         binding.privacyToolsSectionDivider.isVisible = true
         binding.utilitiesSectionDivider.isVisible = true
+        binding.customTabsMenuDivider.isVisible = false
     }
 
     private fun renderNewTabPageMenu(viewState: BrowserMenuViewState.NewTabPage) {
         backMenuItem.isEnabled = false
         forwardMenuItem.isEnabled = viewState.canGoForward
-        refreshMenuItem.isVisible = false
         newTabMenuItem.isEnabled = false
         newDuckChatTabMenuItem.isEnabled = true
         settingsMenuItem.isEnabled = true
 
+        refreshMenuItem.isVisible = false
         autofillMenuItem.isVisible = viewState.showAutofill
         downloadsMenuItem.isVisible = true
-        duckChatHistoryMenuItem.isVisible = true
+        duckChatHistoryMenuItem.isVisible = false
         renderVpnMenu(viewState.vpnMenuState)
 
         binding.urlPageActionsSectionDivider.isVisible = false
         binding.librarySectionDivider.isVisible = true
         binding.privacyToolsSectionDivider.isVisible = false
         binding.utilitiesSectionDivider.isVisible = false
+        binding.customTabsMenuDivider.isVisible = false
     }
 
     private fun renderCustomTabsMenu(viewState: BrowserMenuViewState.CustomTabs) {
         backMenuItem.isEnabled = viewState.canGoBack
         forwardMenuItem.isEnabled = viewState.canGoForward
-        refreshMenuItem.isVisible = true
         newTabMenuItem.isEnabled = false
         newDuckChatTabMenuItem.isEnabled = false
         settingsMenuItem.isEnabled = false
 
+        refreshMenuItem.isVisible = true
         printPageMenuItem.isVisible = true
         sharePageMenuItem.isVisible = viewState.canSharePage
         findInPageMenuItem.isVisible = viewState.canFindInPage
+        openInDdgBrowserMenuItem.isVisible = true
+        runningInDdgBrowserMenuItem.isVisible = true
 
         val changeBrowserLabel = context.getString(
             if (viewState.isDesktopBrowsingMode) {
@@ -281,26 +311,29 @@ class BrowserMenuBottomSheet(
         binding.librarySectionDivider.isVisible = false
         binding.privacyToolsSectionDivider.isVisible = false
         binding.utilitiesSectionDivider.isVisible = true
+        binding.customTabsMenuDivider.isVisible = true
     }
 
     private fun renderDuckAiMenu(viewState: BrowserMenuViewState.DuckAi) {
         backMenuItem.isEnabled = false
         forwardMenuItem.isEnabled = false
-        refreshMenuItem.isVisible = false
         newTabMenuItem.isEnabled = false
         newDuckChatTabMenuItem.isEnabled = true
         settingsMenuItem.isEnabled = true
 
+        refreshMenuItem.isVisible = false
         brokenSiteMenuItem.isVisible = viewState.canReportSite
         printPageMenuItem.isVisible = viewState.canPrintPage
         autofillMenuItem.isVisible = viewState.showAutofill
 
         duckChatHistoryMenuItem.isVisible = true
+        duckChatSettingsMenuItem.isVisible = true
 
         binding.urlPageActionsSectionDivider.isVisible = true
         binding.librarySectionDivider.isVisible = false
         binding.privacyToolsSectionDivider.isVisible = false
         binding.utilitiesSectionDivider.isVisible = true
+        binding.customTabsMenuDivider.isVisible = true
     }
 
     private fun renderVpnMenu(viewState: VpnMenuState) {
