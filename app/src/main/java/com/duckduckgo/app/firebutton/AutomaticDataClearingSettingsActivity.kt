@@ -20,17 +20,17 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.annotation.StringRes
+import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityAutomaticDataClearingSettingsBinding
-import com.duckduckgo.app.firebutton.FireButtonViewModel.AutomaticallyClearData
+import com.duckduckgo.app.firebutton.AutomaticDataClearingSettingsViewModel.Command
+import com.duckduckgo.app.firebutton.AutomaticDataClearingSettingsViewModel.ViewState
 import com.duckduckgo.app.pixels.AppPixelName
-import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.clear.ClearWhenOption
-import com.duckduckgo.app.settings.clear.getClearWhatOptionForIndex
 import com.duckduckgo.app.settings.clear.getClearWhenForIndex
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
@@ -51,7 +51,7 @@ class AutomaticDataClearingSettingsActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var appBuildConfig: AppBuildConfig
 
-    private val viewModel: FireButtonViewModel by bindViewModel()
+    private val viewModel: AutomaticDataClearingSettingsViewModel by bindViewModel()
     private val binding: ActivityAutomaticDataClearingSettingsBinding by viewBinding()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -67,48 +67,43 @@ class AutomaticDataClearingSettingsActivity : DuckDuckGoActivity() {
 
     private fun configureUiEventHandlers() {
         with(binding) {
-            automaticallyClearWhatSetting.setClickListener { viewModel.onAutomaticallyClearWhatClicked() }
-            automaticallyClearWhenSetting.setClickListener { viewModel.onAutomaticallyClearWhenClicked() }
+            clearWhenSetting.setClickListener {
+                viewModel.onClearWhenClicked()
+            }
         }
     }
 
     private fun observeViewModel() {
-        viewModel.viewState()
+        viewModel.viewState
             .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
-            .onEach { viewState ->
-                updateAutomaticClearDataOptions(viewState.automaticallyClearData, viewState.clearDuckAiData)
-            }.launchIn(lifecycleScope)
+            .onEach { viewState -> updateUi(viewState) }
+            .launchIn(lifecycleScope)
 
-        viewModel.commands()
+        viewModel.commands
             .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
             .onEach { processCommand(it) }
             .launchIn(lifecycleScope)
     }
 
-    private fun updateAutomaticClearDataOptions(
-        automaticallyClearData: AutomaticallyClearData,
-        clearDuckAiData: Boolean,
-    ) {
-        val clearWhatSubtitle = getString(automaticallyClearData.clearWhatOption.nameStringResourceId(clearDuckAiData))
-        binding.automaticallyClearWhatSetting.setSecondaryText(clearWhatSubtitle)
-
-        val clearWhenSubtitle = getString(automaticallyClearData.clearWhenOption.nameStringResourceId())
-        binding.automaticallyClearWhenSetting.setSecondaryText(clearWhenSubtitle)
-
-        val whenOptionEnabled = automaticallyClearData.clearWhenOptionEnabled
-        binding.automaticallyClearWhenSetting.isEnabled = whenOptionEnabled
-    }
-
-    @StringRes
-    private fun ClearWhatOption.nameStringResourceId(clearDuckAi: Boolean): Int {
-        return when (this) {
-            ClearWhatOption.CLEAR_NONE -> R.string.settingsAutomaticallyClearWhatOptionNone
-            ClearWhatOption.CLEAR_TABS_ONLY -> R.string.settingsAutomaticallyClearWhatOptionTabs
-            ClearWhatOption.CLEAR_TABS_AND_DATA -> if (clearDuckAi) {
-                R.string.settingsAutomaticallyClearWhatOptionTabsAndDataAndChats
-            } else {
-                R.string.settingsAutomaticallyClearWhatOptionTabsAndData
+    private fun updateUi(viewState: ViewState) {
+        with(binding) {
+            automaticClearingToggle.quietlySetIsChecked(viewState.automaticClearingEnabled) { _, isChecked ->
+                viewModel.onAutomaticClearingToggled(isChecked)
             }
+            optionsContainer.isVisible = viewState.automaticClearingEnabled
+
+            clearTabsSetting.quietlySetIsChecked(viewState.clearTabs) { _, isChecked ->
+                viewModel.onClearTabsToggled(isChecked)
+            }
+            clearDataSetting.quietlySetIsChecked(viewState.clearData) { _, isChecked ->
+                viewModel.onClearDataToggled(isChecked)
+            }
+            clearDuckAiChatsSetting.quietlySetIsChecked(viewState.clearDuckAiChats) { _, isChecked ->
+                viewModel.onClearDuckAiChatsToggled(isChecked)
+            }
+            clearDuckAiChatsSetting.isVisible = viewState.showDuckAiChatsOption
+
+            clearWhenSetting.setSecondaryText(getString(viewState.clearWhenOption.nameStringResourceId()))
         }
     }
 
@@ -124,48 +119,13 @@ class AutomaticDataClearingSettingsActivity : DuckDuckGoActivity() {
         }
     }
 
-    private fun processCommand(it: FireButtonViewModel.Command) {
-        when (it) {
-            is FireButtonViewModel.Command.ShowClearWhatDialog -> launchAutomaticallyClearWhatDialog(it.option, it.clearDuckAi)
-            is FireButtonViewModel.Command.ShowClearWhenDialog -> launchAutomaticallyClearWhenDialog(it.option)
-            else -> { /* Handled by parent activity */ }
+    private fun processCommand(command: Command) {
+        when (command) {
+            is Command.ShowClearWhenDialog -> launchClearWhenDialog(command.option)
         }
     }
 
-    private fun launchAutomaticallyClearWhatDialog(
-        option: ClearWhatOption,
-        clearDuckAi: Boolean,
-    ) {
-        val currentOption = option.getOptionIndex()
-        RadioListAlertDialogBuilder(this)
-            .setTitle(R.string.settingsAutomaticallyClearWhatDialogTitle)
-            .setOptions(
-                listOf(
-                    R.string.settingsAutomaticallyClearWhatOptionNone,
-                    R.string.settingsAutomaticallyClearWhatOptionTabs,
-                    if (clearDuckAi) {
-                        R.string.settingsAutomaticallyClearWhatOptionTabsAndDataAndChats
-                    } else {
-                        R.string.settingsAutomaticallyClearWhatOptionTabsAndData
-                    },
-                ),
-                currentOption,
-            )
-            .setPositiveButton(R.string.settingsAutomaticallyClearingDialogSave)
-            .setNegativeButton(R.string.cancel)
-            .addEventListener(
-                object : RadioListAlertDialogBuilder.EventListener() {
-                    override fun onPositiveButtonClicked(selectedItem: Int) {
-                        val clearWhatSelected = selectedItem.getClearWhatOptionForIndex()
-                        viewModel.onAutomaticallyWhatOptionSelected(clearWhatSelected)
-                    }
-                },
-            )
-            .show()
-        pixel.fire(AppPixelName.AUTOMATIC_CLEAR_DATA_WHAT_SHOWN)
-    }
-
-    private fun launchAutomaticallyClearWhenDialog(option: ClearWhenOption) {
+    private fun launchClearWhenDialog(option: ClearWhenOption) {
         val currentOption = option.getOptionIndex()
         val clearWhenOptions = mutableListOf(
             R.string.settingsAutomaticallyClearWhenAppExitOnly,
@@ -186,7 +146,7 @@ class AutomaticDataClearingSettingsActivity : DuckDuckGoActivity() {
                 object : RadioListAlertDialogBuilder.EventListener() {
                     override fun onPositiveButtonClicked(selectedItem: Int) {
                         val clearWhenSelected = selectedItem.getClearWhenForIndex()
-                        viewModel.onAutomaticallyWhenOptionSelected(clearWhenSelected)
+                        viewModel.onClearWhenOptionSelected(clearWhenSelected)
                     }
                 },
             )
