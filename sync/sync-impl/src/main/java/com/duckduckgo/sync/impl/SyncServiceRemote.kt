@@ -26,6 +26,7 @@ import logcat.LogPriority.INFO
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
 import org.json.JSONObject
+import retrofit2.HttpException
 import retrofit2.Response
 import javax.inject.*
 
@@ -92,6 +93,20 @@ interface SyncApi {
         token: String,
         since: String,
     ): Result<JSONObject>
+
+    fun deleteAiChats(
+        token: String,
+        until: String,
+    ): Result<Unit>
+
+    /**
+     * Obtain a new "scoped token" for the sync service
+     * A scoped token has a reduced range of capabilities, restricted to only the given scope
+     */
+    fun rescopeToken(
+        token: String,
+        scope: String,
+    ): Result<String>
 }
 
 @ContributesBinding(AppScope::class)
@@ -376,6 +391,64 @@ class SyncServiceRemote @Inject constructor(
             val data = response.body() ?: return@onSuccess Result.Error(reason = "GetSettings: empty body")
             Result.Success(data)
         }
+    }
+
+    override fun deleteAiChats(
+        token: String,
+        until: String,
+    ): Result<Unit> {
+        val response = runCatching {
+            val deleteCall = syncService.deleteAiChats("Bearer $token", until)
+            deleteCall.execute()
+        }.getOrElse { throwable ->
+            logcat(INFO) { "Sync-service: error ${throwable.localizedMessage}" }
+            return Result.Error(reason = throwable.message.toString())
+        }
+
+        return onSuccess(response) {
+            Result.Success(Unit)
+        }
+    }
+
+    override fun rescopeToken(
+        token: String,
+        scope: String,
+    ): Result<String> {
+        return runCatching {
+            val rescopeCall = syncService.rescopeToken("Bearer $token", TokenRescopeRequest(scope))
+            val response = rescopeCall.execute()
+
+            if (response.isSuccessful) {
+                val newToken = response.body()?.token.takeUnless { it.isNullOrEmpty() }
+                    ?: return Result.Error(reason = "empty response")
+                Result.Success(newToken)
+            } else {
+                mapRescopeTokenError(response)
+            }
+        }.getOrElse { throwable ->
+            logcat(INFO) { "Sync-service: rescope token error ${throwable.localizedMessage}" }
+            val error = if (throwable is HttpException) {
+                Result.Error(code = throwable.code(), reason = "unexpected status code")
+            } else {
+                Result.Error(reason = "internal error")
+            }
+            error.removeKeysIfInvalid()
+            error
+        }
+    }
+
+    private fun mapRescopeTokenError(response: Response<TokenRescopeResponse?>): Result<String> {
+        val errorBody = response.errorBody()
+        val hasErrorBody = runCatching {
+            errorBody != null && errorBody.string().isNotEmpty()
+        }.getOrDefault(false)
+        val error = if (hasErrorBody) {
+            Result.Error(code = response.code(), reason = "unexpected status code")
+        } else {
+            Result.Error(code = response.code(), reason = "empty response")
+        }
+        error.removeKeysIfInvalid()
+        return error
     }
 
     private fun <T, R> onSuccess(

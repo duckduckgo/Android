@@ -33,7 +33,6 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat.Type
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.updatePadding
-import androidx.fragment.app.FragmentManager
 import com.airbnb.lottie.RenderMode
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.databinding.SheetFireClearDataBinding
@@ -136,6 +135,10 @@ class LegacyFireDialog : BottomSheetDialogFragment(), FireDialog {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        if (savedInstanceState == null) {
+            pixel.enqueueFire(AppPixelName.FIRE_DIALOG_SHOWN)
+        }
+
         canRestart = !animationEnabled()
 
         setupLayout()
@@ -178,10 +181,6 @@ class LegacyFireDialog : BottomSheetDialogFragment(), FireDialog {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-    }
-
-    override fun show(fragmentManager: FragmentManager, tag: String?) {
-        super.show(fragmentManager, tag)
     }
 
     private fun setupLayout() {

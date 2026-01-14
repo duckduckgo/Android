@@ -22,14 +22,28 @@ interface SyncCrypto {
     /**
      * Encrypts a blob of text
      * @param text to encrypt
-     * @return text encrypted
+     * @return text encrypted (Base64 encoded)
      */
     fun encrypt(text: String): String
 
     /**
      * Decrypts a blob of text
-     * @param text to decrypt
+     * @param data text to decrypt
      * @return text decrypted
      */
     fun decrypt(data: String): String
+
+    /**
+     * Encrypts a byte array
+     * @param data raw bytes to encrypt
+     * @return encrypted byte array
+     */
+    fun encrypt(data: ByteArray): ByteArray
+
+    /**
+     * Decrypts a byte array
+     * @param data encrypted byte array
+     * @return decrypted byte array
+     */
+    fun decrypt(data: ByteArray): ByteArray
 }

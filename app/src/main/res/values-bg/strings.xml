@@ -212,6 +212,37 @@
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Fire Button</string>
     <string name="dataClearingActivityTitle">Изчистване на данни</string>
+    <string name="dataClearingDescription">Изтриването на данните може да помогне за защитата на поверителността ти онлайн. Използвай Fire Button, за да изчистиш данните ръчно, или задай автоматично изчистване.</string>
+    <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
+        <item quantity="one">%1$d сайт е изключен от изчистване</item>
+        <item quantity="other">%1$d сайта са изключени от изчистване</item>
+    </plurals>
+    <string name="dataClearingAutomaticClearingOn">Включен</string>
+    <string name="dataClearingAutomaticClearingOff">Изключено</string>
+    <string name="dataClearingClearBrowsingData">Изчистване на данните за сърфиране</string>
+    <string name="dataClearingAutomaticDataClearing">Автоматично изчистване на данни</string>
+    <string name="dataClearingAutomaticallyClearDataToggle">Автоматично изчистване на данните</string>
+    <string name="dataClearingAutomaticTabsOptionDescription">Затваряне на всички отворени раздели</string>
+    <string name="dataClearingAutomaticDataOptionDescription">Изтрива всички данни от сайта, включително посетени сайтове. Може да Ви отпише от акаунтите.</string>
+    <string name="dataClearingAutomaticChatsOptionDescription">Изтриване на всички чатове, включително закачените чатове</string>
+
+    <!-- Fire Dialog Granular Options -->
+    <string name="fireDialogTitle">Избери какво да изтриеш</string>
+    <string name="dataClearingOptionTabs">Раздели</string>
+    <string name="dataClearingOptionData">Бисквитки и данни за сайта</string>
+    <string name="dataClearingDuckAiChats">Чатове с Duck.ai</string>
+    <string name="fireDialogOptionDuckAiChatsDescription">Изтриване на всички чатове</string>
+    <string name="fireDialogDeleteButton">Изтрий</string>
+    <plurals name="fireDialogOptionTabsDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Затваряне на раздела</item>
+        <item quantity="other">Затваряне на всички %1$d раздела</item>
+    </plurals>
+    <string name="fireDialogOptionDataDescriptionNoHistory">Може да Ви отпише от акаунтите.</string>
+    <string name="fireDialogOptionDescriptionNothingToDelete">Няма</string>
+    <plurals name="fireDialogOptionDataDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Изтрий от 1 сайт. Може да те отпише от акаунтите.</item>
+        <item quantity="other">Изтрий от %1$d сайта. Може да те отпише от акаунтите.</item>
+    </plurals>
 
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Разрешения</string>

@@ -212,6 +212,37 @@
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Fire Button</string>
     <string name="dataClearingActivityTitle">Datarydning</string>
+    <string name="dataClearingDescription">Sletning af dine data kan hjælpe med at beskytte dit privatliv online. Brug Fire Button til at rydde data manuelt, eller opsæt automatisk rydning.</string>
+    <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
+        <item quantity="one">%1$d websted udelukket fra rydning</item>
+        <item quantity="other">%1$d websteder udelukket fra rydning</item>
+    </plurals>
+    <string name="dataClearingAutomaticClearingOn">Til</string>
+    <string name="dataClearingAutomaticClearingOff">Fra</string>
+    <string name="dataClearingClearBrowsingData">Ryd browserdata</string>
+    <string name="dataClearingAutomaticDataClearing">Automatisk sletning af data</string>
+    <string name="dataClearingAutomaticallyClearDataToggle">Ryd data automatisk</string>
+    <string name="dataClearingAutomaticTabsOptionDescription">Luk alle åbne faner</string>
+    <string name="dataClearingAutomaticDataOptionDescription">Slet alle webstedsdata, inklusive besøgte sider. Du kan blive logget ud af konti.</string>
+    <string name="dataClearingAutomaticChatsOptionDescription">Slet alle chats, inklusive fastgjorte chats</string>
+
+    <!-- Fire Dialog Granular Options -->
+    <string name="fireDialogTitle">Vælg, hvad du vil slette</string>
+    <string name="dataClearingOptionTabs">Faner</string>
+    <string name="dataClearingOptionData">Cookies og webstedsdata</string>
+    <string name="dataClearingDuckAiChats">Duck.ai-chats</string>
+    <string name="fireDialogOptionDuckAiChatsDescription">Slet alle chats</string>
+    <string name="fireDialogDeleteButton">Slet</string>
+    <plurals name="fireDialogOptionTabsDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Luk fane</item>
+        <item quantity="other">Luk alle %1$d faner</item>
+    </plurals>
+    <string name="fireDialogOptionDataDescriptionNoHistory">Du kan blive logget ud af konti.</string>
+    <string name="fireDialogOptionDescriptionNothingToDelete">Ingen</string>
+    <plurals name="fireDialogOptionDataDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Slet fra 1 websted. Du kan blive logget ud af konti.</item>
+        <item quantity="other">Slet fra %1$d websteder. Du kan blive logget ud af konti.</item>
+    </plurals>
 
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Tilladelser</string>

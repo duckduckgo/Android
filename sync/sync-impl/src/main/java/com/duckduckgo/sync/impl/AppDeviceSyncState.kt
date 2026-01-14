@@ -52,4 +52,8 @@ class AppDeviceSyncState @Inject constructor(
     override fun isFeatureEnabled(): Boolean {
         return syncFeatureToggle.showSync()
     }
+
+    override fun isDuckChatSyncFeatureEnabled(): Boolean {
+        return syncFeatureToggle.allowAiChatSync()
+    }
 }

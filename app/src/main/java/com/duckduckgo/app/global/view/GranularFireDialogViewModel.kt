@@ -91,6 +91,7 @@ class GranularFireDialogViewModel @Inject constructor(
     private val _siteCount = MutableStateFlow(0)
     private val _isHistoryEnabled = MutableStateFlow(false)
     private val _chatClearingEnabled = MutableStateFlow(false)
+    private var hasFiredDialogShownPixel: Boolean = false
 
     // Capacity set to 3 to handle the onDeleteClicked() command burst:
     // OnClearStarted -> PlayAnimation -> ClearingComplete
@@ -151,6 +152,10 @@ class GranularFireDialogViewModel @Inject constructor(
     fun onShow() {
         viewModelScope.launch {
             command.send(Command.OnShow)
+            if (!hasFiredDialogShownPixel) {
+                hasFiredDialogShownPixel = true
+                pixel.fire(AppPixelName.FIRE_DIALOG_SHOWN)
+            }
         }
     }
 

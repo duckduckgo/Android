@@ -78,7 +78,7 @@ class SyncDevicesAttributeMetric @Inject constructor(
     override suspend fun getMetricParameters(): Map<String, String> {
         val connectedDevices = connectedDevicesObserver.observeConnectedDevicesCount().value
         val params = mutableMapOf(
-            "device_count" to getBucketValue(connectedDevices).toString(),
+            "number_of_devices" to getBucketValue(connectedDevices).toString(),
             "version" to bucketConfig.await().version.toString(),
         )
         return params

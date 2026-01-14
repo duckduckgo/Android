@@ -29,6 +29,11 @@ interface DeviceSyncState {
     fun isUserSignedInOnDevice(): Boolean
 
     /**
+     * Checks if chat sync feature is enabled
+     */
+    fun isDuckChatSyncFeatureEnabled(): Boolean
+
+    /**
      * Returns the sync account state
      */
     fun getAccountState(): SyncAccountState

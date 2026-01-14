@@ -74,6 +74,12 @@ appId: com.duckduckgo.mobile.android
     id: "omnibarTextInput"
 - assertNotVisible:
     id: "autoCompleteSuggestionsList"
+# dismiss RMF card if it appears
+- tapOn:
+    id: "close"
+    childOf:
+      id: "remoteMessage"
+    optional: true
 - assertVisible:
     text: "reddit at DuckDuckGo"
     childOf:

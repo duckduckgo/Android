@@ -22,6 +22,7 @@ import com.squareup.moshi.Json
 import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.PATCH
@@ -109,9 +110,21 @@ interface SyncService {
     @GET("$SYNC_PROD_ENVIRONMENT_URL/sync/settings")
     fun settingsSince(@Header("Authorization") token: String, @Query("since") since: String): Call<JSONObject>
 
+    @DELETE("$SYNC_PROD_ENVIRONMENT_URL/sync/ai_chats")
+    fun deleteAiChats(
+        @Header("Authorization") token: String,
+        @Query("until") until: String,
+    ): Call<JSONObject>
+
+    @POST("$SYNC_PROD_ENVIRONMENT_URL/sync/token/rescope")
+    fun rescopeToken(
+        @Header("Authorization") token: String,
+        @Body request: TokenRescopeRequest,
+    ): Call<TokenRescopeResponse>
+
     companion object {
         const val SYNC_PROD_ENVIRONMENT_URL = "https://sync.duckduckgo.com"
-        const val SYNC_DEV_ENVIRONMENT_URL = "https://dev-sync-use.duckduckgo.com"
+        const val SYNC_DEV_ENVIRONMENT_URL = "https://sync-staging.duckduckgo.com"
     }
 }
 
@@ -179,6 +192,14 @@ data class Device(
 data class ErrorResponse(
     val code: Int = -1,
     val error: String,
+)
+
+data class TokenRescopeRequest(
+    val scope: String,
+)
+
+data class TokenRescopeResponse(
+    val token: String,
 )
 
 @Suppress("ktlint:standard:class-naming")

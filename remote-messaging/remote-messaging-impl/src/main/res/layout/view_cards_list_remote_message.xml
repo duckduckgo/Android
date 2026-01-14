@@ -72,7 +72,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/illustrationBarrier"
         app:textType="primary"
-        app:typography="h1"
+        app:typography="title"
         tools:text="What's new" />
 
     <!-- Barrier to ensure RecyclerView starts below the tallest header element -->

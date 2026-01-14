@@ -41,16 +41,15 @@ import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBa
 import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarOptionBottomSheetDialogFactory
 import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarSelection
 import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarSelection.SEARCH_AND_AI
-import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_CANCELLED
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_CONFIRMED
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_DISPLAYED
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_NOT_NOW
-import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelParameters
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelParameters.NEW_ADDRESS_BAR_SELECTION
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
+import com.duckduckgo.sync.api.DeviceSyncState
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.JsonAdapter
@@ -193,6 +192,11 @@ interface DuckChatInternal : DuckChat {
     fun isDuckChatFeatureEnabled(): Boolean
 
     /**
+     * Returns whether chat sync feature is enabled.
+     */
+    fun isChatSyncFeatureEnabled(): Boolean
+
+    /**
      * This method takes a [url] and returns `true` or `false`.
      * @return `true` if the given [url] can be handled in the duck ai webview and `false` otherwise.
      */
@@ -270,6 +274,7 @@ class RealDuckChat @Inject constructor(
     private val imageUploadFeature: AIChatImageUploadFeature,
     private val browserNav: BrowserNav,
     private val newAddressBarOptionBottomSheetDialogFactory: NewAddressBarOptionBottomSheetDialogFactory,
+    private val deviceSyncState: DeviceSyncState,
 ) : DuckChatInternal,
     DuckAiFeatureState,
     PrivacyConfigCallbackPlugin {
@@ -303,6 +308,7 @@ class RealDuckChat @Inject constructor(
     private var duckAiInputScreenBottomBarEnabled = false
     private var showAIChatAddressBarChoiceScreen = false
     private var isDuckChatUserEnabled = false
+    private var isChatSyncFeatureEnabled = false
     private var duckChatLink = DUCK_CHAT_WEB_LINK
     private var bangRegex: Regex? = null
     private var isAddressBarEntryPointEnabled: Boolean = false
@@ -362,6 +368,8 @@ class RealDuckChat @Inject constructor(
     override fun isInputScreenFeatureAvailable(): Boolean = duckAiInputScreen
 
     override fun isDuckChatFeatureEnabled(): Boolean = isDuckChatFeatureEnabled
+
+    override fun isChatSyncFeatureEnabled(): Boolean = isChatSyncFeatureEnabled
 
     override fun isDuckChatFullScreenModeFeatureAvailable(): Boolean = duckChatFeature.fullscreenMode().isEnabled()
 
@@ -522,21 +530,13 @@ class RealDuckChat @Inject constructor(
     ) {
         val url = appendParameters(parameters, duckChatLink)
         appCoroutineScope.launch(dispatchers.io()) {
-            val sessionDelta = duckChatFeatureRepository.sessionDeltaInMinutes()
-            val params = mapOf(DuckChatPixelParameters.DELTA_TIMESTAMP_PARAMETERS to sessionDelta.toString())
-
             val hasSessionActive =
                 when {
                     forceNewSession -> false
                     else -> hasActiveSession()
                 }
 
-            duckChatFeatureRepository.registerOpened()
-
             withContext(dispatchers.main()) {
-                pixel.fire(DuckChatPixelName.DUCK_CHAT_OPEN, parameters = params)
-                pixel.fire(DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_DUCK_AI_OPEN)
-                pixel.fire(DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_DUCK_AI_OPEN_DAILY, type = Pixel.PixelType.Daily())
                 logcat { "Duck.ai: restoring Duck.ai session $url hasSessionActive $hasSessionActive" }
                 openDuckChatSession(url, hasSessionActive)
             }
@@ -660,6 +660,7 @@ class RealDuckChat @Inject constructor(
             showAIChatAddressBarChoiceScreen = duckChatFeature.showAIChatAddressBarChoiceScreen().isEnabled()
             showInputScreenOnSystemSearchLaunchEnabled = duckChatFeature.showInputScreenOnSystemSearchLaunch().isEnabled()
             inputScreenMainButtonsEnabled = duckChatFeature.showMainButtonsInInputScreen().isEnabled()
+            isChatSyncFeatureEnabled = deviceSyncState.isDuckChatSyncFeatureEnabled()
 
             val showMainButtons = duckChatFeature.showMainButtonsInInputScreen().isEnabled()
             _showMainButtonsInInputScreen.emit(showMainButtons)

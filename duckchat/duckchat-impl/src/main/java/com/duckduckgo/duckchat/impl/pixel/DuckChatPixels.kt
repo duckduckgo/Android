@@ -109,9 +109,11 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
+import kotlin.collections.plusAssign
 
 interface DuckChatPixels {
     fun sendReportMetricPixel(reportMetric: ReportMetric)
+    fun reportOpen()
 }
 
 @ContributesBinding(AppScope::class)
@@ -139,6 +141,17 @@ class RealDuckChatPixels @Inject constructor(
             withContext(dispatcherProvider.main()) {
                 pixel.fire(pixelName, parameters = params)
             }
+        }
+    }
+
+    override fun reportOpen() {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            duckChatFeatureRepository.registerOpened()
+            val sessionDelta = duckChatFeatureRepository.sessionDeltaInMinutes()
+            val params = mapOf(DuckChatPixelParameters.DELTA_TIMESTAMP_PARAMETERS to sessionDelta.toString())
+            pixel.fire(DUCK_CHAT_OPEN, parameters = params)
+            pixel.fire(PRODUCT_TELEMETRY_SURFACE_DUCK_AI_OPEN)
+            pixel.fire(PRODUCT_TELEMETRY_SURFACE_DUCK_AI_OPEN_DAILY, type = Pixel.PixelType.Daily())
         }
     }
 }

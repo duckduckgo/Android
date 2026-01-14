@@ -212,6 +212,37 @@
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Fire Button</string>
     <string name="dataClearingActivityTitle">Datenlöschung</string>
+    <string name="dataClearingDescription">Das Löschen deiner Daten kann dazu beitragen, deinen Online-Datenschutz zu verbessern. Verwende den Fire Button, um Daten manuell zu löschen, oder richte eine automatische Datenlöschung ein.</string>
+    <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
+        <item quantity="one">%1$d Website vom Löschen ausgeschlossen</item>
+        <item quantity="other">%1$d Websites vom Löschen ausgeschlossen</item>
+    </plurals>
+    <string name="dataClearingAutomaticClearingOn">Ein</string>
+    <string name="dataClearingAutomaticClearingOff">Aus</string>
+    <string name="dataClearingClearBrowsingData">Browserdaten löschen</string>
+    <string name="dataClearingAutomaticDataClearing">Automatische Datenlöschung</string>
+    <string name="dataClearingAutomaticallyClearDataToggle">Daten automatisch löschen</string>
+    <string name="dataClearingAutomaticTabsOptionDescription">Alle offenen Tabs schließen</string>
+    <string name="dataClearingAutomaticDataOptionDescription">Löschen aller Websitedaten, einschließlich der besuchten Seiten; du wirst möglicherweise von Konten abgemeldet.</string>
+    <string name="dataClearingAutomaticChatsOptionDescription">Löschen aller Chats, einschließlich angehefteter Chats</string>
+
+    <!-- Fire Dialog Granular Options -->
+    <string name="fireDialogTitle">Wähle, was du löschen möchtest</string>
+    <string name="dataClearingOptionTabs">Tabs</string>
+    <string name="dataClearingOptionData">Cookies und Website-Daten</string>
+    <string name="dataClearingDuckAiChats">Duck.ai-Chats</string>
+    <string name="fireDialogOptionDuckAiChatsDescription">Alle Chats löschen</string>
+    <string name="fireDialogDeleteButton">Löschen</string>
+    <plurals name="fireDialogOptionTabsDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Tab schließen</item>
+        <item quantity="other">Alle %1$d Tabs schließen</item>
+    </plurals>
+    <string name="fireDialogOptionDataDescriptionNoHistory">du wirst möglicherweise von Konten abgemeldet.</string>
+    <string name="fireDialogOptionDescriptionNothingToDelete">Gar nichts</string>
+    <plurals name="fireDialogOptionDataDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Von 1 Website löschen. Du wirst möglicherweise von Konten abgemeldet.</item>
+        <item quantity="other">Von %1$d Websites löschen. Du wirst möglicherweise von Konten abgemeldet.</item>
+    </plurals>
 
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Berechtigungen</string>

@@ -23,7 +23,7 @@ import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin
 import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin.PixelParameter
 import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin.PixelParameter.Companion.removeAtb
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.sync.api.engine.SyncableType
+import com.duckduckgo.sync.api.engine.SyncFeatureType
 import com.duckduckgo.sync.impl.API_CODE
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.pixels.SyncPixelName.SYNC_DAILY
@@ -85,7 +85,7 @@ interface SyncPixels {
     )
 
     fun fireDailySyncApiErrorPixel(
-        feature: SyncableType,
+        feature: SyncFeatureType,
         apiError: Error,
     )
 
@@ -181,7 +181,7 @@ class RealSyncPixels @Inject constructor(
     }
 
     override fun fireDailySyncApiErrorPixel(
-        feature: SyncableType,
+        feature: SyncFeatureType,
         apiError: Error,
     ) {
         when (apiError.code) {

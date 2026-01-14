@@ -212,6 +212,37 @@
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Fire Button</string>
     <string name="dataClearingActivityTitle">Datarensning</string>
+    <string name="dataClearingDescription">Att radera dina data kan bidra till att skydda din integritet online. Använd Fire Button för att rensa data manuellt eller ställa in automatisk rensning.</string>
+    <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
+        <item quantity="one">%1$d webbplats undantas från rensning</item>
+        <item quantity="other">%1$d webbplatser undantas från rensning</item>
+    </plurals>
+    <string name="dataClearingAutomaticClearingOn">På</string>
+    <string name="dataClearingAutomaticClearingOff">Av</string>
+    <string name="dataClearingClearBrowsingData">Rensa webbläsardata</string>
+    <string name="dataClearingAutomaticDataClearing">Automatisk datarensning</string>
+    <string name="dataClearingAutomaticallyClearDataToggle">Rensa data automatiskt</string>
+    <string name="dataClearingAutomaticTabsOptionDescription">Stäng alla öppna flikar</string>
+    <string name="dataClearingAutomaticDataOptionDescription">Radera all webbplatsdata, inklusive besökta webbplatser. Kan logga ut dig från konton.</string>
+    <string name="dataClearingAutomaticChatsOptionDescription">Ta bort alla chattar, inklusive fästa chattar</string>
+
+    <!-- Fire Dialog Granular Options -->
+    <string name="fireDialogTitle">Välj vad som ska raderas</string>
+    <string name="dataClearingOptionTabs">Flikar</string>
+    <string name="dataClearingOptionData">Cookies och webbplatsdata</string>
+    <string name="dataClearingDuckAiChats">Duck.ai-chattar</string>
+    <string name="fireDialogOptionDuckAiChatsDescription">Radera alla chattar</string>
+    <string name="fireDialogDeleteButton">Ta bort</string>
+    <plurals name="fireDialogOptionTabsDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Stäng flik</item>
+        <item quantity="other">Stäng alla %1$d flikar</item>
+    </plurals>
+    <string name="fireDialogOptionDataDescriptionNoHistory">Kan logga ut dig från konton.</string>
+    <string name="fireDialogOptionDescriptionNothingToDelete">Inga</string>
+    <plurals name="fireDialogOptionDataDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Ta bort från 1 webbplats. Kan logga ut dig från konton.</item>
+        <item quantity="other">Ta bort från %1$d webbplatser. Kan logga ut dig från konton.</item>
+    </plurals>
 
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Behörigheter</string>

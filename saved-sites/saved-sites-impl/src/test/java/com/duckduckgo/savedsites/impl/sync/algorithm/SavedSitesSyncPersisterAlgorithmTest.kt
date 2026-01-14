@@ -245,12 +245,12 @@ class SavedSitesSyncPersisterAlgorithmTest {
     }
 
     class FakeCrypto : SyncCrypto {
-        override fun encrypt(text: String): String {
-            return text
-        }
+        override fun encrypt(text: String) = text
 
-        override fun decrypt(data: String): String {
-            return data
-        }
+        override fun decrypt(data: String) = data
+
+        override fun encrypt(data: ByteArray): ByteArray = data
+
+        override fun decrypt(data: ByteArray): ByteArray = data
     }
 }

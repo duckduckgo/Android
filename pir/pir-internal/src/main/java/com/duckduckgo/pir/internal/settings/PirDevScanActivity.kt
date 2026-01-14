@@ -19,6 +19,9 @@ package com.duckduckgo.pir.internal.settings
 import android.content.Intent
 import android.os.Bundle
 import android.os.Process
+import android.view.View
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
@@ -83,6 +86,9 @@ class PirDevScanActivity : DuckDuckGoActivity() {
 
     private val binding: ActivityPirInternalScanBinding by viewBinding()
     private val recordStringBuilder = StringBuilder()
+    private lateinit var dropDownAdapter: ArrayAdapter<String>
+    private val brokerOptions = mutableListOf<String>()
+    private var selectedBroker: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -93,6 +99,14 @@ class PirDevScanActivity : DuckDuckGoActivity() {
     }
 
     private fun bindViews() {
+        lifecycleScope.launch {
+            repository.getAllActiveBrokers().also {
+                brokerOptions.addAll(it)
+                dropDownAdapter.clear()
+                dropDownAdapter.addAll(brokerOptions)
+            }
+        }
+
         repository.getAllExtractedProfilesFlow()
             .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
             .onEach {
@@ -127,6 +141,8 @@ class PirDevScanActivity : DuckDuckGoActivity() {
     }
 
     private fun setupViews() {
+        dropDownAdapter = ArrayAdapter<String>(this, android.R.layout.simple_spinner_item)
+
         binding.debugRunScan.setOnClickListener {
             pirNotificationManager.cancelNotifications()
             logcat { "PIR-SCAN: Attempting to start PirForegroundScanService from ${Process.myPid()}" }
@@ -167,6 +183,35 @@ class PirDevScanActivity : DuckDuckGoActivity() {
             globalActivityStarter.start(this, PirResultsScreenParams.PirScanResultsScreen)
         }
 
+        binding.scanBrokers.adapter = dropDownAdapter
+        dropDownAdapter.addAll(brokerOptions)
+
+        binding.scanBrokers.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long,
+            ) {
+                selectedBroker = brokerOptions[position]
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {}
+        }
+
+        binding.debugScan.setOnClickListener {
+            pirNotificationManager.cancelNotifications()
+            if (selectedBroker != null) {
+                globalActivityStarter.start(
+                    this,
+                    PirDevWebViewResultsScreenParams(
+                        brokers = listOf(selectedBroker!!),
+                        debugType = DebugType.SCAN,
+                    ),
+                )
+            }
+        }
+
         binding.debugForceKill.setOnClickListener {
             killRunningWork()
         }
@@ -178,7 +223,7 @@ class PirDevScanActivity : DuckDuckGoActivity() {
                 repository.deleteAllUserProfilesQueries()
                 eventsRepository.deleteEventLogs()
                 eventsRepository.deleteAllOptOutData()
-                pirSchedulingRepository.deleteAllJobRecords()
+                pirSchedulingRepository.clearAllData()
                 eventsRepository.deleteAllEmailConfirmationsLogs()
             }
         }

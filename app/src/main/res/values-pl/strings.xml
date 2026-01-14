@@ -214,6 +214,43 @@
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Przycisk zabezpieczenia</string>
     <string name="dataClearingActivityTitle">Czyszczenie danych</string>
+    <string name="dataClearingDescription">Usunięcie danych może pomóc chronić Twoją prywatność w sieci. Użyj przycisku Fire Button, aby ręcznie wyczyścić dane, lub skonfiguruj automatyczne czyszczenie.</string>
+    <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
+        <item quantity="one">%1$d witryna wyłączona z czyszczenia</item>
+        <item quantity="few">%1$d witryny wyłączone z czyszczenia</item>
+        <item quantity="many">%1$d witryn wyłączonych z czyszczenia</item>
+        <item quantity="other">%1$d witryny wyłączonej z czyszczenia</item>
+    </plurals>
+    <string name="dataClearingAutomaticClearingOn">Wł.</string>
+    <string name="dataClearingAutomaticClearingOff">Wyłączone</string>
+    <string name="dataClearingClearBrowsingData">Wyczyść dane przeglądania</string>
+    <string name="dataClearingAutomaticDataClearing">Automatyczne czyszczenie danych</string>
+    <string name="dataClearingAutomaticallyClearDataToggle">Automatyczne czyszczenie danych</string>
+    <string name="dataClearingAutomaticTabsOptionDescription">Zamknij wszystkie otwarte karty</string>
+    <string name="dataClearingAutomaticDataOptionDescription">Usuń wszystkie dane witryn, w tym odwiedzone strony. Może nastąpić wylogowanie z kont.</string>
+    <string name="dataClearingAutomaticChatsOptionDescription">Usuń wszystkie czaty, w tym przypięte</string>
+
+    <!-- Fire Dialog Granular Options -->
+    <string name="fireDialogTitle">Wybierz, co chcesz usunąć</string>
+    <string name="dataClearingOptionTabs">Karty</string>
+    <string name="dataClearingOptionData">Pliki cookie i dane witryny</string>
+    <string name="dataClearingDuckAiChats">Czaty Duck.ai</string>
+    <string name="fireDialogOptionDuckAiChatsDescription">Usuń wszystkie czaty</string>
+    <string name="fireDialogDeleteButton">Usuń</string>
+    <plurals name="fireDialogOptionTabsDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Zamknij kartę</item>
+        <item quantity="few">Zamknij wszystkie %1$d karty</item>
+        <item quantity="many">Zamknij wszystkie %1$d kart</item>
+        <item quantity="other">Zamknij wszystkie %1$d karty</item>
+    </plurals>
+    <string name="fireDialogOptionDataDescriptionNoHistory">Może nastąpić wylogowanie z kont.</string>
+    <string name="fireDialogOptionDescriptionNothingToDelete">Brak</string>
+    <plurals name="fireDialogOptionDataDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Usuń z 1 witryny. Może spowodować wylogowanie z kont.</item>
+        <item quantity="few">Usuń z %1$d witryn. Może spowodować wylogowanie z kont.</item>
+        <item quantity="many">Usuń z %1$d witryn. Może spowodować wylogowanie z kont.</item>
+        <item quantity="other">Usuń z %1$d witryny. Może spowodować wylogowanie z kont.</item>
+    </plurals>
 
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Uprawnienia</string>

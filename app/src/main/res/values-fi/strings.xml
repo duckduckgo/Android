@@ -212,6 +212,37 @@
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Fire-painike</string>
     <string name="dataClearingActivityTitle">Datan tyhjentäminen</string>
+    <string name="dataClearingDescription">Tietojesi poistaminen voi auttaa suojaamaan yksityisyyttäsi verkossa. Tyhjennä tiedot manuaalisesti Fire Buttonilla tai määritä automaattinen tyhjennys.</string>
+    <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
+        <item quantity="one">%1$d kohde jätettiin poiston ulkopuolelle</item>
+        <item quantity="other">%1$d kohdetta jätettiin poiston ulkopuolelle</item>
+    </plurals>
+    <string name="dataClearingAutomaticClearingOn">Päällä</string>
+    <string name="dataClearingAutomaticClearingOff">Pois</string>
+    <string name="dataClearingClearBrowsingData">Poista selaustiedot</string>
+    <string name="dataClearingAutomaticDataClearing">Automaattinen tietojen tyhjennys</string>
+    <string name="dataClearingAutomaticallyClearDataToggle">Tyhjennä tiedot automaattisesti</string>
+    <string name="dataClearingAutomaticTabsOptionDescription">Sulje kaikki avoimet välilehdet</string>
+    <string name="dataClearingAutomaticDataOptionDescription">Poista kaikki sivuston tiedot, mukaan lukien vieraillut sivustot. Saattaa kirjata sinut ulos tileiltä.</string>
+    <string name="dataClearingAutomaticChatsOptionDescription">Poista kaikki keskustelut, myös kiinnitetyt keskustelut</string>
+
+    <!-- Fire Dialog Granular Options -->
+    <string name="fireDialogTitle">Valitse, mitä poistetaan</string>
+    <string name="dataClearingOptionTabs">Välilehdet</string>
+    <string name="dataClearingOptionData">Evästeet ja sivuston tiedot</string>
+    <string name="dataClearingDuckAiChats">Duck.ai-keskustelut</string>
+    <string name="fireDialogOptionDuckAiChatsDescription">Poista kaikki keskustelut</string>
+    <string name="fireDialogDeleteButton">Poista</string>
+    <plurals name="fireDialogOptionTabsDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Sulje välilehti</item>
+        <item quantity="other">Sulje kaikki %1$d välilehteä</item>
+    </plurals>
+    <string name="fireDialogOptionDataDescriptionNoHistory">Saattaa kirjata sinut ulos tileiltä.</string>
+    <string name="fireDialogOptionDescriptionNothingToDelete">Ei mitään</string>
+    <plurals name="fireDialogOptionDataDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Poista yhdeltä sivustolta. Saattaa kirjata sinut ulos tileiltä.</item>
+        <item quantity="other">Poista %1$d sivustolta. Saattaa kirjata sinut ulos tileiltä.</item>
+    </plurals>
 
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Käyttöoikeudet</string>
