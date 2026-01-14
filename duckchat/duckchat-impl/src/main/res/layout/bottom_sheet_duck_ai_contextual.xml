@@ -223,7 +223,7 @@
         <FrameLayout
             android:id="@+id/contextualWebViewContainer"
             android:layout_width="match_parent"
-            android:layout_height="760dp"
+            android:layout_height="750dp"
             android:visibility="gone"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -234,7 +234,7 @@
                 android:id="@+id/simpleWebview"
                 android:visibility="gone"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+                android:layout_height="750dp" />
 
         </FrameLayout>
 

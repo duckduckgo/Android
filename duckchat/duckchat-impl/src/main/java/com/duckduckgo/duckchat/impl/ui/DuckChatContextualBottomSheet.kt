@@ -26,7 +26,6 @@ import android.os.Message
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE
 import android.webkit.WebChromeClient
 import android.webkit.WebSettings
 import android.webkit.WebView
@@ -35,6 +34,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.doOnLayout
+import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePadding
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -122,7 +122,16 @@ class DuckChatContextualBottomSheet(
 
         bottomSheetDialog.window?.let { window ->
             ViewCompat.setOnApplyWindowInsetsListener(window.decorView) { view, insets ->
-                if (!isExpanded) {
+                logcat { "Duck.ai setOnApplyWindowInsetsListener decorView $view" }
+                if (sheetMode == SheetMode.WEBVIEW) {
+                    val newHeight = binding.root.height
+                    binding.contextualWebViewContainer.updateLayoutParams {
+                        height = newHeight
+                    }
+                    binding.simpleWebview.updateLayoutParams {
+                        height = newHeight
+                    }
+                } else {
                     val imeBottom = insets.getInsets(WindowInsetsCompat.Type.ime()).bottom
                     val systemBottom = insets.getInsets(WindowInsetsCompat.Type.systemBars()).bottom
                     val extraMargin = (imeBottom - systemBottom).coerceAtLeast(0)
@@ -212,7 +221,6 @@ class DuckChatContextualBottomSheet(
         bottomSheetDialog?.let {
             bottomSheetDialog.window?.let {
                 it.decorView.updatePadding(bottom = 0)
-                it.setSoftInputMode(SOFT_INPUT_ADJUST_RESIZE)
             }
             binding.root.doOnLayout {
                 bottomSheetDialog.behavior.state = BottomSheetBehavior.STATE_EXPANDED
