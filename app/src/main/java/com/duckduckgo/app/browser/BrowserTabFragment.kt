@@ -3131,7 +3131,7 @@ class BrowserTabFragment :
 
     private fun showDuckChatBottomSheet() {
         if (duckChatContextualSheet == null) {
-            duckChatContextualSheet = duckChatContextualBottomSheetFactory.create()
+            duckChatContextualSheet = DuckChatContextualBottomSheet.newInstance()
         }
         duckChatContextualSheet?.show(childFragmentManager, DuckChatContextualBottomSheet.TAG)
     }

@@ -19,6 +19,7 @@ package com.duckduckgo.duckchat.impl.ui
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Dialog
+import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.os.Environment
@@ -38,6 +39,8 @@ import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePadding
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.view.gone
@@ -47,6 +50,7 @@ import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.common.utils.extensions.hideKeyboard
+import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.downloads.api.DOWNLOAD_SNACKBAR_DELAY
 import com.duckduckgo.downloads.api.DOWNLOAD_SNACKBAR_LENGTH
 import com.duckduckgo.downloads.api.DownloadCommand
@@ -70,6 +74,7 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.snackbar.Snackbar
+import dagger.android.support.AndroidSupportInjection
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.cancellable
 import kotlinx.coroutines.flow.launchIn
@@ -79,23 +84,55 @@ import kotlinx.coroutines.withContext
 import logcat.logcat
 import org.json.JSONObject
 import java.io.File
+import javax.inject.Inject
+import javax.inject.Named
 
-class DuckChatContextualBottomSheet(
-    private val viewModelFactory: FragmentViewModelFactory,
-    private val webViewClient: DuckChatWebViewClient,
-    private val contentScopeScripts: JsMessaging,
-    private val duckChatJSHelper: DuckChatJSHelper,
-    private val subscriptionsHandler: SubscriptionsHandler,
-    private val appCoroutineScope: CoroutineScope,
-    private val dispatcherProvider: DispatcherProvider,
-    private val browserNav: BrowserNav,
-    private val appBuildConfig: AppBuildConfig,
-    private val fileDownloader: FileDownloader,
-    private val downloadCallback: DownloadStateListener,
-    private val downloadsFileActions: DownloadsFileActions,
-    private val aiChatDownloadFeature: AIChatDownloadFeature,
-    private val duckChat: DuckChat,
-) : BottomSheetDialogFragment(), DownloadConfirmationDialogListener {
+@InjectWith(FragmentScope::class)
+class DuckChatContextualBottomSheet : BottomSheetDialogFragment(), DownloadConfirmationDialogListener {
+
+    @Inject
+    lateinit var viewModelFactory: FragmentViewModelFactory
+
+    @Inject
+    lateinit var duckChatWebViewClient: DuckChatWebViewClient
+
+    @Inject
+    @Named("ContentScopeScripts")
+    lateinit var contentScopeScripts: JsMessaging
+
+    @Inject
+    lateinit var duckChatJSHelper: DuckChatJSHelper
+
+    @Inject
+    lateinit var subscriptionsHandler: SubscriptionsHandler
+
+    @Inject
+    @AppCoroutineScope
+    lateinit var appCoroutineScope: CoroutineScope
+
+    @Inject
+    lateinit var dispatcherProvider: DispatcherProvider
+
+    @Inject
+    lateinit var browserNav: BrowserNav
+
+    @Inject
+    lateinit var appBuildConfig: AppBuildConfig
+
+    @Inject
+    lateinit var fileDownloader: FileDownloader
+
+    @Inject
+    lateinit var downloadCallback: DownloadStateListener
+
+    @Inject
+    lateinit var downloadsFileActions: DownloadsFileActions
+
+    @Inject
+    lateinit var aiChatDownloadFeature: AIChatDownloadFeature
+
+    @Inject
+    lateinit var duckChat: DuckChat
 
     // this will go in the viewmodel
     private enum class SheetMode {
@@ -115,6 +152,11 @@ class DuckChatContextualBottomSheet(
     private var pendingFileDownload: PendingFileDownload? = null
     private val downloadMessagesJob = ConflatedJob()
     private var isExpanded = false
+
+    override fun onAttach(context: Context) {
+        AndroidSupportInjection.inject(this)
+        super.onAttach(context)
+    }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         logcat { "Duck.ai Contextual: onCreateDialog" }
@@ -187,9 +229,9 @@ class DuckChatContextualBottomSheet(
     }
 
     override fun onDestroyView() {
-        logcat { "Duck.ai Contextual: onDestroyView" }
         super.onDestroyView()
         _binding = null
+        downloadMessagesJob.cancel()
     }
 
     override fun onCreateView(
@@ -197,7 +239,6 @@ class DuckChatContextualBottomSheet(
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        logcat { "Duck.ai Contextual: onCreateView" }
         _binding = BottomSheetDuckAiContextualBinding.inflate(inflater, container, false)
         configureViews(binding)
         return binding.root
@@ -267,12 +308,11 @@ class DuckChatContextualBottomSheet(
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
-        logcat { "Duck.ai Contextual: onViewCreated" }
 
         configureDialogButtons(binding)
 
         binding.simpleWebview.let {
-            it.webViewClient = webViewClient
+            it.webViewClient = duckChatWebViewClient
             it.webChromeClient = object : WebChromeClient() {
                 override fun onCreateWindow(
                     view: WebView?,
@@ -496,5 +536,9 @@ class DuckChatContextualBottomSheet(
         private const val CUSTOM_UA =
             "Mozilla/5.0 (Linux; Android 16) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/124.0.0.0 Mobile DuckDuckGo/5 Safari/537.36"
         private const val PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE = 200
+
+        fun newInstance(): DuckChatContextualBottomSheet {
+            return DuckChatContextualBottomSheet()
+        }
     }
 }
