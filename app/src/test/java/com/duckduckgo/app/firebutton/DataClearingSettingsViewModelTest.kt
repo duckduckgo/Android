@@ -69,9 +69,9 @@ internal class DataClearingSettingsViewModelTest {
     private val automaticClearOptionsFlow = MutableStateFlow<Set<FireClearOption>>(emptySet())
 
     @Before
-    fun before() {
+    fun before() = runTest {
         whenever(mockSettingsDataStore.selectedFireAnimation).thenReturn(FireAnimation.HeroFire)
-        whenever(mockSettingsDataStore.clearDuckAiData).thenReturn(false)
+        whenever(mockFireDataStore.isManualClearOptionSelected(FireClearOption.DUCKAI_CHATS)).thenReturn(false)
         whenever(mockDuckAiFeatureState.showClearDuckAIChatHistory).thenReturn(duckAiShowClearDuckAIChatHistoryFlow)
         whenever(mockFireproofWebsiteRepository.getFireproofWebsites()).thenReturn(fireproofWebsitesLiveData)
         whenever(mockFireDataStore.getAutomaticClearOptionsFlow()).thenReturn(automaticClearOptionsFlow)
@@ -86,8 +86,9 @@ internal class DataClearingSettingsViewModelTest {
             mockPixel,
             mockDuckChat,
             mockDuckAiFeatureState,
-            mockFireproofWebsiteRepository,
             mockFireDataStore,
+            coroutineTestRule.testDispatcherProvider,
+            mockFireproofWebsiteRepository,
         )
     }
 
@@ -117,8 +118,9 @@ internal class DataClearingSettingsViewModelTest {
             mockPixel,
             mockDuckChat,
             mockDuckAiFeatureState,
-            mockFireproofWebsiteRepository,
             mockFireDataStore,
+            coroutineTestRule.testDispatcherProvider,
+            mockFireproofWebsiteRepository,
         )
 
         testee.viewState.test {
@@ -139,8 +141,9 @@ internal class DataClearingSettingsViewModelTest {
             mockPixel,
             mockDuckChat,
             mockDuckAiFeatureState,
-            mockFireproofWebsiteRepository,
             mockFireDataStore,
+            coroutineTestRule.testDispatcherProvider,
+            mockFireproofWebsiteRepository,
         )
 
         testee.viewState.test {
@@ -161,8 +164,9 @@ internal class DataClearingSettingsViewModelTest {
             mockPixel,
             mockDuckChat,
             mockDuckAiFeatureState,
-            mockFireproofWebsiteRepository,
             mockFireDataStore,
+            coroutineTestRule.testDispatcherProvider,
+            mockFireproofWebsiteRepository,
         )
 
         testee.viewState.test {
@@ -302,7 +306,7 @@ internal class DataClearingSettingsViewModelTest {
 
     @Test
     fun whenClearDuckAiDataToggledOnThenUpdateStateAndFirePixel() = runTest {
-        whenever(mockSettingsDataStore.clearDuckAiData).thenReturn(false)
+        whenever(mockFireDataStore.isManualClearOptionSelected(FireClearOption.DUCKAI_CHATS)).thenReturn(false)
 
         testee.viewState.test {
             assertFalse(awaitItem().clearDuckAiData)
@@ -310,7 +314,7 @@ internal class DataClearingSettingsViewModelTest {
             testee.onClearDuckAiDataToggled(true)
 
             assertTrue(awaitItem().clearDuckAiData)
-            verify(mockSettingsDataStore).clearDuckAiData = true
+            verify(mockFireDataStore).addManualClearOption(FireClearOption.DUCKAI_CHATS)
             verify(mockPixel).fire(AppPixelName.SETTINGS_CLEAR_DUCK_AI_DATA_TOGGLED_ON)
 
             cancelAndConsumeRemainingEvents()
@@ -319,7 +323,7 @@ internal class DataClearingSettingsViewModelTest {
 
     @Test
     fun whenClearDuckAiDataToggledOffThenUpdateStateAndFirePixel() = runTest {
-        whenever(mockSettingsDataStore.clearDuckAiData).thenReturn(true)
+        whenever(mockFireDataStore.isManualClearOptionSelected(FireClearOption.DUCKAI_CHATS)).thenReturn(true)
 
         testee = DataClearingSettingsViewModel(
             mockSettingsDataStore,
@@ -327,32 +331,22 @@ internal class DataClearingSettingsViewModelTest {
             mockPixel,
             mockDuckChat,
             mockDuckAiFeatureState,
-            mockFireproofWebsiteRepository,
             mockFireDataStore,
+            coroutineTestRule.testDispatcherProvider,
+            mockFireproofWebsiteRepository,
         )
 
         testee.viewState.test {
             assertTrue(awaitItem().clearDuckAiData)
 
-            whenever(mockSettingsDataStore.clearDuckAiData).thenReturn(true)
             testee.onClearDuckAiDataToggled(false)
 
             assertFalse(awaitItem().clearDuckAiData)
-            verify(mockSettingsDataStore).clearDuckAiData = false
+            verify(mockFireDataStore).removeManualClearOption(FireClearOption.DUCKAI_CHATS)
             verify(mockPixel).fire(AppPixelName.SETTINGS_CLEAR_DUCK_AI_DATA_TOGGLED_OFF)
 
             cancelAndConsumeRemainingEvents()
         }
-    }
-
-    @Test
-    fun whenClearDuckAiDataToggledWithSameValueThenDoNotUpdateOrFirePixel() {
-        whenever(mockSettingsDataStore.clearDuckAiData).thenReturn(false)
-
-        testee.onClearDuckAiDataToggled(false)
-
-        verify(mockSettingsDataStore, never()).clearDuckAiData = false
-        verify(mockPixel, never()).fire(AppPixelName.SETTINGS_CLEAR_DUCK_AI_DATA_TOGGLED_OFF)
     }
 
     @Test

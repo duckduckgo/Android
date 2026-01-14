@@ -25,9 +25,11 @@ import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.fire.store.FireDataStore
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.clear.FireAnimation
+import com.duckduckgo.app.settings.clear.FireClearOption.DUCKAI_CHATS
 import com.duckduckgo.app.settings.clear.getPixelValue
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
@@ -50,8 +52,9 @@ class DataClearingSettingsViewModel @Inject constructor(
     private val pixel: Pixel,
     private val duckChat: DuckChat,
     private val duckAiFeatureState: DuckAiFeatureState,
+    private val fireDataStore: FireDataStore,
+    private val dispatcherProvider: DispatcherProvider,
     fireproofWebsiteRepository: FireproofWebsiteRepository,
-    fireDataStore: FireDataStore,
 ) : ViewModel() {
 
     data class ViewState(
@@ -94,7 +97,7 @@ class DataClearingSettingsViewModel @Inject constructor(
             _viewState.update {
                 it.copy(
                     selectedFireAnimation = settingsDataStore.selectedFireAnimation,
-                    clearDuckAiData = settingsDataStore.clearDuckAiData,
+                    clearDuckAiData = fireDataStore.isManualClearOptionSelected(DUCKAI_CHATS),
                     showClearDuckAiDataSetting = duckChat.wasOpenedBefore() && duckAiFeatureState.showClearDuckAIChatHistory.value,
                 )
             }
@@ -130,19 +133,17 @@ class DataClearingSettingsViewModel @Inject constructor(
         pixel.fire(pixelName)
     }
 
-    fun onClearDuckAiDataToggled(enabled: Boolean) {
-        if (settingsDataStore.clearDuckAiData == enabled) {
-            logcat(VERBOSE) { "User selected same thing they already have set: clearDuckAiData=$enabled; no need to do anything else" }
-            return
-        }
+    fun onClearDuckAiDataToggled(isChecked: Boolean) {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            _viewState.update { it.copy(clearDuckAiData = isChecked) }
 
-        settingsDataStore.clearDuckAiData = enabled
-        _viewState.update { it.copy(clearDuckAiData = enabled) }
-
-        if (enabled) {
-            pixel.fire(AppPixelName.SETTINGS_CLEAR_DUCK_AI_DATA_TOGGLED_ON)
-        } else {
-            pixel.fire(AppPixelName.SETTINGS_CLEAR_DUCK_AI_DATA_TOGGLED_OFF)
+            if (isChecked) {
+                fireDataStore.addManualClearOption(DUCKAI_CHATS)
+                pixel.fire(AppPixelName.SETTINGS_CLEAR_DUCK_AI_DATA_TOGGLED_ON)
+            } else {
+                fireDataStore.removeManualClearOption(DUCKAI_CHATS)
+                pixel.fire(AppPixelName.SETTINGS_CLEAR_DUCK_AI_DATA_TOGGLED_OFF)
+            }
         }
     }
 
