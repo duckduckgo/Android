@@ -29,6 +29,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.experiments.api.VariantManager
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
+import io.reactivex.Observable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -103,7 +104,6 @@ open class StatisticsRequester @Inject constructor(
     private fun storedAtbFormatNeedsCorrecting(storedAtb: Atb): Boolean =
         storedAtb.version.endsWith(LEGACY_ATB_FORMAT_SUFFIX)
 
-    @SuppressLint("CheckResult")
     override fun refreshSearchRetentionAtb() {
         val atb = store.atb
 
@@ -113,25 +113,24 @@ open class StatisticsRequester @Inject constructor(
         }
 
         appCoroutineScope.launch(dispatchers.io()) {
-            val fullAtb = atb.formatWithVariant(variantManager.getVariantKey())
             val oldSearchAtb = store.searchRetentionAtb ?: atb.version
 
-            service
-                .updateSearchAtb(
-                    atb = fullAtb,
-                    retentionAtb = oldSearchAtb,
-                    email = emailSignInState(),
-                )
-                .subscribeOn(Schedulers.io())
-                .subscribe(
-                    {
-                        logcat(VERBOSE) { "Search atb refresh succeeded, latest atb is ${it.version}" }
-                        store.searchRetentionAtb = it.version
-                        storeUpdateVersionIfPresent(it)
-                        plugins.getPlugins().forEach { plugin -> plugin.onSearchRetentionAtbRefreshed(oldSearchAtb, it.version) }
-                    },
-                    { logcat(VERBOSE) { "Search atb refresh failed with error ${it.localizedMessage}" } },
-                )
+            refreshRetentionAtb(
+                atb = atb,
+                oldRetentionAtb = oldSearchAtb,
+                logLabel = "Search",
+                updateCall = { fullAtb, retentionAtb, email ->
+                    service.updateSearchAtb(
+                        atb = fullAtb,
+                        retentionAtb = retentionAtb,
+                        email = email,
+                    )
+                },
+                onSuccess = { updatedAtb ->
+                    store.searchRetentionAtb = updatedAtb.version
+                    plugins.getPlugins().forEach { plugin -> plugin.onSearchRetentionAtbRefreshed(oldSearchAtb, updatedAtb.version) }
+                },
+            )
         }
     }
 
@@ -144,25 +143,24 @@ open class StatisticsRequester @Inject constructor(
         }
 
         appCoroutineScope.launch(dispatchers.io()) {
-            val fullAtb = atb.formatWithVariant(variantManager.getVariantKey())
             val oldDuckAiAtb = store.duckaiRetentionAtb ?: atb.version
 
-            service
-                .updateDuckAiAtb(
-                    atb = fullAtb,
-                    retentionAtb = oldDuckAiAtb,
-                    email = emailSignInState(),
-                )
-                .subscribeOn(Schedulers.io())
-                .subscribe(
-                    {
-                        logcat(VERBOSE) { "Duck.ai atb refresh succeeded, latest atb is ${it.version}" }
-                        store.duckaiRetentionAtb = it.version
-                        storeUpdateVersionIfPresent(it)
-                        plugins.getPlugins().forEach { plugin -> plugin.onDuckAiRetentionAtbRefreshed(oldDuckAiAtb, it.version) }
-                    },
-                    { logcat(VERBOSE) { "Duck.ai atb refresh failed with error ${it.localizedMessage}" } },
-                )
+            refreshRetentionAtb(
+                atb = atb,
+                oldRetentionAtb = oldDuckAiAtb,
+                logLabel = "Duck.ai",
+                updateCall = { fullAtb, retentionAtb, email ->
+                    service.updateDuckAiAtb(
+                        atb = fullAtb,
+                        retentionAtb = retentionAtb,
+                        email = email,
+                    )
+                },
+                onSuccess = { updatedAtb ->
+                    store.duckaiRetentionAtb = updatedAtb.version
+                    plugins.getPlugins().forEach { plugin -> plugin.onDuckAiRetentionAtbRefreshed(oldDuckAiAtb, updatedAtb.version) }
+                },
+            )
         }
     }
 
@@ -176,29 +174,50 @@ open class StatisticsRequester @Inject constructor(
             return
         }
 
-        val fullAtb = atb.formatWithVariant(variantManager.getVariantKey())
         val oldAppAtb = store.appRetentionAtb ?: atb.version
 
-        service
-            .updateAppAtb(
-                atb = fullAtb,
-                retentionAtb = oldAppAtb,
-                email = emailSignInState(),
-            )
-            .subscribeOn(Schedulers.io())
-            .subscribe(
-                {
-                    logcat(VERBOSE) { "App atb refresh succeeded, latest atb is ${it.version}" }
-                    store.appRetentionAtb = it.version
-                    storeUpdateVersionIfPresent(it)
-                    plugins.getPlugins().forEach { plugin -> plugin.onAppRetentionAtbRefreshed(oldAppAtb, it.version) }
-                },
-                { logcat(VERBOSE) { "App atb refresh failed with error ${it.localizedMessage}" } },
-            )
+        refreshRetentionAtb(
+            atb = atb,
+            oldRetentionAtb = oldAppAtb,
+            logLabel = "App",
+            updateCall = { fullAtb, retentionAtb, email ->
+                service.updateAppAtb(
+                    atb = fullAtb,
+                    retentionAtb = retentionAtb,
+                    email = email,
+                )
+            },
+            onSuccess = { updatedAtb ->
+                store.appRetentionAtb = updatedAtb.version
+                plugins.getPlugins().forEach { plugin -> plugin.onAppRetentionAtbRefreshed(oldAppAtb, updatedAtb.version) }
+            },
+        )
     }
 
     private fun emailSignInState(): Int =
         kotlin.runCatching { emailManager.isSignedIn().asInt() }.getOrDefault(0)
+
+    @SuppressLint("CheckResult")
+    private fun refreshRetentionAtb(
+        atb: Atb,
+        oldRetentionAtb: String,
+        logLabel: String,
+        updateCall: (String, String, Int) -> Observable<Atb>,
+        onSuccess: (Atb) -> Unit,
+    ) {
+        val fullAtb = atb.formatWithVariant(variantManager.getVariantKey())
+
+        updateCall(fullAtb, oldRetentionAtb, emailSignInState())
+            .subscribeOn(Schedulers.io())
+            .subscribe(
+                {
+                    logcat(VERBOSE) { "$logLabel atb refresh succeeded, latest atb is ${it.version}" }
+                    onSuccess(it)
+                    storeUpdateVersionIfPresent(it)
+                },
+                { logcat(VERBOSE) { "$logLabel atb refresh failed with error ${it.localizedMessage}" } },
+            )
+    }
 
     private fun storeUpdateVersionIfPresent(retrievedAtb: Atb) {
         retrievedAtb.updateVersion?.let { updateVersion ->
