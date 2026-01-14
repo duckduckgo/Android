@@ -21,6 +21,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import android.widget.CompoundButton
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -55,6 +56,11 @@ class DataClearingSettingsActivity : DuckDuckGoActivity() {
     private val viewModel: DataClearingSettingsViewModel by bindViewModel()
     private val binding: ActivityDataClearingSettingsBinding by viewBinding()
 
+    private val clearDuckAiDataToggleListener =
+        CompoundButton.OnCheckedChangeListener { _, isChecked ->
+            viewModel.onClearDuckAiDataToggled(isChecked)
+        }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -75,7 +81,7 @@ class DataClearingSettingsActivity : DuckDuckGoActivity() {
             fireproofWebsites.setClickListener { viewModel.onFireproofWebsitesClicked() }
             automaticDataClearingSetting.setClickListener { viewModel.onAutomaticDataClearingClicked() }
             selectedFireAnimationSetting.setClickListener { viewModel.userRequestedToChangeFireAnimation() }
-            clearDuckAiDataSetting.setOnCheckedChangeListener { _, isChecked -> viewModel.onClearDuckAiDataToggled(isChecked) }
+            clearDuckAiDataSetting.setOnCheckedChangeListener(clearDuckAiDataToggleListener)
             clearDataAction.setClickListener { viewModel.onClearDataActionClicked() }
         }
     }
@@ -117,7 +123,7 @@ class DataClearingSettingsActivity : DuckDuckGoActivity() {
         enabled: Boolean,
         isVisible: Boolean,
     ) {
-        binding.clearDuckAiDataSetting.setIsChecked(enabled)
+        binding.clearDuckAiDataSetting.quietlySetIsChecked(enabled, clearDuckAiDataToggleListener)
         binding.clearDuckAiDataSetting.visibility = if (isVisible) View.VISIBLE else View.GONE
     }
 
