@@ -62,6 +62,7 @@ jobs:
           maestro_test_name: internalSecurityTest_${{ github.sha }}
           maestro_app_file: apk/internal.apk
           maestro_include_tags: securityTestInternal
+          maestro_api_level: 30
           test_suite_name: Security Internal
 
       - name: Create Asana task when workflow failed

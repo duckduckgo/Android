@@ -64,6 +64,7 @@ jobs:
           maestro_test_name: omnibar_${{ github.sha }}
           maestro_app_file: apk/playRelease.apk
           maestro_include_tags: omnibarTest
+          maestro_api_level: 30
           test_suite_name: Omnibar
 
       - name: Create Asana task when workflow failed

@@ -63,6 +63,7 @@ jobs:
         with:
           maestro_test_name: customTabs_${{ github.sha }}
           maestro_app_file: apk/release.apk
+          maestro_api_level: 30
           maestro_include_tags: customTabsTest
           test_suite_name: Custom Tabs
 

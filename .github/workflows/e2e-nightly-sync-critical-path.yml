@@ -72,6 +72,7 @@ jobs:
           maestro_app_file: apk/release.apk
           maestro_include_tags: syncCriticalPathTest
           test_suite_name: Sync Critical Path
+          maestro_api_level: 30
           maestro_env: |
             CODE=${{ steps.sync-recovery-code.outputs.recovery-code }}
 

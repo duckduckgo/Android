@@ -8,6 +8,10 @@ inputs:
   maestro_app_file:
     description: 'Path to the APK file'
     required: true
+  maestro_api_level:
+    description: 'Android API level'
+    required: false
+    default: '34'
   maestro_include_tags:
     description: 'Maestro tags to include'
     required: true
@@ -46,7 +50,7 @@ runs:
         name: ${{ inputs.maestro_test_name }}
         timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
         app-file: ${{ inputs.maestro_app_file }}
-        android-api-level: 34
+        android-api-level: ${{ inputs.maestro_api_level }}
         workspace: .maestro
         include-tags: ${{ inputs.maestro_include_tags }}
         env: ${{ inputs.maestro_env }}

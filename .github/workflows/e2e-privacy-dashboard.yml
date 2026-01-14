@@ -67,6 +67,7 @@ jobs:
           maestro_test_name: privacyDashboard_adClickTest_${{ github.sha }}
           maestro_app_file: apk/release.apk
           maestro_include_tags: adClickTest
+          maestro_api_level: 30
           test_suite_name: Ad Click (Privacy Dashboard)
 
       - name: Run Privacy Maestro Tests
@@ -77,4 +78,5 @@ jobs:
           maestro_test_name: privacyDashboard_privacyTest_${{ github.sha }}
           maestro_app_file: apk/release.apk
           maestro_include_tags: privacyTest
+          maestro_api_level: 30
           test_suite_name: Privacy Tests (Privacy Dashboard)
