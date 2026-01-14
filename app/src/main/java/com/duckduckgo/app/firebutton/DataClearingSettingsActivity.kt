@@ -34,7 +34,6 @@ import com.duckduckgo.app.firebutton.DataClearingSettingsViewModel.Command
 import com.duckduckgo.app.global.view.FireDialogProvider
 import com.duckduckgo.app.settings.clear.FireAnimation
 import com.duckduckgo.app.settings.clear.FireAnimation.HeroAbstract.getAnimationForIndex
-import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
@@ -46,9 +45,6 @@ import javax.inject.Inject
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(DataClearingSettingsScreenNoParams::class)
 class DataClearingSettingsActivity : DuckDuckGoActivity() {
-
-    @Inject
-    lateinit var pixel: Pixel
 
     @Inject
     lateinit var fireDialogProvider: FireDialogProvider
