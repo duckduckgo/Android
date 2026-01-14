@@ -93,6 +93,7 @@ import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.RestoreSubscription
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.SendJsEvent
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.SendResponseToJs
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.SubscriptionChangeSelected
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.SubscriptionSelected
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.PurchaseStateView
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionsWebViewActivityWithParams.ToolbarConfig
@@ -494,6 +495,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
             is SendJsEvent -> sendJsEvent(command.event)
             is SendResponseToJs -> sendResponseToJs(command.data)
             is SubscriptionSelected -> selectSubscription(command.id, command.offerId, command.experimentName, command.experimentCohort)
+            is SubscriptionChangeSelected -> changeSubscriptionPlan(command.planId, command.offerId, command.replacementMode)
             is RestoreSubscription -> restoreSubscription()
             is GoToITR -> goToITR()
             is GoToPIR -> goToPIR()
@@ -610,6 +612,20 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
         experimentCohort: String?,
     ) {
         viewModel.purchaseSubscription(this, id, offerId, experimentName, experimentCohort, params.origin)
+    }
+
+    private fun changeSubscriptionPlan(
+        planId: String,
+        offerId: String?,
+        replacementMode: com.duckduckgo.subscriptions.impl.billing.SubscriptionReplacementMode,
+    ) {
+        viewModel.switchSubscriptionPlan(
+            activity = this,
+            planId = planId,
+            offerId = offerId,
+            replacementMode = replacementMode,
+            origin = params.origin,
+        )
     }
 
     private fun sendResponseToJs(data: JsCallbackData) {

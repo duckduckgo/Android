@@ -282,6 +282,13 @@ interface PrivacyProFeature {
     fun allowProTierPurchase(): Toggle
 
     /**
+     * When enabled, pending plan hint is displayed to users.
+     * When disabled, pending plans hint is not shown (kill switch for pending plans UI).
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun showPendingPlanHint(): Toggle
+
+    /**
      * When enabled, a VPN reminder notification will be scheduled for day 2 of the free trial.
      */
     @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.FALSE)

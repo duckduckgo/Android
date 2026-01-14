@@ -105,14 +105,22 @@
                     app:textType="secondary"
                     app:typography="body2" />
 
-                <ImageView
-                    android:id="@+id/tierPill"
+                <com.duckduckgo.common.ui.view.divider.VerticalDivider
+                    android:layout_width="wrap_content"
+                    android:layout_height="6dp"
+                    android:layout_marginStart="@dimen/keyline_3"
+                    android:layout_marginEnd="@dimen/keyline_2"
+                    android:layout_gravity="center_vertical"/>
+
+                <com.duckduckgo.common.ui.view.text.DaxTextView
+                    android:id="@+id/tierName"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/keyline_2"
-                    tools:src="@drawable/ic_pro_pill"
+                    tools:text="PRO"
+                    tools:visibility="visible"
                     android:visibility="gone"
-                    tools:visibility="visible" />
+                    app:textType="primary"
+                    app:typography="body2" />
 
             </LinearLayout>
 
@@ -178,19 +186,19 @@
                 app:primaryText="@string/subscriptionSettingSectionManageSubscription" />
 
             <com.duckduckgo.common.ui.view.listitem.OneLineListItem
-                android:id="@+id/viewAllPlansTop"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:visibility="gone"
-                app:primaryText="@string/subscriptionSettingViewAllPlans"
-                tools:visibility="visible" />
-
-            <com.duckduckgo.common.ui.view.listitem.OneLineListItem
                 android:id="@+id/switchPlan"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:visibility="gone"
                 tools:primaryText="Switch to Yearly Plan"
+                tools:visibility="visible" />
+
+            <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+                android:id="@+id/viewAllPlansTop"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:primaryText="@string/subscriptionSettingViewAllPlans"
                 tools:visibility="visible" />
 
             <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
