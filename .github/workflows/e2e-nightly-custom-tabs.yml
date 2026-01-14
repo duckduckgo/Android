@@ -61,11 +61,20 @@ jobs:
         uses: ./.github/actions/maestro-cloud-asana-reporter
         timeout-minutes: 120
         with:
+          maestro_api_key: ${{ secrets.ROBIN_API_KEY }}
+          maestro_project_id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
           maestro_test_name: customTabs_${{ github.sha }}
+          maestro_timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
           maestro_app_file: apk/release.apk
           maestro_api_level: 30
           maestro_include_tags: customTabsTest
+          asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          asana_project_id: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
+          asana_section_id: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
           test_suite_name: Custom Tabs
+          is_release_blocker: 'true'
+          asana_releases_project_id: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_ID }}
+          asana_releases_blocker_section_id: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_BLOCKER_SECTION_ID }}
 
       - name: Create Asana task when workflow failed
         if: ${{ failure() && steps.maestro-cloud-asana.outputs.flow_summary_status != 'failure' }}

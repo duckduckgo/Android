@@ -2,6 +2,12 @@ name: 'Maestro Cloud with Asana Reporting'
 description: 'Runs Maestro Cloud tests, analyzes results, and reports failures to Asana'
 
 inputs:
+  maestro_api_key:
+    description: 'Robin API Key'
+    required: true
+  maestro_project_id:
+    description: 'Robin Project ID'
+    required: true
   maestro_test_name:
     description: 'Name for the Maestro run'
     required: true
@@ -15,6 +21,18 @@ inputs:
   maestro_include_tags:
     description: 'Maestro tags to include'
     required: true
+  maestro_timeout:
+    description: 'Maestro timeout in minutes'
+    required: true
+  asana_pat:
+    description: 'Asana Personal Access Token'
+    required: true
+  asana_project_id:
+    description: 'Asana Project ID'
+    required: true
+  asana_section_id:
+    description: 'Asana Section ID'
+    required: true
   test_suite_name:
     description: 'Readable name for the test suite (used in Asana task)'
     required: true
@@ -26,6 +44,14 @@ inputs:
     description: 'Whether to add the failure as a release blocker in Asana'
     required: false
     default: 'false'
+  asana_releases_project_id:
+    description: 'Asana Releases Project ID (needed if is_release_blocker is true)'
+    required: false
+    default: ''
+  asana_releases_blocker_section_id:
+    description: 'Asana Releases Blocker Section ID (needed if is_release_blocker is true)'
+    required: false
+    default: ''
 
 outputs:
   flow_summary_status:
@@ -45,10 +71,10 @@ runs:
       id: maestro-run
       uses: mobile-dev-inc/action-maestro-cloud@v1.9.8
       with:
-        api-key: ${{ secrets.ROBIN_API_KEY }}
-        project-id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
+        api-key: ${{ inputs.maestro_api_key }}
+        project-id: ${{ inputs.maestro_project_id }}
         name: ${{ inputs.maestro_test_name }}
-        timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
+        timeout: ${{ inputs.maestro_timeout }}
         app-file: ${{ inputs.maestro_app_file }}
         android-api-level: ${{ inputs.maestro_api_level }}
         workspace: .maestro
@@ -75,9 +101,9 @@ runs:
       id: create-maestro-failure-task
       uses: duckduckgo/native-github-asana-sync@v2.0
       with:
-        asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
-        asana-project: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
-        asana-section: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
+        asana-pat: ${{ inputs.asana_pat }}
+        asana-project: ${{ inputs.asana_project_id }}
+        asana-section: ${{ inputs.asana_section_id }}
         asana-task-name: E2E Tests Failure - ${{ inputs.test_suite_name }}
         asana-task-description: |
           Run: https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
@@ -90,8 +116,8 @@ runs:
       if: always() && inputs.is_release_blocker == 'true' && steps.create-maestro-failure-task.outputs.taskId != ''
       uses: duckduckgo/native-github-asana-sync@v2.0
       with:
-        asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
-        asana-project: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_ID }}
-        asana-section: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_BLOCKER_SECTION_ID }}
+        asana-pat: ${{ inputs.asana_pat }}
+        asana-project: ${{ inputs.asana_releases_project_id }}
+        asana-section: ${{ inputs.asana_releases_blocker_section_id }}
         asana-task-id: ${{ steps.create-maestro-failure-task.outputs.taskId }}
         action: 'add-task-asana-project'
