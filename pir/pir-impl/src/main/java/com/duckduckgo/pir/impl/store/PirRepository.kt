@@ -198,6 +198,8 @@ interface PirRepository {
 
     suspend fun clearAllData()
 
+    suspend fun clearUserData()
+
     data class GeneratedEmailData(
         val emailAddress: String,
         val pattern: String,
@@ -748,6 +750,14 @@ class RealPirRepository(
             extractedProfileDao()?.deleteAllExtractedProfiles()
             userProfileDao()?.deleteAllProfiles()
             pirDataStore.reset()
+        }
+    }
+
+    override suspend fun clearUserData() {
+        withContext(dispatcherProvider.io()) {
+            extractedProfileDao()?.deleteAllExtractedProfiles()
+            userProfileDao()?.deleteAllProfiles()
+            pirDataStore.resetUserData()
         }
     }
 
