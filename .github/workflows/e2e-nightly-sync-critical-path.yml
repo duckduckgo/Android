@@ -88,7 +88,7 @@ jobs:
         with:
           asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana-project: ${{ vars.GH_BROWSER_SYNC_BACKUP_PROJECT_ID }}
-          asana-section: ${{ vars.GGH_BROWSER_SYNC_BACKUP_PROJECT_TRIAGE_SECTION_ID }}
+          asana-section: ${{ vars.GH_BROWSER_SYNC_BACKUP_PROJECT_TRIAGE_SECTION_ID }}
           asana-task-id: ${{ steps.maestro-cloud-asana.outputs.asana_task_id }}
           action: 'add-task-asana-project'
 
