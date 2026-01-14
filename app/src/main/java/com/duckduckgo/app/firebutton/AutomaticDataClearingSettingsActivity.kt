@@ -29,11 +29,9 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityAutomaticDataClearingSettingsBinding
 import com.duckduckgo.app.firebutton.AutomaticDataClearingSettingsViewModel.Command
 import com.duckduckgo.app.firebutton.AutomaticDataClearingSettingsViewModel.ViewState
-import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.clear.FireClearOption
 import com.duckduckgo.app.settings.clear.getClearWhenForIndex
-import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.dialog.RadioListAlertDialogBuilder
@@ -45,10 +43,6 @@ import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
 class AutomaticDataClearingSettingsActivity : DuckDuckGoActivity() {
-
-    @Inject
-    lateinit var pixel: Pixel
-
     @Inject
     lateinit var appBuildConfig: AppBuildConfig
 
@@ -64,6 +58,11 @@ class AutomaticDataClearingSettingsActivity : DuckDuckGoActivity() {
 
         configureUiEventHandlers()
         observeViewModel()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        viewModel.onScreenExit()
     }
 
     private fun configureUiEventHandlers() {

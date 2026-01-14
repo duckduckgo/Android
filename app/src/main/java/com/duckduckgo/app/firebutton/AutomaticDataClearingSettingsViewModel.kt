@@ -20,8 +20,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.fire.store.FireDataStore
+import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.clear.FireClearOption
+import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.DATA_CLEAR_TYPE_CHATS
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.DATA_CLEAR_TYPE_DATA
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.DATA_CLEAR_TYPE_TABS
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
@@ -43,6 +48,7 @@ class AutomaticDataClearingSettingsViewModel @Inject constructor(
     private val duckChat: DuckChat,
     duckAiFeatureState: DuckAiFeatureState,
     private val dispatcherProvider: DispatcherProvider,
+    private val pixel: Pixel,
 ) : ViewModel() {
 
     data class ViewState(
@@ -60,6 +66,7 @@ class AutomaticDataClearingSettingsViewModel @Inject constructor(
 
     private val _commands = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
     private var duckChatWasOpenedBefore = MutableStateFlow(false)
+    private var initialOptions: Set<FireClearOption>? = null
 
     val viewState: Flow<ViewState> = combine(
         fireDataStore.getAutomaticClearOptionsFlow(),
@@ -81,11 +88,18 @@ class AutomaticDataClearingSettingsViewModel @Inject constructor(
 
     init {
         loadDuckChatState()
+        loadInitialOptions()
     }
 
     private fun loadDuckChatState() {
         viewModelScope.launch(dispatcherProvider.io()) {
             duckChatWasOpenedBefore.value = duckChat.wasOpenedBefore()
+        }
+    }
+
+    private fun loadInitialOptions() {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            initialOptions = fireDataStore.getAutomaticClearOptions()
         }
     }
 
@@ -122,6 +136,26 @@ class AutomaticDataClearingSettingsViewModel @Inject constructor(
         viewModelScope.launch {
             withContext(dispatcherProvider.io()) {
                 fireDataStore.setAutomaticallyClearWhenOption(option)
+            }
+        }
+    }
+
+    fun onScreenExit() {
+        sendPixelIfOptionsChanged()
+    }
+
+    private fun sendPixelIfOptionsChanged() {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            val options = fireDataStore.getAutomaticClearOptions()
+            if (options != initialOptions) {
+                pixel.fire(
+                    AppPixelName.DATA_CLEARING_AUTOMATIC_OPTIONS_UPDATED,
+                    mapOf(
+                        DATA_CLEAR_TYPE_TABS to (FireClearOption.TABS in options).toString(),
+                        DATA_CLEAR_TYPE_DATA to (FireClearOption.DATA in options).toString(),
+                        DATA_CLEAR_TYPE_CHATS to (FireClearOption.DUCKAI_CHATS in options).toString(),
+                    ),
+                )
             }
         }
     }
