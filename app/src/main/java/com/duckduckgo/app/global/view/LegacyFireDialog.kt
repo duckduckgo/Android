@@ -248,6 +248,10 @@ class LegacyFireDialog : BottomSheetDialogFragment(), FireDialog {
         hideClearDataOptions()
         if (animationEnabled()) {
             playAnimation()
+        } else {
+            // Animation was enabled when dialog opened but is now disabled.
+            // Update canRestart so ClearAllDataFinished can complete the flow.
+            canRestart = true
         }
         parentFragmentManager.setFragmentResult(
             FireDialog.REQUEST_KEY,

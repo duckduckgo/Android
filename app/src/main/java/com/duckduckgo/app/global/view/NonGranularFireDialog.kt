@@ -179,7 +179,15 @@ class NonGranularFireDialog : BottomSheetDialogFragment(), FireDialog {
 
     private fun handleCommand(command: Command) {
         when (command) {
-            is Command.PlayAnimation -> if (isAnimationEnabled()) playAnimation()
+            is Command.PlayAnimation -> {
+                if (isAnimationEnabled()) {
+                    playAnimation()
+                } else {
+                    // Animation was enabled when dialog opened but is now disabled.
+                    // Update canRestart so ClearingComplete can complete the flow.
+                    canRestart = true
+                }
+            }
             is Command.ClearingComplete -> onClearAllEvent(ClearAllEvent.ClearingFinished)
             is Command.OnShow -> sendFragmentResult(FireDialog.EVENT_ON_SHOW)
             is Command.OnCancel -> {
