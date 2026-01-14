@@ -121,7 +121,6 @@ import com.duckduckgo.app.browser.customtabs.CustomTabViewModel.Companion.CUSTOM
 import com.duckduckgo.app.browser.databinding.FragmentBrowserTabBinding
 import com.duckduckgo.app.browser.databinding.HttpAuthenticationBinding
 import com.duckduckgo.app.browser.downloader.BlobConverterInjector
-import com.duckduckgo.app.browser.duckchat.DuckChatContextualBottomSheetFactory
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.filechooser.FileChooserIntentBuilder
 import com.duckduckgo.app.browser.filechooser.capture.launcher.UploadFromExternalMediaAppLauncher
@@ -588,9 +587,6 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var browserMenuViewStateFactory: BrowserMenuViewStateFactory
-
-    @Inject
-    lateinit var duckChatContextualBottomSheetFactory: DuckChatContextualBottomSheetFactory
 
     /**
      * We use this to monitor whether the user was seeing the in-context Email Protection signup prompt
