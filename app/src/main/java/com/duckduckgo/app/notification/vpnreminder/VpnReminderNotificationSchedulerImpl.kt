@@ -24,6 +24,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.subscriptions.api.VpnReminderNotificationScheduler
 import com.duckduckgo.subscriptions.impl.PrivacyProFeature
 import com.squareup.anvil.annotations.ContributesBinding
+import dagger.Lazy
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.withContext
 import java.util.concurrent.TimeUnit
@@ -34,7 +35,7 @@ import javax.inject.Inject
 class VpnReminderNotificationSchedulerImpl @Inject constructor(
     private val workManager: WorkManager,
     private val notificationManager: NotificationManagerCompat,
-    private val privacyProFeature: PrivacyProFeature,
+    private val privacyProFeature: Lazy<PrivacyProFeature>,
     private val dispatcherProvider: DispatcherProvider,
 ) : VpnReminderNotificationScheduler {
 
@@ -42,7 +43,7 @@ class VpnReminderNotificationSchedulerImpl @Inject constructor(
         cancelScheduledNotification()
 
         val isFeatureEnabled = withContext(dispatcherProvider.io()) {
-            privacyProFeature.vpnReminderNotification().isEnabled()
+            privacyProFeature.get().vpnReminderNotification().isEnabled()
         }
 
         if (!isFeatureEnabled) {

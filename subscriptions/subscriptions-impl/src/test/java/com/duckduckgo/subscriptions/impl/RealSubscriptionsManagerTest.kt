@@ -23,6 +23,7 @@ import com.duckduckgo.subscriptions.api.SubscriptionStatus.INACTIVE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.NOT_AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.UNKNOWN
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.WAITING
+import com.duckduckgo.subscriptions.api.VpnReminderNotificationScheduler
 import com.duckduckgo.subscriptions.impl.RealSubscriptionsManager.RecoverSubscriptionResult
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN_ROW
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN_US
@@ -134,6 +135,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
     private val subscriptionSwitchWideEvent: SubscriptionSwitchWideEvent = mock()
     private val freeTrialConversionWideEvent: FreeTrialConversionWideEvent = mock()
     private val subscriptionRestoreWideEvent: SubscriptionRestoreWideEvent = mock()
+    private val vpnReminderNotificationScheduler: VpnReminderNotificationScheduler = mock()
 
     private val authClient: AuthClient = mock()
     private val pkceGenerator: PkceGenerator = PkceGeneratorImpl()
@@ -168,6 +170,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             subscriptionSwitchWideEvent,
             freeTrialConversionWideEvent,
             subscriptionRestoreWideEvent,
+            vpnReminderNotificationScheduler,
         )
     }
 
@@ -615,6 +618,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             subscriptionSwitchWideEvent,
             freeTrialConversionWideEvent,
             subscriptionRestoreWideEvent,
+            vpnReminderNotificationScheduler,
         )
 
         manager.subscriptionStatus.test {
@@ -649,6 +653,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             subscriptionSwitchWideEvent,
             freeTrialConversionWideEvent,
             subscriptionRestoreWideEvent,
+            vpnReminderNotificationScheduler,
         )
 
         manager.subscriptionStatus.test {
@@ -687,6 +692,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             subscriptionSwitchWideEvent,
             freeTrialConversionWideEvent,
             subscriptionRestoreWideEvent,
+            vpnReminderNotificationScheduler,
         )
 
         manager.currentPurchaseState.test {
@@ -739,6 +745,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             subscriptionSwitchWideEvent,
             freeTrialConversionWideEvent,
             subscriptionRestoreWideEvent,
+            vpnReminderNotificationScheduler,
         )
 
         manager.currentPurchaseState.test {
@@ -781,6 +788,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             subscriptionSwitchWideEvent,
             freeTrialConversionWideEvent,
             subscriptionRestoreWideEvent,
+            vpnReminderNotificationScheduler,
         )
 
         manager.currentPurchaseState.test {
@@ -816,6 +824,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             subscriptionSwitchWideEvent,
             freeTrialConversionWideEvent,
             subscriptionRestoreWideEvent,
+            vpnReminderNotificationScheduler,
         )
 
         manager.currentPurchaseState.test {
@@ -1173,6 +1182,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             subscriptionSwitchWideEvent,
             freeTrialConversionWideEvent,
             subscriptionRestoreWideEvent,
+            vpnReminderNotificationScheduler,
         )
         manager.signOut()
         verify(mockRepo).setSubscription(null)
@@ -1224,6 +1234,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             subscriptionSwitchWideEvent,
             freeTrialConversionWideEvent,
             subscriptionRestoreWideEvent,
+            vpnReminderNotificationScheduler,
         )
 
         manager.subscriptionStatus.test {
@@ -1488,6 +1499,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             subscriptionSwitchWideEvent,
             freeTrialConversionWideEvent,
             subscriptionRestoreWideEvent,
+            vpnReminderNotificationScheduler,
         )
 
         assertFalse(subscriptionsManager.canSupportEncryption())
