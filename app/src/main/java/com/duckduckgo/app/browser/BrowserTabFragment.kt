@@ -1582,7 +1582,11 @@ class BrowserTabFragment :
                 viewModel.onVpnMenuClicked()
             }
             onMenuItemClicked(newDuckChatTabMenuItem) {
-                viewModel.openNewDuckChat(omnibar.viewMode)
+                activity?.currentFocus?.let {
+                    it.hideKeyboard()
+                    it.clearFocus()
+                }
+                viewModel.onDuckChatMenuClicked()
             }
             onMenuItemClicked(duckChatHistoryMenuItem) {
                 pixel.fire(DuckChatPixelName.DUCK_CHAT_SETTINGS_SIDEBAR_TAPPED)
