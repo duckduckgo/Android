@@ -42,7 +42,7 @@ tags:
             timeout: 50000
             speed: 60
             element:
-              text: "Stacked Text Alert Dialog With 4 buttons"
+              text: "Stacked Text Alert Destructive Dialog With 4 buttons"
             direction: DOWN
         - tapOn: "Stacked Text Alert Dialog With 4 buttons"
         - assertVisible: "Keep Using"
@@ -51,7 +51,7 @@ tags:
             timeout: 50000
             speed: 60
             element:
-              text: "Action Bottom Sheet"
+              text: "Promo Bottom Sheet"
             direction: DOWN
         - tapOn: "Action Bottom Sheet"
         - assertVisible: "Primary Item"
@@ -65,18 +65,12 @@ tags:
             timeout: 50000
             speed: 60
             element:
-              text: "Promo Bottom Sheet with title"
+              text: "Promo Bottom Sheet with image"
             direction: DOWN
         - tapOn:
             id: "com.duckduckgo.mobile.android:id/promoBottomSheetButtonWithTitle"
         - tapOn:
             id: "com.duckduckgo.mobile.android:id/bottomSheetPromoPrimaryButton"
-        - scrollUntilVisible:
-            timeout: 50000
-            speed: 60
-            element:
-              text: "Promo Bottom Sheet with image"
-            direction: DOWN
         - scrollUntilVisible:
             timeout: 50000
             speed: 60
