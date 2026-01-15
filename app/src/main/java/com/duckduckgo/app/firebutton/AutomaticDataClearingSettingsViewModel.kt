@@ -158,6 +158,7 @@ class AutomaticDataClearingSettingsViewModel @Inject constructor(
                         DATA_CLEAR_TYPE_CHATS to (FireClearOption.DUCKAI_CHATS in options).toString(),
                     ),
                 )
+                initialOptions = options
             }
         }
     }

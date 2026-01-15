@@ -37,6 +37,7 @@ import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -296,6 +297,26 @@ internal class AutomaticDataClearingSettingsViewModelTest {
                 "tabs" to "true",
                 "data" to "false",
                 "chats" to "true",
+            ),
+        )
+    }
+
+    @Test
+    fun whenOnScreenExitCalledMultipleTimesWithoutChangesThenPixelFiresOnlyOnce() = runTest {
+        whenever(mockFireDataStore.getAutomaticClearOptions()).thenReturn(
+            setOf(FireClearOption.TABS),
+        )
+
+        testee.onScreenExit()
+        testee.onScreenExit()
+        testee.onScreenExit()
+
+        verify(mockPixel, times(1)).fire(
+            AppPixelName.DATA_CLEARING_AUTOMATIC_OPTIONS_UPDATED,
+            mapOf(
+                "tabs" to "true",
+                "data" to "false",
+                "chats" to "false",
             ),
         )
     }
