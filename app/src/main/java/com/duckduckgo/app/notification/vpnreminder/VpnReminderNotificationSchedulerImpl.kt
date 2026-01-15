@@ -19,10 +19,13 @@ package com.duckduckgo.app.notification.vpnreminder
 import androidx.core.app.NotificationManagerCompat
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.subscriptions.api.VpnReminderNotificationScheduler
+import com.duckduckgo.subscriptions.impl.PrivacyProFeature
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
+import kotlinx.coroutines.withContext
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -31,10 +34,20 @@ import javax.inject.Inject
 class VpnReminderNotificationSchedulerImpl @Inject constructor(
     private val workManager: WorkManager,
     private val notificationManager: NotificationManagerCompat,
+    private val privacyProFeature: PrivacyProFeature,
+    private val dispatcherProvider: DispatcherProvider,
 ) : VpnReminderNotificationScheduler {
 
     override suspend fun scheduleVpnReminderNotification() {
         cancelScheduledNotification()
+
+        val isFeatureEnabled = withContext(dispatcherProvider.io()) {
+            privacyProFeature.vpnReminderNotification().isEnabled()
+        }
+
+        if (!isFeatureEnabled) {
+            return
+        }
 
         if (!notificationManager.areNotificationsEnabled()) {
             return
