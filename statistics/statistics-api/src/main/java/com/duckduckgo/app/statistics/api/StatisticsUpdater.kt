@@ -17,6 +17,10 @@
 package com.duckduckgo.app.statistics.api
 
 interface StatisticsUpdater {
+    fun initializeAtb()
+
+    fun refreshAppRetentionAtb()
+
     /**
      * Refreshes the search retention ATB value.
      */

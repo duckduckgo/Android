@@ -17,8 +17,6 @@
 package com.duckduckgo.app.statistics.api
 
 import android.annotation.SuppressLint
-import androidx.annotation.VisibleForTesting
-import androidx.annotation.VisibleForTesting.Companion.PACKAGE_PRIVATE
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.model.Atb
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
@@ -41,8 +39,7 @@ import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
-// this class is open so that we can mock it in tests
-open class StatisticsRequester @Inject constructor(
+class StatisticsRequester @Inject constructor(
     private val store: StatisticsDataStore,
     private val service: StatisticsService,
     private val variantManager: VariantManager,
@@ -57,8 +54,7 @@ open class StatisticsRequester @Inject constructor(
      * consume referer data
      */
     @SuppressLint("CheckResult")
-    @VisibleForTesting(otherwise = PACKAGE_PRIVATE)
-    fun initializeAtb() {
+    override fun initializeAtb() {
         logcat(INFO) { "Initializing ATB" }
 
         if (store.hasInstallationStatistics) {
@@ -165,8 +161,7 @@ open class StatisticsRequester @Inject constructor(
     }
 
     @SuppressLint("CheckResult")
-    @VisibleForTesting(otherwise = PACKAGE_PRIVATE)
-    fun refreshAppRetentionAtb() {
+    override fun refreshAppRetentionAtb() {
         val atb = store.atb
 
         if (atb == null) {

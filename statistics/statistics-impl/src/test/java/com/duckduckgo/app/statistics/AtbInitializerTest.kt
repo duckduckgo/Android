@@ -17,7 +17,6 @@
 package com.duckduckgo.app.statistics
 
 import androidx.lifecycle.testing.TestLifecycleOwner
-import com.duckduckgo.app.statistics.api.StatisticsRequester
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.StatisticsPixelName
@@ -48,7 +47,7 @@ class AtbInitializerTest {
     private lateinit var testee: AtbInitializer
 
     private val statisticsDataStore: StatisticsDataStore = mock()
-    private val statisticsUpdater: StatisticsRequester = mock()
+    private val statisticsUpdater: StatisticsUpdater = mock()
     private var atbInitializerListener = FakeAtbInitializerListener()
     private val lifecycleOwner = TestLifecycleOwner()
 
