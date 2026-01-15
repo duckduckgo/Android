@@ -80,6 +80,7 @@ class InputModeWidget @JvmOverloads constructor(
     private val menuButton: View
     private val fireButton: View
     private val voiceInputButton: View
+    private var bottomButtonsMode: Boolean = false
 
     private val inputModeCardExtendedEndMargin: Int by lazy {
         resources.getDimensionPixelSize(R.dimen.inputScreenOmnibarCardExtendedMarginHorizontal)
@@ -123,7 +124,13 @@ class InputModeWidget @JvmOverloads constructor(
             if (field != value) {
                 field = value
                 beginChangeBoundsTransition()
-                inputField.maxLines = if (value) MAX_LINES else 1
+                val isChatMode = inputModeSwitch.selectedTabPosition == 1
+                val chatMin = if (bottomButtonsMode) 1 else CHAT_MIN_LINES
+                inputField.maxLines = when {
+                    value -> MAX_LINES
+                    isChatMode -> chatMin
+                    else -> 1
+                }
                 inputField.setHorizontallyScrolling(!value)
                 inputField.post {
                     inputField.requestLayout()
@@ -204,7 +211,6 @@ class InputModeWidget @JvmOverloads constructor(
             inputField.setSelection(0)
             inputField.scrollTo(0, 0)
 
-            beginChangeBoundsTransition()
             onClearTextTapped?.invoke()
         }
         inputModeWidgetBack.setOnClickListener {
@@ -334,14 +340,24 @@ class InputModeWidget @JvmOverloads constructor(
                         InputType.TYPE_TEXT_VARIATION_URI or
                         InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS,
                 )
+                minLines = 1
+                maxLines = if (canExpand) MAX_LINES else 1
             } else {
                 hint = context.getString(R.string.input_screen_chat_hint)
-                imeOptions = EditorInfo.IME_FLAG_NO_EXTRACT_UI or EditorInfo.IME_FLAG_NO_PERSONALIZED_LEARNING or EditorInfo.IME_ACTION_GO
+                imeOptions = EditorInfo.IME_FLAG_NO_EXTRACT_UI or EditorInfo.IME_FLAG_NO_PERSONALIZED_LEARNING or EditorInfo.IME_ACTION_NONE
                 setRawInputType(
                     InputType.TYPE_CLASS_TEXT or
                         InputType.TYPE_TEXT_FLAG_AUTO_CORRECT or
-                        InputType.TYPE_TEXT_FLAG_CAP_SENTENCES,
+                        InputType.TYPE_TEXT_FLAG_CAP_SENTENCES or
+                        InputType.TYPE_TEXT_FLAG_MULTI_LINE,
                 )
+                val chatMin = if (bottomButtonsMode) 1 else CHAT_MIN_LINES
+                minLines = chatMin
+                maxLines = if (canExpand) MAX_LINES else chatMin
+            }
+            setHorizontallyScrolling(!canExpand)
+            post {
+                requestLayout()
             }
         }
         (context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager).restartInput(inputField)
@@ -390,6 +406,8 @@ class InputModeWidget @JvmOverloads constructor(
         }
     }
 
+    fun isChatTabSelected(): Boolean = inputModeSwitch.selectedTabPosition == 1
+
     fun setScrollPosition(
         position: Int,
         positionOffset: Float,
@@ -412,31 +430,31 @@ class InputModeWidget @JvmOverloads constructor(
         view.isVisible = visible
     }
 
-    fun printNewLine() {
-        val currentText = inputField.text.toString()
-        val selectionStart = inputField.selectionStart
-        val selectionEnd = inputField.selectionEnd
-        val newText = currentText.substring(0, selectionStart) + "\n" + currentText.substring(selectionEnd)
-        text = newText
-        inputField.setSelection(selectionStart + 1)
-    }
-
     fun selectAllText() {
         inputField.selectAll()
     }
 
     fun setInputScreenBottomButtons(inputScreenButtons: InputScreenButtons) {
+        bottomButtonsMode = true
         inputScreenButtonsContainer.addView(inputScreenButtons)
         inputFieldClearText.updateLayoutParams<MarginLayoutParams> {
             // align the clear text button with the center of the submit button
             marginEnd = 4f.toPx(context).roundToInt()
         }
+        inputScreenButtonsContainer.visibility = VISIBLE
     }
 
     fun setInputScreenButtonsVisible(buttonsVisible: Boolean) {
         if (inputScreenButtonsContainer.isNotEmpty()) {
-            beginInputScreenButtonsVisibilityTransition()
-            inputScreenButtonsContainer.isVisible = buttonsVisible
+            if (bottomButtonsMode) {
+                inputScreenButtonsContainer.visibility = VISIBLE
+                return
+            }
+            val targetVisibility = if (buttonsVisible) VISIBLE else INVISIBLE
+            if (inputScreenButtonsContainer.visibility != targetVisibility) {
+                beginInputScreenButtonsVisibilityTransition()
+                inputScreenButtonsContainer.visibility = targetVisibility
+            }
         }
     }
 
@@ -473,6 +491,7 @@ class InputModeWidget @JvmOverloads constructor(
     companion object {
         private const val FADE_DURATION = 150L
         private const val EXPAND_COLLAPSE_TRANSITION_DURATION = 150L
-        private const val MAX_LINES = 8
+        private const val MAX_LINES = 5
+        private const val CHAT_MIN_LINES = 2
     }
 }

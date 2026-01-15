@@ -34,19 +34,6 @@
         android:visibility="gone" />
 
     <ImageView
-        android:id="@+id/actionNewLine"
-        android:layout_marginTop="6dp"
-        android:layout_marginBottom="8dp"
-        android:layout_width="36dp"
-        android:layout_height="36dp"
-        android:layout_marginStart="8dp"
-        android:background="@drawable/selectable_item_rounded_corner_background"
-        android:importantForAccessibility="no"
-        android:scaleType="centerInside"
-        android:src="@drawable/ic_enter_24"
-        android:visibility="visible" />
-
-    <ImageView
         android:id="@+id/actionSend"
         android:layout_marginTop="6dp"
         android:layout_marginBottom="8dp"
@@ -59,7 +46,7 @@
         android:importantForAccessibility="no"
         android:scaleType="centerInside"
         android:src="@drawable/ic_find_search_24"
-        android:visibility="gone"
+        android:visibility="invisible"
         app:tint="?attr/daxColorWhite" />
 
 </LinearLayout>
