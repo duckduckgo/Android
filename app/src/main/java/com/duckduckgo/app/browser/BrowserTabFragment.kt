@@ -1349,9 +1349,9 @@ class BrowserTabFragment :
         }
     }
 
-    private fun renderBrowserMenu(viewState: BrowserViewState) {
+    private fun renderBrowserMenu(viewState: BrowserViewState, omnibarViewMode: Omnibar.ViewMode = omnibar.viewMode) {
         val browseMenuState = browserMenuViewStateFactory.create(
-            omnibarViewMode = omnibar.viewMode,
+            omnibarViewMode = omnibarViewMode,
             viewState = viewState,
             customTabsMode = tabDisplayedInCustomTabScreen,
         )
@@ -1954,12 +1954,7 @@ class BrowserTabFragment :
     }
 
     private fun showDuckAI(browserViewState: BrowserViewState) {
-        val browseMenuState = browserMenuViewStateFactory.create(
-            omnibarViewMode = ViewMode.DuckAI,
-            viewState = browserViewState,
-            customTabsMode = tabDisplayedInCustomTabScreen,
-        )
-        popupMenu?.render(browseMenuState)
+        renderBrowserMenu(viewState = browserViewState, omnibarViewMode = ViewMode.DuckAI)
         omnibar.setViewMode(ViewMode.DuckAI)
     }
 
