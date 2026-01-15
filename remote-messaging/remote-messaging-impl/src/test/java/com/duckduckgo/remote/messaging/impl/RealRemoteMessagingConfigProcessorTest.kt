@@ -28,7 +28,7 @@ import com.duckduckgo.remote.messaging.fixtures.RemoteMessagingConfigOM.aRemoteM
 import com.duckduckgo.remote.messaging.fixtures.jsonMatchingAttributeMappers
 import com.duckduckgo.remote.messaging.fixtures.messageActionPlugins
 import com.duckduckgo.remote.messaging.impl.mappers.RemoteMessagingConfigJsonMapper
-import com.duckduckgo.remote.messaging.impl.network.RemoteMessageImagePrefetcher
+import com.duckduckgo.remote.messaging.impl.store.RemoteMessageImageStore
 import com.duckduckgo.remote.messaging.store.RemoteMessagingConfigRepository
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -50,7 +50,7 @@ class RealRemoteMessagingConfigProcessorTest {
 
     private val appBuildConfig: AppBuildConfig = mock()
 
-    private val remoteMessageImagePrefetcher = mock<RemoteMessageImagePrefetcher>()
+    private val remoteMessageImageStore = mock<RemoteMessageImageStore>()
     private var remoteMessagingFeatureToggles: RemoteMessagingFeatureToggles = FakeFeatureToggleFactory.create(
         RemoteMessagingFeatureToggles::class.java,
     )
@@ -69,7 +69,7 @@ class RealRemoteMessagingConfigProcessorTest {
         remoteMessagingConfigRepository,
         remoteMessagingRepository,
         remoteMessagingConfigMatcher,
-        remoteMessageImagePrefetcher,
+        remoteMessageImageStore,
         remoteMessagingFeatureToggles,
     )
 
@@ -161,7 +161,7 @@ class RealRemoteMessagingConfigProcessorTest {
 
         testee.process(aJsonRemoteMessagingConfig(version = 1L))
 
-        verify(remoteMessageImagePrefetcher).prefetchImage(evaluatedMessage)
+        verify(remoteMessageImageStore).fetchAndStoreImage(evaluatedMessage)
         verify(remoteMessagingRepository).activeMessage(evaluatedMessage)
     }
 
@@ -174,7 +174,7 @@ class RealRemoteMessagingConfigProcessorTest {
 
         testee.process(aJsonRemoteMessagingConfig(version = 1L))
 
-        verify(remoteMessageImagePrefetcher).prefetchImage(null)
+        verify(remoteMessageImageStore).fetchAndStoreImage(null)
         verify(remoteMessagingRepository).activeMessage(null)
     }
 }

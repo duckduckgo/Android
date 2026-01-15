@@ -150,6 +150,27 @@ class NewTabLegacyPageViewModelTest {
                 assertTrue(it.favourites?.isEmpty() == true)
                 assertTrue(it.newMessage)
                 assertTrue(it.onboardingComplete)
+                assertNull(it.messageImageFilePath)
+            }
+        }
+    }
+
+    @Test
+    fun whenRemoteMessageAvailableWithStoredImageAndOnboardingCompleteThenMessageShown() = runTest {
+        val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList(), listOf(Surface.NEW_TAB_PAGE))
+        whenever(mockRemoteMessageModel.getActiveMessages()).thenReturn(flowOf(remoteMessage))
+        whenever(mockRemoteMessageModel.getRemoteMessageImageFile()).thenReturn("messageFile")
+        whenever(mockDismissedCtaDao.exists(DAX_END)).thenReturn(true)
+
+        testee.onStart(mockLifecycleOwner)
+
+        testee.viewState.test {
+            expectMostRecentItem().also {
+                assertEquals(it.message, remoteMessage)
+                assertEquals("messageFile", it.messageImageFilePath)
+                assertTrue(it.favourites?.isEmpty() == true)
+                assertTrue(it.newMessage)
+                assertTrue(it.onboardingComplete)
             }
         }
     }

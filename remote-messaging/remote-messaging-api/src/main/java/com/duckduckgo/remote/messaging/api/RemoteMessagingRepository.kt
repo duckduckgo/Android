@@ -27,4 +27,6 @@ interface RemoteMessagingRepository {
     fun dismissedMessages(): List<String>
     fun didShow(id: String): Boolean
     fun markAsShown(remoteMessage: RemoteMessage)
+
+    suspend fun getRemoteMessageImageFile() : String?
 }

@@ -75,6 +75,7 @@ class NewTabLegacyPageViewModel @AssistedInject constructor(
         private val showDaxLogo: Boolean,
         private val appTpEnabled: Boolean = false,
         val message: RemoteMessage? = null,
+        val messageImageFilePath: String? = null,
         val newMessage: Boolean = false,
         val onboardingComplete: Boolean = false,
         val favourites: List<Favorite>? = null,
@@ -146,9 +147,11 @@ class NewTabLegacyPageViewModel @AssistedInject constructor(
                     }
 
                     withContext(dispatchers.io()) {
+                        val messageImageFilePath = remoteMessagingModel.getRemoteMessageImageFile()
                         _viewState.emit(
                             viewState.value.copy(
                                 message = snapshot.remoteMessage,
+                                messageImageFilePath = messageImageFilePath,
                                 newMessage = newMessage,
                                 favourites = snapshot.favourites,
                                 onboardingComplete = isHomeOnboardingComplete(),

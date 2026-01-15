@@ -34,8 +34,8 @@ import com.duckduckgo.remote.messaging.impl.mappers.RemoteMessagingConfigJsonMap
 import com.duckduckgo.remote.messaging.impl.matchers.AndroidAppAttributeMatcher
 import com.duckduckgo.remote.messaging.impl.matchers.DeviceAttributeMatcher
 import com.duckduckgo.remote.messaging.impl.matchers.UserAttributeMatcher
-import com.duckduckgo.remote.messaging.impl.network.GlideRemoteMessageImagePrefetcher
-import com.duckduckgo.remote.messaging.impl.network.RemoteMessageImagePrefetcher
+import com.duckduckgo.remote.messaging.impl.store.GlideRemoteMessageImageStore
+import com.duckduckgo.remote.messaging.impl.store.RemoteMessageImageStore
 import com.duckduckgo.remote.messaging.impl.network.RemoteMessagingService
 import com.duckduckgo.remote.messaging.store.LocalRemoteMessagingConfigRepository
 import com.duckduckgo.remote.messaging.store.RemoteMessagesDao
@@ -67,8 +67,8 @@ object DomainModule {
     fun provideImagePrefetcher(
         context: Context,
         dispatcherProvider: DispatcherProvider,
-    ): RemoteMessageImagePrefetcher {
-        return GlideRemoteMessageImagePrefetcher(context, dispatcherProvider)
+    ): RemoteMessageImageStore {
+        return GlideRemoteMessageImageStore(context, dispatcherProvider)
     }
 }
 
@@ -84,14 +84,14 @@ object DataSourceModule {
         remoteMessagingRepository: RemoteMessagingRepository,
         remoteMessagingConfigMatcher: RemoteMessagingConfigMatcher,
         remoteMessagingFeatureToggles: RemoteMessagingFeatureToggles,
-        remoteMessageImagePrefetcher: RemoteMessageImagePrefetcher,
+        remoteMessageImageStore: RemoteMessageImageStore,
     ): RemoteMessagingConfigProcessor {
         return RealRemoteMessagingConfigProcessor(
             remoteMessagingConfigJsonMapper,
             remoteMessagingConfigRepository,
             remoteMessagingRepository,
             remoteMessagingConfigMatcher,
-            remoteMessageImagePrefetcher,
+            remoteMessageImageStore,
             remoteMessagingFeatureToggles,
         )
     }
@@ -102,12 +102,14 @@ object DataSourceModule {
         remoteMessagesDao: RemoteMessagesDao,
         dispatchers: DispatcherProvider,
         messageMapper: MessageMapper,
+        remoteMessageImageStore: RemoteMessageImageStore,
     ): RemoteMessagingRepository {
         return AppRemoteMessagingRepository(
             remoteMessagingConfigRepository,
             remoteMessagesDao,
             dispatchers,
             messageMapper,
+            remoteMessageImageStore,
         )
     }
 

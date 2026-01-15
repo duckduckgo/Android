@@ -72,8 +72,9 @@ class CardsListRemoteMessageViewModel @Inject constructor(
                 lastRemoteMessageSeen = message
             }
             val cardsList = message?.content as? Content.CardsList
+            val imageFile = remoteMessagingModel.getRemoteMessageImageFile()
             if (cardsList != null) {
-                _viewState.value = ViewState(cardsList)
+                _viewState.value = ViewState(cardsList, imageFile)
             } else {
                 _command.send(Command.DismissMessage)
             }
@@ -124,7 +125,10 @@ class CardsListRemoteMessageViewModel @Inject constructor(
         }
     }
 
-    data class ViewState(val cardsLists: Content.CardsList)
+    data class ViewState(
+        val cardsLists: Content.CardsList,
+        val cardsListImageFilePath: String?
+    )
 
     sealed class Command {
         data object DismissMessage : Command()

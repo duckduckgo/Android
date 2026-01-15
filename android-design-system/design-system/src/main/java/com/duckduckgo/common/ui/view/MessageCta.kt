@@ -38,6 +38,7 @@ import com.duckduckgo.common.ui.view.MessageCta.MessageType.REMOTE_MESSAGE
 import com.duckduckgo.common.ui.view.MessageCta.MessageType.REMOTE_PROMO_MESSAGE
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.databinding.ViewMessageCtaBinding
+import java.io.File
 
 class MessageCta : FrameLayout {
 
@@ -167,9 +168,16 @@ class MessageCta : FrameLayout {
         imageUrl: String,
         @DrawableRes drawableRes: Int?,
     ) {
+        // Check if imageUrl is a local file path
+        val imageSource: Any = if (imageUrl.startsWith("/")) {
+            File(imageUrl)
+        } else {
+            imageUrl
+        }
+
         Glide
             .with(imageView)
-            .load(imageUrl)
+            .load(imageSource)
             .apply {
                 if (drawableRes != null) {
                     error(AppCompatResources.getDrawable(context, drawableRes))
