@@ -4769,7 +4769,9 @@ class BrowserTabFragment :
 
                 browserNavigationBarIntegration.configureFireButtonHighlight(highlighted = viewState.fireButton.isHighlighted())
 
-                recreateBrowserMenu()
+                if (viewState.shouldRecreateMenu) {
+                    recreateBrowserMenu()
+                }
                 renderBrowserMenu(viewState)
 
                 renderFullscreenMode(viewState)

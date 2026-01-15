@@ -61,6 +61,7 @@ data class BrowserViewState(
     val lastQueryOrigin: QueryOrigin = QueryOrigin.FromUser,
     val vpnMenuState: VpnMenuState = VpnMenuState.Hidden,
     val useBottomSheetMenu: Boolean = false,
+    val shouldRecreateMenu: Boolean = false,
 )
 
 sealed class HighlightableButton {
