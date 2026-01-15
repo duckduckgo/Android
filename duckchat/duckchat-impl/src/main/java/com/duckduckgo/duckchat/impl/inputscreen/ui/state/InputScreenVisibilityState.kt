@@ -23,10 +23,9 @@ data class InputScreenVisibilityState(
     val bottomFadeVisible: Boolean = false,
     val showChatLogo: Boolean = true,
     val showSearchLogo: Boolean = true,
-    val newLineButtonVisible: Boolean = false,
     val mainButtonsVisible: Boolean = false,
     val searchMode: Boolean = false,
     val fullScreenMode: Boolean = false,
 ) {
-    val actionButtonsContainerVisible: Boolean = submitButtonVisible || voiceInputButtonVisible || newLineButtonVisible
+    val actionButtonsContainerVisible: Boolean = submitButtonVisible || voiceInputButtonVisible
 }

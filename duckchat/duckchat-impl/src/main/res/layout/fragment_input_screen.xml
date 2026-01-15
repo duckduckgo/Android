@@ -25,7 +25,7 @@
         android:id="@+id/inputModeWidgetContainerTop"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:elevation="1dp"
+        android:elevation="4dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -33,19 +33,17 @@
     <FrameLayout
         android:id="@+id/ddgLogoContainer"
         android:layout_width="180dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="86dp"
+        android:layout_height="180dp"
+        android:layout_marginTop="180dp"
+        android:elevation="2dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/inputModeWidgetContainerTop">
+        app:layout_constraintTop_toTopOf="parent">
 
         <com.airbnb.lottie.LottieAnimationView
             android:id="@+id/ddgLogo"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:adjustViewBounds="true"
-            android:maxWidth="180dp"
-            android:maxHeight="180dp"
+            android:layout_height="match_parent"
             app:lottie_autoPlay="false"
             app:lottie_loop="false" />
 
@@ -56,16 +54,70 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginHorizontal="@dimen/inputScreenMarginHorizontal"
+        android:elevation="1dp"
         app:layout_constraintBottom_toTopOf="@id/inputModeWidgetContainerBottom"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/inputModeWidgetContainerTop" />
 
+    <com.duckduckgo.duckchat.impl.inputscreen.ui.view.TouchThroughNestedScrollView
+        android:id="@+id/newTabContainerScrollView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginHorizontal="@dimen/inputScreenMarginHorizontal"
+        android:visibility="gone"
+        android:elevation="2dp"
+        android:clickable="true"
+        android:focusable="true"
+        app:layout_constraintBottom_toTopOf="@id/inputModeWidgetContainerBottom"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/inputModeWidgetContainerTop">
+
+        <FrameLayout
+            android:id="@+id/newTabContainerLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clickable="true"
+            android:focusable="true" />
+
+    </com.duckduckgo.duckchat.impl.inputscreen.ui.view.TouchThroughNestedScrollView>
+
+    <FrameLayout
+        android:id="@+id/autoCompleteOverlay"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginHorizontal="@dimen/inputScreenMarginHorizontal"
+        android:visibility="gone"
+        android:elevation="3dp"
+        android:clickable="true"
+        android:focusable="true"
+        app:layout_constraintBottom_toTopOf="@id/inputModeWidgetContainerBottom"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/inputModeWidgetContainerTop">
+
+        <com.duckduckgo.duckchat.impl.inputscreen.ui.view.SwipeableRecyclerView
+            android:id="@+id/autoCompleteRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false" />
+
+        <FrameLayout
+            android:id="@+id/autoCompleteBottomFadeContainer"
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:layout_gravity="bottom"
+            android:elevation="8dp"
+            android:foreground="@drawable/bottom_fade_overlay" />
+
+    </FrameLayout>
+
     <FrameLayout
         android:id="@+id/inputScreenButtonsContainer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:elevation="1dp"
+        android:elevation="4dp"
         android:layout_marginEnd="6dp"
         android:layout_marginBottom="4dp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -75,7 +127,7 @@
         android:id="@+id/inputModeWidgetContainerBottom"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:elevation="1dp"
+        android:elevation="4dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="parent" />
