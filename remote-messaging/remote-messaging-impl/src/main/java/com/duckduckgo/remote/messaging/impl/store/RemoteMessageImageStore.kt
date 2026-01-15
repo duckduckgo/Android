@@ -52,6 +52,7 @@ class GlideRemoteMessageImageStore(
     override suspend fun fetchAndStoreImage(message: RemoteMessage?) {
         val imageUrl = message?.content?.getImageUrl()
 
+        deleteStoredImage()
         if (imageUrl.isNullOrEmpty()) {
             logcat { "RMF: No image URL to prefetch for message: ${message?.id}" }
             return
@@ -85,6 +86,10 @@ class GlideRemoteMessageImageStore(
     }
 
     override suspend fun clearStoredImageFile() {
+        deleteStoredImage()
+    }
+
+    private suspend fun deleteStoredImage() {
         withContext(dispatcherProvider.io()) {
             runCatching {
                 getImageFile().let {
