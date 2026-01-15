@@ -23,19 +23,26 @@ import com.duckduckgo.pir.impl.store.PirSchedulingRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
-interface PirFeatureRemover {
-    suspend fun removeFeature()
+interface PirFeatureDataCleaner {
+    suspend fun removeAllData()
+    suspend fun removeUserData()
 }
 
 @ContributesBinding(AppScope::class)
-class RealPirFeatureRemover @Inject constructor(
+class RealPirFeatureDataCleaner @Inject constructor(
     private val pirRepository: PirRepository,
     private val pirSchedulingRepository: PirSchedulingRepository,
     private val pirEventsRepository: PirEventsRepository,
-) : PirFeatureRemover {
+) : PirFeatureDataCleaner {
 
-    override suspend fun removeFeature() {
+    override suspend fun removeAllData() {
         pirRepository.clearAllData()
+        pirSchedulingRepository.clearAllData()
+        pirEventsRepository.clearAllData()
+    }
+
+    override suspend fun removeUserData() {
+        pirRepository.clearUserData()
         pirSchedulingRepository.clearAllData()
         pirEventsRepository.clearAllData()
     }

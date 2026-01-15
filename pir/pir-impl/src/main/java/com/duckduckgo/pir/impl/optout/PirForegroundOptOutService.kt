@@ -23,6 +23,7 @@ import android.os.IBinder
 import android.os.Process
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.di.scopes.ServiceScope
+import com.duckduckgo.pir.impl.PirFeatureDataCleaner
 import com.duckduckgo.pir.impl.R
 import com.duckduckgo.pir.impl.checker.PirWorkHandler
 import com.duckduckgo.pir.impl.notifications.PirNotificationManager
@@ -44,6 +45,9 @@ class PirForegroundOptOutService : Service(), CoroutineScope by MainScope() {
 
     @Inject
     lateinit var pirWorkHandler: PirWorkHandler
+
+    @Inject
+    lateinit var pirFeatureDataCleaner: PirFeatureDataCleaner
 
     override fun onCreate() {
         super.onCreate()
@@ -72,6 +76,7 @@ class PirForegroundOptOutService : Service(), CoroutineScope by MainScope() {
             if (pirWorkHandler.canRunPir().firstOrNull() == false) {
                 logcat { "PIR-OPT-OUT: PIR opt-out not allowed to run!" }
                 pirWorkHandler.cancelWork()
+                pirFeatureDataCleaner.removeAllData()
                 stopSelf()
                 return@launch
             }

@@ -29,6 +29,7 @@ interface PirDataStore {
     var weeklyStatLastSentMs: Long
 
     fun reset()
+    fun resetUserData()
 }
 
 internal class RealPirDataStore(
@@ -91,6 +92,10 @@ internal class RealPirDataStore(
 
     override fun reset() {
         mainConfigEtag = null
+        resetUserData()
+    }
+
+    override fun resetUserData() {
         customStatsPixelsLastSentMs = 0L
         dauLastSentMs = 0L
         wauLastSentMs = 0L

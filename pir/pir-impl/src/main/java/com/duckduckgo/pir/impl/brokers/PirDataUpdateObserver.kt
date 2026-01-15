@@ -21,6 +21,7 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.pir.impl.PirFeatureDataCleaner
 import com.duckduckgo.pir.impl.checker.PirWorkHandler
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.CoroutineScope
@@ -38,6 +39,7 @@ class PirDataUpdateObserver @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val brokerJsonUpdater: BrokerJsonUpdater,
     private val pirWorkHandler: PirWorkHandler,
+    private val pirFeatureDataCleaner: PirFeatureDataCleaner,
 ) : MainProcessLifecycleObserver {
     override fun onCreate(owner: LifecycleOwner) {
         coroutineScope.launch(dispatcherProvider.io()) {
@@ -56,6 +58,7 @@ class PirDataUpdateObserver @Inject constructor(
                         logcat { "PIR-update: PIR not enabled" }
                         // This will also cancel any ongoing work that is currently running if PIR is not enabled
                         pirWorkHandler.cancelWork()
+                        pirFeatureDataCleaner.removeAllData()
                     }
                 }
         }
