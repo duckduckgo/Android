@@ -34,6 +34,7 @@ import com.duckduckgo.subscriptions.api.SubscriptionStatus.INACTIVE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.NOT_AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.UNKNOWN
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.WAITING
+import com.duckduckgo.subscriptions.api.VpnReminderNotificationScheduler
 import com.duckduckgo.subscriptions.impl.RealSubscriptionsManager.RecoverSubscriptionResult
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.BASIC_SUBSCRIPTION
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.LEGACY_FE_ITR
@@ -308,6 +309,7 @@ class RealSubscriptionsManager @Inject constructor(
     private val subscriptionSwitchWideEvent: SubscriptionSwitchWideEvent,
     private val freeTrialConversionWideEvent: FreeTrialConversionWideEvent,
     private val subscriptionRestoreWideEvent: SubscriptionRestoreWideEvent,
+    private val vpnReminderNotificationScheduler: VpnReminderNotificationScheduler,
 ) : SubscriptionsManager {
     private val adapter = Moshi.Builder().build().adapter(ResponseError::class.java)
 
@@ -735,6 +737,7 @@ class RealSubscriptionsManager @Inject constructor(
                 subscriptionPurchaseWideEvent.onPurchaseConfirmationSuccess()
                 if (subscription.activeOffers.contains(ActiveOfferType.TRIAL)) {
                     freeTrialConversionWideEvent.onFreeTrialStarted(subscription.productId)
+                    vpnReminderNotificationScheduler.scheduleVpnReminderNotification()
                 }
             } else {
                 handlePurchaseFailed()
