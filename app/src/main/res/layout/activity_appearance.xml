@@ -275,6 +275,20 @@
                 app:showSwitch="true" />
 
             <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+                android:id="@+id/trackersCountInAddressBarDivider"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="0dp" />
+
+            <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+                android:id="@+id/showTrackersCountInAddressBar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="@string/showTrackerCountInAddressBar"
+                app:primaryTextTruncated="false"
+                app:showSwitch="true" />
+
+            <com.duckduckgo.common.ui.view.divider.HorizontalDivider
                 android:id="@+id/trackersAnimationSettingDivider"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

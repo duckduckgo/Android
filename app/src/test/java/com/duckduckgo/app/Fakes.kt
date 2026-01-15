@@ -214,6 +214,12 @@ class FakeSettingsDataStore :
             store["clearDuckAiData"] = value
         }
 
+    override var showTrackersCountInAddressBar: Boolean
+        get() = store["showTrackersCountInAddressBar"] as Boolean? ?: true
+        set(value) {
+            store["showTrackersCountInAddressBar"] = value
+        }
+
     override fun isCurrentlySelected(clearWhatOption: ClearWhatOption): Boolean {
         val currentlySelected = store["automaticallyClearWhatOption"] as ClearWhatOption?
         return currentlySelected == clearWhatOption

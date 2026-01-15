@@ -4257,6 +4257,45 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenUserPreferenceDisabledThenTrackersAnimationDisabled() {
+        whenever(mockSettingsDataStore.showTrackersCountInAddressBar).thenReturn(false)
+        loadUrl("https://example.com")
+        assertFalse(loadingViewState().trackersAnimationEnabled)
+    }
+
+    @Test
+    fun whenUserPreferenceEnabledAndPrivacyProtectionActiveThenTrackersAnimationEnabled() {
+        whenever(mockSettingsDataStore.showTrackersCountInAddressBar).thenReturn(true)
+        whenever(mockContentBlocking.isAnException("example.com")).thenReturn(false)
+        loadUrl("https://example.com")
+        assertTrue(loadingViewState().trackersAnimationEnabled)
+    }
+
+    @Test
+    fun whenUserPreferenceDisabledEvenWithPrivacyProtectionActiveThenTrackersAnimationDisabled() {
+        whenever(mockSettingsDataStore.showTrackersCountInAddressBar).thenReturn(false)
+        whenever(mockContentBlocking.isAnException("example.com")).thenReturn(false)
+        loadUrl("https://example.com")
+        assertFalse(loadingViewState().trackersAnimationEnabled)
+    }
+
+    @Test
+    fun whenUserPreferenceEnabledButPrivacyProtectionDisabledThenTrackersAnimationDisabled() {
+        whenever(mockSettingsDataStore.showTrackersCountInAddressBar).thenReturn(true)
+        whenever(mockContentBlocking.isAnException("example.com")).thenReturn(true)
+        loadUrl("https://example.com")
+        assertFalse(loadingViewState().trackersAnimationEnabled)
+    }
+
+    @Test
+    fun whenUserPreferenceDisabledAndPrivacyProtectionDisabledThenTrackersAnimationDisabled() {
+        whenever(mockSettingsDataStore.showTrackersCountInAddressBar).thenReturn(false)
+        whenever(mockContentBlocking.isAnException("example.com")).thenReturn(true)
+        loadUrl("https://example.com")
+        assertFalse(loadingViewState().trackersAnimationEnabled)
+    }
+
+    @Test
     fun whenEditBookmarkRequestedThenRepositoryIsNotUpdated() =
         runTest {
             val url = "http://www.example.com"
