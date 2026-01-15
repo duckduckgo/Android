@@ -53,13 +53,13 @@ class GlideRemoteMessageImageStore(
         val imageUrl = message?.content?.getImageUrl()
 
         if (imageUrl.isNullOrEmpty()) {
-            logcat(tag = "RadoiuC") { "RMF: No image URL to prefetch for message: ${message?.id}" }
+            logcat { "RMF: No image URL to prefetch for message: ${message?.id}" }
             return
         }
 
         withContext(dispatcherProvider.io()) {
             runCatching {
-                logcat(tag = "RadoiuC") { "RMF: Prefetching image: $imageUrl for message: ${message.id}" }
+                logcat { "RMF: Prefetching image: $imageUrl for message: ${message.id}" }
 
                 val downloadedFile = Glide.with(context)
                     .asFile()
@@ -70,9 +70,9 @@ class GlideRemoteMessageImageStore(
                 val permanentFile = getImageFile()
                 downloadedFile.copyTo(permanentFile, overwrite = true)
 
-                logcat(tag = "RadoiuC") { "RMF: Successfully saved image to permanent storage: ${permanentFile.absolutePath}" }
+                logcat { "RMF: Successfully saved image to permanent storage: ${permanentFile.absolutePath}" }
             }.onFailure { error ->
-                logcat(tag = "RadoiuC") { "RMF: Failed to prefetch image $imageUrl: ${error.message}" }
+                logcat { "RMF: Failed to prefetch image $imageUrl: ${error.message}" }
             }
         }
     }
@@ -89,12 +89,12 @@ class GlideRemoteMessageImageStore(
             runCatching {
                 getImageFile().let {
                     if (it.exists()) {
-                        logcat(tag = "RadoiuC") { "RMF: clear the stored image file" }
+                        logcat { "RMF: clear the stored image file" }
                         it.delete()
                     }
                 }
             }.onFailure {
-                logcat(tag = "RadoiuC") { "Failed to clear the stored image file" }
+                logcat { "Failed to clear the stored image file" }
             }
         }
     }
