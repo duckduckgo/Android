@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 DuckDuckGo
+ * Copyright (c) 2026 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,7 +39,6 @@ import android.webkit.WebSettings
 import android.webkit.WebView
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.annotation.AnyThread
-import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ActivityOptionsCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.activityViewModels
@@ -52,7 +51,6 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.view.dialog.ActionBottomSheetDialog
 import com.duckduckgo.common.ui.view.makeSnackbarWithNoBottomInset
-import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -75,6 +73,7 @@ import com.duckduckgo.duckchat.api.viewmodel.DuckChatSharedViewModel
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.databinding.ActivityDuckChatWebviewBinding
+import com.duckduckgo.duckchat.impl.databinding.FragmentContextualDuckAiBinding
 import com.duckduckgo.duckchat.impl.feature.AIChatDownloadFeature
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper.Companion.DUCK_CHAT_FEATURE_NAME
@@ -92,6 +91,7 @@ import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.subscriptions.api.SUBSCRIPTIONS_FEATURE_NAME
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.CoroutineScope
@@ -105,9 +105,10 @@ import org.json.JSONObject
 import java.io.File
 import javax.inject.Inject
 import javax.inject.Named
+import kotlin.getValue
 
 @InjectWith(FragmentScope::class)
-open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_chat_webview), DownloadConfirmationDialogListener {
+class DuckChatContextualFragment : DuckDuckGoFragment(R.layout.fragment_contextual_duck_ai), DownloadConfirmationDialogListener {
 
     @Inject
     lateinit var viewModelFactory: FragmentViewModelFactory
@@ -179,13 +180,20 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
     private var pendingFileDownload: PendingFileDownload? = null
     private val downloadMessagesJob = ConflatedJob()
 
-    private val binding: ActivityDuckChatWebviewBinding by viewBinding()
+    private val binding: FragmentContextualDuckAiBinding by viewBinding()
     private var pendingUploadTask: ValueCallback<Array<Uri>>? = null
 
     private val root: ViewGroup by lazy { binding.root }
-    private val toolbar: Toolbar? by lazy { binding.includeToolbar.toolbar }
 
     internal val simpleWebview: WebView by lazy { binding.simpleWebview }
+
+    // this will go in the viewmodel
+    private enum class SheetMode {
+        INPUT,
+        WEBVIEW,
+    }
+
+    private var sheetMode = SheetMode.WEBVIEW
 
     @SuppressLint("SetJavaScriptEnabled")
     override fun onViewCreated(
@@ -323,20 +331,17 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
             }
             pendingUploadTask = null
         }
-
-        configureOmnibar()
+        configureBottomSheet(view)
         observeViewModel()
     }
 
-    private fun configureOmnibar() {
-        toolbar?.let {
-            it.show()
-            it.setNavigationIcon(com.duckduckgo.mobile.android.R.drawable.ic_arrow_left_24)
-            it.setNavigationOnClickListener {
-                requireActivity().onBackPressed()
-            }
-            it.setTitle(R.string.duck_chat_title)
+    private fun configureBottomSheet(view: View) {
+        val parent = view.parent as? View ?: return
+        val bottomSheetBehavior = BottomSheetBehavior.from(parent)
+        binding.contextualClose.setOnClickListener {
+            bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
         }
+        binding.contextualModeButtons.setOnClickListener {  }
     }
 
     private fun observeViewModel() {
@@ -708,7 +713,7 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
         private const val PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE = 200
         private const val CUSTOM_UA =
             "Mozilla/5.0 (Linux; Android 16) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/124.0.0.0 Mobile DuckDuckGo/5 Safari/537.36"
-        private const val REQUEST_CODE_CHOOSE_FILE = 100
+        const val REQUEST_CODE_CHOOSE_FILE = 100
         const val KEY_DUCK_AI_URL: String = "KEY_DUCK_AI_URL"
         const val KEY_DUCK_AI_TABS: String = "KEY_DUCK_AI_TABS"
     }
