@@ -4729,6 +4729,7 @@ class BrowserTabFragment :
                 val browserShowingChanged = viewState.browserShowing != lastSeenBrowserViewState?.browserShowing
                 val errorChanged = viewState.browserError != lastSeenBrowserViewState?.browserError
                 val sslErrorChanged = viewState.sslError != lastSeenBrowserViewState?.sslError
+                val menuTypeChanged = viewState.useBottomSheetMenu != lastSeenBrowserViewState?.useBottomSheetMenu
 
                 lastSeenBrowserViewState = viewState
                 if (browserShowingChanged) {
@@ -4764,7 +4765,7 @@ class BrowserTabFragment :
 
                 browserNavigationBarIntegration.configureFireButtonHighlight(highlighted = viewState.fireButton.isHighlighted())
 
-                if (viewState.shouldRecreateMenu) {
+                if (menuTypeChanged) {
                     recreateBrowserMenu()
                 }
                 renderBrowserMenu(viewState)

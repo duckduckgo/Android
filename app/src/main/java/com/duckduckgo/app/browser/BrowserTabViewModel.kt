@@ -813,7 +813,6 @@ class BrowserTabViewModel @Inject constructor(
                 val useBottomSheetMenu = state.hasOption && state.isEnabled
                 browserViewState.value = currentState.copy(
                     useBottomSheetMenu = useBottomSheetMenu,
-                    shouldRecreateMenu = currentState.useBottomSheetMenu != useBottomSheetMenu,
                 )
             }
             .launchIn(viewModelScope)
