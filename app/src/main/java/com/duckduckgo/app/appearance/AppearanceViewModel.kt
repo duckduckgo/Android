@@ -20,6 +20,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.webkit.WebViewFeature
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.app.browser.animations.AddressBarTrackersAnimationManager
 import com.duckduckgo.app.browser.api.OmnibarRepository
 import com.duckduckgo.app.browser.menu.BrowserMenuDisplayRepository
 import com.duckduckgo.app.browser.omnibar.OmnibarType
@@ -60,6 +61,7 @@ class AppearanceViewModel @Inject constructor(
     private val pixel: Pixel,
     private val dispatcherProvider: DispatcherProvider,
     private val tabSwitcherDataStore: TabSwitcherDataStore,
+    private val addressBarTrackersAnimationManager: AddressBarTrackersAnimationManager,
     omnibarRepository: OmnibarRepository,
 ) : ViewModel() {
     data class ViewState(
@@ -71,6 +73,8 @@ class AppearanceViewModel @Inject constructor(
         val omnibarType: OmnibarType = OmnibarType.SINGLE_TOP,
         val isFullUrlEnabled: Boolean = true,
         val isTrackersCountInTabSwitcherEnabled: Boolean = true,
+        val isAddressBarTrackersAnimationEnabled: Boolean = true,
+        val shouldShowAddressBarTrackersAnimationItem: Boolean = false,
         val hasExperimentalBrowserMenuOption: Boolean = false,
         val useBottomSheetMenuEnabled: Boolean = false,
         val shouldShowSplitOmnibarSettings: Boolean = false,
@@ -99,6 +103,7 @@ class AppearanceViewModel @Inject constructor(
             supportsForceDarkMode = WebViewFeature.isFeatureSupported(WebViewFeature.ALGORITHMIC_DARKENING),
             omnibarType = settingsDataStore.omnibarType,
             shouldShowSplitOmnibarSettings = omnibarRepository.isSplitOmnibarAvailable,
+            isAddressBarTrackersAnimationEnabled = settingsDataStore.showTrackersCountInAddressBar,
         ),
     )
 
@@ -108,11 +113,13 @@ class AppearanceViewModel @Inject constructor(
         browserMenuDisplayRepository.browserMenuState,
         tabSwitcherDataStore.isTrackersAnimationInfoTileHidden(),
     ) { currentViewState, isFullUrlEnabled, browserMenuState, isTrackersAnimationTileHidden ->
+        val isFeatureEnabled = addressBarTrackersAnimationManager.isFeatureEnabled()
         currentViewState.copy(
             isTrackersCountInTabSwitcherEnabled = !isTrackersAnimationTileHidden,
             isFullUrlEnabled = isFullUrlEnabled,
             hasExperimentalBrowserMenuOption = browserMenuState.hasOption,
             useBottomSheetMenuEnabled = browserMenuState.isEnabled,
+            shouldShowAddressBarTrackersAnimationItem = isFeatureEnabled,
         )
     }.stateIn(viewModelScope, SharingStarted.Lazily, viewState.value)
 
@@ -199,6 +206,16 @@ class AppearanceViewModel @Inject constructor(
 
             val params = mapOf(Pixel.PixelParameter.IS_ENABLED to checked.toString())
             pixel.fire(AppPixelName.SETTINGS_APPEARANCE_IS_TRACKER_COUNT_IN_TAB_SWITCHER_TOGGLED, params)
+        }
+    }
+
+    fun onShowTrackersCountInAddressBarChanged(checked: Boolean) {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            settingsDataStore.showTrackersCountInAddressBar = checked
+            viewState.update { it.copy(isAddressBarTrackersAnimationEnabled = checked) }
+
+            val params = mapOf(Pixel.PixelParameter.IS_ENABLED to checked.toString())
+            pixel.fire(AppPixelName.SETTINGS_APPEARANCE_IS_TRACKER_COUNT_IN_ADDRESS_BAR_TOGGLED, params)
         }
     }
 
