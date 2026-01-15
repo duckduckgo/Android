@@ -3157,7 +3157,6 @@ class BrowserTabFragment :
             }
             override fun onSlide(bottomSheet: View, slideOffset: Float) {}
         })
-
     }
 
     private fun configureOmnibarTextInput() {

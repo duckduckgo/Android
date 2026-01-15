@@ -72,7 +72,6 @@ import com.duckduckgo.duckchat.api.inputscreen.InputScreenBrowserButtonsConfig
 import com.duckduckgo.duckchat.api.viewmodel.DuckChatSharedViewModel
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.R
-import com.duckduckgo.duckchat.impl.databinding.ActivityDuckChatWebviewBinding
 import com.duckduckgo.duckchat.impl.databinding.FragmentContextualDuckAiBinding
 import com.duckduckgo.duckchat.impl.feature.AIChatDownloadFeature
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
@@ -341,7 +340,7 @@ class DuckChatContextualFragment : DuckDuckGoFragment(R.layout.fragment_contextu
         binding.contextualClose.setOnClickListener {
             bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
         }
-        binding.contextualModeButtons.setOnClickListener {  }
+        binding.contextualModeButtons.setOnClickListener { }
     }
 
     private fun observeViewModel() {
