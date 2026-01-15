@@ -1582,6 +1582,9 @@ class BrowserTabFragment :
                 viewModel.onVpnMenuClicked()
             }
             onMenuItemClicked(newDuckChatTabMenuItem) {
+                viewModel.openNewDuckChat(omnibar.viewMode)
+            }
+            onMenuItemClicked(newDuckChatMenuItem) {
                 activity?.currentFocus?.let {
                     it.hideKeyboard()
                     it.clearFocus()

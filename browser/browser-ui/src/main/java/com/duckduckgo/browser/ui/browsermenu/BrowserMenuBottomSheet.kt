@@ -77,6 +77,9 @@ class BrowserMenuBottomSheet(
     val newDuckChatTabMenuItem: MenuActionButtonView
         get() = binding.newDuckChatTabMenuItem
 
+    val newDuckChatMenuItem: MenuActionButtonView
+        get() = binding.newDuckChatMenuItem
+
     val settingsMenuItem: MenuActionButtonView
         get() = binding.settingsMenuItem
 
@@ -178,6 +181,9 @@ class BrowserMenuBottomSheet(
         forwardMenuItem.isEnabled = viewState.canGoForward
         newTabMenuItem.isEnabled = true
         newDuckChatTabMenuItem.isEnabled = true
+        newDuckChatTabMenuItem.isVisible = true
+        newDuckChatMenuItem.isEnabled = false
+        newDuckChatMenuItem.isVisible = false
         settingsMenuItem.isEnabled = true
 
         refreshMenuItem.isVisible = true
@@ -251,7 +257,10 @@ class BrowserMenuBottomSheet(
         backMenuItem.isEnabled = false
         forwardMenuItem.isEnabled = viewState.canGoForward
         newTabMenuItem.isEnabled = false
-        newDuckChatTabMenuItem.isEnabled = true
+        newDuckChatTabMenuItem.isEnabled = false
+        newDuckChatTabMenuItem.isVisible = false
+        newDuckChatMenuItem.isEnabled = true
+        newDuckChatMenuItem.isVisible = true
         settingsMenuItem.isEnabled = true
 
         refreshMenuItem.isVisible = false
@@ -272,6 +281,9 @@ class BrowserMenuBottomSheet(
         forwardMenuItem.isEnabled = viewState.canGoForward
         newTabMenuItem.isEnabled = false
         newDuckChatTabMenuItem.isEnabled = false
+        newDuckChatTabMenuItem.isVisible = false
+        newDuckChatMenuItem.isEnabled = false
+        newDuckChatMenuItem.isVisible = false
         settingsMenuItem.isEnabled = false
 
         refreshMenuItem.isVisible = true
@@ -319,6 +331,9 @@ class BrowserMenuBottomSheet(
         forwardMenuItem.isEnabled = false
         newTabMenuItem.isEnabled = false
         newDuckChatTabMenuItem.isEnabled = true
+        newDuckChatTabMenuItem.isVisible = true
+        newDuckChatMenuItem.isEnabled = false
+        newDuckChatMenuItem.isVisible = false
         settingsMenuItem.isEnabled = true
 
         refreshMenuItem.isVisible = false

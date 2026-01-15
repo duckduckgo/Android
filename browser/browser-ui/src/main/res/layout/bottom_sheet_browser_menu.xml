@@ -77,8 +77,17 @@
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
-                    app:menuActionLabel="@string/browserMenuNewChat"
+                    android:visibility="gone"
+                    app:menuActionLabel="@string/browserMenuNewAIChat"
                     app:menuActionSrc="@drawable/ic_ai_chat_add_24" />
+
+                <com.duckduckgo.common.ui.view.MenuActionButtonView
+                    android:id="@+id/newDuckChatMenuItem"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    app:menuActionLabel="@string/browserMenuDuckChat"
+                    app:menuActionSrc="@drawable/ic_ai_chat_24" />
 
                 <com.duckduckgo.common.ui.view.MenuActionButtonView
                     android:id="@+id/settingsMenuItem"
