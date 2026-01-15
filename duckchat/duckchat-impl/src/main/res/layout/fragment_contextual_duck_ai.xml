@@ -22,6 +22,7 @@
     android:layout_height="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_marginTop="@dimen/keyline_2"
+    android:id="@+id/contextualModeRoot"
     android:background="@drawable/rounded_top_corners_bottom_sheet_drawable"
     android:orientation="vertical">
 

@@ -3141,16 +3141,13 @@ class BrowserTabFragment :
         binding.duckAiFragmentContainer.show()
 
         val bottomSheetBehavior = BottomSheetBehavior.from(binding.duckAiFragmentContainer)
-        bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
-        bottomSheetBehavior.isShouldRemoveExpandedCorners = false
-        bottomSheetBehavior.skipCollapsed = true
-        bottomSheetBehavior.isDraggable = true
-        bottomSheetBehavior.isHideable = true
+        bottomSheetBehavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
 
         bottomSheetBehavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
             override fun onStateChanged(bottomSheet: View, newState: Int) {
                 if (newState == BottomSheetBehavior.STATE_HIDDEN) {
                     binding.duckAiFragmentContainer.gone()
+                    hideKeyboard()
                 }
             }
             override fun onSlide(bottomSheet: View, slideOffset: Float) {}

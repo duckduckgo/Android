@@ -330,6 +330,7 @@ class DuckChatContextualFragment : DuckDuckGoFragment(R.layout.fragment_contextu
             }
             pendingUploadTask = null
         }
+
         configureBottomSheet(view)
         observeViewModel()
     }
@@ -337,10 +338,34 @@ class DuckChatContextualFragment : DuckDuckGoFragment(R.layout.fragment_contextu
     private fun configureBottomSheet(view: View) {
         val parent = view.parent as? View ?: return
         val bottomSheetBehavior = BottomSheetBehavior.from(parent)
+
+        bottomSheetBehavior.isShouldRemoveExpandedCorners = false
+        bottomSheetBehavior.skipCollapsed = true
+        bottomSheetBehavior.isDraggable = false
+        bottomSheetBehavior.isHideable = true
+        bottomSheetBehavior.isFitToContents = true
+
+        bottomSheetBehavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
+            override fun onStateChanged(bottomSheet: View, newState: Int) {
+                if (newState == BottomSheetBehavior.STATE_EXPANDED) {
+                    bottomSheetBehavior.isDraggable = true
+                }
+            }
+            override fun onSlide(bottomSheet: View, slideOffset: Float) {}
+        })
+
         binding.contextualClose.setOnClickListener {
             bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
         }
         binding.contextualModeButtons.setOnClickListener { }
+        binding.contextualModeRoot.setOnClickListener { }
+        binding.inputField.onFocusChangeListener = View.OnFocusChangeListener { _, focused ->
+            if (focused) {
+                bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+            } else {
+                bottomSheetBehavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
+            }
+        }
     }
 
     private fun observeViewModel() {
