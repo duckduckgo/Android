@@ -178,6 +178,7 @@ class AppearanceActivity : DuckDuckGoActivity() {
                         viewState.isTrackersCountInTabSwitcherEnabled,
                         showTrackersCountInTabSwitcher,
                     )
+                    binding.bottomSheetMenuSettingDivider.isVisible = viewState.hasExperimentalBrowserMenuOption
                     binding.useBottomSheetMenuSetting.isVisible = viewState.hasExperimentalBrowserMenuOption
                     binding.useBottomSheetMenuSetting.quietlySetIsChecked(
                         viewState.useBottomSheetMenuEnabled,
