@@ -129,6 +129,7 @@ object PixelInterceptorPixelsRequiringDataCleaning : PixelParamRemovalPlugin {
             AppPixelName.SEARCH_WIDGET_ADDED.pixelName to PixelParameter.removeAtb(),
             AppPixelName.SEARCH_WIDGET_DELETED.pixelName to PixelParameter.removeAtb(),
             AppPixelName.SETTINGS_APPEARANCE_IS_TRACKER_COUNT_IN_TAB_SWITCHER_TOGGLED.pixelName to PixelParameter.removeAll(),
+            AppPixelName.SETTINGS_APPEARANCE_IS_TRACKER_COUNT_IN_ADDRESS_BAR_TOGGLED.pixelName to PixelParameter.removeAll(),
             AppPixelName.TIMEOUT_WAITING_FOR_APP_REFERRER.pixelName to PixelParameter.removeAtb(),
             AppPixelName.PRODUCT_TELEMETRY_SURFACE_LANDSCAPE_ORIENTATION_USED.pixelName to PixelParameter.removeAtb(),
             AppPixelName.PRODUCT_TELEMETRY_SURFACE_LANDSCAPE_ORIENTATION_USED_DAILY.pixelName to PixelParameter.removeAtb(),

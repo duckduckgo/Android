@@ -1804,6 +1804,9 @@ class BrowserTabViewModel @Inject constructor(
         site: Site?,
         previousUrl: String?,
     ): Boolean {
+        if (!settingsDataStore.showTrackersCountInAddressBar) {
+            return false
+        }
         val canShowTrackerAnimation = !(privacyProtectionDisabled || maliciousSiteBlocked) &&
             site?.privacyProtection() ?: PrivacyShield.UNKNOWN != PrivacyShield.UNPROTECTED
 

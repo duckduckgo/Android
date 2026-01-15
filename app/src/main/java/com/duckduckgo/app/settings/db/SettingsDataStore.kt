@@ -106,6 +106,7 @@ interface SettingsDataStore {
     var urlPreferenceSetByUser: Boolean
     var clearDuckAiData: Boolean
     var useBottomSheetMenu: Boolean
+    var showTrackersCountInAddressBar: Boolean
 
     /**
      * Check if a value has been set to the URL display preference.
@@ -272,6 +273,10 @@ class SettingsSharedPreferences @Inject constructor(
         get() = preferences.getBoolean(KEY_USE_BOTTOM_SHEET_MENU, false)
         set(enabled) = preferences.edit { putBoolean(KEY_USE_BOTTOM_SHEET_MENU, enabled) }
 
+    override var showTrackersCountInAddressBar: Boolean
+        get() = preferences.getBoolean(KEY_SHOW_TRACKERS_COUNT_IN_ADDRESS_BAR, true)
+        set(enabled) = preferences.edit { putBoolean(KEY_SHOW_TRACKERS_COUNT_IN_ADDRESS_BAR, enabled) }
+
     override fun hasBackgroundTimestampRecorded(): Boolean = preferences.contains(KEY_APP_BACKGROUNDED_TIMESTAMP)
 
     override fun clearAppBackgroundTimestamp() = preferences.edit { remove(KEY_APP_BACKGROUNDED_TIMESTAMP) }
@@ -351,6 +356,7 @@ class SettingsSharedPreferences @Inject constructor(
         const val URL_PREFERENCE_SET_BY_USER = "URL_PREFERENCE_SET_BY_USER"
         const val KEY_CLEAR_DUCK_AI_DATA = "KEY_CLEAR_DUCK_AI_DATA"
         const val KEY_USE_BOTTOM_SHEET_MENU = "USE_BOTTOM_SHEET_MENU"
+        const val KEY_SHOW_TRACKERS_COUNT_IN_ADDRESS_BAR = "KEY_SHOW_TRACKERS_COUNT_IN_ADDRESS_BAR"
     }
 
     private class FireAnimationPrefsMapper {
