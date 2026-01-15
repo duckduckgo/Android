@@ -127,7 +127,7 @@ class CardsListRemoteMessageViewModel @Inject constructor(
 
     data class ViewState(
         val cardsLists: Content.CardsList,
-        val cardsListImageFilePath: String?
+        val cardsListImageFilePath: String?,
     )
 
     sealed class Command {

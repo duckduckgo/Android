@@ -44,7 +44,7 @@ fun RemoteMessage.asMessage(
     isLightModeEnabled: Boolean,
     localImageFilePath: String? = null,
 ): Message? {
-        // Use local file if available, otherwise fall back to imageUrl
+    // Use local file if available, otherwise fall back to imageUrl
     fun getImageSource(imageUrl: String?): String? {
         return localImageFilePath ?: imageUrl
     }

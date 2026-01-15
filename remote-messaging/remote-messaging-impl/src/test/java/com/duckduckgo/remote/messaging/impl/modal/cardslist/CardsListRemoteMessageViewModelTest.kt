@@ -166,7 +166,6 @@ class CardsListRemoteMessageViewModelTest {
         whenever(remoteMessagingRepository.getMessageById(eq(messageId))).thenReturn(message)
         whenever(remoteMessagingModel.getRemoteMessageImageFile()).thenReturn("imageFile")
 
-
         viewModel.viewState.test {
             assertNull(awaitItem()) // Initial state
 

@@ -21,9 +21,9 @@ import com.bumptech.glide.Glide
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.remote.messaging.api.Content
 import com.duckduckgo.remote.messaging.api.RemoteMessage
-import java.io.File
 import kotlinx.coroutines.withContext
 import logcat.logcat
+import java.io.File
 
 interface RemoteMessageImageStore {
 

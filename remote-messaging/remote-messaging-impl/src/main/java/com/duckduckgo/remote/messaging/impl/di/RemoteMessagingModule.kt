@@ -34,9 +34,9 @@ import com.duckduckgo.remote.messaging.impl.mappers.RemoteMessagingConfigJsonMap
 import com.duckduckgo.remote.messaging.impl.matchers.AndroidAppAttributeMatcher
 import com.duckduckgo.remote.messaging.impl.matchers.DeviceAttributeMatcher
 import com.duckduckgo.remote.messaging.impl.matchers.UserAttributeMatcher
+import com.duckduckgo.remote.messaging.impl.network.RemoteMessagingService
 import com.duckduckgo.remote.messaging.impl.store.GlideRemoteMessageImageStore
 import com.duckduckgo.remote.messaging.impl.store.RemoteMessageImageStore
-import com.duckduckgo.remote.messaging.impl.network.RemoteMessagingService
 import com.duckduckgo.remote.messaging.store.LocalRemoteMessagingConfigRepository
 import com.duckduckgo.remote.messaging.store.RemoteMessagesDao
 import com.duckduckgo.remote.messaging.store.RemoteMessagingCohortStore
