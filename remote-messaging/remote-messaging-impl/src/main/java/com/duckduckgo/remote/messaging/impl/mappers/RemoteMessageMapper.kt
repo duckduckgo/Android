@@ -40,7 +40,14 @@ import com.duckduckgo.remote.messaging.api.Content.PromoSingleAction
 import com.duckduckgo.remote.messaging.api.Content.Small
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 
-fun RemoteMessage.asMessage(isLightModeEnabled: Boolean): Message? {
+fun RemoteMessage.asMessage(
+    isLightModeEnabled: Boolean,
+    localImageFilePath: String? = null,
+): Message? {
+    // Use local file if available, otherwise fall back to imageUrl
+    fun getImageSource(imageUrl: String?): String? {
+        return localImageFilePath ?: imageUrl
+    }
     return when (val content = this.content) {
         is Small -> Message(
             title = content.titleText,
@@ -54,7 +61,7 @@ fun RemoteMessage.asMessage(isLightModeEnabled: Boolean): Message? {
             subtitle = content.descriptionText,
             action = content.primaryActionText,
             messageType = MessageType.REMOTE_MESSAGE,
-            imageUrl = content.imageUrl,
+            imageUrl = getImageSource(content.imageUrl),
         )
 
         is BigTwoActions -> Message(
@@ -64,7 +71,7 @@ fun RemoteMessage.asMessage(isLightModeEnabled: Boolean): Message? {
             action = content.primaryActionText,
             action2 = content.secondaryActionText,
             messageType = MessageType.REMOTE_MESSAGE,
-            imageUrl = content.imageUrl,
+            imageUrl = getImageSource(content.imageUrl),
         )
 
         is Medium -> Message(
@@ -72,7 +79,7 @@ fun RemoteMessage.asMessage(isLightModeEnabled: Boolean): Message? {
             title = content.titleText,
             subtitle = content.descriptionText,
             messageType = MessageType.REMOTE_MESSAGE,
-            imageUrl = content.imageUrl,
+            imageUrl = getImageSource(content.imageUrl),
         )
 
         is PromoSingleAction -> Message(
@@ -81,7 +88,7 @@ fun RemoteMessage.asMessage(isLightModeEnabled: Boolean): Message? {
             subtitle = content.descriptionText,
             promoAction = content.actionText,
             messageType = MessageType.REMOTE_PROMO_MESSAGE,
-            imageUrl = content.imageUrl,
+            imageUrl = getImageSource(content.imageUrl),
         )
 
         else -> null

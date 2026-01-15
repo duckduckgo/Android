@@ -67,6 +67,7 @@ import kotlinx.coroutines.flow.onEach
 import logcat.LogPriority.WARN
 import logcat.asLog
 import logcat.logcat
+import java.io.File
 import javax.inject.Inject
 
 @InjectWith(ViewScope::class)
@@ -145,9 +146,14 @@ class CardsListRemoteMessageView @JvmOverloads constructor(
         viewState?.cardsLists?.let {
             cardsListAdapter.submitList(it.listItems)
             if (it.imageUrl.orEmpty().isNotEmpty()) {
+                // Use local file if available, otherwise fall back to imageUrl
+                val imageSource = viewState.cardsListImageFilePath?.let { url ->
+                    File(url)
+                } ?: it.imageUrl
+
                 Glide
                     .with(binding.remoteImage)
-                    .load(it.imageUrl)
+                    .load(imageSource)
                     .error(it.placeholder.drawable(true))
                     .centerCrop()
                     .transition(withCrossFade())

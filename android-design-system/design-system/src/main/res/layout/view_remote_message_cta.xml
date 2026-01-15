@@ -28,12 +28,14 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:paddingTop="@dimen/keyline_2"
         android:paddingBottom="@dimen/keyline_4">
 
         <ImageView
             android:id="@+id/close"
             android:layout_width="@dimen/messageCtaCloseButtonSize"
             android:layout_height="@dimen/messageCtaCloseButtonSize"
+            android:layout_marginTop="-8dp"
             android:background="?selectableItemBackground"
             android:padding="@dimen/keyline_2"
             android:src="@drawable/ic_close_24"
@@ -44,7 +46,7 @@
             android:id="@+id/topIllustrationAnimated"
             android:layout_width="wrap_content"
             android:layout_height="0dp"
-            android:layout_marginTop="@dimen/keyline_4"
+            android:layout_marginTop="@dimen/keyline_2"
             android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHeight_max="96dp"
@@ -57,7 +59,7 @@
             android:id="@+id/topIllustration"
             android:layout_width="@dimen/messageCtaIllustrationSize"
             android:layout_height="@dimen/messageCtaIllustrationSize"
-            android:layout_marginTop="@dimen/keyline_4"
+            android:layout_marginTop="@dimen/keyline_2"
             android:scaleType="center"
             android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
@@ -68,7 +70,7 @@
             android:id="@+id/topImage"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:layout_marginTop="@dimen/keyline_4"
+            android:layout_marginTop="@dimen/keyline_2"
             android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -92,7 +94,6 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/illustrationBarrier"
-            app:layout_goneMarginTop="@dimen/keyline_4"
             app:typography="h3"
             tools:text="Placeholder Title" />
 

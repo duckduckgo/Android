@@ -65,6 +65,7 @@ class RemoteMessageViewModel @Inject constructor(
 
     data class ViewState(
         val message: RemoteMessage? = null,
+        val messageImageFilePath: String? = null,
         val newMessage: Boolean = false,
     )
 
@@ -101,10 +102,15 @@ class RemoteMessageViewModel @Inject constructor(
         viewModelScope.launch(dispatchers.io()) {
             remoteMessagingModel.getActiveMessages()
                 .map { message ->
-                    if (message?.surfaces?.contains(Surface.NEW_TAB_PAGE) == true) message else null
+                    if (message?.surfaces?.contains(Surface.NEW_TAB_PAGE) == true) {
+                        val imageFile = remoteMessagingModel.getRemoteMessageImageFile()
+                        message to imageFile
+                    } else {
+                        null to null
+                    }
                 }
                 .flowOn(dispatchers.io())
-                .onEach { message ->
+                .onEach { (message, imageFile) ->
                     withContext(dispatchers.main()) {
                         val newMessage = message?.id != lastRemoteMessageSeen?.id
                         if (newMessage) {
@@ -114,6 +120,7 @@ class RemoteMessageViewModel @Inject constructor(
                         _viewState.emit(
                             viewState.value.copy(
                                 message = message,
+                                messageImageFilePath = imageFile,
                                 newMessage = newMessage,
                             ),
                         )
