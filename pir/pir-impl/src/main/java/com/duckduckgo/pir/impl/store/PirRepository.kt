@@ -196,8 +196,15 @@ interface PirRepository {
 
     suspend fun setWeeklyStatLastSentMs(timeMs: Long)
 
+    /**
+     * This method deletes all data in the PIR repository, including brokers, extracted profiles, user profiles and resets the data store.
+     */
     suspend fun clearAllData()
 
+    /**
+     * This method deletes all data in the PIR repository that is related to the user: user profiles, extracted profiles and
+     * resets the user data in the data store.
+     */
     suspend fun clearUserData()
 
     data class GeneratedEmailData(
