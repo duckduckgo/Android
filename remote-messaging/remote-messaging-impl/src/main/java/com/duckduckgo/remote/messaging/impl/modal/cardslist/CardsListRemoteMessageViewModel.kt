@@ -21,6 +21,7 @@ import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.remote.messaging.api.CardItem
@@ -30,6 +31,7 @@ import com.duckduckgo.remote.messaging.api.RemoteMessageModel
 import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
 import com.duckduckgo.remote.messaging.impl.modal.cardslist.RealCardsListRemoteMessagePixelHelper.Companion.PARAM_NAME_DISMISS_TYPE
 import com.duckduckgo.remote.messaging.impl.modal.cardslist.RealCardsListRemoteMessagePixelHelper.Companion.PARAM_VALUE_CLOSE_BUTTON
+import com.duckduckgo.remote.messaging.impl.pixels.RemoteMessagingPixelName
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -47,6 +49,7 @@ class CardsListRemoteMessageViewModel @Inject constructor(
     private val commandActionMapper: CommandActionMapper,
     private val dispatchers: DispatcherProvider,
     private val cardsListPixelHelper: CardsListRemoteMessagePixelHelper,
+    private val pixel: Pixel,
 ) : ViewModel(), DefaultLifecycleObserver, CardItemClickListener {
 
     private val _viewState = MutableStateFlow<ViewState?>(null)
@@ -113,6 +116,20 @@ class CardsListRemoteMessageViewModel @Inject constructor(
                 remoteMessagingModel.onPrimaryActionClicked(message)
             }
         }
+    }
+
+    fun onRemoteImageLoadFailed() {
+        pixel.fire(
+            RemoteMessagingPixelName.REMOTE_MESSAGE_IMAGE_LOAD_FAILED,
+            mapOf(Pixel.PixelParameter.MESSAGE_SHOWN to lastRemoteMessageSeen?.id.orEmpty()),
+        )
+    }
+
+    fun onRemoteImageLoadSuccess() {
+        pixel.fire(
+            RemoteMessagingPixelName.REMOTE_MESSAGE_IMAGE_LOAD_SUCCESS,
+            mapOf(Pixel.PixelParameter.MESSAGE_SHOWN to lastRemoteMessageSeen?.id.orEmpty()),
+        )
     }
 
     override fun onItemClicked(item: CardItem) {
