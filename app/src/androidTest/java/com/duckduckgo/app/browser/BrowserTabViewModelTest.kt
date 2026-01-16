@@ -6894,6 +6894,31 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenLoadingUrlWithTrackersAnimationEnabledThenLastAnimatedUrlIsUpdatedImmediately() = runTest {
+        whenever(mockAddressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(true)
+        whenever(mockAddressBarTrackersAnimationManager.shouldShowAnimation(anyOrNull(), anyOrNull())).thenReturn(true)
+
+        loadUrl("https://www.example.com")
+
+        // Verify shouldShowAnimation is called with updated lastAnimatedUrl on second navigation
+        // The second call should pass the first URL as lastAnimatedUrl
+        loadUrl("https://www.example.com/page2")
+
+        // Verify that by the second load, the manager received the first URL as lastAnimatedUrl
+        verify(mockAddressBarTrackersAnimationManager, times(2)).shouldShowAnimation(anyOrNull(), anyOrNull())
+
+        // The first call should have null as lastAnimatedUrl
+        // The second call should have the first URL as lastAnimatedUrl (immediate update)
+        val captor = argumentCaptor<String>()
+        verify(mockAddressBarTrackersAnimationManager, times(2)).shouldShowAnimation(anyOrNull(), captor.capture())
+
+        // First navigation: lastAnimatedUrl was null
+        assertNull(captor.firstValue)
+        // Second navigation: lastAnimatedUrl should be the first URL (updated immediately)
+        assertEquals("https://www.example.com", captor.secondValue)
+    }
+
+    @Test
     fun whenVisitSiteThenUpdateLoadingViewStateAndOmnibarViewState() {
         testee.browserViewState.value =
             browserViewState().copy(

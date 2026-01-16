@@ -1772,15 +1772,23 @@ class BrowserTabViewModel @Inject constructor(
     private suspend fun updateLoadingStatePrivacy(domain: String) {
         val privacyProtectionDisabled = isPrivacyProtectionDisabled(domain)
         withContext(dispatchers.main()) {
+            // TODO when removing the flag we should tidy this logic up
             if (addressBarTrackersAnimationManager.isFeatureEnabled()) {
-                val shouldShowAddressBarTrackersAnimation =
-                    addressBarTrackersAnimationManager.shouldShowAnimation(currentUrl = site?.url, lastAnimatedUrl = lastAnimatedUrl)
-                loadingViewState.value =
-                    currentLoadingViewState().copy(
-                        trackersAnimationEnabled = shouldShowAddressBarTrackersAnimation &&
-                            !(privacyProtectionDisabled || currentBrowserViewState().maliciousSiteBlocked),
-                        url = site?.url ?: "",
-                    )
+                val canShowTrackerAnimation = !(privacyProtectionDisabled || currentBrowserViewState().maliciousSiteBlocked)
+
+                val shouldAnimate = addressBarTrackersAnimationManager
+                    .shouldShowAnimation(currentUrl = site?.url, lastAnimatedUrl = lastAnimatedUrl)
+
+                val trackersAnimationEnabled = shouldAnimate && canShowTrackerAnimation
+
+                if (trackersAnimationEnabled) {
+                    lastAnimatedUrl = site?.url
+                }
+
+                loadingViewState.value = currentLoadingViewState().copy(
+                    trackersAnimationEnabled = trackersAnimationEnabled,
+                    url = site?.url ?: "",
+                )
             } else {
                 loadingViewState.value =
                     currentLoadingViewState().copy(
@@ -3213,7 +3221,10 @@ class BrowserTabViewModel @Inject constructor(
         command.value = ShowWebContent
     }
 
-    fun userLaunchingTabSwitcher(viewMode: Omnibar.ViewMode, hasFocus: Boolean) {
+    fun userLaunchingTabSwitcher(
+        viewMode: Omnibar.ViewMode,
+        hasFocus: Boolean,
+    ) {
         command.value = LaunchTabSwitcher
 
         pixel.fire(AppPixelName.TAB_MANAGER_CLICKED)
@@ -4534,6 +4545,7 @@ class BrowserTabViewModel @Inject constructor(
             is VpnMenuState.Subscribed -> {
                 command.value = LaunchVpnManagement
             }
+
             VpnMenuState.Hidden -> {} // Should not happen as menu item should not be visible
             else -> {
                 command.value = LaunchPrivacyPro("https://duckduckgo.com/pro?origin=funnel_appmenu_android".toUri())
@@ -4608,7 +4620,6 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onStartTrackersAnimation() {
-        lastAnimatedUrl = site?.url
         val site = siteLiveData.value
         val trackerEvents = site?.orderedTrackerBlockedEntities()
         command.value = Command.StartAddressBarTrackersAnimation(trackerEvents)
