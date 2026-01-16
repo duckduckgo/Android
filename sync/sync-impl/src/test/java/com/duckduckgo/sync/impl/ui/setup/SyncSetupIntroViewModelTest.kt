@@ -18,6 +18,8 @@ package com.duckduckgo.sync.impl.ui.setup
 
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.RECOVERY_INTRO
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.SYNC_INTRO
 import com.duckduckgo.sync.impl.ui.setup.SyncSetupIntroViewModel.Command.AbortFlow
@@ -35,7 +37,9 @@ class SyncSetupIntroViewModelTest {
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
-    private val testee = SyncSetupIntroViewModel()
+    private val syncFeature = FakeFeatureToggleFactory.create(SyncFeature::class.java)
+
+    private val testee = SyncSetupIntroViewModel(syncFeature, coroutineTestRule.testDispatcherProvider)
 
     @Test
     fun whenSyncIntroArgumentThenIntroCreateAccountScreenShown() = runTest {

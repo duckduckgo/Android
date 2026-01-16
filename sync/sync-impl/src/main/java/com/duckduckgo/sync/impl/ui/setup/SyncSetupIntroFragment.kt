@@ -93,7 +93,12 @@ class SyncSetupIntroFragment : DuckDuckGoFragment(R.layout.fragment_intro_sync) 
         when (viewState.viewMode) {
             is CreateAccountIntro -> {
                 binding.contentTitle.text = getString(R.string.sync_intro_enable_title)
-                binding.contentBody.text = getString(R.string.sync_intro_enable_content)
+                val contentRes = if (viewState.aiChatSyncEnabled) {
+                    R.string.sync_intro_enable_content_with_ai_chat
+                } else {
+                    R.string.sync_intro_enable_content
+                }
+                binding.contentBody.text = getString(contentRes)
                 binding.contentIllustration.setImageResource(R.drawable.ic_sync_server_128)
                 binding.syncIntroCta.text = getString(R.string.sync_intro_enable_cta)
                 binding.syncIntroFooter.text = getString(R.string.sync_intro_enable_footer)
