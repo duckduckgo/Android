@@ -19,6 +19,7 @@ package com.duckduckgo.pir.impl.brokers
 import androidx.lifecycle.Lifecycle.State.INITIALIZED
 import androidx.lifecycle.testing.TestLifecycleOwner
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.pir.impl.PirFeatureDataCleaner
 import com.duckduckgo.pir.impl.checker.PirWorkHandler
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
@@ -29,6 +30,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 class PirDataUpdateObserverTest {
@@ -39,6 +41,7 @@ class PirDataUpdateObserverTest {
     private val lifecycleOwner = TestLifecycleOwner(initialState = INITIALIZED)
     private val brokerJsonUpdater: BrokerJsonUpdater = mock()
     private val pirWorkHandler: PirWorkHandler = mock()
+    private val pirFeatureDataCleaner: PirFeatureDataCleaner = mock()
     private val canRunPirFlow = MutableStateFlow(false)
 
     private lateinit var pirDataUpdateObserver: PirDataUpdateObserver
@@ -52,6 +55,7 @@ class PirDataUpdateObserverTest {
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             brokerJsonUpdater = brokerJsonUpdater,
             pirWorkHandler = pirWorkHandler,
+            pirFeatureDataCleaner = pirFeatureDataCleaner,
         )
     }
 
@@ -61,6 +65,7 @@ class PirDataUpdateObserverTest {
         canRunPirFlow.value = false
 
         verify(pirWorkHandler).cancelWork()
+        verify(pirFeatureDataCleaner).removeAllData()
         verify(brokerJsonUpdater, never()).update()
     }
 
@@ -76,6 +81,7 @@ class PirDataUpdateObserverTest {
         // Then disable PIR
         canRunPirFlow.value = false
         verify(pirWorkHandler).cancelWork()
+        verify(pirFeatureDataCleaner).removeAllData()
     }
 
     @Test
@@ -87,6 +93,7 @@ class PirDataUpdateObserverTest {
         // First PIR is disabled
         canRunPirFlow.value = false
         verify(pirWorkHandler).cancelWork()
+        verify(pirFeatureDataCleaner).removeAllData()
 
         // Then enable PIR
         canRunPirFlow.value = true
@@ -96,6 +103,7 @@ class PirDataUpdateObserverTest {
     @Test
     fun whenOnCreateCalledMultipleTimesAndPIREnabledThenUpdatesBrokerOnce() = runTest {
         whenever(brokerJsonUpdater.update()).thenReturn(true)
+        canRunPirFlow.value = true
 
         pirDataUpdateObserver.onCreate(lifecycleOwner)
 
@@ -106,6 +114,7 @@ class PirDataUpdateObserverTest {
 
         // Should call update only once
         verify(brokerJsonUpdater, times(1)).update()
+        verifyNoInteractions(pirFeatureDataCleaner)
     }
 
     @Test
@@ -114,6 +123,7 @@ class PirDataUpdateObserverTest {
 
         verify(pirWorkHandler).cancelWork()
         verify(brokerJsonUpdater, never()).update()
+        verify(pirFeatureDataCleaner).removeAllData()
     }
 
     @Test
@@ -125,5 +135,6 @@ class PirDataUpdateObserverTest {
 
         verify(brokerJsonUpdater).update()
         verify(pirWorkHandler, never()).cancelWork()
+        verifyNoInteractions(pirFeatureDataCleaner)
     }
 }

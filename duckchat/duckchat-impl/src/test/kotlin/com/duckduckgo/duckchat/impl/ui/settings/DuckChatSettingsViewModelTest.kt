@@ -68,7 +68,6 @@ class DuckChatSettingsViewModelTest {
             whenever(duckChat.observeShowInAddressBarUserSetting()).thenReturn(flowOf(false))
             whenever(duckChat.observeCosmeticInputScreenUserSettingEnabled()).thenReturn(flowOf(null))
             whenever(duckChat.observeInputScreenUserSettingEnabled()).thenReturn(flowOf(false))
-            whenever(duckChat.isDuckChatFullScreenModeFeatureAvailable()).thenReturn(false)
             testee = DuckChatSettingsViewModel(
                 duckChatActivityParams = DuckChatSettingsNoParams,
                 duckChat = duckChat,
@@ -106,20 +105,6 @@ class DuckChatSettingsViewModelTest {
         runTest {
             testee.onShowDuckChatInMenuToggled(true)
             verify(duckChat).setShowInBrowserMenuUserSetting(true)
-        }
-
-    @Test
-    fun whenShowDuckChatInAddressBarDisabledThenSetUserSetting() =
-        runTest {
-            testee.onShowDuckChatInAddressBarToggled(false)
-            verify(duckChat).setShowInAddressBarUserSetting(false)
-        }
-
-    @Test
-    fun whenShowDuckChatInAddressBarEnabledThenSetUserSetting() =
-        runTest {
-            testee.onShowDuckChatInAddressBarToggled(true)
-            verify(duckChat).setShowInAddressBarUserSetting(true)
         }
 
     @Test
@@ -451,20 +436,6 @@ class DuckChatSettingsViewModelTest {
         runTest {
             testee.onShowDuckChatInMenuToggled(false)
             verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_MENU_SETTING_OFF)
-        }
-
-    @Test
-    fun `when onShowDuckChatInAddressBarToggled true then on pixel fired`() =
-        runTest {
-            testee.onShowDuckChatInAddressBarToggled(true)
-            verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_SEARCHBAR_SETTING_ON)
-        }
-
-    @Test
-    fun `when onShowDuckChatInAddressBarToggled false then off pixel fired`() =
-        runTest {
-            testee.onShowDuckChatInAddressBarToggled(false)
-            verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_SEARCHBAR_SETTING_OFF)
         }
 
     @Test
