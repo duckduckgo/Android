@@ -28,6 +28,7 @@ import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BROKER_CUSTOM_STATS_42DAY_UNC
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BROKER_CUSTOM_STATS_7DAY_CONFIRMED_OPTOUT
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BROKER_CUSTOM_STATS_7DAY_UNCONFIRMED_OPTOUT
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BROKER_CUSTOM_STATS_OPTOUT_SUBMIT_SUCCESSRATE
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_CPU_USAGE
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_DASHBOARD_OPENED
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_DOWNLOAD_MAINCONFIG_BE_FAILURE
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_DOWNLOAD_MAINCONFIG_FAILURE
@@ -43,13 +44,9 @@ import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_EMAIL_CONFIRMATION_RUN_STARTE
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_ENGAGEMENT_DAU
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_ENGAGEMENT_MAU
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_ENGAGEMENT_WAU
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_FOREGROUND_RUN_COMPLETED
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_FOREGROUND_RUN_STARTED
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INITIAL_SCAN_DURATION
-import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INTERNAL_CPU_USAGE
-import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INTERNAL_MANUAL_SCAN_COMPLETED
-import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INTERNAL_MANUAL_SCAN_STARTED
-import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INTERNAL_SCHEDULED_SCAN_COMPLETED
-import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INTERNAL_SCHEDULED_SCAN_SCHEDULED
-import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INTERNAL_SCHEDULED_SCAN_STARTED
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INTERNAL_SECURE_STORAGE_UNAVAILABLE
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_OPTOUT_STAGE_CAPTCHA_PARSE
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_OPTOUT_STAGE_CAPTCHA_SEND
@@ -70,6 +67,9 @@ import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_SCAN_STAGE_RESULT_ERROR
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_SCAN_STAGE_RESULT_MATCHES
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_SCAN_STAGE_RESULT_NO_MATCH
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_SCAN_STARTED
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_SCHEDULED_RUN_COMPLETED
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_SCHEDULED_RUN_SCHEDULED
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_SCHEDULED_RUN_STARTED
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_UPDATE_BROKER_FAILURE
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_UPDATE_BROKER_SUCCESS
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_WEEKLY_CHILD_ORPHANED_OPTOUTS
@@ -570,7 +570,7 @@ class RealPirPixelSender @Inject constructor(
     private val pixelSender: Pixel,
 ) : PirPixelSender {
     override fun reportManualScanStarted() {
-        fire(PIR_INTERNAL_MANUAL_SCAN_STARTED)
+        fire(PIR_FOREGROUND_RUN_STARTED)
     }
 
     override fun reportManualScanCompleted(
@@ -579,15 +579,15 @@ class RealPirPixelSender @Inject constructor(
         val params = mapOf(
             PARAM_KEY_TOTAL_TIME to totalTimeInMillis.toString(),
         )
-        fire(PIR_INTERNAL_MANUAL_SCAN_COMPLETED, params)
+        fire(PIR_FOREGROUND_RUN_COMPLETED, params)
     }
 
     override fun reportScheduledScanScheduled() {
-        fire(PIR_INTERNAL_SCHEDULED_SCAN_SCHEDULED)
+        fire(PIR_SCHEDULED_RUN_SCHEDULED)
     }
 
     override fun reportScheduledScanStarted() {
-        fire(PIR_INTERNAL_SCHEDULED_SCAN_STARTED)
+        fire(PIR_SCHEDULED_RUN_STARTED)
     }
 
     override fun reportScheduledScanCompleted(
@@ -596,7 +596,7 @@ class RealPirPixelSender @Inject constructor(
         val params = mapOf(
             PARAM_KEY_TOTAL_TIME to totalTimeInMillis.toString(),
         )
-        fire(PIR_INTERNAL_SCHEDULED_SCAN_COMPLETED, params)
+        fire(PIR_SCHEDULED_RUN_COMPLETED, params)
     }
 
     override fun reportOptOutSubmitted(
@@ -650,7 +650,7 @@ class RealPirPixelSender @Inject constructor(
         val params = mapOf(
             PARAM_KEY_CPU_USAGE to averageCpuUsagePercent.toString(),
         )
-        fire(PIR_INTERNAL_CPU_USAGE, params)
+        fire(PIR_CPU_USAGE, params)
     }
 
     override fun reportEmailConfirmationLinkFetched(
