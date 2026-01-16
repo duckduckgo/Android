@@ -35,11 +35,13 @@ fun LargeSecondaryButton(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
 ) {
     SecondaryButton(
         text = text,
         onClick = onClick,
         modifier = modifier.defaultMinSize(minHeight = 48.dp),
+        enabled = enabled,
     )
 }
 
@@ -51,11 +53,13 @@ fun SmallSecondaryButton(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
 ) {
     SecondaryButton(
         text = text,
         onClick = onClick,
         modifier = modifier.defaultMinSize(minHeight = 36.dp),
+        enabled = enabled,
     )
 }
 
@@ -67,22 +71,25 @@ internal fun SecondaryButton(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
 ) {
     OutlinedButton(
         onClick = onClick,
-        modifier = modifier.defaultMinSize(minHeight = 48.dp),
+        modifier = modifier,
+        enabled = enabled,
         shape = RoundedCornerShape(12.dp),
         colors = ButtonDefaults.outlinedButtonColors(
             contentColor = DuckDuckGoTheme.colors.brand.accentBlue,
+            disabledContentColor = DuckDuckGoTheme.textColors.disabled,
         ),
         border = BorderStroke(
             width = 1.dp,
-            color = DuckDuckGoTheme.colors.brand.accentBlue,
+            color = if (enabled) DuckDuckGoTheme.colors.brand.accentBlue else DuckDuckGoTheme.textColors.disabled,
         ),
         content = {
             DaxText(
                 text = text,
-                color = DuckDuckGoTheme.colors.brand.accentBlue,
+                color = if (enabled) DuckDuckGoTheme.colors.brand.accentBlue else DuckDuckGoTheme.textColors.disabled,
                 style = DuckDuckGoTheme.typography.button,
             )
         },

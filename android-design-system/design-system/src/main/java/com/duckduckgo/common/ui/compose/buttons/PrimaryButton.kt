@@ -33,11 +33,13 @@ fun LargePrimaryButton(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
 ) {
     PrimaryButton(
         text = text,
         onClick = onClick,
         modifier = modifier.defaultMinSize(minHeight = 48.dp),
+        enabled = enabled,
     )
 }
 
@@ -49,11 +51,13 @@ fun SmallPrimaryButton(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
 ) {
     PrimaryButton(
         text = text,
         onClick = onClick,
         modifier = modifier.defaultMinSize(minHeight = 36.dp),
+        enabled = enabled,
     )
 }
 
@@ -65,19 +69,23 @@ internal fun PrimaryButton(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
 ) {
     androidx.compose.material3.Button(
         onClick = onClick,
         modifier = modifier,
+        enabled = enabled,
         shape = RoundedCornerShape(12.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = DuckDuckGoTheme.colors.brand.accentBlue,
             contentColor = DuckDuckGoTheme.colors.text.primaryInverted,
+            disabledContainerColor = DuckDuckGoTheme.colors.backgrounds.containerDisabled,
+            disabledContentColor = DuckDuckGoTheme.textColors.disabled,
         ),
         content = {
             DaxText(
                 text = text,
-                color = DuckDuckGoTheme.colors.text.primaryInverted,
+                color = if (enabled) DuckDuckGoTheme.colors.text.primaryInverted else DuckDuckGoTheme.textColors.disabled,
                 style = DuckDuckGoTheme.typography.button,
             )
         },

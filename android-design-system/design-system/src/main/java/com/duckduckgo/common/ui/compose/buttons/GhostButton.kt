@@ -33,11 +33,13 @@ fun LargeGhostButton(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
 ) {
     GhostButton(
         text = text,
         onClick = onClick,
         modifier = modifier.defaultMinSize(minHeight = 48.dp),
+        enabled = enabled,
     )
 }
 
@@ -49,11 +51,13 @@ fun SmallGhostButton(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
 ) {
     GhostButton(
         text = text,
         onClick = onClick,
         modifier = modifier.defaultMinSize(minHeight = 36.dp),
+        enabled = enabled,
     )
 }
 
@@ -65,17 +69,20 @@ internal fun GhostButton(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
 ) {
     TextButton(
         onClick = onClick,
         modifier = modifier,
+        enabled = enabled,
         colors = ButtonDefaults.textButtonColors(
             contentColor = DuckDuckGoTheme.colors.brand.accentBlue,
+            disabledContentColor = DuckDuckGoTheme.textColors.disabled,
         ),
         content = {
             DaxText(
                 text = text,
-                color = DuckDuckGoTheme.colors.brand.accentBlue,
+                color = if (enabled) DuckDuckGoTheme.colors.brand.accentBlue else DuckDuckGoTheme.textColors.disabled,
                 style = DuckDuckGoTheme.typography.button,
             )
         },
