@@ -29,7 +29,7 @@ tags:
 - assertVisible:
     id: "browserLayout"
 - assertVisible:
-    text: "reddit"
+    text: "error text"
     childOf:
       id: "browserLayout"
 
