@@ -36,9 +36,9 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
-import org.junit.Assert.assertFalse
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -242,7 +242,7 @@ class RealDuckChatJSHelperTest {
     }
 
     @Test
-    fun whenGetAIChatNativeConfigValuesAndDuckChatFeatureEnabledAndFullScreenModeEnabledAndModeFullThenReturnJsCallbackDataWithCorrectData() = runTest {
+    fun whenGetAIChatNativeConfigValuesAndDuckChatFeatureEnabledAndFullScreenModeEnabledAndModeFullThenReturnCorrectData() = runTest {
         val featureName = "aiChat"
         val method = "getAIChatNativeConfigValues"
         val id = "123"
@@ -275,7 +275,7 @@ class RealDuckChatJSHelperTest {
     }
 
     @Test
-    fun whenGetAIChatNativeConfigValuesAndDuckChatFeatureEnabledAndContextualModeEnabledAndModeContextualThenReturnJsCallbackDataWithCorrectData() = runTest {
+    fun whenGetAIChatNativeConfigValuesAndDuckChatFeatureAndContextualModeEnabledAndModeContextualThenCorrectData() = runTest {
         val featureName = "aiChat"
         val method = "getAIChatNativeConfigValues"
         val id = "123"
