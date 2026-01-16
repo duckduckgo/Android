@@ -248,7 +248,7 @@ class BrowserMenuBottomSheet(
 
         binding.urlPageActionsSectionDivider.isVisible = true
         binding.librarySectionDivider.isVisible = true
-        binding.privacyToolsSectionDivider.isVisible = true
+        binding.privacyToolsSectionDivider.isVisible = viewState.canFireproofSite || viewState.isEmailSignedIn
         binding.utilitiesSectionDivider.isVisible = true
         binding.customTabsMenuDivider.isVisible = false
     }
