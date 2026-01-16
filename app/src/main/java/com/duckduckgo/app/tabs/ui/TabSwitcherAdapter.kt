@@ -57,6 +57,7 @@ import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType.GRID
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType.LIST
+import com.duckduckgo.app.tabs.model.isAboutBlank
 import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder.Companion.GRID_TAB
 import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder.Companion.LIST_TAB
 import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder.Companion.TRACKER_ANIMATION_TILE_INFO_PANEL
@@ -348,6 +349,11 @@ class TabSwitcherAdapter(
     }
 
     private fun loadFavicon(tab: TabEntity, glide: RequestManager, view: ImageView) {
+        if (tab.isAboutBlank) {
+            glide.clear(view)
+            glide.load(AndroidR.drawable.ic_globe_24).into(view)
+            return
+        }
         val url = tab.url
         if (url.isNullOrBlank()) {
             glide.clear(view)
