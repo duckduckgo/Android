@@ -110,6 +110,14 @@ class RealPirJobsRunner @Inject constructor(
         attemptCreateScanJobs(activeBrokers, profileQueries)
         executeScanJobs(context, executionType, activeBrokers)
 
+        // We emit a pixel after the scans are completed from the foreground scan
+        if (executionType == MANUAL) {
+            pixelSender.reportInitialScanDuration(
+                durationMs = currentTimeProvider.currentTimeMillis() - startTimeInMillis,
+                profileQueryCount = profileQueries.size,
+            )
+        }
+
         val formOptOutBrokers = pirRepository.getBrokersForOptOut(true).toSet()
         val activeFormOptOutBrokers = formOptOutBrokers.intersect(activeBrokers)
 

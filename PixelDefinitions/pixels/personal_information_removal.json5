@@ -1113,7 +1113,7 @@
         "parameters": ["appVersion"]
     },
     "m_dbp_initial_scan_duration": {
-        "description": "Fired when the initial scan is completed.",
+        "description": "Fired when the initial scan for all brokers and profile combination are completed.",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],

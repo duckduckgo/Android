@@ -500,6 +500,7 @@ class PirEndToEndTest {
             PirPixel.PIR_SCAN_STAGE,
             PirPixel.PIR_SCAN_STAGE_RESULT_MATCHES,
             PirPixel.PIR_INTERNAL_MANUAL_SCAN_COMPLETED,
+            PirPixel.PIR_INITIAL_SCAN_DURATION,
         )
 
         // Opt-out pixels
@@ -580,7 +581,7 @@ class PirEndToEndTest {
         fakeTimeProvider.advanceByHours(73)
 
         // Run confirmation scan
-        val confirmationResult = pirJobsRunner.runEligibleJobs(context, PirExecutionType.MANUAL)
+        val confirmationResult = pirJobsRunner.runEligibleJobs(context, PirExecutionType.SCHEDULED)
         assertTrue("Confirmation scan should succeed", confirmationResult.isSuccess)
 
         // Verify navigate actions were pushed for active broker only
@@ -615,12 +616,12 @@ class PirEndToEndTest {
 
         // Verify confirmation scan pixels fired
         assertPixelsWereFired(
-            PirPixel.PIR_INTERNAL_MANUAL_SCAN_STARTED,
+            PirPixel.PIR_INTERNAL_SCHEDULED_SCAN_STARTED,
             PirPixel.PIR_INTERNAL_SCAN_STATS,
             PirPixel.PIR_SCAN_STARTED,
             PirPixel.PIR_SCAN_STAGE,
             PirPixel.PIR_SCAN_STAGE_RESULT_MATCHES,
-            PirPixel.PIR_INTERNAL_MANUAL_SCAN_COMPLETED,
+            PirPixel.PIR_INTERNAL_SCHEDULED_SCAN_COMPLETED,
         )
     }
 

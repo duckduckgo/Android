@@ -44,6 +44,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
+import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
 
 class RealPirJobsRunnerTest {
@@ -159,6 +160,7 @@ class RealPirJobsRunnerTest {
         verify(mockPixelSender).reportOptOutStats(0)
         verify(mockPixelSender).reportManualScanCompleted(any())
         verify(mockPirScan).stop()
+        verifyNoMoreInteractions(mockPixelSender)
         verifyNoInteractions(mockPirSchedulingRepository)
         verifyNoInteractions(mockEligibleScanJobProvider)
         verifyNoInteractions(mockEligibleOptOutJobProvider)
@@ -267,6 +269,7 @@ class RealPirJobsRunnerTest {
         verify(mockPixelSender).reportOptOutStats(0)
         verify(mockPixelSender).reportManualScanCompleted(any())
         verify(mockPirScan).stop()
+        verifyNoMoreInteractions(mockPixelSender)
         verifyNoInteractions(mockPirSchedulingRepository)
         verifyNoInteractions(mockEligibleScanJobProvider)
         verifyNoInteractions(mockEligibleOptOutJobProvider)
@@ -313,6 +316,8 @@ class RealPirJobsRunnerTest {
 
         // Then
         verify(mockPixelSender).reportManualScanStarted()
+        // we just dont attempt what the mock for time provider is giving us
+        verify(mockPixelSender).reportInitialScanDuration(0L, 2)
         verify(mockPixelSender).reportManualScanCompleted(any())
         verify(mockPixelSender).reportScanStats(1)
         verify(mockPixelSender).reportOptOutStats(0)
@@ -321,6 +326,7 @@ class RealPirJobsRunnerTest {
             mockContext,
             RunType.MANUAL,
         )
+        verifyNoMoreInteractions(mockPixelSender)
     }
 
     @Test
@@ -365,11 +371,14 @@ class RealPirJobsRunnerTest {
         verify(mockPixelSender).reportManualScanCompleted(any())
         verify(mockPixelSender).reportScanStats(1)
         verify(mockPixelSender).reportOptOutStats(0)
+        // we just dont attempt what the mock for time provider is giving us
+        verify(mockPixelSender).reportInitialScanDuration(0L, 2)
         verify(mockPirScan).executeScanForJobs(
             listOf(testScanJobRecord),
             mockContext,
             RunType.MANUAL,
         )
+        verifyNoMoreInteractions(mockPixelSender)
     }
 
     @Test
@@ -419,6 +428,7 @@ class RealPirJobsRunnerTest {
             mockContext,
             RunType.SCHEDULED,
         )
+        verifyNoMoreInteractions(mockPixelSender)
     }
 
     @Test
