@@ -80,6 +80,7 @@ class RealBrowserMenuViewStateFactory @Inject constructor(
             vpnMenuState = browserViewState.vpnMenuState,
             showAutofill = browserViewState.showAutofill,
             canGoForward = browserViewState.canGoForward,
+            isSSLError = browserViewState.sslError != NONE,
         )
     }
 

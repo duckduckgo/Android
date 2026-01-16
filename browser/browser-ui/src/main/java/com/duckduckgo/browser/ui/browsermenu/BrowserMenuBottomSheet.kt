@@ -269,6 +269,10 @@ class BrowserMenuBottomSheet(
         duckChatHistoryMenuItem.isVisible = false
         renderVpnMenu(viewState.vpnMenuState)
 
+        if (viewState.isSSLError) {
+            newTabMenuItem.isEnabled = true
+        }
+
         binding.urlPageActionsSectionDivider.isVisible = false
         binding.librarySectionDivider.isVisible = true
         binding.privacyToolsSectionDivider.isVisible = viewState.vpnMenuState != VpnMenuState.Hidden
