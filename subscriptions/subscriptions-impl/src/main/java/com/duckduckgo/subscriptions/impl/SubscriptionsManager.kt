@@ -737,7 +737,9 @@ class RealSubscriptionsManager @Inject constructor(
                 subscriptionPurchaseWideEvent.onPurchaseConfirmationSuccess()
                 if (subscription.activeOffers.contains(ActiveOfferType.TRIAL)) {
                     freeTrialConversionWideEvent.onFreeTrialStarted(subscription.productId)
-                    vpnReminderNotificationScheduler.scheduleVpnReminderNotification()
+                    if (privacyProFeature.get().vpnReminderNotification().isEnabled()) {
+                        vpnReminderNotificationScheduler.scheduleVpnReminderNotification()
+                    }
                 }
             } else {
                 handlePurchaseFailed()

@@ -19,14 +19,10 @@ package com.duckduckgo.app.notification.vpnreminder
 import androidx.core.app.NotificationManagerCompat
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
-import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.subscriptions.api.VpnReminderNotificationScheduler
-import com.duckduckgo.subscriptions.impl.PrivacyProFeature
 import com.squareup.anvil.annotations.ContributesBinding
-import dagger.Lazy
 import dagger.SingleInstanceIn
-import kotlinx.coroutines.withContext
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -35,27 +31,17 @@ import javax.inject.Inject
 class VpnReminderNotificationSchedulerImpl @Inject constructor(
     private val workManager: WorkManager,
     private val notificationManager: NotificationManagerCompat,
-    private val privacyProFeature: Lazy<PrivacyProFeature>,
-    private val dispatcherProvider: DispatcherProvider,
 ) : VpnReminderNotificationScheduler {
 
     override suspend fun scheduleVpnReminderNotification() {
         cancelScheduledNotification()
-
-        val isFeatureEnabled = withContext(dispatcherProvider.io()) {
-            privacyProFeature.get().vpnReminderNotification().isEnabled()
-        }
-
-        if (!isFeatureEnabled) {
-            return
-        }
 
         if (!notificationManager.areNotificationsEnabled()) {
             return
         }
 
         val request = OneTimeWorkRequestBuilder<VpnReminderNotificationWorker>()
-            .addTag(VpnReminderNotificationWorker.VPN_REMINDER_WORK_REQUEST_TAG)
+            .addTag(VPN_REMINDER_WORK_REQUEST_TAG)
             .setInitialDelay(VPN_REMINDER_DELAY_DURATION_IN_DAYS, TimeUnit.DAYS)
             .build()
 
@@ -63,10 +49,11 @@ class VpnReminderNotificationSchedulerImpl @Inject constructor(
     }
 
     override fun cancelScheduledNotification() {
-        workManager.cancelAllWorkByTag(VpnReminderNotificationWorker.VPN_REMINDER_WORK_REQUEST_TAG)
+        workManager.cancelAllWorkByTag(VPN_REMINDER_WORK_REQUEST_TAG)
     }
 
     companion object {
+        const val VPN_REMINDER_WORK_REQUEST_TAG = "com.duckduckgo.subscriptions.vpn.reminder.schedule"
         const val VPN_REMINDER_DELAY_DURATION_IN_DAYS = 2L
     }
 }

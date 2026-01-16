@@ -40,8 +40,4 @@ class VpnReminderNotificationWorker(
         notificationSender.sendNotification(vpnReminderNotification)
         return Result.success()
     }
-
-    companion object {
-        const val VPN_REMINDER_WORK_REQUEST_TAG = "com.duckduckgo.subscriptions.vpn.reminder.schedule"
-    }
 }
