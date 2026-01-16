@@ -49,6 +49,9 @@ jobs:
         with:
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
 
+      - name: Assemble the project
+        run: ./gradlew assemblePlayRelease -Pforce-default-variant -Pskip-onboarding -x lint
+
       - name: Move APK to new folder
         if: always()
         run: find . -name "*.apk"  -exec mv '{}' apk/playRelease.apk \;
@@ -62,7 +65,7 @@ jobs:
           maestro_project_id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
           maestro_test_name: omnibar_${{ github.sha }}
           maestro_timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
-          maestro_app_binary_id: ae7284eae2131da6d8add95c9e1057293d7cbb22
+          maestro_app_file: apk/playRelease.apk
           maestro_include_tags: omnibarTest
           asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana_project_id: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
