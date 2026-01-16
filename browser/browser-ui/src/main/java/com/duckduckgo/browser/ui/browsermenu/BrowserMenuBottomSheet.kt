@@ -336,7 +336,7 @@ class BrowserMenuBottomSheet(
         newDuckChatMenuItem.isVisible = false
         settingsMenuItem.isEnabled = true
 
-        refreshMenuItem.isVisible = false
+        refreshMenuItem.isVisible = true
         brokenSiteMenuItem.isVisible = viewState.canReportSite
         printPageMenuItem.isVisible = viewState.canPrintPage
         autofillMenuItem.isVisible = viewState.showAutofill
@@ -345,7 +345,7 @@ class BrowserMenuBottomSheet(
         duckChatSettingsMenuItem.isVisible = true
 
         binding.urlPageActionsSectionDivider.isVisible = true
-        binding.librarySectionDivider.isVisible = false
+        binding.librarySectionDivider.isVisible = true
         binding.privacyToolsSectionDivider.isVisible = false
         binding.utilitiesSectionDivider.isVisible = true
         binding.customTabsMenuDivider.isVisible = false

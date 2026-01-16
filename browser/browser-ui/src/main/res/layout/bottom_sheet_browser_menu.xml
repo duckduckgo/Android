@@ -193,7 +193,7 @@
                 android:id="@+id/duckChatHistoryMenuItem"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:iconDrawable="@drawable/ic_list_24"
+                app:iconDrawable="@drawable/ic_history_16"
                 app:primaryText="@string/browserMenuChatHistory" />
 
             <com.duckduckgo.common.ui.view.divider.HorizontalDivider
