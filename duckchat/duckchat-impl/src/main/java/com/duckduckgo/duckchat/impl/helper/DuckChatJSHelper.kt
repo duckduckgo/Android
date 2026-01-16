@@ -49,6 +49,13 @@ interface DuckChatJSHelper {
     ): JsCallbackData?
 
     fun onNativeAction(action: NativeAction): SubscriptionEventData
+
+    fun registerMode(mode: Mode)
+}
+
+enum class Mode {
+    FULL,
+    CONTEXTUAL,
 }
 
 enum class NativeAction {
@@ -68,6 +75,7 @@ class RealDuckChatJSHelper @Inject constructor(
 ) : DuckChatJSHelper {
 
     private val registerOpenedJob = ConflatedJob()
+    private var duckAIMode: Mode = Mode.FULL
 
     override suspend fun processJsCallbackMessage(
         featureName: String,
@@ -165,6 +173,10 @@ class RealDuckChatJSHelper @Inject constructor(
         )
     }
 
+    override fun registerMode(mode: Mode) {
+        duckAIMode = mode
+    }
+
     private fun getAIChatNativeHandoffData(
         featureName: String,
         method: String,
@@ -194,7 +206,9 @@ class RealDuckChatJSHelper @Inject constructor(
                 put(SUPPORTS_CHAT_ID_RESTORATION, duckChat.isDuckChatFullScreenModeEnabled())
                 put(SUPPORTS_IMAGE_UPLOAD, duckChat.isImageUploadEnabled())
                 put(SUPPORTS_STANDALONE_MIGRATION, duckChat.isStandaloneMigrationEnabled())
-                put(SUPPORTS_CHAT_FULLSCREEN_MODE, duckChat.isDuckChatFullScreenModeEnabled())
+                put(SUPPORTS_CHAT_FULLSCREEN_MODE, duckChat.isDuckChatFullScreenModeEnabled() && duckAIMode == Mode.FULL)
+                put(SUPPORTS_CHAT_CONTEXTUAL_MODE, duckChat.isDuckChatContextualModeEnabled() && duckAIMode == Mode.CONTEXTUAL)
+                put(SUPPORTS_CHAT_SYNC, duckChat.isChatSyncFeatureEnabled())
                 put(SUPPORTS_CHAT_SYNC, duckChat.isChatSyncFeatureEnabled())
             }.also { logcat { "DuckChat-Sync: getAIChatNativeConfigValues $it" } }
         return JsCallbackData(jsonPayload, featureName, method, id)
@@ -260,6 +274,7 @@ class RealDuckChatJSHelper @Inject constructor(
         private const val SUPPORTS_CHAT_ID_RESTORATION = "supportsURLChatIDRestoration"
         private const val SUPPORTS_STANDALONE_MIGRATION = "supportsStandaloneMigration"
         private const val SUPPORTS_CHAT_FULLSCREEN_MODE = "supportsAIChatFullMode"
+        private const val SUPPORTS_CHAT_CONTEXTUAL_MODE = "supportsAIChatContextualMode"
         private const val SUPPORTS_CHAT_SYNC = "supportsAIChatSync"
         private const val REPORT_METRIC = "reportMetric"
         private const val PLATFORM = "platform"

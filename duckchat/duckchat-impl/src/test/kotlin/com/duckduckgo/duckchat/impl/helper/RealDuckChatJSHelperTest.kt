@@ -37,6 +37,7 @@ import kotlinx.coroutines.test.runTest
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -194,6 +195,7 @@ class RealDuckChatJSHelperTest {
             put("supportsImageUpload", false)
             put("supportsStandaloneMigration", false)
             put("supportsAIChatFullMode", false)
+            put("supportsAIChatContextualMode", false)
             put("supportsAIChatSync", false)
         }
 
@@ -226,6 +228,7 @@ class RealDuckChatJSHelperTest {
             put("supportsImageUpload", false)
             put("supportsStandaloneMigration", false)
             put("supportsAIChatFullMode", false)
+            put("supportsAIChatContextualMode", false)
             put("supportsAIChatSync", false)
         }
 
@@ -258,6 +261,7 @@ class RealDuckChatJSHelperTest {
             put("supportsImageUpload", false)
             put("supportsStandaloneMigration", false)
             put("supportsAIChatFullMode", true)
+            put("supportsAIChatContextualMode", false)
             put("supportsAIChatSync", false)
         }
 
@@ -289,6 +293,7 @@ class RealDuckChatJSHelperTest {
             put("supportsImageUpload", false)
             put("supportsStandaloneMigration", true)
             put("supportsAIChatFullMode", false)
+            put("supportsAIChatContextualMode", false)
             put("supportsAIChatSync", false)
         }
 
@@ -454,6 +459,7 @@ class RealDuckChatJSHelperTest {
             put("supportsImageUpload", true)
             put("supportsStandaloneMigration", false)
             put("supportsAIChatFullMode", false)
+            put("supportsAIChatContextualMode", false)
             put("supportsAIChatSync", false)
         }
 
@@ -482,6 +488,7 @@ class RealDuckChatJSHelperTest {
             put("supportsImageUpload", false)
             put("supportsStandaloneMigration", false)
             put("supportsAIChatFullMode", false)
+            put("supportsAIChatContextualMode", false)
             put("supportsAIChatSync", true)
         }
 
@@ -620,7 +627,7 @@ class RealDuckChatJSHelperTest {
         val featureName = "aiChat"
         val method = "getAIChatNativeHandoffData"
 
-        testee.processJsCallbackMessage(featureName, method, null, null)
+        testee.processJsCallbackMessage(featureName, method, "123", null)
 
         coroutineRule.testScope.testScheduler.advanceTimeBy(500)
         coroutineRule.testScope.advanceUntilIdle()
@@ -633,12 +640,40 @@ class RealDuckChatJSHelperTest {
         val featureName = "aiChat"
         val method = "getAIChatNativeHandoffData"
 
-        testee.processJsCallbackMessage(featureName, method, null, null)
-        testee.processJsCallbackMessage(featureName, method, null, null)
+        testee.processJsCallbackMessage(featureName, method, "123", null)
+        testee.processJsCallbackMessage(featureName, method, "123", null)
 
         coroutineRule.testScope.testScheduler.advanceTimeBy(500)
         coroutineRule.testScope.advanceUntilIdle()
 
         verify(mockDuckChatPixels, times(1)).reportOpen()
+    }
+
+    @Test
+    fun whenModeIsFullThenSupportsFullModeIsTrue() = runTest {
+        val featureName = "aiChat"
+        val method = "getAIChatNativeConfigValues"
+        val id = "123"
+
+        testee.registerMode(Mode.FULL)
+        whenever(mockDuckChat.isDuckChatFullScreenModeEnabled()).thenReturn(true)
+
+        val result = testee.processJsCallbackMessage(featureName, method, id, null)
+
+        assertTrue(result!!.params.getBoolean("supportsAIChatFullMode"))
+    }
+
+    @Test
+    fun whenModeIsContextualThenSupportsContextualModeIsTrue() = runTest {
+        val featureName = "aiChat"
+        val method = "getAIChatNativeConfigValues"
+        val id = "123"
+
+        testee.registerMode(Mode.CONTEXTUAL)
+        whenever(mockDuckChat.isDuckChatContextualModeEnabled()).thenReturn(true)
+
+        val result = testee.processJsCallbackMessage(featureName, method, id, null)
+
+        assertTrue(result!!.params.getBoolean("supportsAIChatContextualMode"))
     }
 }
