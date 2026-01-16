@@ -51,21 +51,6 @@ enum class PirPixel(
         type = Count,
     ),
 
-    PIR_INTERNAL_SCAN_STATS(
-        baseName = "pir_internal_scan-stats",
-        type = Count,
-    ),
-
-    PIR_INTERNAL_OPT_OUT_STATS(
-        baseName = "pir_internal_opt-out-stats",
-        type = Count,
-    ),
-
-    PIR_INTERNAL_BROKER_OPT_OUT_STARTED(
-        baseName = "pir_internal_opt-out_started",
-        type = Count,
-    ),
-
     PIR_INTERNAL_CPU_USAGE(
         baseName = "pir_internal_cpu_usage",
         type = Count,

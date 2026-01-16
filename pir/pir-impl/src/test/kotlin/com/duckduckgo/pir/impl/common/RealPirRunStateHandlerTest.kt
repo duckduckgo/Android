@@ -457,7 +457,12 @@ class RealPirRunStateHandlerTest {
             testee.handleState(state)
 
             verify(mockJobRecordUpdater).markOptOutAsAttempted(testExtractedProfileId)
-            verify(mockPixelSender).reportOptOutStarted(brokerName = testBrokerName)
+            verify(mockPixelSender).reportOptOutStageStart(
+                brokerUrl = testBroker.url,
+                parentUrl = testBroker.parent.orEmpty(),
+                attemptId = "c9982ded-021a-4251-9e03-2c58b130410f",
+            )
+            verifyNoMoreInteractions(mockPixelSender)
         }
 
     @Test

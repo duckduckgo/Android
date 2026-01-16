@@ -495,7 +495,6 @@ class PirEndToEndTest {
         // Scan pixels
         assertPixelsWereFired(
             PirPixel.PIR_INTERNAL_MANUAL_SCAN_STARTED,
-            PirPixel.PIR_INTERNAL_SCAN_STATS,
             PirPixel.PIR_SCAN_STARTED,
             PirPixel.PIR_SCAN_STAGE,
             PirPixel.PIR_SCAN_STAGE_RESULT_MATCHES,
@@ -505,9 +504,7 @@ class PirEndToEndTest {
 
         // Opt-out pixels
         assertPixelsWereFired(
-            PirPixel.PIR_INTERNAL_SCAN_STATS,
             PirPixel.PIR_OPTOUT_STAGE_START,
-            PirPixel.PIR_INTERNAL_BROKER_OPT_OUT_STARTED,
             PirPixel.PIR_OPTOUT_STAGE_FILLFORM,
             PirPixel.PIR_OPTOUT_STAGE_CAPTCHA_PARSE,
             PirPixel.PIR_OPTOUT_STAGE_CAPTCHA_SEND,
@@ -618,7 +615,6 @@ class PirEndToEndTest {
         // Verify confirmation scan pixels fired
         assertPixelsWereFired(
             PirPixel.PIR_INTERNAL_SCHEDULED_SCAN_STARTED,
-            PirPixel.PIR_INTERNAL_SCAN_STATS,
             PirPixel.PIR_SCAN_STARTED,
             PirPixel.PIR_SCAN_STAGE,
             PirPixel.PIR_SCAN_STAGE_RESULT_MATCHES,

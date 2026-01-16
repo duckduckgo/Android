@@ -44,12 +44,9 @@ import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_ENGAGEMENT_DAU
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_ENGAGEMENT_MAU
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_ENGAGEMENT_WAU
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INITIAL_SCAN_DURATION
-import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INTERNAL_BROKER_OPT_OUT_STARTED
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INTERNAL_CPU_USAGE
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INTERNAL_MANUAL_SCAN_COMPLETED
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INTERNAL_MANUAL_SCAN_STARTED
-import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INTERNAL_OPT_OUT_STATS
-import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INTERNAL_SCAN_STATS
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INTERNAL_SCHEDULED_SCAN_COMPLETED
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INTERNAL_SCHEDULED_SCAN_SCHEDULED
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INTERNAL_SCHEDULED_SCAN_STARTED
@@ -116,15 +113,6 @@ interface PirPixelSender {
     )
 
     /**
-     * Emits a pixel to signal that an opt-out job for a specific extractedProfile has been started.
-     *
-     * @param brokerName Broker in which the ExtractedProfile being opted out was found.
-     */
-    fun reportOptOutStarted(
-        brokerName: String,
-    )
-
-    /**
      * Emits a pixel to signal that an opt-out job for a specific extractedProfile has been successfully submitted.
      *
      * @param brokerUrl url of the Broker for which the opt-out is for
@@ -168,24 +156,6 @@ interface PirPixelSender {
         emailPattern: String?,
         actionId: String,
         actionType: String,
-    )
-
-    /**
-     * Emits a pixel that contains the scan related stats for the current run.
-     *
-     * @param totalScanToRun The total number of scans that are eligible for the current run.
-     */
-    fun reportScanStats(
-        totalScanToRun: Int,
-    )
-
-    /**
-     * Emits a pixel that contains the opt-out related stats for the current run.
-     *
-     * @param totalOptOutsToRun The total number of opt-outs that are eligible for the current run.
-     */
-    fun reportOptOutStats(
-        totalOptOutsToRun: Int,
     )
 
     /**
@@ -629,15 +599,6 @@ class RealPirPixelSender @Inject constructor(
         fire(PIR_INTERNAL_SCHEDULED_SCAN_COMPLETED, params)
     }
 
-    override fun reportOptOutStarted(
-        brokerName: String,
-    ) {
-        val params = mapOf(
-            PARAM_KEY_BROKER_NAME to brokerName,
-        )
-        fire(PIR_INTERNAL_BROKER_OPT_OUT_STARTED, params)
-    }
-
     override fun reportOptOutSubmitted(
         brokerUrl: String,
         parent: String,
@@ -683,20 +644,6 @@ class RealPirPixelSender @Inject constructor(
         )
 
         fire(PIR_OPTOUT_SUBMIT_FAILURE, params)
-    }
-
-    override fun reportScanStats(totalScanToRun: Int) {
-        val params = mapOf(
-            PARAM_KEY_SCAN_COUNT to totalScanToRun.toString(),
-        )
-        fire(PIR_INTERNAL_SCAN_STATS, params)
-    }
-
-    override fun reportOptOutStats(totalOptOutsToRun: Int) {
-        val params = mapOf(
-            PARAM_KEY_OPTOUT_COUNT to totalOptOutsToRun.toString(),
-        )
-        fire(PIR_INTERNAL_OPT_OUT_STATS, params)
     }
 
     override fun sendCPUUsageAlert(averageCpuUsagePercent: Int) {
@@ -1392,10 +1339,7 @@ class RealPirPixelSender @Inject constructor(
     }
 
     companion object {
-        private const val PARAM_KEY_BROKER_NAME = "brokerName"
         private const val PARAM_KEY_TOTAL_TIME = "totalTimeInMillis"
-        private const val PARAM_KEY_SCAN_COUNT = "totalScanToRun"
-        private const val PARAM_KEY_OPTOUT_COUNT = "totalOptOutToRun"
         private const val PARAM_KEY_CPU_USAGE = "cpuUsage"
         private const val PARAM_BROKER_URL = "data_broker_url"
         private const val PARAM_BROKER_VERSION = "broker_version"
