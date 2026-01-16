@@ -65,10 +65,10 @@ class RealSavedSitesImporter(
 
     override suspend fun import(uri: Uri, destination: ImportFolder): ImportSavedSitesResult {
         return try {
-            val savedSites = contentResolver.openInputStream(uri).use { stream ->
+            val savedSites = contentResolver.openInputStream(uri)?.use { stream ->
                 val document = Jsoup.parse(stream, Charsets.UTF_8.name(), BASE_URI)
                 savedSitesParser.parseHtml(document, savedSitesRepository, destination)
-            }
+            } ?: return ImportSavedSitesResult.Error(Exception("Unable to open input stream"))
 
             val bookmarks = savedSites.filterIsInstance<SavedSite.Bookmark>()
             val bookmarksAndFolders = savedSites.filterNot { it is SavedSite.Favorite }

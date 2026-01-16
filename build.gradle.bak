@@ -1,0 +1,206 @@
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+import static de.fayard.refreshVersions.core.Versions.versionFor
+
+buildscript {
+
+    ext {
+        min_sdk = 26
+        target_sdk = 35
+        compile_sdk = 35
+
+        // Calculate lint_version (must always be gradle_plugin + 23)
+        def gradle_plugin_version = versionFor(project, Android.tools.build.gradlePlugin)
+        def components = gradle_plugin_version.split('\\.')
+        lint_version = gradle_plugin_version.replaceFirst(components[0], (components[0].toInteger() + 23).toString())
+    }
+
+    repositories {
+        google()
+        mavenCentral()
+        maven { url "https://plugins.gradle.org/m2/" }
+    }
+    dependencies {
+        classpath(Android.tools.build.gradlePlugin)
+
+        // NOTE: Do not place your application dependencies here; they belong
+        // in the individual module build.gradle files
+    }
+}
+
+plugins {
+    id 'com.squareup.anvil' apply false
+    id 'org.jetbrains.dokka'
+    id 'com.osacky.fulladle'
+    id 'org.jetbrains.kotlin.android' apply false
+    id 'org.jetbrains.kotlin.plugin.compose' apply false
+    id 'com.google.devtools.ksp' apply false
+    id 'com.diffplug.spotless' apply false
+}
+
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+        maven { url 'https://jitpack.io' }
+    }
+    configurations.all {
+        resolutionStrategy.force 'org.objenesis:objenesis:2.6'
+    }
+}
+
+subprojects {
+
+    if (project.name.endsWith("api")) {
+        apply plugin: 'org.jetbrains.dokka'
+    }
+
+    String[] allowAndroidTestsIn = ["app", "sync-lib", "httpsupgrade-impl", "pir-impl", "feature-toggles-impl"]
+    if (!allowAndroidTestsIn.contains(project.name)) {
+        project.projectDir.eachFile(groovy.io.FileType.DIRECTORIES) { File parent ->
+            if (parent.name == "src") {
+                parent.eachFile(groovy.io.FileType.DIRECTORIES) { child ->
+                    if (child.name == "androidTest") {
+                        throw new GradleException("Only the app module can have Android Tests. Perhaps you could use Robolectric?")
+                    }
+                }
+            }
+        }
+    }
+
+    String[] allowStringsIn = ["app"]
+    if (!allowStringsIn.contains(project.name)) {
+        project.projectDir.eachDirRecurse { File parent ->
+            if (parent.name == "values") {
+                parent.eachFile(groovy.io.FileType.FILES) { child ->
+                    if (child.name == "strings.xml") {
+                        throw new GradleException("Duplicate strings.xml file found in $project. " +
+                                "Only :app should contain the strings.xml file. " +
+                                "Rename file to strings-<feature>.xml instead.")
+                    }
+                }
+            }
+        }
+    }
+
+    def projectPath = path
+    configurations.configureEach {
+        if (name == "compileClasspath" || name.endsWith("CompileClasspath")) {
+            incoming.beforeResolve {
+
+                plugins.each { plugin ->
+                    // API modules cannot use the anvil plugin
+                    if (projectPath.endsWith("api")) {
+                        if (plugin.toString().contains("com.squareup.anvil.plugin")) {
+                            throw new GradleException("Invalid plugin $projectPath -> " +
+                                    "'api' modules can't use the anvil plugin")
+                        }
+                    }
+                    if (!projectPath.endsWith(":app") && plugin.toString().toLowerCase().contains("kapt")) {
+                        throw new GradleException("Invalid usage of kapt $projectPath -> " +
+                                "Use ksp instead of kapt")
+                    }
+                }
+
+                for (dependency in dependencies) {
+                    // API modules cannot depend on dagger/anvil
+                    if (projectPath.endsWith("api")
+                            && projectPath != ":feature-toggles-api"
+                            && projectPath != ":settings-api") {
+                        def notAllowedDeps = ["anvil", "dagger"]
+                        if (notAllowedDeps.contains(dependency.name)) {
+                            throw new GradleException("Invalid dependency $projectPath -> " +
+                                    "'api' modules can't depend on dagger/anvil")
+                        }
+                    }
+
+                    if (dependency instanceof ProjectDependency) {
+                        def dependencyPath = dependency.dependencyProject.path
+                        if (dependencyPath == projectPath) continue
+                        // internal modules have to use internalImplementation
+                        // when a non internal configuration is built (i.e. PlayDebug) no internal dependencies should be found
+                        def internalExceptions = []
+                        if (dependencyPath.endsWith('internal') && !internalExceptions.contains(dependencyPath) && !name.toLowerCase().contains("internal")) {
+                            throw new GradleException("Invalid dependency $projectPath -> $dependencyPath. " +
+                                    "'internal' modules must use internalImplementation")
+                        }
+                        // internal modules can depend on impl
+                        if (projectPath.endsWith('internal') && dependencyPath.endsWith('impl')) continue
+                        if (!projectPath.endsWith(":app") && dependencyPath.endsWith("impl")) {
+                            throw new GradleException("Invalid dependency $projectPath -> $dependencyPath. " +
+                                    "Only :app module can depend on 'impl' modules")
+                        }
+                        // API modules cannot depend on :di
+                        if (projectPath.endsWith("api") && dependencyPath == ":di") {
+                            throw new GradleException("Invalid dependency $projectPath -> $dependencyPath. " +
+                                    "'api' modules can't depend on the 'di' module")
+                        }
+
+                        // API modules can depend on :feature-toggles-api
+                        if (projectPath.endsWith("api")
+                                && dependencyPath.endsWith("api")
+                                && dependencyPath != ":feature-toggles-api"
+                                && dependencyPath != ":navigation-api"
+                                && dependencyPath != ":js-messaging-api"
+                        ) {
+                            if (projectPath.endsWith(":feature-toggles-api") &&
+                                    (dependencyPath == ":experiments-api"
+                                            || dependencyPath == ":feature-toggles-internal-api")
+                            ) {
+                                // noop
+                            } else {
+                                throw new GradleException("Invalid dependency $projectPath -> $dependencyPath. " +
+                                        "'api' modules can't depend on other 'api' modules")
+                            }
+                        }
+                        if (dependencyPath.endsWith(":app")) {
+                            throw new GradleException("Invalid dependency $projectPath -> $dependencyPath. " +
+                                    "No other module can depend on ':app'")
+                        }
+                    }
+                }
+            }
+        }
+        resolutionStrategy.dependencySubstitution {
+            // Use Guava (which already bundles ListenableFuture) everywhere a bare listenablefuture is requested.
+            // Note: refreshVersions placeholders ("_") are not resolved in substitutions, so pin the version explicitly.
+            substitute(module("com.google.guava:listenablefuture"))
+                    .using(module("com.google.guava:guava:33.4.0-android"))
+                    .because("Use guava’s bundled ListenableFuture to avoid duplicate classes")
+        }
+    }
+}
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}
+
+fladle {
+    configs {
+        serviceAccountCredentials.set(project.layout.projectDirectory.file("flank.json"))
+        androidTests {
+            async.set(false)
+            flankVersion.set("21.+")
+            testShards.set(2)
+            useOrchestrator.set(false)
+            recordVideo.set(false)
+            testTargets.set([
+                    "notAnnotation com.duckduckgo.espresso.PrivacyTest",
+                    "notAnnotation com.duckduckgo.espresso.UserJourney",
+            ])
+            devices.set([
+                    ["model": "MediumPhone.arm", "version": "30"],
+                    ["model": "Pixel2.arm", "version": "28"]
+            ])
+            localResultsDir.set("fladleResults")
+        }
+    }
+}
+
+tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile) {
+    compilerOptions.freeCompilerArgs.addAll(
+            "-P",
+            "plugin:androidx.compose.compiler.plugins.kotlin:experimentalStrongSkipping=true",
+    )
+}
+
+apply plugin: 'android-reporting'
