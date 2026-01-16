@@ -276,7 +276,12 @@ enum class PirPixel(
     PIR_DASHBOARD_OPENED(
         baseName = "pir_webui_dashboard_opened",
         types = setOf(Count, Daily()),
-    ), ;
+    ),
+    PIR_INITIAL_SCAN_DURATION(
+        baseName = "m_dbp_initial_scan_duration",
+        type = Count,
+    ),
+    ;
 
     constructor(
         baseName: String,

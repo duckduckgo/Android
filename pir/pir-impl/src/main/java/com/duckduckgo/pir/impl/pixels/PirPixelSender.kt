@@ -43,6 +43,7 @@ import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_EMAIL_CONFIRMATION_RUN_STARTE
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_ENGAGEMENT_DAU
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_ENGAGEMENT_MAU
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_ENGAGEMENT_WAU
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INITIAL_SCAN_DURATION
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INTERNAL_BROKER_OPT_OUT_STARTED
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INTERNAL_CPU_USAGE
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INTERNAL_MANUAL_SCAN_COMPLETED
@@ -587,6 +588,11 @@ interface PirPixelSender {
     )
 
     fun reportDashboardOpened()
+
+    fun reportInitialScanDuration(
+        durationMs: Long,
+        profileQueryCount: Int,
+    )
 }
 
 @ContributesBinding(AppScope::class)
@@ -1363,6 +1369,18 @@ class RealPirPixelSender @Inject constructor(
         fire(PIR_DASHBOARD_OPENED)
     }
 
+    override fun reportInitialScanDuration(
+        durationMs: Long,
+        profileQueryCount: Int,
+    ) {
+        val params = mapOf(
+            PARAM_KEY_DURATION_MS to durationMs.toString(),
+            PARAM_KEY_PROFILE_QUERY_COUNT to profileQueryCount.toString(),
+        )
+
+        fire(PIR_INITIAL_SCAN_DURATION, params)
+    }
+
     private fun fire(
         pixel: PirPixel,
         params: Map<String, String> = emptyMap(),
@@ -1408,5 +1426,7 @@ class RealPirPixelSender @Inject constructor(
         private const val PARAM_KEY_REMOVED_AT = "removed_at"
         private const val PARAM_KEY_MSG = "message"
         private const val PARAM_KEY_STEP = "stepType"
+        private const val PARAM_KEY_DURATION_MS = "duration_in_ms"
+        private const val PARAM_KEY_PROFILE_QUERY_COUNT = "profile_queries"
     }
 }

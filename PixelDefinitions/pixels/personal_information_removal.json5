@@ -1111,5 +1111,24 @@
         "triggers": ["other"],
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"]
+    },
+    "m_dbp_initial_scan_duration": {
+        "description": "Fired when the initial scan is completed.",
+        "owners": ["karlenDimla", "landomen"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "duration_in_ms",
+                "description": "Total duration of the initial scan in ms",
+                "type": "string"
+            },
+            {
+                "key": "profile_queries",
+                "description": "Total number of profile queries made during the initial scan",
+                "type": "string"
+            }
+        ]
     }
 }
