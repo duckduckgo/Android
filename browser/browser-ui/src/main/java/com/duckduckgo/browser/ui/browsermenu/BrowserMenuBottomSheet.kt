@@ -28,6 +28,7 @@ import com.duckduckgo.browser.ui.databinding.BottomSheetBrowserMenuBinding
 import com.duckduckgo.common.ui.setRoundCorners
 import com.duckduckgo.common.ui.view.MenuActionButtonView
 import com.duckduckgo.common.ui.view.MenuItemView
+import com.duckduckgo.common.ui.view.MenuItemViewSize
 import com.duckduckgo.common.ui.view.StatusIndicatorView
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.mobile.android.R.drawable
@@ -42,6 +43,11 @@ class BrowserMenuBottomSheet(
 
     init {
         setContentView(binding.root)
+
+        // Set VPN menu item size to medium like other menu items
+        binding.includeVpnMenuItem.vpnMenuItem
+            .findViewById<MenuItemView>(R.id.menuItemView)
+            .setSize(MenuItemViewSize.MEDIUM)
 
         setOnShowListener { dialogInterface ->
             (dialogInterface as BottomSheetDialog).setRoundCorners()
@@ -197,7 +203,7 @@ class BrowserMenuBottomSheet(
         addBookmarksMenuItem.isVisible = viewState.canSaveSite
         val bookmarkLabel = context.getString(if (viewState.isBookmark) R.string.browserMenuEditBookmark else R.string.browserMenuAddBookmark)
         addBookmarksMenuItem.label(bookmarkLabel)
-        addBookmarksMenuItem.setIcon(if (viewState.isBookmark) drawable.ic_bookmark_solid_16 else drawable.ic_bookmark_16)
+        addBookmarksMenuItem.setIcon(if (viewState.isBookmark) drawable.ic_bookmark_solid_24 else drawable.ic_bookmark_24)
 
         fireproofWebsiteMenuItem.isVisible = viewState.canFireproofSite
         val fireproofLabel = context.getString(
@@ -208,7 +214,7 @@ class BrowserMenuBottomSheet(
             },
         )
         fireproofWebsiteMenuItem.label(fireproofLabel)
-        fireproofWebsiteMenuItem.setIcon(if (viewState.isFireproofWebsite) drawable.ic_fire_16 else drawable.ic_fireproof_solid_16)
+        fireproofWebsiteMenuItem.setIcon(if (viewState.isFireproofWebsite) drawable.ic_fire_24 else drawable.ic_fireproof_solid_24)
         duckChatHistoryMenuItem.isVisible = false
 
         createAliasMenuItem.isVisible = viewState.isEmailSignedIn
@@ -223,7 +229,7 @@ class BrowserMenuBottomSheet(
         )
         changeBrowserModeMenuItem.label(changeBrowserLabel)
         changeBrowserModeMenuItem.setIcon(
-            if (viewState.isDesktopBrowsingMode) drawable.ic_device_mobile_16 else drawable.ic_device_desktop_16,
+            if (viewState.isDesktopBrowsingMode) drawable.ic_device_mobile_24 else drawable.ic_device_desktop_24,
         )
 
         findInPageMenuItem.isVisible = viewState.canFindInPage
@@ -238,7 +244,7 @@ class BrowserMenuBottomSheet(
         ).toString()
         privacyProtectionMenuItem.label(privacyProtectionLabel)
         privacyProtectionMenuItem.setIcon(
-            if (viewState.isPrivacyProtectionDisabled) drawable.ic_shield_16 else drawable.ic_shield_disabled_16,
+            if (viewState.isPrivacyProtectionDisabled) drawable.ic_shield_24 else drawable.ic_shield_disabled_24,
         )
         brokenSiteMenuItem.isVisible = viewState.canReportSite
 
@@ -320,7 +326,7 @@ class BrowserMenuBottomSheet(
         ).toString()
         privacyProtectionMenuItem.label(privacyProtectionLabel)
         privacyProtectionMenuItem.setIcon(
-            if (viewState.isPrivacyProtectionDisabled) drawable.ic_shield_16 else drawable.ic_shield_disabled_16,
+            if (viewState.isPrivacyProtectionDisabled) drawable.ic_shield_24 else drawable.ic_shield_disabled_24,
         )
 
         binding.urlPageActionsSectionDivider.isVisible = true
