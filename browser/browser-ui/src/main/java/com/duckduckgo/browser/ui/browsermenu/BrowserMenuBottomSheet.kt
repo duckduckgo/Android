@@ -348,7 +348,7 @@ class BrowserMenuBottomSheet(
         binding.librarySectionDivider.isVisible = false
         binding.privacyToolsSectionDivider.isVisible = false
         binding.utilitiesSectionDivider.isVisible = true
-        binding.customTabsMenuDivider.isVisible = true
+        binding.customTabsMenuDivider.isVisible = false
     }
 
     private fun renderVpnMenu(viewState: VpnMenuState) {
