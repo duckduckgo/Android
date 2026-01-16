@@ -63,6 +63,9 @@ outputs:
   maestro_console_url:
     description: 'The URL to the Maestro Cloud console'
     value: ${{ steps.maestro-run.outputs.MAESTRO_CLOUD_CONSOLE_URL }}
+  maestro_app_binary_id:
+    description: 'The ID of the app binary used or uploaded'
+    value: ${{ steps.maestro-run.outputs.MAESTRO_CLOUD_APP_BINARY_ID }}
   asana_task_id:
     description: 'The ID of the created Asana task if tests failed'
     value: ${{ steps.create-maestro-failure-task.outputs.taskId }}
