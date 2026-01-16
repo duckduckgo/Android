@@ -179,11 +179,11 @@ class BrowserMenuBottomSheet(
     private fun renderBrowserMenu(viewState: BrowserMenuViewState.Browser) {
         backMenuItem.isEnabled = viewState.canGoBack
         forwardMenuItem.isEnabled = viewState.canGoForward
+        newDuckChatTabMenuItem.isEnabled = viewState.showNewDuckChatTabOption
+        newDuckChatTabMenuItem.isVisible = viewState.showNewDuckChatTabOption
+        newDuckChatMenuItem.isEnabled = viewState.showDuckChatOption
+        newDuckChatMenuItem.isVisible = viewState.showDuckChatOption
         newTabMenuItem.isEnabled = true
-        newDuckChatTabMenuItem.isEnabled = true
-        newDuckChatTabMenuItem.isVisible = true
-        newDuckChatMenuItem.isEnabled = false
-        newDuckChatMenuItem.isVisible = false
         settingsMenuItem.isEnabled = true
 
         refreshMenuItem.isVisible = true
@@ -259,8 +259,8 @@ class BrowserMenuBottomSheet(
         newTabMenuItem.isEnabled = false
         newDuckChatTabMenuItem.isEnabled = false
         newDuckChatTabMenuItem.isVisible = false
-        newDuckChatMenuItem.isEnabled = true
-        newDuckChatMenuItem.isVisible = true
+        newDuckChatMenuItem.isEnabled = viewState.showDuckChatOption
+        newDuckChatMenuItem.isVisible = viewState.showDuckChatOption
         settingsMenuItem.isEnabled = true
 
         refreshMenuItem.isVisible = false
