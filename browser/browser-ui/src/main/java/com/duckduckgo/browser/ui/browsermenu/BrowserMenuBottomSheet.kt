@@ -283,7 +283,7 @@ class BrowserMenuBottomSheet(
         newDuckChatTabMenuItem.isEnabled = false
         newDuckChatTabMenuItem.isVisible = false
         newDuckChatMenuItem.isEnabled = false
-        newDuckChatMenuItem.isVisible = false
+        newDuckChatMenuItem.isVisible = true
         settingsMenuItem.isEnabled = false
 
         refreshMenuItem.isVisible = true
