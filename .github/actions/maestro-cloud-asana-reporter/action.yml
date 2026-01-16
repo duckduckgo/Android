@@ -13,7 +13,10 @@ inputs:
     required: true
   maestro_app_file:
     description: 'Path to the APK file'
-    required: true
+    required: false
+  maestro_app_binary_id:
+    description: 'The ID of the app binary to use (if already uploaded)'
+    required: false
   maestro_api_level:
     description: 'Android API level'
     required: false
@@ -75,7 +78,8 @@ runs:
         project-id: ${{ inputs.maestro_project_id }}
         name: ${{ inputs.maestro_test_name }}
         timeout: ${{ inputs.maestro_timeout }}
-        app-file: ${{ inputs.maestro_app_file }}
+        app-file: ${{ inputs.maestro_app_binary_id == '' && inputs.maestro_app_file || '' }}
+        app-binary-id: ${{ inputs.maestro_app_binary_id != '' && inputs.maestro_app_binary_id || '' }}
         android-api-level: ${{ inputs.maestro_api_level }}
         workspace: .maestro
         include-tags: ${{ inputs.maestro_include_tags }}
