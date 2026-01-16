@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.notification.vpnreminder
 
+import android.annotation.SuppressLint
 import androidx.core.app.NotificationManagerCompat
 import androidx.work.WorkManager
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -33,6 +34,7 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
+@SuppressLint("DenyListedApi")
 class VpnReminderNotificationSchedulerImplTest {
 
     @get:Rule
