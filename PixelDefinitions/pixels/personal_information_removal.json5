@@ -1136,7 +1136,19 @@
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion"]
+        "parameters": [
+            "appVersion",
+            {
+                "key": "man",
+                "description": "Manufacturer of the device",
+                "type": "string"
+            },
+            {
+                "key": "batteryOptimizations",
+                "description": "If device has battery optimizations enabled for the app",
+                "enum": ["false", "true"]
+            }
+        ]
     },
     "m_dbp_foreground-run_completed": {
         "description": "Fired when pir run is started in the foreground",
@@ -1149,6 +1161,16 @@
                 "key": "totalTimeInMillis",
                 "description": "Total time in ms the foreground run took to complete",
                 "type": "string"
+            },
+            {
+                "key": "man",
+                "description": "Manufacturer of the device",
+                "type": "string"
+            },
+            {
+                "key": "batteryOptimizations",
+                "description": "If device has battery optimizations enabled for the app",
+                "enum": ["false", "true"]
             }
         ]
     },
@@ -1164,7 +1186,19 @@
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion"]
+        "parameters": [
+            "appVersion",
+            {
+                "key": "man",
+                "description": "Manufacturer of the device",
+                "type": "string"
+            },
+            {
+                "key": "batteryOptimizations",
+                "description": "If device has battery optimizations enabled for the app",
+                "enum": ["false", "true"]
+            }
+        ]
     },
     "m_dbp_scheduled-run_completed": {
         "description": "Fired when the pir scheduled run is completed",
@@ -1177,6 +1211,16 @@
                 "key": "totalTimeInMillis",
                 "description": "Total time in ms the scheduled run took to complete",
                 "type": "string"
+            },
+            {
+                "key": "man",
+                "description": "Manufacturer of the device",
+                "type": "string"
+            },
+            {
+                "key": "batteryOptimizations",
+                "description": "If device has battery optimizations enabled for the app",
+                "enum": ["false", "true"]
             }
         ]
     },
@@ -1453,7 +1497,19 @@
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion"]
+        "parameters": [
+            "appVersion",
+            {
+                "key": "man",
+                "description": "Manufacturer of the device",
+                "type": "string"
+            },
+            {
+                "key": "batteryOptimizations",
+                "description": "If device has battery optimizations enabled for the app",
+                "enum": ["false", "true"]
+            }
+        ]
     },
     "m_dbp_email-confirmation_completed": {
         "description": "Android specific pixel which is fired when the email confirmation job completes",
@@ -1476,6 +1532,16 @@
                 "key": "totalEmailConfirmationJobs",
                 "description": "Total number of email confirmation opt-outs to be resumed",
                 "type": "number"
+            },
+            {
+                "key": "man",
+                "description": "Manufacturer of the device",
+                "type": "string"
+            },
+            {
+                "key": "batteryOptimizations",
+                "description": "If device has battery optimizations enabled for the app",
+                "enum": ["false", "true"]
             }
         ]
     },
