@@ -629,10 +629,12 @@ class RealPirRunStateHandlerTest {
             val state =
                 BrokerRecordEmailConfirmationCompleted(
                     broker = testBroker,
-                    extractedProfileId = testExtractedProfileId,
+                    extractedProfile = testExtractedProfile,
                     isSuccess = true,
                     lastActionId = "last82ded-021a-4251-9e03-2c58b130410f",
                     totalTimeMillis = 1000L,
+                    emailPattern = "",
+                    attemptId = "attemptid-123",
                 )
             whenever(mockRepository.getBrokerForName(testBrokerName)).thenReturn(testBroker)
             whenever(mockSchedulingRepository.getEmailConfirmationJob(testExtractedProfileId)).thenReturn(testEmailConfirmationJob)
@@ -659,6 +661,14 @@ class RealPirRunStateHandlerTest {
                 EMAIL_CONFIRMATION_SUCCESS,
                 testBrokerName,
             )
+            verify(mockPixelSender).reportOptOutSubmitted(
+                brokerUrl = testBroker.url,
+                parent = "",
+                attemptId = state.attemptId,
+                durationMs = state.totalTimeMillis,
+                optOutAttemptCount = testEmailConfirmationJob.jobAttemptData.jobAttemptCount,
+                emailPattern = state.emailPattern,
+            )
             verifyNoMoreInteractions(mockPixelSender)
             verifyNoMoreInteractions(mockJobRecordUpdater)
         }
@@ -669,10 +679,12 @@ class RealPirRunStateHandlerTest {
             val state =
                 BrokerRecordEmailConfirmationCompleted(
                     broker = testBroker,
-                    extractedProfileId = testExtractedProfileId,
+                    extractedProfile = testExtractedProfile,
                     isSuccess = false,
                     lastActionId = "last82ded-021a-4251-9e03-2c58b130410f",
                     totalTimeMillis = 1000L,
+                    attemptId = "attemptid-123",
+                    emailPattern = "",
                 )
             whenever(mockRepository.getBrokerForName(testBrokerName)).thenReturn(testBroker)
             whenever(mockJobRecordUpdater.recordEmailConfirmationFailed(any(), any())).thenReturn(testEmailConfirmationJob)
