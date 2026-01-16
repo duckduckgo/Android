@@ -94,6 +94,21 @@ class RemoteMessageViewModelTest {
                 assertTrue(it.newMessage)
                 assertTrue(it.message?.id == remoteMessage.id)
                 assertTrue(it.message?.content == remoteMessage.content)
+                assertTrue(it.messageImageFilePath == null)
+            }
+        }
+    }
+
+    @Test
+    fun whenViewModelInitialisedAndMessageWithSavedImageThenViewStateEmitInitState() = runTest {
+        val remoteMessage = whenRemoteMessageAvailable("imagePath")
+
+        testee.viewState.test {
+            expectMostRecentItem().also {
+                assertTrue(it.newMessage)
+                assertTrue(it.message?.id == remoteMessage.id)
+                assertTrue(it.message?.content == remoteMessage.content)
+                assertTrue(it.messageImageFilePath == "imagePath")
             }
         }
     }
@@ -187,9 +202,10 @@ class RemoteMessageViewModelTest {
         verify(playStoreUtils).launchPlayStore(appPackage)
     }
 
-    private fun whenRemoteMessageAvailable(): RemoteMessage {
+    private suspend fun whenRemoteMessageAvailable(imageFilePath: String? = null): RemoteMessage {
         val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList(), listOf(Surface.NEW_TAB_PAGE))
         whenever(remoteMessageModel.getActiveMessages()).thenReturn(flowOf(remoteMessage))
+        whenever(remoteMessageModel.getRemoteMessageImageFile()).thenReturn(imageFilePath)
         testee.onStart(mockLifecycleOwner)
         return remoteMessage
     }

@@ -128,6 +128,55 @@ class CardsListRemoteMessageViewModelTest {
             assertEquals(cardsList, viewState?.cardsLists)
             assertEquals("Test Cards", viewState?.cardsLists?.titleText)
             assertEquals(1, viewState?.cardsLists?.listItems?.size)
+            assertNull(viewState?.cardsListImageFilePath)
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenInitCalledWithValidMessageIdAndExistingImageFileThenViewStateUpdatedWithCardsListContent() = runTest {
+        val messageId = "message-123"
+        val cardsList = Content.CardsList(
+            titleText = "Test Cards",
+            descriptionText = "Description",
+            placeholder = Content.Placeholder.DDG_ANNOUNCE,
+            listItems = listOf(
+                CardItem(
+                    id = "id",
+                    type = CardItemType.TWO_LINE_LIST_ITEM,
+                    placeholder = Content.Placeholder.CRITICAL_UPDATE,
+                    titleText = "Card 1",
+                    descriptionText = "Description 1",
+                    primaryAction = Action.Dismiss,
+                    matchingRules = emptyList(),
+                    exclusionRules = emptyList(),
+                ),
+            ),
+            primaryActionText = "Dismiss",
+            primaryAction = Action.Dismiss,
+        )
+        val message = RemoteMessage(
+            id = messageId,
+            content = cardsList,
+            matchingRules = emptyList(),
+            exclusionRules = emptyList(),
+            surfaces = listOf(Surface.MODAL),
+        )
+        whenever(remoteMessagingRepository.getMessageById(eq(messageId))).thenReturn(message)
+        whenever(remoteMessagingModel.getRemoteMessageImageFile()).thenReturn("imageFile")
+
+        viewModel.viewState.test {
+            assertNull(awaitItem()) // Initial state
+
+            viewModel.init(messageId)
+
+            val viewState = awaitItem()
+            assertNotNull(viewState)
+            assertEquals(cardsList, viewState?.cardsLists)
+            assertEquals("Test Cards", viewState?.cardsLists?.titleText)
+            assertEquals(1, viewState?.cardsLists?.listItems?.size)
+            assertEquals("imageFile", viewState?.cardsListImageFilePath)
 
             cancelAndIgnoreRemainingEvents()
         }

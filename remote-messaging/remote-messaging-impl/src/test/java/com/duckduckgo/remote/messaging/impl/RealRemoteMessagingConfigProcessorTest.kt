@@ -21,13 +21,14 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
+import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
 import com.duckduckgo.remote.messaging.fixtures.JsonRemoteMessageOM.aJsonRemoteMessagingConfig
 import com.duckduckgo.remote.messaging.fixtures.RemoteMessagingConfigOM.aRemoteMessagingConfig
 import com.duckduckgo.remote.messaging.fixtures.jsonMatchingAttributeMappers
 import com.duckduckgo.remote.messaging.fixtures.messageActionPlugins
 import com.duckduckgo.remote.messaging.impl.mappers.RemoteMessagingConfigJsonMapper
-import com.duckduckgo.remote.messaging.store.RemoteMessagingCohortStore
+import com.duckduckgo.remote.messaging.impl.store.RemoteMessageImageStore
 import com.duckduckgo.remote.messaging.store.RemoteMessagingConfigRepository
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -48,6 +49,8 @@ class RealRemoteMessagingConfigProcessorTest {
     @get:Rule var coroutineRule = CoroutineTestRule()
 
     private val appBuildConfig: AppBuildConfig = mock()
+
+    private val remoteMessageImageStore = mock<RemoteMessageImageStore>()
     private var remoteMessagingFeatureToggles: RemoteMessagingFeatureToggles = FakeFeatureToggleFactory.create(
         RemoteMessagingFeatureToggles::class.java,
     )
@@ -59,14 +62,14 @@ class RealRemoteMessagingConfigProcessorTest {
     )
     private val remoteMessagingConfigRepository = mock<RemoteMessagingConfigRepository>()
     private val remoteMessagingRepository = mock<RemoteMessagingRepository>()
-    private val remoteMessagingCohortStore = mock<RemoteMessagingCohortStore>()
-    private val remoteMessagingConfigMatcher = RemoteMessagingConfigMatcher(setOf(mock(), mock(), mock()), mock(), remoteMessagingCohortStore)
+    private val remoteMessagingConfigMatcher = mock<RemoteMessagingConfigMatcher>()
 
     private val testee = RealRemoteMessagingConfigProcessor(
         remoteMessagingConfigJsonMapper,
         remoteMessagingConfigRepository,
         remoteMessagingRepository,
         remoteMessagingConfigMatcher,
+        remoteMessageImageStore,
         remoteMessagingFeatureToggles,
     )
 
@@ -146,5 +149,32 @@ class RealRemoteMessagingConfigProcessorTest {
         testee.process(aJsonRemoteMessagingConfig(version = 1L))
 
         verify(remoteMessagingConfigRepository).insert(any())
+    }
+
+    @Test
+    fun whenEvaluatedMessageThenPrefetchImageAndSetActiveMessage() = runTest {
+        val evaluatedMessage = mock<RemoteMessage>()
+        whenever(remoteMessagingConfigRepository.get()).thenReturn(
+            aRemoteMessagingConfig(version = 0L),
+        )
+        whenever(remoteMessagingConfigMatcher.evaluate(any())).thenReturn(evaluatedMessage)
+
+        testee.process(aJsonRemoteMessagingConfig(version = 1L))
+
+        verify(remoteMessageImageStore).fetchAndStoreImage(evaluatedMessage)
+        verify(remoteMessagingRepository).activeMessage(evaluatedMessage)
+    }
+
+    @Test
+    fun whenSkipProcessingThenDoNotSetActiveMessage() = runTest {
+        whenever(remoteMessagingConfigRepository.get()).thenReturn(
+            aRemoteMessagingConfig(version = 0L),
+        )
+        whenever(remoteMessagingConfigMatcher.evaluate(any())).thenReturn(null)
+
+        testee.process(aJsonRemoteMessagingConfig(version = 1L))
+
+        verify(remoteMessageImageStore).fetchAndStoreImage(null)
+        verify(remoteMessagingRepository).activeMessage(null)
     }
 }
