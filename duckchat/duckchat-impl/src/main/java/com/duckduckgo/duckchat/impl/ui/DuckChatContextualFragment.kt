@@ -268,7 +268,7 @@ class DuckChatContextualFragment : DuckDuckGoFragment(R.layout.fragment_contextu
                         when (featureName) {
                             DUCK_CHAT_FEATURE_NAME -> {
                                 appCoroutineScope.launch(dispatcherProvider.io()) {
-                                    duckChatJSHelper.processJsCallbackMessage(featureName, method, id, data)?.let { response ->
+                                    duckChatJSHelper.processJsCallbackMessage(featureName, method, id, data, Mode.CONTEXTUAL)?.let { response ->
                                         logcat { "Duck.ai: response $response" }
                                         withContext(dispatcherProvider.main()) {
                                             if (response.method == METHOD_OPEN_KEYBOARD) {
@@ -301,7 +301,6 @@ class DuckChatContextualFragment : DuckDuckGoFragment(R.layout.fragment_contextu
                     }
                 },
             )
-            duckChatJSHelper.registerMode(Mode.CONTEXTUAL)
         }
 
         externalCameraLauncher.registerForResult(this) {

@@ -38,6 +38,7 @@ import org.json.JSONObject
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
+import org.junit.Assert.assertFalse
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -61,8 +62,8 @@ class RealDuckChatJSHelperTest {
 
     private val testee = RealDuckChatJSHelper(
         duckChat = mockDuckChat,
-        dataStore = mockDataStore,
         duckChatPixels = mockDuckChatPixels,
+        dataStore = mockDataStore,
         duckAiMetricCollector = mockDuckAiMetricCollector,
         appCoroutineScope = coroutineRule.testScope,
         dispatcherProvider = coroutineRule.testDispatcherProvider,
@@ -241,7 +242,7 @@ class RealDuckChatJSHelperTest {
     }
 
     @Test
-    fun whenGetAIChatNativeConfigValuesAndDuckChatFeatureEnabledAndFullScreenModeEnabledThenReturnJsCallbackDataWithCorrectData() = runTest {
+    fun whenGetAIChatNativeConfigValuesAndDuckChatFeatureEnabledAndFullScreenModeEnabledAndModeFullThenReturnJsCallbackDataWithCorrectData() = runTest {
         val featureName = "aiChat"
         val method = "getAIChatNativeConfigValues"
         val id = "123"
@@ -249,7 +250,7 @@ class RealDuckChatJSHelperTest {
         whenever(mockDuckChat.isDuckChatFeatureEnabled()).thenReturn(true)
         whenever(mockDuckChat.isDuckChatFullScreenModeEnabled()).thenReturn(true)
 
-        val result = testee.processJsCallbackMessage(featureName, method, id, null)
+        val result = testee.processJsCallbackMessage(featureName, method, id, null, Mode.FULL)
 
         val jsonPayload = JSONObject().apply {
             put("platform", "android")
@@ -262,6 +263,39 @@ class RealDuckChatJSHelperTest {
             put("supportsStandaloneMigration", false)
             put("supportsAIChatFullMode", true)
             put("supportsAIChatContextualMode", false)
+            put("supportsAIChatSync", false)
+        }
+
+        val expected = JsCallbackData(jsonPayload, featureName, method, id)
+
+        assertEquals(expected.id, result!!.id)
+        assertEquals(expected.method, result.method)
+        assertEquals(expected.featureName, result.featureName)
+        assertEquals(expected.params.toString(), result.params.toString())
+    }
+
+    @Test
+    fun whenGetAIChatNativeConfigValuesAndDuckChatFeatureEnabledAndContextualModeEnabledAndModeContextualThenReturnJsCallbackDataWithCorrectData() = runTest {
+        val featureName = "aiChat"
+        val method = "getAIChatNativeConfigValues"
+        val id = "123"
+
+        whenever(mockDuckChat.isDuckChatFeatureEnabled()).thenReturn(true)
+        whenever(mockDuckChat.isDuckChatContextualModeEnabled()).thenReturn(true)
+
+        val result = testee.processJsCallbackMessage(featureName, method, id, null, Mode.CONTEXTUAL)
+
+        val jsonPayload = JSONObject().apply {
+            put("platform", "android")
+            put("isAIChatHandoffEnabled", true)
+            put("supportsClosingAIChat", true)
+            put("supportsOpeningSettings", true)
+            put("supportsNativeChatInput", false)
+            put("supportsURLChatIDRestoration", false)
+            put("supportsImageUpload", false)
+            put("supportsStandaloneMigration", false)
+            put("supportsAIChatFullMode", false)
+            put("supportsAIChatContextualMode", true)
             put("supportsAIChatSync", false)
         }
 
@@ -650,30 +684,32 @@ class RealDuckChatJSHelperTest {
     }
 
     @Test
-    fun whenModeIsFullThenSupportsFullModeIsTrue() = runTest {
+    fun whenModeIsFullAndFullScreenModeEnabledThenSupportsAIChatFullModeIsTrue() = runTest {
         val featureName = "aiChat"
         val method = "getAIChatNativeConfigValues"
         val id = "123"
 
-        testee.registerMode(Mode.FULL)
+        whenever(mockDuckChat.isDuckChatFeatureEnabled()).thenReturn(true)
         whenever(mockDuckChat.isDuckChatFullScreenModeEnabled()).thenReturn(true)
 
-        val result = testee.processJsCallbackMessage(featureName, method, id, null)
+        val result = testee.processJsCallbackMessage(featureName, method, id, null, Mode.FULL)
 
         assertTrue(result!!.params.getBoolean("supportsAIChatFullMode"))
+        assertFalse(result.params.getBoolean("supportsAIChatContextualMode"))
     }
 
     @Test
-    fun whenModeIsContextualThenSupportsContextualModeIsTrue() = runTest {
+    fun whenModeIsContextualAndContextualModeEnabledThenSupportsAIChatContextualModeIsTrue() = runTest {
         val featureName = "aiChat"
         val method = "getAIChatNativeConfigValues"
         val id = "123"
 
-        testee.registerMode(Mode.CONTEXTUAL)
+        whenever(mockDuckChat.isDuckChatFeatureEnabled()).thenReturn(true)
         whenever(mockDuckChat.isDuckChatContextualModeEnabled()).thenReturn(true)
 
-        val result = testee.processJsCallbackMessage(featureName, method, id, null)
+        val result = testee.processJsCallbackMessage(featureName, method, id, null, Mode.CONTEXTUAL)
 
         assertTrue(result!!.params.getBoolean("supportsAIChatContextualMode"))
+        assertFalse(result.params.getBoolean("supportsAIChatFullMode"))
     }
 }

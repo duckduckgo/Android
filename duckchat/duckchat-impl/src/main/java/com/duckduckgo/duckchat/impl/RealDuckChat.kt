@@ -374,7 +374,7 @@ class RealDuckChat @Inject constructor(
 
     override fun isDuckChatFullScreenModeEnabled(): Boolean = isFullscreenModeEnabled
 
-    override fun isDuckChatContextualModeEnabled(): Boolean = isFullscreenModeEnabled
+    override fun isDuckChatContextualModeEnabled(): Boolean = isContextualModeEnabled
 
     override fun observeEnableDuckChatUserSetting(): Flow<Boolean> = duckChatFeatureRepository.observeDuckChatUserEnabled()
 
