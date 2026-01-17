@@ -69,6 +69,7 @@ import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
 import com.duckduckgo.app.browser.tabs.TabManager
 import com.duckduckgo.app.browser.tabs.TabManager.TabModel
 import com.duckduckgo.app.browser.tabs.adapter.TabPagerAdapter
+import com.duckduckgo.app.browser.webview.profile.ProfileSwitchTabsResetter
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.dispatchers.ExternalIntentProcessingState
 import com.duckduckgo.app.downloads.DownloadsScreens.DownloadsScreenNoParams
@@ -205,6 +206,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var fireDialogProvider: FireDialogProvider
+
+    @Inject
+    lateinit var profileSwitchTabsResetter: ProfileSwitchTabsResetter
 
     private val lastActiveTabs = TabList()
 
@@ -399,6 +403,40 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 }
             }
         }
+
+        // Observe profile switch tab reset events (works in both swiping and non-swiping modes)
+        lifecycleScope.launch {
+            profileSwitchTabsResetter.resetEvent.collect { event ->
+                handleProfileSwitchTabsReset(event.clearTabs)
+            }
+        }
+    }
+
+    /**
+     * Handles tab fragment reset after a WebView profile switch.
+     * Removes all existing tab fragments so new ones can be created with the new profile.
+     */
+    private fun handleProfileSwitchTabsReset(clearTabs: Boolean) {
+        logcat(INFO) { "Handling profile switch tabs reset, clearTabs=$clearTabs" }
+
+        if (swipingTabsFeature.isEnabled) {
+            // When swiping is enabled, clear via the pager adapter
+            tabPagerAdapter.clearFragments()
+        } else {
+            // When swiping is disabled, remove individual tab fragments from fragment manager
+            val tabFragments = supportFragmentManager.fragments
+                .filterIsInstance<BrowserTabFragment>()
+
+            if (tabFragments.isNotEmpty()) {
+                removeTabs(tabFragments)
+            }
+        }
+
+        currentTab = null
+        lastActiveTabs.clear()
+
+        // Let the ViewModel handle the tab repository operations
+        viewModel.onProfileSwitchTabsReset(clearTabs)
     }
 
     private fun setupFireDialogListener() {

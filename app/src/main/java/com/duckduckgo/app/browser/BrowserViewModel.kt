@@ -515,6 +515,33 @@ class BrowserViewModel @Inject constructor(
         pixel.fire(AppPixelName.PRODUCT_TELEMETRY_SURFACE_LANDSCAPE_ORIENTATION_USED)
         pixel.fire(AppPixelName.PRODUCT_TELEMETRY_SURFACE_LANDSCAPE_ORIENTATION_USED_DAILY, type = Daily())
     }
+
+    /**
+     * Handles tab reset after a WebView profile switch.
+     * Called from BrowserActivity after all tab fragments have been removed.
+     *
+     * @param clearTabs If true, deletes all tabs and a new default tab will be created.
+     *                  If false, reselects the current tab to trigger fragment recreation.
+     */
+    fun onProfileSwitchTabsReset(clearTabs: Boolean) {
+        viewModelScope.launch(dispatchers.io()) {
+            if (clearTabs) {
+                logcat(INFO) { "Profile switch: clearing all tabs" }
+                tabRepository.deleteAll()
+                // onTabsUpdated observer will create new default tab when tabs list is empty
+            } else {
+                logcat(INFO) { "Profile switch: reselecting current tab" }
+                val currentTab = tabRepository.getSelectedTab()
+                if (currentTab != null) {
+                    // Reselect the current tab to trigger fragment recreation
+                    tabRepository.select(currentTab.tabId)
+                } else {
+                    // No current tab selected, create a new one
+                    tabRepository.add()
+                }
+            }
+        }
+    }
 }
 
 /**
