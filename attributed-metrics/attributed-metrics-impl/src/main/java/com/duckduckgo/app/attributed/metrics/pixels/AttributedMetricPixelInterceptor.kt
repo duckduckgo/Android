@@ -33,19 +33,22 @@ import javax.inject.Inject
 class AttributedMetricPixelInterceptor @Inject constructor() : Interceptor, PixelInterceptorPlugin {
 
     override fun intercept(chain: Interceptor.Chain): Response {
-        val request = chain.request().newBuilder()
-        var url = chain.request().url
-        val pixel = chain.request().url.pathSegments.last()
-        if (pixel.startsWith(ATTRIBUTED_METRICS_PIXEL_PREFIX)) {
-            url = url.toUrl().toString()
-                .replace("android_${DeviceInfo.FormFactor.PHONE.description}", "android")
-                .replace("android_${DeviceInfo.FormFactor.TABLET.description}", "android")
-                .toHttpUrl()
-            logcat(tag = "AttributedMetrics") {
-                "Pixel renamed to: $url"
-            }
+        val originalRequest = chain.request()
+        val pixel = originalRequest.url.pathSegments.last()
+
+        if (!pixel.startsWith(ATTRIBUTED_METRICS_PIXEL_PREFIX)) {
+            return chain.proceed(originalRequest)
         }
-        return chain.proceed(request.url(url).build())
+
+        val url = originalRequest.url.toUrl().toString()
+            .replace("android_${DeviceInfo.FormFactor.PHONE.description}", "android")
+            .replace("android_${DeviceInfo.FormFactor.TABLET.description}", "android")
+            .toHttpUrl()
+        logcat(tag = "AttributedMetrics") {
+            "Pixel renamed to: $url"
+        }
+
+        return chain.proceed(originalRequest.newBuilder().url(url).build())
     }
 
     override fun getInterceptor() = this

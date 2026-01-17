@@ -43,18 +43,19 @@ class VpnLatencyPixelInterceptor @Inject constructor(
     override fun getInterceptor(): Interceptor = this
 
     override fun intercept(chain: Chain): Response {
-        val request = chain.request().newBuilder()
-        val pixel = chain.request().url.pathSegments.last()
-        val url = if (LATENCY_PIXELS.any { pixel.startsWith(it) }) {
-            chain.request().url.newBuilder()
-                .addQueryParameter(PARAM_LOCATION, getLocationParamValue())
-                .addQueryParameter(PARAM_OSABOVE15, isOsAbove15().toString())
-                .build()
-        } else {
-            chain.request().url
+        val originalRequest = chain.request()
+        val pixel = originalRequest.url.pathSegments.last()
+
+        if (LATENCY_PIXELS.none { pixel.startsWith(it) }) {
+            return chain.proceed(originalRequest)
         }
 
-        return chain.proceed(request.url(url).build())
+        val url = originalRequest.url.newBuilder()
+            .addQueryParameter(PARAM_LOCATION, getLocationParamValue())
+            .addQueryParameter(PARAM_OSABOVE15, isOsAbove15().toString())
+            .build()
+
+        return chain.proceed(originalRequest.newBuilder().url(url).build())
     }
 
     private fun getLocationParamValue(): String {

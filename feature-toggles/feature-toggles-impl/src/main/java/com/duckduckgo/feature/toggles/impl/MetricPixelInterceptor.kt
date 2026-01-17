@@ -46,17 +46,19 @@ class MetricPixelInterceptor @Inject constructor(
     private val pixelStore: MetricsPixelStore,
 ) : PixelInterceptorPlugin, Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
-        val request = chain.request().newBuilder()
-        val pixel = chain.request().url.pathSegments.last()
+        val originalRequest = chain.request()
+        val pixel = originalRequest.url.pathSegments.last()
 
         // If not a metrics pixel, proceed
-        if (!pixel.startsWith(METRICS_PIXEL_PREFIX)) return chain.proceed(request.build())
+        if (!pixel.startsWith(METRICS_PIXEL_PREFIX)) {
+            return chain.proceed(originalRequest)
+        }
 
         // If one of the parameters doesn't exist or is empty, drop request
-        val metricName = chain.request().url.queryParameter("metric")
-        val value = chain.request().url.queryParameter("value")
-        val conversionWindowDays = chain.request().url.queryParameter("conversionWindowDays")
-        val enrollmentDate = chain.request().url.queryParameter("enrollmentDate")
+        val metricName = originalRequest.url.queryParameter("metric")
+        val value = originalRequest.url.queryParameter("value")
+        val conversionWindowDays = originalRequest.url.queryParameter("conversionWindowDays")
+        val enrollmentDate = originalRequest.url.queryParameter("enrollmentDate")
 
         if (metricName.isNullOrEmpty() || value.isNullOrEmpty() || conversionWindowDays.isNullOrEmpty() || enrollmentDate.isNullOrEmpty()) {
             return dummyResponse(chain)
@@ -96,7 +98,7 @@ class MetricPixelInterceptor @Inject constructor(
         // If inside conversion window, proceed, if not drop
         val diffDays = daysBetweenTodayAnd(enrollmentDate)
         return if (diffDays in lowerWindow..upperWindow) {
-            chain.proceed(request.build()).also { pixelStore.storePixelTag(tag) }
+            chain.proceed(originalRequest).also { pixelStore.storePixelTag(tag) }
         } else {
             dummyResponse(chain)
         }

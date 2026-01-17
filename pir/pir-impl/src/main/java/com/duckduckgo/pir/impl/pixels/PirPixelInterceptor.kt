@@ -37,27 +37,27 @@ class PirPixelInterceptor @Inject constructor(
     private val appBuildConfig: AppBuildConfig,
 ) : PixelInterceptorPlugin, Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
-        val request = chain.request().newBuilder()
-        val pixel = chain.request().url.pathSegments.last()
+        val originalRequest = chain.request()
+        val pixel = originalRequest.url.pathSegments.last()
 
-        val url = if (pixel.startsWith(PIXEL_PREFIX) && !EXCEPTIONS.any { exception -> pixel.startsWith(exception) }) {
-            chain.request().url.newBuilder()
-                .addQueryParameter(
-                    KEY_METADATA,
-                    JSONObject()
-                        .put("os", appBuildConfig.sdkInt)
-                        .put("batteryOptimizations", (!isIgnoringBatteryOptimizations()).toString())
-                        .put("man", appBuildConfig.manufacturer)
-                        .toString().toByteArray().run {
-                            Base64.encodeToString(this, Base64.NO_WRAP or Base64.NO_PADDING or Base64.URL_SAFE)
-                        },
-                )
-                .build()
-        } else {
-            chain.request().url
+        if (!pixel.startsWith(PIXEL_PREFIX) || EXCEPTIONS.any { exception -> pixel.startsWith(exception) }) {
+            return chain.proceed(originalRequest)
         }
 
-        return chain.proceed(request.url(url).build())
+        val url = originalRequest.url.newBuilder()
+            .addQueryParameter(
+                KEY_METADATA,
+                JSONObject()
+                    .put("os", appBuildConfig.sdkInt)
+                    .put("batteryOptimizations", (!isIgnoringBatteryOptimizations()).toString())
+                    .put("man", appBuildConfig.manufacturer)
+                    .toString().toByteArray().run {
+                        Base64.encodeToString(this, Base64.NO_WRAP or Base64.NO_PADDING or Base64.URL_SAFE)
+                    },
+            )
+            .build()
+
+        return chain.proceed(originalRequest.newBuilder().url(url).build())
     }
 
     override fun getInterceptor(): Interceptor = this

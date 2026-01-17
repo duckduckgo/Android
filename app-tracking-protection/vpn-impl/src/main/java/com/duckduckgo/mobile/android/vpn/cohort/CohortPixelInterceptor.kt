@@ -37,20 +37,23 @@ class CohortPixelInterceptor @Inject constructor(
     private val cohortStore: CohortStore,
 ) : PixelInterceptorPlugin, Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
-        val request = chain.request().newBuilder()
-        val pixel = chain.request().url.pathSegments.last()
+        val originalRequest = chain.request()
+        val pixel = originalRequest.url.pathSegments.last()
 
-        val url = if (pixel.startsWith(PIXEL_PREFIX) && !EXCEPTIONS.any { exception -> pixel.startsWith(exception) }) {
-            // IF there is no cohort for ATP we just drop the pixel request
-            // ELSE we add the cohort param
-            cohortStore.getCohortStoredLocalDate()?.let {
-                chain.request().url.newBuilder().addQueryParameter(COHORT_PARAM, cohortCalculator.calculateCohortForDate(it)).build()
-            } ?: return dummyResponse(chain)
-        } else {
-            chain.request().url
+        if (!pixel.startsWith(PIXEL_PREFIX) || EXCEPTIONS.any { exception -> pixel.startsWith(exception) }) {
+            return chain.proceed(originalRequest)
         }
 
-        return chain.proceed(request.url(url).build())
+        // IF there is no cohort for ATP we just drop the pixel request
+        val cohortDate = cohortStore.getCohortStoredLocalDate()
+            ?: return dummyResponse(chain)
+
+        // ELSE we add the cohort param
+        val url = originalRequest.url.newBuilder()
+            .addQueryParameter(COHORT_PARAM, cohortCalculator.calculateCohortForDate(cohortDate))
+            .build()
+
+        return chain.proceed(originalRequest.newBuilder().url(url).build())
     }
 
     private fun dummyResponse(chain: Interceptor.Chain): Response {
