@@ -43,5 +43,17 @@ interface WebViewCapabilityChecker {
          * The ability to inject Javascript which is guaranteed to be executed first on the page, and available in all iframes
          */
         data object DocumentStartJavaScript : WebViewCapability
+
+        /**
+         * MultiProfile
+         * The ability to create and use multiple WebView profiles to isolate browsing data
+         */
+        data object MultiProfile : WebViewCapability
+
+        /**
+         * DeleteBrowsingData
+         * The ability to use WebStorageCompat.deleteBrowsingData to clear profile data
+         */
+        data object DeleteBrowsingData : WebViewCapability
     }
 }

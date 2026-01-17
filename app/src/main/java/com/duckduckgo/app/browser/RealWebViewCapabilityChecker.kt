@@ -20,7 +20,9 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.webkit.WebViewFeature
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability
+import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability.DeleteBrowsingData
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability.DocumentStartJavaScript
+import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability.MultiProfile
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability.WebMessageListener
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
@@ -54,6 +56,8 @@ class RealWebViewCapabilityChecker @Inject constructor(
         when (capability) {
             DocumentStartJavaScript -> isDocumentStartJavaScriptSupported()
             WebMessageListener -> isWebMessageListenerSupported()
+            MultiProfile -> isMultiProfileSupported()
+            DeleteBrowsingData -> isDeleteBrowsingDataSupported()
         }
 
     override fun onStart(owner: LifecycleOwner) {

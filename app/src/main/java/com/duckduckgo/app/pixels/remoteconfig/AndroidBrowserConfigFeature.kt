@@ -258,6 +258,16 @@ interface AndroidBrowserConfigFeature {
     fun granularFireDialog(): Toggle
 
     /**
+     * Controls whether WebView profile switching is used instead of process restart on fire button.
+     * When enabled, a new WebView profile is created on each fire button usage to avoid process restart.
+     * @return `true` when the remote config has the global "webViewProfiles" androidBrowserConfig
+     * sub-feature flag enabled
+     * If the remote feature is not present defaults to `false`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun webViewProfiles(): Toggle
+
+    /**
      * Controls the experimental browsing menu in appearance settings.
      * @return `true` when the remote config has the global "experimentalBrowsingMenu" androidBrowserConfig
      * sub-feature flag enabled
