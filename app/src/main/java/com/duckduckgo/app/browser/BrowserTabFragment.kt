@@ -178,6 +178,7 @@ import com.duckduckgo.app.browser.webshare.WebShareChooser
 import com.duckduckgo.app.browser.webshare.WebViewCompatWebShareChooser
 import com.duckduckgo.app.browser.webview.WebContentDebugging
 import com.duckduckgo.app.browser.webview.WebViewBlobDownloadFeature
+import com.duckduckgo.app.browser.webview.profile.WebViewProfileManager
 import com.duckduckgo.app.cta.ui.BrokenSitePromptDialogCta
 import com.duckduckgo.app.cta.ui.Cta
 import com.duckduckgo.app.cta.ui.CtaViewModel
@@ -562,6 +563,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var webViewCapabilityChecker: WebViewCapabilityChecker
+
+    @Inject
+    lateinit var webViewProfileManager: WebViewProfileManager
 
     @Inject
     lateinit var swipingTabsFeature: SwipingTabsFeatureProvider
@@ -3221,6 +3225,10 @@ class BrowserTabFragment :
                 ).findViewById<DuckDuckGoWebView>(R.id.browserWebView)
 
         webView?.let {
+            // CRITICAL: Set WebView profile FIRST before any other operation
+            // Profile cannot be changed after any other operation on the WebView
+            setWebViewProfile(it)
+
             it.webViewClient = webViewClient
             it.webChromeClient = webChromeClient
             it.clearSslPreferences()
@@ -3336,6 +3344,22 @@ class BrowserTabFragment :
 
         lifecycleScope.launch {
             webView?.let { passkeyInitializer.configurePasskeySupport(it) }
+        }
+    }
+
+    /**
+     * Sets the WebView profile for data isolation.
+     * MUST be called FIRST before any other WebView operation - profile cannot be changed after.
+     */
+    private fun setWebViewProfile(webView: DuckDuckGoWebView) {
+        val profileName = webViewProfileManager.getCurrentProfileName()
+        if (profileName.isNotEmpty()) {
+            try {
+                WebViewCompat.setProfile(webView, profileName)
+                logcat { "WebView profile set to: $profileName" }
+            } catch (e: Exception) {
+                logcat(ERROR) { "Failed to set WebView profile: ${e.asLog()}" }
+            }
         }
     }
 

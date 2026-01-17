@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.fire
 
+import com.duckduckgo.app.browser.webview.profile.WebViewProfileManager
 import com.duckduckgo.app.fire.store.FireDataStore
 import com.duckduckgo.app.global.view.ClearDataAction
 import com.duckduckgo.app.settings.clear.ClearWhenOption
@@ -46,6 +47,7 @@ class DataClearing @Inject constructor(
     private val clearDataAction: ClearDataAction,
     private val settingsDataStore: SettingsDataStore,
     private val dataClearerTimeKeeper: BackgroundTimeKeeper,
+    private val webViewProfileManager: WebViewProfileManager,
 ) : ManualDataClearing, AutomaticDataClearing {
 
     override suspend fun clearDataUsingManualFireOptions(shouldRestartIfRequired: Boolean, wasAppUsedSinceLastClear: Boolean) {
@@ -58,7 +60,21 @@ class DataClearing @Inject constructor(
         clearDataAction.setAppUsedSinceLastClearFlag(wasAppUsedSinceLastClear)
 
         val wasDataCleared = options.contains(FireClearOption.DATA) || options.contains(FireClearOption.DUCKAI_CHATS)
+        val shouldClearTabs = options.contains(FireClearOption.TABS)
+
         if (shouldRestartIfRequired && wasDataCleared) {
+            // Try profile switching first to avoid process restart
+            if (webViewProfileManager.isProfileSwitchingAvailable()) {
+                val success = webViewProfileManager.switchToNewProfile()
+                if (success) {
+                    logcat { "Profile switch successful, resetting tabs" }
+                    // Reset tab fragments with the new profile
+                    clearDataAction.resetTabsForProfileSwitch(clearTabs = shouldClearTabs)
+                    return
+                }
+                logcat(WARN) { "Profile switch failed, falling back to process restart" }
+            }
+            // Fallback to process restart
             clearDataAction.killAndRestartProcess(notifyDataCleared = false)
         }
     }

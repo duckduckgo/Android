@@ -21,6 +21,7 @@ import android.webkit.WebStorage
 import android.webkit.WebView
 import com.duckduckgo.app.browser.WebDataManager
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
+import com.duckduckgo.app.browser.webview.profile.ProfileSwitchTabsResetter
 import com.duckduckgo.app.fire.AppCacheClearer
 import com.duckduckgo.app.fire.FireActivity
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
@@ -89,6 +90,14 @@ interface ClearDataAction {
      * @param enableTransitionAnimation whether to enable transition animation during restart
      */
     fun killAndRestartProcess(notifyDataCleared: Boolean, enableTransitionAnimation: Boolean = true)
+
+    /**
+     * Resets WebView fragments for profile switching.
+     * Removes all existing fragments to force new WebView creation with new profile.
+     * @param clearTabs If true, deletes all tabs and creates new one.
+     *                  If false, preserves tabs but recreates fragments.
+     */
+    suspend fun resetTabsForProfileSwitch(clearTabs: Boolean)
 }
 
 class ClearPersonalDataAction(
@@ -107,6 +116,7 @@ class ClearPersonalDataAction(
     private val navigationHistory: NavigationHistory,
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
     private val webTrackersBlockedRepository: WebTrackersBlockedRepository,
+    private val profileSwitchTabsResetter: ProfileSwitchTabsResetter,
 ) : ClearDataAction {
 
     override fun killAndRestartProcess(notifyDataCleared: Boolean, enableTransitionAnimation: Boolean) {
@@ -240,5 +250,11 @@ class ClearPersonalDataAction(
             settingsDataStore.appUsedSinceLastClear = appUsedSinceLastClear
             logcat { "Set appUsedSinceClear flag to $appUsedSinceLastClear" }
         }
+    }
+
+    override suspend fun resetTabsForProfileSwitch(clearTabs: Boolean) {
+        logcat(INFO) { "Resetting tabs for profile switch, clearTabs=$clearTabs" }
+        // Emit event to BrowserActivity to remove all fragments and handle tab reset
+        profileSwitchTabsResetter.requestReset(clearTabs)
     }
 }

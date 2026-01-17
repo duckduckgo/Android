@@ -326,11 +326,9 @@ class GranularFireDialog : BottomSheetDialogFragment(), FireDialog {
                 binding.fireAnimationView.addAnimatorUpdateListener(accelerateAnimatorUpdateListener)
             }
         } else {
-            if (viewModel.viewState.value.shouldRestartAfterClearing) {
-                clearDataAction.killAndRestartProcess(notifyDataCleared = false, enableTransitionAnimation = false)
-            } else {
-                dismiss()
-            }
+            // DataClearing handles the restart/profile switch logic,
+            // so we just dismiss the dialog
+            dismiss()
         }
     }
 

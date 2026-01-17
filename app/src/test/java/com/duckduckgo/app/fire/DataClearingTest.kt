@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.fire
 
+import com.duckduckgo.app.browser.webview.profile.WebViewProfileManager
 import com.duckduckgo.app.fire.store.FireDataStore
 import com.duckduckgo.app.global.view.ClearDataAction
 import com.duckduckgo.app.settings.clear.ClearWhenOption
@@ -55,6 +56,9 @@ class DataClearingTest {
     @Mock
     private lateinit var mockTimeKeeper: BackgroundTimeKeeper
 
+    @Mock
+    private lateinit var mockWebViewProfileManager: WebViewProfileManager
+
     @Before
     fun setup() {
         MockitoAnnotations.openMocks(this)
@@ -63,6 +67,7 @@ class DataClearingTest {
             clearDataAction = mockClearDataAction,
             settingsDataStore = mockSettingsDataStore,
             dataClearerTimeKeeper = mockTimeKeeper,
+            webViewProfileManager = mockWebViewProfileManager,
         )
     }
 
@@ -169,8 +174,9 @@ class DataClearingTest {
     }
 
     @Test
-    fun whenManualClearWithDataAndShouldRestartProcess_thenRestartProcess() = runTest {
+    fun whenManualClearWithDataAndShouldRestartProcess_andProfileSwitchNotAvailable_thenRestartProcess() = runTest {
         configureManualOptions(setOf(FireClearOption.DATA))
+        configureProfileSwitchingUnavailable()
 
         testee.clearDataUsingManualFireOptions(shouldRestartIfRequired = true, wasAppUsedSinceLastClear = false)
 
@@ -180,8 +186,9 @@ class DataClearingTest {
     }
 
     @Test
-    fun whenManualClearWithTabsAndDataAndShouldRestartProcess_thenRestartProcess() = runTest {
+    fun whenManualClearWithTabsAndDataAndShouldRestartProcess_andProfileSwitchNotAvailable_thenRestartProcess() = runTest {
         configureManualOptions(setOf(FireClearOption.TABS, FireClearOption.DATA))
+        configureProfileSwitchingUnavailable()
 
         testee.clearDataUsingManualFireOptions(shouldRestartIfRequired = true, wasAppUsedSinceLastClear = false)
 
@@ -192,13 +199,71 @@ class DataClearingTest {
     }
 
     @Test
-    fun whenManualClearWithDuckAiChatsAndShouldRestartProcess_thenRestartProcess() = runTest {
+    fun whenManualClearWithDuckAiChatsAndShouldRestartProcess_andProfileSwitchNotAvailable_thenRestartProcess() = runTest {
         configureManualOptions(setOf(FireClearOption.DUCKAI_CHATS))
+        configureProfileSwitchingUnavailable()
 
         testee.clearDataUsingManualFireOptions(shouldRestartIfRequired = true, wasAppUsedSinceLastClear = false)
 
         verify(mockClearDataAction).clearDuckAiChatsOnly()
         verify(mockClearDataAction).setAppUsedSinceLastClearFlag(false)
+        verify(mockClearDataAction).killAndRestartProcess(notifyDataCleared = false)
+    }
+
+    @Test
+    fun whenManualClearWithDataAndShouldRestartProcess_andProfileSwitchAvailable_thenResetTabsWithoutClear() = runTest {
+        configureManualOptions(setOf(FireClearOption.DATA))
+        configureProfileSwitchingSuccessful()
+
+        testee.clearDataUsingManualFireOptions(shouldRestartIfRequired = true, wasAppUsedSinceLastClear = false)
+
+        verify(mockClearDataAction).clearBrowserDataOnly(true)
+        verify(mockClearDataAction).setAppUsedSinceLastClearFlag(false)
+        verify(mockWebViewProfileManager).switchToNewProfile()
+        verify(mockClearDataAction).resetTabsForProfileSwitch(clearTabs = false)
+        verify(mockClearDataAction, never()).killAndRestartProcess(any(), any())
+    }
+
+    @Test
+    fun whenManualClearWithTabsAndDataAndShouldRestartProcess_andProfileSwitchAvailable_thenResetTabsWithClear() = runTest {
+        configureManualOptions(setOf(FireClearOption.TABS, FireClearOption.DATA))
+        configureProfileSwitchingSuccessful()
+
+        testee.clearDataUsingManualFireOptions(shouldRestartIfRequired = true, wasAppUsedSinceLastClear = false)
+
+        verify(mockClearDataAction).clearTabsOnly()
+        verify(mockClearDataAction).clearBrowserDataOnly(true)
+        verify(mockClearDataAction).setAppUsedSinceLastClearFlag(false)
+        verify(mockWebViewProfileManager).switchToNewProfile()
+        verify(mockClearDataAction).resetTabsForProfileSwitch(clearTabs = true)
+        verify(mockClearDataAction, never()).killAndRestartProcess(any(), any())
+    }
+
+    @Test
+    fun whenManualClearWithDuckAiChatsAndShouldRestartProcess_andProfileSwitchAvailable_thenResetTabsWithoutClear() = runTest {
+        configureManualOptions(setOf(FireClearOption.DUCKAI_CHATS))
+        configureProfileSwitchingSuccessful()
+
+        testee.clearDataUsingManualFireOptions(shouldRestartIfRequired = true, wasAppUsedSinceLastClear = false)
+
+        verify(mockClearDataAction).clearDuckAiChatsOnly()
+        verify(mockClearDataAction).setAppUsedSinceLastClearFlag(false)
+        verify(mockWebViewProfileManager).switchToNewProfile()
+        verify(mockClearDataAction).resetTabsForProfileSwitch(clearTabs = false)
+        verify(mockClearDataAction, never()).killAndRestartProcess(any(), any())
+    }
+
+    @Test
+    fun whenManualClearWithDataAndShouldRestartProcess_andProfileSwitchFails_thenFallbackToRestartProcess() = runTest {
+        configureManualOptions(setOf(FireClearOption.DATA))
+        configureProfileSwitchingFailed()
+
+        testee.clearDataUsingManualFireOptions(shouldRestartIfRequired = true, wasAppUsedSinceLastClear = false)
+
+        verify(mockClearDataAction).clearBrowserDataOnly(true)
+        verify(mockClearDataAction).setAppUsedSinceLastClearFlag(false)
+        verify(mockWebViewProfileManager).switchToNewProfile()
+        verify(mockClearDataAction, never()).resetTabsForProfileSwitch(any())
         verify(mockClearDataAction).killAndRestartProcess(notifyDataCleared = false)
     }
 
@@ -547,5 +612,19 @@ class DataClearingTest {
                 eq(clearWhenOption),
             ),
         ).thenReturn(enoughTimePassed)
+    }
+
+    private suspend fun configureProfileSwitchingUnavailable() {
+        whenever(mockWebViewProfileManager.isProfileSwitchingAvailable()).thenReturn(false)
+    }
+
+    private suspend fun configureProfileSwitchingSuccessful() {
+        whenever(mockWebViewProfileManager.isProfileSwitchingAvailable()).thenReturn(true)
+        whenever(mockWebViewProfileManager.switchToNewProfile()).thenReturn(true)
+    }
+
+    private suspend fun configureProfileSwitchingFailed() {
+        whenever(mockWebViewProfileManager.isProfileSwitchingAvailable()).thenReturn(true)
+        whenever(mockWebViewProfileManager.switchToNewProfile()).thenReturn(false)
     }
 }

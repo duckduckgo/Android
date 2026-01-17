@@ -282,7 +282,9 @@ class NonGranularFireDialog : BottomSheetDialogFragment(), FireDialog {
                 binding.fireAnimationView.addAnimatorUpdateListener(accelerateAnimatorUpdateListener)
             }
         } else {
-            clearDataAction.killAndRestartProcess(notifyDataCleared = false, enableTransitionAnimation = false)
+            // DataClearing handles the restart/profile switch logic,
+            // so we just dismiss the dialog
+            dismiss()
         }
     }
 

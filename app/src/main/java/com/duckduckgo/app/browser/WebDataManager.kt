@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.browser
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.webkit.WebStorage
 import android.webkit.WebView

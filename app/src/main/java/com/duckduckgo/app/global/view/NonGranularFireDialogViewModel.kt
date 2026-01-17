@@ -124,7 +124,7 @@ class NonGranularFireDialogViewModel @Inject constructor(
             withContext(dispatcherProvider.io()) {
                 fireButtonStore.incrementFireButtonUseCount()
                 userEventsStore.registerUserEvent(UserEventKey.FIRE_BUTTON_EXECUTED)
-                dataClearing.clearDataUsingManualFireOptions()
+                dataClearing.clearDataUsingManualFireOptions(shouldRestartIfRequired = true)
             }
 
             command.send(Command.ClearingComplete)

@@ -26,6 +26,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
+import com.duckduckgo.app.browser.webview.profile.WebViewProfileManager
 import com.duckduckgo.app.fire.store.FireDataStore
 import com.duckduckgo.app.global.ApplicationClearDataState
 import com.duckduckgo.app.global.ApplicationClearDataState.FINISHED
@@ -75,6 +76,7 @@ class AutomaticDataClearer @Inject constructor(
     private val dataClearerForegroundAppRestartPixel: DataClearerForegroundAppRestartPixel,
     private val dispatchers: DispatcherProvider,
     private val fireDataStore: FireDataStore,
+    private val webViewProfileManager: WebViewProfileManager,
 ) : DataClearer, BrowserLifecycleObserver, CoroutineScope {
 
     private val clearJob: Job = Job()
@@ -102,6 +104,14 @@ class AutomaticDataClearer @Inject constructor(
         logcat { "onAppForegrounded; is from fresh app launch? $isFreshAppLaunch" }
 
         workManager.cancelAllWorkByTag(DataClearingWorker.WORK_REQUEST_TAG)
+
+        // Initialize WebView profile manager on app foreground
+        webViewProfileManager.initialize()
+
+        // Clean up stale profiles on fresh app launch
+        if (isFreshAppLaunch) {
+            webViewProfileManager.cleanupStaleProfiles()
+        }
 
         withContext(dispatchers.io()) {
             val appUsedSinceLastClear = settingsDataStore.appUsedSinceLastClear
