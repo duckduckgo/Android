@@ -38,20 +38,65 @@
             android:paddingTop="@dimen/keyline_4"
             android:paddingBottom="@dimen/keyline_5">
 
-            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
-                android:id="@+id/automaticallyClearWhatSetting"
+            <!-- Master Toggle -->
+            <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+                android:id="@+id/automaticClearingToggle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:primaryText="@string/settingsAutomaticallyClearData"
-                app:primaryTextTruncated="false"
-                tools:secondaryText="Tabs and data" />
+                app:primaryText="@string/dataClearingAutomaticallyClearDataToggle"
+                app:showSwitch="true" />
 
-            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
-                android:id="@+id/automaticallyClearWhenSetting"
+            <!-- Options Container (shown/hidden based on master toggle) -->
+            <LinearLayout
+                android:id="@+id/optionsContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:primaryText="@string/settingsAutomaticallyClearWhen"
-                tools:secondaryText="App exit only" />
+                android:orientation="vertical">
+
+                <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <!-- Tabs Toggle -->
+                <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                    android:id="@+id/clearTabsSetting"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:primaryText="@string/dataClearingOptionTabs"
+                    app:secondaryText="@string/dataClearingAutomaticTabsOptionDescription"
+                    app:showSwitch="true" />
+
+                <!-- Cookies and Site Data Toggle -->
+                <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                    android:id="@+id/clearDataSetting"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:primaryText="@string/dataClearingOptionData"
+                    app:secondaryText="@string/dataClearingAutomaticDataOptionDescription"
+                    app:showSwitch="true" />
+
+                <!-- Duck.ai Chats Toggle -->
+                <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                    android:id="@+id/clearDuckAiChatsSetting"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:primaryText="@string/dataClearingDuckAiChats"
+                    app:secondaryText="@string/dataClearingAutomaticChatsOptionDescription"
+                    app:showSwitch="true" />
+
+                <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <!-- Clear On... Setting -->
+                <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                    android:id="@+id/clearWhenSetting"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:primaryText="@string/settingsAutomaticallyClearWhen"
+                    tools:secondaryText="App exit only" />
+
+            </LinearLayout>
 
         </LinearLayout>
     </ScrollView>
