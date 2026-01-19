@@ -395,7 +395,7 @@ class DuckChatContextualFragment : DuckDuckGoFragment(R.layout.fragment_contextu
                 }
 
                 override fun afterTextChanged(text: Editable?) {
-                    binding.duckAiContextualSend.isEnabled = text.toString().isEmpty()
+                    binding.duckAiContextualSend.isEnabled = !text.toString().isEmpty()
                 }
             },
         )
@@ -417,6 +417,7 @@ class DuckChatContextualFragment : DuckDuckGoFragment(R.layout.fragment_contextu
             binding.duckAiContextualAddAttachment.show()
         }
         binding.duckAiContextualAddAttachment.setOnClickListener {
+            binding.duckAiContextualAddAttachment.gone()
             binding.duckAiContextualLayout.show()
         }
         binding.contextualPromptSummarize.setOnClickListener {
