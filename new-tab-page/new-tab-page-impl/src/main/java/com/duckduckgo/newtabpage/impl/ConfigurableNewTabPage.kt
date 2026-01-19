@@ -22,7 +22,7 @@ import com.duckduckgo.anvil.annotations.ContributesActivePlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 import com.duckduckgo.newtabpage.api.NewTabPagePlugin
-import com.duckduckgo.newtabpage.impl.view.NewTabPageView
+import com.duckduckgo.newtabpage.impl.view.ConfigurableNewTabPageView
 import javax.inject.Inject
 
 @ContributesActivePlugin(
@@ -33,13 +33,13 @@ import javax.inject.Inject
     supportExperiments = true,
     internalAlwaysEnabled = false,
 )
-class NewTabPage @Inject constructor() : NewTabPagePlugin {
+class ConfigurableNewTabPage @Inject constructor() : NewTabPagePlugin {
 
     override fun getView(
         context: Context,
         showLogo: Boolean,
         onHasContent: ((Boolean) -> Unit)?,
     ): View {
-        return NewTabPageView(context, showLogo = showLogo, onHasContent = onHasContent)
+        return ConfigurableNewTabPageView(context, showLogo = showLogo, onHasContent = onHasContent)
     }
 }

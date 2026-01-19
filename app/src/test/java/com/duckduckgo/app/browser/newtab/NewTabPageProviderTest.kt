@@ -79,7 +79,7 @@ class NewTabPageProviderTest {
 
         testee.provideNewTabPageVersion().test {
             expectMostRecentItem().also {
-                assertTrue(it is NewTabLegacyPage)
+                assertTrue(it is NewTabPage)
             }
         }
     }
