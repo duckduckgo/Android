@@ -494,19 +494,17 @@ class PirEndToEndTest {
         println("==========STEP 6: Verify all scan and opt-out pixels fired ==========")
         // Scan pixels
         assertPixelsWereFired(
-            PirPixel.PIR_INTERNAL_MANUAL_SCAN_STARTED,
-            PirPixel.PIR_INTERNAL_SCAN_STATS,
+            PirPixel.PIR_FOREGROUND_RUN_STARTED,
             PirPixel.PIR_SCAN_STARTED,
             PirPixel.PIR_SCAN_STAGE,
             PirPixel.PIR_SCAN_STAGE_RESULT_MATCHES,
-            PirPixel.PIR_INTERNAL_MANUAL_SCAN_COMPLETED,
+            PirPixel.PIR_FOREGROUND_RUN_COMPLETED,
+            PirPixel.PIR_INITIAL_SCAN_DURATION,
         )
 
         // Opt-out pixels
         assertPixelsWereFired(
-            PirPixel.PIR_INTERNAL_SCAN_STATS,
             PirPixel.PIR_OPTOUT_STAGE_START,
-            PirPixel.PIR_INTERNAL_BROKER_OPT_OUT_STARTED,
             PirPixel.PIR_OPTOUT_STAGE_FILLFORM,
             PirPixel.PIR_OPTOUT_STAGE_CAPTCHA_PARSE,
             PirPixel.PIR_OPTOUT_STAGE_CAPTCHA_SEND,
@@ -562,6 +560,7 @@ class PirEndToEndTest {
             PirPixel.PIR_EMAIL_CONFIRMATION_LINK_RECEIVED,
             PirPixel.PIR_EMAIL_CONFIRMATION_ATTEMPT_START,
             PirPixel.PIR_EMAIL_CONFIRMATION_ATTEMPT_SUCCESS,
+            PirPixel.PIR_OPTOUT_SUBMIT_SUCCESS,
             PirPixel.PIR_EMAIL_CONFIRMATION_JOB_SUCCESS,
             PirPixel.PIR_EMAIL_CONFIRMATION_RUN_COMPLETED,
         )
@@ -580,7 +579,7 @@ class PirEndToEndTest {
         fakeTimeProvider.advanceByHours(73)
 
         // Run confirmation scan
-        val confirmationResult = pirJobsRunner.runEligibleJobs(context, PirExecutionType.MANUAL)
+        val confirmationResult = pirJobsRunner.runEligibleJobs(context, PirExecutionType.SCHEDULED)
         assertTrue("Confirmation scan should succeed", confirmationResult.isSuccess)
 
         // Verify navigate actions were pushed for active broker only
@@ -615,12 +614,11 @@ class PirEndToEndTest {
 
         // Verify confirmation scan pixels fired
         assertPixelsWereFired(
-            PirPixel.PIR_INTERNAL_MANUAL_SCAN_STARTED,
-            PirPixel.PIR_INTERNAL_SCAN_STATS,
+            PirPixel.PIR_SCHEDULED_RUN_STARTED,
             PirPixel.PIR_SCAN_STARTED,
             PirPixel.PIR_SCAN_STAGE,
             PirPixel.PIR_SCAN_STAGE_RESULT_MATCHES,
-            PirPixel.PIR_INTERNAL_MANUAL_SCAN_COMPLETED,
+            PirPixel.PIR_SCHEDULED_RUN_COMPLETED,
         )
     }
 
@@ -686,8 +684,8 @@ class PirEndToEndTest {
 
         // Verify scan completion pixels were fired (indicating graceful completion)
         assertPixelsWereFired(
-            PirPixel.PIR_INTERNAL_MANUAL_SCAN_STARTED,
-            PirPixel.PIR_INTERNAL_MANUAL_SCAN_COMPLETED,
+            PirPixel.PIR_FOREGROUND_RUN_STARTED,
+            PirPixel.PIR_FOREGROUND_RUN_COMPLETED,
         )
     }
 
@@ -777,8 +775,8 @@ class PirEndToEndTest {
 
         // Verify scan completion pixels were fired (indicating graceful completion)
         assertPixelsWereFired(
-            PirPixel.PIR_INTERNAL_MANUAL_SCAN_STARTED,
-            PirPixel.PIR_INTERNAL_MANUAL_SCAN_COMPLETED,
+            PirPixel.PIR_FOREGROUND_RUN_STARTED,
+            PirPixel.PIR_FOREGROUND_RUN_COMPLETED,
         )
     }
 

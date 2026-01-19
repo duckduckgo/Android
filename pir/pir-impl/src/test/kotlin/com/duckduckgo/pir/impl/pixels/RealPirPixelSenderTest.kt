@@ -116,22 +116,6 @@ class RealPirPixelSenderTest {
     }
 
     @Test
-    fun whenReportOptOutStartedThenFiresPixelWithBrokerName() = runTest {
-        testee.reportOptOutStarted("test-broker")
-
-        val paramsCaptor = argumentCaptor<Map<String, String>>()
-        verify(mockPixelSender).fire(
-            pixelName = any(),
-            parameters = paramsCaptor.capture(),
-            encodedParameters = any(),
-            type = any(),
-        )
-
-        assert(paramsCaptor.firstValue.containsKey("brokerName"))
-        assert(paramsCaptor.firstValue["brokerName"] == "test-broker")
-    }
-
-    @Test
     fun whenReportOptOutSubmittedThenFiresPixelWithAllParameters() = runTest {
         testee.reportOptOutSubmitted(
             brokerUrl = "https://broker.com",
@@ -216,36 +200,6 @@ class RealPirPixelSenderTest {
         assert(params["pattern"] == "pattern-xyz")
         assert(params["action_id"] == "action-1")
         assert(params["action_type"] == "fillform")
-    }
-
-    @Test
-    fun whenReportScanStatsThenFiresPixelWithTotalScanCount() = runTest {
-        testee.reportScanStats(25)
-
-        val paramsCaptor = argumentCaptor<Map<String, String>>()
-        verify(mockPixelSender).fire(
-            pixelName = any(),
-            parameters = paramsCaptor.capture(),
-            encodedParameters = any(),
-            type = any(),
-        )
-
-        assert(paramsCaptor.firstValue["totalScanToRun"] == "25")
-    }
-
-    @Test
-    fun whenReportOptOutStatsThenFiresPixelWithTotalOptOutCount() = runTest {
-        testee.reportOptOutStats(15)
-
-        val paramsCaptor = argumentCaptor<Map<String, String>>()
-        verify(mockPixelSender).fire(
-            pixelName = any(),
-            parameters = paramsCaptor.capture(),
-            encodedParameters = any(),
-            type = any(),
-        )
-
-        assert(paramsCaptor.firstValue["totalOptOutToRun"] == "15")
     }
 
     @Test

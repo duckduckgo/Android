@@ -563,6 +563,7 @@ class BrokerStepCompletedEventHandlerTest {
                 currentStage = PirStage.OTHER,
                 stageStartMs = testStageStartMs,
             ),
+            attemptId = "attempt-123",
         )
         val event = BrokerStepCompleted(
             needsEmailConfirmation = false,
@@ -577,7 +578,9 @@ class BrokerStepCompletedEventHandlerTest {
         assertEquals(true, capturedState.firstValue.isSuccess)
         assertEquals("action-2", capturedState.firstValue.lastActionId)
         assertEquals(testCurrentTimeInMillis - testBrokerStartTime, capturedState.firstValue.totalTimeMillis)
-        assertEquals(456L, capturedState.firstValue.extractedProfileId)
+        assertEquals(testExtractedProfile, capturedState.firstValue.extractedProfile)
+        assertEquals("", capturedState.firstValue.emailPattern)
+        assertEquals("attempt-123", capturedState.firstValue.attemptId)
     }
 
     @Test
