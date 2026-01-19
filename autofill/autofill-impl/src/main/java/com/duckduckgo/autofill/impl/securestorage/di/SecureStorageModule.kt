@@ -18,7 +18,6 @@ package com.duckduckgo.autofill.impl.securestorage.di
 
 import android.content.Context
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.impl.securestorage.DerivedKeySecretFactory
 import com.duckduckgo.autofill.impl.securestorage.RealDerivedKeySecretFactory
 import com.duckduckgo.autofill.store.RealSecureStorageKeyRepository
@@ -43,10 +42,9 @@ object SecureStorageModule {
         context: Context,
         @AppCoroutineScope coroutineScope: CoroutineScope,
         dispatcherProvider: DispatcherProvider,
-        autofillFeature: AutofillFeature,
     ): SecureStorageKeyRepository =
         RealSecureStorageKeyRepository(
-            RealSecureStorageKeyStore(context, coroutineScope, dispatcherProvider, autofillFeature),
+            RealSecureStorageKeyStore(context, coroutineScope, dispatcherProvider),
         )
 }
 
