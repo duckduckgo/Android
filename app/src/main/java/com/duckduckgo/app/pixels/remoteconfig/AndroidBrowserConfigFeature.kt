@@ -240,13 +240,22 @@ interface AndroidBrowserConfigFeature {
     fun shorterUrlDefault(): Toggle
 
     /**
-     * Controls the fire dialog and data clearing options.
-     * @return `true` when the remote config has the global "moreGranularDataClearingOptions" androidBrowserConfig
+     * Controls the automatic data clearing options, which allows to specify granular automatic clearing options.
+     * @return `true` when the remote config has the global "improvedDataClearingOptions" androidBrowserConfig
      * sub-feature flag enabled
      * If the remote feature is not present defaults to `false`
      */
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
-    fun moreGranularDataClearingOptions(): Toggle
+    fun improvedDataClearingOptions(): Toggle
+
+    /**
+     * Controls the fire dialog and data clearing options.
+     * @return `true` when the remote config has the global "granularFireDialog" androidBrowserConfig
+     * sub-feature flag enabled
+     * If the remote feature is not present defaults to `false`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun granularFireDialog(): Toggle
 
     /**
      * Controls the experimental browsing menu in appearance settings.

@@ -112,10 +112,10 @@ class ClearDataNotificationTest {
     }
 
     private fun givenFeatureFlagEnabled() {
-        androidBrowserConfigFeature.moreGranularDataClearingOptions().setRawStoredState(Toggle.State(true))
+        androidBrowserConfigFeature.improvedDataClearingOptions().setRawStoredState(Toggle.State(true))
     }
 
     private fun givenFeatureFlagDisabled() {
-        androidBrowserConfigFeature.moreGranularDataClearingOptions().setRawStoredState(Toggle.State(false))
+        androidBrowserConfigFeature.improvedDataClearingOptions().setRawStoredState(Toggle.State(false))
     }
 }

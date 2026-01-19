@@ -770,11 +770,11 @@ class AutomaticDataClearerTest {
     }
 
     private fun enableGranularFeature() {
-        fakeAndroidBrowserConfigFeature.moreGranularDataClearingOptions().setRawStoredState(State(true))
+        fakeAndroidBrowserConfigFeature.improvedDataClearingOptions().setRawStoredState(State(true))
     }
 
     private fun disableGranularFeature() {
-        fakeAndroidBrowserConfigFeature.moreGranularDataClearingOptions().setRawStoredState(State(false))
+        fakeAndroidBrowserConfigFeature.improvedDataClearingOptions().setRawStoredState(State(false))
     }
 
     private suspend fun configureShouldClearAutomatically(shouldClear: Boolean) {

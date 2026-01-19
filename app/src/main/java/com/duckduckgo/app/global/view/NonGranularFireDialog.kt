@@ -33,33 +33,27 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat.Type
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.updatePadding
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.airbnb.lottie.RenderMode
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.databinding.SheetFireClearDataBinding
-import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.firebutton.FireButtonStore
-import com.duckduckgo.app.global.events.db.UserEventKey
-import com.duckduckgo.app.global.events.db.UserEventsStore
-import com.duckduckgo.app.pixels.AppPixelName
-import com.duckduckgo.app.pixels.AppPixelName.FIRE_DIALOG_ANIMATION
-import com.duckduckgo.app.pixels.AppPixelName.FIRE_DIALOG_CLEAR_PRESSED
-import com.duckduckgo.app.pixels.AppPixelName.PRODUCT_TELEMETRY_SURFACE_DATA_CLEARING
-import com.duckduckgo.app.settings.clear.getPixelValue
+import com.duckduckgo.app.global.view.NonGranularFireDialogViewModel.Command
 import com.duckduckgo.app.settings.db.SettingsDataStore
-import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_ANIMATION
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.setAndPropagateUpFitsSystemWindows
 import com.duckduckgo.common.ui.view.show
-import com.duckduckgo.common.utils.DateProvider
-import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.di.scopes.FragmentScope
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.android.support.AndroidSupportInjection
-import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import com.duckduckgo.mobile.android.R as CommonR
@@ -68,35 +62,22 @@ import com.google.android.material.R as MaterialR
 private const val ANIMATION_MAX_SPEED = 1.4f
 private const val ANIMATION_SPEED_INCREMENT = 0.15f
 
+/**
+ * Non-granular Fire dialog with simple 2-button layout (Clear All and Cancel).
+ */
 @InjectWith(FragmentScope::class)
-class LegacyFireDialog : BottomSheetDialogFragment(), FireDialog {
-    @AppCoroutineScope
-    @Inject
-    lateinit var appCoroutineScope: CoroutineScope
+class NonGranularFireDialog : BottomSheetDialogFragment(), FireDialog {
+    @Inject lateinit var settingsDataStore: SettingsDataStore
 
-    @Inject
-    lateinit var clearDataAction: ClearDataAction
+    @Inject lateinit var appBuildConfig: AppBuildConfig
 
-    @Inject
-    lateinit var pixel: Pixel
+    @Inject lateinit var clearDataAction: ClearDataAction
 
-    @Inject
-    lateinit var settingsDataStore: SettingsDataStore
+    @Inject lateinit var viewModelFactory: FragmentViewModelFactory
 
-    @Inject
-    lateinit var userEventsStore: UserEventsStore
-
-    @Inject
-    lateinit var dispatcherProvider: DispatcherProvider
-
-    @Inject
-    lateinit var fireButtonStore: FireButtonStore
-
-    @Inject
-    lateinit var appBuildConfig: AppBuildConfig
-
-    @Inject
-    lateinit var dateProvider: DateProvider
+    private val viewModel: NonGranularFireDialogViewModel by lazy {
+        ViewModelProvider(this, viewModelFactory)[NonGranularFireDialogViewModel::class.java]
+    }
 
     private var _binding: SheetFireClearDataBinding? = null
     private val binding get() = _binding!!
@@ -135,14 +116,11 @@ class LegacyFireDialog : BottomSheetDialogFragment(), FireDialog {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        if (savedInstanceState == null) {
-            pixel.enqueueFire(AppPixelName.FIRE_DIALOG_SHOWN)
-        }
-
-        canRestart = !animationEnabled()
+        canRestart = !isAnimationEnabled()
 
         setupLayout()
         configureBottomSheet()
+        observeViewModel()
 
         if (appBuildConfig.sdkInt == 26) {
             dialog?.window?.navigationBarColor = ContextCompat.getColor(requireContext(), CommonR.color.translucentDark)
@@ -153,29 +131,19 @@ class LegacyFireDialog : BottomSheetDialogFragment(), FireDialog {
         removeTopPadding()
         addBottomPaddingToButtons()
 
-        if (animationEnabled()) {
+        if (isAnimationEnabled()) {
             configureFireAnimationView()
         }
     }
 
     override fun onStart() {
         super.onStart()
-        parentFragmentManager.setFragmentResult(
-            FireDialog.REQUEST_KEY,
-            Bundle().apply {
-                putString(FireDialog.RESULT_KEY_EVENT, FireDialog.EVENT_ON_SHOW)
-            },
-        )
+        viewModel.onShow()
     }
 
     override fun onCancel(dialog: DialogInterface) {
         super.onCancel(dialog)
-        parentFragmentManager.setFragmentResult(
-            FireDialog.REQUEST_KEY,
-            Bundle().apply {
-                putString(FireDialog.RESULT_KEY_EVENT, FireDialog.EVENT_ON_CANCEL)
-            },
-        )
+        viewModel.onCancel()
     }
 
     override fun onDestroyView() {
@@ -184,30 +152,66 @@ class LegacyFireDialog : BottomSheetDialogFragment(), FireDialog {
     }
 
     private fun setupLayout() {
-        binding.apply {
-            clearAllOption.setOnClickListener {
-                onClearOptionClicked()
-            }
-            cancelOption.setOnClickListener {
-                parentFragmentManager.setFragmentResult(
-                    FireDialog.REQUEST_KEY,
-                    Bundle().apply {
-                        putString(FireDialog.RESULT_KEY_EVENT, FireDialog.EVENT_ON_CANCEL)
-                    },
-                )
-                dismiss()
-            }
-
-            if (settingsDataStore.clearDuckAiData) {
-                clearAllOption.setPrimaryText(requireContext().getString(com.duckduckgo.app.browser.R.string.fireClearAllPlusDuckChats))
-            }
+        binding.clearAllOption.setOnClickListener {
+            hideClearDataOptions()
+            viewModel.onDeleteClicked()
+        }
+        binding.cancelOption.setOnClickListener {
+            viewModel.onCancel()
         }
     }
 
     private fun configureBottomSheet() {
-        (dialog as? BottomSheetDialog)?.behavior?.apply {
-            state = BottomSheetBehavior.STATE_EXPANDED
+        (dialog as? BottomSheetDialog)?.behavior?.state = BottomSheetBehavior.STATE_EXPANDED
+    }
+
+    private fun observeViewModel() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.viewState.collect { render(it) }
+            }
         }
+
+        viewModel.commands()
+            .onEach { handleCommand(it) }
+            .launchIn(viewLifecycleOwner.lifecycleScope)
+    }
+
+    private fun handleCommand(command: Command) {
+        when (command) {
+            is Command.PlayAnimation -> {
+                if (isAnimationEnabled()) {
+                    playAnimation()
+                } else {
+                    // Animation was enabled when dialog opened but is now disabled.
+                    // Update canRestart so ClearingComplete can complete the flow.
+                    canRestart = true
+                }
+            }
+            is Command.ClearingComplete -> onClearAllEvent(ClearAllEvent.ClearingFinished)
+            is Command.OnShow -> sendFragmentResult(FireDialog.EVENT_ON_SHOW)
+            is Command.OnCancel -> {
+                sendFragmentResult(FireDialog.EVENT_ON_CANCEL)
+                dismiss()
+            }
+            is Command.OnClearStarted -> sendFragmentResult(FireDialog.EVENT_ON_CLEAR_STARTED)
+        }
+    }
+
+    private fun sendFragmentResult(event: String) {
+        parentFragmentManager.setFragmentResult(
+            FireDialog.REQUEST_KEY,
+            Bundle().apply { putString(FireDialog.RESULT_KEY_EVENT, event) },
+        )
+    }
+
+    private fun render(state: NonGranularFireDialogViewModel.ViewState) {
+        val textRes = if (state.isDuckAiChatsSelected) {
+            com.duckduckgo.app.browser.R.string.fireClearAllPlusDuckChats
+        } else {
+            com.duckduckgo.app.browser.R.string.fireClearAll
+        }
+        binding.clearAllOption.setPrimaryText(requireContext().getString(textRes))
     }
 
     private fun removeTopPadding() {
@@ -237,41 +241,9 @@ class LegacyFireDialog : BottomSheetDialogFragment(), FireDialog {
         }
     }
 
-    private fun onClearOptionClicked() {
-        trySendDailyClearOptionClicked()
-        pixel.enqueueFire(FIRE_DIALOG_CLEAR_PRESSED)
-        pixel.enqueueFire(PRODUCT_TELEMETRY_SURFACE_DATA_CLEARING)
-        pixel.enqueueFire(
-            pixel = FIRE_DIALOG_ANIMATION,
-            parameters = mapOf(FIRE_ANIMATION to settingsDataStore.selectedFireAnimation.getPixelValue()),
-        )
-        hideClearDataOptions()
-        if (animationEnabled()) {
-            playAnimation()
-        } else {
-            // Animation was enabled when dialog opened but is now disabled.
-            // Update canRestart so ClearAllDataFinished can complete the flow.
-            canRestart = true
-        }
-        parentFragmentManager.setFragmentResult(
-            FireDialog.REQUEST_KEY,
-            Bundle().apply {
-                putString(FireDialog.RESULT_KEY_EVENT, FireDialog.EVENT_ON_CLEAR_STARTED)
-            },
-        )
+    private fun isAnimationEnabled() = settingsDataStore.fireAnimationEnabled && isAnimatorDurationEnabled()
 
-        appCoroutineScope.launch(dispatcherProvider.io()) {
-            fireButtonStore.incrementFireButtonUseCount()
-            userEventsStore.registerUserEvent(UserEventKey.FIRE_BUTTON_EXECUTED)
-            clearDataAction.clearTabsAndAllDataAsync(appInForeground = true, shouldFireDataClearPixel = true)
-            clearDataAction.setAppUsedSinceLastClearFlag(false)
-            onFireDialogClearAllEvent(FireDialogClearAllEvent.ClearAllDataFinished)
-        }
-    }
-
-    private fun animationEnabled() = settingsDataStore.fireAnimationEnabled && animatorDurationEnabled()
-
-    private fun animatorDurationEnabled(): Boolean {
+    private fun isAnimatorDurationEnabled(): Boolean {
         val animatorScale = Settings.Global.getFloat(requireContext().contentResolver, ANIMATOR_DURATION_SCALE, 1.0f)
         return animatorScale != 0.0f
     }
@@ -292,7 +264,7 @@ class LegacyFireDialog : BottomSheetDialogFragment(), FireDialog {
                 override fun onAnimationCancel(animation: Animator) {}
                 override fun onAnimationStart(animation: Animator) {}
                 override fun onAnimationEnd(animation: Animator) {
-                    onFireDialogClearAllEvent(FireDialogClearAllEvent.AnimationFinished)
+                    onClearAllEvent(ClearAllEvent.AnimationFinished)
                 }
             },
         )
@@ -303,10 +275,10 @@ class LegacyFireDialog : BottomSheetDialogFragment(), FireDialog {
     }
 
     @Synchronized
-    private fun onFireDialogClearAllEvent(event: FireDialogClearAllEvent) {
+    private fun onClearAllEvent(event: ClearAllEvent) {
         if (!canRestart && _binding != null) {
             canRestart = true
-            if (event is FireDialogClearAllEvent.ClearAllDataFinished) {
+            if (event is ClearAllEvent.ClearingFinished) {
                 binding.fireAnimationView.addAnimatorUpdateListener(accelerateAnimatorUpdateListener)
             }
         } else {
@@ -314,24 +286,12 @@ class LegacyFireDialog : BottomSheetDialogFragment(), FireDialog {
         }
     }
 
-    private fun trySendDailyClearOptionClicked() {
-        val now = dateProvider.getUtcIsoLocalDate()
-        val timestamp = fireButtonStore.lastEventSendTime
-
-        if (timestamp == null || now > timestamp) {
-            fireButtonStore.storeLastFireButtonClearEventTime(now)
-            pixel.enqueueFire(AppPixelName.PRODUCT_TELEMETRY_SURFACE_DATA_CLEARING_DAILY)
-        }
-    }
-
-    private sealed class FireDialogClearAllEvent {
-        data object AnimationFinished : FireDialogClearAllEvent()
-        data object ClearAllDataFinished : FireDialogClearAllEvent()
+    private sealed class ClearAllEvent {
+        data object AnimationFinished : ClearAllEvent()
+        data object ClearingFinished : ClearAllEvent()
     }
 
     companion object {
-        fun newInstance(): LegacyFireDialog {
-            return LegacyFireDialog()
-        }
+        fun newInstance(): NonGranularFireDialog = NonGranularFireDialog()
     }
 }
