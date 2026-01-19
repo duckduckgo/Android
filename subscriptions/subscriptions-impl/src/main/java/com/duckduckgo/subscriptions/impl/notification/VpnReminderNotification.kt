@@ -14,22 +14,18 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.notification.vpnreminder
+package com.duckduckgo.subscriptions.impl.notification
 
 import android.app.PendingIntent
 import android.content.Context
 import android.os.Bundle
 import androidx.core.app.NotificationManagerCompat
-import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.notification.NotificationRegistrar
 import com.duckduckgo.app.notification.TaskStackBuilderFactory
-import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.notification.model.Channel
 import com.duckduckgo.app.notification.model.NotificationSpec
 import com.duckduckgo.app.notification.model.SchedulableNotification
 import com.duckduckgo.app.notification.model.SchedulableNotificationPlugin
-import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -39,6 +35,7 @@ import com.duckduckgo.networkprotection.api.NetworkProtectionScreens.NetworkProt
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.Subscriptions
+import com.duckduckgo.subscriptions.impl.R
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
@@ -48,7 +45,6 @@ import javax.inject.Inject
 
 class VpnReminderNotification @Inject constructor(
     private val context: Context,
-    private val notificationDao: NotificationDao,
     private val subscriptions: Subscriptions,
     private val networkProtectionState: NetworkProtectionState,
     private val dispatcherProvider: DispatcherProvider,
@@ -57,17 +53,13 @@ class VpnReminderNotification @Inject constructor(
     override val id = "com.duckduckgo.subscriptions.vpn.reminder"
 
     override suspend fun canShow(): Boolean {
-        if (notificationDao.exists(id)) {
-            return false
-        }
-
         return withContext(dispatcherProvider.io()) {
             // Only show if user has an active subscription and VPN is not yet enabled
             val subscriptionStatus = subscriptions.getSubscriptionStatus()
             val isSubscriptionActive = subscriptionStatus.isActive()
             val isVpnEnabled = networkProtectionState.isEnabled()
 
-            return@withContext !(!isSubscriptionActive || isVpnEnabled)
+            return@withContext isSubscriptionActive && !isVpnEnabled
         }
     }
 
@@ -93,17 +85,22 @@ class VpnReminderNotificationSpecification(context: Context) : NotificationSpec 
         name = R.string.vpnReminderNotificationChannelName,
         priority = NotificationManagerCompat.IMPORTANCE_DEFAULT,
     )
-    override val systemId = NotificationRegistrar.NotificationId.VpnReminder
+    override val systemId = NOTIFICATION_SYSTEM_ID
     override val name = "VPN Reminder"
     override val icon = com.duckduckgo.mobile.android.R.drawable.notification_logo
     override val title: String = context.getString(R.string.vpnReminderNotificationTitle)
     override val description: String = context.getString(R.string.vpnReminderNotificationDescription)
     override val launchButton: String? = null
     override val closeButton: String? = null
-    override val pixelSuffix = "vpn_reminder"
+    override val pixelSuffix = PIXEL_SUFFIX
     override val autoCancel = true
     override val bundle: Bundle = Bundle()
     override val color: Int = context.getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorAccentBlue)
+
+    companion object {
+        private const val NOTIFICATION_SYSTEM_ID = 111
+        private const val PIXEL_SUFFIX = "vpn_reminder"
+    }
 }
 
 @ContributesMultibinding(AppScope::class)
@@ -122,11 +119,11 @@ class VpnReminderNotificationPlugin @Inject constructor(
     }
 
     override fun onNotificationCancelled() {
-        pixel.fire(pixelName(AppPixelName.NOTIFICATION_CANCELLED.pixelName))
+        pixel.fire(pixelName(NOTIFICATION_CANCELLED_PIXEL))
     }
 
     override fun onNotificationShown() {
-        pixel.fire(pixelName(AppPixelName.NOTIFICATION_SHOWN.pixelName))
+        pixel.fire(pixelName(NOTIFICATION_SHOWN_PIXEL))
     }
 
     private fun pixelName(notificationType: String) = "${notificationType}_${getSpecification().pixelSuffix}"
@@ -147,5 +144,10 @@ class VpnReminderNotificationPlugin @Inject constructor(
             addNextIntentWithParentStack(intent)
             getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
         }
+    }
+
+    companion object {
+        private const val NOTIFICATION_SHOWN_PIXEL = "mnot_s"
+        private const val NOTIFICATION_CANCELLED_PIXEL = "mnot_c"
     }
 }

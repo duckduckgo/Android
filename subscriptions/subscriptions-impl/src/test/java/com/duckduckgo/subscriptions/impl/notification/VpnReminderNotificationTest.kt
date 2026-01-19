@@ -14,12 +14,9 @@
  * limitations under the License.
  */
 
-@file:Suppress("RemoveExplicitTypeArguments")
+package com.duckduckgo.subscriptions.impl.notification
 
-package com.duckduckgo.app.notification.vpnreminder
-
-import androidx.test.platform.app.InstrumentationRegistry
-import com.duckduckgo.app.notification.db.NotificationDao
+import android.content.Context
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
@@ -31,7 +28,6 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
@@ -40,8 +36,7 @@ class VpnReminderNotificationTest {
     @get:Rule
     var coroutineRule = CoroutineTestRule()
 
-    private val context = InstrumentationRegistry.getInstrumentation().targetContext
-    private val notificationDao: NotificationDao = mock()
+    private val context: Context = mock()
     private val subscriptions: Subscriptions = mock()
     private val networkProtectionState: NetworkProtectionState = mock()
     private val dispatcherProvider: DispatcherProvider = coroutineRule.testDispatcherProvider
@@ -52,7 +47,6 @@ class VpnReminderNotificationTest {
     fun before() {
         testee = VpnReminderNotification(
             context,
-            notificationDao,
             subscriptions,
             networkProtectionState,
             dispatcherProvider,
@@ -60,15 +54,7 @@ class VpnReminderNotificationTest {
     }
 
     @Test
-    fun whenNotificationAlreadySeenThenCanShowIsFalse() = runTest {
-        whenever(notificationDao.exists(any())).thenReturn(true)
-
-        assertFalse(testee.canShow())
-    }
-
-    @Test
     fun whenSubscriptionActiveAndVpnDisabledThenCanShowIsTrue() = runTest {
-        whenever(notificationDao.exists(any())).thenReturn(false)
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.AUTO_RENEWABLE)
         whenever(networkProtectionState.isEnabled()).thenReturn(false)
 
@@ -77,7 +63,6 @@ class VpnReminderNotificationTest {
 
     @Test
     fun whenSubscriptionActiveAndVpnEnabledThenCanShowIsFalse() = runTest {
-        whenever(notificationDao.exists(any())).thenReturn(false)
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.AUTO_RENEWABLE)
         whenever(networkProtectionState.isEnabled()).thenReturn(true)
 
@@ -86,10 +71,25 @@ class VpnReminderNotificationTest {
 
     @Test
     fun whenSubscriptionNotActiveThenCanShowIsFalse() = runTest {
-        whenever(notificationDao.exists(any())).thenReturn(false)
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.EXPIRED)
         whenever(networkProtectionState.isEnabled()).thenReturn(false)
 
         assertFalse(testee.canShow())
+    }
+
+    @Test
+    fun whenSubscriptionInGracePeriodAndVpnDisabledThenCanShowIsTrue() = runTest {
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.GRACE_PERIOD)
+        whenever(networkProtectionState.isEnabled()).thenReturn(false)
+
+        assertTrue(testee.canShow())
+    }
+
+    @Test
+    fun whenSubscriptionNotAutoRenewableAndVpnDisabledThenCanShowIsTrue() = runTest {
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.NOT_AUTO_RENEWABLE)
+        whenever(networkProtectionState.isEnabled()).thenReturn(false)
+
+        assertTrue(testee.canShow())
     }
 }

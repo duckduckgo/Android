@@ -14,17 +14,32 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.notification.vpnreminder
+package com.duckduckgo.subscriptions.impl.notification
 
 import androidx.core.app.NotificationManagerCompat
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.subscriptions.api.VpnReminderNotificationScheduler
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+
+/**
+ * Scheduler for VPN reminder notifications during free trial.
+ */
+interface VpnReminderNotificationScheduler {
+    /**
+     * Schedules a VPN reminder notification for day 2 of the free trial.
+     * Should be called when the free trial starts.
+     */
+    suspend fun scheduleVpnReminderNotification()
+
+    /**
+     * Cancels any scheduled VPN reminder notifications.
+     */
+    fun cancelScheduledNotification()
+}
 
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)

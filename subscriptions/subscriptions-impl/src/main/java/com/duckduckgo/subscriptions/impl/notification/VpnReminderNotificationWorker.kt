@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.notification.vpnreminder
+package com.duckduckgo.subscriptions.impl.notification
 
 import android.content.Context
 import androidx.work.CoroutineWorker
