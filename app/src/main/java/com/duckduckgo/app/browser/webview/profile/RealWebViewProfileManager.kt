@@ -25,6 +25,7 @@ import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.webkit.ProfileStore
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability
+import com.duckduckgo.app.browser.api.WebViewProfileManager
 import com.duckduckgo.app.fire.FireproofRepository
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.common.utils.AppUrl

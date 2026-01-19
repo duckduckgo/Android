@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.webview.profile
+package com.duckduckgo.app.browser.api
 
 /**
  * Manages WebView profiles for data isolation between fire button uses.
