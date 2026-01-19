@@ -128,6 +128,18 @@ constructor(
         }
     }
 
+    /**
+     * The zxing library doesn't offer a way to define the scanning area independently
+     * from the visible scanner view. On small devices, to ensure a good scanning
+     * experience, we want to establish a minimum scanning area, so that a shorter
+     * scanner view doesn't limit the scanning area.
+     *
+     * Since we want to place additional views relative to the visible scanner view, we
+     * position them relative to a container that holds the scanning view. When the
+     * scanning area needs to be larger, we let the scanning view grow beyond the
+     * container bounds, with the overflow hidden.
+     */
+
     private fun setupExpandedScanningArea() {
         if (minScanningAreaHeight == MIN_SCANNING_AREA_HEIGHT_NOT_SET) return
         binding.barcodeContainer.doOnNextLayout {
