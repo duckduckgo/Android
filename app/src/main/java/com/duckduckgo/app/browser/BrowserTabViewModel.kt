@@ -3945,6 +3945,7 @@ class BrowserTabViewModel @Inject constructor(
             DUCK_CHAT_FEATURE_NAME -> {
                 viewModelScope.launch(dispatchers.io()) {
                     val response = duckChatJSHelper.processJsCallbackMessage(featureName, method, id, data)
+                    logcat { "Duck.ai: btf response $response" }
                     withContext(dispatchers.main()) {
                         response?.let {
                             command.value = SendResponseToJs(it)
@@ -4466,18 +4467,31 @@ class BrowserTabViewModel @Inject constructor(
             command.value = HideKeyboardForChat
         }
 
-        if (duckAiFeatureState.showFullScreenMode.value) {
-            val url = when {
-                hasFocus && isNtp && query.isNullOrBlank() -> duckChat.getDuckChatUrl(query ?: "", false)
-                hasFocus -> duckChat.getDuckChatUrl(query ?: "", true)
-                else -> duckChat.getDuckChatUrl(query ?: "", false)
+        if (!duckAiFeatureState.showInputScreen.value) {
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_LEGACY_OMNIBAR_AICHAT_BUTTON_PRESSED)
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_LEGACY_OMNIBAR_AICHAT_BUTTON_PRESSED_DAILY, type = Daily())
+        }
+
+        when {
+            duckAiFeatureState.showContextualMode.value && !isNtp -> {
+                command.value = Command.ShowDuckAIContextualMode
             }
-            onUserSubmittedQuery(url)
-        } else {
-            when {
-                hasFocus && isNtp && query.isNullOrBlank() -> duckChat.openDuckChat()
-                hasFocus -> duckChat.openDuckChatWithAutoPrompt(query ?: "")
-                else -> duckChat.openDuckChat()
+
+            duckAiFeatureState.showFullScreenMode.value -> {
+                val url = when {
+                    hasFocus && isNtp && query.isNullOrBlank() -> duckChat.getDuckChatUrl(query ?: "", false)
+                    hasFocus -> duckChat.getDuckChatUrl(query ?: "", true)
+                    else -> duckChat.getDuckChatUrl(query ?: "", false)
+                }
+                onUserSubmittedQuery(url)
+            }
+
+            else -> {
+                when {
+                    hasFocus && isNtp && query.isNullOrBlank() -> duckChat.openDuckChat()
+                    hasFocus -> duckChat.openDuckChatWithAutoPrompt(query ?: "")
+                    else -> duckChat.openDuckChat()
+                }
             }
         }
     }

@@ -15,11 +15,10 @@
   -->
 
 <resources>
-    <dimen name="inputScreenUserPrefToggleSpacing">16dp</dimen>
-    <dimen name="inputScreenOmnibarCardExtendedMarginHorizontal">@dimen/omnibarCardMarginHorizontal</dimen>
-    <dimen name="inputScreenOmnibarCardMarginHorizontal">4dp</dimen>
-    <dimen name="inputScreenMarginHorizontal">0dp</dimen>
-    <dimen name="inputScreenAutocompleteListBottomSpace">64dp</dimen>
-    <dimen name="inputScreenContentSeparatorHeight">0.5dp</dimen>
-    <dimen name="contextualBottomSheetTopOffset">80dp</dimen>
+
+    <!-- Duck.ai Contextual Bottom Sheet -->
+    <string name="duckAIContextualPromptSummarize">Summarize this Page</string>
+    <string name="duckAIContextualPromptExplain">Explain in simpler terms</string>
+    <string name="duckAIContextualPromptSuggest">Suggest related articles to explore</string>
+
 </resources>
