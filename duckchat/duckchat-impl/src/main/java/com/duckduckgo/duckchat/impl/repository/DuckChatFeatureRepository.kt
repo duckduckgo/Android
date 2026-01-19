@@ -39,11 +39,15 @@ interface DuckChatFeatureRepository {
 
     suspend fun setShowInVoiceSearch(showToggle: Boolean)
 
+    suspend fun setAutomaticPageContextAttachment(isEnabled: Boolean)
+
     fun observeDuckChatUserEnabled(): Flow<Boolean>
 
     fun observeInputScreenUserSettingEnabled(): Flow<Boolean>
 
     fun observeCosmeticInputScreenUserSettingEnabled(): Flow<Boolean?>
+
+    fun observeAutomaticContextAttachmentUserSettingEnabled(): Flow<Boolean>
 
     fun observeShowInBrowserMenu(): Flow<Boolean>
 
@@ -110,11 +114,18 @@ class RealDuckChatFeatureRepository @Inject constructor(
         duckChatDataStore.setShowInVoiceSearch(showToggle)
     }
 
+    override suspend fun setAutomaticPageContextAttachment(isEnabled: Boolean) {
+        duckChatDataStore.setAutomaticPageContextAttachment(isEnabled)
+    }
+
     override fun observeDuckChatUserEnabled(): Flow<Boolean> = duckChatDataStore.observeDuckChatUserEnabled()
 
     override fun observeInputScreenUserSettingEnabled(): Flow<Boolean> = duckChatDataStore.observeInputScreenUserSettingEnabled()
 
     override fun observeCosmeticInputScreenUserSettingEnabled(): Flow<Boolean?> = duckChatDataStore.observeCosmeticInputScreenUserSettingEnabled()
+
+    override fun observeAutomaticContextAttachmentUserSettingEnabled(): Flow<Boolean> =
+        duckChatDataStore.observeAutomaticContextAttachmentUserSettingEnabled()
 
     override fun observeShowInBrowserMenu(): Flow<Boolean> = duckChatDataStore.observeShowInBrowserMenu()
 

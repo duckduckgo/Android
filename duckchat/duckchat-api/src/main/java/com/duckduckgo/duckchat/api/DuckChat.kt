@@ -89,4 +89,9 @@ interface DuckChat {
      * Returns null if the cosmetic value has not been set before.
      */
     fun observeCosmeticInputScreenUserSettingEnabled(): Flow<Boolean?>
+
+    /**
+     * Observes the cosmetic value for the automatic context attachment for Contextual Mode
+     */
+    fun observeAutomaticContextAttachmentUserSettingEnabled(): Flow<Boolean>
 }
