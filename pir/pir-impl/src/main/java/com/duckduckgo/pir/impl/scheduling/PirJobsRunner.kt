@@ -93,16 +93,12 @@ class RealPirJobsRunner @Inject constructor(
 
         if (profileQueries.isEmpty()) {
             logcat { "PIR-JOB-RUNNER: No profile queries available. Completing run." }
-            pixelSender.reportScanStats(0)
-            pixelSender.reportOptOutStats(0)
             emitCompletedPixel(executionType, startTimeInMillis)
             return@withContext Result.success(Unit)
         }
 
         if (activeBrokers.isEmpty()) {
             logcat { "PIR-JOB-RUNNER: No active brokers available. Completing run." }
-            pixelSender.reportScanStats(0)
-            pixelSender.reportOptOutStats(0)
             emitCompletedPixel(executionType, startTimeInMillis)
             return@withContext Result.success(Unit)
         }
@@ -123,7 +119,6 @@ class RealPirJobsRunner @Inject constructor(
 
         if (activeFormOptOutBrokers.isEmpty()) {
             logcat { "PIR-JOB-RUNNER: No active parent brokers available for optout. Completing run." }
-            pixelSender.reportOptOutStats(0)
             emitCompletedPixel(executionType, startTimeInMillis)
             return@withContext Result.success(Unit)
         }
@@ -208,7 +203,6 @@ class RealPirJobsRunner @Inject constructor(
                     RunType.SCHEDULED
                 }
 
-                pixelSender.reportScanStats(it.size)
                 if (it.isNotEmpty()) {
                     logcat { "PIR-JOB-RUNNER: Executing scan for ${it.size} eligible scan jobs." }
                     pirScan.executeScanForJobs(it, context, runType)
@@ -253,7 +247,6 @@ class RealPirJobsRunner @Inject constructor(
             .filter {
                 activeFormOptOutBrokers.contains(it.brokerName)
             }.also {
-                pixelSender.reportOptOutStats(it.size)
                 if (it.isNotEmpty()) {
                     logcat { "PIR-JOB-RUNNER: Executing opt-outs for ${it.size} eligible optout jobs." }
                     pirOptOut.executeOptOutForJobs(it, context)

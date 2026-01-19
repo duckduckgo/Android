@@ -673,10 +673,6 @@ class RealPirRunStateHandler @Inject constructor(
             parentUrl = state.broker.parent.orEmpty(),
             attemptId = state.attemptId,
         )
-
-        pixelSender.reportOptOutStarted(
-            brokerName = state.broker.name,
-        )
     }
 
     private suspend fun handleBrokerRecordOptOutSubmitted(state: BrokerRecordOptOutSubmitted) {
