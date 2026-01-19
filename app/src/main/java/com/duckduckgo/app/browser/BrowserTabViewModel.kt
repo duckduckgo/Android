@@ -3803,6 +3803,7 @@ class BrowserTabViewModel @Inject constructor(
             omnibarViewState.value = currentOmnibarViewState().copy(
                 omnibarText = ABOUT_BLANK,
             )
+            pageChanged(ABOUT_BLANK, ABOUT_BLANK)
         }
     }
 
