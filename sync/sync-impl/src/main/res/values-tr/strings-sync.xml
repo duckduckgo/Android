@@ -34,6 +34,7 @@
     <string name="sync_setup_begin_syncing">Senkronizasyonu Başlat</string>
     <string name="sync_setup_with_another_device_cta_title">Başka Bir Cihazla Senkronize Et</string>
     <string name="sync_setup_with_another_device_cta_subtitle">Yer imlerini ve parolaları cihazlarınız arasında güvenli bir şekilde senkronize edin.</string>
+    <string name="sync_setup_with_another_device_cta_subtitle_with_ai_chat">Yer işaretleri, şifreler ve Duck.ai sohbetlerini cihazlarınız arasında güvenli bir şekilde senkronize edin.</string>
     <string name="sync_off_hint">Verileriniz uçtan uca şifrelenir ve DuckDuckGo\'nun şifreleme anahtarına erişimi yoktur.</string>
     <string name="sync_setup_single_device_title">Tek Cihaz Kurulumu</string>
     <string name="sync_setup_other_options_title">Diğer Seçenekler</string>
@@ -45,12 +46,14 @@
     <!-- Setup screen -->
     <string name="sync_enable_sync_title">Senkronizasyon ve Yedeklemeyi Ayarlama</string>
     <string name="sync_enable_sync_content">Yer imleriniz ve şifreler senkronize edilmek üzere hazırlanıyor. Bu sadece bir dakikanızı alacaktır.</string>
+    <string name="sync_enable_sync_content_with_ai_chat">Yer işaretleriniz, şifreleriniz ve Duck.ai sohbetleriniz senkronize edilmeye hazırlanıyor. Bu sadece bir dakikanızı alacaktır.</string>
     <string name="sync_enable_options">Seçenekler</string>
     <string name="sync_enable_option_favicons_title">Yer İşareti Simgelerini Getir</string>
     <string name="sync_enable_option_favicons_subtitle">Senkronize edilmiş yer imleri için simgeleri otomatik olarak indirin.</string>
     <string name="sync_enable_connecting">Bağlantı kuruluyor...</string>
     <string name="sync_intro_enable_title">Bu Cihazı Senkronize Et ve Yedekle</string>
     <string name="sync_intro_enable_content">Bu, DuckDuckGo\'nun güvenli sunucusunda yer işaretlerinizin ve parolalarınızın diğer cihazlarınızla senkronize edilebilen şifreli bir yedeğini oluşturur. \n\n Şifreleme anahtarı sadece cihazınızda saklanır, DuckDuckGo buna erişemez.</string>
+    <string name="sync_intro_enable_content_with_ai_chat">Bu işlem, yer işaretleri, şifreler ve Duck.ai sohbetlerinin şifrelenmiş bir yedeğini DuckDuckGo\'nun güvenli sunucusunda oluşturur ve bunlar diğer cihazlarınızla senkronize edilebilir. \n\n Şifreleme anahtarı sadece cihazınızda saklanır ve DuckDuckGo bu anahtara erişemez.</string>
     <string name="sync_intro_enable_footer">Daha sonra diğer cihazlarınızla senkronize edebilirsiniz.</string>
     <string name="sync_intro_enable_cta">Senkronizasyon ve Yedekleme\'yi açın</string>
     <string name="sync_intro_recover_title">Senkronize Edilen Verileri Kurtar</string>
