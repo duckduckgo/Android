@@ -867,8 +867,6 @@ class BrowserTabFragment :
 
     private var automaticFireproofDialog: DaxAlertDialog? = null
 
-    private var duckChatContextualSheet: DuckChatContextualFragment? = null
-
     private var webShareRequest =
         registerForActivityResult(WebShareChooser()) {
             contentScopeScripts.onResponse(it)

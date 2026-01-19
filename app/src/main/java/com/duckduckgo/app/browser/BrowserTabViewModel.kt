@@ -4478,7 +4478,6 @@ class BrowserTabViewModel @Inject constructor(
 
             duckAiFeatureState.showFullScreenMode.value -> {
                 val url = when {
-                    hasFocus && isNtp && query.isNullOrBlank() -> duckChat.getDuckChatUrl(query ?: "", false)
                     hasFocus -> duckChat.getDuckChatUrl(query ?: "", true)
                     else -> duckChat.getDuckChatUrl(query ?: "", false)
                 }
@@ -4487,7 +4486,6 @@ class BrowserTabViewModel @Inject constructor(
 
             else -> {
                 when {
-                    hasFocus && isNtp && query.isNullOrBlank() -> duckChat.openDuckChat()
                     hasFocus -> duckChat.openDuckChatWithAutoPrompt(query ?: "")
                     else -> duckChat.openDuckChat()
                 }
