@@ -378,7 +378,7 @@ class DuckChatContextualFragment : DuckDuckGoFragment(R.layout.fragment_contextu
         binding.inputField.setOnEditorActionListener(
             TextView.OnEditorActionListener { _, actionId, keyEvent ->
                 if (actionId == EditorInfo.IME_ACTION_GO || keyEvent?.keyCode == KeyEvent.KEYCODE_ENTER) {
-                    sendPrompt()
+                    sendPrompt(bottomSheetBehavior)
                     return@OnEditorActionListener true
                 }
                 false
@@ -400,7 +400,7 @@ class DuckChatContextualFragment : DuckDuckGoFragment(R.layout.fragment_contextu
             },
         )
         binding.duckAiContextualSend.setOnClickListener {
-            sendPrompt()
+            sendPrompt(bottomSheetBehavior)
         }
         binding.contextualFullScreen.setOnClickListener {
             logcat { "Duck.ai: fullscreen ${simpleWebview.url}" }
@@ -425,13 +425,14 @@ class DuckChatContextualFragment : DuckDuckGoFragment(R.layout.fragment_contextu
         }
     }
 
-    private fun sendPrompt() {
+    private fun sendPrompt(bottomSheetBehavior: BottomSheetBehavior<View>) {
         val prompt = binding.inputField.text.toString()
         hideKeyboard(binding.inputField)
         if (prompt.isNotEmpty()) {
             val url = duckChat.getDuckChatUrl(prompt, true)
             simpleWebview.loadUrl(url)
             showDuckChat()
+            bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
         }
     }
 
