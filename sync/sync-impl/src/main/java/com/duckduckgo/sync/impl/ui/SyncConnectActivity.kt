@@ -48,8 +48,10 @@ import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeView
 import com.duckduckgo.sync.impl.ui.setup.EnterCodeContract
 import com.duckduckgo.sync.impl.ui.setup.EnterCodeContract.EnterCodeContractOutput
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
@@ -72,36 +74,49 @@ class SyncConnectActivity : DuckDuckGoActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        binding = if (syncFeature.useExpandableBarcodeConnectSyncLayout().isEnabled()) {
-            val viewBinding = ActivityConnectSyncNewBinding.inflate(layoutInflater)
-            ConnectSyncBinding.NewBinding(viewBinding)
-        } else {
-            val viewBinding = ActivityConnectSyncBinding.inflate(layoutInflater)
-            ConnectSyncBinding.OldBinding(viewBinding)
-        }
+        lifecycleScope.launch {
+            syncFeature.useExpandableBarcodeConnectSyncLayout().enabled()
+                .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
+                .first()
+                .let { flag ->
+                    binding = if (flag) {
+                        val viewBinding = ActivityConnectSyncNewBinding.inflate(layoutInflater)
+                        ConnectSyncBinding.NewBinding(viewBinding)
+                    } else {
+                        val viewBinding = ActivityConnectSyncBinding.inflate(layoutInflater)
+                        ConnectSyncBinding.OldBinding(viewBinding)
+                    }
 
-        setContentView(binding.root)
-        setupToolbar(binding.includeToolbar.toolbar)
+                    setContentView(binding.root)
+                    setupToolbar(binding.includeToolbar.toolbar)
 
-        onBackPressedDispatcher.addCallback(this) {
-            onUserCancelled()
-        }
+                    onBackPressedDispatcher.addCallback(this@SyncConnectActivity) {
+                        onUserCancelled()
+                    }
 
-        observeUiEvents()
-        configureListeners()
-        if (savedInstanceState == null) {
-            viewModel.onBarcodeScreenShown()
+                    observeUiEvents()
+                    configureListeners()
+                    if (savedInstanceState == null) {
+                        viewModel.onBarcodeScreenShown()
+                    }
+                    // Start QR reader since onResume was likely already called
+                    binding.qrCodeReader.resume()
+                }
         }
     }
 
     override fun onResume() {
         super.onResume()
-        binding.qrCodeReader.resume()
+        if (::binding.isInitialized) {
+            binding.qrCodeReader.resume()
+        }
     }
 
     override fun onPause() {
         super.onPause()
-        binding.qrCodeReader.pause()
+        if (::binding.isInitialized) {
+            binding.qrCodeReader.pause()
+        }
     }
 
     private fun onUserCancelled() {
