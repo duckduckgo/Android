@@ -34,6 +34,7 @@
     <string name="sync_setup_begin_syncing">Стартиране на синхронизиране</string>
     <string name="sync_setup_with_another_device_cta_title">Синхронизиране с друго устройство</string>
     <string name="sync_setup_with_another_device_cta_subtitle">Сигурно синхронизиране на отметките и паролите между отделни устройства.</string>
+    <string name="sync_setup_with_another_device_cta_subtitle_with_ai_chat">Сигурно синхронизиране на отметки, пароли и чатове с Duck.ai между отделни устройства.</string>
     <string name="sync_off_hint">Данните Ви са изцяло криптирани и DuckDuckGo няма достъп до ключа за криптиране.</string>
     <string name="sync_setup_single_device_title">Настройка на едно устройство</string>
     <string name="sync_setup_other_options_title">Други опции</string>
@@ -45,12 +46,14 @@
     <!-- Setup screen -->
     <string name="sync_enable_sync_title">Настройка на Синхронизиране и архивиране!</string>
     <string name="sync_enable_sync_content">Вашите отметки и пароли се подготвят за синхронизиране. Това ще отнеме само няколко секунди.</string>
+    <string name="sync_enable_sync_content_with_ai_chat">Отметките, паролите и чатовете в Duck.ai се подготвят за синхронизиране. Това ще отнеме само няколко секунди.</string>
     <string name="sync_enable_options">Опции</string>
     <string name="sync_enable_option_favicons_title">Извличане на икони на отметки</string>
     <string name="sync_enable_option_favicons_subtitle">Автоматично изтегляне на икони за синхронизираните отметки.</string>
     <string name="sync_enable_connecting">Свързване…</string>
     <string name="sync_intro_enable_title">Синхронизиране и архивиране на това устройство</string>
     <string name="sync_intro_enable_content">Създава криптирано резервно копие на Вашите отметки и пароли на защитения сървър на DuckDuckGo, което може да бъде синхронизирано с други Ваши устройства. Ключът за криптиране се съхранява само на Вашето устройство и DuckDuckGo няма достъп до него.</string>
+    <string name="sync_intro_enable_content_with_ai_chat">Създава криптирано резервно копие на Вашите отметки, пароли и чатове с Duck.ai на защитения сървър на DuckDuckGo, което може да бъде синхронизирано с други Ваши устройства. \n\n Ключът за криптиране се съхранява само на Вашето устройство и DuckDuckGo няма достъп до него.</string>
     <string name="sync_intro_enable_footer">Можете да синхронизирате с други устройства по-късно.</string>
     <string name="sync_intro_enable_cta">Включване на Синхронизиране и архивиране</string>
     <string name="sync_intro_recover_title">Възстановяване на синхронизирани данни</string>
