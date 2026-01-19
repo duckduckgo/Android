@@ -41,7 +41,7 @@ interface SharedPreferencesProvider {
      * @param name Name of the shared preferences
      *
      *
-     * @return the encrypted shared preferences of null if there was any error (eg. devices doesn't support it)
+     * @return the encrypted shared preferences or null if there was any error (eg. device doesn't support it)
      */
     suspend fun getMigratedEncryptedSharedPreferences(name: String): SharedPreferences?
 }
