@@ -343,6 +343,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
 import logcat.LogPriority.INFO
@@ -3225,9 +3226,7 @@ class BrowserTabFragment :
                 ).findViewById<DuckDuckGoWebView>(R.id.browserWebView)
 
         webView?.let {
-            // CRITICAL: Set WebView profile FIRST before any other operation
-            // Profile cannot be changed after any other operation on the WebView
-            setWebViewProfile(it)
+            setWebViewProfileIfAvailable(it)
 
             it.webViewClient = webViewClient
             it.webChromeClient = webChromeClient
@@ -3351,14 +3350,19 @@ class BrowserTabFragment :
      * Sets the WebView profile for data isolation.
      * MUST be called FIRST before any other WebView operation - profile cannot be changed after.
      */
-    private fun setWebViewProfile(webView: DuckDuckGoWebView) {
-        val profileName = webViewProfileManager.getCurrentProfileName()
-        if (profileName.isNotEmpty()) {
-            try {
-                WebViewCompat.setProfile(webView, profileName)
-                logcat { "WebView profile set to: $profileName" }
-            } catch (e: Exception) {
-                logcat(ERROR) { "Failed to set WebView profile: ${e.asLog()}" }
+    @SuppressLint("RequiresFeature")
+    private fun setWebViewProfileIfAvailable(webView: DuckDuckGoWebView) {
+        runBlocking {
+            if (webViewProfileManager.isProfileSwitchingAvailable()) {
+                val profileName = webViewProfileManager.getCurrentProfileName()
+                if (profileName.isNotEmpty()) {
+                    try {
+                        WebViewCompat.setProfile(webView, profileName)
+                        logcat { "WebView profile set to: $profileName" }
+                    } catch (e: Exception) {
+                        logcat(ERROR) { "Failed to set WebView profile: ${e.asLog()}" }
+                    }
+                }
             }
         }
     }

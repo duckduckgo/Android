@@ -20,6 +20,7 @@ import android.content.Context
 import com.duckduckgo.app.browser.WebDataManager
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
 import com.duckduckgo.app.browser.favicon.FaviconManager
+import com.duckduckgo.app.browser.api.WebViewProfileManager
 import com.duckduckgo.app.browser.webview.profile.ProfileSwitchTabsResetter
 import com.duckduckgo.app.fire.AndroidAppCacheClearer
 import com.duckduckgo.app.fire.AppCacheClearer
@@ -86,6 +87,7 @@ object PrivacyModule {
         dispatcherProvider: DispatcherProvider,
         webTrackingRepository: WebTrackersBlockedRepository,
         profileSwitchTabsResetter: ProfileSwitchTabsResetter,
+        webViewProfileManager: WebViewProfileManager,
     ): ClearDataAction {
         return ClearPersonalDataAction(
             context,
@@ -104,6 +106,7 @@ object PrivacyModule {
             dispatcherProvider,
             webTrackingRepository,
             profileSwitchTabsResetter,
+            webViewProfileManager,
         )
     }
 

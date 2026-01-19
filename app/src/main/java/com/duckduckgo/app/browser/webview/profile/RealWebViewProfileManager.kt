@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.browser.webview.profile
 
+import android.annotation.SuppressLint
 import android.webkit.CookieManager
 import androidx.annotation.MainThread
 import androidx.datastore.core.DataStore
@@ -44,6 +45,7 @@ import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
+@SuppressLint("RequiresFeature")
 class RealWebViewProfileManager @Inject constructor(
     @WebViewProfileData private val store: DataStore<Preferences>,
     private val fireproofRepository: FireproofRepository,

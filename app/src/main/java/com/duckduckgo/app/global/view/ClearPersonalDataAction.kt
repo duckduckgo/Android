@@ -16,11 +16,14 @@
 
 package com.duckduckgo.app.global.view
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.webkit.WebStorage
 import android.webkit.WebView
+import androidx.webkit.ProfileStore
 import com.duckduckgo.app.browser.WebDataManager
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
+import com.duckduckgo.app.browser.api.WebViewProfileManager
 import com.duckduckgo.app.browser.webview.profile.ProfileSwitchTabsResetter
 import com.duckduckgo.app.fire.AppCacheClearer
 import com.duckduckgo.app.fire.FireActivity
@@ -117,6 +120,7 @@ class ClearPersonalDataAction(
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
     private val webTrackersBlockedRepository: WebTrackersBlockedRepository,
     private val profileSwitchTabsResetter: ProfileSwitchTabsResetter,
+    private val webViewProfileManager: WebViewProfileManager,
 ) : ClearDataAction {
 
     override fun killAndRestartProcess(notifyDataCleared: Boolean, enableTransitionAnimation: Boolean) {
@@ -241,8 +245,17 @@ class ClearPersonalDataAction(
         return WebView(context)
     }
 
-    private fun createWebStorage(): WebStorage {
-        return WebStorage.getInstance()
+    @SuppressLint("RequiresFeature")
+    private suspend fun createWebStorage(): WebStorage {
+        if (!webViewProfileManager.isProfileSwitchingAvailable()) {
+            return WebStorage.getInstance()
+        }
+        val profileName = webViewProfileManager.getCurrentProfileName()
+        if (profileName.isEmpty()) {
+            return WebStorage.getInstance()
+        }
+        return ProfileStore.getInstance().getProfile(profileName)?.webStorage
+            ?: WebStorage.getInstance()
     }
 
     override suspend fun setAppUsedSinceLastClearFlag(appUsedSinceLastClear: Boolean) {
