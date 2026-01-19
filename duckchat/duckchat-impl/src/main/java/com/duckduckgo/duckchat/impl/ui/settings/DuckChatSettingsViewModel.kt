@@ -86,7 +86,7 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
                 isSearchSectionVisible = isSearchSectionVisible(duckChatActivityParams),
                 isHideGeneratedImagesOptionVisible = showHideAiGeneratedImagesOption,
                 isAutomaticContextEnabled = isAutomaticPageContextEnabled,
-                isAutomaticContextVisible = duckChatFeature.contextualMode().isEnabled(),
+                isAutomaticContextVisible = isDuckChatUserEnabled && duckChatFeature.contextualMode().isEnabled(),
             )
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ViewState())
 
@@ -118,11 +118,6 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
 
     fun onAutomaticContextAttachmentToggled(checked: Boolean) {
         viewModelScope.launch {
-            if (checked) {
-                pixel.fire(DuckChatPixelName.DUCK_CHAT_USER_ENABLED)
-            } else {
-                pixel.fire(DuckChatPixelName.DUCK_CHAT_USER_DISABLED)
-            }
             duckChat.setAutomaticPageContextUserSetting(checked)
         }
     }

@@ -19,17 +19,12 @@ package com.duckduckgo.duckchat.impl.ui.settings
 import app.cash.turbine.test
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.duckchat.api.DuckChatNativeSettingsNoParams
 import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
 import com.duckduckgo.duckchat.impl.DuckChatInternal
-import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.inputscreen.ui.metrics.discovery.InputScreenDiscoveryFunnel
-import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
-import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Command.LaunchFeedback
 import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Command.OpenLink
 import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Command.OpenLinkInNewTab
-import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Command.OpenShortcutSettings
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.settings.api.SettingsPageFeature
@@ -68,6 +63,7 @@ class DuckChatSettingsViewModelTest {
             whenever(duckChat.observeShowInAddressBarUserSetting()).thenReturn(flowOf(false))
             whenever(duckChat.observeCosmeticInputScreenUserSettingEnabled()).thenReturn(flowOf(null))
             whenever(duckChat.observeInputScreenUserSettingEnabled()).thenReturn(flowOf(false))
+            whenever(duckChat.observeAutomaticContextAttachmentUserSettingEnabled()).thenReturn(flowOf(false))
             testee = DuckChatSettingsViewModel(
                 duckChatActivityParams = DuckChatSettingsNoParams,
                 duckChat = duckChat,
@@ -105,6 +101,13 @@ class DuckChatSettingsViewModelTest {
         runTest {
             testee.onShowDuckChatInMenuToggled(true)
             verify(duckChat).setShowInBrowserMenuUserSetting(true)
+        }
+
+    @Test
+    fun whenAutomaticContextAttachmentToggledThenSetUserSetting() =
+        runTest {
+            testee.onAutomaticContextAttachmentToggled(true)
+            verify(duckChat).setAutomaticPageContextUserSetting(true)
         }
 
     @Test
@@ -334,139 +337,9 @@ class DuckChatSettingsViewModelTest {
         }
 
     @Test
-    fun whenDuckChatSearchAISettingsClickedThenPixelIsSent() =
+    fun `view state - automatic context enabled then set correct state`() =
         runTest {
-            testee.duckChatSearchAISettingsClicked()
-            verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_SEARCH_ASSIST_SETTINGS_BUTTON_CLICKED)
-        }
-
-    @Test
-    fun whenDuckChatSearchAISettingsClickedAndEmbeddedEnabledAndHideAiGeneratedImagesDisabledThenOpenSettingsLinkWithLegacyLink() =
-        runTest {
-            @Suppress("DenyListedApi")
-            settingsPageFeature.embeddedSettingsWebView().setRawStoredState(State(enable = true))
-            @Suppress("DenyListedApi")
-            duckChatFeature.showHideAiGeneratedImages().setRawStoredState(State(enable = false))
-
-            testee.duckChatSearchAISettingsClicked()
-
-            testee.commands.test {
-                val command = awaitItem()
-                assertTrue(command is OpenLink)
-                command as OpenLink
-                assertEquals(
-                    DuckChatSettingsViewModel.LEGACY_DUCK_CHAT_SEARCH_AI_SETTINGS_LINK_EMBEDDED,
-                    command.link,
-                )
-                assertEquals(R.string.duck_chat_assist_settings_title, command.titleRes)
-                cancelAndIgnoreRemainingEvents()
-            }
-        }
-
-    @Test
-    fun whenDuckChatSearchAISettingsClickedAndEmbeddedEnabledAndHideAiGeneratedImagesEnabledThenOpenSettingsLinkWithNewLink() =
-        runTest {
-            @Suppress("DenyListedApi")
-            settingsPageFeature.embeddedSettingsWebView().setRawStoredState(State(enable = true))
-            @Suppress("DenyListedApi")
-            duckChatFeature.showHideAiGeneratedImages().setRawStoredState(State(enable = true))
-
-            testee = DuckChatSettingsViewModel(
-                duckChatActivityParams = DuckChatSettingsNoParams,
-                duckChat = duckChat,
-                pixel = mockPixel,
-                inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
-                settingsPageFeature = settingsPageFeature,
-                dispatcherProvider = coroutineRule.testDispatcherProvider,
-                duckChatFeature = duckChatFeature,
-            )
-
-            testee.duckChatSearchAISettingsClicked()
-
-            testee.commands.test {
-                val command = awaitItem()
-                assertTrue(command is OpenLink)
-                command as OpenLink
-                assertEquals(
-                    DuckChatSettingsViewModel.DUCK_CHAT_SEARCH_AI_SETTINGS_LINK_EMBEDDED,
-                    command.link,
-                )
-                assertEquals(R.string.duckAiSerpSettingsTitle, command.titleRes)
-                cancelAndIgnoreRemainingEvents()
-            }
-        }
-
-    @Test
-    fun `when onDuckChatUserEnabledToggled true then enabled pixel fired`() =
-        runTest {
-            testee.onDuckChatUserEnabledToggled(true)
-            verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_USER_ENABLED)
-        }
-
-    @Test
-    fun `when onDuckChatUserEnabledToggled false then disabled pixel fired`() =
-        runTest {
-            testee.onDuckChatUserEnabledToggled(false)
-            verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_USER_DISABLED)
-        }
-
-    @Test
-    fun `when onDuckAiInputScreenWithAiSelected true then on pixel fired`() =
-        runTest {
-            testee.onDuckAiInputScreenWithAiSelected()
-            verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_ADDRESS_BAR_SETTING_ON)
-        }
-
-    @Test
-    fun `when onDuckAiInputScreenWithoutAiSelected false then off pixel fired`() =
-        runTest {
-            testee.onDuckAiInputScreenWithoutAiSelected()
-            verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_ADDRESS_BAR_SETTING_OFF)
-        }
-
-    @Test
-    fun `when onShowDuckChatInMenuToggled true then on pixel fired`() =
-        runTest {
-            testee.onShowDuckChatInMenuToggled(true)
-            verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_MENU_SETTING_ON)
-        }
-
-    @Test
-    fun `when onShowDuckChatInMenuToggled false then off pixel fired`() =
-        runTest {
-            testee.onShowDuckChatInMenuToggled(false)
-            verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_MENU_SETTING_OFF)
-        }
-
-    @Test
-    fun `when Duck ai shortcuts clicked, then dispatch launch command`() =
-        runTest {
-            testee.onDuckAiShortcutsClicked()
-
-            testee.commands.test {
-                val command = awaitItem()
-                assertTrue(command is OpenShortcutSettings)
-                cancelAndIgnoreRemainingEvents()
-            }
-        }
-
-    @Test
-    fun `when input toggle share feedback clicked, then dispatch launch command`() =
-        runTest {
-            testee.duckAiInputScreenShareFeedbackClicked()
-
-            testee.commands.test {
-                val command = awaitItem()
-                assertTrue(command is LaunchFeedback)
-                cancelAndIgnoreRemainingEvents()
-            }
-        }
-
-    @Test
-    fun `when hideAiGeneratedImagesOption is enabled then viewState shows option visible`() =
-        runTest {
-            @Suppress("DenyListedApi")
-            duckChatFeature.showHideAiGeneratedImages().setRawStoredState(State(enable = true))
+            whenever(duckChat.observeAutomaticContextAttachmentUserSettingEnabled()).thenReturn(flowOf(true))
             testee = DuckChatSettingsViewModel(
                 duckChatActivityParams = DuckChatSettingsNoParams,
                 duckChat = duckChat,
@@ -478,16 +351,36 @@ class DuckChatSettingsViewModelTest {
             )
 
             testee.viewState.test {
-                val state = awaitItem()
-                assertTrue(state.isHideGeneratedImagesOptionVisible)
+                assertTrue(awaitItem().isAutomaticContextEnabled)
             }
         }
 
     @Test
-    fun `when hideAiGeneratedImagesOption is disabled then viewState shows option not visible`() =
+    fun `view state - automatic context disabled then set correct state`() =
         runTest {
+            whenever(duckChat.observeAutomaticContextAttachmentUserSettingEnabled()).thenReturn(flowOf(false))
+            testee = DuckChatSettingsViewModel(
+                duckChatActivityParams = DuckChatSettingsNoParams,
+                duckChat = duckChat,
+                pixel = mockPixel,
+                inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
+                settingsPageFeature = settingsPageFeature,
+                dispatcherProvider = coroutineRule.testDispatcherProvider,
+                duckChatFeature = duckChatFeature,
+            )
+
+            testee.viewState.test {
+                assertFalse(awaitItem().isAutomaticContextEnabled)
+            }
+        }
+
+    @Test
+    fun `view state - automatic context visible when flag enabled and duck chat enabled`() =
+        runTest {
+            whenever(duckChat.observeEnableDuckChatUserSetting()).thenReturn(flowOf(true))
+            whenever(duckChat.observeAutomaticContextAttachmentUserSettingEnabled()).thenReturn(flowOf(false))
             @Suppress("DenyListedApi")
-            duckChatFeature.showHideAiGeneratedImages().setRawStoredState(State(enable = false))
+            duckChatFeature.contextualMode().setRawStoredState(State(enable = true))
             testee = DuckChatSettingsViewModel(
                 duckChatActivityParams = DuckChatSettingsNoParams,
                 duckChat = duckChat,
@@ -499,14 +392,17 @@ class DuckChatSettingsViewModelTest {
             )
 
             testee.viewState.test {
-                val state = awaitItem()
-                assertFalse(state.isHideGeneratedImagesOptionVisible)
+                assertTrue(awaitItem().isAutomaticContextVisible)
             }
         }
 
     @Test
-    fun `when DuckChatSettingsNoParams passed then viewState shows search section visible`() =
+    fun `view state - automatic context hidden when flag enabled but duck chat disabled`() =
         runTest {
+            whenever(duckChat.observeEnableDuckChatUserSetting()).thenReturn(flowOf(false))
+            whenever(duckChat.observeAutomaticContextAttachmentUserSettingEnabled()).thenReturn(flowOf(false))
+            @Suppress("DenyListedApi")
+            duckChatFeature.contextualMode().setRawStoredState(State(enable = true))
             testee = DuckChatSettingsViewModel(
                 duckChatActivityParams = DuckChatSettingsNoParams,
                 duckChat = duckChat,
@@ -518,16 +414,18 @@ class DuckChatSettingsViewModelTest {
             )
 
             testee.viewState.test {
-                val state = awaitItem()
-                assertTrue(state.isSearchSectionVisible)
+                assertFalse(awaitItem().isAutomaticContextVisible)
             }
         }
 
     @Test
-    fun `when DuckChatNativeSettingsNoParams passed then viewState shows search section hidden`() =
+    fun `view state - automatic context hidden when flag disabled`() =
         runTest {
+            whenever(duckChat.observeAutomaticContextAttachmentUserSettingEnabled()).thenReturn(flowOf(false))
+            @Suppress("DenyListedApi")
+            duckChatFeature.contextualMode().setRawStoredState(State(enable = false))
             testee = DuckChatSettingsViewModel(
-                duckChatActivityParams = DuckChatNativeSettingsNoParams,
+                duckChatActivityParams = DuckChatSettingsNoParams,
                 duckChat = duckChat,
                 pixel = mockPixel,
                 inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
@@ -537,33 +435,7 @@ class DuckChatSettingsViewModelTest {
             )
 
             testee.viewState.test {
-                val state = awaitItem()
-                assertFalse(state.isSearchSectionVisible)
-            }
-        }
-
-    @Test
-    fun `when onDuckAiHideAiGeneratedImagesClicked then pixel is fired`() =
-        runTest {
-            testee.onDuckAiHideAiGeneratedImagesClicked()
-            verify(mockPixel).fire(DuckChatPixelName.SERP_SETTINGS_OPEN_HIDE_AI_GENERATED_IMAGES)
-        }
-
-    @Test
-    fun `when onDuckAiHideAiGeneratedImagesClicked then OpenLink command with correct link is emitted`() =
-        runTest {
-            testee.onDuckAiHideAiGeneratedImagesClicked()
-
-            testee.commands.test {
-                val command = awaitItem()
-                assertTrue(command is OpenLink)
-                command as OpenLink
-                assertEquals(
-                    DuckChatSettingsViewModel.DUCK_CHAT_HIDE_GENERATED_IMAGES_LINK_EMBEDDED,
-                    command.link,
-                )
-                assertEquals(R.string.duckAiSerpSettingsTitle, command.titleRes)
-                cancelAndIgnoreRemainingEvents()
+                assertFalse(awaitItem().isAutomaticContextVisible)
             }
         }
 }
