@@ -32,7 +32,6 @@ import com.duckduckgo.sync.api.DeviceSyncState
 import com.duckduckgo.sync.api.DeviceSyncState.SyncAccountState.SignedIn
 import com.duckduckgo.sync.api.SyncActivityWithEmptyParams
 import com.squareup.anvil.annotations.ContributesMultibinding
-import logcat.LogPriority
 import logcat.logcat
 import javax.inject.Inject
 
@@ -51,7 +50,7 @@ class SetUpSyncHandler @Inject constructor(
             ) {
                 if (jsMessage.id.isNullOrEmpty()) return
 
-                logcat(LogPriority.WARN) { "DuckChat-Sync: ${jsMessage.method} called" }
+                logcat { "DuckChat-Sync: ${jsMessage.method} called" }
 
                 val responder = SyncJsResponder(jsMessaging, jsMessage, featureName)
 

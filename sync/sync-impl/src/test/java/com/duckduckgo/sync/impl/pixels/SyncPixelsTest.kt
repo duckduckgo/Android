@@ -148,6 +148,21 @@ class RealSyncPixelsTest {
         verify(pixel, times(2)).fire("m_sync_bookmarks_too_many_requests_daily", emptyMap(), emptyMap(), type = Pixel.PixelType.Daily())
     }
 
+    @Test
+    fun whenFireSyncAccountErrorPixelForRescopeTokenThenPixelSent() {
+        val error = Error(code = 401, reason = "unauthorized")
+
+        testee.fireSyncAccountErrorPixel(error, SyncAccountOperation.RESCOPE_TOKEN)
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_RESCOPE_TOKEN_FAILURE,
+            mapOf(
+                SyncPixelParameters.ERROR_CODE to "401",
+                SyncPixelParameters.ERROR_REASON to "unauthorized",
+            ),
+        )
+    }
+
     private fun givenSomeDailyStats(): DailyStats {
         val date = DatabaseDateFormatter.getUtcIsoLocalDate()
         val dailyStats = DailyStats("1", date, emptyMap())
