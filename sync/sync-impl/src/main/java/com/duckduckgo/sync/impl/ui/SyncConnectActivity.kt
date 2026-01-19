@@ -72,7 +72,7 @@ class SyncConnectActivity : DuckDuckGoActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        binding = if (syncFeature.useNewActivityConnectSyncLayout().isEnabled()) {
+        binding = if (syncFeature.useExpandableBarcodeConnectSyncLayout().isEnabled()) {
             val viewBinding = ActivityConnectSyncNewBinding.inflate(layoutInflater)
             ConnectSyncBinding.NewBinding(viewBinding)
         } else {

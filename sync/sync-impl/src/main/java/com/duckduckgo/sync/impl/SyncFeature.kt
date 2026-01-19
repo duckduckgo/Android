@@ -70,5 +70,5 @@ interface SyncFeature {
     fun aiChatSync(): Toggle
 
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun useNewActivityConnectSyncLayout(): Toggle
+    fun useExpandableBarcodeConnectSyncLayout(): Toggle
 }
