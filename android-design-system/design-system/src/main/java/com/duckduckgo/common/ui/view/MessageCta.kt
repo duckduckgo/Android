@@ -17,19 +17,28 @@
 package com.duckduckgo.common.ui.view
 
 import android.content.Context
+import android.graphics.drawable.Drawable
 import android.os.Build
 import android.util.AttributeSet
 import android.widget.FrameLayout
+import android.widget.ImageView
 import androidx.annotation.DrawableRes
 import androidx.annotation.RawRes
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.text.HtmlCompat
 import androidx.core.view.isVisible
 import com.airbnb.lottie.LottieAnimationView
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.target.Target
 import com.duckduckgo.common.ui.view.MessageCta.MessageType.REMOTE_MESSAGE
 import com.duckduckgo.common.ui.view.MessageCta.MessageType.REMOTE_PROMO_MESSAGE
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.databinding.ViewMessageCtaBinding
+import java.io.File
 
 class MessageCta : FrameLayout {
 
@@ -43,6 +52,9 @@ class MessageCta : FrameLayout {
     private var onPrimaryButtonClicked: () -> Unit = {}
     private var onSecondaryButtonClicked: () -> Unit = {}
     private var onPromoActionButtonClicked: () -> Unit = {}
+
+    private var onRemoteImageLoadFailed: () -> Unit = {}
+    private var onRemoteImageLoadSuccess: () -> Unit = {}
 
     constructor(context: Context) : this(context, null)
 
@@ -81,10 +93,10 @@ class MessageCta : FrameLayout {
         binding.promoRemoteMessage.root.gone()
 
         configureTopIllustration(
+            imageUrl = message.imageUrl,
             drawableRes = message.topIllustration,
             animationRes = message.topAnimation,
         )
-
         remoteMessageBinding.messageTitle.text = HtmlCompat.fromHtml(message.title, HtmlCompat.FROM_HTML_MODE_LEGACY)
         remoteMessageBinding.messageSubtitle.text = HtmlCompat.fromHtml(message.subtitle, HtmlCompat.FROM_HTML_MODE_LEGACY)
 
@@ -118,21 +130,100 @@ class MessageCta : FrameLayout {
         }
     }
 
-    private fun configureTopIllustration(@DrawableRes drawableRes: Int?, @RawRes animationRes: Int?) {
+    private fun configureTopIllustration(
+        imageUrl: String?,
+        @DrawableRes drawableRes: Int?,
+        @RawRes animationRes: Int?,
+    ) {
         with(remoteMessageBinding) {
-            if (animationRes != null) {
-                topIllustration.gone()
-                topIllustrationAnimated.setAnimation(animationRes)
-                topIllustrationAnimated.show()
-            } else if (drawableRes != null) {
-                topIllustrationAnimated.gone()
-                topIllustration.setImageDrawable(AppCompatResources.getDrawable(context, drawableRes))
-                topIllustration.show()
-            } else {
-                topIllustration.gone()
-                topIllustrationAnimated.gone()
+            when {
+                imageUrl.orEmpty().isNotEmpty() -> {
+                    loadImageUrl(topImage, imageUrl.orEmpty(), drawableRes)
+                    topImage.show()
+                    topIllustration.gone()
+                    topIllustrationAnimated.gone()
+                }
+
+                animationRes != null -> {
+                    topIllustration.gone()
+                    topImage.gone()
+                    topIllustrationAnimated.setAnimation(animationRes)
+                    topIllustrationAnimated.show()
+                }
+
+                drawableRes != null -> {
+                    topImage.gone()
+                    topIllustrationAnimated.gone()
+                    loadImageDrawable(topIllustration, drawableRes)
+                }
+
+                else -> {
+                    topImage.gone()
+                    topIllustration.gone()
+                    topIllustrationAnimated.gone()
+                }
             }
         }
+    }
+
+    private fun loadImageUrl(
+        imageView: ImageView,
+        imageUrl: String,
+        @DrawableRes drawableRes: Int?,
+    ) {
+        // Check if imageUrl is a local file path
+        val imageSource: Any = if (imageUrl.startsWith("/")) {
+            File(imageUrl)
+        } else {
+            imageUrl
+        }
+
+        Glide
+            .with(imageView)
+            .load(imageSource)
+            .apply {
+                if (drawableRes != null) {
+                    error(AppCompatResources.getDrawable(context, drawableRes))
+                }
+            }
+            .addListener(
+                object : RequestListener<Drawable> {
+                    override fun onLoadFailed(
+                        e: GlideException?,
+                        model: Any?,
+                        target: Target<Drawable?>,
+                        isFirstResource: Boolean,
+                    ): Boolean {
+                        onRemoteImageLoadFailed()
+                        if (drawableRes == null) {
+                            imageView.gone()
+                        }
+                        return false
+                    }
+
+                    override fun onResourceReady(
+                        resource: Drawable,
+                        model: Any,
+                        target: Target<Drawable?>?,
+                        dataSource: DataSource,
+                        isFirstResource: Boolean,
+                    ): Boolean {
+                        onRemoteImageLoadSuccess()
+                        return false
+                    }
+                },
+            )
+            .centerCrop()
+            .transition(withCrossFade())
+            .into(imageView)
+    }
+
+    private fun loadImageDrawable(
+        topIllustration: ImageView,
+        @DrawableRes drawableRes: Int,
+    ) {
+        topIllustration.setImageDrawable(AppCompatResources.getDrawable(context, drawableRes))
+        topIllustration.show()
     }
 
     private fun setPromoMessage(message: Message) {
@@ -143,11 +234,17 @@ class MessageCta : FrameLayout {
         promoMessageBinding.messageSubtitle.text = HtmlCompat.fromHtml(message.subtitle, 0)
         promoMessageBinding.actionButton.text = message.promoAction
 
-        if (message.middleIllustration == null) {
+        if (message.imageUrl.orEmpty().isNotEmpty()) {
+            loadImageUrl(promoMessageBinding.remoteImage, message.imageUrl.orEmpty(), message.middleIllustration)
+            promoMessageBinding.remoteImage.show()
             promoMessageBinding.illustration.gone()
+        } else if (message.middleIllustration == null) {
+            promoMessageBinding.illustration.gone()
+            promoMessageBinding.remoteImage.gone()
         } else {
             val drawable = AppCompatResources.getDrawable(context, message.middleIllustration)
             promoMessageBinding.illustration.setImageDrawable(drawable)
+            promoMessageBinding.remoteImage.gone()
             promoMessageBinding.illustration.show()
         }
 
@@ -176,6 +273,14 @@ class MessageCta : FrameLayout {
         this.onCloseButton = onDismiss
     }
 
+    fun onRemoteImageLoadSuccess(onRemoteImageLoadSuccess: () -> Unit) {
+        this.onRemoteImageLoadSuccess = onRemoteImageLoadSuccess
+    }
+
+    fun onRemoteImageLoadFailed(onRemoteImageLoadFailed: () -> Unit) {
+        this.onRemoteImageLoadFailed = onRemoteImageLoadFailed
+    }
+
     fun onTopAnimationConfigured(configure: (LottieAnimationView) -> Unit) {
         val view = binding.remoteMessage.topIllustrationAnimated
         if (view.isVisible) {
@@ -190,6 +295,7 @@ class MessageCta : FrameLayout {
         val title: String = "",
         val subtitle: String = "",
         val action: String = "",
+        val imageUrl: String? = null,
         val actionIcon: Int? = null,
         val action2: String = "",
         val promoAction: String = "",

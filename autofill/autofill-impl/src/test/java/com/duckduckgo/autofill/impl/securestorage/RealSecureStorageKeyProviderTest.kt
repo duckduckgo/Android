@@ -53,7 +53,6 @@ class RealSecureStorageKeyProviderTest {
             secureStorageKeyRepository,
             encryptionHelper,
             secureStorageKeyGenerator,
-            fakeAutofillFeature,
         )
     }
 

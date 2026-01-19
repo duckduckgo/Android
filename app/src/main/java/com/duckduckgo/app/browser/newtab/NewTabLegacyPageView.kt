@@ -153,7 +153,7 @@ class NewTabLegacyPageView @JvmOverloads constructor(
             homeBackgroundLogo.hideLogo()
         }
         if (viewState.message != null && viewState.onboardingComplete) {
-            showRemoteMessage(viewState.message, viewState.newMessage)
+            showRemoteMessage(viewState.message, viewState.messageImageFilePath, viewState.newMessage)
         } else {
             binding.messageCta.gone()
             if (viewState.lowPriorityMessage != null) {
@@ -245,14 +245,17 @@ class NewTabLegacyPageView @JvmOverloads constructor(
 
     private fun showRemoteMessage(
         message: RemoteMessage,
+        messageImageFilePath: String?,
         newMessage: Boolean,
     ) {
         val parentVisible = (this.parent as? View)?.isVisible ?: false
-        val msg = message.asMessage(isLightModeEnabled = appTheme.isLightModeEnabled())
+        val msg = message.asMessage(
+            isLightModeEnabled = appTheme.isLightModeEnabled(),
+            localImageFilePath = messageImageFilePath,
+        )
         val shouldRender = parentVisible && (newMessage || binding.messageCta.isGone)
 
         if (msg != null && shouldRender) {
-            binding.messageCta.setMessage(msg)
             binding.messageCta.onCloseButtonClicked {
                 viewModel.onMessageCloseButtonClicked()
             }
@@ -265,6 +268,14 @@ class NewTabLegacyPageView @JvmOverloads constructor(
             binding.messageCta.onPromoActionClicked {
                 viewModel.onMessageActionButtonClicked()
             }
+            binding.messageCta.onRemoteImageLoadFailed {
+                viewModel.onRemoteImageLoadFailed()
+            }
+            binding.messageCta.onRemoteImageLoadSuccess {
+                viewModel.onRemoteImageLoadSuccess()
+            }
+            binding.messageCta.setMessage(msg)
+
             binding.messageCta.show()
             viewModel.onMessageShown()
         }

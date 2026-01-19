@@ -1,8 +1,6 @@
-name: Omnibar End-to-End tests
+name: 'End to End Tests - Input Screen (Nightly)'
 
 on:
-  schedule:
-    - cron: '0 7 * * *' # run at 7 AM UTC
   workflow_dispatch:
 
 concurrency:
@@ -56,26 +54,30 @@ jobs:
         if: always()
         run: find . -name "*.apk"  -exec mv '{}' apk/playRelease.apk \;
 
-      - name: Omnibar Maestro run
-        uses: mobile-dev-inc/action-maestro-cloud@v1.9.8
+      - name: Run Input Screen Maestro Tests
+        id: maestro-cloud-asana
+        uses: ./.github/actions/maestro-cloud-asana-reporter
         timeout-minutes: 120
         with:
-          api-key: ${{ secrets.ROBIN_API_KEY }}
-          project-id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
-          name: omnibar_${{ github.sha }}
-          timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
-          app-file: apk/playRelease.apk
-          android-api-level: 34
-          workspace: .maestro
-          include-tags: omnibarTest
+          maestro_api_key: ${{ secrets.ROBIN_API_KEY }}
+          maestro_project_id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
+          maestro_test_name: inputScreen_${{ github.sha }}
+          maestro_timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
+          maestro_app_file: apk/playRelease.apk
+          maestro_include_tags: inputScreenTest
+          test_suite_name: Input Screen
+          maestro_api_level: 30
+          asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          asana_project_id: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
+          asana_section_id: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
 
       - name: Create Asana task when workflow failed
-        if: ${{ failure() }}
-        uses: honeycombio/gha-create-asana-task@main
+        if: ${{ failure() && steps.maestro-cloud-asana.outputs.flow_summary_status != 'failure' }}
+        uses: duckduckgo/native-github-asana-sync@v2.0
         with:
-          asana-secret: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          asana-workspace-id: ${{ secrets.GH_ASANA_WORKSPACE_ID }}
-          asana-project-id: ${{ secrets.GH_ASANA_AOR_PROJECT_ID }}
-          asana-section-id: ${{ secrets.GH_ASANA_INCOMING_ID }}
-          asana-task-name: GH Workflow Failure - Omnibar E2E tests
-          asana-task-description: The Omnibar end-to-end workflow has failed. See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
+          asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          asana-project: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
+          asana-section: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
+          asana-task-name: GH Workflow Failure - Input Screen End to End Tests (Nightly)
+          asana-task-description: The Input Screen end-to-end workflow has failed. See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
+          action: 'create-asana-task'

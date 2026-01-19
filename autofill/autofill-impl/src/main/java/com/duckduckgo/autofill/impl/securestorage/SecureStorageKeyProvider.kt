@@ -16,14 +16,12 @@
 
 package com.duckduckgo.autofill.impl.securestorage
 
-import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.impl.securestorage.encryption.EncryptionHelper
 import com.duckduckgo.autofill.impl.securestorage.encryption.EncryptionHelper.EncryptedBytes
 import com.duckduckgo.autofill.store.SecureStorageKeyRepository
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.securestorage.impl.encryption.RandomBytesGenerator
 import com.squareup.anvil.annotations.ContributesBinding
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import okio.ByteString.Companion.toByteString
@@ -53,7 +51,6 @@ class RealSecureStorageKeyProvider @Inject constructor(
     private val secureStorageKeyRepository: SecureStorageKeyRepository,
     private val encryptionHelper: EncryptionHelper,
     private val secureStorageKeyGenerator: SecureStorageKeyGenerator,
-    private val autofillFeature: AutofillFeature,
 ) : SecureStorageKeyProvider {
 
     override suspend fun canAccessKeyStore(): Boolean = secureStorageKeyRepository.canUseEncryption()
@@ -61,68 +58,30 @@ class RealSecureStorageKeyProvider @Inject constructor(
     private val l2KeyMutex = Mutex()
 
     override suspend fun getl1Key(): ByteArray {
-        if (autofillFeature.createAsyncPreferences().isEnabled()) {
-            return getl1KeyAsync()
-        } else {
-            return getl1KeySync()
-        }
-    }
-
-    private suspend fun getl1KeyAsync(): ByteArray {
         l1KeyMutex.withLock {
-            return innerGetL1Key()
-        }
-    }
-
-    @Synchronized
-    private fun getl1KeySync(): ByteArray {
-        return runBlocking {
-            innerGetL1Key()
-        }
-    }
-
-    private suspend fun innerGetL1Key(): ByteArray {
-        // If no key exists in the keystore, we generate a new one and store it
-        return if (secureStorageKeyRepository.getL1Key() == null) {
-            randomBytesGenerator.generateBytes(L1_PASSPHRASE_SIZE).also {
-                secureStorageKeyRepository.setL1Key(it)
+            // If no key exists in the keystore, we generate a new one and store it
+            return if (secureStorageKeyRepository.getL1Key() == null) {
+                randomBytesGenerator.generateBytes(L1_PASSPHRASE_SIZE).also {
+                    secureStorageKeyRepository.setL1Key(it)
+                }
+            } else {
+                secureStorageKeyRepository.getL1Key()!!
             }
-        } else {
-            secureStorageKeyRepository.getL1Key()!!
         }
     }
 
     override suspend fun getl2Key(): Key {
-        if (autofillFeature.createAsyncPreferences().isEnabled()) {
-            return getl2KeyAsync()
-        } else {
-            return getl2KeySync()
-        }
-    }
-
-    private suspend fun getl2KeyAsync(): Key {
-        return l2KeyMutex.withLock {
-            innerGetL2Key()
-        }
-    }
-
-    @Synchronized
-    private fun getl2KeySync(): Key {
-        return runBlocking {
-            innerGetL2Key()
-        }
-    }
-
-    private suspend fun innerGetL2Key(): Key {
-        val userPassword = if (secureStorageKeyRepository.getPassword() == null) {
-            randomBytesGenerator.generateBytes(PASSWORD_SIZE).also {
-                secureStorageKeyRepository.setPassword(it)
+        l2KeyMutex.withLock {
+            val userPassword = if (secureStorageKeyRepository.getPassword() == null) {
+                randomBytesGenerator.generateBytes(PASSWORD_SIZE).also {
+                    secureStorageKeyRepository.setPassword(it)
+                }
+            } else {
+                secureStorageKeyRepository.getPassword()
             }
-        } else {
-            secureStorageKeyRepository.getPassword()
-        }
 
-        return getl2Key(userPassword!!.toByteString().base64())
+            return getl2Key(userPassword!!.toByteString().base64())
+        }
     }
 
     private suspend fun getl2Key(password: String): Key {

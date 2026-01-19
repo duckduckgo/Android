@@ -57,6 +57,7 @@ jobs:
         run: find . -name "*internal-release*.apk" -exec mv '{}' apk/internal.apk \;
 
       - name: Run Design System Maestro Tests
+        id: maestro-run
         uses: mobile-dev-inc/action-maestro-cloud@v1.9.8
         timeout-minutes: 30
         with:
@@ -68,6 +69,16 @@ jobs:
           android-api-level: 30
           workspace: .maestro
           include-tags: androidDesignSystemTest
+
+      - name: Analyze Maestro Flow Results
+        if: always()
+        id: analyze-maestro
+        uses: ./.github/actions/maestro-flow-analyzer
+        with:
+          flow_results_json: ${{ steps.maestro-run.outputs.MAESTRO_CLOUD_FLOW_RESULTS }}
+          console_url: ${{ steps.maestro-run.outputs.MAESTRO_CLOUD_CONSOLE_URL }}
+          upload_status: ${{ steps.maestro-run.outputs.MAESTRO_CLOUD_UPLOAD_STATUS }}
+          app_binary_id: ${{ steps.maestro-run.outputs.MAESTRO_CLOUD_APP_BINARY_ID }}
 
       - name: Comment on PR
         if: failure()

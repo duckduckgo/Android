@@ -24,6 +24,7 @@ import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId.DAX_END
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.ui.view.MessageCta
 import com.duckduckgo.common.utils.playstore.PlayStoreUtils
@@ -35,6 +36,7 @@ import com.duckduckgo.remote.messaging.api.Content
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.api.RemoteMessageModel
 import com.duckduckgo.remote.messaging.api.Surface
+import com.duckduckgo.remote.messaging.impl.pixels.RemoteMessagingPixelName
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.sync.api.engine.SyncEngine
@@ -69,6 +71,7 @@ class NewTabLegacyPageViewModelTest {
     private val mockSettingsDataStore: SettingsDataStore = mock()
     private val mockLowPriorityMessagingModel: LowPriorityMessagingModel = mock()
     private val mockAppTrackingProtection: AppTrackingProtection = mock()
+    private val pixel: Pixel = mock()
 
     private lateinit var testee: NewTabLegacyPageViewModel
 
@@ -97,6 +100,7 @@ class NewTabLegacyPageViewModelTest {
             settingsDataStore = mockSettingsDataStore,
             lowPriorityMessagingModel = mockLowPriorityMessagingModel,
             appTrackingProtection = mockAppTrackingProtection,
+            pixel = pixel,
         )
     }
 
@@ -147,6 +151,27 @@ class NewTabLegacyPageViewModelTest {
         testee.viewState.test {
             expectMostRecentItem().also {
                 assertEquals(it.message, remoteMessage)
+                assertTrue(it.favourites?.isEmpty() == true)
+                assertTrue(it.newMessage)
+                assertTrue(it.onboardingComplete)
+                assertNull(it.messageImageFilePath)
+            }
+        }
+    }
+
+    @Test
+    fun whenRemoteMessageAvailableWithStoredImageAndOnboardingCompleteThenMessageShown() = runTest {
+        val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList(), listOf(Surface.NEW_TAB_PAGE))
+        whenever(mockRemoteMessageModel.getActiveMessages()).thenReturn(flowOf(remoteMessage))
+        whenever(mockRemoteMessageModel.getRemoteMessageImageFile()).thenReturn("messageFile")
+        whenever(mockDismissedCtaDao.exists(DAX_END)).thenReturn(true)
+
+        testee.onStart(mockLifecycleOwner)
+
+        testee.viewState.test {
+            expectMostRecentItem().also {
+                assertEquals(it.message, remoteMessage)
+                assertEquals("messageFile", it.messageImageFilePath)
                 assertTrue(it.favourites?.isEmpty() == true)
                 assertTrue(it.newMessage)
                 assertTrue(it.onboardingComplete)
@@ -523,5 +548,33 @@ class NewTabLegacyPageViewModelTest {
                 assertNull(it.message)
             }
         }
+    }
+
+    @Test
+    fun whenRemoteImageLoadSuccessThenPixelFired() = runTest {
+        val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList(), listOf(Surface.NEW_TAB_PAGE))
+        whenever(mockRemoteMessageModel.getActiveMessages()).thenReturn(flowOf(remoteMessage))
+
+        testee.onStart(mockLifecycleOwner)
+        testee.onRemoteImageLoadSuccess()
+
+        verify(pixel).fire(
+            RemoteMessagingPixelName.REMOTE_MESSAGE_IMAGE_LOAD_SUCCESS,
+            mapOf(Pixel.PixelParameter.MESSAGE_SHOWN to "id1"),
+        )
+    }
+
+    @Test
+    fun whenRemoteImageLoadFailedThenPixelFired() = runTest {
+        val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList(), listOf(Surface.NEW_TAB_PAGE))
+        whenever(mockRemoteMessageModel.getActiveMessages()).thenReturn(flowOf(remoteMessage))
+
+        testee.onStart(mockLifecycleOwner)
+        testee.onRemoteImageLoadFailed()
+
+        verify(pixel).fire(
+            RemoteMessagingPixelName.REMOTE_MESSAGE_IMAGE_LOAD_FAILED,
+            mapOf(Pixel.PixelParameter.MESSAGE_SHOWN to "id1"),
+        )
     }
 }

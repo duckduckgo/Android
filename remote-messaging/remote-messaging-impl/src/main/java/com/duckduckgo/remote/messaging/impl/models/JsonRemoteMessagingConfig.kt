@@ -38,6 +38,7 @@ data class JsonContent(
     val messageType: String = "",
     val titleText: String = "",
     val descriptionText: String = "",
+    val imageUrl: String? = null,
     val placeholder: String = "",
     val primaryActionText: String = "",
     val primaryAction: JsonMessageAction? = null,

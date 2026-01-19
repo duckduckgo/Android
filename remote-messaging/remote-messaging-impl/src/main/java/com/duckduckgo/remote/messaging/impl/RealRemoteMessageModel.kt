@@ -79,6 +79,10 @@ class RealRemoteMessageModel @Inject constructor(
         return action
     }
 
+    override suspend fun getRemoteMessageImageFile(): String? {
+        return remoteMessagingRepository.getRemoteMessageImageFile()
+    }
+
     private fun Content.getPrimaryAction(): Action? {
         return when (this) {
             is Content.BigSingleAction -> {

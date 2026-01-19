@@ -124,7 +124,17 @@ internal class AutomaticDataClearingSettingsViewModelTest {
 
     @Test
     fun whenDuckAiChatsOptionSelectedThenClearDuckAiChatsIsTrue() = runTest {
+        duckAiShowClearDuckAIChatHistoryFlow.value = true
+        whenever(mockDuckChat.wasOpenedBefore()).thenReturn(true)
         automaticClearOptionsFlow.value = setOf(FireClearOption.DUCKAI_CHATS)
+
+        testee = AutomaticDataClearingSettingsViewModel(
+            mockFireDataStore,
+            mockDuckChat,
+            mockDuckAiFeatureState,
+            coroutineTestRule.testDispatcherProvider,
+            mockPixel,
+        )
 
         testee.viewState.test {
             val state = awaitItem()
@@ -137,7 +147,17 @@ internal class AutomaticDataClearingSettingsViewModelTest {
 
     @Test
     fun whenAllOptionsSelectedThenAllFlagsAreTrue() = runTest {
+        duckAiShowClearDuckAIChatHistoryFlow.value = true
+        whenever(mockDuckChat.wasOpenedBefore()).thenReturn(true)
         automaticClearOptionsFlow.value = setOf(FireClearOption.TABS, FireClearOption.DATA, FireClearOption.DUCKAI_CHATS)
+
+        testee = AutomaticDataClearingSettingsViewModel(
+            mockFireDataStore,
+            mockDuckChat,
+            mockDuckAiFeatureState,
+            coroutineTestRule.testDispatcherProvider,
+            mockPixel,
+        )
 
         testee.viewState.test {
             val state = awaitItem()
@@ -215,6 +235,80 @@ internal class AutomaticDataClearingSettingsViewModelTest {
         testee.viewState.test {
             val state = awaitItem()
             assertFalse(state.showDuckAiChatsOption)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenOnlyDuckAiChatsSelectedAndDuckAiNotAvailableThenAutomaticClearingIsDisabled() = runTest {
+        duckAiShowClearDuckAIChatHistoryFlow.value = false
+        automaticClearOptionsFlow.value = setOf(FireClearOption.DUCKAI_CHATS)
+
+        testee.viewState.test {
+            val state = awaitItem()
+            assertFalse(state.automaticClearingEnabled)
+            assertFalse(state.clearDuckAiChats)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenDuckAiChatsAndOtherOptionsSelectedAndDuckAiNotAvailableThenOnlyOtherOptionsAreEnabled() = runTest {
+        duckAiShowClearDuckAIChatHistoryFlow.value = false
+        automaticClearOptionsFlow.value = setOf(FireClearOption.TABS, FireClearOption.DATA, FireClearOption.DUCKAI_CHATS)
+
+        testee.viewState.test {
+            val state = awaitItem()
+            assertTrue(state.automaticClearingEnabled)
+            assertTrue(state.clearTabs)
+            assertTrue(state.clearData)
+            assertFalse(state.clearDuckAiChats)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenDuckAiChatsSelectedAndDuckChatNotOpenedBeforeThenDuckAiChatsIsFiltered() = runTest {
+        duckAiShowClearDuckAIChatHistoryFlow.value = true
+        whenever(mockDuckChat.wasOpenedBefore()).thenReturn(false)
+        automaticClearOptionsFlow.value = setOf(FireClearOption.DUCKAI_CHATS)
+
+        testee = AutomaticDataClearingSettingsViewModel(
+            mockFireDataStore,
+            mockDuckChat,
+            mockDuckAiFeatureState,
+            coroutineTestRule.testDispatcherProvider,
+            mockPixel,
+        )
+
+        testee.viewState.test {
+            val state = awaitItem()
+            assertFalse(state.automaticClearingEnabled)
+            assertFalse(state.clearDuckAiChats)
+            assertFalse(state.showDuckAiChatsOption)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenDuckAiChatsSelectedAndDuckAiFullyAvailableThenDuckAiChatsIsEnabled() = runTest {
+        duckAiShowClearDuckAIChatHistoryFlow.value = true
+        whenever(mockDuckChat.wasOpenedBefore()).thenReturn(true)
+        automaticClearOptionsFlow.value = setOf(FireClearOption.DUCKAI_CHATS)
+
+        testee = AutomaticDataClearingSettingsViewModel(
+            mockFireDataStore,
+            mockDuckChat,
+            mockDuckAiFeatureState,
+            coroutineTestRule.testDispatcherProvider,
+            mockPixel,
+        )
+
+        testee.viewState.test {
+            val state = awaitItem()
+            assertTrue(state.automaticClearingEnabled)
+            assertTrue(state.clearDuckAiChats)
+            assertTrue(state.showDuckAiChatsOption)
             cancelAndConsumeRemainingEvents()
         }
     }
