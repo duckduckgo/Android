@@ -373,6 +373,8 @@ class DuckChatContextualFragment : DuckDuckGoFragment(R.layout.fragment_contextu
         binding.inputField.onFocusChangeListener = View.OnFocusChangeListener { _, focused ->
             if (focused) {
                 bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+            } else if (sheetMode == SheetMode.INPUT) {
+                bottomSheetBehavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
             }
         }
         binding.inputField.setOnEditorActionListener(
@@ -386,11 +388,21 @@ class DuckChatContextualFragment : DuckDuckGoFragment(R.layout.fragment_contextu
         )
         binding.inputField.addTextChangedListener(
             object : TextWatcher {
-                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+                override fun beforeTextChanged(
+                    s: CharSequence?,
+                    start: Int,
+                    count: Int,
+                    after: Int,
+                ) {
                     // NOOP
                 }
 
-                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                override fun onTextChanged(
+                    s: CharSequence?,
+                    start: Int,
+                    before: Int,
+                    count: Int,
+                ) {
                     // NOOP
                 }
 
