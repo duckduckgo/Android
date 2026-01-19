@@ -24,6 +24,8 @@ import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchAddHomeScreenWidget
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchAutofillPasswordsManagement
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchAutofillSettings
+import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchDataClearingSettingsScreen
+import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchFireButtonScreen
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.autoconsent.api.Autoconsent
@@ -285,5 +287,34 @@ class SettingsViewModelTest {
         testee.viewState().test {
             assertTrue(awaitItem().isDuckChatEnabled)
         }
+    }
+
+    @Test
+    fun `when fire button setting clicked and improved data clearing enabled then launch data clearing settings screen`() = runTest {
+        fakeAndroidBrowserConfigFeature.improvedDataClearingOptions().setRawStoredState(State(true))
+
+        testee.commands().test {
+            testee.onFireButtonSettingClicked()
+
+            assertEquals(LaunchDataClearingSettingsScreen, awaitItem())
+        }
+    }
+
+    @Test
+    fun `when fire button setting clicked and improved data clearing disabled then launch fire button screen`() = runTest {
+        fakeAndroidBrowserConfigFeature.improvedDataClearingOptions().setRawStoredState(State(false))
+
+        testee.commands().test {
+            testee.onFireButtonSettingClicked()
+
+            assertEquals(LaunchFireButtonScreen, awaitItem())
+        }
+    }
+
+    @Test
+    fun `when fire button setting clicked then pixel is fired`() = runTest {
+        testee.onFireButtonSettingClicked()
+
+        verify(pixelMock).fire(AppPixelName.SETTINGS_FIRE_BUTTON_PRESSED)
     }
 }
