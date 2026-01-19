@@ -1431,5 +1431,19 @@
         "triggers": ["other"],
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"]
+    },
+    "m_dbp_background-run_stats": {
+        "description": "Android specific pixel fired once daily to report if expected runs have occurred within the expected threshold",
+        "owners": ["karlenDimla", "landomen"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "scanFrequencyWithinThreshold",
+                "description": "A background scan has run within 48 hours since the last one",
+                "enum": ["false", "true"]
+            }
+        ]
     }
 }

@@ -18,6 +18,7 @@ package com.duckduckgo.pir.impl.pixels
 
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BG_STATS
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BROKER_ACTION_FAILED
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BROKER_CUSTOM_STATS_14DAY_CONFIRMED_OPTOUT
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BROKER_CUSTOM_STATS_14DAY_UNCONFIRMED_OPTOUT
@@ -537,6 +538,10 @@ interface PirPixelSender {
     fun reportInitialScanDuration(
         durationMs: Long,
         profileQueryCount: Int,
+    )
+
+    fun reportBackgroundScanStats(
+        scanFrequencyWithinThreshold: Boolean,
     )
 }
 
@@ -1265,6 +1270,13 @@ class RealPirPixelSender @Inject constructor(
         fire(PIR_INITIAL_SCAN_DURATION, params)
     }
 
+    override fun reportBackgroundScanStats(scanFrequencyWithinThreshold: Boolean) {
+        val params = mapOf(
+            PARAM_KEY_SCAN_FREQUENCY to scanFrequencyWithinThreshold.toString(),
+        )
+        fire(PIR_BG_STATS, params)
+    }
+
     private fun fire(
         pixel: PirPixel,
         params: Map<String, String> = emptyMap(),
@@ -1308,5 +1320,6 @@ class RealPirPixelSender @Inject constructor(
         private const val PARAM_KEY_STEP = "stepType"
         private const val PARAM_KEY_DURATION_MS = "duration_in_ms"
         private const val PARAM_KEY_PROFILE_QUERY_COUNT = "profile_queries"
+        private const val PARAM_KEY_SCAN_FREQUENCY = "scanFrequencyWithinThreshold"
     }
 }
