@@ -63,9 +63,9 @@ class PirPixelInterceptorTest {
     }
 
     @Test
-    fun whenInterceptPirInternalPixelThenAddsMetadataParameter() = runTest {
+    fun whenInterceptAllowListedPixelThenAddsMetadataParameter() = runTest {
         val request = Request.Builder()
-            .url("https://example.com/pir_internal_scan_started")
+            .url("https://example.com/m_dbp_foreground-run_started")
             .build()
 
         whenever(mockChain.request()).thenReturn(request)
@@ -99,9 +99,9 @@ class PirPixelInterceptorTest {
     }
 
     @Test
-    fun whenInterceptPirInternalPixelThenMetadataContainsCorrectFields() = runTest {
+    fun whenInterceptPirAllowListedPixelThenMetadataContainsCorrectFields() = runTest {
         val request = Request.Builder()
-            .url("https://example.com/pir_internal_test_pixel")
+            .url("https://example.com/m_dbp_foreground-run_completed")
             .build()
 
         whenever(mockChain.request()).thenReturn(request)
@@ -120,17 +120,16 @@ class PirPixelInterceptorTest {
         val decodedJson = String(decodedBytes)
         val jsonObject = JSONObject(decodedJson)
 
-        assertEquals(30, jsonObject.getInt("os"))
         assertEquals("false", jsonObject.getString("batteryOptimizations"))
         assertEquals("TestManufacturer", jsonObject.getString("man"))
     }
 
     @Test
-    fun whenInterceptPirInternalPixelWithBatteryOptimizationsDisabledThenMetadataShowsTrue() = runTest {
+    fun whenInterceptPirAllowlistedPixelWithBatteryOptimizationsDisabledThenMetadataShowsTrue() = runTest {
         whenever(mockPowerManager.isIgnoringBatteryOptimizations(any())).thenReturn(false)
 
         val request = Request.Builder()
-            .url("https://example.com/pir_internal_test_pixel")
+            .url("https://example.com/m_dbp_foreground-run_started")
             .build()
 
         whenever(mockChain.request()).thenReturn(request)
@@ -152,9 +151,9 @@ class PirPixelInterceptorTest {
     }
 
     @Test
-    fun whenInterceptPirInternalPixelThenPreservesOtherQueryParameters() = runTest {
+    fun whenInterceptPirAllowListedPixelThenPreservesOtherQueryParameters() = runTest {
         val request = Request.Builder()
-            .url("https://example.com/pir_internal_test_pixel?existing=param&another=value")
+            .url("https://example.com/m_dbp_foreground-run_started?existing=param&another=value")
             .build()
 
         whenever(mockChain.request()).thenReturn(request)
@@ -171,9 +170,9 @@ class PirPixelInterceptorTest {
     }
 
     @Test
-    fun whenInterceptPirInternalPixelThenMetadataIsBase64Encoded() = runTest {
+    fun whenInterceptPirAllowListedThenMetadataIsBase64Encoded() = runTest {
         val request = Request.Builder()
-            .url("https://example.com/pir_internal_test")
+            .url("https://example.com/m_dbp_foreground-run_started")
             .build()
 
         whenever(mockChain.request()).thenReturn(request)
@@ -215,7 +214,7 @@ class PirPixelInterceptorTest {
         whenever(mockPowerManager.isIgnoringBatteryOptimizations(any())).thenThrow(RuntimeException("Test exception"))
 
         val request = Request.Builder()
-            .url("https://example.com/pir_internal_test")
+            .url("https://example.com/m_dbp_foreground-run_started")
             .build()
 
         whenever(mockChain.request()).thenReturn(request)
@@ -242,7 +241,7 @@ class PirPixelInterceptorTest {
         whenever(mockContext.packageName).thenReturn(null)
 
         val request = Request.Builder()
-            .url("https://example.com/pir_internal_test")
+            .url("https://example.com/m_dbp_foreground-run_started")
             .build()
 
         whenever(mockChain.request()).thenReturn(request)

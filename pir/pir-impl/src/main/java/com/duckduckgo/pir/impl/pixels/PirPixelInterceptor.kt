@@ -40,12 +40,11 @@ class PirPixelInterceptor @Inject constructor(
         val request = chain.request().newBuilder()
         val pixel = chain.request().url.pathSegments.last()
 
-        val url = if (pixel.startsWith(PIXEL_PREFIX) && !EXCEPTIONS.any { exception -> pixel.startsWith(exception) }) {
+        val url = if (ALLOWLIST.any { prefix -> pixel.startsWith(prefix) }) {
             chain.request().url.newBuilder()
                 .addQueryParameter(
                     KEY_METADATA,
                     JSONObject()
-                        .put("os", appBuildConfig.sdkInt)
                         .put("batteryOptimizations", (!isIgnoringBatteryOptimizations()).toString())
                         .put("man", appBuildConfig.manufacturer)
                         .toString().toByteArray().run {
@@ -73,7 +72,13 @@ class PirPixelInterceptor @Inject constructor(
 
     companion object {
         private const val KEY_METADATA = "metadata"
-        private const val PIXEL_PREFIX = "pir_internal"
-        private val EXCEPTIONS = emptyList<String>()
+        private val ALLOWLIST = listOf(
+            "m_dbp_foreground-run_started",
+            "m_dbp_foreground-run_completed",
+            "m_dbp_scheduled-run_started",
+            "m_dbp_scheduled-run_completed",
+            "m_dbp_email-confirmation_started",
+            "m_dbp_email-confirmation_completed",
+        )
     }
 }
