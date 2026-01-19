@@ -27,6 +27,8 @@ import android.os.Bundle
 import android.os.Environment
 import android.os.Message
 import android.provider.MediaStore
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.KeyEvent
 import android.view.View
 import android.view.ViewGroup
@@ -380,6 +382,21 @@ class DuckChatContextualFragment : DuckDuckGoFragment(R.layout.fragment_contextu
                 false
             },
         )
+        binding.inputField.addTextChangedListener(
+            object : TextWatcher {
+                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+                    // NOOP
+                }
+
+                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                    // NOOP
+                }
+
+                override fun afterTextChanged(text: Editable?) {
+                    binding.actionSend.isEnabled = text.toString().isEmpty()
+                }
+            },
+        )
         binding.actionSend.setOnClickListener {
             sendPrompt()
         }
@@ -613,7 +630,7 @@ class DuckChatContextualFragment : DuckDuckGoFragment(R.layout.fragment_contextu
 
     private fun downloadFailed(command: DownloadCommand.ShowDownloadFailedMessage) {
         val downloadFailedSnackbar = root.makeSnackbarWithNoBottomInset(getString(command.messageId), Snackbar.LENGTH_LONG)
-        root.postDelayed({ downloadFailedSnackbar.show() }, DOWNLOAD_SNACKBAR_DELAY)
+        root.postDelayed({ downloadFailedSnackbar?.show() }, DOWNLOAD_SNACKBAR_DELAY)
     }
 
     private fun downloadSucceeded(command: DownloadCommand.ShowDownloadSuccessMessage) {
@@ -629,7 +646,7 @@ class DuckChatContextualFragment : DuckDuckGoFragment(R.layout.fragment_contextu
                     }
                 }
             }
-        root.postDelayed({ downloadSucceededSnackbar.show() }, DOWNLOAD_SNACKBAR_DELAY)
+        root.postDelayed({ downloadSucceededSnackbar?.show() }, DOWNLOAD_SNACKBAR_DELAY)
     }
 
     private fun requestFileDownload(
