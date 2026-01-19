@@ -164,7 +164,6 @@ class RemoteMessageView @JvmOverloads constructor(
         if (msg != null && shouldRender) {
             binding.messageCta.show()
             viewModel.onMessageShown()
-            binding.messageCta.setMessage(msg)
             binding.messageCta.onCloseButtonClicked {
                 viewModel.onMessageCloseButtonClicked()
             }
@@ -177,6 +176,13 @@ class RemoteMessageView @JvmOverloads constructor(
             binding.messageCta.onPromoActionClicked {
                 viewModel.onMessageActionButtonClicked()
             }
+            binding.messageCta.onRemoteImageLoadSuccess {
+                viewModel.onRemoteImageLoadSuccess()
+            }
+            binding.messageCta.onRemoteImageLoadFailed {
+                viewModel.onRemoteImageLoadFailed()
+            }
+            binding.messageCta.setMessage(msg)
         }
     }
 

@@ -256,7 +256,6 @@ class NewTabLegacyPageView @JvmOverloads constructor(
         val shouldRender = parentVisible && (newMessage || binding.messageCta.isGone)
 
         if (msg != null && shouldRender) {
-            binding.messageCta.setMessage(msg)
             binding.messageCta.onCloseButtonClicked {
                 viewModel.onMessageCloseButtonClicked()
             }
@@ -269,6 +268,14 @@ class NewTabLegacyPageView @JvmOverloads constructor(
             binding.messageCta.onPromoActionClicked {
                 viewModel.onMessageActionButtonClicked()
             }
+            binding.messageCta.onRemoteImageLoadFailed {
+                viewModel.onRemoteImageLoadFailed()
+            }
+            binding.messageCta.onRemoteImageLoadSuccess {
+                viewModel.onRemoteImageLoadSuccess()
+            }
+            binding.messageCta.setMessage(msg)
+
             binding.messageCta.show()
             viewModel.onMessageShown()
         }

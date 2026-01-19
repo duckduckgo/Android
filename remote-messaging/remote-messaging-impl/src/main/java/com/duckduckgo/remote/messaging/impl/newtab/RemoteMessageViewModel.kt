@@ -22,6 +22,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.playstore.PlayStoreUtils
 import com.duckduckgo.di.scopes.ViewScope
@@ -39,6 +40,7 @@ import com.duckduckgo.remote.messaging.api.Action.UrlInContext
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.api.RemoteMessageModel
 import com.duckduckgo.remote.messaging.api.Surface
+import com.duckduckgo.remote.messaging.impl.pixels.RemoteMessagingPixelName
 import com.duckduckgo.survey.api.SurveyParameterManager
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
@@ -61,6 +63,7 @@ class RemoteMessageViewModel @Inject constructor(
     private val remoteMessagingModel: RemoteMessageModel,
     private val playStoreUtils: PlayStoreUtils,
     private val surveyParameterManager: SurveyParameterManager,
+    private val pixel: Pixel,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     data class ViewState(
@@ -171,6 +174,20 @@ class RemoteMessageViewModel @Inject constructor(
 
     fun openPlayStore(appPackage: String) {
         playStoreUtils.launchPlayStore(appPackage)
+    }
+
+    fun onRemoteImageLoadFailed() {
+        pixel.fire(
+            RemoteMessagingPixelName.REMOTE_MESSAGE_IMAGE_LOAD_FAILED,
+            mapOf(Pixel.PixelParameter.MESSAGE_SHOWN to lastRemoteMessageSeen?.id.orEmpty()),
+        )
+    }
+
+    fun onRemoteImageLoadSuccess() {
+        pixel.fire(
+            RemoteMessagingPixelName.REMOTE_MESSAGE_IMAGE_LOAD_SUCCESS,
+            mapOf(Pixel.PixelParameter.MESSAGE_SHOWN to lastRemoteMessageSeen?.id.orEmpty()),
+        )
     }
 
     private suspend fun Action.asNewTabCommand(): Command {

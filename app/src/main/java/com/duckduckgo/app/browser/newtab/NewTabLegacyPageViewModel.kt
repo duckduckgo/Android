@@ -27,12 +27,14 @@ import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.playstore.PlayStoreUtils
 import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.api.RemoteMessageModel
 import com.duckduckgo.remote.messaging.api.Surface
+import com.duckduckgo.remote.messaging.impl.pixels.RemoteMessagingPixelName
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.sync.api.engine.SyncEngine
@@ -69,6 +71,7 @@ class NewTabLegacyPageViewModel @AssistedInject constructor(
     private val settingsDataStore: SettingsDataStore,
     private val lowPriorityMessagingModel: LowPriorityMessagingModel,
     private val appTrackingProtection: AppTrackingProtection,
+    private val pixel: Pixel,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     data class ViewState(
@@ -230,6 +233,20 @@ class NewTabLegacyPageViewModel @AssistedInject constructor(
         viewModelScope.launch {
             lowPriorityMessagingModel.getPrimaryButtonCommand()?.let { command.send(it) }
         }
+    }
+
+    fun onRemoteImageLoadFailed() {
+        pixel.fire(
+            RemoteMessagingPixelName.REMOTE_MESSAGE_IMAGE_LOAD_FAILED,
+            mapOf(Pixel.PixelParameter.MESSAGE_SHOWN to lastRemoteMessageSeen?.id.orEmpty()),
+        )
+    }
+
+    fun onRemoteImageLoadSuccess() {
+        pixel.fire(
+            RemoteMessagingPixelName.REMOTE_MESSAGE_IMAGE_LOAD_SUCCESS,
+            mapOf(Pixel.PixelParameter.MESSAGE_SHOWN to lastRemoteMessageSeen?.id.orEmpty()),
+        )
     }
 
     class NewTabLegacyPageViewModelProviderFactory(

@@ -155,5 +155,33 @@
                 "type": "string"
             }
         ]
+    },
+    "m_remote_message_image_load_success": {
+        "description": "Triggered when a remote message image is successfully loaded and displayed",
+        "owners": ["catalinradoiu"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "message",
+                "description": "The identifier for the message, sourced from the remote message configuration",
+                "type": "string"
+            }
+        ]
+    },
+    "m_remote_message_image_load_failed": {
+        "description": "Triggered when a remote message image fails to load",
+        "owners": ["catalinradoiu"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "message",
+                "description": "The identifier for the message, sourced from the remote message configuration",
+                "type": "string"
+            }
+        ]
     }
 }

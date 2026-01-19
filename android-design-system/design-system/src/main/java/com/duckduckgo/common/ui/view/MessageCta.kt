@@ -53,6 +53,9 @@ class MessageCta : FrameLayout {
     private var onSecondaryButtonClicked: () -> Unit = {}
     private var onPromoActionButtonClicked: () -> Unit = {}
 
+    private var onRemoteImageLoadFailed: () -> Unit = {}
+    private var onRemoteImageLoadSuccess: () -> Unit = {}
+
     constructor(context: Context) : this(context, null)
 
     constructor(
@@ -191,6 +194,7 @@ class MessageCta : FrameLayout {
                         target: Target<Drawable?>,
                         isFirstResource: Boolean,
                     ): Boolean {
+                        onRemoteImageLoadFailed()
                         if (drawableRes == null) {
                             imageView.gone()
                         }
@@ -204,6 +208,7 @@ class MessageCta : FrameLayout {
                         dataSource: DataSource,
                         isFirstResource: Boolean,
                     ): Boolean {
+                        onRemoteImageLoadSuccess()
                         return false
                     }
                 },
@@ -266,6 +271,14 @@ class MessageCta : FrameLayout {
 
     fun onCloseButtonClicked(onDismiss: () -> Unit) {
         this.onCloseButton = onDismiss
+    }
+
+    fun onRemoteImageLoadSuccess(onRemoteImageLoadSuccess: () -> Unit) {
+        this.onRemoteImageLoadSuccess = onRemoteImageLoadSuccess
+    }
+
+    fun onRemoteImageLoadFailed(onRemoteImageLoadFailed: () -> Unit) {
+        this.onRemoteImageLoadFailed = onRemoteImageLoadFailed
     }
 
     fun onTopAnimationConfigured(configure: (LottieAnimationView) -> Unit) {
