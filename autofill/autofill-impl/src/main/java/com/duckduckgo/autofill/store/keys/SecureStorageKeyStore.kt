@@ -23,6 +23,7 @@ import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
@@ -31,7 +32,6 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import okio.ByteString.Companion.decodeBase64
 import okio.ByteString.Companion.toByteString
-import java.lang.Exception
 
 /**
  * This class provides a way to access and store key related data
@@ -58,54 +58,53 @@ class RealSecureStorageKeyStore constructor(
     private val coroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
     private val autofillFeature: AutofillFeature,
+    private val sharedPreferencesProvider: SharedPreferencesProvider,
 ) : SecureStorageKeyStore {
 
     private val mutex: Mutex = Mutex()
+    private val harmonyMutex: Mutex = Mutex()
     private val encryptedPreferencesDeferred: Deferred<SharedPreferences?> by lazy {
         coroutineScope.async(dispatcherProvider.io()) {
-            encryptedPreferencesAsync()
+            try {
+                mutex.withLock {
+                    EncryptedSharedPreferences.create(
+                        context,
+                        FILENAME,
+                        MasterKey.Builder(context)
+                            .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+                            .build(),
+                        EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+                        EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM,
+                    )
+                }
+            } catch (e: Exception) {
+                null
+            }
         }
     }
 
-    private val encryptedPreferencesSync: SharedPreferences? by lazy { encryptedPreferencesSync() }
+    private val harmonyPreferencesDeferred: Deferred<SharedPreferences?> by lazy {
+        coroutineScope.async(dispatcherProvider.io()) {
+            try {
+                harmonyMutex.withLock {
+                    if (autofillFeature.useHarmony().isEnabled()) {
+                        sharedPreferencesProvider.getMigratedEncryptedSharedPreferences(FILENAME)
+                    } else {
+                        null
+                    }
+                }
+            } catch (e: Exception) {
+                null
+            }
+        }
+    }
 
     private suspend fun getEncryptedPreferences(): SharedPreferences? {
-        return if (autofillFeature.createAsyncPreferences().isEnabled()) encryptedPreferencesDeferred.await() else encryptedPreferencesSync
+        return encryptedPreferencesDeferred.await()
     }
 
-    private suspend fun encryptedPreferencesAsync(): SharedPreferences? {
-        return try {
-            mutex.withLock {
-                EncryptedSharedPreferences.create(
-                    context,
-                    FILENAME,
-                    MasterKey.Builder(context)
-                        .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
-                        .build(),
-                    EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-                    EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM,
-                )
-            }
-        } catch (e: Exception) {
-            null
-        }
-    }
-
-    @Synchronized
-    private fun encryptedPreferencesSync(): SharedPreferences? {
-        return try {
-            EncryptedSharedPreferences.create(
-                context,
-                FILENAME,
-                MasterKey.Builder(context)
-                    .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
-                    .build(),
-                EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-                EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM,
-            )
-        } catch (e: Exception) {
-            null
-        }
+    private suspend fun getHarmonyEncryptedPreferences(): SharedPreferences? {
+        return harmonyPreferencesDeferred.await()
     }
 
     override suspend fun updateKey(
@@ -120,12 +119,27 @@ class RealSecureStorageKeyStore constructor(
                     putString(keyName, keyValue.toByteString().base64())
                 }
             }
+
+            if (autofillFeature.useHarmony().isEnabled()) {
+                getHarmonyEncryptedPreferences()?.edit(commit = true) {
+                    if (keyValue == null) {
+                        remove(keyName)
+                    } else {
+                        putString(keyName, keyValue.toByteString().base64())
+                    }
+                }
+            }
         }
     }
 
     override suspend fun getKey(keyName: String): ByteArray? {
         return withContext(dispatcherProvider.io()) {
-            return@withContext getEncryptedPreferences()?.getString(keyName, null)?.run {
+            val preferences = if (autofillFeature.useHarmony().isEnabled()) {
+                getHarmonyEncryptedPreferences()
+            } else {
+                getEncryptedPreferences()
+            }
+            return@withContext preferences?.getString(keyName, null)?.run {
                 this.decodeBase64()?.toByteArray()
             }
         }

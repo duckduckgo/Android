@@ -16,20 +16,24 @@
 
 package com.duckduckgo.data.store.impl
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Context.MODE_PRIVATE
 import android.content.SharedPreferences
+import android.system.ErrnoException
 import androidx.core.content.edit
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.anrs.api.CrashLogger
 import com.duckduckgo.anrs.api.CrashLogger.Crash
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.util.UUID
@@ -37,6 +41,9 @@ import java.util.concurrent.Executor
 
 @RunWith(AndroidJUnit4::class)
 class SharedPreferencesProviderImplTest {
+
+    @get:Rule
+    var coroutinesTestRule = CoroutineTestRule()
 
     private val context: Context = InstrumentationRegistry.getInstrumentation().context.applicationContext
     private lateinit var prefs: SharedPreferences
@@ -50,11 +57,15 @@ class SharedPreferencesProviderImplTest {
         }
     }
 
+    @SuppressLint("DenyListedApi")
     @Before
     fun setup() {
         name = UUID.randomUUID().toString()
         prefs = context.getSharedPreferences(name, MODE_PRIVATE)
-        vpnPreferencesProvider = SharedPreferencesProviderImpl(context) { crashLogger }
+        vpnPreferencesProvider = SharedPreferencesProviderImpl(
+            context = context,
+            dispatcherProvider = coroutinesTestRule.testDispatcherProvider,
+        ) { crashLogger }
     }
 
     @After
@@ -94,7 +105,7 @@ class SharedPreferencesProviderImplTest {
     fun whenSafeSharedPreferencesFails_thenCrashIsLoggedAndDefaultReturned() {
         val brokenPrefs = object : SharedPreferences by prefs {
             override fun getString(key: String?, defValue: String?): String? {
-                throw android.system.ErrnoException("fsync", 5)
+                throw ErrnoException("fsync", 5)
             }
         }
 

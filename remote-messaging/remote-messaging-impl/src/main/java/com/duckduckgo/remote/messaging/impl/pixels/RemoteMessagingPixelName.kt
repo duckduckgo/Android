@@ -27,4 +27,6 @@ enum class RemoteMessagingPixelName(override val pixelName: String) : Pixel.Pixe
     REMOTE_MESSAGE_SECONDARY_ACTION_CLICKED("m_remote_message_secondary_action_clicked"),
     REMOTE_MESSAGE_ACTION_CLICKED("m_remote_message_action_clicked"),
     REMOTE_MESSAGE_SHARED("m_remote_message_share"),
+    REMOTE_MESSAGE_IMAGE_LOAD_SUCCESS("m_remote_message_image_load_success"),
+    REMOTE_MESSAGE_IMAGE_LOAD_FAILED("m_remote_message_image_load_failed"),
 }

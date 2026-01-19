@@ -875,4 +875,16 @@ class RealPirRepositoryTest {
         verify(mockUserProfileDao).deleteAllProfiles()
         verify(mockPirDataStore).reset()
     }
+
+    @Test
+    fun whenClearAllUserDataOnlyThenDeleteAllUserTables() = runTest {
+        testee.clearUserData()
+
+        verify(mockExtractedProfileDao).deleteAllExtractedProfiles()
+        verify(mockUserProfileDao).deleteAllProfiles()
+        verify(mockPirDataStore).resetUserData()
+        verify(mockBrokerDao, never()).deleteAll()
+        verify(mockBrokerJsonDao, never()).deleteAll()
+        verify(mockPirDataStore, never()).reset()
+    }
 }

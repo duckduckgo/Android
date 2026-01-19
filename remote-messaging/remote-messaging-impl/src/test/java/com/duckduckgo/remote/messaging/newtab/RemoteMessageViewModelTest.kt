@@ -18,6 +18,7 @@ package com.duckduckgo.remote.messaging.newtab
 
 import androidx.lifecycle.LifecycleOwner
 import app.cash.turbine.test
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.playstore.PlayStoreUtils
 import com.duckduckgo.remote.messaging.api.Action.DefaultBrowser
@@ -28,6 +29,7 @@ import com.duckduckgo.remote.messaging.api.RemoteMessageModel
 import com.duckduckgo.remote.messaging.api.Surface
 import com.duckduckgo.remote.messaging.impl.newtab.RemoteMessageViewModel
 import com.duckduckgo.remote.messaging.impl.newtab.RemoteMessageViewModel.Command.SubmitUrl
+import com.duckduckgo.remote.messaging.impl.pixels.RemoteMessagingPixelName
 import com.duckduckgo.survey.api.SurveyParameterManager
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
@@ -51,6 +53,7 @@ class RemoteMessageViewModelTest {
     private var remoteMessageModel: RemoteMessageModel = mock()
     private var playStoreUtils: PlayStoreUtils = mock()
     private var surveyParameterManager: SurveyParameterManager = mock()
+    private var pixel: Pixel = mock()
 
     @Before
     fun setUp() {
@@ -59,6 +62,7 @@ class RemoteMessageViewModelTest {
             remoteMessageModel,
             playStoreUtils,
             surveyParameterManager,
+            pixel,
         )
     }
 
@@ -94,6 +98,21 @@ class RemoteMessageViewModelTest {
                 assertTrue(it.newMessage)
                 assertTrue(it.message?.id == remoteMessage.id)
                 assertTrue(it.message?.content == remoteMessage.content)
+                assertTrue(it.messageImageFilePath == null)
+            }
+        }
+    }
+
+    @Test
+    fun whenViewModelInitialisedAndMessageWithSavedImageThenViewStateEmitInitState() = runTest {
+        val remoteMessage = whenRemoteMessageAvailable("imagePath")
+
+        testee.viewState.test {
+            expectMostRecentItem().also {
+                assertTrue(it.newMessage)
+                assertTrue(it.message?.id == remoteMessage.id)
+                assertTrue(it.message?.content == remoteMessage.content)
+                assertTrue(it.messageImageFilePath == "imagePath")
             }
         }
     }
@@ -187,9 +206,34 @@ class RemoteMessageViewModelTest {
         verify(playStoreUtils).launchPlayStore(appPackage)
     }
 
-    private fun whenRemoteMessageAvailable(): RemoteMessage {
+    @Test
+    fun whenRemoteImageLoadSuccessThenPixelFired() = runTest {
+        whenRemoteMessageAvailable()
+
+        testee.onRemoteImageLoadSuccess()
+
+        verify(pixel).fire(
+            RemoteMessagingPixelName.REMOTE_MESSAGE_IMAGE_LOAD_SUCCESS,
+            mapOf(Pixel.PixelParameter.MESSAGE_SHOWN to "id1"),
+        )
+    }
+
+    @Test
+    fun whenRemoteImageLoadFailedThenPixelFired() = runTest {
+        whenRemoteMessageAvailable()
+
+        testee.onRemoteImageLoadFailed()
+
+        verify(pixel).fire(
+            RemoteMessagingPixelName.REMOTE_MESSAGE_IMAGE_LOAD_FAILED,
+            mapOf(Pixel.PixelParameter.MESSAGE_SHOWN to "id1"),
+        )
+    }
+
+    private suspend fun whenRemoteMessageAvailable(imageFilePath: String? = null): RemoteMessage {
         val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList(), listOf(Surface.NEW_TAB_PAGE))
         whenever(remoteMessageModel.getActiveMessages()).thenReturn(flowOf(remoteMessage))
+        whenever(remoteMessageModel.getRemoteMessageImageFile()).thenReturn(imageFilePath)
         testee.onStart(mockLifecycleOwner)
         return remoteMessage
     }

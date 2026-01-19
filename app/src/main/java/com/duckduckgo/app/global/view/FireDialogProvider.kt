@@ -21,8 +21,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
-import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 /**
@@ -48,18 +47,12 @@ class FireDialogProviderImpl @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
 ) : FireDialogProvider {
 
-    override suspend fun createFireDialog(): FireDialog = coroutineScope {
-        val useImprovedDataClearing = async(dispatcherProvider.io()) {
-            androidBrowserConfigFeature.improvedDataClearingOptions().isEnabled()
-        }
-
-        val useGranularFireDialog = async(dispatcherProvider.io()) {
-            androidBrowserConfigFeature.granularFireDialog().isEnabled()
-        }
-
+    override suspend fun createFireDialog(): FireDialog = withContext(dispatcherProvider.io()) {
         when {
-            useGranularFireDialog.await() -> GranularFireDialog.newInstance()
-            useImprovedDataClearing.await() -> NonGranularFireDialog.newInstance()
+            androidBrowserConfigFeature.granularFireDialog().isEnabled() ->
+                GranularFireDialog.newInstance()
+            androidBrowserConfigFeature.improvedDataClearingOptions().isEnabled() ->
+                NonGranularFireDialog.newInstance()
             else -> LegacyFireDialog.newInstance()
         }
     }
