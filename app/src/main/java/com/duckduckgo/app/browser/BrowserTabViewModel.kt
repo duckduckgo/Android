@@ -1637,7 +1637,7 @@ class BrowserTabViewModel @Inject constructor(
         title: String?,
     ) {
         logcat(VERBOSE) { "Duck.ai: Page changed: $url" }
-        cleanupBlobDownloadReplyProxyMaps()
+        cleanupBlobDownloadReplyProxyMaps(url)
 
         hasCtaBeenShownForCurrentPage.set(false)
         buildSiteFactory(url, title, urlUnchangedForExternalLaunchPurposes(site?.url, url))
@@ -1725,8 +1725,8 @@ class BrowserTabViewModel @Inject constructor(
         automaticSavedLoginsMonitor.clearAutoSavedLoginId(tabId)
     }
 
-    private fun cleanupBlobDownloadReplyProxyMaps() {
-        fixedReplyProxyMap.clear()
+    private fun cleanupBlobDownloadReplyProxyMaps(url: String) {
+        fixedReplyProxyMap.keys.retainAll { sameOrigin(it, url) }
     }
 
     private fun setAdClickActiveTabData(url: String?) {
@@ -4332,14 +4332,11 @@ class BrowserTabViewModel @Inject constructor(
         replyProxy: JavaScriptReplyProxy,
         locationHref: String? = null,
     ) {
-        appCoroutineScope.launch(dispatchers.io()) {
-            // FF check has disk IO
-            val frameProxies = fixedReplyProxyMap[originUrl]?.toMutableMap() ?: mutableMapOf()
-            // if location.href is not passed, we fall back to origin
-            val safeLocationHref = locationHref ?: originUrl
-            frameProxies[safeLocationHref] = replyProxy
-            fixedReplyProxyMap[originUrl] = frameProxies
-        }
+        val frameProxies = fixedReplyProxyMap[originUrl]?.toMutableMap() ?: mutableMapOf()
+        // if location.href is not passed, we fall back to origin
+        val safeLocationHref = locationHref ?: originUrl
+        frameProxies[safeLocationHref] = replyProxy
+        fixedReplyProxyMap[originUrl] = frameProxies
     }
 
     fun onStartPrint() {

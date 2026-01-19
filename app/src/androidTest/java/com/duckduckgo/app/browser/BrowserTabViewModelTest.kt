@@ -43,6 +43,7 @@ import androidx.lifecycle.Observer
 import androidx.room.Room
 import androidx.test.filters.SdkSuppress
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
+import androidx.webkit.JavaScriptReplyProxy
 import app.cash.turbine.test
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.app.ValueCaptorObserver
@@ -8240,5 +8241,106 @@ class BrowserTabViewModelTest {
 
         verify(mockPixel).fire(DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_KEYBOARD_USAGE)
         verify(mockPixel).fire(DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_KEYBOARD_USAGE_DAILY, type = Daily())
+    }
+
+    @Test
+    fun whenNavigatingToSameOriginThenBlobProxyIsRetained() = runTest {
+        val originUrl = "https://example.com"
+        val blobUrl = "blob:https://example.com/some-blob-id"
+        val mockReplyProxy: JavaScriptReplyProxy = mock()
+
+        testee.saveReplyProxyForBlobDownload(originUrl, mockReplyProxy)
+
+        // Navigate to the same origin (proxy should be retained)
+        loadUrl("https://example.com/another-page")
+
+        testee.requestFileDownload(
+            webView = mockWebView,
+            url = blobUrl,
+            contentDisposition = null,
+            mimeType = "application/octet-stream",
+            requestUserConfirmation = true,
+            isBlobDownloadWebViewFeatureEnabled = true,
+        )
+
+        verify(mockWebViewCompatWrapper).postMessage(eq(mockWebView), eq(mockReplyProxy), eq(blobUrl))
+    }
+
+    @Test
+    fun whenNavigatingToDifferentOriginThenBlobProxyIsRemoved() = runTest {
+        val originUrl = "https://example.com"
+        val blobUrl = "blob:https://example.com/some-blob-id"
+        val mockReplyProxy: JavaScriptReplyProxy = mock()
+
+        testee.saveReplyProxyForBlobDownload(originUrl, mockReplyProxy)
+
+        // Navigate to a different origin (proxy should be removed)
+        loadUrl("https://different-site.com/page")
+
+        testee.requestFileDownload(
+            webView = mockWebView,
+            url = blobUrl,
+            contentDisposition = null,
+            mimeType = "application/octet-stream",
+            requestUserConfirmation = true,
+            isBlobDownloadWebViewFeatureEnabled = true,
+        )
+
+        verify(mockWebViewCompatWrapper, never()).postMessage(any(), any(), any())
+    }
+
+    @Test
+    fun whenSavingMultipleProxiesForSameOriginThenAllAreRetainedOnSameOriginNavigation() = runTest {
+        val originUrl = "https://example.com"
+        val locationHref1 = "https://example.com/frame1"
+        val locationHref2 = "https://example.com/frame2"
+        val blobUrl = "blob:https://example.com/some-blob-id"
+        val mockReplyProxy1: JavaScriptReplyProxy = mock()
+        val mockReplyProxy2: JavaScriptReplyProxy = mock()
+
+        testee.saveReplyProxyForBlobDownload(originUrl, mockReplyProxy1, locationHref1)
+        testee.saveReplyProxyForBlobDownload(originUrl, mockReplyProxy2, locationHref2)
+
+        // Navigate to the same origin (all proxies should be retained)
+        loadUrl("https://example.com/another-page")
+
+        testee.requestFileDownload(
+            webView = mockWebView,
+            url = blobUrl,
+            contentDisposition = null,
+            mimeType = "application/octet-stream",
+            requestUserConfirmation = true,
+            isBlobDownloadWebViewFeatureEnabled = true,
+        )
+
+        verify(mockWebViewCompatWrapper).postMessage(eq(mockWebView), eq(mockReplyProxy1), eq(blobUrl))
+        verify(mockWebViewCompatWrapper).postMessage(eq(mockWebView), eq(mockReplyProxy2), eq(blobUrl))
+    }
+
+    @Test
+    fun whenSavingProxiesForDifferentOriginsThenOnlyMatchingOriginIsRetained() = runTest {
+        val originUrl1 = "https://example.com"
+        val originUrl2 = "https://other-site.com"
+        val blobUrl = "blob:https://example.com/some-blob-id"
+        val mockReplyProxy1: JavaScriptReplyProxy = mock()
+        val mockReplyProxy2: JavaScriptReplyProxy = mock()
+
+        testee.saveReplyProxyForBlobDownload(originUrl1, mockReplyProxy1)
+        testee.saveReplyProxyForBlobDownload(originUrl2, mockReplyProxy2)
+
+        // Navigate to first origin (only first proxy should be retained)
+        loadUrl("https://example.com/page")
+
+        testee.requestFileDownload(
+            webView = mockWebView,
+            url = blobUrl,
+            contentDisposition = null,
+            mimeType = "application/octet-stream",
+            requestUserConfirmation = true,
+            isBlobDownloadWebViewFeatureEnabled = true,
+        )
+
+        verify(mockWebViewCompatWrapper).postMessage(eq(mockWebView), eq(mockReplyProxy1), eq(blobUrl))
+        verify(mockWebViewCompatWrapper, never()).postMessage(eq(mockWebView), eq(mockReplyProxy2), eq(blobUrl))
     }
 }
