@@ -34,6 +34,7 @@
     <string name="sync_setup_begin_syncing">Synchroniseren starten</string>
     <string name="sync_setup_with_another_device_cta_title">Synchroniseren met een ander apparaat</string>
     <string name="sync_setup_with_another_device_cta_subtitle">Synchroniseer bladwijzers en wachtwoorden veilig tussen je apparaten.</string>
+    <string name="sync_setup_with_another_device_cta_subtitle_with_ai_chat">Synchroniseer bladwijzers, wachtwoorden en Duck.ai-chats veilig tussen je apparaten.</string>
     <string name="sync_off_hint">Je gegevens zijn volledig versleuteld en DuckDuckGo heeft geen toegang tot de versleutelingscode.</string>
     <string name="sync_setup_single_device_title">Configuratie van één apparaat</string>
     <string name="sync_setup_other_options_title">Andere opties</string>
@@ -45,12 +46,14 @@
     <!-- Setup screen -->
     <string name="sync_enable_sync_title">\'Synchronisatie en back-up\' instellen!</string>
     <string name="sync_enable_sync_content">Je bladwijzers en wachtwoorden worden voorbereid voor synchronisatie. Dit hoeft niet zo lang te duren.</string>
+    <string name="sync_enable_sync_content_with_ai_chat">Je bladwijzers, wachtwoorden en Duck.ai-chats worden voorbereid voor synchronisatie. Even geduld.</string>
     <string name="sync_enable_options">Opties</string>
     <string name="sync_enable_option_favicons_title">Bladwijzerpictogrammen ophalen</string>
     <string name="sync_enable_option_favicons_subtitle">Download automatisch pictogrammen voor gesynchroniseerde bladwijzers.</string>
     <string name="sync_enable_connecting">Er wordt verbinding gemaakt ...</string>
     <string name="sync_intro_enable_title">Dit apparaat synchroniseren en back-up maken</string>
     <string name="sync_intro_enable_content">Hiermee maak je een versleutelde back-up van je bladwijzers en wachtwoorden op de beveiligde server van DuckDuckGo. Deze back-up kan met je andere apparaten worden gesynchroniseerd. \n\n De versleutelingscode wordt alleen op je apparaat opgeslagen. DuckDuckGo heeft er geen toegang toe.</string>
+    <string name="sync_intro_enable_content_with_ai_chat">Hiermee maak je een versleutelde back-up van je bladwijzers, wachtwoorden en Duck.ai-chats op de beveiligde server van DuckDuckGo. Deze back-up kan met je andere apparaten worden gesynchroniseerd. \n\n De versleutelingscode wordt alleen op je apparaat opgeslagen. DuckDuckGo heeft er geen toegang toe.</string>
     <string name="sync_intro_enable_footer">Je kunt later synchroniseren met je andere apparaten.</string>
     <string name="sync_intro_enable_cta">\'Synchronisatie en back-up\' inschakelen</string>
     <string name="sync_intro_recover_title">Gesynchroniseerde gegevens herstellen</string>
