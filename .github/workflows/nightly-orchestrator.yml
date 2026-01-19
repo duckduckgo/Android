@@ -29,15 +29,8 @@ jobs:
       commit: ${{ needs.resolve-commit.outputs.commit_sha }}
     secrets: inherit
 
-  call-custom-tabs:
-    needs: [resolve-commit, call-nightly]
-    uses: ./.github/workflows/e2e-nightly-custom-tabs.yml
-    with:
-      commit: ${{ needs.resolve-commit.outputs.commit_sha }}
-    secrets: inherit
-
   call-end-to-end:
-    needs: [resolve-commit, call-custom-tabs]
+    needs: [resolve-commit, call-nightly]
     uses: ./.github/workflows/e2e-nightly-full-suite.yml
     with:
       commit: ${{ needs.resolve-commit.outputs.commit_sha }}
