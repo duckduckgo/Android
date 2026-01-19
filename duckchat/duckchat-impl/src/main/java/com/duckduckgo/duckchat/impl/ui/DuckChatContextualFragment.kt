@@ -189,6 +189,8 @@ class DuckChatContextualFragment : DuckDuckGoFragment(R.layout.fragment_contextu
     }
 
     private var sheetMode = SheetMode.INPUT
+    private val contextualPageTitle get() = requireArguments().getString(KEY_DUCK_AI_CONTEXTUAL_PAGE_TITLE)
+    private val contextualPageUrl get() = requireArguments().getString(KEY_DUCK_AI_CONTEXTUAL_PAGE_URL)
 
     @SuppressLint("SetJavaScriptEnabled")
     override fun onViewCreated(
@@ -393,11 +395,11 @@ class DuckChatContextualFragment : DuckDuckGoFragment(R.layout.fragment_contextu
                 }
 
                 override fun afterTextChanged(text: Editable?) {
-                    binding.actionSend.isEnabled = text.toString().isEmpty()
+                    binding.duckAiContextualSend.isEnabled = text.toString().isEmpty()
                 }
             },
         )
-        binding.actionSend.setOnClickListener {
+        binding.duckAiContextualSend.setOnClickListener {
             sendPrompt()
         }
         binding.contextualFullScreen.setOnClickListener {
@@ -408,6 +410,17 @@ class DuckChatContextualFragment : DuckDuckGoFragment(R.layout.fragment_contextu
                 }
                 setFragmentResult(KEY_DUCK_AI_CONTEXTUAL_RESULT, result)
             }
+        }
+        binding.duckAiContextualPageTitle.text = contextualPageTitle
+        binding.duckAiContextualPageRemove.setOnClickListener {
+            binding.duckAiContextualLayout.gone()
+            binding.duckAiContextualAddAttachment.show()
+        }
+        binding.duckAiContextualAddAttachment.setOnClickListener {
+            binding.duckAiContextualLayout.show()
+        }
+        binding.contextualPromptSummarize.setOnClickListener {
+            binding.inputField.setText(binding.contextualPromptSummarize.text.toString())
         }
     }
 
@@ -743,7 +756,11 @@ class DuckChatContextualFragment : DuckDuckGoFragment(R.layout.fragment_contextu
         private const val CUSTOM_UA =
             "Mozilla/5.0 (Linux; Android 16) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/124.0.0.0 Mobile DuckDuckGo/5 Safari/537.36"
         const val REQUEST_CODE_CHOOSE_FILE = 100
+
         const val KEY_DUCK_AI_URL: String = "KEY_DUCK_AI_URL"
         const val KEY_DUCK_AI_CONTEXTUAL_RESULT: String = "KEY_DUCK_AI_CONTEXTUAL_RESULT"
+
+        const val KEY_DUCK_AI_CONTEXTUAL_PAGE_TITLE: String = "KEY_DUCK_AI_CONTEXTUAL_PAGE_TITLE"
+        const val KEY_DUCK_AI_CONTEXTUAL_PAGE_URL: String = "KEY_DUCK_AI_CONTEXTUAL_PAGE_URL"
     }
 }
