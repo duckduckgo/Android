@@ -31,7 +31,7 @@ jobs:
 
   call-custom-tabs:
     needs: [resolve-commit, call-nightly]
-    uses: ./.github/workflows/custom-tabs-nightly.yml
+    uses: ./.github/workflows/e2e-nightly-custom-tabs.yml
     with:
       commit: ${{ needs.resolve-commit.outputs.commit_sha }}
     secrets: inherit
