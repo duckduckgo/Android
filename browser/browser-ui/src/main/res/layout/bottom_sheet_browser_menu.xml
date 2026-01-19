@@ -129,7 +129,7 @@
                 android:id="@+id/addToHomeMenuItem"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:iconDrawable="@drawable/ic_add_to_home_16"
+                app:iconDrawable="@drawable/ic_add_to_home_24"
                 app:menuSize="medium"
                 app:primaryText="@string/browserMenuAddToHome" />
 
@@ -166,6 +166,16 @@
                 app:iconDrawable="@drawable/ic_open_in_24"
                 app:menuSize="medium"
                 app:primaryText="@string/browserMenuOpenAppLink" />
+
+            <com.duckduckgo.common.ui.view.MenuItemView
+                android:id="@+id/openInDdgBrowserMenuItem"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:iconDrawable="@drawable/ic_open_in_24"
+                app:primaryText="@string/browserMenuOpenInDDG"
+                app:menuSize="medium"
+                tools:visibility="visible" />
 
             <com.duckduckgo.common.ui.view.divider.HorizontalDivider
                 android:id="@+id/librarySectionDivider"
@@ -274,16 +284,6 @@
                 android:visibility="gone"
                 app:iconDrawable="@drawable/ic_settings_ai_24"
                 app:primaryText="@string/browserMenuChatSettings"
-                app:menuSize="medium"
-                tools:visibility="visible" />
-
-            <com.duckduckgo.common.ui.view.MenuItemView
-                android:id="@+id/openInDdgBrowserMenuItem"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:visibility="gone"
-                app:iconDrawable="@drawable/ic_open_in_24"
-                app:primaryText="@string/browserMenuOpenInDDG"
                 app:menuSize="medium"
                 tools:visibility="visible" />
 
