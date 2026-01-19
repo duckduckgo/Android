@@ -1151,7 +1151,7 @@
         ]
     },
     "m_dbp_foreground-run_completed": {
-        "description": "Fired when pir run is started in the foreground",
+        "description": "Fired when pir run is completed in the foreground",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
