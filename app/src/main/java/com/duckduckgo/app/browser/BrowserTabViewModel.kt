@@ -3945,6 +3945,7 @@ class BrowserTabViewModel @Inject constructor(
             DUCK_CHAT_FEATURE_NAME -> {
                 viewModelScope.launch(dispatchers.io()) {
                     val response = duckChatJSHelper.processJsCallbackMessage(featureName, method, id, data)
+                    logcat { "Duck.ai: btf response $response" }
                     withContext(dispatchers.main()) {
                         response?.let {
                             command.value = SendResponseToJs(it)
@@ -4473,11 +4474,16 @@ class BrowserTabViewModel @Inject constructor(
 
         when {
             duckAiFeatureState.showContextualMode.value && !isNtp -> {
-                command.value = Command.ShowDuckAIContextualMode
+                val contextualPageUrl = url
+                val contextualPageTitle = title
+                if (contextualPageUrl != null && contextualPageTitle != null) {
+                    command.value = Command.ShowDuckAIContextualMode(contextualPageUrl, contextualPageTitle)
+                }
             }
 
             duckAiFeatureState.showFullScreenMode.value -> {
                 val url = when {
+                    hasFocus && isNtp && query.isNullOrBlank() -> duckChat.getDuckChatUrl(query ?: "", false)
                     hasFocus -> duckChat.getDuckChatUrl(query ?: "", true)
                     else -> duckChat.getDuckChatUrl(query ?: "", false)
                 }
@@ -4486,6 +4492,7 @@ class BrowserTabViewModel @Inject constructor(
 
             else -> {
                 when {
+                    hasFocus && isNtp && query.isNullOrBlank() -> duckChat.openDuckChat()
                     hasFocus -> duckChat.openDuckChatWithAutoPrompt(query ?: "")
                     else -> duckChat.openDuckChat()
                 }
