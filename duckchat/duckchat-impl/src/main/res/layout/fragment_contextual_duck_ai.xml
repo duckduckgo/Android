@@ -20,7 +20,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_marginTop="@dimen/keyline_2"
+    android:id="@+id/contextualModeRoot"
     android:background="@drawable/rounded_top_corners_bottom_sheet_drawable"
     android:orientation="vertical">
 
@@ -29,20 +31,20 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:paddingHorizontal="@dimen/keyline_2"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         android:paddingTop="@dimen/keyline_4"
         android:paddingBottom="@dimen/keyline_4"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        android:paddingHorizontal="@dimen/keyline_2">
 
         <View
             android:id="@+id/contextualDragHandle"
             android:layout_width="32dp"
             android:layout_height="4dp"
             android:background="@drawable/duck_ai_prompt_background"
-            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
@@ -51,25 +53,25 @@
             android:layout_height="@dimen/toolbarIcon"
             android:background="@drawable/selectable_item_rounded_corner_background"
             android:contentDescription="@string/browserMenuChatHistory"
-            android:scaleType="center"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:scaleType="center"
             app:srcCompat="@drawable/ic_expand_24" />
 
         <com.duckduckgo.common.ui.view.text.DaxTextView
             android:id="@+id/contextualTitle"
             android:layout_width="wrap_content"
             android:layout_height="0dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/contextualDragHandle"
             android:layout_marginTop="@dimen/keyline_4"
+            android:gravity="center"
+            app:typography="h2"
             android:drawableStart="@drawable/ic_duck_ai_color_24"
             android:drawablePadding="@dimen/keyline_2"
-            android:gravity="center"
-            android:text="@string/duck_chat_title"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/contextualDragHandle"
-            app:typography="h2" />
+            android:text="@string/duck_chat_title"/>
 
         <ImageView
             android:id="@+id/contextualClose"
@@ -79,16 +81,146 @@
             android:background="@drawable/selectable_item_rounded_corner_background"
             android:contentDescription="@string/browserMenuChatHistory"
             android:scaleType="center"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:srcCompat="@drawable/ic_close_24_small" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <LinearLayout
+        android:id="@+id/contextualModeNativeContent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_gravity="bottom">
+
+        <LinearLayout
+            android:id="@+id/contextualModePrompts"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/contextualModeInputSpacer"
+            app:layout_constraintBottom_toTopOf="@id/inputModeWidgetCard"
+            android:orientation="vertical"
+            android:paddingHorizontal="@dimen/keyline_4"
+            android:paddingTop="@dimen/keyline_4"
+            android:paddingBottom="@dimen/keyline_3">
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/contextualPromptSummarize"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="@dimen/keyline_2"
+                app:typography="body2_bold"
+                android:background="@drawable/duck_ai_prompt_background"
+                android:drawableStart="@drawable/ic_arrow_down_right_16"
+                android:drawablePadding="@dimen/keyline_2"
+                android:text="@string/duckAIContextualPromptSummarize"/>
+
+        </LinearLayout>
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/inputModeWidgetCard"
+            style="@style/Widget.DuckDuckGo.OmnibarCardView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/contextualModePrompts"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginHorizontal="@dimen/keyline_4"
+            android:layout_marginTop="@dimen/keyline_2"
+            android:layout_marginBottom="@dimen/keyline_4"
+            app:cardElevation="0dp"
+            app:strokeColor="?attr/daxColorAccentBlue"
+            app:strokeWidth="@dimen/omnibarOutlineWidth">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:padding="@dimen/keyline_2">
+
+                <LinearLayout
+                    android:id="@+id/inputModeWidgetCardContent"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <EditText
+                        android:id="@+id/inputField"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginStart="10dp"
+                        android:layout_weight="1"
+                        android:background="@null"
+                        android:fontFamily="sans-serif"
+                        android:gravity="start|top"
+                        android:hint="@string/input_screen_chat_hint"
+                        android:lineSpacingMultiplier="1.2"
+                        android:minHeight="40dp"
+                        android:paddingVertical="@dimen/keyline_2"
+                        android:textColor="?attr/daxColorPrimaryText"
+                        android:textColorHighlight="?attr/daxOmnibarTextColorHighlight"
+                        android:textColorHint="?attr/daxColorSecondaryText"
+                        android:textCursorDrawable="@drawable/text_cursor"
+                        android:textSize="16sp"
+                        android:textStyle="normal" />
+
+                    <ImageView
+                        android:id="@+id/inputFieldVoiceInputButton"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:layout_gravity="top"
+                        android:background="@drawable/selectable_item_rounded_corner_background"
+                        android:gravity="center"
+                        android:importantForAccessibility="no"
+                        android:scaleType="center"
+                        android:visibility="gone"
+                        android:layout_margin="@dimen/keyline_1"
+                        app:srcCompat="@drawable/ic_microphone_24"
+                        tools:visibility="visible" />
+
+                    <ImageView
+                        android:id="@+id/inputFieldClearText"
+                        android:layout_width="@dimen/toolbarIcon"
+                        android:layout_height="@dimen/toolbarIcon"
+                        android:layout_gravity="top"
+                        android:background="@drawable/selectable_item_rounded_corner_background"
+                        android:gravity="center"
+                        android:importantForAccessibility="no"
+                        android:scaleType="centerInside"
+                        android:visibility="gone"
+                        app:srcCompat="@drawable/ic_close_circle_small_secondary_24" />
+
+                </LinearLayout>
+
+                <ImageView
+                    android:id="@+id/actionSend"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:layout_gravity="bottom|end"
+                    android:background="@drawable/background_input_screen_button"
+                    android:backgroundTint="?attr/daxColorButtonPrimaryContainer"
+                    android:foreground="@drawable/selectable_circular_ripple"
+                    android:importantForAccessibility="no"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/ic_arrow_up_24"
+                    android:layout_margin="@dimen/keyline_1"
+                    app:tint="?attr/daxColorWhite" />
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+    </LinearLayout>
+
     <WebView
         android:id="@+id/simpleWebview"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:visibility="gone"/>
 
 </LinearLayout>

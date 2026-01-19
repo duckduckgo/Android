@@ -27,8 +27,10 @@ import android.os.Bundle
 import android.os.Environment
 import android.os.Message
 import android.provider.MediaStore
+import android.view.KeyEvent
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.webkit.CookieManager
 import android.webkit.MimeTypeMap
@@ -37,11 +39,10 @@ import android.webkit.WebChromeClient
 import android.webkit.WebChromeClient.FileChooserParams
 import android.webkit.WebSettings
 import android.webkit.WebView
-import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
+import android.widget.TextView
 import androidx.annotation.AnyThread
-import androidx.core.app.ActivityOptionsCompat
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.setFragmentResult
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
@@ -50,11 +51,14 @@ import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.view.dialog.ActionBottomSheetDialog
+import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.makeSnackbarWithNoBottomInset
+import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.FragmentViewModelFactory
+import com.duckduckgo.common.utils.extensions.hideKeyboard
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.downloads.api.DOWNLOAD_SNACKBAR_DELAY
 import com.duckduckgo.downloads.api.DOWNLOAD_SNACKBAR_LENGTH
@@ -64,12 +68,6 @@ import com.duckduckgo.downloads.api.DownloadStateListener
 import com.duckduckgo.downloads.api.DownloadsFileActions
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
-import com.duckduckgo.duckchat.api.inputscreen.BrowserAndInputScreenTransitionProvider
-import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityParams
-import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityResultCodes
-import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityResultParams
-import com.duckduckgo.duckchat.api.inputscreen.InputScreenBrowserButtonsConfig
-import com.duckduckgo.duckchat.api.viewmodel.DuckChatSharedViewModel
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.databinding.FragmentContextualDuckAiBinding
@@ -115,8 +113,6 @@ class DuckChatContextualFragment : DuckDuckGoFragment(R.layout.fragment_contextu
     private val viewModel: DuckChatWebViewViewModel by lazy {
         ViewModelProvider(this, viewModelFactory)[DuckChatWebViewViewModel::class.java]
     }
-
-    private val browseSharedViewModel: DuckChatSharedViewModel by activityViewModels()
 
     @Inject
     lateinit var webViewClient: DuckChatWebViewClient
@@ -171,9 +167,6 @@ class DuckChatContextualFragment : DuckDuckGoFragment(R.layout.fragment_contextu
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
 
-    @Inject
-    lateinit var browserAndInputScreenTransitionProvider: BrowserAndInputScreenTransitionProvider
-
     private val cookieManager: CookieManager by lazy { CookieManager.getInstance() }
 
     private var pendingFileDownload: PendingFileDownload? = null
@@ -192,7 +185,7 @@ class DuckChatContextualFragment : DuckDuckGoFragment(R.layout.fragment_contextu
         WEBVIEW,
     }
 
-    private var sheetMode = SheetMode.WEBVIEW
+    private var sheetMode = SheetMode.INPUT
 
     @SuppressLint("SetJavaScriptEnabled")
     override fun onViewCreated(
@@ -200,8 +193,6 @@ class DuckChatContextualFragment : DuckDuckGoFragment(R.layout.fragment_contextu
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
-
-        val url = arguments?.getString(KEY_DUCK_AI_URL) ?: "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5"
 
         simpleWebview.let {
             it.webViewClient = webViewClient
@@ -310,10 +301,6 @@ class DuckChatContextualFragment : DuckDuckGoFragment(R.layout.fragment_contextu
             )
         }
 
-        url?.let {
-            simpleWebview.loadUrl(it)
-        }
-
         externalCameraLauncher.registerForResult(this) {
             when (it) {
                 is MediaCaptured -> pendingUploadTask?.onReceiveValue(arrayOf(Uri.fromFile(it.file)))
@@ -330,6 +317,7 @@ class DuckChatContextualFragment : DuckDuckGoFragment(R.layout.fragment_contextu
             }
             pendingUploadTask = null
         }
+
         configureBottomSheet(view)
         observeViewModel()
     }
@@ -337,10 +325,87 @@ class DuckChatContextualFragment : DuckDuckGoFragment(R.layout.fragment_contextu
     private fun configureBottomSheet(view: View) {
         val parent = view.parent as? View ?: return
         val bottomSheetBehavior = BottomSheetBehavior.from(parent)
+
+        configureBehaviour(bottomSheetBehavior)
+        configureButtons(bottomSheetBehavior)
+    }
+
+    private fun configureBehaviour(bottomSheetBehavior: BottomSheetBehavior<View>) {
+        bottomSheetBehavior.isShouldRemoveExpandedCorners = false
+        bottomSheetBehavior.skipCollapsed = true
+        bottomSheetBehavior.isDraggable = false
+        bottomSheetBehavior.isHideable = true
+        bottomSheetBehavior.isFitToContents = true
+
+        bottomSheetBehavior.addBottomSheetCallback(
+            object : BottomSheetBehavior.BottomSheetCallback() {
+                override fun onStateChanged(
+                    bottomSheet: View,
+                    newState: Int,
+                ) {
+                    logcat { "Duck.ai: state changed $newState sheetMode $sheetMode" }
+                    if (newState == BottomSheetBehavior.STATE_EXPANDED) {
+                        bottomSheetBehavior.isDraggable = true
+                    }
+                }
+
+                override fun onSlide(
+                    bottomSheet: View,
+                    slideOffset: Float,
+                ) {
+                }
+            },
+        )
+    }
+
+    private fun configureButtons(bottomSheetBehavior: BottomSheetBehavior<View>) {
         binding.contextualClose.setOnClickListener {
             bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
         }
         binding.contextualModeButtons.setOnClickListener { }
+        binding.contextualModeRoot.setOnClickListener { }
+        binding.inputField.onFocusChangeListener = View.OnFocusChangeListener { _, focused ->
+            if (focused) {
+                bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+            }
+        }
+        binding.inputField.setOnEditorActionListener(
+            TextView.OnEditorActionListener { _, actionId, keyEvent ->
+                if (actionId == EditorInfo.IME_ACTION_GO || keyEvent?.keyCode == KeyEvent.KEYCODE_ENTER) {
+                    sendPrompt()
+                    return@OnEditorActionListener true
+                }
+                false
+            },
+        )
+        binding.actionSend.setOnClickListener {
+            sendPrompt()
+        }
+        binding.contextualFullScreen.setOnClickListener {
+            logcat { "Duck.ai: fullscreen ${simpleWebview.url}" }
+            simpleWebview.url?.let { url ->
+                val result = Bundle().apply {
+                    putString(KEY_DUCK_AI_URL, url)
+                }
+                setFragmentResult(KEY_DUCK_AI_CONTEXTUAL_RESULT, result)
+            }
+        }
+    }
+
+    private fun sendPrompt() {
+        val prompt = binding.inputField.text.toString()
+        hideKeyboard(binding.inputField)
+        if (prompt.isNotEmpty()) {
+            val url = duckChat.getDuckChatUrl(prompt, true)
+            simpleWebview.loadUrl(url)
+            showDuckChat()
+        }
+    }
+
+    private fun showDuckChat() {
+        sheetMode = SheetMode.WEBVIEW
+        binding.contextualModeNativeContent.gone()
+        binding.simpleWebview.show()
     }
 
     private fun observeViewModel() {
@@ -358,60 +423,6 @@ class DuckChatContextualFragment : DuckDuckGoFragment(R.layout.fragment_contextu
                 }
             }.launchIn(lifecycleScope)
     }
-
-    private fun launchInputScreen() {
-        // val isTopOmnibar = omnibar.omnibarType != OmnibarType.SINGLE_BOTTOM
-        // TODO: Support Bottom / Split omnibar
-        val isTopOmnibar = true
-        val tabs = arguments?.getInt(KEY_DUCK_AI_TABS) ?: 0
-        val intent =
-            globalActivityStarter.startIntent(
-                requireContext(),
-                InputScreenActivityParams(
-                    query = "",
-                    isTopOmnibar = true,
-                    browserButtonsConfig = InputScreenBrowserButtonsConfig.Enabled(tabs = tabs),
-                ),
-            )
-        val enterTransition = browserAndInputScreenTransitionProvider.getInputScreenEnterAnimation(true)
-        val exitTransition = browserAndInputScreenTransitionProvider.getBrowserExitAnimation(isTopOmnibar)
-        val options =
-            ActivityOptionsCompat.makeCustomAnimation(
-                requireActivity(),
-                enterTransition,
-                exitTransition,
-            )
-        inputScreenLauncher.launch(intent, options)
-    }
-
-    private val inputScreenLauncher =
-        registerForActivityResult(StartActivityForResult()) { result ->
-            val data = result.data
-            when (result.resultCode) {
-                InputScreenActivityResultCodes.NEW_SEARCH_REQUESTED -> {
-                    data?.getStringExtra(InputScreenActivityResultParams.SEARCH_QUERY_PARAM)?.let { query ->
-                        browseSharedViewModel.onSearchRequested(query)
-                    }
-                }
-
-                InputScreenActivityResultCodes.SWITCH_TO_TAB_REQUESTED -> {
-                    data?.getStringExtra(InputScreenActivityResultParams.TAB_ID_PARAM)?.let { tabId ->
-                        browseSharedViewModel.openExistingTab(tabId)
-                    }
-                }
-
-                InputScreenActivityResultCodes.MENU_REQUESTED -> {
-                }
-
-                InputScreenActivityResultCodes.TAB_SWITCHER_REQUESTED -> {
-                    browseSharedViewModel.onTabSwitcherClicked()
-                }
-
-                InputScreenActivityResultCodes.FIRE_BUTTON_REQUESTED -> {
-                    browseSharedViewModel.onFireButtonClicked()
-                }
-            }
-        }
 
     data class FileChooserRequestedParams(
         val filePickingMode: Int,
@@ -714,6 +725,6 @@ class DuckChatContextualFragment : DuckDuckGoFragment(R.layout.fragment_contextu
             "Mozilla/5.0 (Linux; Android 16) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/124.0.0.0 Mobile DuckDuckGo/5 Safari/537.36"
         const val REQUEST_CODE_CHOOSE_FILE = 100
         const val KEY_DUCK_AI_URL: String = "KEY_DUCK_AI_URL"
-        const val KEY_DUCK_AI_TABS: String = "KEY_DUCK_AI_TABS"
+        const val KEY_DUCK_AI_CONTEXTUAL_RESULT: String = "KEY_DUCK_AI_CONTEXTUAL_RESULT"
     }
 }

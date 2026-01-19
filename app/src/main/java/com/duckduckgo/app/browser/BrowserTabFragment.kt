@@ -297,6 +297,8 @@ import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityResultParams
 import com.duckduckgo.duckchat.api.inputscreen.InputScreenBrowserButtonsConfig
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckchat.impl.ui.DuckChatContextualFragment
+import com.duckduckgo.duckchat.impl.ui.DuckChatContextualFragment.Companion.KEY_DUCK_AI_CONTEXTUAL_RESULT
+import com.duckduckgo.duckchat.impl.ui.DuckChatContextualFragment.Companion.KEY_DUCK_AI_URL
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayerSettingsNoParams
 import com.duckduckgo.js.messaging.api.JsCallbackData
@@ -357,6 +359,7 @@ import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Provider
 import kotlin.coroutines.CoroutineContext
+import kotlin.getValue
 
 @InjectWith(FragmentScope::class)
 class BrowserTabFragment :
@@ -370,6 +373,7 @@ class BrowserTabFragment :
     private val supervisorJob = SupervisorJob()
 
     private var duckAiContextualFragment: DuckChatContextualFragment? = null
+    private var duckAiContextualBehaviourState: Int = BottomSheetBehavior.STATE_HALF_EXPANDED
 
     override val coroutineContext: CoroutineContext
         get() = supervisorJob + dispatchers.main()
@@ -2404,7 +2408,7 @@ class BrowserTabFragment :
             is Command.PageStarted -> onPageStarted()
             is Command.EnableDuckAIFullScreen -> showDuckAI(it.browserViewState)
             is Command.DisableDuckAIFullScreen -> omnibar.setViewMode(ViewMode.Browser(it.url))
-            is Command.ShowDuckAIContextualMode -> showDuckChatBottomSheet()
+            is Command.ShowDuckAIContextualMode -> showDuckChatContextualSheet()
         }
     }
 
@@ -3125,7 +3129,7 @@ class BrowserTabFragment :
         )
     }
 
-    private fun showDuckChatBottomSheet() {
+    private fun showDuckChatContextualSheet() {
         duckAiContextualFragment?.let { fragment ->
             val transaction = childFragmentManager.beginTransaction()
             transaction.show(fragment)
@@ -3138,23 +3142,40 @@ class BrowserTabFragment :
             transaction.commit()
         }
 
+        childFragmentManager.setFragmentResultListener(KEY_DUCK_AI_CONTEXTUAL_RESULT, viewLifecycleOwner) { _, bundle ->
+            val contextualChatUrl = bundle.getString(KEY_DUCK_AI_URL)
+            contextualChatUrl?.let {
+                webView?.loadUrl(contextualChatUrl)
+                removeDuckChatContextualSheet()
+            }
+        }
+
         binding.duckAiFragmentContainer.show()
 
         val bottomSheetBehavior = BottomSheetBehavior.from(binding.duckAiFragmentContainer)
-        bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
-        bottomSheetBehavior.isShouldRemoveExpandedCorners = false
-        bottomSheetBehavior.skipCollapsed = true
-        bottomSheetBehavior.isDraggable = true
-        bottomSheetBehavior.isHideable = true
+        bottomSheetBehavior.state = duckAiContextualBehaviourState
 
         bottomSheetBehavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
             override fun onStateChanged(bottomSheet: View, newState: Int) {
                 if (newState == BottomSheetBehavior.STATE_HIDDEN) {
                     binding.duckAiFragmentContainer.gone()
+                    hideKeyboard()
+                }
+                if (newState == BottomSheetBehavior.STATE_HALF_EXPANDED || newState == BottomSheetBehavior.STATE_EXPANDED) {
+                    duckAiContextualBehaviourState = newState
                 }
             }
             override fun onSlide(bottomSheet: View, slideOffset: Float) {}
         })
+    }
+
+    private fun removeDuckChatContextualSheet() {
+        duckAiContextualFragment?.let { fragment ->
+            val transaction = childFragmentManager.beginTransaction()
+            transaction.remove(fragment)
+            transaction.commit()
+        }
+        duckAiContextualFragment = null
     }
 
     private fun configureOmnibarTextInput() {
