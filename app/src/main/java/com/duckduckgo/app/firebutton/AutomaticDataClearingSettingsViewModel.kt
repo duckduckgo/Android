@@ -67,12 +67,19 @@ class AutomaticDataClearingSettingsViewModel @Inject constructor(
         duckAiFeatureState.showClearDuckAIChatHistory,
         duckChatWasOpenedBefore,
     ) { options, clearWhenOption, showClearDuckAiChatHistory, wasOpenedBefore ->
+        val isDuckChatClearingAvailable = wasOpenedBefore && showClearDuckAiChatHistory
+        val clearingOptions = if (!isDuckChatClearingAvailable) {
+            options - FireClearOption.DUCKAI_CHATS
+        } else {
+            options
+        }
+
         ViewState(
-            automaticClearingEnabled = options.isNotEmpty(),
-            clearTabs = FireClearOption.TABS in options,
-            clearData = FireClearOption.DATA in options,
-            clearDuckAiChats = FireClearOption.DUCKAI_CHATS in options,
-            showDuckAiChatsOption = wasOpenedBefore && showClearDuckAiChatHistory,
+            automaticClearingEnabled = clearingOptions.isNotEmpty(),
+            clearTabs = FireClearOption.TABS in clearingOptions,
+            clearData = FireClearOption.DATA in clearingOptions,
+            clearDuckAiChats = FireClearOption.DUCKAI_CHATS in clearingOptions,
+            showDuckAiChatsOption = isDuckChatClearingAvailable,
             clearWhenOption = clearWhenOption,
         )
     }.flowOn(dispatcherProvider.io())

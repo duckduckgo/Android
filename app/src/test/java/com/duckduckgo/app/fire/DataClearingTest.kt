@@ -22,6 +22,8 @@ import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.clear.FireClearOption
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.duckchat.api.DuckAiFeatureState
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -55,14 +57,22 @@ class DataClearingTest {
     @Mock
     private lateinit var mockTimeKeeper: BackgroundTimeKeeper
 
+    @Mock
+    private lateinit var mockDuckAiFeatureState: DuckAiFeatureState
+
+    private val showClearDuckAIChatHistoryFlow = MutableStateFlow(true)
+
     @Before
     fun setup() {
         MockitoAnnotations.openMocks(this)
+        showClearDuckAIChatHistoryFlow.value = true
+        whenever(mockDuckAiFeatureState.showClearDuckAIChatHistory).thenReturn(showClearDuckAIChatHistoryFlow)
         testee = DataClearing(
             fireDataStore = mockFireDataStore,
             clearDataAction = mockClearDataAction,
             settingsDataStore = mockSettingsDataStore,
             dataClearerTimeKeeper = mockTimeKeeper,
+            duckAiFeatureState = mockDuckAiFeatureState,
         )
     }
 
@@ -203,6 +213,43 @@ class DataClearingTest {
     }
 
     @Test
+    fun whenManualClearWithDuckAiChatsButFeatureFlagDisabled_thenDoNotClearChats() = runTest {
+        showClearDuckAIChatHistoryFlow.value = false
+        configureManualOptions(setOf(FireClearOption.DUCKAI_CHATS))
+
+        testee.clearDataUsingManualFireOptions(shouldRestartIfRequired = false, wasAppUsedSinceLastClear = true)
+
+        verify(mockClearDataAction, never()).clearDuckAiChatsOnly()
+        verify(mockClearDataAction).setAppUsedSinceLastClearFlag(true)
+        verify(mockClearDataAction, never()).killAndRestartProcess(any(), any())
+    }
+
+    @Test
+    fun whenManualClearWithAllOptionsButFeatureFlagDisabled_thenClearAllExceptDuckAiChats() = runTest {
+        showClearDuckAIChatHistoryFlow.value = false
+        configureManualOptions(setOf(FireClearOption.TABS, FireClearOption.DATA, FireClearOption.DUCKAI_CHATS))
+
+        testee.clearDataUsingManualFireOptions(shouldRestartIfRequired = false, wasAppUsedSinceLastClear = true)
+
+        verify(mockClearDataAction).clearTabsOnly()
+        verify(mockClearDataAction).clearBrowserDataOnly(true)
+        verify(mockClearDataAction, never()).clearDuckAiChatsOnly()
+        verify(mockClearDataAction).setAppUsedSinceLastClearFlag(true)
+    }
+
+    @Test
+    fun whenManualClearWithDuckAiChatsOnlyButFeatureFlagDisabledAndShouldRestartProcess_thenDoNotRestart() = runTest {
+        showClearDuckAIChatHistoryFlow.value = false
+        configureManualOptions(setOf(FireClearOption.DUCKAI_CHATS))
+
+        testee.clearDataUsingManualFireOptions(shouldRestartIfRequired = true, wasAppUsedSinceLastClear = false)
+
+        verify(mockClearDataAction, never()).clearDuckAiChatsOnly()
+        verify(mockClearDataAction).setAppUsedSinceLastClearFlag(false)
+        verify(mockClearDataAction, never()).killAndRestartProcess(any(), any())
+    }
+
+    @Test
     fun whenAutomaticClearWithTabsOnlyAndKillProcessIfNeeded_thenClearTabsAndReturnFalse() = runTest {
         configureAutomaticOptions(setOf(FireClearOption.TABS))
 
@@ -300,6 +347,46 @@ class DataClearingTest {
         verify(mockClearDataAction).clearDuckAiChatsOnly()
         verify(mockClearDataAction).setAppUsedSinceLastClearFlag(true)
         verify(mockClearDataAction, never()).killProcess()
+    }
+
+    @Test
+    fun whenAutomaticClearWithDuckAiChatsButFeatureFlagDisabled_thenDoNotClearChats() = runTest {
+        showClearDuckAIChatHistoryFlow.value = false
+        configureAutomaticOptions(setOf(FireClearOption.DUCKAI_CHATS))
+
+        val result = testee.clearDataUsingAutomaticFireOptions(killProcessIfNeeded = false)
+
+        assertFalse(result)
+        verify(mockClearDataAction, never()).clearDuckAiChatsOnly()
+        verify(mockClearDataAction).setAppUsedSinceLastClearFlag(true)
+        verify(mockClearDataAction, never()).killProcess()
+    }
+
+    @Test
+    fun whenAutomaticClearWithDuckAiChatsButFeatureFlagDisabledAndKillProcessIfNeeded_thenDoNotKillProcess() = runTest {
+        showClearDuckAIChatHistoryFlow.value = false
+        configureAutomaticOptions(setOf(FireClearOption.DUCKAI_CHATS))
+
+        val result = testee.clearDataUsingAutomaticFireOptions(killProcessIfNeeded = true)
+
+        assertFalse(result)
+        verify(mockClearDataAction, never()).clearDuckAiChatsOnly()
+        verify(mockClearDataAction).setAppUsedSinceLastClearFlag(false)
+        verify(mockClearDataAction, never()).killProcess()
+    }
+
+    @Test
+    fun whenAutomaticClearWithAllOptionsButFeatureFlagDisabled_thenClearAllExceptDuckAiChats() = runTest {
+        showClearDuckAIChatHistoryFlow.value = false
+        configureAutomaticOptions(setOf(FireClearOption.TABS, FireClearOption.DATA, FireClearOption.DUCKAI_CHATS))
+
+        val result = testee.clearDataUsingAutomaticFireOptions(killProcessIfNeeded = false)
+
+        assertTrue(result)
+        verify(mockClearDataAction).clearTabsOnly()
+        verify(mockClearDataAction).clearBrowserDataOnly(false)
+        verify(mockClearDataAction, never()).clearDuckAiChatsOnly()
+        verify(mockClearDataAction).setAppUsedSinceLastClearFlag(true)
     }
 
     @Test
