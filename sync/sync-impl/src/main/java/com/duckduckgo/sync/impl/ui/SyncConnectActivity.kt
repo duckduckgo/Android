@@ -30,6 +30,7 @@ import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.button.DaxButtonGhost
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.show
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.databinding.IncludeDefaultToolbarBinding
 import com.duckduckgo.sync.impl.R
@@ -48,10 +49,10 @@ import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeView
 import com.duckduckgo.sync.impl.ui.setup.EnterCodeContract
 import com.duckduckgo.sync.impl.ui.setup.EnterCodeContract.EnterCodeContractOutput
 import com.google.android.material.snackbar.Snackbar
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
@@ -59,6 +60,9 @@ class SyncConnectActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var syncFeature: SyncFeature
+
+    @Inject
+    lateinit var dispatcherProvider: DispatcherProvider
 
     private lateinit var binding: ConnectSyncBinding
     private val viewModel: SyncConnectViewModel by bindViewModel()
@@ -75,9 +79,9 @@ class SyncConnectActivity : DuckDuckGoActivity() {
         super.onCreate(savedInstanceState)
 
         lifecycleScope.launch {
-            syncFeature.useExpandableBarcodeConnectSyncLayout().enabled()
-                .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
-                .first()
+            withContext(dispatcherProvider.io()) {
+                syncFeature.useExpandableBarcodeConnectSyncLayout().isEnabled()
+            }
                 .let { flag ->
                     binding = if (flag) {
                         val viewBinding = ActivityConnectSyncNewBinding.inflate(layoutInflater)
@@ -99,8 +103,6 @@ class SyncConnectActivity : DuckDuckGoActivity() {
                     if (savedInstanceState == null) {
                         viewModel.onBarcodeScreenShown()
                     }
-                    // Start QR reader since onResume was likely already called
-                    binding.qrCodeReader.resume()
                 }
         }
     }
