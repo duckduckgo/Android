@@ -4564,7 +4564,11 @@ class BrowserTabViewModel @Inject constructor(
             duckAiFeatureState.showContextualMode.value && !isNtp -> {
                 viewModelScope.launch {
                     if (duckChat.isContextualOnboardingCompleted()) {
-                        command.value = Command.ShowDuckAIContextualMode
+                        val contextualUrl = url
+                        val contextualTitle = title
+                        if (contextualUrl != null && contextualTitle != null) {
+                            command.value = Command.ShowDuckAIContextualMode(contextualUrl, contextualTitle)
+                        }
                     } else {
                         command.value = Command.ShowDuckAIContextualOnboarding
                     }
