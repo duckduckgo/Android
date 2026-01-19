@@ -154,6 +154,7 @@ object PixelInterceptorPixelsRequiringDataCleaning : PixelParamRemovalPlugin {
             CustomTabPixelNames.CUSTOM_TABS_DAX_CLICKED.pixelName to PixelParameter.removeAtb(),
             CustomTabPixelNames.CUSTOM_TABS_DAX_CLICKED_DAILY.pixelName to PixelParameter.removeAtb(),
             AppPixelName.FIRE_DIALOG_SHOWN.pixelName to PixelParameter.removeAtb(),
+            AppPixelName.DATA_CLEARING_AUTOMATIC_OPTIONS_UPDATED.pixelName to PixelParameter.removeAtb(),
             RemoteMessagingPixelName.REMOTE_MESSAGE_IMAGE_LOAD_SUCCESS.pixelName to PixelParameter.removeAtb(),
             RemoteMessagingPixelName.REMOTE_MESSAGE_IMAGE_LOAD_FAILED.pixelName to PixelParameter.removeAtb(),
         )

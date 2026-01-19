@@ -19,8 +19,10 @@ package com.duckduckgo.app.firebutton
 import app.cash.turbine.test
 import com.duckduckgo.app.fire.store.FireDataStore
 import com.duckduckgo.app.firebutton.AutomaticDataClearingSettingsViewModel.Command
+import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.clear.FireClearOption
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
@@ -32,7 +34,10 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -46,6 +51,7 @@ internal class AutomaticDataClearingSettingsViewModelTest {
     private val mockFireDataStore: FireDataStore = mock()
     private val mockDuckChat: DuckChat = mock()
     private val mockDuckAiFeatureState: DuckAiFeatureState = mock()
+    private val mockPixel: Pixel = mock()
 
     private val duckAiShowClearDuckAIChatHistoryFlow = MutableStateFlow(false)
     private val automaticClearOptionsFlow = MutableStateFlow<Set<FireClearOption>>(emptySet())
@@ -56,6 +62,7 @@ internal class AutomaticDataClearingSettingsViewModelTest {
         whenever(mockDuckAiFeatureState.showClearDuckAIChatHistory).thenReturn(duckAiShowClearDuckAIChatHistoryFlow)
         whenever(mockFireDataStore.getAutomaticClearOptionsFlow()).thenReturn(automaticClearOptionsFlow)
         whenever(mockFireDataStore.getAutomaticallyClearWhenOptionFlow()).thenReturn(clearWhenOptionFlow)
+        whenever(mockFireDataStore.getAutomaticClearOptions()).thenReturn(emptySet())
         whenever(mockDuckChat.wasOpenedBefore()).thenReturn(false)
 
         testee = AutomaticDataClearingSettingsViewModel(
@@ -63,6 +70,7 @@ internal class AutomaticDataClearingSettingsViewModelTest {
             mockDuckChat,
             mockDuckAiFeatureState,
             coroutineTestRule.testDispatcherProvider,
+            mockPixel,
         )
     }
 
@@ -125,6 +133,7 @@ internal class AutomaticDataClearingSettingsViewModelTest {
             mockDuckChat,
             mockDuckAiFeatureState,
             coroutineTestRule.testDispatcherProvider,
+            mockPixel,
         )
 
         testee.viewState.test {
@@ -147,6 +156,7 @@ internal class AutomaticDataClearingSettingsViewModelTest {
             mockDuckChat,
             mockDuckAiFeatureState,
             coroutineTestRule.testDispatcherProvider,
+            mockPixel,
         )
 
         testee.viewState.test {
@@ -179,6 +189,7 @@ internal class AutomaticDataClearingSettingsViewModelTest {
             mockDuckChat,
             mockDuckAiFeatureState,
             coroutineTestRule.testDispatcherProvider,
+            mockPixel,
         )
 
         testee.viewState.test {
@@ -198,6 +209,7 @@ internal class AutomaticDataClearingSettingsViewModelTest {
             mockDuckChat,
             mockDuckAiFeatureState,
             coroutineTestRule.testDispatcherProvider,
+            mockPixel,
         )
 
         testee.viewState.test {
@@ -217,6 +229,7 @@ internal class AutomaticDataClearingSettingsViewModelTest {
             mockDuckChat,
             mockDuckAiFeatureState,
             coroutineTestRule.testDispatcherProvider,
+            mockPixel,
         )
 
         testee.viewState.test {
@@ -265,6 +278,7 @@ internal class AutomaticDataClearingSettingsViewModelTest {
             mockDuckChat,
             mockDuckAiFeatureState,
             coroutineTestRule.testDispatcherProvider,
+            mockPixel,
         )
 
         testee.viewState.test {
@@ -287,6 +301,7 @@ internal class AutomaticDataClearingSettingsViewModelTest {
             mockDuckChat,
             mockDuckAiFeatureState,
             coroutineTestRule.testDispatcherProvider,
+            mockPixel,
         )
 
         testee.viewState.test {
@@ -339,9 +354,64 @@ internal class AutomaticDataClearingSettingsViewModelTest {
     }
 
     @Test
+    fun whenClearWhenClickedThenPixelIsFired() = runTest {
+        whenever(mockFireDataStore.getAutomaticallyClearWhenOption()).thenReturn(ClearWhenOption.APP_EXIT_ONLY)
+
+        testee.onClearWhenClicked()
+
+        verify(mockPixel).fire(AppPixelName.AUTOMATIC_CLEAR_DATA_WHEN_SHOWN)
+    }
+
+    @Test
     fun whenClearWhenOptionSelectedThenOptionIsSaved() = runTest {
         testee.onClearWhenOptionSelected(ClearWhenOption.APP_EXIT_OR_60_MINS)
 
         verify(mockFireDataStore).setAutomaticallyClearWhenOption(ClearWhenOption.APP_EXIT_OR_60_MINS)
+    }
+
+    @Test
+    fun whenNoOptionsModifiedThenOnScreenExitDoesNotFirePixel() = runTest {
+        testee.onScreenExit()
+
+        verify(mockPixel, never()).fire(any<Pixel.PixelName>(), any(), any(), any())
+    }
+
+    @Test
+    fun whenOptionsModifiedThenOnScreenExitFiresPixelWithCurrentOptions() = runTest {
+        whenever(mockFireDataStore.getAutomaticClearOptions()).thenReturn(
+            setOf(FireClearOption.TABS, FireClearOption.DUCKAI_CHATS),
+        )
+
+        testee.onAutomaticClearingToggled(true)
+        testee.onScreenExit()
+
+        verify(mockPixel).fire(
+            AppPixelName.DATA_CLEARING_AUTOMATIC_OPTIONS_UPDATED,
+            mapOf(
+                "tabs" to "true",
+                "data" to "false",
+                "chats" to "true",
+            ),
+        )
+    }
+
+    @Test
+    fun whenOnScreenExitCalledMultipleTimesWithoutChangesThenPixelFiresOnlyOnce() = runTest {
+        whenever(mockFireDataStore.getAutomaticClearOptions()).thenReturn(
+            setOf(FireClearOption.TABS),
+        )
+
+        testee.onScreenExit()
+        testee.onScreenExit()
+        testee.onScreenExit()
+
+        verify(mockPixel, times(1)).fire(
+            AppPixelName.DATA_CLEARING_AUTOMATIC_OPTIONS_UPDATED,
+            mapOf(
+                "tabs" to "true",
+                "data" to "false",
+                "chats" to "false",
+            ),
+        )
     }
 }
