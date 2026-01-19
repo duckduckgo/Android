@@ -37,7 +37,7 @@ interface SharedPreferencesProvider {
     fun getEncryptedSharedPreferences(name: String, multiprocess: Boolean = false): SharedPreferences?
 
     /**
-     * Returns and instance of Encrypted Shared Preferences supporting multiprocess, migrating its contents if needed
+     * Returns an instance of Encrypted Shared Preferences supporting multiprocess, migrating its contents if needed
      * @param name Name of the shared preferences
      *
      *
