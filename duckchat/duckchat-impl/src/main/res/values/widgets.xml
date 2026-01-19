@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><!--
+<!--
   ~ Copyright (c) 2025 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,12 +16,9 @@
 
 <resources>
 
-    <!-- Duck.ai Contextual Bottom Sheet -->
-    <string name="duckAIContextualPromptSummarize">Summarize this Page</string>
-    <string name="duckAIContextualPromptExplain">Explain in simpler terms</string>
-    <string name="duckAIContextualPromptSuggest">Suggest related articles to explore</string>
-    <string name="duckAIContextualAutomaticContextTitle">Automatically Send Context</string>
-    <string name="duckAIContextualAutomaticContextMessage">Automatically send context to Duck.ai</string>
-    <string name="duckAIContextualPageContent">Page Content</string>
+    <style name="Widget.DuckDuckGo.DuckChatContextualFavicon">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">@dimen/smallShapeCornerRadius</item>
+    </style>
 
 </resources>
