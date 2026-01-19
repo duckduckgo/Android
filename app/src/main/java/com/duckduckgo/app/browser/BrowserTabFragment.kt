@@ -2898,7 +2898,14 @@ class BrowserTabFragment :
                         object : StackedAlertDialogBuilder.EventListener() {
                             override fun onButtonClicked(position: Int) {
                                 when (LaunchInExternalAppOptions.getOptionFromPosition(position)) {
-                                    LaunchInExternalAppOptions.OPEN -> onClick()
+                                    LaunchInExternalAppOptions.OPEN -> {
+                                        runCatching {
+                                            onClick()
+                                        }.onFailure { exception ->
+                                            logcat(ERROR) { "Failed to launch external app: ${exception.asLog()}" }
+                                            showToast(R.string.unableToOpenLink)
+                                        }
+                                    }
                                     LaunchInExternalAppOptions.CLOSE_TAB -> {
                                         launch {
                                             viewModel.closeCurrentTab()

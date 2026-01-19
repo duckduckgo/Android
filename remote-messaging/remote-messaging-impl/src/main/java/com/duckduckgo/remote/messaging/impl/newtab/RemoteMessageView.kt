@@ -131,7 +131,7 @@ class RemoteMessageView @JvmOverloads constructor(
 
     private fun render(viewState: ViewState) {
         if (viewState.message != null) {
-            showRemoteMessage(viewState.message, viewState.newMessage)
+            showRemoteMessage(viewState.message, viewState.messageImageFilePath, viewState.newMessage)
         } else {
             binding.messageCta.gone()
         }
@@ -152,15 +152,18 @@ class RemoteMessageView @JvmOverloads constructor(
 
     private fun showRemoteMessage(
         message: RemoteMessage,
+        messageImageFilePath: String?,
         newMessage: Boolean,
     ) {
-        val msg = message.asMessage(isLightModeEnabled = appTheme.isLightModeEnabled())
+        val msg = message.asMessage(
+            isLightModeEnabled = appTheme.isLightModeEnabled(),
+            localImageFilePath = messageImageFilePath,
+        )
         val shouldRender = newMessage || binding.root.visibility == View.GONE
 
         if (msg != null && shouldRender) {
             binding.messageCta.show()
             viewModel.onMessageShown()
-            binding.messageCta.setMessage(msg)
             binding.messageCta.onCloseButtonClicked {
                 viewModel.onMessageCloseButtonClicked()
             }
@@ -173,6 +176,13 @@ class RemoteMessageView @JvmOverloads constructor(
             binding.messageCta.onPromoActionClicked {
                 viewModel.onMessageActionButtonClicked()
             }
+            binding.messageCta.onRemoteImageLoadSuccess {
+                viewModel.onRemoteImageLoadSuccess()
+            }
+            binding.messageCta.onRemoteImageLoadFailed {
+                viewModel.onRemoteImageLoadFailed()
+            }
+            binding.messageCta.setMessage(msg)
         }
     }
 

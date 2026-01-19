@@ -17,6 +17,7 @@
 package com.duckduckgo.remote.messaging.impl.modal.cardslist
 
 import app.cash.turbine.test
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.remote.messaging.api.Action
 import com.duckduckgo.remote.messaging.api.CardItem
@@ -27,6 +28,7 @@ import com.duckduckgo.remote.messaging.api.RemoteMessageModel
 import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
 import com.duckduckgo.remote.messaging.api.Surface
 import com.duckduckgo.remote.messaging.impl.modal.cardslist.CardsListRemoteMessageViewModel.Command
+import com.duckduckgo.remote.messaging.impl.pixels.RemoteMessagingPixelName
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
@@ -49,6 +51,7 @@ class CardsListRemoteMessageViewModelTest {
     private val remoteMessagingModel: RemoteMessageModel = mock()
     private val commandActionMapper: CommandActionMapper = mock()
     private val cardsListPixelHelper: CardsListRemoteMessagePixelHelper = mock()
+    private val pixel: Pixel = mock()
 
     @Before
     fun setup() {
@@ -58,6 +61,7 @@ class CardsListRemoteMessageViewModelTest {
             commandActionMapper = commandActionMapper,
             dispatchers = coroutineTestRule.testDispatcherProvider,
             cardsListPixelHelper = cardsListPixelHelper,
+            pixel = pixel,
         )
     }
 
@@ -128,6 +132,55 @@ class CardsListRemoteMessageViewModelTest {
             assertEquals(cardsList, viewState?.cardsLists)
             assertEquals("Test Cards", viewState?.cardsLists?.titleText)
             assertEquals(1, viewState?.cardsLists?.listItems?.size)
+            assertNull(viewState?.cardsListImageFilePath)
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenInitCalledWithValidMessageIdAndExistingImageFileThenViewStateUpdatedWithCardsListContent() = runTest {
+        val messageId = "message-123"
+        val cardsList = Content.CardsList(
+            titleText = "Test Cards",
+            descriptionText = "Description",
+            placeholder = Content.Placeholder.DDG_ANNOUNCE,
+            listItems = listOf(
+                CardItem(
+                    id = "id",
+                    type = CardItemType.TWO_LINE_LIST_ITEM,
+                    placeholder = Content.Placeholder.CRITICAL_UPDATE,
+                    titleText = "Card 1",
+                    descriptionText = "Description 1",
+                    primaryAction = Action.Dismiss,
+                    matchingRules = emptyList(),
+                    exclusionRules = emptyList(),
+                ),
+            ),
+            primaryActionText = "Dismiss",
+            primaryAction = Action.Dismiss,
+        )
+        val message = RemoteMessage(
+            id = messageId,
+            content = cardsList,
+            matchingRules = emptyList(),
+            exclusionRules = emptyList(),
+            surfaces = listOf(Surface.MODAL),
+        )
+        whenever(remoteMessagingRepository.getMessageById(eq(messageId))).thenReturn(message)
+        whenever(remoteMessagingModel.getRemoteMessageImageFile()).thenReturn("imageFile")
+
+        viewModel.viewState.test {
+            assertNull(awaitItem()) // Initial state
+
+            viewModel.init(messageId)
+
+            val viewState = awaitItem()
+            assertNotNull(viewState)
+            assertEquals(cardsList, viewState?.cardsLists)
+            assertEquals("Test Cards", viewState?.cardsLists?.titleText)
+            assertEquals(1, viewState?.cardsLists?.listItems?.size)
+            assertEquals("imageFile", viewState?.cardsListImageFilePath)
 
             cancelAndIgnoreRemainingEvents()
         }
@@ -497,5 +550,63 @@ class CardsListRemoteMessageViewModelTest {
         viewModel.onItemClicked(cardItem)
 
         verify(commandActionMapper).asCommand(eq(action))
+    }
+
+    @Test
+    fun whenRemoteImageLoadSuccessThenPixelFired() = runTest {
+        val messageId = "message-123"
+        val cardsList = Content.CardsList(
+            titleText = "Test Cards",
+            descriptionText = "Description",
+            placeholder = Content.Placeholder.DDG_ANNOUNCE,
+            listItems = emptyList(),
+            primaryActionText = "Dismiss",
+            primaryAction = Action.Dismiss,
+        )
+        val message = RemoteMessage(
+            id = messageId,
+            content = cardsList,
+            matchingRules = emptyList(),
+            exclusionRules = emptyList(),
+            surfaces = listOf(Surface.MODAL),
+        )
+        whenever(remoteMessagingRepository.getMessageById(eq(messageId))).thenReturn(message)
+
+        viewModel.init(messageId)
+        viewModel.onRemoteImageLoadSuccess()
+
+        verify(pixel).fire(
+            RemoteMessagingPixelName.REMOTE_MESSAGE_IMAGE_LOAD_SUCCESS,
+            mapOf(Pixel.PixelParameter.MESSAGE_SHOWN to messageId),
+        )
+    }
+
+    @Test
+    fun whenRemoteImageLoadFailedThenPixelFired() = runTest {
+        val messageId = "message-123"
+        val cardsList = Content.CardsList(
+            titleText = "Test Cards",
+            descriptionText = "Description",
+            placeholder = Content.Placeholder.DDG_ANNOUNCE,
+            listItems = emptyList(),
+            primaryActionText = "Dismiss",
+            primaryAction = Action.Dismiss,
+        )
+        val message = RemoteMessage(
+            id = messageId,
+            content = cardsList,
+            matchingRules = emptyList(),
+            exclusionRules = emptyList(),
+            surfaces = listOf(Surface.MODAL),
+        )
+        whenever(remoteMessagingRepository.getMessageById(eq(messageId))).thenReturn(message)
+
+        viewModel.init(messageId)
+        viewModel.onRemoteImageLoadFailed()
+
+        verify(pixel).fire(
+            RemoteMessagingPixelName.REMOTE_MESSAGE_IMAGE_LOAD_FAILED,
+            mapOf(Pixel.PixelParameter.MESSAGE_SHOWN to messageId),
+        )
     }
 }

@@ -17,7 +17,6 @@
 package com.duckduckgo.autofill.impl.securestorage.encryption
 
 import android.security.keystore.KeyProperties
-import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.impl.securestorage.SecureStorageException
 import com.duckduckgo.autofill.impl.securestorage.SecureStorageException.InternalSecureStorageException
 import com.duckduckgo.autofill.impl.securestorage.encryption.EncryptionHelper.EncryptedBytes
@@ -59,7 +58,6 @@ interface EncryptionHelper {
 
 @ContributesBinding(AppScope::class)
 class RealEncryptionHelper @Inject constructor(
-    private val autofillFeature: AutofillFeature,
     private val dispatcherProvider: DispatcherProvider,
 ) : EncryptionHelper {
     private val encryptionCipher = Cipher.getInstance(TRANSFORMATION)
@@ -72,83 +70,31 @@ class RealEncryptionHelper @Inject constructor(
         raw: ByteArray,
         key: Key,
     ): EncryptedBytes = withContext(dispatcherProvider.io()) {
-        return@withContext if (autofillFeature.createAsyncPreferences().isEnabled()) {
-            encryptAsync(raw, key)
-        } else {
-            encryptSync(raw, key)
-        }
-    }
-
-    @Synchronized
-    private fun encryptSync(
-        raw: ByteArray,
-        key: Key,
-    ): EncryptedBytes {
-        return innerEncrypt(raw, key)
-    }
-
-    private suspend fun encryptAsync(
-        raw: ByteArray,
-        key: Key,
-    ): EncryptedBytes {
         encryptMutex.withLock {
-            return innerEncrypt(raw, key)
-        }
-    }
+            val encrypted = try {
+                encryptionCipher.init(Cipher.ENCRYPT_MODE, key)
+                encryptionCipher.doFinal(raw)
+            } catch (exception: Exception) {
+                throw InternalSecureStorageException(message = "Error occurred while encrypting data", cause = exception)
+            }
+            val iv = encryptionCipher.iv
 
-    private fun innerEncrypt(
-        raw: ByteArray,
-        key: Key,
-    ): EncryptedBytes {
-        val encrypted = try {
-            encryptionCipher.init(Cipher.ENCRYPT_MODE, key)
-            encryptionCipher.doFinal(raw)
-        } catch (exception: Exception) {
-            throw InternalSecureStorageException(message = "Error occurred while encrypting data", cause = exception)
+            EncryptedBytes(encrypted, iv)
         }
-        val iv = encryptionCipher.iv
-
-        return EncryptedBytes(encrypted, iv)
     }
 
     override suspend fun decrypt(
         toDecrypt: EncryptedBytes,
         key: Key,
     ): ByteArray = withContext(dispatcherProvider.io()) {
-        return@withContext if (autofillFeature.createAsyncPreferences().isEnabled()) {
-            decryptAsync(toDecrypt, key)
-        } else {
-            decryptSync(toDecrypt, key)
-        }
-    }
-
-    @Synchronized
-    private fun decryptSync(
-        toDecrypt: EncryptedBytes,
-        key: Key,
-    ): ByteArray {
-        return innerDecrypt(toDecrypt, key)
-    }
-
-    private suspend fun decryptAsync(
-        toDecrypt: EncryptedBytes,
-        key: Key,
-    ): ByteArray {
         decryptMutex.withLock {
-            return innerDecrypt(toDecrypt, key)
-        }
-    }
-
-    private fun innerDecrypt(
-        toDecrypt: EncryptedBytes,
-        key: Key,
-    ): ByteArray {
-        return try {
-            val ivSpec = GCMParameterSpec(GCM_PARAM_SPEC_LENGTH, toDecrypt.iv)
-            decryptionCipher.init(Cipher.DECRYPT_MODE, key, ivSpec)
-            decryptionCipher.doFinal(toDecrypt.data)
-        } catch (exception: Exception) {
-            throw InternalSecureStorageException(message = "Error occurred while decrypting data", cause = exception)
+            try {
+                val ivSpec = GCMParameterSpec(GCM_PARAM_SPEC_LENGTH, toDecrypt.iv)
+                decryptionCipher.init(Cipher.DECRYPT_MODE, key, ivSpec)
+                decryptionCipher.doFinal(toDecrypt.data)
+            } catch (exception: Exception) {
+                throw InternalSecureStorageException(message = "Error occurred while decrypting data", cause = exception)
+            }
         }
     }
 

@@ -48,18 +48,12 @@ class FireDialogProviderImpl @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
 ) : FireDialogProvider {
 
-    override suspend fun createFireDialog(): FireDialog = coroutineScope {
-        val useImprovedDataClearing = async(dispatcherProvider.io()) {
-            androidBrowserConfigFeature.improvedDataClearingOptions().isEnabled()
-        }
-
-        val useGranularFireDialog = async(dispatcherProvider.io()) {
-            androidBrowserConfigFeature.granularFireDialog().isEnabled()
-        }
-
+    override suspend fun createFireDialog(): FireDialog = withContext(dispatcherProvider.io()) {
         when {
-            useGranularFireDialog.await() -> GranularFireDialog.newInstance()
-            useImprovedDataClearing.await() -> NonGranularFireDialog.newInstance()
+            androidBrowserConfigFeature.granularFireDialog().isEnabled() ->
+                GranularFireDialog.newInstance()
+            androidBrowserConfigFeature.improvedDataClearingOptions().isEnabled() ->
+                NonGranularFireDialog.newInstance()
             else -> LegacyFireDialog.newInstance()
         }
     }

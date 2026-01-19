@@ -21,7 +21,6 @@ import android.content.Intent
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.Toggle
-import com.duckduckgo.pir.impl.PirFeatureRemover
 import com.duckduckgo.pir.impl.PirRemoteFeatures
 import com.duckduckgo.pir.impl.notifications.PirNotificationManager
 import com.duckduckgo.pir.impl.scan.PirScanScheduler
@@ -54,7 +53,6 @@ class RealPirWorkHandlerTest {
     private val context: Context = mock()
     private val pirBetaToggle: Toggle = mock()
     private val pirRepository: PirRepository = mock()
-    private val pirFeatureRemover: PirFeatureRemover = mock()
     private val pirNotificationManager: PirNotificationManager = mock()
 
     private lateinit var pirWorkHandler: RealPirWorkHandler
@@ -71,7 +69,6 @@ class RealPirWorkHandlerTest {
             context = context,
             pirScanScheduler = pirScanScheduler,
             pirRepository = pirRepository,
-            pirFeatureRemover = pirFeatureRemover,
             pirNotificationManager = pirNotificationManager,
         )
     }
@@ -284,7 +281,6 @@ class RealPirWorkHandlerTest {
         // Verify that stopService is called 3 times (for each of the 3 services)
         verify(context, times(2)).stopService(any<Intent>())
         verify(pirScanScheduler).cancelScheduledScans(context)
-        verify(pirFeatureRemover).removeFeature()
         verify(pirNotificationManager).cancelNotifications()
     }
 }

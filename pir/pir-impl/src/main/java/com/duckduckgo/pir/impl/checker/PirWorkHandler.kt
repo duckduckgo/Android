@@ -20,7 +20,6 @@ import android.content.Context
 import android.content.Intent
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.pir.impl.PirFeatureRemover
 import com.duckduckgo.pir.impl.PirRemoteFeatures
 import com.duckduckgo.pir.impl.notifications.PirNotificationManager
 import com.duckduckgo.pir.impl.optout.PirForegroundOptOutService
@@ -69,7 +68,6 @@ class RealPirWorkHandler @Inject constructor(
     private val context: Context,
     private val pirScanScheduler: PirScanScheduler,
     private val pirRepository: PirRepository,
-    private val pirFeatureRemover: PirFeatureRemover,
     private val pirNotificationManager: PirNotificationManager,
 ) : PirWorkHandler {
 
@@ -101,7 +99,6 @@ class RealPirWorkHandler @Inject constructor(
         context.stopService(Intent(context, PirForegroundOptOutService::class.java))
         // Cancel any running or scheduled workers
         pirScanScheduler.cancelScheduledScans(context)
-        pirFeatureRemover.removeFeature()
         pirNotificationManager.cancelNotifications()
     }
 
