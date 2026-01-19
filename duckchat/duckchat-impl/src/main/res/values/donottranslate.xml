@@ -20,5 +20,7 @@
     <string name="duckAIContextualPromptSummarize">Summarize this Page</string>
     <string name="duckAIContextualPromptExplain">Explain in simpler terms</string>
     <string name="duckAIContextualPromptSuggest">Suggest related articles to explore</string>
+    <string name="duckAIContextualAutomaticContextTitle">Automatically Send Context</string>
+    <string name="duckAIContextualAutomaticContextMessage">Automatically send context to Duck.ai</string>
 
 </resources>

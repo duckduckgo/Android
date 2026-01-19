@@ -200,6 +200,15 @@
                 app:primaryText="@string/duck_ai_shortcut_settings_title"
                 app:secondaryText="@string/duck_ai_shortcut_settings_description" />
 
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                android:id="@+id/duckAIAutomaticContext"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:primaryText="@string/duckAIContextualAutomaticContextTitle"
+                app:secondaryText="@string/duckAIContextualAutomaticContextMessage"
+                app:showSwitch="true" />
+
             <com.duckduckgo.common.ui.view.divider.HorizontalDivider
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

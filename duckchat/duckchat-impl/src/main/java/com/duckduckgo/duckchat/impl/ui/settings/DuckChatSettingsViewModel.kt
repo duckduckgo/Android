@@ -66,6 +66,8 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
         val shouldShowInputScreenToggle: Boolean = false,
         val isSearchSectionVisible: Boolean = true,
         val isHideGeneratedImagesOptionVisible: Boolean = false,
+        val isAutomaticContextVisible: Boolean = false,
+        val isAutomaticContextEnabled: Boolean = false,
     )
 
     val viewState =
