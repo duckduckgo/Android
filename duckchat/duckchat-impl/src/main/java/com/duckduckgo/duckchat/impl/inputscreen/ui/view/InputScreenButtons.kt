@@ -45,6 +45,12 @@ class InputScreenButtons @JvmOverloads constructor(
             binding.actionSend.setOnClickListener { value?.invoke() }
         }
 
+    var onNewLineClick: (() -> Unit)? = null
+        set(value) {
+            field = value
+            binding.actionNewLine.setOnClickListener { value?.invoke() }
+        }
+
     var onVoiceClick: (() -> Unit)? = null
         set(value) {
             field = value
@@ -69,6 +75,10 @@ class InputScreenButtons @JvmOverloads constructor(
         binding.actionSend.isVisible = visible
     }
 
+    fun setNewLineButtonVisible(visible: Boolean) {
+        binding.actionNewLine.isVisible = visible
+    }
+
     fun setVoiceButtonVisible(visible: Boolean) {
         binding.actionVoice.isVisible = visible
     }
@@ -80,6 +90,10 @@ class InputScreenButtons @JvmOverloads constructor(
             width = buttonSizePx
             height = buttonSizePx
         }
+        binding.actionNewLine.updateLayoutParams {
+            width = buttonSizePx
+            height = buttonSizePx
+        }
         binding.actionVoice.updateLayoutParams {
             width = buttonSizePx
             height = buttonSizePx
@@ -87,15 +101,18 @@ class InputScreenButtons @JvmOverloads constructor(
 
         // add shadows via elevation and add padding to the container to avoid clipping
         val elevation = 6f.toPx(context)
+        binding.actionNewLine.elevation = elevation
         binding.actionVoice.elevation = elevation
         binding.actionSend.elevation = elevation
         val padding = elevation.times(2).roundToInt()
         binding.root.setPadding(padding)
 
-        // add circular background and click ripple to voice button
+        // add circular background and click ripple to all remaining buttons
         val backgroundRes = R.drawable.background_input_screen_button
+        binding.actionNewLine.setBackgroundResource(backgroundRes)
         binding.actionVoice.setBackgroundResource(backgroundRes)
         val circularRippleDrawable = ContextCompat.getDrawable(context, CommonR.drawable.selectable_circular_ripple)
+        binding.actionNewLine.foreground = circularRippleDrawable
         binding.actionVoice.foreground = circularRippleDrawable
     }
 }

@@ -154,6 +154,7 @@ class InputScreenViewModel @AssistedInject constructor(
                 bottomFadeVisible = false,
                 showChatLogo = true,
                 showSearchLogo = true,
+                newLineButtonVisible = false,
                 mainButtonsVisible = false,
                 searchMode = true,
                 fullScreenMode = duckAiFeatureState.showFullScreenMode.value,
@@ -396,6 +397,7 @@ class InputScreenViewModel @AssistedInject constructor(
         _visibilityState.update {
             it.copy(
                 showChatLogo = true,
+                newLineButtonVisible = query.isNotBlank(),
             )
         }
     }
@@ -470,7 +472,7 @@ class InputScreenViewModel @AssistedInject constructor(
                 it.copy(icon = SubmitButtonIcon.SEND)
             }
             _visibilityState.update {
-                it.copy(searchMode = false, mainButtonsVisible = false)
+                it.copy(newLineButtonVisible = true, searchMode = false, mainButtonsVisible = false)
             }
         }
         if (userSelectedMode == SEARCH) {
@@ -486,7 +488,7 @@ class InputScreenViewModel @AssistedInject constructor(
         userSelectedMode = SEARCH
         viewModelScope.launch {
             _visibilityState.update {
-                it.copy(mainButtonsVisible = canShowMainButtons())
+                it.copy(newLineButtonVisible = false, mainButtonsVisible = canShowMainButtons())
             }
         }
     }
