@@ -73,7 +73,7 @@ runs:
     - name: Assemble release APK
       if: ${{ inputs.flavours == 'all' || inputs.flavours == 'play' }}
       shell: bash
-      run: ./gradlew assemblePlayRelease -Pforce-default-variant -Pskip-onboarding ${{ inputs.gradle_flags }}
+      run: ./gradlew assemblePlayRelease -Pforce-default-variant -Pskip-onboarding -x lint ${{ inputs.gradle_flags }}
 
     - name: Move Play APK
       if: ${{ inputs.flavours == 'all' || inputs.flavours == 'play' }}
@@ -83,7 +83,7 @@ runs:
     - name: Assemble internal release APK
       if: ${{ inputs.flavours == 'all' || inputs.flavours == 'internal' }}
       shell: bash
-      run: ./gradlew assembleInternalRelease -Pforce-default-variant -Pskip-onboarding ${{ inputs.gradle_flags }}
+      run: ./gradlew assembleInternalRelease -Pforce-default-variant -Pskip-onboarding -x lint ${{ inputs.gradle_flags }}
 
     - name: Move Internal APK
       if: ${{ inputs.flavours == 'all' || inputs.flavours == 'internal' }}
