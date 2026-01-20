@@ -17,9 +17,9 @@
 <resources>
 
     <!-- Personal Information Removal -->
-    <string name="pirStorageUnavailableDialogTitle">Something went wrong</string>
-    <string name="pirStorageUnavailableDialogMessage">Personal Information Removal is not available at this moment. Please restart the app and try again.</string>
-    <string name="pirStorageUnavailableDialogButton">OK</string>
+    <string name="pirStorageUnavailableDialogTitle">Temporary issue with Personal Information Removal</string>
+    <string name="pirStorageUnavailableDialogMessage">Please restart the DuckDuckGo app and try again.</string>
+    <string name="pirStorageUnavailableDialogButton">Got It</string>
 
     <!-- Black Friday offer-->
     <string name="subscriptionSettingBlackFridayOffer">Save 40% on First Year</string>
