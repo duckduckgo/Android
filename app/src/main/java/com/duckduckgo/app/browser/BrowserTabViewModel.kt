@@ -1774,7 +1774,9 @@ class BrowserTabViewModel @Inject constructor(
         withContext(dispatchers.main()) {
             // TODO when removing the flag we should tidy this logic up
             if (addressBarTrackersAnimationManager.isFeatureEnabled()) {
-                val canShowTrackerAnimation = !(privacyProtectionDisabled || currentBrowserViewState().maliciousSiteBlocked)
+                val site = site
+                val canShowTrackerAnimation = !(privacyProtectionDisabled || currentBrowserViewState().maliciousSiteBlocked) &&
+                    site?.privacyProtection() ?: PrivacyShield.UNKNOWN != PrivacyShield.UNPROTECTED
 
                 val shouldAnimate = addressBarTrackersAnimationManager
                     .shouldShowAnimation(currentUrl = site?.url, lastAnimatedUrl = lastAnimatedUrl)
