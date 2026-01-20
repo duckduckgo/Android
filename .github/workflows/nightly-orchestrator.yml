@@ -60,7 +60,7 @@ jobs:
   tag_lgc_when_successful:
     name: Tag last good commit when successful
     runs-on: ubuntu-24.04 #https://github.com/actions/runner-images/issues/6709
-    needs: [ resolve-commit, call-custom-tabs, call-end-to-end, call-privacy, call-update-content-scope, call-update-ref-tests]
+    needs: [ resolve-commit, call-end-to-end, call-privacy, call-update-content-scope, call-update-ref-tests]
     if: ${{ success() }}
     steps:
       - name: Checkout repository
