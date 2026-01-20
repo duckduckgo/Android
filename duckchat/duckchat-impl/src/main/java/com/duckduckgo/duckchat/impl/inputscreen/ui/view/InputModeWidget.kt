@@ -29,6 +29,7 @@ import android.transition.ChangeBounds
 import android.transition.Fade
 import android.transition.TransitionManager
 import android.util.AttributeSet
+import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -256,8 +257,12 @@ class InputModeWidget @JvmOverloads constructor(
         with(inputField) {
             setHorizontallyScrolling(true)
 
-            setOnEditorActionListener { _, actionId, _ ->
-                if (actionId == EditorInfo.IME_ACTION_GO) {
+            setOnEditorActionListener { _, actionId, keyEvent ->
+                val isHardwareEnter =
+                    (keyEvent?.keyCode == KeyEvent.KEYCODE_ENTER || keyEvent?.keyCode == KeyEvent.KEYCODE_NUMPAD_ENTER) &&
+                        keyEvent.action == KeyEvent.ACTION_DOWN
+
+                if (actionId == EditorInfo.IME_ACTION_GO || isHardwareEnter) {
                     submitMessage()
 
                     val params = inputScreenPixelsModeParam(isSearchMode = inputModeSwitch.selectedTabPosition == 0)
