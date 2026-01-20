@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 DuckDuckGo
+ * Copyright (c) 2025 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,24 +14,20 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.statistics.store
+package com.duckduckgo.app.statistics.api
 
-import com.duckduckgo.app.statistics.model.Atb
+interface StatisticsUpdater {
+    fun initializeAtb()
 
-/**
- * Persistent storage for ATB values.
- */
-interface StatisticsDataStore {
+    fun refreshAppRetentionAtb()
 
-    val hasInstallationStatistics: Boolean
+    /**
+     * Refreshes the search retention ATB value.
+     */
+    fun refreshSearchRetentionAtb()
 
-    var atb: Atb?
-    var appRetentionAtb: String?
-    var searchRetentionAtb: String?
-    var duckaiRetentionAtb: String?
-    var variant: String?
-    var referrerVariant: String?
-
-    fun saveAtb(atb: Atb)
-    fun clearAtb()
+    /**
+     * Refreshes the DuckAI retention ATB value.
+     */
+    fun refreshDuckAiRetentionAtb()
 }

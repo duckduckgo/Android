@@ -66,6 +66,9 @@ class StubStatisticsModule {
 
             override fun refreshSearchRetentionAtb() {
             }
+
+            override fun refreshDuckAiRetentionAtb() {
+            }
         }
     }
 

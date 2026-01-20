@@ -16,16 +16,12 @@
 
 package com.duckduckgo.pir.impl.pixels
 
-import android.content.Context
-import android.os.PowerManager
-import android.util.Base64
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.plugins.pixel.PixelInterceptorPlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import okhttp3.Interceptor
 import okhttp3.Response
-import org.json.JSONObject
 import javax.inject.Inject
 
 @ContributesMultibinding(
@@ -33,7 +29,6 @@ import javax.inject.Inject
     boundType = PixelInterceptorPlugin::class,
 )
 class PirPixelInterceptor @Inject constructor(
-    private val context: Context,
     private val appBuildConfig: AppBuildConfig,
 ) : PixelInterceptorPlugin, Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
@@ -43,15 +38,9 @@ class PirPixelInterceptor @Inject constructor(
         val url = if (ALLOWLIST.any { prefix -> pixel.startsWith(prefix) }) {
             chain.request().url.newBuilder()
                 .addQueryParameter(
-                    KEY_METADATA,
-                    JSONObject()
-                        .put("batteryOptimizations", (!isIgnoringBatteryOptimizations()).toString())
-                        .put("man", appBuildConfig.manufacturer)
-                        .toString().toByteArray().run {
-                            Base64.encodeToString(this, Base64.NO_WRAP or Base64.NO_PADDING or Base64.URL_SAFE)
-                        },
-                )
-                .build()
+                    KEY_MAN,
+                    appBuildConfig.manufacturer,
+                ).build()
         } else {
             chain.request().url
         }
@@ -61,17 +50,8 @@ class PirPixelInterceptor @Inject constructor(
 
     override fun getInterceptor(): Interceptor = this
 
-    private fun isIgnoringBatteryOptimizations(): Boolean {
-        return runCatching {
-            context.packageName?.let {
-                val powerManager = context.getSystemService(Context.POWER_SERVICE) as PowerManager
-                powerManager.isIgnoringBatteryOptimizations(context.packageName)
-            } ?: false
-        }.getOrDefault(false)
-    }
-
     companion object {
-        private const val KEY_METADATA = "metadata"
+        private const val KEY_MAN = "man"
         private val ALLOWLIST = listOf(
             "m_dbp_foreground-run_started",
             "m_dbp_foreground-run_completed",

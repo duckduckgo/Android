@@ -67,7 +67,7 @@ class PirForegroundScanService : Service(), CoroutineScope by MainScope() {
     ): Int {
         logcat { "PIR-SCAN: PIR service started on ${Process.myPid()} thread: ${Thread.currentThread().name}" }
         val notification: Notification = pirNotificationManager.createScanStatusNotification(
-            title = getString(R.string.pirNotificationTitle),
+            title = getString(R.string.pirFeatureName),
             message = getString(R.string.pirNotificationMessageInProgress),
         )
         startForeground(1, notification)
@@ -84,7 +84,7 @@ class PirForegroundScanService : Service(), CoroutineScope by MainScope() {
             val result = pirJobsRunner.runEligibleJobs(this@PirForegroundScanService, PirExecutionType.MANUAL)
             if (result.isSuccess) {
                 pirNotificationManager.showScanStatusNotification(
-                    title = getString(R.string.pirNotificationTitle),
+                    title = getString(R.string.pirNotificationTitleComplete),
                     message = getString(R.string.pirNotificationMessageComplete),
                 )
             }
