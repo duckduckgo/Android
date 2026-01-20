@@ -72,14 +72,14 @@ jobs:
 
       - name: Bundle the JVM checks report
         if: always()
-        run: find . -type d -name 'reports' | zip -@ -r unit-tests-report.zip
+        run: find . -type d -name 'reports' | zip -@ -r unit-tests-report-nightly.zip
 
       - name: Upload the JVM checks report
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: unit-tests-report
-          path: unit-tests-report.zip
+          name: unit-tests-report-nightly
+          path: unit-tests-report-nightly.zip
 
   lint:
     name: Lint
@@ -113,14 +113,14 @@ jobs:
 
       - name: Bundle the lint report
         if: always()
-        run: find . -name lint-results\* | zip -@ -r lint-report.zip
+        run: find . -name lint-results\* | zip -@ -r lint-report-nightly.zip
 
       - name: Upload the JVM lint report
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: lint-report
-          path: lint-report.zip
+          name: lint-report-nightly
+          path: lint-report-nightly.zip
 
   android_tests:
     runs-on: android-large-runner
@@ -167,7 +167,7 @@ jobs:
 
       - name: Bundle the Android CI tests report
         if: always()
-        run: find . -type d -name 'fladleResults' | zip -@ -r android-tests-report.zip
+        run: find . -type d -name 'fladleResults' | zip -@ -r android-tests-report-nightly.zip
 
       - name: Generate json file with failures
         if: ${{ failure() }}
@@ -182,8 +182,8 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: android-tests-report
-          path: android-tests-report.zip
+          name: android-tests-report-nightly
+          path: android-tests-report-nightly.zip
 
   create_task_when_failed:
     name: Create Asana task when workflow failed
