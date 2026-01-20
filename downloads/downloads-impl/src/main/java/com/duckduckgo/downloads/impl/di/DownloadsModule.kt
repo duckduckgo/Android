@@ -16,14 +16,18 @@
 
 package com.duckduckgo.downloads.impl.di
 
+import android.annotation.SuppressLint
 import com.duckduckgo.data.store.api.DatabaseProvider
 import com.duckduckgo.data.store.api.RoomDatabaseConfig
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.downloads.impl.DownloadFileService
 import com.duckduckgo.downloads.store.DownloadsDatabase
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
+import retrofit2.Retrofit
+import javax.inject.Named
 
 @Module
 @ContributesTo(AppScope::class)
@@ -39,5 +43,19 @@ class DownloadsModule {
                 fallbackToDestructiveMigration = true,
             ),
         )
+    }
+
+    /**
+     * Provides a fallback DownloadFileService that uses HTTP/1.1 only.
+     * Used when HTTP/2 fails with StreamResetException on certain servers.
+     */
+    @Provides
+    @SingleInstanceIn(AppScope::class)
+    @Named("http1Fallback")
+    @SuppressLint("NoRetrofitCreateMethodCallDetector")
+    fun provideDownloadFileServiceHttp1Fallback(
+        @Named("downloadsHttp1") retrofit: Retrofit,
+    ): DownloadFileService {
+        return retrofit.create(DownloadFileService::class.java)
     }
 }

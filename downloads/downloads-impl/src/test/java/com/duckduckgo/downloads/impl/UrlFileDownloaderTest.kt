@@ -42,6 +42,7 @@ class UrlFileDownloaderTest {
     val coroutineRule = CoroutineTestRule()
 
     private val downloadFileService: DownloadFileService = mock()
+    private val downloadFileServiceHttp1: DownloadFileService = mock()
     private val call: Call<ResponseBody> = mock()
     private lateinit var realFileDownloadManager: RealUrlFileDownloadCallManager
 
@@ -53,9 +54,11 @@ class UrlFileDownloaderTest {
     fun setup() {
         realFileDownloadManager = RealUrlFileDownloadCallManager()
         whenever(downloadFileService.downloadFile(anyOrNull(), anyOrNull(), anyString())).thenReturn(call)
+        whenever(downloadFileServiceHttp1.downloadFile(anyOrNull(), anyOrNull(), anyString())).thenReturn(call)
 
         urlFileDownloader = UrlFileDownloader(
             downloadFileService,
+            downloadFileServiceHttp1,
             realFileDownloadManager,
             FakeCookieManagerWrapper(),
             fileDownloadFeature = fileDownloadFeature,
@@ -205,6 +208,7 @@ class UrlFileDownloaderTest {
 
         val urlFileDownloader = UrlFileDownloader(
             downloadFileService,
+            downloadFileServiceHttp1,
             realFileDownloadManager,
             FakeCookieManagerWrapper("session=abc123; token=xyz"),
             fileDownloadFeature = fileDownloadFeature,
@@ -222,6 +226,7 @@ class UrlFileDownloaderTest {
 
         val urlFileDownloader = UrlFileDownloader(
             downloadFileService,
+            downloadFileServiceHttp1,
             realFileDownloadManager,
             FakeCookieManagerWrapper("session=abc123; token=xyz"),
             fileDownloadFeature = fileDownloadFeature,
