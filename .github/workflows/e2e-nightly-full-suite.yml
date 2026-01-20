@@ -59,7 +59,7 @@ jobs:
           maestro_project_id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
           maestro_test_name: binary_release_upload_${{ github.sha }}
           maestro_timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
-          maestro_app_file: ${{ steps.assemble.outputs.release_apk_path }}
+          maestro_app_file: ${{ steps.assemble.outputs.play_apk_path }}
           maestro_api_level: 30
           maestro_include_tags: binaryUpload
           asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
