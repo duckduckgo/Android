@@ -26,7 +26,7 @@
 
     <!-- VPN Reminder Notification -->
     <string name="vpnReminderNotificationChannelName">VPN Reminders</string>
-    <string name="vpnReminderNotificationTitle">😱 Don\'t forget to turn on your VPN</string>
-    <string name="vpnReminderNotificationDescription">Block harmful sites and scams, hide your location, and shield your online activity now. 👉</string>
+    <string name="vpnReminderNotificationTitle">Turn on your VPN</string>
+    <string name="vpnReminderNotificationDescription">Block harmful sites and scams, hide your location, and shield your online activity now.</string>
 
 </resources>
