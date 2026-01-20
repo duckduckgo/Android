@@ -1,4 +1,4 @@
-name: Nightly
+name: Nightly orchestrator
 
 on:
   schedule:

@@ -22,7 +22,7 @@ on:
         type: string
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: ${{ github.workflow_ref }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -72,7 +72,7 @@ jobs:
 
       - name: Bundle the Android CI tests report
         if: always()
-        run: find . -type d -name 'fladleResults' | zip -@ -r android-tests-report.zip
+        run: find . -type d -name 'fladleResults' | zip -@ -r android-tests-report-privacy.zip
 
       - name: Generate json file with failures
         if: ${{ failure() }}
@@ -87,8 +87,8 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: android-tests-report
-          path: android-tests-report.zip
+          name: android-tests-report-privacy
+          path: android-tests-report-privacy.zip
 
       - name: Create Asana task when workflow failed
         if: ${{ failure() && github.event_name != 'workflow_dispatch' }}
