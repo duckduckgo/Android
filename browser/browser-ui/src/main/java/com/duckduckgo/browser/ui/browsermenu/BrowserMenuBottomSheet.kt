@@ -262,7 +262,7 @@ class BrowserMenuBottomSheet(
     private fun renderNewTabPageMenu(viewState: BrowserMenuViewState.NewTabPage) {
         backMenuItem.isEnabled = false
         forwardMenuItem.isEnabled = viewState.canGoForward
-        newTabMenuItem.isEnabled = false
+        newTabMenuItem.isEnabled = true
         newDuckChatTabMenuItem.isEnabled = false
         newDuckChatTabMenuItem.isVisible = false
         newDuckChatMenuItem.isEnabled = viewState.showDuckChatOption
