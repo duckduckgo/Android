@@ -582,7 +582,7 @@ class BrowserTabViewModel @Inject constructor(
                 siteHttpErrorHandler.assignErrorsAndClearCache(value)
             }
         }
-    private var lastAnimatedUrl: String? = null
+    private var previousUrl: String? = null
     private lateinit var tabId: String
     private var webNavigationState: WebNavigationState? = null
     private var httpsUpgraded = false
@@ -1779,11 +1779,10 @@ class BrowserTabViewModel @Inject constructor(
                     privacyProtectionDisabled = privacyProtectionDisabled,
                     maliciousSiteBlocked = currentBrowserViewState().maliciousSiteBlocked,
                     site = site,
+                    previousUrl = previousUrl,
                 )
 
-                if (isTrackersAnimationEnabled) {
-                    lastAnimatedUrl = site?.url
-                }
+                previousUrl = site?.url
 
                 loadingViewState.value = currentLoadingViewState().copy(
                     trackersAnimationEnabled = isTrackersAnimationEnabled,
@@ -1803,12 +1802,13 @@ class BrowserTabViewModel @Inject constructor(
         privacyProtectionDisabled: Boolean,
         maliciousSiteBlocked: Boolean,
         site: Site?,
+        previousUrl: String?,
     ): Boolean {
         val canShowTrackerAnimation = !(privacyProtectionDisabled || maliciousSiteBlocked) &&
             site?.privacyProtection() ?: PrivacyShield.UNKNOWN != PrivacyShield.UNPROTECTED
 
         val shouldAnimate = addressBarTrackersAnimationManager
-            .shouldShowAnimation(currentUrl = site?.url, lastAnimatedUrl = lastAnimatedUrl)
+            .shouldShowAnimation(currentUrl = site?.url, lastAnimatedUrl = previousUrl)
 
         return shouldAnimate && canShowTrackerAnimation
     }
