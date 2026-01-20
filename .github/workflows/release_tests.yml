@@ -28,8 +28,9 @@ jobs:
         uses: ./.github/actions/checkout-and-assemble
         with:
           commit: ${{ github.event.inputs.app-version }}
-          fake_release_properties: ${{ secrets.FAKE_RELEASE_PROPERTIES }}
-          fake_release_key: ${{ secrets.FAKE_RELEASE_KEY }}
+          flavours: 'play'
+          release_properties: ${{ secrets.FAKE_RELEASE_PROPERTIES }}
+          release_key: ${{ secrets.FAKE_RELEASE_KEY }}
           gradle_encryption_key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
 
       - name: Notify Mattermost of Maestro tests
