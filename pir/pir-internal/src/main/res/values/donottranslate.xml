@@ -27,6 +27,7 @@
     <string name="pirDevForceKillScan">Kill with no reset</string>
     <string name="pirDevForceKillOptOut">Reset optout</string>
     <string name="pirDevViewScanResults">View All Scan Results</string>
+    <string name="pirDevViewExtractedProfiles">View Extracted Profiles</string>
     <string name="pirDevViewOptOutResults">View All OptOut Results</string>
     <string name="pirDevViewEmailResults">View Email Confirmation Results</string>
     <string name="pirDevViewRunEvents">View PIR Run events</string>
