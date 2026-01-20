@@ -80,6 +80,7 @@ import com.duckduckgo.duckchat.impl.inputscreen.ui.view.SwipeableRecyclerView
 import com.duckduckgo.duckchat.impl.inputscreen.ui.viewmodel.InputScreenViewModel
 import com.duckduckgo.duckchat.impl.inputscreen.ui.viewmodel.InputScreenViewModel.InputScreenViewModelFactory
 import com.duckduckgo.duckchat.impl.inputscreen.ui.viewmodel.InputScreenViewModel.InputScreenViewModelProviderFactory
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.navigation.api.getActivityParams
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.api.VoiceSearchLauncher
@@ -347,6 +348,7 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
                 hideAutoCompleteIfOnChatTab(state)
                 previousSearchMode = state.searchMode
                 updateButtonVisibility(state)
+                inputScreenButtons.setNewLineButtonVisible(state.newLineButtonVisible)
             }.launchIn(lifecycleScope)
 
         viewModel.visibilityState
@@ -560,6 +562,10 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
             // todo remove round-tripping through the input mode widget - actions should go directly to the view model
             inputModeWidget.submitMessage()
             viewModel.onSendButtonClicked()
+        }
+        inputScreenButtons.onNewLineClick = {
+            inputModeWidget.printNewLine()
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_FLOATING_RETURN_PRESSED)
         }
         inputScreenButtons.onVoiceClick = {
             voiceSearchLauncher.launch(requireActivity(), VoiceSearchMode.fromValue(inputModeWidget.getSelectedTabPosition()))

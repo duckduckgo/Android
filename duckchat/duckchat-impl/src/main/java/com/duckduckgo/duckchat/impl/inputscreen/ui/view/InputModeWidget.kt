@@ -344,12 +344,11 @@ class InputModeWidget @JvmOverloads constructor(
                 maxLines = if (canExpand) MAX_LINES else 1
             } else {
                 hint = context.getString(R.string.input_screen_chat_hint)
-                imeOptions = EditorInfo.IME_FLAG_NO_EXTRACT_UI or EditorInfo.IME_FLAG_NO_PERSONALIZED_LEARNING or EditorInfo.IME_ACTION_NONE
+                imeOptions = EditorInfo.IME_FLAG_NO_EXTRACT_UI or EditorInfo.IME_FLAG_NO_PERSONALIZED_LEARNING or EditorInfo.IME_ACTION_GO
                 setRawInputType(
                     InputType.TYPE_CLASS_TEXT or
                         InputType.TYPE_TEXT_FLAG_AUTO_CORRECT or
-                        InputType.TYPE_TEXT_FLAG_CAP_SENTENCES or
-                        InputType.TYPE_TEXT_FLAG_MULTI_LINE,
+                        InputType.TYPE_TEXT_FLAG_CAP_SENTENCES,
                 )
                 val chatMin = if (bottomButtonsMode) 1 else CHAT_MIN_LINES
                 minLines = chatMin
@@ -428,6 +427,15 @@ class InputModeWidget @JvmOverloads constructor(
             )
         }
         view.isVisible = visible
+    }
+
+    fun printNewLine() {
+        val currentText = inputField.text.toString()
+        val selectionStart = inputField.selectionStart
+        val selectionEnd = inputField.selectionEnd
+        val newText = currentText.substring(0, selectionStart) + "\n" + currentText.substring(selectionEnd)
+        text = newText
+        inputField.setSelection(selectionStart + 1)
     }
 
     fun selectAllText() {
