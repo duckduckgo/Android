@@ -1142,11 +1142,6 @@
                 "key": "man",
                 "description": "Manufacturer of the device",
                 "type": "string"
-            },
-            {
-                "key": "batteryOptimizations",
-                "description": "If device has battery optimizations enabled for the app",
-                "enum": ["false", "true"]
             }
         ]
     },
@@ -1166,11 +1161,6 @@
                 "key": "man",
                 "description": "Manufacturer of the device",
                 "type": "string"
-            },
-            {
-                "key": "batteryOptimizations",
-                "description": "If device has battery optimizations enabled for the app",
-                "enum": ["false", "true"]
             }
         ]
     },
@@ -1192,11 +1182,6 @@
                 "key": "man",
                 "description": "Manufacturer of the device",
                 "type": "string"
-            },
-            {
-                "key": "batteryOptimizations",
-                "description": "If device has battery optimizations enabled for the app",
-                "enum": ["false", "true"]
             }
         ]
     },
@@ -1216,11 +1201,6 @@
                 "key": "man",
                 "description": "Manufacturer of the device",
                 "type": "string"
-            },
-            {
-                "key": "batteryOptimizations",
-                "description": "If device has battery optimizations enabled for the app",
-                "enum": ["false", "true"]
             }
         ]
     },
@@ -1503,11 +1483,6 @@
                 "key": "man",
                 "description": "Manufacturer of the device",
                 "type": "string"
-            },
-            {
-                "key": "batteryOptimizations",
-                "description": "If device has battery optimizations enabled for the app",
-                "enum": ["false", "true"]
             }
         ]
     },
@@ -1537,11 +1512,6 @@
                 "key": "man",
                 "description": "Manufacturer of the device",
                 "type": "string"
-            },
-            {
-                "key": "batteryOptimizations",
-                "description": "If device has battery optimizations enabled for the app",
-                "enum": ["false", "true"]
             }
         ]
     },
