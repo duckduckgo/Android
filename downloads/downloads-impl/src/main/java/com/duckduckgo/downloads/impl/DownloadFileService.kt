@@ -30,7 +30,10 @@ import retrofit2.http.Url
 interface DownloadFileService {
 
     @HEAD
-    fun getFileDetails(@Url urlString: String): Call<Void>?
+    fun getFileDetails(
+        @Header("User-Agent") userAgent: String?,
+        @Url urlString: String,
+    ): Call<Void>?
 
     @Streaming
     @GET
