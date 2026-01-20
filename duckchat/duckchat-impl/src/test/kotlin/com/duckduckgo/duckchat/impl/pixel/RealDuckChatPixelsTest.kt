@@ -25,6 +25,7 @@ import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_SELECT_FIRST_HISTORY_I
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_SUBMIT_FIRST_PROMPT
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_SUBMIT_PROMPT
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_TAP_KEYBOARD_RETURN_KEY
+import com.duckduckgo.duckchat.impl.metric.DuckAiMetricCollector
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_KEYBOARD_RETURN_PRESSED
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_OPEN
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_OPEN_HISTORY
@@ -42,7 +43,6 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
@@ -57,6 +57,7 @@ class RealDuckChatPixelsTest {
     private val mockDuckChatFeatureRepository: DuckChatFeatureRepository = mock()
 
     private val statisticsUpdater: StatisticsUpdater = mock()
+    private val duckAiMetricCollector: DuckAiMetricCollector = mock()
 
     private lateinit var testee: RealDuckChatPixels
 
@@ -70,6 +71,7 @@ class RealDuckChatPixelsTest {
             appCoroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             statisticsUpdater = statisticsUpdater,
+            duckAiMetricCollector = duckAiMetricCollector,
         )
     }
 
@@ -86,6 +88,7 @@ class RealDuckChatPixelsTest {
             parameters = mapOf(DuckChatPixelParameters.DELTA_TIMESTAMP_PARAMETERS to "5"),
         )
         verify(statisticsUpdater).refreshDuckAiRetentionAtb()
+        verify(duckAiMetricCollector).onMessageSent()
     }
 
     @Test
@@ -101,6 +104,7 @@ class RealDuckChatPixelsTest {
             parameters = mapOf(DuckChatPixelParameters.DELTA_TIMESTAMP_PARAMETERS to "10"),
         )
         verify(statisticsUpdater).refreshDuckAiRetentionAtb()
+        verify(duckAiMetricCollector).onMessageSent()
     }
 
     @Test

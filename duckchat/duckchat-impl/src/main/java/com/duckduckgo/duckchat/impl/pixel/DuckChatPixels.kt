@@ -30,6 +30,7 @@ import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_SELECT_FIRST_HISTORY_I
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_SUBMIT_FIRST_PROMPT
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_SUBMIT_PROMPT
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_TAP_KEYBOARD_RETURN_KEY
+import com.duckduckgo.duckchat.impl.metric.DuckAiMetricCollector
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_ADDRESS_BAR_IS_ENABLED_DAILY
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_BROWSER_MENU_IS_ENABLED_DAILY
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_DUCK_AI_SETTINGS_TAPPED
@@ -122,6 +123,7 @@ class RealDuckChatPixels @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
     private val statisticsUpdater: StatisticsUpdater,
+    private val duckAiMetricCollector: DuckAiMetricCollector,
 ) : DuckChatPixels {
 
     override fun sendReportMetricPixel(reportMetric: ReportMetric) {
@@ -149,6 +151,7 @@ class RealDuckChatPixels @Inject constructor(
                 pixel.fire(pixelName, parameters = params)
                 if (refreshAtb) {
                     statisticsUpdater.refreshDuckAiRetentionAtb()
+                    duckAiMetricCollector.onMessageSent()
                 }
             }
         }
