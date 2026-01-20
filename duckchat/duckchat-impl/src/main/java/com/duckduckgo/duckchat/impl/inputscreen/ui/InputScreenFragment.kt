@@ -683,7 +683,7 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
     fun getFavoritesContainer(): FrameLayout = binding.newTabContainerLayout
 
     fun getAutoCompleteRecyclerView(): SwipeableRecyclerView {
-        return binding.autoCompleteRecyclerView
+        return binding.autoCompleteSuggestionsList
     }
 
     fun getAutoCompleteBottomFadeContainer(): FrameLayout {

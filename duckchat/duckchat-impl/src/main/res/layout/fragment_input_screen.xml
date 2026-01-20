@@ -98,7 +98,7 @@
         app:layout_constraintTop_toBottomOf="@id/inputModeWidgetContainerTop">
 
         <com.duckduckgo.duckchat.impl.inputscreen.ui.view.SwipeableRecyclerView
-            android:id="@+id/autoCompleteRecyclerView"
+            android:id="@+id/autoCompleteSuggestionsList"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:clipToPadding="false" />
