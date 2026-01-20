@@ -27,6 +27,9 @@ import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.APP_SETTINGS_I
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.APP_SETTINGS_PIR_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.APP_SETTINGS_RESTORE_PURCHASE_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.AUTH_V1_SIGN_IN_ATTEMPT
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.FREE_TRIAL_START
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.FREE_TRIAL_VPN_ACTIVATION
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelParameter.ACTIVATION_DAY
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.AUTH_V2_INVALID_REFRESH_TOKEN_DETECTED
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.AUTH_V2_INVALID_REFRESH_TOKEN_RECOVERED
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.AUTH_V2_INVALID_REFRESH_TOKEN_SIGNED_OUT
@@ -120,6 +123,8 @@ interface SubscriptionPixelSender {
     fun reportAuthV2TokenStoreError()
     fun reportSubscriptionsWebViewRenderProcessCrash(isRepeated: Boolean)
     fun reportAuthV1SignInAttempt()
+    fun reportFreeTrialStart()
+    fun reportFreeTrialVpnActivation(activationDay: String)
 }
 
 @ContributesBinding(AppScope::class)
@@ -297,6 +302,14 @@ class SubscriptionPixelSenderImpl @Inject constructor(
 
     override fun reportAuthV1SignInAttempt() {
         fire(AUTH_V1_SIGN_IN_ATTEMPT)
+    }
+
+    override fun reportFreeTrialStart() {
+        fire(FREE_TRIAL_START)
+    }
+
+    override fun reportFreeTrialVpnActivation(activationDay: String) {
+        fire(FREE_TRIAL_VPN_ACTIVATION, mapOf(ACTIVATION_DAY to activationDay))
     }
 
     private fun fire(
