@@ -52,7 +52,7 @@ class UrlFileDownloaderTest {
     @Before
     fun setup() {
         realFileDownloadManager = RealUrlFileDownloadCallManager()
-        whenever(downloadFileService.downloadFile(anyOrNull(), anyString())).thenReturn(call)
+        whenever(downloadFileService.downloadFile(anyOrNull(), anyOrNull(), anyString())).thenReturn(call)
 
         urlFileDownloader = UrlFileDownloader(
             downloadFileService,
@@ -186,7 +186,7 @@ class UrlFileDownloaderTest {
         val pendingFileDownload = buildPendingDownload("https://example.com/file.txt")
         urlFileDownloader.downloadFile(pendingFileDownload, "file.txt", mock<DownloadCallback>())
 
-        verify(downloadFileService).downloadFile(cookie = eq(null), urlString = any())
+        verify(downloadFileService).downloadFile(cookie = eq(null), userAgent = anyOrNull(), urlString = any())
     }
 
     @Test
@@ -196,7 +196,7 @@ class UrlFileDownloaderTest {
         val pendingFileDownload = buildPendingDownload("https://example.com/file.txt")
         urlFileDownloader.downloadFile(pendingFileDownload, "file.txt", mock<DownloadCallback>())
 
-        verify(downloadFileService).downloadFile(cookie = eq(""), urlString = any())
+        verify(downloadFileService).downloadFile(cookie = eq(""), userAgent = anyOrNull(), urlString = any())
     }
 
     @Test
@@ -213,7 +213,7 @@ class UrlFileDownloaderTest {
         val pendingFileDownload = buildPendingDownload("https://example.com/file.txt")
         urlFileDownloader.downloadFile(pendingFileDownload, "file.txt", mock<DownloadCallback>())
 
-        verify(downloadFileService).downloadFile(cookie = eq("session=abc123; token=xyz"), urlString = any())
+        verify(downloadFileService).downloadFile(cookie = eq("session=abc123; token=xyz"), userAgent = anyOrNull(), urlString = any())
     }
 
     @Test
@@ -230,7 +230,7 @@ class UrlFileDownloaderTest {
         val pendingFileDownload = buildPendingDownload("https://example.com/file.txt")
         urlFileDownloader.downloadFile(pendingFileDownload, "file.txt", mock<DownloadCallback>())
 
-        verify(downloadFileService).downloadFile(cookie = eq("session=abc123; token=xyz"), urlString = any())
+        verify(downloadFileService).downloadFile(cookie = eq("session=abc123; token=xyz"), userAgent = anyOrNull(), urlString = any())
     }
 
     private fun buildPendingDownload(

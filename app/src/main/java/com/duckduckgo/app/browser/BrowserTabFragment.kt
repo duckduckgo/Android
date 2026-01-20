@@ -4129,6 +4129,7 @@ class BrowserTabFragment :
                 contentDisposition = contentDisposition,
                 mimeType = mimeType,
                 subfolder = Environment.DIRECTORY_DOWNLOADS,
+                userAgent = userAgentProvider.userAgent(),
             )
 
         if (hasWriteStoragePermission()) {
@@ -4146,6 +4147,7 @@ class BrowserTabFragment :
             PendingFileDownload(
                 url = url,
                 subfolder = Environment.DIRECTORY_DOWNLOADS,
+                userAgent = userAgentProvider.userAgent(),
             )
 
         if (hasWriteStoragePermission()) {
