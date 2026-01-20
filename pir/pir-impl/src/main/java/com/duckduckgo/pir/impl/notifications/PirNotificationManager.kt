@@ -101,7 +101,6 @@ class RealPirNotificationManager @Inject constructor(
             .setContentText(message)
             .setSmallIcon(com.duckduckgo.mobile.android.R.drawable.notification_logo)
             .setContentIntent(pendingIntent)
-            .setStyle(NotificationCompat.BigTextStyle().bigText(message))
             .build()
     }
 

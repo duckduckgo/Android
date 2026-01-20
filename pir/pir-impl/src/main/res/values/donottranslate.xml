@@ -16,10 +16,10 @@
 
 <resources>
     <string name="activityPirDashboard" translatable="false">PIR</string>
-    <string name="pirFeatureName" translatable="false">Personal Information Removal</string>
-    <string name="pirNotificationMessageInProgress">A scan is currently in progress.</string>
-    <string name="pirNotificationTitleComplete">Scan complete!</string>
-    <string name="pirNotificationMessageComplete">DuckDuckGo has started the process to remove records matching your personal info online. See what we found…</string>
+    <string name="pirNotificationTitle">Pir Manual Scan</string>
+    <string name="pirNotificationMessageInProgress">Manual scan is currently in progress…</string>
+    <string name="pirNotificationMessageComplete">Manual scan is complete! View your results.</string>
+    <string name="pirOptOutNotificationTitle">Pir Opt Out</string>
     <string name="pirOptOutNotificationMessageInProgress">Opt out is currently in progress…</string>
     <string name="pirOptOutNotificationMessageComplete">Opt out is complete! View your results.</string>
 </resources>

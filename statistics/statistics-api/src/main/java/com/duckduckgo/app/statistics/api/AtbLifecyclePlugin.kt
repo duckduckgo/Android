@@ -32,13 +32,6 @@ interface AtbLifecyclePlugin {
     }
 
     /**
-     * Will be called right after we have refreshed the ATB retention on duck.ai
-     */
-    fun onDuckAiRetentionAtbRefreshed(oldAtb: String, newAtb: String) {
-        // default is no-op
-    }
-
-    /**
      * Will be called right after the ATB is first initialized and successfully sent via exti call
      */
     fun onAppAtbInitialized() {

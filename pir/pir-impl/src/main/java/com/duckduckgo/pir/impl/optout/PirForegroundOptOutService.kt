@@ -65,7 +65,7 @@ class PirForegroundOptOutService : Service(), CoroutineScope by MainScope() {
     ): Int {
         logcat { "PIR-OPT-OUT: PIR service started on ${Process.myPid()} thread: ${Thread.currentThread().name}" }
         val notification: Notification = pirNotificationManager.createScanStatusNotification(
-            title = getString(R.string.pirFeatureName),
+            title = getString(R.string.pirOptOutNotificationTitle),
             message = getString(
                 R.string.pirOptOutNotificationMessageInProgress,
             ),
@@ -91,7 +91,7 @@ class PirForegroundOptOutService : Service(), CoroutineScope by MainScope() {
 
             if (result.isSuccess) {
                 pirNotificationManager.showScanStatusNotification(
-                    title = getString(R.string.pirFeatureName),
+                    title = getString(R.string.pirOptOutNotificationTitle),
                     message = getString(R.string.pirOptOutNotificationMessageComplete),
                 )
             }

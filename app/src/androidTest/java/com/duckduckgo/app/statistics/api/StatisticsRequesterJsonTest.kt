@@ -113,14 +113,6 @@ class StatisticsRequesterJsonTest {
     }
 
     @Test
-    fun whenAlreadyInitializedRefreshDuckAiRetentionCallWithUpdateVersionResponseUpdatesAtb() {
-        statisticsStore.saveAtb(Atb("100-1"))
-        queueResponseFromFile(VALID_UPDATE_RESPONSE_JSON)
-        testee.refreshDuckAiRetentionAtb()
-        assertEquals("v99-1", statisticsStore.atb?.version)
-    }
-
-    @Test
     fun whenNotYetInitializedAtbInitializationStoresAtbResponse() {
         queueResponseFromFile(VALID_JSON)
         queueResponseFromString(responseBody = "", responseCode = 200)
@@ -244,16 +236,6 @@ class StatisticsRequesterJsonTest {
     }
 
     @Test
-    fun whenAlreadyInitializedRefreshDuckAiCallGoesToCorrectEndpoint() {
-        statisticsStore.saveAtb(Atb("100-1"))
-        queueResponseFromFile(VALID_REFRESH_RESPONSE_JSON)
-        testee.refreshDuckAiRetentionAtb()
-        val refreshRequest = takeRequestImmediately()
-        assertEquals("/atb.js", refreshRequest?.encodedPath())
-        assertEquals("duckai", refreshRequest?.extractQueryParam("at"))
-    }
-
-    @Test
     fun whenAlreadyInitializedRefreshSearchCallUpdatesSearchRetentionAtb() {
         statisticsStore.saveAtb(Atb("100-1"))
         queueResponseFromFile(VALID_REFRESH_RESPONSE_JSON)
@@ -267,14 +249,6 @@ class StatisticsRequesterJsonTest {
         queueResponseFromFile(VALID_REFRESH_RESPONSE_JSON)
         testee.refreshAppRetentionAtb()
         assertEquals("v107-7", statisticsStore.appRetentionAtb)
-    }
-
-    @Test
-    fun whenAlreadyInitializedRefreshDuckAiCallUpdatesAppRetentionAtb() {
-        statisticsStore.saveAtb(Atb("100-1"))
-        queueResponseFromFile(VALID_REFRESH_RESPONSE_JSON)
-        testee.refreshDuckAiRetentionAtb()
-        assertEquals("v107-7", statisticsStore.duckaiRetentionAtb)
     }
 
     @Test
@@ -292,16 +266,6 @@ class StatisticsRequesterJsonTest {
         statisticsStore.saveAtb(Atb("100-1"))
         queueResponseFromFile(VALID_REFRESH_RESPONSE_JSON)
         testee.refreshAppRetentionAtb()
-        val refreshRequest = takeRequestImmediately()
-        val testParam = refreshRequest?.extractQueryParam(ParamKey.DEV_MODE)
-        assertTestParameterSent(testParam)
-    }
-
-    @Test
-    fun whenAlreadyInitializedRefreshDuckAiCallSendsTestParameter() {
-        statisticsStore.saveAtb(Atb("100-1"))
-        queueResponseFromFile(VALID_REFRESH_RESPONSE_JSON)
-        testee.refreshDuckAiRetentionAtb()
         val refreshRequest = takeRequestImmediately()
         val testParam = refreshRequest?.extractQueryParam(ParamKey.DEV_MODE)
         assertTestParameterSent(testParam)
@@ -328,16 +292,6 @@ class StatisticsRequesterJsonTest {
     }
 
     @Test
-    fun whenAlreadyInitializedRefreshDuckAiCallSendsCorrectAtb() {
-        statisticsStore.saveAtb(Atb("100-1"))
-        queueResponseFromFile(VALID_REFRESH_RESPONSE_JSON)
-        testee.refreshDuckAiRetentionAtb()
-        val refreshRequest = takeRequestImmediately()
-        val atbParam = refreshRequest?.extractQueryParam(ParamKey.ATB)
-        assertEquals("100-1ma", atbParam)
-    }
-
-    @Test
     fun whenAlreadyInitializedRefreshSearchCallSendsCorrectRetentionAtb() {
         statisticsStore.saveAtb(Atb("100-1"))
         statisticsStore.searchRetentionAtb = "101-3"
@@ -354,17 +308,6 @@ class StatisticsRequesterJsonTest {
         statisticsStore.appRetentionAtb = "101-3"
         queueResponseFromFile(VALID_REFRESH_RESPONSE_JSON)
         testee.refreshAppRetentionAtb()
-        val refreshRequest = takeRequestImmediately()
-        val atbParam = refreshRequest?.extractQueryParam(ParamKey.RETENTION_ATB)
-        assertEquals("101-3", atbParam)
-    }
-
-    @Test
-    fun whenAlreadyInitializedRefreshDuckAiCallSendsCorrectRetentionAtb() {
-        statisticsStore.saveAtb(Atb("100-1"))
-        statisticsStore.duckaiRetentionAtb = "101-3"
-        queueResponseFromFile(VALID_REFRESH_RESPONSE_JSON)
-        testee.refreshDuckAiRetentionAtb()
         val refreshRequest = takeRequestImmediately()
         val atbParam = refreshRequest?.extractQueryParam(ParamKey.RETENTION_ATB)
         assertEquals("101-3", atbParam)
