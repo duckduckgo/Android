@@ -27,6 +27,9 @@ interface PirDataStore {
     var wauLastSentMs: Long
     var mauLastSentMs: Long
     var weeklyStatLastSentMs: Long
+
+    fun reset()
+    fun resetUserData()
 }
 
 internal class RealPirDataStore(
@@ -86,6 +89,19 @@ internal class RealPirDataStore(
                 putLong(KEY_WEEKLY_STATS_LAST_SENT_MS, value)
             }
         }
+
+    override fun reset() {
+        mainConfigEtag = null
+        resetUserData()
+    }
+
+    override fun resetUserData() {
+        customStatsPixelsLastSentMs = 0L
+        dauLastSentMs = 0L
+        wauLastSentMs = 0L
+        mauLastSentMs = 0L
+        weeklyStatLastSentMs = 0L
+    }
 
     companion object {
         private const val FILENAME = "com.duckduckgo.pir.v1"

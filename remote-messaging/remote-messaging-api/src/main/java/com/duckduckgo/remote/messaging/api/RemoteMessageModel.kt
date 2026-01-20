@@ -33,4 +33,6 @@ interface RemoteMessageModel {
     suspend fun onSecondaryActionClicked(remoteMessage: RemoteMessage): Action?
 
     suspend fun onActionClicked(remoteMessage: RemoteMessage): Action?
+
+    suspend fun getRemoteMessageImageFile(): String?
 }

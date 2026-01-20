@@ -28,4 +28,16 @@ class FakePirDataStore : PirDataStore {
     override var wauLastSentMs: Long = 0L
     override var mauLastSentMs: Long = 0L
     override var weeklyStatLastSentMs: Long = 0L
+    override fun reset() {
+        mainConfigEtag = null
+        resetUserData()
+    }
+
+    override fun resetUserData() {
+        customStatsPixelsLastSentMs = 0L
+        dauLastSentMs = 0L
+        wauLastSentMs = 0L
+        mauLastSentMs = 0L
+        weeklyStatLastSentMs = 0L
+    }
 }

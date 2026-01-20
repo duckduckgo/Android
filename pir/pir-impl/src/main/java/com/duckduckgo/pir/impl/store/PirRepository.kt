@@ -196,6 +196,17 @@ interface PirRepository {
 
     suspend fun setWeeklyStatLastSentMs(timeMs: Long)
 
+    /**
+     * This method deletes all data in the PIR repository, including brokers, extracted profiles, user profiles and resets the data store.
+     */
+    suspend fun clearAllData()
+
+    /**
+     * This method deletes all data in the PIR repository that is related to the user: user profiles, extracted profiles and
+     * resets the user data in the data store.
+     */
+    suspend fun clearUserData()
+
     data class GeneratedEmailData(
         val emailAddress: String,
         val pattern: String,
@@ -736,6 +747,24 @@ class RealPirRepository(
     override suspend fun setWeeklyStatLastSentMs(timeMs: Long) {
         withContext(dispatcherProvider.io()) {
             pirDataStore.weeklyStatLastSentMs = timeMs
+        }
+    }
+
+    override suspend fun clearAllData() {
+        withContext(dispatcherProvider.io()) {
+            brokerJsonDao()?.deleteAll()
+            brokerDao()?.deleteAll()
+            extractedProfileDao()?.deleteAllExtractedProfiles()
+            userProfileDao()?.deleteAllProfiles()
+            pirDataStore.reset()
+        }
+    }
+
+    override suspend fun clearUserData() {
+        withContext(dispatcherProvider.io()) {
+            extractedProfileDao()?.deleteAllExtractedProfiles()
+            userProfileDao()?.deleteAllProfiles()
+            pirDataStore.resetUserData()
         }
     }
 

@@ -19,6 +19,11 @@ package com.duckduckgo.app.firebutton
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 
 /**
- * Use this model to launch the FireButton screen
+ * Use this model to launch the FireButton screen (legacy)
  */
 object FireButtonScreenNoParams : ActivityParams
+
+/**
+ * Use this model to launch the new DataClearingSettings screen
+ */
+object DataClearingSettingsScreenNoParams : ActivityParams

@@ -177,14 +177,14 @@ interface DuckChatInternal : DuckChat {
     fun isInputScreenFeatureAvailable(): Boolean
 
     /**
-     * Returns whether dedicated Duck.ai full screen mode feature is available (its feature flag is enabled).
-     */
-    fun isDuckChatFullScreenModeFeatureAvailable(): Boolean
-
-    /**
      * Returns whether dedicated Duck.ai full screen mode is enabled (its feature flag is enabled).
      */
     fun isDuckChatFullScreenModeEnabled(): Boolean
+
+    /**
+     * Returns whether dedicated Duck.ai contextual mode is enabled (its feature flag is enabled).
+     */
+    fun isDuckChatContextualModeEnabled(): Boolean
 
     /**
      * Checks whether DuckChat is enabled based on remote config flag.
@@ -320,6 +320,7 @@ class RealDuckChat @Inject constructor(
     private var inputScreenMainButtonsEnabled = false
     private var showInputScreenOnSystemSearchLaunchEnabled: Boolean = true
     private var isFullscreenModeEnabled: Boolean = false
+    private var isContextualModeEnabled: Boolean = false
 
     init {
         if (isMainProcess) {
@@ -371,9 +372,9 @@ class RealDuckChat @Inject constructor(
 
     override fun isChatSyncFeatureEnabled(): Boolean = isChatSyncFeatureEnabled
 
-    override fun isDuckChatFullScreenModeFeatureAvailable(): Boolean = duckChatFeature.fullscreenMode().isEnabled()
-
     override fun isDuckChatFullScreenModeEnabled(): Boolean = isFullscreenModeEnabled
+
+    override fun isDuckChatContextualModeEnabled(): Boolean = isContextualModeEnabled
 
     override fun observeEnableDuckChatUserSetting(): Flow<Boolean> = duckChatFeatureRepository.observeDuckChatUserEnabled()
 
@@ -734,6 +735,7 @@ class RealDuckChat @Inject constructor(
             _showFullScreenMode.emit(showFullScreenMode)
 
             val showContextualMode = isDuckChatFeatureEnabled && isDuckChatUserEnabled && duckChatFeature.contextualMode().isEnabled()
+            isContextualModeEnabled = showContextualMode
             _showContextualMode.emit(showContextualMode)
         }
 

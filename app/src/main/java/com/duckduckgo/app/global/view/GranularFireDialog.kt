@@ -69,17 +69,13 @@ private const val ANIMATION_SPEED_INCREMENT = 0.15f
  */
 @InjectWith(FragmentScope::class)
 class GranularFireDialog : BottomSheetDialogFragment(), FireDialog {
-    @Inject
-    lateinit var settingsDataStore: SettingsDataStore
+    @Inject lateinit var settingsDataStore: SettingsDataStore
 
-    @Inject
-    lateinit var appBuildConfig: AppBuildConfig
+    @Inject lateinit var appBuildConfig: AppBuildConfig
 
-    @Inject
-    lateinit var clearDataAction: ClearDataAction
+    @Inject lateinit var clearDataAction: ClearDataAction
 
-    @Inject
-    lateinit var viewModelFactory: FragmentViewModelFactory
+    @Inject lateinit var viewModelFactory: FragmentViewModelFactory
 
     private val viewModel: GranularFireDialogViewModel by lazy {
         ViewModelProvider(this, viewModelFactory)[GranularFireDialogViewModel::class.java]
@@ -90,7 +86,7 @@ class GranularFireDialog : BottomSheetDialogFragment(), FireDialog {
 
     private val accelerateAnimatorUpdateListener = object : ValueAnimator.AnimatorUpdateListener {
         override fun onAnimationUpdate(animation: ValueAnimator) {
-            binding.fireAnimationView.let {
+            _binding?.fireAnimationView?.let {
                 it.speed += ANIMATION_SPEED_INCREMENT
                 if (it.speed > ANIMATION_MAX_SPEED) {
                     it.removeUpdateListener(this)
@@ -99,9 +95,7 @@ class GranularFireDialog : BottomSheetDialogFragment(), FireDialog {
         }
     }
 
-    private var hasRestarted = false
-    private var isAnimationComplete = false
-    private var isClearingComplete = false
+    private var canFinish = false
 
     override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this)
@@ -125,7 +119,7 @@ class GranularFireDialog : BottomSheetDialogFragment(), FireDialog {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        hasRestarted = false
+        canFinish = !isAnimationEnabled()
 
         setupLayout()
         configureBottomSheet()
@@ -161,72 +155,57 @@ class GranularFireDialog : BottomSheetDialogFragment(), FireDialog {
     }
 
     private fun setupLayout() {
-        binding.apply {
-            deleteButton.setOnClickListener {
-                hideClearDataOptions()
-                viewModel.onDeleteClicked()
-            }
-
-            cancelButton.setOnClickListener {
-                viewModel.onCancel()
-            }
+        binding.deleteButton.setOnClickListener {
+            hideClearDataOptions()
+            viewModel.onDeleteClicked()
+        }
+        binding.cancelButton.setOnClickListener {
+            viewModel.onCancel()
         }
     }
 
     private fun configureBottomSheet() {
-        (dialog as? BottomSheetDialog)?.behavior?.apply {
-            state = BottomSheetBehavior.STATE_EXPANDED
-        }
+        (dialog as? BottomSheetDialog)?.behavior?.state = BottomSheetBehavior.STATE_EXPANDED
     }
 
     private fun observeViewModel() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.viewState.collect { state ->
-                    render(state)
-                }
+                viewModel.viewState.collect { render(it) }
             }
         }
 
         viewModel.commands()
-            .onEach { command ->
-                when (command) {
-                    is Command.PlayAnimation -> {
-                        if (isAnimationEnabled()) {
-                            playAnimation()
-                        }
-                    }
-                    is Command.ClearingComplete -> {
-                        onClearingComplete()
-                    }
-                    is Command.OnShow -> {
-                        parentFragmentManager.setFragmentResult(
-                            FireDialog.REQUEST_KEY,
-                            Bundle().apply {
-                                putString(FireDialog.RESULT_KEY_EVENT, FireDialog.EVENT_ON_SHOW)
-                            },
-                        )
-                    }
-                    is Command.OnCancel -> {
-                        parentFragmentManager.setFragmentResult(
-                            FireDialog.REQUEST_KEY,
-                            Bundle().apply {
-                                putString(FireDialog.RESULT_KEY_EVENT, FireDialog.EVENT_ON_CANCEL)
-                            },
-                        )
-                        dismiss()
-                    }
-                    is Command.OnClearStarted -> {
-                        parentFragmentManager.setFragmentResult(
-                            FireDialog.REQUEST_KEY,
-                            Bundle().apply {
-                                putString(FireDialog.RESULT_KEY_EVENT, FireDialog.EVENT_ON_CLEAR_STARTED)
-                            },
-                        )
-                    }
+            .onEach { handleCommand(it) }
+            .launchIn(viewLifecycleOwner.lifecycleScope)
+    }
+
+    private fun handleCommand(command: Command) {
+        when (command) {
+            is Command.PlayAnimation -> {
+                if (isAnimationEnabled()) {
+                    playAnimation()
+                } else {
+                    // Animation was enabled when dialog opened but is now disabled.
+                    // Update canFinish so ClearingComplete can complete the flow.
+                    canFinish = true
                 }
             }
-            .launchIn(viewLifecycleOwner.lifecycleScope)
+            is Command.ClearingComplete -> onClearAllEvent(ClearAllEvent.ClearingFinished)
+            is Command.OnShow -> sendFragmentResult(FireDialog.EVENT_ON_SHOW)
+            is Command.OnCancel -> {
+                sendFragmentResult(FireDialog.EVENT_ON_CANCEL)
+                dismiss()
+            }
+            is Command.OnClearStarted -> sendFragmentResult(FireDialog.EVENT_ON_CLEAR_STARTED)
+        }
+    }
+
+    private fun sendFragmentResult(event: String) {
+        parentFragmentManager.setFragmentResult(
+            FireDialog.REQUEST_KEY,
+            Bundle().apply { putString(FireDialog.RESULT_KEY_EVENT, event) },
+        )
     }
 
     private fun render(state: GranularFireDialogViewModel.ViewState) {
@@ -279,15 +258,6 @@ class GranularFireDialog : BottomSheetDialogFragment(), FireDialog {
         }
     }
 
-    private fun onClearingComplete() {
-        isClearingComplete = true
-        // Add accelerator listener when clearing finishes to speed up remaining animation
-        if (isAnimationEnabled() && !isAnimationComplete) {
-            binding.fireAnimationView.addAnimatorUpdateListener(accelerateAnimatorUpdateListener)
-        }
-        checkIfShouldRestart()
-    }
-
     private fun removeTopPadding() {
         dialog?.findViewById<View>(MaterialR.id.design_bottom_sheet)?.apply {
             ViewCompat.setOnApplyWindowInsetsListener(this) { view, insets ->
@@ -338,15 +308,10 @@ class GranularFireDialog : BottomSheetDialogFragment(), FireDialog {
                 override fun onAnimationCancel(animation: Animator) {}
                 override fun onAnimationStart(animation: Animator) {}
                 override fun onAnimationEnd(animation: Animator) {
-                    onAnimationComplete()
+                    onClearAllEvent(ClearAllEvent.AnimationFinished)
                 }
             },
         )
-    }
-
-    private fun onAnimationComplete() {
-        isAnimationComplete = true
-        checkIfShouldRestart()
     }
 
     private fun hideClearDataOptions() {
@@ -354,15 +319,13 @@ class GranularFireDialog : BottomSheetDialogFragment(), FireDialog {
     }
 
     @Synchronized
-    private fun checkIfShouldRestart() {
-        val allTasksComplete = if (isAnimationEnabled()) {
-            isAnimationComplete && isClearingComplete
+    private fun onClearAllEvent(event: ClearAllEvent) {
+        if (!canFinish && _binding != null) {
+            canFinish = true
+            if (event is ClearAllEvent.ClearingFinished) {
+                binding.fireAnimationView.addAnimatorUpdateListener(accelerateAnimatorUpdateListener)
+            }
         } else {
-            isClearingComplete
-        }
-
-        if (allTasksComplete && !hasRestarted) {
-            hasRestarted = true
             if (viewModel.viewState.value.shouldRestartAfterClearing) {
                 clearDataAction.killAndRestartProcess(notifyDataCleared = false, enableTransitionAnimation = false)
             } else {
@@ -371,9 +334,12 @@ class GranularFireDialog : BottomSheetDialogFragment(), FireDialog {
         }
     }
 
+    private sealed class ClearAllEvent {
+        data object AnimationFinished : ClearAllEvent()
+        data object ClearingFinished : ClearAllEvent()
+    }
+
     companion object {
-        fun newInstance(): GranularFireDialog {
-            return GranularFireDialog()
-        }
+        fun newInstance(): GranularFireDialog = GranularFireDialog()
     }
 }

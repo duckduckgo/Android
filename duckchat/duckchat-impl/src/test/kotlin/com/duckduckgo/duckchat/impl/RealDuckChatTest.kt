@@ -1154,6 +1154,38 @@ class RealDuckChatTest {
         assertFalse(testee.isChatSyncFeatureEnabled())
     }
 
+    @Test
+    fun `when contextual mode enabled, then showContextualMode emits true`() = runTest {
+        duckChatFeature.contextualMode().setRawStoredState(State(enable = true))
+        testee.onPrivacyConfigDownloaded()
+
+        assertTrue(testee.showContextualMode.value)
+    }
+
+    @Test
+    fun `when contextual mode disabled, then showContextualMode emits false`() = runTest {
+        duckChatFeature.contextualMode().setRawStoredState(State(enable = false))
+        testee.onPrivacyConfigDownloaded()
+
+        assertFalse(testee.showContextualMode.value)
+    }
+
+    @Test
+    fun `when contextual mode enabled, isDuckChatContextualModeEnabled returns true`() = runTest {
+        duckChatFeature.contextualMode().setRawStoredState(State(enable = true))
+        testee.onPrivacyConfigDownloaded()
+
+        assertTrue(testee.isDuckChatContextualModeEnabled())
+    }
+
+    @Test
+    fun `when contextual mode disabled, isDuckChatContextualModeEnabled returns false`() = runTest {
+        duckChatFeature.contextualMode().setRawStoredState(State(enable = false))
+        testee.onPrivacyConfigDownloaded()
+
+        assertFalse(testee.isDuckChatContextualModeEnabled())
+    }
+
     companion object {
         val SETTINGS_JSON = """
         {

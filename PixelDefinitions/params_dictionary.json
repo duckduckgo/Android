@@ -78,5 +78,23 @@
         "type": "string",
         "description": "Signals the pixel processing pipeline",
         "enum": ["true"]
+    },
+    "tabs": {
+        "key": "tabs",
+        "type": "string",
+        "description": "Indicates whether the tabs clearing option is enabled or disabled",
+        "enum": ["true", "false"]
+    },
+    "data": {
+        "key": "data",
+        "type": "string",
+        "description": "Indicates whether the browsing data clearing option is enabled or disabled",
+        "enum": ["true", "false"]
+    },
+    "chats": {
+        "key": "chats",
+        "type": "string",
+        "description": "Indicates whether the Duck.ai chats clearing option is enabled or disabled",
+        "enum": ["true", "false"]
     }
 }

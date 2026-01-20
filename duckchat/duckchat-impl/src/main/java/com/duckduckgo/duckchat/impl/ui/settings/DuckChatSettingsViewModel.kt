@@ -122,17 +122,6 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
         }
     }
 
-    fun onShowDuckChatInAddressBarToggled(checked: Boolean) {
-        viewModelScope.launch {
-            if (checked) {
-                pixel.fire(DuckChatPixelName.DUCK_CHAT_SEARCHBAR_SETTING_ON)
-            } else {
-                pixel.fire(DuckChatPixelName.DUCK_CHAT_SEARCHBAR_SETTING_OFF)
-            }
-            duckChat.setShowInAddressBarUserSetting(checked)
-        }
-    }
-
     fun duckChatLearnMoreClicked() {
         viewModelScope.launch {
             commandChannel.send(OpenLink(DUCK_CHAT_LEARN_MORE_LINK, R.string.duck_chat_title))

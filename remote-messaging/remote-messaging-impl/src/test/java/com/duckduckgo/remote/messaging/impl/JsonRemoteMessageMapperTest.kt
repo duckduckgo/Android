@@ -201,6 +201,48 @@ class JsonRemoteMessageMapperTest(private val testCase: TestCase) {
                     ),
                 ),
             ),
+            TestCase(
+                listOf(
+                    aJsonMessage(id = "id1", content = mediumJsonContent(imageUrl = "https://example.com/image.png")),
+                    aJsonMessage(id = "id2", content = bigSingleActionJsonContent(imageUrl = "https://example.com/banner.jpg")),
+                    aJsonMessage(id = "id3", content = bigTwoActionJsonContent(imageUrl = "https://example.com/promo.png")),
+                    aJsonMessage(id = "id4", content = promoSingleActionJsonContent(imageUrl = "https://example.com/promo2.jpg")),
+                    aJsonMessage(id = "id5", content = cardsListJsonContent(imageUrl = "https://example.com/cards.png")),
+                    aJsonMessage(id = "id6", content = mediumJsonContent(imageUrl = null)),
+                ),
+                listOf(
+                    aMediumMessage(
+                        id = "id1",
+                        mediumContent(imageUrl = "https://example.com/image.png"),
+                        surfaces = listOf(NEW_TAB_PAGE),
+                    ),
+                    aBigSingleActionMessage(
+                        id = "id2",
+                        bigSingleActionContent(imageUrl = "https://example.com/banner.jpg"),
+                        surfaces = listOf(NEW_TAB_PAGE),
+                    ),
+                    aBigTwoActionsMessage(
+                        id = "id3",
+                        bigTwoActionsContent(imageUrl = "https://example.com/promo.png"),
+                        surfaces = listOf(NEW_TAB_PAGE),
+                    ),
+                    aPromoSingleActionMessage(
+                        id = "id4",
+                        promoSingleActionContent(imageUrl = "https://example.com/promo2.jpg"),
+                        surfaces = listOf(NEW_TAB_PAGE),
+                    ),
+                    aCardsListMessage(
+                        id = "id5",
+                        cardsListContent(imageUrl = "https://example.com/cards.png"),
+                        surfaces = listOf(NEW_TAB_PAGE),
+                    ),
+                    aMediumMessage(
+                        id = "id6",
+                        mediumContent(imageUrl = null),
+                        surfaces = listOf(NEW_TAB_PAGE),
+                    ),
+                ),
+            ),
         )
 
         private fun frenchTranslations() = JsonContentTranslations(

@@ -43,6 +43,7 @@ import androidx.lifecycle.Observer
 import androidx.room.Room
 import androidx.test.filters.SdkSuppress
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
+import androidx.webkit.JavaScriptReplyProxy
 import app.cash.turbine.test
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.app.ValueCaptorObserver
@@ -456,6 +457,8 @@ class BrowserTabViewModelTest {
 
     private val mockDuckAiFeatureStateFullScreenModeFlow = MutableStateFlow(false)
 
+    private val mockDuckAiContextualModeFlow = MutableStateFlow(false)
+
     private val mockExternalIntentProcessingState: ExternalIntentProcessingState = mock()
 
     private val mockVpnMenuStateProvider: VpnMenuStateProvider = mock()
@@ -678,6 +681,7 @@ class BrowserTabViewModelTest {
             whenever(mockDuckAiFeatureState.showInputScreen).thenReturn(mockDuckAiFeatureStateInputScreenFlow)
             whenever(mockDuckAiFeatureState.showInputScreenAutomaticallyOnNewTab).thenReturn(mockDuckAiFeatureStateInputScreenOpenAutomaticallyFlow)
             whenever(mockDuckAiFeatureState.showFullScreenMode).thenReturn(mockDuckAiFeatureStateFullScreenModeFlow)
+            whenever(mockDuckAiFeatureState.showContextualMode).thenReturn(mockDuckAiContextualModeFlow)
             whenever(mockExternalIntentProcessingState.hasPendingTabLaunch).thenReturn(mockHasPendingTabLaunchFlow)
             whenever(mockExternalIntentProcessingState.hasPendingDuckAiOpen).thenReturn(mockHasPendingDuckAiOpenFlow)
             whenever(mockVpnMenuStateProvider.getVpnMenuState()).thenReturn(flowOf(VpnMenuState.Hidden))
@@ -6533,7 +6537,9 @@ class BrowserTabViewModelTest {
         runTest {
             whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
             val jsCallbackData = JsCallbackData(JSONObject(), "", "", "")
-            whenever(mockDuckChatJSHelper.processJsCallbackMessage(anyString(), anyString(), anyOrNull(), anyOrNull())).thenReturn(jsCallbackData)
+            whenever(
+                mockDuckChatJSHelper.processJsCallbackMessage(anyString(), anyString(), anyOrNull(), anyOrNull(), any()),
+            ).thenReturn(jsCallbackData)
             testee.processJsCallbackMessage(
                 DUCK_CHAT_FEATURE_NAME,
                 "method",
@@ -6549,7 +6555,7 @@ class BrowserTabViewModelTest {
     fun whenProcessJsCallbackMessageForDuckChatAndResponseIsNullThenDoNotSendCommand() =
         runTest {
             whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
-            whenever(mockDuckChatJSHelper.processJsCallbackMessage(anyString(), anyString(), anyOrNull(), anyOrNull())).thenReturn(null)
+            whenever(mockDuckChatJSHelper.processJsCallbackMessage(anyString(), anyString(), anyOrNull(), anyOrNull(), any())).thenReturn(null)
             testee.processJsCallbackMessage(
                 DUCK_CHAT_FEATURE_NAME,
                 "method",
@@ -7037,7 +7043,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenProcessJsCallbackMessageForSubscriptionsAndResponseIsNullThenDoNotSendCommand() =
         runTest {
-            whenever(mockDuckChatJSHelper.processJsCallbackMessage(anyString(), anyString(), anyOrNull(), anyOrNull())).thenReturn(null)
+            whenever(mockDuckChatJSHelper.processJsCallbackMessage(anyString(), anyString(), anyOrNull(), anyOrNull(), any())).thenReturn(null)
             testee.processJsCallbackMessage(
                 featureName = SUBSCRIPTIONS_FEATURE_NAME,
                 method = "method",
@@ -8240,5 +8246,135 @@ class BrowserTabViewModelTest {
 
         verify(mockPixel).fire(DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_KEYBOARD_USAGE)
         verify(mockPixel).fire(DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_KEYBOARD_USAGE_DAILY, type = Daily())
+    }
+
+    @Test
+    fun whenNavigatingToSameOriginThenBlobProxyIsRetained() = runTest {
+        val originUrl = "https://example.com"
+        val blobUrl = "blob:https://example.com/some-blob-id"
+        val mockReplyProxy: JavaScriptReplyProxy = mock()
+
+        testee.saveReplyProxyForBlobDownload(originUrl, mockReplyProxy)
+
+        // Navigate to the same origin (proxy should be retained)
+        loadUrl("https://example.com/another-page")
+
+        testee.requestFileDownload(
+            webView = mockWebView,
+            url = blobUrl,
+            contentDisposition = null,
+            mimeType = "application/octet-stream",
+            requestUserConfirmation = true,
+            isBlobDownloadWebViewFeatureEnabled = true,
+        )
+
+        verify(mockWebViewCompatWrapper).postMessage(eq(mockWebView), eq(mockReplyProxy), eq(blobUrl))
+    }
+
+    @Test
+    fun whenNavigatingToDifferentOriginThenBlobProxyIsRemoved() = runTest {
+        val originUrl = "https://example.com"
+        val blobUrl = "blob:https://example.com/some-blob-id"
+        val mockReplyProxy: JavaScriptReplyProxy = mock()
+
+        testee.saveReplyProxyForBlobDownload(originUrl, mockReplyProxy)
+
+        // Navigate to a different origin (proxy should be removed)
+        loadUrl("https://different-site.com/page")
+
+        testee.requestFileDownload(
+            webView = mockWebView,
+            url = blobUrl,
+            contentDisposition = null,
+            mimeType = "application/octet-stream",
+            requestUserConfirmation = true,
+            isBlobDownloadWebViewFeatureEnabled = true,
+        )
+
+        verify(mockWebViewCompatWrapper, never()).postMessage(any(), any(), any())
+    }
+
+    @Test
+    fun whenSavingMultipleProxiesForSameOriginThenAllAreRetainedOnSameOriginNavigation() = runTest {
+        val originUrl = "https://example.com"
+        val locationHref1 = "https://example.com/frame1"
+        val locationHref2 = "https://example.com/frame2"
+        val blobUrl = "blob:https://example.com/some-blob-id"
+        val mockReplyProxy1: JavaScriptReplyProxy = mock()
+        val mockReplyProxy2: JavaScriptReplyProxy = mock()
+
+        testee.saveReplyProxyForBlobDownload(originUrl, mockReplyProxy1, locationHref1)
+        testee.saveReplyProxyForBlobDownload(originUrl, mockReplyProxy2, locationHref2)
+
+        // Navigate to the same origin (all proxies should be retained)
+        loadUrl("https://example.com/another-page")
+
+        testee.requestFileDownload(
+            webView = mockWebView,
+            url = blobUrl,
+            contentDisposition = null,
+            mimeType = "application/octet-stream",
+            requestUserConfirmation = true,
+            isBlobDownloadWebViewFeatureEnabled = true,
+        )
+
+        verify(mockWebViewCompatWrapper).postMessage(eq(mockWebView), eq(mockReplyProxy1), eq(blobUrl))
+        verify(mockWebViewCompatWrapper).postMessage(eq(mockWebView), eq(mockReplyProxy2), eq(blobUrl))
+    }
+
+    @Test
+    fun whenSavingProxiesForDifferentOriginsThenOnlyMatchingOriginIsRetained() = runTest {
+        val originUrl1 = "https://example.com"
+        val originUrl2 = "https://other-site.com"
+        val blobUrl = "blob:https://example.com/some-blob-id"
+        val mockReplyProxy1: JavaScriptReplyProxy = mock()
+        val mockReplyProxy2: JavaScriptReplyProxy = mock()
+
+        testee.saveReplyProxyForBlobDownload(originUrl1, mockReplyProxy1)
+        testee.saveReplyProxyForBlobDownload(originUrl2, mockReplyProxy2)
+
+        // Navigate to first origin (only first proxy should be retained)
+        loadUrl("https://example.com/page")
+
+        testee.requestFileDownload(
+            webView = mockWebView,
+            url = blobUrl,
+            contentDisposition = null,
+            mimeType = "application/octet-stream",
+            requestUserConfirmation = true,
+            isBlobDownloadWebViewFeatureEnabled = true,
+        )
+
+        verify(mockWebViewCompatWrapper).postMessage(eq(mockWebView), eq(mockReplyProxy1), eq(blobUrl))
+        verify(mockWebViewCompatWrapper, never()).postMessage(eq(mockWebView), eq(mockReplyProxy2), eq(blobUrl))
+    }
+
+    @Test
+    fun whenOnDuckChatOmnibarButtonClickedAndContextualModeEnabledAndNotNTPThenCommandSent() = runTest {
+        mockDuckAiContextualModeFlow.emit(true)
+
+        testee.onDuckChatOmnibarButtonClicked(query = "example", hasFocus = false, isNtp = false)
+
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        assertTrue(commandCaptor.lastValue is Command.ShowDuckAIContextualMode)
+    }
+
+    @Test
+    fun whenOnDuckChatOmnibarButtonClickedAndContextualModeEnabledAndNTPThenContextualNotCalled() = runTest {
+        val duckAIUrl = "https://duckduckgo.com/?q=test"
+
+        mockDuckAiContextualModeFlow.emit(true)
+        mockDuckAiFeatureStateFullScreenModeFlow.emit(true)
+
+        whenever(mockDuckChat.getDuckChatUrl(any(), any())).thenReturn(duckAIUrl)
+        whenever(mockOmnibarConverter.convertQueryToUrl(duckAIUrl, null)).thenReturn(duckAIUrl)
+
+        testee.onDuckChatOmnibarButtonClicked(query = "example", hasFocus = false, isNtp = true)
+
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        val command = commandCaptor.lastValue as Navigate
+        assertEquals(duckAIUrl, command.url)
+
+        verify(mockDuckChat, never()).openDuckChat()
     }
 }

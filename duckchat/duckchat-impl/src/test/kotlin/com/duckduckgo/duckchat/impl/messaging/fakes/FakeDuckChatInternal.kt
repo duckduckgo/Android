@@ -126,9 +126,9 @@ class FakeDuckChatInternal(
 
     override fun isInputScreenFeatureAvailable(): Boolean = false
 
-    override fun isDuckChatFullScreenModeFeatureAvailable(): Boolean = false
-
     override fun isDuckChatFullScreenModeEnabled(): Boolean = false
+
+    override fun isDuckChatContextualModeEnabled(): Boolean = false
 
     override fun isDuckChatFeatureEnabled(): Boolean = true
 

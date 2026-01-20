@@ -30,7 +30,9 @@ import com.duckduckgo.pir.impl.optout.PirOptOut
 import com.duckduckgo.pir.impl.scan.PirScan
 import com.duckduckgo.pir.internal.databinding.ActivityPirInternalWebviewBinding
 import kotlinx.coroutines.launch
+import logcat.logcat
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.milliseconds
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(PirDevWebViewResultsScreenParams::class)
@@ -55,10 +57,14 @@ class PirDevWebViewActivity : DuckDuckGoActivity() {
         val debugType = params?.debugType ?: DebugType.OPT_OUT
         lifecycleScope.launch {
             if (!brokers.isNullOrEmpty()) {
+                val startTime = System.currentTimeMillis()
+                logcat { "PIR-DEV: Debug ${debugType.name} started at $startTime" }
                 when (debugType) {
                     DebugType.SCAN -> pirScan.debugExecute(brokers, binding.pirDevWebView)
                     DebugType.OPT_OUT -> pirOptOut.debugExecute(brokers, binding.pirDevWebView)
                 }.also {
+                    val duration = (System.currentTimeMillis() - startTime).milliseconds
+                    logcat { "PIR-DEV: Debug ${debugType.name} finished in ${duration.inWholeSeconds} seconds / ${duration.inWholeMinutes} minutes" }
                     finish()
                 }
             } else {

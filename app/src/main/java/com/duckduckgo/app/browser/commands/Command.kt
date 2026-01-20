@@ -503,4 +503,6 @@ sealed class Command {
 
     data class EnableDuckAIFullScreen(val browserViewState: BrowserViewState) : Command()
     data class DisableDuckAIFullScreen(val url: String) : Command()
+
+    data object ShowDuckAIContextualMode : Command()
 }

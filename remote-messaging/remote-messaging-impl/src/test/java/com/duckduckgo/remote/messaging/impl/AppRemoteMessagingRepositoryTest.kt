@@ -33,6 +33,7 @@ import com.duckduckgo.remote.messaging.api.Content.Small
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.api.Surface
 import com.duckduckgo.remote.messaging.fixtures.getMessageMapper
+import com.duckduckgo.remote.messaging.impl.store.RemoteMessageImageStore
 import com.duckduckgo.remote.messaging.store.RemoteMessageEntity.Status
 import com.duckduckgo.remote.messaging.store.RemoteMessagingConfigRepository
 import com.duckduckgo.remote.messaging.store.RemoteMessagingDatabase
@@ -45,6 +46,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 
 // TODO: when pattern established, refactor objects to use (create module https://app.asana.com/0/0/1201807285420697/f)
 @RunWith(AndroidJUnit4::class)
@@ -62,12 +64,14 @@ class AppRemoteMessagingRepositoryTest {
     private val dao = db.remoteMessagesDao()
 
     private val remoteMessagingConfigRepository: RemoteMessagingConfigRepository = mock()
+    private val remoteMessageImageStore: RemoteMessageImageStore = mock()
 
     private val testee = AppRemoteMessagingRepository(
         remoteMessagingConfigRepository,
         dao,
         coroutineRule.testDispatcherProvider,
         getMessageMapper(),
+        remoteMessageImageStore,
     )
 
     @After
@@ -421,6 +425,24 @@ class AppRemoteMessagingRepositoryTest {
         dao.messagesById("id3")?.let {
             assertEquals(Status.SCHEDULED, it.status)
         }
+    }
+
+    @Test
+    fun whenGetRemoteMessageImageFileReturnFilePathIfExists() = runTest {
+        whenever(remoteMessageImageStore.getLocalImageFilePath()).thenReturn("imagePath")
+
+        val result = testee.getRemoteMessageImageFile()
+
+        assertEquals("imagePath", result)
+    }
+
+    @Test
+    fun whenGetRemoteMessageImageFileReturnNullIfFilePathDoesNotExist() = runTest {
+        whenever(remoteMessageImageStore.getLocalImageFilePath()).thenReturn(null)
+
+        val result = testee.getRemoteMessageImageFile()
+
+        assertNull(result)
     }
 
     companion object {
