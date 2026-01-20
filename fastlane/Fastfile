@@ -260,47 +260,7 @@ platform :android do
         ref = options[:ref]
         branch_name = "release/#{app_version}"
 
-        # Checkout all branches are available
-        sh("git fetch")
-        sh("git checkout main")
-        sh("git submodule update --init --recursive")
-        sh("git reset --hard")
-        sh("git clean -f -fxd")
-
-        sh("git checkout #{ref}")
-        sh("git submodule update --init --recursive")
-        sh("git reset --hard")
-        sh("git clean -f -fxd")
-
-        # Create a new release branch
-        sh("git checkout -b #{branch_name}")
-        UI.success("Release branch #{branch_name} created successfully!")
-
-        # Update version properties file and push release branch
-        File.open(appVersionFilePath, 'w') do |file|
-            file.write("VERSION=#{app_version}")
-        end
-
-        sh("git add #{appVersionFilePath}")
-        sh("git commit -am 'Updated version number for new release - #{app_version}'")
-        sh "git push origin #{branch_name}"
-
-        # Merge release branch into main and tag it
-        sh "git checkout main"
-        sh "git merge --no-ff release/#{app_version}"
-        sh "git tag -a #{app_version} -m #{app_version}"
-        sh "git push origin main --tags"
-        UI.header("#{app_version} tag has been successfully created. 🎉")
-
-        # Merge changes into develop
-        sh "git checkout develop"
-        sh "git pull origin develop"
-        sh "git merge --no-ff release/#{app_version}"
-        sh "git push origin develop"
-
-        # Clean up branches
-        sh "git push -d origin release/#{app_version}"
-        sh "git branch -d release/#{app_version}"
+        sh("echo release branch will be created from ref: #{ref}")
     end
 
     # Note, this currently relies on having `git flow` tools installed.
