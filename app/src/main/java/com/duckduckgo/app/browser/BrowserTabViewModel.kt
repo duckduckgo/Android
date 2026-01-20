@@ -1775,20 +1775,18 @@ class BrowserTabViewModel @Inject constructor(
             // TODO when removing the flag we should tidy this logic up
             if (addressBarTrackersAnimationManager.isFeatureEnabled()) {
                 val site = site
-                val canShowTrackerAnimation = !(privacyProtectionDisabled || currentBrowserViewState().maliciousSiteBlocked) &&
-                    site?.privacyProtection() ?: PrivacyShield.UNKNOWN != PrivacyShield.UNPROTECTED
+                val isTrackersAnimationEnabled = isTrackersAnimationEnabled(
+                    privacyProtectionDisabled = privacyProtectionDisabled,
+                    maliciousSiteBlocked = currentBrowserViewState().maliciousSiteBlocked,
+                    site = site,
+                )
 
-                val shouldAnimate = addressBarTrackersAnimationManager
-                    .shouldShowAnimation(currentUrl = site?.url, lastAnimatedUrl = lastAnimatedUrl)
-
-                val trackersAnimationEnabled = shouldAnimate && canShowTrackerAnimation
-
-                if (trackersAnimationEnabled) {
+                if (isTrackersAnimationEnabled) {
                     lastAnimatedUrl = site?.url
                 }
 
                 loadingViewState.value = currentLoadingViewState().copy(
-                    trackersAnimationEnabled = trackersAnimationEnabled,
+                    trackersAnimationEnabled = isTrackersAnimationEnabled,
                     url = site?.url ?: "",
                 )
             } else {
@@ -1799,6 +1797,20 @@ class BrowserTabViewModel @Inject constructor(
                     )
             }
         }
+    }
+
+    private fun isTrackersAnimationEnabled(
+        privacyProtectionDisabled: Boolean,
+        maliciousSiteBlocked: Boolean,
+        site: Site?,
+    ): Boolean {
+        val canShowTrackerAnimation = !(privacyProtectionDisabled || maliciousSiteBlocked) &&
+            site?.privacyProtection() ?: PrivacyShield.UNKNOWN != PrivacyShield.UNPROTECTED
+
+        val shouldAnimate = addressBarTrackersAnimationManager
+            .shouldShowAnimation(currentUrl = site?.url, lastAnimatedUrl = lastAnimatedUrl)
+
+        return shouldAnimate && canShowTrackerAnimation
     }
 
     private suspend fun updatePrivacyProtectionState(domain: String) {
