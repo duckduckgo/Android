@@ -80,6 +80,7 @@ import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.DISABLED_WIH_HELP_LINK
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.ENABLED
 import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
+import com.duckduckgo.remote.messaging.api.Content
 import com.duckduckgo.remote.messaging.impl.store.ModalSurfaceStore
 import com.duckduckgo.settings.api.SettingsPageFeature
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback
@@ -171,6 +172,10 @@ class SettingsViewModel @Inject constructor(
         data object LaunchFeedback : Command()
         data object LaunchPproUnifiedFeedback : Command()
         data object LaunchOtherPlatforms : Command()
+        data class LaunchWhatsNew(
+            val messageId: String,
+            val messageType: Content.MessageType,
+        ) : Command()
     }
 
     private val viewState = MutableStateFlow(ViewState())
@@ -257,6 +262,16 @@ class SettingsViewModel @Inject constructor(
 
     fun commands(): Flow<Command> {
         return command.receiveAsFlow()
+    }
+
+    fun onWhatsNewClicked() {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            val messageId = modalSurfaceStore.getLastShownRemoteMessageId()
+            val messageType = modalSurfaceStore.getLastShownRemoteMessageType()
+            if (messageId != null && messageType != null) {
+                command.send(Command.LaunchWhatsNew(messageId, messageType))
+            }
+        }
     }
 
     fun userRequestedToAddHomeScreenWidget() {
