@@ -26,6 +26,7 @@ import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchAutofillPassw
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchAutofillSettings
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchDataClearingSettingsScreen
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchFireButtonScreen
+import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchWhatsNew
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.autoconsent.api.Autoconsent
@@ -40,6 +41,7 @@ import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
+import com.duckduckgo.remote.messaging.api.Content.MessageType
 import com.duckduckgo.remote.messaging.impl.store.ModalSurfaceStore
 import com.duckduckgo.settings.api.SettingsPageFeature
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback
@@ -350,5 +352,43 @@ class SettingsViewModelTest {
         testee.start()
 
         assertFalse(testee.viewState().first().showWhatsNew)
+    }
+
+    @Test
+    fun `when whats new clicked and message id and type exist then launch whats new command is sent`() = runTest {
+        val messageId = "test-message-id"
+        val messageType = MessageType.MEDIUM
+        whenever(modalSurfaceStoreMock.getLastShownRemoteMessageId()).thenReturn(messageId)
+        whenever(modalSurfaceStoreMock.getLastShownRemoteMessageType()).thenReturn(messageType)
+
+        testee.commands().test {
+            testee.onWhatsNewClicked()
+
+            assertEquals(LaunchWhatsNew(messageId, messageType), awaitItem())
+        }
+    }
+
+    @Test
+    fun `when whats new clicked and message id is null then no command is sent`() = runTest {
+        whenever(modalSurfaceStoreMock.getLastShownRemoteMessageId()).thenReturn(null)
+        whenever(modalSurfaceStoreMock.getLastShownRemoteMessageType()).thenReturn(MessageType.MEDIUM)
+
+        testee.commands().test {
+            testee.onWhatsNewClicked()
+
+            expectNoEvents()
+        }
+    }
+
+    @Test
+    fun `when whats new clicked and message type is null then no command is sent`() = runTest {
+        whenever(modalSurfaceStoreMock.getLastShownRemoteMessageId()).thenReturn("test-message-id")
+        whenever(modalSurfaceStoreMock.getLastShownRemoteMessageType()).thenReturn(null)
+
+        testee.commands().test {
+            testee.onWhatsNewClicked()
+
+            expectNoEvents()
+        }
     }
 }
