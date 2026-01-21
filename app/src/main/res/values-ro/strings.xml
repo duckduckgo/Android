@@ -60,9 +60,9 @@
     <string name="undoSnackbarAction">Anulează</string>
     <!-- Trackers blocked animation-->
     <plurals name="trackersBlockedAnimationMessage" tools:ignore="ImpliedQuantity">
-        <item quantity="one">Instrument de urmărire blocat</item>
-        <item quantity="few">Instrumente de urmărire blocate</item>
-        <item quantity="other">Instrumente de urmărire blocate</item>
+        <item quantity="one">Tracker</item>
+        <item quantity="few">Trackere</item>
+        <item quantity="other">Trackere</item>
     </plurals>
 
     <!-- Downloading files -->
