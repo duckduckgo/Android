@@ -285,7 +285,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:visibility="gone"
-                app:primaryText="Experimental Browser Menu"
+                app:primaryText="@string/showExperimentalBrowserMenu"
                 app:primaryTextTruncated="false"
                 app:showSwitch="true"
                 tools:visibility="visible" />
