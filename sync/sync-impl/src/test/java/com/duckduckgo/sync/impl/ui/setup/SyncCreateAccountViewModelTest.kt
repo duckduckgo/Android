@@ -18,10 +18,9 @@ package com.duckduckgo.sync.impl.ui.setup
 
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.SyncAccountRepository
-import com.duckduckgo.sync.impl.SyncFeature
+import com.duckduckgo.sync.impl.SyncFeatureToggle
 import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.ui.setup.SyncCreateAccountViewModel.Command.FinishSetupFlow
 import com.duckduckgo.sync.impl.ui.setup.SyncCreateAccountViewModel.Command.ShowError
@@ -42,13 +41,13 @@ class SyncCreateAccountViewModelTest {
 
     private val syncRepostitory: SyncAccountRepository = mock()
     private val syncPixels: SyncPixels = mock()
-    private val syncFeature = FakeFeatureToggleFactory.create(SyncFeature::class.java)
+    private val syncFeatureToggle: SyncFeatureToggle = mock()
 
     private val testee = SyncCreateAccountViewModel(
         syncRepostitory,
         syncPixels,
         coroutineTestRule.testDispatcherProvider,
-        syncFeature,
+        syncFeatureToggle,
     )
 
     @Test

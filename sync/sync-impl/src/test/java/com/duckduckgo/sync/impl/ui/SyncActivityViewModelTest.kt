@@ -19,7 +19,6 @@ package com.duckduckgo.sync.impl.ui
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.sync.TestSyncFixtures
 import com.duckduckgo.sync.TestSyncFixtures.connectedDevice
 import com.duckduckgo.sync.TestSyncFixtures.deviceId
@@ -36,7 +35,6 @@ import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.SyncAccountRepository.AuthCode
-import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.SyncFeatureToggle
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator
 import com.duckduckgo.sync.impl.pixels.SyncPixels
@@ -84,7 +82,6 @@ class SyncActivityViewModelTest {
     private val syncFeatureToggle: SyncFeatureToggle = mock()
     private val syncPixels: SyncPixels = mock()
     private val deviceAuthenticator: DeviceAuthenticator = mock()
-    private val syncFeature = FakeFeatureToggleFactory.create(SyncFeature::class.java)
 
     private val stateFlow = MutableStateFlow(SyncState.READY)
 
@@ -101,7 +98,6 @@ class SyncActivityViewModelTest {
             syncFeatureToggle = syncFeatureToggle,
             syncPixels = syncPixels,
             deviceAuthenticator = deviceAuthenticator,
-            syncFeature = syncFeature,
         )
         whenever(deviceAuthenticator.isAuthenticationRequired()).thenReturn(true)
         whenever(syncStateMonitor.syncState()).thenReturn(emptyFlow())

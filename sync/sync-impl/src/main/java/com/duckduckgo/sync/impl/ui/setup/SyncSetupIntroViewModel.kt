@@ -21,7 +21,7 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
-import com.duckduckgo.sync.impl.SyncFeature
+import com.duckduckgo.sync.impl.SyncFeatureToggle
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.SYNC_INTRO
 import com.duckduckgo.sync.impl.ui.setup.SyncSetupIntroViewModel.Command.AbortFlow
@@ -41,7 +41,7 @@ import javax.inject.*
 
 @ContributesViewModel(FragmentScope::class)
 class SyncSetupIntroViewModel @Inject constructor(
-    private val syncFeature: SyncFeature,
+    private val syncFeatureToggle: SyncFeatureToggle,
     private val dispatchers: DispatcherProvider,
 ) : ViewModel() {
 
@@ -53,7 +53,7 @@ class SyncSetupIntroViewModel @Inject constructor(
             SYNC_INTRO -> CreateAccountIntro
             else -> RecoverAccountIntro
         }
-        val aiChatSyncEnabled = syncFeature.aiChatSync().isEnabled()
+        val aiChatSyncEnabled = syncFeatureToggle.allowAiChatSync()
         viewState.emit(ViewState(viewMode, aiChatSyncEnabled))
     }.flowOn(dispatchers.io())
 

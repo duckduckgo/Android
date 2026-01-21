@@ -34,7 +34,6 @@ import com.duckduckgo.sync.impl.RecoveryCodePDF
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncAccountRepository
-import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.SyncFeatureToggle
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator
 import com.duckduckgo.sync.impl.onFailure
@@ -85,7 +84,6 @@ class SyncActivityViewModel @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val syncFeatureToggle: SyncFeatureToggle,
     private val syncPixels: SyncPixels,
-    private val syncFeature: SyncFeature,
 ) : ViewModel() {
 
     private var syncStateObserverJob = ConflatedJob()
@@ -151,7 +149,7 @@ class SyncActivityViewModel @Inject constructor(
             showAccount = syncAccountRepository.isSignedIn(),
             syncedDevices = syncedDevices,
             disabledSetupFlows = disabledSetupFlows(),
-            aiChatSyncEnabled = syncFeature.aiChatSync().isEnabled(),
+            aiChatSyncEnabled = syncFeatureToggle.allowAiChatSync(),
         )
     }
 
@@ -421,7 +419,7 @@ class SyncActivityViewModel @Inject constructor(
 
     private fun signedOutState(): ViewState = ViewState(
         disabledSetupFlows = disabledSetupFlows(),
-        aiChatSyncEnabled = syncFeature.aiChatSync().isEnabled(),
+        aiChatSyncEnabled = syncFeatureToggle.allowAiChatSync(),
     )
 
     private suspend fun requiresSetupAuthentication(action: suspend () -> Unit) {
