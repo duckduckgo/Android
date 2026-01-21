@@ -128,6 +128,8 @@
     <string name="atp_NewTabDisabled"><b>App Tracking Protection disabled.</b>\nTap to continue blocking tracking attempts across your apps.</string>
     <string name="atp_NewTabRevoked"><b>A VPN app on your device disabled App Tracking Protection.</b>\nTap to re-enable.</string>
     <string name="atp_NewTabEnabled"><b>App Tracking Protection is enabled</b> and blocking tracking attempts across your apps.</string>
+    <!-- smartling.character_limit = 15 -->
+    <string name="vpnMenuYellowPill">Try for free</string>
 
     <!-- Exclusion List -->
     <string name="atp_ExclusionListActivityTitle">All Apps</string>
