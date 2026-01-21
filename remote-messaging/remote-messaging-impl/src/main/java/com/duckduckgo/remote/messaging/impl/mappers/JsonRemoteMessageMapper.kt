@@ -144,7 +144,11 @@ private fun List<String>?.toSurfaceList(): List<Surface> {
         Surface.entries.firstOrNull { it.jsonValue == value }
     } ?: listOf(Surface.NEW_TAB_PAGE)
 }
-private fun RemoteMessage.localizeMessage(translations: Map<String, JsonContentTranslations>?, locale: Locale): RemoteMessage {
+
+private fun RemoteMessage.localizeMessage(
+    translations: Map<String, JsonContentTranslations>?,
+    locale: Locale,
+): RemoteMessage {
     if (translations == null) return this
 
     val deviceTranslations = translations[locale.asJsonFormat()] ?: translations[locale.language]
@@ -232,7 +236,7 @@ private fun Content.localize(translations: JsonContentTranslations): Content {
             descriptionText = translations.descriptionText.takeUnless { it.isEmpty() } ?: this.descriptionText,
             primaryActionText = translations.primaryActionText.takeUnless { it.isEmpty() } ?: this.primaryActionText,
             listItems = listItems.map { item ->
-                val (itemTitle, itemDescription) = item.localize(item.id, translations)
+                val (itemTitle, itemDescription) = item.localize(translations)
                 item.copy(
                     titleText = itemTitle.takeUnless { it.isEmpty() } ?: item.titleText,
                     descriptionText = itemDescription.takeUnless { it.isEmpty() } ?: item.descriptionText,
@@ -243,8 +247,7 @@ private fun Content.localize(translations: JsonContentTranslations): Content {
 }
 
 private fun CardItem.localize(
-    itemId: String,
     translations: JsonContentTranslations,
-): Pair<String, String> = translations.listItems?.get(itemId)?.let {
+): Pair<String, String> = translations.listItems?.get(id)?.let {
     it.titleText to it.descriptionText
 } ?: ("" to "")
