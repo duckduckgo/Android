@@ -73,9 +73,9 @@ class RemoteMessageModalSurfaceEvaluatorImpl @Inject constructor(
                 return@withContext ModalEvaluator.EvaluationResult.Skipped
             }
 
-            // if (!hasMetBackgroundTimeThreshold()) {
-            //     return@withContext ModalEvaluator.EvaluationResult.Skipped
-            // }
+            if (!hasMetBackgroundTimeThreshold()) {
+                return@withContext ModalEvaluator.EvaluationResult.Skipped
+            }
 
             val message = remoteMessagingRepository.message()
                 ?: return@withContext ModalEvaluator.EvaluationResult.Skipped
