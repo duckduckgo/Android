@@ -38,6 +38,8 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 @SuppressLint("NoBottomSheetDialog")
 class BrowserMenuBottomSheet(
     private val context: Context,
+    private val onDismissListener: () -> Unit,
+    private val onMenuItemClickListener: () -> Unit,
 ) : BottomSheetDialog(context) {
     private val binding = BottomSheetBrowserMenuBinding.inflate(LayoutInflater.from(context))
 
@@ -61,6 +63,7 @@ class BrowserMenuBottomSheet(
         }
 
         setOnCancelListener {
+            onDismissListener()
             dismiss()
         }
     }
@@ -165,6 +168,7 @@ class BrowserMenuBottomSheet(
 
     fun onMenuItemClicked(view: View, onClick: () -> Unit) {
         view.setOnClickListener {
+            onMenuItemClickListener()
             onClick()
             dismiss()
         }

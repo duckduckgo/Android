@@ -270,6 +270,16 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     MENU_ACTION_DOWNLOADS_PRESSED("m_nav_downloads_menu_item_pressed"),
     MENU_ACTION_AUTOFILL_PRESSED("m_nav_autofill_menu_item_pressed"),
 
+    EXPERIMENTAL_MENU_USED("m_experimental-browsing-menu_used"),
+    EXPERIMENTAL_MENU_ENABLED("m_experimental-browsing-menu_enabled"),
+    EXPERIMENTAL_MENU_DISABLED("m_experimental-browsing-menu_disabled"),
+    EXPERIMENTAL_MENU_DISPLAYED("m_experimental-browsing-menu_displayed"),
+    EXPERIMENTAL_MENU_DISPLAYED_NTP("m_experimental-browsing-menu_displayed_ntp"),
+    EXPERIMENTAL_MENU_DISPLAYED_AICHAT("m_experimental-browsing-menu_displayed_aichat"),
+    EXPERIMENTAL_MENU_DISPLAYED_CUSTOMTABS("m_experimental-browsing-menu_displayed_customtabs"),
+    EXPERIMENTAL_MENU_DISPLAYED_ERROR("m_experimental-browsing-menu_displayed_error"),
+    EXPERIMENTAL_MENU_DISMISSED("m_experimental-browsing-menu_dismissed"),
+
     FIREPROOF_WEBSITE_ADDED("m_fw_a"),
     FIREPROOF_WEBSITE_REMOVE("m_fw_r"),
     FIREPROOF_LOGIN_DIALOG_SHOWN("m_fw_ld_s"),

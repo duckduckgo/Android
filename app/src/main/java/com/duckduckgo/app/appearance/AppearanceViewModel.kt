@@ -32,6 +32,7 @@ import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_THEME_TOGGLED_LIGHT
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_THEME_TOGGLED_SYSTEM_DEFAULT
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.tabs.store.TabSwitcherDataStore
 import com.duckduckgo.common.ui.DuckDuckGoTheme
 import com.duckduckgo.common.ui.store.ThemingDataStore
@@ -222,6 +223,11 @@ class AppearanceViewModel @Inject constructor(
     fun onUseBottomSheetMenuChanged(checked: Boolean) {
         viewModelScope.launch(dispatcherProvider.io()) {
             browserMenuDisplayRepository.setExperimentalMenuEnabled(checked)
+            if (checked) {
+                pixel.fire(AppPixelName.EXPERIMENTAL_MENU_ENABLED, type = Daily())
+            } else {
+                pixel.fire(AppPixelName.EXPERIMENTAL_MENU_DISABLED, type = Daily())
+            }
         }
     }
 }
