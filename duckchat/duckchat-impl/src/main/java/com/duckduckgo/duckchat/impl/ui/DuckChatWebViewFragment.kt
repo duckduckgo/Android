@@ -80,6 +80,7 @@ import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper.Companion.DUCK_CHAT_FEATURE_NAME
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper.Companion.METHOD_OPEN_KEYBOARD
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper.Companion.SELECTOR
+import com.duckduckgo.duckchat.impl.messaging.sync.SyncStatusChangedObserver
 import com.duckduckgo.duckchat.impl.ui.filechooser.FileChooserIntentBuilder
 import com.duckduckgo.duckchat.impl.ui.filechooser.capture.camera.CameraHardwareChecker
 import com.duckduckgo.duckchat.impl.ui.filechooser.capture.launcher.UploadFromExternalMediaAppLauncher
@@ -130,6 +131,9 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
 
     @Inject
     lateinit var subscriptionsHandler: SubscriptionsHandler
+
+    @Inject
+    lateinit var syncStatusChangedObserver: SyncStatusChangedObserver
 
     @Inject
     @AppCoroutineScope
@@ -353,6 +357,25 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
                     }
                 }
             }.launchIn(lifecycleScope)
+
+        observeSyncStatusChanges()
+    }
+
+    private fun observeSyncStatusChanges() {
+        syncStatusChangedObserver.syncStatusChangedEvents
+            .onEach { payload ->
+                // Only send if this fragment is actually visible
+                if (isVisible) {
+                    val event = SubscriptionEventData(
+                        featureName = DUCK_CHAT_FEATURE_NAME,
+                        subscriptionName = "submitSyncStatusChanged",
+                        params = payload,
+                    )
+                    contentScopeScripts.sendSubscriptionEvent(event)
+                    logcat { "DuckChat-Sync: sent sync status event from DuckChatWebViewFragment $payload" }
+                }
+            }
+            .launchIn(lifecycleScope)
     }
 
     private fun launchInputScreen() {

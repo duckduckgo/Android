@@ -195,7 +195,7 @@ class EncryptWithSyncMasterKeyHandlerTest {
     }
 
     private fun configureSignedIn() {
-        whenever(mockDeviceSyncState.getAccountState()).thenReturn(SignedIn(emptyList()))
+        whenever(mockDeviceSyncState.getAccountState()).thenReturn(SignedIn("testUserId", emptyList()))
     }
 
     private fun verifyNoResponse() {

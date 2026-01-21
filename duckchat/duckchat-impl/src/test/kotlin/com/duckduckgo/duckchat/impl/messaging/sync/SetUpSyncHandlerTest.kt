@@ -127,7 +127,7 @@ class SetUpSyncHandlerTest {
     @Test
     fun `when sync is already set up then error response is sent`() {
         configureSyncEnabled()
-        whenever(mockDeviceSyncState.getAccountState()).thenReturn(SignedIn(emptyList()))
+        whenever(mockDeviceSyncState.getAccountState()).thenReturn(SignedIn("testUserId", emptyList()))
         val jsMessage = createJsMessage("sendToSetupSync", "test-id")
 
         handler.getJsMessageHandler().process(jsMessage, mockJsMessaging, null)

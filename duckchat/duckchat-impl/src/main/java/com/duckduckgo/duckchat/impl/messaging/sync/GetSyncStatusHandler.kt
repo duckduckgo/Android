@@ -14,19 +14,20 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.sync.impl.messaging
+package com.duckduckgo.duckchat.impl.messaging.sync
 
 import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.contentscopescripts.api.ContentScopeJsMessageHandlersPlugin
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.impl.DuckChatConstants
+import com.duckduckgo.duckchat.impl.DuckChatConstants.HOST_DUCK_AI
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessageHandler
 import com.duckduckgo.js.messaging.api.JsMessaging
-import com.duckduckgo.sync.api.DeviceSyncState
-import com.duckduckgo.sync.store.SyncStore
 import com.squareup.anvil.annotations.ContributesMultibinding
+import kotlinx.coroutines.runBlocking
 import logcat.LogPriority
 import logcat.logcat
 import org.json.JSONObject
@@ -34,8 +35,7 @@ import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
 class GetSyncStatusHandler @Inject constructor(
-    private val deviceSyncState: DeviceSyncState,
-    private val syncStore: SyncStore,
+    private val syncStatusHelper: SyncStatusHelper,
 ) : ContentScopeJsMessageHandlersPlugin {
     override fun getJsMessageHandler(): JsMessageHandler =
         object : JsMessageHandler {
@@ -48,17 +48,9 @@ class GetSyncStatusHandler @Inject constructor(
 
                 logcat { "DuckChat-Sync: ${jsMessage.method} called" }
 
+                // Handler is already called on worker thread, use runBlocking for suspend call
                 val jsonPayload = runCatching {
-                    val syncAvailable = deviceSyncState.isFeatureEnabled()
-                    val signedIn = syncStore.isSignedIn()
-
-                    val payload = JSONObject().apply {
-                        put("syncAvailable", syncAvailable)
-                        put("userId", if (signedIn) (syncStore.userId ?: JSONObject.NULL) else JSONObject.NULL)
-                        put("deviceId", if (signedIn) (syncStore.deviceId ?: JSONObject.NULL) else JSONObject.NULL)
-                        put("deviceName", if (signedIn) (syncStore.deviceName ?: JSONObject.NULL) else JSONObject.NULL)
-                        put("deviceType", if (signedIn) "mobile" else JSONObject.NULL)
-                    }
+                    val payload = runBlocking { syncStatusHelper.buildSyncStatusPayload() }
 
                     JSONObject().apply {
                         put("ok", true)
@@ -83,11 +75,7 @@ class GetSyncStatusHandler @Inject constructor(
                     HOST_DUCK_AI,
                 )
 
-            override val featureName: String = "aiChat"
+            override val featureName: String = DuckChatConstants.JS_MESSAGING_FEATURE_NAME
             override val methods: List<String> = listOf("getSyncStatus")
         }
-
-    private companion object {
-        private const val HOST_DUCK_AI = "duck.ai"
-    }
 }
