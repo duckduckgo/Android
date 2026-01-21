@@ -111,6 +111,8 @@ import com.duckduckgo.app.browser.logindetection.LoginDetected
 import com.duckduckgo.app.browser.logindetection.NavigationAwareLoginDetector
 import com.duckduckgo.app.browser.logindetection.NavigationEvent
 import com.duckduckgo.app.browser.logindetection.NavigationEvent.LoginAttempt
+import com.duckduckgo.app.browser.menu.BrowserMenuDisplayRepository
+import com.duckduckgo.app.browser.menu.BrowserMenuDisplayState
 import com.duckduckgo.app.browser.menu.VpnMenuStateProvider
 import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
@@ -436,6 +438,7 @@ class BrowserTabViewModelTest {
 
     private val mockSettingsDataStore: SettingsDataStore = mock()
     private val mockUrlDisplayRepository: UrlDisplayRepository = mock()
+    private val mockBrowserMenuDisplayRepository: BrowserMenuDisplayRepository = mock()
 
     private val mockAutoCompleteSettings: AutoCompleteSettings = mock()
 
@@ -599,6 +602,7 @@ class BrowserTabViewModelTest {
     private val selectedTab = TabEntity("TAB_ID", exampleUrl, position = 0, sourceTabId = "TAB_ID_SOURCE")
     private val flowSelectedTab = MutableStateFlow(selectedTab)
     private val isFullSiteAddressEnabledFlow = MutableStateFlow(true)
+    private val browserMenuStateFlow = MutableStateFlow(BrowserMenuDisplayState(hasOption = false, isEnabled = false))
 
     private val mockWebViewCompatWrapper: WebViewCompatWrapper = mock()
 
@@ -666,6 +670,7 @@ class BrowserTabViewModelTest {
             whenever(mockSettingsDataStore.automaticFireproofSetting).thenReturn(AutomaticFireproofSetting.ASK_EVERY_TIME)
             whenever(mockSettingsDataStore.omnibarType).thenReturn(OmnibarType.SINGLE_TOP)
             whenever(mockUrlDisplayRepository.isFullUrlEnabled).then { isFullSiteAddressEnabledFlow }
+            whenever(mockBrowserMenuDisplayRepository.browserMenuState).then { browserMenuStateFlow }
             whenever(mockSSLCertificatesFeature.allowBypass()).thenReturn(mockEnabledToggle)
             whenever(subscriptions.shouldLaunchPrivacyProForUrl(any())).thenReturn(false)
             whenever(mockDuckDuckGoUrlDetector.isDuckDuckGoUrl(any())).thenReturn(false)
@@ -801,6 +806,7 @@ class BrowserTabViewModelTest {
                 trackingParameters = mockTrackingParameters,
                 settingsDataStore = mockSettingsDataStore,
                 urlDisplayRepository = mockUrlDisplayRepository,
+                browserMenuDisplayRepository = mockBrowserMenuDisplayRepository,
                 adClickManager = mockAdClickManager,
                 autofillCapabilityChecker = autofillCapabilityChecker,
                 autofillFireproofDialogSuppressor = autofillFireproofDialogSuppressor,
@@ -6497,6 +6503,54 @@ class BrowserTabViewModelTest {
         runTest {
             testee.onPopupMenuLaunched()
             verify(mockAdditionalDefaultBrowserPrompts).onPopupMenuLaunched()
+        }
+
+    @Test
+    fun whenBrowserMenuHasOptionButNotEnabledThenUseBottomSheetMenuFalse() =
+        runTest {
+            // Given - repository returns hasOption=true but isEnabled=false
+            browserMenuStateFlow.emit(BrowserMenuDisplayState(hasOption = true, isEnabled = false))
+
+            // Then
+            assertFalse(browserViewState().useBottomSheetMenu)
+        }
+
+    @Test
+    fun whenBrowserMenuHasOptionAndEnabledThenUseBottomSheetMenuTrue() =
+        runTest {
+            // Given - repository returns hasOption=true and isEnabled=true
+            browserMenuStateFlow.emit(BrowserMenuDisplayState(hasOption = true, isEnabled = true))
+
+            // Then
+            assertTrue(browserViewState().useBottomSheetMenu)
+        }
+
+    @Test
+    fun whenBrowserMenuStateChangesThenUseBottomSheetMenuUpdates() =
+        runTest {
+            // Given - Start with enabled=false
+            browserMenuStateFlow.emit(BrowserMenuDisplayState(hasOption = true, isEnabled = false))
+
+            // Initial state
+            assertFalse(browserViewState().useBottomSheetMenu)
+
+            // When enabled
+            browserMenuStateFlow.emit(BrowserMenuDisplayState(hasOption = true, isEnabled = true))
+            assertTrue(browserViewState().useBottomSheetMenu)
+
+            // When disabled again
+            browserMenuStateFlow.emit(BrowserMenuDisplayState(hasOption = true, isEnabled = false))
+            assertFalse(browserViewState().useBottomSheetMenu)
+        }
+
+    @Test
+    fun whenBrowserMenuHasNoOptionThenUseBottomSheetMenuFalse() =
+        runTest {
+            // Given - Even if isEnabled is true, if hasOption is false (feature flag off), should be false
+            browserMenuStateFlow.emit(BrowserMenuDisplayState(hasOption = false, isEnabled = true))
+
+            // Then
+            assertFalse(browserViewState().useBottomSheetMenu)
         }
 
     private fun givenTabManagerData() =

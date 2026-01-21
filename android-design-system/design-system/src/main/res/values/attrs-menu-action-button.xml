@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Copyright (c) 2021 DuckDuckGo
+  ~ Copyright (c) 2026 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -15,23 +15,13 @@
   -->
 
 <resources>
+    <attr name="menuActionSrc" format="reference" />
+    <attr name="menuActionLabel" format="string" />
 
-    <!--Menu item view-->
-    <declare-styleable name="MenuItemView">
-        <attr name="iconDrawable" format="reference" />
-        <attr name="menuSize">
-            <enum name="small" value="0"/>
-            <enum name="medium" value="1"/>
-        </attr>
-        <attr name="primaryText" />
+    <!--Menu action button view-->
+    <declare-styleable name="MenuActionButtonView">
+        <attr name="menuActionSrc" />
+        <attr name="menuActionLabel" />
         <attr name="typography" />
-        <attr name="textType" />
     </declare-styleable>
-
-    <declare-styleable name="PopupMenuItemView">
-        <attr name="primaryText" />
-        <attr name="primaryTextType" />
-        <attr name="trailingIcon" />
-    </declare-styleable>
-
 </resources>
