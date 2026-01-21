@@ -30,22 +30,47 @@ jobs:
           token: ${{ secrets.GT_DAXMOBILE }}
           fetch-depth: 0
 
-      - name: Set up ruby env
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: 2.7.2
-          bundler-cache: true
-
       - name: Set up git config
         run: |
           git remote set-url origin https://${{ secrets.GT_DAXMOBILE }}@github.com/duckduckgo/Android.git/
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
 
+      - name: Get LGC
+        id: get_lgc_tag
+        run: |
+          output=$(git tag -l "LGC-*" --sort=refname | tail -n 1)
+          if [ -z "$output" ]; then
+            echo "::error::No LGC tag found. Ensure the nightly orchestrator has completed successfully at least once."
+            exit 1
+          fi
+          echo "lgc_tag=$output" >> $GITHUB_OUTPUT
+
+      - name: Check for production release on LGC commit
+        id: check_production_release
+        run: |
+          lgc_commit=$(git rev-list -n 1 ${{ steps.get_lgc_tag.outputs.lgc_tag }})
+          
+          all_tags=$(git tag --points-at $lgc_commit)
+          
+          # Find production release tag (X.Y.Z format only)
+          release_tag=$(echo "$all_tags" | grep -E "^[0-9]+\.[0-9]+\.[0-9]+$" | head -n 1 || true)
+          
+          if [ -n "$release_tag" ]; then
+            echo "::error::LGC commit already has production release: $release_tag"
+            exit 1
+          fi
+
+      - name: Set up ruby env
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 2.7.2
+          bundler-cache: true
+
       - name: Use fastlane lane to create and push tagged release
         id: create_git_tag
         run: |        
-          bundle exec fastlane android tag_and_push_release_version app_version:${{ github.event.inputs.app-version }}
+          bundle exec fastlane android tag_and_push_release_version app_version:${{ github.event.inputs.app-version }} ref:${{ steps.get_lgc_tag.outputs.lgc_tag }}
 
       - name: Notify Mattermost
         id: send-mm-message
