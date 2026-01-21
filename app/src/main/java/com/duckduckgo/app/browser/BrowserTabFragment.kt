@@ -103,6 +103,7 @@ import com.duckduckgo.app.browser.R.string
 import com.duckduckgo.app.browser.SSLErrorType.NONE
 import com.duckduckgo.app.browser.WebViewErrorResponse.LOADING
 import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
+import com.duckduckgo.app.browser.animations.AddressBarTrackersAnimationManager
 import com.duckduckgo.app.browser.api.OmnibarRepository
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability
@@ -592,6 +593,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var browserMenuViewStateFactory: BrowserMenuViewStateFactory
+
+    @Inject
+    lateinit var addressBarTrackersAnimationManager: AddressBarTrackersAnimationManager
 
     /**
      * We use this to monitor whether the user was seeing the in-context Email Protection signup prompt
@@ -2558,6 +2562,9 @@ class BrowserTabFragment :
             is Command.EnableDuckAIFullScreen -> showDuckAI(it.browserViewState)
             is Command.DisableDuckAIFullScreen -> omnibar.setViewMode(ViewMode.Browser(it.url))
             is Command.ShowDuckAIContextualMode -> showDuckChatContextualSheet()
+            is Command.StartAddressBarTrackersAnimation -> {
+                omnibar.startTrackersAnimation(it.trackerEntities)
+            }
         }
     }
 
@@ -4702,7 +4709,11 @@ class BrowserTabFragment :
                     val site = viewModel.siteLiveData.value
                     val events = site?.orderedTrackerBlockedEntities()
                     activity?.let { activity ->
-                        omnibar.startTrackersAnimation(events)
+                        if (addressBarTrackersAnimationManager.isFeatureEnabled()) {
+                            viewModel.onStartTrackersAnimation()
+                        } else {
+                            omnibar.startTrackersAnimation(events)
+                        }
                     }
                 }
             }

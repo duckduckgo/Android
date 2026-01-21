@@ -105,4 +105,61 @@ class RealAddressBarTrackersAnimationManagerTest {
 
         assertFalse(result)
     }
+
+    @Test
+    fun whenCurrentUrlIsNullThenShouldShowAnimationReturnsFalse() {
+        val result = testee.shouldShowAnimation(currentUrl = null, lastAnimatedUrl = null)
+
+        assertFalse(result)
+    }
+
+    @Test
+    fun whenLastAnimatedUrlIsNullThenShouldShowAnimationReturnsTrue() {
+        val result = testee.shouldShowAnimation(
+            currentUrl = "https://www.example.com",
+            lastAnimatedUrl = null,
+        )
+
+        assertTrue(result)
+    }
+
+    @Test
+    fun whenSameETldPlusOneThenShouldShowAnimationReturnsFalse() {
+        val result = testee.shouldShowAnimation(
+            currentUrl = "https://www.example.com/page",
+            lastAnimatedUrl = "https://www.example.com",
+        )
+
+        assertFalse(result)
+    }
+
+    @Test
+    fun whenDifferentETldPlusOneThenShouldShowAnimationReturnsTrue() {
+        val result = testee.shouldShowAnimation(
+            currentUrl = "https://www.example.com",
+            lastAnimatedUrl = "https://www.different.com",
+        )
+
+        assertTrue(result)
+    }
+
+    @Test
+    fun whenSubdomainOfSameETldPlusOneThenShouldShowAnimationReturnsFalse() {
+        val result = testee.shouldShowAnimation(
+            currentUrl = "https://video.example.com",
+            lastAnimatedUrl = "https://www.example.com",
+        )
+
+        assertFalse(result)
+    }
+
+    @Test
+    fun whenDifferentUserSubdomainOnPublicSuffixThenShouldShowAnimationReturnsTrue() {
+        val result = testee.shouldShowAnimation(
+            currentUrl = "https://user2.github.io",
+            lastAnimatedUrl = "https://user1.github.io",
+        )
+
+        assertTrue(result)
+    }
 }
