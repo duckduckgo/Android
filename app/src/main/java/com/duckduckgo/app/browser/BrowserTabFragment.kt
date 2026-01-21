@@ -1373,7 +1373,11 @@ class BrowserTabFragment :
                     it.hideKeyboard()
                     it.clearFocus()
                 }
-                viewModel.onDuckChatMenuClicked()
+                if (duckAiFeatureState.showFullScreenMode.value) {
+                    viewModel.openNewDuckChat(omnibar.viewMode)
+                } else {
+                    viewModel.onDuckChatMenuClicked()
+                }
             }
             onMenuItemClicked(bookmarksMenuItem) {
                 viewModel.onBookmarksMenuItemClicked()
