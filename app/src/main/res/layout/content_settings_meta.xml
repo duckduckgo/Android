@@ -27,18 +27,25 @@
         android:layout_height="wrap_content" />
 
     <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+        android:id="@+id/whatsNewSetting"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:leadingIcon="@drawable/ic_announce_yellow_24"
+        app:primaryText="What's new" />
+
+    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
         android:id="@+id/aboutSetting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:primaryText="@string/settingsHeadingAbout"
-        app:leadingIcon="@drawable/ic_duckduckgo_color_24" />
+        app:leadingIcon="@drawable/ic_duckduckgo_color_24"
+        app:primaryText="@string/settingsHeadingAbout" />
 
     <com.duckduckgo.common.ui.view.listitem.OneLineListItem
         android:id="@+id/shareFeedbackSetting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:primaryText="@string/leaveFeedbackNew"
-        app:leadingIcon="@drawable/ic_feedback_color_24" />
+        app:leadingIcon="@drawable/ic_feedback_color_24"
+        app:primaryText="@string/leaveFeedbackNew" />
 
     <com.duckduckgo.common.ui.view.listitem.OneLineListItem
         android:id="@+id/ddgOnOtherPlatformsSetting"
@@ -47,6 +54,6 @@
         app:leadingIcon="@drawable/ic_downloads_color_24"
         app:primaryText="@string/settingsDDGOnOtherPlatforms"
         app:trailingIcon="@drawable/ic_open_in_16"
-        app:trailingIconTint="?attr/daxColorSecondaryIcon"/>
+        app:trailingIconTint="?attr/daxColorSecondaryIcon" />
 
 </LinearLayout>

@@ -324,6 +324,7 @@ class SettingsActivity : DuckDuckGoActivity() {
                     updateDuckChat(it.isDuckChatEnabled)
                     updateVoiceSearchVisibility(it.isVoiceSearchVisible)
                     updateAddWidgetInProtections(it.isAddWidgetInProtectionsVisible, it.widgetsInstalled)
+                    updateWhatsNewVisibility(it.showWhatsNew)
                     sortSettingItemsAlphabetically()
                 }
             }.launchIn(lifecycleScope)
@@ -377,6 +378,10 @@ class SettingsActivity : DuckDuckGoActivity() {
         }
         viewsPrivacy.widgetPromptSetting.isVisible = isVisible
         viewsNextSteps.addWidgetToHomeScreenSetting.isVisible = !isVisible
+    }
+
+    private fun updateWhatsNewVisibility(isVisible: Boolean) {
+        viewsOther.whatsNewSetting.isVisible = isVisible
     }
 
     private fun watchForCompleteSetupSettingsChanges() {
