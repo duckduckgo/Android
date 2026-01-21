@@ -31,7 +31,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:leadingIcon="@drawable/ic_announce_yellow_24"
-        app:primaryText="What's new" />
+        app:primaryText="@string/settingsWhatsNew" />
 
     <com.duckduckgo.common.ui.view.listitem.OneLineListItem
         android:id="@+id/aboutSetting"
