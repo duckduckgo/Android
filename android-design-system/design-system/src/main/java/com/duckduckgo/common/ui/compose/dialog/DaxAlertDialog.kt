@@ -70,68 +70,91 @@ fun DaxAlertDialog(
             }
         },
     ) {
-        Surface(
+        DaxAlertDialogContent(
+            title = title,
             modifier = modifier,
-            shape = DuckDuckGoTheme.shapes.medium,
-            color = DuckDuckGoTheme.colors.backgrounds.surface,
+            message = message,
+            headerImage = headerImage,
+            content = content,
+            buttons = buttons,
+        )
+    }
+}
+
+/**
+ * The content of [DaxAlertDialog] extracted for preview support.
+ * Dialogs don't render in Compose previews, so this allows previewing the dialog content.
+ */
+@Composable
+internal fun DaxAlertDialogContent(
+    title: String,
+    modifier: Modifier = Modifier,
+    message: String? = null,
+    @DrawableRes headerImage: Int? = null,
+    content: (@Composable () -> Unit)? = null,
+    buttons: @Composable () -> Unit,
+) {
+    Surface(
+        modifier = modifier,
+        shape = DuckDuckGoTheme.shapes.medium,
+        color = DuckDuckGoTheme.colors.backgrounds.surface,
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(24.dp)
+                .verticalScroll(rememberScrollState()),
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Column(
-                modifier = Modifier
-                    .padding(24.dp)
-                    .verticalScroll(rememberScrollState()),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                // Header image
-                if (headerImage != null) {
-                    Image(
-                        painter = painterResource(id = headerImage),
-                        contentDescription = null,
-                        modifier = Modifier
-                            .size(96.dp)
-                            .padding(bottom = 16.dp),
-                    )
-                }
-
-                // Title
-                DaxText(
-                    text = title,
-                    style = DuckDuckGoTheme.typography.h2,
-                    modifier = Modifier.fillMaxWidth(),
+            // Header image
+            if (headerImage != null) {
+                Image(
+                    painter = painterResource(id = headerImage),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(96.dp)
+                        .padding(bottom = 16.dp),
                 )
+            }
 
-                // Message
-                if (message != null) {
-                    DaxText(
-                        text = message,
-                        style = DuckDuckGoTheme.typography.body1,
-                        color = DuckDuckGoTheme.textColors.secondary,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 8.dp),
-                    )
-                }
+            // Title
+            DaxText(
+                text = title,
+                style = DuckDuckGoTheme.typography.h2,
+                modifier = Modifier.fillMaxWidth(),
+            )
 
-                // Custom content slot
-                if (content != null) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 8.dp),
-                    ) {
-                        content()
-                    }
-                }
+            // Message
+            if (message != null) {
+                DaxText(
+                    text = message,
+                    style = DuckDuckGoTheme.typography.body1,
+                    color = DuckDuckGoTheme.textColors.secondary,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 8.dp),
+                )
+            }
 
-                // Buttons slot
+            // Custom content slot
+            if (content != null) {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 16.dp),
-                    horizontalAlignment = Alignment.End,
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                        .padding(top = 8.dp),
                 ) {
-                    buttons()
+                    content()
                 }
+            }
+
+            // Buttons slot
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 16.dp),
+                horizontalAlignment = Alignment.End,
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                buttons()
             }
         }
     }

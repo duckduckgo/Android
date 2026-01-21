@@ -59,37 +59,78 @@ fun StackedAlertDialog(
         headerImage = headerImage,
         dismissOnClickOutside = false,
         buttons = {
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                buttons.forEachIndexed { index, buttonText ->
-                    val buttonType = when {
-                        destructiveButtonIndex == index -> DaxButtonType.GHOST_DESTRUCTIVE
-                        destructiveButtonIndex != null -> DaxButtonType.SECONDARY
-                        else -> DaxButtonType.GHOST
-                    }
-
-                    DaxButton(
-                        text = buttonText,
-                        buttonType = buttonType,
-                        onClick = {
-                            onButtonClick(index)
-                            onDismissRequest()
-                        },
-                    )
-                }
-            }
+            StackedAlertDialogButtons(
+                buttons = buttons,
+                onButtonClick = { index ->
+                    onButtonClick(index)
+                    onDismissRequest()
+                },
+                destructiveButtonIndex = destructiveButtonIndex,
+            )
         },
     )
+}
+
+/**
+ * Content composable for [StackedAlertDialog] that can be used in previews.
+ * Dialogs don't render in Compose previews, so this allows previewing the dialog content.
+ */
+@Composable
+internal fun StackedAlertDialogContent(
+    title: String,
+    buttons: List<String>,
+    onButtonClick: (index: Int) -> Unit,
+    modifier: Modifier = Modifier,
+    message: String? = null,
+    @DrawableRes headerImage: Int? = null,
+    destructiveButtonIndex: Int? = null,
+) {
+    DaxAlertDialogContent(
+        title = title,
+        modifier = modifier,
+        message = message,
+        headerImage = headerImage,
+        buttons = {
+            StackedAlertDialogButtons(
+                buttons = buttons,
+                onButtonClick = onButtonClick,
+                destructiveButtonIndex = destructiveButtonIndex,
+            )
+        },
+    )
+}
+
+@Composable
+private fun StackedAlertDialogButtons(
+    buttons: List<String>,
+    onButtonClick: (index: Int) -> Unit,
+    destructiveButtonIndex: Int?,
+) {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        buttons.forEachIndexed { index, buttonText ->
+            val buttonType = when {
+                destructiveButtonIndex == index -> DaxButtonType.GHOST_DESTRUCTIVE
+                destructiveButtonIndex != null -> DaxButtonType.SECONDARY
+                else -> DaxButtonType.GHOST
+            }
+
+            DaxButton(
+                text = buttonText,
+                buttonType = buttonType,
+                onClick = { onButtonClick(index) },
+            )
+        }
+    }
 }
 
 @PreviewLightDark
 @Composable
 private fun StackedAlertDialogPreview() {
     PreviewBox {
-        StackedAlertDialog(
-            onDismissRequest = {},
+        StackedAlertDialogContent(
             title = "Choose an Option",
             message = "Select one of the options below to continue.",
             buttons = listOf("Option 1", "Option 2", "Option 3"),
@@ -102,8 +143,7 @@ private fun StackedAlertDialogPreview() {
 @Composable
 private fun StackedAlertDialogDestructivePreview() {
     PreviewBox {
-        StackedAlertDialog(
-            onDismissRequest = {},
+        StackedAlertDialogContent(
             title = "Delete Item?",
             message = "This action cannot be undone.",
             buttons = listOf("Keep", "Delete"),

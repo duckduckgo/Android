@@ -84,71 +84,150 @@ fun RadioListAlertDialog(
         message = message,
         dismissOnClickOutside = dismissOnClickOutside,
         content = {
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                options.forEachIndexed { index, option ->
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable {
-                                currentSelection = index
-                                onOptionSelected(index)
-                            }
-                            .padding(vertical = 4.dp),
-                    ) {
-                        RadioButton(
-                            selected = currentSelection == index,
-                            onClick = {
-                                currentSelection = index
-                                onOptionSelected(index)
-                            },
-                            colors = RadioButtonDefaults.colors(
-                                selectedColor = DuckDuckGoTheme.colors.brand.accentBlue,
-                                unselectedColor = DuckDuckGoTheme.textColors.secondary,
-                            ),
-                        )
-                        DaxText(
-                            text = option,
-                            style = DuckDuckGoTheme.typography.body1,
-                            color = DuckDuckGoTheme.textColors.primary,
-                        )
-                    }
-                }
-            }
+            RadioListOptions(
+                options = options,
+                currentSelection = currentSelection,
+                onOptionSelected = { index ->
+                    currentSelection = index
+                    onOptionSelected(index)
+                },
+            )
         },
         buttons = {
-            Row {
-                DaxButton(
-                    text = negativeButton,
-                    buttonType = negativeButtonType,
-                    onClick = {
-                        onNegativeClick()
-                        onDismissRequest()
-                    },
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                DaxButton(
-                    text = positiveButton,
-                    buttonType = positiveButtonType,
-                    enabled = currentSelection >= 0,
-                    onClick = {
-                        onPositiveClick(currentSelection)
-                        onDismissRequest()
-                    },
-                )
-            }
+            RadioListButtons(
+                positiveButton = positiveButton,
+                onPositiveClick = {
+                    onPositiveClick(currentSelection)
+                    onDismissRequest()
+                },
+                positiveButtonType = positiveButtonType,
+                positiveEnabled = currentSelection >= 0,
+                negativeButton = negativeButton,
+                onNegativeClick = {
+                    onNegativeClick()
+                    onDismissRequest()
+                },
+                negativeButtonType = negativeButtonType,
+            )
         },
     )
+}
+
+/**
+ * Content composable for [RadioListAlertDialog] that can be used in previews.
+ * Dialogs don't render in Compose previews, so this allows previewing the dialog content.
+ */
+@Composable
+internal fun RadioListAlertDialogContent(
+    title: String,
+    options: List<String>,
+    positiveButton: String,
+    onPositiveClick: (selectedIndex: Int) -> Unit,
+    negativeButton: String,
+    onNegativeClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    message: String? = null,
+    selectedIndex: Int = -1,
+    onOptionSelected: (index: Int) -> Unit = {},
+    positiveButtonType: DaxButtonType = DaxButtonType.PRIMARY,
+    negativeButtonType: DaxButtonType = DaxButtonType.GHOST,
+) {
+    var currentSelection by remember { mutableIntStateOf(selectedIndex) }
+
+    DaxAlertDialogContent(
+        title = title,
+        modifier = modifier,
+        message = message,
+        content = {
+            RadioListOptions(
+                options = options,
+                currentSelection = currentSelection,
+                onOptionSelected = { index ->
+                    currentSelection = index
+                    onOptionSelected(index)
+                },
+            )
+        },
+        buttons = {
+            RadioListButtons(
+                positiveButton = positiveButton,
+                onPositiveClick = { onPositiveClick(currentSelection) },
+                positiveButtonType = positiveButtonType,
+                positiveEnabled = currentSelection >= 0,
+                negativeButton = negativeButton,
+                onNegativeClick = onNegativeClick,
+                negativeButtonType = negativeButtonType,
+            )
+        },
+    )
+}
+
+@Composable
+private fun RadioListOptions(
+    options: List<String>,
+    currentSelection: Int,
+    onOptionSelected: (index: Int) -> Unit,
+) {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        options.forEachIndexed { index, option ->
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { onOptionSelected(index) }
+                    .padding(vertical = 4.dp),
+            ) {
+                RadioButton(
+                    selected = currentSelection == index,
+                    onClick = { onOptionSelected(index) },
+                    colors = RadioButtonDefaults.colors(
+                        selectedColor = DuckDuckGoTheme.colors.brand.accentBlue,
+                        unselectedColor = DuckDuckGoTheme.textColors.secondary,
+                    ),
+                )
+                DaxText(
+                    text = option,
+                    style = DuckDuckGoTheme.typography.body1,
+                    color = DuckDuckGoTheme.textColors.primary,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun RadioListButtons(
+    positiveButton: String,
+    onPositiveClick: () -> Unit,
+    positiveButtonType: DaxButtonType,
+    positiveEnabled: Boolean,
+    negativeButton: String,
+    onNegativeClick: () -> Unit,
+    negativeButtonType: DaxButtonType,
+) {
+    Row {
+        DaxButton(
+            text = negativeButton,
+            buttonType = negativeButtonType,
+            onClick = onNegativeClick,
+        )
+        Spacer(modifier = Modifier.width(8.dp))
+        DaxButton(
+            text = positiveButton,
+            buttonType = positiveButtonType,
+            enabled = positiveEnabled,
+            onClick = onPositiveClick,
+        )
+    }
 }
 
 @PreviewLightDark
 @Composable
 private fun RadioListAlertDialogPreview() {
     PreviewBox {
-        RadioListAlertDialog(
-            onDismissRequest = {},
+        RadioListAlertDialogContent(
             title = "Select Theme",
             message = "Choose your preferred theme for the app.",
             options = listOf("Light", "Dark", "System Default"),
@@ -165,8 +244,7 @@ private fun RadioListAlertDialogPreview() {
 @Composable
 private fun RadioListAlertDialogNoSelectionPreview() {
     PreviewBox {
-        RadioListAlertDialog(
-            onDismissRequest = {},
+        RadioListAlertDialogContent(
             title = "Select Option",
             options = listOf("Option A", "Option B", "Option C"),
             positiveButton = "Confirm",
