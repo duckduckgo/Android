@@ -16,7 +16,7 @@
 
 package com.duckduckgo.downloads.impl
 
-import android.webkit.CookieManager
+import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
@@ -30,8 +30,10 @@ interface CookieManagerWrapper {
 }
 
 @ContributesBinding(AppScope::class)
-class CookieManagerWrapperImpl @Inject constructor() : CookieManagerWrapper {
+class CookieManagerWrapperImpl @Inject constructor(
+    private val cookieManagerProvider: CookieManagerProvider,
+) : CookieManagerWrapper {
     override fun getCookie(url: String): String? {
-        return CookieManager.getInstance().getCookie(url)
+        return cookieManagerProvider.get()?.getCookie(url)
     }
 }

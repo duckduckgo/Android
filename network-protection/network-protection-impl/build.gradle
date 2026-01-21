@@ -47,6 +47,7 @@ dependencies {
     implementation project(':data-store-api')
     implementation project(':new-tab-page-api')
     implementation project(':survey-api')
+    implementation project(':cookies-api')
 
     implementation AndroidX.appCompat
     implementation AndroidX.constraintLayout

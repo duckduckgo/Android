@@ -32,6 +32,14 @@ interface WebViewProfileManager {
     suspend fun isProfileSwitchingAvailable(): Boolean
 
     /**
+     * Synchronously checks if WebView profile switching is available.
+     * Returns the cached availability state computed during [initialize].
+     * This is safe to call from non-suspend contexts.
+     * @return true if profile switching is available
+     */
+    fun isProfileSwitchingAvailableSync(): Boolean
+
+    /**
      * Gets the current active profile name.
      * This is cached in memory for synchronous access during WebView configuration.
      * @return the current profile name, or empty string if using default profile

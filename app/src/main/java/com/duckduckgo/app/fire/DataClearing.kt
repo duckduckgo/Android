@@ -16,7 +16,7 @@
 
 package com.duckduckgo.app.fire
 
-import com.duckduckgo.app.browser.webview.profile.WebViewProfileManager
+import com.duckduckgo.app.browser.api.WebViewProfileManager
 import com.duckduckgo.app.fire.store.FireDataStore
 import com.duckduckgo.app.global.view.ClearDataAction
 import com.duckduckgo.app.settings.clear.ClearWhenOption

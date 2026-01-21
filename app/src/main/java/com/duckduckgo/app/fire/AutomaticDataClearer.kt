@@ -26,7 +26,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
-import com.duckduckgo.app.browser.webview.profile.WebViewProfileManager
+import com.duckduckgo.app.browser.api.WebViewProfileManager
 import com.duckduckgo.app.fire.store.FireDataStore
 import com.duckduckgo.app.global.ApplicationClearDataState
 import com.duckduckgo.app.global.ApplicationClearDataState.FINISHED

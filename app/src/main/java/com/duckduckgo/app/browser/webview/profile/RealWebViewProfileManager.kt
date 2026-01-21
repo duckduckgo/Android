@@ -60,11 +60,20 @@ class RealWebViewProfileManager @Inject constructor(
     @Volatile
     private var isInitialized: Boolean = false
 
+    @Volatile
+    private var cachedProfileSwitchingAvailable: Boolean = false
+
     override suspend fun isProfileSwitchingAvailable(): Boolean {
         return withContext(dispatchers.io()) {
-            androidBrowserConfigFeature.webViewProfiles().isEnabled() &&
+            val available = androidBrowserConfigFeature.webViewProfiles().isEnabled() &&
                 capabilityChecker.isSupported(WebViewCapability.MultiProfile)
+            cachedProfileSwitchingAvailable = available
+            available
         }
+    }
+
+    override fun isProfileSwitchingAvailableSync(): Boolean {
+        return cachedProfileSwitchingAvailable
     }
 
     override fun getCurrentProfileName(): String {
@@ -135,6 +144,10 @@ class RealWebViewProfileManager @Inject constructor(
 
         withContext(dispatchers.io()) {
             try {
+                // Cache availability state during initialization
+                cachedProfileSwitchingAvailable = androidBrowserConfigFeature.webViewProfiles().isEnabled() &&
+                    capabilityChecker.isSupported(WebViewCapability.MultiProfile)
+
                 val currentIndex = getCurrentProfileIndex()
                 currentProfileName = if (currentIndex > 0) {
                     getProfileName(currentIndex)
@@ -142,10 +155,11 @@ class RealWebViewProfileManager @Inject constructor(
                     "" // Use default profile for index 0
                 }
                 isInitialized = true
-                logcat { "WebViewProfileManager initialized with profile: '$currentProfileName'" }
+                logcat { "WebViewProfileManager initialized with profile: '$currentProfileName', switching available: $cachedProfileSwitchingAvailable" }
             } catch (e: Exception) {
                 logcat(ERROR) { "Failed to initialize WebViewProfileManager: ${e.asLog()}" }
                 currentProfileName = ""
+                cachedProfileSwitchingAvailable = false
                 isInitialized = true
             }
         }

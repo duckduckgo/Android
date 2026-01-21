@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 DuckDuckGo
+ * Copyright (c) 2025 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,16 +14,19 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.cookies.impl
+package com.duckduckgo.app.browser.webview.profile
 
-import android.webkit.CookieManager
+import android.annotation.SuppressLint
+import android.webkit.WebStorage
 import androidx.webkit.ProfileStore
+import com.duckduckgo.app.browser.api.WebStorageProvider
 import com.duckduckgo.app.browser.api.WebViewProfileManager
-import com.duckduckgo.cookies.api.CookieManagerProvider
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.Lazy
 import dagger.SingleInstanceIn
+import kotlinx.coroutines.withContext
 import logcat.LogPriority.WARN
 import logcat.asLog
 import logcat.logcat
@@ -31,43 +34,35 @@ import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
-class DefaultCookieManagerProvider @Inject constructor(
+class DefaultWebStorageProvider @Inject constructor(
     private val webViewProfileManager: Lazy<WebViewProfileManager>,
-) : CookieManagerProvider {
+    private val dispatchers: DispatcherProvider,
+) : WebStorageProvider {
 
-    @Volatile
-    private var defaultInstance: CookieManager? = null
-
-    override fun get(): CookieManager? {
+    @SuppressLint("RequiresFeature")
+    override suspend fun get(): WebStorage {
         val profileManager = webViewProfileManager.get()
 
         // If profile switching is not available, return default
-        if (!profileManager.isProfileSwitchingAvailableSync()) {
-            return getDefaultCookieManager()
+        if (!profileManager.isProfileSwitchingAvailable()) {
+            return WebStorage.getInstance()
         }
 
         val profileName = profileManager.getCurrentProfileName()
 
         // If profile name is empty, return default
         if (profileName.isEmpty()) {
-            return getDefaultCookieManager()
+            return WebStorage.getInstance()
         }
 
-        // Try to get profile's CookieManager, fall back to default on failure
-        return try {
-            val profileStore = ProfileStore.getInstance()
-            profileStore.getProfile(profileName)?.cookieManager ?: getDefaultCookieManager()
-        } catch (e: Exception) {
-            logcat(WARN) { "Failed to get profile CookieManager, falling back to default: ${e.asLog()}" }
-            getDefaultCookieManager()
-        }
-    }
-
-    private fun getDefaultCookieManager(): CookieManager? {
-        return runCatching {
-            defaultInstance ?: synchronized(this) {
-                defaultInstance ?: CookieManager.getInstance().also { defaultInstance = it }
+        return withContext(dispatchers.main()) {
+            try {
+                val profileStore = ProfileStore.getInstance()
+                profileStore.getProfile(profileName)?.webStorage ?: WebStorage.getInstance()
+            } catch (e: Exception) {
+                logcat(WARN) { "Failed to get profile WebStorage, falling back to default: ${e.asLog()}" }
+                WebStorage.getInstance()
             }
-        }.getOrNull()
+        }
     }
 }

@@ -16,11 +16,11 @@
 
 package com.duckduckgo.networkprotection.impl.reddit
 
-import android.webkit.CookieManager
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -106,19 +106,25 @@ private annotation class InternalApi
 object CookieManagerWrapperModule {
     @Provides
     @InternalApi
-    fun providesCookieManagerWrapper(): CookieManagerWrapper {
-        return CookieManagerWrapperImpl()
+    fun providesCookieManagerWrapper(
+        cookieManagerProvider: CookieManagerProvider,
+    ): CookieManagerWrapper {
+        return CookieManagerWrapperImpl(cookieManagerProvider)
     }
 }
-private class CookieManagerWrapperImpl constructor() : CookieManagerWrapper {
 
-    private val cookieManager: CookieManager by lazy { CookieManager.getInstance() }
+private class CookieManagerWrapperImpl(
+    private val cookieManagerProvider: CookieManagerProvider,
+) : CookieManagerWrapper {
+
     override fun getCookie(url: String): String? {
-        return cookieManager.getCookie(url)
+        return cookieManagerProvider.get()?.getCookie(url)
     }
 
     override fun setCookie(domain: String, cookie: String) {
-        cookieManager.setCookie(domain, cookie)
-        cookieManager.flush()
+        cookieManagerProvider.get()?.let { cookieManager ->
+            cookieManager.setCookie(domain, cookie)
+            cookieManager.flush()
+        }
     }
 }
