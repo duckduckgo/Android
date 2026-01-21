@@ -57,14 +57,6 @@ jobs:
             exit 1
           fi
 
-      - name: Checkout LGC tag
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ steps.get_lgc_tag.outputs.lgc_tag }}
-          submodules: recursive
-          token: ${{ secrets.GT_DAXMOBILE }}
-          fetch-depth: 0
-
       - name: Set up ruby env
         uses: ruby/setup-ruby@v1
         with:
