@@ -34,6 +34,7 @@
     <string name="sync_setup_begin_syncing">Pradėti sinchronizavimą</string>
     <string name="sync_setup_with_another_device_cta_title">Sinchronizuoti su kitu įrenginiu</string>
     <string name="sync_setup_with_another_device_cta_subtitle">Saugiai sinchronizuokite žymes ir slaptažodžius tarp savo įrenginių.</string>
+    <string name="sync_setup_with_another_device_cta_subtitle_with_ai_chat">Saugiai sinchronizuokite žymes, slaptažodžius ir Duck.ai pokalbius tarp savo įrenginių.</string>
     <string name="sync_off_hint">Jūsų duomenys šifruojami ištisiniu būdu, o „DuckDuckGo“ neturi prieigos prie šifravimo rakto.</string>
     <string name="sync_setup_single_device_title">Vieno įrenginio sąranka</string>
     <string name="sync_setup_other_options_title">Kitos parinktys</string>
@@ -45,12 +46,14 @@
     <!-- Setup screen -->
     <string name="sync_enable_sync_title">Nustatome sinchronizavimą ir atsarginės kopijos kūrimą!</string>
     <string name="sync_enable_sync_content">Jūsų žymės ir slaptažodžiai yra ruošiami sinchronizuoti. Tai turėtų užtrukti tik akimirką.</string>
+    <string name="sync_enable_sync_content_with_ai_chat">Jūsų žymos, slaptažodžiai ir „Duck.ai“ pokalbiai ruošiami sinchronizuoti. Tai turėtų užtrukti tik akimirką.</string>
     <string name="sync_enable_options">Parinktys</string>
     <string name="sync_enable_option_favicons_title">Gauti žymių piktogramas</string>
     <string name="sync_enable_option_favicons_subtitle">Automatiškai atsisiųskite sinchronizuotų žymių piktogramas.</string>
     <string name="sync_enable_connecting">Jungiamasi...</string>
     <string name="sync_intro_enable_title">Sinchronizuokite ir sukurkite atsarginę šio įrenginio kopiją</string>
     <string name="sync_intro_enable_content">Taip „DuckDuckGo“ saugiame serveryje sukuriama užšifruota atsarginė žymių ir slaptažodžių kopija, kurią galima sinchronizuoti su kitais įrenginiais. \n\n Šifravimo raktas saugomas tik jūsų įrenginyje, „DuckDuckGo“ negali jo pasiekti.</string>
+    <string name="sync_intro_enable_content_with_ai_chat">Tai sukuria užšifruotą jūsų žymių, slaptažodžių ir Duck.ai pokalbių atsarginę kopiją “DuckDuckGo” saugiame serveryje, kurią galima sinchronizuoti su kitais jūsų įrenginiais. \n\n Šifravimo raktas saugomas tik jūsų įrenginyje, „DuckDuckGo“ negali jo pasiekti.</string>
     <string name="sync_intro_enable_footer">Vėliau galėsite sinchronizuoti su kitais įrenginiais.</string>
     <string name="sync_intro_enable_cta">Įjunkite sinchronizavimą ir atsarginės kopijos kūrimą</string>
     <string name="sync_intro_recover_title">Atkurti sinchronizuotus duomenis</string>

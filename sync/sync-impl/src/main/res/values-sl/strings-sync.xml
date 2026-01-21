@@ -34,6 +34,7 @@
     <string name="sync_setup_begin_syncing">Začetek sinhronizacije</string>
     <string name="sync_setup_with_another_device_cta_title">Sinhronizacija z drugo napravo</string>
     <string name="sync_setup_with_another_device_cta_subtitle">Varno sinhronizirajte zaznamke in gesla med napravami.</string>
+    <string name="sync_setup_with_another_device_cta_subtitle_with_ai_chat">Varno sinhronizirajte zaznamke, gesla in klepete Duck.ai med svojimi napravami.</string>
     <string name="sync_off_hint">Vaši podatki so celovito šifrirani in DuckDuckGo nima dostopa do šifrirnega ključa.</string>
     <string name="sync_setup_single_device_title">Nastavitev ene naprave</string>
     <string name="sync_setup_other_options_title">Druge možnosti</string>
@@ -45,12 +46,14 @@
     <!-- Setup screen -->
     <string name="sync_enable_sync_title">Nastavljanje sinhronizacije in varnostnega kopiranja</string>
     <string name="sync_enable_sync_content">Vaše zaznamke in gesla pripravljamo za sinhronizacijo. To bo trajalo le trenutek.</string>
+    <string name="sync_enable_sync_content_with_ai_chat">Vaši zaznamki, gesla in klepeti Duck.ai so pripravljeni za sinhronizacijo. To bo trajalo le trenutek.</string>
     <string name="sync_enable_options">Možnosti</string>
     <string name="sync_enable_option_favicons_title">Pridobivanje ikon zaznamkov</string>
     <string name="sync_enable_option_favicons_subtitle">Samodejno prenesite ikone za sinhronizirane zaznamke.</string>
     <string name="sync_enable_connecting">Povezovanje ...</string>
     <string name="sync_intro_enable_title">Sinhronizirajte in varnostno kopirajte to napravo</string>
     <string name="sync_intro_enable_content">S tem ustvarite šifrirano varnostno kopijo zaznamkov in gesel v varnem strežniku DuckDuckGo, ki jo lahko sinhronizirate z drugimi napravami. \n\n Šifrirni ključ je shranjen samo v vaši napravi, DuckDuckGo ne more dostopati do njega.</string>
+    <string name="sync_intro_enable_content_with_ai_chat">S tem ustvarite šifrirano varnostno kopijo zaznamkov, gesel in klepetov Duck.ai v varnem strežniku DuckDuckGo, ki jo lahko sinhronizirate z drugimi napravami. \n\n Šifrirni ključ je shranjen samo v vaši napravi, DuckDuckGo ne more dostopati do njega.</string>
     <string name="sync_intro_enable_footer">Pozneje lahko sinhronizirate z drugimi napravami.</string>
     <string name="sync_intro_enable_cta">Vklopite sinhronizacijo in varnostno kopiranje</string>
     <string name="sync_intro_recover_title">Obnovitev sinhroniziranih podatkov</string>

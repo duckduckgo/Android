@@ -18,6 +18,7 @@ package com.duckduckgo.sync.impl.ui.setup
 
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.sync.impl.SyncFeatureToggle
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.RECOVERY_INTRO
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.SYNC_INTRO
 import com.duckduckgo.sync.impl.ui.setup.SyncSetupIntroViewModel.Command.AbortFlow
@@ -29,13 +30,16 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.mock
 
 class SyncSetupIntroViewModelTest {
 
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
-    private val testee = SyncSetupIntroViewModel()
+    private val syncFeatureToggle: SyncFeatureToggle = mock()
+
+    private val testee = SyncSetupIntroViewModel(syncFeatureToggle, coroutineTestRule.testDispatcherProvider)
 
     @Test
     fun whenSyncIntroArgumentThenIntroCreateAccountScreenShown() = runTest {
