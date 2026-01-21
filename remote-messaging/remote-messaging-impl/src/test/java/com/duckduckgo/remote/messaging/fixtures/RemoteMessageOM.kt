@@ -240,4 +240,32 @@ object RemoteMessageOM {
             surfaces = surfaces,
         )
     }
+
+    fun translatedListItems(
+        item1TitleText: String = "Item Title 1",
+        item1DescriptionText: String = "Item Description 1",
+        item2TitleText: String = "Item Title 2",
+        item2DescriptionText: String = "Item Description 2",
+    ) = listOf(
+        CardItem(
+            id = "item1",
+            type = CardItemType.TWO_LINE_LIST_ITEM,
+            titleText = item1TitleText,
+            descriptionText = item1DescriptionText,
+            placeholder = IMAGE_AI,
+            primaryAction = urlAction(),
+            matchingRules = emptyList(),
+            exclusionRules = emptyList(),
+        ),
+        CardItem(
+            id = "item2",
+            type = CardItemType.TWO_LINE_LIST_ITEM,
+            titleText = item2TitleText,
+            descriptionText = item2DescriptionText,
+            placeholder = RADAR,
+            primaryAction = urlAction(),
+            matchingRules = emptyList(),
+            exclusionRules = emptyList(),
+        ),
+    )
 }
