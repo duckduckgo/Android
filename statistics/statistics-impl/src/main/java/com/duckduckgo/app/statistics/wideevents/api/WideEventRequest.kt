@@ -35,7 +35,7 @@ data class AppSection(
     @field:Json(name = "name") val name: String,
     @field:Json(name = "version") val version: String,
     @field:Json(name = "form_factor") val formFactor: String,
-    @field:Json(name = "dev_mode") val devMode: String,
+    @field:Json(name = "dev_mode") val devMode: Boolean,
 )
 
 data class FeatureSection(

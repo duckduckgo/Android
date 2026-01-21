@@ -89,7 +89,7 @@ class ApiWideEventSenderTest {
                 name = "DuckDuckGo Android",
                 version = "5.123.0",
                 formFactor = "phone",
-                devMode = "false",
+                devMode = false,
             ),
             feature = FeatureSection(
                 name = eventName,
@@ -129,7 +129,7 @@ class ApiWideEventSenderTest {
                 name = "DuckDuckGo Android",
                 version = "5.123.0",
                 formFactor = "phone",
-                devMode = "false",
+                devMode = false,
             ),
             feature = FeatureSection(
                 name = "feature-event",
@@ -164,7 +164,7 @@ class ApiWideEventSenderTest {
                 name = "DuckDuckGo Android",
                 version = "5.123.0",
                 formFactor = "phone",
-                devMode = "false",
+                devMode = false,
             ),
             feature = FeatureSection(
                 name = "simple-event",
@@ -199,7 +199,7 @@ class ApiWideEventSenderTest {
                 name = "DuckDuckGo Android",
                 version = "5.123.0",
                 formFactor = "phone",
-                devMode = "true",
+                devMode = true,
             ),
             feature = FeatureSection(
                 name = "debug-event",
@@ -234,7 +234,7 @@ class ApiWideEventSenderTest {
                 name = "DuckDuckGo Android",
                 version = "5.123.0",
                 formFactor = "tablet",
-                devMode = "false",
+                devMode = false,
             ),
             feature = FeatureSection(
                 name = "tablet-event",
@@ -267,7 +267,7 @@ class ApiWideEventSenderTest {
                 name = "DuckDuckGo Android",
                 version = "5.123.0",
                 formFactor = "phone",
-                devMode = "false",
+                devMode = false,
             ),
             feature = FeatureSection(
                 name = "unknown-event",
@@ -305,7 +305,7 @@ class ApiWideEventSenderTest {
                 name = "DuckDuckGo Android",
                 version = "5.123.0",
                 formFactor = "phone",
-                devMode = "false",
+                devMode = false,
             ),
             feature = FeatureSection(
                 name = "filtered-event",
