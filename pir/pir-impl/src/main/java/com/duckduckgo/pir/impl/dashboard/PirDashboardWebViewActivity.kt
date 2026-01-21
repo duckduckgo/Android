@@ -155,7 +155,7 @@ class PirDashboardWebViewActivity : DuckDuckGoActivity() {
             is SendJsEvent -> sendJsEvent(command.event)
             is SendResponseToJs -> sendResponseToJs(command.data)
             is Command.ShowManualConfigWarning -> {
-                binding.manualConfigWarning.isVisible = true
+                binding.manualConfigWarning.isVisible = command.show
             }
         }
     }

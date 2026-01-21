@@ -63,11 +63,9 @@ class PirDashboardWebViewViewModel @Inject constructor(
 
         if (appBuildConfig.isInternalBuild()) {
             viewModelScope.launch {
-                if (pirRepository.hasBrokerConfigBeenManuallyUpdated()) {
-                    command.send(
-                        Command.ShowManualConfigWarning(true),
-                    )
-                }
+                command.send(
+                    Command.ShowManualConfigWarning(pirRepository.hasBrokerConfigBeenManuallyUpdated()),
+                )
             }
         }
     }
