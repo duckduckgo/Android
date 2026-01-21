@@ -40,6 +40,7 @@ import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
+import com.duckduckgo.remote.messaging.impl.store.ModalSurfaceStore
 import com.duckduckgo.settings.api.SettingsPageFeature
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback
 import com.duckduckgo.subscriptions.api.Subscriptions
@@ -107,6 +108,8 @@ class SettingsViewModelTest {
 
     private val fakePostCtaExperienceToggles = FakeFeatureToggleFactory.create(PostCtaExperienceToggles::class.java)
 
+    private val modalSurfaceStoreMock: ModalSurfaceStore = mock()
+
     @Before
     fun before() = runTest {
         whenever(dispatcherProviderMock.io()).thenReturn(coroutineTestRule.testDispatcher)
@@ -129,6 +132,7 @@ class SettingsViewModelTest {
             duckChat = duckChatMock,
             duckAiFeatureState = mockDuckAiFeatureState,
             voiceSearchAvailability = voiceSearchAvailabilityMock,
+            modalSurfaceStore = modalSurfaceStoreMock,
             privacyProUnifiedFeedback = privacyProUnifiedFeedbackMock,
             settingsPixelDispatcher = settingsPixelDispatcherMock,
             autofillFeature = autofillFeature,
@@ -316,5 +320,35 @@ class SettingsViewModelTest {
         testee.onFireButtonSettingClicked()
 
         verify(pixelMock).fire(AppPixelName.SETTINGS_FIRE_BUTTON_PRESSED)
+    }
+
+    @Test
+    fun `when whats new feature flag enabled and remote message exists then show whats new`() = runTest {
+        fakeSettingsPageFeature.whatsNewEnabled().setRawStoredState(State(true))
+        whenever(modalSurfaceStoreMock.getLastShownRemoteMessageId()).thenReturn("message-id")
+
+        testee.start()
+
+        assertTrue(testee.viewState().first().showWhatsNew)
+    }
+
+    @Test
+    fun `when whats new feature flag enabled and no remote message then do not show whats new`() = runTest {
+        fakeSettingsPageFeature.whatsNewEnabled().setRawStoredState(State(true))
+        whenever(modalSurfaceStoreMock.getLastShownRemoteMessageId()).thenReturn(null)
+
+        testee.start()
+
+        assertFalse(testee.viewState().first().showWhatsNew)
+    }
+
+    @Test
+    fun `when whats new feature flag disabled then do not show whats new`() = runTest {
+        fakeSettingsPageFeature.whatsNewEnabled().setRawStoredState(State(false))
+        whenever(modalSurfaceStoreMock.getLastShownRemoteMessageId()).thenReturn("message-id")
+
+        testee.start()
+
+        assertFalse(testee.viewState().first().showWhatsNew)
     }
 }
