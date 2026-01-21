@@ -75,6 +75,8 @@ interface PirRepository {
 
     suspend fun updateBrokerJsons(brokers: List<BrokerJson>)
 
+    suspend fun clearAllBrokerJsons()
+
     suspend fun getAllLocalBrokerJsons(): List<BrokerJson>
 
     suspend fun getStoredBrokersCount(): Int
@@ -305,6 +307,12 @@ class RealPirRepository(
                 }.also {
                     brokerJsonDao()?.insertBrokerJsonEtags(it)
                 }
+        }
+    }
+
+    override suspend fun clearAllBrokerJsons() {
+        withContext(dispatcherProvider.io()) {
+            brokerJsonDao()?.deleteAll()
         }
     }
 
