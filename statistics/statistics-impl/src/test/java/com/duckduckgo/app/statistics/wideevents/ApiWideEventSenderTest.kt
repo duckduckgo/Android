@@ -29,13 +29,18 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.device.DeviceInfo
 import kotlinx.coroutines.test.runTest
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import retrofit2.HttpException
+import retrofit2.Response
 import java.time.Duration
 import java.time.Instant
 
@@ -323,6 +328,34 @@ class ApiWideEventSenderTest {
         verify(wideEventService).sendWideEvent(eq(expectedRequest))
     }
 
+    @Test
+    fun `when sendWideEvent called and API returns client error then it does not throw`() = runTest {
+        val event = createWideEvent(
+            id = 450L,
+            name = "client-error-event",
+            status = WideEventRepository.WideEventStatus.SUCCESS,
+        )
+
+        whenever(wideEventService.sendWideEvent(any())).thenThrow(httpException(400))
+
+        apiWideEventSender.sendWideEvent(event)
+
+        verify(wideEventService).sendWideEvent(any())
+    }
+
+    @Test(expected = HttpException::class)
+    fun `when sendWideEvent called and API returns server error then it rethrows`() = runTest {
+        val event = createWideEvent(
+            id = 460L,
+            name = "server-error-event",
+            status = WideEventRepository.WideEventStatus.SUCCESS,
+        )
+
+        whenever(wideEventService.sendWideEvent(any())).thenThrow(httpException(500))
+
+        apiWideEventSender.sendWideEvent(event)
+    }
+
     @Test(expected = IllegalArgumentException::class)
     fun `when sendWideEvent called with null status then throws exception`() = runTest {
         val event = createWideEvent(
@@ -332,6 +365,11 @@ class ApiWideEventSenderTest {
         )
 
         apiWideEventSender.sendWideEvent(event)
+    }
+
+    private fun httpException(code: Int): HttpException {
+        val responseBody = "failure".toResponseBody("text/json".toMediaTypeOrNull())
+        return HttpException(Response.error<String>(code, responseBody))
     }
 
     private fun createWideEvent(
