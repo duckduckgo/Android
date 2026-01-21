@@ -73,9 +73,9 @@ class RemoteMessageModalSurfaceEvaluatorImpl @Inject constructor(
                 return@withContext ModalEvaluator.EvaluationResult.Skipped
             }
 
-            if (!hasMetBackgroundTimeThreshold()) {
-                return@withContext ModalEvaluator.EvaluationResult.Skipped
-            }
+            // if (!hasMetBackgroundTimeThreshold()) {
+            //     return@withContext ModalEvaluator.EvaluationResult.Skipped
+            // }
 
             val message = remoteMessagingRepository.message()
                 ?: return@withContext ModalEvaluator.EvaluationResult.Skipped
@@ -100,7 +100,7 @@ class RemoteMessageModalSurfaceEvaluatorImpl @Inject constructor(
                 }
 
                 // Record this message as shown, and clear background timestamp
-                modalSurfaceStore.recordLastShownRemoteMessageId(message.id)
+                modalSurfaceStore.recordLastShownRemoteMessage(message)
                 modalSurfaceStore.clearBackgroundTimestamp()
 
                 return@withContext ModalEvaluator.EvaluationResult.ModalShown

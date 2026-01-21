@@ -122,20 +122,9 @@ class ModalSurfaceStoreImplTest {
     fun whenLastShownRemoteMessageIdRecordedThenValueIsRetrieved() = runTest {
         val messageId = "test-message-id"
 
-        testee.recordLastShownRemoteMessageId(messageId)
+        testee.recordLastShownRemoteMessage(messageId)
 
         assertEquals(messageId, testee.getLastShownRemoteMessageId())
-    }
-
-    @Test
-    fun whenLastShownRemoteMessageIdClearedThenValueIsNull() = runTest {
-        val messageId = "test-message-id"
-        testee.recordLastShownRemoteMessageId(messageId)
-        assertEquals(messageId, testee.getLastShownRemoteMessageId())
-
-        testee.clearLastShownRemoteMessageId()
-
-        assertNull(testee.getLastShownRemoteMessageId())
     }
 
     @Test
@@ -143,19 +132,10 @@ class ModalSurfaceStoreImplTest {
         val firstMessageId = "first-message-id"
         val secondMessageId = "second-message-id"
 
-        testee.recordLastShownRemoteMessageId(firstMessageId)
+        testee.recordLastShownRemoteMessage(firstMessageId)
         assertEquals(firstMessageId, testee.getLastShownRemoteMessageId())
 
-        testee.recordLastShownRemoteMessageId(secondMessageId)
+        testee.recordLastShownRemoteMessage(secondMessageId)
         assertEquals(secondMessageId, testee.getLastShownRemoteMessageId())
-    }
-
-    @Test
-    fun whenClearLastShownRemoteMessageIdCalledWithoutRecordingThenNoError() = runTest {
-        assertNull(testee.getLastShownRemoteMessageId())
-
-        testee.clearLastShownRemoteMessageId()
-
-        assertNull(testee.getLastShownRemoteMessageId())
     }
 }

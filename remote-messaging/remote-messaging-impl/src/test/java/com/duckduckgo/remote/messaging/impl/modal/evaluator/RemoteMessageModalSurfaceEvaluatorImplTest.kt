@@ -259,7 +259,7 @@ class RemoteMessageModalSurfaceEvaluatorImplTest {
 
         testee.evaluate()
 
-        verify(mockModalSurfaceStore).recordLastShownRemoteMessageId(messageId)
+        verify(mockModalSurfaceStore).recordLastShownRemoteMessage(messageId)
     }
 
     @Test

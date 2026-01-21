@@ -24,6 +24,8 @@ import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.remote.messaging.api.Content.MessageType
+import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.impl.di.ModalSurface
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
@@ -56,15 +58,17 @@ interface ModalSurfaceStore {
     suspend fun getLastShownRemoteMessageId(): String?
 
     /**
-     * Records the remote message ID that was just shown.
-     * @param messageId the ID of the message that was shown.
+     * Returns the last shown remote message type.
+     * @return the message type, or null if not available.
      */
-    suspend fun recordLastShownRemoteMessageId(messageId: String)
+    suspend fun getLastShownRemoteMessageType(): MessageType?
 
     /**
-     * Clears the last shown remote message ID.
+     * Records the remote message that was just shown.
+     * Saves both the message ID and type atomically.
+     * @param message the message that was shown.
      */
-    suspend fun clearLastShownRemoteMessageId()
+    suspend fun recordLastShownRemoteMessage(message: RemoteMessage)
 }
 
 @ContributesBinding(AppScope::class)
@@ -97,22 +101,24 @@ class ModalSurfaceStoreImpl @Inject constructor(
 
     override suspend fun getLastShownRemoteMessageId(): String? {
         return withContext(dispatchers.io()) {
-            val key = getKeyLastShownRemoteMessageId()
-            store.data.firstOrNull()?.get(key)
+            store.data.firstOrNull()?.get(getKeyLastShownRemoteMessageId())
         }
     }
 
-    override suspend fun recordLastShownRemoteMessageId(messageId: String) {
-        withContext(dispatchers.io()) {
-            val key = getKeyLastShownRemoteMessageId()
-            store.edit { it[key] = messageId }
+    override suspend fun getLastShownRemoteMessageType(): MessageType? {
+        return withContext(dispatchers.io()) {
+            store.data.firstOrNull()?.get(getKeyLastShownRemoteMessageType())?.let {
+                runCatching { MessageType.valueOf(it) }.getOrNull()
+            }
         }
     }
 
-    override suspend fun clearLastShownRemoteMessageId() {
+    override suspend fun recordLastShownRemoteMessage(message: RemoteMessage) {
         withContext(dispatchers.io()) {
-            val key = getKeyLastShownRemoteMessageId()
-            store.edit { it.remove(key) }
+            store.edit {
+                it[getKeyLastShownRemoteMessageId()] = message.id
+                it[getKeyLastShownRemoteMessageType()] = message.content.messageType.name
+            }
         }
     }
 
@@ -124,8 +130,13 @@ class ModalSurfaceStoreImpl @Inject constructor(
         return stringPreferencesKey(KEY_NAME_LAST_SHOWN_REMOTE_MESSAGE_ID)
     }
 
+    private fun getKeyLastShownRemoteMessageType(): Preferences.Key<String> {
+        return stringPreferencesKey(KEY_NAME_LAST_SHOWN_MESSAGE_TYPE)
+    }
+
     companion object {
         private const val KEY_NAME_BACKGROUNDED_TIMESTAMP = "modal_evaluator_backgrounded_timestamp"
         private const val KEY_NAME_LAST_SHOWN_REMOTE_MESSAGE_ID = "modal_evaluator_last_shown_remote_message_id"
+        private const val KEY_NAME_LAST_SHOWN_MESSAGE_TYPE = "modal_evaluator_last_shown_message_type"
     }
 }
