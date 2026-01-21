@@ -50,7 +50,7 @@
             android:orientation="vertical"
             android:paddingBottom="@dimen/keyline_4">
 
-            <TextView
+            <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/manualConfigWarning"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

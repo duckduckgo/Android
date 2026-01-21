@@ -24,7 +24,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <TextView
+    <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/manualConfigWarning"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

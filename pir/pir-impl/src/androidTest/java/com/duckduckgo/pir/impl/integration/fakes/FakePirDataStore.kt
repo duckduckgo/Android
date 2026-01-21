@@ -28,8 +28,11 @@ class FakePirDataStore : PirDataStore {
     override var wauLastSentMs: Long = 0L
     override var mauLastSentMs: Long = 0L
     override var weeklyStatLastSentMs: Long = 0L
+    override var hasBrokerConfigBeenManuallyUpdated: Boolean = false
+
     override fun reset() {
         mainConfigEtag = null
+        hasBrokerConfigBeenManuallyUpdated = false
         resetUserData()
     }
 
