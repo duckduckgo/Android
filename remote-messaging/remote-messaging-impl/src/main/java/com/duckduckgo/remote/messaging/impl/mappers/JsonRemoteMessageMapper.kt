@@ -203,29 +203,48 @@ private fun Content.localize(translations: JsonContentTranslations): Content {
             descriptionText = translations.descriptionText.takeUnless { it.isEmpty() } ?: this.descriptionText,
             primaryActionText = translations.primaryActionText.takeUnless { it.isEmpty() } ?: this.primaryActionText,
         )
+
         is BigTwoActions -> this.copy(
             titleText = translations.titleText.takeUnless { it.isEmpty() } ?: this.titleText,
             descriptionText = translations.descriptionText.takeUnless { it.isEmpty() } ?: this.descriptionText,
             primaryActionText = translations.primaryActionText.takeUnless { it.isEmpty() } ?: this.primaryActionText,
             secondaryActionText = translations.secondaryActionText.takeUnless { it.isEmpty() } ?: this.secondaryActionText,
         )
+
         is Medium -> this.copy(
             titleText = translations.titleText.takeUnless { it.isEmpty() } ?: this.titleText,
             descriptionText = translations.descriptionText.takeUnless { it.isEmpty() } ?: this.descriptionText,
         )
+
         is Small -> this.copy(
             titleText = translations.titleText.takeUnless { it.isEmpty() } ?: this.titleText,
             descriptionText = translations.descriptionText.takeUnless { it.isEmpty() } ?: this.descriptionText,
         )
+
         is PromoSingleAction -> this.copy(
             titleText = translations.titleText.takeUnless { it.isEmpty() } ?: this.titleText,
             descriptionText = translations.descriptionText.takeUnless { it.isEmpty() } ?: this.descriptionText,
             actionText = translations.actionText.takeUnless { it.isEmpty() } ?: this.actionText,
         )
+
         is CardsList -> this.copy(
             titleText = translations.titleText.takeUnless { it.isEmpty() } ?: this.titleText,
             descriptionText = translations.descriptionText.takeUnless { it.isEmpty() } ?: this.descriptionText,
             primaryActionText = translations.primaryActionText.takeUnless { it.isEmpty() } ?: this.primaryActionText,
+            listItems = listItems.map { item ->
+                val (itemTitle, itemDescription) = item.localize(item.id, translations)
+                item.copy(
+                    titleText = itemTitle.takeUnless { it.isEmpty() } ?: item.titleText,
+                    descriptionText = itemDescription.takeUnless { it.isEmpty() } ?: item.descriptionText,
+                )
+            },
         )
     }
 }
+
+private fun CardItem.localize(
+    itemId: String,
+    translations: JsonContentTranslations,
+): Pair<String, String> = translations.listItems?.get(itemId)?.let {
+    it.titleText to it.descriptionText
+} ?: ("" to "")
