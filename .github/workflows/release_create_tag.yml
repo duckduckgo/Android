@@ -72,4 +72,4 @@ jobs:
         id: create_git_tag
         run: |
           echo "Calling fastlane with ref: ${{ steps.get_lgc_tag.outputs.lgc_tag }}"
-          bundle exec fastlane android tag_and_push_release_version app_version:${{ github.event.inputs.app-version }} ref:${{ steps.get_lgc_tag.outputs.lgc_tag }}
+          bundle exec fastlane android test_tag_and_push_release_version app_version:${{ github.event.inputs.app-version }} ref:${{ steps.get_lgc_tag.outputs.lgc_tag }}

@@ -254,8 +254,8 @@ platform :android do
 
         end
 
-    desc "Create a new release branch and update the version"
-    lane :tag_and_push_release_version do |options|
+    desc "(Test) Create a new release branch and update the version"
+    lane :test_tag_and_push_release_version do |options|
         app_version = options[:app_version]
         ref = options[:ref]
         branch_name = "release/#{app_version}"
