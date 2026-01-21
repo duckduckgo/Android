@@ -144,7 +144,11 @@ private fun List<String>?.toSurfaceList(): List<Surface> {
         Surface.entries.firstOrNull { it.jsonValue == value }
     } ?: listOf(Surface.NEW_TAB_PAGE)
 }
-private fun RemoteMessage.localizeMessage(translations: Map<String, JsonContentTranslations>?, locale: Locale): RemoteMessage {
+
+private fun RemoteMessage.localizeMessage(
+    translations: Map<String, JsonContentTranslations>?,
+    locale: Locale,
+): RemoteMessage {
     if (translations == null) return this
 
     val deviceTranslations = translations[locale.asJsonFormat()] ?: translations[locale.language]
@@ -203,29 +207,47 @@ private fun Content.localize(translations: JsonContentTranslations): Content {
             descriptionText = translations.descriptionText.takeUnless { it.isEmpty() } ?: this.descriptionText,
             primaryActionText = translations.primaryActionText.takeUnless { it.isEmpty() } ?: this.primaryActionText,
         )
+
         is BigTwoActions -> this.copy(
             titleText = translations.titleText.takeUnless { it.isEmpty() } ?: this.titleText,
             descriptionText = translations.descriptionText.takeUnless { it.isEmpty() } ?: this.descriptionText,
             primaryActionText = translations.primaryActionText.takeUnless { it.isEmpty() } ?: this.primaryActionText,
             secondaryActionText = translations.secondaryActionText.takeUnless { it.isEmpty() } ?: this.secondaryActionText,
         )
+
         is Medium -> this.copy(
             titleText = translations.titleText.takeUnless { it.isEmpty() } ?: this.titleText,
             descriptionText = translations.descriptionText.takeUnless { it.isEmpty() } ?: this.descriptionText,
         )
+
         is Small -> this.copy(
             titleText = translations.titleText.takeUnless { it.isEmpty() } ?: this.titleText,
             descriptionText = translations.descriptionText.takeUnless { it.isEmpty() } ?: this.descriptionText,
         )
+
         is PromoSingleAction -> this.copy(
             titleText = translations.titleText.takeUnless { it.isEmpty() } ?: this.titleText,
             descriptionText = translations.descriptionText.takeUnless { it.isEmpty() } ?: this.descriptionText,
             actionText = translations.actionText.takeUnless { it.isEmpty() } ?: this.actionText,
         )
+
         is CardsList -> this.copy(
             titleText = translations.titleText.takeUnless { it.isEmpty() } ?: this.titleText,
             descriptionText = translations.descriptionText.takeUnless { it.isEmpty() } ?: this.descriptionText,
             primaryActionText = translations.primaryActionText.takeUnless { it.isEmpty() } ?: this.primaryActionText,
+            listItems = listItems.map { item ->
+                val (itemTitle, itemDescription) = item.localize(translations)
+                item.copy(
+                    titleText = itemTitle.takeUnless { it.isEmpty() } ?: item.titleText,
+                    descriptionText = itemDescription.takeUnless { it.isEmpty() } ?: item.descriptionText,
+                )
+            },
         )
     }
 }
+
+private fun CardItem.localize(
+    translations: JsonContentTranslations,
+): Pair<String, String> = translations.listItems?.get(id)?.let {
+    it.titleText to it.descriptionText
+} ?: ("" to "")

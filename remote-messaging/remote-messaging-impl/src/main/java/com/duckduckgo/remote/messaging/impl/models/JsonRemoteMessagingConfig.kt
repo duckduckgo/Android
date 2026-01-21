@@ -56,6 +56,12 @@ data class JsonContentTranslations(
     val primaryActionText: String = "",
     val secondaryActionText: String = "",
     val actionText: String = "",
+    val listItems: Map<String, JsonListItemTranslation>? = null,
+)
+
+data class JsonListItemTranslation(
+    val titleText: String = "",
+    val descriptionText: String = "",
 )
 
 data class JsonMatchingRule(
