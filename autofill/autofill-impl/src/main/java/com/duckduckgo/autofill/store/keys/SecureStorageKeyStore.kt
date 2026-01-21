@@ -32,6 +32,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+import logcat.logcat
 import okio.ByteString.Companion.decodeBase64
 import okio.ByteString.Companion.toByteString
 
@@ -94,6 +95,7 @@ class RealSecureStorageKeyStore constructor(
                         sharedPreferencesProvider.getMigratedEncryptedSharedPreferences(FILENAME).also {
                             if (it == null) {
                                 pixel.fire(AUTOFILL_HARMONY_PREFERENCES_RETRIEVAL_FAILED)
+                                logcat { "autofill harmony preferences retrieval returned null" }
                             }
                         }
                     } else {
@@ -102,6 +104,7 @@ class RealSecureStorageKeyStore constructor(
                 }
             } catch (e: Exception) {
                 pixel.fire(AUTOFILL_HARMONY_PREFERENCES_RETRIEVAL_FAILED)
+                logcat { "autofill harmony preferences retrieval failed: $e" }
                 null
             }
         }
