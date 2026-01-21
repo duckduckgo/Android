@@ -21,6 +21,9 @@ import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.remote.messaging.api.Content.MessageType
+import com.duckduckgo.remote.messaging.fixtures.RemoteMessageOM.aCardsListMessage
+import com.duckduckgo.remote.messaging.fixtures.RemoteMessageOM.aSmallMessage
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -119,43 +122,39 @@ class ModalSurfaceStoreImplTest {
     }
 
     @Test
-    fun whenLastShownRemoteMessageIdRecordedThenValueIsRetrieved() = runTest {
-        val messageId = "test-message-id"
-
-        testee.recordLastShownRemoteMessageId(messageId)
-
-        assertEquals(messageId, testee.getLastShownRemoteMessageId())
+    fun whenInitializedThenLastShownRemoteMessageTypeIsNull() = runTest {
+        assertNull(testee.getLastShownRemoteMessageType())
     }
 
     @Test
-    fun whenLastShownRemoteMessageIdClearedThenValueIsNull() = runTest {
-        val messageId = "test-message-id"
-        testee.recordLastShownRemoteMessageId(messageId)
-        assertEquals(messageId, testee.getLastShownRemoteMessageId())
+    fun whenLastShownRemoteMessageRecordedThenIdIsRetrieved() = runTest {
+        val message = aCardsListMessage(id = "test-message-id")
 
-        testee.clearLastShownRemoteMessageId()
+        testee.recordLastShownRemoteMessage(message)
 
-        assertNull(testee.getLastShownRemoteMessageId())
+        assertEquals("test-message-id", testee.getLastShownRemoteMessageId())
     }
 
     @Test
-    fun whenLastShownRemoteMessageIdRecordedMultipleTimesThenLatestValueIsStored() = runTest {
-        val firstMessageId = "first-message-id"
-        val secondMessageId = "second-message-id"
+    fun whenLastShownRemoteMessageRecordedThenTypeIsRetrieved() = runTest {
+        val message = aCardsListMessage(id = "test-message-id")
 
-        testee.recordLastShownRemoteMessageId(firstMessageId)
-        assertEquals(firstMessageId, testee.getLastShownRemoteMessageId())
+        testee.recordLastShownRemoteMessage(message)
 
-        testee.recordLastShownRemoteMessageId(secondMessageId)
-        assertEquals(secondMessageId, testee.getLastShownRemoteMessageId())
+        assertEquals(MessageType.CARDS_LIST, testee.getLastShownRemoteMessageType())
     }
 
     @Test
-    fun whenClearLastShownRemoteMessageIdCalledWithoutRecordingThenNoError() = runTest {
-        assertNull(testee.getLastShownRemoteMessageId())
+    fun whenLastShownRemoteMessageRecordedMultipleTimesThenLatestValuesAreStored() = runTest {
+        val firstMessage = aSmallMessage(id = "first-message-id")
+        val secondMessage = aCardsListMessage(id = "second-message-id")
 
-        testee.clearLastShownRemoteMessageId()
+        testee.recordLastShownRemoteMessage(firstMessage)
+        assertEquals("first-message-id", testee.getLastShownRemoteMessageId())
+        assertEquals(MessageType.SMALL, testee.getLastShownRemoteMessageType())
 
-        assertNull(testee.getLastShownRemoteMessageId())
+        testee.recordLastShownRemoteMessage(secondMessage)
+        assertEquals("second-message-id", testee.getLastShownRemoteMessageId())
+        assertEquals(MessageType.CARDS_LIST, testee.getLastShownRemoteMessageType())
     }
 }
