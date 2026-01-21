@@ -21,6 +21,7 @@ import android.os.Bundle
 import android.webkit.WebChromeClient
 import android.webkit.WebSettings
 import android.webkit.WebView
+import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -153,6 +154,9 @@ class PirDashboardWebViewActivity : DuckDuckGoActivity() {
         when (command) {
             is SendJsEvent -> sendJsEvent(command.event)
             is SendResponseToJs -> sendResponseToJs(command.data)
+            is Command.ShowManualConfigWarning -> {
+                binding.manualConfigWarning.isVisible = true
+            }
         }
     }
 

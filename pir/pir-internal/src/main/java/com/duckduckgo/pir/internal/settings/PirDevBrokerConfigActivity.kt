@@ -30,6 +30,7 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
+import com.duckduckgo.pir.impl.brokers.BrokerJsonUpdater
 import com.duckduckgo.pir.impl.brokers.StepsAsStringAdapter
 import com.duckduckgo.pir.impl.models.Broker
 import com.duckduckgo.pir.impl.service.DbpService.PirJsonBroker
@@ -50,6 +51,9 @@ class PirDevBrokerConfigActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var repository: PirRepository
+
+    @Inject
+    lateinit var brokerJsonUpdater: BrokerJsonUpdater
 
     @Inject
     lateinit var dispatcherProvider: DispatcherProvider
@@ -91,6 +95,10 @@ class PirDevBrokerConfigActivity : DuckDuckGoActivity() {
         binding.updateConfigButton.setOnClickListener {
             updateBrokerConfig()
         }
+
+        binding.resetAllConfigsButton.setOnClickListener {
+            resetAllBrokerConfigs()
+        }
     }
 
     private fun loadBrokers() {
@@ -110,7 +118,7 @@ class PirDevBrokerConfigActivity : DuckDuckGoActivity() {
             return
         }
 
-        val jsonInput = binding.brokerJsonInput.text.toString().trim()
+        val jsonInput = binding.brokerJsonInput.text.trim()
         if (jsonInput.isEmpty()) {
             showError(getString(R.string.pirDevBrokerConfigEmptyJson))
             return
@@ -128,6 +136,7 @@ class PirDevBrokerConfigActivity : DuckDuckGoActivity() {
                 if (parsedBroker != null) {
                     withContext(dispatcherProvider.io()) {
                         repository.updateBrokerData(broker.fileName, parsedBroker)
+                        repository.setHasBrokerConfigBeenManuallyUpdated(true)
                     }
                     logcat { "PIR-BROKER-CONFIG: Successfully updated broker config for ${broker.name}" }
                     Toast.makeText(
@@ -160,6 +169,47 @@ class PirDevBrokerConfigActivity : DuckDuckGoActivity() {
         } catch (e: Exception) {
             logcat(LogPriority.ERROR) { "PIR-BROKER-CONFIG: JSON parse error: ${e.message}" }
             null
+        }
+    }
+
+    private fun resetAllBrokerConfigs() {
+        lifecycleScope.launch {
+            binding.resetAllConfigsButton.isEnabled = false
+            binding.updateConfigButton.isEnabled = false
+            binding.statusText.isVisible = false
+
+            try {
+                withContext(dispatcherProvider.io()) {
+                    // Clear etags to force re-download
+                    repository.updateMainEtag(null)
+                    repository.updateBrokerJsons(emptyList())
+                    repository.setHasBrokerConfigBeenManuallyUpdated(false)
+                }
+
+                logcat { "PIR-BROKER-CONFIG: Starting broker config re-download..." }
+
+                val success = withContext(dispatcherProvider.io()) {
+                    brokerJsonUpdater.update()
+                }
+
+                if (success) {
+                    logcat { "PIR-BROKER-CONFIG: Successfully reset and re-downloaded all broker configs" }
+                    Toast.makeText(
+                        this@PirDevBrokerConfigActivity,
+                        getString(R.string.pirDevBrokerConfigResetSuccess),
+                        Toast.LENGTH_SHORT,
+                    ).show()
+                    loadBrokers()
+                } else {
+                    showError(getString(R.string.pirDevBrokerConfigResetError))
+                }
+            } catch (e: Exception) {
+                logcat(LogPriority.ERROR) { "PIR-BROKER-CONFIG: Failed to reset broker configs: ${e.message}" }
+                showError(getString(R.string.pirDevBrokerConfigResetError))
+            } finally {
+                binding.resetAllConfigsButton.isEnabled = true
+                binding.updateConfigButton.isEnabled = true
+            }
         }
     }
 

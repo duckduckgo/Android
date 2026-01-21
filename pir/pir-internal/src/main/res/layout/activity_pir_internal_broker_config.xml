@@ -86,7 +86,15 @@
         android:id="@+id/updateConfigButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/keyline_4"
+        android:layout_marginHorizontal="@dimen/keyline_4"
+        android:layout_marginTop="@dimen/keyline_4"
         android:text="@string/pirDevBrokerConfigUpdate" />
+
+    <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
+        android:id="@+id/resetAllConfigsButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/keyline_4"
+        android:text="@string/pirDevBrokerConfigResetAll" />
 
 </LinearLayout>
