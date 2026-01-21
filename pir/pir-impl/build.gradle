@@ -45,6 +45,7 @@ dependencies {
     implementation AndroidX.core.ktx
     implementation AndroidX.webkit
     implementation Google.dagger
+    implementation Google.android.material
     implementation KotlinX.coroutines.android
 
     // Room

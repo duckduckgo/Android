@@ -50,6 +50,18 @@
             android:orientation="vertical"
             android:paddingBottom="@dimen/keyline_4">
 
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/manualConfigWarning"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?attr/daxColorAccentYellow"
+                android:layout_marginHorizontal="@dimen/keyline_4"
+                android:layout_marginTop="@dimen/keyline_4"
+                android:padding="@dimen/keyline_2"
+                android:text="@string/pirDashboardManualConfigWarning"
+                android:textColor="?attr/daxColorSecondaryText"
+                android:visibility="gone" />
+
             <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

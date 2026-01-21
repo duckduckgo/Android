@@ -81,6 +81,10 @@ class PirDevSettingsActivity : DuckDuckGoActivity() {
         binding.viewRunEvents.setOnClickListener {
             globalActivityStarter.start(this, PirEventsResultsScreen)
         }
+
+        binding.brokerConfig.setOnClickListener {
+            globalActivityStarter.start(this, PirBrokerConfigScreenNoParams)
+        }
     }
 
     private fun bindViews() {

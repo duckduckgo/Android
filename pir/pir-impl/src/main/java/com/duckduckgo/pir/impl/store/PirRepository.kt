@@ -75,6 +75,8 @@ interface PirRepository {
 
     suspend fun updateBrokerJsons(brokers: List<BrokerJson>)
 
+    suspend fun clearAllBrokerJsons()
+
     suspend fun getAllLocalBrokerJsons(): List<BrokerJson>
 
     suspend fun getStoredBrokersCount(): Int
@@ -196,6 +198,10 @@ interface PirRepository {
 
     suspend fun setWeeklyStatLastSentMs(timeMs: Long)
 
+    suspend fun setHasBrokerConfigBeenManuallyUpdated(updated: Boolean)
+
+    suspend fun hasBrokerConfigBeenManuallyUpdated(): Boolean
+
     /**
      * This method deletes all data in the PIR repository, including brokers, extracted profiles, user profiles and resets the data store.
      */
@@ -301,6 +307,12 @@ class RealPirRepository(
                 }.also {
                     brokerJsonDao()?.insertBrokerJsonEtags(it)
                 }
+        }
+    }
+
+    override suspend fun clearAllBrokerJsons() {
+        withContext(dispatcherProvider.io()) {
+            brokerJsonDao()?.deleteAll()
         }
     }
 
@@ -748,6 +760,16 @@ class RealPirRepository(
         withContext(dispatcherProvider.io()) {
             pirDataStore.weeklyStatLastSentMs = timeMs
         }
+    }
+
+    override suspend fun setHasBrokerConfigBeenManuallyUpdated(updated: Boolean) {
+        withContext(dispatcherProvider.io()) {
+            pirDataStore.hasBrokerConfigBeenManuallyUpdated = updated
+        }
+    }
+
+    override suspend fun hasBrokerConfigBeenManuallyUpdated(): Boolean = withContext(dispatcherProvider.io()) {
+        return@withContext pirDataStore.hasBrokerConfigBeenManuallyUpdated
     }
 
     override suspend fun clearAllData() {
