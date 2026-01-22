@@ -46,6 +46,7 @@
     <string name="browserMenuChatHistory">Chat History</string>
     <string name="browserMenuChatSettings">Duck.ai Settings</string>
     <string name="browserMenuVPN">VPN</string>
+    <string name="browserMenuVpnTryForFree">Try for free</string>
 
     <!-- Browser Menu Content Description -->
     <string name="browserMenuBack">Back</string>

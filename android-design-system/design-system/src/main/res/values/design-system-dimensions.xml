@@ -148,6 +148,10 @@
     <!-- InfoPanel -->
     <dimen name="infoPanelIconSize">16dp</dimen>
 
+    <!-- Yellow Pill -->
+    <dimen name="yellowPillHeight">16dp</dimen>
+    <dimen name="yellowPillPaddingHorizontal">5dp</dimen>
+
     <!-- Message CTA -->
     <dimen name="messageCtaCloseButtonSize">40dp</dimen>
     <dimen name="messageCtaIllustrationSize">64dp</dimen>
