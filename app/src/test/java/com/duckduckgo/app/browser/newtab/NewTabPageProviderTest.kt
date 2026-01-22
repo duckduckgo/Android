@@ -30,72 +30,72 @@ class NewTabPageProviderTest {
     private lateinit var testee: NewTabPageProvider
 
     @Test
-    fun whenLegacyPluginEnabledThenLegacyViewProvided() = runTest {
-        testee = RealNewTabPageProvider(legacyPluginEnabled)
-
-        testee.provideNewTabPageVersion().test {
-            expectMostRecentItem().also {
-                assertTrue(it is LegacyNewTabPlugin)
-            }
-        }
-    }
-
-    @Test
     fun whenNewPluginEnabledThenNewViewProvided() = runTest {
-        testee = RealNewTabPageProvider(newPluginEnabled)
+        testee = RealNewTabPageProvider(ntpPluginEnabled)
 
         testee.provideNewTabPageVersion().test {
             expectMostRecentItem().also {
-                assertTrue(it is NewNewTabPlugin)
+                assertTrue(it is NewTabPlugin)
             }
         }
     }
 
     @Test
-    fun whenNTPFirstPluginFirstEnabledThenLegacyViewProvided() = runTest {
+    fun whenConfigurablePluginEnabledThenConfigurablePluginViewProvided() = runTest {
+        testee = RealNewTabPageProvider(configurablePluginEnabled)
+
+        testee.provideNewTabPageVersion().test {
+            expectMostRecentItem().also {
+                assertTrue(it is ConfigurableNewTabPlugin)
+            }
+        }
+    }
+
+    @Test
+    fun whenNTPFirstPluginFirstEnabledThenNTPViewProvided() = runTest {
         testee = RealNewTabPageProvider(ntpFirstPluginsEnabled)
 
         testee.provideNewTabPageVersion().test {
             expectMostRecentItem().also {
-                assertTrue(it is NewNewTabPlugin)
+                assertTrue(it is ConfigurableNewTabPlugin)
             }
         }
     }
 
     @Test
-    fun whenAllPluginsEnabledThenLegacyViewProvided() = runTest {
+    fun whenAllPluginsEnabledThenFirstViewProvided() = runTest {
         testee = RealNewTabPageProvider(allPluginsEnabled)
 
         testee.provideNewTabPageVersion().test {
             expectMostRecentItem().also {
-                assertTrue(it is LegacyNewTabPlugin)
+                assertTrue(it is NewTabPlugin)
             }
         }
     }
 
     @Test
-    fun whenNoPluginsEnabledThenLegacyViewProvided() = runTest {
+    fun whenNoPluginsEnabledThenNewViewProvided() = runTest {
         testee = RealNewTabPageProvider(noPluginsEnabled)
 
         testee.provideNewTabPageVersion().test {
             expectMostRecentItem().also {
-                assertTrue(it is NewTabLegacyPage)
+                assertTrue(it is NewTabPage)
             }
         }
     }
 
-    private val legacyPluginEnabled = object : ActivePluginPoint<NewTabPagePlugin> {
+    private val ntpPluginEnabled = object : ActivePluginPoint<NewTabPagePlugin> {
         override suspend fun getPlugins(): Collection<NewTabPagePlugin> {
             return listOf(
-                LegacyNewTabPlugin(),
+                NewTabPlugin(),
             )
         }
     }
 
-    private val newPluginEnabled = object : ActivePluginPoint<NewTabPagePlugin> {
+    private val configurablePluginEnabled = object : ActivePluginPoint<NewTabPagePlugin> {
         override suspend fun getPlugins(): Collection<NewTabPagePlugin> {
             return listOf(
-                NewNewTabPlugin(),
+                ConfigurableNewTabPlugin(),
             )
         }
     }
@@ -103,8 +103,8 @@ class NewTabPageProviderTest {
     private val allPluginsEnabled = object : ActivePluginPoint<NewTabPagePlugin> {
         override suspend fun getPlugins(): Collection<NewTabPagePlugin> {
             return listOf(
-                LegacyNewTabPlugin(),
-                NewNewTabPlugin(),
+                NewTabPlugin(),
+                ConfigurableNewTabPlugin(),
             )
         }
     }
@@ -112,8 +112,8 @@ class NewTabPageProviderTest {
     private val ntpFirstPluginsEnabled = object : ActivePluginPoint<NewTabPagePlugin> {
         override suspend fun getPlugins(): Collection<NewTabPagePlugin> {
             return listOf(
-                NewNewTabPlugin(),
-                LegacyNewTabPlugin(),
+                ConfigurableNewTabPlugin(),
+                NewTabPlugin(),
             )
         }
     }
@@ -124,7 +124,7 @@ class NewTabPageProviderTest {
         }
     }
 
-    class LegacyNewTabPlugin : NewTabPagePlugin {
+    class NewTabPlugin : NewTabPagePlugin {
         override fun getView(
             context: Context,
             showLogo: Boolean,
@@ -134,7 +134,7 @@ class NewTabPageProviderTest {
         }
     }
 
-    class NewNewTabPlugin : NewTabPagePlugin {
+    class ConfigurableNewTabPlugin : NewTabPagePlugin {
         override fun getView(
             context: Context,
             showLogo: Boolean,
