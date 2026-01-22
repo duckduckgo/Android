@@ -123,4 +123,36 @@ class UserSegmentsPixelSenderTest {
         verify(usageHistory, never()).addAppUsage(any())
         verify(usageHistory, never()).addSearchUsage(any())
     }
+
+    @Test
+    fun whenAppRetentionAtbRefreshedAndAtbUnchangedThenPixelNotFired() = runTest {
+        whenever(usageHistory.getAppUsageHistory()).thenReturn(listOf("v123-1"))
+
+        testee.onAppRetentionAtbRefreshed("v123-1", "v123-1")
+        advanceUntilIdle()
+
+        verify(segmentCalculation, never()).computeUserSegmentForActivityType(any(), any())
+        verify(pixel, never()).fire(
+            pixelName = eq(StatisticsPixelName.RETENTION_SEGMENTS.pixelName),
+            parameters = any(),
+            encodedParameters = any(),
+            type = any(),
+        )
+    }
+
+    @Test
+    fun whenSearchRetentionAtbRefreshedAndAtbUnchangedThenPixelNotFired() = runTest {
+        whenever(usageHistory.getSearchUsageHistory()).thenReturn(listOf("v123-1"))
+
+        testee.onSearchRetentionAtbRefreshed("v123-1", "v123-1")
+        advanceUntilIdle()
+
+        verify(segmentCalculation, never()).computeUserSegmentForActivityType(any(), any())
+        verify(pixel, never()).fire(
+            pixelName = eq(StatisticsPixelName.RETENTION_SEGMENTS.pixelName),
+            parameters = any(),
+            encodedParameters = any(),
+            type = any(),
+        )
+    }
 }

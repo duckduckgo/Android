@@ -24,6 +24,7 @@ import com.duckduckgo.app.statistics.api.StatisticsRequester
 import com.duckduckgo.app.statistics.api.StatisticsService
 import com.duckduckgo.app.statistics.model.Atb
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.StatisticsPixelName
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.statistics.store.StatisticsSharedPreferences
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
@@ -46,7 +47,12 @@ import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.any
+import org.mockito.kotlin.argumentCaptor
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
@@ -76,37 +82,7 @@ class DuckAiRetentionIntegrationTest {
         }
     }
 
-    private val pixel = object : Pixel {
-        override fun fire(
-            pixel: Pixel.PixelName,
-            parameters: Map<String, String>,
-            encodedParameters: Map<String, String>,
-            type: Pixel.PixelType,
-        ) {
-        }
-
-        override fun fire(
-            pixelName: String,
-            parameters: Map<String, String>,
-            encodedParameters: Map<String, String>,
-            type: Pixel.PixelType,
-        ) {
-        }
-
-        override fun enqueueFire(
-            pixel: Pixel.PixelName,
-            parameters: Map<String, String>,
-            encodedParameters: Map<String, String>,
-        ) {
-        }
-
-        override fun enqueueFire(
-            pixelName: String,
-            parameters: Map<String, String>,
-            encodedParameters: Map<String, String>,
-        ) {
-        }
-    }
+    private val pixel: Pixel = mock()
 
     private val mockVariantManager: VariantManager = mock()
     private val mockEmailManager: EmailManager = mock()
@@ -118,6 +94,11 @@ class DuckAiRetentionIntegrationTest {
 
         statisticsStore = StatisticsSharedPreferences(context)
         statisticsStore.clearAtb()
+        statisticsStore.searchRetentionAtb = null
+        statisticsStore.appRetentionAtb = null
+        statisticsStore.duckaiRetentionAtb = null
+        statisticsStore.variant = null
+        statisticsStore.referrerVariant = null
         context.deleteSharedPreferences(RETENTION_SEGMENTS_PREF_FILE)
         context.deleteSharedPreferences("$RETENTION_SEGMENTS_PREF_FILE.harmony")
 
@@ -178,12 +159,39 @@ class DuckAiRetentionIntegrationTest {
     @Test
     fun whenDuckAiRetentionAtbRefreshSucceeds_thenDuckAiHistoryUpdated() = runTest {
         statisticsStore.saveAtb(Atb("100-1"))
-        queueResponseFromFile(VALID_REFRESH_RESPONSE_JSON)
+        val refreshedAtb = "v999-1"
+        queueResponseWithVersion(refreshedAtb)
 
         testee.refreshDuckAiRetentionAtb()
         coroutineRule.testScope.advanceUntilIdle()
 
-        assertEquals(listOf("v107-7"), usageHistory.getDuckAiHistory())
+        assertEquals(listOf(refreshedAtb), usageHistory.getDuckAiHistory())
+        val paramsCaptor = argumentCaptor<Map<String, String>>()
+        verify(pixel).fire(
+            pixelName = eq(StatisticsPixelName.RETENTION_SEGMENTS.pixelName),
+            parameters = paramsCaptor.capture(),
+            encodedParameters = any(),
+            type = any(),
+        )
+        assertEquals("duckai", paramsCaptor.firstValue["activity_type"])
+    }
+
+    @Test
+    fun whenDuckAiRetentionAtbNotRefreshed_thenPixelNotSent() = runTest {
+        statisticsStore.saveAtb(Atb("100-1"))
+        val refreshedAtb = "v999-2"
+        statisticsStore.duckaiRetentionAtb = refreshedAtb
+        queueResponseWithVersion(refreshedAtb)
+
+        testee.refreshDuckAiRetentionAtb()
+        coroutineRule.testScope.advanceUntilIdle()
+
+        verify(pixel, never()).fire(
+            pixelName = eq(StatisticsPixelName.RETENTION_SEGMENTS.pixelName),
+            parameters = any(),
+            encodedParameters = any(),
+            type = any(),
+        )
     }
 
     private fun configureStubNetworking() {
@@ -212,6 +220,25 @@ class DuckAiRetentionIntegrationTest {
             .setResponseCode(responseCode)
 
         server.enqueue(response)
+    }
+
+    private fun queueResponseWithVersion(
+        version: String,
+        responseCode: Int = 200,
+    ) {
+        val responseBody = """
+            {
+              "for_more_info": "https://duck.co/help/privacy/atb",
+              "minorVersion": 3,
+              "majorVersion": 105,
+              "version": "$version"
+            }
+        """.trimIndent()
+        server.enqueue(
+            MockResponse()
+                .setBody(responseBody)
+                .setResponseCode(responseCode),
+        )
     }
 
     companion object {
