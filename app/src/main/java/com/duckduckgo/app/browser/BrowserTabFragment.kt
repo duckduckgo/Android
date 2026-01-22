@@ -4681,9 +4681,9 @@ class BrowserTabFragment :
                         createTrackersAnimation()
                     }
                 } else {
-                    lifecycleScope.launch {
-                        if (addressBarTrackersAnimationManager.isFeatureEnabled()) {
-                            if (viewState.progress == MAX_PROGRESS) {
+                    if (viewState.progress == MAX_PROGRESS) {
+                        lifecycleScope.launch {
+                            if (addressBarTrackersAnimationManager.isFeatureEnabled()) {
                                 viewModel.refreshCta()
                             }
                         }
