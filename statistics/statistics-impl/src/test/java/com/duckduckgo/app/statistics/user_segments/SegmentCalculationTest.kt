@@ -5,6 +5,7 @@ import com.duckduckgo.app.statistics.model.Atb
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.statistics.user_segments.SegmentCalculation.ActivityType.APP_USE
+import com.duckduckgo.app.statistics.user_segments.SegmentCalculation.ActivityType.DUCKAI
 import com.duckduckgo.app.statistics.user_segments.SegmentCalculation.ActivityType.SEARCH
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -98,13 +99,26 @@ class SegmentCalculationTest(private val input: TestInput) {
 
         input.client.usage.forEachIndexed { index, usage ->
             input.results[index].asParameterMap()?.let { expected ->
-                val actual = if (expected["activity_type"] == "search") {
-                    usageHistory.addSearchUsage(usage)
-                    segmentCalculation.computeUserSegmentForActivityType(SEARCH, usageHistory.getSearchUsageHistory())
-                } else {
-                    usageHistory.addAppUsage(usage)
-                    segmentCalculation.computeUserSegmentForActivityType(APP_USE, usageHistory.getAppUsageHistory())
+                val activityType = when (expected["activity_type"]) {
+                    "search" -> SEARCH
+                    "duckai" -> DUCKAI
+                    else -> APP_USE
                 }
+                val usageHistoryList = when (activityType) {
+                    SEARCH -> {
+                        usageHistory.addSearchUsage(usage)
+                        usageHistory.getSearchUsageHistory()
+                    }
+                    APP_USE -> {
+                        usageHistory.addAppUsage(usage)
+                        usageHistory.getAppUsageHistory()
+                    }
+                    DUCKAI -> {
+                        usageHistory.addDuckAiUsage(usage)
+                        usageHistory.getDuckAiHistory()
+                    }
+                }
+                val actual = segmentCalculation.computeUserSegmentForActivityType(activityType, usageHistoryList)
                 assertEquals(expected, actual.toPixelParams())
             }
         }
@@ -120,7 +134,11 @@ class SegmentCalculationTest(private val input: TestInput) {
         var oldAtb: String = atbStore.atb!!.version
         input.client.usage.forEachIndexed { index, usage ->
             val expected = input.results[index].asParameterMap()
-            val activityType = if (input.client.activity_type == "search") SEARCH else APP_USE
+            val activityType = when (input.client.activity_type) {
+                "search" -> SEARCH
+                "duckai" -> DUCKAI
+                else -> APP_USE
+            }
 
             val actual = userSegmentsPixelSender.handleAtbRefresh(activityType, oldAtb, usage)
             oldAtb = usage
