@@ -4803,7 +4803,7 @@ class BrowserTabViewModelTest {
         testee.handleNewTabIfEmptyUrl()
         assertEquals("about:blank", omnibarViewState().omnibarText)
         assertEquals("about:blank", testee.url)
-        assertEquals("about:blank", testee.title)
+        assertEquals(null, testee.title)
     }
 
     @Test
