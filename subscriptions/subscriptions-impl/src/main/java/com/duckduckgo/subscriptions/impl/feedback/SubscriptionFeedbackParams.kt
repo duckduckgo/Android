@@ -74,6 +74,7 @@ enum class SubscriptionFeedbackVpnSubCategory : SubscriptionFeedbackSubCategory 
 
 enum class SubscriptionFeedbackSubsSubCategory : SubscriptionFeedbackSubCategory {
     ONE_TIME_PASSWORD,
+    UNABLE_TO_ACCESS_FEATURES,
     OTHER,
 }
 
@@ -152,6 +153,7 @@ internal fun SubscriptionFeedbackVpnSubCategory.asParams(): String {
 internal fun SubscriptionFeedbackSubsSubCategory.asParams(): String {
     return when (this) {
         ONE_TIME_PASSWORD -> "otp"
+        SubscriptionFeedbackSubsSubCategory.UNABLE_TO_ACCESS_FEATURES -> "unableToAccessFeatures"
         SubscriptionFeedbackSubsSubCategory.OTHER -> "somethingElse"
     }
 }

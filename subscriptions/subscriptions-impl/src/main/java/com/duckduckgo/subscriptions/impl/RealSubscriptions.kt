@@ -277,6 +277,9 @@ interface PrivacyProFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun tierMessagingEnabled(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun allowProTierPurchase(): Toggle
 }
 
 @ContributesBinding(AppScope::class)

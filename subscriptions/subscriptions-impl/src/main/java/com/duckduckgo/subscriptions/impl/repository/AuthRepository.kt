@@ -30,6 +30,7 @@ import com.duckduckgo.subscriptions.api.SubscriptionStatus.NOT_AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.UNKNOWN
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.WAITING
 import com.duckduckgo.subscriptions.impl.PrivacyProFeature
+import com.duckduckgo.subscriptions.impl.SubscriptionTier
 import com.duckduckgo.subscriptions.impl.model.Entitlement
 import com.duckduckgo.subscriptions.impl.serp_promo.SerpPromo
 import com.duckduckgo.subscriptions.impl.store.SubscriptionsDataStore
@@ -308,7 +309,7 @@ data class Account(
 )
 
 data class Subscription(
-    val productId: String,
+    val productId: String, // this is the plan id returned by the backend
     val billingPeriod: String,
     val startedAt: Long,
     val expiresOrRenewsAt: Long,
@@ -317,6 +318,9 @@ data class Subscription(
     val activeOffers: List<ActiveOfferType>,
 ) {
     fun isActive(): Boolean = status.isActive()
+
+    val tier: SubscriptionTier
+        get() = SubscriptionTier.fromPlanId(productId)
 }
 
 fun SubscriptionStatus.isActive(): Boolean {
