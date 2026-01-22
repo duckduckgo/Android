@@ -66,6 +66,7 @@ class RealWebViewProfileManager @Inject constructor(
     override suspend fun isProfileSwitchingAvailable(): Boolean {
         return withContext(dispatchers.io()) {
             val available = androidBrowserConfigFeature.webViewProfiles().isEnabled() &&
+                androidBrowserConfigFeature.improvedDataClearingOptions().isEnabled() &&
                 capabilityChecker.isSupported(WebViewCapability.MultiProfile)
             cachedProfileSwitchingAvailable = available
             available
@@ -144,28 +145,26 @@ class RealWebViewProfileManager @Inject constructor(
 
         withContext(dispatchers.io()) {
             try {
-                // Cache availability state during initialization
-                cachedProfileSwitchingAvailable = androidBrowserConfigFeature.webViewProfiles().isEnabled() &&
-                    capabilityChecker.isSupported(WebViewCapability.MultiProfile)
-
-                val currentIndex = getCurrentProfileIndex()
-                currentProfileName = if (currentIndex > 0) {
-                    getProfileName(currentIndex)
-                } else {
-                    "" // Use default profile for index 0
+                cachedProfileSwitchingAvailable = isProfileSwitchingAvailable()
+                if (cachedProfileSwitchingAvailable) {
+                    val currentIndex = getCurrentProfileIndex()
+                    currentProfileName = if (currentIndex > 0) {
+                        getProfileName(currentIndex)
+                    } else {
+                        "${PROFILE_PREFIX}0"
+                    }
+                    logcat { "WebViewProfileManager initialized with profile: '$currentProfileName', switching available: $cachedProfileSwitchingAvailable" }
                 }
-                isInitialized = true
-                logcat { "WebViewProfileManager initialized with profile: '$currentProfileName', switching available: $cachedProfileSwitchingAvailable" }
             } catch (e: Exception) {
                 logcat(ERROR) { "Failed to initialize WebViewProfileManager: ${e.asLog()}" }
-                currentProfileName = ""
                 cachedProfileSwitchingAvailable = false
+            } finally {
                 isInitialized = true
             }
         }
     }
 
-    // Profile store functionality (inlined from DataStoreWebViewProfileStore)
+    // TODO: Move back to WebViewProfileStoreDataStore
 
     private suspend fun getCurrentProfileIndex(): Int {
         return store.data.map { preferences ->
@@ -186,8 +185,6 @@ class RealWebViewProfileManager @Inject constructor(
     private fun getProfileName(index: Int): String {
         return "$PROFILE_PREFIX$index"
     }
-
-    // Cookie migration functionality (inlined from RealFireproofCookieMigrator)
 
     private suspend fun migrateFireproofedCookies(
         oldProfileName: String,

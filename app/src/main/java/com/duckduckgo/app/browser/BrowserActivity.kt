@@ -57,6 +57,7 @@ import com.duckduckgo.app.browser.animations.slideAndFadeInFromLeft
 import com.duckduckgo.app.browser.animations.slideAndFadeInFromRight
 import com.duckduckgo.app.browser.animations.slideAndFadeOutToLeft
 import com.duckduckgo.app.browser.animations.slideAndFadeOutToRight
+import com.duckduckgo.app.browser.api.WebViewProfileManager
 import com.duckduckgo.app.browser.databinding.ActivityBrowserBinding
 import com.duckduckgo.app.browser.databinding.IncludeOmnibarToolbarMockupBinding
 import com.duckduckgo.app.browser.databinding.IncludeOmnibarToolbarMockupBottomBinding
@@ -136,6 +137,7 @@ import logcat.LogPriority.VERBOSE
 import logcat.LogPriority.WARN
 import logcat.asLog
 import logcat.logcat
+import java.io.File
 import javax.inject.Inject
 
 // open class so that we can test BrowserApplicationStateInfo
@@ -209,6 +211,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var profileSwitchTabsResetter: ProfileSwitchTabsResetter
+
+    @Inject
+    lateinit var webViewProfileManager: WebViewProfileManager
 
     private val lastActiveTabs = TabList()
 
@@ -406,8 +411,8 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
         // Observe profile switch tab reset events (works in both swiping and non-swiping modes)
         lifecycleScope.launch {
-            profileSwitchTabsResetter.resetEvent.collect { event ->
-                handleProfileSwitchTabsReset(event.clearTabs)
+            profileSwitchTabsResetter.resetEvent.collect {
+                handleProfileSwitchTabsReset()
             }
         }
     }
@@ -416,12 +421,33 @@ open class BrowserActivity : DuckDuckGoActivity() {
      * Handles tab fragment reset after a WebView profile switch.
      * Removes all existing tab fragments so new ones can be created with the new profile.
      */
-    private fun handleProfileSwitchTabsReset(clearTabs: Boolean) {
-        logcat(INFO) { "Handling profile switch tabs reset, clearTabs=$clearTabs" }
+    private fun handleProfileSwitchTabsReset() {
+        recreate()
+        return
+        logcat(INFO) { "Handling profile switch tabs reset" }
 
         if (swipingTabsFeature.isEnabled) {
             // When swiping is enabled, clear via the pager adapter
+            supportFragmentManager.fragments
+                .filterIsInstance<BrowserTabFragment>()
+                .forEach {
+                    it.onDestroy()
+                }
+
+            val webViewCacheDir = File(cacheDir, "WebView")
+            if (webViewCacheDir.exists() && webViewCacheDir.isDirectory) {
+                webViewCacheDir.listFiles { file -> file.isDirectory && file.name.startsWith("Profile") }
+                    ?.forEach { profileDir ->
+                        logcat(INFO) { "Deleting WebView profile cache: ${profileDir.name}" }
+                        profileDir.deleteRecursively()
+                    }
+            }
+
             tabPagerAdapter.clearFragments()
+
+            lifecycleScope.launch {
+                webViewProfileManager.cleanupStaleProfiles()
+            }
         } else {
             // When swiping is disabled, remove individual tab fragments from fragment manager
             val tabFragments = supportFragmentManager.fragments
@@ -436,7 +462,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         lastActiveTabs.clear()
 
         // Let the ViewModel handle the tab repository operations
-        viewModel.onProfileSwitchTabsReset(clearTabs)
+//        viewModel.onProfileSwitchTabsReset()
     }
 
     private fun setupFireDialogListener() {

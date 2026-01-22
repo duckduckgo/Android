@@ -26,10 +26,8 @@ import javax.inject.Inject
 
 /**
  * Event emitted when tabs need to be reset after a profile switch.
- * @param clearTabs If true, delete all tabs and create a new one.
- *                  If false, preserve tabs but recreate fragments with new WebView profile.
  */
-data class ResetTabsForProfileSwitchEvent(val clearTabs: Boolean)
+data object ResetTabsForProfileSwitchEvent
 
 /**
  * Handles communication between ClearPersonalDataAction and BrowserActivity
@@ -48,9 +46,8 @@ interface ProfileSwitchTabsResetter {
 
     /**
      * Request a tab reset after profile switch.
-     * @param clearTabs If true, delete all tabs. If false, preserve tabs and recreate fragments.
      */
-    suspend fun requestReset(clearTabs: Boolean)
+    suspend fun requestReset()
 }
 
 @ContributesBinding(AppScope::class)
@@ -60,7 +57,7 @@ class RealProfileSwitchTabsResetter @Inject constructor() : ProfileSwitchTabsRes
     private val _resetEvent = MutableSharedFlow<ResetTabsForProfileSwitchEvent>()
     override val resetEvent: Flow<ResetTabsForProfileSwitchEvent> = _resetEvent.asSharedFlow()
 
-    override suspend fun requestReset(clearTabs: Boolean) {
-        _resetEvent.emit(ResetTabsForProfileSwitchEvent(clearTabs))
+    override suspend fun requestReset() {
+        _resetEvent.emit(ResetTabsForProfileSwitchEvent)
     }
 }

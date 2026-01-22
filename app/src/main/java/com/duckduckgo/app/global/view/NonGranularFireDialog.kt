@@ -39,6 +39,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.airbnb.lottie.RenderMode
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.app.browser.api.WebViewProfileManager
 import com.duckduckgo.app.browser.databinding.SheetFireClearDataBinding
 import com.duckduckgo.app.global.view.NonGranularFireDialogViewModel.Command
 import com.duckduckgo.app.settings.db.SettingsDataStore
@@ -74,6 +75,8 @@ class NonGranularFireDialog : BottomSheetDialogFragment(), FireDialog {
     @Inject lateinit var clearDataAction: ClearDataAction
 
     @Inject lateinit var viewModelFactory: FragmentViewModelFactory
+
+    @Inject lateinit var webViewProfileManager: WebViewProfileManager
 
     private val viewModel: NonGranularFireDialogViewModel by lazy {
         ViewModelProvider(this, viewModelFactory)[NonGranularFireDialogViewModel::class.java]
@@ -282,9 +285,14 @@ class NonGranularFireDialog : BottomSheetDialogFragment(), FireDialog {
                 binding.fireAnimationView.addAnimatorUpdateListener(accelerateAnimatorUpdateListener)
             }
         } else {
-            // DataClearing handles the restart/profile switch logic,
-            // so we just dismiss the dialog
-            dismiss()
+            lifecycleScope.launch {
+                if (webViewProfileManager.isProfileSwitchingAvailable()) {
+                    clearDataAction.resetTabsForProfileSwitch()
+                    dismiss()
+                } else {
+                    clearDataAction.killAndRestartProcess(notifyDataCleared = false, enableTransitionAnimation = false)
+                }
+            }
         }
     }
 

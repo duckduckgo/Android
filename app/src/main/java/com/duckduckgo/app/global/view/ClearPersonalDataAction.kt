@@ -92,12 +92,9 @@ interface ClearDataAction {
     fun killAndRestartProcess(notifyDataCleared: Boolean, enableTransitionAnimation: Boolean = true)
 
     /**
-     * Resets WebView fragments for profile switching.
      * Removes all existing fragments to force new WebView creation with new profile.
-     * @param clearTabs If true, deletes all tabs and creates new one.
-     *                  If false, preserves tabs but recreates fragments.
      */
-    suspend fun resetTabsForProfileSwitch(clearTabs: Boolean)
+    suspend fun resetTabsForProfileSwitch()
 }
 
 class ClearPersonalDataAction(
@@ -249,9 +246,8 @@ class ClearPersonalDataAction(
         }
     }
 
-    override suspend fun resetTabsForProfileSwitch(clearTabs: Boolean) {
-        logcat(INFO) { "Resetting tabs for profile switch, clearTabs=$clearTabs" }
-        // Emit event to BrowserActivity to remove all fragments and handle tab reset
-        profileSwitchTabsResetter.requestReset(clearTabs)
+    override suspend fun resetTabsForProfileSwitch() {
+        logcat(INFO) { "Resetting tabs for profile switch" }
+        profileSwitchTabsResetter.requestReset()
     }
 }

@@ -50,31 +50,55 @@ class DataClearing @Inject constructor(
     private val webViewProfileManager: WebViewProfileManager,
 ) : ManualDataClearing, AutomaticDataClearing {
 
-    override suspend fun clearDataUsingManualFireOptions(shouldRestartIfRequired: Boolean, wasAppUsedSinceLastClear: Boolean) {
+    override suspend fun clearDataUsingManualFireOptions(
+        shouldRestartIfRequired: Boolean,
+        wasAppUsedSinceLastClear: Boolean,
+    ) {
+        if (webViewProfileManager.isProfileSwitchingAvailable()) {
+            clearDataWithProfileSwitch(shouldRestartIfRequired)
+        } else {
+            clearDataWithProcessRestart(shouldRestartIfRequired)
+        }
+        clearDataAction.setAppUsedSinceLastClearFlag(wasAppUsedSinceLastClear)
+    }
+
+    private suspend fun clearDataWithProfileSwitch(shouldRestartIfRequired: Boolean) {
         val options = fireDataStore.getManualClearOptions()
+        val shouldDeleteTabs = options.contains(FireClearOption.TABS)
+
+        // delete data without tabs first (tabs will be handled after profile switch if needed)
+        performGranularClear(
+            options = options - FireClearOption.TABS,
+            shouldFireDataClearPixel = true,
+        )
+
+        val wasProfileSwitched = webViewProfileManager.switchToNewProfile()
+        if (wasProfileSwitched) {
+            logcat { "Profile switch successful, resetting tabs" }
+//            if (shouldDeleteTabs) {
+// //                clearDataAction.clearTabsOnly()
+//                clearDataAction.resetTabsForProfileSwitch()
+//            } else {
+//                clearDataAction.resetTabsForProfileSwitch()
+//            }
+        } else {
+            logcat(WARN) { "Profile switching failed, fall back to process restart" }
+
+            clearDataWithProcessRestart(shouldRestartIfRequired)
+        }
+    }
+
+    private suspend fun clearDataWithProcessRestart(shouldRestartIfRequired: Boolean) {
+        val options = fireDataStore.getManualClearOptions()
+
         performGranularClear(
             options = options,
             shouldFireDataClearPixel = true,
         )
 
-        clearDataAction.setAppUsedSinceLastClearFlag(wasAppUsedSinceLastClear)
-
-        val wasDataCleared = options.contains(FireClearOption.DATA) || options.contains(FireClearOption.DUCKAI_CHATS)
-        val shouldClearTabs = options.contains(FireClearOption.TABS)
-
+        val wasDataCleared = options.contains(FireClearOption.DATA) ||
+            options.contains(FireClearOption.DUCKAI_CHATS)
         if (shouldRestartIfRequired && wasDataCleared) {
-            // Try profile switching first to avoid process restart
-            if (webViewProfileManager.isProfileSwitchingAvailable()) {
-                val success = webViewProfileManager.switchToNewProfile()
-                if (success) {
-                    logcat { "Profile switch successful, resetting tabs" }
-                    // Reset tab fragments with the new profile
-                    clearDataAction.resetTabsForProfileSwitch(clearTabs = shouldClearTabs)
-                    return
-                }
-                logcat(WARN) { "Profile switch failed, falling back to process restart" }
-            }
-            // Fallback to process restart
             clearDataAction.killAndRestartProcess(notifyDataCleared = false)
         }
     }
