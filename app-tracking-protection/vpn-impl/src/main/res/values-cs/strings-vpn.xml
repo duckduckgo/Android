@@ -137,6 +137,8 @@
     <string name="atp_NewTabDisabled"><b>App Tracking Protection vypnutá.</b>\nKlepnutím na tuto možnost budeš i nadále blokovat pokusy o sledování ve všech aplikacích.</string>
     <string name="atp_NewTabRevoked"><b>Aplikace VPN ve tvém zařízení zakázala App Tracking Protection.</b>\nKlepnutím na položku ji znovu povolíš.</string>
     <string name="atp_NewTabEnabled"><b>App Tracking Protection je zapnutá</b> a blokuje pokusy o sledování ve všech aplikacích.</string>
+    <!-- smartling.character_limit = 15 -->
+    <string name="vpnMenuYellowPill">Zkus to zdarma</string>
 
     <!-- Exclusion List -->
     <string name="atp_ExclusionListActivityTitle">Všechny aplikace</string>
