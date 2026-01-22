@@ -90,20 +90,4 @@ When working with Maestro tests in this project, always consider the existing or
 - Avoid special characters in filenames (ASCII letters, numbers, `_`, and `.` are all acceptable)
 
 ### Prefer to Skip Onboarding
-- Most tests launch the app in a clean state, which would result in the onboarding flow launching first. Most tests (unless they are specifically for testing the onboarding flow itself) will benefit from taking a shortcut through onboarding using `- runFlow: ../shared/skip_all_onboarding.yaml`
-
-### Retries
-- Use `retry` block to mark that a test can be retried (if any of the retries pass the whole test is considered a pass)
-- Retries are defined as follows, where the test commands are then included in the `commands:` block
-- Prefer a `maxRetries: 3` when tests will be run in CI / Maestro Cloud. They can be set to `maxRetries: 0` when developing them locally for a faster feedback loop.
-
-```
-- retry:
-    maxRetries: 3
-    commands:
-```
-
-### Prefer shorter, specific tests
-- Tests should ideally test something that can be run quickly. 
-- Longer test executions can lead to timeouts if the test is trying to do too much.
-- The more a test is doing, the harder it can be debug if it fails.
+- Most tests launch the app in a clean state, which would result in the onboarding flow launching first. Most tests (unless they are specifically for testing the onboarding 
