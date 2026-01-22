@@ -1451,6 +1451,13 @@ class BrowserTabViewModel @Inject constructor(
             return true
         }
 
+        if (site?.url == ABOUT_BLANK && handleAboutBlankEnabled) {
+            viewModelScope.launch {
+                removeCurrentTabFromRepository()
+            }
+            return true
+        }
+
         val navigation = webNavigationState ?: return false
 
         if (currentFindInPageViewState().visible) {
@@ -3806,6 +3813,7 @@ class BrowserTabViewModel @Inject constructor(
             site = siteFactory.buildSite(
                 url = ABOUT_BLANK,
                 tabId = tabId,
+                title = ABOUT_BLANK,
                 httpUpgraded = httpsUpgraded,
             )
             viewModelScope.launch(dispatchers.io()) {
