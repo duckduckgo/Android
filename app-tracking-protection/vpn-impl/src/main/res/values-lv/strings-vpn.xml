@@ -133,6 +133,8 @@
     <string name="atp_NewTabDisabled"><b>Lietotņu pretizsekošanas aizsardzība ir atspējota.</b>\nPieskaries, lai turpinātu bloķēt izsekošanas mēģinājumus visās lietotnēs.</string>
     <string name="atp_NewTabRevoked"><b>Kāda VPN lietotne tavā ierīcē atspējojusi Lietotņu pretizsekošanas aizsardzību.</b>\nPieskaries, lai iespējotu no jauna.</string>
     <string name="atp_NewTabEnabled"><b>Lietotņu pretizsekošanas aizsardzība ir iespējota</b> un bloķē izsekošanas mēģinājumus tavās lietotnēs.</string>
+    <!-- smartling.character_limit = 15 -->
+    <string name="vpnMenuYellowPill">Bezm. izmēģin.</string>
 
     <!-- Exclusion List -->
     <string name="atp_ExclusionListActivityTitle">Visas lietotnes</string>
