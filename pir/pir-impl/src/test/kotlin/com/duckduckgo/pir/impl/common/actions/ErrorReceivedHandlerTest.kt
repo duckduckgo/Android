@@ -29,6 +29,8 @@ import com.duckduckgo.pir.impl.models.ProfileQuery
 import com.duckduckgo.pir.impl.pixels.PirStage
 import com.duckduckgo.pir.impl.scripts.models.BrokerAction
 import com.duckduckgo.pir.impl.scripts.models.PirError
+import com.duckduckgo.pir.impl.scripts.models.PirError.ActionError.CaptchaServiceError
+import com.duckduckgo.pir.impl.scripts.models.PirError.ActionError.EmailError
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -126,18 +128,19 @@ class ErrorReceivedHandlerTest {
             ),
         )
         val state = State(
-            runType = RunType.OPTOUT,
+            runType = RunType.MANUAL,
             brokerStepsToExecute = listOf(scanStep),
             profileQuery = testProfileQuery,
             currentBrokerStepIndex = 0,
-            currentActionIndex = 1,
+            currentActionIndex = 0,
             actionRetryCount = 2,
             stageStatus = PirStageStatus(
                 currentStage = PirStage.CAPTCHA_SEND,
                 stageStartMs = 1000L,
             ),
         )
-        val testError = PirError.CaptchaServiceError(
+        val testError = CaptchaServiceError(
+            actionID = testAction.id,
             errorCode = 500,
             errorDetails = "Service unavailable",
         )
@@ -172,7 +175,8 @@ class ErrorReceivedHandlerTest {
                 stageStartMs = 2000L,
             ),
         )
-        val testError = PirError.EmailError(
+        val testError = EmailError(
+            actionID = testAction.id,
             errorCode = 404,
             error = "Email service error",
         )
@@ -260,5 +264,179 @@ class ErrorReceivedHandlerTest {
         assertEquals("https://example.com", result.nextState.pendingUrl)
         assertEquals(PirStage.FILL_FORM, result.nextState.stageStatus.currentStage)
         assertEquals(7000L, result.nextState.stageStatus.stageStartMs)
+    }
+
+    @Test
+    fun whenBrokerStepIndexExceedsBrokerStepsSizeThenEventIsInvalidAndReturnsUnchangedState() = runTest {
+        val scanStep = ScanStep(
+            broker = testBroker,
+            step = ScanStepActions(
+                stepType = "scan",
+                actions = listOf(testAction),
+                scanType = "initial",
+            ),
+        )
+        val state = State(
+            runType = RunType.MANUAL,
+            brokerStepsToExecute = listOf(scanStep),
+            profileQuery = testProfileQuery,
+            currentBrokerStepIndex = 5, // Exceeds broker steps size (1)
+            currentActionIndex = 0,
+            stageStatus = PirStageStatus(
+                currentStage = PirStage.OTHER,
+                stageStartMs = 0,
+            ),
+        )
+        val testError = CaptchaServiceError(
+            actionID = testAction.id,
+            errorCode = 500,
+            errorDetails = "Service unavailable",
+        )
+        val event = ErrorReceived(error = testError)
+
+        val result = testee.invoke(state, event)
+
+        assertEquals(state, result.nextState)
+        assertNull(result.nextEvent)
+        assertNull(result.sideEffect)
+    }
+
+    @Test
+    fun whenActionIndexExceedsActionsSizeThenEventIsInvalidAndReturnsUnchangedState() = runTest {
+        val scanStep = ScanStep(
+            broker = testBroker,
+            step = ScanStepActions(
+                stepType = "scan",
+                actions = listOf(testAction),
+                scanType = "initial",
+            ),
+        )
+        val state = State(
+            runType = RunType.MANUAL,
+            brokerStepsToExecute = listOf(scanStep),
+            profileQuery = testProfileQuery,
+            currentBrokerStepIndex = 0,
+            currentActionIndex = 10, // Exceeds actions size (1)
+            stageStatus = PirStageStatus(
+                currentStage = PirStage.OTHER,
+                stageStartMs = 0,
+            ),
+        )
+        val testError = CaptchaServiceError(
+            actionID = testAction.id,
+            errorCode = 500,
+            errorDetails = "Service unavailable",
+        )
+        val event = ErrorReceived(error = testError)
+
+        val result = testee.invoke(state, event)
+
+        assertEquals(state, result.nextState)
+        assertNull(result.nextEvent)
+        assertNull(result.sideEffect)
+    }
+
+    @Test
+    fun whenActionErrorWithMismatchedActionIdThenEventIsInvalidAndReturnsUnchangedState() = runTest {
+        val scanStep = ScanStep(
+            broker = testBroker,
+            step = ScanStepActions(
+                stepType = "scan",
+                actions = listOf(testAction), // testAction.id = "action-1"
+                scanType = "initial",
+            ),
+        )
+        val state = State(
+            runType = RunType.MANUAL,
+            brokerStepsToExecute = listOf(scanStep),
+            profileQuery = testProfileQuery,
+            currentBrokerStepIndex = 0,
+            currentActionIndex = 0,
+            stageStatus = PirStageStatus(
+                currentStage = PirStage.OTHER,
+                stageStartMs = 0,
+            ),
+        )
+        val testError = CaptchaServiceError(
+            actionID = "different-action-id", // Does not match "action-1"
+            errorCode = 500,
+            errorDetails = "Service unavailable",
+        )
+        val event = ErrorReceived(error = testError)
+
+        val result = testee.invoke(state, event)
+
+        assertEquals(state, result.nextState)
+        assertNull(result.nextEvent)
+        assertNull(result.sideEffect)
+    }
+
+    @Test
+    fun whenActionErrorWithMatchingActionIdThenEventIsValidAndReturnsBrokerActionFailed() = runTest {
+        val scanStep = ScanStep(
+            broker = testBroker,
+            step = ScanStepActions(
+                stepType = "scan",
+                actions = listOf(testAction), // testAction.id = "action-1"
+                scanType = "initial",
+            ),
+        )
+        val state = State(
+            runType = RunType.MANUAL,
+            brokerStepsToExecute = listOf(scanStep),
+            profileQuery = testProfileQuery,
+            currentBrokerStepIndex = 0,
+            currentActionIndex = 0,
+            stageStatus = PirStageStatus(
+                currentStage = PirStage.OTHER,
+                stageStartMs = 0,
+            ),
+        )
+        val testError = CaptchaServiceError(
+            actionID = testAction.id, // Matches "action-1"
+            errorCode = 500,
+            errorDetails = "Service unavailable",
+        )
+        val event = ErrorReceived(error = testError)
+
+        val result = testee.invoke(state, event)
+
+        assertEquals(state, result.nextState)
+        val nextEvent = result.nextEvent as BrokerActionFailed
+        assertEquals(testError, nextEvent.error)
+        assertFalse(nextEvent.allowRetry)
+    }
+
+    @Test
+    fun whenNonActionErrorThenEventIsValidRegardlessOfActionId() = runTest {
+        val scanStep = ScanStep(
+            broker = testBroker,
+            step = ScanStepActions(
+                stepType = "scan",
+                actions = listOf(testAction), // testAction.id = "action-1"
+                scanType = "initial",
+            ),
+        )
+        val state = State(
+            runType = RunType.MANUAL,
+            brokerStepsToExecute = listOf(scanStep),
+            profileQuery = testProfileQuery,
+            currentBrokerStepIndex = 0,
+            currentActionIndex = 0,
+            stageStatus = PirStageStatus(
+                currentStage = PirStage.OTHER,
+                stageStartMs = 0,
+            ),
+        )
+        // JsError is not an ActionError, so action ID check is skipped
+        val testError = PirError.JsError.ActionError("Some JS error")
+        val event = ErrorReceived(error = testError)
+
+        val result = testee.invoke(state, event)
+
+        assertEquals(state, result.nextState)
+        val nextEvent = result.nextEvent as BrokerActionFailed
+        assertEquals(testError, nextEvent.error)
+        assertFalse(nextEvent.allowRetry)
     }
 }

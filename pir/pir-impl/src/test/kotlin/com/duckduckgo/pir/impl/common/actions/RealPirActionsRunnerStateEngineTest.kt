@@ -31,6 +31,7 @@ import com.duckduckgo.pir.impl.models.Broker
 import com.duckduckgo.pir.impl.models.ProfileQuery
 import com.duckduckgo.pir.impl.pixels.PirStage
 import com.duckduckgo.pir.impl.scripts.models.PirError
+import com.duckduckgo.pir.impl.scripts.models.PirError.ActionError.JsActionFailed
 import com.duckduckgo.pir.impl.scripts.models.PirScriptRequestData.UserProfile
 import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -843,7 +844,7 @@ class RealPirActionsRunnerStateEngineTest {
     fun whenBrokerActionFailedEventThenHandlerInvoked() = runTest {
         var handlerInvoked = false
         val failedEvent = Event.BrokerActionFailed(
-            error = PirError.ActionFailed("action-1", "Failed"),
+            error = JsActionFailed("action-1", "Failed"),
             allowRetry = true,
         )
 
