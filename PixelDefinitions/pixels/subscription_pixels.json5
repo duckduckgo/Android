@@ -1,14 +1,14 @@
 {
     "subscription_free_trial_start": {
         "description": "Fired when a user starts a free trial. Used to measure total count of trialists independent of whether they complete the trial.",
-        "owners": ["nalcalagarcia"],
+        "owners": ["nalcalag"],
         "triggers": ["other"],
         "suffixes": ["unique", "form_factor"],
         "parameters": ["appVersion"]
     },
     "subscription_free_trial_vpn_activation": {
         "description": "Fired when a user activates VPN while on a free trial. Used to measure how many trialists activate VPN and compare with wide event data.",
-        "owners": ["nalcalagarcia"],
+        "owners": ["nalcalag"],
         "triggers": ["other"],
         "suffixes": ["unique", "form_factor"],
         "parameters": [
