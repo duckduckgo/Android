@@ -299,6 +299,8 @@ import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityResultParams
 import com.duckduckgo.duckchat.api.inputscreen.InputScreenBrowserButtonsConfig
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckchat.impl.ui.DuckChatContextualFragment
+import com.duckduckgo.duckchat.impl.ui.DuckChatContextualFragment.Companion.KEY_DUCK_AI_CONTEXTUAL_RESULT
+import com.duckduckgo.duckchat.impl.ui.DuckChatContextualFragment.Companion.KEY_DUCK_AI_URL
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayerSettingsNoParams
 import com.duckduckgo.js.messaging.api.JsCallbackData
@@ -3286,43 +3288,43 @@ class BrowserTabFragment :
     }
 
     private fun showDuckChatContextualSheet() {
-        // duckAiContextualFragment?.let { fragment ->
-        //     val transaction = childFragmentManager.beginTransaction()
-        //     transaction.show(fragment)
-        //     transaction.commit()
-        // } ?: run {
-        //     val fragment = DuckChatContextualFragment()
-        //     duckAiContextualFragment = fragment
-        //     val transaction = childFragmentManager.beginTransaction()
-        //     transaction.replace(binding.duckAiFragmentContainer.id, fragment)
-        //     transaction.commit()
-        // }
-        //
-        // childFragmentManager.setFragmentResultListener(KEY_DUCK_AI_CONTEXTUAL_RESULT, viewLifecycleOwner) { _, bundle ->
-        //     val contextualChatUrl = bundle.getString(KEY_DUCK_AI_URL)
-        //     contextualChatUrl?.let {
-        //         webView?.loadUrl(contextualChatUrl)
-        //         removeDuckChatContextualSheet()
-        //     }
-        // }
-        //
-        // binding.duckAiFragmentContainer.show()
-        //
-        // val bottomSheetBehavior = BottomSheetBehavior.from(binding.duckAiFragmentContainer)
-        // bottomSheetBehavior.state = duckAiContextualBehaviourState
-        //
-        // bottomSheetBehavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
-        //     override fun onStateChanged(bottomSheet: View, newState: Int) {
-        //         if (newState == BottomSheetBehavior.STATE_HIDDEN) {
-        //             binding.duckAiFragmentContainer.gone()
-        //             hideKeyboard()
-        //         }
-        //         if (newState == BottomSheetBehavior.STATE_HALF_EXPANDED || newState == BottomSheetBehavior.STATE_EXPANDED) {
-        //             duckAiContextualBehaviourState = newState
-        //         }
-        //     }
-        //     override fun onSlide(bottomSheet: View, slideOffset: Float) {}
-        // })
+        duckAiContextualFragment?.let { fragment ->
+            val transaction = childFragmentManager.beginTransaction()
+            transaction.show(fragment)
+            transaction.commit()
+        } ?: run {
+            val fragment = DuckChatContextualFragment()
+            duckAiContextualFragment = fragment
+            val transaction = childFragmentManager.beginTransaction()
+            transaction.replace(binding.duckAiContextualFragmentContainer.id, fragment)
+            transaction.commit()
+        }
+
+        childFragmentManager.setFragmentResultListener(KEY_DUCK_AI_CONTEXTUAL_RESULT, viewLifecycleOwner) { _, bundle ->
+            val contextualChatUrl = bundle.getString(KEY_DUCK_AI_URL)
+            contextualChatUrl?.let {
+                webView?.loadUrl(contextualChatUrl)
+                removeDuckChatContextualSheet()
+            }
+        }
+
+        binding.duckAiContextualFragmentContainer.show()
+
+        val bottomSheetBehavior = BottomSheetBehavior.from(binding.duckAiContextualFragmentContainer)
+        bottomSheetBehavior.state = duckAiContextualBehaviourState
+
+        bottomSheetBehavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
+            override fun onStateChanged(bottomSheet: View, newState: Int) {
+                if (newState == BottomSheetBehavior.STATE_HIDDEN) {
+                    binding.duckAiContextualFragmentContainer.gone()
+                    hideKeyboard()
+                }
+                if (newState == BottomSheetBehavior.STATE_HALF_EXPANDED || newState == BottomSheetBehavior.STATE_EXPANDED) {
+                    duckAiContextualBehaviourState = newState
+                }
+            }
+            override fun onSlide(bottomSheet: View, slideOffset: Float) {}
+        })
     }
 
     private fun removeDuckChatContextualSheet() {
