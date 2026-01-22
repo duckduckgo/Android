@@ -32,6 +32,8 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
+import logcat.logcat
+import retrofit2.HttpException
 import javax.inject.Inject
 import javax.inject.Named
 
@@ -66,7 +68,12 @@ class ApiWideEventSender @Inject constructor(
             context = event.flowEntryPoint?.let { ContextSection(name = it) },
         )
 
-        wideEventService.sendWideEvent(request)
+        try {
+            wideEventService.sendWideEvent(request)
+        } catch (e: HttpException) {
+            logcat { "HttpException on sending wide event. event name: ${event.name}, message: ${e.message()}" }
+            if (e.code() !in 400..499) throw e // Don't throw on client error to avoid retries
+        }
     }
 
     private fun buildFeatureData(event: WideEventRepository.WideEvent): FeatureData? {
