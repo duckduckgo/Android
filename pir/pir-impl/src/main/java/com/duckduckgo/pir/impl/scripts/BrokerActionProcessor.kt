@@ -25,6 +25,7 @@ import com.duckduckgo.pir.impl.scripts.BrokerActionProcessor.ActionResultListene
 import com.duckduckgo.pir.impl.scripts.models.ActionRequest
 import com.duckduckgo.pir.impl.scripts.models.BrokerAction
 import com.duckduckgo.pir.impl.scripts.models.PirError
+import com.duckduckgo.pir.impl.scripts.models.PirError.ActionError.JsActionFailed
 import com.duckduckgo.pir.impl.scripts.models.PirResult
 import com.duckduckgo.pir.impl.scripts.models.PirScriptError
 import com.duckduckgo.pir.impl.scripts.models.PirScriptRequestData
@@ -156,7 +157,7 @@ class RealBrokerActionProcessor(
                 handleSuccess(result.result.success)
             } else if (result?.result?.error != null) {
                 handleError(
-                    PirError.ActionFailed(
+                    JsActionFailed(
                         actionID = result.result.error.actionID,
                         message = result.result.error.message,
                     ),
