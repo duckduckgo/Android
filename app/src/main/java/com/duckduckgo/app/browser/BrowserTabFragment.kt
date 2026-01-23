@@ -1658,7 +1658,7 @@ class BrowserTabFragment :
                     pixel.fire(AppPixelName.EXPERIMENTAL_MENU_DISPLAYED_AICHAT)
                 } else if (omnibar.viewMode == ViewMode.NewTab) {
                     pixel.fire(AppPixelName.EXPERIMENTAL_MENU_DISPLAYED_NTP)
-                } else if (viewState != null && viewState.sslError != NONE) {
+                } else if (viewState != null && (viewState.sslError != NONE || viewState.browserError != OMITTED)) {
                     pixel.fire(AppPixelName.EXPERIMENTAL_MENU_DISPLAYED_ERROR)
                 } else {
                     pixel.fire(AppPixelName.EXPERIMENTAL_MENU_DISPLAYED)
