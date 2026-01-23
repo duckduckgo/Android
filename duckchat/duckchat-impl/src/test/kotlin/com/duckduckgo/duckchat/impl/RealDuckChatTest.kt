@@ -239,7 +239,7 @@ class RealDuckChatTest {
     fun whenObserveAutomaticContextAttachmentUserSettingThenEmitCorrectValues() = runTest {
         whenever(mockDuckChatFeatureRepository.observeAutomaticContextAttachmentUserSettingEnabled()).thenReturn(flowOf(true, false))
 
-        val results = testee.observeAutomaticContextAttachmentUserSetting().take(2).toList()
+        val results = testee.observeAutomaticContextAttachmentUserSettingEnabled().take(2).toList()
 
         assertTrue(results[0])
         assertFalse(results[1])
