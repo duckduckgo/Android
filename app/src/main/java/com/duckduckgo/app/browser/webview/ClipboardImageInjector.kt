@@ -357,9 +357,12 @@ class ClipboardImageInjectorImpl @Inject constructor(
                 else -> "jpg"
             }
 
-            val filename = "clipboard_image_${System.currentTimeMillis()}.$extension"
+            val filename = "$CLIPBOARD_IMAGE_FILENAME.$extension"
 
             if (appBuildConfig.sdkInt >= Build.VERSION_CODES.Q) {
+                // Delete any existing clipboard image with this name
+                deletePreviousMediaStoreImage(filename)
+
                 val contentValues = ContentValues().apply {
                     put(MediaStore.Images.Media.DISPLAY_NAME, filename)
                     put(MediaStore.Images.Media.MIME_TYPE, mimeType)
@@ -385,6 +388,7 @@ class ClipboardImageInjectorImpl @Inject constructor(
             } else {
                 val cacheDir = context.externalCacheDir ?: context.cacheDir
                 val file = File(cacheDir, filename)
+                // File will be overwritten if it exists
                 FileOutputStream(file).use { outputStream ->
                     bitmap.compress(format, 100, outputStream)
                 }
@@ -399,11 +403,33 @@ class ClipboardImageInjectorImpl @Inject constructor(
         }.getOrNull()
     }
 
+    @SuppressLint("DenyListedApi")
+    private fun deletePreviousMediaStoreImage(filename: String) {
+        runCatching {
+            val selection = "${MediaStore.Images.Media.DISPLAY_NAME} = ?"
+            val selectionArgs = arrayOf(filename)
+            val deleted = context.contentResolver.delete(
+                MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                selection,
+                selectionArgs,
+            )
+            if (deleted > 0) {
+                logcat { "ClipboardImageInjector: Deleted previous clipboard image: $deleted rows" }
+            }
+        }.onFailure { e ->
+            logcat { "ClipboardImageInjector: Failed to delete previous clipboard image: ${e.message}" }
+        }
+    }
+
     private suspend fun getPolyfillScript(): String {
         return withContext(dispatcherProvider.io()) {
             context.resources.openRawResource(R.raw.clipboard_polyfill)
                 .bufferedReader()
                 .use { it.readText() }
         }
+    }
+
+    companion object {
+        private const val CLIPBOARD_IMAGE_FILENAME = "ddg_clipboard_image"
     }
 }
