@@ -20,8 +20,8 @@ import android.content.Context
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrowserPrompts
 import com.duckduckgo.app.browser.newtab.LowPriorityMessage.DefaultBrowserMessage
-import com.duckduckgo.app.browser.newtab.NewTabPageViewModel.Command
-import com.duckduckgo.app.browser.newtab.NewTabPageViewModel.Command.LaunchDefaultBrowser
+import com.duckduckgo.app.browser.newtab.NewTabLegacyPageViewModel.Command
+import com.duckduckgo.app.browser.newtab.NewTabLegacyPageViewModel.Command.LaunchDefaultBrowser
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.ui.view.MessageCta.Message

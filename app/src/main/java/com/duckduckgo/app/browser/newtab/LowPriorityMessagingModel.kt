@@ -16,7 +16,7 @@
 
 package com.duckduckgo.app.browser.newtab
 
-import com.duckduckgo.app.browser.newtab.NewTabPageViewModel.Command
+import com.duckduckgo.app.browser.newtab.NewTabLegacyPageViewModel.Command
 
 interface LowPriorityMessagingModel {
     suspend fun getMessage(): LowPriorityMessage?
