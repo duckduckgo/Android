@@ -377,15 +377,25 @@ class ClipboardImageInjectorImpl @Inject constructor(
                     contentValues,
                 )
 
-                uri?.let {
-                    context.contentResolver.openOutputStream(it)?.use { outputStream ->
-                        bitmap.compress(format, 100, outputStream)
-                    }
-
-                    contentValues.clear()
-                    contentValues.put(MediaStore.Images.Media.IS_PENDING, 0)
-                    context.contentResolver.update(it, contentValues, null, null)
+                if (uri == null) {
+                    logcat { "ClipboardImageInjector: Failed to insert into MediaStore" }
+                    return@runCatching null
                 }
+
+                val outputStream = context.contentResolver.openOutputStream(uri)
+                if (outputStream == null) {
+                    logcat { "ClipboardImageInjector: Failed to open output stream, deleting invalid entry" }
+                    context.contentResolver.delete(uri, null, null)
+                    return@runCatching null
+                }
+
+                outputStream.use {
+                    bitmap.compress(format, 100, it)
+                }
+
+                contentValues.clear()
+                contentValues.put(MediaStore.Images.Media.IS_PENDING, 0)
+                context.contentResolver.update(uri, contentValues, null, null)
 
                 uri
             } else {
