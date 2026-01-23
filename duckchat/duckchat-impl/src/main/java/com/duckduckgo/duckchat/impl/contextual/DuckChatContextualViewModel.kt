@@ -16,8 +16,35 @@
 
 package com.duckduckgo.duckchat.impl.contextual
 
+import androidx.lifecycle.ViewModel
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.js.messaging.api.SubscriptionEventData
+import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.receiveAsFlow
+import javax.inject.Inject
 
 @ContributesViewModel(FragmentScope::class)
-class DuckChatContextualViewModel
+class DuckChatContextualViewModel @Inject constructor(
+    private val pageContextRepository: PageContextRepository,
+    private val dispatchers: DispatcherProvider,
+) : ViewModel() {
+
+    private val commandChannel = Channel<Command>(capacity = 1, onBufferOverflow = DROP_OLDEST)
+    val commands = commandChannel.receiveAsFlow()
+
+    private val _subscriptionEventDataChannel = Channel<SubscriptionEventData>(capacity = Channel.BUFFERED)
+    val subscriptionEventDataFlow = _subscriptionEventDataChannel.receiveAsFlow()
+
+    sealed class Command {
+        data object SendSubscriptionAuthUpdateEvent : Command()
+    }
+
+    data class ViewState(
+        val pageTitle: String,
+        val pageUrl: String,
+        val tabId: String,
+    )
+}

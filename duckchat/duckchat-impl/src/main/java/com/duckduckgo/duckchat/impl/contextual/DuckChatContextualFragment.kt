@@ -19,7 +19,6 @@ package com.duckduckgo.duckchat.impl.contextual
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -33,7 +32,6 @@ import android.view.KeyEvent
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
-import android.view.inputmethod.InputMethodManager
 import android.webkit.CookieManager
 import android.webkit.MimeTypeMap
 import android.webkit.ValueCallback
@@ -46,7 +44,9 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.setFragmentResult
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
@@ -76,7 +76,6 @@ import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
 import com.duckduckgo.duckchat.impl.helper.Mode
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper
 import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewClient
-import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewViewModel
 import com.duckduckgo.duckchat.impl.ui.SubscriptionsHandler
 import com.duckduckgo.duckchat.impl.ui.filechooser.FileChooserIntentBuilder
 import com.duckduckgo.duckchat.impl.ui.filechooser.capture.camera.CameraHardwareChecker
@@ -109,8 +108,8 @@ class DuckChatContextualFragment :
     @Inject
     lateinit var viewModelFactory: FragmentViewModelFactory
 
-    private val viewModel: DuckChatWebViewViewModel by lazy {
-        ViewModelProvider(this, viewModelFactory)[DuckChatWebViewViewModel::class.java]
+    private val viewModel: DuckChatContextualViewModel by lazy {
+        ViewModelProvider(this, viewModelFactory)[DuckChatContextualViewModel::class.java]
     }
 
     @Inject
@@ -166,6 +165,9 @@ class DuckChatContextualFragment :
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
 
+    @Inject
+    lateinit var faviconManager: FaviconManager
+
     private val cookieManager: CookieManager by lazy { CookieManager.getInstance() }
 
     private var pendingFileDownload: FileDownloader.PendingFileDownload? = null
@@ -185,8 +187,6 @@ class DuckChatContextualFragment :
     }
 
     private var sheetMode = SheetMode.INPUT
-    private val contextualPageTitle get() = requireArguments().getString(KEY_DUCK_AI_CONTEXTUAL_PAGE_TITLE)
-    private val contextualPageUrl get() = requireArguments().getString(KEY_DUCK_AI_CONTEXTUAL_PAGE_URL)
 
     @SuppressLint("SetJavaScriptEnabled")
     override fun onViewCreated(
@@ -207,11 +207,7 @@ class DuckChatContextualFragment :
                     view?.requestFocusNodeHref(resultMsg)
                     val newWindowUrl = resultMsg?.data?.getString("url")
                     if (newWindowUrl != null) {
-                        if (viewModel.handleOnSameWebView(newWindowUrl)) {
-                            simpleWebview.loadUrl(newWindowUrl)
-                        } else {
-                            startActivity(browserNav.openInNewTab(requireContext(), newWindowUrl))
-                        }
+                        startActivity(browserNav.openInNewTab(requireContext(), newWindowUrl))
                         return true
                     }
                     return false
@@ -271,14 +267,6 @@ class DuckChatContextualFragment :
                                     duckChatJSHelper.processJsCallbackMessage(featureName, method, id, data, Mode.CONTEXTUAL)?.let { response ->
                                         logcat { "Duck.ai: response $response" }
                                         withContext(dispatcherProvider.main()) {
-                                            if (response.method == RealDuckChatJSHelper.Companion.METHOD_OPEN_KEYBOARD) {
-                                                simpleWebview.evaluateJavascript(
-                                                    response.params.get(RealDuckChatJSHelper.Companion.SELECTOR)
-                                                        .toString(),
-                                                    null,
-                                                )
-                                                showSoftKeyboard()
-                                            }
                                             contentScopeScripts.onResponse(response)
                                         }
                                     }
@@ -311,6 +299,7 @@ class DuckChatContextualFragment :
                         Uri.fromFile(it.file),
                     ),
                 )
+
                 is UploadFromExternalMediaAppLauncher.MediaCaptureResult.CouldNotCapturePermissionDenied -> {
                     pendingUploadTask?.onReceiveValue(null)
                     externalCameraLauncher.showPermissionRationaleDialog(requireActivity(), it.inputAction)
@@ -424,7 +413,6 @@ class DuckChatContextualFragment :
                 setFragmentResult(KEY_DUCK_AI_CONTEXTUAL_RESULT, result)
             }
         }
-        binding.duckAiContextualPageTitle.text = contextualPageTitle
         binding.duckAiContextualPageRemove.setOnClickListener {
             binding.duckAiContextualLayout.gone()
             binding.duckAiContextualAddAttachment.show()
@@ -436,6 +424,8 @@ class DuckChatContextualFragment :
         binding.contextualPromptSummarize.setOnClickListener {
             binding.inputField.setText(binding.contextualPromptSummarize.text.toString())
         }
+
+        renderPageContext()
     }
 
     private fun sendPrompt(bottomSheetBehavior: BottomSheetBehavior<View>) {
@@ -459,7 +449,7 @@ class DuckChatContextualFragment :
         viewModel.commands
             .onEach { command ->
                 when (command) {
-                    is DuckChatWebViewViewModel.Command.SendSubscriptionAuthUpdateEvent -> {
+                    is DuckChatContextualViewModel.Command.SendSubscriptionAuthUpdateEvent -> {
                         val authUpdateEvent = SubscriptionEventData(
                             featureName = SUBSCRIPTIONS_FEATURE_NAME,
                             subscriptionName = "authUpdate",
@@ -471,21 +461,23 @@ class DuckChatContextualFragment :
             }.launchIn(lifecycleScope)
     }
 
+    private fun renderPageContext() {
+        requireArguments().getString(KEY_DUCK_AI_CONTEXTUAL_PAGE_TITLE)?.let {
+            binding.duckAiContextualPageTitle.text = it
+        }
+        val pageUrl = requireArguments().getString(KEY_DUCK_AI_CONTEXTUAL_PAGE_URL)
+        val tabId = requireArguments().getString(KEY_DUCK_AI_CONTEXTUAL_TAB_ID)
+        if (pageUrl != null && tabId != null) {
+            viewModel.viewModelScope.launch {
+                faviconManager.loadToViewFromLocalWithPlaceholder(tabId, pageUrl, binding.duckAiContextualFavicon)
+            }
+        }
+    }
+
     data class FileChooserRequestedParams(
         val filePickingMode: Int,
         val acceptMimeTypes: List<String>,
     )
-
-    private fun showSoftKeyboard() {
-        simpleWebview.requestFocus()
-        val imm = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
-        imm?.showSoftInput(simpleWebview, InputMethodManager.SHOW_IMPLICIT)
-    }
-
-    private fun hideSoftKeyboard() {
-        val imm = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
-        imm?.hideSoftInputFromWindow(simpleWebview.windowToken, 0)
-    }
 
     fun showFileChooser(
         filePathCallback: ValueCallback<Array<Uri>>,
@@ -606,25 +598,8 @@ class DuckChatContextualFragment :
     }
 
     fun onBackPressed(): Boolean {
-        if (!isVisible) return false
-
-        if (!simpleWebview.canGoBack()) {
-            exit()
-            return true
-        }
-
-        val history = simpleWebview.copyBackForwardList()
-        if (viewModel.shouldCloseDuckChat(history)) {
-            exit()
-        } else {
-            simpleWebview.goBack()
-        }
+        binding.contextualClose.performClick()
         return true
-    }
-
-    private fun exit() {
-        hideSoftKeyboard()
-        duckChat.closeDuckChat()
     }
 
     override fun continueDownload(pendingFileDownload: FileDownloader.PendingFileDownload) {
@@ -780,5 +755,6 @@ class DuckChatContextualFragment :
 
         const val KEY_DUCK_AI_CONTEXTUAL_PAGE_TITLE: String = "KEY_DUCK_AI_CONTEXTUAL_PAGE_TITLE"
         const val KEY_DUCK_AI_CONTEXTUAL_PAGE_URL: String = "KEY_DUCK_AI_CONTEXTUAL_PAGE_URL"
+        const val KEY_DUCK_AI_CONTEXTUAL_TAB_ID: String = "KEY_DUCK_AI_CONTEXTUAL_TAB_ID"
     }
 }
