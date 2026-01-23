@@ -319,6 +319,8 @@ import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.impl.contextual.PageContextJSHelper
+import com.duckduckgo.duckchat.impl.contextual.RealPageContextJSHelper.Companion.PAGE_CONTEXT_FEATURE_NAME
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
 import com.duckduckgo.duckchat.impl.helper.NativeAction
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper.Companion.DUCK_CHAT_FEATURE_NAME
@@ -490,6 +492,7 @@ class BrowserTabViewModel @Inject constructor(
     private val omnibarRepository: OmnibarRepository,
     private val contentScopeScriptsSubscriptionEventPluginPoint: PluginPoint<ContentScopeScriptsSubscriptionEventPlugin>,
     private val serpSettingsFeature: SerpSettingsFeature,
+    private val pageContextJSHelper: PageContextJSHelper,
     private val syncStatusChangedObserver: SyncStatusChangedObserver,
 ) : ViewModel(),
     WebViewClientListener,
@@ -3279,10 +3282,12 @@ class BrowserTabViewModel @Inject constructor(
             is Omnibar.ViewMode.DuckAI -> {
                 pixel.fire(DuckChatPixelName.DUCK_CHAT_TAB_SWITCHER_OPENED)
             }
+
             is Omnibar.ViewMode.NewTab -> {
                 val params = mapOf(PixelParameter.FROM_FOCUSED_NTP to hasFocus.toString())
                 pixel.fire(AppPixelName.TAB_MANAGER_OPENED_FROM_NEW_TAB, parameters = params)
             }
+
             else -> {
                 val url = site?.url
                 if (url != null) {
@@ -4033,7 +4038,6 @@ class BrowserTabViewModel @Inject constructor(
             DUCK_CHAT_FEATURE_NAME -> {
                 viewModelScope.launch(dispatchers.io()) {
                     val response = duckChatJSHelper.processJsCallbackMessage(featureName, method, id, data)
-                    logcat { "Duck.ai: btf response $response" }
                     withContext(dispatchers.main()) {
                         response?.let {
                             command.value = SendResponseToJs(it)
@@ -4045,6 +4049,17 @@ class BrowserTabViewModel @Inject constructor(
             SUBSCRIPTIONS_FEATURE_NAME -> {
                 viewModelScope.launch(dispatchers.io()) {
                     val response = subscriptionsJSHelper.processJsCallbackMessage(featureName, method, id, data, context)
+                    withContext(dispatchers.main()) {
+                        response?.let {
+                            command.value = SendResponseToJs(it)
+                        }
+                    }
+                }
+            }
+
+            PAGE_CONTEXT_FEATURE_NAME -> {
+                viewModelScope.launch(dispatchers.io()) {
+                    val response = pageContextJSHelper.processJsCallbackMessage(featureName, method, id, data)
                     withContext(dispatchers.main()) {
                         response?.let {
                             command.value = SendResponseToJs(it)
@@ -4568,7 +4583,11 @@ class BrowserTabViewModel @Inject constructor(
                         val contextualTitle = title
                         if (contextualUrl != null && contextualTitle != null) {
                             command.value = Command.ShowDuckAIContextualMode(contextualUrl, contextualTitle)
-                        }
+                            viewModelScope.launch {
+                                val subscriptionEvent = pageContextJSHelper.onContextualOpened()
+                                _subscriptionEventDataChannel.send(subscriptionEvent)
+                            }
+                            }
                     } else {
                         command.value = Command.ShowDuckAIContextualOnboarding
                     }
