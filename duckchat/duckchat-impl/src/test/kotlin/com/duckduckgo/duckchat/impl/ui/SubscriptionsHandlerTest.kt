@@ -79,7 +79,7 @@ class SubscriptionsHandlerTest {
         val id = "testId"
         val data = JSONObject()
         val response = JsCallbackData(JSONObject(), featureName, method, id)
-        whenever(subscriptionsJSHelper.processJsCallbackMessage(featureName, method, id, data))
+        whenever(subscriptionsJSHelper.processJsCallbackMessage(featureName, method, id, data, null))
             .thenReturn(response)
 
         subscriptionsHandler.handleSubscriptionsFeature(
@@ -92,7 +92,7 @@ class SubscriptionsHandlerTest {
             contentScopeScripts,
         )
 
-        verify(subscriptionsJSHelper).processJsCallbackMessage(featureName, method, id, data)
+        verify(subscriptionsJSHelper).processJsCallbackMessage(featureName, method, id, data, null)
         verify(contentScopeScripts).onResponse(response)
     }
 
@@ -102,7 +102,7 @@ class SubscriptionsHandlerTest {
         val method = "someMethod"
         val id = "testId"
         val data = JSONObject()
-        whenever(subscriptionsJSHelper.processJsCallbackMessage(featureName, method, id, data))
+        whenever(subscriptionsJSHelper.processJsCallbackMessage(featureName, method, id, data, null))
             .thenReturn(null)
 
         subscriptionsHandler.handleSubscriptionsFeature(
@@ -115,7 +115,7 @@ class SubscriptionsHandlerTest {
             contentScopeScripts,
         )
 
-        verify(subscriptionsJSHelper).processJsCallbackMessage(featureName, method, id, data)
+        verify(subscriptionsJSHelper).processJsCallbackMessage(featureName, method, id, data, null)
         verify(contentScopeScripts, never()).onResponse(any())
     }
 
@@ -126,7 +126,7 @@ class SubscriptionsHandlerTest {
         val id = "testId"
         val data = JSONObject()
         val response = JsCallbackData(JSONObject(), featureName, method, id)
-        whenever(subscriptionsJSHelper.processJsCallbackMessage(featureName, method, id, data))
+        whenever(subscriptionsJSHelper.processJsCallbackMessage(featureName, method, id, data, null))
             .thenReturn(response)
 
         subscriptionsHandler.handleSubscriptionsFeature(
@@ -149,7 +149,7 @@ class SubscriptionsHandlerTest {
         val id = "testId"
         val data = JSONObject()
         val response = JsCallbackData(JSONObject(), featureName, method, id)
-        whenever(subscriptionsJSHelper.processJsCallbackMessage(featureName, method, id, data))
+        whenever(subscriptionsJSHelper.processJsCallbackMessage(featureName, method, id, data, null))
             .thenReturn(response)
 
         subscriptionsHandler.handleSubscriptionsFeature(
@@ -172,7 +172,7 @@ class SubscriptionsHandlerTest {
         val id = "testId"
         val data = JSONObject()
         val response = JsCallbackData(JSONObject(), featureName, method, id)
-        whenever(subscriptionsJSHelper.processJsCallbackMessage(featureName, method, id, data))
+        whenever(subscriptionsJSHelper.processJsCallbackMessage(featureName, method, id, data, null))
             .thenReturn(response)
 
         subscriptionsHandler.handleSubscriptionsFeature(
@@ -195,7 +195,7 @@ class SubscriptionsHandlerTest {
         val id = "testId"
         val data = JSONObject("{\"origin\": \"duckai_chat\"}")
         val response = JsCallbackData(JSONObject(), featureName, method, id)
-        whenever(subscriptionsJSHelper.processJsCallbackMessage(featureName, method, id, data))
+        whenever(subscriptionsJSHelper.processJsCallbackMessage(featureName, method, id, data, null))
             .thenReturn(response)
 
         subscriptionsHandler.handleSubscriptionsFeature(
@@ -218,7 +218,7 @@ class SubscriptionsHandlerTest {
         val id = "testId"
         val data = JSONObject("{\"origin\": \"\"}")
         val response = JsCallbackData(JSONObject(), featureName, method, id)
-        whenever(subscriptionsJSHelper.processJsCallbackMessage(featureName, method, id, data))
+        whenever(subscriptionsJSHelper.processJsCallbackMessage(featureName, method, id, data, null))
             .thenReturn(response)
 
         subscriptionsHandler.handleSubscriptionsFeature(
@@ -241,7 +241,7 @@ class SubscriptionsHandlerTest {
         val id = "testId"
         val data: JSONObject? = null
         val response = JsCallbackData(JSONObject(), featureName, method, id)
-        whenever(subscriptionsJSHelper.processJsCallbackMessage(featureName, method, id, data))
+        whenever(subscriptionsJSHelper.processJsCallbackMessage(featureName, method, id, data, null))
             .thenReturn(response)
 
         subscriptionsHandler.handleSubscriptionsFeature(
@@ -264,7 +264,7 @@ class SubscriptionsHandlerTest {
         val id = "testId"
         val data: JSONObject? = null
         val response = JsCallbackData(JSONObject(), featureName, method, id)
-        whenever(subscriptionsJSHelper.processJsCallbackMessage(featureName, method, id, data))
+        whenever(subscriptionsJSHelper.processJsCallbackMessage(featureName, method, id, data, null))
             .thenReturn(response)
 
         subscriptionsHandler.handleSubscriptionsFeature(
@@ -277,7 +277,7 @@ class SubscriptionsHandlerTest {
             contentScopeScripts,
         )
 
-        verify(subscriptionsJSHelper).processJsCallbackMessage(featureName, method, id, data)
+        verify(subscriptionsJSHelper).processJsCallbackMessage(featureName, method, id, data, null)
         verify(globalActivityStarter).start(context, SubscriptionsSettingsScreenWithEmptyParams)
     }
 
@@ -288,7 +288,7 @@ class SubscriptionsHandlerTest {
         val id: String? = null
         val data = JSONObject()
         val response = JsCallbackData(JSONObject(), featureName, method, "")
-        whenever(subscriptionsJSHelper.processJsCallbackMessage(featureName, method, id, data))
+        whenever(subscriptionsJSHelper.processJsCallbackMessage(featureName, method, id, data, null))
             .thenReturn(response)
 
         subscriptionsHandler.handleSubscriptionsFeature(
@@ -301,7 +301,7 @@ class SubscriptionsHandlerTest {
             contentScopeScripts,
         )
 
-        verify(subscriptionsJSHelper).processJsCallbackMessage(featureName, method, id, data)
+        verify(subscriptionsJSHelper).processJsCallbackMessage(featureName, method, id, data, null)
         verify(globalActivityStarter).start(context, SubscriptionPurchase(featurePage = "duckai"))
     }
 }

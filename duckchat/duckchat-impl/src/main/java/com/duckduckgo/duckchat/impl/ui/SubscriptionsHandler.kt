@@ -48,6 +48,13 @@ class SubscriptionsHandler @Inject constructor(
         contentScopeScripts: JsMessaging,
     ) {
         appCoroutineScope.launch(dispatcherProvider.io()) {
+            val response = subscriptionsJSHelper.processJsCallbackMessage(featureName, method, id, data, null)
+            withContext(dispatcherProvider.main()) {
+                response?.let {
+                    contentScopeScripts.onResponse(response)
+                }
+            }
+
             when (method) {
                 METHOD_BACK_TO_SETTINGS -> {
                     withContext(dispatcherProvider.main()) {
