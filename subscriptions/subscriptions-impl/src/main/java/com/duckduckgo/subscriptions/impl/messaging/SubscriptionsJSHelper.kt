@@ -16,9 +16,14 @@
 
 package com.duckduckgo.subscriptions.impl.messaging
 
+import android.content.Context
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.js.messaging.api.JsCallbackData
+import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.subscriptions.api.SubscriptionScreens.RestoreSubscriptionScreenWithParams
+import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionPurchase
+import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionsSettingsScreenWithEmptyParams
 import com.duckduckgo.subscriptions.api.SubscriptionsJSHelper
 import com.duckduckgo.subscriptions.impl.AccessTokenResult
 import com.duckduckgo.subscriptions.impl.PrivacyProFeature
@@ -33,14 +38,18 @@ import javax.inject.Inject
 class RealSubscriptionsJSHelper @Inject constructor(
     private val subscriptionsManager: SubscriptionsManager,
     private val privacyProFeature: PrivacyProFeature,
+    private val globalActivityStarter: GlobalActivityStarter,
     private val dispatcherProvider: DispatcherProvider,
 ) : SubscriptionsJSHelper {
+
+    private val defaultDuckAiSubscriptionPurchase = SubscriptionPurchase(featurePage = DUCK_AI_FEATURE_PAGE)
 
     override suspend fun processJsCallbackMessage(
         featureName: String,
         method: String,
         id: String?,
         data: JSONObject?,
+        context: Context?,
     ): JsCallbackData? = withContext(dispatcherProvider.io()) {
         when (method) {
             METHOD_HANDSHAKE -> id?.let {
@@ -78,6 +87,41 @@ class RealSubscriptionsJSHelper @Inject constructor(
             METHOD_GET_FEATURE_CONFIG -> id?.let {
                 if (privacyProFeature.duckAISubscriptionMessaging().isEnabled().not()) return@withContext null
                 getFeatureConfigData(featureName, method, it)
+            }
+
+            METHOD_BACK_TO_SETTINGS -> {
+                withContext(dispatcherProvider.main()) {
+                    context?.let {
+                        globalActivityStarter.start(context, SubscriptionsSettingsScreenWithEmptyParams)
+                    }
+                    return@withContext null
+                }
+            }
+
+            METHOD_OPEN_SUBSCRIPTION_ACTIVATION -> {
+                withContext(dispatcherProvider.main()) {
+                    context?.let {
+                        globalActivityStarter.start(context, RestoreSubscriptionScreenWithParams(isOriginWeb = true))
+                    }
+                    return@withContext null
+                }
+            }
+
+            METHOD_OPEN_SUBSCRIPTION_PURCHASE -> {
+                val subscriptionParams = runCatching {
+                    data?.getString(MESSAGE_PARAM_ORIGIN_KEY)
+                        .takeUnless { it.isNullOrBlank() }
+                        ?.let { nonEmptyOrigin ->
+                            defaultDuckAiSubscriptionPurchase.copy(origin = nonEmptyOrigin)
+                        } ?: defaultDuckAiSubscriptionPurchase
+                }.getOrDefault(defaultDuckAiSubscriptionPurchase)
+
+                withContext(dispatcherProvider.main()) {
+                    context?.let {
+                        globalActivityStarter.start(context, subscriptionParams)
+                    }
+                }
+                return@withContext null
             }
 
             else -> null
@@ -153,5 +197,10 @@ class RealSubscriptionsJSHelper @Inject constructor(
         private const val STATUS = "status"
         private const val ACCESS_TOKEN = "accessToken"
         private const val USE_PAID_DUCK_AI = "usePaidDuckAi"
+        private const val METHOD_BACK_TO_SETTINGS = "backToSettings"
+        private const val METHOD_OPEN_SUBSCRIPTION_ACTIVATION = "openSubscriptionActivation"
+        private const val METHOD_OPEN_SUBSCRIPTION_PURCHASE = "openSubscriptionPurchase"
+        private const val MESSAGE_PARAM_ORIGIN_KEY = "origin"
+        private const val DUCK_AI_FEATURE_PAGE = "duckai"
     }
 }

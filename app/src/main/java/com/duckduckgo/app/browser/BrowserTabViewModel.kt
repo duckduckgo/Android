@@ -17,6 +17,7 @@
 package com.duckduckgo.app.browser
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
 import android.net.http.SslCertificate
@@ -3875,6 +3876,7 @@ class BrowserTabViewModel @Inject constructor(
         id: String?,
         data: JSONObject?,
         isActiveCustomTab: Boolean = false,
+        context: Context? = null,
         getWebViewUrl: () -> String?,
     ) {
         logcat { "jsCallback $featureName $method $data" }
@@ -3956,7 +3958,7 @@ class BrowserTabViewModel @Inject constructor(
 
             SUBSCRIPTIONS_FEATURE_NAME -> {
                 viewModelScope.launch(dispatchers.io()) {
-                    val response = subscriptionsJSHelper.processJsCallbackMessage(featureName, method, id, data)
+                    val response = subscriptionsJSHelper.processJsCallbackMessage(featureName, method, id, data, context)
                     withContext(dispatchers.main()) {
                         response?.let {
                             command.value = SendResponseToJs(it)
