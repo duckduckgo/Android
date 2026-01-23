@@ -48,6 +48,8 @@ class DuckChatContentScopeJsMessageHandler @Inject constructor() : ContentScopeJ
             override val featureName: String = "aiChat"
             override val methods: List<String> =
                 listOf(
+                    "getAIChatPageContext",
+                    "getPageContext",
                     "getAIChatNativeHandoffData",
                     "getAIChatNativeConfigValues",
                     "openAIChat",
