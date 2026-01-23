@@ -204,6 +204,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:padding="@dimen/keyline_2"
+                    android:layout_marginTop="@dimen/keyline_2"
                     android:background="@drawable/background_large_rounded_surface">
 
                     <com.google.android.material.imageview.ShapeableImageView
