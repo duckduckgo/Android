@@ -1,5 +1,5 @@
 project(crash-ndk)
-cmake_minimum_required(VERSION 3.4.1)
+cmake_minimum_required(VERSION 5.
 
 add_library( # Sets the name of the library.
         crash-ndk
