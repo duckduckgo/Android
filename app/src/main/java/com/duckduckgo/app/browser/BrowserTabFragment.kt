@@ -3345,7 +3345,7 @@ class BrowserTabFragment :
         childFragmentManager.setFragmentResultListener(KEY_DUCK_AI_CONTEXTUAL_RESULT, viewLifecycleOwner) { _, bundle ->
             val contextualChatUrl = bundle.getString(KEY_DUCK_AI_URL)
             contextualChatUrl?.let {
-                webView?.loadUrl(contextualChatUrl)
+                viewModel.onUserSubmittedQuery(contextualChatUrl)
                 removeDuckChatContextualSheet()
             }
         }
