@@ -647,7 +647,7 @@ class RealPirPixelSender @Inject constructor(
         linkAgeMs: Long,
     ) {
         val params = mapOf(
-            PARAM_BROKER_URL to brokerUrl,
+            PARAM_KEY_BROKER to brokerUrl,
             PARAM_BROKER_VERSION to brokerVersion,
             PARAM_LINK_AGE to linkAgeMs.toString(),
         )
@@ -661,7 +661,7 @@ class RealPirPixelSender @Inject constructor(
         errorCode: String,
     ) {
         val params = mapOf(
-            PARAM_BROKER_URL to brokerUrl,
+            PARAM_KEY_BROKER to brokerUrl,
             PARAM_BROKER_VERSION to brokerVersion,
             PARAM_STATUS to status,
             PARAM_ERROR_CODE to errorCode,
@@ -677,7 +677,7 @@ class RealPirPixelSender @Inject constructor(
         tries: Int,
     ) {
         val params = mapOf(
-            PARAM_BROKER_URL to brokerUrl,
+            PARAM_KEY_BROKER to brokerUrl,
             PARAM_BROKER_VERSION to brokerVersion,
             PARAM_ACTION_ID to actionId,
             PARAM_DURATION to durationMs.toString(),
@@ -693,7 +693,7 @@ class RealPirPixelSender @Inject constructor(
         actionId: String,
     ) {
         val params = mapOf(
-            PARAM_BROKER_URL to brokerUrl,
+            PARAM_KEY_BROKER to brokerUrl,
             PARAM_BROKER_VERSION to brokerVersion,
             PARAM_ATTEMPT_NUMBER to attemptNumber.toString(),
             PARAM_ACTION_ID to actionId,
@@ -709,7 +709,7 @@ class RealPirPixelSender @Inject constructor(
         durationMs: Long,
     ) {
         val params = mapOf(
-            PARAM_BROKER_URL to brokerUrl,
+            PARAM_KEY_BROKER to brokerUrl,
             PARAM_BROKER_VERSION to brokerVersion,
             PARAM_ATTEMPT_NUMBER to attemptNumber.toString(),
             PARAM_ACTION_ID to actionId,
@@ -726,7 +726,7 @@ class RealPirPixelSender @Inject constructor(
         durationMs: Long,
     ) {
         val params = mapOf(
-            PARAM_BROKER_URL to brokerUrl,
+            PARAM_KEY_BROKER to brokerUrl,
             PARAM_BROKER_VERSION to brokerVersion,
             PARAM_ATTEMPT_NUMBER to attemptNumber.toString(),
             PARAM_ACTION_ID to actionId,
@@ -741,7 +741,7 @@ class RealPirPixelSender @Inject constructor(
         actionId: String,
     ) {
         val params = mapOf(
-            PARAM_BROKER_URL to brokerUrl,
+            PARAM_KEY_BROKER to brokerUrl,
             PARAM_BROKER_VERSION to brokerVersion,
             PARAM_ACTION_ID to actionId,
         )
@@ -753,7 +753,7 @@ class RealPirPixelSender @Inject constructor(
         brokerVersion: String,
     ) {
         val params = mapOf(
-            PARAM_BROKER_URL to brokerUrl,
+            PARAM_KEY_BROKER to brokerUrl,
             PARAM_BROKER_VERSION to brokerVersion,
         )
         fire(PIR_EMAIL_CONFIRMATION_JOB_SUCCESS, params)
@@ -1294,7 +1294,7 @@ class RealPirPixelSender @Inject constructor(
         brokerVersion: String,
     ) {
         val params = mapOf(
-            PARAM_BROKER_URL to brokerUrl,
+            PARAM_KEY_BROKER to brokerUrl,
             PARAM_BROKER_VERSION to brokerVersion,
         )
         fire(PIR_SCAN_INVALID_EVENT, params)
@@ -1305,7 +1305,7 @@ class RealPirPixelSender @Inject constructor(
         brokerVersion: String,
     ) {
         val params = mapOf(
-            PARAM_BROKER_URL to brokerUrl,
+            PARAM_KEY_BROKER to brokerUrl,
             PARAM_BROKER_VERSION to brokerVersion,
         )
         fire(PIR_OPTOUT_INVALID_EVENT, params)
@@ -1324,7 +1324,6 @@ class RealPirPixelSender @Inject constructor(
     companion object {
         private const val PARAM_KEY_TOTAL_TIME = "totalTimeInMillis"
         private const val PARAM_KEY_CPU_USAGE = "cpuUsage"
-        private const val PARAM_BROKER_URL = "data_broker_url"
         private const val PARAM_BROKER_VERSION = "broker_version"
         private const val PARAM_LINK_AGE = "link_age_ms"
         private const val PARAM_STATUS = "status"
