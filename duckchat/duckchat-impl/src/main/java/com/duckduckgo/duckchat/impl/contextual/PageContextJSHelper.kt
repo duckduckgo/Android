@@ -17,20 +17,20 @@
 package com.duckduckgo.duckchat.impl.contextual
 
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.squareup.anvil.annotations.ContributesBinding
+import logcat.logcat
 import org.json.JSONObject
 import javax.inject.Inject
 
 interface PageContextJSHelper {
 
-    suspend fun processJsCallbackMessage(
+    suspend fun processPageContext(
         featureName: String,
         method: String,
         data: JSONObject?,
         tabId: String,
-    ): JsCallbackData?
+    )
 
     fun onContextualOpened(): SubscriptionEventData
 }
@@ -39,23 +39,28 @@ interface PageContextJSHelper {
 class RealPageContextJSHelper @Inject constructor(
     private val pageContextRepository: PageContextRepository,
 ) : PageContextJSHelper {
-    override suspend fun processJsCallbackMessage(
+    override suspend fun processPageContext(
         featureName: String,
         method: String,
         data: JSONObject?,
         tabId: String,
-    ): JsCallbackData? {
+    ) {
+        logcat { "PageContextJSHelper: received feature=$featureName method=$method tab=$tabId hasData=${data != null}" }
         if (method != METHOD_COLLECTION_RESULT) {
-            return null
+            logcat { "PageContextJSHelper: Ignoring method=$method for feature=$featureName" }
+            return
         }
 
         val serializedPageData = data?.optString(KEY_SERIALIZED_PAGE_DATA, null)
         if (!serializedPageData.isNullOrBlank()) {
             pageContextRepository.update(tabId, serializedPageData)
+            logcat { "PageContextJSHelper: Stored page context for tab=$tabId (length=${serializedPageData.length})" }
         } else if (data?.optBoolean(KEY_SUCCESS, true) == false) {
             pageContextRepository.clear(tabId)
+            logcat { "PageContextJSHelper: Clear requested for tab=$tabId" }
+        } else {
+            logcat { "PageContextJSHelper: No page context provided for tab=$tabId rawData=$data" }
         }
-        return null
     }
 
     override fun onContextualOpened(): SubscriptionEventData {

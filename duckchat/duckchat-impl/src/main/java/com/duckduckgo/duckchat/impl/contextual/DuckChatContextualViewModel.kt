@@ -17,13 +17,20 @@
 package com.duckduckgo.duckchat.impl.contextual
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import logcat.logcat
+import org.json.JSONObject
 import javax.inject.Inject
 
 @ContributesViewModel(FragmentScope::class)
@@ -40,11 +47,41 @@ class DuckChatContextualViewModel @Inject constructor(
 
     sealed class Command {
         data object SendSubscriptionAuthUpdateEvent : Command()
+        data class PageContextUpdated(val pageTitle: String, val pageUrl: String, val tabId: String) : Command()
     }
 
-    data class ViewState(
-        val pageTitle: String,
-        val pageUrl: String,
-        val tabId: String,
-    )
+    fun observePageContextChanges(tabId: String) {
+        viewModelScope.launch(dispatchers.io()) {
+            logcat { "Duck.ai: observePageContextChanges started for tab=$tabId" }
+            pageContextRepository.getPageContext(tabId).onEach { pageContext ->
+                if (pageContext == null) {
+                    return@onEach
+                }
+
+                val serialized = pageContext.serializedPageData
+
+                if (pageContext.tabId != tabId) {
+                    logcat { "Duck.ai: skipping pageContext for tab=${pageContext.tabId} expected=$tabId" }
+                }
+
+                if (pageContext.isCleared) {
+                    logcat { "Duck.ai: pageContext cleared for tab=$tabId" }
+                }
+
+                logcat { "Duck.ai: pageContext update for tab=$tabId (length=${serialized.length})" }
+
+                val json = JSONObject(serialized)
+                val title = json.optString("title").takeIf { it.isNotBlank() }
+                val url = json.optString("url").takeIf { it.isNotBlank() }
+
+                if (title == null && url == null) {
+                    logcat { "Duck.ai: missing title/url in pageContext for tab=$tabId json=$json" }
+                } else {
+                    withContext(dispatchers.main()) {
+                        commandChannel.trySend(Command.PageContextUpdated(title!!, url!!, tabId))
+                    }
+                }
+            }.launchIn(viewModelScope)
+        }
+    }
 }
