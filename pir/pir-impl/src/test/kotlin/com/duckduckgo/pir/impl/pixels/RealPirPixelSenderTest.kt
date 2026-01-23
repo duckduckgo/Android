@@ -120,7 +120,6 @@ class RealPirPixelSenderTest {
         testee.reportOptOutSubmitted(
             brokerUrl = "https://broker.com",
             parent = "parent-broker",
-            attemptId = "attempt-123",
             durationMs = 5000L,
             optOutAttemptCount = 2,
             emailPattern = "pattern-abc",
@@ -148,7 +147,6 @@ class RealPirPixelSenderTest {
         testee.reportOptOutSubmitted(
             brokerUrl = "https://broker.com",
             parent = "parent-broker",
-            attemptId = "attempt-123",
             durationMs = 5000L,
             optOutAttemptCount = 2,
             emailPattern = null,
@@ -171,7 +169,6 @@ class RealPirPixelSenderTest {
             brokerUrl = "https://broker.com",
             parent = "parent-broker",
             brokerJsonVersion = "1.0",
-            attemptId = "attempt-456",
             durationMs = 3000L,
             stage = PirStage.FILL_FORM,
             tries = 3,
@@ -268,7 +265,6 @@ class RealPirPixelSenderTest {
         testee.reportStagePendingEmailConfirmation(
             brokerUrl = "https://broker.com",
             brokerVersion = "2.0",
-            attemptId = "attempt-789",
             actionId = "action-2",
             durationMs = 2000L,
             tries = 1,
@@ -297,7 +293,6 @@ class RealPirPixelSenderTest {
             brokerUrl = "https://broker.com",
             brokerVersion = "2.0",
             attemptNumber = 1,
-            attemptId = "attempt-abc",
             actionId = "action-3",
         )
 
@@ -323,7 +318,6 @@ class RealPirPixelSenderTest {
             brokerUrl = "https://broker.com",
             brokerVersion = "2.0",
             attemptNumber = 2,
-            attemptId = "attempt-def",
             actionId = "action-4",
             durationMs = 1500L,
         )
@@ -351,7 +345,6 @@ class RealPirPixelSenderTest {
             brokerUrl = "https://broker.com",
             brokerVersion = "2.0",
             attemptNumber = 3,
-            attemptId = "attempt-ghi",
             actionId = "action-5",
             durationMs = 1000L,
         )
@@ -378,7 +371,6 @@ class RealPirPixelSenderTest {
         testee.reportEmailConfirmationAttemptRetriesExceeded(
             brokerUrl = "https://broker.com",
             brokerVersion = "2.0",
-            attemptId = "attempt-jkl",
             actionId = "action-6",
         )
 
@@ -727,7 +719,6 @@ class RealPirPixelSenderTest {
         testee.reportOptOutStageStart(
             brokerUrl = "https://broker.com",
             parentUrl = "https://parent.com",
-            attemptId = "attempt-start-1",
         )
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
@@ -750,7 +741,6 @@ class RealPirPixelSenderTest {
             brokerUrl = "https://broker.com",
             parentUrl = "https://parent.com",
             brokerVersion = "4.0",
-            attemptId = "attempt-email-1",
             durationMs = 1000L,
             tries = 1,
             actionId = "action-email-1",
@@ -779,7 +769,6 @@ class RealPirPixelSenderTest {
         testee.reportOptOutStageFinish(
             brokerUrl = "https://broker.com",
             parentUrl = "https://parent.com",
-            attemptId = "attempt-finish-1",
             durationMs = 10000L,
         )
 
