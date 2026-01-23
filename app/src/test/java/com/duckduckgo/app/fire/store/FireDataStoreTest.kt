@@ -150,6 +150,36 @@ class FireDataStoreTest {
     }
 
     @Test
+    fun whenNoManualOptionsSet_andClearDuckAiDataEnabled_thenReturnsDefaultOptionsWithDuckAiChats() = runTest {
+        whenever(settingsDataStore.clearDuckAiData).thenReturn(true)
+
+        val options = fireDataStore.getManualClearOptions()
+
+        assertEquals(setOf(FireClearOption.TABS, FireClearOption.DATA, FireClearOption.DUCKAI_CHATS), options)
+    }
+
+    @Test
+    fun whenNoManualOptionsSet_andClearDuckAiDataEnabled_thenFlowEmitsDefaultOptionsWithDuckAiChats() = runTest {
+        whenever(settingsDataStore.clearDuckAiData).thenReturn(true)
+
+        fireDataStore.getManualClearOptionsFlow().test {
+            assertEquals(setOf(FireClearOption.TABS, FireClearOption.DATA, FireClearOption.DUCKAI_CHATS), awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenManualOptionsAlreadySet_andClearDuckAiDataEnabled_thenLegacySettingIgnored() = runTest {
+        whenever(settingsDataStore.clearDuckAiData).thenReturn(true)
+
+        fireDataStore.setManualClearOptions(setOf(FireClearOption.TABS))
+
+        val options = fireDataStore.getManualClearOptions()
+
+        assertEquals(setOf(FireClearOption.TABS), options)
+    }
+
+    @Test
     fun whenNoAutomaticOptionsSet_thenReturnsEmptySet() = runTest {
         val options = fireDataStore.getAutomaticClearOptions()
         assertTrue(options.isEmpty())
@@ -315,6 +345,47 @@ class FireDataStoreTest {
 
         fireDataStore.getAutomaticClearOptionsFlow().test {
             assertEquals(setOf(FireClearOption.TABS, FireClearOption.DATA), awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenNoAutomaticOptionsSet_andLegacyIsNone_andClearDuckAiDataEnabled_thenReturnsDuckAiChatsOnly() = runTest {
+        whenever(settingsDataStore.automaticallyClearWhatOption).thenReturn(ClearWhatOption.CLEAR_NONE)
+        whenever(settingsDataStore.clearDuckAiData).thenReturn(true)
+
+        val options = fireDataStore.getAutomaticClearOptions()
+
+        assertEquals(setOf(FireClearOption.DUCKAI_CHATS), options)
+    }
+
+    @Test
+    fun whenNoAutomaticOptionsSet_andLegacyIsTabsOnly_andClearDuckAiDataEnabled_thenReturnsTabsAndDuckAiChats() = runTest {
+        whenever(settingsDataStore.automaticallyClearWhatOption).thenReturn(ClearWhatOption.CLEAR_TABS_ONLY)
+        whenever(settingsDataStore.clearDuckAiData).thenReturn(true)
+
+        val options = fireDataStore.getAutomaticClearOptions()
+
+        assertEquals(setOf(FireClearOption.TABS, FireClearOption.DUCKAI_CHATS), options)
+    }
+
+    @Test
+    fun whenNoAutomaticOptionsSet_andLegacyIsTabsAndData_andClearDuckAiDataEnabled_thenReturnsAllOptions() = runTest {
+        whenever(settingsDataStore.automaticallyClearWhatOption).thenReturn(ClearWhatOption.CLEAR_TABS_AND_DATA)
+        whenever(settingsDataStore.clearDuckAiData).thenReturn(true)
+
+        val options = fireDataStore.getAutomaticClearOptions()
+
+        assertEquals(setOf(FireClearOption.TABS, FireClearOption.DATA, FireClearOption.DUCKAI_CHATS), options)
+    }
+
+    @Test
+    fun whenNoAutomaticOptionsSet_andLegacyIsTabsAndData_andClearDuckAiDataEnabled_thenFlowEmitsAllOptions() = runTest {
+        whenever(settingsDataStore.automaticallyClearWhatOption).thenReturn(ClearWhatOption.CLEAR_TABS_AND_DATA)
+        whenever(settingsDataStore.clearDuckAiData).thenReturn(true)
+
+        fireDataStore.getAutomaticClearOptionsFlow().test {
+            assertEquals(setOf(FireClearOption.TABS, FireClearOption.DATA, FireClearOption.DUCKAI_CHATS), awaitItem())
             cancelAndIgnoreRemainingEvents()
         }
     }

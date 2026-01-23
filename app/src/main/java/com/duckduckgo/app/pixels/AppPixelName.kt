@@ -479,4 +479,6 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     BROWSER_NAV_MENU_PRESSED("m_browser_nav_menu_pressed"),
 
     TIMEOUT_WAITING_FOR_APP_REFERRER("timeout_waiting_for_referrer"),
+
+    DATA_CLEARING_AUTOMATIC_OPTIONS_UPDATED("m_automatic_data_clearing_options_updated"),
 }

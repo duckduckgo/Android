@@ -184,6 +184,8 @@ import com.duckduckgo.app.browser.logindetection.FireproofDialogsEventHandler.Ev
 import com.duckduckgo.app.browser.logindetection.LoginDetected
 import com.duckduckgo.app.browser.logindetection.NavigationAwareLoginDetector
 import com.duckduckgo.app.browser.logindetection.NavigationEvent
+import com.duckduckgo.app.browser.menu.BrowserMenuDisplayRepository
+import com.duckduckgo.app.browser.menu.BrowserMenuDisplayState
 import com.duckduckgo.app.browser.menu.VpnMenuStateProvider
 import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
@@ -242,6 +244,7 @@ import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.global.model.domain
 import com.duckduckgo.app.global.model.domainMatchesUrl
+import com.duckduckgo.app.global.model.orderedTrackerBlockedEntities
 import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_BANNER_DISMISSED
@@ -440,6 +443,7 @@ class BrowserTabViewModel @Inject constructor(
     private val downloadCallback: DownloadStateListener,
     private val settingsDataStore: SettingsDataStore,
     private val urlDisplayRepository: UrlDisplayRepository,
+    private val browserMenuDisplayRepository: BrowserMenuDisplayRepository,
     private val autofillCapabilityChecker: AutofillCapabilityChecker,
     private val adClickManager: AdClickManager,
     private val autofillFireproofDialogSuppressor: AutofillFireproofDialogSuppressor,
@@ -578,6 +582,7 @@ class BrowserTabViewModel @Inject constructor(
                 siteHttpErrorHandler.assignErrorsAndClearCache(value)
             }
         }
+    private var previousUrl: String? = null
     private lateinit var tabId: String
     private var webNavigationState: WebNavigationState? = null
     private var httpsUpgraded = false
@@ -597,6 +602,13 @@ class BrowserTabViewModel @Inject constructor(
             scope = viewModelScope,
             started = SharingStarted.Eagerly,
             initialValue = true,
+        )
+
+    private val browserMenuState = browserMenuDisplayRepository.browserMenuState
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.Eagerly,
+            initialValue = BrowserMenuDisplayState(hasOption = false, isEnabled = false),
         )
 
     private val fireproofWebsitesObserver =
@@ -794,6 +806,16 @@ class BrowserTabViewModel @Inject constructor(
         isFullUrlEnabled
             .onEach {
                 command.value = Command.RefreshOmnibar
+            }
+            .launchIn(viewModelScope)
+
+        browserMenuState
+            .onEach { state ->
+                val currentState = currentBrowserViewState()
+                val useBottomSheetMenu = state.hasOption && state.isEnabled
+                browserViewState.value = currentState.copy(
+                    useBottomSheetMenu = useBottomSheetMenu,
+                )
             }
             .launchIn(viewModelScope)
     }
@@ -1637,7 +1659,7 @@ class BrowserTabViewModel @Inject constructor(
         title: String?,
     ) {
         logcat(VERBOSE) { "Duck.ai: Page changed: $url" }
-        cleanupBlobDownloadReplyProxyMaps()
+        cleanupBlobDownloadReplyProxyMaps(url)
 
         hasCtaBeenShownForCurrentPage.set(false)
         buildSiteFactory(url, title, urlUnchangedForExternalLaunchPurposes(site?.url, url))
@@ -1725,8 +1747,8 @@ class BrowserTabViewModel @Inject constructor(
         automaticSavedLoginsMonitor.clearAutoSavedLoginId(tabId)
     }
 
-    private fun cleanupBlobDownloadReplyProxyMaps() {
-        fixedReplyProxyMap.clear()
+    private fun cleanupBlobDownloadReplyProxyMaps(url: String) {
+        fixedReplyProxyMap.keys.retainAll { sameOrigin(it, url) }
     }
 
     private fun setAdClickActiveTabData(url: String?) {
@@ -1750,12 +1772,45 @@ class BrowserTabViewModel @Inject constructor(
     private suspend fun updateLoadingStatePrivacy(domain: String) {
         val privacyProtectionDisabled = isPrivacyProtectionDisabled(domain)
         withContext(dispatchers.main()) {
-            loadingViewState.value =
-                currentLoadingViewState().copy(
-                    trackersAnimationEnabled = !(privacyProtectionDisabled || currentBrowserViewState().maliciousSiteBlocked),
+            // TODO when removing the flag we should tidy this logic up
+            if (addressBarTrackersAnimationManager.isFeatureEnabled()) {
+                val site = site
+                val isTrackersAnimationEnabled = isTrackersAnimationEnabled(
+                    privacyProtectionDisabled = privacyProtectionDisabled,
+                    maliciousSiteBlocked = currentBrowserViewState().maliciousSiteBlocked,
+                    site = site,
+                    previousUrl = previousUrl,
+                )
+
+                previousUrl = site?.url
+
+                loadingViewState.value = currentLoadingViewState().copy(
+                    trackersAnimationEnabled = isTrackersAnimationEnabled,
                     url = site?.url ?: "",
                 )
+            } else {
+                loadingViewState.value =
+                    currentLoadingViewState().copy(
+                        trackersAnimationEnabled = !(privacyProtectionDisabled || currentBrowserViewState().maliciousSiteBlocked),
+                        url = site?.url ?: "",
+                    )
+            }
         }
+    }
+
+    private fun isTrackersAnimationEnabled(
+        privacyProtectionDisabled: Boolean,
+        maliciousSiteBlocked: Boolean,
+        site: Site?,
+        previousUrl: String?,
+    ): Boolean {
+        val canShowTrackerAnimation = !(privacyProtectionDisabled || maliciousSiteBlocked) &&
+            site?.privacyProtection() ?: PrivacyShield.UNKNOWN != PrivacyShield.UNPROTECTED
+
+        val shouldAnimate = addressBarTrackersAnimationManager
+            .shouldShowAnimation(currentUrl = site?.url, lastAnimatedUrl = previousUrl)
+
+        return shouldAnimate && canShowTrackerAnimation
     }
 
     private suspend fun updatePrivacyProtectionState(domain: String) {
@@ -3180,7 +3235,10 @@ class BrowserTabViewModel @Inject constructor(
         command.value = ShowWebContent
     }
 
-    fun userLaunchingTabSwitcher(viewMode: Omnibar.ViewMode, hasFocus: Boolean) {
+    fun userLaunchingTabSwitcher(
+        viewMode: Omnibar.ViewMode,
+        hasFocus: Boolean,
+    ) {
         command.value = LaunchTabSwitcher
 
         pixel.fire(AppPixelName.TAB_MANAGER_CLICKED)
@@ -3945,6 +4003,7 @@ class BrowserTabViewModel @Inject constructor(
             DUCK_CHAT_FEATURE_NAME -> {
                 viewModelScope.launch(dispatchers.io()) {
                     val response = duckChatJSHelper.processJsCallbackMessage(featureName, method, id, data)
+                    logcat { "Duck.ai: btf response $response" }
                     withContext(dispatchers.main()) {
                         response?.let {
                             command.value = SendResponseToJs(it)
@@ -4332,14 +4391,11 @@ class BrowserTabViewModel @Inject constructor(
         replyProxy: JavaScriptReplyProxy,
         locationHref: String? = null,
     ) {
-        appCoroutineScope.launch(dispatchers.io()) {
-            // FF check has disk IO
-            val frameProxies = fixedReplyProxyMap[originUrl]?.toMutableMap() ?: mutableMapOf()
-            // if location.href is not passed, we fall back to origin
-            val safeLocationHref = locationHref ?: originUrl
-            frameProxies[safeLocationHref] = replyProxy
-            fixedReplyProxyMap[originUrl] = frameProxies
-        }
+        val frameProxies = fixedReplyProxyMap[originUrl]?.toMutableMap() ?: mutableMapOf()
+        // if location.href is not passed, we fall back to origin
+        val safeLocationHref = locationHref ?: originUrl
+        frameProxies[safeLocationHref] = replyProxy
+        fixedReplyProxyMap[originUrl] = frameProxies
     }
 
     fun onStartPrint() {
@@ -4469,18 +4525,31 @@ class BrowserTabViewModel @Inject constructor(
             command.value = HideKeyboardForChat
         }
 
-        if (duckAiFeatureState.showFullScreenMode.value) {
-            val url = when {
-                hasFocus && isNtp && query.isNullOrBlank() -> duckChat.getDuckChatUrl(query ?: "", false)
-                hasFocus -> duckChat.getDuckChatUrl(query ?: "", true)
-                else -> duckChat.getDuckChatUrl(query ?: "", false)
+        if (!duckAiFeatureState.showInputScreen.value) {
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_LEGACY_OMNIBAR_AICHAT_BUTTON_PRESSED)
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_LEGACY_OMNIBAR_AICHAT_BUTTON_PRESSED_DAILY, type = Daily())
+        }
+
+        when {
+            duckAiFeatureState.showContextualMode.value && !isNtp -> {
+                command.value = Command.ShowDuckAIContextualMode
             }
-            onUserSubmittedQuery(url)
-        } else {
-            when {
-                hasFocus && isNtp && query.isNullOrBlank() -> duckChat.openDuckChat()
-                hasFocus -> duckChat.openDuckChatWithAutoPrompt(query ?: "")
-                else -> duckChat.openDuckChat()
+
+            duckAiFeatureState.showFullScreenMode.value -> {
+                val url = when {
+                    hasFocus && isNtp && query.isNullOrBlank() -> duckChat.getDuckChatUrl(query ?: "", false)
+                    hasFocus -> duckChat.getDuckChatUrl(query ?: "", true)
+                    else -> duckChat.getDuckChatUrl(query ?: "", false)
+                }
+                onUserSubmittedQuery(url)
+            }
+
+            else -> {
+                when {
+                    hasFocus && isNtp && query.isNullOrBlank() -> duckChat.openDuckChat()
+                    hasFocus -> duckChat.openDuckChatWithAutoPrompt(query ?: "")
+                    else -> duckChat.openDuckChat()
+                }
             }
         }
     }
@@ -4490,6 +4559,7 @@ class BrowserTabViewModel @Inject constructor(
             is VpnMenuState.Subscribed -> {
                 command.value = LaunchVpnManagement
             }
+
             VpnMenuState.Hidden -> {} // Should not happen as menu item should not be visible
             else -> {
                 command.value = LaunchPrivacyPro("https://duckduckgo.com/pro?origin=funnel_appmenu_android".toUri())
@@ -4561,6 +4631,12 @@ class BrowserTabViewModel @Inject constructor(
     fun sendKeyboardFocusedPixel() {
         pixel.fire(DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_KEYBOARD_USAGE)
         pixel.fire(DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_KEYBOARD_USAGE_DAILY, type = Daily())
+    }
+
+    fun onStartTrackersAnimation() {
+        val site = siteLiveData.value
+        val trackerEvents = site?.orderedTrackerBlockedEntities()
+        command.value = Command.StartAddressBarTrackersAnimation(trackerEvents)
     }
 
     private fun trackersCount(): String =

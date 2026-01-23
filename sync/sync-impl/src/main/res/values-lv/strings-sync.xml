@@ -34,6 +34,7 @@
     <string name="sync_setup_begin_syncing">Sinhronizācijas sākšana</string>
     <string name="sync_setup_with_another_device_cta_title">Sinhronizēt ar citu ierīci</string>
     <string name="sync_setup_with_another_device_cta_subtitle">Droši sinhronizē grāmatzīmes un paroles starp ierīcēm.</string>
+    <string name="sync_setup_with_another_device_cta_subtitle_with_ai_chat">Droši sinhronizē grāmatzīmes, paroles un Duck.ai tērzēšanas sarunas starp savām ierīcēm.</string>
     <string name="sync_off_hint">Tavi dati tiek šifrēti no gala līdz galam, un DuckDuckGo nav piekļuves šifrēšanas atslēgai.</string>
     <string name="sync_setup_single_device_title">Vienas ierīces iestatīšana</string>
     <string name="sync_setup_other_options_title">Citas iespējas</string>
@@ -45,12 +46,14 @@
     <!-- Setup screen -->
     <string name="sync_enable_sync_title">Sinhronizācijas un dublēšanas iestatīšana!</string>
     <string name="sync_enable_sync_content">Tavas grāmatzīmes un paroles tiek sagatavotas sinhronizēšanai. Tam vajadzētu aizņemt tikai neilgu brīdi.</string>
+    <string name="sync_enable_sync_content_with_ai_chat">Tavas grāmatzīmes, paroles un Duck.ai tērzēšanas sarunas tiek sagatavotas sinhronizācijai. Tam vajadzētu aizņemt tikai neilgu brīdi.</string>
     <string name="sync_enable_options">Opcijas</string>
     <string name="sync_enable_option_favicons_title">Ienest grāmatzīmju ikonas</string>
     <string name="sync_enable_option_favicons_subtitle">Automātiski lejupielādēt ikonas sinhronizētām grāmatzīmēm.</string>
     <string name="sync_enable_connecting">Notiek savienojuma izveide…</string>
     <string name="sync_intro_enable_title">Šīs ierīces sinhronizācija un dublēšana</string>
     <string name="sync_intro_enable_content">Tādējādi DuckDuckGo drošajā serverī tiek izveidota šifrēta grāmatzīmju un paroļu dublējumkopija, ko var sinhronizēt ar citām ierīcēm. \n\n Šifrēšanas atslēga tiek saglabāta tikai tavā ierīcē – DuckDuckGo tai nevar piekļūt.</string>
+    <string name="sync_intro_enable_content_with_ai_chat">Tas izveido šifrētu tavu grāmatzīmju, paroļu un Duck.ai tērzēšanas dublējumu DuckDuckGo drošajā serverī, ko vari sinhronizēt ar citām tavām ierīcēm. \n\n Šifrēšanas atslēga tiek saglabāta tikai tavā ierīcē – DuckDuckGo tai nevar piekļūt.</string>
     <string name="sync_intro_enable_footer">Vēlāk vari sinhronizēt ar citām ierīcēm.</string>
     <string name="sync_intro_enable_cta">Ieslēgt sinhronizāciju un dublēšanu</string>
     <string name="sync_intro_recover_title">Sinhronizēto datu atgūšana</string>

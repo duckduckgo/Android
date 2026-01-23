@@ -21,16 +21,20 @@ import android.content.SharedPreferences
 import androidx.core.content.edit
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
+import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.autofill.api.AutofillFeature
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_HARMONY_PREFERENCES_RETRIEVAL_FAILED
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+import logcat.logcat
 import okio.ByteString.Companion.decodeBase64
 import okio.ByteString.Companion.toByteString
-import java.lang.Exception
 
 /**
  * This class provides a way to access and store key related data
@@ -56,9 +60,13 @@ class RealSecureStorageKeyStore constructor(
     private val context: Context,
     private val coroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
+    private val autofillFeature: AutofillFeature,
+    private val sharedPreferencesProvider: SharedPreferencesProvider,
+    private val pixel: Pixel,
 ) : SecureStorageKeyStore {
 
     private val mutex: Mutex = Mutex()
+    private val harmonyMutex: Mutex = Mutex()
     private val encryptedPreferencesDeferred: Deferred<SharedPreferences?> by lazy {
         coroutineScope.async(dispatcherProvider.io()) {
             try {
@@ -79,8 +87,35 @@ class RealSecureStorageKeyStore constructor(
         }
     }
 
+    private val harmonyPreferencesDeferred: Deferred<SharedPreferences?> by lazy {
+        coroutineScope.async(dispatcherProvider.io()) {
+            try {
+                harmonyMutex.withLock {
+                    if (autofillFeature.useHarmony().isEnabled()) {
+                        sharedPreferencesProvider.getMigratedEncryptedSharedPreferences(FILENAME).also {
+                            if (it == null) {
+                                pixel.fire(AUTOFILL_HARMONY_PREFERENCES_RETRIEVAL_FAILED)
+                                logcat { "autofill harmony preferences retrieval returned null" }
+                            }
+                        }
+                    } else {
+                        null
+                    }
+                }
+            } catch (e: Exception) {
+                pixel.fire(AUTOFILL_HARMONY_PREFERENCES_RETRIEVAL_FAILED)
+                logcat { "autofill harmony preferences retrieval failed: $e" }
+                null
+            }
+        }
+    }
+
     private suspend fun getEncryptedPreferences(): SharedPreferences? {
         return encryptedPreferencesDeferred.await()
+    }
+
+    private suspend fun getHarmonyEncryptedPreferences(): SharedPreferences? {
+        return harmonyPreferencesDeferred.await()
     }
 
     override suspend fun updateKey(
@@ -95,12 +130,27 @@ class RealSecureStorageKeyStore constructor(
                     putString(keyName, keyValue.toByteString().base64())
                 }
             }
+
+            if (autofillFeature.useHarmony().isEnabled()) {
+                getHarmonyEncryptedPreferences()?.edit(commit = true) {
+                    if (keyValue == null) {
+                        remove(keyName)
+                    } else {
+                        putString(keyName, keyValue.toByteString().base64())
+                    }
+                }
+            }
         }
     }
 
     override suspend fun getKey(keyName: String): ByteArray? {
         return withContext(dispatcherProvider.io()) {
-            return@withContext getEncryptedPreferences()?.getString(keyName, null)?.run {
+            val preferences = if (autofillFeature.useHarmony().isEnabled()) {
+                getHarmonyEncryptedPreferences()
+            } else {
+                getEncryptedPreferences()
+            }
+            return@withContext preferences?.getString(keyName, null)?.run {
                 this.decodeBase64()?.toByteArray()
             }
         }

@@ -21,6 +21,7 @@ import android.text.Editable
 import android.view.MotionEvent
 import android.view.View
 import android.widget.ImageView
+import androidx.annotation.DrawableRes
 import androidx.appcompat.widget.Toolbar
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.postDelayed
@@ -424,5 +425,9 @@ class Omnibar(
 
     fun setDraftTextIfNtpOrSerp(query: String) {
         omnibarView.setDraftTextIfNtpOrSerp(query)
+    }
+
+    fun configureBrowserMenuIcon(@DrawableRes resId: Int) {
+        omnibarView.setMenuIcon(resId)
     }
 }

@@ -149,6 +149,7 @@ class SyncActivityViewModel @Inject constructor(
             showAccount = syncAccountRepository.isSignedIn(),
             syncedDevices = syncedDevices,
             disabledSetupFlows = disabledSetupFlows(),
+            aiChatSyncEnabled = syncFeatureToggle.allowAiChatSync(),
         )
     }
 
@@ -168,6 +169,7 @@ class SyncActivityViewModel @Inject constructor(
         val showAccount: Boolean = false,
         val syncedDevices: List<SyncDeviceListItem> = emptyList(),
         val disabledSetupFlows: List<SetupFlows> = emptyList(),
+        val aiChatSyncEnabled: Boolean = false,
     )
 
     sealed class SetupFlows {
@@ -417,6 +419,7 @@ class SyncActivityViewModel @Inject constructor(
 
     private fun signedOutState(): ViewState = ViewState(
         disabledSetupFlows = disabledSetupFlows(),
+        aiChatSyncEnabled = syncFeatureToggle.allowAiChatSync(),
     )
 
     private suspend fun requiresSetupAuthentication(action: suspend () -> Unit) {

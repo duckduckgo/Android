@@ -128,6 +128,8 @@ class FakeDuckChatInternal(
 
     override fun isDuckChatFullScreenModeEnabled(): Boolean = false
 
+    override fun isDuckChatContextualModeEnabled(): Boolean = false
+
     override fun isDuckChatFeatureEnabled(): Boolean = true
 
     override fun isChatSyncFeatureEnabled(): Boolean = true

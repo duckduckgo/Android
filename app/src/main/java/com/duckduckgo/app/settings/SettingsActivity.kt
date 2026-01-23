@@ -36,6 +36,7 @@ import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivitySettingsNewBinding
 import com.duckduckgo.app.email.ui.EmailProtectionUnsupportedScreenNoParams
+import com.duckduckgo.app.firebutton.DataClearingSettingsScreenNoParams
 import com.duckduckgo.app.firebutton.FireButtonScreenNoParams
 import com.duckduckgo.app.generalsettings.GeneralSettingsScreenNoParams
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
@@ -52,6 +53,7 @@ import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchAppearanceScr
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchAutofillPasswordsManagement
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchAutofillSettings
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchCookiePopupProtectionScreen
+import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchDataClearingSettingsScreen
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchDefaultBrowser
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchDuckChatScreen
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchEmailProtection
@@ -91,6 +93,7 @@ import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreen
 import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreens.AppTrackerOnboardingActivityWithEmptyParamsParams
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
+import com.duckduckgo.remote.messaging.impl.modal.ModalSurfaceActivityFromMessageId
 import com.duckduckgo.settings.api.CompleteSetupSettingsPlugin
 import com.duckduckgo.settings.api.DuckPlayerSettingsPlugin
 import com.duckduckgo.settings.api.ProSettingsPlugin
@@ -256,6 +259,9 @@ class SettingsActivity : DuckDuckGoActivity() {
         }
 
         with(viewsOther) {
+            whatsNewSetting.setOnClickListener {
+                viewModel.onWhatsNewClicked()
+            }
             aboutSetting.setOnClickListener { viewModel.onAboutSettingClicked() }
             shareFeedbackSetting.setOnClickListener { viewModel.onShareFeedbackClicked() }
             ddgOnOtherPlatformsSetting.setTrailingIconSize(Small)
@@ -322,6 +328,7 @@ class SettingsActivity : DuckDuckGoActivity() {
                     updateDuckChat(it.isDuckChatEnabled)
                     updateVoiceSearchVisibility(it.isVoiceSearchVisible)
                     updateAddWidgetInProtections(it.isAddWidgetInProtectionsVisible, it.widgetsInstalled)
+                    updateWhatsNewVisibility(it.showWhatsNew)
                     sortSettingItemsAlphabetically()
                 }
             }.launchIn(lifecycleScope)
@@ -377,6 +384,10 @@ class SettingsActivity : DuckDuckGoActivity() {
         viewsNextSteps.addWidgetToHomeScreenSetting.isVisible = !isVisible
     }
 
+    private fun updateWhatsNewVisibility(isVisible: Boolean) {
+        viewsOther.whatsNewSetting.isVisible = isVisible
+    }
+
     private fun watchForCompleteSetupSettingsChanges() {
         with(viewsCompleteSetup) {
             settingsCompleteFeaturesContainer.viewTreeObserver.addOnGlobalLayoutListener {
@@ -427,6 +438,7 @@ class SettingsActivity : DuckDuckGoActivity() {
             is LaunchAutofillPasswordsManagement -> launchScreen(
                 AutofillPasswordsManagementScreen(source = AutofillScreenLaunchSource.SettingsActivity),
             )
+
             is LaunchAccessibilitySettings -> launchScreen(AccessibilityScreens.Default)
             is LaunchAppTPTrackersScreen -> launchScreen(AppTrackerActivityWithEmptyParams)
             is LaunchAppTPOnboarding -> launchScreen(AppTrackerOnboardingActivityWithEmptyParamsParams)
@@ -438,6 +450,7 @@ class SettingsActivity : DuckDuckGoActivity() {
             is LaunchWebTrackingProtectionScreen -> launchScreen(WebTrackingProtectionScreenNoParams)
             is LaunchCookiePopupProtectionScreen -> launchActivity(AutoconsentSettingsActivity.intent(this))
             is LaunchFireButtonScreen -> launchScreen(FireButtonScreenNoParams)
+            is LaunchDataClearingSettingsScreen -> launchScreen(DataClearingSettingsScreenNoParams)
             is LaunchPermissionsScreen -> launchScreen(PermissionsScreenNoParams)
             is LaunchDuckChatScreen -> launchScreen(DuckChatSettingsNoParams)
             is LaunchAppearanceScreen -> launchScreen(AppearanceScreen.Default)
@@ -446,6 +459,7 @@ class SettingsActivity : DuckDuckGoActivity() {
             is LaunchFeedback -> launchFeedback()
             is LaunchPproUnifiedFeedback -> launchScreen(GeneralPrivacyProFeedbackScreenNoParams)
             is LaunchOtherPlatforms -> launchActivityAndFinish(BrowserActivity.intent(context = this, queryExtra = OTHER_PLATFORMS_URL))
+            is Command.LaunchWhatsNew -> launchScreen(ModalSurfaceActivityFromMessageId(it.messageId, it.messageType))
         }
     }
 

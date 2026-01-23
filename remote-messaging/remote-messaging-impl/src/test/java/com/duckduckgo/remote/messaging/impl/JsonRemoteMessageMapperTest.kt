@@ -38,9 +38,11 @@ import com.duckduckgo.remote.messaging.fixtures.RemoteMessageOM.cardsListContent
 import com.duckduckgo.remote.messaging.fixtures.RemoteMessageOM.mediumContent
 import com.duckduckgo.remote.messaging.fixtures.RemoteMessageOM.promoSingleActionContent
 import com.duckduckgo.remote.messaging.fixtures.RemoteMessageOM.smallContent
+import com.duckduckgo.remote.messaging.fixtures.RemoteMessageOM.translatedListItems
 import com.duckduckgo.remote.messaging.fixtures.messageActionPlugins
 import com.duckduckgo.remote.messaging.impl.mappers.mapToRemoteMessage
 import com.duckduckgo.remote.messaging.impl.models.JsonContentTranslations
+import com.duckduckgo.remote.messaging.impl.models.JsonListItemTranslation
 import com.duckduckgo.remote.messaging.impl.models.JsonRemoteMessage
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -243,6 +245,64 @@ class JsonRemoteMessageMapperTest(private val testCase: TestCase) {
                     ),
                 ),
             ),
+            TestCase(
+                listOf(
+                    aJsonMessage(
+                        id = "id1",
+                        content = cardsListJsonContent(),
+                        translations = mapOf("fr" to frenchTranslationsWithListItems()),
+                    ),
+                ),
+                listOf(
+                    aCardsListMessage(
+                        id = "id1",
+                        cardsListContent(
+                            titleText = "Bonjour",
+                            descriptionText = "la description",
+                            primaryActionText = "action principale",
+                            listItems = translatedListItems(
+                                item1TitleText = "Titre de l'élément 1",
+                                item1DescriptionText = "Description de l'élément 1",
+                                item2TitleText = "Titre de l'élément 2",
+                                item2DescriptionText = "Description de l'élément 2",
+                            ),
+                        ),
+                        surfaces = listOf(NEW_TAB_PAGE),
+                    ),
+                ),
+            ),
+            TestCase(
+                listOf(
+                    aJsonMessage(
+                        id = "id1",
+                        content = cardsListJsonContent(),
+                        translations = mapOf(
+                            "fr" to JsonContentTranslations(
+                                titleText = "Bonjour",
+                                descriptionText = "la description",
+                                primaryActionText = "action principale",
+                                listItems = mapOf(
+                                    "unknown_item" to JsonListItemTranslation(
+                                        titleText = "Should not appear",
+                                        descriptionText = "Should not appear",
+                                    ),
+                                ),
+                            ),
+                        ),
+                    ),
+                ),
+                listOf(
+                    aCardsListMessage(
+                        id = "id1",
+                        cardsListContent(
+                            titleText = "Bonjour",
+                            descriptionText = "la description",
+                            primaryActionText = "action principale",
+                        ),
+                        surfaces = listOf(NEW_TAB_PAGE),
+                    ),
+                ),
+            ),
         )
 
         private fun frenchTranslations() = JsonContentTranslations(
@@ -251,6 +311,24 @@ class JsonRemoteMessageMapperTest(private val testCase: TestCase) {
             primaryActionText = "action principale",
             secondaryActionText = "action secondaire",
             actionText = "action principale",
+        )
+
+        private fun frenchTranslationsWithListItems() = JsonContentTranslations(
+            titleText = "Bonjour",
+            descriptionText = "la description",
+            primaryActionText = "action principale",
+            secondaryActionText = "action secondaire",
+            actionText = "action principale",
+            listItems = mapOf(
+                "item1" to JsonListItemTranslation(
+                    titleText = "Titre de l'élément 1",
+                    descriptionText = "Description de l'élément 1",
+                ),
+                "item2" to JsonListItemTranslation(
+                    titleText = "Titre de l'élément 2",
+                    descriptionText = "Description de l'élément 2",
+                ),
+            ),
         )
     }
 

@@ -252,14 +252,13 @@ class RemoteMessageModalSurfaceEvaluatorImplTest {
         givenOnboardingComplete()
         givenBackgroundThresholdMet()
         givenNoLastShownMessageId()
-        val messageId = "test-message-id"
-        val message = createRemoteMessage(id = messageId, surfaces = listOf(Surface.MODAL))
+        val message = createRemoteMessage(id = "test-message-id", surfaces = listOf(Surface.MODAL))
         whenever(mockRemoteMessagingRepository.message()).thenReturn(message)
         whenever(mockGlobalActivityStarter.startIntent(any(), any<GlobalActivityStarter.ActivityParams>())).thenReturn(mockIntent)
 
         testee.evaluate()
 
-        verify(mockModalSurfaceStore).recordLastShownRemoteMessageId(messageId)
+        verify(mockModalSurfaceStore).recordLastShownRemoteMessage(message)
     }
 
     @Test

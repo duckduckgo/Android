@@ -22,6 +22,7 @@ import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.clear.FireClearOption
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import logcat.LogPriority.WARN
@@ -46,6 +47,7 @@ class DataClearing @Inject constructor(
     private val clearDataAction: ClearDataAction,
     private val settingsDataStore: SettingsDataStore,
     private val dataClearerTimeKeeper: BackgroundTimeKeeper,
+    private val duckAiFeatureState: DuckAiFeatureState,
 ) : ManualDataClearing, AutomaticDataClearing {
 
     override suspend fun clearDataUsingManualFireOptions(shouldRestartIfRequired: Boolean, wasAppUsedSinceLastClear: Boolean) {
@@ -57,7 +59,9 @@ class DataClearing @Inject constructor(
 
         clearDataAction.setAppUsedSinceLastClearFlag(wasAppUsedSinceLastClear)
 
-        val wasDataCleared = options.contains(FireClearOption.DATA) || options.contains(FireClearOption.DUCKAI_CHATS)
+        val wasDuckAiChatsCleared = options.contains(FireClearOption.DUCKAI_CHATS) &&
+            duckAiFeatureState.showClearDuckAIChatHistory.value
+        val wasDataCleared = options.contains(FireClearOption.DATA) || wasDuckAiChatsCleared
         if (shouldRestartIfRequired && wasDataCleared) {
             clearDataAction.killAndRestartProcess(notifyDataCleared = false)
         }
@@ -72,7 +76,9 @@ class DataClearing @Inject constructor(
 
         clearDataAction.setAppUsedSinceLastClearFlag(!killProcessIfNeeded)
 
-        val wasDataCleared = options.contains(FireClearOption.DATA) || options.contains(FireClearOption.DUCKAI_CHATS)
+        val wasDuckAiChatsCleared = options.contains(FireClearOption.DUCKAI_CHATS) &&
+            duckAiFeatureState.showClearDuckAIChatHistory.value
+        val wasDataCleared = options.contains(FireClearOption.DATA) || wasDuckAiChatsCleared
         if (killProcessIfNeeded && wasDataCleared) {
             clearDataAction.killProcess()
             return false
@@ -147,7 +153,8 @@ class DataClearing @Inject constructor(
 
         val shouldClearTabs = FireClearOption.TABS in options
         val shouldClearData = FireClearOption.DATA in options
-        val shouldClearDuckAiChats = FireClearOption.DUCKAI_CHATS in options
+        val shouldClearDuckAiChats = FireClearOption.DUCKAI_CHATS in options &&
+            duckAiFeatureState.showClearDuckAIChatHistory.value
 
         if (shouldClearTabs) {
             clearDataAction.clearTabsOnly()

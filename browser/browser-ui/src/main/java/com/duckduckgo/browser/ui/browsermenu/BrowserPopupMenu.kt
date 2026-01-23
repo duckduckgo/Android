@@ -32,7 +32,7 @@ import com.duckduckgo.common.ui.view.StatusIndicatorView
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.mobile.android.R.drawable
 
-class BrowserMenu(
+class BrowserPopupMenu(
     private val context: Context,
     layoutInflater: LayoutInflater,
     private val omnibarType: OmnibarType,

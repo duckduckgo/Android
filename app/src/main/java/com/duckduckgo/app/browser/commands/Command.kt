@@ -41,6 +41,7 @@ import com.duckduckgo.app.cta.ui.BrokenSitePromptDialogCta
 import com.duckduckgo.app.cta.ui.DaxBubbleCta
 import com.duckduckgo.app.cta.ui.OnboardingDaxDialogCta
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
+import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
@@ -503,4 +504,7 @@ sealed class Command {
 
     data class EnableDuckAIFullScreen(val browserViewState: BrowserViewState) : Command()
     data class DisableDuckAIFullScreen(val url: String) : Command()
+
+    data object ShowDuckAIContextualMode : Command()
+    data class StartAddressBarTrackersAnimation(val trackerEntities: List<Entity>?) : Command()
 }

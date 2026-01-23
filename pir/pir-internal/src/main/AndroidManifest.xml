@@ -22,5 +22,9 @@
             android:name=".settings.PirDevWebViewActivity"
             android:label="@string/pirDevDebugOptOutTitle" />
 
+        <activity
+            android:name=".settings.PirDevBrokerConfigActivity"
+            android:label="@string/pirDevBrokerConfigTitle" />
+
     </application>
 </manifest>

@@ -34,6 +34,7 @@
     <string name="sync_setup_begin_syncing">Začať synchronizáciu</string>
     <string name="sync_setup_with_another_device_cta_title">Synchronizácia s iným zariadením</string>
     <string name="sync_setup_with_another_device_cta_subtitle">Bezpečne synchronizujte záložky a heslá medzi svojimi zariadeniami.</string>
+    <string name="sync_setup_with_another_device_cta_subtitle_with_ai_chat">Bezpečne synchronizuj záložky, heslá a chaty Duck.ai medzi tvojimi zariadeniami.</string>
     <string name="sync_off_hint">Vaše údaje sú šifrované na oboch koncoch (end-to-end) a DuckDuckGo nemá prístup k šifrovaciemu kľúču.</string>
     <string name="sync_setup_single_device_title">Nastavenie jedného zariadenia</string>
     <string name="sync_setup_other_options_title">Ďalšie možnosti</string>
@@ -45,12 +46,14 @@
     <!-- Setup screen -->
     <string name="sync_enable_sync_title">Nastavenie synchronizácie a zálohovania!</string>
     <string name="sync_enable_sync_content">Vaše záložky a heslá sa pripravujú na synchronizáciu. Malo by to trvať len chvíľu.</string>
+    <string name="sync_enable_sync_content_with_ai_chat">Tvoje záložky, heslá a čety Duck.ai sa pripravujú na synchronizáciu. Malo by to trvať len chvíľu.</string>
     <string name="sync_enable_options">Možnosti</string>
     <string name="sync_enable_option_favicons_title">Prevzatie ikon záložiek</string>
     <string name="sync_enable_option_favicons_subtitle">Automatické preberanie ikon pre synchronizované záložky.</string>
     <string name="sync_enable_connecting">Pripája sa...</string>
     <string name="sync_intro_enable_title">Synchronizujte a zálohujte toto zariadenie</string>
     <string name="sync_intro_enable_content">Vytvorí sa tak šifrovaná záloha vašich záložiek a hesiel na zabezpečenom serveri DuckDuckGo, ktorú môžete synchronizovať s ostatnými zariadeniami. \n\n Šifrovací kľúč je uložený iba vo vašom zariadení - DuckDuckGo k nemu nemá prístup.</string>
+    <string name="sync_intro_enable_content_with_ai_chat">Tým sa na zabezpečenom serveri DuckDuckGo vytvorí šifrovaná záloha tvojich záložiek, hesiel a četov Duck.ai, ktorú môžeš synchronizovať s tvojimi ostatnými zariadeniami. \n\n Šifrovací kľúč je uložený iba v tvojom zariadení - DuckDuckGo k nemu nemá prístup.</string>
     <string name="sync_intro_enable_footer">S ostatnými zariadeniami môžete synchronizovať neskôr.</string>
     <string name="sync_intro_enable_cta">Zapnite synchronizáciu a zálohovanie</string>
     <string name="sync_intro_recover_title">Obnovenie synchronizovaných údajov</string>

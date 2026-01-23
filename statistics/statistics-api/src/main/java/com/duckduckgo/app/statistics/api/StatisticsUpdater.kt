@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 DuckDuckGo
+ * Copyright (c) 2025 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,20 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.firebutton
+package com.duckduckgo.app.statistics.api
 
-import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
+interface StatisticsUpdater {
+    fun initializeAtb()
 
-/**
- * Use this model to launch the FireButton screen
- */
-object FireButtonScreenNoParams : ActivityParams
+    fun refreshAppRetentionAtb()
+
+    /**
+     * Refreshes the search retention ATB value.
+     */
+    fun refreshSearchRetentionAtb()
+
+    /**
+     * Refreshes the DuckAI retention ATB value.
+     */
+    fun refreshDuckAiRetentionAtb()
+}

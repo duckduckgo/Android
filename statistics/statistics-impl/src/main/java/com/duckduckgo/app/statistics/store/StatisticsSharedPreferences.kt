@@ -47,6 +47,10 @@ class StatisticsSharedPreferences @Inject constructor(private val context: Conte
         get() = preferences.getString(KEY_SEARCH_RETENTION_ATB, null)
         set(value) = preferences.edit { putString(KEY_SEARCH_RETENTION_ATB, value) }
 
+    override var duckaiRetentionAtb: String?
+        get() = preferences.getString(KEY_DUCK_AI_RETENTION_ATB, null)
+        set(value) = preferences.edit { putString(KEY_DUCK_AI_RETENTION_ATB, value) }
+
     override var appRetentionAtb: String?
         get() = preferences.getString(KEY_APP_RETENTION_ATB, null)
         set(value) = preferences.edit { putString(KEY_APP_RETENTION_ATB, value) }
@@ -65,6 +69,8 @@ class StatisticsSharedPreferences @Inject constructor(private val context: Conte
         private const val FILENAME = "com.duckduckgo.app.statistics"
         private const val KEY_ATB = "com.duckduckgo.app.statistics.atb"
         private const val KEY_SEARCH_RETENTION_ATB = "com.duckduckgo.app.statistics.retentionatb"
+
+        private const val KEY_DUCK_AI_RETENTION_ATB = "com.duckduckgo.app.statistics.duckairetentionatb"
         private const val KEY_APP_RETENTION_ATB = "com.duckduckgo.app.statistics.appretentionatb"
         private const val KEY_VARIANT = "com.duckduckgo.app.statistics.variant"
         private const val KEY_REFERRER_VARIANT = "com.duckduckgo.app.statistics.referrerVariant"

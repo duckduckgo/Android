@@ -34,6 +34,7 @@
     <string name="sync_setup_begin_syncing">Szinkronizálás megkezdése</string>
     <string name="sync_setup_with_another_device_cta_title">Szinkronizálás másik eszközzel</string>
     <string name="sync_setup_with_another_device_cta_subtitle">Szinkronizáld biztonságosan a könyvjelzőket és jelszavakat az eszközök között.</string>
+    <string name="sync_setup_with_another_device_cta_subtitle_with_ai_chat">Szinkronizáld biztonságosan a könyvjelzőket, a jelszavakat és a Duck.ai-csevegéseket az eszközeid között.</string>
     <string name="sync_off_hint">Az adataid végponttól végpontig titkosítva vannak, a DuckDuckGo pedig nem fér hozzá a titkosítási kulcshoz.</string>
     <string name="sync_setup_single_device_title">Egyeszközös beállítás</string>
     <string name="sync_setup_other_options_title">Egyéb lehetőségek</string>
@@ -45,12 +46,14 @@
     <!-- Setup screen -->
     <string name="sync_enable_sync_title">Szinkronizálás és biztonsági mentés beállítása!</string>
     <string name="sync_enable_sync_content">A rendszer előkészíti a könyvjelzők és jelszavak szinkronizálását. Ez csak néhány pillanatig tart.</string>
+    <string name="sync_enable_sync_content_with_ai_chat">Felkészülés a könyvjelzőid, jelszavaid és Duck.ai-csevegéseid szinkronizálására. Ez csak néhány pillanatig tart.</string>
     <string name="sync_enable_options">Opciók</string>
     <string name="sync_enable_option_favicons_title">Könyvjelző ikonok lekérése</string>
     <string name="sync_enable_option_favicons_subtitle">A szinkronizált könyvjelzők ikonjainak automatikus letöltése.</string>
     <string name="sync_enable_connecting">Csatlakozás…</string>
     <string name="sync_intro_enable_title">Az eszköz szinkronizálása és biztonsági mentése</string>
     <string name="sync_intro_enable_content">Ez a DuckDuckGo biztonságos szerverén egy titkosított biztonsági másolatot készít a könyvjelzőidről és jelszavaidról, amelyet más eszközökkel szinkronizálhatsz. A titkosítási kulcsot csak az eszközöd tárolja, a DuckDuckGo nem fér hozzá.</string>
+    <string name="sync_intro_enable_content_with_ai_chat">Ez egy titkosított biztonsági másolatot hoz létre a könyvjelzőidről, a jelszavaidról és a Duck.ai-csevegéseidről a DuckDuckGo biztonságos szerverén, amely szinkronizálható a többi eszközöddel. \n\n A titkosítási kulcs csak az eszközödön kerül eltárolásra, a DuckDuckGo nem fér hozzá.</string>
     <string name="sync_intro_enable_footer">Később szinkronizálhatod más eszközeidet.</string>
     <string name="sync_intro_enable_cta">Szinkronizálás és biztonsági mentés bekapcsolása</string>
     <string name="sync_intro_recover_title">Szinkronizált adatok helyreállítása</string>

@@ -123,6 +123,12 @@
         <item name="android:background">?attr/selectableItemBackground</item>
     </style>
 
+    <style name="Widget.DuckDuckGo.MenuActionButtonView">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:background">?attr/selectableItemBackground</item>
+    </style>
+
     <!-- SkeletonView -->
     <style name="Widget.DuckDuckGo.SkeletonView">
         <item name="android:background">@drawable/background_skeleton_ui</item>
@@ -410,6 +416,15 @@
     <!-- Bottom Sheet -->
     <style name="Widget.DuckDuckGo.BottomSheetDialog" parent="ThemeOverlay.MaterialComponents.BottomSheetDialog">
         <item name="bottomSheetStyle">@style/Widget.DuckDuckGo.ModalBottomSheetStyle</item>
+    </style>
+
+    <!-- Workaround is necessary if we want to show the drag handle in our bottom sheets -->
+    <!-- See https://github.com/material-components/material-components-android/issues/3178 -->
+    <style name="Widget.MaterialComponents.BottomSheet.DragHandle" parent="Widget.Material3.BottomSheet.DragHandle">
+        <item name="tint">?colorOnSurface</item>
+        <item name="android:alpha">0.24</item>
+        <item name="android:minHeight">@dimen/bottomSheetDragHeight</item>
+        <item name="android:paddingBottom">0dp</item>
     </style>
 
     <style name="Widget.DuckDuckGo.ModalBottomSheetStyle" parent="Widget.MaterialComponents.BottomSheet.Modal">

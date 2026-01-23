@@ -1,12 +1,21 @@
 name: 'End to End Tests - Full Suite (Nightly)'
 
 on:
-  schedule:
-    - cron: '0 3 * * *' # run at 3 AM UTC
+  workflow_call:
+    inputs:
+      commit:
+        description: 'Specific commit SHA to checkout (optional, defaults to latest)'
+        required: true
+        type: string
   workflow_dispatch:
+    inputs:
+      commit:
+        description: 'Specific commit SHA to checkout (optional, defaults to latest)'
+        required: false
+        type: string
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: ${{ github.workflow_ref }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -18,6 +27,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
+          ref: ${{ inputs.commit || github.sha }}
           submodules: recursive
 
       - name: Set up JDK version
@@ -62,6 +72,26 @@ jobs:
       - name: Move APK to new folder
         if: always()
         run: find . -name "*internal-release*.apk" -exec mv '{}' apk/internal.apk \;
+
+      - name: Custom tabs flows
+        id: maestro-custom-tabs
+        uses: ./.github/actions/maestro-cloud-asana-reporter
+        timeout-minutes: 120
+        with:
+          maestro_api_key: ${{ secrets.ROBIN_API_KEY }}
+          maestro_project_id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
+          maestro_test_name: customTabs_${{ github.sha }}
+          maestro_timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
+          maestro_app_file: apk/internal.apk
+          maestro_api_level: 30
+          maestro_include_tags: customTabsTest
+          asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          asana_project_id: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
+          asana_section_id: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
+          test_suite_name: Custom Tabs
+          is_release_blocker: 'true'
+          asana_releases_project_id: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_ID }}
+          asana_releases_blocker_section_id: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_BLOCKER_SECTION_ID }}
 
       - name: Onboarding flows
         id: maestro-onboarding

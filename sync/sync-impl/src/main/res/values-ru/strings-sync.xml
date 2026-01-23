@@ -34,6 +34,7 @@
     <string name="sync_setup_begin_syncing">Начало синхронизации</string>
     <string name="sync_setup_with_another_device_cta_title">Синхронизировать с другим устройством</string>
     <string name="sync_setup_with_another_device_cta_subtitle">Безопасная синхронизация закладок и паролей на ваших устройствах.</string>
+    <string name="sync_setup_with_another_device_cta_subtitle_with_ai_chat">Безопасная синхронизация закладок, паролей и чатов Duck.ai между устройствами.</string>
     <string name="sync_off_hint">Ваши данные защищены сквозным шифрованием. У DuckDuckGo нет доступа к ключу шифрования.</string>
     <string name="sync_setup_single_device_title">Настройка на одном устройстве</string>
     <string name="sync_setup_other_options_title">Другие варианты</string>
@@ -45,12 +46,14 @@
     <!-- Setup screen -->
     <string name="sync_enable_sync_title">Настройка синхронизации и резервного копирования</string>
     <string name="sync_enable_sync_content">Закладки и пароли готовятся к синхронизации. Это не займет много времени.</string>
+    <string name="sync_enable_sync_content_with_ai_chat">Ваши закладки, пароли и чаты Duck.ai готовятся к синхронизации. Это не займет много времени.</string>
     <string name="sync_enable_options">Параметры</string>
     <string name="sync_enable_option_favicons_title">Загружать значки закладок</string>
     <string name="sync_enable_option_favicons_subtitle">Позволяет автоматически загружать значки для синхронизированных закладок.</string>
     <string name="sync_enable_connecting">Выполняется подключение...</string>
     <string name="sync_intro_enable_title">Синхронизация и резервное копирование устройства</string>
     <string name="sync_intro_enable_content">DuckDuckGo создаст зашифрованную резервную копию ваших закладок и паролей на защищенном сервере. Копию можно синхронизировать с другими устройствами.\n\n Ключ шифрования хранится только на вашем устройстве. У DuckDuckGo нет к нему доступа.</string>
+    <string name="sync_intro_enable_content_with_ai_chat">DuckDuckGo создаст зашифрованную резервную копию ваших закладок, паролей и чатов Duck.ai на надежном сервере. Копию можно синхронизировать с другими устройствами. \n\n Ключ шифрования хранится только на вашем устройстве. У DuckDuckGo нет к нему доступа.</string>
     <string name="sync_intro_enable_footer">Синхронизацию с другими устройствами можно выполнить позже.</string>
     <string name="sync_intro_enable_cta">Включить синхронизацию и копирование</string>
     <string name="sync_intro_recover_title">Восстановить синхронизированные данные</string>

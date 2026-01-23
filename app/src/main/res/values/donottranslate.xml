@@ -66,6 +66,9 @@
     <!-- ADS -->
     <string name="ads_demo_activity_title" translatable="false">Android Design System Demo</string>
 
+    <!-- What's new -->
+    <string name="settingsWhatsNew">What\'s new</string>
+
     <!-- Digital Asset Links -->
     <string name="asset_statements">
       [{
