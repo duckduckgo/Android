@@ -36,7 +36,6 @@ import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.utils.FragmentViewModelFactory
-import com.duckduckgo.common.utils.plugins.ActivePluginPoint
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.inputscreen.ui.InputScreenConfigResolver
@@ -49,7 +48,8 @@ import com.duckduckgo.duckchat.impl.inputscreen.ui.view.RecyclerBottomSpacingDec
 import com.duckduckgo.duckchat.impl.inputscreen.ui.view.SwipeableRecyclerView
 import com.duckduckgo.duckchat.impl.inputscreen.ui.viewmodel.InputScreenViewModel
 import com.duckduckgo.navigation.api.GlobalActivityStarter
-import com.duckduckgo.newtabpage.api.NewTabPagePlugin
+import com.duckduckgo.newtabpage.api.NewTabPageProvider
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -59,14 +59,14 @@ import com.duckduckgo.browser.ui.R as BrowserUI
 
 @InjectWith(FragmentScope::class)
 class SearchTabFragment : DuckDuckGoFragment(R.layout.fragment_search_tab) {
-    @Inject
-    lateinit var newTabPagePlugins: ActivePluginPoint<NewTabPagePlugin>
 
     @Inject lateinit var viewModelFactory: FragmentViewModelFactory
 
     @Inject lateinit var globalActivityStarter: GlobalActivityStarter
 
     @Inject lateinit var inputScreenConfigResolver: InputScreenConfigResolver
+
+    @Inject lateinit var newTabPageProvider: NewTabPageProvider
 
     private val viewModel: InputScreenViewModel by lazy {
         ViewModelProvider(requireParentFragment(), viewModelFactory)[InputScreenViewModel::class.java]
@@ -142,7 +142,7 @@ class SearchTabFragment : DuckDuckGoFragment(R.layout.fragment_search_tab) {
         val favoritesContainer = parentFragment.getFavoritesContainer()
 
         lifecycleScope.launch {
-            newTabPagePlugins.getPlugins().firstOrNull()?.let { plugin ->
+            newTabPageProvider.provideNewTabPageVersion().first().let { plugin ->
                 newTabPageView =
                     plugin.getView(requireContext(), showLogo = false) { hasContent ->
                         if (isAdded && view != null) {

@@ -41,7 +41,7 @@ interface NewTabPagePlugin : ActivePlugin {
     ): View
 
     companion object {
-        const val PRIORITY_CONFIGURABLE_NTP = 0
-        const val PRIORITY_NTP = 100
+        const val PRIORITY_NTP = 0
+        const val PRIORITY_CONFIGURABLE_NTP = 100
     }
 }

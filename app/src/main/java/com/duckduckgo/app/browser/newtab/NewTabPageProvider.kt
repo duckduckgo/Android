@@ -24,15 +24,11 @@ import com.duckduckgo.common.utils.plugins.ActivePluginPoint
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.newtabpage.api.NewTabPagePlugin
+import com.duckduckgo.newtabpage.api.NewTabPageProvider
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
-
-interface NewTabPageProvider {
-
-    fun provideNewTabPageVersion(): Flow<NewTabPagePlugin>
-}
 
 @ContributesBinding(scope = ActivityScope::class)
 class RealNewTabPageProvider @Inject constructor(
