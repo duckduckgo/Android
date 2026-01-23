@@ -6677,7 +6677,7 @@ class BrowserTabViewModelTest {
                 data = null,
                 false,
             ) { "someUrl" }
-            verify(mockDuckChatJSHelper).processJsCallbackMessage(DUCK_CHAT_FEATURE_NAME, "method", "id", null)
+            verify(mockDuckChatJSHelper).processJsCallbackMessage(eq(DUCK_CHAT_FEATURE_NAME), eq("method"), eq("id"), isNull(), any())
             assertCommandIssued<Command.SendResponseToJs>()
         }
 
@@ -6693,7 +6693,7 @@ class BrowserTabViewModelTest {
                 data = null,
                 false,
             ) { "someUrl" }
-            verify(mockDuckChatJSHelper).processJsCallbackMessage(DUCK_CHAT_FEATURE_NAME, "method", "id", null)
+            verify(mockDuckChatJSHelper).processJsCallbackMessage(eq(DUCK_CHAT_FEATURE_NAME), eq("method"), eq("id"), isNull(), any())
             assertCommandNotIssued<Command.SendResponseToJs>()
         }
 
