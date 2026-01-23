@@ -44,7 +44,10 @@ interface DeviceSyncState {
      */
     sealed interface SyncAccountState {
         data object SignedOut : SyncAccountState
-        data class SignedIn(val devices: List<ConnectedDevice>) : SyncAccountState
+        data class SignedIn(
+            val userId: String,
+            val devices: List<ConnectedDevice>,
+        ) : SyncAccountState
     }
 
     /**

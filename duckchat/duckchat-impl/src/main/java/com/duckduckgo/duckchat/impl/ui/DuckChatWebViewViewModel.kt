@@ -21,16 +21,23 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.AppUrl
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.impl.DuckChatConstants.HOST_DUCK_AI
 import com.duckduckgo.duckchat.impl.DuckChatInternal
+import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper.Companion.DUCK_CHAT_FEATURE_NAME
+import com.duckduckgo.duckchat.impl.messaging.sync.SyncStatusChangedObserver
+import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.duckduckgo.subscriptions.api.Subscriptions
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.withContext
+import logcat.logcat
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import javax.inject.Inject
 
@@ -38,10 +45,15 @@ import javax.inject.Inject
 class DuckChatWebViewViewModel @Inject constructor(
     private val subscriptions: Subscriptions,
     private val duckChat: DuckChatInternal,
+    private val syncStatusChangedObserver: SyncStatusChangedObserver,
+    private val dispatchers: DispatcherProvider,
 ) : ViewModel() {
 
     private val commandChannel = Channel<Command>(capacity = 1, onBufferOverflow = DROP_OLDEST)
     val commands = commandChannel.receiveAsFlow()
+
+    private val _subscriptionEventDataChannel = Channel<SubscriptionEventData>(capacity = Channel.BUFFERED)
+    val subscriptionEventDataFlow = _subscriptionEventDataChannel.receiveAsFlow()
 
     sealed class Command {
         data object SendSubscriptionAuthUpdateEvent : Command()
@@ -49,6 +61,7 @@ class DuckChatWebViewViewModel @Inject constructor(
 
     init {
         observeSubscriptionChanges()
+        observeSyncStatusChanges()
     }
 
     fun handleOnSameWebView(url: String): Boolean {
@@ -72,5 +85,22 @@ class DuckChatWebViewViewModel @Inject constructor(
             .onEach { _ ->
                 commandChannel.trySend(Command.SendSubscriptionAuthUpdateEvent)
             }.launchIn(viewModelScope)
+    }
+
+    private fun observeSyncStatusChanges() {
+        syncStatusChangedObserver.syncStatusChangedEvents
+            .onEach { payload ->
+                withContext(dispatchers.main()) {
+                    val event = SubscriptionEventData(
+                        featureName = DUCK_CHAT_FEATURE_NAME,
+                        subscriptionName = "submitSyncStatusChanged",
+                        params = payload,
+                    )
+                    _subscriptionEventDataChannel.trySend(event)
+                    logcat { "DuckChat-Sync: sent sync status event from DuckChatWebViewViewModel $payload" }
+                }
+            }
+            .flowOn(dispatchers.io())
+            .launchIn(viewModelScope)
     }
 }

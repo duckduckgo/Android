@@ -37,6 +37,7 @@ class AppDeviceSyncState @Inject constructor(
 
     override fun getAccountState(): SyncAccountState {
         if (!isUserSignedInOnDevice()) return SyncAccountState.SignedOut
+        val accountInfo = syncAccountRepository.getAccountInfo()
         val devices = syncAccountRepository.getConnectedDevices().getOrNull() ?: emptyList()
         val devicesMapped = devices.map {
             ConnectedDevice(
@@ -46,7 +47,10 @@ class AppDeviceSyncState @Inject constructor(
                 deviceType = it.deviceType.type(),
             )
         }
-        return SyncAccountState.SignedIn(devicesMapped)
+        return SyncAccountState.SignedIn(
+            userId = accountInfo.userId,
+            devices = devicesMapped,
+        )
     }
 
     override fun isFeatureEnabled(): Boolean {
