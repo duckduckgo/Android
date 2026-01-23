@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.duckchat.impl.ui
+package com.duckduckgo.duckchat.impl.contextual
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.app.Activity.RESULT_OK
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -38,7 +38,6 @@ import android.webkit.CookieManager
 import android.webkit.MimeTypeMap
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
-import android.webkit.WebChromeClient.FileChooserParams
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.widget.TextView
@@ -69,23 +68,19 @@ import com.duckduckgo.downloads.api.DownloadConfirmationDialogListener
 import com.duckduckgo.downloads.api.DownloadStateListener
 import com.duckduckgo.downloads.api.DownloadsFileActions
 import com.duckduckgo.downloads.api.FileDownloader
-import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.databinding.FragmentContextualDuckAiBinding
 import com.duckduckgo.duckchat.impl.feature.AIChatDownloadFeature
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
 import com.duckduckgo.duckchat.impl.helper.Mode
-import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper.Companion.DUCK_CHAT_FEATURE_NAME
-import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper.Companion.METHOD_OPEN_KEYBOARD
-import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper.Companion.SELECTOR
+import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper
+import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewClient
+import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewViewModel
+import com.duckduckgo.duckchat.impl.ui.SubscriptionsHandler
 import com.duckduckgo.duckchat.impl.ui.filechooser.FileChooserIntentBuilder
 import com.duckduckgo.duckchat.impl.ui.filechooser.capture.camera.CameraHardwareChecker
 import com.duckduckgo.duckchat.impl.ui.filechooser.capture.launcher.UploadFromExternalMediaAppLauncher
-import com.duckduckgo.duckchat.impl.ui.filechooser.capture.launcher.UploadFromExternalMediaAppLauncher.MediaCaptureResult.CouldNotCapturePermissionDenied
-import com.duckduckgo.duckchat.impl.ui.filechooser.capture.launcher.UploadFromExternalMediaAppLauncher.MediaCaptureResult.ErrorAccessingMediaApp
-import com.duckduckgo.duckchat.impl.ui.filechooser.capture.launcher.UploadFromExternalMediaAppLauncher.MediaCaptureResult.MediaCaptured
-import com.duckduckgo.duckchat.impl.ui.filechooser.capture.launcher.UploadFromExternalMediaAppLauncher.MediaCaptureResult.NoMediaCaptured
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
@@ -105,10 +100,11 @@ import org.json.JSONObject
 import java.io.File
 import javax.inject.Inject
 import javax.inject.Named
-import kotlin.getValue
 
 @InjectWith(FragmentScope::class)
-class DuckChatContextualFragment : DuckDuckGoFragment(R.layout.fragment_contextual_duck_ai), DownloadConfirmationDialogListener {
+class DuckChatContextualFragment :
+    DuckDuckGoFragment(R.layout.fragment_contextual_duck_ai),
+    DownloadConfirmationDialogListener {
 
     @Inject
     lateinit var viewModelFactory: FragmentViewModelFactory
@@ -172,7 +168,7 @@ class DuckChatContextualFragment : DuckDuckGoFragment(R.layout.fragment_contextu
 
     private val cookieManager: CookieManager by lazy { CookieManager.getInstance() }
 
-    private var pendingFileDownload: PendingFileDownload? = null
+    private var pendingFileDownload: FileDownloader.PendingFileDownload? = null
     private val downloadMessagesJob = ConflatedJob()
 
     private val binding: FragmentContextualDuckAiBinding by viewBinding()
@@ -270,14 +266,15 @@ class DuckChatContextualFragment : DuckDuckGoFragment(R.layout.fragment_contextu
                     ) {
                         logcat { "Duck.ai: process $featureName $method $id $data" }
                         when (featureName) {
-                            DUCK_CHAT_FEATURE_NAME -> {
+                            RealDuckChatJSHelper.Companion.DUCK_CHAT_FEATURE_NAME -> {
                                 appCoroutineScope.launch(dispatcherProvider.io()) {
                                     duckChatJSHelper.processJsCallbackMessage(featureName, method, id, data, Mode.CONTEXTUAL)?.let { response ->
                                         logcat { "Duck.ai: response $response" }
                                         withContext(dispatcherProvider.main()) {
-                                            if (response.method == METHOD_OPEN_KEYBOARD) {
+                                            if (response.method == RealDuckChatJSHelper.Companion.METHOD_OPEN_KEYBOARD) {
                                                 simpleWebview.evaluateJavascript(
-                                                    response.params.get(SELECTOR).toString(),
+                                                    response.params.get(RealDuckChatJSHelper.Companion.SELECTOR)
+                                                        .toString(),
                                                     null,
                                                 )
                                                 showSoftKeyboard()
@@ -309,14 +306,18 @@ class DuckChatContextualFragment : DuckDuckGoFragment(R.layout.fragment_contextu
 
         externalCameraLauncher.registerForResult(this) {
             when (it) {
-                is MediaCaptured -> pendingUploadTask?.onReceiveValue(arrayOf(Uri.fromFile(it.file)))
-                is CouldNotCapturePermissionDenied -> {
+                is UploadFromExternalMediaAppLauncher.MediaCaptureResult.MediaCaptured -> pendingUploadTask?.onReceiveValue(
+                    arrayOf(
+                        Uri.fromFile(it.file),
+                    ),
+                )
+                is UploadFromExternalMediaAppLauncher.MediaCaptureResult.CouldNotCapturePermissionDenied -> {
                     pendingUploadTask?.onReceiveValue(null)
                     externalCameraLauncher.showPermissionRationaleDialog(requireActivity(), it.inputAction)
                 }
 
-                is NoMediaCaptured -> pendingUploadTask?.onReceiveValue(null)
-                is ErrorAccessingMediaApp -> {
+                is UploadFromExternalMediaAppLauncher.MediaCaptureResult.NoMediaCaptured -> pendingUploadTask?.onReceiveValue(null)
+                is UploadFromExternalMediaAppLauncher.MediaCaptureResult.ErrorAccessingMediaApp -> {
                     pendingUploadTask?.onReceiveValue(null)
                     Snackbar.make(root, it.messageId, BaseTransientBottomBar.LENGTH_SHORT).show()
                 }
@@ -488,7 +489,7 @@ class DuckChatContextualFragment : DuckDuckGoFragment(R.layout.fragment_contextu
 
     fun showFileChooser(
         filePathCallback: ValueCallback<Array<Uri>>,
-        fileChooserParams: FileChooserParams,
+        fileChooserParams: WebChromeClient.FileChooserParams,
     ) {
         val mimeTypes = convertAcceptTypesToMimeTypes(fileChooserParams.acceptTypes)
         val fileChooserRequestedParams = FileChooserRequestedParams(fileChooserParams.mode, mimeTypes)
@@ -527,7 +528,7 @@ class DuckChatContextualFragment : DuckDuckGoFragment(R.layout.fragment_contextu
         fileChooserParams: FileChooserRequestedParams,
     ) {
         pendingUploadTask = filePathCallback
-        val canChooseMultipleFiles = fileChooserParams.filePickingMode == FileChooserParams.MODE_OPEN_MULTIPLE
+        val canChooseMultipleFiles = fileChooserParams.filePickingMode == WebChromeClient.FileChooserParams.MODE_OPEN_MULTIPLE
         val intent = fileChooserIntentBuilder.intent(fileChooserParams.acceptMimeTypes.toTypedArray(), canChooseMultipleFiles)
         startActivityForResult(intent, REQUEST_CODE_CHOOSE_FILE)
     }
@@ -626,7 +627,7 @@ class DuckChatContextualFragment : DuckDuckGoFragment(R.layout.fragment_contextu
         duckChat.closeDuckChat()
     }
 
-    override fun continueDownload(pendingFileDownload: PendingFileDownload) {
+    override fun continueDownload(pendingFileDownload: FileDownloader.PendingFileDownload) {
         fileDownloader.enqueueDownload(pendingFileDownload)
     }
 
@@ -652,7 +653,10 @@ class DuckChatContextualFragment : DuckDuckGoFragment(R.layout.fragment_contextu
 
     @SuppressLint("WrongConstant")
     private fun downloadStarted(command: DownloadCommand.ShowDownloadStartedMessage) {
-        root.makeSnackbarWithNoBottomInset(getString(command.messageId, command.fileName), DOWNLOAD_SNACKBAR_LENGTH)?.show()
+        root.makeSnackbarWithNoBottomInset(
+            getString(command.messageId, command.fileName),
+            DOWNLOAD_SNACKBAR_LENGTH,
+        )?.show()
     }
 
     private fun downloadFailed(command: DownloadCommand.ShowDownloadFailedMessage) {
@@ -681,7 +685,7 @@ class DuckChatContextualFragment : DuckDuckGoFragment(R.layout.fragment_contextu
         contentDisposition: String?,
         mimeType: String,
     ) {
-        pendingFileDownload = PendingFileDownload(
+        pendingFileDownload = FileDownloader.PendingFileDownload(
             url = url,
             contentDisposition = contentDisposition,
             mimeType = mimeType,
@@ -734,7 +738,7 @@ class DuckChatContextualFragment : DuckDuckGoFragment(R.layout.fragment_contextu
         resultCode: Int,
         intent: Intent?,
     ) {
-        if (resultCode != RESULT_OK || intent == null) {
+        if (resultCode != Activity.RESULT_OK || intent == null) {
             pendingUploadTask?.onReceiveValue(null)
             return
         }
