@@ -4582,12 +4582,12 @@ class BrowserTabViewModel @Inject constructor(
                         val contextualUrl = url
                         val contextualTitle = title
                         if (contextualUrl != null && contextualTitle != null) {
-                            command.value = Command.ShowDuckAIContextualMode(contextualUrl, contextualTitle)
+                            command.value = Command.ShowDuckAIContextualMode(contextualUrl, contextualTitle, tabId)
                             viewModelScope.launch {
                                 val subscriptionEvent = pageContextJSHelper.onContextualOpened()
                                 _subscriptionEventDataChannel.send(subscriptionEvent)
                             }
-                            }
+                        }
                     } else {
                         command.value = Command.ShowDuckAIContextualOnboarding
                     }
