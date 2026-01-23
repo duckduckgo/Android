@@ -17,15 +17,12 @@
 package com.duckduckgo.app.browser.webview.profile
 
 import android.annotation.SuppressLint
-import android.webkit.CookieManager
 import androidx.annotation.MainThread
 import androidx.webkit.ProfileStore
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability
 import com.duckduckgo.app.browser.api.WebViewProfileManager
-import com.duckduckgo.app.fire.FireproofRepository
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
-import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
@@ -42,7 +39,7 @@ import javax.inject.Inject
 @SuppressLint("RequiresFeature")
 class RealWebViewProfileManager @Inject constructor(
     private val profileDataStore: WebViewProfileDataStore,
-    private val fireproofRepository: FireproofRepository,
+    private val migrationManager: WebViewProfileMigrationManager,
     private val capabilityChecker: WebViewCapabilityChecker,
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
     private val dispatchers: DispatcherProvider,
@@ -90,8 +87,8 @@ class RealWebViewProfileManager @Inject constructor(
                 val webViewProfileStore = ProfileStore.getInstance()
                 webViewProfileStore.getOrCreateProfile(newProfileName)
 
-                // Migrate fireproofed cookies
-                migrateFireproofedCookies(oldProfileName, newProfileName)
+                // Migrate profile data (cookies and IndexedDB)
+                migrationManager.migrateProfileData(oldProfileName, newProfileName)
 
                 // Update in-memory cache
                 currentProfileName = newProfileName
@@ -158,81 +155,4 @@ class RealWebViewProfileManager @Inject constructor(
         }
     }
 
-    private suspend fun migrateFireproofedCookies(
-        oldProfileName: String,
-        newProfileName: String,
-    ) {
-        try {
-            // Fetch fireproof domains on IO thread (database access)
-            val fireproofDomains = withContext(dispatchers.io()) {
-                fireproofRepository.fireproofWebsites()
-            }
-            logcat { "Migrating cookies for ${fireproofDomains.size} fireproofed domains + ${DDG_DOMAINS.size} DDG domains" }
-
-            // ProfileStore operations must be on main thread
-            withContext(dispatchers.main()) {
-                val profileStore = ProfileStore.getInstance()
-
-                // Get old profile's cookie manager (or default if empty profile name)
-                val oldCookieManager = if (oldProfileName.isEmpty()) {
-                    CookieManager.getInstance()
-                } else {
-                    profileStore.getProfile(oldProfileName)?.cookieManager ?: CookieManager.getInstance()
-                }
-
-                // Get new profile's cookie manager
-                val newProfile = profileStore.getOrCreateProfile(newProfileName)
-                val newCookieManager = newProfile.cookieManager
-
-                // Migrate fireproofed domain cookies
-                val domainsToMigrate = fireproofDomains.flatMap { domain ->
-                    // Include both with and without https:// prefix for better cookie matching
-                    listOf(domain, "https://$domain")
-                } + DDG_DOMAINS
-
-                domainsToMigrate.forEach { domain ->
-                    migrateCookiesForDomain(oldCookieManager, newCookieManager, domain)
-                }
-
-                // Flush to persist cookies
-                newCookieManager.flush()
-
-                logcat { "Cookie migration completed from '$oldProfileName' to '$newProfileName'" }
-            }
-        } catch (e: Exception) {
-            logcat(ERROR) { "Failed to migrate cookies: ${e.asLog()}" }
-        }
-    }
-
-    private fun migrateCookiesForDomain(
-        oldCookieManager: CookieManager,
-        newCookieManager: CookieManager,
-        domain: String,
-    ) {
-        try {
-            val cookies = oldCookieManager.getCookie(domain)
-            if (cookies.isNullOrEmpty()) return
-
-            // Cookies are returned as a single string separated by "; "
-            // They need to be set one by one
-            cookies.split(";").forEach { cookie ->
-                val trimmedCookie = cookie.trim()
-                if (trimmedCookie.isNotEmpty()) {
-                    newCookieManager.setCookie(domain, trimmedCookie)
-                }
-            }
-            logcat { "Migrated cookies for domain: $domain" }
-        } catch (e: Exception) {
-            logcat(ERROR) { "Failed to migrate cookies for $domain: ${e.asLog()}" }
-        }
-    }
-
-    private companion object {
-        // DuckDuckGo domains that should always have cookies preserved
-        val DDG_DOMAINS = listOf(
-            AppUrl.Url.COOKIES,
-            AppUrl.Url.SURVEY_COOKIES,
-            AppUrl.Url.DUCK_AI,
-        )
-    }
 }
