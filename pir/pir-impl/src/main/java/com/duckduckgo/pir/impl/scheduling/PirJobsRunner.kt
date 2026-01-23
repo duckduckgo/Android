@@ -73,7 +73,6 @@ class RealPirJobsRunner @Inject constructor(
         executionType: PirExecutionType,
     ): Result<Unit> = withContext(dispatcherProvider.io()) {
         val startTimeInMillis = currentTimeProvider.currentTimeMillis()
-        storeScanStats(startTimeInMillis, executionType)
 
         emitStartPixel(executionType)
 
@@ -105,6 +104,7 @@ class RealPirJobsRunner @Inject constructor(
             return@withContext Result.success(Unit)
         }
 
+        storeScanStats(startTimeInMillis, executionType)
         attemptCreateScanJobs(activeBrokers, profileQueries)
         executeScanJobs(context, executionType, activeBrokers)
 
