@@ -16,13 +16,10 @@
 
 package com.duckduckgo.duckchat.impl.contextual
 
-import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.squareup.anvil.annotations.ContributesBinding
-import kotlinx.coroutines.CoroutineScope
 import org.json.JSONObject
 import javax.inject.Inject
 
@@ -40,8 +37,7 @@ interface PageContextJSHelper {
 
 @ContributesBinding(AppScope::class)
 class RealPageContextJSHelper @Inject constructor(
-    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
-    private val dispatcherProvider: DispatcherProvider,
+    private val pageContextRepository: PageContextRepository,
 ) : PageContextJSHelper {
     override suspend fun processJsCallbackMessage(
         featureName: String,
@@ -49,6 +45,16 @@ class RealPageContextJSHelper @Inject constructor(
         id: String?,
         data: JSONObject?,
     ): JsCallbackData? {
+        if (method != METHOD_COLLECTION_RESULT) {
+            return null
+        }
+
+        val serializedPageData = data?.optString(KEY_SERIALIZED_PAGE_DATA, null)
+        if (!serializedPageData.isNullOrBlank()) {
+            pageContextRepository.update(serializedPageData)
+        } else if (data?.optBoolean(KEY_SUCCESS, true) == false) {
+            pageContextRepository.clear()
+        }
         return null
     }
 
@@ -63,5 +69,8 @@ class RealPageContextJSHelper @Inject constructor(
     companion object {
         const val PAGE_CONTEXT_FEATURE_NAME = "pageContext"
         private const val SUBSCRIPTION_COLLECT = "collect"
+        private const val METHOD_COLLECTION_RESULT = "collectionResult"
+        private const val KEY_SERIALIZED_PAGE_DATA = "serializedPageData"
+        private const val KEY_SUCCESS = "success"
     }
 }

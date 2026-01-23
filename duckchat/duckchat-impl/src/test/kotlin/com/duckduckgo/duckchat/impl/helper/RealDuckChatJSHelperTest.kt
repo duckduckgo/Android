@@ -26,6 +26,8 @@ import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_SELECT_FIRST_HISTORY_I
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_SUBMIT_FIRST_PROMPT
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_SUBMIT_PROMPT
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_TAP_KEYBOARD_RETURN_KEY
+import com.duckduckgo.duckchat.impl.contextual.PageContextData
+import com.duckduckgo.duckchat.impl.contextual.PageContextRepository
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper.Companion.DUCK_CHAT_FEATURE_NAME
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatDataStore
@@ -55,11 +57,13 @@ class RealDuckChatJSHelperTest {
     private val mockDuckChat: DuckChatInternal = mock()
     private val mockDataStore: DuckChatDataStore = mock()
     private val mockDuckChatPixels: DuckChatPixels = mock()
+    private val mockPageContextRepository: PageContextRepository = mock()
 
     private val testee = RealDuckChatJSHelper(
         duckChat = mockDuckChat,
         duckChatPixels = mockDuckChatPixels,
         dataStore = mockDataStore,
+        pageContextRepository = mockPageContextRepository,
         appCoroutineScope = coroutineRule.testScope,
         dispatcherProvider = coroutineRule.testDispatcherProvider,
     )
@@ -73,6 +77,52 @@ class RealDuckChatJSHelperTest {
         val result = testee.processJsCallbackMessage(featureName, method, id, null)
 
         assertNull(result)
+    }
+
+    @Test
+    fun whenGetAIChatPageContextAndDataAvailableThenReturnParsedPageContext() = runTest {
+        val featureName = "aiChat"
+        val method = "getAIChatPageContext"
+        val id = "123"
+        val serialized = """{"title":"Example","content":"Content","url":"https://example.com"}"""
+
+        whenever(mockPageContextRepository.getLatestPageContext()).thenReturn(PageContextData(serialized, 123L))
+
+        val result = testee.processJsCallbackMessage(featureName, method, id, null)
+
+        val jsonPayload = JSONObject().apply {
+            put("pageContext", JSONObject(serialized))
+        }
+
+        val expected = JsCallbackData(jsonPayload, featureName, method, id)
+
+        assertEquals(expected.id, result!!.id)
+        assertEquals(expected.method, result.method)
+        assertEquals(expected.featureName, result.featureName)
+        assertEquals(expected.params.toString(), result.params.toString())
+    }
+
+    @Test
+    fun whenGetPageContextAndDataAvailableThenReturnSerializedPageData() = runTest {
+        val featureName = "aiChat"
+        val method = "getPageContext"
+        val id = "123"
+        val serialized = """{"title":"Example","content":"Content","url":"https://example.com"}"""
+
+        whenever(mockPageContextRepository.getLatestPageContext()).thenReturn(PageContextData(serialized, 123L))
+
+        val result = testee.processJsCallbackMessage(featureName, method, id, null)
+
+        val jsonPayload = JSONObject().apply {
+            put("serializedPageData", serialized)
+        }
+
+        val expected = JsCallbackData(jsonPayload, featureName, method, id)
+
+        assertEquals(expected.id, result!!.id)
+        assertEquals(expected.method, result.method)
+        assertEquals(expected.featureName, result.featureName)
+        assertEquals(expected.params.toString(), result.params.toString())
     }
 
     @Test

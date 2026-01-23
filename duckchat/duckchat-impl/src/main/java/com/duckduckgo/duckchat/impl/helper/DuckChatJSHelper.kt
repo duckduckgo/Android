@@ -25,6 +25,7 @@ import com.duckduckgo.duckchat.impl.ChatState.HIDE
 import com.duckduckgo.duckchat.impl.ChatState.SHOW
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.ReportMetric
+import com.duckduckgo.duckchat.impl.contextual.PageContextRepository
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatDataStore
 import com.duckduckgo.js.messaging.api.JsCallbackData
@@ -67,6 +68,7 @@ class RealDuckChatJSHelper @Inject constructor(
     private val duckChat: DuckChatInternal,
     private val duckChatPixels: DuckChatPixels,
     private val dataStore: DuckChatDataStore,
+    private val pageContextRepository: PageContextRepository,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
 ) : DuckChatJSHelper {
@@ -90,6 +92,16 @@ class RealDuckChatJSHelper @Inject constructor(
         }
 
         return when (method) {
+            METHOD_GET_AI_CHAT_PAGE_CONTEXT ->
+                id?.let {
+                    getAiChatPageContext(featureName, method, it)
+                }
+
+            METHOD_GET_PAGE_CONTEXT ->
+                id?.let {
+                    getPageContext(featureName, method, it)
+                }
+
             METHOD_GET_AI_CHAT_NATIVE_HANDOFF_DATA ->
                 id?.let {
                     getAIChatNativeHandoffData(featureName, method, it)
@@ -205,6 +217,33 @@ class RealDuckChatJSHelper @Inject constructor(
         return JsCallbackData(jsonPayload, featureName, method, id)
     }
 
+    private fun getPageContext(
+        featureName: String,
+        method: String,
+        id: String,
+    ): JsCallbackData {
+        val jsonPayload = JSONObject().apply {
+            pageContextRepository.getLatestPageContext()?.serializedPageData?.let { serialized ->
+                put(SERIALIZED_PAGE_DATA, serialized)
+            }
+        }
+        return JsCallbackData(jsonPayload, featureName, method, id)
+    }
+
+    private fun getAiChatPageContext(
+        featureName: String,
+        method: String,
+        id: String,
+    ): JsCallbackData {
+        val jsonPayload = JSONObject().apply {
+            val serialized = pageContextRepository.getLatestPageContext()?.serializedPageData ?: return@apply
+            runCatching { JSONObject(serialized) }.getOrNull()?.let { pageContext ->
+                put(PAGE_CONTEXT, pageContext)
+            }
+        }
+        return JsCallbackData(jsonPayload, featureName, method, id)
+    }
+
     private fun getOpenKeyboardResponse(
         featureName: String,
         method: String,
@@ -248,6 +287,8 @@ class RealDuckChatJSHelper @Inject constructor(
         const val DUCK_CHAT_FEATURE_NAME = "aiChat"
         private const val METHOD_GET_AI_CHAT_NATIVE_HANDOFF_DATA = "getAIChatNativeHandoffData"
         private const val METHOD_GET_AI_CHAT_NATIVE_CONFIG_VALUES = "getAIChatNativeConfigValues"
+        private const val METHOD_GET_PAGE_CONTEXT = "getPageContext"
+        private const val METHOD_GET_AI_CHAT_PAGE_CONTEXT = "getAIChatPageContext"
         private const val METHOD_OPEN_AI_CHAT = "openAIChat"
         private const val METHOD_CLOSE_AI_CHAT = "closeAIChat"
         private const val METHOD_OPEN_AI_CHAT_SETTINGS = "openAIChatSettings"
@@ -271,6 +312,8 @@ class RealDuckChatJSHelper @Inject constructor(
         private const val REPORT_METRIC = "reportMetric"
         private const val PLATFORM = "platform"
         private const val ANDROID = "android"
+        private const val SERIALIZED_PAGE_DATA = "serializedPageData"
+        private const val PAGE_CONTEXT = "pageContext"
         const val SELECTOR = "selector"
         private const val DEFAULT_SELECTOR = "'user-prompt'"
         private const val SUCCESS = "success"
