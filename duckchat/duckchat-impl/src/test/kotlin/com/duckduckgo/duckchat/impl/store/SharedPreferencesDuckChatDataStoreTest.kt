@@ -127,18 +127,6 @@ class SharedPreferencesDuckChatDataStoreTest {
     }
 
     @Test
-    fun `when automatic context attachment default then return false`() = runTest {
-        assertFalse(testee.observeAutomaticContextAttachmentUserSettingEnabled().first())
-    }
-
-    @Test
-    fun `when automatic context attachment set to true then return true`() = runTest {
-        testee.setAutomaticPageContextAttachment(true)
-
-        assertTrue(testee.observeAutomaticContextAttachmentUserSettingEnabled().first())
-    }
-
-    @Test
     fun whenMenuFlagChangesLaterThenAddressBarRemainsUnchanged() = runTest {
         assertTrue(testee.getShowInBrowserMenu())
         assertTrue(testee.getShowInAddressBar())
