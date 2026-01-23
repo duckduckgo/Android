@@ -136,7 +136,6 @@ class RealPirPixelSenderTest {
         val params = paramsCaptor.firstValue
         assert(params["data_broker"] == "https://broker.com")
         assert(params["parent"] == "parent-broker")
-        assert(params["attempt_id"] == "attempt-123")
         assert(params["duration"] == "5000")
         assert(params["tries"] == "2")
         assert(params["pattern"] == "pattern-abc")
@@ -190,7 +189,6 @@ class RealPirPixelSenderTest {
         assert(params["data_broker"] == "https://broker.com")
         assert(params["parent"] == "parent-broker")
         assert(params["broker_version"] == "1.0")
-        assert(params["attempt_id"] == "attempt-456")
         assert(params["duration"] == "3000")
         assert(params["stage"] == "fill-form")
         assert(params["tries"] == "3")
@@ -281,7 +279,6 @@ class RealPirPixelSenderTest {
         val params = paramsCaptor.firstValue
         assert(params["data_broker_url"] == "https://broker.com")
         assert(params["broker_version"] == "2.0")
-        assert(params["attempt_id"] == "attempt-789")
         assert(params["action_id"] == "action-2")
         assert(params["duration"] == "2000")
         assert(params["tries"] == "1")
@@ -308,7 +305,6 @@ class RealPirPixelSenderTest {
         assert(params["data_broker_url"] == "https://broker.com")
         assert(params["broker_version"] == "2.0")
         assert(params["attempt_number"] == "1")
-        assert(params["attempt_id"] == "attempt-abc")
         assert(params["action_id"] == "action-3")
     }
 
@@ -334,7 +330,6 @@ class RealPirPixelSenderTest {
         assert(params["data_broker_url"] == "https://broker.com")
         assert(params["broker_version"] == "2.0")
         assert(params["attempt_number"] == "2")
-        assert(params["attempt_id"] == "attempt-def")
         assert(params["action_id"] == "action-4")
         assert(params["duration"] == "1500")
     }
@@ -361,7 +356,6 @@ class RealPirPixelSenderTest {
         assert(params["data_broker_url"] == "https://broker.com")
         assert(params["broker_version"] == "2.0")
         assert(params["attempt_number"] == "3")
-        assert(params["attempt_id"] == "attempt-ghi")
         assert(params["action_id"] == "action-5")
         assert(params["duration"] == "1000")
     }
@@ -385,7 +379,6 @@ class RealPirPixelSenderTest {
         val params = paramsCaptor.firstValue
         assert(params["data_broker_url"] == "https://broker.com")
         assert(params["broker_version"] == "2.0")
-        assert(params["attempt_id"] == "attempt-jkl")
         assert(params["action_id"] == "action-6")
     }
 
@@ -732,7 +725,6 @@ class RealPirPixelSenderTest {
         val params = paramsCaptor.firstValue
         assert(params["data_broker"] == "https://broker.com")
         assert(params["parent"] == "https://parent.com")
-        assert(params["attempt_id"] == "attempt-start-1")
     }
 
     @Test
@@ -757,7 +749,6 @@ class RealPirPixelSenderTest {
         val params = paramsCaptor.firstValue
         assert(params["data_broker"] == "https://broker.com")
         assert(params["parent"] == "https://parent.com")
-        assert(params["attempt_id"] == "attempt-email-1")
         assert(params["broker_version"] == "4.0")
         assert(params["duration"] == "1000")
         assert(params["tries"] == "1")
@@ -783,7 +774,6 @@ class RealPirPixelSenderTest {
         val params = paramsCaptor.firstValue
         assert(params["data_broker"] == "https://broker.com")
         assert(params["parent"] == "https://parent.com")
-        assert(params["attempt_id"] == "attempt-finish-1")
         assert(params["duration"] == "10000")
     }
 

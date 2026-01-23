@@ -460,7 +460,6 @@ class RealPirRunStateHandlerTest {
             verify(mockPixelSender).reportOptOutStageStart(
                 brokerUrl = testBroker.url,
                 parentUrl = testBroker.parent.orEmpty(),
-                attemptId = "c9982ded-021a-4251-9e03-2c58b130410f",
             )
             verifyNoMoreInteractions(mockPixelSender)
         }
@@ -504,7 +503,6 @@ class RealPirRunStateHandlerTest {
             verify(mockPixelSender).reportOptOutSubmitted(
                 brokerUrl = testBroker.url,
                 parent = "",
-                attemptId = state.attemptId,
                 durationMs = testEventTimeInMillis - testStartTimeInMillis,
                 optOutAttemptCount = 2,
                 emailPattern = state.emailPattern,
@@ -556,7 +554,6 @@ class RealPirRunStateHandlerTest {
                 brokerUrl = testBroker.url,
                 parent = "",
                 brokerJsonVersion = testBroker.version,
-                attemptId = "c9982ded-021a-4251-9e03-2c58b130410f",
                 durationMs = testEventTimeInMillis - testStartTimeInMillis,
                 stage = state.stage,
                 tries = 2,
@@ -592,7 +589,6 @@ class RealPirRunStateHandlerTest {
             verify(mockPixelSender).reportStagePendingEmailConfirmation(
                 brokerUrl = testBroker.url,
                 brokerVersion = testBroker.version,
-                attemptId = "c9982ded-021a-4251-9e03-2c58b130410f",
                 actionId = "hello82ded-021a-4251-9e03-2c58b130410f",
                 durationMs = testTotalTimeMillis,
                 tries = 1,
@@ -620,7 +616,6 @@ class RealPirRunStateHandlerTest {
             verify(mockPixelSender).reportEmailConfirmationAttemptStart(
                 brokerUrl = testBroker.url,
                 brokerVersion = testBroker.version,
-                attemptId = testEmailConfirmationJob.emailData.attemptId,
                 actionId = state.firstActionId,
                 attemptNumber = testEmailConfirmationJob.jobAttemptData.jobAttemptCount,
             )
@@ -649,7 +644,6 @@ class RealPirRunStateHandlerTest {
             verify(mockPixelSender).reportEmailConfirmationAttemptSuccess(
                 brokerUrl = testBroker.url,
                 brokerVersion = testBroker.version,
-                attemptId = testEmailConfirmationJob.emailData.attemptId,
                 actionId = state.lastActionId,
                 attemptNumber = testEmailConfirmationJob.jobAttemptData.jobAttemptCount,
                 durationMs = state.totalTimeMillis,
@@ -669,7 +663,6 @@ class RealPirRunStateHandlerTest {
             verify(mockPixelSender).reportOptOutSubmitted(
                 brokerUrl = testBroker.url,
                 parent = "",
-                attemptId = state.attemptId,
                 durationMs = state.totalTimeMillis,
                 optOutAttemptCount = testEmailConfirmationJob.jobAttemptData.jobAttemptCount,
                 emailPattern = state.emailPattern,
@@ -704,7 +697,6 @@ class RealPirRunStateHandlerTest {
             verify(mockPixelSender).reportEmailConfirmationAttemptFailed(
                 brokerUrl = testBroker.url,
                 brokerVersion = testBroker.version,
-                attemptId = testEmailConfirmationJob.emailData.attemptId,
                 actionId = state.lastActionId,
                 attemptNumber = testEmailConfirmationJob.jobAttemptData.jobAttemptCount,
                 durationMs = state.totalTimeMillis,
