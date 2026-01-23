@@ -27,10 +27,12 @@ class PirPixelParamRemovalPlugin @Inject constructor() : PixelParamRemovalPlugin
     override fun names(): List<Pair<String, Set<PixelParameter>>> {
         return listOf(
             PIR_PIXEL_PREFIX to PixelParameter.removeAtb(),
+            PIR_WEBUI_PIXEL_PREFIX to PixelParameter.removeAtb(),
         )
     }
 
     companion object {
         private const val PIR_PIXEL_PREFIX = "m_dbp_"
+        private const val PIR_WEBUI_PIXEL_PREFIX = "pir_webui_"
     }
 }
