@@ -5192,6 +5192,7 @@ class BrowserTabViewModelTest {
                 "myId",
                 JSONObject("""{ "my":"object"}"""),
                 false,
+                null,
                 { "someUrl" },
             )
             assertCommandIssued<Command.WebShareRequest> {
@@ -5247,6 +5248,7 @@ class BrowserTabViewModelTest {
                 "myId",
                 JSONObject("""{ "my":"object"}"""),
                 false,
+                null,
                 { "someUrl" },
             )
             assertCommandIssued<Command.ScreenLock> {
@@ -5267,6 +5269,7 @@ class BrowserTabViewModelTest {
                 "myId",
                 JSONObject("""{ "my":"object"}"""),
                 false,
+                null,
                 { "someUrl" },
             )
             assertCommandNotIssued<Command.ScreenUnlock>()
@@ -5282,6 +5285,7 @@ class BrowserTabViewModelTest {
                 "myId",
                 JSONObject("""{ "my":"object"}"""),
                 false,
+                null,
                 { "someUrl" },
             )
             assertCommandIssued<Command.ScreenUnlock>()
@@ -5298,6 +5302,7 @@ class BrowserTabViewModelTest {
                 "id",
                 data = null,
                 false,
+                null,
                 { "someUrl" },
             )
             assertCommandIssued<Command.SendResponseToJs>()
@@ -5314,6 +5319,7 @@ class BrowserTabViewModelTest {
                 "id",
                 JSONObject("""{ overlayInteracted: "true", privatePlayerMode: {disabled: {} }}"""),
                 false,
+                null,
             ) { "someUrl" }
             assertCommandIssued<Command.SendResponseToJs>()
             verify(mockDuckPlayer).setUserPreferences(any(), any())
@@ -5331,6 +5337,7 @@ class BrowserTabViewModelTest {
                 "id",
                 JSONObject("""{ overlayInteracted: "true", privatePlayerMode: {enabled: {} }}"""),
                 false,
+                null,
                 { "someUrl" },
             )
             assertCommandIssued<Command.SendResponseToJs>()
@@ -5349,6 +5356,7 @@ class BrowserTabViewModelTest {
                 "id",
                 JSONObject("""{ overlayInteracted: "true", privatePlayerMode: {enabled: {} }}"""),
                 false,
+                null,
             ) { "someUrl" }
             assertCommandIssued<Command.SendResponseToDuckPlayer>()
             verify(mockDuckPlayer).setUserPreferences(true, "enabled")
@@ -5366,6 +5374,7 @@ class BrowserTabViewModelTest {
                 "id",
                 JSONObject("""{ pixelName: "pixel", params: {}}"""),
                 false,
+                null,
             ) { "someUrl" }
             verify(mockDuckPlayer).sendDuckPlayerPixel("pixel", mapOf())
         }
@@ -5382,6 +5391,7 @@ class BrowserTabViewModelTest {
                 "id",
                 JSONObject("""{ href: "duck://player/1234" }"""),
                 false,
+                null,
                 { "someUrl" },
             )
             assertCommandIssued<Navigate>()
@@ -5399,6 +5409,7 @@ class BrowserTabViewModelTest {
                 "id",
                 JSONObject("""{ href: "duck://player/1234" }"""),
                 false,
+                null,
                 { "someUrl" },
             )
             verify(mockDuckPlayer).setDuckPlayerOrigin(OVERLAY)
@@ -5416,6 +5427,7 @@ class BrowserTabViewModelTest {
                 "id",
                 JSONObject("""{ href: "duck://player/1234" }"""),
                 false,
+                null,
                 { "someUrl" },
             )
             verify(mockDuckPlayer).setDuckPlayerOrigin(AUTO)
@@ -5433,6 +5445,7 @@ class BrowserTabViewModelTest {
                 "id",
                 JSONObject("""{ href: "duck://player/1234" }"""),
                 false,
+                null,
                 { "someUrl" },
             )
             assertCommandIssued<Navigate>()
@@ -5450,6 +5463,7 @@ class BrowserTabViewModelTest {
                 "id",
                 JSONObject("""{ href: "duck://player/1234" }"""),
                 false,
+                null,
                 { "someUrl" },
             )
             assertCommandIssued<Command.OpenInNewTab>()
@@ -5498,6 +5512,7 @@ class BrowserTabViewModelTest {
                 "id",
                 null,
                 false,
+                null,
                 { "someUrl" },
             )
             assertCommandIssued<Command.SendResponseToJs>()
@@ -5514,6 +5529,7 @@ class BrowserTabViewModelTest {
                 "id",
                 null,
                 false,
+                null,
                 { "someUrl" },
             )
             assertCommandIssued<Command.SendResponseToDuckPlayer>()
@@ -5529,6 +5545,7 @@ class BrowserTabViewModelTest {
                 "id",
                 null,
                 false,
+                null,
                 { "someUrl" },
             )
             assertCommandIssued<Command.OpenDuckPlayerSettings>()
@@ -5546,6 +5563,7 @@ class BrowserTabViewModelTest {
                 "id",
                 null,
                 false,
+                null,
                 { "someUrl" },
             )
             assertCommandIssued<Command.OpenDuckPlayerPageInfo>()
@@ -7028,7 +7046,7 @@ class BrowserTabViewModelTest {
     fun whenProcessJsCallbackMessageForSubscriptionsThenSendCommand() =
         runTest {
             val jsCallbackData = JsCallbackData(JSONObject(), "", "", "")
-            whenever(mockSubscriptionsJSHelper.processJsCallbackMessage(anyString(), anyString(), anyOrNull(), anyOrNull()))
+            whenever(mockSubscriptionsJSHelper.processJsCallbackMessage(anyString(), anyString(), anyOrNull(), anyOrNull(), anyOrNull()))
                 .thenReturn(jsCallbackData)
             testee.processJsCallbackMessage(
                 featureName = SUBSCRIPTIONS_FEATURE_NAME,
@@ -7036,7 +7054,7 @@ class BrowserTabViewModelTest {
                 id = "id",
                 data = null,
             ) { "someUrl" }
-            verify(mockSubscriptionsJSHelper).processJsCallbackMessage(SUBSCRIPTIONS_FEATURE_NAME, "method", "id", null)
+            verify(mockSubscriptionsJSHelper).processJsCallbackMessage(SUBSCRIPTIONS_FEATURE_NAME, "method", "id", null, null)
             assertCommandIssued<Command.SendResponseToJs>()
         }
 
@@ -7050,7 +7068,7 @@ class BrowserTabViewModelTest {
                 id = "id",
                 data = null,
             ) { "someUrl" }
-            verify(mockSubscriptionsJSHelper).processJsCallbackMessage(SUBSCRIPTIONS_FEATURE_NAME, "method", "id", null)
+            verify(mockSubscriptionsJSHelper).processJsCallbackMessage(SUBSCRIPTIONS_FEATURE_NAME, "method", "id", null, null)
             assertCommandNotIssued<Command.SendResponseToJs>()
         }
 

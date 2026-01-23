@@ -3371,7 +3371,7 @@ class BrowserTabFragment :
                         id: String?,
                         data: JSONObject?,
                     ) {
-                        viewModel.processJsCallbackMessage(featureName, method, id, data, isActiveCustomTab()) {
+                        viewModel.processJsCallbackMessage(featureName, method, id, data, isActiveCustomTab(), context = requireActivity()) {
                             it.url
                         }
                     }
