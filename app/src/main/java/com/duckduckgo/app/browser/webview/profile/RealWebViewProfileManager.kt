@@ -19,10 +19,6 @@ package com.duckduckgo.app.browser.webview.profile
 import android.annotation.SuppressLint
 import android.webkit.CookieManager
 import androidx.annotation.MainThread
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.webkit.ProfileStore
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability
@@ -34,8 +30,6 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
-import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
 import logcat.LogPriority.WARN
@@ -47,7 +41,7 @@ import javax.inject.Inject
 @SingleInstanceIn(AppScope::class)
 @SuppressLint("RequiresFeature")
 class RealWebViewProfileManager @Inject constructor(
-    @WebViewProfileData private val store: DataStore<Preferences>,
+    private val profileDataStore: WebViewProfileDataStore,
     private val fireproofRepository: FireproofRepository,
     private val capabilityChecker: WebViewCapabilityChecker,
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
@@ -87,8 +81,8 @@ class RealWebViewProfileManager @Inject constructor(
         return withContext(dispatchers.main()) {
             try {
                 val oldProfileName = currentProfileName
-                val newIndex = incrementProfileIndex()
-                val newProfileName = getProfileName(newIndex)
+                val newIndex = profileDataStore.incrementProfileIndex()
+                val newProfileName = profileDataStore.getProfileName(newIndex)
 
                 logcat { "Switching profile from '$oldProfileName' to '$newProfileName'" }
 
@@ -124,7 +118,7 @@ class RealWebViewProfileManager @Inject constructor(
                 logcat { "Cleaning up stale profiles. Current: '$currentProfile', All: $allProfiles" }
 
                 allProfiles
-                    .filter { it.startsWith(PROFILE_PREFIX) && it != currentProfile }
+                    .filter { it.startsWith(WebViewProfileDataStore.PROFILE_PREFIX) && it != currentProfile }
                     .forEach { staleProfile ->
                         try {
                             webViewProfileStore.deleteProfile(staleProfile)
@@ -147,11 +141,11 @@ class RealWebViewProfileManager @Inject constructor(
             try {
                 cachedProfileSwitchingAvailable = isProfileSwitchingAvailable()
                 if (cachedProfileSwitchingAvailable) {
-                    val currentIndex = getCurrentProfileIndex()
+                    val currentIndex = profileDataStore.getCurrentProfileIndex()
                     currentProfileName = if (currentIndex > 0) {
-                        getProfileName(currentIndex)
+                        profileDataStore.getProfileName(currentIndex)
                     } else {
-                        "${PROFILE_PREFIX}0"
+                        "${WebViewProfileDataStore.PROFILE_PREFIX}0"
                     }
                     logcat { "WebViewProfileManager initialized with profile: '$currentProfileName', switching available: $cachedProfileSwitchingAvailable" }
                 }
@@ -162,28 +156,6 @@ class RealWebViewProfileManager @Inject constructor(
                 isInitialized = true
             }
         }
-    }
-
-    // TODO: Move back to WebViewProfileStoreDataStore
-
-    private suspend fun getCurrentProfileIndex(): Int {
-        return store.data.map { preferences ->
-            preferences[KEY_PROFILE_INDEX] ?: 0
-        }.firstOrNull() ?: 0
-    }
-
-    private suspend fun incrementProfileIndex(): Int {
-        var newIndex = 0
-        store.edit { preferences ->
-            val currentIndex = preferences[KEY_PROFILE_INDEX] ?: 0
-            newIndex = currentIndex + 1
-            preferences[KEY_PROFILE_INDEX] = newIndex
-        }
-        return newIndex
-    }
-
-    private fun getProfileName(index: Int): String {
-        return "$PROFILE_PREFIX$index"
     }
 
     private suspend fun migrateFireproofedCookies(
@@ -256,9 +228,6 @@ class RealWebViewProfileManager @Inject constructor(
     }
 
     private companion object {
-        val KEY_PROFILE_INDEX = intPreferencesKey("PROFILE_INDEX")
-        const val PROFILE_PREFIX = "ddg_default_"
-
         // DuckDuckGo domains that should always have cookies preserved
         val DDG_DOMAINS = listOf(
             AppUrl.Url.COOKIES,
