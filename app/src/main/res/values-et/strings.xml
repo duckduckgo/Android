@@ -924,11 +924,16 @@
     <string name="settingsHeadingCompleteSetup">Vii seadistamine lõpule</string>
 
     <!--TabSwitcher Trackers Animation-->
-    <string name="showTrackerCountInTabSwitcher">Kuva jälgurite arv vahekaardi vahetajas</string>
+    <string name="trackerBlockedInTheLast7days" instruction="Placeholder is 1 tracker blocked">&lt;b&gt;%1$s jälgija blokeeritud &lt;/b&gt; viimase 7 päeva jooksul</string>
     <string name="tabSwitcherAnimationTileRemovalDialogTitle" instruction="A title for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Kas peita jälgurite arv?</string>
     <string name="tabSwitcherAnimationTileRemovalDialogBody" instruction="A message for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Saad selle uuesti sisse lülitada suvandis Seaded &gt; Välimus.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Peida</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Jäta alles</string>
+
+    <!-- Trackers blocked animation-->
+    <string name="settingsTrackersBlockedAnimationHeaderTitle">Blokeeritud jälgurite animatsioon</string>
+    <string name="showTrackerCountInAddressBar">Näita aadressiribal</string>
+    <string name="showWeeklyTrackerCountInTabSwitcher">Näita vahelehtede halduris</string>
 
     <!-- Widgets -->
     <string name="searchOnlyWidgetLabel" instruction="Label for the search-only widget">Ainult otsi</string>
