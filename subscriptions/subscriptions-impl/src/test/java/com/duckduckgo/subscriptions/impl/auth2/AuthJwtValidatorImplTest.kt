@@ -21,7 +21,6 @@ import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.subscriptions.impl.model.Entitlement
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
-import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.time.Instant
@@ -34,7 +33,6 @@ class AuthJwtValidatorImplTest {
     private val authJwtValidator = AuthJwtValidatorImpl(timeProvider)
 
     @Test
-    @Ignore
     fun `when valid access token then returns claims`() {
         val claims = authJwtValidator.validateAccessToken(ACCESS_TOKEN, JWK_SET)
 
@@ -51,7 +49,6 @@ class AuthJwtValidatorImplTest {
     }
 
     @Test
-    @Ignore
     fun `when valid refresh token then returns claims`() {
         val claims = authJwtValidator.validateRefreshToken(REFRESH_TOKEN, JWK_SET)
 

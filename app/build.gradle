@@ -18,8 +18,7 @@ ext {
 
 android {
     defaultConfig {
-//        applicationId "com.duckduckgo.mobile.android"
-        applicationId "com.duckduckgo.dev.android"
+        applicationId "com.duckduckgo.mobile.android"
 
         minSdk min_sdk
         targetSdk target_sdk
@@ -141,11 +140,11 @@ android {
     }
     buildTypes {
         debug {
-//            applicationIdSuffix ".debug"
+            applicationIdSuffix ".debug"
             pseudoLocalesEnabled false
             manifestPlaceholders = [
-                    appIcon     : "@mipmap/ic_launcher_gold",
-                    appIconRound: "@mipmap/ic_launcher_gold_round"
+                    appIcon     : "@mipmap/ic_launcher_blue",
+                    appIconRound: "@mipmap/ic_launcher_blue_round"
             ]
         }
         release {

@@ -22,10 +22,10 @@ import retrofit2.http.Query
 
 interface SubscriptionsCachedService {
     @Deprecated("Use featuresV2 instead")
-    @GET("https://subscriptions-dev.duckduckgo.com/api/products/{sku}/features")
+    @GET("https://subscriptions.duckduckgo.com/api/products/{sku}/features")
     suspend fun features(@Path("sku") sku: String): FeaturesResponse
 
-    @GET("https://subscriptions-dev.duckduckgo.com/api/v2/features")
+    @GET("https://subscriptions.duckduckgo.com/api/v2/features")
     suspend fun featuresV2(@Query("sku") sku: String): FeaturesV2Response
 }
 
