@@ -17,32 +17,37 @@
 package com.duckduckgo.duckchat.impl.contextual
 
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.impl.store.DuckChatDataStore
 import com.squareup.anvil.annotations.ContributesBinding
-import java.util.concurrent.ConcurrentHashMap
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 data class PageContextData(
+    val tabId: String,
     val serializedPageData: String,
     val collectedAtMs: Long,
+    val isCleared: Boolean = false,
 )
 
 interface PageContextRepository {
-    fun update(tabId: String, serializedPageData: String)
-    fun clear(tabId: String)
-    fun getLatestPageContext(tabId: String): PageContextData?
+    suspend fun update(tabId: String, serializedPageData: String)
+    suspend fun clear(tabId: String)
+    fun getPageContext(tabId: String): Flow<PageContextData?>
 }
 
 @ContributesBinding(AppScope::class)
-class RealPageContextRepository @Inject constructor() : PageContextRepository {
-    private val pageContexts = ConcurrentHashMap<String, PageContextData>()
+class RealPageContextRepository @Inject constructor(
+    private val dataStore: DuckChatDataStore,
+) : PageContextRepository {
 
-    override fun update(tabId: String, serializedPageData: String) {
-        pageContexts[tabId] = PageContextData(serializedPageData, System.currentTimeMillis())
+    override suspend fun update(tabId: String, serializedPageData: String) {
+        dataStore.setDuckChatPageContext(tabId, serializedPageData)
     }
 
-    override fun clear(tabId: String) {
-        pageContexts.remove(tabId)
+    override suspend fun clear(tabId: String) {
+        dataStore.clearDuckChatPageContext(tabId)
     }
 
-    override fun getLatestPageContext(tabId: String): PageContextData? = pageContexts[tabId]
+    override fun getPageContext(tabId: String): Flow<PageContextData?> =
+        dataStore.observeDuckChatPageContext()
 }

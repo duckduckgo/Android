@@ -425,7 +425,10 @@ class DuckChatContextualFragment :
             binding.inputField.setText(binding.contextualPromptSummarize.text.toString())
         }
 
-        renderPageContext()
+        val pageTitle = requireArguments().getString(KEY_DUCK_AI_CONTEXTUAL_PAGE_TITLE)!!
+        val pageUrl = requireArguments().getString(KEY_DUCK_AI_CONTEXTUAL_PAGE_URL)!!
+        val tabId = requireArguments().getString(KEY_DUCK_AI_CONTEXTUAL_TAB_ID)!!
+        renderPageContext(pageTitle, pageUrl, tabId)
     }
 
     private fun sendPrompt(bottomSheetBehavior: BottomSheetBehavior<View>) {
@@ -457,20 +460,28 @@ class DuckChatContextualFragment :
                         )
                         contentScopeScripts.sendSubscriptionEvent(authUpdateEvent)
                     }
+
+                    is DuckChatContextualViewModel.Command.PageContextUpdated -> {
+                        logcat { "Duck.ai: PageContextUpdated tab=${command.tabId} title=${command.pageTitle} url=${command.pageUrl}" }
+                        renderPageContext(command.pageTitle, command.pageUrl, command.tabId)
+                    }
                 }
             }.launchIn(lifecycleScope)
+
+        requireArguments().getString(KEY_DUCK_AI_CONTEXTUAL_TAB_ID)?.let { tabId ->
+            viewModel.observePageContextChanges(tabId)
+        }
     }
 
-    private fun renderPageContext() {
-        requireArguments().getString(KEY_DUCK_AI_CONTEXTUAL_PAGE_TITLE)?.let {
-            binding.duckAiContextualPageTitle.text = it
-        }
-        val pageUrl = requireArguments().getString(KEY_DUCK_AI_CONTEXTUAL_PAGE_URL)
-        val tabId = requireArguments().getString(KEY_DUCK_AI_CONTEXTUAL_TAB_ID)
-        if (pageUrl != null && tabId != null) {
-            viewModel.viewModelScope.launch {
-                faviconManager.loadToViewFromLocalWithPlaceholder(tabId, pageUrl, binding.duckAiContextualFavicon)
-            }
+    private fun renderPageContext(
+        pageTitle: String,
+        pageUrl: String,
+        tabId: String,
+    ) {
+        logcat { "Duck.ai: renderPageContext tab=$tabId title=$pageTitle url=$pageUrl" }
+        binding.duckAiContextualPageTitle.text = pageTitle
+        viewModel.viewModelScope.launch {
+            faviconManager.loadToViewFromLocalWithPlaceholder(tabId, pageUrl, binding.duckAiContextualFavicon)
         }
     }
 
