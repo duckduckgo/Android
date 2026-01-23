@@ -621,8 +621,22 @@ open class BrowserActivity : DuckDuckGoActivity() {
             if (duckAiFeatureState.showInputScreenAutomaticallyOnNewTab.value) {
                 externalIntentProcessingState.onIntentRequestToOpenDuckAi()
             }
-            val duckChatSessionActive = intent.getBooleanExtra(DUCK_CHAT_SESSION_ACTIVE, false)
-            viewModel.openDuckChat(intent.getStringExtra(DUCK_CHAT_URL), duckChatSessionActive, withTransition = duckAiShouldAnimate)
+
+            if (duckAiFeatureState.showFullScreenMode.value) {
+                val url = intent.getStringExtra(DUCK_CHAT_URL) ?: duckChat.getDuckChatUrl("", false)
+                if (currentTab != null) {
+                    currentTab?.submitQuery(url)
+                } else {
+                    if (swipingTabsFeature.isEnabled) {
+                        launchNewTab(query = url, skipHome = true)
+                    } else {
+                        lifecycleScope.launch { viewModel.onOpenInNewTabRequested(query = url, skipHome = true) }
+                    }
+                }
+            } else {
+                val duckChatSessionActive = intent.getBooleanExtra(DUCK_CHAT_SESSION_ACTIVE, false)
+                viewModel.openDuckChat(intent.getStringExtra(DUCK_CHAT_URL), duckChatSessionActive, withTransition = duckAiShouldAnimate)
+            }
             return
         }
 
