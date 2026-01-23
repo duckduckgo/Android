@@ -49,7 +49,7 @@ import com.duckduckgo.duckchat.impl.inputscreen.ui.view.SwipeableRecyclerView
 import com.duckduckgo.duckchat.impl.inputscreen.ui.viewmodel.InputScreenViewModel
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.newtabpage.api.NewTabPageProvider
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -142,7 +142,7 @@ class SearchTabFragment : DuckDuckGoFragment(R.layout.fragment_search_tab) {
         val favoritesContainer = parentFragment.getFavoritesContainer()
 
         lifecycleScope.launch {
-            newTabPageProvider.provideNewTabPageVersion().first().let { plugin ->
+            newTabPageProvider.provideNewTabPageVersion().firstOrNull()?.let { plugin ->
                 newTabPageView =
                     plugin.getView(requireContext(), showLogo = false) { hasContent ->
                         if (isAdded && view != null) {
