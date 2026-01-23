@@ -1648,7 +1648,7 @@ class BrowserTabFragment :
         binding.rootView.postDelayed(delay) {
             if (isAdded) {
                 bottomSheetMenu?.show()
-                if (bottomSheetMenu?.isShowing == false) {
+                if (bottomSheetMenu?.isShowing != true) {
                     return@postDelayed
                 }
                 val viewState = viewModel.browserViewState.value
