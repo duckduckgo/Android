@@ -39,7 +39,7 @@ class RealNewTabPageProvider @Inject constructor(
     private val newTabPageVersions: ActivePluginPoint<NewTabPagePlugin>,
 ) : NewTabPageProvider {
     override fun provideNewTabPageVersion(): Flow<NewTabPagePlugin> = flow {
-        val newTabPage = newTabPageVersions.getPlugins().firstOrNull() ?: NewTabPage()
+        val newTabPage = newTabPageVersions.getPlugins().firstOrNull() ?: NewTabLegacyPage()
         emit(newTabPage)
     }
 }
@@ -49,14 +49,14 @@ class RealNewTabPageProvider @Inject constructor(
     boundType = NewTabPagePlugin::class,
     priority = NewTabPagePlugin.PRIORITY_NTP,
 )
-class NewTabPage @Inject constructor() : NewTabPagePlugin {
+class NewTabLegacyPage @Inject constructor() : NewTabPagePlugin {
 
     override fun getView(
         context: Context,
         showLogo: Boolean,
         onHasContent: ((Boolean) -> Unit)?,
     ): View {
-        return NewTabPageView(context, showLogo = showLogo, onHasContent = onHasContent)
+        return NewTabLegacyPageView(context, showLogo = showLogo, onHasContent = onHasContent)
     }
 }
 

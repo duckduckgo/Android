@@ -18,7 +18,7 @@ package com.duckduckgo.app.browser.newtab
 
 import androidx.lifecycle.LifecycleOwner
 import app.cash.turbine.test
-import com.duckduckgo.app.browser.newtab.NewTabPageViewModel.Command
+import com.duckduckgo.app.browser.newtab.NewTabLegacyPageViewModel.Command
 import com.duckduckgo.app.browser.remotemessage.CommandActionMapper
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId.DAX_END
@@ -55,7 +55,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
-class NewTabPageViewModelTest {
+class NewTabLegacyPageViewModelTest {
 
     @get:Rule
     var coroutinesTestRule = CoroutineTestRule()
@@ -73,7 +73,7 @@ class NewTabPageViewModelTest {
     private val mockAppTrackingProtection: AppTrackingProtection = mock()
     private val pixel: Pixel = mock()
 
-    private lateinit var testee: NewTabPageViewModel
+    private lateinit var testee: NewTabLegacyPageViewModel
 
     @Before
     fun setUp() = runTest {
@@ -86,8 +86,8 @@ class NewTabPageViewModelTest {
         testee = createTestee()
     }
 
-    private fun createTestee(showLogo: Boolean = true): NewTabPageViewModel {
-        return NewTabPageViewModel(
+    private fun createTestee(showLogo: Boolean = true): NewTabLegacyPageViewModel {
+        return NewTabLegacyPageViewModel(
             showDaxLogo = showLogo,
             dispatchers = coroutinesTestRule.testDispatcherProvider,
             remoteMessagingModel = mockRemoteMessageModel,
@@ -210,7 +210,7 @@ class NewTabPageViewModelTest {
 
         val action = Action.Dismiss
         whenever(mockRemoteMessageModel.onPrimaryActionClicked(remoteMessage)).thenReturn(Action.Dismiss)
-        whenever(mockCommandActionMapper.asNewTabCommand(action)).thenReturn(NewTabPageViewModel.Command.DismissMessage)
+        whenever(mockCommandActionMapper.asNewTabCommand(action)).thenReturn(NewTabLegacyPageViewModel.Command.DismissMessage)
 
         testee.onStart(mockLifecycleOwner)
 
@@ -230,7 +230,7 @@ class NewTabPageViewModelTest {
 
         val action = Action.Dismiss
         whenever(mockRemoteMessageModel.onSecondaryActionClicked(remoteMessage)).thenReturn(Action.Dismiss)
-        whenever(mockCommandActionMapper.asNewTabCommand(action)).thenReturn(NewTabPageViewModel.Command.DismissMessage)
+        whenever(mockCommandActionMapper.asNewTabCommand(action)).thenReturn(NewTabLegacyPageViewModel.Command.DismissMessage)
 
         testee.onStart(mockLifecycleOwner)
 
@@ -250,7 +250,7 @@ class NewTabPageViewModelTest {
 
         val action = Action.Dismiss
         whenever(mockRemoteMessageModel.onActionClicked(remoteMessage)).thenReturn(Action.Dismiss)
-        whenever(mockCommandActionMapper.asNewTabCommand(action)).thenReturn(NewTabPageViewModel.Command.DismissMessage)
+        whenever(mockCommandActionMapper.asNewTabCommand(action)).thenReturn(NewTabLegacyPageViewModel.Command.DismissMessage)
 
         testee.onStart(mockLifecycleOwner)
 

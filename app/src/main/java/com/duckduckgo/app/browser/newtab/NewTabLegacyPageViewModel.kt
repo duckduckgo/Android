@@ -58,7 +58,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
-class NewTabPageViewModel @AssistedInject constructor(
+class NewTabLegacyPageViewModel @AssistedInject constructor(
     @Assisted private val showDaxLogo: Boolean,
     private val dispatchers: DispatcherProvider,
     private val remoteMessagingModel: RemoteMessageModel,
@@ -249,8 +249,8 @@ class NewTabPageViewModel @AssistedInject constructor(
         )
     }
 
-    class NewTabPageViewModelProviderFactory(
-        private val assistedFactory: NewTabPageViewModelFactory,
+    class NewTabLegacyPageViewModelProviderFactory(
+        private val assistedFactory: NewTabLegacyPageViewModelFactory,
         private val showDaxLogo: Boolean,
     ) : ViewModelProvider.Factory {
 
@@ -261,9 +261,9 @@ class NewTabPageViewModel @AssistedInject constructor(
     }
 
     @AssistedFactory
-    interface NewTabPageViewModelFactory {
+    interface NewTabLegacyPageViewModelFactory {
         fun create(
             showDaxLogo: Boolean,
-        ): NewTabPageViewModel
+        ): NewTabLegacyPageViewModel
     }
 }

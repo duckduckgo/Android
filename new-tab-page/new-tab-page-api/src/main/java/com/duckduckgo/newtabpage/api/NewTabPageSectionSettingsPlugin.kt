@@ -21,7 +21,7 @@ import android.view.View
 
 /**
  * This class is used to provide each of the Sections that build the New Tab Page
- * Implementation of https://app.asana.com/1/137249556945/project/72649045549333/task/1207111396655548?focus=true
+ * Implementation of https://app.asana.com/0/1174433894299346/12070643725750
  */
 
 interface NewTabPageSectionSettingsPlugin {
