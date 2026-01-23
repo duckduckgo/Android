@@ -281,7 +281,7 @@ interface PrivacyProFeature {
     /**
      * When enabled, a VPN reminder notification will be scheduled for day 2 of the free trial.
      */
-    @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.TRUE)
+    @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.FALSE)
     fun vpnReminderNotification(): Toggle
 }
 
