@@ -321,6 +321,7 @@ import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
 import com.duckduckgo.duckchat.impl.helper.NativeAction
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper.Companion.DUCK_CHAT_FEATURE_NAME
+import com.duckduckgo.duckchat.impl.messaging.sync.SyncStatusChangedObserver
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.ENABLED
@@ -488,6 +489,7 @@ class BrowserTabViewModel @Inject constructor(
     private val omnibarRepository: OmnibarRepository,
     private val contentScopeScriptsSubscriptionEventPluginPoint: PluginPoint<ContentScopeScriptsSubscriptionEventPlugin>,
     private val serpSettingsFeature: SerpSettingsFeature,
+    private val syncStatusChangedObserver: SyncStatusChangedObserver,
 ) : ViewModel(),
     WebViewClientListener,
     EditSavedSiteListener,
@@ -694,6 +696,8 @@ class BrowserTabViewModel @Inject constructor(
             addressBarTrackersAnimationManager.fetchFeatureState()
         }
 
+        observeSyncStatusChangesForDuckChat()
+
         tabRepository.childClosedTabs
             .onEach { closedTab ->
                 if (this@BrowserTabViewModel::tabId.isInitialized && tabId == closedTab) {
@@ -865,6 +869,27 @@ class BrowserTabViewModel @Inject constructor(
                             refreshWebView = shouldRefreshWebview,
                         )
                 }.launchIn(viewModelScope)
+    }
+
+    private fun observeSyncStatusChangesForDuckChat() {
+        syncStatusChangedObserver.syncStatusChangedEvents
+            .onEach { payload ->
+                // Only send sync status events when viewing duck.ai
+                val currentUrl = url
+                if (currentUrl != null && duckChat.isDuckChatUrl(currentUrl.toUri())) {
+                    withContext(dispatchers.main()) {
+                        val event = SubscriptionEventData(
+                            featureName = DUCK_CHAT_FEATURE_NAME,
+                            subscriptionName = "submitSyncStatusChanged",
+                            params = payload,
+                        )
+                        _subscriptionEventDataChannel.trySend(event)
+                        logcat { "DuckChat-Sync: sent sync status event from BrowserTabViewModel $payload" }
+                    }
+                }
+            }
+            .flowOn(dispatchers.io())
+            .launchIn(viewModelScope)
     }
 
     override fun getCurrentTabId(): String = tabId

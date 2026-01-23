@@ -297,8 +297,6 @@ import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityParams
 import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityResultCodes
 import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityResultParams
 import com.duckduckgo.duckchat.api.inputscreen.InputScreenBrowserButtonsConfig
-import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper.Companion.DUCK_CHAT_FEATURE_NAME
-import com.duckduckgo.duckchat.impl.messaging.sync.SyncStatusChangedObserver
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckchat.impl.ui.DuckChatContextualFragment
 import com.duckduckgo.duckchat.impl.ui.DuckChatContextualFragment.Companion.KEY_DUCK_AI_CONTEXTUAL_RESULT
@@ -346,7 +344,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.cancellable
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -568,9 +565,6 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var duckChat: DuckChat
-
-    @Inject
-    lateinit var syncStatusChangedObserver: SyncStatusChangedObserver
 
     @Inject
     lateinit var duckAiFeatureState: DuckAiFeatureState
@@ -989,34 +983,12 @@ class BrowserTabFragment :
         viewModel.handleExternalLaunch(isLaunchedFromExternalApp)
 
         observeSubscriptionEventDataChannel()
-        observeSyncStatusChangesForDuckChat()
     }
 
     private fun observeSubscriptionEventDataChannel() {
         viewModel.subscriptionEventDataFlow.onEach { subscriptionEventData ->
             contentScopeScripts.sendSubscriptionEvent(subscriptionEventData)
         }.launchIn(lifecycleScope)
-    }
-
-    private fun observeSyncStatusChangesForDuckChat() {
-        syncStatusChangedObserver.syncStatusChangedEvents
-            .onEach { payload ->
-                // Only send sync status events when viewing duck.ai
-                val currentUrl = viewModel.url
-                if (currentUrl != null && duckChat.isDuckChatUrl(currentUrl.toUri())) {
-                    withContext(dispatchers.main()) {
-                        val event = SubscriptionEventData(
-                            featureName = DUCK_CHAT_FEATURE_NAME,
-                            subscriptionName = "submitSyncStatusChanged",
-                            params = payload,
-                        )
-                        contentScopeScripts.sendSubscriptionEvent(event)
-                        logcat { "DuckChat-Sync: sent sync status event from BrowserTabFragment $payload" }
-                    }
-                }
-            }
-            .flowOn(dispatchers.io())
-            .launchIn(lifecycleScope)
     }
 
     private fun resumeWebView() {
