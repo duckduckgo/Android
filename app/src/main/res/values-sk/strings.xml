@@ -962,11 +962,16 @@
     <string name="settingsHeadingCompleteSetup">Dokonči svoje nastavenie</string>
 
     <!--TabSwitcher Trackers Animation-->
-    <string name="showTrackerCountInTabSwitcher">Zobraziť počet sledovačov v prepínači kariet</string>
+    <string name="trackerBlockedInTheLast7days" instruction="Placeholder is 1 tracker blocked">Za posledných 7&amp;nbsp;dní &lt;b&gt;bolo zablokovaných%1$s sledovačov &lt;/b&gt;</string>
     <string name="tabSwitcherAnimationTileRemovalDialogTitle" instruction="A title for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Skryť počet sledovaných položiek?</string>
     <string name="tabSwitcherAnimationTileRemovalDialogBody" instruction="A message for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Túto funkciu môžeš znova zapnúť v časti Nastavenia &gt; Vzhľad.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Skryť</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Ponechať</string>
+
+    <!-- Trackers blocked animation-->
+    <string name="settingsTrackersBlockedAnimationHeaderTitle">Animácia blokovania sledovačov</string>
+    <string name="showTrackerCountInAddressBar">Zobraziť v adresnom riadku</string>
+    <string name="showWeeklyTrackerCountInTabSwitcher">Zobraziť v Správcovi kariet</string>
 
     <!-- Widgets -->
     <string name="searchOnlyWidgetLabel" instruction="Label for the search-only widget">Len vyhľadávanie</string>
