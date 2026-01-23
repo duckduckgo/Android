@@ -137,7 +137,6 @@ import logcat.LogPriority.VERBOSE
 import logcat.LogPriority.WARN
 import logcat.asLog
 import logcat.logcat
-import java.io.File
 import javax.inject.Inject
 
 // open class so that we can test BrowserApplicationStateInfo
@@ -419,50 +418,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     /**
      * Handles tab fragment reset after a WebView profile switch.
-     * Removes all existing tab fragments so new ones can be created with the new profile.
      */
     private fun handleProfileSwitchTabsReset() {
         recreate()
-        return
-        logcat(INFO) { "Handling profile switch tabs reset" }
-
-        if (swipingTabsFeature.isEnabled) {
-            // When swiping is enabled, clear via the pager adapter
-            supportFragmentManager.fragments
-                .filterIsInstance<BrowserTabFragment>()
-                .forEach {
-                    it.onDestroy()
-                }
-
-            val webViewCacheDir = File(cacheDir, "WebView")
-            if (webViewCacheDir.exists() && webViewCacheDir.isDirectory) {
-                webViewCacheDir.listFiles { file -> file.isDirectory && file.name.startsWith("Profile") }
-                    ?.forEach { profileDir ->
-                        logcat(INFO) { "Deleting WebView profile cache: ${profileDir.name}" }
-                        profileDir.deleteRecursively()
-                    }
-            }
-
-            tabPagerAdapter.clearFragments()
-
-            lifecycleScope.launch {
-                webViewProfileManager.cleanupStaleProfiles()
-            }
-        } else {
-            // When swiping is disabled, remove individual tab fragments from fragment manager
-            val tabFragments = supportFragmentManager.fragments
-                .filterIsInstance<BrowserTabFragment>()
-
-            if (tabFragments.isNotEmpty()) {
-                removeTabs(tabFragments)
-            }
-        }
-
-        currentTab = null
-        lastActiveTabs.clear()
-
-        // Let the ViewModel handle the tab repository operations
-//        viewModel.onProfileSwitchTabsReset()
     }
 
     private fun setupFireDialogListener() {

@@ -75,12 +75,11 @@ class DataClearing @Inject constructor(
         val wasProfileSwitched = webViewProfileManager.switchToNewProfile()
         if (wasProfileSwitched) {
             logcat { "Profile switch successful, resetting tabs" }
-//            if (shouldDeleteTabs) {
-// //                clearDataAction.clearTabsOnly()
-//                clearDataAction.resetTabsForProfileSwitch()
-//            } else {
-//                clearDataAction.resetTabsForProfileSwitch()
-//            }
+            if (shouldDeleteTabs) {
+                clearDataAction.clearTabsOnly()
+            } else {
+                clearDataAction.resetTabsForProfileSwitch()
+            }
         } else {
             logcat(WARN) { "Profile switching failed, fall back to process restart" }
 
