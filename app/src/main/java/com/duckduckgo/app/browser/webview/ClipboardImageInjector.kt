@@ -318,7 +318,7 @@ class ClipboardImageInjectorImpl @Inject constructor(
             logcat { "ClipboardImageInjector: Bitmap decoded: ${bitmap.width}x${bitmap.height}" }
             val uri = saveBitmapToCache(bitmap, mimeType)
             if (uri != null) {
-                withContext(dispatcherProvider.main()) {
+                val clipboardSuccess = withContext(dispatcherProvider.main()) {
                     runCatching {
                         if (appBuildConfig.sdkInt >= Build.VERSION_CODES.P) {
                             clipboardManager.clearPrimaryClip()
@@ -327,12 +327,15 @@ class ClipboardImageInjectorImpl @Inject constructor(
                         val clipData = ClipData.newUri(context.contentResolver, "Image", uri)
                         clipboardManager.setPrimaryClip(clipData)
                         logcat { "ClipboardImageInjector: Clipboard updated with uri: $uri" }
+                        true
                     }.onFailure { e ->
                         logcat { "ClipboardImageInjector: Error setting clipboard: ${e.message}" }
-                    }
+                    }.getOrDefault(false)
                 }
-                logcat { "ClipboardImageInjector: Image copied to clipboard successfully, uri: $uri" }
-                true
+                if (clipboardSuccess) {
+                    logcat { "ClipboardImageInjector: Image copied to clipboard successfully, uri: $uri" }
+                }
+                clipboardSuccess
             } else {
                 logcat { "ClipboardImageInjector: Failed to save bitmap to cache" }
                 false
