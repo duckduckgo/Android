@@ -127,6 +127,18 @@ class SharedPreferencesDuckChatDataStoreTest {
     }
 
     @Test
+    fun `when automatic context attachment default then return false`() = runTest {
+        assertFalse(testee.observeAutomaticContextAttachmentUserSettingEnabled().first())
+    }
+
+    @Test
+    fun `when automatic context attachment set to true then return true`() = runTest {
+        testee.setAutomaticPageContextAttachment(true)
+
+        assertTrue(testee.observeAutomaticContextAttachmentUserSettingEnabled().first())
+    }
+
+    @Test
     fun whenMenuFlagChangesLaterThenAddressBarRemainsUnchanged() = runTest {
         assertTrue(testee.getShowInBrowserMenu())
         assertTrue(testee.getShowInAddressBar())
@@ -301,6 +313,21 @@ class SharedPreferencesDuckChatDataStoreTest {
         job.join()
 
         assertEquals(listOf(true, false), results)
+    }
+
+    @Test
+    fun `when observeAutomaticContextAttachmentUserSettingEnabled then receive updates`() = runTest {
+        val results = mutableListOf<Boolean>()
+        val job = launch {
+            testee.observeAutomaticContextAttachmentUserSettingEnabled()
+                .take(2)
+                .toList(results)
+        }
+
+        testee.setAutomaticPageContextAttachment(true)
+        job.join()
+
+        assertEquals(listOf(false, true), results)
     }
 
     @Test

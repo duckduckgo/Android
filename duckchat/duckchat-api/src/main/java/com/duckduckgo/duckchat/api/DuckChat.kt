@@ -91,7 +91,7 @@ interface DuckChat {
     fun observeCosmeticInputScreenUserSettingEnabled(): Flow<Boolean?>
 
     /**
-     * Observes the cosmetic value for the automatic context attachment for Contextual Mode
+     * Observes the value for the automatic context attachment for Contextual Mode
      */
     fun observeAutomaticContextAttachmentUserSettingEnabled(): Flow<Boolean>
 }
