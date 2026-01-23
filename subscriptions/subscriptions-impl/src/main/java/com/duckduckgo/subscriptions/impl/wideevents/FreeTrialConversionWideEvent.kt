@@ -23,6 +23,7 @@ import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.subscriptions.impl.PrivacyProFeature
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.AuthRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.Lazy
@@ -58,12 +59,15 @@ class FreeTrialConversionWideEventImpl @Inject constructor(
     private val authRepository: AuthRepository,
     private val timeProvider: CurrentTimeProvider,
     private val dispatchers: DispatcherProvider,
+    private val pixelSender: SubscriptionPixelSender,
 ) : FreeTrialConversionWideEvent {
 
     private var cachedFlowId: Long? = null
     private var vpnActivationStepRecorded: Boolean = false
 
     override suspend fun onFreeTrialStarted(productId: String) {
+        pixelSender.reportFreeTrialStart()
+
         if (!isFeatureEnabled()) return
 
         // Skip if there's already an active flow to avoid restarting on subsequent updates
@@ -88,13 +92,9 @@ class FreeTrialConversionWideEventImpl @Inject constructor(
     }
 
     override suspend fun onVpnActivatedSuccessfully() {
-        if (!isFeatureEnabled()) return
-        if (vpnActivationStepRecorded) return
-
-        val wideEventId = getCurrentWideEventId() ?: return
         val subscription = authRepository.getSubscription() ?: return
 
-        // Only record step if subscription is in free trial
+        // Only proceed if subscription is in free trial
         if (!authRepository.isFreeTrialActive()) {
             return
         }
@@ -103,15 +103,24 @@ class FreeTrialConversionWideEventImpl @Inject constructor(
         val currentTime = timeProvider.currentTimeMillis()
         val daysSinceStart = TimeUnit.MILLISECONDS.toDays(currentTime - subscriptionStartedAt)
 
-        val stepName = if (daysSinceStart < 1) {
+        val activationDay = if (daysSinceStart < 1) {
             STEP_VPN_ACTIVATED_D1
         } else {
             STEP_VPN_ACTIVATED_D2_TO_D7
         }
 
+        // Fire pixel for VPN activation during free trial (independent of wide event feature flag)
+        pixelSender.reportFreeTrialVpnActivation(activationDay)
+
+        // Wide event logic (gated by feature flag)
+        if (!isFeatureEnabled()) return
+        if (vpnActivationStepRecorded) return
+
+        val wideEventId = getCurrentWideEventId() ?: return
+
         wideEventClient.flowStep(
             wideEventId = wideEventId,
-            stepName = stepName,
+            stepName = activationDay,
             success = true,
         )
 

@@ -36,6 +36,8 @@ import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.AUTH_V2_MIGRAT
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.AUTH_V2_MIGRATION_SUCCESS
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.AUTH_V2_TOKEN_STORE_ERROR
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.AUTH_V2_TOKEN_VALIDATION_ERROR
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.FREE_TRIAL_START
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.FREE_TRIAL_VPN_ACTIVATION
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.OFFER_RESTORE_PURCHASE_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.OFFER_SCREEN_SHOWN
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.OFFER_SUBSCRIBE_CLICK
@@ -66,6 +68,7 @@ import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_S
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_SETTINGS_REMOVE_FROM_DEVICE_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_SETTINGS_SHOWN
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_WEBVIEW_RENDER_PROCESS_CRASH
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelParameter.ACTIVATION_DAY
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
@@ -120,6 +123,8 @@ interface SubscriptionPixelSender {
     fun reportAuthV2TokenStoreError()
     fun reportSubscriptionsWebViewRenderProcessCrash(isRepeated: Boolean)
     fun reportAuthV1SignInAttempt()
+    fun reportFreeTrialStart()
+    fun reportFreeTrialVpnActivation(activationDay: String)
 }
 
 @ContributesBinding(AppScope::class)
@@ -297,6 +302,14 @@ class SubscriptionPixelSenderImpl @Inject constructor(
 
     override fun reportAuthV1SignInAttempt() {
         fire(AUTH_V1_SIGN_IN_ATTEMPT)
+    }
+
+    override fun reportFreeTrialStart() {
+        fire(FREE_TRIAL_START)
+    }
+
+    override fun reportFreeTrialVpnActivation(activationDay: String) {
+        fire(FREE_TRIAL_VPN_ACTIVATION, mapOf(ACTIVATION_DAY to activationDay))
     }
 
     private fun fire(
