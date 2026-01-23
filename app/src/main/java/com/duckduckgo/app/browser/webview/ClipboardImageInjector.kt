@@ -354,10 +354,10 @@ class ClipboardImageInjectorImpl @Inject constructor(
                 else -> Bitmap.CompressFormat.JPEG
             }
 
-            val extension = when (format) {
-                Bitmap.CompressFormat.PNG -> "png"
-                Bitmap.CompressFormat.WEBP -> "webp"
-                else -> "jpg"
+            val (extension, actualMimeType) = when (format) {
+                Bitmap.CompressFormat.PNG -> "png" to "image/png"
+                Bitmap.CompressFormat.WEBP -> "webp" to "image/webp"
+                else -> "jpg" to "image/jpeg"
             }
 
             val filename = "$CLIPBOARD_IMAGE_FILENAME.$extension"
@@ -368,7 +368,7 @@ class ClipboardImageInjectorImpl @Inject constructor(
 
                 val contentValues = ContentValues().apply {
                     put(MediaStore.Images.Media.DISPLAY_NAME, filename)
-                    put(MediaStore.Images.Media.MIME_TYPE, mimeType)
+                    put(MediaStore.Images.Media.MIME_TYPE, actualMimeType)
                     put(MediaStore.Images.Media.IS_PENDING, 1)
                 }
 
