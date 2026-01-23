@@ -389,8 +389,14 @@ class ClipboardImageInjectorImpl @Inject constructor(
                     return@runCatching null
                 }
 
-                outputStream.use {
+                val compressSuccess = outputStream.use {
                     bitmap.compress(format, 100, it)
+                }
+
+                if (!compressSuccess) {
+                    logcat { "ClipboardImageInjector: Bitmap compression failed, deleting invalid entry" }
+                    context.contentResolver.delete(uri, null, null)
+                    return@runCatching null
                 }
 
                 contentValues.clear()
@@ -402,9 +408,16 @@ class ClipboardImageInjectorImpl @Inject constructor(
                 val cacheDir = context.externalCacheDir ?: context.cacheDir
                 val file = File(cacheDir, filename)
                 // File will be overwritten if it exists
-                FileOutputStream(file).use { outputStream ->
+                val compressSuccess = FileOutputStream(file).use { outputStream ->
                     bitmap.compress(format, 100, outputStream)
                 }
+
+                if (!compressSuccess) {
+                    logcat { "ClipboardImageInjector: Bitmap compression failed, deleting file" }
+                    file.delete()
+                    return@runCatching null
+                }
+
                 FileProvider.getUriForFile(
                     context,
                     "${context.packageName}.provider",
