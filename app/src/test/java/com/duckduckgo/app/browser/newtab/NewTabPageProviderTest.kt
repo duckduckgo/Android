@@ -21,6 +21,7 @@ import android.view.View
 import app.cash.turbine.test
 import com.duckduckgo.common.utils.plugins.ActivePluginPoint
 import com.duckduckgo.newtabpage.api.NewTabPagePlugin
+import com.duckduckgo.newtabpage.api.NewTabPageProvider
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertTrue
 import org.junit.Test
