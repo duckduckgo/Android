@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.browser
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.webkit.WebStorage
 import android.webkit.WebView
@@ -206,7 +205,8 @@ class WebViewDataManager @Inject constructor(
      */
     private suspend fun clearWebViewDirectories(shouldClearDuckAiData: Boolean) = withContext(dispatcherProvider.io()) {
         val dataDir = context.applicationInfo.dataDir
-        fileDeleter.deleteContents(File(dataDir, "app_webview"), listOf("Default", "Cookies"))
+        val profileDir = getCurrentProfileFolder()
+        fileDeleter.deleteContents(File(dataDir, "app_webview"), listOf(profileDir, "Cookies"))
 
         // We don't delete the Default dir as Cookies may be inside however we do clear any other content
         val excludedDirectories = mutableListOf("Cookies")
@@ -223,7 +223,7 @@ class WebViewDataManager @Inject constructor(
                 logcat(WARN) { "Failed to clear IndexedDB, will delete it instead: ${t.asLog()}" }
             }
         }
-        fileDeleter.deleteContents(File(dataDir, "app_webview/Default"), excludedDirectories)
+        fileDeleter.deleteContents(File(dataDir, "app_webview/$profileDir"), excludedDirectories)
     }
 
     /**
@@ -250,5 +250,30 @@ class WebViewDataManager @Inject constructor(
 
     private suspend fun clearExternalCookies() {
         cookieManager.removeExternalCookies()
+    }
+
+    /**
+     * Finds the current profile's folder.
+     * WebView profile folders use "Profile X" format where X is an incrementing number.
+     * The highest numbered folder is the current active profile.
+     * Falls back to "Default" if no profile folders exist.
+     */
+    private fun getCurrentProfileFolder(): String {
+        val appWebViewDir = File(context.applicationInfo.dataDir, "app_webview")
+        val profileDirs = appWebViewDir.listFiles { file ->
+            file.isDirectory && file.name.startsWith("Profile ")
+        }
+
+        // Find highest numbered profile folder, or fall back to Default
+        val currentProfileDir = profileDirs
+            ?.mapNotNull { dir ->
+                val number = dir.name.removePrefix("Profile ").toIntOrNull()
+                number?.let { dir to it }
+            }
+            ?.maxByOrNull { it.second }
+            ?.first
+            ?.name ?: "Default"
+
+        return currentProfileDir
     }
 }
