@@ -21,7 +21,9 @@ import android.content.SharedPreferences
 import androidx.core.content.edit
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.api.AutofillFeature
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_HARMONY_PREFERENCES_RETRIEVAL_FAILED
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import kotlinx.coroutines.CoroutineScope
@@ -30,6 +32,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+import logcat.logcat
 import okio.ByteString.Companion.decodeBase64
 import okio.ByteString.Companion.toByteString
 
@@ -59,6 +62,7 @@ class RealSecureStorageKeyStore constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val autofillFeature: AutofillFeature,
     private val sharedPreferencesProvider: SharedPreferencesProvider,
+    private val pixel: Pixel,
 ) : SecureStorageKeyStore {
 
     private val mutex: Mutex = Mutex()
@@ -88,12 +92,19 @@ class RealSecureStorageKeyStore constructor(
             try {
                 harmonyMutex.withLock {
                     if (autofillFeature.useHarmony().isEnabled()) {
-                        sharedPreferencesProvider.getMigratedEncryptedSharedPreferences(FILENAME)
+                        sharedPreferencesProvider.getMigratedEncryptedSharedPreferences(FILENAME).also {
+                            if (it == null) {
+                                pixel.fire(AUTOFILL_HARMONY_PREFERENCES_RETRIEVAL_FAILED)
+                                logcat { "autofill harmony preferences retrieval returned null" }
+                            }
+                        }
                     } else {
                         null
                     }
                 }
             } catch (e: Exception) {
+                pixel.fire(AUTOFILL_HARMONY_PREFERENCES_RETRIEVAL_FAILED)
+                logcat { "autofill harmony preferences retrieval failed: $e" }
                 null
             }
         }
