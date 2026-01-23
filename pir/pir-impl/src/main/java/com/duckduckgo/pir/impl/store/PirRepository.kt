@@ -202,6 +202,10 @@ interface PirRepository {
 
     suspend fun hasBrokerConfigBeenManuallyUpdated(): Boolean
 
+    suspend fun latestBackgroundScanRunInMs(): Long
+
+    suspend fun setLatestBackgroundScanRunInMs(timeMs: Long)
+
     /**
      * This method deletes all data in the PIR repository, including brokers, extracted profiles, user profiles and resets the data store.
      */
@@ -770,6 +774,16 @@ class RealPirRepository(
 
     override suspend fun hasBrokerConfigBeenManuallyUpdated(): Boolean = withContext(dispatcherProvider.io()) {
         return@withContext pirDataStore.hasBrokerConfigBeenManuallyUpdated
+    }
+
+    override suspend fun latestBackgroundScanRunInMs(): Long = withContext(dispatcherProvider.io()) {
+        return@withContext pirDataStore.latestBackgroundScanRunInMs
+    }
+
+    override suspend fun setLatestBackgroundScanRunInMs(timeMs: Long) {
+        withContext(dispatcherProvider.io()) {
+            pirDataStore.latestBackgroundScanRunInMs = timeMs
+        }
     }
 
     override suspend fun clearAllData() {

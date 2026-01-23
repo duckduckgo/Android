@@ -73,6 +73,8 @@ class RealPirJobsRunner @Inject constructor(
         executionType: PirExecutionType,
     ): Result<Unit> = withContext(dispatcherProvider.io()) {
         val startTimeInMillis = currentTimeProvider.currentTimeMillis()
+        storeScanStats(startTimeInMillis, executionType)
+
         emitStartPixel(executionType)
 
         // Clean up any already running scan jobs before starting new ones as this function can be called
@@ -129,6 +131,23 @@ class RealPirJobsRunner @Inject constructor(
         logcat { "PIR-JOB-RUNNER: Completed." }
         emitCompletedPixel(executionType, startTimeInMillis)
         return@withContext Result.success(Unit)
+    }
+
+    private suspend fun storeScanStats(
+        startTimeInMillis: Long,
+        executionType: PirExecutionType,
+    ) {
+        val previousRun = pirRepository.latestBackgroundScanRunInMs()
+
+        // The first run will be the starting point of counting the stats (regardless if manual or scheduled)
+        if (previousRun == 0L) {
+            pirRepository.setLatestBackgroundScanRunInMs(startTimeInMillis)
+        } else {
+            // We will only update the values on the succeeding background scans only
+            if (executionType == PirExecutionType.SCHEDULED) {
+                pirRepository.setLatestBackgroundScanRunInMs(startTimeInMillis)
+            }
+        }
     }
 
     private fun emitStartPixel(executionType: PirExecutionType) {
