@@ -66,6 +66,8 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
         val shouldShowInputScreenToggle: Boolean = false,
         val isSearchSectionVisible: Boolean = true,
         val isHideGeneratedImagesOptionVisible: Boolean = false,
+        val isAutomaticContextVisible: Boolean = false,
+        val isAutomaticContextEnabled: Boolean = false,
     )
 
     val viewState =
@@ -73,8 +75,9 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
             duckChat.observeEnableDuckChatUserSetting(),
             duckChat.observeCosmeticInputScreenUserSettingEnabled(),
             duckChat.observeInputScreenUserSettingEnabled(),
+            duckChat.observeAutomaticContextAttachmentUserSettingEnabled(),
             flowOf(duckChatFeature.showHideAiGeneratedImages().isEnabled()).flowOn(dispatcherProvider.io()),
-        ) { isDuckChatUserEnabled, cosmeticInputScreenEnabled, isInputScreenEnabled, showHideAiGeneratedImagesOption ->
+        ) { isDuckChatUserEnabled, cosmeticInputScreenEnabled, isInputScreenEnabled, isAutomaticPageContextEnabled, showHideAiGeneratedImagesOption ->
             ViewState(
                 isDuckChatUserEnabled = isDuckChatUserEnabled,
                 isInputScreenEnabled = cosmeticInputScreenEnabled ?: isInputScreenEnabled,
@@ -82,6 +85,8 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
                 shouldShowInputScreenToggle = isDuckChatUserEnabled && duckChat.isInputScreenFeatureAvailable(),
                 isSearchSectionVisible = isSearchSectionVisible(duckChatActivityParams),
                 isHideGeneratedImagesOptionVisible = showHideAiGeneratedImagesOption,
+                isAutomaticContextEnabled = isAutomaticPageContextEnabled,
+                isAutomaticContextVisible = isDuckChatUserEnabled && duckChatFeature.contextualMode().isEnabled(),
             )
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ViewState())
 
@@ -108,6 +113,12 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
                 pixel.fire(DuckChatPixelName.DUCK_CHAT_USER_DISABLED)
             }
             duckChat.setEnableDuckChatUserSetting(checked)
+        }
+    }
+
+    fun onAutomaticContextAttachmentToggled(checked: Boolean) {
+        viewModelScope.launch {
+            duckChat.setAutomaticPageContextUserSetting(checked)
         }
     }
 

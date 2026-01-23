@@ -22,6 +22,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
@@ -89,6 +90,13 @@ class DuckChatFeatureRepositoryTest {
     }
 
     @Test
+    fun `when setAutomaticPageContextAttachment then set in data store`() = runTest {
+        testee.setAutomaticPageContextAttachment(true)
+
+        verify(mockDataStore).setAutomaticPageContextAttachment(true)
+    }
+
+    @Test
     fun whenObserveDuckChatUserEnabledThenObserveDataStore() = runTest {
         whenever(mockDataStore.observeDuckChatUserEnabled()).thenReturn(flowOf(true, false))
 
@@ -144,6 +152,15 @@ class DuckChatFeatureRepositoryTest {
     }
 
     @Test
+    fun `when observeAutomaticContextAttachmentUserSettingEnabled then observe data store`() = runTest {
+        whenever(mockDataStore.observeAutomaticContextAttachmentUserSettingEnabled()).thenReturn(flowOf(false, true))
+
+        val results = testee.observeAutomaticContextAttachmentUserSettingEnabled().take(2).toList()
+        assertFalse(results[0])
+        assertTrue(results[1])
+    }
+
+    @Test
     fun whenIsDuckChatUserEnabledThenGetFromDataStore() = runTest {
         whenever(mockDataStore.isDuckChatUserEnabled()).thenReturn(false)
         assertFalse(testee.isDuckChatUserEnabled())
@@ -172,6 +189,12 @@ class DuckChatFeatureRepositoryTest {
     fun `when isInputScreenUserSettingEnabled called, then get from data store`() = runTest {
         whenever(mockDataStore.isInputScreenUserSettingEnabled()).thenReturn(true)
         assertTrue(testee.isInputScreenUserSettingEnabled())
+    }
+
+    @Test
+    fun `when isFullScreenModeUserSettingEnabled called, then get from data store`() = runTest {
+        whenever(mockDataStore.isFullScreenUserSettingEnabled()).thenReturn(true)
+        assertTrue(testee.isFullScreenModeUserSettingEnabled())
     }
 
     @Test
@@ -211,6 +234,56 @@ class DuckChatFeatureRepositoryTest {
         whenever(mockDataStore.wasOpenedBefore()).thenReturn(true)
 
         val result = testee.wasOpenedBefore()
+
+        assertTrue(result)
+    }
+
+    @Test
+    fun whenLastSessionTimestampCheckedThenReturnDataFromTheStore() = runTest {
+        whenever(mockDataStore.lastSessionTimestamp()).thenReturn(12345L)
+
+        val result = testee.lastSessionTimestamp()
+
+        assertEquals(12345L, result)
+    }
+
+    @Test
+    fun whenSessionDeltaInMinutesCheckedThenReturnDataFromTheStore() = runTest {
+        whenever(mockDataStore.sessionDeltaTimestamp()).thenReturn(120000L) // 2 minutes
+
+        val result = testee.sessionDeltaInMinutes()
+
+        assertEquals(2L, result)
+    }
+
+    @Test
+    fun whenSetAppBackgroundTimestampThenSetInDataStore() = runTest {
+        testee.setAppBackgroundTimestamp(12345L)
+
+        verify(mockDataStore).setAppBackgroundTimestamp(12345L)
+    }
+
+    @Test
+    fun whenGetAppBackgroundTimestampCheckedThenReturnDataFromTheStore() = runTest {
+        whenever(mockDataStore.getAppBackgroundTimestamp()).thenReturn(12345L)
+
+        val result = testee.getAppBackgroundTimestamp()
+
+        assertEquals(12345L, result)
+    }
+
+    @Test
+    fun whenSetAIChatHistoryEnabledThenSetInDataStore() = runTest {
+        testee.setAIChatHistoryEnabled(true)
+
+        verify(mockDataStore).setAIChatHistoryEnabled(true)
+    }
+
+    @Test
+    fun whenIsAIChatHistoryEnabledCheckedThenReturnDataFromTheStore() = runTest {
+        whenever(mockDataStore.isAIChatHistoryEnabled()).thenReturn(true)
+
+        val result = testee.isAIChatHistoryEnabled()
 
         assertTrue(result)
     }

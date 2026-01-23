@@ -304,6 +304,21 @@ class SharedPreferencesDuckChatDataStoreTest {
     }
 
     @Test
+    fun `when observeAutomaticContextAttachmentUserSettingEnabled then receive updates`() = runTest {
+        val results = mutableListOf<Boolean>()
+        val job = launch {
+            testee.observeAutomaticContextAttachmentUserSettingEnabled()
+                .take(2)
+                .toList(results)
+        }
+
+        testee.setAutomaticPageContextAttachment(true)
+        job.join()
+
+        assertEquals(listOf(false, true), results)
+    }
+
+    @Test
     fun whenRegisterOpenedThenWasOpenedBeforeThenReturnTrue() = runTest {
         assertFalse(testee.wasOpenedBefore())
         testee.registerOpened()

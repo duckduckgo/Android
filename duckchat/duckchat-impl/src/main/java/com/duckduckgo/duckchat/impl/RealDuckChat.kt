@@ -89,6 +89,11 @@ interface DuckChatInternal : DuckChat {
     suspend fun setShowInVoiceSearchUserSetting(showToggle: Boolean)
 
     /**
+     * Set user setting to determine whether DuckChat should automatically update the page context in Contextual Mode
+     */
+    suspend fun setAutomaticPageContextUserSetting(isEnabled: Boolean)
+
+    /**
      * Observes whether DuckChat is user enabled or disabled.
      */
     fun observeEnableDuckChatUserSetting(): Flow<Boolean>
@@ -364,6 +369,13 @@ class RealDuckChat @Inject constructor(
             cacheUserSettings()
         }
 
+    override suspend fun setAutomaticPageContextUserSetting(isEnabled: Boolean) {
+        withContext(dispatchers.io()) {
+            duckChatFeatureRepository.setAutomaticPageContextAttachment(isEnabled)
+            cacheUserSettings()
+        }
+    }
+
     override fun isEnabled(): Boolean = isDuckChatFeatureEnabled && isDuckChatUserEnabled
 
     override fun isInputScreenFeatureAvailable(): Boolean = duckAiInputScreen
@@ -382,6 +394,9 @@ class RealDuckChat @Inject constructor(
 
     override fun observeCosmeticInputScreenUserSettingEnabled(): Flow<Boolean?> =
         duckChatFeatureRepository.observeCosmeticInputScreenUserSettingEnabled()
+
+    override fun observeAutomaticContextAttachmentUserSettingEnabled(): Flow<Boolean> =
+        duckChatFeatureRepository.observeAutomaticContextAttachmentUserSettingEnabled()
 
     override fun observeShowInBrowserMenuUserSetting(): Flow<Boolean> = duckChatFeatureRepository.observeShowInBrowserMenu()
 
