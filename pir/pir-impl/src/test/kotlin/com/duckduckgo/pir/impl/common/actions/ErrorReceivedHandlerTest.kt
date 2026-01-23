@@ -20,6 +20,8 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep.ScanStep
 import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStepActions.ScanStepActions
 import com.duckduckgo.pir.impl.common.PirJob.RunType
+import com.duckduckgo.pir.impl.common.PirRunStateHandler
+import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerStepInvalidEvent
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.BrokerActionFailed
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.ErrorReceived
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.PirStageStatus
@@ -38,12 +40,16 @@ import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.Mockito.mock
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 
 class ErrorReceivedHandlerTest {
     @get:Rule
     val coroutineRule = CoroutineTestRule()
 
     private lateinit var testee: ErrorReceivedHandler
+    private var mockPirRunStateHandler: PirRunStateHandler = mock()
 
     private val testBroker = Broker(
         name = "test-broker",
@@ -76,7 +82,7 @@ class ErrorReceivedHandlerTest {
 
     @Before
     fun setUp() {
-        testee = ErrorReceivedHandler()
+        testee = ErrorReceivedHandler(mockPirRunStateHandler)
     }
 
     @Test
@@ -115,6 +121,7 @@ class ErrorReceivedHandlerTest {
         assertEquals(testError, nextEvent.error)
         assertFalse(nextEvent.allowRetry)
         assertNull(result.sideEffect)
+        verifyNoInteractions(mockPirRunStateHandler)
     }
 
     @Test
@@ -152,6 +159,7 @@ class ErrorReceivedHandlerTest {
         val nextEvent = result.nextEvent as BrokerActionFailed
         assertEquals(testError, nextEvent.error)
         assertFalse(nextEvent.allowRetry)
+        verifyNoInteractions(mockPirRunStateHandler)
     }
 
     @Test
@@ -188,6 +196,7 @@ class ErrorReceivedHandlerTest {
         val nextEvent = result.nextEvent as BrokerActionFailed
         assertEquals(testError, nextEvent.error)
         assertFalse(nextEvent.allowRetry)
+        verifyNoInteractions(mockPirRunStateHandler)
     }
 
     @Test
@@ -220,6 +229,7 @@ class ErrorReceivedHandlerTest {
         val nextEvent = result.nextEvent as BrokerActionFailed
         assertEquals(testError, nextEvent.error)
         assertFalse(nextEvent.allowRetry)
+        verifyNoInteractions(mockPirRunStateHandler)
     }
 
     @Test
@@ -299,6 +309,12 @@ class ErrorReceivedHandlerTest {
         assertEquals(state, result.nextState)
         assertNull(result.nextEvent)
         assertNull(result.sideEffect)
+        verify(mockPirRunStateHandler).handleState(
+            BrokerStepInvalidEvent(
+                broker = Broker.unknown(),
+                runType = RunType.MANUAL,
+            ),
+        )
     }
 
     @Test
@@ -334,6 +350,12 @@ class ErrorReceivedHandlerTest {
         assertEquals(state, result.nextState)
         assertNull(result.nextEvent)
         assertNull(result.sideEffect)
+        verify(mockPirRunStateHandler).handleState(
+            BrokerStepInvalidEvent(
+                broker = testBroker,
+                runType = RunType.MANUAL,
+            ),
+        )
     }
 
     @Test
@@ -369,6 +391,12 @@ class ErrorReceivedHandlerTest {
         assertEquals(state, result.nextState)
         assertNull(result.nextEvent)
         assertNull(result.sideEffect)
+        verify(mockPirRunStateHandler).handleState(
+            BrokerStepInvalidEvent(
+                broker = testBroker,
+                runType = RunType.MANUAL,
+            ),
+        )
     }
 
     @Test
@@ -405,6 +433,7 @@ class ErrorReceivedHandlerTest {
         val nextEvent = result.nextEvent as BrokerActionFailed
         assertEquals(testError, nextEvent.error)
         assertFalse(nextEvent.allowRetry)
+        verifyNoInteractions(mockPirRunStateHandler)
     }
 
     @Test
@@ -438,5 +467,6 @@ class ErrorReceivedHandlerTest {
         val nextEvent = result.nextEvent as BrokerActionFailed
         assertEquals(testError, nextEvent.error)
         assertFalse(nextEvent.allowRetry)
+        verifyNoInteractions(mockPirRunStateHandler)
     }
 }

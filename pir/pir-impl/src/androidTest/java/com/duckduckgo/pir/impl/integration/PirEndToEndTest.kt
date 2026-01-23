@@ -786,7 +786,7 @@ class PirEndToEndTest {
             StartedEventHandler(),
             LoadUrlCompleteEventHandler(),
             LoadUrlFailedEventHandler(),
-            ErrorReceivedHandler(),
+            ErrorReceivedHandler(pirRunStateHandler),
             RetryGetCaptchaSolutionEventHandler(),
             RetryAwaitCaptchaSolutionEventHandler(),
             JsActionSuccessEventHandler(pirRunStateHandler, fakeTimeProvider),

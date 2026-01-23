@@ -28,6 +28,7 @@ import com.duckduckgo.pir.impl.common.PirJob.RunType
 import com.duckduckgo.pir.impl.common.PirRunStateHandler
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerOptOutActionSucceeded
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerScanActionSucceeded
+import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerStepInvalidEvent
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.ExecuteBrokerStepAction
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.JsActionSuccess
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.PirStageStatus
@@ -63,6 +64,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
 
 class JsActionSuccessEventHandlerTest {
@@ -203,6 +205,7 @@ class JsActionSuccessEventHandlerTest {
         assertEquals(testBroker1, capturedState.firstValue.broker)
         assertEquals(testProfileQueryId, capturedState.firstValue.profileQueryId)
         assertEquals(navigateResponse, capturedState.firstValue.pirSuccessResponse)
+        verifyNoMoreInteractions(mockPirRunStateHandler)
     }
 
     @Test
@@ -242,6 +245,7 @@ class JsActionSuccessEventHandlerTest {
         assertNull(result.sideEffect)
 
         verify(mockPirRunStateHandler).handleState(any<BrokerScanActionSucceeded>())
+        verifyNoMoreInteractions(mockPirRunStateHandler)
     }
 
     @Test
@@ -619,6 +623,7 @@ class JsActionSuccessEventHandlerTest {
         assertEquals(navigateResponse, capturedState.firstValue.result)
 
         assertEquals(LoadUrl(url = "https://example.com/result"), result.sideEffect)
+        verifyNoMoreInteractions(mockPirRunStateHandler)
     }
 
     @Test
@@ -649,6 +654,12 @@ class JsActionSuccessEventHandlerTest {
         assertEquals(state, result.nextState)
         assertNull(result.nextEvent)
         assertNull(result.sideEffect)
+        verify(mockPirRunStateHandler).handleState(
+            BrokerStepInvalidEvent(
+                broker = Broker.unknown(),
+                runType = RunType.MANUAL,
+            ),
+        )
     }
 
     @Test
@@ -679,6 +690,12 @@ class JsActionSuccessEventHandlerTest {
         assertEquals(state, result.nextState)
         assertNull(result.nextEvent)
         assertNull(result.sideEffect)
+        verify(mockPirRunStateHandler).handleState(
+            BrokerStepInvalidEvent(
+                broker = testScanStep.broker,
+                runType = RunType.MANUAL,
+            ),
+        )
     }
 
     @Test
@@ -709,6 +726,12 @@ class JsActionSuccessEventHandlerTest {
         assertEquals(state, result.nextState)
         assertNull(result.nextEvent)
         assertNull(result.sideEffect)
+        verify(mockPirRunStateHandler).handleState(
+            BrokerStepInvalidEvent(
+                broker = testScanStep.broker,
+                runType = RunType.MANUAL,
+            ),
+        )
     }
 
     private fun setupBrokerStep(actionId: String): BrokerStep {
