@@ -1445,5 +1445,43 @@
                 "enum": ["false", "true"]
             }
         ]
+    },
+    "m_dbp_scan_invalid-event_dropped": {
+        "description": "Android specific pixel fired whenever an invalid event occurs during scan processing",
+        "owners": ["karlenDimla", "landomen"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "data_broker",
+                "description": "The URL of the data broker",
+                "type": "string"
+            },
+            {
+                "key": "broker_version",
+                "description": "The version of the broker JSON file",
+                "type": "string"
+            }
+        ]
+    },
+    "m_dbp_optout_invalid-event_dropped": {
+        "description": "Android specific pixel fired whenever an invalid even occurs during optout processing",
+        "owners": ["karlenDimla", "landomen"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "data_broker",
+                "description": "The URL of the data broker",
+                "type": "string"
+            },
+            {
+                "key": "broker_version",
+                "description": "The version of the broker JSON file",
+                "type": "string"
+            }
+        ]
     }
 }

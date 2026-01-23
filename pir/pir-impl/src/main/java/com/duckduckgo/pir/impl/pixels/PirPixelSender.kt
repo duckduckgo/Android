@@ -49,6 +49,7 @@ import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_FOREGROUND_RUN_COMPLETED
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_FOREGROUND_RUN_STARTED
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INITIAL_SCAN_DURATION
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INTERNAL_SECURE_STORAGE_UNAVAILABLE
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_OPTOUT_INVALID_EVENT
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_OPTOUT_STAGE_CAPTCHA_PARSE
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_OPTOUT_STAGE_CAPTCHA_SEND
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_OPTOUT_STAGE_CAPTCHA_SOLVE
@@ -63,6 +64,7 @@ import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_OPTOUT_STAGE_SUBMIT
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_OPTOUT_STAGE_VALIDATE
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_OPTOUT_SUBMIT_FAILURE
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_OPTOUT_SUBMIT_SUCCESS
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_SCAN_INVALID_EVENT
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_SCAN_STAGE
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_SCAN_STAGE_RESULT_ERROR
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_SCAN_STAGE_RESULT_MATCHES
@@ -542,6 +544,16 @@ interface PirPixelSender {
 
     fun reportBackgroundScanStats(
         scanFrequencyWithinThreshold: Boolean,
+    )
+
+    fun reportScanInvalidEvent(
+        brokerUrl: String,
+        brokerVersion: String,
+    )
+
+    fun reportOptOutInvalidEvent(
+        brokerUrl: String,
+        brokerVersion: String,
     )
 }
 
@@ -1275,6 +1287,28 @@ class RealPirPixelSender @Inject constructor(
             PARAM_KEY_SCAN_FREQUENCY to scanFrequencyWithinThreshold.toString(),
         )
         fire(PIR_BG_STATS, params)
+    }
+
+    override fun reportScanInvalidEvent(
+        brokerUrl: String,
+        brokerVersion: String,
+    ) {
+        val params = mapOf(
+            PARAM_BROKER_URL to brokerUrl,
+            PARAM_BROKER_VERSION to brokerVersion,
+        )
+        fire(PIR_SCAN_INVALID_EVENT, params)
+    }
+
+    override fun reportOptOutInvalidEvent(
+        brokerUrl: String,
+        brokerVersion: String,
+    ) {
+        val params = mapOf(
+            PARAM_BROKER_URL to brokerUrl,
+            PARAM_BROKER_VERSION to brokerVersion,
+        )
+        fire(PIR_OPTOUT_INVALID_EVENT, params)
     }
 
     private fun fire(
