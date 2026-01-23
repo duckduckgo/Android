@@ -4059,7 +4059,7 @@ class BrowserTabViewModel @Inject constructor(
 
             PAGE_CONTEXT_FEATURE_NAME -> {
                 viewModelScope.launch(dispatchers.io()) {
-                    val response = pageContextJSHelper.processJsCallbackMessage(featureName, method, id, data)
+                    val response = pageContextJSHelper.processJsCallbackMessage(featureName, method, data, tabId)
                     withContext(dispatchers.main()) {
                         response?.let {
                             command.value = SendResponseToJs(it)

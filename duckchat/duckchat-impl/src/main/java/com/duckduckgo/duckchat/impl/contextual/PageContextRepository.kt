@@ -18,6 +18,7 @@ package com.duckduckgo.duckchat.impl.contextual
 
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
+import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 
 data class PageContextData(
@@ -26,23 +27,22 @@ data class PageContextData(
 )
 
 interface PageContextRepository {
-    fun update(serializedPageData: String)
-    fun clear()
-    fun getLatestPageContext(): PageContextData?
+    fun update(tabId: String, serializedPageData: String)
+    fun clear(tabId: String)
+    fun getLatestPageContext(tabId: String): PageContextData?
 }
 
 @ContributesBinding(AppScope::class)
 class RealPageContextRepository @Inject constructor() : PageContextRepository {
-    @Volatile
-    private var latestPageContext: PageContextData? = null
+    private val pageContexts = ConcurrentHashMap<String, PageContextData>()
 
-    override fun update(serializedPageData: String) {
-        latestPageContext = PageContextData(serializedPageData, System.currentTimeMillis())
+    override fun update(tabId: String, serializedPageData: String) {
+        pageContexts[tabId] = PageContextData(serializedPageData, System.currentTimeMillis())
     }
 
-    override fun clear() {
-        latestPageContext = null
+    override fun clear(tabId: String) {
+        pageContexts.remove(tabId)
     }
 
-    override fun getLatestPageContext(): PageContextData? = latestPageContext
+    override fun getLatestPageContext(tabId: String): PageContextData? = pageContexts[tabId]
 }

@@ -28,8 +28,8 @@ interface PageContextJSHelper {
     suspend fun processJsCallbackMessage(
         featureName: String,
         method: String,
-        id: String?,
         data: JSONObject?,
+        tabId: String,
     ): JsCallbackData?
 
     fun onContextualOpened(): SubscriptionEventData
@@ -42,8 +42,8 @@ class RealPageContextJSHelper @Inject constructor(
     override suspend fun processJsCallbackMessage(
         featureName: String,
         method: String,
-        id: String?,
         data: JSONObject?,
+        tabId: String,
     ): JsCallbackData? {
         if (method != METHOD_COLLECTION_RESULT) {
             return null
@@ -51,9 +51,9 @@ class RealPageContextJSHelper @Inject constructor(
 
         val serializedPageData = data?.optString(KEY_SERIALIZED_PAGE_DATA, null)
         if (!serializedPageData.isNullOrBlank()) {
-            pageContextRepository.update(serializedPageData)
+            pageContextRepository.update(tabId, serializedPageData)
         } else if (data?.optBoolean(KEY_SUCCESS, true) == false) {
-            pageContextRepository.clear()
+            pageContextRepository.clear(tabId)
         }
         return null
     }
