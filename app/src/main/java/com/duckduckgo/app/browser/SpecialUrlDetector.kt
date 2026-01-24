@@ -61,6 +61,7 @@ class SpecialUrlDetectorImpl(
     ): UrlType {
         val uriString = uri.toString()
 
+        logcat(tag = "RadoiuC") { "Uri: $uri scheme: ${uri.scheme}" }
         return when (val scheme = uri.scheme) {
             TEL_SCHEME -> buildTelephone(uriString)
             TELPROMPT_SCHEME -> buildTelephonePrompt(uriString)
@@ -91,7 +92,9 @@ class SpecialUrlDetectorImpl(
                 }
                 // if there's no redirects (initiatingUrl = null) then it's user initiated
                 val userInitiated = initiatingUrl == null
-                checkForIntent(scheme, uriString, intentFlags, userInitiated)
+                checkForIntent(scheme, uriString, intentFlags, userInitiated).also {
+                    logcat(tag = "RadoiuC") { "Check for intent result: $it" }
+                }
             }
         }
     }
@@ -206,7 +209,7 @@ class SpecialUrlDetectorImpl(
             return try {
                 val intent = Intent.parseUri(uriString, intentFlags)
                 // only proceed if something can handle it
-                if (userInitiated && (intent == null || packageManager.resolveActivity(intent, 0) == null) &&
+                if (userInitiated && invalidIntentWithNoPackage(intent) &&
                     androidBrowserConfigFeature.validateIntentResolution().isEnabled()
                 ) {
                     return UrlType.Unknown(uriString)
@@ -233,6 +236,9 @@ class SpecialUrlDetectorImpl(
 
         return UrlType.SearchQuery(uriString)
     }
+
+    private fun invalidIntentWithNoPackage(intent: Intent?) = intent == null ||
+        (packageManager.resolveActivity(intent, 0) == null && intent.`package` == null)
 
     private fun buildFallbackIntent(fallbackUrl: String?): Intent? {
         if (determineType(fallbackUrl) is UrlType.NonHttpAppLink) {
