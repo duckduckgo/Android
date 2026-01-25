@@ -1,0 +1,7 @@
+form pocket option api
+
+cuenta =+'Barberiavelez@gmail.com 
+contraseña = x3h5oemw
+
+api = pocket option(cuenta y contraseña)
+api.connect()
