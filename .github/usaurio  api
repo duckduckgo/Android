@@ -1,0 +1,7 @@
+form iqoptionapi.stable_api import iqoption 
+
+cuenta = +Barberiavelez@gmail.com 
+contraseña = +
+
+api = iqoption(cuenta. contraseña)
+api connect()
