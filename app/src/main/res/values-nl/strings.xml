@@ -924,11 +924,15 @@
     <string name="settingsHeadingCompleteSetup">Je instelling voltooien</string>
 
     <!--TabSwitcher Trackers Animation-->
-    <string name="showTrackerCountInTabSwitcher">Aantal trackers in tabbladwisselaar</string>
+    <string name="trackerBlockedInTheLast7days" instruction="Placeholder is 1 tracker blocked">&lt;b&gt;%1$s tracker geblokkeerd &lt;/b&gt; in de afgelopen 7 dagen</string>
     <string name="tabSwitcherAnimationTileRemovalDialogTitle" instruction="A title for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Trackertelling verbergen?</string>
     <string name="tabSwitcherAnimationTileRemovalDialogBody" instruction="A message for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Je kunt dit weer inschakelen in Instellingen &gt; Weergave.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Verbergen</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Bewaren</string>
+    <!-- Trackers blocked animation settings -->
+    <string name="settingsTrackersBlockedAnimationHeaderTitle">Animatie voor geblokkeerde trackers</string>
+    <string name="showTrackerCountInAddressBar">In adresbalk weergeven</string>
+    <string name="showWeeklyTrackerCountInTabSwitcher">Weergeven in Tabbladbeheer</string>
 
     <!-- Widgets -->
     <string name="searchOnlyWidgetLabel" instruction="Label for the search-only widget">Alleen zoeken</string>
