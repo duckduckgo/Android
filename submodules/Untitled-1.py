@@ -4,20 +4,19 @@ from Telegram Bot API TOKEN 8313904219:AAGrk7sDzZewAd43MJMoGHbDRB06qGzDoDs
 import requests
 import pandas as pd
 import ta
-import logging
-
+import logging 
+operación  abierta 
 from telegram import Update
 from telegram.ext import (
         ApplicationBuilder,
             CommandHandler,
                 ContextTypes,
-)
-
+eur usd otc
 # ==========================
 # CONFIGURACIÓN alerta  de señales de trading ACTIVADO/pocket option 
 # ==========================
 TOKEN = "TU_TOKEN_AQUI"8313904219:AAGrk7sDzZewAd43MJMoGHbDRB06qGzDoDs
-CHAT_ID = 8313904219  # TU CHAT ID
+CHAT_ID = 8313904219  # TU CHAT ID 
 
 SYMBOL = "BTCUSDT"
 INTERVAL = "15m"  # 1m, 5m, 15m, 1h, etc.
