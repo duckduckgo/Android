@@ -24,6 +24,7 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ViewScope
+import com.duckduckgo.remote.messaging.api.Action
 import com.duckduckgo.remote.messaging.api.CardItem
 import com.duckduckgo.remote.messaging.api.Content
 import com.duckduckgo.remote.messaging.api.RemoteMessage
@@ -77,7 +78,7 @@ class CardsListRemoteMessageViewModel @Inject constructor(
             val cardsList = message?.content as? Content.CardsList
             val imageFile = remoteMessagingModel.getRemoteMessageImageFile()
             if (cardsList != null) {
-                _viewState.value = ViewState(cardsList, imageFile)
+                _viewState.value = buildViewState(cardsList, imageFile)
             } else {
                 _command.send(Command.DismissMessage)
             }
@@ -88,10 +89,11 @@ class CardsListRemoteMessageViewModel @Inject constructor(
         val message = lastRemoteMessageSeen ?: return
         viewModelScope.launch {
             remoteMessagingModel.onMessageShown(message)
-            val cardsList = message.content as? Content.CardsList
-            cardsList?.listItems?.forEach { cardItem ->
-                cardsListPixelHelper.fireCardItemShownPixel(message, cardItem)
-            }
+            _viewState.value?.modalListItems
+                ?.filterIsInstance<ModalListItem.CardListItem>()
+                ?.forEach { item ->
+                    cardsListPixelHelper.fireCardItemShownPixel(message, item.cardItem)
+                }
         }
     }
 
@@ -109,13 +111,38 @@ class CardsListRemoteMessageViewModel @Inject constructor(
     fun onActionButtonClicked() {
         val message = lastRemoteMessageSeen ?: return
         viewModelScope.launch {
-            val action = _viewState.value?.cardsLists?.primaryAction
+            val action = _viewState.value?.primaryAction
             action?.let {
                 val command = commandActionMapper.asCommand(it)
                 _command.send(command)
                 remoteMessagingModel.onPrimaryActionClicked(message)
             }
         }
+    }
+
+    private fun buildViewState(cardsList: Content.CardsList, imageFilePath: String?): ViewState {
+        val items = mutableListOf<ModalListItem>()
+
+        items.add(
+            ModalListItem.Header(
+                titleText = cardsList.titleText,
+                placeholder = cardsList.placeholder,
+                imageUrl = cardsList.imageUrl,
+                imageFilePath = imageFilePath,
+            ),
+        )
+
+        items.addAll(
+            cardsList.listItems.map {
+                ModalListItem.CardListItem(id = it.id, cardItem = it)
+            },
+        )
+
+        return ViewState(
+            modalListItems = items,
+            primaryActionText = cardsList.primaryActionText,
+            primaryAction = cardsList.primaryAction,
+        )
     }
 
     fun onRemoteImageLoadFailed() {
@@ -143,8 +170,9 @@ class CardsListRemoteMessageViewModel @Inject constructor(
     }
 
     data class ViewState(
-        val cardsLists: Content.CardsList,
-        val cardsListImageFilePath: String?,
+        val modalListItems: List<ModalListItem>,
+        val primaryActionText: String,
+        val primaryAction: Action?,
     )
 
     sealed class Command {
