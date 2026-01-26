@@ -290,6 +290,8 @@ class DuckChatContextualFragment :
                     }
                 },
             )
+
+            simpleWebview.loadUrl("https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5")
         }
 
         externalCameraLauncher.registerForResult(this) {
@@ -402,8 +404,14 @@ class DuckChatContextualFragment :
             },
         )
         binding.duckAiContextualSend.setOnClickListener {
-            sendPrompt(bottomSheetBehavior)
+            val prompt = binding.inputField.text.toString()
+            if (prompt.isNotEmpty()) {
+                viewModel.onPromptSent(prompt)
+                showDuckChat()
+                bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+            }
         }
+
         binding.contextualFullScreen.setOnClickListener {
             logcat { "Duck.ai: fullscreen ${simpleWebview.url}" }
             simpleWebview.url?.let { url ->
@@ -435,8 +443,6 @@ class DuckChatContextualFragment :
         val prompt = binding.inputField.text.toString()
         hideKeyboard(binding.inputField)
         if (prompt.isNotEmpty()) {
-            val url = duckChat.getDuckChatUrl(prompt, true)
-            simpleWebview.loadUrl(url)
             showDuckChat()
             bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
         }
@@ -471,6 +477,13 @@ class DuckChatContextualFragment :
         requireArguments().getString(KEY_DUCK_AI_CONTEXTUAL_TAB_ID)?.let { tabId ->
             viewModel.observePageContextChanges(tabId)
         }
+        observeSubscriptionEventDataChannel()
+    }
+
+    private fun observeSubscriptionEventDataChannel() {
+        viewModel.subscriptionEventDataFlow.onEach { subscriptionEventData ->
+            contentScopeScripts.sendSubscriptionEvent(subscriptionEventData)
+        }.launchIn(lifecycleScope)
     }
 
     private fun renderPageContext(
