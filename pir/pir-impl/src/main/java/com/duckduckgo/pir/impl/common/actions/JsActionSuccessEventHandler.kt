@@ -27,6 +27,7 @@ import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerOptOu
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerOptOutStageCaptchaParsed
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerOptOutStageFillForm
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerScanActionSucceeded
+import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerStepInvalidEvent
 import com.duckduckgo.pir.impl.common.actions.EventHandler.Next
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.ConditionExpectationSucceeded
@@ -37,6 +38,7 @@ import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.SideEf
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.SideEffect.GetCaptchaSolution
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.SideEffect.LoadUrl
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.State
+import com.duckduckgo.pir.impl.models.Broker
 import com.duckduckgo.pir.impl.pixels.PirStage
 import com.duckduckgo.pir.impl.scripts.models.PirScriptRequestData.UserProfile
 import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse
@@ -75,6 +77,18 @@ class JsActionSuccessEventHandler @Inject constructor(
          */
         if (!isEventValid(state, event as JsActionSuccess)) {
             // Nothing to do here, the event is outdated
+            val broker = if (state.brokerStepsToExecute.size <= state.currentBrokerStepIndex) {
+                Broker.unknown()
+            } else {
+                state.brokerStepsToExecute[state.currentBrokerStepIndex].broker
+            }
+
+            pirRunStateHandler.handleState(
+                BrokerStepInvalidEvent(
+                    broker = broker,
+                    runType = state.runType,
+                ),
+            )
             return Next(nextState = state)
         }
 
@@ -197,7 +211,10 @@ class JsActionSuccessEventHandler @Inject constructor(
         }
     }
 
-    private fun isEventValid(state: State, jsActionSuccess: JsActionSuccess): Boolean {
+    private fun isEventValid(
+        state: State,
+        jsActionSuccess: JsActionSuccess,
+    ): Boolean {
         // Broker steps has probably been considered completed before the js response arrived
         if (state.brokerStepsToExecute.size <= state.currentBrokerStepIndex) return false
 

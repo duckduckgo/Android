@@ -19,6 +19,7 @@ package com.duckduckgo.pir.impl.common
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.pir.impl.common.PirJob.RunType
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerOptOutActionSucceeded
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerOptOutConditionFound
@@ -42,6 +43,7 @@ import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerScanF
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerScanStarted
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerScanSuccess
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerStepActionFailed
+import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerStepInvalidEvent
 import com.duckduckgo.pir.impl.models.AddressCityState
 import com.duckduckgo.pir.impl.models.Broker
 import com.duckduckgo.pir.impl.models.ExtractedProfile
@@ -254,6 +256,11 @@ interface PirRunStateHandler {
             val actionID: String,
             val errorMessage: String,
         ) : PirRunState(broker)
+
+        data class BrokerStepInvalidEvent(
+            override val broker: Broker,
+            val runType: RunType,
+        ) : PirRunState(broker)
     }
 }
 
@@ -295,8 +302,23 @@ class RealPirRunStateHandler @Inject constructor(
                 is BrokerOptOutStageGenerateEmailReceived -> handleBrokerOptOutStageGenerateEmailReceived(pirRunState)
                 is BrokerOptOutStageSubmit -> handleBrokerOptOutStageSubmit(pirRunState)
                 is BrokerOptOutStageValidate -> handleBrokerOptOutStageValidate(pirRunState)
+                is BrokerStepInvalidEvent -> handleBrokerStepInvalidEvent(pirRunState)
             }
         }
+
+    private fun handleBrokerStepInvalidEvent(pirRunState: BrokerStepInvalidEvent) {
+        if (pirRunState.runType == RunType.MANUAL || pirRunState.runType == RunType.SCHEDULED) {
+            pixelSender.reportScanInvalidEvent(
+                brokerUrl = pirRunState.broker.url,
+                brokerVersion = pirRunState.broker.version,
+            )
+        } else {
+            pixelSender.reportOptOutInvalidEvent(
+                brokerUrl = pirRunState.broker.url,
+                brokerVersion = pirRunState.broker.version,
+            )
+        }
+    }
 
     private fun handleBrokerOptOutStageSubmit(pirRunState: BrokerOptOutStageSubmit) {
         pixelSender.reportOptOutStageSubmit(

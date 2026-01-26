@@ -266,6 +266,18 @@ enum class PirPixel(
         baseName = "m_dbp_initial_scan_duration",
         type = Count,
     ),
+    PIR_BG_STATS(
+        baseName = "m_dbp_background-run_stats",
+        type = Daily(),
+    ),
+    PIR_SCAN_INVALID_EVENT(
+        baseName = "m_dbp_scan_invalid-event_dropped",
+        type = Daily(),
+    ),
+    PIR_OPTOUT_INVALID_EVENT(
+        baseName = "m_dbp_optout_invalid-event_dropped",
+        type = Daily(),
+    ),
     ;
 
     constructor(

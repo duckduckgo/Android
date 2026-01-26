@@ -18,6 +18,7 @@ package com.duckduckgo.pir.impl.common
 
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.CurrentTimeProvider
+import com.duckduckgo.pir.impl.common.PirJob.RunType
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerRecordEmailConfirmationCompleted
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerRecordEmailConfirmationNeeded
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerRecordEmailConfirmationStarted
@@ -28,6 +29,7 @@ import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerScanA
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerScanFailed
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerScanStarted
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerScanSuccess
+import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerStepInvalidEvent
 import com.duckduckgo.pir.impl.models.AddressCityState
 import com.duckduckgo.pir.impl.models.Broker
 import com.duckduckgo.pir.impl.models.ExtractedProfile
@@ -708,5 +710,73 @@ class RealPirRunStateHandlerTest {
             )
             verifyNoMoreInteractions(mockPixelSender)
             verifyNoMoreInteractions(mockJobRecordUpdater)
+        }
+
+    @Test
+    fun whenHandleBrokerStepInvalidEventWithManualRunTypeThenReportsScanInvalidEvent() =
+        runTest {
+            val state = BrokerStepInvalidEvent(
+                broker = testBroker,
+                runType = RunType.MANUAL,
+            )
+
+            testee.handleState(state)
+
+            verify(mockPixelSender).reportScanInvalidEvent(
+                brokerUrl = testBroker.url,
+                brokerVersion = testBroker.version,
+            )
+            verifyNoMoreInteractions(mockPixelSender)
+        }
+
+    @Test
+    fun whenHandleBrokerStepInvalidEventWithScheduledRunTypeThenReportsScanInvalidEvent() =
+        runTest {
+            val state = BrokerStepInvalidEvent(
+                broker = testBroker,
+                runType = RunType.SCHEDULED,
+            )
+
+            testee.handleState(state)
+
+            verify(mockPixelSender).reportScanInvalidEvent(
+                brokerUrl = testBroker.url,
+                brokerVersion = testBroker.version,
+            )
+            verifyNoMoreInteractions(mockPixelSender)
+        }
+
+    @Test
+    fun whenHandleBrokerStepInvalidEventWithOptOutRunTypeThenReportsOptOutInvalidEvent() =
+        runTest {
+            val state = BrokerStepInvalidEvent(
+                broker = testBroker,
+                runType = RunType.OPTOUT,
+            )
+
+            testee.handleState(state)
+
+            verify(mockPixelSender).reportOptOutInvalidEvent(
+                brokerUrl = testBroker.url,
+                brokerVersion = testBroker.version,
+            )
+            verifyNoMoreInteractions(mockPixelSender)
+        }
+
+    @Test
+    fun whenHandleBrokerStepInvalidEventWithEmailConfirmationRunTypeThenReportsOptOutInvalidEvent() =
+        runTest {
+            val state = BrokerStepInvalidEvent(
+                broker = testBroker,
+                runType = RunType.EMAIL_CONFIRMATION,
+            )
+
+            testee.handleState(state)
+
+            verify(mockPixelSender).reportOptOutInvalidEvent(
+                brokerUrl = testBroker.url,
+                brokerVersion = testBroker.version,
+            )
+            verifyNoMoreInteractions(mockPixelSender)
         }
 }
