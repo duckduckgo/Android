@@ -924,11 +924,15 @@
     <string name="settingsHeadingCompleteSetup">Ολοκληρώστε την εγκατάστασή σας</string>
 
     <!--TabSwitcher Trackers Animation-->
-    <string name="showTrackerCountInTabSwitcher">Εμφάνιση πλήθους εφαρμογών παρακολούθησης στην Εναλλαγή καρτελών</string>
+    <string name="trackerBlockedInTheLast7days" instruction="Placeholder is 1 tracker blocked">&lt;b&gt;%1$s εφαρμογή παρακολούθησης αποκλείστηκε &lt;/b&gt; τις τελευταίες 7 ημέρες</string>
     <string name="tabSwitcherAnimationTileRemovalDialogTitle" instruction="A title for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Απόκρυψη πλήθους εφαρμογών παρακολούθησης;</string>
     <string name="tabSwitcherAnimationTileRemovalDialogBody" instruction="A message for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Μπορείτε να ενεργοποιήσετε ξανά αυτήν την επιλογή στις Ρυθμίσεις &gt; Εμφάνιση.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Αποκρυψη</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Διατήρηση</string>
+    <!-- Trackers blocked animation settings -->
+    <string name="settingsTrackersBlockedAnimationHeaderTitle">Κίνηση αποκλεισμένων εφαρμογών παρακολούθησης</string>
+    <string name="showTrackerCountInAddressBar">Εμφάνιση στη Γραμμή διευθύνσεων</string>
+    <string name="showWeeklyTrackerCountInTabSwitcher">Εμφάνιση στη Διαχείριση καρτελών</string>
 
     <!-- Widgets -->
     <string name="searchOnlyWidgetLabel" instruction="Label for the search-only widget">Αναζήτηση μόνο</string>
