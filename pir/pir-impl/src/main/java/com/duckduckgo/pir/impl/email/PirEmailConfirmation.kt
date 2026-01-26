@@ -33,7 +33,6 @@ import com.duckduckgo.pir.impl.common.RealPirActionsRunner
 import com.duckduckgo.pir.impl.common.splitIntoParts
 import com.duckduckgo.pir.impl.models.ProfileQuery
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.EmailConfirmationJobRecord
-import com.duckduckgo.pir.impl.scheduling.JobRecordUpdater
 import com.duckduckgo.pir.impl.scripts.PirCssScriptLoader
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.squareup.anvil.annotations.ContributesBinding
@@ -79,7 +78,6 @@ class RealPirEmailConfirmation @Inject constructor(
     private val pirCssScriptLoader: PirCssScriptLoader,
     private val pirActionsRunnerFactory: RealPirActionsRunner.Factory,
     private val dispatcherProvider: DispatcherProvider,
-    private val jobRecordUpdater: JobRecordUpdater,
     callbacks: PluginPoint<PirCallbacks>,
 ) : PirJob(callbacks),
     PirEmailConfirmation {
@@ -266,9 +264,5 @@ class RealPirEmailConfirmation @Inject constructor(
             }
             runners.clear()
         }
-    }
-
-    companion object {
-        private const val KEY_LINK = "link"
     }
 }
