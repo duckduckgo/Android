@@ -26,6 +26,15 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  print_event_names:
+    name: Print event names
+    runs-on: ubuntu-latest
+    steps:
+      - name: Print event name
+        run: | 
+          echo "event_name: ${{ github.event_name }}"
+          echo "conditional result: ${{ github.event_name == 'workflow_dispatch' || github.event_name == 'workflow_call' || github.event_name == 'pull_request' }}"
+
   privacy_tests:
     if: ${{ github.event_name == 'workflow_dispatch' || github.event_name == 'workflow_call' || github.event_name == 'pull_request' }}
     name: Privacy Tests
