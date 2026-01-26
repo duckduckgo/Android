@@ -144,9 +144,10 @@ class CardsListAdapter @Inject constructor() : ListAdapter<CardItem, CardsListAd
             oldItem: CardItem,
             newItem: CardItem,
         ): Boolean {
-            return oldItem == newItem
+            return oldItem.id == newItem.id
         }
 
+        @Suppress("DiffUtilEquals")
         override fun areContentsTheSame(
             oldItem: CardItem,
             newItem: CardItem,
