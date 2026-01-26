@@ -29,6 +29,7 @@ import android.provider.MediaStore
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.KeyEvent
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
@@ -178,6 +179,7 @@ class DuckChatContextualFragment :
 
     private val root: ViewGroup by lazy { binding.root }
 
+    private lateinit var bottomSheetBehavior: BottomSheetBehavior<View>
     internal val simpleWebview: WebView by lazy { binding.simpleWebview }
 
     // this will go in the viewmodel
@@ -187,6 +189,8 @@ class DuckChatContextualFragment :
     }
 
     private var sheetMode = SheetMode.INPUT
+    private var lastWebViewX = 0f
+    private var lastWebViewY = 0f
 
     @SuppressLint("SetJavaScriptEnabled")
     override fun onViewCreated(
@@ -227,6 +231,34 @@ class DuckChatContextualFragment :
                         throw e
                     }
                 }
+            }
+
+            it.setOnTouchListener { v, event ->
+                when (event.actionMasked) {
+                    MotionEvent.ACTION_DOWN -> {
+                        lastWebViewX = event.x
+                        lastWebViewY = event.y
+                        v.parent?.requestDisallowInterceptTouchEvent(true)
+                    }
+
+                    MotionEvent.ACTION_MOVE -> {
+                        val dx = event.x - lastWebViewX
+                        val dy = event.y - lastWebViewY
+                        lastWebViewX = event.x
+                        lastWebViewY = event.y
+
+                        val isHorizontal = kotlin.math.abs(dx) > kotlin.math.abs(dy)
+                        val atBottom = !v.canScrollVertically(1)
+                        val allowSheetDrag = !isHorizontal && atBottom && dy > 0
+
+                        v.parent?.requestDisallowInterceptTouchEvent(!allowSheetDrag)
+                    }
+
+                    MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                        v.parent?.requestDisallowInterceptTouchEvent(false)
+                    }
+                }
+                false
             }
 
             it.settings.apply {
@@ -322,7 +354,7 @@ class DuckChatContextualFragment :
 
     private fun configureBottomSheet(view: View) {
         val parent = view.parent as? View ?: return
-        val bottomSheetBehavior = BottomSheetBehavior.from(parent)
+        bottomSheetBehavior = BottomSheetBehavior.from(parent)
 
         configureBehaviour(bottomSheetBehavior)
         configureButtons(bottomSheetBehavior)
@@ -331,7 +363,7 @@ class DuckChatContextualFragment :
     private fun configureBehaviour(bottomSheetBehavior: BottomSheetBehavior<View>) {
         bottomSheetBehavior.isShouldRemoveExpandedCorners = false
         bottomSheetBehavior.skipCollapsed = true
-        bottomSheetBehavior.isDraggable = false
+        bottomSheetBehavior.isDraggable = true
         bottomSheetBehavior.isHideable = true
         bottomSheetBehavior.isFitToContents = true
 
@@ -342,9 +374,6 @@ class DuckChatContextualFragment :
                     newState: Int,
                 ) {
                     logcat { "Duck.ai: state changed $newState sheetMode $sheetMode" }
-                    if (newState == BottomSheetBehavior.STATE_EXPANDED) {
-                        bottomSheetBehavior.isDraggable = true
-                    }
                 }
 
                 override fun onSlide(
@@ -364,6 +393,8 @@ class DuckChatContextualFragment :
         binding.contextualModeRoot.setOnClickListener { }
         binding.inputField.onFocusChangeListener = View.OnFocusChangeListener { _, focused ->
             if (focused) {
+                sheetMode = SheetMode.INPUT
+                bottomSheetBehavior.isDraggable = true
                 bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
             } else if (sheetMode == SheetMode.INPUT) {
                 bottomSheetBehavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
