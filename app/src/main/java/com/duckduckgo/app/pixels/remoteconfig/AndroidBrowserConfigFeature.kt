@@ -266,4 +266,13 @@ interface AndroidBrowserConfigFeature {
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     @Toggle.InternalAlwaysEnabled
     fun experimentalBrowsingMenu(): Toggle
+
+    /**
+     * Controls whether verified install/update pixels are sent.
+     * @return `true` when the remote config has the global "sendVerifiedInstallPixels" androidBrowserConfig
+     * sub-feature flag enabled
+     * If the remote feature is not present defaults to `true`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun sendVerifiedInstallPixels(): Toggle
 }

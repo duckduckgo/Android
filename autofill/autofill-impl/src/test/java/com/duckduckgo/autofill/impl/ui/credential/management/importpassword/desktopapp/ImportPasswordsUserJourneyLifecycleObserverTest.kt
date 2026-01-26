@@ -86,12 +86,12 @@ class ImportPasswordsUserJourneyLifecycleObserverTest {
     }
 
     private fun configureSignedInWithDesktopDevice() {
-        val syncState = SignedIn(listOf(aDevice(DESKTOP)))
+        val syncState = SignedIn("testUserId", listOf(aDevice(DESKTOP)))
         whenever(deviceSyncState.getAccountState()).thenReturn(syncState)
     }
 
     private fun configureSignedInWithMobileDevice() {
-        val syncState = SignedIn(listOf(aDevice(MOBILE)))
+        val syncState = SignedIn("testUserId", listOf(aDevice(MOBILE)))
         whenever(deviceSyncState.getAccountState()).thenReturn(syncState)
     }
 

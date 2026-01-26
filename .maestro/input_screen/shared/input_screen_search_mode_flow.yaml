@@ -15,8 +15,7 @@ appId: com.duckduckgo.mobile.android
       id: "autoCompleteSuggestionsList"
 
 # verify that submitting a search query opens SERP
-- tapOn:
-    id: "actionSend"
+- pressKey: Enter
 - assertNotVisible:
     id: "inputModeWidget"
 - assertVisible:
@@ -58,8 +57,7 @@ appId: com.duckduckgo.mobile.android
 - tapOn:
     id: "inputFieldClearText"
 - inputText: "eff.org"
-- tapOn:
-    id: "actionSend"
+- pressKey: Enter
 - assertNotVisible:
     id: "inputModeWidget"
 - assertVisible:

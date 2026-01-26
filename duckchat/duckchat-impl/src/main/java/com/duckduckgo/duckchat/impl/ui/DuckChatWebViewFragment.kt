@@ -353,6 +353,19 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
                     }
                 }
             }.launchIn(lifecycleScope)
+
+        observeSyncStatusChanges()
+    }
+
+    private fun observeSyncStatusChanges() {
+        viewModel.subscriptionEventDataFlow
+            .onEach { event ->
+                // Only send if this fragment is actually visible
+                if (isVisible) {
+                    contentScopeScripts.sendSubscriptionEvent(event)
+                }
+            }
+            .launchIn(lifecycleScope)
     }
 
     private fun launchInputScreen() {

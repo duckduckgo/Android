@@ -34,6 +34,7 @@
     <string name="sync_setup_begin_syncing">Započni sinkronizaciju</string>
     <string name="sync_setup_with_another_device_cta_title">Sinkronizacija s drugim uređajem</string>
     <string name="sync_setup_with_another_device_cta_subtitle">Sigurno sinkroniziraj oznake i lozinke između svojih uređaja.</string>
+    <string name="sync_setup_with_another_device_cta_subtitle_with_ai_chat">Sigurno sinkroniziraj oznake, lozinke i Duck.ai čavrljanja između svojih uređaja.</string>
     <string name="sync_off_hint">Tvoji su podaci šifrirani od početka do kraja, a DuckDuckGo nema pristup ključu za šifriranje.</string>
     <string name="sync_setup_single_device_title">Postavljanje jednog uređaja</string>
     <string name="sync_setup_other_options_title">Ostale mogućnosti</string>
@@ -45,12 +46,14 @@
     <!-- Setup screen -->
     <string name="sync_enable_sync_title">Postavljanje sinkronizacije i sigurnosnog kopiranja!</string>
     <string name="sync_enable_sync_content">Tvoje oznake i lozinke se pripremaju za sinkronizaciju. Ovo bi trebalo trajati samo trenutak.</string>
+    <string name="sync_enable_sync_content_with_ai_chat">Tvoje oznake, lozinke i Duck.ai čavrljanja pripremaju se za sinkronizaciju. Ovo bi trebalo potrajati samo trenutak.</string>
     <string name="sync_enable_options">Opcije</string>
     <string name="sync_enable_option_favicons_title">Dohvaćanje ikona knjižnih oznaka</string>
     <string name="sync_enable_option_favicons_subtitle">Automatski preuzmi ikone za sinkronizirane oznake.</string>
     <string name="sync_enable_connecting">Povezivanje u tijeku...</string>
     <string name="sync_intro_enable_title">Sinkroniziraj i izradi sigurnosnu kopiju ovog uređaja</string>
     <string name="sync_intro_enable_content">Time se stvara šifrirana sigurnosna kopija tvojih oznaka i lozinki na sigurnom poslužitelju DuckDuckGo, koja se može sinkronizirati s tvojim drugim uređajima. \n\n Ključ za šifriranje pohranjen je samo na tvom uređaju, DuckDuckGo mu ne može pristupiti.</string>
+    <string name="sync_intro_enable_content_with_ai_chat">Time se stvara šifrirana sigurnosna kopija tvojih oznaka, lozinki i Duck.ai čavrljanja na sigurnom poslužitelju DuckDuckGo, koja se može sinkronizirati s tvojim drugim uređajima. \n\n Ključ za šifriranje pohranjen je samo na tvom uređaju, DuckDuckGo mu ne može pristupiti.</string>
     <string name="sync_intro_enable_footer">Kasnije možeš sinkronizirati s drugim uređajima.</string>
     <string name="sync_intro_enable_cta">Uključi sinkronizaciju i sigurnosno kopiranje</string>
     <string name="sync_intro_recover_title">Oporavak sinkroniziranih podataka</string>

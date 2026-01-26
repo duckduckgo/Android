@@ -267,7 +267,6 @@ class RealPirEmailConfirmationJobsRunner @Inject constructor(
                     brokerUrl = broker.url,
                     brokerVersion = broker.version,
                     actionId = it.jobAttemptData.lastJobAttemptActionId,
-                    attemptId = it.emailData.attemptId,
                 )
 
                 jobRecordUpdater.recordEmailConfirmationAttemptMaxed(it.extractedProfileId)

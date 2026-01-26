@@ -51,4 +51,18 @@
     <string name="pirDevSettingNotAvailableMessage">PIR database is not available. This may be due to keystore access issues.</string>
     <string name="pirDevDebugScanHeader">Debug Scan (select broker)</string>
     <string name="pirDevDebugScan">Debug Scan</string>
+    <string name="pirDevBrokerConfig">Broker Config</string>
+    <string name="pirDevBrokerConfigTitle">Broker Config</string>
+    <string name="pirDevBrokerConfigSelectBroker">Select Broker</string>
+    <string name="pirDevBrokerConfigJsonInput">Broker JSON Config</string>
+    <string name="pirDevBrokerConfigJsonHint">Paste broker config JSON here…</string>
+    <string name="pirDevBrokerConfigUpdate">Update Config</string>
+    <string name="pirDevBrokerConfigNoBrokerSelected">Please select a broker first</string>
+    <string name="pirDevBrokerConfigEmptyJson">Please enter a valid JSON config</string>
+    <string name="pirDevBrokerConfigParseError">Failed to parse JSON. Please check the format.</string>
+    <string name="pirDevBrokerConfigUpdateSuccess" instruction="Placeholder is broker name">Successfully updated config for %1$s</string>
+    <string name="pirDevBrokerConfigUpdateError" instruction="Placeholder is error message">Update failed: %1$s</string>
+    <string name="pirDevBrokerConfigResetAll">Reset All Configs (Re-download)</string>
+    <string name="pirDevBrokerConfigResetSuccess">Successfully re-downloaded all broker configs</string>
+    <string name="pirDevBrokerConfigResetError">Failed to re-download broker configs</string>
 </resources>

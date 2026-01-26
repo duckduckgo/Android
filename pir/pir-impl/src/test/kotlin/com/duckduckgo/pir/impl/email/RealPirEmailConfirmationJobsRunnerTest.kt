@@ -481,7 +481,6 @@ class RealPirEmailConfirmationJobsRunnerTest {
             brokerUrl = testBroker.url,
             brokerVersion = testBroker.version,
             actionId = testEmailConfirmationJobRecordMaxedOut.jobAttemptData.lastJobAttemptActionId,
-            attemptId = testEmailConfirmationJobRecordMaxedOut.emailData.attemptId,
         )
         verify(mockPirEventsRepository).saveEmailConfirmationLog(
             eventTimeInMillis = testCurrentTime,

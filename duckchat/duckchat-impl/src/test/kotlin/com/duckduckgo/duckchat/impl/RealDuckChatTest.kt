@@ -155,6 +155,20 @@ class RealDuckChatTest {
     }
 
     @Test
+    fun whenSetAutomaticPageContextUserSettingThenRepositorySetCalled() = runTest {
+        testee.setAutomaticPageContextUserSetting(true)
+
+        verify(mockDuckChatFeatureRepository).setAutomaticPageContextAttachment(true)
+    }
+
+    @Test
+    fun whenSetAutomaticPageContextUserSettingFalseThenRepositorySetCalled() = runTest {
+        testee.setAutomaticPageContextUserSetting(false)
+
+        verify(mockDuckChatFeatureRepository).setAutomaticPageContextAttachment(false)
+    }
+
+    @Test
     fun whenDuckChatFeatureEnabledAndUserEnabledThenIsEnabledReturnsTrue() = runTest {
         duckChatFeature.self().setRawStoredState(State(true))
         whenever(mockDuckChatFeatureRepository.isDuckChatUserEnabled()).thenReturn(true)
@@ -217,6 +231,16 @@ class RealDuckChatTest {
         whenever(mockDuckChatFeatureRepository.observeShowInVoiceSearch()).thenReturn(flowOf(true, false))
 
         val results = testee.observeShowInVoiceSearchUserSetting().take(2).toList()
+        assertTrue(results[0])
+        assertFalse(results[1])
+    }
+
+    @Test
+    fun whenObserveAutomaticContextAttachmentUserSettingThenEmitCorrectValues() = runTest {
+        whenever(mockDuckChatFeatureRepository.observeAutomaticContextAttachmentUserSettingEnabled()).thenReturn(flowOf(true, false))
+
+        val results = testee.observeAutomaticContextAttachmentUserSettingEnabled().take(2).toList()
+
         assertTrue(results[0])
         assertFalse(results[1])
     }

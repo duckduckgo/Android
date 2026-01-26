@@ -27,6 +27,7 @@ import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.di.DuckChat
+import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_AI_AUTOMATIC_CONTEXT_ATTACHMENT
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_AI_INPUT_SCREEN_COSMETIC_SETTING
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_AI_INPUT_SCREEN_USER_SETTING
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_CHAT_BACKGROUND_TIMESTAMP
@@ -68,11 +69,15 @@ interface DuckChatDataStore {
 
     suspend fun setShowInVoiceSearch(showToggle: Boolean)
 
+    suspend fun setAutomaticPageContextAttachment(enabled: Boolean)
+
     fun observeDuckChatUserEnabled(): Flow<Boolean>
 
     fun observeInputScreenUserSettingEnabled(): Flow<Boolean>
 
     fun observeCosmeticInputScreenUserSettingEnabled(): Flow<Boolean?>
+
+    fun observeAutomaticContextAttachmentUserSettingEnabled(): Flow<Boolean>
 
     suspend fun isCosmeticInputScreenUserSettingEnabled(): Boolean
 
@@ -137,6 +142,7 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
         val DUCK_CHAT_FULLSCREEN_MODE_SETTING = booleanPreferencesKey(name = "DUCK_CHAT_FULLSCREEN_MODE_SETTING")
         val DUCK_CHAT_BACKGROUND_TIMESTAMP = longPreferencesKey(name = "DUCK_CHAT_BACKGROUND_TIMESTAMP")
         val DUCK_CHAT_HISTORY_ENABLED = booleanPreferencesKey(name = "DUCK_CHAT_HISTORY_ENABLED")
+        val DUCK_AI_AUTOMATIC_CONTEXT_ATTACHMENT = booleanPreferencesKey(name = "DUCK_AI_AUTOMATIC_CONTEXT_ATTACHMENT")
     }
 
     private fun Preferences.defaultShowInAddressBar(): Boolean =
@@ -177,6 +183,12 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
             .map { prefs -> prefs[DUCK_AI_INPUT_SCREEN_COSMETIC_SETTING] }
             .distinctUntilChanged()
             .stateIn(appCoroutineScope, SharingStarted.Eagerly, null)
+
+    private val automaticContextAttachment: StateFlow<Boolean> =
+        store.data
+            .map { prefs -> prefs[DUCK_AI_AUTOMATIC_CONTEXT_ATTACHMENT] ?: false }
+            .distinctUntilChanged()
+            .stateIn(appCoroutineScope, SharingStarted.Eagerly, false)
 
     private val duckChatShowInBrowserMenu: StateFlow<Boolean> =
         store.data
@@ -227,11 +239,17 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
         store.edit { prefs -> prefs[DUCK_CHAT_SHOW_IN_VOICE_SEARCH] = showToggle }
     }
 
+    override suspend fun setAutomaticPageContextAttachment(enabled: Boolean) {
+        store.edit { prefs -> prefs[DUCK_AI_AUTOMATIC_CONTEXT_ATTACHMENT] = enabled }
+    }
+
     override fun observeDuckChatUserEnabled(): Flow<Boolean> = duckChatUserEnabled
 
     override fun observeInputScreenUserSettingEnabled(): Flow<Boolean> = inputScreenUserSettingEnabled
 
     override fun observeCosmeticInputScreenUserSettingEnabled(): Flow<Boolean?> = cosmeticInputScreenUserSettingEnabled
+
+    override fun observeAutomaticContextAttachmentUserSettingEnabled(): Flow<Boolean> = automaticContextAttachment
 
     override fun observeShowInBrowserMenu(): Flow<Boolean> = duckChatShowInBrowserMenu
 

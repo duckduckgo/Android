@@ -129,6 +129,8 @@
     <string name="atp_NewTabDisabled"><b>App Tracking Protection desactivada.</b>\nToca para seguir bloqueando los intentos de rastreo en tus aplicaciones.</string>
     <string name="atp_NewTabRevoked"><b>Una aplicación VPN en tu dispositivo ha desactivado App Tracking Protection.</b>\nToca para volver a activarla.</string>
     <string name="atp_NewTabEnabled"><b>App Tracking Protection está activada</b> y bloquea los intentos de rastreo en tus aplicaciones.</string>
+    <!-- smartling.character_limit = 15 -->
+    <string name="vpnMenuYellowPill">Probar Gratis</string>
 
     <!-- Exclusion List -->
     <string name="atp_ExclusionListActivityTitle">Todas las aplicaciones</string>

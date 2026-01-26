@@ -142,15 +142,15 @@
 
     </RelativeLayout>
 
-<!--    <FrameLayout-->
-<!--        android:id="@+id/duckAiFragmentContainer"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="match_parent"-->
-<!--        android:elevation="12dp"-->
-<!--        app:behavior_hideable="true"-->
-<!--        app:behavior_skipCollapsed="true"-->
-<!--        app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"-->
-<!--        android:visibility="gone" />-->
+    <FrameLayout
+        android:id="@+id/duckAiContextualFragmentContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:elevation="12dp"
+        app:behavior_hideable="true"
+        app:behavior_skipCollapsed="true"
+        app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
+        android:visibility="gone" />
 
     <com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView
         android:id="@+id/navigationBar"

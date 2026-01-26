@@ -100,7 +100,7 @@ class RemoteMessageModalSurfaceEvaluatorImpl @Inject constructor(
                 }
 
                 // Record this message as shown, and clear background timestamp
-                modalSurfaceStore.recordLastShownRemoteMessageId(message.id)
+                modalSurfaceStore.recordLastShownRemoteMessage(message)
                 modalSurfaceStore.clearBackgroundTimestamp()
 
                 return@withContext ModalEvaluator.EvaluationResult.ModalShown

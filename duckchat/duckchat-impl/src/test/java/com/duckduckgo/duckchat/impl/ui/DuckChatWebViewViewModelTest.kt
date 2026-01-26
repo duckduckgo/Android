@@ -22,6 +22,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.impl.DuckChatInternal
+import com.duckduckgo.duckchat.impl.messaging.sync.SyncStatusChangedObserver
 import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewViewModel.Command
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE
@@ -31,6 +32,7 @@ import com.duckduckgo.subscriptions.api.SubscriptionStatus.UNKNOWN
 import com.duckduckgo.subscriptions.api.Subscriptions
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.test.runTest
+import org.json.JSONObject
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -50,14 +52,22 @@ class DuckChatWebViewViewModelTest {
 
     private val subscriptions: Subscriptions = mock()
     private val duckChat: DuckChatInternal = mock()
+    private val syncStatusChangedObserver: SyncStatusChangedObserver = mock()
     private val subscriptionStatusFlow = MutableSharedFlow<SubscriptionStatus>()
+    private val syncStatusChangedEventsFlow = MutableSharedFlow<JSONObject>()
 
     private lateinit var viewModel: DuckChatWebViewViewModel
 
     @Before
     fun setup() {
         whenever(subscriptions.getSubscriptionStatusFlow()).thenReturn(subscriptionStatusFlow)
-        viewModel = DuckChatWebViewViewModel(subscriptions, duckChat)
+        whenever(syncStatusChangedObserver.syncStatusChangedEvents).thenReturn(syncStatusChangedEventsFlow)
+        viewModel = DuckChatWebViewViewModel(
+            subscriptions = subscriptions,
+            duckChat = duckChat,
+            syncStatusChangedObserver = syncStatusChangedObserver,
+            dispatchers = coroutineTestRule.testDispatcherProvider,
+        )
     }
 
     @Test

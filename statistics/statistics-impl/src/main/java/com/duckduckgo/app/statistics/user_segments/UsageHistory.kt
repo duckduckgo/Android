@@ -19,6 +19,7 @@ package com.duckduckgo.app.statistics.user_segments
 import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.duckduckgo.app.statistics.user_segments.RealUsageHistory.SegmentKey.KEY_APP_USE_DATES
+import com.duckduckgo.app.statistics.user_segments.RealUsageHistory.SegmentKey.KEY_DUCKAI_DATES
 import com.duckduckgo.app.statistics.user_segments.RealUsageHistory.SegmentKey.KEY_SEARCH_DATES
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
@@ -43,7 +44,7 @@ interface UsageHistory {
     suspend fun getSearchUsageHistory(): List<String>
 
     /**
-     * Call this method to add a new APP_USE ATB to the search usage history
+     * Call this method to add a new APP_USE ATB to the app usage history
      * @param atb the new set ATB to add to the APP_USE history
      */
     suspend fun addAppUsage(atb: String)
@@ -53,6 +54,18 @@ interface UsageHistory {
      * @return the APP_USE ATB history
      */
     suspend fun getAppUsageHistory(): List<String>
+
+    /**
+     * Call this method to add a new DUCKAI ATB to the DuckAI usage history
+     * @param atb the new set ATB to add to the DUCKAI history
+     */
+    suspend fun addDuckAiUsage(atb: String)
+
+    /**
+     * Get the history of DUCKAI set ATBs
+     * @return the DUCKAI ATB history
+     */
+    suspend fun getDuckAiHistory(): List<String>
 }
 
 private class RealUsageHistory(
@@ -95,6 +108,14 @@ private class RealUsageHistory(
         return getOrderedUsageHistoryInternal(KEY_APP_USE_DATES)
     }
 
+    override suspend fun addDuckAiUsage(atb: String) {
+        addUsageInternal(atb, KEY_DUCKAI_DATES)
+    }
+
+    override suspend fun getDuckAiHistory(): List<String> {
+        return getOrderedUsageHistoryInternal(KEY_DUCKAI_DATES)
+    }
+
     companion object {
         private const val RETENTION_SEGMENTS_PREF_FILE = "com.duckduckgo.mobile.android.retention.usage.history"
     }
@@ -102,6 +123,7 @@ private class RealUsageHistory(
     private enum class SegmentKey(name: String) {
         KEY_SEARCH_DATES("search.usage"),
         KEY_APP_USE_DATES("app_use.usage"),
+        KEY_DUCKAI_DATES("duckai.usage"),
     }
 }
 

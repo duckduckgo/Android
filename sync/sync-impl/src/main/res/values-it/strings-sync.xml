@@ -34,6 +34,7 @@
     <string name="sync_setup_begin_syncing">Inizia la sincronizzazione</string>
     <string name="sync_setup_with_another_device_cta_title">Sincronizza con un altro dispositivo</string>
     <string name="sync_setup_with_another_device_cta_subtitle">Sincronizza in sicurezza i segnalibri e le password tra i tuoi dispositivi.</string>
+    <string name="sync_setup_with_another_device_cta_subtitle_with_ai_chat">Sincronizza in modo sicuro segnalibri, password e chat di Duck.ai tra i tuoi dispositivi.</string>
     <string name="sync_off_hint">I tuoi dati sono crittografati end-to-end e DuckDuckGo non ha accesso alla chiave di crittografia.</string>
     <string name="sync_setup_single_device_title">Configurazione di un singolo dispositivo</string>
     <string name="sync_setup_other_options_title">Altre opzioni</string>
@@ -45,12 +46,14 @@
     <!-- Setup screen -->
     <string name="sync_enable_sync_title">Configurazione della sincronizzazione e del backup.</string>
     <string name="sync_enable_sync_content">I segnalibri e le password sono pronti per la sincronizzazione. L\'operazione dovrebbe richiedere pochi istanti.</string>
+    <string name="sync_enable_sync_content_with_ai_chat">Segnalibri, password e chat di Duck.ai sono in fase di preparazione per la sincronizzazione. L\'operazione dovrebbe richiedere pochi istanti.</string>
     <string name="sync_enable_options">Opzioni</string>
     <string name="sync_enable_option_favicons_title">Recupera icone segnalibro</string>
     <string name="sync_enable_option_favicons_subtitle">Scarica automaticamente le icone per i segnalibri sincronizzati.</string>
     <string name="sync_enable_connecting">Connessione…</string>
     <string name="sync_intro_enable_title">Sincronizza ed esegui il backup di questo dispositivo</string>
     <string name="sync_intro_enable_content">Questo crea un backup crittografato dei tuoi segnalibri e password sul server sicuro di DuckDuckGo, sincronizzabile con gli altri tuoi dispositivi. \n\n La chiave di crittografia viene memorizzata solo sul tuo dispositivo e DuckDuckGo non può accedervi.</string>
+    <string name="sync_intro_enable_content_with_ai_chat">In questo modo viene creato un backup crittografato dei tuoi segnalibri, delle tue password e delle chat di Duck.ai sul server sicuro di DuckDuckGo, che può essere sincronizzato con gli altri tuoi dispositivi. \n\n La chiave di crittografia viene memorizzata solo sul tuo dispositivo e DuckDuckGo non può accedervi.</string>
     <string name="sync_intro_enable_footer">Potrai effettuare la sincronizzazione con gli altri dispositivi in un secondo momento.</string>
     <string name="sync_intro_enable_cta">Attiva Sincronizzazione e backup</string>
     <string name="sync_intro_recover_title">Recupera i dati sincronizzati</string>

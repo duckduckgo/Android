@@ -129,6 +129,8 @@
     <string name="atp_NewTabDisabled">Η <b>Προστασία παρακολούθησης από εφαρμογές απενεργοποιήθηκε.</b>\nΠατήστε για να συνεχίσετε τον αποκλεισμό προσπαθειών παρακολούθησης των εφαρμογών σας.</string>
     <string name="atp_NewTabRevoked"><b>Μια εφαρμογή VPN στη συσκευή σας απενεργοποίησε την Προστασία παρακολούθησης από εφαρμογές.</b>\nΠατήστε για να την ενεργοποιήσετε ξανά.</string>
     <string name="atp_NewTabEnabled">Η <b>Προστασία παρακολούθησης από εφαρμογές</b> είναι ενεργοποιημένη και εμποδίζει τις προσπάθειες παρακολούθησης στις εφαρμογές σας.</string>
+    <!-- smartling.character_limit = 15 -->
+    <string name="vpnMenuYellowPill">Δωρεάν δοκιμή</string>
 
     <!-- Exclusion List -->
     <string name="atp_ExclusionListActivityTitle">Όλες οι εφαρμογές</string>

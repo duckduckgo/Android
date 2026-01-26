@@ -17,10 +17,12 @@
 package com.duckduckgo.app.browser.animations
 
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.extensions.toTldPlusOne
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.withContext
+import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import javax.inject.Inject
 
 interface AddressBarTrackersAnimationManager {
@@ -35,6 +37,19 @@ interface AddressBarTrackersAnimationManager {
      * @return true if the feature is enabled, false otherwise
      */
     suspend fun isFeatureEnabled(): Boolean
+
+    /**
+     * Determines if the tracker animation should be shown based on the current URL
+     * and the URL where the animation was last shown.
+     *
+     * Uses Public Suffix List (PSL) and eTLD+1 for accurate domain matching, handling
+     * user-controlled subdomains like *.github.io as separate sites.
+     *
+     * @param currentUrl The current page URL (null if no site loaded)
+     * @param lastAnimatedUrl The URL where animation was last shown (null if never shown)
+     * @return true if animation should be shown, false otherwise
+     */
+    fun shouldShowAnimation(currentUrl: String?, lastAnimatedUrl: String?): Boolean
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -56,5 +71,23 @@ class RealAddressBarTrackersAnimationManager @Inject constructor(
         cachedFeatureState ?: addressBarTrackersAnimationFeatureToggle.feature().isEnabled().also {
             cachedFeatureState = it
         }
+    }
+
+    override fun shouldShowAnimation(currentUrl: String?, lastAnimatedUrl: String?): Boolean {
+        if (currentUrl == null) {
+            return false
+        }
+
+        val currentHost = currentUrl.toHttpUrlOrNull()?.host ?: return false
+        val currentETldPlusOne = currentHost.toTldPlusOne()
+
+        if (lastAnimatedUrl == null) {
+            return true
+        }
+
+        val lastHost = lastAnimatedUrl.toHttpUrlOrNull()?.host ?: return true
+        val lastETldPlusOne = lastHost.toTldPlusOne()
+
+        return currentETldPlusOne != lastETldPlusOne
     }
 }

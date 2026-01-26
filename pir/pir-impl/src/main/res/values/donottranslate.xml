@@ -22,4 +22,5 @@
     <string name="pirNotificationMessageComplete">DuckDuckGo has started the process to remove records matching your personal info online. See what we found…</string>
     <string name="pirOptOutNotificationMessageInProgress">Opt out is currently in progress…</string>
     <string name="pirOptOutNotificationMessageComplete">Opt out is complete! View your results.</string>
+    <string name="pirDashboardManualConfigWarning">Warning: Broker config has been manually modified. Results may differ from production.</string>
 </resources>
