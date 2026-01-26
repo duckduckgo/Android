@@ -129,7 +129,7 @@ private val twoLineListItemMapper: (JsonListItem, Set<MessageActionMapperPlugin>
 
 private val sectionTitleMapper: (JsonListItem, Set<MessageActionMapperPlugin>) -> CardItem = { jsonItem, _ ->
     CardItem.SectionTitle(
-        id = jsonItem.id,
+        id = jsonItem.id.failIfEmpty(),
         type = jsonItem.type.toCardItemType(),
         titleText = jsonItem.titleText.failIfEmpty(),
         itemIDs = jsonItem.itemIDs.orEmpty(),
