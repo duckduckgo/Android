@@ -1140,7 +1140,7 @@ class BrowserTabViewModel @Inject constructor(
 
         when (cta) {
             is DaxBubbleCta.DaxIntroSearchOptionsCta,
-                -> {
+            -> {
                 if (!ctaViewModel.isSuggestedSearchOption(query)) {
                     pixel.fire(ONBOARDING_SEARCH_CUSTOM, type = Unique())
                 }
@@ -1148,7 +1148,7 @@ class BrowserTabViewModel @Inject constructor(
 
             is DaxBubbleCta.DaxIntroVisitSiteOptionsCta,
             is OnboardingDaxDialogCta.DaxSiteSuggestionsCta,
-                -> {
+            -> {
                 if (!ctaViewModel.isSuggestedSiteOption(query)) {
                     pixel.fire(ONBOARDING_VISIT_SITE_CUSTOM, type = Unique())
                 }
@@ -4308,7 +4308,7 @@ class BrowserTabViewModel @Inject constructor(
             is OnboardingDaxDialogCta.DaxTrackersBlockedCta,
             is OnboardingDaxDialogCta.DaxNoTrackersCta,
             is OnboardingDaxDialogCta.DaxMainNetworkCta,
-                -> {
+            -> {
                 viewModelScope.launch {
                     val cta =
                         withContext(dispatchers.io()) {
