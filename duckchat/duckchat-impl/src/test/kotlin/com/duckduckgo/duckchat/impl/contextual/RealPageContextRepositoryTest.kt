@@ -17,6 +17,7 @@
 package com.duckduckgo.duckchat.impl.contextual
 
 import com.duckduckgo.duckchat.impl.store.DuckChatDataStore
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.first
@@ -24,6 +25,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class RealPageContextRepositoryTest {
 
     private val fakeDataStore = FakeDuckChatDataStore()
@@ -88,13 +90,13 @@ private class FakeDuckChatDataStore : DuckChatDataStore {
     override suspend fun setFullScreenModeUserSetting(enabled: Boolean) = unsupported()
     override suspend fun setShowInVoiceSearch(showToggle: Boolean) = unsupported()
     override suspend fun setAutomaticPageContextAttachment(enabled: Boolean) = unsupported()
-    override fun observeDuckChatUserEnabled(): Flow<Boolean> = unsupportedFlow()
-    override fun observeInputScreenUserSettingEnabled(): Flow<Boolean> = unsupportedFlow()
-    override fun observeCosmeticInputScreenUserSettingEnabled(): Flow<Boolean?> = unsupportedFlow()
-    override fun observeAutomaticContextAttachmentUserSettingEnabled(): Flow<Boolean> = unsupportedFlow()
-    override fun observeShowInBrowserMenu(): Flow<Boolean> = unsupportedFlow()
-    override fun observeShowInAddressBar(): Flow<Boolean> = unsupportedFlow()
-    override fun observeShowInVoiceSearch(): Flow<Boolean> = unsupportedFlow()
+    override fun observeDuckChatUserEnabled(): Flow<Boolean> = unsupportedFlow<Boolean>()
+    override fun observeInputScreenUserSettingEnabled(): Flow<Boolean> = unsupportedFlow<Boolean>()
+    override fun observeCosmeticInputScreenUserSettingEnabled(): Flow<Boolean?> = unsupportedFlow<Boolean?>()
+    override fun observeAutomaticContextAttachmentUserSettingEnabled(): Flow<Boolean> = unsupportedFlow<Boolean>()
+    override fun observeShowInBrowserMenu(): Flow<Boolean> = unsupportedFlow<Boolean>()
+    override fun observeShowInAddressBar(): Flow<Boolean> = unsupportedFlow<Boolean>()
+    override fun observeShowInVoiceSearch(): Flow<Boolean> = unsupportedFlow<Boolean>()
     override suspend fun isDuckChatUserEnabled(): Boolean = unsupported()
     override suspend fun isInputScreenUserSettingEnabled(): Boolean = unsupported()
     override suspend fun isFullScreenUserSettingEnabled(): Boolean = unsupported()

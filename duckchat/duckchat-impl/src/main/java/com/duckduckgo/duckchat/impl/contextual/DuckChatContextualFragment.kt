@@ -60,6 +60,7 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.FragmentViewModelFactory
+import com.duckduckgo.common.utils.extensions.hideKeyboard
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.downloads.api.DOWNLOAD_SNACKBAR_DELAY
 import com.duckduckgo.downloads.api.DOWNLOAD_SNACKBAR_LENGTH
@@ -341,9 +342,8 @@ class DuckChatContextualFragment :
         configureBottomSheet(view)
         observeViewModel()
 
-        viewModel.onSheetOpened()
         requireArguments().getString(KEY_DUCK_AI_CONTEXTUAL_TAB_ID)?.let { tabId ->
-            viewModel.observePageContextChanges(tabId)
+            viewModel.onSheetOpened(tabId)
         }
     }
 
@@ -375,11 +375,7 @@ class DuckChatContextualFragment :
         binding.inputField.setOnEditorActionListener(
             TextView.OnEditorActionListener { _, actionId, keyEvent ->
                 if (actionId == EditorInfo.IME_ACTION_GO || keyEvent?.keyCode == KeyEvent.KEYCODE_ENTER) {
-                    val prompt = binding.inputField.text.toString()
-                    if (prompt.isNotEmpty()) {
-                        viewModel.onPromptSent(prompt)
-                        bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
-                    }
+                    sendNativePrompt()
                     return@OnEditorActionListener true
                 }
                 false
@@ -411,11 +407,7 @@ class DuckChatContextualFragment :
             },
         )
         binding.duckAiContextualSend.setOnClickListener {
-            val prompt = binding.inputField.text.toString()
-            if (prompt.isNotEmpty()) {
-                viewModel.onPromptSent(prompt)
-                bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
-            }
+            sendNativePrompt()
         }
 
         binding.contextualFullScreen.setOnClickListener {
@@ -438,11 +430,15 @@ class DuckChatContextualFragment :
         binding.contextualPromptSummarize.setOnClickListener {
             binding.inputField.setText(binding.contextualPromptSummarize.text.toString())
         }
+    }
 
-        val pageTitle = requireArguments().getString(KEY_DUCK_AI_CONTEXTUAL_PAGE_TITLE)!!
-        val pageUrl = requireArguments().getString(KEY_DUCK_AI_CONTEXTUAL_PAGE_URL)!!
-        val tabId = requireArguments().getString(KEY_DUCK_AI_CONTEXTUAL_TAB_ID)!!
-        renderPageContext(pageTitle, pageUrl, tabId)
+    private fun sendNativePrompt() {
+        val prompt = binding.inputField.text.toString()
+        if (prompt.isNotEmpty()) {
+            viewModel.onPromptSent(prompt)
+            bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+            hideKeyboard(binding.inputField)
+        }
     }
 
     private fun observeViewModel() {
@@ -458,12 +454,8 @@ class DuckChatContextualFragment :
                         contentScopeScripts.sendSubscriptionEvent(authUpdateEvent)
                     }
 
-                    is DuckChatContextualViewModel.Command.PageContextUpdated -> {
-                        logcat { "Duck.ai: PageContextUpdated tab=${command.tabId} title=${command.pageTitle} url=${command.pageUrl}" }
-                        renderPageContext(command.pageTitle, command.pageUrl, command.tabId)
-                    }
-
                     is DuckChatContextualViewModel.Command.LoadUrl -> {
+                        logcat { "Duck.ai Contextual: load url ${command.url}" }
                         simpleWebview.loadUrl(command.url)
                     }
                 }
@@ -478,11 +470,21 @@ class DuckChatContextualFragment :
     }
 
     private fun renderViewState(viewState: DuckChatContextualViewModel.ViewState) {
-        bottomSheetBehavior.state == viewState.sheetState
+        bottomSheetBehavior.state = viewState.sheetState
 
-        if (viewState.sheetMode == DuckChatContextualViewModel.SheetMode.WEBVIEW) {
-            binding.contextualModeNativeContent.gone()
-            binding.simpleWebview.show()
+        when (viewState) {
+            is DuckChatContextualViewModel.ViewState.InputModeViewState -> {
+                binding.contextualModeNativeContent.show()
+                binding.simpleWebview.gone()
+                if (viewState.hasContext) {
+                    renderPageContext(viewState.contextTitle, viewState.contextUrl, viewState.tabId)
+                }
+            }
+
+            is DuckChatContextualViewModel.ViewState.ChatViewState -> {
+                binding.contextualModeNativeContent.gone()
+                binding.simpleWebview.show()
+            }
         }
     }
 
@@ -782,9 +784,6 @@ class DuckChatContextualFragment :
 
         const val KEY_DUCK_AI_URL: String = "KEY_DUCK_AI_URL"
         const val KEY_DUCK_AI_CONTEXTUAL_RESULT: String = "KEY_DUCK_AI_CONTEXTUAL_RESULT"
-
-        const val KEY_DUCK_AI_CONTEXTUAL_PAGE_TITLE: String = "KEY_DUCK_AI_CONTEXTUAL_PAGE_TITLE"
-        const val KEY_DUCK_AI_CONTEXTUAL_PAGE_URL: String = "KEY_DUCK_AI_CONTEXTUAL_PAGE_URL"
         const val KEY_DUCK_AI_CONTEXTUAL_TAB_ID: String = "KEY_DUCK_AI_CONTEXTUAL_TAB_ID"
     }
 }
