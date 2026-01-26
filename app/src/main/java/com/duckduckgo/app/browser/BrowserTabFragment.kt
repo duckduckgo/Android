@@ -2601,7 +2601,7 @@ class BrowserTabFragment :
             is Command.StartAddressBarTrackersAnimation -> {
                 omnibar.startTrackersAnimation(it.trackerEntities)
             }
-            is Command.ShowDuckAIContextualMode -> showDuckChatContextualSheet(it.url, it.title, it.tabId)
+            is Command.ShowDuckAIContextualMode -> showDuckChatContextualSheet(it.tabId)
         }
     }
 
@@ -3322,11 +3322,7 @@ class BrowserTabFragment :
         )
     }
 
-    private fun showDuckChatContextualSheet(
-        url: String,
-        title: String,
-        tabId: String,
-    ) {
+    private fun showDuckChatContextualSheet(tabId: String) {
         duckAiContextualFragment?.let { fragment ->
             val transaction = childFragmentManager.beginTransaction()
             transaction.show(fragment)
@@ -3334,8 +3330,6 @@ class BrowserTabFragment :
         } ?: run {
             val fragment = DuckChatContextualFragment()
             val args = Bundle()
-            args.putString(DuckChatContextualFragment.KEY_DUCK_AI_CONTEXTUAL_PAGE_TITLE, title)
-            args.putString(DuckChatContextualFragment.KEY_DUCK_AI_CONTEXTUAL_PAGE_URL, url)
             args.putString(DuckChatContextualFragment.KEY_DUCK_AI_CONTEXTUAL_TAB_ID, tabId)
             fragment.arguments = args
 

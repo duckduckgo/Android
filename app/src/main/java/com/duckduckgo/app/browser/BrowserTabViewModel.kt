@@ -1140,7 +1140,7 @@ class BrowserTabViewModel @Inject constructor(
 
         when (cta) {
             is DaxBubbleCta.DaxIntroSearchOptionsCta,
-            -> {
+                -> {
                 if (!ctaViewModel.isSuggestedSearchOption(query)) {
                     pixel.fire(ONBOARDING_SEARCH_CUSTOM, type = Unique())
                 }
@@ -1148,7 +1148,7 @@ class BrowserTabViewModel @Inject constructor(
 
             is DaxBubbleCta.DaxIntroVisitSiteOptionsCta,
             is OnboardingDaxDialogCta.DaxSiteSuggestionsCta,
-            -> {
+                -> {
                 if (!ctaViewModel.isSuggestedSiteOption(query)) {
                     pixel.fire(ONBOARDING_VISIT_SITE_CUSTOM, type = Unique())
                 }
@@ -4308,7 +4308,7 @@ class BrowserTabViewModel @Inject constructor(
             is OnboardingDaxDialogCta.DaxTrackersBlockedCta,
             is OnboardingDaxDialogCta.DaxNoTrackersCta,
             is OnboardingDaxDialogCta.DaxMainNetworkCta,
-            -> {
+                -> {
                 viewModelScope.launch {
                     val cta =
                         withContext(dispatchers.io()) {
@@ -4573,14 +4573,10 @@ class BrowserTabViewModel @Inject constructor(
 
         when {
             duckAiFeatureState.showContextualMode.value && !isNtp -> {
-                val contextualUrl = url
-                val contextualTitle = title
-                if (contextualUrl != null && contextualTitle != null) {
-                    command.value = Command.ShowDuckAIContextualMode(contextualUrl, contextualTitle, tabId)
-                    viewModelScope.launch {
-                        val subscriptionEvent = pageContextJSHelper.onContextualOpened()
-                        _subscriptionEventDataChannel.send(subscriptionEvent)
-                    }
+                command.value = Command.ShowDuckAIContextualMode(tabId)
+                viewModelScope.launch {
+                    val subscriptionEvent = pageContextJSHelper.onContextualOpened()
+                    _subscriptionEventDataChannel.send(subscriptionEvent)
                 }
             }
 

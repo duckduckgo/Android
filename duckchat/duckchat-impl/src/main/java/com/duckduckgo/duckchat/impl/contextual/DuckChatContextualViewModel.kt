@@ -63,43 +63,42 @@ class DuckChatContextualViewModel @Inject constructor(
     sealed class Command {
         data class LoadUrl(val url: String) : Command()
         data object SendSubscriptionAuthUpdateEvent : Command()
-        data class PageContextUpdated(
-            val pageTitle: String,
-            val pageUrl: String,
-            val tabId: String,
-        ) : Command()
     }
 
-    private val _viewState =
+    private val _viewState: MutableStateFlow<ViewState> =
         MutableStateFlow(
-            ViewState(
+            ViewState.InputModeViewState(
                 sheetMode = SheetMode.INPUT,
+                sheetState = BottomSheetBehavior.STATE_HALF_EXPANDED,
+                hasContext = false,
+                contextUrl = "",
+                contextTitle = "",
+                tabId = "",
             ),
         )
     val viewState: StateFlow<ViewState> = _viewState.asStateFlow()
 
-    data class ViewState(
-        val sheetMode: SheetMode = SheetMode.INPUT,
-        val sheetState: Int = BottomSheetBehavior.STATE_HIDDEN,
-    )
+    sealed class ViewState(open val sheetState: Int) {
+        data class InputModeViewState(
+            val sheetMode: SheetMode = SheetMode.INPUT,
+            override val sheetState: Int = BottomSheetBehavior.STATE_HALF_EXPANDED,
+            val hasContext: Boolean = false,
+            val contextUrl: String,
+            val contextTitle: String,
+            val tabId: String,
+        ) : ViewState(sheetState)
 
-    fun onSheetOpened() {
-        viewModelScope.launch(dispatchers.main()) {
-            when (_viewState.value.sheetMode) {
-                SheetMode.INPUT -> {
-                    val initialUrl = duckChat.getDuckChatUrl("", false)
-                    commandChannel.trySend(Command.LoadUrl(initialUrl))
-                }
-
-                SheetMode.WEBVIEW -> {
-                }
-            }
-        }
+        data class ChatViewState(
+            val sheetMode: SheetMode = SheetMode.WEBVIEW,
+            val url: String,
+            override val sheetState: Int = BottomSheetBehavior.STATE_EXPANDED,
+        ) : ViewState(sheetState)
     }
 
-    fun observePageContextChanges(tabId: String) {
+    fun onSheetOpened(tabId: String) {
         viewModelScope.launch(dispatchers.io()) {
-            logcat { "Duck.ai: observePageContextChanges started for tab=$tabId" }
+            logcat { "Duck.ai: onSheetOpened for tab=$tabId" }
+
             pageContextRepository.getPageContext(tabId).onEach { pageContext ->
                 if (pageContext == null) {
                     return@onEach
@@ -115,8 +114,6 @@ class DuckChatContextualViewModel @Inject constructor(
                     logcat { "Duck.ai: pageContext cleared for tab=$tabId" }
                 }
 
-                logcat { "Duck.ai: pageContext update for tab=$tabId (length=${updatedPageContext.length})" }
-
                 val json = JSONObject(updatedPageContext)
                 val title = json.optString("title").takeIf { it.isNotBlank() }
                 val url = json.optString("url").takeIf { it.isNotBlank() }
@@ -124,25 +121,45 @@ class DuckChatContextualViewModel @Inject constructor(
                 if (title == null && url == null) {
                     logcat { "Duck.ai: missing title/url in pageContext for tab=$tabId json=$json" }
                 } else {
-                    withContext(dispatchers.main()) {
-                        commandChannel.trySend(Command.PageContextUpdated(title!!, url!!, tabId))
+                    val inputMode = _viewState.value
+
+                    if (inputMode is ViewState.InputModeViewState) {
+                        _viewState.update {
+                            inputMode.copy(
+                                contextTitle = title!!,
+                                contextUrl = url!!,
+                                tabId = tabId,
+                                hasContext = true,
+                            )
+                        }
+                    } else {
+                        viewModelScope.launch(dispatchers.io()) {
+                            val contextPrompt = generateContext()
+                            withContext(dispatchers.main()) {
+                                _subscriptionEventDataChannel.trySend(contextPrompt)
+                            }
+                        }
                     }
                 }
             }.launchIn(viewModelScope)
+        }
+        viewModelScope.launch {
+            val chatUrl = duckChat.getDuckChatUrl("", false)
+            commandChannel.trySend(Command.LoadUrl(chatUrl))
         }
     }
 
     fun onNativeInputFocused(focused: Boolean) {
         viewModelScope.launch {
-            _viewState.update {
-                if (focused) {
-                    it.copy(
-                        sheetState = BottomSheetBehavior.STATE_EXPANDED,
-                    )
+            _viewState.update { current ->
+                if (current is ViewState.InputModeViewState) {
+                    if (focused) {
+                        current.copy(sheetState = BottomSheetBehavior.STATE_EXPANDED)
+                    } else {
+                        current.copy(sheetState = BottomSheetBehavior.STATE_HALF_EXPANDED)
+                    }
                 } else {
-                    it.copy(
-                        sheetState = BottomSheetBehavior.STATE_HALF_EXPANDED,
-                    )
+                    current
                 }
             }
         }
@@ -153,13 +170,12 @@ class DuckChatContextualViewModel @Inject constructor(
             val contextPrompt = generateContextPrompt(prompt)
             withContext(dispatchers.main()) {
                 logcat { "Duck.ai: pageContext prompt $contextPrompt" }
-                _subscriptionEventDataChannel.trySend(contextPrompt)
-                _viewState.update {
-                    it.copy(
-                        sheetMode = SheetMode.WEBVIEW,
+                _viewState.value =
+                    ViewState.ChatViewState(
+                        url = "chatUrl",
                         sheetState = BottomSheetBehavior.STATE_EXPANDED,
                     )
-                }
+                _subscriptionEventDataChannel.trySend(contextPrompt)
             }
         }
     }
@@ -192,6 +208,14 @@ class DuckChatContextualViewModel @Inject constructor(
             featureName = RealDuckChatJSHelper.DUCK_CHAT_FEATURE_NAME,
             subscriptionName = "submitAIChatNativePrompt",
             params = params,
+        )
+    }
+
+    private fun generateContext(): SubscriptionEventData {
+        return SubscriptionEventData(
+            featureName = RealDuckChatJSHelper.DUCK_CHAT_FEATURE_NAME,
+            subscriptionName = "submitPageContext",
+            params = JSONObject(updatedPageContext),
         )
     }
 }
