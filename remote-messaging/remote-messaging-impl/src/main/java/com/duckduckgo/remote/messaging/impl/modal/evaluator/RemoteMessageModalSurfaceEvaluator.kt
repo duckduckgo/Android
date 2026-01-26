@@ -37,7 +37,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import logcat.logcat
 import javax.inject.Inject
 
 interface RemoteMessageModalSurfaceEvaluator
@@ -79,9 +78,7 @@ class RemoteMessageModalSurfaceEvaluatorImpl @Inject constructor(
                 return@withContext ModalEvaluator.EvaluationResult.Skipped
             }
 
-            val message = remoteMessagingRepository.message().also {
-                logcat(tag = "RadoiuC") { "Remote message: $it" }
-            }
+            val message = remoteMessagingRepository.message()
                 ?: return@withContext ModalEvaluator.EvaluationResult.Skipped
 
             if (message.surfaces.contains(Surface.MODAL)) {
