@@ -352,7 +352,7 @@ class DuckChatContextualFragment :
         bottomSheetBehavior = BottomSheetBehavior.from(parent)
 
         configureBehaviour(bottomSheetBehavior)
-        configureButtons(bottomSheetBehavior)
+        configureButtons()
     }
 
     private fun configureBehaviour(bottomSheetBehavior: BottomSheetBehavior<View>) {
@@ -363,9 +363,9 @@ class DuckChatContextualFragment :
         bottomSheetBehavior.isFitToContents = true
     }
 
-    private fun configureButtons(bottomSheetBehavior: BottomSheetBehavior<View>) {
+    private fun configureButtons() {
         binding.contextualClose.setOnClickListener {
-            bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+            viewModel.onContextualClose()
         }
         binding.contextualModeButtons.setOnClickListener { }
         binding.contextualModeRoot.setOnClickListener { }
@@ -420,15 +420,13 @@ class DuckChatContextualFragment :
             }
         }
         binding.duckAiContextualPageRemove.setOnClickListener {
-            binding.duckAiContextualLayout.gone()
-            binding.duckAiContextualAddAttachment.show()
+            viewModel.removePageContext()
         }
         binding.duckAiContextualAddAttachment.setOnClickListener {
-            binding.duckAiContextualAddAttachment.gone()
-            binding.duckAiContextualLayout.show()
+            viewModel.addPageContext()
         }
         binding.contextualPromptSummarize.setOnClickListener {
-            binding.inputField.setText(binding.contextualPromptSummarize.text.toString())
+            viewModel.replacePrompt(binding.contextualPromptSummarize.text.toString())
         }
     }
 
@@ -478,6 +476,14 @@ class DuckChatContextualFragment :
                 binding.simpleWebview.gone()
                 if (viewState.hasContext) {
                     renderPageContext(viewState.contextTitle, viewState.contextUrl, viewState.tabId)
+                    binding.duckAiContextualLayout.show()
+                    binding.duckAiContextualAddAttachment.gone()
+                } else {
+                    binding.duckAiContextualLayout.gone()
+                    binding.duckAiContextualAddAttachment.show()
+                }
+                if (viewState.prompt.isNotEmpty()) {
+                    binding.inputField.setText(viewState.prompt)
                 }
             }
 

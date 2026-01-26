@@ -74,6 +74,7 @@ class DuckChatContextualViewModel @Inject constructor(
                 contextUrl = "",
                 contextTitle = "",
                 tabId = "",
+                prompt = "",
             ),
         )
     val viewState: StateFlow<ViewState> = _viewState.asStateFlow()
@@ -86,6 +87,7 @@ class DuckChatContextualViewModel @Inject constructor(
             val contextUrl: String,
             val contextTitle: String,
             val tabId: String,
+            val prompt: String,
         ) : ViewState(sheetState)
 
         data class ChatViewState(
@@ -136,6 +138,7 @@ class DuckChatContextualViewModel @Inject constructor(
                         viewModelScope.launch(dispatchers.io()) {
                             val contextPrompt = generateContext()
                             withContext(dispatchers.main()) {
+                                logcat { "Duck.ai: send new pageContext $contextPrompt" }
                                 _subscriptionEventDataChannel.trySend(contextPrompt)
                             }
                         }
@@ -212,10 +215,67 @@ class DuckChatContextualViewModel @Inject constructor(
     }
 
     private fun generateContext(): SubscriptionEventData {
+        val params =
+            JSONObject().apply {
+                put("pageContext", updatedPageContext)
+            }
+
         return SubscriptionEventData(
             featureName = RealDuckChatJSHelper.DUCK_CHAT_FEATURE_NAME,
             subscriptionName = "submitPageContext",
-            params = JSONObject(updatedPageContext),
+            params = params,
         )
+    }
+
+    fun onContextualClose() {
+        viewModelScope.launch {
+            _viewState.update { current ->
+                if (current is ViewState.InputModeViewState) {
+                    current.copy(sheetState = BottomSheetBehavior.STATE_HIDDEN)
+                } else {
+                    val chatState = current as ViewState.ChatViewState
+                    chatState.copy(sheetState = BottomSheetBehavior.STATE_HIDDEN)
+                }
+            }
+        }
+    }
+
+    fun removePageContext() {
+        viewModelScope.launch {
+            _viewState.update { current ->
+                if (current is ViewState.InputModeViewState) {
+                    current.copy(hasContext = false)
+                } else {
+                    val chatState = current as ViewState.ChatViewState
+                    chatState.copy(sheetState = BottomSheetBehavior.STATE_HIDDEN)
+                }
+            }
+        }
+    }
+
+    fun addPageContext() {
+        viewModelScope.launch {
+            _viewState.update { current ->
+                if (current is ViewState.InputModeViewState) {
+                    current.copy(hasContext = true)
+                } else {
+                    val chatState = current as ViewState.ChatViewState
+                    chatState.copy(sheetState = BottomSheetBehavior.STATE_HIDDEN)
+                }
+            }
+        }
+    }
+
+    fun replacePrompt(prompt: String) {
+        viewModelScope.launch {
+            _viewState.update { current ->
+                if (current is ViewState.InputModeViewState) {
+                    current.copy(prompt = prompt)
+                } else {
+                    val chatState = current as ViewState.ChatViewState
+                    chatState.copy(sheetState = BottomSheetBehavior.STATE_HIDDEN)
+                }
+            }
+        }
     }
 }
