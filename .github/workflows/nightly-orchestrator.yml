@@ -57,10 +57,19 @@ jobs:
       commit: ${{ needs.resolve-commit.outputs.commit_sha }}
     secrets: inherit
 
+  validate-all-jobs-ran:
+    name: Validate no jobs were skipped
+    runs-on: ubuntu-latest
+    needs: [ resolve-commit, call-nightly, call-end-to-end, call-privacy, call-update-content-scope, call-update-ref-tests ]
+    if: ${{ always() && contains(needs.*.result, 'skipped') }}
+    steps:
+      - name: Fail due to skipped jobs
+        run: exit 1
+
   tag_lgc_when_successful:
     name: Tag last good commit when successful
     runs-on: ubuntu-latest
-    needs: [ resolve-commit, call-end-to-end, call-privacy, call-update-content-scope, call-update-ref-tests]
+    needs: [ resolve-commit, call-end-to-end, call-privacy, call-update-content-scope, call-update-ref-tests, validate-all-jobs-ran]
     if: ${{ success() }}
     steps:
       - name: Checkout repository
