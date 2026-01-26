@@ -289,4 +289,127 @@ class DownloaderUtilTest {
             ),
         )
     }
+
+    // Unicode whitespace extension spoofing protection tests
+    // See: https://issues.chromium.org/issues/40053668
+    // See: https://issues.chromium.org/issues/40918159
+
+    @Test
+    fun whenFilenameContainsHangulFillerToHideExtensionThenRealExtensionIsRevealed() {
+        // U+3164 (HANGUL FILLER) is used to hide the real .apk extension
+        // "halo.pdfㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤ.apk" should become "halo.pdf.apk"
+        assertEquals(
+            "halo.pdf.apk",
+            DownloaderUtil.guessFileName(
+                url = "https://example.com/halo.pdf\u3164\u3164\u3164\u3164\u3164\u3164\u3164\u3164\u3164\u3164\u3164\u3164\u3164\u3164\u3164\u3164\u3164.apk",
+                contentDisposition = null,
+                mimeType = "application/octet-stream",
+            ),
+        )
+    }
+
+    @Test
+    fun whenFilenameContainsZeroWidthSpaceToHideExtensionThenRealExtensionIsRevealed() {
+        // U+200B (ZERO WIDTH SPACE) is used to hide the real .exe extension
+        assertEquals(
+            "document.pdf.exe",
+            DownloaderUtil.guessFileName(
+                url = "https://example.com/document.pdf\u200B\u200B\u200B\u200B\u200B.exe",
+                contentDisposition = null,
+                mimeType = "application/octet-stream",
+            ),
+        )
+    }
+
+    @Test
+    fun whenFilenameContainsHalfwidthHangulFillerToHideExtensionThenRealExtensionIsRevealed() {
+        // U+FFA0 (HALFWIDTH HANGUL FILLER) is used to hide the real .apk extension
+        assertEquals(
+            "safe.pdf.apk",
+            DownloaderUtil.guessFileName(
+                url = "https://example.com/safe.pdf\uFFA0\uFFA0\uFFA0\uFFA0\uFFA0.apk",
+                contentDisposition = null,
+                mimeType = "application/octet-stream",
+            ),
+        )
+    }
+
+    @Test
+    fun whenFilenameContainsMixedUnicodeWhitespaceToHideExtensionThenRealExtensionIsRevealed() {
+        // Mixed Unicode whitespace characters to hide the real .apk extension
+        // U+3164 (HANGUL FILLER), U+200B (ZERO WIDTH SPACE), U+FEFF (BOM)
+        assertEquals(
+            "invoice.pdf.apk",
+            DownloaderUtil.guessFileName(
+                url = "https://example.com/invoice.pdf\u3164\u200B\uFEFF\u3164\u200B.apk",
+                contentDisposition = null,
+                mimeType = "application/octet-stream",
+            ),
+        )
+    }
+
+    @Test
+    fun whenFilenameContainsIdeographicSpaceToHideExtensionThenRealExtensionIsRevealed() {
+        // U+3000 (IDEOGRAPHIC SPACE) is used to hide the real .apk extension
+        assertEquals(
+            "photo.jpg.apk",
+            DownloaderUtil.guessFileName(
+                url = "https://example.com/photo.jpg\u3000\u3000\u3000.apk",
+                contentDisposition = null,
+                mimeType = "application/octet-stream",
+            ),
+        )
+    }
+
+    @Test
+    fun whenContentDispositionContainsHangulFillerToHideExtensionThenRealExtensionIsRevealed() {
+        // Attack via Content-Disposition header
+        assertEquals(
+            "report.pdf.apk",
+            DownloaderUtil.guessFileName(
+                url = "https://example.com/download",
+                contentDisposition = """attachment; filename="report.pdf${"\u3164".repeat(10)}.apk"""",
+                mimeType = "application/octet-stream",
+            ),
+        )
+    }
+
+    @Test
+    fun whenFilenameContainsNoBreakSpaceToHideExtensionThenRealExtensionIsRevealed() {
+        // U+00A0 (NO-BREAK SPACE) is used to hide the real .apk extension
+        assertEquals(
+            "setup.pdf.apk",
+            DownloaderUtil.guessFileName(
+                url = "https://example.com/setup.pdf\u00A0\u00A0\u00A0\u00A0\u00A0.apk",
+                contentDisposition = null,
+                mimeType = "application/octet-stream",
+            ),
+        )
+    }
+
+    @Test
+    fun whenFilenameContainsWordJoinerToHideExtensionThenRealExtensionIsRevealed() {
+        // U+2060 (WORD JOINER) is used to hide the real .apk extension
+        assertEquals(
+            "file.pdf.apk",
+            DownloaderUtil.guessFileName(
+                url = "https://example.com/file.pdf\u2060\u2060\u2060.apk",
+                contentDisposition = null,
+                mimeType = "application/octet-stream",
+            ),
+        )
+    }
+
+    @Test
+    fun whenFilenameIsNormalWithNoUnicodeWhitespaceThenFilenameUnchanged() {
+        // Normal filename should not be affected
+        assertEquals(
+            "normal_file.pdf",
+            DownloaderUtil.guessFileName(
+                url = "https://example.com/normal_file.pdf",
+                contentDisposition = null,
+                mimeType = "application/pdf",
+            ),
+        )
+    }
 }
