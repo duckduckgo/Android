@@ -17,11 +17,6 @@
                 "type": "string"
             },
             {
-                "key": "attempt_id",
-                "description": "Client-generated ID of the opt-out attempt",
-                "type": "string"
-            },
-            {
                 "key": "duration",
                 "description": "Total duration of the opt-out attempt in milliseconds",
                 "type": "string"
@@ -69,11 +64,6 @@
             {
                 "key": "broker_version",
                 "description": "The version of the broker JSON file",
-                "type": "string"
-            },
-            {
-                "key": "attempt_id",
-                "description": "Client-generated ID of the opt-out attempt",
                 "type": "string"
             },
             {
@@ -573,11 +563,6 @@
                 "key": "parent",
                 "description": "The parent data broker url of the one this opt-out attempt targets",
                 "type": "string"
-            },
-            {
-                "key": "attempt_id",
-                "description": "Client-generated ID of the opt-out attempt",
-                "type": "string"
             }
         ]
     },
@@ -601,11 +586,6 @@
             {
                 "key": "broker_version",
                 "description": "The version of the broker JSON file",
-                "type": "string"
-            },
-            {
-                "key": "attempt_id",
-                "description": "Client-generated ID of the opt-out attempt",
                 "type": "string"
             },
             {
@@ -648,11 +628,6 @@
                 "type": "string"
             },
             {
-                "key": "attempt_id",
-                "description": "Client-generated ID of the opt-out attempt",
-                "type": "string"
-            },
-            {
                 "key": "duration",
                 "description": "Stage duration in milliseconds",
                 "type": "string"
@@ -689,11 +664,6 @@
             {
                 "key": "broker_version",
                 "description": "The version of the broker JSON file",
-                "type": "string"
-            },
-            {
-                "key": "attempt_id",
-                "description": "Client-generated ID of the opt-out attempt",
                 "type": "string"
             },
             {
@@ -736,11 +706,6 @@
                 "type": "string"
             },
             {
-                "key": "attempt_id",
-                "description": "Client-generated ID of the opt-out attempt",
-                "type": "string"
-            },
-            {
                 "key": "duration",
                 "description": "Stage duration in milliseconds",
                 "type": "string"
@@ -777,11 +742,6 @@
             {
                 "key": "broker_version",
                 "description": "The version of the broker JSON file",
-                "type": "string"
-            },
-            {
-                "key": "attempt_id",
-                "description": "Client-generated ID of the opt-out attempt",
                 "type": "string"
             },
             {
@@ -829,11 +789,6 @@
                 "type": "string"
             },
             {
-                "key": "attempt_id",
-                "description": "The ID of the opt out attempt",
-                "type": "string"
-            },
-            {
                 "key": "action_id",
                 "description": "The ID of the action, to disambiguate between multiple actions in the same opt out attempt",
                 "type": "string"
@@ -873,11 +828,6 @@
                 "type": "string"
             },
             {
-                "key": "attempt_id",
-                "description": "The ID of the opt out attempt",
-                "type": "string"
-            },
-            {
                 "key": "action_id",
                 "description": "The ID of the action, to disambiguate between multiple actions in the same opt out attempt",
                 "type": "string"
@@ -909,11 +859,6 @@
             {
                 "key": "broker_version",
                 "description": "The version of the broker JSON file",
-                "type": "string"
-            },
-            {
-                "key": "attempt_id",
-                "description": "Client-generated ID of the opt-out attempt",
                 "type": "string"
             },
             {
@@ -956,11 +901,6 @@
                 "type": "string"
             },
             {
-                "key": "attempt_id",
-                "description": "Client-generated ID of the opt-out attempt",
-                "type": "string"
-            },
-            {
                 "key": "duration",
                 "description": "Stage duration in milliseconds",
                 "type": "string"
@@ -992,11 +932,6 @@
             {
                 "key": "parent",
                 "description": "The parent data broker of the one this opt-out attempt targets",
-                "type": "string"
-            },
-            {
-                "key": "attempt_id",
-                "description": "Client-generated ID of the opt-out attempt",
                 "type": "string"
             },
             {
@@ -1291,11 +1226,6 @@
                 "type": "string"
             },
             {
-                "key": "attempt_id",
-                "description": "Client-generated ID of the attempt",
-                "type": "string"
-            },
-            {
                 "key": "action_id",
                 "description": "Predefined identifier of the broker action executed in this stage",
                 "type": "string"
@@ -1335,11 +1265,6 @@
                 "type": "number"
             },
             {
-                "key": "attempt_id",
-                "description": "Client-generated ID of the attempt",
-                "type": "string"
-            },
-            {
                 "key": "action_id",
                 "description": "Predefined identifier of the broker action executed in this stage",
                 "type": "string"
@@ -1371,11 +1296,6 @@
             {
                 "key": "duration",
                 "description": "Stage duration in milliseconds",
-                "type": "string"
-            },
-            {
-                "key": "attempt_id",
-                "description": "Client-generated ID of the attempt",
                 "type": "string"
             },
             {
@@ -1413,11 +1333,6 @@
                 "type": "string"
             },
             {
-                "key": "attempt_id",
-                "description": "Client-generated ID of the attempt",
-                "type": "string"
-            },
-            {
                 "key": "action_id",
                 "description": "Predefined identifier of the broker action executed in this stage",
                 "type": "string"
@@ -1439,11 +1354,6 @@
             {
                 "key": "broker_version",
                 "description": "The version of the broker JSON file",
-                "type": "string"
-            },
-            {
-                "key": "attempt_id",
-                "description": "Client-generated ID of the attempt",
                 "type": "string"
             },
             {
