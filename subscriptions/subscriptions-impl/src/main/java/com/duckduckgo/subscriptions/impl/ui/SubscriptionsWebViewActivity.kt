@@ -72,6 +72,7 @@ import com.duckduckgo.navigation.api.getActivityParams
 import com.duckduckgo.pir.api.dashboard.PirDashboardWebViewScreen
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.RestoreSubscriptionScreenWithParams
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionPurchase
+import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionUpgrade
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.subscriptions.impl.PrivacyProFeature
 import com.duckduckgo.subscriptions.impl.R.string
@@ -134,6 +135,7 @@ data class SubscriptionsWebViewActivityWithParams(
     delayGeneration = true, // Delayed because it has a dependency on DownloadConfirmationFragment from another module
 )
 @ContributeToActivityStarter(SubscriptionPurchase::class)
+@ContributeToActivityStarter(SubscriptionUpgrade::class)
 @ContributeToActivityStarter(SubscriptionsWebViewActivityWithParams::class)
 class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationDialogListener {
 
@@ -341,6 +343,13 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
                     webViewActivityWithParams
                 }
             }
+        }
+
+        intent.getActivityParams(SubscriptionUpgrade::class.java)?.let { params ->
+            return SubscriptionsWebViewActivityWithParams(
+                url = subscriptionsUrlProvider.upgradeToProUrl,
+                origin = params.origin,
+            )
         }
 
         return intent.getActivityParams(SubscriptionsWebViewActivityWithParams::class.java)
