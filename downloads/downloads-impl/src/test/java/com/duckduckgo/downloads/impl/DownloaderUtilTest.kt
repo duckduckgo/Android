@@ -298,10 +298,11 @@ class DownloaderUtilTest {
     fun whenFilenameContainsHangulFillerToHideExtensionThenRealExtensionIsRevealed() {
         // U+3164 (HANGUL FILLER) is used to hide the real .apk extension
         // "halo.pdfㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤ.apk" should become "halo.pdf.apk"
+        val hangulFillers = "\u3164".repeat(17)
         assertEquals(
             "halo.pdf.apk",
             DownloaderUtil.guessFileName(
-                url = "https://example.com/halo.pdf\u3164\u3164\u3164\u3164\u3164\u3164\u3164\u3164\u3164\u3164\u3164\u3164\u3164\u3164\u3164\u3164\u3164.apk",
+                url = "https://example.com/halo.pdf${hangulFillers}.apk",
                 contentDisposition = null,
                 mimeType = "application/octet-stream",
             ),
