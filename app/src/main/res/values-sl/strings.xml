@@ -962,11 +962,15 @@
     <string name="settingsHeadingCompleteSetup">Dokončanje nastavitve</string>
 
     <!--TabSwitcher Trackers Animation-->
-    <string name="showTrackerCountInTabSwitcher">Pokaži število sledilnikov v preklopniku zavihkov</string>
+    <string name="trackerBlockedInTheLast7days" instruction="Placeholder is 1 tracker blocked">&lt;b&gt;%1$s sledilnik je bil blokiran &lt;/b&gt;v zadnjih 7 dneh</string>
     <string name="tabSwitcherAnimationTileRemovalDialogTitle" instruction="A title for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Želite skriti število sledilnikov?</string>
     <string name="tabSwitcherAnimationTileRemovalDialogBody" instruction="A message for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">To lahko znova vklopite, če greste na Nastavitve &gt; Videz.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Skrij se</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Obdrži</string>
+    <!-- Trackers blocked animation settings -->
+    <string name="settingsTrackersBlockedAnimationHeaderTitle">Animacija blokiranih sledilnikov</string>
+    <string name="showTrackerCountInAddressBar">Prikaži v naslovni vrstici</string>
+    <string name="showWeeklyTrackerCountInTabSwitcher">Prikaži v upravitelju zavihkov</string>
 
     <!-- Widgets -->
     <string name="searchOnlyWidgetLabel" instruction="Label for the search-only widget">Samo iskanje</string>
