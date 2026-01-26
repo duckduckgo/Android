@@ -943,11 +943,15 @@
     <string name="settingsHeadingCompleteSetup">Finalizează configurarea</string>
 
     <!--TabSwitcher Trackers Animation-->
-    <string name="showTrackerCountInTabSwitcher">Afișează numărul de tehnologii de urmărire în comutatorul de file</string>
+    <string name="trackerBlockedInTheLast7days" instruction="Placeholder is 1 tracker blocked">&lt;b&gt;%1$s tehnologie de urmărire blocată &lt;/b&gt; în ultimele 7 zile</string>
     <string name="tabSwitcherAnimationTileRemovalDialogTitle" instruction="A title for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Ascunzi contorul tehnologiilor de urmărire?</string>
     <string name="tabSwitcherAnimationTileRemovalDialogBody" instruction="A message for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Poți să activezi din nou această opțiune în Setări &gt; Aspect.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Ascunde</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Păstrează</string>
+    <!-- Trackers blocked animation settings -->
+    <string name="settingsTrackersBlockedAnimationHeaderTitle">Animația de blocare a tehnologiilor de urmărire</string>
+    <string name="showTrackerCountInAddressBar">Afișează în bara de adrese</string>
+    <string name="showWeeklyTrackerCountInTabSwitcher">Afișează în managerul de file</string>
 
     <!-- Widgets -->
     <string name="searchOnlyWidgetLabel" instruction="Label for the search-only widget">Doar căutare</string>
