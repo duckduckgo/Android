@@ -194,6 +194,9 @@ class DuckChatContextualFragment :
 
         simpleWebview.let {
             it.webViewClient = webViewClient
+            webViewClient.onPageFinishedListener = { url ->
+                viewModel.onChatPageLoaded(url)
+            }
             it.webChromeClient = object : WebChromeClient() {
                 override fun onCreateWindow(
                     view: WebView?,

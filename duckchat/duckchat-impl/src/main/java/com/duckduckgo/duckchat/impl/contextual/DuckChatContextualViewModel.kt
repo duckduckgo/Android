@@ -183,6 +183,10 @@ class DuckChatContextualViewModel @Inject constructor(
         }
     }
 
+    fun onChatPageLoaded(url: String?) {
+        // No-op for now; kept for future use.
+    }
+
     private fun generateContextPrompt(prompt: String): SubscriptionEventData {
         val viewState = _viewState.value as ViewState.InputModeViewState
         val pageContext = if (viewState.hasContext) {
