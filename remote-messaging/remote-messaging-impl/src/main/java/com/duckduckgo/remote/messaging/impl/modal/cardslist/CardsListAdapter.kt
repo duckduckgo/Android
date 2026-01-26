@@ -17,45 +17,120 @@
 package com.duckduckgo.remote.messaging.impl.modal.cardslist
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.remote.messaging.api.CardItem
-import com.duckduckgo.remote.messaging.impl.databinding.ViewRemoteMessageEntryBinding
+import com.duckduckgo.remote.messaging.api.CardItemType
+import com.duckduckgo.remote.messaging.impl.databinding.ViewRemoteMessageCardItemBinding
+import com.duckduckgo.remote.messaging.impl.databinding.ViewRemoteMessageFeaturedListItemBinding
+import com.duckduckgo.remote.messaging.impl.databinding.ViewRemoteMessageSectionTitleItemBinding
 import com.duckduckgo.remote.messaging.impl.mappers.drawable
-import com.duckduckgo.remote.messaging.impl.modal.cardslist.CardsListAdapter.CardItemViewHolder
 import javax.inject.Inject
 
-class CardsListAdapter @Inject constructor() : ListAdapter<CardItem, CardItemViewHolder>(ModalSurfaceDiffCallback()) {
+class CardsListAdapter @Inject constructor() : ListAdapter<CardItem, CardsListAdapter.RemoteMessageItemHolder>(ModalSurfaceDiffCallback()) {
 
     private lateinit var cardItemClickListener: CardItemClickListener
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
-    ): CardItemViewHolder {
-        return CardItemViewHolder(ViewRemoteMessageEntryBinding.inflate(LayoutInflater.from(parent.context), parent, false), cardItemClickListener)
+    ): RemoteMessageItemHolder = when (viewType) {
+        ITEM_TYPE_LIST_SECTION_TITLE -> RemoteMessageItemHolder.SectionTitleHolder(
+            ViewRemoteMessageSectionTitleItemBinding.inflate(
+                LayoutInflater.from(
+                    parent.context,
+                ),
+                parent,
+                false,
+            ),
+        )
+
+        ITEM_TYPE_FEATURED_TWO_LINE_LIST_ITEM -> RemoteMessageItemHolder.FeaturedItemHolder(
+            ViewRemoteMessageFeaturedListItemBinding.inflate(
+                LayoutInflater.from(parent.context),
+                parent,
+                false,
+            ),
+            cardItemClickListener,
+        )
+
+        else -> RemoteMessageItemHolder.CardItemViewHolder(
+            ViewRemoteMessageCardItemBinding.inflate(
+                LayoutInflater.from(parent.context),
+                parent,
+                false,
+            ),
+            cardItemClickListener,
+        )
     }
 
     override fun onBindViewHolder(
-        holder: CardItemViewHolder,
+        holder: RemoteMessageItemHolder,
         position: Int,
     ) {
-        holder.bind(getItem(position) as CardItem)
+        when (holder) {
+            is RemoteMessageItemHolder.CardItemViewHolder -> {
+                holder.bind(getItem(position) as CardItem.ListItem)
+            }
+
+            is RemoteMessageItemHolder.FeaturedItemHolder -> {
+                holder.bind(getItem(position) as CardItem.ListItem)
+            }
+
+            is RemoteMessageItemHolder.SectionTitleHolder -> {
+                holder.bind(getItem(position) as CardItem.SectionTitle)
+            }
+        }
     }
 
-    class CardItemViewHolder(
-        private val binding: ViewRemoteMessageEntryBinding,
-        private val listener: CardItemClickListener,
-    ) : RecyclerView.ViewHolder(binding.root) {
+    override fun getItemViewType(position: Int): Int =
+        when (getItem(position).type) {
+            CardItemType.TWO_LINE_LIST_ITEM -> ITEM_TYPE_TWO_LINE_LIST_ITEM
+            CardItemType.LIST_SECTION_TITLE -> ITEM_TYPE_LIST_SECTION_TITLE
+            CardItemType.FEATURED_TWO_LINE_SINGLE_ACTION_LIST_ITEM -> ITEM_TYPE_FEATURED_TWO_LINE_LIST_ITEM
+        }
 
-        fun bind(item: CardItem) {
-            binding.title.text = item.titleText
-            binding.description.text = item.descriptionText
-            binding.startImage.setImageResource(item.placeholder.drawable(true))
-            binding.root.setOnClickListener {
-                listener.onItemClicked(item)
+    sealed class RemoteMessageItemHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        class CardItemViewHolder(
+            private val binding: ViewRemoteMessageCardItemBinding,
+            private val listener: CardItemClickListener,
+        ) : RemoteMessageItemHolder(binding.root) {
+
+            fun bind(item: CardItem.ListItem) {
+                binding.title.text = item.titleText
+                binding.description.text = item.descriptionText
+                binding.startImage.setImageResource(item.placeholder.drawable(true))
+                binding.root.setOnClickListener {
+                    listener.onItemClicked(item)
+                }
+            }
+        }
+
+        class SectionTitleHolder(
+            private val binding: ViewRemoteMessageSectionTitleItemBinding,
+        ) : RemoteMessageItemHolder(binding.root) {
+
+            fun bind(item: CardItem.SectionTitle) {
+                binding.sectionTitle.text = item.titleText
+            }
+        }
+
+        class FeaturedItemHolder(
+            private val binding: ViewRemoteMessageFeaturedListItemBinding,
+            private val listener: CardItemClickListener,
+        ) : RemoteMessageItemHolder(binding.root) {
+
+            fun bind(item: CardItem.ListItem) {
+                binding.title.text = item.titleText
+                binding.description.text = item.descriptionText
+                binding.image.setImageResource(item.placeholder.drawable(true))
+                binding.action.text = item.primaryActionText
+                binding.action.setOnClickListener {
+                    listener.onItemClicked(item)
+                }
             }
         }
     }
@@ -78,5 +153,11 @@ class CardsListAdapter @Inject constructor() : ListAdapter<CardItem, CardItemVie
         ): Boolean {
             return oldItem == newItem
         }
+    }
+
+    companion object {
+        private const val ITEM_TYPE_FEATURED_TWO_LINE_LIST_ITEM = 0
+        private const val ITEM_TYPE_TWO_LINE_LIST_ITEM = 1
+        private const val ITEM_TYPE_LIST_SECTION_TITLE = 2
     }
 }

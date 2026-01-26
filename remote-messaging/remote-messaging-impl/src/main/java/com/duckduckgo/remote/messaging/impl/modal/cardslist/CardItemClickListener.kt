@@ -19,5 +19,5 @@ package com.duckduckgo.remote.messaging.impl.modal.cardslist
 import com.duckduckgo.remote.messaging.api.CardItem
 
 interface CardItemClickListener {
-    fun onItemClicked(item: CardItem)
+    fun onItemClicked(item: CardItem.ListItem)
 }
