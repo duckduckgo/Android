@@ -34,8 +34,10 @@ import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import logcat.logcat
 import javax.inject.Inject
 
 interface RemoteMessageModalSurfaceEvaluator
@@ -77,7 +79,9 @@ class RemoteMessageModalSurfaceEvaluatorImpl @Inject constructor(
                 return@withContext ModalEvaluator.EvaluationResult.Skipped
             }
 
-            val message = remoteMessagingRepository.message()
+            val message = remoteMessagingRepository.message().also {
+                logcat(tag = "RadoiuC") { "Remote message: $it" }
+            }
                 ?: return@withContext ModalEvaluator.EvaluationResult.Skipped
 
             if (message.surfaces.contains(Surface.MODAL)) {
@@ -94,6 +98,8 @@ class RemoteMessageModalSurfaceEvaluatorImpl @Inject constructor(
                 ) ?: return@withContext ModalEvaluator.EvaluationResult.Skipped
 
                 // Launch activity in app scope to decouple from evaluation completion
+
+                delay(MODAL_DISPLAY_DELAY)
                 appCoroutineScope.launch(dispatchers.main()) {
                     intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
                     applicationContext.startActivity(intent)
@@ -120,5 +126,6 @@ class RemoteMessageModalSurfaceEvaluatorImpl @Inject constructor(
 
     companion object {
         private const val BACKGROUND_THRESHOLD_MILLIS = 4 * 60 * 60 * 1000L // 4 hours
+        private const val MODAL_DISPLAY_DELAY = 1500L
     }
 }
