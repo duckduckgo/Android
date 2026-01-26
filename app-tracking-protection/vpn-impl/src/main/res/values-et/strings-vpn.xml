@@ -129,6 +129,8 @@
     <string name="atp_NewTabDisabled"><b>Rakenduse jälgimise kaitse on keelatud.</b>\nPuuduta, et jätkata jälgimiskatsete blokeerimist kõigis oma rakendustes.</string>
     <string name="atp_NewTabRevoked"><b>VPN-rakendus sinu seadmes on rakenduse jälgimise kaitse keelanud.</b>\nPuuduta selle uuesti lubamiseks.</string>
     <string name="atp_NewTabEnabled"><b>Rakenduse jälgimise kaitse on lubatud</b> ja blokeerib jälgimiskatsed kõigis sinu rakendustes.</string>
+    <!-- smartling.character_limit = 15 -->
+    <string name="vpnMenuYellowPill">Proovi tasuta</string>
 
     <!-- Exclusion List -->
     <string name="atp_ExclusionListActivityTitle">Kõik rakendused</string>

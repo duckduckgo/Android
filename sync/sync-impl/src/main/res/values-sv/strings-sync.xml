@@ -34,6 +34,7 @@
     <string name="sync_setup_begin_syncing">Starta synkronisering</string>
     <string name="sync_setup_with_another_device_cta_title">Synkronisera med en annan enhet</string>
     <string name="sync_setup_with_another_device_cta_subtitle">Synkronisera bokmärken och lösenord mellan dina enheter på ett säkert sätt.</string>
+    <string name="sync_setup_with_another_device_cta_subtitle_with_ai_chat">Synkronisera bokmärken, lösenord och Duck.ai-chattar mellan dina enheter på ett säkert sätt.</string>
     <string name="sync_off_hint">Dina data krypteras under hela vägen och DuckDuckGo har inte tillgång till krypteringsnyckeln.</string>
     <string name="sync_setup_single_device_title">Konfiguration för en enda enhet</string>
     <string name="sync_setup_other_options_title">Andra alternativ</string>
@@ -45,12 +46,14 @@
     <!-- Setup screen -->
     <string name="sync_enable_sync_title">Konfigurerar synkronisering och säkerhetskopiering!</string>
     <string name="sync_enable_sync_content">Dina bokmärken och lösenord förbereds för synkronisering. Detta bör bara ta ett ögonblick.</string>
+    <string name="sync_enable_sync_content_with_ai_chat">Dina bokmärken, lösenord och Duck.ai-chattar förbereds för synkronisering. Detta bör bara ta ett ögonblick.</string>
     <string name="sync_enable_options">Alternativ</string>
     <string name="sync_enable_option_favicons_title">Hämta ikoner för bokmärken</string>
     <string name="sync_enable_option_favicons_subtitle">Ladda automatiskt ner ikoner för synkroniserade bokmärken.</string>
     <string name="sync_enable_connecting">Ansluter …</string>
     <string name="sync_intro_enable_title">Synkronisera och säkerhetskopiera denna enhet</string>
     <string name="sync_intro_enable_content">Detta skapar en krypterad säkerhetskopia av dina bokmärken och lösenord på DuckDuckGos säkra server, som kan synkroniseras med dina andra enheter. \n\n Krypteringsnyckeln lagras endast på din enhet. DuckDuckGo har inte åtkomst till den.</string>
+    <string name="sync_intro_enable_content_with_ai_chat">Detta skapar en krypterad säkerhetskopia av dina bokmärken, lösenord och Duck.ai-chattar på DuckDuckGos säkra server, som kan synkroniseras med dina andra enheter. \n\n Krypteringsnyckeln lagras endast på din enhet. DuckDuckGo har inte åtkomst till den.</string>
     <string name="sync_intro_enable_footer">Du kan synkronisera med dina andra enheter senare.</string>
     <string name="sync_intro_enable_cta">Aktivera synkronisering och säkerhetskopiering</string>
     <string name="sync_intro_recover_title">Återställ synkroniserade data</string>

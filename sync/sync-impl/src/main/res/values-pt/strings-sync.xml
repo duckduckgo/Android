@@ -34,6 +34,7 @@
     <string name="sync_setup_begin_syncing">Iniciar a sincronização</string>
     <string name="sync_setup_with_another_device_cta_title">Sincronizar com outro dispositivo</string>
     <string name="sync_setup_with_another_device_cta_subtitle">Sincroniza os marcadores e palavras-passe entre os teus dispositivos em segurança.</string>
+    <string name="sync_setup_with_another_device_cta_subtitle_with_ai_chat">Sincroniza de forma segura os teus marcadores, palavras-passe e conversas Duck.ai entre os teus dispositivos.</string>
     <string name="sync_off_hint">Os teus dados são encriptados de ponta a ponta e o DuckDuckGo não tem acesso à chave de encriptação.</string>
     <string name="sync_setup_single_device_title">Configuração de dispositivo único</string>
     <string name="sync_setup_other_options_title">Outras opções</string>
@@ -45,12 +46,14 @@
     <!-- Setup screen -->
     <string name="sync_enable_sync_title">A configurar a sincronização e a cópia de segurança!</string>
     <string name="sync_enable_sync_content">Os teus marcadores e palavras-passe estão a ser preparados para sincronização. Deve demorar apenas alguns segundos.</string>
+    <string name="sync_enable_sync_content_with_ai_chat">Os marcadores, palavras-passe e chats de Duck.ai estão a ser preparados para sincronização. Deve ser um processo rápido.</string>
     <string name="sync_enable_options">Opções</string>
     <string name="sync_enable_option_favicons_title">A obter ícones dos marcadores</string>
     <string name="sync_enable_option_favicons_subtitle">Transferir automaticamente ícones para marcadores sincronizados.</string>
     <string name="sync_enable_connecting">A ligar…</string>
     <string name="sync_intro_enable_title">Sincronizar e fazer cópia de segurança deste dispositivo</string>
     <string name="sync_intro_enable_content">Cria uma cópia de segurança encriptada dos teus marcadores e palavras-passe no servidor seguro do DuckDuckGo, que pode ser sincronizada com os teus restantes dispositivos. \n\n A chave de encriptação é armazenada apenas no teu dispositivo. O DuckDuckGo não consegue aceder à chave.</string>
+    <string name="sync_intro_enable_content_with_ai_chat">Isto cria uma cópia de segurança encriptada dos marcadores, palavras-passe e chats do Duck.ai no servidor seguro da DuckDuckGo, que pode ser sincronizado com os teus outros dispositivos. \n\n A chave de encriptação é armazenada apenas no teu dispositivo. O DuckDuckGo não consegue aceder à chave.</string>
     <string name="sync_intro_enable_footer">Podes sincronizar com outros dispositivos mais tarde.</string>
     <string name="sync_intro_enable_cta">Ativar a sincronização e cópia de segurança</string>
     <string name="sync_intro_recover_title">Recuperar dados sincronizados</string>

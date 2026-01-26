@@ -16,12 +16,12 @@
 
 package com.duckduckgo.pir.impl.scripts.models
 
-import com.duckduckgo.pir.impl.scripts.models.PirError.ActionFailed
-import com.duckduckgo.pir.impl.scripts.models.PirError.CaptchaServiceError
-import com.duckduckgo.pir.impl.scripts.models.PirError.CaptchaServiceMaxAttempts
-import com.duckduckgo.pir.impl.scripts.models.PirError.CaptchaSolutionFailed
-import com.duckduckgo.pir.impl.scripts.models.PirError.ClientError
-import com.duckduckgo.pir.impl.scripts.models.PirError.EmailError
+import com.duckduckgo.pir.impl.scripts.models.PirError.ActionError.CaptchaServiceError
+import com.duckduckgo.pir.impl.scripts.models.PirError.ActionError.CaptchaServiceMaxAttempts
+import com.duckduckgo.pir.impl.scripts.models.PirError.ActionError.CaptchaSolutionFailed
+import com.duckduckgo.pir.impl.scripts.models.PirError.ActionError.ClientError
+import com.duckduckgo.pir.impl.scripts.models.PirError.ActionError.EmailError
+import com.duckduckgo.pir.impl.scripts.models.PirError.ActionError.JsActionFailed
 import com.duckduckgo.pir.impl.scripts.models.PirError.JsError.ActionError
 import com.duckduckgo.pir.impl.scripts.models.PirError.JsError.NoActionFound
 import com.duckduckgo.pir.impl.scripts.models.PirError.JsError.ParsingErrorObjectFailed
@@ -46,49 +46,54 @@ sealed class PirError {
         ) : JsError()
     }
 
-    /**
-     * Action execution resolved to a failure (not an error) for a specific action.
-     */
-    data class ActionFailed(
-        val actionID: String,
-        val message: String,
-    ) : PirError()
+    sealed class ActionError(open val actionID: String) : PirError() {
+        /**
+         * Action execution resolved to a failure (not an error) for a specific action.
+         */
+        data class JsActionFailed(
+            override val actionID: String,
+            val message: String,
+        ) : ActionError(actionID)
 
-    /**
-     * Captcha service returned an error.
-     */
-    data class CaptchaServiceError(
-        val errorCode: Int,
-        val errorDetails: String,
-        val maxAttemptReached: Boolean = false,
-    ) : PirError()
+        data class ClientError(
+            override val actionID: String,
+            val message: String,
+        ) : ActionError(actionID)
 
-    /**
-     * Captcha service failed to solve the captcha
-     */
-    data class CaptchaSolutionFailed(
-        val message: String,
-    ) : PirError()
+        /**
+         * Email service returned an error.
+         */
+        data class EmailError(
+            override val actionID: String,
+            val errorCode: Int,
+            val error: String,
+        ) : ActionError(actionID)
 
-    /**
-     * Captcha service solution check attempts has been maxed.
-     */
-    data object CaptchaServiceMaxAttempts : PirError()
+        /**
+         * Captcha service failed to solve the captcha
+         */
+        data class CaptchaSolutionFailed(
+            override val actionID: String,
+            val message: String,
+        ) : ActionError(actionID)
 
-    /**
-     * Email service returned an error.
-     */
-    data class EmailError(
-        val errorCode: Int,
-        val error: String,
-    ) : PirError()
+        /**
+         * Captcha service returned an error.
+         */
+        data class CaptchaServiceError(
+            override val actionID: String,
+            val errorCode: Int,
+            val errorDetails: String,
+            val maxAttemptReached: Boolean = false,
+        ) : ActionError(actionID)
 
-    /**
-     * Error originating from the client.
-     */
-    data class ClientError(
-        val message: String,
-    ) : PirError()
+        /**
+         * Captcha service solution check attempts has been maxed.
+         */
+        data class CaptchaServiceMaxAttempts(
+            override val actionID: String,
+        ) : ActionError(actionID)
+    }
 
     /**
      * Catch all for any unknown error.
@@ -100,11 +105,11 @@ sealed class PirError {
 
 fun PirError.getCategory(): String {
     return when (this) {
-        is ActionFailed -> ERROR_CATEGORY_VALIDATION
+        is JsActionFailed -> ERROR_CATEGORY_VALIDATION
         NoActionFound -> ERROR_CATEGORY_VALIDATION
         ParsingErrorObjectFailed -> ERROR_CATEGORY_VALIDATION
         is ActionError -> ERROR_CATEGORY_VALIDATION
-        CaptchaServiceMaxAttempts -> ERROR_CATEGORY_VALIDATION
+        is CaptchaServiceMaxAttempts -> ERROR_CATEGORY_VALIDATION
         is CaptchaSolutionFailed -> ERROR_CATEGORY_VALIDATION
         is CaptchaServiceError -> mapErrorCode(this.errorCode)
         is EmailError -> mapErrorCode(this.errorCode)
@@ -135,10 +140,10 @@ fun PirError.getDetails(): String {
         UnableToLoadBrokerUrl -> "Unable to load broker url"
         NoActionFound -> "No action found"
         ParsingErrorObjectFailed -> "Error in parsing object"
-        CaptchaServiceMaxAttempts -> "Maximum attempts for captcha solution reached"
+        is CaptchaServiceMaxAttempts -> "Maximum attempts for captcha solution reached"
         is CaptchaSolutionFailed -> "Failed to solve captcha"
         is ActionError -> this.error
-        is ActionFailed -> this.message
+        is JsActionFailed -> this.message
         is CaptchaServiceError -> this.errorDetails
         is EmailError -> this.error
         is Unknown -> this.error

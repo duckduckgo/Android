@@ -34,6 +34,7 @@
     <string name="sync_setup_begin_syncing">Începe sincronizarea</string>
     <string name="sync_setup_with_another_device_cta_title">Sincronizează cu un alt dispozitiv</string>
     <string name="sync_setup_with_another_device_cta_subtitle">Sincronizează în siguranță marcajele și parolele între dispozitivele tale.</string>
+    <string name="sync_setup_with_another_device_cta_subtitle_with_ai_chat">Sincronizează în siguranță marcajele, parolele și chaturile Duck.ai pe dispozitivele tale.</string>
     <string name="sync_off_hint">Datele tale sunt criptate integral, iar DuckDuckGo nu are acces la cheia de criptare.</string>
     <string name="sync_setup_single_device_title">Configurare pe un singur dispozitiv</string>
     <string name="sync_setup_other_options_title">Alte opțiuni</string>
@@ -45,12 +46,14 @@
     <!-- Setup screen -->
     <string name="sync_enable_sync_title">Se configurează Sincronizare și backup!</string>
     <string name="sync_enable_sync_content">Marcajele și parolele tale sunt pregătite pentru sincronizare. Acest lucru ar trebui să dureze doar un moment.</string>
+    <string name="sync_enable_sync_content_with_ai_chat">Marcajele, parolele și chaturile Duck.ai sunt pregătite pentru sincronizare. Acest lucru ar trebui să dureze doar un moment.</string>
     <string name="sync_enable_options">Opțiuni</string>
     <string name="sync_enable_option_favicons_title">Preia pictogramele pentru marcaje</string>
     <string name="sync_enable_option_favicons_subtitle">Descarcă  automat pictograme pentru marcajele sincronizate.</string>
     <string name="sync_enable_connecting">Se conectează…</string>
     <string name="sync_intro_enable_title">Sincronizează și fă backup pentru acest dispozitiv</string>
     <string name="sync_intro_enable_content">Aceasta creează o copie de backup criptată a marcajelor și a parolelor tale pe serverul securizat DuckDuckGo, care poate fi sincronizată cu celelalte dispozitive. \n\n Cheia de criptare este stocată doar pe dispozitivul tău, DuckDuckGo nu o poate accesa.</string>
+    <string name="sync_intro_enable_content_with_ai_chat">Aceasta creează o copie de rezervă criptată a marcajelor, parolelor și chaturilor Duck.ai pe serverul securizat DuckDuckGo, care poate fi sincronizată cu celelalte dispozitive ale tale. \n\n Cheia de criptare este stocată doar pe dispozitivul tău, DuckDuckGo nu o poate accesa.</string>
     <string name="sync_intro_enable_footer">Poți sincroniza mai târziu cu celelalte dispozitive ale tale.</string>
     <string name="sync_intro_enable_cta">Activează Sincronizare și backup</string>
     <string name="sync_intro_recover_title">Recuperează datele sincronizate</string>

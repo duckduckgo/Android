@@ -25,7 +25,6 @@ import com.duckduckgo.duckchat.impl.ChatState.HIDE
 import com.duckduckgo.duckchat.impl.ChatState.SHOW
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.ReportMetric
-import com.duckduckgo.duckchat.impl.metric.DuckAiMetricCollector
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatDataStore
 import com.duckduckgo.js.messaging.api.JsCallbackData
@@ -68,7 +67,6 @@ class RealDuckChatJSHelper @Inject constructor(
     private val duckChat: DuckChatInternal,
     private val duckChatPixels: DuckChatPixels,
     private val dataStore: DuckChatDataStore,
-    private val duckAiMetricCollector: DuckAiMetricCollector,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
 ) : DuckChatJSHelper {
@@ -147,9 +145,6 @@ class RealDuckChatJSHelper @Inject constructor(
                     .fromValue(data?.optString("metricName"))
                     ?.let { reportMetric ->
                         duckChatPixels.sendReportMetricPixel(reportMetric)
-                        if (reportMetric == ReportMetric.USER_DID_SUBMIT_PROMPT || reportMetric == ReportMetric.USER_DID_SUBMIT_FIRST_PROMPT) {
-                            duckAiMetricCollector.onMessageSent()
-                        }
                     }
                 null
             }

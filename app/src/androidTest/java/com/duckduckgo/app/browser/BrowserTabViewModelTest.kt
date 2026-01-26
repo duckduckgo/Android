@@ -111,6 +111,8 @@ import com.duckduckgo.app.browser.logindetection.LoginDetected
 import com.duckduckgo.app.browser.logindetection.NavigationAwareLoginDetector
 import com.duckduckgo.app.browser.logindetection.NavigationEvent
 import com.duckduckgo.app.browser.logindetection.NavigationEvent.LoginAttempt
+import com.duckduckgo.app.browser.menu.BrowserMenuDisplayRepository
+import com.duckduckgo.app.browser.menu.BrowserMenuDisplayState
 import com.duckduckgo.app.browser.menu.VpnMenuStateProvider
 import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
@@ -246,6 +248,7 @@ import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
 import com.duckduckgo.duckchat.impl.helper.NativeAction
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper.Companion.DUCK_CHAT_FEATURE_NAME
+import com.duckduckgo.duckchat.impl.messaging.sync.SyncStatusChangedObserver
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerOrigin.AUTO
@@ -436,6 +439,7 @@ class BrowserTabViewModelTest {
 
     private val mockSettingsDataStore: SettingsDataStore = mock()
     private val mockUrlDisplayRepository: UrlDisplayRepository = mock()
+    private val mockBrowserMenuDisplayRepository: BrowserMenuDisplayRepository = mock()
 
     private val mockAutoCompleteSettings: AutoCompleteSettings = mock()
 
@@ -562,6 +566,8 @@ class BrowserTabViewModelTest {
     private val swipingTabsFeature = FakeFeatureToggleFactory.create(SwipingTabsFeature::class.java)
     private val swipingTabsFeatureProvider = SwipingTabsFeatureProvider(swipingTabsFeature)
     private val mockDuckChat: DuckChat = mock()
+    private val mockSyncStatusChangedObserver: SyncStatusChangedObserver = mock()
+    private val syncStatusChangedEventsFlow = MutableSharedFlow<JSONObject>()
     private val mockHistory: NavigationHistory = mock()
 
     private val defaultBrowserPromptsExperimentShowPopupMenuItemFlow = MutableStateFlow(false)
@@ -599,6 +605,7 @@ class BrowserTabViewModelTest {
     private val selectedTab = TabEntity("TAB_ID", exampleUrl, position = 0, sourceTabId = "TAB_ID_SOURCE")
     private val flowSelectedTab = MutableStateFlow(selectedTab)
     private val isFullSiteAddressEnabledFlow = MutableStateFlow(true)
+    private val browserMenuStateFlow = MutableStateFlow(BrowserMenuDisplayState(hasOption = false, isEnabled = false))
 
     private val mockWebViewCompatWrapper: WebViewCompatWrapper = mock()
 
@@ -666,6 +673,7 @@ class BrowserTabViewModelTest {
             whenever(mockSettingsDataStore.automaticFireproofSetting).thenReturn(AutomaticFireproofSetting.ASK_EVERY_TIME)
             whenever(mockSettingsDataStore.omnibarType).thenReturn(OmnibarType.SINGLE_TOP)
             whenever(mockUrlDisplayRepository.isFullUrlEnabled).then { isFullSiteAddressEnabledFlow }
+            whenever(mockBrowserMenuDisplayRepository.browserMenuState).then { browserMenuStateFlow }
             whenever(mockSSLCertificatesFeature.allowBypass()).thenReturn(mockEnabledToggle)
             whenever(subscriptions.shouldLaunchPrivacyProForUrl(any())).thenReturn(false)
             whenever(mockDuckDuckGoUrlDetector.isDuckDuckGoUrl(any())).thenReturn(false)
@@ -688,6 +696,7 @@ class BrowserTabViewModelTest {
             whenever(nonHttpAppLinkChecker.isPermitted(anyOrNull())).thenReturn(true)
             remoteMessagingModel = givenRemoteMessagingModel(mockRemoteMessagingRepository, mockPixel, coroutineRule.testDispatcherProvider)
             runBlocking { whenever(mockAddressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(false) }
+            whenever(mockAddressBarTrackersAnimationManager.shouldShowAnimation(anyOrNull(), anyOrNull())).thenReturn(true)
 
             ctaViewModel =
                 CtaViewModel(
@@ -736,6 +745,7 @@ class BrowserTabViewModelTest {
             fakeContentScopeScriptsSubscriptionEventPluginPoint = FakeContentScopeScriptsSubscriptionEventPluginPoint()
 
             whenever(mockDuckChat.getDuckChatUrl(any(), any())).thenReturn(duckChatURL)
+            whenever(mockSyncStatusChangedObserver.syncStatusChangedEvents).thenReturn(syncStatusChangedEventsFlow)
 
             initialiseViewModel()
 
@@ -801,6 +811,7 @@ class BrowserTabViewModelTest {
                 trackingParameters = mockTrackingParameters,
                 settingsDataStore = mockSettingsDataStore,
                 urlDisplayRepository = mockUrlDisplayRepository,
+                browserMenuDisplayRepository = mockBrowserMenuDisplayRepository,
                 adClickManager = mockAdClickManager,
                 autofillCapabilityChecker = autofillCapabilityChecker,
                 autofillFireproofDialogSuppressor = autofillFireproofDialogSuppressor,
@@ -853,6 +864,7 @@ class BrowserTabViewModelTest {
                 omnibarRepository = mockOmnibarFeatureRepository,
                 contentScopeScriptsSubscriptionEventPluginPoint = fakeContentScopeScriptsSubscriptionEventPluginPoint,
                 serpSettingsFeature = serpSettingsFeature,
+                syncStatusChangedObserver = mockSyncStatusChangedObserver,
             )
 
         testee.loadData("abc", null, false, false)
@@ -5192,6 +5204,7 @@ class BrowserTabViewModelTest {
                 "myId",
                 JSONObject("""{ "my":"object"}"""),
                 false,
+                null,
                 { "someUrl" },
             )
             assertCommandIssued<Command.WebShareRequest> {
@@ -5247,6 +5260,7 @@ class BrowserTabViewModelTest {
                 "myId",
                 JSONObject("""{ "my":"object"}"""),
                 false,
+                null,
                 { "someUrl" },
             )
             assertCommandIssued<Command.ScreenLock> {
@@ -5267,6 +5281,7 @@ class BrowserTabViewModelTest {
                 "myId",
                 JSONObject("""{ "my":"object"}"""),
                 false,
+                null,
                 { "someUrl" },
             )
             assertCommandNotIssued<Command.ScreenUnlock>()
@@ -5282,6 +5297,7 @@ class BrowserTabViewModelTest {
                 "myId",
                 JSONObject("""{ "my":"object"}"""),
                 false,
+                null,
                 { "someUrl" },
             )
             assertCommandIssued<Command.ScreenUnlock>()
@@ -5298,6 +5314,7 @@ class BrowserTabViewModelTest {
                 "id",
                 data = null,
                 false,
+                null,
                 { "someUrl" },
             )
             assertCommandIssued<Command.SendResponseToJs>()
@@ -5314,6 +5331,7 @@ class BrowserTabViewModelTest {
                 "id",
                 JSONObject("""{ overlayInteracted: "true", privatePlayerMode: {disabled: {} }}"""),
                 false,
+                null,
             ) { "someUrl" }
             assertCommandIssued<Command.SendResponseToJs>()
             verify(mockDuckPlayer).setUserPreferences(any(), any())
@@ -5331,6 +5349,7 @@ class BrowserTabViewModelTest {
                 "id",
                 JSONObject("""{ overlayInteracted: "true", privatePlayerMode: {enabled: {} }}"""),
                 false,
+                null,
                 { "someUrl" },
             )
             assertCommandIssued<Command.SendResponseToJs>()
@@ -5349,6 +5368,7 @@ class BrowserTabViewModelTest {
                 "id",
                 JSONObject("""{ overlayInteracted: "true", privatePlayerMode: {enabled: {} }}"""),
                 false,
+                null,
             ) { "someUrl" }
             assertCommandIssued<Command.SendResponseToDuckPlayer>()
             verify(mockDuckPlayer).setUserPreferences(true, "enabled")
@@ -5366,6 +5386,7 @@ class BrowserTabViewModelTest {
                 "id",
                 JSONObject("""{ pixelName: "pixel", params: {}}"""),
                 false,
+                null,
             ) { "someUrl" }
             verify(mockDuckPlayer).sendDuckPlayerPixel("pixel", mapOf())
         }
@@ -5382,6 +5403,7 @@ class BrowserTabViewModelTest {
                 "id",
                 JSONObject("""{ href: "duck://player/1234" }"""),
                 false,
+                null,
                 { "someUrl" },
             )
             assertCommandIssued<Navigate>()
@@ -5399,6 +5421,7 @@ class BrowserTabViewModelTest {
                 "id",
                 JSONObject("""{ href: "duck://player/1234" }"""),
                 false,
+                null,
                 { "someUrl" },
             )
             verify(mockDuckPlayer).setDuckPlayerOrigin(OVERLAY)
@@ -5416,6 +5439,7 @@ class BrowserTabViewModelTest {
                 "id",
                 JSONObject("""{ href: "duck://player/1234" }"""),
                 false,
+                null,
                 { "someUrl" },
             )
             verify(mockDuckPlayer).setDuckPlayerOrigin(AUTO)
@@ -5433,6 +5457,7 @@ class BrowserTabViewModelTest {
                 "id",
                 JSONObject("""{ href: "duck://player/1234" }"""),
                 false,
+                null,
                 { "someUrl" },
             )
             assertCommandIssued<Navigate>()
@@ -5450,6 +5475,7 @@ class BrowserTabViewModelTest {
                 "id",
                 JSONObject("""{ href: "duck://player/1234" }"""),
                 false,
+                null,
                 { "someUrl" },
             )
             assertCommandIssued<Command.OpenInNewTab>()
@@ -5498,6 +5524,7 @@ class BrowserTabViewModelTest {
                 "id",
                 null,
                 false,
+                null,
                 { "someUrl" },
             )
             assertCommandIssued<Command.SendResponseToJs>()
@@ -5514,6 +5541,7 @@ class BrowserTabViewModelTest {
                 "id",
                 null,
                 false,
+                null,
                 { "someUrl" },
             )
             assertCommandIssued<Command.SendResponseToDuckPlayer>()
@@ -5529,6 +5557,7 @@ class BrowserTabViewModelTest {
                 "id",
                 null,
                 false,
+                null,
                 { "someUrl" },
             )
             assertCommandIssued<Command.OpenDuckPlayerSettings>()
@@ -5546,6 +5575,7 @@ class BrowserTabViewModelTest {
                 "id",
                 null,
                 false,
+                null,
                 { "someUrl" },
             )
             assertCommandIssued<Command.OpenDuckPlayerPageInfo>()
@@ -6499,6 +6529,54 @@ class BrowserTabViewModelTest {
             verify(mockAdditionalDefaultBrowserPrompts).onPopupMenuLaunched()
         }
 
+    @Test
+    fun whenBrowserMenuHasOptionButNotEnabledThenUseBottomSheetMenuFalse() =
+        runTest {
+            // Given - repository returns hasOption=true but isEnabled=false
+            browserMenuStateFlow.emit(BrowserMenuDisplayState(hasOption = true, isEnabled = false))
+
+            // Then
+            assertFalse(browserViewState().useBottomSheetMenu)
+        }
+
+    @Test
+    fun whenBrowserMenuHasOptionAndEnabledThenUseBottomSheetMenuTrue() =
+        runTest {
+            // Given - repository returns hasOption=true and isEnabled=true
+            browserMenuStateFlow.emit(BrowserMenuDisplayState(hasOption = true, isEnabled = true))
+
+            // Then
+            assertTrue(browserViewState().useBottomSheetMenu)
+        }
+
+    @Test
+    fun whenBrowserMenuStateChangesThenUseBottomSheetMenuUpdates() =
+        runTest {
+            // Given - Start with enabled=false
+            browserMenuStateFlow.emit(BrowserMenuDisplayState(hasOption = true, isEnabled = false))
+
+            // Initial state
+            assertFalse(browserViewState().useBottomSheetMenu)
+
+            // When enabled
+            browserMenuStateFlow.emit(BrowserMenuDisplayState(hasOption = true, isEnabled = true))
+            assertTrue(browserViewState().useBottomSheetMenu)
+
+            // When disabled again
+            browserMenuStateFlow.emit(BrowserMenuDisplayState(hasOption = true, isEnabled = false))
+            assertFalse(browserViewState().useBottomSheetMenu)
+        }
+
+    @Test
+    fun whenBrowserMenuHasNoOptionThenUseBottomSheetMenuFalse() =
+        runTest {
+            // Given - Even if isEnabled is true, if hasOption is false (feature flag off), should be false
+            browserMenuStateFlow.emit(BrowserMenuDisplayState(hasOption = false, isEnabled = true))
+
+            // Then
+            assertFalse(browserViewState().useBottomSheetMenu)
+        }
+
     private fun givenTabManagerData() =
         runTest {
             val tabCount = "61-80"
@@ -6839,6 +6917,31 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenLoadingUrlWithTrackersAnimationEnabledThenLastAnimatedUrlIsUpdatedImmediately() = runTest {
+        whenever(mockAddressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(true)
+        whenever(mockAddressBarTrackersAnimationManager.shouldShowAnimation(anyOrNull(), anyOrNull())).thenReturn(true)
+
+        loadUrl("https://www.example.com")
+
+        // Verify shouldShowAnimation is called with updated lastAnimatedUrl on second navigation
+        // The second call should pass the first URL as lastAnimatedUrl
+        loadUrl("https://www.example.com/page2")
+
+        // Verify that by the second load, the manager received the first URL as lastAnimatedUrl
+        verify(mockAddressBarTrackersAnimationManager, times(2)).shouldShowAnimation(anyOrNull(), anyOrNull())
+
+        // The first call should have null as lastAnimatedUrl
+        // The second call should have the first URL as lastAnimatedUrl (immediate update)
+        val captor = argumentCaptor<String>()
+        verify(mockAddressBarTrackersAnimationManager, times(2)).shouldShowAnimation(anyOrNull(), captor.capture())
+
+        // First navigation: lastAnimatedUrl was null
+        assertNull(captor.firstValue)
+        // Second navigation: lastAnimatedUrl should be the first URL (updated immediately)
+        assertEquals("https://www.example.com", captor.secondValue)
+    }
+
+    @Test
     fun whenVisitSiteThenUpdateLoadingViewStateAndOmnibarViewState() {
         testee.browserViewState.value =
             browserViewState().copy(
@@ -7028,7 +7131,7 @@ class BrowserTabViewModelTest {
     fun whenProcessJsCallbackMessageForSubscriptionsThenSendCommand() =
         runTest {
             val jsCallbackData = JsCallbackData(JSONObject(), "", "", "")
-            whenever(mockSubscriptionsJSHelper.processJsCallbackMessage(anyString(), anyString(), anyOrNull(), anyOrNull()))
+            whenever(mockSubscriptionsJSHelper.processJsCallbackMessage(anyString(), anyString(), anyOrNull(), anyOrNull(), anyOrNull()))
                 .thenReturn(jsCallbackData)
             testee.processJsCallbackMessage(
                 featureName = SUBSCRIPTIONS_FEATURE_NAME,
@@ -7036,7 +7139,7 @@ class BrowserTabViewModelTest {
                 id = "id",
                 data = null,
             ) { "someUrl" }
-            verify(mockSubscriptionsJSHelper).processJsCallbackMessage(SUBSCRIPTIONS_FEATURE_NAME, "method", "id", null)
+            verify(mockSubscriptionsJSHelper).processJsCallbackMessage(SUBSCRIPTIONS_FEATURE_NAME, "method", "id", null, null)
             assertCommandIssued<Command.SendResponseToJs>()
         }
 
@@ -7050,7 +7153,7 @@ class BrowserTabViewModelTest {
                 id = "id",
                 data = null,
             ) { "someUrl" }
-            verify(mockSubscriptionsJSHelper).processJsCallbackMessage(SUBSCRIPTIONS_FEATURE_NAME, "method", "id", null)
+            verify(mockSubscriptionsJSHelper).processJsCallbackMessage(SUBSCRIPTIONS_FEATURE_NAME, "method", "id", null, null)
             assertCommandNotIssued<Command.SendResponseToJs>()
         }
 
@@ -7634,6 +7737,15 @@ class BrowserTabViewModelTest {
         testee.pageFinished(mockWebView, webViewNavState, nonDdgUrl)
 
         assertNull("SERP logo should be cleared when navigating to non-DuckDuckGo URL", omnibarViewState().serpLogo)
+    }
+
+    @Test
+    fun whenOnStartTrackersAnimationCalledThenStartAddressBarTrackersAnimationCommandIssued() = runTest {
+        loadUrl("https://www.example.com")
+
+        testee.onStartTrackersAnimation()
+
+        assertCommandIssued<Command.StartAddressBarTrackersAnimation>()
     }
 
     private fun aCredential(): LoginCredentials = LoginCredentials(domain = null, username = null, password = null)

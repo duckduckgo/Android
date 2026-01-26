@@ -58,12 +58,12 @@ import com.duckduckgo.pir.impl.models.ProfileQuery
 import com.duckduckgo.pir.impl.scripts.BrokerActionProcessor
 import com.duckduckgo.pir.impl.scripts.BrokerActionProcessor.ActionResultListener
 import com.duckduckgo.pir.impl.scripts.models.PirError
-import com.duckduckgo.pir.impl.scripts.models.PirError.ActionFailed
-import com.duckduckgo.pir.impl.scripts.models.PirError.CaptchaServiceError
-import com.duckduckgo.pir.impl.scripts.models.PirError.CaptchaServiceMaxAttempts
-import com.duckduckgo.pir.impl.scripts.models.PirError.CaptchaSolutionFailed
-import com.duckduckgo.pir.impl.scripts.models.PirError.ClientError
-import com.duckduckgo.pir.impl.scripts.models.PirError.EmailError
+import com.duckduckgo.pir.impl.scripts.models.PirError.ActionError.CaptchaServiceError
+import com.duckduckgo.pir.impl.scripts.models.PirError.ActionError.CaptchaServiceMaxAttempts
+import com.duckduckgo.pir.impl.scripts.models.PirError.ActionError.CaptchaSolutionFailed
+import com.duckduckgo.pir.impl.scripts.models.PirError.ActionError.ClientError
+import com.duckduckgo.pir.impl.scripts.models.PirError.ActionError.EmailError
+import com.duckduckgo.pir.impl.scripts.models.PirError.ActionError.JsActionFailed
 import com.duckduckgo.pir.impl.scripts.models.PirError.JsError
 import com.duckduckgo.pir.impl.scripts.models.PirError.UnableToLoadBrokerUrl
 import com.duckduckgo.pir.impl.scripts.models.PirError.Unknown
@@ -281,7 +281,7 @@ class RealPirActionsRunner @AssistedInject constructor(
                 // IF this timer completes, then timeout was reached
                 kotlin.runCatching {
                     onError(
-                        ActionFailed(
+                        JsActionFailed(
                             actionID = effect.actionId,
                             message = "Local timeout",
                         ),
@@ -304,6 +304,7 @@ class RealPirActionsRunner @AssistedInject constructor(
             if (effect.transactionID.isEmpty()) {
                 onError(
                     ClientError(
+                        actionID = effect.actionId,
                         message = "Invalid state: No transaction ID for captcha",
                     ),
                 )
@@ -330,7 +331,9 @@ class RealPirActionsRunner @AssistedInject constructor(
                                 else -> {
                                     if (effect.attempt == effect.retries) {
                                         onError(
-                                            CaptchaServiceMaxAttempts,
+                                            CaptchaServiceMaxAttempts(
+                                                actionID = effect.actionId,
+                                            ),
                                         )
                                     } else {
                                         delay(effect.pollingIntervalSeconds * 1000L)
@@ -453,7 +456,7 @@ class RealPirActionsRunner @AssistedInject constructor(
         }
 
         when (pirError) {
-            is ActionFailed ->
+            is JsActionFailed ->
                 Event.BrokerActionFailed(
                     error = pirError,
                     allowRetry = true, // Failure is in js execution so we could retry.

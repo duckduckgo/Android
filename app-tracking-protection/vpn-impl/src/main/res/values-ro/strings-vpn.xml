@@ -133,6 +133,8 @@
     <string name="atp_NewTabDisabled"><b> Protecția împotriva urmăririi de către aplicație a fost dezactivată. </b>\nAtinge pentru a continua să blochezi încercările de urmărire în toate aplicațiile tale.</string>
     <string name="atp_NewTabRevoked"><b>O aplicație VPN de pe dispozitivul tău a dezactivat Protecția împotriva urmăririi de către aplicație.</b>\nAtinge pentru a reactiva.</string>
     <string name="atp_NewTabEnabled"><b>Protecția împotriva urmăririi de către aplicație este activată</b> și blochează încercările de urmărire în aplicațiile tale.</string>
+    <!-- smartling.character_limit = 15 -->
+    <string name="vpnMenuYellowPill">Încearcă gratis</string>
 
     <!-- Exclusion List -->
     <string name="atp_ExclusionListActivityTitle">Toate aplicațiile</string>

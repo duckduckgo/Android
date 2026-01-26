@@ -1394,6 +1394,12 @@ class OmnibarLayout @JvmOverloads constructor(
         }
     }
 
+    override fun setMenuIcon(resId: Int) {
+        ContextCompat.getDrawable(context, resId)?.let {
+            browserMenuImageView.setImageDrawable(it)
+        }
+    }
+
     override fun onAnimationFinished() {
         omnibarTextListener?.onTrackersCountFinished()
     }

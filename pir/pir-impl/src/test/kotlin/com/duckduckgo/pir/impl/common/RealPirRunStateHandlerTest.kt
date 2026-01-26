@@ -18,6 +18,7 @@ package com.duckduckgo.pir.impl.common
 
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.CurrentTimeProvider
+import com.duckduckgo.pir.impl.common.PirJob.RunType
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerRecordEmailConfirmationCompleted
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerRecordEmailConfirmationNeeded
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerRecordEmailConfirmationStarted
@@ -28,6 +29,7 @@ import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerScanA
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerScanFailed
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerScanStarted
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerScanSuccess
+import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerStepInvalidEvent
 import com.duckduckgo.pir.impl.models.AddressCityState
 import com.duckduckgo.pir.impl.models.Broker
 import com.duckduckgo.pir.impl.models.ExtractedProfile
@@ -460,7 +462,6 @@ class RealPirRunStateHandlerTest {
             verify(mockPixelSender).reportOptOutStageStart(
                 brokerUrl = testBroker.url,
                 parentUrl = testBroker.parent.orEmpty(),
-                attemptId = "c9982ded-021a-4251-9e03-2c58b130410f",
             )
             verifyNoMoreInteractions(mockPixelSender)
         }
@@ -504,7 +505,6 @@ class RealPirRunStateHandlerTest {
             verify(mockPixelSender).reportOptOutSubmitted(
                 brokerUrl = testBroker.url,
                 parent = "",
-                attemptId = state.attemptId,
                 durationMs = testEventTimeInMillis - testStartTimeInMillis,
                 optOutAttemptCount = 2,
                 emailPattern = state.emailPattern,
@@ -556,7 +556,6 @@ class RealPirRunStateHandlerTest {
                 brokerUrl = testBroker.url,
                 parent = "",
                 brokerJsonVersion = testBroker.version,
-                attemptId = "c9982ded-021a-4251-9e03-2c58b130410f",
                 durationMs = testEventTimeInMillis - testStartTimeInMillis,
                 stage = state.stage,
                 tries = 2,
@@ -592,7 +591,6 @@ class RealPirRunStateHandlerTest {
             verify(mockPixelSender).reportStagePendingEmailConfirmation(
                 brokerUrl = testBroker.url,
                 brokerVersion = testBroker.version,
-                attemptId = "c9982ded-021a-4251-9e03-2c58b130410f",
                 actionId = "hello82ded-021a-4251-9e03-2c58b130410f",
                 durationMs = testTotalTimeMillis,
                 tries = 1,
@@ -620,7 +618,6 @@ class RealPirRunStateHandlerTest {
             verify(mockPixelSender).reportEmailConfirmationAttemptStart(
                 brokerUrl = testBroker.url,
                 brokerVersion = testBroker.version,
-                attemptId = testEmailConfirmationJob.emailData.attemptId,
                 actionId = state.firstActionId,
                 attemptNumber = testEmailConfirmationJob.jobAttemptData.jobAttemptCount,
             )
@@ -649,7 +646,6 @@ class RealPirRunStateHandlerTest {
             verify(mockPixelSender).reportEmailConfirmationAttemptSuccess(
                 brokerUrl = testBroker.url,
                 brokerVersion = testBroker.version,
-                attemptId = testEmailConfirmationJob.emailData.attemptId,
                 actionId = state.lastActionId,
                 attemptNumber = testEmailConfirmationJob.jobAttemptData.jobAttemptCount,
                 durationMs = state.totalTimeMillis,
@@ -669,7 +665,6 @@ class RealPirRunStateHandlerTest {
             verify(mockPixelSender).reportOptOutSubmitted(
                 brokerUrl = testBroker.url,
                 parent = "",
-                attemptId = state.attemptId,
                 durationMs = state.totalTimeMillis,
                 optOutAttemptCount = testEmailConfirmationJob.jobAttemptData.jobAttemptCount,
                 emailPattern = state.emailPattern,
@@ -704,7 +699,6 @@ class RealPirRunStateHandlerTest {
             verify(mockPixelSender).reportEmailConfirmationAttemptFailed(
                 brokerUrl = testBroker.url,
                 brokerVersion = testBroker.version,
-                attemptId = testEmailConfirmationJob.emailData.attemptId,
                 actionId = state.lastActionId,
                 attemptNumber = testEmailConfirmationJob.jobAttemptData.jobAttemptCount,
                 durationMs = state.totalTimeMillis,
@@ -716,5 +710,73 @@ class RealPirRunStateHandlerTest {
             )
             verifyNoMoreInteractions(mockPixelSender)
             verifyNoMoreInteractions(mockJobRecordUpdater)
+        }
+
+    @Test
+    fun whenHandleBrokerStepInvalidEventWithManualRunTypeThenReportsScanInvalidEvent() =
+        runTest {
+            val state = BrokerStepInvalidEvent(
+                broker = testBroker,
+                runType = RunType.MANUAL,
+            )
+
+            testee.handleState(state)
+
+            verify(mockPixelSender).reportScanInvalidEvent(
+                brokerUrl = testBroker.url,
+                brokerVersion = testBroker.version,
+            )
+            verifyNoMoreInteractions(mockPixelSender)
+        }
+
+    @Test
+    fun whenHandleBrokerStepInvalidEventWithScheduledRunTypeThenReportsScanInvalidEvent() =
+        runTest {
+            val state = BrokerStepInvalidEvent(
+                broker = testBroker,
+                runType = RunType.SCHEDULED,
+            )
+
+            testee.handleState(state)
+
+            verify(mockPixelSender).reportScanInvalidEvent(
+                brokerUrl = testBroker.url,
+                brokerVersion = testBroker.version,
+            )
+            verifyNoMoreInteractions(mockPixelSender)
+        }
+
+    @Test
+    fun whenHandleBrokerStepInvalidEventWithOptOutRunTypeThenReportsOptOutInvalidEvent() =
+        runTest {
+            val state = BrokerStepInvalidEvent(
+                broker = testBroker,
+                runType = RunType.OPTOUT,
+            )
+
+            testee.handleState(state)
+
+            verify(mockPixelSender).reportOptOutInvalidEvent(
+                brokerUrl = testBroker.url,
+                brokerVersion = testBroker.version,
+            )
+            verifyNoMoreInteractions(mockPixelSender)
+        }
+
+    @Test
+    fun whenHandleBrokerStepInvalidEventWithEmailConfirmationRunTypeThenReportsOptOutInvalidEvent() =
+        runTest {
+            val state = BrokerStepInvalidEvent(
+                broker = testBroker,
+                runType = RunType.EMAIL_CONFIRMATION,
+            )
+
+            testee.handleState(state)
+
+            verify(mockPixelSender).reportOptOutInvalidEvent(
+                brokerUrl = testBroker.url,
+                brokerVersion = testBroker.version,
+            )
+            verifyNoMoreInteractions(mockPixelSender)
         }
 }

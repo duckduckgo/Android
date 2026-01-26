@@ -261,6 +261,16 @@ enum class SubscriptionPixel(
         types = setOf(Count, Daily()),
         includedParameters = setOf(APP_VERSION),
     ),
+    FREE_TRIAL_START(
+        baseName = "subscription_free_trial_start",
+        type = Unique(),
+        includedParameters = setOf(APP_VERSION),
+    ),
+    FREE_TRIAL_VPN_ACTIVATION(
+        baseName = "subscription_free_trial_vpn_activation",
+        type = Unique(),
+        includedParameters = setOf(APP_VERSION),
+    ),
     ;
 
     constructor(
@@ -279,6 +289,7 @@ object SubscriptionPixelParameter {
     const val REASON = "reason"
     const val OS_VERSION = "os_version"
     const val PETAL = "petal"
+    const val ACTIVATION_DAY = "activation_day"
 }
 
 internal val PixelType.pixelNameSuffix: String

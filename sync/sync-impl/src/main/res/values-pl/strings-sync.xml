@@ -34,6 +34,7 @@
     <string name="sync_setup_begin_syncing">Rozpocznij synchronizację</string>
     <string name="sync_setup_with_another_device_cta_title">Synchronizuj z innym urządzeniem</string>
     <string name="sync_setup_with_another_device_cta_subtitle">Bezpiecznie synchronizuj zakładki i hasła między swoimi urządzeniami.</string>
+    <string name="sync_setup_with_another_device_cta_subtitle_with_ai_chat">Bezpiecznie synchronizuj zakładki, hasła i czaty Duck.ai między urządzeniami.</string>
     <string name="sync_off_hint">Twoje dane są kompleksowo szyfrowane, a DuckDuckGo nie ma dostępu do klucza szyfrowania.</string>
     <string name="sync_setup_single_device_title">Konfiguracja na jednym urządzeniu</string>
     <string name="sync_setup_other_options_title">Inne opcje</string>
@@ -45,12 +46,14 @@
     <!-- Setup screen -->
     <string name="sync_enable_sync_title">Konfigurowanie synchronizacji i kopii zapasowej!</string>
     <string name="sync_enable_sync_content">Twoje zakładki i hasła są przygotowywane do synchronizacji. To powinno zająć tylko chwilę.</string>
+    <string name="sync_enable_sync_content_with_ai_chat">Twoje zakładki, hasła i czaty Duck.ai są przygotowywane do synchronizacji. To powinno zająć tylko chwilę.</string>
     <string name="sync_enable_options">Opcje</string>
     <string name="sync_enable_option_favicons_title">Pobierz ikony zakładek</string>
     <string name="sync_enable_option_favicons_subtitle">Automatycznie pobieraj ikony dla zsynchronizowanych zakładek.</string>
     <string name="sync_enable_connecting">Łączenie...</string>
     <string name="sync_intro_enable_title">Synchronizuj i twórz kopie zapasowe tego urządzenia</string>
     <string name="sync_intro_enable_content">Tworzy na bezpiecznym serwerze DuckDuckGo zaszyfrowaną kopię zapasową zakładek i haseł, którą można zsynchronizować z innymi urządzeniami. \n\n Klucz szyfrowania jest przechowywany tylko na urządzeniu użytkownika, DuckDuckGo nie może uzyskać do niego dostępu.</string>
+    <string name="sync_intro_enable_content_with_ai_chat">Tworzy na bezpiecznym serwerze DuckDuckGo zaszyfrowaną kopię zapasową zakładek, haseł i czatów Duck.ai, którą można zsynchronizować z innymi urządzeniami. \n\n Klucz szyfrowania jest przechowywany tylko na urządzeniu użytkownika, DuckDuckGo nie może uzyskać do niego dostępu.</string>
     <string name="sync_intro_enable_footer">Możesz później przeprowadzić synchronizację z innymi urządzeniami.</string>
     <string name="sync_intro_enable_cta">Włącz synchronizację i kopię zapasową</string>
     <string name="sync_intro_recover_title">Odzyskaj zsynchronizowane dane</string>

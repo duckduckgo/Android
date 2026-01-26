@@ -27,6 +27,7 @@ import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.subscriptions.api.ActiveOfferType
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.impl.PrivacyProFeature
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.AuthRepository
 import com.duckduckgo.subscriptions.impl.repository.Subscription
 import kotlinx.coroutines.test.runTest
@@ -38,6 +39,7 @@ import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
@@ -52,6 +54,7 @@ class FreeTrialConversionWideEventTest {
     private val wideEventClient: WideEventClient = mock()
     private val authRepository: AuthRepository = mock()
     private val timeProvider: CurrentTimeProvider = mock()
+    private val pixelSender: SubscriptionPixelSender = mock()
 
     @SuppressLint("DenyListedApi")
     private val privacyProFeature: PrivacyProFeature =
@@ -69,16 +72,18 @@ class FreeTrialConversionWideEventTest {
             authRepository = authRepository,
             timeProvider = timeProvider,
             dispatchers = coroutineRule.testDispatcherProvider,
+            pixelSender = pixelSender,
         )
     }
 
     @Test
-    fun `onFreeTrialStarted starts flow with correct metadata`() = runTest {
+    fun `onFreeTrialStarted starts flow with correct metadata and fires pixel`() = runTest {
         whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any())).thenReturn(Result.success(123L))
         whenever(wideEventClient.getFlowIds(any())).thenReturn(Result.success(emptyList()))
 
         freeTrialConversionWideEvent.onFreeTrialStarted("ddg.privacy.pro.yearly.renews.us")
 
+        verify(pixelSender).reportFreeTrialStart()
         verify(wideEventClient).flowStart(
             name = "free-trial-conversion",
             flowEntryPoint = null,
@@ -91,16 +96,17 @@ class FreeTrialConversionWideEventTest {
     }
 
     @Test
-    fun `onFreeTrialStarted does not restart flow if one already exists`() = runTest {
+    fun `onFreeTrialStarted does not restart flow if one already exists but still fires pixel`() = runTest {
         whenever(wideEventClient.getFlowIds(any())).thenReturn(Result.success(listOf(123L)))
 
         freeTrialConversionWideEvent.onFreeTrialStarted("ddg.privacy.pro.yearly.renews.us")
 
+        verify(pixelSender).reportFreeTrialStart()
         verify(wideEventClient, never()).flowStart(any(), any(), any(), any())
     }
 
     @Test
-    fun `onVpnActivatedSuccessfully records D1 step when activated within first day`() = runTest {
+    fun `onVpnActivatedSuccessfully records D1 step and fires pixel when activated within first day`() = runTest {
         val subscriptionStartedAt = System.currentTimeMillis() - TimeUnit.HOURS.toMillis(12)
         val subscription = createSubscription(
             startedAt = subscriptionStartedAt,
@@ -114,6 +120,7 @@ class FreeTrialConversionWideEventTest {
 
         freeTrialConversionWideEvent.onVpnActivatedSuccessfully()
 
+        verify(pixelSender).reportFreeTrialVpnActivation("vpn_activated_d1")
         verify(wideEventClient).flowStep(
             wideEventId = 123L,
             stepName = "vpn_activated_d1",
@@ -122,7 +129,7 @@ class FreeTrialConversionWideEventTest {
     }
 
     @Test
-    fun `onVpnActivatedSuccessfully records D2-7 step when activated after first day`() = runTest {
+    fun `onVpnActivatedSuccessfully records D2-7 step and fires pixel when activated after first day`() = runTest {
         val subscriptionStartedAt = System.currentTimeMillis() - TimeUnit.DAYS.toMillis(3)
         val subscription = createSubscription(
             startedAt = subscriptionStartedAt,
@@ -136,6 +143,7 @@ class FreeTrialConversionWideEventTest {
 
         freeTrialConversionWideEvent.onVpnActivatedSuccessfully()
 
+        verify(pixelSender).reportFreeTrialVpnActivation("vpn_activated_d2_to_d7")
         verify(wideEventClient).flowStep(
             wideEventId = 123L,
             stepName = "vpn_activated_d2_to_d7",
@@ -144,18 +152,19 @@ class FreeTrialConversionWideEventTest {
     }
 
     @Test
-    fun `onVpnActivatedSuccessfully does not record step if not in free trial`() = runTest {
+    fun `onVpnActivatedSuccessfully does not record step or fire pixel if not in free trial`() = runTest {
         whenever(wideEventClient.getFlowIds(any())).thenReturn(Result.success(listOf(123L)))
         whenever(authRepository.getSubscription()).thenReturn(createSubscription())
         whenever(authRepository.isFreeTrialActive()).thenReturn(false)
 
         freeTrialConversionWideEvent.onVpnActivatedSuccessfully()
 
+        verify(pixelSender, never()).reportFreeTrialVpnActivation(any())
         verify(wideEventClient, never()).flowStep(any(), any(), any(), any())
     }
 
     @Test
-    fun `onVpnActivatedSuccessfully only records step once per flow`() = runTest {
+    fun `onVpnActivatedSuccessfully only records wide event step once per flow but fires pixel each time`() = runTest {
         val subscriptionStartedAt = System.currentTimeMillis() - TimeUnit.HOURS.toMillis(6)
         val subscription = createSubscription(
             startedAt = subscriptionStartedAt,
@@ -169,15 +178,18 @@ class FreeTrialConversionWideEventTest {
 
         // First activation
         freeTrialConversionWideEvent.onVpnActivatedSuccessfully()
-        // Second activation - should be ignored
+        // Second activation - wide event step should be ignored but pixel fires
         freeTrialConversionWideEvent.onVpnActivatedSuccessfully()
 
+        // Pixel fires each time VPN activates during free trial
+        verify(pixelSender, times(2)).reportFreeTrialVpnActivation("vpn_activated_d1")
+
+        // Wide event step only recorded once
         verify(wideEventClient).flowStep(
             wideEventId = 123L,
             stepName = "vpn_activated_d1",
             success = true,
         )
-        // Verify flowStep was only called once
         verify(wideEventClient).getFlowIds(any())
         verifyNoMoreInteractions(wideEventClient)
     }
@@ -244,10 +256,19 @@ class FreeTrialConversionWideEventTest {
 
     @SuppressLint("DenyListedApi")
     @Test
-    fun `when feature disabled then no events are sent`() = runTest {
+    fun `when feature disabled then no wide events are sent but pixels still fire`() = runTest {
         privacyProFeature.sendFreeTrialConversionWideEvent().setRawStoredState(Toggle.State(false))
 
+        val subscriptionStartedAt = System.currentTimeMillis() - TimeUnit.HOURS.toMillis(12)
+        val subscription = createSubscription(
+            startedAt = subscriptionStartedAt,
+            activeOffers = listOf(ActiveOfferType.TRIAL),
+        )
+
         whenever(wideEventClient.getFlowIds(any())).thenReturn(Result.success(emptyList()))
+        whenever(authRepository.getSubscription()).thenReturn(subscription)
+        whenever(authRepository.isFreeTrialActive()).thenReturn(true)
+        whenever(timeProvider.currentTimeMillis()).thenReturn(System.currentTimeMillis())
 
         freeTrialConversionWideEvent.onFreeTrialStarted("ddg.privacy.pro.yearly.renews.us")
         freeTrialConversionWideEvent.onVpnActivatedSuccessfully()
@@ -257,13 +278,18 @@ class FreeTrialConversionWideEventTest {
             isSubscriptionActive = true,
         )
 
+        // Pixels still fire regardless of wide event feature flag
+        verify(pixelSender).reportFreeTrialStart()
+        verify(pixelSender).reportFreeTrialVpnActivation("vpn_activated_d1")
+
+        // Wide events do not fire when feature is disabled
         verify(wideEventClient, never()).flowStart(any(), any(), any(), any())
         verify(wideEventClient, never()).flowStep(any(), any(), any(), any())
         verify(wideEventClient, never()).flowFinish(any(), any(), any())
     }
 
     @Test
-    fun `flow resets after conversion`() = runTest {
+    fun `flow resets after conversion and pixel fires for new trial`() = runTest {
         whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any())).thenReturn(Result.success(456L))
         whenever(wideEventClient.getFlowIds(any()))
             .thenReturn(Result.success(listOf(123L)))
@@ -282,9 +308,10 @@ class FreeTrialConversionWideEventTest {
             metadata = emptyMap(),
         )
 
-        // Now starting a new free trial should create a new flow
+        // Now starting a new free trial should create a new flow and fire pixel
         freeTrialConversionWideEvent.onFreeTrialStarted("ddg.privacy.pro.monthly.renews.us")
 
+        verify(pixelSender).reportFreeTrialStart()
         verify(wideEventClient).flowStart(
             name = eq("free-trial-conversion"),
             flowEntryPoint = anyOrNull(),

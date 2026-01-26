@@ -24,6 +24,7 @@ import androidx.work.WorkManager
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.pir.impl.email.PirEmailConfirmationRemoteWorker
+import com.duckduckgo.pir.impl.pixels.PirBackgroundScanStatsWorker
 import com.duckduckgo.pir.impl.pixels.PirCustomStatsWorker
 import com.duckduckgo.pir.impl.pixels.PirPixelSender
 import com.duckduckgo.pir.impl.store.PirEventsRepository
@@ -77,7 +78,7 @@ class RealPirScanSchedulerTest {
         testee.scheduleScans()
 
         val tagCaptor = argumentCaptor<String>()
-        verify(mockWorkManager, times(3)).enqueueUniquePeriodicWork(
+        verify(mockWorkManager, times(4)).enqueueUniquePeriodicWork(
             tagCaptor.capture(),
             eq(ExistingPeriodicWorkPolicy.UPDATE),
             any<PeriodicWorkRequest>(),
@@ -87,6 +88,7 @@ class RealPirScanSchedulerTest {
         assertTrue(tags.contains(PirScheduledScanRemoteWorker.TAG_SCHEDULED_SCAN))
         assertTrue(tags.contains(PirEmailConfirmationRemoteWorker.TAG_EMAIL_CONFIRMATION))
         assertTrue(tags.contains(PirCustomStatsWorker.TAG_PIR_RECURRING_CUSTOM_STATS))
+        assertTrue(tags.contains(PirBackgroundScanStatsWorker.TAG_PIR_BACKGROUND_STATS_DAILY))
     }
 
     @Test
@@ -114,7 +116,7 @@ class RealPirScanSchedulerTest {
         testee.scheduleScans()
 
         val policyCaptor = argumentCaptor<ExistingPeriodicWorkPolicy>()
-        verify(mockWorkManager, times(3)).enqueueUniquePeriodicWork(
+        verify(mockWorkManager, times(4)).enqueueUniquePeriodicWork(
             any(),
             policyCaptor.capture(),
             any<PeriodicWorkRequest>(),
@@ -190,7 +192,7 @@ class RealPirScanSchedulerTest {
     fun whenCancelScheduledScansThenCancelsAllThreeWorkers() {
         testee.cancelScheduledScans(mockContext)
 
-        verify(mockWorkManager, times(3)).cancelUniqueWork(any())
+        verify(mockWorkManager, times(4)).cancelUniqueWork(any())
     }
 
     @Test
@@ -231,7 +233,7 @@ class RealPirScanSchedulerTest {
 
         testee.scheduleScans()
 
-        verify(mockWorkManager, times(3)).enqueueUniquePeriodicWork(
+        verify(mockWorkManager, times(4)).enqueueUniquePeriodicWork(
             any(),
             any(),
             any<PeriodicWorkRequest>(),
@@ -243,7 +245,7 @@ class RealPirScanSchedulerTest {
         testee.scheduleScans()
         testee.scheduleScans()
 
-        verify(mockWorkManager, times(6)).enqueueUniquePeriodicWork(
+        verify(mockWorkManager, times(8)).enqueueUniquePeriodicWork(
             any(),
             any(),
             any<PeriodicWorkRequest>(),
@@ -264,8 +266,8 @@ class RealPirScanSchedulerTest {
         testee.cancelScheduledScans(mockContext)
         testee.scheduleScans()
 
-        verify(mockWorkManager, times(3)).cancelUniqueWork(any())
-        verify(mockWorkManager, times(6)).enqueueUniquePeriodicWork(
+        verify(mockWorkManager, times(4)).cancelUniqueWork(any())
+        verify(mockWorkManager, times(8)).enqueueUniquePeriodicWork(
             any(),
             any(),
             any<PeriodicWorkRequest>(),
@@ -291,6 +293,11 @@ class RealPirScanSchedulerTest {
             any(),
             any<PeriodicWorkRequest>(),
         )
+        verify(mockWorkManager).enqueueUniquePeriodicWork(
+            eq(PirBackgroundScanStatsWorker.TAG_PIR_BACKGROUND_STATS_DAILY),
+            any(),
+            any<PeriodicWorkRequest>(),
+        )
     }
 
     @Test
@@ -300,5 +307,6 @@ class RealPirScanSchedulerTest {
         verify(mockWorkManager).cancelUniqueWork(eq(PirScheduledScanRemoteWorker.TAG_SCHEDULED_SCAN))
         verify(mockWorkManager).cancelUniqueWork(eq(PirEmailConfirmationRemoteWorker.TAG_EMAIL_CONFIRMATION))
         verify(mockWorkManager).cancelUniqueWork(eq(PirCustomStatsWorker.TAG_PIR_RECURRING_CUSTOM_STATS))
+        verify(mockWorkManager).cancelUniqueWork(eq(PirBackgroundScanStatsWorker.TAG_PIR_BACKGROUND_STATS_DAILY))
     }
 }

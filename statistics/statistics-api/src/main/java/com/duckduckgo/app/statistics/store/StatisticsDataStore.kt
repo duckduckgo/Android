@@ -28,6 +28,7 @@ interface StatisticsDataStore {
     var atb: Atb?
     var appRetentionAtb: String?
     var searchRetentionAtb: String?
+    var duckaiRetentionAtb: String?
     var variant: String?
     var referrerVariant: String?
 

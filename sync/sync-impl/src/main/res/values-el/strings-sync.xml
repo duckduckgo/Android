@@ -34,6 +34,7 @@
     <string name="sync_setup_begin_syncing">Έναρξη συγχρονισμού</string>
     <string name="sync_setup_with_another_device_cta_title">Συγχρονισμός με άλλη συσκευή</string>
     <string name="sync_setup_with_another_device_cta_subtitle">Συγχρονίστε με ασφάλεια σελιδοδείκτες και κωδικούς πρόσβασης μεταξύ των συσκευών σας.</string>
+    <string name="sync_setup_with_another_device_cta_subtitle_with_ai_chat">Συγχρονίστε με ασφάλεια σελιδοδείκτες, κωδικούς πρόσβασης και συνομιλίες στο Duck.ai μεταξύ των συσκευών σας.</string>
     <string name="sync_off_hint">Τα δεδομένα σας είναι κρυπτογραφημένα από άκρο σε άκρο και το DuckDuckGo δεν έχει πρόσβαση στο κλειδί κρυπτογράφησης.</string>
     <string name="sync_setup_single_device_title">Εγκατάσταση μίας συσκευής</string>
     <string name="sync_setup_other_options_title">Άλλες επιλογές</string>
@@ -45,12 +46,14 @@
     <!-- Setup screen -->
     <string name="sync_enable_sync_title">Ρύθμιση Συγχρονισμού και δημιουργίας αντιγράφων ασφάλειας!</string>
     <string name="sync_enable_sync_content">Οι σελιδοδείκτες και οι κωδικοί πρόσβασής σας προετοιμάζονται για συγχρονισμό. Αυτό θα πρέπει να διαρκέσει ελάχιστο χρόνο.</string>
+    <string name="sync_enable_sync_content_with_ai_chat">Οι σελιδοδείκτες, οι κωδικοί πρόσβασης και οι συνομιλίες σας στο Duck.ai προετοιμάζονται για συγχρονισμό. Αυτό θα πρέπει να διαρκέσει ελάχιστο χρόνο.</string>
     <string name="sync_enable_options">Επιλογές</string>
     <string name="sync_enable_option_favicons_title">Λήψη εικονιδίων σελιδοδείκτη</string>
     <string name="sync_enable_option_favicons_subtitle">Αυτόματη λήψη εικονιδίων για τους συγχρονισμένους σελιδοδείκτες.</string>
     <string name="sync_enable_connecting">Σύνδεση...</string>
     <string name="sync_intro_enable_title">Συγχρονισμός και δημιουργία αντιγράφων ασφάλειας αυτής της συσκευής</string>
     <string name="sync_intro_enable_content">Αυτό δημιουργεί ένα κρυπτογραφημένο αντίγραφο ασφάλειας των σελιδοδεικτών και των κωδικών πρόσβασής σας στον ασφαλή διακομιστή του DuckDuckGo, το οποίο μπορεί να συγχρονιστεί με τις άλλες συσκευές σας. Το κλειδί κρυπτογράφησης αποθηκεύεται μόνο στη συσκευή σας. Δεν μπορεί να έχει πρόσβαση σε αυτό το DuckDuckGo.</string>
+    <string name="sync_intro_enable_content_with_ai_chat">Αυτό δημιουργεί ένα κρυπτογραφημένο αντίγραφο ασφάλειας των σελιδοδεικτών, των κωδικών πρόσβασής σας και των συνομιλιών στο Duck.ai στον ασφαλή διακομιστή του DuckDuckGo, το οποίο μπορεί να συγχρονιστεί με τις άλλες συσκευές σας. \n\n Το κλειδί κρυπτογράφησης αποθηκεύεται μόνο στη συσκευή σας. Δεν μπορεί να έχει πρόσβαση σε αυτό το DuckDuckGo.</string>
     <string name="sync_intro_enable_footer">Μπορείτε να προβείτε σε συγχρονισμό με τις άλλες συσκευές σας αργότερα.</string>
     <string name="sync_intro_enable_cta">Ενεργοποίηση συγχρονισμού και δημιουργίας αντιγράφων ασφαλείας</string>
     <string name="sync_intro_recover_title">Ανάκτηση συγχρονισμένων δεδομένων</string>

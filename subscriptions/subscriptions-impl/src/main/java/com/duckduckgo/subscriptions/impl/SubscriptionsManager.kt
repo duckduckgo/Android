@@ -58,6 +58,7 @@ import com.duckduckgo.subscriptions.impl.billing.RetryPolicy
 import com.duckduckgo.subscriptions.impl.billing.SubscriptionReplacementMode
 import com.duckduckgo.subscriptions.impl.billing.retry
 import com.duckduckgo.subscriptions.impl.model.Entitlement
+import com.duckduckgo.subscriptions.impl.notification.VpnReminderNotificationScheduler
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionFailureErrorType
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.AccessToken
@@ -308,6 +309,7 @@ class RealSubscriptionsManager @Inject constructor(
     private val subscriptionSwitchWideEvent: SubscriptionSwitchWideEvent,
     private val freeTrialConversionWideEvent: FreeTrialConversionWideEvent,
     private val subscriptionRestoreWideEvent: SubscriptionRestoreWideEvent,
+    private val vpnReminderNotificationScheduler: VpnReminderNotificationScheduler,
 ) : SubscriptionsManager {
     private val adapter = Moshi.Builder().build().adapter(ResponseError::class.java)
 
@@ -735,6 +737,9 @@ class RealSubscriptionsManager @Inject constructor(
                 subscriptionPurchaseWideEvent.onPurchaseConfirmationSuccess()
                 if (subscription.activeOffers.contains(ActiveOfferType.TRIAL)) {
                     freeTrialConversionWideEvent.onFreeTrialStarted(subscription.productId)
+                    if (privacyProFeature.get().vpnReminderNotification().isEnabled()) {
+                        vpnReminderNotificationScheduler.scheduleVpnReminderNotification()
+                    }
                 }
             } else {
                 handlePurchaseFailed()

@@ -17,11 +17,6 @@
                 "type": "string"
             },
             {
-                "key": "attempt_id",
-                "description": "Client-generated ID of the opt-out attempt",
-                "type": "string"
-            },
-            {
                 "key": "duration",
                 "description": "Total duration of the opt-out attempt in milliseconds",
                 "type": "string"
@@ -69,11 +64,6 @@
             {
                 "key": "broker_version",
                 "description": "The version of the broker JSON file",
-                "type": "string"
-            },
-            {
-                "key": "attempt_id",
-                "description": "Client-generated ID of the opt-out attempt",
                 "type": "string"
             },
             {
@@ -573,11 +563,6 @@
                 "key": "parent",
                 "description": "The parent data broker url of the one this opt-out attempt targets",
                 "type": "string"
-            },
-            {
-                "key": "attempt_id",
-                "description": "Client-generated ID of the opt-out attempt",
-                "type": "string"
             }
         ]
     },
@@ -601,11 +586,6 @@
             {
                 "key": "broker_version",
                 "description": "The version of the broker JSON file",
-                "type": "string"
-            },
-            {
-                "key": "attempt_id",
-                "description": "Client-generated ID of the opt-out attempt",
                 "type": "string"
             },
             {
@@ -648,11 +628,6 @@
                 "type": "string"
             },
             {
-                "key": "attempt_id",
-                "description": "Client-generated ID of the opt-out attempt",
-                "type": "string"
-            },
-            {
                 "key": "duration",
                 "description": "Stage duration in milliseconds",
                 "type": "string"
@@ -689,11 +664,6 @@
             {
                 "key": "broker_version",
                 "description": "The version of the broker JSON file",
-                "type": "string"
-            },
-            {
-                "key": "attempt_id",
-                "description": "Client-generated ID of the opt-out attempt",
                 "type": "string"
             },
             {
@@ -736,11 +706,6 @@
                 "type": "string"
             },
             {
-                "key": "attempt_id",
-                "description": "Client-generated ID of the opt-out attempt",
-                "type": "string"
-            },
-            {
                 "key": "duration",
                 "description": "Stage duration in milliseconds",
                 "type": "string"
@@ -777,11 +742,6 @@
             {
                 "key": "broker_version",
                 "description": "The version of the broker JSON file",
-                "type": "string"
-            },
-            {
-                "key": "attempt_id",
-                "description": "Client-generated ID of the opt-out attempt",
                 "type": "string"
             },
             {
@@ -829,11 +789,6 @@
                 "type": "string"
             },
             {
-                "key": "attempt_id",
-                "description": "The ID of the opt out attempt",
-                "type": "string"
-            },
-            {
                 "key": "action_id",
                 "description": "The ID of the action, to disambiguate between multiple actions in the same opt out attempt",
                 "type": "string"
@@ -873,11 +828,6 @@
                 "type": "string"
             },
             {
-                "key": "attempt_id",
-                "description": "The ID of the opt out attempt",
-                "type": "string"
-            },
-            {
                 "key": "action_id",
                 "description": "The ID of the action, to disambiguate between multiple actions in the same opt out attempt",
                 "type": "string"
@@ -909,11 +859,6 @@
             {
                 "key": "broker_version",
                 "description": "The version of the broker JSON file",
-                "type": "string"
-            },
-            {
-                "key": "attempt_id",
-                "description": "Client-generated ID of the opt-out attempt",
                 "type": "string"
             },
             {
@@ -956,11 +901,6 @@
                 "type": "string"
             },
             {
-                "key": "attempt_id",
-                "description": "Client-generated ID of the opt-out attempt",
-                "type": "string"
-            },
-            {
                 "key": "duration",
                 "description": "Stage duration in milliseconds",
                 "type": "string"
@@ -992,11 +932,6 @@
             {
                 "key": "parent",
                 "description": "The parent data broker of the one this opt-out attempt targets",
-                "type": "string"
-            },
-            {
-                "key": "attempt_id",
-                "description": "Client-generated ID of the opt-out attempt",
                 "type": "string"
             },
             {
@@ -1142,11 +1077,6 @@
                 "key": "man",
                 "description": "Manufacturer of the device",
                 "type": "string"
-            },
-            {
-                "key": "batteryOptimizations",
-                "description": "If device has battery optimizations enabled for the app",
-                "enum": ["false", "true"]
             }
         ]
     },
@@ -1166,11 +1096,6 @@
                 "key": "man",
                 "description": "Manufacturer of the device",
                 "type": "string"
-            },
-            {
-                "key": "batteryOptimizations",
-                "description": "If device has battery optimizations enabled for the app",
-                "enum": ["false", "true"]
             }
         ]
     },
@@ -1192,11 +1117,6 @@
                 "key": "man",
                 "description": "Manufacturer of the device",
                 "type": "string"
-            },
-            {
-                "key": "batteryOptimizations",
-                "description": "If device has battery optimizations enabled for the app",
-                "enum": ["false", "true"]
             }
         ]
     },
@@ -1216,11 +1136,6 @@
                 "key": "man",
                 "description": "Manufacturer of the device",
                 "type": "string"
-            },
-            {
-                "key": "batteryOptimizations",
-                "description": "If device has battery optimizations enabled for the app",
-                "enum": ["false", "true"]
             }
         ]
     },
@@ -1311,11 +1226,6 @@
                 "type": "string"
             },
             {
-                "key": "attempt_id",
-                "description": "Client-generated ID of the attempt",
-                "type": "string"
-            },
-            {
                 "key": "action_id",
                 "description": "Predefined identifier of the broker action executed in this stage",
                 "type": "string"
@@ -1355,11 +1265,6 @@
                 "type": "number"
             },
             {
-                "key": "attempt_id",
-                "description": "Client-generated ID of the attempt",
-                "type": "string"
-            },
-            {
                 "key": "action_id",
                 "description": "Predefined identifier of the broker action executed in this stage",
                 "type": "string"
@@ -1391,11 +1296,6 @@
             {
                 "key": "duration",
                 "description": "Stage duration in milliseconds",
-                "type": "string"
-            },
-            {
-                "key": "attempt_id",
-                "description": "Client-generated ID of the attempt",
                 "type": "string"
             },
             {
@@ -1433,11 +1333,6 @@
                 "type": "string"
             },
             {
-                "key": "attempt_id",
-                "description": "Client-generated ID of the attempt",
-                "type": "string"
-            },
-            {
                 "key": "action_id",
                 "description": "Predefined identifier of the broker action executed in this stage",
                 "type": "string"
@@ -1459,11 +1354,6 @@
             {
                 "key": "broker_version",
                 "description": "The version of the broker JSON file",
-                "type": "string"
-            },
-            {
-                "key": "attempt_id",
-                "description": "Client-generated ID of the attempt",
                 "type": "string"
             },
             {
@@ -1503,11 +1393,6 @@
                 "key": "man",
                 "description": "Manufacturer of the device",
                 "type": "string"
-            },
-            {
-                "key": "batteryOptimizations",
-                "description": "If device has battery optimizations enabled for the app",
-                "enum": ["false", "true"]
             }
         ]
     },
@@ -1537,11 +1422,6 @@
                 "key": "man",
                 "description": "Manufacturer of the device",
                 "type": "string"
-            },
-            {
-                "key": "batteryOptimizations",
-                "description": "If device has battery optimizations enabled for the app",
-                "enum": ["false", "true"]
             }
         ]
     },
@@ -1551,5 +1431,57 @@
         "triggers": ["other"],
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"]
+    },
+    "m_dbp_background-run_stats": {
+        "description": "Android specific pixel fired once daily to report if expected runs have occurred within the expected threshold",
+        "owners": ["karlenDimla", "landomen"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "scanFrequencyWithinThreshold",
+                "description": "A background scan has run within 48 hours since the last one",
+                "enum": ["false", "true"]
+            }
+        ]
+    },
+    "m_dbp_scan_invalid-event_dropped": {
+        "description": "Android specific pixel fired whenever an invalid event occurs during scan processing",
+        "owners": ["karlenDimla", "landomen"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "data_broker",
+                "description": "The URL of the data broker",
+                "type": "string"
+            },
+            {
+                "key": "broker_version",
+                "description": "The version of the broker JSON file",
+                "type": "string"
+            }
+        ]
+    },
+    "m_dbp_optout_invalid-event_dropped": {
+        "description": "Android specific pixel fired whenever an invalid even occurs during optout processing",
+        "owners": ["karlenDimla", "landomen"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "data_broker",
+                "description": "The URL of the data broker",
+                "type": "string"
+            },
+            {
+                "key": "broker_version",
+                "description": "The version of the broker JSON file",
+                "type": "string"
+            }
+        ]
     }
 }

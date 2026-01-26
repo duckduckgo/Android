@@ -80,6 +80,8 @@ import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.DISABLED_WIH_HELP_LINK
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.ENABLED
 import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
+import com.duckduckgo.remote.messaging.api.Content
+import com.duckduckgo.remote.messaging.impl.store.ModalSurfaceStore
 import com.duckduckgo.settings.api.SettingsPageFeature
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.DDG_SETTINGS
@@ -118,6 +120,7 @@ class SettingsViewModel @Inject constructor(
     private val duckChat: DuckChat,
     private val duckAiFeatureState: DuckAiFeatureState,
     private val voiceSearchAvailability: VoiceSearchAvailability,
+    private val modalSurfaceStore: ModalSurfaceStore,
     private val privacyProUnifiedFeedback: PrivacyProUnifiedFeedback,
     private val settingsPixelDispatcher: SettingsPixelDispatcher,
     private val autofillFeature: AutofillFeature,
@@ -142,6 +145,7 @@ class SettingsViewModel @Inject constructor(
         val isVoiceSearchVisible: Boolean = false,
         val isAddWidgetInProtectionsVisible: Boolean = false,
         val widgetsInstalled: Boolean = false,
+        val showWhatsNew: Boolean = false,
     )
 
     sealed class Command {
@@ -168,6 +172,10 @@ class SettingsViewModel @Inject constructor(
         data object LaunchFeedback : Command()
         data object LaunchPproUnifiedFeedback : Command()
         data object LaunchOtherPlatforms : Command()
+        data class LaunchWhatsNew(
+            val messageId: String,
+            val messageType: Content.MessageType,
+        ) : Command()
     }
 
     private val viewState = MutableStateFlow(ViewState())
@@ -222,6 +230,9 @@ class SettingsViewModel @Inject constructor(
                     widgetsInstalled = withContext(dispatcherProvider.io()) {
                         widgetCapabilities.hasInstalledWidgets
                     },
+                    showWhatsNew = withContext(dispatcherProvider.io()) {
+                        settingsPageFeature.whatsNewEnabled().isEnabled() && modalSurfaceStore.getLastShownRemoteMessageId() != null
+                    },
                 ),
             )
         }
@@ -251,6 +262,16 @@ class SettingsViewModel @Inject constructor(
 
     fun commands(): Flow<Command> {
         return command.receiveAsFlow()
+    }
+
+    fun onWhatsNewClicked() {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            val messageId = modalSurfaceStore.getLastShownRemoteMessageId()
+            val messageType = modalSurfaceStore.getLastShownRemoteMessageType()
+            if (messageId != null && messageType != null) {
+                command.send(Command.LaunchWhatsNew(messageId, messageType))
+            }
+        }
     }
 
     fun userRequestedToAddHomeScreenWidget() {

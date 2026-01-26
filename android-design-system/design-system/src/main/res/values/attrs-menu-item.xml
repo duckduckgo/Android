@@ -19,6 +19,10 @@
     <!--Menu item view-->
     <declare-styleable name="MenuItemView">
         <attr name="iconDrawable" format="reference" />
+        <attr name="menuSize">
+            <enum name="small" value="0"/>
+            <enum name="medium" value="1"/>
+        </attr>
         <attr name="primaryText" />
         <attr name="typography" />
         <attr name="textType" />

@@ -129,6 +129,8 @@
     <string name="atp_NewTabDisabled"><b>Uygulama İzleme Koruması devre dışı.</b>\nUygulamalarınızda izleme girişimlerini engellemeye devam etmek için dokunun.</string>
     <string name="atp_NewTabRevoked"><b>Cihazınızdaki bir VPN uygulaması Uygulama İzleme Korumasını devre dışı bıraktı.</b>\nYeniden etkinleştirmek için dokunun.</string>
     <string name="atp_NewTabEnabled"><b>Uygulama İzleme Koruması etkinleştirildi</b> ve uygulamalarınızdaki izleme girişimlerini engelliyor.</string>
+    <!-- smartling.character_limit = 15 -->
+    <string name="vpnMenuYellowPill">Ücretsiz deneme</string>
 
     <!-- Exclusion List -->
     <string name="atp_ExclusionListActivityTitle">Tüm Uygulamalar</string>

@@ -17,11 +17,15 @@
 package com.duckduckgo.pir.impl.common.actions
 
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.pir.impl.common.PirRunStateHandler
+import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerStepInvalidEvent
 import com.duckduckgo.pir.impl.common.actions.EventHandler.Next
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.BrokerActionFailed
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.ErrorReceived
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.State
+import com.duckduckgo.pir.impl.models.Broker
+import com.duckduckgo.pir.impl.scripts.models.PirError
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import kotlin.reflect.KClass
@@ -30,7 +34,9 @@ import kotlin.reflect.KClass
     scope = AppScope::class,
     boundType = EventHandler::class,
 )
-class ErrorReceivedHandler @Inject constructor() : EventHandler {
+class ErrorReceivedHandler @Inject constructor(
+    private val pirRunStateHandler: PirRunStateHandler,
+) : EventHandler {
     override val event: KClass<out Event> = ErrorReceived::class
 
     override suspend fun invoke(
@@ -46,6 +52,23 @@ class ErrorReceivedHandler @Inject constructor() : EventHandler {
          *  - ClientError (Unrecoverable)
          *  We don't need to retry the action if any of these errors happen.
          */
+        if (!isEventValid(state, event as ErrorReceived)) {
+            // Nothing to do here, the event is outdated
+            val broker = if (state.brokerStepsToExecute.size <= state.currentBrokerStepIndex) {
+                Broker.unknown()
+            } else {
+                state.brokerStepsToExecute[state.currentBrokerStepIndex].broker
+            }
+
+            pirRunStateHandler.handleState(
+                BrokerStepInvalidEvent(
+                    broker = broker,
+                    runType = state.runType,
+                ),
+            )
+            return Next(nextState = state)
+        }
+
         return Next(
             nextState = state,
             nextEvent = BrokerActionFailed(
@@ -53,5 +76,24 @@ class ErrorReceivedHandler @Inject constructor() : EventHandler {
                 allowRetry = false,
             ),
         )
+    }
+
+    private fun isEventValid(
+        state: State,
+        event: ErrorReceived,
+    ): Boolean {
+        // Broker steps has probably been considered completed before the js response arrived
+        if (state.brokerStepsToExecute.size <= state.currentBrokerStepIndex) return false
+
+        // Broker step actions has probably been considered completed before the js response arrived
+        if (state.brokerStepsToExecute[state.currentBrokerStepIndex].step.actions.size <= state.currentActionIndex) return false
+
+        val currentBrokerStep = state.brokerStepsToExecute[state.currentBrokerStepIndex]
+        val currentBrokerStepAction = currentBrokerStep.step.actions[state.currentActionIndex]
+
+        // The action IDs don't match, the js response is probably for an outdated / old action
+        if (event.error is PirError.ActionError && event.error.actionID != currentBrokerStepAction.id) return false
+
+        return true
     }
 }

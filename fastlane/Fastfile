@@ -257,6 +257,7 @@ platform :android do
     desc "Create a new release branch and update the version"
     lane :tag_and_push_release_version do |options|
         app_version = options[:app_version]
+        ref = options[:ref]
         branch_name = "release/#{app_version}"
 
         # Checkout all branches are available
@@ -266,7 +267,7 @@ platform :android do
         sh("git reset --hard")
         sh("git clean -f -fxd")
 
-        sh("git checkout develop")
+        sh("git checkout #{ref}")
         sh("git submodule update --init --recursive")
         sh("git reset --hard")
         sh("git clean -f -fxd")

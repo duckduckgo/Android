@@ -28,7 +28,10 @@ import com.duckduckgo.pir.impl.common.NativeBrokerActionHandler.NativeAction
 import com.duckduckgo.pir.impl.common.NativeBrokerActionHandler.NativeActionResult.Failure
 import com.duckduckgo.pir.impl.common.NativeBrokerActionHandler.NativeActionResult.Success
 import com.duckduckgo.pir.impl.common.NativeBrokerActionHandler.NativeActionResult.Success.NativeSuccessData
-import com.duckduckgo.pir.impl.scripts.models.PirError
+import com.duckduckgo.pir.impl.scripts.models.PirError.ActionError.CaptchaServiceError
+import com.duckduckgo.pir.impl.scripts.models.PirError.ActionError.CaptchaSolutionFailed
+import com.duckduckgo.pir.impl.scripts.models.PirError.ActionError.ClientError
+import com.duckduckgo.pir.impl.scripts.models.PirError.ActionError.EmailError
 import com.duckduckgo.pir.impl.service.DbpService.CaptchaSolutionMeta
 import com.duckduckgo.pir.impl.service.ResponseError
 import com.duckduckgo.pir.impl.store.PirRepository
@@ -112,9 +115,9 @@ class RealNativeBrokerActionHandlerTest {
 
         assertTrue(result is Failure)
         val failureResult = result as Failure
-        assertEquals(testActionId, failureResult.actionId)
-        assertTrue(failureResult.error is PirError.EmailError)
-        val emailError = failureResult.error as PirError.EmailError
+        assertTrue(failureResult.error is EmailError)
+        val emailError = failureResult.error as EmailError
+        assertEquals(testActionId, emailError.actionID)
         assertEquals(errorCode, emailError.errorCode)
         assertTrue(emailError.error.contains("Error email generation:"))
         assertTrue(emailError.error.contains(errorCode.toString()))
@@ -135,8 +138,9 @@ class RealNativeBrokerActionHandlerTest {
 
         assertTrue(result is Failure)
         val failureResult = result as Failure
-        assertTrue(failureResult.error is PirError.EmailError)
-        val emailError = failureResult.error as PirError.EmailError
+        assertTrue(failureResult.error is EmailError)
+        val emailError = failureResult.error as EmailError
+        assertEquals(testActionId, emailError.actionID)
         assertEquals(errorCode, emailError.errorCode)
         assertTrue(emailError.error.contains("Error email generation:"))
         assertTrue(emailError.error.contains(errorCode.toString()))
@@ -153,9 +157,9 @@ class RealNativeBrokerActionHandlerTest {
 
         assertTrue(result is Failure)
         val failureResult = result as Failure
-        assertEquals(testActionId, failureResult.actionId)
-        assertTrue(failureResult.error is PirError.ClientError)
-        val clientError = failureResult.error as PirError.ClientError
+        assertTrue(failureResult.error is ClientError)
+        val clientError = failureResult.error as ClientError
+        assertEquals(testActionId, clientError.actionID)
         assertTrue(clientError.message.contains("Error email generation:"))
         assertTrue(clientError.message.contains(exceptionMessage))
         assertFalse(failureResult.retryNativeAction)
@@ -243,9 +247,9 @@ class RealNativeBrokerActionHandlerTest {
 
         assertTrue(result is Failure)
         val failureResult = result as Failure
-        assertEquals(testActionId, failureResult.actionId)
-        assertTrue(failureResult.error is PirError.ClientError)
-        val clientError = failureResult.error as PirError.ClientError
+        assertTrue(failureResult.error is ClientError)
+        val clientError = failureResult.error as ClientError
+        assertEquals(testActionId, clientError.actionID)
         assertEquals(errorMessage, clientError.message)
         assertFalse(failureResult.retryNativeAction)
     }
@@ -277,9 +281,9 @@ class RealNativeBrokerActionHandlerTest {
 
         assertTrue(result is Failure)
         val failureResult = result as Failure
-        assertEquals(testActionId, failureResult.actionId)
-        assertTrue(failureResult.error is PirError.CaptchaServiceError)
-        val serviceError = failureResult.error as PirError.CaptchaServiceError
+        assertTrue(failureResult.error is CaptchaServiceError)
+        val serviceError = failureResult.error as CaptchaServiceError
+        assertEquals(testActionId, serviceError.actionID)
         assertEquals(errorCode, serviceError.errorCode)
         assertEquals(errorMessage, serviceError.errorDetails)
         assertFalse(failureResult.retryNativeAction)
@@ -312,9 +316,9 @@ class RealNativeBrokerActionHandlerTest {
 
         assertTrue(result is Failure)
         val failureResult = result as Failure
-        assertEquals(testActionId, failureResult.actionId)
-        assertTrue(failureResult.error is PirError.CaptchaServiceError)
-        val serviceError = failureResult.error as PirError.CaptchaServiceError
+        assertTrue(failureResult.error is CaptchaServiceError)
+        val serviceError = failureResult.error as CaptchaServiceError
+        assertEquals(testActionId, serviceError.actionID)
         assertEquals(errorCode, serviceError.errorCode)
         assertEquals(errorMessage, serviceError.errorDetails)
         assertFalse(failureResult.retryNativeAction)
@@ -347,9 +351,9 @@ class RealNativeBrokerActionHandlerTest {
 
         assertTrue(result is Failure)
         val failureResult = result as Failure
-        assertEquals(testActionId, failureResult.actionId)
-        assertTrue(failureResult.error is PirError.CaptchaServiceError)
-        val serviceError = failureResult.error as PirError.CaptchaServiceError
+        assertTrue(failureResult.error is CaptchaServiceError)
+        val serviceError = failureResult.error as CaptchaServiceError
+        assertEquals(testActionId, serviceError.actionID)
         assertEquals(errorCode, serviceError.errorCode)
         assertEquals(errorMessage, serviceError.errorDetails)
         assertTrue(failureResult.retryNativeAction)
@@ -381,9 +385,9 @@ class RealNativeBrokerActionHandlerTest {
 
         assertTrue(result is Failure)
         val failureResult = result as Failure
-        assertEquals(testActionId, failureResult.actionId)
-        assertTrue(failureResult.error is PirError.CaptchaSolutionFailed)
-        val solutionFailedError = failureResult.error as PirError.CaptchaSolutionFailed
+        assertTrue(failureResult.error is CaptchaSolutionFailed)
+        val solutionFailedError = failureResult.error as CaptchaSolutionFailed
+        assertEquals(testActionId, solutionFailedError.actionID)
         assertEquals(errorMessage, solutionFailedError.message)
         assertFalse(failureResult.retryNativeAction)
     }
@@ -418,9 +422,9 @@ class RealNativeBrokerActionHandlerTest {
 
         assertTrue(result is Failure)
         val failureResult = result as Failure
-        assertEquals(testActionId, failureResult.actionId)
-        assertTrue(failureResult.error is PirError.ClientError)
-        val clientError = failureResult.error as PirError.ClientError
+        assertTrue(failureResult.error is ClientError)
+        val clientError = failureResult.error as ClientError
+        assertEquals(testActionId, clientError.actionID)
         assertEquals("Invalid scenario", clientError.message)
         assertFalse(failureResult.retryNativeAction)
     }
@@ -501,9 +505,9 @@ class RealNativeBrokerActionHandlerTest {
 
         assertTrue(result is Failure)
         val failureResult = result as Failure
-        assertEquals(testActionId, failureResult.actionId)
-        assertTrue(failureResult.error is PirError.ClientError)
-        val clientError = failureResult.error as PirError.ClientError
+        assertTrue(failureResult.error is ClientError)
+        val clientError = failureResult.error as ClientError
+        assertEquals(testActionId, clientError.actionID)
         assertEquals(errorMessage, clientError.message)
         assertFalse(failureResult.retryNativeAction)
     }
@@ -528,9 +532,9 @@ class RealNativeBrokerActionHandlerTest {
 
         assertTrue(result is Failure)
         val failureResult = result as Failure
-        assertEquals(testActionId, failureResult.actionId)
-        assertTrue(failureResult.error is PirError.CaptchaServiceError)
-        val serviceError = failureResult.error as PirError.CaptchaServiceError
+        assertTrue(failureResult.error is CaptchaServiceError)
+        val serviceError = failureResult.error as CaptchaServiceError
+        assertEquals(testActionId, serviceError.actionID)
         assertEquals(errorCode, serviceError.errorCode)
         assertEquals(errorMessage, serviceError.errorDetails)
         assertFalse(failureResult.retryNativeAction)
@@ -556,9 +560,9 @@ class RealNativeBrokerActionHandlerTest {
 
         assertTrue(result is Failure)
         val failureResult = result as Failure
-        assertEquals(testActionId, failureResult.actionId)
-        assertTrue(failureResult.error is PirError.CaptchaServiceError)
-        val serviceError = failureResult.error as PirError.CaptchaServiceError
+        assertTrue(failureResult.error is CaptchaServiceError)
+        val serviceError = failureResult.error as CaptchaServiceError
+        assertEquals(testActionId, serviceError.actionID)
         assertEquals(errorCode, serviceError.errorCode)
         assertEquals(errorMessage, serviceError.errorDetails)
         assertFalse(failureResult.retryNativeAction)
@@ -584,9 +588,9 @@ class RealNativeBrokerActionHandlerTest {
 
         assertTrue(result is Failure)
         val failureResult = result as Failure
-        assertEquals(testActionId, failureResult.actionId)
-        assertTrue(failureResult.error is PirError.CaptchaServiceError)
-        val serviceError = failureResult.error as PirError.CaptchaServiceError
+        assertTrue(failureResult.error is CaptchaServiceError)
+        val serviceError = failureResult.error as CaptchaServiceError
+        assertEquals(testActionId, serviceError.actionID)
         assertEquals(errorCode, serviceError.errorCode)
         assertEquals(errorMessage, serviceError.errorDetails)
         assertTrue(failureResult.retryNativeAction)
@@ -611,9 +615,9 @@ class RealNativeBrokerActionHandlerTest {
 
         assertTrue(result is Failure)
         val failureResult = result as Failure
-        assertEquals(testActionId, failureResult.actionId)
-        assertTrue(failureResult.error is PirError.CaptchaSolutionFailed)
-        val solutionFailedError = failureResult.error as PirError.CaptchaSolutionFailed
+        assertTrue(failureResult.error is CaptchaSolutionFailed)
+        val solutionFailedError = failureResult.error as CaptchaSolutionFailed
+        assertEquals(testActionId, solutionFailedError.actionID)
         assertEquals(errorMessage, solutionFailedError.message)
         assertFalse(failureResult.retryNativeAction)
     }
@@ -632,9 +636,9 @@ class RealNativeBrokerActionHandlerTest {
 
         assertTrue(result is Failure)
         val failureResult = result as Failure
-        assertEquals(testActionId, failureResult.actionId)
-        assertTrue(failureResult.error is PirError.ClientError)
-        val clientError = failureResult.error as PirError.ClientError
+        assertTrue(failureResult.error is ClientError)
+        val clientError = failureResult.error as ClientError
+        assertEquals(testActionId, clientError.actionID)
         assertEquals("Invalid scenario", clientError.message)
         assertFalse(failureResult.retryNativeAction)
     }

@@ -34,9 +34,8 @@
     },
     "widePixelDevMode": {
         "key": "app.dev_mode",
-        "type": "string",
-        "description": "Whether the app is a development build. This is `true` for development builds and `false` for production/internal builds.",
-        "enum": ["true", "false"]
+        "type": "boolean",
+        "description": "Whether the app is a development build. This is `true` for development builds and `false` for production/internal builds."
     },
     "widePixelPlatform": {
         "key": "global.platform",

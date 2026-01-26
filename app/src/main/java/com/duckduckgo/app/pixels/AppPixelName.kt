@@ -24,6 +24,8 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     PROCESS_CREATED_VPN("m_process_created_vpn"),
 
     APP_LAUNCH_VERIFIED_INSTALL("m_app_launched_on_verified_play_store_install"),
+    APP_INSTALL_VERIFIED_INSTALL("verified_app_install"),
+    APP_UPDATE_VERIFIED_INSTALL("verified_app_update"),
 
     FORGET_ALL_PRESSED_BROWSING("mf_bp"),
     FORGET_ALL_PRESSED_TABSWITCHING("mf_tp"),

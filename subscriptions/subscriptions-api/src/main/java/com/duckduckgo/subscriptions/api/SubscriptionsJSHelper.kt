@@ -16,6 +16,7 @@
 
 package com.duckduckgo.subscriptions.api
 
+import android.content.Context
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import org.json.JSONObject
 
@@ -25,6 +26,7 @@ interface SubscriptionsJSHelper {
         method: String,
         id: String?,
         data: JSONObject?,
+        context: Context?,
     ): JsCallbackData?
 }
 

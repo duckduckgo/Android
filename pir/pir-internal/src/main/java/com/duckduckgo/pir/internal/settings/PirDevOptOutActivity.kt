@@ -21,6 +21,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -128,6 +129,8 @@ class PirDevOptOutActivity : DuckDuckGoActivity() {
 
     private fun bindViews() {
         lifecycleScope.launch {
+            binding.manualConfigWarning.isVisible = repository.hasBrokerConfigBeenManuallyUpdated()
+
             repository.getBrokersForOptOut(formOptOutOnly = true).also {
                 brokerOptions.addAll(it)
                 dropDownAdapter.clear()

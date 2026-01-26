@@ -34,6 +34,7 @@ import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -94,13 +95,15 @@ class RemoteMessageModalSurfaceEvaluatorImpl @Inject constructor(
                 ) ?: return@withContext ModalEvaluator.EvaluationResult.Skipped
 
                 // Launch activity in app scope to decouple from evaluation completion
+
+                delay(MODAL_DISPLAY_DELAY)
                 appCoroutineScope.launch(dispatchers.main()) {
                     intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
                     applicationContext.startActivity(intent)
                 }
 
                 // Record this message as shown, and clear background timestamp
-                modalSurfaceStore.recordLastShownRemoteMessageId(message.id)
+                modalSurfaceStore.recordLastShownRemoteMessage(message)
                 modalSurfaceStore.clearBackgroundTimestamp()
 
                 return@withContext ModalEvaluator.EvaluationResult.ModalShown
@@ -120,5 +123,6 @@ class RemoteMessageModalSurfaceEvaluatorImpl @Inject constructor(
 
     companion object {
         private const val BACKGROUND_THRESHOLD_MILLIS = 4 * 60 * 60 * 1000L // 4 hours
+        private const val MODAL_DISPLAY_DELAY = 1500L
     }
 }

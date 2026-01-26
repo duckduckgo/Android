@@ -41,6 +41,7 @@ class FakeDuckChatInternal(
     private val _showMainButtonsInInputScreen = MutableStateFlow(false)
     private val inputScreenUserSettingEnabled = MutableStateFlow(false)
     private val cosmeticInputScreenUserSettingEnabled = MutableStateFlow<Boolean?>(null)
+    private val automaticContextAttachmentUserSettingEnabled = MutableStateFlow<Boolean>(false)
 
     // DuckChat interface methods
     override fun isEnabled(): Boolean = enabled
@@ -72,6 +73,7 @@ class FakeDuckChatInternal(
     override fun observeInputScreenUserSettingEnabled(): Flow<Boolean> = inputScreenUserSettingEnabled
 
     override fun observeCosmeticInputScreenUserSettingEnabled(): Flow<Boolean?> = cosmeticInputScreenUserSettingEnabled
+    override fun observeAutomaticContextAttachmentUserSettingEnabled(): Flow<Boolean> = automaticContextAttachmentUserSettingEnabled
 
     // DuckChatInternal interface methods
     override suspend fun setEnableDuckChatUserSetting(enabled: Boolean) {
@@ -88,6 +90,10 @@ class FakeDuckChatInternal(
 
     override suspend fun setShowInVoiceSearchUserSetting(showToggle: Boolean) {
         showInVoiceSearchUserSetting.value = showToggle
+    }
+
+    override suspend fun setAutomaticPageContextUserSetting(isEnabled: Boolean) {
+        automaticContextAttachmentUserSettingEnabled.value = isEnabled
     }
 
     override fun observeEnableDuckChatUserSetting(): Flow<Boolean> = enableDuckChatUserSetting

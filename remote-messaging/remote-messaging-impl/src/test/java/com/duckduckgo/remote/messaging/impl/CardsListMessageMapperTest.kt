@@ -17,6 +17,7 @@
 package com.duckduckgo.remote.messaging.impl
 
 import com.duckduckgo.remote.messaging.api.Action
+import com.duckduckgo.remote.messaging.api.CardItem
 import com.duckduckgo.remote.messaging.api.CardItemType
 import com.duckduckgo.remote.messaging.api.Content
 import com.duckduckgo.remote.messaging.api.JsonMessageAction
@@ -96,7 +97,7 @@ class CardsListMessageMapperTest {
         val content = remoteMessages.first().content as Content.CardsList
         assertEquals(3, content.listItems.size)
 
-        val item1 = content.listItems[0]
+        val item1 = content.listItems[0] as CardItem.ListItem
         assertEquals("feature1", item1.id)
         assertEquals(CardItemType.TWO_LINE_LIST_ITEM, item1.type)
         assertEquals("Feature One", item1.titleText)
@@ -105,12 +106,12 @@ class CardsListMessageMapperTest {
         assertTrue(item1.primaryAction is Action.Url)
         assertEquals("https://example.com/feature1", (item1.primaryAction as Action.Url).value)
 
-        val item2 = content.listItems[1]
+        val item2 = content.listItems[1] as CardItem.ListItem
         assertEquals("feature2", item2.id)
         assertEquals("Feature Two", item2.titleText)
         assertEquals(Content.Placeholder.RADAR, item2.placeholder)
 
-        val item3 = content.listItems[2]
+        val item3 = content.listItems[2] as CardItem.ListItem
         assertEquals("feature3", item3.id)
         assertEquals("Feature Three", item3.titleText)
         assertEquals(Content.Placeholder.KEY_IMPORT, item3.placeholder)
@@ -267,8 +268,8 @@ class CardsListMessageMapperTest {
         assertEquals(1, remoteMessages.size)
         val content = remoteMessages.first().content as Content.CardsList
         assertEquals(Content.Placeholder.DDG_ANNOUNCE, content.placeholder)
-        assertEquals(Content.Placeholder.DUCK_AI, content.listItems[0].placeholder)
-        assertEquals(Content.Placeholder.PRIVACY_SHIELD, content.listItems[1].placeholder)
+        assertEquals(Content.Placeholder.DUCK_AI, (content.listItems[0] as CardItem.ListItem).placeholder)
+        assertEquals(Content.Placeholder.PRIVACY_SHIELD, (content.listItems[1] as CardItem.ListItem).placeholder)
     }
 
     @Test
@@ -317,11 +318,11 @@ class CardsListMessageMapperTest {
         val content = remoteMessages.first().content as Content.CardsList
         assertEquals(3, content.listItems.size)
 
-        assertTrue(content.listItems[0].primaryAction is Action.Url)
-        assertTrue(content.listItems[1].primaryAction is Action.Dismiss)
-        assertTrue(content.listItems[2].primaryAction is Action.Share)
+        assertTrue((content.listItems[0] as CardItem.ListItem).primaryAction is Action.Url)
+        assertTrue((content.listItems[1] as CardItem.ListItem).primaryAction is Action.Dismiss)
+        assertTrue((content.listItems[2] as CardItem.ListItem).primaryAction is Action.Share)
 
-        val shareAction = content.listItems[2].primaryAction as Action.Share
+        val shareAction = (content.listItems[2] as CardItem.ListItem).primaryAction as Action.Share
         assertEquals("Share this!", shareAction.value)
         assertEquals("Share Title", shareAction.title)
     }
@@ -364,12 +365,12 @@ class CardsListMessageMapperTest {
         val content = remoteMessages.first().content as Content.CardsList
         assertEquals(2, content.listItems.size)
 
-        val item1 = content.listItems[0]
+        val item1 = content.listItems[0] as CardItem.ListItem
         assertEquals("item1", item1.id)
         assertEquals(listOf(1, 2, 3), item1.matchingRules)
         assertEquals(listOf(4, 5), item1.exclusionRules)
 
-        val item2 = content.listItems[1]
+        val item2 = content.listItems[1] as CardItem.ListItem
         assertEquals("item2", item2.id)
         assertEquals(listOf(6), item2.matchingRules)
         assertEquals(emptyList<Int>(), item2.exclusionRules)
@@ -401,7 +402,7 @@ class CardsListMessageMapperTest {
         val content = remoteMessages.first().content as Content.CardsList
         assertEquals(1, content.listItems.size)
 
-        val item = content.listItems[0]
+        val item = content.listItems[0] as CardItem.ListItem
         assertEquals("item1", item.id)
         assertEquals(emptyList<Int>(), item.matchingRules)
         assertEquals(emptyList<Int>(), item.exclusionRules)

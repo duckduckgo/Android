@@ -18,6 +18,7 @@ package com.duckduckgo.autofill.impl.securestorage.di
 
 import android.content.Context
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.impl.securestorage.DerivedKeySecretFactory
 import com.duckduckgo.autofill.impl.securestorage.RealDerivedKeySecretFactory
@@ -46,9 +47,10 @@ object SecureStorageModule {
         dispatcherProvider: DispatcherProvider,
         autofillFeature: AutofillFeature,
         sharedPreferencesProvider: SharedPreferencesProvider,
+        pixel: Pixel,
     ): SecureStorageKeyRepository =
         RealSecureStorageKeyRepository(
-            RealSecureStorageKeyStore(context, coroutineScope, dispatcherProvider, autofillFeature, sharedPreferencesProvider),
+            RealSecureStorageKeyStore(context, coroutineScope, dispatcherProvider, autofillFeature, sharedPreferencesProvider, pixel),
         )
 }
 

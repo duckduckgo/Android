@@ -21,6 +21,8 @@ import android.app.Activity
 import android.content.Intent
 import android.graphics.Rect
 import android.os.Bundle
+import android.transition.ChangeBounds
+import android.transition.TransitionManager
 import android.util.TypedValue
 import android.view.Gravity
 import android.view.View
@@ -30,17 +32,21 @@ import android.widget.FrameLayout
 import android.widget.Toast
 import android.widget.Toast.LENGTH_SHORT
 import androidx.activity.OnBackPressedCallback
+import androidx.core.view.isNotEmpty
 import androidx.core.view.isVisible
+import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.store.AppTheme
+import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.extensions.hideKeyboard
 import com.duckduckgo.common.utils.extensions.showKeyboard
@@ -64,11 +70,13 @@ import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.SubmitSearch
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.SwitchToTab
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.UserSubmittedQuery
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.InputFieldCommand
+import com.duckduckgo.duckchat.impl.inputscreen.ui.state.InputScreenVisibilityState
 import com.duckduckgo.duckchat.impl.inputscreen.ui.state.SubmitButtonIcon.SEARCH
 import com.duckduckgo.duckchat.impl.inputscreen.ui.state.SubmitButtonIcon.SEND
 import com.duckduckgo.duckchat.impl.inputscreen.ui.tabs.InputScreenPagerAdapter
 import com.duckduckgo.duckchat.impl.inputscreen.ui.view.InputModeWidget
 import com.duckduckgo.duckchat.impl.inputscreen.ui.view.InputScreenButtons
+import com.duckduckgo.duckchat.impl.inputscreen.ui.view.SwipeableRecyclerView
 import com.duckduckgo.duckchat.impl.inputscreen.ui.viewmodel.InputScreenViewModel
 import com.duckduckgo.duckchat.impl.inputscreen.ui.viewmodel.InputScreenViewModel.InputScreenViewModelFactory
 import com.duckduckgo.duckchat.impl.inputscreen.ui.viewmodel.InputScreenViewModel.InputScreenViewModelProviderFactory
@@ -124,6 +132,10 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
 
     private var isKeyboardCurrentlyVisible: Boolean = false
     private var globalLayoutListener: ViewTreeObserver.OnGlobalLayoutListener? = null
+    private var previousSearchMode: Boolean? = null
+    private var wasAutoCompleteVisibleOnSwipeStart: Boolean = false
+    private var hadInputTextOnSwipeStart: Boolean = false
+    private var autoCompleteTargetVisibility: Boolean = false
 
     private val pageChangeCallback =
         object : OnPageChangeCallback() {
@@ -137,12 +149,25 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
                 positionOffset: Float,
                 positionOffsetPixels: Int,
             ) {
-                viewModel.onPageScrolled(position, positionOffset)
+                viewModel.onPageScrolled(position, positionOffset, wasAutoCompleteVisibleOnSwipeStart, hadInputTextOnSwipeStart)
             }
 
             override fun onPageScrollStateChanged(state: Int) {
-                if (state == ViewPager2.SCROLL_STATE_IDLE) {
-                    viewModel.onScrollStateIdle()
+                when (state) {
+                    ViewPager2.SCROLL_STATE_DRAGGING -> {
+                        wasAutoCompleteVisibleOnSwipeStart = autoCompleteTargetVisibility
+                        hadInputTextOnSwipeStart = inputModeWidget.text.isNotBlank()
+                    }
+                    ViewPager2.SCROLL_STATE_IDLE -> {
+                        viewModel.onScrollStateIdle()
+                        wasAutoCompleteVisibleOnSwipeStart = false
+                        hadInputTextOnSwipeStart = false
+
+                        if (autoCompleteTargetVisibility) {
+                            binding.viewPager.isUserInputEnabled = false
+                        }
+                    }
+                    else -> {}
                 }
             }
         }
@@ -222,11 +247,20 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
 
         configureViewPager()
 
+        binding.newTabContainerScrollView.setViewPager(binding.viewPager)
+
+        if (!useTopBar) {
+            binding.autoCompleteBottomFadeContainer.isVisible = false
+            binding.ddgLogoContainer.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+                topMargin -= resources.getDimensionPixelSize(R.dimen.inputScreenLogoBottomBarTopMargin)
+            }
+        }
+
         val tabs = when (val browserButtonsConfig = params?.browserButtonsConfig) {
             is InputScreenBrowserButtonsConfig.Enabled -> browserButtonsConfig.tabs
             else -> 0
         }
-        configureOmnibar(tabs)
+        configureOmnibar(tabs, useTopBar)
 
         configureVoice(useTopBar)
         configureObservers()
@@ -264,6 +298,9 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         logoAnimator?.cancel()
         logoAnimator = null
         binding.ddgLogo.clearAnimation()
+        binding.ddgLogoContainer.animate().cancel()
+        binding.autoCompleteOverlay.animate().cancel()
+        binding.newTabContainerScrollView.animate().cancel()
         binding.viewPager.unregisterOnPageChangeCallback(pageChangeCallback)
         globalLayoutListener?.let {
             binding.root.viewTreeObserver.removeOnGlobalLayoutListener(it)
@@ -304,27 +341,21 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
             }.launchIn(lifecycleScope)
 
         viewModel.visibilityState
-            .onEach {
-                binding.ddgLogoContainer.isVisible =
-                    if (it.searchMode) {
-                        it.showSearchLogo
-                    } else {
-                        it.showChatLogo
-                    }
-
-                binding.ddgLogo.progress = if (it.searchMode) 0f else 1f
-                inputScreenButtons.setSendButtonVisible(it.submitButtonVisible)
-                inputScreenButtons.setNewLineButtonVisible(it.newLineButtonVisible)
-                inputModeWidget.setMainButtonsVisible(
-                    it.mainButtonsVisible,
-                )
+            .onEach { state ->
+                updateLogoVisibility(state)
+                beginRootTransition()
+                updateFavoritesVisibility(state.searchMode, !state.autoCompleteSuggestionsVisible)
+                hideAutoCompleteIfOnChatTab(state)
+                previousSearchMode = state.searchMode
+                updateButtonVisibility(state)
+                inputScreenButtons.setNewLineButtonVisible(state.newLineButtonVisible)
             }.launchIn(lifecycleScope)
 
         viewModel.visibilityState
             .map { it.actionButtonsContainerVisible }
             .distinctUntilChanged()
             .onEach {
-                inputModeWidget.setInputScreenButtonsVisible(it)
+                inputModeWidget.setInputScreenButtonsVisible(inputScreenConfigResolver.useTopBar() && it)
             }.launchIn(lifecycleScope)
     }
 
@@ -384,7 +415,7 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         binding.viewPager.registerOnPageChangeCallback(pageChangeCallback)
     }
 
-    private fun configureOmnibar(tabs: Int) =
+    private fun configureOmnibar(tabs: Int, useTopBar: Boolean) =
         with(inputModeWidget) {
             onSearchSent = { query ->
                 viewModel.onSearchSubmitted(query)
@@ -399,20 +430,38 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
                 binding.viewPager.setCurrentItem(0, true)
                 viewModel.onSearchSelected()
                 viewModel.onSearchInputTextChanged(inputModeWidget.text)
-                binding.ddgLogoContainer.isVisible = viewModel.visibilityState.value.showSearchLogo
+
+                if (viewModel.visibilityState.value.showSearchLogo && !viewModel.visibilityState.value.autoCompleteSuggestionsVisible) {
+                    binding.ddgLogoContainer.isVisible = true
+                } else {
+                    if (binding.ddgLogoContainer.isVisible) {
+                        binding.ddgLogoContainer.animate()
+                            .alpha(0f)
+                            .setDuration(LOGO_FADE_DURATION)
+                            .withEndAction {
+                                binding.ddgLogoContainer.isVisible = false
+                                binding.ddgLogoContainer.alpha = 1f
+                            }
+                            .start()
+                    }
+                }
             }
             onChatSelected = {
                 binding.viewPager.setCurrentItem(1, true)
                 viewModel.onChatSelected()
                 viewModel.onChatInputTextChanged(inputModeWidget.text)
-                binding.ddgLogoContainer.apply {
-                    val showChatLogo = viewModel.visibilityState.value.showChatLogo
-                    val showSearchLogo = viewModel.visibilityState.value.showSearchLogo
-                    isVisible = showChatLogo
-                    if (showChatLogo && !showSearchLogo) {
-                        alpha = 0f
-                        animate().alpha(1f).setDuration(LOGO_FADE_DURATION).start()
-                    }
+                if (!useTopBar) {
+                    inputScreenButtons.setSendButtonVisible(true)
+                    inputModeWidget.setInputScreenButtonsVisible(true)
+                }
+
+                if (viewModel.visibilityState.value.showSearchLogo && !viewModel.visibilityState.value.autoCompleteSuggestionsVisible) {
+                    binding.ddgLogoContainer.isVisible = true
+                } else if (viewModel.visibilityState.value.showChatLogo) {
+                    binding.ddgLogo.progress = 1f
+                    binding.ddgLogoContainer.alpha = 0f
+                    binding.ddgLogoContainer.isVisible = true
+                    binding.ddgLogoContainer.animate().alpha(1f).setDuration(LOGO_FADE_DURATION).start()
                 }
             }
             onSubmitMessageAvailable = { isAvailable ->
@@ -426,12 +475,17 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
             }
             onChatTextChanged = { text ->
                 viewModel.onChatInputTextChanged(text)
+                if (!useTopBar) {
+                    val isOnChatTab = inputModeWidget.isChatTabSelected() || !viewModel.visibilityState.value.searchMode
+                    inputScreenButtons.setSendButtonVisible(isOnChatTab)
+                    inputModeWidget.setInputScreenButtonsVisible(isOnChatTab)
+                }
             }
             onInputFieldClicked = {
                 viewModel.onInputFieldTouched()
             }
             onTabTapped = { index ->
-                viewModel.onTabTapped(index)
+                viewModel.onTabTapped(index, inputModeWidget.text)
             }
             tabSwitcherButton.count = tabs
             onTabSwitcherTapped = {
@@ -528,6 +582,8 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
                     R.raw.duckduckgo_ai_transition_dark
                 },
             )
+            val initialProgress = if (viewModel.visibilityState.value.searchMode) 0f else 1f
+            progress = initialProgress
         }
 
     private fun setLogoProgress(targetProgress: Float) {
@@ -567,9 +623,249 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
             .launchIn(lifecycleScope)
     }
 
+    private fun updateLogoVisibility(state: InputScreenVisibilityState) {
+        val wasChatMode = previousSearchMode == false
+        val logoWasVisible = binding.ddgLogoContainer.isVisible && binding.ddgLogoContainer.alpha > 0f
+
+        val shouldBeVisible = when {
+            state.showSearchLogo -> true
+            state.searchMode -> false
+            else -> state.showChatLogo
+        }
+
+        if (!shouldBeVisible && logoWasVisible && wasChatMode && state.searchMode) {
+            fadeOutLogo()
+        } else {
+            showOrHideLogo(shouldBeVisible, !logoWasVisible, state.searchMode)
+        }
+    }
+
+    private fun fadeOutLogo() {
+        binding.ddgLogoContainer.animate()
+            .alpha(0f)
+            .setDuration(LOGO_FADE_DURATION)
+            .withEndAction {
+                binding.ddgLogoContainer.isVisible = false
+                binding.ddgLogoContainer.alpha = 1f
+            }
+            .start()
+    }
+
+    private fun showOrHideLogo(shouldBeVisible: Boolean, wasHidden: Boolean, searchMode: Boolean) {
+        binding.ddgLogoContainer.animate().cancel()
+        binding.ddgLogoContainer.alpha = 1f
+        if (shouldBeVisible && wasHidden) {
+            binding.ddgLogo.progress = if (searchMode) 0f else 1f
+        }
+        binding.ddgLogoContainer.isVisible = shouldBeVisible
+    }
+
+    private fun hideAutoCompleteIfOnChatTab(state: InputScreenVisibilityState) {
+        if (!state.searchMode && autoCompleteTargetVisibility) {
+            autoCompleteTargetVisibility = false
+            binding.autoCompleteOverlay.animate().cancel()
+            hideAutoComplete()
+        }
+    }
+
+    private fun updateButtonVisibility(state: InputScreenVisibilityState) {
+        val useTopBar = inputScreenConfigResolver.useTopBar()
+        if (useTopBar) {
+            inputScreenButtons.setSendButtonVisible(state.submitButtonVisible)
+        } else {
+            val isOnChatTab = inputModeWidget.isChatTabSelected() || !state.searchMode
+            inputScreenButtons.setSendButtonVisible(isOnChatTab)
+            inputModeWidget.setInputScreenButtonsVisible(isOnChatTab)
+        }
+        inputModeWidget.setMainButtonsVisible(state.mainButtonsVisible)
+    }
+
+    fun getFavoritesContainer(): FrameLayout = binding.newTabContainerLayout
+
+    fun getAutoCompleteRecyclerView(): SwipeableRecyclerView {
+        return binding.autoCompleteSuggestionsList
+    }
+
+    fun getAutoCompleteBottomFadeContainer(): FrameLayout {
+        return binding.autoCompleteBottomFadeContainer
+    }
+
+    fun getViewPager(): ViewPager2 {
+        return binding.viewPager
+    }
+
+    fun updateAutoCompleteVisibility(visible: Boolean) {
+        val shouldShow = visible && viewModel.visibilityState.value.searchMode
+        if (autoCompleteTargetVisibility == shouldShow) return
+
+        autoCompleteTargetVisibility = shouldShow
+        binding.autoCompleteOverlay.animate().cancel()
+        beginRootTransition()
+        if (shouldShow) showAutoComplete() else hideAutoComplete()
+    }
+
+    private fun showAutoComplete() {
+        val overlay = binding.autoCompleteOverlay
+        disableViewPagerInput()
+        overlay.elevation = 3f.toPx()
+        overlay.alpha = 0f
+        overlay.isVisible = true
+        overlay.bringToFront()
+        overlay.animate()
+            .alpha(1f)
+            .setDuration(FAVORITES_ANIMATION_DURATION)
+            .setInterpolator(android.view.animation.DecelerateInterpolator())
+            .setUpdateListener { invalidateBlurView() }
+            .start()
+    }
+
+    private fun hideAutoComplete() {
+        val overlay = binding.autoCompleteOverlay
+        overlay.animate()
+            .alpha(0f)
+            .setDuration(FAVORITES_ANIMATION_DURATION)
+            .setInterpolator(android.view.animation.AccelerateInterpolator())
+            .setUpdateListener { invalidateBlurView() }
+            .withEndAction {
+                overlay.isVisible = false
+                overlay.alpha = 1f
+                overlay.elevation = 0f
+                enableViewPagerInputIfNoFavorites()
+            }
+            .start()
+    }
+
+    private fun invalidateBlurView() {
+        binding.autoCompleteBottomFadeContainer.getChildAt(0)?.invalidate()
+    }
+
+    fun onFavoritesContentChanged(hasContent: Boolean) {
+        val state = viewModel.visibilityState.value
+        updateFavoritesVisibility(
+            searchMode = state.searchMode,
+            autocompleteHidden = !state.autoCompleteSuggestionsVisible,
+            hasContent = hasContent,
+        )
+        showLogoIfNoContent(hasContent, state)
+    }
+
+    private fun showLogoIfNoContent(hasContent: Boolean, state: InputScreenVisibilityState) {
+        if (!hasContent && !state.autoCompleteSuggestionsVisible) {
+            binding.ddgLogoContainer.isVisible = true
+            binding.ddgLogo.progress = if (state.searchMode) 0f else 1f
+        }
+    }
+
+    private fun updateFavoritesVisibility(
+        searchMode: Boolean,
+        autocompleteHidden: Boolean,
+        hasContent: Boolean? = null,
+    ) {
+        val actualHasContent = hasContent ?: binding.newTabContainerLayout.isNotEmpty()
+        val shouldShow = searchMode && autocompleteHidden && actualHasContent
+        val isCurrentlyVisible = binding.newTabContainerScrollView.isVisible
+
+        when {
+            !actualHasContent -> hideFavoritesImmediate()
+            isCurrentlyVisible == shouldShow -> return
+            !autocompleteHidden -> hideFavoritesForAutocomplete()
+            else -> {
+                prepareFavoritesForAnimation(shouldShow)
+                animateFavoritesVisibility(shouldShow)
+            }
+        }
+    }
+
+    private fun hideFavoritesImmediate() {
+        binding.newTabContainerScrollView.isVisible = false
+        binding.newTabContainerScrollView.elevation = 0f
+        enableViewPagerInput()
+    }
+
+    private fun hideFavoritesForAutocomplete() {
+        val scrollView = binding.newTabContainerScrollView
+        scrollView.isVisible = false
+        scrollView.alpha = 1f
+        scrollView.translationY = 0f
+        scrollView.elevation = 0f
+    }
+
+    private fun prepareFavoritesForAnimation(show: Boolean) {
+        val scrollView = binding.newTabContainerScrollView
+        if (show) {
+            scrollView.elevation = 2f.toPx()
+            disableViewPagerInput()
+        } else {
+            scrollView.elevation = 0f
+            enableViewPagerInput()
+        }
+    }
+
+    private fun enableViewPagerInput() {
+        binding.viewPager.isUserInputEnabled = true
+        binding.viewPager.isClickable = true
+        binding.viewPager.isFocusable = true
+    }
+
+    private fun disableViewPagerInput() {
+        binding.viewPager.isUserInputEnabled = false
+        binding.viewPager.isClickable = false
+        binding.viewPager.isFocusable = false
+    }
+
+    private fun enableViewPagerInputIfNoFavorites() {
+        if (!binding.newTabContainerScrollView.isVisible) {
+            enableViewPagerInput()
+        }
+    }
+
+    private fun beginRootTransition() {
+        TransitionManager.beginDelayedTransition(
+            binding.root,
+            ChangeBounds().apply {
+                duration = ROOT_TRANSITION_DURATION
+                excludeTarget(R.id.inputScreenButtonsContainer, true)
+                excludeTarget(R.id.viewPager, true)
+                excludeTarget(RecyclerView::class.java, true)
+            },
+        )
+    }
+
+    private fun animateFavoritesVisibility(show: Boolean) {
+        val scrollView = binding.newTabContainerScrollView
+        if (show) showFavorites(scrollView) else hideFavorites(scrollView)
+    }
+
+    private fun showFavorites(scrollView: View) {
+        scrollView.alpha = 0f
+        scrollView.translationY = 0f
+        scrollView.isVisible = true
+        scrollView.bringToFront()
+        scrollView.animate()
+            .alpha(1f)
+            .setDuration(FAVORITES_ANIMATION_DURATION)
+            .setInterpolator(android.view.animation.DecelerateInterpolator())
+            .start()
+    }
+
+    private fun hideFavorites(scrollView: View) {
+        scrollView.animate()
+            .alpha(0f)
+            .setDuration(FAVORITES_ANIMATION_DURATION)
+            .setInterpolator(android.view.animation.AccelerateInterpolator())
+            .withEndAction {
+                scrollView.isVisible = false
+                scrollView.alpha = 1f
+                scrollView.translationY = 0f
+            }
+            .start()
+    }
+
     companion object {
         const val LOGO_ANIMATION_DURATION = 350L
         const val LOGO_MAX_FRAME = 15
         const val LOGO_FADE_DURATION = 200L
+        const val FAVORITES_ANIMATION_DURATION = 200L
+        const val ROOT_TRANSITION_DURATION = 150L
     }
 }

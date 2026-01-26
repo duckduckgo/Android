@@ -60,8 +60,8 @@
     <string name="undoSnackbarAction">Visszavonás</string>
     <!-- Trackers blocked animation-->
     <plurals name="trackersBlockedAnimationMessage" tools:ignore="ImpliedQuantity">
-        <item quantity="one">Nyomkövető</item>
-        <item quantity="other">Nyomkövetők</item>
+        <item quantity="one">Nyomkövető blokkolva</item>
+        <item quantity="other">Nyomkövetők blokkolva</item>
     </plurals>
 
     <!-- Downloading files -->

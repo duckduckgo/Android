@@ -60,8 +60,8 @@
     <string name="undoSnackbarAction">Angre</string>
     <!-- Trackers blocked animation-->
     <plurals name="trackersBlockedAnimationMessage" tools:ignore="ImpliedQuantity">
-        <item quantity="one">sporer</item>
-        <item quantity="other">sporere blokkert</item>
+        <item quantity="one">Blokkert sporer</item>
+        <item quantity="other">Blokkerte sporere</item>
     </plurals>
 
     <!-- Downloading files -->

@@ -27,6 +27,8 @@ interface PirDataStore {
     var wauLastSentMs: Long
     var mauLastSentMs: Long
     var weeklyStatLastSentMs: Long
+    var hasBrokerConfigBeenManuallyUpdated: Boolean
+    var latestBackgroundScanRunInMs: Long
 
     fun reset()
     fun resetUserData()
@@ -90,8 +92,25 @@ internal class RealPirDataStore(
             }
         }
 
+    override var hasBrokerConfigBeenManuallyUpdated: Boolean
+        get() = preferences.getBoolean(KEY_BROKER_CONFIG_MANUALLY_UPDATED, false)
+        set(value) {
+            preferences.edit {
+                putBoolean(KEY_BROKER_CONFIG_MANUALLY_UPDATED, value)
+            }
+        }
+
+    override var latestBackgroundScanRunInMs: Long
+        get() = preferences.getLong(KEY_LAST_BG_SCAN_RUN, 0L)
+        set(value) {
+            preferences.edit {
+                putLong(KEY_LAST_BG_SCAN_RUN, value)
+            }
+        }
+
     override fun reset() {
         mainConfigEtag = null
+        hasBrokerConfigBeenManuallyUpdated = false
         resetUserData()
     }
 
@@ -101,6 +120,7 @@ internal class RealPirDataStore(
         wauLastSentMs = 0L
         mauLastSentMs = 0L
         weeklyStatLastSentMs = 0L
+        latestBackgroundScanRunInMs = 0L
     }
 
     companion object {
@@ -111,5 +131,7 @@ internal class RealPirDataStore(
         private const val KEY_ENGAGEMENT_WAU_LAST_MS = "KEY_ENGAGEMENT_WAU_LAST_MS"
         private const val KEY_ENGAGEMENT_MAU_LAST_MS = "KEY_ENGAGEMENT_MAU_LAST_MS"
         private const val KEY_WEEKLY_STATS_LAST_SENT_MS = "KEY_WEEKLY_STATS_LAST_SENT_MS"
+        private const val KEY_BROKER_CONFIG_MANUALLY_UPDATED = "KEY_BROKER_CONFIG_MANUALLY_UPDATED"
+        private const val KEY_LAST_BG_SCAN_RUN = "KEY_LAST_BG_SCAN_RUN_MS"
     }
 }

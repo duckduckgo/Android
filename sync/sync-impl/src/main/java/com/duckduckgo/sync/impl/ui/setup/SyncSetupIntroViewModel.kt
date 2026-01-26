@@ -19,7 +19,9 @@ package com.duckduckgo.sync.impl.ui.setup
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.sync.impl.SyncFeatureToggle
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.SYNC_INTRO
 import com.duckduckgo.sync.impl.ui.setup.SyncSetupIntroViewModel.Command.AbortFlow
@@ -31,13 +33,17 @@ import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.*
 
 @ContributesViewModel(FragmentScope::class)
-class SyncSetupIntroViewModel @Inject constructor() : ViewModel() {
+class SyncSetupIntroViewModel @Inject constructor(
+    private val syncFeatureToggle: SyncFeatureToggle,
+    private val dispatchers: DispatcherProvider,
+) : ViewModel() {
 
     private val command = Channel<Command>(1, DROP_OLDEST)
 
@@ -47,8 +53,9 @@ class SyncSetupIntroViewModel @Inject constructor() : ViewModel() {
             SYNC_INTRO -> CreateAccountIntro
             else -> RecoverAccountIntro
         }
-        viewState.emit(ViewState(viewMode))
-    }
+        val aiChatSyncEnabled = syncFeatureToggle.allowAiChatSync()
+        viewState.emit(ViewState(viewMode, aiChatSyncEnabled))
+    }.flowOn(dispatchers.io())
 
     fun commands(): Flow<Command> = command.receiveAsFlow()
 
@@ -60,6 +67,7 @@ class SyncSetupIntroViewModel @Inject constructor() : ViewModel() {
 
     data class ViewState(
         val viewMode: ViewMode = CreateAccountIntro,
+        val aiChatSyncEnabled: Boolean = false,
     )
 
     sealed class ViewMode {

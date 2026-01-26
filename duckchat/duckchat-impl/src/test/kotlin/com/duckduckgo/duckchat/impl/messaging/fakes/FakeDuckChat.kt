@@ -35,6 +35,7 @@ class FakeDuckChat(
     private var wasOpenedBeforeValue: Boolean = false
     private val inputScreenUserSettingEnabled = MutableStateFlow<Boolean>(false)
     private val cosmeticInputScreenUserSettingEnabled = MutableStateFlow<Boolean?>(null)
+    private val automaticContextAttachmentUserSettingEnabled = MutableStateFlow<Boolean>(false)
 
     override fun isEnabled(): Boolean = enabled
 
@@ -83,6 +84,10 @@ class FakeDuckChat(
 
     override fun observeCosmeticInputScreenUserSettingEnabled(): Flow<Boolean?> {
         return cosmeticInputScreenUserSettingEnabled
+    }
+
+    override fun observeAutomaticContextAttachmentUserSettingEnabled(): Flow<Boolean> {
+        return automaticContextAttachmentUserSettingEnabled
     }
 
     fun setEnabled(enabled: Boolean) {
