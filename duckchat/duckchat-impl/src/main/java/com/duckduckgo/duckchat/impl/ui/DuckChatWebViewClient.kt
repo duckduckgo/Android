@@ -28,6 +28,8 @@ class DuckChatWebViewClient @Inject constructor(
     private val jsPlugins: PluginPoint<JsInjectorPlugin>,
 ) : WebViewClient() {
 
+    var onPageFinishedListener: ((String?) -> Unit)? = null
+
     @UiThread
     override fun onPageStarted(
         webView: WebView,
@@ -37,5 +39,14 @@ class DuckChatWebViewClient @Inject constructor(
         jsPlugins.getPlugins().forEach {
             it.onPageStarted(webView, url, null)
         }
+    }
+
+    @UiThread
+    override fun onPageFinished(
+        view: WebView,
+        url: String?,
+    ) {
+        super.onPageFinished(view, url)
+        onPageFinishedListener?.invoke(url)
     }
 }
