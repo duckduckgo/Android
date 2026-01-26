@@ -302,7 +302,7 @@ class DownloaderUtilTest {
         assertEquals(
             "halo.pdf.apk",
             DownloaderUtil.guessFileName(
-                url = "https://example.com/halo.pdf${hangulFillers}.apk",
+                url = "https://example.com/halo.pdf$hangulFillers.apk",
                 contentDisposition = null,
                 mimeType = "application/octet-stream",
             ),
