@@ -51,6 +51,7 @@ import com.squareup.moshi.*
 import dagger.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
 import logcat.LogPriority.INFO
 import logcat.LogPriority.VERBOSE
@@ -74,7 +75,7 @@ interface SyncAccountRepository {
     fun getRecoveryCode(): Result<AuthCode>
     fun getThisConnectedDevice(): ConnectedDevice?
     fun getConnectedDevices(): Result<List<ConnectedDevice>>
-    fun getConnectQR(): Result<AuthCode>
+    suspend fun getConnectQR(): Result<AuthCode>
     fun pollConnectionKeys(): Result<Boolean>
     fun generateExchangeInvitationCode(): Result<AuthCode>
     fun pollSecondDeviceExchangeAcknowledgement(): Result<Boolean>
@@ -376,29 +377,33 @@ class AppSyncAccountRepository @Inject constructor(
         }
     }
 
-    override fun getConnectQR(): Result<AuthCode> {
-        val prepareForConnect = kotlin.runCatching {
-            nativeLib.prepareForConnect().also {
-                it.checkResult("Creating ConnectQR code failed")
+    override suspend fun getConnectQR(): Result<AuthCode> {
+        return withContext(dispatcherProvider.io()) {
+            val prepareForConnect = kotlin.runCatching {
+                nativeLib.prepareForConnect().also {
+                    it.checkResult("Creating ConnectQR code failed")
+                }
+            }.getOrElse { return@withContext it.asErrorResult().alsoFireAccountErrorPixel().copy(code = GENERIC_ERROR.code) }
+
+            val deviceId = syncDeviceIds.deviceId()
+            syncStore.deviceId = deviceId
+            if (syncFeature.storePublicKeyWhenGeneratingQRCode().isEnabled()) {
+                syncStore.primaryKey = prepareForConnect.publicKey
             }
-        }.getOrElse { return it.asErrorResult().alsoFireAccountErrorPixel().copy(code = GENERIC_ERROR.code) }
+            syncStore.secretKey = prepareForConnect.secretKey
 
-        val deviceId = syncDeviceIds.deviceId()
-        syncStore.deviceId = deviceId
-        syncStore.primaryKey = prepareForConnect.publicKey
-        syncStore.secretKey = prepareForConnect.secretKey
+            val linkingQRCode = Adapters.recoveryCodeAdapter.toJson(
+                LinkCode(connect = ConnectCode(deviceId = deviceId, secretKey = prepareForConnect.publicKey)),
+            ) ?: return@withContext Error(reason = "Error generating Linking Code").alsoFireAccountErrorPixel()
 
-        val linkingQRCode = Adapters.recoveryCodeAdapter.toJson(
-            LinkCode(connect = ConnectCode(deviceId = deviceId, secretKey = prepareForConnect.publicKey)),
-        ) ?: return Error(reason = "Error generating Linking Code").alsoFireAccountErrorPixel()
-
-        val b64Encoded = linkingQRCode.encodeB64()
-        val qrCode = if (syncFeature.syncSetupBarcodeIsUrlBased().isEnabled()) {
-            syncCodeUrlWrapper.wrapCodeInUrl(b64Encoded)
-        } else {
-            b64Encoded
+            val b64Encoded = linkingQRCode.encodeB64()
+            val qrCode = if (syncFeature.syncSetupBarcodeIsUrlBased().isEnabled()) {
+                syncCodeUrlWrapper.wrapCodeInUrl(b64Encoded)
+            } else {
+                b64Encoded
+            }
+            return@withContext Success(AuthCode(qrCode = qrCode, rawCode = b64Encoded))
         }
-        return Success(AuthCode(qrCode = qrCode, rawCode = b64Encoded))
     }
 
     private fun connectDevice(connectKeys: ConnectCode): Result<Boolean> {
