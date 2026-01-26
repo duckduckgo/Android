@@ -924,11 +924,15 @@
     <string name="settingsHeadingCompleteSetup">Kurulumu Tamamlayın</string>
 
     <!--TabSwitcher Trackers Animation-->
-    <string name="showTrackerCountInTabSwitcher">Sekme Değiştiricide İzleyici sayısını göster</string>
+    <string name="trackerBlockedInTheLast7days" instruction="Placeholder is 1 tracker blocked">Son 7 günde &lt;b&gt;%1$s izleyici engellendi&lt;/b&gt;</string>
     <string name="tabSwitcherAnimationTileRemovalDialogTitle" instruction="A title for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">İzleyici Sayısı Gizlensin mi?</string>
     <string name="tabSwitcherAnimationTileRemovalDialogBody" instruction="A message for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Bunu Ayarlar &gt; Görünüm\'den tekrar açabilirsiniz.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Gizle</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Gizleme</string>
+    <!-- Trackers blocked animation settings -->
+    <string name="settingsTrackersBlockedAnimationHeaderTitle">Engellenen İzleyiciler Animasyonu</string>
+    <string name="showTrackerCountInAddressBar">Adres Çubuğunda Göster</string>
+    <string name="showWeeklyTrackerCountInTabSwitcher">Sekme Yöneticisinde Göster</string>
 
     <!-- Widgets -->
     <string name="searchOnlyWidgetLabel" instruction="Label for the search-only widget">Yalnızca Arama</string>
