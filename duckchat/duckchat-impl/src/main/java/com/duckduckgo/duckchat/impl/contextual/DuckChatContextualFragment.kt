@@ -60,7 +60,6 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.FragmentViewModelFactory
-import com.duckduckgo.common.utils.extensions.hideKeyboard
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.downloads.api.DOWNLOAD_SNACKBAR_DELAY
 import com.duckduckgo.downloads.api.DOWNLOAD_SNACKBAR_LENGTH
@@ -182,13 +181,6 @@ class DuckChatContextualFragment :
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<View>
     internal val simpleWebview: WebView by lazy { binding.simpleWebview }
 
-    // this will go in the viewmodel
-    private enum class SheetMode {
-        INPUT,
-        WEBVIEW,
-    }
-
-    private var sheetMode = SheetMode.INPUT
     private var lastWebViewX = 0f
     private var lastWebViewY = 0f
 
@@ -322,8 +314,6 @@ class DuckChatContextualFragment :
                     }
                 },
             )
-
-            simpleWebview.loadUrl("https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5")
         }
 
         externalCameraLauncher.registerForResult(this) {
@@ -350,6 +340,11 @@ class DuckChatContextualFragment :
 
         configureBottomSheet(view)
         observeViewModel()
+
+        viewModel.onSheetOpened()
+        requireArguments().getString(KEY_DUCK_AI_CONTEXTUAL_TAB_ID)?.let { tabId ->
+            viewModel.observePageContextChanges(tabId)
+        }
     }
 
     private fun configureBottomSheet(view: View) {
@@ -366,23 +361,6 @@ class DuckChatContextualFragment :
         bottomSheetBehavior.isDraggable = true
         bottomSheetBehavior.isHideable = true
         bottomSheetBehavior.isFitToContents = true
-
-        bottomSheetBehavior.addBottomSheetCallback(
-            object : BottomSheetBehavior.BottomSheetCallback() {
-                override fun onStateChanged(
-                    bottomSheet: View,
-                    newState: Int,
-                ) {
-                    logcat { "Duck.ai: state changed $newState sheetMode $sheetMode" }
-                }
-
-                override fun onSlide(
-                    bottomSheet: View,
-                    slideOffset: Float,
-                ) {
-                }
-            },
-        )
     }
 
     private fun configureButtons(bottomSheetBehavior: BottomSheetBehavior<View>) {
@@ -392,18 +370,16 @@ class DuckChatContextualFragment :
         binding.contextualModeButtons.setOnClickListener { }
         binding.contextualModeRoot.setOnClickListener { }
         binding.inputField.onFocusChangeListener = View.OnFocusChangeListener { _, focused ->
-            if (focused) {
-                sheetMode = SheetMode.INPUT
-                bottomSheetBehavior.isDraggable = true
-                bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
-            } else if (sheetMode == SheetMode.INPUT) {
-                bottomSheetBehavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
-            }
+            viewModel.onNativeInputFocused(focused)
         }
         binding.inputField.setOnEditorActionListener(
             TextView.OnEditorActionListener { _, actionId, keyEvent ->
                 if (actionId == EditorInfo.IME_ACTION_GO || keyEvent?.keyCode == KeyEvent.KEYCODE_ENTER) {
-                    sendPrompt(bottomSheetBehavior)
+                    val prompt = binding.inputField.text.toString()
+                    if (prompt.isNotEmpty()) {
+                        viewModel.onPromptSent(prompt)
+                        bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+                    }
                     return@OnEditorActionListener true
                 }
                 false
@@ -438,7 +414,6 @@ class DuckChatContextualFragment :
             val prompt = binding.inputField.text.toString()
             if (prompt.isNotEmpty()) {
                 viewModel.onPromptSent(prompt)
-                showDuckChat()
                 bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
             }
         }
@@ -470,21 +445,6 @@ class DuckChatContextualFragment :
         renderPageContext(pageTitle, pageUrl, tabId)
     }
 
-    private fun sendPrompt(bottomSheetBehavior: BottomSheetBehavior<View>) {
-        val prompt = binding.inputField.text.toString()
-        hideKeyboard(binding.inputField)
-        if (prompt.isNotEmpty()) {
-            showDuckChat()
-            bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
-        }
-    }
-
-    private fun showDuckChat() {
-        sheetMode = SheetMode.WEBVIEW
-        binding.contextualModeNativeContent.gone()
-        binding.simpleWebview.show()
-    }
-
     private fun observeViewModel() {
         viewModel.commands
             .onEach { command ->
@@ -502,13 +462,28 @@ class DuckChatContextualFragment :
                         logcat { "Duck.ai: PageContextUpdated tab=${command.tabId} title=${command.pageTitle} url=${command.pageUrl}" }
                         renderPageContext(command.pageTitle, command.pageUrl, command.tabId)
                     }
+
+                    is DuckChatContextualViewModel.Command.LoadUrl -> {
+                        simpleWebview.loadUrl(command.url)
+                    }
                 }
             }.launchIn(lifecycleScope)
 
-        requireArguments().getString(KEY_DUCK_AI_CONTEXTUAL_TAB_ID)?.let { tabId ->
-            viewModel.observePageContextChanges(tabId)
-        }
+        viewModel.viewState
+            .onEach { viewState ->
+                renderViewState(viewState)
+            }.launchIn(lifecycleScope)
+
         observeSubscriptionEventDataChannel()
+    }
+
+    private fun renderViewState(viewState: DuckChatContextualViewModel.ViewState) {
+        bottomSheetBehavior.state == viewState.sheetState
+
+        if (viewState.sheetMode == DuckChatContextualViewModel.SheetMode.WEBVIEW) {
+            binding.contextualModeNativeContent.gone()
+            binding.simpleWebview.show()
+        }
     }
 
     private fun observeSubscriptionEventDataChannel() {

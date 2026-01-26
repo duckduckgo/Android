@@ -21,13 +21,19 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import logcat.logcat
@@ -38,6 +44,7 @@ import javax.inject.Inject
 class DuckChatContextualViewModel @Inject constructor(
     private val pageContextRepository: PageContextRepository,
     private val dispatchers: DispatcherProvider,
+    private val duckChat: DuckChat,
 ) : ViewModel() {
 
     private val commandChannel = Channel<Command>(capacity = 1, onBufferOverflow = DROP_OLDEST)
@@ -46,15 +53,48 @@ class DuckChatContextualViewModel @Inject constructor(
     private val _subscriptionEventDataChannel = Channel<SubscriptionEventData>(capacity = Channel.BUFFERED)
     val subscriptionEventDataFlow = _subscriptionEventDataChannel.receiveAsFlow()
 
+    enum class SheetMode {
+        INPUT,
+        WEBVIEW,
+    }
+
     private var updatedPageContext: String = ""
 
     sealed class Command {
+        data class LoadUrl(val url: String) : Command()
         data object SendSubscriptionAuthUpdateEvent : Command()
         data class PageContextUpdated(
             val pageTitle: String,
             val pageUrl: String,
             val tabId: String,
         ) : Command()
+    }
+
+    private val _viewState =
+        MutableStateFlow(
+            ViewState(
+                sheetMode = SheetMode.INPUT,
+            ),
+        )
+    val viewState: StateFlow<ViewState> = _viewState.asStateFlow()
+
+    data class ViewState(
+        val sheetMode: SheetMode = SheetMode.INPUT,
+        val sheetState: Int = BottomSheetBehavior.STATE_HIDDEN,
+    )
+
+    fun onSheetOpened() {
+        viewModelScope.launch(dispatchers.main()) {
+            when (_viewState.value.sheetMode) {
+                SheetMode.INPUT -> {
+                    val initialUrl = duckChat.getDuckChatUrl("", false)
+                    commandChannel.trySend(Command.LoadUrl(initialUrl))
+                }
+
+                SheetMode.WEBVIEW -> {
+                }
+            }
+        }
     }
 
     fun observePageContextChanges(tabId: String) {
@@ -92,12 +132,34 @@ class DuckChatContextualViewModel @Inject constructor(
         }
     }
 
+    fun onNativeInputFocused(focused: Boolean) {
+        viewModelScope.launch {
+            _viewState.update {
+                if (focused) {
+                    it.copy(
+                        sheetState = BottomSheetBehavior.STATE_EXPANDED,
+                    )
+                } else {
+                    it.copy(
+                        sheetState = BottomSheetBehavior.STATE_HALF_EXPANDED,
+                    )
+                }
+            }
+        }
+    }
+
     fun onPromptSent(prompt: String) {
         viewModelScope.launch(dispatchers.io()) {
             val contextPrompt = generateContextPrompt(prompt)
             withContext(dispatchers.main()) {
                 logcat { "Duck.ai: pageContext prompt $contextPrompt" }
                 _subscriptionEventDataChannel.trySend(contextPrompt)
+                _viewState.update {
+                    it.copy(
+                        sheetMode = SheetMode.WEBVIEW,
+                        sheetState = BottomSheetBehavior.STATE_EXPANDED,
+                    )
+                }
             }
         }
     }
@@ -132,21 +194,4 @@ class DuckChatContextualViewModel @Inject constructor(
             params = params,
         )
     }
-
-    // {
-    //     "platform": "android",
-    //     "tool": "query",
-    //     "query": {
-    //     "prompt": "Summarize this page",
-    //     "autoSubmit": true
-    // },
-    //     "pageContext": {
-    //     "title": "Page Title",
-    //     "url": "https://example.com",
-    //     "content": "Extracted DOM text...",
-    //     "favicon": [{"href": "data:image/png;base64,...", "rel": "icon"}],
-    //     "truncated": false,
-    //     "fullContentLength": 1234
-    // }
-    // }
 }
