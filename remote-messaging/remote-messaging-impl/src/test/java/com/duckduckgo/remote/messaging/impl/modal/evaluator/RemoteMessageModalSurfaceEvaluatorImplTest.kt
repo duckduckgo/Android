@@ -351,7 +351,7 @@ class RemoteMessageModalSurfaceEvaluatorImplTest {
                     primaryActionText = "test-primary-action-text",
                     primaryAction = Action.Dismiss,
                     listItems = listOf(
-                        CardItem(
+                        CardItem.ListItem(
                             id = "item1",
                             type = CardItemType.TWO_LINE_LIST_ITEM,
                             placeholder = Content.Placeholder.DDG_ANNOUNCE,
