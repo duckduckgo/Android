@@ -21,6 +21,7 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
@@ -45,9 +46,15 @@ class DuckChatContextualViewModel @Inject constructor(
     private val _subscriptionEventDataChannel = Channel<SubscriptionEventData>(capacity = Channel.BUFFERED)
     val subscriptionEventDataFlow = _subscriptionEventDataChannel.receiveAsFlow()
 
+    private var updatedPageContext: String = ""
+
     sealed class Command {
         data object SendSubscriptionAuthUpdateEvent : Command()
-        data class PageContextUpdated(val pageTitle: String, val pageUrl: String, val tabId: String) : Command()
+        data class PageContextUpdated(
+            val pageTitle: String,
+            val pageUrl: String,
+            val tabId: String,
+        ) : Command()
     }
 
     fun observePageContextChanges(tabId: String) {
@@ -58,7 +65,7 @@ class DuckChatContextualViewModel @Inject constructor(
                     return@onEach
                 }
 
-                val serialized = pageContext.serializedPageData
+                updatedPageContext = pageContext.serializedPageData
 
                 if (pageContext.tabId != tabId) {
                     logcat { "Duck.ai: skipping pageContext for tab=${pageContext.tabId} expected=$tabId" }
@@ -68,9 +75,9 @@ class DuckChatContextualViewModel @Inject constructor(
                     logcat { "Duck.ai: pageContext cleared for tab=$tabId" }
                 }
 
-                logcat { "Duck.ai: pageContext update for tab=$tabId (length=${serialized.length})" }
+                logcat { "Duck.ai: pageContext update for tab=$tabId (length=${updatedPageContext.length})" }
 
-                val json = JSONObject(serialized)
+                val json = JSONObject(updatedPageContext)
                 val title = json.optString("title").takeIf { it.isNotBlank() }
                 val url = json.optString("url").takeIf { it.isNotBlank() }
 
@@ -84,4 +91,62 @@ class DuckChatContextualViewModel @Inject constructor(
             }.launchIn(viewModelScope)
         }
     }
+
+    fun onPromptSent(prompt: String) {
+        viewModelScope.launch(dispatchers.io()) {
+            val contextPrompt = generateContextPrompt(prompt)
+            withContext(dispatchers.main()) {
+                logcat { "Duck.ai: pageContext prompt $contextPrompt" }
+                _subscriptionEventDataChannel.trySend(contextPrompt)
+            }
+        }
+    }
+
+    private fun generateContextPrompt(prompt: String): SubscriptionEventData {
+        val pageContext =
+            updatedPageContext
+                .takeIf { it.isNotBlank() }
+                ?.let { runCatching { JSONObject(it) }.getOrNull() }
+                ?: run {
+                    logcat { "Duck.ai: no pageContext available, skipping pageContext in prompt" }
+                    null
+                }
+
+        val params =
+            JSONObject().apply {
+                put("platform", "android")
+                put("tool", "query")
+                put(
+                    "query",
+                    JSONObject().apply {
+                        put("prompt", prompt)
+                        put("autoSubmit", true)
+                    },
+                )
+                pageContext?.let { put("pageContext", it) }
+            }
+
+        return SubscriptionEventData(
+            featureName = RealDuckChatJSHelper.DUCK_CHAT_FEATURE_NAME,
+            subscriptionName = "submitAIChatNativePrompt",
+            params = params,
+        )
+    }
+
+    // {
+    //     "platform": "android",
+    //     "tool": "query",
+    //     "query": {
+    //     "prompt": "Summarize this page",
+    //     "autoSubmit": true
+    // },
+    //     "pageContext": {
+    //     "title": "Page Title",
+    //     "url": "https://example.com",
+    //     "content": "Extracted DOM text...",
+    //     "favicon": [{"href": "data:image/png;base64,...", "rel": "icon"}],
+    //     "truncated": false,
+    //     "fullContentLength": 1234
+    // }
+    // }
 }
