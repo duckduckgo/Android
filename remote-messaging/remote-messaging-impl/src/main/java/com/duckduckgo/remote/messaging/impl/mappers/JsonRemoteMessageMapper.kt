@@ -106,6 +106,42 @@ private val cardsListMapper: (JsonContent, Set<MessageActionMapperPlugin>) -> Co
     )
 }
 
+private fun List<JsonListItem>?.toListItems(actionMappers: Set<MessageActionMapperPlugin>): List<CardItem> {
+    return this?.mapNotNull { jsonItem ->
+        itemMappers[jsonItem.type]?.invoke(jsonItem, actionMappers)
+    } ?: emptyList()
+}
+
+private val twoLineListItemMapper: (JsonListItem, Set<MessageActionMapperPlugin>) -> CardItem = { jsonItem, actionMappers ->
+    CardItem.ListItem(
+        id = jsonItem.id.failIfEmpty(),
+        type = jsonItem.type.toCardItemType(),
+        titleText = jsonItem.titleText.failIfEmpty(),
+        descriptionText = jsonItem.descriptionText.orEmpty().failIfEmpty(),
+        placeholder = jsonItem.placeholder.orEmpty().asPlaceholder(),
+        primaryAction = jsonItem.primaryAction?.toAction(actionMappers)
+            ?: throw IllegalStateException("CardItem primaryAction cannot be null"),
+        primaryActionText = jsonItem.primaryActionText.orEmpty(),
+        matchingRules = jsonItem.matchingRules.orEmpty(),
+        exclusionRules = jsonItem.exclusionRules.orEmpty(),
+    )
+}
+
+private val sectionTitleMapper: (JsonListItem, Set<MessageActionMapperPlugin>) -> CardItem = { jsonItem, _ ->
+    CardItem.SectionTitle(
+        id = jsonItem.id.failIfEmpty(),
+        type = jsonItem.type.toCardItemType(),
+        titleText = jsonItem.titleText.failIfEmpty(),
+        itemIDs = jsonItem.itemIDs.orEmpty(),
+    )
+}
+
+private val itemMappers = mapOf(
+    CardItemType.TWO_LINE_LIST_ITEM.jsonValue to twoLineListItemMapper,
+    CardItemType.FEATURED_TWO_LINE_SINGLE_ACTION_LIST_ITEM.jsonValue to twoLineListItemMapper,
+    CardItemType.LIST_SECTION_TITLE.jsonValue to sectionTitleMapper,
+)
+
 // plugin point?
 private val messageMappers = mapOf(
     Pair(SMALL.jsonValue, smallMapper),
@@ -184,22 +220,6 @@ private fun String.toCardItemType(): CardItemType {
     return CardItemType.entries.first { it.jsonValue == this }
 }
 
-private fun List<JsonListItem>?.toListItems(actionMappers: Set<MessageActionMapperPlugin>): List<CardItem> {
-    return this?.map { jsonItem ->
-        CardItem(
-            id = jsonItem.id.failIfEmpty(),
-            type = jsonItem.type.toCardItemType(),
-            titleText = jsonItem.titleText.failIfEmpty(),
-            descriptionText = jsonItem.descriptionText.failIfEmpty(),
-            placeholder = jsonItem.placeholder.asPlaceholder(),
-            primaryAction = jsonItem.primaryAction?.toAction(actionMappers)
-                ?: throw IllegalStateException("CardItem primaryAction cannot be null"),
-            matchingRules = jsonItem.matchingRules.orEmpty(),
-            exclusionRules = jsonItem.exclusionRules.orEmpty(),
-        )
-    } ?: emptyList()
-}
-
 private fun Content.localize(translations: JsonContentTranslations): Content {
     return when (this) {
         is BigSingleAction -> this.copy(
@@ -236,11 +256,21 @@ private fun Content.localize(translations: JsonContentTranslations): Content {
             descriptionText = translations.descriptionText.takeUnless { it.isEmpty() } ?: this.descriptionText,
             primaryActionText = translations.primaryActionText.takeUnless { it.isEmpty() } ?: this.primaryActionText,
             listItems = listItems.map { item ->
-                val (itemTitle, itemDescription) = item.localize(translations)
-                item.copy(
-                    titleText = itemTitle.takeUnless { it.isEmpty() } ?: item.titleText,
-                    descriptionText = itemDescription.takeUnless { it.isEmpty() } ?: item.descriptionText,
-                )
+                when (item) {
+                    is CardItem.ListItem -> {
+                        val (itemTitle, itemDescription) = item.localize(translations)
+                        item.copy(
+                            titleText = itemTitle.takeUnless { it.isEmpty() } ?: item.titleText,
+                            descriptionText = itemDescription.takeUnless { it.isEmpty() } ?: item.descriptionText,
+                        )
+                    }
+                    is CardItem.SectionTitle -> {
+                        val (itemTitle, _) = item.localize(translations)
+                        item.copy(
+                            titleText = itemTitle.takeUnless { it.isEmpty() } ?: item.titleText,
+                        )
+                    }
+                }
             },
         )
     }
@@ -249,5 +279,5 @@ private fun Content.localize(translations: JsonContentTranslations): Content {
 private fun CardItem.localize(
     translations: JsonContentTranslations,
 ): Pair<String, String> = translations.listItems?.get(id)?.let {
-    it.titleText to it.descriptionText
+    it.titleText to it.descriptionText.orEmpty()
 } ?: ("" to "")

@@ -17,6 +17,7 @@
 package com.duckduckgo.remote.messaging.impl
 
 import com.duckduckgo.remote.messaging.api.AttributeMatcherPlugin
+import com.duckduckgo.remote.messaging.api.CardItem
 import com.duckduckgo.remote.messaging.api.Content
 import com.duckduckgo.remote.messaging.api.MatchingAttribute
 import com.duckduckgo.remote.messaging.api.RemoteMessage
@@ -68,8 +69,11 @@ class RemoteMessagingConfigMatcher(
     ): RemoteMessage? {
         val cardsList = message.content as? Content.CardsList ?: return message
 
-        val filteredItems = cardsList.listItems.filter { cardItem ->
-            if (cardItem.matchingRules.isEmpty() && cardItem.exclusionRules.isEmpty()) {
+        // First pass: filter list items based on matching/exclusion rules
+        val filteredListItems = cardsList.listItems.filter { cardItem ->
+            if (cardItem !is CardItem.ListItem) {
+                true
+            } else if (cardItem.matchingRules.isEmpty() && cardItem.exclusionRules.isEmpty()) {
                 true
             } else {
                 // Evaluate CardItem rules following the same logic as for remote message
@@ -86,6 +90,16 @@ class RemoteMessagingConfigMatcher(
                 }
 
                 itemMatching == EvaluationResult.Match && itemExclusion == EvaluationResult.Fail
+            }
+        }
+
+        // Second pass: filter section titles that have no remaining items
+        val remainingItemIds = filteredListItems.filterIsInstance<CardItem.ListItem>().map { it.id }.toSet()
+        val filteredItems = filteredListItems.filter { cardItem ->
+            if (cardItem is CardItem.SectionTitle) {
+                cardItem.itemIDs.any { it in remainingItemIds }
+            } else {
+                true
             }
         }
 

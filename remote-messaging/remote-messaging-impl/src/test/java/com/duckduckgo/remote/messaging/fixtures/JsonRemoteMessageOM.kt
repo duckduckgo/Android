@@ -126,6 +126,7 @@ object JsonRemoteMessageOM {
                 descriptionText = "Item Description 1",
                 placeholder = "ImageAI",
                 primaryAction = jsonMessageAction(),
+                primaryActionText = "Item Action 1",
             ),
             JsonListItem(
                 id = "item2",
@@ -134,6 +135,7 @@ object JsonRemoteMessageOM {
                 descriptionText = "Item Description 2",
                 placeholder = "Radar",
                 primaryAction = jsonMessageAction(),
+                primaryActionText = "Item Action 2",
             ),
         ),
         imageUrl: String? = null,

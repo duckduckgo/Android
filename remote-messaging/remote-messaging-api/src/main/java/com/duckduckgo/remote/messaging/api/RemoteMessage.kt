@@ -164,17 +164,43 @@ sealed class Action(
     data object DefaultCredentialProvider : Action(DEFAULT_CREDENTIAL_PROVIDER.jsonValue, "", null)
 }
 
-data class CardItem(
-    val id: String,
-    val type: CardItemType,
-    val titleText: String,
-    val descriptionText: String,
-    val placeholder: Placeholder,
-    val primaryAction: Action,
-    val matchingRules: List<Int>,
-    val exclusionRules: List<Int>,
-)
+sealed class CardItem {
+    abstract val id: String
+    abstract val type: CardItemType
+
+    abstract val titleText: String
+
+    /**
+     * Represents both TWO_LINE_LIST_ITEM and FEATURED_TWO_LINE_SINGLE_ACTION_LIST_ITEM.
+     * The [type] field determines the visual styling.
+     */
+    data class ListItem(
+        override val id: String,
+        override val type: CardItemType,
+        override val titleText: String,
+        val descriptionText: String,
+        val placeholder: Placeholder,
+        val primaryAction: Action,
+        val primaryActionText: String = "",
+        val matchingRules: List<Int>,
+        val exclusionRules: List<Int>,
+    ) : CardItem()
+
+    /**
+     * Represents a section header that groups related list items.
+     * If all items referenced by [itemIDs] are excluded,
+     * this section title should also be excluded.
+     */
+    data class SectionTitle(
+        override val id: String,
+        override val type: CardItemType,
+        override val titleText: String,
+        val itemIDs: List<String>,
+    ) : CardItem()
+}
 
 enum class CardItemType(val jsonValue: String) {
     TWO_LINE_LIST_ITEM("two_line_list_item"),
+    LIST_SECTION_TITLE("section_title"),
+    FEATURED_TWO_LINE_SINGLE_ACTION_LIST_ITEM("featured_two_line_single_action_list_item"),
 }

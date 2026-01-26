@@ -280,7 +280,7 @@ class RemoteMessagingConfigJsonMapperTest {
                 primaryActionText = "Got It",
                 primaryAction = Action.Dismiss,
                 listItems = listOf(
-                    CardItem(
+                    CardItem.ListItem(
                         id = "hide_search_images",
                         type = CardItemType.TWO_LINE_LIST_ITEM,
                         titleText = "Hide AI Images in Search",
@@ -292,7 +292,7 @@ class RemoteMessagingConfigJsonMapperTest {
                         matchingRules = emptyList(),
                         exclusionRules = emptyList(),
                     ),
-                    CardItem(
+                    CardItem.ListItem(
                         id = "enhanced_scam_blocker",
                         type = CardItemType.TWO_LINE_LIST_ITEM,
                         titleText = "Enhanced Scam Blocker",
@@ -304,7 +304,7 @@ class RemoteMessagingConfigJsonMapperTest {
                         matchingRules = emptyList(),
                         exclusionRules = emptyList(),
                     ),
-                    CardItem(
+                    CardItem.ListItem(
                         id = "import_passwords",
                         type = CardItemType.TWO_LINE_LIST_ITEM,
                         titleText = "Simpler Password Management",

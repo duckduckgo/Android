@@ -29,6 +29,7 @@ import com.duckduckgo.remote.messaging.api.Content.Small
 import com.duckduckgo.remote.messaging.api.MessageActionMapperPlugin
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.impl.mappers.ActionAdapter
+import com.duckduckgo.remote.messaging.impl.mappers.CardItemAdapter
 import com.duckduckgo.remote.messaging.impl.mappers.MessageMapper
 import com.squareup.anvil.annotations.ContributesTo
 import com.squareup.moshi.JsonAdapter
@@ -68,6 +69,7 @@ object RMFMapperModule {
                     .withSubtype(CardsList::class.java, MessageType.CARDS_LIST.name),
             )
             .add(ActionAdapter(actionMappers))
+            .add(CardItemAdapter())
             .add(KotlinJsonAdapterFactory())
             .build()
         return moshi.adapter(RemoteMessage::class.java)
