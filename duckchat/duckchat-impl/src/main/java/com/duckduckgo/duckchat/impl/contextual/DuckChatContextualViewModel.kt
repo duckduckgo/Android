@@ -184,7 +184,8 @@ class DuckChatContextualViewModel @Inject constructor(
     }
 
     private fun generateContextPrompt(prompt: String): SubscriptionEventData {
-        val pageContext =
+        val viewState = _viewState.value as ViewState.InputModeViewState
+        val pageContext = if (viewState.hasContext) {
             updatedPageContext
                 .takeIf { it.isNotBlank() }
                 ?.let { runCatching { JSONObject(it) }.getOrNull() }
@@ -192,6 +193,9 @@ class DuckChatContextualViewModel @Inject constructor(
                     logcat { "Duck.ai: no pageContext available, skipping pageContext in prompt" }
                     null
                 }
+        } else {
+            null
+        }
 
         val params =
             JSONObject().apply {
@@ -215,10 +219,7 @@ class DuckChatContextualViewModel @Inject constructor(
     }
 
     private fun generateContext(): SubscriptionEventData {
-        val params =
-            JSONObject().apply {
-                put("pageContext", updatedPageContext)
-            }
+        val params = JSONObject(updatedPageContext)
 
         return SubscriptionEventData(
             featureName = RealDuckChatJSHelper.DUCK_CHAT_FEATURE_NAME,
