@@ -95,10 +95,10 @@
             android:layout_marginTop="2dp"
             android:importantForAccessibility="no"
             android:src="@drawable/ic_chevron_medium_right_blue_16"
-            android:tint="?attr/colorAccent"
             app:layout_constraintBottom_toBottomOf="@id/action"
             app:layout_constraintStart_toEndOf="@id/action"
-            app:layout_constraintTop_toTopOf="@id/action" />
+            app:layout_constraintTop_toTopOf="@id/action"
+            app:tint="?attr/colorAccent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
