@@ -20,18 +20,19 @@ import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 
-class DuckChatContextualSharedViewModel(): ViewModel() {
+class DuckChatContextualSharedViewModel() : ViewModel() {
 
     private val _command = Channel<Command>()
     val commands = _command.receiveAsFlow() // Activity will collect this
 
-    fun onPageContextReceived(tabId: String, pageContext: String){
+    fun onPageContextReceived(tabId: String, pageContext: String) {
         _command.trySend(Command.PageContextAttached(tabId, pageContext))
     }
 
     sealed class Command {
         data class PageContextAttached(
             val tabId: String,
-            val pageContext: String) : Command()
+            val pageContext: String,
+        ) : Command()
     }
 }
