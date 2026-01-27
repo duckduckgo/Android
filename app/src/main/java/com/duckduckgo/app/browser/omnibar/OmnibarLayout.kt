@@ -1097,13 +1097,12 @@ class OmnibarLayout @JvmOverloads constructor(
                 }
 
             // For new custom tabs, determine light/dark variant based on container color
-            // Shield sits on secondaryToolbarColor background, so invert: light bg needs dark shield
+            // Shield sits on customTabToolbarColor background, so invert: light bg needs dark shield
             val useLightAnimation = if (viewMode is ViewMode.CustomTab &&
                 omnibarRepository.isNewCustomTabEnabled &&
                 !isDefaultToolbarColor(customTabToolbarColor)
             ) {
-                val secondaryToolbarColor = calculateAddressBarColor(customTabToolbarColor)
-                isColorLight(secondaryToolbarColor)
+                isColorLight(customTabToolbarColor)
             } else {
                 null // Use default theme-based selection
             }
@@ -1133,11 +1132,9 @@ class OmnibarLayout @JvmOverloads constructor(
                         toolbarContainer.background = customTab.toolbarColor.toDrawable()
 
                         val foregroundColor = calculateCustomTabForegroundColor(customTab.toolbarColor)
-                        val secondaryToolbarColor = calculateAddressBarColor(customTab.toolbarColor)
                         customTabCloseIcon.setColorFilter(foregroundColor)
-                        customTabDomain.setTextColor(calculateCustomTabForegroundColor(secondaryToolbarColor))
-                        customToolbarContainer.setCardBackgroundColor(secondaryToolbarColor)
                         browserMenuImageView.setColorFilter(foregroundColor)
+                        customTabDomain.setTextColor(foregroundColor)
 
                         animationBackgroundColor = calculateAnimationBackgroundColor(customTab.toolbarColor)
                     } else {
