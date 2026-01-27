@@ -581,7 +581,7 @@ class RealPirPixelSender @Inject constructor(
     }
 
     override fun reportManualScanStartFailed() {
-        fire(PIR_FOREGROUND_RUN_START_FAILED)
+        enqueueFire(PIR_FOREGROUND_RUN_START_FAILED)
     }
 
     override fun reportScheduledScanScheduled() {
@@ -1328,6 +1328,16 @@ class RealPirPixelSender @Inject constructor(
         pixel.getPixelNames().forEach { (pixelType, pixelName) ->
             logcat { "PIR-LOGGING: $pixelName params: $params" }
             pixelSender.fire(pixelName = pixelName, type = pixelType, parameters = params)
+        }
+    }
+
+    private fun enqueueFire(
+        pixel: PirPixel,
+        params: Map<String, String> = emptyMap(),
+    ) {
+        pixel.getPixelNames().forEach { (_, pixelName) ->
+            logcat { "PIR-LOGGING: $pixelName params: $params" }
+            pixelSender.enqueueFire(pixelName = pixelName, parameters = params)
         }
     }
 
