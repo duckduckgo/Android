@@ -924,11 +924,15 @@
     <string name="settingsHeadingCompleteSetup">Einrichtung abschließen</string>
 
     <!--TabSwitcher Trackers Animation-->
-    <string name="showTrackerCountInTabSwitcher">Anzahl der Tracker im Tabwechsel-Bildschirm anzeigen</string>
+    <string name="trackerBlockedInTheLast7days" instruction="Placeholder is 1 tracker blocked">&lt;b&gt;%1$s Tracker wurde in den letzten 7 Tagen blockiert &lt;/b&gt;</string>
     <string name="tabSwitcherAnimationTileRemovalDialogTitle" instruction="A title for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Tracker-Anzahl ausblenden?</string>
     <string name="tabSwitcherAnimationTileRemovalDialogBody" instruction="A message for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Du kannst dies in den Einstellungen &gt; Erscheinungsbild wieder aktivieren.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Ausblenden</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Behalten</string>
+    <!-- Trackers blocked animation settings -->
+    <string name="settingsTrackersBlockedAnimationHeaderTitle">Animation für blockierte Tracker</string>
+    <string name="showTrackerCountInAddressBar">In der Adresszeile anzeigen</string>
+    <string name="showWeeklyTrackerCountInTabSwitcher">Im Tabs-Manager anzeigen</string>
 
     <!-- Widgets -->
     <string name="searchOnlyWidgetLabel" instruction="Label for the search-only widget">Nur Suchen</string>
