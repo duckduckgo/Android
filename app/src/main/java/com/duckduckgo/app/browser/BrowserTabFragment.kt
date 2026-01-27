@@ -1597,7 +1597,11 @@ class BrowserTabFragment :
                     it.hideKeyboard()
                     it.clearFocus()
                 }
-                viewModel.onDuckChatMenuClicked()
+                if (duckAiFeatureState.showFullScreenMode.value) {
+                    viewModel.openNewDuckChat(omnibar.viewMode)
+                } else {
+                    viewModel.onDuckChatMenuClicked()
+                }
             }
             onMenuItemClicked(duckChatHistoryMenuItem) {
                 pixel.fire(DuckChatPixelName.DUCK_CHAT_SETTINGS_SIDEBAR_TAPPED)
