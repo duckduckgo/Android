@@ -507,4 +507,9 @@ sealed class Command {
 
     data class ShowDuckAIContextualMode(val tabId: String) : Command()
     data class StartAddressBarTrackersAnimation(val trackerEntities: List<Entity>?) : Command()
+
+    data class PageContextReceived(
+        val tabId: String,
+        val pageContext: String,
+    ) : Command()
 }

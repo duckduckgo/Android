@@ -43,6 +43,7 @@ import android.widget.TextView
 import androidx.annotation.AnyThread
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.setFragmentResult
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewModelScope
@@ -112,6 +113,8 @@ class DuckChatContextualFragment :
     private val viewModel: DuckChatContextualViewModel by lazy {
         ViewModelProvider(this, viewModelFactory)[DuckChatContextualViewModel::class.java]
     }
+
+    private val sharedContextualViewModel: DuckChatContextualSharedViewModel by viewModels({ requireParentFragment() })
 
     @Inject
     lateinit var webViewClient: DuckChatWebViewClient
@@ -459,6 +462,16 @@ class DuckChatContextualFragment :
                             putString(KEY_DUCK_AI_URL, command.url)
                         }
                         setFragmentResult(KEY_DUCK_AI_CONTEXTUAL_RESULT, result)
+                    }
+                }
+            }.launchIn(lifecycleScope)
+
+        sharedContextualViewModel.commands.
+            onEach { command ->
+                when(command){
+                    is DuckChatContextualSharedViewModel.Command.PageContextAttached -> {
+                        logcat { "Duck.ai Contextual: page context received" }
+                        viewModel.onPageContextReceived(command.tabId, command.pageContext)
                     }
                 }
             }.launchIn(lifecycleScope)

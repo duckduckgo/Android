@@ -4060,7 +4060,12 @@ class BrowserTabViewModel @Inject constructor(
             PAGE_CONTEXT_FEATURE_NAME -> {
                 viewModelScope.launch(dispatchers.io()) {
                     logcat { "Duck.ai: pageContext message feature=$featureName method=$method tabId=$tabId data=$data" }
-                    pageContextJSHelper.processPageContext(featureName, method, data, tabId)
+                    val pageContext = pageContextJSHelper.processPageContext(featureName, method, data, tabId)
+                    if (pageContext != null){
+                        withContext(dispatchers.main()) {
+                            command.value = Command.PageContextReceived(tabId, pageContext)
+                        }
+                    }
                 }
             }
 
