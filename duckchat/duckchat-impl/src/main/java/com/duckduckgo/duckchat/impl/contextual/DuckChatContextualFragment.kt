@@ -487,16 +487,18 @@ class DuckChatContextualFragment :
     private fun renderViewState(viewState: DuckChatContextualViewModel.ViewState) {
         bottomSheetBehavior.state = viewState.sheetState
 
-        when (viewState) {
-            is DuckChatContextualViewModel.ViewState.InputModeViewState -> {
+        when (viewState.sheetMode) {
+            DuckChatContextualViewModel.SheetMode.INPUT -> {
                 binding.contextualModeNativeContent.show()
                 binding.simpleWebview.gone()
-                if (viewState.hasContext) {
-                    renderPageContext(viewState.contextTitle, viewState.contextUrl, viewState.tabId)
+                renderPageContext(viewState.contextTitle, viewState.contextUrl, viewState.tabId)
+                if (viewState.showContext) {
                     binding.duckAiContextualLayout.show()
+                    binding.contextualModePrompts.show()
                     binding.duckAiContextualAddAttachment.gone()
                 } else {
                     binding.duckAiContextualLayout.gone()
+                    binding.contextualModePrompts.gone()
                     binding.duckAiContextualAddAttachment.show()
                 }
                 if (viewState.prompt.isNotEmpty()) {
@@ -504,7 +506,7 @@ class DuckChatContextualFragment :
                 }
             }
 
-            is DuckChatContextualViewModel.ViewState.ChatViewState -> {
+            DuckChatContextualViewModel.SheetMode.WEBVIEW -> {
                 binding.contextualModeNativeContent.gone()
                 binding.simpleWebview.show()
             }
@@ -522,7 +524,6 @@ class DuckChatContextualFragment :
         pageUrl: String,
         tabId: String,
     ) {
-        logcat { "Duck.ai: renderPageContext tab=$tabId title=$pageTitle url=$pageUrl" }
         binding.duckAiContextualPageTitle.text = pageTitle
         viewModel.viewModelScope.launch {
             faviconManager.loadToViewFromLocalWithPlaceholder(tabId, pageUrl, binding.duckAiContextualFavicon)

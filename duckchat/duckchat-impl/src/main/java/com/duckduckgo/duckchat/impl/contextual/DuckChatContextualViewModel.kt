@@ -30,6 +30,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -66,34 +67,43 @@ class DuckChatContextualViewModel @Inject constructor(
 
     private val _viewState: MutableStateFlow<ViewState> =
         MutableStateFlow(
-            ViewState.InputModeViewState(
+            ViewState(
                 sheetMode = SheetMode.INPUT,
                 sheetState = BottomSheetBehavior.STATE_HALF_EXPANDED,
-                hasContext = false,
+                showContext = false,
+                allowsAutomaticContextAttachment = false,
                 contextUrl = "",
                 contextTitle = "",
                 tabId = "",
                 prompt = "",
+                url = "",
             ),
         )
     val viewState: StateFlow<ViewState> = _viewState.asStateFlow()
 
-    sealed class ViewState(open val sheetState: Int) {
-        data class InputModeViewState(
-            val sheetMode: SheetMode = SheetMode.INPUT,
-            override val sheetState: Int = BottomSheetBehavior.STATE_HALF_EXPANDED,
-            val hasContext: Boolean = false,
-            val contextUrl: String,
-            val contextTitle: String,
-            val tabId: String,
-            val prompt: String,
-        ) : ViewState(sheetState)
+    data class ViewState(
+        val sheetMode: SheetMode = SheetMode.INPUT,
+        val sheetState: Int = BottomSheetBehavior.STATE_HALF_EXPANDED,
+        val allowsAutomaticContextAttachment: Boolean = false,
+        val showContext: Boolean = false,
+        val contextUrl: String = "",
+        val contextTitle: String = "",
+        val tabId: String = "",
+        val prompt: String = "",
+        val url: String = "",
+    )
 
-        data class ChatViewState(
-            val sheetMode: SheetMode = SheetMode.WEBVIEW,
-            val url: String,
-            override val sheetState: Int = BottomSheetBehavior.STATE_EXPANDED,
-        ) : ViewState(sheetState)
+    init {
+        viewModelScope.launch(dispatchers.io()) {
+            duckChat.observeAutomaticContextAttachmentUserSettingEnabled().collect { enabled ->
+                _viewState.update {
+                    it.copy(
+                        allowsAutomaticContextAttachment = enabled,
+                        showContext = enabled,
+                    )
+                }
+            }
+        }
     }
 
     fun onSheetOpened(tabId: String) {
@@ -110,7 +120,7 @@ class DuckChatContextualViewModel @Inject constructor(
     fun onNativeInputFocused(focused: Boolean) {
         viewModelScope.launch {
             _viewState.update { current ->
-                if (current is ViewState.InputModeViewState) {
+                if (current.sheetMode == SheetMode.INPUT) {
                     if (focused) {
                         current.copy(sheetState = BottomSheetBehavior.STATE_EXPANDED)
                     } else {
@@ -129,7 +139,8 @@ class DuckChatContextualViewModel @Inject constructor(
             withContext(dispatchers.main()) {
                 logcat { "Duck.ai: pageContext prompt $contextPrompt" }
                 _viewState.value =
-                    ViewState.ChatViewState(
+                    _viewState.value.copy(
+                        sheetMode = SheetMode.WEBVIEW,
                         url = "chatUrl",
                         sheetState = BottomSheetBehavior.STATE_EXPANDED,
                     )
@@ -145,18 +156,19 @@ class DuckChatContextualViewModel @Inject constructor(
     }
 
     private fun generateContextPrompt(prompt: String): SubscriptionEventData {
-        val viewState = _viewState.value as ViewState.InputModeViewState
-        val pageContext = if (viewState.hasContext) {
-            updatedPageContext
-                .takeIf { it.isNotBlank() }
-                ?.let { runCatching { JSONObject(it) }.getOrNull() }
-                ?: run {
-                    logcat { "Duck.ai: no pageContext available, skipping pageContext in prompt" }
-                    null
-                }
-        } else {
-            null
-        }
+        val viewState = _viewState.value
+        val pageContext =
+            if (viewState.showContext) {
+                updatedPageContext
+                    .takeIf { it.isNotBlank() }
+                    ?.let { runCatching { JSONObject(it) }.getOrNull() }
+                    ?: run {
+                        logcat { "Duck.ai: no pageContext available, skipping pageContext in prompt" }
+                        null
+                    }
+            } else {
+                null
+            }
 
         val params =
             JSONObject().apply {
@@ -197,26 +209,14 @@ class DuckChatContextualViewModel @Inject constructor(
 
     fun onContextualClose() {
         viewModelScope.launch {
-            _viewState.update { current ->
-                if (current is ViewState.InputModeViewState) {
-                    current.copy(sheetState = BottomSheetBehavior.STATE_HIDDEN)
-                } else {
-                    val chatState = current as ViewState.ChatViewState
-                    chatState.copy(sheetState = BottomSheetBehavior.STATE_HIDDEN)
-                }
-            }
+            _viewState.update { current -> current.copy(sheetState = BottomSheetBehavior.STATE_HIDDEN) }
         }
     }
 
     fun removePageContext() {
         viewModelScope.launch {
             _viewState.update { current ->
-                if (current is ViewState.InputModeViewState) {
-                    current.copy(hasContext = false)
-                } else {
-                    val chatState = current as ViewState.ChatViewState
-                    chatState.copy(sheetState = BottomSheetBehavior.STATE_HIDDEN)
-                }
+                current.copy(showContext = false)
             }
         }
     }
@@ -224,12 +224,9 @@ class DuckChatContextualViewModel @Inject constructor(
     fun addPageContext() {
         viewModelScope.launch {
             _viewState.update { current ->
-                if (current is ViewState.InputModeViewState) {
-                    current.copy(hasContext = true)
-                } else {
-                    val chatState = current as ViewState.ChatViewState
-                    chatState.copy(sheetState = BottomSheetBehavior.STATE_HIDDEN)
-                }
+                current.copy(
+                    showContext = true,
+                )
             }
         }
     }
@@ -237,12 +234,7 @@ class DuckChatContextualViewModel @Inject constructor(
     fun replacePrompt(prompt: String) {
         viewModelScope.launch {
             _viewState.update { current ->
-                if (current is ViewState.InputModeViewState) {
-                    current.copy(prompt = prompt)
-                } else {
-                    val chatState = current as ViewState.ChatViewState
-                    chatState.copy(sheetState = BottomSheetBehavior.STATE_HIDDEN)
-                }
+                current.copy(prompt = prompt)
             }
         }
     }
@@ -256,33 +248,36 @@ class DuckChatContextualViewModel @Inject constructor(
         }
     }
 
-    fun onPageContextReceived(tabId: String, pageContext: String) {
+    fun onPageContextReceived(
+        tabId: String,
+        pageContext: String,
+    ) {
         updatedPageContext = pageContext
 
         val json = JSONObject(updatedPageContext)
         val title = json.optString("title").takeIf { it.isNotBlank() }
         val url = json.optString("url").takeIf { it.isNotBlank() }
 
-        if (title == null && url == null) {
-            logcat { "Duck.ai: missing title/url in pageContext json=$json" }
-        } else {
+        if (title != null && url != null) {
             val inputMode = _viewState.value
 
-            if (inputMode is ViewState.InputModeViewState) {
+            if (inputMode.sheetMode == SheetMode.INPUT) {
                 _viewState.update {
                     inputMode.copy(
-                        contextTitle = title!!,
-                        contextUrl = url!!,
+                        contextTitle = title,
+                        contextUrl = url,
                         tabId = tabId,
-                        hasContext = true,
+                        showContext = _viewState.value.allowsAutomaticContextAttachment && _viewState.value.showContext,
                     )
                 }
             } else {
-                viewModelScope.launch(dispatchers.io()) {
-                    val contextPrompt = generateContext()
-                    withContext(dispatchers.main()) {
-                        logcat { "Duck.ai: send new pageContext $contextPrompt" }
-                        _subscriptionEventDataChannel.trySend(contextPrompt)
+                if (_viewState.value.allowsAutomaticContextAttachment) {
+                    viewModelScope.launch(dispatchers.io()) {
+                        val contextPrompt = generateContext()
+                        withContext(dispatchers.main()) {
+                            logcat { "Duck.ai: send new pageContext $contextPrompt" }
+                            _subscriptionEventDataChannel.trySend(contextPrompt)
+                        }
                     }
                 }
             }
