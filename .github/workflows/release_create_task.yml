@@ -23,9 +23,6 @@ jobs:
     runs-on: macos-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
       - name: Check app-version value
         run: |
           if [ "${{ github.event.inputs.app-version }}" == "PLACEHOLDER" ]; then
@@ -34,6 +31,24 @@ jobs:
           else
             echo "Input value is valid: ${{ github.event.inputs.app-version }}"
           fi
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.app-version || github.sha }}
+
+      - name: Get previous release tag
+        id: get_previous_tag
+        run: |
+          output=$(git for-each-ref --sort=taggerdate --format='%(refname:short)' refs/tags | grep -E "^[0-9]+\.[0-9]+\.[0-9]+$" | grep -v "^${{ github.event.inputs.app-version }}$" | tail -n 1)
+          echo "Previous tag: $output"
+          echo "previous_tag=$output" >> "$GITHUB_OUTPUT"
+
+      - name: Check for changes
+        id: check_for_changes
+        uses: ./.github/actions/check-for-changes-since-tag
+        with:
+          tag: ${{ steps.get_previous_tag.outputs.previous_tag }}
+          branch: main
 
       - name: Install Release Bridge from Homebrew
         run: |
@@ -50,9 +65,28 @@ jobs:
           mattermost-message: ${{env.emoji_start}} Starting release process for version ${{ github.event.inputs.app-version }}
           action: 'send-mattermost-message'
 
-      - name: Create task in Asana
+      - name: Install dependencies for create-asana-release task
         run: |
-          AndroidAsanaBridge version=${{ github.event.inputs.app-version }} action=createRelease,tagPendingTasks,addLinksToDescription,removePendingTasks
+          python -m pip install --upgrade pip
+          pip install -r scripts/release/requirements.txt
+
+      - name: Create Asana release task
+        if: steps.check_for_changes.outputs.has_changes == 'true'
+        env:
+          ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
+        shell: bash
+        run: |
+          RELEASE_TASK_URL=$(python ./scripts/release/create-asana-release.py \
+          --android-repo-path . \
+          --tag "${{ github.event.inputs.app-version }}" \
+          --trigger-phrase 'Task/Issue URL:' \
+          --asana-project-id "${{ vars.GH_ANDROID_RELEASE_BOARD_PROJECT_ID }}" \
+          --asana-section-id "${{ vars.GH_ANDROID_RELEASE_BOARD_QA_SECTION_ID }}" \
+          --asana-workspace-id "${{ secrets.GH_ASANA_WORKSPACE_ID }}" \
+          --asana-api-key-env-var ASANA_ACCESS_TOKEN \
+          --template-task-id "${{ vars.GH_ANDROID_RELEASE_BOARD_TEMPLATE_TASK_ID }}" \
+          --public-release)
+          echo "RELEASE_TASK_URL=$RELEASE_TASK_URL" >> "$GITHUB_ENV"
 
       - name: Assign task to Github Actor
         id: assign-release-task
@@ -74,14 +108,14 @@ jobs:
             # Check for error markers
             if [[ "$TASK_ID_VALUE" == "TASK_NOT_FOUND" || "$TASK_ID_VALUE" == "USER_MAPPING_FILE_NOT_FOUND" || "$TASK_ID_VALUE" == "USER_NOT_IN_MAPPING" ]]; then
               echo "::error::Error marker found in output file: $TASK_ID_VALUE"
-              echo "task_id=" >> $GITHUB_OUTPUT # Set actual output to empty on error
+              echo "task_id=" >> "$GITHUB_OUTPUT" # Set actual output to empty on error
             else
               echo "Successfully read Task ID: '$TASK_ID_VALUE'"
-              echo "task_id=$TASK_ID_VALUE" >> $GITHUB_OUTPUT
+              echo "task_id=$TASK_ID_VALUE" >> "$GITHUB_OUTPUT"
             fi
           else
             echo "::error::Output file $OUTPUT_FILE not found!"
-            echo "task_id=" >> $GITHUB_OUTPUT # Set actual output to empty if file not found
+            echo "task_id=" >> "$GITHUB_OUTPUT" # Set actual output to empty if file not found
           fi
 
       - name: Get Asana Task Permalink
