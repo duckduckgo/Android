@@ -158,6 +158,7 @@ import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewGenerator
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.browser.ui.dialogs.AutomaticFireproofDialogOptions
+import com.duckduckgo.app.browser.ui.dialogs.DuckAiContextualOnboardingBottomSheetDialog
 import com.duckduckgo.app.browser.ui.dialogs.LaunchInExternalAppOptions
 import com.duckduckgo.app.browser.ui.dialogs.widgetprompt.AlternativeHomeScreenWidgetBottomSheetDialog
 import com.duckduckgo.app.browser.urlextraction.DOMUrlExtractor
@@ -378,6 +379,7 @@ class BrowserTabFragment :
 
     private var duckAiContextualFragment: DuckChatContextualFragment? = null
     private var duckAiContextualBehaviourState: Int = BottomSheetBehavior.STATE_HALF_EXPANDED
+    private var duckAiContextualOnboardingSheet: DuckAiContextualOnboardingBottomSheetDialog? = null
 
     override val coroutineContext: CoroutineContext
         get() = supervisorJob + dispatchers.main()
@@ -567,6 +569,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var duckChat: DuckChat
+
+    @Inject
+    lateinit var duckChatDataStore: com.duckduckgo.duckchat.impl.store.DuckChatDataStore
 
     @Inject
     lateinit var duckAiFeatureState: DuckAiFeatureState
@@ -1786,6 +1791,8 @@ class BrowserTabFragment :
         webView?.removeEnableSwipeRefreshCallback()
         webView?.stopNestedScroll()
         webView?.stopLoading()
+        duckAiContextualOnboardingSheet?.dismiss()
+        duckAiContextualOnboardingSheet = null
         browserNavigationBarIntegration.onDestroyView()
         super.onDestroyView()
     }
@@ -2599,6 +2606,7 @@ class BrowserTabFragment :
             is Command.EnableDuckAIFullScreen -> showDuckAI(it.browserViewState)
             is Command.DisableDuckAIFullScreen -> omnibar.setViewMode(ViewMode.Browser(it.url))
             is Command.ShowDuckAIContextualMode -> showDuckChatContextualSheet()
+            is Command.ShowDuckAIContextualOnboarding -> showDuckAiContextualOnboardingSheet()
             is Command.StartAddressBarTrackersAnimation -> {
                 omnibar.startTrackersAnimation(it.trackerEntities)
             }
@@ -3360,6 +3368,26 @@ class BrowserTabFragment :
             }
             override fun onSlide(bottomSheet: View, slideOffset: Float) {}
         })
+    }
+
+    private fun showDuckAiContextualOnboardingSheet() {
+        if (duckAiContextualOnboardingSheet != null) return
+
+        val dialog = DuckAiContextualOnboardingBottomSheetDialog(
+            requireContext(),
+            viewLifecycleOwner.lifecycleScope,
+            duckChatDataStore,
+            globalActivityStarter,
+        )
+        dialog.eventListener = object : DuckAiContextualOnboardingBottomSheetDialog.EventListener {
+            override fun onDismissed() {
+                duckAiContextualOnboardingSheet = null
+                showDuckChatContextualSheet()
+            }
+        }
+
+        dialog.show()
+        duckAiContextualOnboardingSheet = dialog
     }
 
     private fun removeDuckChatContextualSheet() {

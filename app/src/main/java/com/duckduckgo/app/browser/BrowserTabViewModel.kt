@@ -464,6 +464,7 @@ class BrowserTabViewModel @Inject constructor(
     private val httpErrorPixels: Lazy<HttpErrorPixels>,
     private val duckPlayer: DuckPlayer,
     private val duckChat: DuckChat,
+    private val duckChatDataStore: com.duckduckgo.duckchat.impl.store.DuckChatDataStore,
     private val duckAiFeatureState: DuckAiFeatureState,
     private val duckPlayerJSHelper: DuckPlayerJSHelper,
     private val refreshPixelSender: RefreshPixelSender,
@@ -4562,7 +4563,13 @@ class BrowserTabViewModel @Inject constructor(
 
         when {
             duckAiFeatureState.showContextualMode.value && !isNtp -> {
-                command.value = Command.ShowDuckAIContextualMode
+                viewModelScope.launch {
+                    if (duckChatDataStore.isContextualOnboardingDismissed()) {
+                        command.value = Command.ShowDuckAIContextualMode
+                    } else {
+                        command.value = Command.ShowDuckAIContextualOnboarding
+                    }
+                }
             }
 
             duckAiFeatureState.showFullScreenMode.value -> {
