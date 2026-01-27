@@ -184,9 +184,8 @@ class PirDevScanActivity : DuckDuckGoActivity() {
 
                     globalActivityStarter.start(
                         this@PirDevScanActivity,
-                        PirDevWebViewResultsScreenParams(
+                        PirDevWebViewScreenParams.PirDevScanWebViewScreenParams(
                             brokers = listOf(selectedBroker!!),
-                            debugType = DebugType.SCAN,
                         ),
                     )
                 }
