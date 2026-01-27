@@ -77,6 +77,12 @@ interface DuckChat {
     fun showContextualOnboardingDialog(context: Context, onDismissed: () -> Unit)
 
     /**
+     * Checks if the contextual onboarding has been dismissed.
+     * @return true if the onboarding was dismissed, false otherwise
+     */
+    suspend fun isContextualOnboardingDismissed(): Boolean
+
+    /**
      * Set user setting to determine whether dedicated Duck.ai input screen with a mode switch should be used.
      */
     suspend fun setInputScreenUserSetting(enabled: Boolean)

@@ -672,6 +672,10 @@ class RealDuckChat @Inject constructor(
         dialog.show()
     }
 
+    override suspend fun isContextualOnboardingDismissed(): Boolean {
+        return duckChatFeatureRepository.isContextualOnboardingDismissed()
+    }
+
     private suspend fun hasActiveSession(): Boolean {
         val now = System.currentTimeMillis()
         val lastSession = duckChatFeatureRepository.lastSessionTimestamp()
