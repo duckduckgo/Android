@@ -54,6 +54,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.Boolean
 
 interface DuckChatDataStore {
     suspend fun setDuckChatUserEnabled(enabled: Boolean)
@@ -123,6 +124,8 @@ interface DuckChatDataStore {
     suspend fun setContextualOnboardingCompleted(completed: Boolean)
 
     suspend fun isContextualOnboardingCompleted(): Boolean
+
+    suspend fun isAutomaticPageContextAttachmentEnabled(): Boolean
 }
 
 @ContributesBinding(AppScope::class)
@@ -340,4 +343,6 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
     override suspend fun isContextualOnboardingCompleted(): Boolean = store.data.firstOrNull()?.let {
         it[DUCK_AI_CONTEXTUAL_ONBOARDING_DISMISSED]
     } ?: false
+
+    override suspend fun isAutomaticPageContextAttachmentEnabled() = store.data.firstOrNull()?.let { it[DUCK_AI_AUTOMATIC_CONTEXT_ATTACHMENT] } ?: false
 }

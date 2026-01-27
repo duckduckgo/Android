@@ -149,6 +149,17 @@ class RealDuckChatJSHelper @Inject constructor(
                 null
             }
 
+            METHOD_GET_PAGE_CONTEXT -> {
+                id?.let {
+                    val reason = data?.optString("reason") ?: "userAction"
+                    if (reason == "userAction" || (reason == "init" && duckChat.isAutomaticContextAttachmentEnabled())) {
+                        getPageContextResponse(featureName, method, it)
+                    } else {
+                        null
+                    }
+                }
+            }
+
             else -> null
         }
     }
@@ -205,6 +216,14 @@ class RealDuckChatJSHelper @Inject constructor(
         return JsCallbackData(jsonPayload, featureName, method, id)
     }
 
+    private fun getPageContextResponse(
+        featureName: String,
+        method: String,
+        id: String,
+    ): JsCallbackData {
+        return JsCallbackData(JSONObject(), featureName, method, id)
+    }
+
     private fun getOpenKeyboardResponse(
         featureName: String,
         method: String,
@@ -254,6 +273,7 @@ class RealDuckChatJSHelper @Inject constructor(
         private const val METHOD_RESPONSE_STATE = "responseState"
         private const val METHOD_HIDE_CHAT_INPUT = "hideChatInput"
         private const val METHOD_SHOW_CHAT_INPUT = "showChatInput"
+        const val METHOD_GET_PAGE_CONTEXT = "getAIChatPageContext"
         const val METHOD_OPEN_KEYBOARD = "openKeyboard"
         private const val AI_CHAT_PAYLOAD = "aiChatPayload"
         private const val METHOD_OPEN_KEYBOARD_PAYLOAD = "selector"

@@ -1142,30 +1142,37 @@ class RealDuckChatTest {
 
     @Test
     fun `when get duck chat url with query and autoprompt then return correct url`() = runTest {
-        val url = testee.getDuckChatUrl("query", true)
+        val url = testee.getDuckChatUrl(query = "query", autoPrompt = true, sidebar = false)
 
         assertTrue(url == "https://duckduckgo.com/?q=query&prompt=1&ia=chat&duckai=5")
     }
 
     @Test
     fun `when get duck chat url with query and no autoprompt then return correct url`() = runTest {
-        val url = testee.getDuckChatUrl("query", false)
+        val url = testee.getDuckChatUrl(query = "query", autoPrompt = false, sidebar = false)
 
         assertTrue(url == "https://duckduckgo.com/?q=query&ia=chat&duckai=5")
     }
 
     @Test
     fun `when get duck chat url with empty query and no autoprompt then return correct url`() = runTest {
-        val url = testee.getDuckChatUrl("", false)
+        val url = testee.getDuckChatUrl(query = "", autoPrompt = false, sidebar = false)
 
         assertTrue(url == "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5")
     }
 
     @Test
     fun `when get duck chat url with empty query and autoprompt then return correct url`() = runTest {
-        val url = testee.getDuckChatUrl("", true)
+        val url = testee.getDuckChatUrl(query = "", autoPrompt = true, sidebar = false)
 
         assertTrue(url == "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5")
+    }
+
+    @Test
+    fun `when get duck chat url with query and sidebar then return url with placement parameter`() = runTest {
+        val url = testee.getDuckChatUrl(query = "query", autoPrompt = false, sidebar = true)
+
+        assertTrue(url == "https://duckduckgo.com/?q=query&placement=sidebar&ia=chat&duckai=5")
     }
 
     @Test

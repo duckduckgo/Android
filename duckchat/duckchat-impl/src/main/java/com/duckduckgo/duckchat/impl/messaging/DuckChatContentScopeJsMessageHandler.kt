@@ -58,6 +58,8 @@ class DuckChatContentScopeJsMessageHandler @Inject constructor() : ContentScopeJ
                     "showChatInput",
                     "reportMetric",
                     "openKeyboard",
+                    "getAIChatPageContext",
+                    "submitAIChatPageContext",
                 )
         }
 }
