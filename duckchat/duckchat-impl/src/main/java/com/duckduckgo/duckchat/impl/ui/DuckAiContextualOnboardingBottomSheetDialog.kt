@@ -20,10 +20,11 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.duckchat.api.DuckChatNativeSettingsNoParams
 import com.duckduckgo.duckchat.impl.R
-import com.duckduckgo.duckchat.impl.store.DuckChatDataStore
+import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.coroutines.CoroutineScope
@@ -32,8 +33,8 @@ import kotlinx.coroutines.launch
 @SuppressLint("NoBottomSheetDialog")
 class DuckAiContextualOnboardingBottomSheetDialog(
     context: Context,
-    private val coroutineScope: CoroutineScope,
-    private val duckChatDataStore: DuckChatDataStore,
+    @AppCoroutineScope private val coroutineScope: CoroutineScope,
+    private val duckChatFeatureRepository: DuckChatFeatureRepository,
     private val globalActivityStarter: GlobalActivityStarter,
 ) : BottomSheetDialog(context) {
 
@@ -54,14 +55,14 @@ class DuckAiContextualOnboardingBottomSheetDialog(
 
         view.findViewById<View>(R.id.duckAiContextualOnboardingPrimaryButton).setOnClickListener {
             coroutineScope.launch {
-                duckChatDataStore.setContextualOnboardingDismissed(true)
+                duckChatFeatureRepository.setContextualOnboardingDismissed(true)
             }
             dismiss()
         }
 
         view.findViewById<View>(R.id.duckAiContextualOnboardingSecondaryButton).setOnClickListener {
             coroutineScope.launch {
-                duckChatDataStore.setContextualOnboardingDismissed(true)
+                duckChatFeatureRepository.setContextualOnboardingDismissed(true)
             }
             globalActivityStarter.start(context, DuckChatNativeSettingsNoParams)
             dismiss()

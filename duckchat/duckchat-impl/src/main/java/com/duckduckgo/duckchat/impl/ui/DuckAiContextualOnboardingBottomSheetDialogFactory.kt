@@ -18,7 +18,7 @@ package com.duckduckgo.duckchat.impl.ui
 
 import android.content.Context
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.duckchat.impl.store.DuckChatDataStore
+import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.CoroutineScope
@@ -34,7 +34,7 @@ interface DuckAiContextualOnboardingBottomSheetDialogFactory {
 
 @ContributesBinding(AppScope::class)
 class RealDuckAiContextualOnboardingBottomSheetDialogFactory @Inject constructor(
-    private val duckChatDataStore: DuckChatDataStore,
+    private val duckChatFeatureRepository: DuckChatFeatureRepository,
 ) : DuckAiContextualOnboardingBottomSheetDialogFactory {
 
     override fun create(
@@ -45,7 +45,7 @@ class RealDuckAiContextualOnboardingBottomSheetDialogFactory @Inject constructor
         return DuckAiContextualOnboardingBottomSheetDialog(
             context = context,
             coroutineScope = coroutineScope,
-            duckChatDataStore = duckChatDataStore,
+            duckChatFeatureRepository = duckChatFeatureRepository,
             globalActivityStarter = globalActivityStarter,
         )
     }
