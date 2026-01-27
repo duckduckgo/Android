@@ -46,6 +46,7 @@ interface DuckChatJSHelper {
         id: String?,
         data: JSONObject?,
         mode: Mode = Mode.FULL,
+        pageContext: String? = null,
     ): JsCallbackData?
 
     fun onNativeAction(action: NativeAction): SubscriptionEventData
@@ -79,6 +80,7 @@ class RealDuckChatJSHelper @Inject constructor(
         id: String?,
         data: JSONObject?,
         mode: Mode,
+        pageContext: String?,
     ): JsCallbackData? {
         fun registerDuckChatIsOpenDebounced(windowMs: Long = 500L) {
             // we debounced because METHOD_GET_AI_CHAT_NATIVE_HANDOFF_DATA can be called more than once
@@ -152,8 +154,8 @@ class RealDuckChatJSHelper @Inject constructor(
             METHOD_GET_PAGE_CONTEXT -> {
                 id?.let {
                     val reason = data?.optString("reason") ?: "userAction"
-                    if (reason == "userAction" || (reason == "init" && duckChat.isAutomaticContextAttachmentEnabled())) {
-                        getPageContextResponse(featureName, method, it)
+                    if (pageContext != null && (reason == "userAction" || (reason == "init" && duckChat.isAutomaticContextAttachmentEnabled()))) {
+                        getPageContextResponse(featureName, method, it, pageContext)
                     } else {
                         null
                     }
@@ -220,8 +222,17 @@ class RealDuckChatJSHelper @Inject constructor(
         featureName: String,
         method: String,
         id: String,
+        pageContext: String,
     ): JsCallbackData {
-        return JsCallbackData(JSONObject(), featureName, method, id)
+        val params =
+            JSONObject().apply {
+                put(
+                    PAGE_CONTEXT,
+                    JSONObject(pageContext),
+                )
+            }
+
+        return JsCallbackData(params, featureName, method, id)
     }
 
     private fun getOpenKeyboardResponse(
@@ -278,6 +289,7 @@ class RealDuckChatJSHelper @Inject constructor(
         private const val AI_CHAT_PAYLOAD = "aiChatPayload"
         private const val METHOD_OPEN_KEYBOARD_PAYLOAD = "selector"
         private const val IS_HANDOFF_ENABLED = "isAIChatHandoffEnabled"
+        private const val PAGE_CONTEXT = "pageContext"
         private const val SUPPORTS_CLOSING_AI_CHAT = "supportsClosingAIChat"
         private const val SUPPORTS_OPENING_SETTINGS = "supportsOpeningSettings"
         private const val SUPPORTS_NATIVE_CHAT_INPUT = "supportsNativeChatInput"
