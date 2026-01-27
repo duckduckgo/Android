@@ -46,7 +46,7 @@
             android:process=":pir">
             <property
                 android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
-                android:value="Executing operations for the Personal Information Removal feature" />
+                android:value="Executing debug operations for the Personal Information Removal feature. Only used as a debug tool." />
         </service>
 
         <service

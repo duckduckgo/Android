@@ -30,6 +30,7 @@ import com.duckduckgo.pir.impl.PirFeatureDataCleaner
 import com.duckduckgo.pir.impl.R
 import com.duckduckgo.pir.impl.checker.PirWorkHandler
 import com.duckduckgo.pir.impl.notifications.PirNotificationManager
+import com.duckduckgo.pir.impl.pixels.PirPixelSender
 import com.duckduckgo.pir.impl.scheduling.PirExecutionType
 import com.duckduckgo.pir.impl.scheduling.PirJobsRunner
 import dagger.android.AndroidInjection
@@ -54,6 +55,9 @@ class PirForegroundScanService : Service(), CoroutineScope by MainScope() {
 
     @Inject
     lateinit var pirFeatureDataCleaner: PirFeatureDataCleaner
+
+    @Inject
+    lateinit var pirPixelSender: PirPixelSender
 
     override fun onCreate() {
         super.onCreate()
@@ -87,6 +91,7 @@ class PirForegroundScanService : Service(), CoroutineScope by MainScope() {
             )
         } catch (_: Exception) {
             logcat(LogPriority.ERROR) { "PIR-SCAN: Could not start the service as foreground!" }
+            pirPixelSender.reportManualScanStartFailed()
             // If we can't start as a foreground service, there's no point in continuing.
             stopSelf()
             return START_NOT_STICKY

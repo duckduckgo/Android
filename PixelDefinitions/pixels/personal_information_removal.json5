@@ -1099,6 +1099,20 @@
             }
         ]
     },
+    "m_dbp_foreground-run_start-failed": {
+        "description": "Fired when pir foreground service fails to start as foreground",
+        "owners": ["karlenDimla", "landomen"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "man",
+                "description": "Manufacturer of the device",
+                "type": "string"
+            }
+        ]
+    },
     "m_dbp_scheduled-run_scheduled": {
         "description": "Fired when the pir scheduled runs are scheduled",
         "owners": ["karlenDimla", "landomen"],
