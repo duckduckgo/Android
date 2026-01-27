@@ -414,13 +414,7 @@ class DuckChatContextualFragment :
         }
 
         binding.contextualFullScreen.setOnClickListener {
-            logcat { "Duck.ai: fullscreen ${simpleWebview.url}" }
-            simpleWebview.url?.let { url ->
-                val result = Bundle().apply {
-                    putString(KEY_DUCK_AI_URL, url)
-                }
-                setFragmentResult(KEY_DUCK_AI_CONTEXTUAL_RESULT, result)
-            }
+            viewModel.onFullModeRequested()
         }
         binding.duckAiContextualPageRemove.setOnClickListener {
             viewModel.removePageContext()
@@ -458,6 +452,13 @@ class DuckChatContextualFragment :
                     is DuckChatContextualViewModel.Command.LoadUrl -> {
                         logcat { "Duck.ai Contextual: load url ${command.url}" }
                         simpleWebview.loadUrl(command.url)
+                    }
+
+                    is DuckChatContextualViewModel.Command.OpenFullscreenMode -> {
+                        val result = Bundle().apply {
+                            putString(KEY_DUCK_AI_URL, command.url)
+                        }
+                        setFragmentResult(KEY_DUCK_AI_CONTEXTUAL_RESULT, result)
                     }
                 }
             }.launchIn(lifecycleScope)

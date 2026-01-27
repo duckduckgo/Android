@@ -58,11 +58,13 @@ class DuckChatContextualViewModel @Inject constructor(
         WEBVIEW,
     }
 
+    private var fullModeUrl: String = ""
     private var updatedPageContext: String = ""
 
     sealed class Command {
         data class LoadUrl(val url: String) : Command()
         data object SendSubscriptionAuthUpdateEvent : Command()
+        data class OpenFullscreenMode(val url: String) : Command()
     }
 
     private val _viewState: MutableStateFlow<ViewState> =
@@ -184,7 +186,9 @@ class DuckChatContextualViewModel @Inject constructor(
     }
 
     fun onChatPageLoaded(url: String?) {
-        // No-op for now; kept for future use.
+        if (url != null) {
+            fullModeUrl
+        }
     }
 
     private fun generateContextPrompt(prompt: String): SubscriptionEventData {
@@ -280,6 +284,15 @@ class DuckChatContextualViewModel @Inject constructor(
                     val chatState = current as ViewState.ChatViewState
                     chatState.copy(sheetState = BottomSheetBehavior.STATE_HIDDEN)
                 }
+            }
+        }
+    }
+
+    fun onFullModeRequested() {
+        logcat { "Duck.ai: request fullmode url $fullModeUrl" }
+        if (fullModeUrl.isNotEmpty()) {
+            viewModelScope.launch {
+                commandChannel.trySend(Command.OpenFullscreenMode(fullModeUrl))
             }
         }
     }
