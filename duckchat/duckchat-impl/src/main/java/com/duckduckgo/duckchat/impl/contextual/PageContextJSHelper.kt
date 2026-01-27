@@ -19,7 +19,6 @@ package com.duckduckgo.duckchat.impl.contextual
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.squareup.anvil.annotations.ContributesBinding
-import logcat.logcat
 import org.json.JSONObject
 import javax.inject.Inject
 
@@ -36,8 +35,7 @@ interface PageContextJSHelper {
 }
 
 @ContributesBinding(AppScope::class)
-class RealPageContextJSHelper @Inject constructor(
-) : PageContextJSHelper {
+class RealPageContextJSHelper @Inject constructor() : PageContextJSHelper {
     override suspend fun processPageContext(
         featureName: String,
         method: String,

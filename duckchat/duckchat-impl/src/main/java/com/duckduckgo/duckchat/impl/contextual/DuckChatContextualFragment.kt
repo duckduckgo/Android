@@ -466,9 +466,9 @@ class DuckChatContextualFragment :
                 }
             }.launchIn(lifecycleScope)
 
-        sharedContextualViewModel.commands.
-            onEach { command ->
-                when(command){
+        sharedContextualViewModel.commands
+            .onEach { command ->
+                when (command) {
                     is DuckChatContextualSharedViewModel.Command.PageContextAttached -> {
                         logcat { "Duck.ai Contextual: page context received" }
                         viewModel.onPageContextReceived(command.tabId, command.pageContext)
