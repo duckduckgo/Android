@@ -23,7 +23,7 @@ import com.duckduckgo.newtabpage.api.NewTabPageSection
 import com.duckduckgo.newtabpage.api.NewTabPageSectionProvider
 import com.duckduckgo.newtabpage.impl.FakeEnabledSectionPlugin
 import com.duckduckgo.newtabpage.impl.pixels.NewTabPixels
-import com.duckduckgo.newtabpage.impl.view.NewTabPageViewModel
+import com.duckduckgo.newtabpage.impl.view.ConfigurableNewTabPageViewModel
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
@@ -35,7 +35,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
-class NewTabPageViewModelTest {
+class ConfigurableNewTabPageViewModelTest {
 
     @get:Rule
     var coroutinesTestRule = CoroutineTestRule()
@@ -44,11 +44,11 @@ class NewTabPageViewModelTest {
     private val pixels: NewTabPixels = mock()
     private val lifecycleOwner: LifecycleOwner = mock()
 
-    private lateinit var testee: NewTabPageViewModel
+    private lateinit var testee: ConfigurableNewTabPageViewModel
 
     @Before
     fun setup() {
-        testee = NewTabPageViewModel(sectionProvider, pixels, coroutinesTestRule.testDispatcherProvider)
+        testee = ConfigurableNewTabPageViewModel(sectionProvider, pixels, coroutinesTestRule.testDispatcherProvider)
     }
 
     @Test

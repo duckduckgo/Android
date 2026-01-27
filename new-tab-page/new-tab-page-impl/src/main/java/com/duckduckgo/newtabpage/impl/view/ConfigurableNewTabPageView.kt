@@ -39,8 +39,8 @@ import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.newtabpage.api.NewTabPageSection
-import com.duckduckgo.newtabpage.impl.databinding.ViewNewTabPageBinding
-import com.duckduckgo.newtabpage.impl.view.NewTabPageViewModel.ViewState
+import com.duckduckgo.newtabpage.impl.databinding.ViewConfigurableNewTabPageBinding
+import com.duckduckgo.newtabpage.impl.view.ConfigurableNewTabPageViewModel.ViewState
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -48,7 +48,7 @@ import logcat.logcat
 import javax.inject.Inject
 
 @InjectWith(ViewScope::class)
-class NewTabPageView @JvmOverloads constructor(
+class ConfigurableNewTabPageView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
@@ -65,10 +65,10 @@ class NewTabPageView @JvmOverloads constructor(
     @Inject
     lateinit var dispatchers: DispatcherProvider
 
-    private val binding: ViewNewTabPageBinding by viewBinding()
+    private val binding: ViewConfigurableNewTabPageBinding by viewBinding()
 
-    private val viewModel: NewTabPageViewModel by lazy {
-        ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[NewTabPageViewModel::class.java]
+    private val viewModel: ConfigurableNewTabPageViewModel by lazy {
+        ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[ConfigurableNewTabPageViewModel::class.java]
     }
 
     private val conflatedJob = ConflatedJob()
