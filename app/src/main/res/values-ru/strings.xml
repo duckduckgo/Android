@@ -962,11 +962,16 @@
     <string name="settingsHeadingCompleteSetup">Завершение настройки</string>
 
     <!--TabSwitcher Trackers Animation-->
-    <string name="showTrackerCountInTabSwitcher">Показывать счетчик трекеров в переключателе вкладок</string>
+    <string name="trackerBlockedInTheLast7days" instruction="Placeholder is 1 tracker blocked">&lt;b&gt;Заблокировано трекеров: %1$s &lt;/b&gt; (за последние 7 дней)</string>
     <string name="tabSwitcherAnimationTileRemovalDialogTitle" instruction="A title for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Скрыть счетчик трекеров?</string>
     <string name="tabSwitcherAnimationTileRemovalDialogBody" instruction="A message for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Вы можете включить его снова в разделе «Настройки &gt; Внешний вид».</string>
     <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Скрыть</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Оставить</string>
+
+    <!-- Trackers blocked animation-->
+    <string name="settingsTrackersBlockedAnimationHeaderTitle">Анимация блокировки трекеров</string>
+    <string name="showTrackerCountInAddressBar">Показывать в адресной строке</string>
+    <string name="showWeeklyTrackerCountInTabSwitcher">Показывать в диспетчере вкладок</string>
 
     <!-- Widgets -->
     <string name="searchOnlyWidgetLabel" instruction="Label for the search-only widget">Только поиск</string>
