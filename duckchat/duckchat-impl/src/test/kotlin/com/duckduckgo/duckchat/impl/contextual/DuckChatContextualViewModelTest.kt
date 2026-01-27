@@ -291,6 +291,38 @@ class DuckChatContextualViewModelTest {
             }
         }
 
+    @Test
+    fun `when full mode requested with url then open fullscreen command emitted`() =
+        runTest {
+            setFullModeUrl("https://duck.chat/full")
+
+            testee.commands.test {
+                testee.onFullModeRequested()
+
+                val command = awaitItem() as DuckChatContextualViewModel.Command.OpenFullscreenMode
+                assertEquals("https://duck.chat/full", command.url)
+
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `when full mode requested without url then no command emitted`() =
+        runTest {
+            testee.commands.test {
+                testee.onFullModeRequested()
+
+                expectNoEvents()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    private fun setFullModeUrl(url: String) {
+        val fullModeUrlField = DuckChatContextualViewModel::class.java.getDeclaredField("fullModeUrl")
+        fullModeUrlField.isAccessible = true
+        fullModeUrlField.set(testee, url)
+    }
+
     private class FakePageContextRepository : PageContextRepository {
         private val updates = MutableSharedFlow<PageContextData?>(replay = 1, extraBufferCapacity = 1)
 
