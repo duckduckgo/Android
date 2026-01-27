@@ -1176,6 +1176,20 @@ class RealDuckChatTest {
     }
 
     @Test
+    fun `when get duck chat url with query autoprompt and sidebar then return url with placement and prompt`() = runTest {
+        val url = testee.getDuckChatUrl(query = "query", autoPrompt = true, sidebar = true)
+
+        assertTrue(url == "https://duckduckgo.com/?q=query&prompt=1&placement=sidebar&ia=chat&duckai=5")
+    }
+
+    @Test
+    fun `when get duck chat url with empty query and sidebar then return correct url`() = runTest {
+        val url = testee.getDuckChatUrl(query = "", autoPrompt = false, sidebar = true)
+
+        assertTrue(url == "https://duckduckgo.com/?placement=sidebar&q=DuckDuckGo+AI+Chat&ia=chat&duckai=5")
+    }
+
+    @Test
     fun `when url can be handled by webview return true`() {
         assertTrue(testee.canHandleOnAiWebView("https://duck.ai/somepath"))
         assertTrue(testee.canHandleOnAiWebView("https://duck.ai/somepath/someotherpath?test=1"))

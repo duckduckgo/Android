@@ -77,7 +77,6 @@ import com.duckduckgo.duckchat.impl.feature.AIChatDownloadFeature
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
 import com.duckduckgo.duckchat.impl.helper.Mode
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper
-import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper.Companion.METHOD_GET_PAGE_CONTEXT
 import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewClient
 import com.duckduckgo.duckchat.impl.ui.SubscriptionsHandler
 import com.duckduckgo.duckchat.impl.ui.filechooser.FileChooserIntentBuilder
@@ -296,26 +295,17 @@ class DuckChatContextualFragment :
                         when (featureName) {
                             RealDuckChatJSHelper.Companion.DUCK_CHAT_FEATURE_NAME -> {
                                 appCoroutineScope.launch(dispatcherProvider.io()) {
-                                    duckChatJSHelper.processJsCallbackMessage(featureName, method, id, data, Mode.CONTEXTUAL)?.let { response ->
-                                        if (method == METHOD_GET_PAGE_CONTEXT) {
-                                            val params =
-                                                JSONObject().apply {
-                                                    put(
-                                                        "pageContext",
-                                                        JSONObject(viewModel.updatedPageContext),
-                                                    )
-                                                }
-
-                                            val newResponse = response.copy(params = params)
-                                            logcat { "Duck.ai: response $newResponse" }
-                                            withContext(dispatcherProvider.main()) {
-                                                contentScopeScripts.onResponse(newResponse)
-                                            }
-                                        } else {
-                                            logcat { "Duck.ai: response $response" }
-                                            withContext(dispatcherProvider.main()) {
-                                                contentScopeScripts.onResponse(response)
-                                            }
+                                    duckChatJSHelper.processJsCallbackMessage(
+                                        featureName,
+                                        method,
+                                        id,
+                                        data,
+                                        Mode.CONTEXTUAL,
+                                        viewModel.updatedPageContext,
+                                    )?.let { response ->
+                                        logcat { "Duck.ai: response $response" }
+                                        withContext(dispatcherProvider.main()) {
+                                            contentScopeScripts.onResponse(response)
                                         }
                                     }
                                 }
