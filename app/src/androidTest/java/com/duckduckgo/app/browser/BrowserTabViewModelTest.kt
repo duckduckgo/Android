@@ -245,6 +245,7 @@ import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.impl.contextual.PageContextJSHelper
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
 import com.duckduckgo.duckchat.impl.helper.NativeAction
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper.Companion.DUCK_CHAT_FEATURE_NAME
@@ -569,6 +570,7 @@ class BrowserTabViewModelTest {
     private val mockSyncStatusChangedObserver: SyncStatusChangedObserver = mock()
     private val syncStatusChangedEventsFlow = MutableSharedFlow<JSONObject>()
     private val mockHistory: NavigationHistory = mock()
+    private val mockPageContextJSHelper: PageContextJSHelper = mock()
 
     private val defaultBrowserPromptsExperimentShowPopupMenuItemFlow = MutableStateFlow(false)
     private val mockAdditionalDefaultBrowserPrompts: AdditionalDefaultBrowserPrompts = mock()
@@ -866,6 +868,7 @@ class BrowserTabViewModelTest {
                 contentScopeScriptsSubscriptionEventPluginPoint = fakeContentScopeScriptsSubscriptionEventPluginPoint,
                 serpSettingsFeature = serpSettingsFeature,
                 syncStatusChangedObserver = mockSyncStatusChangedObserver,
+                pageContextJSHelper = mockPageContextJSHelper,
             )
 
         testee.loadData("abc", null, false, false)
@@ -6677,7 +6680,7 @@ class BrowserTabViewModelTest {
                 data = null,
                 false,
             ) { "someUrl" }
-            verify(mockDuckChatJSHelper).processJsCallbackMessage(eq(DUCK_CHAT_FEATURE_NAME), eq("method"), eq("id"), isNull(), any())
+            verify(mockDuckChatJSHelper).processJsCallbackMessage(eq(DUCK_CHAT_FEATURE_NAME), eq("method"), eq("id"), anyOrNull(), any())
             assertCommandIssued<Command.SendResponseToJs>()
         }
 
@@ -6693,7 +6696,7 @@ class BrowserTabViewModelTest {
                 data = null,
                 false,
             ) { "someUrl" }
-            verify(mockDuckChatJSHelper).processJsCallbackMessage(eq(DUCK_CHAT_FEATURE_NAME), eq("method"), eq("id"), isNull(), any())
+            verify(mockDuckChatJSHelper).processJsCallbackMessage(eq(DUCK_CHAT_FEATURE_NAME), eq("method"), eq("id"), anyOrNull(), any())
             assertCommandNotIssued<Command.SendResponseToJs>()
         }
 
