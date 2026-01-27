@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.ui.dialogs
+package com.duckduckgo.duckchat.impl.ui
 
 import android.annotation.SuppressLint
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
-import com.duckduckgo.app.browser.R
 import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.duckchat.api.DuckChatNativeSettingsNoParams
+import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.store.DuckChatDataStore
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.google.android.material.bottomsheet.BottomSheetDialog

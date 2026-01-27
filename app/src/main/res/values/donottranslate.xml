@@ -77,10 +77,4 @@
       }]
     </string>
 
-    <!-- Duck AI contextual onboarding -->
-    <string name="duck_chat_contextual_onboarding_title" instruction="Title for contextual Duck AI onboarding sheet">Ask about this page</string>
-    <string name="duck_chat_contextual_onboarding_body" instruction="Body text for contextual Duck AI onboarding sheet">Duck.ai can now help answer questions about the page you\'re viewing.\n\nPage content is only included when you attach it. You can change this anytime in Settings.</string>
-    <string name="duck_chat_contextual_onboarding_primary" instruction="Button to continue to contextual Duck AI sheet">Got it</string>
-    <string name="duck_chat_contextual_onboarding_secondary" instruction="Button to dismiss contextual Duck AI sheet">View settings</string>
-
 </resources>

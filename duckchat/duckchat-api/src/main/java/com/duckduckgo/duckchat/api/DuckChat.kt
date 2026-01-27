@@ -70,6 +70,13 @@ interface DuckChat {
     fun showNewAddressBarOptionChoiceScreen(context: Context, isDarkThemeEnabled: Boolean)
 
     /**
+     * Shows the contextual onboarding bottom sheet dialog.
+     * @param context The context to show the dialog in
+     * @param onDismissed Callback invoked when the dialog is dismissed
+     */
+    fun showContextualOnboardingDialog(context: Context, onDismissed: () -> Unit)
+
+    /**
      * Set user setting to determine whether dedicated Duck.ai input screen with a mode switch should be used.
      */
     suspend fun setInputScreenUserSetting(enabled: Boolean)
