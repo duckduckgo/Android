@@ -102,52 +102,8 @@ class DuckChatContextualViewModel @Inject constructor(
     fun onSheetOpened(tabId: String) {
         viewModelScope.launch(dispatchers.io()) {
             logcat { "Duck.ai: onSheetOpened for tab=$tabId" }
-
-            pageContextRepository.getPageContext(tabId).onEach { pageContext ->
-                if (pageContext == null) {
-                    return@onEach
-                }
-
-                updatedPageContext = pageContext.serializedPageData
-
-                if (pageContext.tabId != tabId) {
-                    logcat { "Duck.ai: skipping pageContext for tab=${pageContext.tabId} expected=$tabId" }
-                }
-
-                if (pageContext.isCleared) {
-                    logcat { "Duck.ai: pageContext cleared for tab=$tabId" }
-                }
-
-                val json = JSONObject(updatedPageContext)
-                val title = json.optString("title").takeIf { it.isNotBlank() }
-                val url = json.optString("url").takeIf { it.isNotBlank() }
-
-                if (title == null && url == null) {
-                    logcat { "Duck.ai: missing title/url in pageContext for tab=$tabId json=$json" }
-                } else {
-                    val inputMode = _viewState.value
-
-                    if (inputMode is ViewState.InputModeViewState) {
-                        _viewState.update {
-                            inputMode.copy(
-                                contextTitle = title!!,
-                                contextUrl = url!!,
-                                tabId = tabId,
-                                hasContext = true,
-                            )
-                        }
-                    } else {
-                        viewModelScope.launch(dispatchers.io()) {
-                            val contextPrompt = generateContext()
-                            withContext(dispatchers.main()) {
-                                logcat { "Duck.ai: send new pageContext $contextPrompt" }
-                                _subscriptionEventDataChannel.trySend(contextPrompt)
-                            }
-                        }
-                    }
-                }
-            }.launchIn(viewModelScope)
         }
+
         viewModelScope.launch {
             val chatUrl = duckChat.getDuckChatUrl("", false)
             commandChannel.trySend(Command.LoadUrl(chatUrl))
@@ -227,11 +183,16 @@ class DuckChatContextualViewModel @Inject constructor(
     }
 
     private fun generateContext(): SubscriptionEventData {
-        val params = JSONObject(updatedPageContext)
+        val params =
+            JSONObject().apply {
+                put(
+                    "pageContext",
+                    JSONObject(updatedPageContext))
+            }
 
         return SubscriptionEventData(
             featureName = RealDuckChatJSHelper.DUCK_CHAT_FEATURE_NAME,
-            subscriptionName = "submitPageContext",
+            subscriptionName = "submitAIChatPageContext",
             params = params,
         )
     }
@@ -293,6 +254,39 @@ class DuckChatContextualViewModel @Inject constructor(
         if (fullModeUrl.isNotEmpty()) {
             viewModelScope.launch {
                 commandChannel.trySend(Command.OpenFullscreenMode(fullModeUrl))
+            }
+        }
+    }
+
+    fun onPageContextReceived(tabId: String, pageContext: String) {
+        updatedPageContext = pageContext
+
+        val json = JSONObject(updatedPageContext)
+        val title = json.optString("title").takeIf { it.isNotBlank() }
+        val url = json.optString("url").takeIf { it.isNotBlank() }
+
+        if (title == null && url == null) {
+            logcat { "Duck.ai: missing title/url in pageContext json=$json" }
+        } else {
+            val inputMode = _viewState.value
+
+            if (inputMode is ViewState.InputModeViewState) {
+                _viewState.update {
+                    inputMode.copy(
+                        contextTitle = title!!,
+                        contextUrl = url!!,
+                        tabId = tabId,
+                        hasContext = true,
+                    )
+                }
+            } else {
+                viewModelScope.launch(dispatchers.io()) {
+                    val contextPrompt = generateContext()
+                    withContext(dispatchers.main()) {
+                        logcat { "Duck.ai: send new pageContext $contextPrompt" }
+                        _subscriptionEventDataChannel.trySend(contextPrompt)
+                    }
+                }
             }
         }
     }

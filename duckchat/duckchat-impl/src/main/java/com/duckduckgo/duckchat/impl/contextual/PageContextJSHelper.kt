@@ -30,37 +30,29 @@ interface PageContextJSHelper {
         method: String,
         data: JSONObject?,
         tabId: String,
-    )
+    ): String?
 
     fun onContextualOpened(): SubscriptionEventData
 }
 
 @ContributesBinding(AppScope::class)
 class RealPageContextJSHelper @Inject constructor(
-    private val pageContextRepository: PageContextRepository,
 ) : PageContextJSHelper {
     override suspend fun processPageContext(
         featureName: String,
         method: String,
         data: JSONObject?,
         tabId: String,
-    ) {
-        logcat { "PageContextJSHelper: received feature=$featureName method=$method tab=$tabId hasData=${data != null}" }
+    ): String? {
         if (method != METHOD_COLLECTION_RESULT) {
-            logcat { "PageContextJSHelper: Ignoring method=$method for feature=$featureName" }
-            return
+            return null
         }
 
         val serializedPageData = data?.optString(KEY_SERIALIZED_PAGE_DATA, null)
         if (!serializedPageData.isNullOrBlank()) {
-            pageContextRepository.update(tabId, serializedPageData)
-            logcat { "PageContextJSHelper: Stored page context for tab=$tabId (length=${serializedPageData.length})" }
-        } else if (data?.optBoolean(KEY_SUCCESS, true) == false) {
-            pageContextRepository.clear(tabId)
-            logcat { "PageContextJSHelper: Clear requested for tab=$tabId" }
-        } else {
-            logcat { "PageContextJSHelper: No page context provided for tab=$tabId rawData=$data" }
+            return serializedPageData
         }
+        return null
     }
 
     override fun onContextualOpened(): SubscriptionEventData {
@@ -76,6 +68,5 @@ class RealPageContextJSHelper @Inject constructor(
         private const val SUBSCRIPTION_COLLECT = "collect"
         private const val METHOD_COLLECTION_RESULT = "collectionResult"
         private const val KEY_SERIALIZED_PAGE_DATA = "serializedPageData"
-        private const val KEY_SUCCESS = "success"
     }
 }
