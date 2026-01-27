@@ -187,7 +187,7 @@ class DuckChatContextualViewModel @Inject constructor(
 
     fun onChatPageLoaded(url: String?) {
         if (url != null) {
-            fullModeUrl
+            fullModeUrl = url
         }
     }
 
