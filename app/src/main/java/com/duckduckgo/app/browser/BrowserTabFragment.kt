@@ -199,7 +199,9 @@ import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.app.tabs.ui.GridViewColumnCalculator
 import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
 import com.duckduckgo.app.widget.AddWidgetLauncher
@@ -1377,13 +1379,7 @@ class BrowserTabFragment :
     private fun launchBrowserMenu(addExtraDelay: Boolean = false) {
         val useBottomSheetMenu = viewModel.browserViewState.value?.useBottomSheetMenu ?: false
         if (useBottomSheetMenu && bottomSheetMenu != null) {
-            val delay = if (addExtraDelay) POPUP_MENU_DELAY * 2 else POPUP_MENU_DELAY
-            // small delay added to let keyboard disappear and avoid jarring transition
-            binding.rootView.postDelayed(delay) {
-                if (isAdded) {
-                    bottomSheetMenu?.show()
-                }
-            }
+            launchBottomSheetMenu(addExtraDelay)
         } else if (!useBottomSheetMenu && popupMenu != null) {
             val isSplitOmnibarEnabled = omnibarRepository.omnibarType == OmnibarType.SPLIT
             launchPopupMenu(anchorToNavigationBar = isSplitOmnibarEnabled, addExtraDelay = addExtraDelay)
@@ -1505,7 +1501,17 @@ class BrowserTabFragment :
     }
 
     private fun createBottomSheetMenu() {
-        bottomSheetMenu = BrowserMenuBottomSheet(context = requireContext())
+        bottomSheetMenu = BrowserMenuBottomSheet(
+            context = requireContext(),
+            onDismissListener = {
+                pixel.fire(AppPixelName.EXPERIMENTAL_MENU_DISMISSED)
+            },
+            onMenuItemClickListener = {
+                pixel.fire(AppPixelName.EXPERIMENTAL_MENU_USED, type = Daily())
+                pixel.fire(AppPixelName.EXPERIMENTAL_MENU_USED, type = Unique())
+                pixel.fire(AppPixelName.EXPERIMENTAL_MENU_USED, type = Count)
+            },
+        )
         bottomSheetMenu?.apply {
             onMenuItemClicked(backMenuItem) {
                 onBackArrowClicked()
@@ -1637,6 +1643,31 @@ class BrowserTabFragment :
             startActivity(intent)
         } else {
             showToast(R.string.unableToOpenLink)
+        }
+    }
+
+    private fun launchBottomSheetMenu(addExtraDelay: Boolean) {
+        val delay = if (addExtraDelay) POPUP_MENU_DELAY * 2 else POPUP_MENU_DELAY
+        // small delay added to let keyboard disappear and avoid jarring transition
+        binding.rootView.postDelayed(delay) {
+            if (isAdded) {
+                bottomSheetMenu?.show()
+                if (bottomSheetMenu?.isShowing != true) {
+                    return@postDelayed
+                }
+                val viewState = viewModel.browserViewState.value
+                if (isActiveCustomTab()) {
+                    pixel.fire(AppPixelName.EXPERIMENTAL_MENU_DISPLAYED_CUSTOMTABS)
+                } else if (omnibar.viewMode == ViewMode.DuckAI) {
+                    pixel.fire(AppPixelName.EXPERIMENTAL_MENU_DISPLAYED_AICHAT)
+                } else if (omnibar.viewMode == ViewMode.NewTab) {
+                    pixel.fire(AppPixelName.EXPERIMENTAL_MENU_DISPLAYED_NTP)
+                } else if (viewState != null && (viewState.sslError != NONE || viewState.browserError != OMITTED)) {
+                    pixel.fire(AppPixelName.EXPERIMENTAL_MENU_DISPLAYED_ERROR)
+                } else {
+                    pixel.fire(AppPixelName.EXPERIMENTAL_MENU_DISPLAYED)
+                }
+            }
         }
     }
 
