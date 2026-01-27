@@ -89,6 +89,7 @@ class PirForegroundScanService : Service(), CoroutineScope by MainScope() {
             logcat(LogPriority.ERROR) { "PIR-SCAN: Could not start the service as foreground!" }
             // If we can't start as a foreground service, there's no point in continuing.
             stopSelf()
+            return START_NOT_STICKY
         }
 
         launch {
