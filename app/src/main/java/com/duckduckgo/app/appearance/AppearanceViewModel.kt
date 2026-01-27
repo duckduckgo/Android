@@ -32,7 +32,9 @@ import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_THEME_TOGGLED_LIGHT
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_THEME_TOGGLED_SYSTEM_DEFAULT
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.app.tabs.store.TabSwitcherDataStore
 import com.duckduckgo.common.ui.DuckDuckGoTheme
 import com.duckduckgo.common.ui.store.ThemingDataStore
@@ -225,8 +227,12 @@ class AppearanceViewModel @Inject constructor(
             browserMenuDisplayRepository.setExperimentalMenuEnabled(checked)
             if (checked) {
                 pixel.fire(AppPixelName.EXPERIMENTAL_MENU_ENABLED, type = Daily())
+                pixel.fire(AppPixelName.EXPERIMENTAL_MENU_ENABLED, type = Unique())
+                pixel.fire(AppPixelName.EXPERIMENTAL_MENU_ENABLED, type = Count)
             } else {
                 pixel.fire(AppPixelName.EXPERIMENTAL_MENU_DISABLED, type = Daily())
+                pixel.fire(AppPixelName.EXPERIMENTAL_MENU_DISABLED, type = Unique())
+                pixel.fire(AppPixelName.EXPERIMENTAL_MENU_DISABLED, type = Count)
             }
         }
     }

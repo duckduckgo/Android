@@ -734,6 +734,18 @@ internal class AppearanceViewModelTest {
                 encodedParameters = emptyMap(),
                 type = Pixel.PixelType.Daily(),
             )
+            verify(mockPixel).fire(
+                pixel = AppPixelName.EXPERIMENTAL_MENU_ENABLED,
+                parameters = emptyMap(),
+                encodedParameters = emptyMap(),
+                type = Pixel.PixelType.Unique(),
+            )
+            verify(mockPixel).fire(
+                pixel = AppPixelName.EXPERIMENTAL_MENU_ENABLED,
+                parameters = emptyMap(),
+                encodedParameters = emptyMap(),
+                type = Pixel.PixelType.Count,
+            )
         }
 
     @Test
@@ -752,6 +764,18 @@ internal class AppearanceViewModelTest {
                 parameters = emptyMap(),
                 encodedParameters = emptyMap(),
                 type = Pixel.PixelType.Daily(),
+            )
+            verify(mockPixel).fire(
+                pixel = AppPixelName.EXPERIMENTAL_MENU_DISABLED,
+                parameters = emptyMap(),
+                encodedParameters = emptyMap(),
+                type = Pixel.PixelType.Unique(),
+            )
+            verify(mockPixel).fire(
+                pixel = AppPixelName.EXPERIMENTAL_MENU_DISABLED,
+                parameters = emptyMap(),
+                encodedParameters = emptyMap(),
+                type = Pixel.PixelType.Count,
             )
         }
 }

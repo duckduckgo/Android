@@ -199,7 +199,9 @@ import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.app.tabs.ui.GridViewColumnCalculator
 import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
 import com.duckduckgo.app.widget.AddWidgetLauncher
@@ -1506,6 +1508,8 @@ class BrowserTabFragment :
             },
             onMenuItemClickListener = {
                 pixel.fire(AppPixelName.EXPERIMENTAL_MENU_USED, type = Daily())
+                pixel.fire(AppPixelName.EXPERIMENTAL_MENU_USED, type = Unique())
+                pixel.fire(AppPixelName.EXPERIMENTAL_MENU_USED, type = Count)
             },
         )
         bottomSheetMenu?.apply {
