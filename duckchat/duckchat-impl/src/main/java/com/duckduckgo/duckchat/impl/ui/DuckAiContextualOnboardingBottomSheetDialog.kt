@@ -19,10 +19,12 @@ package com.duckduckgo.duckchat.impl.ui
 import android.annotation.SuppressLint
 import android.content.Context
 import android.view.LayoutInflater
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.ui.setRoundCorners
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.duckchat.api.DuckChatNativeSettingsNoParams
 import com.duckduckgo.duckchat.impl.databinding.BottomSheetDuckAiContextualOnboardingBinding
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -31,12 +33,14 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+
 @SuppressLint("NoBottomSheetDialog")
 class DuckAiContextualOnboardingBottomSheetDialog(
     context: Context,
     private val viewModel: DuckAiContextualOnboardingViewModel,
     private val globalActivityStarter: GlobalActivityStarter,
     dispatcherProvider: DispatcherProvider,
+    private val pixel: Pixel,
 ) : BottomSheetDialog(context) {
 
     private val binding: BottomSheetDuckAiContextualOnboardingBinding =
@@ -56,6 +60,7 @@ class DuckAiContextualOnboardingBottomSheetDialog(
         behavior.state = BottomSheetBehavior.STATE_EXPANDED
 
         setOnShowListener { dialogInterface ->
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_ONBOARDING_DISPLAYED)
             (dialogInterface as BottomSheetDialog).setRoundCorners()
         }
 
@@ -65,6 +70,7 @@ class DuckAiContextualOnboardingBottomSheetDialog(
             .onEach { command ->
                 when (command) {
                     is DuckAiContextualOnboardingViewModel.Command.OnboardingCompleted -> {
+                        pixel.fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_ONBOARDING_CONFIRM_PRESSED)
                         eventListener?.onConfirmed()
                         dismiss()
                     }
@@ -77,6 +83,7 @@ class DuckAiContextualOnboardingBottomSheetDialog(
         }
 
         binding.duckAiContextualOnboardingSecondaryButton.setOnClickListener {
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_ONBOARDING_SETTINGS_PRESSED)
             globalActivityStarter.start(context, DuckChatNativeSettingsNoParams)
             dismiss()
         }
