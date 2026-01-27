@@ -22,6 +22,7 @@ import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -67,6 +68,7 @@ class DuckChatContextualViewModelTest {
                 }
                 """.trimIndent()
 
+            enableAutomaticContextAttachment()
             testee.onSheetOpened(tabId)
             testee.onPageContextReceived(tabId, serializedPageData)
 
@@ -140,6 +142,7 @@ class DuckChatContextualViewModelTest {
                 """.trimIndent()
 
             // Load and cache context, then remove it to set hasContext=false while data remains cached.
+            enableAutomaticContextAttachment()
             testee.onSheetOpened(tabId)
             testee.onPageContextReceived(tabId, serializedPageData)
             testee.removePageContext()
@@ -187,16 +190,35 @@ class DuckChatContextualViewModelTest {
                 }
                 """.trimIndent()
 
+            enableAutomaticContextAttachment()
             testee.viewState.test {
                 awaitItem()
 
                 testee.onPageContextReceived(tabId, serializedPageData)
 
-                val state = awaitItem() as DuckChatContextualViewModel.ViewState.InputModeViewState
-                assertTrue(state.hasContext)
+                val state = awaitItem() as DuckChatContextualViewModel.ViewState
+                assertTrue(state.showContext)
                 assertEquals("Ctx Title", state.contextTitle)
                 assertEquals("https://ctx.com", state.contextUrl)
                 assertEquals("tab-1", state.tabId)
+            }
+        }
+
+    @Test
+    fun `when automatic context attachment changes then view state updates`() =
+        runTest {
+            testee.viewState.test {
+                val initial = awaitItem()
+                assertFalse(initial.allowsAutomaticContextAttachment)
+                assertFalse(initial.showContext)
+
+                (duckChat as FakeDuckChat).setAutomaticContextAttachment(true)
+
+                val updated = awaitItem()
+                assertTrue(updated.allowsAutomaticContextAttachment)
+                assertTrue(updated.showContext)
+
+                cancelAndIgnoreRemainingEvents()
             }
         }
 
@@ -208,11 +230,11 @@ class DuckChatContextualViewModelTest {
                 awaitItem()
 
                 testee.onNativeInputFocused(true)
-                val expandedState = expectMostRecentItem() as DuckChatContextualViewModel.ViewState.InputModeViewState
+                val expandedState = expectMostRecentItem() as DuckChatContextualViewModel.ViewState
                 assertEquals(BottomSheetBehavior.STATE_EXPANDED, expandedState.sheetState)
 
                 testee.onNativeInputFocused(false)
-                val halfExpandedState = expectMostRecentItem() as DuckChatContextualViewModel.ViewState.InputModeViewState
+                val halfExpandedState = expectMostRecentItem() as DuckChatContextualViewModel.ViewState
                 assertEquals(BottomSheetBehavior.STATE_HALF_EXPANDED, halfExpandedState.sheetState)
 
                 cancelAndIgnoreRemainingEvents()
@@ -227,7 +249,8 @@ class DuckChatContextualViewModelTest {
                 awaitItem()
 
                 testee.onPromptSent("hello")
-                val viewState = expectMostRecentItem() as DuckChatContextualViewModel.ViewState.ChatViewState
+                val viewState = expectMostRecentItem() as DuckChatContextualViewModel.ViewState
+                assertEquals(DuckChatContextualViewModel.SheetMode.WEBVIEW, viewState.sheetMode)
                 assertEquals("chatUrl", viewState.url)
                 assertEquals(BottomSheetBehavior.STATE_EXPANDED, viewState.sheetState)
 
@@ -258,12 +281,12 @@ class DuckChatContextualViewModelTest {
                 awaitItem()
 
                 testee.addPageContext()
-                val withContext = expectMostRecentItem() as DuckChatContextualViewModel.ViewState.InputModeViewState
-                assertTrue(withContext.hasContext)
+                val withContext = expectMostRecentItem() as DuckChatContextualViewModel.ViewState
+                assertTrue(withContext.showContext)
 
                 testee.removePageContext()
-                val withoutContext = expectMostRecentItem() as DuckChatContextualViewModel.ViewState.InputModeViewState
-                assertFalse(withoutContext.hasContext)
+                val withoutContext = expectMostRecentItem() as DuckChatContextualViewModel.ViewState
+                assertFalse(withoutContext.showContext)
 
                 cancelAndIgnoreRemainingEvents()
             }
@@ -277,7 +300,7 @@ class DuckChatContextualViewModelTest {
                 awaitItem()
 
                 testee.replacePrompt("new prompt")
-                val state = expectMostRecentItem() as DuckChatContextualViewModel.ViewState.InputModeViewState
+                val state = expectMostRecentItem() as DuckChatContextualViewModel.ViewState
                 assertEquals("new prompt", state.prompt)
 
                 cancelAndIgnoreRemainingEvents()
@@ -322,6 +345,7 @@ class DuckChatContextualViewModelTest {
                 }
                 """.trimIndent()
 
+            enableAutomaticContextAttachment()
             testee.subscriptionEventDataFlow.test {
                 testee.onPromptSent("hello") // enter chat mode
                 awaitItem() // consume prompt event
@@ -345,8 +369,14 @@ class DuckChatContextualViewModelTest {
         fullModeUrlField.set(testee, url)
     }
 
+    private fun enableAutomaticContextAttachment() {
+        (duckChat as FakeDuckChat).setAutomaticContextAttachment(true)
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+    }
+
     private class FakeDuckChat : com.duckduckgo.duckchat.api.DuckChat {
         var nextUrl: String = ""
+        private val automaticContextAttachment = MutableStateFlow(false)
 
         override fun isEnabled(): Boolean = true
         override fun openDuckChat() = Unit
@@ -360,6 +390,10 @@ class DuckChatContextualViewModelTest {
         override suspend fun setCosmeticInputScreenUserSetting(enabled: Boolean) = Unit
         override fun observeInputScreenUserSettingEnabled(): Flow<Boolean> = kotlinx.coroutines.flow.emptyFlow()
         override fun observeCosmeticInputScreenUserSettingEnabled(): Flow<Boolean?> = kotlinx.coroutines.flow.emptyFlow()
-        override fun observeAutomaticContextAttachmentUserSettingEnabled(): Flow<Boolean> = kotlinx.coroutines.flow.emptyFlow()
+        override fun observeAutomaticContextAttachmentUserSettingEnabled(): Flow<Boolean> = automaticContextAttachment
+
+        fun setAutomaticContextAttachment(enabled: Boolean) {
+            automaticContextAttachment.value = enabled
+        }
     }
 }
