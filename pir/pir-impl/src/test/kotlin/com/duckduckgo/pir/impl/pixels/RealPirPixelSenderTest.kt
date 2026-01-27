@@ -68,6 +68,20 @@ class RealPirPixelSenderTest {
     }
 
     @Test
+    fun whenReportManualScanStartFailedThenEnqueuesCorrectPixel() = runTest {
+        testee.reportManualScanStartFailed()
+
+        val paramsCaptor = argumentCaptor<Map<String, String>>()
+        verify(mockPixelSender).enqueueFire(
+            pixelName = any(),
+            parameters = paramsCaptor.capture(),
+            encodedParameters = any(),
+        )
+
+        assert(paramsCaptor.firstValue.isEmpty())
+    }
+
+    @Test
     fun whenReportScheduledScanScheduledThenFiresCorrectPixel() = runTest {
         testee.reportScheduledScanScheduled()
 
