@@ -204,6 +204,11 @@ interface DuckChatInternal : DuckChat {
     fun isChatSyncFeatureEnabled(): Boolean
 
     /**
+     * Returns whether Duck.ai in contextual mode should auto attach context (its feature flag is enabled and user setting is enabled).
+     */
+    fun isAutomaticContextAttachmentEnabled(): Boolean
+
+    /**
      * This method takes a [url] and returns `true` or `false`.
      * @return `true` if the given [url] can be handled in the duck ai webview and `false` otherwise.
      */
@@ -329,6 +334,7 @@ class RealDuckChat @Inject constructor(
     private var showInputScreenOnSystemSearchLaunchEnabled: Boolean = true
     private var isFullscreenModeEnabled: Boolean = false
     private var isContextualModeEnabled: Boolean = false
+    private var isAutomaticContextAttachmentEnabled: Boolean = false
 
     init {
         if (isMainProcess) {
@@ -390,6 +396,8 @@ class RealDuckChat @Inject constructor(
     override fun isDuckChatFullScreenModeEnabled(): Boolean = isFullscreenModeEnabled
 
     override fun isDuckChatContextualModeEnabled(): Boolean = isContextualModeEnabled
+
+    override fun isAutomaticContextAttachmentEnabled(): Boolean = isAutomaticContextAttachmentEnabled
 
     override fun observeEnableDuckChatUserSetting(): Flow<Boolean> = duckChatFeatureRepository.observeDuckChatUserEnabled()
 
@@ -494,19 +502,19 @@ class RealDuckChat @Inject constructor(
 
     override fun openDuckChatWithAutoPrompt(query: String) {
         logcat { "Duck.ai: openDuckChatWithAutoPrompt query $query" }
-        val parameters = addChatParameters(query, autoPrompt = true)
+        val parameters = addChatParameters(query, autoPrompt = true, sidebar = false)
         openDuckChat(parameters, forceNewSession = true)
     }
 
     override fun openDuckChatWithPrefill(query: String) {
         logcat { "Duck.ai: openDuckChatWithPrefill query $query" }
-        val parameters = addChatParameters(query, autoPrompt = false)
+        val parameters = addChatParameters(query, autoPrompt = false, sidebar = false)
         openDuckChat(parameters, forceNewSession = true)
     }
 
-    override fun getDuckChatUrl(query: String, autoPrompt: Boolean): String {
+    override fun getDuckChatUrl(query: String, autoPrompt: Boolean, sidebar: Boolean): String {
         logcat { "Duck.ai: getDuckChatUrl query $query autoPrompt $autoPrompt" }
-        val parameters = addChatParameters(query, autoPrompt = autoPrompt)
+        val parameters = addChatParameters(query, autoPrompt = autoPrompt, sidebar = sidebar)
         val url = appendParameters(parameters, duckChatLink)
         return url
     }
@@ -514,6 +522,7 @@ class RealDuckChat @Inject constructor(
     private fun addChatParameters(
         query: String,
         autoPrompt: Boolean,
+        sidebar: Boolean,
     ): Map<String, String> {
         val hasDuckChatBang = isDuckChatBang(query.toUri())
         logcat { "Duck.ai: hasDuckChatBang $hasDuckChatBang" }
@@ -530,6 +539,9 @@ class RealDuckChat @Inject constructor(
                 if (autoPrompt) {
                     put(PROMPT_QUERY_NAME, PROMPT_QUERY_VALUE)
                 }
+            }
+            if (sidebar) {
+                put(PLACEMENT_QUERY_NAME, PLACEMENT_QUERY_VALUE)
             }
         }
     }
@@ -772,6 +784,8 @@ class RealDuckChat @Inject constructor(
             val showContextualMode = isDuckChatFeatureEnabled && isDuckChatUserEnabled && duckChatFeature.contextualMode().isEnabled()
             isContextualModeEnabled = showContextualMode
             _showContextualMode.emit(showContextualMode)
+
+            isAutomaticContextAttachmentEnabled = showContextualMode && duckChatFeatureRepository.isAutomaticPageContextAttachmentUserSettingEnabled()
         }
 
     companion object {
@@ -782,6 +796,8 @@ class RealDuckChat @Inject constructor(
         private const val CHAT_QUERY_VALUE = "chat"
         private const val PROMPT_QUERY_NAME = "prompt"
         private const val PROMPT_QUERY_VALUE = "1"
+        private const val PLACEMENT_QUERY_NAME = "placement"
+        private const val PLACEMENT_QUERY_VALUE = "sidebar"
         private const val BANG_QUERY_NAME = "bang"
         private const val BANG_QUERY_VALUE = "true"
         private const val DEFAULT_SESSION_ALIVE = 60
