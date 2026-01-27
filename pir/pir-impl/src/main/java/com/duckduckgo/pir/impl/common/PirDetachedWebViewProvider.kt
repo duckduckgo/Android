@@ -118,6 +118,7 @@ class RealPirDetachedWebViewProvider @Inject constructor() :
                     logcat { "PIR-SCAN: webview onPageStarted $url" }
                     requestedUrl = url
                     receivedError = false
+                    view?.evaluateJavascript("javascript:$scriptToLoad", null)
                 }
 
                 override fun onPageFinished(
@@ -126,7 +127,6 @@ class RealPirDetachedWebViewProvider @Inject constructor() :
                 ) {
                     if (!receivedError) {
                         logcat { "PIR-SCAN: webview onPageFinished receivedError $receivedError requestedUrl $requestedUrl for url $url" }
-                        view?.evaluateJavascript("javascript:$scriptToLoad", null)
                         onPageLoaded(url)
                     }
                     super.onPageFinished(view, url)
