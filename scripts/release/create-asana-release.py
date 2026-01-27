@@ -49,7 +49,7 @@ def extract_asana_task_links(commits: List[git.Commit], url_prefix: str) -> List
             commit_hash=commit.hexsha,
         ))
     
-    return task_links
+    return [link for link in task_links if link.url]
 
 def extract_task_id_from_url(url: str) -> str:
     """
@@ -76,6 +76,72 @@ def extract_task_id_from_url(url: str) -> str:
         task_id = parts[-2]
     
     return task_id
+
+def create_asana_release_task(client: asana.ApiClient,
+                              workspace_id: str,
+                              release_tag: str,
+                              template_task_id: str,
+                              section_id: str,
+                              project_id: str,
+                              task_links: List[AsanaTaskLink]) -> str:
+    """
+    Create a new Asana release task by duplicating a template task.
+    """
+    tasks_api = asana.TasksApi(client)
+
+    # Duplicate the template task
+    log(f"Duplicating template task {template_task_id}")
+    job_response = tasks_api.duplicate_task(
+        {
+            "data": {
+                "name": f"Android Release {release_tag}",
+                "include": "subtasks,projects,notes"
+            }
+        },
+        template_task_id,
+        {}
+    )
+
+    new_task_id = job_response['new_task']['gid']
+    log(f"Created new task {new_task_id}")
+
+    # Get the current task to retrieve its notes
+    task = tasks_api.get_task(new_task_id, {"opt_fields": "html_notes"})
+    current_notes = task.get('html_notes', '')
+
+    # Build the task links bullet points
+    task_links_html = ""
+    for link in task_links:
+        if link.url:
+            task_links_html += f'<li><a href="{link.url}"/></li>'
+
+    # Replace the placeholder section with actual task links using regex to handle newlines
+    placeholder_pattern = r"<strong>This release includes:</strong>\s*<ul><li>Add Asana tasks in release here and tag them with release number e\.g android-release-5\.9\.0</li></ul>"
+    replacement = f"<strong>This release includes:</strong><ul>{task_links_html}</ul>"
+    updated_notes = re.sub(placeholder_pattern, replacement, current_notes)
+    if updated_notes == current_notes:
+        # Fallback if pattern not found
+        updated_notes = current_notes + replacement
+
+    # Update the task with the new notes
+    log(f"Updating task with notes: {updated_notes}")
+    tasks_api.update_task({"data": {"html_notes": updated_notes}}, new_task_id, {})
+    log(f"Updated task description with {len(task_links)} task links")
+
+    # Add the task to the project section
+    section_api = asana.SectionsApi(client)
+    section_api.add_task_for_section(
+        section_id,
+        {
+            "body": {
+                "data": {
+                    "task": new_task_id,
+                }
+            }
+        }
+    )
+
+    return new_task_id
 
 def create_asana_task(client: asana.ApiClient,
                       workspace_id: str,
@@ -127,6 +193,105 @@ def create_asana_task(client: asana.ApiClient,
     
     return task['gid']
 
+def find_or_create_tag(client: asana.ApiClient, workspace_id: str, tag_name: str) -> str:
+    """
+    Find an existing tag by name or create a new one.
+    Returns the tag GID.
+    """
+    tags_api = asana.TagsApi(client)
+
+    # Search for existing tag
+    try:
+        tags = tags_api.get_tags_for_workspace(workspace_id, {"opt_fields": "name"})
+        for tag in tags:
+            if tag['name'] == tag_name:
+                log(f"Found existing tag '{tag_name}' with ID {tag['gid']}")
+                return tag['gid']
+    except Exception as e:
+        log(f"Error searching for tag: {e}")
+
+    # Create new tag if not found
+    log(f"Creating new tag '{tag_name}'")
+    new_tag = tags_api.create_tag({
+        "data": {
+            "name": tag_name,
+            "workspace": workspace_id
+        }
+    }, {})
+    return new_tag['gid']
+
+
+def tag_tasks(client: asana.ApiClient, workspace_id: str, task_links: List[AsanaTaskLink], tag_name: str) -> None:
+    """
+    Tag all tasks from the task links with the specified tag.
+    """
+    log(f"Tagging tasks with '{tag_name}'")
+
+    tag_id = find_or_create_tag(client, workspace_id, tag_name)
+    tasks_api = asana.TasksApi(client)
+
+    tagged_count = 0
+    for link in task_links:
+        if link.url:
+            task_id = extract_task_id_from_url(link.url)
+            try:
+                tasks_api.add_tag_for_task({"data": {"tag": tag_id}}, task_id)
+                tagged_count += 1
+            except Exception as e:
+                log(f"Error tagging task {task_id}: {e}")
+
+    log(f"Tagged {tagged_count} tasks with '{tag_name}'")
+
+
+def remove_tasks_from_project(client: asana.ApiClient, task_links: List[AsanaTaskLink], project_id: str) -> None:
+    """
+    Remove all tasks from the task links from the specified project.
+    """
+    log(f"Removing tasks from project {project_id}")
+
+    tasks_api = asana.TasksApi(client)
+
+    removed_count = 0
+    for link in task_links:
+        if link.url:
+            task_id = extract_task_id_from_url(link.url)
+            try:
+                tasks_api.remove_project_for_task({"data": {"project": project_id}}, task_id)
+                removed_count += 1
+            except Exception as e:
+                log(f"Error removing task {task_id} from project: {e}")
+
+    log(f"Removed {removed_count} tasks from project")
+
+
+def get_latest_public_release_tag_before_commit(repo_path: str, current_tag: str) -> str | None:
+    """
+    Return the previous public release tag before `current_tag`, sorted by tagger date.
+    Public release tags match the pattern: X.Y.Z (e.g., 5.264.0)
+    """
+    public_pattern = re.compile(r'^\d+\.\d+\.\d+$')
+
+    try:
+        result = subprocess.run(
+            ["git", "-C", repo_path, "for-each-ref", "--sort=taggerdate", "--format=%(refname:short)", "refs/tags"],
+            capture_output=True,
+            text=True,
+            check=True
+        )
+        tags = result.stdout.strip().splitlines()
+
+        # Filter to only public release tags (X.Y.Z format)
+        public_tags = [tag for tag in tags if public_pattern.match(tag)]
+
+        # Exclude the current tag
+        public_tags = [tag for tag in public_tags if tag != current_tag]
+
+        # Return the last (most recent by tagger date) tag
+        return public_tags[-1] if public_tags else None
+    except subprocess.CalledProcessError:
+        return None
+
+
 def get_latest_internal_tag_before_commit(repo_path: str, current_tag: str) -> str | None:
     """
     Return the previous *internal* tag before `current_tag`, sorted by creation date (not version number).
@@ -162,6 +327,8 @@ def main():
     parser.add_argument('--asana-section-id', required=True, help='Asana section ID to place the task in')
     parser.add_argument('--asana-workspace-id', required=True, help='Asana workspace ID')
     parser.add_argument('--asana-api-key-env-var', required=True, help='Environment variable name containing the API key')
+    parser.add_argument('--public-release', action='store_true', help='Whether the release is a public one or internal')
+    parser.add_argument('--template-task-id', help='Asana template task ID to duplicate (required for public releases)')
     
     args = parser.parse_args()
     
@@ -178,26 +345,59 @@ def main():
         configuration = asana.Configuration()
         configuration.access_token = asana_api_key
         client = asana.ApiClient(configuration)
-        
+
+        is_public_release = args.public_release
+
+        if is_public_release and not args.template_task_id:
+            log("Error: --template-task-id is required for public releases")
+            return 1
+
         # Get the start tag (latest tag before the specified tag)
-        # start_tag = get_latest_tag_before_commit(args.android_repo_path, args.tag)
-        start_tag = get_latest_internal_tag_before_commit(args.android_repo_path, args.tag)
+        if is_public_release:
+            start_tag = get_latest_public_release_tag_before_commit(args.android_repo_path, args.tag)
+        else:
+            start_tag = get_latest_internal_tag_before_commit(args.android_repo_path, args.tag)
         if not start_tag:
             log(f"Error: No previous version tag found before {args.tag}")
             return 1
         
         log(f"Using tag {start_tag} as start commit")
-        log(f"Using tag {args.tag} as end commit")
-        
+
+        # For public releases, get commits up to main; for internal, use the tag
+        end_ref = "main" if is_public_release else args.tag
+
         # Get commits between the tags
-        commits = get_commits_between(args.android_repo_path, start_tag, args.tag)
+        commits = get_commits_between(args.android_repo_path, start_tag, end_ref)
         
         log(f"Extracting task links from {len(commits)} commits")
         # Extract Asana task links from commit messages
         task_links = extract_asana_task_links(commits, args.trigger_phrase)
 
-        # Create the Asana task with the tag name
-        task_id = create_asana_task(client, args.asana_workspace_id, args.tag, task_links, args.asana_section_id)
+
+        log(f"Extracted {len(task_links)} tasks from {len(commits)} commits")
+        for link in task_links:
+            log(f"  - {link.commit_hash[:9]}: {link.url or 'no task'}")
+
+        # Create the Asana task
+        if is_public_release:
+            task_id = create_asana_release_task(
+                client,
+                args.asana_workspace_id,
+                args.tag,
+                args.template_task_id,
+                args.asana_section_id,
+                args.asana_project_id,
+                task_links
+            )
+
+            # Tag all linked tasks with the release version
+            tag_tasks(client, args.asana_workspace_id, task_links, f"android-release-{args.tag}")
+
+            # Remove tasks from the release board project
+            remove_tasks_from_project(client, task_links, args.asana_project_id)
+        else:
+            task_id = create_asana_task(client, args.asana_workspace_id, args.tag, task_links, args.asana_section_id)
+
         task_url = f"https://app.asana.com/1/{args.asana_workspace_id}/project/{args.asana_project_id}/task/{task_id}"
         print(task_url) # Only the URL is ever printed to stdout
 
