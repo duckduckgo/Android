@@ -6671,7 +6671,14 @@ class BrowserTabViewModelTest {
             whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
             val jsCallbackData = JsCallbackData(JSONObject(), "", "", "")
             whenever(
-                mockDuckChatJSHelper.processJsCallbackMessage(anyString(), anyString(), anyOrNull(), anyOrNull(), any()),
+                mockDuckChatJSHelper.processJsCallbackMessage(
+                    anyString(),
+                    anyString(),
+                    anyOrNull(),
+                    anyOrNull(),
+                    any(),
+                    viewModel.updatedPageContext
+                ),
             ).thenReturn(jsCallbackData)
             testee.processJsCallbackMessage(
                 DUCK_CHAT_FEATURE_NAME,
@@ -6680,7 +6687,14 @@ class BrowserTabViewModelTest {
                 data = null,
                 false,
             ) { "someUrl" }
-            verify(mockDuckChatJSHelper).processJsCallbackMessage(eq(DUCK_CHAT_FEATURE_NAME), eq("method"), eq("id"), anyOrNull(), any())
+            verify(mockDuckChatJSHelper).processJsCallbackMessage(
+                eq(DUCK_CHAT_FEATURE_NAME),
+                eq("method"),
+                eq("id"),
+                anyOrNull(),
+                any(),
+                viewModel.updatedPageContext
+            )
             assertCommandIssued<Command.SendResponseToJs>()
         }
 
@@ -6688,7 +6702,14 @@ class BrowserTabViewModelTest {
     fun whenProcessJsCallbackMessageForDuckChatAndResponseIsNullThenDoNotSendCommand() =
         runTest {
             whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
-            whenever(mockDuckChatJSHelper.processJsCallbackMessage(anyString(), anyString(), anyOrNull(), anyOrNull(), any())).thenReturn(null)
+            whenever(mockDuckChatJSHelper.processJsCallbackMessage(
+                anyString(),
+                anyString(),
+                anyOrNull(),
+                anyOrNull(),
+                any(),
+                viewModel.updatedPageContext
+            )).thenReturn(null)
             testee.processJsCallbackMessage(
                 DUCK_CHAT_FEATURE_NAME,
                 "method",
@@ -6696,7 +6717,14 @@ class BrowserTabViewModelTest {
                 data = null,
                 false,
             ) { "someUrl" }
-            verify(mockDuckChatJSHelper).processJsCallbackMessage(eq(DUCK_CHAT_FEATURE_NAME), eq("method"), eq("id"), anyOrNull(), any())
+            verify(mockDuckChatJSHelper).processJsCallbackMessage(
+                eq(DUCK_CHAT_FEATURE_NAME),
+                eq("method"),
+                eq("id"),
+                anyOrNull(),
+                any(),
+                viewModel.updatedPageContext
+            )
             assertCommandNotIssued<Command.SendResponseToJs>()
         }
 
@@ -7201,7 +7229,14 @@ class BrowserTabViewModelTest {
     @Test
     fun whenProcessJsCallbackMessageForSubscriptionsAndResponseIsNullThenDoNotSendCommand() =
         runTest {
-            whenever(mockDuckChatJSHelper.processJsCallbackMessage(anyString(), anyString(), anyOrNull(), anyOrNull(), any())).thenReturn(null)
+            whenever(mockDuckChatJSHelper.processJsCallbackMessage(
+                anyString(),
+                anyString(),
+                anyOrNull(),
+                anyOrNull(),
+                any(),
+                viewModel.updatedPageContext
+            )).thenReturn(null)
             testee.processJsCallbackMessage(
                 featureName = SUBSCRIPTIONS_FEATURE_NAME,
                 method = "method",
