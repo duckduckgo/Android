@@ -50,7 +50,7 @@ interface DuckChat {
     /**
      * Returns the Duck Chat URL to be used
      */
-    fun getDuckChatUrl(query: String, autoPrompt: Boolean): String
+    fun getDuckChatUrl(query: String, autoPrompt: Boolean, sidebar: Boolean = false): String
 
     /**
      * Determines whether a given [Uri] is a DuckChat URL.
