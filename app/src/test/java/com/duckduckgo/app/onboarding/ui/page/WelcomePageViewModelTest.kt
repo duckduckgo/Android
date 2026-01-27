@@ -45,6 +45,7 @@ import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_RESUME_ONBOARDING_PR
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_SEARCH_ONLY_SELECTED
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_SKIP_ONBOARDING_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_SKIP_ONBOARDING_SHOWN_UNIQUE
+import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_SPLIT_ADDRESS_BAR_SELECTED_UNIQUE
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -225,6 +226,20 @@ class WelcomePageViewModelTest {
             testee.commands.test {
                 val command = awaitItem()
                 Assert.assertTrue(command is ShowAddressBarPositionDialog)
+                Assert.assertTrue((command as ShowAddressBarPositionDialog).showSplitOption)
+            }
+        }
+
+    @Test
+    fun whenSplitOmnibarFeatureIsEnabledThenShowAddressBarPositionDialogWithSplitOption() =
+        runTest {
+            mockAndroidBrowserConfigFeature.splitOmnibarWelcomePage().setRawStoredState(Toggle.State(remoteEnableState = true))
+            testee.onDefaultBrowserSet()
+
+            testee.commands.test {
+                val command = awaitItem()
+                Assert.assertTrue(command is ShowAddressBarPositionDialog)
+                Assert.assertTrue((command as ShowAddressBarPositionDialog).showSplitOption)
             }
         }
 
@@ -242,7 +257,7 @@ class WelcomePageViewModelTest {
     @Test
     fun whenBottomAddressBarIsSelectedThenSendPixel() =
         runTest {
-            testee.onAddressBarPositionOptionSelected(false)
+            testee.onAddressBarPositionOptionSelected(OmnibarType.SINGLE_BOTTOM)
             testee.onPrimaryCtaClicked(PreOnboardingDialogType.ADDRESS_BAR_POSITION)
 
             verify(mockPixel).fire(PREONBOARDING_BOTTOM_ADDRESS_BAR_SELECTED_UNIQUE)
@@ -251,10 +266,40 @@ class WelcomePageViewModelTest {
     @Test
     fun whenBottomAddressBarIsSelectedThenSetUserSetting() =
         runTest {
-            testee.onAddressBarPositionOptionSelected(false)
+            testee.onAddressBarPositionOptionSelected(OmnibarType.SINGLE_BOTTOM)
             testee.onPrimaryCtaClicked(PreOnboardingDialogType.ADDRESS_BAR_POSITION)
 
             verify(mockSettingsDataStore).omnibarType = OmnibarType.SINGLE_BOTTOM
+        }
+
+    @Test
+    fun whenSplitAddressBarIsSelectedAndFeatureEnabledThenSetUserSetting() =
+        runTest {
+            mockAndroidBrowserConfigFeature.splitOmnibarWelcomePage().setRawStoredState(Toggle.State(remoteEnableState = true))
+            testee.onAddressBarPositionOptionSelected(OmnibarType.SPLIT)
+            testee.onPrimaryCtaClicked(PreOnboardingDialogType.ADDRESS_BAR_POSITION)
+
+            verify(mockSettingsDataStore).omnibarType = OmnibarType.SPLIT
+        }
+
+    @Test
+    fun whenSplitAddressBarIsSelectedAndFeatureEnabledThenSendPixel() =
+        runTest {
+            mockAndroidBrowserConfigFeature.splitOmnibarWelcomePage().setRawStoredState(Toggle.State(remoteEnableState = true))
+            testee.onAddressBarPositionOptionSelected(OmnibarType.SPLIT)
+            testee.onPrimaryCtaClicked(PreOnboardingDialogType.ADDRESS_BAR_POSITION)
+
+            verify(mockPixel).fire(PREONBOARDING_SPLIT_ADDRESS_BAR_SELECTED_UNIQUE)
+        }
+
+    @Test
+    fun whenSplitAddressBarIsSelectedAndFeatureDisabledThenDoNotSetUserSetting() =
+        runTest {
+            mockAndroidBrowserConfigFeature.splitOmnibarWelcomePage().setRawStoredState(Toggle.State(remoteEnableState = false))
+            testee.onAddressBarPositionOptionSelected(OmnibarType.SPLIT)
+            testee.onPrimaryCtaClicked(PreOnboardingDialogType.ADDRESS_BAR_POSITION)
+
+            verify(mockSettingsDataStore, org.mockito.kotlin.never()).omnibarType = OmnibarType.SPLIT
         }
 
     @Test

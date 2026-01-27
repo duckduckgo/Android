@@ -37,6 +37,7 @@ import androidx.transition.TransitionManager
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ContentOnboardingWelcomePageBinding
+import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.ADDRESS_BAR_POSITION
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.COMPARISON_CHART
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INITIAL
@@ -107,26 +108,38 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
                 is ShowComparisonChart -> configureDaxCta(COMPARISON_CHART)
                 is ShowSkipOnboardingOption -> configureDaxCta(SKIP_ONBOARDING_OPTION)
                 is ShowDefaultBrowserDialog -> showDefaultBrowserDialog(it.intent)
-                is ShowAddressBarPositionDialog -> configureDaxCta(ADDRESS_BAR_POSITION)
+                is ShowAddressBarPositionDialog -> configureDaxCta(ADDRESS_BAR_POSITION, it.showSplitOption)
                 is ShowInputScreenDialog -> configureDaxCta(INPUT_SCREEN)
                 is Finish -> onContinuePressed()
                 is OnboardingSkipped -> onSkipPressed()
-                is SetAddressBarPositionOptions -> setAddressBarPositionOptions(it.defaultOption)
+                is SetAddressBarPositionOptions -> setAddressBarPositionOptions(it.selectedOption)
             }
         }.launchIn(lifecycleScope)
     }
 
-    private fun setAddressBarPositionOptions(defaultOption: Boolean) {
-        if (defaultOption) {
-            binding.daxDialogCta.addressBarPosition.option1.setBackgroundResource(R.drawable.background_preonboarding_option_selected)
-            binding.daxDialogCta.addressBarPosition.option1Switch.isChecked = true
-            binding.daxDialogCta.addressBarPosition.option2.setBackgroundResource(R.drawable.background_preonboarding_option)
-            binding.daxDialogCta.addressBarPosition.option2Switch.isChecked = false
-        } else {
-            binding.daxDialogCta.addressBarPosition.option1.setBackgroundResource(R.drawable.background_preonboarding_option)
-            binding.daxDialogCta.addressBarPosition.option1Switch.isChecked = false
-            binding.daxDialogCta.addressBarPosition.option2.setBackgroundResource(R.drawable.background_preonboarding_option_selected)
-            binding.daxDialogCta.addressBarPosition.option2Switch.isChecked = true
+    private fun setAddressBarPositionOptions(selectedOption: OmnibarType) {
+        // Reset all options to unselected state
+        binding.daxDialogCta.addressBarPosition.option1.setBackgroundResource(R.drawable.background_preonboarding_option)
+        binding.daxDialogCta.addressBarPosition.option1Switch.isChecked = false
+        binding.daxDialogCta.addressBarPosition.option2.setBackgroundResource(R.drawable.background_preonboarding_option)
+        binding.daxDialogCta.addressBarPosition.option2Switch.isChecked = false
+        binding.daxDialogCta.addressBarPosition.option3.setBackgroundResource(R.drawable.background_preonboarding_option)
+        binding.daxDialogCta.addressBarPosition.option3Switch.isChecked = false
+
+        // Set selected option
+        when (selectedOption) {
+            OmnibarType.SINGLE_TOP -> {
+                binding.daxDialogCta.addressBarPosition.option1.setBackgroundResource(R.drawable.background_preonboarding_option_selected)
+                binding.daxDialogCta.addressBarPosition.option1Switch.isChecked = true
+            }
+            OmnibarType.SINGLE_BOTTOM -> {
+                binding.daxDialogCta.addressBarPosition.option2.setBackgroundResource(R.drawable.background_preonboarding_option_selected)
+                binding.daxDialogCta.addressBarPosition.option2Switch.isChecked = true
+            }
+            OmnibarType.SPLIT -> {
+                binding.daxDialogCta.addressBarPosition.option3.setBackgroundResource(R.drawable.background_preonboarding_option_selected)
+                binding.daxDialogCta.addressBarPosition.option3Switch.isChecked = true
+            }
         }
     }
 
@@ -186,7 +199,7 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
         }
     }
 
-    private fun configureDaxCta(onboardingDialogType: PreOnboardingDialogType) {
+    private fun configureDaxCta(onboardingDialogType: PreOnboardingDialogType, showSplitOption: Boolean = false) {
         context?.let {
             var afterAnimation: () -> Unit = {}
             viewModel.onDialogShown(onboardingDialogType)
@@ -304,17 +317,29 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
                     binding.daxDialogCta.addressBarPosition.root.show()
                     binding.daxDialogCta.addressBarPosition.root.alpha = MIN_ALPHA
 
+                    // Show or hide split option based on feature toggle
+                    if (showSplitOption) {
+                        binding.daxDialogCta.addressBarPosition.option3.show()
+                    } else {
+                        binding.daxDialogCta.addressBarPosition.option3.gone()
+                    }
+
                     afterAnimation = {
                         binding.daxDialogCta.dialogTextCta.finishAnimation()
-                        setAddressBarPositionOptions(true)
+                        setAddressBarPositionOptions(OmnibarType.SINGLE_TOP) // Default to top
                         binding.daxDialogCta.primaryCta.text = it.getString(R.string.preOnboardingAddressBarOkButton)
                         binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked(ADDRESS_BAR_POSITION) }
                         binding.daxDialogCta.primaryCta.animate().alpha(MAX_ALPHA).duration = ANIMATION_DURATION
                         binding.daxDialogCta.addressBarPosition.option1.setOnClickListener {
-                            viewModel.onAddressBarPositionOptionSelected(true)
+                            viewModel.onAddressBarPositionOptionSelected(OmnibarType.SINGLE_TOP)
                         }
                         binding.daxDialogCta.addressBarPosition.option2.setOnClickListener {
-                            viewModel.onAddressBarPositionOptionSelected(false)
+                            viewModel.onAddressBarPositionOptionSelected(OmnibarType.SINGLE_BOTTOM)
+                        }
+                        if (showSplitOption) {
+                            binding.daxDialogCta.addressBarPosition.option3.setOnClickListener {
+                                viewModel.onAddressBarPositionOptionSelected(OmnibarType.SPLIT)
+                            }
                         }
                         binding.daxDialogCta.addressBarPosition.root.animate().alpha(MAX_ALPHA).duration = ANIMATION_DURATION
                     }
