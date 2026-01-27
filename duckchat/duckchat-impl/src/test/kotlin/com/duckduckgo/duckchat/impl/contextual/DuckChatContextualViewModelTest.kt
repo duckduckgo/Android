@@ -22,8 +22,6 @@ import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -43,14 +41,11 @@ class DuckChatContextualViewModelTest {
     val coroutineRule = CoroutineTestRule()
 
     private lateinit var testee: DuckChatContextualViewModel
-    private lateinit var pageContextRepository: FakePageContextRepository
     private val duckChat: com.duckduckgo.duckchat.api.DuckChat = FakeDuckChat()
 
     @Before
     fun setup() {
-        pageContextRepository = FakePageContextRepository()
         testee = DuckChatContextualViewModel(
-            pageContextRepository = pageContextRepository,
             dispatchers = coroutineRule.testDispatcherProvider,
             duckChat = duckChat,
         )
@@ -73,8 +68,7 @@ class DuckChatContextualViewModelTest {
                 """.trimIndent()
 
             testee.onSheetOpened(tabId)
-            pageContextRepository.update(tabId, serializedPageData)
-            advanceUntilIdle()
+            testee.onPageContextReceived(tabId, serializedPageData)
 
             testee.subscriptionEventDataFlow.test {
                 val prompt = "Summarize this page"
@@ -109,7 +103,6 @@ class DuckChatContextualViewModelTest {
         runTest {
             val tabId = "tab-1"
             testee.onSheetOpened(tabId)
-            advanceUntilIdle()
 
             testee.subscriptionEventDataFlow.test {
                 val prompt = "Hello Duck.ai"
@@ -148,8 +141,7 @@ class DuckChatContextualViewModelTest {
 
             // Load and cache context, then remove it to set hasContext=false while data remains cached.
             testee.onSheetOpened(tabId)
-            pageContextRepository.update(tabId, serializedPageData)
-            advanceUntilIdle()
+            testee.onPageContextReceived(tabId, serializedPageData)
             testee.removePageContext()
 
             testee.subscriptionEventDataFlow.test {
@@ -185,21 +177,22 @@ class DuckChatContextualViewModelTest {
     @Test
     fun `when page context arrives input state stores context`() =
         runTest {
-            testee.viewState.test {
-                val tabId = "tab-1"
-                val serializedPageData =
-                    """
+            val tabId = "tab-1"
+            val serializedPageData =
+                """
                 {
                     "title": "Ctx Title",
                     "url": "https://ctx.com",
                     "content": "content"
                 }
-                    """.trimIndent()
+                """.trimIndent()
 
-                testee.onSheetOpened(tabId)
-                pageContextRepository.update(tabId, serializedPageData)
+            testee.viewState.test {
+                awaitItem()
 
-                val state = expectMostRecentItem() as DuckChatContextualViewModel.ViewState.InputModeViewState
+                testee.onPageContextReceived(tabId, serializedPageData)
+
+                val state = awaitItem() as DuckChatContextualViewModel.ViewState.InputModeViewState
                 assertTrue(state.hasContext)
                 assertEquals("Ctx Title", state.contextTitle)
                 assertEquals("https://ctx.com", state.contextUrl)
@@ -317,24 +310,39 @@ class DuckChatContextualViewModelTest {
             }
         }
 
+    @Test
+    fun `when page context received in chat mode then subscription event emitted`() =
+        runTest {
+            val serializedPageData =
+                """
+                {
+                    "title": "Ctx Title",
+                    "url": "https://ctx.com",
+                    "content": "content"
+                }
+                """.trimIndent()
+
+            testee.subscriptionEventDataFlow.test {
+                testee.onPromptSent("hello") // enter chat mode
+                awaitItem() // consume prompt event
+
+                testee.onPageContextReceived("tab-1", serializedPageData)
+
+                val event = awaitItem()
+                assertEquals("submitAIChatPageContext", event.subscriptionName)
+                val params = event.params.getJSONObject("pageContext")
+                assertEquals("Ctx Title", params.getString("title"))
+                assertEquals("https://ctx.com", params.getString("url"))
+                assertEquals("content", params.getString("content"))
+
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
     private fun setFullModeUrl(url: String) {
         val fullModeUrlField = DuckChatContextualViewModel::class.java.getDeclaredField("fullModeUrl")
         fullModeUrlField.isAccessible = true
         fullModeUrlField.set(testee, url)
-    }
-
-    private class FakePageContextRepository : PageContextRepository {
-        private val updates = MutableSharedFlow<PageContextData?>(replay = 1, extraBufferCapacity = 1)
-
-        override suspend fun update(tabId: String, serializedPageData: String) {
-            updates.emit(PageContextData(tabId, serializedPageData, System.currentTimeMillis(), isCleared = false))
-        }
-
-        override suspend fun clear(tabId: String) {
-            updates.emit(PageContextData(tabId, "", System.currentTimeMillis(), isCleared = true))
-        }
-
-        override fun getPageContext(tabId: String): Flow<PageContextData?> = updates
     }
 
     private class FakeDuckChat : com.duckduckgo.duckchat.api.DuckChat {

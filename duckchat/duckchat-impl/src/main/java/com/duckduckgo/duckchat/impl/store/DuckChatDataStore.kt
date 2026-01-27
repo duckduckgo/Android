@@ -26,7 +26,6 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.duckchat.impl.contextual.PageContextData
 import com.duckduckgo.duckchat.impl.di.DuckChat
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_AI_AUTOMATIC_CONTEXT_ATTACHMENT
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_AI_CONTEXTUAL_ONBOARDING_DISMISSED
@@ -37,9 +36,6 @@ import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Key
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_CHAT_HISTORY_ENABLED
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_CHAT_LAST_SESSION_TIMESTAMP
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_CHAT_OPENED
-import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_CHAT_PAGE_CONTEXT_CLEARED
-import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_CHAT_PAGE_CONTEXT_JSON
-import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_CHAT_PAGE_CONTEXT_TAB_ID
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_CHAT_SESSION_DELTA_TIMESTAMP
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_CHAT_SHOW_IN_ADDRESS_BAR
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_CHAT_SHOW_IN_MENU
@@ -124,12 +120,6 @@ interface DuckChatDataStore {
 
     suspend fun isAIChatHistoryEnabled(): Boolean
 
-    suspend fun setDuckChatPageContext(tabId: String, serializedPageData: String)
-
-    suspend fun clearDuckChatPageContext(tabId: String)
-
-    fun observeDuckChatPageContext(): Flow<PageContextData?>
-
     suspend fun setContextualOnboardingCompleted(completed: Boolean)
 
     suspend fun isContextualOnboardingCompleted(): Boolean
@@ -158,9 +148,6 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
         val DUCK_CHAT_BACKGROUND_TIMESTAMP = longPreferencesKey(name = "DUCK_CHAT_BACKGROUND_TIMESTAMP")
         val DUCK_CHAT_HISTORY_ENABLED = booleanPreferencesKey(name = "DUCK_CHAT_HISTORY_ENABLED")
         val DUCK_AI_AUTOMATIC_CONTEXT_ATTACHMENT = booleanPreferencesKey(name = "DUCK_AI_AUTOMATIC_CONTEXT_ATTACHMENT")
-        val DUCK_CHAT_PAGE_CONTEXT_TAB_ID = stringPreferencesKey(name = "DUCK_CHAT_PAGE_CONTEXT_TAB_ID")
-        val DUCK_CHAT_PAGE_CONTEXT_JSON = stringPreferencesKey(name = "DUCK_CHAT_PAGE_CONTEXT_JSON")
-        val DUCK_CHAT_PAGE_CONTEXT_CLEARED = booleanPreferencesKey(name = "DUCK_CHAT_PAGE_CONTEXT_CLEARED")
         val DUCK_AI_CONTEXTUAL_ONBOARDING_DISMISSED = booleanPreferencesKey(name = "DUCK_AI_CONTEXTUAL_ONBOARDING_DISMISSED")
     }
 
@@ -353,31 +340,4 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
     override suspend fun isContextualOnboardingCompleted(): Boolean = store.data.firstOrNull()?.let {
         it[DUCK_AI_CONTEXTUAL_ONBOARDING_DISMISSED]
     } ?: false
-
-    override suspend fun setDuckChatPageContext(tabId: String, serializedPageData: String) {
-        store.edit { prefs ->
-            prefs[DUCK_CHAT_PAGE_CONTEXT_TAB_ID] = tabId
-            prefs[DUCK_CHAT_PAGE_CONTEXT_JSON] = serializedPageData
-            prefs[DUCK_CHAT_PAGE_CONTEXT_CLEARED] = false
-        }
-    }
-
-    override suspend fun clearDuckChatPageContext(tabId: String) {
-        store.edit { prefs ->
-            prefs[DUCK_CHAT_PAGE_CONTEXT_TAB_ID] = tabId
-            prefs[DUCK_CHAT_PAGE_CONTEXT_JSON] = ""
-            prefs[DUCK_CHAT_PAGE_CONTEXT_CLEARED] = true
-        }
-    }
-
-    override fun observeDuckChatPageContext(): Flow<PageContextData?> {
-        return store.data
-            .map { prefs ->
-                val tabId = prefs[DUCK_CHAT_PAGE_CONTEXT_TAB_ID] ?: return@map null
-                val serialized = prefs[DUCK_CHAT_PAGE_CONTEXT_JSON] ?: ""
-                val cleared = prefs[DUCK_CHAT_PAGE_CONTEXT_CLEARED] ?: false
-                PageContextData(tabId = tabId, serializedPageData = serialized, collectedAtMs = System.currentTimeMillis(), isCleared = cleared)
-            }
-            .distinctUntilChanged()
-    }
 }
