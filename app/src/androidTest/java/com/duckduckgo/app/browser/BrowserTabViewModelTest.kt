@@ -672,6 +672,7 @@ class BrowserTabViewModelTest {
             whenever(mockRemoteMessagingRepository.messageFlow()).thenReturn(remoteMessageFlow.consumeAsFlow())
             whenever(mockSettingsDataStore.automaticFireproofSetting).thenReturn(AutomaticFireproofSetting.ASK_EVERY_TIME)
             whenever(mockSettingsDataStore.omnibarType).thenReturn(OmnibarType.SINGLE_TOP)
+            whenever(mockSettingsDataStore.showTrackersCountInAddressBar).thenReturn(true)
             whenever(mockUrlDisplayRepository.isFullUrlEnabled).then { isFullSiteAddressEnabledFlow }
             whenever(mockBrowserMenuDisplayRepository.browserMenuState).then { browserMenuStateFlow }
             whenever(mockSSLCertificatesFeature.allowBypass()).thenReturn(mockEnabledToggle)
@@ -4267,6 +4268,57 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenLoadUrlAndUrlIsInContentBlockingExceptionsListThenPrivacyOnIsFalse() {
+        runBlocking { whenever(mockAddressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(true) }
+        whenever(mockAddressBarTrackersAnimationManager.shouldShowAnimation(anyOrNull(), anyOrNull())).thenReturn(true)
+        whenever(mockContentBlocking.isAnException("example.com")).thenReturn(true)
+        loadUrl("https://example.com")
+        assertFalse(loadingViewState().trackersAnimationEnabled)
+    }
+
+    @Test
+    fun whenUserPreferenceDisabledThenTrackersAnimationDisabled() {
+        runBlocking { whenever(mockAddressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(true) }
+        whenever(mockAddressBarTrackersAnimationManager.shouldShowAnimation(anyOrNull(), anyOrNull())).thenReturn(true)
+        whenever(mockSettingsDataStore.showTrackersCountInAddressBar).thenReturn(false)
+        loadUrl("https://example.com")
+        assertFalse(loadingViewState().trackersAnimationEnabled)
+    }
+
+    @Test
+    fun whenUserPreferenceEnabledAndPrivacyProtectionActiveThenTrackersAnimationEnabled() {
+        runBlocking { whenever(mockAddressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(true) }
+        whenever(mockAddressBarTrackersAnimationManager.shouldShowAnimation(anyOrNull(), anyOrNull())).thenReturn(true)
+        whenever(mockSettingsDataStore.showTrackersCountInAddressBar).thenReturn(true)
+        whenever(mockContentBlocking.isAnException("example.com")).thenReturn(false)
+        loadUrl("https://example.com")
+        assertTrue(loadingViewState().trackersAnimationEnabled)
+    }
+
+    @Test
+    fun whenUserPreferenceDisabledEvenWithPrivacyProtectionActiveThenTrackersAnimationDisabled() {
+        runBlocking { whenever(mockAddressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(true) }
+        whenever(mockAddressBarTrackersAnimationManager.shouldShowAnimation(anyOrNull(), anyOrNull())).thenReturn(true)
+        whenever(mockSettingsDataStore.showTrackersCountInAddressBar).thenReturn(false)
+        whenever(mockContentBlocking.isAnException("example.com")).thenReturn(false)
+        loadUrl("https://example.com")
+        assertFalse(loadingViewState().trackersAnimationEnabled)
+    }
+
+    @Test
+    fun whenUserPreferenceEnabledButPrivacyProtectionDisabledThenTrackersAnimationDisabled() {
+        runBlocking { whenever(mockAddressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(true) }
+        whenever(mockAddressBarTrackersAnimationManager.shouldShowAnimation(anyOrNull(), anyOrNull())).thenReturn(true)
+        whenever(mockSettingsDataStore.showTrackersCountInAddressBar).thenReturn(true)
+        whenever(mockContentBlocking.isAnException("example.com")).thenReturn(true)
+        loadUrl("https://example.com")
+        assertFalse(loadingViewState().trackersAnimationEnabled)
+    }
+
+    @Test
+    fun whenUserPreferenceDisabledAndPrivacyProtectionDisabledThenTrackersAnimationDisabled() {
+        runBlocking { whenever(mockAddressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(true) }
+        whenever(mockAddressBarTrackersAnimationManager.shouldShowAnimation(anyOrNull(), anyOrNull())).thenReturn(true)
+        whenever(mockSettingsDataStore.showTrackersCountInAddressBar).thenReturn(false)
         whenever(mockContentBlocking.isAnException("example.com")).thenReturn(true)
         loadUrl("https://example.com")
         assertFalse(loadingViewState().trackersAnimationEnabled)
