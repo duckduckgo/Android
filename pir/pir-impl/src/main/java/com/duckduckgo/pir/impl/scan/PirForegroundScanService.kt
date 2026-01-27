@@ -79,7 +79,7 @@ class PirForegroundScanService : Service(), CoroutineScope by MainScope() {
                 this,
                 1,
                 notification,
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                if (Build.VERSION.SDK_INT >= 34) {
                     FOREGROUND_SERVICE_TYPE_SPECIAL_USE
                 } else {
                     0
