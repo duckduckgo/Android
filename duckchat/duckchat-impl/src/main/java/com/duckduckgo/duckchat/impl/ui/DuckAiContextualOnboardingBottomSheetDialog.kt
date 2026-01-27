@@ -56,24 +56,18 @@ class DuckAiContextualOnboardingBottomSheetDialog(
         view.findViewById<View>(R.id.duckAiContextualOnboardingPrimaryButton).setOnClickListener {
             coroutineScope.launch {
                 duckChatFeatureRepository.setContextualOnboardingDismissed(true)
+                eventListener?.onConfirmed()
             }
             dismiss()
         }
 
         view.findViewById<View>(R.id.duckAiContextualOnboardingSecondaryButton).setOnClickListener {
-            coroutineScope.launch {
-                duckChatFeatureRepository.setContextualOnboardingDismissed(true)
-            }
             globalActivityStarter.start(context, DuckChatNativeSettingsNoParams)
             dismiss()
-        }
-
-        setOnDismissListener {
-            eventListener?.onDismissed()
         }
     }
 
     interface EventListener {
-        fun onDismissed()
+        fun onConfirmed()
     }
 }

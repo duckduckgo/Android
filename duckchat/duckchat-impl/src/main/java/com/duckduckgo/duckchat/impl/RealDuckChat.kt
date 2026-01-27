@@ -657,7 +657,7 @@ class RealDuckChat @Inject constructor(
 
     override fun showContextualOnboardingDialog(
         context: Context,
-        onDismissed: () -> Unit,
+        onConfirmed: () -> Unit,
     ) {
         val dialog = duckAiContextualOnboardingBottomSheetDialogFactory.create(
             context = context,
@@ -665,8 +665,8 @@ class RealDuckChat @Inject constructor(
             globalActivityStarter = globalActivityStarter,
         )
         dialog.eventListener = object : DuckAiContextualOnboardingBottomSheetDialog.EventListener {
-            override fun onDismissed() {
-                onDismissed()
+            override fun onConfirmed() {
+                onConfirmed()
             }
         }
         dialog.show()

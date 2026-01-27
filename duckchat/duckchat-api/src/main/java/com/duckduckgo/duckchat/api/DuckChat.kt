@@ -72,9 +72,9 @@ interface DuckChat {
     /**
      * Shows the contextual onboarding bottom sheet dialog.
      * @param context The context to show the dialog in
-     * @param onDismissed Callback invoked when the dialog is dismissed
+     * @param onConfirmed Callback invoked when the user confirms the dialog
      */
-    fun showContextualOnboardingDialog(context: Context, onDismissed: () -> Unit)
+    fun showContextualOnboardingDialog(context: Context, onConfirmed: () -> Unit)
 
     /**
      * Checks if the contextual onboarding has been dismissed.
