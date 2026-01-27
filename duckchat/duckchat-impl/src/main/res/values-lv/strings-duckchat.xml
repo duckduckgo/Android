@@ -93,4 +93,10 @@
     <string name="duck_ai_paid_settings_enable_in_settings">Ieslēgt MI funkciju iestatījumos</string>
     <string name="duck_ai_paid_settings_manage_in_settings">Pārvaldīt MI funkciju iestatījumos</string>
     <string name="duck_ai_paid_settings_manage_secondary">Konfigurē Duck.ai MI funkciju iestatījumos.</string>
+
+    <!-- Duck AI contextual onboarding -->
+    <string name="duck_chat_contextual_onboarding_title" instruction="Title for contextual Duck AI onboarding sheet">Jautā par šo lapu</string>
+    <string name="duck_chat_contextual_onboarding_body" instruction="Body text for contextual Duck AI onboarding sheet">Duck.ai tagad var palīdzēt atbildēt uz jautājumiem par to lapu, kuru pašlaik skaties.\n\nLapas saturs tiek iekļauts tikai tad, kad Tu to pievieno. To vari jebkurā laikā mainīt iestatījumos.</string>
+    <string name="duck_chat_contextual_onboarding_primary" instruction="Button to continue to contextual Duck AI sheet">Sapratu</string>
+    <string name="duck_chat_contextual_onboarding_secondary" instruction="Button to go to AI settings">Skatīt iestatījumus</string>
 </resources>
