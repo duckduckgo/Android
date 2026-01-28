@@ -24,7 +24,12 @@ jobs:
     name: Custom Tabs nightly tests
 
     steps:
-      - name: Checkout and Assemble
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Assemble APKs
         id: assemble
         uses: ./.github/actions/checkout-and-assemble
         with:

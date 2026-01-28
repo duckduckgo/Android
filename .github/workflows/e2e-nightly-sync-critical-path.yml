@@ -22,7 +22,12 @@ jobs:
           debug: true
           no-teardown: false # Turn this to true so the account is not deleted after the test
 
-      - name: Checkout and Assemble
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Assemble APKs
         id: assemble
         uses: ./.github/actions/checkout-and-assemble
         with:
