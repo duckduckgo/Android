@@ -1377,8 +1377,13 @@ class BrowserTabFragment :
     }
 
     private fun launchBrowserMenu(addExtraDelay: Boolean = false) {
-        val useBottomSheetMenu = viewModel.browserViewState.value?.useBottomSheetMenu ?: false
+        val viewState = viewModel.browserViewState.value
+        val useBottomSheetMenu = viewState?.useBottomSheetMenu ?: false
         if (useBottomSheetMenu && bottomSheetMenu != null) {
+            recreateBrowserMenu()
+            viewState?.let {
+                renderBrowserMenu(viewState = viewState, omnibarViewMode = omnibar.viewMode)
+            }
             launchBottomSheetMenu(addExtraDelay)
         } else if (!useBottomSheetMenu && popupMenu != null) {
             val isSplitOmnibarEnabled = omnibarRepository.omnibarType == OmnibarType.SPLIT
