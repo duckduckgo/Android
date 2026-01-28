@@ -43,6 +43,7 @@ data class BrokenSite(
     val jsPerformance: List<Double>?,
     val contentScopeExperiments: List<Toggle>?,
     val debugFlags: List<String>?,
+    val breakageData: String?,
 ) {
     companion object {
         const val SITE_TYPE_DESKTOP = "desktop"
