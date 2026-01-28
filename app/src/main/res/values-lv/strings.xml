@@ -943,7 +943,7 @@
     <string name="settingsHeadingCompleteSetup">Pabeidz iestatīšanu</string>
 
     <!--TabSwitcher Trackers Animation-->
-    <string name="trackerBlockedInTheLast7days" instruction="Placeholder is 1 tracker blocked">Pēdējo 7 dienu laikā &lt;b&gt;bloķēts%1$s izsekotājs &lt;/b&gt;</string>
+    <string name="trackerBlockedInTheLast7days" instruction="Placeholder is 1 tracker blocked">Pēdējo 7 dienu laikā &lt;b&gt;bloķēts %1$s izsekotājs &lt;/b&gt;</string>
     <string name="tabSwitcherAnimationTileRemovalDialogTitle" instruction="A title for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Vai slēpt izsekotāju skaitu?</string>
     <string name="tabSwitcherAnimationTileRemovalDialogBody" instruction="A message for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Vari to atkal ieslēgt sadaļā Iestatījumi &gt; Izskats.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Paslēpt</string>
