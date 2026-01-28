@@ -330,5 +330,6 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
 
     override suspend fun isAIChatHistoryEnabled(): Boolean = store.data.firstOrNull()?.let { it[DUCK_CHAT_HISTORY_ENABLED] } ?: false
 
-    override suspend fun isAutomaticPageContextAttachmentEnabled() = store.data.firstOrNull()?.let { it[DUCK_AI_AUTOMATIC_CONTEXT_ATTACHMENT] } ?: false
+    override suspend fun isAutomaticPageContextAttachmentEnabled() =
+        store.data.firstOrNull()?.let { it[DUCK_AI_AUTOMATIC_CONTEXT_ATTACHMENT] } ?: false
 }

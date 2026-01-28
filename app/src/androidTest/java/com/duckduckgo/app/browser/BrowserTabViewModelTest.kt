@@ -6677,7 +6677,7 @@ class BrowserTabViewModelTest {
                     anyOrNull(),
                     anyOrNull(),
                     any(),
-                    viewModel.updatedPageContext
+                    anyOrNull(),
                 ),
             ).thenReturn(jsCallbackData)
             testee.processJsCallbackMessage(
@@ -6693,7 +6693,7 @@ class BrowserTabViewModelTest {
                 eq("id"),
                 anyOrNull(),
                 any(),
-                viewModel.updatedPageContext
+                anyOrNull(),
             )
             assertCommandIssued<Command.SendResponseToJs>()
         }
@@ -6702,14 +6702,16 @@ class BrowserTabViewModelTest {
     fun whenProcessJsCallbackMessageForDuckChatAndResponseIsNullThenDoNotSendCommand() =
         runTest {
             whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
-            whenever(mockDuckChatJSHelper.processJsCallbackMessage(
-                anyString(),
-                anyString(),
-                anyOrNull(),
-                anyOrNull(),
-                any(),
-                viewModel.updatedPageContext
-            )).thenReturn(null)
+            whenever(
+                mockDuckChatJSHelper.processJsCallbackMessage(
+                    anyString(),
+                    anyString(),
+                    anyOrNull(),
+                    anyOrNull(),
+                    any(),
+                    anyOrNull(),
+                ),
+            ).thenReturn(null)
             testee.processJsCallbackMessage(
                 DUCK_CHAT_FEATURE_NAME,
                 "method",
@@ -6723,7 +6725,7 @@ class BrowserTabViewModelTest {
                 eq("id"),
                 anyOrNull(),
                 any(),
-                viewModel.updatedPageContext
+                anyOrNull(),
             )
             assertCommandNotIssued<Command.SendResponseToJs>()
         }
@@ -7229,14 +7231,16 @@ class BrowserTabViewModelTest {
     @Test
     fun whenProcessJsCallbackMessageForSubscriptionsAndResponseIsNullThenDoNotSendCommand() =
         runTest {
-            whenever(mockDuckChatJSHelper.processJsCallbackMessage(
-                anyString(),
-                anyString(),
-                anyOrNull(),
-                anyOrNull(),
-                any(),
-                viewModel.updatedPageContext
-            )).thenReturn(null)
+            whenever(
+                mockDuckChatJSHelper.processJsCallbackMessage(
+                    anyString(),
+                    anyString(),
+                    anyOrNull(),
+                    anyOrNull(),
+                    any(),
+                    any(),
+                ),
+            ).thenReturn(null)
             testee.processJsCallbackMessage(
                 featureName = SUBSCRIPTIONS_FEATURE_NAME,
                 method = "method",
