@@ -22,6 +22,7 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
 import com.duckduckgo.duckchat.impl.helper.NativeAction
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper
+import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -50,6 +51,7 @@ class DuckChatContextualViewModelTest {
     private lateinit var testee: DuckChatContextualViewModel
     private val duckChat: com.duckduckgo.duckchat.api.DuckChat = FakeDuckChat()
     private val duckChatJSHelper: DuckChatJSHelper = mock()
+    private val contextualDataStore = FakeDuckChatContextualDataStore()
 
     @Before
     fun setup() {
@@ -67,6 +69,7 @@ class DuckChatContextualViewModelTest {
             dispatchers = coroutineRule.testDispatcherProvider,
             duckChat = duckChat,
             duckChatJSHelper = duckChatJSHelper,
+            contextualDataStore = contextualDataStore,
         )
     }
 
@@ -385,6 +388,18 @@ class DuckChatContextualViewModelTest {
         }
     }
 
+    @Test
+    fun `onChatPageLoaded stores url by tab id`() = runTest {
+        val tabId = "tab-1"
+        val url = "https://duck.ai/chat"
+        testee.onSheetOpened(tabId)
+
+        testee.onChatPageLoaded(url)
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        assertEquals(url, contextualDataStore.getTabChatUrl(tabId))
+    }
+
     private fun setFullModeUrl(url: String) {
         val fullModeUrlField = DuckChatContextualViewModel::class.java.getDeclaredField("fullModeUrl")
         fullModeUrlField.isAccessible = true
@@ -416,6 +431,24 @@ class DuckChatContextualViewModelTest {
 
         fun setAutomaticContextAttachment(enabled: Boolean) {
             automaticContextAttachment.value = enabled
+        }
+    }
+
+    private class FakeDuckChatContextualDataStore : DuckChatContextualDataStore {
+        private val urls = mutableMapOf<String, String>()
+
+        override suspend fun persistTabChatUrl(tabId: String, url: String) {
+            urls[tabId] = url
+        }
+
+        override suspend fun getTabChatUrl(tabId: String): String? = urls[tabId]
+
+        override suspend fun clearTabChatUrl(tabId: String) {
+            urls.remove(tabId)
+        }
+
+        override suspend fun clearAll() {
+            urls.clear()
         }
     }
 }
