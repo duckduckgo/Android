@@ -344,5 +344,6 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
         it[DUCK_AI_CONTEXTUAL_ONBOARDING_DISMISSED]
     } ?: false
 
-    override suspend fun isAutomaticPageContextAttachmentEnabled() = store.data.firstOrNull()?.let { it[DUCK_AI_AUTOMATIC_CONTEXT_ATTACHMENT] } ?: false
+    override suspend fun isAutomaticPageContextAttachmentEnabled() =
+        store.data.firstOrNull()?.let { it[DUCK_AI_AUTOMATIC_CONTEXT_ATTACHMENT] } ?: false
 }
