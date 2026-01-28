@@ -382,6 +382,9 @@ class DuckChatContextualFragment :
         binding.contextualClose.setOnClickListener {
             viewModel.onContextualClose()
         }
+        binding.contextualNewChat.setOnClickListener {
+            viewModel.onNewChatRequested()
+        }
         binding.contextualModeButtons.setOnClickListener { }
         binding.contextualModeRoot.setOnClickListener { }
         binding.inputField.onFocusChangeListener = View.OnFocusChangeListener { _, focused ->
@@ -501,6 +504,9 @@ class DuckChatContextualFragment :
             DuckChatContextualViewModel.SheetMode.INPUT -> {
                 binding.contextualModeNativeContent.show()
                 binding.simpleWebview.gone()
+
+                binding.contextualNewChat.gone()
+
                 renderPageContext(viewState.contextTitle, viewState.contextUrl, viewState.tabId)
                 if (viewState.showContext) {
                     binding.duckAiContextualLayout.show()
@@ -519,6 +525,7 @@ class DuckChatContextualFragment :
             DuckChatContextualViewModel.SheetMode.WEBVIEW -> {
                 binding.contextualModeNativeContent.gone()
                 binding.simpleWebview.show()
+                binding.contextualNewChat.show()
             }
         }
     }
