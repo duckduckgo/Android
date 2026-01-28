@@ -30,6 +30,7 @@ jobs:
           release_key: ${{ secrets.FAKE_RELEASE_KEY }}
           gradle_encryption_key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
           gradle_flags: '-Pautofill-disable-auth-requirement'
+          develocity_access_key: ${{ secrets.DEVELOCITY_ACCESS_KEY }}
 
       - name: Run Autofill Critical Path E2E Flows
         id: maestro-critical-path

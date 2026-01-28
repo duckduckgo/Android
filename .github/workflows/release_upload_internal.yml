@@ -15,6 +15,8 @@ jobs:
   create-tag:
     name: Generate and upload bundle to Play Store Internal track
     runs-on: ubuntu-latest
+    env:
+      DEVELOCITY_ACCESS_KEY: ${{ secrets.DEVELOCITY_ACCESS_KEY }}
 
     steps:
       - name: Checkout repository

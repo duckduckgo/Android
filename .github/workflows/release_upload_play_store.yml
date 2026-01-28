@@ -25,6 +25,8 @@ jobs:
   release-production:
     runs-on: ubuntu-latest
     name: Publish Bundle to Play Store Internal track
+    env:
+      DEVELOCITY_ACCESS_KEY: ${{ secrets.DEVELOCITY_ACCESS_KEY }}
 
     steps:
       - name: Checkout repository
