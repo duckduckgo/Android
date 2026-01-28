@@ -66,7 +66,7 @@ class PirPixelInterceptorTest {
         verify(mockChain).proceed(requestCaptor.capture())
 
         val capturedRequest = requestCaptor.firstValue
-        val man = capturedRequest.url.queryParameter("man")
+        val man = capturedRequest.url.queryParameter("manufacturer")
         assertNull(man)
     }
 
@@ -84,7 +84,7 @@ class PirPixelInterceptorTest {
         verify(mockChain).proceed(requestCaptor.capture())
 
         val capturedRequest = requestCaptor.firstValue
-        val man = capturedRequest.url.queryParameter("man")
+        val man = capturedRequest.url.queryParameter("manufacturer")
         assertEquals("TestManufacturer", man)
     }
 
@@ -104,7 +104,7 @@ class PirPixelInterceptorTest {
         val capturedRequest = requestCaptor.firstValue
         assertEquals("param", capturedRequest.url.queryParameter("existing"))
         assertEquals("value", capturedRequest.url.queryParameter("another"))
-        assertEquals("TestManufacturer", capturedRequest.url.queryParameter("man"))
+        assertEquals("TestManufacturer", capturedRequest.url.queryParameter("manufacturer"))
     }
 
     @Test
@@ -139,7 +139,7 @@ class PirPixelInterceptorTest {
         verify(mockChain).proceed(requestCaptor.capture())
 
         val capturedRequest = requestCaptor.firstValue
-        val man = capturedRequest.url.queryParameter("man")
+        val man = capturedRequest.url.queryParameter("manufacturer")
         assertEquals("TestManufacturer", man)
     }
 
@@ -157,7 +157,7 @@ class PirPixelInterceptorTest {
         verify(mockChain).proceed(requestCaptor.capture())
 
         val capturedRequest = requestCaptor.firstValue
-        val man = capturedRequest.url.queryParameter("man")
+        val man = capturedRequest.url.queryParameter("manufacturer")
         assertEquals("TestManufacturer", man)
     }
 }

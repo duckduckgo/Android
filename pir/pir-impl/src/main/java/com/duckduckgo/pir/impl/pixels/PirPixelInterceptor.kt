@@ -38,7 +38,7 @@ class PirPixelInterceptor @Inject constructor(
         val url = if (ALLOWLIST.any { prefix -> pixel.startsWith(prefix) }) {
             chain.request().url.newBuilder()
                 .addQueryParameter(
-                    KEY_MAN,
+                    KEY_MANUFACTURER,
                     appBuildConfig.manufacturer,
                 ).build()
         } else {
@@ -51,7 +51,7 @@ class PirPixelInterceptor @Inject constructor(
     override fun getInterceptor(): Interceptor = this
 
     companion object {
-        private const val KEY_MAN = "man"
+        private const val KEY_MANUFACTURER = "manufacturer"
         private val ALLOWLIST = listOf(
             "m_dbp_foreground-run_started",
             "m_dbp_foreground-run_completed",

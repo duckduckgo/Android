@@ -1074,7 +1074,7 @@
         "parameters": [
             "appVersion",
             {
-                "key": "man",
+                "key": "manufacturer",
                 "description": "Manufacturer of the device",
                 "type": "string"
             }
@@ -1093,7 +1093,7 @@
                 "type": "string"
             },
             {
-                "key": "man",
+                "key": "manufacturer",
                 "description": "Manufacturer of the device",
                 "type": "string"
             }
@@ -1107,7 +1107,7 @@
         "parameters": [
             "appVersion",
             {
-                "key": "man",
+                "key": "manufacturer",
                 "description": "Manufacturer of the device",
                 "type": "string"
             }
@@ -1121,7 +1121,7 @@
         "parameters": [
             "appVersion",
             {
-                "key": "man",
+                "key": "manufacturer",
                 "description": "Manufacturer of the device",
                 "type": "string"
             }
@@ -1142,7 +1142,7 @@
         "parameters": [
             "appVersion",
             {
-                "key": "man",
+                "key": "manufacturer",
                 "description": "Manufacturer of the device",
                 "type": "string"
             }
@@ -1161,7 +1161,7 @@
                 "type": "string"
             },
             {
-                "key": "man",
+                "key": "manufacturer",
                 "description": "Manufacturer of the device",
                 "type": "string"
             }
@@ -1418,7 +1418,7 @@
         "parameters": [
             "appVersion",
             {
-                "key": "man",
+                "key": "manufacturer",
                 "description": "Manufacturer of the device",
                 "type": "string"
             }
@@ -1447,7 +1447,7 @@
                 "type": "number"
             },
             {
-                "key": "man",
+                "key": "manufacturer",
                 "description": "Manufacturer of the device",
                 "type": "string"
             }
