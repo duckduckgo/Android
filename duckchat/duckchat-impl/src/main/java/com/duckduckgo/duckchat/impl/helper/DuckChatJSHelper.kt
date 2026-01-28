@@ -46,6 +46,7 @@ interface DuckChatJSHelper {
         id: String?,
         data: JSONObject?,
         mode: Mode = Mode.FULL,
+        pageContext: String? = null,
     ): JsCallbackData?
 
     fun onNativeAction(action: NativeAction): SubscriptionEventData
@@ -79,6 +80,7 @@ class RealDuckChatJSHelper @Inject constructor(
         id: String?,
         data: JSONObject?,
         mode: Mode,
+        pageContext: String?,
     ): JsCallbackData? {
         fun registerDuckChatIsOpenDebounced(windowMs: Long = 500L) {
             // we debounced because METHOD_GET_AI_CHAT_NATIVE_HANDOFF_DATA can be called more than once
@@ -149,6 +151,17 @@ class RealDuckChatJSHelper @Inject constructor(
                 null
             }
 
+            METHOD_GET_PAGE_CONTEXT -> {
+                id?.let {
+                    val reason = data?.optString("reason") ?: "userAction"
+                    if (pageContext != null && (reason == "userAction" || (reason == "init" && duckChat.isAutomaticContextAttachmentEnabled()))) {
+                        getPageContextResponse(featureName, method, it, pageContext)
+                    } else {
+                        null
+                    }
+                }
+            }
+
             else -> null
         }
     }
@@ -205,6 +218,23 @@ class RealDuckChatJSHelper @Inject constructor(
         return JsCallbackData(jsonPayload, featureName, method, id)
     }
 
+    private fun getPageContextResponse(
+        featureName: String,
+        method: String,
+        id: String,
+        pageContext: String,
+    ): JsCallbackData {
+        val params =
+            JSONObject().apply {
+                put(
+                    PAGE_CONTEXT,
+                    JSONObject(pageContext),
+                )
+            }
+
+        return JsCallbackData(params, featureName, method, id)
+    }
+
     private fun getOpenKeyboardResponse(
         featureName: String,
         method: String,
@@ -249,15 +279,17 @@ class RealDuckChatJSHelper @Inject constructor(
         private const val METHOD_GET_AI_CHAT_NATIVE_HANDOFF_DATA = "getAIChatNativeHandoffData"
         private const val METHOD_GET_AI_CHAT_NATIVE_CONFIG_VALUES = "getAIChatNativeConfigValues"
         private const val METHOD_OPEN_AI_CHAT = "openAIChat"
-        private const val METHOD_CLOSE_AI_CHAT = "closeAIChat"
+        const val METHOD_CLOSE_AI_CHAT = "closeAIChat"
         private const val METHOD_OPEN_AI_CHAT_SETTINGS = "openAIChatSettings"
         private const val METHOD_RESPONSE_STATE = "responseState"
         private const val METHOD_HIDE_CHAT_INPUT = "hideChatInput"
         private const val METHOD_SHOW_CHAT_INPUT = "showChatInput"
+        const val METHOD_GET_PAGE_CONTEXT = "getAIChatPageContext"
         const val METHOD_OPEN_KEYBOARD = "openKeyboard"
         private const val AI_CHAT_PAYLOAD = "aiChatPayload"
         private const val METHOD_OPEN_KEYBOARD_PAYLOAD = "selector"
         private const val IS_HANDOFF_ENABLED = "isAIChatHandoffEnabled"
+        private const val PAGE_CONTEXT = "pageContext"
         private const val SUPPORTS_CLOSING_AI_CHAT = "supportsClosingAIChat"
         private const val SUPPORTS_OPENING_SETTINGS = "supportsOpeningSettings"
         private const val SUPPORTS_NATIVE_CHAT_INPUT = "supportsNativeChatInput"

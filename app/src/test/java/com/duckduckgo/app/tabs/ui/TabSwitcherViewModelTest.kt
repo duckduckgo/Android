@@ -872,7 +872,7 @@ class TabSwitcherViewModelTest {
         whenever(duckChatMock.wasOpenedBefore()).thenReturn(false)
 
         val duckChatURL = "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5"
-        whenever(duckChatMock.getDuckChatUrl(any(), any())).thenReturn(duckChatURL)
+        whenever(duckChatMock.getDuckChatUrl(any(), any(), any())).thenReturn(duckChatURL)
 
         testee.onDuckAIButtonClicked()
 

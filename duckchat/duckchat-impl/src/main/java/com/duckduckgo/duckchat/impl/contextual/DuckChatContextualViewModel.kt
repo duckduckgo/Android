@@ -57,7 +57,7 @@ class DuckChatContextualViewModel @Inject constructor(
     }
 
     private var fullModeUrl: String = ""
-    private var updatedPageContext: String = ""
+    var updatedPageContext: String = ""
 
     sealed class Command {
         data class LoadUrl(val url: String) : Command()
@@ -112,7 +112,7 @@ class DuckChatContextualViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            val chatUrl = duckChat.getDuckChatUrl("", false)
+            val chatUrl = duckChat.getDuckChatUrl("", false, sidebar = true)
             commandChannel.trySend(Command.LoadUrl(chatUrl))
         }
     }
@@ -270,16 +270,19 @@ class DuckChatContextualViewModel @Inject constructor(
                         showContext = _viewState.value.allowsAutomaticContextAttachment && _viewState.value.showContext,
                     )
                 }
-            } else {
-                if (_viewState.value.allowsAutomaticContextAttachment) {
-                    viewModelScope.launch(dispatchers.io()) {
-                        val contextPrompt = generateContext()
-                        withContext(dispatchers.main()) {
-                            logcat { "Duck.ai: send new pageContext $contextPrompt" }
-                            _subscriptionEventDataChannel.trySend(contextPrompt)
-                        }
-                    }
-                }
+            }
+        }
+    }
+
+    fun handleJSCall(method: String): Boolean {
+        when (method) {
+            RealDuckChatJSHelper.METHOD_CLOSE_AI_CHAT -> {
+                logcat { "Duck.ai: $method handled at the VM level" }
+                onContextualClose()
+                return true
+            }
+            else -> {
+                return false
             }
         }
     }
