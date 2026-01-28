@@ -2599,6 +2599,7 @@ class BrowserTabFragment :
             is Command.EnableDuckAIFullScreen -> showDuckAI(it.browserViewState)
             is Command.DisableDuckAIFullScreen -> omnibar.setViewMode(ViewMode.Browser(it.url))
             is Command.ShowDuckAIContextualMode -> showDuckChatContextualSheet()
+            is Command.ShowDuckAIContextualOnboarding -> showDuckAiContextualOnboarding()
             is Command.StartAddressBarTrackersAnimation -> {
                 omnibar.startTrackersAnimation(it.trackerEntities)
             }
@@ -3360,6 +3361,14 @@ class BrowserTabFragment :
             }
             override fun onSlide(bottomSheet: View, slideOffset: Float) {}
         })
+    }
+
+    private fun showDuckAiContextualOnboarding() {
+        duckChat.showContextualOnboarding(
+            requireContext(),
+        ) {
+            showDuckChatContextualSheet()
+        }
     }
 
     private fun removeDuckChatContextualSheet() {

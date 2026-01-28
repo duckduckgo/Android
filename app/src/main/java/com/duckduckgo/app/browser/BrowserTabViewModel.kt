@@ -4562,7 +4562,13 @@ class BrowserTabViewModel @Inject constructor(
 
         when {
             duckAiFeatureState.showContextualMode.value && !isNtp -> {
-                command.value = Command.ShowDuckAIContextualMode
+                viewModelScope.launch {
+                    if (duckChat.isContextualOnboardingCompleted()) {
+                        command.value = Command.ShowDuckAIContextualMode
+                    } else {
+                        command.value = Command.ShowDuckAIContextualOnboarding
+                    }
+                }
             }
 
             duckAiFeatureState.showFullScreenMode.value -> {

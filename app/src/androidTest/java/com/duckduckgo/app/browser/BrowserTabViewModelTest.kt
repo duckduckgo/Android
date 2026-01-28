@@ -8514,13 +8514,25 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenOnDuckChatOmnibarButtonClickedAndContextualModeEnabledAndNotNTPThenCommandSent() = runTest {
+    fun whenOnDuckChatOmnibarButtonClickedAndContextualModeEnabledAndNotNTPAndOnboardingCompletedThenShowContextualModeCommandSent() = runTest {
         mockDuckAiContextualModeFlow.emit(true)
+        whenever(mockDuckChat.isContextualOnboardingCompleted()).thenReturn(true)
 
         testee.onDuckChatOmnibarButtonClicked(query = "example", hasFocus = false, isNtp = false)
 
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertTrue(commandCaptor.lastValue is Command.ShowDuckAIContextualMode)
+    }
+
+    @Test
+    fun whenOnDuckChatOmnibarButtonClickedAndContextualModeEnabledAndNotNTPAndOnboardingNotCompletedThenShowOnboardingCommandSent() = runTest {
+        mockDuckAiContextualModeFlow.emit(true)
+        whenever(mockDuckChat.isContextualOnboardingCompleted()).thenReturn(false)
+
+        testee.onDuckChatOmnibarButtonClicked(query = "example", hasFocus = false, isNtp = false)
+
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        assertTrue(commandCaptor.lastValue is Command.ShowDuckAIContextualOnboarding)
     }
 
     @Test

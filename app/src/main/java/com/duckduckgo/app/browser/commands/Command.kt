@@ -506,5 +506,6 @@ sealed class Command {
     data class DisableDuckAIFullScreen(val url: String) : Command()
 
     data object ShowDuckAIContextualMode : Command()
+    data object ShowDuckAIContextualOnboarding : Command()
     data class StartAddressBarTrackersAnimation(val trackerEntities: List<Entity>?) : Command()
 }

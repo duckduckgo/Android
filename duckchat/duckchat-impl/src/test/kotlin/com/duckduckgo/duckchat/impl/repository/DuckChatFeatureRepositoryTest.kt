@@ -287,4 +287,18 @@ class DuckChatFeatureRepositoryTest {
 
         assertTrue(result)
     }
+
+    @Test
+    fun whenSetContextualOnboardingCompletedThenSetInDataStore() = runTest {
+        testee.setContextualOnboardingCompleted(true)
+
+        verify(mockDataStore).setContextualOnboardingCompleted(true)
+    }
+
+    @Test
+    fun whenIsContextualOnboardingCompletedCalledThenReturnDataFromTheStore() = runTest {
+        whenever(mockDataStore.isContextualOnboardingCompleted()).thenReturn(true)
+
+        assertTrue(testee.isContextualOnboardingCompleted())
+    }
 }
