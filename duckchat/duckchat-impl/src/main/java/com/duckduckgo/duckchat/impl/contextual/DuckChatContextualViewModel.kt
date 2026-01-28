@@ -25,6 +25,7 @@ import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
 import com.duckduckgo.duckchat.impl.helper.NativeAction
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper
+import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
@@ -45,6 +46,7 @@ class DuckChatContextualViewModel @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val duckChat: DuckChat,
     private val duckChatJSHelper: DuckChatJSHelper,
+    private val contextualDataStore: DuckChatContextualDataStore,
 ) : ViewModel() {
 
     private val commandChannel = Channel<Command>(capacity = 1, onBufferOverflow = DROP_OLDEST)
@@ -113,6 +115,10 @@ class DuckChatContextualViewModel @Inject constructor(
             logcat { "Duck.ai: onSheetOpened for tab=$tabId" }
         }
 
+        _viewState.update { current ->
+            current.copy(tabId = tabId)
+        }
+
         viewModelScope.launch {
             val chatUrl = duckChat.getDuckChatUrl("", false, sidebar = true)
             commandChannel.trySend(Command.LoadUrl(chatUrl))
@@ -154,6 +160,12 @@ class DuckChatContextualViewModel @Inject constructor(
     fun onChatPageLoaded(url: String?) {
         if (url != null) {
             fullModeUrl = url
+            val tabId = _viewState.value.tabId
+            if (tabId.isNotBlank()) {
+                viewModelScope.launch(dispatchers.io()) {
+                    contextualDataStore.persistTabChatUrl(tabId, url)
+                }
+            }
         }
     }
 
