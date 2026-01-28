@@ -4241,6 +4241,13 @@ class BrowserTabFragment :
         return viewModel.onUserPressedBack(isCustomTab)
     }
 
+    fun isInDuckAiMode(): Boolean = getOmnibar()?.viewMode == ViewMode.DuckAI
+
+    fun closeCurrentTab() {
+        if (!isAdded) return
+        viewModel.closeCurrentTab()
+    }
+
     private fun resetWebView() {
         logcat { "Duck.ai: resetWebView" }
         destroyWebView()
