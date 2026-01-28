@@ -1186,7 +1186,7 @@ class RealDuckChatTest {
     fun `when get duck chat url with empty query and sidebar then return correct url`() = runTest {
         val url = testee.getDuckChatUrl(query = "", autoPrompt = false, sidebar = true)
 
-        assertTrue(url == "https://duckduckgo.com/?placement=sidebar&q=DuckDuckGo+AI+Chat&ia=chat&duckai=5")
+        assertTrue(url == "https://duckduckgo.com/?placement=sidebar&q=DuckDuckGo%20AI%20Chat&ia=chat&duckai=5")
     }
 
     @Test
