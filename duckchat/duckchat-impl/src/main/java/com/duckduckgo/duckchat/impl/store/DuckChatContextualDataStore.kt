@@ -20,6 +20,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.di.DuckChat
@@ -28,21 +29,24 @@ import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
 import dagger.SingleInstanceIn
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 interface DuckChatContextualDataStore {
     suspend fun persistTabChatUrl(tabId: String, url: String)
     suspend fun getTabChatUrl(tabId: String): String?
-    suspend fun clearTabChatUrl(tabId: String)
-    suspend fun clearAll()
+    fun clearTabChatUrl(tabId: String)
+    fun clearAll()
 }
 
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
 class RealDuckChatContextualDataStore @Inject constructor(
     @DuckChat private val store: DataStore<Preferences>,
+    @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val dispatchers: DispatcherProvider,
     moshi: Moshi,
 ) : DuckChatContextualDataStore {
@@ -79,8 +83,8 @@ class RealDuckChatContextualDataStore @Inject constructor(
         }
     }
 
-    override suspend fun clearTabChatUrl(tabId: String) {
-        withContext(dispatchers.io()) {
+    override fun clearTabChatUrl(tabId: String) {
+        coroutineScope.launch(dispatchers.io()) {
             store.edit { prefs ->
                 val updated =
                     load(prefs[Keys.TAB_CHAT_URLS])
@@ -91,8 +95,8 @@ class RealDuckChatContextualDataStore @Inject constructor(
         }
     }
 
-    override suspend fun clearAll() {
-        withContext(dispatchers.io()) {
+    override fun clearAll() {
+        coroutineScope.launch(dispatchers.io()) {
             store.edit { prefs ->
                 prefs.remove(Keys.TAB_CHAT_URLS)
             }
