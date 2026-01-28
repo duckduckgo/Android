@@ -25,6 +25,7 @@ import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 import androidx.security.crypto.MasterKeys
 import com.duckduckgo.anrs.api.CrashLogger
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
@@ -43,6 +44,7 @@ private const val MIGRATED_TO_HARMONY = "migrated_to_harmony"
 class SharedPreferencesProviderImpl @Inject constructor(
     private val context: Context,
     private val dispatcherProvider: DispatcherProvider,
+    private val pixel: Pixel,
     private val crashLogger: Lazy<CrashLogger>,
 ) : SharedPreferencesProvider {
     @SuppressLint("DenyListedApi")
@@ -71,7 +73,15 @@ class SharedPreferencesProviderImpl @Inject constructor(
 
     override suspend fun getMigratedEncryptedSharedPreferences(name: String): SharedPreferences? {
         logcat { "Migrate and return encrypted preferences to Harmony" }
-        return runCatching { SafeSharedPreferences(migrateEncryptedToHarmonyIfNecessary(name), crashLogger.get()) }.getOrNull()
+        return runCatching {
+            SafeSharedPreferences(migrateEncryptedToHarmonyIfNecessary(name), crashLogger.get())
+        }.getOrElse {
+            pixel.fire(
+                DataStorePixelNames.DATA_STORE_MIGRATE_ENCRYPTED_PREFERENCES_FAILED,
+                mapOf("name" to name, "cause" to it.javaClass.name),
+            )
+            null
+        }
     }
 
     private fun getEncryptedSharedPreferencesInternal(
