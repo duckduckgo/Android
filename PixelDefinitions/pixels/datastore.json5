@@ -1,0 +1,21 @@
+{
+    "data-store_migrate_encrypted-preferences-failed": {
+        "description": "Retrieving harmony preferences failed. Includes param 'name' with the preferences file that failed, and 'error' which contains the name of the exception class\",",
+        "owners": ["CrisBarreiro"],
+        "triggers": ["exception"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "name",
+                "description": "The name of the sharedPreferences file that we were trying to migrate",
+                "type": "string"
+            },
+            {
+                "key": "error",
+                "description": "The class name the exception thrown",
+                "type": "string"
+            }
+        ]
+    }
+}
