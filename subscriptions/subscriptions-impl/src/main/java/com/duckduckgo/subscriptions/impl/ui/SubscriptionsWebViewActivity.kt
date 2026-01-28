@@ -396,6 +396,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
             contentDisposition = contentDisposition,
             mimeType = mimeType,
             subfolder = Environment.DIRECTORY_DOWNLOADS,
+            userAgent = userAgent.userAgent(),
         )
 
         if (hasWriteStoragePermission()) {

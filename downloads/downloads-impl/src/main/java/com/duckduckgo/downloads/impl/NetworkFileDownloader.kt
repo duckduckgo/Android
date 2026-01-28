@@ -46,7 +46,7 @@ class NetworkFileDownloader @Inject constructor(
         logcat { "Make a HEAD request for ${pendingDownload.url} as there are no values for Content-Disposition or Content-Type." }
 
         runCatching {
-            fileService.getFileDetails(pendingDownload.url)?.execute()?.let { response ->
+            fileService.getFileDetails(pendingDownload.userAgent, pendingDownload.url)?.execute()?.let { response ->
                 var updatedPendingDownload = pendingDownload.copy()
 
                 if (response.isSuccessful) {

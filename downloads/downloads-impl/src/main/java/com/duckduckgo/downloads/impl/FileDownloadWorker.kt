@@ -67,6 +67,7 @@ private const val CONTENT_DISPOSITION = "CONTENT_DISPOSITION"
 private const val MIME_TYPE = "MIME_TYPE"
 private const val SUBFOLDER = "SUBFOLDER"
 private const val DIRECTORY = "DIRECTORY"
+private const val USER_AGENT = "USER_AGENT"
 
 @VisibleForTesting
 internal const val IS_URL_COMPRESSED = "IS_URL_COMPRESSED"
@@ -82,6 +83,7 @@ fun FileDownloader.PendingFileDownload.toInputData(): Data {
         .putString(SUBFOLDER, subfolder)
         .putString(DIRECTORY, directory.absolutePath)
         .putBoolean(IS_URL_COMPRESSED, urlTooLarge)
+        .putString(USER_AGENT, userAgent)
         .build()
 }
 
@@ -95,6 +97,7 @@ fun Data.toPendingFileDownload(): FileDownloader.PendingFileDownload {
         subfolder = getString(SUBFOLDER)!!,
         directory = File(getString(DIRECTORY)!!),
         isUrlCompressed = false,
+        userAgent = getString(USER_AGENT),
     )
 }
 

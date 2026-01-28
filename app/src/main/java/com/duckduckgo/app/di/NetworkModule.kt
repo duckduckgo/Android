@@ -43,6 +43,7 @@ import logcat.logcat
 import okhttp3.Cache
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
+import okhttp3.Protocol
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.moshi.MoshiConverterFactory
@@ -144,6 +145,57 @@ class NetworkModule {
             .baseUrl(Url.API)
             .callFactory { okHttpClient.get().newCall(it) }
             .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+            .addConverterFactory(MoshiConverterFactory.create(moshi))
+            .build()
+    }
+
+    /**
+     * HTTP/1.1-only OkHttpClient for downloads fallback.
+     * Used when HTTP/2 fails with StreamResetException on certain servers.
+     */
+    @Provides
+    @SingleInstanceIn(AppScope::class)
+    @Named("downloadsHttp1")
+    fun downloadsHttp1OkHttpClient(
+        apiRequestInterceptor: ApiRequestInterceptor,
+        apiInterceptorPlugins: PluginPoint<ApiInterceptorPlugin>,
+    ): OkHttpClient {
+        return OkHttpClient.Builder()
+            .protocols(listOf(Protocol.HTTP_1_1))
+            .addInterceptor(apiRequestInterceptor)
+            .apply {
+                apiInterceptorPlugins.getPlugins().forEach {
+                    addInterceptor(it.getInterceptor())
+                }
+            }
+            .proxySelector(
+                object : ProxySelector() {
+                    override fun select(uri: URI?): List<Proxy> {
+                        return try {
+                            getDefault().select(uri)
+                        } catch (t: Throwable) {
+                            listOf(Proxy.NO_PROXY)
+                        }
+                    }
+
+                    override fun connectFailed(uri: URI?, sa: SocketAddress?, ioe: IOException?) {
+                        getDefault().connectFailed(uri, sa, ioe)
+                    }
+                },
+            )
+            .build()
+    }
+
+    @Provides
+    @SingleInstanceIn(AppScope::class)
+    @Named("downloadsHttp1")
+    fun downloadsHttp1Retrofit(
+        @Named("downloadsHttp1") okHttpClient: Lazy<OkHttpClient>,
+        moshi: Moshi,
+    ): Retrofit {
+        return Retrofit.Builder()
+            .baseUrl(Url.API)
+            .callFactory { okHttpClient.get().newCall(it) }
             .addConverterFactory(MoshiConverterFactory.create(moshi))
             .build()
     }
