@@ -22,7 +22,7 @@
     android:layout_marginTop="6dp"
     android:clipChildren="false"
     android:clipToPadding="false"
-    android:paddingBottom="@dimen/featuredListItemTopMargin">
+    android:paddingBottom="@dimen/featuredListItemBottomMargin">
 
     <com.google.android.material.card.MaterialCardView
         android:layout_width="0dp"
