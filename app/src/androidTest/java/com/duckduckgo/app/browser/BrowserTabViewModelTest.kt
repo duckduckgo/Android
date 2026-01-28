@@ -2036,6 +2036,37 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenBackPressedOnAboutBlankTabAndFeatureEnabledThenRemoveTabAndReturnTrue() = runTest {
+        fakeAndroidConfigBrowserFeature.handleAboutBlank().setRawStoredState(State(enable = true))
+        resetChannels()
+        initialiseViewModel()
+
+        selectedTabLiveData.value = aTabEntity(id = "id").copy(url = "about:blank", title = "about:blank", sourceTabId = null)
+        testee.handleNewTabIfEmptyUrl()
+
+        val result = testee.onUserPressedBack(isCustomTab = false)
+
+        assertTrue(result)
+        verify(mockTabRepository).deleteTabAndSelectSource("id")
+        verify(mockAdClickManager).clearTabId("id")
+    }
+
+    @Test
+    fun whenBackPressedOnAboutBlankTabAndFeatureDisabledThenDoNotRemoveTab() = runTest {
+        fakeAndroidConfigBrowserFeature.handleAboutBlank().setRawStoredState(State(enable = false))
+        resetChannels()
+        initialiseViewModel()
+
+        selectedTabLiveData.value = aTabEntity(id = "id").copy(url = "about:blank", title = "about:blank", sourceTabId = null)
+        testee.handleNewTabIfEmptyUrl()
+
+        testee.onUserPressedBack(isCustomTab = false)
+
+        verify(mockTabRepository, never()).deleteTabAndSelectSource(eq("id"))
+        verify(mockAdClickManager, never()).clearTabId(eq("id"))
+    }
+
+    @Test
     fun whenIsCustomTabAndCannotGoBackThenReturnFalse() {
         setupNavigation(isBrowsing = true, canGoBack = false)
         assertFalse(testee.onUserPressedBack(isCustomTab = true))
@@ -4784,6 +4815,32 @@ class BrowserTabViewModelTest {
         fakeAndroidConfigBrowserFeature.handleAboutBlank().setRawStoredState(State(enable = false))
         testee.handleNewTabIfEmptyUrl()
         assertEquals(omnibarViewState().omnibarText, "")
+    }
+
+    @Test
+    fun whenHandleNewTabIfEmptyUrlWithEmptyUrlThenOmnibarAndUrlSetToAboutBlank() {
+        fakeAndroidConfigBrowserFeature.handleAboutBlank().setRawStoredState(State(enable = true))
+        resetChannels()
+        initialiseViewModel()
+        // Simulate a new tab with empty URL
+        testee.loadData("tabId", null, false, false)
+        testee.handleNewTabIfEmptyUrl()
+        assertEquals("about:blank", omnibarViewState().omnibarText)
+        assertEquals("about:blank", testee.url)
+        assertEquals("about:blank", testee.title)
+    }
+
+    @Test
+    fun whenHandleNewTabIfEmptyUrlWithNonEmptyUrlThenNoChangeToUrl() {
+        fakeAndroidConfigBrowserFeature.handleAboutBlank().setRawStoredState(State(enable = true))
+        resetChannels()
+        initialiseViewModel()
+        val url = "https://duckduckgo.com"
+        testee.loadData("tabId", url, false, false)
+        testee.navigationStateChanged(buildWebNavigation(url))
+        testee.handleNewTabIfEmptyUrl()
+        assertEquals(url, testee.url)
+        assertNotEquals("about:blank", testee.title)
     }
 
     @Test

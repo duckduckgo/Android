@@ -67,6 +67,32 @@ class TabRendererExtensionTest {
         assertEquals("", TabEntity("", null, TITLE, position = 0).displayUrl())
     }
 
+    @Test
+    fun whenTabUrlIsAboutBlankThenDisplayTitleIsAboutBlank() {
+        assertEquals("about:blank", TabEntity("1", url = "about:blank", title = null, position = 0).displayTitle(context))
+    }
+
+    @Test
+    fun whenTabUrlIsAboutBlankWithSourceTabThenDisplayTitleIsAboutBlank() {
+        assertEquals("about:blank", TabEntity("1", url = "about:blank", title = null, sourceTabId = "parent-id", position = 0).displayTitle(context))
+    }
+
+    @Test
+    fun whenTabIsBlankNewTabThenDisplayTitleIsNewTab() {
+        whenever(context.getString(R.string.newTabMenuItem)).thenReturn("New Tab")
+        assertEquals("New Tab", TabEntity("1", url = null, title = null, position = 0).displayTitle(context))
+    }
+
+    @Test
+    fun whenTabUrlIsAboutBlankUppercaseThenDisplayTitleIsAboutBlank() {
+        assertEquals("about:blank", TabEntity("1", url = "ABOUT:BLANK", title = null, position = 0).displayTitle(context))
+    }
+
+    @Test
+    fun whenTabHasRegularUrlThenDisplayTitleShowsTitle() {
+        assertEquals("My Page", TabEntity("1", url = "https://example.com", title = "My Page", position = 0).displayTitle(context))
+    }
+
     companion object {
         private const val TITLE = "Title"
         private const val URL = "https://example.com"

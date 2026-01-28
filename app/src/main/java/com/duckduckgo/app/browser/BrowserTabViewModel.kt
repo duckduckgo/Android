@@ -404,6 +404,7 @@ import java.net.URISyntaxException
 import java.util.Locale
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
+import kotlin.text.equals
 
 private const val SCAM_PROTECTION_REPORT_ERROR_URL = "https://duckduckgo.com/malicious-site-protection/report-error?url="
 
@@ -1473,6 +1474,13 @@ class BrowserTabViewModel @Inject constructor(
         val hasSourceTab = tabRepository.liveSelectedTab.value?.sourceTabId != null
 
         if (isNavigationToEmptyUrlFromParent(hasSourceTab, isCustomTab) && handleAboutBlankEnabled) {
+            viewModelScope.launch {
+                removeCurrentTabFromRepository()
+            }
+            return true
+        }
+
+        if (site?.url.equals(ABOUT_BLANK, ignoreCase = true) && handleAboutBlankEnabled) {
             viewModelScope.launch {
                 removeCurrentTabFromRepository()
             }
@@ -3870,6 +3878,15 @@ class BrowserTabViewModel @Inject constructor(
             omnibarViewState.value = currentOmnibarViewState().copy(
                 omnibarText = ABOUT_BLANK,
             )
+            site = siteFactory.buildSite(
+                url = ABOUT_BLANK,
+                tabId = tabId,
+                title = ABOUT_BLANK,
+                httpUpgraded = httpsUpgraded,
+            )
+            viewModelScope.launch(dispatchers.io()) {
+                tabRepository.update(tabId, site)
+            }
         }
     }
 
