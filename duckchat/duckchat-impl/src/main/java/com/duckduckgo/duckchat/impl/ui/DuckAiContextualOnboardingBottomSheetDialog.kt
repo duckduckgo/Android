@@ -22,6 +22,7 @@ import android.content.DialogInterface
 import android.view.LayoutInflater
 import android.widget.FrameLayout
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.duckchat.api.DuckChatNativeSettingsNoParams
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.databinding.BottomSheetDuckAiContextualOnboardingBinding
@@ -33,12 +34,14 @@ import com.google.android.material.shape.CornerFamily
 import com.google.android.material.shape.MaterialShapeDrawable
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import com.duckduckgo.mobile.android.R as CommonR
 
 @SuppressLint("NoBottomSheetDialog")
 class DuckAiContextualOnboardingBottomSheetDialog(
     context: Context,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
+    private val dispatcherProvider: DispatcherProvider,
     private val duckChatFeatureRepository: DuckChatFeatureRepository,
     private val globalActivityStarter: GlobalActivityStarter,
 ) : BottomSheetDialog(context) {
@@ -69,9 +72,11 @@ class DuckAiContextualOnboardingBottomSheetDialog(
         binding.duckAiContextualOnboardingPrimaryButton.setOnClickListener {
             coroutineScope.launch {
                 duckChatFeatureRepository.setContextualOnboardingCompleted(true)
+                withContext(dispatcherProvider.main()) {
+                    eventListener?.onConfirmed()
+                    dismiss()
+                }
             }
-            eventListener?.onConfirmed()
-            dismiss()
         }
 
         binding.duckAiContextualOnboardingSecondaryButton.setOnClickListener {
