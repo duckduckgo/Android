@@ -1354,7 +1354,6 @@ class RealPirPixelSender @Inject constructor(
     companion object {
         private const val PARAM_KEY_TOTAL_TIME = "totalTimeInMillis"
         private const val PARAM_KEY_CPU_USAGE = "cpuUsage"
-        private const val PARAM_KEY_MEMORY_LEVEL = "memory_level"
         private const val PARAM_BROKER_VERSION = "broker_version"
         private const val PARAM_LINK_AGE = "link_age_ms"
         private const val PARAM_STATUS = "status"
