@@ -17,6 +17,7 @@
 package com.duckduckgo.duckchat.impl.ui
 
 import android.content.Context
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
 import com.duckduckgo.navigation.api.GlobalActivityStarter
@@ -25,23 +26,17 @@ import kotlinx.coroutines.CoroutineScope
 import javax.inject.Inject
 
 interface DuckAiContextualOnboardingBottomSheetDialogFactory {
-    fun create(
-        context: Context,
-        coroutineScope: CoroutineScope,
-        globalActivityStarter: GlobalActivityStarter,
-    ): DuckAiContextualOnboardingBottomSheetDialog
+    fun create(context: Context): DuckAiContextualOnboardingBottomSheetDialog
 }
 
 @ContributesBinding(AppScope::class)
 class RealDuckAiContextualOnboardingBottomSheetDialogFactory @Inject constructor(
+    @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val duckChatFeatureRepository: DuckChatFeatureRepository,
+    private val globalActivityStarter: GlobalActivityStarter,
 ) : DuckAiContextualOnboardingBottomSheetDialogFactory {
 
-    override fun create(
-        context: Context,
-        coroutineScope: CoroutineScope,
-        globalActivityStarter: GlobalActivityStarter,
-    ): DuckAiContextualOnboardingBottomSheetDialog {
+    override fun create(context: Context): DuckAiContextualOnboardingBottomSheetDialog {
         return DuckAiContextualOnboardingBottomSheetDialog(
             context = context,
             coroutineScope = coroutineScope,

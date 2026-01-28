@@ -659,11 +659,7 @@ class RealDuckChat @Inject constructor(
         context: Context,
         onConfirmed: () -> Unit,
     ) {
-        val dialog = duckAiContextualOnboardingBottomSheetDialogFactory.create(
-            context = context,
-            coroutineScope = appCoroutineScope,
-            globalActivityStarter = globalActivityStarter,
-        )
+        val dialog = duckAiContextualOnboardingBottomSheetDialogFactory.create(context)
         dialog.eventListener = object : DuckAiContextualOnboardingBottomSheetDialog.EventListener {
             override fun onConfirmed() {
                 onConfirmed()
