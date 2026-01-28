@@ -30,7 +30,7 @@ import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -78,8 +78,8 @@ class RealDuckChatContextualDataStore @Inject constructor(
 
     override suspend fun getTabChatUrl(tabId: String): String? {
         return withContext(dispatchers.io()) {
-            val prefs = store.data.first()
-            load(prefs[Keys.TAB_CHAT_URLS])[tabId]
+            val prefs = store.data.firstOrNull()
+            load(prefs?.get(Keys.TAB_CHAT_URLS))[tabId]
         }
     }
 
