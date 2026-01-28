@@ -39,6 +39,8 @@ class RealBrokenSiteContext @Inject constructor(
 
     override var jsPerformance: DoubleArray? = null
 
+    override var breakageData: String? = null
+
     override fun onUserTriggeredRefresh() {
         userRefreshCount++
     }
@@ -68,5 +70,10 @@ class RealBrokenSiteContext @Inject constructor(
         }
         jsPerformance = recordedJsValues
         logcat { "jsPerformance recorded as $performanceMetrics" }
+    }
+
+    override fun recordBreakageData(breakageData: String?) {
+        this.breakageData = breakageData
+        logcat { "breakageData recorded as $breakageData" }
     }
 }
