@@ -114,6 +114,11 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
                 is SetAddressBarPositionOptions -> setAddressBarPositionOptions(it.defaultOption)
             }
         }.launchIn(lifecycleScope)
+
+        viewModel.viewState.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).onEach { state ->
+            // This will fire immediately with the current state upon rotation
+            state?.let { configureDaxCta(it) }
+        }.launchIn(lifecycleScope)
     }
 
     private fun setAddressBarPositionOptions(defaultOption: Boolean) {
