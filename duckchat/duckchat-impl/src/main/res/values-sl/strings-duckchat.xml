@@ -93,4 +93,10 @@
     <string name="duck_ai_paid_settings_enable_in_settings">Omogočite v nastavitvah funkcij umetne inteligence</string>
     <string name="duck_ai_paid_settings_manage_in_settings">Upravljajte v nastavitvah funkcij umetne inteligence</string>
     <string name="duck_ai_paid_settings_manage_secondary">Konfigurirajte Duck.ai v nastavitvah funkcij umetne inteligence.</string>
+
+    <!-- Duck AI contextual onboarding -->
+    <string name="duck_chat_contextual_onboarding_title" instruction="Title for contextual Duck AI onboarding sheet">Vprašaj o tej strani</string>
+    <string name="duck_chat_contextual_onboarding_body" instruction="Body text for contextual Duck AI onboarding sheet">Duck.ai vam zdaj lahko pomaga odgovoriti na vprašanja o strani, ki si jo ogledujete.\n\nVsebina strani je vključena le, če jo priložite. To lahko kadar koli spremenite v nastavitvah.</string>
+    <string name="duck_chat_contextual_onboarding_primary" instruction="Button to continue to contextual Duck AI sheet">Razumem</string>
+    <string name="duck_chat_contextual_onboarding_secondary" instruction="Button to go to AI settings">Prikaži nastavitve</string>
 </resources>

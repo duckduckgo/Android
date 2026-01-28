@@ -93,4 +93,10 @@
     <string name="duck_ai_paid_settings_enable_in_settings">Ενεργοποίηση στις Ρυθμίσεις λειτουργιών τεχνητής νοημοσύνης</string>
     <string name="duck_ai_paid_settings_manage_in_settings">Διαχείριση στις Ρυθμίσεις λειτουργιών τεχνητής νοημοσύνης</string>
     <string name="duck_ai_paid_settings_manage_secondary">Διαμόρφωση του Duck.ai στις Ρυθμίσεις λειτουργιών τεχνητής νοημοσύνης.</string>
+
+    <!-- Duck AI contextual onboarding -->
+    <string name="duck_chat_contextual_onboarding_title" instruction="Title for contextual Duck AI onboarding sheet">Ρωτήστε γι\' αυτήν τη σελίδα</string>
+    <string name="duck_chat_contextual_onboarding_body" instruction="Body text for contextual Duck AI onboarding sheet">Το Duck.ai μπορεί τώρα να σας βοηθήσει να απαντάτε σε ερωτήσεις σχετικά με τη σελίδα που βλέπετε.\n\nΤο περιεχόμενο της σελίδας περιλαμβάνεται μόνο όταν το επισυνάπτετε. Μπορείτε να το αλλάξετε αυτό οποιαδήποτε στιγμή από τις Ρυθμίσεις.</string>
+    <string name="duck_chat_contextual_onboarding_primary" instruction="Button to continue to contextual Duck AI sheet">Το έπιασα</string>
+    <string name="duck_chat_contextual_onboarding_secondary" instruction="Button to go to AI settings">Προβολή ρυθμίσεων</string>
 </resources>
