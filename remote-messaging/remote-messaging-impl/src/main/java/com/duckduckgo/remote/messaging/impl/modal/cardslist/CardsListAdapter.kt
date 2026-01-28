@@ -178,7 +178,7 @@ class CardsListAdapter @Inject constructor() : ListAdapter<ModalListItem, CardsL
                 binding.title.text = item.titleText
                 binding.description.text = item.descriptionText
                 binding.startImage.setImageResource(item.placeholder.drawable(true))
-                binding.root.setOnClickListener {
+                binding.listItemContainer.setOnClickListener {
                     listener.onItemClicked(item)
                 }
             }
