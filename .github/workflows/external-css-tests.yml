@@ -17,6 +17,8 @@ jobs:
   unit_tests:
     name: External content scope script tests
     runs-on: ubuntu-latest
+    env:
+      DEVELOCITY_ACCESS_KEY: ${{ secrets.DEVELOCITY_ACCESS_KEY }}
 
     steps:
       - name: Checkout repository

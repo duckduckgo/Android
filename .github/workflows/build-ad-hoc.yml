@@ -28,6 +28,8 @@ jobs:
   build-apk:
     name: Generate and upload universal APK to GH Action Run
     runs-on: ubuntu-latest
+    env:
+      DEVELOCITY_ACCESS_KEY: ${{ secrets.DEVELOCITY_ACCESS_KEY }}
 
     steps:
       - name: Checkout repository

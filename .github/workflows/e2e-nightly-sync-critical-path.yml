@@ -36,6 +36,7 @@ jobs:
           release_key: ${{ secrets.FAKE_RELEASE_KEY }}
           gradle_encryption_key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
           gradle_flags: '-Psync-disable-auth-requirement'
+          develocity_access_key: ${{ secrets.DEVELOCITY_ACCESS_KEY }}
 
       - name: Run Sync Maestro Tests
         id: maestro-cloud-asana

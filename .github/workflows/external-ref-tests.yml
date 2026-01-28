@@ -61,6 +61,8 @@ jobs:
   android_tests:
     runs-on: ubuntu-latest
     name: External reference tests android tests
+    env:
+      DEVELOCITY_ACCESS_KEY: ${{ secrets.DEVELOCITY_ACCESS_KEY }}
 
     steps:
       - name: Checkout repository

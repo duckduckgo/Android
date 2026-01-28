@@ -12,6 +12,8 @@ jobs:
     name: Run Benchmark
     runs-on: android-large-runner
     timeout-minutes: 120
+    env:
+      DEVELOCITY_ACCESS_KEY: ${{ secrets.DEVELOCITY_ACCESS_KEY }}
 
     steps:
       - name: Determine branch

@@ -14,6 +14,8 @@ jobs:
   maestro_test:
     runs-on: ubuntu-latest
     name: Run Design System Maestro Tests
+    env:
+      DEVELOCITY_ACCESS_KEY: ${{ secrets.DEVELOCITY_ACCESS_KEY }}
 
     steps:
       - name: Checkout repository
