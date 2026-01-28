@@ -111,17 +111,33 @@ class DuckChatContextualViewModel @Inject constructor(
     }
 
     fun onSheetOpened(tabId: String) {
-        viewModelScope.launch(dispatchers.io()) {
-            logcat { "Duck.ai: onSheetOpened for tab=$tabId" }
-        }
-
         _viewState.update { current ->
             current.copy(tabId = tabId)
         }
 
-        viewModelScope.launch {
-            val chatUrl = duckChat.getDuckChatUrl("", false, sidebar = true)
-            commandChannel.trySend(Command.LoadUrl(chatUrl))
+        viewModelScope.launch(dispatchers.io()) {
+            logcat { "Duck.ai: onSheetOpened for tab=$tabId" }
+
+            val existingChatUrl = contextualDataStore.getTabChatUrl(tabId)
+
+            if (existingChatUrl.isNullOrBlank()) {
+                val chatUrl = duckChat.getDuckChatUrl("", false, sidebar = true)
+                withContext(dispatchers.main()) {
+                    commandChannel.trySend(Command.LoadUrl(chatUrl))
+                }
+            } else {
+                withContext(dispatchers.main()) {
+                    _viewState.update { current ->
+                        current.copy(
+                            sheetMode = SheetMode.WEBVIEW,
+                            sheetState = BottomSheetBehavior.STATE_EXPANDED,
+                            url = existingChatUrl,
+                            tabId = tabId,
+                        )
+                    }
+                    commandChannel.trySend(Command.LoadUrl(existingChatUrl))
+                }
+            }
         }
     }
 
@@ -158,6 +174,7 @@ class DuckChatContextualViewModel @Inject constructor(
     }
 
     fun onChatPageLoaded(url: String?) {
+        logcat { "Duck.ai: onChatPageLoaded $url" }
         if (url != null) {
             fullModeUrl = url
             val tabId = _viewState.value.tabId
@@ -303,6 +320,10 @@ class DuckChatContextualViewModel @Inject constructor(
 
     fun onNewChatRequested() {
         viewModelScope.launch(dispatchers.io()) {
+            val currentTabId = _viewState.value.tabId
+            if (currentTabId.isNotBlank()) {
+                contextualDataStore.clearTabChatUrl(currentTabId)
+            }
             val subscriptionEvent = duckChatJSHelper.onNativeAction(NativeAction.NEW_CHAT)
             _subscriptionEventDataChannel.trySend(subscriptionEvent)
         }
