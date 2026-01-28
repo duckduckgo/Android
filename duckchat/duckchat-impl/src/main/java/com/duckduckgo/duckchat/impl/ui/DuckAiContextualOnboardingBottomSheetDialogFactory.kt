@@ -18,6 +18,7 @@ package com.duckduckgo.duckchat.impl.ui
 
 import android.content.Context
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
@@ -36,6 +37,7 @@ class RealDuckAiContextualOnboardingBottomSheetDialogFactory @Inject constructor
     private val dispatcherProvider: DispatcherProvider,
     private val duckChatFeatureRepository: DuckChatFeatureRepository,
     private val globalActivityStarter: GlobalActivityStarter,
+    private val pixel: Pixel,
 ) : DuckAiContextualOnboardingBottomSheetDialogFactory {
 
     override fun create(context: Context): DuckAiContextualOnboardingBottomSheetDialog {
@@ -45,6 +47,7 @@ class RealDuckAiContextualOnboardingBottomSheetDialogFactory @Inject constructor
             dispatcherProvider = dispatcherProvider,
             duckChatFeatureRepository = duckChatFeatureRepository,
             globalActivityStarter = globalActivityStarter,
+            pixel = pixel,
         )
     }
 }
