@@ -123,12 +123,11 @@ class PirForegroundScanService : Service(), CoroutineScope by MainScope() {
 
     override fun onLowMemory() {
         logcat(WARN) { "PIR-SCAN: onLowMemory called" }
+        pirPixelSender.reportManualScanLowMemory()
     }
 
     override fun onTrimMemory(level: Int) {
-        super.onTrimMemory(level)
         logcat(WARN) { "PIR-SCAN: onTrimMemory called with level: $level" }
-        pirPixelSender.reportManualScanLowMemory()
     }
 
     override fun onDestroy() {
