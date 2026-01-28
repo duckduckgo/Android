@@ -302,6 +302,17 @@
     <string name="widgetConfigurationActivityTitle">Widget Configuration</string>
     <string name="favoritesWidgetLabel">Search and Favorites</string>
     <string name="searchWidgetLabel">Search and Duck.ai</string>
+    <string name="shortcutsWidgetLabel">DuckDuckGo Shortcuts</string>
+    <string name="shortcutsWidgetTitle">Protection. Privacy. Peace of mind.</string>
+    <string name="shortcutsWidgetDescription">Quick access to Duck.ai, Search, Email Protection, and VPN</string>
+    <string name="shortcutWidgetDuckAi">Duck.ai</string>
+    <string name="shortcutWidgetSearch">Search</string>
+    <string name="shortcutWidgetBookmarks">Bookmarks</string>
+    <string name="shortcutWidgetEmail">Email</string>
+    <string name="shortcutWidgetVpn">VPN</string>
+    <string name="shortcutWidgetAppTp">AppTP</string>
+    <string name="emailAliasCopied">Duck Address copied to clipboard</string>
+    <string name="emailAliasError">Unable to generate Duck Address</string>
 
     <!-- Home Screen Shortcuts -->
 

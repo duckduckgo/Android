@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2025 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="180dp"
+    android:height="180dp"
+    android:viewportWidth="180"
+    android:viewportHeight="180">
+    <!-- Orange Background -->
+    <path
+        android:fillColor="#DE5833"
+        android:pathData="M16,0 L164,0 C172.84,0 180,7.16 180,16 L180,164 C180,172.84 172.84,180 164,180 L16,180 C7.16,180 0,172.84 0,164 L0,16 C0,7.16 7.16,0 16,0 Z" />
+
+    <!-- Title text placeholder -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M30,16 L150,16 L150,28 L30,28 Z" />
+
+    <!-- Row 1 Icon Circles -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M45,60 m-18,0 a18,18 0,1 1,36 0 a18,18 0,1 1,-36 0" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M135,60 m-18,0 a18,18 0,1 1,36 0 a18,18 0,1 1,-36 0" />
+
+    <!-- Row 2 Icon Circles -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M45,125 m-18,0 a18,18 0,1 1,36 0 a18,18 0,1 1,-36 0" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M135,125 m-18,0 a18,18 0,1 1,36 0 a18,18 0,1 1,-36 0" />
+
+    <!-- Duck.ai icon placeholder (chat bubble) -->
+    <path
+        android:fillColor="#DE5833"
+        android:pathData="M39,53 C35,53 31,56.5 31,61 C31,63.5 32.2,65.7 34,67 L33,72 L38,69 C38.3,69 38.7,69 39,69 C43,69 47,65.5 47,61 C47,56.5 43,53 39,53 Z" />
+
+    <!-- Search icon placeholder -->
+    <path
+        android:fillColor="#666666"
+        android:pathData="M130,55 A7,7 0 1 1 130,69 A7,7 0 1 1 130,55 M137,66 L143,72"
+        android:strokeColor="#666666"
+        android:strokeWidth="2" />
+
+    <!-- Email icon placeholder -->
+    <path
+        android:fillColor="#3969EF"
+        android:pathData="M30,118 L60,118 L60,136 L30,136 Z M30,118 L45,128 L60,118" />
+
+    <!-- VPN icon placeholder -->
+    <path
+        android:fillColor="#3969EF"
+        android:pathData="M135,115 L135,115 C141,115 146,120 146,126 L146,137 L124,137 L124,126 C124,120 129,115 135,115 Z" />
+
+    <!-- Labels - white text placeholders -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M32,88 L58,88 L58,96 L32,96 Z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M122,88 L148,88 L148,96 L122,96 Z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M35,153 L55,153 L55,161 L35,161 Z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M125,153 L145,153 L145,161 L125,161 Z" />
+</vector>

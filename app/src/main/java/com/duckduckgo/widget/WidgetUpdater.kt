@@ -63,6 +63,14 @@ class WidgetUpdaterImpl @Inject constructor() : WidgetUpdater {
                 SearchAndFavoritesWidget::class.java,
             )
         }
+
+        AppWidgetManager.getInstance(context).getAppWidgetIds(ComponentName(context, ShortcutsWidget::class.java))?.also {
+            broadcastUpdate(
+                it,
+                context,
+                ShortcutsWidget::class.java,
+            )
+        }
     }
 
     private fun broadcastUpdate(

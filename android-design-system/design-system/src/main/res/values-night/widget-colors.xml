@@ -42,4 +42,7 @@
     <color name="searchWidgetSearchBarTrailingIconColor">@color/white84</color>
     <color name="emptyFavoriteDescriptionTextColor">@color/white60</color>
     <color name="emptyFavoriteActionTextColor">@color/blue30</color>
+    <color name="shortcutsWidgetBackgroundColor">@color/searchWidgetBackgroundColorDark</color>
+    <color name="shortcutsWidgetIconBackgroundColor">@color/searchWidgetSearchBarBackgroundColorDark</color>
+    <color name="shortcutsWidgetTextColor">@color/white84</color>
 </resources>
