@@ -37,6 +37,7 @@ class VpnDatabaseTest {
         MigrationTestHelper(InstrumentationRegistry.getInstrumentation(), VpnDatabase::class.qualifiedName!!, FrameworkSQLiteOpenHelperFactory())
 
     @Test
+    @Suppress("DenyListedApi")
     fun whenTestingAllMigrationsThenSucceeds() {
         createDatabase(18)
 
