@@ -16,7 +16,7 @@ develocity {
         obfuscation {
             ipAddresses { addresses -> addresses.collect { address -> "0.0.0.0" } }
             hostname { host -> host.collect { character -> Character.getNumericValue(character as char) }.join("-") }
-            username { name -> name.size() >= 4 ? name[0..1] + name[-2..-1] : name }
+            username { name -> name.size() >= 2 ? name[0] + name[-1] : name }
             externalProcessName { processName -> 'non-build-process' }
         }
     }
