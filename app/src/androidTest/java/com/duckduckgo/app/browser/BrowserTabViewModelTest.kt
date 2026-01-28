@@ -289,7 +289,9 @@ import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.savedsites.impl.SavedSitesPixelName
+import com.duckduckgo.serp.logos.api.SerpEasterEggLogosToggles
 import com.duckduckgo.serp.logos.api.SerpLogo
+import com.duckduckgo.serp.logos.impl.store.FavouriteSerpLogoDataStore
 import com.duckduckgo.settings.api.SerpSettingsFeature
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.LocationPermissionRequest
@@ -623,6 +625,10 @@ class BrowserTabViewModelTest {
 
     private lateinit var fakeContentScopeScriptsSubscriptionEventPluginPoint: FakeContentScopeScriptsSubscriptionEventPluginPoint
     private var serpSettingsFeature = FakeFeatureToggleFactory.create(SerpSettingsFeature::class.java)
+    private val mockSerpEasterEggLogosToggles: SerpEasterEggLogosToggles = mock()
+    private val mockSetFavouriteToggle: Toggle = mock()
+    private val mockFavouriteSerpLogoDataStore: FavouriteSerpLogoDataStore = mock()
+    private val favouriteLogoFlow = MutableStateFlow<String?>(null)
 
     @Before
     fun before() =
@@ -754,6 +760,11 @@ class BrowserTabViewModelTest {
             whenever(mockSyncStatusChangedObserver.syncStatusChangedEvents).thenReturn(syncStatusChangedEventsFlow)
             whenever(subscriptions.getSubscriptionStatusFlow()).thenReturn(subscriptionStatusFlow)
 
+            // SERP favourite logo mocks
+            whenever(mockSerpEasterEggLogosToggles.setFavourite()).thenReturn(mockSetFavouriteToggle)
+            whenever(mockSetFavouriteToggle.isEnabled()).thenReturn(false)
+            whenever(mockFavouriteSerpLogoDataStore.favouriteSerpEasterEggLogoUrlFlow).thenReturn(favouriteLogoFlow)
+
             initialiseViewModel()
 
             val mockWebHistoryItem: WebHistoryItem = mock()
@@ -873,6 +884,8 @@ class BrowserTabViewModelTest {
                 serpSettingsFeature = serpSettingsFeature,
                 syncStatusChangedObserver = mockSyncStatusChangedObserver,
                 pageContextJSHelper = mockPageContextJSHelper,
+                serpEasterEggLogosToggles = mockSerpEasterEggLogosToggles,
+                favouriteSerpLogoDataStore = mockFavouriteSerpLogoDataStore,
             )
 
         testee.loadData("abc", null, false, false)
@@ -7903,6 +7916,82 @@ class BrowserTabViewModelTest {
         testee.onStartTrackersAnimation()
 
         assertCommandIssued<Command.StartAddressBarTrackersAnimation>()
+    }
+
+    @Test
+    fun whenFavouriteLogoSetAndFeatureEnabledThenExtractSerpLogoNotIssued() = runTest {
+        whenever(mockDuckAiFeatureState.showFullScreenMode).thenReturn(mockDuckAiFullScreenMode)
+        whenever(mockSetFavouriteToggle.isEnabled()).thenReturn(true)
+        favouriteLogoFlow.value = "https://example.com/favourite-logo.png"
+
+        val ddgUrl = "https://duckduckgo.com/?q=test"
+        val webViewNavState = WebViewNavigationState(mockStack, 100)
+
+        testee.pageFinished(mockWebView, webViewNavState, ddgUrl)
+
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        val commands = commandCaptor.allValues
+        assertFalse(
+            "ExtractSerpLogo command should NOT be issued when favourite is set and feature is enabled",
+            commands.any { it is Command.ExtractSerpLogo },
+        )
+    }
+
+    @Test
+    fun whenFavouriteLogoSetAndFeatureEnabledThenSerpLogoIsSetToFavourite() = runTest {
+        whenever(mockDuckAiFeatureState.showFullScreenMode).thenReturn(mockDuckAiFullScreenMode)
+        whenever(mockSetFavouriteToggle.isEnabled()).thenReturn(true)
+        val favouriteUrl = "https://example.com/favourite-logo.png"
+        favouriteLogoFlow.value = favouriteUrl
+
+        val ddgUrl = "https://duckduckgo.com/?q=test"
+        val webViewNavState = WebViewNavigationState(mockStack, 100)
+
+        testee.pageFinished(mockWebView, webViewNavState, ddgUrl)
+
+        assertEquals(
+            "serpLogo should be set to favourite EasterEgg when favourite is set and feature is enabled",
+            SerpLogo.EasterEgg(favouriteUrl),
+            omnibarViewState().serpLogo,
+        )
+    }
+
+    @Test
+    fun whenFavouriteLogoSetButFeatureDisabledThenExtractSerpLogoIssued() = runTest {
+        whenever(mockDuckAiFeatureState.showFullScreenMode).thenReturn(mockDuckAiFullScreenMode)
+        whenever(mockSetFavouriteToggle.isEnabled()).thenReturn(false)
+        favouriteLogoFlow.value = "https://example.com/favourite-logo.png"
+
+        val ddgUrl = "https://duckduckgo.com/?q=test"
+        val webViewNavState = WebViewNavigationState(mockStack, 100)
+
+        testee.pageFinished(mockWebView, webViewNavState, ddgUrl)
+
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        val commands = commandCaptor.allValues
+        assertTrue(
+            "ExtractSerpLogo command should be issued when feature is disabled even if favourite is set",
+            commands.any { it is Command.ExtractSerpLogo && it.currentUrl == ddgUrl },
+        )
+    }
+
+    @Test
+    fun whenNoFavouriteLogoSetAndFeatureEnabledThenExtractSerpLogoIssued() = runTest {
+        whenever(mockDuckAiFeatureState.showFullScreenMode).thenReturn(mockDuckAiFullScreenMode)
+        whenever(mockSetFavouriteToggle.isEnabled()).thenReturn(true)
+        favouriteLogoFlow.value = null
+
+        val ddgUrl = "https://duckduckgo.com/?q=test"
+        val webViewNavState = WebViewNavigationState(mockStack, 100)
+
+        testee.pageFinished(mockWebView, webViewNavState, ddgUrl)
+
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        val commands = commandCaptor.allValues
+        assertTrue(
+            "ExtractSerpLogo command should be issued when no favourite is set even if feature is enabled",
+            commands.any { it is Command.ExtractSerpLogo && it.currentUrl == ddgUrl },
+        )
     }
 
     private fun aCredential(): LoginCredentials = LoginCredentials(domain = null, username = null, password = null)
