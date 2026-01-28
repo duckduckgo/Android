@@ -137,8 +137,6 @@
     <string name="atp_NewTabDisabled"><b>Ochrona przed śledzeniem przez aplikacje jest wyłączona.</b>\nDotknij, aby dalej blokować próby śledzenia przez aplikacje.</string>
     <string name="atp_NewTabRevoked"><b>Aplikacja VPN na Twoim urządzeniu wyłączyła ochronę śledzenia aplikacji. </b>\nStuknij, aby ponownie włączyć.</string>
     <string name="atp_NewTabEnabled"><b>Ochrona przed śledzeniem przez aplikacje jest włączona</b> i blokuje próby śledzenia przez Twoje aplikacje.</string>
-    <!-- smartling.character_limit = 15 -->
-    <string name="vpnMenuYellowPill">Wypróbuj gratis</string>
 
     <!-- Exclusion List -->
     <string name="atp_ExclusionListActivityTitle">Wszystkie aplikacje</string>
