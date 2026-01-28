@@ -129,8 +129,6 @@
     <string name="atp_NewTabDisabled"><b>App Tracking Protection poistettu käytöstä.</b>\nNapauta jatkaaksesi seurantayritysten estämistä kaikissa sovelluksissasi.</string>
     <string name="atp_NewTabRevoked"><b>Laitteesi VPN poisti App Tracking Protectionin käytöstä.</b>\nOta uudelleen käyttöön napauttamalla.</string>
     <string name="atp_NewTabEnabled"><b>App Tracking Protection on käytössä</b> ja estää seurantayritykset kaikissa sovelluksissasi.</string>
-    <!-- smartling.character_limit = 15 -->
-    <string name="vpnMenuYellowPill">Ilmaiskokeilu</string>
 
     <!-- Exclusion List -->
     <string name="atp_ExclusionListActivityTitle">Kaikki sovellukset</string>

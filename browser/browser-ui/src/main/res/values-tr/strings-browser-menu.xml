@@ -47,6 +47,8 @@
     <string name="browserMenuChatHistory">Sohbet Geçmişi</string>
     <string name="browserMenuChatSettings">Duck.ai Ayarları</string>
     <string name="browserMenuVPN">VPN</string>
+    <!-- smartling.character_limit = 15 -->
+    <string name="browserMenuVpnTryForFree">Ücretsiz deneme</string>
 
     <!-- Browser Menu Content Description -->
     <string name="browserMenuBack">Geri</string>

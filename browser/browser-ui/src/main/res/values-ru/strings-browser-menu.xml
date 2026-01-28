@@ -47,6 +47,8 @@
     <string name="browserMenuChatHistory">История чата</string>
     <string name="browserMenuChatSettings">Настройки Duck.ai</string>
     <string name="browserMenuVPN">VPN</string>
+    <!-- smartling.character_limit = 15 -->
+    <string name="browserMenuVpnTryForFree">Попробовать</string>
 
     <!-- Browser Menu Content Description -->
     <string name="browserMenuBack">Назад</string>

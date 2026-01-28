@@ -47,6 +47,8 @@
     <string name="browserMenuChatHistory">Tērzēšanas sarunu vēsture</string>
     <string name="browserMenuChatSettings">Duck.ai iestatījumi</string>
     <string name="browserMenuVPN">VPN</string>
+    <!-- smartling.character_limit = 15 -->
+    <string name="browserMenuVpnTryForFree">Bezm. izmēģin.</string>
 
     <!-- Browser Menu Content Description -->
     <string name="browserMenuBack">Atpakaļ</string>

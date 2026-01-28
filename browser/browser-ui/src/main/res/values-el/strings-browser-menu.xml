@@ -47,6 +47,8 @@
     <string name="browserMenuChatHistory">Ιστορικό συνομιλίας</string>
     <string name="browserMenuChatSettings">Ρυθμίσεις Duck.ai</string>
     <string name="browserMenuVPN">VPN</string>
+    <!-- smartling.character_limit = 15 -->
+    <string name="browserMenuVpnTryForFree">Δωρεάν δοκιμή</string>
 
     <!-- Browser Menu Content Description -->
     <string name="browserMenuBack">Πίσω</string>

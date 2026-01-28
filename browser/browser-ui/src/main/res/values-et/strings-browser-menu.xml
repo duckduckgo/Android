@@ -47,6 +47,8 @@
     <string name="browserMenuChatHistory">Vestluse ajalugu</string>
     <string name="browserMenuChatSettings">Duck.ai seaded</string>
     <string name="browserMenuVPN">VPN</string>
+    <!-- smartling.character_limit = 15 -->
+    <string name="browserMenuVpnTryForFree">Proovi tasuta</string>
 
     <!-- Browser Menu Content Description -->
     <string name="browserMenuBack">Tagasi</string>

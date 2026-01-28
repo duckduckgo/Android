@@ -137,8 +137,6 @@
     <string name="atp_NewTabDisabled"><b>Zaščita pred sledenjem aplikacijam App Tracking Protection je onemogočena. </b>\nDotaknite se, če želite nadaljevati blokiranje poskusov sledenja.</string>
     <string name="atp_NewTabRevoked"><b>Aplikacija VPN v vaši napravi je onemogočila zaščito pred sledenjem aplikacij App Tracking Protection.</b>\nTapnite za ponovno omogočanje.</string>
     <string name="atp_NewTabEnabled"><b>Zaščita pred sledenjem aplikacijam App Tracking Protection je omogočena</b> in blokira poskuse sledenja vašim aplikacijam.</string>
-    <!-- smartling.character_limit = 15 -->
-    <string name="vpnMenuYellowPill">Preizkusite</string>
 
     <!-- Exclusion List -->
     <string name="atp_ExclusionListActivityTitle">Vse aplikacije</string>
