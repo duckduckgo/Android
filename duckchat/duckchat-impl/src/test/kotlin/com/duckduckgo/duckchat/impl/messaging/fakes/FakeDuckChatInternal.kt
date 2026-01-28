@@ -82,6 +82,8 @@ class FakeDuckChatInternal(
 
     override suspend fun isContextualOnboardingCompleted(): Boolean = contextualOnboardingCompleted
 
+    override fun isAutomaticContextAttachmentEnabled(): Boolean = automaticContextAttachmentUserSettingEnabled.value
+
     // DuckChatInternal interface methods
     override suspend fun setEnableDuckChatUserSetting(enabled: Boolean) {
         enableDuckChatUserSetting.value = enabled
