@@ -373,7 +373,6 @@ class TabDataRepository @Inject constructor(
 
         purgeDeletableTabsJob += appCoroutineScope.launch(dispatchers.io()) {
             tabsDao.purgeDeletableTabsAndUpdateSelection()
-            duckChatContextualDataStore.clearAll()
         }
         purgeDeletableTabsJob.join()
     }
