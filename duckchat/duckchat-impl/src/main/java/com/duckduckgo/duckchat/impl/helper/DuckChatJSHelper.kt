@@ -279,7 +279,7 @@ class RealDuckChatJSHelper @Inject constructor(
         private const val METHOD_GET_AI_CHAT_NATIVE_HANDOFF_DATA = "getAIChatNativeHandoffData"
         private const val METHOD_GET_AI_CHAT_NATIVE_CONFIG_VALUES = "getAIChatNativeConfigValues"
         private const val METHOD_OPEN_AI_CHAT = "openAIChat"
-        private const val METHOD_CLOSE_AI_CHAT = "closeAIChat"
+        const val METHOD_CLOSE_AI_CHAT = "closeAIChat"
         private const val METHOD_OPEN_AI_CHAT_SETTINGS = "openAIChatSettings"
         private const val METHOD_RESPONSE_STATE = "responseState"
         private const val METHOD_HIDE_CHAT_INPUT = "hideChatInput"

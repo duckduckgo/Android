@@ -293,19 +293,21 @@ class DuckChatContextualFragment :
                     ) {
                         logcat { "Duck.ai: process $featureName $method $id $data" }
                         when (featureName) {
-                            RealDuckChatJSHelper.Companion.DUCK_CHAT_FEATURE_NAME -> {
+                            RealDuckChatJSHelper.DUCK_CHAT_FEATURE_NAME -> {
                                 appCoroutineScope.launch(dispatcherProvider.io()) {
-                                    duckChatJSHelper.processJsCallbackMessage(
-                                        featureName,
-                                        method,
-                                        id,
-                                        data,
-                                        Mode.CONTEXTUAL,
-                                        viewModel.updatedPageContext,
-                                    )?.let { response ->
-                                        logcat { "Duck.ai: response $response" }
-                                        withContext(dispatcherProvider.main()) {
-                                            contentScopeScripts.onResponse(response)
+                                    if (!viewModel.handleJSCall(method)) {
+                                        duckChatJSHelper.processJsCallbackMessage(
+                                            featureName,
+                                            method,
+                                            id,
+                                            data,
+                                            Mode.CONTEXTUAL,
+                                            viewModel.updatedPageContext,
+                                        )?.let { response ->
+                                            logcat { "Duck.ai: response $response" }
+                                            withContext(dispatcherProvider.main()) {
+                                                contentScopeScripts.onResponse(response)
+                                            }
                                         }
                                     }
                                 }

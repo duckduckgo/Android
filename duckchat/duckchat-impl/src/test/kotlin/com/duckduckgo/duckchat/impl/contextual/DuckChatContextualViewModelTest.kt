@@ -333,6 +333,27 @@ class DuckChatContextualViewModelTest {
             }
         }
 
+    @Test
+    fun `handleJSCall closeAIChat hides sheet and returns true`() = runTest {
+        testee.viewState.test {
+            awaitItem() // initial emission
+
+            val handled = testee.handleJSCall("closeAIChat")
+            val state = expectMostRecentItem()
+
+            assertTrue(handled)
+            assertEquals(BottomSheetBehavior.STATE_HIDDEN, state.sheetState)
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `handleJSCall unknown method returns false and leaves state unchanged`() = runTest {
+        val handled = testee.handleJSCall("unknownMethod")
+        assertFalse(handled)
+    }
+
     private fun setFullModeUrl(url: String) {
         val fullModeUrlField = DuckChatContextualViewModel::class.java.getDeclaredField("fullModeUrl")
         fullModeUrlField.isAccessible = true

@@ -273,4 +273,17 @@ class DuckChatContextualViewModel @Inject constructor(
             }
         }
     }
+
+    fun handleJSCall(method: String): Boolean {
+        when (method) {
+            RealDuckChatJSHelper.METHOD_CLOSE_AI_CHAT -> {
+                logcat { "Duck.ai: $method handled at the VM level" }
+                onContextualClose()
+                return true
+            }
+            else -> {
+                return false
+            }
+        }
+    }
 }
