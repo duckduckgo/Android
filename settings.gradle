@@ -15,7 +15,7 @@ develocity {
         publishing.onlyIf { it.authenticated }
         obfuscation {
             ipAddresses { addresses -> addresses.collect { address -> "0.0.0.0" } }
-            hostname { host -> "dax" + (isCI ? "-ci" : "-dev") }
+            hostname { host -> isCI ? "ci" : "dev" }
             username { name -> "dax" }
             externalProcessName { processName -> 'non-build-process' }
         }
