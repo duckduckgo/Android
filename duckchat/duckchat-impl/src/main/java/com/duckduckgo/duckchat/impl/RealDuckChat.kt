@@ -655,7 +655,7 @@ class RealDuckChat @Inject constructor(
             ).show()
     }
 
-    override fun showContextualOnboardingDialog(
+    override fun showContextualOnboarding(
         context: Context,
         onConfirmed: () -> Unit,
     ) {

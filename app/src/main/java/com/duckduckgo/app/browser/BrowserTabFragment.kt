@@ -3364,7 +3364,7 @@ class BrowserTabFragment :
     }
 
     private fun showDuckAiContextualOnboardingSheet() {
-        duckChat.showContextualOnboardingDialog(
+        duckChat.showContextualOnboarding(
             requireContext(),
         ) {
             showDuckChatContextualSheet()

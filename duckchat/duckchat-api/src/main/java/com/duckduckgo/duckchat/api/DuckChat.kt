@@ -70,19 +70,6 @@ interface DuckChat {
     fun showNewAddressBarOptionChoiceScreen(context: Context, isDarkThemeEnabled: Boolean)
 
     /**
-     * Shows the contextual onboarding bottom sheet dialog.
-     * @param context The context to show the dialog in.
-     * @param onConfirmed Callback invoked when the user confirms the dialog.
-     */
-    fun showContextualOnboardingDialog(context: Context, onConfirmed: () -> Unit)
-
-    /**
-     * Checks if the contextual onboarding has been completed.
-     * @return true if the onboarding was completed, false otherwise.
-     */
-    suspend fun isContextualOnboardingCompleted(): Boolean
-
-    /**
      * Set user setting to determine whether dedicated Duck.ai input screen with a mode switch should be used.
      */
     suspend fun setInputScreenUserSetting(enabled: Boolean)
@@ -107,4 +94,17 @@ interface DuckChat {
      * Observes the value for the automatic context attachment for Contextual Mode
      */
     fun observeAutomaticContextAttachmentUserSettingEnabled(): Flow<Boolean>
+
+    /**
+     * Shows the contextual onboarding bottom sheet dialog.
+     * @param context The context to show the dialog in.
+     * @param onConfirmed Callback invoked when the user confirms the dialog.
+     */
+    fun showContextualOnboarding(context: Context, onConfirmed: () -> Unit)
+
+    /**
+     * Checks if the contextual onboarding has been completed.
+     * @return true if the onboarding was completed, false otherwise.
+     */
+    suspend fun isContextualOnboardingCompleted(): Boolean
 }
