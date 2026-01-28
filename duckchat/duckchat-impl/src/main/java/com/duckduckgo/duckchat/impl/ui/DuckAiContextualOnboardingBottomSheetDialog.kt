@@ -68,7 +68,7 @@ class DuckAiContextualOnboardingBottomSheetDialog(
 
         binding.duckAiContextualOnboardingPrimaryButton.setOnClickListener {
             coroutineScope.launch {
-                duckChatFeatureRepository.setContextualOnboardingDismissed(true)
+                duckChatFeatureRepository.setContextualOnboardingCompleted(true)
                 eventListener?.onConfirmed()
             }
             dismiss()

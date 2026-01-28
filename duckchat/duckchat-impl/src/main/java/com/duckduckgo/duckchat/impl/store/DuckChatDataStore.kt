@@ -120,9 +120,9 @@ interface DuckChatDataStore {
 
     suspend fun isAIChatHistoryEnabled(): Boolean
 
-    suspend fun setContextualOnboardingDismissed(dismissed: Boolean)
+    suspend fun setContextualOnboardingCompleted(completed: Boolean)
 
-    suspend fun isContextualOnboardingDismissed(): Boolean
+    suspend fun isContextualOnboardingCompleted(): Boolean
 }
 
 @ContributesBinding(AppScope::class)
@@ -333,11 +333,11 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
 
     override suspend fun isAIChatHistoryEnabled(): Boolean = store.data.firstOrNull()?.let { it[DUCK_CHAT_HISTORY_ENABLED] } ?: false
 
-    override suspend fun setContextualOnboardingDismissed(dismissed: Boolean) {
-        store.edit { it[DUCK_AI_CONTEXTUAL_ONBOARDING_DISMISSED] = dismissed }
+    override suspend fun setContextualOnboardingCompleted(completed: Boolean) {
+        store.edit { it[DUCK_AI_CONTEXTUAL_ONBOARDING_DISMISSED] = completed }
     }
 
-    override suspend fun isContextualOnboardingDismissed(): Boolean = store.data.firstOrNull()?.let {
+    override suspend fun isContextualOnboardingCompleted(): Boolean = store.data.firstOrNull()?.let {
         it[DUCK_AI_CONTEXTUAL_ONBOARDING_DISMISSED]
     } ?: false
 }

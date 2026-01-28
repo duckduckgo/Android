@@ -83,9 +83,9 @@ interface DuckChatFeatureRepository {
 
     suspend fun isAIChatHistoryEnabled(): Boolean
 
-    suspend fun setContextualOnboardingDismissed(dismissed: Boolean)
+    suspend fun setContextualOnboardingCompleted(completed: Boolean)
 
-    suspend fun isContextualOnboardingDismissed(): Boolean
+    suspend fun isContextualOnboardingCompleted(): Boolean
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -174,11 +174,11 @@ class RealDuckChatFeatureRepository @Inject constructor(
 
     override suspend fun isAIChatHistoryEnabled(): Boolean = duckChatDataStore.isAIChatHistoryEnabled()
 
-    override suspend fun setContextualOnboardingDismissed(dismissed: Boolean) {
-        duckChatDataStore.setContextualOnboardingDismissed(dismissed)
+    override suspend fun setContextualOnboardingCompleted(completed: Boolean) {
+        duckChatDataStore.setContextualOnboardingCompleted(completed)
     }
 
-    override suspend fun isContextualOnboardingDismissed(): Boolean = duckChatDataStore.isContextualOnboardingDismissed()
+    override suspend fun isContextualOnboardingCompleted(): Boolean = duckChatDataStore.isContextualOnboardingCompleted()
 
     private fun updateWidgets() {
         val intent = Intent(AppWidgetManager.ACTION_APPWIDGET_UPDATE)

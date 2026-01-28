@@ -672,8 +672,8 @@ class RealDuckChat @Inject constructor(
         dialog.show()
     }
 
-    override suspend fun isContextualOnboardingDismissed(): Boolean {
-        return duckChatFeatureRepository.isContextualOnboardingDismissed()
+    override suspend fun isContextualOnboardingCompleted(): Boolean {
+        return duckChatFeatureRepository.isContextualOnboardingCompleted()
     }
 
     private suspend fun hasActiveSession(): Boolean {
