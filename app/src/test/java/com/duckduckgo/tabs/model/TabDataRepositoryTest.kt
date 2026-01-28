@@ -41,6 +41,7 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.InstantSchedulersRule
 import com.duckduckgo.common.test.blockingObserve
 import com.duckduckgo.common.utils.CurrentTimeProvider
+import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
@@ -738,6 +739,7 @@ class TabDataRepositoryTest {
         tabSwitcherDataStore: TabSwitcherDataStore = mock(),
         duckDuckGoUrlDetector: DuckDuckGoUrlDetector = mock(),
         timeProvider: CurrentTimeProvider = FakeTimeProvider(),
+        contextualDataStore: DuckChatContextualDataStore = mock(),
     ): TabDataRepository {
         return TabDataRepository(
             dao,
@@ -760,6 +762,7 @@ class TabDataRepositoryTest {
             mockAdClickManager,
             mockWebViewSessionStorage,
             tabManagerFeatureFlags,
+            contextualDataStore,
         )
     }
 
