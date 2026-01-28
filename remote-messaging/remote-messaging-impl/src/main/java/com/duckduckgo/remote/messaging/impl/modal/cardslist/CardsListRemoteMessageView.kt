@@ -21,7 +21,6 @@ import android.app.PendingIntent
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
-import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
@@ -33,17 +32,9 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import androidx.lifecycle.lifecycleScope
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.DataSource
-import com.bumptech.glide.load.engine.GlideException
-import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade
-import com.bumptech.glide.request.RequestListener
-import com.bumptech.glide.request.target.Target
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
-import com.duckduckgo.common.ui.view.gone
-import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.ViewViewModelFactory
@@ -54,7 +45,6 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.DeeplinkActivityParams
 import com.duckduckgo.remote.messaging.impl.R
 import com.duckduckgo.remote.messaging.impl.databinding.ViewCardsListRemoteMessageBinding
-import com.duckduckgo.remote.messaging.impl.mappers.drawable
 import com.duckduckgo.remote.messaging.impl.modal.cardslist.CardsListRemoteMessageViewModel.Command
 import com.duckduckgo.remote.messaging.impl.modal.cardslist.CardsListRemoteMessageViewModel.Command.DismissMessage
 import com.duckduckgo.remote.messaging.impl.modal.cardslist.CardsListRemoteMessageViewModel.Command.LaunchAppTPOnboarding
@@ -72,7 +62,6 @@ import kotlinx.coroutines.flow.onEach
 import logcat.LogPriority.WARN
 import logcat.asLog
 import logcat.logcat
-import java.io.File
 import javax.inject.Inject
 
 @InjectWith(ViewScope::class)
@@ -137,6 +126,15 @@ class CardsListRemoteMessageView @JvmOverloads constructor(
 
     private fun setupUi() {
         cardsListAdapter.setListener(viewModel)
+        cardsListAdapter.headerImageLoadListener = object : CardsListAdapter.HeaderImageLoadListener {
+            override fun onImageLoadSuccess() {
+                viewModel.onRemoteImageLoadSuccess()
+            }
+
+            override fun onImageLoadFailed() {
+                viewModel.onRemoteImageLoadFailed()
+            }
+        }
         binding.cardItemsRecyclerView.adapter = cardsListAdapter
 
         binding.closeButton.setOnClickListener {
@@ -148,51 +146,8 @@ class CardsListRemoteMessageView @JvmOverloads constructor(
     }
 
     private fun render(viewState: CardsListRemoteMessageViewModel.ViewState?) {
-        viewState?.cardsLists?.let {
-            cardsListAdapter.submitList(it.listItems)
-            if (it.imageUrl.orEmpty().isNotEmpty()) {
-                // Use local file if available, otherwise fall back to imageUrl
-                val imageSource = viewState.cardsListImageFilePath?.let { url ->
-                    File(url)
-                } ?: it.imageUrl
-
-                Glide
-                    .with(binding.remoteImage)
-                    .load(imageSource)
-                    .error(it.placeholder.drawable(true))
-                    .addListener(object : RequestListener<Drawable> {
-                        override fun onLoadFailed(
-                            e: GlideException?,
-                            model: Any?,
-                            target: Target<Drawable?>,
-                            isFirstResource: Boolean,
-                        ): Boolean {
-                            viewModel.onRemoteImageLoadFailed()
-                            return false
-                        }
-
-                        override fun onResourceReady(
-                            resource: Drawable,
-                            model: Any,
-                            target: Target<Drawable?>?,
-                            dataSource: DataSource,
-                            isFirstResource: Boolean,
-                        ): Boolean {
-                            viewModel.onRemoteImageLoadSuccess()
-                            return false
-                        }
-                    })
-                    .centerCrop()
-                    .transition(withCrossFade())
-                    .into(binding.remoteImage)
-                binding.headerImage.gone()
-                binding.remoteImage.show()
-            } else {
-                binding.headerImage.setImageResource(it.placeholder.drawable(true))
-                binding.remoteImage.gone()
-                binding.headerImage.show()
-            }
-            binding.headerTitle.text = it.titleText
+        viewState?.let {
+            cardsListAdapter.submitList(it.modalListItems)
             binding.actionButton.text = it.primaryActionText
             viewModel.onMessageShown()
         }
