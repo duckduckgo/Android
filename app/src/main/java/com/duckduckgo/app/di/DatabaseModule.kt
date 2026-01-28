@@ -17,8 +17,7 @@
 package com.duckduckgo.app.di
 
 import android.content.Context
-import androidx.room.Room
-import androidx.room.RoomDatabase
+import androidx.room.RoomDatabase.JournalMode.TRUNCATE
 import com.duckduckgo.app.bookmarks.migration.AppDatabaseBookmarksMigrationCallbackProvider
 import com.duckduckgo.app.browser.DefaultWebViewDatabaseProvider
 import com.duckduckgo.app.browser.WebViewDatabaseProvider
@@ -26,6 +25,8 @@ import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.db.MigrationsProvider
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.appbuildconfig.api.*
+import com.duckduckgo.data.store.api.DatabaseProvider
+import com.duckduckgo.data.store.api.RoomDatabaseConfig
 import com.duckduckgo.di.scopes.AppScope
 import dagger.Lazy
 import dagger.Module
@@ -52,17 +53,23 @@ object DatabaseModule {
     @Provides
     @SingleInstanceIn(AppScope::class)
     fun provideAppDatabase(
-        context: Context,
         migrationsProvider: MigrationsProvider,
         databaseBookmarksMigrationCallbackProvider: AppDatabaseBookmarksMigrationCallbackProvider,
+        databaseProvider: DatabaseProvider,
     ): AppDatabase {
-        return Room.databaseBuilder(context, AppDatabase::class.java, "app.db")
-            .addMigrations(*migrationsProvider.ALL_MIGRATIONS.toTypedArray())
-            .addCallback(migrationsProvider.BOOKMARKS_DB_ON_CREATE)
-            .addCallback(migrationsProvider.CHANGE_JOURNAL_ON_OPEN)
-            .addCallback(databaseBookmarksMigrationCallbackProvider.provideCallbacks())
-            .setJournalMode(RoomDatabase.JournalMode.TRUNCATE)
-            .build()
+        return databaseProvider.buildRoomDatabase(
+            AppDatabase::class.java,
+            "app.db",
+            config = RoomDatabaseConfig(
+                callbacks = listOf(
+                    migrationsProvider.BOOKMARKS_DB_ON_CREATE,
+                    migrationsProvider.CHANGE_JOURNAL_ON_OPEN,
+                    databaseBookmarksMigrationCallbackProvider.provideCallbacks(),
+                ),
+                journalMode = TRUNCATE,
+                migrations = migrationsProvider.ALL_MIGRATIONS,
+            ),
+        )
     }
 
     @Provides
