@@ -19,8 +19,11 @@ package com.duckduckgo.pir.impl.optout
 import android.app.Notification
 import android.app.Service
 import android.content.Intent
+import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
+import android.os.Build
 import android.os.IBinder
 import android.os.Process
+import androidx.core.app.ServiceCompat
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.di.scopes.ServiceScope
 import com.duckduckgo.pir.impl.PirFeatureDataCleaner
@@ -32,6 +35,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
+import logcat.LogPriority
 import logcat.logcat
 import javax.inject.Inject
 
@@ -70,7 +74,24 @@ class PirForegroundOptOutService : Service(), CoroutineScope by MainScope() {
                 R.string.pirOptOutNotificationMessageInProgress,
             ),
         )
-        startForeground(1, notification)
+
+        try {
+            ServiceCompat.startForeground(
+                this,
+                PIR_OPT_OUT_NOTIFICATION_ID,
+                notification,
+                if (Build.VERSION.SDK_INT >= 34) {
+                    FOREGROUND_SERVICE_TYPE_SPECIAL_USE
+                } else {
+                    0
+                },
+            )
+        } catch (_: Exception) {
+            logcat(LogPriority.ERROR) { "PIR-OPT-OUT: Could not start the service as foreground!" }
+            // If we can't start as a foreground service, there's no point in continuing.
+            stopSelf()
+            return START_NOT_STICKY
+        }
 
         launch {
             if (pirWorkHandler.canRunPir().firstOrNull() == false) {
@@ -108,6 +129,7 @@ class PirForegroundOptOutService : Service(), CoroutineScope by MainScope() {
     }
 
     companion object {
+        private const val PIR_OPT_OUT_NOTIFICATION_ID = 9782
         const val EXTRA_BROKER_TO_OPT_OUT = "EXTRA_BROKER_TO_OPT_OUT"
     }
 }
