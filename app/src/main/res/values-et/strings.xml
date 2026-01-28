@@ -72,6 +72,7 @@
     <string name="options">Valikud</string>
     <string name="shareLink">Jaga linki</string>
     <string name="copyUrl">Kopeeri lingi aadress</string>
+    <string name="urlCopiedToClipboard">URL kopeeriti lõikelauale</string>
 
     <!-- Find in page -->
     <string name="nextSearchTermDescription">Otsi järgmine</string>

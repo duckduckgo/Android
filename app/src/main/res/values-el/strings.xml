@@ -72,6 +72,7 @@
     <string name="options">Επιλογές</string>
     <string name="shareLink">Κοινή χρήση συνδέσμου</string>
     <string name="copyUrl">Αντιγραφή διεύθυνσης συνδέσμου</string>
+    <string name="urlCopiedToClipboard">Έγινε αντιγραφή της διεύθυνσης URL στο πρόχειρο</string>
 
     <!-- Find in page -->
     <string name="nextSearchTermDescription">Εύρεση επόμενου</string>

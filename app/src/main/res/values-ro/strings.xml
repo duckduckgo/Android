@@ -73,6 +73,7 @@
     <string name="options">Opțiuni</string>
     <string name="shareLink">Trimite linkul</string>
     <string name="copyUrl">Copiază adresa linkului</string>
+    <string name="urlCopiedToClipboard">Adresa URL a fost copiată în clipboard</string>
 
     <!-- Find in page -->
     <string name="nextSearchTermDescription">Arată rezultatul următor</string>

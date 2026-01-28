@@ -71,6 +71,7 @@
     <string name="options">Options</string>
     <string name="shareLink">Share Link</string>
     <string name="copyUrl">Copy Link Address</string>
+    <string name="urlCopiedToClipboard">URL copied to clipboard</string>
 
     <!-- Find in page -->
     <string name="nextSearchTermDescription">Find next</string>

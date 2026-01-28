@@ -74,6 +74,7 @@
     <string name="options">Parinktys</string>
     <string name="shareLink">Bendrinti nuorodą</string>
     <string name="copyUrl">Kopijuoti nuorodos adresą</string>
+    <string name="urlCopiedToClipboard">URL nukopijuotas į iškarpinę</string>
 
     <!-- Find in page -->
     <string name="nextSearchTermDescription">Rasti kitą</string>

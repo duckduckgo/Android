@@ -72,6 +72,7 @@
     <string name="options">Opties</string>
     <string name="shareLink">Link delen</string>
     <string name="copyUrl">Adres link kopiëren</string>
+    <string name="urlCopiedToClipboard">URL gekopieerd naar klembord</string>
 
     <!-- Find in page -->
     <string name="nextSearchTermDescription">Volgende zoeken</string>
