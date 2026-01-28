@@ -19,12 +19,16 @@ package com.duckduckgo.duckchat.impl.contextual
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
+import com.duckduckgo.duckchat.impl.helper.NativeAction
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper
+import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
+import org.json.JSONObject
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -32,6 +36,8 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(AndroidJUnit4::class)
@@ -43,12 +49,24 @@ class DuckChatContextualViewModelTest {
 
     private lateinit var testee: DuckChatContextualViewModel
     private val duckChat: com.duckduckgo.duckchat.api.DuckChat = FakeDuckChat()
+    private val duckChatJSHelper: DuckChatJSHelper = mock()
 
     @Before
     fun setup() {
+        whenever(
+            duckChatJSHelper.onNativeAction(NativeAction.NEW_CHAT),
+        ).thenReturn(
+            SubscriptionEventData(
+                RealDuckChatJSHelper.DUCK_CHAT_FEATURE_NAME,
+                "submitNewChatAction",
+                JSONObject(),
+            ),
+        )
+
         testee = DuckChatContextualViewModel(
             dispatchers = coroutineRule.testDispatcherProvider,
             duckChat = duckChat,
+            duckChatJSHelper = duckChatJSHelper,
         )
     }
 
@@ -352,6 +370,19 @@ class DuckChatContextualViewModelTest {
     fun `handleJSCall unknown method returns false and leaves state unchanged`() = runTest {
         val handled = testee.handleJSCall("unknownMethod")
         assertFalse(handled)
+    }
+
+    @Test
+    fun `onNewChatRequested emits new chat subscription`() = runTest {
+        testee.subscriptionEventDataFlow.test {
+            testee.onNewChatRequested()
+
+            val event = awaitItem()
+            assertEquals("submitNewChatAction", event.subscriptionName)
+            assertEquals(RealDuckChatJSHelper.DUCK_CHAT_FEATURE_NAME, event.featureName)
+
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     private fun setFullModeUrl(url: String) {
