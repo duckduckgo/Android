@@ -494,6 +494,7 @@ class DuckChatContextualFragment :
     }
 
     private fun renderViewState(viewState: DuckChatContextualViewModel.ViewState) {
+        logcat { "Duck.ai Contextual: render $viewState" }
         bottomSheetBehavior.state = viewState.sheetState
 
         when (viewState.sheetMode) {
