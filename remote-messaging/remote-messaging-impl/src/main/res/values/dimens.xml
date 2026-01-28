@@ -15,6 +15,7 @@
   -->
 
 <resources>
+    <dimen name="messageContentMaxWidth">600dp</dimen>
     <dimen name="actionButtonHorizontalMargin">24dp</dimen>
     <dimen name="featuredListItemHorizontalMargin">24dp</dimen>
     <dimen name="featuredListItemBottomMargin">16dp</dimen>
