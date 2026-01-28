@@ -39,6 +39,7 @@ import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import logcat.LogPriority
+import logcat.LogPriority.WARN
 import logcat.logcat
 import javax.inject.Inject
 
@@ -118,6 +119,16 @@ class PirForegroundScanService : Service(), CoroutineScope by MainScope() {
 
         logcat { "PIR-SCAN: START_NOT_STICKY" }
         return START_NOT_STICKY
+    }
+
+    override fun onLowMemory() {
+        logcat(WARN) { "PIR-SCAN: onLowMemory called" }
+    }
+
+    override fun onTrimMemory(level: Int) {
+        super.onTrimMemory(level)
+        logcat(WARN) { "PIR-SCAN: onTrimMemory called with level: $level" }
+        pirPixelSender.reportManualScanLowMemory()
     }
 
     override fun onDestroy() {

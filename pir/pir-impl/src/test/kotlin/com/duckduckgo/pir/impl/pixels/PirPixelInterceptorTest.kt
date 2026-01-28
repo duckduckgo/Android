@@ -124,4 +124,40 @@ class PirPixelInterceptorTest {
         val capturedRequest = requestCaptor.firstValue
         assertEquals(originalUrl, capturedRequest.url.toString())
     }
+
+    @Test
+    fun whenInterceptLowMemoryPixelThenAddsManufacturerParameter() = runTest {
+        val request = Request.Builder()
+            .url("https://example.com/m_dbp_foreground-run_low-memory")
+            .build()
+
+        whenever(mockChain.request()).thenReturn(request)
+
+        testee.intercept(mockChain)
+
+        val requestCaptor = org.mockito.kotlin.argumentCaptor<Request>()
+        verify(mockChain).proceed(requestCaptor.capture())
+
+        val capturedRequest = requestCaptor.firstValue
+        val man = capturedRequest.url.queryParameter("man")
+        assertEquals("TestManufacturer", man)
+    }
+
+    @Test
+    fun whenInterceptStartFailedPixelThenAddsManufacturerParameter() = runTest {
+        val request = Request.Builder()
+            .url("https://example.com/m_dbp_foreground-run_start-failed")
+            .build()
+
+        whenever(mockChain.request()).thenReturn(request)
+
+        testee.intercept(mockChain)
+
+        val requestCaptor = org.mockito.kotlin.argumentCaptor<Request>()
+        verify(mockChain).proceed(requestCaptor.capture())
+
+        val capturedRequest = requestCaptor.firstValue
+        val man = capturedRequest.url.queryParameter("man")
+        assertEquals("TestManufacturer", man)
+    }
 }

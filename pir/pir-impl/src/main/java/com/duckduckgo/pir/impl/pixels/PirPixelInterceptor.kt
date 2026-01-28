@@ -56,6 +56,7 @@ class PirPixelInterceptor @Inject constructor(
             "m_dbp_foreground-run_started",
             "m_dbp_foreground-run_completed",
             "m_dbp_foreground-run_start-failed",
+            "m_dbp_foreground-run_low-memory",
             "m_dbp_scheduled-run_started",
             "m_dbp_scheduled-run_completed",
             "m_dbp_email-confirmation_started",

@@ -46,6 +46,7 @@ import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_ENGAGEMENT_DAU
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_ENGAGEMENT_MAU
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_ENGAGEMENT_WAU
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_FOREGROUND_RUN_COMPLETED
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_FOREGROUND_RUN_LOW_MEMORY
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_FOREGROUND_RUN_STARTED
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_FOREGROUND_RUN_START_FAILED
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INITIAL_SCAN_DURATION
@@ -103,6 +104,11 @@ interface PirPixelSender {
      * Emits a pixel to signal that a manually initiated scan failed to start as foreground.
      */
     fun reportManualScanStartFailed()
+
+    /**
+     * Emits a pixel to signal that the foreground scan service is running low on memory.
+     */
+    fun reportManualScanLowMemory()
 
     /**
      * Emits a pixel to signal that the scheduled scan has been scheduled.
@@ -582,6 +588,10 @@ class RealPirPixelSender @Inject constructor(
 
     override fun reportManualScanStartFailed() {
         enqueueFire(PIR_FOREGROUND_RUN_START_FAILED)
+    }
+
+    override fun reportManualScanLowMemory() {
+        enqueueFire(PIR_FOREGROUND_RUN_LOW_MEMORY)
     }
 
     override fun reportScheduledScanScheduled() {
@@ -1344,6 +1354,7 @@ class RealPirPixelSender @Inject constructor(
     companion object {
         private const val PARAM_KEY_TOTAL_TIME = "totalTimeInMillis"
         private const val PARAM_KEY_CPU_USAGE = "cpuUsage"
+        private const val PARAM_KEY_MEMORY_LEVEL = "memory_level"
         private const val PARAM_BROKER_VERSION = "broker_version"
         private const val PARAM_LINK_AGE = "link_age_ms"
         private const val PARAM_STATUS = "status"
