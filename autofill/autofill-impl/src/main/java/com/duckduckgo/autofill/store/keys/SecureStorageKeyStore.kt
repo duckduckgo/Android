@@ -158,7 +158,11 @@ class RealSecureStorageKeyStore constructor(
     }
 
     override suspend fun canUseEncryption(): Boolean = withContext(dispatcherProvider.io()) {
-        getEncryptedPreferences() != null
+        if (autofillFeature.useHarmony().isEnabled()) {
+            getHarmonyEncryptedPreferences() != null
+        } else {
+            getEncryptedPreferences() != null
+        }
     }
 
     companion object {
