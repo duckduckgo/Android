@@ -52,7 +52,7 @@ class FakeDuckChatInternal(
 
     override fun openDuckChatWithPrefill(query: String) { }
 
-    override fun getDuckChatUrl(query: String, autoPrompt: Boolean): String {
+    override fun getDuckChatUrl(query: String, autoPrompt: Boolean, sidebar: Boolean): String {
         return "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5"
     }
 
@@ -74,6 +74,8 @@ class FakeDuckChatInternal(
 
     override fun observeCosmeticInputScreenUserSettingEnabled(): Flow<Boolean?> = cosmeticInputScreenUserSettingEnabled
     override fun observeAutomaticContextAttachmentUserSettingEnabled(): Flow<Boolean> = automaticContextAttachmentUserSettingEnabled
+
+    override fun isAutomaticContextAttachmentEnabled(): Boolean = automaticContextAttachmentUserSettingEnabled.value
 
     // DuckChatInternal interface methods
     override suspend fun setEnableDuckChatUserSetting(enabled: Boolean) {

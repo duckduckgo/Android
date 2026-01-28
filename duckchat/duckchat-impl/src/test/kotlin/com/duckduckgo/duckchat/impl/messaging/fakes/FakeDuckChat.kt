@@ -54,6 +54,7 @@ class FakeDuckChat(
     override fun getDuckChatUrl(
         query: String,
         autoPrompt: Boolean,
+        sidebar: Boolean,
     ): String {
         return "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5"
     }

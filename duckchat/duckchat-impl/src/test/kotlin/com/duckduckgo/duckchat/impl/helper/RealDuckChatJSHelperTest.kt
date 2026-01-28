@@ -35,6 +35,7 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Rule
 import org.junit.Test
@@ -62,6 +63,17 @@ class RealDuckChatJSHelperTest {
         appCoroutineScope = coroutineRule.testScope,
         dispatcherProvider = coroutineRule.testDispatcherProvider,
     )
+    private val viewModel =
+        object {
+            val updatedPageContext: String =
+                """
+                {
+                    "title": "Example Title",
+                    "url": "https://example.com",
+                    "content": "Example content"
+                }
+                """.trimIndent()
+        }
 
     @Test
     fun whenMethodIsUnknownThenReturnNull() = runTest {
@@ -74,7 +86,7 @@ class RealDuckChatJSHelperTest {
             method,
             id,
             null,
-            updatedPageContext = viewModel.updatedPageContext,
+            pageContext = viewModel.updatedPageContext,
         )
 
         assertNull(result)
@@ -90,7 +102,7 @@ class RealDuckChatJSHelperTest {
             method,
             null,
             null,
-            updatedPageContext = viewModel.updatedPageContext,
+            pageContext = viewModel.updatedPageContext,
         )
 
         assertNull(result)
@@ -110,7 +122,7 @@ class RealDuckChatJSHelperTest {
             method,
             id,
             null,
-            updatedPageContext = viewModel.updatedPageContext,
+            pageContext = viewModel.updatedPageContext,
         )
 
         val jsonPayload = JSONObject().apply {
@@ -141,7 +153,7 @@ class RealDuckChatJSHelperTest {
             method,
             id,
             null,
-            updatedPageContext = viewModel.updatedPageContext,
+            pageContext = viewModel.updatedPageContext,
         )
 
         val jsonPayload = JSONObject().apply {
@@ -172,7 +184,7 @@ class RealDuckChatJSHelperTest {
             method,
             id,
             null,
-            updatedPageContext = viewModel.updatedPageContext,
+            pageContext = viewModel.updatedPageContext,
         )
 
         val jsonPayload = JSONObject().apply {
@@ -199,7 +211,7 @@ class RealDuckChatJSHelperTest {
             method,
             null,
             null,
-            updatedPageContext = viewModel.updatedPageContext,
+            pageContext = viewModel.updatedPageContext,
         )
 
         assertNull(result)
@@ -219,7 +231,7 @@ class RealDuckChatJSHelperTest {
             method,
             id,
             null,
-            updatedPageContext = viewModel.updatedPageContext,
+            pageContext = viewModel.updatedPageContext,
         )
 
         val jsonPayload = JSONObject().apply {
@@ -259,7 +271,7 @@ class RealDuckChatJSHelperTest {
             method,
             id,
             null,
-            updatedPageContext = viewModel.updatedPageContext,
+            pageContext = viewModel.updatedPageContext,
         )
 
         val jsonPayload = JSONObject().apply {
@@ -299,7 +311,7 @@ class RealDuckChatJSHelperTest {
             method,
             id,
             null,
-            updatedPageContext = viewModel.updatedPageContext,
+            pageContext = viewModel.updatedPageContext,
         )
 
         val jsonPayload = JSONObject().apply {
@@ -323,6 +335,91 @@ class RealDuckChatJSHelperTest {
         assertEquals(expected.method, result.method)
         assertEquals(expected.featureName, result.featureName)
         assertEquals(expected.params.toString(), result.params.toString())
+    }
+
+    @Test
+    fun `when get AI chat page context for user action then return payload`() = runTest {
+        val featureName = "aiChat"
+        val method = "getAIChatPageContext"
+        val id = "123"
+        val data = JSONObject(mapOf("reason" to "userAction"))
+
+        val result = testee.processJsCallbackMessage(
+            featureName,
+            method,
+            id,
+            data,
+            pageContext = viewModel.updatedPageContext,
+        )
+
+        val expectedPayload = JSONObject().apply {
+            put("pageContext", JSONObject(viewModel.updatedPageContext))
+        }
+
+        assertNotNull(result)
+        assertEquals(expectedPayload.toString(), result!!.params.toString())
+    }
+
+    @Test
+    fun `when get AI chat page context for init without automatic attachment then return null`() = runTest {
+        val featureName = "aiChat"
+        val method = "getAIChatPageContext"
+        val id = "123"
+        val data = JSONObject(mapOf("reason" to "init"))
+        whenever(mockDuckChat.isAutomaticContextAttachmentEnabled()).thenReturn(false)
+
+        val result = testee.processJsCallbackMessage(
+            featureName,
+            method,
+            id,
+            data,
+            pageContext = viewModel.updatedPageContext,
+        )
+
+        assertNull(result)
+    }
+
+    @Test
+    fun `when get AI chat page context for init with automatic attachment then return payload`() = runTest {
+        val featureName = "aiChat"
+        val method = "getAIChatPageContext"
+        val id = "123"
+        val data = JSONObject(mapOf("reason" to "init"))
+        whenever(mockDuckChat.isAutomaticContextAttachmentEnabled()).thenReturn(true)
+
+        val result = testee.processJsCallbackMessage(
+            featureName,
+            method,
+            id,
+            data,
+            pageContext = viewModel.updatedPageContext,
+        )
+
+        val expectedPayload = JSONObject().apply {
+            put("pageContext", JSONObject(viewModel.updatedPageContext))
+        }
+
+        assertNotNull(result)
+        assertEquals(expectedPayload.toString(), result!!.params.toString())
+    }
+
+    @Test
+    fun `when get AI chat page context without context then return null`() = runTest {
+        val featureName = "aiChat"
+        val method = "getAIChatPageContext"
+        val id = "123"
+        val data = JSONObject(mapOf("reason" to "userAction"))
+        whenever(mockDuckChat.isAutomaticContextAttachmentEnabled()).thenReturn(true)
+
+        val result = testee.processJsCallbackMessage(
+            featureName,
+            method,
+            id,
+            data,
+            pageContext = null,
+        )
+
+        assertNull(result)
     }
 
     @Test
@@ -379,7 +476,7 @@ class RealDuckChatJSHelperTest {
             method,
             id,
             null,
-            updatedPageContext = viewModel.updatedPageContext,
+            pageContext = viewModel.updatedPageContext,
         )
 
         val jsonPayload = JSONObject().apply {
@@ -420,7 +517,7 @@ class RealDuckChatJSHelperTest {
                 method,
                 id,
                 data,
-                updatedPageContext = viewModel.updatedPageContext,
+                pageContext = viewModel.updatedPageContext,
             ),
         )
 
@@ -440,7 +537,7 @@ class RealDuckChatJSHelperTest {
                 method,
                 id,
                 null,
-                updatedPageContext = viewModel.updatedPageContext,
+                pageContext = viewModel.updatedPageContext,
             ),
         )
         verify(mockDataStore).updateUserPreferences(null)
@@ -460,7 +557,7 @@ class RealDuckChatJSHelperTest {
                 method,
                 id,
                 data,
-                updatedPageContext = viewModel.updatedPageContext,
+                pageContext = viewModel.updatedPageContext,
             ),
         )
         verify(mockDataStore).updateUserPreferences(null)
@@ -480,7 +577,7 @@ class RealDuckChatJSHelperTest {
                 method,
                 id,
                 data,
-                updatedPageContext = viewModel.updatedPageContext,
+                pageContext = viewModel.updatedPageContext,
             ),
         )
 
@@ -500,7 +597,7 @@ class RealDuckChatJSHelperTest {
                 method,
                 id,
                 data,
-                updatedPageContext = viewModel.updatedPageContext,
+                pageContext = viewModel.updatedPageContext,
             ),
         )
 
@@ -520,7 +617,7 @@ class RealDuckChatJSHelperTest {
                 method,
                 id,
                 data,
-                updatedPageContext = viewModel.updatedPageContext,
+                pageContext = viewModel.updatedPageContext,
             ),
         )
 
@@ -540,7 +637,7 @@ class RealDuckChatJSHelperTest {
                 method,
                 id,
                 data,
-                updatedPageContext = viewModel.updatedPageContext,
+                pageContext = viewModel.updatedPageContext,
             ),
         )
 
@@ -560,7 +657,7 @@ class RealDuckChatJSHelperTest {
                 method,
                 id,
                 data,
-                updatedPageContext = viewModel.updatedPageContext,
+                pageContext = viewModel.updatedPageContext,
             ),
         )
 
@@ -580,7 +677,7 @@ class RealDuckChatJSHelperTest {
                 method,
                 id,
                 data,
-                updatedPageContext = viewModel.updatedPageContext,
+                pageContext = viewModel.updatedPageContext,
             ),
         )
 
@@ -599,7 +696,7 @@ class RealDuckChatJSHelperTest {
                 method,
                 id,
                 null,
-                updatedPageContext = viewModel.updatedPageContext,
+                pageContext = viewModel.updatedPageContext,
             ),
         )
 
@@ -618,7 +715,7 @@ class RealDuckChatJSHelperTest {
                 method,
                 id,
                 null,
-                updatedPageContext = viewModel.updatedPageContext,
+                pageContext = viewModel.updatedPageContext,
             ),
         )
 
@@ -640,7 +737,7 @@ class RealDuckChatJSHelperTest {
             method,
             id,
             null,
-            updatedPageContext = viewModel.updatedPageContext,
+            pageContext = viewModel.updatedPageContext,
         )
 
         val expectedPayload = JSONObject().apply {
@@ -676,7 +773,7 @@ class RealDuckChatJSHelperTest {
             method,
             id,
             null,
-            updatedPageContext = viewModel.updatedPageContext,
+            pageContext = viewModel.updatedPageContext,
         )
 
         val expectedPayload = JSONObject().apply {
@@ -709,7 +806,7 @@ class RealDuckChatJSHelperTest {
                 method,
                 id,
                 null,
-                updatedPageContext = viewModel.updatedPageContext,
+                pageContext = viewModel.updatedPageContext,
             ),
         )
 
@@ -729,7 +826,7 @@ class RealDuckChatJSHelperTest {
                 method,
                 id,
                 data,
-                updatedPageContext = viewModel.updatedPageContext,
+                pageContext = viewModel.updatedPageContext,
             ),
         )
 
@@ -749,7 +846,7 @@ class RealDuckChatJSHelperTest {
                 method,
                 id,
                 data,
-                updatedPageContext = viewModel.updatedPageContext,
+                pageContext = viewModel.updatedPageContext,
             ),
         )
 
@@ -769,7 +866,7 @@ class RealDuckChatJSHelperTest {
                 method,
                 id,
                 data,
-                updatedPageContext = viewModel.updatedPageContext,
+                pageContext = viewModel.updatedPageContext,
             ),
         )
 
@@ -789,7 +886,7 @@ class RealDuckChatJSHelperTest {
                 method,
                 id,
                 data,
-                updatedPageContext = viewModel.updatedPageContext,
+                pageContext = viewModel.updatedPageContext,
             ),
         )
 
@@ -809,7 +906,7 @@ class RealDuckChatJSHelperTest {
                 method,
                 id,
                 data,
-                updatedPageContext = viewModel.updatedPageContext,
+                pageContext = viewModel.updatedPageContext,
             ),
         )
 
@@ -829,7 +926,7 @@ class RealDuckChatJSHelperTest {
                 method,
                 id,
                 data,
-                updatedPageContext = viewModel.updatedPageContext,
+                pageContext = viewModel.updatedPageContext,
             ),
         )
 
@@ -848,7 +945,7 @@ class RealDuckChatJSHelperTest {
             method,
             id,
             data,
-            updatedPageContext = viewModel.updatedPageContext,
+            pageContext = viewModel.updatedPageContext,
         )
 
         val expectedPayload = JSONObject().apply {
@@ -894,7 +991,7 @@ class RealDuckChatJSHelperTest {
             method,
             "123",
             null,
-            updatedPageContext = viewModel.updatedPageContext,
+            pageContext = viewModel.updatedPageContext,
         )
 
         coroutineRule.testScope.testScheduler.advanceTimeBy(500)
@@ -913,14 +1010,14 @@ class RealDuckChatJSHelperTest {
             method,
             "123",
             null,
-            updatedPageContext = viewModel.updatedPageContext,
+            pageContext = viewModel.updatedPageContext,
         )
         testee.processJsCallbackMessage(
             featureName,
             method,
             "123",
             null,
-            updatedPageContext = viewModel.updatedPageContext,
+            pageContext = viewModel.updatedPageContext,
         )
 
         coroutineRule.testScope.testScheduler.advanceTimeBy(500)

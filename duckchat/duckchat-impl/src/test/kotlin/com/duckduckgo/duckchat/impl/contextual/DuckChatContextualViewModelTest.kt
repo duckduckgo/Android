@@ -164,7 +164,7 @@ class DuckChatContextualViewModelTest {
     @Test
     fun `when sheet opened in input mode then load url command emitted`() =
         runTest {
-            val expectedUrl = "https://duck.chat/?q="
+            val expectedUrl = "https://duckduckgo.com/?placement=sidebar&q=DuckDuckGo+AI+Chat&ia=chat&duckai=5"
             (duckChat as FakeDuckChat).nextUrl = expectedUrl
             val tabId = "tab-1"
 
@@ -333,36 +333,6 @@ class DuckChatContextualViewModelTest {
             }
         }
 
-    @Test
-    fun `when page context received in chat mode then subscription event emitted`() =
-        runTest {
-            val serializedPageData =
-                """
-                {
-                    "title": "Ctx Title",
-                    "url": "https://ctx.com",
-                    "content": "content"
-                }
-                """.trimIndent()
-
-            enableAutomaticContextAttachment()
-            testee.subscriptionEventDataFlow.test {
-                testee.onPromptSent("hello") // enter chat mode
-                awaitItem() // consume prompt event
-
-                testee.onPageContextReceived("tab-1", serializedPageData)
-
-                val event = awaitItem()
-                assertEquals("submitAIChatPageContext", event.subscriptionName)
-                val params = event.params.getJSONObject("pageContext")
-                assertEquals("Ctx Title", params.getString("title"))
-                assertEquals("https://ctx.com", params.getString("url"))
-                assertEquals("content", params.getString("content"))
-
-                cancelAndIgnoreRemainingEvents()
-            }
-        }
-
     private fun setFullModeUrl(url: String) {
         val fullModeUrlField = DuckChatContextualViewModel::class.java.getDeclaredField("fullModeUrl")
         fullModeUrlField.isAccessible = true
@@ -382,7 +352,7 @@ class DuckChatContextualViewModelTest {
         override fun openDuckChat() = Unit
         override fun openDuckChatWithAutoPrompt(query: String) = Unit
         override fun openDuckChatWithPrefill(query: String) = Unit
-        override fun getDuckChatUrl(query: String, autoPrompt: Boolean): String = nextUrl
+        override fun getDuckChatUrl(query: String, autoPrompt: Boolean, sidebar: Boolean): String = nextUrl
         override fun isDuckChatUrl(uri: android.net.Uri): Boolean = false
         override suspend fun wasOpenedBefore(): Boolean = false
         override fun showNewAddressBarOptionChoiceScreen(context: android.content.Context, isDarkThemeEnabled: Boolean) = Unit
