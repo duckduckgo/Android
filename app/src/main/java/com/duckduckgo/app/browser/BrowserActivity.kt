@@ -641,7 +641,11 @@ open class BrowserActivity : DuckDuckGoActivity() {
         }
 
         if (intent.getBooleanExtra(CLOSE_DUCK_CHAT, false)) {
-            closeDuckChat()
+            if (duckAiFeatureState.showFullScreenMode.value && currentTab?.isInDuckAiMode() == true) {
+                closeDuckChatFullScreen()
+            } else {
+                closeDuckChat()
+            }
             return
         }
 
@@ -857,6 +861,12 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     fun launchDownloads() {
         globalActivityStarter.start(this, DownloadsScreenNoParams)
+    }
+
+    fun closeDuckChatFullScreen() {
+        isDuckChatVisible = false
+        externalIntentProcessingState.onDuckAiClosed()
+        currentTab?.closeCurrentTab()
     }
 
     fun closeDuckChat() {
