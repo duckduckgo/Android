@@ -37,6 +37,7 @@ dependencies {
     implementation project(path: ':anvil-annotations')
     implementation project(path: ':downloads-api')
     implementation project(path: ':browser-api')
+    implementation project(path: ':cookies-api')
     implementation project(path: ':di')
     implementation project(path: ':common-utils')
     implementation project(path: ':design-system')

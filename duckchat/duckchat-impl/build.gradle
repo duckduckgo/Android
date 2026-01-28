@@ -46,6 +46,7 @@ dependencies {
     implementation project(':sync-api')
     implementation project(':data-store-api')
     implementation project(':cookies-api')
+    implementation 'androidx.webkit:webkit:1.15.0'
 
     anvil project(path: ':anvil-compiler')
     implementation project(path: ':anvil-annotations')

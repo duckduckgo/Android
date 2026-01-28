@@ -592,6 +592,9 @@ class BrowserTabFragment :
     @Inject
     lateinit var browserMenuViewStateFactory: BrowserMenuViewStateFactory
 
+    @Inject
+    lateinit var specialUrlDetector: SpecialUrlDetector
+
     /**
      * We use this to monitor whether the user was seeing the in-context Email Protection signup prompt
      * This is needed because the activity stack will be cleared if an external link is opened in our browser
@@ -1961,6 +1964,10 @@ class BrowserTabFragment :
         clientBrandHintProvider.setOn(webView?.safeSettings, url)
         hideKeyboard()
         omnibar.hideFindInPage()
+        if (duckChat.isDuckChatUrl(url.toUri())) {
+            destroyWebView()
+            configureWebView("duckchat")
+        }
         webView?.loadUrl(url, headers)
     }
 
@@ -3208,7 +3215,7 @@ class BrowserTabFragment :
     }
 
     @SuppressLint("SetJavaScriptEnabled")
-    private fun configureWebView() {
+    private fun configureWebView(profileName: String? = null) {
         binding.daxDialogOnboardingCtaContent.layoutTransition = LayoutTransition()
         binding.daxDialogOnboardingCtaContent.layoutTransition.enableTransitionType(LayoutTransition.CHANGING)
 
@@ -3226,7 +3233,7 @@ class BrowserTabFragment :
                 ).findViewById<DuckDuckGoWebView>(R.id.browserWebView)
 
         webView?.let {
-            setWebViewProfileIfAvailable(it)
+            setWebViewProfileIfAvailable(it, profileName)
 
             it.webViewClient = webViewClient
             it.webChromeClient = webChromeClient
@@ -3351,13 +3358,13 @@ class BrowserTabFragment :
      * MUST be called FIRST before any other WebView operation - profile cannot be changed after.
      */
     @SuppressLint("RequiresFeature")
-    private fun setWebViewProfileIfAvailable(webView: DuckDuckGoWebView) {
+    private fun setWebViewProfileIfAvailable(webView: DuckDuckGoWebView, hardcodedProfile: String?) {
         runBlocking {
             if (webViewProfileManager.isProfileSwitchingAvailable()) {
                 val profileName = webViewProfileManager.getCurrentProfileName()
                 if (profileName.isNotEmpty()) {
                     try {
-                        WebViewCompat.setProfile(webView, profileName)
+                        WebViewCompat.setProfile(webView, hardcodedProfile ?: profileName)
                         logcat { "WebView profile set to: $profileName" }
                     } catch (e: Exception) {
                         logcat(ERROR) { "Failed to set WebView profile: ${e.asLog()}" }

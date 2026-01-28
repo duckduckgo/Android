@@ -44,7 +44,9 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.webkit.WebViewCompat
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.app.browser.api.WebViewProfileManager
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
@@ -99,7 +101,10 @@ import kotlinx.coroutines.flow.cancellable
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
+import logcat.LogPriority.ERROR
+import logcat.asLog
 import logcat.logcat
 import org.json.JSONObject
 import java.io.File
@@ -177,6 +182,9 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
     @Inject
     lateinit var cookieManagerProvider: CookieManagerProvider
 
+    @Inject
+    lateinit var webViewProfileManager: WebViewProfileManager
+
     private var pendingFileDownload: PendingFileDownload? = null
     private val downloadMessagesJob = ConflatedJob()
 
@@ -198,6 +206,7 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
         val url = arguments?.getString(KEY_DUCK_AI_URL) ?: "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5"
 
         simpleWebview.let {
+            setWebViewProfileIfAvailable(it)
             it.webViewClient = webViewClient
             it.webChromeClient = object : WebChromeClient() {
                 override fun onCreateWindow(
@@ -327,6 +336,23 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
 
         configureOmnibar()
         observeViewModel()
+    }
+
+    /**
+     * Sets the WebView profile for data isolation.
+     * MUST be called FIRST before any other WebView operation - profile cannot be changed after.
+     */
+    @SuppressLint("RequiresFeature")
+    private fun setWebViewProfileIfAvailable(webView: WebView) {
+        runBlocking {
+            if (webViewProfileManager.isProfileSwitchingAvailable()) {
+                try {
+                    WebViewCompat.setProfile(webView, "duckchat")
+                } catch (e: Exception) {
+                    logcat(ERROR) { "Failed to set WebView profile: ${e.asLog()}" }
+                }
+            }
+        }
     }
 
     private fun configureOmnibar() {
