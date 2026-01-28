@@ -10,6 +10,32 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  get-current-timestamp:
+    name: Get current timestamp
+    runs-on: ubuntu-latest
+    outputs:
+      timestamp: ${{ steps.timestamp.outputs.timestamp }}
+    steps:
+      - name: Get current timestamp
+        id: timestamp
+        run: |
+          echo "timestamp=$(date -u +'%Y-%m-%dT%H%M%S')" >> "$GITHUB_OUTPUT"
+
+  get-tasks-waiting-for-release:
+    name: Get tasks waiting for release
+    runs-on: ubuntu-latest
+    outputs:
+      timestamp: ${{ steps.list-waiting.outputs.waiting-for-release }}
+    steps:
+      - name: Install Release Bridge from Homebrew
+        run: |
+          brew tap cdrussell/aarb
+          brew install aarb
+      - name: Get tasks waiting for release
+        id: list-waiting
+        run: |
+          echo "waiting-for-release=$(AndroidAsanaBridge action=listPendingTasksGid | grep -E '^[0-9]+(,[0-9]+)*$')" >> "$GITHUB_OUTPUT"
+
   resolve-commit:
     name: Resolve commit SHA
     runs-on: android-large-runner
@@ -20,7 +46,7 @@ jobs:
         id: resolve
         run: |
           echo "Using commit: ${{ github.sha }}"
-          echo "commit_sha=${{ github.sha }}" >> $GITHUB_OUTPUT
+          echo "commit_sha=${{ github.sha }}" >> "$GITHUB_OUTPUT"
 
   call-nightly:
     needs: resolve-commit
@@ -60,7 +86,7 @@ jobs:
   tag_lgc_when_successful:
     name: Tag last good commit when successful
     runs-on: ubuntu-latest
-    needs: [ resolve-commit, call-nightly, call-end-to-end, call-privacy, call-update-content-scope, call-update-ref-tests]
+    needs: [ get-current-timestamp, get-tasks-waiting-for-release, resolve-commit, call-nightly, call-end-to-end, call-privacy, call-update-content-scope, call-update-ref-tests]
     if: ${{ success() }}
     steps:
       - name: Checkout repository
@@ -78,6 +104,15 @@ jobs:
 
       - name: Create tag
         run: |
-          TAG_NAME="LGC-$(date -u +'%Y-%m-%dT%H%M%S')"
+          TAG_NAME="LGC-${{ needs.get-current-timestamp.outputs.timestamp }}"
           git tag "$TAG_NAME"
           git push origin "$TAG_NAME"
+
+      - name: Install Release Bridge from Homebrew
+        run: |
+          brew tap cdrussell/aarb
+          brew install aarb
+
+      - name: Tag tasks waiting for release
+        run: |
+          AndroidAsanaBridge action=tagTasksFromList lgc=LGC-${{ needs.get-current-timestamp.outputs.timestamp }} tasks=${{ needs.get-tasks-waiting-for-release.outputs.timestamp }}
