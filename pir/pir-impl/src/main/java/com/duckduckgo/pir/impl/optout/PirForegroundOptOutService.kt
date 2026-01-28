@@ -78,7 +78,7 @@ class PirForegroundOptOutService : Service(), CoroutineScope by MainScope() {
         try {
             ServiceCompat.startForeground(
                 this,
-                1,
+                PIR_OPT_OUT_NOTIFICATION_ID,
                 notification,
                 if (Build.VERSION.SDK_INT >= 34) {
                     FOREGROUND_SERVICE_TYPE_SPECIAL_USE
@@ -129,6 +129,7 @@ class PirForegroundOptOutService : Service(), CoroutineScope by MainScope() {
     }
 
     companion object {
+        private const val PIR_OPT_OUT_NOTIFICATION_ID = 9782
         const val EXTRA_BROKER_TO_OPT_OUT = "EXTRA_BROKER_TO_OPT_OUT"
     }
 }

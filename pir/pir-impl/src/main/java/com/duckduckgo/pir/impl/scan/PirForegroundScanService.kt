@@ -82,7 +82,7 @@ class PirForegroundScanService : Service(), CoroutineScope by MainScope() {
         try {
             ServiceCompat.startForeground(
                 this,
-                1,
+                PIR_SCAN_NOTIFICATION_ID,
                 notification,
                 if (Build.VERSION.SDK_INT >= 34) {
                     FOREGROUND_SERVICE_TYPE_SPECIAL_USE
@@ -134,5 +134,9 @@ class PirForegroundScanService : Service(), CoroutineScope by MainScope() {
     override fun onDestroy() {
         logcat { "PIR-SCAN: PIR service destroyed" }
         pirJobsRunner.stop()
+    }
+
+    companion object {
+        private const val PIR_SCAN_NOTIFICATION_ID = 8791
     }
 }
