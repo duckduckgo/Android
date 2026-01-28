@@ -32,6 +32,7 @@ import kotlinx.coroutines.test.runTest
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -478,11 +479,11 @@ class DuckChatContextualViewModelTest {
 
         override suspend fun getTabChatUrl(tabId: String): String? = urls[tabId]
 
-        override suspend fun clearTabChatUrl(tabId: String) {
+        override fun clearTabChatUrl(tabId: String) {
             urls.remove(tabId)
         }
 
-        override suspend fun clearAll() {
+        override fun clearAll() {
             urls.clear()
         }
     }
