@@ -18,6 +18,7 @@ package com.duckduckgo.app.browser.omnibar
 
 import android.view.MotionEvent.ACTION_UP
 import android.webkit.URLUtil
+import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
@@ -59,7 +60,6 @@ import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.common.utils.extractDomain
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
@@ -89,6 +89,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import logcat.logcat
 import javax.inject.Inject
+import kotlin.text.startsWith
 import com.duckduckgo.app.global.model.PrivacyShield as PrivacyShieldState
 
 @ContributesViewModel(FragmentScope::class)
@@ -143,7 +144,7 @@ class OmnibarLayoutViewModel @Inject constructor(
 
     private fun getViewMode(state: ViewState): ViewMode {
         return if (state.viewMode is CustomTab) {
-            val domain = if (state.url.isBlank()) state.omnibarText else state.url.extractDomain()
+            val domain = formatUrlForCustomTab(state.url.ifBlank { state.omnibarText })
             if (domain != state.viewMode.domain) {
                 val isDuckPlayerUrl = duckPlayer.getDuckPlayerState() == ENABLED && duckPlayer.isDuckPlayerUri(state.url)
                 state.viewMode.copy(
@@ -156,6 +157,16 @@ class OmnibarLayoutViewModel @Inject constructor(
         } else {
             state.viewMode
         }
+    }
+
+    private fun formatUrlForCustomTab(url: String?): String? = if (url.isNullOrBlank()) {
+        ""
+    } else if (isFullUrlEnabled.value) {
+        url
+    } else if (url.startsWith("duck")) {
+        url.toUri().buildUpon().path("").toString()
+    } else {
+        addressDisplayFormatter.getShortUrl(url)
     }
 
     private val showDuckAiButton = combine(
