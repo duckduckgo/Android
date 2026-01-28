@@ -20,7 +20,6 @@ import android.content.Context
 import android.util.AttributeSet
 import android.util.TypedValue
 import android.view.Gravity
-import androidx.annotation.StringRes
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.ContextCompat
 import com.duckduckgo.mobile.android.R
@@ -45,7 +44,7 @@ class DaxYellowPill @JvmOverloads constructor(
         setBackgroundResource(R.drawable.background_yellow_pill)
 
         setTextColor(ContextCompat.getColor(context, R.color.black))
-        setTextSize(TypedValue.COMPLEX_UNIT_SP, 11f)
+        setTextSize(TypedValue.COMPLEX_UNIT_SP, 10f)
         setTypeface(typeface, android.graphics.Typeface.BOLD)
 
         val horizontalPadding = resources.getDimensionPixelSize(R.dimen.yellowPillPaddingHorizontal)
@@ -72,19 +71,5 @@ class DaxYellowPill @JvmOverloads constructor(
             }
             recycle()
         }
-    }
-
-    /**
-     * Sets the pill text from a string resource.
-     */
-    fun setPillText(@StringRes textRes: Int) {
-        setText(textRes)
-    }
-
-    /**
-     * Sets the pill text from a string.
-     */
-    fun setPillText(text: String) {
-        setText(text)
     }
 }
