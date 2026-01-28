@@ -22,6 +22,7 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
 import com.duckduckgo.duckchat.impl.helper.NativeAction
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper
+import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -31,6 +32,7 @@ import kotlinx.coroutines.test.runTest
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -50,6 +52,7 @@ class DuckChatContextualViewModelTest {
     private lateinit var testee: DuckChatContextualViewModel
     private val duckChat: com.duckduckgo.duckchat.api.DuckChat = FakeDuckChat()
     private val duckChatJSHelper: DuckChatJSHelper = mock()
+    private val contextualDataStore = FakeDuckChatContextualDataStore()
 
     @Before
     fun setup() {
@@ -67,6 +70,7 @@ class DuckChatContextualViewModelTest {
             dispatchers = coroutineRule.testDispatcherProvider,
             duckChat = duckChat,
             duckChatJSHelper = duckChatJSHelper,
+            contextualDataStore = contextualDataStore,
         )
     }
 
@@ -373,6 +377,28 @@ class DuckChatContextualViewModelTest {
     }
 
     @Test
+    fun `when sheet opened with stored chat url then load it and expand`() = runTest {
+        val tabId = "tab-1"
+        val storedUrl = "https://duck.ai/chat"
+        contextualDataStore.persistTabChatUrl(tabId, storedUrl)
+
+        testee.commands.test {
+            testee.onSheetOpened(tabId)
+
+            val loadCommand = awaitItem() as DuckChatContextualViewModel.Command.LoadUrl
+            assertEquals(storedUrl, loadCommand.url)
+
+            val state = testee.viewState.value
+            assertEquals(DuckChatContextualViewModel.SheetMode.WEBVIEW, state.sheetMode)
+            assertEquals(BottomSheetBehavior.STATE_EXPANDED, state.sheetState)
+            assertEquals(storedUrl, state.url)
+            assertEquals(tabId, state.tabId)
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
     fun `onNewChatRequested emits new chat subscription`() = runTest {
         testee.subscriptionEventDataFlow.test {
             testee.onNewChatRequested()
@@ -383,6 +409,31 @@ class DuckChatContextualViewModelTest {
 
             cancelAndIgnoreRemainingEvents()
         }
+    }
+
+    @Test
+    fun `onChatPageLoaded stores url by tab id`() = runTest {
+        val tabId = "tab-1"
+        val url = "https://duck.ai/chat"
+        testee.onSheetOpened(tabId)
+
+        testee.onChatPageLoaded(url)
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        assertEquals(url, contextualDataStore.getTabChatUrl(tabId))
+    }
+
+    @Test
+    fun `onNewChatRequested clears stored url for current tab`() = runTest {
+        val tabId = "tab-1"
+        val url = "https://duck.ai/chat"
+        testee.onSheetOpened(tabId)
+        contextualDataStore.persistTabChatUrl(tabId, url)
+
+        testee.onNewChatRequested()
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        assertNull(contextualDataStore.getTabChatUrl(tabId))
     }
 
     private fun setFullModeUrl(url: String) {
@@ -416,6 +467,24 @@ class DuckChatContextualViewModelTest {
 
         fun setAutomaticContextAttachment(enabled: Boolean) {
             automaticContextAttachment.value = enabled
+        }
+    }
+
+    private class FakeDuckChatContextualDataStore : DuckChatContextualDataStore {
+        private val urls = mutableMapOf<String, String>()
+
+        override suspend fun persistTabChatUrl(tabId: String, url: String) {
+            urls[tabId] = url
+        }
+
+        override suspend fun getTabChatUrl(tabId: String): String? = urls[tabId]
+
+        override fun clearTabChatUrl(tabId: String) {
+            urls.remove(tabId)
+        }
+
+        override fun clearAll() {
+            urls.clear()
         }
     }
 }
