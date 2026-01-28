@@ -16,55 +16,67 @@
   ~ limitations under the License.
   -->
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="@drawable/background_rounded_top_corners"
-    android:orientation="vertical"
-    android:paddingHorizontal="@dimen/keyline_4"
-    android:paddingTop="@dimen/keyline_4"
-    android:paddingBottom="@dimen/keyline_5">
+    android:layout_height="match_parent"
+    android:paddingTop="12dp">
 
-    <Space
-        android:layout_width="match_parent"
-        android:layout_height="24dp" />
-
-    <com.duckduckgo.common.ui.view.text.DaxTextView
-        android:id="@+id/duckAiContextualOnboardingTitle"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:gravity="center"
-        app:textType="primary"
-        app:typography="h1" />
+        android:background="@drawable/rounded_top_corners_bottom_sheet_drawable"
+        android:orientation="vertical"
+        android:paddingBottom="16dp">
 
-    <com.duckduckgo.common.ui.view.text.DaxTextView
-        android:id="@+id/duckAiContextualOnboardingBody"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="24dp"
-        android:gravity="center"
-        app:textType="primary"
-        app:typography="body1" />
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="20dp"
+            app:srcCompat="@drawable/content_upload_128"
+            tools:ignore="ContentDescription" />
 
-    <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
-        android:id="@+id/duckAiContextualOnboardingPrimaryButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/duck_chat_contextual_onboarding_primary"
-        app:cornerRadius="12dp" />
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/duckAiContextualOnboardingTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:paddingHorizontal="24dp"
+            android:gravity="center"
+            tools:text="@string/duck_chat_contextual_onboarding_title"
+            app:textType="primary"
+            app:typography="h1" />
 
-    <com.duckduckgo.common.ui.view.button.DaxButtonGhost
-        android:id="@+id/duckAiContextualOnboardingSecondaryButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/keyline_2"
-        android:text="@string/duck_chat_contextual_onboarding_secondary"
-        app:cornerRadius="12dp" />
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/duckAiContextualOnboardingBody"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:paddingHorizontal="24dp"
+            android:gravity="center"
+            tools:text="@string/duck_chat_contextual_onboarding_body"
+            app:textType="primary"
+            app:typography="body1" />
 
-    <Space
-        android:layout_width="match_parent"
-        android:layout_height="12dp" />
+        <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+            android:id="@+id/duckAiContextualOnboardingPrimaryButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="36dp"
+            android:layout_marginHorizontal="24dp"
+            android:text="@string/duck_chat_contextual_onboarding_primary"
+            app:daxButtonSize="large" />
 
-</LinearLayout>
+        <com.duckduckgo.common.ui.view.button.DaxButtonGhost
+            android:id="@+id/duckAiContextualOnboardingSecondaryButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="24dp"
+            android:text="@string/duck_chat_contextual_onboarding_secondary"
+            app:daxButtonSize="large" />
+
+    </LinearLayout>
+
+</ScrollView>
