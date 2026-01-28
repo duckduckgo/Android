@@ -37,7 +37,10 @@ import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.FrameLayout
+import android.widget.ImageView
+import androidx.annotation.DrawableRes
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
 import androidx.core.view.isNotEmpty
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
@@ -79,6 +82,7 @@ class InputModeWidget @JvmOverloads constructor(
     private val inputModeWidgetLayout: View
     val tabSwitcherButton: TabSwitcherButton
     private val menuButton: View
+    private val menuIconImageView: ImageView
     private val fireButton: View
     private val voiceInputButton: View
     private var bottomButtonsMode: Boolean = false
@@ -151,6 +155,7 @@ class InputModeWidget @JvmOverloads constructor(
         inputModeSwitch = findViewById(R.id.inputModeSwitch)
         inputModeWidgetCard = findViewById(R.id.inputModeWidgetCard)
         menuButton = findViewById(R.id.inputFieldBrowserMenu)
+        menuIconImageView = findViewById(R.id.browserMenuImageView)
         fireButton = findViewById(R.id.inputFieldFireButton)
         tabSwitcherButton = findViewById(R.id.inputFieldTabsMenu)
         voiceInputButton = findViewById(R.id.inputFieldVoiceInputButton)
@@ -484,6 +489,12 @@ class InputModeWidget @JvmOverloads constructor(
 
     fun setVoiceButtonVisible(visible: Boolean) {
         voiceInputButton.isVisible = visible
+    }
+
+    fun setMenuIcon(@DrawableRes resId: Int) {
+        ContextCompat.getDrawable(context, resId)?.let {
+            menuIconImageView.setImageDrawable(it)
+        }
     }
 
     fun setMainButtonsVisible(
