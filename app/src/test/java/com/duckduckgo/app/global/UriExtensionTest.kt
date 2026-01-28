@@ -28,6 +28,7 @@ import com.duckduckgo.common.utils.hasIpHost
 import com.duckduckgo.common.utils.isHttp
 import com.duckduckgo.common.utils.isHttps
 import com.duckduckgo.common.utils.isHttpsVersionOfUri
+import com.duckduckgo.common.utils.isLocalUrl
 import com.duckduckgo.common.utils.isMobileSite
 import com.duckduckgo.common.utils.toDesktopUri
 import com.duckduckgo.common.utils.toStringDropScheme
@@ -275,5 +276,74 @@ class UriExtensionTest {
         assertEquals("www.foo.com", "www.foo.com/path/to/foo?key=value".extractDomain())
         assertEquals("foo.com", "foo.com/path/to/foo?key=value".extractDomain())
         assertEquals("foo.com", "http://foo.com/path/to/foo?key=value".extractDomain())
+    }
+
+    @Test
+    fun whenHostIsLocalhostThenIsLocalUrlReturnsTrue() {
+        assertTrue("http://localhost".toUri().isLocalUrl)
+        assertTrue("https://localhost".toUri().isLocalUrl)
+        assertTrue("http://localhost:8080".toUri().isLocalUrl)
+        assertTrue("http://LOCALHOST".toUri().isLocalUrl)
+    }
+
+    @Test
+    fun whenHostIsLoopbackIpThenIsLocalUrlReturnsTrue() {
+        assertTrue("http://127.0.0.1".toUri().isLocalUrl)
+        assertTrue("http://127.0.0.1:3000".toUri().isLocalUrl)
+        assertTrue("http://127.1.2.3".toUri().isLocalUrl)
+        assertTrue("http://127.255.255.255".toUri().isLocalUrl)
+    }
+
+    @Test
+    fun whenHostIsPrivateNetworkClass10ThenIsLocalUrlReturnsTrue() {
+        assertTrue("http://10.0.0.1".toUri().isLocalUrl)
+        assertTrue("http://10.255.255.255".toUri().isLocalUrl)
+        assertTrue("http://10.1.2.3:8080".toUri().isLocalUrl)
+    }
+
+    @Test
+    fun whenHostIsPrivateNetworkClass172ThenIsLocalUrlReturnsTrue() {
+        assertTrue("http://172.16.0.1".toUri().isLocalUrl)
+        assertTrue("http://172.31.255.255".toUri().isLocalUrl)
+        assertTrue("http://172.20.10.5".toUri().isLocalUrl)
+    }
+
+    @Test
+    fun whenHostIsPrivateNetworkClass192ThenIsLocalUrlReturnsTrue() {
+        assertTrue("http://192.168.0.1".toUri().isLocalUrl)
+        assertTrue("http://192.168.255.255".toUri().isLocalUrl)
+        assertTrue("http://192.168.1.100:3000".toUri().isLocalUrl)
+    }
+
+    @Test
+    fun whenHostIsPublicIpThenIsLocalUrlReturnsFalse() {
+        assertFalse("http://8.8.8.8".toUri().isLocalUrl)
+        assertFalse("http://1.1.1.1".toUri().isLocalUrl)
+        assertFalse("http://93.184.216.34".toUri().isLocalUrl)
+    }
+
+    @Test
+    fun whenHostIsNormalDomainThenIsLocalUrlReturnsFalse() {
+        assertFalse("http://example.com".toUri().isLocalUrl)
+        assertFalse("https://duckduckgo.com".toUri().isLocalUrl)
+        assertFalse("http://www.google.com".toUri().isLocalUrl)
+    }
+
+    @Test
+    fun whenHostIsEdgeCaseFor172ThenIsLocalUrlReturnsCorrectly() {
+        assertFalse("http://172.15.0.1".toUri().isLocalUrl)
+        assertFalse("http://172.32.0.1".toUri().isLocalUrl)
+    }
+
+    @Test
+    fun whenHostIsEdgeCaseFor192ThenIsLocalUrlReturnsCorrectly() {
+        assertFalse("http://192.167.0.1".toUri().isLocalUrl)
+        assertFalse("http://192.169.0.1".toUri().isLocalUrl)
+    }
+
+    @Test
+    fun whenHostIsNullOrEmptyThenIsLocalUrlReturnsFalse() {
+        assertFalse("file:///path/to/file".toUri().isLocalUrl)
+        assertFalse("about:blank".toUri().isLocalUrl)
     }
 }

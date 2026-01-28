@@ -64,6 +64,31 @@ val Uri.hasIpHost: Boolean
         return baseHost?.matches(IP_REGEX) ?: false
     }
 
+/**
+ * Checks if the URI represents a local or private network address.
+ * This includes localhost, loopback addresses (127.0.0.0/8),
+ * and private network ranges (10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16).
+ */
+val Uri.isLocalUrl: Boolean
+    get() {
+        val host = this.host?.lowercase() ?: return false
+        if (host == "localhost") return true
+
+        val ipv4Parts = host.split(".")
+        if (ipv4Parts.size != 4) return false
+
+        val octets = ipv4Parts.mapNotNull { it.toIntOrNull() }
+        if (octets.size != 4 || octets.any { it !in 0..255 }) return false
+
+        val (first, second) = octets
+        if (first == 127) return true
+        if (first == 10) return true
+        if (first == 172 && second in 16..31) return true
+        if (first == 192 && second == 168) return true
+
+        return false
+    }
+
 val Uri.absoluteString: String
     get() {
         return "$scheme://$host$path"
