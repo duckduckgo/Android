@@ -24,7 +24,11 @@ import androidx.security.crypto.MasterKey
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_HARMONY_PREFERENCES_GET_KEY_FAILED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_HARMONY_PREFERENCES_RETRIEVAL_FAILED
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_HARMONY_PREFERENCES_UPDATE_KEY_FAILED
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_PREFERENCES_GET_KEY_FAILED
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_PREFERENCES_UPDATE_KEY_FAILED
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import kotlinx.coroutines.CoroutineScope
@@ -124,21 +128,29 @@ class RealSecureStorageKeyStore constructor(
         keyValue: ByteArray?,
     ) {
         withContext(dispatcherProvider.io()) {
-            getEncryptedPreferences()?.edit(commit = true) {
-                if (keyValue == null) {
-                    remove(keyName)
-                } else {
-                    putString(keyName, keyValue.toByteString().base64())
-                }
-            }
-
-            if (autofillFeature.useHarmony().isEnabled()) {
-                getHarmonyEncryptedPreferences()?.edit(commit = true) {
+            runCatching {
+                getEncryptedPreferences()?.edit(commit = true) {
                     if (keyValue == null) {
                         remove(keyName)
                     } else {
                         putString(keyName, keyValue.toByteString().base64())
                     }
+                }
+            }.getOrElse {
+                pixel.fire(AUTOFILL_PREFERENCES_UPDATE_KEY_FAILED, mapOf("error" to it.javaClass.name))
+            }
+
+            if (autofillFeature.useHarmony().isEnabled()) {
+                runCatching {
+                    getHarmonyEncryptedPreferences()?.edit(commit = true) {
+                        if (keyValue == null) {
+                            remove(keyName)
+                        } else {
+                            putString(keyName, keyValue.toByteString().base64())
+                        }
+                    }
+                }.getOrElse {
+                    pixel.fire(AUTOFILL_HARMONY_PREFERENCES_UPDATE_KEY_FAILED, mapOf("error" to it.javaClass.name))
                 }
             }
         }
@@ -146,13 +158,24 @@ class RealSecureStorageKeyStore constructor(
 
     override suspend fun getKey(keyName: String): ByteArray? {
         return withContext(dispatcherProvider.io()) {
-            val preferences = if (autofillFeature.useHarmony().isEnabled()) {
+            val useHarmony = autofillFeature.useHarmony().isEnabled()
+            val preferences = if (useHarmony) {
                 getHarmonyEncryptedPreferences()
             } else {
                 getEncryptedPreferences()
             }
-            return@withContext preferences?.getString(keyName, null)?.run {
-                this.decodeBase64()?.toByteArray()
+            return@withContext runCatching {
+                preferences?.getString(keyName, null)?.run {
+                    this.decodeBase64()?.toByteArray()
+                }
+            }.getOrElse {
+                val pixelName = if (useHarmony) {
+                    AUTOFILL_HARMONY_PREFERENCES_GET_KEY_FAILED
+                } else {
+                    AUTOFILL_PREFERENCES_GET_KEY_FAILED
+                }
+                pixel.fire(pixelName, mapOf("error" to it.javaClass.name))
+                null
             }
         }
     }
