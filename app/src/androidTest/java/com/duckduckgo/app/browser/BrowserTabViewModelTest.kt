@@ -747,7 +747,7 @@ class BrowserTabViewModelTest {
 
             fakeContentScopeScriptsSubscriptionEventPluginPoint = FakeContentScopeScriptsSubscriptionEventPluginPoint()
 
-            whenever(mockDuckChat.getDuckChatUrl(any(), any())).thenReturn(duckChatURL)
+            whenever(mockDuckChat.getDuckChatUrl(any(), any(), any())).thenReturn(duckChatURL)
             whenever(mockSyncStatusChangedObserver.syncStatusChangedEvents).thenReturn(syncStatusChangedEventsFlow)
 
             initialiseViewModel()
@@ -6804,7 +6804,7 @@ class BrowserTabViewModelTest {
     fun whenOnDuckChatOmnibarButtonClickedAndFullScreenModeThenOpenChatNotCalled() = runTest {
         val duckAIUrl = "https://duckduckgo.com/?q=test"
         mockDuckAiFeatureStateFullScreenModeFlow.emit(true)
-        whenever(mockDuckChat.getDuckChatUrl(any(), any())).thenReturn(duckAIUrl)
+        whenever(mockDuckChat.getDuckChatUrl(any(), any(), any())).thenReturn(duckAIUrl)
         whenever(mockOmnibarConverter.convertQueryToUrl(duckAIUrl, null)).thenReturn(duckAIUrl)
 
         testee.onDuckChatOmnibarButtonClicked(query = "example", hasFocus = false, isNtp = true)
@@ -8584,7 +8584,7 @@ class BrowserTabViewModelTest {
         mockDuckAiContextualModeFlow.emit(true)
         mockDuckAiFeatureStateFullScreenModeFlow.emit(true)
 
-        whenever(mockDuckChat.getDuckChatUrl(any(), any())).thenReturn(duckAIUrl)
+        whenever(mockDuckChat.getDuckChatUrl(any(), any(), any())).thenReturn(duckAIUrl)
         whenever(mockOmnibarConverter.convertQueryToUrl(duckAIUrl, null)).thenReturn(duckAIUrl)
 
         testee.onDuckChatOmnibarButtonClicked(query = "example", hasFocus = false, isNtp = true)
