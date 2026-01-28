@@ -23,6 +23,7 @@ import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.api.AutofillFeature
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_HARMONY_PREFERENCES_RETRIEVAL_FAILED
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
@@ -82,6 +83,7 @@ class RealSecureStorageKeyStore constructor(
                     )
                 }
             } catch (e: Exception) {
+                pixel.fire(AutofillPixelNames.AUTOFILL_PREFERENCES_RETRIEVAL_FAILED, mapOf("error" to e.javaClass.name))
                 null
             }
         }
@@ -94,7 +96,6 @@ class RealSecureStorageKeyStore constructor(
                     if (autofillFeature.useHarmony().isEnabled()) {
                         sharedPreferencesProvider.getMigratedEncryptedSharedPreferences(FILENAME).also {
                             if (it == null) {
-                                pixel.fire(AUTOFILL_HARMONY_PREFERENCES_RETRIEVAL_FAILED)
                                 logcat { "autofill harmony preferences retrieval returned null" }
                             }
                         }
@@ -103,7 +104,7 @@ class RealSecureStorageKeyStore constructor(
                     }
                 }
             } catch (e: Exception) {
-                pixel.fire(AUTOFILL_HARMONY_PREFERENCES_RETRIEVAL_FAILED)
+                pixel.fire(AUTOFILL_HARMONY_PREFERENCES_RETRIEVAL_FAILED, mapOf("error" to e.javaClass.name))
                 logcat { "autofill harmony preferences retrieval failed: $e" }
                 null
             }

@@ -227,6 +227,7 @@ enum class AutofillPixelNames(override val pixelName: String) : Pixel.PixelName 
     PRODUCT_TELEMETRY_SURFACE_PASSWORDS_OPENED("m_product_telemetry_surface_usage_passwords_page"),
     PRODUCT_TELEMETRY_SURFACE_PASSWORDS_OPENED_DAILY("m_product_telemetry_surface_usage_passwords_page_daily"),
     AUTOFILL_HARMONY_PREFERENCES_RETRIEVAL_FAILED("autofill_harmony_preferences_retrieval_failed"),
+    AUTOFILL_PREFERENCES_RETRIEVAL_FAILED("autofill_preferences_retrieval_failed"),
 }
 
 object AutofillPixelParameters {
