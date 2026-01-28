@@ -211,6 +211,7 @@ class BrokenSitesMultipleReportReferenceTest(private val testCase: MultipleRepor
                 jsPerformance = null,
                 contentScopeExperiments = null,
                 debugFlags = null,
+                breakageData = report.breakageData,
             )
 
             testee.submitBrokenSiteFeedback(brokenSite, toggle = false)
@@ -279,6 +280,7 @@ class BrokenSitesMultipleReportReferenceTest(private val testCase: MultipleRepor
         val remoteConfigEtag: String?,
         val remoteConfigVersion: String?,
         val lastSentDay: String?,
+        val breakageData: String?,
     )
 
     data class UrlParam(

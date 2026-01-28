@@ -639,6 +639,34 @@ class BrokenSiteSubmitterTest {
         assertEquals("flag1,flag2", params["debugFlags"])
     }
 
+    @Test
+    fun whenBreakageDataIsNullThenEncodedParamsDoNotContainIt() = runTest {
+        val brokenSite = getBrokenSite()
+
+        testee.submitBrokenSiteFeedback(brokenSite, toggle = false)
+
+        val encodedParamsCaptor = argumentCaptor<Map<String, String>>()
+        verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), any(), encodedParamsCaptor.capture(), eq(Count))
+        val encodedParams = encodedParamsCaptor.firstValue
+
+        assertFalse(encodedParams.containsKey("breakageData"))
+    }
+
+    @Test
+    fun whenBreakageDataExistsThenItIsIncludedInEncodedParams() = runTest {
+        // Pre-encoded breakage data from content-scope-scripts
+        val preEncodedBreakageData = "%7B%22test%22%3A%22value%22%7D"
+        val brokenSite = getBrokenSite().copy(breakageData = preEncodedBreakageData)
+
+        testee.submitBrokenSiteFeedback(brokenSite, toggle = false)
+
+        val encodedParamsCaptor = argumentCaptor<Map<String, String>>()
+        verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), any(), encodedParamsCaptor.capture(), eq(Count))
+        val encodedParams = encodedParamsCaptor.firstValue
+
+        assertEquals(preEncodedBreakageData, encodedParams["breakageData"])
+    }
+
     private fun assignToExperiment() {
         val enrollmentDateET = ZonedDateTime.now(ZoneId.of("America/New_York")).toString()
         testBlockListFeature.tdsNextExperimentTest().setRawStoredState(
@@ -674,6 +702,7 @@ class BrokenSiteSubmitterTest {
             jsPerformance = null,
             contentScopeExperiments = null,
             debugFlags = null,
+            breakageData = null,
         )
     }
 
