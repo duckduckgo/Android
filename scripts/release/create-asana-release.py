@@ -385,11 +385,8 @@ def main():
         
         log(f"Using tag {start_tag} as start commit")
 
-        # For public releases, get commits up to main; for internal, use the tag
-        end_ref = "main" if is_public_release else args.tag
-
         # Get commits between the tags
-        commits = get_commits_between(args.android_repo_path, start_tag, end_ref)
+        commits = get_commits_between(args.android_repo_path, start_tag, args.tag)
         
         log(f"Extracting task links from {len(commits)} commits")
         # Extract Asana task links from commit messages
