@@ -39,3 +39,18 @@ fun View.setupThemedComposeView(
         }
     }
 }
+
+/**
+ * Helper to setup a ComposeView and properly handle its lifecycle.
+ */
+fun ComposeView.setupThemedComposeView(
+    isDarkTheme: Boolean,
+    content: @Composable () -> Unit,
+) {
+    setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+    setContent {
+        DuckDuckGoTheme(isDarkTheme) {
+            content()
+        }
+    }
+}
