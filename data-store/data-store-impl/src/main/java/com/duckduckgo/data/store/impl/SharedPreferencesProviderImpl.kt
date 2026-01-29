@@ -219,8 +219,9 @@ class SharedPreferencesProviderImpl @Inject constructor(
                 )
                 return@withContext null
             }
-            runCatching {
-                if (destination.getBoolean(MIGRATED_TO_HARMONY, false)) return@runCatching destination
+
+            val alreadyMigrated = runCatching {
+                destination.getBoolean(MIGRATED_TO_HARMONY, false)
             }.getOrElse {
                 pixel.fire(
                     DATA_STORE_MIGRATE_ENCRYPTED_QUERY_PREFERENCES_DESTINATION_FAILED,
@@ -229,6 +230,8 @@ class SharedPreferencesProviderImpl @Inject constructor(
                 )
                 return@withContext null
             }
+
+            if (alreadyMigrated) return@withContext destination
 
             val origin = runCatching {
                 EncryptedSharedPreferences.create(
