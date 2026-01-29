@@ -52,6 +52,13 @@ class TabSwitcherItemDiffCallback(
                     oldItem.tabEntity.url == newItem.tabEntity.url &&
                     (oldItem as? SelectableTab)?.isSelected == (newItem as? SelectableTab)?.isSelected
             }
+            oldItem is TabSwitcherItem.TabGroup && newItem is TabSwitcherItem.TabGroup -> {
+                oldItem.groupName == newItem.groupName &&
+                    oldItem.totalTabsCount == newItem.totalTabsCount &&
+                    oldItem.previewTabs.map { it.tabPreviewFile } == newItem.previewTabs.map { it.tabPreviewFile } &&
+                    (oldItem as? TabSwitcherItem.TabGroup.SelectableTabGroup)?.isSelected ==
+                    (newItem as? TabSwitcherItem.TabGroup.SelectableTabGroup)?.isSelected
+            }
             else -> false
         }
     }
@@ -89,6 +96,11 @@ class TabSwitcherItemDiffCallback(
                     DIFF_ALPHA,
                     if (isDragging) ANIMATED_TILE_NO_REPLACE_ALPHA else ANIMATED_TILE_DEFAULT_ALPHA,
                 )
+            }
+            oldItem is TabSwitcherItem.TabGroup && newItem is TabSwitcherItem.TabGroup -> {
+                if (oldItem.previewTabs.map { it.tabPreviewFile } != newItem.previewTabs.map { it.tabPreviewFile }) {
+                    diffBundle.putBoolean(DIFF_KEY_GROUP_PREVIEWS, true)
+                }
             }
         }
 
@@ -134,5 +146,6 @@ class TabSwitcherItemDiffCallback(
         const val DIFF_KEY_VIEWED = "viewed"
         const val DIFF_ALPHA = "alpha"
         const val DIFF_KEY_SELECTION = "selection"
+        const val DIFF_KEY_GROUP_PREVIEWS = "groupPreviews"
     }
 }

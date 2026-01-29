@@ -43,6 +43,7 @@ fun Menu.createDynamicInterface(
     popupMenu.selectionActionsDivider.isVisible = dynamicMenu.isSelectionActionsDividerVisible
     popupMenu.shareSelectedLinksMenuItem.isVisible = dynamicMenu.isShareSelectedLinksVisible
     popupMenu.bookmarkSelectedTabsMenuItem.isVisible = dynamicMenu.isBookmarkSelectedTabsVisible
+    popupMenu.groupTabsMenuItem.isVisible = dynamicMenu.isGroupTabsVisible
     popupMenu.selectTabsDivider.isVisible = dynamicMenu.isSelectTabsDividerVisible
     popupMenu.selectTabsMenuItem.isVisible = dynamicMenu.isSelectTabsVisible
     popupMenu.closeSelectedTabsMenuItem.isVisible = dynamicMenu.isCloseSelectedTabsVisible
@@ -55,6 +56,9 @@ fun Menu.createDynamicInterface(
     }
     popupMenu.bookmarkSelectedTabsMenuItem.apply {
         setPrimaryText(resources.getQuantityString(R.plurals.bookmarkTabsMenuItem, numSelectedTabs, numSelectedTabs))
+    }
+    popupMenu.groupTabsMenuItem.apply {
+        setPrimaryText(resources.getQuantityString(R.plurals.groupTabsMenuItem, numSelectedTabs, numSelectedTabs))
     }
     popupMenu.closeSelectedTabsMenuItem.apply {
         setPrimaryText(resources.getQuantityString(R.plurals.closeTabsMenuItem, numSelectedTabs, numSelectedTabs))

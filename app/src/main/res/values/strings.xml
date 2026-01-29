@@ -721,6 +721,16 @@
         <item quantity="one">Bookmark Tab</item>
         <item quantity="other">Bookmark %1$d Tabs</item>
     </plurals>
+    <plurals name="groupTabsMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Group Tab</item>
+        <item quantity="other">Group Tabs</item>
+    </plurals>
+    <string name="createTabGroupDialogTitle">Create Tab Group</string>
+    <string name="createTabGroupDialogPositiveButton">Create</string>
+    <string name="tabGroupNameHint">Group name</string>
+    <string name="tabGroupMenuContentDescription">Tab group menu</string>
+    <string name="ungroupTabsMenuItem">Ungroup Tabs</string>
+    <string name="removeFromGroup">Remove from group</string>
     <string name="tabSwitcherBookmarkDialogDescription">Existing bookmarks will not be duplicated.</string>
 
     <plurals name="tabSwitcherCloseAllTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">

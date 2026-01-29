@@ -34,9 +34,16 @@ import java.time.LocalDateTime
             onDelete = ForeignKey.SET_NULL,
             onUpdate = ForeignKey.SET_NULL,
         ),
+        ForeignKey(
+            entity = TabGroupEntity::class,
+            parentColumns = ["groupId"],
+            childColumns = ["groupId"],
+            onDelete = ForeignKey.SET_NULL,
+        ),
     ],
     indices = [
         Index("tabId"),
+        Index("groupId"),
     ],
 )
 data class TabEntity(
@@ -50,6 +57,7 @@ data class TabEntity(
     val sourceTabId: String? = null,
     val deletable: Boolean = false,
     val lastAccessTime: LocalDateTime? = null,
+    val groupId: String? = null,
 )
 
 val TabEntity.isBlank: Boolean

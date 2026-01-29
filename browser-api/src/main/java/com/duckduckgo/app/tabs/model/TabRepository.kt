@@ -139,4 +139,33 @@ interface TabRepository {
      * @return the number of tabs that are inactive
      */
     fun countTabsAccessedWithinRange(accessOlderThan: Long, accessNotMoreThan: Long? = null): Int
+
+    /**
+     * Creates a new tab group and assigns the specified tabs to it.
+     * @param name the name of the group
+     * @param tabIds the IDs of the tabs to assign to the group
+     * @return the ID of the created group
+     */
+    suspend fun createGroupAndAssignTabs(name: String, tabIds: List<String>): String
+
+    /**
+     * Removes tabs from their group (sets groupId to null).
+     * Also deletes the group if it becomes empty.
+     * @param tabIds the IDs of the tabs to remove from their groups
+     */
+    suspend fun removeTabsFromGroup(tabIds: List<String>)
+
+    /**
+     * Ungroups all tabs in a group (sets groupId to null for all tabs in the group).
+     * The group is automatically deleted since it becomes empty.
+     * @param groupId the ID of the group to ungroup
+     */
+    suspend fun ungroupAllTabsInGroup(groupId: String)
+
+    /**
+     * Adds a tab to an existing group.
+     * @param tabId the ID of the tab to add
+     * @param groupId the ID of the group to add the tab to
+     */
+    suspend fun addTabToGroup(tabId: String, groupId: String)
 }

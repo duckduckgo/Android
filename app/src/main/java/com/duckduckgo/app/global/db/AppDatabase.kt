@@ -55,9 +55,11 @@ import com.duckduckgo.app.statistics.model.QueryParamsTypeConverter
 import com.duckduckgo.app.statistics.store.PendingPixelDao
 import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
+import com.duckduckgo.app.tabs.db.TabGroupsDao
 import com.duckduckgo.app.tabs.db.TabsDao
 import com.duckduckgo.app.tabs.model.LocalDateTimeTypeConverter
 import com.duckduckgo.app.tabs.model.TabEntity
+import com.duckduckgo.app.tabs.model.TabGroupEntity
 import com.duckduckgo.app.tabs.model.TabSelectionEntity
 import com.duckduckgo.app.trackerdetection.db.*
 import com.duckduckgo.app.trackerdetection.model.*
@@ -73,7 +75,7 @@ import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
 
 @Database(
     exportSchema = true,
-    version = 60,
+    version = 61,
     entities = [
         TdsTracker::class,
         TdsEntity::class,
@@ -84,6 +86,7 @@ import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
         SitesVisitedEntity::class,
         TabEntity::class,
         TabSelectionEntity::class,
+        TabGroupEntity::class,
         BookmarkEntity::class,
         FavoriteEntity::class,
         BookmarkFolderEntity::class,
@@ -133,6 +136,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun userAllowListDao(): UserAllowListDao
     abstract fun networkLeaderboardDao(): NetworkLeaderboardDao
     abstract fun tabsDao(): TabsDao
+    abstract fun tabGroupsDao(): TabGroupsDao
     abstract fun bookmarksDao(): BookmarksDao
     abstract fun favoritesDao(): FavoritesDao
     abstract fun bookmarkFoldersDao(): BookmarkFoldersDao
@@ -708,6 +712,54 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
         }
     }
 
+    private val MIGRATION_60_TO_61: Migration = object : Migration(60, 61) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            // Create tab_groups table first (referenced by foreign key)
+            database.execSQL(
+                "CREATE TABLE IF NOT EXISTS `tab_groups` (" +
+                    "`groupId` TEXT NOT NULL, " +
+                    "`name` TEXT NOT NULL, " +
+                    "PRIMARY KEY(`groupId`))",
+            )
+
+            // SQLite does not support adding foreign keys via ALTER TABLE
+            // Must recreate the table with the new foreign key
+            database.execSQL(
+                "CREATE TABLE IF NOT EXISTS `tabs_new` (" +
+                    "`tabId` TEXT NOT NULL, " +
+                    "`url` TEXT, " +
+                    "`title` TEXT, " +
+                    "`skipHome` INTEGER NOT NULL, " +
+                    "`viewed` INTEGER NOT NULL, " +
+                    "`position` INTEGER NOT NULL, " +
+                    "`tabPreviewFile` TEXT, " +
+                    "`sourceTabId` TEXT, " +
+                    "`deletable` INTEGER NOT NULL, " +
+                    "`lastAccessTime` TEXT, " +
+                    "`groupId` TEXT, " +
+                    "PRIMARY KEY(`tabId`), " +
+                    "FOREIGN KEY(`sourceTabId`) REFERENCES `tabs`(`tabId`) ON UPDATE SET NULL ON DELETE SET NULL, " +
+                    "FOREIGN KEY(`groupId`) REFERENCES `tab_groups`(`groupId`) ON DELETE SET NULL)",
+            )
+
+            // Copy data from old table
+            database.execSQL(
+                "INSERT INTO `tabs_new` (`tabId`, `url`, `title`, `skipHome`, `viewed`, `position`, " +
+                    "`tabPreviewFile`, `sourceTabId`, `deletable`, `lastAccessTime`) " +
+                    "SELECT `tabId`, `url`, `title`, `skipHome`, `viewed`, `position`, " +
+                    "`tabPreviewFile`, `sourceTabId`, `deletable`, `lastAccessTime` FROM `tabs`",
+            )
+
+            // Drop old table and rename new one
+            database.execSQL("DROP TABLE `tabs`")
+            database.execSQL("ALTER TABLE `tabs_new` RENAME TO `tabs`")
+
+            // Recreate indices
+            database.execSQL("CREATE INDEX IF NOT EXISTS `index_tabs_tabId` ON `tabs` (`tabId`)")
+            database.execSQL("CREATE INDEX IF NOT EXISTS `index_tabs_groupId` ON `tabs` (`groupId`)")
+        }
+    }
+
     /**
      * WARNING ⚠️
      * This needs to happen because Room doesn't support UNIQUE (...) ON CONFLICT REPLACE when creating the bookmarks table.
@@ -793,6 +845,7 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
             MIGRATION_57_TO_58,
             MIGRATION_58_TO_59,
             MIGRATION_59_TO_60,
+            MIGRATION_60_TO_61,
         )
 
     @Deprecated(

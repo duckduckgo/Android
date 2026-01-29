@@ -39,6 +39,8 @@ class TabTouchHelper(
     private val onTabMoved: (Int, Int) -> Unit,
     private val onTabDraggingStarted: () -> Unit,
     private val onTabDraggingFinished: () -> Unit,
+    private val onTabDroppedOnGroup: (tabPosition: Int, groupPosition: Int) -> Unit,
+    private val onTabDroppedOnTab: (draggedTabPosition: Int, targetTabPosition: Int) -> Unit,
 ) : ItemTouchHelper.SimpleCallback(
     /* dragDirs = */
     ItemTouchHelper.START or ItemTouchHelper.END or ItemTouchHelper.UP or ItemTouchHelper.DOWN,
@@ -46,6 +48,9 @@ class TabTouchHelper(
     ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT,
 ) {
     var mode: Mode = Mode.Normal
+
+    // Track the currently hovered drop target (group or tab) for visual feedback
+    private var hoveredDropTargetViewHolder: ViewHolder? = null
 
     override fun onSwiped(viewHolder: ViewHolder, direction: Int) {
         onTabSwiped(viewHolder.bindingAdapterPosition)
@@ -64,14 +69,72 @@ class TabTouchHelper(
             val alpha = 1 - (abs(dX) / (recyclerView.width / numberGridColumns))
             viewHolder.itemView.alpha = MathUtils.clamp(alpha, 0f, 1f)
         }
+
+        if (actionState == ACTION_STATE_DRAG && isCurrentlyActive) {
+            val itemView = viewHolder.itemView
+            val draggedCenterX = itemView.left + itemView.width / 2 + dX
+            val draggedCenterY = itemView.top + itemView.height / 2 + dY
+
+            // Find drop target (group has priority over tab)
+            var foundTarget: ViewHolder? = null
+            for (i in 0 until recyclerView.childCount) {
+                val child = recyclerView.getChildAt(i)
+                val holder = recyclerView.getChildViewHolder(child)
+                if (holder != viewHolder && holder.isValidDropTarget()) {
+                    if (draggedCenterX >= child.left && draggedCenterX <= child.right &&
+                        draggedCenterY >= child.top && draggedCenterY <= child.bottom
+                    ) {
+                        // Prefer group over tab if both overlap
+                        if (holder.isTabGroupViewHolder()) {
+                            foundTarget = holder
+                            break
+                        } else if (foundTarget == null) {
+                            foundTarget = holder
+                        }
+                    }
+                }
+            }
+
+            if (foundTarget != hoveredDropTargetViewHolder) {
+                resetHoveredDropTarget()
+                if (foundTarget != null) {
+                    hoveredDropTargetViewHolder = foundTarget
+                    animateHover(foundTarget.itemView, SCALE_HOVER)
+                }
+            }
+        }
+
         super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
     }
 
     override fun onMove(recyclerView: RecyclerView, viewHolder: ViewHolder, target: ViewHolder): Boolean {
+        // Prevent moving tabs to a tab group position
+        if (target.isTabGroupViewHolder()) {
+            return false
+        }
+
         val from = viewHolder.bindingAdapterPosition
         val to = target.bindingAdapterPosition
         onTabMoved(from, to)
         return true
+    }
+
+    private fun resetHoveredDropTarget() {
+        hoveredDropTargetViewHolder?.let { holder ->
+            animateHover(holder.itemView, SCALE_NORMAL)
+        }
+        hoveredDropTargetViewHolder = null
+    }
+
+    private fun animateHover(view: View, scaleTo: Float) {
+        AnimatorSet().apply {
+            duration = ANIM_DURATION
+            interpolator = AccelerateDecelerateInterpolator()
+            playTogether(
+                getScaleXAnimator(view, scaleTo),
+                getScaleYAnimator(view, scaleTo),
+            )
+        }.start()
     }
 
     /*
@@ -104,6 +167,20 @@ class TabTouchHelper(
     override fun clearView(recyclerView: RecyclerView, viewHolder: ViewHolder) {
         super.clearView(recyclerView, viewHolder)
 
+        // Handle drop on target
+        hoveredDropTargetViewHolder?.let { targetHolder ->
+            val draggedPosition = viewHolder.bindingAdapterPosition
+            val targetPosition = targetHolder.bindingAdapterPosition
+            if (draggedPosition != RecyclerView.NO_POSITION && targetPosition != RecyclerView.NO_POSITION) {
+                when {
+                    targetHolder.isTabGroupViewHolder() -> onTabDroppedOnGroup(draggedPosition, targetPosition)
+                    targetHolder.isTabViewHolder() -> onTabDroppedOnTab(draggedPosition, targetPosition)
+                }
+            }
+        }
+
+        resetHoveredDropTarget()
+
         // Clear alpha, scale and elevation after drag/swipe
         (viewHolder.itemView as? CardView)?.also {
             AnimatorSet().apply {
@@ -127,7 +204,7 @@ class TabTouchHelper(
         recyclerView: RecyclerView,
         viewHolder: ViewHolder,
     ): Int {
-        if (viewHolder.isTabAnimatedTabViewHolder() || mode is Mode.Selection) {
+        if (viewHolder.isTabAnimatedTabViewHolder() || viewHolder.isTabGroupViewHolder() || mode is Mode.Selection) {
             return 0
         }
         return super.getMovementFlags(recyclerView, viewHolder)
@@ -155,6 +232,15 @@ class TabTouchHelper(
     private fun ViewHolder?.isTabAnimatedTabViewHolder(): Boolean =
         this is TabSwitcherAdapter.TabSwitcherViewHolder.TrackerAnimationInfoPanelViewHolder
 
+    private fun ViewHolder?.isTabGroupViewHolder(): Boolean =
+        this is TabSwitcherAdapter.TabSwitcherViewHolder.TabGroupViewHolder
+
+    private fun ViewHolder?.isTabViewHolder(): Boolean =
+        this is TabSwitcherAdapter.TabSwitcherViewHolder.GridTabViewHolder
+
+    private fun ViewHolder?.isValidDropTarget(): Boolean =
+        isTabGroupViewHolder() || isTabViewHolder()
+
     companion object {
         private const val ANIM_DURATION = 100L
 
@@ -163,5 +249,6 @@ class TabTouchHelper(
 
         private const val SCALE_DRAG = 0.8f
         private const val SCALE_NORMAL = 1f
+        private const val SCALE_HOVER = 0.9f
     }
 }

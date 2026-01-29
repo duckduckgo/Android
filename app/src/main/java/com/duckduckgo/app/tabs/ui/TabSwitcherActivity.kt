@@ -24,6 +24,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.MotionEvent
 import android.view.View
+import android.widget.EditText
 import android.widget.FrameLayout
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatDelegate.FEATURE_SUPPORT_ACTION_BAR
@@ -41,6 +42,7 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.api.OmnibarRepository
 import com.duckduckgo.app.browser.databinding.ActivityTabSwitcherBinding
+import com.duckduckgo.app.browser.databinding.PopupTabGroupMenuBinding
 import com.duckduckgo.app.browser.databinding.PopupTabsMenuBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarObserver
@@ -63,6 +65,7 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.CloseAllTabsReque
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.CloseAndShowUndoMessage
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.CloseTabsRequest
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.DismissAnimatedTileDismissalDialog
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.GroupTabsRequest
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.ShareLink
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.ShareLinks
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.ShowAnimatedTileDismissalDialog
@@ -84,6 +87,7 @@ import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.collectLatest
@@ -181,6 +185,10 @@ class TabSwitcherActivity :
         }
     }
 
+    private val tabGroupPopupMenu by lazy {
+        PopupMenu(layoutInflater, R.layout.popup_tab_group_menu)
+    }
+
     private val snackbarAnchorView by lazy {
         when (settingsDataStore.omnibarType) {
             OmnibarType.SINGLE_BOTTOM -> {
@@ -190,6 +198,7 @@ class TabSwitcherActivity :
             OmnibarType.SINGLE_TOP -> {
                 null
             }
+
             OmnibarType.SPLIT -> {
                 binding.navigationBar
             }
@@ -204,6 +213,18 @@ class TabSwitcherActivity :
 
         tabsAdapter.setAnimationTileCloseClickListener {
             viewModel.onTrackerAnimationInfoPanelClicked()
+        }
+
+        tabsAdapter.setTabGroupSelectionListener { tabIds ->
+            viewModel.onGroupSelected(tabIds)
+        }
+
+        tabsAdapter.setTabGroupMenuClickListener { groupId, anchorView ->
+            showTabGroupMenu(groupId, anchorView)
+        }
+
+        tabsAdapter.setTabGroupClickListener { groupId ->
+            showTabGroupDetailsDialog(groupId)
         }
 
         extractIntentExtras()
@@ -258,9 +279,11 @@ class TabSwitcherActivity :
             OmnibarType.SINGLE_TOP -> {
                 binding.root.removeView(binding.tabSwitcherToolbarBottom.root)
             }
+
             OmnibarType.SINGLE_BOTTOM -> {
                 binding.root.removeView(binding.tabSwitcherToolbarTop.root)
             }
+
             OmnibarType.SPLIT -> {
                 binding.root.removeView(binding.tabSwitcherToolbarBottom.root)
             }
@@ -285,6 +308,8 @@ class TabSwitcherActivity :
                 onTabMoved = this::onTabMoved,
                 onTabDraggingStarted = this::onTabDraggingStarted,
                 onTabDraggingFinished = this::onTabDraggingFinished,
+                onTabDroppedOnGroup = this::onTabDroppedOnGroup,
+                onTabDroppedOnTab = this::onTabDroppedOnTab,
             )
 
         val swipeListener = ItemTouchHelper(tabTouchHelper)
@@ -384,7 +409,7 @@ class TabSwitcherActivity :
                 tabsRecycler.invalidateItemDecorations()
                 tabsAdapter.updateData(it.tabSwitcherItems)
 
-                updateToolbarTitle(it.mode, it.tabs.size)
+                updateToolbarTitle(it.mode, it.tabsCount)
                 updateTabGridItemDecorator()
 
                 tabTouchHelper.mode = it.mode
@@ -422,6 +447,7 @@ class TabSwitcherActivity :
                 val gridLayoutManager = getGridLayoutManager(columnCount)
                 tabsRecycler.layoutManager = gridLayoutManager
             }
+
             LayoutType.LIST -> {
                 tabsRecycler.layoutManager = LinearLayoutManager(this@TabSwitcherActivity)
             }
@@ -515,6 +541,7 @@ class TabSwitcherActivity :
             Close -> {
                 finishAfterTransition()
             }
+
             is CloseAndShowUndoMessage -> {
                 skipTabPurge = true
                 setResult(
@@ -525,10 +552,12 @@ class TabSwitcherActivity :
                 )
                 finishAfterTransition()
             }
+
             is CloseAllTabsRequest -> showCloseAllTabsConfirmation(command.numTabs)
             is ShareLinks -> launchShareMultipleLinkChooser(command.links)
             is ShareLink -> launchShareLinkChooser(command.link, command.title)
             is BookmarkTabsRequest -> showBookmarkTabsConfirmation(command.tabIds)
+            is GroupTabsRequest -> showCreateGroupDialog(command.tabIds)
             is ShowUndoBookmarkMessage -> showBookmarkSnackbarWithUndo(command.numBookmarks)
             is CloseTabsRequest -> showCloseSelectedTabsConfirmation(command.tabIds, command.isClosingOtherTabs)
             is ShowUndoDeleteTabsMessage -> showTabsDeletedSnackbar(command.tabIds)
@@ -576,6 +605,7 @@ class TabSwitcherActivity :
         popupMenu.onMenuItemClicked(popupMenu.contentView.findViewById(R.id.deselectAllMenuItem)) { viewModel.onDeselectAllTabs() }
         popupMenu.onMenuItemClicked(popupMenu.contentView.findViewById(R.id.shareSelectedLinksMenuItem)) { viewModel.onShareSelectedTabs() }
         popupMenu.onMenuItemClicked(popupMenu.contentView.findViewById(R.id.bookmarkSelectedTabsMenuItem)) { viewModel.onBookmarkSelectedTabs() }
+        popupMenu.onMenuItemClicked(popupMenu.contentView.findViewById(R.id.groupTabsMenuItem)) { viewModel.onGroupSelectedTabs() }
         popupMenu.onMenuItemClicked(popupMenu.contentView.findViewById(R.id.selectTabsMenuItem)) { viewModel.onSelectionModeRequested() }
         popupMenu.onMenuItemClicked(popupMenu.contentView.findViewById(R.id.closeSelectedTabsMenuItem)) {
             viewModel.onCloseSelectedTabsRequested(
@@ -604,6 +634,37 @@ class TabSwitcherActivity :
         val anchorView = findViewById<View>(itemId)
         popupMenu.show(binding.root, anchorView)
         viewModel.onMenuOpened()
+    }
+
+    private fun showTabGroupMenu(groupId: String, anchorView: View) {
+        val popupBinding = PopupTabGroupMenuBinding.bind(tabGroupPopupMenu.contentView)
+        tabGroupPopupMenu.onMenuItemClicked(popupBinding.ungroupTabsMenuItem) {
+            viewModel.onUngroupTabs(groupId)
+        }
+        tabGroupPopupMenu.show(binding.root, anchorView)
+    }
+
+    private fun showTabGroupDetailsDialog(groupId: String) {
+        val tabGroup = tabsAdapter.getTabGroup(groupId) ?: return
+        TabGroupDetailsDialog(
+            context = this,
+            tabGroupWithTabs = tabGroup.tabGroupWithTabs,
+            faviconManager = faviconManager,
+            webViewPreviewPersister = webViewPreviewPersister,
+            coroutineScope = lifecycleScope,
+            dispatchers = dispatchers,
+            onTabSelected = { tabId ->
+                launch {
+                    viewModel.onTabSelected(tabId)
+                }
+            },
+            onTabClosed = { tabId ->
+                viewModel.onCloseTabFromGroupDialog(tabId)
+            },
+            onTabRemovedFromGroup = { tabId ->
+                viewModel.onRemoveTabFromGroup(tabId)
+            },
+        ).show()
     }
 
     override fun onMenuOpened(
@@ -647,6 +708,8 @@ class TabSwitcherActivity :
                 is Tab -> {
                     viewModel.onTabCloseInNormalModeRequested(tab, swipeGestureUsed = deletedBySwipe)
                 }
+
+                is TabSwitcherItem.TabGroup -> {}
                 is TrackersAnimationInfoPanel -> Unit
             }
         }
@@ -682,6 +745,18 @@ class TabSwitcherActivity :
         tabsAdapter.onDraggingFinished()
 
         tabsRecycler.addItemDecoration(tabItemDecorator)
+    }
+
+    private fun onTabDroppedOnGroup(tabPosition: Int, groupPosition: Int) {
+        val tabItem = tabsAdapter.getTabSwitcherItem(tabPosition) as? Tab ?: return
+        val groupItem = tabsAdapter.getTabSwitcherItem(groupPosition) as? TabSwitcherItem.TabGroup ?: return
+        viewModel.onTabDroppedOnGroup(tabItem.id, groupItem.id)
+    }
+
+    private fun onTabDroppedOnTab(draggedTabPosition: Int, targetTabPosition: Int) {
+        val draggedTab = tabsAdapter.getTabSwitcherItem(draggedTabPosition) as? Tab ?: return
+        val targetTab = tabsAdapter.getTabSwitcherItem(targetTabPosition) as? Tab ?: return
+        viewModel.onTabsDroppedToCreateGroup(draggedTab.id, targetTab.id)
     }
 
     private fun showTabDeletedSnackbar(tab: TabEntity) {
@@ -855,6 +930,25 @@ class TabSwitcherActivity :
                     }
                 },
             ).show()
+    }
+
+    private fun showCreateGroupDialog(tabIds: List<String>) {
+        val editText = EditText(this).apply {
+            hint = getString(R.string.tabGroupNameHint)
+            setPadding(48, 32, 48, 32)
+        }
+
+        MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.createTabGroupDialogTitle)
+            .setView(editText)
+            .setPositiveButton(R.string.createTabGroupDialogPositiveButton) { _, _ ->
+                val groupName = editText.text.toString().trim()
+                if (groupName.isNotEmpty()) {
+                    viewModel.onGroupTabsConfirmed(groupName, tabIds)
+                }
+            }
+            .setNegativeButton(R.string.cancel, null)
+            .show()
     }
 
     private fun showAnimatedTileDismissalDialog() {

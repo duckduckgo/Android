@@ -32,14 +32,18 @@ import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.tabs.model.TabEntity
+import com.duckduckgo.app.tabs.model.TabGroupsDelegate
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType.GRID
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType.LIST
+import com.duckduckgo.app.tabs.model.TabsWithGroups
 import com.duckduckgo.app.tabs.store.TabSwitcherDataStore
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.NormalTab
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.SelectableTab
+import com.duckduckgo.app.tabs.ui.TabSwitcherItem.TabGroup.NormalTabGroup
+import com.duckduckgo.app.tabs.ui.TabSwitcherItem.TabGroup.SelectableTabGroup
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.TrackersAnimationInfoPanel
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.TrackersAnimationInfoPanel.Companion.TRACKER_ANIMATION_PANEL_ID
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.BookmarkTabsRequest
@@ -84,6 +88,7 @@ import kotlin.time.Duration.Companion.milliseconds
 @ContributesViewModel(ActivityScope::class)
 class TabSwitcherViewModel @Inject constructor(
     private val tabRepository: TabRepository,
+    private val tabGroupsDelegate: TabGroupsDelegate,
     private val dispatcherProvider: DispatcherProvider,
     private val pixel: Pixel,
     private val swipingTabsFeature: SwipingTabsFeatureProvider,
@@ -103,16 +108,16 @@ class TabSwitcherViewModel @Inject constructor(
 
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
-    private val tabSwitcherItemsFlow = tabRepository.flowTabs
+    private val tabSwitcherItemsFlow = tabGroupsDelegate.getTabsWithGroups()
         .debounce(100.milliseconds)
         .conflate()
-        .flatMapLatest { tabEntities ->
+        .flatMapLatest { tabsWithGroups ->
             combine(
                 tabRepository.flowSelectedTab,
                 _viewState,
                 tabSwitcherDataStore.isTrackersAnimationInfoTileHidden(),
             ) { activeTab, viewState, isAnimationTileDismissed ->
-                getTabItems(tabEntities, activeTab, isAnimationTileDismissed, viewState.mode)
+                getTabItems(tabsWithGroups, activeTab, isAnimationTileDismissed, viewState.mode)
             }
         }
 
@@ -150,9 +155,19 @@ class TabSwitcherViewModel @Inject constructor(
     val tabSwitcherItems: List<TabSwitcherItem>
         get() = viewState.value.tabSwitcherItems
 
-    // only the actual browser tabs
+    // only the actual browser tabs (excludes grouped tabs)
     val tabs: List<Tab>
         get() = tabSwitcherItems.filterIsInstance<Tab>()
+
+    // all tab IDs including those in groups
+    private val allTabIds: List<String>
+        get() {
+            val groupedTabIds = tabSwitcherItems
+                .filterIsInstance<TabSwitcherItem.TabGroup>()
+                .flatMap { it.tabIds }
+            val ungroupedTabIds = tabs.map { it.id }
+            return groupedTabIds + ungroupedTabIds
+        }
 
     private val recentlySavedBookmarks = mutableListOf<Bookmark>()
 
@@ -179,6 +194,7 @@ class TabSwitcherViewModel @Inject constructor(
         data class ShareLinks(val links: List<String>) : Command()
         data class BookmarkTabsRequest(val tabIds: List<String>) : Command()
         data class ShowUndoBookmarkMessage(val numBookmarks: Int) : Command()
+        data class GroupTabsRequest(val tabIds: List<String>) : Command()
         data class ShowUndoDeleteTabsMessage(val tabIds: List<String>) : Command()
         data object ShowFireBottomSheet : Command()
     }
@@ -235,6 +251,18 @@ class TabSwitcherViewModel @Inject constructor(
         }
     }
 
+    fun onGroupSelected(groupTabIds: List<String>) {
+        val mode = viewState.value.mode as? Selection ?: return
+        val allSelected = groupTabIds.all { it in mode.selectedTabs }
+        if (allSelected) {
+            // Deselect all tabs in group
+            unselectTabs(groupTabIds)
+        } else {
+            // Select all tabs in group
+            selectTabs(groupTabIds)
+        }
+    }
+
     suspend fun onUndoDeleteSnackbarDismissed(tabIds: List<String>) {
         // delete only recently deleted tabs, because others may need to be preserved for restoring
         deleteTabs(tabIds)
@@ -256,7 +284,7 @@ class TabSwitcherViewModel @Inject constructor(
         pixel.fire(AppPixelName.TAB_MANAGER_SELECT_MODE_MENU_SELECT_ALL)
         pixel.fire(AppPixelName.TAB_MANAGER_SELECT_MODE_MENU_SELECT_ALL_DAILY, type = Daily())
 
-        _viewState.update { it.copy(mode = Selection(selectedTabs = tabs.map { tab -> tab.id })) }
+        _viewState.update { it.copy(mode = Selection(selectedTabs = allTabIds)) }
     }
 
     fun onDeselectAllTabs() {
@@ -292,6 +320,50 @@ class TabSwitcherViewModel @Inject constructor(
 
         (viewState.value.mode as? Selection)?.let { mode ->
             command.value = BookmarkTabsRequest(mode.selectedTabs)
+        }
+    }
+
+    fun onGroupSelectedTabs() {
+        (viewState.value.mode as? Selection)?.let { mode ->
+            command.value = Command.GroupTabsRequest(mode.selectedTabs)
+        }
+    }
+
+    fun onGroupTabsConfirmed(groupName: String, tabIds: List<String>) {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            tabRepository.createGroupAndAssignTabs(groupName, tabIds)
+        }
+        triggerNormalMode()
+    }
+
+    fun onUngroupTabs(groupId: String) {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            tabRepository.ungroupAllTabsInGroup(groupId)
+        }
+    }
+
+    fun onTabDroppedOnGroup(tabId: String, groupId: String) {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            tabRepository.addTabToGroup(tabId, groupId)
+        }
+    }
+
+    fun onTabsDroppedToCreateGroup(tabId1: String, tabId2: String) {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            val groupName = "New group"
+            tabRepository.createGroupAndAssignTabs(groupName, listOf(tabId1, tabId2))
+        }
+    }
+
+    fun onRemoveTabFromGroup(tabId: String) {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            tabRepository.removeTabsFromGroup(listOf(tabId))
+        }
+    }
+
+    fun onCloseTabFromGroupDialog(tabId: String) {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            tabRepository.deleteTabs(listOf(tabId))
         }
     }
 
@@ -334,7 +406,7 @@ class TabSwitcherViewModel @Inject constructor(
 
     // user has indicated they want to close all tabs
     fun onCloseAllTabsRequested() {
-        command.value = Command.CloseAllTabsRequest(tabs.size)
+        command.value = Command.CloseAllTabsRequest(allTabIds.size)
 
         pixel.fire(AppPixelName.TAB_MANAGER_MENU_CLOSE_ALL_TABS_PRESSED)
         pixel.fire(AppPixelName.TAB_MANAGER_MENU_CLOSE_ALL_TABS_PRESSED_DAILY, type = Daily())
@@ -351,7 +423,7 @@ class TabSwitcherViewModel @Inject constructor(
         }
 
         val selectedTabs = selectionMode.selectedTabs
-        val allTabsCount = tabs.size
+        val allTabsCount = allTabIds.size
         command.value = if (allTabsCount == selectedTabs.size) {
             Command.CloseAllTabsRequest(allTabsCount)
         } else {
@@ -365,7 +437,7 @@ class TabSwitcherViewModel @Inject constructor(
         pixel.fire(AppPixelName.TAB_MANAGER_SELECT_MODE_MENU_CLOSE_OTHER_TABS_DAILY, type = Daily())
 
         val selectedTabs = selectionMode.selectedTabs
-        val otherTabsIds = (tabs.map { it.id }) - selectedTabs.toSet()
+        val otherTabsIds = allTabIds - selectedTabs.toSet()
         if (otherTabsIds.isNotEmpty()) {
             command.value = Command.CloseTabsRequest(otherTabsIds, isClosingOtherTabs = true)
         }
@@ -378,7 +450,7 @@ class TabSwitcherViewModel @Inject constructor(
                 unselectTabs(tabIds)
             }
 
-            if (tabs.size == tabIds.size) {
+            if (allTabIds.size == tabIds.size) {
                 pixel.fire(AppPixelName.TAB_MANAGER_MENU_CLOSE_ALL_TABS_CONFIRMED)
                 pixel.fire(AppPixelName.TAB_MANAGER_MENU_CLOSE_ALL_TABS_CONFIRMED_DAILY, type = Daily())
 
@@ -398,7 +470,7 @@ class TabSwitcherViewModel @Inject constructor(
 
     // user has confirmed they want to close all tabs -> mark all tabs as deletable and show undo snackbar
     fun onCloseAllTabsConfirmed() {
-        onCloseTabsConfirmed(tabs.map { it.id })
+        onCloseTabsConfirmed(allTabIds)
     }
 
     fun onTabCloseInNormalModeRequested(
@@ -406,7 +478,7 @@ class TabSwitcherViewModel @Inject constructor(
         swipeGestureUsed: Boolean = false,
     ) {
         viewModelScope.launch {
-            if (tabs.size == 1) {
+            if (allTabIds.size == 1) {
                 // mark the tab as deletable, the undo snackbar will be shown after tab switcher is closed
                 markTabAsDeletable(tab, swipeGestureUsed)
                 command.value = Command.CloseAndShowUndoMessage(listOf(tab.id))
@@ -601,31 +673,41 @@ class TabSwitcherViewModel @Inject constructor(
     }
 
     private suspend fun getTabItems(
-        tabEntities: List<TabEntity>,
+        tabsWithGroups: TabsWithGroups,
         activeTab: TabEntity?,
         isTrackersAnimationInfoPanelHidden: Boolean,
         mode: Mode,
     ): List<TabSwitcherItem> {
-        val normalTabs = tabEntities.map {
-            NormalTab(it, isActive = it.tabId == activeTab?.tabId)
-        }
-
-        suspend fun getNormalTabItemsWithOptionalAnimationTile(): List<TabSwitcherItem> {
-            return if (!isTrackersAnimationInfoPanelHidden) {
-                val trackerCountForLast7Days = webTrackersBlockedAppRepository.getTrackerCountForLast7Days()
-
-                listOf(TrackersAnimationInfoPanel(trackerCountForLast7Days)) + normalTabs
-            } else {
-                normalTabs
-            }
-        }
-
         return if (mode is Selection) {
-            tabEntities.map {
+            // In selection mode, show selectable groups + selectable ungrouped tabs
+            val groupItems = tabsWithGroups.groups.map { groupWithTabs ->
+                val allTabsInGroupSelected = groupWithTabs.tabs.all { it.tabId in mode.selectedTabs }
+                SelectableTabGroup(groupWithTabs, isSelected = allTabsInGroupSelected)
+            }
+
+            val ungroupedTabItems = tabsWithGroups.ungroupedTabs.map {
                 SelectableTab(it, isSelected = it.tabId in mode.selectedTabs)
             }
+
+            groupItems + ungroupedTabItems
         } else {
-            getNormalTabItemsWithOptionalAnimationTile()
+            // In normal mode, show groups + ungrouped tabs
+            val groupItems = tabsWithGroups.groups.map { groupWithTabs ->
+                NormalTabGroup(groupWithTabs)
+            }
+
+            val ungroupedTabItems = tabsWithGroups.ungroupedTabs.map {
+                NormalTab(it, isActive = it.tabId == activeTab?.tabId)
+            }
+
+            val items = groupItems + ungroupedTabItems
+
+            if (!isTrackersAnimationInfoPanelHidden) {
+                val trackerCountForLast7Days = webTrackersBlockedAppRepository.getTrackerCountForLast7Days()
+                listOf(TrackersAnimationInfoPanel(trackerCountForLast7Days)) + items
+            } else {
+                items
+            }
         }
     }
 
@@ -637,7 +719,18 @@ class TabSwitcherViewModel @Inject constructor(
         val isSplitOmnibarEnabled: Boolean = false,
     ) {
         val tabs: List<Tab> = tabSwitcherItems.filterIsInstance<Tab>()
+        val tabsCount: Int = allTabIds.size
         val numSelectedTabs: Int = (mode as? Selection)?.selectedTabs?.size ?: 0
+
+        // all tab IDs including those in groups
+        private val allTabIds: List<String>
+            get() {
+                val groupedTabIds = tabSwitcherItems
+                    .filterIsInstance<TabSwitcherItem.TabGroup>()
+                    .flatMap { it.tabIds }
+                val ungroupedTabIds = tabs.map { it.id }
+                return groupedTabIds + ungroupedTabIds
+            }
 
         val dynamicInterface = when (mode) {
             is Normal -> {
@@ -651,6 +744,7 @@ class TabSwitcherViewModel @Inject constructor(
                     isSelectionActionsDividerVisible = false,
                     isShareSelectedLinksVisible = false,
                     isBookmarkSelectedTabsVisible = false,
+                    isGroupTabsVisible = false,
                     isSelectTabsDividerVisible = true,
                     isSelectTabsVisible = true,
                     isCloseSelectedTabsVisible = false,
@@ -668,7 +762,7 @@ class TabSwitcherViewModel @Inject constructor(
             }
 
             is Selection -> {
-                val areAllTabsSelected = numSelectedTabs == tabs.size
+                val areAllTabsSelected = numSelectedTabs == allTabIds.size
                 val isSomethingSelected = numSelectedTabs > 0
                 val isNtpTheOnlySelectedTab = numSelectedTabs == 1 &&
                     tabs.any { it is SelectableTab && it.isSelected && it.isNewTabPage }
@@ -683,6 +777,7 @@ class TabSwitcherViewModel @Inject constructor(
                     isSelectionActionsDividerVisible = isSelectionActionable,
                     isShareSelectedLinksVisible = isSelectionActionable,
                     isBookmarkSelectedTabsVisible = isSelectionActionable,
+                    isGroupTabsVisible = isSelectionActionable,
                     isSelectTabsDividerVisible = false,
                     isSelectTabsVisible = false,
                     isCloseSelectedTabsVisible = isSomethingSelected,
@@ -706,6 +801,7 @@ class TabSwitcherViewModel @Inject constructor(
             val isSelectionActionsDividerVisible: Boolean,
             val isShareSelectedLinksVisible: Boolean,
             val isBookmarkSelectedTabsVisible: Boolean,
+            val isGroupTabsVisible: Boolean,
             val isSelectTabsDividerVisible: Boolean,
             val isSelectTabsVisible: Boolean,
             val isCloseSelectedTabsVisible: Boolean,

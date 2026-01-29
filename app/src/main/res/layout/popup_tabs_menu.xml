@@ -59,6 +59,11 @@
         android:layout_height="wrap_content" />
 
     <com.duckduckgo.common.ui.view.PopupMenuItemView
+        android:id="@+id/groupTabsMenuItem"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <com.duckduckgo.common.ui.view.PopupMenuItemView
         android:id="@+id/shareSelectedLinksMenuItem"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />

@@ -29,6 +29,7 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.tabs.TabManagerFeatureFlags
+import com.duckduckgo.app.tabs.db.TabGroupsDao
 import com.duckduckgo.app.tabs.db.TabsDao
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType
 import com.duckduckgo.app.tabs.model.TabSwitcherData.UserState
@@ -58,6 +59,7 @@ import javax.inject.Inject
 @SingleInstanceIn(AppScope::class)
 class TabDataRepository @Inject constructor(
     private val tabsDao: TabsDao,
+    private val tabGroupsDao: TabGroupsDao,
     private val siteFactory: SiteFactory,
     private val webViewPreviewPersister: WebViewPreviewPersister,
     private val faviconManager: FaviconManager,
@@ -480,5 +482,33 @@ class TabDataRepository @Inject constructor(
      */
     private fun databaseExecutor(): Scheduler {
         return Schedulers.single()
+    }
+
+    override suspend fun createGroupAndAssignTabs(name: String, tabIds: List<String>): String = withContext(dispatchers.io()) {
+        val groupId = UUID.randomUUID().toString()
+        val group = TabGroupEntity(groupId = groupId, name = name)
+        tabGroupsDao.insertGroup(group)
+        tabIds.forEach { tabId ->
+            tabsDao.updateTabGroup(tabId, groupId)
+        }
+        return@withContext groupId
+    }
+
+    override suspend fun removeTabsFromGroup(tabIds: List<String>) = withContext(dispatchers.io()) {
+        tabIds.forEach { tabId ->
+            tabsDao.updateTabGroup(tabId, null)
+        }
+        // Delete any groups that are now empty
+        tabGroupsDao.deleteEmptyGroups()
+    }
+
+    override suspend fun ungroupAllTabsInGroup(groupId: String) = withContext(dispatchers.io()) {
+        tabsDao.clearGroupForAllTabs(groupId)
+        // The group is now empty, delete it
+        tabGroupsDao.deleteEmptyGroups()
+    }
+
+    override suspend fun addTabToGroup(tabId: String, groupId: String) = withContext(dispatchers.io()) {
+        tabsDao.updateTabGroup(tabId, groupId)
     }
 }

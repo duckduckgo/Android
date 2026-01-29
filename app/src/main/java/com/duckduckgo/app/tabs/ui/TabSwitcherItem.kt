@@ -17,6 +17,7 @@
 package com.duckduckgo.app.tabs.ui
 
 import com.duckduckgo.app.tabs.model.TabEntity
+import com.duckduckgo.app.tabs.model.TabGroupWithTabs
 
 sealed class TabSwitcherItem(val id: String) {
     sealed class Tab(val tabEntity: TabEntity) : TabSwitcherItem(tabEntity.tabId) {
@@ -43,5 +44,33 @@ sealed class TabSwitcherItem(val id: String) {
             const val ANIMATED_TILE_DEFAULT_ALPHA = 1f
             const val TRACKER_ANIMATION_PANEL_ID = "TrackersAnimationInfoPanel"
         }
+    }
+
+    sealed class TabGroup(
+        val tabGroupWithTabs: TabGroupWithTabs,
+    ) : TabSwitcherItem(tabGroupWithTabs.group.groupId) {
+        val groupName: String
+            get() = tabGroupWithTabs.group.name
+
+        val previewTabs: List<TabEntity>
+            get() = tabGroupWithTabs.previewTabs
+
+        val additionalTabsCount: Int
+            get() = tabGroupWithTabs.additionalTabsCount
+
+        val totalTabsCount: Int
+            get() = tabGroupWithTabs.tabs.size
+
+        val tabIds: List<String>
+            get() = tabGroupWithTabs.tabs.map { it.tabId }
+
+        data class NormalTabGroup(
+            private val group: TabGroupWithTabs,
+        ) : TabGroup(group)
+
+        data class SelectableTabGroup(
+            private val group: TabGroupWithTabs,
+            val isSelected: Boolean,
+        ) : TabGroup(group)
     }
 }

@@ -236,6 +236,27 @@ abstract class TabsDao {
         viewed: Boolean,
     )
 
+    @Query("SELECT * FROM tabs WHERE groupId = :groupId AND deletable IS 0 ORDER BY position")
+    abstract fun getTabsInGroup(groupId: String): List<TabEntity>
+
+    @Query("SELECT * FROM tabs WHERE groupId = :groupId AND deletable IS 0 ORDER BY position")
+    abstract fun flowTabsInGroup(groupId: String): Flow<List<TabEntity>>
+
+    @Query("SELECT * FROM tabs WHERE groupId IS NULL AND deletable IS 0 ORDER BY position")
+    abstract fun getUngroupedTabs(): List<TabEntity>
+
+    @Query("SELECT * FROM tabs WHERE groupId IS NULL AND deletable IS 0 ORDER BY position")
+    abstract fun flowUngroupedTabs(): Flow<List<TabEntity>>
+
+    @Query("UPDATE tabs SET groupId = :groupId WHERE tabId = :tabId")
+    abstract fun updateTabGroup(tabId: String, groupId: String?)
+
+    @Query("UPDATE tabs SET groupId = NULL WHERE groupId = :groupId")
+    abstract fun clearGroupForAllTabs(groupId: String)
+
+    @Query("SELECT COUNT(*) FROM tabs WHERE groupId = :groupId AND deletable IS 0")
+    abstract fun getTabCountInGroup(groupId: String): Int
+
     @Transaction
     open fun updateTabsOrder(from: Int, to: Int) {
         if (from != to) {

@@ -42,12 +42,14 @@ import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ItemTabGridBinding
+import com.duckduckgo.app.browser.databinding.ItemTabGroupBinding
 import com.duckduckgo.app.browser.databinding.ItemTabListBinding
 import com.duckduckgo.app.browser.databinding.ItemTabSwitcherAnimationInfoPanelBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.browser.tabs.adapter.TabSwitcherItemDiffCallback
 import com.duckduckgo.app.browser.tabs.adapter.TabSwitcherItemDiffCallback.Companion.DIFF_ALPHA
+import com.duckduckgo.app.browser.tabs.adapter.TabSwitcherItemDiffCallback.Companion.DIFF_KEY_GROUP_PREVIEWS
 import com.duckduckgo.app.browser.tabs.adapter.TabSwitcherItemDiffCallback.Companion.DIFF_KEY_PREVIEW
 import com.duckduckgo.app.browser.tabs.adapter.TabSwitcherItemDiffCallback.Companion.DIFF_KEY_SELECTION
 import com.duckduckgo.app.browser.tabs.adapter.TabSwitcherItemDiffCallback.Companion.DIFF_KEY_TITLE
@@ -59,6 +61,7 @@ import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType.GRID
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType.LIST
 import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder.Companion.GRID_TAB
 import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder.Companion.LIST_TAB
+import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder.Companion.TAB_GROUP
 import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder.Companion.TRACKER_ANIMATION_TILE_INFO_PANEL
 import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder.TabViewHolder
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab
@@ -93,6 +96,9 @@ class TabSwitcherAdapter(
     private var isDragging: Boolean = false
     private var layoutType: LayoutType = GRID
     private var onAnimationTileCloseClickListener: (() -> Unit)? = null
+    private var onTabGroupClickListener: ((String) -> Unit)? = null
+    private var onTabGroupMenuClickListener: ((String, View) -> Unit)? = null
+    private var onTabGroupSelectionListener: ((List<String>) -> Unit)? = null
 
     init {
         setHasStableIds(true)
@@ -115,6 +121,10 @@ class TabSwitcherAdapter(
                 addExtraCloseButtonTouchArea(binding.close)
                 TabSwitcherViewHolder.ListTabViewHolder(binding)
             }
+            TAB_GROUP -> {
+                val binding = ItemTabGroupBinding.inflate(inflater, parent, false)
+                TabSwitcherViewHolder.TabGroupViewHolder(binding)
+            }
             TRACKER_ANIMATION_TILE_INFO_PANEL -> {
                 val binding = ItemTabSwitcherAnimationInfoPanelBinding.inflate(inflater, parent, false)
                 TabSwitcherViewHolder.TrackerAnimationInfoPanelViewHolder(binding)
@@ -131,6 +141,7 @@ class TabSwitcherAdapter(
                     LIST -> LIST_TAB
                 }
             }
+            is TabSwitcherItem.TabGroup -> TAB_GROUP
             is TabSwitcherItem.TrackersAnimationInfoPanel -> TRACKER_ANIMATION_TILE_INFO_PANEL
         }
 
@@ -143,6 +154,9 @@ class TabSwitcherAdapter(
             }
             is TabSwitcherViewHolder.ListTabViewHolder -> {
                 bindListTab(holder, list[position] as Tab)
+            }
+            is TabSwitcherViewHolder.TabGroupViewHolder -> {
+                bindTabGroup(holder, list[position] as TabSwitcherItem.TabGroup)
             }
             is TabSwitcherViewHolder.TrackerAnimationInfoPanelViewHolder -> {
                 val trackersAnimationInfoPanel = list[position] as TabSwitcherItem.TrackersAnimationInfoPanel
@@ -209,6 +223,69 @@ class TabSwitcherAdapter(
             bindingAdapterPosition = { holder.bindingAdapterPosition },
             tabId = tab.id,
         )
+    }
+
+    private fun bindTabGroup(holder: TabSwitcherViewHolder.TabGroupViewHolder, tabGroup: TabSwitcherItem.TabGroup) {
+        val binding = holder.binding
+
+        binding.groupName.text = tabGroup.groupName
+        loadGroupPreviews(holder, tabGroup)
+
+        val context = binding.root.context
+
+        // Handle selection state
+        when (tabGroup) {
+            is TabSwitcherItem.TabGroup.SelectableTabGroup -> {
+                binding.selectionIndicator.show()
+                binding.overflowMenu.hide()
+                if (tabGroup.isSelected) {
+                    binding.selectionIndicator.setImageResource(CommonR.drawable.ic_check_blue_24)
+                    binding.selectionIndicator.contentDescription = context.getString(R.string.tabSelectedIndicator)
+                } else {
+                    binding.selectionIndicator.setImageResource(CommonR.drawable.ic_shape_circle_24)
+                    binding.selectionIndicator.contentDescription = context.getString(R.string.tabNotSelectedIndicator)
+                }
+                // Click to toggle group selection
+                binding.root.setOnClickListener {
+                    onTabGroupSelectionListener?.invoke(tabGroup.tabIds)
+                }
+            }
+            is TabSwitcherItem.TabGroup.NormalTabGroup -> {
+                binding.selectionIndicator.hide()
+                binding.overflowMenu.show()
+                // Click listener for the whole group
+                binding.root.setOnClickListener {
+                    onTabGroupClickListener?.invoke(tabGroup.tabGroupWithTabs.group.groupId)
+                }
+                // Overflow menu click listener
+                binding.overflowMenu.setOnClickListener {
+                    onTabGroupMenuClickListener?.invoke(tabGroup.tabGroupWithTabs.group.groupId, it)
+                }
+            }
+        }
+    }
+
+    private fun loadGroupPreviews(holder: TabSwitcherViewHolder.TabGroupViewHolder, tabGroup: TabSwitcherItem.TabGroup) {
+        val binding = holder.binding
+        val glide = Glide.with(binding.root.context)
+        val previewTabs = tabGroup.previewTabs
+        val additionalCount = tabGroup.additionalTabsCount
+        val previews = listOf(binding.preview1, binding.preview2, binding.preview3, binding.preview4)
+
+        previews.forEachIndexed { index, imageView ->
+            if (index < previewTabs.size) {
+                loadTabGroupPreviewImage(previewTabs[index], glide, imageView)
+            } else {
+                glide.clear(imageView)
+            }
+        }
+
+        if (additionalCount > 0 && previewTabs.size >= 4) {
+            binding.additionalCountContainer.show()
+            binding.additionalCount.text = "+$additionalCount"
+        } else {
+            binding.additionalCountContainer.hide()
+        }
     }
 
     private fun attachTabClickListeners(tabViewHolder: TabViewHolder, bindingAdapterPosition: () -> Int, tabId: String) {
@@ -278,6 +355,17 @@ class TabSwitcherAdapter(
                 for (payload in payloads) {
                     val bundle = payload as Bundle
                     holder.itemView.alpha = bundle.getFloat(DIFF_ALPHA, ANIMATED_TILE_DEFAULT_ALPHA)
+                }
+            }
+            TAB_GROUP -> {
+                val tabGroup = list[position] as TabSwitcherItem.TabGroup
+                val groupHolder = holder as TabSwitcherViewHolder.TabGroupViewHolder
+                for (payload in payloads) {
+                    val bundle = payload as Bundle
+                    holder.itemView.alpha = bundle.getFloat(DIFF_ALPHA, ANIMATED_TILE_DEFAULT_ALPHA)
+                    if (bundle.containsKey(DIFF_KEY_GROUP_PREVIEWS)) {
+                        loadGroupPreviews(groupHolder, tabGroup)
+                    }
                 }
             }
         }
@@ -359,7 +447,33 @@ class TabSwitcherAdapter(
         }
     }
 
-    private fun loadTabPreviewImage(tab: TabEntity, glide: RequestManager, tabPreview: ImageView) {
+    private fun loadTabPreviewImage(tab: TabEntity, glide: RequestManager, imageView: ImageView) {
+        loadPreviewImage(
+            tab = tab,
+            glide = glide,
+            imageView = imageView,
+            showDaxIconFallback = true,
+            clipToHeight = true,
+        )
+    }
+
+    private fun loadTabGroupPreviewImage(tab: TabEntity, glide: RequestManager, imageView: ImageView) {
+        loadPreviewImage(
+            tab = tab,
+            glide = glide,
+            imageView = imageView,
+            showDaxIconFallback = false,
+            clipToHeight = false,
+        )
+    }
+
+    private fun loadPreviewImage(
+        tab: TabEntity,
+        glide: RequestManager,
+        imageView: ImageView,
+        showDaxIconFallback: Boolean,
+        clipToHeight: Boolean,
+    ) {
         fun fitAndClipBottom() = object : Transformation<Bitmap> {
             override fun transform(
                 context: Context,
@@ -376,34 +490,51 @@ class TabSwitcherAdapter(
         }
 
         val previewFile = tab.tabPreviewFile
-        if (tab.url.isNullOrBlank()) {
-            glide.load(AndroidR.drawable.ic_dax_icon_72)
-                .into(tabPreview)
-        } else if (previewFile != null) {
-            lifecycleOwner.lifecycleScope.launch {
-                val cachedWebViewPreview = withContext(dispatchers.io()) {
-                    File(webViewPreviewPersister.fullPathForFile(tab.tabId, previewFile)).takeIf { it.exists() }
+
+        if (showDaxIconFallback && tab.url.isNullOrBlank()) {
+            glide.load(AndroidR.drawable.ic_dax_icon_72).into(imageView)
+            return
+        }
+
+        if (previewFile == null) {
+            glide.clear(imageView)
+            return
+        }
+
+        lifecycleOwner.lifecycleScope.launch {
+            val cachedWebViewPreview = withContext(dispatchers.io()) {
+                File(webViewPreviewPersister.fullPathForFile(tab.tabId, previewFile)).takeIf { it.exists() }
+            }
+
+            if (cachedWebViewPreview == null) {
+                glide.clear(imageView)
+                return@launch
+            }
+
+            try {
+                val transforms = if (clipToHeight) {
+                    arrayOf(
+                        fitAndClipBottom(),
+                        RoundedCorners(imageView.context.resources.getDimensionPixelSize(CommonR.dimen.smallShapeCornerRadius)),
+                    )
+                } else {
+                    arrayOf(
+                        RoundedCorners(imageView.context.resources.getDimensionPixelSize(CommonR.dimen.smallShapeCornerRadius)),
+                    )
                 }
 
-                if (cachedWebViewPreview == null) {
-                    glide.clear(tabPreview)
-                    return@launch
-                }
-
-                try {
-                    glide.load(cachedWebViewPreview)
-                        .transition(DrawableTransitionOptions.withCrossFade()).transform(
-                            fitAndClipBottom(),
-                            RoundedCorners(tabPreview.context.resources.getDimensionPixelSize(CommonR.dimen.smallShapeCornerRadius)),
-                        )
-                        .into(tabPreview)
-                } catch (e: Exception) {
-                    logcat(ERROR) { "Error loading tab preview for ${tab.tabId}: ${e.message}" }
-                    glide.load(AndroidR.drawable.ic_dax_icon_72).into(tabPreview)
+                glide.load(cachedWebViewPreview)
+                    .transition(DrawableTransitionOptions.withCrossFade())
+                    .transform(*transforms)
+                    .into(imageView)
+            } catch (e: Exception) {
+                logcat(ERROR) { "Error loading preview for ${tab.tabId}: ${e.message}" }
+                if (showDaxIconFallback) {
+                    glide.load(AndroidR.drawable.ic_dax_icon_72).into(imageView)
+                } else {
+                    glide.clear(imageView)
                 }
             }
-        } else {
-            glide.clear(tabPreview)
         }
     }
 
@@ -416,6 +547,19 @@ class TabSwitcherAdapter(
                     putFloat(DIFF_ALPHA, alpha)
                 },
             )
+        }
+    }
+
+    private fun updateTabGroupsAlpha(alpha: Float) {
+        list.forEachIndexed { index, item ->
+            if (item is TabSwitcherItem.TabGroup) {
+                notifyItemChanged(
+                    index,
+                    Bundle().apply {
+                        putFloat(DIFF_ALPHA, alpha)
+                    },
+                )
+            }
         }
     }
 
@@ -432,14 +576,19 @@ class TabSwitcherAdapter(
         it is Tab && it.tabEntity.tabId == tabId
     }
 
+    fun getTabGroup(groupId: String): TabSwitcherItem.TabGroup? = list.filterIsInstance<TabSwitcherItem.TabGroup>()
+        .firstOrNull { it.id == groupId }
+
     fun onDraggingStarted() {
         isDragging = true
         updateAnimatedTileAlpha(ANIMATED_TILE_NO_REPLACE_ALPHA)
+        updateTabGroupsAlpha(ANIMATED_TILE_NO_REPLACE_ALPHA)
     }
 
     fun onDraggingFinished() {
         isDragging = false
         updateAnimatedTileAlpha(ANIMATED_TILE_DEFAULT_ALPHA)
+        updateTabGroupsAlpha(ANIMATED_TILE_DEFAULT_ALPHA)
     }
 
     fun onTabMoved(from: Int, to: Int) {
@@ -457,6 +606,18 @@ class TabSwitcherAdapter(
         onAnimationTileCloseClickListener = onClick
     }
 
+    fun setTabGroupClickListener(onClick: (groupId: String) -> Unit) {
+        onTabGroupClickListener = onClick
+    }
+
+    fun setTabGroupMenuClickListener(onClick: (groupId: String, anchorView: View) -> Unit) {
+        onTabGroupMenuClickListener = onClick
+    }
+
+    fun setTabGroupSelectionListener(onClick: (tabIds: List<String>) -> Unit) {
+        onTabGroupSelectionListener = onClick
+    }
+
     companion object {
         private const val DUCKDUCKGO_TITLE_SUFFIX = "at DuckDuckGo"
     }
@@ -467,6 +628,7 @@ class TabSwitcherAdapter(
             const val GRID_TAB = 0
             const val LIST_TAB = 1
             const val TRACKER_ANIMATION_TILE_INFO_PANEL = 2
+            const val TAB_GROUP = 3
 
             const val EXTRA_CLOSE_BUTTON_TOUCH_AREA = 6 // dp
 
@@ -526,6 +688,10 @@ class TabSwitcherAdapter(
 
         data class TrackerAnimationInfoPanelViewHolder(
             val binding: ItemTabSwitcherAnimationInfoPanelBinding,
+        ) : TabSwitcherViewHolder(binding.root)
+
+        data class TabGroupViewHolder(
+            val binding: ItemTabGroupBinding,
         ) : TabSwitcherViewHolder(binding.root)
     }
 }
