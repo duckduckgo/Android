@@ -55,9 +55,14 @@ private const val MIGRATED_TO_HARMONY = "migrated_to_harmony"
 class SharedPreferencesProviderImpl @Inject constructor(
     private val context: Context,
     private val dispatcherProvider: DispatcherProvider,
-    private val pixel: Pixel,
+    pixelLazy: Lazy<Pixel>,
     private val crashLogger: Lazy<CrashLogger>,
 ) : SharedPreferencesProvider {
+
+    private val pixel by lazy {
+        pixelLazy.get()
+    }
+
     @SuppressLint("DenyListedApi")
     override fun getSharedPreferences(name: String, multiprocess: Boolean, migrate: Boolean): SharedPreferences {
         val prefs = if (multiprocess) {
