@@ -33,6 +33,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.DialogProperties
 import com.duckduckgo.common.ui.compose.text.DaxText
 import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
 
@@ -69,10 +70,11 @@ fun DaxAlertDialog(
                 onDismissRequest()
             }
         },
+        properties = DialogProperties(usePlatformDefaultWidth = false),
     ) {
         DaxAlertDialogContent(
             title = title,
-            modifier = modifier,
+            modifier = modifier.fillMaxWidth(0.83f),
             message = message,
             headerImage = headerImage,
             content = content,
@@ -101,7 +103,7 @@ internal fun DaxAlertDialogContent(
     ) {
         Column(
             modifier = Modifier
-                .padding(24.dp)
+                .padding(start = 24.dp, top = 24.dp, end = 24.dp, bottom = 18.dp)
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
@@ -111,8 +113,8 @@ internal fun DaxAlertDialogContent(
                     painter = painterResource(id = headerImage),
                     contentDescription = null,
                     modifier = Modifier
-                        .size(96.dp)
-                        .padding(bottom = 16.dp),
+                        .padding(bottom = 16.dp)
+                        .size(40.dp),
                 )
             }
 
