@@ -17,6 +17,8 @@ jobs:
   build_debug_apk:
     name: Build debug apk
     runs-on: ubuntu-latest
+    env:
+      DEVELOCITY_ACCESS_KEY: ${{ secrets.DEVELOCITY_ACCESS_KEY }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4

@@ -23,6 +23,10 @@ inputs:
     description: 'Additional flags to pass to the gradlew command'
     required: false
     default: ''
+  develocity_access_key:
+    description: 'Develocity access key for Gradle remote caching'
+    required: false
+    default: ''
 
 outputs:
   play_apk_path:
@@ -73,6 +77,8 @@ runs:
     - name: Assemble release APK
       if: ${{ inputs.flavours == 'all' || inputs.flavours == 'play' }}
       shell: bash
+      env:
+        DEVELOCITY_ACCESS_KEY: ${{ inputs.develocity_access_key }}
       run: ./gradlew assemblePlayRelease -Pforce-default-variant -Pskip-onboarding -x lint ${{ inputs.gradle_flags }}
 
     - name: Move Play APK
@@ -83,6 +89,8 @@ runs:
     - name: Assemble internal release APK
       if: ${{ inputs.flavours == 'all' || inputs.flavours == 'internal' }}
       shell: bash
+      env:
+        DEVELOCITY_ACCESS_KEY: ${{ inputs.develocity_access_key }}
       run: ./gradlew assembleInternalRelease -Pforce-default-variant -Pskip-onboarding -x lint ${{ inputs.gradle_flags }}
 
     - name: Move Internal APK
