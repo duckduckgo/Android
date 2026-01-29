@@ -381,7 +381,6 @@ class BrowserTabFragment :
     private val supervisorJob = SupervisorJob()
 
     private var duckAiContextualFragment: DuckChatContextualFragment? = null
-    private var duckAiContextualBehaviourState: Int = BottomSheetBehavior.STATE_HALF_EXPANDED
 
     override val coroutineContext: CoroutineContext
         get() = supervisorJob + dispatchers.main()
@@ -3338,21 +3337,38 @@ class BrowserTabFragment :
 
     private fun showDuckChatContextualSheet(tabId: String) {
         duckAiContextualFragment?.let { fragment ->
-            val transaction = childFragmentManager.beginTransaction()
-            transaction.show(fragment)
-            transaction.commit()
+            openExistingContextualFragment(fragment)
         } ?: run {
-            val fragment = DuckChatContextualFragment()
-            val args = Bundle()
-            args.putString(DuckChatContextualFragment.KEY_DUCK_AI_CONTEXTUAL_TAB_ID, tabId)
-            fragment.arguments = args
-
-            duckAiContextualFragment = fragment
-            val transaction = childFragmentManager.beginTransaction()
-            transaction.replace(binding.duckAiContextualFragmentContainer.id, fragment)
-            transaction.commit()
+            createNewContextualFragment(tabId)
         }
 
+        binding.duckAiContextualFragmentContainer.show()
+
+        reactToDuckChatContextualSheetResult()
+        ensureBrowserIsCompatibleWithContextualSheetState()
+    }
+
+    private fun createNewContextualFragment(tabId: String) {
+        val fragment = DuckChatContextualFragment()
+        val args = Bundle()
+        args.putString(DuckChatContextualFragment.KEY_DUCK_AI_CONTEXTUAL_TAB_ID, tabId)
+        fragment.arguments = args
+
+        duckAiContextualFragment = fragment
+        val transaction = childFragmentManager.beginTransaction()
+        transaction.replace(binding.duckAiContextualFragmentContainer.id, fragment)
+        transaction.commit()
+    }
+
+    private fun openExistingContextualFragment(fragment: DuckChatContextualFragment) {
+        val transaction = childFragmentManager.beginTransaction()
+        transaction.show(fragment)
+        transaction.commit()
+
+        sharedContextualViewModel.onOpenRequested()
+    }
+
+    private fun reactToDuckChatContextualSheetResult() {
         childFragmentManager.setFragmentResultListener(KEY_DUCK_AI_CONTEXTUAL_RESULT, viewLifecycleOwner) { _, bundle ->
             val contextualChatUrl = bundle.getString(KEY_DUCK_AI_URL)
             contextualChatUrl?.let {
@@ -3360,21 +3376,20 @@ class BrowserTabFragment :
                 removeDuckChatContextualSheet()
             }
         }
+    }
 
-        binding.duckAiContextualFragmentContainer.show()
-
+    private fun ensureBrowserIsCompatibleWithContextualSheetState() {
         val bottomSheetBehavior = BottomSheetBehavior.from(binding.duckAiContextualFragmentContainer)
-        bottomSheetBehavior.state = duckAiContextualBehaviourState
-
         bottomSheetBehavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
             override fun onStateChanged(bottomSheet: View, newState: Int) {
                 logcat { "Duck.ai Contextual: BTF onStateChanged $newState" }
                 if (newState == BottomSheetBehavior.STATE_HIDDEN) {
                     binding.duckAiContextualFragmentContainer.gone()
                     hideKeyboard()
+                    browserActivity?.onEditModeChanged(false)
                 }
                 if (newState == BottomSheetBehavior.STATE_HALF_EXPANDED || newState == BottomSheetBehavior.STATE_EXPANDED) {
-                    duckAiContextualBehaviourState = newState
+                    browserActivity?.onEditModeChanged(true)
                 }
             }
             override fun onSlide(bottomSheet: View, slideOffset: Float) {}

@@ -478,8 +478,8 @@ class DuckChatContextualFragment :
                         setFragmentResult(KEY_DUCK_AI_CONTEXTUAL_RESULT, result)
                     }
 
-                    DuckChatContextualViewModel.Command.CloseSheet -> {
-                        bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+                    is DuckChatContextualViewModel.Command.ChangeSheetState -> {
+                        bottomSheetBehavior.state = command.newState
                     }
                 }
             }.launchIn(lifecycleScope)
@@ -490,6 +490,10 @@ class DuckChatContextualFragment :
                     is DuckChatContextualSharedViewModel.Command.PageContextAttached -> {
                         logcat { "Duck.ai Contextual: page context received" }
                         viewModel.onPageContextReceived(command.tabId, command.pageContext)
+                    }
+
+                    DuckChatContextualSharedViewModel.Command.OpenSheet -> {
+                        viewModel.reopenSheet()
                     }
                 }
             }.launchIn(lifecycleScope)

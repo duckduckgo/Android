@@ -68,7 +68,7 @@ class DuckChatContextualViewModel @Inject constructor(
         data class LoadUrl(val url: String) : Command()
         data object SendSubscriptionAuthUpdateEvent : Command()
         data class OpenFullscreenMode(val url: String) : Command()
-        data object CloseSheet : Command()
+        data class ChangeSheetState(val newState: Int) : Command()
     }
 
     private val _viewState: MutableStateFlow<ViewState> =
@@ -114,14 +114,15 @@ class DuckChatContextualViewModel @Inject constructor(
         }
     }
 
-    fun onSheetOpened(tabId: String) {
-        _viewState.update { current ->
-            current.copy(
-                tabId = tabId,
-                chatHistoryEnabled = false,
-            )
-        }
+    fun reopenSheet() {
+        logcat { "Duck.ai: reopenSheet" }
 
+        viewModelScope.launch {
+            commandChannel.trySend(Command.ChangeSheetState(BottomSheetBehavior.STATE_EXPANDED))
+        }
+    }
+
+    fun onSheetOpened(tabId: String) {
         viewModelScope.launch(dispatchers.io()) {
             logcat { "Duck.ai: onSheetOpened for tab=$tabId" }
 
@@ -242,7 +243,7 @@ class DuckChatContextualViewModel @Inject constructor(
 
     fun onContextualClose() {
         viewModelScope.launch {
-            commandChannel.trySend(Command.CloseSheet)
+            commandChannel.trySend(Command.ChangeSheetState(BottomSheetBehavior.STATE_HIDDEN))
         }
     }
 
