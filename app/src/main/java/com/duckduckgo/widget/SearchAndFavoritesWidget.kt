@@ -39,6 +39,7 @@ import com.duckduckgo.widget.FavoritesWidgetItemFactory.Companion.THEME_EXTRAS
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import logcat.LogPriority
 import logcat.LogPriority.INFO
 import logcat.logcat
 import javax.inject.Inject
@@ -103,19 +104,14 @@ class SearchAndFavoritesWidget : AppWidgetProvider() {
         appWidgetManager: AppWidgetManager,
         appWidgetIds: IntArray,
     ) {
+        logcat(INFO) { "SearchAndFavoritesWidget: onUpdate" }
         // need to use goAsync since updating the widget may take some time
-        // and without it onUpdate could be called multiple times at same time
-        val pendingResult = goAsync()
-        appCoroutineScope.launch {
-            try {
-                appWidgetIds.forEach { id ->
-                    updateWidget(context, appWidgetManager, id, null)
-                }
-            } finally {
-                pendingResult.finish()
+        // and without it onUpdate/onAppWidgetOptionsChanged could be called multiple times at same time
+        goSafeAsync {
+            appWidgetIds.forEach { id ->
+                updateWidget(context, appWidgetManager, id, null)
             }
         }
-        super.onUpdate(context, appWidgetManager, appWidgetIds)
     }
 
     override fun onAppWidgetOptionsChanged(
@@ -124,18 +120,12 @@ class SearchAndFavoritesWidget : AppWidgetProvider() {
         appWidgetId: Int,
         newOptions: Bundle,
     ) {
-        logcat(INFO) { "SearchAndFavoritesWidget - onAppWidgetOptionsChanged" }
+        logcat(INFO) { "SearchAndFavoritesWidget: onAppWidgetOptionsChanged" }
         // need to use goAsync since updating the widget may take some time
-        // and without it onUpdate could be called multiple times at same time
-        val pendingResult = goAsync()
-        appCoroutineScope.launch {
-            try {
-                updateWidget(context, appWidgetManager, appWidgetId, newOptions)
-            } finally {
-                pendingResult.finish()
-            }
+        // and without it onAppWidgetOptionsChanged/onUpdate could be called multiple times at same time
+        goSafeAsync {
+            updateWidget(context, appWidgetManager, appWidgetId, newOptions)
         }
-        super.onAppWidgetOptionsChanged(context, appWidgetManager, appWidgetId, newOptions)
     }
 
     override fun onDeleted(
@@ -211,10 +201,10 @@ class SearchAndFavoritesWidget : AppWidgetProvider() {
         var portraitHeight = appWidgetOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT)
 
         if (newOptions != null) {
-            portraitWidth = appWidgetOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH)
-            landsWidth = appWidgetOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_WIDTH)
-            landsHeight = appWidgetOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT)
-            portraitHeight = appWidgetOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT)
+            portraitWidth = newOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH)
+            landsWidth = newOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_WIDTH)
+            landsHeight = newOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT)
+            portraitHeight = newOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT)
         }
 
         val orientation = context.resources.configuration.orientation
@@ -320,6 +310,39 @@ class SearchAndFavoritesWidget : AppWidgetProvider() {
         }
         factory.onDestroy()
         return builder.build()
+    }
+
+    @Suppress("NoHardcodedCoroutineDispatcher")
+    private fun goSafeAsync(
+        block: suspend () -> Unit,
+    ) {
+        if (Build.MANUFACTURER.equals("vivo", ignoreCase = true)) {
+            // avoid calling goAsync() on Vivo devices as calling finish() on the PendingResult can cause crash:
+            // https://issuetracker.google.com/issues/257513022
+            appCoroutineScope.launch {
+                try {
+                    block()
+                } catch (e: Exception) {
+                    logcat(LogPriority.ERROR) { "Failed to finish PendingResult: $e" }
+                }
+            }
+            return
+        }
+
+        val pendingResult = goAsync()
+        appCoroutineScope.launch {
+            try {
+                block()
+            } finally {
+                // Always call finish(), even if the coroutineScope was cancelled
+                try {
+                    pendingResult?.finish()
+                } catch (e: Exception) {
+                    // on some devices like Vivo, calling finish() can throw an exception: https://issuetracker.google.com/issues/257513022
+                    logcat(LogPriority.ERROR) { "Failed to finish PendingResult: $e" }
+                }
+            }
+        }
     }
 
     companion object {
