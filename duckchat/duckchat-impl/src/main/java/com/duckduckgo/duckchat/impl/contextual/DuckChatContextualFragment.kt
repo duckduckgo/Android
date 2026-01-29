@@ -532,10 +532,10 @@ class DuckChatContextualFragment :
 
     private fun renderViewState(viewState: DuckChatContextualViewModel.ViewState) {
         logcat { "Duck.ai Contextual: render $viewState" }
-        if (viewState.chatHistoryEnabled) {
-            binding.contextualFullScreen.gone()
-        } else {
+        if (viewState.showFullscreen) {
             binding.contextualFullScreen.show()
+        } else {
+            binding.contextualFullScreen.gone()
         }
 
         when (viewState.sheetMode) {
@@ -546,6 +546,7 @@ class DuckChatContextualFragment :
                 binding.contextualNewChat.gone()
 
                 renderPageContext(viewState.contextTitle, viewState.contextUrl, viewState.tabId)
+
                 if (viewState.showContext) {
                     binding.duckAiContextualLayout.show()
                     binding.contextualModePrompts.show()

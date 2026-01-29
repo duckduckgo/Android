@@ -86,7 +86,8 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
                 isSearchSectionVisible = isSearchSectionVisible(duckChatActivityParams),
                 isHideGeneratedImagesOptionVisible = showHideAiGeneratedImagesOption,
                 isAutomaticContextEnabled = isAutomaticPageContextEnabled,
-                isAutomaticContextVisible = isDuckChatUserEnabled && duckChatFeature.contextualMode().isEnabled(),
+                isAutomaticContextVisible = isDuckChatUserEnabled && duckChatFeature.contextualMode()
+                    .isEnabled() && duckChatFeature.automaticContextAttachment().isEnabled(),
             )
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ViewState())
 

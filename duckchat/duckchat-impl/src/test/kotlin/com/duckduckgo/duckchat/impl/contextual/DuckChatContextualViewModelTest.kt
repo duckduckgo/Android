@@ -20,17 +20,16 @@ import android.content.Context
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
-import com.duckduckgo.duckchat.impl.helper.NativeAction
+import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper
 import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
-import com.duckduckgo.js.messaging.api.SubscriptionEventData
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
-import org.json.JSONObject
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
@@ -39,8 +38,6 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(AndroidJUnit4::class)
@@ -52,25 +49,17 @@ class DuckChatContextualViewModelTest {
 
     private lateinit var testee: DuckChatContextualViewModel
     private val duckChat: com.duckduckgo.duckchat.api.DuckChat = FakeDuckChat()
-    private val duckChatJSHelper: DuckChatJSHelper = mock()
     private val contextualDataStore = FakeDuckChatContextualDataStore()
+    private val duckChatFeature = FakeFeatureToggleFactory.create(DuckChatFeature::class.java)
 
     @Before
     fun setup() {
-        whenever(
-            duckChatJSHelper.onNativeAction(NativeAction.NEW_CHAT),
-        ).thenReturn(
-            SubscriptionEventData(
-                RealDuckChatJSHelper.DUCK_CHAT_FEATURE_NAME,
-                "submitNewChatAction",
-                JSONObject(),
-            ),
-        )
+        duckChatFeature.automaticContextAttachment().setRawStoredState(Toggle.State(enable = true))
 
         testee = DuckChatContextualViewModel(
             dispatchers = coroutineRule.testDispatcherProvider,
             duckChat = duckChat,
-            duckChatJSHelper = duckChatJSHelper,
+            duckChatFeature = duckChatFeature,
             contextualDataStore = contextualDataStore,
         )
     }
@@ -193,7 +182,7 @@ class DuckChatContextualViewModelTest {
 
             testee.commands.test {
                 testee.onSheetOpened(tabId)
-                val command = awaitItem()
+                val command = expectMostRecentItem()
                 assertTrue(command is DuckChatContextualViewModel.Command.LoadUrl)
                 assertEquals(expectedUrl, (command as DuckChatContextualViewModel.Command.LoadUrl).url)
                 cancelAndIgnoreRemainingEvents()
@@ -215,11 +204,9 @@ class DuckChatContextualViewModelTest {
 
             enableAutomaticContextAttachment()
             testee.viewState.test {
-                awaitItem()
-
                 testee.onPageContextReceived(tabId, serializedPageData)
 
-                val state = awaitItem() as DuckChatContextualViewModel.ViewState
+                val state = expectMostRecentItem() as DuckChatContextualViewModel.ViewState
                 assertTrue(state.showContext)
                 assertEquals("Ctx Title", state.contextTitle)
                 assertEquals("https://ctx.com", state.contextUrl)
@@ -315,8 +302,6 @@ class DuckChatContextualViewModelTest {
 
     @Test
     fun `reopenSheet half expands when sheet in input mode`() = runTest {
-        testee.onSheetOpened("tabId")
-
         testee.commands.test {
             testee.reopenSheet()
 
@@ -383,25 +368,34 @@ class DuckChatContextualViewModelTest {
     @Test
     fun `when full mode requested with url then open fullscreen command emitted`() =
         runTest {
-            setFullModeUrl("https://duck.chat/full")
+            val tabId = "tab-1"
+            val url = "https://duck.ai/chat?chatID=123"
+            contextualDataStore.persistTabChatUrl(tabId, url)
+
+            testee.onSheetOpened(tabId)
+            testee.onChatPageLoaded(url)
 
             testee.commands.test {
                 testee.onFullModeRequested()
 
-                val command = awaitItem() as DuckChatContextualViewModel.Command.OpenFullscreenMode
-                assertEquals("https://duck.chat/full", command.url)
+                val command = expectMostRecentItem() as DuckChatContextualViewModel.Command.OpenFullscreenMode
+                assertEquals(url, command.url)
 
                 cancelAndIgnoreRemainingEvents()
             }
         }
 
     @Test
-    fun `when full mode requested without url then no command emitted`() =
+    fun `when full mode requested without url then default fullscreen command emitted`() =
         runTest {
+            (duckChat as FakeDuckChat).nextUrl = "https://duck.ai/default"
+
             testee.commands.test {
                 testee.onFullModeRequested()
 
-                expectNoEvents()
+                val command = awaitItem() as DuckChatContextualViewModel.Command.OpenFullscreenMode
+                assertEquals("https://duck.ai/default", command.url)
+
                 cancelAndIgnoreRemainingEvents()
             }
         }
@@ -430,7 +424,7 @@ class DuckChatContextualViewModelTest {
     }
 
     @Test
-    fun `when sheet opened with stored chat url then load it and expand`() = runTest {
+    fun `when sheet opened with stored chat url then load it and half expand`() = runTest {
         val tabId = "tab-1"
         val storedUrl = "https://duck.ai/chat?chatID=123"
         contextualDataStore.persistTabChatUrl(tabId, storedUrl)
@@ -438,8 +432,7 @@ class DuckChatContextualViewModelTest {
         testee.commands.test {
             testee.onSheetOpened(tabId)
 
-            val changeState =
-                awaitItem() as DuckChatContextualViewModel.Command.ChangeSheetState
+            val changeState = awaitItem() as DuckChatContextualViewModel.Command.ChangeSheetState
             assertEquals(BottomSheetBehavior.STATE_EXPANDED, changeState.newState)
 
             val loadCommand = awaitItem() as DuckChatContextualViewModel.Command.LoadUrl
@@ -449,20 +442,7 @@ class DuckChatContextualViewModelTest {
             assertEquals(DuckChatContextualViewModel.SheetMode.WEBVIEW, state.sheetMode)
             assertEquals(storedUrl, state.url)
             assertEquals(tabId, state.tabId)
-            assertTrue(state.chatHistoryEnabled)
-
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun `onNewChatRequested emits new chat subscription`() = runTest {
-        testee.subscriptionEventDataFlow.test {
-            testee.onNewChatRequested()
-
-            val event = awaitItem()
-            assertEquals("submitNewChatAction", event.subscriptionName)
-            assertEquals(RealDuckChatJSHelper.DUCK_CHAT_FEATURE_NAME, event.featureName)
+            assertTrue(state.showFullscreen)
 
             cancelAndIgnoreRemainingEvents()
         }
@@ -472,45 +452,28 @@ class DuckChatContextualViewModelTest {
     fun `onChatPageLoaded stores url by tab id`() = runTest {
         val tabId = "tab-1"
         val url = "https://duck.ai/chat?chatID=123"
+        contextualDataStore.persistTabChatUrl(tabId, url)
+
         testee.onSheetOpened(tabId)
-
         testee.onChatPageLoaded(url)
-        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
 
-        assertEquals(url, contextualDataStore.getTabChatUrl(tabId))
-        assertTrue(testee.viewState.value.chatHistoryEnabled)
-    }
-
-    @Test
-    fun `onChatPageLoaded without chat id does not store url`() = runTest {
-        val tabId = "tab-1"
-        val url = "https://duck.ai/chat"
-        testee.onSheetOpened(tabId)
-
-        testee.onChatPageLoaded(url)
-        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
-
-        assertNull(contextualDataStore.getTabChatUrl(tabId))
-        assertFalse(testee.viewState.value.chatHistoryEnabled)
+        testee.viewState.test {
+            val state = expectMostRecentItem()
+            assertTrue(state.showFullscreen)
+            assertEquals(url, contextualDataStore.getTabChatUrl(tabId))
+        }
     }
 
     @Test
     fun `onNewChatRequested clears stored url for current tab`() = runTest {
         val tabId = "tab-1"
         val url = "https://duck.ai/chat?chatID=123"
-        testee.onSheetOpened(tabId)
         contextualDataStore.persistTabChatUrl(tabId, url)
 
+        testee.onSheetOpened(tabId)
         testee.onNewChatRequested()
-        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
 
         assertNull(contextualDataStore.getTabChatUrl(tabId))
-    }
-
-    private fun setFullModeUrl(url: String) {
-        val fullModeUrlField = DuckChatContextualViewModel::class.java.getDeclaredField("fullModeUrl")
-        fullModeUrlField.isAccessible = true
-        fullModeUrlField.set(testee, url)
     }
 
     private fun enableAutomaticContextAttachment() {

@@ -34,6 +34,7 @@ import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.settings.api.SettingsPageFeature
 import junit.framework.TestCase.assertEquals
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
@@ -57,6 +58,7 @@ class DuckChatSettingsViewModelTest {
     private val mockInputScreenDiscoveryFunnel: InputScreenDiscoveryFunnel = mock()
     private val settingsPageFeature = FakeFeatureToggleFactory.create(SettingsPageFeature::class.java)
     private val duckChatFeature = FakeFeatureToggleFactory.create(DuckChatFeature::class.java)
+    private val automaticContextAttachment = MutableStateFlow(false)
 
     @Before
     fun setUp() =
@@ -68,7 +70,7 @@ class DuckChatSettingsViewModelTest {
             whenever(duckChat.observeShowInAddressBarUserSetting()).thenReturn(flowOf(false))
             whenever(duckChat.observeCosmeticInputScreenUserSettingEnabled()).thenReturn(flowOf(null))
             whenever(duckChat.observeInputScreenUserSettingEnabled()).thenReturn(flowOf(false))
-            whenever(duckChat.observeAutomaticContextAttachmentUserSettingEnabled()).thenReturn(flowOf(false))
+            whenever(duckChat.observeAutomaticContextAttachmentUserSettingEnabled()).thenReturn(automaticContextAttachment)
             testee = DuckChatSettingsViewModel(
                 duckChatActivityParams = DuckChatSettingsNoParams,
                 duckChat = duckChat,
@@ -79,6 +81,22 @@ class DuckChatSettingsViewModelTest {
                 duckChatFeature = duckChatFeature,
             )
         }
+
+    @Test
+    fun `automatic context attachment toggles view state`() = runTest {
+        testee.viewState.test {
+            val initial = expectMostRecentItem()
+            assertFalse(initial.isAutomaticContextEnabled)
+
+            automaticContextAttachment.value = true
+            assertTrue(awaitItem().isAutomaticContextEnabled)
+
+            automaticContextAttachment.value = false
+            assertFalse(awaitItem().isAutomaticContextEnabled)
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
 
     @Test
     fun whenDuckChatUserEnabledToggledDisabledThenSetUserSetting() =
@@ -615,12 +633,15 @@ class DuckChatSettingsViewModelTest {
         }
 
     @Test
-    fun `view state - automatic context visible when flag enabled and duck chat enabled`() =
+    fun `view state - automatic context visible when flags enabled and duck chat enabled`() =
         runTest {
             whenever(duckChat.observeEnableDuckChatUserSetting()).thenReturn(flowOf(true))
             whenever(duckChat.observeAutomaticContextAttachmentUserSettingEnabled()).thenReturn(flowOf(false))
             @Suppress("DenyListedApi")
             duckChatFeature.contextualMode().setRawStoredState(State(enable = true))
+            @Suppress("DenyListedApi")
+            duckChatFeature.automaticContextAttachment().setRawStoredState(State(enable = true))
+
             testee = DuckChatSettingsViewModel(
                 duckChatActivityParams = DuckChatNativeSettingsNoParams,
                 duckChat = duckChat,

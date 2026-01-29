@@ -23,8 +23,7 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.api.DuckChat
-import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
-import com.duckduckgo.duckchat.impl.helper.NativeAction
+import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper
 import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
@@ -32,9 +31,11 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -46,7 +47,7 @@ import javax.inject.Inject
 class DuckChatContextualViewModel @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val duckChat: DuckChat,
-    private val duckChatJSHelper: DuckChatJSHelper,
+    private val duckChatFeature: DuckChatFeature,
     private val contextualDataStore: DuckChatContextualDataStore,
 ) : ViewModel() {
 
@@ -76,21 +77,29 @@ class DuckChatContextualViewModel @Inject constructor(
             ViewState(
                 sheetMode = SheetMode.INPUT,
                 showContext = false,
-                allowsAutomaticContextAttachment = false,
+                showFullscreen = true,
                 contextUrl = "",
                 contextTitle = "",
                 tabId = "",
                 prompt = "",
                 url = "",
-                chatHistoryEnabled = false,
             ),
         )
-    val viewState: StateFlow<ViewState> = _viewState.asStateFlow()
+
+    val viewState = combine(
+        _viewState,
+        duckChatFeature.automaticContextAttachment().enabled(),
+        duckChat.observeAutomaticContextAttachmentUserSettingEnabled(),
+    ) { state, automaticContextAttachmentEnabled, userSettingEnabled ->
+        state.copy(
+            allowsAutomaticContextAttachment = automaticContextAttachmentEnabled && userSettingEnabled,
+        )
+    }.flowOn(dispatchers.io()).stateIn(viewModelScope, SharingStarted.Eagerly, _viewState.value)
 
     data class ViewState(
         val sheetMode: SheetMode = SheetMode.INPUT,
         val allowsAutomaticContextAttachment: Boolean = false,
-        val chatHistoryEnabled: Boolean = false,
+        val showFullscreen: Boolean = true,
         val showContext: Boolean = false,
         val contextUrl: String = "",
         val contextTitle: String = "",
@@ -98,19 +107,6 @@ class DuckChatContextualViewModel @Inject constructor(
         val prompt: String = "",
         val url: String = "",
     )
-
-    init {
-        viewModelScope.launch(dispatchers.io()) {
-            duckChat.observeAutomaticContextAttachmentUserSettingEnabled().collect { enabled ->
-                _viewState.update {
-                    it.copy(
-                        allowsAutomaticContextAttachment = enabled,
-                        showContext = enabled,
-                    )
-                }
-            }
-        }
-    }
 
     fun reopenSheet() {
         logcat { "Duck.ai: reopenSheet" }
@@ -130,11 +126,17 @@ class DuckChatContextualViewModel @Inject constructor(
             logcat { "Duck.ai: onSheetOpened for tab=$tabId" }
 
             val existingChatUrl = contextualDataStore.getTabChatUrl(tabId)
-
             if (existingChatUrl.isNullOrBlank()) {
-                val chatUrl = duckChat.getDuckChatUrl("", false, sidebar = true)
                 withContext(dispatchers.main()) {
+                    commandChannel.trySend(Command.ChangeSheetState(BottomSheetBehavior.STATE_HALF_EXPANDED))
+                    val chatUrl = duckChat.getDuckChatUrl("", false, sidebar = true)
                     commandChannel.trySend(Command.LoadUrl(chatUrl))
+                    _viewState.update {
+                        it.copy(
+                            sheetMode = SheetMode.INPUT,
+                            showFullscreen = true,
+                        )
+                    }
                 }
             } else {
                 val hasChatHistory = hasChatId(existingChatUrl)
@@ -145,7 +147,7 @@ class DuckChatContextualViewModel @Inject constructor(
                             sheetMode = SheetMode.WEBVIEW,
                             url = existingChatUrl,
                             tabId = tabId,
-                            chatHistoryEnabled = hasChatHistory,
+                            showFullscreen = hasChatHistory,
                         )
                     }
                     commandChannel.trySend(Command.ChangeSheetState(BottomSheetBehavior.STATE_EXPANDED))
@@ -184,18 +186,20 @@ class DuckChatContextualViewModel @Inject constructor(
         logcat { "Duck.ai: onChatPageLoaded $url" }
         val hasChatId = hasChatId(url)
 
-        viewModelScope.launch {
-            _viewState.update { current ->
-                current.copy(chatHistoryEnabled = hasChatId)
+        val currentState = _viewState.value
+        if (currentState.sheetMode == SheetMode.WEBVIEW) {
+            viewModelScope.launch {
+                _viewState.update { current ->
+                    current.copy(showFullscreen = hasChatId)
+                }
             }
-        }
-
-        if (url != null && hasChatId) {
-            fullModeUrl = url
-            val tabId = _viewState.value.tabId
-            if (tabId.isNotBlank()) {
-                viewModelScope.launch(dispatchers.io()) {
-                    contextualDataStore.persistTabChatUrl(tabId, url)
+            if (url != null && hasChatId) {
+                fullModeUrl = url
+                val tabId = _viewState.value.tabId
+                if (tabId.isNotBlank()) {
+                    viewModelScope.launch(dispatchers.io()) {
+                        contextualDataStore.persistTabChatUrl(tabId, url)
+                    }
                 }
             }
         }
@@ -271,10 +275,16 @@ class DuckChatContextualViewModel @Inject constructor(
 
     fun onFullModeRequested() {
         logcat { "Duck.ai: request fullmode url $fullModeUrl" }
-        if (fullModeUrl.isNotEmpty()) {
-            viewModelScope.launch {
-                commandChannel.trySend(Command.OpenFullscreenMode(fullModeUrl))
+        val currentState = _viewState.value
+        val chatUrl = if (currentState.sheetMode == SheetMode.INPUT) {
+            duckChat.getDuckChatUrl("", false, sidebar = false)
+        } else {
+            fullModeUrl.ifEmpty {
+                duckChat.getDuckChatUrl("", false, sidebar = false)
             }
+        }
+        viewModelScope.launch {
+            commandChannel.trySend(Command.OpenFullscreenMode(chatUrl))
         }
     }
 
@@ -324,11 +334,15 @@ class DuckChatContextualViewModel @Inject constructor(
             if (currentTabId.isNotBlank()) {
                 contextualDataStore.clearTabChatUrl(currentTabId)
                 withContext(dispatchers.main()) {
-                    _viewState.update { it.copy(chatHistoryEnabled = false) }
+                    _viewState.update {
+                        it.copy(
+                            sheetMode = SheetMode.INPUT,
+                            showFullscreen = true,
+                        )
+                    }
+                    commandChannel.trySend(Command.ChangeSheetState(BottomSheetBehavior.STATE_HALF_EXPANDED))
                 }
             }
-            val subscriptionEvent = duckChatJSHelper.onNativeAction(NativeAction.NEW_CHAT)
-            _subscriptionEventDataChannel.trySend(subscriptionEvent)
         }
     }
 

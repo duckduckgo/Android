@@ -3372,7 +3372,7 @@ class BrowserTabFragment :
         childFragmentManager.setFragmentResultListener(KEY_DUCK_AI_CONTEXTUAL_RESULT, viewLifecycleOwner) { _, bundle ->
             val contextualChatUrl = bundle.getString(KEY_DUCK_AI_URL)
             contextualChatUrl?.let {
-                viewModel.onUserSubmittedQuery(contextualChatUrl)
+                viewModel.openLinkInNewTab(contextualChatUrl.toUri())
                 removeDuckChatContextualSheet()
             }
         }
@@ -3380,20 +3380,32 @@ class BrowserTabFragment :
 
     private fun ensureBrowserIsCompatibleWithContextualSheetState() {
         val bottomSheetBehavior = BottomSheetBehavior.from(binding.duckAiContextualFragmentContainer)
-        bottomSheetBehavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
-            override fun onStateChanged(bottomSheet: View, newState: Int) {
-                logcat { "Duck.ai Contextual: BTF onStateChanged $newState" }
-                if (newState == BottomSheetBehavior.STATE_HIDDEN) {
-                    binding.duckAiContextualFragmentContainer.gone()
-                    hideKeyboard()
-                    browserActivity?.onEditModeChanged(false)
+        bottomSheetBehavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
+
+        bottomSheetBehavior.addBottomSheetCallback(
+            object : BottomSheetBehavior.BottomSheetCallback() {
+                override fun onStateChanged(
+                    bottomSheet: View,
+                    newState: Int,
+                ) {
+                    logcat { "Duck.ai Contextual: BTF onStateChanged $newState" }
+                    if (newState == BottomSheetBehavior.STATE_HIDDEN) {
+                        binding.duckAiContextualFragmentContainer.gone()
+                        hideKeyboard()
+                        browserActivity?.onEditModeChanged(false)
+                    }
+                    if (newState == BottomSheetBehavior.STATE_HALF_EXPANDED || newState == BottomSheetBehavior.STATE_EXPANDED) {
+                        browserActivity?.onEditModeChanged(true)
+                    }
                 }
-                if (newState == BottomSheetBehavior.STATE_HALF_EXPANDED || newState == BottomSheetBehavior.STATE_EXPANDED) {
-                    browserActivity?.onEditModeChanged(true)
+
+                override fun onSlide(
+                    bottomSheet: View,
+                    slideOffset: Float,
+                ) {
                 }
-            }
-            override fun onSlide(bottomSheet: View, slideOffset: Float) {}
-        })
+            },
+        )
     }
 
     private fun showDuckAiContextualOnboarding() {
