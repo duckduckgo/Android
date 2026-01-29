@@ -22,6 +22,8 @@ import androidx.work.CoroutineWorker
 import androidx.work.ListenableWorker.Result.success
 import androidx.work.WorkerParameters
 import com.duckduckgo.anvil.annotations.ContributesWorker
+import com.duckduckgo.app.fire.store.FireDataStore
+import com.duckduckgo.app.fire.wideevents.DataClearingWideEvent
 import com.duckduckgo.app.global.view.ClearDataAction
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.clear.ClearWhatOption
@@ -54,6 +56,12 @@ class DataClearingWorker(
     lateinit var androidBrowserConfigFeature: AndroidBrowserConfigFeature
 
     @Inject
+    lateinit var fireDataStore: FireDataStore
+
+    @Inject
+    lateinit var dataClearingWideEvent: DataClearingWideEvent
+
+    @Inject
     lateinit var dispatchers: DispatcherProvider
 
     @WorkerThread
@@ -68,9 +76,31 @@ class DataClearingWorker(
         withContext(dispatchers.io()) {
             if (androidBrowserConfigFeature.improvedDataClearingOptions().isEnabled()) {
                 // Use new granular clearing - will automatically kill the process
-                dataClearing.clearDataUsingAutomaticFireOptions()
+                val clearOptions = fireDataStore.getAutomaticClearOptions()
+                dataClearingWideEvent.start(
+                    entryPoint = DataClearingWideEvent.EntryPoint.AUTO_BACKGROUND,
+                    clearOptions = clearOptions,
+                )
+                try {
+                    dataClearing.clearDataUsingAutomaticFireOptions()
+                    dataClearingWideEvent.finishSuccess()
+                } catch (e: Exception) {
+                    dataClearingWideEvent.finishFailure(e)
+                    throw e
+                }
             } else {
-                clearData(settingsDataStore.automaticallyClearWhatOption)
+                dataClearingWideEvent.startLegacy(
+                    entryPoint = DataClearingWideEvent.EntryPoint.LEGACY_AUTO_BACKGROUND,
+                    clearWhatOption = settingsDataStore.automaticallyClearWhatOption,
+                    clearDuckAiData = settingsDataStore.clearDuckAiData,
+                )
+                try {
+                    clearData(settingsDataStore.automaticallyClearWhatOption)
+                    dataClearingWideEvent.finishSuccess()
+                } catch (e: Exception) {
+                    dataClearingWideEvent.finishFailure(e)
+                    throw e
+                }
             }
         }
 
