@@ -282,6 +282,55 @@ class DuckChatContextualViewModelTest {
         }
 
     @Test
+    fun `when prompt sent then sheet expands`() = runTest {
+        testee.commands.test {
+            testee.onPromptSent("hello")
+
+            val command = awaitItem()
+            assertEquals(
+                DuckChatContextualViewModel.Command.ChangeSheetState(BottomSheetBehavior.STATE_EXPANDED),
+                command,
+            )
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `reopenSheet expands when sheet in webview mode`() = runTest {
+        testee.onPromptSent("test")
+
+        testee.commands.test {
+            testee.reopenSheet()
+
+            val command = awaitItem()
+            assertEquals(
+                DuckChatContextualViewModel.Command.ChangeSheetState(BottomSheetBehavior.STATE_EXPANDED),
+                command,
+            )
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `reopenSheet half expands when sheet in input mode`() = runTest {
+        testee.onSheetOpened("tabId")
+
+        testee.commands.test {
+            testee.reopenSheet()
+
+            val command = awaitItem()
+            assertEquals(
+                DuckChatContextualViewModel.Command.ChangeSheetState(BottomSheetBehavior.STATE_HALF_EXPANDED),
+                command,
+            )
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
     fun `when contextual close invoked then sheet hidden`() =
         runTest {
             testee.commands.test {

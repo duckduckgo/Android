@@ -116,7 +116,12 @@ class DuckChatContextualViewModel @Inject constructor(
         logcat { "Duck.ai: reopenSheet" }
 
         viewModelScope.launch {
-            commandChannel.trySend(Command.ChangeSheetState(BottomSheetBehavior.STATE_EXPANDED))
+            val currentState = _viewState.value
+            if (currentState.sheetMode == SheetMode.INPUT) {
+                commandChannel.trySend(Command.ChangeSheetState(BottomSheetBehavior.STATE_HALF_EXPANDED))
+            } else {
+                commandChannel.trySend(Command.ChangeSheetState(BottomSheetBehavior.STATE_EXPANDED))
+            }
         }
     }
 
