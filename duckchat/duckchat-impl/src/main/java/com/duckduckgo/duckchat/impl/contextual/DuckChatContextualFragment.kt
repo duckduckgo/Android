@@ -500,6 +500,12 @@ class DuckChatContextualFragment :
         logcat { "Duck.ai Contextual: render $viewState" }
         bottomSheetBehavior.state = viewState.sheetState
 
+        if (viewState.chatHistoryEnabled) {
+            binding.contextualFullScreen.show()
+        } else {
+            binding.contextualFullScreen.gone()
+        }
+
         when (viewState.sheetMode) {
             DuckChatContextualViewModel.SheetMode.INPUT -> {
                 binding.contextualModeNativeContent.show()

@@ -16,6 +16,7 @@
 
 package com.duckduckgo.duckchat.impl.contextual
 
+import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
@@ -81,6 +82,7 @@ class DuckChatContextualViewModel @Inject constructor(
                 tabId = "",
                 prompt = "",
                 url = "",
+                chatHistoryEnabled = false,
             ),
         )
     val viewState: StateFlow<ViewState> = _viewState.asStateFlow()
@@ -89,6 +91,7 @@ class DuckChatContextualViewModel @Inject constructor(
         val sheetMode: SheetMode = SheetMode.INPUT,
         val sheetState: Int = BottomSheetBehavior.STATE_HALF_EXPANDED,
         val allowsAutomaticContextAttachment: Boolean = false,
+        val chatHistoryEnabled: Boolean = false,
         val showContext: Boolean = false,
         val contextUrl: String = "",
         val contextTitle: String = "",
@@ -112,7 +115,10 @@ class DuckChatContextualViewModel @Inject constructor(
 
     fun onSheetOpened(tabId: String) {
         _viewState.update { current ->
-            current.copy(tabId = tabId)
+            current.copy(
+                tabId = tabId,
+                chatHistoryEnabled = false,
+            )
         }
 
         viewModelScope.launch(dispatchers.io()) {
@@ -126,6 +132,8 @@ class DuckChatContextualViewModel @Inject constructor(
                     commandChannel.trySend(Command.LoadUrl(chatUrl))
                 }
             } else {
+                val hasChatHistory = hasChatId(existingChatUrl)
+
                 withContext(dispatchers.main()) {
                     _viewState.update { current ->
                         current.copy(
@@ -133,6 +141,7 @@ class DuckChatContextualViewModel @Inject constructor(
                             sheetState = BottomSheetBehavior.STATE_EXPANDED,
                             url = existingChatUrl,
                             tabId = tabId,
+                            chatHistoryEnabled = hasChatHistory,
                         )
                     }
                     commandChannel.trySend(Command.LoadUrl(existingChatUrl))
@@ -175,7 +184,15 @@ class DuckChatContextualViewModel @Inject constructor(
 
     fun onChatPageLoaded(url: String?) {
         logcat { "Duck.ai: onChatPageLoaded $url" }
-        if (url != null) {
+        val hasChatId = hasChatId(url)
+
+        viewModelScope.launch {
+            _viewState.update { current ->
+                current.copy(chatHistoryEnabled = hasChatId)
+            }
+        }
+
+        if (url != null && hasChatId) {
             fullModeUrl = url
             val tabId = _viewState.value.tabId
             if (tabId.isNotBlank()) {
@@ -218,22 +235,6 @@ class DuckChatContextualViewModel @Inject constructor(
         return SubscriptionEventData(
             featureName = RealDuckChatJSHelper.DUCK_CHAT_FEATURE_NAME,
             subscriptionName = "submitAIChatNativePrompt",
-            params = params,
-        )
-    }
-
-    private fun generateContext(): SubscriptionEventData {
-        val params =
-            JSONObject().apply {
-                put(
-                    "pageContext",
-                    JSONObject(updatedPageContext),
-                )
-            }
-
-        return SubscriptionEventData(
-            featureName = RealDuckChatJSHelper.DUCK_CHAT_FEATURE_NAME,
-            subscriptionName = "submitAIChatPageContext",
             params = params,
         )
     }
@@ -312,6 +313,7 @@ class DuckChatContextualViewModel @Inject constructor(
                 onContextualClose()
                 return true
             }
+
             else -> {
                 return false
             }
@@ -323,9 +325,18 @@ class DuckChatContextualViewModel @Inject constructor(
             val currentTabId = _viewState.value.tabId
             if (currentTabId.isNotBlank()) {
                 contextualDataStore.clearTabChatUrl(currentTabId)
+                withContext(dispatchers.main()) {
+                    _viewState.update { it.copy(chatHistoryEnabled = false) }
+                }
             }
             val subscriptionEvent = duckChatJSHelper.onNativeAction(NativeAction.NEW_CHAT)
             _subscriptionEventDataChannel.trySend(subscriptionEvent)
         }
+    }
+
+    private fun hasChatId(url: String?): Boolean {
+        return url?.toUri()?.getQueryParameter("chatID")
+            .orEmpty()
+            .isNotBlank()
     }
 }

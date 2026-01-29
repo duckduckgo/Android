@@ -1120,7 +1120,7 @@ class BrowserTabViewModel @Inject constructor(
         query: String,
         queryOrigin: QueryOrigin = QueryOrigin.FromUser,
     ) {
-        logcat { "Duck.ai: onUserSubmittedQuery $query" }
+        logcat { "onUserSubmittedQuery $query" }
         navigationAwareLoginDetector.onEvent(NavigationEvent.UserAction.NewQuerySubmitted)
 
         if (query.isBlank()) {
@@ -1170,8 +1170,6 @@ class BrowserTabViewModel @Inject constructor(
 
         val verticalParameter = extractVerticalParameter(url)
         var urlToNavigate = queryUrlConverter.convertQueryToUrl(trimmedInput, verticalParameter, queryOrigin)
-
-        logcat { "Duck.ai: urlToNavigate $urlToNavigate" }
 
         when (val type = specialUrlDetector.determineType(trimmedInput)) {
             is ShouldLaunchDuckChatLink -> {
@@ -2051,11 +2049,9 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private fun evaluateDuckAIPage(url: String?) {
-        logcat { "Duck.ai: evaluateDuckAIPage $url" }
         url?.let {
             if (duckAiFeatureState.showFullScreenMode.value) {
                 if (duckDuckGoUrlDetector.isDuckDuckGoChatUrl(it)) {
-                    logcat { "Duck.ai: AI Chat page loaded $it" }
                     command.value = Command.EnableDuckAIFullScreen(currentBrowserViewState())
                 } else {
                     command.value = Command.DisableDuckAIFullScreen(url)
@@ -4064,7 +4060,6 @@ class BrowserTabViewModel @Inject constructor(
 
             PAGE_CONTEXT_FEATURE_NAME -> {
                 viewModelScope.launch(dispatchers.io()) {
-                    logcat { "Duck.ai: pageContext message feature=$featureName method=$method tabId=$tabId data=$data" }
                     val pageContext = pageContextJSHelper.processPageContext(featureName, method, data, tabId)
                     if (pageContext != null) {
                         withContext(dispatchers.main()) {
