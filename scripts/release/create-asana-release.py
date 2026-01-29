@@ -264,32 +264,32 @@ def remove_tasks_from_project(client: asana.ApiClient, task_links: List[AsanaTas
     log(f"Removed {removed_count} tasks from project")
 
 
-def get_latest_public_release_tag_before_commit(repo_path: str, current_tag: str) -> str | None:
-    """
-    Return the previous public release tag before `current_tag`, sorted by tagger date.
-    Public release tags match the pattern: X.Y.Z (e.g., 5.264.0)
-    """
-    public_pattern = re.compile(r'^\d+\.\d+\.\d+$')
+ def get_latest_public_release_tag_before_commit(repo_path: str, current_tag: str) -> str | None:
+      """
+      Return the previous public release tag before `current_tag`, sorted by semantic version.
+      Public release tags match the pattern: X.Y.Z (e.g., 5.264.0)
+      """
+      public_pattern = re.compile(r'^\d+\.\d+\.\d+$')
 
-    try:
-        result = subprocess.run(
-            ["git", "-C", repo_path, "for-each-ref", "--sort=taggerdate", "--format=%(refname:short)", "refs/tags"],
-            capture_output=True,
-            text=True,
-            check=True
-        )
-        tags = result.stdout.strip().splitlines()
+      try:
+          result = subprocess.run(
+              ["git", "-C", repo_path, "for-each-ref", "--sort=version:refname", "--format=%(refname:short)", "refs/tags"],
+              capture_output=True,
+              text=True,
+              check=True
+          )
+          tags = result.stdout.strip().splitlines()
 
-        # Filter to only public release tags (X.Y.Z format)
-        public_tags = [tag for tag in tags if public_pattern.match(tag)]
+          # Filter to only public release tags (X.Y.Z format)
+          public_tags = [tag for tag in tags if public_pattern.match(tag)]
 
-        # Exclude the current tag
-        public_tags = [tag for tag in public_tags if tag != current_tag]
+          if current_tag not in public_tags:
+              return None
 
-        # Return the last (most recent by tagger date) tag
-        return public_tags[-1] if public_tags else None
-    except subprocess.CalledProcessError:
-        return None
+          idx = public_tags.index(current_tag)
+          return public_tags[idx - 1] if idx > 0 else None
+      except subprocess.CalledProcessError:
+          return None
 
 
 def get_latest_internal_tag_before_commit(repo_path: str, current_tag: str) -> str | None:
