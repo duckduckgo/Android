@@ -30,7 +30,6 @@ import androidx.core.graphics.drawable.toBitmap
 import androidx.core.net.toUri
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.favicon.FaviconPersister
 import com.duckduckgo.app.browser.favicon.FileBasedFaviconPersister.Companion.FAVICON_PERSISTED_DIR
 import com.duckduckgo.app.browser.favicon.FileBasedFaviconPersister.Companion.NO_SUBFOLDER
@@ -57,9 +56,6 @@ class FavoritesWidgetItemFactory(
 
     @Inject
     lateinit var savedSitesRepository: SavedSitesRepository
-
-    @Inject
-    lateinit var faviconManager: FaviconManager
 
     @Inject
     lateinit var widgetPrefs: WidgetPreferences
@@ -187,11 +183,14 @@ class FavoritesWidgetItemFactory(
             if (item.bitmapUri != null) {
                 remoteViews.setViewVisibility(R.id.quickAccessFavicon, View.VISIBLE)
                 remoteViews.setImageViewUri(R.id.quickAccessFavicon, item.bitmapUri)
+                remoteViews.setViewVisibility(R.id.placeholderFavicon, View.GONE)
+            } else {
+                remoteViews.setViewVisibility(R.id.quickAccessFavicon, View.GONE)
+                remoteViews.setViewVisibility(R.id.placeholderFavicon, View.VISIBLE)
             }
             remoteViews.setViewVisibility(R.id.quickAccessFaviconContainer, View.VISIBLE)
             remoteViews.setTextViewText(R.id.quickAccessTitle, item.title)
             remoteViews.setViewVisibility(R.id.quickAccessTitle, View.VISIBLE)
-            remoteViews.setViewVisibility(R.id.placeholderFavicon, View.GONE)
             configureClickListener(remoteViews, item.url)
         } else {
             if (currentFavorites.isEmpty()) {
