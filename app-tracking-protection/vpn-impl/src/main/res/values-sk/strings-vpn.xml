@@ -137,8 +137,6 @@
     <string name="atp_NewTabDisabled"><b> Ochrana pred sledovaním aplikácií je vypnutá. </b>\nŤuknutím na položku pokračujte v blokovaní pokusov o sledovanie vo všetkých aplikáciách.</string>
     <string name="atp_NewTabRevoked"><b>Aplikácia VPN vo vašom zariadení zakázala ochranu pred sledovaním aplikácií.</b>\nŤuknutím na položku znova povolíte.</string>
     <string name="atp_NewTabEnabled"><b>Ochrana pred sledovaním aplikácií je zapnutá</b> a blokuje pokusy o sledovanie vo vašich aplikáciách.</string>
-    <!-- smartling.character_limit = 15 -->
-    <string name="vpnMenuYellowPill">Skús zadarmo!</string>
 
     <!-- Exclusion List -->
     <string name="atp_ExclusionListActivityTitle">Všetky aplikácie</string>
