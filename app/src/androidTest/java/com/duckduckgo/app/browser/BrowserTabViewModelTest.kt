@@ -5359,7 +5359,7 @@ class BrowserTabViewModelTest {
     fun whenProcessJsCallbackMessageUiLockChangedThenUiLockStateUpdated() =
         runTest {
             testee.processJsCallbackMessage(
-                "browserUiLock",
+                "webCompat",
                 "uiLockChanged",
                 null,
                 JSONObject("""{ "locked": true, "signals": { "overflow": "hidden" } }"""),
@@ -5375,7 +5375,7 @@ class BrowserTabViewModelTest {
     fun whenPageStartedThenUiLockStateReset() =
         runTest {
             testee.processJsCallbackMessage(
-                "browserUiLock",
+                "webCompat",
                 "uiLockChanged",
                 null,
                 JSONObject("""{ "locked": true }"""),

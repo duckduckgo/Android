@@ -3985,7 +3985,11 @@ class BrowserTabViewModel @Inject constructor(
     ) {
         logcat { "jsCallback $featureName $method $data" }
 
-        if (featureName == BROWSER_UI_LOCK_FEATURE_NAME && method == UI_LOCK_CHANGED_METHOD && data != null) {
+        if (
+            method == UI_LOCK_CHANGED_METHOD &&
+            data != null &&
+            (featureName == WEB_COMPAT_FEATURE_NAME || featureName == LEGACY_BROWSER_UI_LOCK_FEATURE_NAME)
+        ) {
             updateUiLockState(data)
         }
 
@@ -4696,7 +4700,8 @@ class BrowserTabViewModel @Inject constructor(
 
     companion object {
         private const val FIXED_PROGRESS = 50
-        private const val BROWSER_UI_LOCK_FEATURE_NAME = "browserUiLock"
+        private const val WEB_COMPAT_FEATURE_NAME = "webCompat"
+        private const val LEGACY_BROWSER_UI_LOCK_FEATURE_NAME = "browserUiLock"
         private const val UI_LOCK_CHANGED_METHOD = "uiLockChanged"
 
         // Minimum progress to show web content again after decided to hide web content (possible spoofing attack).

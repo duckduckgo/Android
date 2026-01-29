@@ -40,6 +40,6 @@ class WebCompatContentScopeJsMessageHandler @Inject constructor() : ContentScope
 
         override val allowedDomains: List<String> = emptyList()
         override val featureName: String = "webCompat"
-        override val methods: List<String> = listOf("webShare", "permissionsQuery", "screenLock", "screenUnlock")
+        override val methods: List<String> = listOf("webShare", "permissionsQuery", "screenLock", "screenUnlock", "uiLockChanged")
     }
 }
