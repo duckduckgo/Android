@@ -10,6 +10,7 @@ import asana
 from dataclasses import dataclass
 import sys
 import subprocess
+import time
 
 @dataclass
 class AsanaTaskLink:
@@ -102,7 +103,14 @@ def create_asana_release_task(client: asana.ApiClient,
         {}
     )
 
-    new_task_id = job_response['new_task']['gid']
+    if job_response['status'] == 'succeeded':
+        new_task_id = job_response['new_task']['gid']
+    elif job_response['status'] == 'failed':
+        raise Exception(f"Task duplication failed: {job_response}")
+    else:
+        completed_job = wait_for_job(client, job_response['gid'])
+        new_task_id = completed_job['new_task']['gid']
+
     log(f"Created new task {new_task_id}")
 
     # Get the current task to retrieve its notes
@@ -142,6 +150,20 @@ def create_asana_release_task(client: asana.ApiClient,
     )
 
     return new_task_id
+
+def wait_for_job(client: asana.ApiClient, job_gid: str, timeout: int = 30, interval: float = 0.5):
+    """Wait for an Asana job to complete."""
+    jobs_api = asana.JobsApi(client)
+    elapsed = 0
+    while elapsed < timeout:
+        job = jobs_api.get_job(job_gid, {})
+        if job['status'] == 'succeeded':
+            return job
+        if job['status'] == 'failed':
+            raise Exception(f"Job failed: {job}")
+        time.sleep(interval)
+        elapsed += interval
+    raise TimeoutError(f"Job {job_gid} did not complete within {timeout}s")
 
 def create_asana_task(client: asana.ApiClient,
                       workspace_id: str,
@@ -264,32 +286,32 @@ def remove_tasks_from_project(client: asana.ApiClient, task_links: List[AsanaTas
     log(f"Removed {removed_count} tasks from project")
 
 
- def get_latest_public_release_tag_before_commit(repo_path: str, current_tag: str) -> str | None:
-      """
-      Return the previous public release tag before `current_tag`, sorted by semantic version.
-      Public release tags match the pattern: X.Y.Z (e.g., 5.264.0)
-      """
-      public_pattern = re.compile(r'^\d+\.\d+\.\d+$')
+def get_latest_public_release_tag_before_commit(repo_path: str, current_tag: str) -> str | None:
+    """
+    Return the previous public release tag before `current_tag`, sorted by semantic version.
+    Public release tags match the pattern: X.Y.Z (e.g., 5.264.0)
+    """
+    public_pattern = re.compile(r'^\d+\.\d+\.\d+$')
 
-      try:
-          result = subprocess.run(
-              ["git", "-C", repo_path, "for-each-ref", "--sort=version:refname", "--format=%(refname:short)", "refs/tags"],
-              capture_output=True,
-              text=True,
-              check=True
-          )
-          tags = result.stdout.strip().splitlines()
+    try:
+        result = subprocess.run(
+            ["git", "-C", repo_path, "for-each-ref", "--sort=version:refname", "--format=%(refname:short)", "refs/tags"],
+            capture_output=True,
+            text=True,
+            check=True
+        )
+        tags = result.stdout.strip().splitlines()
 
-          # Filter to only public release tags (X.Y.Z format)
-          public_tags = [tag for tag in tags if public_pattern.match(tag)]
+        # Filter to only public release tags (X.Y.Z format)
+        public_tags = [tag for tag in tags if public_pattern.match(tag)]
 
-          if current_tag not in public_tags:
-              return None
+        if current_tag not in public_tags:
+            return None
 
-          idx = public_tags.index(current_tag)
-          return public_tags[idx - 1] if idx > 0 else None
-      except subprocess.CalledProcessError:
-          return None
+        idx = public_tags.index(current_tag)
+        return public_tags[idx - 1] if idx > 0 else None
+    except subprocess.CalledProcessError:
+        return None
 
 
 def get_latest_internal_tag_before_commit(repo_path: str, current_tag: str) -> str | None:
