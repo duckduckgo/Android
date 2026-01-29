@@ -195,6 +195,8 @@ class DuckChatContextualFragment :
     ) {
         super.onViewCreated(view, savedInstanceState)
 
+        logcat { "Duck.ai: onViewCreated" }
+
         simpleWebview.let {
             it.webViewClient = webViewClient
             webViewClient.onPageFinishedListener = { url ->
@@ -475,6 +477,10 @@ class DuckChatContextualFragment :
                         }
                         setFragmentResult(KEY_DUCK_AI_CONTEXTUAL_RESULT, result)
                     }
+
+                    DuckChatContextualViewModel.Command.CloseSheet -> {
+                        bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+                    }
                 }
             }.launchIn(lifecycleScope)
 
@@ -501,9 +507,9 @@ class DuckChatContextualFragment :
         bottomSheetBehavior.state = viewState.sheetState
 
         if (viewState.chatHistoryEnabled) {
-            binding.contextualFullScreen.show()
-        } else {
             binding.contextualFullScreen.gone()
+        } else {
+            binding.contextualFullScreen.show()
         }
 
         when (viewState.sheetMode) {

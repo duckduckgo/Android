@@ -1684,7 +1684,7 @@ class BrowserTabViewModel @Inject constructor(
         url: String,
         title: String?,
     ) {
-        logcat(VERBOSE) { "Duck.ai: Page changed: $url" }
+        logcat(VERBOSE) { "Page changed: $url" }
         cleanupBlobDownloadReplyProxyMaps(url)
 
         hasCtaBeenShownForCurrentPage.set(false)

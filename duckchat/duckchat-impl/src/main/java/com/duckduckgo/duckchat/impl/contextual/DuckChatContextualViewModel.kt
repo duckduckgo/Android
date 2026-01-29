@@ -68,6 +68,7 @@ class DuckChatContextualViewModel @Inject constructor(
         data class LoadUrl(val url: String) : Command()
         data object SendSubscriptionAuthUpdateEvent : Command()
         data class OpenFullscreenMode(val url: String) : Command()
+        data object CloseSheet : Command()
     }
 
     private val _viewState: MutableStateFlow<ViewState> =
@@ -240,9 +241,8 @@ class DuckChatContextualViewModel @Inject constructor(
     }
 
     fun onContextualClose() {
-        logcat { "Duck.ai Contextual: onContextualClose" }
         viewModelScope.launch {
-            _viewState.update { current -> current.copy(sheetState = BottomSheetBehavior.STATE_HIDDEN) }
+            commandChannel.trySend(Command.CloseSheet)
         }
     }
 

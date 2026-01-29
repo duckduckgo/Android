@@ -284,13 +284,11 @@ class DuckChatContextualViewModelTest {
     @Test
     fun `when contextual close invoked then sheet hidden`() =
         runTest {
-            testee.viewState.test {
-                // initial emission
-                awaitItem()
-
+            testee.commands.test {
                 testee.onContextualClose()
-                val state = expectMostRecentItem()
-                assertEquals(BottomSheetBehavior.STATE_HIDDEN, state.sheetState)
+
+                val command = awaitItem()
+                assertEquals(DuckChatContextualViewModel.Command.CloseSheet, command)
 
                 cancelAndIgnoreRemainingEvents()
             }
@@ -357,15 +355,14 @@ class DuckChatContextualViewModelTest {
         }
 
     @Test
-    fun `handleJSCall closeAIChat hides sheet and returns true`() = runTest {
-        testee.viewState.test {
-            awaitItem() // initial emission
-
+    fun `handleJSCall closeAIChat emits close command and returns true`() = runTest {
+        testee.commands.test {
             val handled = testee.handleJSCall("closeAIChat")
-            val state = expectMostRecentItem()
+
+            val command = awaitItem()
 
             assertTrue(handled)
-            assertEquals(BottomSheetBehavior.STATE_HIDDEN, state.sheetState)
+            assertEquals(DuckChatContextualViewModel.Command.CloseSheet, command)
 
             cancelAndIgnoreRemainingEvents()
         }
