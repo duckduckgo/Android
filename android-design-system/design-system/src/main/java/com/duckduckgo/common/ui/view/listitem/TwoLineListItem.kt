@@ -23,7 +23,10 @@ import android.util.AttributeSet
 import android.view.View
 import android.widget.ImageView
 import com.duckduckgo.common.ui.view.DaxSwitch
+import com.duckduckgo.common.ui.view.DaxYellowPill
+import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.listitem.DaxListItem.IconSize.Medium
+import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.R
@@ -52,10 +55,9 @@ class TwoLineListItem @JvmOverloads constructor(
         get() = binding.trailingIconContainer
     override val trailingSwitch: DaxSwitch
         get() = binding.trailingSwitch
-    override val betaPill: ImageView
-        get() = binding.betaPill
-    override val newPill: ImageView?
-        get() = null
+
+    override val yellowPill: DaxYellowPill
+        get() = binding.yellowPill
 
     override val itemContainer: View
         get() = binding.itemContainer
@@ -113,7 +115,12 @@ class TwoLineListItem @JvmOverloads constructor(
                 setPrimaryTextColorStateList(getColorStateList(R.styleable.TwoLineListItem_primaryTextColorOverlay))
             }
 
-            setPillVisible(getBoolean(R.styleable.TwoLineListItem_showBetaPill, false))
+            if (getBoolean(R.styleable.OneLineListItem_showYellowPill, false)) {
+                yellowPill.show()
+                yellowPill.text = getString(R.styleable.OneLineListItem_textYellowPill)
+            } else {
+                yellowPill.gone()
+            }
 
             val showTrailingIcon = hasValue(R.styleable.TwoLineListItem_trailingIcon)
 
