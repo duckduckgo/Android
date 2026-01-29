@@ -21,14 +21,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingTop="12dp">
+    android:paddingTop="@dimen/keyline_3">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/rounded_top_corners_bottom_sheet_drawable"
         android:orientation="vertical"
-        android:paddingBottom="16dp">
+        android:paddingBottom="@dimen/keyline_4">
 
         <ImageView
             android:layout_width="wrap_content"
@@ -42,10 +42,10 @@
             android:id="@+id/duckAiContextualOnboardingTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:paddingHorizontal="24dp"
+            android:layout_marginTop="@dimen/keyline_5"
+            android:paddingHorizontal="@dimen/keyline_5"
             android:gravity="center"
-            tools:text="@string/duck_chat_contextual_onboarding_title"
+            android:text="@string/duck_chat_contextual_onboarding_title"
             app:textType="primary"
             app:typography="h1" />
 
@@ -53,10 +53,10 @@
             android:id="@+id/duckAiContextualOnboardingBody"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:paddingHorizontal="24dp"
+            android:layout_marginTop="@dimen/keyline_5"
+            android:paddingHorizontal="@dimen/keyline_5"
             android:gravity="center"
-            tools:text="@string/duck_chat_contextual_onboarding_body"
+            android:text="@string/duck_chat_contextual_onboarding_body"
             app:textType="primary"
             app:typography="body1" />
 
@@ -65,7 +65,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="36dp"
-            android:layout_marginHorizontal="24dp"
+            android:layout_marginHorizontal="@dimen/keyline_5"
             android:text="@string/duck_chat_contextual_onboarding_primary"
             app:daxButtonSize="large" />
 
@@ -73,7 +73,7 @@
             android:id="@+id/duckAiContextualOnboardingSecondaryButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="24dp"
+            android:layout_marginHorizontal="@dimen/keyline_5"
             android:text="@string/duck_chat_contextual_onboarding_secondary"
             app:daxButtonSize="large" />
 

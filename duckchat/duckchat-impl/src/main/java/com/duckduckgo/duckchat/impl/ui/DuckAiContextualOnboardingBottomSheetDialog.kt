@@ -18,36 +18,31 @@ package com.duckduckgo.duckchat.impl.ui
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.DialogInterface
 import android.view.LayoutInflater
-import android.widget.FrameLayout
-import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.common.ui.setRoundCorners
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.duckchat.api.DuckChatNativeSettingsNoParams
-import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.databinding.BottomSheetDuckAiContextualOnboardingBinding
-import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
-import com.google.android.material.shape.CornerFamily
-import com.google.android.material.shape.MaterialShapeDrawable
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import com.duckduckgo.mobile.android.R as CommonR
-
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 @SuppressLint("NoBottomSheetDialog")
 class DuckAiContextualOnboardingBottomSheetDialog(
     context: Context,
-    @AppCoroutineScope private val coroutineScope: CoroutineScope,
-    private val dispatcherProvider: DispatcherProvider,
-    private val duckChatFeatureRepository: DuckChatFeatureRepository,
+    private val viewModel: DuckAiContextualOnboardingViewModel,
     private val globalActivityStarter: GlobalActivityStarter,
+    dispatcherProvider: DispatcherProvider,
 ) : BottomSheetDialog(context) {
 
     private val binding: BottomSheetDuckAiContextualOnboardingBinding =
         BottomSheetDuckAiContextualOnboardingBinding.inflate(LayoutInflater.from(context))
+
+    private val mainCoroutineScope = CoroutineScope(SupervisorJob() + dispatcherProvider.main())
 
     var eventListener: EventListener? = null
 
@@ -61,45 +56,30 @@ class DuckAiContextualOnboardingBottomSheetDialog(
         behavior.state = BottomSheetBehavior.STATE_EXPANDED
 
         setOnShowListener { dialogInterface ->
-            setRoundCorners(dialogInterface)
+            (dialogInterface as BottomSheetDialog).setRoundCorners()
         }
 
-        binding.duckAiContextualOnboardingTitle.text =
-            context.getString(R.string.duck_chat_contextual_onboarding_title)
-        binding.duckAiContextualOnboardingBody.text =
-            context.getString(R.string.duck_chat_contextual_onboarding_body)
+        setOnDismissListener { mainCoroutineScope.cancel() }
 
-        binding.duckAiContextualOnboardingPrimaryButton.setOnClickListener {
-            coroutineScope.launch {
-                duckChatFeatureRepository.setContextualOnboardingCompleted(true)
-                withContext(dispatcherProvider.main()) {
-                    eventListener?.onConfirmed()
-                    dismiss()
+        viewModel.commands
+            .onEach { command ->
+                when (command) {
+                    is DuckAiContextualOnboardingViewModel.Command.OnboardingCompleted -> {
+                        eventListener?.onConfirmed()
+                        dismiss()
+                    }
                 }
             }
+            .launchIn(mainCoroutineScope)
+
+        binding.duckAiContextualOnboardingPrimaryButton.setOnClickListener {
+            viewModel.completeOnboarding()
         }
 
         binding.duckAiContextualOnboardingSecondaryButton.setOnClickListener {
             globalActivityStarter.start(context, DuckChatNativeSettingsNoParams)
             dismiss()
         }
-    }
-
-    /**
-     * By default, when bottom sheet dialog is expanded, the corners become squared.
-     * This function ensures that the bottom sheet dialog will have rounded corners even when in an expanded state.
-     */
-    private fun setRoundCorners(dialogInterface: DialogInterface) {
-        val bottomSheetDialog = dialogInterface as BottomSheetDialog
-        val bottomSheet = bottomSheetDialog.findViewById<FrameLayout>(com.google.android.material.R.id.design_bottom_sheet)
-
-        val shapeDrawable = MaterialShapeDrawable.createWithElevationOverlay(context)
-        shapeDrawable.shapeAppearanceModel = shapeDrawable.shapeAppearanceModel
-            .toBuilder()
-            .setTopLeftCorner(CornerFamily.ROUNDED, context.resources.getDimension(CommonR.dimen.dialogBorderRadius))
-            .setTopRightCorner(CornerFamily.ROUNDED, context.resources.getDimension(CommonR.dimen.dialogBorderRadius))
-            .build()
-        bottomSheet?.background = shapeDrawable
     }
 
     interface EventListener {

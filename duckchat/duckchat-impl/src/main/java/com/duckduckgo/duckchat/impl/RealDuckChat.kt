@@ -48,7 +48,7 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_NEW_ADDRES
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelParameters.NEW_ADDRESS_BAR_SELECTION
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
 import com.duckduckgo.duckchat.impl.ui.DuckAiContextualOnboardingBottomSheetDialog
-import com.duckduckgo.duckchat.impl.ui.DuckAiContextualOnboardingBottomSheetDialogFactory
+import com.duckduckgo.duckchat.impl.ui.DuckAiContextualOnboardingViewModel
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import com.duckduckgo.sync.api.DeviceSyncState
@@ -281,7 +281,7 @@ class RealDuckChat @Inject constructor(
     private val imageUploadFeature: AIChatImageUploadFeature,
     private val browserNav: BrowserNav,
     private val newAddressBarOptionBottomSheetDialogFactory: NewAddressBarOptionBottomSheetDialogFactory,
-    private val duckAiContextualOnboardingBottomSheetDialogFactory: DuckAiContextualOnboardingBottomSheetDialogFactory,
+    private val duckAiContextualOnboardingViewModel: DuckAiContextualOnboardingViewModel,
     private val deviceSyncState: DeviceSyncState,
 ) : DuckChatInternal,
     DuckAiFeatureState,
@@ -659,7 +659,12 @@ class RealDuckChat @Inject constructor(
         context: Context,
         onConfirmed: () -> Unit,
     ) {
-        val dialog = duckAiContextualOnboardingBottomSheetDialogFactory.create(context)
+        val dialog = DuckAiContextualOnboardingBottomSheetDialog(
+            context = context,
+            viewModel = duckAiContextualOnboardingViewModel,
+            globalActivityStarter = globalActivityStarter,
+            dispatcherProvider = dispatchers,
+        )
         dialog.eventListener = object : DuckAiContextualOnboardingBottomSheetDialog.EventListener {
             override fun onConfirmed() {
                 onConfirmed()
