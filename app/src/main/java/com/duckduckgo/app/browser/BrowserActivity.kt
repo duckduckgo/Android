@@ -1435,6 +1435,10 @@ open class BrowserActivity : DuckDuckGoActivity() {
         viewModel.onOmnibarEditModeChanged(isInEditMode)
     }
 
+    fun onUiLockChanged(isLocked: Boolean) {
+        viewModel.onUiLockChanged(isLocked)
+    }
+
     private data class CombinedInstanceState(
         val originalInstanceState: Bundle?,
         val newInstanceState: Bundle?,

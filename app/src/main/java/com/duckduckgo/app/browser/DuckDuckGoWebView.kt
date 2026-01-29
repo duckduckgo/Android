@@ -443,7 +443,7 @@ class DuckDuckGoWebView :
         enableSwipeRefreshCallback?.invoke(enable && contentAllowsSwipeToRefresh)
     }
 
-    private fun setContentAllowsSwipeToRefresh(allowed: Boolean) {
+    fun setContentAllowsSwipeToRefresh(allowed: Boolean) {
         contentAllowsSwipeToRefresh = allowed
         if (!allowed) {
             enableSwipeRefresh(false)

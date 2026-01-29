@@ -560,6 +560,32 @@ class BrowserViewModelTest {
     }
 
     @Test
+    fun whenUiLockedTabSwipingIsDisabled() = runTest {
+        initSuspendTestee()
+
+        swipingTabsFeature.self().setRawStoredState(State(enable = true))
+        testee.onUiLockChanged(true)
+
+        testee.viewState.test {
+            val state = awaitItem()
+            assertFalse(state.isTabSwipingEnabled)
+        }
+    }
+
+    @Test
+    fun whenUiUnlockedTabSwipingIsEnabled() = runTest {
+        initSuspendTestee()
+
+        swipingTabsFeature.self().setRawStoredState(State(enable = true))
+        testee.onUiLockChanged(false)
+
+        testee.viewState.test {
+            val state = awaitItem()
+            assertTrue(state.isTabSwipingEnabled)
+        }
+    }
+
+    @Test
     fun whenOmnibarIsNotInEditModeAndBrowserIsInFullscreenModeTabSwipingIsDisabled() = runTest {
         initSuspendTestee()
 

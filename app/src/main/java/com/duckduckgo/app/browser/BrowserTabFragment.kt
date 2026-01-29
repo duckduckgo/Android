@@ -347,6 +347,7 @@ import kotlinx.coroutines.flow.cancellable
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -1877,6 +1878,16 @@ class BrowserTabFragment :
                 }
         }
 
+        lifecycleScope.launch {
+            viewModel.uiLockState
+                .map { it.isLocked }
+                .distinctUntilChanged()
+                .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
+                .collectLatest { isLocked ->
+                    applyUiLockState(isLocked)
+                }
+        }
+
         addTabsObserver()
     }
 
@@ -1928,6 +1939,9 @@ class BrowserTabFragment :
                 it?.let {
                     val wasActive = isActiveTab
                     isActiveTab = it.tabId == tabId
+                    if (!wasActive && isActiveTab) {
+                        browserActivity?.onUiLockChanged(viewModel.uiLockState.value.isLocked)
+                    }
                     if (wasActive && !isActiveTab) {
                         logcat { "Tab $tabId is newly inactive" }
 
@@ -3940,6 +3954,16 @@ class BrowserTabFragment :
 
         // avoids progressView from showing under toolbar
         binding.swipeRefreshContainer.progressViewStartOffset -= 15
+    }
+
+    private fun applyUiLockState(isLocked: Boolean) {
+        val isUnlocked = !isLocked
+        binding.swipeRefreshContainer.isEnabled = isUnlocked
+        webView?.setContentAllowsSwipeToRefresh(isUnlocked)
+        omnibar.isScrollingEnabled = isUnlocked
+        if (isActiveTab) {
+            browserActivity?.onUiLockChanged(isLocked)
+        }
     }
 
     @Suppress("NewApi") // This API and the behaviour described only apply to apps with targetSdkVersion ≥ TIRAMISU.

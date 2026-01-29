@@ -5356,6 +5356,41 @@ class BrowserTabViewModelTest {
         }
 
     @Test
+    fun whenProcessJsCallbackMessageUiLockChangedThenUiLockStateUpdated() =
+        runTest {
+            testee.processJsCallbackMessage(
+                "browserUiLock",
+                "uiLockChanged",
+                null,
+                JSONObject("""{ "locked": true, "signals": { "overflow": "hidden" } }"""),
+                false,
+                null,
+                { "someUrl" },
+            )
+
+            assertTrue(testee.uiLockState.value.isLocked)
+        }
+
+    @Test
+    fun whenPageStartedThenUiLockStateReset() =
+        runTest {
+            testee.processJsCallbackMessage(
+                "browserUiLock",
+                "uiLockChanged",
+                null,
+                JSONObject("""{ "locked": true }"""),
+                false,
+                null,
+                { "someUrl" },
+            )
+            assertTrue(testee.uiLockState.value.isLocked)
+
+            testee.pageStarted(WebViewNavigationState(mockStack, 0), emptyList())
+
+            assertFalse(testee.uiLockState.value.isLocked)
+        }
+
+    @Test
     fun whenProcessJsCallbackMessageGetUserPreferencesFromOverlayThenSendCommand() =
         runTest {
             whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
