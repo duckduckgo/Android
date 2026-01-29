@@ -240,6 +240,7 @@ class DuckChatContextualViewModel @Inject constructor(
     }
 
     fun onContextualClose() {
+        logcat { "Duck.ai Contextual: onContextualClose" }
         viewModelScope.launch {
             _viewState.update { current -> current.copy(sheetState = BottomSheetBehavior.STATE_HIDDEN) }
         }
