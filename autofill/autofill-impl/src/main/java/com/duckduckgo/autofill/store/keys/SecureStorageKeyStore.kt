@@ -22,6 +22,7 @@ import androidx.core.content.edit
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_HARMONY_PREFERENCES_GET_KEY_FAILED
@@ -30,6 +31,7 @@ import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_HARMONY_PR
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_PREFERENCES_GET_KEY_FAILED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_PREFERENCES_UPDATE_KEY_FAILED
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.sanitizeStackTrace
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
@@ -87,7 +89,11 @@ class RealSecureStorageKeyStore constructor(
                     )
                 }
             } catch (e: Exception) {
-                pixel.fire(AutofillPixelNames.AUTOFILL_PREFERENCES_RETRIEVAL_FAILED, mapOf("error" to e.javaClass.name))
+                pixel.fire(
+                    AutofillPixelNames.AUTOFILL_PREFERENCES_RETRIEVAL_FAILED,
+                    mapOf("error" to e.sanitizeStackTrace()),
+                    type = Daily(),
+                )
                 null
             }
         }
@@ -108,7 +114,11 @@ class RealSecureStorageKeyStore constructor(
                     }
                 }
             } catch (e: Exception) {
-                pixel.fire(AUTOFILL_HARMONY_PREFERENCES_RETRIEVAL_FAILED, mapOf("error" to e.javaClass.name))
+                pixel.fire(
+                    AUTOFILL_HARMONY_PREFERENCES_RETRIEVAL_FAILED,
+                    mapOf("error" to e.sanitizeStackTrace()),
+                    type = Daily(),
+                )
                 logcat { "autofill harmony preferences retrieval failed: $e" }
                 null
             }
@@ -137,7 +147,11 @@ class RealSecureStorageKeyStore constructor(
                     }
                 }
             }.getOrElse {
-                pixel.fire(AUTOFILL_PREFERENCES_UPDATE_KEY_FAILED, mapOf("error" to it.javaClass.name))
+                pixel.fire(
+                    AUTOFILL_PREFERENCES_UPDATE_KEY_FAILED,
+                    mapOf("error" to it.sanitizeStackTrace()),
+                    type = Daily(),
+                )
             }
 
             if (autofillFeature.useHarmony().isEnabled()) {
@@ -150,7 +164,11 @@ class RealSecureStorageKeyStore constructor(
                         }
                     }
                 }.getOrElse {
-                    pixel.fire(AUTOFILL_HARMONY_PREFERENCES_UPDATE_KEY_FAILED, mapOf("error" to it.javaClass.name))
+                    pixel.fire(
+                        AUTOFILL_HARMONY_PREFERENCES_UPDATE_KEY_FAILED,
+                        mapOf("error" to it.sanitizeStackTrace()),
+                        type = Daily(),
+                    )
                 }
             }
         }
@@ -174,7 +192,11 @@ class RealSecureStorageKeyStore constructor(
                 } else {
                     AUTOFILL_PREFERENCES_GET_KEY_FAILED
                 }
-                pixel.fire(pixelName, mapOf("error" to it.javaClass.name))
+                pixel.fire(
+                    pixelName,
+                    mapOf("error" to it.sanitizeStackTrace()),
+                    type = Daily(),
+                )
                 null
             }
         }
