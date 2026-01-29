@@ -1161,7 +1161,7 @@ class OmnibarLayout @JvmOverloads constructor(
                         omnibarItemPressedListener?.onCustomTabPrivacyDashboardPressed()
                     }
 
-                    customToolbarContainer.setOnClickListener {
+                    customTabToolbar.setOnClickListener {
                         pixel.fire(CustomTabPixelNames.CUSTOM_TABS_ADDRESS_BAR_CLICKED)
                         pixel.fire(CustomTabPixelNames.CUSTOM_TABS_ADDRESS_BAR_CLICKED_DAILY, type = PixelType.Daily())
                     }
