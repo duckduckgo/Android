@@ -19,5 +19,14 @@ package com.duckduckgo.data.store.impl
 import com.duckduckgo.app.statistics.pixels.Pixel
 
 enum class DataStorePixelNames(override val pixelName: String) : Pixel.PixelName {
-    DATA_STORE_MIGRATE_ENCRYPTED_PREFERENCES_FAILED("data-store_migrate_encrypted-preferences-failed"),
+    DATA_STORE_MIGRATE_ENCRYPTED_GET_PREFERENCES_ORIGIN_FAILED("data-store_migrate_encrypted_get-preferences_origin_failed"),
+    DATA_STORE_MIGRATE_UNENCRYPTED_GET_PREFERENCES_ORIGIN_FAILED("data-store_migrate_unencrypted_get-preferences_origin_failed"),
+    DATA_STORE_MIGRATE_ENCRYPTED_GET_PREFERENCES_DESTINATION_FAILED("data-store_migrate_encrypted_get-preferences_destination_failed"),
+    DATA_STORE_MIGRATE_UNENCRYPTED_GET_PREFERENCES_DESTINATION_FAILED("data-store_migrate_unencrypted_get-preferences_destination_failed"),
+    DATA_STORE_MIGRATE_ENCRYPTED_QUERY_PREFERENCES_DESTINATION_FAILED("data-store_migrate_encrypted_query-preferences_destination_failed"),
+    DATA_STORE_MIGRATE_UNENCRYPTED_QUERY_PREFERENCES_DESTINATION_FAILED("data-store_migrate_unencrypted_query-preferences_destination_failed"),
+    DATA_STORE_MIGRATE_ENCRYPTED_QUERY_ALL_PREFERENCES_ORIGIN_FAILED("data-store_migrate_encrypted_query-all-preferences_origin_failed"),
+    DATA_STORE_MIGRATE_UNENCRYPTED_QUERY_ALL_PREFERENCES_ORIGIN_FAILED("data-store_migrate_unencrypted_query-all-preferences_origin_failed"),
+    DATA_STORE_MIGRATE_ENCRYPTED_UPDATE_PREFERENCES_DESTINATION_FAILED("data-store_migrate_encrypted_update-preferences_destination_failed"),
+    DATA_STORE_MIGRATE_UNENCRYPTED_UPDATE_PREFERENCES_DESTINATION_FAILED("data-store_migrate_unencrypted_update-preferences_destination_failed"),
 }
