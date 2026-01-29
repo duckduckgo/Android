@@ -814,6 +814,8 @@
     <string name="highlightsPreOnboardingAddressBarOption1Description">Gemakkelijk te zien</string>
     <string name="highlightsPreOnboardingAddressBarOption2Title">Onderkant</string>
     <string name="highlightsPreOnboardingAddressBarOption2Description">Gemakkelijk te bereiken</string>
+    <string name="highlightsPreOnboardingAddressBarOption3Title">Splitsen</string>
+    <string name="highlightsPreOnboardingAddressBarOption3Description">Het beste van beide</string>
     <string name="onboardingSearchDaxDialogTitle">Probeer een zoekopdracht!</string>
     <string name="onboardingSearchDaxDialogDescription">Je DuckDuckGo-zoekopdrachten zijn altijd privé.</string>
     <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">"hoe zeg je 'eend' in het Engels?"</string>
