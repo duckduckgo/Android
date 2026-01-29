@@ -513,7 +513,6 @@ class RealDuckChat @Inject constructor(
     }
 
     override fun getDuckChatUrl(query: String, autoPrompt: Boolean, sidebar: Boolean): String {
-        logcat { "Duck.ai: getDuckChatUrl query $query autoPrompt $autoPrompt" }
         val parameters = addChatParameters(query, autoPrompt = autoPrompt, sidebar = sidebar)
         val url = appendParameters(parameters, duckChatLink)
         return url
@@ -525,11 +524,7 @@ class RealDuckChat @Inject constructor(
         sidebar: Boolean,
     ): Map<String, String> {
         val hasDuckChatBang = isDuckChatBang(query.toUri())
-        logcat { "Duck.ai: hasDuckChatBang $hasDuckChatBang" }
-
         val cleanedQuery = stripBang(query)
-        logcat { "Duck.ai: cleaned query $cleanedQuery" }
-
         return mutableMapOf<String, String>().apply {
             if (cleanedQuery.isNotEmpty()) {
                 put(QUERY, cleanedQuery)

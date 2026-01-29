@@ -379,7 +379,7 @@ class DuckChatContextualViewModelTest {
     @Test
     fun `when sheet opened with stored chat url then load it and expand`() = runTest {
         val tabId = "tab-1"
-        val storedUrl = "https://duck.ai/chat"
+        val storedUrl = "https://duck.ai/chat?chatID=123"
         contextualDataStore.persistTabChatUrl(tabId, storedUrl)
 
         testee.commands.test {
@@ -393,6 +393,7 @@ class DuckChatContextualViewModelTest {
             assertEquals(BottomSheetBehavior.STATE_EXPANDED, state.sheetState)
             assertEquals(storedUrl, state.url)
             assertEquals(tabId, state.tabId)
+            assertTrue(state.chatHistoryEnabled)
 
             cancelAndIgnoreRemainingEvents()
         }
@@ -414,19 +415,33 @@ class DuckChatContextualViewModelTest {
     @Test
     fun `onChatPageLoaded stores url by tab id`() = runTest {
         val tabId = "tab-1"
-        val url = "https://duck.ai/chat"
+        val url = "https://duck.ai/chat?chatID=123"
         testee.onSheetOpened(tabId)
 
         testee.onChatPageLoaded(url)
         coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
 
         assertEquals(url, contextualDataStore.getTabChatUrl(tabId))
+        assertTrue(testee.viewState.value.chatHistoryEnabled)
+    }
+
+    @Test
+    fun `onChatPageLoaded without chat id does not store url`() = runTest {
+        val tabId = "tab-1"
+        val url = "https://duck.ai/chat"
+        testee.onSheetOpened(tabId)
+
+        testee.onChatPageLoaded(url)
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        assertNull(contextualDataStore.getTabChatUrl(tabId))
+        assertFalse(testee.viewState.value.chatHistoryEnabled)
     }
 
     @Test
     fun `onNewChatRequested clears stored url for current tab`() = runTest {
         val tabId = "tab-1"
-        val url = "https://duck.ai/chat"
+        val url = "https://duck.ai/chat?chatID=123"
         testee.onSheetOpened(tabId)
         contextualDataStore.persistTabChatUrl(tabId, url)
 
