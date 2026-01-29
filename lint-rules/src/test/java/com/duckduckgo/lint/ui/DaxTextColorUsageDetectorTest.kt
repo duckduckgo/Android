@@ -54,6 +54,10 @@ class DaxTextColorUsageDetectorTest {
         import androidx.compose.runtime.Composable
         import androidx.compose.ui.graphics.Color
 
+        data class DuckDuckGoColors(
+            val text: DuckDuckGoTextColors
+        )
+
         data class DuckDuckGoTextColors(
             val primary: Color,
             val secondary: Color,
@@ -61,12 +65,14 @@ class DaxTextColorUsageDetectorTest {
         )
 
         object DuckDuckGoTheme {
-            val textColors: DuckDuckGoTextColors
+            val colors: DuckDuckGoColors
                 @Composable
-                get() = DuckDuckGoTextColors(
-                    primary = Color(0xFF000000),
-                    secondary = Color(0xFF666666),
-                    tertiary = Color(0xFF999999)
+                get() = DuckDuckGoColors(
+                    text = DuckDuckGoTextColors(
+                        primary = Color(0xFF000000),
+                        secondary = Color(0xFF666666),
+                        tertiary = Color(0xFF999999)
+                    )
                 )
         }
         """.trimIndent()
@@ -85,7 +91,7 @@ class DaxTextColorUsageDetectorTest {
         fun DaxText(
             text: String,
             modifier: Modifier = Modifier,
-            color: Color = DuckDuckGoTheme.textColors.primary
+            color: Color = DuckDuckGoTheme.colors.text.primary
         ) {
             // Implementation
         }
@@ -108,7 +114,7 @@ class DaxTextColorUsageDetectorTest {
                     fun TestScreen() {
                         DaxText(
                             text = "Hello",
-                            color = DuckDuckGoTheme.textColors.primary
+                            color = DuckDuckGoTheme.colors.text.primary
                         )
                     }
                     """.trimIndent()
@@ -141,7 +147,7 @@ class DaxTextColorUsageDetectorTest {
                         val theme = DuckDuckGoTheme
                         DaxText(
                             text = "Hello",
-                            color = theme.textColors.secondary
+                            color = theme.colors.text.secondary
                         )
                     }
                     """.trimIndent()
@@ -214,11 +220,11 @@ class DaxTextColorUsageDetectorTest {
             .run()
             .expect(
                 """
-                src/com/example/test/test.kt:11: Warning: Use DuckDuckGoTheme.textColors instead of arbitrary Color values to maintain design system consistency and theme support.
+                src/com/example/test/test.kt:11: Warning: Use DuckDuckGoTheme.colors.text instead of arbitrary Color values to maintain design system consistency and theme support.
 
                 Examples:
-                • DuckDuckGoTheme.textColors.primary
-                • DuckDuckGoTheme.textColors.secondary
+                • DuckDuckGoTheme.colors.text.primary
+                • DuckDuckGoTheme.colors.text.secondary
 
                 For one-off cases requiring custom colors, use good judgement or consider raising it in the Android Design System AOR. [InvalidDaxTextColorUsage]
                         color = Color.Red
@@ -258,11 +264,11 @@ class DaxTextColorUsageDetectorTest {
             .run()
             .expect(
                 """
-                src/com/example/test/test.kt:11: Warning: Use DuckDuckGoTheme.textColors instead of arbitrary Color values to maintain design system consistency and theme support.
+                src/com/example/test/test.kt:11: Warning: Use DuckDuckGoTheme.colors.text instead of arbitrary Color values to maintain design system consistency and theme support.
 
                 Examples:
-                • DuckDuckGoTheme.textColors.primary
-                • DuckDuckGoTheme.textColors.secondary
+                • DuckDuckGoTheme.colors.text.primary
+                • DuckDuckGoTheme.colors.text.secondary
 
                 For one-off cases requiring custom colors, use good judgement or consider raising it in the Android Design System AOR. [InvalidDaxTextColorUsage]
                         color = Color(0xFF123456)
@@ -289,7 +295,7 @@ class DaxTextColorUsageDetectorTest {
                     fun TestScreen() {
                         DaxText(
                             text = "Valid",
-                            color = DuckDuckGoTheme.textColors.primary
+                            color = DuckDuckGoTheme.colors.text.primary
                         )
 
                         DaxText(
@@ -299,7 +305,7 @@ class DaxTextColorUsageDetectorTest {
 
                         DaxText(
                             text = "Also Valid",
-                            color = DuckDuckGoTheme.textColors.secondary
+                            color = DuckDuckGoTheme.colors.text.secondary
                         )
 
                         DaxText(
@@ -319,20 +325,20 @@ class DaxTextColorUsageDetectorTest {
             .run()
             .expect(
                 """
-                src/com/example/test/test.kt:17: Warning: Use DuckDuckGoTheme.textColors instead of arbitrary Color values to maintain design system consistency and theme support.
+                src/com/example/test/test.kt:17: Warning: Use DuckDuckGoTheme.colors.text instead of arbitrary Color values to maintain design system consistency and theme support.
 
                 Examples:
-                • DuckDuckGoTheme.textColors.primary
-                • DuckDuckGoTheme.textColors.secondary
+                • DuckDuckGoTheme.colors.text.primary
+                • DuckDuckGoTheme.colors.text.secondary
 
                 For one-off cases requiring custom colors, use good judgement or consider raising it in the Android Design System AOR. [InvalidDaxTextColorUsage]
                         color = Color.Blue
                                 ~~~~~~~~~~
-                src/com/example/test/test.kt:27: Warning: Use DuckDuckGoTheme.textColors instead of arbitrary Color values to maintain design system consistency and theme support.
+                src/com/example/test/test.kt:27: Warning: Use DuckDuckGoTheme.colors.text instead of arbitrary Color values to maintain design system consistency and theme support.
 
                 Examples:
-                • DuckDuckGoTheme.textColors.primary
-                • DuckDuckGoTheme.textColors.secondary
+                • DuckDuckGoTheme.colors.text.primary
+                • DuckDuckGoTheme.colors.text.secondary
 
                 For one-off cases requiring custom colors, use good judgement or consider raising it in the Android Design System AOR. [InvalidDaxTextColorUsage]
                         color = Color(0xFFFF0000)

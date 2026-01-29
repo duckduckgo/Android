@@ -55,7 +55,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.sp
 import com.duckduckgo.common.ui.compose.text.DaxText
 import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
-import com.duckduckgo.common.ui.compose.theme.asTextStyle
 import com.duckduckgo.common.ui.compose.tools.PreviewBox
 import com.duckduckgo.mobile.android.R
 
@@ -174,11 +173,11 @@ internal fun DaxSecureTextField(
     // override is needed as TextField uses MaterialTheme.typography internally for animating the label text style
     MaterialTheme(
         typography = Typography(
-            bodySmall = DuckDuckGoTheme.typography.caption.asTextStyle.copy(
+            bodySmall = DuckDuckGoTheme.typography.caption.copy(
                 fontFamily = FontFamily.Default,
                 color = DuckDuckGoTheme.colors.text.secondary,
             ),
-            bodyLarge = DuckDuckGoTheme.typography.body1.asTextStyle.copy(
+            bodyLarge = DuckDuckGoTheme.typography.body1.copy(
                 fontFamily = FontFamily.Default,
                 color = DuckDuckGoTheme.colors.text.secondary,
             ),
@@ -221,8 +220,8 @@ internal fun DaxSecureTextField(
                     ),
                 enabled = inputMode == DaxTextFieldInputMode.Editable || inputMode == DaxTextFieldInputMode.ReadOnly,
                 readOnly = inputMode == DaxTextFieldInputMode.ReadOnly || inputMode == DaxTextFieldInputMode.Disabled,
-                textStyle = DuckDuckGoTheme.typography.body1.asTextStyle.copy(
-                    color = DuckDuckGoTheme.textColors.primary,
+                textStyle = DuckDuckGoTheme.typography.body1.copy(
+                    color = DuckDuckGoTheme.colors.text.primary,
                 ),
                 cursorBrush = SolidColor(daxTextFieldColors.cursorColor),
                 keyboardOptions = keyboardOptions,
@@ -260,7 +259,7 @@ internal fun DaxSecureTextField(
                             DaxText(
                                 text = error,
                                 style = DuckDuckGoTheme.typography.caption,
-                                color = DuckDuckGoTheme.textColors.destructive,
+                                color = DuckDuckGoTheme.colors.text.destructive,
                             )
                         }
                     } else {
