@@ -40,6 +40,7 @@ import android.webkit.WebChromeClient
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.widget.TextView
+import androidx.activity.OnBackPressedCallback
 import androidx.annotation.AnyThread
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.setFragmentResult
@@ -183,6 +184,7 @@ class DuckChatContextualFragment :
     private val root: ViewGroup by lazy { binding.root }
 
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<View>
+    private lateinit var backPressedCallback: OnBackPressedCallback
     internal val simpleWebview: WebView by lazy { binding.simpleWebview }
 
     private var lastWebViewX = 0f
@@ -357,6 +359,7 @@ class DuckChatContextualFragment :
         }
 
         configureBottomSheet(view)
+        setupBackPressHandling()
         observeViewModel()
 
         requireArguments().getString(KEY_DUCK_AI_CONTEXTUAL_TAB_ID)?.let { tabId ->
@@ -378,6 +381,27 @@ class DuckChatContextualFragment :
         bottomSheetBehavior.isDraggable = true
         bottomSheetBehavior.isHideable = true
         bottomSheetBehavior.isFitToContents = true
+    }
+
+    private fun setupBackPressHandling() {
+        backPressedCallback =
+            object : OnBackPressedCallback(bottomSheetBehavior.state != BottomSheetBehavior.STATE_HIDDEN) {
+                override fun handleOnBackPressed() {
+                    viewModel.onContextualClose()
+                }
+            }
+
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, backPressedCallback)
+
+        bottomSheetBehavior.addBottomSheetCallback(
+            object : BottomSheetBehavior.BottomSheetCallback() {
+                override fun onStateChanged(bottomSheet: View, newState: Int) {
+                    backPressedCallback.isEnabled = newState != BottomSheetBehavior.STATE_HIDDEN
+                }
+
+                override fun onSlide(bottomSheet: View, slideOffset: Float) {}
+            },
+        )
     }
 
     private fun configureButtons() {
@@ -684,11 +708,6 @@ class DuckChatContextualFragment :
             }
         }
         return mimeTypes.toList()
-    }
-
-    fun onBackPressed(): Boolean {
-        binding.contextualClose.performClick()
-        return true
     }
 
     override fun continueDownload(pendingFileDownload: FileDownloader.PendingFileDownload) {

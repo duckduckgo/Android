@@ -288,7 +288,10 @@ class DuckChatContextualViewModelTest {
                 testee.onContextualClose()
 
                 val command = awaitItem()
-                assertEquals(DuckChatContextualViewModel.Command.CloseSheet, command)
+                assertEquals(
+                    DuckChatContextualViewModel.Command.ChangeSheetState(BottomSheetBehavior.STATE_HIDDEN),
+                    command,
+                )
 
                 cancelAndIgnoreRemainingEvents()
             }
@@ -362,7 +365,10 @@ class DuckChatContextualViewModelTest {
             val command = awaitItem()
 
             assertTrue(handled)
-            assertEquals(DuckChatContextualViewModel.Command.CloseSheet, command)
+            assertEquals(
+                DuckChatContextualViewModel.Command.ChangeSheetState(BottomSheetBehavior.STATE_HIDDEN),
+                command,
+            )
 
             cancelAndIgnoreRemainingEvents()
         }
