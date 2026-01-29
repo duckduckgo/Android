@@ -37,4 +37,7 @@
     <string name="alwaysOn">Винаги включено</string>
     <string name="on">Включен</string>
     <string name="off">Изключено</string>
+
+    <!-- Page Header -->
+    <string name="pageHeaderLearnMore">Научете повече</string>
 </resources>
