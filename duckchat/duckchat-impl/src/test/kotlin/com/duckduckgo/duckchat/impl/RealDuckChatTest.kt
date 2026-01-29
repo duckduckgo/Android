@@ -41,7 +41,7 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_NEW_ADDRES
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_NOT_NOW
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelParameters.NEW_ADDRESS_BAR_SELECTION
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
-import com.duckduckgo.duckchat.impl.ui.DuckAiContextualOnboardingViewModel
+import com.duckduckgo.duckchat.impl.ui.DuckAiContextualOnboardingBottomSheetDialogFactory
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.navigation.api.GlobalActivityStarter
@@ -93,7 +93,7 @@ class RealDuckChatTest {
     private val imageUploadFeature: AIChatImageUploadFeature = FakeFeatureToggleFactory.create(AIChatImageUploadFeature::class.java)
     private val mockNewAddressBarOptionBottomSheetDialogFactory: NewAddressBarOptionBottomSheetDialogFactory = mock()
     private val mockNewAddressBarOptionBottomSheetDialog: NewAddressBarOptionBottomSheetDialog = mock()
-    private val mockDuckAiContextualOnboardingViewModel: DuckAiContextualOnboardingViewModel = mock()
+    private val mockDuckAiContextualOnboardingBottomSheetDialogFactory: DuckAiContextualOnboardingBottomSheetDialogFactory = mock()
     private val mockDeviceSyncState: DeviceSyncState = mock()
 
     private lateinit var testee: RealDuckChat
@@ -129,7 +129,7 @@ class RealDuckChatTest {
                 imageUploadFeature,
                 mockBrowserNav,
                 mockNewAddressBarOptionBottomSheetDialogFactory,
-                mockDuckAiContextualOnboardingViewModel,
+                mockDuckAiContextualOnboardingBottomSheetDialogFactory,
                 mockDeviceSyncState,
             ),
         )
