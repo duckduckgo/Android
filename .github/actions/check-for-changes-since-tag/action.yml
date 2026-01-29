@@ -5,10 +5,6 @@ inputs:
   tag:
     description: 'Tag to check'
     required: true
-  branch:
-    description: 'Branch to check'
-    required: false
-    default: 'develop'
 
 outputs:
   has_changes:
@@ -22,7 +18,7 @@ runs:
       shell: bash
       run: |      
         # Check if there are any new commits since the tag
-        new_commits=$(git rev-list ${{ inputs.tag }}..${{ inputs.branch }} --count)
+        new_commits=$(git rev-list ${{ inputs.tag }}..develop --count)
         echo "$new_commits commits since ${{ inputs.tag }} tag"
         
         if [ $new_commits -gt 0 ]; then        
