@@ -278,4 +278,13 @@ interface AndroidBrowserConfigFeature {
 
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun refreshDuckAiOnSubscriptionChanges(): Toggle
+
+    /**
+     * Controls whether data clearing wide events are sent.
+     * @return `true` when the remote config has the global "sendDataClearingWideEvent" androidBrowserConfig
+     * sub-feature flag enabled
+     * If the remote feature is not present defaults to `true`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun sendDataClearingWideEvent(): Toggle
 }
