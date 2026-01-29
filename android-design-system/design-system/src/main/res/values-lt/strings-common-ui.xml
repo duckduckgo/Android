@@ -37,4 +37,7 @@
     <string name="alwaysOn">Visada įjungta</string>
     <string name="on">Įjungti</string>
     <string name="off">Išjungti</string>
+
+    <!-- Page Header -->
+    <string name="pageHeaderLearnMore">Sužinoti daugiau</string>
 </resources>

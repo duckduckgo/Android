@@ -37,4 +37,7 @@
     <string name="alwaysOn">Her Zaman Açık</string>
     <string name="on">Açık</string>
     <string name="off">Kapalı</string>
+
+    <!-- Page Header -->
+    <string name="pageHeaderLearnMore">Daha Fazla Bilgi</string>
 </resources>

@@ -37,4 +37,7 @@
     <string name="alwaysOn">Siempre activado</string>
     <string name="on">Activado</string>
     <string name="off">Desactivado</string>
+
+    <!-- Page Header -->
+    <string name="pageHeaderLearnMore">Más información</string>
 </resources>

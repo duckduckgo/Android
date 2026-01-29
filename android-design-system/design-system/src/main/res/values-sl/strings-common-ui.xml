@@ -37,4 +37,7 @@
     <string name="alwaysOn">Vedno vklopljeno</string>
     <string name="on">Vključeno</string>
     <string name="off">Izklopljeno</string>
+
+    <!-- Page Header -->
+    <string name="pageHeaderLearnMore">Več</string>
 </resources>
