@@ -75,7 +75,6 @@ class DuckChatContextualViewModel @Inject constructor(
         MutableStateFlow(
             ViewState(
                 sheetMode = SheetMode.INPUT,
-                sheetState = BottomSheetBehavior.STATE_HALF_EXPANDED,
                 showContext = false,
                 allowsAutomaticContextAttachment = false,
                 contextUrl = "",
@@ -90,7 +89,6 @@ class DuckChatContextualViewModel @Inject constructor(
 
     data class ViewState(
         val sheetMode: SheetMode = SheetMode.INPUT,
-        val sheetState: Int = BottomSheetBehavior.STATE_HALF_EXPANDED,
         val allowsAutomaticContextAttachment: Boolean = false,
         val chatHistoryEnabled: Boolean = false,
         val showContext: Boolean = false,
@@ -140,12 +138,12 @@ class DuckChatContextualViewModel @Inject constructor(
                     _viewState.update { current ->
                         current.copy(
                             sheetMode = SheetMode.WEBVIEW,
-                            sheetState = BottomSheetBehavior.STATE_EXPANDED,
                             url = existingChatUrl,
                             tabId = tabId,
                             chatHistoryEnabled = hasChatHistory,
                         )
                     }
+                    commandChannel.trySend(Command.ChangeSheetState(BottomSheetBehavior.STATE_EXPANDED))
                     commandChannel.trySend(Command.LoadUrl(existingChatUrl))
                 }
             }
@@ -153,17 +151,10 @@ class DuckChatContextualViewModel @Inject constructor(
     }
 
     fun onNativeInputFocused(focused: Boolean) {
-        viewModelScope.launch {
-            _viewState.update { current ->
-                if (current.sheetMode == SheetMode.INPUT) {
-                    if (focused) {
-                        current.copy(sheetState = BottomSheetBehavior.STATE_EXPANDED)
-                    } else {
-                        current.copy(sheetState = BottomSheetBehavior.STATE_HALF_EXPANDED)
-                    }
-                } else {
-                    current
-                }
+        if (_viewState.value.sheetMode == SheetMode.INPUT) {
+            val state = if (focused) BottomSheetBehavior.STATE_EXPANDED else BottomSheetBehavior.STATE_HALF_EXPANDED
+            viewModelScope.launch {
+                commandChannel.trySend(Command.ChangeSheetState(state))
             }
         }
     }
@@ -177,9 +168,9 @@ class DuckChatContextualViewModel @Inject constructor(
                     _viewState.value.copy(
                         sheetMode = SheetMode.WEBVIEW,
                         url = "chatUrl",
-                        sheetState = BottomSheetBehavior.STATE_EXPANDED,
                     )
                 _subscriptionEventDataChannel.trySend(contextPrompt)
+                commandChannel.trySend(Command.ChangeSheetState(BottomSheetBehavior.STATE_EXPANDED))
             }
         }
     }

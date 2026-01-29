@@ -532,8 +532,6 @@ class DuckChatContextualFragment :
 
     private fun renderViewState(viewState: DuckChatContextualViewModel.ViewState) {
         logcat { "Duck.ai Contextual: render $viewState" }
-        bottomSheetBehavior.state = viewState.sheetState
-
         if (viewState.chatHistoryEnabled) {
             binding.contextualFullScreen.gone()
         } else {

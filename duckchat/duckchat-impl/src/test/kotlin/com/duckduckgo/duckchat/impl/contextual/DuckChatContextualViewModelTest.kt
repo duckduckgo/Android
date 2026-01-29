@@ -248,17 +248,18 @@ class DuckChatContextualViewModelTest {
     @Test
     fun `when native input focused then sheet state updates`() =
         runTest {
-            testee.viewState.test {
-                // initial emission
-                awaitItem()
-
+            testee.commands.test {
                 testee.onNativeInputFocused(true)
-                val expandedState = expectMostRecentItem() as DuckChatContextualViewModel.ViewState
-                assertEquals(BottomSheetBehavior.STATE_EXPANDED, expandedState.sheetState)
+                assertEquals(
+                    DuckChatContextualViewModel.Command.ChangeSheetState(BottomSheetBehavior.STATE_EXPANDED),
+                    awaitItem(),
+                )
 
                 testee.onNativeInputFocused(false)
-                val halfExpandedState = expectMostRecentItem() as DuckChatContextualViewModel.ViewState
-                assertEquals(BottomSheetBehavior.STATE_HALF_EXPANDED, halfExpandedState.sheetState)
+                assertEquals(
+                    DuckChatContextualViewModel.Command.ChangeSheetState(BottomSheetBehavior.STATE_HALF_EXPANDED),
+                    awaitItem(),
+                )
 
                 cancelAndIgnoreRemainingEvents()
             }
@@ -275,7 +276,6 @@ class DuckChatContextualViewModelTest {
                 val viewState = expectMostRecentItem() as DuckChatContextualViewModel.ViewState
                 assertEquals(DuckChatContextualViewModel.SheetMode.WEBVIEW, viewState.sheetMode)
                 assertEquals("chatUrl", viewState.url)
-                assertEquals(BottomSheetBehavior.STATE_EXPANDED, viewState.sheetState)
 
                 cancelAndIgnoreRemainingEvents()
             }
@@ -389,12 +389,15 @@ class DuckChatContextualViewModelTest {
         testee.commands.test {
             testee.onSheetOpened(tabId)
 
+            val changeState =
+                awaitItem() as DuckChatContextualViewModel.Command.ChangeSheetState
+            assertEquals(BottomSheetBehavior.STATE_EXPANDED, changeState.newState)
+
             val loadCommand = awaitItem() as DuckChatContextualViewModel.Command.LoadUrl
             assertEquals(storedUrl, loadCommand.url)
 
             val state = testee.viewState.value
             assertEquals(DuckChatContextualViewModel.SheetMode.WEBVIEW, state.sheetMode)
-            assertEquals(BottomSheetBehavior.STATE_EXPANDED, state.sheetState)
             assertEquals(storedUrl, state.url)
             assertEquals(tabId, state.tabId)
             assertTrue(state.chatHistoryEnabled)
