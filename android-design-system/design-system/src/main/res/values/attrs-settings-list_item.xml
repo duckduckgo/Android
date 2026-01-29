@@ -18,7 +18,8 @@
     <declare-styleable name="SettingsListItem">
         <attr name="leadingIcon" />
         <attr name="primaryText" />
-        <attr name="pillIcon" />
+        <attr name="showYellowPill" />
+        <attr name="textYellowPill" />
         <attr name="indicatorStatus" />
     </declare-styleable>
 </resources>

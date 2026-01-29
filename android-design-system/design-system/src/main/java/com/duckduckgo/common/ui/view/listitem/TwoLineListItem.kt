@@ -115,9 +115,9 @@ class TwoLineListItem @JvmOverloads constructor(
                 setPrimaryTextColorStateList(getColorStateList(R.styleable.TwoLineListItem_primaryTextColorOverlay))
             }
 
-            if (getBoolean(R.styleable.OneLineListItem_showYellowPill, false)) {
+            if (getBoolean(R.styleable.TwoLineListItem_showYellowPill, false)) {
                 yellowPill.show()
-                yellowPill.text = getString(R.styleable.OneLineListItem_textYellowPill)
+                yellowPill.text = getString(R.styleable.TwoLineListItem_textYellowPill)
             } else {
                 yellowPill.gone()
             }

@@ -21,6 +21,7 @@ import android.util.AttributeSet
 import android.view.View
 import android.widget.ImageView
 import com.duckduckgo.common.ui.view.DaxSwitch
+import com.duckduckgo.common.ui.view.DaxYellowPill
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.text.DaxTextView
@@ -51,9 +52,7 @@ class BookmarksListItem @JvmOverloads constructor(
         get() = binding.trailingIconContainer
     override val trailingSwitch: DaxSwitch
         get() = binding.trailingSwitch
-    override val betaPill: ImageView?
-        get() = null
-    override val newPill: ImageView?
+    override val yellowPill: DaxYellowPill?
         get() = null
 
     override val itemContainer: View
@@ -120,7 +119,7 @@ class BookmarksListItem @JvmOverloads constructor(
                 setPrimaryTextColorStateList(getColorStateList(R.styleable.TwoLineListItem_primaryTextColorOverlay))
             }
 
-            setFavoriteStarVisible(getBoolean(R.styleable.TwoLineListItem_showBetaPill, false))
+            setFavoriteStarVisible(getBoolean(R.styleable.TwoLineListItem_showYellowPill, false))
 
             val showTrailingIcon = hasValue(R.styleable.TwoLineListItem_trailingIcon)
             val showSwitch = getBoolean(R.styleable.TwoLineListItem_showSwitch, false)
