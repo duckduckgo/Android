@@ -1074,7 +1074,7 @@
         "parameters": [
             "appVersion",
             {
-                "key": "man",
+                "key": "manufacturer",
                 "description": "Manufacturer of the device",
                 "type": "string"
             }
@@ -1093,7 +1093,35 @@
                 "type": "string"
             },
             {
-                "key": "man",
+                "key": "manufacturer",
+                "description": "Manufacturer of the device",
+                "type": "string"
+            }
+        ]
+    },
+    "m_dbp_foreground-run_start-failed": {
+        "description": "Fired when pir foreground service fails to start as foreground",
+        "owners": ["karlenDimla", "landomen"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "manufacturer",
+                "description": "Manufacturer of the device",
+                "type": "string"
+            }
+        ]
+    },
+    "m_dbp_foreground-run_low-memory": {
+        "description": "Fired when pir foreground service is running low on memory",
+        "owners": ["karlenDimla", "landomen"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "manufacturer",
                 "description": "Manufacturer of the device",
                 "type": "string"
             }
@@ -1114,7 +1142,7 @@
         "parameters": [
             "appVersion",
             {
-                "key": "man",
+                "key": "manufacturer",
                 "description": "Manufacturer of the device",
                 "type": "string"
             }
@@ -1133,7 +1161,7 @@
                 "type": "string"
             },
             {
-                "key": "man",
+                "key": "manufacturer",
                 "description": "Manufacturer of the device",
                 "type": "string"
             }
@@ -1390,7 +1418,7 @@
         "parameters": [
             "appVersion",
             {
-                "key": "man",
+                "key": "manufacturer",
                 "description": "Manufacturer of the device",
                 "type": "string"
             }
@@ -1419,7 +1447,7 @@
                 "type": "number"
             },
             {
-                "key": "man",
+                "key": "manufacturer",
                 "description": "Manufacturer of the device",
                 "type": "string"
             }
