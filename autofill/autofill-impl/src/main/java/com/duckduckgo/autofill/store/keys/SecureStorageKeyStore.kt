@@ -29,6 +29,7 @@ import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_HARMONY_PR
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_HARMONY_PREFERENCES_UPDATE_KEY_FAILED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_PREFERENCES_GET_KEY_FAILED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_PREFERENCES_UPDATE_KEY_FAILED
+import com.duckduckgo.autofill.impl.service.AutofillServiceFeature
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import kotlinx.coroutines.CoroutineScope
@@ -66,6 +67,7 @@ class RealSecureStorageKeyStore constructor(
     private val coroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
     private val autofillFeature: AutofillFeature,
+    private val autofillServiceFeature: AutofillServiceFeature,
     private val sharedPreferencesProvider: SharedPreferencesProvider,
     private val pixel: Pixel,
 ) : SecureStorageKeyStore {
@@ -160,7 +162,11 @@ class RealSecureStorageKeyStore constructor(
         return withContext(dispatcherProvider.io()) {
             val useHarmony = autofillFeature.useHarmony().isEnabled()
             val preferences = if (useHarmony) {
-                getHarmonyEncryptedPreferences()
+                /*
+                 * If harmony preferences retrieval failed, allow to fallback to legacy preferences
+                 * only if autofill service is disabled, since legacy preferences don't support multi-process
+                 */
+                getHarmonyEncryptedPreferences() ?: if (!autofillServiceFeature.self().isEnabled()) getEncryptedPreferences() else null
             } else {
                 getEncryptedPreferences()
             }
@@ -182,7 +188,11 @@ class RealSecureStorageKeyStore constructor(
 
     override suspend fun canUseEncryption(): Boolean = withContext(dispatcherProvider.io()) {
         if (autofillFeature.useHarmony().isEnabled()) {
-            getHarmonyEncryptedPreferences() != null
+            /*
+             * If harmony preferences retrieval failed, allow to fallback to legacy preferences
+             * only if autofill service is disabled, since legacy preferences don't support multi-process
+             */
+            getHarmonyEncryptedPreferences() != null || (!autofillServiceFeature.self().isEnabled() && getEncryptedPreferences() != null)
         } else {
             getEncryptedPreferences() != null
         }
