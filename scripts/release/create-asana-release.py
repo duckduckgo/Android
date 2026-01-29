@@ -25,10 +25,10 @@ def get_commits_between(repo_path: str, start_commit: str, end_commit: str) -> L
     Get a list of commits between two commit hashes in a git repository.
     """
     repo = Repo(repo_path)
-
+    
     # Get all commits between start (exclusive) and end (inclusive)
     commits = list(repo.iter_commits(f"{start_commit}..{end_commit}"))
-
+    
     return commits
 
 def extract_asana_task_links(commits: List[git.Commit], url_prefix: str) -> List[AsanaTaskLink]:
@@ -37,7 +37,7 @@ def extract_asana_task_links(commits: List[git.Commit], url_prefix: str) -> List
     """
     task_links = []
     url_pattern = re.compile(rf"{re.escape(url_prefix)}\s*(https://app\.asana\.com/\S*)")
-
+    
     for commit in commits:
         message = commit.message
         match = url_pattern.search(message)
@@ -49,7 +49,7 @@ def extract_asana_task_links(commits: List[git.Commit], url_prefix: str) -> List
             url=full_url,
             commit_hash=commit.hexsha,
         ))
-
+    
     return task_links
 
 def extract_task_id_from_url(url: str) -> str:
@@ -63,19 +63,19 @@ def extract_task_id_from_url(url: str) -> str:
     """
     # Remove any query parameters
     url = url.split('?')[0]
-
+    
     # Split by slashes and get the last non-empty part
     parts = [p for p in url.split('/') if p]
-
+    
     # The task ID is either:
     # - The last part before any query parameters (for /task/ format)
     # - The last part (for short format)
     task_id = parts[-1]
-
+    
     # If the last part is 'f', get the previous part
     if task_id == 'f':
         task_id = parts[-2]
-
+    
     return task_id
 
 def create_asana_release_task(client: asana.ApiClient,
@@ -183,9 +183,9 @@ def create_asana_task(client: asana.ApiClient,
             task_link = "no task"
         commit_url = f"https://github.com/duckduckgo/Android/commit/{link.commit_hash}"
         description += f"- {task_link} - <a href=\"{commit_url}\">{link.commit_hash[:9]}</a>\n"
-
+    
     description += "</body>"
-
+    
     tasks_api = asana.TasksApi(client)
     section_api = asana.SectionsApi(client)
 
@@ -200,7 +200,7 @@ def create_asana_task(client: asana.ApiClient,
         },
         {}
     )
-
+    
     # Add the task to the project and optionally to a section
     section_api.add_task_for_section(
         section_id,
@@ -212,7 +212,7 @@ def create_asana_task(client: asana.ApiClient,
             }
         }
     )
-
+    
     return task['gid']
 
 def find_or_create_tag(client: asana.ApiClient, workspace_id: str, tag_name: str) -> str:
@@ -353,17 +353,17 @@ def main():
     parser.add_argument('--template-task-id', help='Asana template task ID to duplicate (required for public releases)')
 
     args = parser.parse_args()
-
+    
     try:
         # Get environment variables
         asana_api_key = os.getenv(args.asana_api_key_env_var)
-
+        
         # Validate environment variables
         if not asana_api_key:
             log("Error: Missing required environment variable")
             log(f"Please set {args.asana_api_key_env_var}")
             return 1
-
+    
         configuration = asana.Configuration()
         configuration.access_token = asana_api_key
         client = asana.ApiClient(configuration)
@@ -382,12 +382,13 @@ def main():
         if not start_tag:
             log(f"Error: No previous version tag found before {args.tag}")
             return 1
-
+        
         log(f"Using tag {start_tag} as start commit")
-
+        log(f"Using tag {args.tag} as end commit")
+        
         # Get commits between the tags
         commits = get_commits_between(args.android_repo_path, start_tag, args.tag)
-
+        
         log(f"Extracting task links from {len(commits)} commits")
         # Extract Asana task links from commit messages
         task_links = extract_asana_task_links(commits, args.trigger_phrase)
@@ -422,7 +423,7 @@ def main():
         print(task_url) # Only the URL is ever printed to stdout
 
         return 0
-
+        
     except Exception as e:
         import traceback
         log(f"Unexpected error: {e}")
