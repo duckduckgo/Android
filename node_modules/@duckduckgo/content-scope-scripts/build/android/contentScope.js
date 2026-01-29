@@ -4982,6 +4982,14 @@
   _args = new WeakMap();
 
   // src/content-feature.js
+  function createDeferred() {
+    const deferred = {};
+    deferred.promise = new Promise((resolve, reject) => {
+      deferred.resolve = resolve;
+      deferred.reject = reject;
+    });
+    return deferred;
+  }
   var CallFeatureMethodError = class extends Error {
     /**
      * @param {string} message
@@ -4992,7 +5000,9 @@
       this.name = new.target.name;
     }
   };
-  var _messaging, _isDebugFlagSet, _importConfig, _features;
+  var FeatureSkippedError = class extends Error {
+  };
+  var _messaging, _isDebugFlagSet, _importConfig, _features, _ready;
   var ContentFeature = class extends ConfigFeature {
     /**
      * @param {string} featureName
@@ -5029,6 +5039,8 @@
        * @type {Partial<FeatureMap>}
        */
       __privateAdd(this, _features);
+      /** @type {ReturnType<typeof createDeferred>} */
+      __privateAdd(this, _ready);
       /**
        * @template {string} K
        * @typedef {K[] & {__brand: 'exposeMethods'}} ExposeMethods
@@ -5045,12 +5057,21 @@
       this.monitor = new PerformanceMonitor();
       __privateSet(this, _features, features);
       __privateSet(this, _importConfig, importConfig);
+      __privateSet(this, _ready, createDeferred());
     }
     get isDebug() {
       return this.args?.debug || false;
     }
     get shouldLog() {
       return this.isDebug;
+    }
+    /**
+     * Returns a promise that resolves when the feature has been initialised with `init`.
+     *
+     * @returns {Promise<void>}
+     */
+    get _ready() {
+      return __privateGet(this, _ready).promise;
     }
     /**
      * Logging utility for this feature (Stolen some inspo from DuckPlayer logger, will unify in the future)
@@ -5140,7 +5161,12 @@
     /**
      * Run an exposed method of another feature.
      *
+     * Waits for the feature to be initialized before calling the method.
+     *
      * `args` are the arguments to pass to the feature method.
+     *
+     * NOTE: be aware of potential circular dependencies. Check that the feature
+     * you are calling is not calling you back.
      *
      * @template {keyof FeatureMap} FeatureName
      * @template {FeatureMap[FeatureName]} Feature
@@ -5148,9 +5174,9 @@
      * @param {FeatureName} featureName
      * @param {MethodName} methodName
      * @param {Feature[MethodName] extends (...args: infer Args) => any ? Args : never} args
-     * @returns {ReturnType<Feature[MethodName]> | CallFeatureMethodError}
+     * @returns {Promise<ReturnType<Feature[MethodName]> | CallFeatureMethodError>}
      */
-    callFeatureMethod(featureName, methodName, ...args) {
+    async callFeatureMethod(featureName, methodName, ...args) {
       const feature = __privateGet(this, _features)[featureName];
       if (!feature) return new CallFeatureMethodError(`Feature not found: '${featureName}'`);
       if (!(feature._exposedMethods !== void 0 && feature._exposedMethods.some((mn) => mn === methodName)))
@@ -5162,6 +5188,14 @@
       if (!method) return new CallFeatureMethodError(`'${methodName}' not found in feature '${featureName}'`);
       if (!(method instanceof Function))
         return new CallFeatureMethodError(`'${methodName}' is not a function in feature '${featureName}'`);
+      try {
+        await feature._ready;
+      } catch (e) {
+        if (e instanceof FeatureSkippedError) {
+          return new CallFeatureMethodError(`Initialisation of feature '${featureName}' was skipped: ${e.message}`);
+        }
+        throw e;
+      }
       return method.call(feature, ...args);
     }
     /**
@@ -5207,12 +5241,32 @@
     }
     init(_args2) {
     }
-    callInit(args) {
+    /**
+     * @param {object} args
+     */
+    async callInit(args) {
       const mark = this.monitor.mark(this.name + "CallInit");
-      this.setArgs(args);
-      this.init(this.args);
-      mark.end();
-      this.measure();
+      try {
+        this.setArgs(args);
+        await this.init(this.args);
+        __privateGet(this, _ready).resolve?.();
+      } catch (error) {
+        __privateGet(this, _ready).reject?.(error);
+        throw error;
+      } finally {
+        mark.end();
+        this.measure();
+      }
+    }
+    /**
+     * Mark this feature as skipped (not initialized).
+     *
+     * This allows inter-feature communication to fail fast instead of hanging indefinitely.
+     *
+     * @param {string} reason - The reason the feature was skipped
+     */
+    markFeatureAsSkipped(reason) {
+      __privateGet(this, _ready).reject?.(new FeatureSkippedError(reason));
     }
     setArgs(args) {
       this.args = args;
@@ -5363,6 +5417,7 @@
   _isDebugFlagSet = new WeakMap();
   _importConfig = new WeakMap();
   _features = new WeakMap();
+  _ready = new WeakMap();
 
   // src/features/fingerprinting-audio.js
   var FingerprintingAudio = class extends ContentFeature {
@@ -11048,23 +11103,28 @@ ${iframeContent}
     registerMessageSecret(args.messageSecret);
     initStringExemptionLists(args);
     const features = await getFeatures();
-    Object.entries(features).forEach(([featureName, featureInstance2]) => {
-      if (!isFeatureBroken(args, featureName) || alwaysInitExtensionFeatures(args, featureName)) {
-        if (!featureInstance2.getFeatureSettingEnabled("additionalCheck", "enabled")) {
-          return;
+    await Promise.allSettled(
+      Object.entries(features).map(async ([featureName, featureInstance2]) => {
+        if (!isFeatureBroken(args, featureName) || alwaysInitExtensionFeatures(args, featureName)) {
+          if (!featureInstance2.getFeatureSettingEnabled("additionalCheck", "enabled")) {
+            featureInstance2.markFeatureAsSkipped("additionalCheck disabled");
+            return;
+          }
+          await featureInstance2.callInit(args);
+          const hasUrlChangedMethod = "urlChanged" in featureInstance2 && typeof featureInstance2.urlChanged === "function";
+          if (featureInstance2.listenForUrlChanges || hasUrlChangedMethod) {
+            registerForURLChanges((navigationType) => {
+              featureInstance2.recomputeSiteObject();
+              if (hasUrlChangedMethod) {
+                featureInstance2.urlChanged(navigationType);
+              }
+            });
+          }
+        } else {
+          featureInstance2.markFeatureAsSkipped("feature is broken or disabled on this site");
         }
-        featureInstance2.callInit(args);
-        const hasUrlChangedMethod = "urlChanged" in featureInstance2 && typeof featureInstance2.urlChanged === "function";
-        if (featureInstance2.listenForUrlChanges || hasUrlChangedMethod) {
-          registerForURLChanges((navigationType) => {
-            featureInstance2.recomputeSiteObject();
-            if (hasUrlChangedMethod) {
-              featureInstance2.urlChanged(navigationType);
-            }
-          });
-        }
-      }
-    });
+      })
+    );
     while (updates.length) {
       const update = updates.pop();
       await updateFeaturesInner(update);
