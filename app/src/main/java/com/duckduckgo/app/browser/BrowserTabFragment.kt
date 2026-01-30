@@ -3384,7 +3384,7 @@ class BrowserTabFragment :
         duckChat.showContextualOnboarding(
             requireContext(),
         ) {
-            showDuckChatContextualSheet()
+            showDuckChatContextualSheet(tabId)
         }
     }
 
