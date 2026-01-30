@@ -87,6 +87,13 @@ class DataClearingWideEventImpl @Inject constructor(
             ),
             cleanupPolicy = OnProcessStart(ignoreIfIntervalTimeoutPresent = false),
         ).getOrNull()
+
+        cachedFlowId?.let { flowId ->
+            wideEventClient.intervalStart(
+                wideEventId = flowId,
+                key = KEY_TOTAL_DURATION_MS_BUCKETED,
+            )
+        }
     }
 
     override suspend fun startLegacy(
@@ -125,6 +132,11 @@ class DataClearingWideEventImpl @Inject constructor(
         if (!isFeatureEnabled()) return
         val flowId = getCurrentFlowId() ?: return
 
+        wideEventClient.intervalEnd(
+            wideEventId = flowId,
+            key = KEY_TOTAL_DURATION_MS_BUCKETED,
+        )
+
         wideEventClient.flowFinish(
             wideEventId = flowId,
             status = FlowStatus.Success,
@@ -137,6 +149,11 @@ class DataClearingWideEventImpl @Inject constructor(
         if (!isFeatureEnabled()) return
         val flowId = getCurrentFlowId() ?: return
         val errorClass = error.toErrorClass()
+
+        wideEventClient.intervalEnd(
+            wideEventId = flowId,
+            key = KEY_TOTAL_DURATION_MS_BUCKETED,
+        )
 
         wideEventClient.flowFinish(
             wideEventId = flowId,
@@ -204,5 +221,6 @@ class DataClearingWideEventImpl @Inject constructor(
     private companion object {
         const val FLOW_NAME = "data-clearing"
         const val KEY_CLEAR_OPTIONS = "clear_options"
+        const val KEY_TOTAL_DURATION_MS_BUCKETED = "total_duration_ms_bucketed"
     }
 }
