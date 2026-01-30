@@ -21,6 +21,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
+import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
+import com.duckduckgo.duckchat.impl.helper.NativeAction
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper
 import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
@@ -38,6 +40,8 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.Mockito.mock
+import org.mockito.kotlin.verify
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(AndroidJUnit4::class)
@@ -51,6 +55,7 @@ class DuckChatContextualViewModelTest {
     private val duckChat: com.duckduckgo.duckchat.api.DuckChat = FakeDuckChat()
     private val contextualDataStore = FakeDuckChatContextualDataStore()
     private val duckChatFeature = FakeFeatureToggleFactory.create(DuckChatFeature::class.java)
+    private val duckChatJSHelper: DuckChatJSHelper = mock()
 
     @Before
     fun setup() {
@@ -61,6 +66,7 @@ class DuckChatContextualViewModelTest {
             duckChat = duckChat,
             duckChatFeature = duckChatFeature,
             contextualDataStore = contextualDataStore,
+            duckChatJSHelper = duckChatJSHelper,
         )
     }
 
@@ -451,9 +457,17 @@ class DuckChatContextualViewModelTest {
         contextualDataStore.persistTabChatUrl(tabId, url)
 
         testee.onSheetOpened(tabId)
-        testee.onNewChatRequested()
+        testee.subscriptionEventDataFlow.test {
+            testee.onNewChatRequested()
 
-        assertNull(contextualDataStore.getTabChatUrl(tabId))
+            val event = awaitItem()
+            assertEquals(RealDuckChatJSHelper.DUCK_CHAT_FEATURE_NAME, event.featureName)
+            assertEquals("submitNewChatAction", event.subscriptionName)
+
+            assertNull(contextualDataStore.getTabChatUrl(tabId))
+            verify(duckChatJSHelper).onNativeAction(NativeAction.NEW_CHAT)
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     private fun enableAutomaticContextAttachment() {
