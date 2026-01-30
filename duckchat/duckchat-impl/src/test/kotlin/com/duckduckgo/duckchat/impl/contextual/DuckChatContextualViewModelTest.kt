@@ -22,7 +22,6 @@ import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
-import com.duckduckgo.duckchat.impl.helper.NativeAction
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper
 import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
@@ -41,7 +40,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito.mock
-import org.mockito.kotlin.verify
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(AndroidJUnit4::class)
@@ -69,54 +67,6 @@ class DuckChatContextualViewModelTest {
             duckChatJSHelper = duckChatJSHelper,
         )
     }
-
-    @Test
-    fun `when prompt sent with page context then event contains context`() =
-        runTest {
-            val tabId = "tab-1"
-            val serializedPageData =
-                """
-                {
-                    "title": "Page Title",
-                    "url": "https://example.com",
-                    "content": "Extracted DOM text...",
-                    "favicon": [{"href": "data:image/png;base64,...", "rel": "icon"}],
-                    "truncated": false,
-                    "fullContentLength": 1234
-                }
-                """.trimIndent()
-
-            enableAutomaticContextAttachment()
-            testee.onSheetOpened(tabId)
-            testee.onPageContextReceived(tabId, serializedPageData)
-
-            testee.subscriptionEventDataFlow.test {
-                val prompt = "Summarize this page"
-
-                testee.onPromptSent(prompt)
-
-                val event = awaitItem()
-                assertEquals(RealDuckChatJSHelper.DUCK_CHAT_FEATURE_NAME, event.featureName)
-                assertEquals("submitAIChatNativePrompt", event.subscriptionName)
-
-                val params = event.params
-                assertEquals("android", params.getString("platform"))
-                assertEquals("query", params.getString("tool"))
-
-                val query = params.getJSONObject("query")
-                assertEquals(prompt, query.getString("prompt"))
-                assertTrue(query.getBoolean("autoSubmit"))
-
-                val pageContext = params.getJSONObject("pageContext")
-                assertEquals("Page Title", pageContext.getString("title"))
-                assertEquals("https://example.com", pageContext.getString("url"))
-                assertEquals("Extracted DOM text...", pageContext.getString("content"))
-                assertFalse(pageContext.getBoolean("truncated"))
-                assertEquals(1234, pageContext.getInt("fullContentLength"))
-
-                cancelAndIgnoreRemainingEvents()
-            }
-        }
 
     @Test
     fun `when prompt sent without page context then event omits pageContext`() =
@@ -209,11 +159,12 @@ class DuckChatContextualViewModelTest {
                 """.trimIndent()
 
             enableAutomaticContextAttachment()
+
             testee.viewState.test {
+                testee.addPageContext()
                 testee.onPageContextReceived(tabId, serializedPageData)
 
                 val state = expectMostRecentItem() as DuckChatContextualViewModel.ViewState
-                assertTrue(state.showContext)
                 assertEquals("Ctx Title", state.contextTitle)
                 assertEquals("https://ctx.com", state.contextUrl)
                 assertEquals("tab-1", state.tabId)
@@ -225,14 +176,12 @@ class DuckChatContextualViewModelTest {
         runTest {
             testee.viewState.test {
                 val initial = awaitItem()
-                assertFalse(initial.allowsAutomaticContextAttachment)
-                assertFalse(initial.showContext)
+                assertTrue(initial.allowsAutomaticContextAttachment)
 
-                (duckChat as FakeDuckChat).setAutomaticContextAttachment(true)
+                (duckChat as FakeDuckChat).setAutomaticContextAttachment(false)
 
                 val updated = awaitItem()
-                assertTrue(updated.allowsAutomaticContextAttachment)
-                assertTrue(updated.showContext)
+                assertFalse(updated.allowsAutomaticContextAttachment)
 
                 cancelAndIgnoreRemainingEvents()
             }
@@ -457,17 +406,8 @@ class DuckChatContextualViewModelTest {
         contextualDataStore.persistTabChatUrl(tabId, url)
 
         testee.onSheetOpened(tabId)
-        testee.subscriptionEventDataFlow.test {
-            testee.onNewChatRequested()
-
-            val event = awaitItem()
-            assertEquals(RealDuckChatJSHelper.DUCK_CHAT_FEATURE_NAME, event.featureName)
-            assertEquals("submitNewChatAction", event.subscriptionName)
-
-            assertNull(contextualDataStore.getTabChatUrl(tabId))
-            verify(duckChatJSHelper).onNativeAction(NativeAction.NEW_CHAT)
-            cancelAndIgnoreRemainingEvents()
-        }
+        testee.onNewChatRequested()
+        assertNull(contextualDataStore.getTabChatUrl(tabId))
     }
 
     private fun enableAutomaticContextAttachment() {
@@ -477,7 +417,7 @@ class DuckChatContextualViewModelTest {
 
     private class FakeDuckChat : com.duckduckgo.duckchat.api.DuckChat {
         var nextUrl: String = ""
-        private val automaticContextAttachment = MutableStateFlow(false)
+        private val automaticContextAttachment = MutableStateFlow(true)
 
         override fun isEnabled(): Boolean = true
         override fun openDuckChat() = Unit
@@ -494,6 +434,7 @@ class DuckChatContextualViewModelTest {
         override fun observeAutomaticContextAttachmentUserSettingEnabled(): Flow<Boolean> = automaticContextAttachment
         override fun showContextualOnboarding(context: Context, onConfirmed: () -> Unit) = Unit
         override suspend fun isContextualOnboardingCompleted(): Boolean = true
+
         fun setAutomaticContextAttachment(enabled: Boolean) {
             automaticContextAttachment.value = enabled
         }

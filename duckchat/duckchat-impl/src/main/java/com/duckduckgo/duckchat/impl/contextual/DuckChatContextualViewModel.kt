@@ -327,6 +327,7 @@ class DuckChatContextualViewModel @Inject constructor(
             val currentTabId = _viewState.value.tabId
             if (currentTabId.isNotBlank()) {
                 contextualDataStore.clearTabChatUrl(currentTabId)
+
                 withContext(dispatchers.main()) {
                     _viewState.update {
                         it.copy(
