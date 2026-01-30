@@ -30,8 +30,6 @@ import com.duckduckgo.feature.toggles.api.FakeToggleStore
 import com.duckduckgo.feature.toggles.api.FeatureToggles
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -90,53 +88,6 @@ class ClipboardImageInjectorImplTest {
     }
 
     @Test
-    fun whenInitializedThenRequiresLegacyPolyfillInjectionDefaultsToTrue() {
-        assertTrue(testee.requiresLegacyPolyfillInjection)
-    }
-
-    @Test
-    fun whenFeatureDisabledThenRequiresLegacyPolyfillInjectionSetToFalse() = runTest {
-        fakeFeatureToggle.self().setRawStoredState(State(enable = false))
-
-        testee.configureWebViewForClipboard(mockWebView)
-
-        assertFalse(testee.requiresLegacyPolyfillInjection)
-    }
-
-    @Test
-    fun whenFeatureEnabledAndModernApproachNotSupportedThenRequiresLegacyPolyfillInjectionRemainsTrue() = runTest {
-        fakeFeatureToggle.self().setRawStoredState(State(enable = true))
-        whenever(mockWebViewCapabilityChecker.isSupported(WebViewCapability.WebMessageListener)).thenReturn(false)
-        whenever(mockWebViewCapabilityChecker.isSupported(WebViewCapability.DocumentStartJavaScript)).thenReturn(false)
-
-        testee.configureWebViewForClipboard(mockWebView)
-
-        assertTrue(testee.requiresLegacyPolyfillInjection)
-    }
-
-    @Test
-    fun whenFeatureEnabledAndOnlyWebMessageListenerSupportedThenRequiresLegacyPolyfillInjectionRemainsTrue() = runTest {
-        fakeFeatureToggle.self().setRawStoredState(State(enable = true))
-        whenever(mockWebViewCapabilityChecker.isSupported(WebViewCapability.WebMessageListener)).thenReturn(true)
-        whenever(mockWebViewCapabilityChecker.isSupported(WebViewCapability.DocumentStartJavaScript)).thenReturn(false)
-
-        testee.configureWebViewForClipboard(mockWebView)
-
-        assertTrue(testee.requiresLegacyPolyfillInjection)
-    }
-
-    @Test
-    fun whenFeatureEnabledAndOnlyDocumentStartJavaScriptSupportedThenRequiresLegacyPolyfillInjectionRemainsTrue() = runTest {
-        fakeFeatureToggle.self().setRawStoredState(State(enable = true))
-        whenever(mockWebViewCapabilityChecker.isSupported(WebViewCapability.WebMessageListener)).thenReturn(false)
-        whenever(mockWebViewCapabilityChecker.isSupported(WebViewCapability.DocumentStartJavaScript)).thenReturn(true)
-
-        testee.configureWebViewForClipboard(mockWebView)
-
-        assertTrue(testee.requiresLegacyPolyfillInjection)
-    }
-
-    @Test
     fun whenLegacyApproachConfiguredThenJavascriptInterfaceAdded() = runTest {
         fakeFeatureToggle.self().setRawStoredState(State(enable = true))
         whenever(mockWebViewCapabilityChecker.isSupported(WebViewCapability.WebMessageListener)).thenReturn(false)
@@ -164,5 +115,70 @@ class ClipboardImageInjectorImplTest {
         testee.injectLegacyPolyfill(mockWebView)
 
         verify(mockWebView).evaluateJavascript(argThat { startsWith("javascript:") }, isNull())
+    }
+
+    @Test
+    fun whenModernApproachSupportedThenUsesModernApproach() = runTest {
+        fakeFeatureToggle.self().setRawStoredState(State(enable = true))
+        whenever(mockWebViewCapabilityChecker.isSupported(WebViewCapability.WebMessageListener)).thenReturn(true)
+        whenever(mockWebViewCapabilityChecker.isSupported(WebViewCapability.DocumentStartJavaScript)).thenReturn(true)
+
+        testee.configureWebViewForClipboard(mockWebView)
+
+        verify(mockWebViewCompatWrapper).addDocumentStartJavaScript(eq(mockWebView), any(), any())
+        verify(mockWebViewCompatWrapper).addWebMessageListener(eq(mockWebView), eq("ddgClipboardObj"), any(), any())
+        verify(mockWebView, never()).addJavascriptInterface(any(), any())
+    }
+
+    @Test
+    fun whenOnlyWebMessageListenerSupportedThenUsesLegacyApproach() = runTest {
+        fakeFeatureToggle.self().setRawStoredState(State(enable = true))
+        whenever(mockWebViewCapabilityChecker.isSupported(WebViewCapability.WebMessageListener)).thenReturn(true)
+        whenever(mockWebViewCapabilityChecker.isSupported(WebViewCapability.DocumentStartJavaScript)).thenReturn(false)
+
+        testee.configureWebViewForClipboard(mockWebView)
+
+        verify(mockWebView).addJavascriptInterface(
+            any<ClipboardImageJavascriptInterface>(),
+            eq(ClipboardImageJavascriptInterface.JAVASCRIPT_INTERFACE_NAME),
+        )
+        verify(mockWebViewCompatWrapper, never()).addDocumentStartJavaScript(any(), any(), any())
+    }
+
+    @Test
+    fun whenOnlyDocumentStartJavaScriptSupportedThenUsesLegacyApproach() = runTest {
+        fakeFeatureToggle.self().setRawStoredState(State(enable = true))
+        whenever(mockWebViewCapabilityChecker.isSupported(WebViewCapability.WebMessageListener)).thenReturn(false)
+        whenever(mockWebViewCapabilityChecker.isSupported(WebViewCapability.DocumentStartJavaScript)).thenReturn(true)
+
+        testee.configureWebViewForClipboard(mockWebView)
+
+        verify(mockWebView).addJavascriptInterface(
+            any<ClipboardImageJavascriptInterface>(),
+            eq(ClipboardImageJavascriptInterface.JAVASCRIPT_INTERFACE_NAME),
+        )
+        verify(mockWebViewCompatWrapper, never()).addWebMessageListener(any(), any(), any(), any())
+    }
+
+    @Test
+    fun whenModernApproachConfiguredThenInjectLegacyPolyfillDoesNothing() = runTest {
+        fakeFeatureToggle.self().setRawStoredState(State(enable = true))
+        whenever(mockWebViewCapabilityChecker.isSupported(WebViewCapability.WebMessageListener)).thenReturn(true)
+        whenever(mockWebViewCapabilityChecker.isSupported(WebViewCapability.DocumentStartJavaScript)).thenReturn(true)
+
+        testee.configureWebViewForClipboard(mockWebView)
+        testee.injectLegacyPolyfill(mockWebView)
+
+        verify(mockWebView, never()).evaluateJavascript(any(), any())
+    }
+
+    @Test
+    fun whenFeatureDisabledThenInjectLegacyPolyfillDoesNothing() = runTest {
+        fakeFeatureToggle.self().setRawStoredState(State(enable = false))
+
+        testee.configureWebViewForClipboard(mockWebView)
+        testee.injectLegacyPolyfill(mockWebView)
+
+        verify(mockWebView, never()).evaluateJavascript(any(), any())
     }
 }

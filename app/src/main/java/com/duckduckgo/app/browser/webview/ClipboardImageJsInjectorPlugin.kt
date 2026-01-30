@@ -22,7 +22,6 @@ import com.duckduckgo.browser.api.JsInjectorPlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.squareup.anvil.annotations.ContributesMultibinding
-import logcat.logcat
 import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
@@ -36,10 +35,7 @@ class ClipboardImageJsInjectorPlugin @Inject constructor(
         isDesktopMode: Boolean?,
         activeExperiments: List<Toggle>,
     ) {
-        logcat { "ClipboardImageJsInjectorPlugin: onPageStarted, requiresLegacy=${clipboardImageInjector.requiresLegacyPolyfillInjection}" }
-        if (clipboardImageInjector.requiresLegacyPolyfillInjection) {
-            clipboardImageInjector.injectLegacyPolyfill(webView)
-        }
+        clipboardImageInjector.injectLegacyPolyfill(webView)
     }
 
     override fun onPageFinished(

@@ -22,7 +22,6 @@ import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
-import org.mockito.kotlin.whenever
 
 class ClipboardImageJsInjectorPluginTest {
 
@@ -39,21 +38,10 @@ class ClipboardImageJsInjectorPluginTest {
     }
 
     @Test
-    fun whenRequiresLegacyPolyfillInjectionTrueThenInjectsPolyfill() {
-        whenever(mockClipboardImageInjector.requiresLegacyPolyfillInjection).thenReturn(true)
-
+    fun whenOnPageStartedThenInjectsPolyfillCalled() {
         testee.onPageStarted(mockWebView, "https://example.com", null, emptyList())
 
         verify(mockClipboardImageInjector).injectLegacyPolyfill(mockWebView)
-    }
-
-    @Test
-    fun whenRequiresLegacyPolyfillInjectionFalseThenDoesNotInjectPolyfill() {
-        whenever(mockClipboardImageInjector.requiresLegacyPolyfillInjection).thenReturn(false)
-
-        testee.onPageStarted(mockWebView, "https://example.com", null, emptyList())
-
-        verify(mockClipboardImageInjector, never()).injectLegacyPolyfill(mockWebView)
     }
 
     @Test

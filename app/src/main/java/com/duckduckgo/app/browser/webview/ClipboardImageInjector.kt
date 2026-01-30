@@ -58,14 +58,8 @@ interface ClipboardImageInjector {
     suspend fun configureWebViewForClipboard(webView: WebView)
 
     /**
-     * Returns true if the legacy polyfill needs to be injected on each page load.
-     * Defaults to true (safe) and is updated after capability checks complete.
-     */
-    val requiresLegacyPolyfillInjection: Boolean
-
-    /**
      * Injects the legacy polyfill script into the WebView.
-     * Should be called from WebViewClient.onPageStarted() when [requiresLegacyPolyfillInjection] is true.
+     * Should be called from WebViewClient.onPageStarted().
      */
     fun injectLegacyPolyfill(webView: WebView)
 }
@@ -84,8 +78,7 @@ class ClipboardImageInjectorImpl @Inject constructor(
     private val clipboardManager by lazy { context.getSystemService(ClipboardManager::class.java) }
     private var legacyPolyfillScript: String? = null
 
-    override var requiresLegacyPolyfillInjection: Boolean = true
-        private set
+    private var requiresLegacyPolyfillInjection: Boolean = true
 
     init {
         // Pre-load the legacy polyfill script at app startup to ensure it's ready before any WebView is created
@@ -128,12 +121,14 @@ class ClipboardImageInjectorImpl @Inject constructor(
     }
 
     override fun injectLegacyPolyfill(webView: WebView) {
-        val script = legacyPolyfillScript
-        if (script != null) {
-            logcat { "ClipboardImageInjector: Injecting legacy polyfill script" }
-            webView.evaluateJavascript("javascript:$script", null)
-        } else {
-            logcat { "ClipboardImageInjector: Legacy polyfill script not loaded yet" }
+        if (requiresLegacyPolyfillInjection) {
+            val script = legacyPolyfillScript
+            if (script != null) {
+                logcat { "ClipboardImageInjector: Injecting legacy polyfill script" }
+                webView.evaluateJavascript("javascript:$script", null)
+            } else {
+                logcat { "ClipboardImageInjector: Legacy polyfill script not loaded yet" }
+            }
         }
     }
 
