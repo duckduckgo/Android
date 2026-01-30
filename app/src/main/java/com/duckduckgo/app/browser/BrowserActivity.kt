@@ -1262,7 +1262,11 @@ open class BrowserActivity : DuckDuckGoActivity() {
     private val Intent.launchedFromRecents: Boolean
         get() = (flags and Intent.FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY) == Intent.FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY
 
+    private fun canShowFeedbackDialog(): Boolean = lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)
+
     private fun showAppEnjoymentDialog(promptCount: PromptCount) {
+        if (!canShowFeedbackDialog()) return
+
         TextAlertDialogBuilder(this)
             .setTitle(R.string.appEnjoymentDialogTitle)
             .setMessage(R.string.appEnjoymentDialogMessage)
@@ -1291,6 +1295,8 @@ open class BrowserActivity : DuckDuckGoActivity() {
     }
 
     private fun showAppRatingDialog(promptCount: PromptCount) {
+        if (!canShowFeedbackDialog()) return
+
         TextAlertDialogBuilder(this)
             .setTitle(R.string.rateAppDialogTitle)
             .setMessage(R.string.rateAppDialogMessage)
@@ -1319,6 +1325,8 @@ open class BrowserActivity : DuckDuckGoActivity() {
     }
 
     private fun showGiveFeedbackDialog(promptCount: PromptCount) {
+        if (!canShowFeedbackDialog()) return
+
         TextAlertDialogBuilder(this)
             .setTitle(R.string.giveFeedbackDialogTitle)
             .setMessage(R.string.giveFeedbackDialogMessage)
