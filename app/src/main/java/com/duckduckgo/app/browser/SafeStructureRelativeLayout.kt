@@ -20,6 +20,9 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.ViewStructure
 import android.widget.RelativeLayout
+import logcat.LogPriority.ERROR
+import logcat.asLog
+import logcat.logcat
 
 class SafeStructureRelativeLayout @JvmOverloads constructor(
     context: Context,
@@ -30,6 +33,8 @@ class SafeStructureRelativeLayout @JvmOverloads constructor(
     override fun dispatchProvideStructure(structure: ViewStructure) {
         runCatching {
             super.dispatchProvideStructure(structure)
+        }.onFailure { exception ->
+            logcat(ERROR) { "SafeStructureRelativeLayout: Error dispatching structure: ${exception.asLog()}" }
         }
     }
 }
