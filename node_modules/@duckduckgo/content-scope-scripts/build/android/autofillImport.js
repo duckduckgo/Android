@@ -7799,6 +7799,24 @@
           continue;
         }
         results.push(setValueForInput(inputElem, data2.city + ", " + data2.state));
+      } else if (element.type === "fullState") {
+        if (!Object.prototype.hasOwnProperty.call(data2, "state")) {
+          results.push({
+            result: false,
+            error: `element found with selector '${element.selector}', but data didn't contain the key 'state'`
+          });
+          continue;
+        }
+        const state = data2.state;
+        if (!Object.prototype.hasOwnProperty.call(states, state)) {
+          results.push({
+            result: false,
+            error: `element found with selector '${element.selector}', but data contained an invalid 'state' abbreviation`
+          });
+          continue;
+        }
+        const stateFull = states[state];
+        results.push(setValueForInput(inputElem, stateFull));
       } else {
         if (isElementTypeOptional(element.type)) {
           continue;
@@ -7853,7 +7871,17 @@
         events.forEach((ev) => el.dispatchEvent(ev));
         el.blur();
       } else if (el.tagName === "SELECT") {
-        originalSet.call(el, val);
+        const selectElement = (
+          /** @type {HTMLSelectElement} */
+          el
+        );
+        const selectValues = [...selectElement.options].map((o) => o.value);
+        const valStr = String(val);
+        const matchingValue = selectValues.find((option) => option.toLowerCase() === valStr.toLowerCase());
+        if (matchingValue === void 0) {
+          return { result: false, error: `could not find matching value for select element: ${val}` };
+        }
+        originalSet.call(el, matchingValue);
         const events = [
           new Event("mousedown", { bubbles: true }),
           new Event("mouseup", { bubbles: true }),

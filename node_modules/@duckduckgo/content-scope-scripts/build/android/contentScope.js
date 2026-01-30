@@ -8181,6 +8181,17 @@
             result.expandedPerformanceMetrics = expandedPerformanceMetrics.metrics;
           }
         }
+        const breakageDataPayload = {};
+        if (result.detectorData) {
+          breakageDataPayload.detectorData = result.detectorData;
+        }
+        if (Object.keys(breakageDataPayload).length > 0) {
+          try {
+            result.breakageData = encodeURIComponent(JSON.stringify(breakageDataPayload));
+          } catch (e) {
+            result.breakageData = encodeURIComponent(JSON.stringify({ error: "encoding_failed" }));
+          }
+        }
         this.messaging.notify("breakageReportResult", result);
       });
     }
