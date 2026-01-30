@@ -142,7 +142,7 @@ class ClipboardImageInjectorImpl @Inject constructor(
         logcat { "ClipboardImageInjector: Configuring modern approach (WebMessageListener)" }
 
         val script = getPolyfillScript()
-        WebViewCompat.addDocumentStartJavaScript(webView, script, setOf("*"))
+        webViewCompatWrapper.addDocumentStartJavaScript(webView, script, setOf("*"))
 
         webViewCompatWrapper.addWebMessageListener(
             webView,
