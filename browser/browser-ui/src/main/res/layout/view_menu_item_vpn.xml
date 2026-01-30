@@ -56,13 +56,13 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:visibility="visible" />
 
-    <ImageView
+    <com.duckduckgo.common.ui.view.DaxYellowPill
         android:id="@+id/tryForFreePill"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/keyline_2"
         android:padding="@dimen/keyline_2"
-        android:src="@drawable/ic_try_for_free_pill"
+        android:text="@string/browserMenuVpnTryForFree"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
