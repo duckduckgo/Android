@@ -23,9 +23,6 @@ jobs:
     runs-on: macos-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
       - name: Check app-version value
         run: |
           if [ "${{ github.event.inputs.app-version }}" == "PLACEHOLDER" ]; then
@@ -34,11 +31,10 @@ jobs:
           else
             echo "Input value is valid: ${{ github.event.inputs.app-version }}"
           fi
-
-      - name: Install Release Bridge from Homebrew
-        run: |
-          brew tap cdrussell/aarb
-          brew install aarb
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Notify Mattermost of Release starting
         id: send-mm-release-starting
@@ -50,9 +46,27 @@ jobs:
           mattermost-message: ${{env.emoji_start}} Starting release process for version ${{ github.event.inputs.app-version }}
           action: 'send-mattermost-message'
 
-      - name: Create task in Asana
+      - name: Install dependencies for create-asana-public-release task
         run: |
-          AndroidAsanaBridge version=${{ github.event.inputs.app-version }} action=createRelease,tagPendingTasks,addLinksToDescription,removePendingTasks
+          python -m pip install --upgrade pip
+          pip install -r scripts/release/requirements.txt
+
+      - name: Create Asana release task
+        env:
+          ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
+        shell: bash
+        run: |
+          set -eo pipefail
+          RELEASE_TASK_URL=$(python ./scripts/release/create-asana-public-release.py \
+          --android-repo-path . \
+          --tag "${{ github.event.inputs.app-version }}" \
+          --trigger-phrase 'Task/Issue URL:' \
+          --asana-project-id "${{ vars.GH_ANDROID_RELEASE_BOARD_PROJECT_ID }}" \
+          --asana-section-id "${{ vars.GH_ANDROID_RELEASE_BOARD_QA_SECTION_ID }}" \
+          --asana-workspace-id "${{ secrets.GH_ASANA_WORKSPACE_ID }}" \
+          --asana-api-key-env-var ASANA_ACCESS_TOKEN \
+          --template-task-id "${{ vars.GH_ANDROID_RELEASE_BOARD_TEMPLATE_TASK_ID }}")
+          echo "RELEASE_TASK_URL=$RELEASE_TASK_URL" >> "$GITHUB_ENV"
 
       - name: Assign task to Github Actor
         id: assign-release-task
@@ -74,14 +88,14 @@ jobs:
             # Check for error markers
             if [[ "$TASK_ID_VALUE" == "TASK_NOT_FOUND" || "$TASK_ID_VALUE" == "USER_MAPPING_FILE_NOT_FOUND" || "$TASK_ID_VALUE" == "USER_NOT_IN_MAPPING" ]]; then
               echo "::error::Error marker found in output file: $TASK_ID_VALUE"
-              echo "task_id=" >> $GITHUB_OUTPUT # Set actual output to empty on error
+              echo "task_id=" >> "$GITHUB_OUTPUT" # Set actual output to empty on error
             else
               echo "Successfully read Task ID: '$TASK_ID_VALUE'"
-              echo "task_id=$TASK_ID_VALUE" >> $GITHUB_OUTPUT
+              echo "task_id=$TASK_ID_VALUE" >> "$GITHUB_OUTPUT"
             fi
           else
             echo "::error::Output file $OUTPUT_FILE not found!"
-            echo "task_id=" >> $GITHUB_OUTPUT # Set actual output to empty if file not found
+            echo "task_id=" >> "$GITHUB_OUTPUT" # Set actual output to empty if file not found
           fi
 
       - name: Get Asana Task Permalink
