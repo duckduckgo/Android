@@ -246,6 +246,7 @@ import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.contextual.PageContextJSHelper
+import com.duckduckgo.duckchat.impl.contextual.RealPageContextJSHelper.Companion.PAGE_CONTEXT_FEATURE_NAME
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
 import com.duckduckgo.duckchat.impl.helper.NativeAction
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper.Companion.DUCK_CHAT_FEATURE_NAME
@@ -5289,6 +5290,57 @@ class BrowserTabViewModelTest {
                 assertEquals("permissionsQuery", this.data.method)
                 assertEquals("myId", this.data.id)
             }
+        }
+
+    @Test
+    fun whenProcessJsCallbackMessagePageContextThenSendCommand() =
+        runTest {
+            val serializedContext = """{"title":"Example"}"""
+            val data = JSONObject().apply { put("serializedPageData", serializedContext) }
+            whenever(
+                mockPageContextJSHelper.processPageContext(
+                    eq(PAGE_CONTEXT_FEATURE_NAME),
+                    eq("collectionResult"),
+                    anyOrNull(),
+                    eq("abc"),
+                ),
+            ).thenReturn(serializedContext)
+
+            testee.processJsCallbackMessage(
+                PAGE_CONTEXT_FEATURE_NAME,
+                "collectionResult",
+                "contextId",
+                data,
+                false,
+            ) { "someUrl" }
+
+            assertCommandIssued<Command.PageContextReceived> {
+                assertEquals("abc", tabId)
+                assertEquals(serializedContext, pageContext)
+            }
+        }
+
+    @Test
+    fun whenProcessJsCallbackMessagePageContextWithoutDataThenDoNotSendCommand() =
+        runTest {
+            whenever(
+                mockPageContextJSHelper.processPageContext(
+                    eq(PAGE_CONTEXT_FEATURE_NAME),
+                    eq("collectionResult"),
+                    anyOrNull(),
+                    eq("abc"),
+                ),
+            ).thenReturn(null)
+
+            testee.processJsCallbackMessage(
+                PAGE_CONTEXT_FEATURE_NAME,
+                "collectionResult",
+                "contextId",
+                JSONObject("""{ }"""),
+                false,
+            ) { "someUrl" }
+
+            assertCommandNotIssued<Command.PageContextReceived>()
         }
 
     @Test

@@ -19,7 +19,6 @@ package com.duckduckgo.contentscopescripts.impl.features.pagecontext
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
 import com.squareup.anvil.annotations.ContributesMultibinding
-import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
@@ -29,9 +28,8 @@ class PageContextFeaturePlugin @Inject constructor(
 
     override fun store(featureName: String, jsonString: String): Boolean {
         return if (featureName == this.featureName) {
-            runBlocking {
-                pageContextRepository.insertJsonData(jsonString)
-            }
+            pageContextRepository.insertJsonData(jsonString)
+            true
         } else {
             false
         }

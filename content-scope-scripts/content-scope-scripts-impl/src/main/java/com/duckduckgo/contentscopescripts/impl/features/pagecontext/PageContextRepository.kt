@@ -25,11 +25,10 @@ import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 interface PageContextRepository {
-    suspend fun insertJsonData(jsonData: String): Boolean
+    fun insertJsonData(jsonData: String)
     fun getJsonData(): String
 }
 
@@ -52,12 +51,17 @@ class RealPageContextRepository @Inject constructor(
         }
     }
 
-    override suspend fun insertJsonData(jsonData: String): Boolean {
-        val success = withContext(dispatcherProvider.io()) { pageContextStore.insertJsonData(jsonData) }
-        if (success) {
-            this.jsonData = jsonData
+    override fun insertJsonData(jsonData: String) {
+        coroutineScope.launch(dispatcherProvider.io()) {
+            val success = pageContextStore.insertJsonData(jsonData)
+            if (success) {
+                setJSONData(jsonData)
+            }
         }
-        return success
+    }
+
+    private fun setJSONData(newJSONData: String) {
+        this.jsonData = newJSONData
     }
 
     override fun getJsonData(): String {
