@@ -121,7 +121,8 @@ def create_asana_release_task(client: asana.ApiClient,
     task_links_html = ""
     for link in task_links:
         if link.url:
-            task_links_html += f'<li><a href="{link.url}"/></li>'
+            task_id = extract_task_id_from_url(link.url)
+            task_links_html += f'<li><a data-asana-gid="{task_id}"/></li>'
 
     # Replace the placeholder section with actual task links using regex to handle newlines
     placeholder_pattern = r"<strong>This release includes:</strong>\s*<ul><li>Add Asana tasks in release here and tag them with release number e\.g android-release-5\.9\.0</li></ul>"
