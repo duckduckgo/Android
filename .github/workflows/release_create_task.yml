@@ -34,7 +34,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          ref: ${{ inputs.app-version || github.sha }}
           fetch-depth: 0
 
       - name: Install Release Bridge from Homebrew
