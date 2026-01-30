@@ -193,6 +193,7 @@ class SharedPreferencesProviderImpl @Inject constructor(
                     else -> logcat(WARN) { "Could not migrate $key from $name preferences" }
                 }
             }
+            destination.edit(commit = true) { putBoolean(MIGRATED_TO_HARMONY, true) }
         }.getOrElse {
             pixel.fire(
                 DATA_STORE_MIGRATE_UNENCRYPTED_UPDATE_PREFERENCES_DESTINATION_FAILED,
@@ -201,8 +202,6 @@ class SharedPreferencesProviderImpl @Inject constructor(
             )
             throw it
         }
-
-        destination.edit(commit = true) { putBoolean(MIGRATED_TO_HARMONY, true) }
 
         return destination
     }
@@ -298,7 +297,6 @@ class SharedPreferencesProviderImpl @Inject constructor(
                         else -> logcat(WARN) { "Could not migrate $key from $name preferences" }
                     }
                 }
-
                 destination.edit(commit = true) { putBoolean(MIGRATED_TO_HARMONY, true) }
             }.getOrElse {
                 pixel.fire(
