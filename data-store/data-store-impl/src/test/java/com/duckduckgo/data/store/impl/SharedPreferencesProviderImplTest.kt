@@ -67,7 +67,9 @@ class SharedPreferencesProviderImplTest {
             context = context,
             dispatcherProvider = coroutinesTestRule.testDispatcherProvider,
             pixelLazy = { mock() },
-        ) { crashLogger }
+            dataStoreProviderFeatureLazy = { mock() },
+            crashLogger = { crashLogger },
+        )
     }
 
     @After

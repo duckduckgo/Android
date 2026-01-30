@@ -69,7 +69,9 @@ class SharedPreferencesProviderImplTest {
             context,
             coroutineRule.testDispatcherProvider,
             { mock() },
-        ) { crashLogger }
+            { mock() },
+            { crashLogger },
+        )
     }
 
     @After

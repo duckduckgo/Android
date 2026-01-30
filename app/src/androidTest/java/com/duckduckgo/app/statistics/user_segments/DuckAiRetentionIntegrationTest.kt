@@ -106,7 +106,9 @@ class DuckAiRetentionIntegrationTest {
             context,
             coroutineRule.testDispatcherProvider,
             { mock() },
-        ) { crashLogger }
+            { mock() },
+            { crashLogger },
+        )
 
         usageHistory = SegmentStoreModule().provideSegmentStore(
             sharedPreferencesProvider,

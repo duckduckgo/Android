@@ -93,7 +93,7 @@ class RealSecureStorageKeyStore constructor(
                 coroutineContext.ensureActive()
                 pixel.fire(
                     AutofillPixelNames.AUTOFILL_PREFERENCES_RETRIEVAL_FAILED,
-                    mapOf("error" to e.sanitizeStackTrace()),
+                    mapOf("error" to e.error()),
                     type = Daily(),
                 )
                 null
@@ -119,7 +119,7 @@ class RealSecureStorageKeyStore constructor(
                 coroutineContext.ensureActive()
                 pixel.fire(
                     AUTOFILL_HARMONY_PREFERENCES_RETRIEVAL_FAILED,
-                    mapOf("error" to e.sanitizeStackTrace()),
+                    mapOf("error" to e.error()),
                     type = Daily(),
                 )
                 logcat { "autofill harmony preferences retrieval failed: $e" }
@@ -153,7 +153,7 @@ class RealSecureStorageKeyStore constructor(
                 ensureActive()
                 pixel.fire(
                     AUTOFILL_PREFERENCES_UPDATE_KEY_FAILED,
-                    mapOf("error" to it.sanitizeStackTrace()),
+                    mapOf("error" to it.error()),
                     type = Daily(),
                 )
                 throw it
@@ -172,7 +172,7 @@ class RealSecureStorageKeyStore constructor(
                     ensureActive()
                     pixel.fire(
                         AUTOFILL_HARMONY_PREFERENCES_UPDATE_KEY_FAILED,
-                        mapOf("error" to it.sanitizeStackTrace()),
+                        mapOf("error" to it.error()),
                         type = Daily(),
                     )
                     throw it
@@ -202,7 +202,7 @@ class RealSecureStorageKeyStore constructor(
                 }
                 pixel.fire(
                     pixelName,
-                    mapOf("error" to it.sanitizeStackTrace()),
+                    mapOf("error" to it.error()),
                     type = Daily(),
                 )
                 throw it
@@ -215,6 +215,14 @@ class RealSecureStorageKeyStore constructor(
             getHarmonyEncryptedPreferences() != null
         } else {
             getEncryptedPreferences() != null
+        }
+    }
+
+    private fun Throwable.error(): String {
+        return if (autofillFeature.sendSanitizedStackTraces().isEnabled()) {
+            sanitizeStackTrace()
+        } else {
+            javaClass.name
         }
     }
 

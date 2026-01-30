@@ -57,11 +57,16 @@ class SharedPreferencesProviderImpl @Inject constructor(
     private val context: Context,
     private val dispatcherProvider: DispatcherProvider,
     pixelLazy: Lazy<Pixel>,
+    dataStoreProviderFeatureLazy: Lazy<DatabaseProviderFeature>,
     private val crashLogger: Lazy<CrashLogger>,
 ) : SharedPreferencesProvider {
 
     private val pixel by lazy {
         pixelLazy.get()
+    }
+
+    private val dataStoreProviderFeature by lazy {
+        dataStoreProviderFeatureLazy.get()
     }
 
     @SuppressLint("DenyListedApi")
@@ -125,7 +130,7 @@ class SharedPreferencesProviderImpl @Inject constructor(
         }.getOrElse {
             pixel.fire(
                 DATA_STORE_MIGRATE_UNENCRYPTED_GET_PREFERENCES_DESTINATION_FAILED,
-                mapOf("error" to it.sanitizeStackTrace(), "name" to name),
+                mapOf("error" to it.error(), "name" to name),
                 type = Pixel.PixelType.Daily(),
             )
             throw it
@@ -136,7 +141,7 @@ class SharedPreferencesProviderImpl @Inject constructor(
         }.getOrElse {
             pixel.fire(
                 DATA_STORE_MIGRATE_UNENCRYPTED_QUERY_PREFERENCES_DESTINATION_FAILED,
-                mapOf("error" to it.sanitizeStackTrace(), "name" to name),
+                mapOf("error" to it.error(), "name" to name),
                 type = Pixel.PixelType.Daily(),
             )
             throw it
@@ -147,7 +152,7 @@ class SharedPreferencesProviderImpl @Inject constructor(
         }.getOrElse {
             pixel.fire(
                 DATA_STORE_MIGRATE_UNENCRYPTED_GET_PREFERENCES_ORIGIN_FAILED,
-                mapOf("error" to it.sanitizeStackTrace(), "name" to name),
+                mapOf("error" to it.error(), "name" to name),
                 type = Pixel.PixelType.Daily(),
             )
             throw it
@@ -160,7 +165,7 @@ class SharedPreferencesProviderImpl @Inject constructor(
         }.getOrElse {
             pixel.fire(
                 DATA_STORE_MIGRATE_UNENCRYPTED_QUERY_ALL_PREFERENCES_ORIGIN_FAILED,
-                mapOf("error" to it.sanitizeStackTrace(), "name" to name),
+                mapOf("error" to it.error(), "name" to name),
                 type = Pixel.PixelType.Daily(),
             )
             throw it
@@ -198,7 +203,7 @@ class SharedPreferencesProviderImpl @Inject constructor(
         }.getOrElse {
             pixel.fire(
                 DATA_STORE_MIGRATE_UNENCRYPTED_UPDATE_PREFERENCES_DESTINATION_FAILED,
-                mapOf("error" to it.sanitizeStackTrace(), "name" to name),
+                mapOf("error" to it.error(), "name" to name),
                 type = Pixel.PixelType.Daily(),
             )
             throw it
@@ -220,7 +225,7 @@ class SharedPreferencesProviderImpl @Inject constructor(
                 ensureActive()
                 pixel.fire(
                     DATA_STORE_MIGRATE_ENCRYPTED_GET_PREFERENCES_DESTINATION_FAILED,
-                    mapOf("error" to it.sanitizeStackTrace(), "name" to name),
+                    mapOf("error" to it.error(), "name" to name),
                     type = Pixel.PixelType.Daily(),
                 )
                 return@withContext null
@@ -232,7 +237,7 @@ class SharedPreferencesProviderImpl @Inject constructor(
                 ensureActive()
                 pixel.fire(
                     DATA_STORE_MIGRATE_ENCRYPTED_QUERY_PREFERENCES_DESTINATION_FAILED,
-                    mapOf("error" to it.sanitizeStackTrace(), "name" to name),
+                    mapOf("error" to it.error(), "name" to name),
                     type = Pixel.PixelType.Daily(),
                 )
                 return@withContext null
@@ -254,7 +259,7 @@ class SharedPreferencesProviderImpl @Inject constructor(
                 ensureActive()
                 pixel.fire(
                     DATA_STORE_MIGRATE_ENCRYPTED_GET_PREFERENCES_ORIGIN_FAILED,
-                    mapOf("error" to it.sanitizeStackTrace(), "name" to name),
+                    mapOf("error" to it.error(), "name" to name),
                     type = Pixel.PixelType.Daily(),
                 )
                 return@withContext null
@@ -268,7 +273,7 @@ class SharedPreferencesProviderImpl @Inject constructor(
                 ensureActive()
                 pixel.fire(
                     DATA_STORE_MIGRATE_ENCRYPTED_QUERY_ALL_PREFERENCES_ORIGIN_FAILED,
-                    mapOf("error" to it.sanitizeStackTrace(), "name" to name),
+                    mapOf("error" to it.error(), "name" to name),
                     type = Pixel.PixelType.Daily(),
                 )
                 return@withContext null
@@ -307,13 +312,21 @@ class SharedPreferencesProviderImpl @Inject constructor(
                 ensureActive()
                 pixel.fire(
                     DATA_STORE_MIGRATE_ENCRYPTED_UPDATE_PREFERENCES_DESTINATION_FAILED,
-                    mapOf("error" to it.sanitizeStackTrace(), "name" to name),
+                    mapOf("error" to it.error(), "name" to name),
                     type = Pixel.PixelType.Daily(),
                 )
                 return@withContext null
             }
 
             return@withContext destination
+        }
+    }
+
+    private fun Throwable.error(): String {
+        return if (dataStoreProviderFeature.sendSanitizedStackTraces().isEnabled()) {
+            sanitizeStackTrace()
+        } else {
+            javaClass.name
         }
     }
 }
