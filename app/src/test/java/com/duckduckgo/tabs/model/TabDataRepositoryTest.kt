@@ -102,6 +102,8 @@ class TabDataRepositoryTest {
 
     private val mockFaviconManager: FaviconManager = mock()
 
+    private val mockDuckChatContextualDataStore: DuckChatContextualDataStore = mock()
+
     @After
     fun after() {
         daoDeletableTabs.close()
@@ -236,6 +238,7 @@ class TabDataRepositoryTest {
         verify(mockFaviconManager).deleteAllTemp()
         verify(mockAdClickManager).clearAll()
         verify(mockWebViewSessionStorage).deleteAllSessions()
+        verify(mockDuckChatContextualDataStore).clearAll()
         assertNotSame(siteData, testee.retrieveSiteData(addedTabId))
     }
 
@@ -634,6 +637,7 @@ class TabDataRepositoryTest {
             assertNull(testee.retrieveSiteData(tabId).value)
             verify(mockWebViewSessionStorage).deleteSession(tabId)
             verify(mockAdClickManager).clearTabId(tabId)
+            verify(mockDuckChatContextualDataStore).clearTabChatUrl(tabId)
         }
     }
 
@@ -650,6 +654,7 @@ class TabDataRepositoryTest {
             assertNull(testee.retrieveSiteData(tabId).value)
             verify(mockWebViewSessionStorage).deleteSession(tabId)
             verify(mockAdClickManager).clearTabId(tabId)
+            verify(mockDuckChatContextualDataStore).clearTabChatUrl(tabId)
         }
     }
 
@@ -739,7 +744,7 @@ class TabDataRepositoryTest {
         tabSwitcherDataStore: TabSwitcherDataStore = mock(),
         duckDuckGoUrlDetector: DuckDuckGoUrlDetector = mock(),
         timeProvider: CurrentTimeProvider = FakeTimeProvider(),
-        contextualDataStore: DuckChatContextualDataStore = mock(),
+        contextualDataStore: DuckChatContextualDataStore = mockDuckChatContextualDataStore,
     ): TabDataRepository {
         return TabDataRepository(
             dao,
