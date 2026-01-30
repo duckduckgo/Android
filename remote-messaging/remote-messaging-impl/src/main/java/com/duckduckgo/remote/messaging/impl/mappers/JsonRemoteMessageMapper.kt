@@ -258,16 +258,17 @@ private fun Content.localize(translations: JsonContentTranslations): Content {
             listItems = listItems.map { item ->
                 when (item) {
                     is CardItem.ListItem -> {
-                        val (itemTitle, itemDescription) = item.localize(translations)
+                        val translatedItem = item.localize(translations)
                         item.copy(
-                            titleText = itemTitle.takeUnless { it.isEmpty() } ?: item.titleText,
-                            descriptionText = itemDescription.takeUnless { it.isEmpty() } ?: item.descriptionText,
+                            titleText = translatedItem?.title.takeUnless { it.isNullOrEmpty() } ?: item.titleText,
+                            descriptionText = translatedItem?.description.takeUnless { it.isNullOrEmpty() } ?: item.descriptionText,
+                            primaryActionText = translatedItem?.primaryAction.takeUnless { it.isNullOrEmpty() } ?: item.primaryActionText,
                         )
                     }
                     is CardItem.SectionTitle -> {
-                        val (itemTitle, _) = item.localize(translations)
+                        val translatedItem = item.localize(translations)
                         item.copy(
-                            titleText = itemTitle.takeUnless { it.isEmpty() } ?: item.titleText,
+                            titleText = translatedItem?.title.takeUnless { it.isNullOrEmpty() } ?: item.titleText,
                         )
                     }
                 }
@@ -278,6 +279,16 @@ private fun Content.localize(translations: JsonContentTranslations): Content {
 
 private fun CardItem.localize(
     translations: JsonContentTranslations,
-): Pair<String, String> = translations.listItems?.get(id)?.let {
-    it.titleText to it.descriptionText.orEmpty()
-} ?: ("" to "")
+): CardItemTranslations? = translations.listItems?.get(id)?.let {
+    CardItemTranslations(
+        title = it.titleText,
+        description = it.descriptionText.orEmpty(),
+        primaryAction = it.primaryActionText.orEmpty(),
+    )
+}
+
+private data class CardItemTranslations(
+    val title: String,
+    val description: String,
+    val primaryAction: String,
+)

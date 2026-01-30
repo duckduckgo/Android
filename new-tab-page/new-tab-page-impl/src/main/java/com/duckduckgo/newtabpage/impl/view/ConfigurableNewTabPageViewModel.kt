@@ -41,7 +41,7 @@ import javax.inject.Inject
 
 @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
 @ContributesViewModel(ViewScope::class)
-class NewTabPageViewModel @Inject constructor(
+class ConfigurableNewTabPageViewModel @Inject constructor(
     private val newTabSectionsProvider: NewTabPageSectionProvider,
     private val newTabPixels: NewTabPixels,
     private val dispatcherProvider: DispatcherProvider,
