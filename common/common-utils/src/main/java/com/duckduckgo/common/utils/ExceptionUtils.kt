@@ -20,8 +20,8 @@ import logcat.asLog
 
 fun Throwable.sanitizeStackTrace(): String {
     // if we fail for whatever reason, we don't include the stack trace
-    this.asLog().apply {
-        return runCatching {
+    return runCatching {
+        this.asLog().apply {
             val emailRegex = Regex("[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}")
             val phoneRegex = Regex("\\b(?:\\d[\\s()-]?){6,14}\\b") // This regex matches common phone number formats
             val phoneRegex2 = Regex("\\b\\+?\\d[- (]*\\d{3}[- )]*\\d{3}[- ]*\\d{4}\\b") // enhanced to redact also other phone number formats
@@ -36,6 +36,6 @@ fun Throwable.sanitizeStackTrace(): String {
             sanitizedStackTrace = sanitizedStackTrace.replace(ipv4Regex, "[REDACTED_IPV4]")
 
             return sanitizedStackTrace
-        }.getOrDefault(this)
-    }
+        }
+    }.getOrDefault(this.javaClass.name)
 }
