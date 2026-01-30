@@ -16,6 +16,7 @@
 
 package com.duckduckgo.duckchat.impl.contextual
 
+import android.content.Context
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -479,7 +480,8 @@ class DuckChatContextualViewModelTest {
         override fun observeInputScreenUserSettingEnabled(): Flow<Boolean> = kotlinx.coroutines.flow.emptyFlow()
         override fun observeCosmeticInputScreenUserSettingEnabled(): Flow<Boolean?> = kotlinx.coroutines.flow.emptyFlow()
         override fun observeAutomaticContextAttachmentUserSettingEnabled(): Flow<Boolean> = automaticContextAttachment
-
+        override fun showContextualOnboarding(context: Context, onConfirmed: () -> Unit) = Unit
+        override suspend fun isContextualOnboardingCompleted(): Boolean = true
         fun setAutomaticContextAttachment(enabled: Boolean) {
             automaticContextAttachment.value = enabled
         }
