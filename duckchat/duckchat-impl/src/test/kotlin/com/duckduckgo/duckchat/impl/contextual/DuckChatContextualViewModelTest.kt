@@ -20,6 +20,7 @@ import android.content.Context
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
 import com.duckduckgo.duckchat.impl.helper.NativeAction
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper
@@ -52,6 +53,7 @@ class DuckChatContextualViewModelTest {
 
     private lateinit var testee: DuckChatContextualViewModel
     private val duckChat: com.duckduckgo.duckchat.api.DuckChat = FakeDuckChat()
+    private val duckChatInternal: DuckChatInternal = mock()
     private val duckChatJSHelper: DuckChatJSHelper = mock()
     private val contextualDataStore = FakeDuckChatContextualDataStore()
     private val timeProvider = FakeDuckChatContextualTimeProvider()
@@ -59,6 +61,7 @@ class DuckChatContextualViewModelTest {
 
     @Before
     fun setup() {
+        whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(false)
         whenever(
             duckChatJSHelper.onNativeAction(NativeAction.NEW_CHAT),
         ).thenReturn(
@@ -72,6 +75,7 @@ class DuckChatContextualViewModelTest {
         testee = DuckChatContextualViewModel(
             dispatchers = coroutineRule.testDispatcherProvider,
             duckChat = duckChat,
+            duckChatInternal = duckChatInternal,
             duckChatJSHelper = duckChatJSHelper,
             contextualDataStore = contextualDataStore,
             sessionTimeoutProvider = sessionTimeoutProvider,
