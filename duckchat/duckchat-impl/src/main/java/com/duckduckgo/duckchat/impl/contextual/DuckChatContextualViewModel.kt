@@ -23,6 +23,7 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
 import com.duckduckgo.duckchat.impl.helper.NativeAction
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper
@@ -46,6 +47,7 @@ import javax.inject.Inject
 class DuckChatContextualViewModel @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val duckChat: DuckChat,
+    private val duckChatInternal: DuckChatInternal,
     private val duckChatJSHelper: DuckChatJSHelper,
     private val contextualDataStore: DuckChatContextualDataStore,
     private val sessionTimeoutProvider: DuckChatContextualSessionTimeoutProvider,
@@ -79,6 +81,7 @@ class DuckChatContextualViewModel @Inject constructor(
                 sheetMode = SheetMode.INPUT,
                 showContext = false,
                 showFullscreen = true,
+                allowsAutomaticContextAttachment = duckChatInternal.isAutomaticContextAttachmentEnabled(),
                 contextUrl = "",
                 contextTitle = "",
                 tabId = "",
@@ -90,6 +93,7 @@ class DuckChatContextualViewModel @Inject constructor(
     data class ViewState(
         val sheetMode: SheetMode = SheetMode.INPUT,
         val showFullscreen: Boolean = true,
+        val allowsAutomaticContextAttachment: Boolean = false,
         val showContext: Boolean = false,
         val contextUrl: String = "",
         val contextTitle: String = "",
