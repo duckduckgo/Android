@@ -114,15 +114,13 @@ def find_or_create_tag(client: asana.ApiClient, workspace_id: str, tag_name: str
     """
     tags_api = asana.TagsApi(client)
 
-    # Search for existing tag
-    try:
-        tags = tags_api.get_tags_for_workspace(workspace_id, {"opt_fields": "name"})
-        for tag in tags:
-            if tag['name'] == tag_name:
-                log(f"Found existing tag '{tag_name}' with ID {tag['gid']}")
-                return tag['gid']
-    except Exception as e:
-        log(f"Error searching for tag: {e}")
+    # Search for existing tag - let exceptions propagate to avoid creating duplicates
+    # if a transient error (network timeout, rate limiting) occurs
+    tags = tags_api.get_tags_for_workspace(workspace_id, {"opt_fields": "name"})
+    for tag in tags:
+        if tag['name'] == tag_name:
+            log(f"Found existing tag '{tag_name}' with ID {tag['gid']}")
+            return tag['gid']
 
     # Create new tag if not found
     log(f"Creating new tag '{tag_name}'")
