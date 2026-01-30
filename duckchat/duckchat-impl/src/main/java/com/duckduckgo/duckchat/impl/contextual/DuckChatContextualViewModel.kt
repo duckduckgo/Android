@@ -88,7 +88,6 @@ class DuckChatContextualViewModel @Inject constructor(
 
     data class ViewState(
         val sheetMode: SheetMode = SheetMode.INPUT,
-        val allowsAutomaticContextAttachment: Boolean = false,
         val showFullscreen: Boolean = true,
         val showContext: Boolean = false,
         val contextUrl: String = "",
@@ -289,7 +288,6 @@ class DuckChatContextualViewModel @Inject constructor(
                         contextTitle = title,
                         contextUrl = url,
                         tabId = tabId,
-                        showContext = _viewState.value.allowsAutomaticContextAttachment && _viewState.value.showContext,
                     )
                 }
             }
