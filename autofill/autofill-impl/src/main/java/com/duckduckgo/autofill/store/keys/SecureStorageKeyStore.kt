@@ -36,6 +36,7 @@ import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
@@ -89,6 +90,7 @@ class RealSecureStorageKeyStore constructor(
                     )
                 }
             } catch (e: Exception) {
+                coroutineContext.ensureActive()
                 pixel.fire(
                     AutofillPixelNames.AUTOFILL_PREFERENCES_RETRIEVAL_FAILED,
                     mapOf("error" to e.sanitizeStackTrace()),
@@ -114,6 +116,7 @@ class RealSecureStorageKeyStore constructor(
                     }
                 }
             } catch (e: Exception) {
+                coroutineContext.ensureActive()
                 pixel.fire(
                     AUTOFILL_HARMONY_PREFERENCES_RETRIEVAL_FAILED,
                     mapOf("error" to e.sanitizeStackTrace()),
@@ -147,6 +150,7 @@ class RealSecureStorageKeyStore constructor(
                     }
                 }
             }.getOrElse {
+                ensureActive()
                 pixel.fire(
                     AUTOFILL_PREFERENCES_UPDATE_KEY_FAILED,
                     mapOf("error" to it.sanitizeStackTrace()),
@@ -165,6 +169,7 @@ class RealSecureStorageKeyStore constructor(
                         }
                     }
                 }.getOrElse {
+                    ensureActive()
                     pixel.fire(
                         AUTOFILL_HARMONY_PREFERENCES_UPDATE_KEY_FAILED,
                         mapOf("error" to it.sanitizeStackTrace()),
@@ -189,6 +194,7 @@ class RealSecureStorageKeyStore constructor(
                     this.decodeBase64()?.toByteArray()
                 }
             }.getOrElse {
+                ensureActive()
                 val pixelName = if (useHarmony) {
                     AUTOFILL_HARMONY_PREFERENCES_GET_KEY_FAILED
                 } else {

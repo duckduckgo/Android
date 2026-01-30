@@ -44,6 +44,7 @@ import com.frybits.harmony.getHarmonySharedPreferences
 import com.frybits.harmony.secure.getEncryptedHarmonySharedPreferences
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.Lazy
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.WARN
 import logcat.logcat
@@ -216,6 +217,7 @@ class SharedPreferencesProviderImpl @Inject constructor(
                     prefValueEncryptionScheme = EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM,
                 )
             }.getOrElse {
+                ensureActive()
                 pixel.fire(
                     DATA_STORE_MIGRATE_ENCRYPTED_GET_PREFERENCES_DESTINATION_FAILED,
                     mapOf("error" to it.sanitizeStackTrace(), "name" to name),
@@ -227,6 +229,7 @@ class SharedPreferencesProviderImpl @Inject constructor(
             val alreadyMigrated = runCatching {
                 destination.getBoolean(MIGRATED_TO_HARMONY, false)
             }.getOrElse {
+                ensureActive()
                 pixel.fire(
                     DATA_STORE_MIGRATE_ENCRYPTED_QUERY_PREFERENCES_DESTINATION_FAILED,
                     mapOf("error" to it.sanitizeStackTrace(), "name" to name),
@@ -248,6 +251,7 @@ class SharedPreferencesProviderImpl @Inject constructor(
                     EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM,
                 )
             }.getOrElse {
+                ensureActive()
                 pixel.fire(
                     DATA_STORE_MIGRATE_ENCRYPTED_GET_PREFERENCES_ORIGIN_FAILED,
                     mapOf("error" to it.sanitizeStackTrace(), "name" to name),
@@ -261,6 +265,7 @@ class SharedPreferencesProviderImpl @Inject constructor(
             val contents: Map<String?, Any?>? = runCatching {
                 origin.all
             }.getOrElse {
+                ensureActive()
                 pixel.fire(
                     DATA_STORE_MIGRATE_ENCRYPTED_QUERY_ALL_PREFERENCES_ORIGIN_FAILED,
                     mapOf("error" to it.sanitizeStackTrace(), "name" to name),
@@ -299,6 +304,7 @@ class SharedPreferencesProviderImpl @Inject constructor(
                 }
                 destination.edit(commit = true) { putBoolean(MIGRATED_TO_HARMONY, true) }
             }.getOrElse {
+                ensureActive()
                 pixel.fire(
                     DATA_STORE_MIGRATE_ENCRYPTED_UPDATE_PREFERENCES_DESTINATION_FAILED,
                     mapOf("error" to it.sanitizeStackTrace(), "name" to name),
