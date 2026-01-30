@@ -54,10 +54,24 @@
             android:background="@drawable/selectable_item_rounded_corner_background"
             android:contentDescription="@string/browserMenuChatHistory"
             android:scaleType="center"
+            android:layout_marginEnd="@dimen/keyline_2"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/ic_expand_24" />
+
+        <ImageView
+            android:id="@+id/contextualNewChat"
+            android:layout_width="@dimen/toolbarIcon"
+            android:layout_height="@dimen/toolbarIcon"
+            android:background="@drawable/selectable_item_rounded_corner_background"
+            android:contentDescription="@string/browserMenuChatHistory"
+            android:scaleType="center"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/contextualFullScreen"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_ai_chat_add_24" />
 
         <com.duckduckgo.common.ui.view.text.DaxTextView
             android:id="@+id/contextualTitle"
