@@ -36,11 +36,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Install Release Bridge from Homebrew
-        run: |
-          brew tap cdrussell/aarb
-          brew install aarb
-
       - name: Notify Mattermost of Release starting
         id: send-mm-release-starting
         uses: duckduckgo/native-github-asana-sync@v2.0
