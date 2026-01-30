@@ -152,6 +152,7 @@ class RealSecureStorageKeyStore constructor(
                     mapOf("error" to it.sanitizeStackTrace()),
                     type = Daily(),
                 )
+                throw it
             }
 
             if (autofillFeature.useHarmony().isEnabled()) {
@@ -169,6 +170,7 @@ class RealSecureStorageKeyStore constructor(
                         mapOf("error" to it.sanitizeStackTrace()),
                         type = Daily(),
                     )
+                    throw it
                 }
             }
         }
@@ -197,7 +199,7 @@ class RealSecureStorageKeyStore constructor(
                     mapOf("error" to it.sanitizeStackTrace()),
                     type = Daily(),
                 )
-                null
+                throw it
             }
         }
     }
