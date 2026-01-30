@@ -62,7 +62,7 @@ jobs:
           ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
         shell: bash
         run: |
-          RELEASE_TASK_URL=$(python ./scripts/release/create-asana-release.py \
+          RELEASE_TASK_URL=$(python ./scripts/release/create-asana-public-release.py \
           --android-repo-path . \
           --tag "${{ github.event.inputs.app-version }}" \
           --trigger-phrase 'Task/Issue URL:' \
@@ -70,8 +70,7 @@ jobs:
           --asana-section-id "${{ vars.GH_ANDROID_RELEASE_BOARD_QA_SECTION_ID }}" \
           --asana-workspace-id "${{ secrets.GH_ASANA_WORKSPACE_ID }}" \
           --asana-api-key-env-var ASANA_ACCESS_TOKEN \
-          --template-task-id "${{ vars.GH_ANDROID_RELEASE_BOARD_TEMPLATE_TASK_ID }}" \
-          --public-release)
+          --template-task-id "${{ vars.GH_ANDROID_RELEASE_BOARD_TEMPLATE_TASK_ID }}")
           echo "RELEASE_TASK_URL=$RELEASE_TASK_URL" >> "$GITHUB_ENV"
 
       - name: Assign task to Github Actor
