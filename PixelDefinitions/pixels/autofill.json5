@@ -50,7 +50,7 @@
             "appVersion",
             {
                 "key": "error",
-                "description": "TThe stacktrace for the error thrown, sanitized to remove potentially sensitive data",
+                "description": "The stacktrace for the error thrown, sanitized to remove potentially sensitive data",
                 "type": "string"
             }
         ]
