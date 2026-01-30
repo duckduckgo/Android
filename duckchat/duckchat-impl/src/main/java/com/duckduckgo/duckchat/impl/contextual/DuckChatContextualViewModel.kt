@@ -157,15 +157,6 @@ class DuckChatContextualViewModel @Inject constructor(
         }
     }
 
-    fun onNativeInputFocused(focused: Boolean) {
-        if (_viewState.value.sheetMode == SheetMode.INPUT) {
-            val state = if (focused) BottomSheetBehavior.STATE_EXPANDED else BottomSheetBehavior.STATE_HALF_EXPANDED
-            viewModelScope.launch {
-                commandChannel.trySend(Command.ChangeSheetState(state))
-            }
-        }
-    }
-
     fun onPromptSent(prompt: String) {
         viewModelScope.launch(dispatchers.io()) {
             val contextPrompt = generateContextPrompt(prompt)

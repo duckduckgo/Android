@@ -413,9 +413,6 @@ class DuckChatContextualFragment :
         }
         binding.contextualModeButtons.setOnClickListener { }
         binding.contextualModeRoot.setOnClickListener { }
-        binding.inputField.onFocusChangeListener = View.OnFocusChangeListener { _, focused ->
-            viewModel.onNativeInputFocused(focused)
-        }
         binding.inputField.setOnEditorActionListener(
             TextView.OnEditorActionListener { _, actionId, keyEvent ->
                 if (actionId == EditorInfo.IME_ACTION_GO || keyEvent?.keyCode == KeyEvent.KEYCODE_ENTER) {

@@ -233,26 +233,6 @@ class DuckChatContextualViewModelTest {
         }
 
     @Test
-    fun `when native input focused then sheet state updates`() =
-        runTest {
-            testee.commands.test {
-                testee.onNativeInputFocused(true)
-                assertEquals(
-                    DuckChatContextualViewModel.Command.ChangeSheetState(BottomSheetBehavior.STATE_EXPANDED),
-                    awaitItem(),
-                )
-
-                testee.onNativeInputFocused(false)
-                assertEquals(
-                    DuckChatContextualViewModel.Command.ChangeSheetState(BottomSheetBehavior.STATE_HALF_EXPANDED),
-                    awaitItem(),
-                )
-
-                cancelAndIgnoreRemainingEvents()
-            }
-        }
-
-    @Test
     fun `when prompt sent then chat view state emitted`() =
         runTest {
             testee.viewState.test {
