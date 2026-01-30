@@ -40,6 +40,7 @@ import android.webkit.WebChromeClient
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.widget.TextView
+import androidx.activity.OnBackPressedCallback
 import androidx.annotation.AnyThread
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.setFragmentResult
@@ -183,6 +184,7 @@ class DuckChatContextualFragment :
     private val root: ViewGroup by lazy { binding.root }
 
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<View>
+    private lateinit var backPressedCallback: OnBackPressedCallback
     internal val simpleWebview: WebView by lazy { binding.simpleWebview }
 
     private var lastWebViewX = 0f
@@ -355,6 +357,7 @@ class DuckChatContextualFragment :
         }
 
         configureBottomSheet(view)
+        setupBackPressHandling()
         observeViewModel()
 
         requireArguments().getString(KEY_DUCK_AI_CONTEXTUAL_TAB_ID)?.let { tabId ->
@@ -378,6 +381,27 @@ class DuckChatContextualFragment :
         bottomSheetBehavior.isFitToContents = true
     }
 
+    private fun setupBackPressHandling() {
+        backPressedCallback =
+            object : OnBackPressedCallback(bottomSheetBehavior.state != BottomSheetBehavior.STATE_HIDDEN) {
+                override fun handleOnBackPressed() {
+                    viewModel.onContextualClose()
+                }
+            }
+
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, backPressedCallback)
+
+        bottomSheetBehavior.addBottomSheetCallback(
+            object : BottomSheetBehavior.BottomSheetCallback() {
+                override fun onStateChanged(bottomSheet: View, newState: Int) {
+                    backPressedCallback.isEnabled = newState != BottomSheetBehavior.STATE_HIDDEN
+                }
+
+                override fun onSlide(bottomSheet: View, slideOffset: Float) {}
+            },
+        )
+    }
+
     private fun configureButtons() {
         binding.contextualClose.setOnClickListener {
             viewModel.onContextualClose()
@@ -387,9 +411,6 @@ class DuckChatContextualFragment :
         }
         binding.contextualModeButtons.setOnClickListener { }
         binding.contextualModeRoot.setOnClickListener { }
-        binding.inputField.onFocusChangeListener = View.OnFocusChangeListener { _, focused ->
-            viewModel.onNativeInputFocused(focused)
-        }
         binding.inputField.setOnEditorActionListener(
             TextView.OnEditorActionListener { _, actionId, keyEvent ->
                 if (actionId == EditorInfo.IME_ACTION_GO || keyEvent?.keyCode == KeyEvent.KEYCODE_ENTER) {
@@ -475,6 +496,10 @@ class DuckChatContextualFragment :
                         }
                         setFragmentResult(KEY_DUCK_AI_CONTEXTUAL_RESULT, result)
                     }
+
+                    is DuckChatContextualViewModel.Command.ChangeSheetState -> {
+                        bottomSheetBehavior.state = command.newState
+                    }
                 }
             }.launchIn(lifecycleScope)
 
@@ -484,6 +509,10 @@ class DuckChatContextualFragment :
                     is DuckChatContextualSharedViewModel.Command.PageContextAttached -> {
                         logcat { "Duck.ai Contextual: page context received" }
                         viewModel.onPageContextReceived(command.tabId, command.pageContext)
+                    }
+
+                    DuckChatContextualSharedViewModel.Command.OpenSheet -> {
+                        viewModel.reopenSheet()
                     }
                 }
             }.launchIn(lifecycleScope)
@@ -498,9 +527,7 @@ class DuckChatContextualFragment :
 
     private fun renderViewState(viewState: DuckChatContextualViewModel.ViewState) {
         logcat { "Duck.ai Contextual: render $viewState" }
-        bottomSheetBehavior.state = viewState.sheetState
-
-        if (viewState.chatHistoryEnabled) {
+        if (viewState.showFullscreen) {
             binding.contextualFullScreen.show()
         } else {
             binding.contextualFullScreen.gone()
@@ -514,6 +541,7 @@ class DuckChatContextualFragment :
                 binding.contextualNewChat.gone()
 
                 renderPageContext(viewState.contextTitle, viewState.contextUrl, viewState.tabId)
+
                 if (viewState.showContext) {
                     binding.duckAiContextualLayout.show()
                     binding.contextualModePrompts.show()
@@ -674,11 +702,6 @@ class DuckChatContextualFragment :
             }
         }
         return mimeTypes.toList()
-    }
-
-    fun onBackPressed(): Boolean {
-        binding.contextualClose.performClick()
-        return true
     }
 
     override fun continueDownload(pendingFileDownload: FileDownloader.PendingFileDownload) {
