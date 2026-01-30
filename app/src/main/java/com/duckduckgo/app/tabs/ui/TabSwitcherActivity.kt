@@ -24,7 +24,6 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.MotionEvent
 import android.view.View
-import android.widget.EditText
 import android.widget.FrameLayout
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatDelegate.FEATURE_SUPPORT_ACTION_BAR
@@ -42,6 +41,7 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.api.OmnibarRepository
 import com.duckduckgo.app.browser.databinding.ActivityTabSwitcherBinding
+import com.duckduckgo.app.browser.databinding.DialogTabGroupNameBinding
 import com.duckduckgo.app.browser.databinding.PopupTabGroupMenuBinding
 import com.duckduckgo.app.browser.databinding.PopupTabsMenuBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
@@ -79,6 +79,7 @@ import com.duckduckgo.common.ui.view.button.ButtonType
 import com.duckduckgo.common.ui.view.button.ButtonType.DESTRUCTIVE
 import com.duckduckgo.common.ui.view.button.ButtonType.GHOST
 import com.duckduckgo.common.ui.view.button.ButtonType.GHOST_ALT
+import com.duckduckgo.common.ui.view.dialog.CustomAlertDialogBuilder
 import com.duckduckgo.common.ui.view.dialog.DaxAlertDialog
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.gone
@@ -87,7 +88,6 @@ import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.collectLatest
@@ -933,21 +933,22 @@ class TabSwitcherActivity :
     }
 
     private fun showCreateGroupDialog(tabIds: List<String>) {
-        val editText = EditText(this).apply {
-            hint = getString(R.string.tabGroupNameHint)
-            setPadding(48, 32, 48, 32)
-        }
-
-        MaterialAlertDialogBuilder(this)
+        val inputBinding = DialogTabGroupNameBinding.inflate(layoutInflater)
+        CustomAlertDialogBuilder(this)
             .setTitle(R.string.createTabGroupDialogTitle)
-            .setView(editText)
-            .setPositiveButton(R.string.createTabGroupDialogPositiveButton) { _, _ ->
-                val groupName = editText.text.toString().trim()
-                if (groupName.isNotEmpty()) {
-                    viewModel.onGroupTabsConfirmed(groupName, tabIds)
-                }
-            }
-            .setNegativeButton(R.string.cancel, null)
+            .setPositiveButton(R.string.createTabGroupDialogPositiveButton)
+            .setNegativeButton(R.string.cancel)
+            .setView(inputBinding)
+            .addEventListener(
+                object : CustomAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() {
+                        val groupName = inputBinding.groupNameInput.text.trim()
+                        if (groupName.isNotEmpty()) {
+                            viewModel.onGroupTabsConfirmed(groupName, tabIds)
+                        }
+                    }
+                },
+            )
             .show()
     }
 
