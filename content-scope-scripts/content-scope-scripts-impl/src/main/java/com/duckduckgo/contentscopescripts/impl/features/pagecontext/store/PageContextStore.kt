@@ -28,9 +28,6 @@ interface PageContextStore {
     suspend fun getJsonData(): String?
 }
 
-private const val FILENAME: String = "com.duckduckgo.contentscopescripts.pagecontext.store"
-private const val KEY_JSON_DATA: String = "json_data"
-
 @ContributesBinding(AppScope::class)
 class RealPageContextStore @Inject constructor(
     private val sharedPreferencesProvider: SharedPreferencesProvider,
@@ -46,5 +43,10 @@ class RealPageContextStore @Inject constructor(
     @SuppressLint("UseKtx")
     override suspend fun insertJsonData(jsonData: String): Boolean {
         return preferences.edit().putString(KEY_JSON_DATA, jsonData).commit()
+    }
+
+    companion object {
+        private const val FILENAME: String = "com.duckduckgo.contentscopescripts.pagecontext.store"
+        private const val KEY_JSON_DATA: String = "json_data"
     }
 }
