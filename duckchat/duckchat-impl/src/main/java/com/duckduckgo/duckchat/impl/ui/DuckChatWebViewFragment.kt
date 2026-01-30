@@ -269,7 +269,12 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
                         when (featureName) {
                             DUCK_CHAT_FEATURE_NAME -> {
                                 appCoroutineScope.launch(dispatcherProvider.io()) {
-                                    duckChatJSHelper.processJsCallbackMessage(featureName, method, id, data)?.let { response ->
+                                    duckChatJSHelper.processJsCallbackMessage(
+                                        featureName,
+                                        method,
+                                        id,
+                                        data,
+                                    )?.let { response ->
                                         withContext(dispatcherProvider.main()) {
                                             if (response.method == METHOD_OPEN_KEYBOARD) {
                                                 simpleWebview.evaluateJavascript(

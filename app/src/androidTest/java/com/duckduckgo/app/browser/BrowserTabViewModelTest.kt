@@ -747,7 +747,7 @@ class BrowserTabViewModelTest {
 
             fakeContentScopeScriptsSubscriptionEventPluginPoint = FakeContentScopeScriptsSubscriptionEventPluginPoint()
 
-            whenever(mockDuckChat.getDuckChatUrl(any(), any())).thenReturn(duckChatURL)
+            whenever(mockDuckChat.getDuckChatUrl(any(), any(), any())).thenReturn(duckChatURL)
             whenever(mockSyncStatusChangedObserver.syncStatusChangedEvents).thenReturn(syncStatusChangedEventsFlow)
 
             initialiseViewModel()
@@ -6671,7 +6671,14 @@ class BrowserTabViewModelTest {
             whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
             val jsCallbackData = JsCallbackData(JSONObject(), "", "", "")
             whenever(
-                mockDuckChatJSHelper.processJsCallbackMessage(anyString(), anyString(), anyOrNull(), anyOrNull(), any()),
+                mockDuckChatJSHelper.processJsCallbackMessage(
+                    anyString(),
+                    anyString(),
+                    anyOrNull(),
+                    anyOrNull(),
+                    any(),
+                    anyOrNull(),
+                ),
             ).thenReturn(jsCallbackData)
             testee.processJsCallbackMessage(
                 DUCK_CHAT_FEATURE_NAME,
@@ -6680,7 +6687,14 @@ class BrowserTabViewModelTest {
                 data = null,
                 false,
             ) { "someUrl" }
-            verify(mockDuckChatJSHelper).processJsCallbackMessage(eq(DUCK_CHAT_FEATURE_NAME), eq("method"), eq("id"), anyOrNull(), any())
+            verify(mockDuckChatJSHelper).processJsCallbackMessage(
+                eq(DUCK_CHAT_FEATURE_NAME),
+                eq("method"),
+                eq("id"),
+                anyOrNull(),
+                any(),
+                anyOrNull(),
+            )
             assertCommandIssued<Command.SendResponseToJs>()
         }
 
@@ -6688,7 +6702,16 @@ class BrowserTabViewModelTest {
     fun whenProcessJsCallbackMessageForDuckChatAndResponseIsNullThenDoNotSendCommand() =
         runTest {
             whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
-            whenever(mockDuckChatJSHelper.processJsCallbackMessage(anyString(), anyString(), anyOrNull(), anyOrNull(), any())).thenReturn(null)
+            whenever(
+                mockDuckChatJSHelper.processJsCallbackMessage(
+                    anyString(),
+                    anyString(),
+                    anyOrNull(),
+                    anyOrNull(),
+                    any(),
+                    anyOrNull(),
+                ),
+            ).thenReturn(null)
             testee.processJsCallbackMessage(
                 DUCK_CHAT_FEATURE_NAME,
                 "method",
@@ -6696,7 +6719,14 @@ class BrowserTabViewModelTest {
                 data = null,
                 false,
             ) { "someUrl" }
-            verify(mockDuckChatJSHelper).processJsCallbackMessage(eq(DUCK_CHAT_FEATURE_NAME), eq("method"), eq("id"), anyOrNull(), any())
+            verify(mockDuckChatJSHelper).processJsCallbackMessage(
+                eq(DUCK_CHAT_FEATURE_NAME),
+                eq("method"),
+                eq("id"),
+                anyOrNull(),
+                any(),
+                anyOrNull(),
+            )
             assertCommandNotIssued<Command.SendResponseToJs>()
         }
 
@@ -6774,7 +6804,7 @@ class BrowserTabViewModelTest {
     fun whenOnDuckChatOmnibarButtonClickedAndFullScreenModeThenOpenChatNotCalled() = runTest {
         val duckAIUrl = "https://duckduckgo.com/?q=test"
         mockDuckAiFeatureStateFullScreenModeFlow.emit(true)
-        whenever(mockDuckChat.getDuckChatUrl(any(), any())).thenReturn(duckAIUrl)
+        whenever(mockDuckChat.getDuckChatUrl(any(), any(), any())).thenReturn(duckAIUrl)
         whenever(mockOmnibarConverter.convertQueryToUrl(duckAIUrl, null)).thenReturn(duckAIUrl)
 
         testee.onDuckChatOmnibarButtonClicked(query = "example", hasFocus = false, isNtp = true)
@@ -7201,7 +7231,16 @@ class BrowserTabViewModelTest {
     @Test
     fun whenProcessJsCallbackMessageForSubscriptionsAndResponseIsNullThenDoNotSendCommand() =
         runTest {
-            whenever(mockDuckChatJSHelper.processJsCallbackMessage(anyString(), anyString(), anyOrNull(), anyOrNull(), any())).thenReturn(null)
+            whenever(
+                mockDuckChatJSHelper.processJsCallbackMessage(
+                    anyString(),
+                    anyString(),
+                    anyOrNull(),
+                    anyOrNull(),
+                    any(),
+                    any(),
+                ),
+            ).thenReturn(null)
             testee.processJsCallbackMessage(
                 featureName = SUBSCRIPTIONS_FEATURE_NAME,
                 method = "method",
@@ -8545,7 +8584,7 @@ class BrowserTabViewModelTest {
         mockDuckAiContextualModeFlow.emit(true)
         mockDuckAiFeatureStateFullScreenModeFlow.emit(true)
 
-        whenever(mockDuckChat.getDuckChatUrl(any(), any())).thenReturn(duckAIUrl)
+        whenever(mockDuckChat.getDuckChatUrl(any(), any(), any())).thenReturn(duckAIUrl)
         whenever(mockOmnibarConverter.convertQueryToUrl(duckAIUrl, null)).thenReturn(duckAIUrl)
 
         testee.onDuckChatOmnibarButtonClicked(query = "example", hasFocus = false, isNtp = true)

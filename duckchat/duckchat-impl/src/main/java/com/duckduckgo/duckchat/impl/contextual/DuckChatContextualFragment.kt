@@ -293,12 +293,21 @@ class DuckChatContextualFragment :
                     ) {
                         logcat { "Duck.ai: process $featureName $method $id $data" }
                         when (featureName) {
-                            RealDuckChatJSHelper.Companion.DUCK_CHAT_FEATURE_NAME -> {
+                            RealDuckChatJSHelper.DUCK_CHAT_FEATURE_NAME -> {
                                 appCoroutineScope.launch(dispatcherProvider.io()) {
-                                    duckChatJSHelper.processJsCallbackMessage(featureName, method, id, data, Mode.CONTEXTUAL)?.let { response ->
-                                        logcat { "Duck.ai: response $response" }
-                                        withContext(dispatcherProvider.main()) {
-                                            contentScopeScripts.onResponse(response)
+                                    if (!viewModel.handleJSCall(method)) {
+                                        duckChatJSHelper.processJsCallbackMessage(
+                                            featureName,
+                                            method,
+                                            id,
+                                            data,
+                                            Mode.CONTEXTUAL,
+                                            viewModel.updatedPageContext,
+                                        )?.let { response ->
+                                            logcat { "Duck.ai: response $response" }
+                                            withContext(dispatcherProvider.main()) {
+                                                contentScopeScripts.onResponse(response)
+                                            }
                                         }
                                     }
                                 }
@@ -372,6 +381,9 @@ class DuckChatContextualFragment :
     private fun configureButtons() {
         binding.contextualClose.setOnClickListener {
             viewModel.onContextualClose()
+        }
+        binding.contextualNewChat.setOnClickListener {
+            viewModel.onNewChatRequested()
         }
         binding.contextualModeButtons.setOnClickListener { }
         binding.contextualModeRoot.setOnClickListener { }
@@ -485,12 +497,22 @@ class DuckChatContextualFragment :
     }
 
     private fun renderViewState(viewState: DuckChatContextualViewModel.ViewState) {
+        logcat { "Duck.ai Contextual: render $viewState" }
         bottomSheetBehavior.state = viewState.sheetState
+
+        if (viewState.chatHistoryEnabled) {
+            binding.contextualFullScreen.show()
+        } else {
+            binding.contextualFullScreen.gone()
+        }
 
         when (viewState.sheetMode) {
             DuckChatContextualViewModel.SheetMode.INPUT -> {
                 binding.contextualModeNativeContent.show()
                 binding.simpleWebview.gone()
+
+                binding.contextualNewChat.gone()
+
                 renderPageContext(viewState.contextTitle, viewState.contextUrl, viewState.tabId)
                 if (viewState.showContext) {
                     binding.duckAiContextualLayout.show()
@@ -509,6 +531,7 @@ class DuckChatContextualFragment :
             DuckChatContextualViewModel.SheetMode.WEBVIEW -> {
                 binding.contextualModeNativeContent.gone()
                 binding.simpleWebview.show()
+                binding.contextualNewChat.show()
             }
         }
     }

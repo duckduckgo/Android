@@ -41,6 +41,7 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.InstantSchedulersRule
 import com.duckduckgo.common.test.blockingObserve
 import com.duckduckgo.common.utils.CurrentTimeProvider
+import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
@@ -100,6 +101,8 @@ class TabDataRepositoryTest {
     private val mockWebViewPreviewPersister: WebViewPreviewPersister = mock()
 
     private val mockFaviconManager: FaviconManager = mock()
+
+    private val mockDuckChatContextualDataStore: DuckChatContextualDataStore = mock()
 
     @After
     fun after() {
@@ -235,6 +238,7 @@ class TabDataRepositoryTest {
         verify(mockFaviconManager).deleteAllTemp()
         verify(mockAdClickManager).clearAll()
         verify(mockWebViewSessionStorage).deleteAllSessions()
+        verify(mockDuckChatContextualDataStore).clearAll()
         assertNotSame(siteData, testee.retrieveSiteData(addedTabId))
     }
 
@@ -633,6 +637,7 @@ class TabDataRepositoryTest {
             assertNull(testee.retrieveSiteData(tabId).value)
             verify(mockWebViewSessionStorage).deleteSession(tabId)
             verify(mockAdClickManager).clearTabId(tabId)
+            verify(mockDuckChatContextualDataStore).clearTabChatUrl(tabId)
         }
     }
 
@@ -649,6 +654,7 @@ class TabDataRepositoryTest {
             assertNull(testee.retrieveSiteData(tabId).value)
             verify(mockWebViewSessionStorage).deleteSession(tabId)
             verify(mockAdClickManager).clearTabId(tabId)
+            verify(mockDuckChatContextualDataStore).clearTabChatUrl(tabId)
         }
     }
 
@@ -738,6 +744,7 @@ class TabDataRepositoryTest {
         tabSwitcherDataStore: TabSwitcherDataStore = mock(),
         duckDuckGoUrlDetector: DuckDuckGoUrlDetector = mock(),
         timeProvider: CurrentTimeProvider = FakeTimeProvider(),
+        contextualDataStore: DuckChatContextualDataStore = mockDuckChatContextualDataStore,
     ): TabDataRepository {
         return TabDataRepository(
             dao,
@@ -760,6 +767,7 @@ class TabDataRepositoryTest {
             mockAdClickManager,
             mockWebViewSessionStorage,
             tabManagerFeatureFlags,
+            contextualDataStore,
         )
     }
 
