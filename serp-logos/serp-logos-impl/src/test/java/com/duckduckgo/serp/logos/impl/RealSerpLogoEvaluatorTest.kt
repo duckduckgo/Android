@@ -17,9 +17,14 @@
 package com.duckduckgo.serp.logos.impl
 
 import android.webkit.WebView
+import app.cash.turbine.test
 import com.duckduckgo.serp.logos.api.SerpLogo
+import com.duckduckgo.serp.logos.impl.store.FavouriteSerpLogoDataStore
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -39,13 +44,16 @@ class RealSerpLogoEvaluatorTest {
     @Mock
     private lateinit var serpLogoJavascriptInterface: SerpLogoJavascriptInterface
 
+    private lateinit var fakeFavouriteSerpLogoDataStore: FakeFavouriteSerpLogoDataStore
+
     private lateinit var testee: RealSerpLogoEvaluator
 
     @Before
     fun setUp() {
         MockitoAnnotations.openMocks(this)
         whenever(serpLogoJavascriptInterface.js).thenReturn("mock_js_code")
-        testee = RealSerpLogoEvaluator(serpLogoJavascriptInterface)
+        fakeFavouriteSerpLogoDataStore = FakeFavouriteSerpLogoDataStore()
+        testee = RealSerpLogoEvaluator(serpLogoJavascriptInterface, fakeFavouriteSerpLogoDataStore)
     }
 
     @Test
@@ -169,11 +177,51 @@ class RealSerpLogoEvaluatorTest {
         assertEquals(SerpLogo.EasterEgg("https://duckduckgo.com/path/to/logo.png"), result)
     }
 
+    @Test
+    fun whenFavouriteLogoUrlFlowAccessedThenReturnsDelegatedFlow() = runTest {
+        val testUrl = "https://example.com/favourite-logo.png"
+        fakeFavouriteSerpLogoDataStore.favouriteLogoValue = testUrl
+
+        testee.favouriteSerpEasterEggLogoUrlFlow.test {
+            assertEquals(testUrl, awaitItem())
+        }
+    }
+
+    @Test
+    fun whenFavouriteLogoUrlFlowAccessedWithNullThenReturnsNull() = runTest {
+        fakeFavouriteSerpLogoDataStore.favouriteLogoValue = null
+
+        testee.favouriteSerpEasterEggLogoUrlFlow.test {
+            assertNull(awaitItem())
+        }
+    }
+
     private fun mockWebViewEvaluateJavaScript(result: String) {
         doAnswer { invocation ->
             val callback = invocation.arguments[1] as android.webkit.ValueCallback<String>
             callback.onReceiveValue(result)
             null
         }.whenever(webView).evaluateJavascript(any(), any())
+    }
+}
+
+private class FakeFavouriteSerpLogoDataStore : FavouriteSerpLogoDataStore {
+
+    private val _favouriteLogo = MutableStateFlow<String?>(null)
+
+    var favouriteLogoValue: String?
+        get() = _favouriteLogo.value
+        set(value) {
+            _favouriteLogo.value = value
+        }
+
+    override val favouriteSerpEasterEggLogoUrlFlow: Flow<String?> = _favouriteLogo
+
+    override suspend fun setFavouriteLogo(url: String?) {
+        _favouriteLogo.value = url
+    }
+
+    override suspend fun clearFavouriteLogo() {
+        _favouriteLogo.value = null
     }
 }
