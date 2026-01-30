@@ -47,6 +47,7 @@ interface DuckChatJSHelper {
         data: JSONObject?,
         mode: Mode = Mode.FULL,
         pageContext: String? = null,
+        userEnabledContextAttachment: Boolean = false,
     ): JsCallbackData?
 
     fun onNativeAction(action: NativeAction): SubscriptionEventData
@@ -81,6 +82,7 @@ class RealDuckChatJSHelper @Inject constructor(
         data: JSONObject?,
         mode: Mode,
         pageContext: String?,
+        userEnabledContextAttachment: Boolean,
     ): JsCallbackData? {
         fun registerDuckChatIsOpenDebounced(windowMs: Long = 500L) {
             // we debounced because METHOD_GET_AI_CHAT_NATIVE_HANDOFF_DATA can be called more than once
@@ -153,10 +155,19 @@ class RealDuckChatJSHelper @Inject constructor(
 
             METHOD_GET_PAGE_CONTEXT -> {
                 id?.let {
-                    val reason = data?.optString("reason") ?: "userAction"
-                    if (pageContext != null && (reason == "userAction" || (reason == "init" && duckChat.isAutomaticContextAttachmentEnabled()))) {
-                        getPageContextResponse(featureName, method, it, pageContext)
+                    val shouldAddContext = userEnabledContextAttachment && duckChat.isAutomaticContextAttachmentEnabled()
+                    val reason = data?.optString(REASON) ?: REASON_USER_ACTION
+                    logcat { "Duck.ai Contextual: getAIChatPageContext shouldAddContextAutomatically $shouldAddContext reason $reason" }
+                    if (pageContext != null) {
+                        if (reason == REASON_INIT && shouldAddContext) {
+                            getPageContextResponse(featureName, method, it, pageContext)
+                        } else if (reason == REASON_USER_ACTION) {
+                            getPageContextResponse(featureName, method, it, pageContext)
+                        } else {
+                            null
+                        }
                     } else {
+                        logcat { "Duck.ai Contextual: page context is empty, can't add it" }
                         null
                     }
                 }
@@ -303,6 +314,9 @@ class RealDuckChatJSHelper @Inject constructor(
         private const val REPORT_METRIC = "reportMetric"
         private const val PLATFORM = "platform"
         private const val ANDROID = "android"
+        private const val REASON = "reason"
+        private const val REASON_INIT = "init"
+        private const val REASON_USER_ACTION = "userAction"
         const val SELECTOR = "selector"
         private const val DEFAULT_SELECTOR = "'user-prompt'"
         private const val SUCCESS = "success"

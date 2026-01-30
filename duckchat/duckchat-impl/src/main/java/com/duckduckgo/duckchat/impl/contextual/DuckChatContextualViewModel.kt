@@ -293,6 +293,7 @@ class DuckChatContextualViewModel @Inject constructor(
     }
 
     fun removePageContext() {
+        logcat { "Duck.ai Contextual: removePageContext" }
         viewModelScope.launch {
             _viewState.update { current ->
                 current.copy(showContext = false)
@@ -301,6 +302,7 @@ class DuckChatContextualViewModel @Inject constructor(
     }
 
     fun addPageContext() {
+        logcat { "Duck.ai Contextual: addPageContext" }
         viewModelScope.launch {
             _viewState.update { current ->
                 current.copy(
@@ -352,6 +354,7 @@ class DuckChatContextualViewModel @Inject constructor(
                         contextTitle = title,
                         contextUrl = url,
                         tabId = tabId,
+                        showContext = _viewState.value.allowsAutomaticContextAttachment && _viewState.value.showContext,
                     )
                 }
             }
