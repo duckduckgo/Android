@@ -31,10 +31,10 @@ class SafeStructureRelativeLayout @JvmOverloads constructor(
 ) : RelativeLayout(context, attrs, defStyleAttr) {
 
     override fun dispatchProvideStructure(structure: ViewStructure) {
-        runCatching {
+        try {
             super.dispatchProvideStructure(structure)
-        }.onFailure { exception ->
-            logcat(ERROR) { "SafeStructureRelativeLayout: Error dispatching structure: ${exception.asLog()}" }
+        } catch (e: NullPointerException) {
+            logcat(ERROR) { "SafeStructureRelativeLayout: Error dispatching structure: ${e.asLog()}" }
         }
     }
 }
