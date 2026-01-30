@@ -296,6 +296,7 @@ import com.duckduckgo.site.permissions.api.SitePermissionsManager.LocationPermis
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissionQueryResponse
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissions
 import com.duckduckgo.subscriptions.api.SUBSCRIPTIONS_FEATURE_NAME
+import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.subscriptions.api.SubscriptionsJSHelper
 import com.duckduckgo.sync.api.favicons.FaviconsFetchingPrompt
@@ -570,6 +571,7 @@ class BrowserTabViewModelTest {
     private val mockDuckChat: DuckChat = mock()
     private val mockSyncStatusChangedObserver: SyncStatusChangedObserver = mock()
     private val syncStatusChangedEventsFlow = MutableSharedFlow<JSONObject>()
+    private val subscriptionStatusFlow = MutableSharedFlow<SubscriptionStatus>()
     private val mockHistory: NavigationHistory = mock()
     private val mockPageContextJSHelper: PageContextJSHelper = mock()
 
@@ -750,6 +752,7 @@ class BrowserTabViewModelTest {
 
             whenever(mockDuckChat.getDuckChatUrl(any(), any(), any())).thenReturn(duckChatURL)
             whenever(mockSyncStatusChangedObserver.syncStatusChangedEvents).thenReturn(syncStatusChangedEventsFlow)
+            whenever(subscriptions.getSubscriptionStatusFlow()).thenReturn(subscriptionStatusFlow)
 
             initialiseViewModel()
 
@@ -8646,5 +8649,54 @@ class BrowserTabViewModelTest {
         assertEquals(duckAIUrl, command.url)
 
         verify(mockDuckChat, never()).openDuckChat()
+    }
+
+    @Test
+    fun whenSubscriptionChangesWhileOnDuckAiThenAuthUpdateEventSent() = runTest {
+        val duckAiUrl = "https://duck.ai/chat"
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
+        loadUrl(duckAiUrl, title = "Duck.ai")
+
+        testee.subscriptionEventDataFlow.test {
+            subscriptionStatusFlow.emit(SubscriptionStatus.AUTO_RENEWABLE)
+
+            val event = awaitItem()
+            assertEquals(SUBSCRIPTIONS_FEATURE_NAME, event.featureName)
+            assertEquals("authUpdate", event.subscriptionName)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSubscriptionChangesWhileNotOnDuckAiThenNoAuthUpdateEventSent() = runTest {
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(false)
+        loadUrl(exampleUrl, title = "Example")
+
+        testee.subscriptionEventDataFlow.test {
+            subscriptionStatusFlow.emit(SubscriptionStatus.AUTO_RENEWABLE)
+
+            expectNoEvents()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenOnViewVisibleWithPendingAuthUpdateOnDuckAiThenAuthUpdateEventSent() = runTest {
+        val duckAiUrl = "https://duck.ai/chat"
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
+        loadUrl(duckAiUrl, title = "Duck.ai")
+
+        // Trigger subscription change to set pending flag
+        subscriptionStatusFlow.emit(SubscriptionStatus.AUTO_RENEWABLE)
+
+        testee.subscriptionEventDataFlow.test {
+            // Simulate returning to the view (e.g., after purchase flow)
+            testee.onViewVisible()
+
+            val event = awaitItem()
+            assertEquals(SUBSCRIPTIONS_FEATURE_NAME, event.featureName)
+            assertEquals("authUpdate", event.subscriptionName)
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 }

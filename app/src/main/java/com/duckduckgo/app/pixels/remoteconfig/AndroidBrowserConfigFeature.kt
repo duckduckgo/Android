@@ -275,4 +275,7 @@ interface AndroidBrowserConfigFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun sendVerifiedInstallPixels(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun refreshDuckAiOnSubscriptionChanges(): Toggle
 }

@@ -602,6 +602,7 @@ class BrowserTabViewModel @Inject constructor(
     private var isCustomTabScreen: Boolean = false
     private var alreadyShownKeyboard: Boolean = false
     private var handleAboutBlankEnabled: Boolean = false
+    private var pendingDuckChatAuthUpdate: Boolean = false
 
     private val isFullUrlEnabled = urlDisplayRepository.isFullUrlEnabled
         .stateIn(
@@ -701,6 +702,7 @@ class BrowserTabViewModel @Inject constructor(
         }
 
         observeSyncStatusChangesForDuckChat()
+        observeSubscriptionChangesForDuckChat()
 
         tabRepository.childClosedTabs
             .onEach { closedTab ->
@@ -896,6 +898,37 @@ class BrowserTabViewModel @Inject constructor(
             .launchIn(viewModelScope)
     }
 
+    private fun observeSubscriptionChangesForDuckChat() {
+        subscriptions.getSubscriptionStatusFlow()
+            .distinctUntilChanged()
+            .onEach { _ ->
+                if (!androidBrowserConfig.refreshDuckAiOnSubscriptionChanges().isEnabled()) return@onEach
+
+                // Only send subscription auth events when viewing duck.ai
+                val currentUrl = url
+                if (currentUrl != null && duckChat.isDuckChatUrl(currentUrl.toUri())) {
+                    // Mark pending in case WebView is paused (e.g., during purchase flow)
+                    pendingDuckChatAuthUpdate = true
+                    // Try to send immediately (will work if WebView is active)
+                    withContext(dispatchers.main()) {
+                        sendDuckChatAuthUpdate()
+                    }
+                }
+            }
+            .flowOn(dispatchers.io())
+            .launchIn(viewModelScope)
+    }
+
+    private fun sendDuckChatAuthUpdate() {
+        val authUpdateEvent = SubscriptionEventData(
+            featureName = SUBSCRIPTIONS_FEATURE_NAME,
+            subscriptionName = "authUpdate",
+            params = JSONObject(),
+        )
+        _subscriptionEventDataChannel.trySend(authUpdateEvent)
+        logcat { "DuckChat-Subscription: sent authUpdate event from BrowserTabViewModel" }
+    }
+
     override fun getCurrentTabId(): String = tabId
 
     fun onMessageProcessed() {
@@ -1022,6 +1055,16 @@ class BrowserTabViewModel @Inject constructor(
 
         viewModelScope.launch {
             refreshOnViewVisible.emit(true)
+        }
+
+        // Send pending auth update if returning to duck.ai after subscription change (e.g., after purchase flow)
+        // ensures we emit the event even if the WebView was paused
+        if (pendingDuckChatAuthUpdate) {
+            val currentUrl = url
+            if (currentUrl != null && duckChat.isDuckChatUrl(currentUrl.toUri())) {
+                sendDuckChatAuthUpdate()
+                pendingDuckChatAuthUpdate = false
+            }
         }
     }
 
