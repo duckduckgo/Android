@@ -31,6 +31,7 @@ import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin
 import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin.PixelParameter
 import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin.PixelParameter.APP_VERSION
 import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin.PixelParameter.ATB
+import com.duckduckgo.data.store.impl.DataStorePixelNames
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.newtabpage.impl.pixels.NewTabPixelNames
 import com.duckduckgo.remote.messaging.impl.pixels.RemoteMessagingPixelName
@@ -160,8 +161,23 @@ object PixelInterceptorPixelsRequiringDataCleaning : PixelParamRemovalPlugin {
             RemoteMessagingPixelName.REMOTE_MESSAGE_IMAGE_LOAD_SUCCESS.pixelName to PixelParameter.removeAtb(),
             RemoteMessagingPixelName.REMOTE_MESSAGE_IMAGE_LOAD_FAILED.pixelName to PixelParameter.removeAtb(),
             AutofillPixelNames.AUTOFILL_HARMONY_PREFERENCES_RETRIEVAL_FAILED.pixelName to PixelParameter.removeAtb(),
+            AutofillPixelNames.AUTOFILL_PREFERENCES_RETRIEVAL_FAILED.pixelName to PixelParameter.removeAtb(),
+            AutofillPixelNames.AUTOFILL_PREFERENCES_GET_KEY_FAILED.pixelName to PixelParameter.removeAtb(),
+            AutofillPixelNames.AUTOFILL_HARMONY_PREFERENCES_GET_KEY_FAILED.pixelName to PixelParameter.removeAtb(),
+            AutofillPixelNames.AUTOFILL_PREFERENCES_UPDATE_KEY_FAILED.pixelName to PixelParameter.removeAtb(),
+            AutofillPixelNames.AUTOFILL_HARMONY_PREFERENCES_UPDATE_KEY_FAILED.pixelName to PixelParameter.removeAtb(),
             AppPixelName.APP_INSTALL_VERIFIED_INSTALL.pixelName to PixelParameter.removeAtb(),
             AppPixelName.APP_UPDATE_VERIFIED_INSTALL.pixelName to PixelParameter.removeAtb(),
+            DataStorePixelNames.DATA_STORE_MIGRATE_ENCRYPTED_GET_PREFERENCES_ORIGIN_FAILED.pixelName to PixelParameter.removeAtb(),
+            DataStorePixelNames.DATA_STORE_MIGRATE_UNENCRYPTED_GET_PREFERENCES_ORIGIN_FAILED.pixelName to PixelParameter.removeAtb(),
+            DataStorePixelNames.DATA_STORE_MIGRATE_ENCRYPTED_GET_PREFERENCES_DESTINATION_FAILED.pixelName to PixelParameter.removeAtb(),
+            DataStorePixelNames.DATA_STORE_MIGRATE_UNENCRYPTED_GET_PREFERENCES_DESTINATION_FAILED.pixelName to PixelParameter.removeAtb(),
+            DataStorePixelNames.DATA_STORE_MIGRATE_ENCRYPTED_QUERY_PREFERENCES_DESTINATION_FAILED.pixelName to PixelParameter.removeAtb(),
+            DataStorePixelNames.DATA_STORE_MIGRATE_UNENCRYPTED_QUERY_PREFERENCES_DESTINATION_FAILED.pixelName to PixelParameter.removeAtb(),
+            DataStorePixelNames.DATA_STORE_MIGRATE_ENCRYPTED_QUERY_ALL_PREFERENCES_ORIGIN_FAILED.pixelName to PixelParameter.removeAtb(),
+            DataStorePixelNames.DATA_STORE_MIGRATE_UNENCRYPTED_QUERY_ALL_PREFERENCES_ORIGIN_FAILED.pixelName to PixelParameter.removeAtb(),
+            DataStorePixelNames.DATA_STORE_MIGRATE_ENCRYPTED_UPDATE_PREFERENCES_DESTINATION_FAILED.pixelName to PixelParameter.removeAtb(),
+            DataStorePixelNames.DATA_STORE_MIGRATE_UNENCRYPTED_UPDATE_PREFERENCES_DESTINATION_FAILED.pixelName to PixelParameter.removeAtb(),
         )
     }
 }

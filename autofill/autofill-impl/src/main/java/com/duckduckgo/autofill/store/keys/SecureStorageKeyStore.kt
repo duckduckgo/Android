@@ -22,13 +22,21 @@ import androidx.core.content.edit
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.autofill.api.AutofillFeature
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_HARMONY_PREFERENCES_GET_KEY_FAILED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_HARMONY_PREFERENCES_RETRIEVAL_FAILED
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_HARMONY_PREFERENCES_UPDATE_KEY_FAILED
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_PREFERENCES_GET_KEY_FAILED
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_PREFERENCES_UPDATE_KEY_FAILED
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.sanitizeStackTrace
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
@@ -82,6 +90,12 @@ class RealSecureStorageKeyStore constructor(
                     )
                 }
             } catch (e: Exception) {
+                coroutineContext.ensureActive()
+                pixel.fire(
+                    AutofillPixelNames.AUTOFILL_PREFERENCES_RETRIEVAL_FAILED,
+                    mapOf("error" to e.error()),
+                    type = Daily(),
+                )
                 null
             }
         }
@@ -94,7 +108,6 @@ class RealSecureStorageKeyStore constructor(
                     if (autofillFeature.useHarmony().isEnabled()) {
                         sharedPreferencesProvider.getMigratedEncryptedSharedPreferences(FILENAME).also {
                             if (it == null) {
-                                pixel.fire(AUTOFILL_HARMONY_PREFERENCES_RETRIEVAL_FAILED)
                                 logcat { "autofill harmony preferences retrieval returned null" }
                             }
                         }
@@ -103,7 +116,12 @@ class RealSecureStorageKeyStore constructor(
                     }
                 }
             } catch (e: Exception) {
-                pixel.fire(AUTOFILL_HARMONY_PREFERENCES_RETRIEVAL_FAILED)
+                coroutineContext.ensureActive()
+                pixel.fire(
+                    AUTOFILL_HARMONY_PREFERENCES_RETRIEVAL_FAILED,
+                    mapOf("error" to e.error()),
+                    type = Daily(),
+                )
                 logcat { "autofill harmony preferences retrieval failed: $e" }
                 null
             }
@@ -123,21 +141,41 @@ class RealSecureStorageKeyStore constructor(
         keyValue: ByteArray?,
     ) {
         withContext(dispatcherProvider.io()) {
-            getEncryptedPreferences()?.edit(commit = true) {
-                if (keyValue == null) {
-                    remove(keyName)
-                } else {
-                    putString(keyName, keyValue.toByteString().base64())
-                }
-            }
-
-            if (autofillFeature.useHarmony().isEnabled()) {
-                getHarmonyEncryptedPreferences()?.edit(commit = true) {
+            runCatching {
+                getEncryptedPreferences()?.edit(commit = true) {
                     if (keyValue == null) {
                         remove(keyName)
                     } else {
                         putString(keyName, keyValue.toByteString().base64())
                     }
+                }
+            }.getOrElse {
+                ensureActive()
+                pixel.fire(
+                    AUTOFILL_PREFERENCES_UPDATE_KEY_FAILED,
+                    mapOf("error" to it.error()),
+                    type = Daily(),
+                )
+                throw it
+            }
+
+            if (autofillFeature.useHarmony().isEnabled()) {
+                runCatching {
+                    getHarmonyEncryptedPreferences()?.edit(commit = true) {
+                        if (keyValue == null) {
+                            remove(keyName)
+                        } else {
+                            putString(keyName, keyValue.toByteString().base64())
+                        }
+                    }
+                }.getOrElse {
+                    ensureActive()
+                    pixel.fire(
+                        AUTOFILL_HARMONY_PREFERENCES_UPDATE_KEY_FAILED,
+                        mapOf("error" to it.error()),
+                        type = Daily(),
+                    )
+                    throw it
                 }
             }
         }
@@ -145,19 +183,47 @@ class RealSecureStorageKeyStore constructor(
 
     override suspend fun getKey(keyName: String): ByteArray? {
         return withContext(dispatcherProvider.io()) {
-            val preferences = if (autofillFeature.useHarmony().isEnabled()) {
+            val useHarmony = autofillFeature.useHarmony().isEnabled()
+            val preferences = if (useHarmony) {
                 getHarmonyEncryptedPreferences()
             } else {
                 getEncryptedPreferences()
             }
-            return@withContext preferences?.getString(keyName, null)?.run {
-                this.decodeBase64()?.toByteArray()
+            return@withContext runCatching {
+                preferences?.getString(keyName, null)?.run {
+                    this.decodeBase64()?.toByteArray()
+                }
+            }.getOrElse {
+                ensureActive()
+                val pixelName = if (useHarmony) {
+                    AUTOFILL_HARMONY_PREFERENCES_GET_KEY_FAILED
+                } else {
+                    AUTOFILL_PREFERENCES_GET_KEY_FAILED
+                }
+                pixel.fire(
+                    pixelName,
+                    mapOf("error" to it.error()),
+                    type = Daily(),
+                )
+                throw it
             }
         }
     }
 
     override suspend fun canUseEncryption(): Boolean = withContext(dispatcherProvider.io()) {
-        getEncryptedPreferences() != null
+        if (autofillFeature.useHarmony().isEnabled()) {
+            getHarmonyEncryptedPreferences() != null
+        } else {
+            getEncryptedPreferences() != null
+        }
+    }
+
+    private fun Throwable.error(): String {
+        return if (autofillFeature.sendSanitizedStackTraces().isEnabled()) {
+            sanitizeStackTrace()
+        } else {
+            javaClass.name
+        }
     }
 
     companion object {
