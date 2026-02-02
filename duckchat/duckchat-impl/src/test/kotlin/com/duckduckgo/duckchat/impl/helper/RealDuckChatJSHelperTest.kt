@@ -335,6 +335,81 @@ class RealDuckChatJSHelperTest {
     }
 
     @Test
+    fun whenGetPageContextAndIdIsNullThenReturnsNull() = runTest {
+        whenever(mockDuckChat.isAutomaticContextAttachmentEnabled()).thenReturn(true)
+
+        val result =
+            testee.processJsCallbackMessage(
+                featureName = DUCK_CHAT_FEATURE_NAME,
+                method = METHOD_GET_PAGE_CONTEXT,
+                id = null,
+                data = JSONObject().apply { put("reason", "userAction") },
+                mode = Mode.CONTEXTUAL,
+                pageContext = viewModel.updatedPageContext,
+                userEnabledContextAttachment = true,
+            )
+
+        assertNull(result)
+    }
+
+    @Test
+    fun whenGetPageContextInitAutomaticEnabledButUserDisabledThenReturnsNull() = runTest {
+        whenever(mockDuckChat.isAutomaticContextAttachmentEnabled()).thenReturn(true)
+
+        val result =
+            testee.processJsCallbackMessage(
+                featureName = DUCK_CHAT_FEATURE_NAME,
+                method = METHOD_GET_PAGE_CONTEXT,
+                id = "123",
+                data = JSONObject().apply { put("reason", "init") },
+                mode = Mode.CONTEXTUAL,
+                pageContext = viewModel.updatedPageContext,
+                userEnabledContextAttachment = false,
+            )
+
+        assertNull(result)
+    }
+
+    @Test
+    fun whenGetPageContextWithoutReasonThenDefaultsToUserAction() = runTest {
+        whenever(mockDuckChat.isAutomaticContextAttachmentEnabled()).thenReturn(true)
+
+        val result =
+            testee.processJsCallbackMessage(
+                featureName = DUCK_CHAT_FEATURE_NAME,
+                method = METHOD_GET_PAGE_CONTEXT,
+                id = "123",
+                data = null,
+                mode = Mode.CONTEXTUAL,
+                pageContext = viewModel.updatedPageContext,
+                userEnabledContextAttachment = true,
+            )
+
+        assertNotNull(result)
+        val context = result!!.params.getJSONObject("pageContext")
+        assertEquals("Example Title", context.getString("title"))
+        assertEquals("https://example.com", context.getString("url"))
+    }
+
+    @Test
+    fun whenGetPageContextWithUnknownReasonThenReturnsNull() = runTest {
+        whenever(mockDuckChat.isAutomaticContextAttachmentEnabled()).thenReturn(true)
+
+        val result =
+            testee.processJsCallbackMessage(
+                featureName = DUCK_CHAT_FEATURE_NAME,
+                method = METHOD_GET_PAGE_CONTEXT,
+                id = "123",
+                data = JSONObject().apply { put("reason", "unexpected") },
+                mode = Mode.CONTEXTUAL,
+                pageContext = viewModel.updatedPageContext,
+                userEnabledContextAttachment = true,
+            )
+
+        assertNull(result)
+    }
+
+    @Test
     fun whenGetAIChatNativeConfigValuesAndDuckChatFeatureDisabledThenReturnJsCallbackDataWithDuckChatDisabled() = runTest {
         val featureName = "aiChat"
         val method = "getAIChatNativeConfigValues"
@@ -470,6 +545,7 @@ class RealDuckChatJSHelperTest {
             id,
             data,
             pageContext = viewModel.updatedPageContext,
+            userEnabledContextAttachment = true,
         )
 
         val expectedPayload = JSONObject().apply {
@@ -481,11 +557,36 @@ class RealDuckChatJSHelperTest {
     }
 
     @Test
+    fun `when get AI chat page context for init with automatic attachment but user disabled context then return payload`() = runTest {
+        val featureName = "aiChat"
+        val method = "getAIChatPageContext"
+        val id = "123"
+        val data = JSONObject(mapOf("reason" to "init"))
+        whenever(mockDuckChat.isAutomaticContextAttachmentEnabled()).thenReturn(true)
+
+        val result = testee.processJsCallbackMessage(
+            featureName,
+            method,
+            id,
+            data,
+            pageContext = viewModel.updatedPageContext,
+            userEnabledContextAttachment = false,
+        )
+
+        val expectedPayload = JSONObject().apply {
+            put("pageContext", JSONObject(viewModel.updatedPageContext))
+        }
+
+        assertNull(result)
+    }
+
+    @Test
     fun `when get AI chat page context without context then return null`() = runTest {
         val featureName = "aiChat"
         val method = "getAIChatPageContext"
         val id = "123"
         val data = JSONObject(mapOf("reason" to "userAction"))
+
         whenever(mockDuckChat.isAutomaticContextAttachmentEnabled()).thenReturn(true)
 
         val result = testee.processJsCallbackMessage(
@@ -494,6 +595,7 @@ class RealDuckChatJSHelperTest {
             id,
             data,
             pageContext = null,
+            userEnabledContextAttachment = true,
         )
 
         assertNull(result)

@@ -218,21 +218,26 @@ class DuckChatContextualViewModel @Inject constructor(
 
     fun onChatPageLoaded(url: String?) {
         logcat { "Duck.ai: onChatPageLoaded $url" }
-        val hasChatId = hasChatId(url)
+        if (url == null) {
+            return
+        } else {
+            fullModeUrl = url
+            val sheetMode = _viewState.value.sheetMode
+            if (sheetMode == SheetMode.WEBVIEW) {
+                val hasChatId = hasChatId(url)
 
-        val currentState = _viewState.value
-        if (currentState.sheetMode == SheetMode.WEBVIEW) {
-            viewModelScope.launch {
-                _viewState.update { current ->
-                    current.copy(showFullscreen = hasChatId)
+                viewModelScope.launch {
+                    _viewState.update { current ->
+                        current.copy(showFullscreen = hasChatId)
+                    }
                 }
-            }
-            if (url != null && hasChatId) {
-                fullModeUrl = url
-                val tabId = _viewState.value.tabId
-                if (tabId.isNotBlank()) {
-                    viewModelScope.launch(dispatchers.io()) {
-                        contextualDataStore.persistTabChatUrl(tabId, url)
+
+                if (hasChatId) {
+                    val tabId = _viewState.value.tabId
+                    if (tabId.isNotBlank()) {
+                        viewModelScope.launch(dispatchers.io()) {
+                            contextualDataStore.persistTabChatUrl(tabId, url)
+                        }
                     }
                 }
             }
@@ -312,9 +317,13 @@ class DuckChatContextualViewModel @Inject constructor(
     }
 
     fun replacePrompt(prompt: String) {
+        logcat { "Duck.ai Contextual: add predefined Summarize prompt" }
         viewModelScope.launch {
             _viewState.update { current ->
-                current.copy(prompt = prompt)
+                current.copy(
+                    prompt = prompt,
+                    showContext = true,
+                )
             }
         }
     }

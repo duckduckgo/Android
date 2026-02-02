@@ -446,7 +446,7 @@ class DuckChatContextualFragment :
                 }
 
                 override fun afterTextChanged(text: Editable?) {
-                    binding.duckAiContextualSend.isVisible = !text.toString().isEmpty()
+                    binding.duckAiContextualSend.isEnabled = !text.toString().isEmpty()
                     binding.duckAiContextualClearText.isVisible = !text.toString().isEmpty()
                 }
             },
@@ -556,11 +556,9 @@ class DuckChatContextualFragment :
 
                 if (viewState.showContext) {
                     binding.duckAiContextualLayout.show()
-                    binding.contextualModePrompts.show()
                     binding.duckAiAttachContextLayout.gone()
                 } else {
                     binding.duckAiContextualLayout.gone()
-                    binding.contextualModePrompts.gone()
                     binding.duckAiAttachContextLayout.show()
                 }
                 if (viewState.prompt.isNotEmpty()) {

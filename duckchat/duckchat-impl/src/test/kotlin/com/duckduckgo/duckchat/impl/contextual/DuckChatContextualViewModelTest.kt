@@ -290,6 +290,7 @@ class DuckChatContextualViewModelTest {
                 testee.replacePrompt("new prompt")
                 val state = expectMostRecentItem() as DuckChatContextualViewModel.ViewState
                 assertEquals("new prompt", state.prompt)
+                assertTrue(state.showContext)
 
                 cancelAndIgnoreRemainingEvents()
             }
@@ -394,9 +395,23 @@ class DuckChatContextualViewModelTest {
     }
 
     @Test
+    fun `onChatPageLoaded in Input Mode doesn't store url`() = runTest {
+        val tabId = "tab-1"
+        val url = "https://duck.ai/chat?chatID=123"
+        testee.onSheetOpened(tabId)
+
+        testee.onChatPageLoaded(url)
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        assertEquals(null, contextualDataStore.getTabChatUrl(tabId))
+    }
+
+    @Test
     fun `onChatPageLoaded stores url by tab id`() = runTest {
         val tabId = "tab-1"
         val url = "https://duck.ai/chat?chatID=123"
+        contextualDataStore.persistTabChatUrl(tabId, url)
+
         testee.onSheetOpened(tabId)
         testee.onPromptSent("prompt")
 
