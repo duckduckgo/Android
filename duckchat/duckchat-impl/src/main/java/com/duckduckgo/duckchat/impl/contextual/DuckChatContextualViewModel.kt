@@ -159,8 +159,7 @@ class DuckChatContextualViewModel @Inject constructor(
             if (existingChatUrl.isNullOrBlank()) {
                 logcat { "Duck.ai: tab=$tabId doesn't have an existing url, use the default one" }
                 withContext(dispatchers.main()) {
-                    fullModeUrl = ""
-                    commandChannel.trySend(Command.ChangeSheetState(BottomSheetBehavior.STATE_EXPANDED))
+                    commandChannel.trySend(Command.ChangeSheetState(BottomSheetBehavior.STATE_HALF_EXPANDED))
                     val chatUrl = duckChat.getDuckChatUrl("", false, sidebar = true)
                     commandChannel.trySend(Command.LoadUrl(chatUrl))
                     _viewState.update {

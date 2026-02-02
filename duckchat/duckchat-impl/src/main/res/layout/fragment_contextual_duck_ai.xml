@@ -116,7 +116,7 @@
             android:orientation="vertical"
             android:paddingHorizontal="@dimen/keyline_4"
             android:paddingTop="@dimen/keyline_4"
-            android:paddingBottom="@dimen/keyline_3"
+            android:paddingBottom="@dimen/keyline_1"
             app:layout_constraintBottom_toTopOf="@id/inputModeWidgetCard"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -186,7 +186,7 @@
                         android:textStyle="normal" />
 
                     <ImageView
-                        android:id="@+id/inputFieldVoiceInputButton"
+                        android:id="@+id/duckAiContextualVoiceInput"
                         android:layout_width="36dp"
                         android:layout_height="36dp"
                         android:layout_gravity="top"
@@ -200,10 +200,12 @@
                         tools:visibility="visible" />
 
                     <ImageView
-                        android:id="@+id/inputFieldClearText"
-                        android:layout_width="@dimen/toolbarIcon"
-                        android:layout_height="@dimen/toolbarIcon"
+                        android:id="@+id/duckAiContextualClearText"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
                         android:layout_gravity="top"
+                        android:layout_marginVertical="@dimen/keyline_1"
+                        android:layout_marginEnd="@dimen/keyline_1"
                         android:background="@drawable/selectable_item_rounded_corner_background"
                         android:gravity="center"
                         android:importantForAccessibility="no"
@@ -237,6 +239,7 @@
                         android:id="@+id/duckAiContextualPageTitle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:maxWidth="200dp"
                         tools:text="Wikipedia"
                         app:typography="body1_bold"
                         android:maxLines="1"
@@ -310,6 +313,7 @@
                         android:layout_height="36dp"
                         android:layout_gravity="end"
                         android:layout_margin="@dimen/keyline_1"
+                        android:visibility="gone"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
                         app:layout_constraintBottom_toBottomOf="parent"

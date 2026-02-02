@@ -43,6 +43,7 @@ import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.annotation.AnyThread
 import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
@@ -445,12 +446,19 @@ class DuckChatContextualFragment :
                 }
 
                 override fun afterTextChanged(text: Editable?) {
-                    binding.duckAiContextualSend.isEnabled = !text.toString().isEmpty()
+                    binding.duckAiContextualSend.isVisible = !text.toString().isEmpty()
+                    binding.duckAiContextualClearText.isVisible = !text.toString().isEmpty()
                 }
             },
         )
         binding.duckAiContextualSend.setOnClickListener {
             sendNativePrompt()
+        }
+
+        binding.duckAiContextualClearText.setOnClickListener {
+            binding.inputField.text.clear()
+            binding.inputField.setSelection(0)
+            binding.inputField.scrollTo(0, 0)
         }
 
         binding.contextualFullScreen.setOnClickListener {
