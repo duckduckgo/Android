@@ -72,7 +72,7 @@
     <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/customTabShieldIcon"
         android:layout_width="@dimen/toolbarIcon"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:importantForAccessibility="no"
         android:scaleType="matrix"
         app:layout_constraintBottom_toBottomOf="parent"
