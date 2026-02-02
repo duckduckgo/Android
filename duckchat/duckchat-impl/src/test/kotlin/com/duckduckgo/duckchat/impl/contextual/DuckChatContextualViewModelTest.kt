@@ -173,7 +173,6 @@ class DuckChatContextualViewModelTest {
                 """.trimIndent()
 
             // Load and cache context, then remove it to set hasContext=false while data remains cached.
-            enableAutomaticContextAttachment()
             testee.onSheetOpened(tabId)
             testee.onPageContextReceived(tabId, serializedPageData)
             testee.removePageContext()
@@ -221,7 +220,6 @@ class DuckChatContextualViewModelTest {
                 }
                 """.trimIndent()
 
-            enableAutomaticContextAttachment()
             testee.viewState.test {
                 testee.addPageContext()
                 testee.onPageContextReceived(tabId, serializedPageData)
@@ -616,9 +614,6 @@ class DuckChatContextualViewModelTest {
         override fun observeAutomaticContextAttachmentUserSettingEnabled(): Flow<Boolean> = automaticContextAttachment
         override fun showContextualOnboarding(context: Context, onConfirmed: () -> Unit) = Unit
         override suspend fun isContextualOnboardingCompleted(): Boolean = true
-        fun setAutomaticContextAttachment(enabled: Boolean) {
-            automaticContextAttachment.value = enabled
-        }
     }
 
     private class FakeDuckChatContextualDataStore : DuckChatContextualDataStore {
