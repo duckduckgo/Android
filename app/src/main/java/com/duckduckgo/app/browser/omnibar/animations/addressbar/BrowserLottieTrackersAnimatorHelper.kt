@@ -212,6 +212,7 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         addressBarTrackersAnimator.cancelAnimation()
         stopTrackersAnimation()
         stopCookiesAnimation()
+        isCookiesAnimationRunning = false
         enqueueCookiesAnimation = false
         omnibarViews.forEach { it.alpha = 1f }
         shieldViews.forEach { it.alpha = 1f }
@@ -233,9 +234,8 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
     ) {
         if (omnibarViews.any { it.id == R.id.customTabDomain }) return // Do not show cookies animation in custom tabs
 
-        // Cancel any running animators before starting new ones
-        runningCookieAnimators.forEach { it.cancel() }
-        runningCookieAnimators.clear()
+        // Cancel any running animation before starting a new one
+        stopCookiesAnimation()
 
         isCookiesAnimationRunning = true
 
@@ -427,7 +427,15 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
     private fun stopCookiesAnimation() {
         if (!::cookieViewBackground.isInitialized || !::cookieView.isInitialized) return
 
-        // Always cancel any pending animators and transitions to prevent glimpses
+        // If animation was already stopped, skip redundant cleanup
+        if (hasCookiesAnimationBeenCanceled) {
+            return
+        }
+
+        // Set flag BEFORE canceling to prevent callbacks from continuing the old animation
+        hasCookiesAnimationBeenCanceled = true
+
+        // Cancel any pending animators and transitions to prevent glimpses
         runningCookieAnimators.forEach { animator ->
             animator.cancel()
             animator.removeAllListeners()
@@ -443,14 +451,6 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
             TransitionManager.endTransitions(cookieScene)
             cookieScene.gone()
         }
-
-        // If animation was already stopped by user, skip redundant state updates
-        if (hasCookiesAnimationBeenCanceled && !isCookiesAnimationRunning) {
-            return
-        }
-
-        hasCookiesAnimationBeenCanceled = true
-        isCookiesAnimationRunning = false
 
         // Reset view states directly without triggering transitions
         shieldAnimation?.alpha = 1f
