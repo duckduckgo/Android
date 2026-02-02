@@ -61,7 +61,7 @@ class DuckChatContextualViewModelTest {
 
     @Before
     fun setup() {
-        whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(false)
+        whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(true)
         whenever(
             duckChatJSHelper.onNativeAction(NativeAction.NEW_CHAT),
         ).thenReturn(
@@ -223,7 +223,6 @@ class DuckChatContextualViewModelTest {
 
             enableAutomaticContextAttachment()
             testee.viewState.test {
-                awaitItem()
                 testee.addPageContext()
                 testee.onPageContextReceived(tabId, serializedPageData)
 
