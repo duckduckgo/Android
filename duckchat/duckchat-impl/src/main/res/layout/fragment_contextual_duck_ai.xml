@@ -313,7 +313,6 @@
                         android:layout_height="36dp"
                         android:layout_gravity="end"
                         android:layout_margin="@dimen/keyline_1"
-                        android:visibility="gone"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
                         app:layout_constraintBottom_toBottomOf="parent"
