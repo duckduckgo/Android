@@ -61,4 +61,15 @@ class DuckChatContextualSharedViewModelTest {
             cancelAndConsumeRemainingEvents()
         }
     }
+
+    @Test
+    fun whenOpenRequestedThenOpenSheetCommandEmitted() = runTest {
+        testee.commands.test {
+            testee.onOpenRequested()
+
+            val command = awaitItem()
+            assertEquals(DuckChatContextualSharedViewModel.Command.OpenSheet, command)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
 }
