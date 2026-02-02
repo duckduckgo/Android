@@ -385,7 +385,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
@@ -2093,7 +2093,7 @@ class BrowserTabViewModel @Inject constructor(
     private suspend fun evaluateSerpLogoState(url: String?) {
         if (url != null && duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
             val isSetFavouriteEnabled = serpEasterEggLogosToggles.setFavourite().isEnabled()
-            val favouriteLogoUrl = favouriteSerpLogoDataStore.favouriteSerpEasterEggLogoUrlFlow.first()
+            val favouriteLogoUrl = favouriteSerpLogoDataStore.favouriteSerpEasterEggLogoUrlFlow.firstOrNull()
 
             // Don't extract logo if favourite feature is enabled AND a favourite is set
             if (isSetFavouriteEnabled && favouriteLogoUrl != null) {
