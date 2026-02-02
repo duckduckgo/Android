@@ -459,7 +459,7 @@ class DuckChatContextualFragment :
         binding.duckAiContextualPageRemove.setOnClickListener {
             viewModel.removePageContext()
         }
-        binding.duckAiContextualAddAttachment.setOnClickListener {
+        binding.duckAiAttachContextLayout.setOnClickListener {
             viewModel.addPageContext()
         }
         binding.contextualPromptSummarize.setOnClickListener {
@@ -549,11 +549,11 @@ class DuckChatContextualFragment :
                 if (viewState.showContext) {
                     binding.duckAiContextualLayout.show()
                     binding.contextualModePrompts.show()
-                    binding.duckAiContextualAddAttachment.gone()
+                    binding.duckAiAttachContextLayout.gone()
                 } else {
                     binding.duckAiContextualLayout.gone()
                     binding.contextualModePrompts.gone()
-                    binding.duckAiContextualAddAttachment.show()
+                    binding.duckAiAttachContextLayout.show()
                 }
                 if (viewState.prompt.isNotEmpty()) {
                     binding.inputField.setText(viewState.prompt)
