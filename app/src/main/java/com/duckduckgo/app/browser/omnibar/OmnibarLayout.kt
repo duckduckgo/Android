@@ -583,9 +583,6 @@ class OmnibarLayout @JvmOverloads constructor(
         duckAISidebar.setOnClickListener {
             omnibarItemPressedListener?.onDuckAISidebarButtonPressed()
         }
-        newCustomTabToolbarContainer.customTabInnerContainer.setOnClickListener {
-            cancelCustomTabAnimations()
-        }
         trackersAnimation.setOnClickListener {
             cancelAddressBarAnimations()
         }
@@ -1167,6 +1164,8 @@ class OmnibarLayout @JvmOverloads constructor(
                     customTabToolbar.setOnClickListener {
                         pixel.fire(CustomTabPixelNames.CUSTOM_TABS_ADDRESS_BAR_CLICKED)
                         pixel.fire(CustomTabPixelNames.CUSTOM_TABS_ADDRESS_BAR_CLICKED_DAILY, type = PixelType.Daily())
+
+                        cancelCustomTabAnimations()
                     }
 
                     daxIcon.setOnClickListener {
