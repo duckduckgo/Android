@@ -226,13 +226,13 @@ class WelcomePageViewModelTest {
             testee.commands.test {
                 val command = awaitItem()
                 Assert.assertTrue(command is ShowAddressBarPositionDialog)
-                Assert.assertTrue((command as ShowAddressBarPositionDialog).showSplitOption)
             }
         }
 
     @Test
     fun whenSplitOmnibarFeatureIsEnabledThenShowAddressBarPositionDialogWithSplitOption() =
         runTest {
+            mockAndroidBrowserConfigFeature.splitOmnibar().setRawStoredState(Toggle.State(remoteEnableState = true))
             mockAndroidBrowserConfigFeature.splitOmnibarWelcomePage().setRawStoredState(Toggle.State(remoteEnableState = true))
             testee.onDefaultBrowserSet()
 
@@ -275,6 +275,7 @@ class WelcomePageViewModelTest {
     @Test
     fun whenSplitAddressBarIsSelectedAndFeatureEnabledThenSetUserSetting() =
         runTest {
+            mockAndroidBrowserConfigFeature.splitOmnibar().setRawStoredState(Toggle.State(remoteEnableState = true))
             mockAndroidBrowserConfigFeature.splitOmnibarWelcomePage().setRawStoredState(Toggle.State(remoteEnableState = true))
             testee.onAddressBarPositionOptionSelected(OmnibarType.SPLIT)
             testee.onPrimaryCtaClicked(PreOnboardingDialogType.ADDRESS_BAR_POSITION)
@@ -285,6 +286,7 @@ class WelcomePageViewModelTest {
     @Test
     fun whenSplitAddressBarIsSelectedAndFeatureEnabledThenSendPixel() =
         runTest {
+            mockAndroidBrowserConfigFeature.splitOmnibar().setRawStoredState(Toggle.State(remoteEnableState = true))
             mockAndroidBrowserConfigFeature.splitOmnibarWelcomePage().setRawStoredState(Toggle.State(remoteEnableState = true))
             testee.onAddressBarPositionOptionSelected(OmnibarType.SPLIT)
             testee.onPrimaryCtaClicked(PreOnboardingDialogType.ADDRESS_BAR_POSITION)
@@ -295,7 +297,21 @@ class WelcomePageViewModelTest {
     @Test
     fun whenSplitAddressBarIsSelectedAndFeatureDisabledThenDoNotSetUserSetting() =
         runTest {
+            // When splitOmnibarWelcomePage is disabled, split option should not be available
+            mockAndroidBrowserConfigFeature.splitOmnibar().setRawStoredState(Toggle.State(remoteEnableState = true))
             mockAndroidBrowserConfigFeature.splitOmnibarWelcomePage().setRawStoredState(Toggle.State(remoteEnableState = false))
+            testee.onAddressBarPositionOptionSelected(OmnibarType.SPLIT)
+            testee.onPrimaryCtaClicked(PreOnboardingDialogType.ADDRESS_BAR_POSITION)
+
+            verify(mockSettingsDataStore, org.mockito.kotlin.never()).omnibarType = OmnibarType.SPLIT
+        }
+
+    @Test
+    fun whenSplitAddressBarIsSelectedAndMainFeatureDisabledThenDoNotSetUserSetting() =
+        runTest {
+            // When main splitOmnibar feature is disabled, split option should not be available
+            mockAndroidBrowserConfigFeature.splitOmnibar().setRawStoredState(Toggle.State(remoteEnableState = false))
+            mockAndroidBrowserConfigFeature.splitOmnibarWelcomePage().setRawStoredState(Toggle.State(remoteEnableState = true))
             testee.onAddressBarPositionOptionSelected(OmnibarType.SPLIT)
             testee.onPrimaryCtaClicked(PreOnboardingDialogType.ADDRESS_BAR_POSITION)
 

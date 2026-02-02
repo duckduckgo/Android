@@ -343,5 +343,6 @@ class WelcomePageViewModel @Inject constructor(
         }
 
     private fun isSplitOmnibarEnabled(): Boolean =
-        androidBrowserConfigFeature.splitOmnibarWelcomePage().isEnabled()
+        androidBrowserConfigFeature.splitOmnibar().isEnabled() &&
+            androidBrowserConfigFeature.splitOmnibarWelcomePage().isEnabled()
 }

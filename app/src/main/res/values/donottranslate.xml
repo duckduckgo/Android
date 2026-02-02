@@ -53,8 +53,11 @@
 
     <!-- Skip Onboarding (not user-facing) -->
     <string name="skipOnboarding">Skip Onboarding</string>"
-    <string name="highlightsPreOnboardingAddressBarOption3Title">Split</string>
-    <string name="highlightsPreOnboardingAddressBarOption3Description">More space</string>
+
+    <!-- Pre-onboarding Address Bar Position -->
+    <string name="preOnboardingAddressBarPositionTop">Top</string>
+    <string name="preOnboardingAddressBarPositionBottom">Bottom</string>
+    <string name="preOnboardingAddressBarPositionSplit">Split</string>
 
     <!-- Browser tab -->
     <string name="browserDuckPlayerShortUrl">Duck Player</string>
