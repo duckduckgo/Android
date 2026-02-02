@@ -223,9 +223,8 @@
 
                     <com.google.android.material.imageview.ShapeableImageView
                         android:id="@+id/duckAiContextualFavicon"
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
-                        android:padding="@dimen/keyline_2"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
                         android:layout_gravity="center"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
@@ -238,7 +237,6 @@
                         android:id="@+id/duckAiContextualPageTitle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:maxWidth="200dp"
                         tools:text="Wikipedia"
                         app:typography="body1_bold"
                         android:maxLines="1"
@@ -246,23 +244,12 @@
                         android:layout_marginStart="@dimen/keyline_2"
                         app:layout_constraintStart_toEndOf="@+id/duckAiContextualFavicon"
                         app:layout_constraintTop_toTopOf="@+id/duckAiContextualFavicon"
-                        app:layout_constraintBottom_toTopOf="@id/duckAiContextualPageLabel" />
-
-                    <com.duckduckgo.common.ui.view.text.DaxTextView
-                        android:id="@+id/duckAiContextualPageLabel"
-                        android:layout_width="100dp"
-                        android:layout_height="wrap_content"
-                        app:textType="secondary"
-                        android:text="@string/duckAIContextualPageContent"
-                        android:layout_marginStart="@dimen/keyline_2"
-                        app:layout_constraintStart_toEndOf="@+id/duckAiContextualFavicon"
-                        app:layout_constraintTop_toBottomOf="@id/duckAiContextualPageTitle"
-                        app:layout_constraintBottom_toBottomOf="@+id/duckAiContextualFavicon" />
+                        app:layout_constraintBottom_toBottomOf="@id/duckAiContextualFavicon" />
 
                     <ImageView
                         android:id="@+id/duckAiContextualPageRemove"
-                        android:layout_width="@dimen/toolbarIcon"
-                        android:layout_height="@dimen/toolbarIcon"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
                         android:layout_gravity="end"
                         android:background="@drawable/selectable_item_rounded_corner_background"
                         android:contentDescription="@string/browserMenuChatHistory"
@@ -277,25 +264,45 @@
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <androidx.constraintlayout.widget.ConstraintLayout
-                    android:layout_width="match_parent"
+                    android:id="@+id/duckAiAttachContextLayout"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal">
+                    android:padding="@dimen/keyline_2"
+                    android:layout_marginTop="@dimen/keyline_2"
+                    android:background="@drawable/background_dashed_outline">
 
-                    <ImageView
-                        android:id="@+id/duckAiContextualAddAttachment"
-                        android:layout_width="36dp"
-                        android:layout_height="36dp"
-                        android:layout_gravity="top"
-                        android:layout_margin="@dimen/keyline_1"
-                        android:background="@drawable/selectable_item_rounded_corner_background"
+                    <com.google.android.material.imageview.ShapeableImageView
+                        android:id="@+id/duckAiContextualAttachContextIcon"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_gravity="center"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
                         app:layout_constraintBottom_toBottomOf="parent"
-                        android:importantForAccessibility="no"
-                        android:scaleType="center"
-                        android:visibility="gone"
-                        app:srcCompat="@drawable/ic_attach_16"
-                        tools:visibility="visible" />
+                        android:src="@drawable/ic_page_content_attach_24"
+                        app:shapeAppearanceOverlay="@style/Widget.DuckDuckGo.DuckChatContextualFavicon"
+                        android:importantForAccessibility="no" />
+
+                    <com.duckduckgo.common.ui.view.text.DaxTextView
+                        android:id="@+id/duckAiContextualAttachContextLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:textType="secondary"
+                        android:text="@string/duckAIContextualAttachPageContent"
+                        android:paddingEnd="@dimen/keyline_2"
+                        android:layout_marginStart="@dimen/keyline_2"
+                        app:typography="body2_bold"
+                        app:layout_constraintStart_toEndOf="@+id/duckAiContextualAttachContextIcon"
+                        app:layout_constraintTop_toTopOf="@id/duckAiContextualAttachContextIcon"
+                        app:layout_constraintBottom_toBottomOf="@+id/duckAiContextualAttachContextIcon" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/duckAiContextualActions"
+                    android:orientation="horizontal">
 
                     <ImageView
                         android:id="@+id/duckAiContextualSend"
