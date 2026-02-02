@@ -122,7 +122,7 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
             val isLightMode = appTheme.isLightModeEnabled()
 
             // Configure top option
-            val topButton = InputScreenToggleButton.Top(
+            val topButton = OmnibarTypeToggleButton.Top(
                 isActive = selectedOption == OmnibarType.SINGLE_TOP,
                 isLightMode = isLightMode,
             )
@@ -130,7 +130,7 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
             binding.daxDialogCta.addressBarPosition.topOmnibarToggleCheck.setImageResource(topButton.checkRes)
 
             // Configure bottom option
-            val bottomButton = InputScreenToggleButton.Bottom(
+            val bottomButton = OmnibarTypeToggleButton.Bottom(
                 isActive = selectedOption == OmnibarType.SINGLE_BOTTOM,
                 isLightMode = isLightMode,
             )
@@ -138,7 +138,7 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
             binding.daxDialogCta.addressBarPosition.bottomOmnibarToggleCheck.setImageResource(bottomButton.checkRes)
 
             // Configure split option
-            val splitButton = InputScreenToggleButton.Split(
+            val splitButton = OmnibarTypeToggleButton.Split(
                 isActive = selectedOption == OmnibarType.SPLIT,
                 isLightMode = isLightMode,
             )
@@ -503,7 +503,7 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
         binding.daxDialogCta.duckAiInputScreenToggleWithAiCheck.setImageResource(withAiCheckRes)
     }
 
-    private sealed class InputScreenToggleButton(
+    private sealed class OmnibarTypeToggleButton(
         isActive: Boolean,
     ) {
         abstract val imageRes: Int
@@ -518,7 +518,7 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
         class Top(
             isActive: Boolean,
             isLightMode: Boolean,
-        ) : InputScreenToggleButton(isActive) {
+        ) : OmnibarTypeToggleButton(isActive) {
             override val imageRes: Int =
                 when {
                     isActive && isLightMode -> R.drawable.mobile_toolbar_top_selected_light
@@ -531,7 +531,7 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
         class Bottom(
             isActive: Boolean,
             isLightMode: Boolean,
-        ) : InputScreenToggleButton(isActive) {
+        ) : OmnibarTypeToggleButton(isActive) {
             override val imageRes: Int =
                 when {
                     isActive && isLightMode -> R.drawable.mobile_toolbar_bottom_selected_light
@@ -544,7 +544,7 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
         class Split(
             isActive: Boolean,
             isLightMode: Boolean,
-        ) : InputScreenToggleButton(isActive) {
+        ) : OmnibarTypeToggleButton(isActive) {
             override val imageRes: Int =
                 when {
                     isActive && isLightMode -> R.drawable.mobile_toolbar_split_selected_light
