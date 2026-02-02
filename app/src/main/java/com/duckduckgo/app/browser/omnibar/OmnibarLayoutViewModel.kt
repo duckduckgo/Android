@@ -326,7 +326,7 @@ class OmnibarLayoutViewModel @Inject constructor(
             if (isSetFavouriteEasterEggLogoFeatureEnabled && duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(currentUrl)) {
                 _viewState.update {
                     it.copy(
-                        leadingIconState = resolveLeadingIconState(
+                        leadingIconState = getLeadingIconState(
                             viewMode = it.viewMode,
                             hasFocus = it.hasFocus,
                             url = it.url,
@@ -337,7 +337,7 @@ class OmnibarLayoutViewModel @Inject constructor(
             } else if (favouriteSerpEasterEggLogoUrl != null) {
                 _viewState.update {
                     it.copy(
-                        leadingIconState = resolveLeadingIconState(
+                        leadingIconState = getLeadingIconState(
                             viewMode = it.viewMode,
                             hasFocus = it.hasFocus,
                             url = it.url,
@@ -498,20 +498,6 @@ class OmnibarLayoutViewModel @Inject constructor(
         viewMode: ViewMode,
         hasFocus: Boolean,
         url: String,
-        logoUrl: String?,
-    ): LeadingIconState {
-        return resolveLeadingIconState(
-            viewMode = viewMode,
-            hasFocus = hasFocus,
-            url = url,
-            serpLogoUrl = logoUrl,
-        )
-    }
-
-    private fun resolveLeadingIconState(
-        viewMode: ViewMode,
-        hasFocus: Boolean,
-        url: String,
         serpLogoUrl: String?,
     ): LeadingIconState {
         return when (viewMode) {
@@ -646,7 +632,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                                 viewMode = viewMode,
                                 hasFocus = hasFocus,
                                 url = _viewState.value.url,
-                                logoUrl = currentLogoUrl,
+                                serpLogoUrl = currentLogoUrl,
                             ),
                             scrollingEnabled = scrollingEnabled,
                             showVoiceSearch = shouldShowVoiceSearch(
@@ -871,14 +857,14 @@ class OmnibarLayoutViewModel @Inject constructor(
                             viewMode = _viewState.value.viewMode,
                             hasFocus = omnibarViewState.isEditing,
                             url = _viewState.value.url,
-                            logoUrl = omnibarViewState.serpLogo.logoUrl,
+                            serpLogoUrl = omnibarViewState.serpLogo.logoUrl,
                         )
 
                         SerpLogo.Normal -> getLeadingIconState(
                             viewMode = _viewState.value.viewMode,
                             hasFocus = omnibarViewState.isEditing,
                             url = _viewState.value.url,
-                            logoUrl = null,
+                            serpLogoUrl = null,
                         )
 
                         null -> {
@@ -892,7 +878,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                                     viewMode = _viewState.value.viewMode,
                                     hasFocus = omnibarViewState.isEditing,
                                     url = _viewState.value.url,
-                                    logoUrl = currentLogoUrl,
+                                    serpLogoUrl = currentLogoUrl,
                                 )
                             } else {
                                 // previous behaviour for null
@@ -900,7 +886,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                                     viewMode = _viewState.value.viewMode,
                                     hasFocus = omnibarViewState.isEditing,
                                     url = _viewState.value.url,
-                                    logoUrl = null,
+                                    serpLogoUrl = null,
                                 )
                             }
                         }
@@ -932,7 +918,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                     viewMode = _viewState.value.viewMode,
                     hasFocus = it.hasFocus,
                     url = loadingState.url,
-                    logoUrl = currentLogoUrl,
+                    serpLogoUrl = currentLogoUrl,
                 ),
                 showVoiceSearch = shouldShowVoiceSearch(
                     viewMode = _viewState.value.viewMode,
