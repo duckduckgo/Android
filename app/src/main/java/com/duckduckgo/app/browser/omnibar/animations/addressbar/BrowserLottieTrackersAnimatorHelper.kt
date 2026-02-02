@@ -427,11 +427,6 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
     private fun stopCookiesAnimation() {
         if (!::cookieViewBackground.isInitialized || !::cookieView.isInitialized) return
 
-        // If animation was already stopped, skip redundant cleanup
-        if (hasCookiesAnimationBeenCanceled) {
-            return
-        }
-
         // Set flag BEFORE canceling to prevent callbacks from continuing the old animation
         hasCookiesAnimationBeenCanceled = true
 
