@@ -217,7 +217,7 @@ class FeatureToggleInventoryActivity : DuckDuckGoActivity() {
                 toggle.setRawStoredState(state.copy(remoteEnableState = isChecked))
             } ?: toggle.setRawStoredState(State(remoteEnableState = isChecked))
 
-                val actualState = toggle.isEnabled()
+            val actualState = toggle.isEnabled()
             if (actualState != isChecked) {
                 // Force-enabled toggle: correct switch immediately since DiffUtil won't see a change
                 withContext(dispatcherProvider.main()) {
