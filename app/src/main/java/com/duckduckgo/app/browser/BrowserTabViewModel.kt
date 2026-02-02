@@ -1524,13 +1524,6 @@ class BrowserTabViewModel @Inject constructor(
             return true
         }
 
-        if (site?.url.equals(ABOUT_BLANK, ignoreCase = true) && handleAboutBlankEnabled) {
-            viewModelScope.launch {
-                removeCurrentTabFromRepository()
-            }
-            return true
-        }
-
         val navigation = webNavigationState ?: return false
 
         if (currentFindInPageViewState().visible) {
@@ -3922,7 +3915,7 @@ class BrowserTabViewModel @Inject constructor(
                 omnibarText = ABOUT_BLANK,
             )
             site = siteFactory.buildSite(
-                url = ABOUT_BLANK,
+                url = "",
                 tabId = tabId,
                 title = ABOUT_BLANK,
                 httpUpgraded = httpsUpgraded,

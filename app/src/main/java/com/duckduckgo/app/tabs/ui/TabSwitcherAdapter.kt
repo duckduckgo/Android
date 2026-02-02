@@ -382,7 +382,7 @@ class TabSwitcherAdapter(
         }
 
         val previewFile = tab.tabPreviewFile
-        if (tab.url.isNullOrBlank()) {
+        if (tab.url.isNullOrBlank() && !tab.isAboutBlank) {
             glide.load(AndroidR.drawable.ic_dax_icon_72)
                 .into(tabPreview)
         } else if (previewFile != null) {
