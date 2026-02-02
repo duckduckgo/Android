@@ -16,6 +16,11 @@
 
 package com.duckduckgo.remote.messaging.impl
 
+import com.duckduckgo.remote.messaging.api.Action
+import com.duckduckgo.remote.messaging.api.CardItem
+import com.duckduckgo.remote.messaging.api.CardItemType
+import com.duckduckgo.remote.messaging.api.Content
+import com.duckduckgo.remote.messaging.api.JsonMessageAction
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.api.Surface.NEW_TAB_PAGE
 import com.duckduckgo.remote.messaging.fixtures.JsonRemoteMessageOM.aJsonMessage
@@ -42,6 +47,7 @@ import com.duckduckgo.remote.messaging.fixtures.RemoteMessageOM.translatedListIt
 import com.duckduckgo.remote.messaging.fixtures.messageActionPlugins
 import com.duckduckgo.remote.messaging.impl.mappers.mapToRemoteMessage
 import com.duckduckgo.remote.messaging.impl.models.JsonContentTranslations
+import com.duckduckgo.remote.messaging.impl.models.JsonListItem
 import com.duckduckgo.remote.messaging.impl.models.JsonListItemTranslation
 import com.duckduckgo.remote.messaging.impl.models.JsonRemoteMessage
 import org.junit.Assert.assertEquals
@@ -263,8 +269,10 @@ class JsonRemoteMessageMapperTest(private val testCase: TestCase) {
                             listItems = translatedListItems(
                                 item1TitleText = "Titre de l'élément 1",
                                 item1DescriptionText = "Description de l'élément 1",
+                                item1PrimaryActionText = "Action de l'élément 1",
                                 item2TitleText = "Titre de l'élément 2",
                                 item2DescriptionText = "Description de l'élément 2",
+                                item2PrimaryActionText = "Action de l'élément 2",
                             ),
                         ),
                         surfaces = listOf(NEW_TAB_PAGE),
@@ -303,6 +311,82 @@ class JsonRemoteMessageMapperTest(private val testCase: TestCase) {
                     ),
                 ),
             ),
+            TestCase(
+                listOf(
+                    aJsonMessage(
+                        id = "id1",
+                        content = cardsListJsonContent(
+                            listItems = listOf(
+                                JsonListItem(
+                                    id = "item1",
+                                    type = "featured_two_line_single_action_list_item",
+                                    titleText = "Item Title 1",
+                                    descriptionText = "Item Description 1",
+                                    placeholder = "ImageAI",
+                                    primaryAction = JsonMessageAction(type = "url", value = "http://example.com", additionalParameters = null),
+                                    primaryActionText = "Action 1",
+                                ),
+                                JsonListItem(
+                                    id = "section1",
+                                    type = "section_title",
+                                    titleText = "Section Title",
+                                    descriptionText = null,
+                                    placeholder = null,
+                                    primaryAction = null,
+                                    itemIDs = listOf("item1", "item2"),
+                                ),
+                                JsonListItem(
+                                    id = "item2",
+                                    type = "two_line_list_item",
+                                    titleText = "Item Title 2",
+                                    descriptionText = "Item Description 2",
+                                    placeholder = "Radar",
+                                    primaryAction = JsonMessageAction(type = "url", value = "http://example.com", additionalParameters = null),
+                                    primaryActionText = "Action 2",
+                                ),
+                            ),
+                        ),
+                    ),
+                ),
+                listOf(
+                    aCardsListMessage(
+                        id = "id1",
+                        cardsListContent(
+                            listItems = listOf(
+                                CardItem.ListItem(
+                                    id = "item1",
+                                    type = CardItemType.FEATURED_TWO_LINE_SINGLE_ACTION_LIST_ITEM,
+                                    titleText = "Item Title 1",
+                                    descriptionText = "Item Description 1",
+                                    placeholder = Content.Placeholder.IMAGE_AI,
+                                    primaryAction = Action.Url(value = "http://example.com"),
+                                    primaryActionText = "Action 1",
+                                    matchingRules = emptyList(),
+                                    exclusionRules = emptyList(),
+                                ),
+                                CardItem.SectionTitle(
+                                    id = "section1",
+                                    type = CardItemType.LIST_SECTION_TITLE,
+                                    titleText = "Section Title",
+                                    itemIDs = listOf("item1", "item2"),
+                                ),
+                                CardItem.ListItem(
+                                    id = "item2",
+                                    type = CardItemType.TWO_LINE_LIST_ITEM,
+                                    titleText = "Item Title 2",
+                                    descriptionText = "Item Description 2",
+                                    placeholder = Content.Placeholder.RADAR,
+                                    primaryAction = Action.Url(value = "http://example.com"),
+                                    primaryActionText = "Action 2",
+                                    matchingRules = emptyList(),
+                                    exclusionRules = emptyList(),
+                                ),
+                            ),
+                        ),
+                        surfaces = listOf(NEW_TAB_PAGE),
+                    ),
+                ),
+            ),
         )
 
         private fun frenchTranslations() = JsonContentTranslations(
@@ -323,10 +407,12 @@ class JsonRemoteMessageMapperTest(private val testCase: TestCase) {
                 "item1" to JsonListItemTranslation(
                     titleText = "Titre de l'élément 1",
                     descriptionText = "Description de l'élément 1",
+                    primaryActionText = "Action de l'élément 1",
                 ),
                 "item2" to JsonListItemTranslation(
                     titleText = "Titre de l'élément 2",
                     descriptionText = "Description de l'élément 2",
+                    primaryActionText = "Action de l'élément 2",
                 ),
             ),
         )

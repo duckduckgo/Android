@@ -28,8 +28,8 @@ data class JsonRemoteMessagingConfig(
 data class JsonRemoteMessage(
     val id: String,
     val content: JsonContent?,
-    val exclusionRules: List<Int>,
-    val matchingRules: List<Int>,
+    val exclusionRules: List<Int>?,
+    val matchingRules: List<Int>?,
     val translations: Map<String, JsonContentTranslations>,
     val surfaces: List<String>?,
 )
@@ -61,7 +61,8 @@ data class JsonContentTranslations(
 
 data class JsonListItemTranslation(
     val titleText: String = "",
-    val descriptionText: String = "",
+    val descriptionText: String? = "",
+    val primaryActionText: String? = "",
 )
 
 data class JsonMatchingRule(
@@ -78,11 +79,13 @@ data class JsonListItem(
     val id: String,
     val type: String,
     val titleText: String,
-    val descriptionText: String,
-    val placeholder: String = "",
+    val descriptionText: String?,
+    val placeholder: String? = "",
     val primaryAction: JsonMessageAction?,
-    val matchingRules: List<Int> = emptyList(),
-    val exclusionRules: List<Int> = emptyList(),
+    val primaryActionText: String? = "",
+    val matchingRules: List<Int>? = emptyList(),
+    val exclusionRules: List<Int>? = emptyList(),
+    val itemIDs: List<String>? = emptyList(),
 )
 
 @Suppress("ktlint:standard:class-naming")

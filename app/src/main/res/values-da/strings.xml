@@ -924,11 +924,16 @@
     <string name="settingsHeadingCompleteSetup">Færdiggør opsætningen</string>
 
     <!--TabSwitcher Trackers Animation-->
-    <string name="showTrackerCountInTabSwitcher">Vis tracker-antal i faneomskifteren</string>
+    <string name="trackerBlockedInTheLast7days" instruction="Placeholder is 1 tracker blocked">&lt;b&gt;%1$s tracker blokeret &lt;/b&gt; inden for de seneste 7 dage</string>
     <string name="tabSwitcherAnimationTileRemovalDialogTitle" instruction="A title for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Skjul tracker-antallet?</string>
     <string name="tabSwitcherAnimationTileRemovalDialogBody" instruction="A message for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Du kan slå det til igen i Indstillinger &gt; Udseende.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Skjul</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Behold</string>
+
+    <!-- Trackers blocked animation-->
+    <string name="settingsTrackersBlockedAnimationHeaderTitle">Animation af blokerede trackere</string>
+    <string name="showTrackerCountInAddressBar">Vis i adresselinjen</string>
+    <string name="showWeeklyTrackerCountInTabSwitcher">Vis i håndtering af faner</string>
 
     <!-- Widgets -->
     <string name="searchOnlyWidgetLabel" instruction="Label for the search-only widget">Kun søgning</string>

@@ -132,7 +132,7 @@ class CardsListRemoteMessageViewModel @Inject constructor(
         )
     }
 
-    override fun onItemClicked(item: CardItem) {
+    override fun onItemClicked(item: CardItem.ListItem) {
         viewModelScope.launch {
             val message = lastRemoteMessageSeen ?: return@launch
             val action = item.primaryAction

@@ -34,20 +34,20 @@ import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.HomeBackgroundLogo
-import com.duckduckgo.app.browser.databinding.ViewNewTabLegacyBinding
+import com.duckduckgo.app.browser.databinding.ViewNewTabBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
-import com.duckduckgo.app.browser.newtab.NewTabLegacyPageViewModel.Command
-import com.duckduckgo.app.browser.newtab.NewTabLegacyPageViewModel.Command.DismissMessage
-import com.duckduckgo.app.browser.newtab.NewTabLegacyPageViewModel.Command.LaunchAppTPOnboarding
-import com.duckduckgo.app.browser.newtab.NewTabLegacyPageViewModel.Command.LaunchDefaultBrowser
-import com.duckduckgo.app.browser.newtab.NewTabLegacyPageViewModel.Command.LaunchDefaultCredentialProvider
-import com.duckduckgo.app.browser.newtab.NewTabLegacyPageViewModel.Command.LaunchPlayStore
-import com.duckduckgo.app.browser.newtab.NewTabLegacyPageViewModel.Command.LaunchScreen
-import com.duckduckgo.app.browser.newtab.NewTabLegacyPageViewModel.Command.SharePromoLinkRMF
-import com.duckduckgo.app.browser.newtab.NewTabLegacyPageViewModel.Command.SubmitUrl
-import com.duckduckgo.app.browser.newtab.NewTabLegacyPageViewModel.NewTabLegacyPageViewModelFactory
-import com.duckduckgo.app.browser.newtab.NewTabLegacyPageViewModel.NewTabLegacyPageViewModelProviderFactory
-import com.duckduckgo.app.browser.newtab.NewTabLegacyPageViewModel.ViewState
+import com.duckduckgo.app.browser.newtab.NewTabPageViewModel.Command
+import com.duckduckgo.app.browser.newtab.NewTabPageViewModel.Command.DismissMessage
+import com.duckduckgo.app.browser.newtab.NewTabPageViewModel.Command.LaunchAppTPOnboarding
+import com.duckduckgo.app.browser.newtab.NewTabPageViewModel.Command.LaunchDefaultBrowser
+import com.duckduckgo.app.browser.newtab.NewTabPageViewModel.Command.LaunchDefaultCredentialProvider
+import com.duckduckgo.app.browser.newtab.NewTabPageViewModel.Command.LaunchPlayStore
+import com.duckduckgo.app.browser.newtab.NewTabPageViewModel.Command.LaunchScreen
+import com.duckduckgo.app.browser.newtab.NewTabPageViewModel.Command.SharePromoLinkRMF
+import com.duckduckgo.app.browser.newtab.NewTabPageViewModel.Command.SubmitUrl
+import com.duckduckgo.app.browser.newtab.NewTabPageViewModel.NewTabPageViewModelFactory
+import com.duckduckgo.app.browser.newtab.NewTabPageViewModel.NewTabPageViewModelProviderFactory
+import com.duckduckgo.app.browser.newtab.NewTabPageViewModel.ViewState
 import com.duckduckgo.app.browser.remotemessage.SharePromoLinkRMFBroadCastReceiver
 import com.duckduckgo.app.browser.remotemessage.asMessage
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
@@ -75,7 +75,7 @@ import logcat.logcat
 import javax.inject.Inject
 
 @InjectWith(ViewScope::class)
-class NewTabLegacyPageView @JvmOverloads constructor(
+class NewTabPageView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
@@ -104,16 +104,16 @@ class NewTabLegacyPageView @JvmOverloads constructor(
     @Inject
     lateinit var appBuildConfig: AppBuildConfig
 
-    private val binding: ViewNewTabLegacyBinding by viewBinding()
+    private val binding: ViewNewTabBinding by viewBinding()
 
     private val homeBackgroundLogo by lazy { HomeBackgroundLogo(binding.ddgLogo) }
 
     @Inject
-    lateinit var viewModelFactory: NewTabLegacyPageViewModelFactory
+    lateinit var viewModelFactory: NewTabPageViewModelFactory
 
-    private val viewModel: NewTabLegacyPageViewModel by lazy {
-        val providerFactory = NewTabLegacyPageViewModelProviderFactory(viewModelFactory, showDaxLogo = showLogo)
-        ViewModelProvider(owner = findViewTreeViewModelStoreOwner()!!, factory = providerFactory)[NewTabLegacyPageViewModel::class.java]
+    private val viewModel: NewTabPageViewModel by lazy {
+        val providerFactory = NewTabPageViewModelProviderFactory(viewModelFactory, showDaxLogo = showLogo)
+        ViewModelProvider(owner = findViewTreeViewModelStoreOwner()!!, factory = providerFactory)[NewTabPageViewModel::class.java]
     }
 
     private val conflatedStateJob = ConflatedJob()

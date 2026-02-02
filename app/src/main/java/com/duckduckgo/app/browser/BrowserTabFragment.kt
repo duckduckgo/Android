@@ -80,6 +80,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.commitNow
 import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.transaction
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
@@ -141,7 +142,6 @@ import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.navigation.bar.BrowserNavigationBarViewIntegration
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarObserver
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView
-import com.duckduckgo.app.browser.newtab.NewTabPageProvider
 import com.duckduckgo.app.browser.omnibar.Omnibar
 import com.duckduckgo.app.browser.omnibar.Omnibar.FindInPageListener
 import com.duckduckgo.app.browser.omnibar.Omnibar.ItemPressedListener
@@ -149,6 +149,7 @@ import com.duckduckgo.app.browser.omnibar.Omnibar.LogoClickListener
 import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarTextState
 import com.duckduckgo.app.browser.omnibar.Omnibar.TextListener
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
+import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.*
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.browser.omnibar.QueryOrigin
 import com.duckduckgo.app.browser.print.PrintDocumentAdapterFactory
@@ -177,6 +178,7 @@ import com.duckduckgo.app.browser.viewstate.SavedSiteChangedViewState
 import com.duckduckgo.app.browser.webauthn.WebViewPasskeyInitializer
 import com.duckduckgo.app.browser.webshare.WebShareChooser
 import com.duckduckgo.app.browser.webshare.WebViewCompatWebShareChooser
+import com.duckduckgo.app.browser.webview.ClipboardImageInjector
 import com.duckduckgo.app.browser.webview.WebContentDebugging
 import com.duckduckgo.app.browser.webview.WebViewBlobDownloadFeature
 import com.duckduckgo.app.cta.ui.BrokenSitePromptDialogCta
@@ -200,7 +202,9 @@ import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.app.tabs.ui.GridViewColumnCalculator
 import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
 import com.duckduckgo.app.widget.AddWidgetLauncher
@@ -297,10 +301,11 @@ import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityParams
 import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityResultCodes
 import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityResultParams
 import com.duckduckgo.duckchat.api.inputscreen.InputScreenBrowserButtonsConfig
+import com.duckduckgo.duckchat.impl.contextual.DuckChatContextualFragment
+import com.duckduckgo.duckchat.impl.contextual.DuckChatContextualFragment.Companion.KEY_DUCK_AI_CONTEXTUAL_RESULT
+import com.duckduckgo.duckchat.impl.contextual.DuckChatContextualFragment.Companion.KEY_DUCK_AI_URL
+import com.duckduckgo.duckchat.impl.contextual.DuckChatContextualSharedViewModel
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
-import com.duckduckgo.duckchat.impl.ui.DuckChatContextualFragment
-import com.duckduckgo.duckchat.impl.ui.DuckChatContextualFragment.Companion.KEY_DUCK_AI_CONTEXTUAL_RESULT
-import com.duckduckgo.duckchat.impl.ui.DuckChatContextualFragment.Companion.KEY_DUCK_AI_URL
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayerSettingsNoParams
 import com.duckduckgo.js.messaging.api.JsCallbackData
@@ -312,6 +317,7 @@ import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreen
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.DeeplinkActivityParams
 import com.duckduckgo.networkprotection.api.NetworkProtectionScreens.NetworkProtectionManagementScreenNoParams
+import com.duckduckgo.newtabpage.api.NewTabPageProvider
 import com.duckduckgo.privacy.dashboard.api.ui.DashboardOpener
 import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreenParams.BrokenSiteForm
 import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreenParams.BrokenSiteForm.BrokenSiteFormReportFlow
@@ -427,6 +433,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var blobConverterInjector: BlobConverterInjector
+
+    @Inject
+    lateinit var clipboardImageInjector: ClipboardImageInjector
 
     @Inject
     lateinit var bookmarkAddedConfirmationDialogFactory: BookmarkAddedConfirmationDialogFactory
@@ -644,6 +653,8 @@ class BrowserTabFragment :
         viewModel.loadData(tabId, initialUrl, skipHome, isLaunchedFromExternalApp)
         viewModel
     }
+
+    private val sharedContextualViewModel: DuckChatContextualSharedViewModel by viewModels()
 
     private val binding: FragmentBrowserTabBinding by viewBinding()
 
@@ -1377,13 +1388,7 @@ class BrowserTabFragment :
     private fun launchBrowserMenu(addExtraDelay: Boolean = false) {
         val useBottomSheetMenu = viewModel.browserViewState.value?.useBottomSheetMenu ?: false
         if (useBottomSheetMenu && bottomSheetMenu != null) {
-            val delay = if (addExtraDelay) POPUP_MENU_DELAY * 2 else POPUP_MENU_DELAY
-            // small delay added to let keyboard disappear and avoid jarring transition
-            binding.rootView.postDelayed(delay) {
-                if (isAdded) {
-                    bottomSheetMenu?.show()
-                }
-            }
+            launchBottomSheetMenu(addExtraDelay)
         } else if (!useBottomSheetMenu && popupMenu != null) {
             val isSplitOmnibarEnabled = omnibarRepository.omnibarType == OmnibarType.SPLIT
             launchPopupMenu(anchorToNavigationBar = isSplitOmnibarEnabled, addExtraDelay = addExtraDelay)
@@ -1505,7 +1510,17 @@ class BrowserTabFragment :
     }
 
     private fun createBottomSheetMenu() {
-        bottomSheetMenu = BrowserMenuBottomSheet(context = requireContext())
+        bottomSheetMenu = BrowserMenuBottomSheet(
+            context = requireContext(),
+            onDismissListener = {
+                pixel.fire(AppPixelName.EXPERIMENTAL_MENU_DISMISSED)
+            },
+            onMenuItemClickListener = {
+                pixel.fire(AppPixelName.EXPERIMENTAL_MENU_USED, type = Daily())
+                pixel.fire(AppPixelName.EXPERIMENTAL_MENU_USED, type = Unique())
+                pixel.fire(AppPixelName.EXPERIMENTAL_MENU_USED, type = Count)
+            },
+        )
         bottomSheetMenu?.apply {
             onMenuItemClicked(backMenuItem) {
                 onBackArrowClicked()
@@ -1597,7 +1612,11 @@ class BrowserTabFragment :
                     it.hideKeyboard()
                     it.clearFocus()
                 }
-                viewModel.onDuckChatMenuClicked()
+                if (duckAiFeatureState.showFullScreenMode.value) {
+                    viewModel.openNewDuckChat(omnibar.viewMode)
+                } else {
+                    viewModel.onDuckChatMenuClicked()
+                }
             }
             onMenuItemClicked(duckChatHistoryMenuItem) {
                 pixel.fire(DuckChatPixelName.DUCK_CHAT_SETTINGS_SIDEBAR_TAPPED)
@@ -1633,6 +1652,31 @@ class BrowserTabFragment :
             startActivity(intent)
         } else {
             showToast(R.string.unableToOpenLink)
+        }
+    }
+
+    private fun launchBottomSheetMenu(addExtraDelay: Boolean) {
+        val delay = if (addExtraDelay) POPUP_MENU_DELAY * 2 else POPUP_MENU_DELAY
+        // small delay added to let keyboard disappear and avoid jarring transition
+        binding.rootView.postDelayed(delay) {
+            if (isAdded) {
+                bottomSheetMenu?.show()
+                if (bottomSheetMenu?.isShowing != true) {
+                    return@postDelayed
+                }
+                val viewState = viewModel.browserViewState.value
+                if (isActiveCustomTab()) {
+                    pixel.fire(AppPixelName.EXPERIMENTAL_MENU_DISPLAYED_CUSTOMTABS)
+                } else if (omnibar.viewMode == ViewMode.DuckAI) {
+                    pixel.fire(AppPixelName.EXPERIMENTAL_MENU_DISPLAYED_AICHAT)
+                } else if (omnibar.viewMode == ViewMode.NewTab) {
+                    pixel.fire(AppPixelName.EXPERIMENTAL_MENU_DISPLAYED_NTP)
+                } else if (viewState != null && (viewState.sslError != NONE || viewState.browserError != OMITTED)) {
+                    pixel.fire(AppPixelName.EXPERIMENTAL_MENU_DISPLAYED_ERROR)
+                } else {
+                    pixel.fire(AppPixelName.EXPERIMENTAL_MENU_DISPLAYED)
+                }
+            }
         }
     }
 
@@ -2563,9 +2607,14 @@ class BrowserTabFragment :
             is Command.PageStarted -> onPageStarted()
             is Command.EnableDuckAIFullScreen -> showDuckAI(it.browserViewState)
             is Command.DisableDuckAIFullScreen -> omnibar.setViewMode(ViewMode.Browser(it.url))
-            is Command.ShowDuckAIContextualMode -> showDuckChatContextualSheet()
+            is Command.ShowDuckAIContextualMode -> showDuckChatContextualSheet(it.tabId)
+            is Command.ShowDuckAIContextualOnboarding -> showDuckAiContextualOnboarding()
+            is Command.DisableDuckAIFullScreen -> omnibar.setViewMode(Browser(it.url))
             is Command.StartAddressBarTrackersAnimation -> {
                 omnibar.startTrackersAnimation(it.trackerEntities)
+            }
+            is Command.PageContextReceived -> {
+                sharedContextualViewModel.onPageContextReceived(it.tabId, it.pageContext)
             }
         }
     }
@@ -3287,13 +3336,17 @@ class BrowserTabFragment :
         )
     }
 
-    private fun showDuckChatContextualSheet() {
+    private fun showDuckChatContextualSheet(tabId: String) {
         duckAiContextualFragment?.let { fragment ->
             val transaction = childFragmentManager.beginTransaction()
             transaction.show(fragment)
             transaction.commit()
         } ?: run {
             val fragment = DuckChatContextualFragment()
+            val args = Bundle()
+            args.putString(DuckChatContextualFragment.KEY_DUCK_AI_CONTEXTUAL_TAB_ID, tabId)
+            fragment.arguments = args
+
             duckAiContextualFragment = fragment
             val transaction = childFragmentManager.beginTransaction()
             transaction.replace(binding.duckAiContextualFragmentContainer.id, fragment)
@@ -3303,7 +3356,7 @@ class BrowserTabFragment :
         childFragmentManager.setFragmentResultListener(KEY_DUCK_AI_CONTEXTUAL_RESULT, viewLifecycleOwner) { _, bundle ->
             val contextualChatUrl = bundle.getString(KEY_DUCK_AI_URL)
             contextualChatUrl?.let {
-                webView?.loadUrl(contextualChatUrl)
+                viewModel.onUserSubmittedQuery(contextualChatUrl)
                 removeDuckChatContextualSheet()
             }
         }
@@ -3325,6 +3378,14 @@ class BrowserTabFragment :
             }
             override fun onSlide(bottomSheet: View, slideOffset: Float) {}
         })
+    }
+
+    private fun showDuckAiContextualOnboarding() {
+        duckChat.showContextualOnboarding(
+            requireContext(),
+        ) {
+            showDuckChatContextualSheet(tabId)
+        }
     }
 
     private fun removeDuckChatContextualSheet() {
@@ -3509,6 +3570,7 @@ class BrowserTabFragment :
                 onInContextEmailProtectionSignupPromptShown = { showNativeInContextEmailProtectionSignupPrompt() },
             )
             configureWebViewForBlobDownload(it)
+            configureWebViewForClipboard(it)
             lifecycleScope.launch {
                 webViewCompatTestHelper.configureWebViewForWebViewCompatTest(
                     it,
@@ -3723,6 +3785,12 @@ class BrowserTabFragment :
         withContext(dispatchers.io()) { webViewBlobDownloadFeature.self().isEnabled() } &&
             webViewCapabilityChecker.isSupported(WebViewCapability.WebMessageListener) &&
             webViewCapabilityChecker.isSupported(WebViewCapability.DocumentStartJavaScript)
+
+    private fun configureWebViewForClipboard(webView: DuckDuckGoWebView) {
+        lifecycleScope.launch(dispatchers.main()) {
+            clipboardImageInjector.configureWebViewForClipboard(webView)
+        }
+    }
 
     private fun configureWebViewForAutofill(it: DuckDuckGoWebView) {
         it.setSystemAutofillCallback {

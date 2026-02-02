@@ -903,7 +903,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                                 Command.StartTrackersAnimation(
                                     entities = decoration.entities,
                                     isCustomTab = viewState.value.viewMode is CustomTab,
-                                    isAddressBarTrackersAnimationEnabled = addressBarTrackersAnimationManager.isFeatureEnabled(),
+                                    isAddressBarTrackersAnimationEnabled = viewState.value.isAddressBarTrackersAnimationEnabled,
                                 ),
                             )
                         }

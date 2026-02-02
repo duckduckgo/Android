@@ -84,21 +84,21 @@ appId: com.duckduckgo.mobile.android
       id: "focusedFavourites"
 
 # verify that typing shows autocomplete again
-- inputText: "amazo"
+- inputText: "wiki"
 - assertVisible:
     id: "autoCompleteSuggestionsList"
 - assertVisible:
-    text: "amazon.com"
+    text: "wikipedia.org"
 
 # verify that tapping on a suggestion opens the web page
 - tapOn:
-    text: "amazon.com"
+    text: "wikipedia.org"
 - assertNotVisible:
     id: "inputModeWidget"
 - assertVisible:
     id: "browserLayout"
 - assertVisible:
-    text: ".*amazon.com.*"
+    text: ".*wikipedia.org.*"
     childOf:
       id: "omnibarTextInput"
 

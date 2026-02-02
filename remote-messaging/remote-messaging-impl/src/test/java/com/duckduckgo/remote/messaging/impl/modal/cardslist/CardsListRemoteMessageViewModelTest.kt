@@ -99,7 +99,7 @@ class CardsListRemoteMessageViewModelTest {
             descriptionText = "Description",
             placeholder = Content.Placeholder.DDG_ANNOUNCE,
             listItems = listOf(
-                CardItem(
+                CardItem.ListItem(
                     id = "id",
                     type = CardItemType.TWO_LINE_LIST_ITEM,
                     placeholder = Content.Placeholder.CRITICAL_UPDATE,
@@ -146,7 +146,7 @@ class CardsListRemoteMessageViewModelTest {
             descriptionText = "Description",
             placeholder = Content.Placeholder.DDG_ANNOUNCE,
             listItems = listOf(
-                CardItem(
+                CardItem.ListItem(
                     id = "id",
                     type = CardItemType.TWO_LINE_LIST_ITEM,
                     placeholder = Content.Placeholder.CRITICAL_UPDATE,
@@ -237,7 +237,7 @@ class CardsListRemoteMessageViewModelTest {
     @Test
     fun whenOnMessageShownWithValidMessageThenPixelsFiredForAllItems() = runTest {
         val messageId = "message-123"
-        val cardItem1 = CardItem(
+        val cardItem1 = CardItem.ListItem(
             id = "item1",
             type = CardItemType.TWO_LINE_LIST_ITEM,
             placeholder = Content.Placeholder.DDG_ANNOUNCE,
@@ -247,7 +247,7 @@ class CardsListRemoteMessageViewModelTest {
             matchingRules = emptyList(),
             exclusionRules = emptyList(),
         )
-        val cardItem2 = CardItem(
+        val cardItem2 = CardItem.ListItem(
             id = "item2",
             type = CardItemType.TWO_LINE_LIST_ITEM,
             placeholder = Content.Placeholder.CRITICAL_UPDATE,
@@ -381,7 +381,7 @@ class CardsListRemoteMessageViewModelTest {
     @Test
     fun whenOnItemClickedWithNullMessageThenCommandEmittedButNoPixel() = runTest {
         val itemAction = Action.PlayStore("com.example.app")
-        val cardItem = CardItem(
+        val cardItem = CardItem.ListItem(
             id = "id",
             titleText = "Test Card",
             descriptionText = "Description",
@@ -407,7 +407,7 @@ class CardsListRemoteMessageViewModelTest {
     fun whenOnItemClickedWithValidMessageThenCommandEmittedAndPixelFired() = runTest {
         val messageId = "message-123"
         val itemAction = Action.PlayStore("com.example.app")
-        val cardItem = CardItem(
+        val cardItem = CardItem.ListItem(
             id = "item1",
             titleText = "Test Card",
             descriptionText = "Description",
@@ -456,7 +456,7 @@ class CardsListRemoteMessageViewModelTest {
         val messageId = "message-123"
         val itemAction1 = Action.Url("https://example1.com")
         val itemAction2 = Action.Url("https://example2.com")
-        val cardItem1 = CardItem(
+        val cardItem1 = CardItem.ListItem(
             id = "id1",
             titleText = "Card 1",
             descriptionText = "Description 1",
@@ -466,7 +466,7 @@ class CardsListRemoteMessageViewModelTest {
             matchingRules = emptyList(),
             exclusionRules = emptyList(),
         )
-        val cardItem2 = CardItem(
+        val cardItem2 = CardItem.ListItem(
             id = "id2",
             titleText = "Card 2",
             descriptionText = "Description 2",
@@ -517,7 +517,7 @@ class CardsListRemoteMessageViewModelTest {
     fun whenCommandActionMapperCalledThenVerifyCorrectActionPassed() = runTest {
         val messageId = "message-123"
         val action = Action.DefaultBrowser
-        val cardItem = CardItem(
+        val cardItem = CardItem.ListItem(
             id = "id",
             titleText = "Set Default Browser",
             descriptionText = "Make DDG your default",

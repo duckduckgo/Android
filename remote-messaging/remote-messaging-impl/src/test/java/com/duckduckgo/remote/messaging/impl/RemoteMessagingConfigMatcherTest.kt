@@ -443,7 +443,7 @@ class RemoteMessagingConfigMatcherTest {
 
     @Test
     fun whenCardsListMessageWithNoRulesAndCardItemsWithNoRulesThenReturnsMessageWithAllItems() = runBlocking {
-        val cardItem1 = CardItem(
+        val cardItem1 = CardItem.ListItem(
             id = "item1",
             type = CardItemType.TWO_LINE_LIST_ITEM,
             titleText = "Card 1",
@@ -453,7 +453,7 @@ class RemoteMessagingConfigMatcherTest {
             matchingRules = emptyList(),
             exclusionRules = emptyList(),
         )
-        val cardItem2 = CardItem(
+        val cardItem2 = CardItem.ListItem(
             id = "item2",
             type = CardItemType.TWO_LINE_LIST_ITEM,
             titleText = "Card 2",
@@ -479,7 +479,7 @@ class RemoteMessagingConfigMatcherTest {
     @Test
     fun whenCardsListMessageWithSomeCardItemsPassingRulesThenReturnsFilteredMessage() = runBlocking {
         givenDeviceMatches(Api(max = 19))
-        val passingItem = CardItem(
+        val passingItem = CardItem.ListItem(
             id = "passing",
             type = CardItemType.TWO_LINE_LIST_ITEM,
             titleText = "Passing Card",
@@ -489,7 +489,7 @@ class RemoteMessagingConfigMatcherTest {
             matchingRules = rules(1),
             exclusionRules = emptyList(),
         )
-        val failingItem1 = CardItem(
+        val failingItem1 = CardItem.ListItem(
             id = "failing1",
             type = CardItemType.TWO_LINE_LIST_ITEM,
             titleText = "Failing Card 1",
@@ -499,7 +499,7 @@ class RemoteMessagingConfigMatcherTest {
             matchingRules = rules(2),
             exclusionRules = emptyList(),
         )
-        val failingItem2 = CardItem(
+        val failingItem2 = CardItem.ListItem(
             id = "failing2",
             type = CardItemType.TWO_LINE_LIST_ITEM,
             titleText = "Failing Card 2",
@@ -529,7 +529,7 @@ class RemoteMessagingConfigMatcherTest {
     @Test
     fun whenCardsListMessageWithAllCardItemsFailingRulesThenReturnsNull() = runBlocking {
         givenDeviceMatches(Api(max = 19))
-        val failingItem1 = CardItem(
+        val failingItem1 = CardItem.ListItem(
             id = "failing1",
             type = CardItemType.TWO_LINE_LIST_ITEM,
             titleText = "Failing Card 1",
@@ -539,7 +539,7 @@ class RemoteMessagingConfigMatcherTest {
             matchingRules = rules(1),
             exclusionRules = emptyList(),
         )
-        val failingItem2 = CardItem(
+        val failingItem2 = CardItem.ListItem(
             id = "failing2",
             type = CardItemType.TWO_LINE_LIST_ITEM,
             titleText = "Failing Card 2",
@@ -567,7 +567,7 @@ class RemoteMessagingConfigMatcherTest {
     @Test
     fun whenCardsListMessageWithCardItemsWithNoRulesThenReturnsAllItems() = runBlocking {
         givenDeviceMatches(Api(max = 19))
-        val cardItem1 = CardItem(
+        val cardItem1 = CardItem.ListItem(
             id = "item1",
             type = CardItemType.TWO_LINE_LIST_ITEM,
             titleText = "Card 1",
@@ -577,7 +577,7 @@ class RemoteMessagingConfigMatcherTest {
             matchingRules = emptyList(),
             exclusionRules = emptyList(),
         )
-        val cardItem2 = CardItem(
+        val cardItem2 = CardItem.ListItem(
             id = "item2",
             type = CardItemType.TWO_LINE_LIST_ITEM,
             titleText = "Card 2",
@@ -605,7 +605,7 @@ class RemoteMessagingConfigMatcherTest {
     @Test
     fun whenCardsListMessageWithCardItemMatchingExclusionRuleThenItemFiltered() = runBlocking {
         givenDeviceMatches(Api(max = 19), Locale(value = listOf("en-US")))
-        val passingItem = CardItem(
+        val passingItem = CardItem.ListItem(
             id = "passing",
             type = CardItemType.TWO_LINE_LIST_ITEM,
             titleText = "Passing Card",
@@ -615,7 +615,7 @@ class RemoteMessagingConfigMatcherTest {
             matchingRules = rules(1),
             exclusionRules = rules(3),
         )
-        val excludedItem = CardItem(
+        val excludedItem = CardItem.ListItem(
             id = "excluded",
             type = CardItemType.TWO_LINE_LIST_ITEM,
             titleText = "Excluded Card",
@@ -663,7 +663,7 @@ class RemoteMessagingConfigMatcherTest {
     @Test
     fun whenCardsListMessageFailsOwnRulesThenReturnsNullWithoutCheckingCardItems() = runBlocking {
         givenDeviceMatches(Api(max = 19))
-        val cardItem = CardItem(
+        val cardItem = CardItem.ListItem(
             id = "item1",
             type = CardItemType.TWO_LINE_LIST_ITEM,
             titleText = "Card 1",
@@ -687,6 +687,258 @@ class RemoteMessagingConfigMatcherTest {
         )
 
         assertNull(result)
+    }
+
+    @Test
+    fun whenSectionTitleReferencesItemsThatAllPassThenSectionTitleIsKept() = runBlocking {
+        givenDeviceMatches(Api(max = 19))
+        val item1 = CardItem.ListItem(
+            id = "item1",
+            type = CardItemType.TWO_LINE_LIST_ITEM,
+            titleText = "Item 1",
+            descriptionText = "Description 1",
+            placeholder = Content.Placeholder.DDG_ANNOUNCE,
+            primaryAction = Action.Dismiss,
+            matchingRules = rules(1),
+            exclusionRules = emptyList(),
+        )
+        val item2 = CardItem.ListItem(
+            id = "item2",
+            type = CardItemType.TWO_LINE_LIST_ITEM,
+            titleText = "Item 2",
+            descriptionText = "Description 2",
+            placeholder = Content.Placeholder.RADAR,
+            primaryAction = Action.Dismiss,
+            matchingRules = rules(1),
+            exclusionRules = emptyList(),
+        )
+        val sectionTitle = CardItem.SectionTitle(
+            id = "section1",
+            type = CardItemType.LIST_SECTION_TITLE,
+            titleText = "Section 1",
+            itemIDs = listOf("item1", "item2"),
+        )
+        val cardsListContent = cardsListContent(listItems = listOf(sectionTitle, item1, item2))
+        val message = aCardsListMessage(content = cardsListContent)
+
+        val result = testee.evaluate(
+            RemoteConfig(
+                messages = listOf(message),
+                rules = listOf(
+                    rule(id = 1, matchingAttributes = arrayOf(Api(max = 19))),
+                ),
+            ),
+        )
+
+        assertEquals(message, result)
+    }
+
+    @Test
+    fun whenSectionTitleReferencesItemsThatAllFailThenSectionTitleIsRemoved() = runBlocking {
+        givenDeviceMatches(Api(max = 19))
+        val passingItem = CardItem.ListItem(
+            id = "passing",
+            type = CardItemType.TWO_LINE_LIST_ITEM,
+            titleText = "Passing Item",
+            descriptionText = "Description",
+            placeholder = Content.Placeholder.DDG_ANNOUNCE,
+            primaryAction = Action.Dismiss,
+            matchingRules = rules(1),
+            exclusionRules = emptyList(),
+        )
+        val failingItem1 = CardItem.ListItem(
+            id = "failing1",
+            type = CardItemType.TWO_LINE_LIST_ITEM,
+            titleText = "Failing Item 1",
+            descriptionText = "Description 1",
+            placeholder = Content.Placeholder.RADAR,
+            primaryAction = Action.Dismiss,
+            matchingRules = rules(2),
+            exclusionRules = emptyList(),
+        )
+        val failingItem2 = CardItem.ListItem(
+            id = "failing2",
+            type = CardItemType.TWO_LINE_LIST_ITEM,
+            titleText = "Failing Item 2",
+            descriptionText = "Description 2",
+            placeholder = Content.Placeholder.IMAGE_AI,
+            primaryAction = Action.Dismiss,
+            matchingRules = rules(2),
+            exclusionRules = emptyList(),
+        )
+        val sectionTitle = CardItem.SectionTitle(
+            id = "section1",
+            type = CardItemType.LIST_SECTION_TITLE,
+            titleText = "Section with failing items",
+            itemIDs = listOf("failing1", "failing2"),
+        )
+        val cardsListContent = cardsListContent(listItems = listOf(passingItem, sectionTitle, failingItem1, failingItem2))
+        val message = aCardsListMessage(content = cardsListContent)
+
+        val result = testee.evaluate(
+            RemoteConfig(
+                messages = listOf(message),
+                rules = listOf(
+                    rule(id = 1, matchingAttributes = arrayOf(Api(max = 19))),
+                    rule(id = 2, matchingAttributes = arrayOf(Api(max = 15))),
+                ),
+            ),
+        )
+
+        val expectedContent = cardsListContent.copy(listItems = listOf(passingItem))
+        assertEquals(message.copy(content = expectedContent), result)
+    }
+
+    @Test
+    fun whenSectionTitleReferencesSomePassingItemsThenSectionTitleIsKept() = runBlocking {
+        givenDeviceMatches(Api(max = 19))
+        val passingItem = CardItem.ListItem(
+            id = "passing",
+            type = CardItemType.TWO_LINE_LIST_ITEM,
+            titleText = "Passing Item",
+            descriptionText = "Description",
+            placeholder = Content.Placeholder.DDG_ANNOUNCE,
+            primaryAction = Action.Dismiss,
+            matchingRules = rules(1),
+            exclusionRules = emptyList(),
+        )
+        val failingItem = CardItem.ListItem(
+            id = "failing",
+            type = CardItemType.TWO_LINE_LIST_ITEM,
+            titleText = "Failing Item",
+            descriptionText = "Description",
+            placeholder = Content.Placeholder.RADAR,
+            primaryAction = Action.Dismiss,
+            matchingRules = rules(2),
+            exclusionRules = emptyList(),
+        )
+        val sectionTitle = CardItem.SectionTitle(
+            id = "section1",
+            type = CardItemType.LIST_SECTION_TITLE,
+            titleText = "Section with mixed items",
+            itemIDs = listOf("passing", "failing"),
+        )
+        val cardsListContent = cardsListContent(listItems = listOf(sectionTitle, passingItem, failingItem))
+        val message = aCardsListMessage(content = cardsListContent)
+
+        val result = testee.evaluate(
+            RemoteConfig(
+                messages = listOf(message),
+                rules = listOf(
+                    rule(id = 1, matchingAttributes = arrayOf(Api(max = 19))),
+                    rule(id = 2, matchingAttributes = arrayOf(Api(max = 15))),
+                ),
+            ),
+        )
+
+        val expectedContent = cardsListContent.copy(listItems = listOf(sectionTitle, passingItem))
+        assertEquals(message.copy(content = expectedContent), result)
+    }
+
+    @Test
+    fun whenAllItemsAndSectionTitlesAreFilteredThenReturnsNull() = runBlocking {
+        givenDeviceMatches(Api(max = 19))
+        val failingItem1 = CardItem.ListItem(
+            id = "failing1",
+            type = CardItemType.TWO_LINE_LIST_ITEM,
+            titleText = "Failing Item 1",
+            descriptionText = "Description 1",
+            placeholder = Content.Placeholder.DDG_ANNOUNCE,
+            primaryAction = Action.Dismiss,
+            matchingRules = rules(2),
+            exclusionRules = emptyList(),
+        )
+        val failingItem2 = CardItem.ListItem(
+            id = "failing2",
+            type = CardItemType.TWO_LINE_LIST_ITEM,
+            titleText = "Failing Item 2",
+            descriptionText = "Description 2",
+            placeholder = Content.Placeholder.RADAR,
+            primaryAction = Action.Dismiss,
+            matchingRules = rules(2),
+            exclusionRules = emptyList(),
+        )
+        val sectionTitle = CardItem.SectionTitle(
+            id = "section1",
+            type = CardItemType.LIST_SECTION_TITLE,
+            titleText = "Section",
+            itemIDs = listOf("failing1", "failing2"),
+        )
+        val cardsListContent = cardsListContent(listItems = listOf(sectionTitle, failingItem1, failingItem2))
+        val message = aCardsListMessage(content = cardsListContent)
+
+        val result = testee.evaluate(
+            RemoteConfig(
+                messages = listOf(message),
+                rules = listOf(
+                    rule(id = 2, matchingAttributes = arrayOf(Api(max = 15))),
+                ),
+            ),
+        )
+
+        assertNull(result)
+    }
+
+    @Test
+    fun whenMultipleSectionsAndOnlyOneSectionItemsFailThenOnlyThatSectionIsRemoved() = runBlocking {
+        givenDeviceMatches(Api(max = 19))
+        val passingItem1 = CardItem.ListItem(
+            id = "passing1",
+            type = CardItemType.TWO_LINE_LIST_ITEM,
+            titleText = "Passing Item 1",
+            descriptionText = "Description",
+            placeholder = Content.Placeholder.DDG_ANNOUNCE,
+            primaryAction = Action.Dismiss,
+            matchingRules = rules(1),
+            exclusionRules = emptyList(),
+        )
+        val passingItem2 = CardItem.ListItem(
+            id = "passing2",
+            type = CardItemType.TWO_LINE_LIST_ITEM,
+            titleText = "Passing Item 2",
+            descriptionText = "Description",
+            placeholder = Content.Placeholder.RADAR,
+            primaryAction = Action.Dismiss,
+            matchingRules = rules(1),
+            exclusionRules = emptyList(),
+        )
+        val failingItem = CardItem.ListItem(
+            id = "failing",
+            type = CardItemType.TWO_LINE_LIST_ITEM,
+            titleText = "Failing Item",
+            descriptionText = "Description",
+            placeholder = Content.Placeholder.IMAGE_AI,
+            primaryAction = Action.Dismiss,
+            matchingRules = rules(2),
+            exclusionRules = emptyList(),
+        )
+        val section1 = CardItem.SectionTitle(
+            id = "section1",
+            type = CardItemType.LIST_SECTION_TITLE,
+            titleText = "Section 1 - Passing",
+            itemIDs = listOf("passing1", "passing2"),
+        )
+        val section2 = CardItem.SectionTitle(
+            id = "section2",
+            type = CardItemType.LIST_SECTION_TITLE,
+            titleText = "Section 2 - Failing",
+            itemIDs = listOf("failing"),
+        )
+        val cardsListContent = cardsListContent(listItems = listOf(section1, passingItem1, passingItem2, section2, failingItem))
+        val message = aCardsListMessage(content = cardsListContent)
+
+        val result = testee.evaluate(
+            RemoteConfig(
+                messages = listOf(message),
+                rules = listOf(
+                    rule(id = 1, matchingAttributes = arrayOf(Api(max = 19))),
+                    rule(id = 2, matchingAttributes = arrayOf(Api(max = 15))),
+                ),
+            ),
+        )
+
+        val expectedContent = cardsListContent.copy(listItems = listOf(section1, passingItem1, passingItem2))
+        assertEquals(message.copy(content = expectedContent), result)
     }
 
     private suspend fun givenDeviceMatches(

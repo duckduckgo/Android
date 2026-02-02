@@ -65,4 +65,12 @@
     <string name="pirDevBrokerConfigResetAll">Reset All Configs (Re-download)</string>
     <string name="pirDevBrokerConfigResetSuccess">Successfully re-downloaded all broker configs</string>
     <string name="pirDevBrokerConfigResetError">Failed to re-download broker configs</string>
+    <string name="pirDevEmailTitle">PIR Dev Email</string>
+    <string name="pirDevEmailJobHeader">Email Confirmation Jobs</string>
+    <string name="pirDevEmailNoJobs">No email confirmation jobs available</string>
+    <string name="pirDevEmailJobDetails">Selected Job Details</string>
+    <string name="pirDevEmailNoJobSelected">No job selected</string>
+    <string name="pirDevEmailActions">Actions</string>
+    <string name="pirDevRunEmailConfirmation">Run Email Confirmation</string>
+    <string name="pirDevFetchLink">Fetch Link</string>
 </resources>

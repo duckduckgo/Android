@@ -61,7 +61,7 @@ class RealCardsListRemoteMessagePixelHelperTest {
         surfaces = listOf(Surface.MODAL),
     )
 
-    private val testCardItem = CardItem(
+    private val testCardItem = CardItem.ListItem(
         id = "card-item-456",
         titleText = "Card Title",
         descriptionText = "Card Description",

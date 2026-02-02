@@ -924,11 +924,16 @@
     <string name="settingsHeadingCompleteSetup">Завършете настройките</string>
 
     <!--TabSwitcher Trackers Animation-->
-    <string name="showTrackerCountInTabSwitcher">Показване на броя на тракерите в превключвателя на раздели</string>
+    <string name="trackerBlockedInTheLast7days" instruction="Placeholder is 1 tracker blocked">&lt;b&gt;%1$s блокиран тракер &lt;/b&gt; през последните 7 дни</string>
     <string name="tabSwitcherAnimationTileRemovalDialogTitle" instruction="A title for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Искате ли да скриете брояча на тракери?</string>
     <string name="tabSwitcherAnimationTileRemovalDialogBody" instruction="A message for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Можете да го включите отново в Настройки &gt; Външен вид.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Скрий</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Запазване</string>
+
+    <!-- Trackers blocked animation-->
+    <string name="settingsTrackersBlockedAnimationHeaderTitle">Анимация за блокирани тракери</string>
+    <string name="showTrackerCountInAddressBar">Показване в адресната лента</string>
+    <string name="showWeeklyTrackerCountInTabSwitcher">Показване в мениджъра на разделите</string>
 
     <!-- Widgets -->
     <string name="searchOnlyWidgetLabel" instruction="Label for the search-only widget">Само търсене</string>

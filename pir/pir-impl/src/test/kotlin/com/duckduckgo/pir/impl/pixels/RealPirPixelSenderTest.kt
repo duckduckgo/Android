@@ -68,6 +68,32 @@ class RealPirPixelSenderTest {
     }
 
     @Test
+    fun whenReportManualScanStartFailedThenEnqueuesCorrectPixel() = runTest {
+        testee.reportManualScanStartFailed()
+
+        val paramsCaptor = argumentCaptor<Map<String, String>>()
+        verify(mockPixelSender).enqueueFire(
+            pixelName = any(),
+            parameters = paramsCaptor.capture(),
+            encodedParameters = any(),
+        )
+
+        assert(paramsCaptor.firstValue.isEmpty())
+    }
+
+    @Test
+    fun whenReportManualScanLowMemoryThenEnqueuesPixelWithMemoryLevel() = runTest {
+        testee.reportManualScanLowMemory()
+
+        val paramsCaptor = argumentCaptor<Map<String, String>>()
+        verify(mockPixelSender).enqueueFire(
+            pixelName = any(),
+            parameters = paramsCaptor.capture(),
+            encodedParameters = any(),
+        )
+    }
+
+    @Test
     fun whenReportScheduledScanScheduledThenFiresCorrectPixel() = runTest {
         testee.reportScheduledScanScheduled()
 
@@ -229,7 +255,7 @@ class RealPirPixelSenderTest {
         )
 
         val params = paramsCaptor.firstValue
-        assert(params["data_broker_url"] == "https://broker.com")
+        assert(params["data_broker"] == "https://broker.com")
         assert(params["broker_version"] == "2.0")
         assert(params["link_age_ms"] == "60000")
     }
@@ -252,7 +278,7 @@ class RealPirPixelSenderTest {
         )
 
         val params = paramsCaptor.firstValue
-        assert(params["data_broker_url"] == "https://broker.com")
+        assert(params["data_broker"] == "https://broker.com")
         assert(params["broker_version"] == "2.0")
         assert(params["status"] == "error")
         assert(params["error_code"] == "server_error")
@@ -277,7 +303,7 @@ class RealPirPixelSenderTest {
         )
 
         val params = paramsCaptor.firstValue
-        assert(params["data_broker_url"] == "https://broker.com")
+        assert(params["data_broker"] == "https://broker.com")
         assert(params["broker_version"] == "2.0")
         assert(params["action_id"] == "action-2")
         assert(params["duration"] == "2000")
@@ -302,7 +328,7 @@ class RealPirPixelSenderTest {
         )
 
         val params = paramsCaptor.firstValue
-        assert(params["data_broker_url"] == "https://broker.com")
+        assert(params["data_broker"] == "https://broker.com")
         assert(params["broker_version"] == "2.0")
         assert(params["attempt_number"] == "1")
         assert(params["action_id"] == "action-3")
@@ -327,7 +353,7 @@ class RealPirPixelSenderTest {
         )
 
         val params = paramsCaptor.firstValue
-        assert(params["data_broker_url"] == "https://broker.com")
+        assert(params["data_broker"] == "https://broker.com")
         assert(params["broker_version"] == "2.0")
         assert(params["attempt_number"] == "2")
         assert(params["action_id"] == "action-4")
@@ -353,7 +379,7 @@ class RealPirPixelSenderTest {
         )
 
         val params = paramsCaptor.firstValue
-        assert(params["data_broker_url"] == "https://broker.com")
+        assert(params["data_broker"] == "https://broker.com")
         assert(params["broker_version"] == "2.0")
         assert(params["attempt_number"] == "3")
         assert(params["action_id"] == "action-5")
@@ -377,7 +403,7 @@ class RealPirPixelSenderTest {
         )
 
         val params = paramsCaptor.firstValue
-        assert(params["data_broker_url"] == "https://broker.com")
+        assert(params["data_broker"] == "https://broker.com")
         assert(params["broker_version"] == "2.0")
         assert(params["action_id"] == "action-6")
     }
@@ -398,7 +424,7 @@ class RealPirPixelSenderTest {
         )
 
         val params = paramsCaptor.firstValue
-        assert(params["data_broker_url"] == "https://broker.com")
+        assert(params["data_broker"] == "https://broker.com")
         assert(params["broker_version"] == "2.0")
     }
 

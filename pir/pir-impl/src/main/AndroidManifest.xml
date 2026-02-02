@@ -17,8 +17,10 @@
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
 
     <application>
         <activity
@@ -31,14 +33,22 @@
             android:enabled="true"
             android:exported="false"
             android:foregroundServiceType="specialUse"
-            android:process=":pir" />
+            android:process=":pir">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="Executing operations for the Personal Information Removal feature" />
+        </service>
 
         <service
             android:name=".optout.PirForegroundOptOutService"
             android:enabled="true"
             android:exported="false"
             android:foregroundServiceType="specialUse"
-            android:process=":pir" />
+            android:process=":pir">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="Executing debug operations for the Personal Information Removal feature. Only used as a debug tool." />
+        </service>
 
         <service
             android:name=".scan.PirRemoteWorkerService"

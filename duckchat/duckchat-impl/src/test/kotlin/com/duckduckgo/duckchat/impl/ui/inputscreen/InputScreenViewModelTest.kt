@@ -102,7 +102,7 @@ class InputScreenViewModelTest {
                 flowOf(AutoCompleteResult("", listOf(AutoCompleteDefaultSuggestion("suggestion")))),
             )
             whenever(duckChat.wasOpenedBefore()).thenReturn(false)
-            whenever(duckChat.getDuckChatUrl(any(), any())).thenReturn(duckChatURL)
+            whenever(duckChat.getDuckChatUrl(any(), any(), any())).thenReturn(duckChatURL)
             whenever(inputScreenConfigResolver.useTopBar()).thenReturn(true)
             whenever(voiceSearchAvailability.isVoiceSearchAvailable).thenReturn(true)
             whenever(omnibarRepository.omnibarType).thenReturn(OmnibarType.SINGLE_TOP)

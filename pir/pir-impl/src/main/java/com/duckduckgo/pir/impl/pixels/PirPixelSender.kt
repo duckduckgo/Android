@@ -18,6 +18,7 @@ package com.duckduckgo.pir.impl.pixels
 
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BG_STATS
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BROKER_ACTION_FAILED
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BROKER_CUSTOM_STATS_14DAY_CONFIRMED_OPTOUT
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BROKER_CUSTOM_STATS_14DAY_UNCONFIRMED_OPTOUT
@@ -45,9 +46,12 @@ import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_ENGAGEMENT_DAU
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_ENGAGEMENT_MAU
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_ENGAGEMENT_WAU
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_FOREGROUND_RUN_COMPLETED
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_FOREGROUND_RUN_LOW_MEMORY
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_FOREGROUND_RUN_STARTED
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_FOREGROUND_RUN_START_FAILED
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INITIAL_SCAN_DURATION
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INTERNAL_SECURE_STORAGE_UNAVAILABLE
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_OPTOUT_INVALID_EVENT
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_OPTOUT_STAGE_CAPTCHA_PARSE
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_OPTOUT_STAGE_CAPTCHA_SEND
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_OPTOUT_STAGE_CAPTCHA_SOLVE
@@ -62,6 +66,7 @@ import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_OPTOUT_STAGE_SUBMIT
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_OPTOUT_STAGE_VALIDATE
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_OPTOUT_SUBMIT_FAILURE
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_OPTOUT_SUBMIT_SUCCESS
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_SCAN_INVALID_EVENT
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_SCAN_STAGE
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_SCAN_STAGE_RESULT_ERROR
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_SCAN_STAGE_RESULT_MATCHES
@@ -94,6 +99,16 @@ interface PirPixelSender {
     fun reportManualScanCompleted(
         totalTimeInMillis: Long,
     )
+
+    /**
+     * Emits a pixel to signal that a manually initiated scan failed to start as foreground.
+     */
+    fun reportManualScanStartFailed()
+
+    /**
+     * Emits a pixel to signal that the foreground scan service is running low on memory.
+     */
+    fun reportManualScanLowMemory()
 
     /**
      * Emits a pixel to signal that the scheduled scan has been scheduled.
@@ -538,6 +553,20 @@ interface PirPixelSender {
         durationMs: Long,
         profileQueryCount: Int,
     )
+
+    fun reportBackgroundScanStats(
+        scanFrequencyWithinThreshold: Boolean,
+    )
+
+    fun reportScanInvalidEvent(
+        brokerUrl: String,
+        brokerVersion: String,
+    )
+
+    fun reportOptOutInvalidEvent(
+        brokerUrl: String,
+        brokerVersion: String,
+    )
 }
 
 @ContributesBinding(AppScope::class)
@@ -555,6 +584,14 @@ class RealPirPixelSender @Inject constructor(
             PARAM_KEY_TOTAL_TIME to totalTimeInMillis.toString(),
         )
         fire(PIR_FOREGROUND_RUN_COMPLETED, params)
+    }
+
+    override fun reportManualScanStartFailed() {
+        enqueueFire(PIR_FOREGROUND_RUN_START_FAILED)
+    }
+
+    override fun reportManualScanLowMemory() {
+        enqueueFire(PIR_FOREGROUND_RUN_LOW_MEMORY)
     }
 
     override fun reportScheduledScanScheduled() {
@@ -630,7 +667,7 @@ class RealPirPixelSender @Inject constructor(
         linkAgeMs: Long,
     ) {
         val params = mapOf(
-            PARAM_BROKER_URL to brokerUrl,
+            PARAM_KEY_BROKER to brokerUrl,
             PARAM_BROKER_VERSION to brokerVersion,
             PARAM_LINK_AGE to linkAgeMs.toString(),
         )
@@ -644,7 +681,7 @@ class RealPirPixelSender @Inject constructor(
         errorCode: String,
     ) {
         val params = mapOf(
-            PARAM_BROKER_URL to brokerUrl,
+            PARAM_KEY_BROKER to brokerUrl,
             PARAM_BROKER_VERSION to brokerVersion,
             PARAM_STATUS to status,
             PARAM_ERROR_CODE to errorCode,
@@ -660,7 +697,7 @@ class RealPirPixelSender @Inject constructor(
         tries: Int,
     ) {
         val params = mapOf(
-            PARAM_BROKER_URL to brokerUrl,
+            PARAM_KEY_BROKER to brokerUrl,
             PARAM_BROKER_VERSION to brokerVersion,
             PARAM_ACTION_ID to actionId,
             PARAM_DURATION to durationMs.toString(),
@@ -676,7 +713,7 @@ class RealPirPixelSender @Inject constructor(
         actionId: String,
     ) {
         val params = mapOf(
-            PARAM_BROKER_URL to brokerUrl,
+            PARAM_KEY_BROKER to brokerUrl,
             PARAM_BROKER_VERSION to brokerVersion,
             PARAM_ATTEMPT_NUMBER to attemptNumber.toString(),
             PARAM_ACTION_ID to actionId,
@@ -692,7 +729,7 @@ class RealPirPixelSender @Inject constructor(
         durationMs: Long,
     ) {
         val params = mapOf(
-            PARAM_BROKER_URL to brokerUrl,
+            PARAM_KEY_BROKER to brokerUrl,
             PARAM_BROKER_VERSION to brokerVersion,
             PARAM_ATTEMPT_NUMBER to attemptNumber.toString(),
             PARAM_ACTION_ID to actionId,
@@ -709,7 +746,7 @@ class RealPirPixelSender @Inject constructor(
         durationMs: Long,
     ) {
         val params = mapOf(
-            PARAM_BROKER_URL to brokerUrl,
+            PARAM_KEY_BROKER to brokerUrl,
             PARAM_BROKER_VERSION to brokerVersion,
             PARAM_ATTEMPT_NUMBER to attemptNumber.toString(),
             PARAM_ACTION_ID to actionId,
@@ -724,7 +761,7 @@ class RealPirPixelSender @Inject constructor(
         actionId: String,
     ) {
         val params = mapOf(
-            PARAM_BROKER_URL to brokerUrl,
+            PARAM_KEY_BROKER to brokerUrl,
             PARAM_BROKER_VERSION to brokerVersion,
             PARAM_ACTION_ID to actionId,
         )
@@ -736,7 +773,7 @@ class RealPirPixelSender @Inject constructor(
         brokerVersion: String,
     ) {
         val params = mapOf(
-            PARAM_BROKER_URL to brokerUrl,
+            PARAM_KEY_BROKER to brokerUrl,
             PARAM_BROKER_VERSION to brokerVersion,
         )
         fire(PIR_EMAIL_CONFIRMATION_JOB_SUCCESS, params)
@@ -1265,6 +1302,35 @@ class RealPirPixelSender @Inject constructor(
         fire(PIR_INITIAL_SCAN_DURATION, params)
     }
 
+    override fun reportBackgroundScanStats(scanFrequencyWithinThreshold: Boolean) {
+        val params = mapOf(
+            PARAM_KEY_SCAN_FREQUENCY to scanFrequencyWithinThreshold.toString(),
+        )
+        fire(PIR_BG_STATS, params)
+    }
+
+    override fun reportScanInvalidEvent(
+        brokerUrl: String,
+        brokerVersion: String,
+    ) {
+        val params = mapOf(
+            PARAM_KEY_BROKER to brokerUrl,
+            PARAM_BROKER_VERSION to brokerVersion,
+        )
+        fire(PIR_SCAN_INVALID_EVENT, params)
+    }
+
+    override fun reportOptOutInvalidEvent(
+        brokerUrl: String,
+        brokerVersion: String,
+    ) {
+        val params = mapOf(
+            PARAM_KEY_BROKER to brokerUrl,
+            PARAM_BROKER_VERSION to brokerVersion,
+        )
+        fire(PIR_OPTOUT_INVALID_EVENT, params)
+    }
+
     private fun fire(
         pixel: PirPixel,
         params: Map<String, String> = emptyMap(),
@@ -1275,10 +1341,19 @@ class RealPirPixelSender @Inject constructor(
         }
     }
 
+    private fun enqueueFire(
+        pixel: PirPixel,
+        params: Map<String, String> = emptyMap(),
+    ) {
+        pixel.getPixelNames().forEach { (_, pixelName) ->
+            logcat { "PIR-LOGGING: $pixelName params: $params" }
+            pixelSender.enqueueFire(pixelName = pixelName, parameters = params)
+        }
+    }
+
     companion object {
         private const val PARAM_KEY_TOTAL_TIME = "totalTimeInMillis"
         private const val PARAM_KEY_CPU_USAGE = "cpuUsage"
-        private const val PARAM_BROKER_URL = "data_broker_url"
         private const val PARAM_BROKER_VERSION = "broker_version"
         private const val PARAM_LINK_AGE = "link_age_ms"
         private const val PARAM_STATUS = "status"
@@ -1308,5 +1383,6 @@ class RealPirPixelSender @Inject constructor(
         private const val PARAM_KEY_STEP = "stepType"
         private const val PARAM_KEY_DURATION_MS = "duration_in_ms"
         private const val PARAM_KEY_PROFILE_QUERY_COUNT = "profile_queries"
+        private const val PARAM_KEY_SCAN_FREQUENCY = "scanFrequencyWithinThreshold"
     }
 }
