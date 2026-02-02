@@ -1165,6 +1165,7 @@ class BrowserTabFragment :
                     isTopOmnibar = isTopOmnibar,
                     browserButtonsConfig = InputScreenBrowserButtonsConfig.Enabled(tabs = viewModel.tabs.value?.size ?: 0),
                     launchOnChat = omnibar.viewMode == ViewMode.DuckAI,
+                    useBottomSheetMenu = viewModel.browserViewState.value?.useBottomSheetMenu ?: false,
                 ),
             )
         val enterTransition = browserAndInputScreenTransitionProvider.getInputScreenEnterAnimation(isTopOmnibar)
