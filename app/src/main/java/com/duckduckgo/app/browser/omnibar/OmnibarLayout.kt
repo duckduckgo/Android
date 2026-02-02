@@ -121,6 +121,7 @@ import com.duckduckgo.serp.logos.api.SerpEasterEggLogosToggles
 import com.duckduckgo.serp.logos.api.SerpLogos
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.card.MaterialCardView
+import com.google.android.material.color.MaterialColors.isColorLight
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.map
@@ -1050,13 +1051,7 @@ class OmnibarLayout @JvmOverloads constructor(
                 )
             }
         } else if (omnibarRepository.isNewCustomTabEnabled) {
-            val (animationBackgroundColor, useLightAnimation) = if (!isDefaultToolbarColor(customTabToolbarColor)) {
-                val background = calculateAnimationBackgroundColor(customTabToolbarColor)
-                Pair(background, isColorLight(background))
-            } else {
-                Pair(customTabToolbarColor, null)
-            }
-
+            val animationBackgroundColor = calculateAnimationBackgroundColor(customTabToolbarColor)
             if (isAddressBarTrackersAnimationEnabled) {
                 animatorHelper.startAddressBarTrackersAnimation(
                     context = context,
@@ -1075,7 +1070,7 @@ class OmnibarLayout @JvmOverloads constructor(
                     trackersAnimationView = newCustomTabToolbarContainer.trackersAnimation,
                     omnibarViews = customTabViews(),
                     entities = events,
-                    useLightAnimation = useLightAnimation,
+                    useLightAnimation = isColorLight(animationBackgroundColor),
                 )
             }
         }
@@ -1126,7 +1121,6 @@ class OmnibarLayout @JvmOverloads constructor(
                         }
                     }
 
-                    val animationBackgroundColor: Int
                     if (customTab.toolbarColor != 0 && !isDefaultToolbarColor(customTab.toolbarColor)) {
                         toolbar.background = customTab.toolbarColor.toDrawable()
                         toolbarContainer.background = customTab.toolbarColor.toDrawable()
@@ -1135,11 +1129,8 @@ class OmnibarLayout @JvmOverloads constructor(
                         customTabCloseIcon.setColorFilter(foregroundColor)
                         browserMenuImageView.setColorFilter(foregroundColor)
                         customTabDomain.setTextColor(foregroundColor)
-
-                        animationBackgroundColor = calculateAnimationBackgroundColor(customTab.toolbarColor)
-                    } else {
-                        animationBackgroundColor = customTab.toolbarColor
                     }
+                    val animationBackgroundColor = calculateAnimationBackgroundColor(customTab.toolbarColor)
 
                     val iconBackground = newCustomTabToolbarContainer.animatedIconBackgroundView.background
                     if (iconBackground is android.graphics.drawable.GradientDrawable) {
@@ -1247,7 +1238,8 @@ class OmnibarLayout @JvmOverloads constructor(
     }
 
     private fun calculateAnimationBackgroundColor(mainToolbarColor: Int): Int {
-        return ColorUtils.blendARGB(mainToolbarColor, Color.WHITE, 0.12f)
+        val blendColor = if (isColorLight(mainToolbarColor)) Color.BLACK else Color.WHITE
+        return ColorUtils.blendARGB(mainToolbarColor, blendColor, 0.12f)
     }
 
     private fun renderCustomTab(viewMode: ViewMode.CustomTab) {
