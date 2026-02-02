@@ -479,7 +479,6 @@ class DuckChatContextualFragment :
         val prompt = binding.inputField.text.toString()
         if (prompt.isNotEmpty()) {
             viewModel.onPromptSent(prompt)
-            bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
             hideKeyboard(binding.inputField)
         }
     }
@@ -510,6 +509,7 @@ class DuckChatContextualFragment :
                     }
 
                     is DuckChatContextualViewModel.Command.ChangeSheetState -> {
+                        logcat { "Duck.ai Contextual: ChangeSheetState ${command.newState}" }
                         bottomSheetBehavior.state = command.newState
                     }
                 }
