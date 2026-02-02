@@ -24,7 +24,6 @@ data class FeatureToggleItem(
     val isSubFeature: Boolean,
     val isEnabled: Boolean,
 ) {
-    // Include parent name to ensure uniqueness across different parent features
     val featureKey: String get() = with(toggle.featureName()) {
         "${parentName.orEmpty()}|$name"
     }

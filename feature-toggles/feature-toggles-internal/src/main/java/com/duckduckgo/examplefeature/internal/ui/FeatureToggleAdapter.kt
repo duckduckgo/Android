@@ -79,6 +79,10 @@ class FeatureToggleAdapter(
             }
             listItem.quietlySetIsChecked(item.isEnabled, switchListener)
         }
+
+        fun setSwitchState(isEnabled: Boolean) {
+            binding.root.quietlySetIsChecked(isEnabled, switchListener)
+        }
     }
 
     private class FeatureToggleDiffCallback : DiffUtil.ItemCallback<FeatureToggleItem>() {
@@ -87,7 +91,6 @@ class FeatureToggleAdapter(
         }
 
         override fun areContentsTheSame(oldItem: FeatureToggleItem, newItem: FeatureToggleItem): Boolean {
-            // Only compare visible properties, not the Toggle object itself
             return oldItem.displayName == newItem.displayName &&
                 oldItem.isSubFeature == newItem.isSubFeature &&
                 oldItem.isEnabled == newItem.isEnabled
