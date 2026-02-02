@@ -16,6 +16,7 @@
 
 package com.duckduckgo.common.ui.internal.ui.component.templates
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -28,9 +29,11 @@ import com.duckduckgo.common.ui.internal.ui.setupThemedComposeView
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 
+@SuppressLint("NoFragment") // we don't use DI here
 class TemplatesFragment : Fragment() {
     private val appComponentsViewModel by appComponentsViewModel()
 
+    @Suppress("DenyListedApi")
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
