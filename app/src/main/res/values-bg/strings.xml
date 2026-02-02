@@ -810,10 +810,12 @@
     <string name="preOnboardingDaxDialog3Button">Стартиране на сърфирането</string>
     <string name="preOnboardingAddressBarTitle">Къде да сложа адресната лента?</string>
     <string name="preOnboardingAddressBarOkButton">Следващ</string>
-    <string name="highlightsPreOnboardingAddressBarOption1Title">Горе (по подразбиране)</string>
-    <string name="highlightsPreOnboardingAddressBarOption1Description">По-добре се вижда</string>
-    <string name="highlightsPreOnboardingAddressBarOption2Title">Отдолу</string>
-    <string name="highlightsPreOnboardingAddressBarOption2Description">По-лесен достъп</string>
+
+    <!-- Pre-onboarding Address Bar Position -->
+    <string name="preOnboardingAddressBarPositionTop">Най-горе</string>
+    <string name="preOnboardingAddressBarPositionBottom">Отдолу</string>
+    <string name="preOnboardingAddressBarPositionSplit">Раздели</string>
+
     <string name="onboardingSearchDaxDialogTitle">Опитайте търсене!</string>
     <string name="onboardingSearchDaxDialogDescription">Търсенето в DuckDuckGo винаги е поверително.</string>
     <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">"как се нарича патицата на английски"</string>

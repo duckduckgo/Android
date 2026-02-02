@@ -827,10 +827,12 @@
     <string name="preOnboardingDaxDialog3Button">Sākt pārlūkošanu</string>
     <string name="preOnboardingAddressBarTitle">Kur novietot adreses joslu?</string>
     <string name="preOnboardingAddressBarOkButton">Nākamais</string>
-    <string name="highlightsPreOnboardingAddressBarOption1Title">Augšpusē (pēc noklusējuma)</string>
-    <string name="highlightsPreOnboardingAddressBarOption1Description">Viegli pamanāma</string>
-    <string name="highlightsPreOnboardingAddressBarOption2Title">Apakšā</string>
-    <string name="highlightsPreOnboardingAddressBarOption2Description">Viegli pieejama</string>
+
+    <!-- Pre-onboarding Address Bar Position -->
+    <string name="preOnboardingAddressBarPositionTop">Populārākie</string>
+    <string name="preOnboardingAddressBarPositionBottom">Apakšā</string>
+    <string name="preOnboardingAddressBarPositionSplit">Sadalīt</string>
+
     <string name="onboardingSearchDaxDialogTitle">Izmēģini meklēt!</string>
     <string name="onboardingSearchDaxDialogDescription">Tavi DuckDuckGo meklējumi vienmēr ir privāti.</string>
     <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">"kā angliski pateikt “pīle”"</string>

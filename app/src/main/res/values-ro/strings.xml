@@ -827,10 +827,12 @@
     <string name="preOnboardingDaxDialog3Button">Începe navigarea</string>
     <string name="preOnboardingAddressBarTitle">Unde ar trebui să îți pun bara de adrese?</string>
     <string name="preOnboardingAddressBarOkButton">Următorul</string>
-    <string name="highlightsPreOnboardingAddressBarOption1Title">Sus (implicit)</string>
-    <string name="highlightsPreOnboardingAddressBarOption1Description">Ușor de văzut</string>
-    <string name="highlightsPreOnboardingAddressBarOption2Title">Partea de jos</string>
-    <string name="highlightsPreOnboardingAddressBarOption2Description">Ușor de accesat</string>
+
+    <!-- Pre-onboarding Address Bar Position -->
+    <string name="preOnboardingAddressBarPositionTop">Sus</string>
+    <string name="preOnboardingAddressBarPositionBottom">Partea de jos</string>
+    <string name="preOnboardingAddressBarPositionSplit">Împarte</string>
+
     <string name="onboardingSearchDaxDialogTitle">Încearcă o căutare!</string>
     <string name="onboardingSearchDaxDialogDescription">Căutările tale DuckDuckGo sunt întotdeauna private.</string>
     <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">"cum se spune rață în engleză"</string>

@@ -810,10 +810,12 @@
     <string name="preOnboardingDaxDialog3Button">Börja bläddra</string>
     <string name="preOnboardingAddressBarTitle">Var ska jag placera adressfältet?</string>
     <string name="preOnboardingAddressBarOkButton">Nästa</string>
-    <string name="highlightsPreOnboardingAddressBarOption1Title">Överst (standard)</string>
-    <string name="highlightsPreOnboardingAddressBarOption1Description">Lätt att se</string>
-    <string name="highlightsPreOnboardingAddressBarOption2Title">Botten</string>
-    <string name="highlightsPreOnboardingAddressBarOption2Description">Lätt att nå</string>
+
+    <!-- Pre-onboarding Address Bar Position -->
+    <string name="preOnboardingAddressBarPositionTop">Topp</string>
+    <string name="preOnboardingAddressBarPositionBottom">Botten</string>
+    <string name="preOnboardingAddressBarPositionSplit">Dela</string>
+
     <string name="onboardingSearchDaxDialogTitle">Pröva att söka!</string>
     <string name="onboardingSearchDaxDialogDescription">Dina DuckDuckGo-sökningar är alltid privata.</string>
     <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">"hur säger man anka på engelska"</string>

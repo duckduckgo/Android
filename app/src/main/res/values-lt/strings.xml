@@ -844,10 +844,12 @@
     <string name="preOnboardingDaxDialog3Button">Pradėti naršyti</string>
     <string name="preOnboardingAddressBarTitle">Kur turėčiau nustatyti jūsų adreso juostą?</string>
     <string name="preOnboardingAddressBarOkButton">Kitas</string>
-    <string name="highlightsPreOnboardingAddressBarOption1Title">Viršuje (numatytasis nustatymas)</string>
-    <string name="highlightsPreOnboardingAddressBarOption1Description">Lengva pamatyti</string>
-    <string name="highlightsPreOnboardingAddressBarOption2Title">Apačia</string>
-    <string name="highlightsPreOnboardingAddressBarOption2Description">Lengvai pasiekiama</string>
+
+    <!-- Pre-onboarding Address Bar Position -->
+    <string name="preOnboardingAddressBarPositionTop">Viršus</string>
+    <string name="preOnboardingAddressBarPositionBottom">Apačia</string>
+    <string name="preOnboardingAddressBarPositionSplit">Padalintas</string>
+
     <string name="onboardingSearchDaxDialogTitle">Išmėgink paiešką!</string>
     <string name="onboardingSearchDaxDialogDescription">Jūsų „DuckDuckGo“ paieškos visada yra privačios.</string>
     <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">"kaip pasakyti antis anglų kalba"</string>

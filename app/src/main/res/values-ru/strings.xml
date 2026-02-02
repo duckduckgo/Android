@@ -844,10 +844,12 @@
     <string name="preOnboardingDaxDialog3Button">Начать просмотр</string>
     <string name="preOnboardingAddressBarTitle">Где следует разместить адресную строку?</string>
     <string name="preOnboardingAddressBarOkButton">Далее</string>
-    <string name="highlightsPreOnboardingAddressBarOption1Title">Вверху (по умолчанию)</string>
-    <string name="highlightsPreOnboardingAddressBarOption1Description">Легко заметить</string>
-    <string name="highlightsPreOnboardingAddressBarOption2Title">Внизу</string>
-    <string name="highlightsPreOnboardingAddressBarOption2Description">Легко использовать</string>
+
+    <!-- Pre-onboarding Address Bar Position -->
+    <string name="preOnboardingAddressBarPositionTop">Вверху</string>
+    <string name="preOnboardingAddressBarPositionBottom">Внизу</string>
+    <string name="preOnboardingAddressBarPositionSplit">Разделить</string>
+
     <string name="onboardingSearchDaxDialogTitle">Попробуйте поискать!</string>
     <string name="onboardingSearchDaxDialogDescription">Ваши поисковые запросы в DuckDuckGo всегда конфиденциальны.</string>
     <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">"как сказать «утка» на английском?"</string>

@@ -810,10 +810,12 @@
     <string name="preOnboardingDaxDialog3Button">Beginnen met browsen</string>
     <string name="preOnboardingAddressBarTitle">Waar moet ik je adresbalk plaatsen?</string>
     <string name="preOnboardingAddressBarOkButton">Volgende</string>
-    <string name="highlightsPreOnboardingAddressBarOption1Title">Bovenaan (standaard)</string>
-    <string name="highlightsPreOnboardingAddressBarOption1Description">Gemakkelijk te zien</string>
-    <string name="highlightsPreOnboardingAddressBarOption2Title">Onderkant</string>
-    <string name="highlightsPreOnboardingAddressBarOption2Description">Gemakkelijk te bereiken</string>
+
+    <!-- Pre-onboarding Address Bar Position -->
+    <string name="preOnboardingAddressBarPositionTop">Boven</string>
+    <string name="preOnboardingAddressBarPositionBottom">Onderkant</string>
+    <string name="preOnboardingAddressBarPositionSplit">Splitsen</string>
+
     <string name="onboardingSearchDaxDialogTitle">Probeer een zoekopdracht!</string>
     <string name="onboardingSearchDaxDialogDescription">Je DuckDuckGo-zoekopdrachten zijn altijd privé.</string>
     <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">"hoe zeg je 'eend' in het Engels?"</string>

@@ -844,10 +844,12 @@
     <string name="preOnboardingDaxDialog3Button">Započni pretraživanje</string>
     <string name="preOnboardingAddressBarTitle">Gdje trebam staviti tvoju adresnu traku?</string>
     <string name="preOnboardingAddressBarOkButton">Dalje</string>
-    <string name="highlightsPreOnboardingAddressBarOption1Title">Vrh (zadano)</string>
-    <string name="highlightsPreOnboardingAddressBarOption1Description">Lako se vidi</string>
-    <string name="highlightsPreOnboardingAddressBarOption2Title">Dno</string>
-    <string name="highlightsPreOnboardingAddressBarOption2Description">Lako dostupno</string>
+
+    <!-- Pre-onboarding Address Bar Position -->
+    <string name="preOnboardingAddressBarPositionTop">Vrh</string>
+    <string name="preOnboardingAddressBarPositionBottom">Dno</string>
+    <string name="preOnboardingAddressBarPositionSplit">Podijeli</string>
+
     <string name="onboardingSearchDaxDialogTitle">Isprobajte pretragu!</string>
     <string name="onboardingSearchDaxDialogDescription">Tvoja su DuckDuckGo pretraživanja uvijek privatna.</string>
     <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">"kako se kaže patka na engleskom"</string>

@@ -844,10 +844,12 @@
     <string name="preOnboardingDaxDialog3Button">Začnite prehliadať</string>
     <string name="preOnboardingAddressBarTitle">Kam mám umiestniť váš riadok s adresou?</string>
     <string name="preOnboardingAddressBarOkButton">Ďalšie</string>
-    <string name="highlightsPreOnboardingAddressBarOption1Title">Hore (predvolené)</string>
-    <string name="highlightsPreOnboardingAddressBarOption1Description">Ľahko viditeľné</string>
-    <string name="highlightsPreOnboardingAddressBarOption2Title">Spodná časť</string>
-    <string name="highlightsPreOnboardingAddressBarOption2Description">Ľahko dosiahnuteľné</string>
+
+    <!-- Pre-onboarding Address Bar Position -->
+    <string name="preOnboardingAddressBarPositionTop">Hore</string>
+    <string name="preOnboardingAddressBarPositionBottom">Spodná časť</string>
+    <string name="preOnboardingAddressBarPositionSplit">Rozdelenie</string>
+
     <string name="onboardingSearchDaxDialogTitle">Skúste vyhľadávanie!</string>
     <string name="onboardingSearchDaxDialogDescription">Vaše vyhľadávania v službe DuckDuckGo sú vždy súkromné.</string>
     <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">"ako sa povie „kačica“ po anglicky"</string>
