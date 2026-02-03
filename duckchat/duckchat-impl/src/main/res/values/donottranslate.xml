@@ -23,5 +23,6 @@
     <string name="duckAIContextualAutomaticContextTitle">Automatically Send Context</string>
     <string name="duckAIContextualAutomaticContextMessage">Automatically send context to Duck.ai</string>
     <string name="duckAIContextualAttachPageContent">Attach Page Content</string>
+    <string name="duckAIContextualSummarizePrompt">Summarize the context of this page</string>
 
 </resources>

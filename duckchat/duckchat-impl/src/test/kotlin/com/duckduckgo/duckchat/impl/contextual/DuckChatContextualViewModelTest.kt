@@ -249,6 +249,7 @@ class DuckChatContextualViewModelTest {
             }
 
             assertEquals(DuckChatContextualViewModel.SheetMode.WEBVIEW, testee.viewState.value.sheetMode)
+            assertEquals("", testee.viewState.value.prompt)
         }
 
     @Test
@@ -495,11 +496,13 @@ class DuckChatContextualViewModelTest {
         val url = "https://duck.ai/chat?chatID=123"
         testee.onSheetOpened(tabId)
         contextualDataStore.persistTabChatUrl(tabId, url)
+        testee.replacePrompt("new prompt")
 
         testee.onNewChatRequested()
         coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
 
         assertNull(contextualDataStore.getTabChatUrl(tabId))
+        assertEquals("", testee.viewState.value.prompt)
     }
 
     @Test

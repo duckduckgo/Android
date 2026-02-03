@@ -476,9 +476,7 @@ class DuckChatContextualFragment :
         }
 
         binding.duckAiContextualClearText.setOnClickListener {
-            binding.inputField.text.clear()
-            binding.inputField.setSelection(0)
-            binding.inputField.scrollTo(0, 0)
+            clearInputField()
         }
 
         binding.contextualFullScreen.setOnClickListener {
@@ -491,14 +489,22 @@ class DuckChatContextualFragment :
             viewModel.addPageContext()
         }
         binding.contextualPromptSummarize.setOnClickListener {
-            viewModel.replacePrompt(binding.contextualPromptSummarize.text.toString())
+            val prompt = getString(R.string.duckAIContextualSummarizePrompt)
+            viewModel.replacePrompt(prompt)
         }
+    }
+
+    private fun clearInputField() {
+        binding.inputField.text.clear()
+        binding.inputField.setSelection(0)
+        binding.inputField.scrollTo(0, 0)
     }
 
     private fun sendNativePrompt() {
         val prompt = binding.inputField.text.toString()
         if (prompt.isNotEmpty()) {
             viewModel.onPromptSent(prompt)
+            clearInputField()
             hideKeyboard(binding.inputField)
         }
     }
@@ -587,6 +593,8 @@ class DuckChatContextualFragment :
                 }
                 if (viewState.prompt.isNotEmpty()) {
                     binding.inputField.setText(viewState.prompt)
+                } else {
+                    clearInputField()
                 }
             }
 

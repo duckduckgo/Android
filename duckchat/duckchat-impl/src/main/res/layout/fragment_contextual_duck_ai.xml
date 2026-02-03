@@ -209,7 +209,7 @@
                         android:gravity="center"
                         android:importantForAccessibility="no"
                         android:scaleType="centerInside"
-                        android:visibility="gone"
+                        android:visibility="invisible"
                         app:srcCompat="@drawable/ic_close_circle_small_secondary_24" />
 
                 </LinearLayout>

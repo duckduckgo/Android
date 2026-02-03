@@ -218,6 +218,7 @@ class DuckChatContextualViewModel @Inject constructor(
                 _viewState.value =
                     _viewState.value.copy(
                         sheetMode = SheetMode.WEBVIEW,
+                        prompt = "",
                     )
                 _subscriptionEventDataChannel.trySend(contextPrompt)
                 commandChannel.trySend(Command.ChangeSheetState(BottomSheetBehavior.STATE_EXPANDED))
@@ -433,6 +434,7 @@ class DuckChatContextualViewModel @Inject constructor(
                         it.copy(
                             sheetMode = SheetMode.INPUT,
                             showFullscreen = true,
+                            prompt = "",
                         )
                     }
                     commandChannel.trySend(Command.ChangeSheetState(BottomSheetBehavior.STATE_HALF_EXPANDED))
