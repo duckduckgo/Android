@@ -264,6 +264,49 @@ class DuckChatContextualViewModelTest {
         }
 
     @Test
+    fun `when keyboard becomes visible in input mode then sheet expanded`() =
+        runTest {
+            testee.commands.test {
+                testee.onKeyboardVisibilityChanged(true)
+
+                val command = awaitItem() as DuckChatContextualViewModel.Command.ChangeSheetState
+                assertEquals(BottomSheetBehavior.STATE_EXPANDED, command.newState)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `when keyboard hidden in input mode then sheet half expanded`() =
+        runTest {
+            testee.commands.test {
+                testee.onKeyboardVisibilityChanged(false)
+
+                val command = awaitItem() as DuckChatContextualViewModel.Command.ChangeSheetState
+                assertEquals(BottomSheetBehavior.STATE_HALF_EXPANDED, command.newState)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `when add and remove page context then hasContext toggles`() =
+        runTest {
+            testee.viewState.test {
+                // initial emission
+                awaitItem()
+
+                testee.addPageContext()
+                val withContext = expectMostRecentItem() as DuckChatContextualViewModel.ViewState
+                assertTrue(withContext.showContext)
+
+                testee.removePageContext()
+                val withoutContext = expectMostRecentItem() as DuckChatContextualViewModel.ViewState
+                assertFalse(withoutContext.showContext)
+
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
     fun `when replace prompt then prompt stored`() =
         runTest {
             testee.viewState.test {

@@ -3342,13 +3342,24 @@ class BrowserTabFragment :
     }
 
     private fun showDuckChatContextualSheet(tabId: String) {
+        binding.duckAiContextualFragmentContainer.show()
+        binding.rootView.post {
+            val fullHeight = binding.rootView.height
+            if (fullHeight > 0) {
+                val params = binding.duckAiContextualFragmentContainer.layoutParams
+                if (params.height != fullHeight) {
+                    params.height = fullHeight
+                    binding.duckAiContextualFragmentContainer.layoutParams = params
+                }
+                BottomSheetBehavior.from(binding.duckAiContextualFragmentContainer).peekHeight = fullHeight
+            }
+        }
+
         duckAiContextualFragment?.let { fragment ->
             openExistingContextualFragment(fragment)
         } ?: run {
             createNewContextualFragment(tabId)
         }
-
-        binding.duckAiContextualFragmentContainer.show()
 
         reactToDuckChatContextualSheetResult()
         ensureBrowserIsCompatibleWithContextualSheetState()

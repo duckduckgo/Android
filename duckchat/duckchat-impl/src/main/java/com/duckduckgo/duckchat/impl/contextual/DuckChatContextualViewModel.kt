@@ -356,6 +356,22 @@ class DuckChatContextualViewModel @Inject constructor(
         }
     }
 
+    fun onKeyboardVisibilityChanged(isVisible: Boolean) {
+        val currentState = _viewState.value
+        if (currentState.sheetMode != SheetMode.INPUT) return
+
+        val newState =
+            if (isVisible) {
+                BottomSheetBehavior.STATE_EXPANDED
+            } else {
+                BottomSheetBehavior.STATE_HALF_EXPANDED
+            }
+
+        viewModelScope.launch {
+            commandChannel.trySend(Command.ChangeSheetState(newState))
+        }
+    }
+
     fun onPageContextReceived(
         tabId: String,
         pageContext: String,
