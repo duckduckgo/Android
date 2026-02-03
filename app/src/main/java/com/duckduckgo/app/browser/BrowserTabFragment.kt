@@ -1661,7 +1661,7 @@ class BrowserTabFragment :
     }
 
     private fun launchBottomSheetMenu(addExtraDelay: Boolean) {
-        val delay = if (addExtraDelay) POPUP_MENU_DELAY * 2 else POPUP_MENU_DELAY
+        val delay = if (addExtraDelay) BOTTOM_SHEET_MENU_DELAY * 2 else BOTTOM_SHEET_MENU_DELAY
         // small delay added to let keyboard disappear and avoid jarring transition
         binding.rootView.postDelayed(delay) {
             if (isAdded) {
@@ -4636,6 +4636,7 @@ class BrowserTabFragment :
         const val KEYBOARD_DELAY = 200L
         private const val NAVIGATION_DELAY = 100L
         private const val POPUP_MENU_DELAY = 200L
+        private const val BOTTOM_SHEET_MENU_DELAY = 300L
         private const val WIDGET_PROMPT_DELAY = 200L
         private const val CHECK_IF_ABOUT_BLANK_DELAY = 200L
 
