@@ -810,10 +810,12 @@
     <string name="preOnboardingDaxDialog3Button">Commencer la navigation</string>
     <string name="preOnboardingAddressBarTitle">Où dois-je placer votre barre d\'adresse ?</string>
     <string name="preOnboardingAddressBarOkButton">Suivant</string>
-    <string name="highlightsPreOnboardingAddressBarOption1Title">En haut (par défaut)</string>
-    <string name="highlightsPreOnboardingAddressBarOption1Description">Facile à voir</string>
-    <string name="highlightsPreOnboardingAddressBarOption2Title">En bas</string>
-    <string name="highlightsPreOnboardingAddressBarOption2Description">Facile d\'accès</string>
+
+    <!-- Pre-onboarding Address Bar Position -->
+    <string name="preOnboardingAddressBarPositionTop">Haut de page</string>
+    <string name="preOnboardingAddressBarPositionBottom">En bas</string>
+    <string name="preOnboardingAddressBarPositionSplit">Séparée</string>
+
     <string name="onboardingSearchDaxDialogTitle">Essayez une recherche !</string>
     <string name="onboardingSearchDaxDialogDescription">Vos recherches sur DuckDuckGo restent confidentielles.</string>
     <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">"comment dire canard en anglais"</string>

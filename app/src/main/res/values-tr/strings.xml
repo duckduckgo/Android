@@ -810,10 +810,12 @@
     <string name="preOnboardingDaxDialog3Button">Gezinmeye Başla</string>
     <string name="preOnboardingAddressBarTitle">Adres çubuğu nereye yerleştirilsin?</string>
     <string name="preOnboardingAddressBarOkButton">Sonraki</string>
-    <string name="highlightsPreOnboardingAddressBarOption1Title">Üst (Varsayılan)</string>
-    <string name="highlightsPreOnboardingAddressBarOption1Description">Görmesi kolay</string>
-    <string name="highlightsPreOnboardingAddressBarOption2Title">Alt</string>
-    <string name="highlightsPreOnboardingAddressBarOption2Description">Ulaşması kolay</string>
+
+    <!-- Pre-onboarding Address Bar Position -->
+    <string name="preOnboardingAddressBarPositionTop">Başa dön</string>
+    <string name="preOnboardingAddressBarPositionBottom">Alt</string>
+    <string name="preOnboardingAddressBarPositionSplit">Böl</string>
+
     <string name="onboardingSearchDaxDialogTitle">Bir şeyler arayın!</string>
     <string name="onboardingSearchDaxDialogDescription">DuckDuckGo aramalarınız her zaman gizlidir.</string>
     <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">"ingilizcede ördek nasıl denir"</string>
