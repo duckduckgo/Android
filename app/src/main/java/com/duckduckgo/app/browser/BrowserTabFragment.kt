@@ -3375,6 +3375,9 @@ class BrowserTabFragment :
         val transaction = childFragmentManager.beginTransaction()
         transaction.replace(binding.duckAiContextualFragmentContainer.id, fragment)
         transaction.commit()
+
+        val bottomSheetBehavior = BottomSheetBehavior.from(binding.duckAiContextualFragmentContainer)
+        bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
     }
 
     private fun openExistingContextualFragment(fragment: DuckChatContextualFragment) {
