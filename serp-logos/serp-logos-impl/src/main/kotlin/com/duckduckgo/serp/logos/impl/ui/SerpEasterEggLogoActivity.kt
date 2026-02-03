@@ -120,8 +120,7 @@ class SerpEasterEggLogoActivity : DuckDuckGoActivity() {
             .into(binding.enlargedLogoImage)
 
         binding.root.setOnClickListener {
-            animateBackgroundDimFadeOut()
-            supportFinishAfterTransition()
+            viewModel.onBackgroundClicked()
         }
 
         binding.favouriteButton.setOnClickListener {

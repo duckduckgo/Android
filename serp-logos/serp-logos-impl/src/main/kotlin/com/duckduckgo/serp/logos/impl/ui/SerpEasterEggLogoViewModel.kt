@@ -75,6 +75,10 @@ class SerpEasterEggLogoViewModel @Inject constructor(
         }
     }
 
+    fun onBackgroundClicked() {
+        _command.trySend(Command.CloseScreen)
+    }
+
     fun onFavouriteButtonClicked() {
         viewModelScope.launch {
             if (_viewState.value.isFavourite) {
