@@ -22,7 +22,6 @@
     android:id="@+id/contextualModeRoot"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginTop="@dimen/keyline_2"
     android:background="@drawable/rounded_top_corners_bottom_sheet_drawable"
     android:orientation="vertical">
 
