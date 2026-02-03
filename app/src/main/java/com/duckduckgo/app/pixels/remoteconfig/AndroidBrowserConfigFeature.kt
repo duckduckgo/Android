@@ -189,6 +189,16 @@ interface AndroidBrowserConfigFeature {
     fun splitOmnibar(): Toggle
 
     /**
+     * Controls whether the split omnibar option is shown in the welcome page onboarding flow.
+     * @return `true` when the remote config has the global "splitOmnibarWelcomePage" androidBrowserConfig
+     * sub-feature flag enabled
+     * If the remote feature is not present defaults to `true`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    @Toggle.InternalAlwaysEnabled
+    fun splitOmnibarWelcomePage(): Toggle
+
+    /**
      * @return `true` when the remote config has the global "repotWebViewCapabilities" androidBrowserConfig
      * sub-feature flag enabled
      * If the remote feature is not present defaults to `false`
