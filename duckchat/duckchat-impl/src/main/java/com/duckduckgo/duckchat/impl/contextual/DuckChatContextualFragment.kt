@@ -204,9 +204,22 @@ class DuckChatContextualFragment :
                 val imeVisible = heightDiff > threshold
                 if (imeVisible != isKeyboardVisible) {
                     isKeyboardVisible = imeVisible
-                    viewModel.onKeyboardVisibilityChanged(imeVisible)
+                    if (binding.inputField.hasFocus()){
+                        viewModel.onKeyboardVisibilityChanged(imeVisible)
+                    }
                 }
             }
+        }
+    private val bottomSheetCallback =
+        object : BottomSheetBehavior.BottomSheetCallback() {
+            override fun onStateChanged(bottomSheet: View, newState: Int) {
+                if (newState == BottomSheetBehavior.STATE_HIDDEN) {
+                    viewModel.persistTabClosed()
+                }
+                backPressedCallback.isEnabled = newState != BottomSheetBehavior.STATE_HIDDEN
+            }
+
+            override fun onSlide(bottomSheet: View, slideOffset: Float) {}
         }
 
     private var lastWebViewX = 0f
@@ -415,19 +428,7 @@ class DuckChatContextualFragment :
 
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, backPressedCallback)
 
-        bottomSheetBehavior.addBottomSheetCallback(
-            object : BottomSheetBehavior.BottomSheetCallback() {
-                override fun onStateChanged(bottomSheet: View, newState: Int) {
-                    if (newState == BottomSheetBehavior.STATE_HIDDEN) {
-                        binding.root.viewTreeObserver.removeOnGlobalLayoutListener(keyboardVisibilityListener)
-                        viewModel.persistTabClosed()
-                    }
-                    backPressedCallback.isEnabled = newState != BottomSheetBehavior.STATE_HIDDEN
-                }
-
-                override fun onSlide(bottomSheet: View, slideOffset: Float) {}
-            },
-        )
+        bottomSheetBehavior.addBottomSheetCallback(bottomSheetCallback)
     }
 
     private fun configureButtons() {
@@ -435,6 +436,7 @@ class DuckChatContextualFragment :
             viewModel.onContextualClose()
         }
         binding.contextualNewChat.setOnClickListener {
+            hideKeyboard(binding.inputField)
             viewModel.onNewChatRequested()
         }
         binding.contextualModeButtons.setOnClickListener { }
@@ -889,6 +891,8 @@ class DuckChatContextualFragment :
     }
 
     override fun onDestroyView() {
+        bottomSheetBehavior.removeBottomSheetCallback(bottomSheetCallback)
+        binding.root.viewTreeObserver.removeOnGlobalLayoutListener(keyboardVisibilityListener)
         super.onDestroyView()
         appCoroutineScope.launch(dispatcherProvider.io()) {
             cookieManager.flush()
