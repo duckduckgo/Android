@@ -204,7 +204,7 @@ class DuckChatContextualFragment :
                 val imeVisible = heightDiff > threshold
                 if (imeVisible != isKeyboardVisible) {
                     isKeyboardVisible = imeVisible
-                    if (binding.inputField.hasFocus()){
+                    if (binding.inputField.hasFocus()) {
                         viewModel.onKeyboardVisibilityChanged(imeVisible)
                     }
                 }
@@ -212,14 +212,21 @@ class DuckChatContextualFragment :
         }
     private val bottomSheetCallback =
         object : BottomSheetBehavior.BottomSheetCallback() {
-            override fun onStateChanged(bottomSheet: View, newState: Int) {
+            override fun onStateChanged(
+                bottomSheet: View,
+                newState: Int
+            ) {
                 if (newState == BottomSheetBehavior.STATE_HIDDEN) {
                     viewModel.persistTabClosed()
                 }
                 backPressedCallback.isEnabled = newState != BottomSheetBehavior.STATE_HIDDEN
             }
 
-            override fun onSlide(bottomSheet: View, slideOffset: Float) {}
+            override fun onSlide(
+                bottomSheet: View,
+                slideOffset: Float
+            ) {
+            }
         }
 
     private var lastWebViewX = 0f
@@ -543,7 +550,6 @@ class DuckChatContextualFragment :
 
                     is DuckChatContextualViewModel.Command.ChangeSheetState -> {
                         bottomSheetBehavior.state = command.newState
-
                     }
                 }
             }.launchIn(lifecycleScope)
