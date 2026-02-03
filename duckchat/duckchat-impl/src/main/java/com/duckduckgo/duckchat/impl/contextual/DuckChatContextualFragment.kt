@@ -214,7 +214,7 @@ class DuckChatContextualFragment :
         object : BottomSheetBehavior.BottomSheetCallback() {
             override fun onStateChanged(
                 bottomSheet: View,
-                newState: Int
+                newState: Int,
             ) {
                 if (newState == BottomSheetBehavior.STATE_HIDDEN) {
                     viewModel.persistTabClosed()
@@ -224,7 +224,7 @@ class DuckChatContextualFragment :
 
             override fun onSlide(
                 bottomSheet: View,
-                slideOffset: Float
+                slideOffset: Float,
             ) {
             }
         }
@@ -540,7 +540,7 @@ class DuckChatContextualFragment :
                     }
 
                     is DuckChatContextualViewModel.Command.OpenFullscreenMode -> {
-                        binding.root.viewTreeObserver.removeOnGlobalLayoutListener(/* victim = */ keyboardVisibilityListener)
+                        binding.root.viewTreeObserver.removeOnGlobalLayoutListener(keyboardVisibilityListener)
                         val result = Bundle().apply {
                             putString(KEY_DUCK_AI_URL, command.url)
                         }
