@@ -82,6 +82,7 @@ class DuckChatContextualViewModel @Inject constructor(
                 showContext = false,
                 showFullscreen = true,
                 allowsAutomaticContextAttachment = duckChatInternal.isAutomaticContextAttachmentEnabled(),
+                userRemovedContext = false,
                 contextUrl = "",
                 contextTitle = "",
                 tabId = "",
@@ -95,6 +96,7 @@ class DuckChatContextualViewModel @Inject constructor(
         val showFullscreen: Boolean = true,
         val allowsAutomaticContextAttachment: Boolean = false,
         val showContext: Boolean = false,
+        val userRemovedContext: Boolean = false,
         val contextUrl: String = "",
         val contextTitle: String = "",
         val tabId: String = "",
@@ -148,6 +150,11 @@ class DuckChatContextualViewModel @Inject constructor(
                     )
                 }
             }
+            _viewState.update {
+                it.copy(
+                    allowsAutomaticContextAttachment = duckChatInternal.isAutomaticContextAttachmentEnabled(),
+                )
+            }
         }
     }
 
@@ -167,6 +174,7 @@ class DuckChatContextualViewModel @Inject constructor(
                             sheetMode = SheetMode.INPUT,
                             showFullscreen = true,
                             tabId = tabId,
+                            allowsAutomaticContextAttachment = duckChatInternal.isAutomaticContextAttachmentEnabled(),
                         )
                     }
                 }
@@ -184,6 +192,7 @@ class DuckChatContextualViewModel @Inject constructor(
                             sheetMode = SheetMode.WEBVIEW,
                             showFullscreen = hasChatHistory,
                             tabId = tabId,
+                            allowsAutomaticContextAttachment = duckChatInternal.isAutomaticContextAttachmentEnabled(),
                         )
                     }
                     commandChannel.trySend(Command.ChangeSheetState(BottomSheetBehavior.STATE_EXPANDED))
@@ -300,7 +309,10 @@ class DuckChatContextualViewModel @Inject constructor(
         logcat { "Duck.ai Contextual: removePageContext" }
         viewModelScope.launch {
             _viewState.update { current ->
-                current.copy(showContext = false)
+                current.copy(
+                    showContext = false,
+                    userRemovedContext = true,
+                )
             }
         }
     }
@@ -310,7 +322,8 @@ class DuckChatContextualViewModel @Inject constructor(
         viewModelScope.launch {
             _viewState.update { current ->
                 current.copy(
-                    showContext = true,
+                    showContext = updatedPageContext.isNotEmpty(),
+                    userRemovedContext = false,
                 )
             }
         }
@@ -362,7 +375,8 @@ class DuckChatContextualViewModel @Inject constructor(
                         contextTitle = title,
                         contextUrl = url,
                         tabId = tabId,
-                        showContext = _viewState.value.allowsAutomaticContextAttachment && _viewState.value.showContext,
+                        allowsAutomaticContextAttachment = duckChatInternal.isAutomaticContextAttachmentEnabled(),
+                        showContext = duckChatInternal.isAutomaticContextAttachmentEnabled() && !_viewState.value.userRemovedContext,
                     )
                 }
             } else {
@@ -371,6 +385,7 @@ class DuckChatContextualViewModel @Inject constructor(
                         contextTitle = title,
                         contextUrl = url,
                         tabId = tabId,
+                        allowsAutomaticContextAttachment = duckChatInternal.isAutomaticContextAttachmentEnabled(),
                     )
                 }
             }

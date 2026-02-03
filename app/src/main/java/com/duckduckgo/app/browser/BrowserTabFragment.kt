@@ -3392,7 +3392,6 @@ class BrowserTabFragment :
                     bottomSheet: View,
                     newState: Int,
                 ) {
-                    logcat { "Duck.ai Contextual: BTF onStateChanged $newState" }
                     if (newState == BottomSheetBehavior.STATE_HIDDEN) {
                         binding.duckAiContextualFragmentContainer.gone()
                         hideKeyboard()

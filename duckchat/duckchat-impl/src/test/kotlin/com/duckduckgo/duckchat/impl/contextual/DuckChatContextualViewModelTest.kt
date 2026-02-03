@@ -189,6 +189,10 @@ class DuckChatContextualViewModelTest {
 
                 cancelAndIgnoreRemainingEvents()
             }
+
+            val state = testee.viewState.value
+            assertFalse(state.showContext)
+            assertTrue(state.userRemovedContext)
         }
 
     @Test
@@ -226,6 +230,7 @@ class DuckChatContextualViewModelTest {
 
                 val state = expectMostRecentItem()
                 assertTrue(state.showContext)
+                assertFalse(state.userRemovedContext)
                 assertEquals("Ctx Title", state.contextTitle)
                 assertEquals("https://ctx.com", state.contextUrl)
                 assertEquals("tab-1", state.tabId)
@@ -259,25 +264,6 @@ class DuckChatContextualViewModelTest {
         }
 
     @Test
-    fun `when add and remove page context then hasContext toggles`() =
-        runTest {
-            testee.viewState.test {
-                // initial emission
-                awaitItem()
-
-                testee.addPageContext()
-                val withContext = expectMostRecentItem() as DuckChatContextualViewModel.ViewState
-                assertTrue(withContext.showContext)
-
-                testee.removePageContext()
-                val withoutContext = expectMostRecentItem() as DuckChatContextualViewModel.ViewState
-                assertFalse(withoutContext.showContext)
-
-                cancelAndIgnoreRemainingEvents()
-            }
-        }
-
-    @Test
     fun `when replace prompt then prompt stored`() =
         runTest {
             testee.viewState.test {
@@ -288,10 +274,31 @@ class DuckChatContextualViewModelTest {
                 val state = expectMostRecentItem() as DuckChatContextualViewModel.ViewState
                 assertEquals("new prompt", state.prompt)
                 assertTrue(state.showContext)
+                assertFalse(state.userRemovedContext)
 
                 cancelAndIgnoreRemainingEvents()
             }
         }
+
+    @Test
+    fun `when user removed context then page context remains hidden`() = runTest {
+        val tabId = "tab-1"
+        val serializedPageData =
+            """
+            {
+                "title": "Ctx Title",
+                "url": "https://ctx.com",
+                "content": "content"
+            }
+            """.trimIndent()
+
+        testee.removePageContext()
+        testee.onPageContextReceived(tabId, serializedPageData)
+
+        val state = testee.viewState.value
+        assertTrue(state.userRemovedContext)
+        assertFalse(state.showContext)
+    }
 
     @Test
     fun `when full mode requested with url then open fullscreen command emitted`() =
