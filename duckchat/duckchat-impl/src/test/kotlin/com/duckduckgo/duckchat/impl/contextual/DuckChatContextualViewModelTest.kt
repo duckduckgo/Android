@@ -243,7 +243,6 @@ class DuckChatContextualViewModelTest {
             }
 
             assertEquals(DuckChatContextualViewModel.SheetMode.WEBVIEW, testee.viewState.value.sheetMode)
-            assertEquals("chatUrl", testee.viewState.value.url)
         }
 
     @Test
@@ -343,7 +342,6 @@ class DuckChatContextualViewModelTest {
 
             val state = testee.viewState.value
             assertEquals(DuckChatContextualViewModel.SheetMode.WEBVIEW, state.sheetMode)
-            assertEquals(storedUrl, state.url)
             assertEquals(tabId, state.tabId)
 
             cancelAndIgnoreRemainingEvents()
@@ -367,6 +365,8 @@ class DuckChatContextualViewModelTest {
             val event = awaitItem()
             assertEquals("submitNewChatAction", event.subscriptionName)
             assertEquals(RealDuckChatJSHelper.DUCK_CHAT_FEATURE_NAME, event.featureName)
+
+            expectNoEvents()
 
             cancelAndIgnoreRemainingEvents()
         }
@@ -471,15 +471,40 @@ class DuckChatContextualViewModelTest {
             val changeStateCommand = awaitItem() as DuckChatContextualViewModel.Command.ChangeSheetState
             assertEquals(BottomSheetBehavior.STATE_EXPANDED, changeStateCommand.newState)
 
-            val loadCommand = awaitItem() as DuckChatContextualViewModel.Command.LoadUrl
-            assertEquals(storedUrl, loadCommand.url)
+            expectNoEvents()
 
             cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun `reopenSheet in webview mode loads new url when session expired`() = runTest {
+    fun `reopenSheet in webview mode starts new chat when session expired`() = runTest {
+        val tabId = "tab-1"
+        val storedUrl = "https://duck.ai/chat?chatID=123"
+        contextualDataStore.persistTabChatUrl(tabId, storedUrl)
+        sessionTimeoutProvider.timeoutMs = 10_000L
+        timeProvider.nowMs = 100_000L
+        contextualDataStore.persistTabClosedTimestamp(tabId, 95_000L)
+
+        testee.onSheetOpened(tabId)
+
+        testee.subscriptionEventDataFlow.test {
+            timeProvider.nowMs = 120_000L
+            testee.reopenSheet()
+
+            val event = awaitItem()
+            assertEquals("submitNewChatAction", event.subscriptionName)
+            assertEquals(RealDuckChatJSHelper.DUCK_CHAT_FEATURE_NAME, event.featureName)
+
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+        assertNull(contextualDataStore.getTabChatUrl(tabId))
+    }
+
+    @Test
+    fun `reopenSheet in webview mode loads new url when no stored url`() = runTest {
         val tabId = "tab-1"
         val storedUrl = "https://duck.ai/chat?chatID=123"
         contextualDataStore.persistTabChatUrl(tabId, storedUrl)
@@ -495,14 +520,41 @@ class DuckChatContextualViewModelTest {
             awaitItem()
             awaitItem()
 
-            timeProvider.nowMs = 120_000L
-            testee.reopenSheet()
+            contextualDataStore.clearTabChatUrl(tabId)
 
+            testee.reopenSheet()
             val changeStateCommand = awaitItem() as DuckChatContextualViewModel.Command.ChangeSheetState
             assertEquals(BottomSheetBehavior.STATE_EXPANDED, changeStateCommand.newState)
 
             val loadCommand = awaitItem() as DuckChatContextualViewModel.Command.LoadUrl
             assertEquals(expectedUrl, loadCommand.url)
+
+            expectNoEvents()
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `reopenSheet in webview mode starts new chat when session expired and no stored url`() = runTest {
+        val tabId = "tab-1"
+        val storedUrl = "https://duck.ai/chat?chatID=123"
+        contextualDataStore.persistTabChatUrl(tabId, storedUrl)
+        sessionTimeoutProvider.timeoutMs = 10_000L
+        timeProvider.nowMs = 100_000L
+        contextualDataStore.persistTabClosedTimestamp(tabId, 80_000L)
+
+        testee.onSheetOpened(tabId)
+        contextualDataStore.clearTabChatUrl(tabId)
+
+        testee.subscriptionEventDataFlow.test {
+            testee.reopenSheet()
+
+            val event = awaitItem()
+            assertEquals("submitNewChatAction", event.subscriptionName)
+            assertEquals(RealDuckChatJSHelper.DUCK_CHAT_FEATURE_NAME, event.featureName)
+
+            expectNoEvents()
 
             cancelAndIgnoreRemainingEvents()
         }
@@ -515,6 +567,8 @@ class DuckChatContextualViewModelTest {
 
             val command = awaitItem() as DuckChatContextualViewModel.Command.ChangeSheetState
             assertEquals(BottomSheetBehavior.STATE_HALF_EXPANDED, command.newState)
+
+            expectNoEvents()
 
             cancelAndIgnoreRemainingEvents()
         }

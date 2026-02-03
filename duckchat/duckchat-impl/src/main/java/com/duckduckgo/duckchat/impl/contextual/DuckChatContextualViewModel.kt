@@ -83,7 +83,6 @@ class DuckChatContextualViewModel @Inject constructor(
                 contextTitle = "",
                 tabId = "",
                 prompt = "",
-                url = "",
             ),
         )
     val viewState: StateFlow<ViewState> = _viewState.asStateFlow()
@@ -96,7 +95,6 @@ class DuckChatContextualViewModel @Inject constructor(
         val contextTitle: String = "",
         val tabId: String = "",
         val prompt: String = "",
-        val url: String = "",
     )
 
     fun reopenSheet() {
@@ -117,26 +115,34 @@ class DuckChatContextualViewModel @Inject constructor(
 
     private suspend fun reopenWebViewState(currentState: ViewState) {
         val tabId = currentState.tabId
+        val shouldReuseSession = shouldReuseStoredChatUrl(tabId)
+        if (!shouldReuseSession) {
+            onNewChatRequested()
+            return
+        }
         val existingChatUrl = contextualDataStore.getTabChatUrl(tabId)
-        val shouldReuseUrl = !existingChatUrl.isNullOrBlank() && shouldReuseStoredChatUrl(tabId)
-        val urlToLoad =
-            if (shouldReuseUrl) {
-                existingChatUrl
-            } else {
-                duckChat.getDuckChatUrl("", false, sidebar = true)
-            }
         withContext(dispatchers.main()) {
-            if (!shouldReuseUrl) {
-                fullModeUrl = ""
-            }
             commandChannel.trySend(Command.ChangeSheetState(BottomSheetBehavior.STATE_EXPANDED))
-            urlToLoad?.let { commandChannel.trySend(Command.LoadUrl(it)) }
-            _viewState.update { state ->
-                state.copy(
-                    sheetMode = SheetMode.WEBVIEW,
-                    showFullscreen = hasChatId(urlToLoad),
-                    url = urlToLoad.orEmpty(),
-                )
+        }
+        if (existingChatUrl == null) {
+            val urlToLoad = duckChat.getDuckChatUrl("", false, sidebar = true)
+            withContext(dispatchers.main()) {
+                commandChannel.trySend(Command.LoadUrl(urlToLoad))
+                _viewState.update { state ->
+                    state.copy(
+                        sheetMode = SheetMode.WEBVIEW,
+                        showFullscreen = hasChatId(urlToLoad),
+                    )
+                }
+            }
+        } else {
+            withContext(dispatchers.main()) {
+                _viewState.update { state ->
+                    state.copy(
+                        sheetMode = SheetMode.WEBVIEW,
+                        showFullscreen = hasChatId(existingChatUrl),
+                    )
+                }
             }
         }
     }
@@ -173,7 +179,6 @@ class DuckChatContextualViewModel @Inject constructor(
                     _viewState.update { current ->
                         current.copy(
                             sheetMode = SheetMode.WEBVIEW,
-                            url = existingChatUrl,
                             showFullscreen = hasChatHistory,
                             tabId = tabId,
                         )
@@ -201,7 +206,6 @@ class DuckChatContextualViewModel @Inject constructor(
                 _viewState.value =
                     _viewState.value.copy(
                         sheetMode = SheetMode.WEBVIEW,
-                        url = "chatUrl",
                     )
                 _subscriptionEventDataChannel.trySend(contextPrompt)
                 commandChannel.trySend(Command.ChangeSheetState(BottomSheetBehavior.STATE_EXPANDED))
