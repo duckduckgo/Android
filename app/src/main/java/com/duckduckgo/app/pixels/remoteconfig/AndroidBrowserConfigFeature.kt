@@ -180,6 +180,14 @@ interface AndroidBrowserConfigFeature {
     fun vpnMenuItem(): Toggle
 
     /**
+     * @return `true` when the remote config has the global "vpnMenuItemInternational" androidBrowserConfig
+     * sub-feature flag enabled
+     * If the remote feature is not present defaults to `false`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun vpnMenuItemInternational(): Toggle
+
+    /**
      * @return `true` when the remote config has the global "splitOmnibar" androidBrowserConfig
      * sub-feature flag enabled
      * If the remote feature is not present defaults to `false`
