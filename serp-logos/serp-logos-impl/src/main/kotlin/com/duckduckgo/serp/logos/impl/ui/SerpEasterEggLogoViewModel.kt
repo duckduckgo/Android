@@ -22,10 +22,14 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.serp.logos.api.SerpEasterEggLogosToggles
 import com.duckduckgo.serp.logos.impl.store.FavouriteSerpLogoDataStore
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -43,6 +47,13 @@ class SerpEasterEggLogoViewModel @Inject constructor(
 
     private val _viewState = MutableStateFlow(ViewState())
     val viewState: StateFlow<ViewState> = _viewState.asStateFlow()
+
+    sealed interface Command {
+        data object CloseScreen : Command
+    }
+
+    private val _command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
+    val commands: Flow<Command> = _command.receiveAsFlow()
 
     private var currentLogoUrl: String = ""
 
@@ -71,6 +82,7 @@ class SerpEasterEggLogoViewModel @Inject constructor(
             } else {
                 favouriteSerpLogoDataStore.setFavouriteLogo(currentLogoUrl)
             }
+            _command.send(Command.CloseScreen)
         }
     }
 }
