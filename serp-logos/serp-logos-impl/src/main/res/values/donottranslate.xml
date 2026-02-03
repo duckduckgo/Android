@@ -16,8 +16,8 @@
 
 <resources>
 
-    <string name="serpLogoSetAsFavourite">Switch to this logo</string>
-    <string name="serpLogoResetToDefault">Reset search logo</string>
+    <string name="serpLogoSetAsFavourite">Switch to This Logo</string>
+    <string name="serpLogoResetToDefault">Reset Search Logo</string>
     <string name="serpLogoDiscoveryText">You found a hidden logo!</string>
 
 </resources>
