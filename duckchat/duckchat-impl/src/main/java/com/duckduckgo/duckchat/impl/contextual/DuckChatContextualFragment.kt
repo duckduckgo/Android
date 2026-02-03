@@ -306,7 +306,6 @@ class DuckChatContextualFragment :
                                             data,
                                             Mode.CONTEXTUAL,
                                             viewModel.updatedPageContext,
-                                            viewModel.viewState.value.showContext,
                                         )?.let { response ->
                                             logcat { "Duck.ai: response $response" }
                                             withContext(dispatcherProvider.main()) {

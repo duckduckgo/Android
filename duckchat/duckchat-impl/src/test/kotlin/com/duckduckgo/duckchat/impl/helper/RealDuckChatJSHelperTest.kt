@@ -259,7 +259,7 @@ class RealDuckChatJSHelperTest {
     }
 
     @Test
-    fun whenGetPageContextInitAndAutomaticEnabledAndUserEnabledThenReturnsContext() = runTest {
+    fun whenGetPageContextInitAndAutomaticEnabledAndUserEnabledThenReturnsNull() = runTest {
         whenever(mockDuckChat.isAutomaticContextAttachmentEnabled()).thenReturn(true)
         val result =
             testee.processJsCallbackMessage(
@@ -269,13 +269,9 @@ class RealDuckChatJSHelperTest {
                 data = JSONObject().apply { put("reason", "init") },
                 mode = Mode.CONTEXTUAL,
                 pageContext = viewModel.updatedPageContext,
-                userEnabledContextAttachment = true,
             )
 
-        assertNotNull(result)
-        val context = result!!.params.getJSONObject("pageContext")
-        assertEquals("Example Title", context.getString("title"))
-        assertEquals("https://example.com", context.getString("url"))
+        assertNull(result)
     }
 
     @Test
@@ -290,7 +286,6 @@ class RealDuckChatJSHelperTest {
                 data = JSONObject().apply { put("reason", "init") },
                 mode = Mode.CONTEXTUAL,
                 pageContext = viewModel.updatedPageContext,
-                userEnabledContextAttachment = true,
             )
 
         assertNull(result)
@@ -308,7 +303,6 @@ class RealDuckChatJSHelperTest {
                 data = JSONObject().apply { put("reason", "userAction") },
                 mode = Mode.CONTEXTUAL,
                 pageContext = viewModel.updatedPageContext,
-                userEnabledContextAttachment = false,
             )
 
         assertNotNull(result)
@@ -328,7 +322,6 @@ class RealDuckChatJSHelperTest {
                 data = JSONObject().apply { put("reason", "userAction") },
                 mode = Mode.CONTEXTUAL,
                 pageContext = null,
-                userEnabledContextAttachment = true,
             )
 
         assertNull(result)
@@ -346,7 +339,6 @@ class RealDuckChatJSHelperTest {
                 data = JSONObject().apply { put("reason", "userAction") },
                 mode = Mode.CONTEXTUAL,
                 pageContext = viewModel.updatedPageContext,
-                userEnabledContextAttachment = true,
             )
 
         assertNull(result)
@@ -364,7 +356,6 @@ class RealDuckChatJSHelperTest {
                 data = JSONObject().apply { put("reason", "init") },
                 mode = Mode.CONTEXTUAL,
                 pageContext = viewModel.updatedPageContext,
-                userEnabledContextAttachment = false,
             )
 
         assertNull(result)
@@ -382,7 +373,6 @@ class RealDuckChatJSHelperTest {
                 data = null,
                 mode = Mode.CONTEXTUAL,
                 pageContext = viewModel.updatedPageContext,
-                userEnabledContextAttachment = true,
             )
 
         assertNotNull(result)
@@ -403,7 +393,6 @@ class RealDuckChatJSHelperTest {
                 data = JSONObject().apply { put("reason", "unexpected") },
                 mode = Mode.CONTEXTUAL,
                 pageContext = viewModel.updatedPageContext,
-                userEnabledContextAttachment = true,
             )
 
         assertNull(result)
@@ -532,7 +521,7 @@ class RealDuckChatJSHelperTest {
     }
 
     @Test
-    fun `when get AI chat page context for init with automatic attachment then return payload`() = runTest {
+    fun `when get AI chat page context for init with automatic attachment then return null`() = runTest {
         val featureName = "aiChat"
         val method = "getAIChatPageContext"
         val id = "123"
@@ -545,15 +534,9 @@ class RealDuckChatJSHelperTest {
             id,
             data,
             pageContext = viewModel.updatedPageContext,
-            userEnabledContextAttachment = true,
         )
 
-        val expectedPayload = JSONObject().apply {
-            put("pageContext", JSONObject(viewModel.updatedPageContext))
-        }
-
-        assertNotNull(result)
-        assertEquals(expectedPayload.toString(), result!!.params.toString())
+        assertNull(result)
     }
 
     @Test
@@ -570,7 +553,6 @@ class RealDuckChatJSHelperTest {
             id,
             data,
             pageContext = viewModel.updatedPageContext,
-            userEnabledContextAttachment = false,
         )
 
         val expectedPayload = JSONObject().apply {
@@ -595,7 +577,6 @@ class RealDuckChatJSHelperTest {
             id,
             data,
             pageContext = null,
-            userEnabledContextAttachment = true,
         )
 
         assertNull(result)
