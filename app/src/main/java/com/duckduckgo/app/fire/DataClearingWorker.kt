@@ -89,17 +89,22 @@ class DataClearingWorker(
                     throw e
                 }
             } else {
+                val clearWhatOption = settingsDataStore.automaticallyClearWhatOption
                 dataClearingWideEvent.startLegacy(
                     entryPoint = DataClearingWideEvent.EntryPoint.LEGACY_AUTO_BACKGROUND,
-                    clearWhatOption = settingsDataStore.automaticallyClearWhatOption,
+                    clearWhatOption = clearWhatOption,
                     clearDuckAiData = settingsDataStore.clearDuckAiData,
                 )
                 try {
-                    clearData(settingsDataStore.automaticallyClearWhatOption)
+                    clearData(clearWhatOption)
                     dataClearingWideEvent.finishSuccess()
                 } catch (e: Exception) {
                     dataClearingWideEvent.finishFailure(e)
                     throw e
+                }
+                if (clearWhatOption == ClearWhatOption.CLEAR_TABS_AND_DATA) {
+                    logcat(INFO) { "Will kill process now" }
+                    clearDataAction.killProcess()
                 }
             }
         }
@@ -135,9 +140,6 @@ class DataClearingWorker(
             // Use legacy clearing
             clearDataAction.clearTabsAndAllDataAsync(appInForeground = false, shouldFireDataClearPixel = false)
             clearDataAction.setAppUsedSinceLastClearFlag(false)
-
-            logcat(INFO) { "Will kill process now" }
-            clearDataAction.killProcess()
         }
     }
 
