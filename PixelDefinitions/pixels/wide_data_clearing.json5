@@ -45,8 +45,8 @@
                 "enum": ["1000", "5000", "10000", "30000", "60000", "300000", "600000"]
             },
             {
-                "key": "feature.data.ext.error",
-                "description": "Error message indicating cause of the failure. Typically derived from exception type+message.",
+                "key": "feature.data.ext.failure_reason",
+                "description": "Reason for failure. Only present on FAILURE events. By default this is going to be exception class name.",
                 "type": "string"
             },
             {
