@@ -290,10 +290,19 @@ class DuckChatContextualViewModelTest {
     @Test
     fun `when add and remove page context then hasContext toggles`() =
         runTest {
-            testee.viewState.test {
-                // initial emission
-                awaitItem()
+            val tabId = "tab-1"
+            val serializedPageData =
+                """
+            {
+                "title": "Ctx Title",
+                "url": "https://ctx.com",
+                "content": "content"
+            }
+                """.trimIndent()
 
+            testee.onPageContextReceived(tabId, serializedPageData)
+
+            testee.viewState.test {
                 testee.addPageContext()
                 val withContext = expectMostRecentItem() as DuckChatContextualViewModel.ViewState
                 assertTrue(withContext.showContext)
@@ -638,11 +647,6 @@ class DuckChatContextualViewModelTest {
 
             cancelAndIgnoreRemainingEvents()
         }
-    }
-
-    private fun enableAutomaticContextAttachment() {
-        (duckChat as FakeDuckChat).setAutomaticContextAttachment(true)
-        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
     }
 
     private class FakeDuckChat : com.duckduckgo.duckchat.api.DuckChat {
