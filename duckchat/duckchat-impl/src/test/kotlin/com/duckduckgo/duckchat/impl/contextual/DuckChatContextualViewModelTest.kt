@@ -264,13 +264,25 @@ class DuckChatContextualViewModelTest {
         }
 
     @Test
-    fun `when input field focused then sheet expanded`() =
+    fun `when keyboard becomes visible in input mode then sheet expanded`() =
         runTest {
             testee.commands.test {
-                testee.onInputFieldFocused()
+                testee.onKeyboardVisibilityChanged(true)
 
                 val command = awaitItem() as DuckChatContextualViewModel.Command.ChangeSheetState
                 assertEquals(BottomSheetBehavior.STATE_EXPANDED, command.newState)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `when keyboard hidden in input mode then sheet half expanded`() =
+        runTest {
+            testee.commands.test {
+                testee.onKeyboardVisibilityChanged(false)
+
+                val command = awaitItem() as DuckChatContextualViewModel.Command.ChangeSheetState
+                assertEquals(BottomSheetBehavior.STATE_HALF_EXPANDED, command.newState)
                 cancelAndIgnoreRemainingEvents()
             }
         }

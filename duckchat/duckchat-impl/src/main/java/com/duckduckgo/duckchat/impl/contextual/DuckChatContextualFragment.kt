@@ -21,6 +21,7 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Rect
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
@@ -32,6 +33,7 @@ import android.view.KeyEvent
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewTreeObserver
 import android.view.inputmethod.EditorInfo
 import android.webkit.CookieManager
 import android.webkit.MimeTypeMap
@@ -187,6 +189,23 @@ class DuckChatContextualFragment :
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<View>
     private lateinit var backPressedCallback: OnBackPressedCallback
     internal val simpleWebview: WebView by lazy { binding.simpleWebview }
+    private var isKeyboardVisible = false
+
+    private val keyboardVisibilityListener =
+        ViewTreeObserver.OnGlobalLayoutListener {
+            val rootView = binding.root
+            val rect = Rect()
+            rootView.getWindowVisibleDisplayFrame(rect)
+            val visibleHeight = rect.height()
+            val totalHeight = rootView.rootView.height
+            val heightDiff = totalHeight - visibleHeight
+            val threshold = (resources.displayMetrics.density * 100).toInt()
+            val imeVisible = heightDiff > threshold
+            if (imeVisible != isKeyboardVisible) {
+                isKeyboardVisible = imeVisible
+                viewModel.onKeyboardVisibilityChanged(imeVisible)
+            }
+        }
 
     private var lastWebViewX = 0f
     private var lastWebViewY = 0f
@@ -360,6 +379,7 @@ class DuckChatContextualFragment :
         configureBottomSheet(view)
         setupBackPressHandling()
         observeViewModel()
+        setupKeyboardVisibilityListener()
 
         requireArguments().getString(KEY_DUCK_AI_CONTEXTUAL_TAB_ID)?.let { tabId ->
             viewModel.onSheetOpened(tabId)
@@ -425,11 +445,6 @@ class DuckChatContextualFragment :
                 false
             },
         )
-        binding.inputField.setOnFocusChangeListener { _, hasFocus ->
-            if (hasFocus) {
-                viewModel.onInputFieldFocused()
-            }
-        }
         binding.inputField.addTextChangedListener(
             object : TextWatcher {
                 override fun beforeTextChanged(
@@ -539,6 +554,10 @@ class DuckChatContextualFragment :
             }.launchIn(lifecycleScope)
 
         observeSubscriptionEventDataChannel()
+    }
+
+    private fun setupKeyboardVisibilityListener() {
+        binding.root.viewTreeObserver.addOnGlobalLayoutListener(keyboardVisibilityListener)
     }
 
     private fun renderViewState(viewState: DuckChatContextualViewModel.ViewState) {
@@ -854,6 +873,7 @@ class DuckChatContextualFragment :
     }
 
     override fun onDestroyView() {
+        binding.root.viewTreeObserver.removeOnGlobalLayoutListener(keyboardVisibilityListener)
         super.onDestroyView()
         appCoroutineScope.launch(dispatcherProvider.io()) {
             cookieManager.flush()
