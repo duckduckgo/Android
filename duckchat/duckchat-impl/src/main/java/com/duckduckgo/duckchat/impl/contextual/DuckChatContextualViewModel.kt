@@ -356,6 +356,12 @@ class DuckChatContextualViewModel @Inject constructor(
         }
     }
 
+    fun onInputFieldFocused() {
+        viewModelScope.launch(dispatchers.main()) {
+            commandChannel.trySend(Command.ChangeSheetState(BottomSheetBehavior.STATE_EXPANDED))
+        }
+    }
+
     fun onPageContextReceived(
         tabId: String,
         pageContext: String,

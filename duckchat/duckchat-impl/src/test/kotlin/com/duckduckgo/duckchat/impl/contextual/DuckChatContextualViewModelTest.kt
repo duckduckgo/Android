@@ -264,6 +264,37 @@ class DuckChatContextualViewModelTest {
         }
 
     @Test
+    fun `when input field focused then sheet expanded`() =
+        runTest {
+            testee.commands.test {
+                testee.onInputFieldFocused()
+
+                val command = awaitItem() as DuckChatContextualViewModel.Command.ChangeSheetState
+                assertEquals(BottomSheetBehavior.STATE_EXPANDED, command.newState)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `when add and remove page context then hasContext toggles`() =
+        runTest {
+            testee.viewState.test {
+                // initial emission
+                awaitItem()
+
+                testee.addPageContext()
+                val withContext = expectMostRecentItem() as DuckChatContextualViewModel.ViewState
+                assertTrue(withContext.showContext)
+
+                testee.removePageContext()
+                val withoutContext = expectMostRecentItem() as DuckChatContextualViewModel.ViewState
+                assertFalse(withoutContext.showContext)
+
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
     fun `when replace prompt then prompt stored`() =
         runTest {
             testee.viewState.test {

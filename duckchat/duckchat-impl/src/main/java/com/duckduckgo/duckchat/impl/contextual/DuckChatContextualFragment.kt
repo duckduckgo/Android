@@ -43,7 +43,7 @@ import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.annotation.AnyThread
 import androidx.core.content.ContextCompat
-import androidx.core.view.isVisible
+import androidx.core.view.isInvisible
 import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
@@ -294,7 +294,7 @@ class DuckChatContextualFragment :
                         id: String?,
                         data: JSONObject?,
                     ) {
-                        logcat { "Duck.ai: process $featureName $method $id $data" }
+                        logcat { "Duck.ai JS Helper: process $featureName $method $id $data" }
                         when (featureName) {
                             RealDuckChatJSHelper.DUCK_CHAT_FEATURE_NAME -> {
                                 appCoroutineScope.launch(dispatcherProvider.io()) {
@@ -379,7 +379,8 @@ class DuckChatContextualFragment :
         bottomSheetBehavior.skipCollapsed = true
         bottomSheetBehavior.isDraggable = true
         bottomSheetBehavior.isHideable = true
-        bottomSheetBehavior.isFitToContents = true
+        bottomSheetBehavior.isFitToContents = false
+        bottomSheetBehavior.expandedOffset = 0
     }
 
     private fun setupBackPressHandling() {
@@ -424,6 +425,11 @@ class DuckChatContextualFragment :
                 false
             },
         )
+        binding.inputField.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus) {
+                viewModel.onInputFieldFocused()
+            }
+        }
         binding.inputField.addTextChangedListener(
             object : TextWatcher {
                 override fun beforeTextChanged(
@@ -446,7 +452,7 @@ class DuckChatContextualFragment :
 
                 override fun afterTextChanged(text: Editable?) {
                     binding.duckAiContextualSend.isEnabled = !text.toString().isEmpty()
-                    binding.duckAiContextualClearText.isVisible = !text.toString().isEmpty()
+                    binding.duckAiContextualClearText.isInvisible = text.toString().isEmpty()
                 }
             },
         )
