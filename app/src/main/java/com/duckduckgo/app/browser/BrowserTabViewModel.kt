@@ -540,6 +540,13 @@ class BrowserTabViewModel @Inject constructor(
     private var ctaChangedTicker = MutableStateFlow("")
     val hiddenIds = MutableStateFlow(HiddenBookmarksIds())
 
+    /**
+     * Browser UI lock state - when locked, browser gestures (pull-to-refresh, omnibar scroll,
+     * tab swipe) should be disabled to allow pages to manage their own touch interactions.
+     */
+    private val _browserUiLockState = MutableStateFlow(BrowserUiLockState())
+    val browserUiLockState = _browserUiLockState.asStateFlow()
+
     private var activeExperiments: List<Toggle>? = null
 
     private val _subscriptionEventDataChannel = Channel<SubscriptionEventData>(capacity = Channel.BUFFERED)
@@ -548,6 +555,16 @@ class BrowserTabViewModel @Inject constructor(
     data class HiddenBookmarksIds(
         val favorites: List<String> = emptyList(),
         val bookmarks: List<String> = emptyList(),
+    )
+
+    /**
+     * State for browser UI lock feature.
+     * When locked is true, browser gestures should be disabled.
+     */
+    data class BrowserUiLockState(
+        val locked: Boolean = false,
+        val overscrollBehavior: String = "",
+        val overflow: String = "",
     )
 
     /*
@@ -2117,6 +2134,9 @@ class BrowserTabViewModel @Inject constructor(
         activeExperiments: List<Toggle>,
     ) {
         this.activeExperiments = activeExperiments
+
+        // Reset UI lock state on navigation (fail-open behavior)
+        resetBrowserUiLockState()
 
         browserViewState.value =
             currentBrowserViewState().copy(
@@ -4037,6 +4057,12 @@ class BrowserTabViewModel @Inject constructor(
                 site?.debugFlags = (site?.debugFlags ?: listOf()).toMutableList().plus(featureName)?.toList()
             }
 
+            "uiLockChanged" -> {
+                if (data != null) {
+                    handleUiLockChanged(data)
+                }
+            }
+
             "initialPing" -> {
                 if (id != null) {
                     command.value = SendResponseToJs(
@@ -4220,6 +4246,38 @@ class BrowserTabViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    /**
+     * Handle UI lock state change from C-S-S browserUiLock feature.
+     * Updates the browserUiLockState which controls browser gesture behavior.
+     */
+    private fun handleUiLockChanged(data: JSONObject) {
+        try {
+            val locked = data.optBoolean("locked", false)
+            val signals = data.optJSONObject("signals")
+            val overscrollBehavior = signals?.optString("overscrollBehavior", "") ?: ""
+            val overflow = signals?.optString("overflow", "") ?: ""
+
+            _browserUiLockState.value = BrowserUiLockState(
+                locked = locked,
+                overscrollBehavior = overscrollBehavior,
+                overflow = overflow,
+            )
+
+            logcat { "BrowserUiLock: locked=$locked, overscrollBehavior=$overscrollBehavior, overflow=$overflow" }
+        } catch (e: Exception) {
+            logcat { "BrowserUiLock: Failed to parse uiLockChanged data: ${e.message}" }
+            // Fail open - reset to unlocked state
+            resetBrowserUiLockState()
+        }
+    }
+
+    /**
+     * Reset browser UI lock state to unlocked (fail-open behavior).
+     */
+    private fun resetBrowserUiLockState() {
+        _browserUiLockState.value = BrowserUiLockState()
     }
 
     fun breakageReportResult(data: JSONObject) {
