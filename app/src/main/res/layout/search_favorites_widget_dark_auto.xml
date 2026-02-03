@@ -30,7 +30,7 @@
         android:layout_marginEnd="@dimen/searchWidgetFavoritesSideMargin">
 
         <GridView
-            android:id="@+id/emptyfavoritesGrid"
+            android:id="@+id/emptyFavoritesGrid"
             style="@style/Widget.DuckDuckGo.SearchWidgetFavoritesGrid" />
 
         <GridView
