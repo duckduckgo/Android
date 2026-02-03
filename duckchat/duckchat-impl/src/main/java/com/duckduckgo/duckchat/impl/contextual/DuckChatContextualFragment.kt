@@ -522,6 +522,7 @@ class DuckChatContextualFragment :
                     }
 
                     is DuckChatContextualViewModel.Command.OpenFullscreenMode -> {
+                        binding.root.viewTreeObserver.removeOnGlobalLayoutListener(keyboardVisibilityListener)
                         val result = Bundle().apply {
                             putString(KEY_DUCK_AI_URL, command.url)
                         }
