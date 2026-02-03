@@ -73,6 +73,7 @@
     <string name="options">Opcijas</string>
     <string name="shareLink">Kopīgot saiti</string>
     <string name="copyUrl">Kopēt saites adresi</string>
+    <string name="urlCopiedToClipboard">URL ir nokopēts starpliktuvē</string>
 
     <!-- Find in page -->
     <string name="nextSearchTermDescription">Atrast nākamo</string>

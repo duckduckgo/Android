@@ -253,6 +253,7 @@ class OmnibarLayoutViewModel @Inject constructor(
         data class LaunchInputScreen(val query: String) : Command()
         data class EasterEggLogoClicked(val url: String) : Command()
         data object FocusInputField : Command()
+        data class CopyUrlToClipboard(val url: String) : Command()
     }
 
     sealed class LeadingIconState {
@@ -1039,6 +1040,15 @@ class OmnibarLayoutViewModel @Inject constructor(
             val state = _viewState.value.leadingIconState
             if (state is EasterEggLogo) {
                 command.send(Command.EasterEggLogoClicked(state.logoUrl))
+            }
+        }
+    }
+
+    fun onCustomTabUrlLongClicked() {
+        viewModelScope.launch {
+            val url = _viewState.value.url
+            if (url.isNotEmpty()) {
+                command.send(Command.CopyUrlToClipboard(url))
             }
         }
     }

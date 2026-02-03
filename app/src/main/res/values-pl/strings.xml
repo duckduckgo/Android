@@ -74,6 +74,7 @@
     <string name="options">Opcje</string>
     <string name="shareLink">Udostępnij link</string>
     <string name="copyUrl">Skopiuj adres linku</string>
+    <string name="urlCopiedToClipboard">URL skopiowany do schowka</string>
 
     <!-- Find in page -->
     <string name="nextSearchTermDescription">Znajdź następny element</string>
