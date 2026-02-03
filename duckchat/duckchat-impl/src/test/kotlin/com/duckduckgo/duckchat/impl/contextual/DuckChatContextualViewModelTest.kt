@@ -54,6 +54,8 @@ class DuckChatContextualViewModelTest {
     private val duckChat: com.duckduckgo.duckchat.api.DuckChat = FakeDuckChat()
     private val duckChatJSHelper: DuckChatJSHelper = mock()
     private val contextualDataStore = FakeDuckChatContextualDataStore()
+    private val timeProvider = FakeDuckChatContextualTimeProvider()
+    private val sessionTimeoutProvider = FakeDuckChatContextualSessionTimeoutProvider()
 
     @Before
     fun setup() {
@@ -72,6 +74,8 @@ class DuckChatContextualViewModelTest {
             duckChat = duckChat,
             duckChatJSHelper = duckChatJSHelper,
             contextualDataStore = contextualDataStore,
+            sessionTimeoutProvider = sessionTimeoutProvider,
+            timeProvider = timeProvider,
         )
     }
 
@@ -239,7 +243,6 @@ class DuckChatContextualViewModelTest {
             }
 
             assertEquals(DuckChatContextualViewModel.SheetMode.WEBVIEW, testee.viewState.value.sheetMode)
-            assertEquals("chatUrl", testee.viewState.value.url)
         }
 
     @Test
@@ -339,11 +342,37 @@ class DuckChatContextualViewModelTest {
 
             val state = testee.viewState.value
             assertEquals(DuckChatContextualViewModel.SheetMode.WEBVIEW, state.sheetMode)
-            assertEquals(storedUrl, state.url)
             assertEquals(tabId, state.tabId)
 
             cancelAndIgnoreRemainingEvents()
         }
+    }
+
+    @Test
+    fun `when sheet opened with stored chat url and session expired then load new url`() = runTest {
+        val tabId = "tab-1"
+        val storedUrl = "https://duck.ai/chat?chatID=123"
+        contextualDataStore.persistTabChatUrl(tabId, storedUrl)
+
+        val now = 100_000L
+        timeProvider.nowMs = now
+        sessionTimeoutProvider.timeoutMs = 10_000L
+        contextualDataStore.persistTabClosedTimestamp(tabId, now - 20_000L)
+
+        testee.subscriptionEventDataFlow.test {
+            testee.onSheetOpened(tabId)
+
+            val event = awaitItem()
+            assertEquals("submitNewChatAction", event.subscriptionName)
+            assertEquals(RealDuckChatJSHelper.DUCK_CHAT_FEATURE_NAME, event.featureName)
+
+            expectNoEvents()
+
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+        assertNull(contextualDataStore.getTabChatUrl(tabId))
     }
 
     @Test
@@ -398,6 +427,153 @@ class DuckChatContextualViewModelTest {
         assertNull(contextualDataStore.getTabChatUrl(tabId))
     }
 
+    @Test
+    fun `onContextualClose stores last closed timestamp`() = runTest {
+        val tabId = "tab-1"
+        val now = 55_000L
+        timeProvider.nowMs = now
+
+        testee.onSheetOpened(tabId)
+        testee.onContextualClose()
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        assertEquals(now, contextualDataStore.getTabClosedTimestamp(tabId))
+    }
+
+    @Test
+    fun `persistTabClosed stores last closed timestamp`() = runTest {
+        val tabId = "tab-1"
+        val now = 77_000L
+        timeProvider.nowMs = now
+
+        testee.onSheetOpened(tabId)
+        testee.persistTabClosed()
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        assertEquals(now, contextualDataStore.getTabClosedTimestamp(tabId))
+    }
+
+    @Test
+    fun `reopenSheet in webview mode reuses stored url when session active`() = runTest {
+        val tabId = "tab-1"
+        val storedUrl = "https://duck.ai/chat?chatID=123"
+        contextualDataStore.persistTabChatUrl(tabId, storedUrl)
+        sessionTimeoutProvider.timeoutMs = 10_000L
+        timeProvider.nowMs = 100_000L
+        contextualDataStore.persistTabClosedTimestamp(tabId, 95_000L)
+
+        testee.commands.test {
+            testee.onSheetOpened(tabId)
+            awaitItem()
+            awaitItem()
+
+            testee.reopenSheet()
+            val changeStateCommand = awaitItem() as DuckChatContextualViewModel.Command.ChangeSheetState
+            assertEquals(BottomSheetBehavior.STATE_EXPANDED, changeStateCommand.newState)
+
+            expectNoEvents()
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `reopenSheet in webview mode starts new chat when session expired`() = runTest {
+        val tabId = "tab-1"
+        val storedUrl = "https://duck.ai/chat?chatID=123"
+        contextualDataStore.persistTabChatUrl(tabId, storedUrl)
+        sessionTimeoutProvider.timeoutMs = 10_000L
+        timeProvider.nowMs = 100_000L
+        contextualDataStore.persistTabClosedTimestamp(tabId, 95_000L)
+
+        testee.onSheetOpened(tabId)
+
+        testee.subscriptionEventDataFlow.test {
+            timeProvider.nowMs = 120_000L
+            testee.reopenSheet()
+
+            val event = awaitItem()
+            assertEquals("submitNewChatAction", event.subscriptionName)
+            assertEquals(RealDuckChatJSHelper.DUCK_CHAT_FEATURE_NAME, event.featureName)
+
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+        assertNull(contextualDataStore.getTabChatUrl(tabId))
+    }
+
+    @Test
+    fun `reopenSheet in webview mode loads new url when no stored url`() = runTest {
+        val tabId = "tab-1"
+        val storedUrl = "https://duck.ai/chat?chatID=123"
+        contextualDataStore.persistTabChatUrl(tabId, storedUrl)
+        sessionTimeoutProvider.timeoutMs = 10_000L
+        timeProvider.nowMs = 100_000L
+        contextualDataStore.persistTabClosedTimestamp(tabId, 95_000L)
+
+        val expectedUrl = "https://duckduckgo.com/?placement=sidebar&q=DuckDuckGo+AI+Chat&ia=chat&duckai=5"
+        (duckChat as FakeDuckChat).nextUrl = expectedUrl
+
+        testee.commands.test {
+            testee.onSheetOpened(tabId)
+            awaitItem()
+            awaitItem()
+
+            contextualDataStore.clearTabChatUrl(tabId)
+
+            testee.reopenSheet()
+            val changeStateCommand = awaitItem() as DuckChatContextualViewModel.Command.ChangeSheetState
+            assertEquals(BottomSheetBehavior.STATE_EXPANDED, changeStateCommand.newState)
+
+            val loadCommand = awaitItem() as DuckChatContextualViewModel.Command.LoadUrl
+            assertEquals(expectedUrl, loadCommand.url)
+
+            expectNoEvents()
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `reopenSheet in webview mode starts new chat when session expired and no stored url`() = runTest {
+        val tabId = "tab-1"
+        val storedUrl = "https://duck.ai/chat?chatID=123"
+        contextualDataStore.persistTabChatUrl(tabId, storedUrl)
+        sessionTimeoutProvider.timeoutMs = 10_000L
+        timeProvider.nowMs = 100_000L
+        contextualDataStore.persistTabClosedTimestamp(tabId, 80_000L)
+
+        testee.onSheetOpened(tabId)
+        contextualDataStore.clearTabChatUrl(tabId)
+
+        testee.subscriptionEventDataFlow.test {
+            testee.reopenSheet()
+
+            val event = awaitItem()
+            assertEquals("submitNewChatAction", event.subscriptionName)
+            assertEquals(RealDuckChatJSHelper.DUCK_CHAT_FEATURE_NAME, event.featureName)
+
+            expectNoEvents()
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `reopenSheet in input mode half expands sheet`() = runTest {
+        testee.commands.test {
+            testee.reopenSheet()
+
+            val command = awaitItem() as DuckChatContextualViewModel.Command.ChangeSheetState
+            assertEquals(BottomSheetBehavior.STATE_HALF_EXPANDED, command.newState)
+
+            expectNoEvents()
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
     private fun enableAutomaticContextAttachment() {
         (duckChat as FakeDuckChat).setAutomaticContextAttachment(true)
         coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
@@ -429,6 +605,7 @@ class DuckChatContextualViewModelTest {
 
     private class FakeDuckChatContextualDataStore : DuckChatContextualDataStore {
         private val urls = mutableMapOf<String, String>()
+        private val closeTimestamps = mutableMapOf<String, Long>()
 
         override suspend fun persistTabChatUrl(tabId: String, url: String) {
             urls[tabId] = url
@@ -436,12 +613,35 @@ class DuckChatContextualViewModelTest {
 
         override suspend fun getTabChatUrl(tabId: String): String? = urls[tabId]
 
+        override suspend fun persistTabClosedTimestamp(tabId: String, timestampMs: Long) {
+            closeTimestamps[tabId] = timestampMs
+        }
+
+        override suspend fun getTabClosedTimestamp(tabId: String): Long? = closeTimestamps[tabId]
+
         override fun clearTabChatUrl(tabId: String) {
             urls.remove(tabId)
         }
 
+        override fun clearTabClosedTimestamp(tabId: String) {
+            closeTimestamps.remove(tabId)
+        }
+
         override fun clearAll() {
             urls.clear()
+            closeTimestamps.clear()
         }
+    }
+
+    private class FakeDuckChatContextualSessionTimeoutProvider : DuckChatContextualSessionTimeoutProvider {
+        var timeoutMs: Long = 0L
+
+        override fun sessionTimeoutMillis(): Long = timeoutMs
+    }
+
+    private class FakeDuckChatContextualTimeProvider : DuckChatContextualTimeProvider {
+        var nowMs: Long = 0L
+
+        override fun currentTimeMillis(): Long = nowMs
     }
 }

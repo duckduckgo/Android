@@ -394,6 +394,9 @@ class DuckChatContextualFragment :
         bottomSheetBehavior.addBottomSheetCallback(
             object : BottomSheetBehavior.BottomSheetCallback() {
                 override fun onStateChanged(bottomSheet: View, newState: Int) {
+                    if (newState == BottomSheetBehavior.STATE_HIDDEN) {
+                        viewModel.persistTabClosed()
+                    }
                     backPressedCallback.isEnabled = newState != BottomSheetBehavior.STATE_HIDDEN
                 }
 
