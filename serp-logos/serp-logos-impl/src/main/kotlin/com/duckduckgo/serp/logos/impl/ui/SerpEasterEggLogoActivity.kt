@@ -43,6 +43,7 @@ import com.duckduckgo.navigation.api.getActivityParams
 import com.duckduckgo.serp.logos.api.SerpLogoScreens.EasterEggLogoScreen
 import com.duckduckgo.serp.logos.impl.R
 import com.duckduckgo.serp.logos.impl.databinding.ActivitySerpEasterEggLogoBinding
+import com.duckduckgo.serp.logos.impl.ui.SerpEasterEggLogoViewModel.Command.CloseScreen
 import com.duckduckgo.serp.logos.impl.ui.SerpEasterEggLogoViewModel.ViewState
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -133,6 +134,12 @@ class SerpEasterEggLogoActivity : DuckDuckGoActivity() {
             .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
             .onEach { renderViewState(it) }
             .launchIn(lifecycleScope)
+
+        viewModel
+            .commands
+            .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+            .onEach { processCommand(it) }
+            .launchIn(lifecycleScope)
     }
 
     private fun renderViewState(viewState: ViewState) {
@@ -142,6 +149,15 @@ class SerpEasterEggLogoActivity : DuckDuckGoActivity() {
                 getString(R.string.serpLogoResetToDefault)
             } else {
                 getString(R.string.serpLogoSetAsFavourite)
+            }
+        }
+    }
+
+    private fun processCommand(command: SerpEasterEggLogoViewModel.Command) {
+        when (command) {
+            CloseScreen -> {
+                animateBackgroundDimFadeOut()
+                supportFinishAfterTransition()
             }
         }
     }
