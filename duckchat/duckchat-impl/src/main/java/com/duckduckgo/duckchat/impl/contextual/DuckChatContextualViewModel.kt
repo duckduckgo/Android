@@ -48,6 +48,8 @@ class DuckChatContextualViewModel @Inject constructor(
     private val duckChat: DuckChat,
     private val duckChatJSHelper: DuckChatJSHelper,
     private val contextualDataStore: DuckChatContextualDataStore,
+    private val sessionTimeoutProvider: DuckChatContextualSessionTimeoutProvider,
+    private val timeProvider: DuckChatContextualTimeProvider,
 ) : ViewModel() {
 
     private val commandChannel = Channel<Command>(capacity = 1, onBufferOverflow = DROP_OLDEST)
@@ -100,12 +102,41 @@ class DuckChatContextualViewModel @Inject constructor(
     fun reopenSheet() {
         logcat { "Duck.ai: reopenSheet" }
 
-        viewModelScope.launch {
+        viewModelScope.launch(dispatchers.io()) {
             val currentState = _viewState.value
-            if (currentState.sheetMode == SheetMode.INPUT) {
-                commandChannel.trySend(Command.ChangeSheetState(BottomSheetBehavior.STATE_HALF_EXPANDED))
+            if (currentState.sheetMode == SheetMode.WEBVIEW) {
+                reopenWebViewState(currentState)
             } else {
-                commandChannel.trySend(Command.ChangeSheetState(BottomSheetBehavior.STATE_EXPANDED))
+                withContext(dispatchers.main()) {
+                    logcat { "Duck.ai: reopenSheet in Input mode" }
+                    commandChannel.trySend(Command.ChangeSheetState(BottomSheetBehavior.STATE_HALF_EXPANDED))
+                }
+            }
+        }
+    }
+
+    private suspend fun reopenWebViewState(currentState: ViewState) {
+        val tabId = currentState.tabId
+        val existingChatUrl = contextualDataStore.getTabChatUrl(tabId)
+        val shouldReuseUrl = !existingChatUrl.isNullOrBlank() && shouldReuseStoredChatUrl(tabId)
+        val urlToLoad =
+            if (shouldReuseUrl) {
+                existingChatUrl
+            } else {
+                duckChat.getDuckChatUrl("", false, sidebar = true)
+            }
+        withContext(dispatchers.main()) {
+            if (!shouldReuseUrl) {
+                fullModeUrl = ""
+            }
+            commandChannel.trySend(Command.ChangeSheetState(BottomSheetBehavior.STATE_EXPANDED))
+            urlToLoad?.let { commandChannel.trySend(Command.LoadUrl(it)) }
+            _viewState.update { state ->
+                state.copy(
+                    sheetMode = SheetMode.WEBVIEW,
+                    showFullscreen = hasChatId(urlToLoad),
+                    url = urlToLoad.orEmpty(),
+                )
             }
         }
     }
@@ -116,8 +147,10 @@ class DuckChatContextualViewModel @Inject constructor(
 
             val existingChatUrl = contextualDataStore.getTabChatUrl(tabId)
             if (existingChatUrl.isNullOrBlank()) {
+                logcat { "Duck.ai: tab=$tabId doesn't have an existing url, use the default one" }
                 withContext(dispatchers.main()) {
-                    commandChannel.trySend(Command.ChangeSheetState(BottomSheetBehavior.STATE_HALF_EXPANDED))
+                    fullModeUrl = ""
+                    commandChannel.trySend(Command.ChangeSheetState(BottomSheetBehavior.STATE_EXPANDED))
                     val chatUrl = duckChat.getDuckChatUrl("", false, sidebar = true)
                     commandChannel.trySend(Command.LoadUrl(chatUrl))
                     _viewState.update {
@@ -128,7 +161,12 @@ class DuckChatContextualViewModel @Inject constructor(
                         )
                     }
                 }
-            } else {
+                return@launch
+            }
+
+            val shouldReuseUrl = shouldReuseStoredChatUrl(tabId)
+            if (shouldReuseUrl) {
+                logcat { "Duck.ai: tab=$tabId has an existing url and don't need to restart the session" }
                 val hasChatHistory = hasChatId(existingChatUrl)
 
                 withContext(dispatchers.main()) {
@@ -143,6 +181,14 @@ class DuckChatContextualViewModel @Inject constructor(
                     commandChannel.trySend(Command.ChangeSheetState(BottomSheetBehavior.STATE_EXPANDED))
                     commandChannel.trySend(Command.LoadUrl(existingChatUrl))
                 }
+            } else {
+                logcat { "Duck.ai: tab=$tabId session expired, starting a new one" }
+                withContext(dispatchers.main()) {
+                    _viewState.update {
+                        it.copy(tabId = tabId)
+                    }
+                }
+                onNewChatRequested()
             }
         }
     }
@@ -223,8 +269,18 @@ class DuckChatContextualViewModel @Inject constructor(
     }
 
     fun onContextualClose() {
-        viewModelScope.launch {
+        persistTabClosed()
+        viewModelScope.launch(dispatchers.main()) {
             commandChannel.trySend(Command.ChangeSheetState(BottomSheetBehavior.STATE_HIDDEN))
+        }
+    }
+
+    fun persistTabClosed() {
+        viewModelScope.launch(dispatchers.io()) {
+            val tabId = _viewState.value.tabId
+            if (tabId.isNotBlank()) {
+                contextualDataStore.persistTabClosedTimestamp(tabId, timeProvider.currentTimeMillis())
+            }
         }
     }
 
@@ -334,5 +390,13 @@ class DuckChatContextualViewModel @Inject constructor(
         return url?.toUri()?.getQueryParameter("chatID")
             .orEmpty()
             .isNotBlank()
+    }
+
+    private suspend fun shouldReuseStoredChatUrl(tabId: String): Boolean {
+        val lastClosedTimestamp = contextualDataStore.getTabClosedTimestamp(tabId) ?: return true
+        val timeoutMs = sessionTimeoutProvider.sessionTimeoutMillis()
+        if (timeoutMs <= 0) return false
+        val elapsedMs = timeProvider.currentTimeMillis() - lastClosedTimestamp
+        return elapsedMs <= timeoutMs
     }
 }

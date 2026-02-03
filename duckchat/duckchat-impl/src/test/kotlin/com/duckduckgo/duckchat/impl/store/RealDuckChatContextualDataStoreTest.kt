@@ -102,14 +102,43 @@ class RealDuckChatContextualDataStoreTest {
     }
 
     @Test
+    fun whenPersistTabClosedTimestampThenItCanBeRetrieved() = runTest {
+        val tabId = "tab-id"
+        val timestamp = 123_456L
+
+        testee.persistTabClosedTimestamp(tabId, timestamp)
+
+        assertEquals(timestamp, testee.getTabClosedTimestamp(tabId))
+    }
+
+    @Test
+    fun whenClearTabClosedTimestampThenOnlyThatEntryIsRemoved() = runTest {
+        val tabToClear = "tab-to-clear"
+        val remainingTab = "tab-to-keep"
+
+        testee.persistTabClosedTimestamp(tabToClear, 111L)
+        testee.persistTabClosedTimestamp(remainingTab, 222L)
+
+        testee.clearTabClosedTimestamp(tabToClear)
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        assertNull(testee.getTabClosedTimestamp(tabToClear))
+        assertEquals(222L, testee.getTabClosedTimestamp(remainingTab))
+    }
+
+    @Test
     fun whenClearAllThenAllEntriesAreRemoved() = runTest {
         testee.persistTabChatUrl("tab-1", "https://example.com/one")
         testee.persistTabChatUrl("tab-2", "https://example.com/two")
+        testee.persistTabClosedTimestamp("tab-1", 111L)
+        testee.persistTabClosedTimestamp("tab-2", 222L)
 
         testee.clearAll()
         coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
 
         assertNull(testee.getTabChatUrl("tab-1"))
         assertNull(testee.getTabChatUrl("tab-2"))
+        assertNull(testee.getTabClosedTimestamp("tab-1"))
+        assertNull(testee.getTabClosedTimestamp("tab-2"))
     }
 }
