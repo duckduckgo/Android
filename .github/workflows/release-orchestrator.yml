@@ -1,0 +1,47 @@
+name: Release Orchestrator
+
+on:
+  workflow_dispatch:
+    inputs:
+      app-version:
+        description: 'App Version for Release'
+        required: true
+        default: 'PLACEHOLDER'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  create-release-tag:
+    uses: ./.github/workflows/release_create_tag.yml
+    with:
+      app-version: ${{ inputs.app-version }}
+    secrets: inherit
+
+  create-asana-release-task:
+    needs: create-release-tag
+    uses: ./.github/workflows/release_create_task.yml
+    with:
+      app-version: ${{ inputs.app-version }}
+    secrets: inherit
+
+  launch-release-tests:
+    needs: create-asana-release-task
+    uses: ./.github/workflows/release_tests.yml
+    with:
+      app-version: ${{ inputs.app-version }}
+      test-tag: 'releaseTest'
+    secrets: inherit
+
+  upload-play-store:
+    needs: launch-release-tests
+    uses: ./.github/workflows/release_upload_play_store.yml
+    with:
+      ref: ${{ inputs.app-version }}
+    secrets: inherit
+
+  upload-internal:
+    needs: upload-play-store
+    uses: ./.github/workflows/release_upload_internal.yml
+    secrets: inherit
