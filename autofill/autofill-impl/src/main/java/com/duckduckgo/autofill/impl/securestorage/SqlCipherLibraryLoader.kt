@@ -1,0 +1,210 @@
+/*
+ * Copyright (c) 2025 DuckDuckGo
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.duckduckgo.autofill.impl.securestorage
+
+import android.content.Context
+import com.duckduckgo.autofill.api.AutofillFeature
+import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.library.loader.LibraryLoader
+import dagger.SingleInstanceIn
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.TimeoutCancellationException
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeout
+import logcat.LogPriority.ERROR
+import logcat.logcat
+import javax.inject.Inject
+
+/**
+ * Result of attempting to load the sqlcipher native library.
+ */
+sealed interface LibraryLoadResult {
+    /**
+     * Library loaded successfully.
+     */
+    data object Success : LibraryLoadResult
+
+    /**
+     * Timed out waiting for library to load.
+     */
+    data object Timeout : LibraryLoadResult
+
+    /**
+     * Library loading failed with an exception.
+     */
+    data class Failure(val throwable: Throwable) : LibraryLoadResult
+}
+
+/**
+ * Singleton that manages asynchronous loading of the sqlcipher native library.
+ *
+ * This loader uses lazy initialization to avoid blocking the main thread during app startup.
+ *
+ * The loader ensures that sqlcipher is loaded and provides a suspend function to wait for the library to be ready.
+ */
+@SingleInstanceIn(AppScope::class)
+class SqlCipherLibraryLoader @Inject constructor(
+    private val context: Context,
+    private val dispatchers: DispatcherProvider,
+    private val autofillFeature: AutofillFeature,
+) {
+    private val initializationMutex = Mutex()
+    private var libraryLoaded: CompletableDeferred<Unit>? = null
+
+    /**
+     * Suspends until the sqlcipher library is loaded or a timeout occurs.
+     *
+     * Safe to call from any thread. On first call, initiates library loading and feature flag
+     * checks on IO thread. Subsequent calls wait for the existing load operation to complete.
+     *
+     * @param timeoutMillis Maximum time to wait for library loading in milliseconds (default: 10 seconds)
+     * @return Result indicating success, timeout, or failure with exception details
+     */
+    suspend fun waitForLibraryLoad(
+        timeoutMillis: Long = 10_000,
+    ): LibraryLoadResult {
+        logcat { "SqlCipher-Init: waitForLibraryLoad() called with timeout=${timeoutMillis}ms" }
+
+        initialize()
+
+        val deferred = libraryLoaded ?: run {
+            logcat(ERROR) { "SqlCipher-Init: libraryLoaded is null after initialization - this should never happen" }
+            return LibraryLoadResult.Failure(IllegalStateException("Library initialization failed - deferred is null"))
+        }
+
+        val waitStartTimeMillis = System.currentTimeMillis()
+        logcat { "SqlCipher-Init: Waiting for library load to complete (timeout=${timeoutMillis}ms)" }
+
+        return try {
+            withTimeout(timeoutMillis) {
+                deferred.await()
+            }
+            val waitDurationMillis = System.currentTimeMillis() - waitStartTimeMillis
+            logcat { "SqlCipher-Init: Library load wait completed successfully (${waitDurationMillis}ms)" }
+            LibraryLoadResult.Success
+        } catch (_: TimeoutCancellationException) {
+            logcat(ERROR) { "SqlCipher-Init: Timeout after waiting ${timeoutMillis}ms for library load" }
+            LibraryLoadResult.Timeout
+        } catch (e: Throwable) {
+            logcat(ERROR) { "SqlCipher-Init: Failed while waiting for library load: ${e.javaClass.simpleName} - ${e.message}" }
+            LibraryLoadResult.Failure(e)
+        }
+    }
+
+    /**
+     * Ensures the library loading has been initiated.
+     * Called lazily on first use. Handles threading internally - feature flag check
+     * and library loading both occur on IO thread regardless of caller's thread.
+     */
+    private suspend fun initialize() {
+        // Fast path: if already initialized, return immediately
+        if (libraryLoaded != null) {
+            logcat { "SqlCipher-Init: Already initialized, skipping" }
+            return
+        }
+
+        initializationMutex.withLock {
+            // Double-check after acquiring lock
+            if (libraryLoaded != null) {
+                logcat { "SqlCipher-Init: Another thread completed initialization while waiting for lock" }
+                return
+            }
+
+            val useAsyncLoading = withContext(dispatchers.io()) {
+                autofillFeature.sqlCipherAsyncLoading().isEnabled()
+            }
+
+            logcat { "SqlCipher-Init: Feature flag check complete, useAsyncLoading=$useAsyncLoading" }
+
+            if (useAsyncLoading) {
+                loadAsync()
+            } else {
+                loadSync()
+            }
+        }
+    }
+
+    /**
+     * Initiates asynchronous loading of the sqlcipher library.
+     * This method runs on the IO dispatcher to avoid blocking the main thread.
+     */
+    private suspend fun loadAsync() {
+        withContext(dispatchers.io()) {
+            val deferred = CompletableDeferred<Unit>()
+            libraryLoaded = deferred
+
+            val startTimeMillis = System.currentTimeMillis()
+            logcat { "SqlCipher-Init: Starting async library load on IO thread" }
+            try {
+                LibraryLoader.loadLibrary(
+                    context,
+                    SQLCIPHER_LIB_NAME,
+                    object : LibraryLoader.LibraryLoaderListener {
+                        override fun success() {
+                            val durationMillis = System.currentTimeMillis() - startTimeMillis
+                            logcat { "SqlCipher-Init: Asynchronous library load completed successfully (${durationMillis}ms)" }
+                            deferred.complete(Unit)
+                        }
+
+                        override fun failure(throwable: Throwable) {
+                            val durationMillis = System.currentTimeMillis() - startTimeMillis
+                            logcat(ERROR) {
+                                "SqlCipher-Init: Asynchronous library load failed after ${durationMillis}ms: " +
+                                    "${throwable.javaClass.simpleName} - ${throwable.message}"
+                            }
+                            deferred.completeExceptionally(throwable)
+                        }
+                    },
+                )
+            } catch (t: Throwable) {
+                logcat(ERROR) { "SqlCipher-Init: Exception during synchronous library load setup: ${t.javaClass.simpleName} - ${t.message}" }
+                deferred.completeExceptionally(t)
+            }
+        }
+    }
+
+    /**
+     * Performs synchronous loading of the sqlcipher library (fallback mode).
+     * Matches production behavior - blocking call on main thread.
+     */
+    private suspend fun loadSync() {
+        withContext(dispatchers.main()) {
+            val deferred = CompletableDeferred<Unit>()
+            libraryLoaded = deferred
+
+            val startTimeMillis = System.currentTimeMillis()
+            logcat { "SqlCipher-Init: Starting synchronous library load on thread ${Thread.currentThread().name}" }
+            try {
+                LibraryLoader.loadLibrary(context, SQLCIPHER_LIB_NAME)
+                val durationMillis = System.currentTimeMillis() - startTimeMillis
+                logcat { "SqlCipher-Init: Sync library load completed successfully (${durationMillis}ms)" }
+                deferred.complete(Unit)
+            } catch (t: Throwable) {
+                val durationMillis = System.currentTimeMillis() - startTimeMillis
+                logcat(ERROR) { "SqlCipher-Init: Sync library load failed after ${durationMillis}ms: ${t.javaClass.simpleName} - ${t.message}" }
+                deferred.completeExceptionally(t)
+            }
+        }
+    }
+
+    private companion object {
+        private const val SQLCIPHER_LIB_NAME = "sqlcipher"
+    }
+}
