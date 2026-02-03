@@ -3,7 +3,6 @@ package com.duckduckgo.subscriptions.impl.pixels
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
-import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.AUTH_V1_SIGN_IN_ATTEMPT
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.FREE_TRIAL_START
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.FREE_TRIAL_VPN_ACTIVATION
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.PURCHASE_SUCCESS_ORIGIN
@@ -25,7 +24,6 @@ class SubscriptionPixelTest(
             pixel in listOf(
                 PURCHASE_SUCCESS_ORIGIN,
                 SUBSCRIPTION_WEBVIEW_RENDER_PROCESS_CRASH,
-                AUTH_V1_SIGN_IN_ATTEMPT,
                 FREE_TRIAL_START,
                 FREE_TRIAL_VPN_ACTIVATION,
             ),
