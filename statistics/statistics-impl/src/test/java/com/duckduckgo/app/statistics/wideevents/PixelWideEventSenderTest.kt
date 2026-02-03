@@ -108,6 +108,7 @@ class PixelWideEventSenderTest {
                 pixelName = eq("wide_${eventName}_c"),
                 parameters = eq(expectedParameters),
                 encodedParameters = eq(expectedEncodedParameters),
+                type = any(),
             )
 
             verify(pixel).fire(

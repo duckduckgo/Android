@@ -24,6 +24,7 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import com.duckduckgo.app.statistics.api.PixelSender.EnqueuePixelResult
 import com.duckduckgo.app.statistics.api.PixelSender.SendPixelResult.PIXEL_IGNORED
 import com.duckduckgo.app.statistics.api.PixelSender.SendPixelResult.PIXEL_SENT
 import com.duckduckgo.app.statistics.api.RxPixelSenderTest.TestPixels.TEST
@@ -180,7 +181,8 @@ class RxPixelSenderTest {
         givenAppVersion("1.0.0")
         val params = mapOf("param1" to "value1", "param2" to "value2")
 
-        testee.enqueuePixel(TEST.pixelName, params, emptyMap()).test()
+        testee.enqueuePixel(TEST.pixelName, params, emptyMap(), Count).test()
+            .assertValue(EnqueuePixelResult.PIXEL_ENQUEUED)
 
         val testObserver = pendingPixelDao.pixels().test()
         val pixels = testObserver.assertNoErrors().values().last()
@@ -204,7 +206,8 @@ class RxPixelSenderTest {
         givenFormFactor(DeviceInfo.FormFactor.PHONE)
         givenAppVersion("1.0.0")
 
-        testee.enqueuePixel(TEST.pixelName, emptyMap(), emptyMap()).test()
+        testee.enqueuePixel(TEST.pixelName, emptyMap(), emptyMap(), Count).test()
+            .assertValue(EnqueuePixelResult.PIXEL_ENQUEUED)
 
         val pixels = pendingPixelDao.pixels().test().assertNoErrors().values().last()
         assertEquals(1, pixels.size)
@@ -440,6 +443,102 @@ class RxPixelSenderTest {
 
         verifyNoInteractions(api)
         assertTrue("tag" in pixelFiredRepository.uniquePixelsFired)
+    }
+
+    @Test
+    fun whenDailyPixelIsEnqueuedThenPixelNameIsStored() = runTest {
+        givenFormFactor(DeviceInfo.FormFactor.PHONE)
+
+        testee.enqueuePixel(TEST.pixelName, emptyMap(), emptyMap(), Daily())
+            .test().assertValue(EnqueuePixelResult.PIXEL_ENQUEUED)
+
+        assertTrue(TEST.pixelName in pixelFiredRepository.dailyPixelsFiredToday)
+        val pixels = pendingPixelDao.pixels().test().assertNoErrors().values().last()
+        assertEquals(1, pixels.size)
+    }
+
+    @Test
+    fun whenDailyPixelHasAlreadyBeenFiredTodayThenItIsNotEnqueued() = runTest {
+        pixelFiredRepository.dailyPixelsFiredToday += TEST.pixelName
+
+        testee.enqueuePixel(TEST.pixelName, emptyMap(), emptyMap(), Daily())
+            .test().assertValue(EnqueuePixelResult.PIXEL_IGNORED)
+
+        assertTrue(TEST.pixelName in pixelFiredRepository.dailyPixelsFiredToday)
+        val pixels = pendingPixelDao.pixels().test().assertNoErrors().values().last()
+        assertEquals(0, pixels.size)
+    }
+
+    @Test
+    fun whenDailyPixelIsEnqueuedThenTagIsStored() = runTest {
+        givenFormFactor(DeviceInfo.FormFactor.PHONE)
+
+        testee.enqueuePixel(TEST.pixelName, emptyMap(), emptyMap(), Daily("tag"))
+            .test().assertValue(EnqueuePixelResult.PIXEL_ENQUEUED)
+
+        assertTrue("tag" in pixelFiredRepository.dailyPixelsFiredToday)
+        val pixels = pendingPixelDao.pixels().test().assertNoErrors().values().last()
+        assertEquals(1, pixels.size)
+    }
+
+    @Test
+    fun whenDailyPixelHasAlreadyBeenFiredAndUsesTagThenItIsNotEnqueued() = runTest {
+        pixelFiredRepository.dailyPixelsFiredToday += "tag"
+
+        testee.enqueuePixel(TEST.pixelName, emptyMap(), emptyMap(), Daily("tag"))
+            .test().assertValue(EnqueuePixelResult.PIXEL_IGNORED)
+
+        assertTrue("tag" in pixelFiredRepository.dailyPixelsFiredToday)
+        val pixels = pendingPixelDao.pixels().test().assertNoErrors().values().last()
+        assertEquals(0, pixels.size)
+    }
+
+    @Test
+    fun whenUniquePixelIsEnqueuedThenPixelNameIsStored() = runTest {
+        givenFormFactor(DeviceInfo.FormFactor.PHONE)
+
+        testee.enqueuePixel(TEST.pixelName, emptyMap(), emptyMap(), Unique())
+            .test().assertValue(EnqueuePixelResult.PIXEL_ENQUEUED)
+
+        assertTrue(TEST.pixelName in pixelFiredRepository.uniquePixelsFired)
+        val pixels = pendingPixelDao.pixels().test().assertNoErrors().values().last()
+        assertEquals(1, pixels.size)
+    }
+
+    @Test
+    fun whenUniquePixelHasAlreadyBeenFiredThenItIsNotEnqueued() = runTest {
+        pixelFiredRepository.uniquePixelsFired += TEST.pixelName
+
+        testee.enqueuePixel(TEST.pixelName, emptyMap(), emptyMap(), Unique())
+            .test().assertValue(EnqueuePixelResult.PIXEL_IGNORED)
+
+        assertTrue(TEST.pixelName in pixelFiredRepository.uniquePixelsFired)
+        val pixels = pendingPixelDao.pixels().test().assertNoErrors().values().last()
+        assertEquals(0, pixels.size)
+    }
+
+    @Test
+    fun whenUniquePixelIsEnqueuedThenTagIsStored() = runTest {
+        givenFormFactor(DeviceInfo.FormFactor.PHONE)
+
+        testee.enqueuePixel(TEST.pixelName, emptyMap(), emptyMap(), Unique("tag"))
+            .test().assertValue(EnqueuePixelResult.PIXEL_ENQUEUED)
+
+        assertTrue("tag" in pixelFiredRepository.uniquePixelsFired)
+        val pixels = pendingPixelDao.pixels().test().assertNoErrors().values().last()
+        assertEquals(1, pixels.size)
+    }
+
+    @Test
+    fun whenUniquePixelHasAlreadyBeenFiredAndUsesTagThenItIsNotEnqueued() = runTest {
+        pixelFiredRepository.uniquePixelsFired += "tag"
+
+        testee.enqueuePixel(TEST.pixelName, emptyMap(), emptyMap(), Unique("tag"))
+            .test().assertValue(EnqueuePixelResult.PIXEL_IGNORED)
+
+        assertTrue("tag" in pixelFiredRepository.uniquePixelsFired)
+        val pixels = pendingPixelDao.pixels().test().assertNoErrors().values().last()
+        assertEquals(0, pixels.size)
     }
 
     private fun assertPixelEntity(

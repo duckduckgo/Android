@@ -76,6 +76,7 @@ class RealPirPixelSenderTest {
             pixelName = any(),
             parameters = paramsCaptor.capture(),
             encodedParameters = any(),
+            type = any(),
         )
 
         assert(paramsCaptor.firstValue.isEmpty())
@@ -90,6 +91,7 @@ class RealPirPixelSenderTest {
             pixelName = any(),
             parameters = paramsCaptor.capture(),
             encodedParameters = any(),
+            type = any(),
         )
     }
 
