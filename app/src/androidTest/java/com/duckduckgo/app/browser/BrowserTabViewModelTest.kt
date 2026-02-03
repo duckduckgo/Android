@@ -6733,6 +6733,7 @@ class BrowserTabViewModelTest {
                     anyOrNull(),
                     any(),
                     anyOrNull(),
+                    any(),
                 ),
             ).thenReturn(jsCallbackData)
             testee.processJsCallbackMessage(
@@ -6749,6 +6750,7 @@ class BrowserTabViewModelTest {
                 anyOrNull(),
                 any(),
                 anyOrNull(),
+                any(),
             )
             assertCommandIssued<Command.SendResponseToJs>()
         }
@@ -6765,6 +6767,7 @@ class BrowserTabViewModelTest {
                     anyOrNull(),
                     any(),
                     anyOrNull(),
+                    any(),
                 ),
             ).thenReturn(null)
             testee.processJsCallbackMessage(
@@ -6781,6 +6784,7 @@ class BrowserTabViewModelTest {
                 anyOrNull(),
                 any(),
                 anyOrNull(),
+                any(),
             )
             assertCommandNotIssued<Command.SendResponseToJs>()
         }
@@ -7271,7 +7275,15 @@ class BrowserTabViewModelTest {
     fun whenProcessJsCallbackMessageForSubscriptionsThenSendCommand() =
         runTest {
             val jsCallbackData = JsCallbackData(JSONObject(), "", "", "")
-            whenever(mockSubscriptionsJSHelper.processJsCallbackMessage(anyString(), anyString(), anyOrNull(), anyOrNull(), anyOrNull()))
+            whenever(
+                mockSubscriptionsJSHelper.processJsCallbackMessage(
+                    anyString(),
+                    anyString(),
+                    anyOrNull(),
+                    anyOrNull(),
+                    anyOrNull(),
+                ),
+            )
                 .thenReturn(jsCallbackData)
             testee.processJsCallbackMessage(
                 featureName = SUBSCRIPTIONS_FEATURE_NAME,
@@ -7292,6 +7304,7 @@ class BrowserTabViewModelTest {
                     anyString(),
                     anyOrNull(),
                     anyOrNull(),
+                    any(),
                     any(),
                     any(),
                 ),
