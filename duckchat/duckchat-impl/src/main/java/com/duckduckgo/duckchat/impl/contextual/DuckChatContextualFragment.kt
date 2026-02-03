@@ -193,17 +193,19 @@ class DuckChatContextualFragment :
 
     private val keyboardVisibilityListener =
         ViewTreeObserver.OnGlobalLayoutListener {
-            val rootView = binding.root
-            val rect = Rect()
-            rootView.getWindowVisibleDisplayFrame(rect)
-            val visibleHeight = rect.height()
-            val totalHeight = rootView.rootView.height
-            val heightDiff = totalHeight - visibleHeight
-            val threshold = (resources.displayMetrics.density * 100).toInt()
-            val imeVisible = heightDiff > threshold
-            if (imeVisible != isKeyboardVisible) {
-                isKeyboardVisible = imeVisible
-                viewModel.onKeyboardVisibilityChanged(imeVisible)
+            runCatching {
+                val rootView = binding.root
+                val rect = Rect()
+                rootView.getWindowVisibleDisplayFrame(rect)
+                val visibleHeight = rect.height()
+                val totalHeight = rootView.rootView.height
+                val heightDiff = totalHeight - visibleHeight
+                val threshold = (resources.displayMetrics.density * 100).toInt()
+                val imeVisible = heightDiff > threshold
+                if (imeVisible != isKeyboardVisible) {
+                    isKeyboardVisible = imeVisible
+                    viewModel.onKeyboardVisibilityChanged(imeVisible)
+                }
             }
         }
 
@@ -379,10 +381,10 @@ class DuckChatContextualFragment :
         configureBottomSheet(view)
         setupBackPressHandling()
         observeViewModel()
-        setupKeyboardVisibilityListener()
 
         requireArguments().getString(KEY_DUCK_AI_CONTEXTUAL_TAB_ID)?.let { tabId ->
             viewModel.onSheetOpened(tabId)
+            setupKeyboardVisibilityListener()
         }
     }
 
@@ -417,6 +419,7 @@ class DuckChatContextualFragment :
             object : BottomSheetBehavior.BottomSheetCallback() {
                 override fun onStateChanged(bottomSheet: View, newState: Int) {
                     if (newState == BottomSheetBehavior.STATE_HIDDEN) {
+                        binding.root.viewTreeObserver.removeOnGlobalLayoutListener(keyboardVisibilityListener)
                         viewModel.persistTabClosed()
                     }
                     backPressedCallback.isEnabled = newState != BottomSheetBehavior.STATE_HIDDEN
@@ -528,15 +531,17 @@ class DuckChatContextualFragment :
                     }
 
                     is DuckChatContextualViewModel.Command.OpenFullscreenMode -> {
-                        binding.root.viewTreeObserver.removeOnGlobalLayoutListener(keyboardVisibilityListener)
+                        binding.root.viewTreeObserver.removeOnGlobalLayoutListener(/* victim = */ keyboardVisibilityListener)
                         val result = Bundle().apply {
                             putString(KEY_DUCK_AI_URL, command.url)
                         }
+
                         setFragmentResult(KEY_DUCK_AI_CONTEXTUAL_RESULT, result)
                     }
 
                     is DuckChatContextualViewModel.Command.ChangeSheetState -> {
                         bottomSheetBehavior.state = command.newState
+
                     }
                 }
             }.launchIn(lifecycleScope)
@@ -550,6 +555,7 @@ class DuckChatContextualFragment :
                     }
 
                     DuckChatContextualSharedViewModel.Command.OpenSheet -> {
+                        setupKeyboardVisibilityListener()
                         viewModel.reopenSheet()
                     }
                 }
@@ -564,6 +570,7 @@ class DuckChatContextualFragment :
     }
 
     private fun setupKeyboardVisibilityListener() {
+        binding.root.viewTreeObserver.removeOnGlobalLayoutListener(keyboardVisibilityListener)
         binding.root.viewTreeObserver.addOnGlobalLayoutListener(keyboardVisibilityListener)
     }
 
@@ -882,7 +889,6 @@ class DuckChatContextualFragment :
     }
 
     override fun onDestroyView() {
-        binding.root.viewTreeObserver.removeOnGlobalLayoutListener(keyboardVisibilityListener)
         super.onDestroyView()
         appCoroutineScope.launch(dispatcherProvider.io()) {
             cookieManager.flush()
