@@ -17,11 +17,13 @@
 package com.duckduckgo.serp.logos.impl.ui
 
 import android.annotation.SuppressLint
+import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.serp.logos.api.SerpEasterEggLogosToggles
 import com.duckduckgo.serp.logos.impl.store.FavouriteSerpLogoDataStore
+import com.duckduckgo.serp.logos.impl.ui.SerpEasterEggLogoViewModel.Command.CloseScreen
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
@@ -149,6 +151,47 @@ class SerpEasterEggLogoViewModelTest {
         testee.onFavouriteButtonClicked()
 
         assertEquals(null, fakeFavouriteSerpLogoDataStore.favouriteLogoValue)
+    }
+
+    @Test
+    fun whenBackgroundClickedThenCloseScreenCommandEmitted() = runTest {
+        testee = createViewModel()
+
+        testee.commands.test {
+            testee.onBackgroundClicked()
+
+            assertEquals(CloseScreen, awaitItem())
+        }
+    }
+
+    @Test
+    fun whenFavouriteButtonClickedAndNotFavouriteThenCloseScreenCommandEmitted() = runTest {
+        val logoUrl = "https://duckduckgo.com/assets/logo/easter-egg.png"
+        fakeFavouriteSerpLogoDataStore.favouriteLogoValue = null
+        serpEasterEggLogosToggles.setFavourite().setRawStoredState(State(enable = true))
+        testee = createViewModel()
+
+        testee.commands.test {
+            testee.setLogoUrl(logoUrl)
+            testee.onFavouriteButtonClicked()
+
+            assertEquals(CloseScreen, awaitItem())
+        }
+    }
+
+    @Test
+    fun whenFavouriteButtonClickedAndIsFavouriteThenCloseScreenCommandEmitted() = runTest {
+        val logoUrl = "https://duckduckgo.com/assets/logo/easter-egg.png"
+        fakeFavouriteSerpLogoDataStore.favouriteLogoValue = logoUrl
+        serpEasterEggLogosToggles.setFavourite().setRawStoredState(State(enable = true))
+        testee = createViewModel()
+
+        testee.commands.test {
+            testee.setLogoUrl(logoUrl)
+            testee.onFavouriteButtonClicked()
+
+            assertEquals(CloseScreen, awaitItem())
+        }
     }
 }
 
