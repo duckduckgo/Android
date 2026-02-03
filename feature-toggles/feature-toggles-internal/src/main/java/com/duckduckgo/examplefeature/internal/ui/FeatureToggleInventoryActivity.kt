@@ -19,17 +19,16 @@ package com.duckduckgo.examplefeature.internal.ui
 import android.content.Context
 import android.os.Bundle
 import android.text.Editable
-import android.view.View
 import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.anvil.annotations.PriorityKey
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.dialog.ActionBottomSheetDialog
-import com.duckduckgo.common.ui.view.listitem.OneLineListItem
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.text.TextChangedWatcher
@@ -45,10 +44,13 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.JsonWriter
 import com.squareup.moshi.Moshi
-import kotlinx.coroutines.CoroutineStart.LAZY
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okio.Buffer
@@ -67,6 +69,7 @@ class FeatureToggleInventoryActivity : DuckDuckGoActivity() {
     lateinit var moshi: Moshi
 
     private val featureNameFilter = MutableStateFlow("")
+    private val allToggles = MutableStateFlow<List<Toggle>?>(null)
 
     private val searchTextWatcher = object : TextChangedWatcher() {
         override fun afterTextChanged(editable: Editable) {
@@ -76,127 +79,177 @@ class FeatureToggleInventoryActivity : DuckDuckGoActivity() {
 
     private val binding: ActivityFeatureToggleInventoryBinding by viewBinding()
 
-    private val toggles: Deferred<List<Toggle>> = lifecycleScope.async(start = LAZY) {
-        featureTogglesInventory.getAll()
-    }
-
     private val jsonAdapter by lazy {
         moshi.adapter(Toggle.State::class.java)
+    }
+
+    private val adapter by lazy {
+        FeatureToggleAdapter(
+            onToggleChanged = ::onToggleChanged,
+            onItemClicked = ::onItemClicked,
+        )
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
+        setupRecyclerView()
         binding.searchName.addTextChangedListener(searchTextWatcher)
 
         lifecycleScope.launch {
             lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                featureNameFilter.collect { populateViews(nameFilter = it) }
+                launch { loadToggles() }
+                launch { observeFilteredToggles() }
             }
         }
     }
 
-    private suspend fun populateViews(nameFilter: String) = withContext(dispatcherProvider.io()) {
-        val views = getFeatureViews(nameFilter)
-
-        withContext(dispatcherProvider.main()) {
-            binding.featureToggle.removeAllViews()
-            views.forEach { binding.featureToggle.addView(it) }
-            binding.progress.isVisible = false
-            binding.container.isVisible = true
+    private fun setupRecyclerView() {
+        binding.recyclerView.apply {
+            layoutManager = LinearLayoutManager(this@FeatureToggleInventoryActivity)
+            adapter = this@FeatureToggleInventoryActivity.adapter
+            setHasFixedSize(true)
+            setItemViewCacheSize(20)
+            itemAnimator = null
         }
     }
 
-    private suspend fun getFeatureViews(nameFilter: String): List<View> = withContext(dispatcherProvider.io()) {
-        val toggles = this@FeatureToggleInventoryActivity.toggles.await()
-        val match = nameFilter.lowercase()
-        val parentFeatures = toggles
-            .filter { it.featureName().parentName == null }
-            .sortedBy { it.featureName().name.lowercase() }
-        val subFeatures = toggles
-            .filter { it.featureName().parentName != null }
-            .sortedBy { it.featureName().name.lowercase() }
+    private suspend fun loadToggles() {
+        val toggles = withContext(dispatcherProvider.io()) {
+            featureTogglesInventory.getAll()
+        }
+        allToggles.value = toggles
+    }
 
-        val features = mutableListOf<Toggle>().apply {
-            // add parent features that match and all their sub-features
-            parentFeatures.forEach { parentFeature ->
-                if (match.isNotBlank()) {
-                    if (parentFeature.featureName().name.lowercase().contains(match)) {
-                        add(parentFeature)
-                        // add also all sub-features
-                        addAll(
-                            subFeatures.filter { it.featureName().parentName == parentFeature.featureName().name },
-                        )
-                    }
-                } else {
-                    for (parent in parentFeatures) {
-                        add(parent)
-                        addAll(subFeatures.filter { it.featureName().parentName == parent.featureName().name })
-                    }
+    @OptIn(kotlinx.coroutines.FlowPreview::class)
+    private suspend fun observeFilteredToggles() {
+        combine(
+            allToggles,
+            featureNameFilter.debounce(200).distinctUntilChanged(),
+        ) { toggles, filter ->
+            toggles to filter
+        }
+            .filter { (toggles, _) -> toggles != null }
+            .map { (toggles, filter) -> buildFilteredItems(toggles!!, filter) }
+            .flowOn(dispatcherProvider.io())
+            .collect { items ->
+                withContext(dispatcherProvider.main()) {
+                    adapter.submitList(items)
+                    binding.progress.isVisible = false
+                    binding.recyclerView.isVisible = true
                 }
             }
+    }
 
-            // add sub-features that match and their parent feature
-            subFeatures.forEach { feature ->
-                if (match.isNotBlank() && feature.featureName().name.lowercase().contains(match)) {
-                    // add its parent too
-                    addAll(
-                        parentFeatures.filter { it.featureName().name == feature.featureName().parentName },
-                    )
-                    add(feature)
-                }
-            }
-        }.distinct() // de-dup
+    private fun buildFilteredItems(toggles: List<Toggle>, nameFilter: String): List<FeatureToggleItem> {
+        val match = nameFilter.trim()
 
-        val views = features.map { feature ->
-            OneLineListItem(this@FeatureToggleInventoryActivity).apply {
-                if (feature.featureName().parentName != null) {
-                    setPrimaryText("\u2514   ${feature.featureName().name}")
-                    setPrimaryTextTruncation(truncated = true)
-                } else {
-                    setPrimaryText(feature.featureName().name)
-                }
-                showSwitch()
-                quietlySetIsChecked(feature.isEnabled()) { buttonView, isChecked ->
-                    // the callback will be executed in main thread so we need to move it off of it
-                    this@FeatureToggleInventoryActivity.lifecycleScope.launch(dispatcherProvider.io()) {
-                        feature.getRawStoredState()?.let { state ->
-                            // we change the 'remoteEnableState' instead of the 'enable' state because the latter is
-                            // a computed state
-                            feature.setRawStoredState(state.copy(remoteEnableState = isChecked))
-                        } ?: feature.setRawStoredState(State(remoteEnableState = isChecked))
+        data class ToggleWithName(
+            val toggle: Toggle,
+            val featureName: Toggle.FeatureName,
+        )
 
-                        // Validate the toggle state. For instance, we won't be able to disable toggles forced-enabled
-                        // for internal builds
-                        feature.isEnabled().let {
-                            withContext(dispatcherProvider.main()) {
-                                buttonView.isChecked = it
-                            }
-                        }
-                    }
-                }
-                setOnClickListener { _ ->
-                    this@FeatureToggleInventoryActivity.lifecycleScope.launch(dispatcherProvider.io()) {
-                        val featureState = feature.getRawStoredState()
-                        withContext(dispatcherProvider.main()) {
-                            ActionBottomSheetDialog.Builder(this@FeatureToggleInventoryActivity)
-                                .setTitle("Feature Flag info")
-                                .setPrimaryItem(featureState?.toJsonString() ?: "[empty]")
-                                .show()
-                        }
-                    }
-                }
+        fun Toggle.FeatureName.uniqueKey(): String = "${parentName.orEmpty()}|$name"
+
+        val parentFeatures = ArrayList<ToggleWithName>(toggles.size)
+        val subFeatures = ArrayList<ToggleWithName>(toggles.size)
+        for (toggle in toggles) {
+            val featureName = toggle.featureName()
+            val item = ToggleWithName(toggle, featureName)
+            if (featureName.parentName == null) {
+                parentFeatures.add(item)
+            } else {
+                subFeatures.add(item)
             }
         }
 
-        return@withContext views
+        val nameComparator = Comparator<ToggleWithName> { a, b ->
+            a.featureName.name.compareTo(b.featureName.name, ignoreCase = true)
+        }
+        parentFeatures.sortWith(nameComparator)
+        subFeatures.sortWith(nameComparator)
+
+        val subFeaturesByParentName = subFeatures.groupBy { it.featureName.parentName!! }
+        val parentFeaturesByName = parentFeatures.associateBy { it.featureName.name }
+
+        val features = if (match.isBlank()) {
+            ArrayList<ToggleWithName>(toggles.size).apply {
+                for (parent in parentFeatures) {
+                    add(parent)
+                    subFeaturesByParentName[parent.featureName.name]?.let { addAll(it) }
+                }
+            }
+        } else {
+            LinkedHashMap<String, ToggleWithName>(toggles.size).apply {
+                for (parent in parentFeatures) {
+                    if (parent.featureName.name.contains(match, ignoreCase = true)) {
+                        putIfAbsent(parent.featureName.uniqueKey(), parent)
+                        subFeaturesByParentName[parent.featureName.name]?.forEach { putIfAbsent(it.featureName.uniqueKey(), it) }
+                    }
+                }
+
+                for (feature in subFeatures) {
+                    if (feature.featureName.name.contains(match, ignoreCase = true)) {
+                        feature.featureName.parentName?.let { parentName ->
+                            parentFeaturesByName[parentName]?.let { putIfAbsent(it.featureName.uniqueKey(), it) }
+                        }
+                        putIfAbsent(feature.featureName.uniqueKey(), feature)
+                    }
+                }
+            }.values.toList()
+        }
+
+        return features.map { item ->
+            FeatureToggleItem(
+                toggle = item.toggle,
+                displayName = item.featureName.name,
+                isSubFeature = item.featureName.parentName != null,
+                isEnabled = item.toggle.isEnabled(),
+            )
+        }
+    }
+
+    private fun onToggleChanged(item: FeatureToggleItem, isChecked: Boolean) {
+        lifecycleScope.launch(dispatcherProvider.io()) {
+            val toggle = item.toggle
+            toggle.getRawStoredState()?.let { state ->
+                toggle.setRawStoredState(state.copy(remoteEnableState = isChecked))
+            } ?: toggle.setRawStoredState(State(remoteEnableState = isChecked))
+
+            val actualState = toggle.isEnabled()
+            if (actualState != isChecked) {
+                // Force-enabled toggle: correct switch immediately since DiffUtil won't see a change
+                withContext(dispatcherProvider.main()) {
+                    val position = adapter.currentList.indexOfFirst { it.featureKey == item.featureKey }
+                    if (position >= 0) {
+                        (binding.recyclerView.findViewHolderForAdapterPosition(position) as? FeatureToggleAdapter.ViewHolder)
+                            ?.setSwitchState(actualState)
+                    }
+                }
+            } else {
+                // Normal toggle: trigger Flow rebuild to update adapter list
+                allToggles.value = allToggles.value?.toList()
+            }
+        }
+    }
+
+    private fun onItemClicked(item: FeatureToggleItem) {
+        lifecycleScope.launch(dispatcherProvider.io()) {
+            val featureState = item.toggle.getRawStoredState()
+            withContext(dispatcherProvider.main()) {
+                ActionBottomSheetDialog.Builder(this@FeatureToggleInventoryActivity)
+                    .setTitle("Feature Flag info")
+                    .setPrimaryItem(featureState?.toJsonString() ?: "[empty]")
+                    .show()
+            }
+        }
     }
 
     private fun Toggle.State.toJsonString(): String {
         val buffer = Buffer()
         val writer = JsonWriter.of(buffer).apply {
-            indent = "  " // 2 spaces indent
+            indent = "  "
         }
         jsonAdapter.toJson(writer, this)
 
