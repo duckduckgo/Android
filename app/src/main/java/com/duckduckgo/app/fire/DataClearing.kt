@@ -17,6 +17,7 @@
 package com.duckduckgo.app.fire
 
 import com.duckduckgo.app.fire.store.FireDataStore
+import com.duckduckgo.app.fire.wideevents.DataClearingWideEvent
 import com.duckduckgo.app.global.view.ClearDataAction
 import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.clear.FireClearOption
@@ -48,6 +49,7 @@ class DataClearing @Inject constructor(
     private val settingsDataStore: SettingsDataStore,
     private val dataClearerTimeKeeper: BackgroundTimeKeeper,
     private val duckAiFeatureState: DuckAiFeatureState,
+    private val dataClearingWideEvent: DataClearingWideEvent,
 ) : ManualDataClearing, AutomaticDataClearing {
 
     override suspend fun clearDataUsingManualFireOptions(shouldRestartIfRequired: Boolean, wasAppUsedSinceLastClear: Boolean) {
@@ -63,6 +65,7 @@ class DataClearing @Inject constructor(
             duckAiFeatureState.showClearDuckAIChatHistory.value
         val wasDataCleared = options.contains(FireClearOption.DATA) || wasDuckAiChatsCleared
         if (shouldRestartIfRequired && wasDataCleared) {
+            dataClearingWideEvent.finishSuccess() // If there is an open wide event, complete it before killing the process.
             clearDataAction.killAndRestartProcess(notifyDataCleared = false)
         }
     }
@@ -80,6 +83,7 @@ class DataClearing @Inject constructor(
             duckAiFeatureState.showClearDuckAIChatHistory.value
         val wasDataCleared = options.contains(FireClearOption.DATA) || wasDuckAiChatsCleared
         if (killProcessIfNeeded && wasDataCleared) {
+            dataClearingWideEvent.finishSuccess() // If there is an open wide event, complete it before killing the process.
             clearDataAction.killProcess()
             return false
         } else {

@@ -17,6 +17,7 @@
 package com.duckduckgo.app.fire
 
 import com.duckduckgo.app.fire.store.FireDataStore
+import com.duckduckgo.app.fire.wideevents.DataClearingWideEvent
 import com.duckduckgo.app.global.view.ClearDataAction
 import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.clear.FireClearOption
@@ -60,6 +61,9 @@ class DataClearingTest {
     @Mock
     private lateinit var mockDuckAiFeatureState: DuckAiFeatureState
 
+    @Mock
+    private lateinit var mockDataClearingWideEvent: DataClearingWideEvent
+
     private val showClearDuckAIChatHistoryFlow = MutableStateFlow(true)
 
     @Before
@@ -73,6 +77,7 @@ class DataClearingTest {
             settingsDataStore = mockSettingsDataStore,
             dataClearerTimeKeeper = mockTimeKeeper,
             duckAiFeatureState = mockDuckAiFeatureState,
+            dataClearingWideEvent = mockDataClearingWideEvent,
         )
     }
 
@@ -186,6 +191,7 @@ class DataClearingTest {
 
         verify(mockClearDataAction).clearBrowserDataOnly(true)
         verify(mockClearDataAction).setAppUsedSinceLastClearFlag(false)
+        verify(mockDataClearingWideEvent).finishSuccess()
         verify(mockClearDataAction).killAndRestartProcess(notifyDataCleared = false)
     }
 
@@ -198,6 +204,7 @@ class DataClearingTest {
         verify(mockClearDataAction).clearTabsOnly()
         verify(mockClearDataAction).clearBrowserDataOnly(true)
         verify(mockClearDataAction).setAppUsedSinceLastClearFlag(false)
+        verify(mockDataClearingWideEvent).finishSuccess()
         verify(mockClearDataAction).killAndRestartProcess(notifyDataCleared = false)
     }
 
@@ -209,6 +216,7 @@ class DataClearingTest {
 
         verify(mockClearDataAction).clearDuckAiChatsOnly()
         verify(mockClearDataAction).setAppUsedSinceLastClearFlag(false)
+        verify(mockDataClearingWideEvent).finishSuccess()
         verify(mockClearDataAction).killAndRestartProcess(notifyDataCleared = false)
     }
 
