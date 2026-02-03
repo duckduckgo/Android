@@ -365,6 +365,14 @@ class DuckChatContextualViewModel @Inject constructor(
                         showContext = _viewState.value.allowsAutomaticContextAttachment && _viewState.value.showContext,
                     )
                 }
+            } else {
+                _viewState.update {
+                    inputMode.copy(
+                        contextTitle = title,
+                        contextUrl = url,
+                        tabId = tabId,
+                    )
+                }
             }
         }
     }
