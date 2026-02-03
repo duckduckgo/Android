@@ -428,6 +428,9 @@ class RealPirActionsRunner @AssistedInject constructor(
             detachedWebView?.loadUrl("about:blank")
             detachedWebView?.evaluateJavascript("window.stop();", null)
             detachedWebView?.destroy()
+            detachedWebView?.clearFormData()
+            detachedWebView?.clearHistory()
+            detachedWebView?.clearCache(true)
             detachedWebView = null
             logcat { "PIR-RUNNER ($this): Destroyed webview" }
         }

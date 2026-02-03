@@ -30,6 +30,7 @@ import com.duckduckgo.pir.impl.common.PirActionsRunner
 import com.duckduckgo.pir.impl.common.PirJob
 import com.duckduckgo.pir.impl.common.PirJob.RunType
 import com.duckduckgo.pir.impl.common.PirJobConstants.MAX_DETACHED_WEBVIEW_COUNT
+import com.duckduckgo.pir.impl.common.PirWebViewDataCleaner
 import com.duckduckgo.pir.impl.common.RealPirActionsRunner
 import com.duckduckgo.pir.impl.common.splitIntoParts
 import com.duckduckgo.pir.impl.models.Broker
@@ -116,6 +117,7 @@ class RealPirScan @Inject constructor(
     private val pirActionsRunnerFactory: RealPirActionsRunner.Factory,
     private val currentTimeProvider: CurrentTimeProvider,
     private val dispatcherProvider: DispatcherProvider,
+    private val webViewDataCleaner: PirWebViewDataCleaner,
     callbacks: PluginPoint<PirCallbacks>,
 ) : PirScan, PirJob(callbacks) {
 
@@ -240,6 +242,7 @@ class RealPirScan @Inject constructor(
         logcat { "PIR-SCAN: Debug scan completed for all profiles" }
 
         onJobCompleted()
+        webViewDataCleaner.cleanWebViewData()
         return@withContext Result.success(Unit)
     }
 
@@ -298,6 +301,7 @@ class RealPirScan @Inject constructor(
         runType: RunType,
     ) {
         logcat { "PIR-SCAN: Scan completed for all runners on all profiles" }
+        webViewDataCleaner.cleanWebViewData()
         emitScanCompletedPixel(
             runType,
         )
@@ -397,6 +401,7 @@ class RealPirScan @Inject constructor(
         }
         runners.clear()
         onJobStopped()
+        webViewDataCleaner.cleanWebViewData()
     }
 
     private suspend fun emitScanStartPixel(runType: RunType) {
