@@ -32,8 +32,7 @@ class RealDuckChatContextualSessionTimeoutProvider @Inject constructor(
     private val duckChatInternal: DuckChatInternal,
 ) : DuckChatContextualSessionTimeoutProvider {
     override fun sessionTimeoutMillis(): Long {
-        // return duckChatInternal.keepSessionIntervalInMinutes() * MINUTES_TO_MS
-        return MINUTES_TO_MS
+        return duckChatInternal.keepSessionIntervalInMinutes() * MINUTES_TO_MS
     }
 
     private companion object {
