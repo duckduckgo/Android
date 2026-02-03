@@ -509,7 +509,6 @@ class DuckChatContextualFragment :
                     }
 
                     is DuckChatContextualViewModel.Command.ChangeSheetState -> {
-                        logcat { "Duck.ai Contextual: ChangeSheetState ${command.newState}" }
                         bottomSheetBehavior.state = command.newState
                     }
                 }
