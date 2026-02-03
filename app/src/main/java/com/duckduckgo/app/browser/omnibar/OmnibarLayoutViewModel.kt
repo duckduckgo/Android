@@ -68,7 +68,6 @@ import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.ENABLED
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels
 import com.duckduckgo.serp.logos.api.SerpEasterEggLogosToggles
 import com.duckduckgo.serp.logos.api.SerpLogo
-import com.duckduckgo.serp.logos.api.SerpLogos
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
@@ -111,13 +110,11 @@ class OmnibarLayoutViewModel @Inject constructor(
     private val serpEasterEggLogosToggles: SerpEasterEggLogosToggles,
     private val androidBrowserToggles: AndroidBrowserConfigFeature,
     private val addressBarTrackersAnimationManager: AddressBarTrackersAnimationManager,
-    private val serpLogos: SerpLogos,
 ) : ViewModel() {
 
     private val isSplitOmnibarEnabled = settingsDataStore.omnibarType == OmnibarType.SPLIT
 
     private var handleAboutBlankEnabled: Boolean = false
-    private var favouriteSerpEasterEggLogoUrl: String? = null
     private var isSetFavouriteEasterEggLogoFeatureEnabled: Boolean = false
 
     private val _viewState = MutableStateFlow(
@@ -313,39 +310,8 @@ class OmnibarLayoutViewModel @Inject constructor(
                 pixel.fire(pixel = AppPixelName.ADDRESS_BAR_NTP_FOCUSED, parameters = params)
             }.launchIn(viewModelScope)
 
-        combine(
-            serpEasterEggLogosToggles.setFavourite().enabled(),
-            serpLogos.favouriteSerpEasterEggLogoUrlFlow,
-        ) { isSetFavouriteEasterEggLogoFeatureEnabled, favouriteSerpEasterEggLogoUrl ->
+        serpEasterEggLogosToggles.setFavourite().enabled().onEach { isSetFavouriteEasterEggLogoFeatureEnabled ->
             this.isSetFavouriteEasterEggLogoFeatureEnabled = isSetFavouriteEasterEggLogoFeatureEnabled
-            this.favouriteSerpEasterEggLogoUrl = favouriteSerpEasterEggLogoUrl
-            val currentUrl = _viewState.value.url
-
-            // TODO we should be able to remove isDuckDuckGoQueryUrl once we remove the feature toggle.
-            // It's here only as a fallback if we turn the feature off and then back on again
-            if (isSetFavouriteEasterEggLogoFeatureEnabled && duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(currentUrl)) {
-                _viewState.update {
-                    it.copy(
-                        leadingIconState = getLeadingIconState(
-                            viewMode = it.viewMode,
-                            hasFocus = it.hasFocus,
-                            url = it.url,
-                            serpLogoUrl = favouriteSerpEasterEggLogoUrl,
-                        ),
-                    )
-                }
-            } else if (favouriteSerpEasterEggLogoUrl != null) {
-                _viewState.update {
-                    it.copy(
-                        leadingIconState = getLeadingIconState(
-                            viewMode = it.viewMode,
-                            hasFocus = it.hasFocus,
-                            url = it.url,
-                            serpLogoUrl = null,
-                        ),
-                    )
-                }
-            }
         }.flowOn(dispatcherProvider.io())
             .launchIn(viewModelScope)
     }
@@ -506,9 +472,7 @@ class OmnibarLayoutViewModel @Inject constructor(
             else -> {
                 when {
                     hasFocus -> Search
-                    serpLogoUrl != null -> {
-                        EasterEggLogo(logoUrl = serpLogoUrl, serpUrl = url, isFavourite = serpLogoUrl == favouriteSerpEasterEggLogoUrl)
-                    }
+                    serpLogoUrl != null -> EasterEggLogo(logoUrl = serpLogoUrl, serpUrl = url)
                     shouldShowDaxIcon(url) -> Dax
                     shouldShowDuckPlayerIcon(url) -> DuckPlayer
                     url.isEmpty() -> Search
@@ -524,7 +488,6 @@ class OmnibarLayoutViewModel @Inject constructor(
     ): String? {
         val isDuckDuckGoQueryUrl = duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(currentUrl)
         return when {
-            favouriteSerpEasterEggLogoUrl != null && isDuckDuckGoQueryUrl -> favouriteSerpEasterEggLogoUrl
             leadingIconState is EasterEggLogo && isDuckDuckGoQueryUrl -> leadingIconState.logoUrl
             else -> null
         }

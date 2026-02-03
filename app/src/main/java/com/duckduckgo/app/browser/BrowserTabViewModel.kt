@@ -355,7 +355,7 @@ import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment.Delete
 import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment.EditSavedSiteListener
 import com.duckduckgo.serp.logos.api.SerpEasterEggLogosToggles
 import com.duckduckgo.serp.logos.api.SerpLogo
-import com.duckduckgo.serp.logos.impl.store.FavouriteSerpLogoDataStore
+import com.duckduckgo.serp.logos.api.SerpLogos
 import com.duckduckgo.settings.api.SerpSettingsFeature
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.LocationPermissionRequest
@@ -498,7 +498,7 @@ class BrowserTabViewModel @Inject constructor(
     private val pageContextJSHelper: PageContextJSHelper,
     private val syncStatusChangedObserver: SyncStatusChangedObserver,
     private val serpEasterEggLogosToggles: SerpEasterEggLogosToggles,
-    private val favouriteSerpLogoDataStore: FavouriteSerpLogoDataStore,
+    private val serpLogos: SerpLogos,
 ) : ViewModel(),
     WebViewClientListener,
     EditSavedSiteListener,
@@ -788,6 +788,27 @@ class BrowserTabViewModel @Inject constructor(
             .onEach { vpnMenuState ->
                 browserViewState.value = currentBrowserViewState().copy(vpnMenuState = vpnMenuState)
             }.flowOn(dispatchers.main())
+            .launchIn(viewModelScope)
+
+        combine(
+            serpEasterEggLogosToggles.setFavourite().enabled(),
+            serpLogos.favouriteSerpEasterEggLogoUrlFlow,
+        ) { isEnabled, favouriteUrl ->
+            isEnabled to favouriteUrl
+        }.flowOn(dispatchers.io())
+            .onEach { (isEnabled, favouriteUrl) ->
+                val currentUrl = url
+                if (currentUrl != null && duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(currentUrl)) {
+                    if (isEnabled && favouriteUrl != null) {
+                        // Favourite is set - show it
+                        omnibarViewState.value =
+                            currentOmnibarViewState().copy(serpLogo = SerpLogo.EasterEgg(logoUrl = favouriteUrl))
+                    } else if (isEnabled && favouriteUrl == null || !isEnabled) {
+                        // Favourite was cleared - show Dax (Normal logo)
+                        omnibarViewState.value = currentOmnibarViewState().copy(serpLogo = SerpLogo.Normal)
+                    }
+                }
+            }
             .launchIn(viewModelScope)
 
         additionalDefaultBrowserPrompts.showSetAsDefaultPopupMenuItem
@@ -2093,7 +2114,7 @@ class BrowserTabViewModel @Inject constructor(
     private suspend fun evaluateSerpLogoState(url: String?) {
         if (url != null && duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
             val isSetFavouriteEnabled = serpEasterEggLogosToggles.setFavourite().isEnabled()
-            val favouriteLogoUrl = favouriteSerpLogoDataStore.favouriteSerpEasterEggLogoUrlFlow.firstOrNull()
+            val favouriteLogoUrl = serpLogos.favouriteSerpEasterEggLogoUrlFlow.firstOrNull()
 
             // Don't extract logo if favourite feature is enabled AND a favourite is set
             if (isSetFavouriteEnabled && favouriteLogoUrl != null) {
