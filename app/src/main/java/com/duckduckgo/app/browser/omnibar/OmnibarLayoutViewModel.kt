@@ -266,7 +266,7 @@ class OmnibarLayoutViewModel @Inject constructor(
         data class EasterEggLogo(
             val logoUrl: String,
             val serpUrl: String,
-            val isFavourite: Boolean = false,
+            val isFavourite: Boolean,
         ) : LeadingIconState()
     }
 
@@ -411,14 +411,17 @@ class OmnibarLayoutViewModel @Inject constructor(
                     }
                 }
 
+                val isFavouriteEasterEggLogo = it.previousLeadingIconState is EasterEggLogo && it.previousLeadingIconState.isFavourite
+
                 it.copy(
                     hasFocus = false,
                     expanded = false,
                     leadingIconState = getLeadingIconState(
-                        _viewState.value.viewMode,
-                        false,
-                        it.url,
-                        currentLogoUrl,
+                        viewMode = _viewState.value.viewMode,
+                        hasFocus = false,
+                        url = it.url,
+                        serpLogoUrl = currentLogoUrl,
+                        isFavouriteSerpLogo = isFavouriteEasterEggLogo
                     ),
                     previousLeadingIconState = null,
                     highlightFireButton = HighlightableButton.Visible(highlighted = false),
@@ -465,6 +468,7 @@ class OmnibarLayoutViewModel @Inject constructor(
         hasFocus: Boolean,
         url: String,
         serpLogoUrl: String?,
+        isFavouriteSerpLogo: Boolean,
     ): LeadingIconState {
         return when (viewMode) {
             Error, SSLWarning, MaliciousSiteWarning -> Globe
@@ -472,7 +476,7 @@ class OmnibarLayoutViewModel @Inject constructor(
             else -> {
                 when {
                     hasFocus -> Search
-                    serpLogoUrl != null -> EasterEggLogo(logoUrl = serpLogoUrl, serpUrl = url)
+                    serpLogoUrl != null -> EasterEggLogo(logoUrl = serpLogoUrl, serpUrl = url, isFavourite = isFavouriteSerpLogo)
                     shouldShowDaxIcon(url) -> Dax
                     shouldShowDuckPlayerIcon(url) -> DuckPlayer
                     url.isEmpty() -> Search
@@ -596,6 +600,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                                 hasFocus = hasFocus,
                                 url = _viewState.value.url,
                                 serpLogoUrl = currentLogoUrl,
+                                isFavouriteSerpLogo = it.leadingIconState is EasterEggLogo && it.leadingIconState.isFavourite,
                             ),
                             scrollingEnabled = scrollingEnabled,
                             showVoiceSearch = shouldShowVoiceSearch(
@@ -821,6 +826,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                             hasFocus = omnibarViewState.isEditing,
                             url = _viewState.value.url,
                             serpLogoUrl = omnibarViewState.serpLogo.logoUrl,
+                            isFavouriteSerpLogo = omnibarViewState.serpLogo.isFavourite,
                         )
 
                         SerpLogo.Normal -> getLeadingIconState(
@@ -828,6 +834,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                             hasFocus = omnibarViewState.isEditing,
                             url = _viewState.value.url,
                             serpLogoUrl = null,
+                            isFavouriteSerpLogo = false,
                         )
 
                         null -> {
@@ -842,6 +849,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                                     hasFocus = omnibarViewState.isEditing,
                                     url = _viewState.value.url,
                                     serpLogoUrl = currentLogoUrl,
+                                    isFavouriteSerpLogo = it.leadingIconState is EasterEggLogo && it.leadingIconState.isFavourite,
                                 )
                             } else {
                                 // previous behaviour for null
@@ -850,6 +858,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                                     hasFocus = omnibarViewState.isEditing,
                                     url = _viewState.value.url,
                                     serpLogoUrl = null,
+                                    isFavouriteSerpLogo = false,
                                 )
                             }
                         }
@@ -882,6 +891,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                     hasFocus = it.hasFocus,
                     url = loadingState.url,
                     serpLogoUrl = currentLogoUrl,
+                    isFavouriteSerpLogo = it.leadingIconState is EasterEggLogo && it.leadingIconState.isFavourite
                 ),
                 showVoiceSearch = shouldShowVoiceSearch(
                     viewMode = _viewState.value.viewMode,

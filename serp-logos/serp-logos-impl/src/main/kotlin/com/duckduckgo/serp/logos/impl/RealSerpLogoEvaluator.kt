@@ -57,7 +57,7 @@ class RealSerpLogoEvaluator @Inject constructor(
                 val logoUrl = parts[1]
                 logcat { "Parsed logo - type: $logoType, url: $logoUrl" }
                 when (logoType) {
-                    "easterEgg" -> SerpLogo.EasterEgg("${AppUrl.Url.API}$logoUrl")
+                    "easterEgg" -> SerpLogo.EasterEgg(logoUrl = "${AppUrl.Url.API}$logoUrl", isFavourite = false)
                     "normal" -> SerpLogo.Normal
                     else -> {
                         logcat(LogPriority.WARN) { "Unknown logo type: $logoType" }
