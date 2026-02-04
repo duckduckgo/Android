@@ -7906,7 +7906,7 @@ class BrowserTabViewModelTest {
         val nonDdgUrl = "https://example.com/search?q=test"
         val webViewNavState = WebViewNavigationState(mockStack, 100)
 
-        testee.omnibarViewState.value = omnibarViewState().copy(serpLogo = SerpLogo.EasterEgg("some-logo-url"))
+        testee.omnibarViewState.value = omnibarViewState().copy(serpLogo = SerpLogo.EasterEgg(logoUrl = "some-logo-url", isFavourite = false))
         testee.pageFinished(mockWebView, webViewNavState, nonDdgUrl)
 
         assertNull("SERP logo should be cleared when navigating to non-DuckDuckGo URL", omnibarViewState().serpLogo)
@@ -7956,7 +7956,7 @@ class BrowserTabViewModelTest {
 
         assertEquals(
             "serpLogo should be set to favourite EasterEgg when favourite is set and feature is enabled",
-            SerpLogo.EasterEgg(favouriteUrl),
+            SerpLogo.EasterEgg(logoUrl = favouriteUrl, isFavourite = true),
             omnibarViewState().serpLogo,
         )
     }
@@ -8016,7 +8016,7 @@ class BrowserTabViewModelTest {
         // Verify favourite logo is set
         assertEquals(
             "serpLogo should be set to favourite EasterEgg initially",
-            SerpLogo.EasterEgg(favouriteUrl),
+            SerpLogo.EasterEgg(logoUrl = favouriteUrl, isFavourite = true),
             omnibarViewState().serpLogo,
         )
 

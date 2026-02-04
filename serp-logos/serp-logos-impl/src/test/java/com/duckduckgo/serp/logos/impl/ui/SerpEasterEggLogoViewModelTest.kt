@@ -148,6 +148,7 @@ class SerpEasterEggLogoViewModelTest {
         testee = createViewModel()
 
         testee.setLogoUrl(logoUrl)
+        testee.viewState.first { it.isFavourite }
         testee.onFavouriteButtonClicked()
 
         assertEquals(null, fakeFavouriteSerpLogoDataStore.favouriteLogoValue)

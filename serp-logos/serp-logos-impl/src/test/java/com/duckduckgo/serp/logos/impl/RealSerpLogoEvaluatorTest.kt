@@ -64,7 +64,13 @@ class RealSerpLogoEvaluatorTest {
 
         val result = testee.extractSerpLogo(webView)
 
-        assertEquals(SerpLogo.EasterEgg("https://duckduckgo.com$expectedUrl"), result)
+        assertEquals(
+            SerpLogo.EasterEgg(
+                logoUrl = "https://duckduckgo.com$expectedUrl",
+                isFavourite = false,
+            ),
+            result,
+        )
     }
 
     @Test
@@ -164,7 +170,7 @@ class RealSerpLogoEvaluatorTest {
 
         val result = testee.extractSerpLogo(webView)
 
-        assertEquals(SerpLogo.EasterEgg("https://duckduckgo.com"), result)
+        assertEquals(SerpLogo.EasterEgg(logoUrl = "https://duckduckgo.com", isFavourite = false), result)
     }
 
     @Test
@@ -174,7 +180,7 @@ class RealSerpLogoEvaluatorTest {
 
         val result = testee.extractSerpLogo(webView)
 
-        assertEquals(SerpLogo.EasterEgg("https://duckduckgo.com/path/to/logo.png"), result)
+        assertEquals(SerpLogo.EasterEgg(logoUrl = "https://duckduckgo.com/path/to/logo.png", isFavourite = false), result)
     }
 
     @Test

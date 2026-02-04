@@ -1943,7 +1943,7 @@ class OmnibarLayoutViewModelTest {
         val logoUrl = "https://example.com/logo.png"
         val omnibarViewState = OmnibarViewState(
             omnibarText = QUERY,
-            serpLogo = SerpLogo.EasterEgg(logoUrl),
+            serpLogo = SerpLogo.EasterEgg(logoUrl = logoUrl, isFavourite = false),
             isEditing = false,
         )
 
@@ -2005,7 +2005,7 @@ class OmnibarLayoutViewModelTest {
         val omnibarViewState = OmnibarViewState(
             navigationChange = true,
             omnibarText = QUERY,
-            serpLogo = SerpLogo.EasterEgg(logoUrl),
+            serpLogo = SerpLogo.EasterEgg(logoUrl = logoUrl, isFavourite = false),
         )
 
         testee.onExternalStateChange(StateChange.OmnibarStateChange(omnibarViewState))
@@ -2031,7 +2031,7 @@ class OmnibarLayoutViewModelTest {
         val omnibarViewState = OmnibarViewState(
             omnibarText = QUERY,
             queryOrFullUrl = QUERY,
-            serpLogo = SerpLogo.EasterEgg(logoUrl),
+            serpLogo = SerpLogo.EasterEgg(logoUrl = logoUrl, isFavourite = false),
             isEditing = false,
         )
 
@@ -2053,7 +2053,7 @@ class OmnibarLayoutViewModelTest {
 
         val omnibarViewState = OmnibarViewState(
             omnibarText = QUERY,
-            serpLogo = SerpLogo.EasterEgg(logoUrl),
+            serpLogo = SerpLogo.EasterEgg(logoUrl = logoUrl, isFavourite = false),
             isEditing = false,
         )
 
@@ -2434,7 +2434,7 @@ class OmnibarLayoutViewModelTest {
         // BrowserTabViewModel sends the favourite logo as the serpLogo
         val omnibarViewState = OmnibarViewState(
             omnibarText = QUERY,
-            serpLogo = SerpLogo.EasterEgg(favouriteLogoUrl),
+            serpLogo = SerpLogo.EasterEgg(logoUrl = favouriteLogoUrl, isFavourite = true),
             isEditing = false,
         )
         testee.onExternalStateChange(StateChange.OmnibarStateChange(omnibarViewState))
@@ -2476,7 +2476,7 @@ class OmnibarLayoutViewModelTest {
         // SERP returns an Easter Egg logo
         val omnibarViewState = OmnibarViewState(
             omnibarText = QUERY,
-            serpLogo = SerpLogo.EasterEgg(serpEasterEggUrl),
+            serpLogo = SerpLogo.EasterEgg(logoUrl = serpEasterEggUrl, isFavourite = false),
             isEditing = false,
         )
         testee.onExternalStateChange(StateChange.OmnibarStateChange(omnibarViewState))
@@ -2502,7 +2502,7 @@ class OmnibarLayoutViewModelTest {
         // SERP returns an Easter Egg logo
         val omnibarViewState = OmnibarViewState(
             omnibarText = QUERY,
-            serpLogo = SerpLogo.EasterEgg(serpEasterEggUrl),
+            serpLogo = SerpLogo.EasterEgg(logoUrl = serpEasterEggUrl, isFavourite = false),
             isEditing = false,
         )
         testee.onExternalStateChange(StateChange.OmnibarStateChange(omnibarViewState))
@@ -2536,7 +2536,7 @@ class OmnibarLayoutViewModelTest {
         // First, set an Easter Egg logo
         val omnibarViewStateWithLogo = OmnibarViewState(
             omnibarText = QUERY,
-            serpLogo = SerpLogo.EasterEgg(serpEasterEggUrl),
+            serpLogo = SerpLogo.EasterEgg(logoUrl = serpEasterEggUrl, isFavourite = false),
             isEditing = false,
         )
         testee.onExternalStateChange(StateChange.OmnibarStateChange(omnibarViewStateWithLogo))
@@ -2578,7 +2578,7 @@ class OmnibarLayoutViewModelTest {
         // First, set an Easter Egg logo
         val omnibarViewStateWithLogo = OmnibarViewState(
             omnibarText = QUERY,
-            serpLogo = SerpLogo.EasterEgg(serpEasterEggUrl),
+            serpLogo = SerpLogo.EasterEgg(logoUrl = serpEasterEggUrl, isFavourite = false),
             isEditing = false,
         )
         testee.onExternalStateChange(StateChange.OmnibarStateChange(omnibarViewStateWithLogo))
@@ -2617,7 +2617,7 @@ class OmnibarLayoutViewModelTest {
         // First, set an Easter Egg logo
         val omnibarViewStateWithLogo = OmnibarViewState(
             omnibarText = QUERY,
-            serpLogo = SerpLogo.EasterEgg(serpEasterEggUrl),
+            serpLogo = SerpLogo.EasterEgg(logoUrl = serpEasterEggUrl, isFavourite = false),
             isEditing = false,
         )
         testee.onExternalStateChange(StateChange.OmnibarStateChange(omnibarViewStateWithLogo))
