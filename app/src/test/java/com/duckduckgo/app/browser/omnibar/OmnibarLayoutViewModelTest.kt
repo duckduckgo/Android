@@ -43,7 +43,6 @@ import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels
 import com.duckduckgo.serp.logos.api.SerpEasterEggLogosToggles
 import com.duckduckgo.serp.logos.api.SerpLogo
-import com.duckduckgo.serp.logos.api.SerpLogos
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
 import kotlinx.coroutines.flow.MutableStateFlow
