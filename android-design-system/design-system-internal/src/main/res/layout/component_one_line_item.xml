@@ -259,7 +259,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/oneLineListItemWithLongTextTruncated"
         app:primaryText="Item with New Pill"
-        app:showYellowPill="true"
-        app:textYellowPill="New"/>
+        app:pillIcon="true"
+        app:pillText="Beta"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

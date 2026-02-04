@@ -68,9 +68,9 @@ class SettingsListItem @JvmOverloads constructor(
                 leadingIcon.gone()
             }
 
-            if (getBoolean(R.styleable.SettingsListItem_showYellowPill, false)) {
+            if (getBoolean(R.styleable.SettingsListItem_pillIcon, false)) {
                 yellowPill.show()
-                yellowPill.text = getString(R.styleable.SettingsListItem_textYellowPill)
+                yellowPill.text = getString(R.styleable.SettingsListItem_pillText)
             } else {
                 yellowPill.gone()
             }

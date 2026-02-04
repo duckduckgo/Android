@@ -119,7 +119,7 @@ class BookmarksListItem @JvmOverloads constructor(
                 setPrimaryTextColorStateList(getColorStateList(R.styleable.TwoLineListItem_primaryTextColorOverlay))
             }
 
-            setFavoriteStarVisible(getBoolean(R.styleable.TwoLineListItem_showYellowPill, false))
+            setFavoriteStarVisible(getBoolean(R.styleable.TwoLineListItem_pillIcon, false))
 
             val showTrailingIcon = hasValue(R.styleable.TwoLineListItem_trailingIcon)
             val showSwitch = getBoolean(R.styleable.TwoLineListItem_showSwitch, false)

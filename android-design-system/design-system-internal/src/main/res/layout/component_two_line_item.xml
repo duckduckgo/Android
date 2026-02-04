@@ -263,8 +263,8 @@
         app:layout_constraintTop_toBottomOf="@id/twoLineSwitchListItemWithImage"
         app:primaryText="Two Line Item"
         app:secondaryText="With Beta Pill and Switch"
-        app:showYellowPill="true"
-        app:textYellowPill="Beta"
+        app:pillIcon="true"
+        app:pillText="Beta"
         app:showSwitch="true" />
 
     <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
@@ -278,8 +278,8 @@
         app:primaryText="Two Line Item Two Line Item Two Line Item Two Line Item "
         app:primaryTextTruncated="true"
         app:secondaryText="In disabled state"
-        app:showYellowPill="true"
-        app:textYellowPill="Beta"
+        app:pillIcon="true"
+        app:pillText="Beta"
         app:showSwitch="true" />
 
     <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
@@ -292,8 +292,8 @@
         app:leadingIcon="@drawable/ic_globe_16"
         app:primaryText="Two Line Item Two Line Item Two Line Item Two Line Item "
         app:secondaryText="In disabled state"
-        app:showYellowPill="true"
-        app:textYellowPill="New"
+        app:pillIcon="true"
+        app:pillText="Beta"
         app:showSwitch="true" />
 
     <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
@@ -306,8 +306,8 @@
         app:leadingIcon="@drawable/ic_globe_16"
         app:primaryText="Two Line Item Two"
         app:secondaryText="Checked in disabled state"
-        app:showYellowPill="true"
-        app:textYellowPill="Whatever"
+        app:pillIcon="true"
+        app:pillText="Whatever"
         app:showSwitch="true" />
 
     <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
@@ -320,8 +320,8 @@
         app:leadingIcon="@drawable/ic_globe_16"
         app:primaryText="Two Line Item Two"
         app:secondaryText="Checked with switch in disabled state"
-        app:showYellowPill="true"
-        app:textYellowPill="Beta"
+        app:pillIcon="true"
+        app:pillText="Beta"
         app:showSwitch="true"
         app:switchEnabled="false" />
 

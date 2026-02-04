@@ -125,9 +125,9 @@ class OneLineListItem @JvmOverloads constructor(
             val switchEnabled = getBoolean(R.styleable.OneLineListItem_switchEnabled, true)
             setSwitchEnabled(switchEnabled)
 
-            if (getBoolean(R.styleable.OneLineListItem_showYellowPill, false)) {
+            if (getBoolean(R.styleable.OneLineListItem_pillIcon, false)) {
                 yellowPill.show()
-                yellowPill.text = getString(R.styleable.OneLineListItem_textYellowPill)
+                yellowPill.text = getString(R.styleable.OneLineListItem_pillText)
             } else {
                 yellowPill.gone()
             }
