@@ -138,6 +138,7 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     SETTINGS_GENERAL_PRESSED("ms_settings_general_pressed"),
     SETTINGS_WEB_TRACKING_PROTECTION_PRESSED("ms_web_tracking_protection_setting_pressed"),
     SETTINGS_ACCESSIBILITY_PRESSED("ms_accessibility_setting_pressed"),
+    SETTINGS_WHATS_NEW_PRESSED("ms_whats_new_setting_pressed"),
     SETTINGS_ABOUT_PRESSED("ms_about_setting_pressed"),
     SETTINGS_PASSWORDS_PRESSED("ms_passwords_pressed"),
     SETTINGS_SYNC_PRESSED("ms_sync_pressed"),
