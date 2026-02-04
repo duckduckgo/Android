@@ -101,7 +101,6 @@ class OmnibarLayoutViewModelTest {
         }
     }
     private val serpEasterEggLogosToggles: SerpEasterEggLogosToggles = mock()
-    private val serpLogos: SerpLogos = mock()
     private val favouriteLogoFlow = MutableStateFlow<String?>(null)
     private val setFavouriteFeatureEnabledFlow = MutableStateFlow(false)
 
@@ -129,7 +128,6 @@ class OmnibarLayoutViewModelTest {
         whenever(duckAiFeatureState.showInputScreen).thenReturn(duckAiShowInputScreenFlow)
         whenever(androidBrowserToggles.handleAboutBlank()).thenReturn(mock())
         whenever(androidBrowserToggles.handleAboutBlank().isEnabled()).thenReturn(false)
-        whenever(serpLogos.favouriteSerpEasterEggLogoUrlFlow).thenReturn(favouriteLogoFlow)
         whenever(serpEasterEggLogosToggles.setFavourite()).thenReturn(mock())
         whenever(serpEasterEggLogosToggles.setFavourite().isEnabled()).thenReturn(false)
         whenever(serpEasterEggLogosToggles.setFavourite().enabled()).thenReturn(setFavouriteFeatureEnabledFlow)
@@ -180,7 +178,6 @@ class OmnibarLayoutViewModelTest {
             serpEasterEggLogosToggles = serpEasterEggLogosToggles,
             androidBrowserToggles = androidBrowserToggles,
             addressBarTrackersAnimationManager = addressBarTrackersAnimationManager,
-            serpLogos = serpLogos,
         )
     }
 
