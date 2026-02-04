@@ -20,6 +20,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.webkit.WebViewFeature
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.app.browser.animations.AddressBarTrackersAnimationManager
 import com.duckduckgo.app.browser.api.OmnibarRepository
 import com.duckduckgo.app.browser.menu.BrowserMenuDisplayRepository
 import com.duckduckgo.app.browser.omnibar.OmnibarType
@@ -31,6 +32,9 @@ import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_THEME_TOGGLED_LIGHT
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_THEME_TOGGLED_SYSTEM_DEFAULT
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.app.tabs.store.TabSwitcherDataStore
 import com.duckduckgo.common.ui.DuckDuckGoTheme
 import com.duckduckgo.common.ui.store.ThemingDataStore
@@ -60,6 +64,7 @@ class AppearanceViewModel @Inject constructor(
     private val pixel: Pixel,
     private val dispatcherProvider: DispatcherProvider,
     private val tabSwitcherDataStore: TabSwitcherDataStore,
+    private val addressBarTrackersAnimationManager: AddressBarTrackersAnimationManager,
     omnibarRepository: OmnibarRepository,
 ) : ViewModel() {
     data class ViewState(
@@ -71,6 +76,8 @@ class AppearanceViewModel @Inject constructor(
         val omnibarType: OmnibarType = OmnibarType.SINGLE_TOP,
         val isFullUrlEnabled: Boolean = true,
         val isTrackersCountInTabSwitcherEnabled: Boolean = true,
+        val isAddressBarTrackersAnimationEnabled: Boolean = true,
+        val shouldShowAddressBarTrackersAnimationItem: Boolean = false,
         val hasExperimentalBrowserMenuOption: Boolean = false,
         val useBottomSheetMenuEnabled: Boolean = false,
         val shouldShowSplitOmnibarSettings: Boolean = false,
@@ -99,6 +106,7 @@ class AppearanceViewModel @Inject constructor(
             supportsForceDarkMode = WebViewFeature.isFeatureSupported(WebViewFeature.ALGORITHMIC_DARKENING),
             omnibarType = settingsDataStore.omnibarType,
             shouldShowSplitOmnibarSettings = omnibarRepository.isSplitOmnibarAvailable,
+            isAddressBarTrackersAnimationEnabled = settingsDataStore.showTrackersCountInAddressBar,
         ),
     )
 
@@ -108,11 +116,13 @@ class AppearanceViewModel @Inject constructor(
         browserMenuDisplayRepository.browserMenuState,
         tabSwitcherDataStore.isTrackersAnimationInfoTileHidden(),
     ) { currentViewState, isFullUrlEnabled, browserMenuState, isTrackersAnimationTileHidden ->
+        val isAddressBarTrackersAnimationFeatureEnabled = addressBarTrackersAnimationManager.isFeatureEnabled()
         currentViewState.copy(
             isTrackersCountInTabSwitcherEnabled = !isTrackersAnimationTileHidden,
             isFullUrlEnabled = isFullUrlEnabled,
             hasExperimentalBrowserMenuOption = browserMenuState.hasOption,
             useBottomSheetMenuEnabled = browserMenuState.isEnabled,
+            shouldShowAddressBarTrackersAnimationItem = isAddressBarTrackersAnimationFeatureEnabled,
         )
     }.stateIn(viewModelScope, SharingStarted.Lazily, viewState.value)
 
@@ -202,9 +212,28 @@ class AppearanceViewModel @Inject constructor(
         }
     }
 
+    fun onShowTrackersCountInAddressBarChanged(checked: Boolean) {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            settingsDataStore.showTrackersCountInAddressBar = checked
+            viewState.update { it.copy(isAddressBarTrackersAnimationEnabled = checked) }
+
+            val params = mapOf(Pixel.PixelParameter.IS_ENABLED to checked.toString())
+            pixel.fire(AppPixelName.SETTINGS_APPEARANCE_IS_TRACKER_COUNT_IN_ADDRESS_BAR_TOGGLED, params)
+        }
+    }
+
     fun onUseBottomSheetMenuChanged(checked: Boolean) {
         viewModelScope.launch(dispatcherProvider.io()) {
             browserMenuDisplayRepository.setExperimentalMenuEnabled(checked)
+            if (checked) {
+                pixel.fire(AppPixelName.EXPERIMENTAL_MENU_ENABLED_DAILY, type = Daily())
+                pixel.fire(AppPixelName.EXPERIMENTAL_MENU_ENABLED_UNIQUE, type = Unique())
+                pixel.fire(AppPixelName.EXPERIMENTAL_MENU_ENABLED, type = Count)
+            } else {
+                pixel.fire(AppPixelName.EXPERIMENTAL_MENU_DISABLED_DAILY, type = Daily())
+                pixel.fire(AppPixelName.EXPERIMENTAL_MENU_DISABLED_UNIQUE, type = Unique())
+                pixel.fire(AppPixelName.EXPERIMENTAL_MENU_DISABLED, type = Count)
+            }
         }
     }
 }

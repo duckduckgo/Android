@@ -29,47 +29,47 @@
         app:layout_constraintWidth_max="@dimen/messageContentMaxWidth">
 
         <ImageView
-            android:id="@+id/headerImage"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:importantForAccessibility="no"
-            android:visibility="gone"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:src="@drawable/ic_ddg_announce"
-            tools:visibility="visible" />
+        android:id="@+id/headerImage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:importantForAccessibility="no"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:src="@drawable/ic_ddg_announce"
+        tools:visibility="visible" />
 
-        <ImageView
-            android:id="@+id/remoteImage"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:visibility="gone"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+    <ImageView
+        android:id="@+id/remoteImage"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-        <androidx.constraintlayout.widget.Barrier
-            android:id="@+id/illustrationBarrier"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:barrierAllowsGoneWidgets="false"
-            app:barrierDirection="bottom"
-            app:constraint_referenced_ids="headerImage,remoteImage" />
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/illustrationBarrier"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:barrierAllowsGoneWidgets="false"
+        app:barrierDirection="bottom"
+        app:constraint_referenced_ids="headerImage,remoteImage" />
 
-        <com.duckduckgo.common.ui.view.text.DaxTextView
-            android:id="@+id/headerTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="24dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/illustrationBarrier"
-            app:textType="primary"
-            app:typography="title"
-            tools:text="What's new" />
+    <com.duckduckgo.common.ui.view.text.DaxTextView
+        android:id="@+id/headerTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="24dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/illustrationBarrier"
+        app:textType="primary"
+        app:typography="title"
+        tools:text="What's new" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

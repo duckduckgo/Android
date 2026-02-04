@@ -924,11 +924,16 @@
     <string name="settingsHeadingCompleteSetup">Beállítás végrehajtása</string>
 
     <!--TabSwitcher Trackers Animation-->
-    <string name="showTrackerCountInTabSwitcher">Nyomkövető-számláló megjelenítése a lapváltóban</string>
+    <string name="trackerBlockedInTheLast7days" instruction="Placeholder is 1 tracker blocked">&lt;b&gt;%1$s nyomkövető blokkolva &lt;/b&gt; az elmúlt 7 napban</string>
     <string name="tabSwitcherAnimationTileRemovalDialogTitle" instruction="A title for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Elrejted a nyomkövető-számlálót?</string>
     <string name="tabSwitcherAnimationTileRemovalDialogBody" instruction="A message for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Bármikor visszakapcsolhatod a Beállítások &gt; Megjelenés menüben.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Elrejtés</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Megtartás.</string>
+
+    <!-- Trackers blocked animation-->
+    <string name="settingsTrackersBlockedAnimationHeaderTitle">Blokkolt nyomkövetők animációja</string>
+    <string name="showTrackerCountInAddressBar">Megjelenítés a címsorban</string>
+    <string name="showWeeklyTrackerCountInTabSwitcher">Megjelenítés a Lapkezelőben</string>
 
     <!-- Widgets -->
     <string name="searchOnlyWidgetLabel" instruction="Label for the search-only widget">Csak keresés</string>

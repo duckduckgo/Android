@@ -41,6 +41,7 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_NEW_ADDRES
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_NOT_NOW
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelParameters.NEW_ADDRESS_BAR_SELECTION
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
+import com.duckduckgo.duckchat.impl.ui.DuckAiContextualOnboardingBottomSheetDialogFactory
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.navigation.api.GlobalActivityStarter
@@ -92,6 +93,7 @@ class RealDuckChatTest {
     private val imageUploadFeature: AIChatImageUploadFeature = FakeFeatureToggleFactory.create(AIChatImageUploadFeature::class.java)
     private val mockNewAddressBarOptionBottomSheetDialogFactory: NewAddressBarOptionBottomSheetDialogFactory = mock()
     private val mockNewAddressBarOptionBottomSheetDialog: NewAddressBarOptionBottomSheetDialog = mock()
+    private val mockDuckAiContextualOnboardingBottomSheetDialogFactory: DuckAiContextualOnboardingBottomSheetDialogFactory = mock()
     private val mockDeviceSyncState: DeviceSyncState = mock()
 
     private lateinit var testee: RealDuckChat
@@ -106,6 +108,7 @@ class RealDuckChatTest {
         whenever(mockDuckChatFeatureRepository.isFullScreenModeUserSettingEnabled()).thenReturn(true)
         whenever(mockDuckChatFeatureRepository.sessionDeltaInMinutes()).thenReturn(10L)
         whenever(mockDuckChatFeatureRepository.lastSessionTimestamp()).thenReturn(0L)
+        whenever(mockDuckChatFeatureRepository.isContextualOnboardingCompleted()).thenReturn(false)
         whenever(mockContext.getString(any())).thenReturn("Duck.ai")
         duckChatFeature.self().setRawStoredState(State(enable = true))
         duckChatFeature.duckAiInputScreen().setRawStoredState(State(enable = true))
@@ -126,6 +129,7 @@ class RealDuckChatTest {
                 imageUploadFeature,
                 mockBrowserNav,
                 mockNewAddressBarOptionBottomSheetDialogFactory,
+                mockDuckAiContextualOnboardingBottomSheetDialogFactory,
                 mockDeviceSyncState,
             ),
         )
@@ -166,6 +170,18 @@ class RealDuckChatTest {
         testee.setAutomaticPageContextUserSetting(false)
 
         verify(mockDuckChatFeatureRepository).setAutomaticPageContextAttachment(false)
+    }
+
+    @Test
+    fun whenContextualOnboardingIsCompletedThenReturnTrue() = runTest {
+        whenever(mockDuckChatFeatureRepository.isContextualOnboardingCompleted()).thenReturn(true)
+        assertTrue(testee.isContextualOnboardingCompleted())
+    }
+
+    @Test
+    fun whenContextualOnboardingIsNotCompletedThenReturnFalse() = runTest {
+        whenever(mockDuckChatFeatureRepository.isContextualOnboardingCompleted()).thenReturn(false)
+        assertFalse(testee.isContextualOnboardingCompleted())
     }
 
     @Test
@@ -1126,30 +1142,51 @@ class RealDuckChatTest {
 
     @Test
     fun `when get duck chat url with query and autoprompt then return correct url`() = runTest {
-        val url = testee.getDuckChatUrl("query", true)
+        val url = testee.getDuckChatUrl(query = "query", autoPrompt = true, sidebar = false)
 
         assertTrue(url == "https://duckduckgo.com/?q=query&prompt=1&ia=chat&duckai=5")
     }
 
     @Test
     fun `when get duck chat url with query and no autoprompt then return correct url`() = runTest {
-        val url = testee.getDuckChatUrl("query", false)
+        val url = testee.getDuckChatUrl(query = "query", autoPrompt = false, sidebar = false)
 
         assertTrue(url == "https://duckduckgo.com/?q=query&ia=chat&duckai=5")
     }
 
     @Test
     fun `when get duck chat url with empty query and no autoprompt then return correct url`() = runTest {
-        val url = testee.getDuckChatUrl("", false)
+        val url = testee.getDuckChatUrl(query = "", autoPrompt = false, sidebar = false)
 
         assertTrue(url == "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5")
     }
 
     @Test
     fun `when get duck chat url with empty query and autoprompt then return correct url`() = runTest {
-        val url = testee.getDuckChatUrl("", true)
+        val url = testee.getDuckChatUrl(query = "", autoPrompt = true, sidebar = false)
 
         assertTrue(url == "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5")
+    }
+
+    @Test
+    fun `when get duck chat url with query and sidebar then return url with placement parameter`() = runTest {
+        val url = testee.getDuckChatUrl(query = "query", autoPrompt = false, sidebar = true)
+
+        assertTrue(url == "https://duckduckgo.com/?q=query&placement=sidebar&ia=chat&duckai=5")
+    }
+
+    @Test
+    fun `when get duck chat url with query autoprompt and sidebar then return url with placement and prompt`() = runTest {
+        val url = testee.getDuckChatUrl(query = "query", autoPrompt = true, sidebar = true)
+
+        assertTrue(url == "https://duckduckgo.com/?q=query&prompt=1&placement=sidebar&ia=chat&duckai=5")
+    }
+
+    @Test
+    fun `when get duck chat url with empty query and sidebar then return correct url`() = runTest {
+        val url = testee.getDuckChatUrl(query = "", autoPrompt = false, sidebar = true)
+
+        assertTrue(url == "https://duckduckgo.com/?placement=sidebar&q=DuckDuckGo%20AI%20Chat&ia=chat&duckai=5")
     }
 
     @Test

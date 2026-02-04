@@ -19,5 +19,12 @@
         "triggers": ["other"],
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"]
+    },
+    "m_preonboarding_split_address_bar_selected_unique": {
+        "description": "Fires when the user selects the split address bar option during preonboarding",
+        "owners": ["aibrahim-"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
     }
 }

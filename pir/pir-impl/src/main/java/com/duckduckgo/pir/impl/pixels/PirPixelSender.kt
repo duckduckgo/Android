@@ -46,7 +46,9 @@ import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_ENGAGEMENT_DAU
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_ENGAGEMENT_MAU
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_ENGAGEMENT_WAU
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_FOREGROUND_RUN_COMPLETED
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_FOREGROUND_RUN_LOW_MEMORY
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_FOREGROUND_RUN_STARTED
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_FOREGROUND_RUN_START_FAILED
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INITIAL_SCAN_DURATION
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INTERNAL_SECURE_STORAGE_UNAVAILABLE
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_OPTOUT_INVALID_EVENT
@@ -97,6 +99,16 @@ interface PirPixelSender {
     fun reportManualScanCompleted(
         totalTimeInMillis: Long,
     )
+
+    /**
+     * Emits a pixel to signal that a manually initiated scan failed to start as foreground.
+     */
+    fun reportManualScanStartFailed()
+
+    /**
+     * Emits a pixel to signal that the foreground scan service is running low on memory.
+     */
+    fun reportManualScanLowMemory()
 
     /**
      * Emits a pixel to signal that the scheduled scan has been scheduled.
@@ -572,6 +584,14 @@ class RealPirPixelSender @Inject constructor(
             PARAM_KEY_TOTAL_TIME to totalTimeInMillis.toString(),
         )
         fire(PIR_FOREGROUND_RUN_COMPLETED, params)
+    }
+
+    override fun reportManualScanStartFailed() {
+        enqueueFire(PIR_FOREGROUND_RUN_START_FAILED)
+    }
+
+    override fun reportManualScanLowMemory() {
+        enqueueFire(PIR_FOREGROUND_RUN_LOW_MEMORY)
     }
 
     override fun reportScheduledScanScheduled() {
@@ -1318,6 +1338,16 @@ class RealPirPixelSender @Inject constructor(
         pixel.getPixelNames().forEach { (pixelType, pixelName) ->
             logcat { "PIR-LOGGING: $pixelName params: $params" }
             pixelSender.fire(pixelName = pixelName, type = pixelType, parameters = params)
+        }
+    }
+
+    private fun enqueueFire(
+        pixel: PirPixel,
+        params: Map<String, String> = emptyMap(),
+    ) {
+        pixel.getPixelNames().forEach { (_, pixelName) ->
+            logcat { "PIR-LOGGING: $pixelName params: $params" }
+            pixelSender.enqueueFire(pixelName = pixelName, parameters = params)
         }
     }
 

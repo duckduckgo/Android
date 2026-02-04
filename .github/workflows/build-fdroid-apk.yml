@@ -21,6 +21,8 @@ jobs:
   build_fdroid_apk:
     name: Build F-Droid apk
     runs-on: ubuntu-latest
+    env:
+      DEVELOCITY_ACCESS_KEY: ${{ secrets.DEVELOCITY_ACCESS_KEY }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4

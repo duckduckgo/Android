@@ -61,6 +61,8 @@ interface DuckChatFeatureRepository {
 
     suspend fun isFullScreenModeUserSettingEnabled(): Boolean
 
+    suspend fun isAutomaticPageContextAttachmentUserSettingEnabled(): Boolean
+
     suspend fun shouldShowInBrowserMenu(): Boolean
 
     suspend fun shouldShowInAddressBar(): Boolean
@@ -82,6 +84,10 @@ interface DuckChatFeatureRepository {
     suspend fun setAIChatHistoryEnabled(enabled: Boolean)
 
     suspend fun isAIChatHistoryEnabled(): Boolean
+
+    suspend fun setContextualOnboardingCompleted(completed: Boolean)
+
+    suspend fun isContextualOnboardingCompleted(): Boolean
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -139,6 +145,8 @@ class RealDuckChatFeatureRepository @Inject constructor(
 
     override suspend fun isFullScreenModeUserSettingEnabled(): Boolean = duckChatDataStore.isFullScreenUserSettingEnabled()
 
+    override suspend fun isAutomaticPageContextAttachmentUserSettingEnabled() = duckChatDataStore.isAutomaticPageContextAttachmentEnabled()
+
     override suspend fun shouldShowInBrowserMenu(): Boolean = duckChatDataStore.getShowInBrowserMenu()
 
     override suspend fun shouldShowInAddressBar(): Boolean = duckChatDataStore.getShowInAddressBar()
@@ -169,6 +177,12 @@ class RealDuckChatFeatureRepository @Inject constructor(
     }
 
     override suspend fun isAIChatHistoryEnabled(): Boolean = duckChatDataStore.isAIChatHistoryEnabled()
+
+    override suspend fun setContextualOnboardingCompleted(completed: Boolean) {
+        duckChatDataStore.setContextualOnboardingCompleted(completed)
+    }
+
+    override suspend fun isContextualOnboardingCompleted(): Boolean = duckChatDataStore.isContextualOnboardingCompleted()
 
     private fun updateWidgets() {
         val intent = Intent(AppWidgetManager.ACTION_APPWIDGET_UPDATE)

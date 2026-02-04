@@ -23,47 +23,16 @@ jobs:
     name: Create release APK and run E2E Maestro tests
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - name: Checkout and Assemble
+        id: assemble
+        uses: ./.github/actions/checkout-and-assemble
         with:
-          submodules: recursive
-          ref: ${{ github.event.inputs.app-version }}
-
-      - name: Set up JDK version
-        uses: actions/setup-java@v4
-        with:
-          java-version-file: .github/.java-version
-          distribution: 'adopt'
-
-      - name: Create folder
-        if: always()
-        run: mkdir apk
-
-      - name: Decode keys
-        uses: davidSchuppa/base64Secret-toFile-action@v2
-        with:
-          secret: ${{ secrets.FAKE_RELEASE_PROPERTIES }}
-          fileName: ddg_android_build.properties
-          destination-path: $HOME/jenkins_static/com.duckduckgo.mobile.android/
-
-      - name: Decode key file
-        uses: davidSchuppa/base64Secret-toFile-action@v2
-        with:
-          secret: ${{ secrets.FAKE_RELEASE_KEY }}
-          fileName: android
-          destination-path: $HOME/jenkins_static/com.duckduckgo.mobile.android/
-
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v5
-        with:
-          cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
-
-      - name: Assemble release APK
-        run: ./gradlew assemblePlayRelease -Pforce-default-variant -Pskip-onboarding
-
-      - name: Move APK to new folder
-        if: always()
-        run: find . -name "*.apk"  -exec mv '{}' apk/release.apk \;
+          commit: ${{ github.event.inputs.app-version }}
+          flavours: 'play'
+          release_properties: ${{ secrets.FAKE_RELEASE_PROPERTIES }}
+          release_key: ${{ secrets.FAKE_RELEASE_KEY }}
+          gradle_encryption_key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
+          develocity_access_key: ${{ secrets.DEVELOCITY_ACCESS_KEY }}
 
       - name: Maestro tests flows
         id: release-tests
@@ -73,7 +42,7 @@ jobs:
           api-key: ${{ secrets.ROBIN_API_KEY }}
           project-id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
           timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
-          app-file: apk/release.apk
+          app-file: ${{ steps.assemble.outputs.play_apk_path }}
           android-api-level: 30
           workspace: .maestro
           include-tags: ${{ github.event.inputs.test-tag }}

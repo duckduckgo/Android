@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2025 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/duckAiContextualLayout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/background_large_rounded_surface">
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/duckAiContextualFavicon"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:padding="@dimen/keyline_2"
+        android:layout_gravity="center"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:src="@drawable/ic_dax_icon"
+        app:shapeAppearanceOverlay="@style/Widget.DuckDuckGo.DuckChatContextualFavicon"
+        android:importantForAccessibility="no" />
+
+    <com.duckduckgo.common.ui.view.text.DaxTextView
+        android:id="@+id/duckAiContextualPageTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:text="Wikipedia"
+        app:typography="h2"
+        app:layout_constraintStart_toEndOf="@+id/duckAiContextualFavicon"
+        app:layout_constraintTop_toTopOf="@+id/duckAiContextualFavicon"
+        app:layout_constraintBottom_toTopOf="@id/duckAiContextualPageLabel" />
+
+    <com.duckduckgo.common.ui.view.text.DaxTextView
+        android:id="@+id/duckAiContextualPageLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:textType="secondary"
+        android:text="@string/duckAIContextualPageContent"
+        app:layout_constraintStart_toEndOf="@+id/duckAiContextualFavicon"
+        app:layout_constraintTop_toBottomOf="@id/duckAiContextualPageTitle"
+        app:layout_constraintBottom_toBottomOf="@+id/duckAiContextualFavicon" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

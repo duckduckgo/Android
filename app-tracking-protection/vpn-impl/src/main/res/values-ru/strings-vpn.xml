@@ -137,8 +137,6 @@
     <string name="atp_NewTabDisabled"><b>Защита от слежки выключена.</b>\nНажмите, чтобы продолжить блокировку отслеживания в приложениях.</string>
     <string name="atp_NewTabRevoked"><b>VPN-приложение на вашем устройстве отключило защиту от слежки.</b>\nНажмите, чтобы включить ее.</string>
     <string name="atp_NewTabEnabled"><b>Защита от слежки включена</b> и блокирует попытки отслеживания в приложениях.</string>
-    <!-- smartling.character_limit = 15 -->
-    <string name="vpnMenuYellowPill">Попробовать</string>
 
     <!-- Exclusion List -->
     <string name="atp_ExclusionListActivityTitle">Все приложения</string>

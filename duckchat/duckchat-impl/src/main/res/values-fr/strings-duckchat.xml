@@ -93,4 +93,10 @@
     <string name="duck_ai_paid_settings_enable_in_settings">Activer dans les réglages des fonctionnalités d\'IA</string>
     <string name="duck_ai_paid_settings_manage_in_settings">Gérer dans les réglages des fonctionnalités d\'IA</string>
     <string name="duck_ai_paid_settings_manage_secondary">Configurez Duck.ai dans les réglages des fonctionnalités d\'IA.</string>
+
+    <!-- Duck AI contextual onboarding -->
+    <string name="duck_chat_contextual_onboarding_title" instruction="Title for contextual Duck AI onboarding sheet">Posez des questions sur cette page</string>
+    <string name="duck_chat_contextual_onboarding_body" instruction="Body text for contextual Duck AI onboarding sheet">Duck.ai peut désormais vous aider à répondre aux questions concernant la page que vous consultez.\n\nLe contenu de la page n\'est inclus que lorsque vous le joignez. Vous pouvez modifier cela à tout moment dans Réglages.</string>
+    <string name="duck_chat_contextual_onboarding_primary" instruction="Button to continue to contextual Duck AI sheet">J\'ai compris</string>
+    <string name="duck_chat_contextual_onboarding_secondary" instruction="Button to go to AI settings">Afficher les paramètres</string>
 </resources>

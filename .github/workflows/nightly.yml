@@ -125,6 +125,8 @@ jobs:
   android_tests:
     runs-on: android-large-runner
     name: Android CI checks
+    env:
+      DEVELOCITY_ACCESS_KEY: ${{ secrets.DEVELOCITY_ACCESS_KEY }}
 
     steps:
       - name: Checkout repository

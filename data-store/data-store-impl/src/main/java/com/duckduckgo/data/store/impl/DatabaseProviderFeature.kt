@@ -29,4 +29,7 @@ interface DatabaseProviderFeature {
 
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun self(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun sendSanitizedStackTraces(): Toggle
 }

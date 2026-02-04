@@ -962,11 +962,16 @@
     <string name="settingsHeadingCompleteSetup">Užbaik savo sąranką</string>
 
     <!--TabSwitcher Trackers Animation-->
-    <string name="showTrackerCountInTabSwitcher">Rodyti sekiklių skaičių skirtukų perjungiklyje</string>
+    <string name="trackerBlockedInTheLast7days" instruction="Placeholder is 1 tracker blocked">&lt;b&gt;%1$s sekikliai (-ių) užblokuoti &lt;/b&gt; per paskutines 7 dienas</string>
     <string name="tabSwitcherAnimationTileRemovalDialogTitle" instruction="A title for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Slėpti sekiklių skaičių?</string>
     <string name="tabSwitcherAnimationTileRemovalDialogBody" instruction="A message for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Šią funkciją galima vėl įjungti nustatymuose &gt; Išvaizda.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Slėpti</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Laikyti</string>
+
+    <!-- Trackers blocked animation-->
+    <string name="settingsTrackersBlockedAnimationHeaderTitle">Blokuojamų sekiklių animacija</string>
+    <string name="showTrackerCountInAddressBar">Rodyti adreso juostoje</string>
+    <string name="showWeeklyTrackerCountInTabSwitcher">Rodyti skirtukų tvarkyklėje</string>
 
     <!-- Widgets -->
     <string name="searchOnlyWidgetLabel" instruction="Label for the search-only widget">Tik paieška</string>

@@ -179,4 +179,7 @@ interface AutofillFeature {
 
     @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.FALSE)
     fun useHarmony(): Toggle
+
+    @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.FALSE)
+    fun sendSanitizedStackTraces(): Toggle
 }

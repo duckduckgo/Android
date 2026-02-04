@@ -129,8 +129,6 @@
     <string name="atp_NewTabDisabled"><b>Az alkalmazáskövetés elleni védelem ki van kapcsolva.</b>\nKoppints, ha folytatni szeretnéd a követési kísérletek blokkolását az alkalmazásokban.</string>
     <string name="atp_NewTabRevoked"><b>A készülékeden lévő VPN alkalmazás kikapcsolta az alkalmazáskövetés elleni védelmet.</b>\nKoppints az újbóli engedélyezéshez.</string>
     <string name="atp_NewTabEnabled"><b>Az alkalmazáskövetés elleni védelem be van kapcsolva</b> és blokkolja a követési kísérleteket az alkalmazásokban.</string>
-    <!-- smartling.character_limit = 15 -->
-    <string name="vpnMenuYellowPill">Ingyenes próba</string>
 
     <!-- Exclusion List -->
     <string name="atp_ExclusionListActivityTitle">Minden alkalmazás</string>

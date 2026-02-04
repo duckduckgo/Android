@@ -261,4 +261,32 @@
         app:primaryText="Item with New Pill"
         app:showNewPill="true" />
 
+    <LinearLayout
+        android:id="@+id/oneLineListItemWithYellowPill"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/keyline_2"
+        android:gravity="center_vertical"
+        android:minHeight="@dimen/oneLineItemHeight"
+        android:orientation="horizontal"
+        android:paddingHorizontal="@dimen/keyline_4"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/oneLineListItemWithNewPill">
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Item with New Custom View YellowPill"
+            app:typography="body1" />
+
+        <com.duckduckgo.common.ui.view.DaxYellowPill
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/keyline_2"
+            android:text="New" />
+
+    </LinearLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>
