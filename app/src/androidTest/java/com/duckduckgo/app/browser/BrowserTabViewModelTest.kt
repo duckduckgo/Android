@@ -8178,6 +8178,10 @@ class BrowserTabViewModelTest {
 
     private fun aTabEntity(id: String): TabEntity = TabEntity(tabId = id, position = 0)
 
+    private fun givenDisableTrackerAnimationOnRestartFeature(enabled: Boolean) {
+        fakeAndroidConfigBrowserFeature.disableTrackerAnimationOnRestart().setRawStoredState(State(enable = enabled))
+    }
+
     private fun loadTabWithId(tabId: String) {
         testee.loadData(tabId, initialUrl = null, skipHome = false, isExternal = false)
     }
@@ -8867,5 +8871,56 @@ class BrowserTabViewModelTest {
             assertEquals("authUpdate", event.subscriptionName)
             cancelAndIgnoreRemainingEvents()
         }
+    }
+
+    @Test
+    fun whenLoadDataWithInitialUrlThenPreviousUrlIsSetToSkipFirstTrackerAnimation() {
+        givenDisableTrackerAnimationOnRestartFeature(true)
+        val initialUrl = "https://example.com"
+        testee.loadData(tabId = "test-tab", initialUrl = initialUrl, skipHome = false, isExternal = false)
+
+        assertEquals(initialUrl, testee.previousUrl)
+    }
+
+    @Test
+    fun whenLoadDataWithNullInitialUrlThenPreviousUrlRemainsNull() {
+        testee.loadData(tabId = "test-tab", initialUrl = null, skipHome = false, isExternal = false)
+
+        assertNull(testee.previousUrl)
+    }
+
+    @Test
+    fun whenLoadDataWithInitialUrlAndIsExternalTrueThenPreviousUrlIsNotSet() {
+        val initialUrl = "https://example.com"
+        testee.loadData(tabId = "test-tab", initialUrl = initialUrl, skipHome = false, isExternal = true)
+
+        assertNull(testee.previousUrl)
+    }
+
+    @Test
+    fun whenLoadDataWithFeatureFlagDisabledThenPreviousUrlIsNotSet() {
+        givenDisableTrackerAnimationOnRestartFeature(false)
+        val initialUrl = "https://example.com"
+        testee.loadData(tabId = "test-tab", initialUrl = initialUrl, skipHome = false, isExternal = false)
+
+        assertNull(testee.previousUrl)
+    }
+
+    @Test
+    fun whenLoadDataWithFeatureFlagEnabledAndNotExternalThenPreviousUrlIsSet() {
+        givenDisableTrackerAnimationOnRestartFeature(true)
+        val initialUrl = "https://example.com"
+        testee.loadData(tabId = "test-tab", initialUrl = initialUrl, skipHome = false, isExternal = false)
+
+        assertEquals(initialUrl, testee.previousUrl)
+    }
+
+    @Test
+    fun whenLoadDataWithFeatureFlagEnabledButIsExternalThenPreviousUrlIsNotSet() {
+        givenDisableTrackerAnimationOnRestartFeature(true)
+        val initialUrl = "https://example.com"
+        testee.loadData(tabId = "test-tab", initialUrl = initialUrl, skipHome = false, isExternal = true)
+
+        assertNull(testee.previousUrl)
     }
 }

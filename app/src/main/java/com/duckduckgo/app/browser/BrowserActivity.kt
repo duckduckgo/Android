@@ -254,6 +254,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     private var lastIntent: Intent? = null
 
+    // we don't store isExternal in the tab model, as it's only meant for the first time the tab is loaded.
+    private val externalLaunchTabIds = mutableSetOf<String>()
+
     private lateinit var renderer: BrowserStateRenderer
 
     private val binding: ActivityBrowserBinding by viewBinding()
@@ -520,6 +523,10 @@ open class BrowserActivity : DuckDuckGoActivity() {
         transaction.commit()
     }
 
+    fun consumeExternalLaunchForTab(tabId: String): Boolean {
+        return externalLaunchTabIds.remove(tabId)
+    }
+
     private fun selectTab(tab: TabEntity?) {
         logcat(VERBOSE) { "Select tab: $tab" }
 
@@ -533,7 +540,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
         val fragment = supportFragmentManager.findFragmentByTag(tab.tabId) as? BrowserTabFragment
         if (fragment == null) {
-            openNewTab(tab.tabId, tab.url, tab.skipHome, intent?.getBooleanExtra(LAUNCH_FROM_EXTERNAL_EXTRA, false) ?: false)
+            openNewTab(tab.tabId, tab.url, tab.skipHome, isExternal = consumeExternalLaunchForTab(tab.tabId))
             return
         }
         val transaction = supportFragmentManager.beginTransaction()
@@ -731,9 +738,14 @@ open class BrowserActivity : DuckDuckGoActivity() {
                         } else {
                             sharedText
                         }
-                    launchNewTab(query = query, sourceTabId = sourceTabId, skipHome = skipHome)
+                    launchNewTab(query = query, sourceTabId = sourceTabId, skipHome = skipHome, isExternal = isExternal)
                 } else {
-                    lifecycleScope.launch { viewModel.onOpenInNewTabRequested(sourceTabId = sourceTabId, query = sharedText, skipHome = skipHome) }
+                    lifecycleScope.launch {
+                        val tabId = viewModel.onOpenInNewTabRequested(sourceTabId = sourceTabId, query = sharedText, skipHome = skipHome)
+                        if (isExternal) {
+                            externalLaunchTabIds.add(tabId)
+                        }
+                    }
                 }
             }
         } else {
@@ -1422,10 +1434,14 @@ open class BrowserActivity : DuckDuckGoActivity() {
         query: String? = null,
         sourceTabId: String? = null,
         skipHome: Boolean = false,
+        isExternal: Boolean = false,
     ) {
         lifecycleScope.launch {
             if (swipingTabsFeature.isEnabled) {
-                tabManager.openNewTab(query, sourceTabId, skipHome)
+                val tabId = tabManager.openNewTab(query, sourceTabId, skipHome)
+                if (isExternal) {
+                    externalLaunchTabIds.add(tabId)
+                }
             } else {
                 viewModel.onNewTabRequested()
             }
