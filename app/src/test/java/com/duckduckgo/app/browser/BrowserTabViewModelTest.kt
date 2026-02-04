@@ -123,6 +123,7 @@ import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.browser.omnibar.QueryOrigin.FromBookmark
 import com.duckduckgo.app.browser.omnibar.QueryOrigin.FromUser
 import com.duckduckgo.app.browser.omnibar.StandardizedLeadingIconFeatureToggle
+import com.duckduckgo.app.browser.pageload.PageLoadWideEvent
 import com.duckduckgo.app.browser.refreshpixels.RefreshPixelSender
 import com.duckduckgo.app.browser.remotemessage.RemoteMessagingModel
 import com.duckduckgo.app.browser.santize.NonHttpAppLinkChecker
@@ -490,6 +491,8 @@ class BrowserTabViewModelTest {
     private val mockPagesSettingPlugin: PluginPoint<DuckPlayerPageSettingsPlugin> = mock()
 
     private val mockShowOnAppLaunchHandler: ShowOnAppLaunchOptionHandler = mock()
+
+    private val mockPageLoadWideEvent: PageLoadWideEvent = mock()
 
     private lateinit var remoteMessagingModel: RemoteMessagingModel
 
@@ -912,6 +915,7 @@ class BrowserTabViewModelTest {
                 serpEasterEggLogosToggles = mockSerpEasterEggLogosToggles,
                 serpLogos = mockSerpLogos,
                 tabVisitedSitesRepository = mockTabVisitedSitesRepository,
+                pageLoadWideEvent = mockPageLoadWideEvent,
             )
 
         testee.loadData("abc", null, false, false)

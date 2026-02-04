@@ -198,6 +198,7 @@ import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.browser.omnibar.QueryOrigin
 import com.duckduckgo.app.browser.omnibar.QueryOrigin.FromAutocomplete
+import com.duckduckgo.app.browser.pageload.PageLoadWideEvent
 import com.duckduckgo.app.browser.refreshpixels.RefreshPixelSender
 import com.duckduckgo.app.browser.santize.NonHttpAppLinkChecker
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
@@ -502,6 +503,7 @@ class BrowserTabViewModel @Inject constructor(
     private val serpEasterEggLogosToggles: SerpEasterEggLogosToggles,
     private val serpLogos: SerpLogos,
     private val tabVisitedSitesRepository: TabVisitedSitesRepository,
+    private val pageLoadWideEvent: PageLoadWideEvent,
 ) : ViewModel(),
     WebViewClientListener,
     EditSavedSiteListener,
@@ -2094,7 +2096,7 @@ class BrowserTabViewModel @Inject constructor(
         newProgress: Int,
         webViewNavigationState: WebViewNavigationState,
     ) {
-        logcat(VERBOSE) { "Loading in progress $newProgress, url: ${webViewNavigationState.currentUrl}" }
+        logcat(VERBOSE, "Performance Project") { "Loading in progress $newProgress, url: ${webViewNavigationState.currentUrl}" }
 
         if (!currentBrowserViewState().maliciousSiteBlocked) {
             navigationStateChanged(webViewNavigationState)
@@ -2105,6 +2107,18 @@ class BrowserTabViewModel @Inject constructor(
         val isLoading = newProgress < 100 || isProcessingTrackingLink
         val progress = currentLoadingViewState()
         if (progress.progress == newProgress) return
+
+        // Track progress milestones and fixed progress escape for Wide Events
+        val currentUrl = webViewNavigationState.currentUrl
+        if (currentUrl != null && currentUrl != "about:blank") {
+            appCoroutineScope.launch(dispatchers.io()) {
+                // Track escaping fixed progress zone (when progress >= FIXED_PROGRESS)
+                if (progress.progress < FIXED_PROGRESS && newProgress >= FIXED_PROGRESS) {
+                    pageLoadWideEvent.recordExitedFixedProgress(currentUrl, newProgress)
+                }
+            }
+        }
+
         val visualProgress =
             if (newProgress < FIXED_PROGRESS || isProcessingTrackingLink) {
                 FIXED_PROGRESS
