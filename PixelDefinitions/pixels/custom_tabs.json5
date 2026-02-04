@@ -12,7 +12,7 @@
         "description": "When a user clicks the 'Dax logo' on the custom tab, the pixel is fired.",
         "owners": ["0nko"],
         "triggers": ["other"],
-        "suffixes": ["first_daily_count", "form_factor"],
+        "suffixes": ["form_factor"],
         "parameters": ["appVersion"],
         "expires": "2026-02-27"
     }
