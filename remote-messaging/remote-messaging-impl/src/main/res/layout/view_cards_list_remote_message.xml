@@ -53,14 +53,15 @@
         android:id="@+id/actionButton"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/actionButtonHorizontalMargin"
-        android:layout_marginEnd="@dimen/actionButtonHorizontalMargin"
+        android:layout_marginStart="@dimen/keyline_5"
         android:layout_marginTop="16dp"
+        android:layout_marginEnd="@dimen/keyline_5"
         android:layout_marginBottom="16dp"
         app:daxButtonSize="large"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintWidth_max="@dimen/messageContentMaxWidth"
         tools:text="Got it" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

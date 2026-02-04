@@ -15,8 +15,6 @@
   -->
 
 <resources>
-    <dimen name="actionButtonHorizontalMargin">60dp</dimen>
     <dimen name="featuredListItemHorizontalMargin">60dp</dimen>
-    <dimen name="featuredListItemBottomMargin">40dp</dimen>
     <dimen name="featuredListItemTopMargin">40dp</dimen>
 </resources>
