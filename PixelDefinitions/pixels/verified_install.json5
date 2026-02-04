@@ -4,6 +4,7 @@
         "description": "Fires once ever on first app open for verified Play Store installs",
         "owners": ["CDRussell"],
         "triggers": ["other"],
+        "suffixes": ["form_factor"],
         "parameters": [
             "appVersion",
             {
@@ -18,6 +19,7 @@
         "description": "Fires once for every subsequent app update for verified Play Store installs",
         "owners": ["CDRussell"],
         "triggers": ["other"],
+        "suffixes": ["form_factor"],
         "parameters": [
             "appVersion",
             {

@@ -37,6 +37,7 @@ import androidx.transition.TransitionManager
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ContentOnboardingWelcomePageBinding
+import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.ADDRESS_BAR_POSITION
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.COMPARISON_CHART
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INITIAL
@@ -107,26 +108,42 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
                 is ShowComparisonChart -> configureDaxCta(COMPARISON_CHART)
                 is ShowSkipOnboardingOption -> configureDaxCta(SKIP_ONBOARDING_OPTION)
                 is ShowDefaultBrowserDialog -> showDefaultBrowserDialog(it.intent)
-                is ShowAddressBarPositionDialog -> configureDaxCta(ADDRESS_BAR_POSITION)
+                is ShowAddressBarPositionDialog -> configureDaxCta(ADDRESS_BAR_POSITION, it.showSplitOption)
                 is ShowInputScreenDialog -> configureDaxCta(INPUT_SCREEN)
                 is Finish -> onContinuePressed()
                 is OnboardingSkipped -> onSkipPressed()
-                is SetAddressBarPositionOptions -> setAddressBarPositionOptions(it.defaultOption)
+                is SetAddressBarPositionOptions -> setAddressBarPositionOptions(it.selectedOption)
             }
         }.launchIn(lifecycleScope)
     }
 
-    private fun setAddressBarPositionOptions(defaultOption: Boolean) {
-        if (defaultOption) {
-            binding.daxDialogCta.addressBarPosition.option1.setBackgroundResource(R.drawable.background_preonboarding_option_selected)
-            binding.daxDialogCta.addressBarPosition.option1Switch.isChecked = true
-            binding.daxDialogCta.addressBarPosition.option2.setBackgroundResource(R.drawable.background_preonboarding_option)
-            binding.daxDialogCta.addressBarPosition.option2Switch.isChecked = false
-        } else {
-            binding.daxDialogCta.addressBarPosition.option1.setBackgroundResource(R.drawable.background_preonboarding_option)
-            binding.daxDialogCta.addressBarPosition.option1Switch.isChecked = false
-            binding.daxDialogCta.addressBarPosition.option2.setBackgroundResource(R.drawable.background_preonboarding_option_selected)
-            binding.daxDialogCta.addressBarPosition.option2Switch.isChecked = true
+    private fun setAddressBarPositionOptions(selectedOption: OmnibarType) {
+        context?.let { ctx ->
+            val isLightMode = appTheme.isLightModeEnabled()
+
+            // Configure top option
+            val topButton = OmnibarTypeToggleButton.Top(
+                isActive = selectedOption == OmnibarType.SINGLE_TOP,
+                isLightMode = isLightMode,
+            )
+            binding.daxDialogCta.addressBarPosition.topOmnibarToggleImage.setImageResource(topButton.imageRes)
+            binding.daxDialogCta.addressBarPosition.topOmnibarToggleCheck.setImageResource(topButton.checkRes)
+
+            // Configure bottom option
+            val bottomButton = OmnibarTypeToggleButton.Bottom(
+                isActive = selectedOption == OmnibarType.SINGLE_BOTTOM,
+                isLightMode = isLightMode,
+            )
+            binding.daxDialogCta.addressBarPosition.bottomOmnibarToggleImage.setImageResource(bottomButton.imageRes)
+            binding.daxDialogCta.addressBarPosition.bottomOmnibarToggleCheck.setImageResource(bottomButton.checkRes)
+
+            // Configure split option
+            val splitButton = OmnibarTypeToggleButton.Split(
+                isActive = selectedOption == OmnibarType.SPLIT,
+                isLightMode = isLightMode,
+            )
+            binding.daxDialogCta.addressBarPosition.splitOmnibarToggleImage.setImageResource(splitButton.imageRes)
+            binding.daxDialogCta.addressBarPosition.splitOmnibarToggleCheck.setImageResource(splitButton.checkRes)
         }
     }
 
@@ -186,7 +203,7 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
         }
     }
 
-    private fun configureDaxCta(onboardingDialogType: PreOnboardingDialogType) {
+    private fun configureDaxCta(onboardingDialogType: PreOnboardingDialogType, showSplitOption: Boolean = false) {
         context?.let {
             var afterAnimation: () -> Unit = {}
             viewModel.onDialogShown(onboardingDialogType)
@@ -304,17 +321,29 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
                     binding.daxDialogCta.addressBarPosition.root.show()
                     binding.daxDialogCta.addressBarPosition.root.alpha = MIN_ALPHA
 
+                    // Show or hide split option based on feature toggle
+                    if (showSplitOption) {
+                        binding.daxDialogCta.addressBarPosition.splitOmnibarContainer.show()
+                    } else {
+                        binding.daxDialogCta.addressBarPosition.splitOmnibarContainer.gone()
+                    }
+
                     afterAnimation = {
                         binding.daxDialogCta.dialogTextCta.finishAnimation()
-                        setAddressBarPositionOptions(true)
+                        setAddressBarPositionOptions(OmnibarType.SINGLE_TOP) // Default to top
                         binding.daxDialogCta.primaryCta.text = it.getString(R.string.preOnboardingAddressBarOkButton)
                         binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked(ADDRESS_BAR_POSITION) }
                         binding.daxDialogCta.primaryCta.animate().alpha(MAX_ALPHA).duration = ANIMATION_DURATION
-                        binding.daxDialogCta.addressBarPosition.option1.setOnClickListener {
-                            viewModel.onAddressBarPositionOptionSelected(true)
+                        binding.daxDialogCta.addressBarPosition.topOmnibarContainer.setOnClickListener {
+                            viewModel.onAddressBarPositionOptionSelected(OmnibarType.SINGLE_TOP)
                         }
-                        binding.daxDialogCta.addressBarPosition.option2.setOnClickListener {
-                            viewModel.onAddressBarPositionOptionSelected(false)
+                        binding.daxDialogCta.addressBarPosition.bottomOmnibarContainer.setOnClickListener {
+                            viewModel.onAddressBarPositionOptionSelected(OmnibarType.SINGLE_BOTTOM)
+                        }
+                        if (showSplitOption) {
+                            binding.daxDialogCta.addressBarPosition.splitOmnibarContainer.setOnClickListener {
+                                viewModel.onAddressBarPositionOptionSelected(OmnibarType.SPLIT)
+                            }
                         }
                         binding.daxDialogCta.addressBarPosition.root.animate().alpha(MAX_ALPHA).duration = ANIMATION_DURATION
                     }
@@ -472,6 +501,58 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
 
         binding.daxDialogCta.duckAiInputScreenToggleWithoutAiCheck.setImageResource(withoutAiCheckRes)
         binding.daxDialogCta.duckAiInputScreenToggleWithAiCheck.setImageResource(withAiCheckRes)
+    }
+
+    private sealed class OmnibarTypeToggleButton(
+        isActive: Boolean,
+    ) {
+        abstract val imageRes: Int
+
+        val checkRes: Int =
+            if (isActive) {
+                CommonR.drawable.ic_check_accent_24
+            } else {
+                CommonR.drawable.ic_shape_circle_disabled_24
+            }
+
+        class Top(
+            isActive: Boolean,
+            isLightMode: Boolean,
+        ) : OmnibarTypeToggleButton(isActive) {
+            override val imageRes: Int =
+                when {
+                    isActive && isLightMode -> R.drawable.mobile_toolbar_top_selected_light
+                    isActive && !isLightMode -> R.drawable.mobile_toolbar_top_selected_dark
+                    !isActive && isLightMode -> R.drawable.mobile_toolbar_top_unselected_light
+                    else -> R.drawable.mobile_toolbar_top_unselected_dark
+                }
+        }
+
+        class Bottom(
+            isActive: Boolean,
+            isLightMode: Boolean,
+        ) : OmnibarTypeToggleButton(isActive) {
+            override val imageRes: Int =
+                when {
+                    isActive && isLightMode -> R.drawable.mobile_toolbar_bottom_selected_light
+                    isActive && !isLightMode -> R.drawable.mobile_toolbar_bottom_selected_dark
+                    !isActive && isLightMode -> R.drawable.mobile_toolbar_bottom_unselected_light
+                    else -> R.drawable.mobile_toolbar_bottom_unselected_dark
+                }
+        }
+
+        class Split(
+            isActive: Boolean,
+            isLightMode: Boolean,
+        ) : OmnibarTypeToggleButton(isActive) {
+            override val imageRes: Int =
+                when {
+                    isActive && isLightMode -> R.drawable.mobile_toolbar_split_selected_light
+                    isActive && !isLightMode -> R.drawable.mobile_toolbar_split_selected_dark
+                    !isActive && isLightMode -> R.drawable.mobile_toolbar_split_unselected_light
+                    else -> R.drawable.mobile_toolbar_split_unselected_dark
+                }
+        }
     }
 
     companion object {

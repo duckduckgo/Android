@@ -1,0 +1,99 @@
+name: 'Checkout code and assemble build flavour'
+description: 'Checks out the repository and assembles the Play and Internal release APKs'
+
+inputs:
+  commit:
+    description: 'Specific ref or commit SHA to checkout (optional, defaults to github.sha)'
+    required: false
+    default: ''
+  flavours:
+    description: 'The flavours to assemble (play, internal, all)'
+    required: false
+    default: 'all'
+  release_properties:
+    description: 'Release properties secret'
+    required: true
+  release_key:
+    description: 'Release key secret'
+    required: true
+  gradle_encryption_key:
+    description: 'Gradle encryption key secret'
+    required: true
+  gradle_flags:
+    description: 'Additional flags to pass to the gradlew command'
+    required: false
+    default: ''
+  develocity_access_key:
+    description: 'Develocity access key for Gradle remote caching'
+    required: false
+    default: ''
+
+outputs:
+  play_apk_path:
+    description: 'Absolute path to Play flavour apk'
+    value: ${{ github.workspace }}/apk/release.apk
+  internal_apk_path:
+    description: 'Absolute path to Internal flavour apk'
+    value: ${{ github.workspace }}/apk/internal.apk
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        ref: ${{ inputs.commit }}
+        submodules: recursive
+
+    - name: Set up JDK version
+      uses: actions/setup-java@v4
+      with:
+        java-version-file: .github/.java-version
+        distribution: 'adopt'
+
+    - name: Create folder
+      shell: bash
+      run: mkdir -p apk
+
+    - name: Decode keys
+      uses: davidSchuppa/base64Secret-toFile-action@v2
+      with:
+        secret: ${{ inputs.release_properties }}
+        fileName: ddg_android_build.properties
+        destination-path: $HOME/jenkins_static/com.duckduckgo.mobile.android/
+
+    - name: Decode key file
+      uses: davidSchuppa/base64Secret-toFile-action@v2
+      with:
+        secret: ${{ inputs.release_key }}
+        fileName: android
+        destination-path: $HOME/jenkins_static/com.duckduckgo.mobile.android/
+
+    - name: Setup Gradle
+      uses: gradle/actions/setup-gradle@v5
+      with:
+        cache-encryption-key: ${{ inputs.gradle_encryption_key }}
+
+    - name: Assemble release APK
+      if: ${{ inputs.flavours == 'all' || inputs.flavours == 'play' }}
+      shell: bash
+      env:
+        DEVELOCITY_ACCESS_KEY: ${{ inputs.develocity_access_key }}
+      run: ./gradlew assemblePlayRelease -Pforce-default-variant -Pskip-onboarding -x lint ${{ inputs.gradle_flags }}
+
+    - name: Move Play APK
+      if: ${{ inputs.flavours == 'all' || inputs.flavours == 'play' }}
+      shell: bash
+      run: find . -name "*play-release*.apk" -exec mv '{}' apk/release.apk \;
+
+    - name: Assemble internal release APK
+      if: ${{ inputs.flavours == 'all' || inputs.flavours == 'internal' }}
+      shell: bash
+      env:
+        DEVELOCITY_ACCESS_KEY: ${{ inputs.develocity_access_key }}
+      run: ./gradlew assembleInternalRelease -Pforce-default-variant -Pskip-onboarding -x lint ${{ inputs.gradle_flags }}
+
+    - name: Move Internal APK
+      if: ${{ inputs.flavours == 'all' || inputs.flavours == 'internal' }}
+      shell: bash
+      run: find . -name "*internal-release*.apk" -exec mv '{}' apk/internal.apk \;

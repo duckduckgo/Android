@@ -17,6 +17,7 @@
 package com.duckduckgo.pir.impl.email
 
 import android.content.Context
+import android.webkit.WebView
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
@@ -47,6 +48,20 @@ interface PirEmailConfirmation {
         jobRecords: List<EmailConfirmationJobRecord>,
         context: Context,
         runType: RunType,
+    ): Result<Unit>
+
+    /**
+     * This method should only be used if we want to debug email confirmation and pass in a specific [webView]
+     * which will allow us to see the run in action.
+     * Do not use this for non-debug scenarios.
+     * You DO NOT need to set any dispatcher to call this suspend function. It is already set to run on IO.
+     *
+     * @param jobRecord - The email confirmation job record to run
+     * @param webView - attached/visible WebView in which we will run the email confirmation flow.
+     */
+    suspend fun debugExecute(
+        jobRecord: EmailConfirmationJobRecord,
+        webView: WebView,
     ): Result<Unit>
 
     fun stop()
@@ -176,6 +191,62 @@ class RealPirEmailConfirmation @Inject constructor(
         return repository.getAllUserProfileQueries().ifEmpty {
             DEFAULT_PROFILE_QUERIES
         }
+    }
+
+    override suspend fun debugExecute(
+        jobRecord: EmailConfirmationJobRecord,
+        webView: WebView,
+    ): Result<Unit> = withContext(dispatcherProvider.io()) {
+        onJobStarted()
+        cleanPreviousRun()
+
+        logcat { "PIR-EMAIL-CONFIRMATION: Running debug email confirmation for ${jobRecord.brokerName} on ${Thread.currentThread().name}" }
+
+        val activeBrokers = repository.getAllActiveBrokerObjects().associateBy { it.name }
+        val broker = activeBrokers[jobRecord.brokerName]
+        if (broker == null) {
+            logcat { "PIR-EMAIL-CONFIRMATION: Broker ${jobRecord.brokerName} not found." }
+            onJobCompleted()
+            return@withContext Result.failure(IllegalStateException("Broker not found"))
+        }
+
+        val json = repository.getBrokerOptOutSteps(jobRecord.brokerName)
+        if (json.isNullOrEmpty()) {
+            logcat { "PIR-EMAIL-CONFIRMATION: No opt-out steps for ${jobRecord.brokerName}." }
+            onJobCompleted()
+            return@withContext Result.failure(IllegalStateException("No opt-out steps found"))
+        }
+
+        val brokerStep = brokerStepsParser.parseEmailConfirmationStep(broker, json, jobRecord)
+        if (brokerStep == null) {
+            logcat { "PIR-EMAIL-CONFIRMATION: Failed to parse email confirmation step." }
+            onJobCompleted()
+            return@withContext Result.failure(IllegalStateException("Failed to parse email confirmation step"))
+        }
+
+        val profileQuery = repository.getUserProfileQuery(jobRecord.userProfileId)
+            ?: obtainProfiles().firstOrNull { it.id == jobRecord.userProfileId }
+        if (profileQuery == null) {
+            logcat { "PIR-EMAIL-CONFIRMATION: Profile query not found for ${jobRecord.userProfileId}." }
+            onJobCompleted()
+            return@withContext Result.failure(IllegalStateException("Profile query not found"))
+        }
+
+        runners.add(
+            pirActionsRunnerFactory.create(
+                webView.context,
+                pirCssScriptLoader.getScript(),
+                RunType.EMAIL_CONFIRMATION,
+            ),
+        )
+
+        logcat { "PIR-EMAIL-CONFIRMATION: Starting debug execution on visible WebView" }
+        runners[0].startOn(webView, profileQuery, listOf(brokerStep))
+        runners[0].stop()
+        logcat { "PIR-EMAIL-CONFIRMATION: Debug execution completed" }
+
+        onJobCompleted()
+        return@withContext Result.success(Unit)
     }
 
     override fun stop() {

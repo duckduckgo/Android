@@ -213,6 +213,47 @@ object DownloaderUtil {
     }
 
     private fun String.sanitizeFileName(): String {
-        return this.replace('*', '_').replace(" ", "_")
+        return this
+            .replace('*', '_')
+            .replace(" ", "_")
+            .stripUnicodeWhitespace()
+    }
+
+    /**
+     * Strips Unicode whitespace characters from the filename to prevent extension spoofing attacks.
+     *
+     * Attackers can use invisible Unicode whitespace characters to hide the real file extension.
+     * For example: "halo.pdfㅤㅤㅤㅤㅤ.apk" appears as "halo.pdf" but is actually an APK file.
+     *
+     * This removes various Unicode whitespace and invisible characters including:
+     * - Hangul Filler (U+3164) and Halfwidth Hangul Filler (U+FFA0)
+     * - Zero-width characters (U+200B, U+200C, U+200D, U+2060, U+FEFF)
+     * - Various Unicode spaces (U+00A0, U+1680, U+180E, U+2000-U+200A, U+202F, U+205F, U+3000)
+     * - Hangul Jamo fillers (U+115F, U+1160)
+     *
+     * @see <a href="https://issues.chromium.org/issues/40053668">Chromium Issue 40053668</a>
+     */
+    private fun String.stripUnicodeWhitespace(): String {
+        val unicodeWhitespacePattern = Regex(
+            "[" +
+                "\u00A0" + // NO-BREAK SPACE
+                "\u1680" + // OGHAM SPACE MARK
+                "\u180E" + // MONGOLIAN VOWEL SEPARATOR
+                "\u2000-\u200A" + // Various width spaces (EN QUAD through HAIR SPACE)
+                "\u200B" + // ZERO WIDTH SPACE
+                "\u200C" + // ZERO WIDTH NON-JOINER
+                "\u200D" + // ZERO WIDTH JOINER
+                "\u202F" + // NARROW NO-BREAK SPACE
+                "\u205F" + // MEDIUM MATHEMATICAL SPACE
+                "\u2060" + // WORD JOINER
+                "\u3000" + // IDEOGRAPHIC SPACE
+                "\u3164" + // HANGUL FILLER (used in the reported vulnerability)
+                "\uFEFF" + // ZERO WIDTH NO-BREAK SPACE (BOM)
+                "\uFFA0" + // HALFWIDTH HANGUL FILLER
+                "\u115F" + // HANGUL CHOSEONG FILLER
+                "\u1160" + // HANGUL JUNGSEONG FILLER
+                "]",
+        )
+        return this.replace(unicodeWhitespacePattern, "")
     }
 }

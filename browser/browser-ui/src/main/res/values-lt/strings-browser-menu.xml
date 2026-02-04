@@ -47,6 +47,8 @@
     <string name="browserMenuChatHistory">Pokalbių istorija</string>
     <string name="browserMenuChatSettings">„Duck.ai“ nustatymai</string>
     <string name="browserMenuVPN">VPN</string>
+    <!-- smartling.character_limit = 15 -->
+    <string name="browserMenuVpnTryForFree">Išbandykite nemokamai</string>
 
     <!-- Browser Menu Content Description -->
     <string name="browserMenuBack">Atgal</string>

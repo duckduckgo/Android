@@ -17,11 +17,11 @@
 package com.duckduckgo.app.statistics.pixels
 
 import com.duckduckgo.app.statistics.api.PixelSender
+import com.duckduckgo.app.statistics.api.PixelSender.EnqueuePixelResult
 import com.duckduckgo.app.statistics.api.PixelSender.SendPixelResult.PIXEL_SENT
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.app.statistics.pixels.RxBasedPixelTest.TestPixels.TEST
 import com.duckduckgo.common.test.InstantSchedulersRule
-import io.reactivex.Completable
 import io.reactivex.Single
 import org.junit.Rule
 import org.junit.Test
@@ -79,7 +79,7 @@ class RxBasedPixelTest {
         val pixel = RxBasedPixel(mockPixelSender)
         pixel.enqueueFire(TEST)
 
-        verify(mockPixelSender).enqueuePixel("test", emptyMap(), emptyMap())
+        verify(mockPixelSender).enqueuePixel("test", emptyMap(), emptyMap(), Count)
     }
 
     @Test
@@ -89,7 +89,7 @@ class RxBasedPixelTest {
         val pixel = RxBasedPixel(mockPixelSender)
         pixel.enqueueFire(TEST)
 
-        verify(mockPixelSender).enqueuePixel("test", emptyMap(), emptyMap())
+        verify(mockPixelSender).enqueuePixel("test", emptyMap(), emptyMap(), Count)
     }
 
     @Test
@@ -100,15 +100,15 @@ class RxBasedPixelTest {
         val params = mapOf("param1" to "value1", "param2" to "value2")
         pixel.enqueueFire(TEST, params)
 
-        verify(mockPixelSender).enqueuePixel("test", params, emptyMap())
+        verify(mockPixelSender).enqueuePixel("test", params, emptyMap(), Count)
     }
 
     private fun givenEnqueuePixelSucceeds() {
-        whenever(mockPixelSender.enqueuePixel(any(), any(), any())).thenReturn(Completable.complete())
+        whenever(mockPixelSender.enqueuePixel(any(), any(), any(), any())).thenReturn(Single.just(EnqueuePixelResult.PIXEL_ENQUEUED))
     }
 
     private fun givenEnqueuePixelFails() {
-        whenever(mockPixelSender.enqueuePixel(any(), any(), any())).thenReturn(Completable.error(TimeoutException()))
+        whenever(mockPixelSender.enqueuePixel(any(), any(), any(), any())).thenReturn(Single.error(TimeoutException()))
     }
 
     private fun givenSendPixelSucceeds() {

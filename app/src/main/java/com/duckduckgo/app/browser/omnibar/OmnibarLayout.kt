@@ -121,6 +121,7 @@ import com.duckduckgo.serp.logos.api.SerpEasterEggLogosToggles
 import com.duckduckgo.serp.logos.api.SerpLogos
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.card.MaterialCardView
+import com.google.android.material.color.MaterialColors.isColorLight
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.map
@@ -1050,13 +1051,7 @@ class OmnibarLayout @JvmOverloads constructor(
                 )
             }
         } else if (omnibarRepository.isNewCustomTabEnabled) {
-            val (animationBackgroundColor, useLightAnimation) = if (!isDefaultToolbarColor(customTabToolbarColor)) {
-                val background = calculateAnimationBackgroundColor(customTabToolbarColor)
-                Pair(background, isColorLight(background))
-            } else {
-                Pair(customTabToolbarColor, null)
-            }
-
+            val animationBackgroundColor = calculateAnimationBackgroundColor(customTabToolbarColor)
             if (isAddressBarTrackersAnimationEnabled) {
                 animatorHelper.startAddressBarTrackersAnimation(
                     context = context,
@@ -1075,7 +1070,7 @@ class OmnibarLayout @JvmOverloads constructor(
                     trackersAnimationView = newCustomTabToolbarContainer.trackersAnimation,
                     omnibarViews = customTabViews(),
                     entities = events,
-                    useLightAnimation = useLightAnimation,
+                    useLightAnimation = isColorLight(animationBackgroundColor),
                 )
             }
         }
@@ -1097,13 +1092,12 @@ class OmnibarLayout @JvmOverloads constructor(
                 }
 
             // For new custom tabs, determine light/dark variant based on container color
-            // Shield sits on secondaryToolbarColor background, so invert: light bg needs dark shield
+            // Shield sits on customTabToolbarColor background, so invert: light bg needs dark shield
             val useLightAnimation = if (viewMode is ViewMode.CustomTab &&
                 omnibarRepository.isNewCustomTabEnabled &&
                 !isDefaultToolbarColor(customTabToolbarColor)
             ) {
-                val secondaryToolbarColor = calculateAddressBarColor(customTabToolbarColor)
-                isColorLight(secondaryToolbarColor)
+                isColorLight(customTabToolbarColor)
             } else {
                 null // Use default theme-based selection
             }
@@ -1127,22 +1121,16 @@ class OmnibarLayout @JvmOverloads constructor(
                         }
                     }
 
-                    val animationBackgroundColor: Int
                     if (customTab.toolbarColor != 0 && !isDefaultToolbarColor(customTab.toolbarColor)) {
                         toolbar.background = customTab.toolbarColor.toDrawable()
                         toolbarContainer.background = customTab.toolbarColor.toDrawable()
 
                         val foregroundColor = calculateCustomTabForegroundColor(customTab.toolbarColor)
-                        val secondaryToolbarColor = calculateAddressBarColor(customTab.toolbarColor)
                         customTabCloseIcon.setColorFilter(foregroundColor)
-                        customTabDomain.setTextColor(calculateCustomTabForegroundColor(secondaryToolbarColor))
-                        customToolbarContainer.setCardBackgroundColor(secondaryToolbarColor)
                         browserMenuImageView.setColorFilter(foregroundColor)
-
-                        animationBackgroundColor = calculateAnimationBackgroundColor(customTab.toolbarColor)
-                    } else {
-                        animationBackgroundColor = customTab.toolbarColor
+                        customTabDomain.setTextColor(foregroundColor)
                     }
+                    val animationBackgroundColor = calculateAnimationBackgroundColor(customTab.toolbarColor)
 
                     val iconBackground = newCustomTabToolbarContainer.animatedIconBackgroundView.background
                     if (iconBackground is android.graphics.drawable.GradientDrawable) {
@@ -1164,7 +1152,7 @@ class OmnibarLayout @JvmOverloads constructor(
                         omnibarItemPressedListener?.onCustomTabPrivacyDashboardPressed()
                     }
 
-                    customToolbarContainer.setOnClickListener {
+                    customTabToolbar.setOnClickListener {
                         pixel.fire(CustomTabPixelNames.CUSTOM_TABS_ADDRESS_BAR_CLICKED)
                         pixel.fire(CustomTabPixelNames.CUSTOM_TABS_ADDRESS_BAR_CLICKED_DAILY, type = PixelType.Daily())
                     }
@@ -1250,7 +1238,8 @@ class OmnibarLayout @JvmOverloads constructor(
     }
 
     private fun calculateAnimationBackgroundColor(mainToolbarColor: Int): Int {
-        return ColorUtils.blendARGB(mainToolbarColor, Color.WHITE, 0.12f)
+        val blendColor = if (isColorLight(mainToolbarColor)) Color.BLACK else Color.WHITE
+        return ColorUtils.blendARGB(mainToolbarColor, blendColor, 0.12f)
     }
 
     private fun renderCustomTab(viewMode: ViewMode.CustomTab) {

@@ -100,6 +100,11 @@ class AppearanceActivity : DuckDuckGoActivity() {
             viewModel.onShowTrackersCountInTabSwitcherChanged(isChecked)
         }
 
+    private val showTrackersCountInAddressBar =
+        CompoundButton.OnCheckedChangeListener { _, isChecked ->
+            viewModel.onShowTrackersCountInAddressBarChanged(isChecked)
+        }
+
     private val useBottomSheetMenuToggleListener =
         CompoundButton.OnCheckedChangeListener { _, isChecked ->
             viewModel.onUseBottomSheetMenuChanged(isChecked)
@@ -177,6 +182,11 @@ class AppearanceActivity : DuckDuckGoActivity() {
                     binding.showTrackersCountInTabSwitcher.quietlySetIsChecked(
                         viewState.isTrackersCountInTabSwitcherEnabled,
                         showTrackersCountInTabSwitcher,
+                    )
+                    binding.showTrackersCountInAddressBar.isVisible = viewState.shouldShowAddressBarTrackersAnimationItem
+                    binding.showTrackersCountInAddressBar.quietlySetIsChecked(
+                        viewState.isAddressBarTrackersAnimationEnabled,
+                        showTrackersCountInAddressBar,
                     )
                     binding.bottomSheetMenuSettingDivider.isVisible = viewState.hasExperimentalBrowserMenuOption
                     binding.useBottomSheetMenuSetting.isVisible = viewState.hasExperimentalBrowserMenuOption

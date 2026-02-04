@@ -27,51 +27,51 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          ref: ${{ inputs.commit || github.sha }}
           submodules: recursive
 
-      - name: Set up JDK version
-        uses: actions/setup-java@v4
+      - name: Assemble APKs
+        id: assemble
+        uses: ./.github/actions/checkout-and-assemble
         with:
-          java-version-file: .github/.java-version
-          distribution: 'adopt'
+          commit: ${{ inputs.commit }}
+          release_properties: ${{ secrets.FAKE_RELEASE_PROPERTIES }}
+          release_key: ${{ secrets.FAKE_RELEASE_KEY }}
+          gradle_encryption_key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
+          develocity_access_key: ${{ secrets.DEVELOCITY_ACCESS_KEY }}
 
-      - name: Create folder
-        if: always()
-        run: mkdir apk
-
-      - name: Decode keys
-        uses: davidSchuppa/base64Secret-toFile-action@v2
+      - name: Upload Internal Binary to Maestro
+        id: maestro-upload-internal-binary
+        uses: ./.github/actions/maestro-cloud-asana-reporter
+        timeout-minutes: 120
         with:
-          secret: ${{ secrets.FAKE_RELEASE_PROPERTIES }}
-          fileName: ddg_android_build.properties
-          destination-path: $HOME/jenkins_static/com.duckduckgo.mobile.android/
+          maestro_api_key: ${{ secrets.ROBIN_API_KEY }}
+          maestro_project_id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
+          maestro_test_name: binary_internal_upload_${{ github.sha }}
+          maestro_timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
+          maestro_app_file: ${{ steps.assemble.outputs.internal_apk_path }}
+          maestro_api_level: 30
+          maestro_include_tags: binaryUpload
+          asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          asana_project_id: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
+          asana_section_id: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
+          test_suite_name: Internal Binary Upload
 
-      - name: Decode key file
-        uses: davidSchuppa/base64Secret-toFile-action@v2
+      - name: Upload Release Binary to Maestro
+        id: maestro-upload-release-binary
+        uses: ./.github/actions/maestro-cloud-asana-reporter
+        timeout-minutes: 120
         with:
-          secret: ${{ secrets.FAKE_RELEASE_KEY }}
-          fileName: android
-          destination-path: $HOME/jenkins_static/com.duckduckgo.mobile.android/
-
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v5
-        with:
-          cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
-
-      - name: Assemble release APK
-        run: ./gradlew assemblePlayRelease -Pforce-default-variant -Pskip-onboarding
-
-      - name: Move APK to new folder
-        if: always()
-        run: find . -name "*play-release*.apk" -exec mv '{}' apk/release.apk \;
-
-      - name: Assemble internal release APK
-        run: ./gradlew assembleInternalRelease -Pforce-default-variant -Pskip-onboarding
-
-      - name: Move APK to new folder
-        if: always()
-        run: find . -name "*internal-release*.apk" -exec mv '{}' apk/internal.apk \;
+          maestro_api_key: ${{ secrets.ROBIN_API_KEY }}
+          maestro_project_id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
+          maestro_test_name: binary_release_upload_${{ github.sha }}
+          maestro_timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
+          maestro_app_file: ${{ steps.assemble.outputs.play_apk_path }}
+          maestro_api_level: 30
+          maestro_include_tags: binaryUpload
+          asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          asana_project_id: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
+          asana_section_id: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
+          test_suite_name: Release Binary Upload
 
       - name: Custom tabs flows
         id: maestro-custom-tabs
@@ -82,13 +82,53 @@ jobs:
           maestro_project_id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
           maestro_test_name: customTabs_${{ github.sha }}
           maestro_timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
-          maestro_app_file: apk/internal.apk
+          maestro_app_binary_id: ${{ steps.maestro-upload-internal-binary.outputs.maestro_app_binary_id }}
           maestro_api_level: 30
           maestro_include_tags: customTabsTest
           asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana_project_id: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
           asana_section_id: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
           test_suite_name: Custom Tabs
+          is_release_blocker: 'true'
+          asana_releases_project_id: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_ID }}
+          asana_releases_blocker_section_id: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_BLOCKER_SECTION_ID }}
+
+      - name: Internal Privacy Tests
+        id: maestro-internal-privacy
+        uses: ./.github/actions/maestro-cloud-asana-reporter
+        timeout-minutes: 120
+        with:
+          maestro_api_key: ${{ secrets.ROBIN_API_KEY }}
+          maestro_project_id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
+          maestro_test_name: internalPrivacyTest_${{ github.sha }}
+          maestro_timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
+          maestro_app_binary_id: ${{ steps.maestro-upload-internal-binary.outputs.maestro_app_binary_id }}
+          maestro_api_level: 34
+          maestro_include_tags: privacyTestInternal
+          asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          asana_project_id: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
+          asana_section_id: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
+          test_suite_name: Internal Privacy (Nightly)
+          is_release_blocker: 'true'
+          asana_releases_project_id: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_ID }}
+          asana_releases_blocker_section_id: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_BLOCKER_SECTION_ID }}
+
+      - name: Internal Security Tests
+        id: maestro-internal-security
+        uses: ./.github/actions/maestro-cloud-asana-reporter
+        timeout-minutes: 120
+        with:
+          maestro_api_key: ${{ secrets.ROBIN_API_KEY }}
+          maestro_project_id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
+          maestro_test_name: internalSecurityTest_${{ github.sha }}
+          maestro_timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
+          maestro_app_binary_id: ${{ steps.maestro-upload-internal-binary.outputs.maestro_app_binary_id }}
+          maestro_api_level: 30
+          maestro_include_tags: securityTestInternal
+          asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          asana_project_id: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
+          asana_section_id: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
+          test_suite_name: Internal Security (Nightly)
           is_release_blocker: 'true'
           asana_releases_project_id: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_ID }}
           asana_releases_blocker_section_id: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_BLOCKER_SECTION_ID }}
@@ -102,7 +142,7 @@ jobs:
           maestro_project_id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
           maestro_test_name: onboardingTest_${{ github.sha }}
           maestro_timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
-          maestro_app_file: apk/release.apk
+          maestro_app_binary_id: ${{ steps.maestro-upload-release-binary.outputs.maestro_app_binary_id }}
           maestro_api_level: 30
           maestro_include_tags: onboardingTest
           asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
@@ -122,7 +162,7 @@ jobs:
           maestro_project_id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
           maestro_test_name: navigationTest_${{ github.sha }}
           maestro_timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
-          maestro_app_file: apk/release.apk
+          maestro_app_binary_id: ${{ steps.maestro-upload-release-binary.outputs.maestro_app_binary_id }}
           maestro_api_level: 30
           maestro_include_tags: navigationTest
           asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
@@ -142,7 +182,7 @@ jobs:
           maestro_project_id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
           maestro_test_name: adClickTest_${{ github.sha }}
           maestro_timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
-          maestro_app_file: apk/release.apk
+          maestro_app_binary_id: ${{ steps.maestro-upload-release-binary.outputs.maestro_app_binary_id }}
           maestro_api_level: 30
           maestro_include_tags: adClickTest
           asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
@@ -162,33 +202,13 @@ jobs:
           maestro_project_id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
           maestro_test_name: privacyTest_${{ github.sha }}
           maestro_timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
-          maestro_app_file: apk/release.apk
+          maestro_app_binary_id: ${{ steps.maestro-upload-release-binary.outputs.maestro_app_binary_id }}
           maestro_api_level: 30
           maestro_include_tags: privacyTest
           asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana_project_id: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
           asana_section_id: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
           test_suite_name: Privacy (Nightly)
-          is_release_blocker: 'true'
-          asana_releases_project_id: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_ID }}
-          asana_releases_blocker_section_id: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_BLOCKER_SECTION_ID }}
-
-      - name: Internal Privacy Tests
-        id: maestro-internal-privacy
-        uses: ./.github/actions/maestro-cloud-asana-reporter
-        timeout-minutes: 120
-        with:
-          maestro_api_key: ${{ secrets.ROBIN_API_KEY }}
-          maestro_project_id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
-          maestro_test_name: internalPrivacyTest_${{ github.sha }}
-          maestro_timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
-          maestro_app_file: apk/internal.apk
-          maestro_api_level: 34
-          maestro_include_tags: privacyTestInternal
-          asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          asana_project_id: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
-          asana_section_id: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
-          test_suite_name: Internal Privacy (Nightly)
           is_release_blocker: 'true'
           asana_releases_project_id: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_ID }}
           asana_releases_blocker_section_id: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_BLOCKER_SECTION_ID }}
@@ -202,33 +222,13 @@ jobs:
           maestro_project_id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
           maestro_test_name: securityTest_${{ github.sha }}
           maestro_timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
-          maestro_app_file: apk/release.apk
+          maestro_app_binary_id: ${{ steps.maestro-upload-release-binary.outputs.maestro_app_binary_id }}
           maestro_api_level: 30
           maestro_include_tags: securityTest
           asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana_project_id: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
           asana_section_id: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
           test_suite_name: Security (Nightly)
-          is_release_blocker: 'true'
-          asana_releases_project_id: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_ID }}
-          asana_releases_blocker_section_id: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_BLOCKER_SECTION_ID }}
-
-      - name: Internal Security Tests
-        id: maestro-internal-security
-        uses: ./.github/actions/maestro-cloud-asana-reporter
-        timeout-minutes: 120
-        with:
-          maestro_api_key: ${{ secrets.ROBIN_API_KEY }}
-          maestro_project_id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
-          maestro_test_name: internalSecurityTest_${{ github.sha }}
-          maestro_timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
-          maestro_app_file: apk/internal.apk
-          maestro_api_level: 30
-          maestro_include_tags: securityTestInternal
-          asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          asana_project_id: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
-          asana_section_id: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
-          test_suite_name: Internal Security (Nightly)
           is_release_blocker: 'true'
           asana_releases_project_id: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_ID }}
           asana_releases_blocker_section_id: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_BLOCKER_SECTION_ID }}
@@ -242,7 +242,7 @@ jobs:
           maestro_project_id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
           maestro_test_name: releaseTest_${{ github.sha }}
           maestro_timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
-          maestro_app_file: apk/release.apk
+          maestro_app_binary_id: ${{ steps.maestro-upload-release-binary.outputs.maestro_app_binary_id }}
           maestro_api_level: 30
           maestro_include_tags: releaseTest
           asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
@@ -262,7 +262,7 @@ jobs:
           maestro_project_id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
           maestro_test_name: notificationPermissionTest_${{ github.sha }}
           maestro_timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
-          maestro_app_file: apk/release.apk
+          maestro_app_binary_id: ${{ steps.maestro-upload-release-binary.outputs.maestro_app_binary_id }}
           maestro_api_level: 33
           maestro_include_tags: permissionsTest
           asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}

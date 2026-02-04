@@ -245,6 +245,8 @@ import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.impl.contextual.PageContextJSHelper
+import com.duckduckgo.duckchat.impl.contextual.RealPageContextJSHelper.Companion.PAGE_CONTEXT_FEATURE_NAME
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
 import com.duckduckgo.duckchat.impl.helper.NativeAction
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper.Companion.DUCK_CHAT_FEATURE_NAME
@@ -294,6 +296,7 @@ import com.duckduckgo.site.permissions.api.SitePermissionsManager.LocationPermis
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissionQueryResponse
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissions
 import com.duckduckgo.subscriptions.api.SUBSCRIPTIONS_FEATURE_NAME
+import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.subscriptions.api.SubscriptionsJSHelper
 import com.duckduckgo.sync.api.favicons.FaviconsFetchingPrompt
@@ -568,7 +571,9 @@ class BrowserTabViewModelTest {
     private val mockDuckChat: DuckChat = mock()
     private val mockSyncStatusChangedObserver: SyncStatusChangedObserver = mock()
     private val syncStatusChangedEventsFlow = MutableSharedFlow<JSONObject>()
+    private val subscriptionStatusFlow = MutableSharedFlow<SubscriptionStatus>()
     private val mockHistory: NavigationHistory = mock()
+    private val mockPageContextJSHelper: PageContextJSHelper = mock()
 
     private val defaultBrowserPromptsExperimentShowPopupMenuItemFlow = MutableStateFlow(false)
     private val mockAdditionalDefaultBrowserPrompts: AdditionalDefaultBrowserPrompts = mock()
@@ -672,6 +677,7 @@ class BrowserTabViewModelTest {
             whenever(mockRemoteMessagingRepository.messageFlow()).thenReturn(remoteMessageFlow.consumeAsFlow())
             whenever(mockSettingsDataStore.automaticFireproofSetting).thenReturn(AutomaticFireproofSetting.ASK_EVERY_TIME)
             whenever(mockSettingsDataStore.omnibarType).thenReturn(OmnibarType.SINGLE_TOP)
+            whenever(mockSettingsDataStore.showTrackersCountInAddressBar).thenReturn(true)
             whenever(mockUrlDisplayRepository.isFullUrlEnabled).then { isFullSiteAddressEnabledFlow }
             whenever(mockBrowserMenuDisplayRepository.browserMenuState).then { browserMenuStateFlow }
             whenever(mockSSLCertificatesFeature.allowBypass()).thenReturn(mockEnabledToggle)
@@ -744,8 +750,9 @@ class BrowserTabViewModelTest {
 
             fakeContentScopeScriptsSubscriptionEventPluginPoint = FakeContentScopeScriptsSubscriptionEventPluginPoint()
 
-            whenever(mockDuckChat.getDuckChatUrl(any(), any())).thenReturn(duckChatURL)
+            whenever(mockDuckChat.getDuckChatUrl(any(), any(), any())).thenReturn(duckChatURL)
             whenever(mockSyncStatusChangedObserver.syncStatusChangedEvents).thenReturn(syncStatusChangedEventsFlow)
+            whenever(subscriptions.getSubscriptionStatusFlow()).thenReturn(subscriptionStatusFlow)
 
             initialiseViewModel()
 
@@ -865,6 +872,7 @@ class BrowserTabViewModelTest {
                 contentScopeScriptsSubscriptionEventPluginPoint = fakeContentScopeScriptsSubscriptionEventPluginPoint,
                 serpSettingsFeature = serpSettingsFeature,
                 syncStatusChangedObserver = mockSyncStatusChangedObserver,
+                pageContextJSHelper = mockPageContextJSHelper,
             )
 
         testee.loadData("abc", null, false, false)
@@ -4267,6 +4275,57 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenLoadUrlAndUrlIsInContentBlockingExceptionsListThenPrivacyOnIsFalse() {
+        runBlocking { whenever(mockAddressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(true) }
+        whenever(mockAddressBarTrackersAnimationManager.shouldShowAnimation(anyOrNull(), anyOrNull())).thenReturn(true)
+        whenever(mockContentBlocking.isAnException("example.com")).thenReturn(true)
+        loadUrl("https://example.com")
+        assertFalse(loadingViewState().trackersAnimationEnabled)
+    }
+
+    @Test
+    fun whenUserPreferenceDisabledThenTrackersAnimationDisabled() {
+        runBlocking { whenever(mockAddressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(true) }
+        whenever(mockAddressBarTrackersAnimationManager.shouldShowAnimation(anyOrNull(), anyOrNull())).thenReturn(true)
+        whenever(mockSettingsDataStore.showTrackersCountInAddressBar).thenReturn(false)
+        loadUrl("https://example.com")
+        assertFalse(loadingViewState().trackersAnimationEnabled)
+    }
+
+    @Test
+    fun whenUserPreferenceEnabledAndPrivacyProtectionActiveThenTrackersAnimationEnabled() {
+        runBlocking { whenever(mockAddressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(true) }
+        whenever(mockAddressBarTrackersAnimationManager.shouldShowAnimation(anyOrNull(), anyOrNull())).thenReturn(true)
+        whenever(mockSettingsDataStore.showTrackersCountInAddressBar).thenReturn(true)
+        whenever(mockContentBlocking.isAnException("example.com")).thenReturn(false)
+        loadUrl("https://example.com")
+        assertTrue(loadingViewState().trackersAnimationEnabled)
+    }
+
+    @Test
+    fun whenUserPreferenceDisabledEvenWithPrivacyProtectionActiveThenTrackersAnimationDisabled() {
+        runBlocking { whenever(mockAddressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(true) }
+        whenever(mockAddressBarTrackersAnimationManager.shouldShowAnimation(anyOrNull(), anyOrNull())).thenReturn(true)
+        whenever(mockSettingsDataStore.showTrackersCountInAddressBar).thenReturn(false)
+        whenever(mockContentBlocking.isAnException("example.com")).thenReturn(false)
+        loadUrl("https://example.com")
+        assertFalse(loadingViewState().trackersAnimationEnabled)
+    }
+
+    @Test
+    fun whenUserPreferenceEnabledButPrivacyProtectionDisabledThenTrackersAnimationDisabled() {
+        runBlocking { whenever(mockAddressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(true) }
+        whenever(mockAddressBarTrackersAnimationManager.shouldShowAnimation(anyOrNull(), anyOrNull())).thenReturn(true)
+        whenever(mockSettingsDataStore.showTrackersCountInAddressBar).thenReturn(true)
+        whenever(mockContentBlocking.isAnException("example.com")).thenReturn(true)
+        loadUrl("https://example.com")
+        assertFalse(loadingViewState().trackersAnimationEnabled)
+    }
+
+    @Test
+    fun whenUserPreferenceDisabledAndPrivacyProtectionDisabledThenTrackersAnimationDisabled() {
+        runBlocking { whenever(mockAddressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(true) }
+        whenever(mockAddressBarTrackersAnimationManager.shouldShowAnimation(anyOrNull(), anyOrNull())).thenReturn(true)
+        whenever(mockSettingsDataStore.showTrackersCountInAddressBar).thenReturn(false)
         whenever(mockContentBlocking.isAnException("example.com")).thenReturn(true)
         loadUrl("https://example.com")
         assertFalse(loadingViewState().trackersAnimationEnabled)
@@ -5234,6 +5293,57 @@ class BrowserTabViewModelTest {
                 assertEquals("permissionsQuery", this.data.method)
                 assertEquals("myId", this.data.id)
             }
+        }
+
+    @Test
+    fun whenProcessJsCallbackMessagePageContextThenSendCommand() =
+        runTest {
+            val serializedContext = """{"title":"Example"}"""
+            val data = JSONObject().apply { put("serializedPageData", serializedContext) }
+            whenever(
+                mockPageContextJSHelper.processPageContext(
+                    eq(PAGE_CONTEXT_FEATURE_NAME),
+                    eq("collectionResult"),
+                    anyOrNull(),
+                    eq("abc"),
+                ),
+            ).thenReturn(serializedContext)
+
+            testee.processJsCallbackMessage(
+                PAGE_CONTEXT_FEATURE_NAME,
+                "collectionResult",
+                "contextId",
+                data,
+                false,
+            ) { "someUrl" }
+
+            assertCommandIssued<Command.PageContextReceived> {
+                assertEquals("abc", tabId)
+                assertEquals(serializedContext, pageContext)
+            }
+        }
+
+    @Test
+    fun whenProcessJsCallbackMessagePageContextWithoutDataThenDoNotSendCommand() =
+        runTest {
+            whenever(
+                mockPageContextJSHelper.processPageContext(
+                    eq(PAGE_CONTEXT_FEATURE_NAME),
+                    eq("collectionResult"),
+                    anyOrNull(),
+                    eq("abc"),
+                ),
+            ).thenReturn(null)
+
+            testee.processJsCallbackMessage(
+                PAGE_CONTEXT_FEATURE_NAME,
+                "collectionResult",
+                "contextId",
+                JSONObject("""{ }"""),
+                false,
+            ) { "someUrl" }
+
+            assertCommandNotIssued<Command.PageContextReceived>()
         }
 
     @Test
@@ -6616,7 +6726,14 @@ class BrowserTabViewModelTest {
             whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
             val jsCallbackData = JsCallbackData(JSONObject(), "", "", "")
             whenever(
-                mockDuckChatJSHelper.processJsCallbackMessage(anyString(), anyString(), anyOrNull(), anyOrNull(), any()),
+                mockDuckChatJSHelper.processJsCallbackMessage(
+                    anyString(),
+                    anyString(),
+                    anyOrNull(),
+                    anyOrNull(),
+                    any(),
+                    anyOrNull(),
+                ),
             ).thenReturn(jsCallbackData)
             testee.processJsCallbackMessage(
                 DUCK_CHAT_FEATURE_NAME,
@@ -6625,7 +6742,14 @@ class BrowserTabViewModelTest {
                 data = null,
                 false,
             ) { "someUrl" }
-            verify(mockDuckChatJSHelper).processJsCallbackMessage(DUCK_CHAT_FEATURE_NAME, "method", "id", null)
+            verify(mockDuckChatJSHelper).processJsCallbackMessage(
+                eq(DUCK_CHAT_FEATURE_NAME),
+                eq("method"),
+                eq("id"),
+                anyOrNull(),
+                any(),
+                anyOrNull(),
+            )
             assertCommandIssued<Command.SendResponseToJs>()
         }
 
@@ -6633,7 +6757,16 @@ class BrowserTabViewModelTest {
     fun whenProcessJsCallbackMessageForDuckChatAndResponseIsNullThenDoNotSendCommand() =
         runTest {
             whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
-            whenever(mockDuckChatJSHelper.processJsCallbackMessage(anyString(), anyString(), anyOrNull(), anyOrNull(), any())).thenReturn(null)
+            whenever(
+                mockDuckChatJSHelper.processJsCallbackMessage(
+                    anyString(),
+                    anyString(),
+                    anyOrNull(),
+                    anyOrNull(),
+                    any(),
+                    anyOrNull(),
+                ),
+            ).thenReturn(null)
             testee.processJsCallbackMessage(
                 DUCK_CHAT_FEATURE_NAME,
                 "method",
@@ -6641,7 +6774,14 @@ class BrowserTabViewModelTest {
                 data = null,
                 false,
             ) { "someUrl" }
-            verify(mockDuckChatJSHelper).processJsCallbackMessage(DUCK_CHAT_FEATURE_NAME, "method", "id", null)
+            verify(mockDuckChatJSHelper).processJsCallbackMessage(
+                eq(DUCK_CHAT_FEATURE_NAME),
+                eq("method"),
+                eq("id"),
+                anyOrNull(),
+                any(),
+                anyOrNull(),
+            )
             assertCommandNotIssued<Command.SendResponseToJs>()
         }
 
@@ -6719,7 +6859,7 @@ class BrowserTabViewModelTest {
     fun whenOnDuckChatOmnibarButtonClickedAndFullScreenModeThenOpenChatNotCalled() = runTest {
         val duckAIUrl = "https://duckduckgo.com/?q=test"
         mockDuckAiFeatureStateFullScreenModeFlow.emit(true)
-        whenever(mockDuckChat.getDuckChatUrl(any(), any())).thenReturn(duckAIUrl)
+        whenever(mockDuckChat.getDuckChatUrl(any(), any(), any())).thenReturn(duckAIUrl)
         whenever(mockOmnibarConverter.convertQueryToUrl(duckAIUrl, null)).thenReturn(duckAIUrl)
 
         testee.onDuckChatOmnibarButtonClicked(query = "example", hasFocus = false, isNtp = true)
@@ -7146,7 +7286,16 @@ class BrowserTabViewModelTest {
     @Test
     fun whenProcessJsCallbackMessageForSubscriptionsAndResponseIsNullThenDoNotSendCommand() =
         runTest {
-            whenever(mockDuckChatJSHelper.processJsCallbackMessage(anyString(), anyString(), anyOrNull(), anyOrNull(), any())).thenReturn(null)
+            whenever(
+                mockDuckChatJSHelper.processJsCallbackMessage(
+                    anyString(),
+                    anyString(),
+                    anyOrNull(),
+                    anyOrNull(),
+                    any(),
+                    any(),
+                ),
+            ).thenReturn(null)
             testee.processJsCallbackMessage(
                 featureName = SUBSCRIPTIONS_FEATURE_NAME,
                 method = "method",
@@ -8462,13 +8611,25 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenOnDuckChatOmnibarButtonClickedAndContextualModeEnabledAndNotNTPThenCommandSent() = runTest {
+    fun whenOnDuckChatOmnibarButtonClickedAndContextualModeEnabledAndNotNTPAndOnboardingCompletedThenShowContextualModeCommandSent() = runTest {
         mockDuckAiContextualModeFlow.emit(true)
+        whenever(mockDuckChat.isContextualOnboardingCompleted()).thenReturn(true)
 
         testee.onDuckChatOmnibarButtonClicked(query = "example", hasFocus = false, isNtp = false)
 
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertTrue(commandCaptor.lastValue is Command.ShowDuckAIContextualMode)
+    }
+
+    @Test
+    fun whenOnDuckChatOmnibarButtonClickedAndContextualModeEnabledAndNotNTPAndOnboardingNotCompletedThenShowOnboardingCommandSent() = runTest {
+        mockDuckAiContextualModeFlow.emit(true)
+        whenever(mockDuckChat.isContextualOnboardingCompleted()).thenReturn(false)
+
+        testee.onDuckChatOmnibarButtonClicked(query = "example", hasFocus = false, isNtp = false)
+
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        assertTrue(commandCaptor.lastValue is Command.ShowDuckAIContextualOnboarding)
     }
 
     @Test
@@ -8478,7 +8639,7 @@ class BrowserTabViewModelTest {
         mockDuckAiContextualModeFlow.emit(true)
         mockDuckAiFeatureStateFullScreenModeFlow.emit(true)
 
-        whenever(mockDuckChat.getDuckChatUrl(any(), any())).thenReturn(duckAIUrl)
+        whenever(mockDuckChat.getDuckChatUrl(any(), any(), any())).thenReturn(duckAIUrl)
         whenever(mockOmnibarConverter.convertQueryToUrl(duckAIUrl, null)).thenReturn(duckAIUrl)
 
         testee.onDuckChatOmnibarButtonClicked(query = "example", hasFocus = false, isNtp = true)
@@ -8488,5 +8649,54 @@ class BrowserTabViewModelTest {
         assertEquals(duckAIUrl, command.url)
 
         verify(mockDuckChat, never()).openDuckChat()
+    }
+
+    @Test
+    fun whenSubscriptionChangesWhileOnDuckAiThenAuthUpdateEventSent() = runTest {
+        val duckAiUrl = "https://duck.ai/chat"
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
+        loadUrl(duckAiUrl, title = "Duck.ai")
+
+        testee.subscriptionEventDataFlow.test {
+            subscriptionStatusFlow.emit(SubscriptionStatus.AUTO_RENEWABLE)
+
+            val event = awaitItem()
+            assertEquals(SUBSCRIPTIONS_FEATURE_NAME, event.featureName)
+            assertEquals("authUpdate", event.subscriptionName)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSubscriptionChangesWhileNotOnDuckAiThenNoAuthUpdateEventSent() = runTest {
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(false)
+        loadUrl(exampleUrl, title = "Example")
+
+        testee.subscriptionEventDataFlow.test {
+            subscriptionStatusFlow.emit(SubscriptionStatus.AUTO_RENEWABLE)
+
+            expectNoEvents()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenOnViewVisibleWithPendingAuthUpdateOnDuckAiThenAuthUpdateEventSent() = runTest {
+        val duckAiUrl = "https://duck.ai/chat"
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
+        loadUrl(duckAiUrl, title = "Duck.ai")
+
+        // Trigger subscription change to set pending flag
+        subscriptionStatusFlow.emit(SubscriptionStatus.AUTO_RENEWABLE)
+
+        testee.subscriptionEventDataFlow.test {
+            // Simulate returning to the view (e.g., after purchase flow)
+            testee.onViewVisible()
+
+            val event = awaitItem()
+            assertEquals(SUBSCRIPTIONS_FEATURE_NAME, event.featureName)
+            assertEquals("authUpdate", event.subscriptionName)
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 }

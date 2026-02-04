@@ -24,8 +24,9 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="@dimen/menuActionHeight"
-        android:gravity="center_vertical"
-        android:orientation="vertical">
+        android:gravity="top"
+        android:orientation="vertical"
+        android:paddingTop="@dimen/keyline_4">
 
         <ImageView
             android:id="@+id/icon"
@@ -38,13 +39,14 @@
 
         <com.duckduckgo.common.ui.view.text.DaxTextView
             android:id="@+id/label"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
             android:layout_marginTop="@dimen/keyline_2"
+            android:gravity="center"
             android:textColor="?attr/daxColorSecondaryText"
+            android:maxLines="2"
+            android:ellipsize="end"
             app:typography="caption"
             tools:text="Forward" />
-
     </LinearLayout>
 </merge>

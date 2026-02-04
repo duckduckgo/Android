@@ -208,7 +208,6 @@ class SubscriptionMessagingInterface @Inject constructor(
         override fun process(jsMessage: JsMessage, jsMessaging: JsMessaging, jsMessageCallback: JsMessageCallback?) {
             try {
                 val token = jsMessage.params.getString("token")
-                pixelSender.reportAuthV1SignInAttempt()
                 appCoroutineScope.launch(dispatcherProvider.io()) {
                     subscriptionsManager.signInV1(token)
                     subscriptionsChecker.runChecker()

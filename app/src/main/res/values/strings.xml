@@ -923,11 +923,16 @@
     <string name="settingsHeadingCompleteSetup">Complete Your Setup</string>
 
     <!--TabSwitcher Trackers Animation-->
-    <string name="showTrackerCountInTabSwitcher">Show Tracker Count in Tab Switcher</string>
+    <string name="trackerBlockedInTheLast7days" instruction="Placeholder is 1 tracker blocked" >&lt;b&gt;%1$s tracker blocked &lt;/b&gt; in the last 7 days</string>
     <string name="tabSwitcherAnimationTileRemovalDialogTitle" instruction="A title for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Hide tracker count?</string>
     <string name="tabSwitcherAnimationTileRemovalDialogBody" instruction="A message for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">You can turn this back on in Settings > Appearance.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Hide</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Keep</string>
+
+    <!-- Trackers blocked animation-->
+    <string name="settingsTrackersBlockedAnimationHeaderTitle">Trackers Blocked Animation</string>
+    <string name="showTrackerCountInAddressBar">Show in Address Bar</string>
+    <string name="showWeeklyTrackerCountInTabSwitcher">Show in Tabs Manager</string>
 
     <!-- Widgets -->
     <string name="searchOnlyWidgetLabel" instruction="Label for the search-only widget">Search Only</string>

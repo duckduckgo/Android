@@ -24,22 +24,18 @@ import com.duckduckgo.common.utils.plugins.ActivePluginPoint
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.newtabpage.api.NewTabPagePlugin
+import com.duckduckgo.newtabpage.api.NewTabPageProvider
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
-
-interface NewTabPageProvider {
-
-    fun provideNewTabPageVersion(): Flow<NewTabPagePlugin>
-}
 
 @ContributesBinding(scope = ActivityScope::class)
 class RealNewTabPageProvider @Inject constructor(
     private val newTabPageVersions: ActivePluginPoint<NewTabPagePlugin>,
 ) : NewTabPageProvider {
     override fun provideNewTabPageVersion(): Flow<NewTabPagePlugin> = flow {
-        val newTabPage = newTabPageVersions.getPlugins().firstOrNull() ?: NewTabLegacyPage()
+        val newTabPage = newTabPageVersions.getPlugins().firstOrNull() ?: NewTabPage()
         emit(newTabPage)
     }
 }
@@ -49,14 +45,14 @@ class RealNewTabPageProvider @Inject constructor(
     boundType = NewTabPagePlugin::class,
     priority = NewTabPagePlugin.PRIORITY_NTP,
 )
-class NewTabLegacyPage @Inject constructor() : NewTabPagePlugin {
+class NewTabPage @Inject constructor() : NewTabPagePlugin {
 
     override fun getView(
         context: Context,
         showLogo: Boolean,
         onHasContent: ((Boolean) -> Unit)?,
     ): View {
-        return NewTabLegacyPageView(context, showLogo = showLogo, onHasContent = onHasContent)
+        return NewTabPageView(context, showLogo = showLogo, onHasContent = onHasContent)
     }
 }
 

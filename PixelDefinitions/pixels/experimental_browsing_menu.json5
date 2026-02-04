@@ -1,0 +1,76 @@
+// Experimental Browsing Menu Feature Pixels
+// https://app.asana.com/1/137249556945/task/1212688964804884?focus=true
+{
+    "m_experimental-browsing-menu_used": {
+        "description": "Fires when the user uses the experimental browsing menu",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"],
+        "expires": "2026-03-31"
+    },
+    "m_experimental-browsing-menu_displayed": {
+        "description": "Fires when the experimental browsing menu is displayed to the user",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"],
+        "expires": "2026-03-31"
+    },
+    "m_experimental-browsing-menu_displayed_ntp": {
+        "description": "Fires when the experimental browsing menu is displayed to the user on the new tab page",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"],
+        "expires": "2026-03-31"
+    },
+    "m_experimental-browsing-menu_disabled": {
+        "description": "Fires when the experimental browsing menu feature is disabled",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"],
+        "expires": "2026-03-31"
+    },
+    "m_experimental-browsing-menu_enabled": {
+        "description": "Fires when the experimental browsing menu feature is enabled",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"],
+        "expires": "2026-03-31"
+    },
+    "m_experimental-browsing-menu_displayed_aichat": {
+        "description": "Fires when the experimental browsing menu is displayed to the user on the AI Chat page",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"],
+        "expires": "2026-03-31"
+    },
+    "m_experimental-browsing-menu_displayed_customtabs": {
+        "description": "Fires when the experimental browsing menu is displayed to the user on the custom tab page",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"],
+        "expires": "2026-03-31"
+    },
+    "m_experimental-browsing-menu_displayed_error": {
+        "description": "Fires when the experimental browsing menu is displayed to the user on an error page",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"],
+        "expires": "2026-03-31"
+    },
+    "m_experimental-browsing-menu_dismissed": {
+        "description": "Fires when the experimental browsing menu is dismissed by the user",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"],
+        "expires": "2026-03-31"
+    }
+}
