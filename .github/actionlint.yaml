@@ -1,4 +1,0 @@
-self-hosted-runner:
-    labels:
-        # Stops incorrect warning of android-large-runner being used
-        - android-large-runner
