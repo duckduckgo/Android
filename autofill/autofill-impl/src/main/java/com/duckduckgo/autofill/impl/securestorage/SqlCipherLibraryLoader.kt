@@ -24,6 +24,8 @@ import com.duckduckgo.library.loader.LibraryLoader
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.TimeoutCancellationException
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
@@ -79,6 +81,7 @@ class SqlCipherLibraryLoader @Inject constructor(
             Result.failure(e)
         } catch (e: Throwable) {
             logcat(ERROR) { "SqlCipher-Init: Failed while waiting for library load: ${e.javaClass.simpleName} - ${e.message}" }
+            currentCoroutineContext().ensureActive()
             Result.failure(e)
         }
     }
