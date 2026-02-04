@@ -802,7 +802,7 @@ class BrowserTabViewModel @Inject constructor(
                     if (isEnabled && favouriteUrl != null) {
                         // Favourite is set - show it
                         omnibarViewState.value =
-                            currentOmnibarViewState().copy(serpLogo = SerpLogo.EasterEgg(logoUrl = favouriteUrl))
+                            currentOmnibarViewState().copy(serpLogo = SerpLogo.EasterEgg(logoUrl = favouriteUrl, isFavourite = true))
                     } else if (isEnabled && favouriteUrl == null || !isEnabled) {
                         // Favourite was cleared - show Dax (Normal logo)
                         omnibarViewState.value = currentOmnibarViewState().copy(serpLogo = SerpLogo.Normal)
@@ -1210,7 +1210,7 @@ class BrowserTabViewModel @Inject constructor(
 
         when (cta) {
             is DaxBubbleCta.DaxIntroSearchOptionsCta,
-            -> {
+                -> {
                 if (!ctaViewModel.isSuggestedSearchOption(query)) {
                     pixel.fire(ONBOARDING_SEARCH_CUSTOM, type = Unique())
                 }
@@ -1218,7 +1218,7 @@ class BrowserTabViewModel @Inject constructor(
 
             is DaxBubbleCta.DaxIntroVisitSiteOptionsCta,
             is OnboardingDaxDialogCta.DaxSiteSuggestionsCta,
-            -> {
+                -> {
                 if (!ctaViewModel.isSuggestedSiteOption(query)) {
                     pixel.fire(ONBOARDING_VISIT_SITE_CUSTOM, type = Unique())
                 }
@@ -2118,7 +2118,12 @@ class BrowserTabViewModel @Inject constructor(
 
             // Don't extract logo if favourite feature is enabled AND a favourite is set
             if (isSetFavouriteEnabled && favouriteLogoUrl != null) {
-                omnibarViewState.value = currentOmnibarViewState().copy(serpLogo = SerpLogo.EasterEgg(favouriteLogoUrl))
+                omnibarViewState.value = currentOmnibarViewState().copy(
+                    serpLogo = SerpLogo.EasterEgg(
+                        logoUrl = favouriteLogoUrl,
+                        isFavourite = true,
+                    ),
+                )
             } else {
                 command.value = ExtractSerpLogo(url)
             }
@@ -4392,7 +4397,7 @@ class BrowserTabViewModel @Inject constructor(
             is OnboardingDaxDialogCta.DaxTrackersBlockedCta,
             is OnboardingDaxDialogCta.DaxNoTrackersCta,
             is OnboardingDaxDialogCta.DaxMainNetworkCta,
-            -> {
+                -> {
                 viewModelScope.launch {
                     val cta =
                         withContext(dispatchers.io()) {
