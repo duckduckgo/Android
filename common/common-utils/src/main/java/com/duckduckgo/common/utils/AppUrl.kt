@@ -28,6 +28,7 @@ class AppUrl {
         const val PIXEL = "https://improving.duckduckgo.com"
         const val EMAIL_SEGMENT = "email"
         const val DUCK_AI = "https://duck.ai"
+        const val DUCK_AI_HOST = "duck.ai"
     }
 
     object ParamKey {
