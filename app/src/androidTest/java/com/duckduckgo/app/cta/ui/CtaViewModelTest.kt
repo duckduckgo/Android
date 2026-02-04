@@ -54,6 +54,7 @@ import com.duckduckgo.brokensite.api.BrokenSitePrompt
 import com.duckduckgo.brokensite.api.RefreshPattern
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.InstantSchedulersRule
+import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.DISABLED
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.ENABLED
@@ -120,6 +121,8 @@ class CtaViewModelTest {
 
     private val mockBrokenSitePrompt: BrokenSitePrompt = mock()
 
+    private val mockDuckChat: DuckChat = mock()
+
     private val fakeOnboardingHomeScreenWidgetToggles = FakeFeatureToggleFactory.create(OnboardingHomeScreenWidgetToggles::class.java)
 
     private val requiredDaxOnboardingCtas: List<CtaId> = listOf(
@@ -170,6 +173,7 @@ class CtaViewModelTest {
             userStageStore = mockUserStageStore,
             tabRepository = mockTabRepository,
             dispatchers = coroutineRule.testDispatcherProvider,
+            duckChat = mockDuckChat,
             duckDuckGoUrlDetector = DuckDuckGoUrlDetectorImpl(),
             extendedOnboardingFeatureToggles = mockExtendedOnboardingFeatureToggles,
             subscriptions = mockSubscriptions,
@@ -936,6 +940,7 @@ class CtaViewModelTest {
     @Test
     fun givenDuckAISiteWhenRefreshCtaWhileBrowsingThenReturnNull() = runTest {
         givenDaxOnboardingActive()
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
         val site = site(url = "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5")
 
         val value = testee.refreshCta(
