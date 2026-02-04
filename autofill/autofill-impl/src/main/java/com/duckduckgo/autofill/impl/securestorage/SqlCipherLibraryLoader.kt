@@ -64,17 +64,12 @@ class SqlCipherLibraryLoader @Inject constructor(
 
         initialize()
 
-        val deferred = libraryLoaded ?: run {
-            logcat(ERROR) { "SqlCipher-Init: libraryLoaded is null after initialization - this should never happen" }
-            return Result.failure(IllegalStateException("Library initialization failed - deferred is null"))
-        }
-
         val waitStartTimeMillis = System.currentTimeMillis()
         logcat { "SqlCipher-Init: Waiting for library load to complete (timeout=${timeoutMillis}ms)" }
 
         return try {
             withTimeout(timeoutMillis) {
-                deferred.await()
+                libraryLoaded!!.await()
             }
             val waitDurationMillis = System.currentTimeMillis() - waitStartTimeMillis
             logcat { "SqlCipher-Init: Library load wait completed successfully (${waitDurationMillis}ms)" }
