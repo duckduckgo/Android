@@ -23,6 +23,7 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
 import com.duckduckgo.duckchat.impl.helper.NativeAction
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper
@@ -46,6 +47,7 @@ import javax.inject.Inject
 class DuckChatContextualViewModel @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val duckChat: DuckChat,
+    private val duckChatInternal: DuckChatInternal,
     private val duckChatJSHelper: DuckChatJSHelper,
     private val contextualDataStore: DuckChatContextualDataStore,
     private val sessionTimeoutProvider: DuckChatContextualSessionTimeoutProvider,
@@ -79,6 +81,8 @@ class DuckChatContextualViewModel @Inject constructor(
                 sheetMode = SheetMode.INPUT,
                 showContext = false,
                 showFullscreen = true,
+                allowsAutomaticContextAttachment = duckChatInternal.isAutomaticContextAttachmentEnabled(),
+                userRemovedContext = false,
                 contextUrl = "",
                 contextTitle = "",
                 tabId = "",
@@ -90,7 +94,9 @@ class DuckChatContextualViewModel @Inject constructor(
     data class ViewState(
         val sheetMode: SheetMode = SheetMode.INPUT,
         val showFullscreen: Boolean = true,
+        val allowsAutomaticContextAttachment: Boolean = false,
         val showContext: Boolean = false,
+        val userRemovedContext: Boolean = false,
         val contextUrl: String = "",
         val contextTitle: String = "",
         val tabId: String = "",
@@ -144,6 +150,11 @@ class DuckChatContextualViewModel @Inject constructor(
                     )
                 }
             }
+            _viewState.update {
+                it.copy(
+                    allowsAutomaticContextAttachment = duckChatInternal.isAutomaticContextAttachmentEnabled(),
+                )
+            }
         }
     }
 
@@ -155,8 +166,7 @@ class DuckChatContextualViewModel @Inject constructor(
             if (existingChatUrl.isNullOrBlank()) {
                 logcat { "Duck.ai: tab=$tabId doesn't have an existing url, use the default one" }
                 withContext(dispatchers.main()) {
-                    fullModeUrl = ""
-                    commandChannel.trySend(Command.ChangeSheetState(BottomSheetBehavior.STATE_EXPANDED))
+                    commandChannel.trySend(Command.ChangeSheetState(BottomSheetBehavior.STATE_HALF_EXPANDED))
                     val chatUrl = duckChat.getDuckChatUrl("", false, sidebar = true)
                     commandChannel.trySend(Command.LoadUrl(chatUrl))
                     _viewState.update {
@@ -164,6 +174,7 @@ class DuckChatContextualViewModel @Inject constructor(
                             sheetMode = SheetMode.INPUT,
                             showFullscreen = true,
                             tabId = tabId,
+                            allowsAutomaticContextAttachment = duckChatInternal.isAutomaticContextAttachmentEnabled(),
                         )
                     }
                 }
@@ -181,6 +192,7 @@ class DuckChatContextualViewModel @Inject constructor(
                             sheetMode = SheetMode.WEBVIEW,
                             showFullscreen = hasChatHistory,
                             tabId = tabId,
+                            allowsAutomaticContextAttachment = duckChatInternal.isAutomaticContextAttachmentEnabled(),
                         )
                     }
                     commandChannel.trySend(Command.ChangeSheetState(BottomSheetBehavior.STATE_EXPANDED))
@@ -206,6 +218,7 @@ class DuckChatContextualViewModel @Inject constructor(
                 _viewState.value =
                     _viewState.value.copy(
                         sheetMode = SheetMode.WEBVIEW,
+                        prompt = "",
                     )
                 _subscriptionEventDataChannel.trySend(contextPrompt)
                 commandChannel.trySend(Command.ChangeSheetState(BottomSheetBehavior.STATE_EXPANDED))
@@ -215,21 +228,26 @@ class DuckChatContextualViewModel @Inject constructor(
 
     fun onChatPageLoaded(url: String?) {
         logcat { "Duck.ai: onChatPageLoaded $url" }
-        val hasChatId = hasChatId(url)
+        if (url == null) {
+            return
+        } else {
+            fullModeUrl = url
+            val sheetMode = _viewState.value.sheetMode
+            if (sheetMode == SheetMode.WEBVIEW) {
+                val hasChatId = hasChatId(url)
 
-        val currentState = _viewState.value
-        if (currentState.sheetMode == SheetMode.WEBVIEW) {
-            viewModelScope.launch {
-                _viewState.update { current ->
-                    current.copy(showFullscreen = hasChatId)
+                viewModelScope.launch {
+                    _viewState.update { current ->
+                        current.copy(showFullscreen = hasChatId)
+                    }
                 }
-            }
-            if (url != null && hasChatId) {
-                fullModeUrl = url
-                val tabId = _viewState.value.tabId
-                if (tabId.isNotBlank()) {
-                    viewModelScope.launch(dispatchers.io()) {
-                        contextualDataStore.persistTabChatUrl(tabId, url)
+
+                if (hasChatId) {
+                    val tabId = _viewState.value.tabId
+                    if (tabId.isNotBlank()) {
+                        viewModelScope.launch(dispatchers.io()) {
+                            contextualDataStore.persistTabChatUrl(tabId, url)
+                        }
                     }
                 }
             }
@@ -289,27 +307,37 @@ class DuckChatContextualViewModel @Inject constructor(
     }
 
     fun removePageContext() {
+        logcat { "Duck.ai Contextual: removePageContext" }
         viewModelScope.launch {
             _viewState.update { current ->
-                current.copy(showContext = false)
+                current.copy(
+                    showContext = false,
+                    userRemovedContext = true,
+                )
             }
         }
     }
 
     fun addPageContext() {
+        logcat { "Duck.ai Contextual: addPageContext" }
         viewModelScope.launch {
             _viewState.update { current ->
                 current.copy(
-                    showContext = true,
+                    showContext = updatedPageContext.isNotEmpty(),
+                    userRemovedContext = false,
                 )
             }
         }
     }
 
     fun replacePrompt(prompt: String) {
+        logcat { "Duck.ai Contextual: add predefined Summarize prompt" }
         viewModelScope.launch {
             _viewState.update { current ->
-                current.copy(prompt = prompt)
+                current.copy(
+                    prompt = prompt,
+                    showContext = true,
+                )
             }
         }
     }
@@ -326,6 +354,22 @@ class DuckChatContextualViewModel @Inject constructor(
         }
         viewModelScope.launch {
             commandChannel.trySend(Command.OpenFullscreenMode(chatUrl))
+        }
+    }
+
+    fun onKeyboardVisibilityChanged(isVisible: Boolean) {
+        val currentState = _viewState.value
+        if (currentState.sheetMode != SheetMode.INPUT) return
+
+        val newState =
+            if (isVisible) {
+                BottomSheetBehavior.STATE_EXPANDED
+            } else {
+                BottomSheetBehavior.STATE_HALF_EXPANDED
+            }
+
+        viewModelScope.launch {
+            commandChannel.trySend(Command.ChangeSheetState(newState))
         }
     }
 
@@ -348,6 +392,17 @@ class DuckChatContextualViewModel @Inject constructor(
                         contextTitle = title,
                         contextUrl = url,
                         tabId = tabId,
+                        allowsAutomaticContextAttachment = duckChatInternal.isAutomaticContextAttachmentEnabled(),
+                        showContext = duckChatInternal.isAutomaticContextAttachmentEnabled() && !_viewState.value.userRemovedContext,
+                    )
+                }
+            } else {
+                _viewState.update {
+                    inputMode.copy(
+                        contextTitle = title,
+                        contextUrl = url,
+                        tabId = tabId,
+                        allowsAutomaticContextAttachment = duckChatInternal.isAutomaticContextAttachmentEnabled(),
                     )
                 }
             }
@@ -379,6 +434,7 @@ class DuckChatContextualViewModel @Inject constructor(
                         it.copy(
                             sheetMode = SheetMode.INPUT,
                             showFullscreen = true,
+                            prompt = "",
                         )
                     }
                     commandChannel.trySend(Command.ChangeSheetState(BottomSheetBehavior.STATE_HALF_EXPANDED))

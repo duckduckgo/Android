@@ -20,6 +20,7 @@ import android.content.Context
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
 import com.duckduckgo.duckchat.impl.helper.NativeAction
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper
@@ -52,6 +53,7 @@ class DuckChatContextualViewModelTest {
 
     private lateinit var testee: DuckChatContextualViewModel
     private val duckChat: com.duckduckgo.duckchat.api.DuckChat = FakeDuckChat()
+    private val duckChatInternal: DuckChatInternal = mock()
     private val duckChatJSHelper: DuckChatJSHelper = mock()
     private val contextualDataStore = FakeDuckChatContextualDataStore()
     private val timeProvider = FakeDuckChatContextualTimeProvider()
@@ -59,6 +61,7 @@ class DuckChatContextualViewModelTest {
 
     @Before
     fun setup() {
+        whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(true)
         whenever(
             duckChatJSHelper.onNativeAction(NativeAction.NEW_CHAT),
         ).thenReturn(
@@ -72,6 +75,7 @@ class DuckChatContextualViewModelTest {
         testee = DuckChatContextualViewModel(
             dispatchers = coroutineRule.testDispatcherProvider,
             duckChat = duckChat,
+            duckChatInternal = duckChatInternal,
             duckChatJSHelper = duckChatJSHelper,
             contextualDataStore = contextualDataStore,
             sessionTimeoutProvider = sessionTimeoutProvider,
@@ -169,7 +173,6 @@ class DuckChatContextualViewModelTest {
                 """.trimIndent()
 
             // Load and cache context, then remove it to set hasContext=false while data remains cached.
-            enableAutomaticContextAttachment()
             testee.onSheetOpened(tabId)
             testee.onPageContextReceived(tabId, serializedPageData)
             testee.removePageContext()
@@ -186,6 +189,10 @@ class DuckChatContextualViewModelTest {
 
                 cancelAndIgnoreRemainingEvents()
             }
+
+            val state = testee.viewState.value
+            assertFalse(state.showContext)
+            assertTrue(state.userRemovedContext)
         }
 
     @Test
@@ -217,14 +224,13 @@ class DuckChatContextualViewModelTest {
                 }
                 """.trimIndent()
 
-            enableAutomaticContextAttachment()
             testee.viewState.test {
-                awaitItem()
                 testee.addPageContext()
                 testee.onPageContextReceived(tabId, serializedPageData)
 
                 val state = expectMostRecentItem()
                 assertTrue(state.showContext)
+                assertFalse(state.userRemovedContext)
                 assertEquals("Ctx Title", state.contextTitle)
                 assertEquals("https://ctx.com", state.contextUrl)
                 assertEquals("tab-1", state.tabId)
@@ -243,6 +249,7 @@ class DuckChatContextualViewModelTest {
             }
 
             assertEquals(DuckChatContextualViewModel.SheetMode.WEBVIEW, testee.viewState.value.sheetMode)
+            assertEquals("", testee.viewState.value.prompt)
         }
 
     @Test
@@ -258,12 +265,45 @@ class DuckChatContextualViewModelTest {
         }
 
     @Test
+    fun `when keyboard becomes visible in input mode then sheet expanded`() =
+        runTest {
+            testee.commands.test {
+                testee.onKeyboardVisibilityChanged(true)
+
+                val command = awaitItem() as DuckChatContextualViewModel.Command.ChangeSheetState
+                assertEquals(BottomSheetBehavior.STATE_EXPANDED, command.newState)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `when keyboard hidden in input mode then sheet half expanded`() =
+        runTest {
+            testee.commands.test {
+                testee.onKeyboardVisibilityChanged(false)
+
+                val command = awaitItem() as DuckChatContextualViewModel.Command.ChangeSheetState
+                assertEquals(BottomSheetBehavior.STATE_HALF_EXPANDED, command.newState)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
     fun `when add and remove page context then hasContext toggles`() =
         runTest {
-            testee.viewState.test {
-                // initial emission
-                awaitItem()
+            val tabId = "tab-1"
+            val serializedPageData =
+                """
+            {
+                "title": "Ctx Title",
+                "url": "https://ctx.com",
+                "content": "content"
+            }
+                """.trimIndent()
 
+            testee.onPageContextReceived(tabId, serializedPageData)
+
+            testee.viewState.test {
                 testee.addPageContext()
                 val withContext = expectMostRecentItem() as DuckChatContextualViewModel.ViewState
                 assertTrue(withContext.showContext)
@@ -286,10 +326,32 @@ class DuckChatContextualViewModelTest {
                 testee.replacePrompt("new prompt")
                 val state = expectMostRecentItem() as DuckChatContextualViewModel.ViewState
                 assertEquals("new prompt", state.prompt)
+                assertTrue(state.showContext)
+                assertFalse(state.userRemovedContext)
 
                 cancelAndIgnoreRemainingEvents()
             }
         }
+
+    @Test
+    fun `when user removed context then page context remains hidden`() = runTest {
+        val tabId = "tab-1"
+        val serializedPageData =
+            """
+            {
+                "title": "Ctx Title",
+                "url": "https://ctx.com",
+                "content": "content"
+            }
+            """.trimIndent()
+
+        testee.removePageContext()
+        testee.onPageContextReceived(tabId, serializedPageData)
+
+        val state = testee.viewState.value
+        assertTrue(state.userRemovedContext)
+        assertFalse(state.showContext)
+    }
 
     @Test
     fun `when full mode requested with url then open fullscreen command emitted`() =
@@ -390,9 +452,23 @@ class DuckChatContextualViewModelTest {
     }
 
     @Test
+    fun `onChatPageLoaded in Input Mode doesn't store url`() = runTest {
+        val tabId = "tab-1"
+        val url = "https://duck.ai/chat?chatID=123"
+        testee.onSheetOpened(tabId)
+
+        testee.onChatPageLoaded(url)
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        assertEquals(null, contextualDataStore.getTabChatUrl(tabId))
+    }
+
+    @Test
     fun `onChatPageLoaded stores url by tab id`() = runTest {
         val tabId = "tab-1"
         val url = "https://duck.ai/chat?chatID=123"
+        contextualDataStore.persistTabChatUrl(tabId, url)
+
         testee.onSheetOpened(tabId)
         testee.onPromptSent("prompt")
 
@@ -420,11 +496,13 @@ class DuckChatContextualViewModelTest {
         val url = "https://duck.ai/chat?chatID=123"
         testee.onSheetOpened(tabId)
         contextualDataStore.persistTabChatUrl(tabId, url)
+        testee.replacePrompt("new prompt")
 
         testee.onNewChatRequested()
         coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
 
         assertNull(contextualDataStore.getTabChatUrl(tabId))
+        assertEquals("", testee.viewState.value.prompt)
     }
 
     @Test
@@ -574,11 +652,6 @@ class DuckChatContextualViewModelTest {
         }
     }
 
-    private fun enableAutomaticContextAttachment() {
-        (duckChat as FakeDuckChat).setAutomaticContextAttachment(true)
-        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
-    }
-
     private class FakeDuckChat : com.duckduckgo.duckchat.api.DuckChat {
         var nextUrl: String = ""
         private val automaticContextAttachment = MutableStateFlow(true)
@@ -598,9 +671,6 @@ class DuckChatContextualViewModelTest {
         override fun observeAutomaticContextAttachmentUserSettingEnabled(): Flow<Boolean> = automaticContextAttachment
         override fun showContextualOnboarding(context: Context, onConfirmed: () -> Unit) = Unit
         override suspend fun isContextualOnboardingCompleted(): Boolean = true
-        fun setAutomaticContextAttachment(enabled: Boolean) {
-            automaticContextAttachment.value = enabled
-        }
     }
 
     private class FakeDuckChatContextualDataStore : DuckChatContextualDataStore {

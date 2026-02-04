@@ -7271,7 +7271,15 @@ class BrowserTabViewModelTest {
     fun whenProcessJsCallbackMessageForSubscriptionsThenSendCommand() =
         runTest {
             val jsCallbackData = JsCallbackData(JSONObject(), "", "", "")
-            whenever(mockSubscriptionsJSHelper.processJsCallbackMessage(anyString(), anyString(), anyOrNull(), anyOrNull(), anyOrNull()))
+            whenever(
+                mockSubscriptionsJSHelper.processJsCallbackMessage(
+                    anyString(),
+                    anyString(),
+                    anyOrNull(),
+                    anyOrNull(),
+                    anyOrNull(),
+                ),
+            )
                 .thenReturn(jsCallbackData)
             testee.processJsCallbackMessage(
                 featureName = SUBSCRIPTIONS_FEATURE_NAME,
