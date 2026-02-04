@@ -22,6 +22,7 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.library.loader.LibraryLoader
@@ -42,6 +43,7 @@ import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
 import org.robolectric.annotation.Implementation
 import org.robolectric.annotation.Implements
+import java.time.LocalDateTime
 
 @SuppressLint("DenyListedApi")
 @RunWith(AndroidJUnit4::class)
@@ -52,6 +54,7 @@ class SqlCipherLibraryLoaderTest {
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
     private val mockFeature = FakeFeatureToggleFactory.create(AutofillFeature::class.java)
+    private val fakeTimeProvider = FakeCurrentTimeProvider()
     private lateinit var context: Context
     private lateinit var loader: SqlCipherLibraryLoader
 
@@ -59,7 +62,7 @@ class SqlCipherLibraryLoaderTest {
     fun setup() {
         ShadowLibraryLoader.reset()
         context = ApplicationProvider.getApplicationContext()
-        loader = SqlCipherLibraryLoader(context, coroutineTestRule.testDispatcherProvider, mockFeature)
+        loader = SqlCipherLibraryLoader(context, coroutineTestRule.testDispatcherProvider, mockFeature, fakeTimeProvider)
     }
 
     @After
@@ -249,4 +252,10 @@ class ShadowLibraryLoader {
             syncShouldFail = false
         }
     }
+}
+
+class FakeCurrentTimeProvider : CurrentTimeProvider {
+    override fun elapsedRealtime(): Long = System.currentTimeMillis()
+    override fun currentTimeMillis(): Long = System.currentTimeMillis()
+    override fun localDateTimeNow(): LocalDateTime = LocalDateTime.now()
 }

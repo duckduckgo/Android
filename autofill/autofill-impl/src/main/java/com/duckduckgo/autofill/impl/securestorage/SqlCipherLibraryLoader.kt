@@ -18,6 +18,7 @@ package com.duckduckgo.autofill.impl.securestorage
 
 import android.content.Context
 import com.duckduckgo.autofill.api.AutofillFeature
+import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.library.loader.LibraryLoader
@@ -46,6 +47,7 @@ class SqlCipherLibraryLoader @Inject constructor(
     private val context: Context,
     private val dispatchers: DispatcherProvider,
     private val autofillFeature: AutofillFeature,
+    private val currentTimeProvider: CurrentTimeProvider,
 ) {
     private val initializationMutex = Mutex()
     private var libraryLoaded: CompletableDeferred<Unit>? = null
@@ -66,14 +68,14 @@ class SqlCipherLibraryLoader @Inject constructor(
 
         initialize()
 
-        val waitStartTimeMillis = System.currentTimeMillis()
+        val waitStartTimeMillis = currentTimeProvider.currentTimeMillis()
         logcat { "SqlCipher-Init: Waiting for library load to complete (timeout=${timeoutMillis}ms)" }
 
         return try {
             withTimeout(timeoutMillis) {
                 libraryLoaded!!.await()
             }
-            val waitDurationMillis = System.currentTimeMillis() - waitStartTimeMillis
+            val waitDurationMillis = currentTimeProvider.currentTimeMillis() - waitStartTimeMillis
             logcat { "SqlCipher-Init: Library load wait completed successfully (${waitDurationMillis}ms)" }
             Result.success(Unit)
         } catch (e: TimeoutCancellationException) {
@@ -128,7 +130,7 @@ class SqlCipherLibraryLoader @Inject constructor(
             val deferred = CompletableDeferred<Unit>()
             libraryLoaded = deferred
 
-            val startTimeMillis = System.currentTimeMillis()
+            val startTimeMillis = currentTimeProvider.currentTimeMillis()
             logcat { "SqlCipher-Init: Starting async library load on IO thread" }
             try {
                 LibraryLoader.loadLibrary(
@@ -136,13 +138,13 @@ class SqlCipherLibraryLoader @Inject constructor(
                     SQLCIPHER_LIB_NAME,
                     object : LibraryLoader.LibraryLoaderListener {
                         override fun success() {
-                            val durationMillis = System.currentTimeMillis() - startTimeMillis
+                            val durationMillis = currentTimeProvider.currentTimeMillis() - startTimeMillis
                             logcat { "SqlCipher-Init: Asynchronous library load completed successfully (${durationMillis}ms)" }
                             deferred.complete(Unit)
                         }
 
                         override fun failure(throwable: Throwable) {
-                            val durationMillis = System.currentTimeMillis() - startTimeMillis
+                            val durationMillis = currentTimeProvider.currentTimeMillis() - startTimeMillis
                             logcat(ERROR) {
                                 "SqlCipher-Init: Asynchronous library load failed after ${durationMillis}ms: " +
                                     "${throwable.javaClass.simpleName} - ${throwable.message}"
@@ -167,15 +169,15 @@ class SqlCipherLibraryLoader @Inject constructor(
             val deferred = CompletableDeferred<Unit>()
             libraryLoaded = deferred
 
-            val startTimeMillis = System.currentTimeMillis()
+            val startTimeMillis = currentTimeProvider.currentTimeMillis()
             logcat { "SqlCipher-Init: Starting synchronous library load on thread ${Thread.currentThread().name}" }
             try {
                 LibraryLoader.loadLibrary(context, SQLCIPHER_LIB_NAME)
-                val durationMillis = System.currentTimeMillis() - startTimeMillis
+                val durationMillis = currentTimeProvider.currentTimeMillis() - startTimeMillis
                 logcat { "SqlCipher-Init: Sync library load completed successfully (${durationMillis}ms)" }
                 deferred.complete(Unit)
             } catch (t: Throwable) {
-                val durationMillis = System.currentTimeMillis() - startTimeMillis
+                val durationMillis = currentTimeProvider.currentTimeMillis() - startTimeMillis
                 logcat(ERROR) { "SqlCipher-Init: Sync library load failed after ${durationMillis}ms: ${t.javaClass.simpleName} - ${t.message}" }
                 deferred.completeExceptionally(t)
             }
