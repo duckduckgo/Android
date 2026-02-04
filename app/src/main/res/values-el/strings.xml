@@ -128,6 +128,7 @@
     <string name="settingsMenuItemTitle">Ρυθμίσεις</string>
     <string name="settingsHeadingProtections">Προστασίες</string>
     <string name="settingsHeadingAppearance">Εμφάνιση</string>
+    <string name="settingsWhatsNew">Τι νέο υπάρχει</string>
     <string name="settingsHeadingAbout">Σχετικά</string>
     <string name="settingsAboutDuckduckgo">Πληροφορίες για το DuckDuckGo</string>
     <string name="settingsVersion">Έκδοση</string>

@@ -130,6 +130,7 @@
     <string name="settingsMenuItemTitle">Nastavitve</string>
     <string name="settingsHeadingProtections">Zaščite</string>
     <string name="settingsHeadingAppearance">Izgled</string>
+    <string name="settingsWhatsNew">Kaj je novega</string>
     <string name="settingsHeadingAbout">O nas</string>
     <string name="settingsAboutDuckduckgo">O DuckDuckGo</string>
     <string name="settingsVersion">Različica</string>

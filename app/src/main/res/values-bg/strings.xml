@@ -128,6 +128,7 @@
     <string name="settingsMenuItemTitle">Настройки</string>
     <string name="settingsHeadingProtections">Защити</string>
     <string name="settingsHeadingAppearance">Външен вид</string>
+    <string name="settingsWhatsNew">Новости</string>
     <string name="settingsHeadingAbout">За нас</string>
     <string name="settingsAboutDuckduckgo">За DuckDuckGo</string>
     <string name="settingsVersion">Версия</string>
