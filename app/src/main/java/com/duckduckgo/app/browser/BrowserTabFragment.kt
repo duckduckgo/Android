@@ -75,6 +75,7 @@ import androidx.core.text.toSpannable
 import androidx.core.view.ViewCompat
 import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
+import androidx.core.view.updatePadding
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commitNow
@@ -368,6 +369,7 @@ import javax.inject.Named
 import javax.inject.Provider
 import kotlin.coroutines.CoroutineContext
 import kotlin.getValue
+import kotlin.math.max
 
 @InjectWith(FragmentScope::class)
 class BrowserTabFragment :
@@ -1065,6 +1067,8 @@ class BrowserTabFragment :
         configureNavigationBar()
         configureOmnibar()
         configureBrowserTabKeyboardListener()
+        applyContextualSheetInsets()
+        setupContextualSheetHeightSync()
 
         if (savedInstanceState == null) {
             viewModel.setIsCustomTab(tabDisplayedInCustomTabScreen)
@@ -3354,7 +3358,6 @@ class BrowserTabFragment :
                 BottomSheetBehavior.from(binding.duckAiContextualFragmentContainer).peekHeight = fullHeight
             }
         }
-
         duckAiContextualFragment?.let { fragment ->
             openExistingContextualFragment(fragment)
         } ?: run {
@@ -5330,6 +5333,56 @@ class BrowserTabFragment :
                 }
             }
             .launchIn(lifecycleScope)
+    }
+
+    private fun applyContextualSheetInsets() {
+        val container = binding.duckAiContextualFragmentContainer
+
+        val initialPaddingBottom = container.paddingBottom
+        val initialPaddingTop = container.paddingTop
+        val initialPaddingStart = container.paddingStart
+        val initialPaddingEnd = container.paddingEnd
+
+        ViewCompat.setOnApplyWindowInsetsListener(container) { view, insets ->
+            val imeBottom = insets.getInsets(androidx.core.view.WindowInsetsCompat.Type.ime()).bottom
+            val systemBottom = insets.getInsets(androidx.core.view.WindowInsetsCompat.Type.systemBars()).bottom
+            val bottomInset = max(imeBottom, systemBottom)
+
+            view.updatePadding(
+                left = initialPaddingStart,
+                top = initialPaddingTop,
+                right = initialPaddingEnd,
+                bottom = initialPaddingBottom + bottomInset,
+            )
+            insets
+        }
+        ViewCompat.requestApplyInsets(container)
+    }
+
+    private fun setupContextualSheetHeightSync() {
+        val container = binding.duckAiContextualFragmentContainer
+        val browserLayout = binding.rootView
+
+        fun updateContainerHeight(newHeight: Int) {
+            if (newHeight <= 0) return
+            val params = container.layoutParams
+            if (params.height != newHeight) {
+                params.height = newHeight
+                container.layoutParams = params
+            }
+        }
+
+        browserLayout.addOnLayoutChangeListener { _, _, top, _, bottom, _, oldTop, _, oldBottom ->
+            val newHeight = bottom - top
+            val oldHeight = oldBottom - oldTop
+            if (newHeight != oldHeight) {
+                updateContainerHeight(newHeight)
+            }
+        }
+
+        browserLayout.post {
+            updateContainerHeight(browserLayout.height)
+        }
     }
 }
 

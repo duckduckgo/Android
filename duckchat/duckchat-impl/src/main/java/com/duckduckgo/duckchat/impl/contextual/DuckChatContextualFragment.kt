@@ -421,7 +421,7 @@ class DuckChatContextualFragment :
         bottomSheetBehavior.skipCollapsed = true
         bottomSheetBehavior.isDraggable = true
         bottomSheetBehavior.isHideable = true
-        bottomSheetBehavior.isFitToContents = false
+        bottomSheetBehavior.isFitToContents = true
         bottomSheetBehavior.expandedOffset = 0
     }
 
