@@ -1065,7 +1065,6 @@ class BrowserTabFragment :
         configureNavigationBar()
         configureOmnibar()
         configureBrowserTabKeyboardListener()
-        setupContextualSheetHeightSync()
 
         if (savedInstanceState == null) {
             viewModel.setIsCustomTab(tabDisplayedInCustomTabScreen)
@@ -3344,17 +3343,10 @@ class BrowserTabFragment :
 
     private fun showDuckChatContextualSheet(tabId: String) {
         binding.duckAiContextualFragmentContainer.show()
-        binding.rootView.post {
-            val fullHeight = binding.rootView.height
-            if (fullHeight > 0) {
-                val params = binding.duckAiContextualFragmentContainer.layoutParams
-                if (params.height != fullHeight) {
-                    params.height = fullHeight
-                    binding.duckAiContextualFragmentContainer.layoutParams = params
-                }
-                BottomSheetBehavior.from(binding.duckAiContextualFragmentContainer).peekHeight = fullHeight
-            }
-        }
+
+        setupContextualSheetHeightSync()
+
+        omnibar.setExpanded(false)
         duckAiContextualFragment?.let { fragment ->
             openExistingContextualFragment(fragment)
         } ?: run {
@@ -3407,6 +3399,7 @@ class BrowserTabFragment :
                     newState: Int,
                 ) {
                     if (newState == BottomSheetBehavior.STATE_HIDDEN) {
+                        omnibar.setExpanded(true)
                         binding.duckAiContextualFragmentContainer.gone()
                         hideKeyboard()
                         browserActivity?.onEditModeChanged(false)
@@ -5346,10 +5339,12 @@ class BrowserTabFragment :
         }
 
         browserLayout.addOnLayoutChangeListener { _, _, top, _, bottom, _, oldTop, _, oldBottom ->
-            val newHeight = bottom - top
-            val oldHeight = oldBottom - oldTop
-            if (newHeight != oldHeight) {
-                updateContainerHeight(newHeight)
+            if (binding.duckAiContextualFragmentContainer.isVisible) {
+                val newHeight = bottom - top
+                val oldHeight = oldBottom - oldTop
+                if (newHeight != oldHeight) {
+                    updateContainerHeight(newHeight)
+                }
             }
         }
 
