@@ -1,12 +1,19 @@
 name: Release - Create Release Task in Asana
 
 on:
+  workflow_call:
+    inputs:
+      app-version:
+        description: 'App Version for Release'
+        required: true
+        type: string
   workflow_dispatch:
     inputs:
       app-version:
         description: 'App Version for Release'
         required: true
         default: 'PLACEHOLDER'
+        type: string
 
 env:
   ASANA_PAT: ${{ secrets.ASANA_ACCESS_TOKEN }}
@@ -25,11 +32,11 @@ jobs:
     steps:
       - name: Check app-version value
         run: |
-          if [ "${{ github.event.inputs.app-version }}" == "PLACEHOLDER" ]; then
+          if [ "${{ inputs.app-version }}" == "PLACEHOLDER" ]; then
             echo "Input value cannot be 'PLACEHOLDER'."
             exit 1
           else
-            echo "Input value is valid: ${{ github.event.inputs.app-version }}"
+            echo "Input value is valid: ${{ inputs.app-version }}"
           fi
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -43,7 +50,7 @@ jobs:
           mattermost-token: ${{ secrets.MM_AUTH_TOKEN }}
           mattermost-team-id: ${{ secrets.MM_TEAM_ID }}
           mattermost-channel-name: ${{ vars.MM_RELEASE_NOTIFY_CHANNEL }}
-          mattermost-message: ${{env.emoji_start}} Starting release process for version ${{ github.event.inputs.app-version }}
+          mattermost-message: ${{env.emoji_start}} Starting release process for version ${{ inputs.app-version }}
           action: 'send-mattermost-message'
 
       - name: Install dependencies for create-asana-public-release task
@@ -59,7 +66,7 @@ jobs:
           set -eo pipefail
           RELEASE_TASK_URL=$(python ./scripts/release/create-asana-public-release.py \
           --android-repo-path . \
-          --tag "${{ github.event.inputs.app-version }}" \
+          --tag "${{ inputs.app-version }}" \
           --trigger-phrase 'Task/Issue URL:' \
           --asana-project-id "${{ vars.GH_ANDROID_RELEASE_BOARD_PROJECT_ID }}" \
           --asana-section-id "${{ vars.GH_ANDROID_RELEASE_BOARD_QA_SECTION_ID }}" \
@@ -72,7 +79,7 @@ jobs:
         id: assign-release-task
         uses: ./.github/actions/assign-release-task
         with:
-          task_name: 'Android Release ${{ github.event.inputs.app-version }}'
+          task_name: 'Android Release ${{ inputs.app-version }}'
           asana_token: ${{ secrets.ASANA_ACCESS_TOKEN }}
           project_gid: ${{ vars.GH_ANDROID_RELEASE_BOARD_PROJECT_ID }}
           username: ${{ github.actor }}

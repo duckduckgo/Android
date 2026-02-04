@@ -7,10 +7,12 @@ on:
         description: 'App Version for Testing'
         required: true
         default: 'PLACEHOLDER'
+        type: string
       test-tag:
         description: 'Maestro Tests tag to include'
         required: true
         default: 'releaseTest'
+        type: string
 
 env:
   ASANA_PAT: ${{ secrets.ASANA_ACCESS_TOKEN }}
@@ -27,7 +29,7 @@ jobs:
         id: assemble
         uses: ./.github/actions/checkout-and-assemble
         with:
-          commit: ${{ github.event.inputs.app-version }}
+          commit: ${{ inputs.app-version }}
           flavours: 'play'
           release_properties: ${{ secrets.FAKE_RELEASE_PROPERTIES }}
           release_key: ${{ secrets.FAKE_RELEASE_KEY }}
@@ -45,7 +47,7 @@ jobs:
           app-file: ${{ steps.assemble.outputs.play_apk_path }}
           android-api-level: 30
           workspace: .maestro
-          include-tags: ${{ github.event.inputs.test-tag }}
+          include-tags: ${{ inputs.test-tag }}
 
       - name: Analyze Maestro Flow Results
         if: always()
