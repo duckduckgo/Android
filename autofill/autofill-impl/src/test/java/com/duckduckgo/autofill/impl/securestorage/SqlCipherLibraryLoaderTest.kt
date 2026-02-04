@@ -28,10 +28,10 @@ import com.duckduckgo.library.loader.LibraryLoader
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.async
 import kotlinx.coroutines.test.runTest
 import org.junit.After
-import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
@@ -79,7 +79,7 @@ class SqlCipherLibraryLoaderTest {
         // Complete the async load
         ShadowLibraryLoader.completeAsyncSuccess()
 
-        assertEquals(LibraryLoadResult.Success, resultDeferred.await())
+        assertTrue(resultDeferred.await().isSuccess)
     }
 
     @Test
@@ -90,7 +90,7 @@ class SqlCipherLibraryLoaderTest {
 
         // Verify sync loading was used (no callback)
         assertNull("Sync loading should not set callback", ShadowLibraryLoader.asyncCallback)
-        assertEquals(LibraryLoadResult.Success, result)
+        assertTrue(result.isSuccess)
     }
 
     @Test
@@ -101,7 +101,7 @@ class SqlCipherLibraryLoaderTest {
 
         ShadowLibraryLoader.completeAsyncSuccess()
 
-        assertEquals(LibraryLoadResult.Success, resultDeferred.await())
+        assertTrue(resultDeferred.await().isSuccess)
     }
 
     @Test
@@ -109,34 +109,29 @@ class SqlCipherLibraryLoaderTest {
         configureAsyncLoadingEnabled()
 
         val resultDeferred = asyncImmediately { loader.waitForLibraryLoad() }
-        val expectedError = UnsatisfiedLinkError("Test error")
-        ShadowLibraryLoader.completeAsyncFailure(expectedError)
+        ShadowLibraryLoader.completeAsyncFailure(UnsatisfiedLinkError("Test error"))
 
-        val failure = resultDeferred.await() as LibraryLoadResult.Failure
-        assertEquals(expectedError.javaClass, failure.throwable.javaClass)
+        resultDeferred.await().assertIsFailure<UnsatisfiedLinkError>()
     }
 
     @Test
     fun whenSyncLoadFailsThenReturnsFailure() = runTest {
         configureAsyncLoadingDisabled()
+
         ShadowLibraryLoader.syncShouldFail = true
 
-        val result = loader.waitForLibraryLoad()
-
-        assertTrue(result is LibraryLoadResult.Failure)
+        loader.waitForLibraryLoad().assertIsFailure<UnsatisfiedLinkError>()
     }
 
     @Test
-    fun whenTimeoutOccursThenReturnsTimeout() = runTest {
+    fun whenTimeoutOccursThenReturnsFailureWithTimeoutException() = runTest {
         configureAsyncLoadingEnabled()
 
         // Start waiting but don't complete the load
         val resultDeferred = asyncImmediately { loader.waitForLibraryLoad(timeoutMillis = 100) }
 
         // Don't call completeAsyncSuccess() - let it timeout
-        val result = resultDeferred.await()
-
-        assertEquals(LibraryLoadResult.Timeout, result)
+        resultDeferred.await().assertIsFailure<TimeoutCancellationException>()
     }
 
     @Test
@@ -156,8 +151,8 @@ class SqlCipherLibraryLoaderTest {
 
         // Verify no new initialization happened
         assertNull("Should not start new initialization", ShadowLibraryLoader.asyncCallback)
-        assertEquals(LibraryLoadResult.Success, result1)
-        assertEquals(LibraryLoadResult.Success, result2)
+        assertTrue(result1.isSuccess)
+        assertTrue(result2.isSuccess)
     }
 
     @Test
@@ -173,9 +168,9 @@ class SqlCipherLibraryLoaderTest {
         ShadowLibraryLoader.completeAsyncSuccess()
 
         // All should succeed
-        assertEquals(LibraryLoadResult.Success, result1.await())
-        assertEquals(LibraryLoadResult.Success, result2.await())
-        assertEquals(LibraryLoadResult.Success, result3.await())
+        assertTrue(result1.await().isSuccess)
+        assertTrue(result2.await().isSuccess)
+        assertTrue(result3.await().isSuccess)
     }
 
     @Test
@@ -187,12 +182,8 @@ class SqlCipherLibraryLoaderTest {
         val result2 = asyncImmediately { loader.waitForLibraryLoad(timeoutMillis = 100) }
 
         // Don't complete - let them timeout
-        val r1 = result1.await()
-        val r2 = result2.await()
-
-        // Both should timeout
-        assertEquals(LibraryLoadResult.Timeout, r1)
-        assertEquals(LibraryLoadResult.Timeout, r2)
+        result1.await().assertIsFailure<TimeoutCancellationException>()
+        result2.await().assertIsFailure<TimeoutCancellationException>()
     }
 
     private fun configureAsyncLoadingEnabled() {
@@ -211,6 +202,11 @@ class SqlCipherLibraryLoaderTest {
      */
     private fun <T> CoroutineScope.asyncImmediately(block: suspend () -> T): Deferred<T> =
         async(start = CoroutineStart.UNDISPATCHED) { block() }
+
+    private inline fun <reified T : Throwable> Result<*>.assertIsFailure() {
+        assertTrue("Expected failure but was success", isFailure)
+        assertTrue("Expected ${T::class.simpleName} but was ${exceptionOrNull()?.javaClass?.simpleName}", exceptionOrNull() is T)
+    }
 }
 
 /**

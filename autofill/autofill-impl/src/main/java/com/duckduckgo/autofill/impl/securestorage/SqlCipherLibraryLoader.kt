@@ -33,26 +33,6 @@ import logcat.logcat
 import javax.inject.Inject
 
 /**
- * Result of attempting to load the sqlcipher native library.
- */
-sealed interface LibraryLoadResult {
-    /**
-     * Library loaded successfully.
-     */
-    data object Success : LibraryLoadResult
-
-    /**
-     * Timed out waiting for library to load.
-     */
-    data object Timeout : LibraryLoadResult
-
-    /**
-     * Library loading failed with an exception.
-     */
-    data class Failure(val throwable: Throwable) : LibraryLoadResult
-}
-
-/**
  * Singleton that manages asynchronous loading of the sqlcipher native library.
  *
  * This loader uses lazy initialization to avoid blocking the main thread during app startup.
@@ -75,18 +55,18 @@ class SqlCipherLibraryLoader @Inject constructor(
      * checks on IO thread. Subsequent calls wait for the existing load operation to complete.
      *
      * @param timeoutMillis Maximum time to wait for library loading in milliseconds (default: 10 seconds)
-     * @return Result indicating success, timeout, or failure with exception details
+     * @return Result.success if library loaded, Result.failure if there was an exception or it timed out
      */
     suspend fun waitForLibraryLoad(
         timeoutMillis: Long = 10_000,
-    ): LibraryLoadResult {
+    ): Result<Unit> {
         logcat { "SqlCipher-Init: waitForLibraryLoad() called with timeout=${timeoutMillis}ms" }
 
         initialize()
 
         val deferred = libraryLoaded ?: run {
             logcat(ERROR) { "SqlCipher-Init: libraryLoaded is null after initialization - this should never happen" }
-            return LibraryLoadResult.Failure(IllegalStateException("Library initialization failed - deferred is null"))
+            return Result.failure(IllegalStateException("Library initialization failed - deferred is null"))
         }
 
         val waitStartTimeMillis = System.currentTimeMillis()
@@ -98,13 +78,13 @@ class SqlCipherLibraryLoader @Inject constructor(
             }
             val waitDurationMillis = System.currentTimeMillis() - waitStartTimeMillis
             logcat { "SqlCipher-Init: Library load wait completed successfully (${waitDurationMillis}ms)" }
-            LibraryLoadResult.Success
-        } catch (_: TimeoutCancellationException) {
+            Result.success(Unit)
+        } catch (e: TimeoutCancellationException) {
             logcat(ERROR) { "SqlCipher-Init: Timeout after waiting ${timeoutMillis}ms for library load" }
-            LibraryLoadResult.Timeout
+            Result.failure(e)
         } catch (e: Throwable) {
             logcat(ERROR) { "SqlCipher-Init: Failed while waiting for library load: ${e.javaClass.simpleName} - ${e.message}" }
-            LibraryLoadResult.Failure(e)
+            Result.failure(e)
         }
     }
 
