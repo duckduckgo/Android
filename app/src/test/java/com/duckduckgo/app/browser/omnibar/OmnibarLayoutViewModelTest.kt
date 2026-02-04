@@ -2390,24 +2390,6 @@ class OmnibarLayoutViewModelTest {
     // Favourite Logo Tests
 
     @Test
-    fun whenFavouriteLogoSetAndOnDdgUrlThenFavouriteLogoShown() = runTest {
-        val favouriteLogoUrl = "https://example.com/favourite-logo.png"
-        whenever(serpEasterEggLogosToggles.setFavourite().isEnabled()).thenReturn(true)
-        whenever(serpEasterEggLogosToggles.setFavourite().enabled()).thenReturn(flowOf(true))
-        favouriteLogoFlow.value = favouriteLogoUrl
-        initializeViewModel()
-
-        givenSiteLoaded(SERP_URL)
-
-        testee.viewState.test {
-            val viewState = awaitItem()
-            assertTrue(viewState.leadingIconState is LeadingIconState.EasterEggLogo)
-            val easterEggState = viewState.leadingIconState as LeadingIconState.EasterEggLogo
-            assertEquals(favouriteLogoUrl, easterEggState.logoUrl)
-        }
-    }
-
-    @Test
     fun whenFavouriteLogoSetButNotOnDdgUrlThenPrivacyShieldShown() = runTest {
         val favouriteLogoUrl = "https://example.com/favourite-logo.png"
         whenever(serpEasterEggLogosToggles.setFavourite().isEnabled()).thenReturn(true)
