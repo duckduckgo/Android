@@ -2048,7 +2048,8 @@ class BrowserTabViewModelTest {
         resetChannels()
         initialiseViewModel()
 
-        selectedTabLiveData.value = aTabEntity(id = "id").copy(url = "about:blank", title = "about:blank", sourceTabId = null)
+        selectedTabLiveData.value = aTabEntity(id = "id").copy(url = "", title = "about:blank", sourceTabId = "source")
+        testee.onMessageReceived()
         testee.handleNewTabIfEmptyUrl()
 
         val result = testee.onUserPressedBack(isCustomTab = false)
@@ -2064,7 +2065,8 @@ class BrowserTabViewModelTest {
         resetChannels()
         initialiseViewModel()
 
-        selectedTabLiveData.value = aTabEntity(id = "id").copy(url = "about:blank", title = "about:blank", sourceTabId = null)
+        selectedTabLiveData.value = aTabEntity(id = "id").copy(url = "", title = "about:blank", sourceTabId = "source")
+        testee.onMessageReceived()
         testee.handleNewTabIfEmptyUrl()
 
         testee.onUserPressedBack(isCustomTab = false)
@@ -4833,7 +4835,7 @@ class BrowserTabViewModelTest {
         testee.loadData("tabId", null, false, false)
         testee.handleNewTabIfEmptyUrl()
         assertEquals("about:blank", omnibarViewState().omnibarText)
-        assertEquals("about:blank", testee.url)
+        assertEquals("", testee.url)
         assertEquals("about:blank", testee.title)
     }
 

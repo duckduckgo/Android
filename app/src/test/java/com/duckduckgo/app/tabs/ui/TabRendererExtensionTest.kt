@@ -68,13 +68,8 @@ class TabRendererExtensionTest {
     }
 
     @Test
-    fun whenTabUrlIsAboutBlankThenDisplayTitleIsAboutBlank() {
-        assertEquals("about:blank", TabEntity("1", url = "about:blank", title = null, position = 0).displayTitle(context))
-    }
-
-    @Test
-    fun whenTabUrlIsAboutBlankWithSourceTabThenDisplayTitleIsAboutBlank() {
-        assertEquals("about:blank", TabEntity("1", url = "about:blank", title = null, sourceTabId = "parent-id", position = 0).displayTitle(context))
+    fun whenTabTitleIsAboutBlankThenDisplayTitleIsAboutBlank() {
+        assertEquals("about:blank", TabEntity("1", url = null, title = "about:blank", position = 0).displayTitle(context))
     }
 
     @Test
@@ -84,8 +79,8 @@ class TabRendererExtensionTest {
     }
 
     @Test
-    fun whenTabUrlIsAboutBlankUppercaseThenDisplayTitleIsAboutBlank() {
-        assertEquals("about:blank", TabEntity("1", url = "ABOUT:BLANK", title = null, position = 0).displayTitle(context))
+    fun whenTabTitleIsAboutBlankUppercaseThenDisplayTitleIsAboutBlank() {
+        assertEquals("about:blank", TabEntity("1", url = null, title = "ABOUT:BLANK", position = 0).displayTitle(context))
     }
 
     @Test
