@@ -1521,8 +1521,8 @@ class BrowserTabFragment :
                 pixel.fire(AppPixelName.EXPERIMENTAL_MENU_DISMISSED)
             },
             onMenuItemClickListener = {
-                pixel.fire(AppPixelName.EXPERIMENTAL_MENU_USED, type = Daily())
-                pixel.fire(AppPixelName.EXPERIMENTAL_MENU_USED, type = Unique())
+                pixel.fire(AppPixelName.EXPERIMENTAL_MENU_USED_DAILY, type = Daily())
+                pixel.fire(AppPixelName.EXPERIMENTAL_MENU_USED_UNIQUE, type = Unique())
                 pixel.fire(AppPixelName.EXPERIMENTAL_MENU_USED, type = Count)
             },
         )
