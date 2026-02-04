@@ -421,7 +421,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                         hasFocus = false,
                         url = it.url,
                         serpLogoUrl = currentLogoUrl,
-                        isFavouriteSerpLogo = isFavouriteEasterEggLogo
+                        isFavouriteSerpLogo = isFavouriteEasterEggLogo,
                     ),
                     previousLeadingIconState = null,
                     highlightFireButton = HighlightableButton.Visible(highlighted = false),
@@ -891,7 +891,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                     hasFocus = it.hasFocus,
                     url = loadingState.url,
                     serpLogoUrl = currentLogoUrl,
-                    isFavouriteSerpLogo = it.leadingIconState is EasterEggLogo && it.leadingIconState.isFavourite
+                    isFavouriteSerpLogo = it.leadingIconState is EasterEggLogo && it.leadingIconState.isFavourite,
                 ),
                 showVoiceSearch = shouldShowVoiceSearch(
                     viewMode = _viewState.value.viewMode,
