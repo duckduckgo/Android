@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (c) 2021 DuckDuckGo
+  ~ Copyright (c) 2026 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -18,5 +18,9 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources xmlns:tools="http://schemas.android.com/tools">
 
-  <string name="cdClose">Cerrar</string>
+    <string name="cdClose">Cerrar</string>
+
+    <string name="serpLogoSetAsFavourite">Cambiar a este logotipo</string>
+    <string name="serpLogoResetToDefault">Logotipo de Restablecer búsqueda</string>
+    <string name="serpLogoDiscoveryText">¡Has encontrado un logo oculto!</string>
 </resources>
