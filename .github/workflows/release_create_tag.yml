@@ -77,7 +77,7 @@ jobs:
       - name: Use fastlane lane to create and push tagged release
         id: create_git_tag
         run: |        
-          bundle exec fastlane android tag_and_push_release_version app_version:${{ github.event.inputs.app-version }} ref:${{ steps.get_lgc_tag.outputs.lgc_tag }}
+          bundle exec fastlane android tag_and_push_release_version app_version:${{ inputs.app-version }} ref:${{ steps.get_lgc_tag.outputs.lgc_tag }}
 
       - name: Notify Mattermost
         id: send-mm-message
@@ -86,7 +86,7 @@ jobs:
           mattermost-token: ${{ secrets.MM_AUTH_TOKEN }}
           mattermost-team-id: ${{ secrets.MM_TEAM_ID }}
           mattermost-channel-name: ${{ vars.MM_RELEASE_NOTIFY_CHANNEL }}
-          mattermost-message: ${{env.emoji_info}} Release ${{ github.event.inputs.app-version }}. Tag created https://github.com/duckduckgo/Android/releases/tag/${{ github.event.inputs.app-version }}
+          mattermost-message: ${{env.emoji_info}} Release ${{ inputs.app-version }}. Tag created https://github.com/duckduckgo/Android/releases/tag/${{ inputs.app-version }}
           action: 'send-mattermost-message'
 
       - name: Create Asana task when workflow failed
