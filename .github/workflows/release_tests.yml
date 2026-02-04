@@ -1,16 +1,6 @@
 name: Release - Run E2E Maestro Tests
 
 on:
-  workflow_call:
-    inputs:
-      app-version:
-        description: 'App Version for Release'
-        required: true
-        type: string
-      test-tag:
-        description: 'Maestro Tests tag to include'
-        required: true
-        type: string
   workflow_dispatch:
     inputs:
       app-version:
