@@ -57,7 +57,6 @@
             android:id="@+id/illustration"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/keyline_3"
             android:layout_marginBottom="@dimen/keyline_2"
             app:layout_constraintBottom_toTopOf="@id/messageSubtitle"
             app:layout_constraintEnd_toEndOf="parent"
