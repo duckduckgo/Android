@@ -128,6 +128,7 @@
     <string name="settingsMenuItemTitle">Asetukset</string>
     <string name="settingsHeadingProtections">Suojaukset</string>
     <string name="settingsHeadingAppearance">Ulkoasu</string>
+    <string name="settingsWhatsNew">Mitä uutta</string>
     <string name="settingsHeadingAbout">Tietoa meistä</string>
     <string name="settingsAboutDuckduckgo">Tietoa DuckDuckGosta</string>
     <string name="settingsVersion">Versio</string>

@@ -130,6 +130,7 @@
     <string name="settingsMenuItemTitle">Nustatymai</string>
     <string name="settingsHeadingProtections">Apsaugos</string>
     <string name="settingsHeadingAppearance">Išvaizda</string>
+    <string name="settingsWhatsNew">Kas naujo</string>
     <string name="settingsHeadingAbout">Apie</string>
     <string name="settingsAboutDuckduckgo">Apie „DuckDuckGo“</string>
     <string name="settingsVersion">Versija</string>

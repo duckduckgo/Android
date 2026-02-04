@@ -128,6 +128,7 @@
     <string name="settingsMenuItemTitle">Beállítások</string>
     <string name="settingsHeadingProtections">Védelem</string>
     <string name="settingsHeadingAppearance">Megjelenés</string>
+    <string name="settingsWhatsNew">Újdonságok</string>
     <string name="settingsHeadingAbout">További információ</string>
     <string name="settingsAboutDuckduckgo">A DuckDuckGo névjegye</string>
     <string name="settingsVersion">Változat</string>
