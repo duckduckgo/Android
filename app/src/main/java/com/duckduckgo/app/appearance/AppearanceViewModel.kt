@@ -226,12 +226,12 @@ class AppearanceViewModel @Inject constructor(
         viewModelScope.launch(dispatcherProvider.io()) {
             browserMenuDisplayRepository.setExperimentalMenuEnabled(checked)
             if (checked) {
-                pixel.fire(AppPixelName.EXPERIMENTAL_MENU_ENABLED, type = Daily())
-                pixel.fire(AppPixelName.EXPERIMENTAL_MENU_ENABLED, type = Unique())
+                pixel.fire(AppPixelName.EXPERIMENTAL_MENU_ENABLED_DAILY, type = Daily())
+                pixel.fire(AppPixelName.EXPERIMENTAL_MENU_ENABLED_UNIQUE, type = Unique())
                 pixel.fire(AppPixelName.EXPERIMENTAL_MENU_ENABLED, type = Count)
             } else {
-                pixel.fire(AppPixelName.EXPERIMENTAL_MENU_DISABLED, type = Daily())
-                pixel.fire(AppPixelName.EXPERIMENTAL_MENU_DISABLED, type = Unique())
+                pixel.fire(AppPixelName.EXPERIMENTAL_MENU_DISABLED_DAILY, type = Daily())
+                pixel.fire(AppPixelName.EXPERIMENTAL_MENU_DISABLED_UNIQUE, type = Unique())
                 pixel.fire(AppPixelName.EXPERIMENTAL_MENU_DISABLED, type = Count)
             }
         }

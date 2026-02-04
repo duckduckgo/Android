@@ -27,8 +27,14 @@ import javax.inject.Inject
 class BrowserMenuParamRemovalPlugin @Inject constructor() : PixelParamRemovalPlugin {
     override fun names(): List<Pair<String, Set<PixelParameter>>> {
         return listOf(
+            AppPixelName.EXPERIMENTAL_MENU_USED_DAILY.pixelName to PixelParameter.removeAtb(),
+            AppPixelName.EXPERIMENTAL_MENU_USED_UNIQUE.pixelName to PixelParameter.removeAtb(),
             AppPixelName.EXPERIMENTAL_MENU_USED.pixelName to PixelParameter.removeAtb(),
+            AppPixelName.EXPERIMENTAL_MENU_ENABLED_DAILY.pixelName to PixelParameter.removeAtb(),
+            AppPixelName.EXPERIMENTAL_MENU_ENABLED_UNIQUE.pixelName to PixelParameter.removeAtb(),
             AppPixelName.EXPERIMENTAL_MENU_ENABLED.pixelName to PixelParameter.removeAtb(),
+            AppPixelName.EXPERIMENTAL_MENU_DISABLED_DAILY.pixelName to PixelParameter.removeAtb(),
+            AppPixelName.EXPERIMENTAL_MENU_DISABLED_UNIQUE.pixelName to PixelParameter.removeAtb(),
             AppPixelName.EXPERIMENTAL_MENU_DISABLED.pixelName to PixelParameter.removeAtb(),
             AppPixelName.EXPERIMENTAL_MENU_DISPLAYED.pixelName to PixelParameter.removeAtb(),
             AppPixelName.EXPERIMENTAL_MENU_DISPLAYED_NTP.pixelName to PixelParameter.removeAtb(),
