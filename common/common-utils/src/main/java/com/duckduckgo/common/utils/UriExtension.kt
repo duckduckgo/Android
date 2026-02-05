@@ -89,6 +89,10 @@ val Uri.isLocalUrl: Boolean
         // and never performs DNS resolution. On API 26-28, fall back to strict IPv4-only
         // validation to avoid InetAddress.getByName() which can trigger DNS lookups.
         val addr = if (Build.VERSION.SDK_INT >= 29) {
+            // Pre-validate format: require standard dotted-quad IPv4 (a.b.c.d) or
+            // bracketed IPv6 (contains ':'). This prevents parseNumericAddress from
+            // accepting abbreviated forms like "192.168.1" -> "192.168.0.1".
+            if (!host.isStrictNumericAddress()) return false
             runCatching { android.net.InetAddresses.parseNumericAddress(host) }.getOrNull()
         } else {
             // Pre-29: only handle IPv4 addresses with strict validation
@@ -99,6 +103,23 @@ val Uri.isLocalUrl: Boolean
         // For IPv6, also check for unique local addresses (fc00::/7) manually
         return addr.isLoopbackAddress || addr.isSiteLocalAddress || addr.isLinkLocalAddress || addr.isIPv6UniqueLocal()
     }
+
+/**
+ * Checks if a string looks like a strict numeric IP address.
+ * For IPv4: requires exactly 4 dot-separated octets, each 0-255.
+ * For IPv6: requires the presence of colons.
+ */
+private fun String.isStrictNumericAddress(): Boolean {
+    // IPv6: contains colons
+    if (contains(':')) return true
+
+    // IPv4: exactly 4 parts separated by dots, each 0-255
+    val parts = split('.')
+    if (parts.size != 4) return false
+    return parts.all { part ->
+        part.toIntOrNull()?.let { it in 0..255 } ?: false
+    }
+}
 
 /**
  * Strictly parses a string as an IPv4 address without DNS resolution.
