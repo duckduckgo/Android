@@ -120,7 +120,6 @@ private fun String.looksLikeNumericAddress(): Boolean {
     }
 }
 
-
 /**
  * Checks if an IPv6 address is a Unique Local Address (ULA) in the fc00::/7 range.
  * These are the IPv6 equivalent of private IPv4 addresses.
