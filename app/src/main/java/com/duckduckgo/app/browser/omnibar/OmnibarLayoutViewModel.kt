@@ -112,6 +112,7 @@ class OmnibarLayoutViewModel @Inject constructor(
     private val serpEasterEggLogosToggles: SerpEasterEggLogosToggles,
     private val androidBrowserToggles: AndroidBrowserConfigFeature,
     private val addressBarTrackersAnimationManager: AddressBarTrackersAnimationManager,
+    private val standardizedLeadingIconToggle: StandardizedLeadingIconFeatureToggle,
 ) : ViewModel() {
 
     private val isSplitOmnibarEnabled = settingsDataStore.omnibarType == OmnibarType.SPLIT
@@ -465,8 +466,8 @@ class OmnibarLayoutViewModel @Inject constructor(
                     Dax
                 } else if (shouldShowDuckPlayerIcon(url)) {
                     DuckPlayer
-                } else if (isLocalUrl(url)) {
-                    // Show globe icon for localhost and private network addresses
+                } else if (standardizedLeadingIconToggle.self().isEnabled() && isLocalUrl(url)) {
+                    // Show globe icon for localhost and private network addresses (gated by feature flag)
                     Globe
                 } else {
                     if (url.isEmpty()) {

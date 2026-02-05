@@ -40,6 +40,8 @@ import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckplayer.api.DuckPlayer
+import com.duckduckgo.feature.toggles.api.FakeToggleStore
+import com.duckduckgo.feature.toggles.api.FeatureToggles
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels
 import com.duckduckgo.serp.logos.api.SerpEasterEggLogosToggles
 import com.duckduckgo.serp.logos.api.SerpLogo
@@ -104,6 +106,7 @@ class OmnibarLayoutViewModelTest {
     private val androidBrowserToggles: AndroidBrowserConfigFeature = mock()
     private val addressBarTrackersAnimationManager: AddressBarTrackersAnimationManager = mock()
 
+    private lateinit var fakeStandardizedLeadingIconToggle: StandardizedLeadingIconFeatureToggle
     private lateinit var testee: OmnibarLayoutViewModel
 
     private val EMPTY_URL = ""
@@ -128,6 +131,11 @@ class OmnibarLayoutViewModelTest {
         runBlocking {
             whenever(addressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(false)
         }
+
+        fakeStandardizedLeadingIconToggle = FeatureToggles.Builder(
+            FakeToggleStore(),
+            featureName = "standardizedLeadingIcon",
+        ).build().create(StandardizedLeadingIconFeatureToggle::class.java)
 
         initializeViewModel()
     }
@@ -172,6 +180,7 @@ class OmnibarLayoutViewModelTest {
             serpEasterEggLogosToggles = serpEasterEggLogosToggles,
             androidBrowserToggles = androidBrowserToggles,
             addressBarTrackersAnimationManager = addressBarTrackersAnimationManager,
+            standardizedLeadingIconToggle = fakeStandardizedLeadingIconToggle,
         )
     }
 
