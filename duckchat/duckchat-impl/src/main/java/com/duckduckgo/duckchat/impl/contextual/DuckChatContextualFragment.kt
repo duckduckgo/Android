@@ -888,6 +888,7 @@ class DuckChatContextualFragment :
     }
 
     override fun onPause() {
+        viewModel.persistTabClosed()
         downloadMessagesJob.cancel()
         simpleWebview.onPause()
         appCoroutineScope.launch(dispatcherProvider.io()) {
