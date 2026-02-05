@@ -91,7 +91,7 @@ val Uri.isLocalUrl: Boolean
 
         // Try to parse as numeric IP address (both IPv4 and IPv6)
         val addr = runCatching {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            if (Build.VERSION.SDK_INT >= 29) {
                 android.net.InetAddresses.parseNumericAddress(host)
             } else {
                 // Fallback for pre-Q: use InetAddress.getByName (already validated above)

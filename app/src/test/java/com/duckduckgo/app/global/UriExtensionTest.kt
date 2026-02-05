@@ -17,7 +17,6 @@
 package com.duckduckgo.app.global
 
 import android.net.Uri
-import android.os.Build
 import androidx.core.net.toUri
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.common.utils.absoluteString
@@ -40,7 +39,7 @@ import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
 
 @RunWith(AndroidJUnit4::class)
-@Config(sdk = [Build.VERSION_CODES.Q])  // Ensure Uri properly parses IPv6 addresses
+@Config(sdk = [29])  // Ensure Uri properly parses IPv6 addresses
 class UriExtensionTest {
 
     @Test
