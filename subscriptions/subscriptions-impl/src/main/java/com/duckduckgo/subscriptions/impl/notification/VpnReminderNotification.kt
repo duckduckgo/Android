@@ -140,6 +140,7 @@ class VpnReminderNotificationPlugin @Inject constructor(
     override fun getLaunchIntent(): PendingIntent? {
         val intent = globalActivityStarter.startIntent(context, NetworkProtectionManagementScreenNoParams)
             ?: return null
+        intent.putExtra(LAUNCH_FROM_NOTIFICATION_PIXEL_NAME, pixelName(NOTIFICATION_LAUNCHED_PIXEL))
         return taskStackBuilderFactory.createTaskBuilder().run {
             addNextIntentWithParentStack(intent)
             getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
@@ -147,7 +148,9 @@ class VpnReminderNotificationPlugin @Inject constructor(
     }
 
     companion object {
+        const val LAUNCH_FROM_NOTIFICATION_PIXEL_NAME = "LAUNCH_FROM_NOTIFICATION_PIXEL_NAME"
         private const val NOTIFICATION_SHOWN_PIXEL = "mnot_s"
         private const val NOTIFICATION_CANCELLED_PIXEL = "mnot_c"
+        private const val NOTIFICATION_LAUNCHED_PIXEL = "mnot_l"
     }
 }

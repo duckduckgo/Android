@@ -93,6 +93,9 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var dispatcherProvider: DispatcherProvider
 
+    @Inject
+    lateinit var pixel: com.duckduckgo.app.statistics.pixels.Pixel
+
     private val binding: ActivityNetpManagementBinding by viewBinding()
     private val viewModel: NetworkProtectionManagementViewModel by bindViewModel()
     private val vpnPermissionRequestActivityResult =
@@ -120,6 +123,10 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
             if (shouldEnable) {
                 checkVPNPermission()
             }
+        }
+
+        intent.getStringExtra(LAUNCH_FROM_NOTIFICATION_PIXEL_NAME)?.let { pixelName ->
+            pixel.fire(pixelName)
         }
 
         observeViewModel()
@@ -181,9 +188,9 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
 
     private fun renderViewState(viewState: ViewState) {
         when (viewState.connectionState) {
-            ConnectionState.Connecting -> binding.renderConnectingState()
-            ConnectionState.Connected -> viewState.connectionDetails?.let { binding.renderConnectedState(it) }
-            ConnectionState.Disconnected -> binding.renderDisconnectedState()
+            Connecting -> binding.renderConnectingState()
+            Connected -> viewState.connectionDetails?.let { binding.renderConnectedState(it) }
+            Disconnected -> binding.renderDisconnectedState()
             else -> {}
         }
 
@@ -546,6 +553,7 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
     }
 
     companion object {
+        private const val LAUNCH_FROM_NOTIFICATION_PIXEL_NAME = "LAUNCH_FROM_NOTIFICATION_PIXEL_NAME"
         private const val REPORT_ISSUES_ANNOTATION = "report_issues_link"
         private const val OPEN_SETTINGS_ANNOTATION = "open_settings_link"
         private const val TAG_PROMOTION_DIALOG = "TAG_PROMO_DIALOG"
