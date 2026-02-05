@@ -19,6 +19,8 @@ package com.duckduckgo.subscriptions.impl
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.subscriptions.api.Product
 import com.duckduckgo.subscriptions.api.Subscriptions
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -39,7 +41,7 @@ class EntitlementTargetMatcherPluginTest {
 
     @Test
     fun whenEntitlementIsNullThenReturnTrue() = runTest {
-        whenever(subscriptions.getAvailableProducts()).thenReturn(emptySet())
+        whenever(subscriptions.getEntitlementStatus()).thenReturn(emptyFlow())
         val target = NULL_TARGET.copy(entitlement = null)
 
         val result = matcher.matchesTargetProperty(target)
@@ -48,8 +50,8 @@ class EntitlementTargetMatcherPluginTest {
     }
 
     @Test
-    fun whenEntitlementIsNullAndUserHasProductsThenReturnTrue() = runTest {
-        whenever(subscriptions.getAvailableProducts()).thenReturn(setOf(Product.PIR, Product.NetP))
+    fun whenEntitlementIsNullAndUserHasEntitlementsThenReturnTrue() = runTest {
+        whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(listOf(Product.PIR, Product.NetP)))
         val target = NULL_TARGET.copy(entitlement = null)
 
         val result = matcher.matchesTargetProperty(target)
@@ -58,8 +60,8 @@ class EntitlementTargetMatcherPluginTest {
     }
 
     @Test
-    fun whenEntitlementMatchesUserProductThenReturnTrue() = runTest {
-        whenever(subscriptions.getAvailableProducts()).thenReturn(setOf(Product.PIR))
+    fun whenEntitlementMatchesUserEntitlementThenReturnTrue() = runTest {
+        whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(listOf(Product.PIR)))
         val target = NULL_TARGET.copy(entitlement = Product.PIR.value)
 
         val result = matcher.matchesTargetProperty(target)
@@ -68,8 +70,18 @@ class EntitlementTargetMatcherPluginTest {
     }
 
     @Test
-    fun whenEntitlementDoesNotMatchAnyUserProductThenReturnFalse() = runTest {
-        whenever(subscriptions.getAvailableProducts()).thenReturn(setOf(Product.NetP))
+    fun whenEntitlementDoesNotMatchAnyUserEntitlementhenReturnFalse() = runTest {
+        whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(listOf(Product.NetP)))
+        val target = NULL_TARGET.copy(entitlement = Product.PIR.value)
+
+        val result = matcher.matchesTargetProperty(target)
+
+        assertFalse(result)
+    }
+
+    @Test
+    fun whenUserHasNoFlowEntitlementAndEntitlementIsSetThenReturnFalse() = runTest {
+        whenever(subscriptions.getEntitlementStatus()).thenReturn(emptyFlow())
         val target = NULL_TARGET.copy(entitlement = Product.PIR.value)
 
         val result = matcher.matchesTargetProperty(target)
@@ -79,7 +91,7 @@ class EntitlementTargetMatcherPluginTest {
 
     @Test
     fun whenUserHasNoProductsAndEntitlementIsSetThenReturnFalse() = runTest {
-        whenever(subscriptions.getAvailableProducts()).thenReturn(emptySet())
+        whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(emptyList()))
         val target = NULL_TARGET.copy(entitlement = Product.PIR.value)
 
         val result = matcher.matchesTargetProperty(target)
@@ -88,8 +100,8 @@ class EntitlementTargetMatcherPluginTest {
     }
 
     @Test
-    fun whenUserHasMultipleProductsAndEntitlementMatchesOneThenReturnTrue() = runTest {
-        whenever(subscriptions.getAvailableProducts()).thenReturn(setOf(Product.NetP, Product.ITR, Product.PIR))
+    fun whenUserHasMultipleEntitlementsAndEntitlementMatchesOneThenReturnTrue() = runTest {
+        whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(listOf(Product.NetP, Product.ITR, Product.PIR)))
         val target = NULL_TARGET.copy(entitlement = Product.ITR.value)
 
         val result = matcher.matchesTargetProperty(target)
@@ -99,7 +111,7 @@ class EntitlementTargetMatcherPluginTest {
 
     @Test
     fun whenEntitlementIsUnknownValueThenReturnFalse() = runTest {
-        whenever(subscriptions.getAvailableProducts()).thenReturn(setOf(Product.PIR, Product.NetP))
+        whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(listOf(Product.PIR, Product.NetP)))
         val target = NULL_TARGET.copy(entitlement = "Unknown Product")
 
         val result = matcher.matchesTargetProperty(target)

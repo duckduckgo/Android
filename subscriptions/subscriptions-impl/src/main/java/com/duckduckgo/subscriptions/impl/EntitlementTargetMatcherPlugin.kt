@@ -20,6 +20,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.squareup.anvil.annotations.ContributesMultibinding
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
@@ -30,7 +31,7 @@ class EntitlementTargetMatcherPlugin @Inject constructor(
     override fun matchesTargetProperty(target: Toggle.State.Target): Boolean {
         return target.entitlement?.let { entitlement ->
             runBlocking {
-                subscriptions.getAvailableProducts().any { it.value == entitlement }
+                subscriptions.getEntitlementStatus().firstOrNull()?.any { it.value == entitlement } ?: false
             }
         } ?: true
     }
