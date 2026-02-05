@@ -1,0 +1,10 @@
+plugins {
+    id 'java-library'
+    id 'kotlin'
+}
+
+apply from: "$rootProject.projectDir/gradle/jvm-convention.gradle"
+
+dependencies {
+    implementation libs.kotlinStdLib
+}
