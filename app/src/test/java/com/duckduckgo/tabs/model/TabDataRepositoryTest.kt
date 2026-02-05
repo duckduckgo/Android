@@ -29,6 +29,7 @@ import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.model.SiteFactoryImpl
+import com.duckduckgo.app.browser.omnibar.StandardizedLeadingIconFeatureToggle
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.tabs.TabManagerFeatureFlags
 import com.duckduckgo.app.tabs.db.TabsDao
@@ -89,6 +90,7 @@ class TabDataRepositoryTest {
     private val mockDao: TabsDao = mock()
 
     private val mockDuckPlayer: DuckPlayer = mock()
+    private val mockStandardizedLeadingIconToggle: StandardizedLeadingIconFeatureToggle = mock()
 
     private val daoDeletableTabs = Channel<List<TabEntity>>()
 
@@ -757,6 +759,7 @@ class TabDataRepositoryTest {
                 coroutinesTestRule.testDispatcherProvider,
                 duckDuckGoUrlDetector,
                 mockDuckPlayer,
+                mockStandardizedLeadingIconToggle,
             ),
             webViewPreviewPersister,
             faviconManager,

@@ -34,6 +34,7 @@ import com.duckduckgo.app.trackerdetection.model.TrackerStatus
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.browser.api.brokensite.BrokenSiteContext
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.app.browser.omnibar.StandardizedLeadingIconFeatureToggle
 import com.duckduckgo.common.utils.isHttps
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.feature.toggles.api.Toggle
@@ -56,6 +57,7 @@ class SiteMonitor(
     dispatcherProvider: DispatcherProvider,
     brokenSiteContext: BrokenSiteContext,
     private val duckPlayer: DuckPlayer,
+    private val standardizedLeadingIconToggle: StandardizedLeadingIconFeatureToggle,
 ) : Site {
 
     override var url: String = url
@@ -167,14 +169,20 @@ class SiteMonitor(
     }
 
     override fun privacyProtection(): PrivacyShield {
-        val isUserAllowListed = domain?.let { userAllowListRepository.isDomainInUserAllowList(it) } ?: false
         userAllowList = domain?.let { isAllowListed(it) } ?: false
 
         if (maliciousSiteStatus != null) return MALICIOUS
         if (duckPlayer.isDuckPlayerUri(url)) return UNKNOWN
 
-        // Only show UNPROTECTED for user-initiated allowlist, not remote config exceptions
-        if (isUserAllowListed || !isHttps) return UNPROTECTED
+        if (standardizedLeadingIconToggle.self().isEnabled()) {
+            // When feature is enabled, only show UNPROTECTED for user-initiated allowlist,
+            // not remote config exceptions
+            val isUserAllowListed = domain?.let { userAllowListRepository.isDomainInUserAllowList(it) } ?: false
+            if (isUserAllowListed || !isHttps) return UNPROTECTED
+        } else {
+            // Legacy behavior: show UNPROTECTED for both user allowlist and remote config exceptions
+            if (userAllowList || !isHttps) return UNPROTECTED
+        }
 
         if (!fullSiteDetailsAvailable) {
             logcat(INFO) { "Shield: not fullSiteDetailsAvailable for $domain" }
