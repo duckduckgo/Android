@@ -24,6 +24,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
@@ -106,6 +107,7 @@ class NetworkProtectionManagementViewModel @Inject constructor(
     private val localConfig: NetPSettingsLocalConfig,
     private val autoExcludePrompt: AutoExcludePrompt,
     private val vpnEnableWideEvent: VpnEnableWideEvent,
+    private val pixel: Pixel,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     private val refreshVpnRunningState = MutableStateFlow(System.currentTimeMillis())
@@ -439,6 +441,10 @@ class NetworkProtectionManagementViewModel @Inject constructor(
 
     fun onExcludeAppSelected() {
         networkProtectionPixels.reportExcludePromptExcludeAppClicked()
+    }
+
+    fun onLaunchedFromNotification(pixelName: String) {
+        pixel.fire(pixelName)
     }
 
     sealed class Command {

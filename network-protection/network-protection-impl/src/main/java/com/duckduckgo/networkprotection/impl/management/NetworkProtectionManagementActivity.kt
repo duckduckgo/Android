@@ -93,9 +93,6 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var dispatcherProvider: DispatcherProvider
 
-    @Inject
-    lateinit var pixel: com.duckduckgo.app.statistics.pixels.Pixel
-
     private val binding: ActivityNetpManagementBinding by viewBinding()
     private val viewModel: NetworkProtectionManagementViewModel by bindViewModel()
     private val vpnPermissionRequestActivityResult =
@@ -126,7 +123,7 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
         }
 
         intent.getStringExtra(LAUNCH_FROM_NOTIFICATION_PIXEL_NAME)?.let { pixelName ->
-            pixel.fire(pixelName)
+            viewModel.onLaunchedFromNotification(pixelName)
         }
 
         observeViewModel()
