@@ -85,19 +85,15 @@ val Uri.isLocalUrl: Boolean
         val host = this.host?.lowercase() ?: return false
         if (host == "localhost") return true
 
-        // Pre-validate that host looks like a numeric IP address
-        // This prevents malformed IPs and domain names from being parsed
-        if (!host.looksLikeNumericAddress()) return false
-
-        // Try to parse as numeric IP address (both IPv4 and IPv6)
-        val addr = runCatching {
-            if (Build.VERSION.SDK_INT >= 29) {
-                android.net.InetAddresses.parseNumericAddress(host)
-            } else {
-                // Fallback for pre-Q: use InetAddress.getByName (already validated above)
-                InetAddress.getByName(host)
-            }
-        }.getOrNull() ?: return false
+        // Use InetAddresses.parseNumericAddress (API 29+) which only parses numeric IPs
+        // and never performs DNS resolution. On API 26-28, fall back to strict IPv4-only
+        // validation to avoid InetAddress.getByName() which can trigger DNS lookups.
+        val addr = if (Build.VERSION.SDK_INT >= 29) {
+            runCatching { android.net.InetAddresses.parseNumericAddress(host) }.getOrNull()
+        } else {
+            // Pre-29: only handle IPv4 addresses with strict validation
+            host.parseAsStrictIPv4()
+        } ?: return false
 
         // Check if it's a loopback, site-local (private IPv4), or link-local (IPv6) address
         // For IPv6, also check for unique local addresses (fc00::/7) manually
@@ -105,19 +101,19 @@ val Uri.isLocalUrl: Boolean
     }
 
 /**
- * Quick check if a string looks like a numeric IP address (IPv4 or IPv6).
- * Prevents attempting to parse domain names or malformed addresses.
+ * Strictly parses a string as an IPv4 address without DNS resolution.
+ * Returns null if the string is not a valid IPv4 address (exactly 4 octets, each 0-255).
  */
-private fun String.looksLikeNumericAddress(): Boolean {
-    // IPv6: contains colons
-    if (contains(':')) return true
-
-    // IPv4: exactly 4 parts separated by dots, each 0-255
+private fun String.parseAsStrictIPv4(): InetAddress? {
     val parts = split('.')
-    if (parts.size != 4) return false
-    return parts.all { part ->
-        part.toIntOrNull()?.let { it in 0..255 } ?: false
+    if (parts.size != 4) return null
+    val bytes = ByteArray(4)
+    for (i in parts.indices) {
+        val octet = parts[i].toIntOrNull() ?: return null
+        if (octet !in 0..255) return null
+        bytes[i] = octet.toByte()
     }
+    return InetAddress.getByAddress(bytes)
 }
 
 /**
