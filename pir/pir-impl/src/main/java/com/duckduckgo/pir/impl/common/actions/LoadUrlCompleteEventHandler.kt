@@ -66,6 +66,7 @@ class LoadUrlCompleteEventHandler @Inject constructor() : EventHandler {
                         currentBrokerStepIndex = 0,
                         currentActionIndex = 0,
                         pendingUrl = null,
+                        preseeding = false,
                     ),
                     nextEvent = ExecuteNextBrokerStep,
                 )
@@ -78,6 +79,7 @@ class LoadUrlCompleteEventHandler @Inject constructor() : EventHandler {
                     nextState =
                     state.copy(
                         pendingUrl = null,
+                        preseeding = false,
                     ),
                     nextEvent = BrokerStepCompleted(
                         needsEmailConfirmation = false,
