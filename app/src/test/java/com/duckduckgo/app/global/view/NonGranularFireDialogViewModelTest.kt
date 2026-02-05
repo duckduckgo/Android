@@ -19,6 +19,7 @@ package com.duckduckgo.app.global.view
 import app.cash.turbine.test
 import com.duckduckgo.app.fire.ManualDataClearing
 import com.duckduckgo.app.fire.store.FireDataStore
+import com.duckduckgo.app.fire.wideevents.DataClearingWideEvent
 import com.duckduckgo.app.firebutton.FireButtonStore
 import com.duckduckgo.app.global.events.db.UserEventKey
 import com.duckduckgo.app.global.events.db.UserEventsStore
@@ -64,6 +65,7 @@ class NonGranularFireDialogViewModelTest {
     private val mockFireButtonStore: FireButtonStore = mock()
     private val mockDispatcherProvider: DispatcherProvider = mock()
     private val mockDateProvider: DateProvider = mock()
+    private val dataClearingWideEvent: DataClearingWideEvent = mock()
 
     @Before
     fun setup() {
@@ -86,6 +88,7 @@ class NonGranularFireDialogViewModelTest {
         fireButtonStore = mockFireButtonStore,
         dispatcherProvider = mockDispatcherProvider,
         dateProvider = mockDateProvider,
+        dataClearingWideEvent = dataClearingWideEvent,
     )
 
     @Test

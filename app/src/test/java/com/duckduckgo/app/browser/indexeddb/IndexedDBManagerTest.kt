@@ -25,6 +25,7 @@ import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.squareup.moshi.Moshi
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -71,6 +72,9 @@ class IndexedDBManagerTest {
 
         whenever(mockFeature.indexedDB()).thenReturn(mockIndexedDBToggle)
         whenever(mockFeature.fireproofedIndexedDB()).thenReturn(mockFireproofToggle)
+        runBlocking {
+            whenever(mockFileDeleter.deleteContents(any(), any())).thenReturn(Result.success(Unit))
+        }
     }
 
     @Test
