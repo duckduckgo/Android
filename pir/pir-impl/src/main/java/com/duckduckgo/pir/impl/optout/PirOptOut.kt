@@ -272,7 +272,7 @@ class RealPirOptOut @Inject constructor(
         webView: WebView,
     ): Result<Unit> = withContext(dispatcherProvider.io()) {
         onJobStarted()
-        emitStartPixel()
+
         if (runners.isNotEmpty()) {
             cleanRunners()
         }
