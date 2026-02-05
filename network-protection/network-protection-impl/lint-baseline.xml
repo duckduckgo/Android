@@ -140,7 +140,7 @@
         errorLine2="                                                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/networkprotection/impl/quickaccess/VpnTileService.kt"
-            line="93"
+            line="99"
             column="54"/>
     </issue>
 

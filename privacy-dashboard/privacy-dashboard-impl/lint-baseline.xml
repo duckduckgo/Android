@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="6" by="lint 8.7.3" type="baseline" client="gradle" dependencies="false" name="AGP (8.7.3)" variant="all" version="8.7.3">
+<issues format="6" by="lint 8.8.2" type="baseline" client="gradle" dependencies="false" name="AGP (8.7.3)" variant="all" version="8.8.2">
 
     <issue
         id="DenyListedApi"
@@ -19,7 +19,7 @@
         errorLine2="                                         ~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/privacy/dashboard/impl/ui/PrivacyDashboardHybridViewModelTest.kt"
-            line="81"
+            line="79"
             column="42"/>
     </issue>
 
