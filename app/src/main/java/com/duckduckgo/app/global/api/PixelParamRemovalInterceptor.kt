@@ -113,6 +113,7 @@ object PixelInterceptorPixelsRequiringDataCleaning : PixelParamRemovalPlugin {
             AppPixelName.SETTINGS_SYNC_PRESSED.pixelName to PixelParameter.removeAtb(),
             AppPixelName.SETTINGS_PASSWORDS_PRESSED.pixelName to PixelParameter.removeAtb(),
             AppPixelName.SETTINGS_EMAIL_PROTECTION_PRESSED.pixelName to PixelParameter.removeAtb(),
+            AppPixelName.SETTINGS_WHATS_NEW_PRESSED.pixelName to PixelParameter.removeAtb(),
             AppPixelName.ONBOARDING_DAX_CTA_DISMISS_BUTTON.pixelName to PixelParameter.removeAtb(),
             AppPixelName.TAB_MANAGER_INFO_PANEL_IMPRESSIONS.pixelName to PixelParameter.removeAll(),
             AppPixelName.TAB_MANAGER_INFO_PANEL_DISMISSED.pixelName to PixelParameter.removeAll(),

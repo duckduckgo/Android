@@ -1,0 +1,10 @@
+// Settings screen pixels
+{
+    "ms_whats_new_setting_pressed": {
+        "description": "Fired when the user clicks the 'What's New' option in settings.",
+        "owners": ["catalinradoiu"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    }
+}
