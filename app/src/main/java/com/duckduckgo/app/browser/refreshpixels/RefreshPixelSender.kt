@@ -17,6 +17,7 @@
 package com.duckduckgo.app.browser.refreshpixels
 
 import com.duckduckgo.app.browser.customtabs.CustomTabPixelNames
+import com.duckduckgo.app.browser.menu.BrowserMenuDisplayRepository
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -30,6 +31,10 @@ import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import logcat.LogPriority.WARN
 import logcat.logcat
@@ -49,10 +54,22 @@ class DuckDuckGoRefreshPixelSender @Inject constructor(
     private val blockListPixelsPlugin: BlockListPixelsPlugin,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
+    browserMenuDisplayRepository: BrowserMenuDisplayRepository,
 ) : RefreshPixelSender {
+    private val useBottomSheetMenu: StateFlow<Boolean> = browserMenuDisplayRepository.browserMenuState
+        .map { it.hasOption && it.isEnabled }
+        .stateIn(
+            scope = appCoroutineScope,
+            started = SharingStarted.Eagerly,
+            initialValue = false,
+        )
 
     override fun sendMenuRefreshPixels() {
-        pixel.fire(AppPixelName.MENU_ACTION_REFRESH_PRESSED)
+        if (useBottomSheetMenu.value) {
+            pixel.fire(AppPixelName.EXPERIMENTAL_MENU_ACTION_REFRESH_PRESSED)
+        } else {
+            pixel.fire(AppPixelName.MENU_ACTION_REFRESH_PRESSED)
+        }
         pixel.fire(AppPixelName.REFRESH_ACTION_DAILY_PIXEL, type = Daily())
     }
 
@@ -62,7 +79,11 @@ class DuckDuckGoRefreshPixelSender @Inject constructor(
     }
 
     override fun sendCustomTabRefreshPixel() {
-        pixel.fire(CustomTabPixelNames.CUSTOM_TABS_MENU_REFRESH)
+        if (useBottomSheetMenu.value) {
+            pixel.fire(AppPixelName.EXPERIMENTAL_MENU_CUSTOM_TABS_MENU_REFRESH)
+        } else {
+            pixel.fire(CustomTabPixelNames.CUSTOM_TABS_MENU_REFRESH)
+        }
     }
 
     override fun onRefreshPatternDetected(patternsDetected: Set<RefreshPattern>) {

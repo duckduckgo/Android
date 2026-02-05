@@ -30,6 +30,8 @@ import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPr
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.Stage
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.UserType
+import com.duckduckgo.app.browser.menu.BrowserMenuDisplayRepository
+import com.duckduckgo.app.browser.menu.BrowserMenuDisplayState
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.UserStageStore
@@ -111,6 +113,8 @@ class AdditionalDefaultBrowserPromptsImplTest {
 
     @Mock private lateinit var pixelMock: Pixel
 
+    @Mock private lateinit var mockBrowserMenuDisplayRepository: BrowserMenuDisplayRepository
+
     private lateinit var dataStoreMock: DefaultBrowserPromptsDataStore
 
     private lateinit var fakeUserAppStageFlow: MutableSharedFlow<AppStage>
@@ -127,6 +131,9 @@ class AdditionalDefaultBrowserPromptsImplTest {
         whenever(moshiMock.adapter<FeatureSettingsConfigModel>(any())).thenReturn(featureSettingsJsonAdapterMock)
         fakeUserAppStageFlow = MutableSharedFlow()
         whenever(userStageStoreMock.userAppStageFlow()).thenReturn(fakeUserAppStageFlow)
+        whenever(mockBrowserMenuDisplayRepository.browserMenuState).thenReturn(
+            MutableStateFlow(BrowserMenuDisplayState(hasOption = false, isEnabled = false)),
+        )
     }
 
     @Test
@@ -821,6 +828,7 @@ class AdditionalDefaultBrowserPromptsImplTest {
         defaultBrowserDetector: DefaultBrowserDetector = defaultBrowserDetectorMock,
         defaultRoleBrowserDialog: DefaultRoleBrowserDialog = defaultRoleBrowserDialogMock,
         defaultBrowserPromptsAppUsageRepository: DefaultBrowserPromptsAppUsageRepository = defaultBrowserPromptsAppUsageRepositoryMock,
+        browserMenuDisplayRepository: BrowserMenuDisplayRepository = mockBrowserMenuDisplayRepository,
         userStageStore: UserStageStore = userStageStoreMock,
         defaultBrowserPromptsDataStore: DefaultBrowserPromptsDataStore = dataStoreMock,
         experimentStageEvaluator: DefaultBrowserPromptsFlowStageEvaluator = stageEvaluatorMock,
@@ -836,6 +844,7 @@ class AdditionalDefaultBrowserPromptsImplTest {
         defaultBrowserDetector = defaultBrowserDetector,
         defaultRoleBrowserDialog = defaultRoleBrowserDialog,
         defaultBrowserPromptsAppUsageRepository = defaultBrowserPromptsAppUsageRepository,
+        browserMenuDisplayRepository = browserMenuDisplayRepository,
         userStageStore = userStageStore,
         defaultBrowserPromptsDataStore = defaultBrowserPromptsDataStore,
         stageEvaluator = experimentStageEvaluator,

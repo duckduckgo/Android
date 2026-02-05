@@ -2481,10 +2481,18 @@ class BrowserTabViewModel @Inject constructor(
         viewModelScope.launch {
             val bookmark = currentBrowserViewState().bookmark
             if (bookmark != null) {
-                pixel.fire(AppPixelName.MENU_ACTION_EDIT_BOOKMARK_PRESSED.pixelName)
+                if (isBottomSheetMenuEnabled()) {
+                    pixel.fire(AppPixelName.EXPERIMENTAL_MENU_ACTION_EDIT_BOOKMARK_PRESSED)
+                } else {
+                    pixel.fire(AppPixelName.MENU_ACTION_EDIT_BOOKMARK_PRESSED)
+                }
                 onEditSavedSiteRequested(bookmark)
             } else {
-                pixel.fire(AppPixelName.MENU_ACTION_ADD_BOOKMARK_PRESSED.pixelName)
+                if (isBottomSheetMenuEnabled()) {
+                    pixel.fire(AppPixelName.EXPERIMENTAL_MENU_ACTION_ADD_BOOKMARK_PRESSED)
+                } else {
+                    pixel.fire(AppPixelName.MENU_ACTION_ADD_BOOKMARK_PRESSED)
+                }
                 saveSiteBookmark(url, title ?: "")
             }
         }
@@ -2555,10 +2563,18 @@ class BrowserTabViewModel @Inject constructor(
                 val fireproofWebsiteEntity = FireproofWebsiteEntity(domain)
                 fireproofWebsiteRepository.removeFireproofWebsite(fireproofWebsiteEntity)
                 command.value = DeleteFireproofConfirmation(fireproofWebsiteEntity = fireproofWebsiteEntity)
-                pixel.fire(AppPixelName.FIREPROOF_WEBSITE_REMOVE)
+                if (isBottomSheetMenuEnabled()) {
+                    pixel.fire(AppPixelName.EXPERIMENTAL_MENU_FIREPROOF_WEBSITE_REMOVE)
+                } else {
+                    pixel.fire(AppPixelName.FIREPROOF_WEBSITE_REMOVE)
+                }
             } else {
                 fireproofWebsiteRepository.fireproofWebsite(domain)?.let {
-                    pixel.fire(AppPixelName.FIREPROOF_WEBSITE_ADDED)
+                    if (isBottomSheetMenuEnabled()) {
+                        pixel.fire(AppPixelName.EXPERIMENTAL_MENU_FIREPROOF_WEBSITE_ADDED)
+                    } else {
+                        pixel.fire(AppPixelName.FIREPROOF_WEBSITE_ADDED)
+                    }
                     command.value = ShowFireproofWebSiteConfirmation(fireproofWebsiteEntity = it)
                     faviconManager.persistCachedFavicon(tabId, url = domain)
                 }
@@ -2721,9 +2737,17 @@ class BrowserTabViewModel @Inject constructor(
         clickedFromCustomTab: Boolean,
     ) {
         if (clickedFromCustomTab) {
-            pixel.fire(CustomTabPixelNames.CUSTOM_TABS_MENU_DISABLE_PROTECTIONS_ALLOW_LIST_ADD)
+            if (isBottomSheetMenuEnabled()) {
+                pixel.fire(AppPixelName.EXPERIMENTAL_MENU_CUSTOM_TABS_MENU_DISABLE_PROTECTIONS_ALLOW_LIST_ADD)
+            } else {
+                pixel.fire(CustomTabPixelNames.CUSTOM_TABS_MENU_DISABLE_PROTECTIONS_ALLOW_LIST_ADD)
+            }
         } else {
-            pixel.fire(AppPixelName.BROWSER_MENU_ALLOWLIST_ADD, type = Count)
+            if (isBottomSheetMenuEnabled()) {
+                pixel.fire(AppPixelName.EXPERIMENTAL_MENU_ALLOWLIST_ADD, type = Count)
+            } else {
+                pixel.fire(AppPixelName.BROWSER_MENU_ALLOWLIST_ADD, type = Count)
+            }
         }
         userAllowListRepository.addDomainToUserAllowList(domain)
         privacyProtectionTogglePlugin.getPlugins().forEach {
@@ -2739,9 +2763,17 @@ class BrowserTabViewModel @Inject constructor(
         clickedFromCustomTab: Boolean,
     ) {
         if (clickedFromCustomTab) {
-            pixel.fire(CustomTabPixelNames.CUSTOM_TABS_MENU_DISABLE_PROTECTIONS_ALLOW_LIST_REMOVE)
+            if (isBottomSheetMenuEnabled()) {
+                pixel.fire(AppPixelName.EXPERIMENTAL_MENU_CUSTOM_TABS_MENU_DISABLE_PROTECTIONS_ALLOW_LIST_REMOVE)
+            } else {
+                pixel.fire(CustomTabPixelNames.CUSTOM_TABS_MENU_DISABLE_PROTECTIONS_ALLOW_LIST_REMOVE)
+            }
         } else {
-            pixel.fire(AppPixelName.BROWSER_MENU_ALLOWLIST_REMOVE, type = Count)
+            if (isBottomSheetMenuEnabled()) {
+                pixel.fire(AppPixelName.EXPERIMENTAL_MENU_ALLOWLIST_REMOVE, type = Count)
+            } else {
+                pixel.fire(AppPixelName.BROWSER_MENU_ALLOWLIST_REMOVE, type = Count)
+            }
         }
         userAllowListRepository.removeDomainFromUserAllowList(domain)
         privacyProtectionTogglePlugin.getPlugins().forEach {
@@ -2862,6 +2894,7 @@ class BrowserTabViewModel @Inject constructor(
     fun onChangeBrowserModeClicked() {
         val currentBrowserViewState = currentBrowserViewState()
         val desktopSiteRequested = !currentBrowserViewState().isDesktopBrowsingMode
+        val useBottomSheetEnabled = isBottomSheetMenuEnabled()
         browserViewState.value = currentBrowserViewState.copy(isDesktopBrowsingMode = desktopSiteRequested)
         command.value = RefreshUserAgent(site?.uri?.toString(), desktopSiteRequested)
         site?.isDesktopMode = desktopSiteRequested
@@ -2870,9 +2903,17 @@ class BrowserTabViewModel @Inject constructor(
 
         pixel.fire(
             if (desktopSiteRequested) {
-                AppPixelName.MENU_ACTION_DESKTOP_SITE_ENABLE_PRESSED
+                if (useBottomSheetEnabled) {
+                    AppPixelName.EXPERIMENTAL_MENU_ACTION_DESKTOP_SITE_ENABLE_PRESSED
+                } else {
+                    AppPixelName.MENU_ACTION_DESKTOP_SITE_ENABLE_PRESSED
+                }
             } else {
-                AppPixelName.MENU_ACTION_DESKTOP_SITE_DISABLE_PRESSED
+                if (useBottomSheetEnabled) {
+                    AppPixelName.EXPERIMENTAL_MENU_ACTION_DESKTOP_SITE_DISABLE_PRESSED
+                } else {
+                    AppPixelName.MENU_ACTION_DESKTOP_SITE_DISABLE_PRESSED
+                }
             },
         )
 
@@ -3048,9 +3089,17 @@ class BrowserTabViewModel @Inject constructor(
             val url = site?.url
             if (url != null) {
                 if (duckDuckGoUrlDetector.isDuckDuckGoUrl(url)) {
-                    pixel.fire(AppPixelName.MENU_ACTION_NEW_TAB_PRESSED_FROM_SERP)
+                    if (isBottomSheetMenuEnabled()) {
+                        pixel.fire(AppPixelName.EXPERIMENTAL_MENU_ACTION_NEW_TAB_PRESSED_FROM_SERP)
+                    } else {
+                        pixel.fire(AppPixelName.MENU_ACTION_NEW_TAB_PRESSED_FROM_SERP)
+                    }
                 } else {
-                    pixel.fire(AppPixelName.MENU_ACTION_NEW_TAB_PRESSED_FROM_SITE)
+                    if (isBottomSheetMenuEnabled()) {
+                        pixel.fire(AppPixelName.EXPERIMENTAL_MENU_ACTION_NEW_TAB_PRESSED_FROM_SITE)
+                    } else {
+                        pixel.fire(AppPixelName.MENU_ACTION_NEW_TAB_PRESSED_FROM_SITE)
+                    }
                 }
             }
         }
@@ -3250,7 +3299,11 @@ class BrowserTabViewModel @Inject constructor(
 
     fun onPrintSelected() {
         url?.let {
-            pixel.fire(AppPixelName.MENU_ACTION_PRINT_PRESSED)
+            if (isBottomSheetMenuEnabled()) {
+                pixel.fire(AppPixelName.EXPERIMENTAL_MENU_ACTION_PRINT_PRESSED)
+            } else {
+                pixel.fire(AppPixelName.MENU_ACTION_PRINT_PRESSED)
+            }
             command.value = PrintLink(removeAtbAndSourceParamsFromSearch(it), defaultMediaSize())
         }
     }
@@ -3371,6 +3424,8 @@ class BrowserTabViewModel @Inject constructor(
         return fireproofWebsites?.any { it.domain == domain } ?: false
     }
 
+    private fun isBottomSheetMenuEnabled(): Boolean = browserViewState.value?.useBottomSheetMenu ?: false
+
     private fun invalidateBrowsingActions() {
         globalLayoutState.value = Invalidated
         loadingViewState.value = LoadingViewState()
@@ -3474,8 +3529,13 @@ class BrowserTabViewModel @Inject constructor(
     fun consumeAliasAndCopyToClipboard() {
         emailManager.getAlias()?.let {
             command.value = CopyAliasToClipboard(it)
+            val pixelName = if (isBottomSheetMenuEnabled()) {
+                AppPixelName.EXPERIMENTAL_MENU_EMAIL_COPIED_TO_CLIPBOARD
+            } else {
+                AppPixelName.EMAIL_COPIED_TO_CLIPBOARD
+            }
             pixel.enqueueFire(
-                AppPixelName.EMAIL_COPIED_TO_CLIPBOARD,
+                pixelName,
                 mapOf(
                     PixelParameter.COHORT to emailManager.getCohort(),
                     PixelParameter.LAST_USED_DAY to emailManager.getLastUsedDate(),
@@ -4568,7 +4628,11 @@ class BrowserTabViewModel @Inject constructor(
 
     fun openNewDuckChat(viewMode: ViewMode) {
         if (viewMode == ViewMode.DuckAI) {
-            pixel.fire(DuckChatPixelName.DUCK_CHAT_OMNIBAR_NEW_CHAT_TAPPED)
+            if (isBottomSheetMenuEnabled()) {
+                pixel.fire(AppPixelName.EXPERIMENTAL_MENU_DUCK_CHAT_OMNIBAR_NEW_CHAT_TAPPED)
+            } else {
+                pixel.fire(DuckChatPixelName.DUCK_CHAT_OMNIBAR_NEW_CHAT_TAPPED)
+            }
             viewModelScope.launch {
                 val subscriptionEvent = duckChatJSHelper.onNativeAction(NativeAction.NEW_CHAT)
                 _subscriptionEventDataChannel.send(subscriptionEvent)
@@ -4576,7 +4640,11 @@ class BrowserTabViewModel @Inject constructor(
         } else {
             val url = duckChat.getDuckChatUrl("", false)
             command.value = OpenInNewTab(url, tabId)
-            pixel.fire(DuckChatPixelName.DUCK_CHAT_SETTINGS_NEW_CHAT_TAB_TAPPED)
+            if (isBottomSheetMenuEnabled()) {
+                pixel.fire(AppPixelName.EXPERIMENTAL_MENU_DUCK_CHAT_SETTINGS_NEW_CHAT_TAB_TAPPED)
+            } else {
+                pixel.fire(DuckChatPixelName.DUCK_CHAT_SETTINGS_NEW_CHAT_TAB_TAPPED)
+            }
         }
     }
 
@@ -4589,7 +4657,11 @@ class BrowserTabViewModel @Inject constructor(
 
     fun openDuckChatSettings() {
         viewModelScope.launch {
-            pixel.fire(DuckChatPixelName.DUCK_CHAT_DUCK_AI_SETTINGS_TAPPED)
+            if (isBottomSheetMenuEnabled()) {
+                pixel.fire(AppPixelName.EXPERIMENTAL_MENU_DUCK_CHAT_DUCK_AI_SETTINGS_TAPPED)
+            } else {
+                pixel.fire(DuckChatPixelName.DUCK_CHAT_DUCK_AI_SETTINGS_TAPPED)
+            }
             val subscriptionEvent = duckChatJSHelper.onNativeAction(NativeAction.DUCK_AI_SETTINGS)
             _subscriptionEventDataChannel.send(subscriptionEvent)
         }
@@ -4599,7 +4671,11 @@ class BrowserTabViewModel @Inject constructor(
         viewModelScope.launch {
             command.value = HideKeyboardForChat
             val params = duckChat.createWasUsedBeforePixelParams()
-            pixel.fire(DuckChatPixelName.DUCK_CHAT_OPEN_BROWSER_MENU, parameters = params)
+            if (isBottomSheetMenuEnabled()) {
+                pixel.fire(AppPixelName.EXPERIMENTAL_MENU_DUCK_CHAT_OPEN_BROWSER_MENU, parameters = params)
+            } else {
+                pixel.fire(DuckChatPixelName.DUCK_CHAT_OPEN_BROWSER_MENU, parameters = params)
+            }
         }
         duckChat.openDuckChat()
     }
@@ -4696,6 +4772,11 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private fun launchBookmarksActivity() {
+        if (isBottomSheetMenuEnabled()) {
+            pixel.fire(AppPixelName.EXPERIMENTAL_MENU_ACTION_BOOKMARKS_PRESSED)
+        } else {
+            pixel.fire(AppPixelName.MENU_ACTION_BOOKMARKS_PRESSED)
+        }
         command.value = LaunchBookmarksActivity
     }
 

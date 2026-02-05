@@ -1166,7 +1166,7 @@ class BrowserTabFragment :
                     isTopOmnibar = isTopOmnibar,
                     browserButtonsConfig = InputScreenBrowserButtonsConfig.Enabled(tabs = viewModel.tabs.value?.size ?: 0),
                     launchOnChat = omnibar.viewMode == ViewMode.DuckAI,
-                    useBottomSheetMenu = viewModel.browserViewState.value?.useBottomSheetMenu ?: false,
+                    useBottomSheetMenu = isBottomSheetMenuEnabled(),
                 ),
             )
         val enterTransition = browserAndInputScreenTransitionProvider.getInputScreenEnterAnimation(isTopOmnibar)
@@ -1358,8 +1358,7 @@ class BrowserTabFragment :
     }
 
     private fun createBrowserMenu() {
-        val useBottomSheetMenu = viewModel.browserViewState.value?.useBottomSheetMenu ?: false
-        if (useBottomSheetMenu) {
+        if (isBottomSheetMenuEnabled()) {
             createBottomSheetMenu()
         } else {
             createPopupMenuClassic()
@@ -1373,8 +1372,7 @@ class BrowserTabFragment :
             customTabsMode = tabDisplayedInCustomTabScreen,
         )
         logcat { "BrowserMenu: viewMode ${omnibar.viewMode} render browseMenuState $browseMenuState" }
-        val useBottomSheetMenu = viewModel.browserViewState.value?.useBottomSheetMenu ?: false
-        if (useBottomSheetMenu) {
+        if (isBottomSheetMenuEnabled()) {
             val resId = com.duckduckgo.mobile.android.R.drawable.ic_menu_hamburger_24
             omnibar.configureBrowserMenuIcon(resId)
             browserNavigationBarIntegration.configureBrowserMenuIcon(resId)
@@ -1556,22 +1554,22 @@ class BrowserTabFragment :
                 viewModel.onBookmarkMenuClicked()
             }
             onMenuItemClicked(findInPageMenuItem) {
-                pixel.fire(AppPixelName.MENU_ACTION_FIND_IN_PAGE_PRESSED)
+                pixel.fire(AppPixelName.EXPERIMENTAL_MENU_ACTION_FIND_IN_PAGE_PRESSED)
                 viewModel.onFindInPageSelected()
             }
             onMenuItemClicked(privacyProtectionMenuItem) {
                 viewModel.onPrivacyProtectionMenuClicked(clickedFromCustomTab = isActiveCustomTab())
             }
             onMenuItemClicked(brokenSiteMenuItem) {
-                pixel.fire(AppPixelName.MENU_ACTION_REPORT_BROKEN_SITE_PRESSED)
+                pixel.fire(AppPixelName.EXPERIMENTAL_MENU_ACTION_REPORT_BROKEN_SITE_PRESSED)
                 viewModel.onBrokenSiteSelected()
             }
             onMenuItemClicked(downloadsMenuItem) {
-                pixel.fire(AppPixelName.MENU_ACTION_DOWNLOADS_PRESSED)
+                pixel.fire(AppPixelName.EXPERIMENTAL_MENU_ACTION_DOWNLOADS_PRESSED)
                 browserActivity?.launchDownloads()
             }
             onMenuItemClicked(settingsMenuItem) {
-                pixel.fire(AppPixelName.MENU_ACTION_SETTINGS_PRESSED)
+                pixel.fire(AppPixelName.EXPERIMENTAL_MENU_ACTION_SETTINGS_PRESSED)
                 browserActivity?.launchSettings()
             }
             onMenuItemClicked(changeBrowserModeMenuItem) {
@@ -1581,31 +1579,31 @@ class BrowserTabFragment :
                 viewModel.onSetDefaultBrowserSelected()
             }
             onMenuItemClicked(sharePageMenuItem) {
-                pixel.fire(AppPixelName.MENU_ACTION_SHARE_PRESSED)
+                pixel.fire(AppPixelName.EXPERIMENTAL_MENU_ACTION_SHARE_PRESSED)
                 viewModel.onShareSelected()
             }
             onMenuItemClicked(addToHomeMenuItem) {
-                pixel.fire(AppPixelName.MENU_ACTION_ADD_TO_HOME_PRESSED)
+                pixel.fire(AppPixelName.EXPERIMENTAL_MENU_ACTION_ADD_TO_HOME_PRESSED)
                 viewModel.onPinPageToHomeSelected()
             }
             onMenuItemClicked(createAliasMenuItem) {
                 viewModel.consumeAliasAndCopyToClipboard()
             }
             onMenuItemClicked(openInAppMenuItem) {
-                pixel.fire(AppPixelName.MENU_ACTION_APP_LINKS_OPEN_PRESSED)
+                pixel.fire(AppPixelName.EXPERIMENTAL_MENU_ACTION_APP_LINKS_OPEN_PRESSED)
                 viewModel.openAppLink()
             }
             onMenuItemClicked(printPageMenuItem) {
                 viewModel.onPrintSelected()
             }
             onMenuItemClicked(autofillMenuItem) {
-                pixel.fire(AppPixelName.MENU_ACTION_AUTOFILL_PRESSED)
+                pixel.fire(AppPixelName.EXPERIMENTAL_MENU_ACTION_AUTOFILL_PRESSED)
                 viewModel.onAutofillMenuSelected()
             }
             onMenuItemClicked(openInDdgBrowserMenuItem) {
                 viewModel.url?.let {
                     launchCustomTabUrlInDdg(it)
-                    pixel.fire(CustomTabPixelNames.CUSTOM_TABS_OPEN_IN_DDG)
+                    pixel.fire(AppPixelName.EXPERIMENTAL_MENU_CUSTOM_TABS_OPEN_IN_DDG)
                 }
             }
             onMenuItemClicked(vpnMenuItem) {
@@ -1626,7 +1624,7 @@ class BrowserTabFragment :
                 }
             }
             onMenuItemClicked(duckChatHistoryMenuItem) {
-                pixel.fire(DuckChatPixelName.DUCK_CHAT_SETTINGS_SIDEBAR_TAPPED)
+                pixel.fire(AppPixelName.EXPERIMENTAL_MENU_DUCK_CHAT_SETTINGS_SIDEBAR_TAPPED)
                 viewModel.openDuckChatSidebar()
             }
             onMenuItemClicked(duckChatSettingsMenuItem) {
@@ -1636,7 +1634,11 @@ class BrowserTabFragment :
     }
 
     private fun onForwardArrowClicked() {
-        pixel.fire(AppPixelName.MENU_ACTION_NAVIGATE_FORWARD_PRESSED)
+        if (isBottomSheetMenuEnabled()) {
+            pixel.fire(AppPixelName.EXPERIMENTAL_MENU_ACTION_NAVIGATE_FORWARD_PRESSED)
+        } else {
+            pixel.fire(AppPixelName.MENU_ACTION_NAVIGATE_FORWARD_PRESSED)
+        }
         viewModel.onUserPressedForward()
     }
 
@@ -1645,7 +1647,11 @@ class BrowserTabFragment :
     }
 
     private fun onBackArrowClicked() {
-        pixel.fire(AppPixelName.MENU_ACTION_NAVIGATE_BACK_PRESSED)
+        if (isBottomSheetMenuEnabled()) {
+            pixel.fire(AppPixelName.EXPERIMENTAL_MENU_ACTION_NAVIGATE_BACK_PRESSED)
+        } else {
+            pixel.fire(AppPixelName.MENU_ACTION_NAVIGATE_BACK_PRESSED)
+        }
         activity?.onBackPressed()
     }
 
@@ -1960,6 +1966,8 @@ class BrowserTabFragment :
             },
         )
     }
+
+    private fun isBottomSheetMenuEnabled(): Boolean = viewModel.browserViewState.value?.useBottomSheetMenu ?: false
 
     private fun isActiveCustomTab(): Boolean = tabId.startsWith(CUSTOM_TAB_NAME_PREFIX) && fragmentIsVisible()
 

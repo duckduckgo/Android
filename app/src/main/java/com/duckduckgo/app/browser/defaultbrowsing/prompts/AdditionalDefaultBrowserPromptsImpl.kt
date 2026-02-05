@@ -36,6 +36,7 @@ import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPr
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.Stage.STAGE_3
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.Stage.STARTED
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.Stage.STOPPED
+import com.duckduckgo.app.browser.menu.BrowserMenuDisplayRepository
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.onboarding.store.AppStage
@@ -63,6 +64,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -100,6 +102,7 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
     private val defaultBrowserDetector: DefaultBrowserDetector,
     private val defaultRoleBrowserDialog: DefaultRoleBrowserDialog,
     private val defaultBrowserPromptsAppUsageRepository: DefaultBrowserPromptsAppUsageRepository,
+    private val browserMenuDisplayRepository: BrowserMenuDisplayRepository,
     private val userStageStore: UserStageStore,
     private val defaultBrowserPromptsDataStore: DefaultBrowserPromptsDataStore,
     private val stageEvaluator: DefaultBrowserPromptsFlowStageEvaluator,
@@ -182,6 +185,18 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
      * More context in [this Asana task](https://app.asana.com/0/0/1208996977455495/f).
      */
     private var browserSelectionWindowFallbackDeferred: Deferred<Unit>? = null
+
+    /**
+     * Exposes whether the bottom sheet menu is used, so that we can fire the appropriate pixels when the user interacts with the "Set as default"
+     * option in the menu.
+     */
+    private val useBottomSheetMenu: StateFlow<Boolean> = browserMenuDisplayRepository.browserMenuState
+        .map { it.hasOption && it.isEnabled }
+        .stateIn(
+            scope = appCoroutineScope,
+            started = SharingStarted.Eagerly,
+            initialValue = false,
+        )
 
     override fun onPrivacyConfigDownloaded() {
         appCoroutineScope.launch(dispatchers.io()) {
@@ -304,7 +319,12 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
     }
 
     override fun onSetAsDefaultPopupMenuItemSelected() {
-        fireInteractionPixel(AppPixelName.SET_AS_DEFAULT_IN_MENU_CLICK)
+        val pixel = if (useBottomSheetMenu.value) {
+            AppPixelName.EXPERIMENTAL_MENU_SET_AS_DEFAULT_IN_MENU_CLICK
+        } else {
+            AppPixelName.SET_AS_DEFAULT_IN_MENU_CLICK
+        }
+        fireInteractionPixel(pixel)
         launchBestSelectionWindow(trigger = MENU)
     }
 

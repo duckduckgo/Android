@@ -72,5 +72,277 @@
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"],
         "expires": "2026-03-31"
+    },
+    "m_sheet-menu_nb_p": {
+        "description": "Fires when the user presses navigate back from the bottom sheet menu",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"],
+        "expires": "2026-03-31"
+    },
+    "m_sheet-menu_nf_p": {
+        "description": "Fires when the user presses navigate forward from the bottom sheet menu",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"],
+        "expires": "2026-03-31"
+    },
+    "m_sheet-menu_r_p": {
+        "description": "Fires when the user presses refresh from the bottom sheet menu",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"],
+        "expires": "2026-03-31"
+    },
+    "m_custom_tabs_sheet-menu_refresh": {
+        "description": "Fires when the user presses refresh from the bottom sheet menu in custom tabs",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"],
+        "expires": "2026-03-31"
+    },
+    "m_sheet-menu_custom_tabs_open_in_ddg": {
+        "description": "Fires when the user opens custom tab in DuckDuckGo from the bottom sheet menu",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"],
+        "expires": "2026-03-31"
+    },
+    "m_custom_tabs_sheet-menu_disable_protections_allow_list_add": {
+        "description": "Fires when the user disables privacy protections from the bottom sheet menu in custom tabs",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"],
+        "expires": "2026-03-31"
+    },
+    "m_custom_tabs_sheet-menu_disable_protections_allow_list_remove": {
+        "description": "Fires when the user enables privacy protections from the bottom sheet menu in custom tabs",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"],
+        "expires": "2026-03-31"
+    },
+    "m_sheet-menu_new_tab_open_from_serp": {
+        "description": "Fires when the user opens a new tab from SERP using the bottom sheet menu",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"],
+        "expires": "2026-03-31"
+    },
+    "m_sheet-menu_new_tab_open_from_website": {
+        "description": "Fires when the user opens a new tab from a website using the bottom sheet menu",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"],
+        "expires": "2026-03-31"
+    },
+    "sheet-menu_aichat_open_browser_menu": {
+        "description": "Fires when the user opens Duck.ai in browser from the bottom sheet browser menu",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"],
+        "expires": "2026-03-31"
+    },
+    "m_aichat_settings_sheet-menu_new_chat_tab_tapped": {
+        "description": "Fires when the user taps new chat tab in Duck.ai settings from the bottom sheet menu",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"],
+        "expires": "2026-03-31"
+    },
+    "m_aichat_omnibar_sheet-menu_new_chat_button_tapped": {
+        "description": "Fires when the user taps new chat button from the bottom sheet menu",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"],
+        "expires": "2026-03-31"
+    },
+    "m_aichat_settings_sheet-menu_sidebar_tapped": {
+        "description": "Fires when the user taps Duck.ai history from the bottom sheet menu",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"],
+        "expires": "2026-03-31"
+    },
+    "m_aichat_settings_sheet-menu_aichat_settings_tapped": {
+        "description": "Fires when the user taps Duck.ai settings from the bottom sheet menu",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"],
+        "expires": "2026-03-31"
+    },
+    "m_sheet-menu_ab_p": {
+        "description": "Fires when the user adds a bookmark from the bottom sheet menu",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"],
+        "expires": "2026-03-31"
+    },
+    "m_sheet-menu_eb_p": {
+        "description": "Fires when the user edits a bookmark from the bottom sheet menu",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"],
+        "expires": "2026-03-31"
+    },
+    "m_sheet-menu_sh_p": {
+        "description": "Fires when the user shares a page from the bottom sheet menu",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"],
+        "expires": "2026-03-31"
+    },
+    "m_sheet-menu_fip_p": {
+        "description": "Fires when the user opens find in page from the bottom sheet menu",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"],
+        "expires": "2026-03-31"
+    },
+    "m_sheet-menu_print_menu_item_pressed": {
+        "description": "Fires when the user presses print from the bottom sheet menu",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"],
+        "expires": "2026-03-31"
+    },
+    "m_sheet-menu_ath_p": {
+        "description": "Fires when the user adds page to home screen from the bottom sheet menu",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"],
+        "expires": "2026-03-31"
+    },
+    "m_sheet-menu_dse_p": {
+        "description": "Fires when the user enables desktop site from the bottom sheet menu",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"],
+        "expires": "2026-03-31"
+    },
+    "m_sheet-menu_dsd_p": {
+        "description": "Fires when the user disables desktop site from the bottom sheet menu",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"],
+        "expires": "2026-03-31"
+    },
+    "m_sheet-menu_rbs_p": {
+        "description": "Fires when the user reports a broken site from the bottom sheet menu",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"],
+        "expires": "2026-03-31"
+    },
+    "m_sheet-menu_s_p": {
+        "description": "Fires when the user opens settings from the bottom sheet menu",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"],
+        "expires": "2026-03-31"
+    },
+    "m_sheet-menu_app_links_open_menu_item_pressed": {
+        "description": "Fires when the user opens app links from the bottom sheet menu",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"],
+        "expires": "2026-03-31"
+    },
+    "m_sheet-menu_bookmarks_menu_item_pressed": {
+        "description": "Fires when the user opens bookmarks from the bottom sheet menu",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"],
+        "expires": "2026-03-31"
+    },
+    "m_sheet-menu_downloads_menu_item_pressed": {
+        "description": "Fires when the user opens downloads from the bottom sheet menu",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"],
+        "expires": "2026-03-31"
+    },
+    "m_sheet-menu_autofill_menu_item_pressed": {
+        "description": "Fires when the user opens autofill/passwords from the bottom sheet menu",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"],
+        "expires": "2026-03-31"
+    },
+    "m_sheet-menu_fw_a": {
+        "description": "Fires when the user adds a site to fireproof list from the bottom sheet menu",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"],
+        "expires": "2026-03-31"
+    },
+    "m_sheet-menu_fw_r": {
+        "description": "Fires when the user removes a site from fireproof list from the bottom sheet menu",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"],
+        "expires": "2026-03-31"
+    },
+    "mb_sheet-menu_wla": {
+        "description": "Fires when the user adds a site to privacy protection allowlist from the bottom sheet menu",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"],
+        "expires": "2026-03-31"
+    },
+    "mb_sheet-menu_wlr": {
+        "description": "Fires when the user removes a site from privacy protection allowlist from the bottom sheet menu",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"],
+        "expires": "2026-03-31"
+    },
+    "m_sheet-menu_set-as-default_in-menu_click": {
+        "description": "Fires when the user clicks set as default browser from the bottom sheet menu",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"],
+        "expires": "2026-03-31"
+    },
+    "sheet-menu_email_generated_button": {
+        "description": "Fires when the user copies email protection alias to clipboard from the bottom sheet menu",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"],
+        "expires": "2026-03-31"
     }
 }

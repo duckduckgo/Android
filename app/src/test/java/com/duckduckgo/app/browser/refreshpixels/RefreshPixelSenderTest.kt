@@ -3,6 +3,8 @@ package com.duckduckgo.app.browser.refreshpixels
 import android.annotation.SuppressLint
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.browser.customtabs.CustomTabPixelNames
+import com.duckduckgo.app.browser.menu.BrowserMenuDisplayRepository
+import com.duckduckgo.app.browser.menu.BrowserMenuDisplayState
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
@@ -21,6 +23,7 @@ import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.feature.toggles.api.Toggle.State.Cohort
 import com.duckduckgo.feature.toggles.impl.RealFeatureTogglesInventory
 import com.squareup.moshi.Moshi
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -29,6 +32,7 @@ import org.junit.runner.RunWith
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.verify
 import org.mockito.kotlin.never
+import org.mockito.kotlin.whenever
 import java.time.ZoneId
 import java.time.ZonedDateTime
 
@@ -49,6 +53,7 @@ class RefreshPixelSenderTest {
     private val configAdapter = moshi.adapter(Config::class.java)
 
     private val mockPixel: Pixel = mock()
+    private val mockBrowserMenuDisplayRepository: BrowserMenuDisplayRepository = mock()
     private lateinit var testBlockListFeature: TestBlockListFeature
     private lateinit var inventory: FeatureTogglesInventory
     private lateinit var blockListPixelsPlugin: BlockListPixelsPlugin
@@ -76,11 +81,16 @@ class RefreshPixelSenderTest {
 
         blockListPixelsPlugin = BlockListPixelsPlugin(inventory)
 
+        whenever(mockBrowserMenuDisplayRepository.browserMenuState).thenReturn(
+            MutableStateFlow(BrowserMenuDisplayState(hasOption = false, isEnabled = false)),
+        )
+
         testee = DuckDuckGoRefreshPixelSender(
             pixel = mockPixel,
             appCoroutineScope = coroutineTestRule.testScope,
             dispatcherProvider = coroutineTestRule.testDispatcherProvider,
             blockListPixelsPlugin = BlockListPixelsPlugin(inventory),
+            browserMenuDisplayRepository = mockBrowserMenuDisplayRepository,
         )
     }
 
