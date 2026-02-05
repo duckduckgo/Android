@@ -722,6 +722,7 @@ class BrowserTabViewModelTest {
                     duckPlayer = mockDuckPlayer,
                     brokenSitePrompt = mockBrokenSitePrompt,
                     onboardingHomeScreenWidgetToggles = mockOnboardingHomeScreenWidgetToggles,
+                    duckChat = mockDuckChat,
                 )
 
             accessibilitySettingsDataStore =
@@ -8373,7 +8374,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenNonDuckAiPageFinishedAndFullscreenModeEnabledThenDisabledDuckAiModeCommandSent() = runTest {
-        whenever(mockDuckDuckGoUrlDetector.isDuckDuckGoChatUrl(any())).thenReturn(false)
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(false)
         whenever(mockDuckAiFeatureState.showFullScreenMode).thenReturn(mockDuckAiFullScreenModeEnabled)
 
         val nonDdgUrl = "https://example.com/search?q=test"
@@ -8390,7 +8391,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenDuckAiPageFinishedAndFullscreenModeEnabledThenEnableDuckAiModeCommandSent() = runTest {
-        whenever(mockDuckDuckGoUrlDetector.isDuckDuckGoChatUrl(any())).thenReturn(true)
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
         whenever(mockDuckAiFeatureState.showFullScreenMode).thenReturn(mockDuckAiFullScreenModeEnabled)
 
         val nonDdgUrl = "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5"
@@ -8435,7 +8436,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenNewPageWithDuckAIUrlAndFullscreenModeEnabledThenEnableDuckAiModeCommandSent() = runTest {
-        whenever(mockDuckDuckGoUrlDetector.isDuckDuckGoChatUrl(any())).thenReturn(true)
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
         whenever(mockDuckAiFeatureState.showFullScreenMode).thenReturn(mockDuckAiFullScreenModeEnabled)
         testee.browserViewState.value = browserViewState().copy(browserShowing = true)
 
@@ -8455,7 +8456,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenNewPageWithNonDuckAIUrlAndFullscreenModeEnabledThenDisableDuckAiModeCommandSent() = runTest {
-        whenever(mockDuckDuckGoUrlDetector.isDuckDuckGoChatUrl(any())).thenReturn(false)
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(false)
         whenever(mockDuckAiFeatureState.showFullScreenMode).thenReturn(mockDuckAiFullScreenModeEnabled)
         testee.browserViewState.value = browserViewState().copy(browserShowing = true)
 

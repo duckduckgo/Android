@@ -46,6 +46,7 @@ import com.duckduckgo.brokensite.api.BrokenSitePrompt
 import com.duckduckgo.brokensite.api.RefreshPattern
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.AlwaysAsk
@@ -78,6 +79,7 @@ class CtaViewModel @Inject constructor(
     private val userStageStore: UserStageStore,
     private val tabRepository: TabRepository,
     private val dispatchers: DispatcherProvider,
+    private val duckChat: DuckChat,
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
     private val extendedOnboardingFeatureToggles: ExtendedOnboardingFeatureToggles,
     private val subscriptions: Subscriptions,
@@ -380,7 +382,7 @@ class CtaViewModel @Inject constructor(
 
         if (subscriptions.isPrivacyProUrl(uri)) return true
 
-        if (duckDuckGoUrlDetector.isDuckDuckGoChatUrl(uri.toString())) return true
+        if (duckChat.isDuckChatUrl(uri)) return true
 
         val isDuckPlayerUrl =
             duckPlayer.getDuckPlayerState() == DuckPlayerState.ENABLED &&
