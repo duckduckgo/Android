@@ -25,7 +25,7 @@
         "description": "Fired when a render process crash is reported by the WebView that shows subscription pages.",
         "owners": ["lmac012"],
         "triggers": ["other"],
-        "suffixes": ["daily_count_short", "form_factor"],
+        "suffixes": ["daily_count_short_form_factor"],
         "parameters": [
             "appVersion",
             {
@@ -40,7 +40,7 @@
         "description": "Fired when subscription frontend initiates sign-in using auth v1 token.",
         "owners": ["lmac012"],
         "triggers": ["other"],
-        "suffixes": ["daily_count_short", "form_factor"],
+        "suffixes": ["daily_count_short_form_factor"],
         "parameters": ["appVersion"],
         "expires": "2026-02-01"
     },

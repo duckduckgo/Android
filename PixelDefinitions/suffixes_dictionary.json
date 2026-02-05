@@ -17,5 +17,10 @@
         "description": "Platform and device form-factor",
         "key": "android",
         "enum": ["phone", "tablet"]
+    },
+    "daily_count_short_form_factor": {
+        "type": "string",
+        "description": "Pixel schedule type",
+        "enum": [ [["d", "c"], ["android"], ["phone", "tablet"]], [["android"], ["phone", "tablet"]] ]
     }
 }
