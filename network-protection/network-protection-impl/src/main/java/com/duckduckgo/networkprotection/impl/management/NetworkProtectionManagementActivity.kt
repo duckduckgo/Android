@@ -49,6 +49,7 @@ import com.duckduckgo.navigation.api.getActivityParams
 import com.duckduckgo.networkprotection.api.NetworkProtectionScreens.NetPAppExclusionListNoParams
 import com.duckduckgo.networkprotection.api.NetworkProtectionScreens.NetworkProtectionManagementScreenAndEnable
 import com.duckduckgo.networkprotection.api.NetworkProtectionScreens.NetworkProtectionManagementScreenNoParams
+import com.duckduckgo.networkprotection.api.NetworkProtectionScreens.NetworkProtectionManagementScreenWithLaunchPixel
 import com.duckduckgo.networkprotection.impl.R
 import com.duckduckgo.networkprotection.impl.autoexclude.VpnAutoExcludePromptFragment
 import com.duckduckgo.networkprotection.impl.autoexclude.VpnAutoExcludePromptFragment.Companion.Source.VPN_SCREEN
@@ -79,6 +80,7 @@ import javax.inject.Inject
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(NetworkProtectionManagementScreenNoParams::class, screenName = "vpn.main")
 @ContributeToActivityStarter(NetworkProtectionManagementScreenAndEnable::class, screenName = "vpn.main")
+@ContributeToActivityStarter(NetworkProtectionManagementScreenWithLaunchPixel::class, screenName = "vpn.main")
 class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
 
     @Inject
@@ -122,8 +124,8 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
             }
         }
 
-        intent.getStringExtra(LAUNCH_FROM_NOTIFICATION_PIXEL_NAME)?.let { pixelName ->
-            viewModel.onLaunchedFromNotification(pixelName)
+        intent.getActivityParams(NetworkProtectionManagementScreenWithLaunchPixel::class.java)?.let { params ->
+            viewModel.onLaunchedFromNotification(params.pixelName)
         }
 
         observeViewModel()
@@ -550,7 +552,6 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
     }
 
     companion object {
-        private const val LAUNCH_FROM_NOTIFICATION_PIXEL_NAME = "LAUNCH_FROM_NOTIFICATION_PIXEL_NAME"
         private const val REPORT_ISSUES_ANNOTATION = "report_issues_link"
         private const val OPEN_SETTINGS_ANNOTATION = "open_settings_link"
         private const val TAG_PROMOTION_DIALOG = "TAG_PROMO_DIALOG"
