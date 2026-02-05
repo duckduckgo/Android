@@ -20,7 +20,7 @@
 
     <string name="cdClose">Închidere</string>
 
-    <string name="serpLogoSetAsFavourite">Comută la acest logo</string>
+    <string name="serpLogoSetAsFavourite">Schimbă la acest logo</string>
     <string name="serpLogoResetToDefault">Resetează logoul de căutare</string>
     <string name="serpLogoDiscoveryText">Ai găsit un logo ascuns!</string>
 </resources>
