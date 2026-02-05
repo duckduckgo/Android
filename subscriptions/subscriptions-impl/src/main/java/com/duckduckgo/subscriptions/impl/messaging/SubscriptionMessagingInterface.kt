@@ -129,7 +129,7 @@ class SubscriptionMessagingInterface @Inject constructor(
     override val context: String = "subscriptionPages"
     override val callbackName: String = "messageCallback"
     override val secret: String = "duckduckgo-android-messaging-secret"
-    override val allowedDomains: List<String> = listOf("duckduckgo.com")
+    override val allowedDomains: List<String> = listOf("duckduckgo.com", "duck.ai")
 
     private fun isUrlAllowed(url: String?): Boolean {
         if (allowedDomains.isEmpty()) return true
