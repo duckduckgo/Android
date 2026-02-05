@@ -599,6 +599,7 @@ class BrowserTabViewModel @Inject constructor(
     private var isProcessingTrackingLink = false
     private var isLinkOpenedInNewTab = false
     private var allowlistRefreshTriggerJob: Job? = null
+    private var submitQueryJob: Job? = null
     private var isCustomTabScreen: Boolean = false
     private var alreadyShownKeyboard: Boolean = false
     private var handleAboutBlankEnabled: Boolean = false
@@ -1006,6 +1007,7 @@ class BrowserTabViewModel @Inject constructor(
     public override fun onCleared() {
         buildingSiteFactoryJob?.cancel()
         autoCompleteJob.cancel()
+        submitQueryJob?.cancel()
         fireproofWebsiteState.removeObserver(fireproofWebsitesObserver)
         navigationAwareLoginDetector.loginEventLiveData.removeObserver(loginDetectionObserver)
         fireproofDialogsEventHandler.event.removeObserver(fireproofDialogEventObserver)
@@ -1212,96 +1214,99 @@ class BrowserTabViewModel @Inject constructor(
         }
 
         val currentUrl = url
+        val shouldCloseTabForPrivacyPro = webNavigationState?.hasNavigationHistory != true
 
-        viewModelScope.launch(dispatchers.main()) {
-            val verticalParameter = extractVerticalParameter(currentUrl)
-            var urlToNavigate =
-                withContext(dispatchers.io()) {
-                    queryUrlConverter.convertQueryToUrl(trimmedInput, verticalParameter, queryOrigin)
-                }
+        submitQueryJob?.cancel()
+        submitQueryJob =
+            viewModelScope.launch(dispatchers.main()) {
+                val verticalParameter = extractVerticalParameter(currentUrl)
+                var urlToNavigate =
+                    withContext(dispatchers.io()) {
+                        queryUrlConverter.convertQueryToUrl(trimmedInput, verticalParameter, queryOrigin)
+                    }
 
-            when (val type = specialUrlDetector.determineType(trimmedInput)) {
-                is ShouldLaunchDuckChatLink -> {
-                    runCatching {
-                        logcat { "Duck.ai: ShouldLaunchDuckChatLink $urlToNavigate" }
-                        val queryParameter = urlToNavigate.toUri().getQueryParameter(QUERY)
-                        if (queryParameter != null) {
-                            duckChat.openDuckChatWithPrefill(queryParameter)
-                        } else {
-                            duckChat.openDuckChat()
+                when (val type = specialUrlDetector.determineType(trimmedInput)) {
+                    is ShouldLaunchDuckChatLink -> {
+                        runCatching {
+                            logcat { "Duck.ai: ShouldLaunchDuckChatLink $urlToNavigate" }
+                            val queryParameter = urlToNavigate.toUri().getQueryParameter(QUERY)
+                            if (queryParameter != null) {
+                                duckChat.openDuckChatWithPrefill(queryParameter)
+                            } else {
+                                duckChat.openDuckChat()
+                            }
+                            return@launch
                         }
+                    }
+
+                    is ShouldLaunchPrivacyProLink -> {
+                        if (shouldCloseTabForPrivacyPro) {
+                            closeCurrentTab()
+                        }
+                        command.value = LaunchPrivacyPro(urlToNavigate.toUri())
                         return@launch
                     }
-                }
 
-                is ShouldLaunchPrivacyProLink -> {
-                    if (webNavigationState == null || webNavigationState?.hasNavigationHistory == false) {
-                        closeCurrentTab()
-                    }
-                    command.value = LaunchPrivacyPro(urlToNavigate.toUri())
-                    return@launch
-                }
-
-                is NonHttpAppLink -> {
-                    nonHttpAppLinkClicked(type)
-                }
-
-                is SpecialUrlDetector.UrlType.CloakedAmpLink -> {
-                    handleCloakedAmpLink(type.ampUrl)
-                }
-
-                else -> {
-                    if (type is SpecialUrlDetector.UrlType.ExtractedAmpLink) {
-                        logcat { "AMP link detection: Using extracted URL: ${type.extractedUrl}" }
-                        urlToNavigate = type.extractedUrl
-                    } else if (type is SpecialUrlDetector.UrlType.TrackingParameterLink) {
-                        logcat { "Loading parameter cleaned URL: ${type.cleanedUrl}" }
-                        urlToNavigate = type.cleanedUrl
+                    is NonHttpAppLink -> {
+                        nonHttpAppLinkClicked(type)
                     }
 
-                    if (shouldClearHistoryOnNewQuery()) {
-                        returnedHomeAfterSiteLoaded = false
-                        command.value = ResetHistory
+                    is SpecialUrlDetector.UrlType.CloakedAmpLink -> {
+                        handleCloakedAmpLink(type.ampUrl)
                     }
 
-                    fireQueryChangedPixel(trimmedInput)
+                    else -> {
+                        if (type is SpecialUrlDetector.UrlType.ExtractedAmpLink) {
+                            logcat { "AMP link detection: Using extracted URL: ${type.extractedUrl}" }
+                            urlToNavigate = type.extractedUrl
+                        } else if (type is SpecialUrlDetector.UrlType.TrackingParameterLink) {
+                            logcat { "Loading parameter cleaned URL: ${type.cleanedUrl}" }
+                            urlToNavigate = type.cleanedUrl
+                        }
 
-                    if (!appSettingsPreferencesStore.showAppLinksPrompt) {
-                        appLinksHandler.updatePreviousUrl(urlToNavigate)
-                        appLinksHandler.setUserQueryState(true)
-                    } else {
-                        clearPreviousUrl()
+                        if (shouldClearHistoryOnNewQuery()) {
+                            returnedHomeAfterSiteLoaded = false
+                            command.value = ResetHistory
+                        }
+
+                        fireQueryChangedPixel(trimmedInput)
+
+                        if (!appSettingsPreferencesStore.showAppLinksPrompt) {
+                            appLinksHandler.updatePreviousUrl(urlToNavigate)
+                            appLinksHandler.setUserQueryState(true)
+                        } else {
+                            clearPreviousUrl()
+                        }
+
+                        site?.nextUrl = urlToNavigate
+                        command.value = NavigationCommand.Navigate(urlToNavigate, getUrlHeaders(urlToNavigate))
                     }
-
-                    site?.nextUrl = urlToNavigate
-                    command.value = NavigationCommand.Navigate(urlToNavigate, getUrlHeaders(urlToNavigate))
                 }
+
+                globalLayoutState.value = Browser(isNewTabState = false)
+                findInPageViewState.value = FindInPageViewState(visible = false)
+                omnibarViewState.value =
+                    currentOmnibarViewState().copy(
+                        omnibarText = if (isFullUrlEnabled.value) trimmedInput else addressDisplayFormatter.getShortUrl(trimmedInput),
+                        queryOrFullUrl = trimmedInput,
+                        forceExpand = true,
+                    )
+                browserViewState.value =
+                    currentBrowserViewState().copy(
+                        browserShowing = true,
+                        browserError = OMITTED,
+                        sslError = NONE,
+                        maliciousSiteBlocked = false,
+                        maliciousSiteStatus = null,
+                        lastQueryOrigin = queryOrigin,
+                    )
+                autoCompleteViewState.value =
+                    currentAutoCompleteViewState().copy(
+                        showSuggestions = false,
+                        showFavorites = false,
+                        searchResults = AutoCompleteResult("", emptyList()),
+                    )
             }
-
-            globalLayoutState.value = Browser(isNewTabState = false)
-            findInPageViewState.value = FindInPageViewState(visible = false)
-            omnibarViewState.value =
-                currentOmnibarViewState().copy(
-                    omnibarText = if (isFullUrlEnabled.value) trimmedInput else addressDisplayFormatter.getShortUrl(trimmedInput),
-                    queryOrFullUrl = trimmedInput,
-                    forceExpand = true,
-                )
-            browserViewState.value =
-                currentBrowserViewState().copy(
-                    browserShowing = true,
-                    browserError = OMITTED,
-                    sslError = NONE,
-                    maliciousSiteBlocked = false,
-                    maliciousSiteStatus = null,
-                    lastQueryOrigin = queryOrigin,
-                )
-            autoCompleteViewState.value =
-                currentAutoCompleteViewState().copy(
-                    showSuggestions = false,
-                    showFavorites = false,
-                    searchResults = AutoCompleteResult("", emptyList()),
-                )
-        }
     }
 
     private fun getUrlHeaders(url: String?): Map<String, String> = url?.let { customHeadersProvider.getCustomHeaders(it) } ?: emptyMap()
