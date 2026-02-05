@@ -17,9 +17,11 @@ package com.duckduckgo.common.utils
 
 import android.net.Uri
 import android.net.Uri.parse
+import android.os.Build
 import androidx.core.net.toUri
 import com.duckduckgo.common.utils.UrlScheme.Companion.http
 import java.io.UnsupportedEncodingException
+import java.net.InetAddress
 import java.net.URLEncoder
 import java.util.*
 
@@ -66,28 +68,68 @@ val Uri.hasIpHost: Boolean
 
 /**
  * Checks if the URI represents a local or private network address.
- * This includes localhost, loopback addresses (127.0.0.0/8),
- * and private network ranges (10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16).
+ * This includes:
+ * - localhost hostname
+ * - IPv4/IPv6 loopback addresses (127.0.0.0/8, ::1)
+ * - IPv4/IPv6 private network ranges (10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16, fc00::/7)
+ * - IPv6 link-local addresses (fe80::/10)
+ *
+ * Note: file:// URLs return false as they are not network locations.
+ * Note: .local domain names are NOT treated as local (they require mDNS resolution).
  */
 val Uri.isLocalUrl: Boolean
     get() {
+        // Explicitly exclude file:// scheme
+        if (scheme == "file") return false
+
         val host = this.host?.lowercase() ?: return false
         if (host == "localhost") return true
 
-        val ipv4Parts = host.split(".")
-        if (ipv4Parts.size != 4) return false
+        // Pre-validate that host looks like a numeric IP address
+        // This prevents malformed IPs and domain names from being parsed
+        if (!host.looksLikeNumericAddress()) return false
 
-        val octets = ipv4Parts.mapNotNull { it.toIntOrNull() }
-        if (octets.size != 4 || octets.any { it !in 0..255 }) return false
+        // Try to parse as numeric IP address (both IPv4 and IPv6)
+        val addr = runCatching {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                android.net.InetAddresses.parseNumericAddress(host)
+            } else {
+                // Fallback for pre-Q: use InetAddress.getByName (already validated above)
+                InetAddress.getByName(host)
+            }
+        }.getOrNull() ?: return false
 
-        val (first, second) = octets
-        if (first == 127) return true
-        if (first == 10) return true
-        if (first == 172 && second in 16..31) return true
-        if (first == 192 && second == 168) return true
-
-        return false
+        // Check if it's a loopback, site-local (private IPv4), or link-local (IPv6) address
+        // For IPv6, also check for unique local addresses (fc00::/7) manually
+        return addr.isLoopbackAddress || addr.isSiteLocalAddress || addr.isLinkLocalAddress || addr.isIPv6UniqueLocal()
     }
+
+/**
+ * Quick check if a string looks like a numeric IP address (IPv4 or IPv6).
+ * Prevents attempting to parse domain names or malformed addresses.
+ */
+private fun String.looksLikeNumericAddress(): Boolean {
+    // IPv6: contains colons
+    if (contains(':')) return true
+
+    // IPv4: exactly 4 parts separated by dots, each 0-255
+    val parts = split('.')
+    if (parts.size != 4) return false
+    return parts.all { part ->
+        part.toIntOrNull()?.let { it in 0..255 } ?: false
+    }
+}
+
+
+/**
+ * Checks if an IPv6 address is a Unique Local Address (ULA) in the fc00::/7 range.
+ * These are the IPv6 equivalent of private IPv4 addresses.
+ */
+private fun InetAddress.isIPv6UniqueLocal(): Boolean {
+    val bytes = this.address
+    // IPv6 addresses have 16 bytes, check if it starts with 0xfc or 0xfd
+    return bytes.size == 16 && (bytes[0].toInt() and 0xfe) == 0xfc
+}
 
 val Uri.absoluteString: String
     get() {
