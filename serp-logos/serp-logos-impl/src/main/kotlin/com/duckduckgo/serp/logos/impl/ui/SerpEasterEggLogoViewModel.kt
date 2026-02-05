@@ -19,6 +19,7 @@ package com.duckduckgo.serp.logos.impl.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.serp.logos.api.SerpEasterEggLogosToggles
 import com.duckduckgo.serp.logos.impl.store.FavouriteSerpLogoDataStore
@@ -38,6 +39,8 @@ class SerpEasterEggLogoViewModel @Inject constructor(
     private val favouriteSerpLogoDataStore: FavouriteSerpLogoDataStore,
     private val serpEasterEggLogosToggles: SerpEasterEggLogosToggles,
 ) : ViewModel() {
+
+    private var setLogoConflatedJob = ConflatedJob()
 
     data class ViewState(
         val logoUrl: String = "",
@@ -59,7 +62,7 @@ class SerpEasterEggLogoViewModel @Inject constructor(
 
     fun setLogoUrl(logoUrl: String) {
         currentLogoUrl = logoUrl
-        viewModelScope.launch {
+        setLogoConflatedJob += viewModelScope.launch {
             combine(
                 serpEasterEggLogosToggles.setFavourite().enabled(),
                 favouriteSerpLogoDataStore.favouriteSerpEasterEggLogoUrlFlow,
