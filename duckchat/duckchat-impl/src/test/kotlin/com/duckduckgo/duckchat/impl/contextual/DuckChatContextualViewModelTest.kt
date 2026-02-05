@@ -506,7 +506,7 @@ class DuckChatContextualViewModelTest {
     }
 
     @Test
-    fun `onContextualClose stores last closed timestamp`() = runTest {
+    fun `onContextualClose in input mode does not store last closed timestamp`() = runTest {
         val tabId = "tab-1"
         val now = 55_000L
         timeProvider.nowMs = now
@@ -515,7 +515,7 @@ class DuckChatContextualViewModelTest {
         testee.onContextualClose()
         coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
 
-        assertEquals(now, contextualDataStore.getTabClosedTimestamp(tabId))
+        assertNull(contextualDataStore.getTabClosedTimestamp(tabId))
     }
 
     @Test
@@ -525,6 +525,7 @@ class DuckChatContextualViewModelTest {
         timeProvider.nowMs = now
 
         testee.onSheetOpened(tabId)
+        testee.onPromptSent("hello")
         testee.persistTabClosed()
         coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
 

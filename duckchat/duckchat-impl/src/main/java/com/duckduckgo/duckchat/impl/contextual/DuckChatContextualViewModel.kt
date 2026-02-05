@@ -291,13 +291,15 @@ class DuckChatContextualViewModel @Inject constructor(
     }
 
     fun onContextualClose() {
-        persistTabClosed()
         viewModelScope.launch(dispatchers.main()) {
             commandChannel.trySend(Command.ChangeSheetState(BottomSheetBehavior.STATE_HIDDEN))
         }
     }
 
     fun persistTabClosed() {
+        if (_viewState.value.sheetMode != SheetMode.WEBVIEW) {
+            return
+        }
         viewModelScope.launch(dispatchers.io()) {
             val tabId = _viewState.value.tabId
             if (tabId.isNotBlank()) {
