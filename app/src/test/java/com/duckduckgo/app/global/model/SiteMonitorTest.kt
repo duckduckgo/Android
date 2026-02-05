@@ -18,6 +18,7 @@ package com.duckduckgo.app.global.model
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.browser.certificates.BypassedSSLCertificatesRepository
+import com.duckduckgo.app.browser.omnibar.StandardizedLeadingIconFeatureToggle
 import com.duckduckgo.app.global.model.PrivacyShield.PROTECTED
 import com.duckduckgo.app.global.model.PrivacyShield.UNKNOWN
 import com.duckduckgo.app.global.model.PrivacyShield.UNPROTECTED
@@ -78,9 +79,15 @@ class SiteMonitorTest {
 
     private val mockBypassedSSLCertificatesRepository: BypassedSSLCertificatesRepository = mock()
 
+    private val mockStandardizedLeadingIconToggle: StandardizedLeadingIconFeatureToggle = mock()
+
     @Before
     fun setup() {
         whenever(mockDuckPlayer.isDuckPlayerUri(any())).thenReturn(false)
+        // Default to disabled (legacy behavior) for existing tests
+        val mockToggle: com.duckduckgo.feature.toggles.api.Toggle = mock()
+        whenever(mockToggle.isEnabled()).thenReturn(false)
+        whenever(mockStandardizedLeadingIconToggle.self()).thenReturn(mockToggle)
     }
 
     @Test
@@ -96,6 +103,7 @@ class SiteMonitorTest {
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             brokenSiteContext = mockBrokenSiteContext,
             duckPlayer = mockDuckPlayer,
+            standardizedLeadingIconToggle = mockStandardizedLeadingIconToggle,
         )
         assertEquals(HttpsStatus.SECURE, testee.https)
     }
@@ -113,6 +121,7 @@ class SiteMonitorTest {
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             brokenSiteContext = mockBrokenSiteContext,
             duckPlayer = mockDuckPlayer,
+            standardizedLeadingIconToggle = mockStandardizedLeadingIconToggle,
         )
         assertEquals(HttpsStatus.NONE, testee.https)
     }
@@ -130,6 +139,7 @@ class SiteMonitorTest {
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             brokenSiteContext = mockBrokenSiteContext,
             duckPlayer = mockDuckPlayer,
+            standardizedLeadingIconToggle = mockStandardizedLeadingIconToggle,
         )
         testee.hasHttpResources = true
         assertEquals(HttpsStatus.MIXED, testee.https)
@@ -148,6 +158,7 @@ class SiteMonitorTest {
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             brokenSiteContext = mockBrokenSiteContext,
             duckPlayer = mockDuckPlayer,
+            standardizedLeadingIconToggle = mockStandardizedLeadingIconToggle,
         )
         assertEquals(HttpsStatus.NONE, testee.https)
     }
@@ -165,6 +176,7 @@ class SiteMonitorTest {
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             brokenSiteContext = mockBrokenSiteContext,
             duckPlayer = mockDuckPlayer,
+            standardizedLeadingIconToggle = mockStandardizedLeadingIconToggle,
         )
         assertEquals(document, testee.url)
     }
@@ -182,6 +194,7 @@ class SiteMonitorTest {
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             brokenSiteContext = mockBrokenSiteContext,
             duckPlayer = mockDuckPlayer,
+            standardizedLeadingIconToggle = mockStandardizedLeadingIconToggle,
         )
         assertEquals(0, testee.trackerCount)
     }
@@ -199,6 +212,7 @@ class SiteMonitorTest {
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             brokenSiteContext = mockBrokenSiteContext,
             duckPlayer = mockDuckPlayer,
+            standardizedLeadingIconToggle = mockStandardizedLeadingIconToggle,
         )
         testee.trackerDetected(
             TrackingEvent(
@@ -249,6 +263,7 @@ class SiteMonitorTest {
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             brokenSiteContext = mockBrokenSiteContext,
             duckPlayer = mockDuckPlayer,
+            standardizedLeadingIconToggle = mockStandardizedLeadingIconToggle,
         )
         testee.trackerDetected(
             TrackingEvent(
@@ -299,6 +314,7 @@ class SiteMonitorTest {
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             brokenSiteContext = mockBrokenSiteContext,
             duckPlayer = mockDuckPlayer,
+            standardizedLeadingIconToggle = mockStandardizedLeadingIconToggle,
         )
         testee.trackerDetected(
             TrackingEvent(
@@ -349,6 +365,7 @@ class SiteMonitorTest {
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             brokenSiteContext = mockBrokenSiteContext,
             duckPlayer = mockDuckPlayer,
+            standardizedLeadingIconToggle = mockStandardizedLeadingIconToggle,
         )
         testee.trackerDetected(
             TrackingEvent(
@@ -377,6 +394,7 @@ class SiteMonitorTest {
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             brokenSiteContext = mockBrokenSiteContext,
             duckPlayer = mockDuckPlayer,
+            standardizedLeadingIconToggle = mockStandardizedLeadingIconToggle,
         )
         testee.trackerDetected(
             TrackingEvent(
@@ -405,6 +423,7 @@ class SiteMonitorTest {
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             brokenSiteContext = mockBrokenSiteContext,
             duckPlayer = mockDuckPlayer,
+            standardizedLeadingIconToggle = mockStandardizedLeadingIconToggle,
         )
         testee.trackerDetected(
             TrackingEvent(
@@ -444,6 +463,7 @@ class SiteMonitorTest {
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             brokenSiteContext = mockBrokenSiteContext,
             duckPlayer = mockDuckPlayer,
+            standardizedLeadingIconToggle = mockStandardizedLeadingIconToggle,
         )
         assertFalse(testee.upgradedHttps)
     }
@@ -461,6 +481,7 @@ class SiteMonitorTest {
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             brokenSiteContext = mockBrokenSiteContext,
             duckPlayer = mockDuckPlayer,
+            standardizedLeadingIconToggle = mockStandardizedLeadingIconToggle,
         )
         assertEquals(0, testee.surrogates.size)
     }
@@ -478,6 +499,7 @@ class SiteMonitorTest {
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             brokenSiteContext = mockBrokenSiteContext,
             duckPlayer = mockDuckPlayer,
+            standardizedLeadingIconToggle = mockStandardizedLeadingIconToggle,
         )
         testee.surrogateDetected(SurrogateResponse())
         assertEquals(1, testee.surrogates.size)
@@ -496,6 +518,7 @@ class SiteMonitorTest {
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             brokenSiteContext = mockBrokenSiteContext,
             duckPlayer = mockDuckPlayer,
+            standardizedLeadingIconToggle = mockStandardizedLeadingIconToggle,
         )
         testee.trackerDetected(
             TrackingEvent(
@@ -546,6 +569,7 @@ class SiteMonitorTest {
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             brokenSiteContext = mockBrokenSiteContext,
             duckPlayer = mockDuckPlayer,
+            standardizedLeadingIconToggle = mockStandardizedLeadingIconToggle,
         )
         testee.trackerDetected(
             TrackingEvent(
@@ -664,6 +688,44 @@ class SiteMonitorTest {
         assertEquals(UNPROTECTED, testee.privacyProtection())
     }
 
+    @Test
+    fun whenToggleDisabledAndSiteIsRemoteConfigExceptionThenPrivacyShieldIsUnprotected() {
+        // Legacy behavior: remote config exceptions show UNPROTECTED
+        val testee = givenASiteMonitor(url = httpsDocument)
+        whenever(mockAllowListRepository.isDomainInUserAllowList("example.com")).thenReturn(false)
+        whenever(mockContentBlocking.isAnException("example.com")).thenReturn(true)
+
+        assertEquals(UNPROTECTED, testee.privacyProtection())
+    }
+
+    @Test
+    fun whenToggleEnabledAndSiteIsRemoteConfigExceptionThenPrivacyShieldIsNotUnprotected() {
+        // New behavior: remote config exceptions do NOT show UNPROTECTED
+        val enabledToggle: com.duckduckgo.feature.toggles.api.Toggle = mock()
+        whenever(enabledToggle.isEnabled()).thenReturn(true)
+        whenever(mockStandardizedLeadingIconToggle.self()).thenReturn(enabledToggle)
+
+        val testee = givenASiteMonitor(url = httpsDocument)
+        whenever(mockAllowListRepository.isDomainInUserAllowList("example.com")).thenReturn(false)
+        whenever(mockContentBlocking.isAnException("example.com")).thenReturn(true)
+
+        // Should return UNKNOWN (not UNPROTECTED) because fullSiteDetailsAvailable is false
+        assertEquals(UNKNOWN, testee.privacyProtection())
+    }
+
+    @Test
+    fun whenToggleEnabledAndSiteIsUserAllowListedThenPrivacyShieldIsUnprotected() {
+        // Even with toggle enabled, user-initiated allowlist still shows UNPROTECTED
+        val enabledToggle: com.duckduckgo.feature.toggles.api.Toggle = mock()
+        whenever(enabledToggle.isEnabled()).thenReturn(true)
+        whenever(mockStandardizedLeadingIconToggle.self()).thenReturn(enabledToggle)
+
+        val testee = givenASiteMonitor(url = httpsDocument)
+        whenever(mockAllowListRepository.isDomainInUserAllowList("example.com")).thenReturn(true)
+
+        assertEquals(UNPROTECTED, testee.privacyProtection())
+    }
+
     private fun givenASiteMonitor(
         url: String = document,
         title: String? = null,
@@ -681,6 +743,7 @@ class SiteMonitorTest {
         dispatcherProvider = coroutineRule.testDispatcherProvider,
         brokenSiteContext = mockBrokenSiteContext,
         duckPlayer = mockDuckPlayer,
+        standardizedLeadingIconToggle = mockStandardizedLeadingIconToggle,
     )
 
     private fun givenSitePrivacyData(

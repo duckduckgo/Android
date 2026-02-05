@@ -171,6 +171,7 @@ import com.duckduckgo.app.global.model.MaliciousSiteStatus.PHISHING
 import com.duckduckgo.app.global.model.PrivacyShield.PROTECTED
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactoryImpl
+import com.duckduckgo.app.browser.omnibar.StandardizedLeadingIconFeatureToggle
 import com.duckduckgo.app.location.data.LocationPermissionsDao
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.AppStage.ESTABLISHED
@@ -455,6 +456,7 @@ class BrowserTabViewModelTest {
     private val mockFileChooserCallback: ValueCallback<Array<Uri>> = mock()
 
     private val mockDuckPlayer: DuckPlayer = mock()
+    private val mockStandardizedLeadingIconToggle: StandardizedLeadingIconFeatureToggle = mock()
 
     private val mockDuckAiFeatureState: DuckAiFeatureState = mock()
 
@@ -686,6 +688,9 @@ class BrowserTabViewModelTest {
             whenever(mockDuckPlayer.isSimulatedYoutubeNoCookie(any())).thenReturn(false)
             whenever(mockDuckPlayer.isDuckPlayerUri(anyString())).thenReturn(false)
             whenever(mockDuckPlayer.getDuckPlayerState()).thenReturn(ENABLED)
+            val mockFeatureToggle: com.duckduckgo.feature.toggles.api.Toggle = mock()
+            whenever(mockFeatureToggle.isEnabled()).thenReturn(false)
+            whenever(mockStandardizedLeadingIconToggle.self()).thenReturn(mockFeatureToggle)
             whenever(mockAutocompleteTabsFeature.self()).thenReturn(mockEnabledToggle)
             whenever(mockAutocompleteTabsFeature.self().isEnabled()).thenReturn(true)
             whenever(mockSitePermissionsManager.hasSitePermanentPermission(any(), any())).thenReturn(false)
@@ -773,6 +778,7 @@ class BrowserTabViewModelTest {
                 coroutineRule.testDispatcherProvider,
                 DuckDuckGoUrlDetectorImpl(),
                 mockDuckPlayer,
+                mockStandardizedLeadingIconToggle,
             )
 
         val fireproofWebsiteRepositoryImpl =
