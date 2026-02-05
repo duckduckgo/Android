@@ -34,6 +34,7 @@
     <string name="sync_setup_begin_syncing">Synchronisierung beginnen</string>
     <string name="sync_setup_with_another_device_cta_title">Mit anderem Gerät synchronisieren</string>
     <string name="sync_setup_with_another_device_cta_subtitle">Lesezeichen und Passwörter sicher zwischen deinen Geräten synchronisieren.</string>
+    <string name="sync_setup_with_another_device_cta_subtitle_with_ai_chat">Lesezeichen, Passwörter und Duck.ai-Chats sicher zwischen deinen Geräten synchronisieren.</string>
     <string name="sync_off_hint">Deine Daten sind Ende-zu-Ende-verschlüsselt. DuckDuckGo hat keinen Zugriff auf den Verschlüsselungsschlüssel.</string>
     <string name="sync_setup_single_device_title">Einrichtung für ein einzelnes Gerät</string>
     <string name="sync_setup_other_options_title">Andere Optionen</string>
@@ -45,12 +46,14 @@
     <!-- Setup screen -->
     <string name="sync_enable_sync_title">Einrichten von Synchronisieren und sichern!</string>
     <string name="sync_enable_sync_content">Deine Lesezeichen und Passwörter werden für die Synchronisation vorbereitet. Das sollte nur einen Moment dauern.</string>
+    <string name="sync_enable_sync_content_with_ai_chat">Deine Lesezeichen, Passwörter und Duck.ai-Chats werden für die Synchronisation vorbereitet. Das sollte nur einen Moment dauern.</string>
     <string name="sync_enable_options">Optionen</string>
     <string name="sync_enable_option_favicons_title">Lesezeichen-Symbole abrufen</string>
     <string name="sync_enable_option_favicons_subtitle">Symbole für synchronisierte Lesezeichen automatisch herunterladen.</string>
     <string name="sync_enable_connecting">Verbinden ...</string>
     <string name="sync_intro_enable_title">Dieses Gerät synchronisieren und sichern</string>
     <string name="sync_intro_enable_content">Dadurch wird ein verschlüsseltes Backup deiner Lesezeichen und Passwörter auf dem sicheren Server von DuckDuckGo erstellt, der mit deinen anderen Geräten synchronisiert werden kann. \n\n Der Verschlüsselungsschlüssel wird nur auf deinem Gerät gespeichert, DuckDuckGo kann nicht darauf zugreifen.</string>
+    <string name="sync_intro_enable_content_with_ai_chat">Dadurch wird ein verschlüsseltes Backup deiner Lesezeichen, Passwörter und Duck.ai-Chats auf dem sicheren Server von DuckDuckGo erstellt, das mit deinen anderen Geräten synchronisiert werden kann. Der Verschlüsselungsschlüssel wird nur auf deinem Gerät gespeichert, DuckDuckGo kann nicht darauf zugreifen.</string>
     <string name="sync_intro_enable_footer">Du kannst später mit deinen anderen Geräten synchronisieren.</string>
     <string name="sync_intro_enable_cta">„Synchronisieren und sichern“ aktivieren</string>
     <string name="sync_intro_recover_title">Synchronisierte Daten wiederherstellen</string>

@@ -30,7 +30,6 @@ import com.duckduckgo.pir.impl.checker.PirWorkHandler
 import com.duckduckgo.pir.impl.notifications.PirNotificationManager
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.pir.internal.databinding.ActivityPirInternalSettingsBinding
-import com.duckduckgo.pir.internal.settings.PirResultsScreenParams.PirEmailResultsScreen
 import com.duckduckgo.pir.internal.settings.PirResultsScreenParams.PirEventsResultsScreen
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -75,11 +74,15 @@ class PirDevSettingsActivity : DuckDuckGoActivity() {
         }
 
         binding.pirDebugEmail.setOnClickListener {
-            globalActivityStarter.start(this, PirEmailResultsScreen)
+            globalActivityStarter.start(this, PirDevEmailScreenNoParams)
         }
 
         binding.viewRunEvents.setOnClickListener {
             globalActivityStarter.start(this, PirEventsResultsScreen)
+        }
+
+        binding.brokerConfig.setOnClickListener {
+            globalActivityStarter.start(this, PirBrokerConfigScreenNoParams)
         }
     }
 

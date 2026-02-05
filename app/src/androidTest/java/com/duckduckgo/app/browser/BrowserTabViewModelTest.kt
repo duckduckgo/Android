@@ -43,6 +43,7 @@ import androidx.lifecycle.Observer
 import androidx.room.Room
 import androidx.test.filters.SdkSuppress
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
+import androidx.webkit.JavaScriptReplyProxy
 import app.cash.turbine.test
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.app.ValueCaptorObserver
@@ -110,6 +111,8 @@ import com.duckduckgo.app.browser.logindetection.LoginDetected
 import com.duckduckgo.app.browser.logindetection.NavigationAwareLoginDetector
 import com.duckduckgo.app.browser.logindetection.NavigationEvent
 import com.duckduckgo.app.browser.logindetection.NavigationEvent.LoginAttempt
+import com.duckduckgo.app.browser.menu.BrowserMenuDisplayRepository
+import com.duckduckgo.app.browser.menu.BrowserMenuDisplayState
 import com.duckduckgo.app.browser.menu.VpnMenuStateProvider
 import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
@@ -242,9 +245,12 @@ import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.impl.contextual.PageContextJSHelper
+import com.duckduckgo.duckchat.impl.contextual.RealPageContextJSHelper.Companion.PAGE_CONTEXT_FEATURE_NAME
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
 import com.duckduckgo.duckchat.impl.helper.NativeAction
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper.Companion.DUCK_CHAT_FEATURE_NAME
+import com.duckduckgo.duckchat.impl.messaging.sync.SyncStatusChangedObserver
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerOrigin.AUTO
@@ -290,6 +296,7 @@ import com.duckduckgo.site.permissions.api.SitePermissionsManager.LocationPermis
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissionQueryResponse
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissions
 import com.duckduckgo.subscriptions.api.SUBSCRIPTIONS_FEATURE_NAME
+import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.subscriptions.api.SubscriptionsJSHelper
 import com.duckduckgo.sync.api.favicons.FaviconsFetchingPrompt
@@ -435,6 +442,7 @@ class BrowserTabViewModelTest {
 
     private val mockSettingsDataStore: SettingsDataStore = mock()
     private val mockUrlDisplayRepository: UrlDisplayRepository = mock()
+    private val mockBrowserMenuDisplayRepository: BrowserMenuDisplayRepository = mock()
 
     private val mockAutoCompleteSettings: AutoCompleteSettings = mock()
 
@@ -455,6 +463,8 @@ class BrowserTabViewModelTest {
     private val mockDuckAiFeatureStateInputScreenOpenAutomaticallyFlow = MutableStateFlow(false)
 
     private val mockDuckAiFeatureStateFullScreenModeFlow = MutableStateFlow(false)
+
+    private val mockDuckAiContextualModeFlow = MutableStateFlow(false)
 
     private val mockExternalIntentProcessingState: ExternalIntentProcessingState = mock()
 
@@ -559,7 +569,11 @@ class BrowserTabViewModelTest {
     private val swipingTabsFeature = FakeFeatureToggleFactory.create(SwipingTabsFeature::class.java)
     private val swipingTabsFeatureProvider = SwipingTabsFeatureProvider(swipingTabsFeature)
     private val mockDuckChat: DuckChat = mock()
+    private val mockSyncStatusChangedObserver: SyncStatusChangedObserver = mock()
+    private val syncStatusChangedEventsFlow = MutableSharedFlow<JSONObject>()
+    private val subscriptionStatusFlow = MutableSharedFlow<SubscriptionStatus>()
     private val mockHistory: NavigationHistory = mock()
+    private val mockPageContextJSHelper: PageContextJSHelper = mock()
 
     private val defaultBrowserPromptsExperimentShowPopupMenuItemFlow = MutableStateFlow(false)
     private val mockAdditionalDefaultBrowserPrompts: AdditionalDefaultBrowserPrompts = mock()
@@ -596,6 +610,7 @@ class BrowserTabViewModelTest {
     private val selectedTab = TabEntity("TAB_ID", exampleUrl, position = 0, sourceTabId = "TAB_ID_SOURCE")
     private val flowSelectedTab = MutableStateFlow(selectedTab)
     private val isFullSiteAddressEnabledFlow = MutableStateFlow(true)
+    private val browserMenuStateFlow = MutableStateFlow(BrowserMenuDisplayState(hasOption = false, isEnabled = false))
 
     private val mockWebViewCompatWrapper: WebViewCompatWrapper = mock()
 
@@ -662,7 +677,9 @@ class BrowserTabViewModelTest {
             whenever(mockRemoteMessagingRepository.messageFlow()).thenReturn(remoteMessageFlow.consumeAsFlow())
             whenever(mockSettingsDataStore.automaticFireproofSetting).thenReturn(AutomaticFireproofSetting.ASK_EVERY_TIME)
             whenever(mockSettingsDataStore.omnibarType).thenReturn(OmnibarType.SINGLE_TOP)
+            whenever(mockSettingsDataStore.showTrackersCountInAddressBar).thenReturn(true)
             whenever(mockUrlDisplayRepository.isFullUrlEnabled).then { isFullSiteAddressEnabledFlow }
+            whenever(mockBrowserMenuDisplayRepository.browserMenuState).then { browserMenuStateFlow }
             whenever(mockSSLCertificatesFeature.allowBypass()).thenReturn(mockEnabledToggle)
             whenever(subscriptions.shouldLaunchPrivacyProForUrl(any())).thenReturn(false)
             whenever(mockDuckDuckGoUrlDetector.isDuckDuckGoUrl(any())).thenReturn(false)
@@ -678,12 +695,14 @@ class BrowserTabViewModelTest {
             whenever(mockDuckAiFeatureState.showInputScreen).thenReturn(mockDuckAiFeatureStateInputScreenFlow)
             whenever(mockDuckAiFeatureState.showInputScreenAutomaticallyOnNewTab).thenReturn(mockDuckAiFeatureStateInputScreenOpenAutomaticallyFlow)
             whenever(mockDuckAiFeatureState.showFullScreenMode).thenReturn(mockDuckAiFeatureStateFullScreenModeFlow)
+            whenever(mockDuckAiFeatureState.showContextualMode).thenReturn(mockDuckAiContextualModeFlow)
             whenever(mockExternalIntentProcessingState.hasPendingTabLaunch).thenReturn(mockHasPendingTabLaunchFlow)
             whenever(mockExternalIntentProcessingState.hasPendingDuckAiOpen).thenReturn(mockHasPendingDuckAiOpenFlow)
             whenever(mockVpnMenuStateProvider.getVpnMenuState()).thenReturn(flowOf(VpnMenuState.Hidden))
             whenever(nonHttpAppLinkChecker.isPermitted(anyOrNull())).thenReturn(true)
             remoteMessagingModel = givenRemoteMessagingModel(mockRemoteMessagingRepository, mockPixel, coroutineRule.testDispatcherProvider)
             runBlocking { whenever(mockAddressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(false) }
+            whenever(mockAddressBarTrackersAnimationManager.shouldShowAnimation(anyOrNull(), anyOrNull())).thenReturn(true)
 
             ctaViewModel =
                 CtaViewModel(
@@ -731,7 +750,9 @@ class BrowserTabViewModelTest {
 
             fakeContentScopeScriptsSubscriptionEventPluginPoint = FakeContentScopeScriptsSubscriptionEventPluginPoint()
 
-            whenever(mockDuckChat.getDuckChatUrl(any(), any())).thenReturn(duckChatURL)
+            whenever(mockDuckChat.getDuckChatUrl(any(), any(), any())).thenReturn(duckChatURL)
+            whenever(mockSyncStatusChangedObserver.syncStatusChangedEvents).thenReturn(syncStatusChangedEventsFlow)
+            whenever(subscriptions.getSubscriptionStatusFlow()).thenReturn(subscriptionStatusFlow)
 
             initialiseViewModel()
 
@@ -797,6 +818,7 @@ class BrowserTabViewModelTest {
                 trackingParameters = mockTrackingParameters,
                 settingsDataStore = mockSettingsDataStore,
                 urlDisplayRepository = mockUrlDisplayRepository,
+                browserMenuDisplayRepository = mockBrowserMenuDisplayRepository,
                 adClickManager = mockAdClickManager,
                 autofillCapabilityChecker = autofillCapabilityChecker,
                 autofillFireproofDialogSuppressor = autofillFireproofDialogSuppressor,
@@ -849,6 +871,8 @@ class BrowserTabViewModelTest {
                 omnibarRepository = mockOmnibarFeatureRepository,
                 contentScopeScriptsSubscriptionEventPluginPoint = fakeContentScopeScriptsSubscriptionEventPluginPoint,
                 serpSettingsFeature = serpSettingsFeature,
+                syncStatusChangedObserver = mockSyncStatusChangedObserver,
+                pageContextJSHelper = mockPageContextJSHelper,
             )
 
         testee.loadData("abc", null, false, false)
@@ -2902,11 +2926,27 @@ class BrowserTabViewModelTest {
         }
 
     @Test
-    fun whenCloseCurrentTabSelectedThenTabDeletedFromRepository() =
+    fun whenCloseCurrentTabSelectedAndNotInCustomTabThenTabDeletedFromRepository() =
         runTest {
+            testee.setIsCustomTab(false)
             givenOneActiveTabSelected()
             testee.closeCurrentTab()
+            verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
             verify(mockTabRepository).deleteTabAndSelectSource(selectedTabLiveData.value!!.tabId)
+            val command = commandCaptor.allValues.find { it is Command.NavigateBackInCustomTab }
+            assertNull(command)
+        }
+
+    @Test
+    fun whenCloseCurrentTabAndCustomTabAndCustomTabScreenEmitNavigateBackInCustomTabCommand() =
+        runTest {
+            testee.setIsCustomTab(true)
+            testee.closeCurrentTab()
+            verify(mockTabRepository, never()).deleteTabAndSelectSource(any())
+            verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+            val command = commandCaptor.allValues.find { it is Command.NavigateBackInCustomTab }
+            assertNotNull(command)
+            assertTrue(command is Command.NavigateBackInCustomTab)
         }
 
     @Test
@@ -4235,6 +4275,57 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenLoadUrlAndUrlIsInContentBlockingExceptionsListThenPrivacyOnIsFalse() {
+        runBlocking { whenever(mockAddressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(true) }
+        whenever(mockAddressBarTrackersAnimationManager.shouldShowAnimation(anyOrNull(), anyOrNull())).thenReturn(true)
+        whenever(mockContentBlocking.isAnException("example.com")).thenReturn(true)
+        loadUrl("https://example.com")
+        assertFalse(loadingViewState().trackersAnimationEnabled)
+    }
+
+    @Test
+    fun whenUserPreferenceDisabledThenTrackersAnimationDisabled() {
+        runBlocking { whenever(mockAddressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(true) }
+        whenever(mockAddressBarTrackersAnimationManager.shouldShowAnimation(anyOrNull(), anyOrNull())).thenReturn(true)
+        whenever(mockSettingsDataStore.showTrackersCountInAddressBar).thenReturn(false)
+        loadUrl("https://example.com")
+        assertFalse(loadingViewState().trackersAnimationEnabled)
+    }
+
+    @Test
+    fun whenUserPreferenceEnabledAndPrivacyProtectionActiveThenTrackersAnimationEnabled() {
+        runBlocking { whenever(mockAddressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(true) }
+        whenever(mockAddressBarTrackersAnimationManager.shouldShowAnimation(anyOrNull(), anyOrNull())).thenReturn(true)
+        whenever(mockSettingsDataStore.showTrackersCountInAddressBar).thenReturn(true)
+        whenever(mockContentBlocking.isAnException("example.com")).thenReturn(false)
+        loadUrl("https://example.com")
+        assertTrue(loadingViewState().trackersAnimationEnabled)
+    }
+
+    @Test
+    fun whenUserPreferenceDisabledEvenWithPrivacyProtectionActiveThenTrackersAnimationDisabled() {
+        runBlocking { whenever(mockAddressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(true) }
+        whenever(mockAddressBarTrackersAnimationManager.shouldShowAnimation(anyOrNull(), anyOrNull())).thenReturn(true)
+        whenever(mockSettingsDataStore.showTrackersCountInAddressBar).thenReturn(false)
+        whenever(mockContentBlocking.isAnException("example.com")).thenReturn(false)
+        loadUrl("https://example.com")
+        assertFalse(loadingViewState().trackersAnimationEnabled)
+    }
+
+    @Test
+    fun whenUserPreferenceEnabledButPrivacyProtectionDisabledThenTrackersAnimationDisabled() {
+        runBlocking { whenever(mockAddressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(true) }
+        whenever(mockAddressBarTrackersAnimationManager.shouldShowAnimation(anyOrNull(), anyOrNull())).thenReturn(true)
+        whenever(mockSettingsDataStore.showTrackersCountInAddressBar).thenReturn(true)
+        whenever(mockContentBlocking.isAnException("example.com")).thenReturn(true)
+        loadUrl("https://example.com")
+        assertFalse(loadingViewState().trackersAnimationEnabled)
+    }
+
+    @Test
+    fun whenUserPreferenceDisabledAndPrivacyProtectionDisabledThenTrackersAnimationDisabled() {
+        runBlocking { whenever(mockAddressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(true) }
+        whenever(mockAddressBarTrackersAnimationManager.shouldShowAnimation(anyOrNull(), anyOrNull())).thenReturn(true)
+        whenever(mockSettingsDataStore.showTrackersCountInAddressBar).thenReturn(false)
         whenever(mockContentBlocking.isAnException("example.com")).thenReturn(true)
         loadUrl("https://example.com")
         assertFalse(loadingViewState().trackersAnimationEnabled)
@@ -5172,6 +5263,7 @@ class BrowserTabViewModelTest {
                 "myId",
                 JSONObject("""{ "my":"object"}"""),
                 false,
+                null,
                 { "someUrl" },
             )
             assertCommandIssued<Command.WebShareRequest> {
@@ -5204,6 +5296,57 @@ class BrowserTabViewModelTest {
         }
 
     @Test
+    fun whenProcessJsCallbackMessagePageContextThenSendCommand() =
+        runTest {
+            val serializedContext = """{"title":"Example"}"""
+            val data = JSONObject().apply { put("serializedPageData", serializedContext) }
+            whenever(
+                mockPageContextJSHelper.processPageContext(
+                    eq(PAGE_CONTEXT_FEATURE_NAME),
+                    eq("collectionResult"),
+                    anyOrNull(),
+                    eq("abc"),
+                ),
+            ).thenReturn(serializedContext)
+
+            testee.processJsCallbackMessage(
+                PAGE_CONTEXT_FEATURE_NAME,
+                "collectionResult",
+                "contextId",
+                data,
+                false,
+            ) { "someUrl" }
+
+            assertCommandIssued<Command.PageContextReceived> {
+                assertEquals("abc", tabId)
+                assertEquals(serializedContext, pageContext)
+            }
+        }
+
+    @Test
+    fun whenProcessJsCallbackMessagePageContextWithoutDataThenDoNotSendCommand() =
+        runTest {
+            whenever(
+                mockPageContextJSHelper.processPageContext(
+                    eq(PAGE_CONTEXT_FEATURE_NAME),
+                    eq("collectionResult"),
+                    anyOrNull(),
+                    eq("abc"),
+                ),
+            ).thenReturn(null)
+
+            testee.processJsCallbackMessage(
+                PAGE_CONTEXT_FEATURE_NAME,
+                "collectionResult",
+                "contextId",
+                JSONObject("""{ }"""),
+                false,
+            ) { "someUrl" }
+
+            assertCommandNotIssued<Command.PageContextReceived>()
+        }
+
+    @Test
     fun whenProcessJsCallbackMessageScreenLockNotEnabledDoNotSendCommand() =
         runTest {
             whenever(mockEnabledToggle.isEnabled()).thenReturn(false)
@@ -5227,6 +5370,7 @@ class BrowserTabViewModelTest {
                 "myId",
                 JSONObject("""{ "my":"object"}"""),
                 false,
+                null,
                 { "someUrl" },
             )
             assertCommandIssued<Command.ScreenLock> {
@@ -5247,6 +5391,7 @@ class BrowserTabViewModelTest {
                 "myId",
                 JSONObject("""{ "my":"object"}"""),
                 false,
+                null,
                 { "someUrl" },
             )
             assertCommandNotIssued<Command.ScreenUnlock>()
@@ -5262,6 +5407,7 @@ class BrowserTabViewModelTest {
                 "myId",
                 JSONObject("""{ "my":"object"}"""),
                 false,
+                null,
                 { "someUrl" },
             )
             assertCommandIssued<Command.ScreenUnlock>()
@@ -5278,6 +5424,7 @@ class BrowserTabViewModelTest {
                 "id",
                 data = null,
                 false,
+                null,
                 { "someUrl" },
             )
             assertCommandIssued<Command.SendResponseToJs>()
@@ -5294,6 +5441,7 @@ class BrowserTabViewModelTest {
                 "id",
                 JSONObject("""{ overlayInteracted: "true", privatePlayerMode: {disabled: {} }}"""),
                 false,
+                null,
             ) { "someUrl" }
             assertCommandIssued<Command.SendResponseToJs>()
             verify(mockDuckPlayer).setUserPreferences(any(), any())
@@ -5311,6 +5459,7 @@ class BrowserTabViewModelTest {
                 "id",
                 JSONObject("""{ overlayInteracted: "true", privatePlayerMode: {enabled: {} }}"""),
                 false,
+                null,
                 { "someUrl" },
             )
             assertCommandIssued<Command.SendResponseToJs>()
@@ -5329,6 +5478,7 @@ class BrowserTabViewModelTest {
                 "id",
                 JSONObject("""{ overlayInteracted: "true", privatePlayerMode: {enabled: {} }}"""),
                 false,
+                null,
             ) { "someUrl" }
             assertCommandIssued<Command.SendResponseToDuckPlayer>()
             verify(mockDuckPlayer).setUserPreferences(true, "enabled")
@@ -5346,6 +5496,7 @@ class BrowserTabViewModelTest {
                 "id",
                 JSONObject("""{ pixelName: "pixel", params: {}}"""),
                 false,
+                null,
             ) { "someUrl" }
             verify(mockDuckPlayer).sendDuckPlayerPixel("pixel", mapOf())
         }
@@ -5362,6 +5513,7 @@ class BrowserTabViewModelTest {
                 "id",
                 JSONObject("""{ href: "duck://player/1234" }"""),
                 false,
+                null,
                 { "someUrl" },
             )
             assertCommandIssued<Navigate>()
@@ -5379,6 +5531,7 @@ class BrowserTabViewModelTest {
                 "id",
                 JSONObject("""{ href: "duck://player/1234" }"""),
                 false,
+                null,
                 { "someUrl" },
             )
             verify(mockDuckPlayer).setDuckPlayerOrigin(OVERLAY)
@@ -5396,6 +5549,7 @@ class BrowserTabViewModelTest {
                 "id",
                 JSONObject("""{ href: "duck://player/1234" }"""),
                 false,
+                null,
                 { "someUrl" },
             )
             verify(mockDuckPlayer).setDuckPlayerOrigin(AUTO)
@@ -5413,6 +5567,7 @@ class BrowserTabViewModelTest {
                 "id",
                 JSONObject("""{ href: "duck://player/1234" }"""),
                 false,
+                null,
                 { "someUrl" },
             )
             assertCommandIssued<Navigate>()
@@ -5430,6 +5585,7 @@ class BrowserTabViewModelTest {
                 "id",
                 JSONObject("""{ href: "duck://player/1234" }"""),
                 false,
+                null,
                 { "someUrl" },
             )
             assertCommandIssued<Command.OpenInNewTab>()
@@ -5478,6 +5634,7 @@ class BrowserTabViewModelTest {
                 "id",
                 null,
                 false,
+                null,
                 { "someUrl" },
             )
             assertCommandIssued<Command.SendResponseToJs>()
@@ -5494,6 +5651,7 @@ class BrowserTabViewModelTest {
                 "id",
                 null,
                 false,
+                null,
                 { "someUrl" },
             )
             assertCommandIssued<Command.SendResponseToDuckPlayer>()
@@ -5509,6 +5667,7 @@ class BrowserTabViewModelTest {
                 "id",
                 null,
                 false,
+                null,
                 { "someUrl" },
             )
             assertCommandIssued<Command.OpenDuckPlayerSettings>()
@@ -5526,6 +5685,7 @@ class BrowserTabViewModelTest {
                 "id",
                 null,
                 false,
+                null,
                 { "someUrl" },
             )
             assertCommandIssued<Command.OpenDuckPlayerPageInfo>()
@@ -6479,6 +6639,54 @@ class BrowserTabViewModelTest {
             verify(mockAdditionalDefaultBrowserPrompts).onPopupMenuLaunched()
         }
 
+    @Test
+    fun whenBrowserMenuHasOptionButNotEnabledThenUseBottomSheetMenuFalse() =
+        runTest {
+            // Given - repository returns hasOption=true but isEnabled=false
+            browserMenuStateFlow.emit(BrowserMenuDisplayState(hasOption = true, isEnabled = false))
+
+            // Then
+            assertFalse(browserViewState().useBottomSheetMenu)
+        }
+
+    @Test
+    fun whenBrowserMenuHasOptionAndEnabledThenUseBottomSheetMenuTrue() =
+        runTest {
+            // Given - repository returns hasOption=true and isEnabled=true
+            browserMenuStateFlow.emit(BrowserMenuDisplayState(hasOption = true, isEnabled = true))
+
+            // Then
+            assertTrue(browserViewState().useBottomSheetMenu)
+        }
+
+    @Test
+    fun whenBrowserMenuStateChangesThenUseBottomSheetMenuUpdates() =
+        runTest {
+            // Given - Start with enabled=false
+            browserMenuStateFlow.emit(BrowserMenuDisplayState(hasOption = true, isEnabled = false))
+
+            // Initial state
+            assertFalse(browserViewState().useBottomSheetMenu)
+
+            // When enabled
+            browserMenuStateFlow.emit(BrowserMenuDisplayState(hasOption = true, isEnabled = true))
+            assertTrue(browserViewState().useBottomSheetMenu)
+
+            // When disabled again
+            browserMenuStateFlow.emit(BrowserMenuDisplayState(hasOption = true, isEnabled = false))
+            assertFalse(browserViewState().useBottomSheetMenu)
+        }
+
+    @Test
+    fun whenBrowserMenuHasNoOptionThenUseBottomSheetMenuFalse() =
+        runTest {
+            // Given - Even if isEnabled is true, if hasOption is false (feature flag off), should be false
+            browserMenuStateFlow.emit(BrowserMenuDisplayState(hasOption = false, isEnabled = true))
+
+            // Then
+            assertFalse(browserViewState().useBottomSheetMenu)
+        }
+
     private fun givenTabManagerData() =
         runTest {
             val tabCount = "61-80"
@@ -6517,7 +6725,16 @@ class BrowserTabViewModelTest {
         runTest {
             whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
             val jsCallbackData = JsCallbackData(JSONObject(), "", "", "")
-            whenever(mockDuckChatJSHelper.processJsCallbackMessage(anyString(), anyString(), anyOrNull(), anyOrNull())).thenReturn(jsCallbackData)
+            whenever(
+                mockDuckChatJSHelper.processJsCallbackMessage(
+                    anyString(),
+                    anyString(),
+                    anyOrNull(),
+                    anyOrNull(),
+                    any(),
+                    anyOrNull(),
+                ),
+            ).thenReturn(jsCallbackData)
             testee.processJsCallbackMessage(
                 DUCK_CHAT_FEATURE_NAME,
                 "method",
@@ -6525,7 +6742,14 @@ class BrowserTabViewModelTest {
                 data = null,
                 false,
             ) { "someUrl" }
-            verify(mockDuckChatJSHelper).processJsCallbackMessage(DUCK_CHAT_FEATURE_NAME, "method", "id", null)
+            verify(mockDuckChatJSHelper).processJsCallbackMessage(
+                eq(DUCK_CHAT_FEATURE_NAME),
+                eq("method"),
+                eq("id"),
+                anyOrNull(),
+                any(),
+                anyOrNull(),
+            )
             assertCommandIssued<Command.SendResponseToJs>()
         }
 
@@ -6533,7 +6757,16 @@ class BrowserTabViewModelTest {
     fun whenProcessJsCallbackMessageForDuckChatAndResponseIsNullThenDoNotSendCommand() =
         runTest {
             whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
-            whenever(mockDuckChatJSHelper.processJsCallbackMessage(anyString(), anyString(), anyOrNull(), anyOrNull())).thenReturn(null)
+            whenever(
+                mockDuckChatJSHelper.processJsCallbackMessage(
+                    anyString(),
+                    anyString(),
+                    anyOrNull(),
+                    anyOrNull(),
+                    any(),
+                    anyOrNull(),
+                ),
+            ).thenReturn(null)
             testee.processJsCallbackMessage(
                 DUCK_CHAT_FEATURE_NAME,
                 "method",
@@ -6541,7 +6774,14 @@ class BrowserTabViewModelTest {
                 data = null,
                 false,
             ) { "someUrl" }
-            verify(mockDuckChatJSHelper).processJsCallbackMessage(DUCK_CHAT_FEATURE_NAME, "method", "id", null)
+            verify(mockDuckChatJSHelper).processJsCallbackMessage(
+                eq(DUCK_CHAT_FEATURE_NAME),
+                eq("method"),
+                eq("id"),
+                anyOrNull(),
+                any(),
+                anyOrNull(),
+            )
             assertCommandNotIssued<Command.SendResponseToJs>()
         }
 
@@ -6619,7 +6859,7 @@ class BrowserTabViewModelTest {
     fun whenOnDuckChatOmnibarButtonClickedAndFullScreenModeThenOpenChatNotCalled() = runTest {
         val duckAIUrl = "https://duckduckgo.com/?q=test"
         mockDuckAiFeatureStateFullScreenModeFlow.emit(true)
-        whenever(mockDuckChat.getDuckChatUrl(any(), any())).thenReturn(duckAIUrl)
+        whenever(mockDuckChat.getDuckChatUrl(any(), any(), any())).thenReturn(duckAIUrl)
         whenever(mockOmnibarConverter.convertQueryToUrl(duckAIUrl, null)).thenReturn(duckAIUrl)
 
         testee.onDuckChatOmnibarButtonClicked(query = "example", hasFocus = false, isNtp = true)
@@ -6817,6 +7057,31 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenLoadingUrlWithTrackersAnimationEnabledThenLastAnimatedUrlIsUpdatedImmediately() = runTest {
+        whenever(mockAddressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(true)
+        whenever(mockAddressBarTrackersAnimationManager.shouldShowAnimation(anyOrNull(), anyOrNull())).thenReturn(true)
+
+        loadUrl("https://www.example.com")
+
+        // Verify shouldShowAnimation is called with updated lastAnimatedUrl on second navigation
+        // The second call should pass the first URL as lastAnimatedUrl
+        loadUrl("https://www.example.com/page2")
+
+        // Verify that by the second load, the manager received the first URL as lastAnimatedUrl
+        verify(mockAddressBarTrackersAnimationManager, times(2)).shouldShowAnimation(anyOrNull(), anyOrNull())
+
+        // The first call should have null as lastAnimatedUrl
+        // The second call should have the first URL as lastAnimatedUrl (immediate update)
+        val captor = argumentCaptor<String>()
+        verify(mockAddressBarTrackersAnimationManager, times(2)).shouldShowAnimation(anyOrNull(), captor.capture())
+
+        // First navigation: lastAnimatedUrl was null
+        assertNull(captor.firstValue)
+        // Second navigation: lastAnimatedUrl should be the first URL (updated immediately)
+        assertEquals("https://www.example.com", captor.secondValue)
+    }
+
+    @Test
     fun whenVisitSiteThenUpdateLoadingViewStateAndOmnibarViewState() {
         testee.browserViewState.value =
             browserViewState().copy(
@@ -7006,7 +7271,15 @@ class BrowserTabViewModelTest {
     fun whenProcessJsCallbackMessageForSubscriptionsThenSendCommand() =
         runTest {
             val jsCallbackData = JsCallbackData(JSONObject(), "", "", "")
-            whenever(mockSubscriptionsJSHelper.processJsCallbackMessage(anyString(), anyString(), anyOrNull(), anyOrNull()))
+            whenever(
+                mockSubscriptionsJSHelper.processJsCallbackMessage(
+                    anyString(),
+                    anyString(),
+                    anyOrNull(),
+                    anyOrNull(),
+                    anyOrNull(),
+                ),
+            )
                 .thenReturn(jsCallbackData)
             testee.processJsCallbackMessage(
                 featureName = SUBSCRIPTIONS_FEATURE_NAME,
@@ -7014,21 +7287,30 @@ class BrowserTabViewModelTest {
                 id = "id",
                 data = null,
             ) { "someUrl" }
-            verify(mockSubscriptionsJSHelper).processJsCallbackMessage(SUBSCRIPTIONS_FEATURE_NAME, "method", "id", null)
+            verify(mockSubscriptionsJSHelper).processJsCallbackMessage(SUBSCRIPTIONS_FEATURE_NAME, "method", "id", null, null)
             assertCommandIssued<Command.SendResponseToJs>()
         }
 
     @Test
     fun whenProcessJsCallbackMessageForSubscriptionsAndResponseIsNullThenDoNotSendCommand() =
         runTest {
-            whenever(mockDuckChatJSHelper.processJsCallbackMessage(anyString(), anyString(), anyOrNull(), anyOrNull())).thenReturn(null)
+            whenever(
+                mockDuckChatJSHelper.processJsCallbackMessage(
+                    anyString(),
+                    anyString(),
+                    anyOrNull(),
+                    anyOrNull(),
+                    any(),
+                    any(),
+                ),
+            ).thenReturn(null)
             testee.processJsCallbackMessage(
                 featureName = SUBSCRIPTIONS_FEATURE_NAME,
                 method = "method",
                 id = "id",
                 data = null,
             ) { "someUrl" }
-            verify(mockSubscriptionsJSHelper).processJsCallbackMessage(SUBSCRIPTIONS_FEATURE_NAME, "method", "id", null)
+            verify(mockSubscriptionsJSHelper).processJsCallbackMessage(SUBSCRIPTIONS_FEATURE_NAME, "method", "id", null, null)
             assertCommandNotIssued<Command.SendResponseToJs>()
         }
 
@@ -7612,6 +7894,15 @@ class BrowserTabViewModelTest {
         testee.pageFinished(mockWebView, webViewNavState, nonDdgUrl)
 
         assertNull("SERP logo should be cleared when navigating to non-DuckDuckGo URL", omnibarViewState().serpLogo)
+    }
+
+    @Test
+    fun whenOnStartTrackersAnimationCalledThenStartAddressBarTrackersAnimationCommandIssued() = runTest {
+        loadUrl("https://www.example.com")
+
+        testee.onStartTrackersAnimation()
+
+        assertCommandIssued<Command.StartAddressBarTrackersAnimation>()
     }
 
     private fun aCredential(): LoginCredentials = LoginCredentials(domain = null, username = null, password = null)
@@ -8224,5 +8515,196 @@ class BrowserTabViewModelTest {
 
         verify(mockPixel).fire(DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_KEYBOARD_USAGE)
         verify(mockPixel).fire(DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_KEYBOARD_USAGE_DAILY, type = Daily())
+    }
+
+    @Test
+    fun whenNavigatingToSameOriginThenBlobProxyIsRetained() = runTest {
+        val originUrl = "https://example.com"
+        val blobUrl = "blob:https://example.com/some-blob-id"
+        val mockReplyProxy: JavaScriptReplyProxy = mock()
+
+        testee.saveReplyProxyForBlobDownload(originUrl, mockReplyProxy)
+
+        // Navigate to the same origin (proxy should be retained)
+        loadUrl("https://example.com/another-page")
+
+        testee.requestFileDownload(
+            webView = mockWebView,
+            url = blobUrl,
+            contentDisposition = null,
+            mimeType = "application/octet-stream",
+            requestUserConfirmation = true,
+            isBlobDownloadWebViewFeatureEnabled = true,
+        )
+
+        verify(mockWebViewCompatWrapper).postMessage(eq(mockWebView), eq(mockReplyProxy), eq(blobUrl))
+    }
+
+    @Test
+    fun whenNavigatingToDifferentOriginThenBlobProxyIsRemoved() = runTest {
+        val originUrl = "https://example.com"
+        val blobUrl = "blob:https://example.com/some-blob-id"
+        val mockReplyProxy: JavaScriptReplyProxy = mock()
+
+        testee.saveReplyProxyForBlobDownload(originUrl, mockReplyProxy)
+
+        // Navigate to a different origin (proxy should be removed)
+        loadUrl("https://different-site.com/page")
+
+        testee.requestFileDownload(
+            webView = mockWebView,
+            url = blobUrl,
+            contentDisposition = null,
+            mimeType = "application/octet-stream",
+            requestUserConfirmation = true,
+            isBlobDownloadWebViewFeatureEnabled = true,
+        )
+
+        verify(mockWebViewCompatWrapper, never()).postMessage(any(), any(), any())
+    }
+
+    @Test
+    fun whenSavingMultipleProxiesForSameOriginThenAllAreRetainedOnSameOriginNavigation() = runTest {
+        val originUrl = "https://example.com"
+        val locationHref1 = "https://example.com/frame1"
+        val locationHref2 = "https://example.com/frame2"
+        val blobUrl = "blob:https://example.com/some-blob-id"
+        val mockReplyProxy1: JavaScriptReplyProxy = mock()
+        val mockReplyProxy2: JavaScriptReplyProxy = mock()
+
+        testee.saveReplyProxyForBlobDownload(originUrl, mockReplyProxy1, locationHref1)
+        testee.saveReplyProxyForBlobDownload(originUrl, mockReplyProxy2, locationHref2)
+
+        // Navigate to the same origin (all proxies should be retained)
+        loadUrl("https://example.com/another-page")
+
+        testee.requestFileDownload(
+            webView = mockWebView,
+            url = blobUrl,
+            contentDisposition = null,
+            mimeType = "application/octet-stream",
+            requestUserConfirmation = true,
+            isBlobDownloadWebViewFeatureEnabled = true,
+        )
+
+        verify(mockWebViewCompatWrapper).postMessage(eq(mockWebView), eq(mockReplyProxy1), eq(blobUrl))
+        verify(mockWebViewCompatWrapper).postMessage(eq(mockWebView), eq(mockReplyProxy2), eq(blobUrl))
+    }
+
+    @Test
+    fun whenSavingProxiesForDifferentOriginsThenOnlyMatchingOriginIsRetained() = runTest {
+        val originUrl1 = "https://example.com"
+        val originUrl2 = "https://other-site.com"
+        val blobUrl = "blob:https://example.com/some-blob-id"
+        val mockReplyProxy1: JavaScriptReplyProxy = mock()
+        val mockReplyProxy2: JavaScriptReplyProxy = mock()
+
+        testee.saveReplyProxyForBlobDownload(originUrl1, mockReplyProxy1)
+        testee.saveReplyProxyForBlobDownload(originUrl2, mockReplyProxy2)
+
+        // Navigate to first origin (only first proxy should be retained)
+        loadUrl("https://example.com/page")
+
+        testee.requestFileDownload(
+            webView = mockWebView,
+            url = blobUrl,
+            contentDisposition = null,
+            mimeType = "application/octet-stream",
+            requestUserConfirmation = true,
+            isBlobDownloadWebViewFeatureEnabled = true,
+        )
+
+        verify(mockWebViewCompatWrapper).postMessage(eq(mockWebView), eq(mockReplyProxy1), eq(blobUrl))
+        verify(mockWebViewCompatWrapper, never()).postMessage(eq(mockWebView), eq(mockReplyProxy2), eq(blobUrl))
+    }
+
+    @Test
+    fun whenOnDuckChatOmnibarButtonClickedAndContextualModeEnabledAndNotNTPAndOnboardingCompletedThenShowContextualModeCommandSent() = runTest {
+        mockDuckAiContextualModeFlow.emit(true)
+        whenever(mockDuckChat.isContextualOnboardingCompleted()).thenReturn(true)
+
+        testee.onDuckChatOmnibarButtonClicked(query = "example", hasFocus = false, isNtp = false)
+
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        assertTrue(commandCaptor.lastValue is Command.ShowDuckAIContextualMode)
+    }
+
+    @Test
+    fun whenOnDuckChatOmnibarButtonClickedAndContextualModeEnabledAndNotNTPAndOnboardingNotCompletedThenShowOnboardingCommandSent() = runTest {
+        mockDuckAiContextualModeFlow.emit(true)
+        whenever(mockDuckChat.isContextualOnboardingCompleted()).thenReturn(false)
+
+        testee.onDuckChatOmnibarButtonClicked(query = "example", hasFocus = false, isNtp = false)
+
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        assertTrue(commandCaptor.lastValue is Command.ShowDuckAIContextualOnboarding)
+    }
+
+    @Test
+    fun whenOnDuckChatOmnibarButtonClickedAndContextualModeEnabledAndNTPThenContextualNotCalled() = runTest {
+        val duckAIUrl = "https://duckduckgo.com/?q=test"
+
+        mockDuckAiContextualModeFlow.emit(true)
+        mockDuckAiFeatureStateFullScreenModeFlow.emit(true)
+
+        whenever(mockDuckChat.getDuckChatUrl(any(), any(), any())).thenReturn(duckAIUrl)
+        whenever(mockOmnibarConverter.convertQueryToUrl(duckAIUrl, null)).thenReturn(duckAIUrl)
+
+        testee.onDuckChatOmnibarButtonClicked(query = "example", hasFocus = false, isNtp = true)
+
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        val command = commandCaptor.lastValue as Navigate
+        assertEquals(duckAIUrl, command.url)
+
+        verify(mockDuckChat, never()).openDuckChat()
+    }
+
+    @Test
+    fun whenSubscriptionChangesWhileOnDuckAiThenAuthUpdateEventSent() = runTest {
+        val duckAiUrl = "https://duck.ai/chat"
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
+        loadUrl(duckAiUrl, title = "Duck.ai")
+
+        testee.subscriptionEventDataFlow.test {
+            subscriptionStatusFlow.emit(SubscriptionStatus.AUTO_RENEWABLE)
+
+            val event = awaitItem()
+            assertEquals(SUBSCRIPTIONS_FEATURE_NAME, event.featureName)
+            assertEquals("authUpdate", event.subscriptionName)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSubscriptionChangesWhileNotOnDuckAiThenNoAuthUpdateEventSent() = runTest {
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(false)
+        loadUrl(exampleUrl, title = "Example")
+
+        testee.subscriptionEventDataFlow.test {
+            subscriptionStatusFlow.emit(SubscriptionStatus.AUTO_RENEWABLE)
+
+            expectNoEvents()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenOnViewVisibleWithPendingAuthUpdateOnDuckAiThenAuthUpdateEventSent() = runTest {
+        val duckAiUrl = "https://duck.ai/chat"
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
+        loadUrl(duckAiUrl, title = "Duck.ai")
+
+        // Trigger subscription change to set pending flag
+        subscriptionStatusFlow.emit(SubscriptionStatus.AUTO_RENEWABLE)
+
+        testee.subscriptionEventDataFlow.test {
+            // Simulate returning to the view (e.g., after purchase flow)
+            testee.onViewVisible()
+
+            val event = awaitItem()
+            assertEquals(SUBSCRIPTIONS_FEATURE_NAME, event.featureName)
+            assertEquals("authUpdate", event.subscriptionName)
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 }

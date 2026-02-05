@@ -16,18 +16,13 @@
 
 package com.duckduckgo.pir.impl.pixels
 
-import android.content.Context
-import android.os.PowerManager
-import android.util.Base64
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import kotlinx.coroutines.test.runTest
 import okhttp3.Interceptor
 import okhttp3.Request
 import okhttp3.Response
-import org.json.JSONObject
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
@@ -40,21 +35,16 @@ import org.mockito.kotlin.whenever
 @RunWith(AndroidJUnit4::class)
 class PirPixelInterceptorTest {
     private lateinit var testee: PirPixelInterceptor
-    private val mockContext: Context = mock()
     private val mockAppBuildConfig: AppBuildConfig = mock()
     private val mockChain: Interceptor.Chain = mock()
     private val mockResponse: Response = mock()
-    private val mockPowerManager: PowerManager = mock()
 
     @Before
     fun setUp() {
-        testee = PirPixelInterceptor(mockContext, mockAppBuildConfig)
+        testee = PirPixelInterceptor(mockAppBuildConfig)
         whenever(mockChain.proceed(any())).thenReturn(mockResponse)
-        whenever(mockContext.packageName).thenReturn("com.test.app")
-        whenever(mockContext.getSystemService(Context.POWER_SERVICE)).thenReturn(mockPowerManager)
         whenever(mockAppBuildConfig.sdkInt).thenReturn(30)
         whenever(mockAppBuildConfig.manufacturer).thenReturn("TestManufacturer")
-        whenever(mockPowerManager.isIgnoringBatteryOptimizations(any())).thenReturn(true)
     }
 
     @Test
@@ -63,25 +53,7 @@ class PirPixelInterceptorTest {
     }
 
     @Test
-    fun whenInterceptPirInternalPixelThenAddsMetadataParameter() = runTest {
-        val request = Request.Builder()
-            .url("https://example.com/pir_internal_scan_started")
-            .build()
-
-        whenever(mockChain.request()).thenReturn(request)
-
-        testee.intercept(mockChain)
-
-        val requestCaptor = org.mockito.kotlin.argumentCaptor<Request>()
-        verify(mockChain).proceed(requestCaptor.capture())
-
-        val capturedRequest = requestCaptor.firstValue
-        val metadataParam = capturedRequest.url.queryParameter("metadata")
-        assertNotNull(metadataParam)
-    }
-
-    @Test
-    fun whenInterceptNonPirPixelThenDoesNotAddMetadataParameter() = runTest {
+    fun whenInterceptNonPirPixelThenDoesNotAddAnyParameter() = runTest {
         val request = Request.Builder()
             .url("https://example.com/some_other_pixel")
             .build()
@@ -94,14 +66,14 @@ class PirPixelInterceptorTest {
         verify(mockChain).proceed(requestCaptor.capture())
 
         val capturedRequest = requestCaptor.firstValue
-        val metadataParam = capturedRequest.url.queryParameter("metadata")
-        assertNull(metadataParam)
+        val man = capturedRequest.url.queryParameter("manufacturer")
+        assertNull(man)
     }
 
     @Test
-    fun whenInterceptPirInternalPixelThenMetadataContainsCorrectFields() = runTest {
+    fun whenInterceptPirAllowListedPixelThenMetadataContainsCorrectFields() = runTest {
         val request = Request.Builder()
-            .url("https://example.com/pir_internal_test_pixel")
+            .url("https://example.com/m_dbp_foreground-run_completed")
             .build()
 
         whenever(mockChain.request()).thenReturn(request)
@@ -112,49 +84,14 @@ class PirPixelInterceptorTest {
         verify(mockChain).proceed(requestCaptor.capture())
 
         val capturedRequest = requestCaptor.firstValue
-        val metadataParam = capturedRequest.url.queryParameter("metadata")
-        assertNotNull(metadataParam)
-
-        // Decode Base64
-        val decodedBytes = Base64.decode(metadataParam, Base64.NO_WRAP or Base64.NO_PADDING or Base64.URL_SAFE)
-        val decodedJson = String(decodedBytes)
-        val jsonObject = JSONObject(decodedJson)
-
-        assertEquals(30, jsonObject.getInt("os"))
-        assertEquals("false", jsonObject.getString("batteryOptimizations"))
-        assertEquals("TestManufacturer", jsonObject.getString("man"))
+        val man = capturedRequest.url.queryParameter("manufacturer")
+        assertEquals("TestManufacturer", man)
     }
 
     @Test
-    fun whenInterceptPirInternalPixelWithBatteryOptimizationsDisabledThenMetadataShowsTrue() = runTest {
-        whenever(mockPowerManager.isIgnoringBatteryOptimizations(any())).thenReturn(false)
-
+    fun whenInterceptPirAllowListedPixelThenPreservesOtherQueryParameters() = runTest {
         val request = Request.Builder()
-            .url("https://example.com/pir_internal_test_pixel")
-            .build()
-
-        whenever(mockChain.request()).thenReturn(request)
-
-        testee.intercept(mockChain)
-
-        val requestCaptor = org.mockito.kotlin.argumentCaptor<Request>()
-        verify(mockChain).proceed(requestCaptor.capture())
-
-        val capturedRequest = requestCaptor.firstValue
-        val metadataParam = capturedRequest.url.queryParameter("metadata")
-        assertNotNull(metadataParam)
-
-        val decodedBytes = Base64.decode(metadataParam, Base64.NO_WRAP or Base64.NO_PADDING or Base64.URL_SAFE)
-        val decodedJson = String(decodedBytes)
-        val jsonObject = JSONObject(decodedJson)
-
-        assertEquals("true", jsonObject.getString("batteryOptimizations"))
-    }
-
-    @Test
-    fun whenInterceptPirInternalPixelThenPreservesOtherQueryParameters() = runTest {
-        val request = Request.Builder()
-            .url("https://example.com/pir_internal_test_pixel?existing=param&another=value")
+            .url("https://example.com/m_dbp_foreground-run_started?existing=param&another=value")
             .build()
 
         whenever(mockChain.request()).thenReturn(request)
@@ -167,29 +104,7 @@ class PirPixelInterceptorTest {
         val capturedRequest = requestCaptor.firstValue
         assertEquals("param", capturedRequest.url.queryParameter("existing"))
         assertEquals("value", capturedRequest.url.queryParameter("another"))
-        assertNotNull(capturedRequest.url.queryParameter("metadata"))
-    }
-
-    @Test
-    fun whenInterceptPirInternalPixelThenMetadataIsBase64Encoded() = runTest {
-        val request = Request.Builder()
-            .url("https://example.com/pir_internal_test")
-            .build()
-
-        whenever(mockChain.request()).thenReturn(request)
-
-        testee.intercept(mockChain)
-
-        val requestCaptor = org.mockito.kotlin.argumentCaptor<Request>()
-        verify(mockChain).proceed(requestCaptor.capture())
-
-        val capturedRequest = requestCaptor.firstValue
-        val metadataParam = capturedRequest.url.queryParameter("metadata")
-        assertNotNull(metadataParam)
-
-        val decodedBytes = Base64.decode(metadataParam, Base64.NO_WRAP or Base64.NO_PADDING or Base64.URL_SAFE)
-        assertNotNull(decodedBytes)
-        assert(decodedBytes.isNotEmpty())
+        assertEquals("TestManufacturer", capturedRequest.url.queryParameter("manufacturer"))
     }
 
     @Test
@@ -211,11 +126,9 @@ class PirPixelInterceptorTest {
     }
 
     @Test
-    fun whenBatteryOptimizationCheckThrowsExceptionThenDefaultsToFalse() = runTest {
-        whenever(mockPowerManager.isIgnoringBatteryOptimizations(any())).thenThrow(RuntimeException("Test exception"))
-
+    fun whenInterceptLowMemoryPixelThenAddsManufacturerParameter() = runTest {
         val request = Request.Builder()
-            .url("https://example.com/pir_internal_test")
+            .url("https://example.com/m_dbp_foreground-run_low-memory")
             .build()
 
         whenever(mockChain.request()).thenReturn(request)
@@ -226,23 +139,14 @@ class PirPixelInterceptorTest {
         verify(mockChain).proceed(requestCaptor.capture())
 
         val capturedRequest = requestCaptor.firstValue
-        val metadataParam = capturedRequest.url.queryParameter("metadata")
-        assertNotNull(metadataParam)
-
-        val decodedBytes = Base64.decode(metadataParam, Base64.NO_WRAP or Base64.NO_PADDING or Base64.URL_SAFE)
-        val decodedJson = String(decodedBytes)
-        val jsonObject = JSONObject(decodedJson)
-
-        // when exception occurs, should default to false (meaning battery optimizations are enabled)
-        assertEquals("true", jsonObject.getString("batteryOptimizations"))
+        val man = capturedRequest.url.queryParameter("manufacturer")
+        assertEquals("TestManufacturer", man)
     }
 
     @Test
-    fun whenPackageNameIsNullThenBatteryOptimizationCheckReturnsFalse() = runTest {
-        whenever(mockContext.packageName).thenReturn(null)
-
+    fun whenInterceptStartFailedPixelThenAddsManufacturerParameter() = runTest {
         val request = Request.Builder()
-            .url("https://example.com/pir_internal_test")
+            .url("https://example.com/m_dbp_foreground-run_start-failed")
             .build()
 
         whenever(mockChain.request()).thenReturn(request)
@@ -253,13 +157,7 @@ class PirPixelInterceptorTest {
         verify(mockChain).proceed(requestCaptor.capture())
 
         val capturedRequest = requestCaptor.firstValue
-        val metadataParam = capturedRequest.url.queryParameter("metadata")
-        assertNotNull(metadataParam)
-
-        val decodedBytes = Base64.decode(metadataParam, Base64.NO_WRAP or Base64.NO_PADDING or Base64.URL_SAFE)
-        val decodedJson = String(decodedBytes)
-        val jsonObject = JSONObject(decodedJson)
-
-        assertEquals("true", jsonObject.getString("batteryOptimizations"))
+        val man = capturedRequest.url.queryParameter("manufacturer")
+        assertEquals("TestManufacturer", man)
     }
 }

@@ -226,6 +226,12 @@ enum class AutofillPixelNames(override val pixelName: String) : Pixel.PixelName 
     BOOKMARK_IMPORT_FROM_GOOGLE_FLOW_EXTRA_CHROME_EXPORT("bookmark_import_from_google_flow_extra_chrome_export"),
     PRODUCT_TELEMETRY_SURFACE_PASSWORDS_OPENED("m_product_telemetry_surface_usage_passwords_page"),
     PRODUCT_TELEMETRY_SURFACE_PASSWORDS_OPENED_DAILY("m_product_telemetry_surface_usage_passwords_page_daily"),
+    AUTOFILL_HARMONY_PREFERENCES_RETRIEVAL_FAILED("autofill_harmony_preferences_retrieval_failed"),
+    AUTOFILL_PREFERENCES_RETRIEVAL_FAILED("autofill_preferences_retrieval_failed"),
+    AUTOFILL_PREFERENCES_GET_KEY_FAILED("autofill_preferences_get_key_failed"),
+    AUTOFILL_HARMONY_PREFERENCES_GET_KEY_FAILED("autofill_harmony_preferences_get_key_failed"),
+    AUTOFILL_PREFERENCES_UPDATE_KEY_FAILED("autofill_preferences_update_key_failed"),
+    AUTOFILL_HARMONY_PREFERENCES_UPDATE_KEY_FAILED("autofill_harmony_preferences_update_key_failed"),
 }
 
 object AutofillPixelParameters {

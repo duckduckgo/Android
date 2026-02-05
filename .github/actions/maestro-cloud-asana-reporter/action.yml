@@ -1,0 +1,130 @@
+name: 'Maestro Cloud with Asana Reporting'
+description: 'Runs Maestro Cloud tests, analyzes results, and reports failures to Asana'
+
+inputs:
+  maestro_api_key:
+    description: 'Robin API Key'
+    required: true
+  maestro_project_id:
+    description: 'Robin Project ID'
+    required: true
+  maestro_test_name:
+    description: 'Name for the Maestro run'
+    required: true
+  maestro_app_file:
+    description: 'Path to the APK file'
+    required: false
+  maestro_app_binary_id:
+    description: 'The ID of the app binary to use (if already uploaded)'
+    required: false
+  maestro_api_level:
+    description: 'Android API level'
+    required: false
+    default: '34'
+  maestro_include_tags:
+    description: 'Maestro tags to include'
+    required: true
+  maestro_timeout:
+    description: 'Maestro timeout in minutes'
+    required: true
+  asana_pat:
+    description: 'Asana Personal Access Token'
+    required: true
+  asana_project_id:
+    description: 'Asana Project ID'
+    required: true
+  asana_section_id:
+    description: 'Asana Section ID'
+    required: true
+  test_suite_name:
+    description: 'Readable name for the test suite (used in Asana task)'
+    required: true
+  maestro_env:
+    description: 'Environment variables to pass to Maestro (optional)'
+    required: false
+    default: ''
+  is_release_blocker:
+    description: 'Whether to add the failure as a release blocker in Asana'
+    required: false
+    default: 'false'
+  asana_releases_project_id:
+    description: 'Asana Releases Project ID (needed if is_release_blocker is true)'
+    required: false
+    default: ''
+  asana_releases_blocker_section_id:
+    description: 'Asana Releases Blocker Section ID (needed if is_release_blocker is true)'
+    required: false
+    default: ''
+
+outputs:
+  flow_summary_status:
+    description: 'The summary status of the Maestro flow analysis'
+    value: ${{ steps.analyze-maestro.outputs.flow_summary_status }}
+  maestro_console_url:
+    description: 'The URL to the Maestro Cloud console'
+    value: ${{ steps.maestro-run.outputs.MAESTRO_CLOUD_CONSOLE_URL }}
+  maestro_app_binary_id:
+    description: 'The ID of the app binary used or uploaded'
+    value: ${{ steps.maestro-run.outputs.MAESTRO_CLOUD_APP_BINARY_ID }}
+  asana_task_id:
+    description: 'The ID of the created Asana task if tests failed'
+    value: ${{ steps.create-maestro-failure-task.outputs.taskId }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Run Maestro Cloud
+      id: maestro-run
+      uses: mobile-dev-inc/action-maestro-cloud@v1.9.8
+      with:
+        api-key: ${{ inputs.maestro_api_key }}
+        project-id: ${{ inputs.maestro_project_id }}
+        name: ${{ inputs.maestro_test_name }}
+        timeout: ${{ inputs.maestro_timeout }}
+        app-file: ${{ inputs.maestro_app_binary_id == '' && inputs.maestro_app_file || '' }}
+        app-binary-id: ${{ inputs.maestro_app_binary_id != '' && inputs.maestro_app_binary_id || '' }}
+        android-api-level: ${{ inputs.maestro_api_level }}
+        workspace: .maestro
+        include-tags: ${{ inputs.maestro_include_tags }}
+        env: ${{ inputs.maestro_env }}
+
+    - name: Analyze Maestro Flow Results
+      if: always()
+      id: analyze-maestro
+      uses: ./.github/actions/maestro-flow-analyzer
+      with:
+        flow_results_json: ${{ steps.maestro-run.outputs.MAESTRO_CLOUD_FLOW_RESULTS }}
+        console_url: ${{ steps.maestro-run.outputs.MAESTRO_CLOUD_CONSOLE_URL }}
+        upload_status: ${{ steps.maestro-run.outputs.MAESTRO_CLOUD_UPLOAD_STATUS }}
+        app_binary_id: ${{ steps.maestro-run.outputs.MAESTRO_CLOUD_APP_BINARY_ID }}
+
+    - name: Show analyzer output
+      if: always()
+      shell: bash
+      run: echo "flow_summary_status=${{ steps.analyze-maestro.outputs.flow_summary_status }}"
+
+    - name: Create Asana task when Maestro tests failed
+      if: always() && steps.analyze-maestro.outputs.flow_summary_status == 'failure'
+      id: create-maestro-failure-task
+      uses: duckduckgo/native-github-asana-sync@v2.0
+      with:
+        asana-pat: ${{ inputs.asana_pat }}
+        asana-project: ${{ inputs.asana_project_id }}
+        asana-section: ${{ inputs.asana_section_id }}
+        asana-task-name: E2E Tests Failure - ${{ inputs.test_suite_name }}
+        asana-task-description: |
+          Run: https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
+          Console: ${{ steps.maestro-run.outputs.MAESTRO_CLOUD_CONSOLE_URL }}
+          Summary:
+          ${{ steps.analyze-maestro.outputs.flow_summary_message }}
+        action: 'create-asana-task'
+
+    - name: Adding as a release blocker
+      if: always() && inputs.is_release_blocker == 'true' && steps.create-maestro-failure-task.outputs.taskId != ''
+      uses: duckduckgo/native-github-asana-sync@v2.0
+      with:
+        asana-pat: ${{ inputs.asana_pat }}
+        asana-project: ${{ inputs.asana_releases_project_id }}
+        asana-section: ${{ inputs.asana_releases_blocker_section_id }}
+        asana-task-id: ${{ steps.create-maestro-failure-task.outputs.taskId }}
+        action: 'add-task-asana-project'

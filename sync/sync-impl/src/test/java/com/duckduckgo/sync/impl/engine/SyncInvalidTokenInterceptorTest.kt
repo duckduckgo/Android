@@ -94,6 +94,44 @@ class SyncInvalidTokenInterceptorTest {
         assertNull(notificationManager.activeNotifications.find { it.id == SYNC_USER_LOGGED_OUT_NOTIFICATION_ID })
     }
 
+    @Test
+    fun whenInterceptingSyncResponseInvalidTokenWhenDELETEThenNotifyUser() {
+        val chain = givenDeleteRequest(SYNC_PROD_ENVIRONMENT_URL, INVALID_LOGIN_CREDENTIALS.code)
+
+        invalidTokenInterceptor.intercept(chain)
+
+        notificationManager.activeNotifications
+            .find { it.id == SYNC_USER_LOGGED_OUT_NOTIFICATION_ID } ?: fail("Notification not found")
+    }
+
+    @Test
+    fun whenInterceptingNonSyncDeleteRequestThenDoNotNotifyUser() {
+        val chain = givenDeleteRequest("https://www.example.com", INVALID_LOGIN_CREDENTIALS.code)
+
+        invalidTokenInterceptor.intercept(chain)
+
+        assertNull(notificationManager.activeNotifications.find { it.id == SYNC_USER_LOGGED_OUT_NOTIFICATION_ID })
+    }
+
+    @Test
+    fun whenInterceptingSyncResponseInvalidTokenWhenPOSTThenNotifyUser() {
+        val chain = givenPostRequest(SYNC_PROD_ENVIRONMENT_URL, INVALID_LOGIN_CREDENTIALS.code)
+
+        invalidTokenInterceptor.intercept(chain)
+
+        notificationManager.activeNotifications
+            .find { it.id == SYNC_USER_LOGGED_OUT_NOTIFICATION_ID } ?: fail("Notification not found")
+    }
+
+    @Test
+    fun whenInterceptingNonSyncPostRequestThenDoNotNotifyUser() {
+        val chain = givenPostRequest("https://www.example.com", INVALID_LOGIN_CREDENTIALS.code)
+
+        invalidTokenInterceptor.intercept(chain)
+
+        assertNull(notificationManager.activeNotifications.find { it.id == SYNC_USER_LOGGED_OUT_NOTIFICATION_ID })
+    }
+
     private fun givenGetRequest(
         url: String,
         expectedResponseCode: Int? = null,
@@ -109,6 +147,24 @@ class SyncInvalidTokenInterceptorTest {
     ): Chain {
         return object : FakeChain(url, expectedResponseCode) {
             override fun request() = Request.Builder().url(url).method("PATCH", "".toRequestBody()).build()
+        }
+    }
+
+    private fun givenDeleteRequest(
+        url: String,
+        expectedResponseCode: Int? = null,
+    ): Chain {
+        return object : FakeChain(url, expectedResponseCode) {
+            override fun request() = Request.Builder().url(url).method("DELETE", null).build()
+        }
+    }
+
+    private fun givenPostRequest(
+        url: String,
+        expectedResponseCode: Int? = null,
+    ): Chain {
+        return object : FakeChain(url, expectedResponseCode) {
+            override fun request() = Request.Builder().url(url).method("POST", "".toRequestBody()).build()
         }
     }
 }

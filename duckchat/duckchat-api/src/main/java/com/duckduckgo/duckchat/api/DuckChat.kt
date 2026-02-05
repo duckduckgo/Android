@@ -50,7 +50,7 @@ interface DuckChat {
     /**
      * Returns the Duck Chat URL to be used
      */
-    fun getDuckChatUrl(query: String, autoPrompt: Boolean): String
+    fun getDuckChatUrl(query: String, autoPrompt: Boolean, sidebar: Boolean = false): String
 
     /**
      * Determines whether a given [Uri] is a DuckChat URL.
@@ -89,4 +89,22 @@ interface DuckChat {
      * Returns null if the cosmetic value has not been set before.
      */
     fun observeCosmeticInputScreenUserSettingEnabled(): Flow<Boolean?>
+
+    /**
+     * Observes the value for the automatic context attachment for Contextual Mode
+     */
+    fun observeAutomaticContextAttachmentUserSettingEnabled(): Flow<Boolean>
+
+    /**
+     * Shows the contextual onboarding bottom sheet dialog.
+     * @param context The context to show the dialog in.
+     * @param onConfirmed Callback invoked when the user confirms the dialog.
+     */
+    fun showContextualOnboarding(context: Context, onConfirmed: () -> Unit)
+
+    /**
+     * Checks if the contextual onboarding has been completed.
+     * @return true if the onboarding was completed, false otherwise.
+     */
+    suspend fun isContextualOnboardingCompleted(): Boolean
 }

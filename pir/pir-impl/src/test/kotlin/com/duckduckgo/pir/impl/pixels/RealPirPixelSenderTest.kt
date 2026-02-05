@@ -68,6 +68,34 @@ class RealPirPixelSenderTest {
     }
 
     @Test
+    fun whenReportManualScanStartFailedThenEnqueuesCorrectPixel() = runTest {
+        testee.reportManualScanStartFailed()
+
+        val paramsCaptor = argumentCaptor<Map<String, String>>()
+        verify(mockPixelSender).enqueueFire(
+            pixelName = any(),
+            parameters = paramsCaptor.capture(),
+            encodedParameters = any(),
+            type = any(),
+        )
+
+        assert(paramsCaptor.firstValue.isEmpty())
+    }
+
+    @Test
+    fun whenReportManualScanLowMemoryThenEnqueuesPixelWithMemoryLevel() = runTest {
+        testee.reportManualScanLowMemory()
+
+        val paramsCaptor = argumentCaptor<Map<String, String>>()
+        verify(mockPixelSender).enqueueFire(
+            pixelName = any(),
+            parameters = paramsCaptor.capture(),
+            encodedParameters = any(),
+            type = any(),
+        )
+    }
+
+    @Test
     fun whenReportScheduledScanScheduledThenFiresCorrectPixel() = runTest {
         testee.reportScheduledScanScheduled()
 
@@ -116,27 +144,10 @@ class RealPirPixelSenderTest {
     }
 
     @Test
-    fun whenReportOptOutStartedThenFiresPixelWithBrokerName() = runTest {
-        testee.reportOptOutStarted("test-broker")
-
-        val paramsCaptor = argumentCaptor<Map<String, String>>()
-        verify(mockPixelSender).fire(
-            pixelName = any(),
-            parameters = paramsCaptor.capture(),
-            encodedParameters = any(),
-            type = any(),
-        )
-
-        assert(paramsCaptor.firstValue.containsKey("brokerName"))
-        assert(paramsCaptor.firstValue["brokerName"] == "test-broker")
-    }
-
-    @Test
     fun whenReportOptOutSubmittedThenFiresPixelWithAllParameters() = runTest {
         testee.reportOptOutSubmitted(
             brokerUrl = "https://broker.com",
             parent = "parent-broker",
-            attemptId = "attempt-123",
             durationMs = 5000L,
             optOutAttemptCount = 2,
             emailPattern = "pattern-abc",
@@ -153,7 +164,6 @@ class RealPirPixelSenderTest {
         val params = paramsCaptor.firstValue
         assert(params["data_broker"] == "https://broker.com")
         assert(params["parent"] == "parent-broker")
-        assert(params["attempt_id"] == "attempt-123")
         assert(params["duration"] == "5000")
         assert(params["tries"] == "2")
         assert(params["pattern"] == "pattern-abc")
@@ -164,7 +174,6 @@ class RealPirPixelSenderTest {
         testee.reportOptOutSubmitted(
             brokerUrl = "https://broker.com",
             parent = "parent-broker",
-            attemptId = "attempt-123",
             durationMs = 5000L,
             optOutAttemptCount = 2,
             emailPattern = null,
@@ -187,7 +196,6 @@ class RealPirPixelSenderTest {
             brokerUrl = "https://broker.com",
             parent = "parent-broker",
             brokerJsonVersion = "1.0",
-            attemptId = "attempt-456",
             durationMs = 3000L,
             stage = PirStage.FILL_FORM,
             tries = 3,
@@ -209,43 +217,12 @@ class RealPirPixelSenderTest {
         assert(params["data_broker"] == "https://broker.com")
         assert(params["parent"] == "parent-broker")
         assert(params["broker_version"] == "1.0")
-        assert(params["attempt_id"] == "attempt-456")
         assert(params["duration"] == "3000")
         assert(params["stage"] == "fill-form")
         assert(params["tries"] == "3")
         assert(params["pattern"] == "pattern-xyz")
         assert(params["action_id"] == "action-1")
         assert(params["action_type"] == "fillform")
-    }
-
-    @Test
-    fun whenReportScanStatsThenFiresPixelWithTotalScanCount() = runTest {
-        testee.reportScanStats(25)
-
-        val paramsCaptor = argumentCaptor<Map<String, String>>()
-        verify(mockPixelSender).fire(
-            pixelName = any(),
-            parameters = paramsCaptor.capture(),
-            encodedParameters = any(),
-            type = any(),
-        )
-
-        assert(paramsCaptor.firstValue["totalScanToRun"] == "25")
-    }
-
-    @Test
-    fun whenReportOptOutStatsThenFiresPixelWithTotalOptOutCount() = runTest {
-        testee.reportOptOutStats(15)
-
-        val paramsCaptor = argumentCaptor<Map<String, String>>()
-        verify(mockPixelSender).fire(
-            pixelName = any(),
-            parameters = paramsCaptor.capture(),
-            encodedParameters = any(),
-            type = any(),
-        )
-
-        assert(paramsCaptor.firstValue["totalOptOutToRun"] == "15")
     }
 
     @Test
@@ -280,7 +257,7 @@ class RealPirPixelSenderTest {
         )
 
         val params = paramsCaptor.firstValue
-        assert(params["data_broker_url"] == "https://broker.com")
+        assert(params["data_broker"] == "https://broker.com")
         assert(params["broker_version"] == "2.0")
         assert(params["link_age_ms"] == "60000")
     }
@@ -303,7 +280,7 @@ class RealPirPixelSenderTest {
         )
 
         val params = paramsCaptor.firstValue
-        assert(params["data_broker_url"] == "https://broker.com")
+        assert(params["data_broker"] == "https://broker.com")
         assert(params["broker_version"] == "2.0")
         assert(params["status"] == "error")
         assert(params["error_code"] == "server_error")
@@ -314,7 +291,6 @@ class RealPirPixelSenderTest {
         testee.reportStagePendingEmailConfirmation(
             brokerUrl = "https://broker.com",
             brokerVersion = "2.0",
-            attemptId = "attempt-789",
             actionId = "action-2",
             durationMs = 2000L,
             tries = 1,
@@ -329,9 +305,8 @@ class RealPirPixelSenderTest {
         )
 
         val params = paramsCaptor.firstValue
-        assert(params["data_broker_url"] == "https://broker.com")
+        assert(params["data_broker"] == "https://broker.com")
         assert(params["broker_version"] == "2.0")
-        assert(params["attempt_id"] == "attempt-789")
         assert(params["action_id"] == "action-2")
         assert(params["duration"] == "2000")
         assert(params["tries"] == "1")
@@ -343,7 +318,6 @@ class RealPirPixelSenderTest {
             brokerUrl = "https://broker.com",
             brokerVersion = "2.0",
             attemptNumber = 1,
-            attemptId = "attempt-abc",
             actionId = "action-3",
         )
 
@@ -356,10 +330,9 @@ class RealPirPixelSenderTest {
         )
 
         val params = paramsCaptor.firstValue
-        assert(params["data_broker_url"] == "https://broker.com")
+        assert(params["data_broker"] == "https://broker.com")
         assert(params["broker_version"] == "2.0")
         assert(params["attempt_number"] == "1")
-        assert(params["attempt_id"] == "attempt-abc")
         assert(params["action_id"] == "action-3")
     }
 
@@ -369,7 +342,6 @@ class RealPirPixelSenderTest {
             brokerUrl = "https://broker.com",
             brokerVersion = "2.0",
             attemptNumber = 2,
-            attemptId = "attempt-def",
             actionId = "action-4",
             durationMs = 1500L,
         )
@@ -383,10 +355,9 @@ class RealPirPixelSenderTest {
         )
 
         val params = paramsCaptor.firstValue
-        assert(params["data_broker_url"] == "https://broker.com")
+        assert(params["data_broker"] == "https://broker.com")
         assert(params["broker_version"] == "2.0")
         assert(params["attempt_number"] == "2")
-        assert(params["attempt_id"] == "attempt-def")
         assert(params["action_id"] == "action-4")
         assert(params["duration"] == "1500")
     }
@@ -397,7 +368,6 @@ class RealPirPixelSenderTest {
             brokerUrl = "https://broker.com",
             brokerVersion = "2.0",
             attemptNumber = 3,
-            attemptId = "attempt-ghi",
             actionId = "action-5",
             durationMs = 1000L,
         )
@@ -411,10 +381,9 @@ class RealPirPixelSenderTest {
         )
 
         val params = paramsCaptor.firstValue
-        assert(params["data_broker_url"] == "https://broker.com")
+        assert(params["data_broker"] == "https://broker.com")
         assert(params["broker_version"] == "2.0")
         assert(params["attempt_number"] == "3")
-        assert(params["attempt_id"] == "attempt-ghi")
         assert(params["action_id"] == "action-5")
         assert(params["duration"] == "1000")
     }
@@ -424,7 +393,6 @@ class RealPirPixelSenderTest {
         testee.reportEmailConfirmationAttemptRetriesExceeded(
             brokerUrl = "https://broker.com",
             brokerVersion = "2.0",
-            attemptId = "attempt-jkl",
             actionId = "action-6",
         )
 
@@ -437,9 +405,8 @@ class RealPirPixelSenderTest {
         )
 
         val params = paramsCaptor.firstValue
-        assert(params["data_broker_url"] == "https://broker.com")
+        assert(params["data_broker"] == "https://broker.com")
         assert(params["broker_version"] == "2.0")
-        assert(params["attempt_id"] == "attempt-jkl")
         assert(params["action_id"] == "action-6")
     }
 
@@ -459,7 +426,7 @@ class RealPirPixelSenderTest {
         )
 
         val params = paramsCaptor.firstValue
-        assert(params["data_broker_url"] == "https://broker.com")
+        assert(params["data_broker"] == "https://broker.com")
         assert(params["broker_version"] == "2.0")
     }
 
@@ -773,7 +740,6 @@ class RealPirPixelSenderTest {
         testee.reportOptOutStageStart(
             brokerUrl = "https://broker.com",
             parentUrl = "https://parent.com",
-            attemptId = "attempt-start-1",
         )
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
@@ -787,7 +753,6 @@ class RealPirPixelSenderTest {
         val params = paramsCaptor.firstValue
         assert(params["data_broker"] == "https://broker.com")
         assert(params["parent"] == "https://parent.com")
-        assert(params["attempt_id"] == "attempt-start-1")
     }
 
     @Test
@@ -796,7 +761,6 @@ class RealPirPixelSenderTest {
             brokerUrl = "https://broker.com",
             parentUrl = "https://parent.com",
             brokerVersion = "4.0",
-            attemptId = "attempt-email-1",
             durationMs = 1000L,
             tries = 1,
             actionId = "action-email-1",
@@ -813,7 +777,6 @@ class RealPirPixelSenderTest {
         val params = paramsCaptor.firstValue
         assert(params["data_broker"] == "https://broker.com")
         assert(params["parent"] == "https://parent.com")
-        assert(params["attempt_id"] == "attempt-email-1")
         assert(params["broker_version"] == "4.0")
         assert(params["duration"] == "1000")
         assert(params["tries"] == "1")
@@ -825,7 +788,6 @@ class RealPirPixelSenderTest {
         testee.reportOptOutStageFinish(
             brokerUrl = "https://broker.com",
             parentUrl = "https://parent.com",
-            attemptId = "attempt-finish-1",
             durationMs = 10000L,
         )
 
@@ -840,7 +802,6 @@ class RealPirPixelSenderTest {
         val params = paramsCaptor.firstValue
         assert(params["data_broker"] == "https://broker.com")
         assert(params["parent"] == "https://parent.com")
-        assert(params["attempt_id"] == "attempt-finish-1")
         assert(params["duration"] == "10000")
     }
 

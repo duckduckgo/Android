@@ -53,10 +53,20 @@ interface SyncLib {
         primaryKey: String,
     ): DecryptResult
 
+    fun decryptData(
+        encryptedData: ByteArray,
+        primaryKey: String,
+    ): DecryptBytesResult
+
     fun encryptData(
         rawData: String,
         primaryKey: String,
     ): EncryptResult
+
+    fun encryptData(
+        rawData: ByteArray,
+        primaryKey: String,
+    ): EncryptBytesResult
 
     companion object {
         fun create(context: Context): SyncLib = SyncNativeLibImpl { SyncNativeLib(context) }
@@ -98,10 +108,20 @@ internal class SyncNativeLibImpl constructor(syncNativeLibProvider: () -> SyncLi
         primaryKey: String,
     ): DecryptResult = synLib.decryptData(rawData, primaryKey)
 
+    override fun decryptData(
+        encryptedData: ByteArray,
+        primaryKey: String,
+    ): DecryptBytesResult = synLib.decryptData(encryptedData, primaryKey)
+
     override fun encryptData(
         rawData: String,
         primaryKey: String,
     ): EncryptResult = synLib.encryptData(rawData, primaryKey)
+
+    override fun encryptData(
+        rawData: ByteArray,
+        primaryKey: String,
+    ): EncryptBytesResult = synLib.encryptData(rawData, primaryKey)
 }
 
 internal class SyncNativeLib constructor(context: Context) : SyncLib {
@@ -198,15 +218,25 @@ internal class SyncNativeLib constructor(context: Context) : SyncLib {
         rawData: String,
         primaryKey: String,
     ): EncryptResult {
-        val rawDataByteArray = rawData.decodeText()
-        val secretKeyByteArray = primaryKey.decodeKey()
-        val encryptedDataByteArray = ByteArray(rawDataByteArray.size + getEncryptedExtraBytes())
-
-        val result: Int = encrypt(encryptedDataByteArray, rawDataByteArray, secretKeyByteArray)
-
+        val result = encryptData(rawData.decodeText(), primaryKey)
         return EncryptResult(
+            result = result.result,
+            encryptedData = result.encryptedData.encodeKey(),
+        )
+    }
+
+    override fun encryptData(
+        rawData: ByteArray,
+        primaryKey: String,
+    ): EncryptBytesResult {
+        val secretKeyByteArray = primaryKey.decodeKey()
+        val encryptedDataByteArray = ByteArray(rawData.size + getEncryptedExtraBytes())
+
+        val result: Int = encrypt(encryptedDataByteArray, rawData, secretKeyByteArray)
+
+        return EncryptBytesResult(
             result = result,
-            encryptedData = encryptedDataByteArray.encodeKey(),
+            encryptedData = encryptedDataByteArray,
         )
     }
 
@@ -214,15 +244,25 @@ internal class SyncNativeLib constructor(context: Context) : SyncLib {
         encryptedData: String,
         primaryKey: String,
     ): DecryptResult {
-        val encryptedDataByteArray = encryptedData.decodeKey()
-        val secretKeyByteArray = primaryKey.decodeKey()
-        val decryptedData = ByteArray(encryptedDataByteArray.size - getEncryptedExtraBytes())
-
-        val result: Int = decrypt(decryptedData, encryptedDataByteArray, secretKeyByteArray)
-
+        val result = decryptData(encryptedData.decodeKey(), primaryKey)
         return DecryptResult(
+            result = result.result,
+            decryptedData = result.decryptedData.encodeText(),
+        )
+    }
+
+    override fun decryptData(
+        encryptedData: ByteArray,
+        primaryKey: String,
+    ): DecryptBytesResult {
+        val secretKeyByteArray = primaryKey.decodeKey()
+        val decryptedData = ByteArray(encryptedData.size - getEncryptedExtraBytes())
+
+        val result: Int = decrypt(decryptedData, encryptedData, secretKeyByteArray)
+
+        return DecryptBytesResult(
             result = result,
-            decryptedData = decryptedData.encodeText(),
+            decryptedData = decryptedData,
         )
     }
 
@@ -360,4 +400,14 @@ class DecryptResult(
 class EncryptResult(
     override val result: Int,
     val encryptedData: String,
+) : SyncCryptoResult
+
+class DecryptBytesResult(
+    override val result: Int,
+    val decryptedData: ByteArray,
+) : SyncCryptoResult
+
+class EncryptBytesResult(
+    override val result: Int,
+    val encryptedData: ByteArray,
 ) : SyncCryptoResult

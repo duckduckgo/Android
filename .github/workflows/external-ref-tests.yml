@@ -40,7 +40,9 @@ jobs:
           distribution: 'adopt'
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
+        uses: gradle/actions/setup-gradle@v5
+        with:
+          cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
 
       - name: JVM tests
         run: ./gradlew jvm_tests
@@ -59,6 +61,8 @@ jobs:
   android_tests:
     runs-on: ubuntu-latest
     name: External reference tests android tests
+    env:
+      DEVELOCITY_ACCESS_KEY: ${{ secrets.DEVELOCITY_ACCESS_KEY }}
 
     steps:
       - name: Checkout repository
@@ -92,7 +96,9 @@ jobs:
         run: echo "$FLANK" > flank.json
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
+        uses: gradle/actions/setup-gradle@v5
+        with:
+          cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
 
       - name: Build
         run: ./gradlew androidTestsBuild

@@ -324,12 +324,16 @@ class InputScreenViewModel @AssistedInject constructor(
     }
 
     private fun onUserTappedDuckAiPromptAutocomplete(prompt: String) {
-        command.value = Command.SubmitChat(prompt)
         appCoroutineScope.launch(dispatchers.io()) {
             val params = mapOf(DuckChatPixelParameters.WAS_USED_BEFORE to duckChat.wasOpenedBefore().toBinaryString())
             pixel.fire(DuckChatPixelName.DUCK_CHAT_OPEN_AUTOCOMPLETE_EXPERIMENTAL, parameters = params)
         }
-        duckChat.openDuckChatWithAutoPrompt(prompt)
+        if (visibilityState.value.fullScreenMode) {
+            onChatSubmitted(prompt)
+        } else {
+            command.value = Command.SubmitChat(prompt)
+            duckChat.openDuckChatWithAutoPrompt(prompt)
+        }
     }
 
     fun userLongPressedAutocomplete(suggestion: AutoCompleteSuggestion) {
@@ -392,7 +396,7 @@ class InputScreenViewModel @AssistedInject constructor(
         chatInputTextState.value = query.trim()
         _visibilityState.update {
             it.copy(
-                showChatLogo = (query == initialSearchInputText && !it.autoCompleteSuggestionsVisible) || query.isEmpty(),
+                showChatLogo = true,
                 newLineButtonVisible = query.isNotBlank(),
             )
         }
@@ -492,10 +496,18 @@ class InputScreenViewModel @AssistedInject constructor(
     fun onPageScrolled(
         position: Int,
         positionOffset: Float,
+        wasAutoCompleteVisibleOnSwipeStart: Boolean = false,
+        hadInputTextOnSwipeStart: Boolean = false,
     ) {
         if (!isTapTransition) {
-            val logoProgress = calculateLogoProgress(position, positionOffset)
-            command.value = Command.SetLogoProgress(logoProgress)
+            val hasFavoritesOrAutocomplete = newTabPageHasContent.value ||
+                _visibilityState.value.autoCompleteSuggestionsVisible ||
+                wasAutoCompleteVisibleOnSwipeStart
+
+            if (!hasFavoritesOrAutocomplete && !hadInputTextOnSwipeStart) {
+                val logoProgress = calculateLogoProgress(position, positionOffset)
+                command.value = Command.SetLogoProgress(logoProgress)
+            }
             val widgetOffset = calculateInputModeWidgetScrollPosition(positionOffset)
             command.value = Command.SetInputModeWidgetScrollPosition(position, widgetOffset)
         }
@@ -515,11 +527,16 @@ class InputScreenViewModel @AssistedInject constructor(
             else -> 1f - (1f - positionOffset) * (1f - positionOffset) * 2f
         }
 
-    fun onTabTapped(index: Int) {
+    fun onTabTapped(index: Int, currentInputText: String = "") {
         if (currentPagePosition != index) {
             isTapTransition = true
-            if (!newTabPageHasContent.value) {
+            val willHaveAutocomplete = currentInputText.isNotBlank() && _visibilityState.value.autoCompleteSuggestionsVisible
+            val hasFavoritesOrAutocomplete = newTabPageHasContent.value || willHaveAutocomplete
+
+            if (!hasFavoritesOrAutocomplete) {
                 command.value = Command.AnimateLogoToProgress(index.toFloat())
+            } else if (index == 1) {
+                command.value = Command.SetLogoProgress(1f)
             }
         }
     }

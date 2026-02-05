@@ -1,0 +1,340 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  ~ Copyright (c) 2025 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/contextualModeRoot"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/rounded_top_corners_bottom_sheet_drawable"
+    android:orientation="vertical">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/contextualModeButtons"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingHorizontal="@dimen/keyline_2"
+        android:paddingTop="@dimen/keyline_4"
+        android:paddingBottom="@dimen/keyline_4"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <View
+            android:id="@+id/contextualDragHandle"
+            android:layout_width="32dp"
+            android:layout_height="4dp"
+            android:background="@drawable/duck_ai_prompt_background"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/contextualFullScreen"
+            android:layout_width="@dimen/toolbarIcon"
+            android:layout_height="@dimen/toolbarIcon"
+            android:background="@drawable/selectable_item_rounded_corner_background"
+            android:contentDescription="@string/browserMenuChatHistory"
+            android:scaleType="center"
+            android:layout_marginEnd="@dimen/keyline_2"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_expand_24" />
+
+        <ImageView
+            android:id="@+id/contextualNewChat"
+            android:layout_width="@dimen/toolbarIcon"
+            android:layout_height="@dimen/toolbarIcon"
+            android:background="@drawable/selectable_item_rounded_corner_background"
+            android:contentDescription="@string/browserMenuChatHistory"
+            android:scaleType="center"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/contextualFullScreen"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_ai_chat_add_24" />
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/contextualTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_marginTop="@dimen/keyline_4"
+            android:drawableStart="@drawable/ic_duck_ai_color_24"
+            android:drawablePadding="@dimen/keyline_2"
+            android:gravity="center"
+            android:text="@string/duck_chat_title"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/contextualDragHandle"
+            app:typography="h2" />
+
+        <ImageView
+            android:id="@+id/contextualClose"
+            android:layout_width="@dimen/toolbarIcon"
+            android:layout_height="@dimen/toolbarIcon"
+            android:layout_gravity="end"
+            android:background="@drawable/selectable_item_rounded_corner_background"
+            android:contentDescription="@string/browserMenuChatHistory"
+            android:scaleType="center"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_close_24_small" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <LinearLayout
+        android:id="@+id/contextualModeNativeContent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:id="@+id/contextualModePrompts"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="@dimen/keyline_4"
+            android:paddingTop="@dimen/keyline_4"
+            android:paddingBottom="@dimen/keyline_1"
+            app:layout_constraintBottom_toTopOf="@id/inputModeWidgetCard"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/contextualModeInputSpacer">
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/contextualPromptSummarize"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/duck_ai_prompt_background"
+                android:drawableStart="@drawable/ic_arrow_down_right_16"
+                android:drawablePadding="@dimen/keyline_2"
+                android:padding="@dimen/keyline_2"
+                android:text="@string/duckAIContextualPromptSummarize"
+                app:typography="body2_bold" />
+
+        </LinearLayout>
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/inputModeWidgetCard"
+            style="@style/Widget.DuckDuckGo.OmnibarCardView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/keyline_4"
+            android:layout_marginTop="@dimen/keyline_2"
+            android:layout_marginBottom="@dimen/keyline_4"
+            app:cardElevation="0dp"
+            android:animateLayoutChanges="true"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/contextualModePrompts"
+            app:strokeColor="?attr/daxColorAccentBlue"
+            app:strokeWidth="@dimen/omnibarOutlineWidth">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:padding="@dimen/keyline_2">
+
+                <LinearLayout
+                    android:id="@+id/inputModeWidgetCardContent"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <EditText
+                        android:id="@+id/inputField"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginStart="10dp"
+                        android:layout_weight="1"
+                        android:background="@null"
+                        android:fontFamily="sans-serif"
+                        android:gravity="start|top"
+                        android:hint="@string/input_screen_chat_hint"
+                        android:lineSpacingMultiplier="1.2"
+                        android:minHeight="40dp"
+                        android:paddingVertical="@dimen/keyline_2"
+                        android:textColor="?attr/daxColorPrimaryText"
+                        android:textColorHighlight="?attr/daxOmnibarTextColorHighlight"
+                        android:textColorHint="?attr/daxColorSecondaryText"
+                        android:textCursorDrawable="@drawable/text_cursor"
+                        android:textSize="16sp"
+                        android:textStyle="normal" />
+
+                    <ImageView
+                        android:id="@+id/duckAiContextualVoiceInput"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:layout_gravity="top"
+                        android:layout_margin="@dimen/keyline_1"
+                        android:background="@drawable/selectable_item_rounded_corner_background"
+                        android:gravity="center"
+                        android:importantForAccessibility="no"
+                        android:scaleType="center"
+                        android:visibility="gone"
+                        app:srcCompat="@drawable/ic_microphone_24"
+                        tools:visibility="visible" />
+
+                    <ImageView
+                        android:id="@+id/duckAiContextualClearText"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:layout_gravity="top"
+                        android:layout_marginVertical="@dimen/keyline_1"
+                        android:layout_marginEnd="@dimen/keyline_1"
+                        android:background="@drawable/selectable_item_rounded_corner_background"
+                        android:gravity="center"
+                        android:importantForAccessibility="no"
+                        android:scaleType="centerInside"
+                        android:visibility="invisible"
+                        app:srcCompat="@drawable/ic_close_circle_small_secondary_24" />
+
+                </LinearLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/duckAiContextualLayout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="@dimen/keyline_2"
+                    android:layout_marginTop="@dimen/keyline_2"
+                    android:background="@drawable/background_large_rounded_surface">
+
+                    <com.google.android.material.imageview.ShapeableImageView
+                        android:id="@+id/duckAiContextualFavicon"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_gravity="center"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        android:src="@drawable/ic_dax_icon"
+                        app:shapeAppearanceOverlay="@style/Widget.DuckDuckGo.DuckChatContextualFavicon"
+                        android:importantForAccessibility="no" />
+
+                    <com.duckduckgo.common.ui.view.text.DaxTextView
+                        android:id="@+id/duckAiContextualPageTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:maxWidth="200dp"
+                        tools:text="Wikipedia"
+                        app:typography="body1_bold"
+                        android:maxLines="1"
+                        android:ellipsize="end"
+                        android:layout_marginStart="@dimen/keyline_2"
+                        app:layout_constraintStart_toEndOf="@+id/duckAiContextualFavicon"
+                        app:layout_constraintTop_toTopOf="@+id/duckAiContextualFavicon"
+                        app:layout_constraintBottom_toBottomOf="@id/duckAiContextualFavicon" />
+
+                    <ImageView
+                        android:id="@+id/duckAiContextualPageRemove"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_gravity="end"
+                        android:background="@drawable/selectable_item_rounded_corner_background"
+                        android:contentDescription="@string/browserMenuChatHistory"
+                        android:scaleType="center"
+                        android:layout_marginStart="@dimen/keyline_2"
+                        app:layout_constraintStart_toEndOf="@id/duckAiContextualPageTitle"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:srcCompat="@drawable/ic_close_24_small" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/duckAiAttachContextLayout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="@dimen/keyline_2"
+                    android:layout_marginTop="@dimen/keyline_2"
+                    android:background="@drawable/background_dashed_outline">
+
+                    <com.google.android.material.imageview.ShapeableImageView
+                        android:id="@+id/duckAiContextualAttachContextIcon"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_gravity="center"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        android:src="@drawable/ic_page_content_attach_24"
+                        app:shapeAppearanceOverlay="@style/Widget.DuckDuckGo.DuckChatContextualFavicon"
+                        android:importantForAccessibility="no" />
+
+                    <com.duckduckgo.common.ui.view.text.DaxTextView
+                        android:id="@+id/duckAiContextualAttachContextLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:textType="secondary"
+                        android:text="@string/duckAIContextualAttachPageContent"
+                        android:paddingEnd="@dimen/keyline_2"
+                        android:layout_marginStart="@dimen/keyline_2"
+                        app:typography="body2_bold"
+                        app:layout_constraintStart_toEndOf="@+id/duckAiContextualAttachContextIcon"
+                        app:layout_constraintTop_toTopOf="@id/duckAiContextualAttachContextIcon"
+                        app:layout_constraintBottom_toBottomOf="@+id/duckAiContextualAttachContextIcon" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/duckAiContextualActions"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:id="@+id/duckAiContextualSend"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:layout_gravity="end"
+                        android:layout_margin="@dimen/keyline_1"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        android:background="@drawable/background_input_screen_button"
+                        android:backgroundTint="?attr/daxColorButtonPrimaryContainer"
+                        android:foreground="@drawable/selectable_circular_ripple"
+                        android:importantForAccessibility="no"
+                        android:scaleType="centerInside"
+                        android:src="@drawable/ic_arrow_up_24"
+                        app:tint="?attr/daxColorWhite" />
+
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+    </LinearLayout>
+
+    <WebView
+        android:id="@+id/simpleWebview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone" />
+
+</LinearLayout>

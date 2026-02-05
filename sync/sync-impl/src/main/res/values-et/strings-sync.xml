@@ -34,6 +34,7 @@
     <string name="sync_setup_begin_syncing">Alusta sünkroonimist</string>
     <string name="sync_setup_with_another_device_cta_title">Sünkrooni teise seadmega</string>
     <string name="sync_setup_with_another_device_cta_subtitle">Sünkrooni järjehoidjaid ja paroole turvaliselt oma seadmete vahel.</string>
+    <string name="sync_setup_with_another_device_cta_subtitle_with_ai_chat">Sünkroonii järjehoidjaid, paroole ja Duck.ai vestlusi turvaliselt oma seadmete vahel.</string>
     <string name="sync_off_hint">Sinu andmed on otsast lõpuni krüptitud ja DuckDuckGo ei pääse krüpteerimisvõtmele ligi.</string>
     <string name="sync_setup_single_device_title">Ühe seadme seadistamine</string>
     <string name="sync_setup_other_options_title">Muud valikud</string>
@@ -45,12 +46,14 @@
     <!-- Setup screen -->
     <string name="sync_enable_sync_title">Sünkroonimise ja varundamise seadistamine!</string>
     <string name="sync_enable_sync_content">Teie järjehoidjad ja paroolid valmistatakse sünkroonimiseks ette. See peaks võtma vaid hetke.</string>
+    <string name="sync_enable_sync_content_with_ai_chat">Sinu järjehoidjad, paroolid ja Duck.ai vestlused valmistatakse sünkroonimiseks ette. See peaks võtma vaid hetke.</string>
     <string name="sync_enable_options">Valikud</string>
     <string name="sync_enable_option_favicons_title">Too järjehoidjaikoonid</string>
     <string name="sync_enable_option_favicons_subtitle">Laadi automaatselt alla oma sünkroonitud järjehoidjate ikoonid.</string>
     <string name="sync_enable_connecting">Ühendamine ...</string>
     <string name="sync_intro_enable_title">Selle seadme sünkroonimine ja varundamine</string>
     <string name="sync_intro_enable_content">See loob DuckDuckGo turvalises serveris krüptitud varukoopia sinu järjehoidjatest ja paroolidest, mida saab sünkroonida sinu teiste seadmetega. \n\n Krüptimisvõti salvestatakse ainult sinu seadmesse, DuckDuckGo ei pääse sellele juurde.</string>
+    <string name="sync_intro_enable_content_with_ai_chat">See loob DuckDuckGo turvalises serveris krüptitud varukoopia sinu järjehoidjatest, paroolidest ja Duck.ai vestlustest, mida saab sünkroonida sinu teiste seadmetega. \n\n Krüptimisvõti salvestatakse ainult sinu seadmesse, DuckDuckGo ei pääse sellele ligi.</string>
     <string name="sync_intro_enable_footer">Saad hiljem sünkroonida teiste seadmetega.</string>
     <string name="sync_intro_enable_cta">Lülita sünkroonimine ja varundamine sisse</string>
     <string name="sync_intro_recover_title">Taasta sünkroonitud andmed</string>

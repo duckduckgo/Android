@@ -269,7 +269,12 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
                         when (featureName) {
                             DUCK_CHAT_FEATURE_NAME -> {
                                 appCoroutineScope.launch(dispatcherProvider.io()) {
-                                    duckChatJSHelper.processJsCallbackMessage(featureName, method, id, data)?.let { response ->
+                                    duckChatJSHelper.processJsCallbackMessage(
+                                        featureName,
+                                        method,
+                                        id,
+                                        data,
+                                    )?.let { response ->
                                         withContext(dispatcherProvider.main()) {
                                             if (response.method == METHOD_OPEN_KEYBOARD) {
                                                 simpleWebview.evaluateJavascript(
@@ -353,6 +358,19 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
                     }
                 }
             }.launchIn(lifecycleScope)
+
+        observeSyncStatusChanges()
+    }
+
+    private fun observeSyncStatusChanges() {
+        viewModel.subscriptionEventDataFlow
+            .onEach { event ->
+                // Only send if this fragment is actually visible
+                if (isVisible) {
+                    contentScopeScripts.sendSubscriptionEvent(event)
+                }
+            }
+            .launchIn(lifecycleScope)
     }
 
     private fun launchInputScreen() {

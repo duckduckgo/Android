@@ -47,15 +47,13 @@ class FireDialogProviderImpl @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
 ) : FireDialogProvider {
 
-    override suspend fun createFireDialog(): FireDialog {
-        val isGranularMode = withContext(dispatcherProvider.io()) {
-            androidBrowserConfigFeature.moreGranularDataClearingOptions().isEnabled()
-        }
-
-        return if (isGranularMode) {
-            GranularFireDialog.newInstance()
-        } else {
-            LegacyFireDialog.newInstance()
+    override suspend fun createFireDialog(): FireDialog = withContext(dispatcherProvider.io()) {
+        when {
+            androidBrowserConfigFeature.granularFireDialog().isEnabled() ->
+                GranularFireDialog.newInstance()
+            androidBrowserConfigFeature.improvedDataClearingOptions().isEnabled() ->
+                NonGranularFireDialog.newInstance()
+            else -> LegacyFireDialog.newInstance()
         }
     }
 }

@@ -34,6 +34,7 @@
     <string name="sync_setup_begin_syncing">Lancer la synchronisation</string>
     <string name="sync_setup_with_another_device_cta_title">Synchroniser avec un autre appareil</string>
     <string name="sync_setup_with_another_device_cta_subtitle">Synchronisez en toute sécurité les signets et mots de passe entre vos appareils.</string>
+    <string name="sync_setup_with_another_device_cta_subtitle_with_ai_chat">Synchronisez en toute sécurité vos favoris, mots de passe et discussions Duck.ai entre vos appareils.</string>
     <string name="sync_off_hint">Vos données sont cryptées de bout en bout et DuckDuckGo n\'a pas accès à la clé de chiffrement.</string>
     <string name="sync_setup_single_device_title">Configuration d\'un seul appareil</string>
     <string name="sync_setup_other_options_title">Autres options</string>
@@ -45,12 +46,14 @@
     <!-- Setup screen -->
     <string name="sync_enable_sync_title">Configuration de Synchronisation et sauvegarde !</string>
     <string name="sync_enable_sync_content">Vos signets et mots de passe sont en cours de préparation pour la synchronisation. Cela ne devrait prendre qu\'un instant.</string>
+    <string name="sync_enable_sync_content_with_ai_chat">Vos favoris, mots de passe et discussions Duck.ai sont en cours de préparation pour la synchronisation. Cela ne devrait prendre qu\'un instant.</string>
     <string name="sync_enable_options">Options</string>
     <string name="sync_enable_option_favicons_title">Récupérer les icônes des favoris</string>
     <string name="sync_enable_option_favicons_subtitle">Téléchargez automatiquement les icônes des favoris synchronisés.</string>
     <string name="sync_enable_connecting">Connexion…</string>
     <string name="sync_intro_enable_title">Synchroniser et sauvegarder cet appareil</string>
     <string name="sync_intro_enable_content">Cela crée une sauvegarde cryptée de vos favoris et mots de passe sur le serveur sécurisé de DuckDuckGo, qui peut être synchronisée avec vos autres appareils.\n\n La clé de chiffrement n\'est stockée que sur votre appareil ; DuckDuckGo ne peut pas y accéder.</string>
+    <string name="sync_intro_enable_content_with_ai_chat">Cela crée une sauvegarde cryptée de vos favoris, mots de passe et discussions Duck.ai sur le serveur sécurisé de DuckDuckGo, qui peut être synchronisée avec vos autres appareils. \n\n La clé de cryptage n\'est stockée que sur votre appareil ; DuckDuckGo ne peut pas y accéder.</string>
     <string name="sync_intro_enable_footer">Vous pourrez effectuer une synchronisation avec vos autres appareils ultérieurement.</string>
     <string name="sync_intro_enable_cta">Activer Synchronisation et sauvegarde</string>
     <string name="sync_intro_recover_title">Récupérer les données synchronisées</string>

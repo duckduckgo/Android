@@ -34,6 +34,7 @@
     <string name="sync_setup_begin_syncing">Begin Syncing</string>
     <string name="sync_setup_with_another_device_cta_title">Sync With Another Device</string>
     <string name="sync_setup_with_another_device_cta_subtitle">Securely sync bookmarks and passwords between your devices.</string>
+    <string name="sync_setup_with_another_device_cta_subtitle_with_ai_chat">Securely sync bookmarks, passwords, and Duck.ai chats between your devices.</string>
     <string name="sync_off_hint">Your data is end-to-end encrypted, and DuckDuckGo does not have access to the encryption key.</string>
     <string name="sync_setup_single_device_title">Single-Device Setup</string>
     <string name="sync_setup_other_options_title">Other Options</string>
@@ -45,12 +46,14 @@
     <!-- Setup screen -->
     <string name="sync_enable_sync_title">Setting Up Sync and Backup!</string>
     <string name="sync_enable_sync_content">Your bookmarks and passwords are being prepared to sync. This should only take a moment.</string>
+    <string name="sync_enable_sync_content_with_ai_chat">Your bookmarks, passwords, and Duck.ai chats are being prepared to sync. This should only take a moment.</string>
     <string name="sync_enable_options">Options</string>
     <string name="sync_enable_option_favicons_title">Fetch Bookmark Icons</string>
     <string name="sync_enable_option_favicons_subtitle">Automatically download icons for synced bookmarks.</string>
     <string name="sync_enable_connecting">Connecting…</string>
     <string name="sync_intro_enable_title">Sync and Back Up This Device</string>
     <string name="sync_intro_enable_content">This creates an encrypted backup of your bookmarks and passwords on DuckDuckGo’s secure server, which can be synced with your other devices. \n\n The encryption key is only stored on your device, DuckDuckGo cannot access it.</string>
+    <string name="sync_intro_enable_content_with_ai_chat">This creates an encrypted backup of your bookmarks, passwords, and Duck.ai chats on DuckDuckGo’s secure server, which can be synced with your other devices. \n\n The encryption key is only stored on your device, DuckDuckGo cannot access it.</string>
     <string name="sync_intro_enable_footer">You can sync with your other devices later.</string>
     <string name="sync_intro_enable_cta">Turn on Sync &amp; Backup</string>
     <string name="sync_intro_recover_title">Recover Synced Data</string>

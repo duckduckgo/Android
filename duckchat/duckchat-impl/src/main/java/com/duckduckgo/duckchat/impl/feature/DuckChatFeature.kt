@@ -140,8 +140,14 @@ interface DuckChatFeature {
     /**
      * @return `true` when the contextual mode is enabled
      */
-    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun contextualMode(): Toggle
+
+    /**
+     * @return `true` when the feature flag for automatic page context attachment in contextual mode is enabled
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun automaticContextAttachment(): Toggle
 
     /**
      * @return `true` when the Duck.ai Paid Settings status indicator and navigation features are enabled.
@@ -151,4 +157,11 @@ interface DuckChatFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun duckAiPaidSettingsStatus(): Toggle
+
+    /**
+     * @return `true` when we can sync the deletion of duck chats to sync backend
+     * If the remote feature is not present defaults to `true`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun supportsSyncChatsDeletion(): Toggle
 }

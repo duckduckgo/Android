@@ -280,7 +280,7 @@ class RemoteMessagingConfigJsonMapperTest {
                 primaryActionText = "Got It",
                 primaryAction = Action.Dismiss,
                 listItems = listOf(
-                    CardItem(
+                    CardItem.ListItem(
                         id = "hide_search_images",
                         type = CardItemType.TWO_LINE_LIST_ITEM,
                         titleText = "Hide AI Images in Search",
@@ -289,8 +289,10 @@ class RemoteMessagingConfigJsonMapperTest {
                         primaryAction = Action.UrlInContext(
                             value = "https://duckduckgo.com/duckduckgo-help-pages/results/how-to-filter-out-ai-images-in-duckduckgo-search-results",
                         ),
+                        matchingRules = emptyList(),
+                        exclusionRules = emptyList(),
                     ),
-                    CardItem(
+                    CardItem.ListItem(
                         id = "enhanced_scam_blocker",
                         type = CardItemType.TWO_LINE_LIST_ITEM,
                         titleText = "Enhanced Scam Blocker",
@@ -299,14 +301,18 @@ class RemoteMessagingConfigJsonMapperTest {
                         primaryAction = Action.UrlInContext(
                             value = "https://spreadprivacy.com/scam-blocker/",
                         ),
+                        matchingRules = emptyList(),
+                        exclusionRules = emptyList(),
                     ),
-                    CardItem(
+                    CardItem.ListItem(
                         id = "import_passwords",
                         type = CardItemType.TWO_LINE_LIST_ITEM,
                         titleText = "Simpler Password Management",
                         descriptionText = "Use DuckDuckGo to manage passwords on apps and sites across your whole device.",
                         placeholder = Content.Placeholder.KEY_IMPORT,
                         primaryAction = Action.DefaultCredentialProvider,
+                        matchingRules = emptyList(),
+                        exclusionRules = emptyList(),
                     ),
                 ),
             ),

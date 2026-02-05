@@ -910,6 +910,8 @@ class WebViewRequestInterceptorTest {
 
         override var searchRetentionAtb: String? = ""
 
+        override var duckaiRetentionAtb: String? = ""
+
         override var variant: String? = ""
 
         override var referrerVariant: String? = ""

@@ -32,7 +32,7 @@ import javax.inject.Inject
 
 interface TabManager {
     companion object {
-        const val MAX_ACTIVE_TABS = 20
+        const val MAX_ACTIVE_TABS = 15
     }
 
     fun registerCallbacks(onTabsUpdated: (List<TabModel>) -> Unit)

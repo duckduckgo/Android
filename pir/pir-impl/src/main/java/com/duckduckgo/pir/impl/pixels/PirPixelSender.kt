@@ -18,6 +18,7 @@ package com.duckduckgo.pir.impl.pixels
 
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BG_STATS
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BROKER_ACTION_FAILED
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BROKER_CUSTOM_STATS_14DAY_CONFIRMED_OPTOUT
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BROKER_CUSTOM_STATS_14DAY_UNCONFIRMED_OPTOUT
@@ -28,6 +29,7 @@ import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BROKER_CUSTOM_STATS_42DAY_UNC
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BROKER_CUSTOM_STATS_7DAY_CONFIRMED_OPTOUT
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BROKER_CUSTOM_STATS_7DAY_UNCONFIRMED_OPTOUT
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BROKER_CUSTOM_STATS_OPTOUT_SUBMIT_SUCCESSRATE
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_CPU_USAGE
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_DASHBOARD_OPENED
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_DOWNLOAD_MAINCONFIG_BE_FAILURE
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_DOWNLOAD_MAINCONFIG_FAILURE
@@ -43,16 +45,13 @@ import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_EMAIL_CONFIRMATION_RUN_STARTE
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_ENGAGEMENT_DAU
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_ENGAGEMENT_MAU
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_ENGAGEMENT_WAU
-import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INTERNAL_BROKER_OPT_OUT_STARTED
-import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INTERNAL_CPU_USAGE
-import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INTERNAL_MANUAL_SCAN_COMPLETED
-import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INTERNAL_MANUAL_SCAN_STARTED
-import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INTERNAL_OPT_OUT_STATS
-import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INTERNAL_SCAN_STATS
-import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INTERNAL_SCHEDULED_SCAN_COMPLETED
-import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INTERNAL_SCHEDULED_SCAN_SCHEDULED
-import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INTERNAL_SCHEDULED_SCAN_STARTED
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_FOREGROUND_RUN_COMPLETED
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_FOREGROUND_RUN_LOW_MEMORY
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_FOREGROUND_RUN_STARTED
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_FOREGROUND_RUN_START_FAILED
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INITIAL_SCAN_DURATION
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INTERNAL_SECURE_STORAGE_UNAVAILABLE
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_OPTOUT_INVALID_EVENT
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_OPTOUT_STAGE_CAPTCHA_PARSE
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_OPTOUT_STAGE_CAPTCHA_SEND
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_OPTOUT_STAGE_CAPTCHA_SOLVE
@@ -67,11 +66,15 @@ import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_OPTOUT_STAGE_SUBMIT
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_OPTOUT_STAGE_VALIDATE
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_OPTOUT_SUBMIT_FAILURE
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_OPTOUT_SUBMIT_SUCCESS
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_SCAN_INVALID_EVENT
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_SCAN_STAGE
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_SCAN_STAGE_RESULT_ERROR
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_SCAN_STAGE_RESULT_MATCHES
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_SCAN_STAGE_RESULT_NO_MATCH
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_SCAN_STARTED
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_SCHEDULED_RUN_COMPLETED
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_SCHEDULED_RUN_SCHEDULED
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_SCHEDULED_RUN_STARTED
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_UPDATE_BROKER_FAILURE
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_UPDATE_BROKER_SUCCESS
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_WEEKLY_CHILD_ORPHANED_OPTOUTS
@@ -98,6 +101,16 @@ interface PirPixelSender {
     )
 
     /**
+     * Emits a pixel to signal that a manually initiated scan failed to start as foreground.
+     */
+    fun reportManualScanStartFailed()
+
+    /**
+     * Emits a pixel to signal that the foreground scan service is running low on memory.
+     */
+    fun reportManualScanLowMemory()
+
+    /**
      * Emits a pixel to signal that the scheduled scan has been scheduled.
      */
     fun reportScheduledScanScheduled()
@@ -115,20 +128,10 @@ interface PirPixelSender {
     )
 
     /**
-     * Emits a pixel to signal that an opt-out job for a specific extractedProfile has been started.
-     *
-     * @param brokerName Broker in which the ExtractedProfile being opted out was found.
-     */
-    fun reportOptOutStarted(
-        brokerName: String,
-    )
-
-    /**
      * Emits a pixel to signal that an opt-out job for a specific extractedProfile has been successfully submitted.
      *
      * @param brokerUrl url of the Broker for which the opt-out is for
      * @param parent The parent data broker of the one this opt-out attempt targets
-     * @param attemptId - Client-generated ID of the opt-out attempt
      * @param durationMs - Total duration of the opt-out attempt in milliseconds
      * @param optOutAttemptCount - The number of tries it took to submit successfully.
      * @param emailPattern - Email pattern used during submission, when available else null.
@@ -136,7 +139,6 @@ interface PirPixelSender {
     fun reportOptOutSubmitted(
         brokerUrl: String,
         parent: String,
-        attemptId: String,
         durationMs: Long,
         optOutAttemptCount: Int,
         emailPattern: String?,
@@ -148,7 +150,6 @@ interface PirPixelSender {
      * @param brokerUrl url of the Broker for which the opt-out is for
      * @param parent The parent data broker of the one this opt-out attempt targets
      * @param brokerJsonVersion The version of the broker JSON file
-     * @param attemptId - Client-generated ID of the opt-out attempt
      * @param durationMs - Total duration of the opt-out attempt in milliseconds
      * @param stage - The stage where the failure occurred
      * @param tries - The number of tries it took to submit successfully.
@@ -160,31 +161,12 @@ interface PirPixelSender {
         brokerUrl: String,
         parent: String,
         brokerJsonVersion: String,
-        attemptId: String,
         durationMs: Long,
         stage: PirStage,
         tries: Int,
         emailPattern: String?,
         actionId: String,
         actionType: String,
-    )
-
-    /**
-     * Emits a pixel that contains the scan related stats for the current run.
-     *
-     * @param totalScanToRun The total number of scans that are eligible for the current run.
-     */
-    fun reportScanStats(
-        totalScanToRun: Int,
-    )
-
-    /**
-     * Emits a pixel that contains the opt-out related stats for the current run.
-     *
-     * @param totalOptOutsToRun The total number of opt-outs that are eligible for the current run.
-     */
-    fun reportOptOutStats(
-        totalOptOutsToRun: Int,
     )
 
     /**
@@ -228,7 +210,6 @@ interface PirPixelSender {
      *
      * @param brokerUrl The URL of the data broker that this action was operating on
      * @param brokerVersion The version of the broker JSON file
-     * @param attemptId The ID of the opt out attempt
      * @param actionId The ID of the action, to disambiguate between multiple actions in the same opt out attempt
      * @param durationMs The duration of the action execution in milliseconds
      * @param tries The number of tries it took for the action to complete
@@ -236,7 +217,6 @@ interface PirPixelSender {
     fun reportStagePendingEmailConfirmation(
         brokerUrl: String,
         brokerVersion: String,
-        attemptId: String,
         actionId: String,
         durationMs: Long,
         tries: Int,
@@ -248,14 +228,12 @@ interface PirPixelSender {
      * @param brokerUrl The URL of the data broker that this action was operating on
      * @param brokerVersion The version of the broker JSON file
      * @param attemptNumber The confirmation attempt number (1..3)
-     * @param attemptId The ID of the opt out attempt
      * @param actionId The ID of the action, to disambiguate between multiple actions in the same opt out attempt
      */
     fun reportEmailConfirmationAttemptStart(
         brokerUrl: String,
         brokerVersion: String,
         attemptNumber: Int,
-        attemptId: String,
         actionId: String,
     )
 
@@ -265,7 +243,6 @@ interface PirPixelSender {
      * @param brokerUrl The URL of the data broker that this action was operating on
      * @param brokerVersion The version of the broker JSON file
      * @param attemptNumber The confirmation attempt number (1..3)
-     * @param attemptId The ID of the opt out attempt
      * @param actionId The ID of the action, to disambiguate between multiple actions in the same opt out attempt
      * @param durationMs The duration of the attempt in milliseconds
      */
@@ -273,7 +250,6 @@ interface PirPixelSender {
         brokerUrl: String,
         brokerVersion: String,
         attemptNumber: Int,
-        attemptId: String,
         actionId: String,
         durationMs: Long,
     )
@@ -284,7 +260,6 @@ interface PirPixelSender {
      * @param brokerUrl The URL of the data broker that this action was operating on
      * @param brokerVersion The version of the broker JSON file
      * @param attemptNumber The confirmation attempt number (1..3)
-     * @param attemptId The ID of the opt out attempt
      * @param actionId The ID of the action, to disambiguate between multiple actions in the same opt out attempt
      * @param durationMs The duration of the attempt in milliseconds
      */
@@ -292,7 +267,6 @@ interface PirPixelSender {
         brokerUrl: String,
         brokerVersion: String,
         attemptNumber: Int,
-        attemptId: String,
         actionId: String,
         durationMs: Long,
     )
@@ -302,13 +276,11 @@ interface PirPixelSender {
      *
      * @param brokerUrl The URL of the data broker that this action was operating on
      * @param brokerVersion The version of the broker JSON file
-     * @param attemptId The ID of the opt out attempt
      * @param actionId The ID of the action, to disambiguate between multiple actions in the same opt out attempt
      */
     fun reportEmailConfirmationAttemptRetriesExceeded(
         brokerUrl: String,
         brokerVersion: String,
-        attemptId: String,
         actionId: String,
     )
 
@@ -461,14 +433,12 @@ interface PirPixelSender {
     fun reportOptOutStageStart(
         brokerUrl: String,
         parentUrl: String,
-        attemptId: String,
     )
 
     fun reportOptOutStageEmailGenerate(
         brokerUrl: String,
         parentUrl: String,
         brokerVersion: String,
-        attemptId: String,
         durationMs: Long,
         tries: Int,
         actionId: String,
@@ -478,7 +448,6 @@ interface PirPixelSender {
         brokerUrl: String,
         parentUrl: String,
         brokerVersion: String,
-        attemptId: String,
         durationMs: Long,
         tries: Int,
         actionId: String,
@@ -488,7 +457,6 @@ interface PirPixelSender {
         brokerUrl: String,
         parentUrl: String,
         brokerVersion: String,
-        attemptId: String,
         durationMs: Long,
         tries: Int,
         actionId: String,
@@ -498,7 +466,6 @@ interface PirPixelSender {
         brokerUrl: String,
         parentUrl: String,
         brokerVersion: String,
-        attemptId: String,
         durationMs: Long,
         tries: Int,
         actionId: String,
@@ -508,7 +475,6 @@ interface PirPixelSender {
         brokerUrl: String,
         parentUrl: String,
         brokerVersion: String,
-        attemptId: String,
         durationMs: Long,
         tries: Int,
         actionId: String,
@@ -518,7 +484,6 @@ interface PirPixelSender {
         brokerUrl: String,
         parentUrl: String,
         brokerVersion: String,
-        attemptId: String,
         durationMs: Long,
         tries: Int,
         actionId: String,
@@ -528,7 +493,6 @@ interface PirPixelSender {
         brokerUrl: String,
         parentUrl: String,
         brokerVersion: String,
-        attemptId: String,
         durationMs: Long,
         tries: Int,
         actionId: String,
@@ -538,7 +502,6 @@ interface PirPixelSender {
         brokerUrl: String,
         parentUrl: String,
         brokerVersion: String,
-        attemptId: String,
         durationMs: Long,
         tries: Int,
         actionId: String,
@@ -548,7 +511,6 @@ interface PirPixelSender {
         brokerUrl: String,
         parentUrl: String,
         brokerVersion: String,
-        attemptId: String,
         durationMs: Long,
         tries: Int,
         actionId: String,
@@ -557,7 +519,6 @@ interface PirPixelSender {
     fun reportOptOutStageFinish(
         brokerUrl: String,
         parentUrl: String,
-        attemptId: String,
         durationMs: Long,
     )
 
@@ -587,6 +548,25 @@ interface PirPixelSender {
     )
 
     fun reportDashboardOpened()
+
+    fun reportInitialScanDuration(
+        durationMs: Long,
+        profileQueryCount: Int,
+    )
+
+    fun reportBackgroundScanStats(
+        scanFrequencyWithinThreshold: Boolean,
+    )
+
+    fun reportScanInvalidEvent(
+        brokerUrl: String,
+        brokerVersion: String,
+    )
+
+    fun reportOptOutInvalidEvent(
+        brokerUrl: String,
+        brokerVersion: String,
+    )
 }
 
 @ContributesBinding(AppScope::class)
@@ -594,7 +574,7 @@ class RealPirPixelSender @Inject constructor(
     private val pixelSender: Pixel,
 ) : PirPixelSender {
     override fun reportManualScanStarted() {
-        fire(PIR_INTERNAL_MANUAL_SCAN_STARTED)
+        fire(PIR_FOREGROUND_RUN_STARTED)
     }
 
     override fun reportManualScanCompleted(
@@ -603,15 +583,23 @@ class RealPirPixelSender @Inject constructor(
         val params = mapOf(
             PARAM_KEY_TOTAL_TIME to totalTimeInMillis.toString(),
         )
-        fire(PIR_INTERNAL_MANUAL_SCAN_COMPLETED, params)
+        fire(PIR_FOREGROUND_RUN_COMPLETED, params)
+    }
+
+    override fun reportManualScanStartFailed() {
+        enqueueFire(PIR_FOREGROUND_RUN_START_FAILED)
+    }
+
+    override fun reportManualScanLowMemory() {
+        enqueueFire(PIR_FOREGROUND_RUN_LOW_MEMORY)
     }
 
     override fun reportScheduledScanScheduled() {
-        fire(PIR_INTERNAL_SCHEDULED_SCAN_SCHEDULED)
+        fire(PIR_SCHEDULED_RUN_SCHEDULED)
     }
 
     override fun reportScheduledScanStarted() {
-        fire(PIR_INTERNAL_SCHEDULED_SCAN_STARTED)
+        fire(PIR_SCHEDULED_RUN_STARTED)
     }
 
     override fun reportScheduledScanCompleted(
@@ -620,22 +608,12 @@ class RealPirPixelSender @Inject constructor(
         val params = mapOf(
             PARAM_KEY_TOTAL_TIME to totalTimeInMillis.toString(),
         )
-        fire(PIR_INTERNAL_SCHEDULED_SCAN_COMPLETED, params)
-    }
-
-    override fun reportOptOutStarted(
-        brokerName: String,
-    ) {
-        val params = mapOf(
-            PARAM_KEY_BROKER_NAME to brokerName,
-        )
-        fire(PIR_INTERNAL_BROKER_OPT_OUT_STARTED, params)
+        fire(PIR_SCHEDULED_RUN_COMPLETED, params)
     }
 
     override fun reportOptOutSubmitted(
         brokerUrl: String,
         parent: String,
-        attemptId: String,
         durationMs: Long,
         optOutAttemptCount: Int,
         emailPattern: String?,
@@ -643,7 +621,6 @@ class RealPirPixelSender @Inject constructor(
         val params = mapOf(
             PARAM_KEY_BROKER to brokerUrl,
             PARAM_KEY_PARENT to parent,
-            PARAM_ATTEMPT_ID to attemptId,
             PARAM_DURATION to durationMs.toString(),
             PARAM_TRIES to optOutAttemptCount.toString(),
             PARAM_KEY_PATTERN to (emailPattern ?: ""),
@@ -655,7 +632,6 @@ class RealPirPixelSender @Inject constructor(
         brokerUrl: String,
         parent: String,
         brokerJsonVersion: String,
-        attemptId: String,
         durationMs: Long,
         stage: PirStage,
         tries: Int,
@@ -667,7 +643,6 @@ class RealPirPixelSender @Inject constructor(
             PARAM_KEY_BROKER to brokerUrl,
             PARAM_KEY_PARENT to parent,
             PARAM_BROKER_VERSION to brokerJsonVersion,
-            PARAM_ATTEMPT_ID to attemptId,
             PARAM_DURATION to durationMs.toString(),
             PARAM_KEY_STAGE to stage.stageName,
             PARAM_TRIES to tries.toString(),
@@ -679,25 +654,11 @@ class RealPirPixelSender @Inject constructor(
         fire(PIR_OPTOUT_SUBMIT_FAILURE, params)
     }
 
-    override fun reportScanStats(totalScanToRun: Int) {
-        val params = mapOf(
-            PARAM_KEY_SCAN_COUNT to totalScanToRun.toString(),
-        )
-        fire(PIR_INTERNAL_SCAN_STATS, params)
-    }
-
-    override fun reportOptOutStats(totalOptOutsToRun: Int) {
-        val params = mapOf(
-            PARAM_KEY_OPTOUT_COUNT to totalOptOutsToRun.toString(),
-        )
-        fire(PIR_INTERNAL_OPT_OUT_STATS, params)
-    }
-
     override fun sendCPUUsageAlert(averageCpuUsagePercent: Int) {
         val params = mapOf(
             PARAM_KEY_CPU_USAGE to averageCpuUsagePercent.toString(),
         )
-        fire(PIR_INTERNAL_CPU_USAGE, params)
+        fire(PIR_CPU_USAGE, params)
     }
 
     override fun reportEmailConfirmationLinkFetched(
@@ -706,7 +667,7 @@ class RealPirPixelSender @Inject constructor(
         linkAgeMs: Long,
     ) {
         val params = mapOf(
-            PARAM_BROKER_URL to brokerUrl,
+            PARAM_KEY_BROKER to brokerUrl,
             PARAM_BROKER_VERSION to brokerVersion,
             PARAM_LINK_AGE to linkAgeMs.toString(),
         )
@@ -720,7 +681,7 @@ class RealPirPixelSender @Inject constructor(
         errorCode: String,
     ) {
         val params = mapOf(
-            PARAM_BROKER_URL to brokerUrl,
+            PARAM_KEY_BROKER to brokerUrl,
             PARAM_BROKER_VERSION to brokerVersion,
             PARAM_STATUS to status,
             PARAM_ERROR_CODE to errorCode,
@@ -731,15 +692,13 @@ class RealPirPixelSender @Inject constructor(
     override fun reportStagePendingEmailConfirmation(
         brokerUrl: String,
         brokerVersion: String,
-        attemptId: String,
         actionId: String,
         durationMs: Long,
         tries: Int,
     ) {
         val params = mapOf(
-            PARAM_BROKER_URL to brokerUrl,
+            PARAM_KEY_BROKER to brokerUrl,
             PARAM_BROKER_VERSION to brokerVersion,
-            PARAM_ATTEMPT_ID to attemptId,
             PARAM_ACTION_ID to actionId,
             PARAM_DURATION to durationMs.toString(),
             PARAM_TRIES to tries.toString(),
@@ -751,14 +710,12 @@ class RealPirPixelSender @Inject constructor(
         brokerUrl: String,
         brokerVersion: String,
         attemptNumber: Int,
-        attemptId: String,
         actionId: String,
     ) {
         val params = mapOf(
-            PARAM_BROKER_URL to brokerUrl,
+            PARAM_KEY_BROKER to brokerUrl,
             PARAM_BROKER_VERSION to brokerVersion,
             PARAM_ATTEMPT_NUMBER to attemptNumber.toString(),
-            PARAM_ATTEMPT_ID to attemptId,
             PARAM_ACTION_ID to actionId,
         )
         fire(PIR_EMAIL_CONFIRMATION_ATTEMPT_START, params)
@@ -768,15 +725,13 @@ class RealPirPixelSender @Inject constructor(
         brokerUrl: String,
         brokerVersion: String,
         attemptNumber: Int,
-        attemptId: String,
         actionId: String,
         durationMs: Long,
     ) {
         val params = mapOf(
-            PARAM_BROKER_URL to brokerUrl,
+            PARAM_KEY_BROKER to brokerUrl,
             PARAM_BROKER_VERSION to brokerVersion,
             PARAM_ATTEMPT_NUMBER to attemptNumber.toString(),
-            PARAM_ATTEMPT_ID to attemptId,
             PARAM_ACTION_ID to actionId,
             PARAM_DURATION to durationMs.toString(),
         )
@@ -787,15 +742,13 @@ class RealPirPixelSender @Inject constructor(
         brokerUrl: String,
         brokerVersion: String,
         attemptNumber: Int,
-        attemptId: String,
         actionId: String,
         durationMs: Long,
     ) {
         val params = mapOf(
-            PARAM_BROKER_URL to brokerUrl,
+            PARAM_KEY_BROKER to brokerUrl,
             PARAM_BROKER_VERSION to brokerVersion,
             PARAM_ATTEMPT_NUMBER to attemptNumber.toString(),
-            PARAM_ATTEMPT_ID to attemptId,
             PARAM_ACTION_ID to actionId,
             PARAM_DURATION to durationMs.toString(),
         )
@@ -805,13 +758,11 @@ class RealPirPixelSender @Inject constructor(
     override fun reportEmailConfirmationAttemptRetriesExceeded(
         brokerUrl: String,
         brokerVersion: String,
-        attemptId: String,
         actionId: String,
     ) {
         val params = mapOf(
-            PARAM_BROKER_URL to brokerUrl,
+            PARAM_KEY_BROKER to brokerUrl,
             PARAM_BROKER_VERSION to brokerVersion,
-            PARAM_ATTEMPT_ID to attemptId,
             PARAM_ACTION_ID to actionId,
         )
         fire(PIR_EMAIL_CONFIRMATION_MAX_RETRIES_EXCEEDED, params)
@@ -822,7 +773,7 @@ class RealPirPixelSender @Inject constructor(
         brokerVersion: String,
     ) {
         val params = mapOf(
-            PARAM_BROKER_URL to brokerUrl,
+            PARAM_KEY_BROKER to brokerUrl,
             PARAM_BROKER_VERSION to brokerVersion,
         )
         fire(PIR_EMAIL_CONFIRMATION_JOB_SUCCESS, params)
@@ -1049,12 +1000,10 @@ class RealPirPixelSender @Inject constructor(
     override fun reportOptOutStageStart(
         brokerUrl: String,
         parentUrl: String,
-        attemptId: String,
     ) {
         val defaultParams = mutableMapOf(
             PARAM_KEY_BROKER to brokerUrl,
             PARAM_KEY_PARENT to parentUrl,
-            PARAM_ATTEMPT_ID to attemptId,
         )
 
         fire(PIR_OPTOUT_STAGE_START, defaultParams)
@@ -1064,7 +1013,6 @@ class RealPirPixelSender @Inject constructor(
         brokerUrl: String,
         parentUrl: String,
         brokerVersion: String,
-        attemptId: String,
         durationMs: Long,
         tries: Int,
         actionId: String,
@@ -1075,7 +1023,6 @@ class RealPirPixelSender @Inject constructor(
                 brokerUrl = brokerUrl,
                 parentUrl = parentUrl,
                 brokerVersion = brokerVersion,
-                attemptId = attemptId,
                 durationMs = durationMs,
                 tries = tries,
                 actionId = actionId,
@@ -1087,7 +1034,6 @@ class RealPirPixelSender @Inject constructor(
         brokerUrl: String,
         parentUrl: String,
         brokerVersion: String,
-        attemptId: String,
         durationMs: Long,
         tries: Int,
         actionId: String,
@@ -1098,7 +1044,6 @@ class RealPirPixelSender @Inject constructor(
                 brokerUrl = brokerUrl,
                 parentUrl = parentUrl,
                 brokerVersion = brokerVersion,
-                attemptId = attemptId,
                 durationMs = durationMs,
                 tries = tries,
                 actionId = actionId,
@@ -1110,7 +1055,6 @@ class RealPirPixelSender @Inject constructor(
         brokerUrl: String,
         parentUrl: String,
         brokerVersion: String,
-        attemptId: String,
         durationMs: Long,
         tries: Int,
         actionId: String,
@@ -1121,7 +1065,6 @@ class RealPirPixelSender @Inject constructor(
                 brokerUrl = brokerUrl,
                 parentUrl = parentUrl,
                 brokerVersion = brokerVersion,
-                attemptId = attemptId,
                 durationMs = durationMs,
                 tries = tries,
                 actionId = actionId,
@@ -1133,7 +1076,6 @@ class RealPirPixelSender @Inject constructor(
         brokerUrl: String,
         parentUrl: String,
         brokerVersion: String,
-        attemptId: String,
         durationMs: Long,
         tries: Int,
         actionId: String,
@@ -1144,7 +1086,6 @@ class RealPirPixelSender @Inject constructor(
                 brokerUrl = brokerUrl,
                 parentUrl = parentUrl,
                 brokerVersion = brokerVersion,
-                attemptId = attemptId,
                 durationMs = durationMs,
                 tries = tries,
                 actionId = actionId,
@@ -1156,7 +1097,6 @@ class RealPirPixelSender @Inject constructor(
         brokerUrl: String,
         parentUrl: String,
         brokerVersion: String,
-        attemptId: String,
         durationMs: Long,
         tries: Int,
         actionId: String,
@@ -1167,7 +1107,6 @@ class RealPirPixelSender @Inject constructor(
                 brokerUrl = brokerUrl,
                 parentUrl = parentUrl,
                 brokerVersion = brokerVersion,
-                attemptId = attemptId,
                 durationMs = durationMs,
                 tries = tries,
                 actionId = actionId,
@@ -1179,7 +1118,6 @@ class RealPirPixelSender @Inject constructor(
         brokerUrl: String,
         parentUrl: String,
         brokerVersion: String,
-        attemptId: String,
         durationMs: Long,
         tries: Int,
         actionId: String,
@@ -1190,7 +1128,6 @@ class RealPirPixelSender @Inject constructor(
                 brokerUrl = brokerUrl,
                 parentUrl = parentUrl,
                 brokerVersion = brokerVersion,
-                attemptId = attemptId,
                 durationMs = durationMs,
                 tries = tries,
                 actionId = actionId,
@@ -1202,7 +1139,6 @@ class RealPirPixelSender @Inject constructor(
         brokerUrl: String,
         parentUrl: String,
         brokerVersion: String,
-        attemptId: String,
         durationMs: Long,
         tries: Int,
         actionId: String,
@@ -1213,7 +1149,6 @@ class RealPirPixelSender @Inject constructor(
                 brokerUrl = brokerUrl,
                 parentUrl = parentUrl,
                 brokerVersion = brokerVersion,
-                attemptId = attemptId,
                 durationMs = durationMs,
                 tries = tries,
                 actionId = actionId,
@@ -1225,7 +1160,6 @@ class RealPirPixelSender @Inject constructor(
         brokerUrl: String,
         parentUrl: String,
         brokerVersion: String,
-        attemptId: String,
         durationMs: Long,
         tries: Int,
         actionId: String,
@@ -1236,7 +1170,6 @@ class RealPirPixelSender @Inject constructor(
                 brokerUrl = brokerUrl,
                 parentUrl = parentUrl,
                 brokerVersion = brokerVersion,
-                attemptId = attemptId,
                 durationMs = durationMs,
                 tries = tries,
                 actionId = actionId,
@@ -1248,7 +1181,6 @@ class RealPirPixelSender @Inject constructor(
         brokerUrl: String,
         parentUrl: String,
         brokerVersion: String,
-        attemptId: String,
         durationMs: Long,
         tries: Int,
         actionId: String,
@@ -1259,7 +1191,6 @@ class RealPirPixelSender @Inject constructor(
                 brokerUrl = brokerUrl,
                 parentUrl = parentUrl,
                 brokerVersion = brokerVersion,
-                attemptId = attemptId,
                 durationMs = durationMs,
                 tries = tries,
                 actionId = actionId,
@@ -1271,7 +1202,6 @@ class RealPirPixelSender @Inject constructor(
         brokerUrl: String,
         parentUrl: String,
         brokerVersion: String,
-        attemptId: String,
         durationMs: Long,
         tries: Int,
         actionId: String,
@@ -1279,7 +1209,6 @@ class RealPirPixelSender @Inject constructor(
         return mapOf(
             PARAM_KEY_BROKER to brokerUrl,
             PARAM_KEY_PARENT to parentUrl,
-            PARAM_ATTEMPT_ID to attemptId,
             PARAM_BROKER_VERSION to brokerVersion,
             PARAM_DURATION to durationMs.toString(),
             PARAM_TRIES to tries.toString(),
@@ -1290,13 +1219,11 @@ class RealPirPixelSender @Inject constructor(
     override fun reportOptOutStageFinish(
         brokerUrl: String,
         parentUrl: String,
-        attemptId: String,
         durationMs: Long,
     ) {
         val params = mapOf(
             PARAM_KEY_BROKER to brokerUrl,
             PARAM_KEY_PARENT to parentUrl,
-            PARAM_ATTEMPT_ID to attemptId,
             PARAM_DURATION to durationMs.toString(),
         )
 
@@ -1363,6 +1290,47 @@ class RealPirPixelSender @Inject constructor(
         fire(PIR_DASHBOARD_OPENED)
     }
 
+    override fun reportInitialScanDuration(
+        durationMs: Long,
+        profileQueryCount: Int,
+    ) {
+        val params = mapOf(
+            PARAM_KEY_DURATION_MS to durationMs.toString(),
+            PARAM_KEY_PROFILE_QUERY_COUNT to profileQueryCount.toString(),
+        )
+
+        fire(PIR_INITIAL_SCAN_DURATION, params)
+    }
+
+    override fun reportBackgroundScanStats(scanFrequencyWithinThreshold: Boolean) {
+        val params = mapOf(
+            PARAM_KEY_SCAN_FREQUENCY to scanFrequencyWithinThreshold.toString(),
+        )
+        fire(PIR_BG_STATS, params)
+    }
+
+    override fun reportScanInvalidEvent(
+        brokerUrl: String,
+        brokerVersion: String,
+    ) {
+        val params = mapOf(
+            PARAM_KEY_BROKER to brokerUrl,
+            PARAM_BROKER_VERSION to brokerVersion,
+        )
+        fire(PIR_SCAN_INVALID_EVENT, params)
+    }
+
+    override fun reportOptOutInvalidEvent(
+        brokerUrl: String,
+        brokerVersion: String,
+    ) {
+        val params = mapOf(
+            PARAM_KEY_BROKER to brokerUrl,
+            PARAM_BROKER_VERSION to brokerVersion,
+        )
+        fire(PIR_OPTOUT_INVALID_EVENT, params)
+    }
+
     private fun fire(
         pixel: PirPixel,
         params: Map<String, String> = emptyMap(),
@@ -1373,18 +1341,23 @@ class RealPirPixelSender @Inject constructor(
         }
     }
 
+    private fun enqueueFire(
+        pixel: PirPixel,
+        params: Map<String, String> = emptyMap(),
+    ) {
+        pixel.getPixelNames().forEach { (_, pixelName) ->
+            logcat { "PIR-LOGGING: $pixelName params: $params" }
+            pixelSender.enqueueFire(pixelName = pixelName, parameters = params)
+        }
+    }
+
     companion object {
-        private const val PARAM_KEY_BROKER_NAME = "brokerName"
         private const val PARAM_KEY_TOTAL_TIME = "totalTimeInMillis"
-        private const val PARAM_KEY_SCAN_COUNT = "totalScanToRun"
-        private const val PARAM_KEY_OPTOUT_COUNT = "totalOptOutToRun"
         private const val PARAM_KEY_CPU_USAGE = "cpuUsage"
-        private const val PARAM_BROKER_URL = "data_broker_url"
         private const val PARAM_BROKER_VERSION = "broker_version"
         private const val PARAM_LINK_AGE = "link_age_ms"
         private const val PARAM_STATUS = "status"
         private const val PARAM_ERROR_CODE = "error_code"
-        private const val PARAM_ATTEMPT_ID = "attempt_id"
         private const val PARAM_ACTION_ID = "action_id"
         private const val PARAM_DURATION = "duration"
         private const val PARAM_TRIES = "tries"
@@ -1408,5 +1381,8 @@ class RealPirPixelSender @Inject constructor(
         private const val PARAM_KEY_REMOVED_AT = "removed_at"
         private const val PARAM_KEY_MSG = "message"
         private const val PARAM_KEY_STEP = "stepType"
+        private const val PARAM_KEY_DURATION_MS = "duration_in_ms"
+        private const val PARAM_KEY_PROFILE_QUERY_COUNT = "profile_queries"
+        private const val PARAM_KEY_SCAN_FREQUENCY = "scanFrequencyWithinThreshold"
     }
 }

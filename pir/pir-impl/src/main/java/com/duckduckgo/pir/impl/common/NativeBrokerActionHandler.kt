@@ -36,10 +36,10 @@ import com.duckduckgo.pir.impl.common.NativeBrokerActionHandler.NativeActionResu
 import com.duckduckgo.pir.impl.common.NativeBrokerActionHandler.NativeActionResult.Success.NativeSuccessData.CaptchaSolutionStatus.CaptchaStatus
 import com.duckduckgo.pir.impl.common.NativeBrokerActionHandler.NativeActionResult.Success.NativeSuccessData.CaptchaTransactionIdReceived
 import com.duckduckgo.pir.impl.scripts.models.PirError
-import com.duckduckgo.pir.impl.scripts.models.PirError.CaptchaServiceError
-import com.duckduckgo.pir.impl.scripts.models.PirError.CaptchaSolutionFailed
-import com.duckduckgo.pir.impl.scripts.models.PirError.ClientError
-import com.duckduckgo.pir.impl.scripts.models.PirError.EmailError
+import com.duckduckgo.pir.impl.scripts.models.PirError.ActionError.CaptchaServiceError
+import com.duckduckgo.pir.impl.scripts.models.PirError.ActionError.CaptchaSolutionFailed
+import com.duckduckgo.pir.impl.scripts.models.PirError.ActionError.ClientError
+import com.duckduckgo.pir.impl.scripts.models.PirError.ActionError.EmailError
 import com.duckduckgo.pir.impl.service.DbpService.CaptchaSolutionMeta
 import com.duckduckgo.pir.impl.service.ResponseError
 import com.duckduckgo.pir.impl.service.parseError
@@ -102,7 +102,6 @@ interface NativeBrokerActionHandler {
         }
 
         data class Failure(
-            val actionId: String,
             val error: PirError,
             val retryNativeAction: Boolean = false,
         ) : NativeActionResult()
@@ -139,16 +138,16 @@ class RealNativeBrokerActionHandler(
                     val errorMessage = "$PREFIX_GEN_EMAIL_ERROR${error.code()} ${adapter.parseError(error)?.message.orEmpty()}"
 
                     Failure(
-                        actionId = action.actionId,
                         error = EmailError(
+                            actionID = action.actionId,
                             errorCode = error.code(),
                             error = errorMessage,
                         ),
                     )
                 } else {
                     Failure(
-                        actionId = action.actionId,
                         error = ClientError(
+                            actionID = action.actionId,
                             message = PREFIX_GEN_EMAIL_ERROR + error.message,
                         ),
                     )
@@ -173,8 +172,8 @@ class RealNativeBrokerActionHandler(
 
                     else ->
                         Failure(
-                            actionId = nativeAction.actionId,
                             error = ClientError(
+                                actionID = nativeAction.actionId,
                                 message = "Invalid scenario",
                             ),
                             retryNativeAction = false,
@@ -204,8 +203,8 @@ class RealNativeBrokerActionHandler(
 
                     else ->
                         Failure(
-                            actionId = nativeAction.actionId,
                             error = ClientError(
+                                actionID = nativeAction.actionId,
                                 message = "Invalid scenario",
                             ),
                             retryNativeAction = false,
@@ -223,16 +222,16 @@ class RealNativeBrokerActionHandler(
             )
 
             ClientFailure -> Failure(
-                actionId = actionId,
                 error = ClientError(
+                    actionID = actionId,
                     message = this.message,
                 ),
                 retryNativeAction = false,
             )
 
             CriticalFailure, InvalidRequest -> Failure(
-                actionId = actionId,
                 error = CaptchaServiceError(
+                    actionID = actionId,
                     errorCode = this.code,
                     errorDetails = this.message,
                 ),
@@ -240,8 +239,8 @@ class RealNativeBrokerActionHandler(
             )
 
             TransientFailure -> Failure(
-                actionId = actionId,
                 error = CaptchaServiceError(
+                    actionID = actionId,
                     errorCode = this.code,
                     errorDetails = this.message,
                 ),
@@ -249,8 +248,8 @@ class RealNativeBrokerActionHandler(
             )
 
             UnableToSolveCaptcha -> Failure(
-                actionId = actionId,
                 error = CaptchaSolutionFailed(
+                    actionID = actionId,
                     message = this.message,
                 ),
                 retryNativeAction = false,

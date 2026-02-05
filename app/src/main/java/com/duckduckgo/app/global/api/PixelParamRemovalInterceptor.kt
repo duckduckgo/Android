@@ -17,11 +17,13 @@
 package com.duckduckgo.app.global.api
 
 import com.duckduckgo.app.browser.WebViewPixelName
+import com.duckduckgo.app.browser.customtabs.CustomTabPixelNames
 import com.duckduckgo.app.browser.httperrors.HttpErrorPixelName
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.SITE_NOT_WORKING_SHOWN
 import com.duckduckgo.app.pixels.AppPixelName.SITE_NOT_WORKING_WEBSITE_BROKEN
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames
 import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.common.utils.plugins.pixel.PixelInterceptorPlugin
@@ -29,8 +31,10 @@ import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin
 import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin.PixelParameter
 import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin.PixelParameter.APP_VERSION
 import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin.PixelParameter.ATB
+import com.duckduckgo.data.store.impl.DataStorePixelNames
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.newtabpage.impl.pixels.NewTabPixelNames
+import com.duckduckgo.remote.messaging.impl.pixels.RemoteMessagingPixelName
 import com.duckduckgo.savedsites.impl.SavedSitesPixelName
 import com.duckduckgo.site.permissions.impl.SitePermissionsPixelName
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -109,6 +113,7 @@ object PixelInterceptorPixelsRequiringDataCleaning : PixelParamRemovalPlugin {
             AppPixelName.SETTINGS_SYNC_PRESSED.pixelName to PixelParameter.removeAtb(),
             AppPixelName.SETTINGS_PASSWORDS_PRESSED.pixelName to PixelParameter.removeAtb(),
             AppPixelName.SETTINGS_EMAIL_PROTECTION_PRESSED.pixelName to PixelParameter.removeAtb(),
+            AppPixelName.SETTINGS_WHATS_NEW_PRESSED.pixelName to PixelParameter.removeAtb(),
             AppPixelName.ONBOARDING_DAX_CTA_DISMISS_BUTTON.pixelName to PixelParameter.removeAtb(),
             AppPixelName.TAB_MANAGER_INFO_PANEL_IMPRESSIONS.pixelName to PixelParameter.removeAll(),
             AppPixelName.TAB_MANAGER_INFO_PANEL_DISMISSED.pixelName to PixelParameter.removeAll(),
@@ -121,11 +126,13 @@ object PixelInterceptorPixelsRequiringDataCleaning : PixelParamRemovalPlugin {
             AppPixelName.PREONBOARDING_CHOOSE_SEARCH_EXPERIENCE_IMPRESSIONS_UNIQUE.pixelName to PixelParameter.removeAtb(),
             AppPixelName.PREONBOARDING_AICHAT_SELECTED.pixelName to PixelParameter.removeAtb(),
             AppPixelName.PREONBOARDING_SEARCH_ONLY_SELECTED.pixelName to PixelParameter.removeAtb(),
+            AppPixelName.PREONBOARDING_SPLIT_ADDRESS_BAR_SELECTED_UNIQUE.pixelName to PixelParameter.removeAtb(),
             AppPixelName.SEARCH_AND_FAVORITES_WIDGET_ADDED.pixelName to PixelParameter.removeAtb(),
             AppPixelName.SEARCH_AND_FAVORITES_WIDGET_DELETED.pixelName to PixelParameter.removeAtb(),
             AppPixelName.SEARCH_WIDGET_ADDED.pixelName to PixelParameter.removeAtb(),
             AppPixelName.SEARCH_WIDGET_DELETED.pixelName to PixelParameter.removeAtb(),
             AppPixelName.SETTINGS_APPEARANCE_IS_TRACKER_COUNT_IN_TAB_SWITCHER_TOGGLED.pixelName to PixelParameter.removeAll(),
+            AppPixelName.SETTINGS_APPEARANCE_IS_TRACKER_COUNT_IN_ADDRESS_BAR_TOGGLED.pixelName to PixelParameter.removeAll(),
             AppPixelName.TIMEOUT_WAITING_FOR_APP_REFERRER.pixelName to PixelParameter.removeAtb(),
             AppPixelName.PRODUCT_TELEMETRY_SURFACE_LANDSCAPE_ORIENTATION_USED.pixelName to PixelParameter.removeAtb(),
             AppPixelName.PRODUCT_TELEMETRY_SURFACE_LANDSCAPE_ORIENTATION_USED_DAILY.pixelName to PixelParameter.removeAtb(),
@@ -147,6 +154,32 @@ object PixelInterceptorPixelsRequiringDataCleaning : PixelParamRemovalPlugin {
             NewTabPixelNames.PRODUCT_SURFACE_TELEMETRY_NEW_TAB_DISPLAYED_DAILY.pixelName to PixelParameter.removeAtb(),
             SavedSitesPixelName.PRODUCT_TELEMETRY_SURFACE_BOOKMARKS_OPENED.pixelName to PixelParameter.removeAtb(),
             SavedSitesPixelName.PRODUCT_TELEMETRY_SURFACE_BOOKMARKS_OPENED_DAILY.pixelName to PixelParameter.removeAtb(),
+            CustomTabPixelNames.CUSTOM_TABS_ADDRESS_BAR_CLICKED.pixelName to PixelParameter.removeAtb(),
+            CustomTabPixelNames.CUSTOM_TABS_ADDRESS_BAR_CLICKED_DAILY.pixelName to PixelParameter.removeAtb(),
+            CustomTabPixelNames.CUSTOM_TABS_DAX_CLICKED.pixelName to PixelParameter.removeAtb(),
+            CustomTabPixelNames.CUSTOM_TABS_DAX_CLICKED_DAILY.pixelName to PixelParameter.removeAtb(),
+            AppPixelName.FIRE_DIALOG_SHOWN.pixelName to PixelParameter.removeAtb(),
+            AppPixelName.DATA_CLEARING_AUTOMATIC_OPTIONS_UPDATED.pixelName to PixelParameter.removeAtb(),
+            RemoteMessagingPixelName.REMOTE_MESSAGE_IMAGE_LOAD_SUCCESS.pixelName to PixelParameter.removeAtb(),
+            RemoteMessagingPixelName.REMOTE_MESSAGE_IMAGE_LOAD_FAILED.pixelName to PixelParameter.removeAtb(),
+            AutofillPixelNames.AUTOFILL_HARMONY_PREFERENCES_RETRIEVAL_FAILED.pixelName to PixelParameter.removeAtb(),
+            AutofillPixelNames.AUTOFILL_PREFERENCES_RETRIEVAL_FAILED.pixelName to PixelParameter.removeAtb(),
+            AutofillPixelNames.AUTOFILL_PREFERENCES_GET_KEY_FAILED.pixelName to PixelParameter.removeAtb(),
+            AutofillPixelNames.AUTOFILL_HARMONY_PREFERENCES_GET_KEY_FAILED.pixelName to PixelParameter.removeAtb(),
+            AutofillPixelNames.AUTOFILL_PREFERENCES_UPDATE_KEY_FAILED.pixelName to PixelParameter.removeAtb(),
+            AutofillPixelNames.AUTOFILL_HARMONY_PREFERENCES_UPDATE_KEY_FAILED.pixelName to PixelParameter.removeAtb(),
+            AppPixelName.APP_INSTALL_VERIFIED_INSTALL.pixelName to PixelParameter.removeAtb(),
+            AppPixelName.APP_UPDATE_VERIFIED_INSTALL.pixelName to PixelParameter.removeAtb(),
+            DataStorePixelNames.DATA_STORE_MIGRATE_ENCRYPTED_GET_PREFERENCES_ORIGIN_FAILED.pixelName to PixelParameter.removeAtb(),
+            DataStorePixelNames.DATA_STORE_MIGRATE_UNENCRYPTED_GET_PREFERENCES_ORIGIN_FAILED.pixelName to PixelParameter.removeAtb(),
+            DataStorePixelNames.DATA_STORE_MIGRATE_ENCRYPTED_GET_PREFERENCES_DESTINATION_FAILED.pixelName to PixelParameter.removeAtb(),
+            DataStorePixelNames.DATA_STORE_MIGRATE_UNENCRYPTED_GET_PREFERENCES_DESTINATION_FAILED.pixelName to PixelParameter.removeAtb(),
+            DataStorePixelNames.DATA_STORE_MIGRATE_ENCRYPTED_QUERY_PREFERENCES_DESTINATION_FAILED.pixelName to PixelParameter.removeAtb(),
+            DataStorePixelNames.DATA_STORE_MIGRATE_UNENCRYPTED_QUERY_PREFERENCES_DESTINATION_FAILED.pixelName to PixelParameter.removeAtb(),
+            DataStorePixelNames.DATA_STORE_MIGRATE_ENCRYPTED_QUERY_ALL_PREFERENCES_ORIGIN_FAILED.pixelName to PixelParameter.removeAtb(),
+            DataStorePixelNames.DATA_STORE_MIGRATE_UNENCRYPTED_QUERY_ALL_PREFERENCES_ORIGIN_FAILED.pixelName to PixelParameter.removeAtb(),
+            DataStorePixelNames.DATA_STORE_MIGRATE_ENCRYPTED_UPDATE_PREFERENCES_DESTINATION_FAILED.pixelName to PixelParameter.removeAtb(),
+            DataStorePixelNames.DATA_STORE_MIGRATE_UNENCRYPTED_UPDATE_PREFERENCES_DESTINATION_FAILED.pixelName to PixelParameter.removeAtb(),
         )
     }
 }

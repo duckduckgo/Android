@@ -16,19 +16,25 @@
 
 package com.duckduckgo.duckchat.impl.helper
 
+import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.common.utils.ConflatedJob
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.ChatState
 import com.duckduckgo.duckchat.impl.ChatState.HIDE
 import com.duckduckgo.duckchat.impl.ChatState.SHOW
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.ReportMetric
-import com.duckduckgo.duckchat.impl.metric.DuckAiMetricCollector
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatDataStore
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.squareup.anvil.annotations.ContributesBinding
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import logcat.logcat
 import org.json.JSONObject
 import java.util.regex.Pattern
 import javax.inject.Inject
@@ -39,9 +45,16 @@ interface DuckChatJSHelper {
         method: String,
         id: String?,
         data: JSONObject?,
+        mode: Mode = Mode.FULL,
+        pageContext: String? = null,
     ): JsCallbackData?
 
     fun onNativeAction(action: NativeAction): SubscriptionEventData
+}
+
+enum class Mode {
+    FULL,
+    CONTEXTUAL,
 }
 
 enum class NativeAction {
@@ -55,23 +68,38 @@ class RealDuckChatJSHelper @Inject constructor(
     private val duckChat: DuckChatInternal,
     private val duckChatPixels: DuckChatPixels,
     private val dataStore: DuckChatDataStore,
-    private val duckAiMetricCollector: DuckAiMetricCollector,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+    private val dispatcherProvider: DispatcherProvider,
 ) : DuckChatJSHelper {
+
+    private val registerOpenedJob = ConflatedJob()
+
     override suspend fun processJsCallbackMessage(
         featureName: String,
         method: String,
         id: String?,
         data: JSONObject?,
-    ): JsCallbackData? =
-        when (method) {
+        mode: Mode,
+        pageContext: String?,
+    ): JsCallbackData? {
+        fun registerDuckChatIsOpenDebounced(windowMs: Long = 500L) {
+            // we debounced because METHOD_GET_AI_CHAT_NATIVE_HANDOFF_DATA can be called more than once
+            // in some cases, eg. when opening duck.ai with query already
+            registerOpenedJob += appCoroutineScope.launch(dispatcherProvider.io()) {
+                delay(windowMs)
+                duckChatPixels.reportOpen()
+            }
+        }
+
+        return when (method) {
             METHOD_GET_AI_CHAT_NATIVE_HANDOFF_DATA ->
                 id?.let {
                     getAIChatNativeHandoffData(featureName, method, it)
-                }
+                }.also { registerDuckChatIsOpenDebounced() }
 
             METHOD_GET_AI_CHAT_NATIVE_CONFIG_VALUES ->
                 id?.let {
-                    getAIChatNativeConfigValues(featureName, method, it)
+                    getAIChatNativeConfigValues(featureName, method, it, mode)
                 }
 
             METHOD_OPEN_AI_CHAT -> {
@@ -119,15 +147,30 @@ class RealDuckChatJSHelper @Inject constructor(
                     .fromValue(data?.optString("metricName"))
                     ?.let { reportMetric ->
                         duckChatPixels.sendReportMetricPixel(reportMetric)
-                        if (reportMetric == ReportMetric.USER_DID_SUBMIT_PROMPT || reportMetric == ReportMetric.USER_DID_SUBMIT_FIRST_PROMPT) {
-                            duckAiMetricCollector.onMessageSent()
-                        }
                     }
                 null
             }
 
+            METHOD_GET_PAGE_CONTEXT -> {
+                id?.let {
+                    val reason = data?.optString(REASON) ?: REASON_USER_ACTION
+                    logcat { "Duck.ai Contextual: getAIChatPageContext reason $reason" }
+                    if (pageContext != null) {
+                        if (reason == REASON_USER_ACTION) {
+                            getPageContextResponse(featureName, method, it, pageContext)
+                        } else {
+                            null
+                        }
+                    } else {
+                        logcat { "Duck.ai Contextual: page context is empty, can't add it" }
+                        null
+                    }
+                }
+            }
+
             else -> null
         }
+    }
 
     override fun onNativeAction(action: NativeAction): SubscriptionEventData {
         val subscriptionName = when (action) {
@@ -161,6 +204,7 @@ class RealDuckChatJSHelper @Inject constructor(
         featureName: String,
         method: String,
         id: String,
+        mode: Mode,
     ): JsCallbackData {
         val jsonPayload =
             JSONObject().apply {
@@ -172,9 +216,29 @@ class RealDuckChatJSHelper @Inject constructor(
                 put(SUPPORTS_CHAT_ID_RESTORATION, duckChat.isDuckChatFullScreenModeEnabled())
                 put(SUPPORTS_IMAGE_UPLOAD, duckChat.isImageUploadEnabled())
                 put(SUPPORTS_STANDALONE_MIGRATION, duckChat.isStandaloneMigrationEnabled())
-                put(SUPPORTS_CHAT_FULLSCREEN_MODE, duckChat.isDuckChatFullScreenModeEnabled())
-            }
+                put(SUPPORTS_CHAT_FULLSCREEN_MODE, duckChat.isDuckChatFullScreenModeEnabled() && mode == Mode.FULL)
+                put(SUPPORTS_CHAT_CONTEXTUAL_MODE, duckChat.isDuckChatContextualModeEnabled() && mode == Mode.CONTEXTUAL)
+                put(SUPPORTS_CHAT_SYNC, duckChat.isChatSyncFeatureEnabled())
+                put(SUPPORTS_PAGE_CONTEXT, duckChat.isDuckChatContextualModeEnabled() && mode == Mode.CONTEXTUAL)
+            }.also { logcat { "DuckChat-Sync: getAIChatNativeConfigValues $it" } }
         return JsCallbackData(jsonPayload, featureName, method, id)
+    }
+
+    private fun getPageContextResponse(
+        featureName: String,
+        method: String,
+        id: String,
+        pageContext: String,
+    ): JsCallbackData {
+        val params =
+            JSONObject().apply {
+                put(
+                    PAGE_CONTEXT,
+                    JSONObject(pageContext),
+                )
+            }
+
+        return JsCallbackData(params, featureName, method, id)
     }
 
     private fun getOpenKeyboardResponse(
@@ -221,15 +285,17 @@ class RealDuckChatJSHelper @Inject constructor(
         private const val METHOD_GET_AI_CHAT_NATIVE_HANDOFF_DATA = "getAIChatNativeHandoffData"
         private const val METHOD_GET_AI_CHAT_NATIVE_CONFIG_VALUES = "getAIChatNativeConfigValues"
         private const val METHOD_OPEN_AI_CHAT = "openAIChat"
-        private const val METHOD_CLOSE_AI_CHAT = "closeAIChat"
+        const val METHOD_CLOSE_AI_CHAT = "closeAIChat"
         private const val METHOD_OPEN_AI_CHAT_SETTINGS = "openAIChatSettings"
         private const val METHOD_RESPONSE_STATE = "responseState"
         private const val METHOD_HIDE_CHAT_INPUT = "hideChatInput"
         private const val METHOD_SHOW_CHAT_INPUT = "showChatInput"
+        const val METHOD_GET_PAGE_CONTEXT = "getAIChatPageContext"
         const val METHOD_OPEN_KEYBOARD = "openKeyboard"
         private const val AI_CHAT_PAYLOAD = "aiChatPayload"
         private const val METHOD_OPEN_KEYBOARD_PAYLOAD = "selector"
         private const val IS_HANDOFF_ENABLED = "isAIChatHandoffEnabled"
+        private const val PAGE_CONTEXT = "pageContext"
         private const val SUPPORTS_CLOSING_AI_CHAT = "supportsClosingAIChat"
         private const val SUPPORTS_OPENING_SETTINGS = "supportsOpeningSettings"
         private const val SUPPORTS_NATIVE_CHAT_INPUT = "supportsNativeChatInput"
@@ -237,9 +303,14 @@ class RealDuckChatJSHelper @Inject constructor(
         private const val SUPPORTS_CHAT_ID_RESTORATION = "supportsURLChatIDRestoration"
         private const val SUPPORTS_STANDALONE_MIGRATION = "supportsStandaloneMigration"
         private const val SUPPORTS_CHAT_FULLSCREEN_MODE = "supportsAIChatFullMode"
+        private const val SUPPORTS_CHAT_CONTEXTUAL_MODE = "supportsAIChatContextualMode"
+        private const val SUPPORTS_CHAT_SYNC = "supportsAIChatSync"
+        private const val SUPPORTS_PAGE_CONTEXT = "supportsPageContext"
         private const val REPORT_METRIC = "reportMetric"
         private const val PLATFORM = "platform"
         private const val ANDROID = "android"
+        private const val REASON = "reason"
+        private const val REASON_USER_ACTION = "userAction"
         const val SELECTOR = "selector"
         private const val DEFAULT_SELECTOR = "'user-prompt'"
         private const val SUCCESS = "success"

@@ -8,26 +8,36 @@ on:
       - reopened
     paths:
       - 'node_modules/@duckduckgo/content-scope-scripts/**'
-
-  schedule:
-    - cron: '0 3 * * *' # run at 3 AM UTC
-
+  workflow_call:
+    inputs:
+      commit:
+        description: 'Specific commit SHA to checkout (optional, defaults to latest)'
+        required: true
+        type: string
   workflow_dispatch:
+    inputs:
+      commit:
+        description: 'Specific commit SHA to checkout (optional, defaults to latest)'
+        required: false
+        type: string
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: ${{ github.workflow_ref }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
   privacy_tests:
-    if: ${{ github.event_name == 'workflow_dispatch' || github.event_name == 'schedule' || github.event_name == 'pull_request' }}
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event_name == 'schedule' || github.event_name == 'workflow_call' || github.event_name == 'pull_request' }}
     name: Privacy Tests
     runs-on: ubuntu-latest
+    env:
+      DEVELOCITY_ACCESS_KEY: ${{ secrets.DEVELOCITY_ACCESS_KEY }}
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
+          ref: ${{ inputs.commit || github.sha }}
           submodules: recursive
 
       - name: Setup jq
@@ -52,7 +62,9 @@ jobs:
         run: echo "$FLANK" > flank.json
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
+        uses: gradle/actions/setup-gradle@v5
+        with:
+          cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
 
       - name: Build
         run: ./gradlew androidTestsBuild
@@ -62,7 +74,7 @@ jobs:
 
       - name: Bundle the Android CI tests report
         if: always()
-        run: find . -type d -name 'fladleResults' | zip -@ -r android-tests-report.zip
+        run: find . -type d -name 'fladleResults' | zip -@ -r android-tests-report-privacy.zip
 
       - name: Generate json file with failures
         if: ${{ failure() }}
@@ -77,8 +89,8 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: android-tests-report
-          path: android-tests-report.zip
+          name: android-tests-report-privacy
+          path: android-tests-report-privacy.zip
 
       - name: Create Asana task when workflow failed
         if: ${{ failure() && github.event_name != 'workflow_dispatch' }}

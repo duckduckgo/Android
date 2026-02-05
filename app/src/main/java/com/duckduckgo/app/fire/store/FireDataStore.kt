@@ -138,11 +138,18 @@ class SharedPreferencesFireDataStore @Inject constructor(
     }
 
     private suspend fun getLegacyOptions(): Set<FireClearOption> = withContext(dispatcherProvider.io()) {
-        val oldOption = settingsDataStore.automaticallyClearWhatOption
-        when (oldOption) {
-            ClearWhatOption.CLEAR_NONE -> emptySet()
-            ClearWhatOption.CLEAR_TABS_ONLY -> setOf(FireClearOption.TABS)
-            ClearWhatOption.CLEAR_TABS_AND_DATA -> setOf(FireClearOption.TABS, FireClearOption.DATA)
+        buildSet {
+            when (settingsDataStore.automaticallyClearWhatOption) {
+                ClearWhatOption.CLEAR_NONE -> Unit
+                ClearWhatOption.CLEAR_TABS_ONLY -> add(FireClearOption.TABS)
+                ClearWhatOption.CLEAR_TABS_AND_DATA -> {
+                    add(FireClearOption.TABS)
+                    add(FireClearOption.DATA)
+                }
+            }
+            if (settingsDataStore.clearDuckAiData) {
+                add(FireClearOption.DUCKAI_CHATS)
+            }
         }
     }
 
@@ -152,13 +159,22 @@ class SharedPreferencesFireDataStore @Inject constructor(
 
     override fun getManualClearOptionsFlow(): Flow<Set<FireClearOption>> {
         return store.data.map { preferences ->
-            val stringSet = preferences[KEY_MANUAL_CLEAR_OPTIONS] ?: DEFAULT_OPTIONS.map { it.name }.toSet()
+            val stringSet = preferences[KEY_MANUAL_CLEAR_OPTIONS] ?: getDefaultManualOptions().map { it.name }.toSet()
             parseOptionsFromStrings(stringSet)
         }
     }
 
     override suspend fun getManualClearOptions(): Set<FireClearOption> {
-        return getManualClearOptionsFlow().firstOrNull() ?: DEFAULT_OPTIONS
+        return getManualClearOptionsFlow().firstOrNull() ?: getDefaultManualOptions()
+    }
+
+    private suspend fun getDefaultManualOptions(): Set<FireClearOption> = withContext(dispatcherProvider.io()) {
+        buildSet {
+            addAll(DEFAULT_OPTIONS)
+            if (settingsDataStore.clearDuckAiData) {
+                add(FireClearOption.DUCKAI_CHATS)
+            }
+        }
     }
 
     override suspend fun setManualClearOptions(options: Set<FireClearOption>) {
@@ -169,14 +185,14 @@ class SharedPreferencesFireDataStore @Inject constructor(
 
     override suspend fun addManualClearOption(option: FireClearOption) {
         store.edit { preferences ->
-            val currentOptions = preferences[KEY_MANUAL_CLEAR_OPTIONS] ?: DEFAULT_OPTIONS.map { it.name }.toSet()
+            val currentOptions = preferences[KEY_MANUAL_CLEAR_OPTIONS] ?: getDefaultManualOptions().map { it.name }.toSet()
             preferences[KEY_MANUAL_CLEAR_OPTIONS] = currentOptions + option.name
         }
     }
 
     override suspend fun removeManualClearOption(option: FireClearOption) {
         store.edit { preferences ->
-            val currentOptions = preferences[KEY_MANUAL_CLEAR_OPTIONS] ?: DEFAULT_OPTIONS.map { it.name }.toSet()
+            val currentOptions = preferences[KEY_MANUAL_CLEAR_OPTIONS] ?: getDefaultManualOptions().map { it.name }.toSet()
             preferences[KEY_MANUAL_CLEAR_OPTIONS] = currentOptions - option.name
         }
     }

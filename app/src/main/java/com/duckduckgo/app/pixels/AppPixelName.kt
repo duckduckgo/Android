@@ -24,6 +24,8 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     PROCESS_CREATED_VPN("m_process_created_vpn"),
 
     APP_LAUNCH_VERIFIED_INSTALL("m_app_launched_on_verified_play_store_install"),
+    APP_INSTALL_VERIFIED_INSTALL("verified_app_install"),
+    APP_UPDATE_VERIFIED_INSTALL("verified_app_update"),
 
     FORGET_ALL_PRESSED_BROWSING("mf_bp"),
     FORGET_ALL_PRESSED_TABSWITCHING("mf_tp"),
@@ -43,6 +45,7 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     PREONBOARDING_CHOOSE_BROWSER_PRESSED("m_preonboarding_choose_browser_pressed"),
     PREONBOARDING_ADDRESS_BAR_POSITION_SHOWN_UNIQUE("m_preonboarding_address_bar_position_dialog_shown_unique"),
     PREONBOARDING_BOTTOM_ADDRESS_BAR_SELECTED_UNIQUE("m_preonboarding_bottom_address_bar_selected_unique"),
+    PREONBOARDING_SPLIT_ADDRESS_BAR_SELECTED_UNIQUE("m_preonboarding_split_address_bar_selected_unique"),
     PREONBOARDING_SKIP_ONBOARDING_SHOWN_UNIQUE("m_preonboarding_skip_onboarding_shown_unique"),
     PREONBOARDING_CHOOSE_SEARCH_EXPERIENCE_IMPRESSIONS_UNIQUE("m_preonboarding_choose_search_experience_impressions_unique"),
     PREONBOARDING_AICHAT_SELECTED("m_preonboarding_aichat_selected"),
@@ -135,6 +138,7 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     SETTINGS_GENERAL_PRESSED("ms_settings_general_pressed"),
     SETTINGS_WEB_TRACKING_PROTECTION_PRESSED("ms_web_tracking_protection_setting_pressed"),
     SETTINGS_ACCESSIBILITY_PRESSED("ms_accessibility_setting_pressed"),
+    SETTINGS_WHATS_NEW_PRESSED("ms_whats_new_setting_pressed"),
     SETTINGS_ABOUT_PRESSED("ms_about_setting_pressed"),
     SETTINGS_PASSWORDS_PRESSED("ms_passwords_pressed"),
     SETTINGS_SYNC_PRESSED("ms_sync_pressed"),
@@ -143,6 +147,7 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     SETTINGS_APPEARANCE_IS_FULL_URL_OPTION_TOGGLED("m_appearance_settings_is_full_url_option_toggled"),
     APPEARANCE_SETTINGS_IS_FULL_URL_ENABLED_DAILY("m_appearance_settings_is_full_url_enabled_daily"),
     SETTINGS_APPEARANCE_IS_TRACKER_COUNT_IN_TAB_SWITCHER_TOGGLED("m_appearance_settings_is_tracker_count_in_tab_switcher_toggled"),
+    SETTINGS_APPEARANCE_IS_TRACKER_COUNT_IN_ADDRESS_BAR_TOGGLED("m_appearance_settings_is_tracker_count_in_address_bar_toggled"),
     SETTINGS_APP_ICON_PRESSED("ms_app_icon_setting_pressed"),
     SETTINGS_ADDRESS_BAR_POSITION_PRESSED("ms_address_bar_position_setting_pressed"),
     SETTINGS_ADDRESS_BAR_POSITION_SELECTED_TOP("ms_address_bar_position_setting_selected_top"),
@@ -267,6 +272,22 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     MENU_ACTION_DOWNLOADS_PRESSED("m_nav_downloads_menu_item_pressed"),
     MENU_ACTION_AUTOFILL_PRESSED("m_nav_autofill_menu_item_pressed"),
 
+    EXPERIMENTAL_MENU_USED("m_experimental-browsing-menu_used"),
+    EXPERIMENTAL_MENU_USED_UNIQUE("m_experimental-browsing-menu_used_unique"),
+    EXPERIMENTAL_MENU_USED_DAILY("m_experimental-browsing-menu_used_daily"),
+    EXPERIMENTAL_MENU_ENABLED("m_experimental-browsing-menu_enabled"),
+    EXPERIMENTAL_MENU_ENABLED_UNIQUE("m_experimental-browsing-menu_enabled_unique"),
+    EXPERIMENTAL_MENU_ENABLED_DAILY("m_experimental-browsing-menu_enabled_daily"),
+    EXPERIMENTAL_MENU_DISABLED("m_experimental-browsing-menu_disabled"),
+    EXPERIMENTAL_MENU_DISABLED_UNIQUE("m_experimental-browsing-menu_disabled_unique"),
+    EXPERIMENTAL_MENU_DISABLED_DAILY("m_experimental-browsing-menu_disabled_daily"),
+    EXPERIMENTAL_MENU_DISPLAYED("m_experimental-browsing-menu_displayed"),
+    EXPERIMENTAL_MENU_DISPLAYED_NTP("m_experimental-browsing-menu_displayed_ntp"),
+    EXPERIMENTAL_MENU_DISPLAYED_AICHAT("m_experimental-browsing-menu_displayed_aichat"),
+    EXPERIMENTAL_MENU_DISPLAYED_CUSTOMTABS("m_experimental-browsing-menu_displayed_customtabs"),
+    EXPERIMENTAL_MENU_DISPLAYED_ERROR("m_experimental-browsing-menu_displayed_error"),
+    EXPERIMENTAL_MENU_DISMISSED("m_experimental-browsing-menu_dismissed"),
+
     FIREPROOF_WEBSITE_ADDED("m_fw_a"),
     FIREPROOF_WEBSITE_REMOVE("m_fw_r"),
     FIREPROOF_LOGIN_DIALOG_SHOWN("m_fw_ld_s"),
@@ -293,6 +314,7 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     FIRE_DIALOG_CLEAR_PRESSED("m_fd_p"),
     FIRE_DIALOG_CANCEL("m_fd_c"),
     FIRE_DIALOG_ANIMATION("m_fd_a"),
+    FIRE_DIALOG_SHOWN("m_fire_dialog_shown"),
 
     FIRE_ANIMATION_SETTINGS_OPENED("m_fas_o"),
     FIRE_ANIMATION_NEW_SELECTED("m_fas_s"),
@@ -478,4 +500,6 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     BROWSER_NAV_MENU_PRESSED("m_browser_nav_menu_pressed"),
 
     TIMEOUT_WAITING_FOR_APP_REFERRER("timeout_waiting_for_referrer"),
+
+    DATA_CLEARING_AUTOMATIC_OPTIONS_UPDATED("m_automatic_data_clearing_options_updated"),
 }

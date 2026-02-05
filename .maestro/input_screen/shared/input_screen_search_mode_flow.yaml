@@ -15,8 +15,7 @@ appId: com.duckduckgo.mobile.android
       id: "autoCompleteSuggestionsList"
 
 # verify that submitting a search query opens SERP
-- tapOn:
-    id: "actionSend"
+- pressKey: Enter
 - assertNotVisible:
     id: "inputModeWidget"
 - assertVisible:
@@ -58,8 +57,7 @@ appId: com.duckduckgo.mobile.android
 - tapOn:
     id: "inputFieldClearText"
 - inputText: "eff.org"
-- tapOn:
-    id: "actionSend"
+- pressKey: Enter
 - assertNotVisible:
     id: "inputModeWidget"
 - assertVisible:
@@ -74,27 +72,33 @@ appId: com.duckduckgo.mobile.android
     id: "omnibarTextInput"
 - assertNotVisible:
     id: "autoCompleteSuggestionsList"
+# dismiss RMF card if it appears
+- tapOn:
+    id: "close"
+    childOf:
+      id: "remoteMessage"
+    optional: true
 - assertVisible:
     text: "reddit at DuckDuckGo"
     childOf:
       id: "focusedFavourites"
 
 # verify that typing shows autocomplete again
-- inputText: "amazo"
+- inputText: "wiki"
 - assertVisible:
     id: "autoCompleteSuggestionsList"
 - assertVisible:
-    text: "amazon.com"
+    text: "wikipedia.org"
 
 # verify that tapping on a suggestion opens the web page
 - tapOn:
-    text: "amazon.com"
+    text: "wikipedia.org"
 - assertNotVisible:
     id: "inputModeWidget"
 - assertVisible:
     id: "browserLayout"
 - assertVisible:
-    text: ".*amazon.com.*"
+    text: ".*wikipedia.org.*"
     childOf:
       id: "omnibarTextInput"
 

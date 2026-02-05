@@ -17,6 +17,7 @@
 package com.duckduckgo.duckchat.impl.pixel
 
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin
@@ -29,8 +30,12 @@ import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_SELECT_FIRST_HISTORY_I
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_SUBMIT_FIRST_PROMPT
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_SUBMIT_PROMPT
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_TAP_KEYBOARD_RETURN_KEY
+import com.duckduckgo.duckchat.impl.metric.DuckAiMetricCollector
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_ADDRESS_BAR_IS_ENABLED_DAILY
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_BROWSER_MENU_IS_ENABLED_DAILY
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_ONBOARDING_CONFIRM_PRESSED
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_ONBOARDING_DISPLAYED
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_ONBOARDING_SETTINGS_PRESSED
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_DUCK_AI_SETTINGS_TAPPED
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_ADDRESS_BAR_IS_ENABLED_DAILY
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_ADDRESS_BAR_SETTING_OFF
@@ -83,8 +88,6 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_OPEN_TAB_S
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_PAID_OPEN_DUCK_AI_CLICKED
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_PAID_SETTINGS_OPENED
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_SEARCHBAR_BUTTON_OPEN
-import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_SEARCHBAR_SETTING_OFF
-import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_SEARCHBAR_SETTING_ON
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_SEARCH_ASSIST_SETTINGS_BUTTON_CLICKED
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_SEND_PROMPT_ONGOING_CHAT
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_SETTINGS_DISPLAYED
@@ -112,6 +115,7 @@ import javax.inject.Inject
 
 interface DuckChatPixels {
     fun sendReportMetricPixel(reportMetric: ReportMetric)
+    fun reportOpen()
 }
 
 @ContributesBinding(AppScope::class)
@@ -120,16 +124,25 @@ class RealDuckChatPixels @Inject constructor(
     private val duckChatFeatureRepository: DuckChatFeatureRepository,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
+    private val statisticsUpdater: StatisticsUpdater,
+    private val duckAiMetricCollector: DuckAiMetricCollector,
 ) : DuckChatPixels {
 
     override fun sendReportMetricPixel(reportMetric: ReportMetric) {
         appCoroutineScope.launch(dispatcherProvider.io()) {
+            var refreshAtb = false
             val sessionParams = mapOf(
                 DuckChatPixelParameters.DELTA_TIMESTAMP_PARAMETERS to duckChatFeatureRepository.sessionDeltaInMinutes().toString(),
             )
             val (pixelName, params) = when (reportMetric) {
-                USER_DID_SUBMIT_PROMPT -> DUCK_CHAT_SEND_PROMPT_ONGOING_CHAT to sessionParams
-                USER_DID_SUBMIT_FIRST_PROMPT -> DUCK_CHAT_START_NEW_CONVERSATION to sessionParams
+                USER_DID_SUBMIT_PROMPT -> {
+                    refreshAtb = true
+                    DUCK_CHAT_SEND_PROMPT_ONGOING_CHAT to sessionParams
+                }
+                USER_DID_SUBMIT_FIRST_PROMPT -> {
+                    refreshAtb = true
+                    DUCK_CHAT_START_NEW_CONVERSATION to sessionParams
+                }
                 USER_DID_OPEN_HISTORY -> DUCK_CHAT_OPEN_HISTORY to sessionParams
                 USER_DID_SELECT_FIRST_HISTORY_ITEM -> DUCK_CHAT_OPEN_MOST_RECENT_HISTORY_CHAT to sessionParams
                 USER_DID_CREATE_NEW_CHAT -> DUCK_CHAT_START_NEW_CONVERSATION_BUTTON_CLICKED to sessionParams
@@ -138,7 +151,22 @@ class RealDuckChatPixels @Inject constructor(
 
             withContext(dispatcherProvider.main()) {
                 pixel.fire(pixelName, parameters = params)
+                if (refreshAtb) {
+                    statisticsUpdater.refreshDuckAiRetentionAtb()
+                    duckAiMetricCollector.onMessageSent()
+                }
             }
+        }
+    }
+
+    override fun reportOpen() {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            duckChatFeatureRepository.registerOpened()
+            val sessionDelta = duckChatFeatureRepository.sessionDeltaInMinutes()
+            val params = mapOf(DuckChatPixelParameters.DELTA_TIMESTAMP_PARAMETERS to sessionDelta.toString())
+            pixel.fire(DUCK_CHAT_OPEN, parameters = params)
+            pixel.fire(PRODUCT_TELEMETRY_SURFACE_DUCK_AI_OPEN)
+            pixel.fire(PRODUCT_TELEMETRY_SURFACE_DUCK_AI_OPEN_DAILY, type = Pixel.PixelType.Daily())
         }
     }
 }
@@ -152,8 +180,6 @@ enum class DuckChatPixelName(override val pixelName: String) : Pixel.PixelName {
     DUCK_CHAT_USER_DISABLED("aichat_disabled"),
     DUCK_CHAT_MENU_SETTING_OFF("aichat_menu_setting_off"),
     DUCK_CHAT_MENU_SETTING_ON("aichat_menu_setting_on"),
-    DUCK_CHAT_SEARCHBAR_SETTING_OFF("aichat_searchbar_setting_off"),
-    DUCK_CHAT_SEARCHBAR_SETTING_ON("aichat_searchbar_setting_on"),
     DUCK_CHAT_EXPERIMENTAL_ADDRESS_BAR_SETTING_OFF("aichat_experimental_address_bar_setting_off"),
     DUCK_CHAT_EXPERIMENTAL_ADDRESS_BAR_SETTING_ON("aichat_experimental_address_bar_setting_on"),
     DUCK_CHAT_SETTINGS_PRESSED("settings_aichat_pressed"),
@@ -223,6 +249,9 @@ enum class DuckChatPixelName(override val pixelName: String) : Pixel.PixelName {
     PRODUCT_TELEMETRY_SURFACE_DUCK_AI_OPEN_DAILY("m_product_telemetry_surface_usage_duck_ai_daily"),
     PRODUCT_TELEMETRY_SURFACE_KEYBOARD_USAGE("m_product_telemetry_surface_usage_keyboard_active"),
     PRODUCT_TELEMETRY_SURFACE_KEYBOARD_USAGE_DAILY("m_product_telemetry_surface_usage_keyboard_active_daily"),
+    DUCK_CHAT_CONTEXTUAL_ONBOARDING_DISPLAYED("m_aichat_contextual_onboarding_displayed"),
+    DUCK_CHAT_CONTEXTUAL_ONBOARDING_CONFIRM_PRESSED("m_aichat_contextual_onboarding_confirm_pressed"),
+    DUCK_CHAT_CONTEXTUAL_ONBOARDING_SETTINGS_PRESSED("m_aichat_contextual_onboarding_settings_pressed"),
 }
 
 object DuckChatPixelParameters {
@@ -245,8 +274,6 @@ class DuckChatParamRemovalPlugin @Inject constructor() : PixelParamRemovalPlugin
             DUCK_CHAT_USER_DISABLED.pixelName to PixelParameter.removeAtb(),
             DUCK_CHAT_MENU_SETTING_OFF.pixelName to PixelParameter.removeAtb(),
             DUCK_CHAT_MENU_SETTING_ON.pixelName to PixelParameter.removeAtb(),
-            DUCK_CHAT_SEARCHBAR_SETTING_OFF.pixelName to PixelParameter.removeAtb(),
-            DUCK_CHAT_SEARCHBAR_SETTING_ON.pixelName to PixelParameter.removeAtb(),
             DUCK_CHAT_EXPERIMENTAL_ADDRESS_BAR_SETTING_OFF.pixelName to PixelParameter.removeAtb(),
             DUCK_CHAT_EXPERIMENTAL_ADDRESS_BAR_SETTING_ON.pixelName to PixelParameter.removeAtb(),
             DUCK_CHAT_SETTINGS_PRESSED.pixelName to PixelParameter.removeAtb(),
@@ -309,6 +336,9 @@ class DuckChatParamRemovalPlugin @Inject constructor() : PixelParamRemovalPlugin
             PRODUCT_TELEMETRY_SURFACE_DUCK_AI_OPEN_DAILY.pixelName to PixelParameter.removeAtb(),
             PRODUCT_TELEMETRY_SURFACE_KEYBOARD_USAGE.pixelName to PixelParameter.removeAtb(),
             PRODUCT_TELEMETRY_SURFACE_KEYBOARD_USAGE_DAILY.pixelName to PixelParameter.removeAtb(),
+            DUCK_CHAT_CONTEXTUAL_ONBOARDING_DISPLAYED.pixelName to PixelParameter.removeAtb(),
+            DUCK_CHAT_CONTEXTUAL_ONBOARDING_CONFIRM_PRESSED.pixelName to PixelParameter.removeAtb(),
+            DUCK_CHAT_CONTEXTUAL_ONBOARDING_SETTINGS_PRESSED.pixelName to PixelParameter.removeAtb(),
         )
     }
 }

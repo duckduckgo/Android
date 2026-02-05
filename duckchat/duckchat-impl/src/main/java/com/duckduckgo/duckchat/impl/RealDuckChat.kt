@@ -41,16 +41,17 @@ import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBa
 import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarOptionBottomSheetDialogFactory
 import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarSelection
 import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarSelection.SEARCH_AND_AI
-import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_CANCELLED
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_CONFIRMED
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_DISPLAYED
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_NOT_NOW
-import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelParameters
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelParameters.NEW_ADDRESS_BAR_SELECTION
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
+import com.duckduckgo.duckchat.impl.ui.DuckAiContextualOnboardingBottomSheetDialog
+import com.duckduckgo.duckchat.impl.ui.DuckAiContextualOnboardingBottomSheetDialogFactory
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
+import com.duckduckgo.sync.api.DeviceSyncState
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.JsonAdapter
@@ -88,6 +89,11 @@ interface DuckChatInternal : DuckChat {
      * Set user setting to determine whether the Input Mode toggle should be shown on the voice search screen.
      */
     suspend fun setShowInVoiceSearchUserSetting(showToggle: Boolean)
+
+    /**
+     * Set user setting to determine whether DuckChat should automatically update the page context in Contextual Mode
+     */
+    suspend fun setAutomaticPageContextUserSetting(isEnabled: Boolean)
 
     /**
      * Observes whether DuckChat is user enabled or disabled.
@@ -178,19 +184,29 @@ interface DuckChatInternal : DuckChat {
     fun isInputScreenFeatureAvailable(): Boolean
 
     /**
-     * Returns whether dedicated Duck.ai full screen mode feature is available (its feature flag is enabled).
-     */
-    fun isDuckChatFullScreenModeFeatureAvailable(): Boolean
-
-    /**
      * Returns whether dedicated Duck.ai full screen mode is enabled (its feature flag is enabled).
      */
     fun isDuckChatFullScreenModeEnabled(): Boolean
 
     /**
+     * Returns whether dedicated Duck.ai contextual mode is enabled (its feature flag is enabled).
+     */
+    fun isDuckChatContextualModeEnabled(): Boolean
+
+    /**
      * Checks whether DuckChat is enabled based on remote config flag.
      */
     fun isDuckChatFeatureEnabled(): Boolean
+
+    /**
+     * Returns whether chat sync feature is enabled.
+     */
+    fun isChatSyncFeatureEnabled(): Boolean
+
+    /**
+     * Returns whether Duck.ai in contextual mode should auto attach context (its feature flag is enabled and user setting is enabled).
+     */
+    fun isAutomaticContextAttachmentEnabled(): Boolean
 
     /**
      * This method takes a [url] and returns `true` or `false`.
@@ -270,6 +286,8 @@ class RealDuckChat @Inject constructor(
     private val imageUploadFeature: AIChatImageUploadFeature,
     private val browserNav: BrowserNav,
     private val newAddressBarOptionBottomSheetDialogFactory: NewAddressBarOptionBottomSheetDialogFactory,
+    private val duckAiContextualOnboardingBottomSheetDialogFactory: DuckAiContextualOnboardingBottomSheetDialogFactory,
+    private val deviceSyncState: DeviceSyncState,
 ) : DuckChatInternal,
     DuckAiFeatureState,
     PrivacyConfigCallbackPlugin {
@@ -303,6 +321,7 @@ class RealDuckChat @Inject constructor(
     private var duckAiInputScreenBottomBarEnabled = false
     private var showAIChatAddressBarChoiceScreen = false
     private var isDuckChatUserEnabled = false
+    private var isChatSyncFeatureEnabled = false
     private var duckChatLink = DUCK_CHAT_WEB_LINK
     private var bangRegex: Regex? = null
     private var isAddressBarEntryPointEnabled: Boolean = false
@@ -314,6 +333,8 @@ class RealDuckChat @Inject constructor(
     private var inputScreenMainButtonsEnabled = false
     private var showInputScreenOnSystemSearchLaunchEnabled: Boolean = true
     private var isFullscreenModeEnabled: Boolean = false
+    private var isContextualModeEnabled: Boolean = false
+    private var isAutomaticContextAttachmentEnabled: Boolean = false
 
     init {
         if (isMainProcess) {
@@ -357,15 +378,26 @@ class RealDuckChat @Inject constructor(
             cacheUserSettings()
         }
 
+    override suspend fun setAutomaticPageContextUserSetting(isEnabled: Boolean) {
+        withContext(dispatchers.io()) {
+            duckChatFeatureRepository.setAutomaticPageContextAttachment(isEnabled)
+            cacheUserSettings()
+        }
+    }
+
     override fun isEnabled(): Boolean = isDuckChatFeatureEnabled && isDuckChatUserEnabled
 
     override fun isInputScreenFeatureAvailable(): Boolean = duckAiInputScreen
 
     override fun isDuckChatFeatureEnabled(): Boolean = isDuckChatFeatureEnabled
 
-    override fun isDuckChatFullScreenModeFeatureAvailable(): Boolean = duckChatFeature.fullscreenMode().isEnabled()
+    override fun isChatSyncFeatureEnabled(): Boolean = isChatSyncFeatureEnabled
 
     override fun isDuckChatFullScreenModeEnabled(): Boolean = isFullscreenModeEnabled
+
+    override fun isDuckChatContextualModeEnabled(): Boolean = isContextualModeEnabled
+
+    override fun isAutomaticContextAttachmentEnabled(): Boolean = isAutomaticContextAttachmentEnabled
 
     override fun observeEnableDuckChatUserSetting(): Flow<Boolean> = duckChatFeatureRepository.observeDuckChatUserEnabled()
 
@@ -373,6 +405,9 @@ class RealDuckChat @Inject constructor(
 
     override fun observeCosmeticInputScreenUserSettingEnabled(): Flow<Boolean?> =
         duckChatFeatureRepository.observeCosmeticInputScreenUserSettingEnabled()
+
+    override fun observeAutomaticContextAttachmentUserSettingEnabled(): Flow<Boolean> =
+        duckChatFeatureRepository.observeAutomaticContextAttachmentUserSettingEnabled()
 
     override fun observeShowInBrowserMenuUserSetting(): Flow<Boolean> = duckChatFeatureRepository.observeShowInBrowserMenu()
 
@@ -467,19 +502,22 @@ class RealDuckChat @Inject constructor(
 
     override fun openDuckChatWithAutoPrompt(query: String) {
         logcat { "Duck.ai: openDuckChatWithAutoPrompt query $query" }
-        val parameters = addChatParameters(query, autoPrompt = true)
+        val parameters = addChatParameters(query, autoPrompt = true, sidebar = false)
         openDuckChat(parameters, forceNewSession = true)
     }
 
     override fun openDuckChatWithPrefill(query: String) {
         logcat { "Duck.ai: openDuckChatWithPrefill query $query" }
-        val parameters = addChatParameters(query, autoPrompt = false)
+        val parameters = addChatParameters(query, autoPrompt = false, sidebar = false)
         openDuckChat(parameters, forceNewSession = true)
     }
 
-    override fun getDuckChatUrl(query: String, autoPrompt: Boolean): String {
-        logcat { "Duck.ai: getDuckChatUrl query $query autoPrompt $autoPrompt" }
-        val parameters = addChatParameters(query, autoPrompt = autoPrompt)
+    override fun getDuckChatUrl(
+        query: String,
+        autoPrompt: Boolean,
+        sidebar: Boolean,
+    ): String {
+        val parameters = addChatParameters(query, autoPrompt = autoPrompt, sidebar = sidebar)
         val url = appendParameters(parameters, duckChatLink)
         return url
     }
@@ -487,13 +525,10 @@ class RealDuckChat @Inject constructor(
     private fun addChatParameters(
         query: String,
         autoPrompt: Boolean,
+        sidebar: Boolean,
     ): Map<String, String> {
         val hasDuckChatBang = isDuckChatBang(query.toUri())
-        logcat { "Duck.ai: hasDuckChatBang $hasDuckChatBang" }
-
         val cleanedQuery = stripBang(query)
-        logcat { "Duck.ai: cleaned query $cleanedQuery" }
-
         return mutableMapOf<String, String>().apply {
             if (cleanedQuery.isNotEmpty()) {
                 put(QUERY, cleanedQuery)
@@ -503,6 +538,9 @@ class RealDuckChat @Inject constructor(
                 if (autoPrompt) {
                     put(PROMPT_QUERY_NAME, PROMPT_QUERY_VALUE)
                 }
+            }
+            if (sidebar) {
+                put(PLACEMENT_QUERY_NAME, PLACEMENT_QUERY_VALUE)
             }
         }
     }
@@ -522,21 +560,13 @@ class RealDuckChat @Inject constructor(
     ) {
         val url = appendParameters(parameters, duckChatLink)
         appCoroutineScope.launch(dispatchers.io()) {
-            val sessionDelta = duckChatFeatureRepository.sessionDeltaInMinutes()
-            val params = mapOf(DuckChatPixelParameters.DELTA_TIMESTAMP_PARAMETERS to sessionDelta.toString())
-
             val hasSessionActive =
                 when {
                     forceNewSession -> false
                     else -> hasActiveSession()
                 }
 
-            duckChatFeatureRepository.registerOpened()
-
             withContext(dispatchers.main()) {
-                pixel.fire(DuckChatPixelName.DUCK_CHAT_OPEN, parameters = params)
-                pixel.fire(DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_DUCK_AI_OPEN)
-                pixel.fire(DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_DUCK_AI_OPEN_DAILY, type = Pixel.PixelType.Daily())
                 logcat { "Duck.ai: restoring Duck.ai session $url hasSessionActive $hasSessionActive" }
                 openDuckChatSession(url, hasSessionActive)
             }
@@ -556,6 +586,7 @@ class RealDuckChat @Inject constructor(
                 context.startActivity(this)
             }
     }
+
     private fun appendParameters(
         parameters: Map<String, String>,
         url: String,
@@ -636,6 +667,23 @@ class RealDuckChat @Inject constructor(
             ).show()
     }
 
+    override fun showContextualOnboarding(
+        context: Context,
+        onConfirmed: () -> Unit,
+    ) {
+        val dialog = duckAiContextualOnboardingBottomSheetDialogFactory.create(context)
+        dialog.eventListener = object : DuckAiContextualOnboardingBottomSheetDialog.EventListener {
+            override fun onConfirmed() {
+                onConfirmed()
+            }
+        }
+        dialog.show()
+    }
+
+    override suspend fun isContextualOnboardingCompleted(): Boolean {
+        return duckChatFeatureRepository.isContextualOnboardingCompleted()
+    }
+
     private suspend fun hasActiveSession(): Boolean {
         val now = System.currentTimeMillis()
         val lastSession = duckChatFeatureRepository.lastSessionTimestamp()
@@ -660,6 +708,7 @@ class RealDuckChat @Inject constructor(
             showAIChatAddressBarChoiceScreen = duckChatFeature.showAIChatAddressBarChoiceScreen().isEnabled()
             showInputScreenOnSystemSearchLaunchEnabled = duckChatFeature.showInputScreenOnSystemSearchLaunch().isEnabled()
             inputScreenMainButtonsEnabled = duckChatFeature.showMainButtonsInInputScreen().isEnabled()
+            isChatSyncFeatureEnabled = deviceSyncState.isDuckChatSyncFeatureEnabled()
 
             val showMainButtons = duckChatFeature.showMainButtonsInInputScreen().isEnabled()
             _showMainButtonsInInputScreen.emit(showMainButtons)
@@ -733,7 +782,12 @@ class RealDuckChat @Inject constructor(
             _showFullScreenMode.emit(showFullScreenMode)
 
             val showContextualMode = isDuckChatFeatureEnabled && isDuckChatUserEnabled && duckChatFeature.contextualMode().isEnabled()
+            isContextualModeEnabled = showContextualMode
             _showContextualMode.emit(showContextualMode)
+
+            isAutomaticContextAttachmentEnabled = showContextualMode &&
+                duckChatFeature.automaticContextAttachment()
+                    .isEnabled() && duckChatFeatureRepository.isAutomaticPageContextAttachmentUserSettingEnabled()
         }
 
     companion object {
@@ -744,6 +798,8 @@ class RealDuckChat @Inject constructor(
         private const val CHAT_QUERY_VALUE = "chat"
         private const val PROMPT_QUERY_NAME = "prompt"
         private const val PROMPT_QUERY_VALUE = "1"
+        private const val PLACEMENT_QUERY_NAME = "placement"
+        private const val PLACEMENT_QUERY_VALUE = "sidebar"
         private const val BANG_QUERY_NAME = "bang"
         private const val BANG_QUERY_VALUE = "true"
         private const val DEFAULT_SESSION_ALIVE = 60

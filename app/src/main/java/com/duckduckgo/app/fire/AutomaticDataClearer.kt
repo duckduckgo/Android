@@ -27,6 +27,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import com.duckduckgo.app.fire.store.FireDataStore
+import com.duckduckgo.app.fire.wideevents.DataClearingWideEvent
 import com.duckduckgo.app.global.ApplicationClearDataState
 import com.duckduckgo.app.global.ApplicationClearDataState.FINISHED
 import com.duckduckgo.app.global.ApplicationClearDataState.INITIALIZING
@@ -75,6 +76,7 @@ class AutomaticDataClearer @Inject constructor(
     private val dataClearerForegroundAppRestartPixel: DataClearerForegroundAppRestartPixel,
     private val dispatchers: DispatcherProvider,
     private val fireDataStore: FireDataStore,
+    private val dataClearingWideEvent: DataClearingWideEvent,
 ) : DataClearer, BrowserLifecycleObserver, CoroutineScope {
 
     private val clearJob: Job = Job()
@@ -110,7 +112,7 @@ class AutomaticDataClearer @Inject constructor(
             val appIconChanged = settingsDataStore.appIconChanged
             settingsDataStore.appIconChanged = false
 
-            if (androidBrowserConfigFeature.moreGranularDataClearingOptions().isEnabled()) {
+            if (androidBrowserConfigFeature.improvedDataClearingOptions().isEnabled()) {
                 clearDataIfNeeded(appUsedSinceLastClear, appIconChanged)
             } else {
                 clearDataIfNeededLegacy(appUsedSinceLastClear, appIconChanged)
@@ -172,7 +174,7 @@ class AutomaticDataClearer @Inject constructor(
             withContext(dispatchers.io()) {
                 settingsDataStore.appBackgroundedTimestamp = timeNow
 
-                if (androidBrowserConfigFeature.moreGranularDataClearingOptions().isEnabled()) {
+                if (androidBrowserConfigFeature.improvedDataClearingOptions().isEnabled()) {
                     val clearWhenOption = fireDataStore.getAutomaticallyClearWhenOption()
                     val clearOptions = fireDataStore.getAutomaticClearOptions()
 
@@ -198,7 +200,7 @@ class AutomaticDataClearer @Inject constructor(
     override fun onExit() {
         launch(dispatchers.io()) {
             // the app does not have any activity in CREATED state we kill the process
-            val shouldKillProcess = if (androidBrowserConfigFeature.moreGranularDataClearingOptions().isEnabled()) {
+            val shouldKillProcess = if (androidBrowserConfigFeature.improvedDataClearingOptions().isEnabled()) {
                 dataClearing.isAutomaticDataClearingOptionSelected()
             } else {
                 settingsDataStore.automaticallyClearWhatOption != ClearWhatOption.CLEAR_NONE
@@ -228,7 +230,19 @@ class AutomaticDataClearer @Inject constructor(
         withContext(dispatchers.main()) {
             logcat { "Clearing data automatically in foreground with new flow" }
 
-            val shouldRestart = dataClearing.clearDataUsingAutomaticFireOptions(killProcessIfNeeded = false)
+            val clearOptions = fireDataStore.getAutomaticClearOptions()
+            dataClearingWideEvent.start(
+                entryPoint = DataClearingWideEvent.EntryPoint.AUTO_FOREGROUND,
+                clearOptions = clearOptions,
+            )
+            val shouldRestart: Boolean
+            try {
+                shouldRestart = dataClearing.clearDataUsingAutomaticFireOptions(killProcessIfNeeded = false)
+                dataClearingWideEvent.finishSuccess()
+            } catch (e: Exception) {
+                dataClearingWideEvent.finishFailure(e)
+                throw e
+            }
             val needsRestart = !isFreshAppLaunch && shouldRestart
             if (needsRestart) {
                 withContext(dispatchers.io()) {
@@ -252,20 +266,37 @@ class AutomaticDataClearer @Inject constructor(
         withContext(dispatchers.main()) {
             logcat { "Clearing data when app is in the foreground: $clearWhat" }
 
+            dataClearingWideEvent.startLegacy(
+                entryPoint = DataClearingWideEvent.EntryPoint.LEGACY_AUTO_FOREGROUND,
+                clearWhatOption = clearWhat,
+                clearDuckAiData = settingsDataStore.clearDuckAiData,
+            )
             // Use legacy clearing
             val processNeedsRestarted = !isFreshAppLaunch && clearWhat == ClearWhatOption.CLEAR_TABS_AND_DATA
             logcat { "App is in foreground; restart needed? $processNeedsRestarted" }
 
             when (clearWhat) {
                 ClearWhatOption.CLEAR_TABS_ONLY -> {
-                    clearDataAction.clearTabsAsync(true)
+                    try {
+                        clearDataAction.clearTabsAsync(true)
+                        dataClearingWideEvent.finishSuccess()
+                    } catch (e: Exception) {
+                        dataClearingWideEvent.finishFailure(e)
+                        throw e
+                    }
 
                     logcat { "Notifying listener that clearing has finished" }
                     postDataClearerState(FINISHED)
                 }
 
                 ClearWhatOption.CLEAR_TABS_AND_DATA -> {
-                    clearDataAction.clearTabsAndAllDataAsync(appInForeground = true, shouldFireDataClearPixel = false)
+                    try {
+                        clearDataAction.clearTabsAndAllDataAsync(appInForeground = true, shouldFireDataClearPixel = false)
+                        dataClearingWideEvent.finishSuccess()
+                    } catch (e: Exception) {
+                        dataClearingWideEvent.finishFailure(e)
+                        throw e
+                    }
 
                     logcat { "All data now cleared, will restart process? $processNeedsRestarted" }
                     if (processNeedsRestarted) {

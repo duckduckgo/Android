@@ -17,7 +17,9 @@
 package com.duckduckgo.sync.impl
 
 import com.duckduckgo.sync.api.SyncCrypto
+import com.duckduckgo.sync.crypto.DecryptBytesResult
 import com.duckduckgo.sync.crypto.DecryptResult
+import com.duckduckgo.sync.crypto.EncryptBytesResult
 import com.duckduckgo.sync.crypto.EncryptResult
 import com.duckduckgo.sync.crypto.SyncLib
 import com.duckduckgo.sync.impl.error.SyncOperationErrorRecorder
@@ -26,6 +28,7 @@ import com.duckduckgo.sync.store.model.SyncOperationErrorType.DATA_DECRYPT
 import com.duckduckgo.sync.store.model.SyncOperationErrorType.DATA_ENCRYPT
 import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertTrue
+import org.junit.Assert.assertArrayEquals
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any
@@ -47,20 +50,20 @@ class SyncCryptoTest {
         syncCrypto = RealSyncCrypto(nativeLib, syncStore, recorder)
     }
 
-    @Test(expected = java.lang.Exception::class)
-    fun whenEncryptFailsThenResultIsEmpty() {
-        whenever(nativeLib.encryptData(any(), any())).thenReturn(EncryptResult(1, "not encrypted"))
+    // String-based encrypt/decrypt tests
 
-        val result = syncCrypto.encrypt("something")
+    @Test(expected = java.lang.Exception::class)
+    fun whenEncryptStringFailsThenExceptionThrown() {
+        whenever(nativeLib.encryptData(any<String>(), any())).thenReturn(EncryptResult(1, "not encrypted"))
+
+        syncCrypto.encrypt("something")
 
         verify(recorder).record(DATA_ENCRYPT)
-
-        assertTrue(result.isEmpty())
     }
 
     @Test
-    fun whenEncryptSucceedsThenResultIsEncrypted() {
-        whenever(nativeLib.encryptData(any(), any())).thenReturn(EncryptResult(0, "not encrypted"))
+    fun whenEncryptStringSucceedsThenResultIsEncrypted() {
+        whenever(nativeLib.encryptData(any<String>(), any())).thenReturn(EncryptResult(0, "encrypted"))
 
         val result = syncCrypto.encrypt("something")
 
@@ -70,19 +73,17 @@ class SyncCryptoTest {
     }
 
     @Test(expected = java.lang.Exception::class)
-    fun whenDecryptFailsThenResultIsEmpty() {
-        whenever(nativeLib.decryptData(any(), any())).thenReturn(DecryptResult(1, "not decrypted"))
+    fun whenDecryptStringFailsThenExceptionThrown() {
+        whenever(nativeLib.decryptData(any<String>(), any())).thenReturn(DecryptResult(1, "not decrypted"))
 
-        val result = syncCrypto.decrypt("something")
+        syncCrypto.decrypt("something")
 
         verify(recorder).record(DATA_DECRYPT)
-
-        assertTrue(result.isEmpty())
     }
 
     @Test
-    fun whenDecryptSucceedsThenResultIsDecrypted() {
-        whenever(nativeLib.decryptData(any(), any())).thenReturn(DecryptResult(0, "not decrypted"))
+    fun whenDecryptStringSucceedsThenResultIsDecrypted() {
+        whenever(nativeLib.decryptData(any<String>(), any())).thenReturn(DecryptResult(0, "decrypted"))
 
         val result = syncCrypto.decrypt("something")
 
@@ -92,8 +93,70 @@ class SyncCryptoTest {
     }
 
     @Test
-    fun whenDataToDecryptIsEmptyThenResultIsEmpty() {
+    fun whenStringDataToDecryptIsEmptyThenResultIsEmpty() {
         val result = syncCrypto.decrypt("")
+
+        verifyNoInteractions(recorder)
+
+        assertTrue(result.isEmpty())
+    }
+
+    // ByteArray-based encrypt/decrypt tests
+
+    @Test(expected = java.lang.Exception::class)
+    fun whenEncryptByteArrayFailsThenExceptionThrown() {
+        whenever(nativeLib.encryptData(any<ByteArray>(), any())).thenReturn(EncryptBytesResult(1, byteArrayOf()))
+
+        syncCrypto.encrypt("something".toByteArray())
+
+        verify(recorder).record(DATA_ENCRYPT)
+    }
+
+    @Test
+    fun whenEncryptByteArraySucceedsThenResultIsEncrypted() {
+        val encryptedBytes = byteArrayOf(1, 2, 3)
+        whenever(nativeLib.encryptData(any<ByteArray>(), any())).thenReturn(EncryptBytesResult(0, encryptedBytes))
+
+        val result = syncCrypto.encrypt("something".toByteArray())
+
+        verifyNoInteractions(recorder)
+
+        assertArrayEquals(encryptedBytes, result)
+    }
+
+    @Test(expected = java.lang.Exception::class)
+    fun whenDecryptByteArrayFailsThenExceptionThrown() {
+        whenever(nativeLib.decryptData(any<ByteArray>(), any())).thenReturn(DecryptBytesResult(1, byteArrayOf()))
+
+        syncCrypto.decrypt(byteArrayOf(1, 2, 3))
+
+        verify(recorder).record(DATA_DECRYPT)
+    }
+
+    @Test
+    fun whenDecryptByteArraySucceedsThenResultIsDecrypted() {
+        val decryptedBytes = byteArrayOf(4, 5, 6)
+        whenever(nativeLib.decryptData(any<ByteArray>(), any())).thenReturn(DecryptBytesResult(0, decryptedBytes))
+
+        val result = syncCrypto.decrypt(byteArrayOf(1, 2, 3))
+
+        verifyNoInteractions(recorder)
+
+        assertArrayEquals(decryptedBytes, result)
+    }
+
+    @Test
+    fun whenByteArrayDataToDecryptIsEmptyThenResultIsEmpty() {
+        val result = syncCrypto.decrypt(byteArrayOf())
+
+        verifyNoInteractions(recorder)
+
+        assertTrue(result.isEmpty())
+    }
+
+    @Test
+    fun whenByteArrayDataToEncryptIsEmptyThenResultIsEmpty() {
+        val result = syncCrypto.encrypt(byteArrayOf())
 
         verifyNoInteractions(recorder)
 

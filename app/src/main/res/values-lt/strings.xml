@@ -60,10 +60,10 @@
     <string name="undoSnackbarAction">Anuliuoti</string>
     <!-- Trackers blocked animation-->
     <plurals name="trackersBlockedAnimationMessage" tools:ignore="ImpliedQuantity">
-        <item quantity="one">Sekimo priemonė</item>
-        <item quantity="few">Sekimo priemonės</item>
-        <item quantity="many">Sekimo priemonės</item>
-        <item quantity="other">Sekimo priemonių</item>
+        <item quantity="one">Sekimo priemonė užblokuota</item>
+        <item quantity="few">Sekimo priemonės užblokuotos</item>
+        <item quantity="many">Sekimo priemonės užblokuotos</item>
+        <item quantity="other">Sekimo priemonių užblokuota</item>
     </plurals>
 
     <!-- Downloading files -->
@@ -130,6 +130,7 @@
     <string name="settingsMenuItemTitle">Nustatymai</string>
     <string name="settingsHeadingProtections">Apsaugos</string>
     <string name="settingsHeadingAppearance">Išvaizda</string>
+    <string name="settingsWhatsNew">Kas naujo</string>
     <string name="settingsHeadingAbout">Apie</string>
     <string name="settingsAboutDuckduckgo">Apie „DuckDuckGo“</string>
     <string name="settingsVersion">Versija</string>
@@ -214,6 +215,43 @@
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Mygtukas „Fire“</string>
     <string name="dataClearingActivityTitle">Duomenų valymas</string>
+    <string name="dataClearingDescription">Ištrindamas duomenis gali padėti apsaugoti savo privatumą internete. Jei nori išvalyti duomenis rankiniu būdu, naudok „Fire Button“ arba nustatyk automatinį valymą.</string>
+    <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
+        <item quantity="one">%1$d vieta, kuriai netaikomas valymas</item>
+        <item quantity="few">%1$d vietos, kurioms netaikomas valymas</item>
+        <item quantity="many">%1$d vietos, kuriai netaikomas valymas</item>
+        <item quantity="other">%1$d vietų, kurioms netaikomas valymas</item>
+    </plurals>
+    <string name="dataClearingAutomaticClearingOn">Įjungti</string>
+    <string name="dataClearingAutomaticClearingOff">Išjungti</string>
+    <string name="dataClearingClearBrowsingData">Išvalyti naršymo duomenis</string>
+    <string name="dataClearingAutomaticDataClearing">Automatinis duomenų išvalymas</string>
+    <string name="dataClearingAutomaticallyClearDataToggle">Automatiškai valyti duomenis</string>
+    <string name="dataClearingAutomaticTabsOptionDescription">Uždaryti visus atidarytus skirtukus</string>
+    <string name="dataClearingAutomaticDataOptionDescription">Ištrinkite visus svetainės duomenis, įskaitant aplankytas svetaines. Gali jus atjungti nuo paskyrų.</string>
+    <string name="dataClearingAutomaticChatsOptionDescription">Ištrinti visus pokalbius, įskaitant prisegtus</string>
+
+    <!-- Fire Dialog Granular Options -->
+    <string name="fireDialogTitle">Pasirinkite, ką ištrinti</string>
+    <string name="dataClearingOptionTabs">Kortelės</string>
+    <string name="dataClearingOptionData">Slapukai ir svetainės duomenys</string>
+    <string name="dataClearingDuckAiChats">„Duck.ai“ pokalbiai</string>
+    <string name="fireDialogOptionDuckAiChatsDescription">Ištrinti visus pokalbius</string>
+    <string name="fireDialogDeleteButton">Trinti</string>
+    <plurals name="fireDialogOptionTabsDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Uždaryti skirtuką</item>
+        <item quantity="few">Uždaryti visus %1$d skirtukus</item>
+        <item quantity="many">Uždaryti visus %1$d skirtukus</item>
+        <item quantity="other">Uždaryti visus %1$d skirtukų</item>
+    </plurals>
+    <string name="fireDialogOptionDataDescriptionNoHistory">Gali jus atjungti nuo paskyrų.</string>
+    <string name="fireDialogOptionDescriptionNothingToDelete">Jokie</string>
+    <plurals name="fireDialogOptionDataDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Ištrinti iš 1 svetainės. Gali jus atjungti nuo paskyrų.</item>
+        <item quantity="few">Ištrinti iš %1$d svetainių. Gali jus atjungti nuo paskyrų.</item>
+        <item quantity="many">Ištrinti iš %1$d svetainės. Gali jus atjungti nuo paskyrų.</item>
+        <item quantity="other">Ištrinti iš %1$d svetainių. Gali jus atjungti nuo paskyrų.</item>
+    </plurals>
 
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Leidimai</string>
@@ -925,11 +963,16 @@
     <string name="settingsHeadingCompleteSetup">Užbaik savo sąranką</string>
 
     <!--TabSwitcher Trackers Animation-->
-    <string name="showTrackerCountInTabSwitcher">Rodyti sekiklių skaičių skirtukų perjungiklyje</string>
+    <string name="trackerBlockedInTheLast7days" instruction="Placeholder is 1 tracker blocked">&lt;b&gt;%1$s sekikliai (-ių) užblokuoti &lt;/b&gt; per paskutines 7 dienas</string>
     <string name="tabSwitcherAnimationTileRemovalDialogTitle" instruction="A title for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Slėpti sekiklių skaičių?</string>
     <string name="tabSwitcherAnimationTileRemovalDialogBody" instruction="A message for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Šią funkciją galima vėl įjungti nustatymuose &gt; Išvaizda.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Slėpti</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Laikyti</string>
+
+    <!-- Trackers blocked animation-->
+    <string name="settingsTrackersBlockedAnimationHeaderTitle">Blokuojamų sekiklių animacija</string>
+    <string name="showTrackerCountInAddressBar">Rodyti adreso juostoje</string>
+    <string name="showWeeklyTrackerCountInTabSwitcher">Rodyti skirtukų tvarkyklėje</string>
 
     <!-- Widgets -->
     <string name="searchOnlyWidgetLabel" instruction="Label for the search-only widget">Tik paieška</string>

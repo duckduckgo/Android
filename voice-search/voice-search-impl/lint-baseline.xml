@@ -74,7 +74,7 @@
         errorLine2="                                     ~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/voice/impl/listeningmode/VoiceSearchActivity.kt"
-            line="70"
+            line="80"
             column="38"/>
     </issue>
 
@@ -85,7 +85,7 @@
         errorLine2="                                     ~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/voice/impl/listeningmode/VoiceSearchActivity.kt"
-            line="94"
+            line="126"
             column="38"/>
     </issue>
 
@@ -96,7 +96,7 @@
         errorLine2="                                                       ~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/voice/impl/VoiceSearchActivityLauncher.kt"
-            line="97"
+            line="119"
             column="56"/>
     </issue>
 
@@ -107,7 +107,7 @@
         errorLine2="                                                       ~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/voice/impl/VoiceSearchActivityLauncher.kt"
-            line="97"
+            line="119"
             column="56"/>
     </issue>
 

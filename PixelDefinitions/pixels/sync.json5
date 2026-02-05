@@ -1,0 +1,42 @@
+{
+    "sync_setup_promo_bookmark_added_dialog_shown": {
+        "description": "User added a bookmark and we showed the sync setup promo in the bookmark added dialog",
+        "owners": ["CDRussell"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "sync_setup_promo_bookmark_added_dialog_dismissed": {
+        "description": "User manually chose to hide the sync setup promo in the bookmark added dialog",
+        "owners": ["CDRussell"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "sync_setup_promo_bookmark_added_dialog_confirmed": {
+        "description": "User chose to set up sync from the promo in the bookmark added dialog",
+        "owners": ["CDRussell"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_sync_rescope_token_error": {
+        "description": "Fired when rescoping the sync token fails",
+        "owners": ["CDRussell"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "code",
+                "description": "The error code returned from the sync service",
+                "type": "string"
+            },
+            {
+                "key": "reason",
+                "description": "The reason for the rescope token failure",
+                "type": "string"
+            }
+        ]
+    }
+}

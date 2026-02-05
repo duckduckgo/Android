@@ -2,13 +2,24 @@
 <issues format="6" by="lint 8.8.2" type="baseline" client="gradle" dependencies="false" name="AGP (8.7.3)" variant="all" version="8.8.2">
 
     <issue
+        id="NestedWeights"
+        message="Nested weights are bad for performance"
+        errorLine1="            android:layout_weight=&quot;1&quot;"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_pir_internal_broker_config.xml"
+            line="68"
+            column="13"/>
+    </issue>
+
+    <issue
         id="HardcodedText"
         message="Hardcoded string &quot;First name&quot;, should use `@string` resource"
         errorLine1="                android:hint=&quot;First name&quot;"
         errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout/activity_pir_internal_scan.xml"
-            line="63"
+            line="75"
             column="17"/>
     </issue>
 
@@ -19,7 +30,7 @@
         errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout/activity_pir_internal_scan.xml"
-            line="72"
+            line="84"
             column="17"/>
     </issue>
 
@@ -30,7 +41,7 @@
         errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout/activity_pir_internal_scan.xml"
-            line="81"
+            line="93"
             column="17"/>
     </issue>
 
@@ -41,7 +52,7 @@
         errorLine2="                ~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout/activity_pir_internal_scan.xml"
-            line="90"
+            line="102"
             column="17"/>
     </issue>
 
@@ -52,7 +63,7 @@
         errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout/activity_pir_internal_scan.xml"
-            line="99"
+            line="111"
             column="17"/>
     </issue>
 
@@ -63,7 +74,7 @@
         errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout/activity_pir_internal_scan.xml"
-            line="109"
+            line="121"
             column="17"/>
     </issue>
 

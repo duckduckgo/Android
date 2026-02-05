@@ -41,6 +41,8 @@ class FakeDuckChatInternal(
     private val _showMainButtonsInInputScreen = MutableStateFlow(false)
     private val inputScreenUserSettingEnabled = MutableStateFlow(false)
     private val cosmeticInputScreenUserSettingEnabled = MutableStateFlow<Boolean?>(null)
+    private val automaticContextAttachmentUserSettingEnabled = MutableStateFlow<Boolean>(false)
+    var contextualOnboardingCompleted: Boolean = false
 
     // DuckChat interface methods
     override fun isEnabled(): Boolean = enabled
@@ -51,7 +53,7 @@ class FakeDuckChatInternal(
 
     override fun openDuckChatWithPrefill(query: String) { }
 
-    override fun getDuckChatUrl(query: String, autoPrompt: Boolean): String {
+    override fun getDuckChatUrl(query: String, autoPrompt: Boolean, sidebar: Boolean): String {
         return "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5"
     }
 
@@ -72,6 +74,15 @@ class FakeDuckChatInternal(
     override fun observeInputScreenUserSettingEnabled(): Flow<Boolean> = inputScreenUserSettingEnabled
 
     override fun observeCosmeticInputScreenUserSettingEnabled(): Flow<Boolean?> = cosmeticInputScreenUserSettingEnabled
+    override fun observeAutomaticContextAttachmentUserSettingEnabled(): Flow<Boolean> = automaticContextAttachmentUserSettingEnabled
+
+    override fun showContextualOnboarding(context: Context, onConfirmed: () -> Unit) {
+        // No-op for testing
+    }
+
+    override suspend fun isContextualOnboardingCompleted(): Boolean = contextualOnboardingCompleted
+
+    override fun isAutomaticContextAttachmentEnabled(): Boolean = automaticContextAttachmentUserSettingEnabled.value
 
     // DuckChatInternal interface methods
     override suspend fun setEnableDuckChatUserSetting(enabled: Boolean) {
@@ -88,6 +99,10 @@ class FakeDuckChatInternal(
 
     override suspend fun setShowInVoiceSearchUserSetting(showToggle: Boolean) {
         showInVoiceSearchUserSetting.value = showToggle
+    }
+
+    override suspend fun setAutomaticPageContextUserSetting(isEnabled: Boolean) {
+        automaticContextAttachmentUserSettingEnabled.value = isEnabled
     }
 
     override fun observeEnableDuckChatUserSetting(): Flow<Boolean> = enableDuckChatUserSetting
@@ -126,11 +141,13 @@ class FakeDuckChatInternal(
 
     override fun isInputScreenFeatureAvailable(): Boolean = false
 
-    override fun isDuckChatFullScreenModeFeatureAvailable(): Boolean = false
-
     override fun isDuckChatFullScreenModeEnabled(): Boolean = false
 
+    override fun isDuckChatContextualModeEnabled(): Boolean = false
+
     override fun isDuckChatFeatureEnabled(): Boolean = true
+
+    override fun isChatSyncFeatureEnabled(): Boolean = true
 
     override fun canHandleOnAiWebView(url: String): Boolean = false
 

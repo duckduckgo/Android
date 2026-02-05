@@ -23,6 +23,7 @@ import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.duckduckgo.pir.impl.scripts.models.BrokerAction
 import com.duckduckgo.pir.impl.scripts.models.PirError
+import com.duckduckgo.pir.impl.scripts.models.PirError.ActionError.JsActionFailed
 import com.duckduckgo.pir.impl.scripts.models.PirScriptRequestData
 import com.duckduckgo.pir.impl.scripts.models.PirScriptRequestData.SolveCaptcha
 import com.duckduckgo.pir.impl.scripts.models.PirScriptRequestData.UserProfile
@@ -199,7 +200,7 @@ class RealBrokerActionProcessorTest {
 
         val errorCaptor = argumentCaptor<PirError>()
         verify(mockActionResultListener).onError(errorCaptor.capture())
-        val error = errorCaptor.firstValue as PirError.ActionFailed
+        val error = errorCaptor.firstValue as JsActionFailed
         assertEquals("action-1", error.actionID)
         assertEquals("Test error message", error.message)
     }

@@ -34,6 +34,7 @@
     <string name="sync_setup_begin_syncing">Aloita synkronointi</string>
     <string name="sync_setup_with_another_device_cta_title">Synkronoi toisen laitteen kanssa</string>
     <string name="sync_setup_with_another_device_cta_subtitle">Synkronoi kirjanmerkit ja salasanat turvallisesti laitteittesi välillä.</string>
+    <string name="sync_setup_with_another_device_cta_subtitle_with_ai_chat">Synkronoi kirjanmerkit, salasanat ja Duck.ai-keskustelut turvallisesti laitteidesi välillä.</string>
     <string name="sync_off_hint">Tietosi on salattu päästä päähän, eikä DuckDuckGolla ole hallussaan salausavainta.</string>
     <string name="sync_setup_single_device_title">Yhden laitteen asennus</string>
     <string name="sync_setup_other_options_title">Muut vaihtoehdot</string>
@@ -45,12 +46,14 @@
     <!-- Setup screen -->
     <string name="sync_enable_sync_title">Määritetään synkronointi ja varmuuskopiointi!</string>
     <string name="sync_enable_sync_content">Kirjanmerkkejä ja salasanoja valmistellaan synkronointiin. Tähän menee vain pieni hetki.</string>
+    <string name="sync_enable_sync_content_with_ai_chat">Kirjanmerkkejä, salasanoja ja Duck.ai-keskusteluja valmistellaan synkronointiin. Tämän pitäisi kestää vain hetken.</string>
     <string name="sync_enable_options">Valinnat</string>
     <string name="sync_enable_option_favicons_title">Nouda kirjanmerkkikuvakkeet</string>
     <string name="sync_enable_option_favicons_subtitle">Lataa synkronoitujen kirjanmerkkien kuvakkeet automaattisesti.</string>
     <string name="sync_enable_connecting">Yhdistetään…</string>
     <string name="sync_intro_enable_title">Synkronoi ja varmuuskopioi tämä laite</string>
     <string name="sync_intro_enable_content">Tämä luo salatun varmuuskopion kirjanmerkeistäsi ja salasanoistasi DuckDuckGon suojatulle palvelimelle. Voit synkronoida varmuuskopion muiden laitteittesi kanssa.\n\n Salausavain tallennetaan vain laitteellesi. DuckDuckGo ei pääse siihen käsiksi.</string>
+    <string name="sync_intro_enable_content_with_ai_chat">Tämä luo salatun varmuuskopion kirjanmerkeistäsi, salasanoistasi ja Duck.ai -keskusteluistasi DuckDuckGon suojatulle palvelimelle, ja se voidaan synkronoida muiden laitteidesi kanssa. \n\n Salausavain tallennetaan vain laitteellesi. DuckDuckGo ei pääse siihen käsiksi.</string>
     <string name="sync_intro_enable_footer">Voit synkronoiden muiden laitteittesi kanssa myöhemmin.</string>
     <string name="sync_intro_enable_cta">Ota käyttöön synkronointi ja varmuuskopiointi</string>
     <string name="sync_intro_recover_title">Palauta synkronoidut tiedot</string>

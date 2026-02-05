@@ -20,12 +20,14 @@ import android.net.Uri
 import app.cash.turbine.test
 import com.duckduckgo.app.fire.ManualDataClearing
 import com.duckduckgo.app.fire.store.FireDataStore
+import com.duckduckgo.app.fire.wideevents.DataClearingWideEvent
 import com.duckduckgo.app.firebutton.FireButtonStore
 import com.duckduckgo.app.global.events.db.UserEventKey
 import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.view.GranularFireDialogViewModel.Command
 import com.duckduckgo.app.pixels.AppPixelName.FIRE_DIALOG_ANIMATION
 import com.duckduckgo.app.pixels.AppPixelName.FIRE_DIALOG_CLEAR_PRESSED
+import com.duckduckgo.app.pixels.AppPixelName.FIRE_DIALOG_SHOWN
 import com.duckduckgo.app.pixels.AppPixelName.PRODUCT_TELEMETRY_SURFACE_DATA_CLEARING
 import com.duckduckgo.app.pixels.AppPixelName.PRODUCT_TELEMETRY_SURFACE_DATA_CLEARING_DAILY
 import com.duckduckgo.app.settings.clear.FireAnimation
@@ -53,6 +55,7 @@ import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.time.LocalDateTime
@@ -74,6 +77,7 @@ class GranularFireDialogViewModelTest {
     private val mockDuckChat: DuckChat = mock()
     private val mockNavigationHistory: NavigationHistory = mock()
     private val mockDateProvider: DateProvider = mock()
+    private val dataClearingWideEvent: DataClearingWideEvent = mock()
 
     private val tabsFlow = MutableStateFlow<List<TabEntity>>(emptyList())
     private val selectedOptionsFlow = MutableStateFlow<Set<FireClearOption>>(emptySet())
@@ -106,6 +110,7 @@ class GranularFireDialogViewModelTest {
         duckChat = mockDuckChat,
         navigationHistory = mockNavigationHistory,
         dateProvider = mockDateProvider,
+        dataClearingWideEvent = dataClearingWideEvent,
     )
 
     @Test
@@ -410,8 +415,6 @@ class GranularFireDialogViewModelTest {
         testee.commands().test {
             testee.onDeleteClicked()
 
-            coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
-
             assertEquals(Command.OnClearStarted, awaitItem())
             assertEquals(Command.PlayAnimation, awaitItem())
             assertEquals(Command.ClearingComplete, awaitItem())
@@ -427,8 +430,6 @@ class GranularFireDialogViewModelTest {
 
         testee.commands().test {
             testee.onDeleteClicked()
-
-            coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
 
             assertEquals(Command.OnClearStarted, awaitItem())
             assertEquals(Command.ClearingComplete, awaitItem())
@@ -477,8 +478,6 @@ class GranularFireDialogViewModelTest {
         testee.commands().test {
             testee.onDeleteClicked()
 
-            coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
-
             awaitItem() // Skip OnClearStarted
             awaitItem() // Skip PlayAnimation
 
@@ -526,12 +525,29 @@ class GranularFireDialogViewModelTest {
         testee.commands().test {
             testee.onShow()
 
-            coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
-
             assertEquals(Command.OnShow, awaitItem())
 
             cancelAndConsumeRemainingEvents()
         }
+    }
+
+    @Test
+    fun `when onShow called then FIRE_DIALOG_SHOWN pixel is fired`() = runTest {
+        testee = createViewModel()
+
+        testee.onShow()
+
+        verify(mockPixel).fire(FIRE_DIALOG_SHOWN)
+    }
+
+    @Test
+    fun `when onShow called multiple times then FIRE_DIALOG_SHOWN pixel is fired only once`() = runTest {
+        testee = createViewModel()
+
+        testee.onShow()
+        testee.onShow()
+
+        verify(mockPixel, times(1)).fire(FIRE_DIALOG_SHOWN)
     }
 
     @Test
@@ -540,8 +556,6 @@ class GranularFireDialogViewModelTest {
 
         testee.commands().test {
             testee.onCancel()
-
-            coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
 
             assertEquals(Command.OnCancel, awaitItem())
 

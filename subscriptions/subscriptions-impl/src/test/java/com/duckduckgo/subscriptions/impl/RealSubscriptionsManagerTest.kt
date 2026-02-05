@@ -44,6 +44,7 @@ import com.duckduckgo.subscriptions.impl.billing.PurchaseState.Failure
 import com.duckduckgo.subscriptions.impl.billing.PurchaseState.Purchased
 import com.duckduckgo.subscriptions.impl.billing.SubscriptionReplacementMode
 import com.duckduckgo.subscriptions.impl.model.Entitlement
+import com.duckduckgo.subscriptions.impl.notification.VpnReminderNotificationScheduler
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.Account
 import com.duckduckgo.subscriptions.impl.repository.AuthRepository
@@ -120,7 +121,11 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
     private val subscriptionsService: SubscriptionsService = mock()
     private val authDataStore: FakeSubscriptionsDataStore = FakeSubscriptionsDataStore()
     private val serpPromo = FakeSerpPromo()
-    private val authRepository = RealAuthRepository(authDataStore, coroutineRule.testDispatcherProvider, serpPromo)
+
+    @SuppressLint("DenyListedApi")
+    private val privacyProFeature: PrivacyProFeature = FakeFeatureToggleFactory.create(PrivacyProFeature::class.java)
+        .apply { authApiV2().setRawStoredState(State(authApiV2Enabled)) }
+    private val authRepository = RealAuthRepository(authDataStore, coroutineRule.testDispatcherProvider, serpPromo, { privacyProFeature })
     private val emailManager: EmailManager = mock()
     private val playBillingManager: PlayBillingManager = mock()
     private val context: Context = mock()
@@ -130,10 +135,8 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
     private val subscriptionSwitchWideEvent: SubscriptionSwitchWideEvent = mock()
     private val freeTrialConversionWideEvent: FreeTrialConversionWideEvent = mock()
     private val subscriptionRestoreWideEvent: SubscriptionRestoreWideEvent = mock()
+    private val vpnReminderNotificationScheduler: VpnReminderNotificationScheduler = mock()
 
-    @SuppressLint("DenyListedApi")
-    private val privacyProFeature: PrivacyProFeature = FakeFeatureToggleFactory.create(PrivacyProFeature::class.java)
-        .apply { authApiV2().setRawStoredState(State(authApiV2Enabled)) }
     private val authClient: AuthClient = mock()
     private val pkceGenerator: PkceGenerator = PkceGeneratorImpl()
     private val authJwtValidator: AuthJwtValidator = mock()
@@ -167,6 +170,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             subscriptionSwitchWideEvent,
             freeTrialConversionWideEvent,
             subscriptionRestoreWideEvent,
+            vpnReminderNotificationScheduler,
         )
     }
 
@@ -614,6 +618,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             subscriptionSwitchWideEvent,
             freeTrialConversionWideEvent,
             subscriptionRestoreWideEvent,
+            vpnReminderNotificationScheduler,
         )
 
         manager.subscriptionStatus.test {
@@ -648,6 +653,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             subscriptionSwitchWideEvent,
             freeTrialConversionWideEvent,
             subscriptionRestoreWideEvent,
+            vpnReminderNotificationScheduler,
         )
 
         manager.subscriptionStatus.test {
@@ -686,6 +692,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             subscriptionSwitchWideEvent,
             freeTrialConversionWideEvent,
             subscriptionRestoreWideEvent,
+            vpnReminderNotificationScheduler,
         )
 
         manager.currentPurchaseState.test {
@@ -738,6 +745,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             subscriptionSwitchWideEvent,
             freeTrialConversionWideEvent,
             subscriptionRestoreWideEvent,
+            vpnReminderNotificationScheduler,
         )
 
         manager.currentPurchaseState.test {
@@ -780,6 +788,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             subscriptionSwitchWideEvent,
             freeTrialConversionWideEvent,
             subscriptionRestoreWideEvent,
+            vpnReminderNotificationScheduler,
         )
 
         manager.currentPurchaseState.test {
@@ -815,6 +824,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             subscriptionSwitchWideEvent,
             freeTrialConversionWideEvent,
             subscriptionRestoreWideEvent,
+            vpnReminderNotificationScheduler,
         )
 
         manager.currentPurchaseState.test {
@@ -1172,6 +1182,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             subscriptionSwitchWideEvent,
             freeTrialConversionWideEvent,
             subscriptionRestoreWideEvent,
+            vpnReminderNotificationScheduler,
         )
         manager.signOut()
         verify(mockRepo).setSubscription(null)
@@ -1223,6 +1234,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             subscriptionSwitchWideEvent,
             freeTrialConversionWideEvent,
             subscriptionRestoreWideEvent,
+            vpnReminderNotificationScheduler,
         )
 
         manager.subscriptionStatus.test {
@@ -1380,6 +1392,83 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
     }
 
     @Test
+    fun whenGetSubscriptionOfferWithTierMessagingEnabledThenReturnEntitlementsFromV2() = runTest {
+        givenTierMessagingEnabled(true)
+        authRepository.setFeaturesV2(
+            MONTHLY_PLAN_US,
+            setOf(Entitlement(name = "plus", product = NETP)),
+        )
+        authRepository.setFeaturesV2(
+            YEARLY_PLAN_US,
+            setOf(Entitlement(name = "plus", product = NETP)),
+        )
+        givenPlansAvailable(MONTHLY_PLAN_US, YEARLY_PLAN_US)
+
+        val subscriptionOffers = subscriptionsManager.getSubscriptionOffer()
+
+        with(subscriptionOffers) {
+            assertTrue(isNotEmpty())
+            assertTrue(any { it.planId == MONTHLY_PLAN_US })
+            assertTrue(any { it.planId == YEARLY_PLAN_US })
+            assertEquals("plus", first().tier)
+            assertEquals(setOf(Entitlement(name = "plus", product = NETP)), first().entitlements)
+            assertEquals(setOf(NETP), first().features)
+        }
+    }
+
+    @Test
+    fun whenGetSubscriptionOfferWithTierMessagingEnabledAndV2EmptyThenFallbackToV1() = runTest {
+        givenTierMessagingEnabled(true)
+        // V2 is empty, but V1 has data
+        authRepository.setFeatures(MONTHLY_PLAN_US, setOf(NETP))
+        authRepository.setFeatures(YEARLY_PLAN_US, setOf(NETP))
+        givenPlansAvailable(MONTHLY_PLAN_US, YEARLY_PLAN_US)
+
+        val subscriptionOffers = subscriptionsManager.getSubscriptionOffer()
+
+        with(subscriptionOffers) {
+            assertTrue(isNotEmpty())
+            assertTrue(any { it.planId == MONTHLY_PLAN_US })
+            // When falling back to V1, tier defaults to "plus"
+            assertEquals("plus", first().tier)
+            // Entitlements are created from V1 features with name="plus"
+            assertEquals(setOf(Entitlement(name = "plus", product = NETP)), first().entitlements)
+            assertEquals(setOf(NETP), first().features)
+        }
+    }
+
+    @Test
+    fun whenGetSubscriptionOfferWithTierMessagingDisabledThenUseV1Features() = runTest {
+        givenTierMessagingEnabled(false)
+        authRepository.setFeatures(MONTHLY_PLAN_US, setOf(NETP))
+        authRepository.setFeatures(YEARLY_PLAN_US, setOf(NETP))
+        givenPlansAvailable(MONTHLY_PLAN_US, YEARLY_PLAN_US)
+
+        val subscriptionOffers = subscriptionsManager.getSubscriptionOffer()
+
+        with(subscriptionOffers) {
+            assertTrue(isNotEmpty())
+            assertTrue(any { it.planId == MONTHLY_PLAN_US })
+            // When flag OFF, tier defaults to "plus"
+            assertEquals("plus", first().tier)
+            // Entitlements created from V1 features
+            assertEquals(setOf(Entitlement(name = "plus", product = NETP)), first().entitlements)
+            assertEquals(setOf(NETP), first().features)
+        }
+    }
+
+    @Test
+    fun whenGetSubscriptionOfferWithTierMessagingEnabledAndBothStoragesEmptyThenReturnEmptyList() = runTest {
+        givenTierMessagingEnabled(true)
+        // Both V1 and V2 are empty
+        givenPlansAvailable(MONTHLY_PLAN_US, YEARLY_PLAN_US)
+
+        val subscriptionOffers = subscriptionsManager.getSubscriptionOffer()
+
+        assertTrue(subscriptionOffers.isEmpty())
+    }
+
+    @Test
     fun whenCanSupportEncryptionThenReturnTrue() = runTest {
         assertTrue(subscriptionsManager.canSupportEncryption())
     }
@@ -1387,7 +1476,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
     @Test
     fun whenCanSupportEncryptionIfCannotThenReturnFalse() = runTest {
         val authDataStore: SubscriptionsDataStore = FakeSubscriptionsDataStore(supportEncryption = false)
-        val authRepository = RealAuthRepository(authDataStore, coroutineRule.testDispatcherProvider, serpPromo)
+        val authRepository = RealAuthRepository(authDataStore, coroutineRule.testDispatcherProvider, serpPromo, { privacyProFeature })
         whenever(playBillingManager.purchaseState).thenReturn(flowOf())
         subscriptionsManager = RealSubscriptionsManager(
             authService,
@@ -1410,6 +1499,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             subscriptionSwitchWideEvent,
             freeTrialConversionWideEvent,
             subscriptionRestoreWideEvent,
+            vpnReminderNotificationScheduler,
         )
 
         assertFalse(subscriptionsManager.canSupportEncryption())
@@ -2047,6 +2137,11 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
     @SuppressLint("DenyListedApi")
     private fun givenIsLaunchedRow(value: Boolean) {
         privacyProFeature.isLaunchedROW().setRawStoredState(State(remoteEnableState = value))
+    }
+
+    @SuppressLint("DenyListedApi")
+    private fun givenTierMessagingEnabled(value: Boolean) {
+        privacyProFeature.tierMessagingEnabled().setRawStoredState(State(remoteEnableState = value))
     }
 
     @SuppressLint("DenyListedApi")

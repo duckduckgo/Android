@@ -60,10 +60,10 @@
     <string name="undoSnackbarAction">Prekliči spremembe</string>
     <!-- Trackers blocked animation-->
     <plurals name="trackersBlockedAnimationMessage" tools:ignore="ImpliedQuantity">
-        <item quantity="one">Sledilnik</item>
-        <item quantity="two">Sledilnika</item>
-        <item quantity="few">Sledilniki</item>
-        <item quantity="other">Sledilnikov</item>
+        <item quantity="one">Blokiran sledilnik</item>
+        <item quantity="two">Blokirana sledilnika</item>
+        <item quantity="few">Blokirani sledilniki</item>
+        <item quantity="other">Blokiranih sledilnikov</item>
     </plurals>
 
     <!-- Downloading files -->
@@ -130,6 +130,7 @@
     <string name="settingsMenuItemTitle">Nastavitve</string>
     <string name="settingsHeadingProtections">Zaščite</string>
     <string name="settingsHeadingAppearance">Izgled</string>
+    <string name="settingsWhatsNew">Kaj je novega</string>
     <string name="settingsHeadingAbout">O nas</string>
     <string name="settingsAboutDuckduckgo">O DuckDuckGo</string>
     <string name="settingsVersion">Različica</string>
@@ -214,6 +215,43 @@
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Gumb Fire Button</string>
     <string name="dataClearingActivityTitle">Počiščenje podatkov</string>
+    <string name="dataClearingDescription">Brisanje podatkov lahko pomaga zaščititi vašo zasebnost na spletu. Uporabite gumb Fire Button za ročno brisanje podatkov ali nastavite samodejno brisanje.</string>
+    <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
+        <item quantity="one">%1$d lokacija, izključena iz čiščenja</item>
+        <item quantity="two">%1$d lokaciji, izključeni iz čiščenja</item>
+        <item quantity="few">%1$d lokacije, izključene iz čiščenja</item>
+        <item quantity="other">%1$d lokacij, izključenih iz čiščenja</item>
+    </plurals>
+    <string name="dataClearingAutomaticClearingOn">Vključeno</string>
+    <string name="dataClearingAutomaticClearingOff">Izklopljeno</string>
+    <string name="dataClearingClearBrowsingData">Čiščenje podatkov o brskanju</string>
+    <string name="dataClearingAutomaticDataClearing">Samodejno čiščenje podatkov</string>
+    <string name="dataClearingAutomaticallyClearDataToggle">Samodejno počisti podatke</string>
+    <string name="dataClearingAutomaticTabsOptionDescription">Zaprite vse odprte zavihke</string>
+    <string name="dataClearingAutomaticDataOptionDescription">Izbrišite vse podatke o straneh, vključno z obiskanimi stranmi. Morda boste odjavljeni iz računov.</string>
+    <string name="dataClearingAutomaticChatsOptionDescription">Izbrišite vse klepete, vključno s pripetimi klepeti</string>
+
+    <!-- Fire Dialog Granular Options -->
+    <string name="fireDialogTitle">Izberite, kaj želite izbrisati</string>
+    <string name="dataClearingOptionTabs">Zavihki</string>
+    <string name="dataClearingOptionData">Piškotki in podatki spletnega mesta</string>
+    <string name="dataClearingDuckAiChats">Klepeti Duck.ai</string>
+    <string name="fireDialogOptionDuckAiChatsDescription">Izbriši vse klepete</string>
+    <string name="fireDialogDeleteButton">Izbriši</string>
+    <plurals name="fireDialogOptionTabsDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Zapri zavihek</item>
+        <item quantity="two">Zapri %1$d zavihka</item>
+        <item quantity="few">Zapri vse %1$d zavihke</item>
+        <item quantity="other">Zapri vseh %1$d zavihkov</item>
+    </plurals>
+    <string name="fireDialogOptionDataDescriptionNoHistory">Morda boste odjavljeni iz računov.</string>
+    <string name="fireDialogOptionDescriptionNothingToDelete">Brez</string>
+    <plurals name="fireDialogOptionDataDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Izbriši iz 1 strani. Morda boste odjavljeni iz računov.</item>
+        <item quantity="two">Izbriši iz %1$d strani. Morda boste odjavljeni iz računov.</item>
+        <item quantity="few">Izbriši iz %1$d strani. Morda boste odjavljeni iz računov.</item>
+        <item quantity="other">Izbriši iz %1$d strani. Morda boste odjavljeni iz računov.</item>
+    </plurals>
 
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Dovoljenja</string>
@@ -925,11 +963,16 @@
     <string name="settingsHeadingCompleteSetup">Dokončanje nastavitve</string>
 
     <!--TabSwitcher Trackers Animation-->
-    <string name="showTrackerCountInTabSwitcher">Pokaži število sledilnikov v preklopniku zavihkov</string>
+    <string name="trackerBlockedInTheLast7days" instruction="Placeholder is 1 tracker blocked">&lt;b&gt;%1$s sledilnik je bil blokiran &lt;/b&gt;v zadnjih 7 dneh</string>
     <string name="tabSwitcherAnimationTileRemovalDialogTitle" instruction="A title for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Želite skriti število sledilnikov?</string>
     <string name="tabSwitcherAnimationTileRemovalDialogBody" instruction="A message for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">To lahko znova vklopite, če greste na Nastavitve &gt; Videz.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Skrij se</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Obdrži</string>
+
+    <!-- Trackers blocked animation-->
+    <string name="settingsTrackersBlockedAnimationHeaderTitle">Animacija blokiranih sledilnikov</string>
+    <string name="showTrackerCountInAddressBar">Prikaži v naslovni vrstici</string>
+    <string name="showWeeklyTrackerCountInTabSwitcher">Prikaži v upravitelju zavihkov</string>
 
     <!-- Widgets -->
     <string name="searchOnlyWidgetLabel" instruction="Label for the search-only widget">Samo iskanje</string>

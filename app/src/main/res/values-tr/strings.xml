@@ -128,6 +128,7 @@
     <string name="settingsMenuItemTitle">Ayarlar</string>
     <string name="settingsHeadingProtections">Korumalar</string>
     <string name="settingsHeadingAppearance">Görünüm</string>
+    <string name="settingsWhatsNew">Yenilikler</string>
     <string name="settingsHeadingAbout">Hakkında</string>
     <string name="settingsAboutDuckduckgo">DuckDuckGo Hakkında</string>
     <string name="settingsVersion">Versiyon</string>
@@ -212,6 +213,37 @@
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Fire Button</string>
     <string name="dataClearingActivityTitle">Veri Temizleme</string>
+    <string name="dataClearingDescription">Kişisel verilerini silmek, çevrimiçi gizliliğini korumana yardımcı olabilir. Verileri manuel olarak silmek için Fire Button\'ı kullan veya otomatik silme işlemini ayarla.</string>
+    <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
+        <item quantity="one">%1$d site temizleme işleminden hariç tutuldu.</item>
+        <item quantity="other">%1$d site temizleme işleminden hariç tutuldu.</item>
+    </plurals>
+    <string name="dataClearingAutomaticClearingOn">Açık</string>
+    <string name="dataClearingAutomaticClearingOff">Kapalı</string>
+    <string name="dataClearingClearBrowsingData">Tarama Verilerini Temizle</string>
+    <string name="dataClearingAutomaticDataClearing">Otomatik Veri Temizleme</string>
+    <string name="dataClearingAutomaticallyClearDataToggle">Verileri Otomatik Olarak Temizle</string>
+    <string name="dataClearingAutomaticTabsOptionDescription">Tüm açık sekmeleri kapatır</string>
+    <string name="dataClearingAutomaticDataOptionDescription">Ziyaret edilen siteler dahil olmak üzere tüm site verilerini siler. Hesaplarınızdan çıkış yapılabilir.</string>
+    <string name="dataClearingAutomaticChatsOptionDescription">Sabitlenmiş sohbetler dahil tüm sohbetleri siler</string>
+
+    <!-- Fire Dialog Granular Options -->
+    <string name="fireDialogTitle">Nelerin Silineceğini Seçin</string>
+    <string name="dataClearingOptionTabs">Sekmeler</string>
+    <string name="dataClearingOptionData">Çerezler ve Site Verileri</string>
+    <string name="dataClearingDuckAiChats">Duck.ai Sohbetleri</string>
+    <string name="fireDialogOptionDuckAiChatsDescription">Tüm sohbetleri sil</string>
+    <string name="fireDialogDeleteButton">Sil</string>
+    <plurals name="fireDialogOptionTabsDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Sekmeyi Kapat</item>
+        <item quantity="other">%1$d Sekmenin Tümünü Kapat</item>
+    </plurals>
+    <string name="fireDialogOptionDataDescriptionNoHistory">Hesaplarınızdan çıkış yapılabilir.</string>
+    <string name="fireDialogOptionDescriptionNothingToDelete">Yok</string>
+    <plurals name="fireDialogOptionDataDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one">1 siteden sil. Hesaplarınızdan çıkış yapılabilir.</item>
+        <item quantity="other">%1$d siteden sil. Hesaplarınızdan çıkış yapılabilir.</item>
+    </plurals>
 
     <!-- Permissions -->
     <string name="permissionsActivityTitle">İzinler</string>
@@ -893,11 +925,16 @@
     <string name="settingsHeadingCompleteSetup">Kurulumu Tamamlayın</string>
 
     <!--TabSwitcher Trackers Animation-->
-    <string name="showTrackerCountInTabSwitcher">Sekme Değiştiricide İzleyici sayısını göster</string>
+    <string name="trackerBlockedInTheLast7days" instruction="Placeholder is 1 tracker blocked">Son 7 günde &lt;b&gt;%1$s izleyici engellendi&lt;/b&gt;</string>
     <string name="tabSwitcherAnimationTileRemovalDialogTitle" instruction="A title for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">İzleyici Sayısı Gizlensin mi?</string>
     <string name="tabSwitcherAnimationTileRemovalDialogBody" instruction="A message for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Bunu Ayarlar &gt; Görünüm\'den tekrar açabilirsiniz.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Gizle</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Gizleme</string>
+
+    <!-- Trackers blocked animation-->
+    <string name="settingsTrackersBlockedAnimationHeaderTitle">Engellenen İzleyiciler Animasyonu</string>
+    <string name="showTrackerCountInAddressBar">Adres Çubuğunda Göster</string>
+    <string name="showWeeklyTrackerCountInTabSwitcher">Sekme Yöneticisinde Göster</string>
 
     <!-- Widgets -->
     <string name="searchOnlyWidgetLabel" instruction="Label for the search-only widget">Yalnızca Arama</string>

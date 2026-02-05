@@ -55,6 +55,7 @@ private val mediumMapper: (JsonContent, Set<MessageActionMapperPlugin>) -> Conte
         titleText = jsonContent.titleText.failIfEmpty(),
         descriptionText = jsonContent.descriptionText.failIfEmpty(),
         placeholder = jsonContent.placeholder.asPlaceholder(),
+        imageUrl = jsonContent.imageUrl,
     )
 }
 
@@ -65,6 +66,7 @@ private val bigMessageSingleActionMapper: (JsonContent, Set<MessageActionMapperP
         placeholder = jsonContent.placeholder.asPlaceholder(),
         primaryActionText = jsonContent.primaryActionText.failIfEmpty(),
         primaryAction = jsonContent.primaryAction!!.toAction(actionMappers),
+        imageUrl = jsonContent.imageUrl,
     )
 }
 
@@ -77,6 +79,7 @@ private val bigMessageTwoActionMapper: (JsonContent, Set<MessageActionMapperPlug
         primaryAction = jsonContent.primaryAction!!.toAction(actionMappers),
         secondaryActionText = jsonContent.secondaryActionText.failIfEmpty(),
         secondaryAction = jsonContent.secondaryAction!!.toAction(actionMappers),
+        imageUrl = jsonContent.imageUrl,
     )
 }
 
@@ -87,6 +90,7 @@ private val promoSingleActionMapper: (JsonContent, Set<MessageActionMapperPlugin
         placeholder = jsonContent.placeholder.asPlaceholder(),
         actionText = jsonContent.actionText.failIfEmpty(),
         action = jsonContent.action!!.toAction(actionMappers),
+        imageUrl = jsonContent.imageUrl,
     )
 }
 
@@ -98,8 +102,45 @@ private val cardsListMapper: (JsonContent, Set<MessageActionMapperPlugin>) -> Co
         primaryActionText = jsonContent.primaryActionText.failIfEmpty(),
         primaryAction = jsonContent.primaryAction!!.toAction(actionMappers),
         listItems = jsonContent.listItems.toListItems(actionMappers),
+        imageUrl = jsonContent.imageUrl,
     )
 }
+
+private fun List<JsonListItem>?.toListItems(actionMappers: Set<MessageActionMapperPlugin>): List<CardItem> {
+    return this?.mapNotNull { jsonItem ->
+        itemMappers[jsonItem.type]?.invoke(jsonItem, actionMappers)
+    } ?: emptyList()
+}
+
+private val twoLineListItemMapper: (JsonListItem, Set<MessageActionMapperPlugin>) -> CardItem = { jsonItem, actionMappers ->
+    CardItem.ListItem(
+        id = jsonItem.id.failIfEmpty(),
+        type = jsonItem.type.toCardItemType(),
+        titleText = jsonItem.titleText.failIfEmpty(),
+        descriptionText = jsonItem.descriptionText.orEmpty().failIfEmpty(),
+        placeholder = jsonItem.placeholder.orEmpty().asPlaceholder(),
+        primaryAction = jsonItem.primaryAction?.toAction(actionMappers)
+            ?: throw IllegalStateException("CardItem primaryAction cannot be null"),
+        primaryActionText = jsonItem.primaryActionText.orEmpty(),
+        matchingRules = jsonItem.matchingRules.orEmpty(),
+        exclusionRules = jsonItem.exclusionRules.orEmpty(),
+    )
+}
+
+private val sectionTitleMapper: (JsonListItem, Set<MessageActionMapperPlugin>) -> CardItem = { jsonItem, _ ->
+    CardItem.SectionTitle(
+        id = jsonItem.id.failIfEmpty(),
+        type = jsonItem.type.toCardItemType(),
+        titleText = jsonItem.titleText.failIfEmpty(),
+        itemIDs = jsonItem.itemIDs.orEmpty(),
+    )
+}
+
+private val itemMappers = mapOf(
+    CardItemType.TWO_LINE_LIST_ITEM.jsonValue to twoLineListItemMapper,
+    CardItemType.FEATURED_TWO_LINE_SINGLE_ACTION_LIST_ITEM.jsonValue to twoLineListItemMapper,
+    CardItemType.LIST_SECTION_TITLE.jsonValue to sectionTitleMapper,
+)
 
 // plugin point?
 private val messageMappers = mapOf(
@@ -139,7 +180,11 @@ private fun List<String>?.toSurfaceList(): List<Surface> {
         Surface.entries.firstOrNull { it.jsonValue == value }
     } ?: listOf(Surface.NEW_TAB_PAGE)
 }
-private fun RemoteMessage.localizeMessage(translations: Map<String, JsonContentTranslations>?, locale: Locale): RemoteMessage {
+
+private fun RemoteMessage.localizeMessage(
+    translations: Map<String, JsonContentTranslations>?,
+    locale: Locale,
+): RemoteMessage {
     if (translations == null) return this
 
     val deviceTranslations = translations[locale.asJsonFormat()] ?: translations[locale.language]
@@ -175,20 +220,6 @@ private fun String.toCardItemType(): CardItemType {
     return CardItemType.entries.first { it.jsonValue == this }
 }
 
-private fun List<JsonListItem>?.toListItems(actionMappers: Set<MessageActionMapperPlugin>): List<CardItem> {
-    return this?.map { jsonItem ->
-        CardItem(
-            id = jsonItem.id.failIfEmpty(),
-            type = jsonItem.type.toCardItemType(),
-            titleText = jsonItem.titleText.failIfEmpty(),
-            descriptionText = jsonItem.descriptionText.failIfEmpty(),
-            placeholder = jsonItem.placeholder.asPlaceholder(),
-            primaryAction = jsonItem.primaryAction?.toAction(actionMappers)
-                ?: throw IllegalStateException("CardItem primaryAction cannot be null"),
-        )
-    } ?: emptyList()
-}
-
 private fun Content.localize(translations: JsonContentTranslations): Content {
     return when (this) {
         is BigSingleAction -> this.copy(
@@ -196,29 +227,68 @@ private fun Content.localize(translations: JsonContentTranslations): Content {
             descriptionText = translations.descriptionText.takeUnless { it.isEmpty() } ?: this.descriptionText,
             primaryActionText = translations.primaryActionText.takeUnless { it.isEmpty() } ?: this.primaryActionText,
         )
+
         is BigTwoActions -> this.copy(
             titleText = translations.titleText.takeUnless { it.isEmpty() } ?: this.titleText,
             descriptionText = translations.descriptionText.takeUnless { it.isEmpty() } ?: this.descriptionText,
             primaryActionText = translations.primaryActionText.takeUnless { it.isEmpty() } ?: this.primaryActionText,
             secondaryActionText = translations.secondaryActionText.takeUnless { it.isEmpty() } ?: this.secondaryActionText,
         )
+
         is Medium -> this.copy(
             titleText = translations.titleText.takeUnless { it.isEmpty() } ?: this.titleText,
             descriptionText = translations.descriptionText.takeUnless { it.isEmpty() } ?: this.descriptionText,
         )
+
         is Small -> this.copy(
             titleText = translations.titleText.takeUnless { it.isEmpty() } ?: this.titleText,
             descriptionText = translations.descriptionText.takeUnless { it.isEmpty() } ?: this.descriptionText,
         )
+
         is PromoSingleAction -> this.copy(
             titleText = translations.titleText.takeUnless { it.isEmpty() } ?: this.titleText,
             descriptionText = translations.descriptionText.takeUnless { it.isEmpty() } ?: this.descriptionText,
             actionText = translations.actionText.takeUnless { it.isEmpty() } ?: this.actionText,
         )
+
         is CardsList -> this.copy(
             titleText = translations.titleText.takeUnless { it.isEmpty() } ?: this.titleText,
             descriptionText = translations.descriptionText.takeUnless { it.isEmpty() } ?: this.descriptionText,
             primaryActionText = translations.primaryActionText.takeUnless { it.isEmpty() } ?: this.primaryActionText,
+            listItems = listItems.map { item ->
+                when (item) {
+                    is CardItem.ListItem -> {
+                        val translatedItem = item.localize(translations)
+                        item.copy(
+                            titleText = translatedItem?.title.takeUnless { it.isNullOrEmpty() } ?: item.titleText,
+                            descriptionText = translatedItem?.description.takeUnless { it.isNullOrEmpty() } ?: item.descriptionText,
+                            primaryActionText = translatedItem?.primaryAction.takeUnless { it.isNullOrEmpty() } ?: item.primaryActionText,
+                        )
+                    }
+                    is CardItem.SectionTitle -> {
+                        val translatedItem = item.localize(translations)
+                        item.copy(
+                            titleText = translatedItem?.title.takeUnless { it.isNullOrEmpty() } ?: item.titleText,
+                        )
+                    }
+                }
+            },
         )
     }
 }
+
+private fun CardItem.localize(
+    translations: JsonContentTranslations,
+): CardItemTranslations? = translations.listItems?.get(id)?.let {
+    CardItemTranslations(
+        title = it.titleText,
+        description = it.descriptionText.orEmpty(),
+        primaryAction = it.primaryActionText.orEmpty(),
+    )
+}
+
+private data class CardItemTranslations(
+    val title: String,
+    val description: String,
+    val primaryAction: String,
+)

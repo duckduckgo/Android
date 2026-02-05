@@ -18,6 +18,13 @@ package com.duckduckgo.duckchat.impl
 
 object DuckChatConstants {
     const val HOST_DUCK_AI = "duck.ai"
+    const val JS_MESSAGING_FEATURE_NAME = "aiChat"
+
+    object JsResponseKeys {
+        const val OK = "ok"
+        const val REASON = "reason"
+        const val PAYLOAD = "payload"
+    }
 
     object StandaloneConstants {
         const val SERIALIZED_MIGRATION_FILE = "serializedMigrationFile"

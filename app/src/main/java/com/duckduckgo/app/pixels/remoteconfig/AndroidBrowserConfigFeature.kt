@@ -180,6 +180,14 @@ interface AndroidBrowserConfigFeature {
     fun vpnMenuItem(): Toggle
 
     /**
+     * @return `true` when the remote config has the global "vpnMenuItemInternational" androidBrowserConfig
+     * sub-feature flag enabled
+     * If the remote feature is not present defaults to `false`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun vpnMenuItemInternational(): Toggle
+
+    /**
      * @return `true` when the remote config has the global "splitOmnibar" androidBrowserConfig
      * sub-feature flag enabled
      * If the remote feature is not present defaults to `false`
@@ -187,6 +195,16 @@ interface AndroidBrowserConfigFeature {
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     @Toggle.InternalAlwaysEnabled
     fun splitOmnibar(): Toggle
+
+    /**
+     * Controls whether the split omnibar option is shown in the welcome page onboarding flow.
+     * @return `true` when the remote config has the global "splitOmnibarWelcomePage" androidBrowserConfig
+     * sub-feature flag enabled
+     * If the remote feature is not present defaults to `true`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    @Toggle.InternalAlwaysEnabled
+    fun splitOmnibarWelcomePage(): Toggle
 
     /**
      * @return `true` when the remote config has the global "repotWebViewCapabilities" androidBrowserConfig
@@ -240,11 +258,51 @@ interface AndroidBrowserConfigFeature {
     fun shorterUrlDefault(): Toggle
 
     /**
-     * Controls the fire dialog and data clearing options.
-     * @return `true` when the remote config has the global "moreGranularDataClearingOptions" androidBrowserConfig
+     * Controls the automatic data clearing options, which allows to specify granular automatic clearing options.
+     * @return `true` when the remote config has the global "improvedDataClearingOptions" androidBrowserConfig
      * sub-feature flag enabled
      * If the remote feature is not present defaults to `false`
      */
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
-    fun moreGranularDataClearingOptions(): Toggle
+    fun improvedDataClearingOptions(): Toggle
+
+    /**
+     * Controls the fire dialog and data clearing options.
+     * @return `true` when the remote config has the global "granularFireDialog" androidBrowserConfig
+     * sub-feature flag enabled
+     * If the remote feature is not present defaults to `false`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun granularFireDialog(): Toggle
+
+    /**
+     * Controls the experimental browsing menu in appearance settings.
+     * @return `true` when the remote config has the global "experimentalBrowsingMenu" androidBrowserConfig
+     * sub-feature flag enabled
+     * If the remote feature is not present defaults to `false`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    @Toggle.InternalAlwaysEnabled
+    fun experimentalBrowsingMenu(): Toggle
+
+    /**
+     * Controls whether verified install/update pixels are sent.
+     * @return `true` when the remote config has the global "sendVerifiedInstallPixels" androidBrowserConfig
+     * sub-feature flag enabled
+     * If the remote feature is not present defaults to `true`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun sendVerifiedInstallPixels(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun refreshDuckAiOnSubscriptionChanges(): Toggle
+
+    /**
+     * Controls whether data clearing wide events are sent.
+     * @return `true` when the remote config has the global "sendDataClearingWideEvent" androidBrowserConfig
+     * sub-feature flag enabled
+     * If the remote feature is not present defaults to `true`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun sendDataClearingWideEvent(): Toggle
 }

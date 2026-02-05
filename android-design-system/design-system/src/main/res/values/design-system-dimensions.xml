@@ -107,6 +107,9 @@
     <dimen name="popupMenuItemWidth">198dp</dimen>
     <dimen name="popupMenuNavigationItemSize">40dp</dimen>
 
+    <!-- Menu Action Button -->
+    <dimen name="menuActionHeight">82dp</dimen>
+
     <!-- Dialogs -->
     <dimen name="dialogButtonHeight">40dp</dimen>
     <dimen name="dialogImageSize">40dp</dimen>
@@ -127,6 +130,7 @@
     <!-- Bottom Sheet -->
     <dimen name="actionBottomSheetVerticalPadding">8dp</dimen>
     <dimen name="bottomSheetTitleVerticalPadding">14dp</dimen>
+    <dimen name="bottomSheetDragHeight">24dp</dimen>
     <dimen name="promoBottomSheetPadding">24dp</dimen>
     <dimen name="promoBottomSheetImageWidth">48dp</dimen>
 
@@ -143,6 +147,10 @@
 
     <!-- InfoPanel -->
     <dimen name="infoPanelIconSize">16dp</dimen>
+
+    <!-- Yellow Pill -->
+    <dimen name="yellowPillHeight">15dp</dimen>
+    <dimen name="yellowPillPaddingHorizontal">4dp</dimen>
 
     <!-- Message CTA -->
     <dimen name="messageCtaCloseButtonSize">40dp</dimen>

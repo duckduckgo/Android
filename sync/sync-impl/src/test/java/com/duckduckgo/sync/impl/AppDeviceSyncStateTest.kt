@@ -49,6 +49,20 @@ internal class AppDeviceSyncStateTest {
         assertTrue(appDeviceSyncState.isFeatureEnabled())
     }
 
+    @Test
+    fun whenAllowAiChatSyncEnabledThenIsDuckChatSyncFeatureEnabledReturnsTrue() {
+        whenever(syncFeatureToggle.allowAiChatSync()).thenReturn(true)
+
+        assertTrue(appDeviceSyncState.isDuckChatSyncFeatureEnabled())
+    }
+
+    @Test
+    fun whenAllowAiChatSyncDisabledThenIsDuckChatSyncFeatureEnabledReturnsFalse() {
+        whenever(syncFeatureToggle.allowAiChatSync()).thenReturn(false)
+
+        assertFalse(appDeviceSyncState.isDuckChatSyncFeatureEnabled())
+    }
+
     private fun givenFeatureFlag(enabled: Boolean) {
         whenever(syncFeatureToggle.showSync()).thenReturn(enabled)
     }

@@ -60,8 +60,8 @@
     <string name="undoSnackbarAction">Fortryd</string>
     <!-- Trackers blocked animation-->
     <plurals name="trackersBlockedAnimationMessage" tools:ignore="ImpliedQuantity">
-        <item quantity="one">Tracker</item>
-        <item quantity="other">Trackere</item>
+        <item quantity="one">Tracker blokeret</item>
+        <item quantity="other">Trackere blokeret</item>
     </plurals>
 
     <!-- Downloading files -->
@@ -128,6 +128,7 @@
     <string name="settingsMenuItemTitle">Indstillinger</string>
     <string name="settingsHeadingProtections">Beskyttelser</string>
     <string name="settingsHeadingAppearance">udseende</string>
+    <string name="settingsWhatsNew">Nyheder</string>
     <string name="settingsHeadingAbout">Omkring</string>
     <string name="settingsAboutDuckduckgo">Om DuckDuckGo</string>
     <string name="settingsVersion">Version</string>
@@ -212,6 +213,37 @@
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Fire Button</string>
     <string name="dataClearingActivityTitle">Datarydning</string>
+    <string name="dataClearingDescription">Sletning af dine data kan hjælpe med at beskytte dit privatliv online. Brug Fire Button til at rydde data manuelt, eller opsæt automatisk rydning.</string>
+    <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
+        <item quantity="one">%1$d websted udelukket fra rydning</item>
+        <item quantity="other">%1$d websteder udelukket fra rydning</item>
+    </plurals>
+    <string name="dataClearingAutomaticClearingOn">Til</string>
+    <string name="dataClearingAutomaticClearingOff">Fra</string>
+    <string name="dataClearingClearBrowsingData">Ryd browserdata</string>
+    <string name="dataClearingAutomaticDataClearing">Automatisk sletning af data</string>
+    <string name="dataClearingAutomaticallyClearDataToggle">Ryd data automatisk</string>
+    <string name="dataClearingAutomaticTabsOptionDescription">Luk alle åbne faner</string>
+    <string name="dataClearingAutomaticDataOptionDescription">Slet alle webstedsdata, inklusive besøgte sider. Du kan blive logget ud af konti.</string>
+    <string name="dataClearingAutomaticChatsOptionDescription">Slet alle chats, inklusive fastgjorte chats</string>
+
+    <!-- Fire Dialog Granular Options -->
+    <string name="fireDialogTitle">Vælg, hvad du vil slette</string>
+    <string name="dataClearingOptionTabs">Faner</string>
+    <string name="dataClearingOptionData">Cookies og webstedsdata</string>
+    <string name="dataClearingDuckAiChats">Duck.ai-chats</string>
+    <string name="fireDialogOptionDuckAiChatsDescription">Slet alle chats</string>
+    <string name="fireDialogDeleteButton">Slet</string>
+    <plurals name="fireDialogOptionTabsDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Luk fane</item>
+        <item quantity="other">Luk alle %1$d faner</item>
+    </plurals>
+    <string name="fireDialogOptionDataDescriptionNoHistory">Du kan blive logget ud af konti.</string>
+    <string name="fireDialogOptionDescriptionNothingToDelete">Ingen</string>
+    <plurals name="fireDialogOptionDataDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Slet fra 1 websted. Du kan blive logget ud af konti.</item>
+        <item quantity="other">Slet fra %1$d websteder. Du kan blive logget ud af konti.</item>
+    </plurals>
 
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Tilladelser</string>
@@ -893,11 +925,16 @@
     <string name="settingsHeadingCompleteSetup">Færdiggør opsætningen</string>
 
     <!--TabSwitcher Trackers Animation-->
-    <string name="showTrackerCountInTabSwitcher">Vis tracker-antal i faneomskifteren</string>
+    <string name="trackerBlockedInTheLast7days" instruction="Placeholder is 1 tracker blocked">&lt;b&gt;%1$s tracker blokeret &lt;/b&gt; inden for de seneste 7 dage</string>
     <string name="tabSwitcherAnimationTileRemovalDialogTitle" instruction="A title for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Skjul tracker-antallet?</string>
     <string name="tabSwitcherAnimationTileRemovalDialogBody" instruction="A message for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Du kan slå det til igen i Indstillinger &gt; Udseende.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Skjul</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Behold</string>
+
+    <!-- Trackers blocked animation-->
+    <string name="settingsTrackersBlockedAnimationHeaderTitle">Animation af blokerede trackere</string>
+    <string name="showTrackerCountInAddressBar">Vis i adresselinjen</string>
+    <string name="showWeeklyTrackerCountInTabSwitcher">Vis i håndtering af faner</string>
 
     <!-- Widgets -->
     <string name="searchOnlyWidgetLabel" instruction="Label for the search-only widget">Kun søgning</string>

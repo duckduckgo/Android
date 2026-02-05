@@ -1,12 +1,21 @@
 <html>
 <head>
 <meta name="color-scheme" content="light dark">
+<link rel="stylesheet" href="autofill-design-tokens.css">
 <style>
     :root { color-scheme: light dark; }
     html, body {
         margin: 0;
+        --loading-color: $LOADING_COLOR$;
         background-color: rgba(242, 240, 240, 0.9);
+        background-color: var(--loading-color);
         overscroll-behavior: none;
+    }
+    @media (prefers-color-scheme: dark) {
+        html, body {
+            background-color: rgba(100, 98, 100, 0.9);
+            background-color: var(--loading-color);
+        }
     }
 </style>
 </head>

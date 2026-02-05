@@ -30,7 +30,6 @@ import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.TIMESTAMP_CONFLICT
 import com.duckduckgo.sync.store.SyncDatabase
 import com.duckduckgo.sync.store.model.GENERIC_FEATURE
 import com.duckduckgo.sync.store.model.SyncOperationErrorType
-import com.duckduckgo.sync.store.model.SyncOperationErrorType.DATA_PERSISTER_ERROR
 import org.junit.After
 import org.junit.Assert
 import org.junit.Rule

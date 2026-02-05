@@ -35,6 +35,8 @@ class FakeDuckChat(
     private var wasOpenedBeforeValue: Boolean = false
     private val inputScreenUserSettingEnabled = MutableStateFlow<Boolean>(false)
     private val cosmeticInputScreenUserSettingEnabled = MutableStateFlow<Boolean?>(null)
+    private val automaticContextAttachmentUserSettingEnabled = MutableStateFlow<Boolean>(false)
+    var contextualOnboardingCompleted: Boolean = false
 
     override fun isEnabled(): Boolean = enabled
 
@@ -53,6 +55,7 @@ class FakeDuckChat(
     override fun getDuckChatUrl(
         query: String,
         autoPrompt: Boolean,
+        sidebar: Boolean,
     ): String {
         return "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5"
     }
@@ -83,6 +86,18 @@ class FakeDuckChat(
 
     override fun observeCosmeticInputScreenUserSettingEnabled(): Flow<Boolean?> {
         return cosmeticInputScreenUserSettingEnabled
+    }
+
+    override fun observeAutomaticContextAttachmentUserSettingEnabled(): Flow<Boolean> {
+        return automaticContextAttachmentUserSettingEnabled
+    }
+
+    override fun showContextualOnboarding(context: Context, onConfirmed: () -> Unit) {
+        // No-op for testing
+    }
+
+    override suspend fun isContextualOnboardingCompleted(): Boolean {
+        return contextualOnboardingCompleted
     }
 
     fun setEnabled(enabled: Boolean) {

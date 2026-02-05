@@ -65,4 +65,10 @@ interface SyncFeature {
 
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun canOverrideThemeSyncSetup(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun aiChatSync(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun useExpandableBarcodeConnectSyncLayout(): Toggle
 }

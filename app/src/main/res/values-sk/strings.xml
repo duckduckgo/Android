@@ -60,10 +60,10 @@
     <string name="undoSnackbarAction">Vrátenie späť</string>
     <!-- Trackers blocked animation-->
     <plurals name="trackersBlockedAnimationMessage" tools:ignore="ImpliedQuantity">
-        <item quantity="one">Sledovanie</item>
-        <item quantity="few">Sledovania</item>
-        <item quantity="many">Sledovaní</item>
-        <item quantity="other">Sledovaní</item>
+        <item quantity="one">sledovanie je blokované</item>
+        <item quantity="few">sledovania sú blokované</item>
+        <item quantity="many">sledovaní je blokovaných</item>
+        <item quantity="other">sledovaní je blokovaných</item>
     </plurals>
 
     <!-- Downloading files -->
@@ -130,6 +130,7 @@
     <string name="settingsMenuItemTitle">Nastavenia</string>
     <string name="settingsHeadingProtections">Ochrany</string>
     <string name="settingsHeadingAppearance">Vzhľad</string>
+    <string name="settingsWhatsNew">Novinky</string>
     <string name="settingsHeadingAbout">O nás</string>
     <string name="settingsAboutDuckduckgo">Informácie o DuckDuckGo</string>
     <string name="settingsVersion">Verzia</string>
@@ -214,6 +215,43 @@
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Tlačidlo Fire</string>
     <string name="dataClearingActivityTitle">Vymazanie údajov</string>
+    <string name="dataClearingDescription">Odstránenie údajov môže pomôcť chrániť tvoje súkromie online. Pomocou tlačidla Fire Button môžeš údaje vymazať manuálne alebo nastaviť automatické vymazanie.</string>
+    <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
+        <item quantity="one">%1$d lokalita bola vylúčená z vymazania</item>
+        <item quantity="few">%1$d lokality boli vylúčené z vymazania</item>
+        <item quantity="many">%1$d lokality bolo vylúčených z vymazania</item>
+        <item quantity="other">%1$d lokalít bolo vylúčených z vymazania</item>
+    </plurals>
+    <string name="dataClearingAutomaticClearingOn">Zapnuté</string>
+    <string name="dataClearingAutomaticClearingOff">Vypnuté</string>
+    <string name="dataClearingClearBrowsingData">Vymaž údaje o prehliadaní</string>
+    <string name="dataClearingAutomaticDataClearing">Automatické vymazávanie údajov</string>
+    <string name="dataClearingAutomaticallyClearDataToggle">Automaticky vymazať údaje</string>
+    <string name="dataClearingAutomaticTabsOptionDescription">Zatvor všetky otvorené karty</string>
+    <string name="dataClearingAutomaticDataOptionDescription">Odstráň všetky údaje stránok vrátane navštívených stránok. Môže ťa to odhlásiť z účtov.</string>
+    <string name="dataClearingAutomaticChatsOptionDescription">Odstráň všetky čety vrátane pripnutých četov</string>
+
+    <!-- Fire Dialog Granular Options -->
+    <string name="fireDialogTitle">Vyber, čo chceš odstrániť</string>
+    <string name="dataClearingOptionTabs">Karty</string>
+    <string name="dataClearingOptionData">Súbory cookie a údaje o lokalite</string>
+    <string name="dataClearingDuckAiChats">Chaty Duck.ai</string>
+    <string name="fireDialogOptionDuckAiChatsDescription">Zmazať všetky čety</string>
+    <string name="fireDialogDeleteButton">Odstrániť</string>
+    <plurals name="fireDialogOptionTabsDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Zatvoriť kartu</item>
+        <item quantity="few">Zatvoriť všetky %1$d karty</item>
+        <item quantity="many">Zatvoriť všetkých %1$d kariet</item>
+        <item quantity="other">Zatvoriť všetkých %1$d kariet</item>
+    </plurals>
+    <string name="fireDialogOptionDataDescriptionNoHistory">Môže ťa to odhlásiť z účtov.</string>
+    <string name="fireDialogOptionDescriptionNothingToDelete">Žiadne</string>
+    <plurals name="fireDialogOptionDataDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Odstrániť z %1$d webu. Môže ťa to odhlásiť z účtov.</item>
+        <item quantity="few">Odstrániť z %1$d webov. Môže ťa to odhlásiť z účtov.</item>
+        <item quantity="many">Odstrániť z %1$d webu. Môže ťa to odhlásiť z účtov.</item>
+        <item quantity="other">Odstrániť z %1$d webov. Môže ťa to odhlásiť z účtov.</item>
+    </plurals>
 
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Oprávnenia</string>
@@ -925,11 +963,16 @@
     <string name="settingsHeadingCompleteSetup">Dokonči svoje nastavenie</string>
 
     <!--TabSwitcher Trackers Animation-->
-    <string name="showTrackerCountInTabSwitcher">Zobraziť počet sledovačov v prepínači kariet</string>
+    <string name="trackerBlockedInTheLast7days" instruction="Placeholder is 1 tracker blocked">Za posledných 7&amp;nbsp;dní &lt;b&gt;bolo zablokovaných%1$s sledovačov &lt;/b&gt;</string>
     <string name="tabSwitcherAnimationTileRemovalDialogTitle" instruction="A title for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Skryť počet sledovaných položiek?</string>
     <string name="tabSwitcherAnimationTileRemovalDialogBody" instruction="A message for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Túto funkciu môžeš znova zapnúť v časti Nastavenia &gt; Vzhľad.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Skryť</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Ponechať</string>
+
+    <!-- Trackers blocked animation-->
+    <string name="settingsTrackersBlockedAnimationHeaderTitle">Animácia blokovania sledovačov</string>
+    <string name="showTrackerCountInAddressBar">Zobraziť v adresnom riadku</string>
+    <string name="showWeeklyTrackerCountInTabSwitcher">Zobraziť v Správcovi kariet</string>
 
     <!-- Widgets -->
     <string name="searchOnlyWidgetLabel" instruction="Label for the search-only widget">Len vyhľadávanie</string>

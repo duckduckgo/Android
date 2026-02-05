@@ -48,11 +48,13 @@ object JsonRemoteMessageOM {
         titleText: String = "title",
         descriptionText: String = "description",
         placeholder: String = "Announce",
+        imageUrl: String? = null,
     ) = JsonContent(
         messageType = "medium",
         titleText = titleText,
         descriptionText = descriptionText,
         placeholder = placeholder,
+        imageUrl = imageUrl,
     )
 
     fun bigSingleActionJsonContent(
@@ -61,6 +63,7 @@ object JsonRemoteMessageOM {
         placeholder: String = "Announce",
         primaryActionText: String = "Action1",
         primaryAction: JsonMessageAction = jsonMessageAction(),
+        imageUrl: String? = null,
     ) = JsonContent(
         messageType = "big_single_action",
         titleText = titleText,
@@ -68,6 +71,7 @@ object JsonRemoteMessageOM {
         placeholder = placeholder,
         primaryActionText = primaryActionText,
         primaryAction = primaryAction,
+        imageUrl = imageUrl,
     )
 
     fun bigTwoActionJsonContent(
@@ -78,6 +82,7 @@ object JsonRemoteMessageOM {
         primaryAction: JsonMessageAction = jsonMessageAction(),
         secondaryActionText: String = "Action2",
         secondaryAction: JsonMessageAction = jsonMessageAction(),
+        imageUrl: String? = null,
     ) = JsonContent(
         messageType = "big_two_action",
         titleText = titleText,
@@ -87,14 +92,16 @@ object JsonRemoteMessageOM {
         primaryAction = primaryAction,
         secondaryActionText = secondaryActionText,
         secondaryAction = secondaryAction,
+        imageUrl = imageUrl,
     )
 
     fun promoSingleActionJsonContent(
         titleText: String = "title",
         descriptionText: String = "description",
-        placeholder: String = "NewForMacAndWindows",
+        placeholder: String = "MacAndWindows",
         actionText: String = "Action",
         action: JsonMessageAction = jsonMessageAction(),
+        imageUrl: String? = null,
     ) = JsonContent(
         messageType = "promo_single_action",
         titleText = titleText,
@@ -102,6 +109,7 @@ object JsonRemoteMessageOM {
         placeholder = placeholder,
         actionText = actionText,
         action = action,
+        imageUrl = imageUrl,
     )
 
     fun cardsListJsonContent(
@@ -118,6 +126,7 @@ object JsonRemoteMessageOM {
                 descriptionText = "Item Description 1",
                 placeholder = "ImageAI",
                 primaryAction = jsonMessageAction(),
+                primaryActionText = "Item Action 1",
             ),
             JsonListItem(
                 id = "item2",
@@ -126,8 +135,10 @@ object JsonRemoteMessageOM {
                 descriptionText = "Item Description 2",
                 placeholder = "Radar",
                 primaryAction = jsonMessageAction(),
+                primaryActionText = "Item Action 2",
             ),
         ),
+        imageUrl: String? = null,
     ) = JsonContent(
         messageType = "cards_list",
         titleText = titleText,
@@ -136,6 +147,7 @@ object JsonRemoteMessageOM {
         primaryActionText = primaryActionText,
         primaryAction = primaryAction,
         listItems = listItems,
+        imageUrl = imageUrl,
     )
 
     fun emptyJsonContent(messageType: String = "") = JsonContent(messageType = messageType)

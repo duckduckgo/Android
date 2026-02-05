@@ -60,8 +60,8 @@
     <string name="undoSnackbarAction">Kumoa</string>
     <!-- Trackers blocked animation-->
     <plurals name="trackersBlockedAnimationMessage" tools:ignore="ImpliedQuantity">
-        <item quantity="one">trackeri estetty</item>
-        <item quantity="other">trackereita estetty</item>
+        <item quantity="one">seurantatoiminto estetty</item>
+        <item quantity="other">seurantatoimintoa estetty</item>
     </plurals>
 
     <!-- Downloading files -->
@@ -128,6 +128,7 @@
     <string name="settingsMenuItemTitle">Asetukset</string>
     <string name="settingsHeadingProtections">Suojaukset</string>
     <string name="settingsHeadingAppearance">Ulkoasu</string>
+    <string name="settingsWhatsNew">Mitä uutta</string>
     <string name="settingsHeadingAbout">Tietoa meistä</string>
     <string name="settingsAboutDuckduckgo">Tietoa DuckDuckGosta</string>
     <string name="settingsVersion">Versio</string>
@@ -212,6 +213,37 @@
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Fire-painike</string>
     <string name="dataClearingActivityTitle">Datan tyhjentäminen</string>
+    <string name="dataClearingDescription">Tietojesi poistaminen voi auttaa suojaamaan yksityisyyttäsi verkossa. Tyhjennä tiedot manuaalisesti Fire Buttonilla tai määritä automaattinen tyhjennys.</string>
+    <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
+        <item quantity="one">%1$d kohde jätettiin poiston ulkopuolelle</item>
+        <item quantity="other">%1$d kohdetta jätettiin poiston ulkopuolelle</item>
+    </plurals>
+    <string name="dataClearingAutomaticClearingOn">Päällä</string>
+    <string name="dataClearingAutomaticClearingOff">Pois</string>
+    <string name="dataClearingClearBrowsingData">Poista selaustiedot</string>
+    <string name="dataClearingAutomaticDataClearing">Automaattinen tietojen tyhjennys</string>
+    <string name="dataClearingAutomaticallyClearDataToggle">Tyhjennä tiedot automaattisesti</string>
+    <string name="dataClearingAutomaticTabsOptionDescription">Sulje kaikki avoimet välilehdet</string>
+    <string name="dataClearingAutomaticDataOptionDescription">Poista kaikki sivuston tiedot, mukaan lukien vieraillut sivustot. Saattaa kirjata sinut ulos tileiltä.</string>
+    <string name="dataClearingAutomaticChatsOptionDescription">Poista kaikki keskustelut, myös kiinnitetyt keskustelut</string>
+
+    <!-- Fire Dialog Granular Options -->
+    <string name="fireDialogTitle">Valitse, mitä poistetaan</string>
+    <string name="dataClearingOptionTabs">Välilehdet</string>
+    <string name="dataClearingOptionData">Evästeet ja sivuston tiedot</string>
+    <string name="dataClearingDuckAiChats">Duck.ai-keskustelut</string>
+    <string name="fireDialogOptionDuckAiChatsDescription">Poista kaikki keskustelut</string>
+    <string name="fireDialogDeleteButton">Poista</string>
+    <plurals name="fireDialogOptionTabsDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Sulje välilehti</item>
+        <item quantity="other">Sulje kaikki %1$d välilehteä</item>
+    </plurals>
+    <string name="fireDialogOptionDataDescriptionNoHistory">Saattaa kirjata sinut ulos tileiltä.</string>
+    <string name="fireDialogOptionDescriptionNothingToDelete">Ei mitään</string>
+    <plurals name="fireDialogOptionDataDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Poista yhdeltä sivustolta. Saattaa kirjata sinut ulos tileiltä.</item>
+        <item quantity="other">Poista %1$d sivustolta. Saattaa kirjata sinut ulos tileiltä.</item>
+    </plurals>
 
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Käyttöoikeudet</string>
@@ -893,11 +925,16 @@
     <string name="settingsHeadingCompleteSetup">Viimeistele asennuksesi</string>
 
     <!--TabSwitcher Trackers Animation-->
-    <string name="showTrackerCountInTabSwitcher">Näytä seurantaohjelmien määrä välilehtien vaihtotyökalussa</string>
+    <string name="trackerBlockedInTheLast7days" instruction="Placeholder is 1 tracker blocked">&lt;b&gt;%1$s seurantaohjelma estetty &lt;/b&gt; edellisen seitsemän päivän aikana</string>
     <string name="tabSwitcherAnimationTileRemovalDialogTitle" instruction="A title for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Piilotetaanko seurantalaskuri?</string>
     <string name="tabSwitcherAnimationTileRemovalDialogBody" instruction="A message for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Voit ottaa tämän takaisin käyttöön kohdassa Asetukset &gt; Ulkoasu.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Piilota</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Säilytä</string>
+
+    <!-- Trackers blocked animation-->
+    <string name="settingsTrackersBlockedAnimationHeaderTitle">Seurantaohjelmien estetty animaatio</string>
+    <string name="showTrackerCountInAddressBar">Näytä osoitekentässä</string>
+    <string name="showWeeklyTrackerCountInTabSwitcher">Näytä välilehtien hallinnassa</string>
 
     <!-- Widgets -->
     <string name="searchOnlyWidgetLabel" instruction="Label for the search-only widget">Vain haku</string>

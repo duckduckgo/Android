@@ -39,11 +39,15 @@ interface DuckChatFeatureRepository {
 
     suspend fun setShowInVoiceSearch(showToggle: Boolean)
 
+    suspend fun setAutomaticPageContextAttachment(isEnabled: Boolean)
+
     fun observeDuckChatUserEnabled(): Flow<Boolean>
 
     fun observeInputScreenUserSettingEnabled(): Flow<Boolean>
 
     fun observeCosmeticInputScreenUserSettingEnabled(): Flow<Boolean?>
+
+    fun observeAutomaticContextAttachmentUserSettingEnabled(): Flow<Boolean>
 
     fun observeShowInBrowserMenu(): Flow<Boolean>
 
@@ -56,6 +60,8 @@ interface DuckChatFeatureRepository {
     suspend fun isInputScreenUserSettingEnabled(): Boolean
 
     suspend fun isFullScreenModeUserSettingEnabled(): Boolean
+
+    suspend fun isAutomaticPageContextAttachmentUserSettingEnabled(): Boolean
 
     suspend fun shouldShowInBrowserMenu(): Boolean
 
@@ -70,6 +76,18 @@ interface DuckChatFeatureRepository {
     suspend fun lastSessionTimestamp(): Long
 
     suspend fun sessionDeltaInMinutes(): Long
+
+    suspend fun setAppBackgroundTimestamp(timestamp: Long?)
+
+    suspend fun getAppBackgroundTimestamp(): Long?
+
+    suspend fun setAIChatHistoryEnabled(enabled: Boolean)
+
+    suspend fun isAIChatHistoryEnabled(): Boolean
+
+    suspend fun setContextualOnboardingCompleted(completed: Boolean)
+
+    suspend fun isContextualOnboardingCompleted(): Boolean
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -102,11 +120,18 @@ class RealDuckChatFeatureRepository @Inject constructor(
         duckChatDataStore.setShowInVoiceSearch(showToggle)
     }
 
+    override suspend fun setAutomaticPageContextAttachment(isEnabled: Boolean) {
+        duckChatDataStore.setAutomaticPageContextAttachment(isEnabled)
+    }
+
     override fun observeDuckChatUserEnabled(): Flow<Boolean> = duckChatDataStore.observeDuckChatUserEnabled()
 
     override fun observeInputScreenUserSettingEnabled(): Flow<Boolean> = duckChatDataStore.observeInputScreenUserSettingEnabled()
 
     override fun observeCosmeticInputScreenUserSettingEnabled(): Flow<Boolean?> = duckChatDataStore.observeCosmeticInputScreenUserSettingEnabled()
+
+    override fun observeAutomaticContextAttachmentUserSettingEnabled(): Flow<Boolean> =
+        duckChatDataStore.observeAutomaticContextAttachmentUserSettingEnabled()
 
     override fun observeShowInBrowserMenu(): Flow<Boolean> = duckChatDataStore.observeShowInBrowserMenu()
 
@@ -119,6 +144,8 @@ class RealDuckChatFeatureRepository @Inject constructor(
     override suspend fun isInputScreenUserSettingEnabled(): Boolean = duckChatDataStore.isInputScreenUserSettingEnabled()
 
     override suspend fun isFullScreenModeUserSettingEnabled(): Boolean = duckChatDataStore.isFullScreenUserSettingEnabled()
+
+    override suspend fun isAutomaticPageContextAttachmentUserSettingEnabled() = duckChatDataStore.isAutomaticPageContextAttachmentEnabled()
 
     override suspend fun shouldShowInBrowserMenu(): Boolean = duckChatDataStore.getShowInBrowserMenu()
 
@@ -138,6 +165,24 @@ class RealDuckChatFeatureRepository @Inject constructor(
     override suspend fun lastSessionTimestamp(): Long = duckChatDataStore.lastSessionTimestamp()
 
     override suspend fun sessionDeltaInMinutes(): Long = duckChatDataStore.sessionDeltaTimestamp() / MS_TO_MINUTES
+
+    override suspend fun setAppBackgroundTimestamp(timestamp: Long?) {
+        duckChatDataStore.setAppBackgroundTimestamp(timestamp)
+    }
+
+    override suspend fun getAppBackgroundTimestamp(): Long? = duckChatDataStore.getAppBackgroundTimestamp()
+
+    override suspend fun setAIChatHistoryEnabled(enabled: Boolean) {
+        duckChatDataStore.setAIChatHistoryEnabled(enabled)
+    }
+
+    override suspend fun isAIChatHistoryEnabled(): Boolean = duckChatDataStore.isAIChatHistoryEnabled()
+
+    override suspend fun setContextualOnboardingCompleted(completed: Boolean) {
+        duckChatDataStore.setContextualOnboardingCompleted(completed)
+    }
+
+    override suspend fun isContextualOnboardingCompleted(): Boolean = duckChatDataStore.isContextualOnboardingCompleted()
 
     private fun updateWidgets() {
         val intent = Intent(AppWidgetManager.ACTION_APPWIDGET_UPDATE)

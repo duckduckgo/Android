@@ -1,23 +1,33 @@
 name: Nightly
 
 on:
-  schedule:
-    - cron: '0 2 * * *' # run at 2 AM UTC
+  workflow_call:
+    inputs:
+      commit:
+        description: 'Specific commit SHA to checkout (optional, defaults to latest)'
+        required: true
+        type: string
   workflow_dispatch:
+    inputs:
+      commit:
+        description: 'Specific commit SHA to checkout (optional, defaults to latest)'
+        required: false
+        type: string
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: ${{ github.workflow_ref }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
   code_formatting:
     name: Code Formatting
-    runs-on: ubuntu-24.04 #https://github.com/actions/runner-images/issues/6709
+    runs-on: android-large-runner
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
+          ref: ${{ inputs.commit || github.sha }}
           fetch-depth: 0 # required due to setting Spotless ratchetFrom
           submodules: recursive
 
@@ -28,19 +38,22 @@ jobs:
           distribution: 'adopt'
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
+        uses: gradle/actions/setup-gradle@v5
+        with:
+          cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
 
       - name: Run Code Formatting Checks
         run: ./gradlew spotlessCheck
 
   unit_tests:
     name: Unit tests
-    runs-on: ubuntu-24.04 #https://github.com/actions/runner-images/issues/6709
+    runs-on: android-large-runner
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
+          ref: ${{ inputs.commit || github.sha }}
           submodules: recursive
 
       - name: Set up JDK version
@@ -50,30 +63,33 @@ jobs:
           distribution: 'adopt'
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
+        uses: gradle/actions/setup-gradle@v5
+        with:
+          cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
 
       - name: JVM tests
         run: ./gradlew jvm_tests
 
       - name: Bundle the JVM checks report
         if: always()
-        run: find . -type d -name 'reports' | zip -@ -r unit-tests-report.zip
+        run: find . -type d -name 'reports' | zip -@ -r unit-tests-report-nightly.zip
 
       - name: Upload the JVM checks report
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: unit-tests-report
-          path: unit-tests-report.zip
+          name: unit-tests-report-nightly
+          path: unit-tests-report-nightly.zip
 
   lint:
     name: Lint
-    runs-on: ubuntu-24.04 #https://github.com/actions/runner-images/issues/6709
+    runs-on: android-large-runner
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
+          ref: ${{ inputs.commit || github.sha }}
           submodules: recursive
 
       - name: Set up JDK version
@@ -88,30 +104,35 @@ jobs:
           go-version: '1.18.3'
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
+        uses: gradle/actions/setup-gradle@v5
+        with:
+          cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
 
       - name: Lint
         run: ./gradlew lint
 
       - name: Bundle the lint report
         if: always()
-        run: find . -name lint-results\* | zip -@ -r lint-report.zip
+        run: find . -name lint-results\* | zip -@ -r lint-report-nightly.zip
 
       - name: Upload the JVM lint report
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: lint-report
-          path: lint-report.zip
+          name: lint-report-nightly
+          path: lint-report-nightly.zip
 
   android_tests:
-    runs-on: ubuntu-24.04 #https://github.com/actions/runner-images/issues/6709
+    runs-on: android-large-runner
     name: Android CI checks
+    env:
+      DEVELOCITY_ACCESS_KEY: ${{ secrets.DEVELOCITY_ACCESS_KEY }}
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
+          ref: ${{ inputs.commit || github.sha }}
           submodules: recursive
 
       - name: Setup jq
@@ -136,7 +157,9 @@ jobs:
         run: echo "$FLANK" > flank.json
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
+        uses: gradle/actions/setup-gradle@v5
+        with:
+          cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
 
       - name: Build
         run: ./gradlew androidTestsBuild
@@ -146,7 +169,7 @@ jobs:
 
       - name: Bundle the Android CI tests report
         if: always()
-        run: find . -type d -name 'fladleResults' | zip -@ -r android-tests-report.zip
+        run: find . -type d -name 'fladleResults' | zip -@ -r android-tests-report-nightly.zip
 
       - name: Generate json file with failures
         if: ${{ failure() }}
@@ -161,8 +184,8 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: android-tests-report
-          path: android-tests-report.zip
+          name: android-tests-report-nightly
+          path: android-tests-report-nightly.zip
 
   create_task_when_failed:
     name: Create Asana task when workflow failed

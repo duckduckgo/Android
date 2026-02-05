@@ -19,6 +19,8 @@ package com.duckduckgo.app.fire
 import android.content.Context
 import com.duckduckgo.app.browser.favicon.FileBasedFaviconPersister.Companion.FAVICON_PERSISTED_DIR
 import com.duckduckgo.app.fire.model.AppCacheExclusionPlugin
+import com.duckduckgo.app.fire.wideevents.DataClearingFlowStep
+import com.duckduckgo.app.fire.wideevents.DataClearingWideEvent
 import com.duckduckgo.app.global.api.NetworkApiCache
 import com.duckduckgo.app.global.file.FileDeleter
 import com.duckduckgo.common.utils.plugins.PluginPoint
@@ -32,12 +34,19 @@ class AndroidAppCacheClearer(
     private val context: Context,
     private val fileDeleter: FileDeleter,
     private val exclusionPlugins: PluginPoint<AppCacheExclusionPlugin>,
+    private val dataClearingWideEvent: DataClearingWideEvent,
 ) : AppCacheClearer {
 
     override suspend fun clearCache() {
         val pluginExclusions = exclusionPlugins.getPlugins().flatMap { it.filenamesExcludedFromDeletion() }
         val exclusions = (FILENAMES_EXCLUDED_FROM_DELETION + pluginExclusions).distinct()
         fileDeleter.deleteContents(context.cacheDir, exclusions)
+            .onSuccess {
+                dataClearingWideEvent.stepSuccess(DataClearingFlowStep.APP_CACHE_CLEAR)
+            }
+            .onFailure { e ->
+                dataClearingWideEvent.stepFailure(DataClearingFlowStep.APP_CACHE_CLEAR, e)
+            }
     }
 
     companion object {

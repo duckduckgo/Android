@@ -40,7 +40,7 @@ interface SegmentCalculation {
     suspend fun computeUserSegmentForActivityType(activityType: ActivityType, atbUsageHistory: List<String>): UserSegment
 
     enum class ActivityType {
-        APP_USE, SEARCH
+        APP_USE, SEARCH, DUCKAI
     }
 
     data class UserSegment(

@@ -50,6 +50,18 @@
             android:orientation="vertical"
             android:paddingBottom="@dimen/keyline_4">
 
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/manualConfigWarning"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?attr/daxColorAccentYellow"
+                android:layout_marginHorizontal="@dimen/keyline_4"
+                android:layout_marginTop="@dimen/keyline_4"
+                android:padding="@dimen/keyline_2"
+                android:text="@string/pirDashboardManualConfigWarning"
+                android:textColor="?attr/daxColorSecondaryText"
+                android:visibility="gone" />
+
             <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -139,6 +151,26 @@
 
             </LinearLayout>
 
+            <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:primaryText="@string/pirDevDebugScanHeader" />
+
+            <Spinner
+                android:id="@+id/scanBrokers"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/keyline_4" />
+
+            <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+                android:id="@+id/debugScan"
+                android:layout_width="180dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="@string/pirDevDebugScan"
+                app:editable="true"
+                app:type="single_line" />
+
             <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
                 android:id="@+id/debugForceKill"
                 android:layout_width="180dp"
@@ -210,6 +242,13 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:text="@string/pirDevViewScanResults" />
+
+            <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+                android:id="@+id/viewExtractedProfiles"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="@string/pirDevViewExtractedProfiles" />
         </LinearLayout>
     </ScrollView>
 </LinearLayout>

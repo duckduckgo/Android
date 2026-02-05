@@ -57,6 +57,7 @@ class FakePixel : Pixel {
         pixel: PixelName,
         parameters: Map<String, String>,
         encodedParameters: Map<String, String>,
+        type: PixelType,
     ) {
         enqueueFire(pixel.pixelName, parameters, encodedParameters)
     }
@@ -65,6 +66,7 @@ class FakePixel : Pixel {
         pixelName: String,
         parameters: Map<String, String>,
         encodedParameters: Map<String, String>,
+        type: PixelType,
     ) {
         firedPixels.add(
             FiredPixel(

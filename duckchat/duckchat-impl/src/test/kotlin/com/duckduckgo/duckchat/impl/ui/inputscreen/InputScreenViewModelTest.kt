@@ -102,11 +102,13 @@ class InputScreenViewModelTest {
                 flowOf(AutoCompleteResult("", listOf(AutoCompleteDefaultSuggestion("suggestion")))),
             )
             whenever(duckChat.wasOpenedBefore()).thenReturn(false)
-            whenever(duckChat.getDuckChatUrl(any(), any())).thenReturn(duckChatURL)
+            whenever(duckChat.getDuckChatUrl(any(), any(), any())).thenReturn(duckChatURL)
             whenever(inputScreenConfigResolver.useTopBar()).thenReturn(true)
             whenever(voiceSearchAvailability.isVoiceSearchAvailable).thenReturn(true)
             whenever(omnibarRepository.omnibarType).thenReturn(OmnibarType.SINGLE_TOP)
             whenever(duckAiFeatureState.showFullScreenMode).thenReturn(fullScreenModeDisabledFlow)
+            whenever(inputScreenSessionStore.hasUsedSearchMode()).thenReturn(false)
+            whenever(inputScreenSessionStore.hasUsedChatMode()).thenReturn(false)
         }
 
     private fun createViewModel(currentOmnibarText: String = ""): InputScreenViewModel =
@@ -581,16 +583,16 @@ class InputScreenViewModelTest {
     }
 
     @Test
-    fun `when onChatInputTextChanged with different text than initial then showChatLogo should be false`() {
+    fun `when onChatInputTextChanged with different text than initial then showChatLogo should be true`() {
         val viewModel = createViewModel("initial text")
 
         viewModel.onChatInputTextChanged("different text")
 
-        assertFalse(viewModel.visibilityState.value.showChatLogo)
+        assertTrue(viewModel.visibilityState.value.showChatLogo)
     }
 
     @Test
-    fun `when onChatInputTextChanged with same initial text but autocomplete suggestions visible then showChatLogo should be false`() =
+    fun `when onChatInputTextChanged with same initial text but autocomplete suggestions visible then showChatLogo should be true`() =
         runTest {
             val initialText = "test query"
             val viewModel = createViewModel(initialText)
@@ -599,60 +601,24 @@ class InputScreenViewModelTest {
 
             viewModel.onChatInputTextChanged(initialText)
 
-            assertFalse(viewModel.visibilityState.value.showChatLogo)
+            assertTrue(viewModel.visibilityState.value.showChatLogo)
         }
 
     @Test
-    fun `when onChatInputTextChanged with web URL then showChatLogo logic still applies`() {
+    fun `when onChatInputTextChanged with web URL then showChatLogo is always true`() {
         val viewModel = createViewModel("https://example.com")
 
         // Initially true (same as initial text, no autocomplete suggestions for URL)
         viewModel.onChatInputTextChanged("https://example.com")
         assertTrue(viewModel.visibilityState.value.showChatLogo)
 
-        // Change to different URL - should be false
+        // Change to different URL - should still be true
         viewModel.onChatInputTextChanged("https://different.com")
-        assertFalse(viewModel.visibilityState.value.showChatLogo)
+        assertTrue(viewModel.visibilityState.value.showChatLogo)
 
         // Change to empty - should be true
         viewModel.onChatInputTextChanged("")
         assertTrue(viewModel.visibilityState.value.showChatLogo)
-    }
-
-    @Test
-    fun `when onChatInputTextChanged with empty query then newLineButtonVisible is false`() {
-        val viewModel = createViewModel()
-
-        viewModel.onChatInputTextChanged("")
-
-        assertFalse(viewModel.visibilityState.value.newLineButtonVisible)
-    }
-
-    @Test
-    fun `when onChatInputTextChanged with non-empty query then newLineButtonVisible is true`() {
-        val viewModel = createViewModel()
-
-        viewModel.onChatInputTextChanged("query")
-
-        assertTrue(viewModel.visibilityState.value.newLineButtonVisible)
-    }
-
-    @Test
-    fun `when onChatInputTextChanged with newline query then newLineButtonVisible is false`() {
-        val viewModel = createViewModel()
-
-        viewModel.onChatInputTextChanged("\n")
-
-        assertFalse(viewModel.visibilityState.value.newLineButtonVisible)
-    }
-
-    @Test
-    fun `when onChatInputTextChanged with query containing text and newlines then newLineButtonVisible is true`() {
-        val viewModel = createViewModel()
-
-        viewModel.onChatInputTextChanged("query\n123")
-
-        assertTrue(viewModel.visibilityState.value.newLineButtonVisible)
     }
 
     @Test
@@ -1173,20 +1139,6 @@ class InputScreenViewModelTest {
         }
 
     @Test
-    fun `when onChatSelected then new line button is visible`() {
-        val viewModel = createViewModel()
-        viewModel.onChatSelected()
-        assertTrue(viewModel.visibilityState.value.newLineButtonVisible)
-    }
-
-    @Test
-    fun `when onSearchSelected then new line button is not visible`() {
-        val viewModel = createViewModel()
-        viewModel.onSearchSelected()
-        assertFalse(viewModel.visibilityState.value.newLineButtonVisible)
-    }
-
-    @Test
     fun `when onSearchSubmitted with newlines then they are replaced with spaces`() =
         runTest {
             val viewModel = createViewModel()
@@ -1456,7 +1408,7 @@ class InputScreenViewModelTest {
         }
 
     @Test
-    fun `when onTabTapped and has content then AnimateLogoToProgress is not emitted`() =
+    fun `when onTabTapped and has content then SetLogoProgress is emitted`() =
         runTest {
             val viewModel = createViewModel()
             val capturedCommands = mutableListOf<Command>()
@@ -1469,6 +1421,66 @@ class InputScreenViewModelTest {
 
             viewModel.onNewTabPageContentChanged(hasContent = true)
             viewModel.onTabTapped(index = 1)
+
+            assertEquals(1, capturedCommands.size)
+            assertEquals(SetLogoProgress(1f), capturedCommands[0])
+        }
+
+    @Test
+    fun `when onTabTapped with input text and autocomplete visible then SetLogoProgress is emitted`() =
+        runTest {
+            val viewModel = createViewModel("search query")
+            val capturedCommands = mutableListOf<Command>()
+
+            viewModel.command.observeForever { command ->
+                if (command != null) {
+                    capturedCommands.add(command)
+                }
+            }
+
+            assertTrue(viewModel.visibilityState.value.autoCompleteSuggestionsVisible)
+            viewModel.onTabTapped(index = 1, currentInputText = "search query")
+
+            assertEquals(1, capturedCommands.size)
+            assertEquals(SetLogoProgress(1f), capturedCommands[0])
+        }
+
+    @Test
+    fun `when onTabTapped with input text but autocomplete not visible then AnimateLogoToProgress is emitted`() =
+        runTest {
+            val viewModel = createViewModel("https://example.com")
+            val capturedCommands = mutableListOf<Command>()
+
+            viewModel.command.observeForever { command ->
+                if (command != null) {
+                    capturedCommands.add(command)
+                }
+            }
+
+            assertFalse(viewModel.visibilityState.value.autoCompleteSuggestionsVisible)
+            viewModel.onTabTapped(index = 1, currentInputText = "https://example.com")
+
+            assertEquals(1, capturedCommands.size)
+            assertEquals(AnimateLogoToProgress(1f), capturedCommands[0])
+        }
+
+    @Test
+    fun `when onTabTapped to search tab with content then no command is emitted`() =
+        runTest {
+            val viewModel = createViewModel()
+            val capturedCommands = mutableListOf<Command>()
+
+            viewModel.command.observeForever { command ->
+                if (command != null) {
+                    capturedCommands.add(command)
+                }
+            }
+
+            viewModel.onNewTabPageContentChanged(hasContent = true)
+            viewModel.onPageSelected(position = 1)
+            capturedCommands.clear()
+
+            viewModel.onTabTapped(index = 0)
 
             assertEquals(0, capturedCommands.size)
         }
@@ -1521,7 +1533,7 @@ class InputScreenViewModelTest {
         }
 
     @Test
-    fun `when onPageScrolled and has content then SetLogoProgress is 1f`() =
+    fun `when onPageScrolled and has content then SetLogoProgress is not emitted`() =
         runTest {
             val viewModel = createViewModel()
             val capturedCommands = mutableListOf<Command>()
@@ -1540,9 +1552,8 @@ class InputScreenViewModelTest {
 
             viewModel.onPageScrolled(position, positionOffset)
 
-            assertEquals(2, capturedCommands.size)
-            assertEquals(SetLogoProgress(1f), capturedCommands[0])
-            assertEquals(SetInputModeWidgetScrollPosition(position = position, offset = easedOffset), capturedCommands[1])
+            assertEquals(1, capturedCommands.size)
+            assertEquals(SetInputModeWidgetScrollPosition(position = position, offset = easedOffset), capturedCommands[0])
         }
 
     @Test
@@ -1566,6 +1577,86 @@ class InputScreenViewModelTest {
             viewModel.onPageScrolled(position, positionOffset)
 
             assertEquals(0, capturedCommands.size)
+        }
+
+    @Test
+    fun `when onPageScrolled with wasAutoCompleteVisibleOnSwipeStart true then SetLogoProgress is not emitted`() =
+        runTest {
+            val viewModel = createViewModel()
+            val capturedCommands = mutableListOf<Command>()
+
+            viewModel.command.observeForever { command ->
+                if (command != null) {
+                    capturedCommands.add(command)
+                }
+            }
+
+            val position = 0
+            val positionOffset = 0.3f
+            val easedOffset = positionOffset * positionOffset * 2f
+
+            viewModel.onPageScrolled(
+                position = position,
+                positionOffset = positionOffset,
+                wasAutoCompleteVisibleOnSwipeStart = true,
+            )
+
+            assertEquals(1, capturedCommands.size)
+            assertEquals(SetInputModeWidgetScrollPosition(position = position, offset = easedOffset), capturedCommands[0])
+        }
+
+    @Test
+    fun `when onPageScrolled with hadInputTextOnSwipeStart true then SetLogoProgress is not emitted`() =
+        runTest {
+            val viewModel = createViewModel()
+            val capturedCommands = mutableListOf<Command>()
+
+            viewModel.command.observeForever { command ->
+                if (command != null) {
+                    capturedCommands.add(command)
+                }
+            }
+
+            val position = 0
+            val positionOffset = 0.3f
+            val easedOffset = positionOffset * positionOffset * 2f
+
+            viewModel.onPageScrolled(
+                position = position,
+                positionOffset = positionOffset,
+                hadInputTextOnSwipeStart = true,
+            )
+
+            assertEquals(1, capturedCommands.size)
+            assertEquals(SetInputModeWidgetScrollPosition(position = position, offset = easedOffset), capturedCommands[0])
+        }
+
+    @Test
+    fun `when onPageScrolled with both swipe start flags false then SetLogoProgress is emitted`() =
+        runTest {
+            val viewModel = createViewModel()
+            val capturedCommands = mutableListOf<Command>()
+
+            viewModel.command.observeForever { command ->
+                if (command != null) {
+                    capturedCommands.add(command)
+                }
+            }
+
+            val position = 0
+            val positionOffset = 0.3f
+            val easedOffset = positionOffset * positionOffset * 2f
+
+            viewModel.onPageScrolled(
+                position = position,
+                positionOffset = positionOffset,
+                wasAutoCompleteVisibleOnSwipeStart = false,
+                hadInputTextOnSwipeStart = false,
+            )
+
+            assertEquals(2, capturedCommands.size)
+            assertEquals(SetLogoProgress(positionOffset), capturedCommands[0])
+            assertEquals(SetInputModeWidgetScrollPosition(position = position, offset = easedOffset), capturedCommands[1])
         }
 
     @Test
@@ -2044,5 +2135,60 @@ class InputScreenViewModelTest {
 
             verify(pixel).fire(DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_KEYBOARD_USAGE)
             verify(pixel).fire(DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_KEYBOARD_USAGE_DAILY, type = Daily())
+        }
+
+    @Test
+    fun `when userSelectedAutocomplete with DuckAI prompt and fullscreen disabled then SubmitChat command sent and openDuckChatWithAutoPrompt`() =
+        runTest {
+            whenever(duckAiFeatureState.showFullScreenMode).thenReturn(fullScreenModeDisabledFlow)
+
+            val viewModel = createViewModel()
+            val prompt = "prompt"
+
+            viewModel.userSelectedAutocomplete(AutoCompleteSuggestion.AutoCompleteDuckAIPrompt(prompt))
+
+            assertEquals(SubmitChat(prompt), viewModel.command.value)
+            verify(duckChat).openDuckChatWithAutoPrompt(prompt)
+        }
+
+    @Test
+    fun `when userSelectedAutocomplete with DuckAI prompt and fullscreen enabled then onChatSubmitted`() =
+        runTest {
+            whenever(duckAiFeatureState.showFullScreenMode).thenReturn(fullScreenModeEnabledFlow)
+
+            val viewModel = createViewModel()
+
+            viewModel.userSelectedAutocomplete(AutoCompleteSuggestion.AutoCompleteDuckAIPrompt("prompt"))
+
+            assertEquals(SubmitSearch(duckChatURL), viewModel.command.value)
+            verify(duckChat, never()).openDuckChatWithAutoPrompt(any())
+        }
+
+    @Test
+    fun `when userSelectedAutocomplete with DuckAI prompt and DuckAI was used before then pixel fired with was_used_before true`() =
+        runTest {
+            whenever(duckAiFeatureState.showFullScreenMode).thenReturn(fullScreenModeDisabledFlow)
+            whenever(duckChat.wasOpenedBefore()).thenReturn(true)
+
+            createViewModel().userSelectedAutocomplete(AutoCompleteSuggestion.AutoCompleteDuckAIPrompt("prompt"))
+
+            verify(pixel).fire(
+                DuckChatPixelName.DUCK_CHAT_OPEN_AUTOCOMPLETE_EXPERIMENTAL,
+                parameters = mapOf(DuckChatPixelParameters.WAS_USED_BEFORE to true.toBinaryString()),
+            )
+        }
+
+    @Test
+    fun `when userSelectedAutocomplete with DuckAI prompt and DuckAI was not used before then pixel fired with was_used_before false`() =
+        runTest {
+            whenever(duckAiFeatureState.showFullScreenMode).thenReturn(fullScreenModeDisabledFlow)
+            whenever(duckChat.wasOpenedBefore()).thenReturn(false)
+
+            createViewModel().userSelectedAutocomplete(AutoCompleteSuggestion.AutoCompleteDuckAIPrompt("prompt"))
+
+            verify(pixel).fire(
+                DuckChatPixelName.DUCK_CHAT_OPEN_AUTOCOMPLETE_EXPERIMENTAL,
+                parameters = mapOf(DuckChatPixelParameters.WAS_USED_BEFORE to false.toBinaryString()),
+            )
         }
 }

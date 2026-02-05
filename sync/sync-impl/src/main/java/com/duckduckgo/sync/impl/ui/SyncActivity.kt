@@ -462,6 +462,12 @@ class SyncActivity : DuckDuckGoActivity() {
                 syncSetupWithAnotherDevice.isEnabled = !viewState.disabledSetupFlows.contains(SetupFlows.CreateAccountFlow)
                 syncSetupSyncThisDevice.isEnabled = !viewState.disabledSetupFlows.contains(SetupFlows.CreateAccountFlow)
                 syncSetupRecoverData.isEnabled = !viewState.disabledSetupFlows.contains(SetupFlows.SignInFlow)
+                val subtitleRes = if (viewState.aiChatSyncEnabled) {
+                    R.string.sync_setup_with_another_device_cta_subtitle_with_ai_chat
+                } else {
+                    R.string.sync_setup_with_another_device_cta_subtitle
+                }
+                syncSetupWithAnotherDevice.setSecondaryText(getString(subtitleRes))
             }
         }
     }

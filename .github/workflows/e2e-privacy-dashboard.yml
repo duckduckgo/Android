@@ -1,0 +1,68 @@
+name: 'End to End Tests - Privacy Dashboard (On Demand)'
+
+on:
+  pull_request:
+    paths:
+      - 'node_modules/@duckduckgo/privacy-dashboard/**'
+      - 'privacy-dashboard/privacy-dashboard-api/**'
+      - 'privacy-dashboard/privacy-dashboard-impl/**'
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  instrumentation_tests:
+    runs-on: ubuntu-latest
+    name: End-to-End tests
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Assemble APKs
+        id: assemble
+        uses: ./.github/actions/checkout-and-assemble
+        with:
+          flavours: 'play'
+          release_properties: ${{ secrets.FAKE_RELEASE_PROPERTIES }}
+          release_key: ${{ secrets.FAKE_RELEASE_KEY }}
+          gradle_encryption_key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
+          develocity_access_key: ${{ secrets.DEVELOCITY_ACCESS_KEY }}
+
+      - name: Run Ad Click Maestro Tests
+        id: maestro-ad-click
+        uses: ./.github/actions/maestro-cloud-asana-reporter
+        timeout-minutes: 120
+        with:
+          maestro_api_key: ${{ secrets.ROBIN_API_KEY }}
+          maestro_project_id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
+          maestro_test_name: privacyDashboard_adClickTest_${{ github.sha }}
+          maestro_timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
+          maestro_app_file: ${{ steps.assemble.outputs.play_apk_path }}
+          maestro_include_tags: adClickTest
+          maestro_api_level: 30
+          asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          asana_project_id: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
+          asana_section_id: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
+          test_suite_name: Ad Click (Privacy Dashboard)
+
+      - name: Run Privacy Maestro Tests
+        id: maestro-privacy-tests
+        uses: ./.github/actions/maestro-cloud-asana-reporter
+        timeout-minutes: 120
+        with:
+          maestro_api_key: ${{ secrets.ROBIN_API_KEY }}
+          maestro_project_id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
+          maestro_test_name: privacyDashboard_privacyTest_${{ github.sha }}
+          maestro_timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
+          maestro_app_file: ${{ steps.assemble.outputs.play_apk_path }}
+          maestro_include_tags: privacyTest
+          maestro_api_level: 30
+          asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          asana_project_id: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
+          asana_section_id: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
+          test_suite_name: Privacy Tests (Privacy Dashboard)

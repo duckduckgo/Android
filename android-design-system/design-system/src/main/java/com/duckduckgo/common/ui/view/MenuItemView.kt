@@ -69,6 +69,8 @@ constructor(
                 R.drawable.ic_globe_16,
             ),
         )
+        val attrSizeValue = attributes.getInt(R.styleable.MenuItemView_menuSize, 0)
+        setSize(MenuItemViewSize.getMenuItemSize(attrSizeValue))
         updateContentDescription()
         attributes.recycle()
     }
@@ -87,7 +89,42 @@ constructor(
         binding.icon.setImageResource(iconResId)
     }
 
+    fun setSize(size: MenuItemViewSize) {
+        val dimensionSize = when (size) {
+            MenuItemViewSize.SMALL -> resources.getDimensionPixelSize(R.dimen.keyline_4)
+            MenuItemViewSize.MEDIUM -> resources.getDimensionPixelSize(R.dimen.keyline_5)
+        }
+        binding.icon.layoutParams = binding.icon.layoutParams.apply {
+            width = dimensionSize
+            height = dimensionSize
+        }
+        val marginStart = when (size) {
+            MenuItemViewSize.SMALL -> resources.getDimensionPixelSize(R.dimen.keyline_2)
+            MenuItemViewSize.MEDIUM -> resources.getDimensionPixelSize(R.dimen.keyline_4)
+        }
+        binding.label.layoutParams = (binding.label.layoutParams as MarginLayoutParams).apply {
+            this.marginStart = marginStart
+        }
+        invalidate()
+    }
+
     private fun updateContentDescription() {
         binding.root.contentDescription = binding.label.text
+    }
+}
+
+enum class MenuItemViewSize {
+    SMALL,
+    MEDIUM,
+    ;
+
+    companion object {
+        fun getMenuItemSize(attrValue: Int): MenuItemViewSize {
+            return when (attrValue) {
+                0 -> SMALL
+                1 -> MEDIUM
+                else -> SMALL
+            }
+        }
     }
 }

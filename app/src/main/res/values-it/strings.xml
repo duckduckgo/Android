@@ -60,8 +60,8 @@
     <string name="undoSnackbarAction">Annulla</string>
     <!-- Trackers blocked animation-->
     <plurals name="trackersBlockedAnimationMessage" tools:ignore="ImpliedQuantity">
-        <item quantity="one">Tracciamento</item>
-        <item quantity="other">Tracciamento</item>
+        <item quantity="one">Sistema di tracciamento bloccato</item>
+        <item quantity="other">Sistemi di tracciamento bloccati</item>
     </plurals>
 
     <!-- Downloading files -->
@@ -128,6 +128,7 @@
     <string name="settingsMenuItemTitle">Impostazioni</string>
     <string name="settingsHeadingProtections">Protezioni</string>
     <string name="settingsHeadingAppearance">Aspetto</string>
+    <string name="settingsWhatsNew">Novità</string>
     <string name="settingsHeadingAbout">Informazioni</string>
     <string name="settingsAboutDuckduckgo">Informazioni su DuckDuckGo</string>
     <string name="settingsVersion">Versione</string>
@@ -212,6 +213,37 @@
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Fire Button</string>
     <string name="dataClearingActivityTitle">Cancellazione dati</string>
+    <string name="dataClearingDescription">L\'eliminazione dei tuoi dati aiuta a proteggere la tua privacy online. Utilizza il Fire Button per eliminare i dati manualmente, o imposta la cancellazione automatica.</string>
+    <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
+        <item quantity="one">%1$d sito escluso dalla cancellazione</item>
+        <item quantity="other">%1$d siti esclusi dalla cancellazione</item>
+    </plurals>
+    <string name="dataClearingAutomaticClearingOn">On</string>
+    <string name="dataClearingAutomaticClearingOff">Disabilitato</string>
+    <string name="dataClearingClearBrowsingData">Cancella i dati di navigazione</string>
+    <string name="dataClearingAutomaticDataClearing">Cancellazione automatica dei dati</string>
+    <string name="dataClearingAutomaticallyClearDataToggle">Cancellazione automatica dei dati</string>
+    <string name="dataClearingAutomaticTabsOptionDescription">Chiudi tutte le schede aperte</string>
+    <string name="dataClearingAutomaticDataOptionDescription">Elimina tutti i dati del sito, inclusi i siti visitati. Potrebbe disconnetterti dagli account.</string>
+    <string name="dataClearingAutomaticChatsOptionDescription">Elimina tutte le chat, comprese quelle fissate</string>
+
+    <!-- Fire Dialog Granular Options -->
+    <string name="fireDialogTitle">Scegli cosa eliminare</string>
+    <string name="dataClearingOptionTabs">Schede</string>
+    <string name="dataClearingOptionData">Cookie e dati del sito</string>
+    <string name="dataClearingDuckAiChats">Chat di Duck.ai</string>
+    <string name="fireDialogOptionDuckAiChatsDescription">Elimina tutte le chat</string>
+    <string name="fireDialogDeleteButton">Elimina</string>
+    <plurals name="fireDialogOptionTabsDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Chiudi scheda</item>
+        <item quantity="other">Chiudi tutte le %1$d schede</item>
+    </plurals>
+    <string name="fireDialogOptionDataDescriptionNoHistory">Potrebbe disconnetterti dagli account.</string>
+    <string name="fireDialogOptionDescriptionNothingToDelete">Niente</string>
+    <plurals name="fireDialogOptionDataDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Elimina da 1 sito. Potrebbe disconnetterti dagli account.</item>
+        <item quantity="other">Elimina da %1$d siti. Potrebbe disconnetterti dagli account.</item>
+    </plurals>
 
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Autorizzazioni</string>
@@ -893,11 +925,16 @@
     <string name="settingsHeadingCompleteSetup">Completa la configurazione</string>
 
     <!--TabSwitcher Trackers Animation-->
-    <string name="showTrackerCountInTabSwitcher">Mostra il numero dei sistemi di tracciamento nel Selettore schede</string>
+    <string name="trackerBlockedInTheLast7days" instruction="Placeholder is 1 tracker blocked">&lt;b&gt;%1$s sistemi di tracciamento bloccati &lt;/b&gt; negli ultimi 7 giorni</string>
     <string name="tabSwitcherAnimationTileRemovalDialogTitle" instruction="A title for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Nascondere il conteggio dei sistemi di tracciamento?</string>
     <string name="tabSwitcherAnimationTileRemovalDialogBody" instruction="A message for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Puoi riattivarlo in Impostazioni &gt; Aspetto.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Nascondi</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Tieni</string>
+
+    <!-- Trackers blocked animation-->
+    <string name="settingsTrackersBlockedAnimationHeaderTitle">Animazione dei sistemi di tracciamento bloccati</string>
+    <string name="showTrackerCountInAddressBar">Mostra nella barra degli indirizzi</string>
+    <string name="showWeeklyTrackerCountInTabSwitcher">Mostra in Gestore schede</string>
 
     <!-- Widgets -->
     <string name="searchOnlyWidgetLabel" instruction="Label for the search-only widget">Solo ricerca</string>

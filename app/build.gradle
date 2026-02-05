@@ -261,6 +261,9 @@ dependencies {
 	implementation project(":verified-installation-impl")
 	implementation project(":verified-installation-api")
 
+	implementation project(":modal-coordinator-impl")
+	implementation project(":modal-coordinator-api")
+
     implementation project(':navigation-api')
     implementation project(':navigation-impl')
 
@@ -433,6 +436,9 @@ dependencies {
     implementation project(':serp-logos-api')
     implementation project(':serp-logos-impl')
 
+    // Widgets
+    implementation "androidx.core:core-remoteviews:1.1.0"
+
     // Deprecated. TODO: Stop using this artifact.
     implementation "androidx.legacy:legacy-support-v4:_"
     debugImplementation Square.leakCanary.android
@@ -532,10 +538,6 @@ dependencies {
 
     // Browser
     implementation "androidx.browser:browser:_"
-
-    // Flipper
-    internalImplementation "com.facebook.flipper:flipper:_"
-    internalImplementation "com.facebook.soloader:soloader:_"
 
     // Testing dependencies
     androidTestUtil AndroidX.test.orchestrator

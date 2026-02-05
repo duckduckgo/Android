@@ -147,6 +147,7 @@ class SubscriptionMessagingInterface @Inject constructor(
         override val methods: List<String> = listOf(
             "subscriptionSelected",
             "getSubscriptionOptions",
+            "getSubscriptionTierOptions",
             "backToSettings",
             "activateSubscription",
             "featureSelected",
@@ -207,7 +208,6 @@ class SubscriptionMessagingInterface @Inject constructor(
         override fun process(jsMessage: JsMessage, jsMessaging: JsMessaging, jsMessageCallback: JsMessageCallback?) {
             try {
                 val token = jsMessage.params.getString("token")
-                pixelSender.reportAuthV1SignInAttempt()
                 appCoroutineScope.launch(dispatcherProvider.io()) {
                     subscriptionsManager.signInV1(token)
                     subscriptionsChecker.runChecker()
@@ -409,10 +409,12 @@ class SubscriptionMessagingInterface @Inject constructor(
             val authV2Enabled = privacyProFeature.enableSubscriptionFlowsV2().isEnabled()
             val duckAiSubscriberModelsEnabled = privacyProFeature.duckAiPlus().isEnabled()
             val supportsAlternateStripePaymentFlow = privacyProFeature.supportsAlternateStripePaymentFlow().isEnabled()
+            val useGetSubscriptionTierOptions = privacyProFeature.tierMessagingEnabled().isEnabled()
             val resultJson = JSONObject().apply {
                 put("useSubscriptionsAuthV2", authV2Enabled)
                 put("usePaidDuckAi", duckAiSubscriberModelsEnabled)
                 put("useAlternateStripePaymentFlow", supportsAlternateStripePaymentFlow)
+                put("useGetSubscriptionTierOptions", useGetSubscriptionTierOptions)
             }
 
             val response = JsRequestResponse.Success(

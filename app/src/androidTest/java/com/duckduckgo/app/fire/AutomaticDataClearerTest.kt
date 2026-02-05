@@ -25,6 +25,7 @@ import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
 import androidx.work.WorkRequest
 import com.duckduckgo.app.fire.store.FireDataStore
+import com.duckduckgo.app.fire.wideevents.DataClearingWideEvent
 import com.duckduckgo.app.global.view.ClearDataAction
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.clear.ClearWhatOption
@@ -76,6 +77,7 @@ class AutomaticDataClearerTest {
             coroutineTestRule.testScope,
             coroutineTestRule.testDispatcherProvider,
         )
+    private val dataClearingWideEvent: DataClearingWideEvent = mock()
 
     @UiThreadTest
     @Before
@@ -91,6 +93,7 @@ class AutomaticDataClearerTest {
             dataClearerForegroundAppRestartPixel = dataClearerForegroundAppRestartPixel,
             dispatchers = coroutineTestRule.testDispatcherProvider,
             fireDataStore = mockFireDataStore,
+            dataClearingWideEvent = dataClearingWideEvent,
         )
     }
 
@@ -770,11 +773,11 @@ class AutomaticDataClearerTest {
     }
 
     private fun enableGranularFeature() {
-        fakeAndroidBrowserConfigFeature.moreGranularDataClearingOptions().setRawStoredState(State(true))
+        fakeAndroidBrowserConfigFeature.improvedDataClearingOptions().setRawStoredState(State(true))
     }
 
     private fun disableGranularFeature() {
-        fakeAndroidBrowserConfigFeature.moreGranularDataClearingOptions().setRawStoredState(State(false))
+        fakeAndroidBrowserConfigFeature.improvedDataClearingOptions().setRawStoredState(State(false))
     }
 
     private suspend fun configureShouldClearAutomatically(shouldClear: Boolean) {

@@ -68,7 +68,7 @@ class DuckChatSettingsViewModelTest {
             whenever(duckChat.observeShowInAddressBarUserSetting()).thenReturn(flowOf(false))
             whenever(duckChat.observeCosmeticInputScreenUserSettingEnabled()).thenReturn(flowOf(null))
             whenever(duckChat.observeInputScreenUserSettingEnabled()).thenReturn(flowOf(false))
-            whenever(duckChat.isDuckChatFullScreenModeFeatureAvailable()).thenReturn(false)
+            whenever(duckChat.observeAutomaticContextAttachmentUserSettingEnabled()).thenReturn(flowOf(false))
             testee = DuckChatSettingsViewModel(
                 duckChatActivityParams = DuckChatSettingsNoParams,
                 duckChat = duckChat,
@@ -106,20 +106,6 @@ class DuckChatSettingsViewModelTest {
         runTest {
             testee.onShowDuckChatInMenuToggled(true)
             verify(duckChat).setShowInBrowserMenuUserSetting(true)
-        }
-
-    @Test
-    fun whenShowDuckChatInAddressBarDisabledThenSetUserSetting() =
-        runTest {
-            testee.onShowDuckChatInAddressBarToggled(false)
-            verify(duckChat).setShowInAddressBarUserSetting(false)
-        }
-
-    @Test
-    fun whenShowDuckChatInAddressBarEnabledThenSetUserSetting() =
-        runTest {
-            testee.onShowDuckChatInAddressBarToggled(true)
-            verify(duckChat).setShowInAddressBarUserSetting(true)
         }
 
     @Test
@@ -454,20 +440,6 @@ class DuckChatSettingsViewModelTest {
         }
 
     @Test
-    fun `when onShowDuckChatInAddressBarToggled true then on pixel fired`() =
-        runTest {
-            testee.onShowDuckChatInAddressBarToggled(true)
-            verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_SEARCHBAR_SETTING_ON)
-        }
-
-    @Test
-    fun `when onShowDuckChatInAddressBarToggled false then off pixel fired`() =
-        runTest {
-            testee.onShowDuckChatInAddressBarToggled(false)
-            verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_SEARCHBAR_SETTING_OFF)
-        }
-
-    @Test
     fun `when Duck ai shortcuts clicked, then dispatch launch command`() =
         runTest {
             testee.onDuckAiShortcutsClicked()
@@ -593,6 +565,117 @@ class DuckChatSettingsViewModelTest {
                 )
                 assertEquals(R.string.duckAiSerpSettingsTitle, command.titleRes)
                 cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun whenAutomaticContextAttachmentToggledThenSetUserSetting() =
+        runTest {
+            testee.onAutomaticContextAttachmentToggled(true)
+            verify(duckChat).setAutomaticPageContextUserSetting(true)
+        }
+
+    @Test
+    fun `view state - automatic context enabled then set correct state`() =
+        runTest {
+            whenever(duckChat.observeAutomaticContextAttachmentUserSettingEnabled()).thenReturn(flowOf(true))
+
+            testee = DuckChatSettingsViewModel(
+                duckChatActivityParams = DuckChatNativeSettingsNoParams,
+                duckChat = duckChat,
+                pixel = mockPixel,
+                inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
+                settingsPageFeature = settingsPageFeature,
+                dispatcherProvider = coroutineRule.testDispatcherProvider,
+                duckChatFeature = duckChatFeature,
+            )
+
+            testee.viewState.test {
+                assertTrue(awaitItem().isAutomaticContextEnabled)
+            }
+        }
+
+    @Test
+    fun `view state - automatic context disabled then set correct state`() =
+        runTest {
+            whenever(duckChat.observeAutomaticContextAttachmentUserSettingEnabled()).thenReturn(flowOf(false))
+            testee = DuckChatSettingsViewModel(
+                duckChatActivityParams = DuckChatNativeSettingsNoParams,
+                duckChat = duckChat,
+                pixel = mockPixel,
+                inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
+                settingsPageFeature = settingsPageFeature,
+                dispatcherProvider = coroutineRule.testDispatcherProvider,
+                duckChatFeature = duckChatFeature,
+            )
+
+            testee.viewState.test {
+                assertFalse(awaitItem().isAutomaticContextEnabled)
+            }
+        }
+
+    @Test
+    fun `view state - automatic context visible when flag enabled and duck chat enabled`() =
+        runTest {
+            whenever(duckChat.observeEnableDuckChatUserSetting()).thenReturn(flowOf(true))
+            whenever(duckChat.observeAutomaticContextAttachmentUserSettingEnabled()).thenReturn(flowOf(false))
+            @Suppress("DenyListedApi")
+            duckChatFeature.contextualMode().setRawStoredState(State(enable = true))
+            testee = DuckChatSettingsViewModel(
+                duckChatActivityParams = DuckChatNativeSettingsNoParams,
+                duckChat = duckChat,
+                pixel = mockPixel,
+                inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
+                settingsPageFeature = settingsPageFeature,
+                dispatcherProvider = coroutineRule.testDispatcherProvider,
+                duckChatFeature = duckChatFeature,
+            )
+
+            testee.viewState.test {
+                assertTrue(awaitItem().isAutomaticContextVisible)
+            }
+        }
+
+    @Test
+    fun `view state - automatic context hidden when flag enabled but duck chat disabled`() =
+        runTest {
+            whenever(duckChat.observeEnableDuckChatUserSetting()).thenReturn(flowOf(false))
+            whenever(duckChat.observeAutomaticContextAttachmentUserSettingEnabled()).thenReturn(flowOf(false))
+            @Suppress("DenyListedApi")
+            duckChatFeature.contextualMode().setRawStoredState(State(enable = true))
+            testee = DuckChatSettingsViewModel(
+                duckChatActivityParams = DuckChatNativeSettingsNoParams,
+                duckChat = duckChat,
+                pixel = mockPixel,
+                inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
+                settingsPageFeature = settingsPageFeature,
+                dispatcherProvider = coroutineRule.testDispatcherProvider,
+                duckChatFeature = duckChatFeature,
+            )
+
+            testee.viewState.test {
+                assertFalse(awaitItem().isAutomaticContextVisible)
+            }
+        }
+
+    @Test
+    fun `view state - automatic context hidden when flag disabled`() =
+        runTest {
+            whenever(duckChat.observeAutomaticContextAttachmentUserSettingEnabled()).thenReturn(flowOf(false))
+            @Suppress("DenyListedApi")
+            duckChatFeature.contextualMode().setRawStoredState(State(enable = false))
+            testee = DuckChatSettingsViewModel(
+                duckChatActivityParams = DuckChatNativeSettingsNoParams,
+                duckChat = duckChat,
+                pixel = mockPixel,
+                inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
+                settingsPageFeature = settingsPageFeature,
+                dispatcherProvider = coroutineRule.testDispatcherProvider,
+                duckChatFeature = duckChatFeature,
+            )
+
+            testee.viewState.test {
+                assertFalse(awaitItem().isAutomaticContextVisible)
             }
         }
 }

@@ -33,14 +33,23 @@ interface BrokerDao {
     @Query("SELECT stepsJson from pir_broker_scan where brokerName = :brokerName")
     fun getScanJson(brokerName: String): String?
 
+    @Query("DELETE from pir_broker_scan")
+    fun deleteAllBrokerScan()
+
     @Query("SELECT stepsJson from pir_broker_opt_out where brokerName = :brokerName")
     fun getOptOutJson(brokerName: String): String?
+
+    @Query("DELETE from pir_broker_opt_out")
+    fun deleteAllBrokerOptOut()
 
     @Query("SELECT * from pir_broker_scheduling_config where brokerName = :brokerName")
     fun getSchedulingConfig(brokerName: String): BrokerSchedulingConfigEntity?
 
     @Query("SELECT * from pir_broker_scheduling_config")
     fun getAllSchedulingConfigs(): List<BrokerSchedulingConfigEntity>
+
+    @Query("DELETE from pir_broker_scheduling_config")
+    fun deleteAllSchedulingConfig()
 
     @Query("DELETE from pir_broker_details")
     fun deleteAllBrokers()
@@ -103,4 +112,13 @@ interface BrokerDao {
 
     @Query("SELECT brokerName from pir_broker_scan")
     fun getAllBrokersNamesWithScanSteps(): List<String>
+
+    @Transaction
+    fun deleteAll() {
+        deleteAllBrokers()
+        deleteAllBrokerScan()
+        deleteAllBrokerOptOut()
+        deleteAllMirrorSites()
+        deleteAllSchedulingConfig()
+    }
 }

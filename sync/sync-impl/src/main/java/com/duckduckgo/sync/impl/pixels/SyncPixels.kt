@@ -23,7 +23,7 @@ import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin
 import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin.PixelParameter
 import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin.PixelParameter.Companion.removeAtb
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.sync.api.engine.SyncableType
+import com.duckduckgo.sync.api.engine.SyncFeatureType
 import com.duckduckgo.sync.impl.API_CODE
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.pixels.SyncPixelName.SYNC_DAILY
@@ -85,7 +85,7 @@ interface SyncPixels {
     )
 
     fun fireDailySyncApiErrorPixel(
-        feature: SyncableType,
+        feature: SyncFeatureType,
         apiError: Error,
     )
 
@@ -176,12 +176,13 @@ class RealSyncPixels @Inject constructor(
             SyncAccountOperation.DELETE_ACCOUNT -> fireDeleteAccountErrorPixel(result)
             SyncAccountOperation.USER_SIGNED_IN -> fireAlreadySignedInErrorPixel(result)
             SyncAccountOperation.CREATE_PDF -> fireSaveRecoveryPdfErrorPixel(result)
+            SyncAccountOperation.RESCOPE_TOKEN -> fireRescopeTokenErrorPixel(result)
             SyncAccountOperation.GENERIC -> fireSyncAccountErrorPixel(result)
         }
     }
 
     override fun fireDailySyncApiErrorPixel(
-        feature: SyncableType,
+        feature: SyncFeatureType,
         apiError: Error,
     ) {
         when (apiError.code) {
@@ -249,6 +250,10 @@ class RealSyncPixels @Inject constructor(
 
     private fun fireSaveRecoveryPdfErrorPixel(result: Error) {
         result.fireAddingErrorAsParams(SyncPixelName.SYNC_CREATE_PDF_FAILURE)
+    }
+
+    private fun fireRescopeTokenErrorPixel(result: Error) {
+        result.fireAddingErrorAsParams(SyncPixelName.SYNC_RESCOPE_TOKEN_FAILURE)
     }
 
     private fun Error.fireAddingErrorAsParams(pixelName: SyncPixelName) {
@@ -413,6 +418,7 @@ enum class SyncAccountOperation {
     DELETE_ACCOUNT,
     USER_SIGNED_IN,
     CREATE_PDF,
+    RESCOPE_TOKEN,
 }
 
 // https://app.asana.com/0/72649045549333/1205649300615861
@@ -432,6 +438,7 @@ enum class SyncPixelName(override val pixelName: String) : Pixel.PixelName {
     SYNC_DELETE_ACCOUNT_FAILURE("m_delete_account_error"),
     SYNC_USER_SIGNED_IN_FAILURE("m_login_existing_account_error"),
     SYNC_CREATE_PDF_FAILURE("m_sync_create_recovery_pdf_error"),
+    SYNC_RESCOPE_TOKEN_FAILURE("m_sync_rescope_token_error"),
     SYNC_PATCH_COMPRESS_FAILED("m_sync_patch_compression_failed"),
     SYNC_TOO_MANY_REQUESTS_DAILY("m_sync_%s_too_many_requests_daily"),
     SYNC_OBJECT_LIMIT_EXCEEDED_DAILY("m_sync_%s_object_limit_exceeded_daily"),
@@ -506,6 +513,7 @@ object SyncPixelsRequiringDataCleaning : PixelParamRemovalPlugin {
             SyncPixelName.SYNC_SETUP_PROMO_BOOKMARK_ADDED_DIALOG_SHOWN.pixelName to removeAtb(),
             SyncPixelName.SYNC_SETUP_PROMO_BOOKMARK_ADDED_DIALOG_DISMISSED.pixelName to removeAtb(),
             SyncPixelName.SYNC_SETUP_PROMO_BOOKMARK_ADDED_DIALOG_CONFIRMED.pixelName to removeAtb(),
+            SyncPixelName.SYNC_RESCOPE_TOKEN_FAILURE.pixelName to removeAtb(),
         )
     }
 }

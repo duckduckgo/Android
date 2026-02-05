@@ -1,0 +1,192 @@
+{
+    "data-store_migrate_unencrypted_get-preferences_destination_failed": {
+        "description": "Getting destination preferences for unencrypted preferences migration failed (Daily unique)",
+        "owners": ["CrisBarreiro"],
+        "triggers": ["exception"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "name",
+                "description": "The name of the sharedPreferences file that we were trying to migrate",
+                "type": "string"
+            },
+            {
+                "key": "error",
+                "description": "The stacktrace for the error thrown, sanitized to remove potentially sensitive data",
+                "type": "string"
+            }
+        ]
+    },
+    "data-store_migrate_encrypted_get-preferences_destination_failed": {
+        "description": "Getting destination preferences for encrypted preferences migration failed (Daily unique)",
+        "owners": ["CrisBarreiro"],
+        "triggers": ["exception"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "name",
+                "description": "The name of the sharedPreferences file that we were trying to migrate",
+                "type": "string"
+            },
+            {
+                "key": "error",
+                "description": "The stacktrace for the error thrown, sanitized to remove potentially sensitive data",
+                "type": "string"
+            }
+        ]
+    },
+    "data-store_migrate_unencrypted_query-preferences_destination_failed": {
+        "description": "Querying destination preferences for unencrypted preferences migration failed (Daily unique)",
+        "owners": ["CrisBarreiro"],
+        "triggers": ["exception"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "name",
+                "description": "The name of the sharedPreferences file that we were trying to migrate",
+                "type": "string"
+            },
+            {
+                "key": "error",
+                "description": "The stacktrace for the error thrown, sanitized to remove potentially sensitive data",
+                "type": "string"
+            }
+        ]
+    },
+    "data-store_migrate_encrypted_query-preferences_destination_failed": {
+        "description": "Querying destination preferences for encrypted preferences migration failed (Daily unique)",
+        "owners": ["CrisBarreiro"],
+        "triggers": ["exception"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "name",
+                "description": "The name of the sharedPreferences file that we were trying to migrate",
+                "type": "string"
+            },
+            {
+                "key": "error",
+                "description": "The stacktrace for the error thrown, sanitized to remove potentially sensitive data",
+                "type": "string"
+            }
+        ]
+    },
+    "data-store_migrate_unencrypted_get-preferences_origin_failed": {
+        "description": "Getting origin preferences for unencrypted preferences migration failed (Daily unique)",
+        "owners": ["CrisBarreiro"],
+        "triggers": ["exception"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "name",
+                "description": "The name of the sharedPreferences file that we were trying to migrate",
+                "type": "string"
+            },
+            {
+                "key": "error",
+                "description": "The stacktrace for the error thrown, sanitized to remove potentially sensitive data",
+                "type": "string"
+            }
+        ]
+    },
+    "data-store_migrate_encrypted_get-preferences_origin_failed": {
+        "description": "Getting origin preferences for encrypted preferences migration failed (Daily unique)",
+        "owners": ["CrisBarreiro"],
+        "triggers": ["exception"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "name",
+                "description": "The name of the sharedPreferences file that we were trying to migrate",
+                "type": "string"
+            },
+            {
+                "key": "error",
+                "description": "The stacktrace for the error thrown, sanitized to remove potentially sensitive data",
+                "type": "string"
+            }
+        ]
+    },
+    "data-store_migrate_unencrypted_query-all-preferences_origin_failed": {
+        "description": "Querying all origin preferences for unencrypted preferences migration failed (Daily unique)",
+        "owners": ["CrisBarreiro"],
+        "triggers": ["exception"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "name",
+                "description": "The name of the sharedPreferences file that we were trying to migrate",
+                "type": "string"
+            },
+            {
+                "key": "error",
+                "description": "The stacktrace for the error thrown, sanitized to remove potentially sensitive data",
+                "type": "string"
+            }
+        ]
+    },
+    "data-store_migrate_encrypted_query-all-preferences_origin_failed": {
+        "description": "Querying all origin preferences for encrypted preferences migration failed (Daily unique)",
+        "owners": ["CrisBarreiro"],
+        "triggers": ["exception"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "name",
+                "description": "The name of the sharedPreferences file that we were trying to migrate",
+                "type": "string"
+            },
+            {
+                "key": "error",
+                "description": "The stacktrace for the error thrown, sanitized to remove potentially sensitive data",
+                "type": "string"
+            }
+        ]
+    },
+    "data-store_migrate_unencrypted_update-preferences_destination_failed": {
+        "description": "Updating destination preferences for unencrypted preferences migration failed (Daily unique)",
+        "owners": ["CrisBarreiro"],
+        "triggers": ["exception"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "name",
+                "description": "The name of the sharedPreferences file that we were trying to migrate",
+                "type": "string"
+            },
+            {
+                "key": "error",
+                "description": "The stacktrace for the error thrown, sanitized to remove potentially sensitive data",
+                "type": "string"
+            }
+        ]
+    },
+    "data-store_migrate_encrypted_update-preferences_destination_failed": {
+        "description": "Updating destination preferences for encrypted preferences migration failed (Daily unique)",
+        "owners": ["CrisBarreiro"],
+        "triggers": ["exception"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "name",
+                "description": "The name of the sharedPreferences file that we were trying to migrate",
+                "type": "string"
+            },
+            {
+                "key": "error",
+                "description": "The stacktrace for the error thrown, sanitized to remove potentially sensitive data",
+                "type": "string"
+            }
+        ]
+    }
+}

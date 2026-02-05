@@ -58,7 +58,13 @@ class NativeCrashInit @Inject constructor(
     private val isCustomTab: Boolean by lazy { customTabDetector.isCustomTab() }
     private val processName: String by lazy { if (isMainProcess) "main" else "vpn" }
 
-    private val webViewVersion: String by lazy { webViewVersionProvider.getFullVersion() }
+    private val webViewVersion: String by lazy {
+        if (nativeCrashFeature.nativeCrashReportsFullWebViewVersion().isEnabled()) {
+            webViewVersionProvider.getFullVersion()
+        } else {
+            webViewVersionProvider.getMajorVersion()
+        }
+    }
 
     private val webViewPackage: String by lazy { webViewVersionProvider.getPackageName() }
 
