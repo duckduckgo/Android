@@ -8,10 +8,6 @@ on:
         required: true
         default: 'PLACEHOLDER'
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-
 jobs:
   create-release-tag:
     uses: ./.github/workflows/release_create_tag.yml
