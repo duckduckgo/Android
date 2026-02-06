@@ -380,6 +380,67 @@ class DuckChatContextualViewModelTest {
         }
 
     @Test
+    fun `when addPageContext with missing content then context stays hidden`() =
+        runTest {
+            testee.updatedPageContext =
+                """
+                {
+                    "title": "Ctx Title",
+                    "url": "https://ctx.com",
+                    "content": ""
+                }
+                """.trimIndent()
+
+            testee.addPageContext()
+            coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+            val state = testee.viewState.value
+            assertFalse(state.showContext)
+            assertFalse(state.userRemovedContext)
+        }
+
+    @Test
+    fun `when addPageContext with valid context then context shown`() =
+        runTest {
+            testee.updatedPageContext =
+                """
+                {
+                    "title": "Ctx Title",
+                    "url": "https://ctx.com",
+                    "content": "content"
+                }
+                """.trimIndent()
+
+            testee.addPageContext()
+            coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+            val state = testee.viewState.value
+            assertTrue(state.showContext)
+            assertFalse(state.userRemovedContext)
+        }
+
+    @Test
+    fun `when page context received without content then state unchanged`() =
+        runTest {
+            val serializedPageData =
+                """
+                {
+                    "title": "Ctx Title",
+                    "url": "https://ctx.com"
+                }
+                """.trimIndent()
+
+            testee.onPageContextReceived("tab-1", serializedPageData)
+
+            val state = testee.viewState.value
+            assertFalse(state.showContext)
+            assertEquals("", state.contextTitle)
+            assertEquals("", state.contextUrl)
+            assertEquals("", state.tabId)
+            assertEquals("", testee.updatedPageContext)
+        }
+
+    @Test
     fun `when replace prompt without context received then context now shown`() =
         runTest {
             testee.viewState.test {
