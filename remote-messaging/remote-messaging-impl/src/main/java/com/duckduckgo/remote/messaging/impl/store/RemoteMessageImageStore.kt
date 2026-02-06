@@ -54,6 +54,12 @@ class GlideRemoteMessageImageStore(
     override suspend fun fetchAndStoreImage(message: RemoteMessage?) {
         val imageUrl = message?.content?.getImageUrl()
 
+        message?.surfaces?.forEach { surface ->
+            withContext(dispatcherProvider.io()) {
+                deleteStoredImage(surface)
+            }
+        }
+
         if (imageUrl.isNullOrEmpty()) {
             logcat { "RMF: No image URL to prefetch for message: ${message?.id}" }
             return
@@ -61,7 +67,6 @@ class GlideRemoteMessageImageStore(
 
         // Store one image per surface
         message.surfaces.forEach { surface ->
-            deleteStoredImage(surface)
             withContext(dispatcherProvider.io()) {
                 runCatching {
                     logcat { "RMF: Prefetching image: $imageUrl for message: ${message.id} surface: ${surface.jsonValue}" }
