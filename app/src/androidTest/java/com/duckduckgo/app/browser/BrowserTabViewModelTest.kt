@@ -4365,7 +4365,7 @@ class BrowserTabViewModelTest {
             bookmarksListFlow.send(listOf(bookmark))
             loadUrl("www.example.com", isBrowserShowing = true)
             testee.onBookmarkMenuClicked()
-            verify(mockPixel).fire(AppPixelName.MENU_ACTION_EDIT_BOOKMARK_PRESSED.pixelName)
+            verify(mockPixel).fire(AppPixelName.MENU_ACTION_EDIT_BOOKMARK_PRESSED)
         }
 
     @Test
