@@ -20,6 +20,7 @@ import android.net.Uri
 import app.cash.turbine.test
 import com.duckduckgo.app.fire.ManualDataClearing
 import com.duckduckgo.app.fire.store.FireDataStore
+import com.duckduckgo.app.fire.wideevents.DataClearingWideEvent
 import com.duckduckgo.app.firebutton.FireButtonStore
 import com.duckduckgo.app.global.events.db.UserEventKey
 import com.duckduckgo.app.global.events.db.UserEventsStore
@@ -76,6 +77,7 @@ class GranularFireDialogViewModelTest {
     private val mockDuckChat: DuckChat = mock()
     private val mockNavigationHistory: NavigationHistory = mock()
     private val mockDateProvider: DateProvider = mock()
+    private val dataClearingWideEvent: DataClearingWideEvent = mock()
 
     private val tabsFlow = MutableStateFlow<List<TabEntity>>(emptyList())
     private val selectedOptionsFlow = MutableStateFlow<Set<FireClearOption>>(emptySet())
@@ -108,6 +110,7 @@ class GranularFireDialogViewModelTest {
         duckChat = mockDuckChat,
         navigationHistory = mockNavigationHistory,
         dateProvider = mockDateProvider,
+        dataClearingWideEvent = dataClearingWideEvent,
     )
 
     @Test

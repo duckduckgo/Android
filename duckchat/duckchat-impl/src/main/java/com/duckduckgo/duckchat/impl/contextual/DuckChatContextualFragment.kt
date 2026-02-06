@@ -21,6 +21,7 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Rect
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
@@ -32,6 +33,7 @@ import android.view.KeyEvent
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewTreeObserver
 import android.view.inputmethod.EditorInfo
 import android.webkit.CookieManager
 import android.webkit.MimeTypeMap
@@ -40,8 +42,10 @@ import android.webkit.WebChromeClient
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.widget.TextView
+import androidx.activity.OnBackPressedCallback
 import androidx.annotation.AnyThread
 import androidx.core.content.ContextCompat
+import androidx.core.view.isInvisible
 import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
@@ -183,7 +187,47 @@ class DuckChatContextualFragment :
     private val root: ViewGroup by lazy { binding.root }
 
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<View>
+    private lateinit var backPressedCallback: OnBackPressedCallback
     internal val simpleWebview: WebView by lazy { binding.simpleWebview }
+    private var isKeyboardVisible = false
+
+    private val keyboardVisibilityListener =
+        ViewTreeObserver.OnGlobalLayoutListener {
+            runCatching {
+                val rootView = binding.root
+                val rect = Rect()
+                rootView.getWindowVisibleDisplayFrame(rect)
+                val visibleHeight = rect.height()
+                val totalHeight = rootView.rootView.height
+                val heightDiff = totalHeight - visibleHeight
+                val threshold = (resources.displayMetrics.density * 100).toInt()
+                val imeVisible = heightDiff > threshold
+                if (imeVisible != isKeyboardVisible) {
+                    isKeyboardVisible = imeVisible
+                    if (binding.inputField.hasFocus()) {
+                        viewModel.onKeyboardVisibilityChanged(imeVisible)
+                    }
+                }
+            }
+        }
+    private val bottomSheetCallback =
+        object : BottomSheetBehavior.BottomSheetCallback() {
+            override fun onStateChanged(
+                bottomSheet: View,
+                newState: Int,
+            ) {
+                if (newState == BottomSheetBehavior.STATE_HIDDEN) {
+                    viewModel.persistTabClosed()
+                }
+                backPressedCallback.isEnabled = newState != BottomSheetBehavior.STATE_HIDDEN
+            }
+
+            override fun onSlide(
+                bottomSheet: View,
+                slideOffset: Float,
+            ) {
+            }
+        }
 
     private var lastWebViewX = 0f
     private var lastWebViewY = 0f
@@ -291,7 +335,7 @@ class DuckChatContextualFragment :
                         id: String?,
                         data: JSONObject?,
                     ) {
-                        logcat { "Duck.ai: process $featureName $method $id $data" }
+                        logcat { "Duck.ai JS Helper: process $featureName $method $id $data" }
                         when (featureName) {
                             RealDuckChatJSHelper.DUCK_CHAT_FEATURE_NAME -> {
                                 appCoroutineScope.launch(dispatcherProvider.io()) {
@@ -355,10 +399,12 @@ class DuckChatContextualFragment :
         }
 
         configureBottomSheet(view)
+        setupBackPressHandling()
         observeViewModel()
 
         requireArguments().getString(KEY_DUCK_AI_CONTEXTUAL_TAB_ID)?.let { tabId ->
             viewModel.onSheetOpened(tabId)
+            setupKeyboardVisibilityListener()
         }
     }
 
@@ -376,6 +422,20 @@ class DuckChatContextualFragment :
         bottomSheetBehavior.isDraggable = true
         bottomSheetBehavior.isHideable = true
         bottomSheetBehavior.isFitToContents = true
+        bottomSheetBehavior.expandedOffset = 0
+    }
+
+    private fun setupBackPressHandling() {
+        backPressedCallback =
+            object : OnBackPressedCallback(bottomSheetBehavior.state != BottomSheetBehavior.STATE_HIDDEN) {
+                override fun handleOnBackPressed() {
+                    viewModel.onContextualClose()
+                }
+            }
+
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, backPressedCallback)
+
+        bottomSheetBehavior.addBottomSheetCallback(bottomSheetCallback)
     }
 
     private fun configureButtons() {
@@ -383,13 +443,11 @@ class DuckChatContextualFragment :
             viewModel.onContextualClose()
         }
         binding.contextualNewChat.setOnClickListener {
+            hideKeyboard(binding.inputField)
             viewModel.onNewChatRequested()
         }
         binding.contextualModeButtons.setOnClickListener { }
         binding.contextualModeRoot.setOnClickListener { }
-        binding.inputField.onFocusChangeListener = View.OnFocusChangeListener { _, focused ->
-            viewModel.onNativeInputFocused(focused)
-        }
         binding.inputField.setOnEditorActionListener(
             TextView.OnEditorActionListener { _, actionId, keyEvent ->
                 if (actionId == EditorInfo.IME_ACTION_GO || keyEvent?.keyCode == KeyEvent.KEYCODE_ENTER) {
@@ -421,11 +479,16 @@ class DuckChatContextualFragment :
 
                 override fun afterTextChanged(text: Editable?) {
                     binding.duckAiContextualSend.isEnabled = !text.toString().isEmpty()
+                    binding.duckAiContextualClearText.isInvisible = text.toString().isEmpty()
                 }
             },
         )
         binding.duckAiContextualSend.setOnClickListener {
             sendNativePrompt()
+        }
+
+        binding.duckAiContextualClearText.setOnClickListener {
+            clearInputField()
         }
 
         binding.contextualFullScreen.setOnClickListener {
@@ -434,19 +497,26 @@ class DuckChatContextualFragment :
         binding.duckAiContextualPageRemove.setOnClickListener {
             viewModel.removePageContext()
         }
-        binding.duckAiContextualAddAttachment.setOnClickListener {
+        binding.duckAiAttachContextLayout.setOnClickListener {
             viewModel.addPageContext()
         }
         binding.contextualPromptSummarize.setOnClickListener {
-            viewModel.replacePrompt(binding.contextualPromptSummarize.text.toString())
+            val prompt = getString(R.string.duckAIContextualSummarizePrompt)
+            viewModel.replacePrompt(prompt)
         }
+    }
+
+    private fun clearInputField() {
+        binding.inputField.text.clear()
+        binding.inputField.setSelection(0)
+        binding.inputField.scrollTo(0, 0)
     }
 
     private fun sendNativePrompt() {
         val prompt = binding.inputField.text.toString()
         if (prompt.isNotEmpty()) {
             viewModel.onPromptSent(prompt)
-            bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+            clearInputField()
             hideKeyboard(binding.inputField)
         }
     }
@@ -470,10 +540,16 @@ class DuckChatContextualFragment :
                     }
 
                     is DuckChatContextualViewModel.Command.OpenFullscreenMode -> {
+                        binding.root.viewTreeObserver.removeOnGlobalLayoutListener(keyboardVisibilityListener)
                         val result = Bundle().apply {
                             putString(KEY_DUCK_AI_URL, command.url)
                         }
+
                         setFragmentResult(KEY_DUCK_AI_CONTEXTUAL_RESULT, result)
+                    }
+
+                    is DuckChatContextualViewModel.Command.ChangeSheetState -> {
+                        bottomSheetBehavior.state = command.newState
                     }
                 }
             }.launchIn(lifecycleScope)
@@ -484,6 +560,11 @@ class DuckChatContextualFragment :
                     is DuckChatContextualSharedViewModel.Command.PageContextAttached -> {
                         logcat { "Duck.ai Contextual: page context received" }
                         viewModel.onPageContextReceived(command.tabId, command.pageContext)
+                    }
+
+                    DuckChatContextualSharedViewModel.Command.OpenSheet -> {
+                        setupKeyboardVisibilityListener()
+                        viewModel.reopenSheet()
                     }
                 }
             }.launchIn(lifecycleScope)
@@ -496,11 +577,14 @@ class DuckChatContextualFragment :
         observeSubscriptionEventDataChannel()
     }
 
+    private fun setupKeyboardVisibilityListener() {
+        binding.root.viewTreeObserver.removeOnGlobalLayoutListener(keyboardVisibilityListener)
+        binding.root.viewTreeObserver.addOnGlobalLayoutListener(keyboardVisibilityListener)
+    }
+
     private fun renderViewState(viewState: DuckChatContextualViewModel.ViewState) {
         logcat { "Duck.ai Contextual: render $viewState" }
-        bottomSheetBehavior.state = viewState.sheetState
-
-        if (viewState.chatHistoryEnabled) {
+        if (viewState.showFullscreen) {
             binding.contextualFullScreen.show()
         } else {
             binding.contextualFullScreen.gone()
@@ -514,17 +598,18 @@ class DuckChatContextualFragment :
                 binding.contextualNewChat.gone()
 
                 renderPageContext(viewState.contextTitle, viewState.contextUrl, viewState.tabId)
+
                 if (viewState.showContext) {
                     binding.duckAiContextualLayout.show()
-                    binding.contextualModePrompts.show()
-                    binding.duckAiContextualAddAttachment.gone()
+                    binding.duckAiAttachContextLayout.gone()
                 } else {
                     binding.duckAiContextualLayout.gone()
-                    binding.contextualModePrompts.gone()
-                    binding.duckAiContextualAddAttachment.show()
+                    binding.duckAiAttachContextLayout.show()
                 }
                 if (viewState.prompt.isNotEmpty()) {
                     binding.inputField.setText(viewState.prompt)
+                } else {
+                    clearInputField()
                 }
             }
 
@@ -676,11 +761,6 @@ class DuckChatContextualFragment :
         return mimeTypes.toList()
     }
 
-    fun onBackPressed(): Boolean {
-        binding.contextualClose.performClick()
-        return true
-    }
-
     override fun continueDownload(pendingFileDownload: FileDownloader.PendingFileDownload) {
         fileDownloader.enqueueDownload(pendingFileDownload)
     }
@@ -808,6 +888,7 @@ class DuckChatContextualFragment :
     }
 
     override fun onPause() {
+        viewModel.persistTabClosed()
         downloadMessagesJob.cancel()
         simpleWebview.onPause()
         appCoroutineScope.launch(dispatcherProvider.io()) {
@@ -817,6 +898,8 @@ class DuckChatContextualFragment :
     }
 
     override fun onDestroyView() {
+        bottomSheetBehavior.removeBottomSheetCallback(bottomSheetCallback)
+        binding.root.viewTreeObserver.removeOnGlobalLayoutListener(keyboardVisibilityListener)
         super.onDestroyView()
         appCoroutineScope.launch(dispatcherProvider.io()) {
             cookieManager.flush()

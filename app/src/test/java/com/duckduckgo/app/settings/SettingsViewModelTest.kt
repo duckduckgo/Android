@@ -391,4 +391,16 @@ class SettingsViewModelTest {
             expectNoEvents()
         }
     }
+
+    @Test
+    fun `when what new clicked and message id and type exist then pixel event is fired`() = runTest {
+        val messageId = "test-message-id"
+        val messageType = MessageType.MEDIUM
+        whenever(modalSurfaceStoreMock.getLastShownRemoteMessageId()).thenReturn(messageId)
+        whenever(modalSurfaceStoreMock.getLastShownRemoteMessageType()).thenReturn(messageType)
+
+        testee.onWhatsNewClicked()
+
+        verify(pixelMock).fire(AppPixelName.SETTINGS_WHATS_NEW_PRESSED)
+    }
 }

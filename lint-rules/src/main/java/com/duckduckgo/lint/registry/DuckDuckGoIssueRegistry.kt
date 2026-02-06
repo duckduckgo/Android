@@ -24,6 +24,7 @@ import com.duckduckgo.lint.DenyListedApiDetector
 import com.duckduckgo.lint.NoDispatcherComputation.Companion.ISSUE_AVOID_COMPUTATION
 import com.duckduckgo.lint.NoFragmentDetector.Companion.NO_FRAGMENT_ISSUE
 import com.duckduckgo.lint.NoHardcodedCoroutineDispatcherDetector.Companion.NO_HARCODED_COROUTINE_DISPATCHER
+import com.duckduckgo.lint.NoImplImportsInAppModuleDetector.Companion.NO_IMPL_IMPORTS_IN_APP_MODULE_ISSUE
 import com.duckduckgo.lint.NoLifecycleObserverDetector.Companion.NO_LIFECYCLE_OBSERVER_ISSUE
 import com.duckduckgo.lint.NoRetrofitCreateMethodCallDetector.Companion.NO_RETROFIT_CREATE_CALL
 import com.duckduckgo.lint.NoRobolectricTestRunnerDetector.Companion.NO_ROBOLECTRIC_TEST_RUNNER_ISSUE
@@ -63,6 +64,7 @@ class DuckDuckGoIssueRegistry : IssueRegistry() {
             NO_FRAGMENT_ISSUE,
             NO_SYSTEM_LOAD_LIBRARY,
             NO_HARCODED_COROUTINE_DISPATCHER,
+            NO_IMPL_IMPORTS_IN_APP_MODULE_ISSUE,
             MISSING_SMARTLING_REQUIRED_DIRECTIVES,
             MISSING_INSTRUCTION,
             PLACEHOLDER_MISSING_POSITION,

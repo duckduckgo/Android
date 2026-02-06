@@ -23,6 +23,7 @@ import com.duckduckgo.feature.toggles.api.Toggle.State.CohortName
 import com.duckduckgo.feature.toggles.api.internal.CachedToggleStore
 import com.duckduckgo.feature.toggles.api.internal.CachedToggleStore.Listener
 import com.duckduckgo.feature.toggles.internal.api.FeatureTogglesCallback
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -31,6 +32,7 @@ import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
 import org.apache.commons.math3.distribution.EnumeratedIntegerDistribution
+import org.jetbrains.annotations.VisibleForTesting
 import java.lang.reflect.Method
 import java.lang.reflect.Proxy
 import java.time.ZoneId
@@ -45,6 +47,7 @@ class FeatureToggles private constructor(
     private val appVariantProvider: () -> String?,
     private val forceDefaultVariant: () -> Unit,
     private val callback: FeatureTogglesCallback?,
+    private val ioDispatcher: CoroutineDispatcher,
 ) {
 
     private val featureToggleCache = mutableMapOf<Method, Toggle>()
@@ -57,6 +60,7 @@ class FeatureToggles private constructor(
         private var appVariantProvider: () -> String? = { "" },
         private var forceDefaultVariant: () -> Unit = { /** noop **/ },
         private var callback: FeatureTogglesCallback? = null,
+        private var ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
     ) {
 
         fun store(store: Toggle.Store) = apply { this.store = store }
@@ -66,6 +70,9 @@ class FeatureToggles private constructor(
         fun appVariantProvider(variantName: () -> String?) = apply { this.appVariantProvider = variantName }
         fun forceDefaultVariantProvider(forceDefaultVariant: () -> Unit) = apply { this.forceDefaultVariant = forceDefaultVariant }
         fun callback(callback: FeatureTogglesCallback) = apply { this.callback = callback }
+
+        @VisibleForTesting
+        fun ioDispatcher(ioDispatcher: CoroutineDispatcher) = apply { this.ioDispatcher = ioDispatcher }
         fun build(): FeatureToggles {
             val missing = StringBuilder()
             if (this.store == null) {
@@ -85,6 +92,7 @@ class FeatureToggles private constructor(
                 appVariantProvider = appVariantProvider,
                 forceDefaultVariant = forceDefaultVariant,
                 callback = this.callback,
+                ioDispatcher = this.ioDispatcher,
             )
         }
     }
@@ -138,6 +146,7 @@ class FeatureToggles private constructor(
                 appVariantProvider = appVariantProvider,
                 forceDefaultVariant = forceDefaultVariant,
                 callback = callback,
+                ioDispatcher = ioDispatcher,
             ).also { featureToggleCache[method] = it }
         }
     }
@@ -404,6 +413,7 @@ internal class ToggleImpl constructor(
     private val appVariantProvider: () -> String?,
     private val forceDefaultVariant: () -> Unit,
     private val callback: FeatureTogglesCallback?,
+    private val ioDispatcher: CoroutineDispatcher,
 ) : Toggle {
 
     override fun equals(other: Any?): Boolean {
@@ -450,7 +460,7 @@ internal class ToggleImpl constructor(
 
         // when flow collection is cancelled/closed, run the unsubscribe to avoid leaking the listener
         awaitClose { unsubscribe() }
-    }.conflate().flowOn(Dispatchers.IO)
+    }.conflate().flowOn(ioDispatcher)
 
     private fun enrollInternal(force: Boolean = false): Boolean {
         // if the Toggle is not enabled, then we don't enroll

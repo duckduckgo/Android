@@ -29,10 +29,16 @@ class DuckChatContextualSharedViewModel() : ViewModel() {
         _command.trySend(Command.PageContextAttached(tabId, pageContext))
     }
 
+    fun onOpenRequested() {
+        _command.trySend(Command.OpenSheet)
+    }
+
     sealed class Command {
         data class PageContextAttached(
             val tabId: String,
             val pageContext: String,
         ) : Command()
+
+        data object OpenSheet : Command()
     }
 }

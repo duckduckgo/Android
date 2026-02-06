@@ -180,6 +180,14 @@ interface AndroidBrowserConfigFeature {
     fun vpnMenuItem(): Toggle
 
     /**
+     * @return `true` when the remote config has the global "vpnMenuItemInternational" androidBrowserConfig
+     * sub-feature flag enabled
+     * If the remote feature is not present defaults to `false`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun vpnMenuItemInternational(): Toggle
+
+    /**
      * @return `true` when the remote config has the global "splitOmnibar" androidBrowserConfig
      * sub-feature flag enabled
      * If the remote feature is not present defaults to `false`
@@ -187,6 +195,16 @@ interface AndroidBrowserConfigFeature {
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     @Toggle.InternalAlwaysEnabled
     fun splitOmnibar(): Toggle
+
+    /**
+     * Controls whether the split omnibar option is shown in the welcome page onboarding flow.
+     * @return `true` when the remote config has the global "splitOmnibarWelcomePage" androidBrowserConfig
+     * sub-feature flag enabled
+     * If the remote feature is not present defaults to `true`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    @Toggle.InternalAlwaysEnabled
+    fun splitOmnibarWelcomePage(): Toggle
 
     /**
      * @return `true` when the remote config has the global "repotWebViewCapabilities" androidBrowserConfig
@@ -278,4 +296,13 @@ interface AndroidBrowserConfigFeature {
 
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun refreshDuckAiOnSubscriptionChanges(): Toggle
+
+    /**
+     * Controls whether data clearing wide events are sent.
+     * @return `true` when the remote config has the global "sendDataClearingWideEvent" androidBrowserConfig
+     * sub-feature flag enabled
+     * If the remote feature is not present defaults to `true`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun sendDataClearingWideEvent(): Toggle
 }

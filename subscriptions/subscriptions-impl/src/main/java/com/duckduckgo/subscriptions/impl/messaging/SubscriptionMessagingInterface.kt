@@ -129,7 +129,7 @@ class SubscriptionMessagingInterface @Inject constructor(
     override val context: String = "subscriptionPages"
     override val callbackName: String = "messageCallback"
     override val secret: String = "duckduckgo-android-messaging-secret"
-    override val allowedDomains: List<String> = listOf("duckduckgo.com")
+    override val allowedDomains: List<String> = listOf("duckduckgo.com", "duck.ai")
 
     private fun isUrlAllowed(url: String?): Boolean {
         if (allowedDomains.isEmpty()) return true
@@ -208,7 +208,6 @@ class SubscriptionMessagingInterface @Inject constructor(
         override fun process(jsMessage: JsMessage, jsMessaging: JsMessaging, jsMessageCallback: JsMessageCallback?) {
             try {
                 val token = jsMessage.params.getString("token")
-                pixelSender.reportAuthV1SignInAttempt()
                 appCoroutineScope.launch(dispatcherProvider.io()) {
                     subscriptionsManager.signInV1(token)
                     subscriptionsChecker.runChecker()

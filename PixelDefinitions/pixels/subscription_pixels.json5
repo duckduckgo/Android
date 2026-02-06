@@ -1,12 +1,12 @@
 {
-    "subscription_free_trial_start": {
+    "subscription_free_trial_start_u": {
         "description": "Fired when a user starts a free trial. Used to measure total count of trialists independent of whether they complete the trial.",
         "owners": ["nalcalag"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"]
     },
-    "subscription_free_trial_vpn_activation": {
+    "subscription_free_trial_vpn_activation_u": {
         "description": "Fired when a user activates VPN while on a free trial. Used to measure how many trialists activate VPN and compare with wide event data.",
         "owners": ["nalcalag"],
         "triggers": ["other"],
@@ -35,14 +35,6 @@
                 "enum": ["true", "false"]
             }
         ]
-    },
-    "subscription_auth_v1_sign_in_attempt": {
-        "description": "Fired when subscription frontend initiates sign-in using auth v1 token.",
-        "owners": ["lmac012"],
-        "triggers": ["other"],
-        "suffixes": ["daily_count_short", "form_factor"],
-        "parameters": ["appVersion"],
-        "expires": "2026-02-01"
     },
     "m_privacy-pro_app_subscription_active_d": {
         "description": "Fired once daily on app start for an active subscription",

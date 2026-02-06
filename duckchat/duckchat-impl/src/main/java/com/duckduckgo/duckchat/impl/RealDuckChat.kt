@@ -512,7 +512,11 @@ class RealDuckChat @Inject constructor(
         openDuckChat(parameters, forceNewSession = true)
     }
 
-    override fun getDuckChatUrl(query: String, autoPrompt: Boolean, sidebar: Boolean): String {
+    override fun getDuckChatUrl(
+        query: String,
+        autoPrompt: Boolean,
+        sidebar: Boolean,
+    ): String {
         val parameters = addChatParameters(query, autoPrompt = autoPrompt, sidebar = sidebar)
         val url = appendParameters(parameters, duckChatLink)
         return url
@@ -582,6 +586,7 @@ class RealDuckChat @Inject constructor(
                 context.startActivity(this)
             }
     }
+
     private fun appendParameters(
         parameters: Map<String, String>,
         url: String,
@@ -780,7 +785,9 @@ class RealDuckChat @Inject constructor(
             isContextualModeEnabled = showContextualMode
             _showContextualMode.emit(showContextualMode)
 
-            isAutomaticContextAttachmentEnabled = showContextualMode && duckChatFeatureRepository.isAutomaticPageContextAttachmentUserSettingEnabled()
+            isAutomaticContextAttachmentEnabled = showContextualMode &&
+                duckChatFeature.automaticContextAttachment()
+                    .isEnabled() && duckChatFeatureRepository.isAutomaticPageContextAttachmentUserSettingEnabled()
         }
 
     companion object {

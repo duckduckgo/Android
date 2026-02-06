@@ -98,7 +98,7 @@ object JsonRemoteMessageOM {
     fun promoSingleActionJsonContent(
         titleText: String = "title",
         descriptionText: String = "description",
-        placeholder: String = "NewForMacAndWindows",
+        placeholder: String = "MacAndWindows",
         actionText: String = "Action",
         action: JsonMessageAction = jsonMessageAction(),
         imageUrl: String? = null,

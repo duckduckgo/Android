@@ -38,7 +38,10 @@ import javax.inject.Inject
 interface DuckChatContextualDataStore {
     suspend fun persistTabChatUrl(tabId: String, url: String)
     suspend fun getTabChatUrl(tabId: String): String?
+    suspend fun persistTabClosedTimestamp(tabId: String, timestampMs: Long)
+    suspend fun getTabClosedTimestamp(tabId: String): Long?
     fun clearTabChatUrl(tabId: String)
+    fun clearTabClosedTimestamp(tabId: String)
     fun clearAll()
 }
 
@@ -53,6 +56,7 @@ class RealDuckChatContextualDataStore @Inject constructor(
 
     private object Keys {
         val TAB_CHAT_URLS = stringPreferencesKey(name = "DUCK_CHAT_CONTEXTUAL_TAB_URLS")
+        val TAB_CLOSE_TIMESTAMPS = stringPreferencesKey(name = "DUCK_CHAT_CONTEXTUAL_TAB_CLOSE_TIMESTAMPS")
     }
 
     private val mapAdapter: JsonAdapter<Map<String, String>> =
@@ -61,6 +65,15 @@ class RealDuckChatContextualDataStore @Inject constructor(
                 Map::class.java,
                 String::class.java,
                 String::class.java,
+            ),
+        )
+
+    private val timestampMapAdapter: JsonAdapter<Map<String, Long>> =
+        moshi.adapter(
+            Types.newParameterizedType(
+                Map::class.java,
+                String::class.java,
+                Long::class.javaObjectType,
             ),
         )
 
@@ -83,6 +96,25 @@ class RealDuckChatContextualDataStore @Inject constructor(
         }
     }
 
+    override suspend fun persistTabClosedTimestamp(tabId: String, timestampMs: Long) {
+        withContext(dispatchers.io()) {
+            store.edit { prefs ->
+                val updated =
+                    loadTimestamps(prefs[Keys.TAB_CLOSE_TIMESTAMPS])
+                        .toMutableMap()
+                        .apply { this[tabId] = timestampMs }
+                prefs[Keys.TAB_CLOSE_TIMESTAMPS] = timestampMapAdapter.toJson(updated)
+            }
+        }
+    }
+
+    override suspend fun getTabClosedTimestamp(tabId: String): Long? {
+        return withContext(dispatchers.io()) {
+            val prefs = store.data.firstOrNull()
+            loadTimestamps(prefs?.get(Keys.TAB_CLOSE_TIMESTAMPS))[tabId]
+        }
+    }
+
     override fun clearTabChatUrl(tabId: String) {
         coroutineScope.launch(dispatchers.io()) {
             store.edit { prefs ->
@@ -95,15 +127,32 @@ class RealDuckChatContextualDataStore @Inject constructor(
         }
     }
 
+    override fun clearTabClosedTimestamp(tabId: String) {
+        coroutineScope.launch(dispatchers.io()) {
+            store.edit { prefs ->
+                val updated =
+                    loadTimestamps(prefs[Keys.TAB_CLOSE_TIMESTAMPS])
+                        .toMutableMap()
+                        .apply { remove(tabId) }
+                prefs[Keys.TAB_CLOSE_TIMESTAMPS] = timestampMapAdapter.toJson(updated)
+            }
+        }
+    }
+
     override fun clearAll() {
         coroutineScope.launch(dispatchers.io()) {
             store.edit { prefs ->
                 prefs.remove(Keys.TAB_CHAT_URLS)
+                prefs.remove(Keys.TAB_CLOSE_TIMESTAMPS)
             }
         }
     }
 
     private fun load(raw: String?): Map<String, String> {
         return raw?.let { runCatching { mapAdapter.fromJson(it) }.getOrNull() } ?: emptyMap()
+    }
+
+    private fun loadTimestamps(raw: String?): Map<String, Long> {
+        return raw?.let { runCatching { timestampMapAdapter.fromJson(it) }.getOrNull() } ?: emptyMap()
     }
 }

@@ -729,13 +729,13 @@ internal class AppearanceViewModelTest {
             // Then
             verify(mockBrowserMenuDisplayRepository).setExperimentalMenuEnabled(true)
             verify(mockPixel).fire(
-                pixel = AppPixelName.EXPERIMENTAL_MENU_ENABLED,
+                pixel = AppPixelName.EXPERIMENTAL_MENU_ENABLED_DAILY,
                 parameters = emptyMap(),
                 encodedParameters = emptyMap(),
                 type = Pixel.PixelType.Daily(),
             )
             verify(mockPixel).fire(
-                pixel = AppPixelName.EXPERIMENTAL_MENU_ENABLED,
+                pixel = AppPixelName.EXPERIMENTAL_MENU_ENABLED_UNIQUE,
                 parameters = emptyMap(),
                 encodedParameters = emptyMap(),
                 type = Pixel.PixelType.Unique(),
@@ -760,13 +760,13 @@ internal class AppearanceViewModelTest {
             // Then
             verify(mockBrowserMenuDisplayRepository).setExperimentalMenuEnabled(false)
             verify(mockPixel).fire(
-                pixel = AppPixelName.EXPERIMENTAL_MENU_DISABLED,
+                pixel = AppPixelName.EXPERIMENTAL_MENU_DISABLED_DAILY,
                 parameters = emptyMap(),
                 encodedParameters = emptyMap(),
                 type = Pixel.PixelType.Daily(),
             )
             verify(mockPixel).fire(
-                pixel = AppPixelName.EXPERIMENTAL_MENU_DISABLED,
+                pixel = AppPixelName.EXPERIMENTAL_MENU_DISABLED_UNIQUE,
                 parameters = emptyMap(),
                 encodedParameters = emptyMap(),
                 type = Pixel.PixelType.Unique(),

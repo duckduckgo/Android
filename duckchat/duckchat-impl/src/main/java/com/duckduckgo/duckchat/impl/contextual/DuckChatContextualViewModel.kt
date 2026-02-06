@@ -23,6 +23,7 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
 import com.duckduckgo.duckchat.impl.helper.NativeAction
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper
@@ -46,8 +47,11 @@ import javax.inject.Inject
 class DuckChatContextualViewModel @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val duckChat: DuckChat,
+    private val duckChatInternal: DuckChatInternal,
     private val duckChatJSHelper: DuckChatJSHelper,
     private val contextualDataStore: DuckChatContextualDataStore,
+    private val sessionTimeoutProvider: DuckChatContextualSessionTimeoutProvider,
+    private val timeProvider: DuckChatContextualTimeProvider,
 ) : ViewModel() {
 
     private val commandChannel = Channel<Command>(capacity = 1, onBufferOverflow = DROP_OLDEST)
@@ -68,100 +72,140 @@ class DuckChatContextualViewModel @Inject constructor(
         data class LoadUrl(val url: String) : Command()
         data object SendSubscriptionAuthUpdateEvent : Command()
         data class OpenFullscreenMode(val url: String) : Command()
+        data class ChangeSheetState(val newState: Int) : Command()
     }
 
     private val _viewState: MutableStateFlow<ViewState> =
         MutableStateFlow(
             ViewState(
                 sheetMode = SheetMode.INPUT,
-                sheetState = BottomSheetBehavior.STATE_HALF_EXPANDED,
                 showContext = false,
-                allowsAutomaticContextAttachment = false,
+                showFullscreen = true,
+                allowsAutomaticContextAttachment = duckChatInternal.isAutomaticContextAttachmentEnabled(),
+                userRemovedContext = false,
                 contextUrl = "",
                 contextTitle = "",
                 tabId = "",
                 prompt = "",
-                url = "",
-                chatHistoryEnabled = false,
             ),
         )
     val viewState: StateFlow<ViewState> = _viewState.asStateFlow()
 
     data class ViewState(
         val sheetMode: SheetMode = SheetMode.INPUT,
-        val sheetState: Int = BottomSheetBehavior.STATE_HALF_EXPANDED,
+        val showFullscreen: Boolean = true,
         val allowsAutomaticContextAttachment: Boolean = false,
-        val chatHistoryEnabled: Boolean = false,
         val showContext: Boolean = false,
+        val userRemovedContext: Boolean = false,
         val contextUrl: String = "",
         val contextTitle: String = "",
         val tabId: String = "",
         val prompt: String = "",
-        val url: String = "",
     )
 
-    init {
+    fun reopenSheet() {
+        logcat { "Duck.ai: reopenSheet" }
+
         viewModelScope.launch(dispatchers.io()) {
-            duckChat.observeAutomaticContextAttachmentUserSettingEnabled().collect { enabled ->
-                _viewState.update {
-                    it.copy(
-                        allowsAutomaticContextAttachment = enabled,
-                        showContext = enabled,
-                    )
+            val currentState = _viewState.value
+            if (currentState.sheetMode == SheetMode.WEBVIEW) {
+                reopenWebViewState(currentState)
+            } else {
+                withContext(dispatchers.main()) {
+                    logcat { "Duck.ai: reopenSheet in Input mode" }
+                    commandChannel.trySend(Command.ChangeSheetState(BottomSheetBehavior.STATE_HALF_EXPANDED))
                 }
             }
         }
     }
 
-    fun onSheetOpened(tabId: String) {
-        _viewState.update { current ->
-            current.copy(
-                tabId = tabId,
-                chatHistoryEnabled = false,
-            )
+    private suspend fun reopenWebViewState(currentState: ViewState) {
+        val tabId = currentState.tabId
+        val shouldReuseSession = shouldReuseStoredChatUrl(tabId)
+        if (!shouldReuseSession) {
+            onNewChatRequested()
+            return
         }
+        val existingChatUrl = contextualDataStore.getTabChatUrl(tabId)
+        withContext(dispatchers.main()) {
+            commandChannel.trySend(Command.ChangeSheetState(BottomSheetBehavior.STATE_EXPANDED))
+        }
+        if (existingChatUrl == null) {
+            val urlToLoad = duckChat.getDuckChatUrl("", false, sidebar = true)
+            withContext(dispatchers.main()) {
+                commandChannel.trySend(Command.LoadUrl(urlToLoad))
+                _viewState.update { state ->
+                    state.copy(
+                        sheetMode = SheetMode.WEBVIEW,
+                        showFullscreen = hasChatId(urlToLoad),
+                    )
+                }
+            }
+        } else {
+            withContext(dispatchers.main()) {
+                _viewState.update { state ->
+                    state.copy(
+                        sheetMode = SheetMode.WEBVIEW,
+                        showFullscreen = hasChatId(existingChatUrl),
+                    )
+                }
+            }
+            _viewState.update {
+                it.copy(
+                    allowsAutomaticContextAttachment = duckChatInternal.isAutomaticContextAttachmentEnabled(),
+                )
+            }
+        }
+    }
 
+    fun onSheetOpened(tabId: String) {
         viewModelScope.launch(dispatchers.io()) {
             logcat { "Duck.ai: onSheetOpened for tab=$tabId" }
 
             val existingChatUrl = contextualDataStore.getTabChatUrl(tabId)
-
             if (existingChatUrl.isNullOrBlank()) {
-                val chatUrl = duckChat.getDuckChatUrl("", false, sidebar = true)
+                logcat { "Duck.ai: tab=$tabId doesn't have an existing url, use the default one" }
                 withContext(dispatchers.main()) {
+                    commandChannel.trySend(Command.ChangeSheetState(BottomSheetBehavior.STATE_HALF_EXPANDED))
+                    val chatUrl = duckChat.getDuckChatUrl("", false, sidebar = true)
                     commandChannel.trySend(Command.LoadUrl(chatUrl))
+                    _viewState.update {
+                        it.copy(
+                            sheetMode = SheetMode.INPUT,
+                            showFullscreen = true,
+                            tabId = tabId,
+                            allowsAutomaticContextAttachment = duckChatInternal.isAutomaticContextAttachmentEnabled(),
+                        )
+                    }
                 }
-            } else {
+                return@launch
+            }
+
+            val shouldReuseUrl = shouldReuseStoredChatUrl(tabId)
+            if (shouldReuseUrl) {
+                logcat { "Duck.ai: tab=$tabId has an existing url and don't need to restart the session" }
                 val hasChatHistory = hasChatId(existingChatUrl)
 
                 withContext(dispatchers.main()) {
                     _viewState.update { current ->
                         current.copy(
                             sheetMode = SheetMode.WEBVIEW,
-                            sheetState = BottomSheetBehavior.STATE_EXPANDED,
-                            url = existingChatUrl,
+                            showFullscreen = hasChatHistory,
                             tabId = tabId,
-                            chatHistoryEnabled = hasChatHistory,
+                            allowsAutomaticContextAttachment = duckChatInternal.isAutomaticContextAttachmentEnabled(),
                         )
                     }
+                    commandChannel.trySend(Command.ChangeSheetState(BottomSheetBehavior.STATE_EXPANDED))
                     commandChannel.trySend(Command.LoadUrl(existingChatUrl))
                 }
-            }
-        }
-    }
-
-    fun onNativeInputFocused(focused: Boolean) {
-        viewModelScope.launch {
-            _viewState.update { current ->
-                if (current.sheetMode == SheetMode.INPUT) {
-                    if (focused) {
-                        current.copy(sheetState = BottomSheetBehavior.STATE_EXPANDED)
-                    } else {
-                        current.copy(sheetState = BottomSheetBehavior.STATE_HALF_EXPANDED)
+            } else {
+                logcat { "Duck.ai: tab=$tabId session expired, starting a new one" }
+                withContext(dispatchers.main()) {
+                    _viewState.update {
+                        it.copy(tabId = tabId)
                     }
-                } else {
-                    current
                 }
+                onNewChatRequested()
             }
         }
     }
@@ -174,30 +218,37 @@ class DuckChatContextualViewModel @Inject constructor(
                 _viewState.value =
                     _viewState.value.copy(
                         sheetMode = SheetMode.WEBVIEW,
-                        url = "chatUrl",
-                        sheetState = BottomSheetBehavior.STATE_EXPANDED,
+                        prompt = "",
                     )
                 _subscriptionEventDataChannel.trySend(contextPrompt)
+                commandChannel.trySend(Command.ChangeSheetState(BottomSheetBehavior.STATE_EXPANDED))
             }
         }
     }
 
     fun onChatPageLoaded(url: String?) {
         logcat { "Duck.ai: onChatPageLoaded $url" }
-        val hasChatId = hasChatId(url)
-
-        viewModelScope.launch {
-            _viewState.update { current ->
-                current.copy(chatHistoryEnabled = hasChatId)
-            }
-        }
-
-        if (url != null && hasChatId) {
+        if (url == null) {
+            return
+        } else {
             fullModeUrl = url
-            val tabId = _viewState.value.tabId
-            if (tabId.isNotBlank()) {
-                viewModelScope.launch(dispatchers.io()) {
-                    contextualDataStore.persistTabChatUrl(tabId, url)
+            val sheetMode = _viewState.value.sheetMode
+            if (sheetMode == SheetMode.WEBVIEW) {
+                val hasChatId = hasChatId(url)
+
+                viewModelScope.launch {
+                    _viewState.update { current ->
+                        current.copy(showFullscreen = hasChatId)
+                    }
+                }
+
+                if (hasChatId) {
+                    val tabId = _viewState.value.tabId
+                    if (tabId.isNotBlank()) {
+                        viewModelScope.launch(dispatchers.io()) {
+                            contextualDataStore.persistTabChatUrl(tabId, url)
+                        }
+                    }
                 }
             }
         }
@@ -240,43 +291,87 @@ class DuckChatContextualViewModel @Inject constructor(
     }
 
     fun onContextualClose() {
-        viewModelScope.launch {
-            _viewState.update { current -> current.copy(sheetState = BottomSheetBehavior.STATE_HIDDEN) }
+        viewModelScope.launch(dispatchers.main()) {
+            commandChannel.trySend(Command.ChangeSheetState(BottomSheetBehavior.STATE_HIDDEN))
+        }
+    }
+
+    fun persistTabClosed() {
+        if (_viewState.value.sheetMode != SheetMode.WEBVIEW) {
+            return
+        }
+        viewModelScope.launch(dispatchers.io()) {
+            val tabId = _viewState.value.tabId
+            if (tabId.isNotBlank()) {
+                contextualDataStore.persistTabClosedTimestamp(tabId, timeProvider.currentTimeMillis())
+            }
         }
     }
 
     fun removePageContext() {
+        logcat { "Duck.ai Contextual: removePageContext" }
         viewModelScope.launch {
             _viewState.update { current ->
-                current.copy(showContext = false)
+                current.copy(
+                    showContext = false,
+                    userRemovedContext = true,
+                )
             }
         }
     }
 
     fun addPageContext() {
+        logcat { "Duck.ai Contextual: addPageContext" }
         viewModelScope.launch {
             _viewState.update { current ->
                 current.copy(
-                    showContext = true,
+                    showContext = updatedPageContext.isNotEmpty(),
+                    userRemovedContext = false,
                 )
             }
         }
     }
 
     fun replacePrompt(prompt: String) {
+        logcat { "Duck.ai Contextual: add predefined Summarize prompt" }
         viewModelScope.launch {
             _viewState.update { current ->
-                current.copy(prompt = prompt)
+                current.copy(
+                    prompt = prompt,
+                    showContext = true,
+                )
             }
         }
     }
 
     fun onFullModeRequested() {
         logcat { "Duck.ai: request fullmode url $fullModeUrl" }
-        if (fullModeUrl.isNotEmpty()) {
-            viewModelScope.launch {
-                commandChannel.trySend(Command.OpenFullscreenMode(fullModeUrl))
+        val currentState = _viewState.value
+        val chatUrl = if (currentState.sheetMode == SheetMode.INPUT) {
+            duckChat.getDuckChatUrl("", false, sidebar = false)
+        } else {
+            fullModeUrl.ifEmpty {
+                duckChat.getDuckChatUrl("", false, sidebar = false)
             }
+        }
+        viewModelScope.launch {
+            commandChannel.trySend(Command.OpenFullscreenMode(chatUrl))
+        }
+    }
+
+    fun onKeyboardVisibilityChanged(isVisible: Boolean) {
+        val currentState = _viewState.value
+        if (currentState.sheetMode != SheetMode.INPUT) return
+
+        val newState =
+            if (isVisible) {
+                BottomSheetBehavior.STATE_EXPANDED
+            } else {
+                BottomSheetBehavior.STATE_HALF_EXPANDED
+            }
+
+        viewModelScope.launch {
+            commandChannel.trySend(Command.ChangeSheetState(newState))
         }
     }
 
@@ -299,7 +394,17 @@ class DuckChatContextualViewModel @Inject constructor(
                         contextTitle = title,
                         contextUrl = url,
                         tabId = tabId,
-                        showContext = _viewState.value.allowsAutomaticContextAttachment && _viewState.value.showContext,
+                        allowsAutomaticContextAttachment = duckChatInternal.isAutomaticContextAttachmentEnabled(),
+                        showContext = duckChatInternal.isAutomaticContextAttachmentEnabled() && !_viewState.value.userRemovedContext,
+                    )
+                }
+            } else {
+                _viewState.update {
+                    inputMode.copy(
+                        contextTitle = title,
+                        contextUrl = url,
+                        tabId = tabId,
+                        allowsAutomaticContextAttachment = duckChatInternal.isAutomaticContextAttachmentEnabled(),
                     )
                 }
             }
@@ -325,12 +430,21 @@ class DuckChatContextualViewModel @Inject constructor(
             val currentTabId = _viewState.value.tabId
             if (currentTabId.isNotBlank()) {
                 contextualDataStore.clearTabChatUrl(currentTabId)
+
                 withContext(dispatchers.main()) {
-                    _viewState.update { it.copy(chatHistoryEnabled = false) }
+                    _viewState.update {
+                        it.copy(
+                            sheetMode = SheetMode.INPUT,
+                            showFullscreen = true,
+                            prompt = "",
+                        )
+                    }
+                    commandChannel.trySend(Command.ChangeSheetState(BottomSheetBehavior.STATE_HALF_EXPANDED))
+
+                    val subscriptionEvent = duckChatJSHelper.onNativeAction(NativeAction.NEW_CHAT)
+                    _subscriptionEventDataChannel.trySend(subscriptionEvent)
                 }
             }
-            val subscriptionEvent = duckChatJSHelper.onNativeAction(NativeAction.NEW_CHAT)
-            _subscriptionEventDataChannel.trySend(subscriptionEvent)
         }
     }
 
@@ -338,5 +452,13 @@ class DuckChatContextualViewModel @Inject constructor(
         return url?.toUri()?.getQueryParameter("chatID")
             .orEmpty()
             .isNotBlank()
+    }
+
+    private suspend fun shouldReuseStoredChatUrl(tabId: String): Boolean {
+        val lastClosedTimestamp = contextualDataStore.getTabClosedTimestamp(tabId) ?: return true
+        val timeoutMs = sessionTimeoutProvider.sessionTimeoutMillis()
+        if (timeoutMs <= 0) return false
+        val elapsedMs = timeProvider.currentTimeMillis() - lastClosedTimestamp
+        return elapsedMs <= timeoutMs
     }
 }

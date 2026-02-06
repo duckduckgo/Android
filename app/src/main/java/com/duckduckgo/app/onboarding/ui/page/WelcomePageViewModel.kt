@@ -56,6 +56,7 @@ import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_RESUME_ONBOARDING_PR
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_SEARCH_ONLY_SELECTED
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_SKIP_ONBOARDING_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_SKIP_ONBOARDING_SHOWN_UNIQUE
+import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_SPLIT_ADDRESS_BAR_SELECTED_UNIQUE
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -92,7 +93,7 @@ class WelcomePageViewModel @Inject constructor(
     private val _commands = Channel<Command>(1, DROP_OLDEST)
     val commands: Flow<Command> = _commands.receiveAsFlow()
 
-    private var defaultAddressBarPosition: Boolean = true
+    private var addressBarPositionOption: OmnibarType = OmnibarType.SINGLE_TOP
     private var inputScreenSelected: Boolean = true
     private var maxPageCount: Int = 2
     private var reinstallUser: Boolean = false
@@ -120,7 +121,9 @@ class WelcomePageViewModel @Inject constructor(
             val intent: Intent,
         ) : Command
 
-        data object ShowAddressBarPositionDialog : Command
+        data class ShowAddressBarPositionDialog(
+            val showSplitOption: Boolean,
+        ) : Command
 
         data object ShowInputScreenDialog : Command
 
@@ -129,7 +132,7 @@ class WelcomePageViewModel @Inject constructor(
         data object OnboardingSkipped : Command
 
         data class SetAddressBarPositionOptions(
-            val defaultOption: Boolean,
+            val selectedOption: OmnibarType,
         ) : Command
     }
 
@@ -156,7 +159,7 @@ class WelcomePageViewModel @Inject constructor(
                                 _commands.send(ShowDefaultBrowserDialog(intent))
                             } else {
                                 pixel.fire(AppPixelName.DEFAULT_BROWSER_DIALOG_NOT_SHOWN)
-                                _commands.send(ShowAddressBarPositionDialog)
+                                _commands.send(ShowAddressBarPositionDialog(showSplitOption = isSplitOmnibarEnabled()))
                             }
                             false
                         } else {
@@ -179,9 +182,24 @@ class WelcomePageViewModel @Inject constructor(
 
             ADDRESS_BAR_POSITION -> {
                 viewModelScope.launch {
-                    if (!defaultAddressBarPosition) {
-                        settingsDataStore.omnibarType = OmnibarType.SINGLE_BOTTOM
-                        pixel.fire(PREONBOARDING_BOTTOM_ADDRESS_BAR_SELECTED_UNIQUE)
+                    when (addressBarPositionOption) {
+                        OmnibarType.SINGLE_BOTTOM -> {
+                            settingsDataStore.omnibarType = OmnibarType.SINGLE_BOTTOM
+                            pixel.fire(PREONBOARDING_BOTTOM_ADDRESS_BAR_SELECTED_UNIQUE)
+                        }
+                        OmnibarType.SPLIT -> {
+                            if (isSplitOmnibarEnabled()) {
+                                settingsDataStore.omnibarType = OmnibarType.SPLIT
+                                pixel.fire(PREONBOARDING_SPLIT_ADDRESS_BAR_SELECTED_UNIQUE)
+                            } else {
+                                // Fallback to top if split is not enabled
+                                settingsDataStore.omnibarType = OmnibarType.SINGLE_TOP
+                            }
+                        }
+                        OmnibarType.SINGLE_TOP -> {
+                            settingsDataStore.omnibarType = OmnibarType.SINGLE_TOP
+                            // Top is the default, no pixel needed
+                        }
                     }
                     if (androidBrowserConfigFeature.showInputScreenOnboarding().isEnabled()) {
                         _commands.send(Command.ShowInputScreenDialog)
@@ -248,7 +266,7 @@ class WelcomePageViewModel @Inject constructor(
         pixel.fire(AppPixelName.DEFAULT_BROWSER_SET, mapOf(PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString()))
 
         viewModelScope.launch {
-            _commands.send(ShowAddressBarPositionDialog)
+            _commands.send(ShowAddressBarPositionDialog(showSplitOption = isSplitOmnibarEnabled()))
         }
     }
 
@@ -258,7 +276,7 @@ class WelcomePageViewModel @Inject constructor(
         pixel.fire(AppPixelName.DEFAULT_BROWSER_NOT_SET, mapOf(PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString()))
 
         viewModelScope.launch {
-            _commands.send(ShowAddressBarPositionDialog)
+            _commands.send(ShowAddressBarPositionDialog(showSplitOption = isSplitOmnibarEnabled()))
         }
     }
 
@@ -294,10 +312,10 @@ class WelcomePageViewModel @Inject constructor(
         }
     }
 
-    fun onAddressBarPositionOptionSelected(defaultOption: Boolean) {
-        defaultAddressBarPosition = defaultOption
+    fun onAddressBarPositionOptionSelected(selectedOption: OmnibarType) {
+        addressBarPositionOption = selectedOption
         viewModelScope.launch {
-            _commands.send(SetAddressBarPositionOptions(defaultOption))
+            _commands.send(SetAddressBarPositionOptions(selectedOption))
         }
     }
 
@@ -323,4 +341,8 @@ class WelcomePageViewModel @Inject constructor(
         withContext(dispatchers.io()) {
             appBuildConfig.isAppReinstall()
         }
+
+    private fun isSplitOmnibarEnabled(): Boolean =
+        androidBrowserConfigFeature.splitOmnibar().isEnabled() &&
+            androidBrowserConfigFeature.splitOmnibarWelcomePage().isEnabled()
 }

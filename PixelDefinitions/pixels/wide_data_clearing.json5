@@ -1,0 +1,124 @@
+// Wide event pixel for data clearing flow monitoring
+{
+    "wide_data-clearing": {
+        "description": "User clears browsing data through various entry points (Fire button, app shortcuts, automatic clearing)",
+        "owners": ["lmac012"],
+        "triggers": ["other"],
+        "suffixes": ["daily_count_short", "form_factor"],
+        "parameters": [
+            "widePixelPlatform",
+            "widePixelType",
+            "widePixelSampleRate",
+            "widePixelFeatureStatus",
+            "widePixelAppVersion",
+            "widePixelAppName",
+            "widePixelFormFactor",
+            "widePixelDevMode",
+            {
+                "key": "feature.name",
+                "description": "Feature identifier for this wide event",
+                "enum": ["data-clearing"]
+            },
+            {
+                "key": "context.name",
+                "description": "Describes the entry point to the data clearing flow.",
+                "enum": [
+                    "granular_fire_dialog",
+                    "nongranular_fire_dialog",
+                    "app_shortcut",
+                    "auto_foreground",
+                    "auto_background",
+                    "legacy_fire_dialog",
+                    "legacy_app_shortcut",
+                    "legacy_auto_foreground",
+                    "legacy_auto_background"
+                ]
+            },
+            {
+                "key": "feature.data.ext.clear_options",
+                "description": "Comma-separated list of data types being cleared. Values: tabs,data,duckai_chats",
+                "type": "string"
+            },
+            {
+                "key": "feature.data.ext.total_duration_ms_bucketed",
+                "description": "Duration of the data clearing operation, bucketed. Does not include process restart duration. Uses upper end of the bucket.",
+                "enum": ["1000", "5000", "10000", "30000", "60000", "300000", "600000"]
+            },
+            {
+                "key": "feature.data.ext.failure_reason",
+                "description": "Reason for failure. Only present on FAILURE events. By default this is going to be exception class name.",
+                "type": "string"
+            },
+            {
+                "key": "feature.data.ext.step.web_storage_clear_success",
+                "description": "true if the step completed successfully, false otherwise. The implementation swallows exceptions so it does not affect the overall outcome of the data clearing operation, represented by feature.status.",
+                "enum": ["true", "false"]
+            },
+            {
+                "key": "feature.data.ext.step.web_storage_clear_error",
+                "description": "Error message (exception class) - only present if success=false for this step",
+                "type": "string"
+            },
+            {
+                "key": "feature.data.ext.step.web_storage_clear_granular_success",
+                "description": "true if the step completed successfully, false otherwise. The implementation swallows exceptions so it does not affect the overall outcome of the data clearing operation, represented by feature.status.",
+                "enum": ["true", "false"]
+            },
+            {
+                "key": "feature.data.ext.step.web_storage_clear_granular_error",
+                "description": "Error message (exception class) - only present if success=false for this step",
+                "type": "string"
+            },
+            {
+                "key": "feature.data.ext.step.webview_app_webview_clear_success",
+                "description": "true if the step completed successfully, false otherwise. The implementation swallows exceptions so it does not affect the overall outcome of the data clearing operation, represented by feature.status.",
+                "enum": ["true", "false"]
+            },
+            {
+                "key": "feature.data.ext.step.webview_app_webview_clear_error",
+                "description": "Error message (exception class) - only present if success=false for this step",
+                "type": "string"
+            },
+            {
+                "key": "feature.data.ext.step.webview_default_clear_success",
+                "description": "true if the step completed successfully, false otherwise. The implementation swallows exceptions so it does not affect the overall outcome of the data clearing operation, represented by feature.status.",
+                "enum": ["true", "false"]
+            },
+            {
+                "key": "feature.data.ext.step.webview_default_clear_error",
+                "description": "Error message (exception class) - only present if success=false for this step",
+                "type": "string"
+            },
+            {
+                "key": "feature.data.ext.step.indexeddb_clear_selective_success",
+                "description": "true if the step completed successfully, false otherwise. The implementation swallows exceptions so it does not affect the overall outcome of the data clearing operation, represented by feature.status.",
+                "enum": ["true", "false"]
+            },
+            {
+                "key": "feature.data.ext.step.indexeddb_clear_selective_error",
+                "description": "Error message (exception class) - only present if success=false for this step",
+                "type": "string"
+            },
+            {
+                "key": "feature.data.ext.step.indexeddb_clear_duckai_only_success",
+                "description": "true if the step completed successfully, false otherwise. The implementation swallows exceptions so it does not affect the overall outcome of the data clearing operation, represented by feature.status.",
+                "enum": ["true", "false"]
+            },
+            {
+                "key": "feature.data.ext.step.indexeddb_clear_duckai_only_error",
+                "description": "Error message (exception class) - only present if success=false for this step",
+                "type": "string"
+            },
+            {
+                "key": "feature.data.ext.step.app_cache_clear_success",
+                "description": "true if the step completed successfully, false otherwise. The implementation swallows exceptions so it does not affect the overall outcome of the data clearing operation, represented by feature.status.",
+                "enum": ["true", "false"]
+            },
+            {
+                "key": "feature.data.ext.step.app_cache_clear_error",
+                "description": "Error message (exception class) - only present if success=false for this step",
+                "type": "string"
+            }
+        ]
+    }
+}

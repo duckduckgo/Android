@@ -138,7 +138,7 @@
 
                 <include
                     android:id="@+id/address_bar_position"
-                    layout="@layout/pre_onboarding_address_bar_position"
+                    layout="@layout/pre_onboarding_address_bar_position_horizontal"
                     android:visibility="gone" />
 
                 <androidx.constraintlayout.widget.ConstraintLayout

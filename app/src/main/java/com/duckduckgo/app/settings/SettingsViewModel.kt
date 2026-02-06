@@ -42,6 +42,7 @@ import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_PASSWORDS_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_PERMISSIONS_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_PRIVATE_SEARCH_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_WEB_TRACKING_PROTECTION_PRESSED
+import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_WHATS_NEW_PRESSED
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchAboutScreen
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchAccessibilitySettings
@@ -269,6 +270,7 @@ class SettingsViewModel @Inject constructor(
             val messageId = modalSurfaceStore.getLastShownRemoteMessageId()
             val messageType = modalSurfaceStore.getLastShownRemoteMessageType()
             if (messageId != null && messageType != null) {
+                pixel.fire(SETTINGS_WHATS_NEW_PRESSED)
                 command.send(Command.LaunchWhatsNew(messageId, messageType))
             }
         }

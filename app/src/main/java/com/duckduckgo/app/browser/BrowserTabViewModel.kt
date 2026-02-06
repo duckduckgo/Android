@@ -1727,7 +1727,7 @@ class BrowserTabViewModel @Inject constructor(
         url: String,
         title: String?,
     ) {
-        logcat(VERBOSE) { "Duck.ai: Page changed: $url" }
+        logcat(VERBOSE) { "Page changed: $url" }
         cleanupBlobDownloadReplyProxyMaps(url)
 
         hasCtaBeenShownForCurrentPage.set(false)
@@ -1956,7 +1956,7 @@ class BrowserTabViewModel @Inject constructor(
 
     private fun shouldShowLocationPermissionMessage(): Boolean {
         val url = site?.url ?: return true
-        return !duckDuckGoUrlDetector.isDuckDuckGoChatUrl(url)
+        return !duckChat.isDuckChatUrl(Uri.parse(url))
     }
 
     private fun urlUpdated(url: String) {
@@ -2093,7 +2093,7 @@ class BrowserTabViewModel @Inject constructor(
     private fun evaluateDuckAIPage(url: String?) {
         url?.let {
             if (duckAiFeatureState.showFullScreenMode.value) {
-                if (duckDuckGoUrlDetector.isDuckDuckGoChatUrl(it)) {
+                if (duckChat.isDuckChatUrl(Uri.parse(it))) {
                     command.value = Command.EnableDuckAIFullScreen(currentBrowserViewState())
                 } else {
                     command.value = Command.DisableDuckAIFullScreen(url)

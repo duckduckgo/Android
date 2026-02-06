@@ -128,6 +128,7 @@
     <string name="settingsMenuItemTitle">Paramètres</string>
     <string name="settingsHeadingProtections">Protections</string>
     <string name="settingsHeadingAppearance">Apparence</string>
+    <string name="settingsWhatsNew">Nouveautés</string>
     <string name="settingsHeadingAbout">À propos</string>
     <string name="settingsAboutDuckduckgo">À propos de DuckDuckGo</string>
     <string name="settingsVersion">Version</string>

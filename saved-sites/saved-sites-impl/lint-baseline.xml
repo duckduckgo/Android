@@ -250,7 +250,7 @@
         errorLine2="    ^">
         <location
             file="src/main/res/values-es/strings-saved-sites.xml"
-            line="90"
+            line="89"
             column="5"/>
     </issue>
 
@@ -261,7 +261,7 @@
         errorLine2="    ^">
         <location
             file="src/main/res/values-fr/strings-saved-sites.xml"
-            line="90"
+            line="89"
             column="5"/>
     </issue>
 
@@ -272,7 +272,7 @@
         errorLine2="    ^">
         <location
             file="src/main/res/values-it/strings-saved-sites.xml"
-            line="90"
+            line="89"
             column="5"/>
     </issue>
 
@@ -283,7 +283,7 @@
         errorLine2="    ^">
         <location
             file="src/main/res/values-pt/strings-saved-sites.xml"
-            line="90"
+            line="89"
             column="5"/>
     </issue>
 
@@ -338,7 +338,7 @@
         errorLine2="    ^">
         <location
             file="src/main/res/values-hr/strings-saved-sites.xml"
-            line="96"
+            line="95"
             column="5"/>
     </issue>
 
@@ -351,17 +351,6 @@
             file="src/main/res/drawable/ic_icons_download_128.xml"
             line="35"
             column="25"/>
-    </issue>
-
-    <issue
-        id="Overdraw"
-        message="Possible overdraw: Root element paints background `@drawable/rounded_top_corners_bottom_sheet_drawable` with a theme that also paints a background (inferred theme is `@android:style/Theme.Holo`)"
-        errorLine1="    android:background=&quot;@drawable/rounded_top_corners_bottom_sheet_drawable&quot;>"
-        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/bottom_sheet_add_bookmark.xml"
-            line="25"
-            column="5"/>
     </issue>
 
     <issue
@@ -415,7 +404,7 @@
         errorLine2="                                                                            ~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-bg/strings-saved-sites.xml"
-            line="118"
+            line="117"
             column="77"/>
     </issue>
 
@@ -426,7 +415,7 @@
         errorLine2="                                                                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-el/strings-saved-sites.xml"
-            line="118"
+            line="117"
             column="77"/>
     </issue>
 
@@ -437,7 +426,7 @@
         errorLine2="                                                                            ~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-et/strings-saved-sites.xml"
-            line="118"
+            line="117"
             column="77"/>
     </issue>
 
@@ -448,7 +437,7 @@
         errorLine2="                                                                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-it/strings-saved-sites.xml"
-            line="118"
+            line="117"
             column="77"/>
     </issue>
 
@@ -459,7 +448,7 @@
         errorLine2="                                                                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-nl/strings-saved-sites.xml"
-            line="118"
+            line="117"
             column="77"/>
     </issue>
 
@@ -470,7 +459,7 @@
         errorLine2="                                                                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-ro/strings-saved-sites.xml"
-            line="122"
+            line="121"
             column="77"/>
     </issue>
 
