@@ -391,27 +391,21 @@ class DuckChatContextualViewModel @Inject constructor(
             logcat { "Duck.ai: onPageContextReceived $inputMode" }
 
             if (inputMode.sheetMode == SheetMode.INPUT) {
-                if (duckChatInternal.isAutomaticContextAttachmentEnabled()) {
-                    if (!inputMode.userRemovedContext) {
-                        _viewState.update {
-                            inputMode.copy(
-                                contextTitle = title,
-                                contextUrl = url,
-                                tabId = tabId,
-                                allowsAutomaticContextAttachment = duckChatInternal.isAutomaticContextAttachmentEnabled(),
-                                showContext = true,
-                            )
-                        }
-                    }
-                } else {
-                    _viewState.update {
-                        inputMode.copy(
-                            contextTitle = title,
-                            contextUrl = url,
-                            allowsAutomaticContextAttachment = duckChatInternal.isAutomaticContextAttachmentEnabled(),
-                        )
-                    }
-                }
+                val allowsAutomaticContextAttachment = duckChatInternal.isAutomaticContextAttachmentEnabled()
+                val updatedState =
+                    inputMode.copy(
+                        contextTitle = title,
+                        contextUrl = url,
+                        tabId = tabId,
+                        allowsAutomaticContextAttachment = allowsAutomaticContextAttachment,
+                        showContext =
+                        if (allowsAutomaticContextAttachment) {
+                            !inputMode.userRemovedContext
+                        } else {
+                            inputMode.showContext
+                        },
+                    )
+                _viewState.update { updatedState }
             } else {
                 _viewState.update {
                     inputMode.copy(
