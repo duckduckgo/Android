@@ -32,4 +32,6 @@ jobs:
   upload-internal:
     needs: upload-play-store
     uses: ./.github/workflows/release_upload_internal.yml
+    with:
+      ref: 'develop'
     secrets: inherit
