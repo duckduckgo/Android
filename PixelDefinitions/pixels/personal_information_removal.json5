@@ -1004,7 +1004,7 @@
         "description": "Fired when a scan or opt-out action fails while processing a data broker.",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["other"],
-        "suffixes": ["form_factor"],
+        "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
             "appVersion",
             {
@@ -1044,7 +1044,7 @@
         "description": "Android specific pixel which is fired when the PIR dashboard is opened",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["other"],
-        "suffixes": ["form_factor"],
+        "suffixes": ["daily_count_short", "form_factor"],
         "parameters": ["appVersion"]
     },
     "m_dbp_initial_scan_duration": {
@@ -1457,7 +1457,7 @@
         "description": "Android specific pixel which is fired when we detect that the secure storage is unavailable",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["other"],
-        "suffixes": ["form_factor"],
+        "suffixes": ["daily_count_short", "form_factor"],
         "parameters": ["appVersion"]
     },
     "m_dbp_background-run_stats": {
