@@ -21,6 +21,7 @@ import com.bumptech.glide.Glide
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.remote.messaging.api.Content
 import com.duckduckgo.remote.messaging.api.RemoteMessage
+import com.duckduckgo.remote.messaging.api.Surface
 import kotlinx.coroutines.withContext
 import logcat.logcat
 import java.io.File
@@ -29,19 +30,20 @@ interface RemoteMessageImageStore {
 
     /**
      * Fetches and stores the image associated with the provided [message].
+     * Stores one image per surface specified in the message.
      */
     suspend fun fetchAndStoreImage(message: RemoteMessage?)
 
     /**
-     * Returns the local file where the image for the active message is stored.
+     * Returns the local file where the image for the active message and surface is stored.
      * Must be called from a background thread (IO dispatcher).
      */
-    suspend fun getLocalImageFilePath(): String?
+    suspend fun getLocalImageFilePath(surface: Surface): String?
 
     /**
-     * Clears the stored image file.
+     * Clears the stored image file for the specified surface.
      */
-    suspend fun clearStoredImageFile()
+    suspend fun clearStoredImageFile(surface: Surface)
 }
 
 class GlideRemoteMessageImageStore(
@@ -52,60 +54,64 @@ class GlideRemoteMessageImageStore(
     override suspend fun fetchAndStoreImage(message: RemoteMessage?) {
         val imageUrl = message?.content?.getImageUrl()
 
-        deleteStoredImage()
         if (imageUrl.isNullOrEmpty()) {
             logcat { "RMF: No image URL to prefetch for message: ${message?.id}" }
             return
         }
 
-        withContext(dispatcherProvider.io()) {
-            runCatching {
-                logcat { "RMF: Prefetching image: $imageUrl for message: ${message.id}" }
+        // Store one image per surface
+        message.surfaces.forEach { surface ->
+            deleteStoredImage(surface)
+            withContext(dispatcherProvider.io()) {
+                runCatching {
+                    logcat { "RMF: Prefetching image: $imageUrl for message: ${message.id} surface: ${surface.jsonValue}" }
 
-                val downloadedFile = Glide.with(context)
-                    .asFile()
-                    .load(imageUrl)
-                    .submit()
-                    .get()
+                    val downloadedFile = Glide.with(context)
+                        .asFile()
+                        .load(imageUrl)
+                        .submit()
+                        .get()
 
-                val permanentFile = getImageFile()
-                downloadedFile.copyTo(permanentFile, overwrite = true)
+                    val permanentFile = getImageFile(surface)
+                    downloadedFile.copyTo(permanentFile, overwrite = true)
 
-                logcat { "RMF: Successfully saved image to permanent storage: ${permanentFile.absolutePath}" }
-            }.onFailure { error ->
-                logcat { "RMF: Failed to prefetch image $imageUrl: ${error.message}" }
+                    logcat { "RMF: Successfully saved image to permanent storage: ${permanentFile.absolutePath}" }
+                }.onFailure { error ->
+                    logcat { "RMF: Failed to prefetch image $imageUrl for surface ${surface.jsonValue}: ${error.message}" }
+                }
             }
         }
     }
 
-    override suspend fun getLocalImageFilePath(): String? {
+    override suspend fun getLocalImageFilePath(surface: Surface): String? {
         return withContext(dispatcherProvider.io()) {
-            val file = getImageFile()
+            val file = getImageFile(surface)
             if (file.exists()) file.absolutePath else null
         }
     }
 
-    override suspend fun clearStoredImageFile() {
-        deleteStoredImage()
+    override suspend fun clearStoredImageFile(surface: Surface) {
+        deleteStoredImage(surface)
     }
 
-    private suspend fun deleteStoredImage() {
+    private suspend fun deleteStoredImage(surface: Surface) {
         withContext(dispatcherProvider.io()) {
             runCatching {
-                getImageFile().let {
+                getImageFile(surface).let {
                     if (it.exists()) {
-                        logcat { "RMF: clear the stored image file" }
+                        logcat { "RMF: Clear the stored image file for surface: ${surface.jsonValue}" }
                         it.delete()
                     }
                 }
             }.onFailure {
-                logcat { "Failed to clear the stored image file" }
+                logcat { "Failed to clear the stored image file for surface: ${surface.jsonValue}" }
             }
         }
     }
 
-    private fun getImageFile(): File {
-        return File(context.filesDir, REMOTE_IMAGE_FILE)
+    private fun getImageFile(surface: Surface): File {
+        val fileName = "${REMOTE_IMAGE_FILE_PREFIX}_${surface.jsonValue}.png"
+        return File(context.filesDir, fileName)
     }
 
     private fun Content.getImageUrl(): String? {
@@ -120,6 +126,6 @@ class GlideRemoteMessageImageStore(
     }
 
     companion object {
-        private const val REMOTE_IMAGE_FILE = "active_message_remote_image.png"
+        private const val REMOTE_IMAGE_FILE_PREFIX = "active_message_remote_image"
     }
 }
