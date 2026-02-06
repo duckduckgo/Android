@@ -17,12 +17,9 @@
 <resources>
 
     <!-- Duck.ai Contextual Bottom Sheet -->
-    <string name="duckAIContextualPromptSummarize">Summarize this Page</string>
-    <string name="duckAIContextualPromptExplain">Explain in simpler terms</string>
-    <string name="duckAIContextualPromptSuggest">Suggest related articles to explore</string>
-    <string name="duckAIContextualAutomaticContextTitle">Automatically Send Context</string>
-    <string name="duckAIContextualAutomaticContextMessage">Automatically send context to Duck.ai</string>
+    <string name="duckAIContextualPromptSummarize">Summarize This Page</string>
+    <string name="duckAIContextualAutomaticContextTitle">Automatically Send Page Content</string>
+    <string name="duckAIContextualAutomaticContextMessage">Automatically send page content to Duck.ai</string>
     <string name="duckAIContextualAttachPageContent">Attach Page Content</string>
-    <string name="duckAIContextualSummarizePrompt">Summarize the context of this page</string>
 
 </resources>
