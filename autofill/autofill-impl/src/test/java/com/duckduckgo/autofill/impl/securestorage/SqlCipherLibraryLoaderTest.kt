@@ -20,7 +20,11 @@ import android.annotation.SuppressLint
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.autofill.api.AutofillFeature
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.LIBRARY_LOAD_FAILURE_SQLCIPHER
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.LIBRARY_LOAD_TIMEOUT_SQLCIPHER
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
@@ -40,6 +44,11 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.verify
 import org.robolectric.annotation.Config
 import org.robolectric.annotation.Implementation
 import org.robolectric.annotation.Implements
@@ -55,6 +64,7 @@ class SqlCipherLibraryLoaderTest {
 
     private val mockFeature = FakeFeatureToggleFactory.create(AutofillFeature::class.java)
     private val fakeTimeProvider = FakeCurrentTimeProvider()
+    private val pixel: Pixel = mock()
     private lateinit var context: Context
     private lateinit var loader: SqlCipherLibraryLoader
 
@@ -62,7 +72,7 @@ class SqlCipherLibraryLoaderTest {
     fun setup() {
         ShadowLibraryLoader.reset()
         context = ApplicationProvider.getApplicationContext()
-        loader = SqlCipherLibraryLoader(context, coroutineTestRule.testDispatcherProvider, mockFeature, fakeTimeProvider)
+        loader = SqlCipherLibraryLoader(context, coroutineTestRule.testDispatcherProvider, mockFeature, fakeTimeProvider, pixel)
     }
 
     @After
@@ -135,6 +145,52 @@ class SqlCipherLibraryLoaderTest {
 
         // Don't call completeAsyncSuccess() - let it timeout
         resultDeferred.await().assertIsFailure<TimeoutCancellationException>()
+    }
+
+    @Test
+    fun whenAsyncLoadingEnabledAndTimeoutOccursThenTimeoutPixelFired() = runTest {
+        configureAsyncLoadingEnabled()
+
+        val resultDeferred = asyncImmediately { loader.waitForLibraryLoad(timeoutMillis = 100) }
+        resultDeferred.await()
+
+        verify(pixel).fire(LIBRARY_LOAD_TIMEOUT_SQLCIPHER, type = Daily())
+        verify(pixel, never()).fire(eq(LIBRARY_LOAD_FAILURE_SQLCIPHER), any(), any(), any())
+    }
+
+    @Test
+    fun whenAsyncLoadingEnabledAndLoadFailsThenFailurePixelFired() = runTest {
+        configureAsyncLoadingEnabled()
+
+        val resultDeferred = asyncImmediately { loader.waitForLibraryLoad() }
+        ShadowLibraryLoader.completeAsyncFailure(UnsatisfiedLinkError("Test error"))
+        resultDeferred.await()
+
+        verify(pixel).fire(LIBRARY_LOAD_FAILURE_SQLCIPHER, type = Daily())
+        verify(pixel, never()).fire(eq(LIBRARY_LOAD_TIMEOUT_SQLCIPHER), any(), any(), any())
+    }
+
+    @Test
+    fun whenAsyncLoadingEnabledAndLoadSucceedsThenNoPixelFired() = runTest {
+        configureAsyncLoadingEnabled()
+
+        val resultDeferred = asyncImmediately { loader.waitForLibraryLoad() }
+        ShadowLibraryLoader.completeAsyncSuccess()
+        resultDeferred.await()
+
+        verify(pixel, never()).fire(eq(LIBRARY_LOAD_TIMEOUT_SQLCIPHER), any(), any(), any())
+        verify(pixel, never()).fire(eq(LIBRARY_LOAD_FAILURE_SQLCIPHER), any(), any(), any())
+    }
+
+    @Test
+    fun whenAsyncLoadingDisabledAndSyncLoadFailsThenNoPixelFired() = runTest {
+        configureAsyncLoadingDisabled()
+        ShadowLibraryLoader.syncShouldFail = true
+
+        loader.waitForLibraryLoad()
+
+        verify(pixel, never()).fire(eq(LIBRARY_LOAD_TIMEOUT_SQLCIPHER), any(), any(), any())
+        verify(pixel, never()).fire(eq(LIBRARY_LOAD_FAILURE_SQLCIPHER), any(), any(), any())
     }
 
     @Test
