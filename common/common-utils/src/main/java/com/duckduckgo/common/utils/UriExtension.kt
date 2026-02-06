@@ -69,18 +69,17 @@ val Uri.hasIpHost: Boolean
 /**
  * Checks if the URI represents a local or private network address.
  * This includes:
+ * - file:// URLs (local filesystem)
  * - localhost hostname
  * - IPv4/IPv6 loopback addresses (127.0.0.0/8, ::1)
  * - IPv4/IPv6 private network ranges (10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16, fc00::/7)
  * - IPv6 link-local addresses (fe80::/10)
  *
- * Note: file:// URLs return false as they are not network locations.
  * Note: .local domain names are NOT treated as local (they require mDNS resolution).
  */
 val Uri.isLocalUrl: Boolean
     get() {
-        // Explicitly exclude file:// scheme
-        if (scheme == "file") return false
+        if (scheme == "file") return true
 
         val host = this.host?.lowercase() ?: return false
         if (host == "localhost") return true
@@ -89,37 +88,13 @@ val Uri.isLocalUrl: Boolean
         // and never performs DNS resolution. On API 26-28, fall back to strict IPv4-only
         // validation to avoid InetAddress.getByName() which can trigger DNS lookups.
         val addr = if (Build.VERSION.SDK_INT >= 29) {
-            // Pre-validate format: require standard dotted-quad IPv4 (a.b.c.d) or
-            // bracketed IPv6 (contains ':'). This prevents parseNumericAddress from
-            // accepting abbreviated forms like "192.168.1" -> "192.168.0.1".
-            if (!host.isStrictNumericAddress()) return false
             runCatching { android.net.InetAddresses.parseNumericAddress(host) }.getOrNull()
         } else {
-            // Pre-29: only handle IPv4 addresses with strict validation
             host.parseAsStrictIPv4()
         } ?: return false
 
-        // Check if it's a loopback, site-local (private IPv4), or link-local (IPv6) address
-        // For IPv6, also check for unique local addresses (fc00::/7) manually
         return addr.isLoopbackAddress || addr.isSiteLocalAddress || addr.isLinkLocalAddress || addr.isIPv6UniqueLocal()
     }
-
-/**
- * Checks if a string looks like a strict numeric IP address.
- * For IPv4: requires exactly 4 dot-separated octets, each 0-255.
- * For IPv6: requires the presence of colons.
- */
-private fun String.isStrictNumericAddress(): Boolean {
-    // IPv6: contains colons
-    if (contains(':')) return true
-
-    // IPv4: exactly 4 parts separated by dots, each 0-255
-    val parts = split('.')
-    if (parts.size != 4) return false
-    return parts.all { part ->
-        part.toIntOrNull()?.let { it in 0..255 } ?: false
-    }
-}
 
 /**
  * Strictly parses a string as an IPv4 address without DNS resolution.
@@ -140,10 +115,11 @@ private fun String.parseAsStrictIPv4(): InetAddress? {
 /**
  * Checks if an IPv6 address is a Unique Local Address (ULA) in the fc00::/7 range.
  * These are the IPv6 equivalent of private IPv4 addresses.
+ * Java's [InetAddress.isSiteLocalAddress] only covers the deprecated fec0::/10 range,
+ * so this is needed to detect the current fc00::/7 ULA range.
  */
 private fun InetAddress.isIPv6UniqueLocal(): Boolean {
     val bytes = this.address
-    // IPv6 addresses have 16 bytes, check if it starts with 0xfc or 0xfd
     return bytes.size == 16 && (bytes[0].toInt() and 0xfe) == 0xfc
 }
 

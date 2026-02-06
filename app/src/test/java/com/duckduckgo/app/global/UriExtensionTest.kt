@@ -344,8 +344,12 @@ class UriExtensionTest {
     }
 
     @Test
+    fun whenSchemeIsFileThenIsLocalUrlReturnsTrue() {
+        assertTrue("file:///path/to/file".toUri().isLocalUrl)
+    }
+
+    @Test
     fun whenHostIsNullOrEmptyThenIsLocalUrlReturnsFalse() {
-        assertFalse("file:///path/to/file".toUri().isLocalUrl)
         assertFalse("about:blank".toUri().isLocalUrl)
     }
 
@@ -398,7 +402,13 @@ class UriExtensionTest {
     @Test
     fun whenHostIsMalformedIPThenIsLocalUrlReturnsFalse() {
         assertFalse("http://999.999.999.999".toUri().isLocalUrl)
-        assertFalse("http://192.168.1".toUri().isLocalUrl)
         assertFalse("http://192.168.1.1.1".toUri().isLocalUrl)
+    }
+
+    // Abbreviated IPv4 tests - parseNumericAddress normalizes these
+    @Test
+    fun whenHostIsAbbreviatedPrivateIpThenIsLocalUrlReturnsTrue() {
+        // 192.168.1 is parsed as 192.168.0.1 by parseNumericAddress
+        assertTrue("http://192.168.1".toUri().isLocalUrl)
     }
 }
