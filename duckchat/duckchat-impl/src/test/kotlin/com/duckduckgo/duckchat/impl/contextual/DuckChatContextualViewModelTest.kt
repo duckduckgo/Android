@@ -441,13 +441,21 @@ class DuckChatContextualViewModelTest {
         }
 
     @Test
-    fun `when replace prompt without context received then context now shown`() =
+    fun `when replace prompt without valid context then context remains hidden`() =
         runTest {
             testee.viewState.test {
                 // initial emission
                 awaitItem()
 
-                testee.replacePrompt("new prompt")
+                testee.updatedPageContext =
+                    """
+                    {
+                        "title": "Ctx Title",
+                        "url": "https://ctx.com",
+                        "content": ""
+                    }
+                    """.trimIndent()
+                testee.replacePrompt("", "new prompt")
                 val state = expectMostRecentItem() as DuckChatContextualViewModel.ViewState
                 assertEquals("new prompt", state.prompt)
                 assertFalse(state.showContext)
@@ -458,7 +466,7 @@ class DuckChatContextualViewModelTest {
         }
 
     @Test
-    fun `when replace prompt then prompt stored`() =
+    fun `when replace prompt with valid context then context shown`() =
         runTest {
             val tabId = "tab-1"
             val serializedPageData =
@@ -475,11 +483,41 @@ class DuckChatContextualViewModelTest {
                 // initial emission
                 awaitItem()
 
-                testee.replacePrompt("new prompt")
+                testee.replacePrompt("existing", "new prompt")
                 val state = expectMostRecentItem() as DuckChatContextualViewModel.ViewState
-                assertEquals("new prompt", state.prompt)
+                assertEquals("existing new prompt", state.prompt)
                 assertTrue(state.showContext)
                 assertFalse(state.userRemovedContext)
+
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `when replace prompt without previous input then prompt is replaced`() =
+        runTest {
+            testee.viewState.test {
+                awaitItem()
+
+                testee.replacePrompt("", "summarize this")
+
+                val state = expectMostRecentItem() as DuckChatContextualViewModel.ViewState
+                assertEquals("summarize this", state.prompt)
+
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `when replace prompt with previous input then prompt is appended`() =
+        runTest {
+            testee.viewState.test {
+                awaitItem()
+
+                testee.replacePrompt("existing input", "summarize this")
+
+                val state = expectMostRecentItem() as DuckChatContextualViewModel.ViewState
+                assertEquals("existing input summarize this", state.prompt)
 
                 cancelAndIgnoreRemainingEvents()
             }
@@ -648,7 +686,7 @@ class DuckChatContextualViewModelTest {
         val url = "https://duck.ai/chat?chatID=123"
         testee.onSheetOpened(tabId)
         contextualDataStore.persistTabChatUrl(tabId, url)
-        testee.replacePrompt("new prompt")
+        testee.replacePrompt("", "new prompt")
 
         testee.onNewChatRequested()
         coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
