@@ -79,7 +79,9 @@ class RealJsMessageHelper @Inject constructor(
     private fun buildJsResponse(message: String, callback: String, secret: String): String {
         return """
             (function() {
-                window['$callback']('$secret', $message);
+                if (typeof window['$callback'] === 'function') {
+                    window['$callback']('$secret', $message);
+                }
             })();
         """.trimIndent()
     }
