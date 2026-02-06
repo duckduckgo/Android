@@ -206,7 +206,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:visibility="gone"
-                app:primaryText="@string/subscriptionSettingUpdatePaymentOrCancel"
+                app:primaryText="@string/subscriptionSettingManagePaymentOrCancel"
                 tools:secondaryText="Your monthly subscription renews on April 20, 2027."
                 tools:visibility="visible" />
 

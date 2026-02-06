@@ -30,7 +30,7 @@
     <string name="subscriptionsProUpgradeMessage">Unlock more powerful AI</string>
     <string name="subscriptionSettingSectionManageSubscription">Manage Subscription</string>
     <string name="subscriptionSettingViewAllPlans">View All Plans</string>
-    <string name="subscriptionSettingUpdatePaymentOrCancel">Update Payments or Cancel</string>
+    <string name="subscriptionSettingManagePaymentOrCancel">Manage Payment or Cancel</string>
 
     <!-- Pending plan changes -->
     <string name="subscriptionPendingPlanChange" instruction="First placeholder is downgrade/upgrade, second is the plan name (e.g. Plus Yearly), third is a date">Your plan will %1$s to %2$s on %3$s.</string>
