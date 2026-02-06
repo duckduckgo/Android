@@ -11,6 +11,7 @@ import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.impl.PrivacyProFeature
+import com.duckduckgo.subscriptions.impl.R
 import com.duckduckgo.subscriptions.impl.SubscriptionTier
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
@@ -575,7 +576,7 @@ class SubscriptionSettingsViewModelTest {
         viewModel.viewState.test {
             val state = awaitItem() as Ready
             assertEquals(true, state.isPendingDowngrade)
-            assertEquals("Plus Yearly", state.pendingPlanDisplayName)
+            assertEquals(R.string.planNamePlusYearly, state.pendingPlanDisplayNameResId)
         }
     }
 
@@ -618,7 +619,7 @@ class SubscriptionSettingsViewModelTest {
         viewModel.viewState.test {
             val state = awaitItem() as Ready
             assertEquals(false, state.isPendingDowngrade)
-            assertEquals("Pro Yearly", state.pendingPlanDisplayName)
+            assertEquals(R.string.planNameProYearly, state.pendingPlanDisplayNameResId)
         }
     }
 
@@ -661,7 +662,7 @@ class SubscriptionSettingsViewModelTest {
         viewModel.viewState.test {
             val state = awaitItem() as Ready
             assertEquals(true, state.isPendingDowngrade)
-            assertEquals("Plus Monthly", state.pendingPlanDisplayName)
+            assertEquals(R.string.planNamePlusMonthly, state.pendingPlanDisplayNameResId)
         }
     }
 
@@ -704,7 +705,7 @@ class SubscriptionSettingsViewModelTest {
         viewModel.viewState.test {
             val state = awaitItem() as Ready
             assertEquals(false, state.isPendingDowngrade)
-            assertEquals("Plus Yearly", state.pendingPlanDisplayName)
+            assertEquals(R.string.planNamePlusYearly, state.pendingPlanDisplayNameResId)
         }
     }
 
@@ -738,7 +739,7 @@ class SubscriptionSettingsViewModelTest {
         viewModel.viewState.test {
             val state = awaitItem() as Ready
             assertEquals(null, state.isPendingDowngrade)
-            assertEquals(null, state.pendingPlanDisplayName)
+            assertEquals(null, state.pendingPlanDisplayNameResId)
         }
     }
 

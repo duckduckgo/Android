@@ -33,9 +33,8 @@
     <string name="subscriptionSettingManagePaymentOrCancel">Manage Payment or Cancel</string>
 
     <!-- Pending plan changes -->
-    <string name="subscriptionPendingPlanChange" instruction="First placeholder is downgrade/upgrade, second is the plan name (e.g. Plus Yearly), third is a date">Your plan will %1$s to %2$s on %3$s.</string>
-    <string name="planChangeDowngrade">downgrade</string>
-    <string name="planChangeUpgrade">upgrade</string>
+    <string name="subscriptionPendingPlanChangeUpgrade" instruction="First placeholder is the plan name (e.g. Plus Yearly), third is a date">Your plan will upgrade to %1$s on %2$s.</string>
+    <string name="subscriptionPendingPlanChangeDowngrade" instruction="First placeholder is the plan name (e.g. Plus Yearly), third is a date">Your plan will downgrade to %1$s on %2$s.</string>
     <string name="planNamePlusMonthly">Plus Monthly</string>
     <string name="planNamePlusYearly">Plus Yearly</string>
     <string name="planNameProMonthly">Pro Monthly</string>

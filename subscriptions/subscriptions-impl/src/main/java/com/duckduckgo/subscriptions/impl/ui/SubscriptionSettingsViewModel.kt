@@ -29,6 +29,7 @@ import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.SUBSCRIPTION_SETTINGS
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.impl.PrivacyProFeature
+import com.duckduckgo.subscriptions.impl.R
 import com.duckduckgo.subscriptions.impl.SubscriptionTier
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN_ROW
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN_US
@@ -125,7 +126,7 @@ class SubscriptionSettingsViewModel @Inject constructor(
                 pendingBillingPeriod = it.billingPeriod,
             )
         }
-        val pendingPlanDisplayName = pendingPlan?.let {
+        val pendingPlanDisplayNameResId = pendingPlan?.let {
             getPendingPlanDisplayName(it.tier, it.billingPeriod)
         }
 
@@ -151,7 +152,7 @@ class SubscriptionSettingsViewModel @Inject constructor(
                 pendingPlan = pendingPlan,
                 pendingEffectiveDate = pendingEffectiveDate,
                 isPendingDowngrade = isPendingDowngrade,
-                pendingPlanDisplayName = pendingPlanDisplayName,
+                pendingPlanDisplayNameResId = pendingPlanDisplayNameResId,
                 effectiveTier = effectiveTier,
             ),
         )
@@ -224,14 +225,19 @@ class SubscriptionSettingsViewModel @Inject constructor(
     private fun getPendingPlanDisplayName(
         tier: SubscriptionTier,
         billingPeriod: String,
-    ): String {
-        val tierName = when (tier) {
-            SubscriptionTier.PLUS -> "Plus"
-            SubscriptionTier.PRO -> "Pro"
-            SubscriptionTier.UNKNOWN -> "Plus" // fallback
+    ): Int {
+        return when (tier) {
+            SubscriptionTier.PLUS -> {
+                if (billingPeriod.equals("monthly", ignoreCase = true)) R.string.planNamePlusMonthly else R.string.planNamePlusYearly
+            }
+            SubscriptionTier.PRO -> {
+                if (billingPeriod.equals("monthly", ignoreCase = true)) R.string.planNameProMonthly else R.string.planNameProYearly
+            }
+            SubscriptionTier.UNKNOWN -> {
+                // fallback
+                if (billingPeriod.equals("monthly", ignoreCase = true)) R.string.planNamePlusMonthly else R.string.planNamePlusYearly
+            }
         }
-        val periodName = if (billingPeriod.equals("monthly", ignoreCase = true)) "Monthly" else "Yearly"
-        return "$tierName $periodName"
     }
 
     sealed class SubscriptionDuration {
@@ -270,7 +276,7 @@ class SubscriptionSettingsViewModel @Inject constructor(
             val pendingPlan: PendingPlan? = null,
             val pendingEffectiveDate: String? = null,
             val isPendingDowngrade: Boolean? = null,
-            val pendingPlanDisplayName: String? = null,
+            val pendingPlanDisplayNameResId: Int? = null,
             val effectiveTier: SubscriptionTier,
         ) : ViewState()
     }
