@@ -4,8 +4,6 @@ plugins {
     id("com.gradle.common-custom-user-data-gradle-plugin") version "2.4.0"
 }
 
-rootProject.name = "android"
-
 def isCI = System.getenv('CI') != null
 
 develocity {
@@ -98,3 +96,5 @@ buildCache {
         push = isCI && accessKey != null && !accessKey.isEmpty()
     }
 }
+
+rootProject.name = "Android"
