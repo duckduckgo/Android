@@ -4,7 +4,7 @@ plugins {
     id("com.gradle.common-custom-user-data-gradle-plugin") version "2.4.0"
 }
 
-rootProject.name = "android"
+rootProject.name = "androidRoot"
 
 def isCI = System.getenv('CI') != null
 
