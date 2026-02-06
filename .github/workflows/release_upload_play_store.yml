@@ -34,7 +34,7 @@ jobs:
         with:
           submodules: recursive
           token: ${{ secrets.GT_DAXMOBILE }}
-          ref: ${{ github.event.inputs.ref }}
+          ref: ${{ inputs.ref }}
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v5
