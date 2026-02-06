@@ -317,8 +317,36 @@ class DuckChatContextualViewModelTest {
         }
 
     @Test
+    fun `when replace prompt without context received then context now shown`() =
+        runTest {
+            testee.viewState.test {
+                // initial emission
+                awaitItem()
+
+                testee.replacePrompt("new prompt")
+                val state = expectMostRecentItem() as DuckChatContextualViewModel.ViewState
+                assertEquals("new prompt", state.prompt)
+                assertFalse(state.showContext)
+                assertFalse(state.userRemovedContext)
+
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
     fun `when replace prompt then prompt stored`() =
         runTest {
+            val tabId = "tab-1"
+            val serializedPageData =
+                """
+            {
+                "title": "Ctx Title",
+                "url": "https://ctx.com",
+                "content": "content"
+            }
+                """.trimIndent()
+            testee.onPageContextReceived(tabId, serializedPageData)
+
             testee.viewState.test {
                 // initial emission
                 awaitItem()
