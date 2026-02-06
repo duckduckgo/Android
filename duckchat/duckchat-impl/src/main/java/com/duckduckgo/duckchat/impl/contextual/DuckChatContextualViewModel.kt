@@ -322,14 +322,26 @@ class DuckChatContextualViewModel @Inject constructor(
 
     fun addPageContext() {
         logcat { "Duck.ai Contextual: addPageContext" }
+
         viewModelScope.launch {
             _viewState.update { current ->
+                logcat { "Duck.ai Contextual: addPageContext $current context $updatedPageContext" }
                 current.copy(
-                    showContext = updatedPageContext.isNotEmpty(),
+                    showContext = isContextValid(updatedPageContext),
                     userRemovedContext = false,
                 )
             }
         }
+    }
+
+    private fun isContextValid(pageContext: String): Boolean {
+        if (pageContext.isEmpty()) return false
+        val json = JSONObject(pageContext)
+        val title = json.optString("title").takeIf { it.isNotBlank() }
+        val url = json.optString("url").takeIf { it.isNotBlank() }
+        val content = json.optString("content").takeIf { it.isNotBlank() }
+
+        return title != null && url != null && content != null
     }
 
     fun replacePrompt(prompt: String) {
@@ -338,7 +350,7 @@ class DuckChatContextualViewModel @Inject constructor(
             _viewState.update { current ->
                 current.copy(
                     prompt = prompt,
-                    showContext = true,
+                    showContext = updatedPageContext.isNotEmpty(),
                 )
             }
         }
@@ -379,25 +391,32 @@ class DuckChatContextualViewModel @Inject constructor(
         tabId: String,
         pageContext: String,
     ) {
-        updatedPageContext = pageContext
+        if (isContextValid(pageContext)) {
+            updatedPageContext = pageContext
 
-        val json = JSONObject(updatedPageContext)
-        val title = json.optString("title").takeIf { it.isNotBlank() }
-        val url = json.optString("url").takeIf { it.isNotBlank() }
+            val json = JSONObject(updatedPageContext)
+            val title = json.optString("title")
+            val url = json.optString("url")
 
-        if (title != null && url != null) {
             val inputMode = _viewState.value
+            logcat { "Duck.ai: onPageContextReceived $inputMode" }
 
             if (inputMode.sheetMode == SheetMode.INPUT) {
-                _viewState.update {
+                val allowsAutomaticContextAttachment = duckChatInternal.isAutomaticContextAttachmentEnabled()
+                val updatedState =
                     inputMode.copy(
                         contextTitle = title,
                         contextUrl = url,
                         tabId = tabId,
-                        allowsAutomaticContextAttachment = duckChatInternal.isAutomaticContextAttachmentEnabled(),
-                        showContext = duckChatInternal.isAutomaticContextAttachmentEnabled() && !_viewState.value.userRemovedContext,
+                        allowsAutomaticContextAttachment = allowsAutomaticContextAttachment,
+                        showContext =
+                        if (allowsAutomaticContextAttachment) {
+                            !inputMode.userRemovedContext
+                        } else {
+                            inputMode.showContext
+                        },
                     )
-                }
+                _viewState.update { updatedState }
             } else {
                 _viewState.update {
                     inputMode.copy(
@@ -408,6 +427,8 @@ class DuckChatContextualViewModel @Inject constructor(
                     )
                 }
             }
+        } else {
+            updatedPageContext = ""
         }
     }
 

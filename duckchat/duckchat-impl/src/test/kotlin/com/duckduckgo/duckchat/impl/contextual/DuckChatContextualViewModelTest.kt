@@ -174,6 +174,7 @@ class DuckChatContextualViewModelTest {
 
             // Load and cache context, then remove it to set hasContext=false while data remains cached.
             testee.onSheetOpened(tabId)
+            coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
             testee.onPageContextReceived(tabId, serializedPageData)
             testee.removePageContext()
 
@@ -235,6 +236,68 @@ class DuckChatContextualViewModelTest {
                 assertEquals("https://ctx.com", state.contextUrl)
                 assertEquals("tab-1", state.tabId)
             }
+        }
+
+    @Test
+    fun `when page context arrives without title then context not stored`() =
+        runTest {
+            val tabId = "tab-1"
+            val serializedPageData =
+                """
+                {
+                    "title": "",
+                    "url": "https://ctx.com",
+                    "content": "content"
+                }
+                """.trimIndent()
+
+            testee.onSheetOpened(tabId)
+            coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+            testee.onPageContextReceived(tabId, serializedPageData)
+
+            val state = testee.viewState.value
+            assertFalse(state.showContext)
+            assertFalse(state.userRemovedContext)
+            assertEquals("", state.contextTitle)
+            assertEquals("", state.contextUrl)
+            assertEquals(tabId, state.tabId)
+        }
+
+    @Test
+    fun `when automatic context attachment disabled then context not shown`() =
+        runTest {
+            whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(false)
+            testee =
+                DuckChatContextualViewModel(
+                    dispatchers = coroutineRule.testDispatcherProvider,
+                    duckChat = duckChat,
+                    duckChatInternal = duckChatInternal,
+                    duckChatJSHelper = duckChatJSHelper,
+                    contextualDataStore = contextualDataStore,
+                    sessionTimeoutProvider = sessionTimeoutProvider,
+                    timeProvider = timeProvider,
+                )
+
+            val tabId = "tab-1"
+            val serializedPageData =
+                """
+                {
+                    "title": "Ctx Title",
+                    "url": "https://ctx.com",
+                    "content": "content"
+                }
+                """.trimIndent()
+
+            testee.onSheetOpened(tabId)
+            testee.onPageContextReceived(tabId, serializedPageData)
+
+            val state = testee.viewState.value
+            assertFalse(state.showContext)
+            assertFalse(state.userRemovedContext)
+            assertEquals("Ctx Title", state.contextTitle)
+            assertEquals("https://ctx.com", state.contextUrl)
+            assertEquals(tabId, state.tabId)
+            assertFalse(state.allowsAutomaticContextAttachment)
         }
 
     @Test
@@ -317,8 +380,97 @@ class DuckChatContextualViewModelTest {
         }
 
     @Test
+    fun `when addPageContext with missing content then context stays hidden`() =
+        runTest {
+            testee.updatedPageContext =
+                """
+                {
+                    "title": "Ctx Title",
+                    "url": "https://ctx.com",
+                    "content": ""
+                }
+                """.trimIndent()
+
+            testee.addPageContext()
+            coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+            val state = testee.viewState.value
+            assertFalse(state.showContext)
+            assertFalse(state.userRemovedContext)
+        }
+
+    @Test
+    fun `when addPageContext with valid context then context shown`() =
+        runTest {
+            testee.updatedPageContext =
+                """
+                {
+                    "title": "Ctx Title",
+                    "url": "https://ctx.com",
+                    "content": "content"
+                }
+                """.trimIndent()
+
+            testee.addPageContext()
+            coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+            val state = testee.viewState.value
+            assertTrue(state.showContext)
+            assertFalse(state.userRemovedContext)
+        }
+
+    @Test
+    fun `when page context received without content then state unchanged`() =
+        runTest {
+            val serializedPageData =
+                """
+                {
+                    "title": "Ctx Title",
+                    "url": "https://ctx.com"
+                }
+                """.trimIndent()
+
+            testee.onPageContextReceived("tab-1", serializedPageData)
+
+            val state = testee.viewState.value
+            assertFalse(state.showContext)
+            assertEquals("", state.contextTitle)
+            assertEquals("", state.contextUrl)
+            assertEquals("", state.tabId)
+            assertEquals("", testee.updatedPageContext)
+        }
+
+    @Test
+    fun `when replace prompt without context received then context now shown`() =
+        runTest {
+            testee.viewState.test {
+                // initial emission
+                awaitItem()
+
+                testee.replacePrompt("new prompt")
+                val state = expectMostRecentItem() as DuckChatContextualViewModel.ViewState
+                assertEquals("new prompt", state.prompt)
+                assertFalse(state.showContext)
+                assertFalse(state.userRemovedContext)
+
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
     fun `when replace prompt then prompt stored`() =
         runTest {
+            val tabId = "tab-1"
+            val serializedPageData =
+                """
+            {
+                "title": "Ctx Title",
+                "url": "https://ctx.com",
+                "content": "content"
+            }
+                """.trimIndent()
+            testee.onPageContextReceived(tabId, serializedPageData)
+
             testee.viewState.test {
                 // initial emission
                 awaitItem()

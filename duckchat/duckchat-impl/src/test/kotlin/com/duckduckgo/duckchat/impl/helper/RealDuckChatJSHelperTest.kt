@@ -321,7 +321,7 @@ class RealDuckChatJSHelperTest {
                 id = "123",
                 data = JSONObject().apply { put("reason", "userAction") },
                 mode = Mode.CONTEXTUAL,
-                pageContext = null,
+                pageContext = "",
             )
 
         assertNull(result)
@@ -576,7 +576,7 @@ class RealDuckChatJSHelperTest {
             method,
             id,
             data,
-            pageContext = null,
+            pageContext = "",
         )
 
         assertNull(result)
