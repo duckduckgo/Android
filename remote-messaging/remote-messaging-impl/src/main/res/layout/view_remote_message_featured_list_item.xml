@@ -66,6 +66,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/image"
+                app:textType="primary"
                 app:typography="body1"
                 tools:text="If you want more AI" />
 
@@ -80,6 +81,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/title"
+                app:textType="secondary"
                 app:typography="body2"
                 tools:text="Explore new chat models recently added to Duck.ai for a more personalized chat experience that suits your style!" />
 
