@@ -86,36 +86,36 @@ class PrivacyDashboardRenderer(
 
         val cookiePromptManagementStatusAdapter = moshi.adapter(CookiePromptManagementState::class.java)
         val cookiePromptManagementStatusJson = cookiePromptManagementStatusAdapter.toJson(viewState.cookiePromptManagementStatus)
-        webView.evaluateJavascript("javascript:typeof onChangeConsentManaged === 'function' && onChangeConsentManaged($cookiePromptManagementStatusJson);", null)
+        webView.evaluateJavascript("javascript:onChangeConsentManaged($cookiePromptManagementStatusJson);", null)
 
         val maliciousStateJson = """{"kind": ${viewState.maliciousSiteStatus?.let { "\"$it\"" } ?: "null"}}"""
-        webView.evaluateJavascript("javascript:typeof onChangeMaliciousSiteStatus === 'function' && onChangeMaliciousSiteStatus($maliciousStateJson);", null)
+        webView.evaluateJavascript("javascript:onChangeMaliciousSiteStatus($maliciousStateJson);", null)
 
         // remote feature settings
         val remoteFeatureSettingsAdapter = moshi.adapter(RemoteFeatureSettingsViewState::class.java)
         val remoteFeatureSettingsJson = remoteFeatureSettingsAdapter.toJson(viewState.remoteFeatureSettings)
-        webView.evaluateJavascript("javascript:typeof onChangeFeatureSettings === 'function' && onChangeFeatureSettings($remoteFeatureSettingsJson);", null)
+        webView.evaluateJavascript("javascript:onChangeFeatureSettings($remoteFeatureSettingsJson);", null)
 
         if (viewState.siteViewState.locale != lastSeenPrivacyDashboardViewState?.siteViewState?.locale) {
-            webView.evaluateJavascript("javascript:typeof onChangeLocale === 'function' && onChangeLocale($siteViewStateJson);", null)
+            webView.evaluateJavascript("javascript:onChangeLocale($siteViewStateJson);", null)
         }
         if (viewState.protectionStatus != lastSeenPrivacyDashboardViewState?.protectionStatus) {
             val protectionsAdapter = moshi.adapter(ProtectionStatusViewState::class.java)
             val protectionsJson = protectionsAdapter.toJson(viewState.protectionStatus)
-            webView.evaluateJavascript("javascript:typeof onChangeProtectionStatus === 'function' && onChangeProtectionStatus($protectionsJson);", null)
+            webView.evaluateJavascript("javascript:onChangeProtectionStatus($protectionsJson);", null)
         }
         if (viewState.siteViewState.parentEntity != lastSeenPrivacyDashboardViewState?.siteViewState?.parentEntity) {
             val parentEntityAdapter = moshi.adapter(EntityViewState::class.java)
             val parentEntityJson = parentEntityAdapter.toJson(viewState.siteViewState.parentEntity)
-            webView.evaluateJavascript("javascript:typeof onChangeParentEntity === 'function' && onChangeParentEntity($parentEntityJson);", null)
+            webView.evaluateJavascript("javascript:onChangeParentEntity($parentEntityJson);", null)
         }
         if (viewState.siteViewState.secCertificateViewModels != lastSeenPrivacyDashboardViewState?.siteViewState?.secCertificateViewModels) {
-            webView.evaluateJavascript("javascript:typeof onChangeCertificateData === 'function' && onChangeCertificateData($siteViewStateJson);", null)
+            webView.evaluateJavascript("javascript:onChangeCertificateData($siteViewStateJson);", null)
         }
         if (viewState.siteViewState.upgradedHttps != lastSeenPrivacyDashboardViewState?.siteViewState?.upgradedHttps) {
-            webView.evaluateJavascript("javascript:typeof onChangeUpgradedHttps === 'function' && onChangeUpgradedHttps(${viewState.siteViewState.upgradedHttps});", null)
+            webView.evaluateJavascript("javascript:onChangeUpgradedHttps(${viewState.siteViewState.upgradedHttps});", null)
         }
-        webView.evaluateJavascript("javascript:typeof onChangeRequestData === 'function' && onChangeRequestData(\"${viewState.siteViewState.url}\", $requestDataJson);", null)
+        webView.evaluateJavascript("javascript:onChangeRequestData(\"${viewState.siteViewState.url}\", $requestDataJson);", null)
 
         lastSeenPrivacyDashboardViewState = viewState
     }

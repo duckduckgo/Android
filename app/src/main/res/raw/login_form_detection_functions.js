@@ -5,9 +5,7 @@ function loginAttemptDetected() {
     try {
         LoginDetection.log("Possible login attempt detected");
         LoginDetection.loginDetected();
-    } catch (error) {
-        // Expected: LoginDetection bridge may not be attached if WebView is being destroyed
-    }
+    } catch (error) {}
 }
 
 function inputVisible(input) {
@@ -87,9 +85,7 @@ function scanForPasswordField() {
         var found = false
         try {
             found = scanPasswordFieldsInIFrame()
-        } catch (error) {
-            // Expected: cross-origin iframes will throw SecurityError on contentWindow access
-        }
+        } catch (error) {}
         if (!found) {
             LoginDetection.log("No password fields found");
         }
