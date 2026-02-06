@@ -350,7 +350,7 @@ class DuckChatContextualViewModel @Inject constructor(
             _viewState.update { current ->
                 current.copy(
                     prompt = prompt,
-                    showContext = updatedPageContext.isNotEmpty(),
+                    showContext = isContextValid(updatedPageContext),
                 )
             }
         }
