@@ -129,6 +129,7 @@
     <string name="settingsMenuItemTitle">Iestatījumi</string>
     <string name="settingsHeadingProtections">Aizsardzība</string>
     <string name="settingsHeadingAppearance">Izskats</string>
+    <string name="settingsWhatsNew">Kas jauns</string>
     <string name="settingsHeadingAbout">Par</string>
     <string name="settingsAboutDuckduckgo">Par DuckDuckGo</string>
     <string name="settingsVersion">Versija</string>

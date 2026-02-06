@@ -3,16 +3,16 @@
 
     <issue
         id="DuplicateIncludedIds"
-        message="Duplicate id @+id/newTabContent, defined or included multiple times in layout/view_new_tab_page.xml: [layout/view_new_tab_page.xml defines @+id/newTabContent, layout/view_new_tab_page.xml => layout/view_new_tab_page_shimmer_grid_item.xml defines @+id/newTabContent]"
+        message="Duplicate id @+id/newTabContent, defined or included multiple times in layout/view_configurable_new_tab_page.xml: [layout/view_configurable_new_tab_page.xml defines @+id/newTabContent, layout/view_configurable_new_tab_page.xml => layout/view_new_tab_page_shimmer_grid_item.xml defines @+id/newTabContent]"
         errorLine1="                &lt;include layout=&quot;@layout/view_new_tab_page_shimmer_grid_item&quot; />"
         errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/res/layout/view_new_tab_page.xml"
+            file="src/main/res/layout/view_configurable_new_tab_page.xml"
             line="83"
             column="17"
-            message="Duplicate id @+id/newTabContent, defined or included multiple times in layout/view_new_tab_page.xml: [layout/view_new_tab_page.xml defines @+id/newTabContent, layout/view_new_tab_page.xml => layout/view_new_tab_page_shimmer_grid_item.xml defines @+id/newTabContent]"/>
+            message="Duplicate id @+id/newTabContent, defined or included multiple times in layout/view_configurable_new_tab_page.xml: [layout/view_configurable_new_tab_page.xml defines @+id/newTabContent, layout/view_configurable_new_tab_page.xml => layout/view_new_tab_page_shimmer_grid_item.xml defines @+id/newTabContent]"/>
         <location
-            file="src/main/res/layout/view_new_tab_page.xml"
+            file="src/main/res/layout/view_configurable_new_tab_page.xml"
             line="24"
             column="5"
             message="Defined here"/>
@@ -20,7 +20,7 @@
             file="src/main/res/layout/view_new_tab_page_shimmer_grid_item.xml"
             line="22"
             column="5"
-            message="Defined here, included via layout/view_new_tab_page.xml => layout/view_new_tab_page_shimmer_grid_item.xml defines @+id/newTabContent"/>
+            message="Defined here, included via layout/view_configurable_new_tab_page.xml => layout/view_new_tab_page_shimmer_grid_item.xml defines @+id/newTabContent"/>
     </issue>
 
     <issue
@@ -113,7 +113,7 @@
         errorLine1="            &lt;ImageButton"
         errorLine2="             ~~~~~~~~~~~">
         <location
-            file="src/main/res/layout/view_new_tab_page.xml"
+            file="src/main/res/layout/view_configurable_new_tab_page.xml"
             line="131"
             column="14"/>
     </issue>
@@ -124,7 +124,7 @@
         errorLine1="    &lt;ImageButton"
         errorLine2="     ~~~~~~~~~~~">
         <location
-            file="src/main/res/layout/view_new_tab_page.xml"
+            file="src/main/res/layout/view_configurable_new_tab_page.xml"
             line="146"
             column="6"/>
     </issue>

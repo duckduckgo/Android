@@ -32,6 +32,7 @@ import com.duckduckgo.remote.messaging.api.Content.Placeholder.DUCK_AI_OLD
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.IMAGE_AI
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.KEY_IMPORT
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.MAC_AND_WINDOWS
+import com.duckduckgo.remote.messaging.api.Content.Placeholder.MAC_AND_WINDOWS_NEW
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.PRIVACY_SHIELD
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.RADAR
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.SPLIT_BAR_SETTINGS
@@ -97,7 +98,8 @@ private fun Placeholder.drawable(isLightModeEnabled: Boolean): Int {
         DDG_ANNOUNCE -> R.drawable.ic_ddg_announce
         CRITICAL_UPDATE -> R.drawable.ic_critical_update
         APP_UPDATE -> R.drawable.ic_app_update
-        MAC_AND_WINDOWS -> R.drawable.desktop_promo_artwork
+        MAC_AND_WINDOWS_NEW -> R.drawable.desktop_promo_artwork
+        MAC_AND_WINDOWS -> R.drawable.promo_mac_and_windows
         PRIVACY_SHIELD -> R.drawable.ic_privacy_pro
         DUCK_AI_OLD -> R.drawable.ic_duck_ai
         DUCK_AI -> R.drawable.ic_duckai

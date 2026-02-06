@@ -381,6 +381,8 @@ class BrowserTabFragment :
     private val supervisorJob = SupervisorJob()
 
     private var duckAiContextualFragment: DuckChatContextualFragment? = null
+    private var contextualSheetLayoutChangeListener: View.OnLayoutChangeListener? = null
+    private var contextualSheetBottomSheetCallback: BottomSheetBehavior.BottomSheetCallback? = null
 
     override val coroutineContext: CoroutineContext
         get() = supervisorJob + dispatchers.main()
@@ -1800,6 +1802,12 @@ class BrowserTabFragment :
         webView?.removeEnableSwipeRefreshCallback()
         webView?.stopNestedScroll()
         webView?.stopLoading()
+        contextualSheetLayoutChangeListener?.let { binding.rootView.removeOnLayoutChangeListener(it) }
+        contextualSheetLayoutChangeListener = null
+        contextualSheetBottomSheetCallback?.let {
+            BottomSheetBehavior.from(binding.duckAiContextualFragmentContainer).removeBottomSheetCallback(it)
+        }
+        contextualSheetBottomSheetCallback = null
         browserNavigationBarIntegration.onDestroyView()
         super.onDestroyView()
     }
@@ -3342,13 +3350,16 @@ class BrowserTabFragment :
     }
 
     private fun showDuckChatContextualSheet(tabId: String) {
+        binding.duckAiContextualFragmentContainer.show()
+
+        setupContextualSheetHeightSync()
+
+        omnibar.setExpanded(false)
         duckAiContextualFragment?.let { fragment ->
             openExistingContextualFragment(fragment)
         } ?: run {
             createNewContextualFragment(tabId)
         }
-
-        binding.duckAiContextualFragmentContainer.show()
 
         reactToDuckChatContextualSheetResult()
         ensureBrowserIsCompatibleWithContextualSheetState()
@@ -3364,6 +3375,9 @@ class BrowserTabFragment :
         val transaction = childFragmentManager.beginTransaction()
         transaction.replace(binding.duckAiContextualFragmentContainer.id, fragment)
         transaction.commit()
+
+        val bottomSheetBehavior = BottomSheetBehavior.from(binding.duckAiContextualFragmentContainer)
+        bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
     }
 
     private fun openExistingContextualFragment(fragment: DuckChatContextualFragment) {
@@ -3386,16 +3400,15 @@ class BrowserTabFragment :
 
     private fun ensureBrowserIsCompatibleWithContextualSheetState() {
         val bottomSheetBehavior = BottomSheetBehavior.from(binding.duckAiContextualFragmentContainer)
-        bottomSheetBehavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
-
-        bottomSheetBehavior.addBottomSheetCallback(
-            object : BottomSheetBehavior.BottomSheetCallback() {
+        contextualSheetBottomSheetCallback?.let { bottomSheetBehavior.removeBottomSheetCallback(it) }
+        val callback =
+            contextualSheetBottomSheetCallback ?: object : BottomSheetBehavior.BottomSheetCallback() {
                 override fun onStateChanged(
                     bottomSheet: View,
                     newState: Int,
                 ) {
-                    logcat { "Duck.ai Contextual: BTF onStateChanged $newState" }
                     if (newState == BottomSheetBehavior.STATE_HIDDEN) {
+                        omnibar.setExpanded(true)
                         binding.duckAiContextualFragmentContainer.gone()
                         hideKeyboard()
                         browserActivity?.onEditModeChanged(false)
@@ -3410,8 +3423,8 @@ class BrowserTabFragment :
                     slideOffset: Float,
                 ) {
                 }
-            },
-        )
+            }.also { contextualSheetBottomSheetCallback = it }
+        bottomSheetBehavior.addBottomSheetCallback(callback)
     }
 
     private fun showDuckAiContextualOnboarding() {
@@ -3480,6 +3493,7 @@ class BrowserTabFragment :
             pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_LEGACY_OMNIBAR_SHOWN_DAILY, type = Daily())
             pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_LEGACY_OMNIBAR_SHOWN_COUNT)
             cancelPendingAutofillRequestsToChooseCredentials()
+            removeDuckChatContextualSheet()
         } else {
             omnibar.omnibarTextInput.hideKeyboard()
 
@@ -5318,6 +5332,37 @@ class BrowserTabFragment :
                 }
             }
             .launchIn(lifecycleScope)
+    }
+
+    private fun setupContextualSheetHeightSync() {
+        val container = binding.duckAiContextualFragmentContainer
+        val browserLayout = binding.rootView
+
+        fun updateContainerHeight(newHeight: Int) {
+            if (newHeight <= 0) return
+            val params = container.layoutParams
+            if (params.height != newHeight) {
+                params.height = newHeight
+                container.layoutParams = params
+            }
+        }
+
+        contextualSheetLayoutChangeListener?.let { browserLayout.removeOnLayoutChangeListener(it) }
+        val layoutChangeListener =
+            contextualSheetLayoutChangeListener ?: View.OnLayoutChangeListener { _, _, top, _, bottom, _, oldTop, _, oldBottom ->
+                if (binding.duckAiContextualFragmentContainer.isVisible) {
+                    val newHeight = bottom - top
+                    val oldHeight = oldBottom - oldTop
+                    if (newHeight != oldHeight) {
+                        updateContainerHeight(newHeight)
+                    }
+                }
+            }.also { contextualSheetLayoutChangeListener = it }
+        browserLayout.addOnLayoutChangeListener(layoutChangeListener)
+
+        browserLayout.post {
+            updateContainerHeight(browserLayout.height)
+        }
     }
 }
 

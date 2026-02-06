@@ -28,6 +28,7 @@ import com.duckduckgo.app.fire.DataClearerTimeKeeper
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.fire.model.AppCacheExclusionPlugin
+import com.duckduckgo.app.fire.wideevents.DataClearingWideEvent
 import com.duckduckgo.app.global.file.FileDeleter
 import com.duckduckgo.app.global.view.ClearDataAction
 import com.duckduckgo.app.global.view.ClearPersonalDataAction
@@ -122,8 +123,9 @@ object PrivacyModule {
         context: Context,
         fileDeleter: FileDeleter,
         exclusionPlugins: PluginPoint<AppCacheExclusionPlugin>,
+        dataClearingWideEvent: DataClearingWideEvent,
     ): AppCacheClearer {
-        return AndroidAppCacheClearer(context, fileDeleter, exclusionPlugins)
+        return AndroidAppCacheClearer(context, fileDeleter, exclusionPlugins, dataClearingWideEvent)
     }
 
     @Provides

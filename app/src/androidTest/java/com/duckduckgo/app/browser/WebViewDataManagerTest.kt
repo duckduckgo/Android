@@ -25,6 +25,7 @@ import com.duckduckgo.anrs.api.CrashLogger
 import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
 import com.duckduckgo.app.browser.indexeddb.IndexedDBManager
 import com.duckduckgo.app.browser.weblocalstorage.WebLocalStorageManager
+import com.duckduckgo.app.fire.wideevents.DataClearingWideEvent
 import com.duckduckgo.app.global.file.FileDeleter
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.db.SettingsDataStore
@@ -36,12 +37,15 @@ import com.duckduckgo.cookies.api.DuckDuckGoCookieManager
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withContext
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
+import org.junit.Before
 import org.junit.Test
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
@@ -62,22 +66,31 @@ class WebViewDataManagerTest {
     private val mockCrashLogger: CrashLogger = mock()
     private val mockAppBuildConfig: AppBuildConfig = mock()
     private val mockSettingsDataStore: SettingsDataStore = mock()
+    private val mockDataClearingWideEvent: DataClearingWideEvent = mock()
     private val feature = FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
 
-    private val testee = WebViewDataManager(
-        context,
-        mockCookieManager,
-        mockFileDeleter,
-        mockWebViewHttpAuthStore,
-        feature,
-        mockWebLocalStorageManager,
-        mockIndexedDBManager,
-        mockCrashLogger,
-        TestScope(),
-        CoroutineTestRule().testDispatcherProvider,
-        mockAppBuildConfig,
-        mockSettingsDataStore,
-    )
+    private val testee by lazy {
+        WebViewDataManager(
+            context,
+            mockCookieManager,
+            mockFileDeleter,
+            mockWebViewHttpAuthStore,
+            feature,
+            mockWebLocalStorageManager,
+            mockIndexedDBManager,
+            mockCrashLogger,
+            TestScope(),
+            CoroutineTestRule().testDispatcherProvider,
+            mockAppBuildConfig,
+            mockSettingsDataStore,
+            mockDataClearingWideEvent,
+        )
+    }
+
+    @Before
+    fun setup(): Unit = runBlocking {
+        whenever(mockFileDeleter.deleteContents(any(), any())).thenReturn(Result.success(Unit))
+    }
 
     @Test
     fun whenDataClearedThenWebViewHistoryCleared() = runTest {

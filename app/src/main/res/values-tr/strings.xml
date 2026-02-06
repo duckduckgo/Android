@@ -128,6 +128,7 @@
     <string name="settingsMenuItemTitle">Ayarlar</string>
     <string name="settingsHeadingProtections">Korumalar</string>
     <string name="settingsHeadingAppearance">Görünüm</string>
+    <string name="settingsWhatsNew">Yenilikler</string>
     <string name="settingsHeadingAbout">Hakkında</string>
     <string name="settingsAboutDuckduckgo">DuckDuckGo Hakkında</string>
     <string name="settingsVersion">Versiyon</string>

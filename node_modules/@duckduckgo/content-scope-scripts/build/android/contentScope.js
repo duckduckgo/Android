@@ -1362,6 +1362,23 @@
     }
     return false;
   }
+  function withDefaults(defaults, config) {
+    if (config === void 0) {
+      return defaults;
+    }
+    if (
+      // if defaults are undefined
+      defaults === void 0 || // or either config or defaults are a non-object value that we can't merge
+      Array.isArray(defaults) || defaults === null || typeof defaults !== "object" || Array.isArray(config) || config === null || typeof config !== "object"
+    ) {
+      return config;
+    }
+    const result = {};
+    for (const key of new Set2([...Object.keys(defaults), ...Object.keys(config)])) {
+      result[key] = withDefaults(defaults[key], config[key]);
+    }
+    return result;
+  }
 
   // src/features.js
   init_define_import_meta_trackerLookup();
@@ -1395,6 +1412,7 @@
       "duckAiChatHistory",
       "harmfulApis",
       "webCompat",
+      "webDetection",
       "webInterferenceDetection",
       "windowsPermissionUsage",
       "uaChBrands",
@@ -1408,7 +1426,7 @@
     ]
   );
   var platformSupport = {
-    apple: ["webCompat", "duckPlayerNative", ...baseFeatures, "webInterferenceDetection", "pageContext"],
+    apple: ["webCompat", "duckPlayerNative", ...baseFeatures, "webDetection", "webInterferenceDetection", "pageContext"],
     "apple-isolated": [
       "duckPlayer",
       "duckPlayerNative",
@@ -1417,11 +1435,21 @@
       "performanceMetrics",
       "clickToLoad",
       "messageBridge",
-      "favicon"
+      "favicon",
+      "webDetection"
     ],
     "apple-ai-clear": ["duckAiDataClearing"],
     "apple-ai-history": ["duckAiChatHistory"],
-    android: [...baseFeatures, "webCompat", "webInterferenceDetection", "breakageReporting", "duckPlayer", "messageBridge", "pageContext"],
+    android: [
+      ...baseFeatures,
+      "webCompat",
+      "webDetection",
+      "webInterferenceDetection",
+      "breakageReporting",
+      "duckPlayer",
+      "messageBridge",
+      "pageContext"
+    ],
     "android-broker-protection": ["brokerProtection"],
     "android-autofill-import": ["autofillImport"],
     "android-adsjs": [
@@ -1433,11 +1461,13 @@
       "fingerprintingAudio",
       "fingerprintingBattery",
       "gpc",
+      "webDetection",
       "breakageReporting"
     ],
     windows: [
       "cookie",
       ...baseFeatures,
+      "webDetection",
       "webInterferenceDetection",
       "webTelemetry",
       "windowsPermissionUsage",
@@ -1452,9 +1482,9 @@
       "performanceMetrics",
       "duckAiChatHistory"
     ],
-    firefox: ["cookie", ...baseFeatures, "clickToLoad", "webInterferenceDetection", "breakageReporting"],
-    chrome: ["cookie", ...baseFeatures, "clickToLoad", "webInterferenceDetection", "breakageReporting"],
-    "chrome-mv3": ["cookie", ...baseFeatures, "clickToLoad", "webInterferenceDetection", "breakageReporting"],
+    firefox: ["cookie", ...baseFeatures, "clickToLoad", "webDetection", "webInterferenceDetection", "breakageReporting"],
+    chrome: ["cookie", ...baseFeatures, "clickToLoad", "webDetection", "webInterferenceDetection", "breakageReporting"],
+    "chrome-mv3": ["cookie", ...baseFeatures, "clickToLoad", "webDetection", "webInterferenceDetection", "breakageReporting"],
     integration: [...baseFeatures, ...otherFeatures]
   };
 
@@ -4664,25 +4694,8 @@
       }
     }
     /**
-     * Used to match conditional changes for a settings feature.
-     * @typedef {object} ConditionBlock
-     * @property {string[] | string} [domain]
-     * @property {object} [urlPattern]
-     * @property {object} [minSupportedVersion]
-     * @property {object} [maxSupportedVersion]
-     * @property {object} [experiment]
-     * @property {string} [experiment.experimentName]
-     * @property {string} [experiment.cohort]
-     * @property {object} [context]
-     * @property {boolean} [context.frame] - true if the condition applies to frames
-     * @property {boolean} [context.top] - true if the condition applies to the top frame
-     * @property {string} [injectName] - the inject name to match against (e.g., "apple-isolated")
-     * @property {boolean} [internal] - true if the condition applies to internal builds
-     * @property {boolean} [preview] - true if the condition applies to preview builds
-     */
-    /**
      * Takes multiple conditional blocks and returns true if any apply.
-     * @param {ConditionBlock|ConditionBlock[]} conditionBlock
+     * @param {ConditionBlockOrArray} conditionBlock
      * @returns {boolean}
      */
     _matchConditionalBlockOrArray(conditionBlock) {
@@ -4839,6 +4852,14 @@
       return isMaxSupportedVersion(conditionBlock.maxSupportedVersion, __privateGet(this, _args)?.platform?.version);
     }
     /**
+     * Check if a state value is enabled for the current platform.
+     * @param {import('./utils.js').FeatureState | undefined} state
+     * @returns {boolean}
+     */
+    _isStateEnabled(state) {
+      return isStateEnabled(state, __privateGet(this, _args)?.platform);
+    }
+    /**
      * Return the settings object for a feature
      * @param {string} [featureName] - The name of the feature to get the settings for; defaults to the name of the feature
      * @returns {any}
@@ -4876,11 +4897,10 @@
      */
     getFeatureSettingEnabled(featureKeyName, defaultState, featureName) {
       const result = this.getFeatureSetting(featureKeyName, featureName) || defaultState;
-      const platform = __privateGet(this, _args)?.platform;
       if (typeof result === "object") {
-        return isStateEnabled(result.state, platform);
+        return this._isStateEnabled(result.state);
       }
-      return isStateEnabled(result, platform);
+      return this._isStateEnabled(result);
     }
     /**
      * Return a specific setting from the feature settings
@@ -7872,6 +7892,193 @@
   _webNotifications = new WeakMap();
   var web_compat_default = WebCompat;
 
+  // src/features/web-detection.js
+  init_define_import_meta_trackerLookup();
+
+  // src/features/web-detection/parse.js
+  init_define_import_meta_trackerLookup();
+  var DEFAULT_RUN_CONDITIONS = (
+    /** @type {import('../../config-feature.js').ConditionBlock[]} */
+    [
+      {
+        context: { top: true }
+      }
+    ]
+  );
+  var DEFAULTS = {
+    state: (
+      /** @type {FeatureState} */
+      "enabled"
+    ),
+    triggers: {
+      breakageReport: {
+        state: (
+          /** @type {FeatureState} */
+          "enabled"
+        ),
+        runConditions: DEFAULT_RUN_CONDITIONS
+      }
+    },
+    actions: {
+      breakageReportData: {
+        state: (
+          /** @type {FeatureState} */
+          "enabled"
+        )
+      }
+    }
+  };
+  function isValidName(name) {
+    return /^[a-zA-Z][a-zA-Z0-9_]*$/.test(name);
+  }
+  function normalizeDetector(config) {
+    return withDefaults(DEFAULTS, config);
+  }
+  function parseDetectors(detectorsConfig) {
+    const detectors = {};
+    if (!detectorsConfig) {
+      return detectors;
+    }
+    for (const [groupName, groupConfig] of Object.entries(detectorsConfig)) {
+      if (!isValidName(groupName)) {
+        continue;
+      }
+      const groupDetectors = {};
+      for (const [detectorId, detectorConfig] of Object.entries(groupConfig)) {
+        if (!isValidName(detectorId)) {
+          continue;
+        }
+        groupDetectors[detectorId] = normalizeDetector(detectorConfig);
+      }
+      detectors[groupName] = groupDetectors;
+    }
+    return detectors;
+  }
+
+  // src/features/web-detection/matching.js
+  init_define_import_meta_trackerLookup();
+  function asArray(value, defaultValue = []) {
+    if (value === void 0) return defaultValue;
+    return Array.isArray(value) ? value : [value];
+  }
+  function isVisible(element) {
+    const style = getComputedStyle(element);
+    const rect = element.getBoundingClientRect();
+    return rect.width > 0.5 && rect.height > 0.5 && style.display !== "none" && style.visibility !== "hidden" && parseFloat(style.opacity) > 0.05;
+  }
+  function evaluateSingleTextCondition(condition) {
+    const patterns = asArray(condition.pattern);
+    const selectors = asArray(condition.selector, ["body"]);
+    const patternComb = new RegExp(patterns.join("|"), "i");
+    return selectors.some((selector) => {
+      const elements = document.querySelectorAll(selector);
+      for (const element of elements) {
+        if (patternComb.test(element.textContent || "")) {
+          return true;
+        }
+      }
+      return false;
+    });
+  }
+  function evaluateSingleElementCondition(config) {
+    const visibility = config.visibility ?? "any";
+    return asArray(config.selector).some((selector) => {
+      if (visibility === "any") {
+        return document.querySelector(selector) !== null;
+      }
+      for (const element of document.querySelectorAll(selector)) {
+        if (visibility === "visible" && isVisible(element)) {
+          return true;
+        }
+        if (visibility === "hidden" && !isVisible(element)) {
+          return true;
+        }
+      }
+      return false;
+    });
+  }
+  function evaluateORCondition(condition, singleConditionEvaluator) {
+    if (condition === void 0) return true;
+    if (Array.isArray(condition)) {
+      return condition.some((v2) => singleConditionEvaluator(v2));
+    }
+    return singleConditionEvaluator(condition);
+  }
+  function evaluateSingleMatchCondition(condition) {
+    if (!evaluateORCondition(condition.text, evaluateSingleTextCondition)) {
+      return false;
+    }
+    if (!evaluateORCondition(condition.element, evaluateSingleElementCondition)) {
+      return false;
+    }
+    return true;
+  }
+  function evaluateMatch(conditions) {
+    return evaluateORCondition(conditions, evaluateSingleMatchCondition);
+  }
+
+  // src/features/web-detection.js
+  var _detectors;
+  var WebDetection = class extends ContentFeature {
+    constructor() {
+      super(...arguments);
+      /** @type {Record<string, Record<string, DetectorConfig>>} */
+      __privateAdd(this, _detectors, {});
+      __publicField(this, "_exposedMethods", this._declareExposedMethods(["runDetectors"]));
+    }
+    /**
+     * Initialize the feature by loading detector configurations
+     */
+    init() {
+      const detectorsConfig = this.getFeatureSetting("detectors");
+      __privateSet(this, _detectors, parseDetectors(detectorsConfig));
+    }
+    /**
+     * Check if a detector should be triggered.
+     *
+     * @param {DetectorConfig} config
+     * @param {RunDetectionOptions} options
+     * @returns {boolean}
+     */
+    _shouldRunDetector(config, options) {
+      if (!this._isStateEnabled(config.state)) return false;
+      const triggerSettings = config.triggers[options.trigger];
+      if (!triggerSettings || !this._isStateEnabled(triggerSettings.state)) return false;
+      if (triggerSettings.runConditions && !this._matchConditionalBlockOrArray(triggerSettings.runConditions)) return false;
+      return true;
+    }
+    /**
+     * Run all detectors for a specific trigger.
+     *
+     * @param {RunDetectionOptions} options
+     * @returns {DetectorResult[]}
+     */
+    runDetectors(options) {
+      const results = [];
+      for (const [groupName, groupDetectors] of Object.entries(__privateGet(this, _detectors))) {
+        for (const [detectorId, detectorConfig] of Object.entries(groupDetectors)) {
+          if (!this._shouldRunDetector(detectorConfig, options)) continue;
+          let detected;
+          try {
+            detected = evaluateMatch(detectorConfig.match);
+          } catch {
+            detected = "error";
+          }
+          if (options.trigger === "breakageReport" && this._isStateEnabled(detectorConfig.actions.breakageReportData.state)) {
+            if (detected !== false) {
+              results.push({
+                detectorId: `${groupName}.${detectorId}`,
+                detected
+              });
+            }
+          }
+        }
+      }
+      return results;
+    }
+  };
+  _detectors = new WeakMap();
+
   // src/features/web-interference-detection.js
   init_define_import_meta_trackerLookup();
 
@@ -7892,7 +8099,7 @@
     }
     return selectors.some((selector) => {
       const element = document.querySelector(selector);
-      return element && isVisible(element);
+      return element && isVisible2(element);
     });
   }
   function checkWindowProperties(properties) {
@@ -7901,7 +8108,7 @@
     }
     return properties.some((prop) => typeof window?.[prop] !== "undefined");
   }
-  function isVisible(element) {
+  function isVisible2(element) {
     const computedStyle = getComputedStyle(element);
     const rect = element.getBoundingClientRect();
     return rect.width > 0.5 && rect.height > 0.5 && computedStyle.display !== "none" && computedStyle.visibility !== "hidden" && +computedStyle.opacity > 0.05;
@@ -8152,6 +8359,7 @@
     init() {
       const isExpandedPerformanceMetricsEnabled = this.getFeatureSettingEnabled("expandedPerformanceMetrics", "enabled");
       this.messaging.subscribe("getBreakageReportValues", async () => {
+        const breakageDataPayload = {};
         const jsPerformance = getJsPerformanceMetrics();
         const referrer = document.referrer;
         const result = {
@@ -8167,6 +8375,10 @@
           result.pageReloaded = window.performance.navigation && window.performance.navigation.type === 1 || /** @type {PerformanceNavigationTiming[]} */
           window.performance.getEntriesByType("navigation").map((nav) => nav.type).includes("reload");
         }
+        const webDetectionResults = await this.callFeatureMethod("webDetection", "runDetectors", { trigger: "breakageReport" });
+        if (!(webDetectionResults instanceof CallFeatureMethodError) && webDetectionResults.length > 0) {
+          breakageDataPayload.webDetection = webDetectionResults;
+        }
         const detectorSettings = this.getFeatureSetting("interferenceTypes", "webInterferenceDetection");
         if (detectorSettings) {
           result.detectorData = {
@@ -8181,7 +8393,6 @@
             result.expandedPerformanceMetrics = expandedPerformanceMetrics.metrics;
           }
         }
-        const breakageDataPayload = {};
         if (result.detectorData) {
           breakageDataPayload.detectorData = result.detectorData;
         }
@@ -11011,6 +11222,7 @@ ${iframeContent}
     ddg_feature_exceptionHandler: ExceptionHandler,
     ddg_feature_apiManipulation: ApiManipulation,
     ddg_feature_webCompat: web_compat_default,
+    ddg_feature_webDetection: WebDetection,
     ddg_feature_webInterferenceDetection: WebInterferenceDetection,
     ddg_feature_breakageReporting: BreakageReporting,
     ddg_feature_duckPlayer: DuckPlayerFeature,

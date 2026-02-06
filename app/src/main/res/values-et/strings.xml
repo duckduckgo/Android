@@ -128,6 +128,7 @@
     <string name="settingsMenuItemTitle">Sätted</string>
     <string name="settingsHeadingProtections">Kaitsed</string>
     <string name="settingsHeadingAppearance">Välimus</string>
+    <string name="settingsWhatsNew">Mida on uut</string>
     <string name="settingsHeadingAbout">Teave</string>
     <string name="settingsAboutDuckduckgo">DuckDuckGo teave</string>
     <string name="settingsVersion">Versioon</string>
