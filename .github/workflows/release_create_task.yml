@@ -17,7 +17,6 @@ on:
 
 env:
   ASANA_PAT: ${{ secrets.ASANA_ACCESS_TOKEN }}
-  emoji_start: ":flight_departure:" # 🛫
   emoji_info: ":information_source:" # ℹ️
 
 concurrency:
@@ -42,16 +41,6 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
-      - name: Notify Mattermost of Release starting
-        id: send-mm-release-starting
-        uses: duckduckgo/native-github-asana-sync@v2.0
-        with:
-          mattermost-token: ${{ secrets.MM_AUTH_TOKEN }}
-          mattermost-team-id: ${{ secrets.MM_TEAM_ID }}
-          mattermost-channel-name: ${{ vars.MM_RELEASE_NOTIFY_CHANNEL }}
-          mattermost-message: ${{env.emoji_start}} Starting release process for version ${{ inputs.app-version }}
-          action: 'send-mattermost-message'
 
       - name: Install dependencies for create-asana-public-release task
         run: |

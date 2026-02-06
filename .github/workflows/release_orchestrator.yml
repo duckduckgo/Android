@@ -9,21 +9,20 @@ on:
         default: 'PLACEHOLDER'
 
 jobs:
-  create-release-tag:
-    uses: ./.github/workflows/release_create_tag.yml
-    with:
-      app-version: ${{ inputs.app-version }}
-    secrets: inherit
-
-  create-asana-release-task:
-    needs: create-release-tag
-    uses: ./.github/workflows/release_create_task.yml
-    with:
-      app-version: ${{ inputs.app-version }}
-    secrets: inherit
+#  create-release-tag:
+#    uses: ./.github/workflows/release_create_tag.yml
+#    with:
+#      app-version: ${{ inputs.app-version }}
+#    secrets: inherit
+#
+#  create-asana-release-task:
+#    needs: create-release-tag
+#    uses: ./.github/workflows/release_create_task.yml
+#    with:
+#      app-version: ${{ inputs.app-version }}
+#    secrets: inherit
 
   upload-play-store:
-    needs: create-release-tag
     uses: ./.github/workflows/release_upload_play_store.yml
     with:
       ref: ${{ inputs.app-version }}
@@ -32,4 +31,6 @@ jobs:
   upload-internal:
     needs: upload-play-store
     uses: ./.github/workflows/release_upload_internal.yml
+    with:
+      ref: ${{ inputs.app-version }}
     secrets: inherit

@@ -4,6 +4,11 @@ on:
   schedule:
     - cron: '15 2 * * *' # run at 2:15 AM UTC
   workflow_call:
+    inputs:
+      ref:
+        description: 'Ref to build APK from (branch, tag, commit)'
+        type: string
+        required: true
   workflow_dispatch:
 
 env:
@@ -25,6 +30,8 @@ jobs:
           submodules: recursive
           token: ${{ secrets.GT_DAXMOBILE }}
           fetch-depth: 0
+          ref: ${{ inputs.ref || github.sha}}
+
 
       - name: Set up JDK version
         uses: actions/setup-java@v4
