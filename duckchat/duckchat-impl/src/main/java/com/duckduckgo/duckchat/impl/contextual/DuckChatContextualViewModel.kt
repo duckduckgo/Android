@@ -324,6 +324,7 @@ class DuckChatContextualViewModel @Inject constructor(
         logcat { "Duck.ai Contextual: addPageContext" }
         viewModelScope.launch {
             _viewState.update { current ->
+                logcat { "Duck.ai Contextual: addPageContext $current context $updatedPageContext" }
                 current.copy(
                     showContext = updatedPageContext.isNotEmpty(),
                     userRemovedContext = false,
@@ -387,16 +388,29 @@ class DuckChatContextualViewModel @Inject constructor(
 
         if (title != null && url != null) {
             val inputMode = _viewState.value
+            logcat { "Duck.ai: onPageContextReceived $inputMode" }
 
             if (inputMode.sheetMode == SheetMode.INPUT) {
-                _viewState.update {
-                    inputMode.copy(
-                        contextTitle = title,
-                        contextUrl = url,
-                        tabId = tabId,
-                        allowsAutomaticContextAttachment = duckChatInternal.isAutomaticContextAttachmentEnabled(),
-                        showContext = duckChatInternal.isAutomaticContextAttachmentEnabled() && !_viewState.value.userRemovedContext,
-                    )
+                if (duckChatInternal.isAutomaticContextAttachmentEnabled()) {
+                    if (!inputMode.userRemovedContext) {
+                        _viewState.update {
+                            inputMode.copy(
+                                contextTitle = title,
+                                contextUrl = url,
+                                tabId = tabId,
+                                allowsAutomaticContextAttachment = duckChatInternal.isAutomaticContextAttachmentEnabled(),
+                                showContext = true,
+                            )
+                        }
+                    }
+                } else {
+                    _viewState.update {
+                        inputMode.copy(
+                            contextTitle = title,
+                            contextUrl = url,
+                            allowsAutomaticContextAttachment = duckChatInternal.isAutomaticContextAttachmentEnabled(),
+                        )
+                    }
                 }
             } else {
                 _viewState.update {

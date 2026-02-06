@@ -174,6 +174,7 @@ class DuckChatContextualViewModelTest {
 
             // Load and cache context, then remove it to set hasContext=false while data remains cached.
             testee.onSheetOpened(tabId)
+            coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
             testee.onPageContextReceived(tabId, serializedPageData)
             testee.removePageContext()
 
@@ -235,6 +236,68 @@ class DuckChatContextualViewModelTest {
                 assertEquals("https://ctx.com", state.contextUrl)
                 assertEquals("tab-1", state.tabId)
             }
+        }
+
+    @Test
+    fun `when page context arrives without title then context not stored`() =
+        runTest {
+            val tabId = "tab-1"
+            val serializedPageData =
+                """
+                {
+                    "title": "",
+                    "url": "https://ctx.com",
+                    "content": "content"
+                }
+                """.trimIndent()
+
+            testee.onSheetOpened(tabId)
+            coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+            testee.onPageContextReceived(tabId, serializedPageData)
+
+            val state = testee.viewState.value
+            assertFalse(state.showContext)
+            assertFalse(state.userRemovedContext)
+            assertEquals("", state.contextTitle)
+            assertEquals("", state.contextUrl)
+            assertEquals(tabId, state.tabId)
+        }
+
+    @Test
+    fun `when automatic context attachment disabled then context not shown`() =
+        runTest {
+            whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(false)
+            testee =
+                DuckChatContextualViewModel(
+                    dispatchers = coroutineRule.testDispatcherProvider,
+                    duckChat = duckChat,
+                    duckChatInternal = duckChatInternal,
+                    duckChatJSHelper = duckChatJSHelper,
+                    contextualDataStore = contextualDataStore,
+                    sessionTimeoutProvider = sessionTimeoutProvider,
+                    timeProvider = timeProvider,
+                )
+
+            val tabId = "tab-1"
+            val serializedPageData =
+                """
+                {
+                    "title": "Ctx Title",
+                    "url": "https://ctx.com",
+                    "content": "content"
+                }
+                """.trimIndent()
+
+            testee.onSheetOpened(tabId)
+            testee.onPageContextReceived(tabId, serializedPageData)
+
+            val state = testee.viewState.value
+            assertFalse(state.showContext)
+            assertFalse(state.userRemovedContext)
+            assertEquals("Ctx Title", state.contextTitle)
+            assertEquals("https://ctx.com", state.contextUrl)
+            assertEquals(tabId, state.tabId)
+            assertFalse(state.allowsAutomaticContextAttachment)
         }
 
     @Test
