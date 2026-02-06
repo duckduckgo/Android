@@ -583,6 +583,9 @@ class OmnibarLayout @JvmOverloads constructor(
         duckAISidebar.setOnClickListener {
             omnibarItemPressedListener?.onDuckAISidebarButtonPressed()
         }
+        trackersAnimation.setOnClickListener {
+            cancelAddressBarAnimations()
+        }
     }
 
     override fun setLogoClickListener(logoClickListener: LogoClickListener) {
@@ -1025,6 +1028,12 @@ class OmnibarLayout @JvmOverloads constructor(
         }
     }
 
+    private fun cancelCustomTabAnimations() {
+        if (this::animatorHelper.isInitialized) {
+            animatorHelper.cancelAnimations(customTabViews())
+        }
+    }
+
     private fun startTrackersAnimation(
         events: List<Entity>?,
         isCustomTab: Boolean,
@@ -1155,6 +1164,8 @@ class OmnibarLayout @JvmOverloads constructor(
                     customTabToolbar.setOnClickListener {
                         pixel.fire(CustomTabPixelNames.CUSTOM_TABS_ADDRESS_BAR_CLICKED)
                         pixel.fire(CustomTabPixelNames.CUSTOM_TABS_ADDRESS_BAR_CLICKED_DAILY, type = PixelType.Daily())
+
+                        cancelCustomTabAnimations()
                     }
 
                     daxIcon.setOnClickListener {

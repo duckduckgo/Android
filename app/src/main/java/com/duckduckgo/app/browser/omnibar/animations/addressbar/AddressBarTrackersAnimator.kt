@@ -209,7 +209,9 @@ class AddressBarTrackersAnimator @Inject constructor(
                                     override fun onAnimationRepeat(p0: Animator) {}
                                 },
                             )
-                            addressBarTrackersBlockedAnimationShieldIcon.playAnimation()
+                            if (isAnimationRunning) {
+                                addressBarTrackersBlockedAnimationShieldIcon.playAnimation()
+                            }
                         },
                     )
                     runningAnimators.add(this)
@@ -236,6 +238,8 @@ class AddressBarTrackersAnimator @Inject constructor(
     fun cancelAnimation() {
         if (!isAnimationRunning) return
 
+        isAnimationRunning = false
+
         trackerCountAnimator.cancelAnimation()
         runningAnimators.forEach { animator ->
             animator.cancel()
@@ -257,8 +261,6 @@ class AddressBarTrackersAnimator @Inject constructor(
             it.gone()
             it.progress = 0F
         }
-
-        isAnimationRunning = false
 
         sceneRoot = null
         animatedIconBackgroundView = null
