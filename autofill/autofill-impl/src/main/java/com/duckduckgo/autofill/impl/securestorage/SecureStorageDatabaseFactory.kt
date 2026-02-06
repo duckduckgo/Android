@@ -16,13 +16,11 @@
 
 package com.duckduckgo.autofill.impl.securestorage
 
-import android.content.Context
 import com.duckduckgo.autofill.store.db.ALL_MIGRATIONS
 import com.duckduckgo.autofill.store.db.SecureStorageDatabase
 import com.duckduckgo.data.store.api.DatabaseProvider
 import com.duckduckgo.data.store.api.RoomDatabaseConfig
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.library.loader.LibraryLoader
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.sync.Mutex
@@ -43,35 +41,38 @@ interface SecureStorageDatabaseFactory {
     boundType = SecureStorageDatabaseFactory::class,
 )
 class RealSecureStorageDatabaseFactory @Inject constructor(
-    private val context: Context,
     private val keyProvider: SecureStorageKeyProvider,
     private val databaseProvider: DatabaseProvider,
+    private val sqlCipherLoader: SqlCipherLibraryLoader,
 ) : SecureStorageDatabaseFactory {
     private var _database: SecureStorageDatabase? = null
-
     private val mutex = Mutex()
 
-    init {
-        logcat { "Loading the sqlcipher native library" }
-        try {
-            LibraryLoader.loadLibrary(context, "sqlcipher")
-            logcat { "sqlcipher native library loaded ok" }
-        } catch (t: Throwable) {
-            // error loading the library
-            logcat(ERROR) { "Error loading sqlcipher library: ${t.asLog()}" }
-        }
-    }
-
     override suspend fun getDatabase(): SecureStorageDatabase? {
-        _database?.let { return it }
+        _database?.let {
+            logcat { "Autofill-DB-Init: Returning existing database instance" }
+            return it
+        }
+
         mutex.withLock {
             // If we have already the DB instance then let's use it
             if (_database != null) {
+                logcat { "Autofill-DB-Init: Database was initialized while waiting for lock" }
                 return _database
             }
 
+            logcat { "Autofill-DB-Init: Lock acquired, waiting for SqlCipher library load" }
+
+            // Wait for sqlcipher library to load with timeout
+            sqlCipherLoader.waitForLibraryLoad().getOrElse { throwable ->
+                logcat(ERROR) { "Autofill-DB-Init: SqlCipher library load failure - cannot create database: ${throwable.asLog()}" }
+                return null
+            }
+            logcat { "Autofill-DB-Init: SqlCipher library loaded successfully, proceeding with database creation" }
+
             // If we can't access the keystore, it means that L1Key will be null. We don't want to encrypt the db with a null key.
             return if (keyProvider.canAccessKeyStore()) {
+                logcat { "Autofill-DB-Init: Keystore accessible, creating encrypted database" }
                 // At this point, we are guaranteed that if l1key is null, it's because it hasn't been generated yet. Else, we always use the one stored.
                 _database = databaseProvider.buildRoomDatabase(
                     SecureStorageDatabase::class.java,
@@ -81,8 +82,10 @@ class RealSecureStorageDatabaseFactory @Inject constructor(
                         migrations = ALL_MIGRATIONS,
                     ),
                 )
+                logcat { "Autofill-DB-Init: Database created successfully" }
                 _database
             } else {
+                logcat(ERROR) { "Autofill-DB-Init: Cannot access keystore - database creation aborted" }
                 null
             }
         }
