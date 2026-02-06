@@ -41,7 +41,6 @@ class ReinstallAtbListener @Inject constructor(
 
     override suspend fun beforeAtbInit() = withContext(dispatcherProvider.io()) {
         backupDataStore.clearBackupPreferences()
-
         if (appBuildConfig.isAppReinstall()) {
             statisticsDataStore.variant = REINSTALL_VARIANT
             logcat(INFO) { "Variant update for returning user" }

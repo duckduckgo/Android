@@ -43,4 +43,12 @@ interface OnboardingBrandDesignUpdateToggles {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun brandDesignUpdate(): Toggle
+
+    /**
+     * Toggle for serializing concurrent isAppReinstall() filesystem checks with a Mutex.
+     * Attempts to prevent concurrent CACHE_MISS races that cause IO contention during app startup.
+     * Default value: false (disabled).
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun isAppReinstallMutex(): Toggle
 }
