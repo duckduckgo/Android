@@ -18,16 +18,16 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:paddingTop="6dp"
+    android:paddingBottom="6dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/listItemContainer"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/keyline_5"
-        android:layout_marginTop="6dp"
         android:layout_marginEnd="@dimen/keyline_5"
-        android:layout_marginBottom="6dp"
         android:background="@drawable/background_remote_message_entry"
         android:clickable="true"
         android:paddingStart="12dp"
@@ -44,6 +44,7 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:importantForAccessibility="no"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:src="@drawable/ic_image_ai" />
@@ -54,6 +55,7 @@
             android:layout_height="wrap_content"
             android:importantForAccessibility="no"
             android:src="@drawable/ic_chevron_right_24"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -67,7 +69,7 @@
             app:layout_constraintStart_toEndOf="@id/startImage"
             app:layout_constraintTop_toTopOf="parent"
             app:textType="primary"
-            app:typography="h3"
+            app:typography="body1"
             tools:text="Hide AI Images in Search" />
 
         <com.duckduckgo.common.ui.view.text.DaxTextView
@@ -80,6 +82,7 @@
             app:layout_constraintStart_toStartOf="@id/title"
             app:layout_constraintTop_toBottomOf="@id/title"
             app:textType="secondary"
+            app:typography="body2"
             tools:text="Easily hide AI images in your search results with the `AI images` search filter." />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
