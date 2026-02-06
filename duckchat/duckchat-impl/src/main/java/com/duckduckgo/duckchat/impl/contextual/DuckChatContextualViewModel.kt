@@ -322,6 +322,7 @@ class DuckChatContextualViewModel @Inject constructor(
 
     fun addPageContext() {
         logcat { "Duck.ai Contextual: addPageContext" }
+
         viewModelScope.launch {
             _viewState.update { current ->
                 logcat { "Duck.ai Contextual: addPageContext $current context $updatedPageContext" }
@@ -380,13 +381,12 @@ class DuckChatContextualViewModel @Inject constructor(
         tabId: String,
         pageContext: String,
     ) {
-        updatedPageContext = pageContext
-
-        val json = JSONObject(updatedPageContext)
+        val json = JSONObject(pageContext)
         val title = json.optString("title").takeIf { it.isNotBlank() }
         val url = json.optString("url").takeIf { it.isNotBlank() }
 
         if (title != null && url != null) {
+            updatedPageContext = pageContext
             val inputMode = _viewState.value
             logcat { "Duck.ai: onPageContextReceived $inputMode" }
 
@@ -416,6 +416,8 @@ class DuckChatContextualViewModel @Inject constructor(
                     )
                 }
             }
+        } else {
+            updatedPageContext = ""
         }
     }
 
