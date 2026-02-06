@@ -30,8 +30,6 @@ jobs:
           submodules: recursive
           token: ${{ secrets.GT_DAXMOBILE }}
           fetch-depth: 0
-          ref: ${{ inputs.ref || github.sha}}
-
 
       - name: Set up JDK version
         uses: actions/setup-java@v4
