@@ -524,6 +524,54 @@ class DuckChatContextualViewModelTest {
         }
 
     @Test
+    fun `when prompt cleared then prompt is empty`() =
+        runTest {
+            testee.viewState.test {
+                awaitItem()
+
+                testee.replacePrompt("", "summarize this")
+                expectMostRecentItem()
+
+                testee.onPromptCleared()
+                val state = expectMostRecentItem() as DuckChatContextualViewModel.ViewState
+                assertEquals("", state.prompt)
+
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `when prompt cleared then context state unchanged`() =
+        runTest {
+            testee.updatedPageContext =
+                """
+                {
+                    "title": "Ctx Title",
+                    "url": "https://ctx.com",
+                    "content": "content"
+                }
+                """.trimIndent()
+
+            testee.addPageContext()
+            coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+            testee.viewState.test {
+                awaitItem()
+
+                testee.replacePrompt("", "summarize this")
+                expectMostRecentItem()
+
+                testee.onPromptCleared()
+                val state = expectMostRecentItem() as DuckChatContextualViewModel.ViewState
+                assertEquals("", state.prompt)
+                assertTrue(state.showContext)
+                assertFalse(state.userRemovedContext)
+
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
     fun `when user removed context then page context remains hidden`() = runTest {
         val tabId = "tab-1"
         val serializedPageData =
