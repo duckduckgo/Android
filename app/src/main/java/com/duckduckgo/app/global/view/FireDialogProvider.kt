@@ -37,7 +37,7 @@ interface FireDialogProvider {
      * Creates a Fire dialog instance.
      * @return Instance of FireDialog (either Simple or Granular variant)
      */
-    suspend fun createFireDialog(): FireDialog
+    suspend fun createFireDialog(isFromTabSwitcher: Boolean = false): FireDialog
 }
 
 @ContributesBinding(scope = AppScope::class)
@@ -47,8 +47,10 @@ class FireDialogProviderImpl @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
 ) : FireDialogProvider {
 
-    override suspend fun createFireDialog(): FireDialog = withContext(dispatcherProvider.io()) {
+    override suspend fun createFireDialog(isFromTabSwitcher: Boolean): FireDialog = withContext(dispatcherProvider.io()) {
         when {
+            androidBrowserConfigFeature.singleTabFireDialog().isEnabled() ->
+                NonGranularFireDialog.newInstance() // TODO: Replace with SingleTabFireDialog
             androidBrowserConfigFeature.granularFireDialog().isEnabled() ->
                 GranularFireDialog.newInstance()
             androidBrowserConfigFeature.improvedDataClearingOptions().isEnabled() ->

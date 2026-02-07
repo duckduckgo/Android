@@ -618,7 +618,7 @@ class TabSwitcherActivity :
 
     private fun onFireButtonClicked() {
         lifecycleScope.launch {
-            val dialog = fireDialogProvider.createFireDialog()
+            val dialog = fireDialogProvider.createFireDialog(isFromTabSwitcher = true)
             dialog.show(supportFragmentManager)
         }
     }

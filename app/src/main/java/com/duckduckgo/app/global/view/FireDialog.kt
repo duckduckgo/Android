@@ -38,5 +38,6 @@ interface FireDialog {
         const val EVENT_ON_SHOW = "onShow"
         const val EVENT_ON_CANCEL = "onCancel"
         const val EVENT_ON_CLEAR_STARTED = "onClearStarted"
+        const val EVENT_ON_SINGLE_TAB_CLEAR = "onSingleTabClear"
     }
 }
