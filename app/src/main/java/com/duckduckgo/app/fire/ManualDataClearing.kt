@@ -26,4 +26,12 @@ interface ManualDataClearing {
      * @param wasAppUsedSinceLastClear whether the app was used since the last data clear
      */
     suspend fun clearDataUsingManualFireOptions(shouldRestartIfRequired: Boolean = false, wasAppUsedSinceLastClear: Boolean = false)
+
+    /**
+     * Clears all data associated with a single tab:
+     * site browsing data (via WebStorageCompat), tab-specific history,
+     * Duck.ai chat (if applicable), and the tab itself.
+     * @param tabId the tab to burn
+     */
+    suspend fun clearSingleTabData(tabId: String)
 }

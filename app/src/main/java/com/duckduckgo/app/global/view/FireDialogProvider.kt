@@ -50,7 +50,7 @@ class FireDialogProviderImpl @Inject constructor(
     override suspend fun createFireDialog(isFromTabSwitcher: Boolean): FireDialog = withContext(dispatcherProvider.io()) {
         when {
             androidBrowserConfigFeature.singleTabFireDialog().isEnabled() ->
-                NonGranularFireDialog.newInstance() // TODO: Replace with SingleTabFireDialog
+                SingleTabFireDialog.newInstance(isFromTabSwitcher)
             androidBrowserConfigFeature.granularFireDialog().isEnabled() ->
                 GranularFireDialog.newInstance()
             androidBrowserConfigFeature.improvedDataClearingOptions().isEnabled() ->

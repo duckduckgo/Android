@@ -424,7 +424,29 @@ open class BrowserActivity : DuckDuckGoActivity() {
                     isDataClearingInProgress = true
                     removeObservers()
                 }
+                FireDialog.EVENT_ON_SINGLE_TAB_CLEAR -> {
+                    currentTab?.onFireDialogVisibilityChanged(isVisible = false)
+                    showSingleTabDeletedSnackbar()
+                }
             }
+        }
+    }
+
+    private fun showSingleTabDeletedSnackbar() {
+        lifecycleScope.launch {
+            delay(500)
+
+            val anchorView =
+                when (settingsDataStore.omnibarType) {
+                    OmnibarType.SINGLE_TOP -> null
+                    OmnibarType.SINGLE_BOTTOM -> currentTab?.getOmnibar()?.omnibarView?.toolbar ?: binding.fragmentContainer
+                    OmnibarType.SPLIT -> currentTab?.navigationBar ?: binding.fragmentContainer
+                }
+            DefaultSnackbar(
+                parentView = binding.fragmentContainer,
+                message = getString(R.string.singleTabFireDialogSnackbar),
+                anchor = anchorView,
+            ).show()
         }
     }
 
