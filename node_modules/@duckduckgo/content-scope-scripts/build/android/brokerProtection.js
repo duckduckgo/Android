@@ -2008,7 +2008,14 @@
   function isGloballyDisabled(args) {
     return args.site.allowlisted || args.site.isBroken;
   }
-  var platformSpecificFeatures = ["navigatorInterface", "windowsPermissionUsage", "messageBridge", "favicon", "breakageReporting"];
+  var platformSpecificFeatures = [
+    "navigatorInterface",
+    "windowsPermissionUsage",
+    "messageBridge",
+    "favicon",
+    "breakageReporting",
+    "webInterferenceDetection"
+  ];
   function isPlatformSpecificFeature(featureName) {
     return platformSpecificFeatures.includes(featureName);
   }
