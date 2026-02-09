@@ -1,4 +1,7 @@
 import com.duckduckgo.gradle.ModuleCreator
+import static com.gradle.develocity.agent.gradle.test.JUnitXmlDialect.*
+import com.android.build.gradle.internal.tasks.DeviceProviderInstrumentTestTask
+import com.gradle.develocity.agent.gradle.test.ImportJUnitXmlReports
 
 plugins {
     id 'com.android.application'
@@ -575,6 +578,17 @@ dependencies {
     lintChecks project(":lint-rules")
 
     coreLibraryDesugaring Android.tools.desugarJdkLibs
+}
+
+// Develocity Android Instrumented Test Support
+afterEvaluate {
+    tasks.withType(DeviceProviderInstrumentTestTask).names.each {
+        ImportJUnitXmlReports.register(
+            tasks,
+            tasks.named(it),
+            ANDROID_CONNECTED
+        )
+    }
 }
 
 tasks.register('fastlaneVersionCode') {
