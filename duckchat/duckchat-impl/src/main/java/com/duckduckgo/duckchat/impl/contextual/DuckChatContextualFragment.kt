@@ -217,7 +217,7 @@ class DuckChatContextualFragment :
                 newState: Int,
             ) {
                 if (newState == BottomSheetBehavior.STATE_HIDDEN) {
-                    viewModel.onSheetClosed()
+                    viewModel.persistTabClosed()
                 }
                 backPressedCallback.isEnabled = newState != BottomSheetBehavior.STATE_HIDDEN
             }
@@ -501,7 +501,7 @@ class DuckChatContextualFragment :
             viewModel.addPageContext()
         }
         binding.contextualPromptSummarize.setOnClickListener {
-            val prompt = getString(R.string.duckAIContextualSummarizePrompt)
+            val prompt = getString(R.string.duckAIContextualPromptSummarize)
             viewModel.replacePrompt(prompt)
         }
     }
