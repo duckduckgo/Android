@@ -26,6 +26,7 @@ import android.view.MotionEvent
 import android.view.View
 import android.widget.FrameLayout
 import androidx.activity.OnBackPressedCallback
+import com.duckduckgo.app.global.view.FireDialogProvider.FireDialogSource.TAB_SWITCHER
 import androidx.appcompat.app.AppCompatDelegate.FEATURE_SUPPORT_ACTION_BAR
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.Lifecycle
@@ -618,7 +619,7 @@ class TabSwitcherActivity :
 
     private fun onFireButtonClicked() {
         lifecycleScope.launch {
-            val dialog = fireDialogProvider.createFireDialog()
+            val dialog = fireDialogProvider.createFireDialog(TAB_SWITCHER)
             dialog.show(supportFragmentManager)
         }
     }
