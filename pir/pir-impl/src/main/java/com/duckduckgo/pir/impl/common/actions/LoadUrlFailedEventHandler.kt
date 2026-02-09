@@ -56,6 +56,7 @@ class LoadUrlFailedEventHandler @Inject constructor() : EventHandler {
                 nextState =
                 state.copy(
                     pendingUrl = null,
+                    preseeding = false,
                 ),
                 nextEvent = BrokerStepCompleted(
                     needsEmailConfirmation = false,
@@ -70,6 +71,7 @@ class LoadUrlFailedEventHandler @Inject constructor() : EventHandler {
             nextState =
             state.copy(
                 pendingUrl = RECOVERY_URL,
+                preseeding = false,
             ),
             sideEffect =
             LoadUrl(
