@@ -70,6 +70,16 @@ class EntitlementTargetMatcherPluginTest {
     }
 
     @Test
+    fun whenEntitlementMatchesUserEntitlementWithDifferentCaseThenReturnTrue() = runTest {
+        whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(listOf(Product.PIR)))
+        val target = NULL_TARGET.copy(entitlement = Product.PIR.value.lowercase())
+
+        val result = matcher.matchesTargetProperty(target)
+
+        assertTrue(result)
+    }
+
+    @Test
     fun whenEntitlementDoesNotMatchAnyUserEntitlementhenReturnFalse() = runTest {
         whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(listOf(Product.NetP)))
         val target = NULL_TARGET.copy(entitlement = Product.PIR.value)

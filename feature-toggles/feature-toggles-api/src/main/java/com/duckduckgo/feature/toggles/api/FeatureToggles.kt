@@ -307,6 +307,28 @@ interface Toggle {
         val settings: String? = null,
         val exceptions: List<FeatureException> = emptyList(),
     ) {
+        /**
+         * The targeting properties that can be used to specify the target audience for a feature flag.
+         *
+         * Each property acts as a filter criterion. When a property is `null`, it is ignored during
+         * matching (i.e., any value matches). When multiple properties are specified, all must match
+         * for the target to be considered a match (AND logic).
+         *
+         * @param variantKey The experiment variant key to target (e.g., "mc"). When specified, only users
+         *   assigned to this variant will match. Used for A/B testing and experiment targeting.
+         * @param localeCountry The ISO 3166-1 alpha-2 country code to target (e.g., "US", "FR"). Matching
+         *   is case-insensitive.
+         * @param localeLanguage The ISO 639-1 language code to target (e.g., "en", "fr"). Matching is
+         *   case-insensitive.
+         * @param isReturningUser When `true`, targets users who have reinstalled the app. When `false`,
+         *   targets new users only.
+         * @param isPrivacyProEligible When `true`, targets users eligible for Privacy Pro subscription.
+         *   When `false`, targets users not eligible for Privacy Pro.
+         * @param entitlement The subscription Product entitlement string. When specified, only users with
+         *   this active entitlement will match. Matching is case-insensitive.
+         * @param minSdkVersion The minimum Android SDK version required. Devices running an SDK version
+         *   greater than or equal to this value will match.
+         */
         data class Target(
             val variantKey: String?,
             val localeCountry: String?,

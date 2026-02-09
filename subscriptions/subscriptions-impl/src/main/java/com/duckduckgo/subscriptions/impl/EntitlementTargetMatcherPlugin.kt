@@ -31,7 +31,7 @@ class EntitlementTargetMatcherPlugin @Inject constructor(
     override fun matchesTargetProperty(target: Toggle.State.Target): Boolean {
         return target.entitlement?.let { entitlement ->
             runBlocking {
-                subscriptions.getEntitlementStatus().firstOrNull()?.any { it.value == entitlement } ?: false
+                subscriptions.getEntitlementStatus().firstOrNull()?.any { it.value.lowercase() == entitlement.lowercase() } ?: false
             }
         } ?: true
     }
