@@ -232,6 +232,11 @@ class DuckChatContextualViewModel @Inject constructor(
                 commandChannel.trySend(Command.ChangeSheetState(BottomSheetBehavior.STATE_EXPANDED))
             }
         }
+        if (updatedPageContext.isNotBlank()) {
+            duckChatPixels.reportContextualPromptSubmittedWithContextNative()
+        } else {
+            duckChatPixels.reportContextualPromptSubmittedWithoutContextNative()
+        }
     }
 
     fun onChatPageLoaded(url: String?) {

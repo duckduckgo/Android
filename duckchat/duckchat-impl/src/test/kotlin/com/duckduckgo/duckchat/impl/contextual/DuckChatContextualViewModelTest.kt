@@ -164,6 +164,24 @@ class DuckChatContextualViewModelTest {
         }
 
     @Test
+    fun `when prompt sent with updated page context then with-context pixel fired`() = runTest {
+        testee.updatedPageContext = """{"title":"t","url":"https://example.com","content":"c"}"""
+
+        testee.onPromptSent("Hello Duck.ai")
+
+        verify(duckChatPixels).reportContextualPromptSubmittedWithContextNative()
+    }
+
+    @Test
+    fun `when prompt sent without updated page context then without-context pixel fired`() = runTest {
+        testee.updatedPageContext = ""
+
+        testee.onPromptSent("Hello Duck.ai")
+
+        verify(duckChatPixels).reportContextualPromptSubmittedWithoutContextNative()
+    }
+
+    @Test
     fun `when page context removed then prompt omits pageContext even if cached`() =
         runTest {
             val tabId = "tab-1"
