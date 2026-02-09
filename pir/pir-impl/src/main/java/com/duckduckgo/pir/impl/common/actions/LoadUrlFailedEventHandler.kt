@@ -22,6 +22,7 @@ import com.duckduckgo.pir.impl.common.actions.EventHandler.Next
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.BrokerStepCompleted
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.BrokerStepCompleted.StepStatus.Failure
+import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.ExecuteNextBrokerStep
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.LoadUrlFailed
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.SideEffect.LoadUrl
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.State
@@ -49,6 +50,16 @@ class LoadUrlFailedEventHandler @Inject constructor() : EventHandler {
 
         if (state.pendingUrl == null) {
             return Next(state)
+        }
+
+        if (state.preseeding) {
+            // if pre-seeding fails, we proceed the scan as usual since pre-seeding is just an optimization and not critical for the run.
+            return Next(
+                nextState = state.copy(
+                    pendingUrl = null,
+                ),
+                nextEvent = ExecuteNextBrokerStep,
+            )
         }
 
         if (actualEvent.url == RECOVERY_URL) {
