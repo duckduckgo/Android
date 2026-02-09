@@ -116,6 +116,7 @@ import javax.inject.Inject
 interface DuckChatPixels {
     fun sendReportMetricPixel(reportMetric: ReportMetric)
     fun reportOpen()
+    fun reportContextualSheetOpened()
 }
 
 @ContributesBinding(AppScope::class)
@@ -167,6 +168,13 @@ class RealDuckChatPixels @Inject constructor(
             pixel.fire(DUCK_CHAT_OPEN, parameters = params)
             pixel.fire(PRODUCT_TELEMETRY_SURFACE_DUCK_AI_OPEN)
             pixel.fire(PRODUCT_TELEMETRY_SURFACE_DUCK_AI_OPEN_DAILY, type = Pixel.PixelType.Daily())
+        }
+    }
+
+    override fun reportContextualSheetOpened() {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_SHEET_OPENED_COUNT)
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_SHEET_OPENED_DAILY, type = Pixel.PixelType.Daily())
         }
     }
 }
@@ -252,6 +260,8 @@ enum class DuckChatPixelName(override val pixelName: String) : Pixel.PixelName {
     DUCK_CHAT_CONTEXTUAL_ONBOARDING_DISPLAYED("m_aichat_contextual_onboarding_displayed"),
     DUCK_CHAT_CONTEXTUAL_ONBOARDING_CONFIRM_PRESSED("m_aichat_contextual_onboarding_confirm_pressed"),
     DUCK_CHAT_CONTEXTUAL_ONBOARDING_SETTINGS_PRESSED("m_aichat_contextual_onboarding_settings_pressed"),
+    DUCK_CHAT_CONTEXTUAL_SHEET_OPENED_COUNT("m_aichat_contextual_sheet_opened_count"),
+    DUCK_CHAT_CONTEXTUAL_SHEET_OPENED_DAILY("m_aichat_contextual_sheet_opened_daily"),
 }
 
 object DuckChatPixelParameters {
