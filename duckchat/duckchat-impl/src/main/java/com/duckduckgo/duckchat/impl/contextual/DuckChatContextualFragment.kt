@@ -607,7 +607,8 @@ class DuckChatContextualFragment :
                     binding.duckAiAttachContextLayout.show()
                 }
                 if (viewState.prompt.isNotEmpty()) {
-                    binding.inputField.append(viewState.prompt)
+                    binding.inputField.setText(viewState.prompt)
+                    binding.inputField.setSelection(viewState.prompt.length)
                 } else {
                     clearInputField()
                 }
