@@ -6756,6 +6756,7 @@ class BrowserTabViewModelTest {
                     anyOrNull(),
                     any(),
                     anyOrNull(),
+                    any(),
                 ),
             ).thenReturn(jsCallbackData)
             testee.processJsCallbackMessage(
@@ -6788,6 +6789,7 @@ class BrowserTabViewModelTest {
                     anyOrNull(),
                     any(),
                     anyOrNull(),
+                    any(),
                 ),
             ).thenReturn(null)
             testee.processJsCallbackMessage(
