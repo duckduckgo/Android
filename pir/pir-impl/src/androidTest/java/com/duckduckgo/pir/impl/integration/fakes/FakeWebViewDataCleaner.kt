@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 DuckDuckGo
+ * Copyright (c) 2026 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,12 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.pir.impl.common
+package com.duckduckgo.pir.impl.integration.fakes
 
-object PirJobConstants {
-    const val DBP_INITIAL_URL = "dbp://blank"
-    const val RECOVERY_URL = "https://duckduckgo.com/"
-    const val MAX_DETACHED_WEBVIEW_COUNT = 20
-    const val SCHEDULED_SCAN_INTERVAL_HOURS = 12L
-    const val EMAIL_CONFIRMATION_INTERVAL_HOURS = 8L
-    const val CUSTOM_PIXEL_INTERVAL_HOURS = 5L
-    const val BG_STATS_REPORT_INTERVAL_HOURS = 24L
-    const val BG_SCAN_RUN_THRESHOLD_HRS = 48L
-    val preSeedList = listOf(
-        "Spokeo",
-    )
+import com.duckduckgo.pir.impl.common.PirWebViewDataCleaner
+
+class FakeWebViewDataCleaner : PirWebViewDataCleaner {
+    override fun cleanWebViewData() {
+        // No-op for testing
+    }
 }

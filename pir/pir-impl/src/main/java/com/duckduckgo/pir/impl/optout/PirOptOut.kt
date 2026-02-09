@@ -31,6 +31,7 @@ import com.duckduckgo.pir.impl.common.PirActionsRunner
 import com.duckduckgo.pir.impl.common.PirJob
 import com.duckduckgo.pir.impl.common.PirJob.RunType.OPTOUT
 import com.duckduckgo.pir.impl.common.PirJobConstants.MAX_DETACHED_WEBVIEW_COUNT
+import com.duckduckgo.pir.impl.common.PirWebViewDataCleaner
 import com.duckduckgo.pir.impl.common.RealPirActionsRunner
 import com.duckduckgo.pir.impl.common.splitIntoParts
 import com.duckduckgo.pir.impl.models.Broker
@@ -111,6 +112,7 @@ class RealPirOptOut @Inject constructor(
     private val pirActionsRunnerFactory: RealPirActionsRunner.Factory,
     private val currentTimeProvider: CurrentTimeProvider,
     private val dispatcherProvider: DispatcherProvider,
+    private val webViewDataCleaner: PirWebViewDataCleaner,
     callbacks: PluginPoint<PirCallbacks>,
 ) : PirOptOut, PirJob(callbacks) {
     private val runners: MutableList<PirActionsRunner> = mutableListOf()
@@ -260,6 +262,7 @@ class RealPirOptOut @Inject constructor(
 
     private suspend fun completeOptOut() {
         logcat { "PIR-OPT-OUT: Opt-out completed for all runners and profiles" }
+        webViewDataCleaner.cleanWebViewData()
         emitCompletedPixel()
         onJobCompleted()
     }
@@ -269,7 +272,7 @@ class RealPirOptOut @Inject constructor(
         webView: WebView,
     ): Result<Unit> = withContext(dispatcherProvider.io()) {
         onJobStarted()
-        emitStartPixel()
+
         if (runners.isNotEmpty()) {
             cleanRunners()
         }
@@ -310,8 +313,8 @@ class RealPirOptOut @Inject constructor(
 
         logcat { "PIR-OPT-OUT: Opt-out completed for all runners and profiles" }
 
-        emitCompletedPixel()
         onJobCompleted()
+        webViewDataCleaner.cleanWebViewData()
         return@withContext Result.success(Unit)
     }
 
@@ -369,9 +372,7 @@ class RealPirOptOut @Inject constructor(
             }
         }.awaitAll()
 
-        logcat { "PIR-OPT-OUT: Opt-out completed for all runners and profiles" }
-        emitCompletedPixel()
-        onJobCompleted()
+        completeOptOut()
         return@withContext Result.success(Unit)
     }
 
@@ -397,6 +398,7 @@ class RealPirOptOut @Inject constructor(
 
     override fun stop() {
         logcat { "PIR-OPT-OUT: Stopping all runners" }
+        webViewDataCleaner.cleanWebViewData()
         cleanRunners()
         onJobStopped()
     }
