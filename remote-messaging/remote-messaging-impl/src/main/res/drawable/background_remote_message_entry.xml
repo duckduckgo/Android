@@ -15,7 +15,7 @@
   -->
 
 <ripple xmlns:android="http://schemas.android.com/apk/res/android"
-    android:color="?attr/daxColorBackground">
+    android:color="?attr/daxColorSurface">
     <item>
         <shape android:shape="rectangle">
             <solid android:color="?attr/daxColorBackground" />
