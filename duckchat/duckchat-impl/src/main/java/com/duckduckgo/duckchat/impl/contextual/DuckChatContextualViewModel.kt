@@ -27,6 +27,7 @@ import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
 import com.duckduckgo.duckchat.impl.helper.NativeAction
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -52,6 +53,7 @@ class DuckChatContextualViewModel @Inject constructor(
     private val contextualDataStore: DuckChatContextualDataStore,
     private val sessionTimeoutProvider: DuckChatContextualSessionTimeoutProvider,
     private val timeProvider: DuckChatContextualTimeProvider,
+    private val duckChatPixels: DuckChatPixels
 ) : ViewModel() {
 
     private val commandChannel = Channel<Command>(capacity = 1, onBufferOverflow = DROP_OLDEST)
@@ -117,6 +119,8 @@ class DuckChatContextualViewModel @Inject constructor(
                 }
             }
         }
+
+        duckChatPixels.reportContextualSheetOpened()
     }
 
     private suspend fun reopenWebViewState(currentState: ViewState) {
@@ -208,6 +212,8 @@ class DuckChatContextualViewModel @Inject constructor(
                 onNewChatRequested()
             }
         }
+
+        duckChatPixels.reportContextualSheetOpened()
     }
 
     fun onPromptSent(prompt: String) {
@@ -296,7 +302,12 @@ class DuckChatContextualViewModel @Inject constructor(
         }
     }
 
-    fun persistTabClosed() {
+    fun onSheetClosed(){
+        persistTabClosed()
+        duckChatPixels.reportContextualSheetDismissed()
+    }
+
+    private fun persistTabClosed() {
         if (_viewState.value.sheetMode != SheetMode.WEBVIEW) {
             return
         }

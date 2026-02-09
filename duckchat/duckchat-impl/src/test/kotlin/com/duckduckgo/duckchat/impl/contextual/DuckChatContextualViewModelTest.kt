@@ -24,6 +24,7 @@ import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
 import com.duckduckgo.duckchat.impl.helper.NativeAction
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -41,6 +42,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -58,6 +60,7 @@ class DuckChatContextualViewModelTest {
     private val contextualDataStore = FakeDuckChatContextualDataStore()
     private val timeProvider = FakeDuckChatContextualTimeProvider()
     private val sessionTimeoutProvider = FakeDuckChatContextualSessionTimeoutProvider()
+    private val duckChatPixels: DuckChatPixels = mock()
 
     @Before
     fun setup() {
@@ -80,6 +83,7 @@ class DuckChatContextualViewModelTest {
             contextualDataStore = contextualDataStore,
             sessionTimeoutProvider = sessionTimeoutProvider,
             timeProvider = timeProvider,
+            duckChatPixels = duckChatPixels,
         )
     }
 
@@ -213,6 +217,15 @@ class DuckChatContextualViewModelTest {
         }
 
     @Test
+    fun `when sheet opened then contextual opened pixel is fired`() = runTest {
+        testee.onSheetOpened("tab-1")
+
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        verify(duckChatPixels).reportContextualSheetOpened()
+    }
+
+    @Test
     fun `when page context arrives input state stores context`() =
         runTest {
             val tabId = "tab-1"
@@ -276,6 +289,7 @@ class DuckChatContextualViewModelTest {
                     contextualDataStore = contextualDataStore,
                     sessionTimeoutProvider = sessionTimeoutProvider,
                     timeProvider = timeProvider,
+                    duckChatPixels = duckChatPixels,
                 )
 
             val tabId = "tab-1"
@@ -671,17 +685,18 @@ class DuckChatContextualViewModelTest {
     }
 
     @Test
-    fun `persistTabClosed stores last closed timestamp`() = runTest {
+    fun `onSheetClosed stores last closed timestamp and fires dismissed pixel`() = runTest {
         val tabId = "tab-1"
         val now = 77_000L
         timeProvider.nowMs = now
 
         testee.onSheetOpened(tabId)
         testee.onPromptSent("hello")
-        testee.persistTabClosed()
+        testee.onSheetClosed()
         coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
 
         assertEquals(now, contextualDataStore.getTabClosedTimestamp(tabId))
+        verify(duckChatPixels).reportContextualSheetDismissed()
     }
 
     @Test
@@ -803,6 +818,15 @@ class DuckChatContextualViewModelTest {
 
             cancelAndIgnoreRemainingEvents()
         }
+    }
+
+    @Test
+    fun `when reopenSheet called then contextual opened pixel is fired`() = runTest {
+        testee.reopenSheet()
+
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        verify(duckChatPixels).reportContextualSheetOpened()
     }
 
     private class FakeDuckChat : com.duckduckgo.duckchat.api.DuckChat {
