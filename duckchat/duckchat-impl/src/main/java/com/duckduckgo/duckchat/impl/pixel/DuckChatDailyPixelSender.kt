@@ -25,6 +25,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.CoroutineScope
@@ -37,6 +38,7 @@ import javax.inject.Inject
 )
 class DuckChatDailyPixelSender @Inject constructor(
     private val pixel: Pixel,
+    private val duckChatInternal: DuckChatInternal,
     private val duckChatFeatureRepository: DuckChatFeatureRepository,
     private val dispatcherProvider: DispatcherProvider,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
@@ -63,6 +65,11 @@ class DuckChatDailyPixelSender @Inject constructor(
             pixel.fire(
                 pixel = DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_ADDRESS_BAR_IS_ENABLED_DAILY,
                 parameters = mapOf(PixelParameter.IS_ENABLED to duckChatFeatureRepository.isInputScreenUserSettingEnabled().toString()),
+                type = Daily(),
+            )
+            pixel.fire(
+                pixel = DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_SETTING_AUTOMATIC_PAGE_CONTENT_DAILY,
+                parameters = mapOf(PixelParameter.IS_ENABLED to duckChatInternal.isAutomaticContextAttachmentEnabled().toString()),
                 type = Daily(),
             )
         }

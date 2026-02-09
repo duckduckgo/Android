@@ -320,6 +320,7 @@ class RealDuckChatJSHelperTest {
         assertEquals("icon", faviconObject.getString("rel"))
         val faviconHref = faviconObject.getString("href")
         assertEquals(true, faviconHref.startsWith("data:image/png;base64,"))
+        verify(mockDuckChatPixels).reportContextualPageContextManuallyAttachedFrontend()
     }
 
     @Test

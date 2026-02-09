@@ -422,6 +422,7 @@ class DuckChatContextualViewModelTest {
             val state = testee.viewState.value
             assertTrue(state.showContext)
             assertFalse(state.userRemovedContext)
+            verify(duckChatPixels).reportContextualPageContextManuallyAttachedNative()
         }
 
     @Test
@@ -443,6 +444,7 @@ class DuckChatContextualViewModelTest {
             assertEquals("", state.contextUrl)
             assertEquals("", state.tabId)
             assertEquals("", testee.updatedPageContext)
+            verify(duckChatPixels).reportContextualPageContextCollectionEmpty()
         }
 
     @Test
@@ -613,6 +615,15 @@ class DuckChatContextualViewModelTest {
         }
 
     @Test
+    fun `when full mode requested then expanded pixel is fired`() = runTest {
+        testee.onFullModeRequested()
+
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        verify(duckChatPixels).reportContextualSheetExpanded()
+    }
+
+    @Test
     fun `handleJSCall closeAIChat hides sheet and returns true`() = runTest {
         testee.commands.test {
             val handled = testee.handleJSCall("closeAIChat")
@@ -692,6 +703,8 @@ class DuckChatContextualViewModelTest {
 
             cancelAndIgnoreRemainingEvents()
         }
+
+        verify(duckChatPixels).reportContextualSheetNewChat()
     }
 
     @Test
@@ -789,7 +802,7 @@ class DuckChatContextualViewModelTest {
             awaitItem()
             awaitItem()
 
-            testee.reopenSheet()
+            testee.onSheetReopened()
             val changeStateCommand = awaitItem() as DuckChatContextualViewModel.Command.ChangeSheetState
             assertEquals(BottomSheetBehavior.STATE_EXPANDED, changeStateCommand.newState)
 
@@ -797,6 +810,8 @@ class DuckChatContextualViewModelTest {
 
             cancelAndIgnoreRemainingEvents()
         }
+
+        verify(duckChatPixels).reportContextualSheetSessionRestored()
     }
 
     @Test
@@ -812,7 +827,7 @@ class DuckChatContextualViewModelTest {
 
         testee.subscriptionEventDataFlow.test {
             timeProvider.nowMs = 120_000L
-            testee.reopenSheet()
+            testee.onSheetReopened()
 
             val event = awaitItem()
             assertEquals("submitNewChatAction", event.subscriptionName)
@@ -844,7 +859,7 @@ class DuckChatContextualViewModelTest {
 
             contextualDataStore.clearTabChatUrl(tabId)
 
-            testee.reopenSheet()
+            testee.onSheetReopened()
             val changeStateCommand = awaitItem() as DuckChatContextualViewModel.Command.ChangeSheetState
             assertEquals(BottomSheetBehavior.STATE_EXPANDED, changeStateCommand.newState)
 
@@ -870,7 +885,7 @@ class DuckChatContextualViewModelTest {
         contextualDataStore.clearTabChatUrl(tabId)
 
         testee.subscriptionEventDataFlow.test {
-            testee.reopenSheet()
+            testee.onSheetReopened()
 
             val event = awaitItem()
             assertEquals("submitNewChatAction", event.subscriptionName)
@@ -885,7 +900,7 @@ class DuckChatContextualViewModelTest {
     @Test
     fun `reopenSheet in input mode half expands sheet`() = runTest {
         testee.commands.test {
-            testee.reopenSheet()
+            testee.onSheetReopened()
 
             val command = awaitItem() as DuckChatContextualViewModel.Command.ChangeSheetState
             assertEquals(BottomSheetBehavior.STATE_HALF_EXPANDED, command.newState)
@@ -904,7 +919,7 @@ class DuckChatContextualViewModelTest {
 
     @Test
     fun `when reopenSheet called then contextual opened pixel is fired`() = runTest {
-        testee.reopenSheet()
+        testee.onSheetReopened()
         verify(duckChatPixels).reportContextualSheetOpened()
     }
 
@@ -913,6 +928,13 @@ class DuckChatContextualViewModelTest {
         testee.onSheetClosed()
         verify(duckChatPixels).reportContextualSheetDismissed()
     }
+
+    @Test
+    fun `when removeContext then pixel fired`() =
+        runTest {
+            testee.removePageContext()
+            verify(duckChatPixels).reportContextualPageContextRemovedNative()
+        }
 
     private class FakeDuckChat : com.duckduckgo.duckchat.api.DuckChat {
         var nextUrl: String = ""

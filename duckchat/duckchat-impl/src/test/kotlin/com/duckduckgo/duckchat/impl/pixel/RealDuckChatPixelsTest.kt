@@ -267,8 +267,8 @@ class RealDuckChatPixelsTest {
     }
 
     @Test
-    fun `when reportContextualSettingAutomaticPageContentEnabled then fires count and daily`() = runTest {
-        testee.reportContextualSettingAutomaticPageContentEnabled()
+    fun `when reportContextualSettingAutomaticPageContentToggled enabled then fires count and daily`() = runTest {
+        testee.reportContextualSettingAutomaticPageContentToggled(true)
 
         advanceUntilIdle()
 
@@ -277,8 +277,8 @@ class RealDuckChatPixelsTest {
     }
 
     @Test
-    fun `when reportContextualSettingAutomaticPageContentDisabled then fires count and daily`() = runTest {
-        testee.reportContextualSettingAutomaticPageContentDisabled()
+    fun `when reportContextualSettingAutomaticPageContentToggled disabled then fires count and daily`() = runTest {
+        testee.reportContextualSettingAutomaticPageContentToggled(false)
 
         advanceUntilIdle()
 

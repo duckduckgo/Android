@@ -565,7 +565,7 @@ class DuckChatContextualFragment :
 
                     DuckChatContextualSharedViewModel.Command.OpenSheet -> {
                         setupKeyboardVisibilityListener()
-                        viewModel.reopenSheet()
+                        viewModel.onSheetReopened()
                     }
                 }
             }.launchIn(lifecycleScope)

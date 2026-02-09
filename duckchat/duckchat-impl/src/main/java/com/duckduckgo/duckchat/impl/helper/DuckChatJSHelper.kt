@@ -165,6 +165,7 @@ class RealDuckChatJSHelper @Inject constructor(
                     logcat { "Duck.ai Contextual: getAIChatPageContext reason $reason" }
                     if (pageContext.isNotEmpty()) {
                         if (reason == REASON_USER_ACTION) {
+                            duckChatPixels.reportContextualPageContextManuallyAttachedFrontend()
                             getPageContextResponse(featureName, method, it, pageContext, tabId)
                         } else {
                             null

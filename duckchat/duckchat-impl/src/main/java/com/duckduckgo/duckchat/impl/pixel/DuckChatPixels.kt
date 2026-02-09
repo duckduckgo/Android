@@ -128,8 +128,7 @@ interface DuckChatPixels {
     fun reportContextualPromptSubmittedWithContextNative()
     fun reportContextualPromptSubmittedWithoutContextNative()
     fun reportContextualPageContextCollectionEmpty()
-    fun reportContextualSettingAutomaticPageContentEnabled()
-    fun reportContextualSettingAutomaticPageContentDisabled()
+    fun reportContextualSettingAutomaticPageContentToggled(enabled: Boolean)
 }
 
 @ContributesBinding(AppScope::class)
@@ -268,17 +267,15 @@ class RealDuckChatPixels @Inject constructor(
         }
     }
 
-    override fun reportContextualSettingAutomaticPageContentEnabled() {
+    override fun reportContextualSettingAutomaticPageContentToggled(checked: Boolean) {
         appCoroutineScope.launch(dispatcherProvider.io()) {
-            pixel.fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_SETTING_AUTOMATIC_PAGE_CONTENT_ENABLED_COUNT)
-            pixel.fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_SETTING_AUTOMATIC_PAGE_CONTENT_ENABLED_DAILY, type = Pixel.PixelType.Daily())
-        }
-    }
-
-    override fun reportContextualSettingAutomaticPageContentDisabled() {
-        appCoroutineScope.launch(dispatcherProvider.io()) {
-            pixel.fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_SETTING_AUTOMATIC_PAGE_CONTENT_DISABLED_COUNT)
-            pixel.fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_SETTING_AUTOMATIC_PAGE_CONTENT_DISABLED_DAILY, type = Pixel.PixelType.Daily())
+            if (checked) {
+                pixel.fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_SETTING_AUTOMATIC_PAGE_CONTENT_ENABLED_COUNT)
+                pixel.fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_SETTING_AUTOMATIC_PAGE_CONTENT_ENABLED_DAILY, type = Pixel.PixelType.Daily())
+            } else {
+                pixel.fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_SETTING_AUTOMATIC_PAGE_CONTENT_DISABLED_COUNT)
+                pixel.fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_SETTING_AUTOMATIC_PAGE_CONTENT_DISABLED_DAILY, type = Pixel.PixelType.Daily())
+            }
         }
     }
 }
@@ -401,6 +398,7 @@ enum class DuckChatPixelName(override val pixelName: String) : Pixel.PixelName {
     DUCK_CHAT_CONTEXTUAL_SETTING_AUTOMATIC_PAGE_CONTENT_ENABLED_DAILY("m_aichat_contextual_setting_automatic_page_content_enabled_daily"),
     DUCK_CHAT_CONTEXTUAL_SETTING_AUTOMATIC_PAGE_CONTENT_DISABLED_COUNT("m_aichat_contextual_setting_automatic_page_content_disabled_count"),
     DUCK_CHAT_CONTEXTUAL_SETTING_AUTOMATIC_PAGE_CONTENT_DISABLED_DAILY("m_aichat_contextual_setting_automatic_page_content_disabled_daily"),
+    DUCK_CHAT_CONTEXTUAL_SETTING_AUTOMATIC_PAGE_CONTENT_DAILY("m_aichat_contextual_setting_automatic_page_content_daily"),
 }
 
 object DuckChatPixelParameters {
@@ -525,6 +523,7 @@ class DuckChatParamRemovalPlugin @Inject constructor() : PixelParamRemovalPlugin
             DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_SETTING_AUTOMATIC_PAGE_CONTENT_ENABLED_DAILY.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_SETTING_AUTOMATIC_PAGE_CONTENT_DISABLED_COUNT.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_SETTING_AUTOMATIC_PAGE_CONTENT_DISABLED_DAILY.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_SETTING_AUTOMATIC_PAGE_CONTENT_DAILY.pixelName to PixelParameter.removeAtb(),
         )
     }
 }

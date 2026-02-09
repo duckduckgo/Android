@@ -106,7 +106,7 @@ class DuckChatContextualViewModel @Inject constructor(
         val prompt: String = "",
     )
 
-    fun reopenSheet() {
+    fun onSheetReopened() {
         logcat { "Duck.ai: reopenSheet" }
 
         viewModelScope.launch(dispatchers.io()) {
@@ -128,7 +128,7 @@ class DuckChatContextualViewModel @Inject constructor(
         val tabId = currentState.tabId
         val shouldReuseSession = shouldReuseStoredChatUrl(tabId)
         if (!shouldReuseSession) {
-            onNewChatRequested()
+            renderNewChatState()
             return
         }
         val existingChatUrl = contextualDataStore.getTabChatUrl(tabId)
@@ -160,6 +160,7 @@ class DuckChatContextualViewModel @Inject constructor(
                     allowsAutomaticContextAttachment = duckChatInternal.isAutomaticContextAttachmentEnabled(),
                 )
             }
+            duckChatPixels.reportContextualSheetSessionRestored()
         }
     }
 
@@ -211,7 +212,7 @@ class DuckChatContextualViewModel @Inject constructor(
                         it.copy(tabId = tabId)
                     }
                 }
-                onNewChatRequested()
+                renderNewChatState()
             }
         }
         duckChatPixels.reportContextualSheetOpened()
@@ -330,6 +331,7 @@ class DuckChatContextualViewModel @Inject constructor(
                 )
             }
         }
+        duckChatPixels.reportContextualPageContextRemovedNative()
     }
 
     fun addPageContext() {
@@ -344,6 +346,8 @@ class DuckChatContextualViewModel @Inject constructor(
                 )
             }
         }
+
+        duckChatPixels.reportContextualPageContextManuallyAttachedNative()
     }
 
     private fun isContextValid(pageContext: String): Boolean {
@@ -397,6 +401,7 @@ class DuckChatContextualViewModel @Inject constructor(
         viewModelScope.launch {
             commandChannel.trySend(Command.OpenFullscreenMode(chatUrl))
         }
+        duckChatPixels.reportContextualSheetExpanded()
     }
 
     fun onKeyboardVisibilityChanged(isVisible: Boolean) {
@@ -457,6 +462,7 @@ class DuckChatContextualViewModel @Inject constructor(
             }
         } else {
             updatedPageContext = ""
+            duckChatPixels.reportContextualPageContextCollectionEmpty()
         }
     }
 
@@ -475,6 +481,11 @@ class DuckChatContextualViewModel @Inject constructor(
     }
 
     fun onNewChatRequested() {
+        renderNewChatState()
+        duckChatPixels.reportContextualSheetNewChat()
+    }
+
+    private fun renderNewChatState() {
         viewModelScope.launch(dispatchers.io()) {
             val currentTabId = _viewState.value.tabId
             if (currentTabId.isNotBlank()) {
