@@ -99,4 +99,10 @@
     <string name="duck_chat_contextual_onboarding_body" instruction="Body text for contextual Duck AI onboarding sheet">A Duck.ai mostantól segíthet az éppen megtekintett oldallal kapcsolatos kérdések megválaszolásában.\n\nAz oldal tartalma csak akkor kerül továbbításra, ha csatolod. Ezt bármikor megváltoztathatod a Beállításokban.</string>
     <string name="duck_chat_contextual_onboarding_primary" instruction="Button to continue to contextual Duck AI sheet">Értem</string>
     <string name="duck_chat_contextual_onboarding_secondary" instruction="Button to go to AI settings">Megjelenítési beállítások</string>
+
+    <!-- Duck.ai Contextual Bottom Sheet -->
+    <string name="duckAIContextualPromptSummarize">Oldal összefoglalása</string>
+    <string name="duckAIContextualAutomaticContextTitle">Oldal tartalmának automatikus küldése</string>
+    <string name="duckAIContextualAutomaticContextMessage">Az oldal tartalmának automatikus küldése a Duck.ai részére</string>
+    <string name="duckAIContextualAttachPageContent">Oldal tartalmának csatolása</string>
 </resources>
