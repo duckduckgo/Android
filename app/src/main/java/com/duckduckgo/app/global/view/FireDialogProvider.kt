@@ -16,7 +16,7 @@
 
 package com.duckduckgo.app.global.view
 
-import com.duckduckgo.app.global.view.FireDialogProvider.FireDialogSource
+import com.duckduckgo.app.global.view.FireDialogProvider.FireDialogOrigin
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
@@ -36,11 +36,13 @@ import javax.inject.Inject
 interface FireDialogProvider {
     /**
      * Creates a Fire dialog instance.
+     * @param origin The origin of the dialog request.
+     *
      * @return Instance of FireDialog (either Simple or Granular variant)
      */
-    suspend fun createFireDialog(source: FireDialogSource): FireDialog
+    suspend fun createFireDialog(origin: FireDialogOrigin): FireDialog
 
-    enum class FireDialogSource {
+    enum class FireDialogOrigin {
         BROWSER,
         SETTINGS,
         TAB_SWITCHER,
@@ -54,7 +56,7 @@ class FireDialogProviderImpl @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
 ) : FireDialogProvider {
     override suspend fun createFireDialog(
-        source: FireDialogSource,
+        origin: FireDialogOrigin,
     ): FireDialog = withContext(dispatcherProvider.io()) {
         when {
             androidBrowserConfigFeature.singleTabFireDialog().isEnabled() ->
