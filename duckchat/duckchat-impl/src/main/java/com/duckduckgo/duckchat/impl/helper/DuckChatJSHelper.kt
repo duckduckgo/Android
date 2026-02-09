@@ -48,6 +48,7 @@ interface DuckChatJSHelper {
         data: JSONObject?,
         mode: Mode = Mode.FULL,
         pageContext: String = "",
+        tabId: String = "",
     ): JsCallbackData?
 
     fun onNativeAction(action: NativeAction): SubscriptionEventData
