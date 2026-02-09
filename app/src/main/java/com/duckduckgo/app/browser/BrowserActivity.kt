@@ -429,8 +429,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
                     removeObservers()
                 }
                 FireDialog.EVENT_ON_SINGLE_TAB_CLEAR_STARTED -> {
-                    isDataClearingInProgress = true
-                    removeObservers()
                     currentTab?.onFireDialogVisibilityChanged(isVisible = false)
                 }
             }
