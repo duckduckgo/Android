@@ -8,10 +8,6 @@ on:
         required: true
         default: 'PLACEHOLDER'
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-
 jobs:
   create-release-tag:
     uses: ./.github/workflows/release_create_tag.yml
@@ -27,7 +23,7 @@ jobs:
     secrets: inherit
 
   upload-play-store:
-    needs: create-release-tag
+    needs: create-asana-release-task
     uses: ./.github/workflows/release_upload_play_store.yml
     with:
       ref: ${{ inputs.app-version }}
@@ -36,4 +32,6 @@ jobs:
   upload-internal:
     needs: upload-play-store
     uses: ./.github/workflows/release_upload_internal.yml
+    with:
+      ref: 'develop'
     secrets: inherit

@@ -117,9 +117,8 @@ class EvalMessageHandlerPluginTest {
     }
 
     private fun jsonToEvalResp(json: String): EvalResp? {
-        val trimmedJson = json
-            .removePrefix("javascript:(function() {window.autoconsentMessageCallback(")
-            .removeSuffix(", window.origin);})();")
+        val afterPrefix = json.substringAfter("window.autoconsentMessageCallback(")
+        val trimmedJson = afterPrefix.substringBefore(", window.origin")
         val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
         val jsonAdapter: JsonAdapter<EvalResp> = moshi.adapter(EvalResp::class.java)
         return jsonAdapter.fromJson(trimmedJson)
