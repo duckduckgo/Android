@@ -108,8 +108,6 @@ class AppRemoteMessagingRepository(
     }
 
     override suspend fun clearMessageImage(surface: Surface) {
-        withContext(dispatchers.io()) {
-            remoteMessageImageStore.clearStoredImageFile(surface)
-        }
+        remoteMessageImageStore.clearStoredImageFile(surface)
     }
 }
