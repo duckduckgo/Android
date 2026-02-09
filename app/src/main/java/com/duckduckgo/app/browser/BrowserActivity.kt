@@ -427,6 +427,11 @@ open class BrowserActivity : DuckDuckGoActivity() {
                     isDataClearingInProgress = true
                     removeObservers()
                 }
+                FireDialog.EVENT_ON_SINGLE_TAB_CLEAR_STARTED -> {
+                    isDataClearingInProgress = true
+                    removeObservers()
+                    currentTab?.onFireDialogVisibilityChanged(isVisible = false)
+                }
             }
         }
     }
