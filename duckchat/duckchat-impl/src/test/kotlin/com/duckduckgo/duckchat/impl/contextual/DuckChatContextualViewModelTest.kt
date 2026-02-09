@@ -24,6 +24,7 @@ import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
 import com.duckduckgo.duckchat.impl.helper.NativeAction
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -41,6 +42,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -58,6 +60,7 @@ class DuckChatContextualViewModelTest {
     private val contextualDataStore = FakeDuckChatContextualDataStore()
     private val timeProvider = FakeDuckChatContextualTimeProvider()
     private val sessionTimeoutProvider = FakeDuckChatContextualSessionTimeoutProvider()
+    private val duckChatPixels: DuckChatPixels = mock()
 
     @Before
     fun setup() {
@@ -80,6 +83,7 @@ class DuckChatContextualViewModelTest {
             contextualDataStore = contextualDataStore,
             sessionTimeoutProvider = sessionTimeoutProvider,
             timeProvider = timeProvider,
+            duckChatPixels = duckChatPixels,
         )
     }
 
@@ -276,6 +280,7 @@ class DuckChatContextualViewModelTest {
                     contextualDataStore = contextualDataStore,
                     sessionTimeoutProvider = sessionTimeoutProvider,
                     timeProvider = timeProvider,
+                    duckChatPixels = duckChatPixels,
                 )
 
             val tabId = "tab-1"
@@ -757,14 +762,14 @@ class DuckChatContextualViewModelTest {
     }
 
     @Test
-    fun `onSheetClosed stores last closed timestamp`() = runTest {
+    fun `when closing sheet stores last closed timestamp`() = runTest {
         val tabId = "tab-1"
         val now = 77_000L
         timeProvider.nowMs = now
 
         testee.onSheetOpened(tabId)
         testee.onPromptSent("hello")
-        testee.persistTabClosed()
+        testee.onSheetClosed()
         coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
 
         assertEquals(now, contextualDataStore.getTabClosedTimestamp(tabId))
@@ -891,6 +896,24 @@ class DuckChatContextualViewModelTest {
         }
     }
 
+    @Test
+    fun `when sheet opened then contextual opened pixel is fired`() = runTest {
+        testee.onSheetOpened("tab-1")
+        verify(duckChatPixels).reportContextualSheetOpened()
+    }
+
+    @Test
+    fun `when reopenSheet called then contextual opened pixel is fired`() = runTest {
+        testee.reopenSheet()
+        verify(duckChatPixels).reportContextualSheetOpened()
+    }
+
+    @Test
+    fun `when sheet closes then contextual dismissed pixel is fired`() = runTest {
+        testee.onSheetClosed()
+        verify(duckChatPixels).reportContextualSheetDismissed()
+    }
+
     private class FakeDuckChat : com.duckduckgo.duckchat.api.DuckChat {
         var nextUrl: String = ""
         private val automaticContextAttachment = MutableStateFlow(true)
@@ -899,16 +922,29 @@ class DuckChatContextualViewModelTest {
         override fun openDuckChat() = Unit
         override fun openDuckChatWithAutoPrompt(query: String) = Unit
         override fun openDuckChatWithPrefill(query: String) = Unit
-        override fun getDuckChatUrl(query: String, autoPrompt: Boolean, sidebar: Boolean): String = nextUrl
+        override fun getDuckChatUrl(
+            query: String,
+            autoPrompt: Boolean,
+            sidebar: Boolean,
+        ): String = nextUrl
+
         override fun isDuckChatUrl(uri: android.net.Uri): Boolean = false
         override suspend fun wasOpenedBefore(): Boolean = false
-        override fun showNewAddressBarOptionChoiceScreen(context: android.content.Context, isDarkThemeEnabled: Boolean) = Unit
+        override fun showNewAddressBarOptionChoiceScreen(
+            context: android.content.Context,
+            isDarkThemeEnabled: Boolean,
+        ) = Unit
+
         override suspend fun setInputScreenUserSetting(enabled: Boolean) = Unit
         override suspend fun setCosmeticInputScreenUserSetting(enabled: Boolean) = Unit
         override fun observeInputScreenUserSettingEnabled(): Flow<Boolean> = kotlinx.coroutines.flow.emptyFlow()
         override fun observeCosmeticInputScreenUserSettingEnabled(): Flow<Boolean?> = kotlinx.coroutines.flow.emptyFlow()
         override fun observeAutomaticContextAttachmentUserSettingEnabled(): Flow<Boolean> = automaticContextAttachment
-        override fun showContextualOnboarding(context: Context, onConfirmed: () -> Unit) = Unit
+        override fun showContextualOnboarding(
+            context: Context,
+            onConfirmed: () -> Unit,
+        ) = Unit
+
         override suspend fun isContextualOnboardingCompleted(): Boolean = true
     }
 
@@ -916,13 +952,19 @@ class DuckChatContextualViewModelTest {
         private val urls = mutableMapOf<String, String>()
         private val closeTimestamps = mutableMapOf<String, Long>()
 
-        override suspend fun persistTabChatUrl(tabId: String, url: String) {
+        override suspend fun persistTabChatUrl(
+            tabId: String,
+            url: String,
+        ) {
             urls[tabId] = url
         }
 
         override suspend fun getTabChatUrl(tabId: String): String? = urls[tabId]
 
-        override suspend fun persistTabClosedTimestamp(tabId: String, timestampMs: Long) {
+        override suspend fun persistTabClosedTimestamp(
+            tabId: String,
+            timestampMs: Long,
+        ) {
             closeTimestamps[tabId] = timestampMs
         }
 
