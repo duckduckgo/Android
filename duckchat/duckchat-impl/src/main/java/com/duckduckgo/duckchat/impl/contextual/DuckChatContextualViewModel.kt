@@ -354,10 +354,9 @@ class DuckChatContextualViewModel @Inject constructor(
         if (pageContext.isEmpty()) return false
         val json = JSONObject(pageContext)
         val title = json.optString("title").takeIf { it.isNotBlank() }
-        val url = json.optString("url").takeIf { it.isNotBlank() }
         val content = json.optString("content").takeIf { it.isNotBlank() }
 
-        return title != null && url != null && content != null
+        return title != null && content != null
     }
 
     fun replacePrompt(input: String, prompt: String) {
