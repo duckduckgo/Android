@@ -16,6 +16,8 @@
 
 package com.duckduckgo.duckchat.impl.helper
 
+import android.graphics.Bitmap
+import android.util.Base64
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.utils.ConflatedJob
@@ -36,7 +38,9 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import logcat.logcat
+import org.json.JSONArray
 import org.json.JSONObject
+import java.io.ByteArrayOutputStream
 import java.util.regex.Pattern
 import javax.inject.Inject
 
@@ -84,6 +88,7 @@ class RealDuckChatJSHelper @Inject constructor(
         data: JSONObject?,
         mode: Mode,
         pageContext: String,
+        tabId: String,
     ): JsCallbackData? {
         fun registerDuckChatIsOpenDebounced(windowMs: Long = 500L) {
             // we debounced because METHOD_GET_AI_CHAT_NATIVE_HANDOFF_DATA can be called more than once
@@ -160,7 +165,7 @@ class RealDuckChatJSHelper @Inject constructor(
                     logcat { "Duck.ai Contextual: getAIChatPageContext reason $reason" }
                     if (pageContext.isNotEmpty()) {
                         if (reason == REASON_USER_ACTION) {
-                            getPageContextResponse(featureName, method, it, pageContext)
+                            getPageContextResponse(featureName, method, it, pageContext, tabId)
                         } else {
                             null
                         }
@@ -227,21 +232,48 @@ class RealDuckChatJSHelper @Inject constructor(
         return JsCallbackData(jsonPayload, featureName, method, id)
     }
 
-    private fun getPageContextResponse(
+    private suspend fun getPageContextResponse(
         featureName: String,
         method: String,
         id: String,
         pageContext: String,
+        tabId: String,
     ): JsCallbackData {
+        val json = JSONObject(pageContext)
+        val url = json.optString("url").takeIf { it.isNotBlank() }
+        if (url != null) {
+            val favicon = faviconManager.loadFromDisk(tabId, url)
+            if (favicon != null) {
+                logcat { "Duck.ai: Found favicon for tab $tabId and url $url" }
+                val faviconBase64 = encodeBitmapToBase64(favicon)
+                json.put(
+                    "favicon",
+                    JSONArray().put(
+                        JSONObject().apply {
+                            put("href", faviconBase64)
+                            put("rel", "icon")
+                        },
+                    ),
+                )
+            }
+        }
+
         val params =
             JSONObject().apply {
                 put(
                     PAGE_CONTEXT,
-                    JSONObject(pageContext),
+                    json,
                 )
             }
 
         return JsCallbackData(params, featureName, method, id)
+    }
+
+    private fun encodeBitmapToBase64(bitmap: Bitmap): String {
+        val outputStream = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
+        val encoded = Base64.encodeToString(outputStream.toByteArray(), Base64.NO_WRAP)
+        return "data:image/png;base64,$encoded"
     }
 
     private fun getOpenKeyboardResponse(
