@@ -16,6 +16,7 @@
 
 package com.duckduckgo.duckchat.impl.helper
 
+import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -68,6 +69,7 @@ class RealDuckChatJSHelper @Inject constructor(
     private val duckChat: DuckChatInternal,
     private val duckChatPixels: DuckChatPixels,
     private val dataStore: DuckChatDataStore,
+    private val faviconManager: FaviconManager,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
 ) : DuckChatJSHelper {
