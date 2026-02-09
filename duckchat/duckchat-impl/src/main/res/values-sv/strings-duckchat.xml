@@ -99,4 +99,10 @@
     <string name="duck_chat_contextual_onboarding_body" instruction="Body text for contextual Duck AI onboarding sheet">Duck.ai kan nu hjälpa till att svara på frågor om sidan du tittar på.\n\nSidinnehåll inkluderas bara när du bifogar det. Du kan när som helst ändra detta i Inställningar.</string>
     <string name="duck_chat_contextual_onboarding_primary" instruction="Button to continue to contextual Duck AI sheet">Jag fattar</string>
     <string name="duck_chat_contextual_onboarding_secondary" instruction="Button to go to AI settings">Visa inställningar</string>
+
+    <!-- Duck.ai Contextual Bottom Sheet -->
+    <string name="duckAIContextualPromptSummarize">Sammanfatta denna sida</string>
+    <string name="duckAIContextualAutomaticContextTitle">Skicka sidinnehåll automatiskt</string>
+    <string name="duckAIContextualAutomaticContextMessage">Skicka sidinnehåll automatiskt till Duck.ai</string>
+    <string name="duckAIContextualAttachPageContent">Bifoga sidans innehåll</string>
 </resources>
