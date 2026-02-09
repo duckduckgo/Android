@@ -54,7 +54,7 @@ class FireDialogProviderImpl @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
 ) : FireDialogProvider {
     override suspend fun createFireDialog(
-        source: FireDialogSource
+        source: FireDialogSource,
     ): FireDialog = withContext(dispatcherProvider.io()) {
         when {
             androidBrowserConfigFeature.singleTabFireDialog().isEnabled() ->
