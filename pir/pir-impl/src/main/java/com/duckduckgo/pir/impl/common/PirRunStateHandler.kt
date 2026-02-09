@@ -19,6 +19,7 @@ package com.duckduckgo.pir.impl.common
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.pir.impl.common.PirJob.RunType
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerOptOutActionSucceeded
@@ -274,6 +275,7 @@ class RealPirRunStateHandler @Inject constructor(
     private val pirSchedulingRepository: PirSchedulingRepository,
     private val currentTimeProvider: CurrentTimeProvider,
     @Named("pir") private val moshi: Moshi,
+    private val networkProtectionState: NetworkProtectionState,
 ) : PirRunStateHandler {
     private val pirSuccessAdapter by lazy { moshi.adapter(PirSuccessResponse::class.java) }
 
@@ -454,6 +456,7 @@ class RealPirRunStateHandler @Inject constructor(
             parentUrl = state.broker.parent.orEmpty(),
             actionId = state.failedAction.id,
             actionType = state.failedAction.asActionType(),
+            isVpnRunning = safeIsVpnRunning(),
         )
         eventsRepository.saveBrokerScanLog(
             PirBrokerScanLog(
@@ -482,6 +485,7 @@ class RealPirRunStateHandler @Inject constructor(
                 parentUrl = state.broker.parent.orEmpty(),
                 actionId = state.lastAction.id,
                 actionType = state.lastAction.asActionType(),
+                isVpnRunning = safeIsVpnRunning(),
             )
         } else {
             pixelSender.reportScanMatches(
@@ -490,6 +494,7 @@ class RealPirRunStateHandler @Inject constructor(
                 inManualStarted = state.isManualRun,
                 parentUrl = state.broker.parent.orEmpty(),
                 totalMatches = matchCount,
+                isVpnRunning = safeIsVpnRunning(),
             )
         }
         val brokerName = state.broker.name
@@ -715,6 +720,7 @@ class RealPirRunStateHandler @Inject constructor(
             durationMs = endTimeInMillis - startTimeInMillis,
             optOutAttemptCount = attemptCount,
             emailPattern = emailPattern,
+            isVpnRunning = safeIsVpnRunning(),
         )
 
         eventsRepository.saveOptOutCompleted(
@@ -739,6 +745,7 @@ class RealPirRunStateHandler @Inject constructor(
             stage = state.stage,
             actionId = state.failedAction.id,
             actionType = state.failedAction.asActionType(),
+            isVpnRunning = safeIsVpnRunning(),
         )
 
         eventsRepository.saveOptOutCompleted(
@@ -770,6 +777,10 @@ class RealPirRunStateHandler @Inject constructor(
         } else {
             jobRecordUpdater.updateOptOutError(extractedProfileId)
         }
+    }
+
+    private suspend fun safeIsVpnRunning(): Boolean {
+        return runCatching { networkProtectionState.isRunning() }.getOrElse { false }
     }
 
     companion object {

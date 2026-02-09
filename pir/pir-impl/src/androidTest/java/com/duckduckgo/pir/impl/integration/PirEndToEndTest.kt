@@ -53,6 +53,7 @@ import com.duckduckgo.pir.impl.integration.fakes.FakeCurrentTimeProvider
 import com.duckduckgo.pir.impl.integration.fakes.FakeDbpService
 import com.duckduckgo.pir.impl.integration.fakes.FakeEventHandlerPluginPoint
 import com.duckduckgo.pir.impl.integration.fakes.FakeNativeBrokerActionHandler
+import com.duckduckgo.pir.impl.integration.fakes.FakeNetworkProtectionState
 import com.duckduckgo.pir.impl.integration.fakes.FakePirCssScriptLoader
 import com.duckduckgo.pir.impl.integration.fakes.FakePirDataStore
 import com.duckduckgo.pir.impl.integration.fakes.FakePirDetachedWebViewProvider
@@ -167,6 +168,7 @@ class PirEndToEndTest {
     private lateinit var fakeNativeBrokerActionHandler: FakeNativeBrokerActionHandler
     private lateinit var fakePirCssScriptLoader: FakePirCssScriptLoader
     private lateinit var fakePirWebViewDataCleaner: FakeWebViewDataCleaner
+    private lateinit var fakeNetworkProtectionState: FakeNetworkProtectionState
 
     private val activeBrokerName = "FakeBroker"
     private val removedBrokerName = "FakeRemovedBroker"
@@ -241,6 +243,7 @@ class PirEndToEndTest {
         fakePixel = FakePixel()
         pixelSender = RealPirPixelSender(fakePixel)
         fakePirWebViewDataCleaner = FakeWebViewDataCleaner()
+        fakeNetworkProtectionState = FakeNetworkProtectionState()
 
         pirRepository = RealPirRepository(
             dispatcherProvider = dispatcherProvider,
@@ -287,6 +290,7 @@ class PirEndToEndTest {
             pirSchedulingRepository = pirSchedulingRepository,
             currentTimeProvider = fakeTimeProvider,
             moshi = moshi,
+            networkProtectionState = fakeNetworkProtectionState,
         )
 
         brokerActionProcessor = RealBrokerActionProcessor(fakePirMessagingInterface, moshi)
