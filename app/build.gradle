@@ -582,12 +582,17 @@ dependencies {
 
 // Develocity Android Instrumented Test Support
 afterEvaluate {
-    tasks.withType(DeviceProviderInstrumentTestTask).names.each {
+    tasks.matching { it.name.startsWith("execFlank") }.names.each {
         ImportJUnitXmlReports.register(
-            tasks,
-            tasks.named(it),
-            ANDROID_CONNECTED
-        )
+                tasks,
+                tasks.named(it),
+                ANDROID_FIREBASE
+        ).configure {
+            // Fladle outputs results to localResultsDir/build_id/*.xml
+            reports.from(fileTree("fladleResults") {
+                include "**/*.xml"
+            })
+        }
     }
 }
 
