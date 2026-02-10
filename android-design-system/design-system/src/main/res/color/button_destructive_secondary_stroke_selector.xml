@@ -16,7 +16,7 @@
   -->
 
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:color="?attr/colorPrimary" android:state_checked="true"/>
     <item android:color="?attr/daxColorContainerDisabled" android:state_enabled="false"/>
-    <item android:color="?attr/daxColorDestructive" android:state_checked="false"/>
+    <item android:color="?attr/daxColorButtonDestructiveContainerPressed" android:state_pressed="true"/>
+    <item android:color="?attr/daxColorDestructive"/>
 </selector>
