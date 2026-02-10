@@ -49,6 +49,6 @@ interface StandardizedLeadingIconFeatureToggle {
      *
      * @return Toggle that controls whether to use the new icon determination logic
      */
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun self(): Toggle
 }
