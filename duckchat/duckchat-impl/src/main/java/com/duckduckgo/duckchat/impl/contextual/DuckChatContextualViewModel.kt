@@ -232,11 +232,6 @@ class DuckChatContextualViewModel @Inject constructor(
                 commandChannel.trySend(Command.ChangeSheetState(BottomSheetBehavior.STATE_EXPANDED))
             }
         }
-        if (updatedPageContext.isNotBlank()) {
-            duckChatPixels.reportContextualPromptSubmittedWithContextNative()
-        } else {
-            duckChatPixels.reportContextualPromptSubmittedWithoutContextNative()
-        }
     }
 
     fun onChatPageLoaded(url: String?) {
@@ -281,6 +276,12 @@ class DuckChatContextualViewModel @Inject constructor(
             } else {
                 null
             }
+
+        if (pageContext == null) {
+            duckChatPixels.reportContextualPromptSubmittedWithoutContextNative()
+        } else {
+            duckChatPixels.reportContextualPromptSubmittedWithContextNative()
+        }
 
         val params =
             JSONObject().apply {
@@ -343,16 +344,18 @@ class DuckChatContextualViewModel @Inject constructor(
         logcat { "Duck.ai Contextual: addPageContext" }
 
         viewModelScope.launch {
-            _viewState.update { current ->
-                logcat { "Duck.ai Contextual: addPageContext $current context $updatedPageContext" }
-                current.copy(
-                    showContext = isContextValid(updatedPageContext),
-                    userRemovedContext = false,
-                )
+            val isContextValid = isContextValid(updatedPageContext)
+            if (isContextValid) {
+                duckChatPixels.reportContextualPageContextManuallyAttachedNative()
+                _viewState.update { current ->
+                    logcat { "Duck.ai Contextual: addPageContext $current context $updatedPageContext" }
+                    current.copy(
+                        showContext = isContextValid(updatedPageContext),
+                        userRemovedContext = false,
+                    )
+                }
             }
         }
-
-        duckChatPixels.reportContextualPageContextManuallyAttachedNative()
     }
 
     private fun isContextValid(pageContext: String): Boolean {

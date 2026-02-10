@@ -412,6 +412,65 @@ class RealDuckChatJSHelperTest {
     }
 
     @Test
+    fun whenTogglePageContextEnabledThenReportContextAttached() = runTest {
+        val featureName = "aiChat"
+        val method = "togglePageContextTelemetry"
+        val id = "123"
+        val data = JSONObject(mapOf("enabled" to true))
+
+        assertNull(
+            testee.processJsCallbackMessage(
+                featureName,
+                method,
+                id,
+                data,
+                pageContext = viewModel.updatedPageContext,
+            ),
+        )
+
+        verify(mockDuckChatPixels).reportContextualPageContextManuallyAttachedFrontend()
+    }
+
+    @Test
+    fun whenTogglePageContextDisabledThenReportContextRemoved() = runTest {
+        val featureName = "aiChat"
+        val method = "togglePageContextTelemetry"
+        val id = "123"
+        val data = JSONObject(mapOf("enabled" to false))
+
+        assertNull(
+            testee.processJsCallbackMessage(
+                featureName,
+                method,
+                id,
+                data,
+                pageContext = viewModel.updatedPageContext,
+            ),
+        )
+
+        verify(mockDuckChatPixels).reportContextualPageContextRemovedFrontend()
+    }
+
+    @Test
+    fun whenTogglePageContextWithoutDataThenNoPixelReported() = runTest {
+        val featureName = "aiChat"
+        val method = "togglePageContextTelemetry"
+        val id = "123"
+
+        assertNull(
+            testee.processJsCallbackMessage(
+                featureName,
+                method,
+                id,
+                null,
+                pageContext = viewModel.updatedPageContext,
+            ),
+        )
+
+        verifyNoInteractions(mockDuckChatPixels)
+    }
+
+    @Test
     fun whenGetAIChatNativeConfigValuesAndDuckChatFeatureDisabledThenReturnJsCallbackDataWithDuckChatDisabled() = runTest {
         val featureName = "aiChat"
         val method = "getAIChatNativeConfigValues"
