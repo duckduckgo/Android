@@ -68,6 +68,7 @@ import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_S
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_SETTINGS_SHOWN
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_WEBVIEW_RENDER_PROCESS_CRASH
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelParameter.ACTIVATION_DAY
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelParameter.ACTIVATION_PLATFORM
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
@@ -122,7 +123,7 @@ interface SubscriptionPixelSender {
     fun reportAuthV2TokenStoreError()
     fun reportSubscriptionsWebViewRenderProcessCrash(isRepeated: Boolean)
     fun reportFreeTrialStart()
-    fun reportFreeTrialVpnActivation(activationDay: String)
+    fun reportFreeTrialVpnActivation(activationDay: String, platform: String)
 }
 
 @ContributesBinding(AppScope::class)
@@ -302,8 +303,8 @@ class SubscriptionPixelSenderImpl @Inject constructor(
         fire(FREE_TRIAL_START)
     }
 
-    override fun reportFreeTrialVpnActivation(activationDay: String) {
-        fire(FREE_TRIAL_VPN_ACTIVATION, mapOf(ACTIVATION_DAY to activationDay))
+    override fun reportFreeTrialVpnActivation(activationDay: String, platform: String) {
+        fire(FREE_TRIAL_VPN_ACTIVATION, mapOf(ACTIVATION_DAY to activationDay, ACTIVATION_PLATFORM to platform))
     }
 
     private fun fire(
