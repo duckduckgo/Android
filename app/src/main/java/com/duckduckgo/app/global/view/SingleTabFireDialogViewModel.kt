@@ -27,6 +27,7 @@ import com.duckduckgo.app.fire.wideevents.DataClearingWideEvent
 import com.duckduckgo.app.firebutton.FireButtonStore
 import com.duckduckgo.app.global.events.db.UserEventKey
 import com.duckduckgo.app.global.events.db.UserEventsStore
+import com.duckduckgo.app.global.view.FireDialogProvider.FireDialogOrigin.TAB_SWITCHER
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.FIRE_DIALOG_ANIMATION
 import com.duckduckgo.app.pixels.AppPixelName.FIRE_DIALOG_CLEAR_PRESSED
@@ -36,7 +37,6 @@ import com.duckduckgo.app.settings.clear.getPixelValue
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_ANIMATION
-import com.duckduckgo.app.global.view.FireDialogProvider.FireDialogOrigin.TAB_SWITCHER
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.common.utils.DateProvider
 import com.duckduckgo.common.utils.DispatcherProvider
