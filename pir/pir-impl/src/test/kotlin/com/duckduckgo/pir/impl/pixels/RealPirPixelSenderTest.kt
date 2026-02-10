@@ -151,6 +151,7 @@ class RealPirPixelSenderTest {
             durationMs = 5000L,
             optOutAttemptCount = 2,
             emailPattern = "pattern-abc",
+            isVpnRunning = false,
         )
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
@@ -167,6 +168,7 @@ class RealPirPixelSenderTest {
         assert(params["duration"] == "5000")
         assert(params["tries"] == "2")
         assert(params["pattern"] == "pattern-abc")
+        assert(params["vpn_connection_state"] == "disconnected")
     }
 
     @Test
@@ -177,6 +179,7 @@ class RealPirPixelSenderTest {
             durationMs = 5000L,
             optOutAttemptCount = 2,
             emailPattern = null,
+            isVpnRunning = false,
         )
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
@@ -202,6 +205,7 @@ class RealPirPixelSenderTest {
             emailPattern = "pattern-xyz",
             actionId = "action-1",
             actionType = "fillform",
+            isVpnRunning = true,
         )
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
@@ -223,6 +227,7 @@ class RealPirPixelSenderTest {
         assert(params["pattern"] == "pattern-xyz")
         assert(params["action_id"] == "action-1")
         assert(params["action_type"] == "fillform")
+        assert(params["vpn_connection_state"] == "connected")
     }
 
     @Test
@@ -653,6 +658,7 @@ class RealPirPixelSenderTest {
             durationMs = 5000L,
             inManualStarted = true,
             parentUrl = "https://parent.com",
+            isVpnRunning = false,
         )
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
@@ -669,6 +675,7 @@ class RealPirPixelSenderTest {
         assert(params["duration"] == "5000")
         assert(params["is_manual_scan"] == "true")
         assert(params["parent"] == "https://parent.com")
+        assert(params["vpn_connection_state"] == "disconnected")
     }
 
     @Test
@@ -681,6 +688,7 @@ class RealPirPixelSenderTest {
             parentUrl = "https://parent.com",
             actionId = "action-scan-2",
             actionType = "extract",
+            isVpnRunning = true,
         )
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
@@ -699,6 +707,7 @@ class RealPirPixelSenderTest {
         assert(params["parent"] == "https://parent.com")
         assert(params["action_id"] == "action-scan-2")
         assert(params["action_type"] == "extract")
+        assert(params["vpn_connection_state"] == "connected")
     }
 
     @Test
@@ -713,6 +722,7 @@ class RealPirPixelSenderTest {
             parentUrl = "https://parent.com",
             actionId = "action-scan-3",
             actionType = "navigate",
+            isVpnRunning = false,
         )
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
@@ -733,6 +743,7 @@ class RealPirPixelSenderTest {
         assert(params["parent"] == "https://parent.com")
         assert(params["action_id"] == "action-scan-3")
         assert(params["action_type"] == "navigate")
+        assert(params["vpn_connection_state"] == "disconnected")
     }
 
     @Test
