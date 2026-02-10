@@ -586,7 +586,7 @@ afterEvaluate {
         ImportJUnitXmlReports.register(
                 tasks,
                 tasks.named(it),
-                ANDROID_INSTRUMENTATION
+                ANDROID_CONNECTED
         ).configure {
             // Fladle outputs results to localResultsDir/build_id/*.xml
             reports.from(fileTree("fladleResults")  {
