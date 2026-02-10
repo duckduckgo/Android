@@ -431,7 +431,9 @@ class DuckChatContextualViewModel @Inject constructor(
         tabId: String,
         pageContext: String,
     ) {
+        logcat { "Duck.ai: onPageContextReceived $pageContext" }
         if (isContextValid(pageContext)) {
+            logcat { "Duck.ai: onPageContextReceived is valid" }
             updatedPageContext = pageContext
 
             val json = JSONObject(updatedPageContext)
@@ -439,10 +441,11 @@ class DuckChatContextualViewModel @Inject constructor(
             val url = json.optString("url")
 
             val inputMode = _viewState.value
-            logcat { "Duck.ai: onPageContextReceived $inputMode" }
+            logcat { "Duck.ai: onPageContextReceived current state $inputMode" }
 
             if (inputMode.sheetMode == SheetMode.INPUT) {
                 val allowsAutomaticContextAttachment = duckChatInternal.isAutomaticContextAttachmentEnabled()
+                logcat { "Duck.ai: allowsAutomaticContextAttachment $allowsAutomaticContextAttachment" }
                 val updatedState =
                     inputMode.copy(
                         contextTitle = title,
@@ -456,6 +459,10 @@ class DuckChatContextualViewModel @Inject constructor(
                             inputMode.showContext
                         },
                     )
+                logcat { "Duck.ai: onPageContextReceived updated state state $updatedState" }
+                if (updatedState.showContext) {
+                    duckChatPixels.reportContextualPageContextAutoAttached()
+                }
                 _viewState.update { updatedState }
             } else {
                 _viewState.update {

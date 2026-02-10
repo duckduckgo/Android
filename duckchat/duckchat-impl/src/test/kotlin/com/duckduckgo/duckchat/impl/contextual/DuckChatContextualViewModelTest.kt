@@ -42,6 +42,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -463,6 +464,43 @@ class DuckChatContextualViewModelTest {
             assertEquals("", state.tabId)
             assertEquals("", testee.updatedPageContext)
             verify(duckChatPixels).reportContextualPageContextCollectionEmpty()
+        }
+
+    @Test
+    fun `when page context received with automatic attachment then auto-attached pixel fired`() =
+        runTest {
+            val serializedPageData =
+                """
+                {
+                    "title": "Ctx Title",
+                    "url": "https://ctx.com",
+                    "content": "content"
+                }
+                """.trimIndent()
+
+            testee.onPageContextReceived("tab-1", serializedPageData)
+
+            verify(duckChatPixels).reportContextualPageContextAutoAttached()
+        }
+
+    @Test
+    fun `when page context received after user removed context then auto-attached pixel not fired`() =
+        runTest {
+            val serializedPageData =
+                """
+                {
+                    "title": "Ctx Title",
+                    "url": "https://ctx.com",
+                    "content": "content"
+                }
+                """.trimIndent()
+
+            testee.removePageContext()
+            coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+            testee.onPageContextReceived("tab-1", serializedPageData)
+
+            verify(duckChatPixels, never()).reportContextualPageContextAutoAttached()
         }
 
     @Test

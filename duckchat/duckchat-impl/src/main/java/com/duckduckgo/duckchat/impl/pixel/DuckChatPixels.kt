@@ -125,6 +125,7 @@ interface DuckChatPixels {
     fun reportContextualPageContextManuallyAttachedFrontend()
     fun reportContextualPageContextRemovedNative()
     fun reportContextualPageContextRemovedFrontend()
+    fun reportContextualPageContextAutoAttached()
     fun reportContextualPromptSubmittedWithContextNative()
     fun reportContextualPromptSubmittedWithoutContextNative()
     fun reportContextualPageContextCollectionEmpty()
@@ -250,6 +251,13 @@ class RealDuckChatPixels @Inject constructor(
         appCoroutineScope.launch(dispatcherProvider.io()) {
             pixel.fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_PROMPT_SUBMITTED_WITH_CONTEXT_NATIVE_COUNT)
             pixel.fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_PROMPT_SUBMITTED_WITH_CONTEXT_NATIVE_DAILY, type = Pixel.PixelType.Daily())
+        }
+    }
+
+    override fun reportContextualPageContextAutoAttached() {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_PAGE_CONTEXT_AUTO_ATTACHED_COUNT)
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_PAGE_CONTEXT_AUTO_ATTACHED_DAILY, type = Pixel.PixelType.Daily())
         }
     }
 

@@ -26,6 +26,8 @@ import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_SUBMIT_FIRST_PROMPT
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_SUBMIT_PROMPT
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_TAP_KEYBOARD_RETURN_KEY
 import com.duckduckgo.duckchat.impl.metric.DuckAiMetricCollector
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_PAGE_CONTEXT_AUTO_ATTACHED_COUNT
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_PAGE_CONTEXT_AUTO_ATTACHED_DAILY
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_PAGE_CONTEXT_COLLECTION_EMPTY
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_PAGE_CONTEXT_MANUALLY_ATTACHED_FRONTEND_COUNT
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_PAGE_CONTEXT_MANUALLY_ATTACHED_FRONTEND_DAILY
@@ -237,6 +239,26 @@ class RealDuckChatPixelsTest {
     }
 
     @Test
+    fun `when reportContextualPageContextAutoAttached enabled then fires count and daily`() = runTest {
+        testee.reportContextualPageContextAutoAttached(true)
+
+        advanceUntilIdle()
+
+        verify(mockPixel).fire(DUCK_CHAT_CONTEXTUAL_PAGE_CONTEXT_AUTO_ATTACHED_COUNT)
+        verify(mockPixel).fire(DUCK_CHAT_CONTEXTUAL_PAGE_CONTEXT_AUTO_ATTACHED_DAILY, type = Pixel.PixelType.Daily())
+    }
+
+    @Test
+    fun `when reportContextualPageContextAutoAttached disabled then fires count and daily`() = runTest {
+        testee.reportContextualPageContextAutoAttached(false)
+
+        advanceUntilIdle()
+
+        verify(mockPixel).fire(DUCK_CHAT_CONTEXTUAL_PAGE_CONTEXT_AUTO_ATTACHED_COUNT)
+        verify(mockPixel).fire(DUCK_CHAT_CONTEXTUAL_PAGE_CONTEXT_AUTO_ATTACHED_DAILY, type = Pixel.PixelType.Daily())
+    }
+
+    @Test
     fun `when reportContextualPromptSubmittedWithContextNative then fires count and daily`() = runTest {
         testee.reportContextualPromptSubmittedWithContextNative()
 
@@ -259,11 +281,7 @@ class RealDuckChatPixelsTest {
     @Test
     fun `when reportContextualPageContextCollectionEmpty then fires count and daily`() = runTest {
         testee.reportContextualPageContextCollectionEmpty()
-
-        advanceUntilIdle()
-
         verify(mockPixel).fire(DUCK_CHAT_CONTEXTUAL_PAGE_CONTEXT_COLLECTION_EMPTY)
-        verify(mockPixel).fire(DUCK_CHAT_CONTEXTUAL_PAGE_CONTEXT_COLLECTION_EMPTY, type = Pixel.PixelType.Daily())
     }
 
     @Test
