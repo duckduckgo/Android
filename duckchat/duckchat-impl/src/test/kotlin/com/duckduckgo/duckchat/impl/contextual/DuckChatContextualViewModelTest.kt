@@ -671,7 +671,7 @@ class DuckChatContextualViewModelTest {
     }
 
     @Test
-    fun `persistTabClosed stores last closed timestamp`() = runTest {
+    fun `onSheetClosed stores last closed timestamp`() = runTest {
         val tabId = "tab-1"
         val now = 77_000L
         timeProvider.nowMs = now

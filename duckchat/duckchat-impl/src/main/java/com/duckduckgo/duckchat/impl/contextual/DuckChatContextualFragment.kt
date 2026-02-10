@@ -501,7 +501,7 @@ class DuckChatContextualFragment :
             viewModel.addPageContext()
         }
         binding.contextualPromptSummarize.setOnClickListener {
-            val prompt = getString(R.string.duckAIContextualSummarizePrompt)
+            val prompt = getString(R.string.duckAIContextualPromptSummarize)
             viewModel.replacePrompt(prompt)
         }
     }
