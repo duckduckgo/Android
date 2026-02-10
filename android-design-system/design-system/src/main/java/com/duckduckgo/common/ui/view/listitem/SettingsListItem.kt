@@ -22,6 +22,7 @@ import android.widget.ImageView
 import androidx.annotation.DrawableRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
+import com.duckduckgo.common.ui.view.DaxYellowPill
 import com.duckduckgo.common.ui.view.StatusIndicatorView
 import com.duckduckgo.common.ui.view.StatusIndicatorView.Status
 import com.duckduckgo.common.ui.view.defaultSelectableItemBackground
@@ -44,8 +45,8 @@ class SettingsListItem @JvmOverloads constructor(
         get() = binding.primaryText
     private val leadingIcon: ImageView
         get() = binding.leadingIcon
-    private val betaPill: ImageView
-        get() = binding.betaPill
+    private val yellowPill: DaxYellowPill
+        get() = binding.yellowPill
     private val statusIndicator: StatusIndicatorView
         get() = binding.statusIndicator
 
@@ -67,30 +68,17 @@ class SettingsListItem @JvmOverloads constructor(
                 leadingIcon.gone()
             }
 
-            val pillIcon = getInt(R.styleable.SettingsListItem_pillIcon, 0)
-            if (pillIcon != 0) {
-                getPillResource(pillIcon)?.let { resId ->
-                    betaPill.setImageResource(resId)
-                    betaPill.show()
-                } ?: run {
-                    betaPill.gone()
-                }
+            if (getBoolean(R.styleable.SettingsListItem_pillIcon, false)) {
+                yellowPill.show()
+                yellowPill.text = getString(R.styleable.SettingsListItem_pillText)
             } else {
-                betaPill.gone()
+                yellowPill.gone()
             }
 
             val indicatorStatus = Status.from(getInt(R.styleable.SettingsListItem_indicatorStatus, 2))
             statusIndicator.setStatus(indicatorStatus)
 
             recycle()
-        }
-    }
-
-    private fun getPillResource(enumValue: Int): Int? {
-        return when (enumValue) {
-            1 -> R.drawable.ic_beta_pill
-            2 -> R.drawable.ic_new_pill
-            else -> null
         }
     }
 

@@ -19,6 +19,7 @@
         <attr name="leadingIcon" />
         <attr name="primaryText" />
         <attr name="pillIcon" />
+        <attr name="pillText" />
         <attr name="indicatorStatus" />
     </declare-styleable>
 </resources>
