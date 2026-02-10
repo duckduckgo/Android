@@ -46,7 +46,7 @@ interface DuckChatJSHelper {
         id: String?,
         data: JSONObject?,
         mode: Mode = Mode.FULL,
-        pageContext: String? = null,
+        pageContext: String = "",
     ): JsCallbackData?
 
     fun onNativeAction(action: NativeAction): SubscriptionEventData
@@ -80,7 +80,7 @@ class RealDuckChatJSHelper @Inject constructor(
         id: String?,
         data: JSONObject?,
         mode: Mode,
-        pageContext: String?,
+        pageContext: String,
     ): JsCallbackData? {
         fun registerDuckChatIsOpenDebounced(windowMs: Long = 500L) {
             // we debounced because METHOD_GET_AI_CHAT_NATIVE_HANDOFF_DATA can be called more than once
@@ -155,7 +155,7 @@ class RealDuckChatJSHelper @Inject constructor(
                 id?.let {
                     val reason = data?.optString(REASON) ?: REASON_USER_ACTION
                     logcat { "Duck.ai Contextual: getAIChatPageContext reason $reason" }
-                    if (pageContext != null) {
+                    if (pageContext.isNotEmpty()) {
                         if (reason == REASON_USER_ACTION) {
                             getPageContextResponse(featureName, method, it, pageContext)
                         } else {

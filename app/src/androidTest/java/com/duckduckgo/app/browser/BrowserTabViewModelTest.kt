@@ -290,7 +290,9 @@ import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.savedsites.impl.SavedSitesPixelName
+import com.duckduckgo.serp.logos.api.SerpEasterEggLogosToggles
 import com.duckduckgo.serp.logos.api.SerpLogo
+import com.duckduckgo.serp.logos.api.SerpLogos
 import com.duckduckgo.settings.api.SerpSettingsFeature
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.LocationPermissionRequest
@@ -315,6 +317,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceTimeBy
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.json.JSONObject
 import org.junit.After
@@ -625,6 +628,11 @@ class BrowserTabViewModelTest {
 
     private lateinit var fakeContentScopeScriptsSubscriptionEventPluginPoint: FakeContentScopeScriptsSubscriptionEventPluginPoint
     private var serpSettingsFeature = FakeFeatureToggleFactory.create(SerpSettingsFeature::class.java)
+    private val mockSerpEasterEggLogosToggles: SerpEasterEggLogosToggles = mock()
+    private val mockSetFavouriteToggle: Toggle = mock()
+    private val mockSerpLogos: SerpLogos = mock()
+    private val favouriteLogoFlow = MutableStateFlow<String?>(null)
+    private val setFavouriteEnabledFlow = MutableStateFlow(false)
 
     @Before
     fun before() =
@@ -727,6 +735,7 @@ class BrowserTabViewModelTest {
                     duckPlayer = mockDuckPlayer,
                     brokenSitePrompt = mockBrokenSitePrompt,
                     onboardingHomeScreenWidgetToggles = mockOnboardingHomeScreenWidgetToggles,
+                    duckChat = mockDuckChat,
                 )
 
             accessibilitySettingsDataStore =
@@ -758,6 +767,12 @@ class BrowserTabViewModelTest {
             whenever(mockDuckChat.getDuckChatUrl(any(), any(), any())).thenReturn(duckChatURL)
             whenever(mockSyncStatusChangedObserver.syncStatusChangedEvents).thenReturn(syncStatusChangedEventsFlow)
             whenever(subscriptions.getSubscriptionStatusFlow()).thenReturn(subscriptionStatusFlow)
+
+            // SERP favourite logo mocks
+            whenever(mockSerpEasterEggLogosToggles.setFavourite()).thenReturn(mockSetFavouriteToggle)
+            whenever(mockSetFavouriteToggle.isEnabled()).thenReturn(false)
+            whenever(mockSetFavouriteToggle.enabled()).thenReturn(setFavouriteEnabledFlow)
+            whenever(mockSerpLogos.favouriteSerpEasterEggLogoUrlFlow).thenReturn(favouriteLogoFlow)
 
             initialiseViewModel()
 
@@ -879,6 +894,8 @@ class BrowserTabViewModelTest {
                 serpSettingsFeature = serpSettingsFeature,
                 syncStatusChangedObserver = mockSyncStatusChangedObserver,
                 pageContextJSHelper = mockPageContextJSHelper,
+                serpEasterEggLogosToggles = mockSerpEasterEggLogosToggles,
+                serpLogos = mockSerpLogos,
             )
 
         testee.loadData("abc", null, false, false)
@@ -7896,7 +7913,7 @@ class BrowserTabViewModelTest {
         val nonDdgUrl = "https://example.com/search?q=test"
         val webViewNavState = WebViewNavigationState(mockStack, 100)
 
-        testee.omnibarViewState.value = omnibarViewState().copy(serpLogo = SerpLogo.EasterEgg("some-logo-url"))
+        testee.omnibarViewState.value = omnibarViewState().copy(serpLogo = SerpLogo.EasterEgg(logoUrl = "some-logo-url", isFavourite = false))
         testee.pageFinished(mockWebView, webViewNavState, nonDdgUrl)
 
         assertNull("SERP logo should be cleared when navigating to non-DuckDuckGo URL", omnibarViewState().serpLogo)
@@ -7909,6 +7926,150 @@ class BrowserTabViewModelTest {
         testee.onStartTrackersAnimation()
 
         assertCommandIssued<Command.StartAddressBarTrackersAnimation>()
+    }
+
+    @Test
+    fun whenFavouriteLogoSetAndFeatureEnabledThenExtractSerpLogoNotIssued() = runTest {
+        whenever(mockDuckAiFeatureState.showFullScreenMode).thenReturn(mockDuckAiFullScreenMode)
+        whenever(mockSetFavouriteToggle.isEnabled()).thenReturn(true)
+        setFavouriteEnabledFlow.value = true
+        favouriteLogoFlow.value = "https://example.com/favourite-logo.png"
+
+        val ddgUrl = "https://duckduckgo.com/?q=test"
+        val webViewNavState = WebViewNavigationState(mockStack, 100)
+
+        testee.pageFinished(mockWebView, webViewNavState, ddgUrl)
+
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        val commands = commandCaptor.allValues
+        assertFalse(
+            "ExtractSerpLogo command should NOT be issued when favourite is set and feature is enabled",
+            commands.any { it is Command.ExtractSerpLogo },
+        )
+    }
+
+    @Test
+    fun whenFavouriteLogoSetAndFeatureEnabledThenSerpLogoIsSetToFavourite() = runTest {
+        whenever(mockDuckAiFeatureState.showFullScreenMode).thenReturn(mockDuckAiFullScreenMode)
+        whenever(mockSetFavouriteToggle.isEnabled()).thenReturn(true)
+        setFavouriteEnabledFlow.value = true
+        val favouriteUrl = "https://example.com/favourite-logo.png"
+        favouriteLogoFlow.value = favouriteUrl
+
+        val ddgUrl = "https://duckduckgo.com/?q=test"
+        val webViewNavState = WebViewNavigationState(mockStack, 100)
+
+        testee.pageFinished(mockWebView, webViewNavState, ddgUrl)
+
+        assertEquals(
+            "serpLogo should be set to favourite EasterEgg when favourite is set and feature is enabled",
+            SerpLogo.EasterEgg(logoUrl = favouriteUrl, isFavourite = true),
+            omnibarViewState().serpLogo,
+        )
+    }
+
+    @Test
+    fun whenFavouriteLogoSetButFeatureDisabledThenExtractSerpLogoIssued() = runTest {
+        whenever(mockDuckAiFeatureState.showFullScreenMode).thenReturn(mockDuckAiFullScreenMode)
+        whenever(mockSetFavouriteToggle.isEnabled()).thenReturn(false)
+        favouriteLogoFlow.value = "https://example.com/favourite-logo.png"
+
+        val ddgUrl = "https://duckduckgo.com/?q=test"
+        val webViewNavState = WebViewNavigationState(mockStack, 100)
+
+        testee.pageFinished(mockWebView, webViewNavState, ddgUrl)
+
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        val commands = commandCaptor.allValues
+        assertTrue(
+            "ExtractSerpLogo command should be issued when feature is disabled even if favourite is set",
+            commands.any { it is Command.ExtractSerpLogo && it.currentUrl == ddgUrl },
+        )
+    }
+
+    @Test
+    fun whenNoFavouriteLogoSetAndFeatureEnabledThenExtractSerpLogoIssued() = runTest {
+        whenever(mockDuckAiFeatureState.showFullScreenMode).thenReturn(mockDuckAiFullScreenMode)
+        whenever(mockSetFavouriteToggle.isEnabled()).thenReturn(true)
+        setFavouriteEnabledFlow.value = true
+        favouriteLogoFlow.value = null
+
+        val ddgUrl = "https://duckduckgo.com/?q=test"
+        val webViewNavState = WebViewNavigationState(mockStack, 100)
+
+        testee.pageFinished(mockWebView, webViewNavState, ddgUrl)
+
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        val commands = commandCaptor.allValues
+        assertTrue(
+            "ExtractSerpLogo command should be issued when no favourite is set even if feature is enabled",
+            commands.any { it is Command.ExtractSerpLogo && it.currentUrl == ddgUrl },
+        )
+    }
+
+    @Test
+    fun whenFavouriteLogoClearedOnSerpPageThenSerpLogoSetToNormal() = runTest {
+        whenever(mockDuckAiFeatureState.showFullScreenMode).thenReturn(mockDuckAiFullScreenMode)
+        whenever(mockSetFavouriteToggle.isEnabled()).thenReturn(true)
+        val ddgUrl = "https://duckduckgo.com/?q=test"
+        loadUrl(ddgUrl)
+
+        setFavouriteEnabledFlow.value = true
+        val favouriteUrl = "https://example.com/favourite-logo.png"
+        favouriteLogoFlow.value = favouriteUrl
+
+        advanceUntilIdle()
+
+        // Verify favourite logo is set
+        assertEquals(
+            "serpLogo should be set to favourite EasterEgg initially",
+            SerpLogo.EasterEgg(logoUrl = favouriteUrl, isFavourite = true),
+            omnibarViewState().serpLogo,
+        )
+
+        // Clear the favourite
+        favouriteLogoFlow.value = null
+        // Advance scheduler to process the state change
+        advanceUntilIdle()
+
+        // serpLogo should now be Normal (showing Dax)
+        assertEquals(
+            "serpLogo should be Normal when favourite is cleared on SERP page",
+            SerpLogo.Normal,
+            omnibarViewState().serpLogo,
+        )
+    }
+
+    @Test
+    fun whenFavouriteLogoClearedOnNonSerpPageThenSerpLogoUnchanged() = runTest {
+        whenever(mockDuckAiFeatureState.showFullScreenMode).thenReturn(mockDuckAiFullScreenMode)
+        whenever(mockSetFavouriteToggle.isEnabled()).thenReturn(true)
+        setFavouriteEnabledFlow.value = true
+        val favouriteUrl = "https://example.com/favourite-logo.png"
+        favouriteLogoFlow.value = favouriteUrl
+
+        val nonDdgUrl = "https://example.com/page"
+
+        // Load non-SERP page - use loadUrl to properly set up site/url
+        loadUrl(nonDdgUrl)
+
+        // serpLogo should be null for non-SERP pages
+        assertNull(
+            "serpLogo should be null on non-SERP page",
+            omnibarViewState().serpLogo,
+        )
+
+        // Clear the favourite
+        favouriteLogoFlow.value = null
+
+        // Wait for flow to emit
+        advanceUntilIdle()
+
+        // serpLogo should still be null (no change for non-SERP pages)
+        assertNull(
+            "serpLogo should remain null when favourite is cleared on non-SERP page",
+            omnibarViewState().serpLogo,
+        )
     }
 
     private fun aCredential(): LoginCredentials = LoginCredentials(domain = null, username = null, password = null)
@@ -8379,7 +8540,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenNonDuckAiPageFinishedAndFullscreenModeEnabledThenDisabledDuckAiModeCommandSent() = runTest {
-        whenever(mockDuckDuckGoUrlDetector.isDuckDuckGoChatUrl(any())).thenReturn(false)
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(false)
         whenever(mockDuckAiFeatureState.showFullScreenMode).thenReturn(mockDuckAiFullScreenModeEnabled)
 
         val nonDdgUrl = "https://example.com/search?q=test"
@@ -8396,7 +8557,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenDuckAiPageFinishedAndFullscreenModeEnabledThenEnableDuckAiModeCommandSent() = runTest {
-        whenever(mockDuckDuckGoUrlDetector.isDuckDuckGoChatUrl(any())).thenReturn(true)
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
         whenever(mockDuckAiFeatureState.showFullScreenMode).thenReturn(mockDuckAiFullScreenModeEnabled)
 
         val nonDdgUrl = "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5"
@@ -8441,7 +8602,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenNewPageWithDuckAIUrlAndFullscreenModeEnabledThenEnableDuckAiModeCommandSent() = runTest {
-        whenever(mockDuckDuckGoUrlDetector.isDuckDuckGoChatUrl(any())).thenReturn(true)
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
         whenever(mockDuckAiFeatureState.showFullScreenMode).thenReturn(mockDuckAiFullScreenModeEnabled)
         testee.browserViewState.value = browserViewState().copy(browserShowing = true)
 
@@ -8461,7 +8622,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenNewPageWithNonDuckAIUrlAndFullscreenModeEnabledThenDisableDuckAiModeCommandSent() = runTest {
-        whenever(mockDuckDuckGoUrlDetector.isDuckDuckGoChatUrl(any())).thenReturn(false)
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(false)
         whenever(mockDuckAiFeatureState.showFullScreenMode).thenReturn(mockDuckAiFullScreenModeEnabled)
         testee.browserViewState.value = browserViewState().copy(browserShowing = true)
 

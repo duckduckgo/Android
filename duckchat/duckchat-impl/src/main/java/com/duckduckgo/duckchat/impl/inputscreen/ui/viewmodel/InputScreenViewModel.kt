@@ -43,6 +43,7 @@ import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.common.utils.extensions.toBinaryString
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.inputscreen.ui.InputScreenConfigResolver
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.EditWithSelectedQuery
@@ -58,6 +59,7 @@ import com.duckduckgo.duckchat.impl.inputscreen.ui.state.InputFieldState
 import com.duckduckgo.duckchat.impl.inputscreen.ui.state.InputScreenVisibilityState
 import com.duckduckgo.duckchat.impl.inputscreen.ui.state.SubmitButtonIcon
 import com.duckduckgo.duckchat.impl.inputscreen.ui.state.SubmitButtonIconState
+import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.ChatSuggestion
 import com.duckduckgo.duckchat.impl.inputscreen.ui.viewmodel.UserSelectedMode.CHAT
 import com.duckduckgo.duckchat.impl.inputscreen.ui.viewmodel.UserSelectedMode.NONE
 import com.duckduckgo.duckchat.impl.inputscreen.ui.viewmodel.UserSelectedMode.SEARCH
@@ -125,6 +127,7 @@ class InputScreenViewModel @AssistedInject constructor(
     private val autoCompleteSettings: AutoCompleteSettings,
     private val duckChat: DuckChat,
     private val duckAiFeatureState: DuckAiFeatureState,
+    private val duckChatFeature: DuckChatFeature,
     private val pixel: Pixel,
     private val sessionStore: InputScreenSessionStore,
     private val inputScreenDiscoveryFunnel: InputScreenDiscoveryFunnel,
@@ -168,6 +171,9 @@ class InputScreenViewModel @AssistedInject constructor(
 
     private val _submitButtonIconState = MutableStateFlow(SubmitButtonIconState(SubmitButtonIcon.SEARCH))
     val submitButtonIconState: StateFlow<SubmitButtonIconState> = _submitButtonIconState.asStateFlow()
+
+    private val _chatSuggestions = MutableStateFlow<List<ChatSuggestion>>(emptyList())
+    val chatSuggestions: StateFlow<List<ChatSuggestion>> = _chatSuggestions.asStateFlow()
 
     private val refreshSuggestions = MutableSharedFlow<Unit>()
 
@@ -479,6 +485,11 @@ class InputScreenViewModel @AssistedInject constructor(
             fireModeSwitchedPixel(directionToSearch = false)
         }
         userSelectedMode = CHAT
+
+        // Load suggestions when chat tab is selected (only if not already loaded)
+        if (duckChatFeature.aiChatSuggestions().isEnabled() && _chatSuggestions.value.isEmpty()) {
+            loadChatSuggestions()
+        }
     }
 
     fun onSearchSelected() {
@@ -688,6 +699,10 @@ class InputScreenViewModel @AssistedInject constructor(
         userSelectedMode == SEARCH &&
         inputScreenConfigResolver.mainButtonsEnabled() &&
         omnibarRepository.omnibarType != OmnibarType.SPLIT
+
+    private fun loadChatSuggestions() {
+        // TODO: implement load from frontend
+    }
 
     class InputScreenViewModelProviderFactory(
         private val assistedFactory: InputScreenViewModelFactory,

@@ -353,7 +353,9 @@ import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.savedsites.impl.SavedSitesPixelName
 import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment.DeleteBookmarkListener
 import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment.EditSavedSiteListener
+import com.duckduckgo.serp.logos.api.SerpEasterEggLogosToggles
 import com.duckduckgo.serp.logos.api.SerpLogo
+import com.duckduckgo.serp.logos.api.SerpLogos
 import com.duckduckgo.settings.api.SerpSettingsFeature
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.LocationPermissionRequest
@@ -383,6 +385,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
@@ -494,6 +497,8 @@ class BrowserTabViewModel @Inject constructor(
     private val serpSettingsFeature: SerpSettingsFeature,
     private val pageContextJSHelper: PageContextJSHelper,
     private val syncStatusChangedObserver: SyncStatusChangedObserver,
+    private val serpEasterEggLogosToggles: SerpEasterEggLogosToggles,
+    private val serpLogos: SerpLogos,
 ) : ViewModel(),
     WebViewClientListener,
     EditSavedSiteListener,
@@ -579,6 +584,7 @@ class BrowserTabViewModel @Inject constructor(
         )
 
     private var autoCompleteJob = ConflatedJob()
+    private var serpLogoJob = ConflatedJob()
 
     private var site: Site? = null
         set(value) {
@@ -599,6 +605,7 @@ class BrowserTabViewModel @Inject constructor(
     private var isProcessingTrackingLink = false
     private var isLinkOpenedInNewTab = false
     private var allowlistRefreshTriggerJob: Job? = null
+    private var submitQueryJob: Job? = null
     private var isCustomTabScreen: Boolean = false
     private var alreadyShownKeyboard: Boolean = false
     private var handleAboutBlankEnabled: Boolean = false
@@ -782,6 +789,27 @@ class BrowserTabViewModel @Inject constructor(
             .onEach { vpnMenuState ->
                 browserViewState.value = currentBrowserViewState().copy(vpnMenuState = vpnMenuState)
             }.flowOn(dispatchers.main())
+            .launchIn(viewModelScope)
+
+        combine(
+            serpEasterEggLogosToggles.setFavourite().enabled(),
+            serpLogos.favouriteSerpEasterEggLogoUrlFlow,
+        ) { isEnabled, favouriteUrl ->
+            isEnabled to favouriteUrl
+        }.flowOn(dispatchers.io())
+            .onEach { (isEnabled, favouriteUrl) ->
+                val currentUrl = url
+                if (currentUrl != null && duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(currentUrl)) {
+                    if (isEnabled && favouriteUrl != null) {
+                        // Favourite is set - show it
+                        omnibarViewState.value =
+                            currentOmnibarViewState().copy(serpLogo = SerpLogo.EasterEgg(logoUrl = favouriteUrl, isFavourite = true))
+                    } else if (isEnabled && favouriteUrl == null || !isEnabled) {
+                        // Favourite was cleared - show Dax (Normal logo)
+                        omnibarViewState.value = currentOmnibarViewState().copy(serpLogo = SerpLogo.Normal)
+                    }
+                }
+            }
             .launchIn(viewModelScope)
 
         additionalDefaultBrowserPrompts.showSetAsDefaultPopupMenuItem
@@ -1006,6 +1034,7 @@ class BrowserTabViewModel @Inject constructor(
     public override fun onCleared() {
         buildingSiteFactoryJob?.cancel()
         autoCompleteJob.cancel()
+        submitQueryJob?.cancel()
         fireproofWebsiteState.removeObserver(fireproofWebsitesObserver)
         navigationAwareLoginDetector.loginEventLiveData.removeObserver(loginDetectionObserver)
         fireproofDialogsEventHandler.event.removeObserver(fireproofDialogEventObserver)
@@ -1211,86 +1240,100 @@ class BrowserTabViewModel @Inject constructor(
             searchCountDao.incrementSearchCount()
         }
 
-        val verticalParameter = extractVerticalParameter(url)
-        var urlToNavigate = queryUrlConverter.convertQueryToUrl(trimmedInput, verticalParameter, queryOrigin)
+        val currentUrl = url
+        val shouldCloseTabForPrivacyPro = webNavigationState?.hasNavigationHistory != true
 
-        when (val type = specialUrlDetector.determineType(trimmedInput)) {
-            is ShouldLaunchDuckChatLink -> {
-                runCatching {
-                    logcat { "Duck.ai: ShouldLaunchDuckChatLink $urlToNavigate" }
-                    val queryParameter = urlToNavigate.toUri().getQueryParameter(QUERY)
-                    if (queryParameter != null) {
-                        duckChat.openDuckChatWithPrefill(queryParameter)
-                    } else {
-                        duckChat.openDuckChat()
+        submitQueryJob?.cancel()
+        submitQueryJob =
+            viewModelScope.launch(dispatchers.main()) {
+                val verticalParameter = extractVerticalParameter(currentUrl)
+                var urlToNavigate =
+                    withContext(dispatchers.io()) {
+                        queryUrlConverter.convertQueryToUrl(trimmedInput, verticalParameter, queryOrigin)
                     }
-                    return
+
+                when (val type = specialUrlDetector.determineType(trimmedInput)) {
+                    is ShouldLaunchDuckChatLink -> {
+                        runCatching {
+                            logcat { "Duck.ai: ShouldLaunchDuckChatLink $urlToNavigate" }
+                            val queryParameter = urlToNavigate.toUri().getQueryParameter(QUERY)
+                            if (queryParameter != null) {
+                                duckChat.openDuckChatWithPrefill(queryParameter)
+                            } else {
+                                duckChat.openDuckChat()
+                            }
+                            return@launch
+                        }
+                    }
+
+                    is ShouldLaunchPrivacyProLink -> {
+                        if (shouldCloseTabForPrivacyPro) {
+                            closeCurrentTab()
+                        }
+                        command.value = LaunchPrivacyPro(urlToNavigate.toUri())
+                        return@launch
+                    }
+
+                    is NonHttpAppLink -> {
+                        nonHttpAppLinkClicked(type)
+                    }
+
+                    is SpecialUrlDetector.UrlType.CloakedAmpLink -> {
+                        handleCloakedAmpLink(type.ampUrl)
+                    }
+
+                    else -> {
+                        if (type is SpecialUrlDetector.UrlType.ExtractedAmpLink) {
+                            logcat { "AMP link detection: Using extracted URL: ${type.extractedUrl}" }
+                            urlToNavigate = type.extractedUrl
+                        } else if (type is SpecialUrlDetector.UrlType.TrackingParameterLink) {
+                            logcat { "Loading parameter cleaned URL: ${type.cleanedUrl}" }
+                            urlToNavigate = type.cleanedUrl
+                        }
+
+                        if (shouldClearHistoryOnNewQuery()) {
+                            returnedHomeAfterSiteLoaded = false
+                            command.value = ResetHistory
+                        }
+
+                        fireQueryChangedPixel(trimmedInput)
+
+                        if (!appSettingsPreferencesStore.showAppLinksPrompt) {
+                            appLinksHandler.updatePreviousUrl(urlToNavigate)
+                            appLinksHandler.setUserQueryState(true)
+                        } else {
+                            clearPreviousUrl()
+                        }
+
+                        site?.nextUrl = urlToNavigate
+                        command.value = NavigationCommand.Navigate(urlToNavigate, getUrlHeaders(urlToNavigate))
+                    }
                 }
+
+                globalLayoutState.value = Browser(isNewTabState = false)
+                findInPageViewState.value = FindInPageViewState(visible = false)
+                omnibarViewState.value =
+                    currentOmnibarViewState().copy(
+                        omnibarText = if (isFullUrlEnabled.value) trimmedInput else addressDisplayFormatter.getShortUrl(trimmedInput),
+                        queryOrFullUrl = trimmedInput,
+                        forceExpand = true,
+                    )
+                browserViewState.value =
+                    currentBrowserViewState().copy(
+                        browserShowing = true,
+                        browserError = OMITTED,
+                        sslError = NONE,
+                        maliciousSiteBlocked = false,
+                        maliciousSiteStatus = null,
+                        lastQueryOrigin = queryOrigin,
+                    )
+                autoCompleteViewState.value =
+                    currentAutoCompleteViewState().copy(
+                        showSuggestions = false,
+                        showFavorites = false,
+                        searchResults = AutoCompleteResult("", emptyList()),
+                    )
             }
-
-            is ShouldLaunchPrivacyProLink -> {
-                if (webNavigationState == null || webNavigationState?.hasNavigationHistory == false) {
-                    closeCurrentTab()
-                }
-                command.value = LaunchPrivacyPro(urlToNavigate.toUri())
-                return
-            }
-
-            is NonHttpAppLink -> {
-                nonHttpAppLinkClicked(type)
-            }
-
-            is SpecialUrlDetector.UrlType.CloakedAmpLink -> {
-                handleCloakedAmpLink(type.ampUrl)
-            }
-
-            else -> {
-                if (type is SpecialUrlDetector.UrlType.ExtractedAmpLink) {
-                    logcat { "AMP link detection: Using extracted URL: ${type.extractedUrl}" }
-                    urlToNavigate = type.extractedUrl
-                } else if (type is SpecialUrlDetector.UrlType.TrackingParameterLink) {
-                    logcat { "Loading parameter cleaned URL: ${type.cleanedUrl}" }
-                    urlToNavigate = type.cleanedUrl
-                }
-
-                if (shouldClearHistoryOnNewQuery()) {
-                    returnedHomeAfterSiteLoaded = false
-                    command.value = ResetHistory
-                }
-
-                fireQueryChangedPixel(trimmedInput)
-
-                if (!appSettingsPreferencesStore.showAppLinksPrompt) {
-                    appLinksHandler.updatePreviousUrl(urlToNavigate)
-                    appLinksHandler.setUserQueryState(true)
-                } else {
-                    clearPreviousUrl()
-                }
-
-                site?.nextUrl = urlToNavigate
-                command.value = NavigationCommand.Navigate(urlToNavigate, getUrlHeaders(urlToNavigate))
-            }
-        }
-
-        globalLayoutState.value = Browser(isNewTabState = false)
-        findInPageViewState.value = FindInPageViewState(visible = false)
-        omnibarViewState.value =
-            currentOmnibarViewState().copy(
-                omnibarText = if (isFullUrlEnabled.value) trimmedInput else addressDisplayFormatter.getShortUrl(trimmedInput),
-                queryOrFullUrl = trimmedInput,
-                forceExpand = true,
-            )
-        browserViewState.value =
-            currentBrowserViewState().copy(
-                browserShowing = true,
-                browserError = OMITTED,
-                sslError = NONE,
-                maliciousSiteBlocked = false,
-                maliciousSiteStatus = null,
-                lastQueryOrigin = queryOrigin,
-            )
-        autoCompleteViewState.value =
-            currentAutoCompleteViewState().copy(showSuggestions = false, showFavorites = false, searchResults = AutoCompleteResult("", emptyList()))
     }
 
     private fun getUrlHeaders(url: String?): Map<String, String> = url?.let { customHeadersProvider.getCustomHeaders(it) } ?: emptyMap()
@@ -1956,7 +1999,7 @@ class BrowserTabViewModel @Inject constructor(
 
     private fun shouldShowLocationPermissionMessage(): Boolean {
         val url = site?.url ?: return true
-        return !duckDuckGoUrlDetector.isDuckDuckGoChatUrl(url)
+        return !duckChat.isDuckChatUrl(Uri.parse(url))
     }
 
     private fun urlUpdated(url: String) {
@@ -2078,13 +2121,28 @@ class BrowserTabViewModel @Inject constructor(
             url?.let { prefetchFavicon(url) }
 
             evaluateDuckAIPage(url)
-            evaluateSerpLogoState(url)
+            serpLogoJob += viewModelScope.launch {
+                evaluateSerpLogoState(url)
+            }
         }
     }
 
-    private fun evaluateSerpLogoState(url: String?) {
+    private suspend fun evaluateSerpLogoState(url: String?) {
         if (url != null && duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
-            command.value = ExtractSerpLogo(url)
+            val isSetFavouriteEnabled = serpEasterEggLogosToggles.setFavourite().isEnabled()
+            val favouriteLogoUrl = serpLogos.favouriteSerpEasterEggLogoUrlFlow.firstOrNull()
+
+            // Don't extract logo if favourite feature is enabled AND a favourite is set
+            if (isSetFavouriteEnabled && favouriteLogoUrl != null) {
+                omnibarViewState.value = currentOmnibarViewState().copy(
+                    serpLogo = SerpLogo.EasterEgg(
+                        logoUrl = favouriteLogoUrl,
+                        isFavourite = true,
+                    ),
+                )
+            } else {
+                command.value = ExtractSerpLogo(url)
+            }
         } else {
             omnibarViewState.value = currentOmnibarViewState().copy(serpLogo = null)
         }
@@ -2093,7 +2151,7 @@ class BrowserTabViewModel @Inject constructor(
     private fun evaluateDuckAIPage(url: String?) {
         url?.let {
             if (duckAiFeatureState.showFullScreenMode.value) {
-                if (duckDuckGoUrlDetector.isDuckDuckGoChatUrl(it)) {
+                if (duckChat.isDuckChatUrl(Uri.parse(it))) {
                     command.value = Command.EnableDuckAIFullScreen(currentBrowserViewState())
                 } else {
                     command.value = Command.DisableDuckAIFullScreen(url)

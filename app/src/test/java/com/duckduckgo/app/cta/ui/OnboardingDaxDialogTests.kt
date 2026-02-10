@@ -40,6 +40,7 @@ import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.brokensite.api.BrokenSitePrompt
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.subscriptions.api.Subscriptions
@@ -74,12 +75,13 @@ class OnboardingDaxDialogTests {
     private val onboardingStore: OnboardingStore = mock()
     private val userStageStore: UserStageStore = mock()
     private val tabRepository: TabRepository = mock()
-    private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector = mock()
     private val extendedOnboardingFeatureToggles: ExtendedOnboardingFeatureToggles = mock()
     private val mockDuckPlayer: DuckPlayer = mock()
     private val mockBrokenSitePrompt: BrokenSitePrompt = mock()
     private val mockSubscriptions: Subscriptions = mock()
     private val mockOnboardingHomeScreenWidgetToggles: OnboardingHomeScreenWidgetToggles = mock()
+    private val mockDuckChat: DuckChat = mock()
+    private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector = mock()
 
     val mockEnabledToggle: Toggle = org.mockito.kotlin.mock { on { it.isEnabled() } doReturn true }
     val mockDisabledToggle: Toggle = org.mockito.kotlin.mock { on { it.isEnabled() } doReturn false }
@@ -101,6 +103,7 @@ class OnboardingDaxDialogTests {
             userStageStore,
             tabRepository,
             coroutineRule.testDispatcherProvider,
+            mockDuckChat,
             duckDuckGoUrlDetector,
             extendedOnboardingFeatureToggles,
             mockSubscriptions,

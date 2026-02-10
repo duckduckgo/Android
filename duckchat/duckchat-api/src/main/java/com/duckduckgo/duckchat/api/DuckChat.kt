@@ -54,7 +54,10 @@ interface DuckChat {
 
     /**
      * Determines whether a given [Uri] is a DuckChat URL.
-     *
+     * There are two Duck Chat URLs
+     * Legacy: https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5
+     * After Migration: https://duck.ai/chat?q=DuckDuckGo+AI+Chat&duckai=5&atb=v520-1ru&ko=-1&t=ddg_android&migration=native-import
+     * https://app.asana.com/1/137249556945/task/1210497696306780
      * @return true if it is a DuckChat URL, false otherwise.
      */
     fun isDuckChatUrl(uri: Uri): Boolean

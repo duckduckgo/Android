@@ -67,12 +67,20 @@ class PixelWideEventSender @Inject constructor(
 
         val basePixelName = PIXEL_NAME_PREFIX + event.name
         val countPixelName = basePixelName + COUNT_PIXEL_SUFFIX
+        val dailyPixelName = basePixelName + DAILY_PIXEL_SUFFIX
 
         if (shouldEnqueuePixel()) {
             pixelSender.enqueueFire(
                 pixelName = countPixelName,
                 parameters = parameters,
                 encodedParameters = encodedParameters,
+            )
+
+            pixelSender.enqueueFire(
+                pixelName = dailyPixelName,
+                parameters = parameters,
+                encodedParameters = encodedParameters,
+                type = Pixel.PixelType.Daily(),
             )
         } else {
             pixelSender.fire(
@@ -81,14 +89,14 @@ class PixelWideEventSender @Inject constructor(
                 encodedParameters = encodedParameters,
                 type = Pixel.PixelType.Count,
             )
-        }
 
-        pixelSender.fire(
-            pixelName = basePixelName + DAILY_PIXEL_SUFFIX,
-            parameters = parameters,
-            encodedParameters = encodedParameters,
-            type = Pixel.PixelType.Daily(),
-        )
+            pixelSender.fire(
+                pixelName = dailyPixelName,
+                parameters = parameters,
+                encodedParameters = encodedParameters,
+                type = Pixel.PixelType.Daily(),
+            )
+        }
     }
 
     private fun getCommonPixelParameters(): Map<String, String> {

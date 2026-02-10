@@ -46,6 +46,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 // TODO: when pattern established, refactor objects to use (create module https://app.asana.com/0/0/1201807285420697/f)
@@ -429,20 +430,27 @@ class AppRemoteMessagingRepositoryTest {
 
     @Test
     fun whenGetRemoteMessageImageFileReturnFilePathIfExists() = runTest {
-        whenever(remoteMessageImageStore.getLocalImageFilePath()).thenReturn("imagePath")
+        whenever(remoteMessageImageStore.getLocalImageFilePath(Surface.NEW_TAB_PAGE)).thenReturn("imagePath")
 
-        val result = testee.getRemoteMessageImageFile()
+        val result = testee.getRemoteMessageImageFile(Surface.NEW_TAB_PAGE)
 
         assertEquals("imagePath", result)
     }
 
     @Test
     fun whenGetRemoteMessageImageFileReturnNullIfFilePathDoesNotExist() = runTest {
-        whenever(remoteMessageImageStore.getLocalImageFilePath()).thenReturn(null)
+        whenever(remoteMessageImageStore.getLocalImageFilePath(Surface.NEW_TAB_PAGE)).thenReturn(null)
 
-        val result = testee.getRemoteMessageImageFile()
+        val result = testee.getRemoteMessageImageFile(Surface.NEW_TAB_PAGE)
 
         assertNull(result)
+    }
+
+    @Test
+    fun whenClearMessageImageThenClearStoredImageFileForSurface() = runTest {
+        testee.clearMessageImage(Surface.MODAL)
+
+        verify(remoteMessageImageStore).clearStoredImageFile(Surface.MODAL)
     }
 
     companion object {

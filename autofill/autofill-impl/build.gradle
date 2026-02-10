@@ -20,6 +20,7 @@ plugins {
     id 'com.squareup.anvil'
     id 'kotlin-parcelize'
     id 'com.google.devtools.ksp'
+    id 'androidx.room'
 }
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
@@ -136,12 +137,11 @@ android {
         }
     }
     sourceSets {
-        test.assets.srcDirs += files("$projectDir/schemas".toString())
+        test.assets.srcDirs += files("$projectDir/schemas")
     }
-}
-
-ksp {
-    arg("room.schemaLocation", "$projectDir/schemas")
+    room {
+        schemaDirectory("$projectDir/schemas")
+    }
 }
 
 tasks.register('installForAutofillTesting', Exec) {

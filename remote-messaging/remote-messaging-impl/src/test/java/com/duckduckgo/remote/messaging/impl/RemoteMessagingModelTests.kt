@@ -22,6 +22,7 @@ import com.duckduckgo.remote.messaging.api.Content
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.VISUAL_DESIGN_UPDATE
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
+import com.duckduckgo.remote.messaging.api.Surface
 import com.duckduckgo.remote.messaging.impl.pixels.RemoteMessagingPixels
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertNull
@@ -121,21 +122,21 @@ class RemoteMessagingModelTests {
 
     @Test
     fun onGetRemoteImageFileThenReturnFilePathFromRepository() = runTest {
-        whenever(remoteMessagingRepository.getRemoteMessageImageFile()).thenReturn("imageFile")
+        whenever(remoteMessagingRepository.getRemoteMessageImageFile(Surface.NEW_TAB_PAGE)).thenReturn("imageFile")
 
-        val result = testee.getRemoteMessageImageFile()
+        val result = testee.getRemoteMessageImageFile(Surface.NEW_TAB_PAGE)
 
-        verify(remoteMessagingRepository).getRemoteMessageImageFile()
+        verify(remoteMessagingRepository).getRemoteMessageImageFile(Surface.NEW_TAB_PAGE)
         assertEquals("imageFile", result)
     }
 
     @Test
     fun onGetRemoteImageFileThenReturnNullWhenRepositoryReturnsNull() = runTest {
-        whenever(remoteMessagingRepository.getRemoteMessageImageFile()).thenReturn(null)
+        whenever(remoteMessagingRepository.getRemoteMessageImageFile(Surface.NEW_TAB_PAGE)).thenReturn(null)
 
-        val result = testee.getRemoteMessageImageFile()
+        val result = testee.getRemoteMessageImageFile(Surface.NEW_TAB_PAGE)
 
-        verify(remoteMessagingRepository).getRemoteMessageImageFile()
+        verify(remoteMessagingRepository).getRemoteMessageImageFile(Surface.NEW_TAB_PAGE)
         assertNull(result)
     }
 }
