@@ -198,7 +198,13 @@ class SingleTabFireDialog : BottomSheetDialogFragment(), FireDialog {
                 sendFragmentResult(FireDialog.EVENT_ON_CANCEL)
                 dismiss()
             }
-            is Command.OnClearStarted -> sendFragmentResult(FireDialog.EVENT_ON_CLEAR_STARTED)
+            is Command.OnClearStarted -> {
+                if (viewModel.viewState.value.shouldRestartAfterClearing) {
+                    sendFragmentResult(FireDialog.EVENT_ON_CLEAR_STARTED)
+                } else {
+                    sendFragmentResult(FireDialog.EVENT_CLEAR_WITHOUT_RESTART_STARTED)
+                }
+            }
             is Command.OnSingleTabClearComplete -> {
                 onClearAllEvent(ClearAllEvent.ClearingFinished)
                 sendFragmentResult(FireDialog.EVENT_ON_SINGLE_TAB_CLEAR_COMPLETE)

@@ -150,7 +150,7 @@ class SingleTabFireDialogViewModel @Inject constructor(
                 userEventsStore.registerUserEvent(UserEventKey.FIRE_BUTTON_EXECUTED)
                 val clearOptions = fireDataStore.getManualClearOptions()
                 dataClearingWideEvent.start(
-                    entryPoint = DataClearingWideEvent.EntryPoint.NONGRANULAR_FIRE_DIALOG,
+                    entryPoint = DataClearingWideEvent.EntryPoint.SINGLE_TAB_FIRE_DIALOG,
                     clearOptions = clearOptions,
                 )
                 try {
@@ -175,9 +175,9 @@ class SingleTabFireDialogViewModel @Inject constructor(
             }
 
             command.send(Command.OnClearStarted)
-//            trySendDailyDeleteClicked()
+//          TODO: trySendDailyDeleteClicked()
 //          TODO: pixel.enqueueFire(AppPixelName.FIRE_DIALOG_SINGLE_TAB_CLEAR_PRESSED)
-//          TODO: pixel.enqueueFire(PRODUCT_TELEMETRY_SURFACE_DATA_CLEARING)
+            pixel.enqueueFire(PRODUCT_TELEMETRY_SURFACE_DATA_CLEARING)
             pixel.enqueueFire(
                 pixel = FIRE_DIALOG_ANIMATION,
                 parameters = mapOf(FIRE_ANIMATION to settingsDataStore.selectedFireAnimation.getPixelValue()),
