@@ -581,14 +581,20 @@ dependencies {
     coreLibraryDesugaring Android.tools.desugarJdkLibs
 }
 
-// Develocity Android Instrumented Test Support
+// Develocity Android Instrumented Test Support - Firebase/Flank Tests
 afterEvaluate {
-    tasks.withType(DeviceProviderInstrumentTestTask).names.each {
-        ImportJUnitXmlReports.register(
-            tasks,
-            tasks.named(it),
-            ANDROID_CONNECTED
-        )
+    // Import Firebase/Flank test results from localResultsDir
+    tasks.register("importFlankTestResults", ImportJUnitXmlReports) {
+        dialect = ANDROID_FIREBASE
+        // Fladle outputs results to localResultsDir/build_id/*.xml
+        reports.from(fileTree("fladleResults") {
+            include "**/*.xml"
+        })
+    }
+
+    // Make import task run after Flank tasks complete
+    tasks.matching { it.name.startsWith("runFlank") }.configureEach {
+        finalizedBy tasks.named("importFlankTestResults")
     }
 }
 
