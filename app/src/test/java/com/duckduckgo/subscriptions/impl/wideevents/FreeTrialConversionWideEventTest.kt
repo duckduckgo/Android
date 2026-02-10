@@ -120,7 +120,7 @@ class FreeTrialConversionWideEventTest {
 
         freeTrialConversionWideEvent.onVpnActivatedSuccessfully()
 
-        verify(pixelSender).reportFreeTrialVpnActivation("vpn_activated_d1")
+        verify(pixelSender).reportFreeTrialVpnActivation("vpn_activated_d1", "google")
         verify(wideEventClient).flowStep(
             wideEventId = 123L,
             stepName = "vpn_activated_d1",
@@ -143,7 +143,7 @@ class FreeTrialConversionWideEventTest {
 
         freeTrialConversionWideEvent.onVpnActivatedSuccessfully()
 
-        verify(pixelSender).reportFreeTrialVpnActivation("vpn_activated_d2_to_d7")
+        verify(pixelSender).reportFreeTrialVpnActivation("vpn_activated_d2_to_d7", "google")
         verify(wideEventClient).flowStep(
             wideEventId = 123L,
             stepName = "vpn_activated_d2_to_d7",
@@ -159,7 +159,7 @@ class FreeTrialConversionWideEventTest {
 
         freeTrialConversionWideEvent.onVpnActivatedSuccessfully()
 
-        verify(pixelSender, never()).reportFreeTrialVpnActivation(any())
+        verify(pixelSender, never()).reportFreeTrialVpnActivation(any(), any())
         verify(wideEventClient, never()).flowStep(any(), any(), any(), any())
     }
 
@@ -182,7 +182,7 @@ class FreeTrialConversionWideEventTest {
         freeTrialConversionWideEvent.onVpnActivatedSuccessfully()
 
         // Pixel fires each time VPN activates during free trial
-        verify(pixelSender, times(2)).reportFreeTrialVpnActivation("vpn_activated_d1")
+        verify(pixelSender, times(2)).reportFreeTrialVpnActivation("vpn_activated_d1", "google")
 
         // Wide event step only recorded once
         verify(wideEventClient).flowStep(
@@ -280,7 +280,7 @@ class FreeTrialConversionWideEventTest {
 
         // Pixels still fire regardless of wide event feature flag
         verify(pixelSender).reportFreeTrialStart()
-        verify(pixelSender).reportFreeTrialVpnActivation("vpn_activated_d1")
+        verify(pixelSender).reportFreeTrialVpnActivation("vpn_activated_d1", "google")
 
         // Wide events do not fire when feature is disabled
         verify(wideEventClient, never()).flowStart(any(), any(), any(), any())
