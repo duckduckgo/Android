@@ -106,7 +106,7 @@ class RealSecureStorageKeyStore constructor(
             try {
                 harmonyMutex.withLock {
                     if (autofillFeature.useHarmony().isEnabled()) {
-                        sharedPreferencesProvider.getMigratedEncryptedSharedPreferences(FILENAME).also {
+                        sharedPreferencesProvider.getMigratedEncryptedSharedPreferences(FILENAME, "${FILENAME}2").also {
                             if (it == null) {
                                 logcat { "autofill harmony preferences retrieval returned null" }
                             }
