@@ -1113,53 +1113,51 @@ class BrowserTabFragment :
                 // Disable view state saving to prevent BrowserActivity's bundle size from increasing too much
                 binding.swipeRefreshContainer.isSaveEnabled = false
 
-                binding.navigationBar.disableViewStateSaving()
+                navigationBar.disableViewStateSaving()
 
                 newBrowserTab.newTabContainerScrollView.isSaveEnabled = false
 
-                binding.includeNewBrowserTab.newTabContainerScrollView.isSaveEnabled = false
+                daxDialogIntroBubble.daxDialogOption1.isSaveEnabled = false
+                daxDialogIntroBubble.daxDialogOption2.isSaveEnabled = false
+                daxDialogIntroBubble.daxDialogOption3.isSaveEnabled = false
+                daxDialogIntroBubble.daxDialogOption4.isSaveEnabled = false
+                daxDialogIntroBubble.primaryCta.isSaveEnabled = false
+                daxDialogIntroBubble.secondaryCta.isSaveEnabled = false
+                daxDialogIntroBubble.placeholder.isSaveEnabled = false
+                daxDialogIntroBubble.dialogTextCta.isSaveEnabled = false
+                daxDialogIntroBubble.hiddenTextCta.isSaveEnabled = false
+                daxDialogIntroBubble.daxBubbleDialogTitle.isSaveEnabled = false
+                daxDialogIntroBubble.daxDialogDismissButton.isSaveEnabled = false
+                daxDialogIntroBubble.logo.isSaveEnabled = false
 
-                binding.includeNewBrowserTab.includeOnboardingDaxDialogBubble.daxDialogOption1.isSaveEnabled = false
-                binding.includeNewBrowserTab.includeOnboardingDaxDialogBubble.daxDialogOption2.isSaveEnabled = false
-                binding.includeNewBrowserTab.includeOnboardingDaxDialogBubble.daxDialogOption3.isSaveEnabled = false
-                binding.includeNewBrowserTab.includeOnboardingDaxDialogBubble.daxDialogOption4.isSaveEnabled = false
-                binding.includeNewBrowserTab.includeOnboardingDaxDialogBubble.primaryCta.isSaveEnabled = false
-                binding.includeNewBrowserTab.includeOnboardingDaxDialogBubble.secondaryCta.isSaveEnabled = false
-                binding.includeNewBrowserTab.includeOnboardingDaxDialogBubble.placeholder.isSaveEnabled = false
-                binding.includeNewBrowserTab.includeOnboardingDaxDialogBubble.dialogTextCta.isSaveEnabled = false
-                binding.includeNewBrowserTab.includeOnboardingDaxDialogBubble.hiddenTextCta.isSaveEnabled = false
-                binding.includeNewBrowserTab.includeOnboardingDaxDialogBubble.daxBubbleDialogTitle.isSaveEnabled = false
-                binding.includeNewBrowserTab.includeOnboardingDaxDialogBubble.daxDialogDismissButton.isSaveEnabled = false
-                binding.includeNewBrowserTab.includeOnboardingDaxDialogBubble.logo.isSaveEnabled = false
-
-                binding.includeOnboardingInContextDaxDialog.daxDialogOption1.isSaveEnabled = false
-                binding.includeOnboardingInContextDaxDialog.daxDialogOption2.isSaveEnabled = false
-                binding.includeOnboardingInContextDaxDialog.daxDialogOption3.isSaveEnabled = false
-                binding.includeOnboardingInContextDaxDialog.daxDialogOption4.isSaveEnabled = false
-                binding.includeOnboardingInContextDaxDialog.suggestionsDialogTextCta.isSaveEnabled = false
-                binding.includeOnboardingInContextDaxDialog.suggestionsHiddenTextCta.isSaveEnabled = false
-                binding.includeOnboardingInContextDaxDialog.daxBubbleDialogTitle.isSaveEnabled = false
-                binding.includeOnboardingInContextDaxDialog.onboardingDaxDialogBackground.isSaveEnabled = false
-                binding.includeOnboardingInContextDaxDialog.logo.isSaveEnabled = false
-                binding.includeOnboardingInContextDaxDialog.daxDialogDismissButton.isSaveEnabled = false
-                binding.includeOnboardingInContextDaxDialog.cardView.isSaveEnabled = false
-                binding.includeOnboardingInContextDaxDialog.onboardingDialogTitle.isSaveEnabled = false
-                binding.includeOnboardingInContextDaxDialog.hiddenTextCta.isSaveEnabled = false
-                binding.includeOnboardingInContextDaxDialog.dialogTextCta.isSaveEnabled = false
-                binding.includeOnboardingInContextDaxDialog.secondaryCta.isSaveEnabled = false
-                binding.includeOnboardingInContextDaxDialog.primaryCta.isSaveEnabled = false
+                daxDialogInContext.daxDialogOption1.isSaveEnabled = false
+                daxDialogInContext.daxDialogOption2.isSaveEnabled = false
+                daxDialogInContext.daxDialogOption3.isSaveEnabled = false
+                daxDialogInContext.daxDialogOption4.isSaveEnabled = false
+                daxDialogInContext.suggestionsDialogTextCta.isSaveEnabled = false
+                daxDialogInContext.suggestionsHiddenTextCta.isSaveEnabled = false
+                daxDialogInContext.daxBubbleDialogTitle.isSaveEnabled = false
+                daxDialogInContext.onboardingDaxDialogBackground.isSaveEnabled = false
+                daxDialogInContext.logo.isSaveEnabled = false
+                daxDialogInContext.daxDialogDismissButton.isSaveEnabled = false
+                daxDialogInContext.cardView.isSaveEnabled = false
+                daxDialogInContext.onboardingDialogTitle.isSaveEnabled = false
+                daxDialogInContext.hiddenTextCta.isSaveEnabled = false
+                daxDialogInContext.dialogTextCta.isSaveEnabled = false
+                daxDialogInContext.secondaryCta.isSaveEnabled = false
+                daxDialogInContext.primaryCta.isSaveEnabled = false
 
                 binding.autoCompleteSuggestionsList.isSaveEnabled = false
                 binding.daxDialogOnboardingCtaContent.isSaveEnabled = false
 
-                binding.includeErrorView.errorLayout.isSaveEnabled = false
-                binding.includeErrorView.yetiIcon.isSaveEnabled = false
-                binding.includeErrorView.errorTitle.isSaveEnabled = false
-                binding.includeErrorView.errorMessage.isSaveEnabled = false
+                errorView.errorLayout.isSaveEnabled = false
+                errorView.yetiIcon.isSaveEnabled = false
+                errorView.errorTitle.isSaveEnabled = false
+                errorView.errorMessage.isSaveEnabled = false
 
                 omnibar.disableViewStateSaving()
-                binding.sslErrorWarningLayout.disableViewStateSaving()
-                binding.maliciousSiteWarningLayout.disableViewStateSaving()
+                sslErrorView.disableViewStateSaving()
+                maliciousWarningView.disableViewStateSaving()
 
                 binding.includeBrokenSitePromptDialog.titleText.isSaveEnabled = false
                 binding.includeBrokenSitePromptDialog.bodyText.isSaveEnabled = false

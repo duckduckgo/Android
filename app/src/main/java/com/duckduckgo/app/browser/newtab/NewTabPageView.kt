@@ -109,9 +109,6 @@ class NewTabPageView @JvmOverloads constructor(
     @Inject
     lateinit var androidBrowserConfig: AndroidBrowserConfigFeature
 
-    @Inject
-    lateinit var dispatcherProvider: DispatcherProvider
-
     private val binding: ViewNewTabBinding by viewBinding()
 
     private val homeBackgroundLogo by lazy { HomeBackgroundLogo(binding.ddgLogo) }
@@ -154,7 +151,7 @@ class NewTabPageView @JvmOverloads constructor(
 
     private fun disableViewStateSaving() {
         findViewTreeLifecycleOwner()?.lifecycleScope?.launch {
-            val disableViewStateSaving = withContext(dispatcherProvider.io()) {
+            val disableViewStateSaving = withContext(dispatchers.io()) {
                 androidBrowserConfig.reduceBrowserTabBundleSize().isEnabled()
             }
             if (disableViewStateSaving) {
