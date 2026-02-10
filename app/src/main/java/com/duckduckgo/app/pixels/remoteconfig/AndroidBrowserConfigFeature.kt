@@ -305,4 +305,8 @@ interface AndroidBrowserConfigFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun sendDataClearingWideEvent(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    @Toggle.InternalAlwaysEnabled
+    fun reduceBrowserTabBundleSize(): Toggle
 }

@@ -1373,6 +1373,33 @@ class OmnibarLayout @JvmOverloads constructor(
         }
     }
 
+    override fun disableViewStateSaving() {
+        customTabToolbarContainer.customTabDomainOnly.isSaveEnabled = false
+        customTabToolbarContainer.customTabDomain.isSaveEnabled = false
+        customTabToolbarContainer.customTabTitle.isSaveEnabled = false
+        customTabToolbarContainer.customTabDuckPlayerIcon.isSaveEnabled = false
+        customTabToolbarContainer.customTabCloseIcon.isSaveEnabled = false
+        customTabToolbarContainer.customTabShieldIcon.isSaveEnabled = false
+
+        findInPage.findInPageContainer.isSaveEnabled = false
+        findInPage.findInPageMatches.isSaveEnabled = false
+        findInPage.nextSearchTermButton.isSaveEnabled = false
+        findInPage.previousSearchTermButton.isSaveEnabled = false
+        findInPage.findIcon.isSaveEnabled = false
+
+        newCustomTabToolbarContainer.customTabCloseIcon.isSaveEnabled = false
+        newCustomTabToolbarContainer.trackersAnimation.isSaveEnabled = false
+        newCustomTabToolbarContainer.customTabShieldIcon.isSaveEnabled = false
+        newCustomTabToolbarContainer.addressBarTrackersBlockedAnimationShieldIcon.isSaveEnabled = false
+        newCustomTabToolbarContainer.customTabDuckPlayerIcon.isSaveEnabled = false
+        newCustomTabToolbarContainer.daxIcon.isSaveEnabled = false
+        newCustomTabToolbarContainer.customTabDomain.isSaveEnabled = false
+
+        pageLoadingIndicator.isSaveEnabled = false
+        shieldIcon.isSaveEnabled = false
+        omnibarTextInput.isSaveEnabled = false
+    }
+
     override fun setExpanded(
         expanded: Boolean,
         animate: Boolean,

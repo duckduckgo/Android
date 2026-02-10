@@ -1067,6 +1067,7 @@ class BrowserTabFragment :
         configureNavigationBar()
         configureOmnibar()
         configureBrowserTabKeyboardListener()
+        disableViewStateSaving()
 
         if (savedInstanceState == null) {
             viewModel.setIsCustomTab(tabDisplayedInCustomTabScreen)
@@ -1101,6 +1102,71 @@ class BrowserTabFragment :
         }
 
         launchDownloadMessagesJob()
+    }
+
+    private fun disableViewStateSaving() {
+        lifecycleScope.launch {
+            val reduceBundleSize = withContext(dispatchers.io()) {
+                androidBrowserConfigFeature.reduceBrowserTabBundleSize().isEnabled()
+            }
+            if (reduceBundleSize) {
+                // Disable view state saving to prevent BrowserActivity's bundle size from increasing too much
+                binding.swipeRefreshContainer.isSaveEnabled = false
+
+                binding.navigationBar.disableViewStateSaving()
+
+                newBrowserTab.newTabContainerScrollView.isSaveEnabled = false
+
+                binding.includeNewBrowserTab.newTabContainerScrollView.isSaveEnabled = false
+
+                binding.includeNewBrowserTab.includeOnboardingDaxDialogBubble.daxDialogOption1.isSaveEnabled = false
+                binding.includeNewBrowserTab.includeOnboardingDaxDialogBubble.daxDialogOption2.isSaveEnabled = false
+                binding.includeNewBrowserTab.includeOnboardingDaxDialogBubble.daxDialogOption3.isSaveEnabled = false
+                binding.includeNewBrowserTab.includeOnboardingDaxDialogBubble.daxDialogOption4.isSaveEnabled = false
+                binding.includeNewBrowserTab.includeOnboardingDaxDialogBubble.primaryCta.isSaveEnabled = false
+                binding.includeNewBrowserTab.includeOnboardingDaxDialogBubble.secondaryCta.isSaveEnabled = false
+                binding.includeNewBrowserTab.includeOnboardingDaxDialogBubble.placeholder.isSaveEnabled = false
+                binding.includeNewBrowserTab.includeOnboardingDaxDialogBubble.dialogTextCta.isSaveEnabled = false
+                binding.includeNewBrowserTab.includeOnboardingDaxDialogBubble.hiddenTextCta.isSaveEnabled = false
+                binding.includeNewBrowserTab.includeOnboardingDaxDialogBubble.daxBubbleDialogTitle.isSaveEnabled = false
+                binding.includeNewBrowserTab.includeOnboardingDaxDialogBubble.daxDialogDismissButton.isSaveEnabled = false
+                binding.includeNewBrowserTab.includeOnboardingDaxDialogBubble.logo.isSaveEnabled = false
+
+                binding.includeOnboardingInContextDaxDialog.daxDialogOption1.isSaveEnabled = false
+                binding.includeOnboardingInContextDaxDialog.daxDialogOption2.isSaveEnabled = false
+                binding.includeOnboardingInContextDaxDialog.daxDialogOption3.isSaveEnabled = false
+                binding.includeOnboardingInContextDaxDialog.daxDialogOption4.isSaveEnabled = false
+                binding.includeOnboardingInContextDaxDialog.suggestionsDialogTextCta.isSaveEnabled = false
+                binding.includeOnboardingInContextDaxDialog.suggestionsHiddenTextCta.isSaveEnabled = false
+                binding.includeOnboardingInContextDaxDialog.daxBubbleDialogTitle.isSaveEnabled = false
+                binding.includeOnboardingInContextDaxDialog.onboardingDaxDialogBackground.isSaveEnabled = false
+                binding.includeOnboardingInContextDaxDialog.logo.isSaveEnabled = false
+                binding.includeOnboardingInContextDaxDialog.daxDialogDismissButton.isSaveEnabled = false
+                binding.includeOnboardingInContextDaxDialog.cardView.isSaveEnabled = false
+                binding.includeOnboardingInContextDaxDialog.onboardingDialogTitle.isSaveEnabled = false
+                binding.includeOnboardingInContextDaxDialog.hiddenTextCta.isSaveEnabled = false
+                binding.includeOnboardingInContextDaxDialog.dialogTextCta.isSaveEnabled = false
+                binding.includeOnboardingInContextDaxDialog.secondaryCta.isSaveEnabled = false
+                binding.includeOnboardingInContextDaxDialog.primaryCta.isSaveEnabled = false
+
+                binding.autoCompleteSuggestionsList.isSaveEnabled = false
+                binding.daxDialogOnboardingCtaContent.isSaveEnabled = false
+
+                binding.includeErrorView.errorLayout.isSaveEnabled = false
+                binding.includeErrorView.yetiIcon.isSaveEnabled = false
+                binding.includeErrorView.errorTitle.isSaveEnabled = false
+                binding.includeErrorView.errorMessage.isSaveEnabled = false
+
+                omnibar.disableViewStateSaving()
+                binding.sslErrorWarningLayout.disableViewStateSaving()
+                binding.maliciousSiteWarningLayout.disableViewStateSaving()
+
+                binding.includeBrokenSitePromptDialog.titleText.isSaveEnabled = false
+                binding.includeBrokenSitePromptDialog.bodyText.isSaveEnabled = false
+                binding.includeBrokenSitePromptDialog.reportButton.isSaveEnabled = false
+                binding.includeBrokenSitePromptDialog.dismissButton.isSaveEnabled = false
+            }
+        }
     }
 
     private fun updateOrDeleteWebViewPreview() {

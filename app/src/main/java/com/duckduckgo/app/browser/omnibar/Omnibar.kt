@@ -301,6 +301,10 @@ class Omnibar(
         omnibarView.setOmnibarTextListener(listener)
     }
 
+    fun disableViewStateSaving() {
+        omnibarView.disableViewStateSaving()
+    }
+
     fun configureFindInPage(listener: FindInPageListener) {
         // we could move this to the layout once the refactor is do
         findInPage.findInPageInput.setOnFocusChangeListener { _, hasFocus ->
