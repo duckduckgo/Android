@@ -70,6 +70,11 @@ class DataClearing @Inject constructor(
         }
     }
 
+    override suspend fun clearSingleTabData(tabId: String) {
+        // TODO: Wire up visited sites, history, duck.ai chat deletion, and WebStorageCompat clearing
+        logcat { "Single tab clear completed for tab: $tabId" }
+    }
+
     override suspend fun clearDataUsingAutomaticFireOptions(killProcessIfNeeded: Boolean): Boolean {
         val options = fireDataStore.getAutomaticClearOptions()
         performGranularClear(

@@ -60,7 +60,7 @@ class FireDialogProviderImpl @Inject constructor(
     ): FireDialog = withContext(dispatcherProvider.io()) {
         when {
             androidBrowserConfigFeature.singleTabFireDialog().isEnabled() ->
-                NonGranularFireDialog.newInstance() // TODO: Replace with SingleTabFireDialog
+                SingleTabFireDialog.newInstance(origin)
             androidBrowserConfigFeature.granularFireDialog().isEnabled() ->
                 GranularFireDialog.newInstance()
             androidBrowserConfigFeature.improvedDataClearingOptions().isEnabled() ->

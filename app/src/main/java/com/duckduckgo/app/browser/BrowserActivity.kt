@@ -428,10 +428,31 @@ open class BrowserActivity : DuckDuckGoActivity() {
                     isDataClearingInProgress = true
                     removeObservers()
                 }
-                FireDialog.EVENT_ON_SINGLE_TAB_CLEAR_STARTED -> {
+                FireDialog.EVENT_CLEAR_WITHOUT_RESTART_STARTED -> {
                     currentTab?.onFireDialogVisibilityChanged(isVisible = false)
                 }
+                FireDialog.EVENT_ON_SINGLE_TAB_CLEAR_COMPLETE -> {
+                    showSingleTabDeletedSnackbar()
+                }
             }
+        }
+    }
+
+    private fun showSingleTabDeletedSnackbar() {
+        lifecycleScope.launch {
+            delay(500)
+
+            val anchorView =
+                when (settingsDataStore.omnibarType) {
+                    OmnibarType.SINGLE_TOP -> null
+                    OmnibarType.SINGLE_BOTTOM -> currentTab?.getOmnibar()?.omnibarView?.toolbar ?: binding.fragmentContainer
+                    OmnibarType.SPLIT -> currentTab?.navigationBar ?: binding.fragmentContainer
+                }
+            DefaultSnackbar(
+                parentView = binding.fragmentContainer,
+                message = getString(R.string.singleTabFireDialogSnackbar),
+                anchor = anchorView,
+            ).show()
         }
     }
 
