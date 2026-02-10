@@ -30,6 +30,7 @@ import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_HARMONY_PR
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_HARMONY_PREFERENCES_UPDATE_KEY_FAILED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_PREFERENCES_GET_KEY_FAILED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_PREFERENCES_UPDATE_KEY_FAILED
+import com.duckduckgo.autofill.impl.service.AutofillServiceFeature
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.sanitizeStackTrace
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
@@ -71,6 +72,7 @@ class RealSecureStorageKeyStore constructor(
     private val autofillFeature: AutofillFeature,
     private val sharedPreferencesProvider: SharedPreferencesProvider,
     private val pixel: Pixel,
+    private val autofillServiceFeature: AutofillServiceFeature,
 ) : SecureStorageKeyStore {
 
     private val mutex: Mutex = Mutex()
@@ -199,14 +201,21 @@ class RealSecureStorageKeyStore constructor(
         return withContext(dispatcherProvider.io()) {
             val useHarmony = autofillFeature.useHarmony().isEnabled()
             return@withContext runCatching {
-                val preferences = if (useHarmony) {
-                    getHarmonyEncryptedPreferences()
-                } else {
-                    getEncryptedPreferences()
-                } ?: throw IllegalStateException("Preferences unavailable")
+                val legacyPrefs = getEncryptedPreferences()
+                    ?: throw IllegalStateException("Encrypted preferences unavailable")
+                val legacyResult = legacyPrefs.getString(keyName, null)?.decodeBase64()?.toByteArray()
 
-                preferences.getString(keyName, null)?.run {
-                    this.decodeBase64()?.toByteArray()
+                if (useHarmony) {
+                    val harmonyPrefs = getHarmonyEncryptedPreferences()
+                        ?: throw IllegalStateException("Harmony preferences unavailable")
+                    val harmonyResult = harmonyPrefs.getString(keyName, null)?.decodeBase64()?.toByteArray()
+
+                    if (!autofillServiceFeature.self().isEnabled() && !harmonyResult.contentEquals(legacyResult)) {
+                        throw IllegalStateException("Mismatching preference values")
+                    }
+                    harmonyResult
+                } else {
+                    legacyResult
                 }
             }.getOrElse {
                 ensureActive()
