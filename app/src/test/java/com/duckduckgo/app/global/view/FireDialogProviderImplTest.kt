@@ -39,9 +39,9 @@ class FireDialogProviderImplTest {
     @Before
     fun setup() {
         testee = FireDialogProviderImpl(
-                androidBrowserConfigFeature = fakeAndroidBrowserConfigFeature,
-                dispatcherProvider = coroutineTestRule.testDispatcherProvider,
-                )
+            androidBrowserConfigFeature = fakeAndroidBrowserConfigFeature,
+            dispatcherProvider = coroutineTestRule.testDispatcherProvider,
+        )
     }
 
     @Test
