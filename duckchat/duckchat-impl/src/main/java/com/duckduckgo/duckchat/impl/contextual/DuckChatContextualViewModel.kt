@@ -344,13 +344,29 @@ class DuckChatContextualViewModel @Inject constructor(
         return title != null && url != null && content != null
     }
 
-    fun replacePrompt(prompt: String) {
+    fun replacePrompt(input: String, prompt: String) {
         logcat { "Duck.ai Contextual: add predefined Summarize prompt" }
+        viewModelScope.launch {
+            val newPrompt = if (input.isEmpty()) {
+                prompt
+            } else {
+                input.plus(" ").plus(prompt)
+            }
+            _viewState.update { current ->
+                current.copy(
+                    prompt = newPrompt,
+                    showContext = isContextValid(updatedPageContext),
+                )
+            }
+        }
+    }
+
+    fun onPromptCleared() {
+        logcat { "Duck.ai Contextual: onPromptCleared" }
         viewModelScope.launch {
             _viewState.update { current ->
                 current.copy(
-                    prompt = prompt,
-                    showContext = updatedPageContext.isNotEmpty(),
+                    prompt = "",
                 )
             }
         }
