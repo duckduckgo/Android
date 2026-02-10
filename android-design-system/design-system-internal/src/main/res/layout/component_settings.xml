@@ -85,6 +85,6 @@
         app:leadingIcon="@drawable/ic_dax_icon"
         app:primaryText="Settings List Item with New Pill"
         app:pillIcon="true"
-        app:pillText="Beta" />
+        app:pillText="New" />
 
 </LinearLayout>
