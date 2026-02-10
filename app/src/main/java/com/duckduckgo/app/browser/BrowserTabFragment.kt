@@ -1105,7 +1105,7 @@ class BrowserTabFragment :
     }
 
     private fun disableViewStateSaving() {
-        lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             val reduceBundleSize = withContext(dispatchers.io()) {
                 androidBrowserConfigFeature.reduceBrowserTabBundleSize().isEnabled()
             }
