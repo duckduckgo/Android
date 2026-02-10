@@ -478,14 +478,14 @@ class OmnibarLayoutViewModel @Inject constructor(
             NewTab -> Search
             else -> {
                 when {
-                  hasFocus -> Search
-                  serpLogoUrl != null -> EasterEggLogo(logoUrl = serpLogoUrl, serpUrl = url, isFavourite = isFavouriteSerpLogo)
-                  shouldShowDaxIcon(url) -> Dax
-                  shouldShowDuckPlayerIcon(url) -> DuckPlayer
-                  // Show globe icon for localhost and private network addresses
-                  standardizedLeadingIconToggle.self().isEnabled() && isLocalUrl(url) -> Globe
-                  url.isEmpty() -> Search
-                  else -> PrivacyShield
+                    hasFocus -> Search
+                    serpLogoUrl != null -> EasterEggLogo(logoUrl = serpLogoUrl, serpUrl = url, isFavourite = isFavouriteSerpLogo)
+                    shouldShowDaxIcon(url) -> Dax
+                    shouldShowDuckPlayerIcon(url) -> DuckPlayer
+                    // Show globe icon for localhost and private network addresses
+                    standardizedLeadingIconToggle.self().isEnabled() && isLocalUrl(url) -> Globe
+                    url.isEmpty() -> Search
+                    else -> PrivacyShield
                 }
             }
         }
@@ -496,7 +496,7 @@ class OmnibarLayoutViewModel @Inject constructor(
             url.toUri().isLocalUrl
         } catch (e: Exception) {
             false
-          }
+        }
     }
 
     private fun getCurrentSerpLogoUrl(
