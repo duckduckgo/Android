@@ -124,6 +124,7 @@ import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.browser.omnibar.QueryOrigin.FromBookmark
 import com.duckduckgo.app.browser.omnibar.QueryOrigin.FromUser
+import com.duckduckgo.app.browser.omnibar.StandardizedLeadingIconFeatureToggle
 import com.duckduckgo.app.browser.refreshpixels.RefreshPixelSender
 import com.duckduckgo.app.browser.remotemessage.RemoteMessagingModel
 import com.duckduckgo.app.browser.santize.NonHttpAppLinkChecker
@@ -458,6 +459,7 @@ class BrowserTabViewModelTest {
     private val mockFileChooserCallback: ValueCallback<Array<Uri>> = mock()
 
     private val mockDuckPlayer: DuckPlayer = mock()
+    private val mockStandardizedLeadingIconToggle: StandardizedLeadingIconFeatureToggle = mock()
 
     private val mockDuckAiFeatureState: DuckAiFeatureState = mock()
 
@@ -694,6 +696,9 @@ class BrowserTabViewModelTest {
             whenever(mockDuckPlayer.isSimulatedYoutubeNoCookie(any())).thenReturn(false)
             whenever(mockDuckPlayer.isDuckPlayerUri(anyString())).thenReturn(false)
             whenever(mockDuckPlayer.getDuckPlayerState()).thenReturn(ENABLED)
+            val mockFeatureToggle: com.duckduckgo.feature.toggles.api.Toggle = mock()
+            whenever(mockFeatureToggle.isEnabled()).thenReturn(false)
+            whenever(mockStandardizedLeadingIconToggle.self()).thenReturn(mockFeatureToggle)
             whenever(mockAutocompleteTabsFeature.self()).thenReturn(mockEnabledToggle)
             whenever(mockAutocompleteTabsFeature.self().isEnabled()).thenReturn(true)
             whenever(mockSitePermissionsManager.hasSitePermanentPermission(any(), any())).thenReturn(false)
@@ -788,6 +793,7 @@ class BrowserTabViewModelTest {
                 coroutineRule.testDispatcherProvider,
                 DuckDuckGoUrlDetectorImpl(),
                 mockDuckPlayer,
+                mockStandardizedLeadingIconToggle,
             )
 
         val fireproofWebsiteRepositoryImpl =
