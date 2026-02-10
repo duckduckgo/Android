@@ -263,7 +263,6 @@ class RealDuckChatPixels @Inject constructor(
     override fun reportContextualPageContextCollectionEmpty() {
         appCoroutineScope.launch(dispatcherProvider.io()) {
             pixel.fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_PAGE_CONTEXT_COLLECTION_EMPTY)
-            pixel.fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_PAGE_CONTEXT_COLLECTION_EMPTY, type = Pixel.PixelType.Daily())
         }
     }
 
