@@ -589,7 +589,7 @@ afterEvaluate {
                 ANDROID_FIREBASE
         ).configure {
             // Fladle outputs results to localResultsDir/build_id/*.xml
-            reports.from(fileTree("build/fladle/fladleResults")  {
+            reports.from(fileTree("fladleResults")  {
                 include "**/*.xml"
             })
         }
