@@ -441,11 +441,9 @@ class DuckChatContextualViewModel @Inject constructor(
             val url = json.optString("url")
 
             val inputMode = _viewState.value
-            logcat { "Duck.ai: onPageContextReceived current state $inputMode" }
 
             if (inputMode.sheetMode == SheetMode.INPUT) {
                 val allowsAutomaticContextAttachment = duckChatInternal.isAutomaticContextAttachmentEnabled()
-                logcat { "Duck.ai: allowsAutomaticContextAttachment $allowsAutomaticContextAttachment" }
                 val updatedState =
                     inputMode.copy(
                         contextTitle = title,
@@ -459,8 +457,7 @@ class DuckChatContextualViewModel @Inject constructor(
                             inputMode.showContext
                         },
                     )
-                logcat { "Duck.ai: onPageContextReceived updated state state $updatedState" }
-                if (updatedState.showContext) {
+                if (updatedState.showContext && !inputMode.showContext) {
                     duckChatPixels.reportContextualPageContextAutoAttached()
                 }
                 _viewState.update { updatedState }

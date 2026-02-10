@@ -166,9 +166,19 @@ class DuckChatContextualViewModelTest {
 
     @Test
     fun `when prompt sent with updated page context then with-context pixel fired`() = runTest {
-        testee.updatedPageContext = """{"title":"t","url":"https://example.com","content":"c"}"""
+        val serializedPageData =
+            """
+            {
+                "title": "Ctx Title",
+                "url": "https://ctx.com",
+                "content": "content"
+            }
+            """.trimIndent()
+
+        testee.onPageContextReceived("tab-1", serializedPageData)
 
         testee.onPromptSent("Hello Duck.ai")
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
 
         verify(duckChatPixels).reportContextualPromptSubmittedWithContextNative()
     }
@@ -259,6 +269,8 @@ class DuckChatContextualViewModelTest {
                 assertEquals("https://ctx.com", state.contextUrl)
                 assertEquals("tab-1", state.tabId)
             }
+
+            verify(duckChatPixels).reportContextualPageContextAutoAttached()
         }
 
     @Test

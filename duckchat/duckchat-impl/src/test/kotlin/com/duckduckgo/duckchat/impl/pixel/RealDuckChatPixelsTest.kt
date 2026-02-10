@@ -239,18 +239,8 @@ class RealDuckChatPixelsTest {
     }
 
     @Test
-    fun `when reportContextualPageContextAutoAttached enabled then fires count and daily`() = runTest {
-        testee.reportContextualPageContextAutoAttached(true)
-
-        advanceUntilIdle()
-
-        verify(mockPixel).fire(DUCK_CHAT_CONTEXTUAL_PAGE_CONTEXT_AUTO_ATTACHED_COUNT)
-        verify(mockPixel).fire(DUCK_CHAT_CONTEXTUAL_PAGE_CONTEXT_AUTO_ATTACHED_DAILY, type = Pixel.PixelType.Daily())
-    }
-
-    @Test
-    fun `when reportContextualPageContextAutoAttached disabled then fires count and daily`() = runTest {
-        testee.reportContextualPageContextAutoAttached(false)
+    fun `when reportContextualPageContextAutoAttached then fires count and daily`() = runTest {
+        testee.reportContextualPageContextAutoAttached()
 
         advanceUntilIdle()
 
