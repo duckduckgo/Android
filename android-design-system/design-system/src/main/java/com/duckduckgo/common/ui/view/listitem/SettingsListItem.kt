@@ -22,6 +22,7 @@ import android.widget.ImageView
 import androidx.annotation.DrawableRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import com.duckduckgo.common.ui.view.DaxYellowPill
 import com.duckduckgo.common.ui.view.StatusIndicatorView
 import com.duckduckgo.common.ui.view.StatusIndicatorView.Status
@@ -68,12 +69,8 @@ class SettingsListItem @JvmOverloads constructor(
                 leadingIcon.gone()
             }
 
-            if (getBoolean(R.styleable.SettingsListItem_pillIcon, false)) {
-                yellowPill.show()
-                yellowPill.text = getString(R.styleable.SettingsListItem_pillText)
-            } else {
-                yellowPill.gone()
-            }
+            yellowPill.text = getString(R.styleable.SettingsListItem_pillText)
+            showPillIcon(getBoolean(R.styleable.SettingsListItem_pillIcon, false))
 
             val indicatorStatus = Status.from(getInt(R.styleable.SettingsListItem_indicatorStatus, 2))
             statusIndicator.setStatus(indicatorStatus)
@@ -109,5 +106,10 @@ class SettingsListItem @JvmOverloads constructor(
     /** Sets the primary text */
     fun setPrimaryText(text: String) {
         primaryText.text = text
+    }
+
+    /** Sets the pill icon visibility */
+    fun showPillIcon(isVisible: Boolean) {
+        yellowPill.isVisible = isVisible
     }
 }
