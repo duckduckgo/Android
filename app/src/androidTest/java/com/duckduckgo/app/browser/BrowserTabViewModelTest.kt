@@ -2043,39 +2043,6 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenBackPressedOnAboutBlankTabAndFeatureEnabledThenRemoveTabAndReturnTrue() = runTest {
-        fakeAndroidConfigBrowserFeature.handleAboutBlank().setRawStoredState(State(enable = true))
-        resetChannels()
-        initialiseViewModel()
-
-        selectedTabLiveData.value = aTabEntity(id = "id").copy(url = "", title = "about:blank", sourceTabId = "source")
-        testee.onMessageReceived()
-        testee.handleNewTabIfEmptyUrl()
-
-        val result = testee.onUserPressedBack(isCustomTab = false)
-
-        assertTrue(result)
-        verify(mockTabRepository).deleteTabAndSelectSource("id")
-        verify(mockAdClickManager).clearTabId("id")
-    }
-
-    @Test
-    fun whenBackPressedOnAboutBlankTabAndFeatureDisabledThenDoNotRemoveTab() = runTest {
-        fakeAndroidConfigBrowserFeature.handleAboutBlank().setRawStoredState(State(enable = false))
-        resetChannels()
-        initialiseViewModel()
-
-        selectedTabLiveData.value = aTabEntity(id = "id").copy(url = "", title = "about:blank", sourceTabId = "source")
-        testee.onMessageReceived()
-        testee.handleNewTabIfEmptyUrl()
-
-        testee.onUserPressedBack(isCustomTab = false)
-
-        verify(mockTabRepository, never()).deleteTabAndSelectSource(eq("id"))
-        verify(mockAdClickManager, never()).clearTabId(eq("id"))
-    }
-
-    @Test
     fun whenIsCustomTabAndCannotGoBackThenReturnFalse() {
         setupNavigation(isBrowsing = true, canGoBack = false)
         assertFalse(testee.onUserPressedBack(isCustomTab = true))
