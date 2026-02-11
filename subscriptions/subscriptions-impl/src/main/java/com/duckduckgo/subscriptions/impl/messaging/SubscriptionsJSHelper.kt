@@ -23,6 +23,7 @@ import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.RestoreSubscriptionScreenWithParams
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionPurchase
+import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionUpgrade
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionsSettingsScreenWithEmptyParams
 import com.duckduckgo.subscriptions.api.SubscriptionsJSHelper
 import com.duckduckgo.subscriptions.impl.AccessTokenResult
@@ -30,6 +31,7 @@ import com.duckduckgo.subscriptions.impl.PrivacyProFeature
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.withContext
+import logcat.logcat
 import org.json.JSONArray
 import org.json.JSONObject
 import javax.inject.Inject
@@ -51,6 +53,7 @@ class RealSubscriptionsJSHelper @Inject constructor(
         data: JSONObject?,
         context: Context?,
     ): JsCallbackData? = withContext(dispatcherProvider.io()) {
+        logcat { "SubscriptionsJSHelper: processJsCallbackMessage called with method=$method" }
         when (method) {
             METHOD_HANDSHAKE -> id?.let {
                 val availableMethods = if (privacyProFeature.duckAISubscriptionMessaging().isEnabled()) {
@@ -59,6 +62,7 @@ class RealSubscriptionsJSHelper @Inject constructor(
                         put(GET_AUTH_ACCESS_TOKEN)
                         put(GET_FEATURE_CONFIG)
                         put(AUTH_UPDATE)
+                        put(OPEN_SUBSCRIPTION_UPGRADE)
                     }
                 } else {
                     JSONArray().apply {
@@ -72,6 +76,7 @@ class RealSubscriptionsJSHelper @Inject constructor(
                     )
                     put(PLATFORM, ANDROID)
                 }
+                logcat { "SubscriptionsJSHelper: handshake response: $jsonPayload" }
                 return@withContext JsCallbackData(jsonPayload, featureName, method, id)
             }
 
@@ -90,6 +95,7 @@ class RealSubscriptionsJSHelper @Inject constructor(
             }
 
             METHOD_BACK_TO_SETTINGS -> {
+                logcat { "SubscriptionsJSHelper: handling backToSettings navigation" }
                 withContext(dispatcherProvider.main()) {
                     context?.let {
                         globalActivityStarter.start(context, SubscriptionsSettingsScreenWithEmptyParams)
@@ -99,6 +105,7 @@ class RealSubscriptionsJSHelper @Inject constructor(
             }
 
             METHOD_OPEN_SUBSCRIPTION_ACTIVATION -> {
+                logcat { "SubscriptionsJSHelper: handling openSubscriptionActivation navigation" }
                 withContext(dispatcherProvider.main()) {
                     context?.let {
                         globalActivityStarter.start(context, RestoreSubscriptionScreenWithParams(isOriginWeb = true))
@@ -115,10 +122,28 @@ class RealSubscriptionsJSHelper @Inject constructor(
                             defaultDuckAiSubscriptionPurchase.copy(origin = nonEmptyOrigin)
                         } ?: defaultDuckAiSubscriptionPurchase
                 }.getOrDefault(defaultDuckAiSubscriptionPurchase)
+                logcat { "SubscriptionsJSHelper: handling openSubscriptionPurchase navigation with params=$subscriptionParams" }
 
                 withContext(dispatcherProvider.main()) {
                     context?.let {
                         globalActivityStarter.start(context, subscriptionParams)
+                    }
+                }
+                return@withContext null
+            }
+
+            METHOD_OPEN_SUBSCRIPTION_UPGRADE -> {
+                val upgradeParams = runCatching {
+                    data?.getString(MESSAGE_PARAM_ORIGIN_KEY)
+                        .takeUnless { it.isNullOrBlank() }
+                        ?.let { SubscriptionUpgrade(origin = it) }
+                        ?: SubscriptionUpgrade()
+                }.getOrDefault(SubscriptionUpgrade())
+                logcat { "SubscriptionsJSHelper: handling openSubscriptionUpgrade navigation with params=$upgradeParams" }
+
+                withContext(dispatcherProvider.main()) {
+                    context?.let {
+                        globalActivityStarter.start(context, upgradeParams)
                     }
                 }
                 return@withContext null
@@ -172,8 +197,9 @@ class RealSubscriptionsJSHelper @Inject constructor(
     ): JsCallbackData {
         val jsonPayload = JSONObject().apply {
             put(USE_PAID_DUCK_AI, privacyProFeature.duckAiPlus().isEnabled())
+            put(USE_PRO_TIER, privacyProFeature.allowProTierPurchase().isEnabled())
         }
-
+        logcat { "SubscriptionsJSHelper: getFeatureConfig response: $jsonPayload" }
         return JsCallbackData(jsonPayload, featureName, method, id)
     }
 
@@ -200,7 +226,10 @@ class RealSubscriptionsJSHelper @Inject constructor(
         private const val METHOD_BACK_TO_SETTINGS = "backToSettings"
         private const val METHOD_OPEN_SUBSCRIPTION_ACTIVATION = "openSubscriptionActivation"
         private const val METHOD_OPEN_SUBSCRIPTION_PURCHASE = "openSubscriptionPurchase"
+        private const val METHOD_OPEN_SUBSCRIPTION_UPGRADE = "openSubscriptionUpgrade"
         private const val MESSAGE_PARAM_ORIGIN_KEY = "origin"
         private const val DUCK_AI_FEATURE_PAGE = "duckai"
+        private const val USE_PRO_TIER = "useProTier"
+        private const val OPEN_SUBSCRIPTION_UPGRADE = "openSubscriptionUpgrade"
     }
 }
