@@ -217,7 +217,7 @@ class DuckChatContextualFragment :
                 newState: Int,
             ) {
                 if (newState == BottomSheetBehavior.STATE_HIDDEN) {
-                    viewModel.persistTabClosed()
+                    viewModel.onSheetClosed()
                 }
                 backPressedCallback.isEnabled = newState != BottomSheetBehavior.STATE_HIDDEN
             }
@@ -565,7 +565,7 @@ class DuckChatContextualFragment :
 
                     DuckChatContextualSharedViewModel.Command.OpenSheet -> {
                         setupKeyboardVisibilityListener()
-                        viewModel.reopenSheet()
+                        viewModel.onSheetReopened()
                     }
                 }
             }.launchIn(lifecycleScope)
@@ -890,7 +890,7 @@ class DuckChatContextualFragment :
     }
 
     override fun onPause() {
-        viewModel.persistTabClosed()
+        viewModel.onSheetClosed()
         downloadMessagesJob.cancel()
         simpleWebview.onPause()
         appCoroutineScope.launch(dispatcherProvider.io()) {

@@ -165,6 +165,7 @@ class RealDuckChatJSHelper @Inject constructor(
                     logcat { "Duck.ai Contextual: getAIChatPageContext reason $reason" }
                     if (pageContext.isNotEmpty()) {
                         if (reason == REASON_USER_ACTION) {
+                            duckChatPixels.reportContextualPageContextManuallyAttachedFrontend()
                             getPageContextResponse(featureName, method, it, pageContext, tabId)
                         } else {
                             null
@@ -176,7 +177,20 @@ class RealDuckChatJSHelper @Inject constructor(
                 }
             }
 
-            else -> null
+            METHOD_TOGGLE_PAGE_CONTEXT -> {
+                val isEnabled = data?.optBoolean(ENABLED)
+                if (isEnabled != null) {
+                    if (!isEnabled) {
+                        duckChatPixels.reportContextualPageContextRemovedFrontend()
+                    }
+                }
+                null
+            }
+
+            else -> {
+                logcat { "Duck.ai: JS method $method" }
+                null
+            }
         }
     }
 
@@ -327,6 +341,7 @@ class RealDuckChatJSHelper @Inject constructor(
         private const val METHOD_SHOW_CHAT_INPUT = "showChatInput"
         const val METHOD_GET_PAGE_CONTEXT = "getAIChatPageContext"
         const val METHOD_OPEN_KEYBOARD = "openKeyboard"
+        private const val METHOD_TOGGLE_PAGE_CONTEXT = "togglePageContextTelemetry"
         private const val AI_CHAT_PAYLOAD = "aiChatPayload"
         private const val METHOD_OPEN_KEYBOARD_PAYLOAD = "selector"
         private const val IS_HANDOFF_ENABLED = "isAIChatHandoffEnabled"
@@ -346,6 +361,7 @@ class RealDuckChatJSHelper @Inject constructor(
         private const val ANDROID = "android"
         private const val REASON = "reason"
         private const val REASON_USER_ACTION = "userAction"
+        private const val ENABLED = "enabled"
         const val SELECTOR = "selector"
         private const val DEFAULT_SELECTOR = "'user-prompt'"
         private const val SUCCESS = "success"

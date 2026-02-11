@@ -27,6 +27,7 @@ import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
 import com.duckduckgo.duckchat.impl.helper.NativeAction
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -52,6 +53,7 @@ class DuckChatContextualViewModel @Inject constructor(
     private val contextualDataStore: DuckChatContextualDataStore,
     private val sessionTimeoutProvider: DuckChatContextualSessionTimeoutProvider,
     private val timeProvider: DuckChatContextualTimeProvider,
+    private val duckChatPixels: DuckChatPixels,
 ) : ViewModel() {
 
     private val commandChannel = Channel<Command>(capacity = 1, onBufferOverflow = DROP_OLDEST)
@@ -104,7 +106,7 @@ class DuckChatContextualViewModel @Inject constructor(
         val prompt: String = "",
     )
 
-    fun reopenSheet() {
+    fun onSheetReopened() {
         logcat { "Duck.ai: reopenSheet" }
 
         viewModelScope.launch(dispatchers.io()) {
@@ -118,13 +120,15 @@ class DuckChatContextualViewModel @Inject constructor(
                 }
             }
         }
+
+        duckChatPixels.reportContextualSheetOpened()
     }
 
     private suspend fun reopenWebViewState(currentState: ViewState) {
         val tabId = currentState.tabId
         val shouldReuseSession = shouldReuseStoredChatUrl(tabId)
         if (!shouldReuseSession) {
-            onNewChatRequested()
+            renderNewChatState()
             return
         }
         val existingChatUrl = contextualDataStore.getTabChatUrl(tabId)
@@ -156,6 +160,7 @@ class DuckChatContextualViewModel @Inject constructor(
                     allowsAutomaticContextAttachment = duckChatInternal.isAutomaticContextAttachmentEnabled(),
                 )
             }
+            duckChatPixels.reportContextualSheetSessionRestored()
         }
     }
 
@@ -180,6 +185,7 @@ class DuckChatContextualViewModel @Inject constructor(
                         )
                     }
                 }
+                duckChatPixels.reportContextualPlaceholderContextShown()
                 return@launch
             }
 
@@ -207,9 +213,10 @@ class DuckChatContextualViewModel @Inject constructor(
                         it.copy(tabId = tabId)
                     }
                 }
-                onNewChatRequested()
+                renderNewChatState()
             }
         }
+        duckChatPixels.reportContextualSheetOpened()
     }
 
     fun onPromptSent(prompt: String) {
@@ -271,6 +278,12 @@ class DuckChatContextualViewModel @Inject constructor(
                 null
             }
 
+        if (pageContext == null) {
+            duckChatPixels.reportContextualPromptSubmittedWithoutContextNative()
+        } else {
+            duckChatPixels.reportContextualPromptSubmittedWithContextNative()
+        }
+
         val params =
             JSONObject().apply {
                 put("platform", "android")
@@ -298,7 +311,12 @@ class DuckChatContextualViewModel @Inject constructor(
         }
     }
 
-    fun persistTabClosed() {
+    fun onSheetClosed() {
+        persistTabClosed()
+        duckChatPixels.reportContextualSheetDismissed()
+    }
+
+    private fun persistTabClosed() {
         if (_viewState.value.sheetMode != SheetMode.WEBVIEW) {
             return
         }
@@ -320,18 +338,24 @@ class DuckChatContextualViewModel @Inject constructor(
                 )
             }
         }
+        duckChatPixels.reportContextualPlaceholderContextShown()
+        duckChatPixels.reportContextualPageContextRemovedNative()
     }
 
     fun addPageContext() {
         logcat { "Duck.ai Contextual: addPageContext" }
-
+        duckChatPixels.reportContextualPlaceholderContextTapped()
         viewModelScope.launch {
-            _viewState.update { current ->
-                logcat { "Duck.ai Contextual: addPageContext $current context $updatedPageContext" }
-                current.copy(
-                    showContext = isContextValid(updatedPageContext),
-                    userRemovedContext = false,
-                )
+            val isContextValid = isContextValid(updatedPageContext)
+            if (isContextValid) {
+                duckChatPixels.reportContextualPageContextManuallyAttachedNative()
+                _viewState.update { current ->
+                    logcat { "Duck.ai Contextual: addPageContext $current context $updatedPageContext" }
+                    current.copy(
+                        showContext = isContextValid(updatedPageContext),
+                        userRemovedContext = false,
+                    )
+                }
             }
         }
     }
@@ -340,14 +364,14 @@ class DuckChatContextualViewModel @Inject constructor(
         if (pageContext.isEmpty()) return false
         val json = JSONObject(pageContext)
         val title = json.optString("title").takeIf { it.isNotBlank() }
-        val url = json.optString("url").takeIf { it.isNotBlank() }
         val content = json.optString("content").takeIf { it.isNotBlank() }
 
-        return title != null && url != null && content != null
+        return title != null && content != null
     }
 
     fun replacePrompt(input: String, prompt: String) {
         logcat { "Duck.ai Contextual: add predefined Summarize prompt" }
+        duckChatPixels.reportContextualSummarizePromptSelected()
         viewModelScope.launch {
             val newPrompt = if (input.isEmpty()) {
                 prompt
@@ -387,6 +411,7 @@ class DuckChatContextualViewModel @Inject constructor(
         viewModelScope.launch {
             commandChannel.trySend(Command.OpenFullscreenMode(chatUrl))
         }
+        duckChatPixels.reportContextualSheetExpanded()
     }
 
     fun onKeyboardVisibilityChanged(isVisible: Boolean) {
@@ -409,7 +434,9 @@ class DuckChatContextualViewModel @Inject constructor(
         tabId: String,
         pageContext: String,
     ) {
+        logcat { "Duck.ai: onPageContextReceived $pageContext" }
         if (isContextValid(pageContext)) {
+            logcat { "Duck.ai: onPageContextReceived is valid" }
             updatedPageContext = pageContext
 
             val json = JSONObject(updatedPageContext)
@@ -417,7 +444,6 @@ class DuckChatContextualViewModel @Inject constructor(
             val url = json.optString("url")
 
             val inputMode = _viewState.value
-            logcat { "Duck.ai: onPageContextReceived $inputMode" }
 
             if (inputMode.sheetMode == SheetMode.INPUT) {
                 val allowsAutomaticContextAttachment = duckChatInternal.isAutomaticContextAttachmentEnabled()
@@ -434,6 +460,9 @@ class DuckChatContextualViewModel @Inject constructor(
                             inputMode.showContext
                         },
                     )
+                if (updatedState.showContext && !inputMode.showContext) {
+                    duckChatPixels.reportContextualPageContextAutoAttached()
+                }
                 _viewState.update { updatedState }
             } else {
                 _viewState.update {
@@ -447,6 +476,7 @@ class DuckChatContextualViewModel @Inject constructor(
             }
         } else {
             updatedPageContext = ""
+            duckChatPixels.reportContextualPageContextCollectionEmpty()
         }
     }
 
@@ -465,6 +495,11 @@ class DuckChatContextualViewModel @Inject constructor(
     }
 
     fun onNewChatRequested() {
+        renderNewChatState()
+        duckChatPixels.reportContextualSheetNewChat()
+    }
+
+    private fun renderNewChatState() {
         viewModelScope.launch(dispatchers.io()) {
             val currentTabId = _viewState.value.tabId
             if (currentTabId.isNotBlank()) {
@@ -485,6 +520,7 @@ class DuckChatContextualViewModel @Inject constructor(
                 }
             }
         }
+        duckChatPixels.reportContextualPlaceholderContextShown()
     }
 
     private fun hasChatId(url: String?): Boolean {

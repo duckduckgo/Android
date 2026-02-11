@@ -320,6 +320,7 @@ class RealDuckChatJSHelperTest {
         assertEquals("icon", faviconObject.getString("rel"))
         val faviconHref = faviconObject.getString("href")
         assertEquals(true, faviconHref.startsWith("data:image/png;base64,"))
+        verify(mockDuckChatPixels).reportContextualPageContextManuallyAttachedFrontend()
     }
 
     @Test
@@ -408,6 +409,65 @@ class RealDuckChatJSHelperTest {
             )
 
         assertNull(result)
+    }
+
+    @Test
+    fun whenTogglePageContextEnabledThenNoPixelReported() = runTest {
+        val featureName = "aiChat"
+        val method = "togglePageContextTelemetry"
+        val id = "123"
+        val data = JSONObject(mapOf("enabled" to true))
+
+        assertNull(
+            testee.processJsCallbackMessage(
+                featureName,
+                method,
+                id,
+                data,
+                pageContext = viewModel.updatedPageContext,
+            ),
+        )
+
+        verifyNoInteractions(mockDuckChatPixels)
+    }
+
+    @Test
+    fun whenTogglePageContextDisabledThenReportContextRemoved() = runTest {
+        val featureName = "aiChat"
+        val method = "togglePageContextTelemetry"
+        val id = "123"
+        val data = JSONObject(mapOf("enabled" to false))
+
+        assertNull(
+            testee.processJsCallbackMessage(
+                featureName,
+                method,
+                id,
+                data,
+                pageContext = viewModel.updatedPageContext,
+            ),
+        )
+
+        verify(mockDuckChatPixels).reportContextualPageContextRemovedFrontend()
+    }
+
+    @Test
+    fun whenTogglePageContextWithoutDataThenNoPixelReported() = runTest {
+        val featureName = "aiChat"
+        val method = "togglePageContextTelemetry"
+        val id = "123"
+
+        assertNull(
+            testee.processJsCallbackMessage(
+                featureName,
+                method,
+                id,
+                null,
+                pageContext = viewModel.updatedPageContext,
+            ),
+        )
+
+        verifyNoInteractions(mockDuckChatPixels)
     }
 
     @Test

@@ -26,6 +26,7 @@ import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.inputscreen.ui.metrics.discovery.InputScreenDiscoveryFunnel
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Command.LaunchFeedback
 import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Command.OpenLink
 import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Command.OpenLinkInNewTab
@@ -55,6 +56,7 @@ class DuckChatSettingsViewModelTest {
     private val duckChat: DuckChatInternal = mock()
     private val mockPixel: Pixel = mock()
     private val mockInputScreenDiscoveryFunnel: InputScreenDiscoveryFunnel = mock()
+    private val mockDuckChatPixels: DuckChatPixels = mock()
     private val settingsPageFeature = FakeFeatureToggleFactory.create(SettingsPageFeature::class.java)
     private val duckChatFeature = FakeFeatureToggleFactory.create(DuckChatFeature::class.java)
 
@@ -75,6 +77,7 @@ class DuckChatSettingsViewModelTest {
                 pixel = mockPixel,
                 inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
                 settingsPageFeature = settingsPageFeature,
+                duckChatPixels = mockDuckChatPixels,
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
             )
@@ -147,6 +150,7 @@ class DuckChatSettingsViewModelTest {
                 pixel = mockPixel,
                 inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
                 settingsPageFeature = settingsPageFeature,
+                duckChatPixels = mockDuckChatPixels,
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
             )
@@ -167,6 +171,7 @@ class DuckChatSettingsViewModelTest {
                 pixel = mockPixel,
                 inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
                 settingsPageFeature = settingsPageFeature,
+                duckChatPixels = mockDuckChatPixels,
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
             )
@@ -187,6 +192,7 @@ class DuckChatSettingsViewModelTest {
                 pixel = mockPixel,
                 inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
                 settingsPageFeature = settingsPageFeature,
+                duckChatPixels = mockDuckChatPixels,
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
             )
@@ -207,6 +213,7 @@ class DuckChatSettingsViewModelTest {
                 pixel = mockPixel,
                 inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
                 settingsPageFeature = settingsPageFeature,
+                duckChatPixels = mockDuckChatPixels,
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
             )
@@ -227,6 +234,7 @@ class DuckChatSettingsViewModelTest {
                 pixel = mockPixel,
                 inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
                 settingsPageFeature = settingsPageFeature,
+                duckChatPixels = mockDuckChatPixels,
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
             )
@@ -247,6 +255,7 @@ class DuckChatSettingsViewModelTest {
                 pixel = mockPixel,
                 inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
                 settingsPageFeature = settingsPageFeature,
+                duckChatPixels = mockDuckChatPixels,
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
             )
@@ -268,6 +277,7 @@ class DuckChatSettingsViewModelTest {
                 pixel = mockPixel,
                 inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
                 settingsPageFeature = settingsPageFeature,
+                duckChatPixels = mockDuckChatPixels,
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
             )
@@ -290,6 +300,7 @@ class DuckChatSettingsViewModelTest {
                 pixel = mockPixel,
                 inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
                 settingsPageFeature = settingsPageFeature,
+                duckChatPixels = mockDuckChatPixels,
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
             )
@@ -378,6 +389,7 @@ class DuckChatSettingsViewModelTest {
                 pixel = mockPixel,
                 inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
                 settingsPageFeature = settingsPageFeature,
+                duckChatPixels = mockDuckChatPixels,
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
             )
@@ -474,6 +486,7 @@ class DuckChatSettingsViewModelTest {
                 pixel = mockPixel,
                 inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
                 settingsPageFeature = settingsPageFeature,
+                duckChatPixels = mockDuckChatPixels,
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
             )
@@ -495,6 +508,7 @@ class DuckChatSettingsViewModelTest {
                 pixel = mockPixel,
                 inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
                 settingsPageFeature = settingsPageFeature,
+                duckChatPixels = mockDuckChatPixels,
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
             )
@@ -514,6 +528,7 @@ class DuckChatSettingsViewModelTest {
                 pixel = mockPixel,
                 inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
                 settingsPageFeature = settingsPageFeature,
+                duckChatPixels = mockDuckChatPixels,
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
             )
@@ -533,6 +548,7 @@ class DuckChatSettingsViewModelTest {
                 pixel = mockPixel,
                 inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
                 settingsPageFeature = settingsPageFeature,
+                duckChatPixels = mockDuckChatPixels,
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
             )
@@ -576,6 +592,20 @@ class DuckChatSettingsViewModelTest {
         }
 
     @Test
+    fun `when automatic context attachment toggled on then report pixel`() = runTest {
+        testee.onAutomaticContextAttachmentToggled(true)
+
+        verify(mockDuckChatPixels).reportContextualSettingAutomaticPageContentToggled(true)
+    }
+
+    @Test
+    fun `when automatic context attachment toggled off then report pixel`() = runTest {
+        testee.onAutomaticContextAttachmentToggled(false)
+
+        verify(mockDuckChatPixels).reportContextualSettingAutomaticPageContentToggled(false)
+    }
+
+    @Test
     fun `view state - automatic context enabled then set correct state`() =
         runTest {
             whenever(duckChat.observeAutomaticContextAttachmentUserSettingEnabled()).thenReturn(flowOf(true))
@@ -586,6 +616,7 @@ class DuckChatSettingsViewModelTest {
                 pixel = mockPixel,
                 inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
                 settingsPageFeature = settingsPageFeature,
+                duckChatPixels = mockDuckChatPixels,
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
             )
@@ -605,6 +636,7 @@ class DuckChatSettingsViewModelTest {
                 pixel = mockPixel,
                 inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
                 settingsPageFeature = settingsPageFeature,
+                duckChatPixels = mockDuckChatPixels,
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
             )
@@ -620,13 +652,14 @@ class DuckChatSettingsViewModelTest {
             whenever(duckChat.observeEnableDuckChatUserSetting()).thenReturn(flowOf(true))
             whenever(duckChat.observeAutomaticContextAttachmentUserSettingEnabled()).thenReturn(flowOf(false))
             @Suppress("DenyListedApi")
-            duckChatFeature.contextualMode().setRawStoredState(State(enable = true))
+            duckChatFeature.automaticContextAttachment().setRawStoredState(State(enable = true))
             testee = DuckChatSettingsViewModel(
                 duckChatActivityParams = DuckChatNativeSettingsNoParams,
                 duckChat = duckChat,
                 pixel = mockPixel,
                 inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
                 settingsPageFeature = settingsPageFeature,
+                duckChatPixels = mockDuckChatPixels,
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
             )
@@ -642,13 +675,14 @@ class DuckChatSettingsViewModelTest {
             whenever(duckChat.observeEnableDuckChatUserSetting()).thenReturn(flowOf(false))
             whenever(duckChat.observeAutomaticContextAttachmentUserSettingEnabled()).thenReturn(flowOf(false))
             @Suppress("DenyListedApi")
-            duckChatFeature.contextualMode().setRawStoredState(State(enable = true))
+            duckChatFeature.automaticContextAttachment().setRawStoredState(State(enable = true))
             testee = DuckChatSettingsViewModel(
                 duckChatActivityParams = DuckChatNativeSettingsNoParams,
                 duckChat = duckChat,
                 pixel = mockPixel,
                 inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
                 settingsPageFeature = settingsPageFeature,
+                duckChatPixels = mockDuckChatPixels,
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
             )
@@ -663,13 +697,14 @@ class DuckChatSettingsViewModelTest {
         runTest {
             whenever(duckChat.observeAutomaticContextAttachmentUserSettingEnabled()).thenReturn(flowOf(false))
             @Suppress("DenyListedApi")
-            duckChatFeature.contextualMode().setRawStoredState(State(enable = false))
+            duckChatFeature.automaticContextAttachment().setRawStoredState(State(enable = false))
             testee = DuckChatSettingsViewModel(
                 duckChatActivityParams = DuckChatNativeSettingsNoParams,
                 duckChat = duckChat,
                 pixel = mockPixel,
                 inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
                 settingsPageFeature = settingsPageFeature,
+                duckChatPixels = mockDuckChatPixels,
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
             )
