@@ -6773,6 +6773,7 @@ class BrowserTabViewModelTest {
                 anyOrNull(),
                 any(),
                 anyOrNull(),
+                any(),
             )
             assertCommandIssued<Command.SendResponseToJs>()
         }
@@ -6806,6 +6807,7 @@ class BrowserTabViewModelTest {
                 anyOrNull(),
                 any(),
                 anyOrNull(),
+                any(),
             )
             assertCommandNotIssued<Command.SendResponseToJs>()
         }
@@ -7325,6 +7327,7 @@ class BrowserTabViewModelTest {
                     anyString(),
                     anyOrNull(),
                     anyOrNull(),
+                    any(),
                     any(),
                     any(),
                 ),
