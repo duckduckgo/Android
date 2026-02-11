@@ -587,6 +587,13 @@ class DuckChatContextualViewModelTest {
         }
 
     @Test
+    fun `when replace prompt then summarize prompt selected pixel fired`() = runTest {
+        testee.replacePrompt("", "summarize this")
+
+        verify(duckChatPixels).reportContextualSummarizePromptSelected()
+    }
+
+    @Test
     fun `when replace prompt with previous input then prompt is appended`() =
         runTest {
             testee.viewState.test {

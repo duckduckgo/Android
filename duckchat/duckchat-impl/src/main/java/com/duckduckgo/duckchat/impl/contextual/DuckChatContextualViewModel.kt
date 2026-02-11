@@ -371,6 +371,7 @@ class DuckChatContextualViewModel @Inject constructor(
 
     fun replacePrompt(input: String, prompt: String) {
         logcat { "Duck.ai Contextual: add predefined Summarize prompt" }
+        duckChatPixels.reportContextualSummarizePromptSelected()
         viewModelScope.launch {
             val newPrompt = if (input.isEmpty()) {
                 prompt
