@@ -80,12 +80,12 @@ class DaxButtonStylingDetector : LayoutDetector() {
 
     companion object {
 
-        private const val DAX_BUTTON_PRIMARY = "com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary"
-        private const val DAX_BUTTON_SECONDARY = "com.duckduckgo.mobile.android.ui.view.button.DaxButtonSecondary"
-        private const val DAX_BUTTON_GHOST = "com.duckduckgo.mobile.android.ui.view.button.DaxButtonGhost"
-        private const val DAX_BUTTON_DESTRUCTIVE = "com.duckduckgo.mobile.android.ui.view.button.DaxButtonDestructive"
-        private const val DAX_BUTTON_GHOST_DESTRUCTIVE = "com.duckduckgo.mobile.android.ui.view.button.DaxButtonGhostDestructive"
-        private const val DAX_BUTTON_DESTRUCTIVE_SECONDARY = "com.duckduckgo.mobile.android.ui.view.button.DaxButtonDestructiveSecondary"
+        private const val DAX_BUTTON_PRIMARY = "com.duckduckgo.common.ui.view.button.DaxButtonPrimary"
+        private const val DAX_BUTTON_SECONDARY = "com.duckduckgo.common.ui.view.button.DaxButtonSecondary"
+        private const val DAX_BUTTON_GHOST = "com.duckduckgo.common.ui.view.button.DaxButtonGhost"
+        private const val DAX_BUTTON_DESTRUCTIVE = "com.duckduckgo.common.ui.view.button.DaxButtonDestructive"
+        private const val DAX_BUTTON_GHOST_DESTRUCTIVE = "com.duckduckgo.common.ui.view.button.DaxButtonGhostDestructive"
+        private const val DAX_BUTTON_DESTRUCTIVE_SECONDARY = "com.duckduckgo.common.ui.view.button.DaxButtonDestructiveSecondary"
 
         val DAX_BUTTONS = listOf(DAX_BUTTON_PRIMARY, DAX_BUTTON_DESTRUCTIVE, DAX_BUTTON_SECONDARY, DAX_BUTTON_GHOST, DAX_BUTTON_GHOST_DESTRUCTIVE, DAX_BUTTON_DESTRUCTIVE_SECONDARY)
 
