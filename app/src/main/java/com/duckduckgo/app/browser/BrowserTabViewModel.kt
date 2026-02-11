@@ -3971,6 +3971,15 @@ class BrowserTabViewModel @Inject constructor(
             omnibarViewState.value = currentOmnibarViewState().copy(
                 omnibarText = ABOUT_BLANK,
             )
+            site = siteFactory.buildSite(
+                url = "",
+                tabId = tabId,
+                title = ABOUT_BLANK,
+                httpUpgraded = httpsUpgraded,
+            )
+            viewModelScope.launch(dispatchers.io()) {
+                tabRepository.update(tabId, site)
+            }
         }
     }
 

@@ -4817,6 +4817,32 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenHandleNewTabIfEmptyUrlWithEmptyUrlThenOmnibarAndUrlSetToAboutBlank() {
+        fakeAndroidConfigBrowserFeature.handleAboutBlank().setRawStoredState(State(enable = true))
+        resetChannels()
+        initialiseViewModel()
+        // Simulate a new tab with empty URL
+        testee.loadData("tabId", null, false, false)
+        testee.handleNewTabIfEmptyUrl()
+        assertEquals("about:blank", omnibarViewState().omnibarText)
+        assertEquals("", testee.url)
+        assertEquals("about:blank", testee.title)
+    }
+
+    @Test
+    fun whenHandleNewTabIfEmptyUrlWithNonEmptyUrlThenNoChangeToUrl() {
+        fakeAndroidConfigBrowserFeature.handleAboutBlank().setRawStoredState(State(enable = true))
+        resetChannels()
+        initialiseViewModel()
+        val url = "https://duckduckgo.com"
+        testee.loadData("tabId", url, false, false)
+        testee.navigationStateChanged(buildWebNavigation(url))
+        testee.handleNewTabIfEmptyUrl()
+        assertEquals(url, testee.url)
+        assertNotEquals("about:blank", testee.title)
+    }
+
+    @Test
     fun whenUserLongPressedBackOnEmptyStackBrowserNotShowingThenShowHistoryCommandNotSent() {
         setBrowserShowing(false)
         testee.onUserLongPressedBack()
