@@ -285,6 +285,7 @@ object SubscriptionPixelParameter {
     const val OS_VERSION = "os_version"
     const val PETAL = "petal"
     const val ACTIVATION_DAY = "activation_day"
+    const val ACTIVATION_PLATFORM = "activation_platform"
 }
 
 internal val PixelType.pixelNameSuffix: String
