@@ -589,7 +589,7 @@ afterEvaluate {
                 ANDROID_CONNECTED
         ).configure {
             // Fladle outputs results to localResultsDir/build_id/*.xml
-            reports.from(fileTree("fladleResults")  {
+            reports.from(fileTree("build/fladle/fladleResults")  {
                 include "**/*.xml"
             })
         }
