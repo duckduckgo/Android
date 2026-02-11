@@ -78,6 +78,7 @@
         <item name="daxButtonPrimary">@style/Widget.DuckDuckGo.DaxButton.TextButton.Primary</item>
         <item name="daxButtonSecondary">@style/Widget.DuckDuckGo.DaxButton.Secondary</item>
         <item name="daxButtonDestructive">@style/Widget.DuckDuckGo.DaxButton.TextButton.Destructive</item>
+        <item name="daxButtonDestructiveSecondary">@style/Widget.DuckDuckGo.DaxButton.DestructiveSecondary</item>
         <item name="daxButtonGhost">@style/Widget.DuckDuckGo.DaxButton.Ghost</item>
         <item name="daxButtonGhostDestructive">@style/Widget.DuckDuckGo.DaxButton.DestructiveGhost</item>
         <item name="daxButtonGhostAlt">@style/Widget.DuckDuckGo.DaxButton.DestructiveGhostAlt</item>
