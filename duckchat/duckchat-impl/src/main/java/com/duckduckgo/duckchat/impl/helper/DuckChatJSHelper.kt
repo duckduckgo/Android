@@ -180,9 +180,7 @@ class RealDuckChatJSHelper @Inject constructor(
             METHOD_TOGGLE_PAGE_CONTEXT -> {
                 val isEnabled = data?.optBoolean(ENABLED)
                 if (isEnabled != null) {
-                    if (isEnabled) {
-                        duckChatPixels.reportContextualPageContextManuallyAttachedFrontend()
-                    } else {
+                    if (!isEnabled) {
                         duckChatPixels.reportContextualPageContextRemovedFrontend()
                     }
                 }

@@ -185,6 +185,7 @@ class DuckChatContextualViewModel @Inject constructor(
                         )
                     }
                 }
+                duckChatPixels.reportContextualPlaceholderContextShown()
                 return@launch
             }
 
@@ -337,12 +338,13 @@ class DuckChatContextualViewModel @Inject constructor(
                 )
             }
         }
+        duckChatPixels.reportContextualPlaceholderContextShown()
         duckChatPixels.reportContextualPageContextRemovedNative()
     }
 
     fun addPageContext() {
         logcat { "Duck.ai Contextual: addPageContext" }
-
+        duckChatPixels.reportContextualPlaceholderContextTapped()
         viewModelScope.launch {
             val isContextValid = isContextValid(updatedPageContext)
             if (isContextValid) {
@@ -517,6 +519,7 @@ class DuckChatContextualViewModel @Inject constructor(
                 }
             }
         }
+        duckChatPixels.reportContextualPlaceholderContextShown()
     }
 
     private fun hasChatId(url: String?): Boolean {

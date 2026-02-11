@@ -412,7 +412,7 @@ class RealDuckChatJSHelperTest {
     }
 
     @Test
-    fun whenTogglePageContextEnabledThenReportContextAttached() = runTest {
+    fun whenTogglePageContextEnabledThenNoPixelReported() = runTest {
         val featureName = "aiChat"
         val method = "togglePageContextTelemetry"
         val id = "123"
@@ -428,7 +428,7 @@ class RealDuckChatJSHelperTest {
             ),
         )
 
-        verify(mockDuckChatPixels).reportContextualPageContextManuallyAttachedFrontend()
+        verifyNoInteractions(mockDuckChatPixels)
     }
 
     @Test

@@ -43,6 +43,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -433,6 +434,7 @@ class DuckChatContextualViewModelTest {
             val state = testee.viewState.value
             assertFalse(state.showContext)
             assertFalse(state.userRemovedContext)
+            verify(duckChatPixels).reportContextualPlaceholderContextTapped()
         }
 
     @Test
@@ -453,6 +455,7 @@ class DuckChatContextualViewModelTest {
             val state = testee.viewState.value
             assertTrue(state.showContext)
             assertFalse(state.userRemovedContext)
+            verify(duckChatPixels).reportContextualPlaceholderContextTapped()
             verify(duckChatPixels).reportContextualPageContextManuallyAttachedNative()
         }
 
@@ -757,6 +760,7 @@ class DuckChatContextualViewModelTest {
 
         coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
         assertNull(contextualDataStore.getTabChatUrl(tabId))
+        verify(duckChatPixels).reportContextualPlaceholderContextShown()
     }
 
     @Test
@@ -773,6 +777,7 @@ class DuckChatContextualViewModelTest {
         }
 
         verify(duckChatPixels).reportContextualSheetNewChat()
+        verify(duckChatPixels, times(2)).reportContextualPlaceholderContextShown()
     }
 
     @Test
@@ -906,6 +911,7 @@ class DuckChatContextualViewModelTest {
 
         coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
         assertNull(contextualDataStore.getTabChatUrl(tabId))
+        verify(duckChatPixels).reportContextualPlaceholderContextShown()
     }
 
     @Test
@@ -963,6 +969,8 @@ class DuckChatContextualViewModelTest {
 
             cancelAndIgnoreRemainingEvents()
         }
+
+        verify(duckChatPixels).reportContextualPlaceholderContextShown()
     }
 
     @Test
@@ -983,6 +991,7 @@ class DuckChatContextualViewModelTest {
     fun `when sheet opened then contextual opened pixel is fired`() = runTest {
         testee.onSheetOpened("tab-1")
         verify(duckChatPixels).reportContextualSheetOpened()
+        verify(duckChatPixels).reportContextualPlaceholderContextShown()
     }
 
     @Test
@@ -1002,6 +1011,7 @@ class DuckChatContextualViewModelTest {
         runTest {
             testee.removePageContext()
             verify(duckChatPixels).reportContextualPageContextRemovedNative()
+            verify(duckChatPixels).reportContextualPlaceholderContextShown()
         }
 
     private class FakeDuckChat : com.duckduckgo.duckchat.api.DuckChat {
