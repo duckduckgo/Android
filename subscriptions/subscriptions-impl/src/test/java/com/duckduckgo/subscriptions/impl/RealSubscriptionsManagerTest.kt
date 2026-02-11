@@ -62,6 +62,7 @@ import com.duckduckgo.subscriptions.impl.services.ConfirmationEntitlement
 import com.duckduckgo.subscriptions.impl.services.ConfirmationResponse
 import com.duckduckgo.subscriptions.impl.services.CreateAccountResponse
 import com.duckduckgo.subscriptions.impl.services.EntitlementResponse
+import com.duckduckgo.subscriptions.impl.services.PendingPlanResponse
 import com.duckduckgo.subscriptions.impl.services.PortalResponse
 import com.duckduckgo.subscriptions.impl.services.StoreLoginResponse
 import com.duckduckgo.subscriptions.impl.services.SubscriptionResponse
@@ -716,6 +717,55 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             assertEquals(AUTO_RENEWABLE, awaitItem())
             cancelAndConsumeRemainingEvents()
         }
+    }
+
+    @Test
+    fun whenPurchaseSuccessfulWithPendingPlanThenPendingPlanIsStored() = runTest {
+        givenUserIsSignedIn()
+        givenConfirmPurchaseSucceedsWithPendingPlan()
+        givenV2AccessTokenRefreshSucceeds()
+
+        val flowTest: MutableSharedFlow<PurchaseState> = MutableSharedFlow()
+        whenever(playBillingManager.purchaseState).thenReturn(flowTest)
+
+        val manager = RealSubscriptionsManager(
+            authService,
+            subscriptionsService,
+            authRepository,
+            playBillingManager,
+            emailManager,
+            context,
+            TestScope(),
+            coroutineRule.testDispatcherProvider,
+            pixelSender,
+            { privacyProFeature },
+            authClient,
+            authJwtValidator,
+            pkceGenerator,
+            timeProvider,
+            backgroundTokenRefresh,
+            subscriptionPurchaseWideEvent,
+            tokenRefreshWideEvent,
+            subscriptionSwitchWideEvent,
+            freeTrialConversionWideEvent,
+            subscriptionRestoreWideEvent,
+            vpnReminderNotificationScheduler,
+        )
+
+        manager.currentPurchaseState.test {
+            flowTest.emit(Purchased("validToken", "packageName"))
+            assertTrue(awaitItem() is CurrentPurchase.InProgress)
+            assertTrue(awaitItem() is CurrentPurchase.Success)
+            cancelAndConsumeRemainingEvents()
+        }
+
+        val subscription = authRepository.getSubscription()
+        assertNotNull(subscription)
+        assertEquals(1, subscription!!.pendingPlans.size)
+        assertEquals(YEARLY_PLAN_US, subscription.pendingPlans[0].productId)
+        assertEquals("Yearly", subscription.pendingPlans[0].billingPeriod)
+        assertEquals(2000000L, subscription.pendingPlans[0].effectiveAt)
+        assertEquals("scheduled", subscription.pendingPlans[0].status)
     }
 
     @Test
@@ -1941,6 +1991,35 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         )
     }
 
+    private suspend fun givenConfirmPurchaseSucceedsWithPendingPlan() {
+        whenever(subscriptionsService.confirm(any())).thenReturn(
+            ConfirmationResponse(
+                email = "test@duck.com",
+                entitlements = listOf(
+                    ConfirmationEntitlement(NetP.value, NetP.value),
+                ),
+                subscription = SubscriptionResponse(
+                    productId = MONTHLY_PLAN_US,
+                    billingPeriod = "Monthly",
+                    platform = "google",
+                    status = "Auto-Renewable",
+                    startedAt = 1000000L,
+                    expiresOrRenewsAt = 1000000L,
+                    activeOffers = listOf(),
+                    pendingPlans = listOf(
+                        PendingPlanResponse(
+                            productId = YEARLY_PLAN_US,
+                            billingPeriod = "Yearly",
+                            effectiveAt = 2000000L,
+                            status = "scheduled",
+                            tier = "plus",
+                        ),
+                    ),
+                ),
+            ),
+        )
+    }
+
     private suspend fun givenV2AccessTokenRefreshSucceeds(
         newAccessToken: String = FAKE_ACCESS_TOKEN_V2,
         newRefreshToken: String = FAKE_REFRESH_TOKEN_V2,
@@ -2509,6 +2588,87 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
     @SuppressLint("DenyListedApi")
     private fun givenBlackFridayFeatureFlagEnabled(value: Boolean) {
         privacyProFeature.blackFridayOffer2025().setRawStoredState(State(remoteEnableState = value))
+    }
+
+    @Test
+    fun whenRefreshSubscriptionDataWithPendingPlansThenStoresPendingPlans() = runTest {
+        givenUserIsSignedIn()
+        givenSubscriptionSucceedsWithPendingPlans()
+
+        subscriptionsManager.refreshSubscriptionData()
+
+        val subscription = subscriptionsManager.getSubscription()
+        assertNotNull(subscription)
+        assertEquals(1, subscription!!.pendingPlans.size)
+        assertEquals("ddg-privacy-pro-yearly-renews-us", subscription.pendingPlans[0].productId)
+        assertEquals(SubscriptionTier.PLUS, subscription.pendingPlans[0].tier)
+        assertTrue(subscription.hasPendingChange)
+    }
+
+    @Test
+    fun whenRefreshSubscriptionDataWithNoPendingPlansThenStoresEmptyList() = runTest {
+        givenUserIsSignedIn()
+        givenSubscriptionSucceedsWithNoPendingPlans()
+
+        subscriptionsManager.refreshSubscriptionData()
+
+        val subscription = subscriptionsManager.getSubscription()
+        assertNotNull(subscription)
+        assertTrue(subscription!!.pendingPlans.isEmpty())
+        assertFalse(subscription.hasPendingChange)
+    }
+
+    @Test
+    fun whenSubscriptionHasPendingPlanThenEffectiveTierReflectsPendingTier() = runTest {
+        givenUserIsSignedIn()
+        givenSubscriptionSucceedsWithPendingPlans()
+
+        subscriptionsManager.refreshSubscriptionData()
+
+        val subscription = subscriptionsManager.getSubscription()
+        assertNotNull(subscription)
+        // Current tier is based on productId
+        assertEquals(SubscriptionTier.PLUS, subscription!!.tier)
+        // Effective tier reflects the pending plan's tier
+        assertEquals(SubscriptionTier.PLUS, subscription.effectiveTier)
+    }
+
+    private suspend fun givenSubscriptionSucceedsWithPendingPlans() {
+        whenever(subscriptionsService.subscription()).thenReturn(
+            SubscriptionResponse(
+                productId = MONTHLY_PLAN_US,
+                billingPeriod = "Monthly",
+                startedAt = 1234,
+                expiresOrRenewsAt = 1234,
+                platform = "android",
+                status = "Auto-Renewable",
+                activeOffers = listOf(),
+                pendingPlans = listOf(
+                    PendingPlanResponse(
+                        productId = "ddg-privacy-pro-yearly-renews-us",
+                        billingPeriod = "yearly",
+                        effectiveAt = 1700000000000L,
+                        status = "scheduled",
+                        tier = "plus",
+                    ),
+                ),
+            ),
+        )
+    }
+
+    private suspend fun givenSubscriptionSucceedsWithNoPendingPlans() {
+        whenever(subscriptionsService.subscription()).thenReturn(
+            SubscriptionResponse(
+                productId = MONTHLY_PLAN_US,
+                billingPeriod = "Monthly",
+                startedAt = 1234,
+                expiresOrRenewsAt = 1234,
+                platform = "android",
+                status = "Auto-Renewable",
+                activeOffers = listOf(),
+                pendingPlans = emptyList(),
+            ),
+        )
     }
 
     private companion object {

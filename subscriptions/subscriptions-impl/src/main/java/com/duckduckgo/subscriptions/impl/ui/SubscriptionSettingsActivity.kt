@@ -33,9 +33,9 @@ import com.duckduckgo.common.ui.view.button.ButtonType.GHOST_ALT
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
+import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.mobile.android.R
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.subscriptions.api.ActiveOfferType
 import com.duckduckgo.subscriptions.api.PrivacyProFeedbackScreens.PrivacyProFeedbackScreenWithParams
@@ -171,6 +171,12 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
         binding.faq.setPrimaryText(getString(string.privacyProFaq))
         binding.faq.setSecondaryText(getString(string.privacyProFaqSecondary))
 
+        // Reset all tier-related views to default hidden state
+        // This ensures proper state when transitioning between tiers or subscription states
+        binding.tierName.isVisible = false
+        binding.viewAllPlansTop.isVisible = false
+        binding.upgradeToProContainer.isVisible = false
+
         if (viewState.status in listOf(INACTIVE, EXPIRED)) {
             binding.viewPlans.isVisible = true
             binding.changePlan.isVisible = false
@@ -187,27 +193,29 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
             if (viewState.isProTierEnabled) {
                 val tier = viewState.subscriptionTier
 
-                binding.tierPill.isVisible = true
+                binding.tierName.isVisible = true
                 binding.viewAllPlansTop.isVisible = true
                 when (tier) {
                     PRO -> {
-                        binding.tierPill.setImageResource(R.drawable.ic_pro_pill)
+                        binding.tierName.text = getString(string.tierProName)
+                        binding.tierName.setTypography(DaxTextView.Typography.Body2Bold)
                     }
 
                     PLUS -> {
-                        binding.tierPill.setImageResource(R.drawable.ic_plus_pill)
+                        binding.tierName.text = getString(string.tierPlusName)
+                        binding.tierName.setTypography(DaxTextView.Typography.Body2)
                         binding.upgradeToProContainer.isVisible = true
                     }
 
                     UNKNOWN -> {
                         // In case of unknown tier, we hide the pill
-                        binding.tierPill.gone()
+                        binding.tierName.gone()
                     }
                 }
             }
 
-            // Show switch plan option if available (Android only)
-            if (viewState.switchPlanAvailable && viewState.platform.lowercase() == "google") {
+            // Show switch plan option if available (Android only, Plus tier only)
+            if (viewState.switchPlanAvailable && viewState.platform.lowercase() == "google" && viewState.subscriptionTier == PLUS) {
                 binding.switchPlan.show()
                 val switchText = when (viewState.duration) {
                     Monthly -> getString(string.subscriptionSettingSwitchUpgradeDynamic, viewState.savingsPercentage.toString())
@@ -234,8 +242,9 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
                 }
                 binding.changePlan.setSecondaryText(subscriptionRenewalDetailsRes)
 
-                // Active status without a Free Trial
-            } else {
+                // Override with pending plan message if there's a deferred change
+                showPendingPlanMessageIfPresent(viewState)
+            } else { // Active status without a Free Trial
                 binding.subscriptionActiveStatusTextView.text = getString(string.subscriptionStatusSubscribed)
 
                 val status = when (viewState.status) {
@@ -249,6 +258,9 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
                 }
 
                 binding.changePlan.setSecondaryText(getString(subscriptionsDataStringResId, status, viewState.date))
+
+                // Override with pending plan message if there's a deferred change
+                showPendingPlanMessageIfPresent(viewState)
             }
 
             when (viewState.platform.lowercase()) {
@@ -428,6 +440,20 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
                 screenTitle = getString(string.privacyPolicyAndTermsOfService),
             ),
         )
+    }
+
+    private fun showPendingPlanMessageIfPresent(viewState: ViewState.Ready) {
+        if (viewState.pendingPlanDisplayNameResId != null && viewState.pendingEffectiveDate != null) {
+            val changeTypeString = if (viewState.isPendingDowngrade == true) {
+                string.subscriptionPendingPlanChangeDowngrade
+            } else {
+                string.subscriptionPendingPlanChangeUpgrade
+            }
+            val pendingPlanDisplayName = getString(viewState.pendingPlanDisplayNameResId)
+            binding.changePlan.setSecondaryText(
+                getString(changeTypeString, pendingPlanDisplayName, viewState.pendingEffectiveDate),
+            )
+        }
     }
 
     companion object {

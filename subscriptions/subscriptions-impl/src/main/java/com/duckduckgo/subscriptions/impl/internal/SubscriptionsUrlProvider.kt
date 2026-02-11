@@ -43,5 +43,5 @@ class RealSubscriptionsUrlProvider @Inject constructor(
 
     override val plansUrl: String = "${subscriptionsBaseUrl.subscriptionsBaseUrl}/plans"
 
-    override val upgradeToProUrl: String = "${subscriptionsBaseUrl.subscriptionsBaseUrl}/plans?goToUpgrade=true"
+    override val upgradeToProUrl: String = "${subscriptionsBaseUrl.subscriptionsBaseUrl}/plans?tier=pro"
 }

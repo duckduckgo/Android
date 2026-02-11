@@ -30,7 +30,17 @@
     <string name="subscriptionsProUpgradeMessage">Unlock more powerful AI</string>
     <string name="subscriptionSettingSectionManageSubscription">Manage Subscription</string>
     <string name="subscriptionSettingViewAllPlans">View All Plans</string>
-    <string name="subscriptionSettingUpdatePaymentOrCancel">Update Payments or Cancel</string>
+    <string name="subscriptionSettingManagePaymentOrCancel">Manage Payment or Cancel</string>
+
+    <!-- Pending plan changes -->
+    <string name="subscriptionPendingPlanChangeUpgrade" instruction="First placeholder is the plan name (e.g. Plus Yearly), third is a date">Your plan will upgrade to %1$s on %2$s.</string>
+    <string name="subscriptionPendingPlanChangeDowngrade" instruction="First placeholder is the plan name (e.g. Plus Yearly), third is a date">Your plan will downgrade to %1$s on %2$s.</string>
+    <string name="planNamePlusMonthly">Plus Monthly</string>
+    <string name="planNamePlusYearly">Plus Yearly</string>
+    <string name="planNameProMonthly">Pro Monthly</string>
+    <string name="planNameProYearly">Pro Yearly</string>
+    <string name="tierPlusName" translatable="false">PLUS</string>
+    <string name="tierProName" translatable="false">PRO</string>
 
     <!-- VPN Reminder Notification -->
     <string name="vpnReminderNotificationChannelName">VPN Reminders</string>

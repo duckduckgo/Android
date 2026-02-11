@@ -66,6 +66,7 @@ import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.AccessToken
 import com.duckduckgo.subscriptions.impl.repository.Account
 import com.duckduckgo.subscriptions.impl.repository.AuthRepository
+import com.duckduckgo.subscriptions.impl.repository.PendingPlan
 import com.duckduckgo.subscriptions.impl.repository.RefreshToken
 import com.duckduckgo.subscriptions.impl.repository.Subscription
 import com.duckduckgo.subscriptions.impl.repository.isActive
@@ -708,6 +709,21 @@ class RealSubscriptionsManager @Inject constructor(
                 ),
             )
 
+            val pendingPlans = try {
+                confirmationResponse.subscription.pendingPlans.map {
+                    PendingPlan(
+                        productId = it.productId,
+                        billingPeriod = it.billingPeriod,
+                        effectiveAt = it.effectiveAt,
+                        status = it.status,
+                        tier = SubscriptionTier.fromTierString(it.tier),
+                    )
+                }
+            } catch (e: Exception) {
+                logcat(ERROR) { "Failed to parse pending plans: ${e.asLog()}" }
+                emptyList()
+            }
+
             val subscription = Subscription(
                 productId = confirmationResponse.subscription.productId,
                 billingPeriod = confirmationResponse.subscription.billingPeriod,
@@ -716,6 +732,7 @@ class RealSubscriptionsManager @Inject constructor(
                 status = confirmationResponse.subscription.status.toStatus(),
                 platform = confirmationResponse.subscription.platform,
                 activeOffers = confirmationResponse.subscription.activeOffers.map { it.type.toActiveOfferType() },
+                pendingPlans = pendingPlans,
             )
 
             authRepository.setSubscription(subscription)
@@ -930,6 +947,22 @@ class RealSubscriptionsManager @Inject constructor(
                 null
             }
 
+        // Convert full pendingPlans array to domain models
+        val pendingPlans = try {
+            subscription.pendingPlans.map {
+                PendingPlan(
+                    productId = it.productId,
+                    billingPeriod = it.billingPeriod,
+                    effectiveAt = it.effectiveAt,
+                    status = it.status,
+                    tier = SubscriptionTier.fromTierString(it.tier),
+                )
+            }
+        } catch (e: Exception) {
+            logcat(ERROR) { "Failed to parse pending plans: ${e.asLog()}" }
+            emptyList()
+        }
+
         authRepository.setSubscription(
             Subscription(
                 productId = subscription.productId,
@@ -939,6 +972,7 @@ class RealSubscriptionsManager @Inject constructor(
                 status = subscription.status.toStatus(),
                 platform = subscription.platform,
                 activeOffers = subscription.activeOffers.map { it.type.toActiveOfferType() },
+                pendingPlans = pendingPlans,
             ),
         )
 
@@ -1085,9 +1119,15 @@ class RealSubscriptionsManager @Inject constructor(
         subscriptionRestoreWideEvent.onGooglePlayRestoreFlowStartedOnPurchaseAttempt()
         when (val result = recoverSubscriptionFromStore()) {
             is RecoverSubscriptionResult.Success -> {
+                logcat {
+                    "Recovering: Recovered subscription from store on purchase attempt: ${result.subscription}"
+                }
                 subscriptionRestoreWideEvent.onGooglePlayRestoreSuccess()
             }
             is RecoverSubscriptionResult.Failure -> {
+                logcat {
+                    "Recovering: Failed to recover subscription from store on purchase attempt: ${result.message}"
+                }
                 subscriptionRestoreWideEvent.onGooglePlayRestoreFailure(error = result.message)
             }
         }
@@ -1249,6 +1289,9 @@ class RealSubscriptionsManager @Inject constructor(
             val subscription = authRepository.getSubscription()
 
             if (subscription?.isActive() == true) {
+                logcat {
+                    "Recovering: User already has an active subscription: $subscription"
+                }
                 pixelSender.reportSubscriptionActivated()
                 pixelSender.reportRestoreAfterPurchaseAttemptSuccess()
                 _currentPurchaseState.emit(CurrentPurchase.Recovered)

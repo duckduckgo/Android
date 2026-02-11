@@ -9,6 +9,7 @@ import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.RestoreSubscriptionScreenWithParams
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionPurchase
+import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionUpgrade
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionsSettingsScreenWithEmptyParams
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.EXPIRED
@@ -87,6 +88,7 @@ class RealSubscriptionsJSHelperTest {
                     put("getAuthAccessToken")
                     put("getFeatureConfig")
                     put("authUpdate")
+                    put("openSubscriptionUpgrade")
                 },
             )
             put("platform", "android")
@@ -235,17 +237,20 @@ class RealSubscriptionsJSHelperTest {
     }
 
     @Test
-    fun whenGetFeatureConfigRequestThenReturnJsCallbackDataWithUsePaidDuckAiFlag() = runTest {
+    fun whenAllFeatureFlagsEnabledGetFeatureConfigRequestThenReturnJsCallbackDataWithExpectedFeatureFlags() = runTest {
         val method = "getFeatureConfig"
         val id = "123"
         val usePaidDuckAi = true
+        val useProTier = true
 
         privacyProFeature.duckAiPlus().setRawStoredState(com.duckduckgo.feature.toggles.api.Toggle.State(usePaidDuckAi))
+        privacyProFeature.allowProTierPurchase().setRawStoredState(com.duckduckgo.feature.toggles.api.Toggle.State(useProTier))
 
         val result = testee.processJsCallbackMessage(featureName, method, id, null, null)
 
         val jsonPayload = JSONObject().apply {
             put("usePaidDuckAi", usePaidDuckAi)
+            put("useProTier", useProTier)
         }
 
         val expected = JsCallbackData(jsonPayload, featureName, method, id)
@@ -257,17 +262,45 @@ class RealSubscriptionsJSHelperTest {
     }
 
     @Test
-    fun whenGetFeatureConfigRequestWithDisabledFlagThenReturnJsCallbackDataWithUsePaidDuckAiFalse() = runTest {
+    fun whenAllFeatureFlagsDisabledGetFeatureConfigRequestThenReturnJsCallbackDataWithExpectedFeatureFlags() = runTest {
         val method = "getFeatureConfig"
         val id = "123"
         val usePaidDuckAi = false
+        val useProTier = false
 
         privacyProFeature.duckAiPlus().setRawStoredState(com.duckduckgo.feature.toggles.api.Toggle.State(usePaidDuckAi))
+        privacyProFeature.allowProTierPurchase().setRawStoredState(com.duckduckgo.feature.toggles.api.Toggle.State(useProTier))
 
         val result = testee.processJsCallbackMessage(featureName, method, id, null, null)
 
         val jsonPayload = JSONObject().apply {
             put("usePaidDuckAi", usePaidDuckAi)
+            put("useProTier", useProTier)
+        }
+
+        val expected = JsCallbackData(jsonPayload, featureName, method, id)
+
+        assertEquals(expected.id, result?.id)
+        assertEquals(expected.featureName, result?.featureName)
+        assertEquals(expected.method, result?.method)
+        assertEquals(expected.params.toString(), result?.params.toString())
+    }
+
+    @Test
+    fun whenGetFeatureConfigRequestWithMixedFlagsThenReturnWithExpectedFeatureFlags() = runTest {
+        val method = "getFeatureConfig"
+        val id = "123"
+        val usePaidDuckAi = true
+        val useProTier = false
+
+        privacyProFeature.duckAiPlus().setRawStoredState(com.duckduckgo.feature.toggles.api.Toggle.State(usePaidDuckAi))
+        privacyProFeature.allowProTierPurchase().setRawStoredState(com.duckduckgo.feature.toggles.api.Toggle.State(useProTier))
+
+        val result = testee.processJsCallbackMessage(featureName, method, id, null, null)
+
+        val jsonPayload = JSONObject().apply {
+            put("usePaidDuckAi", usePaidDuckAi)
+            put("useProTier", useProTier)
         }
 
         val expected = JsCallbackData(jsonPayload, featureName, method, id)
@@ -325,6 +358,55 @@ class RealSubscriptionsJSHelperTest {
         val result = testee.processJsCallbackMessage(featureName, method, id, null, context)
 
         verify(mockGlobalActivityStarter).start(context, SubscriptionPurchase(featurePage = "duckai"))
+        assertNull(result)
+    }
+
+    @Test
+    fun whenOpenSubscriptionUpgradeRequestWithOriginThenLaunchUpgradeWithOrigin() = runTest {
+        val method = "openSubscriptionUpgrade"
+        val id = "123"
+        val context: Context = mock()
+        val origin = "duckai_upgrade_prompt"
+        val data = JSONObject().apply { put("origin", origin) }
+
+        val result = testee.processJsCallbackMessage(featureName, method, id, data, context)
+
+        verify(mockGlobalActivityStarter).start(context, SubscriptionUpgrade(origin = origin))
+        assertNull(result)
+    }
+
+    @Test
+    fun whenOpenSubscriptionUpgradeRequestWithoutOriginThenLaunchUpgradeWithDefaultParams() = runTest {
+        val method = "openSubscriptionUpgrade"
+        val id = "123"
+        val context: Context = mock()
+
+        val result = testee.processJsCallbackMessage(featureName, method, id, null, context)
+
+        verify(mockGlobalActivityStarter).start(context, SubscriptionUpgrade())
+        assertNull(result)
+    }
+
+    @Test
+    fun whenOpenSubscriptionUpgradeRequestWithEmptyOriginThenLaunchUpgradeWithDefaultParams() = runTest {
+        val method = "openSubscriptionUpgrade"
+        val id = "123"
+        val context: Context = mock()
+        val data = JSONObject().apply { put("origin", "") }
+
+        val result = testee.processJsCallbackMessage(featureName, method, id, data, context)
+
+        verify(mockGlobalActivityStarter).start(context, SubscriptionUpgrade())
+        assertNull(result)
+    }
+
+    @Test
+    fun whenOpenSubscriptionUpgradeRequestWithNullContextThenReturnNull() = runTest {
+        val method = "openSubscriptionUpgrade"
+        val id = "123"
+
+        val result = testee.processJsCallbackMessage(featureName, method, id, null, null)
+
         assertNull(result)
     }
 }

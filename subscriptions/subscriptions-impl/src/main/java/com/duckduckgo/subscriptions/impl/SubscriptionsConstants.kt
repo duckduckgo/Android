@@ -32,24 +32,39 @@ object SubscriptionsConstants {
     const val YEARLY_PLAN_ROW = "ddg-privacy-pro-yearly-renews-row"
     const val MONTHLY_PLAN_ROW = "ddg-privacy-pro-monthly-renews-row"
 
-    val LIST_OF_PLUS_PLANS =
-        listOf(YEARLY_PLAN_US, MONTHLY_PLAN_US, YEARLY_PLAN_ROW, MONTHLY_PLAN_ROW)
+    val LIST_MONTHLY_PLUS_PLANS = listOf(MONTHLY_PLAN_US, MONTHLY_PLAN_ROW)
+    val LIST_YEARLY_PLUS_PLANS = listOf(YEARLY_PLAN_US, YEARLY_PLAN_ROW)
 
-    const val YEARLY_PRO_PLAN_US = "ddg-subscription-pro-sandbox-yearly-renews-us"
-    const val MONTHLY_PRO_PLAN_US = "ddg-subscription-pro-sandbox-monthly-renews-us"
-    const val YEARLY_PRO_PLAN_ROW = "ddg-subscription-pro-sandbox-yearly-renews-row"
-    const val MONTHLY_PRO_PLAN_ROW = "ddg-subscription-pro-sandbox-monthly-renews-row"
+    val LIST_OF_PLUS_PLANS = LIST_MONTHLY_PLUS_PLANS + LIST_YEARLY_PLUS_PLANS
 
-    val LIST_OF_PRO_PLANS =
-        listOf(YEARLY_PRO_PLAN_US, MONTHLY_PRO_PLAN_US, YEARLY_PRO_PLAN_ROW, MONTHLY_PRO_PLAN_ROW)
+    const val YEARLY_PRO_PLAN_US = "ddg-subscription-pro-yearly-renews-us"
+    const val MONTHLY_PRO_PLAN_US = "ddg-subscription-pro-monthly-renews-us"
+    const val YEARLY_PRO_PLAN_ROW = "ddg-subscription-pro-yearly-renews-row"
+    const val MONTHLY_PRO_PLAN_ROW = "ddg-subscription-pro-monthly-renews-row"
 
-    // List of offers
+    val LIST_MONTHLY_PRO_PLANS = listOf(MONTHLY_PRO_PLAN_US, MONTHLY_PRO_PLAN_ROW)
+    val LIST_YEARLY_PRO_PLANS = listOf(YEARLY_PRO_PLAN_US, YEARLY_PRO_PLAN_ROW)
+
+    val LIST_OF_PRO_PLANS = LIST_MONTHLY_PRO_PLANS + LIST_YEARLY_PRO_PLANS
+
+    // List of offers (Plus free trial)
     const val MONTHLY_FREE_TRIAL_OFFER_US = "ddg-privacy-pro-freetrial-monthly-renews-us"
     const val YEARLY_FREE_TRIAL_OFFER_US = "ddg-privacy-pro-freetrial-yearly-renews-us"
     const val MONTHLY_FREE_TRIAL_OFFER_ROW = "ddg-privacy-pro-freetrial-monthly-renews-row"
     const val YEARLY_FREE_TRIAL_OFFER_ROW = "ddg-privacy-pro-freetrial-yearly-renews-row"
-    val LIST_OF_FREE_TRIAL_OFFERS =
+    val LIST_OF_PLUS_FREE_TRIAL_OFFERS =
         listOf(MONTHLY_FREE_TRIAL_OFFER_US, YEARLY_FREE_TRIAL_OFFER_US, MONTHLY_FREE_TRIAL_OFFER_ROW, YEARLY_FREE_TRIAL_OFFER_ROW)
+
+    // List of offers (Pro free trial)
+    const val MONTHLY_PRO_FREE_TRIAL_OFFER_US = "ddg-subscription-pro-freetrial-monthly-renews-us"
+    const val YEARLY_PRO_FREE_TRIAL_OFFER_US = "ddg-subscription-pro-freetrial-yearly-renews-us"
+    const val MONTHLY_PRO_FREE_TRIAL_OFFER_ROW = "ddg-subscription-pro-freetrial-monthly-renews-row"
+    const val YEARLY_PRO_FREE_TRIAL_OFFER_ROW = "ddg-subscription-pro-freetrial-yearly-renews-row"
+    val LIST_OF_PRO_FREE_TRIAL_OFFERS =
+        listOf(MONTHLY_PRO_FREE_TRIAL_OFFER_US, YEARLY_PRO_FREE_TRIAL_OFFER_US, MONTHLY_PRO_FREE_TRIAL_OFFER_ROW, YEARLY_PRO_FREE_TRIAL_OFFER_ROW)
+
+    // Combined list of all free trial offers
+    val LIST_OF_FREE_TRIAL_OFFERS = LIST_OF_PLUS_FREE_TRIAL_OFFERS + LIST_OF_PRO_FREE_TRIAL_OFFERS
 
     // List of features
     const val LEGACY_FE_NETP = "vpn"
@@ -99,6 +114,10 @@ enum class SubscriptionTier(val value: String) {
 
         fun fromPlanId(planId: String): SubscriptionTier {
             return PLAN_TO_TIER.entries.find { it.value.contains(planId) }?.key ?: UNKNOWN
+        }
+
+        fun fromTierString(tierString: String): SubscriptionTier {
+            return entries.find { it.value == tierString } ?: UNKNOWN
         }
     }
 }

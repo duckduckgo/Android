@@ -24,6 +24,7 @@ import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.RestoreSubscriptionScreenWithParams
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionPurchase
+import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionUpgrade
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionsSettingsScreenWithEmptyParams
 import com.duckduckgo.subscriptions.api.SubscriptionsJSHelper
 import kotlinx.coroutines.test.runTest
@@ -303,5 +304,74 @@ class SubscriptionsHandlerTest {
 
         verify(subscriptionsJSHelper).processJsCallbackMessage(featureName, method, id, data, null)
         verify(globalActivityStarter).start(context, SubscriptionPurchase(featurePage = "duckai"))
+    }
+
+    @Test
+    fun `handleSubscriptionsFeature launches subscription upgrade screen when method is openSubscriptionUpgrade`() = runTest {
+        val featureName = "subscriptions"
+        val method = "openSubscriptionUpgrade"
+        val id = "testId"
+        val data = JSONObject()
+        val response = JsCallbackData(JSONObject(), featureName, method, id)
+        whenever(subscriptionsJSHelper.processJsCallbackMessage(featureName, method, id, data, null))
+            .thenReturn(response)
+
+        subscriptionsHandler.handleSubscriptionsFeature(
+            featureName,
+            method,
+            id,
+            data,
+            context,
+            coroutineRule.testScope,
+            contentScopeScripts,
+        )
+
+        verify(globalActivityStarter).start(context, SubscriptionUpgrade())
+    }
+
+    @Test
+    fun `handleSubscriptionsFeature launches subscription upgrade with origin when valid origin provided`() = runTest {
+        val featureName = "subscriptions"
+        val method = "openSubscriptionUpgrade"
+        val id = "testId"
+        val data = JSONObject("{\"origin\": \"duckai_upgrade_prompt\"}")
+        val response = JsCallbackData(JSONObject(), featureName, method, id)
+        whenever(subscriptionsJSHelper.processJsCallbackMessage(featureName, method, id, data, null))
+            .thenReturn(response)
+
+        subscriptionsHandler.handleSubscriptionsFeature(
+            featureName,
+            method,
+            id,
+            data,
+            context,
+            coroutineRule.testScope,
+            contentScopeScripts,
+        )
+
+        verify(globalActivityStarter).start(context, SubscriptionUpgrade(origin = "duckai_upgrade_prompt"))
+    }
+
+    @Test
+    fun `handleSubscriptionsFeature launches subscription upgrade without origin when data is null for openSubscriptionUpgrade`() = runTest {
+        val featureName = "subscriptions"
+        val method = "openSubscriptionUpgrade"
+        val id = "testId"
+        val data: JSONObject? = null
+        val response = JsCallbackData(JSONObject(), featureName, method, id)
+        whenever(subscriptionsJSHelper.processJsCallbackMessage(featureName, method, id, data, null))
+            .thenReturn(response)
+
+        subscriptionsHandler.handleSubscriptionsFeature(
+            featureName,
+            method,
+            id,
+            data,
+            context,
+            coroutineRule.testScope,
+            contentScopeScripts,
+        )
+
+        verify(globalActivityStarter).start(context, SubscriptionUpgrade())
     }
 }
