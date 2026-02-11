@@ -31,8 +31,8 @@ import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.impl.PrivacyProFeature
 import com.duckduckgo.subscriptions.impl.R
 import com.duckduckgo.subscriptions.impl.SubscriptionTier
-import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN_ROW
-import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN_US
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.LIST_MONTHLY_PLUS_PLANS
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.LIST_MONTHLY_PRO_PLANS
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.PendingPlan
@@ -96,8 +96,9 @@ class SubscriptionSettingsViewModel @Inject constructor(
 
         val formatter = DateFormat.getInstanceForSkeleton("ddMMMMyyyy")
         val date = formatter.format(Date(subscription.expiresOrRenewsAt))
+        val monthlyPlans = LIST_MONTHLY_PLUS_PLANS + LIST_MONTHLY_PRO_PLANS
         val type = when (subscription.productId) {
-            MONTHLY_PLAN_US, MONTHLY_PLAN_ROW -> Monthly
+            in monthlyPlans -> Monthly
             else -> Yearly
         }
 
