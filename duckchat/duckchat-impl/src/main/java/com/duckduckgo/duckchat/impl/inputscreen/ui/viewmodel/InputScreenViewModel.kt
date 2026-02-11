@@ -293,6 +293,13 @@ class InputScreenViewModel @AssistedInject constructor(
                 it.copy(showSearchLogo = shouldShowSearchLogo)
             }
         }.launchIn(viewModelScope)
+
+        _chatSuggestions.onEach { suggestions ->
+            val hasChatSuggestions = suggestions.isNotEmpty()
+            _visibilityState.update {
+                it.copy(showChatLogo = !hasChatSuggestions, chatSuggestionsVisible = hasChatSuggestions)
+            }
+        }.launchIn(viewModelScope)
     }
 
     fun onActivityResume() {
@@ -400,9 +407,17 @@ class InputScreenViewModel @AssistedInject constructor(
 
     fun onChatInputTextChanged(query: String) {
         chatInputTextState.value = query.trim()
+
+        // If the query is emptied and there is stale search text, proactively clear it
+        // so that showSearchLogo updates and the logo transition animates when swiping back
+        // We guard on hasMovedBeyondInitialUrl to avoid prematurely enabling autocomplete
+        // when the input screen was opened from the address bar with a URL
+        if (query.trim().isEmpty() && hasMovedBeyondInitialUrl.value && searchInputTextState.value.isNotEmpty()) {
+            searchInputTextState.value = ""
+        }
+
         _visibilityState.update {
             it.copy(
-                showChatLogo = true,
                 newLineButtonVisible = query.isNotBlank(),
             )
         }
@@ -507,21 +522,17 @@ class InputScreenViewModel @AssistedInject constructor(
     fun onPageScrolled(
         position: Int,
         positionOffset: Float,
-        wasAutoCompleteVisibleOnSwipeStart: Boolean = false,
-        hadInputTextOnSwipeStart: Boolean = false,
     ) {
-        if (!isTapTransition) {
-            val hasFavoritesOrAutocomplete = newTabPageHasContent.value ||
-                _visibilityState.value.autoCompleteSuggestionsVisible ||
-                wasAutoCompleteVisibleOnSwipeStart
+        if (isTapTransition) return
 
-            if (!hasFavoritesOrAutocomplete && !hadInputTextOnSwipeStart) {
-                val logoProgress = calculateLogoProgress(position, positionOffset)
-                command.value = Command.SetLogoProgress(logoProgress)
-            }
-            val widgetOffset = calculateInputModeWidgetScrollPosition(positionOffset)
-            command.value = Command.SetInputModeWidgetScrollPosition(position, widgetOffset)
+        val shouldMorphLogos = _visibilityState.value.showSearchLogo && _visibilityState.value.showChatLogo
+
+        if (shouldMorphLogos) {
+            val logoProgress = calculateLogoProgress(position, positionOffset)
+            command.value = Command.SetLogoProgress(logoProgress)
         }
+        val widgetOffset = calculateInputModeWidgetScrollPosition(positionOffset)
+        command.value = Command.SetInputModeWidgetScrollPosition(position, widgetOffset)
     }
 
     private fun calculateLogoProgress(
@@ -538,17 +549,14 @@ class InputScreenViewModel @AssistedInject constructor(
             else -> 1f - (1f - positionOffset) * (1f - positionOffset) * 2f
         }
 
-    fun onTabTapped(index: Int, currentInputText: String = "") {
-        if (currentPagePosition != index) {
-            isTapTransition = true
-            val willHaveAutocomplete = currentInputText.isNotBlank() && _visibilityState.value.autoCompleteSuggestionsVisible
-            val hasFavoritesOrAutocomplete = newTabPageHasContent.value || willHaveAutocomplete
+    fun onTabTapped(index: Int) {
+        if (currentPagePosition == index) return
 
-            if (!hasFavoritesOrAutocomplete) {
-                command.value = Command.AnimateLogoToProgress(index.toFloat())
-            } else if (index == 1) {
-                command.value = Command.SetLogoProgress(1f)
-            }
+        isTapTransition = true
+
+        val shouldMorphLogos = _visibilityState.value.showSearchLogo && _visibilityState.value.showChatLogo
+        if (shouldMorphLogos) {
+            command.value = Command.AnimateLogoToProgress(index.toFloat())
         }
     }
 

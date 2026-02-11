@@ -1412,7 +1412,7 @@ class InputScreenViewModelTest {
         }
 
     @Test
-    fun `when onTabTapped and has content then SetLogoProgress is emitted`() =
+    fun `when onTabTapped and has content then no command is emitted`() =
         runTest {
             val viewModel = createViewModel()
             val capturedCommands = mutableListOf<Command>()
@@ -1426,12 +1426,11 @@ class InputScreenViewModelTest {
             viewModel.onNewTabPageContentChanged(hasContent = true)
             viewModel.onTabTapped(index = 1)
 
-            assertEquals(1, capturedCommands.size)
-            assertEquals(SetLogoProgress(1f), capturedCommands[0])
+            assertEquals(0, capturedCommands.size)
         }
 
     @Test
-    fun `when onTabTapped with input text and autocomplete visible then SetLogoProgress is emitted`() =
+    fun `when onTabTapped and search logo hidden by autocomplete then no command is emitted`() =
         runTest {
             val viewModel = createViewModel("search query")
             val capturedCommands = mutableListOf<Command>()
@@ -1443,14 +1442,13 @@ class InputScreenViewModelTest {
             }
 
             assertTrue(viewModel.visibilityState.value.autoCompleteSuggestionsVisible)
-            viewModel.onTabTapped(index = 1, currentInputText = "search query")
+            viewModel.onTabTapped(index = 1)
 
-            assertEquals(1, capturedCommands.size)
-            assertEquals(SetLogoProgress(1f), capturedCommands[0])
+            assertEquals(0, capturedCommands.size)
         }
 
     @Test
-    fun `when onTabTapped with input text but autocomplete not visible then AnimateLogoToProgress is emitted`() =
+    fun `when onTabTapped and both logos visible then AnimateLogoToProgress is emitted`() =
         runTest {
             val viewModel = createViewModel("https://example.com")
             val capturedCommands = mutableListOf<Command>()
@@ -1462,7 +1460,7 @@ class InputScreenViewModelTest {
             }
 
             assertFalse(viewModel.visibilityState.value.autoCompleteSuggestionsVisible)
-            viewModel.onTabTapped(index = 1, currentInputText = "https://example.com")
+            viewModel.onTabTapped(index = 1)
 
             assertEquals(1, capturedCommands.size)
             assertEquals(AnimateLogoToProgress(1f), capturedCommands[0])
@@ -1584,9 +1582,9 @@ class InputScreenViewModelTest {
         }
 
     @Test
-    fun `when onPageScrolled with wasAutoCompleteVisibleOnSwipeStart true then SetLogoProgress is not emitted`() =
+    fun `when onPageScrolled and search logo hidden then SetLogoProgress is not emitted`() =
         runTest {
-            val viewModel = createViewModel()
+            val viewModel = createViewModel("search query")
             val capturedCommands = mutableListOf<Command>()
 
             viewModel.command.observeForever { command ->
@@ -1595,22 +1593,20 @@ class InputScreenViewModelTest {
                 }
             }
 
+            assertFalse(viewModel.visibilityState.value.showSearchLogo)
+
             val position = 0
             val positionOffset = 0.3f
             val easedOffset = positionOffset * positionOffset * 2f
 
-            viewModel.onPageScrolled(
-                position = position,
-                positionOffset = positionOffset,
-                wasAutoCompleteVisibleOnSwipeStart = true,
-            )
+            viewModel.onPageScrolled(position, positionOffset)
 
             assertEquals(1, capturedCommands.size)
             assertEquals(SetInputModeWidgetScrollPosition(position = position, offset = easedOffset), capturedCommands[0])
         }
 
     @Test
-    fun `when onPageScrolled with hadInputTextOnSwipeStart true then SetLogoProgress is not emitted`() =
+    fun `when onPageScrolled with both logos visible then SetLogoProgress is emitted`() =
         runTest {
             val viewModel = createViewModel()
             val capturedCommands = mutableListOf<Command>()
@@ -1621,42 +1617,14 @@ class InputScreenViewModelTest {
                 }
             }
 
-            val position = 0
-            val positionOffset = 0.3f
-            val easedOffset = positionOffset * positionOffset * 2f
-
-            viewModel.onPageScrolled(
-                position = position,
-                positionOffset = positionOffset,
-                hadInputTextOnSwipeStart = true,
-            )
-
-            assertEquals(1, capturedCommands.size)
-            assertEquals(SetInputModeWidgetScrollPosition(position = position, offset = easedOffset), capturedCommands[0])
-        }
-
-    @Test
-    fun `when onPageScrolled with both swipe start flags false then SetLogoProgress is emitted`() =
-        runTest {
-            val viewModel = createViewModel()
-            val capturedCommands = mutableListOf<Command>()
-
-            viewModel.command.observeForever { command ->
-                if (command != null) {
-                    capturedCommands.add(command)
-                }
-            }
+            assertTrue(viewModel.visibilityState.value.showSearchLogo)
+            assertTrue(viewModel.visibilityState.value.showChatLogo)
 
             val position = 0
             val positionOffset = 0.3f
             val easedOffset = positionOffset * positionOffset * 2f
 
-            viewModel.onPageScrolled(
-                position = position,
-                positionOffset = positionOffset,
-                wasAutoCompleteVisibleOnSwipeStart = false,
-                hadInputTextOnSwipeStart = false,
-            )
+            viewModel.onPageScrolled(position, positionOffset)
 
             assertEquals(2, capturedCommands.size)
             assertEquals(SetLogoProgress(positionOffset), capturedCommands[0])

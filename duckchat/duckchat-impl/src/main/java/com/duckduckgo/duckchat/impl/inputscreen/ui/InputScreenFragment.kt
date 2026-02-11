@@ -137,8 +137,6 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
     private var isKeyboardCurrentlyVisible: Boolean = false
     private var globalLayoutListener: ViewTreeObserver.OnGlobalLayoutListener? = null
     private var previousSearchMode: Boolean? = null
-    private var wasAutoCompleteVisibleOnSwipeStart: Boolean = false
-    private var hadInputTextOnSwipeStart: Boolean = false
     private var autoCompleteTargetVisibility: Boolean = false
     private var chatSuggestionsTargetVisibility: Boolean = false
 
@@ -154,19 +152,16 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
                 positionOffset: Float,
                 positionOffsetPixels: Int,
             ) {
-                viewModel.onPageScrolled(position, positionOffset, wasAutoCompleteVisibleOnSwipeStart, hadInputTextOnSwipeStart)
+                viewModel.onPageScrolled(
+                    position,
+                    positionOffset,
+                )
             }
 
             override fun onPageScrollStateChanged(state: Int) {
                 when (state) {
-                    ViewPager2.SCROLL_STATE_DRAGGING -> {
-                        wasAutoCompleteVisibleOnSwipeStart = autoCompleteTargetVisibility
-                        hadInputTextOnSwipeStart = inputModeWidget.text.isNotBlank()
-                    }
                     ViewPager2.SCROLL_STATE_IDLE -> {
                         viewModel.onScrollStateIdle()
-                        wasAutoCompleteVisibleOnSwipeStart = false
-                        hadInputTextOnSwipeStart = false
 
                         if (autoCompleteTargetVisibility) {
                             binding.viewPager.isUserInputEnabled = false
@@ -442,23 +437,6 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
                 binding.viewPager.setCurrentItem(0, true)
                 viewModel.onSearchSelected()
                 viewModel.onSearchInputTextChanged(inputModeWidget.text)
-
-                if (!duckChatFeature.aiChatSuggestions().isEnabled()) {
-                    if (viewModel.visibilityState.value.showSearchLogo && !viewModel.visibilityState.value.autoCompleteSuggestionsVisible) {
-                        binding.ddgLogoContainer.isVisible = true
-                    } else {
-                        if (binding.ddgLogoContainer.isVisible) {
-                            binding.ddgLogoContainer.animate()
-                                .alpha(0f)
-                                .setDuration(LOGO_FADE_DURATION)
-                                .withEndAction {
-                                    binding.ddgLogoContainer.isVisible = false
-                                    binding.ddgLogoContainer.alpha = 1f
-                                }
-                                .start()
-                        }
-                    }
-                }
             }
             onChatSelected = {
                 binding.viewPager.setCurrentItem(1, true)
@@ -467,18 +445,6 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
                 if (!useTopBar) {
                     inputScreenButtons.setSendButtonVisible(true)
                     inputModeWidget.setInputScreenButtonsVisible(true)
-                }
-                if (duckChatFeature.aiChatSuggestions().isEnabled()) {
-                    if (binding.ddgLogoContainer.isVisible) {
-                        fadeOutLogo()
-                    }
-                } else if (viewModel.visibilityState.value.showSearchLogo && !viewModel.visibilityState.value.autoCompleteSuggestionsVisible) {
-                    binding.ddgLogoContainer.isVisible = true
-                } else if (viewModel.visibilityState.value.showChatLogo) {
-                    binding.ddgLogo.progress = 1f
-                    binding.ddgLogoContainer.alpha = 0f
-                    binding.ddgLogoContainer.isVisible = true
-                    binding.ddgLogoContainer.animate().alpha(1f).setDuration(LOGO_FADE_DURATION).start()
                 }
             }
             onSubmitMessageAvailable = { isAvailable ->
@@ -502,7 +468,7 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
                 viewModel.onInputFieldTouched()
             }
             onTabTapped = { index ->
-                viewModel.onTabTapped(index, inputModeWidget.text)
+                viewModel.onTabTapped(index)
             }
             tabSwitcherButton.count = tabs
             onTabSwitcherTapped = {
@@ -604,16 +570,11 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         }
 
     private fun setLogoProgress(targetProgress: Float) {
-        if (duckChatFeature.aiChatSuggestions().isEnabled()) return
         binding.ddgLogo.progress = targetProgress
     }
 
     private fun animateLogoToProgress(targetProgress: Float) {
         logoAnimator?.cancel()
-        if (duckChatFeature.aiChatSuggestions().isEnabled()) {
-            binding.ddgLogo.progress = 0f
-            return
-        }
         binding.ddgLogo.apply {
             logoAnimator =
                 ValueAnimator.ofFloat(progress, targetProgress).apply {
@@ -646,28 +607,23 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
     }
 
     private fun updateLogoVisibility(state: InputScreenVisibilityState) {
-        val wasChatMode = previousSearchMode == false
         val logoWasVisible = binding.ddgLogoContainer.isVisible && binding.ddgLogoContainer.alpha > 0f
+        val shouldBeVisible = if (state.searchMode) state.showSearchLogo else state.showChatLogo
+        val wasModeChange = previousSearchMode != null && previousSearchMode != state.searchMode
 
-        val shouldBeVisible = when {
-            state.searchMode -> state.showSearchLogo
-            duckChatFeature.aiChatSuggestions().isEnabled() -> false
-            else -> state.showChatLogo
-        }
-
-        if (duckChatFeature.aiChatSuggestions().isEnabled() && shouldBeVisible && !logoWasVisible && wasChatMode && state.searchMode) {
-            fadeInLogo()
-        } else if (!shouldBeVisible && logoWasVisible && wasChatMode && state.searchMode) {
+        if (wasModeChange && shouldBeVisible && !logoWasVisible) {
+            fadeInLogoForMode(state.searchMode)
+        } else if (wasModeChange && !shouldBeVisible && logoWasVisible) {
             fadeOutLogo()
         } else {
             showOrHideLogo(shouldBeVisible, !logoWasVisible, state.searchMode)
         }
     }
 
-    private fun fadeInLogo() {
+    private fun fadeInLogoForMode(searchMode: Boolean) {
         logoAnimator?.cancel()
         binding.ddgLogoContainer.animate().cancel()
-        binding.ddgLogo.progress = 0f
+        binding.ddgLogo.progress = if (searchMode) 0f else 1f
         binding.ddgLogoContainer.alpha = 0f
         binding.ddgLogoContainer.isVisible = true
         binding.ddgLogoContainer.animate()
@@ -691,7 +647,7 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         binding.ddgLogoContainer.animate().cancel()
         binding.ddgLogoContainer.alpha = 1f
         if (shouldBeVisible && wasHidden) {
-            binding.ddgLogo.progress = if (searchMode || duckChatFeature.aiChatSuggestions().isEnabled()) 0f else 1f
+            binding.ddgLogo.progress = if (searchMode) 0f else 1f
         }
         binding.ddgLogoContainer.isVisible = shouldBeVisible
     }
@@ -848,8 +804,7 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
     }
 
     private fun showLogoIfNoContent(hasContent: Boolean, state: InputScreenVisibilityState) {
-        if (duckChatFeature.aiChatSuggestions().isEnabled() && !state.searchMode) return
-        if (!hasContent && !state.autoCompleteSuggestionsVisible) {
+        if (!hasContent && !state.autoCompleteSuggestionsVisible && !state.chatSuggestionsVisible) {
             binding.ddgLogoContainer.isVisible = true
             binding.ddgLogo.progress = if (state.searchMode) 0f else 1f
         }
