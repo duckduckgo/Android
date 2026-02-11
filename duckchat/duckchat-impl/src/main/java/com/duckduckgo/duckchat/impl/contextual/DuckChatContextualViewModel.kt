@@ -67,6 +67,7 @@ class DuckChatContextualViewModel @Inject constructor(
 
     private var fullModeUrl: String = ""
     var updatedPageContext: String = ""
+    var sheetTabId: String = ""
 
     sealed class Command {
         data class LoadUrl(val url: String) : Command()
@@ -161,6 +162,7 @@ class DuckChatContextualViewModel @Inject constructor(
     fun onSheetOpened(tabId: String) {
         viewModelScope.launch(dispatchers.io()) {
             logcat { "Duck.ai: onSheetOpened for tab=$tabId" }
+            sheetTabId = tabId
 
             val existingChatUrl = contextualDataStore.getTabChatUrl(tabId)
             if (existingChatUrl.isNullOrBlank()) {

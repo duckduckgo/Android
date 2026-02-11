@@ -6782,6 +6782,7 @@ class BrowserTabViewModelTest {
                     anyOrNull(),
                     any(),
                     anyOrNull(),
+                    any(),
                 ),
             ).thenReturn(jsCallbackData)
             testee.processJsCallbackMessage(
@@ -6798,6 +6799,7 @@ class BrowserTabViewModelTest {
                 anyOrNull(),
                 any(),
                 anyOrNull(),
+                any(),
             )
             assertCommandIssued<Command.SendResponseToJs>()
         }
@@ -6814,6 +6816,7 @@ class BrowserTabViewModelTest {
                     anyOrNull(),
                     any(),
                     anyOrNull(),
+                    any(),
                 ),
             ).thenReturn(null)
             testee.processJsCallbackMessage(
@@ -6830,6 +6833,7 @@ class BrowserTabViewModelTest {
                 anyOrNull(),
                 any(),
                 anyOrNull(),
+                any(),
             )
             assertCommandNotIssued<Command.SendResponseToJs>()
         }
@@ -7349,6 +7353,7 @@ class BrowserTabViewModelTest {
                     anyString(),
                     anyOrNull(),
                     anyOrNull(),
+                    any(),
                     any(),
                     any(),
                 ),

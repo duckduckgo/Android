@@ -16,6 +16,7 @@
 
 package com.duckduckgo.duckchat.impl.helper
 
+import android.graphics.Bitmap
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.impl.ChatState
@@ -57,10 +58,12 @@ class RealDuckChatJSHelperTest {
     private val mockDuckChat: DuckChatInternal = mock()
     private val mockDataStore: DuckChatDataStore = mock()
     private val mockDuckChatPixels: DuckChatPixels = mock()
+    private val mockFaviconManager: com.duckduckgo.app.browser.favicon.FaviconManager = mock()
     private val testee = RealDuckChatJSHelper(
         duckChat = mockDuckChat,
         duckChatPixels = mockDuckChatPixels,
         dataStore = mockDataStore,
+        faviconManager = mockFaviconManager,
         appCoroutineScope = coroutineRule.testScope,
         dispatcherProvider = coroutineRule.testDispatcherProvider,
     )
@@ -294,6 +297,9 @@ class RealDuckChatJSHelperTest {
     @Test
     fun whenGetPageContextUserActionThenReturnsContextRegardlessOfAutoFlag() = runTest {
         whenever(mockDuckChat.isAutomaticContextAttachmentEnabled()).thenReturn(false)
+        val tabId = "tab-1"
+        val faviconBitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888)
+        whenever(mockFaviconManager.loadFromDisk(tabId, "https://example.com")).thenReturn(faviconBitmap)
 
         val result =
             testee.processJsCallbackMessage(
@@ -303,11 +309,17 @@ class RealDuckChatJSHelperTest {
                 data = JSONObject().apply { put("reason", "userAction") },
                 mode = Mode.CONTEXTUAL,
                 pageContext = viewModel.updatedPageContext,
+                tabId = tabId,
             )
 
         assertNotNull(result)
         val context = result!!.params.getJSONObject("pageContext")
         assertEquals("Example Title", context.getString("title"))
+        val faviconArray = context.getJSONArray("favicon")
+        val faviconObject = faviconArray.getJSONObject(0)
+        assertEquals("icon", faviconObject.getString("rel"))
+        val faviconHref = faviconObject.getString("href")
+        assertEquals(true, faviconHref.startsWith("data:image/png;base64,"))
     }
 
     @Test
