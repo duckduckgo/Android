@@ -110,6 +110,7 @@ import kotlinx.coroutines.withContext
 import logcat.LogPriority.WARN
 import logcat.asLog
 import logcat.logcat
+import java.time.LocalDateTime
 
 enum class UserSelectedMode {
     SEARCH,
@@ -709,7 +710,52 @@ class InputScreenViewModel @AssistedInject constructor(
         omnibarRepository.omnibarType != OmnibarType.SPLIT
 
     private fun loadChatSuggestions() {
-        // TODO: implement load from frontend
+        viewModelScope.launch(dispatchers.io()) {
+            // TODO: Replace with real chat history and proper update
+            _chatSuggestions.value = getTestChatSuggestions()
+        }
+    }
+
+    // Temporary for testing the UI
+    private fun getTestChatSuggestions(): List<ChatSuggestion> {
+        return listOf(
+            ChatSuggestion(
+                chatId = "1",
+                title = "How to make sourdough bread",
+                lastEdit = LocalDateTime.now().minusHours(2),
+                pinned = true,
+            ),
+            ChatSuggestion(
+                chatId = "2",
+                title = "Best practices for Android development",
+                lastEdit = LocalDateTime.now().minusHours(5),
+                pinned = false,
+            ),
+            ChatSuggestion(
+                chatId = "3",
+                title = "What is quantum computing? Is it true that it will break all cryptography algorithms?",
+                lastEdit = LocalDateTime.now().minusDays(1),
+                pinned = false,
+            ),
+            ChatSuggestion(
+                chatId = "4",
+                title = "Recipe for chocolate chip cookies",
+                lastEdit = LocalDateTime.now().minusDays(2),
+                pinned = true,
+            ),
+            ChatSuggestion(
+                chatId = "5",
+                title = "Tips for learning a new language",
+                lastEdit = LocalDateTime.now().minusDays(3),
+                pinned = false,
+            ),
+            ChatSuggestion(
+                chatId = "6",
+                title = "How to build a car?",
+                lastEdit = LocalDateTime.now().minusDays(3),
+                pinned = false,
+            ),
+        )
     }
 
     class InputScreenViewModelProviderFactory(
