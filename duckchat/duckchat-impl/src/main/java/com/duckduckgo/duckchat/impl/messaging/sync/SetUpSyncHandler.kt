@@ -54,7 +54,7 @@ class SetUpSyncHandler @Inject constructor(
 
                 val responder = SyncJsResponder(jsMessaging, jsMessage, featureName)
 
-                val setupError = validateSetupState()
+                val setupError = validateSetupState(jsMessage.method)
                 if (setupError != null) {
                     responder.sendError(setupError)
                     return
@@ -65,11 +65,11 @@ class SetUpSyncHandler @Inject constructor(
                 }?.let { context.startActivity(it) }
             }
 
-            private fun validateSetupState(): String? {
+            private fun validateSetupState(method: String): String? {
                 if (!deviceSyncState.isFeatureEnabled()) {
                     return ERROR_SETUP_UNAVAILABLE
                 }
-                if (deviceSyncState.getAccountState() is SignedIn) {
+                if (method == METHOD_SETUP_SYNC && deviceSyncState.getAccountState() is SignedIn) {
                     return ERROR_SYNC_ALREADY_ON
                 }
                 return null
@@ -82,10 +82,12 @@ class SetUpSyncHandler @Inject constructor(
                 )
 
             override val featureName: String = DuckChatConstants.JS_MESSAGING_FEATURE_NAME
-            override val methods: List<String> = listOf("sendToSyncSettings", "sendToSetupSync")
+            override val methods: List<String> = listOf(METHOD_SYNC_SETTINGS, METHOD_SETUP_SYNC)
         }
 
     private companion object {
+        private const val METHOD_SYNC_SETTINGS = "sendToSyncSettings"
+        private const val METHOD_SETUP_SYNC = "sendToSetupSync"
         private const val ERROR_SETUP_UNAVAILABLE = "setup unavailable"
         private const val ERROR_SYNC_ALREADY_ON = "sync already on"
     }
