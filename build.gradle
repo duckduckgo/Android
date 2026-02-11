@@ -202,18 +202,4 @@ tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile) {
     )
 }
 
-afterEvaluate {
-    tasks.matching { it.name.startsWith("execFlank") }.names.each {
-        ImportJUnitXmlReports.register(
-                tasks,  // Now refers to root project's task container
-                tasks.named(it),
-                ANDROID_FIREBASE
-        ).configure {
-            reports.from(fileTree("fladleResults")  {
-                include "**/*.xml"
-            })
-        }
-    }
-}
-
 apply plugin: 'android-reporting'

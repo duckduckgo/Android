@@ -243,8 +243,6 @@ fladle {
     }
 }
 
-
-
 dependencies {
 	implementation project(":duckchat-api")
 	implementation project(":duckchat-impl")
@@ -584,16 +582,14 @@ dependencies {
 
 // Develocity Android Instrumented Test Support
 afterEvaluate {
-    // Only register app-specific Fladle tasks (privacyTests)
-    tasks.matching {
-        it.name == "execFlankPrivacyTests"
-    }.names.each {
+    tasks.matching { it.name.startsWith("execFlank") }.names.each {
         ImportJUnitXmlReports.register(
                 tasks,
                 tasks.named(it),
-                ANDROID_FIREBASE
+                ANDROID_CONNECTED
         ).configure {
-            reports.from(fileTree("fladleResults")  {
+            // Fladle outputs results to localResultsDir/build_id/*.xml
+            reports.from(fileTree("build/fladle/fladleResults")  {
                 include "**/*.xml"
             })
         }
