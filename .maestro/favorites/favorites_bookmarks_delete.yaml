@@ -21,6 +21,11 @@ tags:
           text: "add bookmark"
       - tapOn:
           text: "add bookmark"
+      # Wait for prompt to disappear
+      - extendedWaitUntil:
+          notVisible:
+            text: "Bookmark added.*"
+          timeout: 5000
       # Add favorite from edit saved site
       - runFlow: ../shared/browser_screen/click_on_menu_button.yaml
       - assertVisible:
