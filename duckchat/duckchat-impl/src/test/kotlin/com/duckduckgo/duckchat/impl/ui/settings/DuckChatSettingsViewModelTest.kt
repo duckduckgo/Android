@@ -675,7 +675,7 @@ class DuckChatSettingsViewModelTest {
             whenever(duckChat.observeEnableDuckChatUserSetting()).thenReturn(flowOf(false))
             whenever(duckChat.observeAutomaticContextAttachmentUserSettingEnabled()).thenReturn(flowOf(false))
             @Suppress("DenyListedApi")
-            duckChatFeature.contextualMode().setRawStoredState(State(enable = true))
+            duckChatFeature.automaticContextAttachment().setRawStoredState(State(enable = true))
             testee = DuckChatSettingsViewModel(
                 duckChatActivityParams = DuckChatNativeSettingsNoParams,
                 duckChat = duckChat,
@@ -697,7 +697,7 @@ class DuckChatSettingsViewModelTest {
         runTest {
             whenever(duckChat.observeAutomaticContextAttachmentUserSettingEnabled()).thenReturn(flowOf(false))
             @Suppress("DenyListedApi")
-            duckChatFeature.contextualMode().setRawStoredState(State(enable = false))
+            duckChatFeature.automaticContextAttachment().setRawStoredState(State(enable = false))
             testee = DuckChatSettingsViewModel(
                 duckChatActivityParams = DuckChatNativeSettingsNoParams,
                 duckChat = duckChat,
