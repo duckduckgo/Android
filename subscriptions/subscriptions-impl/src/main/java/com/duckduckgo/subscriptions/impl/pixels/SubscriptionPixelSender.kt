@@ -312,7 +312,11 @@ class SubscriptionPixelSenderImpl @Inject constructor(
         params: Map<String, String> = emptyMap(),
     ) {
         pixel.getPixelNames().forEach { (pixelType, pixelName) ->
-            pixelSender.fire(pixelName = pixelName, type = pixelType, parameters = params)
+            if (pixel.enqueue) {
+                pixelSender.enqueueFire(pixelName = pixelName, type = pixelType, parameters = params)
+            } else {
+                pixelSender.fire(pixelName = pixelName, type = pixelType, parameters = params)
+            }
         }
     }
 }

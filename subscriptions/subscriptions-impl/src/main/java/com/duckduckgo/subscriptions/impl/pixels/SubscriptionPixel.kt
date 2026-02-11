@@ -29,6 +29,7 @@ enum class SubscriptionPixel(
     private val types: Set<PixelType>,
     private val withSuffix: Boolean = true,
     val includedParameters: Set<PixelParameter> = emptySet(),
+    val enqueue: Boolean = false,
 ) {
     SUBSCRIPTION_ACTIVE(
         baseName = "m_privacy-pro_app_subscription_active",
@@ -265,6 +266,7 @@ enum class SubscriptionPixel(
         baseName = "subscription_free_trial_vpn_activation",
         type = Unique(),
         includedParameters = setOf(APP_VERSION),
+        enqueue = true,
     ),
     ;
 
@@ -273,7 +275,8 @@ enum class SubscriptionPixel(
         type: PixelType,
         withSuffix: Boolean = true,
         includedParameters: Set<PixelParameter> = emptySet(),
-    ) : this(baseName, setOf(type), withSuffix, includedParameters)
+        enqueue: Boolean = false,
+    ) : this(baseName, setOf(type), withSuffix, includedParameters, enqueue)
 
     fun getPixelNames(): Map<PixelType, String> =
         types.associateWith { type -> if (withSuffix) "${baseName}_${type.pixelNameSuffix}" else baseName }
