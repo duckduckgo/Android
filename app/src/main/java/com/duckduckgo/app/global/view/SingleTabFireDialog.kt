@@ -48,7 +48,6 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.setAndPropagateUpFitsSystemWindows
 import com.duckduckgo.common.ui.view.show
-import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.di.scopes.FragmentScope
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -73,8 +72,6 @@ class SingleTabFireDialog : BottomSheetDialogFragment(), FireDialog {
     @Inject lateinit var appBuildConfig: AppBuildConfig
 
     @Inject lateinit var clearDataAction: ClearDataAction
-
-    @Inject lateinit var dispatcherProvider: DispatcherProvider
 
     @Inject lateinit var viewModelFactory: FragmentViewModelFactory
 
