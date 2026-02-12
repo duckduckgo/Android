@@ -155,12 +155,17 @@ class SingleTabFireDialogViewModel @Inject constructor(
             trySendDailyDeleteClicked()
             pixel.enqueueFire(FIRE_DIALOG_CLEAR_PRESSED)
             pixel.enqueueFire(PRODUCT_TELEMETRY_SURFACE_DATA_CLEARING)
+
+            val (selectedFireAnimation, fireAnimationEnabled) = withContext(dispatcherProvider.io()) {
+                settingsDataStore.selectedFireAnimation to settingsDataStore.fireAnimationEnabled
+            }
+
             pixel.enqueueFire(
                 pixel = FIRE_DIALOG_ANIMATION,
-                parameters = mapOf(FIRE_ANIMATION to settingsDataStore.selectedFireAnimation.getPixelValue()),
+                parameters = mapOf(FIRE_ANIMATION to selectedFireAnimation.getPixelValue()),
             )
 
-            if (settingsDataStore.fireAnimationEnabled) {
+            if (fireAnimationEnabled) {
                 command.send(Command.PlayAnimation)
             }
 
@@ -195,12 +200,17 @@ class SingleTabFireDialogViewModel @Inject constructor(
 
             command.send(Command.OnClearStarted)
             pixel.enqueueFire(PRODUCT_TELEMETRY_SURFACE_DATA_CLEARING)
+
+            val (selectedFireAnimation, fireAnimationEnabled) = withContext(dispatcherProvider.io()) {
+                settingsDataStore.selectedFireAnimation to settingsDataStore.fireAnimationEnabled
+            }
+
             pixel.enqueueFire(
                 pixel = FIRE_DIALOG_ANIMATION,
-                parameters = mapOf(FIRE_ANIMATION to settingsDataStore.selectedFireAnimation.getPixelValue()),
+                parameters = mapOf(FIRE_ANIMATION to selectedFireAnimation.getPixelValue()),
             )
 
-            if (settingsDataStore.fireAnimationEnabled) {
+            if (fireAnimationEnabled) {
                 command.send(Command.PlayAnimation)
             }
 
@@ -215,13 +225,15 @@ class SingleTabFireDialogViewModel @Inject constructor(
         }
     }
 
-    private fun trySendDailyDeleteClicked() {
-        val now = dateProvider.getUtcIsoLocalDate()
-        val timestamp = fireButtonStore.lastEventSendTime
+    private suspend fun trySendDailyDeleteClicked() {
+        withContext(dispatcherProvider.io()) {
+            val now = dateProvider.getUtcIsoLocalDate()
+            val timestamp = fireButtonStore.lastEventSendTime
 
-        if (timestamp == null || now > timestamp) {
-            fireButtonStore.storeLastFireButtonClearEventTime(now)
-            pixel.enqueueFire(AppPixelName.PRODUCT_TELEMETRY_SURFACE_DATA_CLEARING_DAILY)
+            if (timestamp == null || now > timestamp) {
+                fireButtonStore.storeLastFireButtonClearEventTime(now)
+                pixel.enqueueFire(AppPixelName.PRODUCT_TELEMETRY_SURFACE_DATA_CLEARING_DAILY)
+            }
         }
     }
 

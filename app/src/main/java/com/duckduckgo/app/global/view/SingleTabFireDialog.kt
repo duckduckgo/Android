@@ -48,6 +48,7 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.setAndPropagateUpFitsSystemWindows
 import com.duckduckgo.common.ui.view.show
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.di.scopes.FragmentScope
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -57,6 +58,7 @@ import dagger.android.support.AndroidSupportInjection
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import com.duckduckgo.mobile.android.R as CommonR
 import com.google.android.material.R as MaterialR
@@ -72,6 +74,8 @@ class SingleTabFireDialog : BottomSheetDialogFragment(), FireDialog {
     @Inject lateinit var appBuildConfig: AppBuildConfig
 
     @Inject lateinit var clearDataAction: ClearDataAction
+
+    @Inject lateinit var dispatcherProvider: DispatcherProvider
 
     @Inject lateinit var viewModelFactory: FragmentViewModelFactory
 
@@ -117,9 +121,6 @@ class SingleTabFireDialog : BottomSheetDialogFragment(), FireDialog {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        animationEnabled = isAnimationEnabled()
-        canFinish = !animationEnabled
-
         val originName = arguments?.getString(ARG_ORIGIN, "BROWSER") ?: "BROWSER"
         viewModel.setOrigin(FireDialogProvider.FireDialogOrigin.valueOf(originName))
 
@@ -136,8 +137,14 @@ class SingleTabFireDialog : BottomSheetDialogFragment(), FireDialog {
         removeTopPadding()
         addBottomPaddingToButtons()
 
-        if (animationEnabled) {
-            configureFireAnimationView()
+        viewLifecycleOwner.lifecycleScope.launch {
+            animationEnabled = withContext(dispatcherProvider.io()) {
+                isAnimationEnabled()
+            }
+            canFinish = !animationEnabled
+            if (animationEnabled) {
+                configureFireAnimationView()
+            }
         }
     }
 
