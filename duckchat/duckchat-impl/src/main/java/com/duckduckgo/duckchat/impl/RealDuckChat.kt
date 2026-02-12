@@ -28,8 +28,10 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.BrowserNav
+import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.common.utils.AppUrl.ParamKey.QUERY
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
@@ -68,6 +70,7 @@ import kotlinx.coroutines.withContext
 import logcat.logcat
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import javax.inject.Inject
+import kotlin.text.forEach
 
 interface DuckChatInternal : DuckChat {
     /**
@@ -288,6 +291,7 @@ class RealDuckChat @Inject constructor(
     private val newAddressBarOptionBottomSheetDialogFactory: NewAddressBarOptionBottomSheetDialogFactory,
     private val duckAiContextualOnboardingBottomSheetDialogFactory: DuckAiContextualOnboardingBottomSheetDialogFactory,
     private val deviceSyncState: DeviceSyncState,
+    private val cookiesManager: CookieManagerProvider,
 ) : DuckChatInternal,
     DuckAiFeatureState,
     PrivacyConfigCallbackPlugin {
@@ -519,6 +523,9 @@ class RealDuckChat @Inject constructor(
     ): String {
         val parameters = addChatParameters(query, autoPrompt = autoPrompt, sidebar = sidebar)
         val url = appendParameters(parameters, duckChatLink)
+        appCoroutineScope.launch(dispatchers.io()) {
+            isStandaloneMigrationCompleted()
+        }
         return url
     }
 
@@ -684,6 +691,14 @@ class RealDuckChat @Inject constructor(
         return duckChatFeatureRepository.isContextualOnboardingCompleted()
     }
 
+    override suspend fun isStandaloneMigrationCompleted(): Boolean {
+        val cookieManager = cookiesManager.get()
+        val ddgCookies = cookieManager?.getCookie(AppUrl.Url.COOKIES)?.split(";").orEmpty()
+        val isMigrationCompleted = ddgCookies.contains("migration_status_dev_01=migrated_dev_01")
+        logcat { "Duck.ai: ddgCookies $ddgCookies isMigrationCompleted $isMigrationCompleted" }
+        return isMigrationCompleted
+    }
+
     private suspend fun hasActiveSession(): Boolean {
         val now = System.currentTimeMillis()
         val lastSession = duckChatFeatureRepository.lastSessionTimestamp()
@@ -783,7 +798,9 @@ class RealDuckChat @Inject constructor(
             isFullscreenModeEnabled = showFullScreenMode
             _showFullScreenMode.emit(showFullScreenMode)
 
-            val showContextualMode = isDuckChatFeatureEnabled && isDuckChatUserEnabled && duckChatFeature.contextualMode().isEnabled()
+            val isStandaloneMigrationCompleted = isStandaloneMigrationCompleted()
+            val showContextualMode = isDuckChatFeatureEnabled && isDuckChatUserEnabled && duckChatFeature.contextualMode().isEnabled() &&
+                isStandaloneMigrationCompleted
             isContextualModeEnabled = showContextualMode
             _showContextualMode.emit(showContextualMode)
 
