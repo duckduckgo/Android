@@ -21,4 +21,5 @@
     android:layout_height="wrap_content"
     app:indicatorStatus="on"
     app:leadingIcon="@drawable/ic_identity_blocked_pir_color_24"
-    app:primaryText="@string/pirSettingTitle" />
+    app:primaryText="@string/pirSettingTitle"
+    app:pillText="Beta"/>
