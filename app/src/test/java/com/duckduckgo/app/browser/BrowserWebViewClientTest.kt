@@ -21,7 +21,6 @@ import android.content.Intent
 import android.net.Uri
 import android.net.http.SslCertificate
 import android.net.http.SslError
-import android.os.Build
 import android.webkit.CookieManager
 import android.webkit.HttpAuthHandler
 import android.webkit.RenderProcessGoneDetail
@@ -113,7 +112,7 @@ import java.security.interfaces.RSAPublicKey
 private val mockToggle: Toggle = mock()
 
 @RunWith(AndroidJUnit4::class)
-@Config(sdk = [Build.VERSION_CODES.UPSIDE_DOWN_CAKE])
+@Config(sdk = [34])
 class BrowserWebViewClientTest {
     @get:Rule
     var coroutinesTestRule = CoroutineTestRule()
