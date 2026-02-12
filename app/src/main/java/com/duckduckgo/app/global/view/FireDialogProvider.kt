@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.global.view
 
+import com.duckduckgo.app.global.view.FireDialogProvider.FireDialogOrigin
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
@@ -35,9 +36,17 @@ import javax.inject.Inject
 interface FireDialogProvider {
     /**
      * Creates a Fire dialog instance.
+     * @param origin The origin of the dialog request.
+     *
      * @return Instance of FireDialog (either Simple or Granular variant)
      */
-    suspend fun createFireDialog(): FireDialog
+    suspend fun createFireDialog(origin: FireDialogOrigin): FireDialog
+
+    enum class FireDialogOrigin {
+        BROWSER,
+        SETTINGS,
+        TAB_SWITCHER,
+    }
 }
 
 @ContributesBinding(scope = AppScope::class)
@@ -46,9 +55,12 @@ class FireDialogProviderImpl @Inject constructor(
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
     private val dispatcherProvider: DispatcherProvider,
 ) : FireDialogProvider {
-
-    override suspend fun createFireDialog(): FireDialog = withContext(dispatcherProvider.io()) {
+    override suspend fun createFireDialog(
+        origin: FireDialogOrigin,
+    ): FireDialog = withContext(dispatcherProvider.io()) {
         when {
+            androidBrowserConfigFeature.singleTabFireDialog().isEnabled() ->
+                NonGranularFireDialog.newInstance() // TODO: Replace with SingleTabFireDialog
             androidBrowserConfigFeature.granularFireDialog().isEnabled() ->
                 GranularFireDialog.newInstance()
             androidBrowserConfigFeature.improvedDataClearingOptions().isEnabled() ->

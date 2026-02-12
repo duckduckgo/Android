@@ -85,6 +85,7 @@ import com.duckduckgo.app.global.sanitize
 import com.duckduckgo.app.global.view.ClearDataAction
 import com.duckduckgo.app.global.view.FireDialog
 import com.duckduckgo.app.global.view.FireDialogProvider
+import com.duckduckgo.app.global.view.FireDialogProvider.FireDialogOrigin.BROWSER
 import com.duckduckgo.app.global.view.renderIfChanged
 import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPage
 import com.duckduckgo.app.pixels.AppPixelName
@@ -426,6 +427,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 FireDialog.EVENT_ON_CLEAR_STARTED -> {
                     isDataClearingInProgress = true
                     removeObservers()
+                }
+                FireDialog.EVENT_ON_SINGLE_TAB_CLEAR_STARTED -> {
+                    currentTab?.onFireDialogVisibilityChanged(isVisible = false)
                 }
             }
         }
@@ -883,7 +887,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         pixel.fire(AppPixelName.FORGET_ALL_PRESSED_BROWSING, params)
 
         lifecycleScope.launch {
-            val dialog = fireDialogProvider.createFireDialog()
+            val dialog = fireDialogProvider.createFireDialog(BROWSER)
             dialog.show(supportFragmentManager)
         }
     }

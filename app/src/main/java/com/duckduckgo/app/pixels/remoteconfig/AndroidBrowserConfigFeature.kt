@@ -314,4 +314,13 @@ interface AndroidBrowserConfigFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun sendDataClearingWideEvent(): Toggle
+
+    /**
+     * Controls the single tab fire dialog that allows deleting a single tab's data.
+     * @return `true` when the remote config has the global "singleTabFireDialog" androidBrowserConfig
+     * sub-feature flag enabled
+     * If the remote feature is not present defaults to `false`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun singleTabFireDialog(): Toggle
 }
