@@ -17,7 +17,7 @@ Each toggle method has a `@Toggle.DefaultValue` annotation (`FALSE`, `TRUE`, or 
 
 **Changing a default on a shipped feature**: if flipping from `FALSE` to `TRUE`, set `minSupportedVersion` in the remote config to the version that includes the change. Otherwise older versions without the finished implementation will activate the feature when they can't reach the config.
 
-## Footguns
+## Pitfalls
 
 - `featureName` in `@ContributesRemoteFeature` must exactly match the feature key in the remote config JSON.
 - `self()` represents the parent feature; other methods are sub-features. The method name becomes the config key.
