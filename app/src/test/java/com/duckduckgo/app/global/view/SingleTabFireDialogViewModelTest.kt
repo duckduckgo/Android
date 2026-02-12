@@ -22,6 +22,11 @@ import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability
 import com.duckduckgo.app.fire.ManualDataClearing
 import com.duckduckgo.app.fire.store.FireDataStore
 import com.duckduckgo.app.fire.wideevents.DataClearingWideEvent
+import android.net.Uri
+import com.duckduckgo.downloads.api.DownloadsRepository
+import com.duckduckgo.downloads.api.model.DownloadItem
+import com.duckduckgo.downloads.store.DownloadStatus
+import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.app.firebutton.FireButtonStore
 import com.duckduckgo.app.global.events.db.UserEventKey
 import com.duckduckgo.app.global.events.db.UserEventsStore
@@ -73,6 +78,8 @@ class SingleTabFireDialogViewModelTest {
     private val mockDateProvider: DateProvider = mock()
     private val mockTabRepository: TabRepository = mock()
     private val mockWebViewCapabilityChecker: WebViewCapabilityChecker = mock()
+    private val mockDownloadsRepository: DownloadsRepository = mock()
+    private val mockDuckChat: DuckChat = mock()
 
     @Before
     fun setup() {
@@ -81,10 +88,13 @@ class SingleTabFireDialogViewModelTest {
         whenever(mockSettingsDataStore.fireAnimationEnabled).thenReturn(true)
         whenever(mockDateProvider.getUtcIsoLocalDate()).thenReturn("2025-12-15")
 
+        whenever(mockSettingsDataStore.singleTabFireDialogShownCount).thenReturn(0)
+
         runTest {
             whenever(mockFireDataStore.isManualClearOptionSelected(FireClearOption.DUCKAI_CHATS)).thenReturn(false)
             whenever(mockFireDataStore.getManualClearOptions()).thenReturn(emptySet())
             whenever(mockWebViewCapabilityChecker.isSupported(DeleteBrowsingData)).thenReturn(false)
+            whenever(mockDownloadsRepository.getDownloads()).thenReturn(emptyList())
         }
     }
 
@@ -100,6 +110,8 @@ class SingleTabFireDialogViewModelTest {
         dateProvider = mockDateProvider,
         tabRepository = mockTabRepository,
         webViewCapabilityChecker = mockWebViewCapabilityChecker,
+        downloadsRepository = mockDownloadsRepository,
+        duckChat = mockDuckChat,
     )
 
     // region Initialization
@@ -114,7 +126,9 @@ class SingleTabFireDialogViewModelTest {
             assertFalse(state.isDuckAiChatsSelected)
             assertFalse(state.isSingleTabEnabled)
             assertFalse(state.isFromTabSwitcher)
-            assertFalse(state.isDuckAiTab)
+            assertFalse(state.showDuckAiSubtitle)
+            assertTrue(state.showSiteDataSubtitle)
+            assertFalse(state.showDownloadsSubtitle)
             assertTrue(state.shouldRestartAfterClearing)
 
             cancelAndConsumeRemainingEvents()
@@ -176,6 +190,207 @@ class SingleTabFireDialogViewModelTest {
             val state = awaitItem()
 
             assertFalse(state.isSingleTabEnabled)
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when shown count is 0 then showSiteDataSubtitle is true`() = runTest {
+        whenever(mockSettingsDataStore.singleTabFireDialogShownCount).thenReturn(0)
+
+        testee = createViewModel()
+
+        testee.viewState.test {
+            val state = awaitItem()
+
+            assertTrue(state.showSiteDataSubtitle)
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when shown count is 1 then showSiteDataSubtitle is true`() = runTest {
+        whenever(mockSettingsDataStore.singleTabFireDialogShownCount).thenReturn(1)
+
+        testee = createViewModel()
+
+        testee.viewState.test {
+            val state = awaitItem()
+
+            assertTrue(state.showSiteDataSubtitle)
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when shown count is 2 then showSiteDataSubtitle is false`() = runTest {
+        whenever(mockSettingsDataStore.singleTabFireDialogShownCount).thenReturn(2)
+
+        testee = createViewModel()
+
+        testee.viewState.test {
+            val state = awaitItem()
+
+            assertFalse(state.showSiteDataSubtitle)
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when shown count is greater than 2 then showSiteDataSubtitle is false`() = runTest {
+        whenever(mockSettingsDataStore.singleTabFireDialogShownCount).thenReturn(5)
+
+        testee = createViewModel()
+
+        testee.viewState.test {
+            val state = awaitItem()
+
+            assertFalse(state.showSiteDataSubtitle)
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when started downloads exist then showDownloadsSubtitle is true`() = runTest {
+        whenever(mockDownloadsRepository.getDownloads()).thenReturn(
+            listOf(
+                DownloadItem(
+                    downloadId = 1L,
+                    downloadStatus = DownloadStatus.STARTED,
+                    fileName = "file.zip",
+                    contentLength = 1000L,
+                    createdAt = "2025-12-15",
+                    filePath = "/path/file.zip",
+                ),
+            ),
+        )
+
+        testee = createViewModel()
+
+        testee.viewState.test {
+            val state = awaitItem()
+
+            assertTrue(state.showDownloadsSubtitle)
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when no started downloads exist then showDownloadsSubtitle is false`() = runTest {
+        whenever(mockDownloadsRepository.getDownloads()).thenReturn(
+            listOf(
+                DownloadItem(
+                    downloadId = 1L,
+                    downloadStatus = DownloadStatus.FINISHED,
+                    fileName = "file.zip",
+                    contentLength = 1000L,
+                    createdAt = "2025-12-15",
+                    filePath = "/path/file.zip",
+                ),
+            ),
+        )
+
+        testee = createViewModel()
+
+        testee.viewState.test {
+            val state = awaitItem()
+
+            assertFalse(state.showDownloadsSubtitle)
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when downloads list is empty then showDownloadsSubtitle is false`() = runTest {
+        whenever(mockDownloadsRepository.getDownloads()).thenReturn(emptyList())
+
+        testee = createViewModel()
+
+        testee.viewState.test {
+            val state = awaitItem()
+
+            assertFalse(state.showDownloadsSubtitle)
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when selected tab is duck ai and chats not selected then showDuckAiSubtitle is true`() = runTest {
+        val duckAiUrl = "https://duck.ai/chat"
+        whenever(mockTabRepository.getSelectedTab()).thenReturn(
+            TabEntity(tabId = "tab1", url = duckAiUrl, title = "Duck AI"),
+        )
+        whenever(mockDuckChat.isDuckChatUrl(Uri.parse(duckAiUrl))).thenReturn(true)
+        whenever(mockFireDataStore.isManualClearOptionSelected(FireClearOption.DUCKAI_CHATS)).thenReturn(false)
+
+        testee = createViewModel()
+
+        testee.viewState.test {
+            val state = awaitItem()
+
+            assertTrue(state.showDuckAiSubtitle)
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when selected tab is duck ai and chats selected then showDuckAiSubtitle is false`() = runTest {
+        val duckAiUrl = "https://duck.ai/chat"
+        whenever(mockTabRepository.getSelectedTab()).thenReturn(
+            TabEntity(tabId = "tab1", url = duckAiUrl, title = "Duck AI"),
+        )
+        whenever(mockDuckChat.isDuckChatUrl(Uri.parse(duckAiUrl))).thenReturn(true)
+        whenever(mockFireDataStore.isManualClearOptionSelected(FireClearOption.DUCKAI_CHATS)).thenReturn(true)
+
+        testee = createViewModel()
+
+        testee.viewState.test {
+            val state = awaitItem()
+
+            assertFalse(state.showDuckAiSubtitle)
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when selected tab is not duck ai then showDuckAiSubtitle is false`() = runTest {
+        val regularUrl = "https://example.com"
+        whenever(mockTabRepository.getSelectedTab()).thenReturn(
+            TabEntity(tabId = "tab1", url = regularUrl, title = "Example"),
+        )
+        whenever(mockDuckChat.isDuckChatUrl(Uri.parse(regularUrl))).thenReturn(false)
+
+        testee = createViewModel()
+
+        testee.viewState.test {
+            val state = awaitItem()
+
+            assertFalse(state.showDuckAiSubtitle)
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when no selected tab then showDuckAiSubtitle is false`() = runTest {
+        whenever(mockTabRepository.getSelectedTab()).thenReturn(null)
+
+        testee = createViewModel()
+
+        testee.viewState.test {
+            val state = awaitItem()
+
+            assertFalse(state.showDuckAiSubtitle)
 
             cancelAndConsumeRemainingEvents()
         }
@@ -249,6 +464,27 @@ class SingleTabFireDialogViewModelTest {
         testee.onShow()
 
         verify(mockPixel, times(1)).fire(FIRE_DIALOG_SHOWN)
+    }
+
+    @Test
+    fun `when onShow called then shown count is incremented once`() = runTest {
+        whenever(mockSettingsDataStore.singleTabFireDialogShownCount).thenReturn(0)
+        testee = createViewModel()
+
+        testee.onShow()
+
+        verify(mockSettingsDataStore).singleTabFireDialogShownCount = 1
+    }
+
+    @Test
+    fun `when onShow called multiple times then shown count is incremented only once`() = runTest {
+        whenever(mockSettingsDataStore.singleTabFireDialogShownCount).thenReturn(0)
+        testee = createViewModel()
+
+        testee.onShow()
+        testee.onShow()
+
+        verify(mockSettingsDataStore, times(1)).singleTabFireDialogShownCount = 1
     }
 
     // endregion

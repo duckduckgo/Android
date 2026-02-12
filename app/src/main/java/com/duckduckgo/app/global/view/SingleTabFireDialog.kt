@@ -234,10 +234,19 @@ class SingleTabFireDialog : BottomSheetDialogFragment(), FireDialog {
             binding.deleteThisTabButton.gone()
         }
 
-        if (state.isDuckAiTab) {
-            binding.dialogSubtitle.text = requireContext().getString(
-                R.string.singleTabFireDialogSubtitleDuckAi,
-            )
+        val subtitleParts = buildList {
+            if (state.showSiteDataSubtitle) {
+                add(getString(R.string.singleTabFireDialogSubtitleSiteData))
+            }
+            if (state.showDownloadsSubtitle) {
+                add(getString(R.string.singleTabFireDialogSubtitleDownloads))
+            }
+            if (state.showDuckAiSubtitle) {
+                add(getString(R.string.singleTabFireDialogSubtitleDuckAi))
+            }
+        }
+        if (subtitleParts.isNotEmpty()) {
+            binding.dialogSubtitle.text = subtitleParts.joinToString("\n")
             binding.dialogSubtitle.show()
         } else {
             binding.dialogSubtitle.gone()
