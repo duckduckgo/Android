@@ -239,6 +239,8 @@ class SingleTabFireDialog : BottomSheetDialogFragment(), FireDialog {
                 R.string.singleTabFireDialogSubtitleDuckAi,
             )
             binding.dialogSubtitle.show()
+        } else {
+            binding.dialogSubtitle.gone()
         }
     }
 
