@@ -53,6 +53,7 @@ class FileDownloadNotificationActionReceiver @Inject constructor(
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
     private val pixel: Pixel,
+    private val failedDownloadRetryUrlStore: FailedDownloadRetryUrlStore,
 ) : BroadcastReceiver(), MainProcessLifecycleObserver {
 
     override fun onCreate(owner: LifecycleOwner) {
@@ -91,7 +92,8 @@ class FileDownloadNotificationActionReceiver @Inject constructor(
             logcat { "Received retry download intent for download id $downloadId" }
             pixel.fire(DOWNLOAD_REQUEST_RETRIED)
 
-            val url = extractUrlFromRetryIntent(intent) ?: return
+            val url = failedDownloadRetryUrlStore.getRetryUrl(downloadId) ?: return
+            failedDownloadRetryUrlStore.removeRetryUrl(downloadId)
             PendingFileDownload(
                 url = url,
                 subfolder = Environment.DIRECTORY_DOWNLOADS,
@@ -106,6 +108,7 @@ class FileDownloadNotificationActionReceiver @Inject constructor(
     }
 
     private suspend fun purgePendingDownloads() {
+        failedDownloadRetryUrlStore.clear()
         downloadsRepository.getDownloads().filter { it.downloadStatus == STARTED }.map { it.downloadId }.run {
             downloadsRepository.delete(this)
             forEach { fileDownloadNotificationManager.cancelDownloadFileNotification(it) }
@@ -119,20 +122,20 @@ class FileDownloadNotificationActionReceiver @Inject constructor(
         private const val EXTRA_RETRY = "EXTRA_RETRY"
         private const val DISMISS_NOTIFICATION_EXTRA = "DISMISS_NOTIFICATION_EXTRA"
         private const val DOWNLOAD_ID_EXTRA = "downloadId"
-        private const val URL_EXTRA = "URL"
 
-        fun cancelDownloadIntent(downloadId: Long): Intent {
+        fun cancelDownloadIntent(context: Context, downloadId: Long): Intent {
             return Intent(INTENT_DOWNLOADS_NOTIFICATION_ACTION).apply {
+                setPackage(context.packageName)
                 putExtra(DOWNLOAD_ID_EXTRA, downloadId)
                 putExtra(CTA, EXTRA_CANCEL)
             }
         }
 
-        fun retryDownloadIntent(downloadId: Long, url: String): Intent {
+        fun retryDownloadIntent(context: Context, downloadId: Long): Intent {
             return Intent(INTENT_DOWNLOADS_NOTIFICATION_ACTION).apply {
+                setPackage(context.packageName)
                 putExtra(DOWNLOAD_ID_EXTRA, downloadId)
                 putExtra(CTA, EXTRA_RETRY)
-                putExtra(URL_EXTRA, url)
                 // we only need to manually dismiss the notification in download retries. This is because
                 // the new retry will have a different download id
                 putExtra(DISMISS_NOTIFICATION_EXTRA, true)
@@ -145,10 +148,6 @@ class FileDownloadNotificationActionReceiver @Inject constructor(
 
         private fun isRetryIntent(intent: Intent): Boolean {
             return intent.getStringExtra(CTA) == EXTRA_RETRY
-        }
-
-        private fun extractUrlFromRetryIntent(intent: Intent): String? {
-            return intent.getStringExtra(URL_EXTRA)
         }
 
         private fun shouldDismissNotification(intent: Intent): Boolean {

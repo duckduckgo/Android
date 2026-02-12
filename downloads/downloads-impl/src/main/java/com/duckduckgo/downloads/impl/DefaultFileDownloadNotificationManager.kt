@@ -56,6 +56,7 @@ class DefaultFileDownloadNotificationManager @Inject constructor(
     private val notificationManager: NotificationManagerCompat,
     private val applicationContext: Context,
     private val appBuildConfig: AppBuildConfig,
+    private val failedDownloadRetryUrlStore: FailedDownloadRetryUrlStore,
 ) : FileDownloadNotificationManager, BrowserLifecycleObserver {
 
     // Group notifications are not automatically cleared when the last notification in the group is removed. So we need to do this manually.
@@ -71,7 +72,7 @@ class DefaultFileDownloadNotificationManager @Inject constructor(
         val pendingIntent = PendingIntent.getBroadcast(
             applicationContext,
             downloadId.toInt(),
-            FileDownloadNotificationActionReceiver.cancelDownloadIntent(downloadId),
+            FileDownloadNotificationActionReceiver.cancelDownloadIntent(applicationContext, downloadId),
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
         )
         val notification = NotificationCompat.Builder(applicationContext, FileDownloadNotificationChannelType.FILE_DOWNLOADING.id)
@@ -145,10 +146,11 @@ class DefaultFileDownloadNotificationManager @Inject constructor(
             .setSmallIcon(com.duckduckgo.mobile.android.R.drawable.notification_logo)
             .apply {
                 url?.let { fileUrl ->
+                    failedDownloadRetryUrlStore.saveRetryUrl(downloadId, fileUrl)
                     val pendingIntent = PendingIntent.getBroadcast(
                         applicationContext,
                         downloadId.toInt(),
-                        FileDownloadNotificationActionReceiver.retryDownloadIntent(downloadId, fileUrl),
+                        FileDownloadNotificationActionReceiver.retryDownloadIntent(applicationContext, downloadId),
                         PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
                     )
                     addAction(
