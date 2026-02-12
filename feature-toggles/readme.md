@@ -1,6 +1,6 @@
 # Feature Toggles Guide
 
-This is the remote Feature Flagging Framework. This guide covers how feature toggles work and how they connect to the remote privacy configuration.
+This guide covers how the remote feature toggling framework works and how toggles connect to the remote privacy configuration.
 
 For the cross-platform overview of the remote config system, see the [Feature Flagging Guide](https://github.com/duckduckgo/privacy-configuration/blob/main/docs/feature-flagging-guide.md) in the privacy-configuration repo.
 
