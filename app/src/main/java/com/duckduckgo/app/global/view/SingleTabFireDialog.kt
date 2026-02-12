@@ -93,6 +93,7 @@ class SingleTabFireDialog : BottomSheetDialogFragment(), FireDialog {
         }
     }
 
+    private var animationEnabled = false
     private var canFinish = false
 
     override fun onAttach(context: Context) {
@@ -116,7 +117,8 @@ class SingleTabFireDialog : BottomSheetDialogFragment(), FireDialog {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        canFinish = !isAnimationEnabled()
+        animationEnabled = isAnimationEnabled()
+        canFinish = !animationEnabled
 
         val originName = arguments?.getString(ARG_ORIGIN, "BROWSER") ?: "BROWSER"
         viewModel.setOrigin(FireDialogProvider.FireDialogOrigin.valueOf(originName))
@@ -134,7 +136,7 @@ class SingleTabFireDialog : BottomSheetDialogFragment(), FireDialog {
         removeTopPadding()
         addBottomPaddingToButtons()
 
-        if (isAnimationEnabled()) {
+        if (animationEnabled) {
             configureFireAnimationView()
         }
     }
@@ -184,11 +186,9 @@ class SingleTabFireDialog : BottomSheetDialogFragment(), FireDialog {
     private fun handleCommand(command: Command) {
         when (command) {
             is Command.PlayAnimation -> {
-                if (isAnimationEnabled()) {
+                if (animationEnabled) {
                     playAnimation()
                 } else {
-                    // Animation was enabled when dialog opened but is now disabled.
-                    // Update canFinish so ClearingComplete can complete the flow.
                     canFinish = true
                 }
             }
