@@ -236,6 +236,7 @@ import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.fire.fireproofwebsite.ui.AutomaticFireproofSetting.ALWAYS
 import com.duckduckgo.app.fire.fireproofwebsite.ui.AutomaticFireproofSetting.ASK_EVERY_TIME
+import com.duckduckgo.app.fire.store.TabVisitedSitesRepository
 import com.duckduckgo.app.generalsettings.showonapplaunch.ShowOnAppLaunchOptionHandler
 import com.duckduckgo.app.global.events.db.UserEventKey
 import com.duckduckgo.app.global.events.db.UserEventsStore
@@ -499,6 +500,7 @@ class BrowserTabViewModel @Inject constructor(
     private val syncStatusChangedObserver: SyncStatusChangedObserver,
     private val serpEasterEggLogosToggles: SerpEasterEggLogosToggles,
     private val serpLogos: SerpLogos,
+    private val tabVisitedSitesRepository: TabVisitedSitesRepository,
 ) : ViewModel(),
     WebViewClientListener,
     EditSavedSiteListener,
@@ -962,6 +964,14 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     override fun getCurrentTabId(): String = tabId
+
+    override fun onSiteVisited(domain: String) {
+        viewModelScope.launch(dispatchers.io()) {
+            if (androidBrowserConfig.singleTabFireDialog().isEnabled()) {
+                tabVisitedSitesRepository.recordVisitedSite(tabId, domain)
+            }
+        }
+    }
 
     fun onMessageProcessed() {
         showBrowser()

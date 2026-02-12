@@ -58,7 +58,6 @@ import dagger.android.support.AndroidSupportInjection
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import com.duckduckgo.mobile.android.R as CommonR
 import com.google.android.material.R as MaterialR
@@ -137,14 +136,10 @@ class SingleTabFireDialog : BottomSheetDialogFragment(), FireDialog {
         removeTopPadding()
         addBottomPaddingToButtons()
 
-        viewLifecycleOwner.lifecycleScope.launch {
-            animationEnabled = withContext(dispatcherProvider.io()) {
-                isAnimationEnabled()
-            }
-            canFinish = !animationEnabled
-            if (animationEnabled) {
-                configureFireAnimationView()
-            }
+        animationEnabled = isAnimationEnabled()
+        canFinish = !animationEnabled
+        if (animationEnabled) {
+            configureFireAnimationView()
         }
     }
 
