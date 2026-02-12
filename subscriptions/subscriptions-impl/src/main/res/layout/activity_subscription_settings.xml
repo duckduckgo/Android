@@ -106,6 +106,7 @@
                     app:typography="body2" />
 
                 <com.duckduckgo.common.ui.view.divider.VerticalDivider
+                    android:id="@+id/verticalTierDivider"
                     android:layout_width="wrap_content"
                     android:layout_height="6dp"
                     android:layout_marginStart="@dimen/keyline_3"

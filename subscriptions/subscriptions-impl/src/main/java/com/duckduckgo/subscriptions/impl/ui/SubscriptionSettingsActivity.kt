@@ -176,6 +176,7 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
         binding.tierName.isVisible = false
         binding.viewAllPlansTop.isVisible = false
         binding.upgradeToProContainer.isVisible = false
+        binding.verticalTierDivider.isVisible = false
 
         if (viewState.status in listOf(INACTIVE, EXPIRED)) {
             binding.viewPlans.isVisible = true
@@ -194,6 +195,7 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
                 val tier = viewState.subscriptionTier
 
                 binding.tierName.isVisible = true
+                binding.verticalTierDivider.isVisible = true
                 binding.viewAllPlansTop.isVisible = true
                 when (tier) {
                     PRO -> {
