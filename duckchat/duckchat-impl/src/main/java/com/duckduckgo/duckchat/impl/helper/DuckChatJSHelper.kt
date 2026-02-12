@@ -16,6 +16,9 @@
 
 package com.duckduckgo.duckchat.impl.helper
 
+import android.graphics.Bitmap
+import android.util.Base64
+import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -35,7 +38,9 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import logcat.logcat
+import org.json.JSONArray
 import org.json.JSONObject
+import java.io.ByteArrayOutputStream
 import java.util.regex.Pattern
 import javax.inject.Inject
 
@@ -46,7 +51,8 @@ interface DuckChatJSHelper {
         id: String?,
         data: JSONObject?,
         mode: Mode = Mode.FULL,
-        pageContext: String? = null,
+        pageContext: String = "",
+        tabId: String = "",
     ): JsCallbackData?
 
     fun onNativeAction(action: NativeAction): SubscriptionEventData
@@ -68,6 +74,7 @@ class RealDuckChatJSHelper @Inject constructor(
     private val duckChat: DuckChatInternal,
     private val duckChatPixels: DuckChatPixels,
     private val dataStore: DuckChatDataStore,
+    private val faviconManager: FaviconManager,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
 ) : DuckChatJSHelper {
@@ -80,7 +87,8 @@ class RealDuckChatJSHelper @Inject constructor(
         id: String?,
         data: JSONObject?,
         mode: Mode,
-        pageContext: String?,
+        pageContext: String,
+        tabId: String,
     ): JsCallbackData? {
         fun registerDuckChatIsOpenDebounced(windowMs: Long = 500L) {
             // we debounced because METHOD_GET_AI_CHAT_NATIVE_HANDOFF_DATA can be called more than once
@@ -155,9 +163,10 @@ class RealDuckChatJSHelper @Inject constructor(
                 id?.let {
                     val reason = data?.optString(REASON) ?: REASON_USER_ACTION
                     logcat { "Duck.ai Contextual: getAIChatPageContext reason $reason" }
-                    if (pageContext != null) {
+                    if (pageContext.isNotEmpty()) {
                         if (reason == REASON_USER_ACTION) {
-                            getPageContextResponse(featureName, method, it, pageContext)
+                            duckChatPixels.reportContextualPageContextManuallyAttachedFrontend()
+                            getPageContextResponse(featureName, method, it, pageContext, tabId)
                         } else {
                             null
                         }
@@ -168,7 +177,20 @@ class RealDuckChatJSHelper @Inject constructor(
                 }
             }
 
-            else -> null
+            METHOD_TOGGLE_PAGE_CONTEXT -> {
+                val isEnabled = data?.optBoolean(ENABLED)
+                if (isEnabled != null) {
+                    if (!isEnabled) {
+                        duckChatPixels.reportContextualPageContextRemovedFrontend()
+                    }
+                }
+                null
+            }
+
+            else -> {
+                logcat { "Duck.ai: JS method $method" }
+                null
+            }
         }
     }
 
@@ -224,21 +246,48 @@ class RealDuckChatJSHelper @Inject constructor(
         return JsCallbackData(jsonPayload, featureName, method, id)
     }
 
-    private fun getPageContextResponse(
+    private suspend fun getPageContextResponse(
         featureName: String,
         method: String,
         id: String,
         pageContext: String,
+        tabId: String,
     ): JsCallbackData {
+        val json = JSONObject(pageContext)
+        val url = json.optString("url").takeIf { it.isNotBlank() }
+        if (url != null) {
+            val favicon = faviconManager.loadFromDisk(tabId, url)
+            if (favicon != null) {
+                logcat { "Duck.ai: Found favicon for tab $tabId and url $url" }
+                val faviconBase64 = encodeBitmapToBase64(favicon)
+                json.put(
+                    "favicon",
+                    JSONArray().put(
+                        JSONObject().apply {
+                            put("href", faviconBase64)
+                            put("rel", "icon")
+                        },
+                    ),
+                )
+            }
+        }
+
         val params =
             JSONObject().apply {
                 put(
                     PAGE_CONTEXT,
-                    JSONObject(pageContext),
+                    json,
                 )
             }
 
         return JsCallbackData(params, featureName, method, id)
+    }
+
+    private fun encodeBitmapToBase64(bitmap: Bitmap): String {
+        val outputStream = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
+        val encoded = Base64.encodeToString(outputStream.toByteArray(), Base64.NO_WRAP)
+        return "data:image/png;base64,$encoded"
     }
 
     private fun getOpenKeyboardResponse(
@@ -292,6 +341,7 @@ class RealDuckChatJSHelper @Inject constructor(
         private const val METHOD_SHOW_CHAT_INPUT = "showChatInput"
         const val METHOD_GET_PAGE_CONTEXT = "getAIChatPageContext"
         const val METHOD_OPEN_KEYBOARD = "openKeyboard"
+        private const val METHOD_TOGGLE_PAGE_CONTEXT = "togglePageContextTelemetry"
         private const val AI_CHAT_PAYLOAD = "aiChatPayload"
         private const val METHOD_OPEN_KEYBOARD_PAYLOAD = "selector"
         private const val IS_HANDOFF_ENABLED = "isAIChatHandoffEnabled"
@@ -311,6 +361,7 @@ class RealDuckChatJSHelper @Inject constructor(
         private const val ANDROID = "android"
         private const val REASON = "reason"
         private const val REASON_USER_ACTION = "userAction"
+        private const val ENABLED = "enabled"
         const val SELECTOR = "selector"
         private const val DEFAULT_SELECTOR = "'user-prompt'"
         private const val SUCCESS = "success"

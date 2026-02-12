@@ -24,12 +24,14 @@ import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep.ScanStep
 import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStepActions.OptOutStepActions
 import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStepActions.ScanStepActions
 import com.duckduckgo.pir.impl.common.PirJob.RunType
+import com.duckduckgo.pir.impl.common.PirJobConstants.preSeedList
 import com.duckduckgo.pir.impl.common.PirRunStateHandler
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerRecordEmailConfirmationStarted
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerRecordOptOutStarted
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerScanStarted
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.ExecuteBrokerStepAction
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.ExecuteNextBrokerStep
+import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.PreSeedCookies
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.PirStageStatus
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.SideEffect.CompleteExecution
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.State
@@ -449,5 +451,134 @@ class ExecuteNextBrokerStepEventHandlerTest {
         assertEquals(testProfileQuery, requestData.userProfile)
         assertNull(requestData.extractedProfile)
         assertNull(result.sideEffect)
+    }
+
+    @Test
+    fun whenBrokerInPreSeedListAndNotPreseedingThenReturnsPreSeedCookiesEvent() = runTest {
+        val preseedBrokerName = preSeedList.first()
+        val preseedBroker = testBroker.copy(name = preseedBrokerName)
+        val scanStep = ScanStep(
+            broker = preseedBroker,
+            step = ScanStepActions(
+                stepType = "scan",
+                actions = listOf(testAction),
+                scanType = "initial",
+            ),
+        )
+        val state = State(
+            runType = RunType.MANUAL,
+            brokerStepsToExecute = listOf(scanStep),
+            profileQuery = testProfileQuery,
+            currentBrokerStepIndex = 0,
+            preseeding = false,
+            stageStatus = PirStageStatus(
+                currentStage = PirStage.OTHER,
+                stageStartMs = 0,
+            ),
+        )
+        val event = ExecuteNextBrokerStep
+
+        val result = testee.invoke(state, event)
+
+        assertEquals(state, result.nextState)
+        assertEquals(PreSeedCookies, result.nextEvent)
+        assertNull(result.sideEffect)
+    }
+
+    @Test
+    fun whenBrokerInPreSeedListAndAlreadyPreseedingThenProceedsNormally() = runTest {
+        val preseedBrokerName = preSeedList.first()
+        val preseedBroker = testBroker.copy(name = preseedBrokerName)
+        val scanStep = ScanStep(
+            broker = preseedBroker,
+            step = ScanStepActions(
+                stepType = "scan",
+                actions = listOf(testAction),
+                scanType = "initial",
+            ),
+        )
+        val state = State(
+            runType = RunType.MANUAL,
+            brokerStepsToExecute = listOf(scanStep),
+            profileQuery = testProfileQuery,
+            currentBrokerStepIndex = 0,
+            preseeding = true,
+            stageStatus = PirStageStatus(
+                currentStage = PirStage.OTHER,
+                stageStartMs = 0,
+            ),
+        )
+        val event = ExecuteNextBrokerStep
+
+        val result = testee.invoke(state, event)
+
+        // Verify it proceeds normally with ExecuteBrokerStepAction
+        val nextEvent = result.nextEvent as ExecuteBrokerStepAction
+        val requestData = nextEvent.actionRequestData as UserProfile
+        assertEquals(testProfileQuery, requestData.userProfile)
+        assertNull(result.sideEffect)
+        // Verify preseeding is set to false after proceeding
+        assertEquals(false, result.nextState.preseeding)
+    }
+
+    @Test
+    fun whenBrokerNotInPreSeedListThenProceedsNormally() = runTest {
+        val nonPreseedBroker = testBroker.copy(name = "NonPreseedBroker")
+        val scanStep = ScanStep(
+            broker = nonPreseedBroker,
+            step = ScanStepActions(
+                stepType = "scan",
+                actions = listOf(testAction),
+                scanType = "initial",
+            ),
+        )
+        val state = State(
+            runType = RunType.MANUAL,
+            brokerStepsToExecute = listOf(scanStep),
+            profileQuery = testProfileQuery,
+            currentBrokerStepIndex = 0,
+            preseeding = false,
+            stageStatus = PirStageStatus(
+                currentStage = PirStage.OTHER,
+                stageStartMs = 0,
+            ),
+        )
+        val event = ExecuteNextBrokerStep
+
+        val result = testee.invoke(state, event)
+
+        // Verify it proceeds normally with ExecuteBrokerStepAction
+        val nextEvent = result.nextEvent as ExecuteBrokerStepAction
+        val requestData = nextEvent.actionRequestData as UserProfile
+        assertEquals(testProfileQuery, requestData.userProfile)
+        assertNull(result.sideEffect)
+    }
+
+    @Test
+    fun whenExecuteNextBrokerStepThenSetsPreseedingToFalse() = runTest {
+        val scanStep = ScanStep(
+            broker = testBroker,
+            step = ScanStepActions(
+                stepType = "scan",
+                actions = listOf(testAction),
+                scanType = "initial",
+            ),
+        )
+        val state = State(
+            runType = RunType.MANUAL,
+            brokerStepsToExecute = listOf(scanStep),
+            profileQuery = testProfileQuery,
+            currentBrokerStepIndex = 0,
+            preseeding = true,
+            stageStatus = PirStageStatus(
+                currentStage = PirStage.OTHER,
+                stageStartMs = 0,
+            ),
+        )
+        val event = ExecuteNextBrokerStep
+
+        val result = testee.invoke(state, event)
+
+        assertEquals(false, result.nextState.preseeding)
     }
 }

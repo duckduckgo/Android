@@ -18,6 +18,7 @@
 
     <style name="Theme.DuckDuckGo.DynamicLogo" parent="Theme.AppCompat.Transparent.NoActionBar">
         <item name="android:windowIsFloating">false</item>
+        <item name="android:backgroundDimAmount">0.85</item>
         <item name="android:backgroundDimEnabled">true</item>
     </style>
 </resources>

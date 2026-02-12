@@ -142,6 +142,7 @@ interface PirPixelSender {
         durationMs: Long,
         optOutAttemptCount: Int,
         emailPattern: String?,
+        isVpnRunning: Boolean,
     )
 
     /**
@@ -167,6 +168,7 @@ interface PirPixelSender {
         emailPattern: String?,
         actionId: String,
         actionType: String,
+        isVpnRunning: Boolean,
     )
 
     /**
@@ -406,6 +408,7 @@ interface PirPixelSender {
         durationMs: Long,
         inManualStarted: Boolean,
         parentUrl: String,
+        isVpnRunning: Boolean,
     )
 
     fun reportScanNoMatch(
@@ -416,6 +419,7 @@ interface PirPixelSender {
         parentUrl: String,
         actionId: String,
         actionType: String,
+        isVpnRunning: Boolean,
     )
 
     fun reportScanError(
@@ -428,6 +432,7 @@ interface PirPixelSender {
         parentUrl: String,
         actionId: String,
         actionType: String,
+        isVpnRunning: Boolean,
     )
 
     fun reportOptOutStageStart(
@@ -617,6 +622,7 @@ class RealPirPixelSender @Inject constructor(
         durationMs: Long,
         optOutAttemptCount: Int,
         emailPattern: String?,
+        isVpnRunning: Boolean,
     ) {
         val params = mapOf(
             PARAM_KEY_BROKER to brokerUrl,
@@ -624,8 +630,17 @@ class RealPirPixelSender @Inject constructor(
             PARAM_DURATION to durationMs.toString(),
             PARAM_TRIES to optOutAttemptCount.toString(),
             PARAM_KEY_PATTERN to (emailPattern ?: ""),
+            PARAM_KEY_VPN_STATE to isVpnRunning.toVpnConnectionState(),
         )
         fire(PIR_OPTOUT_SUBMIT_SUCCESS, params)
+    }
+
+    private fun Boolean.toVpnConnectionState(): String {
+        return if (this) {
+            "connected"
+        } else {
+            "disconnected"
+        }
     }
 
     override fun reportOptOutFailed(
@@ -638,6 +653,7 @@ class RealPirPixelSender @Inject constructor(
         emailPattern: String?,
         actionId: String,
         actionType: String,
+        isVpnRunning: Boolean,
     ) {
         val params = mapOf(
             PARAM_KEY_BROKER to brokerUrl,
@@ -649,6 +665,7 @@ class RealPirPixelSender @Inject constructor(
             PARAM_KEY_PATTERN to (emailPattern ?: ""),
             PARAM_ACTION_ID to actionId,
             PARAM_KEY_ACTION_TYPE to actionType,
+            PARAM_KEY_VPN_STATE to isVpnRunning.toVpnConnectionState(),
         )
 
         fire(PIR_OPTOUT_SUBMIT_FAILURE, params)
@@ -936,6 +953,7 @@ class RealPirPixelSender @Inject constructor(
         durationMs: Long,
         inManualStarted: Boolean,
         parentUrl: String,
+        isVpnRunning: Boolean,
     ) {
         val params = mapOf(
             PARAM_KEY_BROKER to brokerUrl,
@@ -944,6 +962,7 @@ class RealPirPixelSender @Inject constructor(
             PARAM_KEY_PARENT to parentUrl,
             PARAM_KEY_MANUAL_STARTED to inManualStarted.toString(),
             PARAM_KEY_PARENT to parentUrl,
+            PARAM_KEY_VPN_STATE to isVpnRunning.toVpnConnectionState(),
         )
 
         fire(PIR_SCAN_STAGE_RESULT_MATCHES, params)
@@ -957,6 +976,7 @@ class RealPirPixelSender @Inject constructor(
         parentUrl: String,
         actionId: String,
         actionType: String,
+        isVpnRunning: Boolean,
     ) {
         val params = mapOf(
             PARAM_KEY_BROKER to brokerUrl,
@@ -966,6 +986,7 @@ class RealPirPixelSender @Inject constructor(
             PARAM_KEY_PARENT to parentUrl,
             PARAM_ACTION_ID to actionId,
             PARAM_KEY_ACTION_TYPE to actionType,
+            PARAM_KEY_VPN_STATE to isVpnRunning.toVpnConnectionState(),
         )
 
         fire(PIR_SCAN_STAGE_RESULT_NO_MATCH, params)
@@ -981,6 +1002,7 @@ class RealPirPixelSender @Inject constructor(
         parentUrl: String,
         actionId: String,
         actionType: String,
+        isVpnRunning: Boolean,
     ) {
         val params = mapOf(
             PARAM_KEY_BROKER to brokerUrl,
@@ -992,6 +1014,7 @@ class RealPirPixelSender @Inject constructor(
             PARAM_KEY_PARENT to parentUrl,
             PARAM_ACTION_ID to actionId,
             PARAM_KEY_ACTION_TYPE to actionType,
+            PARAM_KEY_VPN_STATE to isVpnRunning.toVpnConnectionState(),
         )
 
         fire(PIR_SCAN_STAGE_RESULT_ERROR, params)
@@ -1384,5 +1407,6 @@ class RealPirPixelSender @Inject constructor(
         private const val PARAM_KEY_DURATION_MS = "duration_in_ms"
         private const val PARAM_KEY_PROFILE_QUERY_COUNT = "profile_queries"
         private const val PARAM_KEY_SCAN_FREQUENCY = "scanFrequencyWithinThreshold"
+        private const val PARAM_KEY_VPN_STATE = "vpn_connection_state"
     }
 }

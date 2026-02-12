@@ -99,4 +99,10 @@
     <string name="duck_chat_contextual_onboarding_body" instruction="Body text for contextual Duck AI onboarding sheet">Duck.ai teď může odpovídat na otázky týkající se stránky, kterou si prohlížíš.\n\nObsah stránky se zobrazí, jen pokud ji přiložíš. Můžeš to kdykoli změnit v Nastavení.</string>
     <string name="duck_chat_contextual_onboarding_primary" instruction="Button to continue to contextual Duck AI sheet">Mám to</string>
     <string name="duck_chat_contextual_onboarding_secondary" instruction="Button to go to AI settings">Zobrazit nastavení</string>
+
+    <!-- Duck.ai Contextual Bottom Sheet -->
+    <string name="duckAIContextualPromptSummarize">Shrnout tuhle stránku</string>
+    <string name="duckAIContextualAutomaticContextTitle">Automaticky odesílat obsah stránky</string>
+    <string name="duckAIContextualAutomaticContextMessage">Automaticky odesílat obsah stránky do Duck.ai</string>
+    <string name="duckAIContextualAttachPageContent">Připojit obsah stránky</string>
 </resources>

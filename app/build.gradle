@@ -7,6 +7,7 @@ plugins {
     id 'kotlin-kapt'
     id 'com.google.devtools.ksp'
     id 'com.squareup.anvil'
+    id 'androidx.room'
 }
 apply from: '../versioning.gradle'
 apply from: "$rootDir/code-formatting.gradle"
@@ -28,13 +29,8 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         archivesBaseName = "duckduckgo-$versionName"
         vectorDrawables.useSupportLibrary = true
-        javaCompileOptions {
-            annotationProcessorOptions {
-                arguments = ["room.schemaLocation": "$projectDir/schemas".toString()]
-            }
-        }
         sourceSets {
-            androidTest.assets.srcDirs += files("$projectDir/schemas".toString())
+            androidTest.assets.srcDirs += files("$projectDir/schemas")
             main {
                 java {
                     resources {
@@ -204,6 +200,9 @@ android {
 
     composeOptions {
         kotlinCompilerExtensionVersion = "_"
+    }
+    room {
+        schemaDirectory("$projectDir/schemas")
     }
 }
 

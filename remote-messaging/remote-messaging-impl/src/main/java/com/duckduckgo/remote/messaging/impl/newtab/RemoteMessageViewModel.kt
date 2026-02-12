@@ -106,7 +106,7 @@ class RemoteMessageViewModel @Inject constructor(
             remoteMessagingModel.getActiveMessages()
                 .map { message ->
                     if (message?.surfaces?.contains(Surface.NEW_TAB_PAGE) == true) {
-                        val imageFile = remoteMessagingModel.getRemoteMessageImageFile()
+                        val imageFile = remoteMessagingModel.getRemoteMessageImageFile(Surface.NEW_TAB_PAGE)
                         message to imageFile
                     } else {
                         null to null
@@ -145,6 +145,7 @@ class RemoteMessageViewModel @Inject constructor(
         val message = lastRemoteMessageSeen ?: return
         viewModelScope.launch {
             remoteMessagingModel.onMessageDismissed(message)
+            remoteMessagingModel.clearMessageImage(Surface.NEW_TAB_PAGE)
         }
     }
 
@@ -152,6 +153,7 @@ class RemoteMessageViewModel @Inject constructor(
         val message = lastRemoteMessageSeen ?: return
         viewModelScope.launch {
             val action = remoteMessagingModel.onPrimaryActionClicked(message) ?: return@launch
+            remoteMessagingModel.clearMessageImage(Surface.NEW_TAB_PAGE)
             command.send(action.asNewTabCommand())
         }
     }
@@ -160,6 +162,7 @@ class RemoteMessageViewModel @Inject constructor(
         val message = lastRemoteMessageSeen ?: return
         viewModelScope.launch {
             val action = remoteMessagingModel.onSecondaryActionClicked(message) ?: return@launch
+            remoteMessagingModel.clearMessageImage(Surface.NEW_TAB_PAGE)
             command.send(action.asNewTabCommand())
         }
     }
@@ -168,6 +171,9 @@ class RemoteMessageViewModel @Inject constructor(
         val message = lastRemoteMessageSeen ?: return
         viewModelScope.launch {
             val action = remoteMessagingModel.onActionClicked(message) ?: return@launch
+            if (action !is Share) {
+                remoteMessagingModel.clearMessageImage(Surface.NEW_TAB_PAGE)
+            }
             command.send(action.asNewTabCommand())
         }
     }

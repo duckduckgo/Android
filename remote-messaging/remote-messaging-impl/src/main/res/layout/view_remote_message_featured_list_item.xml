@@ -19,10 +19,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginTop="6dp"
     android:clipChildren="false"
     android:clipToPadding="false"
-    android:paddingBottom="@dimen/featuredListItemBottomMargin">
+    android:paddingTop="6dp"
+    android:paddingBottom="6dp">
 
     <com.google.android.material.card.MaterialCardView
         android:layout_width="0dp"
@@ -31,7 +31,7 @@
         android:layout_marginEnd="@dimen/keyline_5"
         android:background="?attr/daxColorWindow"
         app:cardCornerRadius="12dp"
-        app:cardElevation="4dp"
+        app:cardElevation="0dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -46,9 +46,10 @@
 
             <ImageView
                 android:id="@+id/image"
-                android:layout_width="128dp"
-                android:layout_height="96dp"
+                android:layout_width="72dp"
+                android:layout_height="72dp"
                 android:layout_marginTop="@dimen/featuredListItemTopMargin"
+                android:importantForAccessibility="no"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
@@ -65,7 +66,8 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/image"
-                app:typography="h2"
+                app:textType="primary"
+                app:typography="body1"
                 tools:text="If you want more AI" />
 
             <com.duckduckgo.common.ui.view.text.DaxTextView
@@ -79,7 +81,8 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/title"
-                app:typography="body1"
+                app:textType="secondary"
+                app:typography="body2"
                 tools:text="Explore new chat models recently added to Duck.ai for a more personalized chat experience that suits your style!" />
 
             <com.duckduckgo.common.ui.view.text.DaxTextView

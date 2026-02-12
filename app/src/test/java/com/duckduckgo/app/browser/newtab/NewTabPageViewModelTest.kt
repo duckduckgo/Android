@@ -50,8 +50,10 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -163,7 +165,7 @@ class NewTabPageViewModelTest {
     fun whenRemoteMessageAvailableWithStoredImageAndOnboardingCompleteThenMessageShown() = runTest {
         val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList(), listOf(Surface.NEW_TAB_PAGE))
         whenever(mockRemoteMessageModel.getActiveMessages()).thenReturn(flowOf(remoteMessage))
-        whenever(mockRemoteMessageModel.getRemoteMessageImageFile()).thenReturn("messageFile")
+        whenever(mockRemoteMessageModel.getRemoteMessageImageFile(Surface.NEW_TAB_PAGE)).thenReturn("messageFile")
         whenever(mockDismissedCtaDao.exists(DAX_END)).thenReturn(true)
 
         testee.onStart(mockLifecycleOwner)
@@ -201,6 +203,7 @@ class NewTabPageViewModelTest {
         testee.onMessageCloseButtonClicked()
 
         verify(mockRemoteMessageModel).onMessageDismissed(remoteMessage)
+        verify(mockRemoteMessageModel).clearMessageImage(Surface.NEW_TAB_PAGE)
     }
 
     @Test
@@ -216,6 +219,7 @@ class NewTabPageViewModelTest {
 
         testee.onMessagePrimaryButtonClicked()
 
+        verify(mockRemoteMessageModel).clearMessageImage(Surface.NEW_TAB_PAGE)
         testee.commands().test {
             expectMostRecentItem().also {
                 assertEquals(it, Command.DismissMessage)
@@ -236,6 +240,7 @@ class NewTabPageViewModelTest {
 
         testee.onMessageSecondaryButtonClicked()
 
+        verify(mockRemoteMessageModel).clearMessageImage(Surface.NEW_TAB_PAGE)
         testee.commands().test {
             expectMostRecentItem().also {
                 assertEquals(it, Command.DismissMessage)
@@ -256,10 +261,33 @@ class NewTabPageViewModelTest {
 
         testee.onMessageActionButtonClicked()
 
+        verify(mockRemoteMessageModel).clearMessageImage(Surface.NEW_TAB_PAGE)
         testee.commands().test {
             expectMostRecentItem().also {
                 assertEquals(it, Command.DismissMessage)
             }
+        }
+    }
+
+    @Test
+    fun whenRemoteMessageActionButtonClickedWithShareActionThenImageNotCleared() = runTest {
+        val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList(), listOf(Surface.NEW_TAB_PAGE))
+        whenever(mockRemoteMessageModel.getActiveMessages()).thenReturn(flowOf(remoteMessage))
+
+        val shareAction = Action.Share("https://example.com", mapOf("title" to "Share Title"))
+        whenever(mockRemoteMessageModel.onActionClicked(remoteMessage)).thenReturn(shareAction)
+        whenever(mockCommandActionMapper.asNewTabCommand(shareAction)).thenReturn(
+            NewTabPageViewModel.Command.SharePromoLinkRMF("https://example.com", "Share Title"),
+        )
+
+        testee.onStart(mockLifecycleOwner)
+
+        testee.onMessageActionButtonClicked()
+
+        verify(mockRemoteMessageModel, never()).clearMessageImage(any())
+        testee.commands().test {
+            val command = expectMostRecentItem()
+            assertTrue(command is NewTabPageViewModel.Command.SharePromoLinkRMF)
         }
     }
 

@@ -164,4 +164,11 @@ interface DuckChatFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun supportsSyncChatsDeletion(): Toggle
+
+    /**
+     * @return `true` when the AI chat suggestions (pinned and recent chats) are enabled
+     * If the remote feature is not present defaults to `false`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun aiChatSuggestions(): Toggle
 }

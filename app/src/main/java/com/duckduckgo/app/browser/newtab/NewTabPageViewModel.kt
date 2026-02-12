@@ -31,6 +31,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.playstore.PlayStoreUtils
 import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
+import com.duckduckgo.remote.messaging.api.Action
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.api.RemoteMessageModel
 import com.duckduckgo.remote.messaging.api.Surface
@@ -150,7 +151,7 @@ class NewTabPageViewModel @AssistedInject constructor(
                     }
 
                     withContext(dispatchers.io()) {
-                        val messageImageFilePath = remoteMessagingModel.getRemoteMessageImageFile()
+                        val messageImageFilePath = remoteMessagingModel.getRemoteMessageImageFile(Surface.NEW_TAB_PAGE)
                         _viewState.emit(
                             viewState.value.copy(
                                 message = snapshot.remoteMessage,
@@ -195,6 +196,7 @@ class NewTabPageViewModel @AssistedInject constructor(
         val message = lastRemoteMessageSeen ?: return
         viewModelScope.launch {
             remoteMessagingModel.onMessageDismissed(message)
+            remoteMessagingModel.clearMessageImage(Surface.NEW_TAB_PAGE)
         }
     }
 
@@ -202,6 +204,7 @@ class NewTabPageViewModel @AssistedInject constructor(
         val message = lastRemoteMessageSeen ?: return
         viewModelScope.launch {
             val action = remoteMessagingModel.onPrimaryActionClicked(message) ?: return@launch
+            remoteMessagingModel.clearMessageImage(Surface.NEW_TAB_PAGE)
             val tabCommand = commandActionMapper.asNewTabCommand(action)
             command.send(tabCommand)
         }
@@ -211,6 +214,7 @@ class NewTabPageViewModel @AssistedInject constructor(
         val message = lastRemoteMessageSeen ?: return
         viewModelScope.launch {
             val action = remoteMessagingModel.onSecondaryActionClicked(message) ?: return@launch
+            remoteMessagingModel.clearMessageImage(Surface.NEW_TAB_PAGE)
             val tabCommand = commandActionMapper.asNewTabCommand(action)
             command.send(tabCommand)
         }
@@ -220,6 +224,9 @@ class NewTabPageViewModel @AssistedInject constructor(
         val message = lastRemoteMessageSeen ?: return
         viewModelScope.launch {
             val action = remoteMessagingModel.onActionClicked(message) ?: return@launch
+            if (action !is Action.Share) {
+                remoteMessagingModel.clearMessageImage(Surface.NEW_TAB_PAGE)
+            }
             val tabCommand = commandActionMapper.asNewTabCommand(action)
             command.send(tabCommand)
         }

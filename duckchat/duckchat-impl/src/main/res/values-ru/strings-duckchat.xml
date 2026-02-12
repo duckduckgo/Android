@@ -99,4 +99,10 @@
     <string name="duck_chat_contextual_onboarding_body" instruction="Body text for contextual Duck AI onboarding sheet">Duck.ai теперь отвечает на вопросы о просматриваемых страницах.\n\nСодержимое страницы добавляется только после ее прикрепления. Этот параметр всегда можно изменить в «Настройках».</string>
     <string name="duck_chat_contextual_onboarding_primary" instruction="Button to continue to contextual Duck AI sheet">Понятно</string>
     <string name="duck_chat_contextual_onboarding_secondary" instruction="Button to go to AI settings">Открыть настройки</string>
+
+    <!-- Duck.ai Contextual Bottom Sheet -->
+    <string name="duckAIContextualPromptSummarize">Кратко изложи содержимое страницы</string>
+    <string name="duckAIContextualAutomaticContextTitle">Автоматически отправлять содержимое страницы</string>
+    <string name="duckAIContextualAutomaticContextMessage">Автоматически отправлять содержимое страницы в Duck.ai</string>
+    <string name="duckAIContextualAttachPageContent">Добавить содержимое страницы</string>
 </resources>

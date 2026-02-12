@@ -18,5 +18,9 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources xmlns:tools="http://schemas.android.com/tools">
 
-  <string name="cdClose">Sulje</string>
+    <string name="cdClose">Sulje</string>
+
+    <string name="serpLogoSetAsFavourite">Vaihda tähän logoon</string>
+    <string name="serpLogoResetToDefault">Palauta hakulogo</string>
+    <string name="serpLogoDiscoveryText">Löysit piilotetun logon!</string>
 </resources>

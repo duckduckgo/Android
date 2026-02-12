@@ -217,7 +217,7 @@ class DuckChatContextualFragment :
                 newState: Int,
             ) {
                 if (newState == BottomSheetBehavior.STATE_HIDDEN) {
-                    viewModel.persistTabClosed()
+                    viewModel.onSheetClosed()
                 }
                 backPressedCallback.isEnabled = newState != BottomSheetBehavior.STATE_HIDDEN
             }
@@ -347,6 +347,7 @@ class DuckChatContextualFragment :
                                             data,
                                             Mode.CONTEXTUAL,
                                             viewModel.updatedPageContext,
+                                            viewModel.sheetTabId,
                                         )?.let { response ->
                                             logcat { "Duck.ai: response $response" }
                                             withContext(dispatcherProvider.main()) {
@@ -488,7 +489,7 @@ class DuckChatContextualFragment :
         }
 
         binding.duckAiContextualClearText.setOnClickListener {
-            clearInputField()
+            viewModel.onPromptCleared()
         }
 
         binding.contextualFullScreen.setOnClickListener {
@@ -501,8 +502,8 @@ class DuckChatContextualFragment :
             viewModel.addPageContext()
         }
         binding.contextualPromptSummarize.setOnClickListener {
-            val prompt = getString(R.string.duckAIContextualSummarizePrompt)
-            viewModel.replacePrompt(prompt)
+            val prompt = getString(R.string.duckAIContextualPromptSummarize)
+            viewModel.replacePrompt(binding.inputField.text.toString(), prompt)
         }
     }
 
@@ -564,7 +565,7 @@ class DuckChatContextualFragment :
 
                     DuckChatContextualSharedViewModel.Command.OpenSheet -> {
                         setupKeyboardVisibilityListener()
-                        viewModel.reopenSheet()
+                        viewModel.onSheetReopened()
                     }
                 }
             }.launchIn(lifecycleScope)
@@ -608,6 +609,7 @@ class DuckChatContextualFragment :
                 }
                 if (viewState.prompt.isNotEmpty()) {
                     binding.inputField.setText(viewState.prompt)
+                    binding.inputField.setSelection(viewState.prompt.length)
                 } else {
                     clearInputField()
                 }
@@ -888,7 +890,7 @@ class DuckChatContextualFragment :
     }
 
     override fun onPause() {
-        viewModel.persistTabClosed()
+        viewModel.onSheetClosed()
         downloadMessagesJob.cancel()
         simpleWebview.onPause()
         appCoroutineScope.launch(dispatcherProvider.io()) {

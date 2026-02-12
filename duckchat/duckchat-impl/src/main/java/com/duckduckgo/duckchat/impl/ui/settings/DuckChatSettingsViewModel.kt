@@ -28,6 +28,7 @@ import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.inputscreen.ui.metrics.discovery.InputScreenDiscoveryFunnel
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Command.OpenLink
 import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Command.OpenLinkInNewTab
 import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Command.OpenShortcutSettings
@@ -53,6 +54,7 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
     private val pixel: Pixel,
     private val inputScreenDiscoveryFunnel: InputScreenDiscoveryFunnel,
     private val settingsPageFeature: SettingsPageFeature,
+    private val duckChatPixels: DuckChatPixels,
     private val dispatcherProvider: DispatcherProvider,
     private val duckChatFeature: DuckChatFeature,
 ) : ViewModel() {
@@ -86,7 +88,7 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
                 isSearchSectionVisible = isSearchSectionVisible(duckChatActivityParams),
                 isHideGeneratedImagesOptionVisible = showHideAiGeneratedImagesOption,
                 isAutomaticContextEnabled = isAutomaticPageContextEnabled,
-                isAutomaticContextVisible = isDuckChatUserEnabled && duckChatFeature.contextualMode().isEnabled(),
+                isAutomaticContextVisible = isDuckChatUserEnabled && duckChatFeature.automaticContextAttachment().isEnabled(),
             )
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ViewState())
 
@@ -120,6 +122,7 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
         viewModelScope.launch {
             duckChat.setAutomaticPageContextUserSetting(checked)
         }
+        duckChatPixels.reportContextualSettingAutomaticPageContentToggled(checked)
     }
 
     fun onShowDuckChatInMenuToggled(checked: Boolean) {
