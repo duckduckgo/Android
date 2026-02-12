@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.global.view
 
-import android.net.Uri
 import app.cash.turbine.test
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability.DeleteBrowsingData
@@ -328,7 +327,7 @@ class SingleTabFireDialogViewModelTest {
         whenever(mockTabRepository.getSelectedTab()).thenReturn(
             TabEntity(tabId = "tab1", url = duckAiUrl, title = "Duck AI"),
         )
-        whenever(mockDuckChat.isDuckChatUrl(Uri.parse(duckAiUrl))).thenReturn(true)
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
         whenever(mockFireDataStore.isManualClearOptionSelected(FireClearOption.DUCKAI_CHATS)).thenReturn(false)
 
         testee = createViewModel()
@@ -348,7 +347,7 @@ class SingleTabFireDialogViewModelTest {
         whenever(mockTabRepository.getSelectedTab()).thenReturn(
             TabEntity(tabId = "tab1", url = duckAiUrl, title = "Duck AI"),
         )
-        whenever(mockDuckChat.isDuckChatUrl(Uri.parse(duckAiUrl))).thenReturn(true)
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
         whenever(mockFireDataStore.isManualClearOptionSelected(FireClearOption.DUCKAI_CHATS)).thenReturn(true)
 
         testee = createViewModel()
@@ -368,7 +367,7 @@ class SingleTabFireDialogViewModelTest {
         whenever(mockTabRepository.getSelectedTab()).thenReturn(
             TabEntity(tabId = "tab1", url = regularUrl, title = "Example"),
         )
-        whenever(mockDuckChat.isDuckChatUrl(Uri.parse(regularUrl))).thenReturn(false)
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(false)
 
         testee = createViewModel()
 
