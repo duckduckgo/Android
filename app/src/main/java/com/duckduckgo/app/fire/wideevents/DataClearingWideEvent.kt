@@ -45,6 +45,7 @@ interface DataClearingWideEvent {
     enum class EntryPoint(val value: String) {
         GRANULAR_FIRE_DIALOG("granular_fire_dialog"),
         NONGRANULAR_FIRE_DIALOG("nongranular_fire_dialog"),
+        SINGLE_TAB_FIRE_DIALOG("single_tab_fire_dialog"),
         APP_SHORTCUT("app_shortcut"),
         AUTO_FOREGROUND("auto_foreground"),
         AUTO_BACKGROUND("auto_background"),

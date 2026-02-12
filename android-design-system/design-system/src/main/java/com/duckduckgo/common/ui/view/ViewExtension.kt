@@ -131,7 +131,7 @@ fun Float.toPx(context: Context): Float = (this * context.resources.displayMetri
 fun View.setAndPropagateUpFitsSystemWindows(enabled: Boolean = false) {
     fitsSystemWindows = enabled
     var view = this
-    while (view.parent != null) {
+    while (view.parent is View) {
         val parent = view.parent as View
         parent.fitsSystemWindows = enabled
         view = parent

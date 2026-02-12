@@ -29,10 +29,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import androidx.core.content.ContextCompat
+import androidx.core.os.bundleOf
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat.Type
 import androidx.core.view.WindowInsetsControllerCompat
-import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
@@ -40,14 +40,15 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.airbnb.lottie.RenderMode
 import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.app.browser.databinding.SheetFireClearDataGranularBinding
-import com.duckduckgo.app.global.view.GranularFireDialogViewModel.Command
-import com.duckduckgo.app.settings.clear.FireClearOption
+import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.databinding.SheetFireSingleTabBinding
+import com.duckduckgo.app.global.view.SingleTabFireDialogViewModel.Command
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.setAndPropagateUpFitsSystemWindows
 import com.duckduckgo.common.ui.view.show
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.di.scopes.FragmentScope
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -57,31 +58,32 @@ import dagger.android.support.AndroidSupportInjection
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import com.duckduckgo.mobile.android.R as CommonR
 import com.google.android.material.R as MaterialR
 
 private const val ANIMATION_MAX_SPEED = 1.4f
 private const val ANIMATION_SPEED_INCREMENT = 0.15f
+private const val ARG_ORIGIN = "origin"
 
-/**
- * Granular Fire dialog that allows users to select which data to clear.
- */
 @InjectWith(FragmentScope::class)
-class GranularFireDialog : BottomSheetDialogFragment(), FireDialog {
+class SingleTabFireDialog : BottomSheetDialogFragment(), FireDialog {
     @Inject lateinit var settingsDataStore: SettingsDataStore
 
     @Inject lateinit var appBuildConfig: AppBuildConfig
 
     @Inject lateinit var clearDataAction: ClearDataAction
 
+    @Inject lateinit var dispatcherProvider: DispatcherProvider
+
     @Inject lateinit var viewModelFactory: FragmentViewModelFactory
 
-    private val viewModel: GranularFireDialogViewModel by lazy {
-        ViewModelProvider(this, viewModelFactory)[GranularFireDialogViewModel::class.java]
+    private val viewModel: SingleTabFireDialogViewModel by lazy {
+        ViewModelProvider(this, viewModelFactory)[SingleTabFireDialogViewModel::class.java]
     }
 
-    private var _binding: SheetFireClearDataGranularBinding? = null
+    private var _binding: SheetFireSingleTabBinding? = null
     private val binding get() = _binding!!
 
     private val accelerateAnimatorUpdateListener = object : ValueAnimator.AnimatorUpdateListener {
@@ -95,6 +97,7 @@ class GranularFireDialog : BottomSheetDialogFragment(), FireDialog {
         }
     }
 
+    private var animationEnabled = false
     private var canFinish = false
 
     override fun onAttach(context: Context) {
@@ -106,20 +109,20 @@ class GranularFireDialog : BottomSheetDialogFragment(), FireDialog {
         return BottomSheetDialog(requireContext(), CommonR.style.Widget_DuckDuckGo_FireDialog)
     }
 
-    @Suppress("DEPRECATION")
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        _binding = SheetFireClearDataGranularBinding.inflate(inflater, container, false)
+        _binding = SheetFireSingleTabBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        canFinish = !isAnimationEnabled()
+        val originName = arguments?.getString(ARG_ORIGIN, "BROWSER") ?: "BROWSER"
+        viewModel.setOrigin(FireDialogProvider.FireDialogOrigin.valueOf(originName))
 
         setupLayout()
         configureBottomSheet()
@@ -134,8 +137,14 @@ class GranularFireDialog : BottomSheetDialogFragment(), FireDialog {
         removeTopPadding()
         addBottomPaddingToButtons()
 
-        if (isAnimationEnabled()) {
-            configureFireAnimationView()
+        viewLifecycleOwner.lifecycleScope.launch {
+            animationEnabled = withContext(dispatcherProvider.io()) {
+                isAnimationEnabled()
+            }
+            canFinish = !animationEnabled
+            if (animationEnabled) {
+                configureFireAnimationView()
+            }
         }
     }
 
@@ -155,12 +164,13 @@ class GranularFireDialog : BottomSheetDialogFragment(), FireDialog {
     }
 
     private fun setupLayout() {
-        binding.deleteButton.setOnClickListener {
+        binding.deleteAllButton.setOnClickListener {
             hideDialog()
-            viewModel.onDeleteClicked()
+            viewModel.onDeleteAllClicked()
         }
-        binding.cancelButton.setOnClickListener {
-            viewModel.onCancel()
+        binding.deleteThisTabButton.setOnClickListener {
+            hideDialog()
+            viewModel.onDeleteThisTabClicked()
         }
     }
 
@@ -183,11 +193,9 @@ class GranularFireDialog : BottomSheetDialogFragment(), FireDialog {
     private fun handleCommand(command: Command) {
         when (command) {
             is Command.PlayAnimation -> {
-                if (isAnimationEnabled()) {
+                if (animationEnabled) {
                     playAnimation()
                 } else {
-                    // Animation was enabled when dialog opened but is now disabled.
-                    // Update canFinish so ClearingComplete can complete the flow.
                     canFinish = true
                 }
             }
@@ -204,6 +212,10 @@ class GranularFireDialog : BottomSheetDialogFragment(), FireDialog {
                     sendFragmentResult(FireDialog.EVENT_CLEAR_WITHOUT_RESTART_STARTED)
                 }
             }
+            is Command.OnSingleTabClearComplete -> {
+                sendFragmentResult(FireDialog.EVENT_ON_SINGLE_TAB_CLEAR_COMPLETE)
+                onClearAllEvent(ClearAllEvent.ClearingFinished)
+            }
         }
     }
 
@@ -214,53 +226,37 @@ class GranularFireDialog : BottomSheetDialogFragment(), FireDialog {
         )
     }
 
-    private fun render(state: GranularFireDialogViewModel.ViewState) {
-        binding.apply {
-            val tabsDescription = resources.getQuantityString(
-                com.duckduckgo.app.browser.R.plurals.fireDialogOptionTabsDescription,
-                state.tabCount,
-                state.tabCount,
-            )
-            tabsOption.setSecondaryText(tabsDescription)
+    private fun render(state: SingleTabFireDialogViewModel.ViewState) {
+        val titleRes = if (state.isDuckAiChatsSelected) {
+            R.string.singleTabFireDialogTitleWithChats
+        } else {
+            R.string.singleTabFireDialogTitle
+        }
+        binding.dialogTitle.text = requireContext().getString(titleRes)
 
-            val dataDescription = if (state.isHistoryEnabled) {
-                if (state.siteCount > 0) {
-                    resources.getQuantityString(
-                        com.duckduckgo.app.browser.R.plurals.fireDialogOptionDataDescription,
-                        state.siteCount,
-                        state.siteCount,
-                    )
-                } else {
-                    getString(com.duckduckgo.app.browser.R.string.fireDialogOptionDescriptionNothingToDelete)
-                }
-            } else {
-                getString(com.duckduckgo.app.browser.R.string.fireDialogOptionDataDescriptionNoHistory)
+        val showDeleteThisTab = state.isSingleTabEnabled && !state.isFromTabSwitcher
+        if (showDeleteThisTab) {
+            binding.deleteThisTabButton.show()
+        } else {
+            binding.deleteThisTabButton.gone()
+        }
+
+        val subtitleParts = buildList {
+            if (state.showSiteDataSubtitle) {
+                add(getString(R.string.singleTabFireDialogSubtitleSiteData))
             }
-            dataOption.setSecondaryText(dataDescription)
-
-            deleteButton.isEnabled = state.isDeleteButtonEnabled
-
-            val tabsListener: (android.widget.CompoundButton, Boolean) -> Unit = { _, isChecked ->
-                viewModel.onOptionToggled(FireClearOption.TABS, isChecked)
+            if (state.showDownloadsSubtitle) {
+                add(getString(R.string.singleTabFireDialogSubtitleDownloads))
             }
-
-            val dataListener: (android.widget.CompoundButton, Boolean) -> Unit = { _, isChecked ->
-                viewModel.onOptionToggled(FireClearOption.DATA, isChecked)
+            if (state.showDuckAiSubtitle) {
+                add(getString(R.string.singleTabFireDialogSubtitleDuckAi))
             }
-
-            val duckAiChatsListener: (android.widget.CompoundButton, Boolean) -> Unit = { _, isChecked ->
-                viewModel.onOptionToggled(FireClearOption.DUCKAI_CHATS, isChecked)
-            }
-
-            tabsOption.quietlySetIsChecked(state.selectedOptions.contains(FireClearOption.TABS), tabsListener)
-            dataOption.quietlySetIsChecked(state.selectedOptions.contains(FireClearOption.DATA), dataListener)
-            duckAiChatsOption.quietlySetIsChecked(state.selectedOptions.contains(FireClearOption.DUCKAI_CHATS), duckAiChatsListener)
-
-            tabsOption.setOnCheckedChangeListener(tabsListener)
-            dataOption.setOnCheckedChangeListener(dataListener)
-            duckAiChatsOption.setOnCheckedChangeListener(duckAiChatsListener)
-
-            duckAiChatsOptionContainer.isVisible = state.isDuckChatClearingEnabled
+        }
+        if (subtitleParts.isNotEmpty()) {
+            binding.dialogSubtitle.text = subtitleParts.joinToString("\n")
+            binding.dialogSubtitle.show()
+        } else {
+            binding.dialogSubtitle.gone()
         }
     }
 
@@ -298,6 +294,10 @@ class GranularFireDialog : BottomSheetDialogFragment(), FireDialog {
         return animatorScale != 0.0f
     }
 
+    private fun hideDialog() {
+        binding.fireDialogRootView.gone()
+    }
+
     private fun playAnimation() {
         dialog?.window?.apply {
             WindowInsetsControllerCompat(this, binding.root).apply {
@@ -318,10 +318,6 @@ class GranularFireDialog : BottomSheetDialogFragment(), FireDialog {
                 }
             },
         )
-    }
-
-    private fun hideDialog() {
-        binding.fireDialogRootView.gone()
     }
 
     @Synchronized
@@ -346,6 +342,10 @@ class GranularFireDialog : BottomSheetDialogFragment(), FireDialog {
     }
 
     companion object {
-        fun newInstance(): GranularFireDialog = GranularFireDialog()
+        fun newInstance(origin: FireDialogProvider.FireDialogOrigin): SingleTabFireDialog {
+            return SingleTabFireDialog().apply {
+                arguments = bundleOf(ARG_ORIGIN to origin.name)
+            }
+        }
     }
 }

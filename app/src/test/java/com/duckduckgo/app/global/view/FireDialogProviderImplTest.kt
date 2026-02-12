@@ -52,8 +52,7 @@ class FireDialogProviderImplTest {
 
         val dialog = testee.createFireDialog(FireDialogOrigin.BROWSER)
 
-        // Currently returns NonGranularFireDialog as stub; will be replaced with SingleTabFireDialog
-        assertTrue(dialog is NonGranularFireDialog)
+        assertTrue(dialog is SingleTabFireDialog)
     }
 
     @Test
@@ -64,8 +63,7 @@ class FireDialogProviderImplTest {
 
         val dialog = testee.createFireDialog(FireDialogOrigin.BROWSER)
 
-        // singleTabFireDialog takes priority, so result should NOT be GranularFireDialog
-        assertTrue(dialog is NonGranularFireDialog)
+        assertTrue(dialog is SingleTabFireDialog)
     }
 
     @Test
