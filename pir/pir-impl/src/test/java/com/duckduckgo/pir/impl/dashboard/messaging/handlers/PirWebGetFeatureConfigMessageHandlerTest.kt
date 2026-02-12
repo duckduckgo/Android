@@ -98,7 +98,10 @@ class PirWebGetFeatureConfigMessageHandlerTest {
         verifyFeatureConfigResponse(jsMessage, useUnifiedFeedback = false)
     }
 
-    private fun verifyFeatureConfigResponse(jsMessage: JsMessage, useUnifiedFeedback: Boolean) {
+    private fun verifyFeatureConfigResponse(
+        jsMessage: JsMessage,
+        useUnifiedFeedback: Boolean,
+    ) {
         val callbackDataCaptor = argumentCaptor<JsCallbackData>()
         verify(mockJsMessaging).onResponse(callbackDataCaptor.capture())
 
@@ -110,5 +113,7 @@ class PirWebGetFeatureConfigMessageHandlerTest {
         // Verify feature config response structure
         assertTrue(callbackData.params.has("useUnifiedFeedback"))
         assertEquals(useUnifiedFeedback, callbackData.params.getBoolean("useUnifiedFeedback"))
+        assertTrue(callbackData.params.has("isBeta"))
+        assertEquals(true, callbackData.params.getBoolean("isBeta"))
     }
 }
