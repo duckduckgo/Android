@@ -15,7 +15,7 @@ Each toggle method has a `@Toggle.DefaultValue` annotation (`FALSE`, `TRUE`, or 
 - **`TRUE`** -- for stable, shipped features. On by default; can be killed remotely.
 - **`INTERNAL`** -- on only for internal builds.
 
-**Changing a default on a shipped feature**: if flipping from `FALSE` to `TRUE`, set `minSupportedVersion` in the remote config to the version that includes the change. Otherwise older versions without the finished implementation will activate the feature when they can't reach the config.
+**Changing a default on a shipped feature**: if flipping from `FALSE` to `TRUE`, set `minSupportedVersion` in the remote config to the version that includes the change. Otherwise older versions without the finished implementation will pick up the new default when they download the config update.
 
 ## Pitfalls
 
