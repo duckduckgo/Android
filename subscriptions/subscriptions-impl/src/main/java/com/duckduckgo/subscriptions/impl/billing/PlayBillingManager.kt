@@ -389,7 +389,6 @@ class RealPlayBillingManager @Inject constructor(
     }
 
     override fun getLatestPurchaseToken(): String? {
-        // TODO milestone4: en deferred (user downgrade), check if purchaseState is PURCHASED
         val activePurchases = purchases.filter { purchase: Purchase ->
             (purchase.products.contains(BASIC_SUBSCRIPTION) || purchase.products.contains(ADVANCED_SUBSCRIPTION)) &&
                 purchase.purchaseState == Purchase.PurchaseState.PURCHASED

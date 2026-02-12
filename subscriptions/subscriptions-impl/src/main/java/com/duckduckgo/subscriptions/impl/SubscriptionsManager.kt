@@ -1200,11 +1200,7 @@ class RealSubscriptionsManager @Inject constructor(
         if (privacyProFeature.get().tierMessagingEnabled().isEnabled()) {
             val v2Entitlements = authRepository.getFeaturesV2(planId)
             if (v2Entitlements.isNotEmpty()) {
-                return v2Entitlements.also {
-                    logcat {
-                        "Subs: getEntitlementsForPlan return v2 entitlements: $it for planId: $planId"
-                    }
-                }
+                return v2Entitlements
             }
             // Fallback to legacy features for smooth runtime flag transitions
         }
@@ -1213,11 +1209,7 @@ class RealSubscriptionsManager @Inject constructor(
         }
         return getLegacyFeatures(planId).map { feature ->
             Entitlement(name = "plus", product = feature) // Temporary name placeholder until we have support multiple tiers
-        }.toSet().also {
-            logcat {
-                "Subs: getEntitlementsForPlan return v1 entitlements: $it for planId: $planId"
-            }
-        }
+        }.toSet()
     }
 
     private suspend fun getLegacyFeatures(planId: String): Set<String> {
