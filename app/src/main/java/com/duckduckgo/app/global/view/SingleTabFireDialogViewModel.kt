@@ -175,8 +175,6 @@ class SingleTabFireDialogViewModel @Inject constructor(
             }
 
             command.send(Command.OnClearStarted)
-//          TODO: trySendDailyDeleteClicked()
-//          TODO: pixel.enqueueFire(AppPixelName.FIRE_DIALOG_SINGLE_TAB_CLEAR_PRESSED)
             pixel.enqueueFire(PRODUCT_TELEMETRY_SURFACE_DATA_CLEARING)
             pixel.enqueueFire(
                 pixel = FIRE_DIALOG_ANIMATION,
@@ -188,23 +186,9 @@ class SingleTabFireDialogViewModel @Inject constructor(
             }
 
             withContext(dispatcherProvider.io()) {
-                // TODO: Consider if we want to track single tab clear separately in the FireButtonStore or UserEventsStore
-//                fireButtonStore.incrementFireButtonUseCount()
                 val selectedTabId = tabRepository.getSelectedTab()?.tabId
                 if (selectedTabId != null) {
-                    // TODO: Wide event
-//                    val clearOptions = fireDataStore.getManualClearOptions()
-//                    dataClearingWideEvent.start(
-//                        entryPoint = DataClearingWideEvent.EntryPoint.NONGRANULAR_FIRE_DIALOG,
-//                        clearOptions = clearOptions,
-//                    )
-                    try {
-                        dataClearing.clearSingleTabData(selectedTabId)
-//                        dataClearingWideEvent.finishSuccess()
-                    } catch (e: Exception) {
-//                        dataClearingWideEvent.finishFailure(e)
-                        throw e
-                    }
+                    dataClearing.clearSingleTabData(selectedTabId)
                 }
             }
 
