@@ -64,7 +64,6 @@ class DataUriDownloader @Inject constructor(
                     )
 
                     runCatching {
-                        error("Simulated failure for testing")
                         writeBytesToFiles(parsedDataUri.data, file)
                     }
                         .onSuccess {
