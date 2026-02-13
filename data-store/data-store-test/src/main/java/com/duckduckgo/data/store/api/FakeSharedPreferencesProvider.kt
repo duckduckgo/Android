@@ -31,7 +31,7 @@ class FakeSharedPreferencesProvider : SharedPreferencesProvider {
         return getSharedPreferences(name, multiprocess)
     }
 
-    override suspend fun getMigratedEncryptedSharedPreferences(name: String): SharedPreferences? {
-        return getSharedPreferences(name, true)
+    override suspend fun getMigratedEncryptedSharedPreferences(originName: String, destinationName: String): SharedPreferences? {
+        return getSharedPreferences(originName, true)
     }
 }
