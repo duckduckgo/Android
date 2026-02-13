@@ -717,4 +717,264 @@ class RealPirDashboardInitialScanStateProviderTest {
             deprecated = false,
         )
     }
+
+    @Test
+    fun whenEstimatedDateIsInFutureThenReturnAsIs() = runTest {
+        // Given: opt-out date is 7 days ago, so estimated date (opt-out + 14 days) is 7 days in the future
+        val sevenDaysInMillis = 7 * 24 * 60 * 60 * 1000L
+        val fourteenDaysInMillis = 14 * 24 * 60 * 60 * 1000L
+        val optOutDate = currentTime - sevenDaysInMillis
+
+        val extractedProfiles = listOf(
+            createExtractedProfile(dbId = 1L, brokerName = "broker1", name = "John Doe"),
+        )
+        val activeBrokers = listOf(createBroker("broker1"))
+        val optOutJobs = listOf(
+            createOptOutJobRecord(
+                extractedProfileId = 1L,
+                status = OptOutJobStatus.REQUESTED,
+                optOutRequestedDateInMillis = optOutDate,
+            ),
+        )
+        val validProfileQueries = listOf(createProfileQuery(id = 1L))
+
+        whenever(mockPirRepository.getAllExtractedProfiles()).thenReturn(extractedProfiles)
+        whenever(mockPirRepository.getAllActiveBrokerObjects()).thenReturn(activeBrokers)
+        whenever(mockPirRepository.getAllBrokerOptOutUrls()).thenReturn(emptyMap())
+        whenever(mockPirSchedulingRepository.getAllValidOptOutJobRecords()).thenReturn(optOutJobs)
+        whenever(mockPirRepository.getAllMirrorSites()).thenReturn(emptyList())
+        whenever(mockPirRepository.getValidUserProfileQueries()).thenReturn(validProfileQueries)
+
+        // When
+        val result = testee.getScanResults()
+
+        // Then: estimated date should be opt-out date + 14 days (in the future, so unchanged)
+        assertEquals(1, result.size)
+        assertEquals(optOutDate + fourteenDaysInMillis, result[0].estimatedRemovalDateInMillis)
+    }
+
+    @Test
+    fun whenEstimatedDateIsExactlyNowThenAdd14Days() = runTest {
+        // Given: opt-out date is exactly 14 days ago, so estimated date equals currentTime
+        val fourteenDaysInMillis = 14 * 24 * 60 * 60 * 1000L
+        val optOutDate = currentTime - fourteenDaysInMillis
+
+        val extractedProfiles = listOf(
+            createExtractedProfile(dbId = 1L, brokerName = "broker1", name = "John Doe"),
+        )
+        val activeBrokers = listOf(createBroker("broker1"))
+        val optOutJobs = listOf(
+            createOptOutJobRecord(
+                extractedProfileId = 1L,
+                status = OptOutJobStatus.REQUESTED,
+                optOutRequestedDateInMillis = optOutDate,
+            ),
+        )
+        val validProfileQueries = listOf(createProfileQuery(id = 1L))
+
+        whenever(mockPirRepository.getAllExtractedProfiles()).thenReturn(extractedProfiles)
+        whenever(mockPirRepository.getAllActiveBrokerObjects()).thenReturn(activeBrokers)
+        whenever(mockPirRepository.getAllBrokerOptOutUrls()).thenReturn(emptyMap())
+        whenever(mockPirSchedulingRepository.getAllValidOptOutJobRecords()).thenReturn(optOutJobs)
+        whenever(mockPirRepository.getAllMirrorSites()).thenReturn(emptyList())
+        whenever(mockPirRepository.getValidUserProfileQueries()).thenReturn(validProfileQueries)
+
+        // When
+        val result = testee.getScanResults()
+
+        // Then: estimated date was exactly now, so should be pushed 14 days into the future
+        assertEquals(1, result.size)
+        assertEquals(currentTime + fourteenDaysInMillis, result[0].estimatedRemovalDateInMillis)
+    }
+
+    @Test
+    fun whenEstimatedDateIsInPastByLessThan14DaysThenAdd14Days() = runTest {
+        // Given: opt-out date is 20 days ago, so estimated date is 6 days in the past
+        val twentyDaysInMillis = 20 * 24 * 60 * 60 * 1000L
+        val fourteenDaysInMillis = 14 * 24 * 60 * 60 * 1000L
+        val optOutDate = currentTime - twentyDaysInMillis
+
+        val extractedProfiles = listOf(
+            createExtractedProfile(dbId = 1L, brokerName = "broker1", name = "John Doe"),
+        )
+        val activeBrokers = listOf(createBroker("broker1"))
+        val optOutJobs = listOf(
+            createOptOutJobRecord(
+                extractedProfileId = 1L,
+                status = OptOutJobStatus.REQUESTED,
+                optOutRequestedDateInMillis = optOutDate,
+            ),
+        )
+        val validProfileQueries = listOf(createProfileQuery(id = 1L))
+
+        whenever(mockPirRepository.getAllExtractedProfiles()).thenReturn(extractedProfiles)
+        whenever(mockPirRepository.getAllActiveBrokerObjects()).thenReturn(activeBrokers)
+        whenever(mockPirRepository.getAllBrokerOptOutUrls()).thenReturn(emptyMap())
+        whenever(mockPirSchedulingRepository.getAllValidOptOutJobRecords()).thenReturn(optOutJobs)
+        whenever(mockPirRepository.getAllMirrorSites()).thenReturn(emptyList())
+        whenever(mockPirRepository.getValidUserProfileQueries()).thenReturn(validProfileQueries)
+
+        // When
+        val result = testee.getScanResults()
+
+        // Then: estimated date was 6 days in the past, should add one 14-day period
+        // Original estimated: optOutDate + 14 days = currentTime - 6 days
+        // Result: optOutDate + 14 days + 14 days = currentTime + 8 days
+        val originalEstimatedDate = optOutDate + fourteenDaysInMillis
+        assertEquals(1, result.size)
+        assertEquals(originalEstimatedDate + fourteenDaysInMillis, result[0].estimatedRemovalDateInMillis)
+    }
+
+    @Test
+    fun whenEstimatedDateIsInPastByMoreThan14DaysThenAddMultiple14DayPeriods() = runTest {
+        // Given: opt-out date is 50 days ago, so estimated date is 36 days in the past
+        // This requires adding 3 periods of 14 days (42 days) to get into the future
+        val fiftyDaysInMillis = 50 * 24 * 60 * 60 * 1000L
+        val fourteenDaysInMillis = 14 * 24 * 60 * 60 * 1000L
+        val optOutDate = currentTime - fiftyDaysInMillis
+
+        val extractedProfiles = listOf(
+            createExtractedProfile(dbId = 1L, brokerName = "broker1", name = "John Doe"),
+        )
+        val activeBrokers = listOf(createBroker("broker1"))
+        val optOutJobs = listOf(
+            createOptOutJobRecord(
+                extractedProfileId = 1L,
+                status = OptOutJobStatus.REQUESTED,
+                optOutRequestedDateInMillis = optOutDate,
+            ),
+        )
+        val validProfileQueries = listOf(createProfileQuery(id = 1L))
+
+        whenever(mockPirRepository.getAllExtractedProfiles()).thenReturn(extractedProfiles)
+        whenever(mockPirRepository.getAllActiveBrokerObjects()).thenReturn(activeBrokers)
+        whenever(mockPirRepository.getAllBrokerOptOutUrls()).thenReturn(emptyMap())
+        whenever(mockPirSchedulingRepository.getAllValidOptOutJobRecords()).thenReturn(optOutJobs)
+        whenever(mockPirRepository.getAllMirrorSites()).thenReturn(emptyList())
+        whenever(mockPirRepository.getValidUserProfileQueries()).thenReturn(validProfileQueries)
+
+        // When
+        val result = testee.getScanResults()
+
+        // Then: estimated date was 36 days in the past
+        // periodsElapsed = 36 / 14 = 2
+        // Added periods = (2 + 1) * 14 = 42 days
+        // Result should be 42 - 36 = 6 days in the future
+        val originalEstimatedDate = optOutDate + fourteenDaysInMillis // 36 days in the past
+        val expectedDate = originalEstimatedDate + (3 * fourteenDaysInMillis) // Add 42 days
+        assertEquals(1, result.size)
+        assertEquals(expectedDate, result[0].estimatedRemovalDateInMillis)
+        assertTrue(result[0].estimatedRemovalDateInMillis!! > currentTime) // Verify it's in the future
+    }
+
+    @Test
+    fun whenEstimatedDateIsVeryFarInPastThenScalablyAddPeriods() = runTest {
+        // Given: opt-out date is 365 days ago (1 year), testing scalability
+        val oneYearInMillis = 365 * 24 * 60 * 60 * 1000L
+        val fourteenDaysInMillis = 14 * 24 * 60 * 60 * 1000L
+        val optOutDate = currentTime - oneYearInMillis
+
+        val extractedProfiles = listOf(
+            createExtractedProfile(dbId = 1L, brokerName = "broker1", name = "John Doe"),
+        )
+        val activeBrokers = listOf(createBroker("broker1"))
+        val optOutJobs = listOf(
+            createOptOutJobRecord(
+                extractedProfileId = 1L,
+                status = OptOutJobStatus.REQUESTED,
+                optOutRequestedDateInMillis = optOutDate,
+            ),
+        )
+        val validProfileQueries = listOf(createProfileQuery(id = 1L))
+
+        whenever(mockPirRepository.getAllExtractedProfiles()).thenReturn(extractedProfiles)
+        whenever(mockPirRepository.getAllActiveBrokerObjects()).thenReturn(activeBrokers)
+        whenever(mockPirRepository.getAllBrokerOptOutUrls()).thenReturn(emptyMap())
+        whenever(mockPirSchedulingRepository.getAllValidOptOutJobRecords()).thenReturn(optOutJobs)
+        whenever(mockPirRepository.getAllMirrorSites()).thenReturn(emptyList())
+        whenever(mockPirRepository.getValidUserProfileQueries()).thenReturn(validProfileQueries)
+
+        // When
+        val result = testee.getScanResults()
+
+        // Then: estimated date was 351 days in the past (365 - 14)
+        // periodsElapsed = 351 / 14 = 25
+        // Added periods = (25 + 1) * 14 = 364 days
+        // Result should be in the future
+        assertEquals(1, result.size)
+        assertTrue(result[0].estimatedRemovalDateInMillis!! > currentTime) // Must be in the future
+        assertTrue(result[0].estimatedRemovalDateInMillis!! <= currentTime + fourteenDaysInMillis) // Within next 14 days
+    }
+
+    @Test
+    fun whenNoOptOutDateThenUsesAddedDateForEstimatedRemoval() = runTest {
+        // Given: no opt-out date, addedDate is 7 days ago
+        val sevenDaysInMillis = 7 * 24 * 60 * 60 * 1000L
+        val fourteenDaysInMillis = 14 * 24 * 60 * 60 * 1000L
+        val addedDate = currentTime - sevenDaysInMillis
+
+        val extractedProfiles = listOf(
+            createExtractedProfile(
+                dbId = 1L,
+                brokerName = "broker1",
+                name = "John Doe",
+                dateAddedInMillis = addedDate,
+            ),
+        )
+        val activeBrokers = listOf(createBroker("broker1"))
+        val validProfileQueries = listOf(createProfileQuery(id = 1L))
+
+        whenever(mockPirRepository.getAllExtractedProfiles()).thenReturn(extractedProfiles)
+        whenever(mockPirRepository.getAllActiveBrokerObjects()).thenReturn(activeBrokers)
+        whenever(mockPirRepository.getAllBrokerOptOutUrls()).thenReturn(emptyMap())
+        whenever(mockPirSchedulingRepository.getAllValidOptOutJobRecords()).thenReturn(emptyList())
+        whenever(mockPirRepository.getAllMirrorSites()).thenReturn(emptyList())
+        whenever(mockPirRepository.getValidUserProfileQueries()).thenReturn(validProfileQueries)
+
+        // When
+        val result = testee.getScanResults()
+
+        // Then: estimated date should be addedDate + 14 days (which is 7 days in the future)
+        assertEquals(1, result.size)
+        assertEquals(addedDate + fourteenDaysInMillis, result[0].estimatedRemovalDateInMillis)
+    }
+
+    @Test
+    fun whenNoOptOutDateAndAddedDateInPastThenAddsPeriods() = runTest {
+        // Given: no opt-out date, addedDate is 30 days ago (estimated would be 16 days in the past)
+        val thirtyDaysInMillis = 30 * 24 * 60 * 60 * 1000L
+        val fourteenDaysInMillis = 14 * 24 * 60 * 60 * 1000L
+        val addedDate = currentTime - thirtyDaysInMillis
+
+        val extractedProfiles = listOf(
+            createExtractedProfile(
+                dbId = 1L,
+                brokerName = "broker1",
+                name = "John Doe",
+                dateAddedInMillis = addedDate,
+            ),
+        )
+        val activeBrokers = listOf(createBroker("broker1"))
+        val validProfileQueries = listOf(createProfileQuery(id = 1L))
+
+        whenever(mockPirRepository.getAllExtractedProfiles()).thenReturn(extractedProfiles)
+        whenever(mockPirRepository.getAllActiveBrokerObjects()).thenReturn(activeBrokers)
+        whenever(mockPirRepository.getAllBrokerOptOutUrls()).thenReturn(emptyMap())
+        whenever(mockPirSchedulingRepository.getAllValidOptOutJobRecords()).thenReturn(emptyList())
+        whenever(mockPirRepository.getAllMirrorSites()).thenReturn(emptyList())
+        whenever(mockPirRepository.getValidUserProfileQueries()).thenReturn(validProfileQueries)
+
+        // When
+        val result = testee.getScanResults()
+
+        // Then: original estimated = addedDate + 14 days = 16 days in the past
+        // periodsElapsed = 16 / 14 = 1
+        // Added periods = (1 + 1) * 14 = 28 days
+        // Result = addedDate + 14 + 28 = addedDate + 42 days = currentTime + 12 days
+        val originalEstimatedDate = addedDate + fourteenDaysInMillis
+        val expectedDate = originalEstimatedDate + (2 * fourteenDaysInMillis)
+        assertEquals(1, result.size)
+        assertEquals(expectedDate, result[0].estimatedRemovalDateInMillis)
+        assertTrue(result[0].estimatedRemovalDateInMillis!! > currentTime)
+    }
 }
