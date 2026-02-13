@@ -51,6 +51,7 @@ interface OmnibarView {
     fun isPulseAnimationPlaying(): Boolean
     fun setDraftTextIfNtpOrSerp(query: String)
     fun setExpanded(expanded: Boolean)
+    fun disableViewStateSaving()
     fun setExpanded(
         expanded: Boolean,
         animate: Boolean,

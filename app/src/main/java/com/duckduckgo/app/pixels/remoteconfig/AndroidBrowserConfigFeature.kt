@@ -323,4 +323,11 @@ interface AndroidBrowserConfigFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun singleTabFireDialog(): Toggle
+
+    /**
+     * Controls whether the state saving for some of the views inside the BrowserTabFragment is disabled or not
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    @Toggle.InternalAlwaysEnabled
+    fun reduceBrowserTabBundleSize(): Toggle
 }
