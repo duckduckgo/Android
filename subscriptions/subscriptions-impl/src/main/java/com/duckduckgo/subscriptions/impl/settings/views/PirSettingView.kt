@@ -116,6 +116,7 @@ class PirSettingView @JvmOverloads constructor(
                     setStatus(isOn = false)
                     binding.pirSettings.setClickListener(null)
                     setLeadingIconResource(R.drawable.ic_identity_blocked_pir_grayscale_color_24)
+                    binding.pirSettings.showPillIcon(false)
                 }
 
                 Hidden -> isGone = true
