@@ -34,16 +34,23 @@ class ApiRequestInterceptor(
     }
 
     override fun intercept(chain: Interceptor.Chain): Response {
-        val request = chain.request().newBuilder()
-
-        val url = chain.request().url
-        if (url.toString().startsWith("${AppUrl.Url.PIXEL}/t/rq_")) {
-            // user agent for re-query pixels needs to be the same for the webview
-            request.addHeader(Header.USER_AGENT, userAgentProvider.userAgent())
-        } else {
-            request.addHeader(Header.USER_AGENT, userAgent)
+        val originalRequest = chain.request()
+        if (originalRequest.header(Header.USER_AGENT) != null) {
+            return chain.proceed(originalRequest)
         }
 
-        return chain.proceed(request.build())
+        // Only add User-Agent if not already set (e.g. added by Retrofit @Header in case of downloads)
+        val url = originalRequest.url.toString()
+        val userAgentValue = if (url.startsWith("${AppUrl.Url.PIXEL}/t/rq_")) {
+            userAgentProvider.userAgent()
+        } else {
+            userAgent
+        }
+
+        val newRequest = originalRequest.newBuilder()
+            .addHeader(Header.USER_AGENT, userAgentValue)
+            .build()
+
+        return chain.proceed(newRequest)
     }
 }

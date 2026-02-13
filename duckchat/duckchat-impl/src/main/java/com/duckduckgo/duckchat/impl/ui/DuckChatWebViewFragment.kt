@@ -92,6 +92,7 @@ import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.subscriptions.api.SUBSCRIPTIONS_FEATURE_NAME
+import com.duckduckgo.user.agent.api.UserAgentProvider
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.CoroutineScope
@@ -173,6 +174,9 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
 
     @Inject
     lateinit var browserAndInputScreenTransitionProvider: BrowserAndInputScreenTransitionProvider
+
+    @Inject
+    lateinit var userAgentProvider: UserAgentProvider
 
     private val cookieManager: CookieManager by lazy { CookieManager.getInstance() }
 
@@ -644,6 +648,7 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
             mimeType = mimeType,
             subfolder = Environment.DIRECTORY_DOWNLOADS,
             fileName = "duck.ai_${System.currentTimeMillis()}",
+            userAgent = userAgentProvider.userAgent(),
         )
 
         if (hasWriteStoragePermission()) {

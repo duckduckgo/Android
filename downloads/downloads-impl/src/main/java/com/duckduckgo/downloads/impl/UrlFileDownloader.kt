@@ -27,16 +27,19 @@ import com.duckduckgo.downloads.store.DownloadStatus.STARTED
 import logcat.asLog
 import logcat.logcat
 import okhttp3.ResponseBody
+import okhttp3.internal.http2.StreamResetException
 import okio.Buffer
 import okio.sink
 import java.io.File
 import javax.inject.Inject
+import javax.inject.Named
 import kotlin.math.exp
 import kotlin.math.floor
 import kotlin.random.Random
 
 class UrlFileDownloader @Inject constructor(
     private val downloadFileService: DownloadFileService,
+    @Named("http1Fallback") private val downloadFileServiceHttp1: DownloadFileService,
     private val urlFileDownloadCallManager: UrlFileDownloadCallManager,
     private val cookieManagerWrapper: CookieManagerWrapper,
     private val fileDownloadFeature: FileDownloadFeature,
@@ -50,12 +53,7 @@ class UrlFileDownloader @Inject constructor(
     ) {
         val url = pendingFileDownload.url
         val directory = pendingFileDownload.directory
-        val call = downloadFileService.downloadFile(
-            urlString = url,
-            cookie = cookieManagerWrapper.getCookie(url).handleNull(),
-        )
         val downloadId = Random.nextLong()
-        urlFileDownloadCallManager.add(downloadId, call)
 
         logcat { "Starting download $fileName / $url" }
         downloadCallback.onStart(
@@ -67,45 +65,120 @@ class UrlFileDownloader @Inject constructor(
                 filePath = directory.path + File.separatorChar + fileName,
                 createdAt = DatabaseDateFormatter.timestamp(),
             ),
-
         )
 
-        runCatching {
-            val response = call.execute()
+        val result = executeDownload(
+            service = downloadFileService,
+            pendingFileDownload = pendingFileDownload,
+            fileName = fileName,
+            directory = directory,
+            downloadId = downloadId,
+            downloadCallback = downloadCallback,
+        )
 
-            if (response.isSuccessful) {
-                response.body()?.let {
-                    if (writeStreamingResponseBodyToDisk(downloadId, fileName, directory, it, downloadCallback)) {
+        when (result) {
+            is DownloadResult.Success -> {
+                val file = directory.getOrCreate(fileName)
+                // for file length we don't use body.contentLength() as it is not reliable. Eg. when downloading image from DDG search
+                // as the link is a re-direct, contentLength() will be -1
+                downloadCallback.onSuccess(downloadId, file.length(), file, pendingFileDownload.mimeType)
+            }
+            is DownloadResult.Cancelled -> {
+                logcat { "Download $fileName cancelled" }
+                downloadCallback.onCancel(downloadId)
+                directory.getOrCreate(fileName).delete()
+            }
+            is DownloadResult.StreamResetError -> {
+                logcat { "HTTP/2 stream reset error, retrying with HTTP/1.1 for $fileName" }
+                directory.getOrCreate(fileName).delete()
+
+                val retryResult = executeDownload(
+                    service = downloadFileServiceHttp1,
+                    pendingFileDownload = pendingFileDownload,
+                    fileName = fileName,
+                    directory = directory,
+                    downloadId = downloadId,
+                    downloadCallback = downloadCallback,
+                )
+
+                when (retryResult) {
+                    is DownloadResult.Success -> {
                         val file = directory.getOrCreate(fileName)
-                        // for file length we don't use body.contentLength() as it is not reliable. Eg. when downloading image from DDG search
-                        // as the link is a re-direct, contentLength() will be -1
                         downloadCallback.onSuccess(downloadId, file.length(), file, pendingFileDownload.mimeType)
-                    } else {
-                        if (call.isCanceled) {
-                            logcat { "Download $fileName cancelled" }
-                            downloadCallback.onCancel(downloadId)
-                        } else {
-                            logcat { "Download $fileName failed" }
-                            downloadCallback.onError(url = url, downloadId = downloadId, reason = Other)
-                        }
-                        // clean up
+                    }
+                    is DownloadResult.Cancelled -> {
+                        logcat { "Download $fileName cancelled during HTTP/1.1 retry" }
+                        downloadCallback.onCancel(downloadId)
+                        directory.getOrCreate(fileName).delete()
+                    }
+                    else -> {
+                        logcat { "Download $fileName failed during HTTP/1.1 retry" }
+                        downloadCallback.onError(url = url, downloadId = downloadId, reason = ConnectionRefused)
                         directory.getOrCreate(fileName).delete()
                     }
                 }
+            }
+            is DownloadResult.Error -> {
+                logcat { "Download $fileName failed: ${result.reason}" }
+                downloadCallback.onError(url = url, downloadId = downloadId, reason = result.reason)
+                directory.getOrCreate(fileName).delete()
+            }
+        }
+    }
+
+    private fun executeDownload(
+        service: DownloadFileService,
+        pendingFileDownload: FileDownloader.PendingFileDownload,
+        fileName: String,
+        directory: File,
+        downloadId: Long,
+        downloadCallback: DownloadCallback,
+    ): DownloadResult {
+        val url = pendingFileDownload.url
+        val call = service.downloadFile(
+            urlString = url,
+            cookie = cookieManagerWrapper.getCookie(url).handleNull(),
+            userAgent = pendingFileDownload.userAgent,
+        )
+        urlFileDownloadCallManager.add(downloadId, call)
+
+        return try {
+            val response = call.execute()
+
+            if (response.isSuccessful) {
+                response.body()?.let { body ->
+                    if (writeStreamingResponseBodyToDisk(downloadId, fileName, directory, body, downloadCallback)) {
+                        DownloadResult.Success
+                    } else {
+                        if (call.isCanceled) {
+                            DownloadResult.Cancelled
+                        } else {
+                            DownloadResult.Error(Other)
+                        }
+                    }
+                } ?: DownloadResult.Error(Other)
             } else {
                 logcat { "Failed to download $fileName / ${response.errorBody()?.string()}" }
-                downloadCallback.onError(url = url, downloadId = downloadId, reason = ConnectionRefused)
+                DownloadResult.Error(ConnectionRefused)
             }
-        }.onFailure {
-            logcat { "Failed to download $fileName: ${it.asLog()}" }
+        } catch (e: StreamResetException) {
+            logcat { "StreamResetException during download $fileName: ${e.asLog()}" }
+            DownloadResult.StreamResetError(e)
+        } catch (t: Throwable) {
+            logcat { "Failed to download $fileName: ${t.asLog()}" }
             if (call.isCanceled) {
-                downloadCallback.onCancel(downloadId)
+                DownloadResult.Cancelled
             } else {
-                downloadCallback.onError(url = url, downloadId = downloadId, reason = ConnectionRefused)
+                DownloadResult.Error(ConnectionRefused)
             }
-            // clean up
-            directory.getOrCreate(fileName).delete()
         }
+    }
+
+    private sealed class DownloadResult {
+        data object Success : DownloadResult()
+        data object Cancelled : DownloadResult()
+        data class StreamResetError(val exception: StreamResetException) : DownloadResult()
+        data class Error(val reason: com.duckduckgo.downloads.api.DownloadFailReason) : DownloadResult()
     }
 
     private fun writeStreamingResponseBodyToDisk(

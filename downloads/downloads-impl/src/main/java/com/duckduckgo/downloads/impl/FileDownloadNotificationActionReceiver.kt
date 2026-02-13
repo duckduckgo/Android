@@ -33,6 +33,7 @@ import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.downloads.impl.pixels.DownloadsPixelName.DOWNLOAD_REQUEST_CANCELLED_BY_USER
 import com.duckduckgo.downloads.impl.pixels.DownloadsPixelName.DOWNLOAD_REQUEST_RETRIED
 import com.duckduckgo.downloads.store.DownloadStatus.STARTED
+import com.duckduckgo.user.agent.api.UserAgentProvider
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
@@ -53,6 +54,7 @@ class FileDownloadNotificationActionReceiver @Inject constructor(
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
     private val pixel: Pixel,
+    private val userAgentProvider: UserAgentProvider,
 ) : BroadcastReceiver(), MainProcessLifecycleObserver {
 
     override fun onCreate(owner: LifecycleOwner) {
@@ -95,6 +97,7 @@ class FileDownloadNotificationActionReceiver @Inject constructor(
             PendingFileDownload(
                 url = url,
                 subfolder = Environment.DIRECTORY_DOWNLOADS,
+                userAgent = userAgentProvider.userAgent(),
             ).run {
                 logcat { "Retrying download for $url" }
                 coroutineScope.launch(dispatcherProvider.io()) {
