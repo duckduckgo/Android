@@ -695,7 +695,6 @@ class RealDuckChat @Inject constructor(
         val cookieManager = cookiesManager.get()
         val ddgCookies = cookieManager?.getCookie(AppUrl.Url.COOKIES)?.split(";").orEmpty()
         val isMigrationCompleted = ddgCookies.contains("migration_status_dev_01=migrated_dev_01")
-        logcat { "Duck.ai: ddgCookies $ddgCookies isMigrationCompleted $isMigrationCompleted" }
         return isMigrationCompleted
     }
 
