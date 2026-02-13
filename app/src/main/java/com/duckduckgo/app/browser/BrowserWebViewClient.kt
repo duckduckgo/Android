@@ -56,6 +56,7 @@ import com.duckduckgo.app.browser.logindetection.WebNavigationEvent
 import com.duckduckgo.app.browser.mediaplayback.MediaPlayback
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.navigation.safeCopyBackForwardList
+import com.duckduckgo.app.browser.pageload.PageLoadWideEvent
 import com.duckduckgo.app.browser.pageloadpixel.PageLoadedHandler
 import com.duckduckgo.app.browser.pageloadpixel.firstpaint.PagePaintedHandler
 import com.duckduckgo.app.browser.print.PrintInjector
@@ -119,7 +120,7 @@ class BrowserWebViewClient @Inject constructor(
     private val jsPlugins: PluginPoint<JsInjectorPlugin>,
     private val currentTimeProvider: CurrentTimeProvider,
     private val pageLoadedHandler: PageLoadedHandler,
-    private val pageLoadWideEvent: com.duckduckgo.app.browser.pageload.PageLoadWideEvent,
+    private val pageLoadWideEvent: PageLoadWideEvent,
     private val shouldSendPagePaintedPixel: PagePaintedHandler,
     private val mediaPlayback: MediaPlayback,
     private val subscriptions: Subscriptions,
@@ -201,7 +202,7 @@ class BrowserWebViewClient @Inject constructor(
         isRedirect: Boolean,
     ): Boolean {
         try {
-            logcat(VERBOSE, tag = "Performance Project") { "shouldOverride webViewUrl: ${webView.url} URL: $url" }
+            logcat(VERBOSE) { "shouldOverride webViewUrl: ${webView.url} URL: $url" }
             webViewClientListener?.onShouldOverride()
             if (requestInterceptor.shouldOverrideUrlLoading(webViewClientListener, url, webView.url?.toUri(), isForMainFrame)) {
                 return true
@@ -434,7 +435,7 @@ class BrowserWebViewClient @Inject constructor(
         webView: WebView,
         url: String,
     ) {
-        logcat(VERBOSE, "Performance Project") { "onPageCommitVisible webViewUrl: ${webView.url} URL: $url progress: ${webView.progress}" }
+        logcat(VERBOSE) { "onPageCommitVisible webViewUrl: ${webView.url} URL: $url progress: ${webView.progress}" }
         // Show only when the commit matches the tab state
         if (webView.url == url) {
             val navigationList = webView.safeCopyBackForwardList() ?: return
@@ -443,8 +444,10 @@ class BrowserWebViewClient @Inject constructor(
             // Record page_visible flow step
             if (url != ABOUT_BLANK) {
                 val progress = webView.progress
-                appCoroutineScope.launch(dispatcherProvider.io()) {
-                    pageLoadWideEvent.recordPageVisible(url, progress)
+                webViewClientListener?.getCurrentTabId()?.let { tabId ->
+                    appCoroutineScope.launch(dispatcherProvider.io()) {
+                        pageLoadWideEvent.recordPageVisible(tabId, progress)
+                    }
                 }
             }
         }
@@ -478,20 +481,20 @@ class BrowserWebViewClient @Inject constructor(
         url: String?,
         favicon: Bitmap?,
     ) {
-        logcat("Performance Project") { "onPageStarted webViewUrl: ${webView.url} URL: $url lastPageStarted $lastPageStarted" }
+        logcat { "onPageStarted webViewUrl: ${webView.url} URL: $url lastPageStarted $lastPageStarted" }
         url?.let {
             // See https://app.asana.com/0/0/1206159443951489/f (WebView limitations)
             if (it != ABOUT_BLANK && start == null) {
                 start = currentTimeProvider.elapsedRealtime()
+                webViewClientListener?.getCurrentTabId()?.let { tabId ->
+                    if (!pageLoadWideEvent.isInProgress(tabId)) {
+                        appCoroutineScope.launch(dispatcherProvider.io()) {
+                            pageLoadWideEvent.startPageLoad(tabId)
+                        }
+                    }
+                }
                 incrementAndTrackLoad() // increment the request counter
                 requestInterceptor.onPageStarted(url)
-            }
-
-            // Start Wide Event flow for new page load (parallel loads handled by ConcurrentHashMap)
-            if (it != ABOUT_BLANK) {
-                appCoroutineScope.launch(dispatcherProvider.io()) {
-                    pageLoadWideEvent.startPageLoad(it)
-                }
             }
 
             handleMediaPlayback(webView, it)
@@ -531,7 +534,7 @@ class BrowserWebViewClient @Inject constructor(
         webView: WebView,
         url: String?,
     ) {
-        logcat(VERBOSE, "Performance Project") { "onPageFinished webViewUrl: ${webView.url} URL: $url progress: ${webView.progress}" }
+        logcat(VERBOSE) { "onPageFinished webViewUrl: ${webView.url} URL: $url progress: ${webView.progress}" }
 
         // See https://app.asana.com/0/0/1206159443951489/f (WebView limitations)
         if (webView.progress == 100) {
@@ -557,16 +560,17 @@ class BrowserWebViewClient @Inject constructor(
 
             if (url != null && url != ABOUT_BLANK) {
                 start?.let { safeStart ->
-                    // Trigger Wide Event completion
-                    appCoroutineScope.launch(dispatcherProvider.io()) {
-                        pageLoadWideEvent.finishPageLoad(
-                            tabId = url,
-                            outcome = "success",
-                            errorCode = null,
-                            isTabInForegroundOnFinish = webViewClientListener?.isTabInForeground() ?: true,
-                            activeRequestsOnLoadStart = parallelRequestsOnStart,
-                            concurrentRequestsOnFinish = decrementLoadCountAndGet(),
-                        )
+                    webViewClientListener?.getCurrentTabId()?.let { tabId ->
+                        appCoroutineScope.launch(dispatcherProvider.io()) {
+                            pageLoadWideEvent.finishPageLoad(
+                                tabId = tabId,
+                                outcome = "success",
+                                errorCode = null,
+                                isTabInForegroundOnFinish = webViewClientListener?.isTabInForeground() ?: true,
+                                activeRequestsOnLoadStart = parallelRequestsOnStart,
+                                concurrentRequestsOnFinish = decrementLoadCountAndGet(),
+                            )
+                        }
                     }
 
                     // TODO (cbarreiro - 22/05/2024): Extract to plugins
@@ -611,7 +615,7 @@ class BrowserWebViewClient @Inject constructor(
             withContext(dispatcherProvider.main()) {
                 loginDetector.onEvent(WebNavigationEvent.ShouldInterceptRequest(webView, request))
             }
-            logcat(VERBOSE, "Performance Project") { "Intercepting resource ${request.url} type:${request.method} on page $documentUrl" }
+            logcat(VERBOSE) { "Intercepting resource ${request.url} type:${request.method} on page $documentUrl" }
             requestInterceptor.shouldIntercept(
                 request,
                 webView,
@@ -624,7 +628,7 @@ class BrowserWebViewClient @Inject constructor(
         view: WebView?,
         detail: RenderProcessGoneDetail?,
     ): Boolean {
-        logcat(WARN, "Performance Project") { "onRenderProcessGone. Did it crash? ${detail?.didCrash()}" }
+        logcat(WARN) { "onRenderProcessGone. Did it crash? ${detail?.didCrash()}" }
         if (detail?.didCrash() == true) {
             pixel.fire(WEB_RENDERER_GONE_CRASH)
         } else {
@@ -647,7 +651,7 @@ class BrowserWebViewClient @Inject constructor(
         host: String?,
         realm: String?,
     ) {
-        logcat(VERBOSE, "Performance Project") { "onReceivedHttpAuthRequest ${view?.url} $realm, $host" }
+        logcat(VERBOSE) { "onReceivedHttpAuthRequest ${view?.url} $realm, $host" }
         if (handler != null) {
             logcat(VERBOSE) { "onReceivedHttpAuthRequest - useHttpAuthUsernamePassword [${handler.useHttpAuthUsernamePassword()}]" }
             if (handler.useHttpAuthUsernamePassword()) {
@@ -685,7 +689,7 @@ class BrowserWebViewClient @Inject constructor(
             else -> logcat { "SSL error ${error.primaryError}" }
         }
 
-        logcat("Performance Project") { "The certificate authority validation result is $trusted" }
+        logcat { "The certificate authority validation result is $trusted" }
         if (trusted is CertificateValidationState.TrustedChain) {
             handler.proceed()
         } else {
@@ -740,16 +744,18 @@ class BrowserWebViewClient @Inject constructor(
                 // Trigger Wide Event failure for main frame errors
                 request.url?.toString()?.let { url ->
                     if (url != ABOUT_BLANK) {
-                        appCoroutineScope.launch(dispatcherProvider.io()) {
-                            val errorDescription = "${webResourceError.errorCode.asStringErrorCode()} - ${webResourceError.description}"
-                            pageLoadWideEvent.finishPageLoad(
-                                tabId = url,
-                                outcome = "error",
-                                errorCode = errorDescription,
-                                isTabInForegroundOnFinish = webViewClientListener?.isTabInForeground() ?: true,
-                                activeRequestsOnLoadStart = parallelRequestsOnStart,
-                                concurrentRequestsOnFinish = decrementLoadCountAndGet(),
-                            )
+                        webViewClientListener?.getCurrentTabId()?.let { tabId ->
+                            appCoroutineScope.launch(dispatcherProvider.io()) {
+                                val errorDescription = "${webResourceError.errorCode.asStringErrorCode()} - ${webResourceError.description}"
+                                pageLoadWideEvent.finishPageLoad(
+                                    tabId = tabId,
+                                    outcome = "error",
+                                    errorCode = errorDescription,
+                                    isTabInForegroundOnFinish = webViewClientListener?.isTabInForeground() ?: true,
+                                    activeRequestsOnLoadStart = parallelRequestsOnStart,
+                                    concurrentRequestsOnFinish = decrementLoadCountAndGet(),
+                                )
+                            }
                         }
                     }
                 }

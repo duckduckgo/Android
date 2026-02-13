@@ -28,6 +28,7 @@ import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.Lazy
+import dagger.SingleInstanceIn
 import kotlinx.coroutines.withContext
 import logcat.logcat
 import java.util.concurrent.ConcurrentHashMap
@@ -40,6 +41,14 @@ import kotlin.time.toJavaDuration
  * Manages flow lifecycle: page_start → page_visible → page_escaped_fixed_progress → page_finish
  */
 interface PageLoadWideEvent {
+    /**
+     * Checks if there is an active page load flow for the given tab ID.
+     *
+     * @param tabId The unique identifier for the tab
+     * @return True if a page load flow is in progress for the tab, false otherwise
+     */
+    fun isInProgress(tabId: String): Boolean
+
     /**
      * Called when a page starts loading.
      * Creates a new Wide Event flow and records page_start step.
@@ -88,6 +97,7 @@ interface PageLoadWideEvent {
 }
 
 @ContributesBinding(AppScope::class)
+@SingleInstanceIn(AppScope::class)
 class RealPageLoadWideEvent @Inject constructor(
     private val wideEventClient: WideEventClient,
     private val deviceInfo: DeviceInfo,
@@ -98,6 +108,8 @@ class RealPageLoadWideEvent @Inject constructor(
     private val dispatchers: DispatcherProvider,
 ) : PageLoadWideEvent {
     private val activeFlows = ConcurrentHashMap<String, Long>()
+
+    override fun isInProgress(tabId: String): Boolean = activeFlows.containsKey(tabId)
 
     override suspend fun startPageLoad(tabId: String) {
         if (!isFeatureEnabled()) return
@@ -157,7 +169,6 @@ class RealPageLoadWideEvent @Inject constructor(
 
     override suspend fun recordExitedFixedProgress(tabId: String, actualProgress: Int) {
         if (!isFeatureEnabled()) return
-
         val flowId = getActiveFlowId(tabId) ?: return
 
         wideEventClient.intervalEnd(
@@ -185,7 +196,6 @@ class RealPageLoadWideEvent @Inject constructor(
         concurrentRequestsOnFinish: Int,
     ) {
         if (!isFeatureEnabled()) return
-
         val flowId = popActiveFlowId(tabId) ?: return
 
         wideEventClient.intervalEnd(

@@ -611,6 +611,7 @@ class BrowserTabViewModel @Inject constructor(
     private var accessibilityObserver: Job? = null
     private var isProcessingTrackingLink = false
     private var isLinkOpenedInNewTab = false
+    private var hasExitedFixedProgress = false
     private var allowlistRefreshTriggerJob: Job? = null
     private var isCustomTabScreen: Boolean = false
     private var alreadyShownKeyboard: Boolean = false
@@ -1866,6 +1867,7 @@ class BrowserTabViewModel @Inject constructor(
 
         isProcessingTrackingLink = false
         isLinkOpenedInNewTab = false
+        hasExitedFixedProgress = false
 
         automaticSavedLoginsMonitor.clearAutoSavedLoginId(tabId)
     }
@@ -2096,7 +2098,7 @@ class BrowserTabViewModel @Inject constructor(
         newProgress: Int,
         webViewNavigationState: WebViewNavigationState,
     ) {
-        logcat(VERBOSE, "Performance Project") { "Loading in progress $newProgress, url: ${webViewNavigationState.currentUrl}" }
+        logcat(VERBOSE) { "Loading in progress $newProgress, url: ${webViewNavigationState.currentUrl}" }
 
         if (!currentBrowserViewState().maliciousSiteBlocked) {
             navigationStateChanged(webViewNavigationState)
@@ -2108,23 +2110,20 @@ class BrowserTabViewModel @Inject constructor(
         val progress = currentLoadingViewState()
         if (progress.progress == newProgress) return
 
-        // Track progress milestones and fixed progress escape for Wide Events
-        val currentUrl = webViewNavigationState.currentUrl
-        if (currentUrl != null && currentUrl != "about:blank") {
-            appCoroutineScope.launch(dispatchers.io()) {
-                // Track escaping fixed progress zone (when progress >= FIXED_PROGRESS)
-                if (progress.progress < FIXED_PROGRESS && newProgress >= FIXED_PROGRESS) {
-                    pageLoadWideEvent.recordExitedFixedProgress(currentUrl, newProgress)
-                }
-            }
-        }
-
         val visualProgress =
             if (newProgress < FIXED_PROGRESS || isProcessingTrackingLink) {
                 FIXED_PROGRESS
             } else {
                 newProgress
             }
+
+        // Track the first time we escape from fixed progress for Wide Events
+        if (!hasExitedFixedProgress && visualProgress == newProgress) {
+            hasExitedFixedProgress = true
+            appCoroutineScope.launch(dispatchers.io()) {
+                pageLoadWideEvent.recordExitedFixedProgress(tabId, newProgress)
+            }
+        }
 
         loadingViewState.value = progress.copy(isLoading = isLoading, progress = visualProgress, url = site?.url ?: "")
 
