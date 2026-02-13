@@ -14,20 +14,13 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.fire
+package com.duckduckgo.dataclearing.impl
 
-import android.os.SystemClock
-import com.duckduckgo.app.settings.clear.ClearWhenOption
+import com.duckduckgo.dataclearing.api.BackgroundTimeKeeper
+import com.duckduckgo.dataclearing.api.ClearWhenOption
+import com.duckduckgo.dataclearing.api.durationMilliseconds
 import logcat.LogPriority.INFO
 import logcat.logcat
-
-interface BackgroundTimeKeeper {
-    fun hasEnoughTimeElapsed(
-        timeNow: Long = SystemClock.elapsedRealtime(),
-        backgroundedTimestamp: Long,
-        clearWhenOption: ClearWhenOption,
-    ): Boolean
-}
 
 class DataClearerTimeKeeper : BackgroundTimeKeeper {
 

@@ -18,8 +18,6 @@ package com.duckduckgo.app.global.view
 
 import android.net.Uri
 import app.cash.turbine.test
-import com.duckduckgo.app.fire.ManualDataClearing
-import com.duckduckgo.app.fire.store.FireDataStore
 import com.duckduckgo.app.fire.wideevents.DataClearingWideEvent
 import com.duckduckgo.app.firebutton.FireButtonStore
 import com.duckduckgo.app.global.events.db.UserEventKey
@@ -31,7 +29,6 @@ import com.duckduckgo.app.pixels.AppPixelName.FIRE_DIALOG_SHOWN
 import com.duckduckgo.app.pixels.AppPixelName.PRODUCT_TELEMETRY_SURFACE_DATA_CLEARING
 import com.duckduckgo.app.pixels.AppPixelName.PRODUCT_TELEMETRY_SURFACE_DATA_CLEARING_DAILY
 import com.duckduckgo.app.settings.clear.FireAnimation
-import com.duckduckgo.app.settings.clear.FireClearOption
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_ANIMATION
@@ -40,6 +37,9 @@ import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.DateProvider
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.dataclearing.api.FireClearOption
+import com.duckduckgo.dataclearing.api.FireDataStore
+import com.duckduckgo.dataclearing.api.ManualDataClearing
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.history.api.HistoryEntry
 import com.duckduckgo.history.api.NavigationHistory

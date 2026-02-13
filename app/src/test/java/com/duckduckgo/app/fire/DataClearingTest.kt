@@ -16,13 +16,14 @@
 
 package com.duckduckgo.app.fire
 
-import com.duckduckgo.app.fire.store.FireDataStore
 import com.duckduckgo.app.fire.wideevents.DataClearingWideEvent
-import com.duckduckgo.app.global.view.ClearDataAction
-import com.duckduckgo.app.settings.clear.ClearWhenOption
-import com.duckduckgo.app.settings.clear.FireClearOption
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.dataclearing.api.BackgroundTimeKeeper
+import com.duckduckgo.dataclearing.api.ClearDataAction
+import com.duckduckgo.dataclearing.api.ClearWhenOption
+import com.duckduckgo.dataclearing.api.FireClearOption
+import com.duckduckgo.dataclearing.api.FireDataStore
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest

@@ -19,12 +19,12 @@ package com.duckduckgo.app.fire.wideevents
 import android.annotation.SuppressLint
 import com.duckduckgo.app.fire.wideevents.DataClearingWideEvent.EntryPoint
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
-import com.duckduckgo.app.settings.clear.ClearWhatOption
-import com.duckduckgo.app.settings.clear.FireClearOption
 import com.duckduckgo.app.statistics.wideevents.CleanupPolicy.OnProcessStart
 import com.duckduckgo.app.statistics.wideevents.FlowStatus
 import com.duckduckgo.app.statistics.wideevents.WideEventClient
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.dataclearing.api.ClearWhatOption
+import com.duckduckgo.dataclearing.api.FireClearOption
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.test.runTest

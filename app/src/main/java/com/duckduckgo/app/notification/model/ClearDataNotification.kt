@@ -21,7 +21,6 @@ import android.content.Context
 import android.os.Bundle
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.fire.AutomaticDataClearing
 import com.duckduckgo.app.firebutton.DataClearingSettingsActivity
 import com.duckduckgo.app.firebutton.FireButtonActivity
 import com.duckduckgo.app.notification.NotificationRegistrar
@@ -29,11 +28,12 @@ import com.duckduckgo.app.notification.TaskStackBuilderFactory
 import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
-import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.dataclearing.api.AutomaticDataClearing
+import com.duckduckgo.dataclearing.api.ClearWhatOption
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.CoroutineScope

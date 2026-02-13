@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 DuckDuckGo
+ * Copyright (c) 2018 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,15 +14,14 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.fire.store
+package com.duckduckgo.dataclearing.api
 
-import androidx.room.Entity
+import android.os.SystemClock
 
-@Entity(
-    tableName = "tab_visited_sites",
-    primaryKeys = ["tabId", "domain"],
-)
-data class TabVisitedSiteEntity(
-    val tabId: String,
-    val domain: String,
-)
+interface BackgroundTimeKeeper {
+    fun hasEnoughTimeElapsed(
+        timeNow: Long = SystemClock.elapsedRealtime(),
+        backgroundedTimestamp: Long,
+        clearWhenOption: ClearWhenOption,
+    ): Boolean
+}

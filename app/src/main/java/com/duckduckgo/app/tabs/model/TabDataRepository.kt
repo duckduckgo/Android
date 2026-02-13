@@ -26,7 +26,6 @@ import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.fire.store.TabVisitedSitesRepository
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.tabs.TabManagerFeatureFlags
@@ -37,6 +36,7 @@ import com.duckduckgo.app.tabs.store.TabSwitcherDataStore
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.dataclearing.api.TabVisitedSitesRepository
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
 import dagger.SingleInstanceIn

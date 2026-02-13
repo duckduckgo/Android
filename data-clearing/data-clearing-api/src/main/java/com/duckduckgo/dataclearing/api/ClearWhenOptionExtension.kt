@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.fire
+package com.duckduckgo.dataclearing.api
 
-import com.duckduckgo.app.settings.clear.ClearWhenOption
 import java.util.concurrent.TimeUnit
 
 fun ClearWhenOption.durationMilliseconds(): Long {

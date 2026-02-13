@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.fire
+package com.duckduckgo.dataclearing.impl
 
 import android.os.SystemClock
-import com.duckduckgo.app.settings.clear.ClearWhenOption
-import com.duckduckgo.app.settings.clear.ClearWhenOption.*
+import com.duckduckgo.dataclearing.api.ClearWhenOption
+import com.duckduckgo.dataclearing.api.ClearWhenOption.*
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
