@@ -71,7 +71,7 @@ class DefaultFileDownloadNotificationManager @Inject constructor(
         val pendingIntent = PendingIntent.getBroadcast(
             applicationContext,
             downloadId.toInt(),
-            FileDownloadNotificationActionReceiver.cancelDownloadIntent(downloadId),
+            FileDownloadNotificationActionReceiver.cancelDownloadIntent(applicationContext, downloadId),
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
         )
         val notification = NotificationCompat.Builder(applicationContext, FileDownloadNotificationChannelType.FILE_DOWNLOADING.id)
@@ -143,12 +143,20 @@ class DefaultFileDownloadNotificationManager @Inject constructor(
             .setShowWhen(false)
             .setContentTitle(applicationContext.getString(R.string.notificationDownloadFailed))
             .setSmallIcon(com.duckduckgo.mobile.android.R.drawable.notification_logo)
+            .setDeleteIntent(
+                PendingIntent.getBroadcast(
+                    applicationContext,
+                    downloadId.toInt().inv(),
+                    FileDownloadNotificationActionReceiver.dismissDownloadIntent(applicationContext, downloadId),
+                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+                ),
+            )
             .apply {
-                url?.let { fileUrl ->
+                url?.let {
                     val pendingIntent = PendingIntent.getBroadcast(
                         applicationContext,
                         downloadId.toInt(),
-                        FileDownloadNotificationActionReceiver.retryDownloadIntent(downloadId, fileUrl),
+                        FileDownloadNotificationActionReceiver.retryDownloadIntent(applicationContext, downloadId),
                         PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
                     )
                     addAction(

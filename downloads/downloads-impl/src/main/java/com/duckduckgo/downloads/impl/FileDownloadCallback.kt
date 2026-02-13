@@ -95,6 +95,7 @@ class FileDownloadCallback @Inject constructor(
     private val dispatchers: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val mediaScanner: MediaScanner,
+    private val failedDownloadRetryUrlStore: FailedDownloadRetryUrlStore,
 ) : DownloadCallback, DownloadStateListener {
 
     private val command = Channel<DownloadCommand>(1, BufferOverflow.DROP_OLDEST)
@@ -201,8 +202,9 @@ class FileDownloadCallback @Inject constructor(
             Other, UnsupportedUrlType, DataUriParseException -> R.string.downloadsDownloadGenericErrorMessage
         }
         val downloadFailedMessage = DownloadCommand.ShowDownloadFailedMessage(messageId = messageId)
-        fileDownloadNotificationManager.showDownloadFailedNotification(downloadId, url)
         appCoroutineScope.launch(dispatchers.io()) {
+            url?.let { failedDownloadRetryUrlStore.saveRetryUrl(downloadId, it) }
+            fileDownloadNotificationManager.showDownloadFailedNotification(downloadId, url)
             command.send(downloadFailedMessage)
         }
     }

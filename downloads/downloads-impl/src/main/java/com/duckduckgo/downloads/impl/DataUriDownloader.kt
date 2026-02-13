@@ -31,6 +31,7 @@ import logcat.logcat
 import java.io.File
 import java.io.IOException
 import javax.inject.Inject
+import kotlin.random.Random
 
 class DataUriDownloader @Inject constructor(
     private val dataUriParser: DataUriParser,
@@ -50,10 +51,10 @@ class DataUriDownloader @Inject constructor(
                 }
                 is ParseResult.ParsedDataUri -> {
                     val file = initialiseFilesOnDisk(pending, parsedDataUri.filename)
-
+                    val downloadId = Random.nextLong()
                     callback.onStart(
                         DownloadItem(
-                            downloadId = 0L,
+                            downloadId = downloadId,
                             downloadStatus = STARTED,
                             fileName = file.name,
                             contentLength = 0L,
@@ -67,11 +68,11 @@ class DataUriDownloader @Inject constructor(
                     }
                         .onSuccess {
                             logcat { "Succeeded to decode Base64" }
-                            callback.onSuccess(file = file, mimeType = parsedDataUri.mimeType)
+                            callback.onSuccess(downloadId = downloadId, contentLength = file.length(), file = file, mimeType = parsedDataUri.mimeType)
                         }
                         .onFailure {
                             logcat { "Failed to decode Base64: ${it.asLog()}" }
-                            callback.onError(url = pending.url, reason = DownloadFailReason.DataUriParseException)
+                            callback.onError(url = pending.url, downloadId = downloadId, reason = DownloadFailReason.DataUriParseException)
                         }
                 }
             }
