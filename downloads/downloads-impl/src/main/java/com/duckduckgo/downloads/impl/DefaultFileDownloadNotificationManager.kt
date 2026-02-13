@@ -143,6 +143,14 @@ class DefaultFileDownloadNotificationManager @Inject constructor(
             .setShowWhen(false)
             .setContentTitle(applicationContext.getString(R.string.notificationDownloadFailed))
             .setSmallIcon(com.duckduckgo.mobile.android.R.drawable.notification_logo)
+            .setDeleteIntent(
+                PendingIntent.getBroadcast(
+                    applicationContext,
+                    downloadId.toInt().inv(),
+                    FileDownloadNotificationActionReceiver.dismissDownloadIntent(applicationContext, downloadId),
+                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+                ),
+            )
             .apply {
                 url?.let {
                     val pendingIntent = PendingIntent.getBroadcast(

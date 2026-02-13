@@ -21,6 +21,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Environment
+import androidx.core.app.NotificationManagerCompat
 import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
@@ -103,11 +104,23 @@ class FileDownloadNotificationActionReceiver @Inject constructor(
                 downloadsRepository.delete(downloadId)
                 fileDownloader.enqueueDownload(pendingDownload)
             }
+        } else if (isDismissIntent(intent)) {
+            logcat { "Received dismiss download intent for download id $downloadId" }
+            coroutineScope.launch(dispatcherProvider.io()) {
+                failedDownloadRetryUrlStore.removeRetryUrl(downloadId)
+            }
         }
     }
 
     private suspend fun purgePendingDownloads() {
-        failedDownloadRetryUrlStore.clear()
+        val hasActiveDownloadNotifications = NotificationManagerCompat.from(context)
+            .activeNotifications
+            .any { it.notification.channelId in downloadNotificationChannelIds }
+
+        if (!hasActiveDownloadNotifications) {
+            failedDownloadRetryUrlStore.clear()
+        }
+
         downloadsRepository.getDownloads().filter { it.downloadStatus == STARTED }.map { it.downloadId }.run {
             downloadsRepository.delete(this)
             forEach { fileDownloadNotificationManager.cancelDownloadFileNotification(it) }
@@ -115,10 +128,15 @@ class FileDownloadNotificationActionReceiver @Inject constructor(
     }
 
     companion object {
+        private val downloadNotificationChannelIds = setOf(
+            FileDownloadNotificationChannelType.FILE_DOWNLOADING.id,
+            FileDownloadNotificationChannelType.FILE_DOWNLOADED.id,
+        )
         private const val INTENT_DOWNLOADS_NOTIFICATION_ACTION = "com.duckduckgo.downloads.notification.action"
         private const val CTA = "CTA"
         private const val EXTRA_CANCEL = "EXTRA_CANCEL"
         private const val EXTRA_RETRY = "EXTRA_RETRY"
+        private const val EXTRA_DISMISS = "EXTRA_DISMISS"
         private const val DISMISS_NOTIFICATION_EXTRA = "DISMISS_NOTIFICATION_EXTRA"
         private const val DOWNLOAD_ID_EXTRA = "downloadId"
 
@@ -141,12 +159,24 @@ class FileDownloadNotificationActionReceiver @Inject constructor(
             }
         }
 
+        fun dismissDownloadIntent(context: Context, downloadId: Long): Intent {
+            return Intent(INTENT_DOWNLOADS_NOTIFICATION_ACTION).apply {
+                setPackage(context.packageName)
+                putExtra(DOWNLOAD_ID_EXTRA, downloadId)
+                putExtra(CTA, EXTRA_DISMISS)
+            }
+        }
+
         private fun isCancelIntent(intent: Intent): Boolean {
             return intent.getStringExtra(CTA) == EXTRA_CANCEL
         }
 
         private fun isRetryIntent(intent: Intent): Boolean {
             return intent.getStringExtra(CTA) == EXTRA_RETRY
+        }
+
+        private fun isDismissIntent(intent: Intent): Boolean {
+            return intent.getStringExtra(CTA) == EXTRA_DISMISS
         }
 
         private fun shouldDismissNotification(intent: Intent): Boolean {
