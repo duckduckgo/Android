@@ -798,13 +798,16 @@ class RealDuckChat @Inject constructor(
             isFullscreenModeEnabled = showFullScreenMode
             _showFullScreenMode.emit(showFullScreenMode)
 
-            val isStandaloneMigrationCompleted = isStandaloneMigrationCompleted()
-            val showContextualMode = isDuckChatFeatureEnabled && isDuckChatUserEnabled && duckChatFeature.contextualMode().isEnabled() &&
-                isStandaloneMigrationCompleted
-            isContextualModeEnabled = showContextualMode
-            _showContextualMode.emit(showContextualMode)
+            val isContextualModeKillSwitch = duckChatFeature.contextualModeKillSwitch().isEnabled()
 
-            isAutomaticContextAttachmentEnabled = showContextualMode &&
+            val showContextualMode = (isDuckChatFeatureEnabled && isDuckChatUserEnabled && isStandaloneMigrationCompleted()) || (
+                isDuckChatFeatureEnabled && isDuckChatUserEnabled && duckChatFeature.contextualMode().isEnabled()
+                )
+
+            isContextualModeEnabled = showContextualMode && isContextualModeKillSwitch
+            _showContextualMode.emit(isContextualModeEnabled)
+
+            isAutomaticContextAttachmentEnabled = isContextualModeEnabled &&
                 duckChatFeature.automaticContextAttachment()
                     .isEnabled() && duckChatFeatureRepository.isAutomaticPageContextAttachmentUserSettingEnabled()
         }

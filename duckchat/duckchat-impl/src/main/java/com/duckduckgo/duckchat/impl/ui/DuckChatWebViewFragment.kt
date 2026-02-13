@@ -177,6 +177,7 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
     private val cookieManager: CookieManager by lazy { CookieManager.getInstance() }
 
     private var pendingFileDownload: PendingFileDownload? = null
+
     private val downloadMessagesJob = ConflatedJob()
 
     private val binding: ActivityDuckChatWebviewBinding by viewBinding()
@@ -195,6 +196,10 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
         super.onViewCreated(view, savedInstanceState)
 
         val url = arguments?.getString(KEY_DUCK_AI_URL) ?: "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5"
+
+        // Explicitly enable cookies for this WebView
+        cookieManager.setAcceptCookie(true)
+        cookieManager.setAcceptThirdPartyCookies(simpleWebview, true)
 
         simpleWebview.let {
             it.webViewClient = webViewClient
@@ -309,6 +314,12 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
         }
 
         url?.let {
+            // Check if migration is already complete to avoid re-triggering
+            val duckAiCookies = cookieManager.getCookie("https://duck.ai")
+            val duckDuckGoCookies = cookieManager.getCookie("https://duckduckgo.com")
+            logcat { "Duck.ai Full screen onViewCreated: URL=$it" }
+            logcat { "Duck.ai Full screen: duck.ai cookies=$duckAiCookies" }
+            logcat { "Duck.ai Full screen: duckduckgo.com cookies=$duckDuckGoCookies" }
             simpleWebview.loadUrl(it)
         }
 
@@ -717,9 +728,6 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
 
     override fun onDestroyView() {
         super.onDestroyView()
-        appCoroutineScope.launch(dispatcherProvider.io()) {
-            cookieManager.flush()
-        }
     }
 
     companion object {
