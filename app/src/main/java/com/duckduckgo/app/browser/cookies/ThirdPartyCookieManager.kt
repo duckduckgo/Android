@@ -66,7 +66,8 @@ class AppThirdPartyCookieManager(
         val host = uri.host ?: return
         val domain = authCookiesAllowedDomainsRepository.getDomain(host)
         withContext(dispatchers.main()) {
-            if (domain != null && hasExcludedCookieName()) {
+            // Allow third-party cookies for domains that need cross-domain functionality
+            if (hostsThatAlwaysRequireThirdPartyCookies.contains(host) || (domain != null && hasExcludedCookieName())) {
                 logcat { "Cookies enabled for $uri" }
                 cookieManagerProvider.get()?.setAcceptThirdPartyCookies(webView, true)
             } else {
@@ -107,6 +108,8 @@ class AppThirdPartyCookieManager(
         private const val CODE = "code"
         const val GOOGLE_ACCOUNTS_URL = "https://accounts.google.com"
         const val GOOGLE_ACCOUNTS_HOST = "accounts.google.com"
-        val hostsThatAlwaysRequireThirdPartyCookies = listOf("home.nest.com")
+
+        // duck.ai needs third-party cookies for cross-domain migration between duckduckgo.com and duck.ai
+        val hostsThatAlwaysRequireThirdPartyCookies = listOf("home.nest.com", "duck.ai", "duckduckgo.com")
     }
 }
