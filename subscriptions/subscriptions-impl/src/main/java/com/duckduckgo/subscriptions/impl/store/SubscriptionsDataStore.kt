@@ -49,6 +49,10 @@ interface SubscriptionsDataStore {
 
     var subscriptionFeatures: String?
     var subscriptionEntitlements: String?
+
+    // Pending Plans (stored as JSON array string)
+    var pendingPlans: String?
+
     fun canUseEncryption(): Boolean
 }
 
@@ -236,6 +240,14 @@ internal class SubscriptionsEncryptedDataStore(
             }
         }
 
+    override var pendingPlans: String?
+        get() = encryptedPreferences?.getString(KEY_PENDING_PLANS, null)
+        set(value) {
+            encryptedPreferences?.edit(commit = true) {
+                putString(KEY_PENDING_PLANS, value)
+            }
+        }
+
     override fun canUseEncryption(): Boolean {
         encryptedPreferences?.edit(commit = true) { putBoolean("test", true) }
         return encryptedPreferences?.getBoolean("test", false) == true
@@ -262,5 +274,6 @@ internal class SubscriptionsEncryptedDataStore(
         const val KEY_SUBSCRIPTION_FEATURES = "KEY_SUBSCRIPTION_FEATURES"
         const val KEY_SUBSCRIPTION_ENTITLEMENTS = "KEY_SUBSCRIPTION_ENTITLEMENTS"
         const val KEY_FREE_TRIAL_ACTIVE = "KEY_FREE_TRIAL_ACTIVE"
+        const val KEY_PENDING_PLANS = "KEY_PENDING_PLANS"
     }
 }

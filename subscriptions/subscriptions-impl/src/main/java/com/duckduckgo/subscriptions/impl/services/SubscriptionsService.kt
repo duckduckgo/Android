@@ -59,6 +59,15 @@ data class SubscriptionResponse(
     val platform: String,
     val status: String,
     val activeOffers: List<ActiveOfferResponse>,
+    val pendingPlans: List<PendingPlanResponse> = emptyList(),
+)
+
+data class PendingPlanResponse(
+    val productId: String,
+    val billingPeriod: String,
+    val effectiveAt: Long,
+    val status: String,
+    val tier: String,
 )
 
 data class ActiveOfferResponse(

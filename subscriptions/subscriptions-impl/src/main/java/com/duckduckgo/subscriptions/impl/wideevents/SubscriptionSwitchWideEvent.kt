@@ -24,8 +24,11 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.impl.PrivacyProFeature
-import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN_ROW
-import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN_US
+import com.duckduckgo.subscriptions.impl.SubscriptionTier
+import com.duckduckgo.subscriptions.impl.SubscriptionTier.PLUS
+import com.duckduckgo.subscriptions.impl.SubscriptionTier.PRO
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.LIST_MONTHLY_PLUS_PLANS
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.LIST_MONTHLY_PRO_PLANS
 import com.duckduckgo.subscriptions.impl.repository.isActive
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.Lazy
@@ -89,21 +92,54 @@ class SubscriptionSwitchWideEventImpl @Inject constructor(
     ) {
         if (!isFeatureEnabled()) return
 
-        val isUpgrade = fromPlan in listOf(MONTHLY_PLAN_US, MONTHLY_PLAN_ROW)
-        val switchType = if (isUpgrade) SWITCH_TYPE_UPGRADE else SWITCH_TYPE_DOWNGRADE
+        val fromTier = SubscriptionTier.fromPlanId(fromPlan)
+        val toTier = SubscriptionTier.fromPlanId(toPlan)
+        val switchType = deriveSwitchBillingType(fromPlan, toPlan)
+        val changeType = deriveChangeType(fromTier, toTier)
 
         cachedFlowId = wideEventClient
             .flowStart(
-                name = SUBSCRIPTION_SWITCH_FEATURE_NAME,
+                name = SUBSCRIPTION_PLAN_CHANGE_FEATURE_NAME,
                 flowEntryPoint = context,
                 metadata = mapOf(
                     KEY_FROM_PLAN to fromPlan,
                     KEY_TO_PLAN to toPlan,
+                    KEY_FROM_TIER to fromTier.value,
+                    KEY_TO_TIER to toTier.value,
                     KEY_SWITCH_TYPE to switchType,
+                    KEY_CHANGE_TYPE to changeType,
                 ),
                 cleanupPolicy = OnProcessStart(ignoreIfIntervalTimeoutPresent = true),
             )
             .getOrNull()
+    }
+
+    private fun deriveSwitchBillingType(
+        fromPlan: String,
+        toPlan: String,
+    ): String {
+        val fromIsMonthly = fromPlan in LIST_MONTHLY_PLUS_PLANS + LIST_MONTHLY_PRO_PLANS
+        val toIsMonthly = toPlan in LIST_MONTHLY_PLUS_PLANS + LIST_MONTHLY_PRO_PLANS
+        return when {
+            fromIsMonthly && toIsMonthly -> SWITCH_TYPE_NONE
+            !fromIsMonthly && !toIsMonthly -> SWITCH_TYPE_NONE
+            toIsMonthly -> SWITCH_TYPE_DOWNGRADE
+            else -> SWITCH_TYPE_UPGRADE
+        }
+    }
+
+    private fun deriveChangeType(
+        fromTier: SubscriptionTier,
+        toTier: SubscriptionTier,
+    ): String {
+        if (fromTier == SubscriptionTier.UNKNOWN || toTier == SubscriptionTier.UNKNOWN) {
+            return CHANGE_TYPE_CROSSGRADE
+        }
+        return when {
+            fromTier == PLUS && toTier == PRO -> CHANGE_TYPE_UPGRADE
+            fromTier == PRO && toTier == PLUS -> CHANGE_TYPE_DOWNGRADE
+            else -> CHANGE_TYPE_CROSSGRADE
+        }
     }
 
     override suspend fun onCurrentSubscriptionValidated() {
@@ -289,7 +325,7 @@ class SubscriptionSwitchWideEventImpl @Inject constructor(
     private suspend fun getCurrentWideEventId(): Long? {
         if (cachedFlowId == null) {
             cachedFlowId = wideEventClient
-                .getFlowIds(SUBSCRIPTION_SWITCH_FEATURE_NAME)
+                .getFlowIds(SUBSCRIPTION_PLAN_CHANGE_FEATURE_NAME)
                 .getOrNull()
                 ?.lastOrNull()
         }
@@ -298,15 +334,22 @@ class SubscriptionSwitchWideEventImpl @Inject constructor(
     }
 
     private companion object {
-        const val SUBSCRIPTION_SWITCH_FEATURE_NAME = "subscription-switch"
+        const val SUBSCRIPTION_PLAN_CHANGE_FEATURE_NAME = "subscription-plan-change"
         const val KEY_FROM_PLAN = "from_plan"
         const val KEY_TO_PLAN = "to_plan"
-        const val KEY_SWITCH_TYPE = "switch_type"
+        const val KEY_FROM_TIER = "from_tier"
+        const val KEY_TO_TIER = "to_tier"
+        const val KEY_SWITCH_TYPE = "billing_cycle_switch_type"
+        const val KEY_CHANGE_TYPE = "tier_change_type"
         const val KEY_ACTIVATION_LATENCY = "activation_latency_ms_bucketed"
 
         // Switch types
         const val SWITCH_TYPE_UPGRADE = "upgrade"
         const val SWITCH_TYPE_DOWNGRADE = "downgrade"
+        const val SWITCH_TYPE_NONE = "none"
+        const val CHANGE_TYPE_CROSSGRADE = "crossgrade"
+        const val CHANGE_TYPE_UPGRADE = "upgrade"
+        const val CHANGE_TYPE_DOWNGRADE = "downgrade"
 
         // Steps
         const val STEP_VALIDATE_CURRENT_SUBSCRIPTION = "validate_current_subscription"

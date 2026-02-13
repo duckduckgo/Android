@@ -35,10 +35,12 @@ import com.duckduckgo.subscriptions.api.SubscriptionStatus.NOT_AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.UNKNOWN
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.WAITING
 import com.duckduckgo.subscriptions.impl.RealSubscriptionsManager.RecoverSubscriptionResult
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.ADVANCED_SUBSCRIPTION
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.BASIC_SUBSCRIPTION
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.LEGACY_FE_ITR
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.LEGACY_FE_NETP
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.LEGACY_FE_PIR
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.LIST_OF_PRO_PLANS
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN_ROW
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN_US
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.NETP
@@ -64,6 +66,7 @@ import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.AccessToken
 import com.duckduckgo.subscriptions.impl.repository.Account
 import com.duckduckgo.subscriptions.impl.repository.AuthRepository
+import com.duckduckgo.subscriptions.impl.repository.PendingPlan
 import com.duckduckgo.subscriptions.impl.repository.RefreshToken
 import com.duckduckgo.subscriptions.impl.repository.Subscription
 import com.duckduckgo.subscriptions.impl.repository.isActive
@@ -548,6 +551,8 @@ class RealSubscriptionsManager @Inject constructor(
             val currentPurchaseToken = playBillingManager.getLatestPurchaseToken()
 
             if (currentPurchaseToken == null) {
+                val errorMessage = "No current purchase token found for switch"
+                logcat { "Subs: Cannot switch plan - $errorMessage" }
                 _currentPurchaseState.emit(CurrentPurchase.Failure("No current purchase token found for switch"))
                 return@withContext
             }
@@ -555,6 +560,8 @@ class RealSubscriptionsManager @Inject constructor(
             // Get account details for external ID
             val account = authRepository.getAccount()
             if (account == null) {
+                val errorMessage = "No account found for switch"
+                logcat { "Subs: Cannot switch plan - $errorMessage" }
                 _currentPurchaseState.emit(CurrentPurchase.Failure("No account found for switch"))
                 return@withContext
             }
@@ -702,6 +709,21 @@ class RealSubscriptionsManager @Inject constructor(
                 ),
             )
 
+            val pendingPlans = try {
+                confirmationResponse.subscription.pendingPlans.map {
+                    PendingPlan(
+                        productId = it.productId,
+                        billingPeriod = it.billingPeriod,
+                        effectiveAt = it.effectiveAt,
+                        status = it.status,
+                        tier = SubscriptionTier.fromTierString(it.tier),
+                    )
+                }
+            } catch (e: Exception) {
+                logcat(ERROR) { "Failed to parse pending plans: ${e.asLog()}" }
+                emptyList()
+            }
+
             val subscription = Subscription(
                 productId = confirmationResponse.subscription.productId,
                 billingPeriod = confirmationResponse.subscription.billingPeriod,
@@ -710,6 +732,7 @@ class RealSubscriptionsManager @Inject constructor(
                 status = confirmationResponse.subscription.status.toStatus(),
                 platform = confirmationResponse.subscription.platform,
                 activeOffers = confirmationResponse.subscription.activeOffers.map { it.type.toActiveOfferType() },
+                pendingPlans = pendingPlans,
             )
 
             authRepository.setSubscription(subscription)
@@ -924,6 +947,22 @@ class RealSubscriptionsManager @Inject constructor(
                 null
             }
 
+        // Convert full pendingPlans array to domain models
+        val pendingPlans = try {
+            subscription.pendingPlans.map {
+                PendingPlan(
+                    productId = it.productId,
+                    billingPeriod = it.billingPeriod,
+                    effectiveAt = it.effectiveAt,
+                    status = it.status,
+                    tier = SubscriptionTier.fromTierString(it.tier),
+                )
+            }
+        } catch (e: Exception) {
+            logcat(ERROR) { "Failed to parse pending plans: ${e.asLog()}" }
+            emptyList()
+        }
+
         authRepository.setSubscription(
             Subscription(
                 productId = subscription.productId,
@@ -933,6 +972,7 @@ class RealSubscriptionsManager @Inject constructor(
                 status = subscription.status.toStatus(),
                 platform = subscription.platform,
                 activeOffers = subscription.activeOffers.map { it.type.toActiveOfferType() },
+                pendingPlans = pendingPlans,
             ),
         )
 
@@ -1079,27 +1119,49 @@ class RealSubscriptionsManager @Inject constructor(
         subscriptionRestoreWideEvent.onGooglePlayRestoreFlowStartedOnPurchaseAttempt()
         when (val result = recoverSubscriptionFromStore()) {
             is RecoverSubscriptionResult.Success -> {
+                logcat {
+                    "Recovering: Recovered subscription from store on purchase attempt: ${result.subscription}"
+                }
                 subscriptionRestoreWideEvent.onGooglePlayRestoreSuccess()
             }
             is RecoverSubscriptionResult.Failure -> {
+                logcat {
+                    "Recovering: Failed to recover subscription from store on purchase attempt: ${result.message}"
+                }
                 subscriptionRestoreWideEvent.onGooglePlayRestoreFailure(error = result.message)
             }
         }
     }
 
     private suspend fun activePlanIds(): List<String> =
-        if (isLaunchedRow()) {
-            listOf(YEARLY_PLAN_US, MONTHLY_PLAN_US, YEARLY_PLAN_ROW, MONTHLY_PLAN_ROW)
-        } else {
-            listOf(YEARLY_PLAN_US, MONTHLY_PLAN_US)
+        buildList {
+            addAll(listOf(YEARLY_PLAN_US, MONTHLY_PLAN_US))
+            if (isLaunchedRow()) {
+                addAll(listOf(YEARLY_PLAN_ROW, MONTHLY_PLAN_ROW))
+            }
+            if (privacyProFeature.get().allowProTierPurchase().isEnabled()) {
+                addAll(LIST_OF_PRO_PLANS)
+            }
         }
 
     override suspend fun getSubscriptionOffer(): List<SubscriptionOffer> =
         playBillingManager.products
-            .find { it.productId == BASIC_SUBSCRIPTION }
-            ?.subscriptionOfferDetails
-            .orEmpty()
-            .filter { activePlanIds().contains(it.basePlanId) }
+            .filter {
+                if (privacyProFeature.get().allowProTierPurchase().isEnabled()) {
+                    it.productId == BASIC_SUBSCRIPTION || it.productId == ADVANCED_SUBSCRIPTION
+                } else {
+                    it.productId == BASIC_SUBSCRIPTION
+                }
+            }
+            .flatMap {
+                logcat {
+                    "Subs: Found product ${it.productId} with ${it.subscriptionOfferDetails?.map { Pair(it.basePlanId, it.offerId) }} offers"
+                }
+                it.subscriptionOfferDetails.orEmpty()
+            }
+            .filter {
+                activePlanIds().contains(it.basePlanId)
+            }
             .let { availablePlans ->
                 availablePlans.map { offer ->
                     val pricingPhases = offer.pricingPhases.pricingPhaseList.map { phase ->
@@ -1117,11 +1179,15 @@ class RealSubscriptionsManager @Inject constructor(
 
                     SubscriptionOffer(
                         planId = offer.basePlanId,
-                        tier = "plus", // Temporary placeholder until we have support multiple tiers
+                        tier = SubscriptionTier.fromPlanId(offer.basePlanId).value,
                         pricingPhases = pricingPhases,
                         offerId = offer.offerId,
                         entitlements = entitlements,
                     )
+                }.also {
+                    logcat {
+                        "Subs: Subscription offers after mapping: $it"
+                    }
                 }
             }
 
@@ -1137,6 +1203,9 @@ class RealSubscriptionsManager @Inject constructor(
                 return v2Entitlements
             }
             // Fallback to legacy features for smooth runtime flag transitions
+        }
+        logcat {
+            "Subs: getEntitlementsForPlan fallback to legacy features for planId: $planId"
         }
         return getLegacyFeatures(planId).map { feature ->
             Entitlement(name = "plus", product = feature) // Temporary name placeholder until we have support multiple tiers
@@ -1212,6 +1281,9 @@ class RealSubscriptionsManager @Inject constructor(
             val subscription = authRepository.getSubscription()
 
             if (subscription?.isActive() == true) {
+                logcat {
+                    "Recovering: User already has an active subscription: $subscription"
+                }
                 pixelSender.reportSubscriptionActivated()
                 pixelSender.reportRestoreAfterPurchaseAttemptSuccess()
                 _currentPurchaseState.emit(CurrentPurchase.Recovered)

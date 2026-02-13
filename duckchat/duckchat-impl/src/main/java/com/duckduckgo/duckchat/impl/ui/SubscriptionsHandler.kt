@@ -22,6 +22,7 @@ import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.RestoreSubscriptionScreenWithParams
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionPurchase
+import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionUpgrade
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionsSettingsScreenWithEmptyParams
 import com.duckduckgo.subscriptions.api.SubscriptionsJSHelper
 import kotlinx.coroutines.CoroutineScope
@@ -82,6 +83,19 @@ class SubscriptionsHandler @Inject constructor(
                     }
                 }
 
+                METHOD_OPEN_SUBSCRIPTION_UPGRADE -> {
+                    val upgradeParams = runCatching {
+                        data?.getString(MESSAGE_PARAM_ORIGIN_KEY)
+                            .takeUnless { it.isNullOrBlank() }
+                            ?.let { SubscriptionUpgrade(origin = it) }
+                            ?: SubscriptionUpgrade()
+                    }.getOrDefault(SubscriptionUpgrade())
+
+                    withContext(dispatcherProvider.main()) {
+                        globalActivityStarter.start(context, upgradeParams)
+                    }
+                }
+
                 else -> {}
             }
         }
@@ -91,6 +105,7 @@ class SubscriptionsHandler @Inject constructor(
         private const val METHOD_BACK_TO_SETTINGS = "backToSettings"
         private const val METHOD_OPEN_SUBSCRIPTION_ACTIVATION = "openSubscriptionActivation"
         private const val METHOD_OPEN_SUBSCRIPTION_PURCHASE = "openSubscriptionPurchase"
+        private const val METHOD_OPEN_SUBSCRIPTION_UPGRADE = "openSubscriptionUpgrade"
         private const val MESSAGE_PARAM_ORIGIN_KEY = "origin"
         private const val DUCK_AI_FEATURE_PAGE = "duckai"
     }

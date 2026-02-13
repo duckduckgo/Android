@@ -1,15 +1,23 @@
 package com.duckduckgo.subscriptions.impl.ui
 
+import android.annotation.SuppressLint
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.FakeToggleStore
+import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE
+import com.duckduckgo.subscriptions.impl.PrivacyProFeature
+import com.duckduckgo.subscriptions.impl.R
+import com.duckduckgo.subscriptions.impl.SubscriptionTier
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.Account
+import com.duckduckgo.subscriptions.impl.repository.PendingPlan
 import com.duckduckgo.subscriptions.impl.repository.Subscription
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.FinishSignOut
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToActivationScreen
@@ -34,6 +42,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
+@SuppressLint("DenyListedApi")
 @RunWith(AndroidJUnit4::class)
 class SubscriptionSettingsViewModelTest {
 
@@ -43,6 +52,7 @@ class SubscriptionSettingsViewModelTest {
     private val subscriptionsManager: SubscriptionsManager = mock()
     private val pixelSender: SubscriptionPixelSender = mock()
     private val privacyProUnifiedFeedback: PrivacyProUnifiedFeedback = mock()
+    private val privacyProFeature = FakeFeatureToggleFactory.create(PrivacyProFeature::class.java, FakeToggleStore())
 
     private lateinit var viewModel: SubscriptionSettingsViewModel
 
@@ -52,6 +62,7 @@ class SubscriptionSettingsViewModelTest {
             subscriptionsManager,
             pixelSender,
             privacyProUnifiedFeedback,
+            privacyProFeature,
         )
     }
 
@@ -358,6 +369,461 @@ class SubscriptionSettingsViewModelTest {
 
             val updatedState = awaitItem() as Ready
             assertEquals(Yearly, updatedState.duration)
+        }
+    }
+
+    @Test
+    fun whenProTierEnabledThenViewStateReflectsIt() = runTest {
+        privacyProFeature.allowProTierPurchase().setRawStoredState(Toggle.State(enable = true))
+        whenever(privacyProUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
+        whenever(subscriptionsManager.isSwitchPlanAvailable()).thenReturn(false)
+        whenever(subscriptionsManager.getSubscription()).thenReturn(
+            Subscription(
+                productId = SubscriptionsConstants.MONTHLY_PLAN_US,
+                billingPeriod = "Monthly",
+                startedAt = 1234,
+                expiresOrRenewsAt = 1701694623000,
+                status = AUTO_RENEWABLE,
+                platform = "android",
+                activeOffers = listOf(),
+            ),
+        )
+
+        whenever(subscriptionsManager.getAccount()).thenReturn(
+            Account(email = null, externalId = "external_id"),
+        )
+
+        val flowTest: MutableSharedFlow<SubscriptionStatus> = MutableSharedFlow()
+        whenever(subscriptionsManager.subscriptionStatus).thenReturn(flowTest)
+
+        viewModel.onCreate(mock())
+        flowTest.emit(AUTO_RENEWABLE)
+        viewModel.viewState.test {
+            assertTrue((awaitItem() as Ready).isProTierEnabled)
+        }
+    }
+
+    @Test
+    fun whenProTierDisabledThenViewStateReflectsIt() = runTest {
+        privacyProFeature.allowProTierPurchase().setRawStoredState(Toggle.State(enable = false))
+        whenever(privacyProUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
+        whenever(subscriptionsManager.isSwitchPlanAvailable()).thenReturn(false)
+        whenever(subscriptionsManager.getSubscription()).thenReturn(
+            Subscription(
+                productId = SubscriptionsConstants.MONTHLY_PLAN_US,
+                billingPeriod = "Monthly",
+                startedAt = 1234,
+                expiresOrRenewsAt = 1701694623000,
+                status = AUTO_RENEWABLE,
+                platform = "android",
+                activeOffers = listOf(),
+            ),
+        )
+
+        whenever(subscriptionsManager.getAccount()).thenReturn(
+            Account(email = null, externalId = "external_id"),
+        )
+
+        val flowTest: MutableSharedFlow<SubscriptionStatus> = MutableSharedFlow()
+        whenever(subscriptionsManager.subscriptionStatus).thenReturn(flowTest)
+
+        viewModel.onCreate(mock())
+        flowTest.emit(AUTO_RENEWABLE)
+        viewModel.viewState.test {
+            assertFalse((awaitItem() as Ready).isProTierEnabled)
+        }
+    }
+
+    @Test
+    fun whenSubscriptionIsPlusTierThenViewStateReflectsIt() = runTest {
+        whenever(privacyProUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
+        whenever(subscriptionsManager.isSwitchPlanAvailable()).thenReturn(false)
+        whenever(subscriptionsManager.getSubscription()).thenReturn(
+            Subscription(
+                productId = SubscriptionsConstants.MONTHLY_PLAN_US,
+                billingPeriod = "Monthly",
+                startedAt = 1234,
+                expiresOrRenewsAt = 1701694623000,
+                status = AUTO_RENEWABLE,
+                platform = "android",
+                activeOffers = listOf(),
+            ),
+        )
+
+        whenever(subscriptionsManager.getAccount()).thenReturn(
+            Account(email = null, externalId = "external_id"),
+        )
+
+        val flowTest: MutableSharedFlow<SubscriptionStatus> = MutableSharedFlow()
+        whenever(subscriptionsManager.subscriptionStatus).thenReturn(flowTest)
+
+        viewModel.onCreate(mock())
+        flowTest.emit(AUTO_RENEWABLE)
+        viewModel.viewState.test {
+            assertEquals(SubscriptionTier.PLUS, (awaitItem() as Ready).subscriptionTier)
+        }
+    }
+
+    @Test
+    fun whenSubscriptionIsProTierThenViewStateReflectsIt() = runTest {
+        whenever(privacyProUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
+        whenever(subscriptionsManager.isSwitchPlanAvailable()).thenReturn(false)
+        whenever(subscriptionsManager.getSubscription()).thenReturn(
+            Subscription(
+                productId = SubscriptionsConstants.MONTHLY_PRO_PLAN_US,
+                billingPeriod = "Monthly",
+                startedAt = 1234,
+                expiresOrRenewsAt = 1701694623000,
+                status = AUTO_RENEWABLE,
+                platform = "android",
+                activeOffers = listOf(),
+            ),
+        )
+
+        whenever(subscriptionsManager.getAccount()).thenReturn(
+            Account(email = null, externalId = "external_id"),
+        )
+
+        val flowTest: MutableSharedFlow<SubscriptionStatus> = MutableSharedFlow()
+        whenever(subscriptionsManager.subscriptionStatus).thenReturn(flowTest)
+
+        viewModel.onCreate(mock())
+        flowTest.emit(AUTO_RENEWABLE)
+        viewModel.viewState.test {
+            assertEquals(SubscriptionTier.PRO, (awaitItem() as Ready).subscriptionTier)
+        }
+    }
+
+    @Test
+    fun whenSubscriptionHasPendingPlanThenViewStateIncludesPendingPlan() = runTest {
+        whenever(privacyProUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
+        whenever(subscriptionsManager.isSwitchPlanAvailable()).thenReturn(false)
+
+        val pendingPlan = PendingPlan(
+            productId = "ddg-privacy-pro-yearly-renews-us",
+            billingPeriod = "yearly",
+            effectiveAt = 1701694623000,
+            status = "scheduled",
+            tier = SubscriptionTier.PLUS,
+        )
+
+        whenever(subscriptionsManager.getSubscription()).thenReturn(
+            Subscription(
+                productId = SubscriptionsConstants.MONTHLY_PRO_PLAN_US,
+                billingPeriod = "Monthly",
+                startedAt = 1234,
+                expiresOrRenewsAt = 1701694623000,
+                status = AUTO_RENEWABLE,
+                platform = "android",
+                activeOffers = listOf(),
+                pendingPlans = listOf(pendingPlan),
+            ),
+        )
+
+        whenever(subscriptionsManager.getAccount()).thenReturn(
+            Account(email = null, externalId = "external_id"),
+        )
+
+        val flowTest: MutableSharedFlow<SubscriptionStatus> = MutableSharedFlow()
+        whenever(subscriptionsManager.subscriptionStatus).thenReturn(flowTest)
+
+        viewModel.onCreate(mock())
+        flowTest.emit(AUTO_RENEWABLE)
+        viewModel.viewState.test {
+            val state = awaitItem() as Ready
+            assertEquals(pendingPlan, state.pendingPlan)
+            assertEquals("December 04, 2023", state.pendingEffectiveDate)
+            assertEquals(SubscriptionTier.PLUS, state.effectiveTier)
+        }
+    }
+
+    @Test
+    fun whenPendingPlanIsTierDowngradeThenIsPendingDowngradeIsTrue() = runTest {
+        whenever(privacyProUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
+        whenever(subscriptionsManager.isSwitchPlanAvailable()).thenReturn(false)
+
+        val pendingPlan = PendingPlan(
+            productId = "ddg-privacy-pro-yearly-renews-us",
+            billingPeriod = "yearly",
+            effectiveAt = 1701694623000,
+            status = "scheduled",
+            tier = SubscriptionTier.PLUS,
+        )
+
+        // Current subscription is PRO, pending is PLUS - this is a downgrade
+        whenever(subscriptionsManager.getSubscription()).thenReturn(
+            Subscription(
+                productId = SubscriptionsConstants.MONTHLY_PRO_PLAN_US,
+                billingPeriod = "Monthly",
+                startedAt = 1234,
+                expiresOrRenewsAt = 1701694623000,
+                status = AUTO_RENEWABLE,
+                platform = "android",
+                activeOffers = listOf(),
+                pendingPlans = listOf(pendingPlan),
+            ),
+        )
+
+        whenever(subscriptionsManager.getAccount()).thenReturn(
+            Account(email = null, externalId = "external_id"),
+        )
+
+        val flowTest: MutableSharedFlow<SubscriptionStatus> = MutableSharedFlow()
+        whenever(subscriptionsManager.subscriptionStatus).thenReturn(flowTest)
+
+        viewModel.onCreate(mock())
+        flowTest.emit(AUTO_RENEWABLE)
+        viewModel.viewState.test {
+            val state = awaitItem() as Ready
+            assertEquals(true, state.isPendingDowngrade)
+            assertEquals(R.string.planNamePlusYearly, state.pendingPlanDisplayNameResId)
+        }
+    }
+
+    @Test
+    fun whenPendingPlanIsTierUpgradeThenIsPendingDowngradeIsFalse() = runTest {
+        whenever(privacyProUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
+        whenever(subscriptionsManager.isSwitchPlanAvailable()).thenReturn(false)
+
+        val pendingPlan = PendingPlan(
+            productId = SubscriptionsConstants.MONTHLY_PRO_PLAN_US,
+            billingPeriod = "yearly",
+            effectiveAt = 1701694623000,
+            status = "scheduled",
+            tier = SubscriptionTier.PRO,
+        )
+
+        // Current subscription is PLUS, pending is PRO - this is an upgrade
+        whenever(subscriptionsManager.getSubscription()).thenReturn(
+            Subscription(
+                productId = SubscriptionsConstants.MONTHLY_PLAN_US,
+                billingPeriod = "Monthly",
+                startedAt = 1234,
+                expiresOrRenewsAt = 1701694623000,
+                status = AUTO_RENEWABLE,
+                platform = "android",
+                activeOffers = listOf(),
+                pendingPlans = listOf(pendingPlan),
+            ),
+        )
+
+        whenever(subscriptionsManager.getAccount()).thenReturn(
+            Account(email = null, externalId = "external_id"),
+        )
+
+        val flowTest: MutableSharedFlow<SubscriptionStatus> = MutableSharedFlow()
+        whenever(subscriptionsManager.subscriptionStatus).thenReturn(flowTest)
+
+        viewModel.onCreate(mock())
+        flowTest.emit(AUTO_RENEWABLE)
+        viewModel.viewState.test {
+            val state = awaitItem() as Ready
+            assertEquals(false, state.isPendingDowngrade)
+            assertEquals(R.string.planNameProYearly, state.pendingPlanDisplayNameResId)
+        }
+    }
+
+    @Test
+    fun whenPendingPlanIsBillingPeriodDowngradeThenIsPendingDowngradeIsTrue() = runTest {
+        whenever(privacyProUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
+        whenever(subscriptionsManager.isSwitchPlanAvailable()).thenReturn(false)
+
+        val pendingPlan = PendingPlan(
+            productId = "ddg-privacy-pro-monthly-renews-us",
+            billingPeriod = "monthly",
+            effectiveAt = 1701694623000,
+            status = "scheduled",
+            tier = SubscriptionTier.PLUS,
+        )
+
+        // Current subscription is Yearly PLUS, pending is Monthly PLUS - this is a downgrade
+        whenever(subscriptionsManager.getSubscription()).thenReturn(
+            Subscription(
+                productId = SubscriptionsConstants.YEARLY_PLAN_US,
+                billingPeriod = "Yearly",
+                startedAt = 1234,
+                expiresOrRenewsAt = 1701694623000,
+                status = AUTO_RENEWABLE,
+                platform = "android",
+                activeOffers = listOf(),
+                pendingPlans = listOf(pendingPlan),
+            ),
+        )
+
+        whenever(subscriptionsManager.getAccount()).thenReturn(
+            Account(email = null, externalId = "external_id"),
+        )
+
+        val flowTest: MutableSharedFlow<SubscriptionStatus> = MutableSharedFlow()
+        whenever(subscriptionsManager.subscriptionStatus).thenReturn(flowTest)
+
+        viewModel.onCreate(mock())
+        flowTest.emit(AUTO_RENEWABLE)
+        viewModel.viewState.test {
+            val state = awaitItem() as Ready
+            assertEquals(true, state.isPendingDowngrade)
+            assertEquals(R.string.planNamePlusMonthly, state.pendingPlanDisplayNameResId)
+        }
+    }
+
+    @Test
+    fun whenPendingPlanIsBillingPeriodUpgradeThenIsPendingDowngradeIsFalse() = runTest {
+        whenever(privacyProUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
+        whenever(subscriptionsManager.isSwitchPlanAvailable()).thenReturn(false)
+
+        val pendingPlan = PendingPlan(
+            productId = SubscriptionsConstants.YEARLY_PLAN_US,
+            billingPeriod = "yearly",
+            effectiveAt = 1701694623000,
+            status = "scheduled",
+            tier = SubscriptionTier.PLUS,
+        )
+
+        // Current subscription is Monthly PLUS, pending is Yearly PLUS - this is an upgrade
+        whenever(subscriptionsManager.getSubscription()).thenReturn(
+            Subscription(
+                productId = SubscriptionsConstants.MONTHLY_PLAN_US,
+                billingPeriod = "Monthly",
+                startedAt = 1234,
+                expiresOrRenewsAt = 1701694623000,
+                status = AUTO_RENEWABLE,
+                platform = "android",
+                activeOffers = listOf(),
+                pendingPlans = listOf(pendingPlan),
+            ),
+        )
+
+        whenever(subscriptionsManager.getAccount()).thenReturn(
+            Account(email = null, externalId = "external_id"),
+        )
+
+        val flowTest: MutableSharedFlow<SubscriptionStatus> = MutableSharedFlow()
+        whenever(subscriptionsManager.subscriptionStatus).thenReturn(flowTest)
+
+        viewModel.onCreate(mock())
+        flowTest.emit(AUTO_RENEWABLE)
+        viewModel.viewState.test {
+            val state = awaitItem() as Ready
+            assertEquals(false, state.isPendingDowngrade)
+            assertEquals(R.string.planNamePlusYearly, state.pendingPlanDisplayNameResId)
+        }
+    }
+
+    @Test
+    fun whenNoPendingPlanThenIsPendingDowngradeIsNull() = runTest {
+        whenever(privacyProUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
+        whenever(subscriptionsManager.isSwitchPlanAvailable()).thenReturn(false)
+
+        whenever(subscriptionsManager.getSubscription()).thenReturn(
+            Subscription(
+                productId = SubscriptionsConstants.MONTHLY_PLAN_US,
+                billingPeriod = "Monthly",
+                startedAt = 1234,
+                expiresOrRenewsAt = 1701694623000,
+                status = AUTO_RENEWABLE,
+                platform = "android",
+                activeOffers = listOf(),
+                pendingPlans = emptyList(),
+            ),
+        )
+
+        whenever(subscriptionsManager.getAccount()).thenReturn(
+            Account(email = null, externalId = "external_id"),
+        )
+
+        val flowTest: MutableSharedFlow<SubscriptionStatus> = MutableSharedFlow()
+        whenever(subscriptionsManager.subscriptionStatus).thenReturn(flowTest)
+
+        viewModel.onCreate(mock())
+        flowTest.emit(AUTO_RENEWABLE)
+        viewModel.viewState.test {
+            val state = awaitItem() as Ready
+            assertEquals(null, state.isPendingDowngrade)
+            assertEquals(null, state.pendingPlanDisplayNameResId)
+        }
+    }
+
+    @Test
+    fun whenSubscriptionHasNoPendingPlanThenViewStateHasNullPendingPlan() = runTest {
+        whenever(privacyProUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
+        whenever(subscriptionsManager.isSwitchPlanAvailable()).thenReturn(false)
+        whenever(subscriptionsManager.getSubscription()).thenReturn(
+            Subscription(
+                productId = SubscriptionsConstants.MONTHLY_PLAN_US,
+                billingPeriod = "Monthly",
+                startedAt = 1234,
+                expiresOrRenewsAt = 1701694623000,
+                status = AUTO_RENEWABLE,
+                platform = "android",
+                activeOffers = listOf(),
+                pendingPlans = emptyList(),
+            ),
+        )
+
+        whenever(subscriptionsManager.getAccount()).thenReturn(
+            Account(email = null, externalId = "external_id"),
+        )
+
+        val flowTest: MutableSharedFlow<SubscriptionStatus> = MutableSharedFlow()
+        whenever(subscriptionsManager.subscriptionStatus).thenReturn(flowTest)
+
+        viewModel.onCreate(mock())
+        flowTest.emit(AUTO_RENEWABLE)
+        viewModel.viewState.test {
+            val state = awaitItem() as Ready
+            assertEquals(null, state.pendingPlan)
+            assertEquals(null, state.pendingEffectiveDate)
+            assertEquals(SubscriptionTier.PLUS, state.effectiveTier)
+        }
+    }
+
+    @Test
+    fun whenSubscriptionHasMultiplePendingPlansThenViewStateUsesFirst() = runTest {
+        whenever(privacyProUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
+        whenever(subscriptionsManager.isSwitchPlanAvailable()).thenReturn(false)
+
+        val firstPendingPlan = PendingPlan(
+            productId = SubscriptionsConstants.YEARLY_PLAN_US,
+            billingPeriod = "yearly",
+            effectiveAt = 1701694623000,
+            status = "scheduled",
+            tier = SubscriptionTier.PLUS,
+        )
+        val secondPendingPlan = PendingPlan(
+            productId = SubscriptionsConstants.MONTHLY_PLAN_US,
+            billingPeriod = "monthly",
+            effectiveAt = 1702000000000,
+            status = "pending",
+            tier = SubscriptionTier.PRO,
+        )
+
+        whenever(subscriptionsManager.getSubscription()).thenReturn(
+            Subscription(
+                productId = SubscriptionsConstants.MONTHLY_PLAN_US,
+                billingPeriod = "Monthly",
+                startedAt = 1234,
+                expiresOrRenewsAt = 1701694623000,
+                status = AUTO_RENEWABLE,
+                platform = "android",
+                activeOffers = listOf(),
+                pendingPlans = listOf(firstPendingPlan, secondPendingPlan),
+            ),
+        )
+
+        whenever(subscriptionsManager.getAccount()).thenReturn(
+            Account(email = null, externalId = "external_id"),
+        )
+
+        val flowTest: MutableSharedFlow<SubscriptionStatus> = MutableSharedFlow()
+        whenever(subscriptionsManager.subscriptionStatus).thenReturn(flowTest)
+
+        viewModel.onCreate(mock())
+        flowTest.emit(AUTO_RENEWABLE)
+        viewModel.viewState.test {
+            val state = awaitItem() as Ready
+            // Should use the first pending plan
+            assertEquals(firstPendingPlan, state.pendingPlan)
+            assertEquals(SubscriptionTier.PLUS, state.effectiveTier)
         }
     }
 }

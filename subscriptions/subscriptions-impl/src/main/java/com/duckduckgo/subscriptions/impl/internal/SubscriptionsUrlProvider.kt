@@ -25,6 +25,8 @@ interface SubscriptionsUrlProvider {
     val welcomeUrl: String
     val activateUrl: String
     val manageUrl: String
+    val plansUrl: String
+    val upgradeToProUrl: String
 }
 
 @ContributesBinding(AppScope::class)
@@ -38,4 +40,8 @@ class RealSubscriptionsUrlProvider @Inject constructor(
     override val activateUrl: String = "${subscriptionsBaseUrl.subscriptionsBaseUrl}/activation-flow"
 
     override val manageUrl: String = "${subscriptionsBaseUrl.subscriptionsBaseUrl}/manage"
+
+    override val plansUrl: String = "${subscriptionsBaseUrl.subscriptionsBaseUrl}/plans"
+
+    override val upgradeToProUrl: String = "${subscriptionsBaseUrl.subscriptionsBaseUrl}/plans?tier=pro"
 }

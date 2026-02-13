@@ -25,6 +25,7 @@ import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.impl.PrivacyProFeature
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -67,18 +68,121 @@ class SubscriptionSwitchWideEventTest {
 
         subscriptionSwitchWideEvent.onSwitchFlowStarted(
             context = "subscription_settings",
-            fromPlan = "ddg-privacy-pro-monthly-renews-us",
-            toPlan = "ddg-privacy-pro-yearly-renews-us",
+            fromPlan = SubscriptionsConstants.MONTHLY_PLAN_US,
+            toPlan = SubscriptionsConstants.YEARLY_PLAN_US,
         )
 
-        // fromPlan is monthly, so switchType should be computed as "upgrade"
+        // Plus monthly → Plus yearly: switchType = upgrade (billing), changeType = crossgrade (same tier)
         verify(wideEventClient).flowStart(
-            name = "subscription-switch",
+            name = "subscription-plan-change",
             flowEntryPoint = "subscription_settings",
             metadata = mapOf(
-                "from_plan" to "ddg-privacy-pro-monthly-renews-us",
-                "to_plan" to "ddg-privacy-pro-yearly-renews-us",
-                "switch_type" to "upgrade",
+                "from_plan" to SubscriptionsConstants.MONTHLY_PLAN_US,
+                "to_plan" to SubscriptionsConstants.YEARLY_PLAN_US,
+                "from_tier" to "plus",
+                "to_tier" to "plus",
+                "billing_cycle_switch_type" to "upgrade",
+                "tier_change_type" to "crossgrade",
+            ),
+            cleanupPolicy = CleanupPolicy.OnProcessStart(ignoreIfIntervalTimeoutPresent = true),
+        )
+    }
+
+    @Test
+    fun `onSwitchFlowStarted with Plus yearly to Plus monthly has tier_change_type crossgrade and downgrade billing cycle`() = runTest {
+        whenever(wideEventClient.flowStart(any(), any(), any(), any())).thenReturn(Result.success(123L))
+
+        subscriptionSwitchWideEvent.onSwitchFlowStarted(
+            context = "subscription_settings",
+            fromPlan = SubscriptionsConstants.YEARLY_PLAN_US,
+            toPlan = SubscriptionsConstants.MONTHLY_PLAN_US,
+        )
+
+        verify(wideEventClient).flowStart(
+            name = "subscription-plan-change",
+            flowEntryPoint = "subscription_settings",
+            metadata = mapOf(
+                "from_plan" to SubscriptionsConstants.YEARLY_PLAN_US,
+                "to_plan" to SubscriptionsConstants.MONTHLY_PLAN_US,
+                "from_tier" to "plus",
+                "to_tier" to "plus",
+                "billing_cycle_switch_type" to "downgrade",
+                "tier_change_type" to "crossgrade",
+            ),
+            cleanupPolicy = CleanupPolicy.OnProcessStart(ignoreIfIntervalTimeoutPresent = true),
+        )
+    }
+
+    @Test
+    fun `onSwitchFlowStarted with Pro monthly to Pro yearly has tier_change_type crossgrade and upgrade billing cycle`() = runTest {
+        whenever(wideEventClient.flowStart(any(), any(), any(), any())).thenReturn(Result.success(123L))
+
+        subscriptionSwitchWideEvent.onSwitchFlowStarted(
+            context = "subscription_settings",
+            fromPlan = SubscriptionsConstants.MONTHLY_PRO_PLAN_US,
+            toPlan = SubscriptionsConstants.YEARLY_PRO_PLAN_US,
+        )
+
+        verify(wideEventClient).flowStart(
+            name = "subscription-plan-change",
+            flowEntryPoint = "subscription_settings",
+            metadata = mapOf(
+                "from_plan" to SubscriptionsConstants.MONTHLY_PRO_PLAN_US,
+                "to_plan" to SubscriptionsConstants.YEARLY_PRO_PLAN_US,
+                "from_tier" to "pro",
+                "to_tier" to "pro",
+                "billing_cycle_switch_type" to "upgrade",
+                "tier_change_type" to "crossgrade",
+            ),
+            cleanupPolicy = CleanupPolicy.OnProcessStart(ignoreIfIntervalTimeoutPresent = true),
+        )
+    }
+
+    @Test
+    fun `onSwitchFlowStarted with Plus to Pro has tier_change_type upgrade and none as billing cycle switch type`() = runTest {
+        whenever(wideEventClient.flowStart(any(), any(), any(), any())).thenReturn(Result.success(123L))
+
+        subscriptionSwitchWideEvent.onSwitchFlowStarted(
+            context = "subscription_settings",
+            fromPlan = SubscriptionsConstants.MONTHLY_PLAN_US,
+            toPlan = SubscriptionsConstants.MONTHLY_PRO_PLAN_US,
+        )
+
+        verify(wideEventClient).flowStart(
+            name = "subscription-plan-change",
+            flowEntryPoint = "subscription_settings",
+            metadata = mapOf(
+                "from_plan" to SubscriptionsConstants.MONTHLY_PLAN_US,
+                "to_plan" to SubscriptionsConstants.MONTHLY_PRO_PLAN_US,
+                "from_tier" to "plus",
+                "to_tier" to "pro",
+                "billing_cycle_switch_type" to "none",
+                "tier_change_type" to "upgrade",
+            ),
+            cleanupPolicy = CleanupPolicy.OnProcessStart(ignoreIfIntervalTimeoutPresent = true),
+        )
+    }
+
+    @Test
+    fun `onSwitchFlowStarted with Pro to Plus has tier_change_type downgrade`() = runTest {
+        whenever(wideEventClient.flowStart(any(), any(), any(), any())).thenReturn(Result.success(123L))
+
+        subscriptionSwitchWideEvent.onSwitchFlowStarted(
+            context = "subscription_settings",
+            fromPlan = SubscriptionsConstants.YEARLY_PRO_PLAN_US,
+            toPlan = SubscriptionsConstants.YEARLY_PLAN_US,
+        )
+
+        verify(wideEventClient).flowStart(
+            name = "subscription-plan-change",
+            flowEntryPoint = "subscription_settings",
+            metadata = mapOf(
+                "from_plan" to SubscriptionsConstants.YEARLY_PRO_PLAN_US,
+                "to_plan" to SubscriptionsConstants.YEARLY_PLAN_US,
+                "from_tier" to "pro",
+                "to_tier" to "plus",
+                "billing_cycle_switch_type" to "none",
+                "tier_change_type" to "downgrade",
             ),
             cleanupPolicy = CleanupPolicy.OnProcessStart(ignoreIfIntervalTimeoutPresent = true),
         )
@@ -324,8 +428,8 @@ class SubscriptionSwitchWideEventTest {
 
         subscriptionSwitchWideEvent.onSwitchFlowStarted(
             context = "subscription_settings",
-            fromPlan = "ddg-privacy-pro-monthly-renews-us",
-            toPlan = "ddg-privacy-pro-yearly-renews-us",
+            fromPlan = SubscriptionsConstants.MONTHLY_PLAN_US,
+            toPlan = SubscriptionsConstants.YEARLY_PLAN_US,
         )
         subscriptionSwitchWideEvent.onCurrentSubscriptionValidated()
         subscriptionSwitchWideEvent.onTargetPlanRetrieved()
@@ -356,7 +460,7 @@ class SubscriptionSwitchWideEventTest {
         whenever(wideEventClient.getFlowIds(any())).thenReturn(Result.success(emptyList()))
 
         subscriptionSwitchWideEvent.onSwitchConfirmationSuccess()
-        verify(wideEventClient).getFlowIds("subscription-switch")
+        verify(wideEventClient).getFlowIds("subscription-plan-change")
         verifyNoMoreInteractions(wideEventClient)
     }
 }

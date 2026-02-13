@@ -12,6 +12,7 @@ import com.duckduckgo.subscriptions.api.SubscriptionStatus.NOT_AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.UNKNOWN
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.WAITING
 import com.duckduckgo.subscriptions.impl.PrivacyProFeature
+import com.duckduckgo.subscriptions.impl.SubscriptionTier
 import com.duckduckgo.subscriptions.impl.model.Entitlement
 import com.duckduckgo.subscriptions.impl.serp_promo.FakeSerpPromo
 import kotlinx.coroutines.test.runTest
@@ -337,5 +338,168 @@ class RealAuthRepositoryTest {
 
         // When flag is OFF, should use v1 storage only
         assertEquals(setOf("feature1", "feature2"), result)
+    }
+
+    @Test
+    fun whenSetPendingPlansWithEmptyListThenStoreNull() = runTest {
+        authRepository.setPendingPlans(emptyList())
+
+        assertNull(authStore.pendingPlans)
+    }
+
+    @Test
+    fun whenSetPendingPlansWithSinglePlanThenStoreJson() = runTest {
+        val pendingPlan = PendingPlan(
+            productId = "ddg-privacy-pro-yearly-renews-us",
+            billingPeriod = "yearly",
+            effectiveAt = 1700000000000L,
+            status = "scheduled",
+            tier = SubscriptionTier.PLUS,
+        )
+
+        authRepository.setPendingPlans(listOf(pendingPlan))
+
+        assertNotNull(authStore.pendingPlans)
+        assertTrue(authStore.pendingPlans!!.contains("ddg-privacy-pro-yearly-renews-us"))
+        assertTrue(authStore.pendingPlans!!.contains("yearly"))
+        assertTrue(authStore.pendingPlans!!.contains("scheduled"))
+        assertTrue(authStore.pendingPlans!!.contains("plus"))
+    }
+
+    @Test
+    fun whenGetPendingPlansThenReturnCorrectList() = runTest {
+        authStore.pendingPlans = """[{
+            "productId": "ddg-privacy-pro-yearly-renews-us",
+            "billingPeriod": "yearly",
+            "effectiveAt": 1700000000000,
+            "status": "scheduled",
+            "tier": "plus"
+        }]"""
+
+        val result = authRepository.getPendingPlans()
+
+        assertEquals(1, result.size)
+        assertEquals("ddg-privacy-pro-yearly-renews-us", result[0].productId)
+        assertEquals("yearly", result[0].billingPeriod)
+        assertEquals(1700000000000L, result[0].effectiveAt)
+        assertEquals("scheduled", result[0].status)
+        assertEquals(SubscriptionTier.PLUS, result[0].tier)
+    }
+
+    @Test
+    fun whenGetPendingPlansWithMultiplePlansThenReturnCorrectList() = runTest {
+        authStore.pendingPlans = """[
+            {"productId": "plan1", "billingPeriod": "monthly", "effectiveAt": 1700000000000, "status": "scheduled", "tier": "plus"},
+            {"productId": "plan2", "billingPeriod": "yearly", "effectiveAt": 1800000000000, "status": "pending", "tier": "pro"}
+        ]"""
+
+        val result = authRepository.getPendingPlans()
+
+        assertEquals(2, result.size)
+        assertEquals("plan1", result[0].productId)
+        assertEquals(SubscriptionTier.PLUS, result[0].tier)
+        assertEquals("plan2", result[1].productId)
+        assertEquals(SubscriptionTier.PRO, result[1].tier)
+    }
+
+    @Test
+    fun whenGetPendingPlansAndNullThenReturnEmptyList() = runTest {
+        authStore.pendingPlans = null
+
+        val result = authRepository.getPendingPlans()
+
+        assertTrue(result.isEmpty())
+    }
+
+    @Test
+    fun whenSetSubscriptionWithPendingPlansThenStorePendingPlans() = runTest {
+        val pendingPlan = PendingPlan(
+            productId = "ddg-privacy-pro-yearly-renews-us",
+            billingPeriod = "yearly",
+            effectiveAt = 1700000000000L,
+            status = "scheduled",
+            tier = SubscriptionTier.PLUS,
+        )
+
+        authRepository.setSubscription(
+            Subscription(
+                productId = "ddg-subscription-pro-monthly-renews-us",
+                billingPeriod = "monthly",
+                startedAt = 1234L,
+                expiresOrRenewsAt = 5678L,
+                status = AUTO_RENEWABLE,
+                platform = "google",
+                activeOffers = emptyList(),
+                pendingPlans = listOf(pendingPlan),
+            ),
+        )
+
+        assertNotNull(authStore.pendingPlans)
+        assertTrue(authStore.pendingPlans!!.contains("ddg-privacy-pro-yearly-renews-us"))
+    }
+
+    @Test
+    fun whenGetSubscriptionWithPendingPlansThenReturnPendingPlans() = runTest {
+        authStore.productId = "ddg-subscription-pro-monthly-renews-us"
+        authStore.billingPeriod = "monthly"
+        authStore.startedAt = 1234L
+        authStore.expiresOrRenewsAt = 5678L
+        authStore.status = AUTO_RENEWABLE.statusName
+        authStore.platform = "google"
+        authStore.pendingPlans = """[{
+            "productId": "ddg-privacy-pro-yearly-renews-us",
+            "billingPeriod": "yearly",
+            "effectiveAt": 1700000000000,
+            "status": "scheduled",
+            "tier": "plus"
+        }]"""
+
+        val subscription = authRepository.getSubscription()
+
+        assertNotNull(subscription)
+        assertEquals(1, subscription!!.pendingPlans.size)
+        assertEquals("ddg-privacy-pro-yearly-renews-us", subscription.pendingPlans[0].productId)
+        assertTrue(subscription.hasPendingChange)
+    }
+
+    @Test
+    fun whenGetSubscriptionWithNoPendingPlansThenReturnEmptyList() = runTest {
+        authStore.productId = "ddg-subscription-pro-monthly-renews-us"
+        authStore.billingPeriod = "monthly"
+        authStore.startedAt = 1234L
+        authStore.expiresOrRenewsAt = 5678L
+        authStore.status = AUTO_RENEWABLE.statusName
+        authStore.platform = "google"
+        authStore.pendingPlans = null
+
+        val subscription = authRepository.getSubscription()
+
+        assertNotNull(subscription)
+        assertTrue(subscription!!.pendingPlans.isEmpty())
+        assertFalse(subscription.hasPendingChange)
+    }
+
+    @Test
+    fun whenGetSubscriptionWithPendingPlansThenPendingPlansReturned() = runTest {
+        authStore.productId = "ddg-subscription-pro-monthly-renews-us"
+        authStore.billingPeriod = "monthly"
+        authStore.startedAt = 1234L
+        authStore.expiresOrRenewsAt = 5678L
+        authStore.status = AUTO_RENEWABLE.statusName
+        authStore.platform = "google"
+        authStore.pendingPlans = """[{
+            "productId": "ddg-privacy-pro-yearly-renews-us",
+            "billingPeriod": "yearly",
+            "effectiveAt": 1700000000000,
+            "status": "scheduled",
+            "tier": "plus"
+        }]"""
+
+        val subscription = authRepository.getSubscription()
+
+        assertNotNull(subscription)
+        assertEquals(1, subscription!!.pendingPlans.size)
+        assertEquals("ddg-privacy-pro-yearly-renews-us", subscription.pendingPlans[0].productId)
+        assertTrue(subscription.hasPendingChange)
     }
 }

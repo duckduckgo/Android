@@ -25,8 +25,14 @@ import com.duckduckgo.subscriptions.impl.SubscriptionsChecker
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_FREE_TRIAL_OFFER_US
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN_US
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PRO_FREE_TRIAL_OFFER_US
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PRO_PLAN_ROW
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PRO_PLAN_US
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_FREE_TRIAL_OFFER_US
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PLAN_US
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PRO_FREE_TRIAL_OFFER_US
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PRO_PLAN_ROW
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PRO_PLAN_US
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.model.Entitlement
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
@@ -46,6 +52,7 @@ import kotlinx.coroutines.test.runTest
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -227,7 +234,7 @@ class SubscriptionWebViewViewModelTest {
                         billingPeriod = "P1M",
                     ),
                 ),
-                entitlements = setOf(Entitlement("plus", SubscriptionsConstants.NETP)),
+                entitlements = setOf(Entitlement("subscriber", SubscriptionsConstants.NETP)),
             ),
             SubscriptionOffer(
                 planId = YEARLY_PLAN_US,
@@ -241,7 +248,7 @@ class SubscriptionWebViewViewModelTest {
                         billingPeriod = "P1Y",
                     ),
                 ),
-                entitlements = setOf(Entitlement("plus", SubscriptionsConstants.NETP)),
+                entitlements = setOf(Entitlement("subscriber", SubscriptionsConstants.NETP)),
             ),
         )
         whenever(subscriptionsManager.getSubscriptionOffer()).thenReturn(testSubscriptionOfferList)
@@ -299,7 +306,7 @@ class SubscriptionWebViewViewModelTest {
                         billingPeriod = "P1M",
                     ),
                 ),
-                entitlements = setOf(Entitlement("plus", SubscriptionsConstants.NETP)),
+                entitlements = setOf(Entitlement("subscriber", SubscriptionsConstants.NETP)),
             ),
             SubscriptionOffer(
                 planId = YEARLY_PLAN_US,
@@ -313,7 +320,7 @@ class SubscriptionWebViewViewModelTest {
                         billingPeriod = "P1Y",
                     ),
                 ),
-                entitlements = setOf(Entitlement("plus", SubscriptionsConstants.NETP)),
+                entitlements = setOf(Entitlement("subscriber", SubscriptionsConstants.NETP)),
             ),
         )
         privacyProFeature.allowPurchase().setRawStoredState(Toggle.State(enable = false))
@@ -351,7 +358,7 @@ class SubscriptionWebViewViewModelTest {
                         billingPeriod = "P1M",
                     ),
                 ),
-                entitlements = setOf(Entitlement("plus", SubscriptionsConstants.NETP)),
+                entitlements = setOf(Entitlement("subscriber", SubscriptionsConstants.NETP)),
             ),
             SubscriptionOffer(
                 planId = YEARLY_PLAN_US,
@@ -365,7 +372,7 @@ class SubscriptionWebViewViewModelTest {
                         billingPeriod = "P1Y",
                     ),
                 ),
-                entitlements = setOf(Entitlement("plus", SubscriptionsConstants.NETP)),
+                entitlements = setOf(Entitlement("subscriber", SubscriptionsConstants.NETP)),
             ),
             SubscriptionOffer(
                 planId = MONTHLY_PLAN_US,
@@ -385,7 +392,7 @@ class SubscriptionWebViewViewModelTest {
                         billingPeriod = "P1W",
                     ),
                 ),
-                entitlements = setOf(Entitlement("plus", SubscriptionsConstants.NETP)),
+                entitlements = setOf(Entitlement("subscriber", SubscriptionsConstants.NETP)),
             ),
             SubscriptionOffer(
                 planId = YEARLY_PLAN_US,
@@ -405,7 +412,7 @@ class SubscriptionWebViewViewModelTest {
                         billingPeriod = "P1W",
                     ),
                 ),
-                entitlements = setOf(Entitlement("plus", SubscriptionsConstants.NETP)),
+                entitlements = setOf(Entitlement("subscriber", SubscriptionsConstants.NETP)),
             ),
         )
         whenever(subscriptionsManager.getSubscriptionOffer()).thenReturn(testSubscriptionOfferList)
@@ -442,7 +449,7 @@ class SubscriptionWebViewViewModelTest {
                         billingPeriod = "P1M",
                     ),
                 ),
-                entitlements = setOf(Entitlement("plus", SubscriptionsConstants.NETP)),
+                entitlements = setOf(Entitlement("subscriber", SubscriptionsConstants.NETP)),
             ),
             SubscriptionOffer(
                 planId = YEARLY_PLAN_US,
@@ -456,7 +463,7 @@ class SubscriptionWebViewViewModelTest {
                         billingPeriod = "P1Y",
                     ),
                 ),
-                entitlements = setOf(Entitlement("plus", SubscriptionsConstants.NETP)),
+                entitlements = setOf(Entitlement("subscriber", SubscriptionsConstants.NETP)),
             ),
             SubscriptionOffer(
                 planId = MONTHLY_PLAN_US,
@@ -476,7 +483,7 @@ class SubscriptionWebViewViewModelTest {
                         billingPeriod = "P1W",
                     ),
                 ),
-                entitlements = setOf(Entitlement("plus", SubscriptionsConstants.NETP)),
+                entitlements = setOf(Entitlement("subscriber", SubscriptionsConstants.NETP)),
             ),
             SubscriptionOffer(
                 planId = YEARLY_PLAN_US,
@@ -496,7 +503,7 @@ class SubscriptionWebViewViewModelTest {
                         billingPeriod = "P1W",
                     ),
                 ),
-                entitlements = setOf(Entitlement("plus", SubscriptionsConstants.NETP)),
+                entitlements = setOf(Entitlement("subscriber", SubscriptionsConstants.NETP)),
             ),
         )
         whenever(subscriptionsManager.getSubscriptionOffer()).thenReturn(testSubscriptionOfferList)
@@ -943,7 +950,7 @@ class SubscriptionWebViewViewModelTest {
                         billingPeriod = "P1M",
                     ),
                 ),
-                entitlements = setOf(Entitlement("plus", SubscriptionsConstants.NETP)),
+                entitlements = setOf(Entitlement("subscriber", SubscriptionsConstants.NETP)),
             ),
             SubscriptionOffer(
                 planId = YEARLY_PLAN_US,
@@ -957,11 +964,12 @@ class SubscriptionWebViewViewModelTest {
                         billingPeriod = "P1Y",
                     ),
                 ),
-                entitlements = setOf(Entitlement("plus", SubscriptionsConstants.NETP)),
+                entitlements = setOf(Entitlement("subscriber", SubscriptionsConstants.NETP)),
             ),
         )
         whenever(subscriptionsManager.getSubscriptionOffer()).thenReturn(testSubscriptionOfferList)
         privacyProFeature.allowPurchase().setRawStoredState(Toggle.State(enable = true))
+        whenever(subscriptionsManager.isFreeTrialEligible()).thenReturn(true)
 
         viewModel.commands().test {
             viewModel.processJsCallbackMessage("test", "getSubscriptionTierOptions", "id", JSONObject("{}"))
@@ -984,6 +992,7 @@ class SubscriptionWebViewViewModelTest {
     @Test
     fun whenGetSubscriptionTierOptionsAndNoOfferThenSendCommandWithEmptyProducts() = runTest {
         privacyProFeature.allowPurchase().setRawStoredState(Toggle.State(enable = true))
+        whenever(subscriptionsManager.isFreeTrialEligible()).thenReturn(true)
         whenever(subscriptionsManager.getSubscriptionOffer()).thenReturn(emptyList())
 
         viewModel.commands().test {
@@ -1017,7 +1026,7 @@ class SubscriptionWebViewViewModelTest {
                         billingPeriod = "P1M",
                     ),
                 ),
-                entitlements = setOf(Entitlement("plus", SubscriptionsConstants.NETP)),
+                entitlements = setOf(Entitlement("subscriber", SubscriptionsConstants.NETP)),
             ),
             SubscriptionOffer(
                 planId = YEARLY_PLAN_US,
@@ -1031,7 +1040,7 @@ class SubscriptionWebViewViewModelTest {
                         billingPeriod = "P1Y",
                     ),
                 ),
-                entitlements = setOf(Entitlement("plus", SubscriptionsConstants.NETP)),
+                entitlements = setOf(Entitlement("subscriber", SubscriptionsConstants.NETP)),
             ),
         )
         privacyProFeature.allowPurchase().setRawStoredState(Toggle.State(enable = false))
@@ -1069,8 +1078,8 @@ class SubscriptionWebViewViewModelTest {
                     ),
                 ),
                 entitlements = setOf(
-                    Entitlement("plus", SubscriptionsConstants.NETP),
-                    Entitlement("plus", SubscriptionsConstants.ITR),
+                    Entitlement("subscriber", SubscriptionsConstants.NETP),
+                    Entitlement("subscriber", SubscriptionsConstants.ITR),
                 ),
             ),
             SubscriptionOffer(
@@ -1086,13 +1095,14 @@ class SubscriptionWebViewViewModelTest {
                     ),
                 ),
                 entitlements = setOf(
-                    Entitlement("plus", SubscriptionsConstants.NETP),
-                    Entitlement("plus", SubscriptionsConstants.ITR),
+                    Entitlement("subscriber", SubscriptionsConstants.NETP),
+                    Entitlement("subscriber", SubscriptionsConstants.ITR),
                 ),
             ),
         )
         whenever(subscriptionsManager.getSubscriptionOffer()).thenReturn(testSubscriptionOfferList)
         privacyProFeature.allowPurchase().setRawStoredState(Toggle.State(enable = true))
+        whenever(subscriptionsManager.isFreeTrialEligible()).thenReturn(true)
 
         viewModel.commands().test {
             viewModel.processJsCallbackMessage("test", "getSubscriptionTierOptions", "id", JSONObject("{}"))
@@ -1104,9 +1114,733 @@ class SubscriptionWebViewViewModelTest {
             val features = params?.products?.first()?.features
             assertNotNull(features)
             assertEquals(2, features?.size)
-            assertTrue(features?.all { it.name == "plus" } == true)
+            assertTrue(features?.all { it.name == "subscriber" } == true)
             assertTrue(features?.any { it.product == SubscriptionsConstants.NETP } == true)
             assertTrue(features?.any { it.product == SubscriptionsConstants.ITR } == true)
+        }
+    }
+
+    @Test
+    fun whenGetSubscriptionTierOptionsWithMultipleTiersThenReturnAllProducts() = runTest {
+        val testSubscriptionOfferList = listOf(
+            // Plus tier offers
+            SubscriptionOffer(
+                planId = MONTHLY_PLAN_US,
+                offerId = null,
+                tier = "plus",
+                pricingPhases = listOf(
+                    PricingPhase(
+                        priceAmount = 1.toBigDecimal(),
+                        priceCurrency = Currency.getInstance("USD"),
+                        formattedPrice = "$1",
+                        billingPeriod = "P1M",
+                    ),
+                ),
+                entitlements = setOf(
+                    Entitlement("subscriber", SubscriptionsConstants.NETP),
+                    Entitlement("plus", SubscriptionsConstants.DUCK_AI),
+                ),
+            ),
+            SubscriptionOffer(
+                planId = YEARLY_PLAN_US,
+                offerId = null,
+                tier = "plus",
+                pricingPhases = listOf(
+                    PricingPhase(
+                        priceAmount = 10.toBigDecimal(),
+                        priceCurrency = Currency.getInstance("USD"),
+                        formattedPrice = "$10",
+                        billingPeriod = "P1Y",
+                    ),
+                ),
+                entitlements = setOf(
+                    Entitlement("subscriber", SubscriptionsConstants.NETP),
+                    Entitlement("plus", SubscriptionsConstants.DUCK_AI),
+                ),
+            ),
+            // Pro tier offers
+            SubscriptionOffer(
+                planId = MONTHLY_PRO_PLAN_US,
+                offerId = null,
+                tier = "pro",
+                pricingPhases = listOf(
+                    PricingPhase(
+                        priceAmount = 5.toBigDecimal(),
+                        priceCurrency = Currency.getInstance("USD"),
+                        formattedPrice = "$5",
+                        billingPeriod = "P1M",
+                    ),
+                ),
+                entitlements = setOf(
+                    Entitlement("subscriber", SubscriptionsConstants.NETP),
+                    Entitlement("pro", SubscriptionsConstants.DUCK_AI),
+                ),
+            ),
+            SubscriptionOffer(
+                planId = YEARLY_PRO_PLAN_US,
+                offerId = null,
+                tier = "pro",
+                pricingPhases = listOf(
+                    PricingPhase(
+                        priceAmount = 50.toBigDecimal(),
+                        priceCurrency = Currency.getInstance("USD"),
+                        formattedPrice = "$50",
+                        billingPeriod = "P1Y",
+                    ),
+                ),
+                entitlements = setOf(
+                    Entitlement("subscriber", SubscriptionsConstants.NETP),
+                    Entitlement("pro", SubscriptionsConstants.DUCK_AI),
+                ),
+            ),
+        )
+        whenever(subscriptionsManager.getSubscriptionOffer()).thenReturn(testSubscriptionOfferList)
+        privacyProFeature.allowPurchase().setRawStoredState(Toggle.State(enable = true))
+        privacyProFeature.allowProTierPurchase().setRawStoredState(Toggle.State(enable = true))
+        whenever(subscriptionsManager.isFreeTrialEligible()).thenReturn(true)
+
+        viewModel.commands().test {
+            viewModel.processJsCallbackMessage("test", "getSubscriptionTierOptions", "id", JSONObject("{}"))
+            val result = awaitItem()
+            assertTrue(result is Command.SendResponseToJs)
+            val response = (result as Command.SendResponseToJs).data
+
+            val params = tierJsonAdapter.fromJson(response.params.toString())
+            assertEquals("id", response.id)
+            assertEquals("test", response.featureName)
+            assertEquals("getSubscriptionTierOptions", response.method)
+
+            // Should have 2 products (Plus and Pro)
+            assertNotNull(params?.products)
+            assertEquals(2, params?.products?.size)
+
+            // Verify Plus product
+            val plusProduct = params?.products?.find { it.tier == "plus" }
+            assertNotNull(plusProduct)
+            assertEquals(YEARLY_PLAN_US, plusProduct?.options?.first()?.id)
+            assertEquals(MONTHLY_PLAN_US, plusProduct?.options?.last()?.id)
+
+            // Verify Pro product
+            val proProduct = params?.products?.find { it.tier == "pro" }
+            assertNotNull(proProduct)
+            assertEquals(YEARLY_PRO_PLAN_US, proProduct?.options?.first()?.id)
+            assertEquals(MONTHLY_PRO_PLAN_US, proProduct?.options?.last()?.id)
+            assertEquals(2, proProduct?.features?.size)
+            assertTrue(proProduct?.features?.any { it.product == SubscriptionsConstants.DUCK_AI && it.name == "pro" } == true)
+            assertTrue(proProduct?.features?.any { it.product == SubscriptionsConstants.NETP && it.name == "subscriber" } == true)
+        }
+    }
+
+    @Test
+    fun whenGetSubscriptionTierOptionsWithOnlyProTierThenReturnSingleProduct() = runTest {
+        val testSubscriptionOfferList = listOf(
+            SubscriptionOffer(
+                planId = MONTHLY_PRO_PLAN_US,
+                offerId = null,
+                tier = "pro",
+                pricingPhases = listOf(
+                    PricingPhase(
+                        priceAmount = 5.toBigDecimal(),
+                        priceCurrency = Currency.getInstance("USD"),
+                        formattedPrice = "$5",
+                        billingPeriod = "P1M",
+                    ),
+                ),
+                entitlements = setOf(
+                    Entitlement("subscriber", SubscriptionsConstants.NETP),
+                    Entitlement("pro", SubscriptionsConstants.DUCK_AI),
+                ),
+            ),
+            SubscriptionOffer(
+                planId = YEARLY_PRO_PLAN_US,
+                offerId = null,
+                tier = "pro",
+                pricingPhases = listOf(
+                    PricingPhase(
+                        priceAmount = 50.toBigDecimal(),
+                        priceCurrency = Currency.getInstance("USD"),
+                        formattedPrice = "$50",
+                        billingPeriod = "P1Y",
+                    ),
+                ),
+                entitlements = setOf(
+                    Entitlement("subscriber", SubscriptionsConstants.NETP),
+                    Entitlement("pro", SubscriptionsConstants.DUCK_AI),
+                ),
+            ),
+        )
+        whenever(subscriptionsManager.getSubscriptionOffer()).thenReturn(testSubscriptionOfferList)
+        privacyProFeature.allowPurchase().setRawStoredState(Toggle.State(enable = true))
+        privacyProFeature.allowProTierPurchase().setRawStoredState(Toggle.State(enable = true))
+        whenever(subscriptionsManager.isFreeTrialEligible()).thenReturn(true)
+
+        viewModel.commands().test {
+            viewModel.processJsCallbackMessage("test", "getSubscriptionTierOptions", "id", JSONObject("{}"))
+            val result = awaitItem()
+            assertTrue(result is Command.SendResponseToJs)
+            val response = (result as Command.SendResponseToJs).data
+
+            val params = tierJsonAdapter.fromJson(response.params.toString())
+
+            // Should have only 1 product (Pro)
+            assertNotNull(params?.products)
+            assertEquals(1, params?.products?.size)
+            assertEquals("pro", params?.products?.first()?.tier)
+            assertEquals(YEARLY_PRO_PLAN_US, params?.products?.first()?.options?.first()?.id)
+            assertEquals(MONTHLY_PRO_PLAN_US, params?.products?.first()?.options?.last()?.id)
+        }
+    }
+
+    @Test
+    fun whenGetSubscriptionTierOptionsAndProTierFlagDisabledThenProProductNotIncluded() = runTest {
+        val testSubscriptionOfferList = listOf(
+            // Plus tier offers
+            SubscriptionOffer(
+                planId = MONTHLY_PLAN_US,
+                offerId = null,
+                tier = "plus",
+                pricingPhases = listOf(
+                    PricingPhase(
+                        priceAmount = 1.toBigDecimal(),
+                        priceCurrency = Currency.getInstance("USD"),
+                        formattedPrice = "$1",
+                        billingPeriod = "P1M",
+                    ),
+                ),
+                entitlements = setOf(
+                    Entitlement("subscriber", SubscriptionsConstants.NETP),
+                    Entitlement("plus", SubscriptionsConstants.DUCK_AI),
+                ),
+            ),
+            SubscriptionOffer(
+                planId = YEARLY_PLAN_US,
+                offerId = null,
+                tier = "plus",
+                pricingPhases = listOf(
+                    PricingPhase(
+                        priceAmount = 10.toBigDecimal(),
+                        priceCurrency = Currency.getInstance("USD"),
+                        formattedPrice = "$10",
+                        billingPeriod = "P1Y",
+                    ),
+                ),
+                entitlements = setOf(
+                    Entitlement("subscriber", SubscriptionsConstants.NETP),
+                    Entitlement("plus", SubscriptionsConstants.DUCK_AI),
+                ),
+            ),
+            // Pro tier offers (should be excluded when flag is disabled)
+            SubscriptionOffer(
+                planId = MONTHLY_PRO_PLAN_US,
+                offerId = null,
+                tier = "pro",
+                pricingPhases = listOf(
+                    PricingPhase(
+                        priceAmount = 5.toBigDecimal(),
+                        priceCurrency = Currency.getInstance("USD"),
+                        formattedPrice = "$5",
+                        billingPeriod = "P1M",
+                    ),
+                ),
+                entitlements = setOf(
+                    Entitlement("subscriber", SubscriptionsConstants.NETP),
+                    Entitlement("pro", SubscriptionsConstants.DUCK_AI),
+                ),
+            ),
+            SubscriptionOffer(
+                planId = YEARLY_PRO_PLAN_US,
+                offerId = null,
+                tier = "pro",
+                pricingPhases = listOf(
+                    PricingPhase(
+                        priceAmount = 50.toBigDecimal(),
+                        priceCurrency = Currency.getInstance("USD"),
+                        formattedPrice = "$50",
+                        billingPeriod = "P1Y",
+                    ),
+                ),
+                entitlements = setOf(
+                    Entitlement("subscriber", SubscriptionsConstants.NETP),
+                    Entitlement("pro", SubscriptionsConstants.DUCK_AI),
+                ),
+            ),
+        )
+        whenever(subscriptionsManager.getSubscriptionOffer()).thenReturn(testSubscriptionOfferList)
+        privacyProFeature.allowPurchase().setRawStoredState(Toggle.State(enable = true))
+        privacyProFeature.allowProTierPurchase().setRawStoredState(Toggle.State(enable = false))
+        whenever(subscriptionsManager.isFreeTrialEligible()).thenReturn(true)
+
+        viewModel.commands().test {
+            viewModel.processJsCallbackMessage("test", "getSubscriptionTierOptions", "id", JSONObject("{}"))
+            val result = awaitItem()
+            assertTrue(result is Command.SendResponseToJs)
+            val response = (result as Command.SendResponseToJs).data
+
+            val params = tierJsonAdapter.fromJson(response.params.toString())
+
+            // Should have only 1 product (Plus) - Pro is excluded due to feature flag
+            assertNotNull(params?.products)
+            assertEquals(1, params?.products?.size)
+            assertEquals("plus", params?.products?.first()?.tier)
+            assertEquals(YEARLY_PLAN_US, params?.products?.first()?.options?.first()?.id)
+            assertEquals(MONTHLY_PLAN_US, params?.products?.first()?.options?.last()?.id)
+        }
+    }
+
+    @Test
+    fun whenGetSubscriptionTierOptionsWithProTierRowPlansAndFlagEnabledThenReturnProProduct() = runTest {
+        val testSubscriptionOfferList = listOf(
+            // Pro tier ROW offers
+            SubscriptionOffer(
+                planId = MONTHLY_PRO_PLAN_ROW,
+                offerId = null,
+                tier = "pro",
+                pricingPhases = listOf(
+                    PricingPhase(
+                        priceAmount = 5.toBigDecimal(),
+                        priceCurrency = Currency.getInstance("EUR"),
+                        formattedPrice = "€5",
+                        billingPeriod = "P1M",
+                    ),
+                ),
+                entitlements = setOf(
+                    Entitlement("subscriber", SubscriptionsConstants.NETP),
+                    Entitlement("pro", SubscriptionsConstants.DUCK_AI),
+                ),
+            ),
+            SubscriptionOffer(
+                planId = YEARLY_PRO_PLAN_ROW,
+                offerId = null,
+                tier = "pro",
+                pricingPhases = listOf(
+                    PricingPhase(
+                        priceAmount = 50.toBigDecimal(),
+                        priceCurrency = Currency.getInstance("EUR"),
+                        formattedPrice = "€50",
+                        billingPeriod = "P1Y",
+                    ),
+                ),
+                entitlements = setOf(
+                    Entitlement("subscriber", SubscriptionsConstants.NETP),
+                    Entitlement("pro", SubscriptionsConstants.DUCK_AI),
+                ),
+            ),
+        )
+        whenever(subscriptionsManager.getSubscriptionOffer()).thenReturn(testSubscriptionOfferList)
+        privacyProFeature.allowPurchase().setRawStoredState(Toggle.State(enable = true))
+        privacyProFeature.allowProTierPurchase().setRawStoredState(Toggle.State(enable = true))
+        whenever(subscriptionsManager.isFreeTrialEligible()).thenReturn(true)
+
+        viewModel.commands().test {
+            viewModel.processJsCallbackMessage("test", "getSubscriptionTierOptions", "id", JSONObject("{}"))
+            val result = awaitItem()
+            assertTrue(result is Command.SendResponseToJs)
+            val response = (result as Command.SendResponseToJs).data
+
+            val params = tierJsonAdapter.fromJson(response.params.toString())
+
+            // Should have only 1 product (Pro ROW)
+            assertNotNull(params?.products)
+            assertEquals(1, params?.products?.size)
+            assertEquals("pro", params?.products?.first()?.tier)
+            assertEquals(YEARLY_PRO_PLAN_ROW, params?.products?.first()?.options?.first()?.id)
+            assertEquals(MONTHLY_PRO_PLAN_ROW, params?.products?.first()?.options?.last()?.id)
+        }
+    }
+
+    @Test
+    fun whenGetSubscriptionTierOptionsWithProTierRowPlansAndFlagDisabledThenNoProProduct() = runTest {
+        val testSubscriptionOfferList = listOf(
+            // Pro tier ROW offers (should be excluded when flag is disabled)
+            SubscriptionOffer(
+                planId = MONTHLY_PRO_PLAN_ROW,
+                offerId = null,
+                tier = "pro",
+                pricingPhases = listOf(
+                    PricingPhase(
+                        priceAmount = 5.toBigDecimal(),
+                        priceCurrency = Currency.getInstance("EUR"),
+                        formattedPrice = "€5",
+                        billingPeriod = "P1M",
+                    ),
+                ),
+                entitlements = setOf(
+                    Entitlement("subscriber", SubscriptionsConstants.NETP),
+                    Entitlement("pro", SubscriptionsConstants.DUCK_AI),
+                ),
+            ),
+            SubscriptionOffer(
+                planId = YEARLY_PRO_PLAN_ROW,
+                offerId = null,
+                tier = "pro",
+                pricingPhases = listOf(
+                    PricingPhase(
+                        priceAmount = 50.toBigDecimal(),
+                        priceCurrency = Currency.getInstance("EUR"),
+                        formattedPrice = "€50",
+                        billingPeriod = "P1Y",
+                    ),
+                ),
+                entitlements = setOf(
+                    Entitlement("subscriber", SubscriptionsConstants.NETP),
+                    Entitlement("pro", SubscriptionsConstants.DUCK_AI),
+                ),
+            ),
+        )
+        whenever(subscriptionsManager.getSubscriptionOffer()).thenReturn(testSubscriptionOfferList)
+        privacyProFeature.allowPurchase().setRawStoredState(Toggle.State(enable = true))
+        privacyProFeature.allowProTierPurchase().setRawStoredState(Toggle.State(enable = false))
+        whenever(subscriptionsManager.isFreeTrialEligible()).thenReturn(true)
+
+        viewModel.commands().test {
+            viewModel.processJsCallbackMessage("test", "getSubscriptionTierOptions", "id", JSONObject("{}"))
+            val result = awaitItem()
+            assertTrue(result is Command.SendResponseToJs)
+            val response = (result as Command.SendResponseToJs).data
+
+            val params = tierJsonAdapter.fromJson(response.params.toString())
+
+            // Should have no products - Pro ROW is excluded due to feature flag
+            assertNotNull(params?.products)
+            assertEquals(0, params?.products?.size)
+        }
+    }
+
+    @Test
+    fun givenProFreeTrialAvailableAndUserEligibleThenSendCommandWithProFreeTrialOffers() = runTest {
+        val testSubscriptionOfferList = listOf(
+            // Pro base plans
+            SubscriptionOffer(
+                planId = MONTHLY_PRO_PLAN_US,
+                offerId = null,
+                tier = "pro",
+                pricingPhases = listOf(
+                    PricingPhase(
+                        priceAmount = 15.toBigDecimal(),
+                        priceCurrency = Currency.getInstance("USD"),
+                        formattedPrice = "$15",
+                        billingPeriod = "P1M",
+                    ),
+                ),
+                entitlements = setOf(
+                    Entitlement("subscriber", SubscriptionsConstants.NETP),
+                    Entitlement("subscriber", SubscriptionsConstants.PIR),
+                ),
+            ),
+            SubscriptionOffer(
+                planId = YEARLY_PRO_PLAN_US,
+                offerId = null,
+                tier = "pro",
+                pricingPhases = listOf(
+                    PricingPhase(
+                        priceAmount = 150.toBigDecimal(),
+                        priceCurrency = Currency.getInstance("USD"),
+                        formattedPrice = "$150",
+                        billingPeriod = "P1Y",
+                    ),
+                ),
+                entitlements = setOf(
+                    Entitlement("subscriber", SubscriptionsConstants.NETP),
+                    Entitlement("subscriber", SubscriptionsConstants.PIR),
+                ),
+            ),
+            // Pro free trial offers
+            SubscriptionOffer(
+                planId = MONTHLY_PRO_PLAN_US,
+                offerId = MONTHLY_PRO_FREE_TRIAL_OFFER_US,
+                tier = "pro",
+                pricingPhases = listOf(
+                    PricingPhase(
+                        priceAmount = 15.toBigDecimal(),
+                        priceCurrency = Currency.getInstance("USD"),
+                        formattedPrice = "$15",
+                        billingPeriod = "P1M",
+                    ),
+                    PricingPhase(
+                        priceAmount = BigDecimal.ZERO,
+                        priceCurrency = Currency.getInstance("USD"),
+                        formattedPrice = "Free",
+                        billingPeriod = "P1W",
+                    ),
+                ),
+                entitlements = setOf(
+                    Entitlement("subscriber", SubscriptionsConstants.NETP),
+                    Entitlement("subscriber", SubscriptionsConstants.PIR),
+                ),
+            ),
+            SubscriptionOffer(
+                planId = YEARLY_PRO_PLAN_US,
+                offerId = YEARLY_PRO_FREE_TRIAL_OFFER_US,
+                tier = "pro",
+                pricingPhases = listOf(
+                    PricingPhase(
+                        priceAmount = 150.toBigDecimal(),
+                        priceCurrency = Currency.getInstance("USD"),
+                        formattedPrice = "$150",
+                        billingPeriod = "P1Y",
+                    ),
+                    PricingPhase(
+                        priceAmount = BigDecimal.ZERO,
+                        priceCurrency = Currency.getInstance("USD"),
+                        formattedPrice = "Free",
+                        billingPeriod = "P1W",
+                    ),
+                ),
+                entitlements = setOf(
+                    Entitlement("subscriber", SubscriptionsConstants.NETP),
+                    Entitlement("subscriber", SubscriptionsConstants.PIR),
+                ),
+            ),
+        )
+        whenever(subscriptionsManager.getSubscriptionOffer()).thenReturn(testSubscriptionOfferList)
+        privacyProFeature.allowPurchase().setRawStoredState(Toggle.State(enable = true))
+        privacyProFeature.allowProTierPurchase().setRawStoredState(Toggle.State(enable = true))
+        whenever(subscriptionsManager.isFreeTrialEligible()).thenReturn(true)
+
+        viewModel.commands().test {
+            viewModel.processJsCallbackMessage("test", "getSubscriptionTierOptions", "id", JSONObject("{}"))
+            val result = awaitItem()
+            assertTrue(result is Command.SendResponseToJs)
+            val response = (result as Command.SendResponseToJs).data
+
+            val params = tierJsonAdapter.fromJson(response.params.toString())
+            assertEquals("id", response.id)
+            assertEquals("test", response.featureName)
+            assertEquals("getSubscriptionTierOptions", response.method)
+
+            // Should have Pro product with free trial offers
+            assertNotNull(params?.products)
+            assertEquals(1, params?.products?.size)
+            assertEquals("pro", params?.products?.first()?.tier)
+
+            // Verify free trial offer IDs are used
+            val proProduct = params?.products?.first()
+            assertEquals(YEARLY_PRO_FREE_TRIAL_OFFER_US, proProduct?.options?.first()?.offer?.id)
+            assertEquals(MONTHLY_PRO_FREE_TRIAL_OFFER_US, proProduct?.options?.last()?.offer?.id)
+        }
+    }
+
+    @Test
+    fun givenProFreeTrialAvailableButUserNotEligibleThenSendCommandWithProBasePlanOffers() = runTest {
+        val testSubscriptionOfferList = listOf(
+            // Pro base plans
+            SubscriptionOffer(
+                planId = MONTHLY_PRO_PLAN_US,
+                offerId = null,
+                tier = "pro",
+                pricingPhases = listOf(
+                    PricingPhase(
+                        priceAmount = 15.toBigDecimal(),
+                        priceCurrency = Currency.getInstance("USD"),
+                        formattedPrice = "$15",
+                        billingPeriod = "P1M",
+                    ),
+                ),
+                entitlements = setOf(
+                    Entitlement("subscriber", SubscriptionsConstants.NETP),
+                    Entitlement("subscriber", SubscriptionsConstants.PIR),
+                ),
+            ),
+            SubscriptionOffer(
+                planId = YEARLY_PRO_PLAN_US,
+                offerId = null,
+                tier = "pro",
+                pricingPhases = listOf(
+                    PricingPhase(
+                        priceAmount = 150.toBigDecimal(),
+                        priceCurrency = Currency.getInstance("USD"),
+                        formattedPrice = "$150",
+                        billingPeriod = "P1Y",
+                    ),
+                ),
+                entitlements = setOf(
+                    Entitlement("subscriber", SubscriptionsConstants.NETP),
+                    Entitlement("subscriber", SubscriptionsConstants.PIR),
+                ),
+            ),
+            // Pro free trial offers (should not be used since user is not eligible)
+            SubscriptionOffer(
+                planId = MONTHLY_PRO_PLAN_US,
+                offerId = MONTHLY_PRO_FREE_TRIAL_OFFER_US,
+                tier = "pro",
+                pricingPhases = listOf(
+                    PricingPhase(
+                        priceAmount = 15.toBigDecimal(),
+                        priceCurrency = Currency.getInstance("USD"),
+                        formattedPrice = "$15",
+                        billingPeriod = "P1M",
+                    ),
+                    PricingPhase(
+                        priceAmount = BigDecimal.ZERO,
+                        priceCurrency = Currency.getInstance("USD"),
+                        formattedPrice = "Free",
+                        billingPeriod = "P1W",
+                    ),
+                ),
+                entitlements = setOf(
+                    Entitlement("subscriber", SubscriptionsConstants.NETP),
+                    Entitlement("subscriber", SubscriptionsConstants.PIR),
+                ),
+            ),
+            SubscriptionOffer(
+                planId = YEARLY_PRO_PLAN_US,
+                offerId = YEARLY_PRO_FREE_TRIAL_OFFER_US,
+                tier = "pro",
+                pricingPhases = listOf(
+                    PricingPhase(
+                        priceAmount = 150.toBigDecimal(),
+                        priceCurrency = Currency.getInstance("USD"),
+                        formattedPrice = "$150",
+                        billingPeriod = "P1Y",
+                    ),
+                    PricingPhase(
+                        priceAmount = BigDecimal.ZERO,
+                        priceCurrency = Currency.getInstance("USD"),
+                        formattedPrice = "Free",
+                        billingPeriod = "P1W",
+                    ),
+                ),
+                entitlements = setOf(
+                    Entitlement("subscriber", SubscriptionsConstants.NETP),
+                    Entitlement("subscriber", SubscriptionsConstants.PIR),
+                ),
+            ),
+        )
+        whenever(subscriptionsManager.getSubscriptionOffer()).thenReturn(testSubscriptionOfferList)
+        privacyProFeature.allowPurchase().setRawStoredState(Toggle.State(enable = true))
+        privacyProFeature.allowProTierPurchase().setRawStoredState(Toggle.State(enable = true))
+        whenever(subscriptionsManager.isFreeTrialEligible()).thenReturn(false) // User not eligible
+
+        viewModel.commands().test {
+            viewModel.processJsCallbackMessage("test", "getSubscriptionTierOptions", "id", JSONObject("{}"))
+            val result = awaitItem()
+            assertTrue(result is Command.SendResponseToJs)
+            val response = (result as Command.SendResponseToJs).data
+
+            val params = tierJsonAdapter.fromJson(response.params.toString())
+            assertEquals("id", response.id)
+            assertEquals("test", response.featureName)
+            assertEquals("getSubscriptionTierOptions", response.method)
+
+            // Should have Pro product with base plan offers (no free trial)
+            assertNotNull(params?.products)
+            assertEquals(1, params?.products?.size)
+            assertEquals("pro", params?.products?.first()?.tier)
+
+            // Verify base plan IDs are used (no offer ID)
+            val proProduct = params?.products?.first()
+            assertEquals(YEARLY_PRO_PLAN_US, proProduct?.options?.first()?.id)
+            assertEquals(MONTHLY_PRO_PLAN_US, proProduct?.options?.last()?.id)
+            assertNull(proProduct?.options?.first()?.offer)
+            assertNull(proProduct?.options?.last()?.offer)
+        }
+    }
+
+    @Test
+    fun givenProFreeTrialAvailableButAllowProTierDisabledThenDoNotShowProOffers() = runTest {
+        val testSubscriptionOfferList = listOf(
+            // Pro base plans
+            SubscriptionOffer(
+                planId = MONTHLY_PRO_PLAN_US,
+                offerId = null,
+                tier = "pro",
+                pricingPhases = listOf(
+                    PricingPhase(
+                        priceAmount = 15.toBigDecimal(),
+                        priceCurrency = Currency.getInstance("USD"),
+                        formattedPrice = "$15",
+                        billingPeriod = "P1M",
+                    ),
+                ),
+                entitlements = setOf(
+                    Entitlement("subscriber", SubscriptionsConstants.NETP),
+                    Entitlement("subscriber", SubscriptionsConstants.PIR),
+                ),
+            ),
+            SubscriptionOffer(
+                planId = YEARLY_PRO_PLAN_US,
+                offerId = null,
+                tier = "pro",
+                pricingPhases = listOf(
+                    PricingPhase(
+                        priceAmount = 150.toBigDecimal(),
+                        priceCurrency = Currency.getInstance("USD"),
+                        formattedPrice = "$150",
+                        billingPeriod = "P1Y",
+                    ),
+                ),
+                entitlements = setOf(
+                    Entitlement("subscriber", SubscriptionsConstants.NETP),
+                    Entitlement("subscriber", SubscriptionsConstants.PIR),
+                ),
+            ),
+            // Pro free trial offers
+            SubscriptionOffer(
+                planId = MONTHLY_PRO_PLAN_US,
+                offerId = MONTHLY_PRO_FREE_TRIAL_OFFER_US,
+                tier = "pro",
+                pricingPhases = listOf(
+                    PricingPhase(
+                        priceAmount = 15.toBigDecimal(),
+                        priceCurrency = Currency.getInstance("USD"),
+                        formattedPrice = "$15",
+                        billingPeriod = "P1M",
+                    ),
+                    PricingPhase(
+                        priceAmount = BigDecimal.ZERO,
+                        priceCurrency = Currency.getInstance("USD"),
+                        formattedPrice = "Free",
+                        billingPeriod = "P1W",
+                    ),
+                ),
+                entitlements = setOf(
+                    Entitlement("subscriber", SubscriptionsConstants.NETP),
+                    Entitlement("subscriber", SubscriptionsConstants.PIR),
+                ),
+            ),
+            SubscriptionOffer(
+                planId = YEARLY_PRO_PLAN_US,
+                offerId = YEARLY_PRO_FREE_TRIAL_OFFER_US,
+                tier = "pro",
+                pricingPhases = listOf(
+                    PricingPhase(
+                        priceAmount = 150.toBigDecimal(),
+                        priceCurrency = Currency.getInstance("USD"),
+                        formattedPrice = "$150",
+                        billingPeriod = "P1Y",
+                    ),
+                    PricingPhase(
+                        priceAmount = BigDecimal.ZERO,
+                        priceCurrency = Currency.getInstance("USD"),
+                        formattedPrice = "Free",
+                        billingPeriod = "P1W",
+                    ),
+                ),
+                entitlements = setOf(
+                    Entitlement("subscriber", SubscriptionsConstants.NETP),
+                    Entitlement("subscriber", SubscriptionsConstants.PIR),
+                ),
+            ),
+        )
+        whenever(subscriptionsManager.getSubscriptionOffer()).thenReturn(testSubscriptionOfferList)
+        privacyProFeature.allowPurchase().setRawStoredState(Toggle.State(enable = true))
+        privacyProFeature.allowProTierPurchase().setRawStoredState(Toggle.State(enable = false)) // Kill switch
+        whenever(subscriptionsManager.isFreeTrialEligible()).thenReturn(true)
+
+        viewModel.commands().test {
+            viewModel.processJsCallbackMessage("test", "getSubscriptionTierOptions", "id", JSONObject("{}"))
+            val result = awaitItem()
+            assertTrue(result is Command.SendResponseToJs)
+            val response = (result as Command.SendResponseToJs).data
+
+            val params = tierJsonAdapter.fromJson(response.params.toString())
+            assertEquals("id", response.id)
+            assertEquals("test", response.featureName)
+            assertEquals("getSubscriptionTierOptions", response.method)
+
+            // Should have no products - Pro is excluded due to feature flag (kill switch)
+            assertNotNull(params?.products)
+            assertEquals(0, params?.products?.size)
         }
     }
 
