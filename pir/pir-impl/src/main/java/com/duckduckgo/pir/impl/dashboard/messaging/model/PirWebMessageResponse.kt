@@ -131,6 +131,7 @@ sealed interface PirWebMessageResponse {
 
     data class GetFeatureConfigResponse(
         val useUnifiedFeedback: Boolean,
+        val isBeta: Boolean,
     ) : PirWebMessageResponse
 
     data class MaintenanceScanStatusResponse(
