@@ -37,6 +37,7 @@ data class BrokenSiteData(
     val userRefreshCount: Int,
     val openerContext: BrokenSiteOpenerContext?,
     val jsPerformance: DoubleArray?,
+    val breakageData: String?,
 ) {
     enum class ReportFlow { MENU, DASHBOARD, TOGGLE_DASHBOARD, TOGGLE_MENU, RELOAD_THREE_TIMES_WITHIN_20_SECONDS }
 
@@ -59,6 +60,7 @@ data class BrokenSiteData(
             val userRefreshCount = site?.realBrokenSiteContext?.userRefreshCount ?: 0
             val openerContext = site?.realBrokenSiteContext?.openerContext
             val jsPerformance = site?.realBrokenSiteContext?.jsPerformance
+            val breakageData = site?.realBrokenSiteContext?.breakageData
             return BrokenSiteData(
                 url = url,
                 blockedTrackers = blockedTrackers,
@@ -75,6 +77,7 @@ data class BrokenSiteData(
                 userRefreshCount = userRefreshCount,
                 openerContext = openerContext,
                 jsPerformance = jsPerformance,
+                breakageData = breakageData,
             )
         }
     }
