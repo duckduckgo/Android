@@ -314,12 +314,6 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
         }
 
         url?.let {
-            // Check if migration is already complete to avoid re-triggering
-            val duckAiCookies = cookieManager.getCookie("https://duck.ai")
-            val duckDuckGoCookies = cookieManager.getCookie("https://duckduckgo.com")
-            logcat { "Duck.ai Full screen onViewCreated: URL=$it" }
-            logcat { "Duck.ai Full screen: duck.ai cookies=$duckAiCookies" }
-            logcat { "Duck.ai Full screen: duckduckgo.com cookies=$duckDuckGoCookies" }
             simpleWebview.loadUrl(it)
         }
 
