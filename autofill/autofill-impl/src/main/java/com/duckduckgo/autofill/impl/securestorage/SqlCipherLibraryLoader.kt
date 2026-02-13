@@ -17,7 +17,11 @@
 package com.duckduckgo.autofill.impl.securestorage
 
 import android.content.Context
+import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.autofill.api.AutofillFeature
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.LIBRARY_LOAD_FAILURE_SQLCIPHER
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.LIBRARY_LOAD_TIMEOUT_SQLCIPHER
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
@@ -48,6 +52,7 @@ class SqlCipherLibraryLoader @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val autofillFeature: AutofillFeature,
     private val currentTimeProvider: CurrentTimeProvider,
+    private val pixel: Pixel,
 ) {
     private val initializationMutex = Mutex()
     private var libraryLoaded: CompletableDeferred<Unit>? = null
@@ -66,7 +71,11 @@ class SqlCipherLibraryLoader @Inject constructor(
     ): Result<Unit> {
         logcat { "SqlCipher-Init: waitForLibraryLoad() called with timeout=${timeoutMillis}ms" }
 
-        initialize()
+        val useAsyncLoading = withContext(dispatchers.io()) {
+            autofillFeature.sqlCipherAsyncLoading().isEnabled()
+        }
+
+        initialize(useAsyncLoading)
 
         val waitStartTimeMillis = currentTimeProvider.currentTimeMillis()
         logcat { "SqlCipher-Init: Waiting for library load to complete (timeout=${timeoutMillis}ms)" }
@@ -80,20 +89,25 @@ class SqlCipherLibraryLoader @Inject constructor(
             Result.success(Unit)
         } catch (e: TimeoutCancellationException) {
             logcat(ERROR) { "SqlCipher-Init: Timeout after waiting ${timeoutMillis}ms for library load" }
+            if (useAsyncLoading) {
+                pixel.fire(LIBRARY_LOAD_TIMEOUT_SQLCIPHER, type = Daily())
+            }
             Result.failure(e)
         } catch (e: Throwable) {
             logcat(ERROR) { "SqlCipher-Init: Failed while waiting for library load: ${e.javaClass.simpleName} - ${e.message}" }
             currentCoroutineContext().ensureActive()
+            if (useAsyncLoading) {
+                pixel.fire(LIBRARY_LOAD_FAILURE_SQLCIPHER, type = Daily())
+            }
             Result.failure(e)
         }
     }
 
     /**
      * Ensures the library loading has been initiated.
-     * Called lazily on first use. Handles threading internally - feature flag check
-     * and library loading both occur on IO thread regardless of caller's thread.
+     * Called lazily on first use.
      */
-    private suspend fun initialize() {
+    private suspend fun initialize(useAsyncLoading: Boolean) {
         // Fast path: if already initialized, return immediately
         if (libraryLoaded != null) {
             logcat { "SqlCipher-Init: Already initialized, skipping" }
@@ -106,12 +120,6 @@ class SqlCipherLibraryLoader @Inject constructor(
                 logcat { "SqlCipher-Init: Another thread completed initialization while waiting for lock" }
                 return
             }
-
-            val useAsyncLoading = withContext(dispatchers.io()) {
-                autofillFeature.sqlCipherAsyncLoading().isEnabled()
-            }
-
-            logcat { "SqlCipher-Init: Feature flag check complete, useAsyncLoading=$useAsyncLoading" }
 
             if (useAsyncLoading) {
                 loadAsync()
