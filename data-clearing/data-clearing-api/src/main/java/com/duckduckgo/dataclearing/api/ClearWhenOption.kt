@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.settings.clear
+package com.duckduckgo.dataclearing.api
 
-import com.duckduckgo.app.settings.clear.ClearWhenOption.APP_EXIT_ONLY
-import com.duckduckgo.app.settings.clear.ClearWhenOption.APP_EXIT_OR_15_MINS
-import com.duckduckgo.app.settings.clear.ClearWhenOption.APP_EXIT_OR_30_MINS
-import com.duckduckgo.app.settings.clear.ClearWhenOption.APP_EXIT_OR_5_MINS
-import com.duckduckgo.app.settings.clear.ClearWhenOption.APP_EXIT_OR_5_SECONDS
-import com.duckduckgo.app.settings.clear.ClearWhenOption.APP_EXIT_OR_60_MINS
+import com.duckduckgo.dataclearing.api.ClearWhenOption.APP_EXIT_ONLY
+import com.duckduckgo.dataclearing.api.ClearWhenOption.APP_EXIT_OR_15_MINS
+import com.duckduckgo.dataclearing.api.ClearWhenOption.APP_EXIT_OR_30_MINS
+import com.duckduckgo.dataclearing.api.ClearWhenOption.APP_EXIT_OR_5_MINS
+import com.duckduckgo.dataclearing.api.ClearWhenOption.APP_EXIT_OR_5_SECONDS
+import com.duckduckgo.dataclearing.api.ClearWhenOption.APP_EXIT_OR_60_MINS
 
 enum class ClearWhenOption {
     APP_EXIT_ONLY,

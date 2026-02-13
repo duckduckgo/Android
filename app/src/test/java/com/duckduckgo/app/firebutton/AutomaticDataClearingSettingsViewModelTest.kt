@@ -17,13 +17,13 @@
 package com.duckduckgo.app.firebutton
 
 import app.cash.turbine.test
-import com.duckduckgo.app.fire.store.FireDataStore
 import com.duckduckgo.app.firebutton.AutomaticDataClearingSettingsViewModel.Command
 import com.duckduckgo.app.pixels.AppPixelName
-import com.duckduckgo.app.settings.clear.ClearWhenOption
-import com.duckduckgo.app.settings.clear.FireClearOption
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.dataclearing.api.ClearWhenOption
+import com.duckduckgo.dataclearing.api.FireClearOption
+import com.duckduckgo.dataclearing.api.FireDataStore
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import kotlinx.coroutines.flow.MutableStateFlow

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.fire.store
+package com.duckduckgo.dataclearing.impl
 
 import androidx.room.Dao
 import androidx.room.Insert

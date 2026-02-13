@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.fire.store
+package com.duckduckgo.dataclearing.impl
 
+import com.duckduckgo.dataclearing.api.TabVisitedSitesRepository
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn

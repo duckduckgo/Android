@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.fire.store
+package com.duckduckgo.dataclearing.impl
 
 import android.content.Context
 import androidx.room.Room

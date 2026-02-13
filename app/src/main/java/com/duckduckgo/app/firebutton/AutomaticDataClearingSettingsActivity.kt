@@ -29,13 +29,13 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityAutomaticDataClearingSettingsBinding
 import com.duckduckgo.app.firebutton.AutomaticDataClearingSettingsViewModel.Command
 import com.duckduckgo.app.firebutton.AutomaticDataClearingSettingsViewModel.ViewState
-import com.duckduckgo.app.settings.clear.ClearWhenOption
-import com.duckduckgo.app.settings.clear.FireClearOption
-import com.duckduckgo.app.settings.clear.getClearWhenForIndex
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.dialog.RadioListAlertDialogBuilder
 import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.dataclearing.api.ClearWhenOption
+import com.duckduckgo.dataclearing.api.FireClearOption
+import com.duckduckgo.dataclearing.api.getClearWhenForIndex
 import com.duckduckgo.di.scopes.ActivityScope
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.fire
+package com.duckduckgo.dataclearing.api
 
 /**
  * Interface for automatic data clearing operations triggered by app lifecycle events.

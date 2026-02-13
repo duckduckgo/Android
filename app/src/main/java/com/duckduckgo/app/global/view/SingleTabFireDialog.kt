@@ -49,6 +49,7 @@ import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.setAndPropagateUpFitsSystemWindows
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.utils.FragmentViewModelFactory
+import com.duckduckgo.dataclearing.api.ClearDataAction
 import com.duckduckgo.di.scopes.FragmentScope
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog

@@ -14,16 +14,14 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.fire.store
+package com.duckduckgo.dataclearing.api
 
-import androidx.room.Database
-import androidx.room.RoomDatabase
-
-@Database(
-    exportSchema = true,
-    version = 1,
-    entities = [TabVisitedSiteEntity::class],
-)
-abstract class TabVisitedSitesDatabase : RoomDatabase() {
-    abstract fun dao(): TabVisitedSitesDao
+/**
+ * Represents individual items that can be cleared during the Fire action.
+ * These can be combined in any combination to customize what gets cleared.
+ */
+enum class FireClearOption {
+    TABS,
+    DATA,
+    DUCKAI_CHATS,
 }

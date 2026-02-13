@@ -22,15 +22,12 @@ import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.fire.AndroidAppCacheClearer
 import com.duckduckgo.app.fire.AppCacheClearer
-import com.duckduckgo.app.fire.BackgroundTimeKeeper
 import com.duckduckgo.app.fire.DataClearerForegroundAppRestartPixel
-import com.duckduckgo.app.fire.DataClearerTimeKeeper
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.fire.model.AppCacheExclusionPlugin
 import com.duckduckgo.app.fire.wideevents.DataClearingWideEvent
 import com.duckduckgo.app.global.file.FileDeleter
-import com.duckduckgo.app.global.view.ClearDataAction
 import com.duckduckgo.app.global.view.ClearPersonalDataAction
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.location.data.LocationPermissionsDao
@@ -46,6 +43,9 @@ import com.duckduckgo.app.trackerdetection.db.TdsEntityDao
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.cookies.api.DuckDuckGoCookieManager
+import com.duckduckgo.dataclearing.api.BackgroundTimeKeeper
+import com.duckduckgo.dataclearing.api.ClearDataAction
+import com.duckduckgo.dataclearing.impl.DataClearerTimeKeeper
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.savedsites.api.SavedSitesRepository

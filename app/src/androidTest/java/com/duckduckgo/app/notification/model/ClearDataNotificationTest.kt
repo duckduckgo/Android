@@ -19,13 +19,13 @@
 package com.duckduckgo.app.notification.model
 
 import androidx.test.platform.app.InstrumentationRegistry
-import com.duckduckgo.app.fire.AutomaticDataClearing
 import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
-import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.dataclearing.api.AutomaticDataClearing
+import com.duckduckgo.dataclearing.api.ClearWhatOption
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.test.runTest

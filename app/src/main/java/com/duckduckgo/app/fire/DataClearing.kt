@@ -16,12 +16,15 @@
 
 package com.duckduckgo.app.fire
 
-import com.duckduckgo.app.fire.store.FireDataStore
 import com.duckduckgo.app.fire.wideevents.DataClearingWideEvent
-import com.duckduckgo.app.global.view.ClearDataAction
-import com.duckduckgo.app.settings.clear.ClearWhenOption
-import com.duckduckgo.app.settings.clear.FireClearOption
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.dataclearing.api.AutomaticDataClearing
+import com.duckduckgo.dataclearing.api.BackgroundTimeKeeper
+import com.duckduckgo.dataclearing.api.ClearDataAction
+import com.duckduckgo.dataclearing.api.ClearWhenOption
+import com.duckduckgo.dataclearing.api.FireClearOption
+import com.duckduckgo.dataclearing.api.FireDataStore
+import com.duckduckgo.dataclearing.api.ManualDataClearing
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.squareup.anvil.annotations.ContributesBinding

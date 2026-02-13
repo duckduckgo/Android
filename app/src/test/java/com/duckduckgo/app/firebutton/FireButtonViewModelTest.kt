@@ -21,12 +21,12 @@ import app.cash.turbine.test
 import com.duckduckgo.app.fire.FireAnimationLoader
 import com.duckduckgo.app.firebutton.FireButtonViewModel.Command
 import com.duckduckgo.app.pixels.AppPixelName
-import com.duckduckgo.app.settings.clear.ClearWhatOption
-import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.clear.FireAnimation
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.dataclearing.api.ClearWhatOption
+import com.duckduckgo.dataclearing.api.ClearWhenOption
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import kotlinx.coroutines.flow.MutableStateFlow

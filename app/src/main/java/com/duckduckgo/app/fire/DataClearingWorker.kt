@@ -22,13 +22,14 @@ import androidx.work.CoroutineWorker
 import androidx.work.ListenableWorker.Result.success
 import androidx.work.WorkerParameters
 import com.duckduckgo.anvil.annotations.ContributesWorker
-import com.duckduckgo.app.fire.store.FireDataStore
 import com.duckduckgo.app.fire.wideevents.DataClearingWideEvent
-import com.duckduckgo.app.global.view.ClearDataAction
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
-import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.dataclearing.api.AutomaticDataClearing
+import com.duckduckgo.dataclearing.api.ClearDataAction
+import com.duckduckgo.dataclearing.api.ClearWhatOption
+import com.duckduckgo.dataclearing.api.FireDataStore
 import com.duckduckgo.di.scopes.AppScope
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.withContext

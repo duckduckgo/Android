@@ -14,14 +14,15 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.settings.clear
+package com.duckduckgo.dataclearing.impl
 
-/**
- * Represents individual items that can be cleared during the Fire action.
- * These can be combined in any combination to customize what gets cleared.
- */
-enum class FireClearOption {
-    TABS,
-    DATA,
-    DUCKAI_CHATS,
-}
+import androidx.room.Entity
+
+@Entity(
+    tableName = "tab_visited_sites",
+    primaryKeys = ["tabId", "domain"],
+)
+data class TabVisitedSiteEntity(
+    val tabId: String,
+    val domain: String,
+)

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.fire.store
+package com.duckduckgo.dataclearing.api
 
 /**
  * Tracks which eTLD+1 domains each browser tab has visited.

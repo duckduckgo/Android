@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.settings.clear
+package com.duckduckgo.dataclearing.api
 
-import com.duckduckgo.app.settings.clear.ClearWhatOption.CLEAR_NONE
-import com.duckduckgo.app.settings.clear.ClearWhatOption.CLEAR_TABS_AND_DATA
-import com.duckduckgo.app.settings.clear.ClearWhatOption.CLEAR_TABS_ONLY
+import com.duckduckgo.dataclearing.api.ClearWhatOption.CLEAR_NONE
+import com.duckduckgo.dataclearing.api.ClearWhatOption.CLEAR_TABS_AND_DATA
+import com.duckduckgo.dataclearing.api.ClearWhatOption.CLEAR_TABS_ONLY
 
 enum class ClearWhatOption {
     CLEAR_NONE,
