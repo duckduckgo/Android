@@ -1053,6 +1053,7 @@ class DuckChatContextualViewModelTest {
         ) = Unit
 
         override suspend fun isContextualOnboardingCompleted(): Boolean = true
+        override suspend fun isStandaloneMigrationCompleted(): Boolean = true
     }
 
     private class FakeDuckChatContextualDataStore : DuckChatContextualDataStore {

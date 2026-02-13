@@ -37,6 +37,7 @@ class FakeDuckChat(
     private val cosmeticInputScreenUserSettingEnabled = MutableStateFlow<Boolean?>(null)
     private val automaticContextAttachmentUserSettingEnabled = MutableStateFlow<Boolean>(false)
     var contextualOnboardingCompleted: Boolean = false
+    var standaloneMigrationCompleted: Boolean = false
 
     override fun isEnabled(): Boolean = enabled
 
@@ -98,6 +99,10 @@ class FakeDuckChat(
 
     override suspend fun isContextualOnboardingCompleted(): Boolean {
         return contextualOnboardingCompleted
+    }
+
+    override suspend fun isStandaloneMigrationCompleted(): Boolean {
+        return standaloneMigrationCompleted
     }
 
     fun setEnabled(enabled: Boolean) {
