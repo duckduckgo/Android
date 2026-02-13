@@ -16,41 +16,48 @@
 
 package com.duckduckgo.downloads.impl
 
+import android.content.Context
+import androidx.datastore.preferences.core.PreferenceDataStoreFactory
+import androidx.datastore.preferences.preferencesDataStoreFile
+import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.platform.app.InstrumentationRegistry
+import com.duckduckgo.common.test.CoroutineTestRule
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
-import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.robolectric.annotation.Config
 
 @RunWith(AndroidJUnit4::class)
-@Config(manifest = Config.NONE)
 class SharedPreferencesFailedDownloadRetryUrlStoreTest {
 
-    private lateinit var store: SharedPreferencesFailedDownloadRetryUrlStore
+    @get:Rule
+    val coroutineRule = CoroutineTestRule()
 
-    @Before
-    fun setup() {
-        val context = InstrumentationRegistry.getInstrumentation().targetContext
-        store = SharedPreferencesFailedDownloadRetryUrlStore(context)
-    }
+    private val context: Context = ApplicationProvider.getApplicationContext()
+
+    private val testDataStore = PreferenceDataStoreFactory.create(
+        scope = coroutineRule.testScope,
+        produceFile = { context.preferencesDataStoreFile("downloads_retry_urls_test") },
+    )
+
+    private val store = SharedPreferencesFailedDownloadRetryUrlStore(testDataStore)
 
     @Test
-    fun whenUrlSavedThenItCanBeRetrieved() {
+    fun whenUrlSavedThenItCanBeRetrieved() = runTest {
         store.saveRetryUrl(1L, "https://example.com/file.txt")
 
         assertEquals("https://example.com/file.txt", store.getRetryUrl(1L))
     }
 
     @Test
-    fun whenNoUrlSavedThenGetReturnsNull() {
+    fun whenNoUrlSavedThenGetReturnsNull() = runTest {
         assertNull(store.getRetryUrl(1L))
     }
 
     @Test
-    fun whenUrlRemovedThenGetReturnsNull() {
+    fun whenUrlRemovedThenGetReturnsNull() = runTest {
         store.saveRetryUrl(1L, "https://example.com/file.txt")
         store.removeRetryUrl(1L)
 
@@ -58,7 +65,7 @@ class SharedPreferencesFailedDownloadRetryUrlStoreTest {
     }
 
     @Test
-    fun whenMultipleUrlsSavedThenEachCanBeRetrievedIndependently() {
+    fun whenMultipleUrlsSavedThenEachCanBeRetrievedIndependently() = runTest {
         store.saveRetryUrl(1L, "https://example.com/file1.txt")
         store.saveRetryUrl(2L, "https://example.com/file2.txt")
 
@@ -67,7 +74,7 @@ class SharedPreferencesFailedDownloadRetryUrlStoreTest {
     }
 
     @Test
-    fun whenRemovingOneUrlThenOtherUrlsAreUnaffected() {
+    fun whenRemovingOneUrlThenOtherUrlsAreUnaffected() = runTest {
         store.saveRetryUrl(1L, "https://example.com/file1.txt")
         store.saveRetryUrl(2L, "https://example.com/file2.txt")
 
@@ -78,7 +85,7 @@ class SharedPreferencesFailedDownloadRetryUrlStoreTest {
     }
 
     @Test
-    fun whenUrlSavedForSameDownloadIdThenItIsOverwritten() {
+    fun whenUrlSavedForSameDownloadIdThenItIsOverwritten() = runTest {
         store.saveRetryUrl(1L, "https://example.com/old.txt")
         store.saveRetryUrl(1L, "https://example.com/new.txt")
 
@@ -86,7 +93,7 @@ class SharedPreferencesFailedDownloadRetryUrlStoreTest {
     }
 
     @Test
-    fun whenDataUriSavedThenItCanBeRetrieved() {
+    fun whenDataUriSavedThenItCanBeRetrieved() = runTest {
         val largeDataUri = "data:image/png;base64," + "A".repeat(10_000)
         store.saveRetryUrl(1L, largeDataUri)
 
@@ -94,14 +101,14 @@ class SharedPreferencesFailedDownloadRetryUrlStoreTest {
     }
 
     @Test
-    fun whenRemovingNonExistentUrlThenNoError() {
+    fun whenRemovingNonExistentUrlThenNoError() = runTest {
         store.removeRetryUrl(999L)
 
         assertNull(store.getRetryUrl(999L))
     }
 
     @Test
-    fun whenClearCalledThenAllUrlsAreRemoved() {
+    fun whenClearCalledThenAllUrlsAreRemoved() = runTest {
         store.saveRetryUrl(1L, "https://example.com/file1.txt")
         store.saveRetryUrl(2L, "https://example.com/file2.txt")
 

@@ -92,17 +92,16 @@ class FileDownloadNotificationActionReceiver @Inject constructor(
             logcat { "Received retry download intent for download id $downloadId" }
             pixel.fire(DOWNLOAD_REQUEST_RETRIED)
 
-            val url = failedDownloadRetryUrlStore.getRetryUrl(downloadId) ?: return
-            failedDownloadRetryUrlStore.removeRetryUrl(downloadId)
-            PendingFileDownload(
-                url = url,
-                subfolder = Environment.DIRECTORY_DOWNLOADS,
-            ).run {
+            coroutineScope.launch(dispatcherProvider.io()) {
+                val url = failedDownloadRetryUrlStore.getRetryUrl(downloadId) ?: return@launch
+                failedDownloadRetryUrlStore.removeRetryUrl(downloadId)
+                val pendingDownload = PendingFileDownload(
+                    url = url,
+                    subfolder = Environment.DIRECTORY_DOWNLOADS,
+                )
                 logcat { "Retrying download for $url" }
-                coroutineScope.launch(dispatcherProvider.io()) {
-                    downloadsRepository.delete(downloadId)
-                    fileDownloader.enqueueDownload(this@run)
-                }
+                downloadsRepository.delete(downloadId)
+                fileDownloader.enqueueDownload(pendingDownload)
             }
         }
     }

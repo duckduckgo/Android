@@ -16,57 +16,50 @@
 
 package com.duckduckgo.downloads.impl
 
-import android.content.Context
-import android.content.SharedPreferences
-import androidx.core.content.edit
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.stringPreferencesKey
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.downloads.impl.di.Downloads
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
+import kotlinx.coroutines.flow.firstOrNull
 import javax.inject.Inject
 
 interface FailedDownloadRetryUrlStore {
-    fun saveRetryUrl(downloadId: Long, url: String)
-    fun getRetryUrl(downloadId: Long): String?
-    fun removeRetryUrl(downloadId: Long)
-    fun clear()
+    suspend fun saveRetryUrl(downloadId: Long, url: String)
+    suspend fun getRetryUrl(downloadId: Long): String?
+    suspend fun removeRetryUrl(downloadId: Long)
+    suspend fun clear()
 }
 
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
 class SharedPreferencesFailedDownloadRetryUrlStore @Inject constructor(
-    private val context: Context,
+    @Downloads private val store: DataStore<Preferences>,
 ) : FailedDownloadRetryUrlStore {
 
-    private val preferences: SharedPreferences by lazy {
-        context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE)
+    override suspend fun saveRetryUrl(downloadId: Long, url: String) {
+        store.edit { it[keyForDownloadId(downloadId)] = url }
     }
 
-    override fun saveRetryUrl(downloadId: Long, url: String) {
-        preferences.edit {
-            putString(keyForDownloadId(downloadId), url)
-        }
+    override suspend fun getRetryUrl(downloadId: Long): String? {
+        return store.data.firstOrNull()?.get(keyForDownloadId(downloadId))
     }
 
-    override fun getRetryUrl(downloadId: Long): String? {
-        return preferences.getString(keyForDownloadId(downloadId), null)
+    override suspend fun removeRetryUrl(downloadId: Long) {
+        store.edit { it.remove(keyForDownloadId(downloadId)) }
     }
 
-    override fun removeRetryUrl(downloadId: Long) {
-        preferences.edit {
-            remove(keyForDownloadId(downloadId))
-        }
+    override suspend fun clear() {
+        store.edit { it.clear() }
     }
 
-    override fun clear() {
-        preferences.edit {
-            clear()
-        }
-    }
-
-    private fun keyForDownloadId(downloadId: Long): String = "$KEY_PREFIX$downloadId"
+    private fun keyForDownloadId(downloadId: Long): Preferences.Key<String> =
+        stringPreferencesKey("$KEY_PREFIX$downloadId")
 
     companion object {
-        const val FILENAME = "com.duckduckgo.downloads.retry_urls"
         private const val KEY_PREFIX = "retry_url_"
     }
 }

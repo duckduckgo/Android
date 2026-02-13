@@ -20,13 +20,19 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.common.test.CoroutineTestRule
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.*
 
 @RunWith(AndroidJUnit4::class)
 class DefaultFileDownloadNotificationManagerTest {
+
+    @get:Rule
+    val coroutineRule = CoroutineTestRule()
 
     private val mockNotificationManager: NotificationManagerCompat = mock()
     private val mockAppBuildConfig: AppBuildConfig = mock()
@@ -45,11 +51,13 @@ class DefaultFileDownloadNotificationManagerTest {
             applicationContext = context,
             appBuildConfig = mockAppBuildConfig,
             failedDownloadRetryUrlStore = mockRetryUrlStore,
+            appCoroutineScope = coroutineRule.testScope,
+            dispatcherProvider = coroutineRule.testDispatcherProvider,
         )
     }
 
     @Test
-    fun whenShowDownloadFailedWithUrlThenUrlSavedToStore() {
+    fun whenShowDownloadFailedWithUrlThenUrlSavedToStore() = runTest {
         val downloadId = 1L
         val url = "https://example.com/file.txt"
 
@@ -59,7 +67,7 @@ class DefaultFileDownloadNotificationManagerTest {
     }
 
     @Test
-    fun whenShowDownloadFailedWithNullUrlThenUrlNotSavedToStore() {
+    fun whenShowDownloadFailedWithNullUrlThenUrlNotSavedToStore() = runTest {
         val downloadId = 1L
 
         notificationManager.showDownloadFailedNotification(downloadId, null)
@@ -68,7 +76,7 @@ class DefaultFileDownloadNotificationManagerTest {
     }
 
     @Test
-    fun whenShowDownloadFailedWithDataUriThenUrlSavedToStore() {
+    fun whenShowDownloadFailedWithDataUriThenUrlSavedToStore() = runTest {
         val downloadId = 1L
         val dataUri = "data:image/png;base64," + "A".repeat(10_000)
 
