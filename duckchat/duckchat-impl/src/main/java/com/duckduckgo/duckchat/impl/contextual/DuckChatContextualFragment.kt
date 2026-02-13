@@ -239,6 +239,10 @@ class DuckChatContextualFragment :
     ) {
         super.onViewCreated(view, savedInstanceState)
 
+        // Explicitly enable cookies for this WebView
+        cookieManager.setAcceptCookie(true)
+        cookieManager.setAcceptThirdPartyCookies(simpleWebview, true)
+
         simpleWebview.let {
             it.webViewClient = webViewClient
             webViewClient.onPageFinishedListener = { url ->
@@ -893,9 +897,20 @@ class DuckChatContextualFragment :
         viewModel.onSheetClosed()
         downloadMessagesJob.cancel()
         simpleWebview.onPause()
+
+        // Log cookies before flush
+        val currentUrl = simpleWebview.url
+        val duckAiCookies = cookieManager.getCookie("https://duck.ai")
+        val duckDuckGoCookies = cookieManager.getCookie("https://duckduckgo.com")
+        logcat { "Duck.ai Contextual onPause: Current URL=$currentUrl" }
+        logcat { "Duck.ai Contextual onPause: duck.ai cookies=$duckAiCookies" }
+        logcat { "Duck.ai Contextual onPause: duckduckgo.com cookies=$duckDuckGoCookies" }
+
+        // Force immediate cookie flush and wait for it
         appCoroutineScope.launch(dispatcherProvider.io()) {
             cookieManager.flush()
         }
+
         super.onPause()
     }
 
@@ -903,9 +918,6 @@ class DuckChatContextualFragment :
         bottomSheetBehavior.removeBottomSheetCallback(bottomSheetCallback)
         binding.root.viewTreeObserver.removeOnGlobalLayoutListener(keyboardVisibilityListener)
         super.onDestroyView()
-        appCoroutineScope.launch(dispatcherProvider.io()) {
-            cookieManager.flush()
-        }
     }
 
     companion object {
