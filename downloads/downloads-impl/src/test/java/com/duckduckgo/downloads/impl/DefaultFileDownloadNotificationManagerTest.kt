@@ -20,10 +20,7 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import com.duckduckgo.common.test.CoroutineTestRule
-import kotlinx.coroutines.test.runTest
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.*
@@ -31,12 +28,8 @@ import org.mockito.kotlin.*
 @RunWith(AndroidJUnit4::class)
 class DefaultFileDownloadNotificationManagerTest {
 
-    @get:Rule
-    val coroutineRule = CoroutineTestRule()
-
     private val mockNotificationManager: NotificationManagerCompat = mock()
     private val mockAppBuildConfig: AppBuildConfig = mock()
-    private val mockRetryUrlStore: FailedDownloadRetryUrlStore = mock()
 
     private lateinit var notificationManager: DefaultFileDownloadNotificationManager
 
@@ -50,39 +43,7 @@ class DefaultFileDownloadNotificationManagerTest {
             notificationManager = mockNotificationManager,
             applicationContext = context,
             appBuildConfig = mockAppBuildConfig,
-            failedDownloadRetryUrlStore = mockRetryUrlStore,
-            appCoroutineScope = coroutineRule.testScope,
-            dispatcherProvider = coroutineRule.testDispatcherProvider,
         )
-    }
-
-    @Test
-    fun whenShowDownloadFailedWithUrlThenUrlSavedToStore() = runTest {
-        val downloadId = 1L
-        val url = "https://example.com/file.txt"
-
-        notificationManager.showDownloadFailedNotification(downloadId, url)
-
-        verify(mockRetryUrlStore).saveRetryUrl(downloadId, url)
-    }
-
-    @Test
-    fun whenShowDownloadFailedWithNullUrlThenUrlNotSavedToStore() = runTest {
-        val downloadId = 1L
-
-        notificationManager.showDownloadFailedNotification(downloadId, null)
-
-        verifyNoInteractions(mockRetryUrlStore)
-    }
-
-    @Test
-    fun whenShowDownloadFailedWithDataUriThenUrlSavedToStore() = runTest {
-        val downloadId = 1L
-        val dataUri = "data:image/png;base64," + "A".repeat(10_000)
-
-        notificationManager.showDownloadFailedNotification(downloadId, dataUri)
-
-        verify(mockRetryUrlStore).saveRetryUrl(downloadId, dataUri)
     }
 
     @Test

@@ -26,18 +26,14 @@ import androidx.annotation.AnyThread
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.FileProvider
-import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.api.BrowserLifecycleObserver
-import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.notification.checkPermissionAndNotify
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.downloads.api.FileDownloadNotificationManager
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 import java.io.File
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicReference
@@ -60,9 +56,6 @@ class DefaultFileDownloadNotificationManager @Inject constructor(
     private val notificationManager: NotificationManagerCompat,
     private val applicationContext: Context,
     private val appBuildConfig: AppBuildConfig,
-    private val failedDownloadRetryUrlStore: FailedDownloadRetryUrlStore,
-    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
-    private val dispatcherProvider: DispatcherProvider,
 ) : FileDownloadNotificationManager, BrowserLifecycleObserver {
 
     // Group notifications are not automatically cleared when the last notification in the group is removed. So we need to do this manually.
@@ -151,10 +144,7 @@ class DefaultFileDownloadNotificationManager @Inject constructor(
             .setContentTitle(applicationContext.getString(R.string.notificationDownloadFailed))
             .setSmallIcon(com.duckduckgo.mobile.android.R.drawable.notification_logo)
             .apply {
-                url?.let { fileUrl ->
-                    appCoroutineScope.launch(dispatcherProvider.io()) {
-                        failedDownloadRetryUrlStore.saveRetryUrl(downloadId, fileUrl)
-                    }
+                url?.let {
                     val pendingIntent = PendingIntent.getBroadcast(
                         applicationContext,
                         downloadId.toInt(),
