@@ -55,7 +55,7 @@ class DataUriDownloaderTest {
 
         verify(mockCallback).onError(url = url, reason = DownloadFailReason.DataUriParseException)
         verify(mockCallback, never()).onStart(any())
-        verify(mockCallback, never()).onSuccess(any(), anyOrNull())
+        verify(mockCallback, never()).onSuccess(any(), any(), any(), anyOrNull())
     }
 
     @Test
@@ -76,7 +76,7 @@ class DataUriDownloaderTest {
         dataUriDownloader.download(pending, mockCallback)
 
         verify(mockCallback).onStart(any())
-        verify(mockCallback).onSuccess(file = any(), mimeType = eq("image/png"))
+        verify(mockCallback).onSuccess(downloadId = any(), contentLength = any(), file = any(), mimeType = eq("image/png"))
         verify(mockCallback, never()).onError(anyOrNull(), anyOrNull(), any())
     }
 
@@ -99,7 +99,7 @@ class DataUriDownloaderTest {
 
         verify(mockCallback).onStart(any())
         verify(mockCallback).onError(url = eq(url), downloadId = any(), reason = eq(DownloadFailReason.DataUriParseException))
-        verify(mockCallback, never()).onSuccess(any(), anyOrNull())
+        verify(mockCallback, never()).onSuccess(any(), any(), any(), anyOrNull())
     }
 
     @Test
@@ -132,6 +132,8 @@ class DataUriDownloaderTest {
         dataUriDownloader.download(pending, mockCallback)
 
         verify(mockCallback).onSuccess(
+            downloadId = any(),
+            contentLength = any(),
             file = check { file ->
                 assert(file.parentFile == pending.directory)
                 assert(file.name == "text.txt")

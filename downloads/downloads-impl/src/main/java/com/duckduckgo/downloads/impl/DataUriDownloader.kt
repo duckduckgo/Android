@@ -68,7 +68,7 @@ class DataUriDownloader @Inject constructor(
                     }
                         .onSuccess {
                             logcat { "Succeeded to decode Base64" }
-                            callback.onSuccess(file = file, mimeType = parsedDataUri.mimeType)
+                            callback.onSuccess(downloadId = downloadId, contentLength = file.length(), file = file, mimeType = parsedDataUri.mimeType)
                         }
                         .onFailure {
                             logcat { "Failed to decode Base64: ${it.asLog()}" }
