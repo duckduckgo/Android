@@ -523,9 +523,6 @@ class RealDuckChat @Inject constructor(
     ): String {
         val parameters = addChatParameters(query, autoPrompt = autoPrompt, sidebar = sidebar)
         val url = appendParameters(parameters, duckChatLink)
-        appCoroutineScope.launch(dispatchers.io()) {
-            isStandaloneMigrationCompleted()
-        }
         return url
     }
 
