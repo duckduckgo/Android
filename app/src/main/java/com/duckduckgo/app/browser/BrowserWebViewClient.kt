@@ -56,7 +56,7 @@ import com.duckduckgo.app.browser.logindetection.WebNavigationEvent
 import com.duckduckgo.app.browser.mediaplayback.MediaPlayback
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.navigation.safeCopyBackForwardList
-import com.duckduckgo.app.browser.pageload.PageLoadWideEvent
+import com.duckduckgo.app.browser.pageload.PageLoadManager
 import com.duckduckgo.app.browser.pageloadpixel.PageLoadedHandler
 import com.duckduckgo.app.browser.pageloadpixel.firstpaint.PagePaintedHandler
 import com.duckduckgo.app.browser.print.PrintInjector
@@ -120,7 +120,7 @@ class BrowserWebViewClient @Inject constructor(
     private val jsPlugins: PluginPoint<JsInjectorPlugin>,
     private val currentTimeProvider: CurrentTimeProvider,
     private val pageLoadedHandler: PageLoadedHandler,
-    private val pageLoadWideEvent: PageLoadWideEvent,
+    private val pageLoadManager: PageLoadManager,
     private val shouldSendPagePaintedPixel: PagePaintedHandler,
     private val mediaPlayback: MediaPlayback,
     private val subscriptions: Subscriptions,
@@ -440,15 +440,8 @@ class BrowserWebViewClient @Inject constructor(
         if (webView.url == url) {
             val navigationList = webView.safeCopyBackForwardList() ?: return
             webViewClientListener?.onPageCommitVisible(WebViewNavigationState(navigationList), url)
-
-            // Record page_visible flow step
-            if (url != ABOUT_BLANK) {
-                val progress = webView.progress
-                webViewClientListener?.getCurrentTabId()?.let { tabId ->
-                    appCoroutineScope.launch(dispatcherProvider.io()) {
-                        pageLoadWideEvent.recordPageVisible(tabId, progress)
-                    }
-                }
+            webViewClientListener?.getCurrentTabId()?.let { tabId ->
+                pageLoadManager.onPageVisible(tabId, url, webView.progress)
             }
         }
     }
@@ -487,11 +480,7 @@ class BrowserWebViewClient @Inject constructor(
             if (it != ABOUT_BLANK && start == null) {
                 start = currentTimeProvider.elapsedRealtime()
                 webViewClientListener?.getCurrentTabId()?.let { tabId ->
-                    if (!pageLoadWideEvent.isInProgress(tabId)) {
-                        appCoroutineScope.launch(dispatcherProvider.io()) {
-                            pageLoadWideEvent.startPageLoad(tabId)
-                        }
-                    }
+                    pageLoadManager.onPageStarted(tabId, it)
                 }
                 incrementAndTrackLoad() // increment the request counter
                 requestInterceptor.onPageStarted(url)
@@ -561,16 +550,13 @@ class BrowserWebViewClient @Inject constructor(
             if (url != null && url != ABOUT_BLANK) {
                 start?.let { safeStart ->
                     webViewClientListener?.getCurrentTabId()?.let { tabId ->
-                        appCoroutineScope.launch(dispatcherProvider.io()) {
-                            pageLoadWideEvent.finishPageLoad(
-                                tabId = tabId,
-                                outcome = "success",
-                                errorCode = null,
-                                isTabInForegroundOnFinish = webViewClientListener?.isTabInForeground() ?: true,
-                                activeRequestsOnLoadStart = parallelRequestsOnStart,
-                                concurrentRequestsOnFinish = decrementLoadCountAndGet(),
-                            )
-                        }
+                        pageLoadManager.onPageLoadSucceeded(
+                            tabId = tabId,
+                            url = url,
+                            isTabInForegroundOnFinish = webViewClientListener?.isTabInForeground() ?: true,
+                            activeRequestsOnLoadStart = parallelRequestsOnStart,
+                            concurrentRequestsOnFinish = decrementLoadCountAndGet(),
+                        )
                     }
 
                     // TODO (cbarreiro - 22/05/2024): Extract to plugins
@@ -743,20 +729,15 @@ class BrowserWebViewClient @Inject constructor(
             if (request?.isForMainFrame == true) {
                 // Trigger Wide Event failure for main frame errors
                 request.url?.toString()?.let { url ->
-                    if (url != ABOUT_BLANK) {
-                        webViewClientListener?.getCurrentTabId()?.let { tabId ->
-                            appCoroutineScope.launch(dispatcherProvider.io()) {
-                                val errorDescription = "${webResourceError.errorCode.asStringErrorCode()} - ${webResourceError.description}"
-                                pageLoadWideEvent.finishPageLoad(
-                                    tabId = tabId,
-                                    outcome = "error",
-                                    errorCode = errorDescription,
-                                    isTabInForegroundOnFinish = webViewClientListener?.isTabInForeground() ?: true,
-                                    activeRequestsOnLoadStart = parallelRequestsOnStart,
-                                    concurrentRequestsOnFinish = decrementLoadCountAndGet(),
-                                )
-                            }
-                        }
+                    webViewClientListener?.getCurrentTabId()?.let { tabId ->
+                        pageLoadManager.onPageLoadFailed(
+                            tabId = tabId,
+                            url = url,
+                            errorDescription = webResourceError.errorCode.asStringErrorCode(),
+                            isTabInForegroundOnFinish = webViewClientListener?.isTabInForeground() ?: true,
+                            activeRequestsOnLoadStart = parallelRequestsOnStart,
+                            concurrentRequestsOnFinish = decrementLoadCountAndGet(),
+                        )
                     }
                 }
 
