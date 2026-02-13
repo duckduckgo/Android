@@ -99,4 +99,10 @@
     <string name="duck_chat_contextual_onboarding_body" instruction="Body text for contextual Duck AI onboarding sheet">Da oggi, Duck.ai può aiutarti a rispondere alle domande sulla pagina che stai visualizzando.\n\nLe informazioni contenute nella pagina vengono incluse solo quando vengono allegate. Puoi modificare questa opzione in qualsiasi momento in Impostazioni.</string>
     <string name="duck_chat_contextual_onboarding_primary" instruction="Button to continue to contextual Duck AI sheet">Ho capito</string>
     <string name="duck_chat_contextual_onboarding_secondary" instruction="Button to go to AI settings">Visualizza le impostazioni</string>
+
+    <!-- Duck.ai Contextual Bottom Sheet -->
+    <string name="duckAIContextualPromptSummarize">Riassumi questa pagina</string>
+    <string name="duckAIContextualAutomaticContextTitle">Invia automaticamente il contenuto della pagina</string>
+    <string name="duckAIContextualAutomaticContextMessage">Invia automaticamente il contenuto della pagina a Duck.ai</string>
+    <string name="duckAIContextualAttachPageContent">Allega il contenuto della pagina</string>
 </resources>

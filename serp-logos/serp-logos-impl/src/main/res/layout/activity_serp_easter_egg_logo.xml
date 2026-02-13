@@ -20,8 +20,8 @@
     android:id="@+id/root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
     android:background="@color/transparent"
+    android:fitsSystemWindows="true"
     tools:background="@color/black30"
     tools:ignore="InvalidColorAttribute">
 
@@ -39,21 +39,50 @@
         app:tint="@color/white"
         tools:ignore="InvalidColorAttribute" />
 
+    <com.duckduckgo.common.ui.view.text.DaxTextView
+        android:id="@+id/discoveryText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/keyline_4"
+        android:alpha="0"
+        android:text="@string/serpLogoDiscoveryText"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/closeIcon"
+        app:typography="h2"
+        tools:alpha="1" />
+
     <ImageView
         android:id="@+id/enlargedLogoImage"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginHorizontal="@dimen/keyline_5"
-        android:layout_marginVertical="@dimen/keyline_5"
+        android:layout_marginHorizontal="@dimen/keyline_4"
+        android:layout_marginVertical="@dimen/keyline_4"
         android:contentDescription="@null"
         android:padding="@dimen/keyline_2"
         android:scaleType="fitCenter"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/favouriteButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHeight_max="200dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/discoveryText"
         app:layout_constraintWidth_max="200dp"
         tools:src="@drawable/ic_ddg_logo" />
+
+    <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+        android:id="@+id/favouriteButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/keyline_5"
+        android:alpha="0"
+        android:visibility="invisible"
+        app:daxButtonSize="large"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:text="@string/serpLogoSetAsFavourite"
+        tools:visibility="visible" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

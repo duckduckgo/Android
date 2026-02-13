@@ -399,6 +399,10 @@ class Omnibar(
         omnibarView.decorate(Decoration.CancelAnimations)
     }
 
+    fun cancelEasterEggLogoAnimation() {
+        omnibarView.decorate(Decoration.CancelEasterEggLogoAnimation)
+    }
+
     fun startTrackersAnimation(events: List<Entity>?) {
         omnibarView.decorate(Decoration.LaunchTrackersAnimation(events))
     }

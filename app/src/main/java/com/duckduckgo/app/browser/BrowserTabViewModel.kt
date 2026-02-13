@@ -353,7 +353,9 @@ import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.savedsites.impl.SavedSitesPixelName
 import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment.DeleteBookmarkListener
 import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment.EditSavedSiteListener
+import com.duckduckgo.serp.logos.api.SerpEasterEggLogosToggles
 import com.duckduckgo.serp.logos.api.SerpLogo
+import com.duckduckgo.serp.logos.api.SerpLogos
 import com.duckduckgo.settings.api.SerpSettingsFeature
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.LocationPermissionRequest
@@ -383,6 +385,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
@@ -494,6 +497,8 @@ class BrowserTabViewModel @Inject constructor(
     private val serpSettingsFeature: SerpSettingsFeature,
     private val pageContextJSHelper: PageContextJSHelper,
     private val syncStatusChangedObserver: SyncStatusChangedObserver,
+    private val serpEasterEggLogosToggles: SerpEasterEggLogosToggles,
+    private val serpLogos: SerpLogos,
 ) : ViewModel(),
     WebViewClientListener,
     EditSavedSiteListener,
@@ -579,6 +584,7 @@ class BrowserTabViewModel @Inject constructor(
         )
 
     private var autoCompleteJob = ConflatedJob()
+    private var serpLogoJob = ConflatedJob()
 
     private var site: Site? = null
         set(value) {
@@ -588,7 +594,9 @@ class BrowserTabViewModel @Inject constructor(
                 siteHttpErrorHandler.assignErrorsAndClearCache(value)
             }
         }
-    private var previousUrl: String? = null
+
+    @VisibleForTesting
+    internal var previousUrl: String? = null
     private lateinit var tabId: String
     private var webNavigationState: WebNavigationState? = null
     private var httpsUpgraded = false
@@ -785,6 +793,27 @@ class BrowserTabViewModel @Inject constructor(
             }.flowOn(dispatchers.main())
             .launchIn(viewModelScope)
 
+        combine(
+            serpEasterEggLogosToggles.setFavourite().enabled(),
+            serpLogos.favouriteSerpEasterEggLogoUrlFlow,
+        ) { isEnabled, favouriteUrl ->
+            isEnabled to favouriteUrl
+        }.flowOn(dispatchers.io())
+            .onEach { (isEnabled, favouriteUrl) ->
+                val currentUrl = url
+                if (currentUrl != null && duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(currentUrl)) {
+                    if (isEnabled && favouriteUrl != null) {
+                        // Favourite is set - show it
+                        omnibarViewState.value =
+                            currentOmnibarViewState().copy(serpLogo = SerpLogo.EasterEgg(logoUrl = favouriteUrl, isFavourite = true))
+                    } else if (isEnabled && favouriteUrl == null || !isEnabled) {
+                        // Favourite was cleared - show Dax (Normal logo)
+                        omnibarViewState.value = currentOmnibarViewState().copy(serpLogo = SerpLogo.Normal)
+                    }
+                }
+            }
+            .launchIn(viewModelScope)
+
         additionalDefaultBrowserPrompts.showSetAsDefaultPopupMenuItem
             .onEach {
                 browserViewState.value = currentBrowserViewState().copy(showSelectDefaultBrowserMenuItem = it)
@@ -837,12 +866,19 @@ class BrowserTabViewModel @Inject constructor(
         skipHome: Boolean,
         isExternal: Boolean,
     ) {
+        logcat { "loadData tabId=$tabId, initialUrl=$initialUrl, skipHome=$skipHome, isExternal=$isExternal" }
         this.tabId = tabId
         this.skipHome = skipHome
         siteLiveData = tabRepository.retrieveSiteData(tabId)
         site = siteLiveData.value
 
-        initialUrl?.let { buildSiteFactory(it, stillExternal = isExternal) }
+        initialUrl?.let {
+            // initialUrl is the previousUrl from previous session unless it's launched from an external app
+            if (androidBrowserConfig.disableTrackerAnimationOnRestart().isEnabled() && !isExternal) {
+                previousUrl = it
+            }
+            buildSiteFactory(it, stillExternal = isExternal)
+        }
     }
 
     fun setIsCustomTab(isCustomTab: Boolean) {
@@ -2094,13 +2130,28 @@ class BrowserTabViewModel @Inject constructor(
             url?.let { prefetchFavicon(url) }
 
             evaluateDuckAIPage(url)
-            evaluateSerpLogoState(url)
+            serpLogoJob += viewModelScope.launch {
+                evaluateSerpLogoState(url)
+            }
         }
     }
 
-    private fun evaluateSerpLogoState(url: String?) {
+    private suspend fun evaluateSerpLogoState(url: String?) {
         if (url != null && duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
-            command.value = ExtractSerpLogo(url)
+            val isSetFavouriteEnabled = serpEasterEggLogosToggles.setFavourite().isEnabled()
+            val favouriteLogoUrl = serpLogos.favouriteSerpEasterEggLogoUrlFlow.firstOrNull()
+
+            // Don't extract logo if favourite feature is enabled AND a favourite is set
+            if (isSetFavouriteEnabled && favouriteLogoUrl != null) {
+                omnibarViewState.value = currentOmnibarViewState().copy(
+                    serpLogo = SerpLogo.EasterEgg(
+                        logoUrl = favouriteLogoUrl,
+                        isFavourite = true,
+                    ),
+                )
+            } else {
+                command.value = ExtractSerpLogo(url)
+            }
         } else {
             omnibarViewState.value = currentOmnibarViewState().copy(serpLogo = null)
         }
@@ -3929,6 +3980,15 @@ class BrowserTabViewModel @Inject constructor(
             omnibarViewState.value = currentOmnibarViewState().copy(
                 omnibarText = ABOUT_BLANK,
             )
+            site = siteFactory.buildSite(
+                url = "",
+                tabId = tabId,
+                title = ABOUT_BLANK,
+                httpUpgraded = httpsUpgraded,
+            )
+            viewModelScope.launch(dispatchers.io()) {
+                tabRepository.update(tabId, site)
+            }
         }
     }
 

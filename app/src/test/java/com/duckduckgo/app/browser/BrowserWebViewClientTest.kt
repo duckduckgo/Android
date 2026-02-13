@@ -18,17 +18,13 @@ package com.duckduckgo.app.browser
 
 import android.content.Context
 import android.content.Intent
-import android.graphics.Bitmap
 import android.net.Uri
 import android.net.http.SslCertificate
 import android.net.http.SslError
-import android.os.Build
 import android.webkit.CookieManager
 import android.webkit.HttpAuthHandler
 import android.webkit.RenderProcessGoneDetail
 import android.webkit.SslErrorHandler
-import android.webkit.WebBackForwardList
-import android.webkit.WebHistoryItem
 import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
@@ -36,9 +32,7 @@ import android.webkit.WebViewClient.ERROR_FAILED_SSL_HANDSHAKE
 import android.webkit.WebViewClient.ERROR_HOST_LOOKUP
 import android.webkit.WebViewClient.ERROR_UNKNOWN
 import androidx.core.net.toUri
-import androidx.test.annotation.UiThreadTest
-import androidx.test.filters.SdkSuppress
-import androidx.test.platform.app.InstrumentationRegistry
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.anrs.api.CrashLogger
 import com.duckduckgo.anrs.api.CrashLogger.Crash
@@ -97,6 +91,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
@@ -108,12 +103,16 @@ import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
+import org.robolectric.RuntimeEnvironment
+import org.robolectric.annotation.Config
 import java.math.BigInteger
 import java.security.cert.X509Certificate
 import java.security.interfaces.RSAPublicKey
 
 private val mockToggle: Toggle = mock()
 
+@RunWith(AndroidJUnit4::class)
+@Config(sdk = [34])
 class BrowserWebViewClientTest {
     @get:Rule
     var coroutinesTestRule = CoroutineTestRule()
@@ -121,7 +120,7 @@ class BrowserWebViewClientTest {
     private lateinit var testee: BrowserWebViewClient
     private lateinit var webView: TestWebView
 
-    private val context = InstrumentationRegistry.getInstrumentation().targetContext
+    private val context: Context = RuntimeEnvironment.getApplication()
     private val requestRewriter: RequestRewriter = mock()
     private val specialUrlDetector: SpecialUrlDetector = mock()
     private val requestInterceptor: RequestInterceptor = mock()
@@ -170,7 +169,6 @@ class BrowserWebViewClientTest {
         )
     private val mockDuckChat: DuckChat = mock()
 
-    @UiThreadTest
     @Before
     fun setup() =
         runTest {
@@ -220,14 +218,12 @@ class BrowserWebViewClientTest {
             whenever(deviceInfo.appVersion).thenReturn("1")
         }
 
-    @UiThreadTest
     @Test
     fun whenOnPageStartedCalledThenInterceptorCallOnPageStarted() {
         testee.onPageStarted(webView, EXAMPLE_URL, null)
         verify(requestInterceptor).onPageStarted(EXAMPLE_URL)
     }
 
-    @UiThreadTest
     @Test
     fun whenOnPageStartedCalledThenListenerNotified() =
         runTest {
@@ -235,7 +231,6 @@ class BrowserWebViewClientTest {
             verify(listener).pageStarted(any(), eq(listOf(mockToggle)))
         }
 
-    @UiThreadTest
     @Test
     fun whenOnPageStartedCalledWithSameUrlAsPreviousThenListenerNotifiedOfRefresh() {
         testee.onPageStarted(webView, EXAMPLE_URL, null)
@@ -243,7 +238,6 @@ class BrowserWebViewClientTest {
         verify(listener).pageRefreshed(EXAMPLE_URL)
     }
 
-    @UiThreadTest
     @Test
     fun whenOnPageStartedCalledWithDifferentUrlToPreviousThenListenerNotNotifiedOfRefresh() {
         testee.onPageStarted(webView, EXAMPLE_URL, null)
@@ -251,7 +245,6 @@ class BrowserWebViewClientTest {
         verify(listener, never()).pageRefreshed(any())
     }
 
-    @UiThreadTest
     @Test
     fun whenOnPageCommitVisibleCalledThenListenerIsNotified() {
         val mockWebView: WebView = mock()
@@ -261,7 +254,6 @@ class BrowserWebViewClientTest {
         verify(listener).onPageCommitVisible(any(), any())
     }
 
-    @UiThreadTest
     @Test
     fun whenOnPageCommitVisibleCalledWithDifferentUrlToPreviousThenListenerNotNotified() {
         val mockWebView: WebView = mock()
@@ -272,14 +264,12 @@ class BrowserWebViewClientTest {
         verify(listener).onPageCommitVisible(any(), any())
     }
 
-    @UiThreadTest
     @Test
     fun whenOnPageStartedCalledThenEventSentToLoginDetector() {
         testee.onPageStarted(webView, EXAMPLE_URL, null)
         verify(loginDetector).onEvent(WebNavigationEvent.OnPageStarted(webView))
     }
 
-    @UiThreadTest
     @Test
     fun whenOnPageStartedCalledThenInjectJsCode() {
         assertEquals(0, jsPlugins.plugin.countStarted)
@@ -288,7 +278,6 @@ class BrowserWebViewClientTest {
         assertEquals(0, jsPlugins.plugin.countFinished)
     }
 
-    @UiThreadTest
     @Test
     fun whenOnPageStartedCalledThenProcessUriForThirdPartyCookiesCalled() =
         runTest {
@@ -296,14 +285,12 @@ class BrowserWebViewClientTest {
             verify(thirdPartyCookieManager).processUriForThirdPartyCookies(webView, EXAMPLE_URL.toUri())
         }
 
-    @UiThreadTest
     @Test
     fun whenOnPageStartedCalledThenInjectAutoconsentCalled() {
         testee.onPageStarted(webView, EXAMPLE_URL, null)
         verify(autoconsent).injectAutoconsent(webView, EXAMPLE_URL)
     }
 
-    @UiThreadTest
     @Test
     fun whenOnPageStartedCalledForUrlWithUserGestureNotRequiredForUrlThenMediaPlaybackRequiresUserGestureIsFalse() {
         whenever(mediaPlayback.doesMediaPlaybackRequireUserGestureForUrl(EXAMPLE_URL)).thenReturn(false)
@@ -311,7 +298,6 @@ class BrowserWebViewClientTest {
         assertFalse(webView.settings.mediaPlaybackRequiresUserGesture)
     }
 
-    @UiThreadTest
     @Test
     fun whenOnPageStartedCalledForUrlWithUserGestureRequiredForUrlThenMediaPlaybackRequiresUserGestureIsTrue() {
         whenever(mediaPlayback.doesMediaPlaybackRequireUserGestureForUrl(EXAMPLE_URL)).thenReturn(true)
@@ -319,14 +305,12 @@ class BrowserWebViewClientTest {
         assertTrue(webView.settings.mediaPlaybackRequiresUserGesture)
     }
 
-    @UiThreadTest
     @Test
     fun whenOnPageFinishedCalledThenListenerNotified() {
         testee.onPageFinished(webView, EXAMPLE_URL)
         verify(listener).pageFinished(eq(webView), any(), eq(EXAMPLE_URL))
     }
 
-    @UiThreadTest
     @Test
     fun whenOnPageFinishedCalledThenInjectJsCode() {
         assertEquals(0, jsPlugins.plugin.countFinished)
@@ -335,7 +319,6 @@ class BrowserWebViewClientTest {
         assertEquals(0, jsPlugins.plugin.countStarted)
     }
 
-    @UiThreadTest
     @Test
     fun whenOnPageStartedThenReturnActiveExperiments() {
         val captor = argumentCaptor<List<Toggle>>()
@@ -344,18 +327,16 @@ class BrowserWebViewClientTest {
         assertTrue(captor.firstValue.contains(mockToggle))
     }
 
-    @UiThreadTest
     @Test
     fun whenPageFinishedThenCallListenerMethod() =
         runTest {
-            val webView = DuckDuckGoWebView(context)
+            val webView = TestWebView(context)
 
             testee.onPageFinished(webView, "example.com")
 
             verify(listener).pageFinished(eq(webView), any(), eq("example.com"))
         }
 
-    @UiThreadTest
     @Test
     fun whenOnReceivedHttpAuthRequestThenListenerNotified() {
         val mockHandler = mock<HttpAuthHandler>()
@@ -365,7 +346,6 @@ class BrowserWebViewClientTest {
         verify(listener).requiresAuthentication(authenticationRequest)
     }
 
-    @UiThreadTest
     @Test
     fun whenShouldInterceptRequestThenEventSentToLoginDetector() {
         val webResourceRequest = mock<WebResourceRequest>()
@@ -373,7 +353,6 @@ class BrowserWebViewClientTest {
         verify(loginDetector).onEvent(WebNavigationEvent.ShouldInterceptRequest(webView, webResourceRequest))
     }
 
-    @UiThreadTest
     @Test
     fun whenShouldInterceptRequestThenShouldInterceptWithUri() {
         TestScope().launch {
@@ -384,7 +363,6 @@ class BrowserWebViewClientTest {
     }
 
     @Test
-    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     fun whenRenderProcessGoneDueToCrashThenCrashDataStoreEntryIsIncremented() {
         val detail: RenderProcessGoneDetail = mock()
         whenever(detail.didCrash()).thenReturn(true)
@@ -393,7 +371,6 @@ class BrowserWebViewClientTest {
     }
 
     @Test
-    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     fun whenRenderProcessGoneDueToNonCrashThenOtherDataStoreEntryIsIncremented() {
         val detail: RenderProcessGoneDetail = mock()
         whenever(detail.didCrash()).thenReturn(false)
@@ -402,7 +379,6 @@ class BrowserWebViewClientTest {
     }
 
     @Test
-    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     fun whenRenderProcessGoneThenEmitEventIntoListener() {
         val detail: RenderProcessGoneDetail = mock()
         whenever(detail.didCrash()).thenReturn(true)
@@ -410,28 +386,24 @@ class BrowserWebViewClientTest {
         verify(listener, times(1)).recoverFromRenderProcessGone()
     }
 
-    @UiThreadTest
     @Test
     fun whenOnPageFinishedCalledIfUrlIsNullThenDoNotCallPrefetchIcon() {
         testee.onPageFinished(webView, null)
         verify(listener, never()).prefetchFavicon(any())
     }
 
-    @UiThreadTest
     @Test
     fun whenOnPageFinishedCalledThenFlushCookies() {
         testee.onPageFinished(webView, null)
         verify(cookieManager).flush()
     }
 
-    @UiThreadTest
     @Test
     fun whenOnPageStartedCalledThenInjectEmailAutofillJsCalled() {
         testee.onPageStarted(webView, null, null)
         verify(browserAutofillConfigurator).configureAutofillForCurrentPage(webView, null)
     }
 
-    @UiThreadTest
     @Test
     fun whenShouldOverrideThrowsExceptionThenRecordException() {
         val exception = RuntimeException()
@@ -440,7 +412,6 @@ class BrowserWebViewClientTest {
         verify(crashLogger).logCrash(Crash(shortName = "m_webview_should_override", t = exception))
     }
 
-    @UiThreadTest
     @Test
     fun whenPrivacyProLinkDetectedThenLaunchPrivacyProAndReturnTrue() {
         val urlType = SpecialUrlDetector.UrlType.ShouldLaunchPrivacyProLink
@@ -449,7 +420,6 @@ class BrowserWebViewClientTest {
         verify(subscriptions).launchPrivacyPro(any(), any())
     }
 
-    @UiThreadTest
     @Test
     fun whenDuckChatLinkDetectedThenLaunchDuckChatAndReturnTrue() {
         val urlType = SpecialUrlDetector.UrlType.ShouldLaunchDuckChatLink
@@ -460,7 +430,6 @@ class BrowserWebViewClientTest {
         verify(mockDuckChat).openDuckChatWithPrefill("example")
     }
 
-    @UiThreadTest
     @Test
     fun whenDuckChatLinkDetectedWithoutQueryThenLaunchDuckChatWithoutQueryAndReturnTrue() {
         val urlType = SpecialUrlDetector.UrlType.ShouldLaunchDuckChatLink
@@ -470,7 +439,6 @@ class BrowserWebViewClientTest {
         verify(mockDuckChat).openDuckChat()
     }
 
-    @UiThreadTest
     @Test
     fun whenDuckChatLinkDetectedAndExceptionThrownThenDoNotLaunchDuckChatAndReturnFalse() {
         val urlType = SpecialUrlDetector.UrlType.ShouldLaunchDuckChatLink
@@ -482,7 +450,6 @@ class BrowserWebViewClientTest {
         verifyNoInteractions(mockDuckChat)
     }
 
-    @UiThreadTest
     @Test
     fun whenShouldOverrideWithShouldNavigateToDuckPlayerSetOriginToSerpAuto() =
         runTest {
@@ -504,7 +471,6 @@ class BrowserWebViewClientTest {
             verify(mockDuckPlayer).setDuckPlayerOrigin(SERP_AUTO)
         }
 
-    @UiThreadTest
     @Test
     fun whenShouldOverrideWithShouldNavigateToDuckPlayerButNotMainFrameDoNothing() =
         runTest {
@@ -545,7 +511,6 @@ class BrowserWebViewClientTest {
             assertFalse(testee.shouldOverrideUrlLoading(mockWebView, webResourceRequest))
         }
 
-    @UiThreadTest
     @Test
     fun whenAppLinkDetectedAndIsHandledThenReturnTrue() {
         val urlType = SpecialUrlDetector.UrlType.AppLink(uriString = EXAMPLE_URL)
@@ -557,7 +522,6 @@ class BrowserWebViewClientTest {
         verify(listener).handleAppLink(urlType, isForMainFrame = true)
     }
 
-    @UiThreadTest
     @Test
     fun whenAppLinkDetectedAndIsNotHandledThenReturnFalse() {
         val urlType = SpecialUrlDetector.UrlType.AppLink(uriString = EXAMPLE_URL)
@@ -578,7 +542,6 @@ class BrowserWebViewClientTest {
         verify(listener, never()).handleAppLink(any(), any())
     }
 
-    @UiThreadTest
     @Test
     fun whenNonHttpAppLinkDetectedAndIsHandledThenReturnTrue() {
         val urlType = SpecialUrlDetector.UrlType.NonHttpAppLink(EXAMPLE_URL, Intent(), EXAMPLE_URL)
@@ -590,7 +553,6 @@ class BrowserWebViewClientTest {
         verify(listener).handleNonHttpAppLink(urlType)
     }
 
-    @UiThreadTest
     @Test
     fun whenShouldLaunchDuckPlayerThenOpenInNewTabAndReturnTrue() =
         runTest {
@@ -607,7 +569,6 @@ class BrowserWebViewClientTest {
             verify(listener).openLinkInNewTab(EXAMPLE_URL.toUri())
         }
 
-    @UiThreadTest
     @Test
     fun whenShouldLaunchDuckPlayerInNewTabButSameUrlThenDoNothing() =
         runTest {
@@ -624,7 +585,6 @@ class BrowserWebViewClientTest {
             verify(listener, never()).openLinkInNewTab(EXAMPLE_URL.toUri())
         }
 
-    @UiThreadTest
     @Test
     fun whenShouldLaunchDuckPlayerButNotMainframeThenDoNothing() =
         runTest {
@@ -640,7 +600,6 @@ class BrowserWebViewClientTest {
             verify(listener, never()).openLinkInNewTab(EXAMPLE_URL.toUri())
         }
 
-    @UiThreadTest
     @Test
     fun whenShouldLaunchDuckPlayerButNotOpenInNewTabThenReturnFalse() =
         runTest {
@@ -654,7 +613,6 @@ class BrowserWebViewClientTest {
             verify(listener, never()).openLinkInNewTab(EXAMPLE_URL.toUri())
         }
 
-    @UiThreadTest
     @Test
     fun whenShouldLaunchDuckPlayerButOpenInNewTabUnavailableThenReturnFalse() =
         runTest {
@@ -668,7 +626,6 @@ class BrowserWebViewClientTest {
             verify(listener, never()).openLinkInNewTab(EXAMPLE_URL.toUri())
         }
 
-    @UiThreadTest
     @Test
     fun whenShouldOverrideWithShouldNavigateToDuckPlayerFromSerpAndOpenInNewTabThenSetOriginToSerpAuto() =
         runTest {
@@ -691,7 +648,6 @@ class BrowserWebViewClientTest {
             verify(mockDuckPlayer).setDuckPlayerOrigin(SERP_AUTO)
         }
 
-    @UiThreadTest
     @Test
     fun whenNonHttpAppLinkDetectedAndIsNotForMainframeThenOnlyReturnTrue() {
         val urlType = SpecialUrlDetector.UrlType.NonHttpAppLink(EXAMPLE_URL, Intent(), EXAMPLE_URL)
@@ -702,7 +658,6 @@ class BrowserWebViewClientTest {
         assertTrue(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
     }
 
-    @UiThreadTest
     @Test
     fun whenNonHttpAppLinkDetectedAndIsNotHandledThenReturnFalse() {
         val urlType = SpecialUrlDetector.UrlType.NonHttpAppLink(EXAMPLE_URL, Intent(), EXAMPLE_URL)
@@ -714,7 +669,6 @@ class BrowserWebViewClientTest {
         verify(listener).handleNonHttpAppLink(urlType)
     }
 
-    @UiThreadTest
     @Test
     fun whenNonHttpAppLinkDetectedAndListenerIsNullThenReturnTrue() {
         whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(
@@ -757,7 +711,6 @@ class BrowserWebViewClientTest {
         whenAmpLinkDetectedAndIsForMainFrameThenReturnTrueAndLoadExtractedUrl()
     }
 
-    @UiThreadTest
     @Test
     fun whenCloakedAmpLinkDetectedAndIsForMainFrameThenHandleCloakedAmpLink() {
         whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any()))
@@ -879,11 +832,12 @@ class BrowserWebViewClientTest {
 
     @Test
     fun whenOnPageFinishedThenCallVerifyVerificationCompleted() {
-        // run on the webview thread
-        webView.post {
-            testee.onPageFinished(webView, EXAMPLE_URL)
-            verify(internalTestUserChecker).verifyVerificationCompleted(EXAMPLE_URL)
-        }
+        val mockWebView = getImmediatelyInvokedMockWebView()
+        whenever(mockWebView.progress).thenReturn(100)
+        whenever(mockWebView.settings).thenReturn(mock())
+        whenever(mockWebView.safeCopyBackForwardList()).thenReturn(TestBackForwardList())
+        testee.onPageFinished(mockWebView, EXAMPLE_URL)
+        verify(internalTestUserChecker).verifyVerificationCompleted(EXAMPLE_URL)
     }
 
     @Test
@@ -1146,7 +1100,6 @@ class BrowserWebViewClientTest {
         assertEquals(10L, endArgumentCaptor.firstValue)
     }
 
-    @UiThreadTest
     @Test
     fun whenOnPageFinishedCalledBeforeCompletionThenJsCodeNotInjected() {
         val mockWebView = getImmediatelyInvokedMockWebView()
@@ -1170,7 +1123,6 @@ class BrowserWebViewClientTest {
         verifyNoInteractions(internalTestUserChecker)
     }
 
-    @UiThreadTest
     @Test
     fun whenOnPageFinishedCalledBeforeCompleteThenOnPageFinishedNotInvoked() {
         val mockWebView = getImmediatelyInvokedMockWebView()
@@ -1205,7 +1157,6 @@ class BrowserWebViewClientTest {
     }
 
     @Test
-    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.Q)
     fun whenSSLErrorReceivedForMainURLThenListenerCalled() {
         val mockWebView = getImmediatelyInvokedMockWebView()
         whenever(mockWebView.url).thenReturn(EXAMPLE_URL)
@@ -1218,7 +1169,6 @@ class BrowserWebViewClientTest {
         verify(listener).onReceivedSslError(any(), any())
     }
 
-    @UiThreadTest
     @Test
     fun whenNonSERPPageLoadsThenFireUriLoadedPixel() {
         val mockWebView = getImmediatelyInvokedMockWebView()
@@ -1233,7 +1183,6 @@ class BrowserWebViewClientTest {
         verify(mockUriLoadedManager).sendUriLoadedPixels(false)
     }
 
-    @UiThreadTest
     @Test
     fun whenDDGNonSERPPageLoadsThenFireUriLoadedPixel() {
         val mockWebView = getImmediatelyInvokedMockWebView()
@@ -1248,7 +1197,6 @@ class BrowserWebViewClientTest {
         verify(mockUriLoadedManager).sendUriLoadedPixels(false)
     }
 
-    @UiThreadTest
     @Test
     fun whenSERPPageLoadsThenFireUriLoadedPixel() {
         val mockWebView = getImmediatelyInvokedMockWebView()
@@ -1271,6 +1219,8 @@ class BrowserWebViewClientTest {
         override fun getUrl(): String? = webViewUrl
 
         override fun getOriginalUrl(): String = EXAMPLE_URL
+
+        override fun getProgress(): Int = 100
     }
 
     private class FakePluginPoint : PluginPoint<JsInjectorPlugin> {
@@ -1299,40 +1249,6 @@ class BrowserWebViewClientTest {
         ) {
             countFinished++
         }
-    }
-
-    private class TestBackForwardList : WebBackForwardList() {
-        private val fakeHistory: MutableList<WebHistoryItem> = mutableListOf()
-        private var fakeCurrentIndex = -1
-
-        fun addPageToHistory(webHistoryItem: WebHistoryItem) {
-            fakeHistory.add(webHistoryItem)
-            fakeCurrentIndex++
-        }
-
-        override fun getSize() = fakeHistory.size
-
-        override fun getItemAtIndex(index: Int): WebHistoryItem = fakeHistory[index]
-
-        override fun getCurrentItem(): WebHistoryItem? = null
-
-        override fun getCurrentIndex(): Int = fakeCurrentIndex
-
-        override fun clone(): WebBackForwardList = throw NotImplementedError()
-    }
-
-    private class TestHistoryItem(
-        private val url: String,
-    ) : WebHistoryItem() {
-        override fun getUrl(): String = url
-
-        override fun getOriginalUrl(): String = url
-
-        override fun getTitle(): String = url
-
-        override fun getFavicon(): Bitmap = throw NotImplementedError()
-
-        override fun clone(): WebHistoryItem = throw NotImplementedError()
     }
 
     fun aHandler(): SslErrorHandler {

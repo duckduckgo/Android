@@ -40,7 +40,7 @@ class DaxButtonStylingDetectorTest {
                     android:layout_height="match_parent"
                     android:background="#eeeeee">
                     
-                  <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
+                  <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
                       android:id="@+id/button"
                       android:layout_width="wrap_content"
                       android:layout_height="44dp"
@@ -55,7 +55,7 @@ class DaxButtonStylingDetectorTest {
             .expect(
                 """
                 res/layout/buttons.xml:9: Error: layout_height is defined by the DaxButton Component, you shouldn't change it [InvalidDaxButtonProperty]
-                  <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
+                  <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 1 errors, 0 warnings
             """.trimMargin()
@@ -77,7 +77,7 @@ class DaxButtonStylingDetectorTest {
                     android:layout_height="match_parent"
                     android:background="#eeeeee">
                     
-                  <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
+                  <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
                       android:id="@+id/button"
                       android:layout_width="wrap_content"
                       android:layout_height="wrap_content"
@@ -93,7 +93,7 @@ class DaxButtonStylingDetectorTest {
             .expect(
                 """
                 res/layout/buttons.xml:9: Error: style is defined by the DaxButton Component, you shouldn't change it [InvalidDaxButtonProperty]
-                  <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
+                  <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 1 errors, 0 warnings
             """.trimMargin()
@@ -115,7 +115,7 @@ class DaxButtonStylingDetectorTest {
                     android:layout_height="match_parent"
                     android:background="#eeeeee">
                     
-                  <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
+                  <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
                       android:id="@+id/button"
                       android:layout_width="wrap_content"
                       android:layout_height="wrap_content"
@@ -131,7 +131,7 @@ class DaxButtonStylingDetectorTest {
             .expect(
                 """
                 res/layout/buttons.xml:9: Error: textStyle is defined by the DaxButton Component, you shouldn't change it [InvalidDaxButtonProperty]
-                  <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
+                  <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 1 errors, 0 warnings
             """.trimMargin()
@@ -153,7 +153,7 @@ class DaxButtonStylingDetectorTest {
                     android:layout_height="match_parent"
                     android:background="#eeeeee">
                     
-                  <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
+                  <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
                       android:id="@+id/button"
                       android:layout_width="wrap_content"
                       android:layout_height="wrap_content"
@@ -169,7 +169,7 @@ class DaxButtonStylingDetectorTest {
             .expect(
                 """
                 res/layout/buttons.xml:9: Error: textColor is defined by the DaxButton Component, you shouldn't change it [InvalidDaxButtonProperty]
-                  <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
+                  <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 1 errors, 0 warnings
             """.trimMargin()
@@ -191,7 +191,7 @@ class DaxButtonStylingDetectorTest {
                     android:layout_height="match_parent"
                     android:background="#eeeeee">
                     
-                  <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
+                  <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
                       android:id="@+id/button"
                       android:layout_width="wrap_content"
                       android:layout_height="wrap_content"
@@ -207,7 +207,7 @@ class DaxButtonStylingDetectorTest {
             .expect(
                 """
                 res/layout/buttons.xml:9: Error: textAppearance is defined by the DaxButton Component, you shouldn't change it [InvalidDaxButtonProperty]
-                  <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
+                  <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 1 errors, 0 warnings
             """.trimMargin()
@@ -229,7 +229,7 @@ class DaxButtonStylingDetectorTest {
                     android:layout_height="match_parent"
                     android:background="#eeeeee">
                     
-                  <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
+                  <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
                       android:id="@+id/button"
                       android:layout_width="wrap_content"
                       android:layout_height="wrap_content"
@@ -245,7 +245,7 @@ class DaxButtonStylingDetectorTest {
             .expect(
                 """
                 res/layout/buttons.xml:9: Error: textAllCaps is defined by the DaxButton Component, you shouldn't change it [InvalidDaxButtonProperty]
-                  <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
+                  <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 1 errors, 0 warnings
             """.trimMargin()
@@ -267,7 +267,7 @@ class DaxButtonStylingDetectorTest {
                     android:layout_height="match_parent"
                     android:background="#eeeeee">
                     
-                  <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
+                  <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
                       android:id="@+id/button"
                       android:layout_width="wrap_content"
                       android:layout_height="wrap_content"
@@ -283,7 +283,7 @@ class DaxButtonStylingDetectorTest {
             .expect(
                 """
                 res/layout/buttons.xml:9: Error: tint is defined by the DaxButton Component, you shouldn't change it [InvalidDaxButtonProperty]
-                  <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
+                  <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 1 errors, 0 warnings
             """.trimMargin()
@@ -305,7 +305,7 @@ class DaxButtonStylingDetectorTest {
                     android:layout_height="match_parent"
                     android:background="#eeeeee">
                     
-                  <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
+                  <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
                       android:id="@+id/button"
                       android:layout_width="wrap_content"
                       android:layout_height="wrap_content"

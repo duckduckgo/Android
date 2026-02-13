@@ -66,6 +66,7 @@ class LoadUrlCompleteEventHandler @Inject constructor() : EventHandler {
                         currentBrokerStepIndex = 0,
                         currentActionIndex = 0,
                         pendingUrl = null,
+                        preseeding = false,
                     ),
                     nextEvent = ExecuteNextBrokerStep,
                 )
@@ -78,6 +79,7 @@ class LoadUrlCompleteEventHandler @Inject constructor() : EventHandler {
                     nextState =
                     state.copy(
                         pendingUrl = null,
+                        preseeding = false,
                     ),
                     nextEvent = BrokerStepCompleted(
                         needsEmailConfirmation = false,
@@ -89,6 +91,15 @@ class LoadUrlCompleteEventHandler @Inject constructor() : EventHandler {
             }
 
             else -> {
+                if (state.preseeding) {
+                    return Next(
+                        nextState = state.copy(
+                            pendingUrl = null,
+                        ),
+                        nextEvent = ExecuteNextBrokerStep,
+                    )
+                }
+
                 // If the current action is still navigate, it means we just finished loading and we can proceed to next action.
                 // Sometimes the loaded url gets redirected to another url (could be different domain too) so we can't really check here.
                 logcat { "PIR-RUNNER ($this): Completed loading for ${event.url}" }

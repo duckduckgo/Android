@@ -26,6 +26,7 @@ import com.duckduckgo.pir.impl.common.BrokerStepsParser
 import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep.OptOutStep
 import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStepActions.OptOutStepActions
 import com.duckduckgo.pir.impl.common.PirJob.RunType.OPTOUT
+import com.duckduckgo.pir.impl.common.PirWebViewDataCleaner
 import com.duckduckgo.pir.impl.common.RealPirActionsRunner
 import com.duckduckgo.pir.impl.models.Broker
 import com.duckduckgo.pir.impl.models.ExtractedProfile
@@ -64,6 +65,7 @@ class RealPirOptOutTest {
     private val mockCallbacks: PluginPoint<PirCallbacks> = mock()
     private val mockContext: Context = mock()
     private val mockPirActionsRunner: RealPirActionsRunner = mock()
+    private val mockWebViewDataCleaner: PirWebViewDataCleaner = mock()
 
     @Before
     fun setUp() {
@@ -78,6 +80,7 @@ class RealPirOptOutTest {
             currentTimeProvider = mockCurrentTimeProvider,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             callbacks = mockCallbacks,
+            webViewDataCleaner = mockWebViewDataCleaner,
         )
     }
 
@@ -176,6 +179,7 @@ class RealPirOptOutTest {
         verify(mockEventsRepository, atLeast(1)).saveEventLog(any())
         verifyNoInteractions(mockBrokerStepsParser)
         verifyNoInteractions(mockPirActionsRunnerFactory)
+        verify(mockWebViewDataCleaner).cleanWebViewData()
     }
 
     @Test
@@ -193,6 +197,7 @@ class RealPirOptOutTest {
         verifyNoInteractions(mockBrokerStepsParser)
         verifyNoInteractions(mockPirCssScriptLoader)
         verifyNoInteractions(mockPirActionsRunnerFactory)
+        verify(mockWebViewDataCleaner).cleanWebViewData()
     }
 
     @Test
@@ -227,6 +232,7 @@ class RealPirOptOutTest {
             testStepsJson,
             DEFAULT_PROFILE_QUERIES[0].id,
         )
+        verify(mockWebViewDataCleaner).cleanWebViewData()
     }
 
     @Test
@@ -245,6 +251,7 @@ class RealPirOptOutTest {
         verifyNoInteractions(mockBrokerStepsParser)
         verifyNoInteractions(mockPirCssScriptLoader)
         verifyNoInteractions(mockPirActionsRunnerFactory)
+        verify(mockWebViewDataCleaner).cleanWebViewData()
     }
 
     @Test
@@ -264,6 +271,7 @@ class RealPirOptOutTest {
         verify(mockBrokerStepsParser, never()).parseStep(any(), any(), any())
         verifyNoInteractions(mockPirCssScriptLoader)
         verifyNoInteractions(mockPirActionsRunnerFactory)
+        verify(mockWebViewDataCleaner).cleanWebViewData()
     }
 
     @Test
@@ -288,6 +296,7 @@ class RealPirOptOutTest {
         verify(mockEventsRepository, times(2)).saveEventLog(any())
         verifyNoInteractions(mockPirCssScriptLoader)
         verifyNoInteractions(mockPirActionsRunnerFactory)
+        verify(mockWebViewDataCleaner).cleanWebViewData()
     }
 
     @Test
@@ -314,6 +323,7 @@ class RealPirOptOutTest {
         verify(mockEventsRepository, times(2)).saveEventLog(any())
         verifyNoInteractions(mockPirCssScriptLoader)
         verifyNoInteractions(mockPirActionsRunnerFactory)
+        verify(mockWebViewDataCleaner).cleanWebViewData()
     }
 
     @Test
@@ -347,6 +357,7 @@ class RealPirOptOutTest {
         verify(mockPirActionsRunner).start(testProfileQuery, listOf(testOptOutStep))
         verify(mockPirActionsRunner).stop()
         verify(mockEventsRepository, times(2)).saveEventLog(any())
+        verify(mockWebViewDataCleaner).cleanWebViewData()
     }
 
     @Test
@@ -383,6 +394,7 @@ class RealPirOptOutTest {
         verify(mockBrokerStepsParser).parseStep(testBroker1, testStepsJson, testProfileQuery.id)
         verify(mockPirCssScriptLoader).getScript()
         verify(mockEventsRepository, times(2)).saveEventLog(any())
+        verify(mockWebViewDataCleaner).cleanWebViewData()
     }
 
     @Test
@@ -416,6 +428,7 @@ class RealPirOptOutTest {
         verify(mockPirActionsRunner).start(deprecatedProfile, listOf(testOptOutStep))
         verify(mockPirActionsRunner).stop()
         verify(mockEventsRepository, times(2)).saveEventLog(any())
+        verify(mockWebViewDataCleaner).cleanWebViewData()
     }
 
     @Test
@@ -479,6 +492,7 @@ class RealPirOptOutTest {
         verify(mockPirActionsRunner, times(2)).start(any(), any())
         verify(mockPirActionsRunner, times(2)).stop()
         verify(mockEventsRepository, times(2)).saveEventLog(any())
+        verify(mockWebViewDataCleaner).cleanWebViewData()
     }
 
     @Test
@@ -536,6 +550,7 @@ class RealPirOptOutTest {
         verify(mockPirActionsRunner, times(2)).start(any(), any())
         verify(mockPirActionsRunner, times(2)).stop()
         verify(mockEventsRepository, times(2)).saveEventLog(any())
+        verify(mockWebViewDataCleaner).cleanWebViewData()
     }
 
     @Test
@@ -582,6 +597,7 @@ class RealPirOptOutTest {
         verify(mockPirActionsRunner, times(2)).start(any(), any())
         verify(mockPirActionsRunner, times(2)).stop()
         verify(mockEventsRepository, times(2)).saveEventLog(any())
+        verify(mockWebViewDataCleaner).cleanWebViewData()
     }
 
     @Test
@@ -612,6 +628,7 @@ class RealPirOptOutTest {
 
         // Then - stop should be called twice: once during execution, once during stop()
         verify(mockPirActionsRunner, times(2)).stop()
+        verify(mockWebViewDataCleaner, times(2)).cleanWebViewData()
     }
 
     @Test
@@ -652,6 +669,7 @@ class RealPirOptOutTest {
         verify(mockPirActionsRunner).start(any(), any())
         verify(mockPirActionsRunner).stop()
         verify(mockEventsRepository, times(2)).saveEventLog(any())
+        verify(mockWebViewDataCleaner).cleanWebViewData()
     }
 
     @Test
@@ -671,6 +689,7 @@ class RealPirOptOutTest {
         verify(mockPirCssScriptLoader).getScript()
         verifyNoInteractions(mockBrokerStepsParser)
         verifyNoInteractions(mockPirActionsRunnerFactory)
+        verify(mockWebViewDataCleaner).cleanWebViewData()
     }
 
     @Test
@@ -692,6 +711,7 @@ class RealPirOptOutTest {
         verify(mockRepository).getBrokersForOptOut(formOptOutOnly = true)
         verify(mockRepository).getAllUserProfileQueries()
         verify(mockEventsRepository, times(2)).saveEventLog(any())
+        verify(mockWebViewDataCleaner).cleanWebViewData()
     }
 
     @Test
@@ -717,6 +737,7 @@ class RealPirOptOutTest {
         verify(mockEventsRepository, times(2)).saveEventLog(any())
         verifyNoInteractions(mockPirCssScriptLoader)
         verifyNoInteractions(mockPirActionsRunnerFactory)
+        verify(mockWebViewDataCleaner).cleanWebViewData()
     }
 
     @Test
@@ -773,5 +794,6 @@ class RealPirOptOutTest {
         verify(mockPirActionsRunner, times(2)).start(any(), any())
         verify(mockPirActionsRunner, times(2)).stop()
         verify(mockEventsRepository, times(2)).saveEventLog(any())
+        verify(mockWebViewDataCleaner).cleanWebViewData()
     }
 }

@@ -18,6 +18,7 @@ plugins {
     id 'com.android.library'
     id 'kotlin-android'
     id 'com.google.devtools.ksp'
+    id 'androidx.room'
 }
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
@@ -40,18 +41,14 @@ dependencies {
     coreLibraryDesugaring Android.tools.desugarJdkLibs
 }
 android {
-    defaultConfig {
-        javaCompileOptions {
-            annotationProcessorOptions {
-                arguments = ["room.schemaLocation": "$projectDir/schemas".toString()]
-            }
-        }
-    }
     sourceSets {
-        test.assets.srcDirs += files("$projectDir/schemas".toString())
+        test.assets.srcDirs += files("$projectDir/schemas")
     }
     namespace 'com.duckduckgo.brokensite.store'
     compileOptions {
         coreLibraryDesugaringEnabled = true
+    }
+    room {
+        schemaDirectory("$projectDir/schemas")
     }
 }

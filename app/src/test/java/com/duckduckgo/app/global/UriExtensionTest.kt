@@ -28,6 +28,7 @@ import com.duckduckgo.common.utils.hasIpHost
 import com.duckduckgo.common.utils.isHttp
 import com.duckduckgo.common.utils.isHttps
 import com.duckduckgo.common.utils.isHttpsVersionOfUri
+import com.duckduckgo.common.utils.isLocalUrl
 import com.duckduckgo.common.utils.isMobileSite
 import com.duckduckgo.common.utils.toDesktopUri
 import com.duckduckgo.common.utils.toStringDropScheme
@@ -35,8 +36,10 @@ import com.duckduckgo.common.utils.withScheme
 import org.junit.Assert.*
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.robolectric.annotation.Config
 
 @RunWith(AndroidJUnit4::class)
+@Config(sdk = [29]) // Ensure Uri properly parses IPv6 addresses
 class UriExtensionTest {
 
     @Test
@@ -275,5 +278,137 @@ class UriExtensionTest {
         assertEquals("www.foo.com", "www.foo.com/path/to/foo?key=value".extractDomain())
         assertEquals("foo.com", "foo.com/path/to/foo?key=value".extractDomain())
         assertEquals("foo.com", "http://foo.com/path/to/foo?key=value".extractDomain())
+    }
+
+    @Test
+    fun whenHostIsLocalhostThenIsLocalUrlReturnsTrue() {
+        assertTrue("http://localhost".toUri().isLocalUrl)
+        assertTrue("https://localhost".toUri().isLocalUrl)
+        assertTrue("http://localhost:8080".toUri().isLocalUrl)
+        assertTrue("http://LOCALHOST".toUri().isLocalUrl)
+    }
+
+    @Test
+    fun whenHostIsLoopbackIpThenIsLocalUrlReturnsTrue() {
+        assertTrue("http://127.0.0.1".toUri().isLocalUrl)
+        assertTrue("http://127.0.0.1:3000".toUri().isLocalUrl)
+        assertTrue("http://127.1.2.3".toUri().isLocalUrl)
+        assertTrue("http://127.255.255.255".toUri().isLocalUrl)
+    }
+
+    @Test
+    fun whenHostIsPrivateNetworkClass10ThenIsLocalUrlReturnsTrue() {
+        assertTrue("http://10.0.0.1".toUri().isLocalUrl)
+        assertTrue("http://10.255.255.255".toUri().isLocalUrl)
+        assertTrue("http://10.1.2.3:8080".toUri().isLocalUrl)
+    }
+
+    @Test
+    fun whenHostIsPrivateNetworkClass172ThenIsLocalUrlReturnsTrue() {
+        assertTrue("http://172.16.0.1".toUri().isLocalUrl)
+        assertTrue("http://172.31.255.255".toUri().isLocalUrl)
+        assertTrue("http://172.20.10.5".toUri().isLocalUrl)
+    }
+
+    @Test
+    fun whenHostIsPrivateNetworkClass192ThenIsLocalUrlReturnsTrue() {
+        assertTrue("http://192.168.0.1".toUri().isLocalUrl)
+        assertTrue("http://192.168.255.255".toUri().isLocalUrl)
+        assertTrue("http://192.168.1.100:3000".toUri().isLocalUrl)
+    }
+
+    @Test
+    fun whenHostIsPublicIpThenIsLocalUrlReturnsFalse() {
+        assertFalse("http://8.8.8.8".toUri().isLocalUrl)
+        assertFalse("http://1.1.1.1".toUri().isLocalUrl)
+        assertFalse("http://93.184.216.34".toUri().isLocalUrl)
+    }
+
+    @Test
+    fun whenHostIsNormalDomainThenIsLocalUrlReturnsFalse() {
+        assertFalse("http://example.com".toUri().isLocalUrl)
+        assertFalse("https://duckduckgo.com".toUri().isLocalUrl)
+        assertFalse("http://www.google.com".toUri().isLocalUrl)
+    }
+
+    @Test
+    fun whenHostIsEdgeCaseFor172ThenIsLocalUrlReturnsCorrectly() {
+        assertFalse("http://172.15.0.1".toUri().isLocalUrl)
+        assertFalse("http://172.32.0.1".toUri().isLocalUrl)
+    }
+
+    @Test
+    fun whenHostIsEdgeCaseFor192ThenIsLocalUrlReturnsCorrectly() {
+        assertFalse("http://192.167.0.1".toUri().isLocalUrl)
+        assertFalse("http://192.169.0.1".toUri().isLocalUrl)
+    }
+
+    @Test
+    fun whenSchemeIsFileThenIsLocalUrlReturnsTrue() {
+        assertTrue("file:///path/to/file".toUri().isLocalUrl)
+    }
+
+    @Test
+    fun whenHostIsNullOrEmptyThenIsLocalUrlReturnsFalse() {
+        assertFalse("about:blank".toUri().isLocalUrl)
+    }
+
+    // IPv6 loopback tests
+    @Test
+    fun whenHostIsIPv6LoopbackThenIsLocalUrlReturnsTrue() {
+        assertTrue("http://[::1]".toUri().isLocalUrl)
+        assertTrue("http://[::1]:8080".toUri().isLocalUrl)
+        assertTrue("https://[0:0:0:0:0:0:0:1]".toUri().isLocalUrl)
+    }
+
+    // IPv6 link-local tests (fe80::/10)
+    @Test
+    fun whenHostIsIPv6LinkLocalThenIsLocalUrlReturnsTrue() {
+        assertTrue("http://[fe80::1]".toUri().isLocalUrl)
+        assertTrue("http://[fe80::abcd:ef01:2345:6789]".toUri().isLocalUrl)
+    }
+
+    // IPv6 unique local addresses (fc00::/7)
+    @Test
+    fun whenHostIsIPv6UniqueLocalThenIsLocalUrlReturnsTrue() {
+        assertTrue("http://[fc00::1]".toUri().isLocalUrl)
+        assertTrue("http://[fd12:3456:789a:bcde::1]".toUri().isLocalUrl)
+    }
+
+    // IPv6 global addresses (should be false)
+    @Test
+    fun whenHostIsIPv6GlobalAddressThenIsLocalUrlReturnsFalse() {
+        assertFalse("http://[2001:db8::1]".toUri().isLocalUrl)
+        assertFalse("https://[2606:2800:220:1:248:1893:25c8:1946]".toUri().isLocalUrl)
+    }
+
+    // Security vulnerability tests - domain suffixes that look like IPs
+    @Test
+    fun whenHostIsIPWithDomainSuffixThenIsLocalUrlReturnsFalse() {
+        assertFalse("http://127.0.0.1.evil.com".toUri().isLocalUrl)
+        assertFalse("http://10.1.evil.com".toUri().isLocalUrl)
+        assertFalse("http://192.168.1.1.attacker.com".toUri().isLocalUrl)
+        assertFalse("http://localhost.evil.com".toUri().isLocalUrl)
+    }
+
+    // .local domain test (documenting current behavior - NOT treated as local)
+    @Test
+    fun whenHostIsDotLocalDomainThenIsLocalUrlReturnsFalse() {
+        assertFalse("http://myserver.local".toUri().isLocalUrl)
+        assertFalse("http://printer.local:631".toUri().isLocalUrl)
+    }
+
+    // Malformed IP tests
+    @Test
+    fun whenHostIsMalformedIPThenIsLocalUrlReturnsFalse() {
+        assertFalse("http://999.999.999.999".toUri().isLocalUrl)
+        assertFalse("http://192.168.1.1.1".toUri().isLocalUrl)
+    }
+
+    // Abbreviated IPv4 tests - parseNumericAddress normalizes these
+    @Test
+    fun whenHostIsAbbreviatedPrivateIpThenIsLocalUrlReturnsTrue() {
+        // 192.168.1 is parsed as 192.168.0.1 by parseNumericAddress
+        assertTrue("http://192.168.1".toUri().isLocalUrl)
     }
 }

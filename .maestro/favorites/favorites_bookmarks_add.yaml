@@ -19,6 +19,11 @@ tags:
       - runFlow: ../shared/browser_screen/click_on_menu_button.yaml
       - tapOn:
           text: "add bookmark"
+      # Wait for prompt to disappear
+      - extendedWaitUntil:
+          notVisible:
+            text: "Bookmark added.*"
+          timeout: 5000
       # Navigate to bookmarks screen
       - runFlow: ../shared/browser_screen/click_on_menu_button.yaml
       - tapOn:

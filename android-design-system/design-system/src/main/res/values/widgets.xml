@@ -174,6 +174,16 @@
         <item name="cornerRadius">@dimen/mediumShapeCornerRadius</item>
     </style>
 
+    <style name="Widget.DuckDuckGo.DaxButton.DestructiveSecondary" parent="Widget.MaterialComponents.Button.OutlinedButton">
+        <item name="android:textColor">@color/button_destructive_secondary_text_color_selector</item>
+        <item name="shapeAppearance">?attr/shapeAppearanceSmallComponent</item>
+        <item name="strokeColor">@color/button_destructive_secondary_stroke_selector</item>
+        <item name="rippleColor">@color/button_destructive_secondary_ripple_selector</item>
+        <item name="iconTint">@color/button_destructive_secondary_text_color_selector</item>
+        <item name="iconPadding">@dimen/keyline_2</item>
+        <item name="cornerRadius">@dimen/mediumShapeCornerRadius</item>
+    </style>
+
     <style name="Widget.DuckDuckGo.DaxButton.Ghost" parent="Widget.MaterialComponents.Button.TextButton">
         <item name="android:textColor">@color/button_secondary_text_color_selector</item>
         <item name="backgroundTint">@color/button_ghost_container_selector</item>

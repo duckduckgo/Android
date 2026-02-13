@@ -226,6 +226,12 @@ class FakeSettingsDataStore :
             store["showTrackersCountInAddressBar"] = value
         }
 
+    override var singleTabFireDialogShownCount: Int
+        get() = store["singleTabFireDialogShownCount"] as Int? ?: 0
+        set(value) {
+            store["singleTabFireDialogShownCount"] = value
+        }
+
     override fun isCurrentlySelected(clearWhatOption: ClearWhatOption): Boolean {
         val currentlySelected = store["automaticallyClearWhatOption"] as ClearWhatOption?
         return currentlySelected == clearWhatOption

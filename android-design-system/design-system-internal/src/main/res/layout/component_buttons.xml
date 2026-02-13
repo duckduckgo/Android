@@ -178,6 +178,41 @@
             android:enabled="false"
             android:text="Ghost Disabled" />
 
+        <com.duckduckgo.common.ui.view.button.DaxButtonDestructiveSecondary
+            android:id="@+id/dax_button_destructive_secondary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Destructive Secondary Small" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonDestructiveSecondary
+            android:id="@+id/dax_button_destructive_secondary_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Destructive Secondary Small"
+            app:icon="@drawable/ic_bookmarks_16" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonDestructiveSecondary
+            android:id="@+id/dax_button_destructive_secondary_large"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Destructive Secondary Large"
+            app:daxButtonSize="large" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonDestructiveSecondary
+            android:id="@+id/dax_button_destructive_secondary_large_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Destructive Secondary Large"
+            app:daxButtonSize="large"
+            app:icon="@drawable/ic_reload_24" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonDestructiveSecondary
+            android:id="@+id/dax_button_destructive_secondary_disabled"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:enabled="false"
+            android:text="Destructive Secondary Disabled" />
+
         <com.duckduckgo.common.ui.view.button.DaxButtonGhostDestructive
             android:id="@+id/dax_button_ghost_destructive"
             android:layout_width="wrap_content"

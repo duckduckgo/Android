@@ -114,6 +114,36 @@
     </FrameLayout>
 
     <FrameLayout
+        android:id="@+id/chatSuggestionsOverlay"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginHorizontal="@dimen/inputScreenMarginHorizontal"
+        android:visibility="gone"
+        android:elevation="3dp"
+        android:clickable="true"
+        android:focusable="true"
+        app:layout_constraintBottom_toTopOf="@id/inputModeWidgetContainerBottom"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/inputModeWidgetContainerTop">
+
+        <com.duckduckgo.duckchat.impl.inputscreen.ui.view.SwipeableRecyclerView
+            android:id="@+id/chatSuggestionsRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false" />
+
+        <FrameLayout
+            android:id="@+id/chatSuggestionsBottomFadeContainer"
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:layout_gravity="bottom"
+            android:elevation="8dp"
+            android:foreground="@drawable/bottom_fade_overlay" />
+
+    </FrameLayout>
+
+    <FrameLayout
         android:id="@+id/inputScreenButtonsContainer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

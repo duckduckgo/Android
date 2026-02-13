@@ -30,6 +30,7 @@ import com.duckduckgo.remote.messaging.api.Content
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.api.RemoteMessageModel
 import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
+import com.duckduckgo.remote.messaging.api.Surface
 import com.duckduckgo.remote.messaging.impl.modal.cardslist.RealCardsListRemoteMessagePixelHelper.Companion.PARAM_NAME_DISMISS_TYPE
 import com.duckduckgo.remote.messaging.impl.modal.cardslist.RealCardsListRemoteMessagePixelHelper.Companion.PARAM_VALUE_CLOSE_BUTTON
 import com.duckduckgo.remote.messaging.impl.pixels.RemoteMessagingPixelName
@@ -76,7 +77,7 @@ class CardsListRemoteMessageViewModel @Inject constructor(
                 lastRemoteMessageSeen = message
             }
             val cardsList = message?.content as? Content.CardsList
-            val imageFile = remoteMessagingModel.getRemoteMessageImageFile()
+            val imageFile = remoteMessagingModel.getRemoteMessageImageFile(Surface.MODAL)
             if (cardsList != null) {
                 _viewState.value = buildViewState(cardsList, imageFile)
             } else {

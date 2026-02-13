@@ -85,6 +85,7 @@ import com.duckduckgo.app.global.sanitize
 import com.duckduckgo.app.global.view.ClearDataAction
 import com.duckduckgo.app.global.view.FireDialog
 import com.duckduckgo.app.global.view.FireDialogProvider
+import com.duckduckgo.app.global.view.FireDialogProvider.FireDialogOrigin.BROWSER
 import com.duckduckgo.app.global.view.renderIfChanged
 import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPage
 import com.duckduckgo.app.pixels.AppPixelName
@@ -253,6 +254,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
     private var instanceStateBundles: CombinedInstanceState? = null
 
     private var lastIntent: Intent? = null
+
+    // we don't store isExternal in the tab model, as it's only meant for the first time the tab is loaded.
+    private val externalLaunchTabIds = mutableSetOf<String>()
 
     private lateinit var renderer: BrowserStateRenderer
 
@@ -424,7 +428,35 @@ open class BrowserActivity : DuckDuckGoActivity() {
                     isDataClearingInProgress = true
                     removeObservers()
                 }
+                FireDialog.EVENT_CLEAR_WITHOUT_RESTART_STARTED -> {
+                    currentTab?.onFireDialogVisibilityChanged(isVisible = false)
+                }
+                FireDialog.EVENT_ON_SINGLE_TAB_CLEAR_COMPLETE -> {
+                    showSingleTabDeletedSnackbar()
+                }
             }
+        }
+    }
+
+    private fun showSingleTabDeletedSnackbar() {
+        lifecycleScope.launch {
+            delay(500)
+
+            val omnibarType = withContext(dispatcherProvider.io()) {
+                settingsDataStore.omnibarType
+            }
+            val anchorView = when (omnibarType) {
+                OmnibarType.SINGLE_TOP -> null
+                OmnibarType.SINGLE_BOTTOM -> currentTab?.getOmnibar()?.omnibarView?.toolbar
+                    ?: binding.fragmentContainer
+
+                OmnibarType.SPLIT -> currentTab?.navigationBar ?: binding.fragmentContainer
+            }
+            DefaultSnackbar(
+                parentView = binding.fragmentContainer,
+                message = getString(R.string.singleTabFireDialogSnackbar),
+                anchor = anchorView,
+            ).show()
         }
     }
 
@@ -520,6 +552,10 @@ open class BrowserActivity : DuckDuckGoActivity() {
         transaction.commit()
     }
 
+    fun consumeExternalLaunchForTab(tabId: String): Boolean {
+        return externalLaunchTabIds.remove(tabId)
+    }
+
     private fun selectTab(tab: TabEntity?) {
         logcat(VERBOSE) { "Select tab: $tab" }
 
@@ -533,7 +569,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
         val fragment = supportFragmentManager.findFragmentByTag(tab.tabId) as? BrowserTabFragment
         if (fragment == null) {
-            openNewTab(tab.tabId, tab.url, tab.skipHome, intent?.getBooleanExtra(LAUNCH_FROM_EXTERNAL_EXTRA, false) ?: false)
+            openNewTab(tab.tabId, tab.url, tab.skipHome, isExternal = consumeExternalLaunchForTab(tab.tabId))
             return
         }
         val transaction = supportFragmentManager.beginTransaction()
@@ -731,9 +767,14 @@ open class BrowserActivity : DuckDuckGoActivity() {
                         } else {
                             sharedText
                         }
-                    launchNewTab(query = query, sourceTabId = sourceTabId, skipHome = skipHome)
+                    launchNewTab(query = query, sourceTabId = sourceTabId, skipHome = skipHome, isExternal = isExternal)
                 } else {
-                    lifecycleScope.launch { viewModel.onOpenInNewTabRequested(sourceTabId = sourceTabId, query = sharedText, skipHome = skipHome) }
+                    lifecycleScope.launch {
+                        val tabId = viewModel.onOpenInNewTabRequested(sourceTabId = sourceTabId, query = sharedText, skipHome = skipHome)
+                        if (isExternal) {
+                            externalLaunchTabIds.add(tabId)
+                        }
+                    }
                 }
             }
         } else {
@@ -871,7 +912,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         pixel.fire(AppPixelName.FORGET_ALL_PRESSED_BROWSING, params)
 
         lifecycleScope.launch {
-            val dialog = fireDialogProvider.createFireDialog()
+            val dialog = fireDialogProvider.createFireDialog(BROWSER)
             dialog.show(supportFragmentManager)
         }
     }
@@ -1422,10 +1463,14 @@ open class BrowserActivity : DuckDuckGoActivity() {
         query: String? = null,
         sourceTabId: String? = null,
         skipHome: Boolean = false,
+        isExternal: Boolean = false,
     ) {
         lifecycleScope.launch {
             if (swipingTabsFeature.isEnabled) {
-                tabManager.openNewTab(query, sourceTabId, skipHome)
+                val tabId = tabManager.openNewTab(query, sourceTabId, skipHome)
+                if (isExternal) {
+                    externalLaunchTabIds.add(tabId)
+                }
             } else {
                 viewModel.onNewTabRequested()
             }

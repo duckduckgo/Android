@@ -298,6 +298,15 @@ interface AndroidBrowserConfigFeature {
     fun refreshDuckAiOnSubscriptionChanges(): Toggle
 
     /**
+     * Controls whether tracker animation is disabled when the app restarts.
+     * @return `true` when the remote config has the global "disableTrackerAnimationOnRestart" androidBrowserConfig
+     * sub-feature flag enabled
+     * If the remote feature is not present defaults to `true`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun disableTrackerAnimationOnRestart(): Toggle
+
+    /**
      * Controls whether data clearing wide events are sent.
      * @return `true` when the remote config has the global "sendDataClearingWideEvent" androidBrowserConfig
      * sub-feature flag enabled
@@ -306,6 +315,18 @@ interface AndroidBrowserConfigFeature {
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun sendDataClearingWideEvent(): Toggle
 
+    /**
+     * Controls the single tab fire dialog that allows deleting a single tab's data.
+     * @return `true` when the remote config has the global "singleTabFireDialog" androidBrowserConfig
+     * sub-feature flag enabled
+     * If the remote feature is not present defaults to `false`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun singleTabFireDialog(): Toggle
+
+    /**
+     * Controls whether the state saving for some of the views inside the BrowserTabFragment is disabled or not
+     */
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     @Toggle.InternalAlwaysEnabled
     fun reduceBrowserTabBundleSize(): Toggle

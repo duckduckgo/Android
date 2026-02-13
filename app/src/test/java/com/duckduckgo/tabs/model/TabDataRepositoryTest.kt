@@ -25,6 +25,7 @@ import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.browser.certificates.BypassedSSLCertificatesRepository
 import com.duckduckgo.app.browser.favicon.FaviconManager
+import com.duckduckgo.app.browser.omnibar.StandardizedLeadingIconFeatureToggle
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.global.db.AppDatabase
@@ -89,6 +90,7 @@ class TabDataRepositoryTest {
     private val mockDao: TabsDao = mock()
 
     private val mockDuckPlayer: DuckPlayer = mock()
+    private val mockStandardizedLeadingIconToggle: StandardizedLeadingIconFeatureToggle = mock()
 
     private val daoDeletableTabs = Channel<List<TabEntity>>()
 
@@ -757,6 +759,7 @@ class TabDataRepositoryTest {
                 coroutinesTestRule.testDispatcherProvider,
                 duckDuckGoUrlDetector,
                 mockDuckPlayer,
+                mockStandardizedLeadingIconToggle,
             ),
             webViewPreviewPersister,
             faviconManager,

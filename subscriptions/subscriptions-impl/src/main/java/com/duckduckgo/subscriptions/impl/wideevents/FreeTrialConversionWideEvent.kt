@@ -110,7 +110,7 @@ class FreeTrialConversionWideEventImpl @Inject constructor(
         }
 
         // Fire pixel for VPN activation during free trial (independent of wide event feature flag)
-        pixelSender.reportFreeTrialVpnActivation(activationDay)
+        pixelSender.reportFreeTrialVpnActivation(activationDay, subscription.platform)
 
         // Wide event logic (gated by feature flag)
         if (!isFeatureEnabled()) return

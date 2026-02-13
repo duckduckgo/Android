@@ -99,4 +99,10 @@
     <string name="duck_chat_contextual_onboarding_body" instruction="Body text for contextual Duck AI onboarding sheet">Duck.ai kan nå hjelpe deg med å svare på spørsmål om siden du ser på.\n\nSideinnhold inkluderes bare når du legger det ved. Du kan endre dette når som helst i innstillingene.</string>
     <string name="duck_chat_contextual_onboarding_primary" instruction="Button to continue to contextual Duck AI sheet">Den er grei</string>
     <string name="duck_chat_contextual_onboarding_secondary" instruction="Button to go to AI settings">Vis innstillinger</string>
+
+    <!-- Duck.ai Contextual Bottom Sheet -->
+    <string name="duckAIContextualPromptSummarize">Oppsummer denne siden</string>
+    <string name="duckAIContextualAutomaticContextTitle">Send sideinnhold automatisk</string>
+    <string name="duckAIContextualAutomaticContextMessage">Send sideinnhold automatisk til Duck.ai</string>
+    <string name="duckAIContextualAttachPageContent">Legg ved sideinnhold</string>
 </resources>

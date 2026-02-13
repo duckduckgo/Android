@@ -33,6 +33,7 @@ import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.common.ui.viewbinding.viewBinding
@@ -85,6 +86,9 @@ class CardsListRemoteMessageView @JvmOverloads constructor(
 
     @Inject
     lateinit var appBuildConfig: AppBuildConfig
+
+    @Inject
+    lateinit var browserNav: BrowserNav
 
     private val binding: ViewCardsListRemoteMessageBinding by viewBinding()
 
@@ -156,7 +160,7 @@ class CardsListRemoteMessageView @JvmOverloads constructor(
     private fun processCommand(command: Command) {
         when (command) {
             is SubmitUrl -> submitUrl(command.url)
-            is SubmitUrlInContext -> submitUrl(command.url)
+            is SubmitUrlInContext -> submitUrlInContext(command.url)
             is DismissMessage -> dismiss()
             is LaunchDefaultCredentialProvider -> launchDefaultCredentialProvider()
             is LaunchAppTPOnboarding -> launchAppTPOnboarding()
@@ -168,6 +172,10 @@ class CardsListRemoteMessageView @JvmOverloads constructor(
     }
 
     private fun submitUrl(url: String) {
+        context.startActivity(browserNav.openInCurrentTab(context, url))
+    }
+
+    private fun submitUrlInContext(url: String) {
         globalActivityStarter.start(
             context,
             WebViewActivityWithParams(

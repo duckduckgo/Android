@@ -179,7 +179,7 @@ class CardsListRemoteMessageViewModelTest {
             surfaces = listOf(Surface.MODAL),
         )
         whenever(remoteMessagingRepository.getMessageById(eq(messageId))).thenReturn(message)
-        whenever(remoteMessagingModel.getRemoteMessageImageFile()).thenReturn("imageFile")
+        whenever(remoteMessagingModel.getRemoteMessageImageFile(Surface.MODAL)).thenReturn("imageFile")
 
         viewModel.viewState.test {
             assertNull(awaitItem()) // Initial state

@@ -64,7 +64,8 @@
         app:indicatorStatus="on"
         app:leadingIcon="@drawable/ic_dax_icon"
         app:primaryText="Settings List Item with Beta Pill"
-        app:pillIcon="betaPill" />
+        app:pillIcon="false"
+        app:pillText="Beta" />
 
     <com.duckduckgo.common.ui.view.listitem.SettingsListItem
         android:id="@+id/settingsListItemWithBetaTagAndLongText"
@@ -73,7 +74,8 @@
         app:indicatorStatus="on"
         app:leadingIcon="@drawable/ic_dax_icon"
         app:primaryText="Settings List Item with Beta Pill and a very long piece of text that should hopefully wrap"
-        app:pillIcon="betaPill" />
+        app:pillIcon="true"
+        app:pillText="Beta" />
 
     <com.duckduckgo.common.ui.view.listitem.SettingsListItem
         android:id="@+id/settingsListItemWithNewTag"
@@ -82,6 +84,7 @@
         app:indicatorStatus="on"
         app:leadingIcon="@drawable/ic_dax_icon"
         app:primaryText="Settings List Item with New Pill"
-        app:pillIcon="newPill" />
+        app:pillIcon="true"
+        app:pillText="New" />
 
 </LinearLayout>

@@ -42,9 +42,9 @@
             android:id="@+id/messageTitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/keyline_2"
+            android:layout_marginStart="@dimen/keyline_4"
             android:layout_marginTop="@dimen/keyline_1"
-            android:layout_marginEnd="@dimen/keyline_2"
+            android:layout_marginEnd="@dimen/keyline_4"
             android:gravity="center"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -98,11 +98,12 @@
             app:typography="body1"
             tools:text="Body text goes here. This component can be used with one or two buttons." />
 
-        <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
+        <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
             android:id="@+id/actionButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/keyline_2"
+            app:icon="@drawable/ic_share_android_16"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

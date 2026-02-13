@@ -4,6 +4,12 @@
         "description": "Fired when the user toggles the 'Show tracker count in address bar' setting in appearance settings.",
         "owners": ["aibrahim-"],
         "triggers": ["other"],
-        "suffixes": ["form_factor"]
+        "suffixes": ["form_factor"],
+        "parameters": [
+            {
+                "key": "is_enabled",
+                "description": "whether the setting is enabled or disabled after the toggle"
+            }
+        ]
     }
 }

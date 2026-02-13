@@ -23,7 +23,6 @@ import android.graphics.Bitmap
 import android.net.Uri
 import android.net.http.SslCertificate
 import android.net.http.SslError
-import android.os.Build
 import android.print.PrintAttributes
 import android.view.MenuItem
 import android.view.View
@@ -41,8 +40,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.room.Room
-import androidx.test.filters.SdkSuppress
-import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.webkit.JavaScriptReplyProxy
 import app.cash.turbine.test
 import com.duckduckgo.adclick.api.AdClickManager
@@ -124,6 +122,7 @@ import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.browser.omnibar.QueryOrigin.FromBookmark
 import com.duckduckgo.app.browser.omnibar.QueryOrigin.FromUser
+import com.duckduckgo.app.browser.omnibar.StandardizedLeadingIconFeatureToggle
 import com.duckduckgo.app.browser.refreshpixels.RefreshPixelSender
 import com.duckduckgo.app.browser.remotemessage.RemoteMessagingModel
 import com.duckduckgo.app.browser.santize.NonHttpAppLinkChecker
@@ -188,7 +187,6 @@ import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_VISIT_SITE_CUSTOM
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
-import com.duckduckgo.app.privacy.model.TestEntity
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -204,6 +202,7 @@ import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.store.TabStatsBucketing
 import com.duckduckgo.app.trackerdetection.EntityLookup
+import com.duckduckgo.app.trackerdetection.TestEntity
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus
 import com.duckduckgo.app.trackerdetection.model.TrackerType
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
@@ -289,7 +288,9 @@ import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.savedsites.impl.SavedSitesPixelName
+import com.duckduckgo.serp.logos.api.SerpEasterEggLogosToggles
 import com.duckduckgo.serp.logos.api.SerpLogo
+import com.duckduckgo.serp.logos.api.SerpLogos
 import com.duckduckgo.settings.api.SerpSettingsFeature
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.LocationPermissionRequest
@@ -314,6 +315,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceTimeBy
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.json.JSONObject
 import org.junit.After
@@ -328,6 +330,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mockito.never
 import org.mockito.Mockito.times
@@ -344,6 +347,8 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
+import org.robolectric.RuntimeEnvironment
+import org.robolectric.annotation.Config
 import java.io.File
 import java.math.BigInteger
 import java.security.cert.X509Certificate
@@ -354,6 +359,8 @@ import java.util.concurrent.TimeUnit
 
 @SuppressLint("DenyListedApi")
 @FlowPreview
+@RunWith(AndroidJUnit4::class)
+@Config(sdk = [34])
 class BrowserTabViewModelTest {
     @get:Rule
     var instantTaskExecutorRule = InstantTaskExecutorRule()
@@ -455,6 +462,7 @@ class BrowserTabViewModelTest {
     private val mockFileChooserCallback: ValueCallback<Array<Uri>> = mock()
 
     private val mockDuckPlayer: DuckPlayer = mock()
+    private val mockStandardizedLeadingIconToggle: StandardizedLeadingIconFeatureToggle = mock()
 
     private val mockDuckAiFeatureState: DuckAiFeatureState = mock()
 
@@ -504,7 +512,7 @@ class BrowserTabViewModelTest {
 
     private lateinit var accessibilitySettingsDataStore: AccessibilitySettingsDataStore
 
-    private val context = getInstrumentation().targetContext
+    private val context: Context = RuntimeEnvironment.getApplication()
 
     private val selectedTabLiveData = MutableLiveData<TabEntity>()
 
@@ -623,11 +631,26 @@ class BrowserTabViewModelTest {
 
     private lateinit var fakeContentScopeScriptsSubscriptionEventPluginPoint: FakeContentScopeScriptsSubscriptionEventPluginPoint
     private var serpSettingsFeature = FakeFeatureToggleFactory.create(SerpSettingsFeature::class.java)
+    private val mockSerpEasterEggLogosToggles: SerpEasterEggLogosToggles = mock()
+    private val mockSetFavouriteToggle: Toggle = mock()
+    private val mockSerpLogos: SerpLogos = mock()
+    private val favouriteLogoFlow = MutableStateFlow<String?>(null)
+    private val setFavouriteEnabledFlow = MutableStateFlow(false)
 
     @Before
     fun before() =
         runTest {
             MockitoAnnotations.openMocks(this)
+
+            // Register MIME types needed by file chooser tests (Robolectric's MimeTypeMap is empty by default)
+            val mimeTypeMap = android.webkit.MimeTypeMap.getSingleton()
+            org.robolectric.Shadows.shadowOf(mimeTypeMap).addExtensionMimeTypeMapping("doc", "application/msword")
+            org.robolectric.Shadows.shadowOf(
+                mimeTypeMap,
+            ).addExtensionMimeTypeMapping("docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document")
+            org.robolectric.Shadows.shadowOf(mimeTypeMap).addExtensionMimeTypeMapping("pdf", "application/pdf")
+            org.robolectric.Shadows.shadowOf(mimeTypeMap).addExtensionMimeTypeMapping("jpeg", "image/jpeg")
+            org.robolectric.Shadows.shadowOf(mimeTypeMap).addExtensionMimeTypeMapping("jpg", "image/jpeg")
 
             swipingTabsFeature.self().setRawStoredState(State(enable = true))
             swipingTabsFeature.enabledForUsers().setRawStoredState(State(enable = true))
@@ -686,6 +709,9 @@ class BrowserTabViewModelTest {
             whenever(mockDuckPlayer.isSimulatedYoutubeNoCookie(any())).thenReturn(false)
             whenever(mockDuckPlayer.isDuckPlayerUri(anyString())).thenReturn(false)
             whenever(mockDuckPlayer.getDuckPlayerState()).thenReturn(ENABLED)
+            val mockFeatureToggle: com.duckduckgo.feature.toggles.api.Toggle = mock()
+            whenever(mockFeatureToggle.isEnabled()).thenReturn(false)
+            whenever(mockStandardizedLeadingIconToggle.self()).thenReturn(mockFeatureToggle)
             whenever(mockAutocompleteTabsFeature.self()).thenReturn(mockEnabledToggle)
             whenever(mockAutocompleteTabsFeature.self().isEnabled()).thenReturn(true)
             whenever(mockSitePermissionsManager.hasSitePermanentPermission(any(), any())).thenReturn(false)
@@ -755,6 +781,12 @@ class BrowserTabViewModelTest {
             whenever(mockSyncStatusChangedObserver.syncStatusChangedEvents).thenReturn(syncStatusChangedEventsFlow)
             whenever(subscriptions.getSubscriptionStatusFlow()).thenReturn(subscriptionStatusFlow)
 
+            // SERP favourite logo mocks
+            whenever(mockSerpEasterEggLogosToggles.setFavourite()).thenReturn(mockSetFavouriteToggle)
+            whenever(mockSetFavouriteToggle.isEnabled()).thenReturn(false)
+            whenever(mockSetFavouriteToggle.enabled()).thenReturn(setFavouriteEnabledFlow)
+            whenever(mockSerpLogos.favouriteSerpEasterEggLogoUrlFlow).thenReturn(favouriteLogoFlow)
+
             initialiseViewModel()
 
             val mockWebHistoryItem: WebHistoryItem = mock()
@@ -774,6 +806,7 @@ class BrowserTabViewModelTest {
                 coroutineRule.testDispatcherProvider,
                 DuckDuckGoUrlDetectorImpl(),
                 mockDuckPlayer,
+                mockStandardizedLeadingIconToggle,
             )
 
         val fireproofWebsiteRepositoryImpl =
@@ -874,6 +907,8 @@ class BrowserTabViewModelTest {
                 serpSettingsFeature = serpSettingsFeature,
                 syncStatusChangedObserver = mockSyncStatusChangedObserver,
                 pageContextJSHelper = mockPageContextJSHelper,
+                serpEasterEggLogosToggles = mockSerpEasterEggLogosToggles,
+                serpLogos = mockSerpLogos,
             )
 
         testee.loadData("abc", null, false, false)
@@ -4795,6 +4830,32 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenHandleNewTabIfEmptyUrlWithEmptyUrlThenOmnibarAndUrlSetToAboutBlank() {
+        fakeAndroidConfigBrowserFeature.handleAboutBlank().setRawStoredState(State(enable = true))
+        resetChannels()
+        initialiseViewModel()
+        // Simulate a new tab with empty URL
+        testee.loadData("tabId", null, false, false)
+        testee.handleNewTabIfEmptyUrl()
+        assertEquals("about:blank", omnibarViewState().omnibarText)
+        assertEquals("", testee.url)
+        assertEquals("about:blank", testee.title)
+    }
+
+    @Test
+    fun whenHandleNewTabIfEmptyUrlWithNonEmptyUrlThenNoChangeToUrl() {
+        fakeAndroidConfigBrowserFeature.handleAboutBlank().setRawStoredState(State(enable = true))
+        resetChannels()
+        initialiseViewModel()
+        val url = "https://duckduckgo.com"
+        testee.loadData("tabId", url, false, false)
+        testee.navigationStateChanged(buildWebNavigation(url))
+        testee.handleNewTabIfEmptyUrl()
+        assertEquals(url, testee.url)
+        assertNotEquals("about:blank", testee.title)
+    }
+
+    @Test
     fun whenUserLongPressedBackOnEmptyStackBrowserNotShowingThenShowHistoryCommandNotSent() {
         setBrowserShowing(false)
         testee.onUserLongPressedBack()
@@ -5804,7 +5865,6 @@ class BrowserTabViewModelTest {
         }
 
     @Test
-    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.Q)
     fun whenAllowBypassSSLCertificatesFeatureDisabledThenSSLCertificateErrorsAreIgnored() {
         whenever(mockEnabledToggle.isEnabled()).thenReturn(false)
 
@@ -5819,7 +5879,6 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.Q)
     fun whenSslCertificateIssueReceivedForLoadingSiteThenShowSslWarningCommandSentAndViewStatesUpdated() {
         whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
 
@@ -5838,7 +5897,6 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.Q)
     fun whenSslCertificateIssueReceivedForAnotherSiteThenShowSslWarningCommandNotSentAndViewStatesNotUpdated() {
         whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
         val url = exampleUrl
@@ -5854,7 +5912,6 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.Q)
     fun whenInFreshStartAndSslCertificateIssueReceivedThenShowSslWarningCommandSentAndViewStatesUpdated() =
         runTest {
             whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
@@ -5958,7 +6015,6 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.Q)
     fun whenSslCertificateActionProceedThenPixelsFiredAndViewStatesUpdated() {
         whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
         val url = exampleUrl
@@ -5977,7 +6033,6 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.Q)
     fun whenWebViewRefreshedThenSSLErrorStateIsNone() {
         whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
         val url = exampleUrl
@@ -5992,7 +6047,6 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.Q)
     fun whenResetSSLErrorThenBrowserErrorStateIsLoading() {
         whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
         val url = exampleUrl
@@ -6734,6 +6788,7 @@ class BrowserTabViewModelTest {
                     anyOrNull(),
                     any(),
                     anyOrNull(),
+                    any(),
                 ),
             ).thenReturn(jsCallbackData)
             testee.processJsCallbackMessage(
@@ -6750,6 +6805,7 @@ class BrowserTabViewModelTest {
                 anyOrNull(),
                 any(),
                 anyOrNull(),
+                any(),
             )
             assertCommandIssued<Command.SendResponseToJs>()
         }
@@ -6766,6 +6822,7 @@ class BrowserTabViewModelTest {
                     anyOrNull(),
                     any(),
                     anyOrNull(),
+                    any(),
                 ),
             ).thenReturn(null)
             testee.processJsCallbackMessage(
@@ -6782,6 +6839,7 @@ class BrowserTabViewModelTest {
                 anyOrNull(),
                 any(),
                 anyOrNull(),
+                any(),
             )
             assertCommandNotIssued<Command.SendResponseToJs>()
         }
@@ -7301,6 +7359,7 @@ class BrowserTabViewModelTest {
                     anyString(),
                     anyOrNull(),
                     anyOrNull(),
+                    any(),
                     any(),
                     any(),
                 ),
@@ -7891,7 +7950,7 @@ class BrowserTabViewModelTest {
         val nonDdgUrl = "https://example.com/search?q=test"
         val webViewNavState = WebViewNavigationState(mockStack, 100)
 
-        testee.omnibarViewState.value = omnibarViewState().copy(serpLogo = SerpLogo.EasterEgg("some-logo-url"))
+        testee.omnibarViewState.value = omnibarViewState().copy(serpLogo = SerpLogo.EasterEgg(logoUrl = "some-logo-url", isFavourite = false))
         testee.pageFinished(mockWebView, webViewNavState, nonDdgUrl)
 
         assertNull("SERP logo should be cleared when navigating to non-DuckDuckGo URL", omnibarViewState().serpLogo)
@@ -7904,6 +7963,150 @@ class BrowserTabViewModelTest {
         testee.onStartTrackersAnimation()
 
         assertCommandIssued<Command.StartAddressBarTrackersAnimation>()
+    }
+
+    @Test
+    fun whenFavouriteLogoSetAndFeatureEnabledThenExtractSerpLogoNotIssued() = runTest {
+        whenever(mockDuckAiFeatureState.showFullScreenMode).thenReturn(mockDuckAiFullScreenMode)
+        whenever(mockSetFavouriteToggle.isEnabled()).thenReturn(true)
+        setFavouriteEnabledFlow.value = true
+        favouriteLogoFlow.value = "https://example.com/favourite-logo.png"
+
+        val ddgUrl = "https://duckduckgo.com/?q=test"
+        val webViewNavState = WebViewNavigationState(mockStack, 100)
+
+        testee.pageFinished(mockWebView, webViewNavState, ddgUrl)
+
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        val commands = commandCaptor.allValues
+        assertFalse(
+            "ExtractSerpLogo command should NOT be issued when favourite is set and feature is enabled",
+            commands.any { it is Command.ExtractSerpLogo },
+        )
+    }
+
+    @Test
+    fun whenFavouriteLogoSetAndFeatureEnabledThenSerpLogoIsSetToFavourite() = runTest {
+        whenever(mockDuckAiFeatureState.showFullScreenMode).thenReturn(mockDuckAiFullScreenMode)
+        whenever(mockSetFavouriteToggle.isEnabled()).thenReturn(true)
+        setFavouriteEnabledFlow.value = true
+        val favouriteUrl = "https://example.com/favourite-logo.png"
+        favouriteLogoFlow.value = favouriteUrl
+
+        val ddgUrl = "https://duckduckgo.com/?q=test"
+        val webViewNavState = WebViewNavigationState(mockStack, 100)
+
+        testee.pageFinished(mockWebView, webViewNavState, ddgUrl)
+
+        assertEquals(
+            "serpLogo should be set to favourite EasterEgg when favourite is set and feature is enabled",
+            SerpLogo.EasterEgg(logoUrl = favouriteUrl, isFavourite = true),
+            omnibarViewState().serpLogo,
+        )
+    }
+
+    @Test
+    fun whenFavouriteLogoSetButFeatureDisabledThenExtractSerpLogoIssued() = runTest {
+        whenever(mockDuckAiFeatureState.showFullScreenMode).thenReturn(mockDuckAiFullScreenMode)
+        whenever(mockSetFavouriteToggle.isEnabled()).thenReturn(false)
+        favouriteLogoFlow.value = "https://example.com/favourite-logo.png"
+
+        val ddgUrl = "https://duckduckgo.com/?q=test"
+        val webViewNavState = WebViewNavigationState(mockStack, 100)
+
+        testee.pageFinished(mockWebView, webViewNavState, ddgUrl)
+
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        val commands = commandCaptor.allValues
+        assertTrue(
+            "ExtractSerpLogo command should be issued when feature is disabled even if favourite is set",
+            commands.any { it is Command.ExtractSerpLogo && it.currentUrl == ddgUrl },
+        )
+    }
+
+    @Test
+    fun whenNoFavouriteLogoSetAndFeatureEnabledThenExtractSerpLogoIssued() = runTest {
+        whenever(mockDuckAiFeatureState.showFullScreenMode).thenReturn(mockDuckAiFullScreenMode)
+        whenever(mockSetFavouriteToggle.isEnabled()).thenReturn(true)
+        setFavouriteEnabledFlow.value = true
+        favouriteLogoFlow.value = null
+
+        val ddgUrl = "https://duckduckgo.com/?q=test"
+        val webViewNavState = WebViewNavigationState(mockStack, 100)
+
+        testee.pageFinished(mockWebView, webViewNavState, ddgUrl)
+
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        val commands = commandCaptor.allValues
+        assertTrue(
+            "ExtractSerpLogo command should be issued when no favourite is set even if feature is enabled",
+            commands.any { it is Command.ExtractSerpLogo && it.currentUrl == ddgUrl },
+        )
+    }
+
+    @Test
+    fun whenFavouriteLogoClearedOnSerpPageThenSerpLogoSetToNormal() = runTest {
+        whenever(mockDuckAiFeatureState.showFullScreenMode).thenReturn(mockDuckAiFullScreenMode)
+        whenever(mockSetFavouriteToggle.isEnabled()).thenReturn(true)
+        val ddgUrl = "https://duckduckgo.com/?q=test"
+        loadUrl(ddgUrl)
+
+        setFavouriteEnabledFlow.value = true
+        val favouriteUrl = "https://example.com/favourite-logo.png"
+        favouriteLogoFlow.value = favouriteUrl
+
+        advanceUntilIdle()
+
+        // Verify favourite logo is set
+        assertEquals(
+            "serpLogo should be set to favourite EasterEgg initially",
+            SerpLogo.EasterEgg(logoUrl = favouriteUrl, isFavourite = true),
+            omnibarViewState().serpLogo,
+        )
+
+        // Clear the favourite
+        favouriteLogoFlow.value = null
+        // Advance scheduler to process the state change
+        advanceUntilIdle()
+
+        // serpLogo should now be Normal (showing Dax)
+        assertEquals(
+            "serpLogo should be Normal when favourite is cleared on SERP page",
+            SerpLogo.Normal,
+            omnibarViewState().serpLogo,
+        )
+    }
+
+    @Test
+    fun whenFavouriteLogoClearedOnNonSerpPageThenSerpLogoUnchanged() = runTest {
+        whenever(mockDuckAiFeatureState.showFullScreenMode).thenReturn(mockDuckAiFullScreenMode)
+        whenever(mockSetFavouriteToggle.isEnabled()).thenReturn(true)
+        setFavouriteEnabledFlow.value = true
+        val favouriteUrl = "https://example.com/favourite-logo.png"
+        favouriteLogoFlow.value = favouriteUrl
+
+        val nonDdgUrl = "https://example.com/page"
+
+        // Load non-SERP page - use loadUrl to properly set up site/url
+        loadUrl(nonDdgUrl)
+
+        // serpLogo should be null for non-SERP pages
+        assertNull(
+            "serpLogo should be null on non-SERP page",
+            omnibarViewState().serpLogo,
+        )
+
+        // Clear the favourite
+        favouriteLogoFlow.value = null
+
+        // Wait for flow to emit
+        advanceUntilIdle()
+
+        // serpLogo should still be null (no change for non-SERP pages)
+        assertNull(
+            "serpLogo should remain null when favourite is cleared on non-SERP page",
+            omnibarViewState().serpLogo,
+        )
     }
 
     private fun aCredential(): LoginCredentials = LoginCredentials(domain = null, username = null, password = null)
@@ -8017,6 +8220,10 @@ class BrowserTabViewModelTest {
     }
 
     private fun aTabEntity(id: String): TabEntity = TabEntity(tabId = id, position = 0)
+
+    private fun givenDisableTrackerAnimationOnRestartFeature(enabled: Boolean) {
+        fakeAndroidConfigBrowserFeature.disableTrackerAnimationOnRestart().setRawStoredState(State(enable = enabled))
+    }
 
     private fun loadTabWithId(tabId: String) {
         testee.loadData(tabId, initialUrl = null, skipHome = false, isExternal = false)
@@ -8707,5 +8914,56 @@ class BrowserTabViewModelTest {
             assertEquals("authUpdate", event.subscriptionName)
             cancelAndIgnoreRemainingEvents()
         }
+    }
+
+    @Test
+    fun whenLoadDataWithInitialUrlThenPreviousUrlIsSetToSkipFirstTrackerAnimation() {
+        givenDisableTrackerAnimationOnRestartFeature(true)
+        val initialUrl = "https://example.com"
+        testee.loadData(tabId = "test-tab", initialUrl = initialUrl, skipHome = false, isExternal = false)
+
+        assertEquals(initialUrl, testee.previousUrl)
+    }
+
+    @Test
+    fun whenLoadDataWithNullInitialUrlThenPreviousUrlRemainsNull() {
+        testee.loadData(tabId = "test-tab", initialUrl = null, skipHome = false, isExternal = false)
+
+        assertNull(testee.previousUrl)
+    }
+
+    @Test
+    fun whenLoadDataWithInitialUrlAndIsExternalTrueThenPreviousUrlIsNotSet() {
+        val initialUrl = "https://example.com"
+        testee.loadData(tabId = "test-tab", initialUrl = initialUrl, skipHome = false, isExternal = true)
+
+        assertNull(testee.previousUrl)
+    }
+
+    @Test
+    fun whenLoadDataWithFeatureFlagDisabledThenPreviousUrlIsNotSet() {
+        givenDisableTrackerAnimationOnRestartFeature(false)
+        val initialUrl = "https://example.com"
+        testee.loadData(tabId = "test-tab", initialUrl = initialUrl, skipHome = false, isExternal = false)
+
+        assertNull(testee.previousUrl)
+    }
+
+    @Test
+    fun whenLoadDataWithFeatureFlagEnabledAndNotExternalThenPreviousUrlIsSet() {
+        givenDisableTrackerAnimationOnRestartFeature(true)
+        val initialUrl = "https://example.com"
+        testee.loadData(tabId = "test-tab", initialUrl = initialUrl, skipHome = false, isExternal = false)
+
+        assertEquals(initialUrl, testee.previousUrl)
+    }
+
+    @Test
+    fun whenLoadDataWithFeatureFlagEnabledButIsExternalThenPreviousUrlIsNotSet() {
+        givenDisableTrackerAnimationOnRestartFeature(true)
+        val initialUrl = "https://example.com"
+        testee.loadData(tabId = "test-tab", initialUrl = initialUrl, skipHome = false, isExternal = true)
+
+        assertNull(testee.previousUrl)
     }
 }

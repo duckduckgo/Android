@@ -16,6 +16,7 @@
 
 package com.duckduckgo.duckchat.impl.helper
 
+import android.graphics.Bitmap
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.impl.ChatState
@@ -57,10 +58,12 @@ class RealDuckChatJSHelperTest {
     private val mockDuckChat: DuckChatInternal = mock()
     private val mockDataStore: DuckChatDataStore = mock()
     private val mockDuckChatPixels: DuckChatPixels = mock()
+    private val mockFaviconManager: com.duckduckgo.app.browser.favicon.FaviconManager = mock()
     private val testee = RealDuckChatJSHelper(
         duckChat = mockDuckChat,
         duckChatPixels = mockDuckChatPixels,
         dataStore = mockDataStore,
+        faviconManager = mockFaviconManager,
         appCoroutineScope = coroutineRule.testScope,
         dispatcherProvider = coroutineRule.testDispatcherProvider,
     )
@@ -294,6 +297,9 @@ class RealDuckChatJSHelperTest {
     @Test
     fun whenGetPageContextUserActionThenReturnsContextRegardlessOfAutoFlag() = runTest {
         whenever(mockDuckChat.isAutomaticContextAttachmentEnabled()).thenReturn(false)
+        val tabId = "tab-1"
+        val faviconBitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888)
+        whenever(mockFaviconManager.loadFromDisk(tabId, "https://example.com")).thenReturn(faviconBitmap)
 
         val result =
             testee.processJsCallbackMessage(
@@ -303,11 +309,18 @@ class RealDuckChatJSHelperTest {
                 data = JSONObject().apply { put("reason", "userAction") },
                 mode = Mode.CONTEXTUAL,
                 pageContext = viewModel.updatedPageContext,
+                tabId = tabId,
             )
 
         assertNotNull(result)
         val context = result!!.params.getJSONObject("pageContext")
         assertEquals("Example Title", context.getString("title"))
+        val faviconArray = context.getJSONArray("favicon")
+        val faviconObject = faviconArray.getJSONObject(0)
+        assertEquals("icon", faviconObject.getString("rel"))
+        val faviconHref = faviconObject.getString("href")
+        assertEquals(true, faviconHref.startsWith("data:image/png;base64,"))
+        verify(mockDuckChatPixels).reportContextualPageContextManuallyAttachedFrontend()
     }
 
     @Test
@@ -321,7 +334,7 @@ class RealDuckChatJSHelperTest {
                 id = "123",
                 data = JSONObject().apply { put("reason", "userAction") },
                 mode = Mode.CONTEXTUAL,
-                pageContext = null,
+                pageContext = "",
             )
 
         assertNull(result)
@@ -396,6 +409,65 @@ class RealDuckChatJSHelperTest {
             )
 
         assertNull(result)
+    }
+
+    @Test
+    fun whenTogglePageContextEnabledThenNoPixelReported() = runTest {
+        val featureName = "aiChat"
+        val method = "togglePageContextTelemetry"
+        val id = "123"
+        val data = JSONObject(mapOf("enabled" to true))
+
+        assertNull(
+            testee.processJsCallbackMessage(
+                featureName,
+                method,
+                id,
+                data,
+                pageContext = viewModel.updatedPageContext,
+            ),
+        )
+
+        verifyNoInteractions(mockDuckChatPixels)
+    }
+
+    @Test
+    fun whenTogglePageContextDisabledThenReportContextRemoved() = runTest {
+        val featureName = "aiChat"
+        val method = "togglePageContextTelemetry"
+        val id = "123"
+        val data = JSONObject(mapOf("enabled" to false))
+
+        assertNull(
+            testee.processJsCallbackMessage(
+                featureName,
+                method,
+                id,
+                data,
+                pageContext = viewModel.updatedPageContext,
+            ),
+        )
+
+        verify(mockDuckChatPixels).reportContextualPageContextRemovedFrontend()
+    }
+
+    @Test
+    fun whenTogglePageContextWithoutDataThenNoPixelReported() = runTest {
+        val featureName = "aiChat"
+        val method = "togglePageContextTelemetry"
+        val id = "123"
+
+        assertNull(
+            testee.processJsCallbackMessage(
+                featureName,
+                method,
+                id,
+                null,
+                pageContext = viewModel.updatedPageContext,
+            ),
+        )
+
+        verifyNoInteractions(mockDuckChatPixels)
     }
 
     @Test
@@ -576,7 +648,7 @@ class RealDuckChatJSHelperTest {
             method,
             id,
             data,
-            pageContext = null,
+            pageContext = "",
         )
 
         assertNull(result)

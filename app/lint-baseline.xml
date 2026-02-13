@@ -513,8 +513,8 @@
         errorLine1="import com.duckduckgo.autoconsent.impl.pixels.AutoConsentPixel"
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/androidTest/java/com/duckduckgo/app/browser/BrowserTabViewModelTest.kt"
-            line="213"
+            file="src/test/java/com/duckduckgo/app/browser/BrowserTabViewModelTest.kt"
+            line="212"
             column="1"/>
     </issue>
 
@@ -524,8 +524,8 @@
         errorLine1="import com.duckduckgo.autoconsent.impl.pixels.AutoconsentPixelManager"
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/androidTest/java/com/duckduckgo/app/browser/BrowserTabViewModelTest.kt"
-            line="214"
+            file="src/test/java/com/duckduckgo/app/browser/BrowserTabViewModelTest.kt"
+            line="213"
             column="1"/>
     </issue>
 
@@ -535,8 +535,8 @@
         errorLine1="import com.duckduckgo.autofill.impl.AutofillFireproofDialogSuppressor"
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/androidTest/java/com/duckduckgo/app/browser/BrowserTabViewModelTest.kt"
-            line="219"
+            file="src/test/java/com/duckduckgo/app/browser/BrowserTabViewModelTest.kt"
+            line="218"
             column="1"/>
     </issue>
 
@@ -546,8 +546,8 @@
         errorLine1="import com.duckduckgo.duckchat.impl.contextual.PageContextJSHelper"
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/androidTest/java/com/duckduckgo/app/browser/BrowserTabViewModelTest.kt"
-            line="248"
+            file="src/test/java/com/duckduckgo/app/browser/BrowserTabViewModelTest.kt"
+            line="247"
             column="1"/>
     </issue>
 
@@ -557,8 +557,8 @@
         errorLine1="import com.duckduckgo.duckchat.impl.contextual.RealPageContextJSHelper.Companion.PAGE_CONTEXT_FEATURE_NAME"
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/androidTest/java/com/duckduckgo/app/browser/BrowserTabViewModelTest.kt"
-            line="249"
+            file="src/test/java/com/duckduckgo/app/browser/BrowserTabViewModelTest.kt"
+            line="248"
             column="1"/>
     </issue>
 
@@ -568,8 +568,8 @@
         errorLine1="import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper"
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/androidTest/java/com/duckduckgo/app/browser/BrowserTabViewModelTest.kt"
-            line="250"
+            file="src/test/java/com/duckduckgo/app/browser/BrowserTabViewModelTest.kt"
+            line="249"
             column="1"/>
     </issue>
 
@@ -579,8 +579,8 @@
         errorLine1="import com.duckduckgo.duckchat.impl.helper.NativeAction"
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/androidTest/java/com/duckduckgo/app/browser/BrowserTabViewModelTest.kt"
-            line="251"
+            file="src/test/java/com/duckduckgo/app/browser/BrowserTabViewModelTest.kt"
+            line="250"
             column="1"/>
     </issue>
 
@@ -590,8 +590,8 @@
         errorLine1="import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper.Companion.DUCK_CHAT_FEATURE_NAME"
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/androidTest/java/com/duckduckgo/app/browser/BrowserTabViewModelTest.kt"
-            line="252"
+            file="src/test/java/com/duckduckgo/app/browser/BrowserTabViewModelTest.kt"
+            line="251"
             column="1"/>
     </issue>
 
@@ -601,8 +601,8 @@
         errorLine1="import com.duckduckgo.duckchat.impl.messaging.sync.SyncStatusChangedObserver"
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/androidTest/java/com/duckduckgo/app/browser/BrowserTabViewModelTest.kt"
-            line="253"
+            file="src/test/java/com/duckduckgo/app/browser/BrowserTabViewModelTest.kt"
+            line="252"
             column="1"/>
     </issue>
 
@@ -612,8 +612,8 @@
         errorLine1="import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName"
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/androidTest/java/com/duckduckgo/app/browser/BrowserTabViewModelTest.kt"
-            line="254"
+            file="src/test/java/com/duckduckgo/app/browser/BrowserTabViewModelTest.kt"
+            line="253"
             column="1"/>
     </issue>
 
@@ -623,8 +623,8 @@
         errorLine1="import com.duckduckgo.newtabpage.impl.pixels.NewTabPixels"
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/androidTest/java/com/duckduckgo/app/browser/BrowserTabViewModelTest.kt"
-            line="276"
+            file="src/test/java/com/duckduckgo/app/browser/BrowserTabViewModelTest.kt"
+            line="275"
             column="1"/>
     </issue>
 
@@ -634,8 +634,8 @@
         errorLine1="import com.duckduckgo.savedsites.impl.SavedSitesPixelName"
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/androidTest/java/com/duckduckgo/app/browser/BrowserTabViewModelTest.kt"
-            line="291"
+            file="src/test/java/com/duckduckgo/app/browser/BrowserTabViewModelTest.kt"
+            line="290"
             column="1"/>
     </issue>
 
@@ -3396,50 +3396,6 @@
             file="src/main/java/com/duckduckgo/app/browser/BrowserTabFragment.kt"
             line="4506"
             column="64"/>
-    </issue>
-
-    <issue
-        id="DenyListedApi"
-        message="No one remembers what these constants map to. Use the API level integer value directly since it&apos;s self-defining."
-        errorLine1="    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)"
-        errorLine2="                                 ~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/androidTest/java/com/duckduckgo/app/browser/BrowserWebViewClientTest.kt"
-            line="387"
-            column="34"/>
-    </issue>
-
-    <issue
-        id="DenyListedApi"
-        message="No one remembers what these constants map to. Use the API level integer value directly since it&apos;s self-defining."
-        errorLine1="    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)"
-        errorLine2="                                 ~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/androidTest/java/com/duckduckgo/app/browser/BrowserWebViewClientTest.kt"
-            line="396"
-            column="34"/>
-    </issue>
-
-    <issue
-        id="DenyListedApi"
-        message="No one remembers what these constants map to. Use the API level integer value directly since it&apos;s self-defining."
-        errorLine1="    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)"
-        errorLine2="                                 ~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/androidTest/java/com/duckduckgo/app/browser/BrowserWebViewClientTest.kt"
-            line="405"
-            column="34"/>
-    </issue>
-
-    <issue
-        id="DenyListedApi"
-        message="No one remembers what these constants map to. Use the API level integer value directly since it&apos;s self-defining."
-        errorLine1="    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.Q)"
-        errorLine2="                                 ~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/androidTest/java/com/duckduckgo/app/browser/BrowserWebViewClientTest.kt"
-            line="1208"
-            column="34"/>
     </issue>
 
     <issue

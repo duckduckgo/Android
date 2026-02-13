@@ -33,6 +33,7 @@ import com.duckduckgo.app.fire.fireproofwebsite.ui.FireproofWebsitesActivity
 import com.duckduckgo.app.firebutton.FireButtonViewModel.AutomaticallyClearData
 import com.duckduckgo.app.firebutton.FireButtonViewModel.Command
 import com.duckduckgo.app.global.view.FireDialogProvider
+import com.duckduckgo.app.global.view.FireDialogProvider.FireDialogOrigin.SETTINGS
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.FireAnimationActivity
 import com.duckduckgo.app.settings.clear.ClearWhatOption
@@ -290,7 +291,7 @@ class FireButtonActivity : DuckDuckGoActivity() {
 
     private fun launchFireDialog() {
         lifecycleScope.launch {
-            val dialog = fireDialogProvider.createFireDialog()
+            val dialog = fireDialogProvider.createFireDialog(SETTINGS)
             dialog.show(supportFragmentManager)
         }
     }
