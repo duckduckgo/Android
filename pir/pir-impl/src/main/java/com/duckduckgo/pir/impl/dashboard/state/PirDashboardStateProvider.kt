@@ -199,11 +199,24 @@ abstract class PirDashboardStateProvider(
         optOutRequestedDateInMillis: Long,
         addedDateInMillis: Long,
     ): Long {
-        return if (optOutRequestedDateInMillis != 0L) {
-            optOutRequestedDateInMillis + ESTIMATED_REMOVAL_TIME_IN_MILLIS
+        val now = currentTimeProvider.currentTimeMillis()
+
+        val baseDate = if (optOutRequestedDateInMillis != 0L) {
+            optOutRequestedDateInMillis
         } else {
-            addedDateInMillis + ESTIMATED_REMOVAL_TIME_IN_MILLIS
+            addedDateInMillis
         }
+
+        val estimatedDate = baseDate + ESTIMATED_REMOVAL_TIME_IN_MILLIS
+
+        // If already in the future (strictly greater than today), return as-is
+        if (estimatedDate > now) {
+            return estimatedDate
+        }
+
+        val elapsedTime = now - estimatedDate
+        val periodsElapsed = elapsedTime / ESTIMATED_REMOVAL_TIME_IN_MILLIS
+        return estimatedDate + ((periodsElapsed + 1) * ESTIMATED_REMOVAL_TIME_IN_MILLIS)
     }
 
     companion object {
