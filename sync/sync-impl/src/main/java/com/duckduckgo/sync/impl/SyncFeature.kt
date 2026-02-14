@@ -71,4 +71,7 @@ interface SyncFeature {
 
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun useExpandableBarcodeConnectSyncLayout(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun storePublicKeyWhenGeneratingQRCode(): Toggle
 }
