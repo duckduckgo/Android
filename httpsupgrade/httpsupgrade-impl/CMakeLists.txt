@@ -37,8 +37,17 @@ find_library( # Sets the name of the path variable.
         # you want CMake to locate.
         log)
 
+# Normalize source/build paths in debug metadata so native outputs are reproducible
+# across different checkout locations.
+target_compile_options(
+       https-bloom-lib
+       PRIVATE
+       "-fdebug-prefix-map=${CMAKE_SOURCE_DIR}=."
+       "-fdebug-prefix-map=${CMAKE_BINARY_DIR}=.")
+
 target_link_options(
        https-bloom-lib
        PRIVATE
+       "-Wl,--build-id=none"
        "-Wl,-z,common-page-size=16384"
        "-Wl,-z,max-page-size=16384")
