@@ -1,6 +1,3 @@
----
-alwaysApply: true
----
 ## PHASE 1: ENVIRONMENT DETECTION
 
 ```
