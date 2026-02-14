@@ -21,6 +21,7 @@ import android.os.Build
 import android.os.Environment
 import androidx.core.content.edit
 import com.duckduckgo.app.browser.BuildConfig
+import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.BuildFlavor
 import com.duckduckgo.appbuildconfig.api.isInternalBuild
@@ -30,14 +31,15 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.experiments.api.VariantManager
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.Lazy
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
 import logcat.LogPriority.INFO
 import logcat.LogPriority.WARN
 import logcat.logcat
 import java.io.File
-import java.lang.IllegalStateException
-import java.util.*
+import java.util.Locale
 import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
@@ -46,10 +48,12 @@ class RealAppBuildConfig @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val sharedPreferencesProvider: SharedPreferencesProvider,
     private val context: Context,
+    private val onboardingBrandDesignUpdateToggles: Lazy<OnboardingBrandDesignUpdateToggles>,
 ) : AppBuildConfig {
     private val preferences by lazy {
         sharedPreferencesProvider.getSharedPreferences("com.duckduckgo.app.buildconfig.cache", false, false)
     }
+    private val reinstallCheckMutex = Mutex()
 
     override val isDebug: Boolean = BuildConfig.DEBUG
     override val applicationId: String = BuildConfig.APPLICATION_ID
@@ -94,14 +98,28 @@ class RealAppBuildConfig @Inject constructor(
                 return@withContext preferences.getBoolean(APP_REINSTALLED_KEY, false)
             }
 
-            val downloadDirectory = getDownloadsDirectory()
-            val ddgDirectoryExists = (downloadDirectory.list()?.asList() ?: emptyList()).contains(DDG_DOWNLOADS_DIRECTORY)
-            val appReinstallValue = if (!ddgDirectoryExists) {
-                createNewDirectory(DDG_DOWNLOADS_DIRECTORY)
-                // this is a new install
-                false
+            val appReinstallValue = if (onboardingBrandDesignUpdateToggles.get().isAppReinstallMutex().isEnabled()) {
+                reinstallCheckMutex.withLock {
+                    val downloadDirectory = getDownloadsDirectory()
+                    val ddgDirectoryExists = (downloadDirectory.list()?.asList() ?: emptyList()).contains(DDG_DOWNLOADS_DIRECTORY)
+                    if (!ddgDirectoryExists) {
+                        createNewDirectory(DDG_DOWNLOADS_DIRECTORY)
+                        // this is a new install
+                        false
+                    } else {
+                        true
+                    }
+                }
             } else {
-                true
+                val downloadDirectory = getDownloadsDirectory()
+                val ddgDirectoryExists = (downloadDirectory.list()?.asList() ?: emptyList()).contains(DDG_DOWNLOADS_DIRECTORY)
+                if (!ddgDirectoryExists) {
+                    createNewDirectory(DDG_DOWNLOADS_DIRECTORY)
+                    // this is a new install
+                    false
+                } else {
+                    true
+                }
             }
             preferences.edit(commit = true) { putBoolean(APP_REINSTALLED_KEY, appReinstallValue) }
             return@withContext appReinstallValue
