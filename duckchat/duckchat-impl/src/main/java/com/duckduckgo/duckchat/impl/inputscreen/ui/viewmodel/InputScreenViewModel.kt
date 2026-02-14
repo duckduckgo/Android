@@ -60,6 +60,7 @@ import com.duckduckgo.duckchat.impl.inputscreen.ui.state.InputScreenVisibilitySt
 import com.duckduckgo.duckchat.impl.inputscreen.ui.state.SubmitButtonIcon
 import com.duckduckgo.duckchat.impl.inputscreen.ui.state.SubmitButtonIconState
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.ChatSuggestion
+import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.reader.ChatSuggestionsReader
 import com.duckduckgo.duckchat.impl.inputscreen.ui.viewmodel.UserSelectedMode.CHAT
 import com.duckduckgo.duckchat.impl.inputscreen.ui.viewmodel.UserSelectedMode.NONE
 import com.duckduckgo.duckchat.impl.inputscreen.ui.viewmodel.UserSelectedMode.SEARCH
@@ -83,6 +84,7 @@ import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -110,6 +112,7 @@ import kotlinx.coroutines.withContext
 import logcat.LogPriority.WARN
 import logcat.asLog
 import logcat.logcat
+import kotlin.coroutines.cancellation.CancellationException
 
 enum class UserSelectedMode {
     SEARCH,
@@ -134,6 +137,7 @@ class InputScreenViewModel @AssistedInject constructor(
     private val inputScreenSessionUsageMetric: InputScreenSessionUsageMetric,
     private val inputScreenConfigResolver: InputScreenConfigResolver,
     private val omnibarRepository: OmnibarRepository,
+    private val chatSuggestionsReader: ChatSuggestionsReader,
 ) : ViewModel() {
 
     private val autoComplete: AutoComplete = autoCompleteFactory.create(
@@ -142,6 +146,7 @@ class InputScreenViewModel @AssistedInject constructor(
 
     private var hasUserSeenHistoryIAM = false
     private var isTapTransition = false
+    private var chatSuggestionsFetchJob: Job? = null
 
     private val newTabPageHasContent = MutableStateFlow(false)
     private val voiceServiceAvailable = MutableStateFlow(voiceSearchAvailability.isVoiceSearchAvailable)
@@ -300,6 +305,19 @@ class InputScreenViewModel @AssistedInject constructor(
                 it.copy(showChatLogo = !hasChatSuggestions, chatSuggestionsVisible = hasChatSuggestions)
             }
         }.launchIn(viewModelScope)
+
+        if (duckChatFeature.aiChatSuggestions().isEnabled()) {
+            @OptIn(FlowPreview::class)
+            chatInputTextState
+                .drop(1)
+                .debounce(CHAT_SUGGESTIONS_DEBOUNCE_MS)
+                .onEach { query ->
+                    if (!_visibilityState.value.searchMode) {
+                        fetchChatSuggestionsWithQuery(query)
+                    }
+                }
+                .launchIn(viewModelScope)
+        }
     }
 
     fun onActivityResume() {
@@ -501,9 +519,12 @@ class InputScreenViewModel @AssistedInject constructor(
         }
         userSelectedMode = CHAT
 
-        // Load suggestions when chat tab is selected (only if not already loaded)
-        if (duckChatFeature.aiChatSuggestions().isEnabled() && _chatSuggestions.value.isEmpty()) {
-            loadChatSuggestions()
+        // Fetch if the query hasn't changed since the last fetch. The observer
+        // on chatInputTextState will handle the case where the query changed.
+        if (duckChatFeature.aiChatSuggestions().isEnabled() &&
+            chatInputTextState.value == searchInputTextState.value
+        ) {
+            fetchChatSuggestionsWithQuery(chatInputTextState.value)
         }
     }
 
@@ -708,8 +729,36 @@ class InputScreenViewModel @AssistedInject constructor(
         inputScreenConfigResolver.mainButtonsEnabled() &&
         omnibarRepository.omnibarType != OmnibarType.SPLIT
 
-    private fun loadChatSuggestions() {
-        // TODO: implement load from frontend
+    fun onChatSuggestionSelected(chatId: String) {
+        viewModelScope.launch {
+            val url = duckChat.getDuckChatUrl("", false)
+                .toUri()
+                .buildUpon()
+                .appendQueryParameter(CHAT_ID_PARAM, chatId)
+                .build()
+                .toString()
+            command.value = Command.SubmitSearch(url)
+        }
+    }
+
+    private fun fetchChatSuggestionsWithQuery(query: String) {
+        chatSuggestionsFetchJob?.cancel()
+        chatSuggestionsFetchJob = viewModelScope.launch {
+            try {
+                val suggestions = chatSuggestionsReader.fetchSuggestions(query)
+                _chatSuggestions.value = suggestions
+            } catch (e: Exception) {
+                // Skip logging for CancellationException since it's expected when a new query replaces an in-flight fetch.
+                if (e !is CancellationException) {
+                    logcat(WARN) { "Failed to load chat suggestions: ${e.asLog()}" }
+                }
+            }
+        }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        chatSuggestionsReader.tearDown()
     }
 
     class InputScreenViewModelProviderFactory(
@@ -727,6 +776,8 @@ class InputScreenViewModel @AssistedInject constructor(
 
     companion object {
         const val DUCK_SCHEME = "duck"
+        private const val CHAT_SUGGESTIONS_DEBOUNCE_MS = 150L
+        private const val CHAT_ID_PARAM = "chatID"
     }
 }
 
