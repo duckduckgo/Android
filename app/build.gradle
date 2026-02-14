@@ -1,4 +1,7 @@
 import com.duckduckgo.gradle.ModuleCreator
+import static com.gradle.develocity.agent.gradle.test.JUnitXmlDialect.*
+import com.android.build.gradle.internal.tasks.DeviceProviderInstrumentTestTask
+import com.gradle.develocity.agent.gradle.test.ImportJUnitXmlReports
 
 plugins {
     id 'com.android.application'
@@ -239,6 +242,8 @@ fladle {
         }
     }
 }
+
+
 
 dependencies {
 	implementation project(":duckchat-api")
@@ -575,6 +580,24 @@ dependencies {
     lintChecks project(":lint-rules")
 
     coreLibraryDesugaring Android.tools.desugarJdkLibs
+}
+
+// Develocity Android Instrumented Test Support
+afterEvaluate {
+    // Only register app-specific Fladle tasks (privacyTests)
+    tasks.matching {
+        it.name == "execFlankPrivacyTests"
+    }.names.each {
+        ImportJUnitXmlReports.register(
+                tasks,
+                tasks.named(it),
+                ANDROID_FIREBASE
+        ).configure {
+            reports.from(fileTree("fladleResults")  {
+                include "**/*.xml"
+            })
+        }
+    }
 }
 
 tasks.register('fastlaneVersionCode') {
