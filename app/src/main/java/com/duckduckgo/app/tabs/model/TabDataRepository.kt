@@ -26,6 +26,7 @@ import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.fire.store.TabVisitedSitesRepository
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.tabs.TabManagerFeatureFlags
@@ -70,7 +71,7 @@ class TabDataRepository @Inject constructor(
     private val webViewSessionStorage: WebViewSessionStorage,
     private val tabManagerFeatureFlags: TabManagerFeatureFlags,
     private val duckChatContextualDataStore: DuckChatContextualDataStore,
-
+    private val tabVisitedSitesRepository: TabVisitedSitesRepository,
 ) : TabRepository {
 
     override val liveTabs: LiveData<List<TabEntity>> = tabsDao.liveTabs().distinctUntilChanged()
@@ -411,6 +412,7 @@ class TabDataRepository @Inject constructor(
         webViewSessionStorage.deleteAllSessions()
         siteData.clear()
         duckChatContextualDataStore.clearAll()
+        tabVisitedSitesRepository.clearAll()
     }
 
     override suspend fun getSelectedTab(): TabEntity? =

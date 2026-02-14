@@ -70,6 +70,7 @@ import com.duckduckgo.browser.api.JsInjectorPlugin
 import com.duckduckgo.common.utils.AppUrl.ParamKey.QUERY
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.extensions.toTldPlusOne
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.contentscopescripts.api.contentscopeExperiments.ContentScopeExperiments
 import com.duckduckgo.cookies.api.CookieManagerProvider
@@ -571,6 +572,11 @@ class BrowserWebViewClient @Inject constructor(
                             }
                         }
                         uriLoadedManager.sendUriLoadedPixels(duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url))
+
+                        uri.host?.let { host ->
+                            val domain = host.toTldPlusOne() ?: host
+                            webViewClientListener?.onSiteVisited(domain)
+                        }
 
                         start = null
                     }

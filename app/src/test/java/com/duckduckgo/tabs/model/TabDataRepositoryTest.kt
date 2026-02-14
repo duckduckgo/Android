@@ -28,6 +28,7 @@ import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.omnibar.StandardizedLeadingIconFeatureToggle
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
+import com.duckduckgo.app.fire.store.TabVisitedSitesRepository
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.model.SiteFactoryImpl
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
@@ -105,6 +106,8 @@ class TabDataRepositoryTest {
     private val mockFaviconManager: FaviconManager = mock()
 
     private val mockDuckChatContextualDataStore: DuckChatContextualDataStore = mock()
+
+    private val mockTabVisitedSitesRepository: TabVisitedSitesRepository = mock()
 
     @After
     fun after() {
@@ -241,6 +244,7 @@ class TabDataRepositoryTest {
         verify(mockAdClickManager).clearAll()
         verify(mockWebViewSessionStorage).deleteAllSessions()
         verify(mockDuckChatContextualDataStore).clearAll()
+        verify(mockTabVisitedSitesRepository).clearAll()
         assertNotSame(siteData, testee.retrieveSiteData(addedTabId))
     }
 
@@ -747,6 +751,7 @@ class TabDataRepositoryTest {
         duckDuckGoUrlDetector: DuckDuckGoUrlDetector = mock(),
         timeProvider: CurrentTimeProvider = FakeTimeProvider(),
         contextualDataStore: DuckChatContextualDataStore = mockDuckChatContextualDataStore,
+        tabVisitedSitesRepository: TabVisitedSitesRepository = mockTabVisitedSitesRepository,
     ): TabDataRepository {
         return TabDataRepository(
             dao,
@@ -771,6 +776,7 @@ class TabDataRepositoryTest {
             mockWebViewSessionStorage,
             tabManagerFeatureFlags,
             contextualDataStore,
+            tabVisitedSitesRepository,
         )
     }
 
