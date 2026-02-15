@@ -120,6 +120,7 @@ import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
 import com.duckduckgo.app.browser.customtabs.CustomTabActivity
 import com.duckduckgo.app.browser.customtabs.CustomTabPixelNames
 import com.duckduckgo.app.browser.customtabs.CustomTabViewModel.Companion.CUSTOM_TAB_NAME_PREFIX
+import com.duckduckgo.app.browser.databinding.DialogAddHomeShortcutBinding
 import com.duckduckgo.app.browser.databinding.FragmentBrowserTabBinding
 import com.duckduckgo.app.browser.databinding.HttpAuthenticationBinding
 import com.duckduckgo.app.browser.downloader.BlobConverterInjector
@@ -1888,6 +1889,30 @@ class BrowserTabFragment :
         shortcutBuilder.requestPinShortcut(context, homeShortcut)
     }
 
+    private fun showAddHomeShortcutDialog(command: Command.ShowAddHomeShortcutDialog) {
+        val dialogBinding = DialogAddHomeShortcutBinding.inflate(layoutInflater)
+        dialogBinding.shortcutNameInput.text = command.title
+
+        CustomAlertDialogBuilder(requireActivity())
+            .setTitle(R.string.addToHomeShortcutDialogTitle)
+            .setPositiveButton(R.string.addToHomeShortcutDialogAdd)
+            .setNegativeButton(R.string.addToHomeShortcutDialogCancel)
+            .setView(dialogBinding)
+            .addEventListener(
+                object : CustomAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() {
+                        val name = dialogBinding.shortcutNameInput.text.ifBlank { command.title }
+                        viewModel.onPinPageToHomeConfirmed(name, command.url, command.icon)
+                    }
+
+                    override fun onDialogShown() {
+                        dialogBinding.shortcutNameInput.showKeyboardDelayed()
+                    }
+                },
+            )
+            .show()
+    }
+
     private fun configureObservers() {
         viewModel.autoCompleteViewState.observe(
             viewLifecycleOwner,
@@ -2493,6 +2518,10 @@ class BrowserTabFragment :
             is Command.ShowImageCamera -> launchCameraCapture(it.filePathCallback, it.fileChooserParams, MediaStore.ACTION_IMAGE_CAPTURE)
             is Command.ShowVideoCamera -> launchCameraCapture(it.filePathCallback, it.fileChooserParams, MediaStore.ACTION_VIDEO_CAPTURE)
             is Command.ShowSoundRecorder -> launchCameraCapture(it.filePathCallback, it.fileChooserParams, MediaStore.Audio.Media.RECORD_SOUND_ACTION)
+
+            is Command.ShowAddHomeShortcutDialog -> {
+                showAddHomeShortcutDialog(it)
+            }
 
             is Command.AddHomeShortcut -> {
                 context?.let { context ->
