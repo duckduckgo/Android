@@ -137,6 +137,7 @@ import com.duckduckgo.app.browser.commands.Command.SendSms
 import com.duckduckgo.app.browser.commands.Command.SetBrowserBackground
 import com.duckduckgo.app.browser.commands.Command.SetOnboardingDialogBackground
 import com.duckduckgo.app.browser.commands.Command.ShareLink
+import com.duckduckgo.app.browser.commands.Command.ShowAddHomeShortcutDialog
 import com.duckduckgo.app.browser.commands.Command.ShowAppLinkPrompt
 import com.duckduckgo.app.browser.commands.Command.ShowAutoconsentAnimation
 import com.duckduckgo.app.browser.commands.Command.ShowBackNavigationHistory
@@ -3078,17 +3079,16 @@ class BrowserTabViewModel @Inject constructor(
     @SuppressLint("CheckResult")
     fun onPinPageToHomeSelected() {
         val currentPage = url ?: return
-        val title =
-            if (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(currentPage)) {
-                duckDuckGoUrlDetector.extractQuery(currentPage) ?: currentPage
-            } else {
-                currentPage.toUri().baseHost ?: currentPage
-            }
+        val defaultTitle = title ?: currentPage.toUri().baseHost ?: currentPage
 
         viewModelScope.launch {
             val favicon: Bitmap? = faviconManager.loadFromDisk(tabId = tabId, url = currentPage)
-            command.value = AddHomeShortcut(title, currentPage, favicon)
+            command.value = ShowAddHomeShortcutDialog(defaultTitle, currentPage, favicon)
         }
+    }
+
+    fun onPinPageToHomeConfirmed(title: String, url: String, icon: Bitmap?) {
+        command.value = AddHomeShortcut(title, url, icon)
     }
 
     fun onBrowserMenuClicked(isCustomTab: Boolean) {
