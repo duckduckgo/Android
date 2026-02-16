@@ -32,10 +32,6 @@ class BrowserUiLockContentScopeJsMessageHandlerTest {
     fun `when message sent then callback called`() = runTest {
         val params = JSONObject().apply {
             put("locked", true)
-            put("signals", JSONObject().apply {
-                put("overscrollBehavior", "none")
-                put("overflow", "")
-            })
         }
 
         val message = JsMessage(
