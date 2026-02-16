@@ -47,6 +47,6 @@ class RealBrowserUiLockStore @Inject constructor(
     companion object {
         private const val PREFS_NAME = "com.duckduckgo.contentscopescripts.browseruilock.store"
         private const val KEY_JSON = "json"
-        private const val DEFAULT_JSON = "{\"state\":\"enabled\"}"
+        private const val DEFAULT_JSON = "{\"state\":\"enabled\",\"exceptions\":[]}"
     }
 }
