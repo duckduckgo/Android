@@ -41,6 +41,16 @@ allprojects {
         google()
         mavenCentral()
         maven { url 'https://jitpack.io' }
+        if (project.findProperty("useProprietaryFont")?.toBoolean()) {
+            mavenLocal()
+            maven {
+                url = uri("https://maven.pkg.github.com/ANA_PRIVATE_ORG/ANA_PRIVATE_FONTS_REPO")
+                credentials {
+                    username = project.findProperty("gpr.user") ?: System.getenv("GITHUB_ACTOR")
+                    password = project.findProperty("gpr.key") ?: System.getenv("GITHUB_TOKEN")
+                }
+            }
+        }
     }
     configurations.all {
         resolutionStrategy.force 'org.objenesis:objenesis:2.6'

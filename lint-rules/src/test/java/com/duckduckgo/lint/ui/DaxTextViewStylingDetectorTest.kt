@@ -264,7 +264,7 @@ class DaxTextViewStylingDetectorTest {
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/customDialogTitle" 
-                    android:fontFamily="@font/roboto_mono"
+                    android:fontFamily="@font/ddg_mono_font"
                     app:textType="secondary"
                     app:typography="body1" />
                       

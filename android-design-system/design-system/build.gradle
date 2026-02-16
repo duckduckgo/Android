@@ -44,7 +44,15 @@ android {
     }
 }
 
+def useProprietaryFont = project.findProperty("useProprietaryFont")?.toBoolean() ?: false
+
 dependencies {
+
+    if (useProprietaryFont) {
+        api "com.duckduckgo:ddg-proprietary-fonts:1.0.0"
+    } else {
+        api project(':fonts')
+    }
 
     implementation project(path: ':common-utils')
 

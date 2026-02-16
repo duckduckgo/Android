@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright (c) 2022 DuckDuckGo
+  ~ Copyright (c) 2026 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -15,8 +15,9 @@
   ~ limitations under the License.
   -->
 
-<resources>
-    <array name="preloaded_fonts" translatable="false">
-        <item>@font/roboto_mono</item>
-    </array>
-</resources>
+<font-family xmlns:app="http://schemas.android.com/apk/res-auto"
+        app:fontProviderAuthority="com.google.android.gms.fonts"
+        app:fontProviderPackage="com.google.android.gms"
+        app:fontProviderQuery="name=Roboto&amp;weight=500"
+        app:fontProviderCerts="@array/com_google_android_gms_fonts_certs">
+</font-family>

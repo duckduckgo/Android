@@ -24,7 +24,7 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
-import com.duckduckgo.mobile.android.R
+import com.duckduckgo.fonts.R
 
 /**
  * Default typography for DuckDuckGo theme.
@@ -32,8 +32,14 @@ import com.duckduckgo.mobile.android.R
  * Figma: https://www.figma.com/design/jHLwh4erLbNc2YeobQpGFt/Design-System-Guidelines?node-id=1313-19967
  */
 
-private val RobotoMono = FontFamily(
-    Font(R.font.roboto_mono, FontWeight.Normal),
+private val DdgFontFamily = FontFamily(
+    Font(R.font.ddg_font, FontWeight.Normal),
+    Font(R.font.ddg_font_medium, FontWeight.Medium),
+    Font(R.font.ddg_font_bold, FontWeight.Bold),
+)
+
+private val DdgMonoFontFamily = FontFamily(
+    Font(R.font.ddg_mono_font, FontWeight.Normal),
 )
 
 @Immutable
@@ -45,6 +51,7 @@ data class DuckDuckGoTypography(
                 fontSize = 32.sp,
                 lineHeight = 36.sp,
                 fontWeight = FontWeight.Bold,
+                fontFamily = DdgFontFamily,
             ),
         ),
 
@@ -54,6 +61,7 @@ data class DuckDuckGoTypography(
                 fontSize = 24.sp,
                 lineHeight = 30.sp,
                 fontWeight = FontWeight.Bold,
+                fontFamily = DdgFontFamily,
             ),
         ),
 
@@ -64,6 +72,7 @@ data class DuckDuckGoTypography(
                 lineHeight = 24.sp,
                 letterSpacing = 0.3.sp,
                 fontWeight = FontWeight.Medium,
+                fontFamily = DdgFontFamily,
             ),
         ),
 
@@ -73,6 +82,7 @@ data class DuckDuckGoTypography(
                 fontSize = 16.sp,
                 lineHeight = 21.sp,
                 fontWeight = FontWeight.Medium,
+                fontFamily = DdgFontFamily,
             ),
         ),
 
@@ -83,6 +93,7 @@ data class DuckDuckGoTypography(
                 lineHeight = 20.sp,
                 letterSpacing = 0.3.sp,
                 fontWeight = FontWeight.Medium,
+                fontFamily = DdgFontFamily,
             ),
         ),
 
@@ -92,6 +103,7 @@ data class DuckDuckGoTypography(
                 fontSize = 13.sp,
                 lineHeight = 16.sp,
                 fontWeight = FontWeight.Medium,
+                fontFamily = DdgFontFamily,
             ),
         ),
 
@@ -99,6 +111,7 @@ data class DuckDuckGoTypography(
         TextStyle(
             fontSize = 16.sp,
             lineHeight = 20.sp,
+            fontFamily = DdgFontFamily,
         ),
     ),
 
@@ -110,7 +123,7 @@ data class DuckDuckGoTypography(
 
     val body1Mono: DuckDuckGoTextStyle = DuckDuckGoTextStyle(
         body1.textStyle.copy(
-            fontFamily = RobotoMono,
+            fontFamily = DdgMonoFontFamily,
         ),
     ),
 
@@ -119,6 +132,7 @@ data class DuckDuckGoTypography(
             fontSize = 14.sp,
             lineHeight = 18.sp,
             letterSpacing = 0.2.sp,
+            fontFamily = DdgFontFamily,
         ),
     ),
 
@@ -134,6 +148,7 @@ data class DuckDuckGoTypography(
             fontSize = 15.sp,
             lineHeight = 20.sp,
             fontWeight = FontWeight.Bold,
+            fontFamily = DdgFontFamily,
         ),
     ),
 
@@ -142,6 +157,7 @@ data class DuckDuckGoTypography(
             fontSize = 12.sp,
             lineHeight = 16.sp,
             letterSpacing = 0.2.sp,
+            fontFamily = DdgFontFamily,
         ),
     ),
 )
