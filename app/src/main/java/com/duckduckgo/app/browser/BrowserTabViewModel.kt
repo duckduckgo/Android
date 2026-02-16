@@ -563,8 +563,6 @@ class BrowserTabViewModel @Inject constructor(
      */
     data class BrowserUiLockState(
         val locked: Boolean = false,
-        val overscrollBehavior: String = "",
-        val overflow: String = "",
     )
 
     /*
@@ -4255,17 +4253,8 @@ class BrowserTabViewModel @Inject constructor(
     private fun handleUiLockChanged(data: JSONObject) {
         try {
             val locked = data.optBoolean("locked", false)
-            val signals = data.optJSONObject("signals")
-            val overscrollBehavior = signals?.optString("overscrollBehavior", "") ?: ""
-            val overflow = signals?.optString("overflow", "") ?: ""
-
-            _browserUiLockState.value = BrowserUiLockState(
-                locked = locked,
-                overscrollBehavior = overscrollBehavior,
-                overflow = overflow,
-            )
-
-            logcat { "BrowserUiLock: locked=$locked, overscrollBehavior=$overscrollBehavior, overflow=$overflow" }
+            _browserUiLockState.value = BrowserUiLockState(locked = locked)
+            logcat { "BrowserUiLock: locked=$locked" }
         } catch (e: Exception) {
             logcat { "BrowserUiLock: Failed to parse uiLockChanged data: ${e.message}" }
             // Fail open - reset to unlocked state
