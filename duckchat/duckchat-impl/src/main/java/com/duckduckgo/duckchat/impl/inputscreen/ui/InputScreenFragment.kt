@@ -184,8 +184,9 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         globalLayoutListener =
             ViewTreeObserver.OnGlobalLayoutListener {
                 val r = Rect()
-                binding.root.getWindowVisibleDisplayFrame(r)
-                val screenHeight = binding.root.rootView.height
+                if (!view.isAttachedToWindow) return@OnGlobalLayoutListener
+                view.getWindowVisibleDisplayFrame(r)
+                val screenHeight = view.rootView.height
                 val keypadHeight = screenHeight - r.bottom
 
                 val previouslyVisible = isKeyboardCurrentlyVisible
@@ -196,11 +197,13 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
                         logcat { "inputScreenLauncher: Keyboard shown (GlobalLayout)" }
                     } else {
                         logcat { "inputScreenLauncher: Keyboard hidden (GlobalLayout)" }
-                        inputModeWidget.clearInputFocus()
+                        if (::inputModeWidget.isInitialized) {
+                            inputModeWidget.clearInputFocus()
+                        }
                     }
                 }
             }
-        binding.root.viewTreeObserver.addOnGlobalLayoutListener(globalLayoutListener)
+        view.viewTreeObserver.addOnGlobalLayoutListener(globalLayoutListener)
 
         inputModeWidget =
             InputModeWidget(requireContext()).also {
@@ -306,7 +309,7 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         binding.newTabContainerScrollView.animate().cancel()
         binding.viewPager.unregisterOnPageChangeCallback(pageChangeCallback)
         globalLayoutListener?.let {
-            binding.root.viewTreeObserver.removeOnGlobalLayoutListener(it)
+            view?.viewTreeObserver?.removeOnGlobalLayoutListener(it)
         }
         globalLayoutListener = null
         super.onDestroyView()
