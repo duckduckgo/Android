@@ -100,21 +100,21 @@ class WideEventPageLoadManager @Inject constructor(
 
     override fun onPageStarted(tabId: String, url: String) {
         if (!shouldTrackUrl(url)) return
-        if (pageLoadWideEvent.isInProgress(tabId)) return
+        if (pageLoadWideEvent.isInProgress(tabId, url)) return
         appCoroutineScope.launch(dispatchers.io()) {
-            pageLoadWideEvent.startPageLoad(tabId)
+            pageLoadWideEvent.startPageLoad(tabId, url)
         }
     }
 
     override fun onPageVisible(tabId: String, url: String, progress: Int) {
-        if (!shouldTrackUrl(url)) return
+        if (!pageLoadWideEvent.isInProgress(tabId, url)) return
         appCoroutineScope.launch(dispatchers.io()) {
             pageLoadWideEvent.recordPageVisible(tabId, progress)
         }
     }
 
     override fun onProgressChanged(tabId: String, url: String, progress: Int) {
-        if (!shouldTrackUrl(url)) return
+        if (!pageLoadWideEvent.isInProgress(tabId, url)) return
         appCoroutineScope.launch(dispatchers.io()) {
             pageLoadWideEvent.recordExitedFixedProgress(tabId, progress)
         }
@@ -127,7 +127,7 @@ class WideEventPageLoadManager @Inject constructor(
         activeRequestsOnLoadStart: Int,
         concurrentRequestsOnFinish: Int,
     ) {
-        if (!shouldTrackUrl(url)) return
+        if (!pageLoadWideEvent.isInProgress(tabId, url)) return
         appCoroutineScope.launch(dispatchers.io()) {
             pageLoadWideEvent.finishPageLoad(
                 tabId = tabId,
@@ -148,7 +148,7 @@ class WideEventPageLoadManager @Inject constructor(
         activeRequestsOnLoadStart: Int,
         concurrentRequestsOnFinish: Int,
     ) {
-        if (!shouldTrackUrl(url)) return
+        if (!pageLoadWideEvent.isInProgress(tabId, url)) return
         appCoroutineScope.launch(dispatchers.io()) {
             pageLoadWideEvent.finishPageLoad(
                 tabId = tabId,

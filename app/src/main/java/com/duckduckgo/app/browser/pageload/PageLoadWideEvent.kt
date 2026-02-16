@@ -42,20 +42,25 @@ import kotlin.time.toJavaDuration
  */
 interface PageLoadWideEvent {
     /**
-     * Checks if there is an active page load flow for the given tab ID.
+     * Checks if there is an active page load flow for the given tab ID and URL.
+     * Returns true only if both the tab ID exists AND the URL matches the tracked URL.
+     * This prevents state leaks when URLs change (redirects, new navigations).
      *
      * @param tabId The unique identifier for the tab
-     * @return True if a page load flow is in progress for the tab, false otherwise
+     * @param url The URL being loaded
+     * @return True if a page load flow is in progress for this specific tab+URL combination
      */
-    fun isInProgress(tabId: String): Boolean
+    fun isInProgress(tabId: String, url: String): Boolean
 
     /**
      * Called when a page starts loading.
      * Creates a new Wide Event flow and records page_start step.
+     * Automatically cancels any existing flow with a different URL.
      *
      * @param tabId The unique identifier for the tab loading the page
+     * @param url The URL being loaded
      */
-    suspend fun startPageLoad(tabId: String)
+    suspend fun startPageLoad(tabId: String, url: String)
 
     /**
      * Called when page becomes visible.
@@ -107,12 +112,22 @@ class RealPageLoadWideEvent @Inject constructor(
     private val androidBrowserConfigFeature: Lazy<AndroidBrowserConfigFeature>,
     private val dispatchers: DispatcherProvider,
 ) : PageLoadWideEvent {
-    private val activeFlows = ConcurrentHashMap<String, Long>()
+    private val activeFlows = ConcurrentHashMap<String, PageLoadState>()
 
-    override fun isInProgress(tabId: String): Boolean = activeFlows.containsKey(tabId)
+    override fun isInProgress(tabId: String, url: String): Boolean {
+        val state = activeFlows[tabId]
+        return state != null && state.url == url
+    }
 
-    override suspend fun startPageLoad(tabId: String) {
+    override suspend fun startPageLoad(tabId: String, url: String) {
         if (!isFeatureEnabled()) return
+
+        val existingState = activeFlows[tabId]
+        if (existingState != null && existingState.url != url) {
+            logcat { "Cancelling previous flow for tabId=$tabId (${existingState.url} → $url)" }
+            activeFlows.remove(tabId)
+            wideEventClient.flowAbort(existingState.flowId)
+        }
 
         val result = wideEventClient.flowStart(
             name = PAGE_LOAD_FEATURE_NAME,
@@ -120,8 +135,8 @@ class RealPageLoadWideEvent @Inject constructor(
         )
 
         result.onSuccess { flowId ->
-            activeFlows[tabId] = flowId
-            logcat { "Page load flow started: tabId=$tabId, flowId=$flowId" }
+            activeFlows[tabId] = PageLoadState(flowId, url)
+            logcat { "Page load flow started: tabId=$tabId, url=$url, flowId=$flowId" }
 
             wideEventClient.flowStep(
                 wideEventId = flowId,
@@ -240,20 +255,25 @@ class RealPageLoadWideEvent @Inject constructor(
     }
 
     private fun getActiveFlowId(tabId: String): Long? {
-        val flowId = activeFlows[tabId]
-        if (flowId == null) {
+        val state = activeFlows[tabId]
+        if (state == null) {
             logcat { "No active flow found for tabId=$tabId" }
         }
-        return flowId
+        return state?.flowId
     }
 
     private fun popActiveFlowId(tabId: String): Long? {
-        val flowId = activeFlows.remove(tabId)
-        if (flowId == null) {
+        val state = activeFlows.remove(tabId)
+        if (state == null) {
             logcat { "No active flow found to pop for tabId=$tabId" }
         }
-        return flowId
+        return state?.flowId
     }
+
+    private data class PageLoadState(
+        val flowId: Long,
+        val url: String,
+    )
 
     private companion object {
         const val PAGE_LOAD_FEATURE_NAME = "page-load"

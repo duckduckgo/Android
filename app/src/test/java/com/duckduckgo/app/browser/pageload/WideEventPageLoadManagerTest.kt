@@ -23,7 +23,9 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.robolectric.annotation.Config
@@ -52,26 +54,26 @@ class WideEventPageLoadManagerTest {
     fun whenOnPageStartedCalled_andNotInProgressThenCallsStartPageLoad() = runTest {
         val tabId = "tab-123"
         val url = "https://reddit.com"
-        whenever(pageLoadWideEvent.isInProgress(tabId)).thenReturn(false)
+        whenever(pageLoadWideEvent.isInProgress(tabId, url)).thenReturn(false)
 
         manager.onPageStarted(tabId, url)
 
         coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
-        verify(pageLoadWideEvent).isInProgress(tabId)
-        verify(pageLoadWideEvent).startPageLoad(tabId)
+        verify(pageLoadWideEvent).isInProgress(tabId, url)
+        verify(pageLoadWideEvent).startPageLoad(tabId, url)
     }
 
     @Test
     fun whenOnPageStartedCalled_andAlreadyInProgressThenDoesNotCallStartPageLoad() = runTest {
         val tabId = "tab-123"
         val url = "https://reddit.com"
-        whenever(pageLoadWideEvent.isInProgress(tabId)).thenReturn(true)
+        whenever(pageLoadWideEvent.isInProgress(tabId, url)).thenReturn(true)
 
         manager.onPageStarted(tabId, url)
 
         coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
-        verify(pageLoadWideEvent).isInProgress(tabId)
-        verify(pageLoadWideEvent, org.mockito.kotlin.never()).startPageLoad(org.mockito.kotlin.any())
+        verify(pageLoadWideEvent).isInProgress(tabId, url)
+        verify(pageLoadWideEvent, never()).startPageLoad(any(), any())
     }
 
     @Test
@@ -79,6 +81,7 @@ class WideEventPageLoadManagerTest {
         val tabId = "tab-123"
         val url = "https://espn.com/nfl"
         val progress = 42
+        whenever(pageLoadWideEvent.isInProgress(tabId, url)).thenReturn(true)
 
         manager.onPageVisible(tabId, url, progress)
 
@@ -91,6 +94,7 @@ class WideEventPageLoadManagerTest {
         val tabId = "tab-123"
         val url = "https://en.wikipedia.org/wiki/DuckDuckGo"
         val progress = 75
+        whenever(pageLoadWideEvent.isInProgress(tabId, url)).thenReturn(true)
 
         manager.onProgressChanged(tabId, url, progress)
 
@@ -105,6 +109,7 @@ class WideEventPageLoadManagerTest {
         val isInForeground = true
         val activeRequestsOnStart = 5
         val concurrentRequestsOnFinish = 2
+        whenever(pageLoadWideEvent.isInProgress(tabId, url)).thenReturn(true)
 
         manager.onPageLoadSucceeded(
             tabId = tabId,
@@ -133,6 +138,7 @@ class WideEventPageLoadManagerTest {
         val isInForeground = false
         val activeRequestsOnStart = 3
         val concurrentRequestsOnFinish = 1
+        whenever(pageLoadWideEvent.isInProgress(tabId, url)).thenReturn(true)
 
         manager.onPageLoadFailed(
             tabId = tabId,
@@ -160,8 +166,9 @@ class WideEventPageLoadManagerTest {
         val tabId2 = "tab-2"
         val url1 = "https://ebay.com"
         val url2 = "https://weather.com"
-        whenever(pageLoadWideEvent.isInProgress(tabId1)).thenReturn(false)
-        whenever(pageLoadWideEvent.isInProgress(tabId2)).thenReturn(false)
+        // Initially not in progress for onPageStarted
+        whenever(pageLoadWideEvent.isInProgress(tabId1, url1)).thenReturn(false, true)
+        whenever(pageLoadWideEvent.isInProgress(tabId2, url2)).thenReturn(false, true)
 
         manager.onPageStarted(tabId1, url1)
         manager.onPageStarted(tabId2, url2)
@@ -169,8 +176,8 @@ class WideEventPageLoadManagerTest {
         manager.onPageVisible(tabId2, url2, 40)
 
         coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
-        verify(pageLoadWideEvent).startPageLoad(tabId1)
-        verify(pageLoadWideEvent).startPageLoad(tabId2)
+        verify(pageLoadWideEvent).startPageLoad(tabId1, url1)
+        verify(pageLoadWideEvent).startPageLoad(tabId2, url2)
         verify(pageLoadWideEvent).recordPageVisible(tabId1, 30)
         verify(pageLoadWideEvent).recordPageVisible(tabId2, 40)
     }
@@ -179,7 +186,7 @@ class WideEventPageLoadManagerTest {
     fun whenCompleteFlowExecutedThenAllMethodsCalledInOrder() = runTest {
         val tabId = "tab-123"
         val url = "https://reddit.com/r/privacy"
-        whenever(pageLoadWideEvent.isInProgress(tabId)).thenReturn(false)
+        whenever(pageLoadWideEvent.isInProgress(tabId, url)).thenReturn(false, true)
 
         manager.onPageStarted(tabId, url)
         manager.onPageVisible(tabId, url, 25)
@@ -193,7 +200,7 @@ class WideEventPageLoadManagerTest {
         )
 
         coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
-        verify(pageLoadWideEvent).startPageLoad(tabId)
+        verify(pageLoadWideEvent).startPageLoad(tabId, url)
         verify(pageLoadWideEvent).recordPageVisible(tabId, 25)
         verify(pageLoadWideEvent).recordExitedFixedProgress(tabId, 60)
         verify(pageLoadWideEvent).finishPageLoad(
@@ -211,7 +218,7 @@ class WideEventPageLoadManagerTest {
         val tabId = "tab-456"
         val url = "https://espn.com"
         val errorDescription = "ERR_NAME_NOT_RESOLVED - DNS lookup failed"
-        whenever(pageLoadWideEvent.isInProgress(tabId)).thenReturn(false)
+        whenever(pageLoadWideEvent.isInProgress(tabId, url)).thenReturn(false, true)
 
         manager.onPageStarted(tabId, url)
         manager.onPageVisible(tabId, url, 15)
@@ -225,7 +232,7 @@ class WideEventPageLoadManagerTest {
         )
 
         coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
-        verify(pageLoadWideEvent).startPageLoad(tabId)
+        verify(pageLoadWideEvent).startPageLoad(tabId, url)
         verify(pageLoadWideEvent).recordPageVisible(tabId, 15)
         verify(pageLoadWideEvent).finishPageLoad(
             tabId = tabId,
@@ -252,28 +259,33 @@ class WideEventPageLoadManagerTest {
     fun whenUrlNotInPageLoadedSitesThenPageVisibleDoesNothing() = runTest {
         val tabId = "tab-123"
         val untrackedUrl = "https://google.com"
+        whenever(pageLoadWideEvent.isInProgress(tabId, untrackedUrl)).thenReturn(false)
 
         manager.onPageVisible(tabId, untrackedUrl, 50)
 
         coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
-        org.mockito.kotlin.verifyNoInteractions(pageLoadWideEvent)
+        verify(pageLoadWideEvent).isInProgress(tabId, untrackedUrl)
+        verify(pageLoadWideEvent, never()).recordPageVisible(any(), any())
     }
 
     @Test
     fun whenUrlNotInPageLoadedSitesThenProgressChangedDoesNothing() = runTest {
         val tabId = "tab-123"
         val untrackedUrl = "https://facebook.com"
+        whenever(pageLoadWideEvent.isInProgress(tabId, untrackedUrl)).thenReturn(false)
 
         manager.onProgressChanged(tabId, untrackedUrl, 75)
 
         coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
-        org.mockito.kotlin.verifyNoInteractions(pageLoadWideEvent)
+        verify(pageLoadWideEvent).isInProgress(tabId, untrackedUrl)
+        verify(pageLoadWideEvent, never()).recordExitedFixedProgress(any(), any())
     }
 
     @Test
     fun whenUrlNotInPageLoadedSitesThenPageLoadSucceededDoesNothing() = runTest {
         val tabId = "tab-123"
         val untrackedUrl = "https://amazon.com"
+        whenever(pageLoadWideEvent.isInProgress(tabId, untrackedUrl)).thenReturn(false)
 
         manager.onPageLoadSucceeded(
             tabId = tabId,
@@ -284,7 +296,8 @@ class WideEventPageLoadManagerTest {
         )
 
         coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
-        org.mockito.kotlin.verifyNoInteractions(pageLoadWideEvent)
+        verify(pageLoadWideEvent).isInProgress(tabId, untrackedUrl)
+        verify(pageLoadWideEvent, never()).finishPageLoad(any(), any(), any(), any(), any(), any())
     }
 
     @Test
@@ -292,6 +305,7 @@ class WideEventPageLoadManagerTest {
         val tabId = "tab-123"
         val untrackedUrl = "https://netflix.com"
         val errorDescription = "ERR_TIMEOUT - Request timeout"
+        whenever(pageLoadWideEvent.isInProgress(tabId, untrackedUrl)).thenReturn(false)
 
         manager.onPageLoadFailed(
             tabId = tabId,
@@ -303,18 +317,84 @@ class WideEventPageLoadManagerTest {
         )
 
         coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
-        org.mockito.kotlin.verifyNoInteractions(pageLoadWideEvent)
+        verify(pageLoadWideEvent).isInProgress(tabId, untrackedUrl)
+        verify(pageLoadWideEvent, never()).finishPageLoad(any(), any(), any(), any(), any(), any())
     }
 
     @Test
     fun whenSubdomainOfTrackedSiteThenEventsAreTracked() = runTest {
         val tabId = "tab-123"
         val subdomainUrl = "https://mobile.twitter.com/duckduckgo"
-        whenever(pageLoadWideEvent.isInProgress(tabId)).thenReturn(false)
+        whenever(pageLoadWideEvent.isInProgress(tabId, subdomainUrl)).thenReturn(false)
 
         manager.onPageStarted(tabId, subdomainUrl)
 
         coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
-        verify(pageLoadWideEvent).startPageLoad(tabId)
+        verify(pageLoadWideEvent).startPageLoad(tabId, subdomainUrl)
+    }
+
+    @Test
+    fun whenTrackedUrlRedirectsToUntrackedUrlThenFinishIsIgnored() = runTest {
+        val tabId = "tab-123"
+        val trackedUrl = "https://espn.com"
+        val untrackedRedirectUrl = "https://espn.co.uk"
+        whenever(pageLoadWideEvent.isInProgress(tabId, trackedUrl)).thenReturn(false)
+        whenever(pageLoadWideEvent.isInProgress(tabId, untrackedRedirectUrl)).thenReturn(false)
+
+        // Start with tracked URL
+        manager.onPageStarted(tabId, trackedUrl)
+        // Redirect to untracked URL - isInProgress returns false, so we just return early
+        manager.onPageLoadSucceeded(
+            tabId = tabId,
+            url = untrackedRedirectUrl,
+            isTabInForegroundOnFinish = true,
+            activeRequestsOnLoadStart = 2,
+            concurrentRequestsOnFinish = 1,
+        )
+
+        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+        verify(pageLoadWideEvent).startPageLoad(tabId, trackedUrl)
+        // isInProgress(tab, untrackedUrl) returns false, so we exit early without calling finishPageLoad
+        verify(pageLoadWideEvent, never()).finishPageLoad(
+            tabId = any(),
+            outcome = any(),
+            errorCode = any(),
+            isTabInForegroundOnFinish = any(),
+            activeRequestsOnLoadStart = any(),
+            concurrentRequestsOnFinish = any(),
+        )
+    }
+
+    @Test
+    fun whenTrackedUrlRedirectsToUntrackedUrlWithErrorThenFinishIsIgnored() = runTest {
+        val tabId = "tab-456"
+        val trackedUrl = "https://reddit.com"
+        val untrackedRedirectUrl = "https://untracked-example.com"
+        val errorDescription = "ERR_CONNECTION_REFUSED"
+        whenever(pageLoadWideEvent.isInProgress(tabId, trackedUrl)).thenReturn(false)
+        whenever(pageLoadWideEvent.isInProgress(tabId, untrackedRedirectUrl)).thenReturn(false)
+
+        // Start with tracked URL
+        manager.onPageStarted(tabId, trackedUrl)
+        // Redirect to untracked URL with error - isInProgress returns false, so we just return early
+        manager.onPageLoadFailed(
+            tabId = tabId,
+            url = untrackedRedirectUrl,
+            errorDescription = errorDescription,
+            isTabInForegroundOnFinish = true,
+            activeRequestsOnLoadStart = 3,
+            concurrentRequestsOnFinish = 0,
+        )
+
+        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+        verify(pageLoadWideEvent).startPageLoad(tabId, trackedUrl)
+        verify(pageLoadWideEvent, never()).finishPageLoad(
+            tabId = any(),
+            outcome = any(),
+            errorCode = any(),
+            isTabInForegroundOnFinish = any(),
+            activeRequestsOnLoadStart = any(),
+            concurrentRequestsOnFinish = any(),
+        )
     }
 }
