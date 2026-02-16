@@ -2,6 +2,94 @@
 <issues format="6" by="lint 8.8.2" type="baseline" client="gradle" dependencies="false" name="AGP (8.7.3)" variant="all" version="8.8.2">
 
     <issue
+        id="NoLifecycleScopeInFragment"
+        message="Use viewLifecycleOwner.lifecycleScope instead of lifecycleScope in Fragments. Fragment views can be destroyed while the fragment is still alive (backstack, ViewPager), which can cause crashes when coroutines try to update destroyed views."
+        errorLine1="            .launchIn(lifecycleScope)"
+        errorLine2="                      ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/sync/impl/ui/setup/SaveRecoveryCodeFragment.kt"
+            line="111"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="NoLifecycleScopeInFragment"
+        message="Use viewLifecycleOwner.lifecycleScope instead of lifecycleScope in Fragments. Fragment views can be destroyed while the fragment is still alive (backstack, ViewPager), which can cause crashes when coroutines try to update destroyed views."
+        errorLine1="            .launchIn(lifecycleScope)"
+        errorLine2="                      ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/sync/impl/ui/setup/SaveRecoveryCodeFragment.kt"
+            line="117"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="NoLifecycleScopeInFragment"
+        message="Use viewLifecycleOwner.lifecycleScope instead of lifecycleScope in Fragments. Fragment views can be destroyed while the fragment is still alive (backstack, ViewPager), which can cause crashes when coroutines try to update destroyed views."
+        errorLine1="            .launchIn(lifecycleScope)"
+        errorLine2="                      ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/sync/impl/ui/setup/SyncCreateAccountFragment.kt"
+            line="77"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="NoLifecycleScopeInFragment"
+        message="Use viewLifecycleOwner.lifecycleScope instead of lifecycleScope in Fragments. Fragment views can be destroyed while the fragment is still alive (backstack, ViewPager), which can cause crashes when coroutines try to update destroyed views."
+        errorLine1="            .launchIn(lifecycleScope)"
+        errorLine2="                      ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/sync/impl/ui/setup/SyncCreateAccountFragment.kt"
+            line="83"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="NoLifecycleScopeInFragment"
+        message="Use viewLifecycleOwner.lifecycleScope instead of lifecycleScope in Fragments. Fragment views can be destroyed while the fragment is still alive (backstack, ViewPager), which can cause crashes when coroutines try to update destroyed views."
+        errorLine1="            .launchIn(lifecycleScope)"
+        errorLine2="                      ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/sync/impl/ui/setup/SyncDeviceConnectedFragment.kt"
+            line="68"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="NoLifecycleScopeInFragment"
+        message="Use viewLifecycleOwner.lifecycleScope instead of lifecycleScope in Fragments. Fragment views can be destroyed while the fragment is still alive (backstack, ViewPager), which can cause crashes when coroutines try to update destroyed views."
+        errorLine1="            .launchIn(lifecycleScope)"
+        errorLine2="                      ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/sync/impl/ui/setup/SyncSetupDeepLinkFragment.kt"
+            line="97"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="NoLifecycleScopeInFragment"
+        message="Use viewLifecycleOwner.lifecycleScope instead of lifecycleScope in Fragments. Fragment views can be destroyed while the fragment is still alive (backstack, ViewPager), which can cause crashes when coroutines try to update destroyed views."
+        errorLine1="            .launchIn(lifecycleScope)"
+        errorLine2="                      ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/sync/impl/ui/setup/SyncSetupIntroFragment.kt"
+            line="83"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="NoLifecycleScopeInFragment"
+        message="Use viewLifecycleOwner.lifecycleScope instead of lifecycleScope in Fragments. Fragment views can be destroyed while the fragment is still alive (backstack, ViewPager), which can cause crashes when coroutines try to update destroyed views."
+        errorLine1="            .launchIn(lifecycleScope)"
+        errorLine2="                      ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/sync/impl/ui/setup/SyncSetupIntroFragment.kt"
+            line="89"
+            column="23"/>
+    </issue>
+
+    <issue
         id="DefaultLocale"
         message="Implicitly using the default locale is a common source of bugs: Use `String.format(Locale, ...)` instead"
         errorLine1="                onResult(Error(String.format(&quot;(%d) %s&quot;, errorCode, errString)))"

@@ -2,6 +2,28 @@
 <issues format="6" by="lint 8.8.2" type="baseline" client="gradle" dependencies="false" name="AGP (8.7.3)" variant="all" version="8.8.2">
 
     <issue
+        id="NoLifecycleScopeInFragment"
+        message="Use viewLifecycleOwner.lifecycleScope instead of lifecycleScope in Fragments. Fragment views can be destroyed while the fragment is still alive (backstack, ViewPager), which can cause crashes when coroutines try to update destroyed views."
+        errorLine1="        lifecycleScope.launch {"
+        errorLine2="        ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/subscriptions/impl/feedback/SubscriptionFeedbackCategoryFragment.kt"
+            line="86"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="NoLifecycleScopeInFragment"
+        message="Use viewLifecycleOwner.lifecycleScope instead of lifecycleScope in Fragments. Fragment views can be destroyed while the fragment is still alive (backstack, ViewPager), which can cause crashes when coroutines try to update destroyed views."
+        errorLine1="        lifecycleScope.launch {"
+        errorLine2="        ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/subscriptions/impl/feedback/SubscriptionFeedbackCategoryFragment.kt"
+            line="93"
+            column="9"/>
+    </issue>
+
+    <issue
         id="DenyListedApi"
         message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
         errorLine1="        privacyProFeature.useUnifiedFeedback().setRawStoredState(Toggle.State(enable = true))"
@@ -85,7 +107,7 @@
         errorLine2="                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/subscriptions/impl/RealSubscriptionsManagerTest.kt"
-            line="340"
+            line="344"
             column="21"/>
     </issue>
 
@@ -96,7 +118,7 @@
         errorLine2="                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/subscriptions/impl/RealSubscriptionsManagerTest.kt"
-            line="1511"
+            line="1645"
             column="21"/>
     </issue>
 
@@ -107,7 +129,7 @@
         errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/subscriptions/impl/RealSubscriptionsManagerTest.kt"
-            line="1517"
+            line="1651"
             column="20"/>
     </issue>
 
@@ -118,7 +140,7 @@
         errorLine2="                                        ~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/subscriptions/impl/ui/SubscriptionsWebViewActivity.kt"
-            line="442"
+            line="455"
             column="41"/>
     </issue>
 
