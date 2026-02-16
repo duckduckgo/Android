@@ -48,7 +48,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @InjectWith(ViewScope::class)
-class SwitchSubscriptionView @JvmOverloads constructor(
+class SwitchSubscriptionProductView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
@@ -65,8 +65,8 @@ class SwitchSubscriptionView @JvmOverloads constructor(
         AndroidSupportInjection.inject(this)
         super.onAttachedToWindow()
 
-        binding.root.setPrimaryText("Switch subscription")
-        binding.root.setSecondaryText("If you have an active subscription, you can switch plans here")
+        binding.root.setPrimaryText("Switch Subscription Plus <> Pro")
+        binding.root.setSecondaryText("If you have an active subscription, you can upgrade/downgrade subs here")
 
         // Subscribe to purchase state to ensure billing manager is connected and purchases are loaded
         val lifecycleOwner = findViewTreeLifecycleOwner()
@@ -192,7 +192,7 @@ class SwitchSubscriptionView @JvmOverloads constructor(
     }
 
     private suspend fun getAvailablePlans(): List<PlanOption> {
-        val offers = subscriptionsManager.getSubscriptionOffer()
+        val offers = subscriptionsManager.getSubscriptionOffer() // Expectation? subscription offers or all offers?
         val currentSubscription = subscriptionsManager.getSubscription()
 
         val currentPlanId = currentSubscription?.productId
@@ -200,9 +200,9 @@ class SwitchSubscriptionView @JvmOverloads constructor(
             .groupBy { it.planId }
             .filter { (planId, _) ->
                 if (currentPlanId in LIST_OF_PLUS_PLANS) {
-                    return@filter planId in LIST_OF_PLUS_PLANS
-                } else {
                     return@filter planId in LIST_OF_PRO_PLANS
+                } else {
+                    return@filter planId in LIST_OF_PLUS_PLANS
                 }
             }
             .mapValues { (_, offersForPlan) ->
@@ -339,6 +339,6 @@ class SwitchSubscriptionView @JvmOverloads constructor(
 }
 
 @ContributesMultibinding(ActivityScope::class)
-class SwitchSubscriptionViewPlugin @Inject constructor() : SubsSettingPlugin {
-    override fun getView(context: Context): View = SwitchSubscriptionView(context)
+class SwitchSubscriptionProductViewPlugin @Inject constructor() : SubsSettingPlugin {
+    override fun getView(context: Context): View = SwitchSubscriptionProductView(context)
 }

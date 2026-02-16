@@ -24,11 +24,14 @@ import com.duckduckgo.subscriptions.api.SubscriptionStatus.NOT_AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.UNKNOWN
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.WAITING
 import com.duckduckgo.subscriptions.impl.RealSubscriptionsManager.RecoverSubscriptionResult
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.ADVANCED_SUBSCRIPTION
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN_ROW
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN_US
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PRO_PLAN_US
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.NETP
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PLAN_ROW
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PLAN_US
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PRO_PLAN_US
 import com.duckduckgo.subscriptions.impl.auth2.AccessTokenClaims
 import com.duckduckgo.subscriptions.impl.auth2.AuthClient
 import com.duckduckgo.subscriptions.impl.auth2.AuthJwtValidator
@@ -59,6 +62,7 @@ import com.duckduckgo.subscriptions.impl.services.ConfirmationEntitlement
 import com.duckduckgo.subscriptions.impl.services.ConfirmationResponse
 import com.duckduckgo.subscriptions.impl.services.CreateAccountResponse
 import com.duckduckgo.subscriptions.impl.services.EntitlementResponse
+import com.duckduckgo.subscriptions.impl.services.PendingPlanResponse
 import com.duckduckgo.subscriptions.impl.services.PortalResponse
 import com.duckduckgo.subscriptions.impl.services.StoreLoginResponse
 import com.duckduckgo.subscriptions.impl.services.SubscriptionResponse
@@ -713,6 +717,55 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             assertEquals(AUTO_RENEWABLE, awaitItem())
             cancelAndConsumeRemainingEvents()
         }
+    }
+
+    @Test
+    fun whenPurchaseSuccessfulWithPendingPlanThenPendingPlanIsStored() = runTest {
+        givenUserIsSignedIn()
+        givenConfirmPurchaseSucceedsWithPendingPlan()
+        givenV2AccessTokenRefreshSucceeds()
+
+        val flowTest: MutableSharedFlow<PurchaseState> = MutableSharedFlow()
+        whenever(playBillingManager.purchaseState).thenReturn(flowTest)
+
+        val manager = RealSubscriptionsManager(
+            authService,
+            subscriptionsService,
+            authRepository,
+            playBillingManager,
+            emailManager,
+            context,
+            TestScope(),
+            coroutineRule.testDispatcherProvider,
+            pixelSender,
+            { privacyProFeature },
+            authClient,
+            authJwtValidator,
+            pkceGenerator,
+            timeProvider,
+            backgroundTokenRefresh,
+            subscriptionPurchaseWideEvent,
+            tokenRefreshWideEvent,
+            subscriptionSwitchWideEvent,
+            freeTrialConversionWideEvent,
+            subscriptionRestoreWideEvent,
+            vpnReminderNotificationScheduler,
+        )
+
+        manager.currentPurchaseState.test {
+            flowTest.emit(Purchased("validToken", "packageName"))
+            assertTrue(awaitItem() is CurrentPurchase.InProgress)
+            assertTrue(awaitItem() is CurrentPurchase.Success)
+            cancelAndConsumeRemainingEvents()
+        }
+
+        val subscription = authRepository.getSubscription()
+        assertNotNull(subscription)
+        assertEquals(1, subscription!!.pendingPlans.size)
+        assertEquals(YEARLY_PLAN_US, subscription.pendingPlans[0].productId)
+        assertEquals("Yearly", subscription.pendingPlans[0].billingPeriod)
+        assertEquals(2000000L, subscription.pendingPlans[0].effectiveAt)
+        assertEquals("scheduled", subscription.pendingPlans[0].status)
     }
 
     @Test
@@ -1469,6 +1522,87 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
     }
 
     @Test
+    fun whenGetSubscriptionOfferWithProTierFlagEnabledThenReturnProPlans() = runTest {
+        givenAllowProTierPurchase(true)
+        authRepository.setFeatures(MONTHLY_PLAN_US, setOf(NETP))
+        authRepository.setFeatures(YEARLY_PLAN_US, setOf(NETP))
+        authRepository.setFeatures(MONTHLY_PRO_PLAN_US, setOf(NETP))
+        authRepository.setFeatures(YEARLY_PRO_PLAN_US, setOf(NETP))
+        givenPlansAvailableForProducts(
+            basicPlanIds = arrayOf(MONTHLY_PLAN_US, YEARLY_PLAN_US),
+            proPlanIds = arrayOf(MONTHLY_PRO_PLAN_US, YEARLY_PRO_PLAN_US),
+        )
+
+        val subscriptionOffers = subscriptionsManager.getSubscriptionOffer()
+
+        with(subscriptionOffers) {
+            assertTrue(any { it.planId == MONTHLY_PLAN_US })
+            assertTrue(any { it.planId == YEARLY_PLAN_US })
+            assertTrue(any { it.planId == MONTHLY_PRO_PLAN_US })
+            assertTrue(any { it.planId == YEARLY_PRO_PLAN_US })
+            assertEquals("plus", find { it.planId == MONTHLY_PLAN_US }?.tier)
+            assertEquals("pro", find { it.planId == MONTHLY_PRO_PLAN_US }?.tier)
+        }
+    }
+
+    @Test
+    fun whenGetSubscriptionOfferWithProTierFlagDisabledThenDoNotReturnProPlans() = runTest {
+        givenAllowProTierPurchase(false)
+        authRepository.setFeatures(MONTHLY_PLAN_US, setOf(NETP))
+        authRepository.setFeatures(YEARLY_PLAN_US, setOf(NETP))
+        authRepository.setFeatures(MONTHLY_PRO_PLAN_US, setOf(NETP))
+        authRepository.setFeatures(YEARLY_PRO_PLAN_US, setOf(NETP))
+        givenPlansAvailableForProducts(
+            basicPlanIds = arrayOf(MONTHLY_PLAN_US, YEARLY_PLAN_US),
+            proPlanIds = arrayOf(MONTHLY_PRO_PLAN_US, YEARLY_PRO_PLAN_US),
+        )
+
+        val subscriptionOffers = subscriptionsManager.getSubscriptionOffer()
+
+        with(subscriptionOffers) {
+            assertTrue(any { it.planId == MONTHLY_PLAN_US })
+            assertTrue(any { it.planId == YEARLY_PLAN_US })
+            assertFalse(any { it.planId == MONTHLY_PRO_PLAN_US })
+            assertFalse(any { it.planId == YEARLY_PRO_PLAN_US })
+        }
+    }
+
+    @Test
+    fun whenGetSubscriptionOfferWithProTierFlagEnabledAndOnlyProPlansAvailableThenReturnOnlyProPlans() = runTest {
+        givenAllowProTierPurchase(true)
+        authRepository.setFeatures(MONTHLY_PRO_PLAN_US, setOf(NETP))
+        authRepository.setFeatures(YEARLY_PRO_PLAN_US, setOf(NETP))
+        givenPlansAvailableForProducts(
+            basicPlanIds = emptyArray(),
+            proPlanIds = arrayOf(MONTHLY_PRO_PLAN_US, YEARLY_PRO_PLAN_US),
+        )
+
+        val subscriptionOffers = subscriptionsManager.getSubscriptionOffer()
+
+        with(subscriptionOffers) {
+            assertEquals(2, size)
+            assertTrue(any { it.planId == MONTHLY_PRO_PLAN_US })
+            assertTrue(any { it.planId == YEARLY_PRO_PLAN_US })
+            assertTrue(all { it.tier == "pro" })
+        }
+    }
+
+    @Test
+    fun whenGetSubscriptionOfferWithProTierFlagDisabledAndOnlyProPlansAvailableThenReturnEmptyList() = runTest {
+        givenAllowProTierPurchase(false)
+        authRepository.setFeatures(MONTHLY_PRO_PLAN_US, setOf(NETP))
+        authRepository.setFeatures(YEARLY_PRO_PLAN_US, setOf(NETP))
+        givenPlansAvailableForProducts(
+            basicPlanIds = emptyArray(),
+            proPlanIds = arrayOf(MONTHLY_PRO_PLAN_US, YEARLY_PRO_PLAN_US),
+        )
+
+        val subscriptionOffers = subscriptionsManager.getSubscriptionOffer()
+
+        assertTrue(subscriptionOffers.isEmpty())
+    }
+
+    @Test
     fun whenCanSupportEncryptionThenReturnTrue() = runTest {
         assertTrue(subscriptionsManager.canSupportEncryption())
     }
@@ -1857,6 +1991,35 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         )
     }
 
+    private suspend fun givenConfirmPurchaseSucceedsWithPendingPlan() {
+        whenever(subscriptionsService.confirm(any())).thenReturn(
+            ConfirmationResponse(
+                email = "test@duck.com",
+                entitlements = listOf(
+                    ConfirmationEntitlement(NetP.value, NetP.value),
+                ),
+                subscription = SubscriptionResponse(
+                    productId = MONTHLY_PLAN_US,
+                    billingPeriod = "Monthly",
+                    platform = "google",
+                    status = "Auto-Renewable",
+                    startedAt = 1000000L,
+                    expiresOrRenewsAt = 1000000L,
+                    activeOffers = listOf(),
+                    pendingPlans = listOf(
+                        PendingPlanResponse(
+                            productId = YEARLY_PLAN_US,
+                            billingPeriod = "Yearly",
+                            effectiveAt = 2000000L,
+                            status = "scheduled",
+                            tier = "plus",
+                        ),
+                    ),
+                ),
+            ),
+        )
+    }
+
     private suspend fun givenV2AccessTokenRefreshSucceeds(
         newAccessToken: String = FAKE_ACCESS_TOKEN_V2,
         newRefreshToken: String = FAKE_REFRESH_TOKEN_V2,
@@ -1904,33 +2067,77 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
     }
 
     private fun givenPlansAvailable(vararg basePlanIds: String) {
-        val productDetails: ProductDetails = mock { productDetails ->
-            whenever(productDetails.productId).thenReturn(SubscriptionsConstants.BASIC_SUBSCRIPTION)
+        givenPlansAvailableForProducts(
+            basicPlanIds = basePlanIds.filter { it in SubscriptionsConstants.LIST_OF_PLUS_PLANS }.toTypedArray(),
+            proPlanIds = basePlanIds.filter { it in SubscriptionsConstants.LIST_OF_PRO_PLANS }.toTypedArray(),
+        )
+    }
 
-            val mockPricingPhase: PricingPhase = mock {
-                on { priceAmountMicros } doReturn 1000000
-                on { priceCurrencyCode } doReturn "USD"
-                on { formattedPrice } doReturn "1$"
-                on { billingPeriod } doReturn "P1M"
-            }
+    private fun givenPlansAvailableForProducts(
+        basicPlanIds: Array<out String> = emptyArray(),
+        proPlanIds: Array<out String> = emptyArray(),
+    ) {
+        val products = mutableListOf<ProductDetails>()
 
-            val pricingPhaseList: List<PricingPhase> = listOf(mockPricingPhase)
+        if (basicPlanIds.isNotEmpty()) {
+            val basicProductDetails: ProductDetails = mock { productDetails ->
+                whenever(productDetails.productId).thenReturn(SubscriptionsConstants.BASIC_SUBSCRIPTION)
 
-            val pricingPhases: PricingPhases = mock { pricingPhases ->
-                whenever(pricingPhases.pricingPhaseList).thenReturn(pricingPhaseList)
-            }
-
-            val offers = basePlanIds.map { basePlanId ->
-                mock<SubscriptionOfferDetails> { offer ->
-                    whenever(offer.basePlanId).thenReturn(basePlanId)
-                    whenever(offer.pricingPhases).thenReturn(pricingPhases)
+                val mockPricingPhase: PricingPhase = mock {
+                    on { priceAmountMicros } doReturn 1000000
+                    on { priceCurrencyCode } doReturn "USD"
+                    on { formattedPrice } doReturn "1$"
+                    on { billingPeriod } doReturn "P1M"
                 }
-            }
 
-            whenever(productDetails.subscriptionOfferDetails).thenReturn(offers)
+                val pricingPhaseList: List<PricingPhase> = listOf(mockPricingPhase)
+
+                val pricingPhases: PricingPhases = mock { pricingPhases ->
+                    whenever(pricingPhases.pricingPhaseList).thenReturn(pricingPhaseList)
+                }
+
+                val offers = basicPlanIds.map { basePlanId ->
+                    mock<SubscriptionOfferDetails> { offer ->
+                        whenever(offer.basePlanId).thenReturn(basePlanId)
+                        whenever(offer.pricingPhases).thenReturn(pricingPhases)
+                    }
+                }
+
+                whenever(productDetails.subscriptionOfferDetails).thenReturn(offers)
+            }
+            products.add(basicProductDetails)
         }
 
-        whenever(playBillingManager.products).thenReturn(listOf(productDetails))
+        if (proPlanIds.isNotEmpty()) {
+            val proProductDetails: ProductDetails = mock { productDetails ->
+                whenever(productDetails.productId).thenReturn(ADVANCED_SUBSCRIPTION)
+
+                val mockPricingPhase: PricingPhase = mock {
+                    on { priceAmountMicros } doReturn 2000000
+                    on { priceCurrencyCode } doReturn "USD"
+                    on { formattedPrice } doReturn "2$"
+                    on { billingPeriod } doReturn "P1M"
+                }
+
+                val pricingPhaseList: List<PricingPhase> = listOf(mockPricingPhase)
+
+                val pricingPhases: PricingPhases = mock { pricingPhases ->
+                    whenever(pricingPhases.pricingPhaseList).thenReturn(pricingPhaseList)
+                }
+
+                val offers = proPlanIds.map { basePlanId ->
+                    mock<SubscriptionOfferDetails> { offer ->
+                        whenever(offer.basePlanId).thenReturn(basePlanId)
+                        whenever(offer.pricingPhases).thenReturn(pricingPhases)
+                    }
+                }
+
+                whenever(productDetails.subscriptionOfferDetails).thenReturn(offers)
+            }
+            products.add(proProductDetails)
+        }
+
+        whenever(playBillingManager.products).thenReturn(products)
     }
 
     @Test
@@ -2142,6 +2349,11 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
     @SuppressLint("DenyListedApi")
     private fun givenTierMessagingEnabled(value: Boolean) {
         privacyProFeature.tierMessagingEnabled().setRawStoredState(State(remoteEnableState = value))
+    }
+
+    @SuppressLint("DenyListedApi")
+    private fun givenAllowProTierPurchase(value: Boolean) {
+        privacyProFeature.allowProTierPurchase().setRawStoredState(State(remoteEnableState = value))
     }
 
     @SuppressLint("DenyListedApi")
@@ -2376,6 +2588,87 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
     @SuppressLint("DenyListedApi")
     private fun givenBlackFridayFeatureFlagEnabled(value: Boolean) {
         privacyProFeature.blackFridayOffer2025().setRawStoredState(State(remoteEnableState = value))
+    }
+
+    @Test
+    fun whenRefreshSubscriptionDataWithPendingPlansThenStoresPendingPlans() = runTest {
+        givenUserIsSignedIn()
+        givenSubscriptionSucceedsWithPendingPlans()
+
+        subscriptionsManager.refreshSubscriptionData()
+
+        val subscription = subscriptionsManager.getSubscription()
+        assertNotNull(subscription)
+        assertEquals(1, subscription!!.pendingPlans.size)
+        assertEquals("ddg-privacy-pro-yearly-renews-us", subscription.pendingPlans[0].productId)
+        assertEquals(SubscriptionTier.PLUS, subscription.pendingPlans[0].tier)
+        assertTrue(subscription.hasPendingChange)
+    }
+
+    @Test
+    fun whenRefreshSubscriptionDataWithNoPendingPlansThenStoresEmptyList() = runTest {
+        givenUserIsSignedIn()
+        givenSubscriptionSucceedsWithNoPendingPlans()
+
+        subscriptionsManager.refreshSubscriptionData()
+
+        val subscription = subscriptionsManager.getSubscription()
+        assertNotNull(subscription)
+        assertTrue(subscription!!.pendingPlans.isEmpty())
+        assertFalse(subscription.hasPendingChange)
+    }
+
+    @Test
+    fun whenSubscriptionHasPendingPlanThenEffectiveTierReflectsPendingTier() = runTest {
+        givenUserIsSignedIn()
+        givenSubscriptionSucceedsWithPendingPlans()
+
+        subscriptionsManager.refreshSubscriptionData()
+
+        val subscription = subscriptionsManager.getSubscription()
+        assertNotNull(subscription)
+        // Current tier is based on productId
+        assertEquals(SubscriptionTier.PLUS, subscription!!.tier)
+        // Effective tier reflects the pending plan's tier
+        assertEquals(SubscriptionTier.PLUS, subscription.effectiveTier)
+    }
+
+    private suspend fun givenSubscriptionSucceedsWithPendingPlans() {
+        whenever(subscriptionsService.subscription()).thenReturn(
+            SubscriptionResponse(
+                productId = MONTHLY_PLAN_US,
+                billingPeriod = "Monthly",
+                startedAt = 1234,
+                expiresOrRenewsAt = 1234,
+                platform = "android",
+                status = "Auto-Renewable",
+                activeOffers = listOf(),
+                pendingPlans = listOf(
+                    PendingPlanResponse(
+                        productId = "ddg-privacy-pro-yearly-renews-us",
+                        billingPeriod = "yearly",
+                        effectiveAt = 1700000000000L,
+                        status = "scheduled",
+                        tier = "plus",
+                    ),
+                ),
+            ),
+        )
+    }
+
+    private suspend fun givenSubscriptionSucceedsWithNoPendingPlans() {
+        whenever(subscriptionsService.subscription()).thenReturn(
+            SubscriptionResponse(
+                productId = MONTHLY_PLAN_US,
+                billingPeriod = "Monthly",
+                startedAt = 1234,
+                expiresOrRenewsAt = 1234,
+                platform = "android",
+                status = "Auto-Renewable",
+                activeOffers = listOf(),
+                pendingPlans = emptyList(),
+            ),
+        )
     }
 
     private companion object {

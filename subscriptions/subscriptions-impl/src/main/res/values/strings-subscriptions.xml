@@ -83,7 +83,7 @@
     <string name="subscriptionSettingSectionHelpAndSupport">Help and Support</string>
     <string name="subscriptionSettingSendFeedback">Send Feedback</string>
     <string name="subscriptionSettingActivating">Activating</string>
-    <string name="subscriptionSettingSwitchUpgradeDynamic" instruction="%1$s is the savings percentage when switching from monthly to yearly (e.g. 16)">Save %1$s%% with a yearly plan</string>
+    <string name="subscriptionSettingSwitchUpgradeDynamic" instruction="%1$s is the savings percentage when switching from monthly to yearly (e.g. 16)">Save %1$s%% With a Yearly Plan</string>
     <!-- smartling.character_limit = 10 -->
     <string name="subscriptionSettingSwitchUpgradePill">Best offer</string>
     <string name="subscriptionSettingSwitchDowngrade">Switch Plan</string>
@@ -151,8 +151,8 @@
     <string name="feedbackSubCategoryItrAdvisorUnhelpful">Call to advisor unhelpful</string>
     <string name="feedbackSubCategoryItrOther">Other</string>
 
-    <string name="feedbackSubCategorySubsOtp">One time password</string>
-    <string name="feedbackSubCategorySubsOther">Other</string>
+    <string name="feedbackSubCategorySubsOtp">Issue with one-time password</string>
+    <string name="feedbackSubCategorySubsOther">Something else</string>
 
     <string name="feedbackSubmitVpnHeader">Found an issue not covered in our <annotation type="faqs_link">help center</annotation> ? We definitely want to know about it.</string>
     <string name="feedbackSubmitVpnDescriptionHint">Tell us what’s going on…</string>
