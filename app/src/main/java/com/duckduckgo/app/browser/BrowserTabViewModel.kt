@@ -3079,7 +3079,7 @@ class BrowserTabViewModel @Inject constructor(
     @SuppressLint("CheckResult")
     fun onPinPageToHomeSelected() {
         val currentPage = url ?: return
-        val defaultTitle = title ?: currentPage.toUri().baseHost ?: currentPage
+        val defaultTitle = title.takeUnless { it.isNullOrBlank() } ?: currentPage.toUri().baseHost ?: currentPage
 
         viewModelScope.launch {
             val favicon: Bitmap? = faviconManager.loadFromDisk(tabId = tabId, url = currentPage)
