@@ -594,6 +594,32 @@ class BrowserViewModelTest {
     }
 
     @Test
+    fun whenUiIsLockedTabSwipingIsDisabled() = runTest {
+        initSuspendTestee()
+
+        swipingTabsFeature.self().setRawStoredState(State(enable = true))
+        testee.onUiLockChanged(true)
+
+        testee.viewState.test {
+            val state = awaitItem()
+            assertFalse(state.isTabSwipingEnabled)
+        }
+    }
+
+    @Test
+    fun whenUiIsNotLockedTabSwipingIsEnabled() = runTest {
+        initSuspendTestee()
+
+        swipingTabsFeature.self().setRawStoredState(State(enable = true))
+        testee.onUiLockChanged(false)
+
+        testee.viewState.test {
+            val state = awaitItem()
+            assertTrue(state.isTabSwipingEnabled)
+        }
+    }
+
+    @Test
     fun whenOnBookmarksActivityResultCalledThenOpenSavedSiteCommandTriggered() = runTest {
         swipingTabsFeature.self().setRawStoredState(State(enable = false))
         val bookmarkUrl = "https://www.example.com"

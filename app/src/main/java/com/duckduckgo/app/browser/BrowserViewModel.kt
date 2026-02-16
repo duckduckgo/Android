@@ -118,8 +118,9 @@ class BrowserViewModel @Inject constructor(
         private val isInEditMode: Boolean = false,
         private val isInFullScreenMode: Boolean = false,
         private val duckAiFullScreenMode: Boolean = false,
+        private val isUiLocked: Boolean = false,
     ) {
-        val isTabSwipingEnabled: Boolean = !isInEditMode && !isInFullScreenMode
+        val isTabSwipingEnabled: Boolean = !isInEditMode && !isInFullScreenMode && !isUiLocked
     }
 
     sealed class Command {
@@ -479,6 +480,12 @@ class BrowserViewModel @Inject constructor(
     fun onFullScreenModeChanged(isFullScreen: Boolean) {
         _viewState.update {
             it.copy(isInFullScreenMode = isFullScreen)
+        }
+    }
+
+    fun onUiLockChanged(locked: Boolean) {
+        _viewState.update {
+            it.copy(isUiLocked = locked)
         }
     }
 
