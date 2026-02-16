@@ -57,6 +57,8 @@ class FileDownloadCallbackTest {
 
     private val mockMediaScanner: MediaScanner = mock()
 
+    private val mockFailedDownloadRetryUrlStore: FailedDownloadRetryUrlStore = mock()
+
     private lateinit var callback: FileDownloadCallback
 
     @Before
@@ -68,6 +70,7 @@ class FileDownloadCallbackTest {
             dispatchers = coroutineRule.testDispatcherProvider,
             appCoroutineScope = TestScope(),
             mediaScanner = mockMediaScanner,
+            failedDownloadRetryUrlStore = mockFailedDownloadRetryUrlStore,
         )
     }
 
@@ -202,6 +205,74 @@ class FileDownloadCallbackTest {
             assertTrue(actualItem is ShowDownloadFailedMessage)
             assertEquals(R.string.downloadsDownloadGenericErrorMessage, actualItem.messageId)
         }
+    }
+
+    @Test
+    fun whenOnProgressCalledThenNotificationUpdated() = runTest {
+        val downloadId = 1L
+        val filename = "file.jpg"
+        val progress = 50
+
+        callback.onProgress(downloadId, filename, progress)
+
+        verify(mockFileDownloadNotificationManager).showDownloadInProgressNotification(downloadId, filename, progress)
+    }
+
+    @Test
+    fun whenOnErrorCalledWithUrlThenRetryUrlSavedToStore() = runTest {
+        val downloadId = 1L
+        val url = "https://example.com/file.txt"
+
+        callback.onError(url = url, downloadId = downloadId, reason = DownloadFailReason.ConnectionRefused)
+
+        verify(mockFailedDownloadRetryUrlStore).saveRetryUrl(downloadId, url)
+    }
+
+    @Test
+    fun whenOnErrorCalledWithoutUrlThenRetryUrlNotSavedToStore() = runTest {
+        callback.onError(downloadId = 1L, reason = DownloadFailReason.ConnectionRefused)
+
+        verifyNoInteractions(mockFailedDownloadRetryUrlStore)
+    }
+
+    @Test
+    fun whenOnErrorCalledWithDataUriParseExceptionThenGenericErrorMessageSent() = runTest {
+        callback.onError(url = "data:image/png;base64,abc", reason = DownloadFailReason.DataUriParseException)
+
+        verify(mockFileDownloadNotificationManager).showDownloadFailedNotification(any(), eq("data:image/png;base64,abc"))
+        callback.commands().test {
+            val actualItem = awaitItem()
+            assertTrue(actualItem is ShowDownloadFailedMessage)
+            assertEquals(R.string.downloadsDownloadGenericErrorMessage, actualItem.messageId)
+        }
+    }
+
+    @Test
+    fun whenOnErrorCalledWithoutDownloadIdThenRepositoryDeleteNotCalled() = runTest {
+        callback.onError(url = "url", reason = DownloadFailReason.Other)
+
+        verify(mockDownloadsRepository, never()).delete(any<List<Long>>())
+    }
+
+    @Test
+    fun whenOnErrorCalledWithDownloadIdAndUrlThenBothDeleteAndRetrySaveHappen() = runTest {
+        val downloadId = 1L
+        val url = "https://example.com/file.txt"
+
+        callback.onError(url = url, downloadId = downloadId, reason = DownloadFailReason.Other)
+
+        verify(mockFailedDownloadRetryUrlStore).saveRetryUrl(downloadId, url)
+        verify(mockDownloadsRepository).delete(downloadIdList = listOf(downloadId))
+    }
+
+    @Test
+    fun whenOnCancelCalledThenNotificationCancelled() = runTest {
+        val downloadId = 1L
+        whenever(mockDownloadsRepository.getDownloadItem(downloadId)).thenReturn(null)
+
+        callback.onCancel(downloadId = downloadId)
+
+        verify(mockFileDownloadNotificationManager).cancelDownloadFileNotification(downloadId)
     }
 
     private fun oneItem() =
