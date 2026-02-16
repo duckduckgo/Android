@@ -1890,6 +1890,11 @@ class BrowserTabFragment :
     }
 
     private fun showAddHomeShortcutDialog(command: Command.ShowAddHomeShortcutDialog) {
+        if (!isActiveCustomTab() && !isActiveTab) {
+            logcat(VERBOSE) { "Will not launch a dialog for an inactive tab" }
+            return
+        }
+
         val dialogBinding = DialogAddHomeShortcutBinding.inflate(layoutInflater)
         dialogBinding.shortcutNameInput.text = command.title
 
