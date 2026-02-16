@@ -47,14 +47,12 @@ interface PageLoadManager {
     fun onPageVisible(tabId: String, url: String, progress: Int)
 
     /**
-     * Called when page progress changes.
-     * Records when the progress bar escapes the fixed progress state.
+     * Called when page progress changes and escapes the fixed progress state.
      * @param tabId The unique identifier for the tab
      * @param url The URL of the page being loaded
-     * @param visualProgress The visual progress shown to the user (may be fixed)
-     * @param actualProgress The actual page load progress
+     * @param progress The page load progress
      */
-    fun onProgressChanged(tabId: String, url: String, visualProgress: Int, actualProgress: Int)
+    fun onProgressChanged(tabId: String, url: String, progress: Int)
 
     /**
      * Called when a page completes loading successfully.
@@ -115,11 +113,10 @@ class WideEventPageLoadManager @Inject constructor(
         }
     }
 
-    override fun onProgressChanged(tabId: String, url: String, visualProgress: Int, actualProgress: Int) {
+    override fun onProgressChanged(tabId: String, url: String, progress: Int) {
         if (!shouldTrackUrl(url)) return
-        if (visualProgress != actualProgress) return
         appCoroutineScope.launch(dispatchers.io()) {
-            pageLoadWideEvent.recordExitedFixedProgress(tabId, actualProgress)
+            pageLoadWideEvent.recordExitedFixedProgress(tabId, progress)
         }
     }
 

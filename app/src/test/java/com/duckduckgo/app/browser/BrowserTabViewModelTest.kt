@@ -348,6 +348,7 @@ import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
 import org.robolectric.RuntimeEnvironment
 import org.robolectric.annotation.Config
@@ -8939,5 +8940,107 @@ class BrowserTabViewModelTest {
         testee.onSiteVisited("about:blank", null)
 
         verify(mockTabVisitedSitesRepository, never()).recordVisitedSite(any(), any())
+    }
+
+    @Test
+    fun whenProgressExceedsFixedProgressFirstTimeThenManagerOnProgressChangedCalled() {
+        val testUrl = "https://example.com"
+        val mockWebHistoryItem: WebHistoryItem = mock()
+        whenever(mockWebHistoryItem.url).thenReturn(testUrl)
+        whenever(mockStack.currentItem).thenReturn(mockWebHistoryItem)
+        setBrowserShowing(true)
+        loadUrl(testUrl)
+
+        testee.progressChanged(60, WebViewNavigationState(mockStack, 60))
+
+        val tabIdCaptor = argumentCaptor<String>()
+        val urlCaptor = argumentCaptor<String>()
+        val progressCaptor = argumentCaptor<Int>()
+
+        verify(mockPageLoadWideEvent).onProgressChanged(
+            tabIdCaptor.capture(),
+            urlCaptor.capture(),
+            progressCaptor.capture(),
+        )
+
+        assertNotNull(tabIdCaptor.firstValue)
+        assertEquals(testUrl, urlCaptor.firstValue)
+        assertEquals(60, progressCaptor.firstValue)
+    }
+
+    @Test
+    fun whenProgressExceedsFixedProgressAgainThenManagerNotCalledAgain() {
+        val testUrl = "https://example.com"
+        val mockWebHistoryItem: WebHistoryItem = mock()
+        whenever(mockWebHistoryItem.url).thenReturn(testUrl)
+        whenever(mockStack.currentItem).thenReturn(mockWebHistoryItem)
+        setBrowserShowing(true)
+        loadUrl(testUrl)
+
+        // First time - should trigger call
+        testee.progressChanged(60, WebViewNavigationState(mockStack, 60))
+
+        // Reset mock to verify second call doesn't happen
+        reset(mockPageLoadWideEvent)
+
+        // Second time - should NOT trigger call
+        testee.progressChanged(75, WebViewNavigationState(mockStack, 75))
+
+        verify(mockPageLoadWideEvent, never()).onProgressChanged(any(), any(), any())
+    }
+
+    @Test
+    fun whenProgressBelowFixedProgressThenManagerNotCalled() {
+        val testUrl = "https://example.com"
+        val mockWebHistoryItem: WebHistoryItem = mock()
+        whenever(mockWebHistoryItem.url).thenReturn(testUrl)
+        whenever(mockStack.currentItem).thenReturn(mockWebHistoryItem)
+        setBrowserShowing(true)
+        loadUrl(testUrl)
+
+        // Progress below FIXED_PROGRESS (50) - should NOT call manager
+        testee.progressChanged(30, WebViewNavigationState(mockStack, 30))
+
+        verify(mockPageLoadWideEvent, never()).onProgressChanged(any(), any(), any())
+    }
+
+    @Test
+    fun whenNewPageLoadedThenProgressTrackerResetsAndCallsManagerAgain() {
+        val firstUrl = "https://example.com"
+        val secondUrl = "https://another.com"
+        val mockWebHistoryItem1: WebHistoryItem = mock()
+        val mockWebHistoryItem2: WebHistoryItem = mock()
+        whenever(mockWebHistoryItem1.url).thenReturn(firstUrl)
+        whenever(mockWebHistoryItem2.url).thenReturn(secondUrl)
+        setBrowserShowing(true)
+
+        // First page load
+        whenever(mockStack.currentItem).thenReturn(mockWebHistoryItem1)
+        loadUrl(firstUrl)
+        testee.progressChanged(60, WebViewNavigationState(mockStack, 60))
+        verify(mockPageLoadWideEvent).onProgressChanged(any(), eq(firstUrl), eq(60))
+
+        // New page load - resets hasExitedFixedProgress flag
+        whenever(mockStack.currentItem).thenReturn(mockWebHistoryItem2)
+        loadUrl(secondUrl)
+        testee.progressChanged(70, WebViewNavigationState(mockStack, 70))
+
+        // Verify second call with new URL
+        verify(mockPageLoadWideEvent).onProgressChanged(any(), eq(secondUrl), eq(70))
+    }
+
+    @Test
+    fun whenProgressReachesExactlyFixedProgressThenManagerNotCalled() {
+        val testUrl = "https://example.com"
+        val mockWebHistoryItem: WebHistoryItem = mock()
+        whenever(mockWebHistoryItem.url).thenReturn(testUrl)
+        whenever(mockStack.currentItem).thenReturn(mockWebHistoryItem)
+        setBrowserShowing(true)
+        loadUrl(testUrl)
+
+        testee.progressChanged(50, WebViewNavigationState(mockStack, 50))
+
+        // Manager is NOT called at exactly FIXED_PROGRESS (50) - only when progress > 50
+        verify(mockPageLoadWideEvent, never()).onProgressChanged(any(), any(), any())
     }
 }

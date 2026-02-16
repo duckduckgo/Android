@@ -2119,9 +2119,9 @@ class BrowserTabViewModel @Inject constructor(
 
         // Track the first time we escape from fixed progress for Wide Events
         val currentUrl = webViewNavigationState.currentUrl
-        if (!hasExitedFixedProgress && currentUrl != null) {
+        if (!hasExitedFixedProgress && currentUrl != null && newProgress > FIXED_PROGRESS) {
             hasExitedFixedProgress = true
-            pageLoadManager.onProgressChanged(tabId, currentUrl, visualProgress, newProgress)
+            pageLoadManager.onProgressChanged(tabId, currentUrl, newProgress)
         }
 
         loadingViewState.value = progress.copy(isLoading = isLoading, progress = visualProgress, url = site?.url ?: "")

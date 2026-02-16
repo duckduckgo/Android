@@ -87,33 +87,15 @@ class WideEventPageLoadManagerTest {
     }
 
     @Test
-    fun whenOnProgressChangedCalled_withMatchingProgressThenCallsRecordExitedFixedProgress() = runTest {
+    fun whenOnProgressChangedCalledThenCallsRecordExitedFixedProgress() = runTest {
         val tabId = "tab-123"
         val url = "https://en.wikipedia.org/wiki/DuckDuckGo"
-        val visualProgress = 75
-        val actualProgress = 75
+        val progress = 75
 
-        manager.onProgressChanged(tabId, url, visualProgress, actualProgress)
-
-        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
-        verify(pageLoadWideEvent).recordExitedFixedProgress(tabId, actualProgress)
-    }
-
-    @Test
-    fun whenOnProgressChangedCalled_withDifferentProgressThenDoesNotCallRecordExitedFixedProgress() = runTest {
-        val tabId = "tab-123"
-        val url = "https://bbc.com/news"
-        val visualProgress = 50 // Fixed progress
-        val actualProgress = 25 // Actual progress less than fixed
-
-        manager.onProgressChanged(tabId, url, visualProgress, actualProgress)
+        manager.onProgressChanged(tabId, url, progress)
 
         coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
-        // Should NOT call recordExitedFixedProgress since visual != actual
-        verify(pageLoadWideEvent, org.mockito.kotlin.never()).recordExitedFixedProgress(
-            org.mockito.kotlin.any(),
-            org.mockito.kotlin.any(),
-        )
+        verify(pageLoadWideEvent).recordExitedFixedProgress(tabId, progress)
     }
 
     @Test
@@ -201,7 +183,7 @@ class WideEventPageLoadManagerTest {
 
         manager.onPageStarted(tabId, url)
         manager.onPageVisible(tabId, url, 25)
-        manager.onProgressChanged(tabId, url, 60, 60)
+        manager.onProgressChanged(tabId, url, 60)
         manager.onPageLoadSucceeded(
             tabId = tabId,
             url = url,
@@ -282,7 +264,7 @@ class WideEventPageLoadManagerTest {
         val tabId = "tab-123"
         val untrackedUrl = "https://facebook.com"
 
-        manager.onProgressChanged(tabId, untrackedUrl, 75, 75)
+        manager.onProgressChanged(tabId, untrackedUrl, 75)
 
         coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
         org.mockito.kotlin.verifyNoInteractions(pageLoadWideEvent)
