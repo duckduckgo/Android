@@ -727,21 +727,20 @@ class BrowserWebViewClient @Inject constructor(
         error?.let { webResourceError ->
             val parsedError = parseErrorResponse(webResourceError)
             if (request?.isForMainFrame == true) {
-                // Trigger Wide Event failure for main frame errors
-                request.url?.toString()?.let { url ->
-                    webViewClientListener?.getCurrentTabId()?.let { tabId ->
-                        pageLoadManager.onPageLoadFailed(
-                            tabId = tabId,
-                            url = url,
-                            errorDescription = webResourceError.errorCode.asStringErrorCode(),
-                            isTabInForegroundOnFinish = webViewClientListener?.isTabInForeground() ?: true,
-                            activeRequestsOnLoadStart = parallelRequestsOnStart,
-                            concurrentRequestsOnFinish = decrementLoadCountAndGet(),
-                        )
-                    }
-                }
-
                 if (parsedError != OMITTED) {
+                    // Trigger Wide Event failure for main frame errors
+                    request.url?.toString()?.let { url ->
+                        webViewClientListener?.getCurrentTabId()?.let { tabId ->
+                            pageLoadManager.onPageLoadFailed(
+                                tabId = tabId,
+                                url = url,
+                                errorDescription = webResourceError.errorCode.asStringErrorCode(),
+                                isTabInForegroundOnFinish = webViewClientListener?.isTabInForeground() ?: true,
+                                activeRequestsOnLoadStart = parallelRequestsOnStart,
+                                concurrentRequestsOnFinish = decrementLoadCountAndGet(),
+                            )
+                        }
+                    }
                     if (this.start != null) {
                         decrementLoadCountAndGet()
                         this.start = null

@@ -935,6 +935,54 @@ class BrowserWebViewClientTest {
     }
 
     @Test
+    fun whenOnReceivedErrorWithNonOmittedErrorThenPageLoadManagerOnPageLoadFailedIsCalled() {
+        val mockWebView = getImmediatelyInvokedMockWebView()
+        val requestUrl = "https://example.com"
+        val tabId = "test-tab-456"
+        whenever(webResourceError.errorCode).thenReturn(ERROR_HOST_LOOKUP)
+        whenever(webResourceError.description).thenReturn("net::ERR_NAME_NOT_RESOLVED")
+        whenever(webResourceRequest.isForMainFrame).thenReturn(true)
+        whenever(webResourceRequest.url).thenReturn(requestUrl.toUri())
+        whenever(listener.getCurrentTabId()).thenReturn(tabId)
+        whenever(listener.isTabInForeground()).thenReturn(true)
+
+        testee.onReceivedError(mockWebView, webResourceRequest, webResourceError)
+
+        verify(mockPageLoadWideEvent).onPageLoadFailed(
+            tabId = eq(tabId),
+            url = eq(requestUrl),
+            errorDescription = any(),
+            isTabInForegroundOnFinish = eq(true),
+            activeRequestsOnLoadStart = any(),
+            concurrentRequestsOnFinish = any(),
+        )
+    }
+
+    @Test
+    fun whenOnReceivedErrorWithOmittedErrorThenPageLoadManagerOnPageLoadFailedIsNotCalled() {
+        val mockWebView = getImmediatelyInvokedMockWebView()
+        val requestUrl = "https://example.com"
+        val tabId = "test-tab-789"
+        whenever(webResourceError.errorCode).thenReturn(ERROR_UNKNOWN)
+        whenever(webResourceError.description).thenReturn("some transient error")
+        whenever(webResourceRequest.isForMainFrame).thenReturn(true)
+        whenever(webResourceRequest.url).thenReturn(requestUrl.toUri())
+        whenever(listener.getCurrentTabId()).thenReturn(tabId)
+        whenever(listener.isTabInForeground()).thenReturn(true)
+
+        testee.onReceivedError(mockWebView, webResourceRequest, webResourceError)
+
+        verify(mockPageLoadWideEvent, never()).onPageLoadFailed(
+            tabId = any(),
+            url = any(),
+            errorDescription = any(),
+            isTabInForegroundOnFinish = any(),
+            activeRequestsOnLoadStart = any(),
+            concurrentRequestsOnFinish = any(),
+        )
+    }
+
+    @Test
     fun whenRewriteRequestWithCustomQueryParamsAndNotOpenedInNewTabThenLoadRewrittenUrl() {
         val mockWebView = getImmediatelyInvokedMockWebView()
         val urlType = SpecialUrlDetector.UrlType.Web(EXAMPLE_URL)
