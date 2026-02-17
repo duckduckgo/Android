@@ -147,6 +147,7 @@ class SettingsViewModel @Inject constructor(
         val isAddWidgetInProtectionsVisible: Boolean = false,
         val widgetsInstalled: Boolean = false,
         val showWhatsNew: Boolean = false,
+        val showGetDesktopBrowser: Boolean = false,
     )
 
     sealed class Command {
@@ -233,6 +234,9 @@ class SettingsViewModel @Inject constructor(
                     },
                     showWhatsNew = withContext(dispatcherProvider.io()) {
                         settingsPageFeature.whatsNewEnabled().isEnabled() && modalSurfaceStore.getLastShownRemoteMessageId() != null
+                    },
+                    showGetDesktopBrowser = withContext(dispatcherProvider.io()) {
+                        settingsPageFeature.newDesktopBrowserSettingEnabled().isEnabled()
                     },
                 ),
             )

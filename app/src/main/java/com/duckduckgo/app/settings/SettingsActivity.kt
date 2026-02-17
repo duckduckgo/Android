@@ -329,6 +329,7 @@ class SettingsActivity : DuckDuckGoActivity() {
                     updateVoiceSearchVisibility(it.isVoiceSearchVisible)
                     updateAddWidgetInProtections(it.isAddWidgetInProtectionsVisible, it.widgetsInstalled)
                     updateWhatsNewVisibility(it.showWhatsNew)
+                    updateGetDesktopBrowserItemVisibility(it.showGetDesktopBrowser)
                     sortSettingItemsAlphabetically()
                 }
             }.launchIn(lifecycleScope)
@@ -386,6 +387,11 @@ class SettingsActivity : DuckDuckGoActivity() {
 
     private fun updateWhatsNewVisibility(isVisible: Boolean) {
         viewsOther.whatsNewSetting.isVisible = isVisible
+    }
+
+    private fun updateGetDesktopBrowserItemVisibility(isVisible: Boolean) {
+        viewsOther.getDesktopBrowserSetting.isVisible = isVisible
+        viewsOther.ddgOnOtherPlatformsSetting.isVisible = !isVisible
     }
 
     private fun watchForCompleteSetupSettingsChanges() {

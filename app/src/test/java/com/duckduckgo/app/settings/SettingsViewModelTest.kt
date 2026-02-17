@@ -369,6 +369,24 @@ class SettingsViewModelTest {
     }
 
     @Test
+    fun `when new desktop browser setting disabled then don't show new desktop browser setting `() = runTest {
+        fakeSettingsPageFeature.newDesktopBrowserSettingEnabled().setRawStoredState(State(false))
+
+        testee.start()
+
+        assertFalse(testee.viewState().first().showGetDesktopBrowser)
+    }
+
+    @Test
+    fun `when new desktop browser setting enabled then show new desktop browser setting `() = runTest {
+        fakeSettingsPageFeature.newDesktopBrowserSettingEnabled().setRawStoredState(State(true))
+
+        testee.start()
+
+        assertTrue(testee.viewState().first().showGetDesktopBrowser)
+    }
+
+    @Test
     fun `when whats new clicked and message id is null then no command is sent`() = runTest {
         whenever(modalSurfaceStoreMock.getLastShownRemoteMessageId()).thenReturn(null)
         whenever(modalSurfaceStoreMock.getLastShownRemoteMessageType()).thenReturn(MessageType.MEDIUM)
