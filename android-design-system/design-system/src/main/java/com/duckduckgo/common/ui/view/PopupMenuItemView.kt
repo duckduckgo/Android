@@ -24,6 +24,7 @@ import android.util.AttributeSet
 import android.widget.LinearLayout
 import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
+import androidx.core.content.res.ResourcesCompat
 import com.duckduckgo.common.ui.view.PopupMenuItemView.PopupMenuItemType.DESTRUCTIVE
 import com.duckduckgo.common.ui.view.PopupMenuItemView.PopupMenuItemType.PRIMARY
 import com.duckduckgo.common.ui.viewbinding.viewBinding
@@ -67,6 +68,7 @@ constructor(
             }
 
             binding.label.text = getString(R.styleable.PopupMenuItemView_primaryText) ?: ""
+            binding.label.typeface = ResourcesCompat.getFont(context, R.font.duck_sans_product_regular)
             updateContentDescription()
             recycle()
         }

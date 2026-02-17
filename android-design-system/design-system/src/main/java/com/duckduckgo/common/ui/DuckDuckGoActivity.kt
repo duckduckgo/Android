@@ -30,6 +30,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.duckduckgo.common.ui.DuckDuckGoTheme.DARK
 import com.duckduckgo.common.ui.store.ThemingDataStore
+import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.isFullScreen
 import com.duckduckgo.mobile.android.R
 import dagger.android.AndroidInjection
@@ -47,6 +48,11 @@ abstract class DuckDuckGoActivity : DaggerActivity() {
     @SuppressLint("MissingSuperCall")
     override fun onCreate(savedInstanceState: Bundle?) {
         onCreate(savedInstanceState, true)
+
+        val toolbar = findViewById<Toolbar?>(R.id.toolbar)
+        toolbar?.apply {
+
+        }
     }
 
     /**

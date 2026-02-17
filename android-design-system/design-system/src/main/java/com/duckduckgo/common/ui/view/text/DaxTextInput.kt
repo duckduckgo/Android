@@ -17,6 +17,7 @@
 package com.duckduckgo.common.ui.view.text
 
 import android.R.attr
+import android.R.attr.typeface
 import android.content.Context
 import android.content.res.TypedArray
 import android.graphics.drawable.Drawable
@@ -38,6 +39,7 @@ import android.widget.TextView.OnEditorActionListener
 import androidx.annotation.DrawableRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
+import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.doOnNextLayout
 import androidx.core.view.postDelayed
 import androidx.core.view.updateLayoutParams
@@ -141,6 +143,9 @@ class DaxTextInput @JvmOverloads constructor(
 
             val enabled = getBoolean(R.styleable.DaxTextInput_android_enabled, true)
             isEnabled = enabled
+
+            val font = ResourcesCompat.getFont(context, R.font.duck_sans_product_regular)
+            binding.internalEditText.typeface = font
 
             setFocusListener()
 

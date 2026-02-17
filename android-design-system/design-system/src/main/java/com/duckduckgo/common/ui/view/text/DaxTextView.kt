@@ -19,6 +19,7 @@ package com.duckduckgo.common.ui.view.text
 import android.content.Context
 import android.util.AttributeSet
 import androidx.core.content.ContextCompat
+import androidx.core.content.res.ResourcesCompat
 import com.duckduckgo.common.ui.view.TypedArrayUtils
 import com.duckduckgo.common.ui.view.text.DaxTextView.Typography.Body1
 import com.duckduckgo.mobile.android.R
@@ -47,6 +48,10 @@ constructor(
         }
 
         setTypography(typography)
+
+        val fontRes = Typography.getDuckSansFont(typography)
+        val font = ResourcesCompat.getFont(context, fontRes)
+        typeface = font
 
         val hasType = typedArray.hasValue(R.styleable.DaxTextView_textType)
         val hasTextColor = typedArray.hasValue(R.styleable.DaxTextView_android_textColor)
@@ -140,6 +145,25 @@ constructor(
                     Button -> R.style.Typography_DuckDuckGo_Button
                     Caption -> R.style.Typography_DuckDuckGo_Caption
                     CaptionAllCaps -> R.style.Typography_DuckDuckGo_Caption_AllCaps
+                }
+            }
+
+            fun getDuckSansFont(typography: Typography): Int {
+                return when (typography) {
+                    Title -> R.font.duck_sans_display_bold
+                    H1 -> R.font.duck_sans_display_bold
+                    H2 -> R.font.duck_sans_display_medium
+                    H3 ->  R.font.duck_sans_display_medium
+                    H4 ->  R.font.duck_sans_display_medium
+                    H5 ->  R.font.duck_sans_display_medium
+                    Body1 ->  R.font.duck_sans_product_regular
+                    Body1Bold -> R.font.duck_sans_product_bold
+                    Body1Mono -> R.font.roboto_mono
+                    Body2 -> R.font.duck_sans_product_regular
+                    Body2Bold -> R.font.duck_sans_product_bold
+                    Button -> R.font.duck_sans_product_bold
+                    Caption -> R.font.duck_sans_product_regular
+                    CaptionAllCaps -> R.font.duck_sans_product_regular
                 }
             }
         }

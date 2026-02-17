@@ -20,6 +20,7 @@ import android.content.Context
 import android.util.AttributeSet
 import android.widget.LinearLayout
 import androidx.annotation.DrawableRes
+import androidx.core.content.res.ResourcesCompat
 import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.R
@@ -55,6 +56,10 @@ constructor(
         }
 
         binding.label.setTypography(typography)
+
+        val fontRes = DaxTextView.Typography.getDuckSansFont(typography)
+        val font = ResourcesCompat.getFont(context, fontRes)
+        binding.label.typeface = font
 
         val hasType = attributes.hasValue(R.styleable.MenuItemView_textType)
         if (hasType) {

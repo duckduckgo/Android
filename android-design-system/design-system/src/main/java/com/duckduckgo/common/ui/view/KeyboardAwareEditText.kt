@@ -26,6 +26,7 @@ import android.util.AttributeSet
 import android.util.Patterns
 import android.view.KeyEvent
 import androidx.appcompat.widget.AppCompatEditText
+import androidx.core.content.res.ResourcesCompat
 import androidx.core.net.toUri
 
 /**
@@ -102,6 +103,8 @@ class KeyboardAwareEditText : AppCompatEditText {
         bottom: Int,
     ) {
         super.onLayout(changed, left, top, right, bottom)
+        val font = ResourcesCompat.getFont(context, com.duckduckgo.mobile.android.R.font.duck_sans_product_regular)
+        typeface = font
         if (isFocused) {
             showKeyboard()
         }

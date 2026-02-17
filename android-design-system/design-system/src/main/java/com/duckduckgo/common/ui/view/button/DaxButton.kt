@@ -63,6 +63,8 @@ open class DaxButton @JvmOverloads constructor(
 
         minHeight = resources.getDimensionPixelSize(Size.dimension(buttonSize))
         setPadding(sidePadding, topPadding, sidePadding, topPadding)
+
+
     }
 }
 
