@@ -164,7 +164,7 @@ class RealWebTelemetryPixelManager @Inject constructor(
 
         for ((paramName, paramConfig) in pixelConfig.parameters) {
             val value = currentParams[paramName] ?: 0
-            if (paramConfig.isCounter) {
+            if (paramConfig.type == "counter") {
                 val bucket = BucketCounter.bucketCount(value, paramConfig.buckets)
                 if (bucket != null) {
                     pixelParams[paramName] = bucket
