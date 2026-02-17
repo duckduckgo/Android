@@ -222,7 +222,7 @@ class WebTelemetryConfigParserTest {
     }
 
     @Test
-    fun `jitter defaults to 0_25 when omitted`() {
+    fun `pixel missing jitter is skipped`() {
         val json = """
             {
                 "state": "enabled",
@@ -240,6 +240,45 @@ class WebTelemetryConfigParserTest {
             }
         """.trimIndent()
         val config = WebTelemetryConfigParser.parse(json)
-        assertEquals(0.25, config.pixels[0].jitter, 0.001)
+        assertTrue(config.pixels.isEmpty())
+    }
+
+    @Test
+    fun `telemetry type missing state is skipped`() {
+        val json = """
+            {
+                "state": "enabled",
+                "settings": {
+                    "telemetryTypes": {
+                        "adwall": {
+                            "template": "counter",
+                            "targets": [{"pixel": "p", "param": "c"}]
+                        }
+                    },
+                    "pixels": {}
+                }
+            }
+        """.trimIndent()
+        val config = WebTelemetryConfigParser.parse(json)
+        assertTrue(config.telemetryTypes.isEmpty())
+    }
+
+    @Test
+    fun `telemetry type missing template is skipped`() {
+        val json = """
+            {
+                "state": "enabled",
+                "settings": {
+                    "telemetryTypes": {
+                        "adwall": {
+                            "state": "enabled"
+                        }
+                    },
+                    "pixels": {}
+                }
+            }
+        """.trimIndent()
+        val config = WebTelemetryConfigParser.parse(json)
+        assertTrue(config.telemetryTypes.isEmpty())
     }
 }
