@@ -48,7 +48,7 @@ class GetDesktopBrowserViewModel @AssistedInject constructor(
         viewModelScope.launch {
             _command.send(
                 Command.ShareDownloadLink(
-                    url = "https://duckduckgo.com/browser?origin=funnel_browser_settings_android",
+                    url = DESKTOP_BROWSER_URL,
                 ),
             )
         }
@@ -80,5 +80,9 @@ class GetDesktopBrowserViewModel @AssistedInject constructor(
     @AssistedFactory
     interface Factory {
         fun create(params: GetDesktopBrowserActivityParams): GetDesktopBrowserViewModel
+    }
+
+    companion object {
+        private const val DESKTOP_BROWSER_URL = "https://duckduckgo.com/browser?origin=funnel_browser_settings_android"
     }
 }
