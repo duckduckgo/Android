@@ -106,7 +106,7 @@ class WebTelemetryConfigParserTest {
         assertEquals(2, dailyPixel.parameters.size)
 
         val adwallParam = dailyPixel.parameters["adwall_count"]!!
-        assertTrue(adwallParam.isCounter)
+        assertEquals("counter", adwallParam.type)
         assertEquals(7, adwallParam.buckets.size)
 
         val trackerParam = dailyPixel.parameters["tracker_count"]!!
