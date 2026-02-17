@@ -232,6 +232,12 @@ class FakeSettingsDataStore :
             store["singleTabFireDialogShownCount"] = value
         }
 
+    override var getDesktopBrowserSettingDismissed: Boolean
+        get() = store["getDesktopBrowserSettingDismissed"] as Boolean? ?: false
+        set(value) {
+            store["getDesktopBrowserSettingDismissed"] = value
+        }
+
     override fun isCurrentlySelected(clearWhatOption: ClearWhatOption): Boolean {
         val currentlySelected = store["automaticallyClearWhatOption"] as ClearWhatOption?
         return currentlySelected == clearWhatOption
