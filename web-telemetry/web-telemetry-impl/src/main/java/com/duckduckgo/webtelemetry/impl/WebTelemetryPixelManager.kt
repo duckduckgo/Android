@@ -22,7 +22,6 @@ import com.duckduckgo.webtelemetry.store.WebTelemetryRepository
 import logcat.LogPriority.WARN
 import logcat.logcat
 import org.json.JSONObject
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 interface WebTelemetryPixelManager {
@@ -73,7 +72,7 @@ class RealWebTelemetryPixelManager @Inject constructor(
         for (pixelConfig in config.pixels) {
             val state = repository.getPixelState(pixelConfig.name) ?: continue
             val elapsedSeconds = (timeProvider.currentTimeMillis() - state.timestampMillis) / 1000.0
-            val thresholdSeconds = periodToSeconds(pixelConfig.period) + state.jitterSeconds
+            val thresholdSeconds = pixelConfig.trigger.period.periodSeconds + state.jitterSeconds
 
             if (elapsedSeconds >= thresholdSeconds) {
                 buildAndFirePixel(pixelConfig, state)
@@ -182,14 +181,6 @@ class RealWebTelemetryPixelManager @Inject constructor(
     }
 
     companion object {
-        fun periodToSeconds(period: String): Long {
-            return when (period) {
-                "day" -> TimeUnit.DAYS.toSeconds(1)
-                "week" -> TimeUnit.DAYS.toSeconds(7)
-                else -> TimeUnit.DAYS.toSeconds(1)
-            }
-        }
-
         fun parseParamsJson(json: String): MutableMap<String, Int> {
             return try {
                 val obj = JSONObject(json)
@@ -225,8 +216,9 @@ interface JitterProvider {
 
 class RealJitterProvider @Inject constructor() : JitterProvider {
     override fun generateJitter(config: PixelConfig): Double {
-        val jitterFraction = config.jitter
-        val periodSeconds = RealWebTelemetryPixelManager.periodToSeconds(config.period).toDouble()
+        val periodConfig = config.trigger.period
+        val periodSeconds = periodConfig.periodSeconds.toDouble()
+        val jitterFraction = periodConfig.jitterMaxPercent / 100.0
         val halfSpread = periodSeconds * jitterFraction * 0.5
         return if (halfSpread > 0) {
             -halfSpread + Math.random() * 2 * halfSpread

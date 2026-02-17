@@ -63,14 +63,32 @@ data class TelemetryTarget(
 )
 
 /**
- * A pixel definition from remote config. Owns the firing schedule, jitter, and parameter definitions.
+ * A pixel definition from remote config. Owns the firing schedule and parameter definitions.
  */
 data class PixelConfig(
     val name: String,
-    val period: String,
-    val jitter: Double,
+    val trigger: PixelTriggerConfig,
     val parameters: Map<String, PixelParameterConfig>,
 )
+
+/**
+ * Defines when a pixel fires.
+ */
+data class PixelTriggerConfig(
+    val period: PixelPeriodConfig,
+)
+
+/**
+ * Period definition with jitter.
+ * [days] is the nominal period length.
+ * [jitterMaxPercent] is the max jitter as a percentage (e.g. 25 means ±12.5%).
+ */
+data class PixelPeriodConfig(
+    val days: Int,
+    val jitterMaxPercent: Int,
+) {
+    val periodSeconds: Long get() = days.toLong() * 86400
+}
 
 /**
  * Defines a single parameter on a pixel (its type and bucketing).

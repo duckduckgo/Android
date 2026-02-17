@@ -47,8 +47,9 @@ class WebTelemetryConfigParserTest {
                 },
                 "pixels": {
                     "webTelemetry.adwall.day": {
-                        "period": "day",
-                        "jitter": 0.25,
+                        "trigger": {
+                            "period": { "days": 1, "jitterMaxPercent": 25 }
+                        },
                         "parameters": {
                             "adwall_count": {
                                 "type": "counter",
@@ -61,8 +62,9 @@ class WebTelemetryConfigParserTest {
                         }
                     },
                     "webTelemetry.adwall.week": {
-                        "period": "week",
-                        "jitter": 0.25,
+                        "trigger": {
+                            "period": { "days": 7, "jitterMaxPercent": 25 }
+                        },
                         "parameters": {
                             "adwall_count": {
                                 "type": "counter",
@@ -101,8 +103,8 @@ class WebTelemetryConfigParserTest {
         assertEquals(2, config.pixels.size)
 
         val dailyPixel = config.pixels.find { it.name == "webTelemetry.adwall.day" }!!
-        assertEquals("day", dailyPixel.period)
-        assertEquals(0.25, dailyPixel.jitter, 0.001)
+        assertEquals(1, dailyPixel.trigger.period.days)
+        assertEquals(25, dailyPixel.trigger.period.jitterMaxPercent)
         assertEquals(2, dailyPixel.parameters.size)
 
         val adwallParam = dailyPixel.parameters["adwall_count"]!!
@@ -113,7 +115,7 @@ class WebTelemetryConfigParserTest {
         assertEquals(4, trackerParam.buckets.size)
 
         val weeklyPixel = config.pixels.find { it.name == "webTelemetry.adwall.week" }!!
-        assertEquals("week", weeklyPixel.period)
+        assertEquals(7, weeklyPixel.trigger.period.days)
         assertEquals(1, weeklyPixel.parameters.size)
     }
 
@@ -180,7 +182,7 @@ class WebTelemetryConfigParserTest {
     }
 
     @Test
-    fun `pixel missing period is skipped`() {
+    fun `pixel missing trigger is skipped`() {
         val json = """
             {
                 "state": "enabled",
@@ -188,7 +190,6 @@ class WebTelemetryConfigParserTest {
                     "telemetryTypes": {},
                     "pixels": {
                         "test.pixel": {
-                            "jitter": 0.25,
                             "parameters": {
                                 "count": {"type": "counter", "buckets": ["0-1"]}
                             }
@@ -210,8 +211,9 @@ class WebTelemetryConfigParserTest {
                     "telemetryTypes": {},
                     "pixels": {
                         "test.pixel": {
-                            "period": "day",
-                            "jitter": 0.25
+                            "trigger": {
+                                "period": { "days": 1, "jitterMaxPercent": 25 }
+                            }
                         }
                     }
                 }
@@ -222,7 +224,7 @@ class WebTelemetryConfigParserTest {
     }
 
     @Test
-    fun `pixel missing jitter is skipped`() {
+    fun `pixel missing jitterMaxPercent in period is skipped`() {
         val json = """
             {
                 "state": "enabled",
@@ -230,7 +232,9 @@ class WebTelemetryConfigParserTest {
                     "telemetryTypes": {},
                     "pixels": {
                         "test.pixel": {
-                            "period": "day",
+                            "trigger": {
+                                "period": { "days": 1 }
+                            },
                             "parameters": {
                                 "count": {"type": "counter", "buckets": ["0+"]}
                             }
