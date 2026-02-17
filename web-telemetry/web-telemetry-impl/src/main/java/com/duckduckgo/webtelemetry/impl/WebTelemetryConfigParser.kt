@@ -84,9 +84,10 @@ object WebTelemetryConfigParser {
     }
 
     private fun parseTelemetryType(name: String, json: JSONObject): TelemetryTypeConfig? {
-        val state = json.optString("state", "disabled")
-        val template = json.optString("template", "")
-        if (template.isEmpty()) return null
+        if (!json.has("state")) return null
+        val state = json.getString("state")
+        if (!json.has("template")) return null
+        val template = json.getString("template")
 
         return TelemetryTypeConfig(name = name, state = state, template = template, rawConfig = json)
     }
@@ -104,10 +105,10 @@ object WebTelemetryConfigParser {
     }
 
     private fun parsePixel(name: String, json: JSONObject): PixelConfig? {
-        val period = json.optString("period", "")
-        if (period.isEmpty()) return null
-
-        val jitter = json.optDouble("jitter", 0.25)
+        if (!json.has("period")) return null
+        val period = json.getString("period")
+        if (!json.has("jitter")) return null
+        val jitter = json.getDouble("jitter")
         val paramsJson = json.optJSONObject("parameters") ?: return null
 
         val parameters = mutableMapOf<String, PixelParameterConfig>()
@@ -123,8 +124,8 @@ object WebTelemetryConfigParser {
     }
 
     private fun parsePixelParameter(json: JSONObject): PixelParameterConfig? {
-        val type = json.optString("type", "")
-        if (type.isEmpty()) return null
+        if (!json.has("type")) return null
+        val type = json.getString("type")
 
         val bucketsArray = json.optJSONArray("buckets")
         val buckets = if (bucketsArray != null) {
