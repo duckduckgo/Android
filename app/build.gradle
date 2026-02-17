@@ -429,6 +429,12 @@ dependencies {
 
     implementation project(':breakage-reporting-impl')
 
+    implementation project(':web-interference-detection-impl')
+    implementation project(':web-interference-detection-store')
+
+    implementation project(':web-detection-impl')
+    implementation project(':web-detection-store')
+
     implementation project(':dax-prompts-api')
     implementation project(':dax-prompts-impl')
 
