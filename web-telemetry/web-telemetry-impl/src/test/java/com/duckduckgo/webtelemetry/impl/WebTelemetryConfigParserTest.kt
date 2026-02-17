@@ -104,7 +104,7 @@ class WebTelemetryConfigParserTest {
 
         val dailyPixel = config.pixels.find { it.name == "webTelemetry.adwall.day" }!!
         assertEquals(1, dailyPixel.trigger.period.days)
-        assertEquals(25, dailyPixel.trigger.period.jitterMaxPercent)
+        assertEquals(25.0, dailyPixel.trigger.period.jitterMaxPercent, 0.001)
         assertEquals(2, dailyPixel.parameters.size)
 
         val adwallParam = dailyPixel.parameters["adwall_count"]!!
