@@ -398,6 +398,9 @@ dependencies {
     implementation project(':web-compat-impl')
     implementation project(':web-compat-store')
 
+    implementation project(':web-telemetry-impl')
+    implementation project(':web-telemetry-store')
+
     implementation project(':subscriptions-api')
 
     internalImplementation project(':subscriptions-impl')
