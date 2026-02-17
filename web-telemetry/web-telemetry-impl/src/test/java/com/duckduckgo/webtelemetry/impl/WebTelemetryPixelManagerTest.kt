@@ -65,8 +65,9 @@ class WebTelemetryPixelManagerTest {
                 },
                 "pixels": {
                     "webTelemetry.adwall.day": {
-                        "period": "day",
-                        "jitter": 0.0,
+                        "trigger": {
+                            "period": { "days": 1, "jitterMaxPercent": 0 }
+                        },
                         "parameters": {
                             "adwall_count": {
                                 "type": "counter",
@@ -79,8 +80,9 @@ class WebTelemetryPixelManagerTest {
                         }
                     },
                     "webTelemetry.adwall.week": {
-                        "period": "week",
-                        "jitter": 0.0,
+                        "trigger": {
+                            "period": { "days": 7, "jitterMaxPercent": 0 }
+                        },
                         "parameters": {
                             "adwall_count": {
                                 "type": "counter",

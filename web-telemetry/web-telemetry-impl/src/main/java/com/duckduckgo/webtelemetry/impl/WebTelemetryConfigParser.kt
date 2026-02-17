@@ -105,10 +105,7 @@ object WebTelemetryConfigParser {
     }
 
     private fun parsePixel(name: String, json: JSONObject): PixelConfig? {
-        if (!json.has("period")) return null
-        val period = json.getString("period")
-        if (!json.has("jitter")) return null
-        val jitter = json.getDouble("jitter")
+        val trigger = parseTrigger(json.optJSONObject("trigger") ?: return null) ?: return null
         val paramsJson = json.optJSONObject("parameters") ?: return null
 
         val parameters = mutableMapOf<String, PixelParameterConfig>()
@@ -120,7 +117,15 @@ object WebTelemetryConfigParser {
         }
         if (parameters.isEmpty()) return null
 
-        return PixelConfig(name = name, period = period, jitter = jitter, parameters = parameters)
+        return PixelConfig(name = name, trigger = trigger, parameters = parameters)
+    }
+
+    private fun parseTrigger(json: JSONObject): PixelTriggerConfig? {
+        val periodJson = json.optJSONObject("period") ?: return null
+        if (!periodJson.has("days") || !periodJson.has("jitterMaxPercent")) return null
+        val days = periodJson.getInt("days")
+        val jitterMaxPercent = periodJson.getInt("jitterMaxPercent")
+        return PixelTriggerConfig(period = PixelPeriodConfig(days = days, jitterMaxPercent = jitterMaxPercent))
     }
 
     private fun parsePixelParameter(json: JSONObject): PixelParameterConfig? {
