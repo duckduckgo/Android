@@ -174,6 +174,7 @@ class SettingsViewModel @Inject constructor(
         data object LaunchFeedback : Command()
         data object LaunchPproUnifiedFeedback : Command()
         data object LaunchOtherPlatforms : Command()
+        data object LaunchGetDesktopBrowser : Command()
         data class LaunchWhatsNew(
             val messageId: String,
             val messageType: Content.MessageType,
@@ -434,6 +435,10 @@ class SettingsViewModel @Inject constructor(
 
     fun onDdgOnOtherPlatformsClicked() {
         viewModelScope.launch { command.send(LaunchOtherPlatforms) }
+    }
+
+    fun onGetDesktopBrowserClicked() {
+        viewModelScope.launch { command.send(Command.LaunchGetDesktopBrowser) }
     }
 
     companion object {
