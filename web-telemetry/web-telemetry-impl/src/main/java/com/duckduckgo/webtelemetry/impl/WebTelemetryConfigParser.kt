@@ -88,16 +88,7 @@ object WebTelemetryConfigParser {
         val template = json.optString("template", "")
         if (template.isEmpty()) return null
 
-        val targetsArray = json.optJSONArray("targets") ?: return null
-        val targets = (0 until targetsArray.length()).mapNotNull { i ->
-            val targetJson = targetsArray.optJSONObject(i) ?: return@mapNotNull null
-            val pixel = targetJson.optString("pixel", "")
-            val param = targetJson.optString("param", "")
-            if (pixel.isNotEmpty() && param.isNotEmpty()) TelemetryTarget(pixel, param) else null
-        }
-        if (targets.isEmpty()) return null
-
-        return TelemetryTypeConfig(name = name, state = state, template = template, targets = targets)
+        return TelemetryTypeConfig(name = name, state = state, template = template, rawConfig = json)
     }
 
     private fun parsePixels(settings: JSONObject): List<PixelConfig> {

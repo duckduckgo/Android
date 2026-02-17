@@ -16,18 +16,42 @@
 
 package com.duckduckgo.webtelemetry.impl
 
+import org.json.JSONObject
+
 /**
- * A telemetry type is a stateless router. When triggered, it increments counter parameters
- * on one or more target pixels.
+ * A telemetry type is a stateless router. The [template] determines how the
+ * type's configuration is interpreted; template-specific fields live in [rawConfig].
  */
 data class TelemetryTypeConfig(
     val name: String,
     val state: String,
     val template: String,
-    val targets: List<TelemetryTarget>,
+    val rawConfig: JSONObject,
 ) {
     val isEnabled: Boolean get() = state == "enabled"
-    val isCounter: Boolean get() = template == "counter"
+}
+
+/**
+ * Counter-specific view of a telemetry type configuration.
+ * Only valid when [TelemetryTypeConfig.template] == "counter".
+ */
+data class CounterTelemetryType(
+    val name: String,
+    val targets: List<TelemetryTarget>,
+) {
+    companion object {
+        fun from(config: TelemetryTypeConfig): CounterTelemetryType? {
+            if (config.template != "counter") return null
+            val targetsArray = config.rawConfig.optJSONArray("targets") ?: return null
+            val targets = (0 until targetsArray.length()).mapNotNull { i ->
+                val targetJson = targetsArray.optJSONObject(i) ?: return@mapNotNull null
+                val pixel = targetJson.optString("pixel", "")
+                val param = targetJson.optString("param", "")
+                if (pixel.isNotEmpty() && param.isNotEmpty()) TelemetryTarget(pixel, param) else null
+            }
+            return if (targets.isNotEmpty()) CounterTelemetryType(config.name, targets) else null
+        }
+    }
 }
 
 /**
@@ -54,6 +78,4 @@ data class PixelConfig(
 data class PixelParameterConfig(
     val type: String,
     val buckets: List<String>,
-) {
-    val isCounter: Boolean get() = type == "counter"
-}
+)

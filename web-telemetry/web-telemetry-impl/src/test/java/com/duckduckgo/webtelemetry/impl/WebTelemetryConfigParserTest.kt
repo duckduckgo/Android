@@ -18,6 +18,7 @@ package com.duckduckgo.webtelemetry.impl
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -82,13 +83,16 @@ class WebTelemetryConfigParserTest {
 
         val adwall = config.telemetryTypes.find { it.name == "adwall" }!!
         assertTrue(adwall.isEnabled)
-        assertTrue(adwall.isCounter)
-        assertEquals(2, adwall.targets.size)
-        assertEquals("webTelemetry.adwall.day", adwall.targets[0].pixel)
-        assertEquals("adwall_count", adwall.targets[0].param)
+        assertEquals("counter", adwall.template)
+
+        val counter = CounterTelemetryType.from(adwall)!!
+        assertEquals(2, counter.targets.size)
+        assertEquals("webTelemetry.adwall.day", counter.targets[0].pixel)
+        assertEquals("adwall_count", counter.targets[0].param)
 
         val tracker = config.telemetryTypes.find { it.name == "trackerBlocked" }!!
-        assertEquals(1, tracker.targets.size)
+        val trackerCounter = CounterTelemetryType.from(tracker)!!
+        assertEquals(1, trackerCounter.targets.size)
     }
 
     @Test
@@ -155,7 +159,7 @@ class WebTelemetryConfigParserTest {
     }
 
     @Test
-    fun `telemetry type missing targets is skipped`() {
+    fun `telemetry type missing targets still parses but counter view returns null`() {
         val json = """
             {
                 "state": "enabled",
@@ -171,7 +175,8 @@ class WebTelemetryConfigParserTest {
             }
         """.trimIndent()
         val config = WebTelemetryConfigParser.parse(json)
-        assertTrue(config.telemetryTypes.isEmpty())
+        assertEquals(1, config.telemetryTypes.size)
+        assertNull(CounterTelemetryType.from(config.telemetryTypes[0]))
     }
 
     @Test

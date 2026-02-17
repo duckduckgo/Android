@@ -49,15 +49,19 @@ class RealWebTelemetryPixelManager @Inject constructor(
 
         val telemetryType = config.telemetryTypes.find { it.name == type && it.isEnabled } ?: return
 
-        for (target in telemetryType.targets) {
+        when (telemetryType.template) {
+            "counter" -> {
+                val counter = CounterTelemetryType.from(telemetryType) ?: return
+                handleCounterEvent(counter)
+            }
+        }
+    }
+
+    private fun handleCounterEvent(counter: CounterTelemetryType) {
+        for (target in counter.targets) {
             val pixelState = repository.getPixelState(target.pixel) ?: continue
             val params = parseParamsJson(pixelState.paramsJson)
-
-            if (telemetryType.isCounter) {
-                val currentValue = params[target.param] ?: 0
-                params[target.param] = currentValue + 1
-            }
-
+            params[target.param] = (params[target.param] ?: 0) + 1
             repository.savePixelState(pixelState.copy(paramsJson = serializeParams(params)))
         }
     }
@@ -126,7 +130,15 @@ class RealWebTelemetryPixelManager @Inject constructor(
         val pixelsByName = config.pixels.associateBy { it.name }
 
         for (type in activeTypes) {
-            for (target in type.targets) {
+            val targets = when (type.template) {
+                "counter" -> CounterTelemetryType.from(type)?.targets ?: emptyList()
+                else -> {
+                    logcat(WARN) { "telemetry type '${type.name}' has unknown template '${type.template}'" }
+                    continue
+                }
+            }
+
+            for (target in targets) {
                 val pixelConfig = pixelsByName[target.pixel]
                 if (pixelConfig == null) {
                     logcat(WARN) { "telemetry type '${type.name}' targets pixel '${target.pixel}' which is not active" }
