@@ -101,4 +101,8 @@
     <string name="singleTabFireDialogSubtitleDownloads">This will cancel downloads in progress.</string>
     <string name="singleTabFireDialogSnackbar">1 tab and its data deleted</string>
 
+    <!-- Chat Suggestions Settings -->
+    <string name="privateSearchChatSuggestionsToggle">Chat Suggestions</string>
+    <string name="privateSearchAutocompleteHintWithChatSuggestions">Show suggestions from your history, bookmarks, and (optionally) Duck.ai chat history as you type in the search bar. All searches are private.</string>
+
 </resources>

@@ -695,6 +695,16 @@ class RealDuckChat @Inject constructor(
         return isMigrationCompleted
     }
 
+    override suspend fun setChatSuggestionsUserSetting(enabled: Boolean) {
+        duckChatFeatureRepository.setChatSuggestionsUserSetting(enabled)
+    }
+
+    override fun observeChatSuggestionsUserSettingEnabled(): Flow<Boolean> =
+        duckChatFeatureRepository.observeChatSuggestionsUserSettingEnabled()
+
+    override fun isChatSuggestionsFeatureAvailable(): Boolean =
+        duckChatFeature.aiChatSuggestions().isEnabled()
+
     private suspend fun hasActiveSession(): Boolean {
         val now = System.currentTimeMillis()
         val lastSession = duckChatFeatureRepository.lastSessionTimestamp()

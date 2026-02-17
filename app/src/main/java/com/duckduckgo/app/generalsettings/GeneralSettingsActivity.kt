@@ -42,6 +42,7 @@ import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.spans.DuckDuckGoClickableSpan
 import com.duckduckgo.common.ui.view.addClickableSpan
 import com.duckduckgo.common.ui.view.fadeTransitionConfig
+import com.duckduckgo.common.ui.view.setEnabledOpacity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
@@ -69,6 +70,10 @@ class GeneralSettingsActivity : DuckDuckGoActivity() {
 
     private val maliciousSiteProtectionToggleListener = CompoundButton.OnCheckedChangeListener { _, isChecked ->
         viewModel.onMaliciousSiteProtectionSettingChanged(isChecked)
+    }
+
+    private val chatSuggestionsToggleListener = CompoundButton.OnCheckedChangeListener { _, isChecked ->
+        viewModel.onChatSuggestionsSettingChanged(isChecked)
     }
 
     private val voiceSearchChangeListener = CompoundButton.OnCheckedChangeListener { _, isChecked ->
@@ -115,14 +120,28 @@ class GeneralSettingsActivity : DuckDuckGoActivity() {
                     )
                     if (it.storeHistoryEnabled) {
                         binding.autocompleteRecentlyVisitedSitesToggle.isVisible = true
+                        binding.recentlyVisitedSitesDescription.isVisible = true
                         binding.autocompleteRecentlyVisitedSitesToggle.quietlySetIsChecked(
                             newCheckedState = it.autoCompleteRecentlyVisitedSitesSuggestionsUserEnabled,
                             changeListener = autocompleteRecentlyVisitedSitesToggleListener,
                         )
                         binding.autocompleteRecentlyVisitedSitesToggle.isEnabled = it.autoCompleteSuggestionsEnabled
+                        binding.recentlyVisitedSitesDescription.setEnabledOpacity(it.autoCompleteSuggestionsEnabled)
                     } else {
                         binding.autocompleteRecentlyVisitedSitesToggle.isVisible = false
+                        binding.recentlyVisitedSitesDescription.isVisible = false
                     }
+                    binding.chatSuggestionsToggle.isVisible = it.showChatSuggestionsToggle
+                    if (it.showChatSuggestionsToggle) {
+                        binding.chatSuggestionsToggle.quietlySetIsChecked(
+                            newCheckedState = it.chatSuggestionsEnabled,
+                            changeListener = chatSuggestionsToggleListener,
+                        )
+                        binding.searchSuggestionsDescription.setText(R.string.privateSearchAutocompleteHintWithChatSuggestions)
+                    } else {
+                        binding.searchSuggestionsDescription.setText(R.string.privateSearchAutocompleteHint)
+                    }
+
                     if (it.maliciousSiteProtectionFeatureAvailable) {
                         binding.maliciousDisabledMessage.isVisible = !it.maliciousSiteProtectionEnabled
                         binding.maliciousToggle.quietlySetIsChecked(
@@ -139,6 +158,7 @@ class GeneralSettingsActivity : DuckDuckGoActivity() {
 
                     if (it.showVoiceSearch) {
                         binding.voiceSearchToggle.isVisible = true
+                        binding.voiceSearchDescription.isVisible = true
                         binding.voiceSearchToggle.quietlySetIsChecked(viewState.voiceSearchEnabled, voiceSearchChangeListener)
                     }
 

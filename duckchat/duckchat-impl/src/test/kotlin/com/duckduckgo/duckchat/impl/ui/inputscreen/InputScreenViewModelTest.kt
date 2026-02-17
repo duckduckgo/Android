@@ -112,6 +112,7 @@ class InputScreenViewModelTest {
             )
             whenever(duckChat.wasOpenedBefore()).thenReturn(false)
             whenever(duckChat.getDuckChatUrl(any(), any(), any())).thenReturn(duckChatURL)
+            whenever(duckChat.observeChatSuggestionsUserSettingEnabled()).thenReturn(flowOf(true))
             whenever(inputScreenConfigResolver.useTopBar()).thenReturn(true)
             whenever(voiceSearchAvailability.isVoiceSearchAvailable).thenReturn(true)
             whenever(omnibarRepository.omnibarType).thenReturn(OmnibarType.SINGLE_TOP)
