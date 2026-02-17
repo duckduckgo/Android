@@ -41,17 +41,17 @@ interface WebTelemetryDao {
     fun deleteConfig()
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertCounter(entity: WebTelemetryCounterEntity)
+    fun insertPixelState(entity: WebTelemetryPixelStateEntity)
 
-    @Query("SELECT * FROM web_telemetry_counter WHERE name = :name")
-    fun getCounter(name: String): WebTelemetryCounterEntity?
+    @Query("SELECT * FROM web_telemetry_pixel_state WHERE pixelName = :name")
+    fun getPixelState(name: String): WebTelemetryPixelStateEntity?
 
-    @Query("SELECT * FROM web_telemetry_counter")
-    fun getAllCounters(): List<WebTelemetryCounterEntity>
+    @Query("SELECT * FROM web_telemetry_pixel_state")
+    fun getAllPixelStates(): List<WebTelemetryPixelStateEntity>
 
-    @Query("DELETE FROM web_telemetry_counter WHERE name = :name")
-    fun deleteCounter(name: String)
+    @Query("DELETE FROM web_telemetry_pixel_state WHERE pixelName = :name")
+    fun deletePixelState(name: String)
 
-    @Query("DELETE FROM web_telemetry_counter")
-    fun deleteAllCounters()
+    @Query("DELETE FROM web_telemetry_pixel_state")
+    fun deleteAllPixelStates()
 }

@@ -29,15 +29,15 @@ import javax.inject.Inject
 
 /**
  * Observes app lifecycle to:
- * 1. Sync telemetry state (enable/disable types) based on remote config
- * 2. Check if any counter periods have elapsed and fire pixels
+ * 1. Sync pixel state (initialise/deregister pixels) based on remote config
+ * 2. Check if any pixel periods have elapsed and fire them
  */
 @ContributesMultibinding(
     scope = AppScope::class,
     boundType = MainProcessLifecycleObserver::class,
 )
 class WebTelemetryLifecycleObserver @Inject constructor(
-    private val counterManager: WebTelemetryCounterManager,
+    private val pixelManager: WebTelemetryPixelManager,
     private val dispatcherProvider: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : MainProcessLifecycleObserver {
@@ -45,8 +45,8 @@ class WebTelemetryLifecycleObserver @Inject constructor(
     @UiThread
     override fun onStart(owner: LifecycleOwner) {
         appCoroutineScope.launch(dispatcherProvider.io()) {
-            counterManager.syncTelemetryState()
-            counterManager.checkAndFireCounters()
+            pixelManager.syncPixelState()
+            pixelManager.checkPixels()
         }
     }
 }

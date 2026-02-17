@@ -17,16 +17,43 @@
 package com.duckduckgo.webtelemetry.impl
 
 /**
- * Parsed representation of a telemetry type configuration from remote config.
+ * A telemetry type is a stateless router. When triggered, it increments counter parameters
+ * on one or more target pixels.
  */
 data class TelemetryTypeConfig(
     val name: String,
     val state: String,
     val template: String,
-    val buckets: List<String>,
-    val pixel: String,
-    val period: String,
+    val targets: List<TelemetryTarget>,
 ) {
     val isEnabled: Boolean get() = state == "enabled"
     val isCounter: Boolean get() = template == "counter"
+}
+
+/**
+ * Links a telemetry type to a specific parameter on a specific pixel.
+ */
+data class TelemetryTarget(
+    val pixel: String,
+    val param: String,
+)
+
+/**
+ * A pixel definition from remote config. Owns the firing schedule, jitter, and parameter definitions.
+ */
+data class PixelConfig(
+    val name: String,
+    val period: String,
+    val jitter: Double,
+    val parameters: Map<String, PixelParameterConfig>,
+)
+
+/**
+ * Defines a single parameter on a pixel (its type and bucketing).
+ */
+data class PixelParameterConfig(
+    val type: String,
+    val buckets: List<String>,
+) {
+    val isCounter: Boolean get() = type == "counter"
 }

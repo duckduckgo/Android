@@ -33,7 +33,7 @@ import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
 class WebTelemetryContentScopeJsMessageHandler @Inject constructor(
-    private val counterManager: WebTelemetryCounterManager,
+    private val pixelManager: WebTelemetryPixelManager,
     private val dispatcherProvider: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : ContentScopeJsMessageHandlersPlugin {
@@ -51,7 +51,7 @@ class WebTelemetryContentScopeJsMessageHandler @Inject constructor(
             }
 
             appCoroutineScope.launch(dispatcherProvider.io()) {
-                counterManager.handleTelemetryEvent(type)
+                pixelManager.handleTelemetryEvent(type)
             }
         }
 

@@ -25,7 +25,7 @@ import androidx.room.migration.Migration
     version = 1,
     entities = [
         WebTelemetryConfigEntity::class,
-        WebTelemetryCounterEntity::class,
+        WebTelemetryPixelStateEntity::class,
     ],
 )
 abstract class WebTelemetryDatabase : RoomDatabase() {
