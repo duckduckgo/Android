@@ -42,6 +42,9 @@ dependencies {
     implementation project(path: ':js-messaging-api')
     implementation project(path: ':statistics-api')
 
+    // Lifecycle
+    implementation AndroidX.lifecycle.commonJava8
+
     // Room
     implementation AndroidX.room.runtime
     implementation AndroidX.room.rxJava2
