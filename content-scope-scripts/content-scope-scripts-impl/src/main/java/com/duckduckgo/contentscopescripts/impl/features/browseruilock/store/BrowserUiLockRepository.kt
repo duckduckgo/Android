@@ -58,6 +58,6 @@ class RealBrowserUiLockRepository constructor(
     }
 
     companion object {
-        const val EMPTY_JSON = """{"state":"enabled","exceptions":[]}"""
+        const val EMPTY_JSON = "{}"
     }
 }
