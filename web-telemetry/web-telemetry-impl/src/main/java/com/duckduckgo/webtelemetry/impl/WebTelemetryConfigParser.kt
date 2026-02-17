@@ -124,7 +124,7 @@ object WebTelemetryConfigParser {
         val periodJson = json.optJSONObject("period") ?: return null
         if (!periodJson.has("days") || !periodJson.has("jitterMaxPercent")) return null
         val days = periodJson.getInt("days")
-        val jitterMaxPercent = periodJson.getInt("jitterMaxPercent")
+        val jitterMaxPercent = periodJson.getDouble("jitterMaxPercent")
         return PixelTriggerConfig(period = PixelPeriodConfig(days = days, jitterMaxPercent = jitterMaxPercent))
     }
 

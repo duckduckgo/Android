@@ -85,7 +85,7 @@ data class PixelTriggerConfig(
  */
 data class PixelPeriodConfig(
     val days: Int,
-    val jitterMaxPercent: Int,
+    val jitterMaxPercent: Double,
 ) {
     val periodSeconds: Long get() = days.toLong() * 86400
 }
