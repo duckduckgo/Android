@@ -23,10 +23,12 @@ import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.webtelemetry.impl.JitterProvider
+import com.duckduckgo.webtelemetry.impl.RealJitterProvider
 import com.duckduckgo.webtelemetry.impl.RealTimeProvider
-import com.duckduckgo.webtelemetry.impl.RealWebTelemetryCounterManager
+import com.duckduckgo.webtelemetry.impl.RealWebTelemetryPixelManager
 import com.duckduckgo.webtelemetry.impl.TimeProvider
-import com.duckduckgo.webtelemetry.impl.WebTelemetryCounterManager
+import com.duckduckgo.webtelemetry.impl.WebTelemetryPixelManager
 import com.duckduckgo.webtelemetry.store.ALL_MIGRATIONS
 import com.duckduckgo.webtelemetry.store.RealWebTelemetryRepository
 import com.duckduckgo.webtelemetry.store.WebTelemetryDatabase
@@ -70,11 +72,18 @@ object WebTelemetryModule {
 
     @SingleInstanceIn(AppScope::class)
     @Provides
-    fun provideWebTelemetryCounterManager(
+    fun provideJitterProvider(): JitterProvider {
+        return RealJitterProvider()
+    }
+
+    @SingleInstanceIn(AppScope::class)
+    @Provides
+    fun provideWebTelemetryPixelManager(
         repository: WebTelemetryRepository,
         pixel: Pixel,
         timeProvider: TimeProvider,
-    ): WebTelemetryCounterManager {
-        return RealWebTelemetryCounterManager(repository, pixel, timeProvider)
+        jitterProvider: JitterProvider,
+    ): WebTelemetryPixelManager {
+        return RealWebTelemetryPixelManager(repository, pixel, timeProvider, jitterProvider)
     }
 }

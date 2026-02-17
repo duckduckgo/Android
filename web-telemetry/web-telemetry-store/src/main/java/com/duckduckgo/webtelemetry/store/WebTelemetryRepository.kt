@@ -24,11 +24,11 @@ interface WebTelemetryRepository {
     fun updateConfig(entity: WebTelemetryConfigEntity)
     fun getConfigEntity(): WebTelemetryConfigEntity
 
-    fun getCounter(name: String): WebTelemetryCounterEntity?
-    fun getAllCounters(): List<WebTelemetryCounterEntity>
-    fun saveCounter(entity: WebTelemetryCounterEntity)
-    fun deleteCounter(name: String)
-    fun deleteAllCounters()
+    fun getPixelState(name: String): WebTelemetryPixelStateEntity?
+    fun getAllPixelStates(): List<WebTelemetryPixelStateEntity>
+    fun savePixelState(entity: WebTelemetryPixelStateEntity)
+    fun deletePixelState(name: String)
+    fun deleteAllPixelStates()
 }
 
 class RealWebTelemetryRepository constructor(
@@ -58,24 +58,24 @@ class RealWebTelemetryRepository constructor(
         return configEntity
     }
 
-    override fun getCounter(name: String): WebTelemetryCounterEntity? {
-        return dao.getCounter(name)
+    override fun getPixelState(name: String): WebTelemetryPixelStateEntity? {
+        return dao.getPixelState(name)
     }
 
-    override fun getAllCounters(): List<WebTelemetryCounterEntity> {
-        return dao.getAllCounters()
+    override fun getAllPixelStates(): List<WebTelemetryPixelStateEntity> {
+        return dao.getAllPixelStates()
     }
 
-    override fun saveCounter(entity: WebTelemetryCounterEntity) {
-        dao.insertCounter(entity)
+    override fun savePixelState(entity: WebTelemetryPixelStateEntity) {
+        dao.insertPixelState(entity)
     }
 
-    override fun deleteCounter(name: String) {
-        dao.deleteCounter(name)
+    override fun deletePixelState(name: String) {
+        dao.deletePixelState(name)
     }
 
-    override fun deleteAllCounters() {
-        dao.deleteAllCounters()
+    override fun deleteAllPixelStates() {
+        dao.deleteAllPixelStates()
     }
 
     private fun loadConfigToMemory() {
