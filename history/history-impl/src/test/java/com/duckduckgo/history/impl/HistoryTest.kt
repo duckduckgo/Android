@@ -63,6 +63,7 @@ class HistoryTest {
         }
     }
 
+    @Test
     fun whenUrlIsSerpThenSaveToHistoryWithQueryAndSerpIsTrue() {
         whenever(mockDuckDuckGoUrlDetector.isDuckDuckGoQueryUrl(any())).thenReturn(true)
         whenever(mockDuckDuckGoUrlDetector.extractQuery(any())).thenReturn("query")
@@ -132,5 +133,25 @@ class HistoryTest {
         testee.removeHistoryEntryByQuery(query)
 
         verify(mockHistoryRepository).removeHistoryEntryByQuery(eq(query))
+    }
+
+    @Test
+    fun whenRemoveHistoryForTabThenRemoveHistoryForTabCalled() = runTest {
+        val tabId = "tab1"
+
+        testee.removeHistoryForTab(tabId)
+
+        verify(mockHistoryRepository).removeHistoryForTab(eq(tabId))
+    }
+
+    @Test
+    fun whenSaveToHistoryWithTabIdThenTabIdIsPassedToRepository() {
+        whenever(mockDuckDuckGoUrlDetector.isDuckDuckGoQueryUrl(any())).thenReturn(false)
+
+        runTest {
+            testee.saveToHistory("url", "title", "tab1")
+
+            verify(mockHistoryRepository).saveToHistory(eq("url"), eq("title"), eq(null), eq(false), eq("tab1"))
+        }
     }
 }
