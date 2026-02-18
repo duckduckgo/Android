@@ -24,7 +24,6 @@ import com.duckduckgo.app.statistics.wideevents.WideEventClient
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.browser.api.WebViewVersionProvider
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
@@ -40,7 +39,6 @@ class PageLoadWideEventTest {
     val coroutineRule = CoroutineTestRule()
 
     private val wideEventClient: WideEventClient = mock()
-    private val deviceInfo: DeviceInfo = mock()
     private val webViewVersionProvider: WebViewVersionProvider = mock()
     private val autoconsent: Autoconsent = mock()
     private val optimizeTrackerEvaluationRCWrapper: OptimizeTrackerEvaluationRCWrapper = mock()
@@ -50,7 +48,6 @@ class PageLoadWideEventTest {
 
     @Before
     fun setup() = runTest {
-        whenever(deviceInfo.appVersion).thenReturn("5.200.0")
         whenever(webViewVersionProvider.getMajorVersion()).thenReturn("120")
         whenever(autoconsent.isAutoconsentEnabled()).thenReturn(true)
         whenever(optimizeTrackerEvaluationRCWrapper.enabled).thenReturn(true)
@@ -68,7 +65,6 @@ class PageLoadWideEventTest {
 
         pageLoadWideEvent = RealPageLoadWideEvent(
             wideEventClient = wideEventClient,
-            deviceInfo = deviceInfo,
             webViewVersionProvider = webViewVersionProvider,
             autoconsent = autoconsent,
             optimizeTrackerEvaluationRCWrapper = optimizeTrackerEvaluationRCWrapper,
@@ -96,9 +92,9 @@ class PageLoadWideEventTest {
             success = true,
             metadata = emptyMap(),
         )
-        verify(wideEventClient).intervalStart(123L, "elapsed_time_to_finish", null)
-        verify(wideEventClient).intervalStart(123L, "elapsed_time_to_visible", null)
-        verify(wideEventClient).intervalStart(123L, "elapsed_time_to_escaped_fixed_progress", null)
+        verify(wideEventClient).intervalStart(123L, "elapsed_time_to_finish_ms_bucketed", null)
+        verify(wideEventClient).intervalStart(123L, "elapsed_time_to_visible_ms_bucketed", null)
+        verify(wideEventClient).intervalStart(123L, "elapsed_time_to_escaped_fixed_progress_ms_bucketed", null)
     }
 
     @Test
@@ -109,7 +105,7 @@ class PageLoadWideEventTest {
         pageLoadWideEvent.startPageLoad("tab_2", "https://twitter.com")
         pageLoadWideEvent.recordPageVisible("tab_2", 50)
 
-        verify(wideEventClient).intervalEnd(456L, "elapsed_time_to_visible")
+        verify(wideEventClient).intervalEnd(456L, "elapsed_time_to_visible_ms_bucketed")
         verify(wideEventClient).flowStep(
             wideEventId = 456L,
             stepName = "page_visible",
@@ -134,7 +130,7 @@ class PageLoadWideEventTest {
         pageLoadWideEvent.startPageLoad("tab_3", "https://reddit.com")
         pageLoadWideEvent.recordExitedFixedProgress("tab_3", 55)
 
-        verify(wideEventClient).intervalEnd(789L, "elapsed_time_to_escaped_fixed_progress")
+        verify(wideEventClient).intervalEnd(789L, "elapsed_time_to_escaped_fixed_progress_ms_bucketed")
         verify(wideEventClient).flowStep(
             wideEventId = 789L,
             stepName = "page_escaped_fixed_progress",
@@ -166,7 +162,7 @@ class PageLoadWideEventTest {
             concurrentRequestsOnFinish = 2,
         )
 
-        verify(wideEventClient).intervalEnd(999L, "elapsed_time_to_finish")
+        verify(wideEventClient).intervalEnd(999L, "elapsed_time_to_finish_ms_bucketed")
         verify(wideEventClient).flowStep(
             wideEventId = 999L,
             stepName = "page_finish",
@@ -177,7 +173,6 @@ class PageLoadWideEventTest {
             wideEventId = 999L,
             status = FlowStatus.Success,
             metadata = mapOf(
-                "app_version_when_page_loaded" to "5.200.0",
                 "webview_version" to "120",
                 "cpm_enabled" to "true",
                 "tracker_optimization_enabled_v2" to "true",
@@ -216,7 +211,6 @@ class PageLoadWideEventTest {
             wideEventId = 888L,
             status = FlowStatus.Failure("error"),
             metadata = mapOf(
-                "app_version_when_page_loaded" to "5.200.0",
                 "webview_version" to "120",
                 "cpm_enabled" to "true",
                 "tracker_optimization_enabled_v2" to "true",
@@ -338,12 +332,12 @@ class PageLoadWideEventTest {
         )
 
         // Verify all intervals were managed
-        verify(wideEventClient).intervalStart(500L, "elapsed_time_to_finish", null)
-        verify(wideEventClient).intervalStart(500L, "elapsed_time_to_visible", null)
-        verify(wideEventClient).intervalStart(500L, "elapsed_time_to_escaped_fixed_progress", null)
-        verify(wideEventClient).intervalEnd(500L, "elapsed_time_to_visible")
-        verify(wideEventClient).intervalEnd(500L, "elapsed_time_to_escaped_fixed_progress")
-        verify(wideEventClient).intervalEnd(500L, "elapsed_time_to_finish")
+        verify(wideEventClient).intervalStart(500L, "elapsed_time_to_finish_ms_bucketed", null)
+        verify(wideEventClient).intervalStart(500L, "elapsed_time_to_visible_ms_bucketed", null)
+        verify(wideEventClient).intervalStart(500L, "elapsed_time_to_escaped_fixed_progress_ms_bucketed", null)
+        verify(wideEventClient).intervalEnd(500L, "elapsed_time_to_visible_ms_bucketed")
+        verify(wideEventClient).intervalEnd(500L, "elapsed_time_to_escaped_fixed_progress_ms_bucketed")
+        verify(wideEventClient).intervalEnd(500L, "elapsed_time_to_finish_ms_bucketed")
 
         // Verify flow was finished
         verify(wideEventClient).flowFinish(eq(500L), eq(FlowStatus.Success), any())

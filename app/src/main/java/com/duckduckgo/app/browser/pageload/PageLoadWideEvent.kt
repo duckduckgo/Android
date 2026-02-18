@@ -24,7 +24,6 @@ import com.duckduckgo.app.statistics.wideevents.WideEventClient
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.browser.api.WebViewVersionProvider
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.Lazy
@@ -105,7 +104,6 @@ interface PageLoadWideEvent {
 @SingleInstanceIn(AppScope::class)
 class RealPageLoadWideEvent @Inject constructor(
     private val wideEventClient: WideEventClient,
-    private val deviceInfo: DeviceInfo,
     private val webViewVersionProvider: WebViewVersionProvider,
     private val autoconsent: Autoconsent,
     private val optimizeTrackerEvaluationRCWrapper: OptimizeTrackerEvaluationRCWrapper,
@@ -239,7 +237,6 @@ class RealPageLoadWideEvent @Inject constructor(
             wideEventId = flowId,
             status = flowStatus,
             metadata = mapOf(
-                KEY_APP_VERSION to deviceInfo.appVersion,
                 KEY_WEBVIEW_VERSION to webViewVersionProvider.getMajorVersion(),
                 KEY_CPM_ENABLED to autoconsent.isAutoconsentEnabled().toString(),
                 KEY_TRACKER_OPTIMIZATION_ENABLED to optimizeTrackerEvaluationRCWrapper.enabled.toString(),
@@ -286,13 +283,12 @@ class RealPageLoadWideEvent @Inject constructor(
         const val STEP_PAGE_VISIBLE = "page_visible"
         const val STEP_PAGE_ESCAPED_FIXED_PROGRESS = "page_escaped_fixed_progress"
         const val STEP_PAGE_FINISH = "page_finish"
-        const val KEY_ELAPSED_TIME_TO_FINISH = "elapsed_time_to_finish"
-        const val KEY_ELAPSED_TIME_TO_VISIBLE = "elapsed_time_to_visible"
-        const val KEY_ELAPSED_TIME_TO_ESCAPED_FIXED_PROGRESS = "elapsed_time_to_escaped_fixed_progress"
+        const val KEY_ELAPSED_TIME_TO_FINISH = "elapsed_time_to_finish_ms_bucketed"
+        const val KEY_ELAPSED_TIME_TO_VISIBLE = "elapsed_time_to_visible_ms_bucketed"
+        const val KEY_ELAPSED_TIME_TO_ESCAPED_FIXED_PROGRESS = "elapsed_time_to_escaped_fixed_progress_ms_bucketed"
         const val KEY_PROGRESS = "progress"
         const val KEY_OUTCOME = "outcome"
         const val KEY_ERROR_CODE = "error_code"
-        const val KEY_APP_VERSION = "app_version_when_page_loaded"
         const val KEY_WEBVIEW_VERSION = "webview_version"
         const val KEY_CPM_ENABLED = "cpm_enabled"
         const val KEY_TRACKER_OPTIMIZATION_ENABLED = "tracker_optimization_enabled_v2"
