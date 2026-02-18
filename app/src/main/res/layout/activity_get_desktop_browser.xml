@@ -92,7 +92,8 @@
         app:daxButtonSize="large"
         app:layout_constraintBottom_toTopOf="@id/noThanksButton"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintVertical_chainStyle="packed" />
 
     <com.duckduckgo.common.ui.view.button.DaxButtonGhost
         android:id="@+id/noThanksButton"
