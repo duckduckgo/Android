@@ -347,6 +347,7 @@ class OmnibarLayoutViewModel @Inject constructor(
             _viewState.update {
                 val shouldUpdateOmnibarText = !isFullUrlEnabled.value &&
                     !it.omnibarText.isEmpty() &&
+                    it.omnibarText != ABOUT_BLANK &&
                     !duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(it.url) || it.viewMode == ViewMode.DuckAI
                 val omnibarText = if (shouldUpdateOmnibarText) {
                     if (it.viewMode == ViewMode.DuckAI) {

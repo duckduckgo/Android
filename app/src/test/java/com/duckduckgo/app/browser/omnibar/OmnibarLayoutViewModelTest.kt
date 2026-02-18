@@ -1589,6 +1589,23 @@ class OmnibarLayoutViewModelTest {
     }
 
     @Test
+    fun whenOmnibarGainsFocusAndFullUrlDisabledAndOmnibarTextIsAboutBlankThenOmnibarTextIsNotUpdated() = runTest {
+        isFullUrlEnabledFlow.emit(false)
+        initializeViewModel()
+
+        givenSiteLoaded("about:blank")
+        testee.onOmnibarFocusChanged(hasFocus = false, inputFieldText = "")
+
+        testee.onOmnibarFocusChanged(hasFocus = true, inputFieldText = "about:blank")
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertEquals("about:blank", viewState.omnibarText)
+            assertFalse(viewState.updateOmnibarText)
+        }
+    }
+
+    @Test
     fun whenExternalOmnibarStateChangedWithForceRenderAndNotDDGUrlAndFullUrlEnabledThenOmnibarTextIsFullUrl() = runTest {
         val omnibarViewState = OmnibarViewState(omnibarText = RANDOM_URL, queryOrFullUrl = RANDOM_URL)
         isFullUrlEnabledFlow.emit(true)
