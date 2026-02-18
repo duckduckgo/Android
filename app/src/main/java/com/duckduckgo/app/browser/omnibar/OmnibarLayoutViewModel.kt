@@ -51,7 +51,6 @@ import com.duckduckgo.app.browser.viewstate.LoadingViewState
 import com.duckduckgo.app.browser.viewstate.OmnibarViewState
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.duckchat.createWasUsedBeforePixelParams
-import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_BUTTON_STATE
@@ -110,14 +109,11 @@ class OmnibarLayoutViewModel @Inject constructor(
     private val settingsDataStore: SettingsDataStore,
     private val urlDisplayRepository: UrlDisplayRepository,
     private val serpEasterEggLogosToggles: SerpEasterEggLogosToggles,
-    private val androidBrowserToggles: AndroidBrowserConfigFeature,
     private val addressBarTrackersAnimationManager: AddressBarTrackersAnimationManager,
     private val standardizedLeadingIconToggle: StandardizedLeadingIconFeatureToggle,
 ) : ViewModel() {
 
     private val isSplitOmnibarEnabled = settingsDataStore.omnibarType == OmnibarType.SPLIT
-
-    private var handleAboutBlankEnabled: Boolean = false
     private var isSetFavouriteEasterEggLogoFeatureEnabled: Boolean = false
 
     private val _viewState = MutableStateFlow(
@@ -232,15 +228,10 @@ class OmnibarLayoutViewModel @Inject constructor(
     ) {
         fun shouldUpdateOmnibarText(
             isFullUrlEnabled: Boolean,
-            isAboutBlankHandleEnabled: Boolean,
         ): Boolean {
             val updateOmnibarText =
                 this.viewMode is Browser || this.viewMode is MaliciousSiteWarning || (!isFullUrlEnabled && omnibarText.isNotEmpty())
-            return if (isAboutBlankHandleEnabled) {
-                updateOmnibarText && url.isNotEmpty()
-            } else {
-                updateOmnibarText
-            }
+            return updateOmnibarText && url.isNotEmpty()
         }
     }
 
@@ -275,11 +266,6 @@ class OmnibarLayoutViewModel @Inject constructor(
 
     init {
         logVoiceSearchAvailability()
-
-        viewModelScope.launch(dispatcherProvider.io()) {
-            handleAboutBlankEnabled = androidBrowserToggles.handleAboutBlank().isEnabled()
-        }
-
         duckAiFeatureState.showInputScreen.onEach { inputScreenEnabled ->
             _viewState.update {
                 it.copy(
@@ -347,6 +333,7 @@ class OmnibarLayoutViewModel @Inject constructor(
             _viewState.update {
                 val shouldUpdateOmnibarText = !isFullUrlEnabled.value &&
                     !it.omnibarText.isEmpty() &&
+                    it.omnibarText != ABOUT_BLANK &&
                     !duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(it.url) || it.viewMode == ViewMode.DuckAI
                 val omnibarText = if (shouldUpdateOmnibarText) {
                     if (it.viewMode == ViewMode.DuckAI) {
@@ -383,7 +370,7 @@ class OmnibarLayoutViewModel @Inject constructor(
             }
         } else {
             _viewState.update {
-                val shouldUpdateOmnibarText = it.shouldUpdateOmnibarText(isFullUrlEnabled.value, handleAboutBlankEnabled)
+                val shouldUpdateOmnibarText = it.shouldUpdateOmnibarText(isFullUrlEnabled.value)
                 logcat { "Omnibar: lost focus in Browser or MaliciousSiteWarning mode $shouldUpdateOmnibarText" }
                 val omnibarText = if (shouldUpdateOmnibarText) {
                     if (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(it.url)) {
@@ -787,7 +774,7 @@ class OmnibarLayoutViewModel @Inject constructor(
         val state = if (shouldUpdateOmnibarTextInput(omnibarViewState, _viewState.value.omnibarText) || forceRender) {
             if (forceRender &&
                 !duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(omnibarViewState.queryOrFullUrl) &&
-                isNotAboutBlank(omnibarViewState)
+                omnibarViewState.omnibarText != ABOUT_BLANK
             ) {
                 val url = if (isFullUrlEnabled.value) {
                     omnibarViewState.queryOrFullUrl
@@ -916,8 +903,6 @@ class OmnibarLayoutViewModel @Inject constructor(
             )
         }
     }
-
-    private fun isNotAboutBlank(viewState: OmnibarViewState) = !(handleAboutBlankEnabled && viewState.omnibarText == ABOUT_BLANK)
 
     fun onUserTouchedOmnibarTextInput(touchAction: Int) {
         logcat { "Omnibar: onUserTouchedOmnibarTextInput" }
