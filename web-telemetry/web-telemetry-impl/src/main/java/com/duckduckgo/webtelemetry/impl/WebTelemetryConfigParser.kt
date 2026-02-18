@@ -20,125 +20,89 @@ import logcat.LogPriority.WARN
 import logcat.logcat
 import org.json.JSONObject
 
-/**
- * Parses the webTelemetry feature JSON from remote config into structured config objects.
- */
-object WebTelemetryConfigParser {
+object EventHubConfigParser {
 
     data class ParsedConfig(
         val featureEnabled: Boolean,
-        val telemetryTypes: List<TelemetryTypeConfig>,
-        val pixels: List<PixelConfig>,
+        val telemetry: List<TelemetryPixelConfig>,
     ) {
         companion object {
-            val EMPTY = ParsedConfig(featureEnabled = false, telemetryTypes = emptyList(), pixels = emptyList())
+            val EMPTY = ParsedConfig(featureEnabled = false, telemetry = emptyList())
         }
     }
 
     fun parse(featureJson: String): ParsedConfig {
         return try {
             val json = JSONObject(featureJson)
-            val featureState = json.optString("state", "")
-            val featureEnabled = featureState == "enabled"
+            val featureEnabled = json.optString("state", "") == "enabled"
+            val settings = json.optJSONObject("settings") ?: return ParsedConfig(featureEnabled, emptyList())
+            val telemetryJson = settings.optJSONObject("telemetry") ?: return ParsedConfig(featureEnabled, emptyList())
 
-            val settings = json.optJSONObject("settings") ?: return ParsedConfig(featureEnabled, emptyList(), emptyList())
+            val telemetry = mutableListOf<TelemetryPixelConfig>()
+            val keys = telemetryJson.keys()
+            while (keys.hasNext()) {
+                val name = keys.next()
+                val pixelJson = telemetryJson.optJSONObject(name) ?: continue
+                parseTelemetryPixel(name, pixelJson)?.let { telemetry.add(it) }
+            }
 
-            val telemetryTypes = parseTelemetryTypes(settings)
-            val pixels = parsePixels(settings)
-
-            ParsedConfig(featureEnabled, telemetryTypes, pixels)
+            ParsedConfig(featureEnabled, telemetry)
         } catch (e: Exception) {
-            logcat(WARN) { "Failed to parse webTelemetry config: ${e.message}" }
+            logcat(WARN) { "Failed to parse eventHub config: ${e.message}" }
             ParsedConfig.EMPTY
         }
     }
 
-    /**
-     * Returns only active (feature enabled + type enabled) telemetry types.
-     */
-    fun parseActiveTelemetryTypes(featureJson: String): List<TelemetryTypeConfig> {
-        val config = parse(featureJson)
-        if (!config.featureEnabled) return emptyList()
-        return config.telemetryTypes.filter { it.isEnabled }
-    }
-
-    /**
-     * Returns active pixel configs (feature must be enabled; all defined pixels are considered active).
-     */
-    fun parseActivePixels(featureJson: String): List<PixelConfig> {
-        val config = parse(featureJson)
-        if (!config.featureEnabled) return emptyList()
-        return config.pixels
-    }
-
-    private fun parseTelemetryTypes(settings: JSONObject): List<TelemetryTypeConfig> {
-        val typesJson = settings.optJSONObject("telemetryTypes") ?: return emptyList()
-        val result = mutableListOf<TelemetryTypeConfig>()
-        val keys = typesJson.keys()
-        while (keys.hasNext()) {
-            val name = keys.next()
-            val typeJson = typesJson.optJSONObject(name) ?: continue
-            parseTelemetryType(name, typeJson)?.let { result.add(it) }
-        }
-        return result
-    }
-
-    private fun parseTelemetryType(name: String, json: JSONObject): TelemetryTypeConfig? {
+    private fun parseTelemetryPixel(name: String, json: JSONObject): TelemetryPixelConfig? {
         if (!json.has("state")) return null
         val state = json.getString("state")
-        if (!json.has("template")) return null
-        val template = json.getString("template")
 
-        return TelemetryTypeConfig(name = name, state = state, template = template, rawConfig = json)
-    }
-
-    private fun parsePixels(settings: JSONObject): List<PixelConfig> {
-        val pixelsJson = settings.optJSONObject("pixels") ?: return emptyList()
-        val result = mutableListOf<PixelConfig>()
-        val keys = pixelsJson.keys()
-        while (keys.hasNext()) {
-            val name = keys.next()
-            val pixelJson = pixelsJson.optJSONObject(name) ?: continue
-            parsePixel(name, pixelJson)?.let { result.add(it) }
-        }
-        return result
-    }
-
-    private fun parsePixel(name: String, json: JSONObject): PixelConfig? {
         val trigger = parseTrigger(json.optJSONObject("trigger") ?: return null) ?: return null
-        val paramsJson = json.optJSONObject("parameters") ?: return null
 
-        val parameters = mutableMapOf<String, PixelParameterConfig>()
+        val paramsJson = json.optJSONObject("parameters") ?: return null
+        val parameters = mutableMapOf<String, TelemetryParameterConfig>()
         val paramKeys = paramsJson.keys()
         while (paramKeys.hasNext()) {
             val paramName = paramKeys.next()
             val paramJson = paramsJson.optJSONObject(paramName) ?: continue
-            parsePixelParameter(paramJson)?.let { parameters[paramName] = it }
+            parseParameter(paramJson)?.let { parameters[paramName] = it }
         }
         if (parameters.isEmpty()) return null
 
-        return PixelConfig(name = name, trigger = trigger, parameters = parameters)
+        return TelemetryPixelConfig(name = name, state = state, trigger = trigger, parameters = parameters)
     }
 
-    private fun parseTrigger(json: JSONObject): PixelTriggerConfig? {
+    private fun parseTrigger(json: JSONObject): TelemetryTriggerConfig? {
         val periodJson = json.optJSONObject("period") ?: return null
-        if (!periodJson.has("days") || !periodJson.has("jitterMaxPercent")) return null
-        val days = periodJson.getInt("days")
-        val jitterMaxPercent = periodJson.getDouble("jitterMaxPercent")
-        return PixelTriggerConfig(period = PixelPeriodConfig(days = days, jitterMaxPercent = jitterMaxPercent))
+        val days = periodJson.optInt("days", 0)
+        val hours = periodJson.optInt("hours", 0)
+        val minutes = periodJson.optInt("minutes", 0)
+        val maxStaggerMins = periodJson.optInt("maxStaggerMins", 0)
+
+        if (days == 0 && hours == 0 && minutes == 0) return null
+
+        return TelemetryTriggerConfig(
+            period = TelemetryPeriodConfig(days = days, hours = hours, minutes = minutes, maxStaggerMins = maxStaggerMins),
+        )
     }
 
-    private fun parsePixelParameter(json: JSONObject): PixelParameterConfig? {
-        if (!json.has("type")) return null
-        val type = json.getString("type")
+    private fun parseParameter(json: JSONObject): TelemetryParameterConfig? {
+        if (!json.has("template")) return null
+        val template = json.getString("template")
 
-        val bucketsArray = json.optJSONArray("buckets")
-        val buckets = if (bucketsArray != null) {
-            (0 until bucketsArray.length()).mapNotNull { bucketsArray.optString(it) }
-        } else {
-            emptyList()
+        return when (template) {
+            "counter" -> {
+                if (!json.has("source")) return null
+                val source = json.getString("source")
+                val bucketsArray = json.optJSONArray("buckets")
+                val buckets = if (bucketsArray != null) {
+                    (0 until bucketsArray.length()).mapNotNull { bucketsArray.optString(it) }
+                } else {
+                    emptyList()
+                }
+                TelemetryParameterConfig(template = template, source = source, buckets = buckets)
+            }
+            else -> null
         }
-
-        return PixelParameterConfig(type = type, buckets = buckets)
     }
 }

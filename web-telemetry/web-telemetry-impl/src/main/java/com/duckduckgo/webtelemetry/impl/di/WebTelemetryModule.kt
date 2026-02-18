@@ -23,12 +23,12 @@ import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.webtelemetry.impl.JitterProvider
-import com.duckduckgo.webtelemetry.impl.RealJitterProvider
+import com.duckduckgo.webtelemetry.impl.EventHubPixelManager
+import com.duckduckgo.webtelemetry.impl.RealEventHubPixelManager
+import com.duckduckgo.webtelemetry.impl.RealStaggerProvider
 import com.duckduckgo.webtelemetry.impl.RealTimeProvider
-import com.duckduckgo.webtelemetry.impl.RealWebTelemetryPixelManager
+import com.duckduckgo.webtelemetry.impl.StaggerProvider
 import com.duckduckgo.webtelemetry.impl.TimeProvider
-import com.duckduckgo.webtelemetry.impl.WebTelemetryPixelManager
 import com.duckduckgo.webtelemetry.store.ALL_MIGRATIONS
 import com.duckduckgo.webtelemetry.store.RealWebTelemetryRepository
 import com.duckduckgo.webtelemetry.store.WebTelemetryDatabase
@@ -66,24 +66,20 @@ object WebTelemetryModule {
 
     @SingleInstanceIn(AppScope::class)
     @Provides
-    fun provideTimeProvider(): TimeProvider {
-        return RealTimeProvider()
-    }
+    fun provideTimeProvider(): TimeProvider = RealTimeProvider()
 
     @SingleInstanceIn(AppScope::class)
     @Provides
-    fun provideJitterProvider(): JitterProvider {
-        return RealJitterProvider()
-    }
+    fun provideStaggerProvider(): StaggerProvider = RealStaggerProvider()
 
     @SingleInstanceIn(AppScope::class)
     @Provides
-    fun provideWebTelemetryPixelManager(
+    fun provideEventHubPixelManager(
         repository: WebTelemetryRepository,
         pixel: Pixel,
         timeProvider: TimeProvider,
-        jitterProvider: JitterProvider,
-    ): WebTelemetryPixelManager {
-        return RealWebTelemetryPixelManager(repository, pixel, timeProvider, jitterProvider)
+        staggerProvider: StaggerProvider,
+    ): EventHubPixelManager {
+        return RealEventHubPixelManager(repository, pixel, timeProvider, staggerProvider)
     }
 }

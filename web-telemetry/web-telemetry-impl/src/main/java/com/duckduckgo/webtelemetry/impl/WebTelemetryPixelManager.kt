@@ -19,49 +19,48 @@ package com.duckduckgo.webtelemetry.impl
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.webtelemetry.store.WebTelemetryPixelStateEntity
 import com.duckduckgo.webtelemetry.store.WebTelemetryRepository
-import logcat.LogPriority.WARN
 import logcat.logcat
 import org.json.JSONObject
 import javax.inject.Inject
 
-interface WebTelemetryPixelManager {
-    /** Route a fireTelemetry event to the appropriate pixel parameters. */
-    fun handleTelemetryEvent(type: String)
+interface EventHubPixelManager {
+    /** Process a webEvent by passing it to all enabled telemetry pixels. */
+    fun handleWebEvent(eventType: String)
 
-    /** Check all active pixels and fire any whose period+jitter has elapsed. */
+    /** Check all pixels and fire any whose period has elapsed. */
     fun checkPixels()
 
-    /** Sync pixel state: initialise new pixels, deregister removed ones. */
-    fun syncPixelState()
+    /** Called when feature config changes. Re-syncs telemetry state. */
+    fun onConfigChanged()
 }
 
-class RealWebTelemetryPixelManager @Inject constructor(
+class RealEventHubPixelManager @Inject constructor(
     private val repository: WebTelemetryRepository,
     private val pixel: Pixel,
     private val timeProvider: TimeProvider,
-    private val jitterProvider: JitterProvider,
-) : WebTelemetryPixelManager {
+    private val staggerProvider: StaggerProvider,
+) : EventHubPixelManager {
 
-    override fun handleTelemetryEvent(type: String) {
+    override fun handleWebEvent(eventType: String) {
         val config = getParsedConfig()
         if (!config.featureEnabled) return
 
-        val telemetryType = config.telemetryTypes.find { it.name == type && it.isEnabled } ?: return
+        for (pixelConfig in config.telemetry) {
+            if (!pixelConfig.isEnabled) continue
+            val state = repository.getPixelState(pixelConfig.name) ?: continue
+            val params = parseParamsJson(state.paramsJson)
+            var changed = false
 
-        when (telemetryType.template) {
-            "counter" -> {
-                val counter = CounterTelemetryType.from(telemetryType) ?: return
-                handleCounterEvent(counter)
+            for ((paramName, paramConfig) in pixelConfig.parameters) {
+                if (paramConfig.isCounter && paramConfig.source == eventType) {
+                    params[paramName] = (params[paramName] ?: 0) + 1
+                    changed = true
+                }
             }
-        }
-    }
 
-    private fun handleCounterEvent(counter: CounterTelemetryType) {
-        for (target in counter.targets) {
-            val pixelState = repository.getPixelState(target.pixel) ?: continue
-            val params = parseParamsJson(pixelState.paramsJson)
-            params[target.param] = (params[target.param] ?: 0) + 1
-            repository.savePixelState(pixelState.copy(paramsJson = serializeParams(params)))
+            if (changed) {
+                repository.savePixelState(state.copy(paramsJson = serializeParams(params)))
+            }
         }
     }
 
@@ -69,118 +68,134 @@ class RealWebTelemetryPixelManager @Inject constructor(
         val config = getParsedConfig()
         if (!config.featureEnabled) return
 
-        for (pixelConfig in config.pixels) {
+        val nowMillis = timeProvider.currentTimeMillis()
+
+        for (pixelConfig in config.telemetry) {
+            if (!pixelConfig.isEnabled) continue
             val state = repository.getPixelState(pixelConfig.name) ?: continue
-            val elapsedSeconds = (timeProvider.currentTimeMillis() - state.timestampMillis) / 1000.0
-            val thresholdSeconds = pixelConfig.trigger.period.periodSeconds + state.jitterSeconds
 
-            if (elapsedSeconds >= thresholdSeconds) {
-                buildAndFirePixel(pixelConfig, state)
+            val periodMillis = pixelConfig.trigger.period.periodSeconds * 1000
+            val fireAtMillis = state.periodStartMillis + periodMillis
 
-                val resetParams = pixelConfig.parameters.keys.associateWith { 0 }.toMutableMap()
-                repository.savePixelState(
-                    WebTelemetryPixelStateEntity(
-                        pixelName = pixelConfig.name,
-                        timestampMillis = timeProvider.currentTimeMillis(),
-                        jitterSeconds = jitterProvider.generateJitter(pixelConfig),
-                        paramsJson = serializeParams(resetParams),
-                    ),
-                )
+            if (nowMillis >= fireAtMillis) {
+                fireTelemetry(pixelConfig, state)
             }
         }
     }
 
-    override fun syncPixelState() {
+    override fun onConfigChanged() {
         val config = getParsedConfig()
         if (!config.featureEnabled) {
             repository.deleteAllPixelStates()
             return
         }
 
-        val activePixelNames = config.pixels.map { it.name }.toSet()
+        val configPixelNames = config.telemetry.map { it.name }.toSet()
         val existingStates = repository.getAllPixelStates()
         val existingNames = existingStates.map { it.pixelName }.toSet()
 
-        val needsInit = activePixelNames - existingNames
-        val needsRemove = existingNames - activePixelNames
-
-        for (pixelName in needsInit) {
-            val pixelConfig = config.pixels.find { it.name == pixelName } ?: continue
-            val initialParams = pixelConfig.parameters.keys.associateWith { 0 }.toMutableMap()
-            repository.savePixelState(
-                WebTelemetryPixelStateEntity(
-                    pixelName = pixelName,
-                    timestampMillis = timeProvider.currentTimeMillis(),
-                    jitterSeconds = jitterProvider.generateJitter(pixelConfig),
-                    paramsJson = serializeParams(initialParams),
-                ),
-            )
+        // Deregister unknown
+        for (name in existingNames - configPixelNames) {
+            repository.deletePixelState(name)
         }
 
-        for (pixelName in needsRemove) {
-            repository.deletePixelState(pixelName)
-        }
-
-        validateTelemetryTypes(config)
-    }
-
-    private fun validateTelemetryTypes(config: WebTelemetryConfigParser.ParsedConfig) {
-        val activeTypes = config.telemetryTypes.filter { it.isEnabled }
-        val pixelsByName = config.pixels.associateBy { it.name }
-
-        for (type in activeTypes) {
-            val targets = when (type.template) {
-                "counter" -> CounterTelemetryType.from(type)?.targets ?: emptyList()
-                else -> {
-                    logcat(WARN) { "telemetry type '${type.name}' has unknown template '${type.template}'" }
-                    continue
-                }
-            }
-
-            for (target in targets) {
-                val pixelConfig = pixelsByName[target.pixel]
-                if (pixelConfig == null) {
-                    logcat(WARN) { "telemetry type '${type.name}' targets pixel '${target.pixel}' which is not active" }
-                    continue
-                }
-                val paramConfig = pixelConfig.parameters[target.param]
-                if (paramConfig == null) {
-                    logcat(WARN) { "telemetry type '${type.name}' targets param '${target.param}' which does not exist on pixel '${target.pixel}'" }
-                    continue
-                }
-                if (type.template != paramConfig.type) {
-                    logcat(WARN) {
-                        "telemetry type '${type.name}' has template '${type.template}' but param '${target.param}' has type '${paramConfig.type}'"
-                    }
-                }
-            }
+        // Register/update each configured pixel
+        for (pixelConfig in config.telemetry) {
+            registerTelemetry(pixelConfig)
         }
     }
 
-    private fun buildAndFirePixel(pixelConfig: PixelConfig, state: WebTelemetryPixelStateEntity) {
-        val currentParams = parseParamsJson(state.paramsJson)
-        val pixelParams = mutableMapOf<String, String>()
+    private fun registerTelemetry(pixelConfig: TelemetryPixelConfig) {
+        val existing = repository.getPixelState(pixelConfig.name)
+
+        if (!pixelConfig.isEnabled) {
+            if (existing != null) {
+                repository.deletePixelState(pixelConfig.name)
+            }
+            return
+        }
+
+        if (existing == null) {
+            startNewPeriod(pixelConfig)
+        }
+        // If already exists, we keep the state (preserving counters mid-period)
+    }
+
+    private fun startNewPeriod(pixelConfig: TelemetryPixelConfig) {
+        val initialParams = pixelConfig.parameters.keys.associateWith { 0 }.toMutableMap()
+        repository.savePixelState(
+            WebTelemetryPixelStateEntity(
+                pixelName = pixelConfig.name,
+                periodStartMillis = timeProvider.currentTimeMillis(),
+                paramsJson = serializeParams(initialParams),
+            ),
+        )
+    }
+
+    private fun fireTelemetry(pixelConfig: TelemetryPixelConfig, state: WebTelemetryPixelStateEntity) {
+        val pixelData = buildPixel(pixelConfig, state)
+
+        // If the only parameter is "period" (no meaningful data), skip firing
+        val dataParams = pixelData.filterKeys { it != PARAM_PERIOD }
+        if (dataParams.isEmpty()) {
+            startNewPeriod(pixelConfig)
+            return
+        }
+
+        val staggerMs = staggerProvider.randomStaggerMs(pixelConfig.trigger.period.maxStaggerMins)
+
+        // Reset counters and start new period immediately
+        startNewPeriod(pixelConfig)
+
+        // Fire the pixel (with stagger delay if applicable)
+        // On Android, we use enqueueFire which persists the pixel for retry
+        pixel.enqueueFire(
+            pixelName = pixelConfig.name,
+            parameters = pixelData,
+        )
+    }
+
+    private fun buildPixel(
+        pixelConfig: TelemetryPixelConfig,
+        state: WebTelemetryPixelStateEntity,
+    ): Map<String, String> {
+        val params = parseParamsJson(state.paramsJson)
+        val pixelData = mutableMapOf<String, String>()
 
         for ((paramName, paramConfig) in pixelConfig.parameters) {
-            val value = currentParams[paramName] ?: 0
-            if (paramConfig.type == "counter") {
+            val value = params[paramName] ?: 0
+            if (paramConfig.isCounter) {
                 val bucket = BucketCounter.bucketCount(value, paramConfig.buckets)
                 if (bucket != null) {
-                    pixelParams[paramName] = bucket
+                    pixelData[paramName] = bucket
                 }
             }
         }
 
-        if (pixelParams.isNotEmpty()) {
-            pixel.fire(pixelName = pixelConfig.name, parameters = pixelParams)
-        }
+        pixelData[PARAM_PERIOD] = toStartOfInterval(
+            state.periodStartMillis,
+            pixelConfig.trigger.period.periodSeconds,
+        ).toString()
+
+        return pixelData
     }
 
-    private fun getParsedConfig(): WebTelemetryConfigParser.ParsedConfig {
-        return WebTelemetryConfigParser.parse(repository.getConfigEntity().json)
+    private fun getParsedConfig(): EventHubConfigParser.ParsedConfig {
+        return EventHubConfigParser.parse(repository.getConfigEntity().json)
     }
 
     companion object {
+        const val PARAM_PERIOD = "period"
+
+        /**
+         * Normalise a timestamp to the start of its interval.
+         * E.g., for a 1-day period, 2026-01-26T17:00 → 2026-01-26T00:00 (epoch seconds).
+         */
+        fun toStartOfInterval(timestampMillis: Long, periodSeconds: Long): Long {
+            val epochSeconds = timestampMillis / 1000
+            return (epochSeconds / periodSeconds) * periodSeconds
+        }
+
         fun parseParamsJson(json: String): MutableMap<String, Int> {
             return try {
                 val obj = JSONObject(json)
@@ -210,20 +225,14 @@ class RealTimeProvider @Inject constructor() : TimeProvider {
     override fun currentTimeMillis(): Long = System.currentTimeMillis()
 }
 
-interface JitterProvider {
-    fun generateJitter(config: PixelConfig): Double
+interface StaggerProvider {
+    /** Returns a random delay in milliseconds, up to [maxStaggerMins] minutes. */
+    fun randomStaggerMs(maxStaggerMins: Int): Long
 }
 
-class RealJitterProvider @Inject constructor() : JitterProvider {
-    override fun generateJitter(config: PixelConfig): Double {
-        val periodConfig = config.trigger.period
-        val periodSeconds = periodConfig.periodSeconds.toDouble()
-        val jitterFraction = periodConfig.jitterMaxPercent / 100.0
-        val halfSpread = periodSeconds * jitterFraction * 0.5
-        return if (halfSpread > 0) {
-            -halfSpread + Math.random() * 2 * halfSpread
-        } else {
-            0.0
-        }
+class RealStaggerProvider @Inject constructor() : StaggerProvider {
+    override fun randomStaggerMs(maxStaggerMins: Int): Long {
+        if (maxStaggerMins <= 0) return 0
+        return (Math.random() * maxStaggerMins * 60 * 1000).toLong()
     }
 }

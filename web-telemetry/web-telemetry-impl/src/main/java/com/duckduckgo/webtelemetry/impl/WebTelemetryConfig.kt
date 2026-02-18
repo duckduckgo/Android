@@ -16,84 +16,45 @@
 
 package com.duckduckgo.webtelemetry.impl
 
-import org.json.JSONObject
-
 /**
- * A telemetry type is a stateless router. The [template] determines how the
- * type's configuration is interpreted; template-specific fields live in [rawConfig].
+ * A telemetry pixel definition from remote config.
+ * Each pixel owns its firing schedule, parameters, and state.
  */
-data class TelemetryTypeConfig(
+data class TelemetryPixelConfig(
     val name: String,
     val state: String,
-    val template: String,
-    val rawConfig: JSONObject,
+    val trigger: TelemetryTriggerConfig,
+    val parameters: Map<String, TelemetryParameterConfig>,
 ) {
     val isEnabled: Boolean get() = state == "enabled"
 }
 
+data class TelemetryTriggerConfig(
+    val period: TelemetryPeriodConfig,
+)
+
 /**
- * Counter-specific view of a telemetry type configuration.
- * Only valid when [TelemetryTypeConfig.template] == "counter".
+ * Period definition.
+ * [days], [hours], [minutes] define the cadence. At least one must be > 0.
+ * [maxStaggerMins] is the max random delay (in minutes) added after the period elapses.
  */
-data class CounterTelemetryType(
-    val name: String,
-    val targets: List<TelemetryTarget>,
+data class TelemetryPeriodConfig(
+    val days: Int = 0,
+    val hours: Int = 0,
+    val minutes: Int = 0,
+    val maxStaggerMins: Int = 0,
 ) {
-    companion object {
-        fun from(config: TelemetryTypeConfig): CounterTelemetryType? {
-            if (config.template != "counter") return null
-            val targetsArray = config.rawConfig.optJSONArray("targets") ?: return null
-            val targets = (0 until targetsArray.length()).mapNotNull { i ->
-                val targetJson = targetsArray.optJSONObject(i) ?: return@mapNotNull null
-                val pixel = targetJson.optString("pixel", "")
-                val param = targetJson.optString("param", "")
-                if (pixel.isNotEmpty() && param.isNotEmpty()) TelemetryTarget(pixel, param) else null
-            }
-            return if (targets.isNotEmpty()) CounterTelemetryType(config.name, targets) else null
-        }
-    }
+    val periodSeconds: Long get() = days.toLong() * 86400 + hours.toLong() * 3600 + minutes.toLong() * 60
 }
 
 /**
- * Links a telemetry type to a specific parameter on a specific pixel.
+ * A pixel parameter definition. The [template] determines how the parameter is handled.
+ * Template-specific fields are accessed directly.
  */
-data class TelemetryTarget(
-    val pixel: String,
-    val param: String,
-)
-
-/**
- * A pixel definition from remote config. Owns the firing schedule and parameter definitions.
- */
-data class PixelConfig(
-    val name: String,
-    val trigger: PixelTriggerConfig,
-    val parameters: Map<String, PixelParameterConfig>,
-)
-
-/**
- * Defines when a pixel fires.
- */
-data class PixelTriggerConfig(
-    val period: PixelPeriodConfig,
-)
-
-/**
- * Period definition with jitter.
- * [days] is the nominal period length.
- * [jitterMaxPercent] is the max jitter as a percentage (e.g. 25 means ±12.5%).
- */
-data class PixelPeriodConfig(
-    val days: Int,
-    val jitterMaxPercent: Double,
-) {
-    val periodSeconds: Long get() = days.toLong() * 86400
-}
-
-/**
- * Defines a single parameter on a pixel (its type and bucketing).
- */
-data class PixelParameterConfig(
-    val type: String,
+data class TelemetryParameterConfig(
+    val template: String,
+    val source: String,
     val buckets: List<String>,
-)
+) {
+    val isCounter: Boolean get() = template == "counter"
+}

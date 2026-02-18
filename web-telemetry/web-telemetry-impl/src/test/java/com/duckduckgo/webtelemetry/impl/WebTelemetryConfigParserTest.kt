@@ -18,56 +18,38 @@ package com.duckduckgo.webtelemetry.impl
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
-import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
-class WebTelemetryConfigParserTest {
+class EventHubConfigParserTest {
 
     private val fullConfig = """
         {
             "state": "enabled",
             "settings": {
-                "telemetryTypes": {
-                    "adwall": {
+                "telemetry": {
+                    "webTelemetry.adwalls.day": {
                         "state": "enabled",
-                        "template": "counter",
-                        "targets": [
-                            { "pixel": "webTelemetry.adwall.day", "param": "adwall_count" },
-                            { "pixel": "webTelemetry.adwall.week", "param": "adwall_count" }
-                        ]
-                    },
-                    "trackerBlocked": {
-                        "state": "enabled",
-                        "template": "counter",
-                        "targets": [
-                            { "pixel": "webTelemetry.adwall.day", "param": "tracker_count" }
-                        ]
-                    }
-                },
-                "pixels": {
-                    "webTelemetry.adwall.day": {
                         "trigger": {
-                            "period": { "days": 1, "jitterMaxPercent": 25 }
+                            "period": { "days": 1, "maxStaggerMins": 180 }
                         },
                         "parameters": {
-                            "adwall_count": {
-                                "type": "counter",
+                            "adwallCount": {
+                                "template": "counter",
+                                "source": "adwall",
                                 "buckets": ["0-1", "2-3", "4-5", "6-10", "11-20", "21-39", "40+"]
-                            },
-                            "tracker_count": {
-                                "type": "counter",
-                                "buckets": ["0", "1-5", "6-20", "21+"]
                             }
                         }
                     },
-                    "webTelemetry.adwall.week": {
+                    "webTelemetry.adwalls.week": {
+                        "state": "enabled",
                         "trigger": {
-                            "period": { "days": 7, "jitterMaxPercent": 25 }
+                            "period": { "days": 7 }
                         },
                         "parameters": {
-                            "adwall_count": {
-                                "type": "counter",
+                            "adwallCount": {
+                                "template": "counter",
+                                "source": "adwall",
                                 "buckets": ["0-5", "6-20", "21-50", "51+"]
                             }
                         }
@@ -78,211 +60,158 @@ class WebTelemetryConfigParserTest {
     """.trimIndent()
 
     @Test
-    fun `full config parses telemetry types correctly`() {
-        val config = WebTelemetryConfigParser.parse(fullConfig)
+    fun `full config parses telemetry pixels correctly`() {
+        val config = EventHubConfigParser.parse(fullConfig)
         assertTrue(config.featureEnabled)
-        assertEquals(2, config.telemetryTypes.size)
-
-        val adwall = config.telemetryTypes.find { it.name == "adwall" }!!
-        assertTrue(adwall.isEnabled)
-        assertEquals("counter", adwall.template)
-
-        val counter = CounterTelemetryType.from(adwall)!!
-        assertEquals(2, counter.targets.size)
-        assertEquals("webTelemetry.adwall.day", counter.targets[0].pixel)
-        assertEquals("adwall_count", counter.targets[0].param)
-
-        val tracker = config.telemetryTypes.find { it.name == "trackerBlocked" }!!
-        val trackerCounter = CounterTelemetryType.from(tracker)!!
-        assertEquals(1, trackerCounter.targets.size)
+        assertEquals(2, config.telemetry.size)
     }
 
     @Test
-    fun `full config parses pixels correctly`() {
-        val config = WebTelemetryConfigParser.parse(fullConfig)
-        assertEquals(2, config.pixels.size)
+    fun `daily pixel parsed with correct trigger and parameters`() {
+        val config = EventHubConfigParser.parse(fullConfig)
+        val daily = config.telemetry.find { it.name == "webTelemetry.adwalls.day" }!!
 
-        val dailyPixel = config.pixels.find { it.name == "webTelemetry.adwall.day" }!!
-        assertEquals(1, dailyPixel.trigger.period.days)
-        assertEquals(25.0, dailyPixel.trigger.period.jitterMaxPercent, 0.001)
-        assertEquals(2, dailyPixel.parameters.size)
+        assertTrue(daily.isEnabled)
+        assertEquals(1, daily.trigger.period.days)
+        assertEquals(180, daily.trigger.period.maxStaggerMins)
+        assertEquals(86400L, daily.trigger.period.periodSeconds)
+        assertEquals(1, daily.parameters.size)
 
-        val adwallParam = dailyPixel.parameters["adwall_count"]!!
-        assertEquals("counter", adwallParam.type)
-        assertEquals(7, adwallParam.buckets.size)
-
-        val trackerParam = dailyPixel.parameters["tracker_count"]!!
-        assertEquals(4, trackerParam.buckets.size)
-
-        val weeklyPixel = config.pixels.find { it.name == "webTelemetry.adwall.week" }!!
-        assertEquals(7, weeklyPixel.trigger.period.days)
-        assertEquals(1, weeklyPixel.parameters.size)
+        val param = daily.parameters["adwallCount"]!!
+        assertTrue(param.isCounter)
+        assertEquals("adwall", param.source)
+        assertEquals(7, param.buckets.size)
     }
 
     @Test
-    fun `disabled feature returns no active types or pixels`() {
-        val json = """{"state": "disabled", "settings": {"telemetryTypes": {}, "pixels": {}}}"""
-        assertTrue(WebTelemetryConfigParser.parseActiveTelemetryTypes(json).isEmpty())
-        assertTrue(WebTelemetryConfigParser.parseActivePixels(json).isEmpty())
+    fun `weekly pixel parsed with hours period`() {
+        val json = """
+            {
+                "state": "enabled",
+                "settings": {
+                    "telemetry": {
+                        "hourly.pixel": {
+                            "state": "enabled",
+                            "trigger": { "period": { "hours": 6 } },
+                            "parameters": {
+                                "count": { "template": "counter", "source": "evt", "buckets": ["0+"] }
+                            }
+                        }
+                    }
+                }
+            }
+        """.trimIndent()
+        val config = EventHubConfigParser.parse(json)
+        val pixel = config.telemetry[0]
+        assertEquals(6, pixel.trigger.period.hours)
+        assertEquals(21600L, pixel.trigger.period.periodSeconds)
+    }
+
+    @Test
+    fun `disabled feature returns empty`() {
+        val json = """{"state": "disabled", "settings": {"telemetry": {}}}"""
+        val config = EventHubConfigParser.parse(json)
+        assertFalse(config.featureEnabled)
     }
 
     @Test
     fun `empty json returns empty config`() {
-        val config = WebTelemetryConfigParser.parse("{}")
+        val config = EventHubConfigParser.parse("{}")
         assertFalse(config.featureEnabled)
-        assertTrue(config.telemetryTypes.isEmpty())
-        assertTrue(config.pixels.isEmpty())
+        assertTrue(config.telemetry.isEmpty())
     }
 
     @Test
-    fun `invalid json returns empty config`() {
-        val config = WebTelemetryConfigParser.parse("not json")
-        assertFalse(config.featureEnabled)
-    }
-
-    @Test
-    fun `disabled telemetry type excluded from active types`() {
+    fun `pixel missing state is skipped`() {
         val json = """
             {
                 "state": "enabled",
                 "settings": {
-                    "telemetryTypes": {
-                        "adwall": {
-                            "state": "disabled",
-                            "template": "counter",
-                            "targets": [{"pixel": "p", "param": "c"}]
+                    "telemetry": {
+                        "test": {
+                            "trigger": { "period": { "days": 1 } },
+                            "parameters": { "c": { "template": "counter", "source": "e", "buckets": ["0+"] } }
                         }
-                    },
-                    "pixels": {}
+                    }
                 }
             }
         """.trimIndent()
-        assertTrue(WebTelemetryConfigParser.parseActiveTelemetryTypes(json).isEmpty())
+        assertTrue(EventHubConfigParser.parse(json).telemetry.isEmpty())
     }
 
     @Test
-    fun `telemetry type missing targets still parses but counter view returns null`() {
+    fun `pixel with zero period is skipped`() {
         val json = """
             {
                 "state": "enabled",
                 "settings": {
-                    "telemetryTypes": {
-                        "adwall": {
+                    "telemetry": {
+                        "test": {
                             "state": "enabled",
-                            "template": "counter"
-                        }
-                    },
-                    "pixels": {}
-                }
-            }
-        """.trimIndent()
-        val config = WebTelemetryConfigParser.parse(json)
-        assertEquals(1, config.telemetryTypes.size)
-        assertNull(CounterTelemetryType.from(config.telemetryTypes[0]))
-    }
-
-    @Test
-    fun `pixel missing trigger is skipped`() {
-        val json = """
-            {
-                "state": "enabled",
-                "settings": {
-                    "telemetryTypes": {},
-                    "pixels": {
-                        "test.pixel": {
-                            "parameters": {
-                                "count": {"type": "counter", "buckets": ["0-1"]}
-                            }
+                            "trigger": { "period": { "days": 0 } },
+                            "parameters": { "c": { "template": "counter", "source": "e", "buckets": ["0+"] } }
                         }
                     }
                 }
             }
         """.trimIndent()
-        val config = WebTelemetryConfigParser.parse(json)
-        assertTrue(config.pixels.isEmpty())
+        assertTrue(EventHubConfigParser.parse(json).telemetry.isEmpty())
     }
 
     @Test
-    fun `pixel missing parameters is skipped`() {
+    fun `parameter missing template is skipped`() {
         val json = """
             {
                 "state": "enabled",
                 "settings": {
-                    "telemetryTypes": {},
-                    "pixels": {
-                        "test.pixel": {
-                            "trigger": {
-                                "period": { "days": 1, "jitterMaxPercent": 25 }
-                            }
+                    "telemetry": {
+                        "test": {
+                            "state": "enabled",
+                            "trigger": { "period": { "days": 1 } },
+                            "parameters": { "c": { "source": "e", "buckets": ["0+"] } }
                         }
                     }
                 }
             }
         """.trimIndent()
-        val config = WebTelemetryConfigParser.parse(json)
-        assertTrue(config.pixels.isEmpty())
+        assertTrue(EventHubConfigParser.parse(json).telemetry.isEmpty())
     }
 
     @Test
-    fun `pixel missing jitterMaxPercent in period is skipped`() {
+    fun `parameter missing source is skipped`() {
         val json = """
             {
                 "state": "enabled",
                 "settings": {
-                    "telemetryTypes": {},
-                    "pixels": {
-                        "test.pixel": {
-                            "trigger": {
-                                "period": { "days": 1 }
-                            },
-                            "parameters": {
-                                "count": {"type": "counter", "buckets": ["0+"]}
-                            }
+                    "telemetry": {
+                        "test": {
+                            "state": "enabled",
+                            "trigger": { "period": { "days": 1 } },
+                            "parameters": { "c": { "template": "counter", "buckets": ["0+"] } }
                         }
                     }
                 }
             }
         """.trimIndent()
-        val config = WebTelemetryConfigParser.parse(json)
-        assertTrue(config.pixels.isEmpty())
+        assertTrue(EventHubConfigParser.parse(json).telemetry.isEmpty())
     }
 
     @Test
-    fun `telemetry type missing state is skipped`() {
+    fun `unknown template is skipped`() {
         val json = """
             {
                 "state": "enabled",
                 "settings": {
-                    "telemetryTypes": {
-                        "adwall": {
-                            "template": "counter",
-                            "targets": [{"pixel": "p", "param": "c"}]
+                    "telemetry": {
+                        "test": {
+                            "state": "enabled",
+                            "trigger": { "period": { "days": 1 } },
+                            "parameters": { "c": { "template": "gauge", "source": "e" } }
                         }
-                    },
-                    "pixels": {}
+                    }
                 }
             }
         """.trimIndent()
-        val config = WebTelemetryConfigParser.parse(json)
-        assertTrue(config.telemetryTypes.isEmpty())
-    }
-
-    @Test
-    fun `telemetry type missing template is skipped`() {
-        val json = """
-            {
-                "state": "enabled",
-                "settings": {
-                    "telemetryTypes": {
-                        "adwall": {
-                            "state": "enabled"
-                        }
-                    },
-                    "pixels": {}
-                }
-            }
-        """.trimIndent()
-        val config = WebTelemetryConfigParser.parse(json)
-        assertTrue(config.telemetryTypes.isEmpty())
+        assertTrue(EventHubConfigParser.parse(json).telemetry.isEmpty())
     }
 }

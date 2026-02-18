@@ -16,10 +16,10 @@
 
 package com.duckduckgo.webtelemetry.impl
 
-enum class WebTelemetryFeatureName(val value: String) {
-    WebTelemetry("webTelemetry"),
+enum class EventHubFeatureName(val value: String) {
+    EventHub("eventHub"),
 }
 
-fun webTelemetryFeatureValueOf(value: String): WebTelemetryFeatureName? {
-    return WebTelemetryFeatureName.entries.find { it.value == value }
+fun eventHubFeatureValueOf(value: String): EventHubFeatureName? {
+    return EventHubFeatureName.entries.find { it.value == value }
 }
