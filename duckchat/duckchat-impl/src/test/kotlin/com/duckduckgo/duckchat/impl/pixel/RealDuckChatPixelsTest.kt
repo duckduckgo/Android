@@ -329,4 +329,11 @@ class RealDuckChatPixelsTest {
         verify(mockPixel).fire(DUCK_CHAT_CONTEXTUAL_PAGE_CONTEXT_PLACEHOLDER_SHOWN_COUNT)
         verify(mockPixel).fire(DUCK_CHAT_CONTEXTUAL_PAGE_CONTEXT_PLACEHOLDER_SHOWN_DAILY, type = Pixel.PixelType.Daily())
     }
+
+    @Test
+    fun `when reportChatSyncActive then fires daily pixel`() {
+        testee.reportChatSyncActive()
+
+        verify(mockPixel).fire(DuckChatPixelName.SYNC_AI_CHAT_ACTIVE, emptyMap(), emptyMap(), type = Pixel.PixelType.Daily())
+    }
 }

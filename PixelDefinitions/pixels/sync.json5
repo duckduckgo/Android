@@ -38,5 +38,12 @@
                 "type": "string"
             }
         ]
+    },
+    "sync_ai_chat_active": {
+        "description": "Fired daily when AI Chat sync is used (via getScopedSyncAuthToken, encrypt, or decrypt), shows enrolled Sync devices using AI Chat",
+        "owners": ["CDRussell"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
     }
 }

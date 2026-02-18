@@ -28,7 +28,6 @@ import com.duckduckgo.sync.api.DeviceSyncState
 import com.duckduckgo.sync.api.DeviceSyncState.SyncAccountState.SignedIn
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.SyncApi
-import com.duckduckgo.sync.impl.pixels.SyncAccountOperation
 import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.store.SyncStore
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -85,12 +84,13 @@ class GetScopedSyncAuthTokenHandler @Inject constructor(
                 return when (result) {
                     is Result.Success -> {
                         logcat(LogPriority.INFO) { "DuckChat-Sync: rescope token succeeded" }
+                        syncPixels.fireAiChatActive()
                         createSuccessPayload(result.data)
                     }
 
                     is Result.Error -> {
                         logcat(LogPriority.ERROR) { "DuckChat-Sync: rescope token failed: code=${result.code}, reason=${result.reason}" }
-                        syncPixels.fireSyncAccountErrorPixel(result, SyncAccountOperation.RESCOPE_TOKEN)
+                        syncPixels.fireAiChatsRescopeTokenError(result)
                         createErrorPayload(result.reason)
                     }
                 }

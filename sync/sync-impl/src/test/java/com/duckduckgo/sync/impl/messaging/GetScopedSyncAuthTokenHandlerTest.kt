@@ -23,7 +23,6 @@ import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.sync.api.DeviceSyncState
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.SyncApi
-import com.duckduckgo.sync.impl.pixels.SyncAccountOperation
 import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.store.SyncStore
 import org.json.JSONObject
@@ -189,6 +188,19 @@ class GetScopedSyncAuthTokenHandlerTest {
     }
 
     @Test
+    fun `when rescope token succeeds then usage pixel is fired`() {
+        configureSyncEnabled()
+        configureSignedIn()
+        whenever(mockSyncStore.token).thenReturn(ORIGINAL_TOKEN)
+        whenever(mockSyncApi.rescopeToken(ORIGINAL_TOKEN, SCOPE)).thenReturn(Result.Success(SCOPED_TOKEN))
+        val jsMessage = createJsMessage(TEST_MESSAGE_ID)
+
+        handler.getJsMessageHandler().process(jsMessage, mockJsMessaging, null)
+
+        verify(mockSyncPixels).fireAiChatActive()
+    }
+
+    @Test
     fun `when rescope token fails then error pixel is fired`() {
         configureSyncEnabled()
         configureSignedIn()
@@ -199,7 +211,7 @@ class GetScopedSyncAuthTokenHandlerTest {
 
         handler.getJsMessageHandler().process(jsMessage, mockJsMessaging, null)
 
-        verify(mockSyncPixels).fireSyncAccountErrorPixel(error, SyncAccountOperation.RESCOPE_TOKEN)
+        verify(mockSyncPixels).fireAiChatsRescopeTokenError(error)
     }
 
     @Test

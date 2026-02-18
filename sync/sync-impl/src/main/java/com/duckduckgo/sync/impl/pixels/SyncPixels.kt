@@ -23,6 +23,7 @@ import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin
 import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin.PixelParameter
 import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin.PixelParameter.Companion.removeAtb
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.sync.api.engine.DeletableType
 import com.duckduckgo.sync.api.engine.SyncFeatureType
 import com.duckduckgo.sync.impl.API_CODE
 import com.duckduckgo.sync.impl.Result.Error
@@ -118,6 +119,9 @@ interface SyncPixels {
     fun fireSetupSyncPromoBookmarkAddedDialogDismissed()
     fun fireSetupSyncPromoBookmarkAddedDialogConfirmed()
     fun fireSetupSyncPromoBookmarkAddedDialogShown()
+
+    fun fireAiChatActive()
+    fun fireAiChatsRescopeTokenError(error: Error)
 }
 
 @ContributesBinding(AppScope::class)
@@ -403,6 +407,18 @@ class RealSyncPixels @Inject constructor(
         pixel.fire(SyncPixelName.SYNC_SETUP_BARCODE_SCANNER_FAILED, parameters = params)
     }
 
+    override fun fireAiChatActive() {
+        pixel.fire(SyncPixelName.SYNC_AI_CHAT_ACTIVE, type = Pixel.PixelType.Daily())
+    }
+
+    override fun fireAiChatsRescopeTokenError(error: Error) {
+        // Skip 401 errors - let FE handle those
+        if (error.code == API_CODE.INVALID_LOGIN_CREDENTIALS.code) return
+
+        // Reuse existing daily error pixel logic for AI Chats
+        fireDailySyncApiErrorPixel(DeletableType.DUCK_AI_CHATS, error)
+    }
+
     companion object {
         private const val SYNC_PIXELS_PREF_FILE = "com.duckduckgo.sync.pixels.v1"
     }
@@ -477,6 +493,7 @@ enum class SyncPixelName(override val pixelName: String) : Pixel.PixelName {
     SYNC_SETUP_PROMO_BOOKMARK_ADDED_DIALOG_SHOWN("sync_setup_promo_bookmark_added_dialog_shown"),
     SYNC_SETUP_PROMO_BOOKMARK_ADDED_DIALOG_DISMISSED("sync_setup_promo_bookmark_added_dialog_dismissed"),
     SYNC_SETUP_PROMO_BOOKMARK_ADDED_DIALOG_CONFIRMED("sync_setup_promo_bookmark_added_dialog_confirmed"),
+    SYNC_AI_CHAT_ACTIVE("sync_ai_chat_active"),
 }
 
 object SyncPixelParameters {
@@ -514,6 +531,7 @@ object SyncPixelsRequiringDataCleaning : PixelParamRemovalPlugin {
             SyncPixelName.SYNC_SETUP_PROMO_BOOKMARK_ADDED_DIALOG_DISMISSED.pixelName to removeAtb(),
             SyncPixelName.SYNC_SETUP_PROMO_BOOKMARK_ADDED_DIALOG_CONFIRMED.pixelName to removeAtb(),
             SyncPixelName.SYNC_RESCOPE_TOKEN_FAILURE.pixelName to removeAtb(),
+            SyncPixelName.SYNC_AI_CHAT_ACTIVE.pixelName to removeAtb(),
         )
     }
 }
