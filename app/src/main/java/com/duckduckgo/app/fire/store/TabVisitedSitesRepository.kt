@@ -17,7 +17,7 @@
 package com.duckduckgo.app.fire.store
 
 /**
- * Tracks which eTLD+1 domains each browser tab has visited.
+ * Associates visited eTLD+1 domains to browser tabs.
  *
  * Used during single-tab burning to determine which sites' data
  * (cookies, web storage, etc.) should be cleared for a specific tab.
