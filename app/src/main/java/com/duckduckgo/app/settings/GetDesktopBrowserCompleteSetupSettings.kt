@@ -66,7 +66,9 @@ class GetDesktopBrowserCompleteSetupSettings @Inject constructor(
         if (settingsPageFeature.newDesktopBrowserSettingEnabled().isEnabled() &&
             !settingsDataStore.getDesktopBrowserSettingDismissed
         ) {
-            val launcher: ActivityResultLauncher<Intent> = activity.registerForActivityResult(
+            val launcher: ActivityResultLauncher<Intent> = activity.activityResultRegistry.register(
+                GET_DESKTOP_BROWSER_LAUNCHER_KEY,
+                activity,
                 ActivityResultContracts.StartActivityForResult(),
             ) { result ->
                 if (result.resultCode == GetDesktopBrowserActivity.RESULT_DISMISSED_OR_SHARED) {
@@ -111,5 +113,9 @@ class GetDesktopBrowserCompleteSetupSettings @Inject constructor(
         }
 
         return popupMenu
+    }
+
+    companion object {
+        private const val GET_DESKTOP_BROWSER_LAUNCHER_KEY = "get_desktop_browser_launcher"
     }
 }
