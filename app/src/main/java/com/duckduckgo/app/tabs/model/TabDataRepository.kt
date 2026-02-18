@@ -325,6 +325,7 @@ class TabDataRepository @Inject constructor(
             tabsDao.deleteTabAndUpdateSelection(tab)
         }
         siteData.remove(tab.tabId)
+        tabVisitedSitesRepository.clearTab(tab.tabId)
     }
 
     override suspend fun deleteTabs(tabIds: List<String>) {
@@ -332,6 +333,7 @@ class TabDataRepository @Inject constructor(
             tabsDao.deleteTabsAndUpdateSelection(tabIds)
             clearAllSiteData(tabIds)
         }
+        tabIds.forEach { tabVisitedSitesRepository.clearTab(it) }
     }
 
     private fun clearAllSiteData(tabIds: List<String>) {
@@ -370,7 +372,9 @@ class TabDataRepository @Inject constructor(
     }
 
     override suspend fun purgeDeletableTabs() = withContext(dispatchers.io()) {
-        clearAllSiteData(getDeletableTabIds())
+        val deletableTabIds = getDeletableTabIds()
+        clearAllSiteData(deletableTabIds)
+        deletableTabIds.forEach { tabVisitedSitesRepository.clearTab(it) }
 
         purgeDeletableTabsJob += appCoroutineScope.launch(dispatchers.io()) {
             tabsDao.purgeDeletableTabsAndUpdateSelection()
@@ -401,6 +405,7 @@ class TabDataRepository @Inject constructor(
                 }
             }
         }
+        tabVisitedSitesRepository.clearTab(tabId)
     }
 
     override suspend fun deleteAll() {

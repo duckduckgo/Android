@@ -225,6 +225,7 @@ class TabDataRepositoryTest {
 
         verify(mockDao).deleteTabAndUpdateSelection(any())
         assertNotSame(siteData, testee.retrieveSiteData(addedTabId))
+        verify(mockTabVisitedSitesRepository).clearTab(addedTabId)
     }
 
     @Test
@@ -379,6 +380,7 @@ class TabDataRepositoryTest {
 
         currentSelectedTabId = testee.liveSelectedTab.blockingObserve()?.tabId
         assertEquals(currentSelectedTabId, sourceTab.tabId)
+        verify(mockTabVisitedSitesRepository).clearTab("tabToDeleteId")
     }
 
     @Test
@@ -644,6 +646,7 @@ class TabDataRepositoryTest {
             verify(mockWebViewSessionStorage).deleteSession(tabId)
             verify(mockAdClickManager).clearTabId(tabId)
             verify(mockDuckChatContextualDataStore).clearTabChatUrl(tabId)
+            verify(mockTabVisitedSitesRepository).clearTab(tabId)
         }
     }
 
@@ -661,6 +664,7 @@ class TabDataRepositoryTest {
             verify(mockWebViewSessionStorage).deleteSession(tabId)
             verify(mockAdClickManager).clearTabId(tabId)
             verify(mockDuckChatContextualDataStore).clearTabChatUrl(tabId)
+            verify(mockTabVisitedSitesRepository).clearTab(tabId)
         }
     }
 
