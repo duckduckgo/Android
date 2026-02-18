@@ -144,7 +144,7 @@ class WideEventRepositoryImpl @Inject constructor(
                 }
 
             duration = Duration.between(interval.startedAt, timeProvider.getCurrentTime())
-            val durationBucket = INTERVAL_BUCKETS.firstOrNull { it >= duration } ?: INTERVAL_BUCKETS.last()
+            val durationBucket = INTERVAL_BUCKETS.last { it <= duration }
 
             event.copy(
                 metadata =
@@ -180,6 +180,7 @@ class WideEventRepositoryImpl @Inject constructor(
     private companion object {
         val INTERVAL_BUCKETS =
             listOf(
+                Duration.ZERO,
                 Duration.ofSeconds(1),
                 Duration.ofSeconds(5),
                 Duration.ofSeconds(10),

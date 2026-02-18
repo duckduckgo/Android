@@ -383,6 +383,96 @@ class WideEventRepositoryTest {
             assertTrue(event.metadata.containsKey("interval_1"))
         }
 
+    @Test
+    fun `when ending an interval with duration less than 1s, maps to zero`() = runTest {
+        val eventId = wideEventRepository.insertWideEvent(
+            name = "interval_event",
+            flowEntryPoint = null,
+            metadata = emptyMap(),
+            cleanupPolicy = DEFAULT_CLEANUP_POLICY,
+        )
+
+        wideEventRepository.startInterval(
+            eventId = eventId,
+            name = "interval_1",
+            timeout = null,
+        )
+
+        timeProvider.currentTime += Duration.ofMillis(500)
+        wideEventRepository.endInterval(eventId, "interval_1")
+        val event = wideEventRepository.getWideEvents(setOf(eventId)).single()
+
+        assertEquals("0", event.metadata["interval_1"])
+    }
+
+    @Test
+    fun `when ending an interval with duration exactly at bucket boundary, maps to that bucket`() = runTest {
+        val eventId = wideEventRepository.insertWideEvent(
+            name = "interval_event",
+            flowEntryPoint = null,
+            metadata = emptyMap(),
+            cleanupPolicy = DEFAULT_CLEANUP_POLICY,
+        )
+
+        wideEventRepository.startInterval(
+            eventId = eventId,
+            name = "interval_1",
+            timeout = null,
+        )
+
+        timeProvider.currentTime += Duration.ofSeconds(5)
+        wideEventRepository.endInterval(eventId, "interval_1")
+        val event = wideEventRepository.getWideEvents(setOf(eventId)).single()
+
+        assertEquals("5000", event.metadata["interval_1"])
+    }
+
+    @Test
+    fun `when ending an interval with duration between buckets, maps to lower bucket`() = runTest {
+        val eventId = wideEventRepository.insertWideEvent(
+            name = "interval_event",
+            flowEntryPoint = null,
+            metadata = emptyMap(),
+            cleanupPolicy = DEFAULT_CLEANUP_POLICY,
+        )
+
+        wideEventRepository.startInterval(
+            eventId = eventId,
+            name = "interval_1",
+            timeout = null,
+        )
+
+        // 7 seconds is between 5s and 10s buckets, should map to 5s (lower end)
+        timeProvider.currentTime += Duration.ofSeconds(7)
+        wideEventRepository.endInterval(eventId, "interval_1")
+        val event = wideEventRepository.getWideEvents(setOf(eventId)).single()
+
+        assertEquals("5000", event.metadata["interval_1"])
+    }
+
+    @Test
+    fun `when ending an interval with duration greater than largest bucket, maps to largest bucket`() = runTest {
+        val eventId = wideEventRepository.insertWideEvent(
+            name = "interval_event",
+            flowEntryPoint = null,
+            metadata = emptyMap(),
+            cleanupPolicy = DEFAULT_CLEANUP_POLICY,
+        )
+
+        wideEventRepository.startInterval(
+            eventId = eventId,
+            name = "interval_1",
+            timeout = null,
+        )
+
+        // 15 minutes is greater than largest bucket (10 minutes)
+        timeProvider.currentTime += Duration.ofMinutes(15)
+        wideEventRepository.endInterval(eventId, "interval_1")
+        val event = wideEventRepository.getWideEvents(setOf(eventId)).single()
+
+        assertEquals(Duration.ofMinutes(10).toMillis().toString(), event.metadata["interval_1"])
+    }
+
     companion object {
         val DEFAULT_CLEANUP_POLICY =
             WideEventRepository.CleanupPolicy.OnTimeout(
