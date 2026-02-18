@@ -24,19 +24,20 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
-class WebTelemetryFeaturePlugin @Inject constructor(
+class EventHubFeaturePlugin @Inject constructor(
     private val repository: WebTelemetryRepository,
+    private val pixelManager: EventHubPixelManager,
 ) : PrivacyFeaturePlugin {
 
     override fun store(featureName: String, jsonString: String): Boolean {
-        val webTelemetryFeatureName = webTelemetryFeatureValueOf(featureName) ?: return false
-        if (webTelemetryFeatureName.value == this.featureName) {
-            val entity = WebTelemetryConfigEntity(json = jsonString)
-            repository.updateConfig(entity)
+        val feature = eventHubFeatureValueOf(featureName) ?: return false
+        if (feature.value == this.featureName) {
+            repository.updateConfig(WebTelemetryConfigEntity(json = jsonString))
+            pixelManager.onConfigChanged()
             return true
         }
         return false
     }
 
-    override val featureName: String = WebTelemetryFeatureName.WebTelemetry.value
+    override val featureName: String = EventHubFeatureName.EventHub.value
 }

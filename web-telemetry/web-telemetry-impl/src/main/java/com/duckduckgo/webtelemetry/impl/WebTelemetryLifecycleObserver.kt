@@ -28,16 +28,14 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /**
- * Observes app lifecycle to:
- * 1. Sync pixel state (initialise/deregister pixels) based on remote config
- * 2. Check if any pixel periods have elapsed and fire them
+ * On app foreground, check if any pixel periods have elapsed and fire them.
  */
 @ContributesMultibinding(
     scope = AppScope::class,
     boundType = MainProcessLifecycleObserver::class,
 )
-class WebTelemetryLifecycleObserver @Inject constructor(
-    private val pixelManager: WebTelemetryPixelManager,
+class EventHubLifecycleObserver @Inject constructor(
+    private val pixelManager: EventHubPixelManager,
     private val dispatcherProvider: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : MainProcessLifecycleObserver {
@@ -45,7 +43,6 @@ class WebTelemetryLifecycleObserver @Inject constructor(
     @UiThread
     override fun onStart(owner: LifecycleOwner) {
         appCoroutineScope.launch(dispatcherProvider.io()) {
-            pixelManager.syncPixelState()
             pixelManager.checkPixels()
         }
     }
