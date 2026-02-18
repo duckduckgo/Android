@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.settings
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
@@ -64,6 +65,7 @@ class GetDesktopBrowserCompleteSetupSettings @Inject constructor(
         if (settingsPageFeature.newDesktopBrowserSettingEnabled().isEnabled() &&
             !settingsDataStore.getDesktopBrowserSettingDismissed
         ) {
+            @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
             activity.lifecycle.addObserver(object : DefaultLifecycleObserver {
                 override fun onResume(owner: LifecycleOwner) {
                     if (settingsDataStore.getDesktopBrowserSettingDismissed) {
