@@ -20,9 +20,9 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.findViewTreeLifecycleOwner
 import com.duckduckgo.anvil.annotations.PriorityKey
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.desktopbrowser.GetDesktopBrowserActivityParams
@@ -43,13 +43,14 @@ import javax.inject.Inject
 class GetDesktopBrowserCompleteSetupSettings @Inject constructor(
     private val settingsPageFeature: SettingsPageFeature,
     private val settingsDataStore: SettingsDataStore,
+    private val activity: AppCompatActivity,
     private val globalActivityStarter: GlobalActivityStarter,
 ) : CompleteSetupSettingsPlugin {
 
     override fun getView(context: Context): View {
-        return TwoLineListItem(context = context).apply {
-            setPrimaryText(context.getString(R.string.getDesktopBrowserSettingItemTitle))
-            setSecondaryText(context.getString(R.string.getDesktopBrowserSettingItemSubtitleTitle))
+        return TwoLineListItem(context = activity).apply {
+            setPrimaryText(activity.getString(R.string.getDesktopBrowserSettingItemTitle))
+            setSecondaryText(activity.getString(R.string.getDesktopBrowserSettingItemSubtitleTitle))
             setLeadingIconResource(R.drawable.ic_device_laptop_install_color_24)
 
             configureOverflowMenu()
@@ -64,7 +65,7 @@ class GetDesktopBrowserCompleteSetupSettings @Inject constructor(
         if (settingsPageFeature.newDesktopBrowserSettingEnabled().isEnabled() &&
             !settingsDataStore.getDesktopBrowserSettingDismissed
         ) {
-            findViewTreeLifecycleOwner()?.lifecycle?.addObserver(
+            activity.lifecycle.addObserver(
                 @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
                 object : DefaultLifecycleObserver {
                     override fun onResume(owner: LifecycleOwner) {
@@ -76,7 +77,7 @@ class GetDesktopBrowserCompleteSetupSettings @Inject constructor(
             )
 
             val intent = globalActivityStarter.startIntent(
-                context,
+                activity,
                 GetDesktopBrowserActivityParams(
                     source = GetDesktopBrowserActivityParams.Source.COMPLETE_SETUP,
                 ),
