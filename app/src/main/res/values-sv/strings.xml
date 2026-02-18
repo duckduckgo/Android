@@ -176,6 +176,8 @@
     <string name="improvedAutoCompleteIAMContent">Komplettera automatiskt-förslag inkluderar nu dina nyligen besökta webbplatser. Stäng av funktionen i inställningarna, eller rensa när som helst med 🔥 Fire Button.</string>
     <string name="improvedAutoCompleteIAMTitle">Samma integritet.\nBättre sökförslag!</string>
     <string name="openAutoCompleteSettings">Öppna inställningar</string>
+    <string name="privateSearchChatSuggestionsToggle">Chattförslag</string>
+    <string name="privateSearchAutocompleteHintWithChatSuggestions">Visa förslag från din historik, dina bokmärken och (valfritt) chatthistoriken från Duck.ai när du skriver i sökfältet. Alla sökningar är privata.</string>
 
     <!-- General Settings -->
     <string name="generalSettingsActivityTitle" instruction="Title of the general settings screen">Allmänt</string>

@@ -176,6 +176,8 @@
     <string name="improvedAutoCompleteIAMContent">Automaattisen täydennyksen ehdotukset sisältävät nyt äskettäin vieraillut sivustot. Voit poistaa tämän käytöstä asetusten kautta tai tyhjentää milloin tahansa 🔥 Fire Buttonilla.</string>
     <string name="improvedAutoCompleteIAMTitle">Sama tietoja,\nparempia hakuehdotuksia!</string>
     <string name="openAutoCompleteSettings">Avaa asetukset</string>
+    <string name="privateSearchChatSuggestionsToggle">Chat-ehdotukset</string>
+    <string name="privateSearchAutocompleteHintWithChatSuggestions">Näytä ehdotuksia historiastasi, kirjanmerkeistäsi ja (valinnaisesti) Duck.ai-keskusteluhistoriastasi, kun kirjoitat hakukenttään. Kaikki haut ovat yksityisiä.</string>
 
     <!-- General Settings -->
     <string name="generalSettingsActivityTitle" instruction="Title of the general settings screen">Yleistä</string>
