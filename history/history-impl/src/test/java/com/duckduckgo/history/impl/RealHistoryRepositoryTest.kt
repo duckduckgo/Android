@@ -53,7 +53,6 @@ class RealHistoryRepositoryTest {
     private val testee = RealHistoryRepository(
         mockHistoryDao,
         dispatcherProvider,
-        coroutineTestRule.testScope,
         mockHistoryDataStore,
     )
 

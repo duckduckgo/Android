@@ -43,7 +43,11 @@ class HistoryModule {
         @AppCoroutineScope appCoroutineScope: CoroutineScope,
         historyDataStore: HistoryDataStore,
     ): HistoryRepository {
-        return RealHistoryRepository(historyDatabase.historyDao(), dispatcherProvider, appCoroutineScope, historyDataStore)
+        return RealHistoryRepository(
+            historyDatabase.historyDao(),
+            dispatcherProvider,
+            historyDataStore,
+        )
     }
 
     @SingleInstanceIn(AppScope::class)

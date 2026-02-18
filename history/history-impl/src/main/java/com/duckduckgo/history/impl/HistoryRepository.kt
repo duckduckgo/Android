@@ -20,7 +20,6 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.history.api.HistoryEntry
 import com.duckduckgo.history.impl.store.HistoryDao
 import com.duckduckgo.history.impl.store.HistoryDataStore
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
@@ -59,7 +58,6 @@ interface HistoryRepository {
 class RealHistoryRepository(
     private val historyDao: HistoryDao,
     private val dispatcherProvider: DispatcherProvider,
-    private val appCoroutineScope: CoroutineScope,
     private val historyDataStore: HistoryDataStore,
 ) : HistoryRepository {
 
