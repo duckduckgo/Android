@@ -165,7 +165,7 @@ class WideEventPageLoadManager @Inject constructor(
         if (url.isBlank()) return false
         if (url == ABOUT_BLANK) return false
         return runCatching {
-            PageLoadedSites.sites.any { site -> UriString.sameOrSubdomain(url, site) }
+            PageLoadedSites.perfSites.any { site -> UriString.sameOrSubdomain(url, site) }
         }.getOrDefault(false)
     }
 }
