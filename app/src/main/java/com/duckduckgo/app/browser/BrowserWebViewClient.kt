@@ -549,13 +549,14 @@ class BrowserWebViewClient @Inject constructor(
 
             if (url != null && url != ABOUT_BLANK) {
                 start?.let { safeStart ->
+                    val concurrentRequestsOnFinish = decrementLoadCountAndGet()
                     webViewClientListener?.getCurrentTabId()?.let { tabId ->
                         pageLoadManager.onPageLoadSucceeded(
                             tabId = tabId,
                             url = url,
                             isTabInForegroundOnFinish = webViewClientListener?.isTabInForeground() ?: true,
                             activeRequestsOnLoadStart = parallelRequestsOnStart,
-                            concurrentRequestsOnFinish = decrementLoadCountAndGet(),
+                            concurrentRequestsOnFinish = concurrentRequestsOnFinish,
                         )
                     }
 
@@ -567,7 +568,7 @@ class BrowserWebViewClient @Inject constructor(
                         end = currentTimeProvider.elapsedRealtime(),
                         isTabInForegroundOnFinish = webViewClientListener?.isTabInForeground() ?: true,
                         activeRequestsOnLoadStart = parallelRequestsOnStart,
-                        concurrentRequestsOnFinish = decrementLoadCountAndGet(),
+                        concurrentRequestsOnFinish = concurrentRequestsOnFinish,
                     )
                     shouldSendPagePaintedPixel(webView = webView, url = url)
                     appCoroutineScope.launch(dispatcherProvider.io()) {
