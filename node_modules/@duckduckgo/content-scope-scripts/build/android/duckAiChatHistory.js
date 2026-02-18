@@ -4027,12 +4027,12 @@
      * @param {number} [params.max_chats] - Maximum number of unpinned chats to return (default: 30, pinned chats have no limit)
      * @param {number} [params.since] - Timestamp in milliseconds - only return chats with lastEdit >= this value
      */
-    getChats(params) {
+    async getChats(params) {
       try {
         const query = params?.query?.toLowerCase().trim() || "";
         const maxChats = params?.max_chats ?? _DuckAiChatHistory.DEFAULT_MAX_CHATS;
         const since = params?.since;
-        const { pinnedChats, chats } = this.retrieveChats(query, maxChats, since);
+        const { pinnedChats, chats } = await this.retrieveChats(query, maxChats, since);
         this.notify("duckAiChatsResult", {
           success: true,
           pinnedChats,
@@ -4051,16 +4051,99 @@
       }
     }
     /**
-     * Retrieves chats from localStorage, optionally filtered by search query and timestamp
+     * Retrieves chats from IndexedDB (preferred) or localStorage, optionally filtered by search query and timestamp.
+     * If IndexedDB contains any saved chats, localStorage is skipped (migration is considered complete).
      * @param {string} query - Search query (empty string returns all chats)
      * @param {number} maxChats - Maximum number of unpinned chats to return (pinned chats have no limit)
      * @param {number} [since] - Timestamp in milliseconds - only return chats with lastEdit >= this value
-     * @returns {{pinnedChats: Array<object>, chats: Array<object>}} Pinned and unpinned chat arrays
+     * @returns {Promise<{pinnedChats: Array<object>, chats: Array<object>}>} Pinned and unpinned chat arrays
      */
-    retrieveChats(query, maxChats, since) {
+    async retrieveChats(query, maxChats, since) {
+      const indexedDBChats = await this.retrieveChatsFromIndexedDB();
+      if (indexedDBChats.length > 0) {
+        return this.processChats(indexedDBChats, query, maxChats, since);
+      }
+      this.log.info("No chats in IndexedDB, falling back to localStorage");
+      const localStorageChats = this.retrieveChatsFromLocalStorage();
+      return this.processChats(localStorageChats, query, maxChats, since);
+    }
+    /**
+     * Retrieves all chats from IndexedDB.
+     * @returns {Promise<Array<object>>} Array of chat objects from IndexedDB
+     */
+    retrieveChatsFromIndexedDB() {
+      const dbName = this.getFeatureSetting("savedChatsIndexDbName") || _DuckAiChatHistory.DEFAULT_INDEXED_DB_NAME;
+      const storeName = this.getFeatureSetting("savedChatsStoreName") || _DuckAiChatHistory.DEFAULT_SAVED_CHATS_STORE;
+      return (
+        /** @type {Promise<Array<object>>} */
+        new Promise((resolve) => {
+          const request = window.indexedDB.open(dbName);
+          request.onerror = () => {
+            this.log.error("Error opening IndexedDB:", request.error);
+            resolve([]);
+          };
+          request.onblocked = () => {
+            this.log.error("IndexedDB open blocked by another connection");
+            resolve([]);
+          };
+          request.onupgradeneeded = (event) => {
+            const upgradeEvent = (
+              /** @type {IDBVersionChangeEvent & { target: IDBOpenDBRequest }} */
+              event
+            );
+            if (upgradeEvent.target?.transaction) {
+              upgradeEvent.target.transaction.abort();
+            }
+            resolve([]);
+          };
+          request.onsuccess = () => {
+            const db = request.result;
+            if (!db) {
+              resolve([]);
+              return;
+            }
+            if (db.version < _DuckAiChatHistory.MIN_INDEXED_DB_VERSION) {
+              db.close();
+              resolve([]);
+              return;
+            }
+            if (!db.objectStoreNames.contains(storeName)) {
+              db.close();
+              resolve([]);
+              return;
+            }
+            try {
+              const transaction = db.transaction([storeName], "readonly");
+              const objectStore = transaction.objectStore(storeName);
+              const getAllRequest = objectStore.getAll();
+              getAllRequest.onsuccess = () => {
+                const results = getAllRequest.result || [];
+                const allChats = results.map((record) => record.Value || record);
+                const chatsWithTitle = allChats.filter((chat) => "title" in chat);
+                db.close();
+                resolve(chatsWithTitle);
+              };
+              getAllRequest.onerror = (err) => {
+                this.log.error("Error getting all records from IndexedDB:", err);
+                db.close();
+                resolve([]);
+              };
+            } catch (err) {
+              this.log.error("Exception during IndexedDB operation:", err);
+              db.close();
+              resolve([]);
+            }
+          };
+        })
+      );
+    }
+    /**
+     * Retrieves all chats from localStorage.
+     * @returns {Array<object>} Array of chat objects from localStorage
+     */
+    retrieveChatsFromLocalStorage() {
       const localStorageKeys = this.getFeatureSetting("chatsLocalStorageKeys") || ["savedAIChats"];
-      const pinnedChats = [];
-      const chats = [];
+      const allChats = [];
       for (const localStorageKey of localStorageKeys) {
         try {
           const rawData = window.localStorage.getItem(localStorageKey);
@@ -4078,21 +4161,35 @@
             this.log.info(`No chats array found for key '${localStorageKey}'`);
             continue;
           }
-          let filteredChats = dataChats;
-          if (since !== void 0) {
-            filteredChats = filteredChats.filter((chat) => this.isNotOlderThan(chat, since));
-          }
-          const matchingChats = query ? filteredChats.filter((chat) => this.chatMatchesQuery(chat, query)) : filteredChats;
-          for (const chat of matchingChats) {
-            const formattedChat = this.formatChat(chat);
-            if (chat.pinned) {
-              pinnedChats.push(formattedChat);
-            } else if (chats.length < maxChats) {
-              chats.push(formattedChat);
-            }
-          }
+          allChats.push(...dataChats);
         } catch (error) {
           this.log.error(`Error parsing data for key '${localStorageKey}':`, error);
+        }
+      }
+      return allChats;
+    }
+    /**
+     * Processes chats by filtering and separating into pinned and unpinned.
+     * @param {Array<object>} allChats - All chat objects to process
+     * @param {string} query - Search query (empty string returns all chats)
+     * @param {number} maxChats - Maximum number of unpinned chats to return
+     * @param {number} [since] - Timestamp in milliseconds - only return chats with lastEdit >= this value
+     * @returns {{pinnedChats: Array<object>, chats: Array<object>}} Pinned and unpinned chat arrays
+     */
+    processChats(allChats, query, maxChats, since) {
+      const pinnedChats = [];
+      const chats = [];
+      let filteredChats = allChats;
+      if (since !== void 0) {
+        filteredChats = filteredChats.filter((chat) => this.isNotOlderThan(chat, since));
+      }
+      const matchingChats = query ? filteredChats.filter((chat) => this.chatMatchesQuery(chat, query)) : filteredChats;
+      for (const chat of matchingChats) {
+        const formattedChat = this.formatChat(chat);
+        if (chat.pinned) {
+          pinnedChats.push(formattedChat);
+        } else if (chats.length < maxChats) {
+          chats.push(formattedChat);
         }
       }
       return { pinnedChats, chats };
@@ -4103,11 +4200,15 @@
      * @returns {object} Formatted chat object
      */
     formatChat(chat) {
+      let lastEdit = chat?.lastEdit;
+      if (lastEdit instanceof Date) {
+        lastEdit = lastEdit.toISOString();
+      }
       return {
         chatId: chat?.chatId,
         title: chat?.title,
         model: chat?.model,
-        lastEdit: chat?.lastEdit,
+        lastEdit,
         pinned: chat?.pinned
       };
     }
@@ -4142,6 +4243,13 @@
   };
   /** @type {number} Default maximum number of chats to return */
   __publicField(_DuckAiChatHistory, "DEFAULT_MAX_CHATS", 30);
+  /** @type {string} Default IndexedDB database name for saved chat data */
+  __publicField(_DuckAiChatHistory, "DEFAULT_INDEXED_DB_NAME", "savedAIChatData");
+  /** @type {string} Default IndexedDB object store name for saved chats */
+  __publicField(_DuckAiChatHistory, "DEFAULT_SAVED_CHATS_STORE", "saved-chats");
+  /** @type {number} Expected IndexedDB version for migrated data */
+  /** @type {number} Minimum IndexedDB version required for migrated data */
+  __publicField(_DuckAiChatHistory, "MIN_INDEXED_DB_VERSION", 2);
   var DuckAiChatHistory = _DuckAiChatHistory;
   var duck_ai_chat_history_default = DuckAiChatHistory;
 
