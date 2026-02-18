@@ -68,12 +68,12 @@
             {
                 "key": "feature.data.ext.step.page_start",
                 "description": "Parameter present when page load begins",
-                "enum": ["true"]
+                "type": "boolean"
             },
             {
                 "key": "feature.data.ext.step.page_visible",
                 "description": "Parameter present when page becomes visible",
-                "enum": ["true"]
+                "type": "boolean"
             },
             {
                 "key": "feature.data.ext.step.page_visible.progress",
@@ -83,7 +83,7 @@
             {
                 "key": "feature.data.ext.step.page_escaped_fixed_progress",
                 "description": "Parameter present when progress escapes the fixed progress zone (typically 50%)",
-                "enum": ["true"]
+                "type": "boolean"
             },
             {
                 "key": "feature.data.ext.step.page_escaped_fixed_progress.progress",
@@ -93,7 +93,7 @@
             {
                 "key": "feature.data.ext.step.page_finish",
                 "description": "Parameter present when page load completes or fails",
-                "enum": ["true"]
+                "type": "boolean"
             },
             {
                 "key": "feature.data.ext.step.page_finish.outcome",
