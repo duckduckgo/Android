@@ -23,7 +23,7 @@ plugins {
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 android {
-    namespace 'com.duckduckgo.persistent.storage.impl'
+    namespace 'com.duckduckgo.persistentstorage.impl'
     anvil {
         generateDaggerFactories = true
     }
