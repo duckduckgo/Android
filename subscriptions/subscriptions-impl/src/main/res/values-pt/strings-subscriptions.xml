@@ -152,8 +152,8 @@
     <string name="feedbackSubCategoryItrAdvisorUnhelpful">A chamada para o consultor não foi útil</string>
     <string name="feedbackSubCategoryItrOther">Outros</string>
 
-    <string name="feedbackSubCategorySubsOtp">Palavra-passe de utilização única</string>
-    <string name="feedbackSubCategorySubsOther">Outros</string>
+    <string name="feedbackSubCategorySubsOtp">Problema com a palavra-passe de utilização única</string>
+    <string name="feedbackSubCategorySubsOther">Outra coisa</string>
 
     <string name="feedbackSubmitVpnHeader">Encontraste um problema que não é abordado no nosso <annotation type="faqs_link">centro de ajuda</annotation> ? Queremos perceber do que se trata.</string>
     <string name="feedbackSubmitVpnDescriptionHint">Diz-nos o que se passa…</string>

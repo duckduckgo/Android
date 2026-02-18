@@ -152,8 +152,8 @@
     <string name="feedbackSubCategoryItrAdvisorUnhelpful">Połączenie z doradcą nie pomogło</string>
     <string name="feedbackSubCategoryItrOther">Inne</string>
 
-    <string name="feedbackSubCategorySubsOtp">Hasło jednorazowe</string>
-    <string name="feedbackSubCategorySubsOther">Inne</string>
+    <string name="feedbackSubCategorySubsOtp">Problem z hasłem jednorazowym</string>
+    <string name="feedbackSubCategorySubsOther">Coś innego</string>
 
     <string name="feedbackSubmitVpnHeader">Wystąpił problem, który nie został omówiony w naszym <annotation type="faqs_link">centrum pomocy</annotation>? Zdecydowanie chcemy o tym wiedzieć.\n\n</string>
     <string name="feedbackSubmitVpnDescriptionHint">Powiedz nam, co się dzieje…</string>

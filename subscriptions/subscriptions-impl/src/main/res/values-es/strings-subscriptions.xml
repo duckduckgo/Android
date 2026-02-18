@@ -152,8 +152,8 @@
     <string name="feedbackSubCategoryItrAdvisorUnhelpful">Llamar al asesor no ayuda</string>
     <string name="feedbackSubCategoryItrOther">Otros</string>
 
-    <string name="feedbackSubCategorySubsOtp">Contraseña de un solo uso</string>
-    <string name="feedbackSubCategorySubsOther">Otros</string>
+    <string name="feedbackSubCategorySubsOtp">Problema con la contraseña de un solo uso</string>
+    <string name="feedbackSubCategorySubsOther">Otro problema</string>
 
     <string name="feedbackSubmitVpnHeader">¿Has encontrado una incidencia que no aparece en nuestro <annotation type="faqs_link">centro de ayuda</annotation> ? Nos interesa mucho saberlo.\n\n</string>
     <string name="feedbackSubmitVpnDescriptionHint">Cuéntanos qué está pasando…</string>

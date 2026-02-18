@@ -152,8 +152,8 @@
     <string name="feedbackSubCategoryItrAdvisorUnhelpful">Apelul către consilier a fost inutil</string>
     <string name="feedbackSubCategoryItrOther">Altele</string>
 
-    <string name="feedbackSubCategorySubsOtp">Parolă unică</string>
-    <string name="feedbackSubCategorySubsOther">Altele</string>
+    <string name="feedbackSubCategorySubsOtp">Problemă cu parola de unică folosință</string>
+    <string name="feedbackSubCategorySubsOther">Altceva</string>
 
     <string name="feedbackSubmitVpnHeader">Ai găsit o problemă care nu este prezentată în <annotation type="faqs_link">centrul nostru de ajutor</annotation> ? Ne dorim foarte mult să știm acest lucru.</string>
     <string name="feedbackSubmitVpnDescriptionHint">Spune-ne ce se întâmplă...</string>
