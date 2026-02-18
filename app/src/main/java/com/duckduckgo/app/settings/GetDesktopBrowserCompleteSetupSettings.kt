@@ -17,15 +17,13 @@
 package com.duckduckgo.app.settings
 
 import android.content.Context
-import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.anvil.annotations.PriorityKey
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.desktopbrowser.GetDesktopBrowserActivity
 import com.duckduckgo.app.desktopbrowser.GetDesktopBrowserActivityParams
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.common.ui.menu.PopupMenu
@@ -66,15 +64,13 @@ class GetDesktopBrowserCompleteSetupSettings @Inject constructor(
         if (settingsPageFeature.newDesktopBrowserSettingEnabled().isEnabled() &&
             !settingsDataStore.getDesktopBrowserSettingDismissed
         ) {
-            val launcher: ActivityResultLauncher<Intent> = activity.activityResultRegistry.register(
-                GET_DESKTOP_BROWSER_LAUNCHER_KEY,
-                activity,
-                ActivityResultContracts.StartActivityForResult(),
-            ) { result ->
-                if (result.resultCode == GetDesktopBrowserActivity.RESULT_DISMISSED_OR_SHARED) {
-                    gone()
+            activity.lifecycle.addObserver(object : DefaultLifecycleObserver {
+                override fun onResume(owner: LifecycleOwner) {
+                    if (settingsDataStore.getDesktopBrowserSettingDismissed) {
+                        gone()
+                    }
                 }
-            }
+            })
 
             val intent = globalActivityStarter.startIntent(
                 activity,
@@ -83,7 +79,7 @@ class GetDesktopBrowserCompleteSetupSettings @Inject constructor(
                 ),
             ) ?: return
 
-            setOnClickListener { launcher.launch(intent) }
+            setOnClickListener { context.startActivity(intent) }
 
             show()
         }
@@ -113,9 +109,5 @@ class GetDesktopBrowserCompleteSetupSettings @Inject constructor(
         }
 
         return popupMenu
-    }
-
-    companion object {
-        private const val GET_DESKTOP_BROWSER_LAUNCHER_KEY = "get_desktop_browser_launcher"
     }
 }
