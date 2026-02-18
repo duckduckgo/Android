@@ -43,7 +43,7 @@ import logcat.logcat
 import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
-@ContributeToActivityStarter(GetDesktopBrowserActivityParams::class)
+@ContributeToActivityStarter(GetDesktopBrowserActivityParams::class, screenName = "getDesktopBrowser")
 class GetDesktopBrowserActivity : DuckDuckGoActivity() {
 
     @Inject
