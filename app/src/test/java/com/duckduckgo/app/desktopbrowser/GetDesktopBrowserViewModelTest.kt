@@ -70,7 +70,7 @@ class GetDesktopBrowserViewModelTest {
             testee.onShareDownloadLinkClicked()
 
             val command = awaitItem() as Command.ShareDownloadLink
-            assertEquals("https://duckduckgo.com/browser?origin=funnel_browser_settings_android", command.url)
+            assertEquals("https://duckduckgo.com/browser?origin=funnel_appsettings_android", command.url)
         }
     }
 

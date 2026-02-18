@@ -83,6 +83,6 @@ class GetDesktopBrowserViewModel @AssistedInject constructor(
     }
 
     companion object {
-        private const val DESKTOP_BROWSER_URL = "https://duckduckgo.com/browser?origin=funnel_browser_settings_android"
+        private const val DESKTOP_BROWSER_URL = "https://duckduckgo.com/browser?origin=funnel_appsettings_android"
     }
 }
