@@ -157,7 +157,7 @@ interface WebViewClientListener {
         url: String,
     )
 
-    fun onSiteVisited(domain: String)
+    fun onSiteVisited(url: Uri)
 
     fun getCurrentTabId(): String
 

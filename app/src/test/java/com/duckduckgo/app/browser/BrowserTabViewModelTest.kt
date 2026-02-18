@@ -8923,4 +8923,31 @@ class BrowserTabViewModelTest {
 
         assertNull(testee.previousUrl)
     }
+
+    @Test
+    fun whenOnSiteVisitedAndFeatureEnabledThenDomainRecorded() = runTest {
+        fakeAndroidConfigBrowserFeature.singleTabFireDialog().setRawStoredState(State(enable = true))
+
+        testee.onSiteVisited(Uri.parse("https://sub.example.com/path"))
+
+        verify(mockTabVisitedSitesRepository).recordVisitedSite("abc", "example.com")
+    }
+
+    @Test
+    fun whenOnSiteVisitedAndFeatureDisabledThenNothingRecorded() = runTest {
+        fakeAndroidConfigBrowserFeature.singleTabFireDialog().setRawStoredState(State(enable = false))
+
+        testee.onSiteVisited(Uri.parse("https://sub.example.com/path"))
+
+        verify(mockTabVisitedSitesRepository, never()).recordVisitedSite(any(), any())
+    }
+
+    @Test
+    fun whenOnSiteVisitedWithNoHostThenNothingRecorded() = runTest {
+        fakeAndroidConfigBrowserFeature.singleTabFireDialog().setRawStoredState(State(enable = true))
+
+        testee.onSiteVisited(Uri.parse("about:blank"))
+
+        verify(mockTabVisitedSitesRepository, never()).recordVisitedSite(any(), any())
+    }
 }

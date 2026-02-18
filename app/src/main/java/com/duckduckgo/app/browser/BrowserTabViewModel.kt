@@ -308,6 +308,7 @@ import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.common.utils.baseHost
 import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.extensions.asLocationPermissionOrigin
+import com.duckduckgo.common.utils.extensions.toTldPlusOne
 import com.duckduckgo.common.utils.isMobileSite
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.common.utils.plugins.headers.CustomHeadersProvider
@@ -965,9 +966,10 @@ class BrowserTabViewModel @Inject constructor(
 
     override fun getCurrentTabId(): String = tabId
 
-    override fun onSiteVisited(domain: String) {
+    override fun onSiteVisited(url: Uri) {
         viewModelScope.launch(dispatchers.io()) {
             if (androidBrowserConfig.singleTabFireDialog().isEnabled()) {
+                val domain = url.host?.toTldPlusOne() ?: url.host ?: return@launch
                 tabVisitedSitesRepository.recordVisitedSite(tabId, domain)
             }
         }
