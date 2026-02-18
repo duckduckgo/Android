@@ -235,7 +235,7 @@ class RealPirScan @Inject constructor(
         allSteps.forEach { (profileQuery, step) ->
             logcat { "PIR-SCAN: Start thread=${Thread.currentThread().name}, profile=$profileQuery and step=$step" }
             runners[0].startOn(webView, profileQuery, listOf(step))
-            runners[0].stop()
+            // don't call stop() here to avoid destroying the WebView as it's reused for all steps
             logcat { "PIR-SCAN: Finish thread=${Thread.currentThread().name}, profile=$profileQuery and step=$step" }
         }
 
