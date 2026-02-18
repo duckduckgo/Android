@@ -65,14 +65,16 @@ class GetDesktopBrowserCompleteSetupSettings @Inject constructor(
         if (settingsPageFeature.newDesktopBrowserSettingEnabled().isEnabled() &&
             !settingsDataStore.getDesktopBrowserSettingDismissed
         ) {
-            @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
-            activity.lifecycle.addObserver(object : DefaultLifecycleObserver {
-                override fun onResume(owner: LifecycleOwner) {
-                    if (settingsDataStore.getDesktopBrowserSettingDismissed) {
-                        gone()
+            activity.lifecycle.addObserver(
+                @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
+                object : DefaultLifecycleObserver {
+                    override fun onResume(owner: LifecycleOwner) {
+                        if (settingsDataStore.getDesktopBrowserSettingDismissed) {
+                            gone()
+                        }
                     }
-                }
-            })
+                },
+            )
 
             val intent = globalActivityStarter.startIntent(
                 activity,
