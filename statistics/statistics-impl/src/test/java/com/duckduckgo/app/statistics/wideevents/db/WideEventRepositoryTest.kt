@@ -473,6 +473,29 @@ class WideEventRepositoryTest {
         assertEquals(Duration.ofMinutes(10).toMillis().toString(), event.metadata["interval_1"])
     }
 
+    @Test
+    fun `when ending an interval with negative duration, maps to minus one bucket`() = runTest {
+        val eventId = wideEventRepository.insertWideEvent(
+            name = "interval_event",
+            flowEntryPoint = null,
+            metadata = emptyMap(),
+            cleanupPolicy = DEFAULT_CLEANUP_POLICY,
+        )
+
+        wideEventRepository.startInterval(
+            eventId = eventId,
+            name = "interval_1",
+            timeout = null,
+        )
+
+        timeProvider.currentTime -= Duration.ofMillis(5)
+        val duration = wideEventRepository.endInterval(eventId, "interval_1")
+        val event = wideEventRepository.getWideEvents(setOf(eventId)).single()
+
+        assertEquals(Duration.ofMillis(-5), duration)
+        assertEquals("-1", event.metadata["interval_1"])
+    }
+
     companion object {
         val DEFAULT_CLEANUP_POLICY =
             WideEventRepository.CleanupPolicy.OnTimeout(

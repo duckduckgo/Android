@@ -144,13 +144,17 @@ class WideEventRepositoryImpl @Inject constructor(
                 }
 
             duration = Duration.between(interval.startedAt, timeProvider.getCurrentTime())
-            val durationBucket = INTERVAL_BUCKETS.last { it <= duration }
+            val bucketValue = if (duration.isNegative) {
+                NEGATIVE_INTERVAL_BUCKET_VALUE
+            } else {
+                INTERVAL_BUCKETS.last { it <= duration }.toMillis().toString()
+            }
 
             event.copy(
                 metadata =
                 mergeMetadata(
                     existingMetadata = event.metadata,
-                    newMetadata = mapOf(interval.name to durationBucket.toMillis().toString()),
+                    newMetadata = mapOf(interval.name to bucketValue),
                 ),
                 activeIntervals = event.activeIntervals - interval,
             )
@@ -178,6 +182,8 @@ class WideEventRepositoryImpl @Inject constructor(
     }
 
     private companion object {
+        const val NEGATIVE_INTERVAL_BUCKET_VALUE = "-1"
+
         val INTERVAL_BUCKETS =
             listOf(
                 Duration.ZERO,
