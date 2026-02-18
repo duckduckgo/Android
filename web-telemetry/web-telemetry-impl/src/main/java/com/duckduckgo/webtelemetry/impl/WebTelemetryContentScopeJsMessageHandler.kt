@@ -32,8 +32,8 @@ import logcat.logcat
 import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
-class WebTelemetryContentScopeJsMessageHandler @Inject constructor(
-    private val pixelManager: WebTelemetryPixelManager,
+class EventHubContentScopeJsMessageHandler @Inject constructor(
+    private val pixelManager: EventHubPixelManager,
     private val dispatcherProvider: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : ContentScopeJsMessageHandlersPlugin {
@@ -44,19 +44,19 @@ class WebTelemetryContentScopeJsMessageHandler @Inject constructor(
             jsMessaging: JsMessaging,
             jsMessageCallback: JsMessageCallback?,
         ) {
-            val type = jsMessage.params.optString("type", "")
-            if (type.isEmpty()) {
-                logcat(WARN) { "fireTelemetry message missing 'type' parameter" }
+            val eventType = jsMessage.params.optString("type", "")
+            if (eventType.isEmpty()) {
+                logcat(WARN) { "webEvent message missing 'type' parameter" }
                 return
             }
 
             appCoroutineScope.launch(dispatcherProvider.io()) {
-                pixelManager.handleTelemetryEvent(type)
+                pixelManager.handleWebEvent(eventType)
             }
         }
 
         override val allowedDomains: List<String> = emptyList()
-        override val featureName: String = "webTelemetry"
-        override val methods: List<String> = listOf("fireTelemetry")
+        override val featureName: String = "eventHub"
+        override val methods: List<String> = listOf("webEvent")
     }
 }
