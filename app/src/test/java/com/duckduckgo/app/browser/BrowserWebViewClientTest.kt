@@ -1036,10 +1036,11 @@ class BrowserWebViewClientTest {
             whenever(mockWebView.settings).thenReturn(mock())
             whenever(mockDuckPlayer.isSimulatedYoutubeNoCookie(any())).thenReturn(false)
             whenever(mockDuckPlayer.isYoutubeWatchUrl(any())).thenReturn(false)
+            whenever(listener.getCurrentTabId()).thenReturn("tabId")
             testee.onPageStarted(mockWebView, EXAMPLE_URL, null)
             whenever(currentTimeProvider.elapsedRealtime()).thenReturn(10)
             testee.onPageFinished(mockWebView, EXAMPLE_URL)
-            verify(navigationHistory).saveToHistory(any(), eq(null))
+            verify(navigationHistory).saveToHistory(any(), eq(null), eq("tabId"))
         }
     }
 
