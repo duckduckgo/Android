@@ -26,14 +26,13 @@ data class WebTelemetryConfigEntity(
 )
 
 /**
- * Persists per-pixel runtime state: timestamp, jitter, and parameter values.
- * [paramsJson] stores a JSON object mapping param names to their current values,
- * e.g. {"adwall_count": 5, "tracker_count": 2}
+ * Persists per-pixel runtime state.
+ * [periodStartMillis] is the UTC timestamp when the current period began.
+ * [paramsJson] stores parameter data as JSON, e.g. {"adwallCount": 5}
  */
 @Entity(tableName = "web_telemetry_pixel_state")
 data class WebTelemetryPixelStateEntity(
     @PrimaryKey val pixelName: String,
-    val timestampMillis: Long,
-    val jitterSeconds: Double,
+    val periodStartMillis: Long,
     val paramsJson: String,
 )
