@@ -36,7 +36,10 @@ interface HistoryRepository {
         title: String?,
         query: String?,
         isSerp: Boolean,
+        tabId: String,
     )
+
+    suspend fun removeHistoryForTab(tabId: String)
 
     suspend fun clearHistory()
 
@@ -73,6 +76,7 @@ class RealHistoryRepository(
         title: String?,
         query: String?,
         isSerp: Boolean,
+        tabId: String,
     ) {
         withContext(dispatcherProvider.io()) {
             historyDao.updateOrInsertVisit(
@@ -81,7 +85,16 @@ class RealHistoryRepository(
                 query,
                 isSerp,
                 LocalDateTime.now(),
+                tabId,
             )
+            fetchAndCacheHistoryEntries()
+        }
+    }
+
+    override suspend fun removeHistoryForTab(tabId: String) {
+        withContext(dispatcherProvider.io()) {
+            cachedHistoryEntries = null
+            historyDao.deleteHistoryForTab(tabId)
             fetchAndCacheHistoryEntries()
         }
     }

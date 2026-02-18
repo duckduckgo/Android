@@ -21,12 +21,12 @@ import kotlinx.coroutines.flow.Flow
 interface NavigationHistory {
 
     /**
-     * Stores a history entry.
+     * Stores a history entry with an associated tab ID.
      * @param url The URL of the history entry.
      * @param title The title of the history entry. Can be null.
+     * @param tabId The tab ID associated with this visit.
      */
-
-    suspend fun saveToHistory(url: String, title: String?)
+    suspend fun saveToHistory(url: String, title: String?, tabId: String)
 
     /**
      * Retrieves all [HistoryEntry].
@@ -69,4 +69,11 @@ interface NavigationHistory {
      * @return [Boolean] true if has [HistoryEntry], false if there are no [HistoryEntry]
      */
     suspend fun hasHistory(): Boolean
+
+    /**
+     * Removes all history visits associated with a specific tab.
+     * History entries that have no remaining visits will be deleted.
+     * @param tabId The tab ID whose history should be removed.
+     */
+    suspend fun removeHistoryForTab(tabId: String)
 }

@@ -57,6 +57,7 @@ data class HistoryEntryEntity(
 data class VisitEntity(
     val historyEntryId: Long,
     val timestamp: String,
+    val tabId: String? = null,
 )
 
 /**

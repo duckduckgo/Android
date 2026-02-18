@@ -556,18 +556,24 @@ class BrowserWebViewClient @Inject constructor(
                         )
                         shouldSendPagePaintedPixel(webView = webView, url = it)
                         appCoroutineScope.launch(dispatcherProvider.io()) {
+                            val currentTabId = webViewClientListener?.getCurrentTabId() ?: return@launch
                             if (duckPlayer.getDuckPlayerState() == ENABLED && duckPlayer.isSimulatedYoutubeNoCookie(uri)) {
                                 duckPlayer.createDuckPlayerUriFromYoutubeNoCookie(url.toUri())?.let {
                                     navigationHistory.saveToHistory(
                                         it,
                                         navigationList.currentItem?.title,
+                                        currentTabId,
                                     )
                                 }
                             } else {
                                 if (duckPlayer.getDuckPlayerState() == ENABLED && duckPlayer.isYoutubeWatchUrl(uri)) {
                                     duckPlayer.duckPlayerNavigatedToYoutube()
                                 }
-                                navigationHistory.saveToHistory(url, navigationList.currentItem?.title)
+                                navigationHistory.saveToHistory(
+                                    url,
+                                    navigationList.currentItem?.title,
+                                    currentTabId,
+                                )
                             }
                         }
                         uriLoadedManager.sendUriLoadedPixels(duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url))
