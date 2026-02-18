@@ -6137,6 +6137,13 @@
           "enabled"
         ),
         runConditions: DEFAULT_RUN_CONDITIONS
+      },
+      auto: {
+        state: (
+          /** @type {FeatureState} */
+          "disabled"
+        ),
+        runConditions: DEFAULT_RUN_CONDITIONS
       }
     },
     actions: {
@@ -6237,12 +6244,14 @@
   }
 
   // src/features/web-detection.js
-  var _detectors;
+  var _detectors, _matchedDetectors;
   var WebDetection = class extends ContentFeature {
     constructor() {
       super(...arguments);
       /** @type {Record<string, Record<string, DetectorConfig>>} */
       __privateAdd(this, _detectors, {});
+      /** @type {Map<string, boolean>} */
+      __privateAdd(this, _matchedDetectors, /* @__PURE__ */ new Map());
       __publicField(this, "_exposedMethods", this._declareExposedMethods(["runDetectors"]));
     }
     /**
@@ -6251,6 +6260,77 @@
     init() {
       const detectorsConfig = this.getFeatureSetting("detectors");
       __privateSet(this, _detectors, parseDetectors(detectorsConfig));
+      this._scheduleAutoRunDetectors();
+    }
+    /**
+     *
+     * @param {DetectorConfig} detectorConfig
+     * @returns {true | false | 'error'}
+     */
+    _evaluateMatch(detectorConfig) {
+      try {
+        return evaluateMatch(detectorConfig.match);
+      } catch {
+        return "error";
+      }
+    }
+    /**
+     * Schedule automatic detector execution based on configured intervals.
+     */
+    _scheduleAutoRunDetectors() {
+      const detectorsByInterval = /* @__PURE__ */ new Map();
+      for (const [groupName, groupDetectors] of Object.entries(__privateGet(this, _detectors))) {
+        for (const [detectorId, detectorConfig] of Object.entries(groupDetectors)) {
+          if (!this._shouldRunDetector(detectorConfig, { trigger: "auto" })) continue;
+          const autoTrigger = detectorConfig.triggers.auto;
+          const fullDetectorId = `${groupName}.${detectorId}`;
+          for (const interval of autoTrigger.when.intervalMs) {
+            const atInterval = detectorsByInterval.get(interval) ?? [];
+            atInterval.push({
+              detectorId: fullDetectorId,
+              config: detectorConfig
+            });
+            detectorsByInterval.set(interval, atInterval);
+          }
+        }
+      }
+      for (const [interval, detectors] of detectorsByInterval.entries()) {
+        setTimeout(() => {
+          for (const { detectorId, config } of detectors) {
+            this._runAutoDetector(detectorId, config);
+          }
+        }, interval);
+      }
+    }
+    /**
+     * Run a single detector with the auto trigger
+     * @param {string} fullDetectorId - The full detector ID (groupName.detectorId)
+     * @param {DetectorConfig} detectorConfig - The detector configuration
+     */
+    _runAutoDetector(fullDetectorId, detectorConfig) {
+      try {
+        if (__privateGet(this, _matchedDetectors).get(fullDetectorId)) {
+          return;
+        }
+        const detected = this._evaluateMatch(detectorConfig);
+        if (detected === true) {
+          __privateGet(this, _matchedDetectors).set(fullDetectorId, true);
+        }
+        if (this.isDebug && detected !== false) {
+          try {
+            this.messaging?.notify("webDetectionAutoRun", {
+              detectorId: fullDetectorId,
+              detected,
+              timestamp: Date.now()
+            });
+          } catch {
+          }
+        }
+      } catch (e) {
+        if (this.isDebug) {
+          this.log.error(`Error running auto-detector ${fullDetectorId}:`, e);
+        }
+      }
     }
     /**
      * Check if a detector should be triggered.
@@ -6277,12 +6357,7 @@
       for (const [groupName, groupDetectors] of Object.entries(__privateGet(this, _detectors))) {
         for (const [detectorId, detectorConfig] of Object.entries(groupDetectors)) {
           if (!this._shouldRunDetector(detectorConfig, options)) continue;
-          let detected;
-          try {
-            detected = evaluateMatch(detectorConfig.match);
-          } catch {
-            detected = "error";
-          }
+          const detected = this._evaluateMatch(detectorConfig);
           if (options.trigger === "breakageReport" && this._isStateEnabled(detectorConfig.actions.breakageReportData.state)) {
             if (detected !== false) {
               results.push({
@@ -6297,6 +6372,7 @@
     }
   };
   _detectors = new WeakMap();
+  _matchedDetectors = new WeakMap();
 
   // src/features/breakage-reporting/utils.js
   function getJsPerformanceMetrics() {
