@@ -4270,6 +4270,24 @@
     }
     return true;
   }
+  var _hasChangeListener;
+  var PermissionStatus = class extends EventTarget {
+    constructor(name, state) {
+      super();
+      __privateAdd(this, _hasChangeListener, false);
+      this.name = name;
+      this.state = state;
+      this.onchange = null;
+    }
+    get hasChangeListener() {
+      return __privateGet(this, _hasChangeListener);
+    }
+    addEventListener(type, callback, options) {
+      if (type === "change") __privateSet(this, _hasChangeListener, true);
+      super.addEventListener(type, callback, options);
+    }
+  };
+  _hasChangeListener = new WeakMap();
   function cleanShareData(data) {
     const dataToSend = {};
     for (const key of ["title", "text", "url"]) {
@@ -4287,7 +4305,7 @@
     }
     return dataToSend;
   }
-  var _activeShareRequest, _activeScreenLockRequest, _webNotifications;
+  var _activeShareRequest, _activeScreenLockRequest, _webNotifications, _permissionPollingTimer;
   var WebCompat = class extends ContentFeature {
     constructor() {
       super(...arguments);
@@ -4297,6 +4315,8 @@
       __privateAdd(this, _activeScreenLockRequest, null);
       /** @type {Map<string, object>} */
       __privateAdd(this, _webNotifications, /* @__PURE__ */ new Map());
+      /** @type {ReturnType<typeof setTimeout> | undefined} */
+      __privateAdd(this, _permissionPollingTimer);
       // Opt in to receive configuration updates from initial ping responses
       __publicField(this, "listenForConfigUpdates", true);
     }
@@ -4647,21 +4667,105 @@
       });
     }
     /**
+     * Handles permission query with native messaging support.
+     * @param {Object} query - The permission query object
+     * @param {Object} settings - The permission settings
+     * @returns {Promise<PermissionStatus|null>} - Returns PermissionStatus if handled, null to fall through
+     */
+    async handlePermissionQuery(query, settings) {
+      if (!query?.name || !settings?.supportedPermissions?.[query.name]?.native) {
+        return null;
+      }
+      try {
+        const permSetting = settings.supportedPermissions[query.name];
+        const returnName = permSetting.name || query.name;
+        const response = await this.messaging.request(MSG_PERMISSIONS_QUERY, query);
+        const returnStatus = response.state || "prompt";
+        return new PermissionStatus(returnName, returnStatus);
+      } catch (err) {
+        return null;
+      }
+    }
+    /**
+     * Polls native messaging once per second (up to 30s) to detect when a
+     * permission was granted/denied by the user, so the PermissionStatus change
+     * event can be dispatched.
+     *
+     * Since there is a performance impact with polling:
+     * - Only one polling timer runs at a time.
+     * - Ticks are skipped until a change listener is registered.
+     * - Chained setTimeout used instead of setInterval, in case the permission
+     *   query message response takes longer than one second, since otherwise a
+     *   change event could be dispatched twice accidentally.
+     *
+     * @param {PermissionStatus} status
+     * @param {Object} query
+     */
+    pollForPermissionChange(status, query) {
+      if (__privateGet(this, _permissionPollingTimer)) {
+        return;
+      }
+      let remaining = 30;
+      const tick = async () => {
+        let statusChanged = false;
+        if (status.hasChangeListener || typeof status.onchange === "function") {
+          try {
+            const { state } = await this.messaging.request(MSG_PERMISSIONS_QUERY, query);
+            if (state && state !== "prompt") {
+              status.state = state;
+              status.dispatchEvent(new Event("change"));
+              if (typeof status.onchange === "function") {
+                try {
+                  status.onchange(new Event("change"));
+                } catch (e) {
+                }
+              }
+              statusChanged = true;
+            }
+          } catch {
+          }
+        }
+        if (!statusChanged && remaining-- > 0) {
+          __privateSet(this, _permissionPollingTimer, setTimeout(tick, 1e3));
+        } else {
+          __privateSet(this, _permissionPollingTimer, void 0);
+        }
+      };
+      __privateSet(this, _permissionPollingTimer, setTimeout(tick, 1e3));
+    }
+    permissionsPresentFix(settings) {
+      const originalQuery = window.navigator.permissions.query;
+      if (typeof originalQuery !== "function") {
+        return;
+      }
+      window.navigator.permissions.query = new Proxy(originalQuery, {
+        apply: async (target, thisArg, args) => {
+          this.addDebugFlag();
+          const query = args[0];
+          if (query?.name && settings?.supportedPermissions?.[query.name]?.native) {
+            const result = await this.handlePermissionQuery(query, settings);
+            if (result) {
+              if (result.state === "prompt") {
+                this.pollForPermissionChange(result, query);
+              }
+              return result;
+            }
+          }
+          return Reflect.apply(target, thisArg, args);
+        }
+      });
+    }
+    /**
      * Adds missing permissions API for Android WebView.
      */
     permissionsFix(settings) {
       if (window.navigator.permissions) {
+        if (this.getFeatureSettingEnabled("permissionsPresent")) {
+          this.permissionsPresentFix(settings);
+        }
         return;
       }
       const permissions = {};
-      class PermissionStatus extends EventTarget {
-        constructor(name, state) {
-          super();
-          this.name = name;
-          this.state = state;
-          this.onchange = null;
-        }
-      }
       permissions.query = new Proxy(
         async (query) => {
           this.addDebugFlag();
@@ -4678,16 +4782,13 @@
               `Failed to execute 'query' on 'Permissions': Failed to read the 'name' property from 'PermissionDescriptor': The provided value '${query.name}' is not a valid enum value of type PermissionName.`
             );
           }
+          const result = await this.handlePermissionQuery(query, settings);
+          if (result) {
+            return result;
+          }
           const permSetting = settings.supportedPermissions[query.name];
           const returnName = permSetting.name || query.name;
-          let returnStatus = settings.permissionResponse || "prompt";
-          if (permSetting.native) {
-            try {
-              const response = await this.messaging.request(MSG_PERMISSIONS_QUERY, query);
-              returnStatus = response.state || "prompt";
-            } catch (err) {
-            }
-          }
+          const returnStatus = settings.permissionResponse || "prompt";
           return Promise.resolve(new PermissionStatus(returnName, returnStatus));
         },
         {
@@ -5177,6 +5278,7 @@
   _activeShareRequest = new WeakMap();
   _activeScreenLockRequest = new WeakMap();
   _webNotifications = new WeakMap();
+  _permissionPollingTimer = new WeakMap();
   var web_compat_default = WebCompat;
 
   // src/features/fingerprinting-hardware.js

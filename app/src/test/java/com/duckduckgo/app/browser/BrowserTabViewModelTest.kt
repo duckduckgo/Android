@@ -1440,6 +1440,20 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenGlobalLayoutInvalidatedDuringQueryConversionThenOpenInNewTabAndStateRemainsInvalidated() {
+        givenOneActiveTabSelected()
+        whenever(mockOmnibarConverter.convertQueryToUrl(any(), anyOrNull(), any(), any())).thenAnswer {
+            testee.recoverFromRenderProcessGone()
+            "foo.com"
+        }
+
+        testee.onUserSubmittedQuery("foo")
+
+        assertCommandIssued<Command.OpenInNewTab>()
+        assertTrue(testee.globalLayoutState.value is GlobalLayoutViewState.Invalidated)
+    }
+
+    @Test
     fun whenBrowsingAndUrlLoadedThenSiteVisitedEntryAddedToLeaderboardDao() =
         runTest {
             loadUrl("http://example.com/abc", isBrowserShowing = true)
