@@ -421,4 +421,13 @@ class SettingsViewModelTest {
 
         verify(pixelMock).fire(AppPixelName.SETTINGS_WHATS_NEW_PRESSED)
     }
+
+    @Test
+    fun `when get desktop browser clicked then launch get desktop browser command is sent`() = runTest {
+        testee.commands().test {
+            testee.onGetDesktopBrowserClicked()
+
+            assertEquals(SettingsViewModel.Command.LaunchGetDesktopBrowser, awaitItem())
+        }
+    }
 }
