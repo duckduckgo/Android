@@ -61,7 +61,7 @@ runs:
 
         # Assign the task to the user
         response=$(curl -s -X PUT "https://app.asana.com/api/1.0/tasks/${found_task_id}" \
-          -H "Authorization: Bearer ${asana_token}" \
+          -H "Authorization: Bearer ${INPUT_ASANA_TOKEN}" \
           -H "Content-Type: application/json" \
           -d "{\"data\": {\"assignee\": \"${INPUT_ASANA_USER_ID}\"}}")
 
