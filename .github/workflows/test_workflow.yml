@@ -25,7 +25,7 @@ jobs:
         with:
           action: 'get-asana-user-id'
           github-username: ${{ github.actor }}
-          github-pat:  ${{ secrets.GT_DAXMOBILE }}
+          github-pat: ${{ secrets.DAXMOBILE_ANDROID_AUTOMATION }}
 
       - name: Print result
         run: echo "Asana ID ${{ steps.test-username-action.outputs.asanaUserId }}"
