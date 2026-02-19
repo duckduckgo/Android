@@ -19,7 +19,6 @@ package com.duckduckgo.webtelemetry.impl
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.webtelemetry.store.WebTelemetryPixelStateEntity
 import com.duckduckgo.webtelemetry.store.WebTelemetryRepository
-import logcat.logcat
 import org.json.JSONObject
 import javax.inject.Inject
 
