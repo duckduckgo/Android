@@ -35,7 +35,21 @@ abstract class HistoryDatabase : RoomDatabase() {
 
 val MIGRATION_1_2 = object : Migration(1, 2) {
     override fun migrate(db: SupportSQLiteDatabase) {
-        db.execSQL("ALTER TABLE visits_list ADD COLUMN tabId TEXT")
+        db.execSQL(
+            "CREATE TABLE IF NOT EXISTS visits_list_new (" +
+                "historyEntryId INTEGER NOT NULL, " +
+                "timestamp TEXT NOT NULL, " +
+                "tabId TEXT NOT NULL DEFAULT '', " +
+                "PRIMARY KEY (timestamp, historyEntryId, tabId), " +
+                "FOREIGN KEY (historyEntryId) REFERENCES history_entries(id) ON DELETE CASCADE" +
+                ")",
+        )
+        db.execSQL(
+            "INSERT INTO visits_list_new (historyEntryId, timestamp, tabId) " +
+                "SELECT historyEntryId, timestamp, '' FROM visits_list",
+        )
+        db.execSQL("DROP TABLE visits_list")
+        db.execSQL("ALTER TABLE visits_list_new RENAME TO visits_list")
     }
 }
 
