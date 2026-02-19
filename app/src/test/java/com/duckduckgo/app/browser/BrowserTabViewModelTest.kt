@@ -162,6 +162,7 @@ import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepositoryImpl
 import com.duckduckgo.app.fire.fireproofwebsite.ui.AutomaticFireproofSetting
+import com.duckduckgo.app.fire.store.TabVisitedSitesRepository
 import com.duckduckgo.app.generalsettings.showonapplaunch.ShowOnAppLaunchOptionHandler
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.events.db.UserEventsStore
@@ -634,6 +635,7 @@ class BrowserTabViewModelTest {
     private val mockSerpEasterEggLogosToggles: SerpEasterEggLogosToggles = mock()
     private val mockSetFavouriteToggle: Toggle = mock()
     private val mockSerpLogos: SerpLogos = mock()
+    private val mockTabVisitedSitesRepository: TabVisitedSitesRepository = mock()
     private val favouriteLogoFlow = MutableStateFlow<String?>(null)
     private val setFavouriteEnabledFlow = MutableStateFlow(false)
 
@@ -909,6 +911,7 @@ class BrowserTabViewModelTest {
                 pageContextJSHelper = mockPageContextJSHelper,
                 serpEasterEggLogosToggles = mockSerpEasterEggLogosToggles,
                 serpLogos = mockSerpLogos,
+                tabVisitedSitesRepository = mockTabVisitedSitesRepository,
             )
 
         testee.loadData("abc", null, false, false)
@@ -8919,5 +8922,32 @@ class BrowserTabViewModelTest {
         testee.loadData(tabId = "test-tab", initialUrl = initialUrl, skipHome = false, isExternal = true)
 
         assertNull(testee.previousUrl)
+    }
+
+    @Test
+    fun whenOnSiteVisitedAndFeatureEnabledThenDomainRecorded() = runTest {
+        fakeAndroidConfigBrowserFeature.singleTabFireDialog().setRawStoredState(State(enable = true))
+
+        testee.onSiteVisited(Uri.parse("https://sub.example.com/path"))
+
+        verify(mockTabVisitedSitesRepository).recordVisitedSite("abc", "example.com")
+    }
+
+    @Test
+    fun whenOnSiteVisitedAndFeatureDisabledThenNothingRecorded() = runTest {
+        fakeAndroidConfigBrowserFeature.singleTabFireDialog().setRawStoredState(State(enable = false))
+
+        testee.onSiteVisited(Uri.parse("https://sub.example.com/path"))
+
+        verify(mockTabVisitedSitesRepository, never()).recordVisitedSite(any(), any())
+    }
+
+    @Test
+    fun whenOnSiteVisitedWithNoHostThenNothingRecorded() = runTest {
+        fakeAndroidConfigBrowserFeature.singleTabFireDialog().setRawStoredState(State(enable = true))
+
+        testee.onSiteVisited(Uri.parse("about:blank"))
+
+        verify(mockTabVisitedSitesRepository, never()).recordVisitedSite(any(), any())
     }
 }

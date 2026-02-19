@@ -572,6 +572,8 @@ class BrowserWebViewClient @Inject constructor(
                         }
                         uriLoadedManager.sendUriLoadedPixels(duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url))
 
+                        webViewClientListener?.onSiteVisited(uri)
+
                         start = null
                     }
                 }

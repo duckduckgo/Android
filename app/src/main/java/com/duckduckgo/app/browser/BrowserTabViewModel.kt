@@ -236,6 +236,7 @@ import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.fire.fireproofwebsite.ui.AutomaticFireproofSetting.ALWAYS
 import com.duckduckgo.app.fire.fireproofwebsite.ui.AutomaticFireproofSetting.ASK_EVERY_TIME
+import com.duckduckgo.app.fire.store.TabVisitedSitesRepository
 import com.duckduckgo.app.generalsettings.showonapplaunch.ShowOnAppLaunchOptionHandler
 import com.duckduckgo.app.global.events.db.UserEventKey
 import com.duckduckgo.app.global.events.db.UserEventsStore
@@ -307,6 +308,7 @@ import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.common.utils.baseHost
 import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.extensions.asLocationPermissionOrigin
+import com.duckduckgo.common.utils.extensions.toTldPlusOne
 import com.duckduckgo.common.utils.isMobileSite
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.common.utils.plugins.headers.CustomHeadersProvider
@@ -499,6 +501,7 @@ class BrowserTabViewModel @Inject constructor(
     private val syncStatusChangedObserver: SyncStatusChangedObserver,
     private val serpEasterEggLogosToggles: SerpEasterEggLogosToggles,
     private val serpLogos: SerpLogos,
+    private val tabVisitedSitesRepository: TabVisitedSitesRepository,
 ) : ViewModel(),
     WebViewClientListener,
     EditSavedSiteListener,
@@ -962,6 +965,15 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     override fun getCurrentTabId(): String = tabId
+
+    override fun onSiteVisited(url: Uri) {
+        viewModelScope.launch(dispatchers.io()) {
+            if (androidBrowserConfig.singleTabFireDialog().isEnabled()) {
+                val domain = url.host?.toTldPlusOne() ?: url.host ?: return@launch
+                tabVisitedSitesRepository.recordVisitedSite(tabId, domain)
+            }
+        }
+    }
 
     fun onMessageProcessed() {
         showBrowser()
