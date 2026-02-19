@@ -320,11 +320,11 @@ class EventHubPixelManagerTest {
 
     @Test
     fun `toStartOfInterval normalises to start of hour`() {
-        // 2025-06-01T01:17:18Z = 1748739438
+        // 2025-06-01T00:57:18Z = 1748739438
         val ts = 1748739438L * 1000
         val result = RealEventHubPixelManager.toStartOfInterval(ts, 3600L)
-        // 2025-06-01T01:00:00Z = 1748737200
-        assertEquals(1748737200L, result)
+        // 2025-06-01T00:00:00Z = 1748736000
+        assertEquals(1748736000L, result)
     }
 
     // --- helpers ---
