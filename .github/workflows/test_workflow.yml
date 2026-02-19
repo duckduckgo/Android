@@ -21,7 +21,7 @@ jobs:
           ref: ${{ github.ref }}
 
       - id: test-username-action
-        uses: duckduckgo/native-github-asana-sync@david/asana_user_id
+        uses: duckduckgo/native-github-asana-sync@v2.3
         with:
           action: 'get-asana-user-id'
           github-username: ${{ github.actor }}
