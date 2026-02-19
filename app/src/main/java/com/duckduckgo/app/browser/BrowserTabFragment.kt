@@ -995,11 +995,31 @@ class BrowserTabFragment :
         viewModel.handleExternalLaunch(isLaunchedFromExternalApp)
 
         observeSubscriptionEventDataChannel()
+        observeBrowserUiLockState()
     }
 
     private fun observeSubscriptionEventDataChannel() {
         viewModel.subscriptionEventDataFlow.onEach { subscriptionEventData ->
             contentScopeScripts.sendSubscriptionEvent(subscriptionEventData)
+        }.launchIn(lifecycleScope)
+    }
+
+    /**
+     * Observe browser UI lock state changes and apply to UI components.
+     * When locked, disables pull-to-refresh, omnibar scrolling, and tab swiping.
+     */
+    private fun observeBrowserUiLockState() {
+        viewModel.browserUiLockState.onEach { state ->
+            val isLocked = state.locked
+
+            // Disable/enable pull-to-refresh via WebView
+            webView?.setBrowserUiLocked(isLocked)
+
+            // Disable/enable omnibar scrolling
+            omnibar.isScrollingEnabled = !isLocked
+
+            // Notify BrowserActivity for tab swiping
+            browserActivity?.onUiLockChanged(isLocked)
         }.launchIn(lifecycleScope)
     }
 

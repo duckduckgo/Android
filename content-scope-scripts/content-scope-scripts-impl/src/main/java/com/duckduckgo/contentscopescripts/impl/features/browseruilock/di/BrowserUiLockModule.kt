@@ -1,0 +1,59 @@
+/*
+ * Copyright (c) 2025 DuckDuckGo
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.duckduckgo.contentscopescripts.impl.features.browseruilock.di
+
+import android.content.Context
+import androidx.room.Room
+import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.di.IsMainProcess
+import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.contentscopescripts.impl.features.browseruilock.store.ALL_MIGRATIONS
+import com.duckduckgo.contentscopescripts.impl.features.browseruilock.store.BrowserUiLockDatabase
+import com.duckduckgo.contentscopescripts.impl.features.browseruilock.store.BrowserUiLockRepository
+import com.duckduckgo.contentscopescripts.impl.features.browseruilock.store.RealBrowserUiLockRepository
+import com.duckduckgo.di.scopes.AppScope
+import com.squareup.anvil.annotations.ContributesTo
+import dagger.Module
+import dagger.Provides
+import dagger.SingleInstanceIn
+import kotlinx.coroutines.CoroutineScope
+
+@Module
+@ContributesTo(AppScope::class)
+object BrowserUiLockModule {
+
+    @SingleInstanceIn(AppScope::class)
+    @Provides
+    fun provideBrowserUiLockDatabase(context: Context): BrowserUiLockDatabase {
+        return Room.databaseBuilder(context, BrowserUiLockDatabase::class.java, "browser_ui_lock.db")
+            .enableMultiInstanceInvalidation()
+            .fallbackToDestructiveMigration()
+            .addMigrations(*ALL_MIGRATIONS)
+            .build()
+    }
+
+    @SingleInstanceIn(AppScope::class)
+    @Provides
+    fun provideBrowserUiLockRepository(
+        database: BrowserUiLockDatabase,
+        @AppCoroutineScope appCoroutineScope: CoroutineScope,
+        dispatcherProvider: DispatcherProvider,
+        @IsMainProcess isMainProcess: Boolean,
+    ): BrowserUiLockRepository {
+        return RealBrowserUiLockRepository(database, appCoroutineScope, dispatcherProvider, isMainProcess)
+    }
+}
