@@ -219,6 +219,11 @@ class TabSwitcherAdapter(
                 itemClickListener.onTabSelected(tabId)
             }
         }
+        tabViewHolder.selectionIndicator.setOnClickListener {
+            if (!isDragging) {
+                itemClickListener.onTabSelected(tabId)
+            }
+        }
         tabViewHolder.close.setOnClickListener(
             createCloseClickListener(
                 bindingAdapterPosition = bindingAdapterPosition,
