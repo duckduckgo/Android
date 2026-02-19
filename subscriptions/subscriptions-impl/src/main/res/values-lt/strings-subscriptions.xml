@@ -152,8 +152,8 @@
     <string name="feedbackSubCategoryItrAdvisorUnhelpful">Skambutis konsultantui buvo nenaudingas</string>
     <string name="feedbackSubCategoryItrOther">Kiti</string>
 
-    <string name="feedbackSubCategorySubsOtp">Vienkartinis slaptažodis</string>
-    <string name="feedbackSubCategorySubsOther">Kiti</string>
+    <string name="feedbackSubCategorySubsOtp">Problema su vienkartiniu slaptažodžiu</string>
+    <string name="feedbackSubCategorySubsOther">Kažkas kito</string>
 
     <string name="feedbackSubmitVpnHeader">Ar radote problemą, kurios nėra mūsų <annotation type="faqs_link">pagalbos centre</annotation> ? Mes tikrai norime apie tai sužinoti.</string>
     <string name="feedbackSubmitVpnDescriptionHint">Praneškite, kas vyksta...</string>

@@ -152,8 +152,8 @@
     <string name="feedbackSubCategoryItrAdvisorUnhelpful">Richiesta di assistenza al consulente non utile</string>
     <string name="feedbackSubCategoryItrOther">Altro</string>
 
-    <string name="feedbackSubCategorySubsOtp">Password una tantum</string>
-    <string name="feedbackSubCategorySubsOther">Altro</string>
+    <string name="feedbackSubCategorySubsOtp">Problema con la password monouso</string>
+    <string name="feedbackSubCategorySubsOther">Qualcos\'altro</string>
 
     <string name="feedbackSubmitVpnHeader">Hai riscontrato un problema che non è stato trattato nel nostro <annotation type="faqs_link">centro assistenza</annotation> ? Ci piacerebbe davvero saperlo.</string>
     <string name="feedbackSubmitVpnDescriptionHint">Raccontaci cosa sta succedendo...</string>

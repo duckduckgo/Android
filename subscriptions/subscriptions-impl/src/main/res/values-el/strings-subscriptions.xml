@@ -152,8 +152,8 @@
     <string name="feedbackSubCategoryItrAdvisorUnhelpful">Η κλήση στον σύμβουλο δεν βοήθησε</string>
     <string name="feedbackSubCategoryItrOther">Άλλα</string>
 
-    <string name="feedbackSubCategorySubsOtp">Κωδικός πρόσβασης μίας χρήσης</string>
-    <string name="feedbackSubCategorySubsOther">Άλλα</string>
+    <string name="feedbackSubCategorySubsOtp">Πρόβλημα με τον κωδικό πρόσβασης μίας χρήσης</string>
+    <string name="feedbackSubCategorySubsOther">Κάτι άλλο</string>
 
     <string name="feedbackSubmitVpnHeader">Βρήκατε ένα πρόβλημα που δεν καλύπτεται στο <annotation type="faqs_link">κέντρο βοήθειας</annotation>; Θέλουμε σίγουρα να μάθουμε γι\' αυτό.</string>
     <string name="feedbackSubmitVpnDescriptionHint">Πείτε μας τι συμβαίνει...</string>

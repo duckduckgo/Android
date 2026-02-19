@@ -176,6 +176,8 @@
     <string name="improvedAutoCompleteIAMContent">Autovervollständigungsvorschläge enthalten jetzt deine kürzlich besuchten Seiten. Du kannst sie in den Einstellungen deaktivieren oder jederzeit mit dem 🔥 Fire Button löschen.</string>
     <string name="improvedAutoCompleteIAMTitle">Gleiche Privatsphäre.\nBessere Suchvorschläge!</string>
     <string name="openAutoCompleteSettings">Einstellungen öffnen</string>
+    <string name="privateSearchChatSuggestionsToggle">Chat-Vorschläge</string>
+    <string name="privateSearchAutocompleteHintWithChatSuggestions">Zeige Vorschläge aus deinem Verlauf, deinen Lesezeichen und (optional) deinem Duck.ai-Chatverlauf, während du in die Suchleiste tippst. Alle Suchanfragen sind privat.</string>
 
     <!-- General Settings -->
     <string name="generalSettingsActivityTitle" instruction="Title of the general settings screen">Allgemeines</string>

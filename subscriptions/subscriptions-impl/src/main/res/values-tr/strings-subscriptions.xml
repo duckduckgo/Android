@@ -152,8 +152,8 @@
     <string name="feedbackSubCategoryItrAdvisorUnhelpful">Danışmanı aramak yardımcı olmuyor</string>
     <string name="feedbackSubCategoryItrOther">Diğer</string>
 
-    <string name="feedbackSubCategorySubsOtp">Tek kullanımlık şifre</string>
-    <string name="feedbackSubCategorySubsOther">Diğer</string>
+    <string name="feedbackSubCategorySubsOtp">Tek kullanımlık şifre ile ilgili sorun</string>
+    <string name="feedbackSubCategorySubsOther">Başka bir şey</string>
 
     <string name="feedbackSubmitVpnHeader"><annotation type="faqs_link">Yardım merkezimizde</annotation> ele alınmayan bir sorun mu buldunuz? Bunu mutlaka öğrenmek istiyoruz.</string>
     <string name="feedbackSubmitVpnDescriptionHint">Bize neler olduğunu anlatın...</string>

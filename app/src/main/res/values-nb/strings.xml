@@ -176,6 +176,8 @@
     <string name="improvedAutoCompleteIAMContent">Automatisk forslagsfullføring inkluderer nå nylig besøkte nettsteder. Slå dette av i innstillingene, eller slett dem når som helst med Fire Button 🔥.</string>
     <string name="improvedAutoCompleteIAMTitle">Samme personvern.\nBedre søkeforslag!</string>
     <string name="openAutoCompleteSettings">Åpne innstillinger</string>
+    <string name="privateSearchChatSuggestionsToggle">Forslag til chat</string>
+    <string name="privateSearchAutocompleteHintWithChatSuggestions">Vis forslag fra historikken, bokmerkene og (valgfritt) Duck.ai-chattehistorikken din mens du skriver i søkefeltet. Alle søk er private.</string>
 
     <!-- General Settings -->
     <string name="generalSettingsActivityTitle" instruction="Title of the general settings screen">Generelt</string>

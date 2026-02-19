@@ -177,6 +177,8 @@
     <string name="improvedAutoCompleteIAMContent">Sugestiile de completare automată includ acum site-urile accesate recent. Dezactivează-le din Setări sau șterge-le în orice moment cu ajutorul Fire Button 🔥.</string>
     <string name="improvedAutoCompleteIAMTitle">Aceeași confidențialitate.\nSugestii de căutare mai bune!</string>
     <string name="openAutoCompleteSettings">Deschide Setări</string>
+    <string name="privateSearchChatSuggestionsToggle">Sugestii de chat</string>
+    <string name="privateSearchAutocompleteHintWithChatSuggestions">Afișează sugestii din istoricul tău, marcaje și (opțional) istoricul chaturilor Duck.ai pe măsură ce tastezi în bara de căutare. Toate căutările sunt private.</string>
 
     <!-- General Settings -->
     <string name="generalSettingsActivityTitle" instruction="Title of the general settings screen">Generalități</string>

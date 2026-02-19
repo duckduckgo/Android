@@ -176,6 +176,8 @@
     <string name="improvedAutoCompleteIAMContent">Предложенията за автоматично попълване вече включват наскоро посетени сайтове. Изключете ги в Настройки, а можете и да ги изтриете по всяко време с 🔥 Fire Button.</string>
     <string name="improvedAutoCompleteIAMTitle">Същата поверителност.\nПо-добри предложения при търсене!</string>
     <string name="openAutoCompleteSettings">Отвори Настройки</string>
+    <string name="privateSearchChatSuggestionsToggle">Предложения за чат</string>
+    <string name="privateSearchAutocompleteHintWithChatSuggestions">Показване на предложения от историята, отметките и (по избор) историята на чата с Duck.ai, когато въвеждате в лентата за търсене. Всички търсения са поверителни.</string>
 
     <!-- General Settings -->
     <string name="generalSettingsActivityTitle" instruction="Title of the general settings screen">Обща информация</string>

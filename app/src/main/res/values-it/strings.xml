@@ -176,6 +176,8 @@
     <string name="improvedAutoCompleteIAMContent">I suggerimenti di completamento automatico ora includono i siti visitati di recente. Disattiva nelle impostazioni o cancella in qualsiasi momento con il 🔥 Fire Button.</string>
     <string name="improvedAutoCompleteIAMTitle">La stessa privacy.\nSuggerimenti di ricerca migliori!</string>
     <string name="openAutoCompleteSettings">Apri Impostazioni</string>
+    <string name="privateSearchChatSuggestionsToggle">Suggerimenti per la chat</string>
+    <string name="privateSearchAutocompleteHintWithChatSuggestions">Mostra suggerimenti dalla tua cronologia, dai segnalibri e (facoltativamente) dalla cronologia chat di Duck.ai mentre digiti nella barra di ricerca. Tutte le ricerche sono private.</string>
 
     <!-- General Settings -->
     <string name="generalSettingsActivityTitle" instruction="Title of the general settings screen">Generale</string>

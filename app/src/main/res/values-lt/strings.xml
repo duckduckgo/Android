@@ -178,6 +178,8 @@
     <string name="improvedAutoCompleteIAMContent">Dabar automatinio užbaigimo pasiūlymuose bus rodomos ir neseniai aplankytos svetainės. Išjunkite nustatymuose arba bet kada išvalykite naudodami mygtuką 🔥 „Fire Button“.</string>
     <string name="improvedAutoCompleteIAMTitle">Tas pats privatumas.\nGeresni paieškos pasiūlymai!</string>
     <string name="openAutoCompleteSettings">Atidaryti nustatymus</string>
+    <string name="privateSearchChatSuggestionsToggle">Pokalbių pasiūlymai</string>
+    <string name="privateSearchAutocompleteHintWithChatSuggestions">Rodyti pasiūlymus iš jūsų istorijos, žymių ir (pasirinktinai) „Duck.ai“ pokalbių istorijos, kai rašai paieškos juostoje. Visos paieškos yra privačios.</string>
 
     <!-- General Settings -->
     <string name="generalSettingsActivityTitle" instruction="Title of the general settings screen">Bendrieji</string>

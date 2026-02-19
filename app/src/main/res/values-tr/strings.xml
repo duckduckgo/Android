@@ -176,6 +176,8 @@
     <string name="improvedAutoCompleteIAMContent">Otomatik tamamlama önerileri artık son ziyaret ettiğiniz siteleri de içeriyor. Bunları ayarlardan kapatabilir veya istediğiniz zaman 🔥 Fire Button ile temizleyebilirsiniz.</string>
     <string name="improvedAutoCompleteIAMTitle">Aynı gizlilik.\nDaha iyi arama önerileri!</string>
     <string name="openAutoCompleteSettings">Ayarları Aç</string>
+    <string name="privateSearchChatSuggestionsToggle">Sohbet Önerileri</string>
+    <string name="privateSearchAutocompleteHintWithChatSuggestions">Arama çubuğuna yazarken geçmişinizden, yer işaretlerinizden ve (isteğe bağlı olarak) Duck.ai sohbet geçmişinizden öneriler gösterin. Tüm aramalar gizlidir.</string>
 
     <!-- General Settings -->
     <string name="generalSettingsActivityTitle" instruction="Title of the general settings screen">Genel</string>

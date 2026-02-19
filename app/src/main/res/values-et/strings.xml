@@ -176,6 +176,8 @@
     <string name="improvedAutoCompleteIAMContent">Automaatse täitmise soovitused hõlmavad nüüd sinu hiljuti külastatud saite. Saad selle välja lülitada seadetes või tühjendada igal ajal nupu 🔥 Fire Button abil.</string>
     <string name="improvedAutoCompleteIAMTitle">Sama privaatsus.\nParemad otsingusoovitused!</string>
     <string name="openAutoCompleteSettings">Ava sätted</string>
+    <string name="privateSearchChatSuggestionsToggle">Vestluse soovitused</string>
+    <string name="privateSearchAutocompleteHintWithChatSuggestions">Kuva otsinguribale tippimise ajal soovitusi oma ajaloost, järjehoidjatest ja (valikuliselt) Duck.ai vestlusajaloo põhjal. Kõik otsingud on privaatsed.</string>
 
     <!-- General Settings -->
     <string name="generalSettingsActivityTitle" instruction="Title of the general settings screen">Üldine</string>

@@ -177,6 +177,8 @@
     <string name="improvedAutoCompleteIAMContent">Automātiskās pabeigšanas ieteikumi tagad ietver tavas nesen apmeklētās vietnes. Izslēdz sadaļā Iestatījumi vai jebkurā laikā notīri ar 🔥 Fire Button.</string>
     <string name="improvedAutoCompleteIAMTitle">Tas pats privātums.\nLabāki meklēšanas ieteikumi!</string>
     <string name="openAutoCompleteSettings">Atvērt iestatījumus</string>
+    <string name="privateSearchChatSuggestionsToggle">Tērzēšanas ieteikumi</string>
+    <string name="privateSearchAutocompleteHintWithChatSuggestions">Rādīt ieteikumus no tavas vēstures, grāmatzīmēm un (pēc izvēles) Duck.ai tērzēšanas vēstures, rakstot meklēšanas joslā. Visi meklējumi ir privāti.</string>
 
     <!-- General Settings -->
     <string name="generalSettingsActivityTitle" instruction="Title of the general settings screen">Vispārīgi</string>

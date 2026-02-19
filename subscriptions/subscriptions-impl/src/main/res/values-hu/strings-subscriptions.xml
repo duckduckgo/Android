@@ -152,8 +152,8 @@
     <string name="feedbackSubCategoryItrAdvisorUnhelpful">Az ügyintézővel folytatott hívás nem volt hasznos</string>
     <string name="feedbackSubCategoryItrOther">Egyéb</string>
 
-    <string name="feedbackSubCategorySubsOtp">Egyszeri jelszó</string>
-    <string name="feedbackSubCategorySubsOther">Egyéb</string>
+    <string name="feedbackSubCategorySubsOtp">Egyszeri jelszóval kapcsolatos probléma</string>
+    <string name="feedbackSubCategorySubsOther">Valami más</string>
 
     <string name="feedbackSubmitVpnHeader">Olyan problémát találtál, amelyet a <annotation type="faqs_link">súgóközpont</annotation> nem tárgyal? Mindenképpen jelezd felénk!</string>
     <string name="feedbackSubmitVpnDescriptionHint">Mondd el, mit tapasztaltál…</string>

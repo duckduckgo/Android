@@ -176,6 +176,8 @@
     <string name="improvedAutoCompleteIAMContent">Οι προτάσεις αυτόματης συμπλήρωσης περιλαμβάνουν πλέον τους ιστότοπους που επισκεφθήκατε πρόσφατα. Απενεργοποιήστε τη λειτουργία από τις Ρυθμίσεις ή καταργήστε την οποιαδήποτε στιγμή με το κουμπί 🔥 Fire Button.</string>
     <string name="improvedAutoCompleteIAMTitle">Ίδιο απόρρητο.\nΚαλύτερες προτάσεις αναζήτησης!</string>
     <string name="openAutoCompleteSettings">Άνοιγμα ρυθμίσεων</string>
+    <string name="privateSearchChatSuggestionsToggle">Προτάσεις συνομιλίας</string>
+    <string name="privateSearchAutocompleteHintWithChatSuggestions">Εμφάνιση προτάσεων από το ιστορικό σας, τους σελιδοδείκτες σας και (προαιρετικά) το ιστορικό συνομιλιών του Duck.ai καθώς πληκτρολογείτε στη γραμμή αναζήτησης. Όλες οι αναζητήσεις είναι ιδιωτικές.</string>
 
     <!-- General Settings -->
     <string name="generalSettingsActivityTitle" instruction="Title of the general settings screen">Γενικά</string>

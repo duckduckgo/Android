@@ -152,8 +152,8 @@
     <string name="feedbackSubCategoryItrAdvisorUnhelpful">Zvans konsultantam nepalīdzēja</string>
     <string name="feedbackSubCategoryItrOther">Cits</string>
 
-    <string name="feedbackSubCategorySubsOtp">Vienreizēja parole</string>
-    <string name="feedbackSubCategorySubsOther">Cits</string>
+    <string name="feedbackSubCategorySubsOtp">Problēma ar vienreizējo paroli</string>
+    <string name="feedbackSubCategorySubsOther">Kaut kas cits</string>
 
     <string name="feedbackSubmitVpnHeader">Vai atradi problēmu, kas nav aplūkota mūsu <annotation type="faqs_link">palīdzības centrā</annotation> ? Mēs noteikti gribam par to uzzināt.</string>
     <string name="feedbackSubmitVpnDescriptionHint">Pastāsti, kas notiek…</string>
