@@ -16,9 +16,12 @@ inputs:
   github_token:
     description: 'GitHub token for private mapping repo access'
     required: true
+
 outputs:
   task_id:
     description: 'The Asana task ID that was found and assigned'
+    value: ${{ steps.find-asana-release-task.outputs.task_id }}
+
 runs:
   using: 'composite'
   steps:
