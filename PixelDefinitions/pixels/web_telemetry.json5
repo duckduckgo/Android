@@ -1,7 +1,7 @@
 {
-    "webTelemetry.adwallDetection.day": {
+    "webTelemetry_adwallDetection_day": {
         "description": "Daily bucketed count of adwall detections across all pages. Fired by the eventHub feature at the end of each 1-day period.",
-        "owners": ["AitorBallesteros"],
+        "owners": ["GuiltyDolphin"],
         "triggers": ["other"],
         "parameters": [
             {
@@ -12,9 +12,9 @@
             }
         ]
     },
-    "webTelemetry.adwallDetection.week": {
+    "webTelemetry_adwallDetection_week": {
         "description": "Weekly bucketed count of adwall detections across all pages. Fired by the eventHub feature at the end of each 7-day period.",
-        "owners": ["AitorBallesteros"],
+        "owners": ["GuiltyDolphin"],
         "triggers": ["other"],
         "parameters": [
             {
