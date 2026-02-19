@@ -95,5 +95,11 @@
         "type": "string",
         "description": "Indicates whether the Duck.ai chats clearing option is enabled or disabled",
         "enum": ["true", "false"]
+    },
+    "status": {
+        "key": "status",
+        "type": "string",
+        "description": "VPN menu item state when the menu was opened or when the VPN item was tapped",
+        "enum": ["pill", "no_pill", "subscribed", "hidden"]
     }
 }
