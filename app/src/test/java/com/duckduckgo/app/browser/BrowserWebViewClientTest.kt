@@ -77,7 +77,6 @@ import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.Off
 import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.On
 import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.Unavailable
 import com.duckduckgo.feature.toggles.api.Toggle
-import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.user.agent.api.ClientBrandHintProvider
@@ -151,7 +150,6 @@ class BrowserWebViewClientTest {
     private val mediaPlayback: MediaPlayback = mock()
     private val subscriptions: Subscriptions = mock()
     private val mockDuckPlayer: DuckPlayer = mock()
-    private val navigationHistory: NavigationHistory = mock()
     private val mockDuckDuckGoUrlDetector: DuckDuckGoUrlDetector = mock()
     private val mockCustomHeaderGracePeriodChecker: CustomHeaderAllowedChecker = mock()
     private val mockFeaturesHeaderProvider: AndroidFeaturesHeaderProvider = mock()
@@ -200,7 +198,6 @@ class BrowserWebViewClientTest {
                     currentTimeProvider,
                     pageLoadedHandler,
                     pagePaintedHandler,
-                    navigationHistory,
                     mediaPlayback,
                     subscriptions,
                     mockDuckPlayer,
@@ -1028,19 +1025,17 @@ class BrowserWebViewClientTest {
     }
 
     @Test
-    fun whenPageFinishesThenHistoryIsSubmitted() {
+    fun whenPageFinishesThenSiteVisitedIsCalled() {
         runTest {
             val mockWebView = getImmediatelyInvokedMockWebView()
             whenever(mockWebView.progress).thenReturn(100)
             whenever(mockWebView.safeCopyBackForwardList()).thenReturn(TestBackForwardList())
             whenever(mockWebView.settings).thenReturn(mock())
-            whenever(mockDuckPlayer.isSimulatedYoutubeNoCookie(any())).thenReturn(false)
             whenever(mockDuckPlayer.isYoutubeWatchUrl(any())).thenReturn(false)
-            whenever(listener.getCurrentTabId()).thenReturn("tabId")
             testee.onPageStarted(mockWebView, EXAMPLE_URL, null)
             whenever(currentTimeProvider.elapsedRealtime()).thenReturn(10)
             testee.onPageFinished(mockWebView, EXAMPLE_URL)
-            verify(navigationHistory).saveToHistory(any(), eq(null), eq("tabId"))
+            verify(listener).onSiteVisited(eq(EXAMPLE_URL), eq(null))
         }
     }
 

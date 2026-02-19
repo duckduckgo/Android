@@ -79,7 +79,6 @@ import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerOrigin.SERP_AUTO
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.ENABLED
 import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.On
 import com.duckduckgo.duckplayer.impl.DUCK_PLAYER_OPEN_IN_YOUTUBE_PATH
-import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
 import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.subscriptions.api.Subscriptions
@@ -121,7 +120,6 @@ class BrowserWebViewClient @Inject constructor(
     private val currentTimeProvider: CurrentTimeProvider,
     private val pageLoadedHandler: PageLoadedHandler,
     private val shouldSendPagePaintedPixel: PagePaintedHandler,
-    private val navigationHistory: NavigationHistory,
     private val mediaPlayback: MediaPlayback,
     private val subscriptions: Subscriptions,
     private val duckPlayer: DuckPlayer,
@@ -540,51 +538,29 @@ class BrowserWebViewClient @Inject constructor(
             flushCookies()
             printInjector.injectPrint(webView)
 
-            url?.let { url ->
-                val uri = url.toUri()
-                if (url != ABOUT_BLANK) {
-                    start?.let { safeStart ->
-                        // TODO (cbarreiro - 22/05/2024): Extract to plugins
-                        pageLoadedHandler.onPageLoaded(
-                            url = url,
-                            title = navigationList.currentItem?.title,
-                            start = safeStart,
-                            end = currentTimeProvider.elapsedRealtime(),
-                            isTabInForegroundOnFinish = webViewClientListener?.isTabInForeground() ?: true,
-                            activeRequestsOnLoadStart = parallelRequestsOnStart,
-                            concurrentRequestsOnFinish = decrementLoadCountAndGet(),
-                        )
-                        shouldSendPagePaintedPixel(webView = webView, url = url)
-                        appCoroutineScope.launch(dispatcherProvider.io()) {
-                            val currentTabId = webViewClientListener?.getCurrentTabId()
-                            if (duckPlayer.getDuckPlayerState() == ENABLED && duckPlayer.isSimulatedYoutubeNoCookie(uri)) {
-                                val duckPlayerUrl = duckPlayer.createDuckPlayerUriFromYoutubeNoCookie(url.toUri())
-                                if (duckPlayerUrl != null && currentTabId != null) {
-                                    navigationHistory.saveToHistory(
-                                        duckPlayerUrl,
-                                        navigationList.currentItem?.title,
-                                        currentTabId,
-                                    )
-                                }
-                            } else {
-                                if (duckPlayer.getDuckPlayerState() == ENABLED && duckPlayer.isYoutubeWatchUrl(uri)) {
-                                    duckPlayer.duckPlayerNavigatedToYoutube()
-                                }
-                                if (currentTabId != null) {
-                                    navigationHistory.saveToHistory(
-                                        url,
-                                        navigationList.currentItem?.title,
-                                        currentTabId,
-                                    )
-                                }
-                            }
+            if (url != null && url != ABOUT_BLANK) {
+                start?.let { safeStart ->
+                    // TODO (cbarreiro - 22/05/2024): Extract to plugins
+                    pageLoadedHandler.onPageLoaded(
+                        url = url,
+                        title = navigationList.currentItem?.title,
+                        start = safeStart,
+                        end = currentTimeProvider.elapsedRealtime(),
+                        isTabInForegroundOnFinish = webViewClientListener?.isTabInForeground() ?: true,
+                        activeRequestsOnLoadStart = parallelRequestsOnStart,
+                        concurrentRequestsOnFinish = decrementLoadCountAndGet(),
+                    )
+                    shouldSendPagePaintedPixel(webView = webView, url = url)
+                    appCoroutineScope.launch(dispatcherProvider.io()) {
+                        if (duckPlayer.getDuckPlayerState() == ENABLED && duckPlayer.isYoutubeWatchUrl(url.toUri())) {
+                            duckPlayer.duckPlayerNavigatedToYoutube()
                         }
-                        uriLoadedManager.sendUriLoadedPixels(duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url))
-
-                        webViewClientListener?.onSiteVisited(uri)
-
-                        start = null
                     }
+                    uriLoadedManager.sendUriLoadedPixels(duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url))
+
+                    webViewClientListener?.onSiteVisited(url, navigationList.currentItem?.title)
+
+                    start = null
                 }
             }
         }

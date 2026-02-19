@@ -965,11 +965,24 @@ class BrowserTabViewModel @Inject constructor(
 
     override fun getCurrentTabId(): String = tabId
 
-    override fun onSiteVisited(uri: Uri) {
+    override fun onSiteVisited(url: String, title: String?) {
         viewModelScope.launch(dispatchers.io()) {
+            val uri = url.toUri()
+
+            if (duckPlayer.getDuckPlayerState() == ENABLED && duckPlayer.isSimulatedYoutubeNoCookie(uri)) {
+                val duckPlayerUrl = duckPlayer.createDuckPlayerUriFromYoutubeNoCookie(uri)
+                if (duckPlayerUrl != null) {
+                    history.saveToHistory(duckPlayerUrl, title, tabId)
+                }
+            } else {
+                history.saveToHistory(url, title, tabId)
+            }
+
             if (androidBrowserConfig.singleTabFireDialog().isEnabled()) {
-                val domain = uri.host?.toTldPlusOne() ?: uri.host ?: return@launch
-                tabVisitedSitesRepository.recordVisitedSite(tabId, domain)
+                val domain = uri.host?.toTldPlusOne() ?: uri.host
+                if (domain != null) {
+                    tabVisitedSitesRepository.recordVisitedSite(tabId, domain)
+                }
             }
         }
     }
