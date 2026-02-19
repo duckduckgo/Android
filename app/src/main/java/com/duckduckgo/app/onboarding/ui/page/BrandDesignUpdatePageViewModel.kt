@@ -136,10 +136,14 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
     fun loadDaxDialog() {
         viewModelScope.launch {
             val isReinstall = isAppReinstall()
-            if (isReinstall) {
-                _viewState.update { it.copy(isReinstallUser = true) }
+            val dialogType = if (isReinstall) INITIAL_REINSTALL_USER else INITIAL
+            _viewState.update {
+                it.copy(
+                    isReinstallUser = isReinstall,
+                    currentDialog = dialogType,
+                )
             }
-            setCurrentDialog(if (isReinstall) INITIAL_REINSTALL_USER else INITIAL)
+            fireDialogShownPixel(dialogType)
         }
     }
 
