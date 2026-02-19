@@ -30,10 +30,14 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.subscriptions.impl.CurrentPurchase
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.LIST_OF_PLUS_PLANS
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.LIST_OF_PRO_PLANS
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN_ROW
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN_US
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PRO_PLAN_US
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PLAN_ROW
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PLAN_US
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PRO_PLAN_US
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.billing.SubscriptionReplacementMode
 import com.duckduckgo.subscriptions.internal.SubsSettingPlugin
@@ -194,6 +198,13 @@ class SwitchSubscriptionView @JvmOverloads constructor(
         val currentPlanId = currentSubscription?.productId
         val deduplicatedOffers = offers
             .groupBy { it.planId }
+            .filter { (planId, _) ->
+                if (currentPlanId in LIST_OF_PLUS_PLANS) {
+                    return@filter planId in LIST_OF_PLUS_PLANS
+                } else {
+                    return@filter planId in LIST_OF_PRO_PLANS
+                }
+            }
             .mapValues { (_, offersForPlan) ->
                 // Get plans without offerId
                 offersForPlan.minByOrNull { if (it.offerId == null) 0 else 1 }!!
@@ -206,8 +217,10 @@ class SwitchSubscriptionView @JvmOverloads constructor(
             val displayText = when {
                 isCurrentPlan -> {
                     when (offer.planId) {
-                        MONTHLY_PLAN_US, MONTHLY_PLAN_ROW -> "Monthly (current)"
-                        YEARLY_PLAN_US, YEARLY_PLAN_ROW -> "Yearly (current)"
+                        MONTHLY_PLAN_US, MONTHLY_PLAN_ROW -> "Plus Monthly (current)"
+                        YEARLY_PLAN_US, YEARLY_PLAN_ROW -> "Plus Yearly (current)"
+                        MONTHLY_PRO_PLAN_US -> "Pro Monthly (current)"
+                        YEARLY_PRO_PLAN_US -> "Pro Yearly (current)"
                         else -> "${offer.planId} (current)"
                     }
                 }
@@ -215,8 +228,10 @@ class SwitchSubscriptionView @JvmOverloads constructor(
                 else -> {
                     val price = offer.pricingPhases.firstOrNull()?.formattedPrice ?: "N/A"
                     when (offer.planId) {
-                        MONTHLY_PLAN_US, MONTHLY_PLAN_ROW -> "Monthly ($price)"
-                        YEARLY_PLAN_US, YEARLY_PLAN_ROW -> "Yearly ($price)"
+                        MONTHLY_PLAN_US, MONTHLY_PLAN_ROW -> "Plus Monthly ($price)"
+                        YEARLY_PLAN_US, YEARLY_PLAN_ROW -> "Plus Yearly ($price)"
+                        MONTHLY_PRO_PLAN_US -> "Pro Monthly ($price)"
+                        YEARLY_PRO_PLAN_US -> "Pro Yearly ($price)"
                         else -> "${offer.planId} ($price)"
                     }
                 }

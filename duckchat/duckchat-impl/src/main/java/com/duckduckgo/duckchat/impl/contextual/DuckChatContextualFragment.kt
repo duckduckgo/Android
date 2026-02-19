@@ -239,6 +239,10 @@ class DuckChatContextualFragment :
     ) {
         super.onViewCreated(view, savedInstanceState)
 
+        // Explicitly enable cookies for this WebView
+        cookieManager.setAcceptCookie(true)
+        cookieManager.setAcceptThirdPartyCookies(simpleWebview, true)
+
         simpleWebview.let {
             it.webViewClient = webViewClient
             webViewClient.onPageFinishedListener = { url ->

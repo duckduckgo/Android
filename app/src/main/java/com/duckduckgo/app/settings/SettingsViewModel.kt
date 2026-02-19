@@ -147,6 +147,7 @@ class SettingsViewModel @Inject constructor(
         val isAddWidgetInProtectionsVisible: Boolean = false,
         val widgetsInstalled: Boolean = false,
         val showWhatsNew: Boolean = false,
+        val showGetDesktopBrowser: Boolean = false,
     )
 
     sealed class Command {
@@ -173,6 +174,7 @@ class SettingsViewModel @Inject constructor(
         data object LaunchFeedback : Command()
         data object LaunchPproUnifiedFeedback : Command()
         data object LaunchOtherPlatforms : Command()
+        data object LaunchGetDesktopBrowser : Command()
         data class LaunchWhatsNew(
             val messageId: String,
             val messageType: Content.MessageType,
@@ -233,6 +235,9 @@ class SettingsViewModel @Inject constructor(
                     },
                     showWhatsNew = withContext(dispatcherProvider.io()) {
                         settingsPageFeature.whatsNewEnabled().isEnabled() && modalSurfaceStore.getLastShownRemoteMessageId() != null
+                    },
+                    showGetDesktopBrowser = withContext(dispatcherProvider.io()) {
+                        settingsPageFeature.newDesktopBrowserSettingEnabled().isEnabled()
                     },
                 ),
             )
@@ -430,6 +435,10 @@ class SettingsViewModel @Inject constructor(
 
     fun onDdgOnOtherPlatformsClicked() {
         viewModelScope.launch { command.send(LaunchOtherPlatforms) }
+    }
+
+    fun onGetDesktopBrowserClicked() {
+        viewModelScope.launch { command.send(Command.LaunchGetDesktopBrowser) }
     }
 
     companion object {

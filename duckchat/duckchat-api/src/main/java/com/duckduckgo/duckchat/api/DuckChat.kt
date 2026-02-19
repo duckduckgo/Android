@@ -110,4 +110,6 @@ interface DuckChat {
      * @return true if the onboarding was completed, false otherwise.
      */
     suspend fun isContextualOnboardingCompleted(): Boolean
+
+    suspend fun isStandaloneMigrationCompleted(): Boolean
 }

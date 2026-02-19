@@ -18,6 +18,7 @@ package com.duckduckgo.autofill.api
 
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
+import com.duckduckgo.feature.toggles.api.Toggle.DefaultValue
 import com.duckduckgo.feature.toggles.api.Toggle.InternalAlwaysEnabled
 
 /**
@@ -182,4 +183,12 @@ interface AutofillFeature {
 
     @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.FALSE)
     fun sendSanitizedStackTraces(): Toggle
+
+    /**
+     * Controls whether SqlCipher library loading uses async mode or sync fallback.
+     *
+     * @return `true` to use async loading (default), `false` to use sync loading fallback
+     */
+    @DefaultValue(Toggle.DefaultFeatureValue.TRUE)
+    fun sqlCipherAsyncLoading(): Toggle
 }

@@ -2,6 +2,204 @@
 <issues format="6" by="lint 8.8.2" type="baseline" client="gradle" dependencies="false" name="AGP (8.7.3)" variant="all" version="8.8.2">
 
     <issue
+        id="NoLifecycleScopeInFragment"
+        message="Use viewLifecycleOwner.lifecycleScope instead of lifecycleScope in Fragments. Fragment views can be destroyed while the fragment is still alive (backstack, ViewPager), which can cause crashes when coroutines try to update destroyed views."
+        errorLine1="            }.launchIn(lifecycleScope)"
+        errorLine2="                       ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/duckchat/impl/contextual/DuckChatContextualFragment.kt"
+            line="560"
+            column="24"/>
+    </issue>
+
+    <issue
+        id="NoLifecycleScopeInFragment"
+        message="Use viewLifecycleOwner.lifecycleScope instead of lifecycleScope in Fragments. Fragment views can be destroyed while the fragment is still alive (backstack, ViewPager), which can cause crashes when coroutines try to update destroyed views."
+        errorLine1="            }.launchIn(lifecycleScope)"
+        errorLine2="                       ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/duckchat/impl/contextual/DuckChatContextualFragment.kt"
+            line="575"
+            column="24"/>
+    </issue>
+
+    <issue
+        id="NoLifecycleScopeInFragment"
+        message="Use viewLifecycleOwner.lifecycleScope instead of lifecycleScope in Fragments. Fragment views can be destroyed while the fragment is still alive (backstack, ViewPager), which can cause crashes when coroutines try to update destroyed views."
+        errorLine1="            }.launchIn(lifecycleScope)"
+        errorLine2="                       ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/duckchat/impl/contextual/DuckChatContextualFragment.kt"
+            line="580"
+            column="24"/>
+    </issue>
+
+    <issue
+        id="NoLifecycleScopeInFragment"
+        message="Use viewLifecycleOwner.lifecycleScope instead of lifecycleScope in Fragments. Fragment views can be destroyed while the fragment is still alive (backstack, ViewPager), which can cause crashes when coroutines try to update destroyed views."
+        errorLine1="        }.launchIn(lifecycleScope)"
+        errorLine2="                   ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/duckchat/impl/contextual/DuckChatContextualFragment.kt"
+            line="633"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="NoLifecycleScopeInFragment"
+        message="Use viewLifecycleOwner.lifecycleScope instead of lifecycleScope in Fragments. Fragment views can be destroyed while the fragment is still alive (backstack, ViewPager), which can cause crashes when coroutines try to update destroyed views."
+        errorLine1="        downloadMessagesJob += lifecycleScope.launch {"
+        errorLine2="                               ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/duckchat/impl/contextual/DuckChatContextualFragment.kt"
+            line="779"
+            column="32"/>
+    </issue>
+
+    <issue
+        id="NoLifecycleScopeInFragment"
+        message="Use viewLifecycleOwner.lifecycleScope instead of lifecycleScope in Fragments. Fragment views can be destroyed while the fragment is still alive (backstack, ViewPager), which can cause crashes when coroutines try to update destroyed views."
+        errorLine1="            }.launchIn(lifecycleScope)"
+        errorLine2="                       ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/duckchat/impl/ui/DuckChatWebViewFragment.kt"
+            line="365"
+            column="24"/>
+    </issue>
+
+    <issue
+        id="NoLifecycleScopeInFragment"
+        message="Use viewLifecycleOwner.lifecycleScope instead of lifecycleScope in Fragments. Fragment views can be destroyed while the fragment is still alive (backstack, ViewPager), which can cause crashes when coroutines try to update destroyed views."
+        errorLine1="            .launchIn(lifecycleScope)"
+        errorLine2="                      ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/duckchat/impl/ui/DuckChatWebViewFragment.kt"
+            line="378"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="NoLifecycleScopeInFragment"
+        message="Use viewLifecycleOwner.lifecycleScope instead of lifecycleScope in Fragments. Fragment views can be destroyed while the fragment is still alive (backstack, ViewPager), which can cause crashes when coroutines try to update destroyed views."
+        errorLine1="        downloadMessagesJob += lifecycleScope.launch {"
+        errorLine2="                               ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/duckchat/impl/ui/DuckChatWebViewFragment.kt"
+            line="600"
+            column="32"/>
+    </issue>
+
+    <issue
+        id="NoLifecycleScopeInFragment"
+        message="Use viewLifecycleOwner.lifecycleScope instead of lifecycleScope in Fragments. Fragment views can be destroyed while the fragment is still alive (backstack, ViewPager), which can cause crashes when coroutines try to update destroyed views."
+        errorLine1="            }.launchIn(lifecycleScope)"
+        errorLine2="                       ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/duckchat/impl/inputscreen/ui/InputScreenFragment.kt"
+            line="332"
+            column="24"/>
+    </issue>
+
+    <issue
+        id="NoLifecycleScopeInFragment"
+        message="Use viewLifecycleOwner.lifecycleScope instead of lifecycleScope in Fragments. Fragment views can be destroyed while the fragment is still alive (backstack, ViewPager), which can cause crashes when coroutines try to update destroyed views."
+        errorLine1="            }.launchIn(lifecycleScope)"
+        errorLine2="                       ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/duckchat/impl/inputscreen/ui/InputScreenFragment.kt"
+            line="342"
+            column="24"/>
+    </issue>
+
+    <issue
+        id="NoLifecycleScopeInFragment"
+        message="Use viewLifecycleOwner.lifecycleScope instead of lifecycleScope in Fragments. Fragment views can be destroyed while the fragment is still alive (backstack, ViewPager), which can cause crashes when coroutines try to update destroyed views."
+        errorLine1="            }.launchIn(lifecycleScope)"
+        errorLine2="                       ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/duckchat/impl/inputscreen/ui/InputScreenFragment.kt"
+            line="347"
+            column="24"/>
+    </issue>
+
+    <issue
+        id="NoLifecycleScopeInFragment"
+        message="Use viewLifecycleOwner.lifecycleScope instead of lifecycleScope in Fragments. Fragment views can be destroyed while the fragment is still alive (backstack, ViewPager), which can cause crashes when coroutines try to update destroyed views."
+        errorLine1="            }.launchIn(lifecycleScope)"
+        errorLine2="                       ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/duckchat/impl/inputscreen/ui/InputScreenFragment.kt"
+            line="362"
+            column="24"/>
+    </issue>
+
+    <issue
+        id="NoLifecycleScopeInFragment"
+        message="Use viewLifecycleOwner.lifecycleScope instead of lifecycleScope in Fragments. Fragment views can be destroyed while the fragment is still alive (backstack, ViewPager), which can cause crashes when coroutines try to update destroyed views."
+        errorLine1="            }.launchIn(lifecycleScope)"
+        errorLine2="                       ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/duckchat/impl/inputscreen/ui/InputScreenFragment.kt"
+            line="369"
+            column="24"/>
+    </issue>
+
+    <issue
+        id="NoLifecycleScopeInFragment"
+        message="Use viewLifecycleOwner.lifecycleScope instead of lifecycleScope in Fragments. Fragment views can be destroyed while the fragment is still alive (backstack, ViewPager), which can cause crashes when coroutines try to update destroyed views."
+        errorLine1="            }.launchIn(lifecycleScope)"
+        errorLine2="                       ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/duckchat/impl/inputscreen/ui/InputScreenFragment.kt"
+            line="540"
+            column="24"/>
+    </issue>
+
+    <issue
+        id="NoLifecycleScopeInFragment"
+        message="Use viewLifecycleOwner.lifecycleScope instead of lifecycleScope in Fragments. Fragment views can be destroyed while the fragment is still alive (backstack, ViewPager), which can cause crashes when coroutines try to update destroyed views."
+        errorLine1="            .launchIn(lifecycleScope)"
+        errorLine2="                      ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/duckchat/impl/inputscreen/ui/InputScreenFragment.kt"
+            line="609"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="NoLifecycleScopeInFragment"
+        message="Use viewLifecycleOwner.lifecycleScope instead of lifecycleScope in Fragments. Fragment views can be destroyed while the fragment is still alive (backstack, ViewPager), which can cause crashes when coroutines try to update destroyed views."
+        errorLine1="        lifecycleScope.launch {"
+        errorLine2="        ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/duckchat/impl/inputscreen/ui/tabs/SearchTabFragment.kt"
+            line="144"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="NoLifecycleScopeInFragment"
+        message="Use viewLifecycleOwner.lifecycleScope instead of lifecycleScope in Fragments. Fragment views can be destroyed while the fragment is still alive (backstack, ViewPager), which can cause crashes when coroutines try to update destroyed views."
+        errorLine1="            }.launchIn(lifecycleScope)"
+        errorLine2="                       ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/duckchat/impl/inputscreen/ui/tabs/SearchTabFragment.kt"
+            line="215"
+            column="24"/>
+    </issue>
+
+    <issue
+        id="NoLifecycleScopeInFragment"
+        message="Use viewLifecycleOwner.lifecycleScope instead of lifecycleScope in Fragments. Fragment views can be destroyed while the fragment is still alive (backstack, ViewPager), which can cause crashes when coroutines try to update destroyed views."
+        errorLine1="            }.launchIn(lifecycleScope)"
+        errorLine2="                       ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/duckchat/impl/inputscreen/ui/tabs/SearchTabFragment.kt"
+            line="220"
+            column="24"/>
+    </issue>
+
+    <issue
         id="DenyListedApi"
         message="first() will throw if flow is empty, firstOrNull() it&apos;s a safer option."
         errorLine1="        assertFalse(testDataStore.data.first().contains(DUCK_CHAT_USER_PREFERENCES))"
@@ -41,7 +239,7 @@
         errorLine2="                                ~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/duckchat/impl/contextual/DuckChatContextualFragment.kt"
-            line="643"
+            line="703"
             column="33"/>
     </issue>
 
@@ -52,7 +250,7 @@
         errorLine2="                                ~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/duckchat/impl/ui/DuckChatWebViewFragment.kt"
-            line="497"
+            line="502"
             column="33"/>
     </issue>
 
@@ -124,6 +322,28 @@
 
     <issue
         id="VectorPath"
+        message="Very long vector path (1200 characters), which is bad for performance. Considering reducing precision, removing minor details or rasterizing vector."
+        errorLine1="      android:pathData=&quot;M14.609,14.388C14.853,14.144 15.249,14.144 15.493,14.388L20.438,19.333V16.375C20.438,16.029 20.718,15.75 21.063,15.75H21.375C21.72,15.75 22,16.03 22,16.375V21.375C22,21.72 21.72,22 21.375,22H16.375C16.03,22 15.75,21.72 15.75,21.375V21.062C15.75,20.717 16.03,20.437 16.375,20.437L19.332,20.437L14.388,15.493C14.144,15.249 14.144,14.853 14.388,14.609L14.609,14.388ZM17.031,3C19.775,3 22,5.225 22,7.969V13.611C21.569,13.141 21.062,12.741 20.5,12.429V9.859C20.5,9.109 19.891,8.5 19.141,8.5H15.151C13.511,8.5 12.019,7.553 11.321,6.069C10.871,5.111 9.908,4.5 8.849,4.5H6.969C5.053,4.5 3.5,6.053 3.5,7.969V16.031C3.5,17.947 5.053,19.5 6.969,19.5H11.99C12.169,20.038 12.423,20.542 12.74,21H6.969C4.225,21 2,18.775 2,16.031V7.969C2,5.225 4.225,3 6.969,3H17.031ZM10.75,14.5C11.164,14.5 11.5,14.836 11.5,15.25C11.5,15.664 11.164,16 10.75,16H6.75C6.336,16 6,15.664 6,15.25C6,14.836 6.336,14.5 6.75,14.5H10.75ZM13.25,10.5C13.664,10.5 14,10.836 14,11.25C14,11.664 13.664,12 13.25,12H6.75C6.336,12 6,11.664 6,11.25C6,10.836 6.336,10.5 6.75,10.5H13.25ZM12.081,4.5C12.316,4.779 12.519,5.091 12.679,5.431C13.129,6.389 14.092,7 15.151,7H19.141C19.608,7 20.048,7.113 20.437,7.311C20.13,5.71 18.722,4.5 17.031,4.5H12.081Z&quot;"
+        errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/drawable/ic_page_content_attach_24.xml"
+            line="23"
+            column="25"/>
+    </issue>
+
+    <issue
+        id="VectorPath"
+        message="Very long vector path (1589 characters), which is bad for performance. Considering reducing precision, removing minor details or rasterizing vector."
+        errorLine1="      android:pathData=&quot;M8.798,3.482C9.597,2.772 10.871,2.934 11.466,3.824C11.682,4.148 11.746,4.488 11.765,4.758C11.782,4.991 11.767,5.299 11.767,5.421C11.767,5.878 11.998,6.382 12.403,6.785C12.809,7.189 13.314,7.415 13.762,7.416H13.762C15.043,7.416 16.799,7.57 17.947,8.722L18.009,8.788C18.637,9.484 18.616,10.575 17.947,11.244L17.946,11.244L15.125,14.065L20.78,19.72C21.073,20.013 21.073,20.488 20.78,20.781C20.487,21.073 20.013,21.073 19.72,20.781L14.065,15.125L11.244,17.946C10.583,18.608 9.502,18.641 8.801,18.021C8.8,18.02 8.798,18.019 8.797,18.017C7.516,16.868 7.416,15.058 7.416,13.762L7.413,13.678C7.387,13.252 7.164,12.784 6.785,12.403C6.381,11.997 5.877,11.767 5.42,11.767C5.298,11.767 4.991,11.782 4.758,11.765C4.487,11.746 4.147,11.682 3.824,11.466C2.905,10.852 2.762,9.514 3.553,8.722V8.722L8.722,3.554L8.798,3.482ZM10.01,4.54C9.917,4.531 9.836,4.561 9.782,4.614L4.614,9.783C4.561,9.836 4.53,9.917 4.54,10.01C4.549,10.104 4.596,10.178 4.657,10.219C4.682,10.236 4.733,10.259 4.865,10.269C4.932,10.274 5.008,10.274 5.104,10.272C5.186,10.271 5.313,10.267 5.42,10.267H5.421C6.361,10.267 7.229,10.722 7.849,11.345C8.468,11.968 8.915,12.835 8.916,13.762V13.762C8.916,15.105 9.068,16.243 9.796,16.899C9.903,16.992 10.083,16.986 10.183,16.886L10.184,16.885L16.886,10.184C16.991,10.078 16.991,9.888 16.886,9.783L16.884,9.781C16.209,9.102 15.037,8.916 13.762,8.916H13.762C12.835,8.915 11.968,8.468 11.345,7.849C10.722,7.229 10.267,6.361 10.267,5.421V5.421C10.267,5.313 10.271,5.186 10.273,5.103C10.274,5.008 10.274,4.932 10.269,4.866C10.26,4.733 10.236,4.682 10.219,4.657C10.178,4.596 10.105,4.55 10.01,4.54Z&quot;"
+        errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/drawable/ic_pin_24.xml"
+            line="23"
+            column="25"/>
+    </issue>
+
+    <issue
+        id="VectorPath"
         message="Very long vector path (1021 characters), which is bad for performance. Considering reducing precision, removing minor details or rasterizing vector."
         errorLine1="        android:pathData=&quot;M72.5,30a8,8 0,1 1,0 16h-10a8,8 0,1 1,0 -16h10ZM66.75,32a5.25,5.25 0,1 0,3.34 9.3l2.56,2.55 0.08,0.06a0.5,0.5 0,0 0,0.69 -0.69l-0.06,-0.08 -2.55,-2.56A5.25,5.25 0,0 0,66.75 32ZM93.5,32c3.31,0 6,2.39 6,5.34 0,2.24 -1.55,4.16 -3.74,4.95 -1.42,0.65 -4.91,1.31 -6.9,1.65a0.53,0.53 0,0 1,-0.49 -0.88l0.97,-1.12c0.21,-0.24 0.17,-0.61 -0.07,-0.82 -1.09,-0.97 -1.77,-2.31 -1.77,-3.79 0,-2.95 2.69,-5.34 6,-5.34ZM93.5,33c-2.87,0 -5,2.05 -5,4.34 0,1.16 0.53,2.24 1.43,3.04 0.6,0.53 0.78,1.52 0.17,2.22l-0.11,0.12a68.24,68.24 0,0 0,2.32 -0.47c1.3,-0.29 2.43,-0.6 3.04,-0.88l0.04,-0.02 0.04,-0.01c1.87,-0.68 3.08,-2.26 3.08,-4.01 0,-2.29 -2.13,-4.34 -5,-4.34ZM66.75,33a4.25,4.25 0,1 1,0 8.5,4.25 4.25,0 0,1 0,-8.5ZM93.21,34.45c0.07,-0.3 0.5,-0.3 0.57,0l0.16,0.66c0.22,0.88 0.91,1.56 1.78,1.78l0.66,0.16c0.3,0.07 0.3,0.5 0,0.57l-0.66,0.17a2.45,2.45 0,0 0,-1.78 1.78l-0.16,0.66c-0.07,0.3 -0.5,0.3 -0.57,0l-0.17,-0.66a2.45,2.45 0,0 0,-1.78 -1.78l-0.66,-0.17c-0.3,-0.07 -0.3,-0.5 0,-0.57l0.66,-0.16a2.45,2.45 0,0 0,1.78 -1.78l0.17,-0.66Z&quot;"
         errorLine2="                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
@@ -173,18 +393,18 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout/fragment_contextual_duck_ai.xml"
-            line="26"
+            line="25"
             column="5"/>
     </issue>
 
     <issue
         id="Overdraw"
-        message="Possible overdraw: Root element paints background `@drawable/background_large_rounded_surface` with a theme that also paints a background (inferred theme is `@android:style/Theme.Holo`)"
-        errorLine1="    android:background=&quot;@drawable/background_large_rounded_surface&quot;>"
-        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        message="Possible overdraw: Root element paints background `?attr/selectableItemBackground` with a theme that also paints a background (inferred theme is `@android:style/Theme.Holo`)"
+        errorLine1="    android:background=&quot;?attr/selectableItemBackground&quot;"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/res/layout/view_duck_ai_contextual_page.xml"
-            line="23"
+            file="src/main/res/layout/item_chat_suggestion.xml"
+            line="24"
             column="5"/>
     </issue>
 
@@ -206,7 +426,7 @@
         errorLine2="                     ~~~~~~~~">
         <location
             file="src/main/res/layout/fragment_contextual_duck_ai.xml"
-            line="167"
+            line="166"
             column="22"/>
     </issue>
 
@@ -228,7 +448,7 @@
         errorLine2="                     ~~~~~~~~">
         <location
             file="src/main/res/layout/fragment_contextual_duck_ai.xml"
-            line="167"
+            line="166"
             column="22"/>
     </issue>
 
@@ -250,7 +470,7 @@
         errorLine2="            ^">
         <location
             file="src/main/java/com/duckduckgo/duckchat/impl/contextual/DuckChatContextualFragment.kt"
-            line="237"
+            line="283"
             column="13"/>
     </issue>
 
@@ -261,7 +481,7 @@
         errorLine2="                                  ^">
         <location
             file="src/main/java/com/duckduckgo/duckchat/impl/contextual/DuckChatContextualFragment.kt"
-            line="237"
+            line="283"
             column="35"/>
     </issue>
 
@@ -351,6 +571,17 @@
             file="src/main/res/layout/view_input_mode_switch_widget.xml"
             line="209"
             column="18"/>
+    </issue>
+
+    <issue
+        id="RtlSymmetry"
+        message="When you define `paddingEnd` you should probably also define `paddingStart` for right-to-left symmetry"
+        errorLine1="                        android:paddingEnd=&quot;@dimen/keyline_2&quot;"
+        errorLine2="                        ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/fragment_contextual_duck_ai.xml"
+            line="294"
+            column="25"/>
     </issue>
 
     <issue

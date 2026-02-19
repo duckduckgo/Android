@@ -107,6 +107,8 @@ interface SettingsDataStore {
     var clearDuckAiData: Boolean
     var useBottomSheetMenu: Boolean
     var showTrackersCountInAddressBar: Boolean
+    var singleTabFireDialogShownCount: Int
+    var getDesktopBrowserSettingDismissed: Boolean
 
     /**
      * Check if a value has been set to the URL display preference.
@@ -277,6 +279,14 @@ class SettingsSharedPreferences @Inject constructor(
         get() = preferences.getBoolean(KEY_SHOW_TRACKERS_COUNT_IN_ADDRESS_BAR, true)
         set(enabled) = preferences.edit { putBoolean(KEY_SHOW_TRACKERS_COUNT_IN_ADDRESS_BAR, enabled) }
 
+    override var singleTabFireDialogShownCount: Int
+        get() = preferences.getInt(KEY_SINGLE_TAB_FIRE_DIALOG_SHOWN_COUNT, 0)
+        set(value) = preferences.edit { putInt(KEY_SINGLE_TAB_FIRE_DIALOG_SHOWN_COUNT, value) }
+
+    override var getDesktopBrowserSettingDismissed: Boolean
+        get() = preferences.getBoolean(KEY_GET_DESKTOP_BROWSER_SETTING_DISMISSED, false)
+        set(value) = preferences.edit { putBoolean(KEY_GET_DESKTOP_BROWSER_SETTING_DISMISSED, value) }
+
     override fun hasBackgroundTimestampRecorded(): Boolean = preferences.contains(KEY_APP_BACKGROUNDED_TIMESTAMP)
 
     override fun clearAppBackgroundTimestamp() = preferences.edit { remove(KEY_APP_BACKGROUNDED_TIMESTAMP) }
@@ -357,6 +367,8 @@ class SettingsSharedPreferences @Inject constructor(
         const val KEY_CLEAR_DUCK_AI_DATA = "KEY_CLEAR_DUCK_AI_DATA"
         const val KEY_USE_BOTTOM_SHEET_MENU = "USE_BOTTOM_SHEET_MENU"
         const val KEY_SHOW_TRACKERS_COUNT_IN_ADDRESS_BAR = "KEY_SHOW_TRACKERS_COUNT_IN_ADDRESS_BAR"
+        const val KEY_SINGLE_TAB_FIRE_DIALOG_SHOWN_COUNT = "KEY_SINGLE_TAB_FIRE_DIALOG_SHOWN_COUNT"
+        const val KEY_GET_DESKTOP_BROWSER_SETTING_DISMISSED = "KEY_GET_DESKTOP_BROWSER_SETTING_DISMISSED"
     }
 
     private class FireAnimationPrefsMapper {

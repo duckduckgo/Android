@@ -35,6 +35,7 @@ import com.duckduckgo.app.appearance.AppearanceScreen
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivitySettingsNewBinding
+import com.duckduckgo.app.desktopbrowser.GetDesktopBrowserActivityParams
 import com.duckduckgo.app.email.ui.EmailProtectionUnsupportedScreenNoParams
 import com.duckduckgo.app.firebutton.DataClearingSettingsScreenNoParams
 import com.duckduckgo.app.firebutton.FireButtonScreenNoParams
@@ -266,6 +267,9 @@ class SettingsActivity : DuckDuckGoActivity() {
             shareFeedbackSetting.setOnClickListener { viewModel.onShareFeedbackClicked() }
             ddgOnOtherPlatformsSetting.setTrailingIconSize(Small)
             ddgOnOtherPlatformsSetting.setOnClickListener { viewModel.onDdgOnOtherPlatformsClicked() }
+            getDesktopBrowserSetting.setOnClickListener {
+                viewModel.onGetDesktopBrowserClicked()
+            }
         }
     }
 
@@ -329,6 +333,7 @@ class SettingsActivity : DuckDuckGoActivity() {
                     updateVoiceSearchVisibility(it.isVoiceSearchVisible)
                     updateAddWidgetInProtections(it.isAddWidgetInProtectionsVisible, it.widgetsInstalled)
                     updateWhatsNewVisibility(it.showWhatsNew)
+                    updateGetDesktopBrowserItemVisibility(it.showGetDesktopBrowser)
                     sortSettingItemsAlphabetically()
                 }
             }.launchIn(lifecycleScope)
@@ -386,6 +391,11 @@ class SettingsActivity : DuckDuckGoActivity() {
 
     private fun updateWhatsNewVisibility(isVisible: Boolean) {
         viewsOther.whatsNewSetting.isVisible = isVisible
+    }
+
+    private fun updateGetDesktopBrowserItemVisibility(isVisible: Boolean) {
+        viewsOther.getDesktopBrowserSetting.isVisible = isVisible
+        viewsOther.ddgOnOtherPlatformsSetting.isVisible = !isVisible
     }
 
     private fun watchForCompleteSetupSettingsChanges() {
@@ -459,6 +469,7 @@ class SettingsActivity : DuckDuckGoActivity() {
             is LaunchFeedback -> launchFeedback()
             is LaunchPproUnifiedFeedback -> launchScreen(GeneralPrivacyProFeedbackScreenNoParams)
             is LaunchOtherPlatforms -> launchActivityAndFinish(BrowserActivity.intent(context = this, queryExtra = OTHER_PLATFORMS_URL))
+            is Command.LaunchGetDesktopBrowser -> launchScreen(GetDesktopBrowserActivityParams(source = GetDesktopBrowserActivityParams.Source.OTHER))
             is Command.LaunchWhatsNew -> launchScreen(ModalSurfaceActivityFromMessageId(it.messageId, it.messageType))
         }
     }

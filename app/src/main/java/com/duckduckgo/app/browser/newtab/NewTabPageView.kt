@@ -51,6 +51,7 @@ import com.duckduckgo.app.browser.newtab.NewTabPageViewModel.ViewState
 import com.duckduckgo.app.browser.remotemessage.SharePromoLinkRMFBroadCastReceiver
 import com.duckduckgo.app.browser.remotemessage.asMessage
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
+import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
@@ -69,6 +70,7 @@ import dagger.android.support.AndroidSupportInjection
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import logcat.LogPriority.WARN
 import logcat.asLog
 import logcat.logcat
@@ -104,6 +106,9 @@ class NewTabPageView @JvmOverloads constructor(
     @Inject
     lateinit var appBuildConfig: AppBuildConfig
 
+    @Inject
+    lateinit var androidBrowserConfig: AndroidBrowserConfigFeature
+
     private val binding: ViewNewTabBinding by viewBinding()
 
     private val homeBackgroundLogo by lazy { HomeBackgroundLogo(binding.ddgLogo) }
@@ -132,6 +137,8 @@ class NewTabPageView @JvmOverloads constructor(
         conflatedCommandJob += viewModel.commands()
             .onEach { processCommands(it) }
             .launchIn(findViewTreeLifecycleOwner()?.lifecycleScope!!)
+
+        disableViewStateSaving()
     }
 
     override fun onDetachedFromWindow() {
@@ -140,6 +147,17 @@ class NewTabPageView @JvmOverloads constructor(
         findViewTreeLifecycleOwner()?.lifecycle?.removeObserver(viewModel)
         conflatedStateJob.cancel()
         conflatedCommandJob.cancel()
+    }
+
+    private fun disableViewStateSaving() {
+        findViewTreeLifecycleOwner()?.lifecycleScope?.launch {
+            val disableViewStateSaving = withContext(dispatchers.io()) {
+                androidBrowserConfig.reduceBrowserTabBundleSize().isEnabled()
+            }
+            if (disableViewStateSaving) {
+                binding.messageCta.disableStateSaving()
+            }
+        }
     }
 
     private fun render(viewState: ViewState) {

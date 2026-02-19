@@ -138,6 +138,13 @@ interface DuckChatFeature {
     fun sendInputScreenOnboardingWideEvent(): Toggle
 
     /**
+     * @return `true` when the contextual mode killswitch is enabled
+     * This overrules contextualMode and standaloneMigration
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun contextualModeKillSwitch(): Toggle
+
+    /**
      * @return `true` when the contextual mode is enabled
      */
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)

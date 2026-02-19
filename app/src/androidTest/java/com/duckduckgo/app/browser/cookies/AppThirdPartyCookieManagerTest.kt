@@ -161,11 +161,16 @@ class AppThirdPartyCookieManagerTest {
 
     @Test
     fun whenClearAllDataIfDomainIsInExclusionListThenDomainNotDeletedFromDatabase() = runTest {
-        givenDomainIsInTheThirdPartyCookieList(EXCLUDED_DOMAIN_URI.host!!)
+        val excludedDomains = AppThirdPartyCookieManager.hostsThatAlwaysRequireThirdPartyCookies
+        excludedDomains.forEach { domain ->
+            givenDomainIsInTheThirdPartyCookieList(domain)
+        }
 
         testee.clearAllData()
 
-        assertNotNull(authCookiesAllowedDomainsRepository.getDomain(EXCLUDED_DOMAIN_URI.host!!))
+        excludedDomains.forEach { domain ->
+            assertNotNull(authCookiesAllowedDomainsRepository.getDomain(domain))
+        }
     }
 
     private suspend fun givenDomainIsInTheThirdPartyCookieList(domain: String) = runTest {

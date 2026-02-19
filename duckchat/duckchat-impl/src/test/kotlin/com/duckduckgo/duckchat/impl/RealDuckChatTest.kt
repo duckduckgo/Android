@@ -19,6 +19,7 @@ package com.duckduckgo.duckchat.impl
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.webkit.CookieManager
 import androidx.core.net.toUri
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.Lifecycle.State.CREATED
@@ -27,6 +28,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.utils.AppUrl
+import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
 import com.duckduckgo.duckchat.impl.feature.AIChatImageUploadFeature
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
@@ -95,6 +98,7 @@ class RealDuckChatTest {
     private val mockNewAddressBarOptionBottomSheetDialog: NewAddressBarOptionBottomSheetDialog = mock()
     private val mockDuckAiContextualOnboardingBottomSheetDialogFactory: DuckAiContextualOnboardingBottomSheetDialogFactory = mock()
     private val mockDeviceSyncState: DeviceSyncState = mock()
+    private val cookiesManager: CookieManagerProvider = mock()
 
     private lateinit var testee: RealDuckChat
 
@@ -131,6 +135,7 @@ class RealDuckChatTest {
                 mockNewAddressBarOptionBottomSheetDialogFactory,
                 mockDuckAiContextualOnboardingBottomSheetDialogFactory,
                 mockDeviceSyncState,
+                cookiesManager,
             ),
         )
         coroutineRule.testScope.advanceUntilIdle()
@@ -1234,6 +1239,7 @@ class RealDuckChatTest {
     @Test
     fun `when contextual mode enabled, isDuckChatContextualModeEnabled returns true`() = runTest {
         duckChatFeature.contextualMode().setRawStoredState(State(enable = true))
+        duckChatFeature.contextualModeKillSwitch().setRawStoredState(State(enable = true))
         testee.onPrivacyConfigDownloaded()
 
         assertTrue(testee.isDuckChatContextualModeEnabled())
@@ -1242,9 +1248,48 @@ class RealDuckChatTest {
     @Test
     fun `when contextual mode disabled, isDuckChatContextualModeEnabled returns false`() = runTest {
         duckChatFeature.contextualMode().setRawStoredState(State(enable = false))
+        duckChatFeature.contextualModeKillSwitch().setRawStoredState(State(enable = true))
         testee.onPrivacyConfigDownloaded()
 
         assertFalse(testee.isDuckChatContextualModeEnabled())
+    }
+
+    @Test
+    fun `when migration cookie present and kill switch enabled then isDuckChatContextualModeEnabled returns true`() = runTest {
+        val cookieManager = mock<CookieManager>()
+        whenever(cookiesManager.get()).thenReturn(cookieManager)
+        whenever(cookieManager.getCookie(AppUrl.Url.COOKIES)).thenReturn("migration_status_dev_01=migrated_dev_01")
+        duckChatFeature.contextualMode().setRawStoredState(State(enable = false))
+        duckChatFeature.contextualModeKillSwitch().setRawStoredState(State(enable = true))
+
+        testee.onPrivacyConfigDownloaded()
+
+        assertTrue(testee.isDuckChatContextualModeEnabled())
+    }
+
+    @Test
+    fun `when migration cookie present then isStandaloneMigrationCompleted returns true`() = runTest {
+        val cookieManager = mock<CookieManager>()
+        whenever(cookiesManager.get()).thenReturn(cookieManager)
+        whenever(cookieManager.getCookie(AppUrl.Url.COOKIES)).thenReturn("a=b;migration_status_dev_01=migrated_dev_01;c=d")
+
+        assertTrue(testee.isStandaloneMigrationCompleted())
+    }
+
+    @Test
+    fun `when migration cookie missing then isStandaloneMigrationCompleted returns false`() = runTest {
+        val cookieManager = mock<CookieManager>()
+        whenever(cookiesManager.get()).thenReturn(cookieManager)
+        whenever(cookieManager.getCookie(AppUrl.Url.COOKIES)).thenReturn("a=b; c=d")
+
+        assertFalse(testee.isStandaloneMigrationCompleted())
+    }
+
+    @Test
+    fun `when cookie manager is null then isStandaloneMigrationCompleted returns false`() = runTest {
+        whenever(cookiesManager.get()).thenReturn(null)
+
+        assertFalse(testee.isStandaloneMigrationCompleted())
     }
 
     companion object {

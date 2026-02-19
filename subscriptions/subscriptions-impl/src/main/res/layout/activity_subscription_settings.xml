@@ -105,12 +105,53 @@
                     app:textType="secondary"
                     app:typography="body2" />
 
+                <com.duckduckgo.common.ui.view.divider.VerticalDivider
+                    android:id="@+id/verticalTierDivider"
+                    android:layout_width="wrap_content"
+                    android:layout_height="6dp"
+                    android:layout_marginStart="@dimen/keyline_3"
+                    android:layout_marginEnd="@dimen/keyline_2"
+                    android:layout_gravity="center_vertical"
+                    android:background="?attr/daxColorLines"/>
+
+                <com.duckduckgo.common.ui.view.text.DaxTextView
+                    android:id="@+id/tierName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    tools:text="PRO"
+                    tools:visibility="visible"
+                    android:visibility="gone"
+                    app:textType="primary"
+                    app:typography="body2" />
+
             </LinearLayout>
 
             <com.duckduckgo.common.ui.view.divider.HorizontalDivider
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/keyline_4" />
+
+            <LinearLayout
+                android:id="@+id/upgradeToProContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:leadingIcon="@drawable/ic_ai_chat_advanced"
+                    app:primaryText="@string/subscriptionsProUpgradeTitle"
+                    app:primaryTextColorOverlay="?attr/daxColorAccentBlue"
+                    app:secondaryTextColorOverlay="?attr/daxColorPrimaryText"
+                    app:secondaryText="@string/subscriptionsProUpgradeMessage" />
+
+                <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+            </LinearLayout>
 
             <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
                 android:id="@+id/activateOnOtherDevices"
@@ -144,7 +185,7 @@
             <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:primaryText="@string/subscriptionSettingSectionSubscription" />
+                app:primaryText="@string/subscriptionSettingSectionManageSubscription" />
 
             <com.duckduckgo.common.ui.view.listitem.OneLineListItem
                 android:id="@+id/switchPlan"
@@ -154,12 +195,20 @@
                 tools:primaryText="Switch to Yearly Plan"
                 tools:visibility="visible" />
 
+            <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+                android:id="@+id/viewAllPlansTop"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:primaryText="@string/subscriptionSettingViewAllPlans"
+                tools:visibility="visible" />
+
             <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
                 android:id="@+id/changePlan"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:visibility="gone"
-                app:primaryText="@string/subscriptionSettingManagePlan"
+                app:primaryText="@string/subscriptionSettingManagePaymentOrCancel"
                 tools:secondaryText="Your monthly subscription renews on April 20, 2027."
                 tools:visibility="visible" />
 

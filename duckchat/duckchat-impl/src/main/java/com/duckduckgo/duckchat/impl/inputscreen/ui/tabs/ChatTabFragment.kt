@@ -39,12 +39,10 @@ import com.duckduckgo.duckchat.impl.inputscreen.ui.InputScreenConfigResolver
 import com.duckduckgo.duckchat.impl.inputscreen.ui.InputScreenFragment
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.ChatSuggestionsAdapter
 import com.duckduckgo.duckchat.impl.inputscreen.ui.view.BottomBlurView
-import com.duckduckgo.duckchat.impl.inputscreen.ui.view.RecyclerBottomSpacingDecoration
 import com.duckduckgo.duckchat.impl.inputscreen.ui.view.SwipeableRecyclerView
 import com.duckduckgo.duckchat.impl.inputscreen.ui.viewmodel.InputScreenViewModel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import logcat.logcat
 import javax.inject.Inject
 import kotlin.math.roundToInt
 
@@ -82,8 +80,7 @@ class ChatTabFragment : DuckDuckGoFragment(R.layout.fragment_chat_tab) {
         val parentFragment = requireParentFragment() as InputScreenFragment
 
         chatSuggestionsAdapter = ChatSuggestionsAdapter { suggestion ->
-            // TODO: Handle navigation to chat in duck.ai fullscreen mode
-            logcat { "Chat suggestion clicked: chatId=${suggestion.chatId}, title=${suggestion.title}" }
+            viewModel.onChatSuggestionSelected(suggestion.chatId)
         }
 
         chatSuggestionsRecyclerView = parentFragment.getChatSuggestionsRecyclerView().apply {
@@ -95,9 +92,8 @@ class ChatTabFragment : DuckDuckGoFragment(R.layout.fragment_chat_tab) {
             setBackgroundColor(typedValue.data)
 
             if (inputScreenConfigResolver.useTopBar()) {
-                val spacing = resources.getDimensionPixelSize(R.dimen.inputScreenAutocompleteListBottomSpace)
-                addItemDecoration(RecyclerBottomSpacingDecoration(spacing))
-                updatePadding(top = 8f.toPx(context).roundToInt())
+                val bottomSpacing = resources.getDimensionPixelSize(R.dimen.inputScreenAutocompleteListBottomSpace)
+                updatePadding(top = 8f.toPx(context).roundToInt(), bottom = bottomSpacing)
             }
         }
     }
@@ -159,9 +155,6 @@ class ChatTabFragment : DuckDuckGoFragment(R.layout.fragment_chat_tab) {
     }
 
     override fun onDestroyView() {
-        while ((chatSuggestionsRecyclerView?.itemDecorationCount ?: 0) > 0) {
-            chatSuggestionsRecyclerView?.removeItemDecorationAt(0)
-        }
         chatSuggestionsRecyclerView?.clearOnScrollListeners()
         bottomBlurLayoutListener?.let { listener ->
             chatSuggestionsRecyclerView?.removeOnLayoutChangeListener(listener)

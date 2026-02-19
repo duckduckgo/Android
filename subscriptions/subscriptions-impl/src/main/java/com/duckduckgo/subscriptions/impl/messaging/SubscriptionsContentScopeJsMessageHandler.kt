@@ -48,6 +48,7 @@ class SubscriptionsContentScopeJsMessageHandler @Inject constructor() : ContentS
             "backToSettings",
             "openSubscriptionActivation",
             "openSubscriptionPurchase",
+            "openSubscriptionUpgrade",
         )
     }
 }

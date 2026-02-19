@@ -41,8 +41,8 @@
             },
             {
                 "key": "feature.data.ext.total_duration_ms_bucketed",
-                "description": "Duration of the data clearing operation, bucketed. Does not include process restart duration. Uses upper end of the bucket.",
-                "enum": ["1000", "5000", "10000", "30000", "60000", "300000", "600000"]
+                "description": "Duration of the data clearing operation, bucketed using the lower bucket boundary. Does not include process restart duration.",
+                "enum": ["0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
             },
             {
                 "key": "feature.data.ext.failure_reason",
@@ -55,7 +55,7 @@
                 "enum": ["true", "false"]
             },
             {
-                "key": "feature.data.ext.step.web_storage_clear_error",
+                "key": "feature.data.ext.web_storage_clear_error",
                 "description": "Error message (exception class) - only present if success=false for this step",
                 "type": "string"
             },
@@ -65,7 +65,7 @@
                 "enum": ["true", "false"]
             },
             {
-                "key": "feature.data.ext.step.web_storage_clear_granular_error",
+                "key": "feature.data.ext.web_storage_clear_granular_error",
                 "description": "Error message (exception class) - only present if success=false for this step",
                 "type": "string"
             },
@@ -75,7 +75,7 @@
                 "enum": ["true", "false"]
             },
             {
-                "key": "feature.data.ext.step.webview_app_webview_clear_error",
+                "key": "feature.data.ext.webview_app_webview_clear_error",
                 "description": "Error message (exception class) - only present if success=false for this step",
                 "type": "string"
             },
@@ -85,7 +85,7 @@
                 "enum": ["true", "false"]
             },
             {
-                "key": "feature.data.ext.step.webview_default_clear_error",
+                "key": "feature.data.ext.webview_default_clear_error",
                 "description": "Error message (exception class) - only present if success=false for this step",
                 "type": "string"
             },
@@ -95,7 +95,7 @@
                 "enum": ["true", "false"]
             },
             {
-                "key": "feature.data.ext.step.indexeddb_clear_selective_error",
+                "key": "feature.data.ext.indexeddb_clear_selective_error",
                 "description": "Error message (exception class) - only present if success=false for this step",
                 "type": "string"
             },
@@ -105,7 +105,7 @@
                 "enum": ["true", "false"]
             },
             {
-                "key": "feature.data.ext.step.indexeddb_clear_duckai_only_error",
+                "key": "feature.data.ext.indexeddb_clear_duckai_only_error",
                 "description": "Error message (exception class) - only present if success=false for this step",
                 "type": "string"
             },
@@ -115,7 +115,7 @@
                 "enum": ["true", "false"]
             },
             {
-                "key": "feature.data.ext.step.app_cache_clear_error",
+                "key": "feature.data.ext.app_cache_clear_error",
                 "description": "Error message (exception class) - only present if success=false for this step",
                 "type": "string"
             }

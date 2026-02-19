@@ -23,7 +23,6 @@ import android.graphics.Bitmap
 import android.net.Uri
 import android.net.http.SslCertificate
 import android.net.http.SslError
-import android.os.Build
 import android.print.PrintAttributes
 import android.view.MenuItem
 import android.view.View
@@ -41,8 +40,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.room.Room
-import androidx.test.filters.SdkSuppress
-import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.webkit.JavaScriptReplyProxy
 import app.cash.turbine.test
 import com.duckduckgo.adclick.api.AdClickManager
@@ -189,7 +187,6 @@ import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_VISIT_SITE_CUSTOM
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
-import com.duckduckgo.app.privacy.model.TestEntity
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -205,6 +202,7 @@ import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.store.TabStatsBucketing
 import com.duckduckgo.app.trackerdetection.EntityLookup
+import com.duckduckgo.app.trackerdetection.TestEntity
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus
 import com.duckduckgo.app.trackerdetection.model.TrackerType
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
@@ -332,6 +330,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mockito.never
 import org.mockito.Mockito.times
@@ -348,6 +347,8 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
+import org.robolectric.RuntimeEnvironment
+import org.robolectric.annotation.Config
 import java.io.File
 import java.math.BigInteger
 import java.security.cert.X509Certificate
@@ -358,6 +359,8 @@ import java.util.concurrent.TimeUnit
 
 @SuppressLint("DenyListedApi")
 @FlowPreview
+@RunWith(AndroidJUnit4::class)
+@Config(sdk = [34])
 class BrowserTabViewModelTest {
     @get:Rule
     var instantTaskExecutorRule = InstantTaskExecutorRule()
@@ -509,7 +512,7 @@ class BrowserTabViewModelTest {
 
     private lateinit var accessibilitySettingsDataStore: AccessibilitySettingsDataStore
 
-    private val context = getInstrumentation().targetContext
+    private val context: Context = RuntimeEnvironment.getApplication()
 
     private val selectedTabLiveData = MutableLiveData<TabEntity>()
 
@@ -638,6 +641,16 @@ class BrowserTabViewModelTest {
     fun before() =
         runTest {
             MockitoAnnotations.openMocks(this)
+
+            // Register MIME types needed by file chooser tests (Robolectric's MimeTypeMap is empty by default)
+            val mimeTypeMap = android.webkit.MimeTypeMap.getSingleton()
+            org.robolectric.Shadows.shadowOf(mimeTypeMap).addExtensionMimeTypeMapping("doc", "application/msword")
+            org.robolectric.Shadows.shadowOf(
+                mimeTypeMap,
+            ).addExtensionMimeTypeMapping("docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document")
+            org.robolectric.Shadows.shadowOf(mimeTypeMap).addExtensionMimeTypeMapping("pdf", "application/pdf")
+            org.robolectric.Shadows.shadowOf(mimeTypeMap).addExtensionMimeTypeMapping("jpeg", "image/jpeg")
+            org.robolectric.Shadows.shadowOf(mimeTypeMap).addExtensionMimeTypeMapping("jpg", "image/jpeg")
 
             swipingTabsFeature.self().setRawStoredState(State(enable = true))
             swipingTabsFeature.enabledForUsers().setRawStoredState(State(enable = true))
@@ -1427,6 +1440,20 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenGlobalLayoutInvalidatedDuringQueryConversionThenOpenInNewTabAndStateRemainsInvalidated() {
+        givenOneActiveTabSelected()
+        whenever(mockOmnibarConverter.convertQueryToUrl(any(), anyOrNull(), any(), any())).thenAnswer {
+            testee.recoverFromRenderProcessGone()
+            "foo.com"
+        }
+
+        testee.onUserSubmittedQuery("foo")
+
+        assertCommandIssued<Command.OpenInNewTab>()
+        assertTrue(testee.globalLayoutState.value is GlobalLayoutViewState.Invalidated)
+    }
+
+    @Test
     fun whenBrowsingAndUrlLoadedThenSiteVisitedEntryAddedToLeaderboardDao() =
         runTest {
             loadUrl("http://example.com/abc", isBrowserShowing = true)
@@ -2003,8 +2030,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenNavigationToEmptyUrlFromParentAndAboutBlankEnabledThenRemoveTabAndReturnTrue() = runTest {
-        fakeAndroidConfigBrowserFeature.handleAboutBlank().setRawStoredState(State(enable = true))
+    fun whenNavigationToEmptyUrlFromParentThenRemoveTabAndReturnTrue() = runTest {
         resetChannels()
         initialiseViewModel()
         loadUrl(null)
@@ -2020,23 +2046,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenNavigationToEmptyUrlFromParentButAboutBlankDisabledThenDoNotRemoveTab() = runTest {
-        fakeAndroidConfigBrowserFeature.handleAboutBlank().setRawStoredState(State(enable = false))
-        resetChannels()
-        initialiseViewModel()
-        loadUrl(null)
-        setupNavigation(isBrowsing = true, canGoBack = true)
-        testee.onMessageReceived()
-        selectedTabLiveData.value = aTabEntity(id = "id").copy(sourceTabId = "source")
-
-        testee.onUserPressedBack(isCustomTab = false)
-
-        verify(mockTabRepository, never()).deleteTabAndSelectSource(any())
-    }
-
-    @Test
-    fun whenNotLinkOpenedInNewTabAndAboutBlankEnabledThenDoNotRemoveTab() = runTest {
-        fakeAndroidConfigBrowserFeature.handleAboutBlank().setRawStoredState(State(enable = true))
+    fun whenNotLinkOpenedInNewTabThenDoNotRemoveTab() = runTest {
         resetChannels()
         initialiseViewModel()
         loadUrl(null, isBrowserShowing = true)
@@ -2051,7 +2061,6 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenIsCustomTabAndNavigationToEmptyUrlFromParentThenDoNotRemoveTab() = runTest {
-        fakeAndroidConfigBrowserFeature.handleAboutBlank().setRawStoredState(State(enable = true))
         resetChannels()
         initialiseViewModel()
 
@@ -2783,11 +2792,10 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenNewTabMenuItemClickedAndHandleAboutBlankEnabledAndEmptyTabWithBlankUrlAndBlankSourceTabIdExistsThenSelectEmptyTab() =
+    fun whenNewTabMenuItemClickedAndEmptyTabWithBlankUrlAndBlankSourceTabIdExistsThenSelectEmptyTab() =
         runTest {
             swipingTabsFeature.self().setRawStoredState(State(enable = true))
             swipingTabsFeature.enabledForUsers().setRawStoredState(State(enable = true))
-            fakeAndroidConfigBrowserFeature.handleAboutBlank().setRawStoredState(State(enable = true))
 
             val emptyTabId = "EMPTY_TAB"
             whenever(mockTabRepository.getTabs()).thenReturn(
@@ -2806,11 +2814,10 @@ class BrowserTabViewModelTest {
         }
 
     @Test
-    fun whenNewTabMenuItemClickedAndHandleAboutBlankEnabledAndEmptyTabWithBlankUrlButSourceTabIdExistsThenAddNewTab() =
+    fun whenNewTabMenuItemClickedAndEmptyTabWithBlankUrlButSourceTabIdExistsThenAddNewTab() =
         runTest {
             swipingTabsFeature.self().setRawStoredState(State(enable = true))
             swipingTabsFeature.enabledForUsers().setRawStoredState(State(enable = true))
-            fakeAndroidConfigBrowserFeature.handleAboutBlank().setRawStoredState(State(enable = true))
 
             whenever(mockTabRepository.getTabs()).thenReturn(
                 listOf(
@@ -2831,11 +2838,10 @@ class BrowserTabViewModelTest {
         }
 
     @Test
-    fun whenNewTabMenuItemClickedAndHandleAboutBlankEnabledAndNoEmptyTabWithBlankUrlExistsThenAddNewTab() =
+    fun whenNewTabMenuItemClickedAndNoEmptyTabWithBlankUrlExistsThenAddNewTab() =
         runTest {
             swipingTabsFeature.self().setRawStoredState(State(enable = true))
             swipingTabsFeature.enabledForUsers().setRawStoredState(State(enable = true))
-            fakeAndroidConfigBrowserFeature.handleAboutBlank().setRawStoredState(State(enable = true))
 
             whenever(mockTabRepository.getTabs()).thenReturn(
                 listOf(
@@ -2864,7 +2870,6 @@ class BrowserTabViewModelTest {
         runTest {
             swipingTabsFeature.self().setRawStoredState(State(enable = true))
             swipingTabsFeature.enabledForUsers().setRawStoredState(State(enable = true))
-            fakeAndroidConfigBrowserFeature.handleAboutBlank().setRawStoredState(State(enable = true))
             whenever(mockTabRepository.getTabs()).thenReturn(
                 listOf(
                     TabEntity("1", "https://example.com", position = 0),
@@ -2882,11 +2887,10 @@ class BrowserTabViewModelTest {
         }
 
     @Test
-    fun whenNavigationBarNewTabButtonClickedAndSwipingTabsEnabledAndEmptyTabExistsWithHandleAboutBlankEnabledThenSelectEmptyTab() =
+    fun whenNavigationBarNewTabButtonClickedAndSwipingTabsEnabledAndEmptyTabExistsWithThenSelectEmptyTab() =
         runTest {
             swipingTabsFeature.self().setRawStoredState(State(enable = true))
             swipingTabsFeature.enabledForUsers().setRawStoredState(State(enable = true))
-            fakeAndroidConfigBrowserFeature.handleAboutBlank().setRawStoredState(State(enable = true))
             val emptyTabId = "EMPTY_TAB"
             whenever(mockTabRepository.getTabs()).thenReturn(
                 listOf(
@@ -2904,33 +2908,10 @@ class BrowserTabViewModelTest {
         }
 
     @Test
-    fun whenNavigationBarNewTabButtonClickedAndSwipingTabsEnabledAndEmptyTabExistsWithHandleAboutBlankDisabledThenSelectEmptyTab() =
+    fun whenNavigationBarNewTabButtonClickedAndSwipingTabsEnabledAndEmptyTabWithSourceTabIdExistsThenLaunchNewTab() =
         runTest {
             swipingTabsFeature.self().setRawStoredState(State(enable = true))
             swipingTabsFeature.enabledForUsers().setRawStoredState(State(enable = true))
-            fakeAndroidConfigBrowserFeature.handleAboutBlank().setRawStoredState(State(enable = false))
-            val emptyTabId = "EMPTY_TAB"
-            whenever(mockTabRepository.getTabs()).thenReturn(
-                listOf(
-                    TabEntity("1", "https://example.com", position = 0),
-                    TabEntity(emptyTabId, url = "", sourceTabId = "SOURCE_TAB", position = 1),
-                ),
-            )
-
-            testee.onNavigationBarNewTabButtonClicked()
-
-            verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-            val launchNewTabCommand = commandCaptor.allValues.find { it is Command.LaunchNewTab }
-            assertNull(launchNewTabCommand)
-            verify(mockTabRepository).select(emptyTabId)
-        }
-
-    @Test
-    fun whenNavigationBarNewTabButtonClickedAndSwipingTabsEnabledAndEmptyTabWithSourceTabIdExistsWithHandleAboutBlankEnabledThenLaunchNewTab() =
-        runTest {
-            swipingTabsFeature.self().setRawStoredState(State(enable = true))
-            swipingTabsFeature.enabledForUsers().setRawStoredState(State(enable = true))
-            fakeAndroidConfigBrowserFeature.handleAboutBlank().setRawStoredState(State(enable = true))
             whenever(mockTabRepository.getTabs()).thenReturn(
                 listOf(
                     TabEntity("1", url = "", sourceTabId = "SOURCE_TAB", position = 0),
@@ -4758,8 +4739,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenHandleNewTabIfEmptyUrlAndHandleAboutBlankEnabledAndNoNavigationStateThenSetOmnibarText() = runTest {
-        fakeAndroidConfigBrowserFeature.handleAboutBlank().setRawStoredState(State(enable = true))
+    fun whenHandleNewTabIfEmptyUrlAndNoNavigationStateThenSetOmnibarText() = runTest {
         resetChannels()
         initialiseViewModel()
         testee.handleNewTabIfEmptyUrl()
@@ -4767,8 +4747,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenHandleNewTabIfEmptyUrlAndHandleAboutBlankEnabledAndNavigationStateChangedThenDoNotSetOmnibarText() = runTest {
-        fakeAndroidConfigBrowserFeature.handleAboutBlank().setRawStoredState(State(enable = true))
+    fun whenHandleNewTabIfEmptyUrlAndNavigationStateChangedThenDoNotSetOmnibarText() = runTest {
         resetChannels()
         initialiseViewModel()
         loadUrl(null)
@@ -4777,8 +4756,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenHandleNewTabIfEmptyUrlAndHandleAboutBlankEnabledAndNoNavigationStateAndCustomTabEmitCommandForUpdateTitle() = runTest {
-        fakeAndroidConfigBrowserFeature.handleAboutBlank().setRawStoredState(State(enable = true))
+    fun whenHandleNewTabIfEmptyUrlAndNoNavigationStateAndCustomTabEmitCommandForUpdateTitle() = runTest {
         resetChannels()
         initialiseViewModel()
         testee.setIsCustomTab(true)
@@ -4789,8 +4767,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenHandleNewTabIfEmptyUrlAndHandleAboutBlankEnabledAndNoNavigationStateAndNewCustomTabEmitCommandForUpdateTitle() = runTest {
-        fakeAndroidConfigBrowserFeature.handleAboutBlank().setRawStoredState(State(enable = true))
+    fun whenHandleNewTabIfEmptyUrlAndNoNavigationStateAndNewCustomTabEmitCommandForUpdateTitle() = runTest {
         fakeAndroidConfigBrowserFeature.newCustomTab().setRawStoredState(State(enable = true))
         resetChannels()
         initialiseViewModel()
@@ -4802,23 +4779,14 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenHandleNewTabIfEmptyUrlAndHandleAboutBlankEnabledAndNonNoNavigationStateThenThenDoNotSetOmnibarText() {
-        fakeAndroidConfigBrowserFeature.handleAboutBlank().setRawStoredState(State(enable = true))
+    fun whenHandleNewTabIfEmptyUrlAndNonNoNavigationStateThenThenDoNotSetOmnibarText() {
         loadUrl("url")
         testee.handleNewTabIfEmptyUrl()
         assertEquals(omnibarViewState().omnibarText, "url")
     }
 
     @Test
-    fun whenHandleNewTabIfEmptyUrlAndHandleAboutBlankDisabledAndNoNavigationStateThenDoNotSetOmnibarText() {
-        fakeAndroidConfigBrowserFeature.handleAboutBlank().setRawStoredState(State(enable = false))
-        testee.handleNewTabIfEmptyUrl()
-        assertEquals(omnibarViewState().omnibarText, "")
-    }
-
-    @Test
     fun whenHandleNewTabIfEmptyUrlWithEmptyUrlThenOmnibarAndUrlSetToAboutBlank() {
-        fakeAndroidConfigBrowserFeature.handleAboutBlank().setRawStoredState(State(enable = true))
         resetChannels()
         initialiseViewModel()
         // Simulate a new tab with empty URL
@@ -4831,7 +4799,6 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenHandleNewTabIfEmptyUrlWithNonEmptyUrlThenNoChangeToUrl() {
-        fakeAndroidConfigBrowserFeature.handleAboutBlank().setRawStoredState(State(enable = true))
         resetChannels()
         initialiseViewModel()
         val url = "https://duckduckgo.com"
@@ -5852,7 +5819,6 @@ class BrowserTabViewModelTest {
         }
 
     @Test
-    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.Q)
     fun whenAllowBypassSSLCertificatesFeatureDisabledThenSSLCertificateErrorsAreIgnored() {
         whenever(mockEnabledToggle.isEnabled()).thenReturn(false)
 
@@ -5867,7 +5833,6 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.Q)
     fun whenSslCertificateIssueReceivedForLoadingSiteThenShowSslWarningCommandSentAndViewStatesUpdated() {
         whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
 
@@ -5886,7 +5851,6 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.Q)
     fun whenSslCertificateIssueReceivedForAnotherSiteThenShowSslWarningCommandNotSentAndViewStatesNotUpdated() {
         whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
         val url = exampleUrl
@@ -5902,7 +5866,6 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.Q)
     fun whenInFreshStartAndSslCertificateIssueReceivedThenShowSslWarningCommandSentAndViewStatesUpdated() =
         runTest {
             whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
@@ -6006,7 +5969,6 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.Q)
     fun whenSslCertificateActionProceedThenPixelsFiredAndViewStatesUpdated() {
         whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
         val url = exampleUrl
@@ -6025,7 +5987,6 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.Q)
     fun whenWebViewRefreshedThenSSLErrorStateIsNone() {
         whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
         val url = exampleUrl
@@ -6040,7 +6001,6 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.Q)
     fun whenResetSSLErrorThenBrowserErrorStateIsLoading() {
         whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
         val url = exampleUrl

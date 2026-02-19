@@ -1067,6 +1067,7 @@ class BrowserTabFragment :
         configureNavigationBar()
         configureOmnibar()
         configureBrowserTabKeyboardListener()
+        disableViewStateSaving()
 
         if (savedInstanceState == null) {
             viewModel.setIsCustomTab(tabDisplayedInCustomTabScreen)
@@ -1101,6 +1102,69 @@ class BrowserTabFragment :
         }
 
         launchDownloadMessagesJob()
+    }
+
+    private fun disableViewStateSaving() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            val reduceBundleSize = withContext(dispatchers.io()) {
+                androidBrowserConfigFeature.reduceBrowserTabBundleSize().isEnabled()
+            }
+            if (reduceBundleSize) {
+                // Disable view state saving to prevent BrowserActivity's bundle size from increasing too much
+                binding.swipeRefreshContainer.isSaveEnabled = false
+
+                navigationBar.disableViewStateSaving()
+
+                newBrowserTab.newTabContainerScrollView.isSaveEnabled = false
+
+                daxDialogIntroBubble.daxDialogOption1.isSaveEnabled = false
+                daxDialogIntroBubble.daxDialogOption2.isSaveEnabled = false
+                daxDialogIntroBubble.daxDialogOption3.isSaveEnabled = false
+                daxDialogIntroBubble.daxDialogOption4.isSaveEnabled = false
+                daxDialogIntroBubble.primaryCta.isSaveEnabled = false
+                daxDialogIntroBubble.secondaryCta.isSaveEnabled = false
+                daxDialogIntroBubble.placeholder.isSaveEnabled = false
+                daxDialogIntroBubble.dialogTextCta.isSaveEnabled = false
+                daxDialogIntroBubble.hiddenTextCta.isSaveEnabled = false
+                daxDialogIntroBubble.daxBubbleDialogTitle.isSaveEnabled = false
+                daxDialogIntroBubble.daxDialogDismissButton.isSaveEnabled = false
+                daxDialogIntroBubble.logo.isSaveEnabled = false
+
+                daxDialogInContext.daxDialogOption1.isSaveEnabled = false
+                daxDialogInContext.daxDialogOption2.isSaveEnabled = false
+                daxDialogInContext.daxDialogOption3.isSaveEnabled = false
+                daxDialogInContext.daxDialogOption4.isSaveEnabled = false
+                daxDialogInContext.suggestionsDialogTextCta.isSaveEnabled = false
+                daxDialogInContext.suggestionsHiddenTextCta.isSaveEnabled = false
+                daxDialogInContext.daxBubbleDialogTitle.isSaveEnabled = false
+                daxDialogInContext.onboardingDaxDialogBackground.isSaveEnabled = false
+                daxDialogInContext.logo.isSaveEnabled = false
+                daxDialogInContext.daxDialogDismissButton.isSaveEnabled = false
+                daxDialogInContext.cardView.isSaveEnabled = false
+                daxDialogInContext.onboardingDialogTitle.isSaveEnabled = false
+                daxDialogInContext.hiddenTextCta.isSaveEnabled = false
+                daxDialogInContext.dialogTextCta.isSaveEnabled = false
+                daxDialogInContext.secondaryCta.isSaveEnabled = false
+                daxDialogInContext.primaryCta.isSaveEnabled = false
+
+                binding.autoCompleteSuggestionsList.isSaveEnabled = false
+                binding.daxDialogOnboardingCtaContent.isSaveEnabled = false
+
+                errorView.errorLayout.isSaveEnabled = false
+                errorView.yetiIcon.isSaveEnabled = false
+                errorView.errorTitle.isSaveEnabled = false
+                errorView.errorMessage.isSaveEnabled = false
+
+                omnibar.disableViewStateSaving()
+                sslErrorView.disableViewStateSaving()
+                maliciousWarningView.disableViewStateSaving()
+
+                binding.includeBrokenSitePromptDialog.titleText.isSaveEnabled = false
+                binding.includeBrokenSitePromptDialog.bodyText.isSaveEnabled = false
+                binding.includeBrokenSitePromptDialog.reportButton.isSaveEnabled = false
+                binding.includeBrokenSitePromptDialog.dismissButton.isSaveEnabled = false
+            }
+        }
     }
 
     private fun updateOrDeleteWebViewPreview() {
