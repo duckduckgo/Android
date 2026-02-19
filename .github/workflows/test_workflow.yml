@@ -20,12 +20,15 @@ jobs:
           token: ${{ secrets.GT_DAXMOBILE }}
           ref: ${{ github.ref }}
 
-      - id: test-username-action
-        uses: duckduckgo/native-github-asana-sync@v2.3
+      - name: Assign task to Github Actor
+        id: assign-release-task
+        uses: ./.github/actions/assign-release-task
         with:
-          action: 'get-asana-user-id'
-          github-username: ${{ github.actor }}
-          github-pat: ${{ secrets.DAXMOBILE_ANDROID_AUTOMATION }}
+          task_name: 'Android Release 5.263.1 [Halted at 10% rollout]'
+          asana_token: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          project_gid: ${{ vars.GH_ANDROID_RELEASE_BOARD_PROJECT_ID }}
+          username: ${{ github.actor }}
+          github_token: ${{ secrets.DAXMOBILE_ANDROID_AUTOMATION }}
 
       - name: Print result
-        run: echo "Asana ID ${{ steps.test-username-action.outputs.asanaUserId }}"
+        run: echo "Asana ID ${{ steps.assign-release-task.outputs.task_id }}"
