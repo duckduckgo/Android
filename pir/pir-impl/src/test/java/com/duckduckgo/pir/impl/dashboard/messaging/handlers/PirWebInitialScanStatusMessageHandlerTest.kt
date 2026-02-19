@@ -16,7 +16,6 @@
 
 package com.duckduckgo.pir.impl.dashboard.messaging.handlers
 
-import android.content.Context
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.json.JSONObjectAdapter
@@ -30,6 +29,7 @@ import com.duckduckgo.pir.impl.dashboard.state.PirDashboardInitialScanStateProvi
 import com.duckduckgo.pir.impl.dashboard.state.PirDashboardInitialScanStateProvider.DashboardBrokerWithStatus
 import com.duckduckgo.pir.impl.models.AddressCityState
 import com.duckduckgo.pir.impl.models.ExtractedProfile
+import com.duckduckgo.pir.impl.pixels.PirPixelSender
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
@@ -42,7 +42,6 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
@@ -65,7 +64,7 @@ class PirWebInitialScanStatusMessageHandlerTest {
     private val mockJsMessageCallback: JsMessageCallback = mock()
     private val testScope = TestScope()
     private val mockRepository: PirRepository = mock()
-    private val mockContext: Context = mock()
+    private val mockPirPixelSender: PirPixelSender = mock()
 
     @Before
     fun setUp() = runTest {
@@ -76,7 +75,7 @@ class PirWebInitialScanStatusMessageHandlerTest {
             appCoroutineScope = testScope,
             stateProvider = mockStateProvider,
             pirRepository = mockRepository,
-            context = mockContext,
+            pirPixelSender = mockPirPixelSender,
         )
         fakeJsMessaging.reset()
     }
@@ -338,7 +337,7 @@ class PirWebInitialScanStatusMessageHandlerTest {
     }
 
     @Test
-    fun whenProcessAndShouldNotRestartScanThenDoesNotStartService() = runTest {
+    fun whenProcessAndShouldNotRestartScanThenDoesNotEmitPixel() = runTest {
         // Given - state provider indicates scan should not be restarted
         val jsMessage = createJsMessage("", PirDashboardWebMessages.INITIAL_SCAN_STATUS)
         whenever(mockRepository.getValidUserProfileQueries()).thenReturn(listOf(mock()))
@@ -351,12 +350,12 @@ class PirWebInitialScanStatusMessageHandlerTest {
         // When
         testee.process(jsMessage, fakeJsMessaging, mockJsMessageCallback)
 
-        // Then - startForegroundService should NOT be called
-        verify(mockContext, never()).startForegroundService(any())
+        // Then - pixel should NOT be emitted
+        verify(mockPirPixelSender, never()).reportInitialScanIncomplete()
     }
 
     @Test
-    fun whenProcessAndShouldRestartScanThenStartsService() = runTest {
+    fun whenProcessAndShouldRestartScanThenEmitsPixel() = runTest {
         // Given - state provider indicates scan should be restarted
         val jsMessage = createJsMessage("", PirDashboardWebMessages.INITIAL_SCAN_STATUS)
         whenever(mockRepository.getValidUserProfileQueries()).thenReturn(listOf(mock()))
@@ -369,12 +368,12 @@ class PirWebInitialScanStatusMessageHandlerTest {
         // When
         testee.process(jsMessage, fakeJsMessaging, mockJsMessageCallback)
 
-        // Then - startForegroundService SHOULD be called
-        verify(mockContext).startForegroundService(any())
+        // Then - pixel SHOULD be emitted
+        verify(mockPirPixelSender).reportInitialScanIncomplete()
     }
 
     @Test
-    fun whenProcessCalledMultipleTimesThenOnlyChecksForResumeOnce() = runTest {
+    fun whenProcessCalledMultipleTimesThenOnlyEmitsPixelOnce() = runTest {
         // Given - state provider indicates scan should be restarted
         val jsMessage = createJsMessage("", PirDashboardWebMessages.INITIAL_SCAN_STATUS)
         whenever(mockRepository.getValidUserProfileQueries()).thenReturn(listOf(mock()))
@@ -387,17 +386,17 @@ class PirWebInitialScanStatusMessageHandlerTest {
         // When - process called first time
         testee.process(jsMessage, fakeJsMessaging, mockJsMessageCallback)
 
-        // Then - service should be started and shouldRestartInitialScan should be called once
-        verify(mockContext).startForegroundService(any())
+        // Then - pixel should be emitted and shouldRestartInitialScan should be called once
+        verify(mockPirPixelSender).reportInitialScanIncomplete()
         verify(mockStateProvider).shouldRestartInitialScan()
 
         // When - process called second time
         testee.process(jsMessage, fakeJsMessaging, mockJsMessageCallback)
 
         // Then - shouldRestartInitialScan should still only have been called once (not twice)
-        // and startForegroundService should also only have been called once
+        // and pixel should also only have been emitted once
         verify(mockStateProvider).shouldRestartInitialScan()
-        verify(mockContext).startForegroundService(any())
+        verify(mockPirPixelSender).reportInitialScanIncomplete()
     }
 
     private fun verifyInitialScanResponse(
