@@ -91,6 +91,7 @@ class TabSwitcherAdapter(
     private val trackerCountAnimator: TrackerCountAnimator,
 ) : Adapter<ViewHolder>() {
 
+    @Volatile
     private var isDragging: Boolean = false
     private var layoutType: LayoutType = GRID
     private var onAnimationTileCloseClickListener: (() -> Unit)? = null
