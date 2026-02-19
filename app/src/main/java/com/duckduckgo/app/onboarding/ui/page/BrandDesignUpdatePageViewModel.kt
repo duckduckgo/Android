@@ -32,15 +32,6 @@ import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INITIAL
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INITIAL_REINSTALL_USER
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INPUT_SCREEN
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.SKIP_ONBOARDING_OPTION
-import com.duckduckgo.app.onboarding.ui.page.BrandDesignUpdatePageViewModel.Command.Finish
-import com.duckduckgo.app.onboarding.ui.page.BrandDesignUpdatePageViewModel.Command.OnboardingSkipped
-import com.duckduckgo.app.onboarding.ui.page.BrandDesignUpdatePageViewModel.Command.SetAddressBarPositionOptions
-import com.duckduckgo.app.onboarding.ui.page.BrandDesignUpdatePageViewModel.Command.ShowAddressBarPositionDialog
-import com.duckduckgo.app.onboarding.ui.page.BrandDesignUpdatePageViewModel.Command.ShowComparisonChart
-import com.duckduckgo.app.onboarding.ui.page.BrandDesignUpdatePageViewModel.Command.ShowDefaultBrowserDialog
-import com.duckduckgo.app.onboarding.ui.page.BrandDesignUpdatePageViewModel.Command.ShowInitialDialog
-import com.duckduckgo.app.onboarding.ui.page.BrandDesignUpdatePageViewModel.Command.ShowInitialReinstallUserDialog
-import com.duckduckgo.app.onboarding.ui.page.BrandDesignUpdatePageViewModel.Command.ShowSkipOnboardingOption
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.NOTIFICATION_RUNTIME_PERMISSION_SHOWN
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_ADDRESS_BAR_POSITION_SHOWN_UNIQUE
@@ -70,7 +61,10 @@ import com.duckduckgo.duckchat.impl.inputscreen.wideevents.InputScreenOnboarding
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -91,13 +85,21 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
     private val inputScreenOnboardingWideEvent: InputScreenOnboardingWideEvent,
 ) : ViewModel() {
 
+    data class ViewState(
+        val currentDialog: PreOnboardingDialogType? = null,
+        val selectedAddressBarPosition: OmnibarType = OmnibarType.SINGLE_TOP,
+        val inputScreenSelected: Boolean = true,
+        val showSplitOption: Boolean = false,
+        val isReinstallUser: Boolean = false,
+    )
+
+    private val _viewState = MutableStateFlow(ViewState())
+    val viewState = _viewState.asStateFlow()
+
     private val _commands = Channel<Command>(1, DROP_OLDEST)
     val commands: Flow<Command> = _commands.receiveAsFlow()
 
-    private var addressBarPositionOption: OmnibarType = OmnibarType.SINGLE_TOP
-    private var inputScreenSelected: Boolean = true
     private var maxPageCount: Int = 2
-    private var reinstallUser: Boolean = false
 
     init {
         viewModelScope.launch(dispatchers.io()) {
@@ -110,45 +112,42 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
     }
 
     sealed interface Command {
-        data object ShowInitialReinstallUserDialog : Command
-
-        data object ShowInitialDialog : Command
-
-        data object ShowComparisonChart : Command
-
-        data object ShowSkipOnboardingOption : Command
-
-        data class ShowDefaultBrowserDialog(
-            val intent: Intent,
-        ) : Command
-
-        data class ShowAddressBarPositionDialog(
-            val showSplitOption: Boolean,
-        ) : Command
-
-        data object ShowInputScreenDialog : Command
-
+        data class ShowDefaultBrowserDialog(val intent: Intent) : Command
         data object Finish : Command
-
         data object OnboardingSkipped : Command
-
-        data class SetAddressBarPositionOptions(
-            val selectedOption: OmnibarType,
-        ) : Command
     }
 
-    fun onPrimaryCtaClicked(currentDialog: PreOnboardingDialogType) {
-        when (currentDialog) {
-            INITIAL_REINSTALL_USER -> {
-                viewModelScope.launch {
-                    _commands.send(ShowComparisonChart)
-                }
-            }
+    private fun setCurrentDialog(dialogType: PreOnboardingDialogType) {
+        _viewState.update { it.copy(currentDialog = dialogType) }
+        fireDialogShownPixel(dialogType)
+    }
 
-            INITIAL -> {
-                viewModelScope.launch {
-                    _commands.send(ShowComparisonChart)
-                }
+    private fun fireDialogShownPixel(dialogType: PreOnboardingDialogType) {
+        when (dialogType) {
+            INITIAL_REINSTALL_USER -> pixel.fire(PREONBOARDING_INTRO_REINSTALL_USER_SHOWN_UNIQUE, type = Unique())
+            INITIAL -> pixel.fire(PREONBOARDING_INTRO_SHOWN_UNIQUE, type = Unique())
+            COMPARISON_CHART -> pixel.fire(PREONBOARDING_COMPARISON_CHART_SHOWN_UNIQUE, type = Unique())
+            SKIP_ONBOARDING_OPTION -> pixel.fire(PREONBOARDING_SKIP_ONBOARDING_SHOWN_UNIQUE, type = Unique())
+            ADDRESS_BAR_POSITION -> pixel.fire(PREONBOARDING_ADDRESS_BAR_POSITION_SHOWN_UNIQUE, type = Unique())
+            INPUT_SCREEN -> pixel.fire(PREONBOARDING_CHOOSE_SEARCH_EXPERIENCE_IMPRESSIONS_UNIQUE, type = Unique())
+        }
+    }
+
+    fun loadDaxDialog() {
+        viewModelScope.launch {
+            val isReinstall = isAppReinstall()
+            if (isReinstall) {
+                _viewState.update { it.copy(isReinstallUser = true) }
+            }
+            setCurrentDialog(if (isReinstall) INITIAL_REINSTALL_USER else INITIAL)
+        }
+    }
+
+    fun onPrimaryCtaClicked() {
+        val currentDialog = _viewState.value.currentDialog ?: return
+        when (currentDialog) {
+            INITIAL_REINSTALL_USER, INITIAL -> {
+                setCurrentDialog(COMPARISON_CHART)
             }
 
             COMPARISON_CHART -> {
@@ -157,14 +156,15 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
                         if (defaultRoleBrowserDialog.shouldShowDialog()) {
                             val intent = defaultRoleBrowserDialog.createIntent(context)
                             if (intent != null) {
-                                _commands.send(ShowDefaultBrowserDialog(intent))
+                                _commands.send(Command.ShowDefaultBrowserDialog(intent))
                             } else {
                                 pixel.fire(AppPixelName.DEFAULT_BROWSER_DIALOG_NOT_SHOWN)
-                                _commands.send(ShowAddressBarPositionDialog(showSplitOption = isSplitOmnibarEnabled()))
+                                _viewState.update { it.copy(showSplitOption = isSplitOmnibarEnabled()) }
+                                setCurrentDialog(ADDRESS_BAR_POSITION)
                             }
                             false
                         } else {
-                            _commands.send(Finish)
+                            _commands.send(Command.Finish)
                             true
                         }
                     pixel.fire(
@@ -176,14 +176,15 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
 
             SKIP_ONBOARDING_OPTION -> {
                 viewModelScope.launch {
-                    _commands.send(OnboardingSkipped)
+                    _commands.send(Command.OnboardingSkipped)
                     pixel.fire(PREONBOARDING_CONFIRM_SKIP_ONBOARDING_PRESSED)
                 }
             }
 
             ADDRESS_BAR_POSITION -> {
                 viewModelScope.launch {
-                    when (addressBarPositionOption) {
+                    val selectedPosition = _viewState.value.selectedAddressBarPosition
+                    when (selectedPosition) {
                         OmnibarType.SINGLE_BOTTOM -> {
                             settingsDataStore.omnibarType = OmnibarType.SINGLE_BOTTOM
                             pixel.fire(PREONBOARDING_BOTTOM_ADDRESS_BAR_SELECTED_UNIQUE)
@@ -193,69 +194,54 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
                                 settingsDataStore.omnibarType = OmnibarType.SPLIT
                                 pixel.fire(PREONBOARDING_SPLIT_ADDRESS_BAR_SELECTED_UNIQUE)
                             } else {
-                                // Fallback to top if split is not enabled
                                 settingsDataStore.omnibarType = OmnibarType.SINGLE_TOP
                             }
                         }
                         OmnibarType.SINGLE_TOP -> {
                             settingsDataStore.omnibarType = OmnibarType.SINGLE_TOP
-                            // Top is the default, no pixel needed
                         }
                     }
                     if (androidBrowserConfigFeature.showInputScreenOnboarding().isEnabled()) {
-                        _commands.send(Command.ShowInputScreenDialog)
+                        setCurrentDialog(INPUT_SCREEN)
                     } else {
-                        _commands.send(Finish)
+                        _commands.send(Command.Finish)
                     }
                 }
             }
 
             INPUT_SCREEN -> {
                 viewModelScope.launch(dispatchers.io()) {
-                    if (inputScreenSelected) {
+                    val inputSelected = _viewState.value.inputScreenSelected
+                    val isReinstall = _viewState.value.isReinstallUser
+                    if (inputSelected) {
                         pixel.fire(PREONBOARDING_AICHAT_SELECTED)
-                        inputScreenOnboardingWideEvent.onInputScreenEnabledDuringOnboarding(reinstallUser = reinstallUser)
+                        inputScreenOnboardingWideEvent.onInputScreenEnabledDuringOnboarding(reinstallUser = isReinstall)
                     } else {
                         pixel.fire(PREONBOARDING_SEARCH_ONLY_SELECTED)
                     }
-                    duckChat.setCosmeticInputScreenUserSetting(inputScreenSelected)
-                    onboardingStore.storeInputScreenSelection(inputScreenSelected)
-                    _commands.send(Finish)
+                    duckChat.setCosmeticInputScreenUserSetting(inputSelected)
+                    onboardingStore.storeInputScreenSelection(inputSelected)
+                    _commands.send(Command.Finish)
                 }
             }
         }
     }
 
-    fun onSecondaryCtaClicked(currentDialog: PreOnboardingDialogType) {
+    fun onSecondaryCtaClicked() {
+        val currentDialog = _viewState.value.currentDialog ?: return
         when (currentDialog) {
             INITIAL_REINSTALL_USER -> {
-                viewModelScope.launch {
-                    reinstallUser = true
-                    _commands.send(ShowSkipOnboardingOption)
-                    pixel.fire(PREONBOARDING_SKIP_ONBOARDING_PRESSED)
-                }
-            }
-
-            INITIAL -> {
-                // no-op
-            }
-
-            COMPARISON_CHART -> {
-                // no-op
+                _viewState.update { it.copy(isReinstallUser = true) }
+                setCurrentDialog(SKIP_ONBOARDING_OPTION)
+                pixel.fire(PREONBOARDING_SKIP_ONBOARDING_PRESSED)
             }
 
             SKIP_ONBOARDING_OPTION -> {
-                viewModelScope.launch {
-                    _commands.send(ShowComparisonChart)
-                    pixel.fire(PREONBOARDING_RESUME_ONBOARDING_PRESSED)
-                }
+                setCurrentDialog(COMPARISON_CHART)
+                pixel.fire(PREONBOARDING_RESUME_ONBOARDING_PRESSED)
             }
 
-            ADDRESS_BAR_POSITION -> {
-                // no-op
-            }
-
-            INPUT_SCREEN -> {
+            INITIAL, COMPARISON_CHART, ADDRESS_BAR_POSITION, INPUT_SCREEN -> {
                 // no-op
             }
         }
@@ -265,20 +251,24 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
         defaultRoleBrowserDialog.dialogShown()
         appInstallStore.defaultBrowser = true
         pixel.fire(AppPixelName.DEFAULT_BROWSER_SET, mapOf(PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString()))
-
-        viewModelScope.launch {
-            _commands.send(ShowAddressBarPositionDialog(showSplitOption = isSplitOmnibarEnabled()))
-        }
+        _viewState.update { it.copy(showSplitOption = isSplitOmnibarEnabled()) }
+        setCurrentDialog(ADDRESS_BAR_POSITION)
     }
 
     fun onDefaultBrowserNotSet() {
         defaultRoleBrowserDialog.dialogShown()
         appInstallStore.defaultBrowser = false
         pixel.fire(AppPixelName.DEFAULT_BROWSER_NOT_SET, mapOf(PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString()))
+        _viewState.update { it.copy(showSplitOption = isSplitOmnibarEnabled()) }
+        setCurrentDialog(ADDRESS_BAR_POSITION)
+    }
 
-        viewModelScope.launch {
-            _commands.send(ShowAddressBarPositionDialog(showSplitOption = isSplitOmnibarEnabled()))
-        }
+    fun onAddressBarPositionOptionSelected(selectedOption: OmnibarType) {
+        _viewState.update { it.copy(selectedAddressBarPosition = selectedOption) }
+    }
+
+    fun onInputScreenOptionSelected(withAi: Boolean) {
+        _viewState.update { it.copy(inputScreenSelected = withAi) }
     }
 
     fun notificationRuntimePermissionRequested() {
@@ -292,50 +282,8 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
         )
     }
 
-    fun onDialogShown(onboardingDialogType: PreOnboardingDialogType) {
-        when (onboardingDialogType) {
-            INITIAL_REINSTALL_USER -> {
-                pixel.fire(PREONBOARDING_INTRO_REINSTALL_USER_SHOWN_UNIQUE, type = Unique())
-            }
-            INITIAL -> {
-                pixel.fire(PREONBOARDING_INTRO_SHOWN_UNIQUE, type = Unique())
-            }
-            COMPARISON_CHART -> {
-                pixel.fire(PREONBOARDING_COMPARISON_CHART_SHOWN_UNIQUE, type = Unique())
-            }
-            SKIP_ONBOARDING_OPTION -> pixel.fire(PREONBOARDING_SKIP_ONBOARDING_SHOWN_UNIQUE, type = Unique())
-            ADDRESS_BAR_POSITION -> {
-                pixel.fire(PREONBOARDING_ADDRESS_BAR_POSITION_SHOWN_UNIQUE, type = Unique())
-            }
-            INPUT_SCREEN -> {
-                pixel.fire(PREONBOARDING_CHOOSE_SEARCH_EXPERIENCE_IMPRESSIONS_UNIQUE, type = Unique())
-            }
-        }
-    }
-
-    fun onAddressBarPositionOptionSelected(selectedOption: OmnibarType) {
-        addressBarPositionOption = selectedOption
-        viewModelScope.launch {
-            _commands.send(SetAddressBarPositionOptions(selectedOption))
-        }
-    }
-
-    fun onInputScreenOptionSelected(withAi: Boolean) {
-        inputScreenSelected = withAi
-    }
-
     fun getMaxPageCount(): Int {
         return maxPageCount
-    }
-
-    fun loadDaxDialog() {
-        viewModelScope.launch {
-            if (isAppReinstall()) {
-                _commands.send(ShowInitialReinstallUserDialog)
-            } else {
-                _commands.send(ShowInitialDialog)
-            }
-        }
     }
 
     private suspend fun isAppReinstall(): Boolean =
