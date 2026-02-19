@@ -4716,24 +4716,15 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onVpnMenuClicked() {
-        val vpnMenuState = currentBrowserViewState().vpnMenuState
-        val statusParam = when (vpnMenuState) {
-            VpnMenuState.NotSubscribed -> {
+        val state = currentBrowserViewState().vpnMenuState
+        when (state) {
+            VpnMenuState.NotSubscribed, VpnMenuState.NotSubscribedNoPill ->
                 command.value = LaunchPrivacyPro("https://duckduckgo.com/pro?origin=funnel_appmenu_android".toUri())
-                "pill"
-            }
-            VpnMenuState.NotSubscribedNoPill -> {
-                command.value = LaunchPrivacyPro("https://duckduckgo.com/pro?origin=funnel_appmenu_android".toUri())
-                "no_pill"
-            }
-            is VpnMenuState.Subscribed -> {
-                command.value = LaunchVpnManagement
-                "subscribed"
-            }
-            VpnMenuState.Hidden -> "" // Should not happen as menu item should not be visible
+            is VpnMenuState.Subscribed -> command.value = LaunchVpnManagement
+            VpnMenuState.Hidden -> {} // Menu item not visible
         }
-        if (statusParam.isNotEmpty()) {
-            pixel.fire(AppPixelName.MENU_ACTION_VPN_PRESSED, mapOf(PixelParameter.STATUS to statusParam))
+        if (state != VpnMenuState.Hidden) {
+            pixel.fire(AppPixelName.MENU_ACTION_VPN_PRESSED, mapOf(PixelParameter.STATUS to state.pixelParam))
         }
     }
 

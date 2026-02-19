@@ -1780,7 +1780,11 @@ class BrowserTabFragment :
                 } else if (omnibar.viewMode == ViewMode.DuckAI) {
                     pixel.fire(DuckChatPixelName.DUCK_CHAT_SETTINGS_MENU_OPEN.pixelName)
                 } else {
-                    val params = mapOf(PixelParameter.FROM_FOCUSED_NTP to isFocusedNtp.toString())
+                    val vpnStatus = currentViewState?.vpnMenuState?.pixelParam.toString()
+                    val params = mapOf(
+                        PixelParameter.FROM_FOCUSED_NTP to isFocusedNtp.toString(),
+                        PixelParameter.STATUS to vpnStatus,
+                    )
                     pixel.fire(AppPixelName.MENU_ACTION_POPUP_OPENED.pixelName, params)
                     pixel.fire(AppPixelName.PRODUCT_TELEMETRY_SURFACE_MENU_OPENED.pixelName)
                     pixel.fire(AppPixelName.PRODUCT_TELEMETRY_SURFACE_MENU_OPENED_DAILY.pixelName, type = Daily())

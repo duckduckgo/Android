@@ -8451,7 +8451,7 @@ class BrowserTabViewModelTest {
 
         verify(mockPixel).fire(
             AppPixelName.MENU_ACTION_VPN_PRESSED,
-            mapOf(PixelParameter.STATUS to "pill"),
+            mapOf(PixelParameter.STATUS to VpnMenuState.NotSubscribed.pixelParam),
         )
     }
 
@@ -8465,7 +8465,7 @@ class BrowserTabViewModelTest {
 
         verify(mockPixel).fire(
             AppPixelName.MENU_ACTION_VPN_PRESSED,
-            mapOf(PixelParameter.STATUS to "no_pill"),
+            mapOf(PixelParameter.STATUS to VpnMenuState.NotSubscribedNoPill.pixelParam),
         )
     }
 
@@ -8479,7 +8479,7 @@ class BrowserTabViewModelTest {
 
         verify(mockPixel).fire(
             AppPixelName.MENU_ACTION_VPN_PRESSED,
-            mapOf(PixelParameter.STATUS to "subscribed"),
+            mapOf(PixelParameter.STATUS to VpnMenuState.Subscribed(isVpnEnabled = true).pixelParam),
         )
     }
 
