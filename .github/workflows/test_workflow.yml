@@ -3,6 +3,11 @@ name: Test - Workflow for Testing
 on:
   workflow_dispatch:
 
+    inputs:
+      ref:
+        description: 'This is an example of an input'
+        required: true
+
 env:
   ASANA_PAT: ${{ secrets.ASANA_ACCESS_TOKEN }}
   GH_TOKEN: ${{ secrets.GT_DAXMOBILE }}
@@ -18,17 +23,4 @@ jobs:
         with:
           submodules: recursive
           token: ${{ secrets.GT_DAXMOBILE }}
-          ref: ${{ github.ref }}
-
-      - name: Assign task to Github Actor
-        id: assign-release-task
-        uses: ./.github/actions/assign-release-task
-        with:
-          task_name: 'Android Release 5.263.1 [Halted at 10% rollout]'
-          asana_token: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          project_gid: ${{ vars.GH_ANDROID_RELEASE_BOARD_PROJECT_ID }}
-          username: ${{ github.actor }}
-          github_token: ${{ secrets.DAXMOBILE_ANDROID_AUTOMATION }}
-
-      - name: Print result
-        run: echo "Asana ID ${{ steps.assign-release-task.outputs.task_id }}"
+          ref: ${{ github.event.inputs.ref }}
