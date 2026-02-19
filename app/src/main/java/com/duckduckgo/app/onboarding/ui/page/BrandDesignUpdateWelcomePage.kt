@@ -109,6 +109,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 state.currentDialog?.let { dialogType ->
                     configureDaxCta(dialogType, state.showSplitOption)
                 }
+                // TODO: react to state.selectedAddressBarPosition for address bar toggle UI
             }
             .launchIn(viewLifecycleOwner.lifecycleScope)
 
