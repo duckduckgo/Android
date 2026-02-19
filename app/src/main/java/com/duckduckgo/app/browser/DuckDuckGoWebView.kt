@@ -64,6 +64,7 @@ class DuckDuckGoWebView :
     NestedScrollingChild3 {
     private var lastClampedTopY: Boolean = true // when created we are always at the top
     private var contentAllowsSwipeToRefresh: Boolean = true
+    internal var isUiLocked: Boolean = false
     private var enableSwipeRefreshCallback: ((Boolean) -> Unit)? = null
     private var hasGestureFinished = true
     private var canSwipeToRefresh = true
@@ -262,6 +263,10 @@ class DuckDuckGoWebView :
     override fun onTouchEvent(ev: MotionEvent): Boolean {
         parent.requestDisallowInterceptTouchEvent(true)
 
+        if (isUiLocked) {
+            return super.onTouchEvent(ev)
+        }
+
         val returnValue: Boolean
 
         val event = MotionEvent.obtain(ev)
@@ -443,11 +448,9 @@ class DuckDuckGoWebView :
         enableSwipeRefreshCallback?.invoke(enable && contentAllowsSwipeToRefresh)
     }
 
-    private fun setContentAllowsSwipeToRefresh(allowed: Boolean) {
+    internal fun setContentAllowsSwipeToRefresh(allowed: Boolean) {
         contentAllowsSwipeToRefresh = allowed
-        if (!allowed) {
-            enableSwipeRefresh(false)
-        }
+        enableSwipeRefresh(allowed)
     }
 
     fun isDestroyed(): Boolean = isDestroyed

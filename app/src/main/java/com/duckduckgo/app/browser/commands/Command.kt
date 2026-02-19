@@ -413,6 +413,8 @@ sealed class Command {
 
     data object ScreenUnlock : Command()
 
+    data class UiLockChanged(val locked: Boolean) : Command()
+
     data object ShowFaviconsPrompt : Command()
 
     data class ShowSSLError(
