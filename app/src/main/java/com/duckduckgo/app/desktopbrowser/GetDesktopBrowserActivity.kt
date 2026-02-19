@@ -36,6 +36,7 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.navigation.api.getActivityParams
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import logcat.LogPriority
@@ -112,6 +113,10 @@ class GetDesktopBrowserActivity : DuckDuckGoActivity() {
             is GetDesktopBrowserViewModel.Command.ShareDownloadLink -> {
                 launchShareSheet(command.url)
             }
+
+            GetDesktopBrowserViewModel.Command.ShowCopiedNotification -> {
+                showCopiedNotification()
+            }
         }
     }
 
@@ -149,12 +154,19 @@ class GetDesktopBrowserActivity : DuckDuckGoActivity() {
         binding.noThanksButton.setOnClickListener {
             viewModel.onNoThanksClicked()
         }
+        binding.browserUrl.setOnClickListener {
+            viewModel.onLinkClicked()
+        }
     }
 
     private fun setupBackNavigationHandler() {
         onBackPressedDispatcher.addCallback(this) {
             viewModel.onBackPressed()
         }
+    }
+
+    private fun showCopiedNotification() {
+        Snackbar.make(binding.root, R.string.getDesktopBrowserUrlLinkCopied, Snackbar.LENGTH_SHORT).show()
     }
 
     private fun getDesktopBrowserViewModel(params: GetDesktopBrowserActivityParams): GetDesktopBrowserViewModel = ViewModelProvider.create(

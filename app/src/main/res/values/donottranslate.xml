@@ -88,6 +88,8 @@
     <string name="getDesktopBrowserShareDownloadLink">Share Download Link</string>
     <string name="getDesktopBrowserNoThanks">No Thanks</string>
     <string name="getDesktopBrowserHideItem">Hide</string>
+    <string name="getDesktopBrowserUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Link copied</string>
+
 
     <!-- Single tab burning -->
     <string name="singleTabFireDialogTitle">Delete tabs and site data?</string>

@@ -2,6 +2,468 @@
 <issues format="6" by="lint 8.8.2" type="baseline" client="gradle" dependencies="false" name="AGP (8.7.3)" variant="all" version="8.8.2">
 
     <issue
+        id="NoLifecycleScopeInFragment"
+        message="Use viewLifecycleOwner.lifecycleScope instead of lifecycleScope in Fragments. Fragment views can be destroyed while the fragment is still alive (backstack, ViewPager), which can cause crashes when coroutines try to update destroyed views."
+        errorLine1="            lifecycleScope.launch(dispatchers.io()) {"
+        errorLine2="            ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/autofill/impl/ui/credential/management/viewing/AutofillManagementCredentialsMode.kt"
+            line="186"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="NoLifecycleScopeInFragment"
+        message="Use viewLifecycleOwner.lifecycleScope instead of lifecycleScope in Fragments. Fragment views can be destroyed while the fragment is still alive (backstack, ViewPager), which can cause crashes when coroutines try to update destroyed views."
+        errorLine1="        lifecycleScope.launch {"
+        errorLine2="        ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/autofill/impl/ui/credential/management/viewing/AutofillManagementCredentialsMode.kt"
+            line="355"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="NoLifecycleScopeInFragment"
+        message="Use viewLifecycleOwner.lifecycleScope instead of lifecycleScope in Fragments. Fragment views can be destroyed while the fragment is still alive (backstack, ViewPager), which can cause crashes when coroutines try to update destroyed views."
+        errorLine1="            }.launchIn(lifecycleScope)"
+        errorLine2="                       ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/autofill/impl/ui/credential/management/viewing/AutofillManagementCredentialsMode.kt"
+            line="390"
+            column="24"/>
+    </issue>
+
+    <issue
+        id="NoLifecycleScopeInFragment"
+        message="Use viewLifecycleOwner.lifecycleScope instead of lifecycleScope in Fragments. Fragment views can be destroyed while the fragment is still alive (backstack, ViewPager), which can cause crashes when coroutines try to update destroyed views."
+        errorLine1="        lifecycleScope.launch(dispatchers.io()) {"
+        errorLine2="        ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/autofill/impl/ui/credential/management/viewing/AutofillManagementCredentialsMode.kt"
+            line="554"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="NoLifecycleScopeInFragment"
+        message="Use viewLifecycleOwner.lifecycleScope instead of lifecycleScope in Fragments. Fragment views can be destroyed while the fragment is still alive (backstack, ViewPager), which can cause crashes when coroutines try to update destroyed views."
+        errorLine1="        lifecycleScope.launch {"
+        errorLine2="        ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/autofill/impl/ui/credential/management/viewing/AutofillManagementListMode.kt"
+            line="355"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="NoLifecycleScopeInFragment"
+        message="Use viewLifecycleOwner.lifecycleScope instead of lifecycleScope in Fragments. Fragment views can be destroyed while the fragment is still alive (backstack, ViewPager), which can cause crashes when coroutines try to update destroyed views."
+        errorLine1="            lifecycleScope.launch(dispatchers.io()) {"
+        errorLine2="            ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/autofill/impl/ui/credential/management/viewing/AutofillManagementListMode.kt"
+            line="379"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="NoLifecycleScopeInFragment"
+        message="Use viewLifecycleOwner.lifecycleScope instead of lifecycleScope in Fragments. Fragment views can be destroyed while the fragment is still alive (backstack, ViewPager), which can cause crashes when coroutines try to update destroyed views."
+        errorLine1="            lifecycleScope.launch(dispatchers.io()) {"
+        errorLine2="            ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/autofill/impl/ui/credential/management/viewing/AutofillManagementListMode.kt"
+            line="575"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="NoLifecycleScopeInFragment"
+        message="Use viewLifecycleOwner.lifecycleScope instead of lifecycleScope in Fragments. Fragment views can be destroyed while the fragment is still alive (backstack, ViewPager), which can cause crashes when coroutines try to update destroyed views."
+        errorLine1="            lifecycleScope.launch(dispatchers.io()) {"
+        errorLine2="            ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/autofill/impl/ui/credential/management/viewing/AutofillManagementListMode.kt"
+            line="600"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="NoLifecycleScopeInFragment"
+        message="Use viewLifecycleOwner.lifecycleScope instead of lifecycleScope in Fragments. Fragment views can be destroyed while the fragment is still alive (backstack, ViewPager), which can cause crashes when coroutines try to update destroyed views."
+        errorLine1="    private val wasUsernameBackFilled: Deferred&lt;Boolean> = lifecycleScope.async(start = LAZY) {"
+        errorLine2="                                                           ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/autofill/impl/ui/credential/saving/AutofillSavingCredentialsDialogFragment.kt"
+            line="138"
+            column="60"/>
+    </issue>
+
+    <issue
+        id="NoLifecycleScopeInFragment"
+        message="Use viewLifecycleOwner.lifecycleScope instead of lifecycleScope in Fragments. Fragment views can be destroyed while the fragment is still alive (backstack, ViewPager), which can cause crashes when coroutines try to update destroyed views."
+        errorLine1="            }.launchIn(lifecycleScope)"
+        errorLine2="                       ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/autofill/impl/ui/credential/saving/AutofillSavingCredentialsDialogFragment.kt"
+            line="178"
+            column="24"/>
+    </issue>
+
+    <issue
+        id="NoLifecycleScopeInFragment"
+        message="Use viewLifecycleOwner.lifecycleScope instead of lifecycleScope in Fragments. Fragment views can be destroyed while the fragment is still alive (backstack, ViewPager), which can cause crashes when coroutines try to update destroyed views."
+        errorLine1="            lifecycleScope.launch {"
+        errorLine2="            ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/autofill/impl/ui/credential/saving/AutofillSavingCredentialsDialogFragment.kt"
+            line="186"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="NoLifecycleScopeInFragment"
+        message="Use viewLifecycleOwner.lifecycleScope instead of lifecycleScope in Fragments. Fragment views can be destroyed while the fragment is still alive (backstack, ViewPager), which can cause crashes when coroutines try to update destroyed views."
+        errorLine1="                lifecycleScope.launch {"
+        errorLine2="                ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/autofill/impl/ui/credential/saving/AutofillSavingCredentialsDialogFragment.kt"
+            line="210"
+            column="17"/>
+    </issue>
+
+    <issue
+        id="NoLifecycleScopeInFragment"
+        message="Use viewLifecycleOwner.lifecycleScope instead of lifecycleScope in Fragments. Fragment views can be destroyed while the fragment is still alive (backstack, ViewPager), which can cause crashes when coroutines try to update destroyed views."
+        errorLine1="            lifecycleScope.launch(dispatcherProvider.io()) {"
+        errorLine2="            ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/autofill/impl/ui/credential/saving/AutofillSavingCredentialsDialogFragment.kt"
+            line="215"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="NoLifecycleScopeInFragment"
+        message="Use viewLifecycleOwner.lifecycleScope instead of lifecycleScope in Fragments. Fragment views can be destroyed while the fragment is still alive (backstack, ViewPager), which can cause crashes when coroutines try to update destroyed views."
+        errorLine1="            lifecycleScope.launch {"
+        errorLine2="            ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/autofill/impl/ui/credential/saving/AutofillSavingCredentialsDialogFragment.kt"
+            line="241"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="NoLifecycleScopeInFragment"
+        message="Use viewLifecycleOwner.lifecycleScope instead of lifecycleScope in Fragments. Fragment views can be destroyed while the fragment is still alive (backstack, ViewPager), which can cause crashes when coroutines try to update destroyed views."
+        errorLine1="            lifecycleScope.launch {"
+        errorLine2="            ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/autofill/impl/ui/credential/saving/AutofillSavingCredentialsDialogFragment.kt"
+            line="264"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="NoLifecycleScopeInFragment"
+        message="Use viewLifecycleOwner.lifecycleScope instead of lifecycleScope in Fragments. Fragment views can be destroyed while the fragment is still alive (backstack, ViewPager), which can cause crashes when coroutines try to update destroyed views."
+        errorLine1="            lifecycleScope.launch {"
+        errorLine2="            ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/autofill/impl/ui/credential/saving/AutofillSavingCredentialsDialogFragment.kt"
+            line="278"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="NoLifecycleScopeInFragment"
+        message="Use viewLifecycleOwner.lifecycleScope instead of lifecycleScope in Fragments. Fragment views can be destroyed while the fragment is still alive (backstack, ViewPager), which can cause crashes when coroutines try to update destroyed views."
+        errorLine1="    private val wasUsernameBackFilled: Deferred&lt;Boolean> = lifecycleScope.async(start = LAZY) {"
+        errorLine2="                                                           ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/autofill/impl/ui/credential/updating/AutofillUpdatingExistingCredentialsDialogFragment.kt"
+            line="94"
+            column="60"/>
+    </issue>
+
+    <issue
+        id="NoLifecycleScopeInFragment"
+        message="Use viewLifecycleOwner.lifecycleScope instead of lifecycleScope in Fragments. Fragment views can be destroyed while the fragment is still alive (backstack, ViewPager), which can cause crashes when coroutines try to update destroyed views."
+        errorLine1="            lifecycleScope.launch {"
+        errorLine2="            ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/autofill/impl/ui/credential/updating/AutofillUpdatingExistingCredentialsDialogFragment.kt"
+            line="121"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="NoLifecycleScopeInFragment"
+        message="Use viewLifecycleOwner.lifecycleScope instead of lifecycleScope in Fragments. Fragment views can be destroyed while the fragment is still alive (backstack, ViewPager), which can cause crashes when coroutines try to update destroyed views."
+        errorLine1="                lifecycleScope.launch {"
+        errorLine2="                ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/autofill/impl/ui/credential/updating/AutofillUpdatingExistingCredentialsDialogFragment.kt"
+            line="173"
+            column="17"/>
+    </issue>
+
+    <issue
+        id="NoLifecycleScopeInFragment"
+        message="Use viewLifecycleOwner.lifecycleScope instead of lifecycleScope in Fragments. Fragment views can be destroyed while the fragment is still alive (backstack, ViewPager), which can cause crashes when coroutines try to update destroyed views."
+        errorLine1="            lifecycleScope.launch {"
+        errorLine2="            ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/autofill/impl/ui/credential/updating/AutofillUpdatingExistingCredentialsDialogFragment.kt"
+            line="219"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="NoLifecycleScopeInFragment"
+        message="Use viewLifecycleOwner.lifecycleScope instead of lifecycleScope in Fragments. Fragment views can be destroyed while the fragment is still alive (backstack, ViewPager), which can cause crashes when coroutines try to update destroyed views."
+        errorLine1="        }.launchIn(lifecycleScope)"
+        errorLine2="                   ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/autofill/impl/email/incontext/prompt/EmailProtectionInContextSignUpPromptFragment.kt"
+            line="96"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="NoLifecycleScopeInFragment"
+        message="Use viewLifecycleOwner.lifecycleScope instead of lifecycleScope in Fragments. Fragment views can be destroyed while the fragment is still alive (backstack, ViewPager), which can cause crashes when coroutines try to update destroyed views."
+        errorLine1="            lifecycleScope.launch {"
+        errorLine2="            ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/autofill/impl/ui/credential/management/importpassword/google/ImportFromGooglePasswordsDialog.kt"
+            line="119"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="NoLifecycleScopeInFragment"
+        message="Use viewLifecycleOwner.lifecycleScope instead of lifecycleScope in Fragments. Fragment views can be destroyed while the fragment is still alive (backstack, ViewPager), which can cause crashes when coroutines try to update destroyed views."
+        errorLine1="            .launchIn(lifecycleScope)"
+        errorLine2="                      ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/autofill/impl/ui/credential/management/importpassword/google/ImportFromGooglePasswordsDialog.kt"
+            line="282"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="NoLifecycleScopeInFragment"
+        message="Use viewLifecycleOwner.lifecycleScope instead of lifecycleScope in Fragments. Fragment views can be destroyed while the fragment is still alive (backstack, ViewPager), which can cause crashes when coroutines try to update destroyed views."
+        errorLine1="        lifecycleScope.launch {"
+        errorLine2="        ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/autofill/impl/importing/takeout/webflow/ImportGoogleBookmarksWebFlowFragment.kt"
+            line="154"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="NoLifecycleScopeInFragment"
+        message="Use viewLifecycleOwner.lifecycleScope instead of lifecycleScope in Fragments. Fragment views can be destroyed while the fragment is still alive (backstack, ViewPager), which can cause crashes when coroutines try to update destroyed views."
+        errorLine1="        lifecycleScope.launch(dispatchers.main()) {"
+        errorLine2="        ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/autofill/impl/importing/takeout/webflow/ImportGoogleBookmarksWebFlowFragment.kt"
+            line="160"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="NoLifecycleScopeInFragment"
+        message="Use viewLifecycleOwner.lifecycleScope instead of lifecycleScope in Fragments. Fragment views can be destroyed while the fragment is still alive (backstack, ViewPager), which can cause crashes when coroutines try to update destroyed views."
+        errorLine1="            }.launchIn(lifecycleScope)"
+        errorLine2="                       ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/autofill/impl/importing/takeout/webflow/ImportGoogleBookmarksWebFlowFragment.kt"
+            line="182"
+            column="24"/>
+    </issue>
+
+    <issue
+        id="NoLifecycleScopeInFragment"
+        message="Use viewLifecycleOwner.lifecycleScope instead of lifecycleScope in Fragments. Fragment views can be destroyed while the fragment is still alive (backstack, ViewPager), which can cause crashes when coroutines try to update destroyed views."
+        errorLine1="            }.launchIn(lifecycleScope)"
+        errorLine2="                       ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/autofill/impl/importing/takeout/webflow/ImportGoogleBookmarksWebFlowFragment.kt"
+            line="207"
+            column="24"/>
+    </issue>
+
+    <issue
+        id="NoLifecycleScopeInFragment"
+        message="Use viewLifecycleOwner.lifecycleScope instead of lifecycleScope in Fragments. Fragment views can be destroyed while the fragment is still alive (backstack, ViewPager), which can cause crashes when coroutines try to update destroyed views."
+        errorLine1="            lifecycleScope.launch {"
+        errorLine2="            ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/autofill/impl/importing/takeout/webflow/ImportGoogleBookmarksWebFlowFragment.kt"
+            line="241"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="NoLifecycleScopeInFragment"
+        message="Use viewLifecycleOwner.lifecycleScope instead of lifecycleScope in Fragments. Fragment views can be destroyed while the fragment is still alive (backstack, ViewPager), which can cause crashes when coroutines try to update destroyed views."
+        errorLine1="        lifecycleScope.launch {"
+        errorLine2="        ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/autofill/impl/importing/takeout/webflow/ImportGoogleBookmarksWebFlowFragment.kt"
+            line="279"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="NoLifecycleScopeInFragment"
+        message="Use viewLifecycleOwner.lifecycleScope instead of lifecycleScope in Fragments. Fragment views can be destroyed while the fragment is still alive (backstack, ViewPager), which can cause crashes when coroutines try to update destroyed views."
+        errorLine1="                    lifecycleScope.launch {"
+        errorLine2="                    ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/autofill/impl/importing/takeout/webflow/ImportGoogleBookmarksWebFlowFragment.kt"
+            line="292"
+            column="21"/>
+    </issue>
+
+    <issue
+        id="NoLifecycleScopeInFragment"
+        message="Use viewLifecycleOwner.lifecycleScope instead of lifecycleScope in Fragments. Fragment views can be destroyed while the fragment is still alive (backstack, ViewPager), which can cause crashes when coroutines try to update destroyed views."
+        errorLine1="        lifecycleScope.launch(dispatchers.main()) {"
+        errorLine2="        ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/autofill/impl/importing/takeout/webflow/ImportGoogleBookmarksWebFlowFragment.kt"
+            line="376"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="NoLifecycleScopeInFragment"
+        message="Use viewLifecycleOwner.lifecycleScope instead of lifecycleScope in Fragments. Fragment views can be destroyed while the fragment is still alive (backstack, ViewPager), which can cause crashes when coroutines try to update destroyed views."
+        errorLine1="        lifecycleScope.launch {"
+        errorLine2="        ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/autofill/impl/importing/takeout/webflow/ImportGoogleBookmarksWebFlowFragment.kt"
+            line="404"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="NoLifecycleScopeInFragment"
+        message="Use viewLifecycleOwner.lifecycleScope instead of lifecycleScope in Fragments. Fragment views can be destroyed while the fragment is still alive (backstack, ViewPager), which can cause crashes when coroutines try to update destroyed views."
+        errorLine1="        lifecycleScope.launch {"
+        errorLine2="        ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/autofill/impl/importing/takeout/webflow/ImportGoogleBookmarksWebFlowFragment.kt"
+            line="419"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="NoLifecycleScopeInFragment"
+        message="Use viewLifecycleOwner.lifecycleScope instead of lifecycleScope in Fragments. Fragment views can be destroyed while the fragment is still alive (backstack, ViewPager), which can cause crashes when coroutines try to update destroyed views."
+        errorLine1="        lifecycleScope.launch {"
+        errorLine2="        ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/autofill/impl/importing/takeout/webflow/ImportGoogleBookmarksWebFlowFragment.kt"
+            line="436"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="NoLifecycleScopeInFragment"
+        message="Use viewLifecycleOwner.lifecycleScope instead of lifecycleScope in Fragments. Fragment views can be destroyed while the fragment is still alive (backstack, ViewPager), which can cause crashes when coroutines try to update destroyed views."
+        errorLine1="        lifecycleScope.launch(dispatchers.main()) {"
+        errorLine2="        ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/autofill/impl/importing/gpm/webflow/ImportGooglePasswordsWebFlowFragment.kt"
+            line="155"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="NoLifecycleScopeInFragment"
+        message="Use viewLifecycleOwner.lifecycleScope instead of lifecycleScope in Fragments. Fragment views can be destroyed while the fragment is still alive (backstack, ViewPager), which can cause crashes when coroutines try to update destroyed views."
+        errorLine1="            }.launchIn(lifecycleScope)"
+        errorLine2="                       ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/autofill/impl/importing/gpm/webflow/ImportGooglePasswordsWebFlowFragment.kt"
+            line="177"
+            column="24"/>
+    </issue>
+
+    <issue
+        id="NoLifecycleScopeInFragment"
+        message="Use viewLifecycleOwner.lifecycleScope instead of lifecycleScope in Fragments. Fragment views can be destroyed while the fragment is still alive (backstack, ViewPager), which can cause crashes when coroutines try to update destroyed views."
+        errorLine1="            }.launchIn(lifecycleScope)"
+        errorLine2="                       ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/autofill/impl/importing/gpm/webflow/ImportGooglePasswordsWebFlowFragment.kt"
+            line="198"
+            column="24"/>
+    </issue>
+
+    <issue
+        id="NoLifecycleScopeInFragment"
+        message="Use viewLifecycleOwner.lifecycleScope instead of lifecycleScope in Fragments. Fragment views can be destroyed while the fragment is still alive (backstack, ViewPager), which can cause crashes when coroutines try to update destroyed views."
+        errorLine1="            lifecycleScope.launch {"
+        errorLine2="            ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/autofill/impl/importing/gpm/webflow/ImportGooglePasswordsWebFlowFragment.kt"
+            line="293"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="NoLifecycleScopeInFragment"
+        message="Use viewLifecycleOwner.lifecycleScope instead of lifecycleScope in Fragments. Fragment views can be destroyed while the fragment is still alive (backstack, ViewPager), which can cause crashes when coroutines try to update destroyed views."
+        errorLine1="        lifecycleScope.launch {"
+        errorLine2="        ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/autofill/impl/importing/gpm/webflow/ImportGooglePasswordsWebFlowFragment.kt"
+            line="301"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="NoLifecycleScopeInFragment"
+        message="Use viewLifecycleOwner.lifecycleScope instead of lifecycleScope in Fragments. Fragment views can be destroyed while the fragment is still alive (backstack, ViewPager), which can cause crashes when coroutines try to update destroyed views."
+        errorLine1="                    lifecycleScope.launch {"
+        errorLine2="                    ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/autofill/impl/importing/gpm/webflow/ImportGooglePasswordsWebFlowFragment.kt"
+            line="314"
+            column="21"/>
+    </issue>
+
+    <issue
+        id="NoLifecycleScopeInFragment"
+        message="Use viewLifecycleOwner.lifecycleScope instead of lifecycleScope in Fragments. Fragment views can be destroyed while the fragment is still alive (backstack, ViewPager), which can cause crashes when coroutines try to update destroyed views."
+        errorLine1="                lifecycleScope.launch {"
+        errorLine2="                ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/autofill/impl/importing/gpm/webflow/ImportGooglePasswordsWebFlowFragment.kt"
+            line="332"
+            column="17"/>
+    </issue>
+
+    <issue
+        id="NoLifecycleScopeInFragment"
+        message="Use viewLifecycleOwner.lifecycleScope instead of lifecycleScope in Fragments. Fragment views can be destroyed while the fragment is still alive (backstack, ViewPager), which can cause crashes when coroutines try to update destroyed views."
+        errorLine1="        lifecycleScope.launch(dispatchers.main()) {"
+        errorLine2="        ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/autofill/impl/importing/gpm/webflow/ImportGooglePasswordsWebFlowFragment.kt"
+            line="350"
+            column="9"/>
+    </issue>
+
+    <issue
         id="ScrollViewSize"
         message="This LinearLayout should use `android:layout_height=&quot;wrap_content&quot;`"
         errorLine1="        android:layout_height=&quot;match_parent&quot;"

@@ -18,8 +18,10 @@ package com.duckduckgo.app.desktopbrowser
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.duckduckgo.app.clipboard.ClipboardInteractor
 import com.duckduckgo.app.desktopbrowser.GetDesktopBrowserActivityParams.Source
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.common.utils.DispatcherProvider
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -34,6 +36,8 @@ import kotlinx.coroutines.launch
 class GetDesktopBrowserViewModel @AssistedInject constructor(
     @Assisted private val params: GetDesktopBrowserActivityParams,
     private val settingsDataStore: SettingsDataStore,
+    private val dispatchers: DispatcherProvider,
+    private val clipboardInteractor: ClipboardInteractor,
 ) : ViewModel() {
 
     private val _viewState = MutableStateFlow(
@@ -67,6 +71,14 @@ class GetDesktopBrowserViewModel @AssistedInject constructor(
         }
     }
 
+    fun onLinkClicked() {
+        viewModelScope.launch(dispatchers.io()) {
+            if (!clipboardInteractor.copyToClipboard(DESKTOP_BROWSER_URL, isSensitive = false)) {
+                _command.send(Command.ShowCopiedNotification)
+            }
+        }
+    }
+
     data class ViewState(
         val showNoThanksButton: Boolean = false,
     )
@@ -74,6 +86,8 @@ class GetDesktopBrowserViewModel @AssistedInject constructor(
     sealed class Command {
         object Close : Command()
         object Dismissed : Command()
+
+        object ShowCopiedNotification : Command()
         data class ShareDownloadLink(val url: String) : Command()
     }
 

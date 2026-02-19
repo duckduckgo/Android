@@ -17,6 +17,7 @@
 package com.duckduckgo.app.desktopbrowser
 
 import app.cash.turbine.test
+import com.duckduckgo.app.clipboard.ClipboardInteractor
 import com.duckduckgo.app.desktopbrowser.GetDesktopBrowserActivityParams.Source
 import com.duckduckgo.app.desktopbrowser.GetDesktopBrowserViewModel.Command
 import com.duckduckgo.app.settings.db.SettingsDataStore
@@ -27,20 +28,25 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
+import org.mockito.kotlin.whenever
 
 class GetDesktopBrowserViewModelTest {
 
     @get:Rule
-    val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
+    val coroutineTestRule = CoroutineTestRule()
 
     private val settingsDataStoreMock: SettingsDataStore = mock()
+    private val clipboardInteractorMock: ClipboardInteractor = mock()
 
     private var testee: GetDesktopBrowserViewModel = GetDesktopBrowserViewModel(
         params = GetDesktopBrowserActivityParams(Source.COMPLETE_SETUP),
         settingsDataStore = settingsDataStoreMock,
+        dispatchers = coroutineTestRule.testDispatcherProvider,
+        clipboardInteractor = clipboardInteractorMock,
     )
 
     @Test
@@ -56,6 +62,8 @@ class GetDesktopBrowserViewModelTest {
         testee = GetDesktopBrowserViewModel(
             params = GetDesktopBrowserActivityParams(Source.OTHER),
             settingsDataStore = settingsDataStoreMock,
+            dispatchers = coroutineTestRule.testDispatcherProvider,
+            clipboardInteractor = clipboardInteractorMock,
         )
 
         testee.viewState.test {
@@ -94,6 +102,28 @@ class GetDesktopBrowserViewModelTest {
 
             verifyNoInteractions(settingsDataStoreMock)
             assertEquals(Command.Close, command)
+        }
+    }
+
+    @Test
+    fun whenOnLinkClickedAndSystemShowsNotificationThenDoNotEmitShowCopiedNotificationCommand() = runTest {
+        whenever(clipboardInteractorMock.copyToClipboard(any(), any())).thenReturn(true)
+
+        testee.commands.test {
+            testee.onLinkClicked()
+            expectNoEvents()
+        }
+    }
+
+    @Test
+    fun whenOnLinkClickedAndSystemDoesNotShowNotificationThenEmitShowCopiedNotificationCommand() = runTest {
+        whenever(clipboardInteractorMock.copyToClipboard(any(), any())).thenReturn(false)
+
+        testee.commands.test {
+            testee.onLinkClicked()
+
+            val command = awaitItem()
+            assertEquals(Command.ShowCopiedNotification, command)
         }
     }
 }

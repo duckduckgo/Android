@@ -41,8 +41,8 @@
             },
             {
                 "key": "feature.data.ext.total_duration_ms_bucketed",
-                "description": "Duration of the data clearing operation, bucketed. Does not include process restart duration. Uses upper end of the bucket.",
-                "enum": ["1000", "5000", "10000", "30000", "60000", "300000", "600000"]
+                "description": "Duration of the data clearing operation, bucketed using the lower bucket boundary. Does not include process restart duration.",
+                "enum": ["0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
             },
             {
                 "key": "feature.data.ext.failure_reason",

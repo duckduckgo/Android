@@ -610,7 +610,6 @@ class BrowserTabViewModel @Inject constructor(
     private var submitQueryJob: Job? = null
     private var isCustomTabScreen: Boolean = false
     private var alreadyShownKeyboard: Boolean = false
-    private var handleAboutBlankEnabled: Boolean = false
     private var pendingDuckChatAuthUpdate: Boolean = false
 
     private val isFullUrlEnabled = urlDisplayRepository.isFullUrlEnabled
@@ -838,10 +837,6 @@ class BrowserTabViewModel @Inject constructor(
                     command.value = LaunchInputScreen
                 }
             }.launchIn(viewModelScope)
-
-        viewModelScope.launch(dispatchers.io()) {
-            handleAboutBlankEnabled = androidBrowserConfig.handleAboutBlank().isEnabled()
-        }
 
         isFullUrlEnabled
             .onEach {
@@ -1469,11 +1464,7 @@ class BrowserTabViewModel @Inject constructor(
         if (swipingTabsFeature.isEnabled) {
             viewModelScope.launch {
                 val emptyTab = tabRepository.getTabs().firstOrNull {
-                    if (handleAboutBlankEnabled) {
-                        it.url.isNullOrBlank() && it.sourceTabId.isNullOrBlank()
-                    } else {
-                        it.url.isNullOrBlank()
-                    }
+                    it.url.isNullOrBlank() && it.sourceTabId.isNullOrBlank()
                 }?.tabId
                 if (emptyTab != null) {
                     tabRepository.select(tabId = emptyTab)
@@ -1572,7 +1563,7 @@ class BrowserTabViewModel @Inject constructor(
         navigationAwareLoginDetector.onEvent(NavigationEvent.UserAction.NavigateBack)
         val hasSourceTab = tabRepository.liveSelectedTab.value?.sourceTabId != null
 
-        if (isNavigationToEmptyUrlFromParent(hasSourceTab, isCustomTab) && handleAboutBlankEnabled) {
+        if (isNavigationToEmptyUrlFromParent(hasSourceTab, isCustomTab)) {
             viewModelScope.launch {
                 removeCurrentTabFromRepository()
             }
@@ -3976,7 +3967,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun handleNewTabIfEmptyUrl() {
-        val shouldDisplayAboutBlank = handleAboutBlankEnabled && webNavigationState == null
+        val shouldDisplayAboutBlank = webNavigationState == null
         if (shouldDisplayAboutBlank) {
             if (isCustomTabScreen) {
                 handleNewTabForEmptyUrlOnCustomTab()
