@@ -20,7 +20,7 @@ jobs:
           token: ${{ secrets.GT_DAXMOBILE }}
 
       - id: test-username-action
-        uses: duckduckgo/native-github-asana-sync@v2.0
+        uses: duckduckgo/native-github-asana-sync@v2.3
         with:
           action: 'get-asana-user-id'
           github-username: ${{ github.actor }}
