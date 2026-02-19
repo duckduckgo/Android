@@ -96,6 +96,7 @@ class TabSwitcherAdapter(
     private var onAnimationTileCloseClickListener: (() -> Unit)? = null
 
     private val differ = AsyncListDiffer(this, TabSwitcherItemDiffCallback(isDragging = { isDragging }))
+    private var pendingList: List<TabSwitcherItem> = emptyList()
 
     init {
         setHasStableIds(true)
@@ -459,6 +460,7 @@ class TabSwitcherAdapter(
     }
 
     fun updateData(updatedList: List<TabSwitcherItem>) {
+        pendingList = updatedList
         differ.submitList(updatedList)
     }
 
@@ -479,7 +481,8 @@ class TabSwitcherAdapter(
     }
 
     fun onTabMoved(from: Int, to: Int) {
-        val swapped = differ.currentList.swap(from, to)
+        val swapped = pendingList.swap(from, to)
+        pendingList = swapped
         differ.submitList(swapped)
     }
 
