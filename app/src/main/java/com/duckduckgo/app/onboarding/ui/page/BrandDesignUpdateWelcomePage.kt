@@ -45,16 +45,6 @@ import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INITIAL
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INITIAL_REINSTALL_USER
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INPUT_SCREEN
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.SKIP_ONBOARDING_OPTION
-import com.duckduckgo.app.onboarding.ui.page.BrandDesignUpdatePageViewModel.Command.Finish
-import com.duckduckgo.app.onboarding.ui.page.BrandDesignUpdatePageViewModel.Command.OnboardingSkipped
-import com.duckduckgo.app.onboarding.ui.page.BrandDesignUpdatePageViewModel.Command.SetAddressBarPositionOptions
-import com.duckduckgo.app.onboarding.ui.page.BrandDesignUpdatePageViewModel.Command.ShowAddressBarPositionDialog
-import com.duckduckgo.app.onboarding.ui.page.BrandDesignUpdatePageViewModel.Command.ShowComparisonChart
-import com.duckduckgo.app.onboarding.ui.page.BrandDesignUpdatePageViewModel.Command.ShowDefaultBrowserDialog
-import com.duckduckgo.app.onboarding.ui.page.BrandDesignUpdatePageViewModel.Command.ShowInitialDialog
-import com.duckduckgo.app.onboarding.ui.page.BrandDesignUpdatePageViewModel.Command.ShowInitialReinstallUserDialog
-import com.duckduckgo.app.onboarding.ui.page.BrandDesignUpdatePageViewModel.Command.ShowInputScreenDialog
-import com.duckduckgo.app.onboarding.ui.page.BrandDesignUpdatePageViewModel.Command.ShowSkipOnboardingOption
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.viewbinding.viewBinding
@@ -99,21 +89,6 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         requireActivity().apply {
             enableEdgeToEdge()
         }
-
-        viewModel.commands.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).onEach {
-            when (it) {
-                is ShowInitialReinstallUserDialog -> configureDaxCta(INITIAL_REINSTALL_USER)
-                is ShowInitialDialog -> configureDaxCta(INITIAL)
-                is ShowComparisonChart -> configureDaxCta(COMPARISON_CHART)
-                is ShowSkipOnboardingOption -> configureDaxCta(SKIP_ONBOARDING_OPTION)
-                is ShowDefaultBrowserDialog -> showDefaultBrowserDialog(it.intent)
-                is ShowAddressBarPositionDialog -> configureDaxCta(ADDRESS_BAR_POSITION, it.showSplitOption)
-                is ShowInputScreenDialog -> configureDaxCta(INPUT_SCREEN)
-                is Finish -> onContinuePressed()
-                is OnboardingSkipped -> onSkipPressed()
-                is SetAddressBarPositionOptions -> setAddressBarPositionOptions(it.selectedOption)
-            }
-        }.launchIn(lifecycleScope)
     }
 
     private fun setAddressBarPositionOptions(selectedOption: OmnibarType) {
@@ -127,6 +102,26 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
+
+        viewModel.viewState
+            .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+            .onEach { state ->
+                state.currentDialog?.let { dialogType ->
+                    configureDaxCta(dialogType, state.showSplitOption)
+                }
+            }
+            .launchIn(viewLifecycleOwner.lifecycleScope)
+
+        viewModel.commands
+            .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+            .onEach { command ->
+                when (command) {
+                    is BrandDesignUpdatePageViewModel.Command.ShowDefaultBrowserDialog -> showDefaultBrowserDialog(command.intent)
+                    is BrandDesignUpdatePageViewModel.Command.Finish -> onContinuePressed()
+                    is BrandDesignUpdatePageViewModel.Command.OnboardingSkipped -> onSkipPressed()
+                }
+            }
+            .launchIn(viewLifecycleOwner.lifecycleScope)
 
         requestNotificationsPermissions()
     }
@@ -168,7 +163,6 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
     ) {
         context?.let {
             // var afterAnimation: () -> Unit = {}
-            viewModel.onDialogShown(onboardingDialogType)
             when (onboardingDialogType) {
                 INITIAL_REINSTALL_USER -> {
                     // TODO
