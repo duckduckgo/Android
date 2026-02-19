@@ -15,12 +15,97 @@
   -->
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/onboardingWelcomePageContainer"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:backgroundTint="@color/daxColorSurfaceBackdrop"
-    android:tag="onboardingDefaultBrowser"
+    android:background="@color/daxColorSurfaceBackdrop"
+    android:clipChildren="false"
+    android:tag="onboardingWelcomePage"
     tools:context="com.duckduckgo.app.onboarding.ui.OnboardingActivity">
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/textGuideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.500684" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/backgroundGuideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.44" />
+
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/logoAnimation"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_marginTop="96dp"
+        android:layout_marginBottom="20dp"
+        android:importantForAccessibility="no"
+        android:transformPivotX="40dp"
+        android:transformPivotY="80dp"
+        app:layout_constraintBottom_toTopOf="@id/welcomeTitle"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1"
+        app:lottie_loop="false"
+        app:lottie_rawRes="@raw/onboarding_launch_screen_logo"
+        tools:lottie_progress="0.99"
+        tools:visibility="visible" />
+
+    <TextView
+        android:id="@+id/welcomeTitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:alpha="0"
+        android:gravity="center"
+        android:lineSpacingExtra="-10sp"
+        android:maxLines="2"
+        android:text="@string/onboardingWelcomeTitle"
+        android:textColor="@color/onboardingTextPrimary"
+        android:textFontWeight="500"
+        android:textSize="44sp"
+        app:layout_constraintBottom_toTopOf="@id/textGuideline"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintVertical_bias="1"
+        tools:alpha="1"
+        tools:ignore="DeprecatedWidgetInXml,InvalidColorAttribute"
+        tools:lottie_progress="0.99"
+        tools:targetApi="28" />
+
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/backgroundAnimation"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:importantForAccessibility="no"
+        android:scaleType="centerCrop"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/backgroundGuideline"
+        app:lottie_loop="false"
+        app:lottie_rawRes="@raw/onboarding_launch_screen_background"
+        tools:lottie_progress="1" />
+
+    <include
+        android:id="@+id/daxDialogCta"
+        layout="@layout/pre_onboarding_dax_dialog_cta"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="32dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_percent="0.85"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintWidth_max="600dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
