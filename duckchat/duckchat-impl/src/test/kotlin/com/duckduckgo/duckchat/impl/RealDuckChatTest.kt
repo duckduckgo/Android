@@ -267,6 +267,42 @@ class RealDuckChatTest {
     }
 
     @Test
+    fun whenSetChatSuggestionsUserSettingThenRepositorySetCalled() = runTest {
+        testee.setChatSuggestionsUserSetting(true)
+        verify(mockDuckChatFeatureRepository).setChatSuggestionsUserSetting(true)
+    }
+
+    @Test
+    fun whenSetChatSuggestionsUserSettingFalseThenRepositorySetCalled() = runTest {
+        testee.setChatSuggestionsUserSetting(false)
+        verify(mockDuckChatFeatureRepository).setChatSuggestionsUserSetting(false)
+    }
+
+    @Test
+    fun whenObserveChatSuggestionsUserSettingEnabledThenEmitCorrectValues() = runTest {
+        whenever(mockDuckChatFeatureRepository.observeChatSuggestionsUserSettingEnabled()).thenReturn(flowOf(true, false))
+
+        val results = testee.observeChatSuggestionsUserSettingEnabled().take(2).toList()
+
+        assertTrue(results[0])
+        assertFalse(results[1])
+    }
+
+    @Test
+    fun whenAiChatSuggestionsFeatureEnabledThenIsChatSuggestionsFeatureAvailableReturnsTrue() {
+        duckChatFeature.aiChatSuggestions().setRawStoredState(State(enable = true))
+
+        assertTrue(testee.isChatSuggestionsFeatureAvailable())
+    }
+
+    @Test
+    fun whenAiChatSuggestionsFeatureDisabledThenIsChatSuggestionsFeatureAvailableReturnsFalse() {
+        duckChatFeature.aiChatSuggestions().setRawStoredState(State(enable = false))
+
+        assertFalse(testee.isChatSuggestionsFeatureAvailable())
+    }
+
+    @Test
     fun whenFeatureEnabledThenShowPopupMenuShortcutReturnsValueFromRepository() {
         assertTrue(testee.showPopupMenuShortcut.value)
     }

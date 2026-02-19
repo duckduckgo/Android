@@ -458,6 +458,23 @@ internal class GeneralSettingsViewModelTest {
     }
 
     @Test
+    fun whenChatSuggestionsUserSettingDisabledThenToggleIsOff() = runTest {
+        whenever(mockDuckChat.isEnabled()).thenReturn(true)
+        whenever(mockDuckChat.isChatSuggestionsFeatureAvailable()).thenReturn(true)
+        whenever(mockDuckChat.observeInputScreenUserSettingEnabled()).thenReturn(flowOf(true))
+        whenever(mockDuckChat.observeChatSuggestionsUserSettingEnabled()).thenReturn(flowOf(false))
+
+        initTestee()
+
+        testee.viewState.test {
+            val state = awaitItem()
+            assertTrue(state!!.showChatSuggestionsToggle)
+            assertFalse(state.chatSuggestionsEnabled)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
     fun whenChatSuggestionsSwitchedOnThenPixelFired() = runTest {
         initTestee()
 
