@@ -3,11 +3,6 @@ name: Test - Workflow for Testing
 on:
   workflow_dispatch:
 
-    inputs:
-      ref:
-        description: 'This is an example of an input'
-        required: true
-
 env:
   ASANA_PAT: ${{ secrets.ASANA_ACCESS_TOKEN }}
   GH_TOKEN: ${{ secrets.GT_DAXMOBILE }}
@@ -23,7 +18,6 @@ jobs:
         with:
           submodules: recursive
           token: ${{ secrets.GT_DAXMOBILE }}
-          ref: ${{ github.event.inputs.ref }}
 
       - id: test-username-action
         uses: duckduckgo/native-github-asana-sync@v1.3
