@@ -134,9 +134,7 @@ class RealEventHubPixelManager @Inject constructor(
     private fun fireTelemetry(pixelConfig: TelemetryPixelConfig, state: WebTelemetryPixelStateEntity) {
         val pixelData = buildPixel(pixelConfig, state)
 
-        // If the only parameter is "period" (no meaningful data), skip firing
-        val dataParams = pixelData.filterKeys { it != PARAM_PERIOD }
-        if (dataParams.isEmpty()) {
+        if (pixelData.isEmpty()) {
             startNewPeriod(pixelConfig)
             return
         }
@@ -171,11 +169,6 @@ class RealEventHubPixelManager @Inject constructor(
             }
         }
 
-        pixelData[PARAM_PERIOD] = toStartOfInterval(
-            state.periodStartMillis,
-            pixelConfig.trigger.period.periodSeconds,
-        ).toString()
-
         return pixelData
     }
 
@@ -184,17 +177,6 @@ class RealEventHubPixelManager @Inject constructor(
     }
 
     companion object {
-        const val PARAM_PERIOD = "period"
-
-        /**
-         * Normalise a timestamp to the start of its interval.
-         * E.g., for a 1-day period, 2026-01-26T17:00 → 2026-01-26T00:00 (epoch seconds).
-         */
-        fun toStartOfInterval(timestampMillis: Long, periodSeconds: Long): Long {
-            val epochSeconds = timestampMillis / 1000
-            return (epochSeconds / periodSeconds) * periodSeconds
-        }
-
         fun parseParamsJson(json: String): MutableMap<String, Int> {
             return try {
                 val obj = JSONObject(json)

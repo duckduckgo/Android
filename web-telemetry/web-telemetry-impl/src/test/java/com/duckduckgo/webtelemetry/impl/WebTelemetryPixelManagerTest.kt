@@ -139,10 +139,9 @@ class EventHubPixelManagerTest {
 
         manager.checkPixels()
 
-        val expectedPeriod = RealEventHubPixelManager.toStartOfInterval(periodStart, 86400L).toString()
         verify(pixel).enqueueFire(
             pixelName = eq("webTelemetry.adwalls.day"),
-            parameters = eq(mapOf("adwallCount" to "11-20", "trackerCount" to "1-5", "period" to expectedPeriod)),
+            parameters = eq(mapOf("adwallCount" to "11-20", "trackerCount" to "1-5")),
             encodedParameters = eq(emptyMap()),
             type = eq(Count),
         )
@@ -166,7 +165,7 @@ class EventHubPixelManagerTest {
     }
 
     @Test
-    fun `checkPixels skips firing when all counter params are zero (only period param)`() {
+    fun `checkPixels skips firing when all counter params are zero`() {
         val periodStart = 1000L
         timeProvider.time = periodStart + TimeUnit.DAYS.toMillis(1) + 1
 
@@ -305,26 +304,6 @@ class EventHubPixelManagerTest {
 
         // Should NOT call savePixelState for existing pixel (preserves counters)
         verify(repository, never()).savePixelState(any())
-    }
-
-    // --- toStartOfInterval ---
-
-    @Test
-    fun `toStartOfInterval normalises to start of day`() {
-        // 2026-01-26T17:00:00Z = 1769526000
-        val ts = 1769526000L * 1000
-        val result = RealEventHubPixelManager.toStartOfInterval(ts, 86400L)
-        // 2026-01-26T00:00:00Z = 1769472000
-        assertEquals(1769472000L, result)
-    }
-
-    @Test
-    fun `toStartOfInterval normalises to start of hour`() {
-        // 2025-06-01T00:57:18Z = 1748739438
-        val ts = 1748739438L * 1000
-        val result = RealEventHubPixelManager.toStartOfInterval(ts, 3600L)
-        // 2025-06-01T00:00:00Z = 1748736000
-        assertEquals(1748736000L, result)
     }
 
     // --- helpers ---
