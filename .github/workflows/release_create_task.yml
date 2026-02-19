@@ -29,14 +29,6 @@ jobs:
     runs-on: macos-latest
 
     steps:
-      - name: Check app-version value
-        run: |
-          if [ "${{ inputs.app-version }}" == "PLACEHOLDER" ]; then
-            echo "Input value cannot be 'PLACEHOLDER'."
-            exit 1
-          else
-            echo "Input value is valid: ${{ inputs.app-version }}"
-          fi
       - name: Checkout repository
         uses: actions/checkout@v4
         with:

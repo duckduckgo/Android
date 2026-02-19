@@ -24,3 +24,13 @@ jobs:
           submodules: recursive
           token: ${{ secrets.GT_DAXMOBILE }}
           ref: ${{ github.event.inputs.ref }}
+
+      - id: test-username-action
+        uses: duckduckgo/native-github-asana-sync@v1.3
+        with:
+          action: 'get-asana-user-id'
+          github-username: ${{ github.actor }}
+          github-pat:  ${{ secrets.GT_DAXMOBILE }}
+
+      - name: Print result
+        run: echo "Asana ID ${{ steps.test-username-action.outputs.asanaUserId }}"
