@@ -1255,10 +1255,6 @@ class BrowserTabViewModel @Inject constructor(
                     withContext(dispatchers.io()) {
                         queryUrlConverter.convertQueryToUrl(trimmedInput, verticalParameter, queryOrigin)
                     }
-                if (currentGlobalLayoutState() is Invalidated) {
-                    recoverTabWithQuery(query)
-                    return@launch
-                }
 
                 when (val type = specialUrlDetector.determineType(trimmedInput)) {
                     is ShouldLaunchDuckChatLink -> {
