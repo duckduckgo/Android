@@ -112,6 +112,7 @@ class InputScreenViewModelTest {
             )
             whenever(duckChat.wasOpenedBefore()).thenReturn(false)
             whenever(duckChat.getDuckChatUrl(any(), any(), any())).thenReturn(duckChatURL)
+            whenever(duckChat.observeChatSuggestionsUserSettingEnabled()).thenReturn(flowOf(true))
             whenever(inputScreenConfigResolver.useTopBar()).thenReturn(true)
             whenever(voiceSearchAvailability.isVoiceSearchAvailable).thenReturn(true)
             whenever(omnibarRepository.omnibarType).thenReturn(OmnibarType.SINGLE_TOP)
@@ -2309,6 +2310,59 @@ class InputScreenViewModelTest {
             advanceUntilIdle()
 
             verify(chatSuggestionsReader, never()).fetchSuggestions(any())
+        }
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun `when onChatSelected and user setting disabled then suggestions are not fetched`() =
+        runTest {
+            whenever(duckChat.observeChatSuggestionsUserSettingEnabled()).thenReturn(flowOf(false))
+            duckChatFeature.aiChatSuggestions().setRawStoredState(State(enable = true))
+
+            val viewModel = createViewModel()
+            viewModel.onChatSelected()
+            advanceUntilIdle()
+
+            verify(chatSuggestionsReader, never()).fetchSuggestions(any())
+        }
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun `when chat input text changes and user setting disabled then suggestions are not fetched`() =
+        runTest {
+            whenever(duckChat.observeChatSuggestionsUserSettingEnabled()).thenReturn(flowOf(false))
+            duckChatFeature.aiChatSuggestions().setRawStoredState(State(enable = true))
+
+            val viewModel = createViewModel()
+            viewModel.onChatSelected()
+            viewModel.onChatInputTextChanged("hello")
+            advanceTimeBy(200)
+            advanceUntilIdle()
+
+            verify(chatSuggestionsReader, never()).fetchSuggestions(any())
+        }
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun `when user setting toggled off then existing suggestions are cleared`() =
+        runTest {
+            val suggestionsFlow = MutableStateFlow(true)
+            whenever(duckChat.observeChatSuggestionsUserSettingEnabled()).thenReturn(suggestionsFlow)
+            val suggestions = listOf(
+                ChatSuggestion(chatId = "1", title = "Test Chat", lastEdit = LocalDateTime.now(), pinned = false),
+            )
+            whenever(chatSuggestionsReader.fetchSuggestions(any())).thenReturn(suggestions)
+            duckChatFeature.aiChatSuggestions().setRawStoredState(State(enable = true))
+
+            val viewModel = createViewModel()
+            viewModel.onChatSelected()
+            advanceUntilIdle()
+            assertEquals(suggestions, viewModel.chatSuggestions.value)
+
+            suggestionsFlow.value = false
+            advanceUntilIdle()
+
+            assertTrue(viewModel.chatSuggestions.value.isEmpty())
         }
 
     @SuppressLint("DenyListedApi")

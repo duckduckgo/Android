@@ -42,6 +42,7 @@ class FakeDuckChatInternal(
     private val inputScreenUserSettingEnabled = MutableStateFlow(false)
     private val cosmeticInputScreenUserSettingEnabled = MutableStateFlow<Boolean?>(null)
     private val automaticContextAttachmentUserSettingEnabled = MutableStateFlow<Boolean>(false)
+    private val chatSuggestionsUserSettingEnabled = MutableStateFlow(true)
     private val standaloneMigrationCompleted = MutableStateFlow<Boolean>(false)
     var contextualOnboardingCompleted: Boolean = false
 
@@ -156,6 +157,14 @@ class FakeDuckChatInternal(
     override val inputScreenBottomBarEnabled: StateFlow<Boolean> = _inputScreenBottomBarEnabled
 
     override val showMainButtonsInInputScreen: StateFlow<Boolean> = _showMainButtonsInInputScreen
+
+    override suspend fun setChatSuggestionsUserSetting(enabled: Boolean) {
+        chatSuggestionsUserSettingEnabled.value = enabled
+    }
+
+    override fun isChatSuggestionsFeatureAvailable(): Boolean = true
+
+    override fun observeChatSuggestionsUserSettingEnabled(): Flow<Boolean> = chatSuggestionsUserSettingEnabled
 
     fun setDuckChatUserEnabled(enabled: Boolean) {
         enableDuckChatUserSetting.value = enabled

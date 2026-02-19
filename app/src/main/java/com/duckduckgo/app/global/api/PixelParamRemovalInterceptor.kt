@@ -180,6 +180,8 @@ object PixelInterceptorPixelsRequiringDataCleaning : PixelParamRemovalPlugin {
             DataStorePixelNames.DATA_STORE_MIGRATE_UNENCRYPTED_QUERY_ALL_PREFERENCES_ORIGIN_FAILED.pixelName to PixelParameter.removeAtb(),
             DataStorePixelNames.DATA_STORE_MIGRATE_ENCRYPTED_UPDATE_PREFERENCES_DESTINATION_FAILED.pixelName to PixelParameter.removeAtb(),
             DataStorePixelNames.DATA_STORE_MIGRATE_UNENCRYPTED_UPDATE_PREFERENCES_DESTINATION_FAILED.pixelName to PixelParameter.removeAtb(),
+            AppPixelName.CHAT_SUGGESTIONS_GENERAL_SETTINGS_TOGGLED_ON.pixelName to PixelParameter.removeAtb(),
+            AppPixelName.CHAT_SUGGESTIONS_GENERAL_SETTINGS_TOGGLED_OFF.pixelName to PixelParameter.removeAtb(),
         )
     }
 }

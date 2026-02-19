@@ -245,6 +245,9 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     AUTOCOMPLETE_RESULT_DELETED("m_autocomplete_result_deleted"),
     AUTOCOMPLETE_RESULT_DELETED_DAILY("m_autocomplete_result_deleted_daily"),
 
+    CHAT_SUGGESTIONS_GENERAL_SETTINGS_TOGGLED_ON("m_aichat_settings_chat_suggestions_turned_on"),
+    CHAT_SUGGESTIONS_GENERAL_SETTINGS_TOGGLED_OFF("m_aichat_settings_chat_suggestions_turned_off"),
+
     SERP_REQUERY("rq_%s"),
 
     CHANGE_APP_ICON_OPENED("m_ic"),

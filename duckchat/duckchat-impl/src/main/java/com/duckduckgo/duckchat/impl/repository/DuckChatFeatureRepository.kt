@@ -55,6 +55,8 @@ interface DuckChatFeatureRepository {
 
     fun observeShowInVoiceSearch(): Flow<Boolean>
 
+    fun observeChatSuggestionsUserSettingEnabled(): Flow<Boolean>
+
     suspend fun isDuckChatUserEnabled(): Boolean
 
     suspend fun isInputScreenUserSettingEnabled(): Boolean
@@ -88,6 +90,8 @@ interface DuckChatFeatureRepository {
     suspend fun setContextualOnboardingCompleted(completed: Boolean)
 
     suspend fun isContextualOnboardingCompleted(): Boolean
+
+    suspend fun setChatSuggestionsUserSetting(enabled: Boolean)
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -139,6 +143,9 @@ class RealDuckChatFeatureRepository @Inject constructor(
 
     override fun observeShowInVoiceSearch(): Flow<Boolean> = duckChatDataStore.observeShowInVoiceSearch()
 
+    override fun observeChatSuggestionsUserSettingEnabled(): Flow<Boolean> =
+        duckChatDataStore.observeChatSuggestionsUserSettingEnabled()
+
     override suspend fun isDuckChatUserEnabled(): Boolean = duckChatDataStore.isDuckChatUserEnabled()
 
     override suspend fun isInputScreenUserSettingEnabled(): Boolean = duckChatDataStore.isInputScreenUserSettingEnabled()
@@ -183,6 +190,10 @@ class RealDuckChatFeatureRepository @Inject constructor(
     }
 
     override suspend fun isContextualOnboardingCompleted(): Boolean = duckChatDataStore.isContextualOnboardingCompleted()
+
+    override suspend fun setChatSuggestionsUserSetting(enabled: Boolean) {
+        duckChatDataStore.setChatSuggestionsUserSetting(enabled)
+    }
 
     private fun updateWidgets() {
         val intent = Intent(AppWidgetManager.ACTION_APPWIDGET_UPDATE)

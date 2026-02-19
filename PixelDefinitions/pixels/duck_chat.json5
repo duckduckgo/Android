@@ -301,5 +301,19 @@
         "triggers": ["other"],
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"]
+    },
+    "m_aichat_settings_chat_suggestions_turned_on": {
+        "description": "User enabled the Chat Suggestions toggle in General Settings",
+        "owners": ["YoussefKeyrouz"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_settings_chat_suggestions_turned_off": {
+        "description": "User disabled the Chat Suggestions toggle in General Settings",
+        "owners": ["YoussefKeyrouz"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
     }
 }

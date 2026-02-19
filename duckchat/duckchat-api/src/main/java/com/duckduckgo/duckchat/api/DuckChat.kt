@@ -112,4 +112,20 @@ interface DuckChat {
     suspend fun isContextualOnboardingCompleted(): Boolean
 
     suspend fun isStandaloneMigrationCompleted(): Boolean
+
+    /**
+     * Set user preference for whether chat suggestions are shown in the input screen.
+     */
+    suspend fun setChatSuggestionsUserSetting(enabled: Boolean)
+
+    /**
+     * Observes whether the user has enabled chat suggestions.
+     */
+    fun observeChatSuggestionsUserSettingEnabled(): Flow<Boolean>
+
+    /**
+     * Returns whether the chat suggestions feature is available (feature flag is enabled).
+     * Does not consider user preference — use for visibility checks.
+     */
+    fun isChatSuggestionsFeatureAvailable(): Boolean
 }

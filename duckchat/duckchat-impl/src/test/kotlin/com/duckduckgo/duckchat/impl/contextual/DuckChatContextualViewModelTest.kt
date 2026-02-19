@@ -31,6 +31,7 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
@@ -1054,6 +1055,9 @@ class DuckChatContextualViewModelTest {
 
         override suspend fun isContextualOnboardingCompleted(): Boolean = true
         override suspend fun isStandaloneMigrationCompleted(): Boolean = true
+        override suspend fun setChatSuggestionsUserSetting(enabled: Boolean) = Unit
+        override fun isChatSuggestionsFeatureAvailable(): Boolean = true
+        override fun observeChatSuggestionsUserSettingEnabled(): Flow<Boolean> = flowOf(true)
     }
 
     private class FakeDuckChatContextualDataStore : DuckChatContextualDataStore {

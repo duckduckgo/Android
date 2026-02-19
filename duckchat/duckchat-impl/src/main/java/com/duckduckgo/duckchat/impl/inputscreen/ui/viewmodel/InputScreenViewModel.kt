@@ -147,6 +147,7 @@ class InputScreenViewModel @AssistedInject constructor(
     private var hasUserSeenHistoryIAM = false
     private var isTapTransition = false
     private var chatSuggestionsFetchJob: Job? = null
+    private val chatSuggestionsUserEnabled = MutableStateFlow(true)
 
     private val newTabPageHasContent = MutableStateFlow(false)
     private val voiceServiceAvailable = MutableStateFlow(voiceSearchAvailability.isVoiceSearchAvailable)
@@ -307,12 +308,22 @@ class InputScreenViewModel @AssistedInject constructor(
         }.launchIn(viewModelScope)
 
         if (duckChatFeature.aiChatSuggestions().isEnabled()) {
+            duckChat.observeChatSuggestionsUserSettingEnabled()
+                .onEach { enabled ->
+                    chatSuggestionsUserEnabled.value = enabled
+                    if (!enabled) {
+                        chatSuggestionsFetchJob?.cancel()
+                        _chatSuggestions.value = emptyList()
+                    }
+                }
+                .launchIn(viewModelScope)
+
             @OptIn(FlowPreview::class)
             chatInputTextState
                 .drop(1)
                 .debounce(CHAT_SUGGESTIONS_DEBOUNCE_MS)
                 .onEach { query ->
-                    if (!_visibilityState.value.searchMode) {
+                    if (!_visibilityState.value.searchMode && chatSuggestionsUserEnabled.value) {
                         fetchChatSuggestionsWithQuery(query)
                     }
                 }
@@ -522,6 +533,7 @@ class InputScreenViewModel @AssistedInject constructor(
         // Fetch if the query hasn't changed since the last fetch. The observer
         // on chatInputTextState will handle the case where the query changed.
         if (duckChatFeature.aiChatSuggestions().isEnabled() &&
+            chatSuggestionsUserEnabled.value &&
             chatInputTextState.value == searchInputTextState.value
         ) {
             fetchChatSuggestionsWithQuery(chatInputTextState.value)
