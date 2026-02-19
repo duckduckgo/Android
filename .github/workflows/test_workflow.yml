@@ -18,6 +18,7 @@ jobs:
         with:
           submodules: recursive
           token: ${{ secrets.GT_DAXMOBILE }}
+          ref: ${{ github.ref }}
 
       - id: test-username-action
         uses: duckduckgo/native-github-asana-sync@v2.3
