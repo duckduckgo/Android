@@ -356,7 +356,7 @@ class TabSwitcherAdapter(
         tab: TabEntity,
         glide: RequestManager,
         view: ImageView,
-        holder: TabSwitcherViewHolder
+        holder: TabSwitcherViewHolder,
     ) {
         if (tab.isAboutBlank) {
             glide.clear(view)
@@ -380,7 +380,7 @@ class TabSwitcherAdapter(
         tab: TabEntity,
         glide: RequestManager,
         tabPreview: ImageView,
-        holder: TabSwitcherViewHolder
+        holder: TabSwitcherViewHolder,
     ) {
         fun fitAndClipBottom() = object : Transformation<Bitmap> {
             override fun transform(
