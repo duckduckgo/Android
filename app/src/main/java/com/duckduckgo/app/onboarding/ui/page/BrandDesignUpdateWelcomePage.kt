@@ -163,6 +163,44 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         }
     }
 
+    private fun buildOutroAnimatorSet(): AnimatorSet {
+        val fadeEasing = PathInterpolator(0.33f, 0.00f, 0.67f, 1.00f)
+        val bgSlideEasing = PathInterpolator(0.10f, 0.85f, 0.64f, 0.99f)
+
+        val logoFade = ObjectAnimator.ofFloat(binding.logoAnimation, View.ALPHA, 1f, 0f).apply {
+            duration = OUTRO_FADE_DURATION
+            interpolator = fadeEasing
+        }
+
+        val textFade = ObjectAnimator.ofFloat(binding.welcomeTitle, View.ALPHA, 1f, 0f).apply {
+            duration = OUTRO_FADE_DURATION
+            interpolator = fadeEasing
+        }
+
+        val screenWidth = binding.root.width.toFloat()
+
+        val bgFade = ObjectAnimator.ofFloat(binding.backgroundAnimation, View.ALPHA, 1f, 0f).apply {
+            startDelay = OUTRO_BG_DELAY
+            duration = OUTRO_BG_OPACITY_DURATION
+            interpolator = fadeEasing
+        }
+
+        val bgTranslateX = ObjectAnimator.ofFloat(
+            binding.backgroundAnimation,
+            View.TRANSLATION_X,
+            0f,
+            -(screenWidth * OUTRO_BG_SLIDE_PERCENT),
+        ).apply {
+            startDelay = OUTRO_BG_DELAY
+            duration = OUTRO_BG_TRANSLATE_DURATION
+            interpolator = bgSlideEasing
+        }
+
+        return AnimatorSet().apply {
+            playTogether(logoFade, textFade, bgFade, bgTranslateX)
+        }
+    }
+
     private fun buildBackgroundIntroAnimatorSet(): AnimatorSet {
         val slideDistance = resources.displayMetrics.heightPixels * BACKGROUND_SLIDE_UP_SCREEN_PERCENT
         val easing = PathInterpolator(0.33f, 0.00f, 0.67f, 1.00f)
@@ -247,6 +285,16 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         }
     }
 
+    // TODO play outro and open welcome dialog
+    private fun playOutroAnimation() {
+        outroAnimatorSet = buildOutroAnimatorSet().apply {
+            doOnEnd {
+                viewModel.loadDaxDialog()
+            }
+            start()
+        }
+    }
+
     override fun onViewCreated(
         view: View,
         savedInstanceState: Bundle?,
@@ -290,6 +338,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         super.onDestroyView()
 
         introAnimatorSet?.cancel()
+        outroAnimatorSet?.cancel()
         backgroundIntroAnimatorSet?.cancel()
 
         binding.logoAnimation.apply {
@@ -442,6 +491,12 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         private const val BACKGROUND_SLIDE_UP_DURATION = 500L
         private const val BACKGROUND_SLIDE_UP_SCREEN_PERCENT = 0.15f
         private const val BACKGROUND_INTRO_SCALE = 2.5f
+
+        private const val OUTRO_FADE_DURATION = 300L
+        private const val OUTRO_BG_DELAY = 300L
+        private const val OUTRO_BG_OPACITY_DURATION = 400L
+        private const val OUTRO_BG_TRANSLATE_DURATION = 700L
+        private const val OUTRO_BG_SLIDE_PERCENT = 0.25f
 
         private const val DEFAULT_BROWSER_ROLE_MANAGER_DIALOG = 101
     }
