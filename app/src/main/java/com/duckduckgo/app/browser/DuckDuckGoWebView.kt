@@ -440,29 +440,12 @@ class DuckDuckGoWebView :
     }
 
     private fun enableSwipeRefresh(enable: Boolean) {
-        enableSwipeRefreshCallback?.invoke(enable && contentAllowsSwipeToRefresh && !browserUiLocked)
+        enableSwipeRefreshCallback?.invoke(enable && contentAllowsSwipeToRefresh)
     }
 
     private fun setContentAllowsSwipeToRefresh(allowed: Boolean) {
         contentAllowsSwipeToRefresh = allowed
         if (!allowed) {
-            enableSwipeRefresh(false)
-        }
-    }
-
-    /**
-     * Browser UI lock state - when true, disables swipe-to-refresh regardless of content settings.
-     * Used by the browserUiLock C-S-S feature to allow pages to manage their own touch interactions.
-     */
-    private var browserUiLocked: Boolean = false
-
-    /**
-     * Set the browser UI lock state. When locked, swipe-to-refresh is disabled.
-     * Call with `true` when the page indicates it wants to manage touch interactions.
-     */
-    fun setBrowserUiLocked(locked: Boolean) {
-        browserUiLocked = locked
-        if (locked) {
             enableSwipeRefresh(false)
         }
     }

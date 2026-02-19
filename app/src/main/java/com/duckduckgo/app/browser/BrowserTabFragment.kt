@@ -1006,14 +1006,12 @@ class BrowserTabFragment :
 
     /**
      * Observe browser UI lock state changes and apply to UI components.
-     * When locked, disables pull-to-refresh, omnibar scrolling, and tab swiping.
+     * When locked, disables omnibar scrolling and tab swiping.
+     * Pull-to-refresh remains enabled as it doesn't interfere with page interactions.
      */
     private fun observeBrowserUiLockState() {
         viewModel.browserUiLockState.onEach { state ->
             val isLocked = state.locked
-
-            // Disable/enable pull-to-refresh via WebView
-            webView?.setBrowserUiLocked(isLocked)
 
             // Disable/enable omnibar scrolling
             omnibar.isScrollingEnabled = !isLocked
