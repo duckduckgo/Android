@@ -131,6 +131,7 @@ import com.duckduckgo.app.browser.commands.Command.ResetHistory
 import com.duckduckgo.app.browser.commands.Command.SaveCredentials
 import com.duckduckgo.app.browser.commands.Command.ScreenLock
 import com.duckduckgo.app.browser.commands.Command.ScreenUnlock
+import com.duckduckgo.app.browser.commands.Command.UiLockChanged
 import com.duckduckgo.app.browser.commands.Command.SendEmail
 import com.duckduckgo.app.browser.commands.Command.SendResponseToJs
 import com.duckduckgo.app.browser.commands.Command.SendSms
@@ -4061,6 +4062,15 @@ class BrowserTabViewModel @Inject constructor(
                 }
             }
 
+            "browserUiLock" -> {
+                when (method) {
+                    "uiLockChanged" -> {
+                        val locked = data?.optBoolean("locked", false) ?: false
+                        uiLockChanged(locked)
+                    }
+                }
+            }
+
             "breakageReporting" ->
                 if (data != null) {
                     when (method) {
@@ -4117,6 +4127,11 @@ class BrowserTabViewModel @Inject constructor(
                 }
 
             "screenUnlock" -> screenUnlock()
+
+            "uiLockChanged" -> {
+                val locked = data?.optBoolean("locked", false) ?: false
+                uiLockChanged(locked)
+            }
 
             "breakageReportResult" ->
                 if (data != null) {
@@ -4309,6 +4324,13 @@ class BrowserTabViewModel @Inject constructor(
                     command.value = ScreenUnlock
                 }
             }
+        }
+    }
+
+    private fun uiLockChanged(locked: Boolean) {
+        logcat { "uiLockChanged called from JS handler: locked=$locked" }
+        viewModelScope.launch(dispatchers.main()) {
+            command.value = UiLockChanged(locked)
         }
     }
 
