@@ -64,6 +64,7 @@ jobs:
           asana_token: ${{ secrets.ASANA_ACCESS_TOKEN }}
           project_gid: ${{ vars.GH_ANDROID_RELEASE_BOARD_PROJECT_ID }}
           username: ${{ github.actor }}
+          github_token: ${{ secrets.GT_DAXMOBILE }}
 
       - name: Read Task ID from file and set as output
         id: read_task_output_step

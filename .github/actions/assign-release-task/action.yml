@@ -13,6 +13,9 @@ inputs:
   username:
     description: 'The Github username to search for'
     required: true
+  github_token:
+    description: 'GitHub token for private mapping repo access'
+    required: true
 outputs:
   task_id:
     description: 'The Asana task ID that was found and assigned'
@@ -26,6 +29,7 @@ runs:
         INPUT_ASANA_TOKEN: ${{ inputs.asana_token }}
         INPUT_PROJECT_GID: ${{ inputs.project_gid }}
         INPUT_USERNAME: ${{ inputs.username }}
+        INPUT_GITHUB_TOKEN: ${{ inputs.github_token }}
         OUTPUT_FILE_PATH: "${{ github.workspace }}/asana_task_id.txt" # Define the output file path
       run: |
         set -e # Exit immediately if a command exits with a non-zero status.
@@ -52,20 +56,16 @@ runs:
         fi
 
         # --- Get Asana User ID ---
-        # Assuming github_asana_mapping.yml is at .github/actions/assign-release-task/github_asana_mapping.yml
-        # relative to the REPO ROOT, not the action directory itself during runtime.
-        # For composite actions, paths in scripts are relative to github.workspace.
-        # If the mapping file is part of the action's folder, the path might need to be:
-        # ${{ github.action_path }}/github_asana_mapping.yml
-        # However, it's often better if such mapping files are at a known repo location.
-        # Let's assume it's checked into the root for simplicity here, or adjust as needed.
-        MAPPING_FILE="${{ github.workspace }}/.github/actions/assign-release-task/github_asana_mapping.yml" # Or adjust path
-        
+        MAPPING_FILE="${RUNNER_TEMP:-/tmp}/github_asana_mapping.yml"
+        RAW_URL="https://raw.githubusercontent.com/duckduckgo/internal-github-asana-utils/main/user_map.yml"
+        echo "Downloading mapping file from: $RAW_URL"
+        curl -sSfL -H "Authorization: token ${INPUT_GITHUB_TOKEN}" "$RAW_URL" -o "$MAPPING_FILE"
+
         echo "Looking up Asana User ID for GitHub user: '$INPUT_USERNAME' in file: '$MAPPING_FILE'"
         if [ ! -f "$MAPPING_FILE" ]; then
-            echo "::error::Mapping file not found at $MAPPING_FILE"
-            echo "USER_MAPPING_FILE_NOT_FOUND" > "$OUTPUT_FILE_PATH" # Overwrite with error state
-            exit 1
+          echo "::error::Mapping file not found at $MAPPING_FILE"
+          echo "USER_MAPPING_FILE_NOT_FOUND" > "$OUTPUT_FILE_PATH" # Overwrite with error state
+          exit 1
         fi
       
 #        asana_user_id=$(grep -E "^$username: " .github/actions/assign-release-task/github_asana_mapping.yml | awk -F': ' '{print $2}' | tr -d '"')
