@@ -3759,6 +3759,7 @@ class BrowserTabFragment :
     private fun uiLockChanged(locked: Boolean) {
         isUiLocked = locked
         omnibar.isUiLocked = locked
+        webView?.setContentAllowsSwipeToRefresh(!locked)
         updateUiLockDebugButton()
     }
 
