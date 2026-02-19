@@ -23,7 +23,7 @@ import com.duckduckgo.history.impl.store.HistoryDataStore
 import com.duckduckgo.history.impl.store.HistoryEntryEntity
 import com.duckduckgo.history.impl.store.HistoryEntryWithVisits
 import com.duckduckgo.history.impl.store.VisitEntity
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -156,9 +156,9 @@ class RealHistoryRepositoryTest {
             ),
         )
 
-        val result = testee.getHistory().first()
+        val result = testee.getHistory().firstOrNull()
 
-        assertEquals(2, result.size)
+        assertEquals(2, result!!.size)
     }
 
     @Test
@@ -170,9 +170,9 @@ class RealHistoryRepositoryTest {
             ),
         )
 
-        val result = testee.getHistory().first()
+        val result = testee.getHistory().firstOrNull()
 
-        assertEquals(1, result.size)
+        assertEquals(1, result!!.size)
     }
 
     private fun historyEntryWithVisits(
