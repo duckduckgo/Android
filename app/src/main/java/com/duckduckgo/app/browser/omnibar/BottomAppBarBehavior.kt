@@ -128,6 +128,7 @@ class BottomAppBarBehavior<V : View>(
         target: View,
         type: Int,
     ) {
+        if (!omnibar.isOmnibarScrollingEnabled()) return
         if (lastStartedType == ViewCompat.TYPE_TOUCH || type == ViewCompat.TYPE_NON_TOUCH) {
             val dY = child.translationY
             val threshold = child.height * 0.5f

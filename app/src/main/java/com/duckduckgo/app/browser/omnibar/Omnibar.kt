@@ -252,6 +252,12 @@ class Omnibar(
             omnibarView.isScrollingEnabled = value
         }
 
+    var isUiLocked: Boolean
+        get() = (omnibarView as? OmnibarLayout)?.isUiLocked ?: false
+        set(value) {
+            (omnibarView as? OmnibarLayout)?.isUiLocked = value
+        }
+
     var viewMode: ViewMode = ViewMode.Browser(null)
         private set
 
