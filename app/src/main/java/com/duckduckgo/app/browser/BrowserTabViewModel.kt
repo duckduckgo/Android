@@ -965,10 +965,10 @@ class BrowserTabViewModel @Inject constructor(
 
     override fun getCurrentTabId(): String = tabId
 
-    override fun onSiteVisited(url: Uri) {
+    override fun onSiteVisited(uri: Uri) {
         viewModelScope.launch(dispatchers.io()) {
             if (androidBrowserConfig.singleTabFireDialog().isEnabled()) {
-                val domain = url.host?.toTldPlusOne() ?: url.host ?: return@launch
+                val domain = uri.host?.toTldPlusOne() ?: uri.host ?: return@launch
                 tabVisitedSitesRepository.recordVisitedSite(tabId, domain)
             }
         }
