@@ -245,9 +245,9 @@
 
     <issue
         id="HardcodedText"
-        message="Hardcoded string &quot;Ghost Destructive Small&quot;, should use `@string` resource"
-        errorLine1="            android:text=&quot;Ghost Destructive Small&quot; />"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        message="Hardcoded string &quot;Destructive Secondary Small&quot;, should use `@string` resource"
+        errorLine1="            android:text=&quot;Destructive Secondary Small&quot; />"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout/component_buttons.xml"
             line="185"
@@ -256,20 +256,20 @@
 
     <issue
         id="HardcodedText"
-        message="Hardcoded string &quot;Ghost Destructive Small&quot;, should use `@string` resource"
-        errorLine1="            android:text=&quot;Ghost Destructive Small&quot; />"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        message="Hardcoded string &quot;Destructive Secondary Small&quot;, should use `@string` resource"
+        errorLine1="            android:text=&quot;Destructive Secondary Small&quot;"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout/component_buttons.xml"
-            line="192"
+            line="191"
             column="13"/>
     </issue>
 
     <issue
         id="HardcodedText"
-        message="Hardcoded string &quot;Ghost Destructive Large&quot;, should use `@string` resource"
-        errorLine1="            android:text=&quot;Ghost Destructive Large&quot;"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        message="Hardcoded string &quot;Destructive Secondary Large&quot;, should use `@string` resource"
+        errorLine1="            android:text=&quot;Destructive Secondary Large&quot;"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout/component_buttons.xml"
             line="198"
@@ -278,12 +278,67 @@
 
     <issue
         id="HardcodedText"
+        message="Hardcoded string &quot;Destructive Secondary Large&quot;, should use `@string` resource"
+        errorLine1="            android:text=&quot;Destructive Secondary Large&quot;"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/component_buttons.xml"
+            line="205"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="Hardcoded string &quot;Destructive Secondary Disabled&quot;, should use `@string` resource"
+        errorLine1="            android:text=&quot;Destructive Secondary Disabled&quot; />"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/component_buttons.xml"
+            line="214"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="Hardcoded string &quot;Ghost Destructive Small&quot;, should use `@string` resource"
+        errorLine1="            android:text=&quot;Ghost Destructive Small&quot; />"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/component_buttons.xml"
+            line="220"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="Hardcoded string &quot;Ghost Destructive Small&quot;, should use `@string` resource"
+        errorLine1="            android:text=&quot;Ghost Destructive Small&quot; />"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/component_buttons.xml"
+            line="227"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
         message="Hardcoded string &quot;Ghost Destructive Large&quot;, should use `@string` resource"
         errorLine1="            android:text=&quot;Ghost Destructive Large&quot;"
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout/component_buttons.xml"
-            line="206"
+            line="233"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="Hardcoded string &quot;Ghost Destructive Large&quot;, should use `@string` resource"
+        errorLine1="            android:text=&quot;Ghost Destructive Large&quot;"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/component_buttons.xml"
+            line="241"
             column="13"/>
     </issue>
 
@@ -294,7 +349,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout/component_buttons.xml"
-            line="214"
+            line="249"
             column="13"/>
     </issue>
 
@@ -305,7 +360,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout/component_buttons.xml"
-            line="220"
+            line="255"
             column="13"/>
     </issue>
 
@@ -316,7 +371,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout/component_buttons.xml"
-            line="227"
+            line="262"
             column="13"/>
     </issue>
 
@@ -327,7 +382,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout/component_buttons.xml"
-            line="233"
+            line="268"
             column="13"/>
     </issue>
 
@@ -338,7 +393,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout/component_buttons.xml"
-            line="241"
+            line="276"
             column="13"/>
     </issue>
 
@@ -349,7 +404,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout/component_buttons.xml"
-            line="249"
+            line="284"
             column="13"/>
     </issue>
 
@@ -362,28 +417,6 @@
             file="src/main/res/layout/component_card.xml"
             line="68"
             column="17"/>
-    </issue>
-
-    <issue
-        id="HardcodedText"
-        message="Hardcoded string &quot;Item with New Custom View YellowPill&quot;, should use `@string` resource"
-        errorLine1="            android:text=&quot;Item with New Custom View YellowPill&quot;"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/component_one_line_item.xml"
-            line="281"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="HardcodedText"
-        message="Hardcoded string &quot;New&quot;, should use `@string` resource"
-        errorLine1="            android:text=&quot;New&quot; />"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/component_one_line_item.xml"
-            line="288"
-            column="13"/>
     </issue>
 
     <issue
@@ -1896,7 +1929,7 @@
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout/component_two_line_item.xml"
-            line="332"
+            line="338"
             column="9"/>
     </issue>
 
@@ -1907,7 +1940,7 @@
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout/component_two_line_item.xml"
-            line="345"
+            line="351"
             column="9"/>
     </issue>
 

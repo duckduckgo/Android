@@ -8,7 +8,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout/activity_serp_easter_egg_logo.xml"
-            line="24"
+            line="23"
             column="5"/>
     </issue>
 

@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2026 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <include
+        android:id="@+id/includeToolbar"
+        layout="@layout/include_default_toolbar" />
+
+    <ImageView
+        android:id="@+id/desktopBrowserIcon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/keyline_6"
+        android:importantForAccessibility="no"
+        android:src="@drawable/image_get_desktop_browser"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/includeToolbar" />
+
+    <com.duckduckgo.common.ui.view.text.DaxTextView
+        android:id="@+id/titleText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/keyline_5"
+        android:layout_marginTop="40dp"
+        android:layout_marginEnd="@dimen/keyline_5"
+        android:gravity="center"
+        android:text="@string/getDesktopBrowserTitle"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/desktopBrowserIcon"
+        app:typography="title" />
+
+    <com.duckduckgo.common.ui.view.text.DaxTextView
+        android:id="@+id/bodyText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/keyline_5"
+        android:layout_marginTop="@dimen/keyline_5"
+        android:layout_marginEnd="@dimen/keyline_5"
+        android:gravity="center"
+        android:paddingStart="@dimen/keyline_6"
+        android:paddingEnd="@dimen/keyline_6"
+        android:text="@string/getDesktopBrowserBody"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/titleText"
+        app:textType="secondary"
+        app:typography="body1" />
+
+    <com.duckduckgo.common.ui.view.text.DaxTextView
+        android:id="@+id/browserUrl"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/keyline_5"
+        android:layout_marginEnd="@dimen/keyline_5"
+        android:gravity="center"
+        android:paddingStart="@dimen/keyline_6"
+        android:paddingEnd="@dimen/keyline_6"
+        android:text="@string/getDesktopBrowserUrl"
+        android:textColor="?daxColorAccentBlue"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/bodyText"
+        app:typography="body1_bold" />
+
+    <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+        android:id="@+id/shareDownloadLinkButton"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/keyline_5"
+        android:layout_marginTop="@dimen/keyline_6"
+        android:layout_marginEnd="@dimen/keyline_5"
+        android:text="@string/getDesktopBrowserShareDownloadLink"
+        app:daxButtonSize="large"
+        app:layout_constraintBottom_toTopOf="@id/noThanksButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <com.duckduckgo.common.ui.view.button.DaxButtonGhost
+        android:id="@+id/noThanksButton"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/keyline_5"
+        android:layout_marginTop="@dimen/keyline_3"
+        android:layout_marginEnd="@dimen/keyline_5"
+        android:layout_marginBottom="@dimen/keyline_5"
+        android:text="@string/getDesktopBrowserNoThanks"
+        android:visibility="gone"
+        app:daxButtonSize="large"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:visibility="visible" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

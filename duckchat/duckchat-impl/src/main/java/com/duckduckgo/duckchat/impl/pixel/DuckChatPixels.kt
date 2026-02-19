@@ -133,6 +133,8 @@ interface DuckChatPixels {
     fun reportContextualSummarizePromptSelected()
     fun reportContextualPlaceholderContextTapped()
     fun reportContextualPlaceholderContextShown()
+
+    fun reportChatSyncActive()
 }
 
 @ContributesBinding(AppScope::class)
@@ -309,6 +311,10 @@ class RealDuckChatPixels @Inject constructor(
             pixel.fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_PAGE_CONTEXT_PLACEHOLDER_SHOWN_DAILY, type = Pixel.PixelType.Daily())
         }
     }
+
+    override fun reportChatSyncActive() {
+        pixel.fire(DuckChatPixelName.SYNC_AI_CHAT_ACTIVE, type = Pixel.PixelType.Daily())
+    }
 }
 
 enum class DuckChatPixelName(override val pixelName: String) : Pixel.PixelName {
@@ -428,6 +434,8 @@ enum class DuckChatPixelName(override val pixelName: String) : Pixel.PixelName {
     DUCK_CHAT_CONTEXTUAL_SETTING_AUTOMATIC_PAGE_CONTENT_DISABLED_COUNT("m_aichat_settings_auto_context_disabled_count"),
     DUCK_CHAT_CONTEXTUAL_SETTING_AUTOMATIC_PAGE_CONTENT_DISABLED_DAILY("m_aichat_settings_auto_context_disabled_daily"),
     DUCK_CHAT_CONTEXTUAL_SETTING_AUTOMATIC_PAGE_CONTENT_DAILY("m_aichat_settings_auto_context"),
+
+    SYNC_AI_CHAT_ACTIVE("sync_ai_chat_active"),
 }
 
 object DuckChatPixelParameters {
@@ -551,6 +559,7 @@ class DuckChatParamRemovalPlugin @Inject constructor() : PixelParamRemovalPlugin
             DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_SETTING_AUTOMATIC_PAGE_CONTENT_DISABLED_COUNT.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_SETTING_AUTOMATIC_PAGE_CONTENT_DISABLED_DAILY.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_SETTING_AUTOMATIC_PAGE_CONTENT_DAILY.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.SYNC_AI_CHAT_ACTIVE.pixelName to PixelParameter.removeAtb(),
         )
     }
 }

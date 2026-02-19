@@ -8,7 +8,7 @@
         errorLine2="                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/remote/messaging/impl/modal/cardslist/CardsListRemoteMessageView.kt"
-            line="237"
+            line="200"
             column="24"/>
     </issue>
 
@@ -40,20 +40,9 @@
         errorLine1="    &lt;ImageView"
         errorLine2="     ~~~~~~~~~">
         <location
-            file="src/main/res/layout/view_cards_list_remote_message.xml"
-            line="49"
+            file="src/main/res/layout/view_remote_message_header.xml"
+            line="43"
             column="6"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="        &lt;ImageView"
-        errorLine2="         ~~~~~~~~~">
-        <location
-            file="src/main/res/layout/view_remote_message_featured_list_item.xml"
-            line="37"
-            column="10"/>
     </issue>
 
 </issues>
