@@ -174,8 +174,8 @@ interface DuckChatFeature {
 
     /**
      * @return `true` when the AI chat suggestions (pinned and recent chats) are enabled
-     * If the remote feature is not present defaults to `false`
+     * If the remote feature is not present defaults to `internal`
      */
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun aiChatSuggestions(): Toggle
 }
