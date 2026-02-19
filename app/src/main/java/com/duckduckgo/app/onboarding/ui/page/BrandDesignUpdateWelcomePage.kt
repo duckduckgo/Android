@@ -17,20 +17,17 @@
 package com.duckduckgo.app.onboarding.ui.page
 
 import android.Manifest
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
-import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.view.View
-import android.animation.AnimatorSet
-import android.animation.ObjectAnimator
 import android.view.animation.PathInterpolator
-import androidx.activity.SystemBarStyle
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.view.ViewPropertyAnimatorCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.flowWithLifecycle
@@ -72,8 +69,12 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         ViewModelProvider(this, viewModelFactory)[BrandDesignUpdatePageViewModel::class.java]
     }
 
-    private var welcomeAnimation: ViewPropertyAnimatorCompat? = null
+    private var introAnimatorSet: AnimatorSet? = null
+    private var outroAnimatorSet: AnimatorSet? = null
+    private var outroRunnable: Runnable? = null
     private var welcomeAnimationFinished = false
+    private var backgroundIntroAnimatorSet: AnimatorSet? = null
+    private var textIntroScale = 1f
 
     private val requestPermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) { permissionGranted ->
         if (permissionGranted) {
@@ -97,11 +98,168 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         }
     }
 
+    private fun buildIntroAnimatorSet(): AnimatorSet {
+        val layout = binding.welcomeTitle.layout
+        val maxLineWidth = (0 until layout.lineCount).maxOf { layout.getLineWidth(it) }
+        textIntroScale = (binding.welcomeTitle.width.toFloat() / maxLineWidth).coerceAtMost(MAX_TEXT_INTRO_SCALE)
+
+        with(binding.logoAnimation) {
+            scaleX = LOGO_INTRO_SCALE
+            scaleY = LOGO_INTRO_SCALE
+        }
+
+        with(binding.welcomeTitle) {
+            scaleX = textIntroScale
+            scaleY = textIntroScale
+        }
+
+        val textFadeInterpolator = PathInterpolator(0.33f, 0.00f, 0.67f, 1.00f)
+        val textSlideInterpolator = PathInterpolator(0.40f, 0.00f, 0.74f, 1.00f)
+        val scaleInterpolator = PathInterpolator(0.33f, 0.00f, 0.67f, 1.00f)
+
+        val alphaAnimator = ObjectAnimator.ofFloat(binding.welcomeTitle, View.ALPHA, 0f, 1f).apply {
+            startDelay = TEXT_INTRO_DELAY
+            duration = TEXT_INTRO_OPACITY_DURATION
+            interpolator = textFadeInterpolator
+        }
+
+        val guidelineAnimator = ObjectAnimator.ofFloat(
+            binding.textGuideline,
+            "guidelinePercent",
+            GUIDELINE_START_PERCENT,
+            GUIDELINE_END_PERCENT,
+        ).apply {
+            startDelay = TEXT_INTRO_DELAY
+            duration = TEXT_INTRO_TRANSLATE_DURATION
+            interpolator = textSlideInterpolator
+        }
+
+        val logoScaleX = ObjectAnimator.ofFloat(binding.logoAnimation, View.SCALE_X, LOGO_INTRO_SCALE, 1f).apply {
+            startDelay = TEXT_INTRO_DELAY
+            duration = LOGO_SCALE_DURATION
+            interpolator = scaleInterpolator
+        }
+
+        val logoScaleY = ObjectAnimator.ofFloat(binding.logoAnimation, View.SCALE_Y, LOGO_INTRO_SCALE, 1f).apply {
+            startDelay = TEXT_INTRO_DELAY
+            duration = LOGO_SCALE_DURATION
+            interpolator = scaleInterpolator
+        }
+
+        val textScaleX = ObjectAnimator.ofFloat(binding.welcomeTitle, View.SCALE_X, textIntroScale, 1f).apply {
+            startDelay = TEXT_INTRO_DELAY + TEXT_INTRO_SCALE_DELAY
+            duration = TEXT_INTRO_TRANSLATE_DURATION
+            interpolator = textSlideInterpolator
+        }
+
+        val textScaleY = ObjectAnimator.ofFloat(binding.welcomeTitle, View.SCALE_Y, textIntroScale, 1f).apply {
+            startDelay = TEXT_INTRO_DELAY + TEXT_INTRO_SCALE_DELAY
+            duration = TEXT_INTRO_TRANSLATE_DURATION
+            interpolator = textSlideInterpolator
+        }
+
+        return AnimatorSet().apply {
+            playTogether(alphaAnimator, guidelineAnimator, logoScaleX, logoScaleY, textScaleX, textScaleY)
+        }
+    }
+
+    private fun buildBackgroundIntroAnimatorSet(): AnimatorSet {
+        val slideDistance = resources.displayMetrics.heightPixels * BACKGROUND_SLIDE_UP_SCREEN_PERCENT
+        val easing = PathInterpolator(0.33f, 0.00f, 0.67f, 1.00f)
+
+        with(binding.backgroundAnimation) {
+            translationY = slideDistance
+            scaleX = BACKGROUND_INTRO_SCALE
+            scaleY = BACKGROUND_INTRO_SCALE
+        }
+
+        val slideUp = ObjectAnimator.ofFloat(binding.backgroundAnimation, View.TRANSLATION_Y, slideDistance, 0f).apply {
+            duration = BACKGROUND_SLIDE_UP_DURATION
+            interpolator = easing
+        }
+        val scaleX = ObjectAnimator.ofFloat(binding.backgroundAnimation, View.SCALE_X, BACKGROUND_INTRO_SCALE, 1f).apply {
+            duration = BACKGROUND_SLIDE_UP_DURATION
+            interpolator = easing
+        }
+        val scaleY = ObjectAnimator.ofFloat(binding.backgroundAnimation, View.SCALE_Y, BACKGROUND_INTRO_SCALE, 1f).apply {
+            duration = BACKGROUND_SLIDE_UP_DURATION
+            interpolator = easing
+        }
+
+        return AnimatorSet().apply {
+            playTogether(slideUp, scaleX, scaleY)
+        }
+    }
+
+    private fun playIntroAnimation() {
+        binding.backgroundAnimation.setMinFrame(BACKGROUND_MIN_FRAME)
+
+        backgroundIntroAnimatorSet = buildBackgroundIntroAnimatorSet()
+
+        binding.logoAnimation.apply {
+            var bgStarted = false
+            addAnimatorUpdateListener {
+                // Start background animation once when logo reaches the "drop" frame
+                if (!bgStarted && frame >= BACKGROUND_TRIGGER_LOGO_FRAME) {
+                    bgStarted = true
+                    binding.backgroundAnimation.playAnimation()
+                    backgroundIntroAnimatorSet?.start()
+                }
+            }
+            addAnimatorListener(object : android.animation.AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: android.animation.Animator) {
+                    viewModel.onIntroAnimationFinished()
+                }
+            })
+            playAnimation()
+        }
+        introAnimatorSet = buildIntroAnimatorSet().apply {
+            start()
+        }
+    }
+
+    private fun snapToIntroEndState() {
+        introAnimatorSet?.cancel()
+        backgroundIntroAnimatorSet?.cancel()
+
+        with(binding.welcomeTitle) {
+            alpha = 1f
+            scaleX = 1f
+            scaleY = 1f
+        }
+        binding.textGuideline.setGuidelinePercent(GUIDELINE_END_PERCENT)
+
+        with(binding.logoAnimation) {
+            alpha = 1f
+            scaleX = 1f
+            scaleY = 1f
+            setMinFrame(BACKGROUND_MIN_FRAME)
+            progress = 1f
+        }
+
+        with(binding.backgroundAnimation) {
+            alpha = 1f
+            translationY = 0f
+            scaleX = 1f
+            scaleY = 1f
+            setMinFrame(BACKGROUND_MIN_FRAME)
+            progress = 1f
+        }
+    }
+
     override fun onViewCreated(
         view: View,
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
+
+        binding.logoAnimation.apply {
+            enableMergePathsForKitKatAndAbove(true)
+            setMaxFrame(60) // If we go past frame 60 the logo disappears
+            repeatCount = 0
+        }
+
+        binding.backgroundAnimation.enableMergePathsForKitKatAndAbove(true)
 
         viewModel.viewState
             .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
@@ -124,12 +282,22 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
             }
             .launchIn(viewLifecycleOwner.lifecycleScope)
 
+        playIntroAnimation()
         requestNotificationsPermissions()
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        welcomeAnimation?.cancel()
+
+        introAnimatorSet?.cancel()
+        backgroundIntroAnimatorSet?.cancel()
+
+        binding.logoAnimation.apply {
+            removeAllAnimatorListeners()
+            removeAllUpdateListeners()
+            cancelAnimation()
+        }
+        binding.backgroundAnimation.cancelAnimation()
     }
 
     override fun onActivityResult(
@@ -160,7 +328,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
 
     private fun configureDaxCta(
         onboardingDialogType: PreOnboardingDialogType,
-        showSplitOption: Boolean = false
+        showSplitOption: Boolean = false,
     ) {
         context?.let {
             // var afterAnimation: () -> Unit = {}
@@ -190,10 +358,6 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 }
             }
         }
-    }
-
-    private fun scheduleWelcomeAnimation(startDelay: Long = ANIMATION_DELAY) {
-        // TODO
     }
 
     private fun showDefaultBrowserDialog(intent: Intent) {
@@ -261,11 +425,23 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
     }
 
     companion object {
-        private const val MIN_ALPHA = 0f
-        private const val MAX_ALPHA = 1f
-        private const val ANIMATION_DURATION = 400L
-        private const val ANIMATION_DELAY = 1400L
-        private const val ANIMATION_DELAY_AFTER_NOTIFICATIONS_PERMISSIONS_HANDLED = 800L
+        private const val GUIDELINE_START_PERCENT = 0.5f
+        private const val GUIDELINE_END_PERCENT = 0.39125f
+
+        private const val TEXT_INTRO_DELAY = 400L
+        private const val TEXT_INTRO_OPACITY_DURATION = 400L
+        private const val TEXT_INTRO_TRANSLATE_DURATION = 600L
+        private const val TEXT_INTRO_SCALE_DELAY = 200L
+        private const val MAX_TEXT_INTRO_SCALE = 1.5f
+
+        private const val LOGO_INTRO_SCALE = 2.5f
+        private const val LOGO_SCALE_DURATION = 600L
+
+        private const val BACKGROUND_MIN_FRAME = 27
+        private const val BACKGROUND_TRIGGER_LOGO_FRAME = 6
+        private const val BACKGROUND_SLIDE_UP_DURATION = 500L
+        private const val BACKGROUND_SLIDE_UP_SCREEN_PERCENT = 0.15f
+        private const val BACKGROUND_INTRO_SCALE = 2.5f
 
         private const val DEFAULT_BROWSER_ROLE_MANAGER_DIALOG = 101
     }
