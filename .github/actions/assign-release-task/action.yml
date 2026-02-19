@@ -22,15 +22,22 @@ outputs:
 runs:
   using: 'composite'
   steps:
-    - name: Find task, assign it, and write ID to file
+    - name: Find Asana User ID
+      id: find-asana-user-id
+      uses: duckduckgo/native-github-asana-sync@v2.3
+      with:
+        action: 'get-asana-user-id'
+        github-username: ${{ github.actor }}
+        github-pat: ${{ inputs.github_token }}
+
+    - name: Find Asana Release task, assign it, and write ID to file
+      id: find-asana-release-task
       shell: bash
       env: # Make inputs available as environment variables for easier access in the script
         INPUT_TASK_NAME: ${{ inputs.task_name }}
         INPUT_ASANA_TOKEN: ${{ inputs.asana_token }}
         INPUT_PROJECT_GID: ${{ inputs.project_gid }}
-        INPUT_USERNAME: ${{ inputs.username }}
-        INPUT_GITHUB_TOKEN: ${{ inputs.github_token }}
-        OUTPUT_FILE_PATH: "${{ github.workspace }}/asana_task_id.txt" # Define the output file path
+        INPUT_ASANA_USER_ID: ${{ steps.find-asana-user-id.outputs.asanaUserId }}
       run: |
         set -e # Exit immediately if a command exits with a non-zero status.
         echo "Searching for task: '$INPUT_TASK_NAME' in project GID: '$INPUT_PROJECT_GID'"
@@ -45,53 +52,27 @@ runs:
 
         if [ -z "$found_task_id" ]; then
           echo "::error::No task with the exact name '$INPUT_TASK_NAME' found in project GID '$INPUT_PROJECT_GID'."
-          # Write an empty string or a specific marker to the file if task not found
-          echo "TASK_NOT_FOUND" > "$OUTPUT_FILE_PATH" 
           exit 1
         else
           echo "Found Task ID: '$found_task_id'"
-          # Write the found task ID to the specified file
-          echo "$found_task_id" > "$OUTPUT_FILE_PATH"
-          echo "Task ID successfully written to $OUTPUT_FILE_PATH"
         fi
 
-        # --- Get Asana User ID ---
-        MAPPING_FILE="${RUNNER_TEMP:-/tmp}/github_asana_mapping.yml"
-        RAW_URL="https://raw.githubusercontent.com/duckduckgo/internal-github-asana-utils/main/user_map.yml"
-        echo "Downloading mapping file from: $RAW_URL"
-        curl -sSfL -H "Authorization: token ${INPUT_GITHUB_TOKEN}" "$RAW_URL" -o "$MAPPING_FILE"
+        echo "Assigning task ID $found_task_id to user ID $INPUT_ASANA_USER_ID"
 
-        echo "Looking up Asana User ID for GitHub user: '$INPUT_USERNAME' in file: '$MAPPING_FILE'"
-        if [ ! -f "$MAPPING_FILE" ]; then
-          echo "::error::Mapping file not found at $MAPPING_FILE"
-          echo "USER_MAPPING_FILE_NOT_FOUND" > "$OUTPUT_FILE_PATH" # Overwrite with error state
+        # Assign the task to the user
+        response=$(curl -s -X PUT "https://app.asana.com/api/1.0/tasks/${found_task_id}" \
+          -H "Authorization: Bearer ${asana_token}" \
+          -H "Content-Type: application/json" \
+          -d "{\"data\": {\"assignee\": \"${INPUT_ASANA_USER_ID}\"}}")
+
+        # Check if the assignment was successful
+        status=$(echo $response | jq -r '.errors')
+
+        if [ "$status" == "null" ]; then
+          echo "Task $task_id successfully assigned to user $asana_user_id."
+          echo "task_id=$found_task_id" >> "$GITHUB_OUTPUT"
+        else
+          echo "Failed to assign task: $status"
           exit 1
         fi
-      
-#        asana_user_id=$(grep -E "^$username: " .github/actions/assign-release-task/github_asana_mapping.yml | awk -F': ' '{print $2}' | tr -d '"')
-#
-#        if [ -z "asana_user_id" ]; then
-#          echo "User $username not found."
-#          exit 1
-#        else
-#          echo "User ID for $username: $asana_user_id"
-#        fi
-#
-#        echo "Assigning task ID $task_id to user ID $asana_user_id"
-#
-#        # Assign the task to the user
-#        response=$(curl -s -X PUT "https://app.asana.com/api/1.0/tasks/${task_id}" \
-#          -H "Authorization: Bearer ${asana_token}" \
-#          -H "Content-Type: application/json" \
-#          -d "{\"data\": {\"assignee\": \"${asana_user_id}\"}}")
-#
-#        # Check if the assignment was successful
-#        status=$(echo $response | jq -r '.errors')
-#
-#        if [ "$status" == "null" ]; then
-#          echo "Task $task_id successfully assigned to user $asana_user_id."
-#        else
-#          echo "Failed to assign task: $status"
-#          exit 1
-#        fi
-#
+
