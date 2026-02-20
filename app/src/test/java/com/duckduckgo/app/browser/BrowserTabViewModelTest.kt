@@ -8442,6 +8442,48 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenVpnMenuClickedWithNotSubscribedStateThenPixelFiredWithPillStatus() {
+        testee.browserViewState.value = browserViewState().copy(
+            vpnMenuState = VpnMenuState.NotSubscribed,
+        )
+
+        testee.onVpnMenuClicked()
+
+        verify(mockPixel).fire(
+            AppPixelName.MENU_ACTION_VPN_PRESSED,
+            mapOf(PixelParameter.STATUS to VpnMenuState.NotSubscribed.pixelParam),
+        )
+    }
+
+    @Test
+    fun whenVpnMenuClickedWithNotSubscribedNoPillStateThenPixelFiredWithNoPillStatus() {
+        testee.browserViewState.value = browserViewState().copy(
+            vpnMenuState = VpnMenuState.NotSubscribedNoPill,
+        )
+
+        testee.onVpnMenuClicked()
+
+        verify(mockPixel).fire(
+            AppPixelName.MENU_ACTION_VPN_PRESSED,
+            mapOf(PixelParameter.STATUS to VpnMenuState.NotSubscribedNoPill.pixelParam),
+        )
+    }
+
+    @Test
+    fun whenVpnMenuClickedWithSubscribedStateThenPixelFiredWithSubscribedStatus() {
+        testee.browserViewState.value = browserViewState().copy(
+            vpnMenuState = VpnMenuState.Subscribed(isVpnEnabled = true),
+        )
+
+        testee.onVpnMenuClicked()
+
+        verify(mockPixel).fire(
+            AppPixelName.MENU_ACTION_VPN_PRESSED,
+            mapOf(PixelParameter.STATUS to VpnMenuState.Subscribed(isVpnEnabled = true).pixelParam),
+        )
+    }
+
+    @Test
     fun whenDuckChatNativeNewChatRequested() = runTest {
         val expectedEvent = SubscriptionEventData(
             featureName = "event1",
