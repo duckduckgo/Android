@@ -24,6 +24,7 @@ import com.duckduckgo.app.statistics.wideevents.WideEventClient
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.browser.api.WebViewVersionProvider
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
@@ -42,7 +43,7 @@ class PageLoadWideEventTest {
     private val webViewVersionProvider: WebViewVersionProvider = mock()
     private val autoconsent: Autoconsent = mock()
     private val optimizeTrackerEvaluationRCWrapper: OptimizeTrackerEvaluationRCWrapper = mock()
-    private val androidBrowserConfigFeature: AndroidBrowserConfigFeature = mock()
+    private val androidBrowserConfigFeature = FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
 
     private lateinit var pageLoadWideEvent: PageLoadWideEvent
 
@@ -52,9 +53,8 @@ class PageLoadWideEventTest {
         whenever(autoconsent.isAutoconsentEnabled()).thenReturn(true)
         whenever(optimizeTrackerEvaluationRCWrapper.enabled).thenReturn(true)
 
-        val mockToggle = mock<Toggle>()
-        whenever(mockToggle.isEnabled()).thenReturn(true)
-        whenever(androidBrowserConfigFeature.sendPageLoadWideEvent()).thenReturn(mockToggle)
+        // Enable feature toggle by default
+        androidBrowserConfigFeature.sendPageLoadWideEvent().setRawStoredState(Toggle.State(true))
 
         // Mock all WideEventClient methods to return successful Results
         whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any())).thenReturn(Result.success(123L))
@@ -239,9 +239,7 @@ class PageLoadWideEventTest {
 
     @Test
     fun `when feature enabled then results in no interactions`() = runTest {
-        val enabledToggle = mock<Toggle>()
-        whenever(enabledToggle.isEnabled()).thenReturn(false)
-        whenever(androidBrowserConfigFeature.sendPageLoadWideEvent()).thenReturn(enabledToggle)
+        androidBrowserConfigFeature.sendPageLoadWideEvent().setRawStoredState(Toggle.State(false))
 
         pageLoadWideEvent.startPageLoad("tab_9", "https://github.com")
         pageLoadWideEvent.recordPageVisible("tab_9", 50)
