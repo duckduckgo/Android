@@ -22,18 +22,18 @@
             },
             {
                 "key": "feature.data.ext.elapsed_time_to_finish_ms_bucketed",
-                "description": "Total duration from page_start to page_finish, bucketed. Uses upper end of the bucket.",
-                "enum": ["1000", "5000", "10000", "30000", "60000", "300000", "600000"]
+                "description": "Total duration from page_start to page_finish, bucketed. Uses lower end of the bucket.",
+                "enum": ["0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
             },
             {
                 "key": "feature.data.ext.elapsed_time_to_visible_ms_bucketed",
-                "description": "Duration from page_start to page_visible, bucketed. Uses upper end of the bucket.",
-                "enum": ["1000", "5000", "10000", "30000", "60000", "300000", "600000"]
+                "description": "Duration from page_start to page_visible, bucketed. Uses lower end of the bucket.",
+                "enum": ["0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
             },
             {
                 "key": "feature.data.ext.elapsed_time_to_escaped_fixed_progress_ms_bucketed",
-                "description": "Duration from page_start to page_escaped_fixed_progress, bucketed. Uses upper end of the bucket.",
-                "enum": ["1000", "5000", "10000", "30000", "60000", "300000", "600000"]
+                "description": "Duration from page_start to page_escaped_fixed_progress, bucketed. Uses lower end of the bucket.",
+                "enum": ["0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
             },
             {
                 "key": "feature.data.ext.webview_version",
