@@ -59,6 +59,7 @@ class DefaultBrowserPageViewModel @Inject constructor(
 
     init {
         viewState.value = newViewState()
+        pixel.fire(AppPixelName.PREONBOARDING_DEFAULT_BROWSER_PAGE_SHOWN)
     }
 
     fun loadUI() {
