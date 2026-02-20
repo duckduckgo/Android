@@ -1,5 +1,6 @@
 import com.duckduckgo.gradle.ModuleCreator
 import static com.gradle.develocity.agent.gradle.test.JUnitXmlDialect.*
+import com.android.build.gradle.internal.tasks.DeviceProviderInstrumentTestTask
 import com.gradle.develocity.agent.gradle.test.ImportJUnitXmlReports
 
 plugins {
@@ -580,18 +581,33 @@ dependencies {
 }
 
 // Develocity Android Instrumented Test Support
+//afterEvaluate {
+//    // Firebase Test Lab (Flank) tests
+//    tasks.matching { it.name.startsWith("execFlank") }.names.each {
+//        ImportJUnitXmlReports.register(
+//                tasks,
+//                tasks.named(it),
+//                ANDROID_FIREBASE
+//        ).configure {
+//            // Fladle outputs results to localResultsDir/build_id/*.xml
+//            reports.from(file("build/fladle/fladleResults/JUnitReport.xml"))
+//        }
+//    }
+//}
+
 afterEvaluate {
-    // Firebase Test Lab (Flank) tests
-    tasks.matching { it.name.startsWith("execFlank") }.names.each {
+    tasks.withType(DeviceProviderInstrumentTestTask).names.each {
         ImportJUnitXmlReports.register(
                 tasks,
                 tasks.named(it),
-                ANDROID_FIREBASE
-        ).configure {
-            // Fladle outputs results to localResultsDir/build_id/*.xml
-            reports.from(file("build/fladle/fladleResults/JUnitReport.xml"))
-        }
+                ANDROID_CONNECTED
+        )
     }
+}
+
+tasks.register("importJUnitXmlForFlankPrivacyTests", ImportJUnitXmlReports) {
+    dialect = ANDROID_FIREBASE
+    reports.from(file("build/fladle/fladleResults/JUnitReport.xml"))
 }
 
 tasks.register('fastlaneVersionCode') {
