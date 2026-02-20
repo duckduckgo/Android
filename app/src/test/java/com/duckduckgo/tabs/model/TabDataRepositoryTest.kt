@@ -814,6 +814,7 @@ class TabDataRepositoryTest {
 
         override fun currentTimeMillis(): Long = currentTime.toEpochMilli()
         override fun elapsedRealtime(): Long = throw UnsupportedOperationException()
+        override fun uptimeMillis(): Long = throw UnsupportedOperationException()
         override fun localDateTimeNow(): LocalDateTime = currentTime.atZone(ZoneOffset.UTC).toLocalDateTime()
     }
 }

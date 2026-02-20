@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 DuckDuckGo
+ * Copyright (c) 2026 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,31 +14,26 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.common.utils
+package com.duckduckgo.app.startup_metrics.impl.android
 
-import android.os.SystemClock
+import android.os.Build
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
-import java.time.LocalDateTime
 import javax.inject.Inject
 
-interface CurrentTimeProvider {
-    fun elapsedRealtime(): Long
-
-    fun uptimeMillis(): Long
-
-    fun currentTimeMillis(): Long
-
-    fun localDateTimeNow(): LocalDateTime
+/**
+ * Provides the current Android API level.
+ */
+interface ApiLevelProvider {
+    /**
+     * Returns the current Android API level.
+     *
+     * @return The current API level as an integer.
+     */
+    fun getApiLevel(): Int
 }
 
 @ContributesBinding(AppScope::class)
-class RealCurrentTimeProvider @Inject constructor() : CurrentTimeProvider {
-    override fun elapsedRealtime(): Long = SystemClock.elapsedRealtime()
-
-    override fun uptimeMillis(): Long = SystemClock.uptimeMillis()
-
-    override fun currentTimeMillis(): Long = System.currentTimeMillis()
-
-    override fun localDateTimeNow(): LocalDateTime = LocalDateTime.now()
+class RealApiLevelProvider @Inject constructor() : ApiLevelProvider {
+    override fun getApiLevel(): Int = Build.VERSION.SDK_INT
 }

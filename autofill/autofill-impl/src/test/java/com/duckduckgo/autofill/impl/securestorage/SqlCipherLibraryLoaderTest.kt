@@ -312,6 +312,7 @@ class ShadowLibraryLoader {
 
 class FakeCurrentTimeProvider : CurrentTimeProvider {
     override fun elapsedRealtime(): Long = System.currentTimeMillis()
+    override fun uptimeMillis(): Long = System.currentTimeMillis()
     override fun currentTimeMillis(): Long = System.currentTimeMillis()
     override fun localDateTimeNow(): LocalDateTime = LocalDateTime.now()
 }

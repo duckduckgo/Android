@@ -49,6 +49,8 @@ class WideEventCleanerTest {
 
             override fun elapsedRealtime(): Long = throw UnsupportedOperationException()
 
+            override fun uptimeMillis(): Long = throw UnsupportedOperationException()
+
             override fun currentTimeMillis(): Long = currentTime.toEpochMilli()
 
             override fun localDateTimeNow(): LocalDateTime = throw UnsupportedOperationException()
