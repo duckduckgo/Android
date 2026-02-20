@@ -211,6 +211,17 @@
     <string name="webTrackingProtectionGlobalPrivacyControlTitle">Visuotinė privatumo kontrolė</string>
     <string name="webTrackingProtectionGlobalPrivacyControlDescription">Išreiškia atsisakymo teises jūsų vardu, liepdamas svetainėms nepardavinėti jūsų asmens informacijos ir jos nebendrinti.</string>
 
+    <!-- Get Desktop Browser -->
+    <string name="getDesktopBrowserSettingItemTitle">Gaukite kompiuterio naršyklę</string>
+    <string name="getDesktopBrowserSettingItemSubtitleTitle">„DuckDuckGo“, skirta „Mac“ ir „Windows“</string>
+    <string name="getDesktopBrowserTitle">Apsaugok asmeninę informaciją ir „Mac“ bei „Windows“ kompiuteriuose!</string>
+    <string name="getDesktopBrowserBody">Kad atsisiųstum „DuckDuckGo“ į „Mac“ arba „Windows“, apsilankyk:</string>
+    <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
+    <string name="getDesktopBrowserShareDownloadLink">Bendrinti atsisiuntimo nuorodą</string>
+    <string name="getDesktopBrowserNoThanks">Ne, dėkoju</string>
+    <string name="getDesktopBrowserHideItem">Slėpti</string>
+    <string name="getDesktopBrowserUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Nuoroda nukopijuota</string>
+
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Apsauga nuo slapukų iškylančiųjų langų</string>
 
