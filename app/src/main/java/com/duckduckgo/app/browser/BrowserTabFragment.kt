@@ -3759,10 +3759,7 @@ class BrowserTabFragment :
         activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
     }
 
-    private var isUiLocked = false
-
     private fun uiLockChanged(locked: Boolean) {
-        isUiLocked = locked
         omnibar.isUiLocked = locked
         if (locked) {
             omnibar.setExpanded(true)
