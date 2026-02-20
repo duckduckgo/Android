@@ -2121,7 +2121,7 @@ class BrowserTabViewModel @Inject constructor(
         val currentUrl = webViewNavigationState.currentUrl
         if (!hasExitedFixedProgress && currentUrl != null && newProgress > FIXED_PROGRESS) {
             hasExitedFixedProgress = true
-            pageLoadManager.onProgressChanged(tabId, currentUrl, newProgress)
+            pageLoadManager.onProgressChanged(tabId, currentUrl)
         }
 
         loadingViewState.value = progress.copy(isLoading = isLoading, progress = visualProgress, url = site?.url ?: "")

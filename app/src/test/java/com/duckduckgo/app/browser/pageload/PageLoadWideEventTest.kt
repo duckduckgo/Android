@@ -132,7 +132,7 @@ class PageLoadWideEventTest {
             .thenReturn(Result.success(789L))
 
         pageLoadWideEvent.startPageLoad("tab_3", "https://reddit.com")
-        pageLoadWideEvent.recordExitedFixedProgress("tab_3", 55)
+        pageLoadWideEvent.recordExitedFixedProgress("tab_3")
 
         verify(wideEventClient).intervalEnd(789L, "elapsed_time_to_escaped_fixed_progress_ms_bucketed")
         verify(wideEventClient).flowStep(
@@ -145,7 +145,7 @@ class PageLoadWideEventTest {
 
     @Test
     fun `when recordExitedFixedProgress called with unknown tab then does nothing`() = runTest {
-        pageLoadWideEvent.recordExitedFixedProgress("unknown_tab", 60)
+        pageLoadWideEvent.recordExitedFixedProgress("unknown_tab")
 
         verify(wideEventClient, never()).intervalEnd(any(), any())
         verify(wideEventClient, never()).flowStep(any(), any(), any(), any())
@@ -247,7 +247,7 @@ class PageLoadWideEventTest {
 
         pageLoadWideEvent.startPageLoad("tab_9", "https://github.com")
         pageLoadWideEvent.recordPageVisible("tab_9", 50)
-        pageLoadWideEvent.recordExitedFixedProgress("tab_9", 55)
+        pageLoadWideEvent.recordExitedFixedProgress("tab_9")
         pageLoadWideEvent.finishPageLoad(
             tabId = "tab_9",
             outcome = PageLoadOutcome.SUCCESS,
@@ -310,7 +310,7 @@ class PageLoadWideEventTest {
         pageLoadWideEvent.recordPageVisible("tab_complete", 45)
 
         // Page escapes fixed progress
-        pageLoadWideEvent.recordExitedFixedProgress("tab_complete", 52)
+        pageLoadWideEvent.recordExitedFixedProgress("tab_complete")
 
         // Page finishes
         pageLoadWideEvent.finishPageLoad(

@@ -49,9 +49,8 @@ interface PageLoadPerformanceMonitor {
      * Called when page progress changes and escapes the fixed progress state.
      * @param tabId The unique identifier for the tab
      * @param url The URL of the page being loaded
-     * @param progress The page load progress
      */
-    fun onProgressChanged(tabId: String, url: String, progress: Int)
+    fun onProgressChanged(tabId: String, url: String)
 
     /**
      * Called when a page completes loading successfully.
@@ -111,10 +110,10 @@ class WideEventPageLoadPerformanceMonitor @Inject constructor(
         }
     }
 
-    override fun onProgressChanged(tabId: String, url: String, progress: Int) {
+    override fun onProgressChanged(tabId: String, url: String) {
         if (!pageLoadWideEvent.isInProgress(tabId, url)) return
         appCoroutineScope.launch {
-            pageLoadWideEvent.recordExitedFixedProgress(tabId, progress)
+            pageLoadWideEvent.recordExitedFixedProgress(tabId)
         }
     }
 

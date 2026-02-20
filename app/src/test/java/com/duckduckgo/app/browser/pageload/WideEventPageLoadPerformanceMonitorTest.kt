@@ -95,10 +95,10 @@ class WideEventPageLoadPerformanceMonitorTest {
         val progress = 75
         whenever(pageLoadWideEvent.isInProgress(tabId, url)).thenReturn(true)
 
-        manager.onProgressChanged(tabId, url, progress)
+        manager.onProgressChanged(tabId, url)
 
         coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
-        verify(pageLoadWideEvent).recordExitedFixedProgress(tabId, progress)
+        verify(pageLoadWideEvent).recordExitedFixedProgress(tabId)
     }
 
     @Test
@@ -189,7 +189,7 @@ class WideEventPageLoadPerformanceMonitorTest {
 
         manager.onPageStarted(tabId, url)
         manager.onPageVisible(tabId, url, 25)
-        manager.onProgressChanged(tabId, url, 60)
+        manager.onProgressChanged(tabId, url)
         manager.onPageLoadSucceeded(
             tabId = tabId,
             url = url,
@@ -201,7 +201,7 @@ class WideEventPageLoadPerformanceMonitorTest {
         coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
         verify(pageLoadWideEvent).startPageLoad(tabId, url)
         verify(pageLoadWideEvent).recordPageVisible(tabId, 25)
-        verify(pageLoadWideEvent).recordExitedFixedProgress(tabId, 60)
+        verify(pageLoadWideEvent).recordExitedFixedProgress(tabId)
         verify(pageLoadWideEvent).finishPageLoad(
             tabId = tabId,
             outcome = PageLoadOutcome.SUCCESS,
@@ -273,11 +273,11 @@ class WideEventPageLoadPerformanceMonitorTest {
         val untrackedUrl = "https://facebook.com"
         whenever(pageLoadWideEvent.isInProgress(tabId, untrackedUrl)).thenReturn(false)
 
-        manager.onProgressChanged(tabId, untrackedUrl, 75)
+        manager.onProgressChanged(tabId, untrackedUrl)
 
         coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
         verify(pageLoadWideEvent).isInProgress(tabId, untrackedUrl)
-        verify(pageLoadWideEvent, never()).recordExitedFixedProgress(any(), any())
+        verify(pageLoadWideEvent, never()).recordExitedFixedProgress(any())
     }
 
     @Test

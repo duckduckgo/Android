@@ -81,12 +81,11 @@ interface PageLoadWideEvent {
 
     /**
      * Called when progress escapes fixed progress zone.
-     * Records page_escaped_fixed_progress flow step with elapsed time and actual progress.
+     * Records page_escaped_fixed_progress flow step with elapsed time.
      *
      * @param tabId The unique identifier for the tab
-     * @param actualProgress The progress when escaping fixed zone (typically >= 50)
      */
-    suspend fun recordExitedFixedProgress(tabId: String, actualProgress: Int)
+    suspend fun recordExitedFixedProgress(tabId: String)
 
     /**
      * Called from BrowserWebViewClient.onPageFinished or onReceivedError when page load completes.
@@ -192,7 +191,7 @@ class RealPageLoadWideEvent @Inject constructor(
         logcat { "Page visible recorded: tabId=$tabId, flowId=$flowId, progress=$currentProgress" }
     }
 
-    override suspend fun recordExitedFixedProgress(tabId: String, actualProgress: Int) {
+    override suspend fun recordExitedFixedProgress(tabId: String) {
         if (!isFeatureEnabled()) return
         val flowId = getActiveFlowId(tabId) ?: return
 
@@ -206,7 +205,7 @@ class RealPageLoadWideEvent @Inject constructor(
             stepName = STEP_PAGE_ESCAPED_FIXED_PROGRESS,
         )
 
-        logcat { "Exited fixed progress: tabId=$tabId, flowId=$flowId, actualProgress=$actualProgress" }
+        logcat { "Exited fixed progress: tabId=$tabId, flowId=$flowId" }
     }
 
     override suspend fun finishPageLoad(

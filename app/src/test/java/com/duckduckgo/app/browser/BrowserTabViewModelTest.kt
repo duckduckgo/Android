@@ -8955,17 +8955,14 @@ class BrowserTabViewModelTest {
 
         val tabIdCaptor = argumentCaptor<String>()
         val urlCaptor = argumentCaptor<String>()
-        val progressCaptor = argumentCaptor<Int>()
 
         verify(mockPageLoadWideEvent).onProgressChanged(
             tabIdCaptor.capture(),
             urlCaptor.capture(),
-            progressCaptor.capture(),
         )
 
         assertNotNull(tabIdCaptor.firstValue)
         assertEquals(testUrl, urlCaptor.firstValue)
-        assertEquals(60, progressCaptor.firstValue)
     }
 
     @Test
@@ -8986,7 +8983,7 @@ class BrowserTabViewModelTest {
         // Second time - should NOT trigger call
         testee.progressChanged(75, WebViewNavigationState(mockStack, 75))
 
-        verify(mockPageLoadWideEvent, never()).onProgressChanged(any(), any(), any())
+        verify(mockPageLoadWideEvent, never()).onProgressChanged(any(), any())
     }
 
     @Test
@@ -9001,7 +8998,7 @@ class BrowserTabViewModelTest {
         // Progress below FIXED_PROGRESS (50) - should NOT call manager
         testee.progressChanged(30, WebViewNavigationState(mockStack, 30))
 
-        verify(mockPageLoadWideEvent, never()).onProgressChanged(any(), any(), any())
+        verify(mockPageLoadWideEvent, never()).onProgressChanged(any(), any())
     }
 
     @Test
@@ -9018,7 +9015,7 @@ class BrowserTabViewModelTest {
         whenever(mockStack.currentItem).thenReturn(mockWebHistoryItem1)
         loadUrl(firstUrl)
         testee.progressChanged(60, WebViewNavigationState(mockStack, 60))
-        verify(mockPageLoadWideEvent).onProgressChanged(any(), eq(firstUrl), eq(60))
+        verify(mockPageLoadWideEvent).onProgressChanged(any(), eq(firstUrl))
 
         // New page load - resets hasExitedFixedProgress flag
         whenever(mockStack.currentItem).thenReturn(mockWebHistoryItem2)
@@ -9026,7 +9023,7 @@ class BrowserTabViewModelTest {
         testee.progressChanged(70, WebViewNavigationState(mockStack, 70))
 
         // Verify second call with new URL
-        verify(mockPageLoadWideEvent).onProgressChanged(any(), eq(secondUrl), eq(70))
+        verify(mockPageLoadWideEvent).onProgressChanged(any(), eq(secondUrl))
     }
 
     @Test
@@ -9041,6 +9038,6 @@ class BrowserTabViewModelTest {
         testee.progressChanged(50, WebViewNavigationState(mockStack, 50))
 
         // Manager is NOT called at exactly FIXED_PROGRESS (50) - only when progress > 50
-        verify(mockPageLoadWideEvent, never()).onProgressChanged(any(), any(), any())
+        verify(mockPageLoadWideEvent, never()).onProgressChanged(any(), any())
     }
 }
