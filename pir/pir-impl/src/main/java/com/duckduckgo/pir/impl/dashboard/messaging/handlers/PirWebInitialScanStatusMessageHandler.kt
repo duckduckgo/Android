@@ -75,7 +75,7 @@ class PirWebInitialScanStatusMessageHandler @Inject constructor(
 
             // Check once per PirDashboardWebViewActivity launch if we need to resume a scan that was interrupted (e.g., by app kill)
             if (!checkedForResumeScan.getAndSet(true)) {
-                resumeInitialScanIfNeeded()
+                checkForIncompleteInitialScan()
             }
 
             jsMessaging.sendResponse(
@@ -100,7 +100,7 @@ class PirWebInitialScanStatusMessageHandler @Inject constructor(
      * Checks if the initial foreground scan should be resumed (was interrupted with remaining brokers).
      * Currently emits a pixel to measure how often this scenario occurs.
      */
-    private suspend fun resumeInitialScanIfNeeded() {
+    private suspend fun checkForIncompleteInitialScan() {
         if (!stateProvider.shouldRestartInitialScan()) {
             logcat { "PIR-WEB: No need to resume scan, it's either not started or already completed" }
             return
