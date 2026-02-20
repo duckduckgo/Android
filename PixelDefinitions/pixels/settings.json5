@@ -6,5 +6,54 @@
         "triggers": ["other"],
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"]
+    },
+
+    // Get Desktop Browser pixels
+    "m_get_desktop_browser_complete_setup_impression": {
+        "description": "Fired when the 'Get Desktop Browser' item is shown under the 'Complete your setup' section in settings.",
+        "owners": ["catalinradoiu"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_get_desktop_browser_clicked": {
+        "description": "Fired when the user clicks the 'Get Desktop Browser' item in settings.",
+        "owners": ["catalinradoiu"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "source",
+                "description": "The source from which the user clicked the 'Get Desktop Browser' item (e.g. 'settings', 'complete_setup')."
+            }
+        ]
+    },
+    "m_get_desktop_browser_dismissed": {
+        "description": "Fired when the user dismisses the 'Get Desktop Browser' modal by clicking 'No Thanks' or hiding the complete setup item.",
+        "owners": ["catalinradoiu"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "source",
+                "description": "The source of the dismissal (e.g. 'no_thanks', 'hide')."
+            }
+        ]
+    },
+    "m_get_desktop_browser_share_download_link_click": {
+        "description": "Fired when the user clicks the 'Share Download Link' button in the 'Get Desktop Browser' modal.",
+        "owners": ["catalinradoiu"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_get_desktop_browser_link_click": {
+        "description": "Fired when the user clicks the desktop browser URL link in the 'Get Desktop Browser' modal, which copies it to clipboard.",
+        "owners": ["catalinradoiu"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
     }
 }
