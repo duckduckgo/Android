@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.contentscopescripts.impl.features.browseruilock
+package com.duckduckgo.app.browser.uilock
 
 import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.di.scopes.AppScope
