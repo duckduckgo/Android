@@ -317,6 +317,7 @@ import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.common.utils.plugins.headers.CustomHeadersProvider
 import com.duckduckgo.common.utils.toDesktopUri
 import com.duckduckgo.contentscopescripts.api.ContentScopeScriptsSubscriptionEventPlugin
+import com.duckduckgo.contentscopescripts.impl.features.browseruilock.BrowserUiLockFeature
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.downloads.api.DownloadCommand
 import com.duckduckgo.downloads.api.DownloadStateListener
@@ -360,7 +361,6 @@ import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment.Delete
 import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment.EditSavedSiteListener
 import com.duckduckgo.serp.logos.api.SerpEasterEggLogosToggles
 import com.duckduckgo.serp.logos.api.SerpLogo
-import com.duckduckgo.contentscopescripts.impl.features.browseruilock.BrowserUiLockFeature
 import com.duckduckgo.serp.logos.api.SerpLogos
 import com.duckduckgo.settings.api.SerpSettingsFeature
 import com.duckduckgo.site.permissions.api.SitePermissionsManager

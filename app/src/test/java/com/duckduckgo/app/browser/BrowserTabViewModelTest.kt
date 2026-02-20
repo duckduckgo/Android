@@ -242,6 +242,7 @@ import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.common.utils.plugins.headers.CustomHeadersProvider
 import com.duckduckgo.contentscopescripts.api.ContentScopeScriptsSubscriptionEventPlugin
+import com.duckduckgo.contentscopescripts.impl.features.browseruilock.BrowserUiLockFeature
 import com.duckduckgo.downloads.api.DownloadStateListener
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
@@ -266,7 +267,6 @@ import com.duckduckgo.duckplayer.api.DuckPlayerPageSettingsPlugin
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.AlwaysAsk
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.Disabled
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.Enabled
-import com.duckduckgo.contentscopescripts.impl.features.browseruilock.BrowserUiLockFeature
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.State
