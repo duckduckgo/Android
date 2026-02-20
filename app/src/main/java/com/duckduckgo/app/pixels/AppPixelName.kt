@@ -505,4 +505,10 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     TIMEOUT_WAITING_FOR_APP_REFERRER("timeout_waiting_for_referrer"),
 
     DATA_CLEARING_AUTOMATIC_OPTIONS_UPDATED("m_automatic_data_clearing_options_updated"),
+
+    GET_DESKTOP_BROWSER_COMPLETE_SETUP_IMPRESSION("m_get_desktop_browser_complete_setup_impression"),
+    GET_DESKTOP_BROWSER_CLICKED("m_get_desktop_browser_clicked"),
+    GET_DESKTOP_BROWSER_DISMISSED("m_get_desktop_browser_dismissed"),
+    GET_DESKTOP_BROWSER_SHARE_DOWNLOAD_LINK_CLICK("m_get_desktop_browser_share_download_link_click"),
+    GET_DESKTOP_BROWSER_LINK_CLICK("m_get_desktop_browser_link_click"),
 }

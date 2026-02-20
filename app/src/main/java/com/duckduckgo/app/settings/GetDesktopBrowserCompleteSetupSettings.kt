@@ -26,7 +26,9 @@ import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.anvil.annotations.PriorityKey
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.desktopbrowser.GetDesktopBrowserActivityParams
+import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.ui.menu.PopupMenu
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.listitem.TwoLineListItem
@@ -45,6 +47,7 @@ class GetDesktopBrowserCompleteSetupSettings @Inject constructor(
     private val settingsDataStore: SettingsDataStore,
     private val activity: AppCompatActivity,
     private val globalActivityStarter: GlobalActivityStarter,
+    private val pixel: Pixel,
 ) : CompleteSetupSettingsPlugin {
 
     override fun getView(context: Context): View {
@@ -65,6 +68,8 @@ class GetDesktopBrowserCompleteSetupSettings @Inject constructor(
         if (settingsPageFeature.newDesktopBrowserSettingEnabled().isEnabled() &&
             !settingsDataStore.getDesktopBrowserSettingDismissed
         ) {
+            pixel.fire(AppPixelName.GET_DESKTOP_BROWSER_COMPLETE_SETUP_IMPRESSION)
+
             activity.lifecycle.addObserver(
                 @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
                 object : DefaultLifecycleObserver {
@@ -83,7 +88,13 @@ class GetDesktopBrowserCompleteSetupSettings @Inject constructor(
                 ),
             ) ?: return
 
-            setOnClickListener { context.startActivity(intent) }
+            setOnClickListener {
+                pixel.fire(
+                    AppPixelName.GET_DESKTOP_BROWSER_CLICKED,
+                    mapOf(GET_DESKTOP_BROWSER_SOURCE_PIXEL_PARAM to GET_DESKTOP_BROWSER_SOURCE_COMPLETE_SETUP),
+                )
+                context.startActivity(intent)
+            }
 
             show()
         }
@@ -108,10 +119,21 @@ class GetDesktopBrowserCompleteSetupSettings @Inject constructor(
         popupMenu.apply {
             onMenuItemClicked(hideButton) {
                 rootView.gone()
+                pixel.fire(
+                    AppPixelName.GET_DESKTOP_BROWSER_DISMISSED,
+                    mapOf(GET_DESKTOP_BROWSER_SOURCE_PIXEL_PARAM to GET_DESKTOP_BROWSER_SOURCE_HIDE),
+                )
                 settingsDataStore.getDesktopBrowserSettingDismissed = true
             }
         }
 
         return popupMenu
+    }
+
+    companion object {
+        const val GET_DESKTOP_BROWSER_SOURCE_PIXEL_PARAM = "source"
+
+        private const val GET_DESKTOP_BROWSER_SOURCE_COMPLETE_SETUP = "complete_setup"
+        private const val GET_DESKTOP_BROWSER_SOURCE_HIDE = "hide"
     }
 }
