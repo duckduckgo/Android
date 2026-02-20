@@ -8,7 +8,12 @@
                 "key": "count",
                 "type": "string",
                 "description": "Bucketed adwall detection count for the period",
-                "enum": ["0", "1-2", "3-5", "6-10", "11-20", "21-39", "40+"]
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            {
+                "key": "attributionPeriod",
+                "type": "integer",
+                "description": "Unix timestamp (UTC) denoting the start of the period in which the attribution window closed"
             }
         ]
     },
@@ -21,7 +26,12 @@
                 "key": "count",
                 "type": "string",
                 "description": "Bucketed adwall detection count for the period",
-                "enum": ["0", "1-2", "3-5", "6-10", "11-20", "21-39", "40+"]
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            {
+                "key": "attributionPeriod",
+                "type": "integer",
+                "description": "Unix timestamp (UTC) denoting the start of the period in which the attribution window closed"
             }
         ]
     }
