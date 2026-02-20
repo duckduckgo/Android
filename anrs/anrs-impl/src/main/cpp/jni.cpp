@@ -15,6 +15,7 @@ char pname[256];
 bool isCustomTab = false;
 char wvPackage[256];
 char wvVersion[256];
+bool includeCrashLocation = false;
 
 ///////////////////////////////////////////////////////////////////////////
 
@@ -41,7 +42,8 @@ Java_com_duckduckgo_app_anr_ndk_NativeCrashInit_jni_1register_1sighandler(
         jstring pname_,
         jboolean customtab_,
         jstring wvpackage_,
-        jstring wvversion_
+        jstring wvversion_,
+        jboolean includecrashlocation_
 ) {
 
     if (!native_crash_handler_init()) {
@@ -78,6 +80,9 @@ Java_com_duckduckgo_app_anr_ndk_NativeCrashInit_jni_1register_1sighandler(
 
     // get and set isCustomTabs
     isCustomTab = customtab_;
+
+    // get and set includeCrashLocation
+    includeCrashLocation = includecrashlocation_;
 
     send_crash_handle_init_pixel();
 

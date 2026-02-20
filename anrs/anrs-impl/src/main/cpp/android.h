@@ -13,6 +13,7 @@ extern char appVersion[256];
 extern bool isCustomTab;
 extern char wvPackage[256];
 extern char wvVersion[256];
+extern bool includeCrashLocation;
 
 // Use this method to print log messages into the console
 #define log_print(prio, format, ...) do { if (prio >= loglevel) __platform_log_print(prio, "ndk-crash", format, ##__VA_ARGS__); } while (0)

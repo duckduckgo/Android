@@ -3,11 +3,14 @@
 #include "pixel.h"
 
 #include <csignal>
+#include <cstdint>
 #include <cstdio>
 #include <cstring>
 #include <memory>
 #include <cxxabi.h>
 #include <unistd.h>
+#include <dlfcn.h>
+#include <ucontext.h>
 
 #define sizeofa(array) sizeof(array) / sizeof(array[0])
 
@@ -39,15 +42,61 @@ typedef void (*CrashSignalHandler)(int, siginfo*, void*);
 // Global instance of context. As the app can only crash once per process lifetime, this can be global
 static CrashInContext* crashInContext = nullptr;
 
+struct CrashLocation {
+    const char* lib_name;
+    uintptr_t offset;
+};
+
+static uintptr_t get_program_counter(void* ctxvoid) {
+    if (!ctxvoid) return 0;
+
+    ucontext_t* ctx = static_cast<ucontext_t*>(ctxvoid);
+#if defined(__aarch64__)
+    return ctx->uc_mcontext.pc;
+#elif defined(__arm__)
+    return ctx->uc_mcontext.arm_pc;
+#elif defined(__x86_64__)
+    return ctx->uc_mcontext.gregs[REG_RIP];
+#elif defined(__i386__)
+    return ctx->uc_mcontext.gregs[REG_EIP];
+#else
+    return 0;
+#endif
+}
+
+static CrashLocation resolve_crash_location(uintptr_t pc) {
+    CrashLocation location = {"unknown", 0};
+    if (pc == 0) return location;
+
+    location.offset = pc;
+
+    Dl_info info = {};
+    if (dladdr(reinterpret_cast<void*>(pc), &info) != 0) {
+        if (info.dli_fbase) {
+            location.offset = pc - reinterpret_cast<uintptr_t>(info.dli_fbase);
+        }
+        if (info.dli_fname && info.dli_fname[0] != '\0') {
+            location.lib_name = info.dli_fname;
+        }
+    }
+    return location;
+}
 
 // Main signal handling function.
 static void native_crash_sig_handler(int signo, siginfo* siginfo, void* ctxvoid) {
     // Restoring an old handler to make built-in Android crash mechanism work.
     sigaction(signo, &crashInContext->old_handlers[signo], nullptr);
 
+    if (includeCrashLocation) {
+        uintptr_t pc = get_program_counter(ctxvoid);
+        CrashLocation loc = resolve_crash_location(pc);
+        send_crash_pixel_with_location(signo, loc.lib_name, loc.offset);
+    } else {
+        send_crash_pixel();
+    }
+
     // Log crash message
     __android_log_print(ANDROID_LOG_ERROR, "ndk-crash", "Terminating with uncaught exception of type %d", signo);
-    send_crash_pixel();
 
     // sometimes signal handlers inlinux consume crashes entirely. For those cases we trigger a signal so that we ultimately
     // crash properly, ie. to run standard bionic handler
