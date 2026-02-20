@@ -135,7 +135,7 @@ class PageLoadWideEventTest {
             wideEventId = 789L,
             stepName = "page_escaped_fixed_progress",
             success = true,
-            metadata = mapOf("progress" to "55"),
+            metadata = emptyMap(),
         )
     }
 
@@ -323,7 +323,7 @@ class PageLoadWideEventTest {
         // Verify all steps were recorded
         verify(wideEventClient).flowStep(500L, "page_start", true, emptyMap())
         verify(wideEventClient).flowStep(500L, "page_visible", true, mapOf("progress" to "45"))
-        verify(wideEventClient).flowStep(500L, "page_escaped_fixed_progress", true, mapOf("progress" to "52"))
+        verify(wideEventClient).flowStep(500L, "page_escaped_fixed_progress", true, emptyMap())
         verify(wideEventClient).flowStep(
             wideEventId = 500L,
             stepName = "page_finish",

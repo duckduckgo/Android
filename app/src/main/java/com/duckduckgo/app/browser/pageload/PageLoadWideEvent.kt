@@ -194,9 +194,6 @@ class RealPageLoadWideEvent @Inject constructor(
         wideEventClient.flowStep(
             wideEventId = flowId,
             stepName = STEP_PAGE_ESCAPED_FIXED_PROGRESS,
-            metadata = mapOf(
-                KEY_PROGRESS to actualProgress.toString(),
-            ),
         )
 
         logcat { "Exited fixed progress: tabId=$tabId, flowId=$flowId, actualProgress=$actualProgress" }
