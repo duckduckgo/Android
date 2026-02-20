@@ -16,6 +16,7 @@
 
 package com.duckduckgo.contentscopescripts.impl.features.browseruilock
 
+import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -23,7 +24,6 @@ import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import kotlinx.coroutines.runBlocking
 
 class BrowserUiLockFeaturePluginTest {
     private lateinit var testee: BrowserUiLockFeaturePlugin
