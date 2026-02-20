@@ -115,7 +115,7 @@ class RealPageLoadWideEvent @Inject constructor(
     override fun isInProgress(tabId: String, url: String): Boolean {
         val state = activeFlows[tabId] ?: return false
         val ageMillis = System.currentTimeMillis() - state.createdAt
-        val isStale = ageMillis > CLEANUP_TIMEOUT_WITH_BUFFER.inWholeMilliseconds
+        val isStale = ageMillis > CLEANUP_TIMEOUT.inWholeMilliseconds
         return state.url == url && !isStale
     }
 
@@ -274,7 +274,6 @@ class RealPageLoadWideEvent @Inject constructor(
 
     private companion object {
         val CLEANUP_TIMEOUT = 5.minutes
-        val CLEANUP_TIMEOUT_WITH_BUFFER = CLEANUP_TIMEOUT + 1.minutes
         const val PAGE_LOAD_FEATURE_NAME = "page-load"
         const val STEP_PAGE_START = "page_start"
         const val STEP_PAGE_VISIBLE = "page_visible"
