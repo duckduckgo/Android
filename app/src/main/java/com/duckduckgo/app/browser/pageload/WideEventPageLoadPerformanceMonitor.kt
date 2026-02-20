@@ -19,7 +19,6 @@ package com.duckduckgo.app.browser.pageload
 import com.duckduckgo.app.browser.UriString
 import com.duckduckgo.app.browser.pageloadpixel.PageLoadedSites
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.CoroutineScope
@@ -95,27 +94,26 @@ private const val ABOUT_BLANK = "about:blank"
 class WideEventPageLoadPerformanceMonitor @Inject constructor(
     private val pageLoadWideEvent: PageLoadWideEvent,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
-    private val dispatchers: DispatcherProvider,
 ) : PageLoadPerformanceMonitor {
 
     override fun onPageStarted(tabId: String, url: String) {
         if (!shouldTrackUrl(url)) return
         if (pageLoadWideEvent.isInProgress(tabId, url)) return
-        appCoroutineScope.launch(dispatchers.io()) {
+        appCoroutineScope.launch {
             pageLoadWideEvent.startPageLoad(tabId, url)
         }
     }
 
     override fun onPageVisible(tabId: String, url: String, progress: Int) {
         if (!pageLoadWideEvent.isInProgress(tabId, url)) return
-        appCoroutineScope.launch(dispatchers.io()) {
+        appCoroutineScope.launch {
             pageLoadWideEvent.recordPageVisible(tabId, progress)
         }
     }
 
     override fun onProgressChanged(tabId: String, url: String, progress: Int) {
         if (!pageLoadWideEvent.isInProgress(tabId, url)) return
-        appCoroutineScope.launch(dispatchers.io()) {
+        appCoroutineScope.launch {
             pageLoadWideEvent.recordExitedFixedProgress(tabId, progress)
         }
     }
@@ -128,7 +126,7 @@ class WideEventPageLoadPerformanceMonitor @Inject constructor(
         concurrentRequestsOnFinish: Int,
     ) {
         if (!pageLoadWideEvent.isInProgress(tabId, url)) return
-        appCoroutineScope.launch(dispatchers.io()) {
+        appCoroutineScope.launch {
             pageLoadWideEvent.finishPageLoad(
                 tabId = tabId,
                 outcome = "success",
@@ -149,7 +147,7 @@ class WideEventPageLoadPerformanceMonitor @Inject constructor(
         concurrentRequestsOnFinish: Int,
     ) {
         if (!pageLoadWideEvent.isInProgress(tabId, url)) return
-        appCoroutineScope.launch(dispatchers.io()) {
+        appCoroutineScope.launch {
             pageLoadWideEvent.finishPageLoad(
                 tabId = tabId,
                 outcome = "error",

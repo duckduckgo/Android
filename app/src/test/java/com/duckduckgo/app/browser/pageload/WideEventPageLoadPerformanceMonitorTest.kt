@@ -46,7 +46,6 @@ class WideEventPageLoadPerformanceMonitorTest {
         manager = WideEventPageLoadPerformanceMonitor(
             pageLoadWideEvent = pageLoadWideEvent,
             appCoroutineScope = coroutineTestRule.testScope,
-            dispatchers = coroutineTestRule.testDispatcherProvider,
         )
     }
 
