@@ -362,6 +362,29 @@ class DefaultBrowserPageViewModelTest {
         assertEquals(0, testee.timesPressedJustOnce)
     }
 
+    @Test
+    fun whenViewModelInitializedThenPageShownPixelIsNotFired() {
+        testee = DefaultBrowserPageViewModel(mockDefaultBrowserDetector, mockPixel, mockInstallStore)
+
+        verify(mockPixel, never()).fire(AppPixelName.PREONBOARDING_DEFAULT_BROWSER_PAGE_SHOWN)
+    }
+
+    @Test
+    fun whenOnPageShownCalledThenPageShownPixelIsFired() {
+        testee.onPageShown()
+
+        verify(mockPixel).fire(AppPixelName.PREONBOARDING_DEFAULT_BROWSER_PAGE_SHOWN)
+    }
+
+    @Test
+    fun whenOnPageShownCalledMultipleTimesThenPageShownPixelIsFiredOnlyOnce() {
+        testee.onPageShown()
+        testee.onPageShown()
+        testee.onPageShown()
+
+        verify(mockPixel, times(1)).fire(AppPixelName.PREONBOARDING_DEFAULT_BROWSER_PAGE_SHOWN)
+    }
+
     private fun captureCommands(): KArgumentCaptor<Command> {
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         return commandCaptor
