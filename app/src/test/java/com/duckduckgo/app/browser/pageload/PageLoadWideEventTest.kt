@@ -24,6 +24,7 @@ import com.duckduckgo.app.statistics.wideevents.WideEventClient
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.browser.api.WebViewVersionProvider
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.test.runTest
@@ -43,6 +44,7 @@ class PageLoadWideEventTest {
     private val webViewVersionProvider: WebViewVersionProvider = mock()
     private val autoconsent: Autoconsent = mock()
     private val optimizeTrackerEvaluationRCWrapper: OptimizeTrackerEvaluationRCWrapper = mock()
+    private val currentTimeProvider: CurrentTimeProvider = mock()
     private val androidBrowserConfigFeature = FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
 
     private lateinit var pageLoadWideEvent: PageLoadWideEvent
@@ -52,6 +54,7 @@ class PageLoadWideEventTest {
         whenever(webViewVersionProvider.getMajorVersion()).thenReturn("120")
         whenever(autoconsent.isAutoconsentEnabled()).thenReturn(true)
         whenever(optimizeTrackerEvaluationRCWrapper.enabled).thenReturn(true)
+        whenever(currentTimeProvider.currentTimeMillis()).thenReturn(1000L)
 
         // Enable feature toggle by default
         androidBrowserConfigFeature.sendPageLoadWideEvent().setRawStoredState(Toggle.State(true))
@@ -69,6 +72,7 @@ class PageLoadWideEventTest {
             autoconsent = autoconsent,
             optimizeTrackerEvaluationRCWrapper = optimizeTrackerEvaluationRCWrapper,
             androidBrowserConfigFeature = { androidBrowserConfigFeature },
+            currentTimeProvider = currentTimeProvider,
             dispatchers = coroutineRule.testDispatcherProvider,
         )
     }

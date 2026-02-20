@@ -23,6 +23,7 @@ import com.duckduckgo.app.statistics.wideevents.FlowStatus
 import com.duckduckgo.app.statistics.wideevents.WideEventClient
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.browser.api.WebViewVersionProvider
+import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
@@ -116,13 +117,14 @@ class RealPageLoadWideEvent @Inject constructor(
     private val autoconsent: Autoconsent,
     private val optimizeTrackerEvaluationRCWrapper: OptimizeTrackerEvaluationRCWrapper,
     private val androidBrowserConfigFeature: Lazy<AndroidBrowserConfigFeature>,
+    private val currentTimeProvider: CurrentTimeProvider,
     private val dispatchers: DispatcherProvider,
 ) : PageLoadWideEvent {
     private val activeFlows = ConcurrentHashMap<String, PageLoadState>()
 
     override fun isInProgress(tabId: String, url: String): Boolean {
         val state = activeFlows[tabId] ?: return false
-        val ageMillis = System.currentTimeMillis() - state.createdAt
+        val ageMillis = currentTimeProvider.currentTimeMillis() - state.createdAt
         val isStale = ageMillis > CLEANUP_TIMEOUT.inWholeMilliseconds
         return state.url == url && !isStale
     }
@@ -274,10 +276,10 @@ class RealPageLoadWideEvent @Inject constructor(
         return state?.flowId
     }
 
-    private data class PageLoadState(
+    private inner class PageLoadState(
         val flowId: Long,
         val url: String,
-        val createdAt: Long = System.currentTimeMillis(),
+        val createdAt: Long = currentTimeProvider.currentTimeMillis(),
     )
 
     private companion object {
