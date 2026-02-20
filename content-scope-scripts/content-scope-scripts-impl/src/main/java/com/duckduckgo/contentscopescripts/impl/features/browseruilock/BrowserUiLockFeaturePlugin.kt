@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 DuckDuckGo
+ * Copyright (c) 2026 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,21 +14,28 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.uilock
+package com.duckduckgo.contentscopescripts.impl.features.browseruilock
 
-import com.duckduckgo.contentscopescripts.api.ContentScopeConfigPlugin
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
 import com.squareup.anvil.annotations.ContributesMultibinding
+import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
-class UiLockContentScopeConfigPlugin @Inject constructor() : ContentScopeConfigPlugin {
+class BrowserUiLockFeaturePlugin @Inject constructor(
+    private val browserUiLockRepository: BrowserUiLockRepository,
+) : PrivacyFeaturePlugin {
 
-    override fun config(): String {
-        return "\"browserUiLock\":{\"state\":\"enabled\",\"exceptions\":[]}"
+    override fun store(featureName: String, jsonString: String): Boolean {
+        return if (featureName == this.featureName) {
+            return runBlocking {
+                browserUiLockRepository.insertJsonData(jsonString)
+            }
+        } else {
+            false
+        }
     }
 
-    override fun preferences(): String? {
-        return null
-    }
+    override val featureName: String = BROWSER_UI_LOCK_FEATURE_NAME
 }
