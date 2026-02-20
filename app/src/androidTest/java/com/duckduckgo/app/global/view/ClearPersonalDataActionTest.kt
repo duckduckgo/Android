@@ -25,6 +25,7 @@ import com.duckduckgo.app.fire.AppCacheClearer
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
+import com.duckduckgo.app.fire.store.TabVisitedSitesRepository
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.api.WebTrackersBlockedRepository
@@ -61,6 +62,7 @@ class ClearPersonalDataActionTest {
     private val mockSitePermissionsManager: SitePermissionsManager = mock()
     private val mockNavigationHistory: NavigationHistory = mock()
     private val mockWebTrackersBlockedRepository: WebTrackersBlockedRepository = mock()
+    private val mockTabVisitedSitesRepository: TabVisitedSitesRepository = mock()
 
     private val fireproofWebsites: LiveData<List<FireproofWebsiteEntity>> = MutableLiveData()
 
@@ -81,6 +83,7 @@ class ClearPersonalDataActionTest {
             sitePermissionsManager = mockSitePermissionsManager,
             navigationHistory = mockNavigationHistory,
             webTrackersBlockedRepository = mockWebTrackersBlockedRepository,
+            tabVisitedSitesRepository = mockTabVisitedSitesRepository,
         )
         whenever(mockFireproofWebsiteRepository.getFireproofWebsites()).thenReturn(fireproofWebsites)
         whenever(mockDeviceSyncState.isUserSignedInOnDevice()).thenReturn(true)
@@ -154,6 +157,12 @@ class ClearPersonalDataActionTest {
     }
 
     @Test
+    fun whenClearTabsAndAllDataAsyncCalledThenTabVisitedSitesCleared() = runTest {
+        testee.clearTabsAndAllDataAsync(appInForeground = false, shouldFireDataClearPixel = false)
+        verify(mockTabVisitedSitesRepository).clearAll()
+    }
+
+    @Test
     fun whenClearTabsAndAllDataAsyncCalledThenCookieManagerFlushed() = runTest {
         testee.clearTabsAndAllDataAsync(appInForeground = false, shouldFireDataClearPixel = false)
         verify(mockCookieManager).flush()
@@ -194,6 +203,7 @@ class ClearPersonalDataActionTest {
         verifyNoInteractions(mockSitePermissionsManager)
         verifyNoInteractions(mockNavigationHistory)
         verifyNoInteractions(mockWebTrackersBlockedRepository)
+        verifyNoInteractions(mockTabVisitedSitesRepository)
         verifyNoInteractions(mockClearingUnsentForgetAllPixelStore)
     }
 
@@ -259,6 +269,12 @@ class ClearPersonalDataActionTest {
     }
 
     @Test
+    fun whenClearBrowserDataOnlyCalledThenTabVisitedSitesCleared() = runTest {
+        testee.clearBrowserDataOnly(shouldFireDataClearPixel = false)
+        verify(mockTabVisitedSitesRepository).clearAll()
+    }
+
+    @Test
     fun whenClearBrowserDataOnlyCalledThenTabsNotCleared() = runTest {
         testee.clearBrowserDataOnly(shouldFireDataClearPixel = false)
         verify(mockTabRepository, never()).deleteAll()
@@ -280,6 +296,8 @@ class ClearPersonalDataActionTest {
         verifyNoInteractions(mockThirdPartyCookieManager)
         verifyNoInteractions(mockSitePermissionsManager)
         verifyNoInteractions(mockNavigationHistory)
+        verifyNoInteractions(mockWebTrackersBlockedRepository)
+        verifyNoInteractions(mockTabVisitedSitesRepository)
         verifyNoInteractions(mockClearingUnsentForgetAllPixelStore)
     }
 

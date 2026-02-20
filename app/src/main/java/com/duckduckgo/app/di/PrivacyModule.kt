@@ -28,6 +28,7 @@ import com.duckduckgo.app.fire.DataClearerTimeKeeper
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.fire.model.AppCacheExclusionPlugin
+import com.duckduckgo.app.fire.store.TabVisitedSitesRepository
 import com.duckduckgo.app.fire.wideevents.DataClearingWideEvent
 import com.duckduckgo.app.global.file.FileDeleter
 import com.duckduckgo.app.global.view.ClearDataAction
@@ -85,6 +86,7 @@ object PrivacyModule {
         navigationHistory: NavigationHistory,
         dispatcherProvider: DispatcherProvider,
         webTrackingRepository: WebTrackersBlockedRepository,
+        tabVisitedSitesRepository: TabVisitedSitesRepository,
     ): ClearDataAction {
         return ClearPersonalDataAction(
             context,
@@ -102,6 +104,7 @@ object PrivacyModule {
             navigationHistory,
             dispatcherProvider,
             webTrackingRepository,
+            tabVisitedSitesRepository,
         )
     }
 

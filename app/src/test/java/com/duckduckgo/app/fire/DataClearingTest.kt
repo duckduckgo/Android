@@ -17,13 +17,17 @@
 package com.duckduckgo.app.fire
 
 import com.duckduckgo.app.fire.store.FireDataStore
+import com.duckduckgo.app.fire.store.TabVisitedSitesRepository
 import com.duckduckgo.app.fire.wideevents.DataClearingWideEvent
 import com.duckduckgo.app.global.view.ClearDataAction
 import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.clear.FireClearOption
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
+import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.history.api.NavigationHistory
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
@@ -64,6 +68,18 @@ class DataClearingTest {
     @Mock
     private lateinit var mockDataClearingWideEvent: DataClearingWideEvent
 
+    @Mock
+    private lateinit var mockTabVisitedSitesRepository: TabVisitedSitesRepository
+
+    @Mock
+    private lateinit var mockNavigationHistory: NavigationHistory
+
+    @Mock
+    private lateinit var mockDuckChat: DuckChat
+
+    @Mock
+    private lateinit var mockTabRepository: TabRepository
+
     private val showClearDuckAIChatHistoryFlow = MutableStateFlow(true)
 
     @Before
@@ -78,6 +94,9 @@ class DataClearingTest {
             dataClearerTimeKeeper = mockTimeKeeper,
             duckAiFeatureState = mockDuckAiFeatureState,
             dataClearingWideEvent = mockDataClearingWideEvent,
+            tabVisitedSitesRepository = mockTabVisitedSitesRepository,
+            navigationHistory = mockNavigationHistory,
+            tabRepository = mockTabRepository,
         )
     }
 
@@ -618,6 +637,68 @@ class DataClearingTest {
         val result = testee.isAutomaticDataClearingOptionSelected()
 
         assertTrue(result)
+    }
+
+    // --- clearSingleTabData tests ---
+
+    @Test
+    fun whenClearSingleTabData_thenClearSiteDataWithVisitedDomains() = runTest {
+        whenever(mockTabVisitedSitesRepository.getVisitedSites("tab1")).thenReturn(setOf("example.com", "test.com"))
+        configureManualOptions(emptySet())
+
+        testee.clearSingleTabData("tab1")
+
+        verify(mockClearDataAction).clearDataForSpecificDomains(eq(setOf("example.com", "test.com")), eq(false))
+    }
+
+    @Test
+    fun whenClearSingleTabDataAndDuckAiChatsInManualOptions_thenClearDuckAiDataForDomains() = runTest {
+        whenever(mockTabVisitedSitesRepository.getVisitedSites("tab1")).thenReturn(setOf("example.com"))
+        configureManualOptions(setOf(FireClearOption.DUCKAI_CHATS))
+
+        testee.clearSingleTabData("tab1")
+
+        verify(mockClearDataAction).clearDataForSpecificDomains(eq(setOf("example.com")), eq(true))
+    }
+
+    @Test
+    fun whenClearSingleTabDataWithNoVisitedSites_thenStillCallClearDataForSpecificDomains() = runTest {
+        whenever(mockTabVisitedSitesRepository.getVisitedSites("tab1")).thenReturn(emptySet())
+        configureManualOptions(emptySet())
+
+        testee.clearSingleTabData("tab1")
+
+        verify(mockClearDataAction).clearDataForSpecificDomains(eq(emptySet()), eq(false))
+    }
+
+    @Test
+    fun whenClearSingleTabData_thenRemoveHistoryForTab() = runTest {
+        whenever(mockTabVisitedSitesRepository.getVisitedSites("tab1")).thenReturn(emptySet())
+        configureManualOptions(emptySet())
+
+        testee.clearSingleTabData("tab1")
+
+        verify(mockNavigationHistory).removeHistoryForTab("tab1")
+    }
+
+    @Test
+    fun whenClearSingleTabData_thenCleanUpVisitedSitesStore() = runTest {
+        whenever(mockTabVisitedSitesRepository.getVisitedSites("tab1")).thenReturn(emptySet())
+        configureManualOptions(emptySet())
+
+        testee.clearSingleTabData("tab1")
+
+        verify(mockTabVisitedSitesRepository).clearTab("tab1")
+    }
+
+    @Test
+    fun whenClearSingleTabData_thenDeleteTab() = runTest {
+        whenever(mockTabVisitedSitesRepository.getVisitedSites("tab1")).thenReturn(emptySet())
+        configureManualOptions(emptySet())
+
+        testee.clearSingleTabData("tab1")
+
+        verify(mockTabRepository).deleteTabAndSelectSource("tab1")
     }
 
     private suspend fun configureManualOptions(options: Set<FireClearOption>) {

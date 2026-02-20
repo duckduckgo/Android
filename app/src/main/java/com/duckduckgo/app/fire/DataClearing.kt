@@ -17,13 +17,16 @@
 package com.duckduckgo.app.fire
 
 import com.duckduckgo.app.fire.store.FireDataStore
+import com.duckduckgo.app.fire.store.TabVisitedSitesRepository
 import com.duckduckgo.app.fire.wideevents.DataClearingWideEvent
 import com.duckduckgo.app.global.view.ClearDataAction
 import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.clear.FireClearOption
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
+import com.duckduckgo.history.api.NavigationHistory
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import logcat.LogPriority.WARN
@@ -50,7 +53,25 @@ class DataClearing @Inject constructor(
     private val dataClearerTimeKeeper: BackgroundTimeKeeper,
     private val duckAiFeatureState: DuckAiFeatureState,
     private val dataClearingWideEvent: DataClearingWideEvent,
+    private val tabVisitedSitesRepository: TabVisitedSitesRepository,
+    private val navigationHistory: NavigationHistory,
+    private val tabRepository: TabRepository,
 ) : ManualDataClearing, AutomaticDataClearing {
+
+    override suspend fun clearSingleTabData(tabId: String) {
+        logcat { "Performing single tab clear for tab: $tabId" }
+
+        val visitedSites = tabVisitedSitesRepository.getVisitedSites(tabId)
+        val shouldClearDuckAiData = fireDataStore.getManualClearOptions()
+            .contains(FireClearOption.DUCKAI_CHATS)
+
+        clearDataAction.clearDataForSpecificDomains(visitedSites, shouldClearDuckAiData)
+        navigationHistory.removeHistoryForTab(tabId)
+        tabVisitedSitesRepository.clearTab(tabId)
+        tabRepository.deleteTabAndSelectSource(tabId)
+
+        logcat { "Single tab clear completed for tab: $tabId" }
+    }
 
     override suspend fun clearDataUsingManualFireOptions(shouldRestartIfRequired: Boolean, wasAppUsedSinceLastClear: Boolean) {
         val options = fireDataStore.getManualClearOptions()
@@ -68,11 +89,6 @@ class DataClearing @Inject constructor(
             dataClearingWideEvent.finishSuccess() // If there is an open wide event, complete it before killing the process.
             clearDataAction.killAndRestartProcess(notifyDataCleared = false)
         }
-    }
-
-    override suspend fun clearSingleTabData(tabId: String) {
-        // TODO: Wire up visited sites, history, duck.ai chat deletion, and WebStorageCompat clearing
-        logcat { "Single tab clear requested for tab: $tabId [NO OP for now]" }
     }
 
     override suspend fun clearDataUsingAutomaticFireOptions(killProcessIfNeeded: Boolean): Boolean {
