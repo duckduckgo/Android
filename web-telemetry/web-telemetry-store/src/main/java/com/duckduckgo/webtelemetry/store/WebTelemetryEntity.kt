@@ -27,12 +27,16 @@ data class WebTelemetryConfigEntity(
 
 /**
  * Persists per-pixel runtime state.
- * [periodStartMillis] is the UTC timestamp when the current period began.
- * [paramsJson] stores parameter data as JSON, e.g. {"adwallCount": 5}
+ * [periodStartMillis] UTC timestamp when the current period began.
+ * [periodEndMillis] UTC timestamp when the current period ends (fire time).
+ * [paramsJson] parameter data as JSON, e.g. {"count": 5}
+ * [stopCountingJson] JSON set of param names that have hit their max bucket, e.g. ["count"]
  */
 @Entity(tableName = "web_telemetry_pixel_state")
 data class WebTelemetryPixelStateEntity(
     @PrimaryKey val pixelName: String,
     val periodStartMillis: Long,
+    val periodEndMillis: Long,
     val paramsJson: String,
+    val stopCountingJson: String = "[]",
 )

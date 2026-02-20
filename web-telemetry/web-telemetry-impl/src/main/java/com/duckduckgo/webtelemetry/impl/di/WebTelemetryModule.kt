@@ -25,9 +25,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.webtelemetry.impl.EventHubPixelManager
 import com.duckduckgo.webtelemetry.impl.RealEventHubPixelManager
-import com.duckduckgo.webtelemetry.impl.RealStaggerProvider
 import com.duckduckgo.webtelemetry.impl.RealTimeProvider
-import com.duckduckgo.webtelemetry.impl.StaggerProvider
 import com.duckduckgo.webtelemetry.impl.TimeProvider
 import com.duckduckgo.webtelemetry.store.ALL_MIGRATIONS
 import com.duckduckgo.webtelemetry.store.RealWebTelemetryRepository
@@ -70,16 +68,11 @@ object WebTelemetryModule {
 
     @SingleInstanceIn(AppScope::class)
     @Provides
-    fun provideStaggerProvider(): StaggerProvider = RealStaggerProvider()
-
-    @SingleInstanceIn(AppScope::class)
-    @Provides
     fun provideEventHubPixelManager(
         repository: WebTelemetryRepository,
         pixel: Pixel,
         timeProvider: TimeProvider,
-        staggerProvider: StaggerProvider,
     ): EventHubPixelManager {
-        return RealEventHubPixelManager(repository, pixel, timeProvider, staggerProvider)
+        return RealEventHubPixelManager(repository, pixel, timeProvider)
     }
 }
