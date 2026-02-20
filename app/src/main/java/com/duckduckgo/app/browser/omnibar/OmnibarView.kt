@@ -34,6 +34,7 @@ import kotlinx.coroutines.flow.Flow
 interface OmnibarView {
     val omnibarType: OmnibarType
     var isScrollingEnabled: Boolean
+    var isUiLocked: Boolean
     val isEditing: Boolean
     val isEditingFlow: Flow<Boolean>
     val findInPage: IncludeFindInPageBinding

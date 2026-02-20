@@ -82,6 +82,7 @@ class BottomAppBarBehavior<V : View>(
         axes: Int,
         type: Int,
     ): Boolean {
+        if (!omnibar.isOmnibarScrollingEnabled()) return false
         if (axes == ViewCompat.SCROLL_AXIS_VERTICAL) {
             lastStartedType = type
             offsetAnimator?.cancel()
@@ -128,7 +129,6 @@ class BottomAppBarBehavior<V : View>(
         target: View,
         type: Int,
     ) {
-        if (!omnibar.isOmnibarScrollingEnabled()) return
         if (lastStartedType == ViewCompat.TYPE_TOUCH || type == ViewCompat.TYPE_NON_TOUCH) {
             val dY = child.translationY
             val threshold = child.height * 0.5f
