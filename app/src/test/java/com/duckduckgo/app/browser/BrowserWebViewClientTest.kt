@@ -48,7 +48,7 @@ import com.duckduckgo.app.browser.logindetection.WebNavigationEvent
 import com.duckduckgo.app.browser.mediaplayback.MediaPlayback
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.navigation.safeCopyBackForwardList
-import com.duckduckgo.app.browser.pageload.PageLoadManager
+import com.duckduckgo.app.browser.pageload.PageLoadPerformanceMonitor
 import com.duckduckgo.app.browser.pageloadpixel.PageLoadedHandler
 import com.duckduckgo.app.browser.pageloadpixel.firstpaint.PagePaintedHandler
 import com.duckduckgo.app.browser.print.PrintInjector
@@ -167,7 +167,7 @@ class BrowserWebViewClientTest {
             mock(),
         )
     private val mockDuckChat: DuckChat = mock()
-    private val mockPageLoadWideEvent: PageLoadManager = mock()
+    private val mockPageLoadWideEvent: PageLoadPerformanceMonitor = mock()
 
     @Before
     fun setup() =

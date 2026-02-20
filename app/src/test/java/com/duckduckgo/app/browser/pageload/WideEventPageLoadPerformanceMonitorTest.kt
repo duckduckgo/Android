@@ -32,18 +32,18 @@ import org.robolectric.annotation.Config
 
 @RunWith(AndroidJUnit4::class)
 @Config(sdk = [34])
-class WideEventPageLoadManagerTest {
+class WideEventPageLoadPerformanceMonitorTest {
 
     @get:Rule
     var coroutineTestRule = CoroutineTestRule()
 
     private lateinit var pageLoadWideEvent: PageLoadWideEvent
-    private lateinit var manager: PageLoadManager
+    private lateinit var manager: PageLoadPerformanceMonitor
 
     @Before
     fun setup() {
         pageLoadWideEvent = mock()
-        manager = WideEventPageLoadManager(
+        manager = WideEventPageLoadPerformanceMonitor(
             pageLoadWideEvent = pageLoadWideEvent,
             appCoroutineScope = coroutineTestRule.testScope,
             dispatchers = coroutineTestRule.testDispatcherProvider,

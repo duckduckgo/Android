@@ -30,7 +30,7 @@ import javax.inject.Inject
  * Manages page load event tracking lifecycle.
  * Coordinates page load events across the browser, tracking visibility, progress, and completion.
  */
-interface PageLoadManager {
+interface PageLoadPerformanceMonitor {
     /**
      * Called when a page starts loading.
      * @param tabId The unique identifier for the tab
@@ -92,11 +92,11 @@ interface PageLoadManager {
 private const val ABOUT_BLANK = "about:blank"
 
 @ContributesBinding(AppScope::class)
-class WideEventPageLoadManager @Inject constructor(
+class WideEventPageLoadPerformanceMonitor @Inject constructor(
     private val pageLoadWideEvent: PageLoadWideEvent,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatchers: DispatcherProvider,
-) : PageLoadManager {
+) : PageLoadPerformanceMonitor {
 
     override fun onPageStarted(tabId: String, url: String) {
         if (!shouldTrackUrl(url)) return

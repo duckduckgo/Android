@@ -56,7 +56,7 @@ import com.duckduckgo.app.browser.logindetection.WebNavigationEvent
 import com.duckduckgo.app.browser.mediaplayback.MediaPlayback
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.navigation.safeCopyBackForwardList
-import com.duckduckgo.app.browser.pageload.PageLoadManager
+import com.duckduckgo.app.browser.pageload.PageLoadPerformanceMonitor
 import com.duckduckgo.app.browser.pageloadpixel.PageLoadedHandler
 import com.duckduckgo.app.browser.pageloadpixel.firstpaint.PagePaintedHandler
 import com.duckduckgo.app.browser.print.PrintInjector
@@ -120,7 +120,7 @@ class BrowserWebViewClient @Inject constructor(
     private val jsPlugins: PluginPoint<JsInjectorPlugin>,
     private val currentTimeProvider: CurrentTimeProvider,
     private val pageLoadedHandler: PageLoadedHandler,
-    private val pageLoadManager: PageLoadManager,
+    private val pageLoadManager: PageLoadPerformanceMonitor,
     private val shouldSendPagePaintedPixel: PagePaintedHandler,
     private val mediaPlayback: MediaPlayback,
     private val subscriptions: Subscriptions,
