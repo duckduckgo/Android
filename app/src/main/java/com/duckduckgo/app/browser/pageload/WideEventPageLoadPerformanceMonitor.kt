@@ -129,7 +129,7 @@ class WideEventPageLoadPerformanceMonitor @Inject constructor(
         appCoroutineScope.launch {
             pageLoadWideEvent.finishPageLoad(
                 tabId = tabId,
-                outcome = "success",
+                outcome = PageLoadOutcome.SUCCESS,
                 errorCode = null,
                 isTabInForegroundOnFinish = isTabInForegroundOnFinish,
                 activeRequestsOnLoadStart = activeRequestsOnLoadStart,
@@ -150,7 +150,7 @@ class WideEventPageLoadPerformanceMonitor @Inject constructor(
         appCoroutineScope.launch {
             pageLoadWideEvent.finishPageLoad(
                 tabId = tabId,
-                outcome = "error",
+                outcome = PageLoadOutcome.ERROR,
                 errorCode = errorDescription,
                 isTabInForegroundOnFinish = isTabInForegroundOnFinish,
                 activeRequestsOnLoadStart = activeRequestsOnLoadStart,

@@ -155,7 +155,7 @@ class PageLoadWideEventTest {
         pageLoadWideEvent.startPageLoad("tab_4", "https://espn.com")
         pageLoadWideEvent.finishPageLoad(
             tabId = "tab_4",
-            outcome = "success",
+            outcome = PageLoadOutcome.SUCCESS,
             errorCode = null,
             isTabInForegroundOnFinish = true,
             activeRequestsOnLoadStart = 5,
@@ -191,7 +191,7 @@ class PageLoadWideEventTest {
         pageLoadWideEvent.startPageLoad("tab_5", "https://wikipedia.org")
         pageLoadWideEvent.finishPageLoad(
             tabId = "tab_5",
-            outcome = "error",
+            outcome = PageLoadOutcome.ERROR,
             errorCode = "ERROR_HOST_LOOKUP",
             isTabInForegroundOnFinish = false,
             activeRequestsOnLoadStart = 3,
@@ -225,7 +225,7 @@ class PageLoadWideEventTest {
     fun `when finishPageLoad called with unknown tab then does nothing`() = runTest {
         pageLoadWideEvent.finishPageLoad(
             tabId = "unknown_tab",
-            outcome = "success",
+            outcome = PageLoadOutcome.SUCCESS,
             errorCode = null,
             isTabInForegroundOnFinish = true,
             activeRequestsOnLoadStart = 0,
@@ -246,7 +246,7 @@ class PageLoadWideEventTest {
         pageLoadWideEvent.recordExitedFixedProgress("tab_9", 55)
         pageLoadWideEvent.finishPageLoad(
             tabId = "tab_9",
-            outcome = "success",
+            outcome = PageLoadOutcome.SUCCESS,
             errorCode = null,
             isTabInForegroundOnFinish = true,
             activeRequestsOnLoadStart = 0,
@@ -311,7 +311,7 @@ class PageLoadWideEventTest {
         // Page finishes
         pageLoadWideEvent.finishPageLoad(
             tabId = "tab_complete",
-            outcome = "success",
+            outcome = PageLoadOutcome.SUCCESS,
             errorCode = null,
             isTabInForegroundOnFinish = true,
             activeRequestsOnLoadStart = 7,

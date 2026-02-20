@@ -121,7 +121,7 @@ class WideEventPageLoadPerformanceMonitorTest {
         coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
         verify(pageLoadWideEvent).finishPageLoad(
             tabId = tabId,
-            outcome = "success",
+            outcome = PageLoadOutcome.SUCCESS,
             errorCode = null,
             isTabInForegroundOnFinish = isInForeground,
             activeRequestsOnLoadStart = activeRequestsOnStart,
@@ -151,7 +151,7 @@ class WideEventPageLoadPerformanceMonitorTest {
         coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
         verify(pageLoadWideEvent).finishPageLoad(
             tabId = tabId,
-            outcome = "error",
+            outcome = PageLoadOutcome.ERROR,
             errorCode = errorDescription,
             isTabInForegroundOnFinish = isInForeground,
             activeRequestsOnLoadStart = activeRequestsOnStart,
@@ -204,7 +204,7 @@ class WideEventPageLoadPerformanceMonitorTest {
         verify(pageLoadWideEvent).recordExitedFixedProgress(tabId, 60)
         verify(pageLoadWideEvent).finishPageLoad(
             tabId = tabId,
-            outcome = "success",
+            outcome = PageLoadOutcome.SUCCESS,
             errorCode = null,
             isTabInForegroundOnFinish = true,
             activeRequestsOnLoadStart = 4,
@@ -235,7 +235,7 @@ class WideEventPageLoadPerformanceMonitorTest {
         verify(pageLoadWideEvent).recordPageVisible(tabId, 15)
         verify(pageLoadWideEvent).finishPageLoad(
             tabId = tabId,
-            outcome = "error",
+            outcome = PageLoadOutcome.ERROR,
             errorCode = errorDescription,
             isTabInForegroundOnFinish = true,
             activeRequestsOnLoadStart = 2,

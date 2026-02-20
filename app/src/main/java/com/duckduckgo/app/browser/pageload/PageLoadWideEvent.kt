@@ -36,6 +36,14 @@ import kotlin.time.Duration.Companion.minutes
 import kotlin.time.toJavaDuration
 
 /**
+ * Represents the outcome of a page load operation.
+ */
+enum class PageLoadOutcome(val value: String) {
+    SUCCESS("success"),
+    ERROR("error"),
+}
+
+/**
  * Tracks page load events as Wide Event flows with multi-phase tracking.
  * Manages flow lifecycle: page_start → page_visible → page_escaped_fixed_progress → page_finish
  */
@@ -84,7 +92,7 @@ interface PageLoadWideEvent {
      * Records page_finish flow step and completes the Wide Event flow.
      *
      * @param tabId The unique identifier for the tab
-     * @param outcome "success", "error", or "timeout"
+     * @param outcome The page load outcome (SUCCESS, ERROR)
      * @param errorCode Optional error code for failures
      * @param isTabInForegroundOnFinish Whether the tab was in foreground when page finished loading
      * @param activeRequestsOnLoadStart Number of active network requests when page load started
@@ -92,7 +100,7 @@ interface PageLoadWideEvent {
      */
     suspend fun finishPageLoad(
         tabId: String,
-        outcome: String,
+        outcome: PageLoadOutcome,
         errorCode: String?,
         isTabInForegroundOnFinish: Boolean,
         activeRequestsOnLoadStart: Int,
@@ -201,7 +209,7 @@ class RealPageLoadWideEvent @Inject constructor(
 
     override suspend fun finishPageLoad(
         tabId: String,
-        outcome: String,
+        outcome: PageLoadOutcome,
         errorCode: String?,
         isTabInForegroundOnFinish: Boolean,
         activeRequestsOnLoadStart: Int,
@@ -218,17 +226,17 @@ class RealPageLoadWideEvent @Inject constructor(
         wideEventClient.flowStep(
             wideEventId = flowId,
             stepName = STEP_PAGE_FINISH,
-            success = (outcome == "success"),
+            success = (outcome == PageLoadOutcome.SUCCESS),
             metadata = mutableMapOf<String, String>().apply {
-                put(KEY_OUTCOME, outcome)
+                put(KEY_OUTCOME, outcome.value)
                 errorCode?.let { put(KEY_ERROR_CODE, it) }
             },
         )
 
-        val flowStatus = if (outcome == "success") {
+        val flowStatus = if (outcome == PageLoadOutcome.SUCCESS) {
             FlowStatus.Success
         } else {
-            FlowStatus.Failure(outcome)
+            FlowStatus.Failure(outcome.value)
         }
         wideEventClient.flowFinish(
             wideEventId = flowId,
