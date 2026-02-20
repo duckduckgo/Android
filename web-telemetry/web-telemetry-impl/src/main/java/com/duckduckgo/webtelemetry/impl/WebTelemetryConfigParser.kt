@@ -74,15 +74,15 @@ object EventHubConfigParser {
 
     private fun parseTrigger(json: JSONObject): TelemetryTriggerConfig? {
         val periodJson = json.optJSONObject("period") ?: return null
-        val days = periodJson.optInt("days", 0)
-        val hours = periodJson.optInt("hours", 0)
+        val seconds = periodJson.optInt("seconds", 0)
         val minutes = periodJson.optInt("minutes", 0)
-        val maxStaggerMins = periodJson.optInt("maxStaggerMins", 0)
+        val hours = periodJson.optInt("hours", 0)
+        val days = periodJson.optInt("days", 0)
 
-        if (days == 0 && hours == 0 && minutes == 0) return null
+        if (seconds == 0 && minutes == 0 && hours == 0 && days == 0) return null
 
         return TelemetryTriggerConfig(
-            period = TelemetryPeriodConfig(days = days, hours = hours, minutes = minutes, maxStaggerMins = maxStaggerMins),
+            period = TelemetryPeriodConfig(seconds = seconds, minutes = minutes, hours = hours, days = days),
         )
     }
 
@@ -94,12 +94,17 @@ object EventHubConfigParser {
             "counter" -> {
                 if (!json.has("source")) return null
                 val source = json.getString("source")
-                val bucketsArray = json.optJSONArray("buckets")
-                val buckets = if (bucketsArray != null) {
-                    (0 until bucketsArray.length()).mapNotNull { bucketsArray.optString(it) }
-                } else {
-                    emptyList()
+                val bucketsArray = json.optJSONArray("buckets") ?: return null
+                val buckets = (0 until bucketsArray.length()).mapNotNull { i ->
+                    val bucketJson = bucketsArray.optJSONObject(i) ?: return@mapNotNull null
+                    if (!bucketJson.has("minInclusive") || !bucketJson.has("name")) return@mapNotNull null
+                    BucketConfig(
+                        minInclusive = bucketJson.getInt("minInclusive"),
+                        maxExclusive = if (bucketJson.has("maxExclusive")) bucketJson.getInt("maxExclusive") else null,
+                        name = bucketJson.getString("name"),
+                    )
                 }
+                if (buckets.isEmpty()) return null
                 TelemetryParameterConfig(template = template, source = source, buckets = buckets)
             }
             else -> null

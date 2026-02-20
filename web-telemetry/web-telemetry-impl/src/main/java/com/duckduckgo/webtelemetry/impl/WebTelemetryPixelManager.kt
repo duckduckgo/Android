@@ -19,17 +19,13 @@ package com.duckduckgo.webtelemetry.impl
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.webtelemetry.store.WebTelemetryPixelStateEntity
 import com.duckduckgo.webtelemetry.store.WebTelemetryRepository
+import org.json.JSONArray
 import org.json.JSONObject
 import javax.inject.Inject
 
 interface EventHubPixelManager {
-    /** Process a webEvent by passing it to all enabled telemetry pixels. */
     fun handleWebEvent(eventType: String)
-
-    /** Check all pixels and fire any whose period has elapsed. */
     fun checkPixels()
-
-    /** Called when feature config changes. Re-syncs telemetry state. */
     fun onConfigChanged()
 }
 
@@ -37,28 +33,46 @@ class RealEventHubPixelManager @Inject constructor(
     private val repository: WebTelemetryRepository,
     private val pixel: Pixel,
     private val timeProvider: TimeProvider,
-    private val staggerProvider: StaggerProvider,
 ) : EventHubPixelManager {
 
     override fun handleWebEvent(eventType: String) {
         val config = getParsedConfig()
         if (!config.featureEnabled) return
 
+        val nowMillis = timeProvider.currentTimeMillis()
+
         for (pixelConfig in config.telemetry) {
             if (!pixelConfig.isEnabled) continue
             val state = repository.getPixelState(pixelConfig.name) ?: continue
+
+            if (state.periodStartMillis == 0L || state.periodEndMillis == 0L) continue
+            if (nowMillis > state.periodEndMillis) continue
+
             val params = parseParamsJson(state.paramsJson)
+            val stopCounting = parseStopCountingJson(state.stopCountingJson)
             var changed = false
 
             for ((paramName, paramConfig) in pixelConfig.parameters) {
                 if (paramConfig.isCounter && paramConfig.source == eventType) {
-                    params[paramName] = (params[paramName] ?: 0) + 1
+                    if (paramName in stopCounting) continue
+
+                    val newValue = (params[paramName] ?: 0) + 1
+                    params[paramName] = newValue
                     changed = true
+
+                    if (BucketCounter.shouldStopCounting(newValue, paramConfig.buckets)) {
+                        stopCounting.add(paramName)
+                    }
                 }
             }
 
             if (changed) {
-                repository.savePixelState(state.copy(paramsJson = serializeParams(params)))
+                repository.savePixelState(
+                    state.copy(
+                        paramsJson = serializeParams(params),
+                        stopCountingJson = serializeStopCounting(stopCounting),
+                    ),
+                )
             }
         }
     }
@@ -73,10 +87,7 @@ class RealEventHubPixelManager @Inject constructor(
             if (!pixelConfig.isEnabled) continue
             val state = repository.getPixelState(pixelConfig.name) ?: continue
 
-            val periodMillis = pixelConfig.trigger.period.periodSeconds * 1000
-            val fireAtMillis = state.periodStartMillis + periodMillis
-
-            if (nowMillis >= fireAtMillis) {
+            if (nowMillis >= state.periodEndMillis && state.periodEndMillis > 0) {
                 fireTelemetry(pixelConfig, state)
             }
         }
@@ -89,66 +100,54 @@ class RealEventHubPixelManager @Inject constructor(
             return
         }
 
-        val configPixelNames = config.telemetry.map { it.name }.toSet()
-        val existingStates = repository.getAllPixelStates()
-        val existingNames = existingStates.map { it.pixelName }.toSet()
-
-        // Deregister unknown
-        for (name in existingNames - configPixelNames) {
-            repository.deletePixelState(name)
-        }
-
-        // Register/update each configured pixel
         for (pixelConfig in config.telemetry) {
-            registerTelemetry(pixelConfig)
-        }
-    }
-
-    private fun registerTelemetry(pixelConfig: TelemetryPixelConfig) {
-        val existing = repository.getPixelState(pixelConfig.name)
-
-        if (!pixelConfig.isEnabled) {
-            if (existing != null) {
-                repository.deletePixelState(pixelConfig.name)
+            if (repository.getPixelState(pixelConfig.name) == null && pixelConfig.isEnabled) {
+                startNewPeriod(pixelConfig)
             }
-            return
         }
-
-        if (existing == null) {
-            startNewPeriod(pixelConfig)
-        }
-        // If already exists, we keep the state (preserving counters mid-period)
-    }
-
-    private fun startNewPeriod(pixelConfig: TelemetryPixelConfig) {
-        val initialParams = pixelConfig.parameters.keys.associateWith { 0 }.toMutableMap()
-        repository.savePixelState(
-            WebTelemetryPixelStateEntity(
-                pixelName = pixelConfig.name,
-                periodStartMillis = timeProvider.currentTimeMillis(),
-                paramsJson = serializeParams(initialParams),
-            ),
-        )
     }
 
     private fun fireTelemetry(pixelConfig: TelemetryPixelConfig, state: WebTelemetryPixelStateEntity) {
+        if (state.periodStartMillis == 0L || state.periodEndMillis == 0L) return
+
         val pixelData = buildPixel(pixelConfig, state)
 
-        if (pixelData.isEmpty()) {
-            startNewPeriod(pixelConfig)
-            return
+        if (pixelData.isNotEmpty()) {
+            val additionalParams = mapOf(
+                PARAM_ATTRIBUTION_PERIOD to calculateAttributionPeriod(
+                    state.periodStartMillis,
+                    pixelConfig.trigger.period,
+                ).toString(),
+            )
+            pixel.enqueueFire(
+                pixelName = pixelConfig.name,
+                parameters = pixelData + additionalParams,
+            )
         }
 
-        val staggerMs = staggerProvider.randomStaggerMs(pixelConfig.trigger.period.maxStaggerMins)
+        // Deregister and re-register: resets state and picks up any config changes
+        repository.deletePixelState(pixelConfig.name)
 
-        // Reset counters and start new period immediately
-        startNewPeriod(pixelConfig)
+        val latestConfig = getParsedConfig()
+        val latestPixelConfig = latestConfig.telemetry.find { it.name == pixelConfig.name }
+        if (latestConfig.featureEnabled && latestPixelConfig != null && latestPixelConfig.isEnabled) {
+            startNewPeriod(latestPixelConfig)
+        }
+    }
 
-        // Fire the pixel (with stagger delay if applicable)
-        // On Android, we use enqueueFire which persists the pixel for retry
-        pixel.enqueueFire(
-            pixelName = pixelConfig.name,
-            parameters = pixelData,
+    private fun startNewPeriod(pixelConfig: TelemetryPixelConfig) {
+        val nowMillis = timeProvider.currentTimeMillis()
+        val periodMillis = pixelConfig.trigger.period.periodSeconds * 1000
+        val initialParams = pixelConfig.parameters.keys.associateWith { 0 }.toMutableMap()
+
+        repository.savePixelState(
+            WebTelemetryPixelStateEntity(
+                pixelName = pixelConfig.name,
+                periodStartMillis = nowMillis,
+                periodEndMillis = nowMillis + periodMillis,
+                paramsJson = serializeParams(initialParams),
+                stopCountingJson = "[]",
+            ),
         )
     }
 
@@ -162,9 +161,9 @@ class RealEventHubPixelManager @Inject constructor(
         for ((paramName, paramConfig) in pixelConfig.parameters) {
             val value = params[paramName] ?: 0
             if (paramConfig.isCounter) {
-                val bucket = BucketCounter.bucketCount(value, paramConfig.buckets)
-                if (bucket != null) {
-                    pixelData[paramName] = bucket
+                val bucketName = BucketCounter.bucketCount(value, paramConfig.buckets)
+                if (bucketName != null) {
+                    pixelData[paramName] = bucketName
                 }
             }
         }
@@ -177,6 +176,18 @@ class RealEventHubPixelManager @Inject constructor(
     }
 
     companion object {
+        const val PARAM_ATTRIBUTION_PERIOD = "attributionPeriod"
+
+        fun calculateAttributionPeriod(periodStartMillis: Long, period: TelemetryPeriodConfig): Long {
+            val periodSecs = period.periodSeconds
+            return toStartOfInterval(periodStartMillis, periodSecs) + periodSecs
+        }
+
+        fun toStartOfInterval(timestampMillis: Long, periodSeconds: Long): Long {
+            val epochSeconds = timestampMillis / 1000
+            return (epochSeconds / periodSeconds) * periodSeconds
+        }
+
         fun parseParamsJson(json: String): MutableMap<String, Int> {
             return try {
                 val obj = JSONObject(json)
@@ -195,6 +206,19 @@ class RealEventHubPixelManager @Inject constructor(
         fun serializeParams(params: Map<String, Int>): String {
             return JSONObject(params.mapValues { it.value as Any }).toString()
         }
+
+        fun parseStopCountingJson(json: String): MutableSet<String> {
+            return try {
+                val arr = JSONArray(json)
+                (0 until arr.length()).mapNotNull { arr.optString(it) }.toMutableSet()
+            } catch (e: Exception) {
+                mutableSetOf()
+            }
+        }
+
+        fun serializeStopCounting(set: Set<String>): String {
+            return JSONArray(set.toList()).toString()
+        }
     }
 }
 
@@ -204,16 +228,4 @@ interface TimeProvider {
 
 class RealTimeProvider @Inject constructor() : TimeProvider {
     override fun currentTimeMillis(): Long = System.currentTimeMillis()
-}
-
-interface StaggerProvider {
-    /** Returns a random delay in milliseconds, up to [maxStaggerMins] minutes. */
-    fun randomStaggerMs(maxStaggerMins: Int): Long
-}
-
-class RealStaggerProvider @Inject constructor() : StaggerProvider {
-    override fun randomStaggerMs(maxStaggerMins: Int): Long {
-        if (maxStaggerMins <= 0) return 0
-        return (Math.random() * maxStaggerMins * 60 * 1000).toLong()
-    }
 }

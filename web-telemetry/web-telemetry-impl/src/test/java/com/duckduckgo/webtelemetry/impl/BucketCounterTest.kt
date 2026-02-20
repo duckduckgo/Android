@@ -17,26 +17,41 @@
 package com.duckduckgo.webtelemetry.impl
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class BucketCounterTest {
 
-    private val buckets = listOf("0-1", "2-3", "4-5", "6-10", "11-20", "21-39", "40+")
+    private val buckets = listOf(
+        BucketConfig(minInclusive = 0, maxExclusive = 1, name = "0"),
+        BucketConfig(minInclusive = 1, maxExclusive = 3, name = "1-2"),
+        BucketConfig(minInclusive = 3, maxExclusive = 6, name = "3-5"),
+        BucketConfig(minInclusive = 6, maxExclusive = 11, name = "6-10"),
+        BucketConfig(minInclusive = 11, maxExclusive = 21, name = "11-20"),
+        BucketConfig(minInclusive = 21, maxExclusive = 40, name = "21-39"),
+        BucketConfig(minInclusive = 40, maxExclusive = null, name = "40+"),
+    )
 
     @Test
     fun `count 0 matches first bucket`() {
-        assertEquals("0-1", BucketCounter.bucketCount(0, buckets))
+        assertEquals("0", BucketCounter.bucketCount(0, buckets))
     }
 
     @Test
-    fun `count 1 matches first bucket`() {
-        assertEquals("0-1", BucketCounter.bucketCount(1, buckets))
+    fun `count 1 matches 1-2 bucket`() {
+        assertEquals("1-2", BucketCounter.bucketCount(1, buckets))
     }
 
     @Test
-    fun `count 2 matches second bucket`() {
-        assertEquals("2-3", BucketCounter.bucketCount(2, buckets))
+    fun `count 2 matches 1-2 bucket`() {
+        assertEquals("1-2", BucketCounter.bucketCount(2, buckets))
+    }
+
+    @Test
+    fun `count 3 matches 3-5 bucket`() {
+        assertEquals("3-5", BucketCounter.bucketCount(3, buckets))
     }
 
     @Test
@@ -55,19 +70,11 @@ class BucketCounterTest {
     }
 
     @Test
-    fun `exact bucket matches`() {
-        val exactBuckets = listOf("0", "1", "2", "3+")
-        assertEquals("0", BucketCounter.bucketCount(0, exactBuckets))
-        assertEquals("1", BucketCounter.bucketCount(1, exactBuckets))
-        assertEquals("2", BucketCounter.bucketCount(2, exactBuckets))
-        assertEquals("3+", BucketCounter.bucketCount(3, exactBuckets))
-        assertEquals("3+", BucketCounter.bucketCount(999, exactBuckets))
-    }
-
-    @Test
     fun `no matching bucket returns null`() {
-        val restrictedBuckets = listOf("0-5", "10-20")
-        assertNull(BucketCounter.bucketCount(7, restrictedBuckets))
+        val restrictedBuckets = listOf(
+            BucketConfig(minInclusive = 5, maxExclusive = 10, name = "5-9"),
+        )
+        assertNull(BucketCounter.bucketCount(3, restrictedBuckets))
     }
 
     @Test
@@ -76,8 +83,21 @@ class BucketCounterTest {
     }
 
     @Test
-    fun `first matching bucket wins`() {
-        val overlapping = listOf("0-10", "5-15", "10+")
-        assertEquals("0-10", BucketCounter.bucketCount(7, overlapping))
+    fun `maxExclusive is exclusive`() {
+        assertEquals("6-10", BucketCounter.bucketCount(10, buckets))
+        assertEquals("11-20", BucketCounter.bucketCount(11, buckets))
+    }
+
+    @Test
+    fun `shouldStopCounting returns true when at max bucket`() {
+        assertTrue(BucketCounter.shouldStopCounting(40, buckets))
+        assertTrue(BucketCounter.shouldStopCounting(100, buckets))
+    }
+
+    @Test
+    fun `shouldStopCounting returns false when higher buckets exist`() {
+        assertFalse(BucketCounter.shouldStopCounting(0, buckets))
+        assertFalse(BucketCounter.shouldStopCounting(5, buckets))
+        assertFalse(BucketCounter.shouldStopCounting(39, buckets))
     }
 }

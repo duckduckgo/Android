@@ -16,38 +16,28 @@
 
 package com.duckduckgo.webtelemetry.impl
 
-/**
- * Maps a raw count into its appropriate bucket string.
- *
- * Bucket formats:
- * - "M" — exactly M
- * - "M-N" — at least M and at most N (inclusive)
- * - "M+" — M or more
- *
- * Returns the first matching bucket, or null if no bucket matches.
- */
 object BucketCounter {
 
-    private val EXACT_PATTERN = Regex("^(\\d+)$")
-    private val RANGE_PATTERN = Regex("^(\\d+)-(\\d+)$")
-    private val OPEN_ENDED_PATTERN = Regex("^(\\d+)\\+$")
-
-    fun bucketCount(count: Int, buckets: List<String>): String? {
+    /**
+     * Find the first bucket matching the given count.
+     * Returns the bucket's [BucketConfig.name], or null if no bucket matches.
+     */
+    fun bucketCount(count: Int, buckets: List<BucketConfig>): String? {
         for (bucket in buckets) {
-            EXACT_PATTERN.matchEntire(bucket)?.let { match ->
-                val value = match.groupValues[1].toInt()
-                if (count == value) return bucket
-            }
-            RANGE_PATTERN.matchEntire(bucket)?.let { match ->
-                val lower = match.groupValues[1].toInt()
-                val upper = match.groupValues[2].toInt()
-                if (count in lower..upper) return bucket
-            }
-            OPEN_ENDED_PATTERN.matchEntire(bucket)?.let { match ->
-                val value = match.groupValues[1].toInt()
-                if (count >= value) return bucket
+            if (count >= bucket.minInclusive) {
+                if (bucket.maxExclusive == null || count < bucket.maxExclusive) {
+                    return bucket.name
+                }
             }
         }
         return null
+    }
+
+    /**
+     * Returns true if no future counting can change the bucket outcome
+     * (i.e., no bucket has a minInclusive greater than the current count).
+     */
+    fun shouldStopCounting(count: Int, buckets: List<BucketConfig>): Boolean {
+        return !buckets.any { count < it.minInclusive }
     }
 }
