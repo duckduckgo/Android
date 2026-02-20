@@ -167,7 +167,7 @@ class BrowserWebViewClientTest {
             mock(),
         )
     private val mockDuckChat: DuckChat = mock()
-    private val mockPageLoadWideEvent: PageLoadPerformanceMonitor = mock()
+    private val pageLoadPerformanceMonitor: PageLoadPerformanceMonitor = mock()
 
     @Before
     fun setup() =
@@ -199,7 +199,7 @@ class BrowserWebViewClientTest {
                     jsPlugins,
                     currentTimeProvider,
                     pageLoadedHandler,
-                    mockPageLoadWideEvent,
+                    pageLoadPerformanceMonitor,
                     pagePaintedHandler,
                     mediaPlayback,
                     subscriptions,
@@ -943,12 +943,15 @@ class BrowserWebViewClientTest {
         whenever(webResourceError.description).thenReturn("net::ERR_NAME_NOT_RESOLVED")
         whenever(webResourceRequest.isForMainFrame).thenReturn(true)
         whenever(webResourceRequest.url).thenReturn(requestUrl.toUri())
+        whenever(mockWebView.safeCopyBackForwardList()).thenReturn(TestBackForwardList())
+        whenever(mockWebView.settings).thenReturn(mock())
         whenever(listener.getCurrentTabId()).thenReturn(tabId)
         whenever(listener.isTabInForeground()).thenReturn(true)
 
+        testee.onPageStarted(mockWebView, requestUrl, null)
         testee.onReceivedError(mockWebView, webResourceRequest, webResourceError)
 
-        verify(mockPageLoadWideEvent).onPageLoadFailed(
+        verify(pageLoadPerformanceMonitor).onPageLoadFailed(
             tabId = eq(tabId),
             url = eq(requestUrl),
             errorDescription = any(),
@@ -972,7 +975,7 @@ class BrowserWebViewClientTest {
 
         testee.onReceivedError(mockWebView, webResourceRequest, webResourceError)
 
-        verify(mockPageLoadWideEvent, never()).onPageLoadFailed(
+        verify(pageLoadPerformanceMonitor, never()).onPageLoadFailed(
             tabId = any(),
             url = any(),
             errorDescription = any(),
@@ -1155,7 +1158,7 @@ class BrowserWebViewClientTest {
         whenever(mockWebView.settings).thenReturn(mock())
         whenever(listener.getCurrentTabId()).thenReturn(tabId)
         testee.onPageStarted(mockWebView, EXAMPLE_URL, null)
-        verify(mockPageLoadWideEvent).onPageStarted(tabId, EXAMPLE_URL)
+        verify(pageLoadPerformanceMonitor).onPageStarted(tabId, EXAMPLE_URL)
     }
 
     @Test
@@ -1166,7 +1169,7 @@ class BrowserWebViewClientTest {
         whenever(mockWebView.settings).thenReturn(mock())
         whenever(listener.getCurrentTabId()).thenReturn(tabId)
         testee.onPageStarted(mockWebView, "about:blank", null)
-        verify(mockPageLoadWideEvent, never()).onPageStarted(any(), any())
+        verify(pageLoadPerformanceMonitor, never()).onPageStarted(any(), any())
     }
 
     @Test
@@ -1176,7 +1179,7 @@ class BrowserWebViewClientTest {
         whenever(mockWebView.settings).thenReturn(mock())
         whenever(listener.getCurrentTabId()).thenReturn(null)
         testee.onPageStarted(mockWebView, EXAMPLE_URL, null)
-        verify(mockPageLoadWideEvent, never()).onPageStarted(any(), any())
+        verify(pageLoadPerformanceMonitor, never()).onPageStarted(any(), any())
     }
 
     @Test
@@ -1189,7 +1192,7 @@ class BrowserWebViewClientTest {
         whenever(mockWebView.safeCopyBackForwardList()).thenReturn(TestBackForwardList())
         whenever(listener.getCurrentTabId()).thenReturn(tabId)
         testee.onPageCommitVisible(mockWebView, EXAMPLE_URL)
-        verify(mockPageLoadWideEvent).onPageVisible(tabId, EXAMPLE_URL, progress)
+        verify(pageLoadPerformanceMonitor).onPageVisible(tabId, EXAMPLE_URL, progress)
     }
 
     @Test
@@ -1209,7 +1212,7 @@ class BrowserWebViewClientTest {
         val urlCaptor = argumentCaptor<String>()
         val foregroundCaptor = argumentCaptor<Boolean>()
 
-        verify(mockPageLoadWideEvent).onPageLoadSucceeded(
+        verify(pageLoadPerformanceMonitor).onPageLoadSucceeded(
             tabId = tabIdCaptor.capture(),
             url = urlCaptor.capture(),
             isTabInForegroundOnFinish = foregroundCaptor.capture(),
@@ -1236,7 +1239,7 @@ class BrowserWebViewClientTest {
         testee.onPageFinished(mockWebView, EXAMPLE_URL)
 
         val foregroundCaptor = argumentCaptor<Boolean>()
-        verify(mockPageLoadWideEvent).onPageLoadSucceeded(
+        verify(pageLoadPerformanceMonitor).onPageLoadSucceeded(
             tabId = any(),
             url = any(),
             isTabInForegroundOnFinish = foregroundCaptor.capture(),
@@ -1253,7 +1256,7 @@ class BrowserWebViewClientTest {
         val tabId = "test-tab-early"
         whenever(listener.getCurrentTabId()).thenReturn(tabId)
         testee.onPageFinished(mockWebView, EXAMPLE_URL)
-        verify(mockPageLoadWideEvent, never()).onPageLoadSucceeded(
+        verify(pageLoadPerformanceMonitor, never()).onPageLoadSucceeded(
             tabId = any(),
             url = any(),
             isTabInForegroundOnFinish = any(),
@@ -1274,7 +1277,7 @@ class BrowserWebViewClientTest {
         testee.onPageStarted(mockWebView, "about:blank", null)
         testee.onPageFinished(mockWebView, "about:blank")
 
-        verify(mockPageLoadWideEvent, never()).onPageLoadSucceeded(
+        verify(pageLoadPerformanceMonitor, never()).onPageLoadSucceeded(
             tabId = any(),
             url = any(),
             isTabInForegroundOnFinish = any(),
@@ -1295,7 +1298,7 @@ class BrowserWebViewClientTest {
         testee.onPageStarted(mockWebView, EXAMPLE_URL, null)
         testee.onPageFinished(mockWebView, EXAMPLE_URL)
 
-        verify(mockPageLoadWideEvent, never()).onPageLoadSucceeded(
+        verify(pageLoadPerformanceMonitor, never()).onPageLoadSucceeded(
             tabId = any(),
             url = any(),
             isTabInForegroundOnFinish = any(),
@@ -1325,7 +1328,7 @@ class BrowserWebViewClientTest {
         val urlCaptor = argumentCaptor<String>()
         val errorCaptor = argumentCaptor<String>()
 
-        verify(mockPageLoadWideEvent).onPageLoadFailed(
+        verify(pageLoadPerformanceMonitor).onPageLoadFailed(
             tabId = tabIdCaptor.capture(),
             url = urlCaptor.capture(),
             errorDescription = errorCaptor.capture(),
@@ -1354,7 +1357,7 @@ class BrowserWebViewClientTest {
         testee.onPageStarted(mockWebView, EXAMPLE_URL, null)
         testee.onReceivedError(mockWebView, webResourceRequest, webResourceError)
 
-        verify(mockPageLoadWideEvent, never()).onPageLoadFailed(
+        verify(pageLoadPerformanceMonitor, never()).onPageLoadFailed(
             tabId = any(),
             url = any(),
             errorDescription = any(),
