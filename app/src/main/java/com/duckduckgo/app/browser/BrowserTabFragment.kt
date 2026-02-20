@@ -1067,7 +1067,7 @@ class BrowserTabFragment :
         configureNavigationBar()
         configureOmnibar()
         configureBrowserTabKeyboardListener()
-        setupUiLockDebugButton() // TODO: Remove before merging
+
         disableViewStateSaving()
 
         if (savedInstanceState == null) {
@@ -3760,7 +3760,6 @@ class BrowserTabFragment :
     }
 
     private var isUiLocked = false
-    private var uiLockDebugButton: android.widget.Button? = null
 
     private fun uiLockChanged(locked: Boolean) {
         isUiLocked = locked
@@ -3769,32 +3768,6 @@ class BrowserTabFragment :
             omnibar.setExpanded(true)
         }
         webView?.setContentAllowsSwipeToRefresh(!locked)
-        updateUiLockDebugButton()
-    }
-
-    private fun updateUiLockDebugButton() {
-        uiLockDebugButton?.text = if (isUiLocked) "Toggle: Locked" else "Toggle: Unlocked"
-    }
-
-    // TODO: Remove this debug method before merging
-    private fun setupUiLockDebugButton() {
-        val button = android.widget.Button(requireContext()).apply {
-            text = "Toggle: Unlocked"
-            setOnClickListener {
-                uiLockChanged(!isUiLocked)
-                android.widget.Toast.makeText(requireContext(), "isUiLocked=$isUiLocked webView=${webView != null} webViewLocked=${webView?.isUiLocked}", android.widget.Toast.LENGTH_SHORT).show()
-            }
-        }
-        val params = androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams(
-            android.view.ViewGroup.LayoutParams.WRAP_CONTENT,
-            android.view.ViewGroup.LayoutParams.WRAP_CONTENT,
-        ).apply {
-            gravity = android.view.Gravity.BOTTOM or android.view.Gravity.START
-            marginStart = 16
-            bottomMargin = 200
-        }
-        binding.rootView.addView(button, params)
-        uiLockDebugButton = button
     }
 
     private fun showFaviconsPrompt() {
