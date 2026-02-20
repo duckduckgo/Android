@@ -27,8 +27,11 @@ import org.json.JSONObject
 import javax.inject.Inject
 
 /**
- * Receives webEvent notifications from C-S-S's webDetection feature and
+ * Receives webEvent notifications from C-S-S's webTelemetry feature and
  * forwards them to the EventHub for telemetry processing.
+ *
+ * The routing is: webDetection → callFeatureMethod('webTelemetry', 'fireEvent') →
+ * webTelemetry.messaging.notify('webEvent', ...) → this handler.
  */
 @ContributesMultibinding(ActivityScope::class)
 class EventHubContentScopeJsMessageHandler @Inject constructor(
@@ -60,7 +63,7 @@ class EventHubContentScopeJsMessageHandler @Inject constructor(
         }
 
         override val allowedDomains: List<String> = emptyList()
-        override val featureName: String = "webDetection"
+        override val featureName: String = "webTelemetry"
         override val methods: List<String> = listOf("webEvent")
     }
 }
