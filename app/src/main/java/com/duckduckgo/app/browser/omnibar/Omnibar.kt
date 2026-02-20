@@ -253,9 +253,9 @@ class Omnibar(
         }
 
     var isUiLocked: Boolean
-        get() = (omnibarView as? OmnibarLayout)?.isUiLocked ?: false
+        get() = omnibarView.isUiLocked
         set(value) {
-            (omnibarView as? OmnibarLayout)?.isUiLocked = value
+            omnibarView.isUiLocked = value
         }
 
     var viewMode: ViewMode = ViewMode.Browser(null)

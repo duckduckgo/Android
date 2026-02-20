@@ -358,6 +358,7 @@ import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment.Delete
 import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment.EditSavedSiteListener
 import com.duckduckgo.serp.logos.api.SerpEasterEggLogosToggles
 import com.duckduckgo.serp.logos.api.SerpLogo
+import com.duckduckgo.contentscopescripts.impl.features.browseruilock.BrowserUiLockFeature
 import com.duckduckgo.serp.logos.api.SerpLogos
 import com.duckduckgo.settings.api.SerpSettingsFeature
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
@@ -503,6 +504,7 @@ class BrowserTabViewModel @Inject constructor(
     private val serpEasterEggLogosToggles: SerpEasterEggLogosToggles,
     private val serpLogos: SerpLogos,
     private val tabVisitedSitesRepository: TabVisitedSitesRepository,
+    private val browserUiLockFeature: BrowserUiLockFeature,
 ) : ViewModel(),
     WebViewClientListener,
     EditSavedSiteListener,
@@ -4301,6 +4303,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private fun uiLockChanged(locked: Boolean) {
+        if (!browserUiLockFeature.self().isEnabled()) return
         viewModelScope.launch(dispatchers.main()) {
             command.value = UiLockChanged(locked)
         }

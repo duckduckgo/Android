@@ -1378,7 +1378,7 @@ class OmnibarLayout @JvmOverloads constructor(
         translationY = y
     }
 
-    internal var isUiLocked: Boolean = false
+    override var isUiLocked: Boolean = false
 
     override fun isOmnibarScrollingEnabled(): Boolean = isScrollingEnabled && !isUiLocked
 
