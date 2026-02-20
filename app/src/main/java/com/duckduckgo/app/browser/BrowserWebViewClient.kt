@@ -729,21 +729,21 @@ class BrowserWebViewClient @Inject constructor(
             val parsedError = parseErrorResponse(webResourceError)
             if (request?.isForMainFrame == true) {
                 if (parsedError != OMITTED) {
-                    // Trigger Wide Event failure for main frame errors
-                    request.url?.toString()?.let { url ->
-                        webViewClientListener?.getCurrentTabId()?.let { tabId ->
-                            pageLoadManager.onPageLoadFailed(
-                                tabId = tabId,
-                                url = url,
-                                errorDescription = webResourceError.errorCode.asStringErrorCode(),
-                                isTabInForegroundOnFinish = webViewClientListener?.isTabInForeground() ?: true,
-                                activeRequestsOnLoadStart = parallelRequestsOnStart,
-                                concurrentRequestsOnFinish = decrementLoadCountAndGet(),
-                            )
-                        }
-                    }
                     if (this.start != null) {
-                        decrementLoadCountAndGet()
+                        // Trigger Wide Event failure for main frame errors
+                        val concurrentRequestsOnFinish = decrementLoadCountAndGet()
+                        request.url?.toString()?.let { url ->
+                            webViewClientListener?.getCurrentTabId()?.let { tabId ->
+                                pageLoadManager.onPageLoadFailed(
+                                    tabId = tabId,
+                                    url = url,
+                                    errorDescription = webResourceError.errorCode.asStringErrorCode(),
+                                    isTabInForegroundOnFinish = webViewClientListener?.isTabInForeground() ?: true,
+                                    activeRequestsOnLoadStart = parallelRequestsOnStart,
+                                    concurrentRequestsOnFinish = concurrentRequestsOnFinish,
+                                )
+                            }
+                        }
                         this.start = null
                     }
                     webViewClientListener?.onReceivedError(parsedError, request.url.toString())
