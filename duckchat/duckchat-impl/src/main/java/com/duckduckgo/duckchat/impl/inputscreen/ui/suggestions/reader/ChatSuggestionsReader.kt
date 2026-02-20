@@ -26,6 +26,7 @@ import androidx.annotation.VisibleForTesting
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.impl.feature.DuckAiChatHistoryFeature
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.ChatSuggestion
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
@@ -33,6 +34,7 @@ import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
+import org.json.JSONArray
 import org.json.JSONObject
 import java.time.Instant
 import java.time.LocalDateTime
@@ -52,6 +54,7 @@ class RealChatSuggestionsReader @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val appBuildConfig: AppBuildConfig,
     private val messaging: ChatSuggestionsJsMessaging,
+    private val duckAiChatHistoryFeature: DuckAiChatHistoryFeature,
 ) : ChatSuggestionsReader {
 
     private var webView: WebView? = null
@@ -64,12 +67,13 @@ class RealChatSuggestionsReader @Inject constructor(
     @SuppressLint("SetJavaScriptEnabled")
     override suspend fun fetchSuggestions(query: String): List<ChatSuggestion> {
         return withContext(dispatchers.main()) {
+            val maxSuggestions = getMaxHistoryCount()
             val script = getScript()
             val wv = getOrCreateWebView(script)
 
             val results = mutableListOf<DomainResult>()
             for (domain in DOMAINS) {
-                val result = fetchFromDomain(wv, domain, query)
+                val result = fetchFromDomain(wv, domain, query, maxSuggestions)
                 if (result != null) {
                     results.add(result)
                 }
@@ -78,7 +82,7 @@ class RealChatSuggestionsReader @Inject constructor(
             val bestResult = results.maxByOrNull { result ->
                 (result.pinnedChats + result.recentChats).maxOfOrNull { it.lastEdit } ?: LocalDateTime.MIN
             } ?: return@withContext emptyList()
-            mergeSuggestions(bestResult.pinnedChats, bestResult.recentChats)
+            mergeSuggestions(bestResult.pinnedChats, bestResult.recentChats, maxSuggestions)
         }
     }
 
@@ -89,29 +93,49 @@ class RealChatSuggestionsReader @Inject constructor(
         chatsResultDeferred = null
         webView?.destroy()
         webView = null
+        cachedScript = null
     }
 
     // region Script Loading
 
     private suspend fun getScript(): String {
         return withContext(dispatchers.io()) {
-            if (cachedScript.isNullOrBlank()) {
-                cachedScript = loadJs(JS_FILE_NAME)
-                    .replace(CONTENT_SCOPE_PLACEHOLDER, getContentScopeJson())
-                    .replace(USER_UNPROTECTED_DOMAINS_PLACEHOLDER, "[]")
-                    .replace(USER_PREFERENCES_PLACEHOLDER, getUserPreferencesJson())
-                    .replace(
-                        MESSAGING_PARAMETERS_PLACEHOLDER,
-                        "${getSecretKeyValuePair()},${getCallbackKeyValuePair()},${getInterfaceKeyValuePair()}",
-                    )
-            }
-            cachedScript!!
+            cachedScript.takeUnless { it.isNullOrBlank() } ?: loadJs(JS_FILE_NAME)
+                .replace(CONTENT_SCOPE_PLACEHOLDER, getContentScopeJson())
+                .replace(USER_UNPROTECTED_DOMAINS_PLACEHOLDER, "[]")
+                .replace(USER_PREFERENCES_PLACEHOLDER, getUserPreferencesJson())
+                .replace(
+                    MESSAGING_PARAMETERS_PLACEHOLDER,
+                    "${getSecretKeyValuePair()},${getCallbackKeyValuePair()},${getInterfaceKeyValuePair()}",
+                ).also { cachedScript = it }
         }
     }
 
-    // TODO: Get this from privacy config instead of hardcoding
-    private fun getContentScopeJson(): String {
-        return """{"features":{"duckAiChatHistory":{"state":"enabled","exceptions":[],"settings":{}}},"unprotectedTemporary":[]}"""
+    @VisibleForTesting
+    internal fun getContentScopeJson(): String {
+        val toggle = duckAiChatHistoryFeature.self()
+        val state = if (toggle.isEnabled()) "enabled" else "disabled"
+        val settings = toggle.getSettings() ?: "{}"
+        val exceptions = JSONArray().apply {
+            toggle.getExceptions().forEach { exception ->
+                put(
+                    JSONObject().apply {
+                        put("domain", exception.domain)
+                        exception.reason?.let { put("reason", it) }
+                    },
+                )
+            }
+        }
+        return """{"features":{"duckAiChatHistory":{"state":"$state","exceptions":$exceptions,"settings":$settings}},"unprotectedTemporary":[]}"""
+    }
+
+    @VisibleForTesting
+    internal fun getMaxHistoryCount(): Int {
+        return runCatching {
+            duckAiChatHistoryFeature.self().getSettings()?.let {
+                JSONObject(it).optInt(MAX_HISTORY_COUNT_KEY, DEFAULT_MAX_SUGGESTIONS)
+            }
+        }.getOrNull() ?: DEFAULT_MAX_SUGGESTIONS
     }
 
     private fun getUserPreferencesJson(): String {
@@ -184,13 +208,13 @@ class RealChatSuggestionsReader @Inject constructor(
 
     // region Fetching
 
-    private suspend fun fetchFromDomain(webView: WebView, domain: String, query: String): DomainResult? {
+    private suspend fun fetchFromDomain(webView: WebView, domain: String, query: String, maxSuggestions: Int): DomainResult? {
         pageLoadDeferred = CompletableDeferred()
         webView.loadDataWithBaseURL(domain, EMPTY_HTML, "text/html", "utf-8", null)
         withTimeoutOrNull(FETCH_TIMEOUT_MS) { pageLoadDeferred?.await() } ?: return null
 
         chatsResultDeferred = CompletableDeferred()
-        val params = buildFetchParams(query)
+        val params = buildFetchParams(query, maxSuggestions)
         messaging.sendSubscriptionEvent(
             SubscriptionEventData(
                 FEATURE_NAME,
@@ -203,12 +227,12 @@ class RealChatSuggestionsReader @Inject constructor(
         return parseResponse(response)
     }
 
-    private fun buildFetchParams(query: String): JSONObject {
+    private fun buildFetchParams(query: String, maxSuggestions: Int): JSONObject {
         return JSONObject().apply {
             if (query.isNotEmpty()) {
                 put("query", query)
             }
-            put("max_chats", MAX_SUGGESTIONS)
+            put("max_chats", maxSuggestions)
             if (query.isEmpty()) {
                 put("since", System.currentTimeMillis() - SEVEN_DAYS_MS)
             }
@@ -266,10 +290,11 @@ class RealChatSuggestionsReader @Inject constructor(
     internal fun mergeSuggestions(
         pinnedChats: List<ChatSuggestion>,
         recentChats: List<ChatSuggestion>,
+        maxSuggestions: Int = DEFAULT_MAX_SUGGESTIONS,
     ): List<ChatSuggestion> {
         return (pinnedChats + recentChats)
             .sortedByDescending { it.lastEdit }
-            .take(MAX_SUGGESTIONS)
+            .take(maxSuggestions)
     }
 
     // endregion
@@ -284,7 +309,8 @@ class RealChatSuggestionsReader @Inject constructor(
         private const val FEATURE_NAME = "duckAiChatHistory"
         private const val SUBSCRIPTION_GET_CHATS = "getDuckAiChats"
         private const val METHOD_CHATS_RESULT = "duckAiChatsResult"
-        private const val MAX_SUGGESTIONS = 10
+        private const val MAX_HISTORY_COUNT_KEY = "maxHistoryCount"
+        private const val DEFAULT_MAX_SUGGESTIONS = 10
         private const val FETCH_TIMEOUT_MS = 3000L
         private const val SEVEN_DAYS_MS = 7L * 24 * 60 * 60 * 1000
         private const val EMPTY_HTML = "<html></html>"
