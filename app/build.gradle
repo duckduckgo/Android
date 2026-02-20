@@ -40,7 +40,7 @@ android {
                 }
                 assets {
                     srcDirs += files("$projectDir/../node_modules/@duckduckgo/privacy-dashboard/build/app".toString())
-                    srcDirs += files("$projectDir/../../content-scope-scripts/build/android/pages".toString())
+                    srcDirs += files("$projectDir/../node_modules/@duckduckgo/content-scope-scripts/build/android/pages".toString())
                 }
             }
         }

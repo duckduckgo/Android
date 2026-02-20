@@ -4301,7 +4301,6 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private fun uiLockChanged(locked: Boolean) {
-        logcat { "uiLockChanged called from JS handler: locked=$locked" }
         viewModelScope.launch(dispatchers.main()) {
             command.value = UiLockChanged(locked)
         }
