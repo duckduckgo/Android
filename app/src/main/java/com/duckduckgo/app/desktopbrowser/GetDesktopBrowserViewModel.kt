@@ -35,6 +35,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class GetDesktopBrowserViewModel @AssistedInject constructor(
     @Assisted private val params: GetDesktopBrowserActivityParams,
@@ -65,11 +66,13 @@ class GetDesktopBrowserViewModel @AssistedInject constructor(
 
     fun onNoThanksClicked() {
         viewModelScope.launch {
-            pixel.fire(
-                AppPixelName.GET_DESKTOP_BROWSER_DISMISSED,
-                mapOf(GET_DESKTOP_BROWSER_SOURCE_PIXEL_PARAM to GET_DESKTOP_BROWSER_SOURCE_NO_THANKS),
-            )
-            settingsDataStore.getDesktopBrowserSettingDismissed = true
+            withContext(dispatchers.io()) {
+                pixel.fire(
+                    AppPixelName.GET_DESKTOP_BROWSER_DISMISSED,
+                    mapOf(GET_DESKTOP_BROWSER_SOURCE_PIXEL_PARAM to GET_DESKTOP_BROWSER_SOURCE_NO_THANKS),
+                )
+                settingsDataStore.getDesktopBrowserSettingDismissed = true
+            }
             _command.send(Command.Dismissed)
         }
     }

@@ -23,6 +23,8 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.findViewTreeLifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.PriorityKey
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.desktopbrowser.GetDesktopBrowserActivityParams
@@ -33,11 +35,14 @@ import com.duckduckgo.common.ui.menu.PopupMenu
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.listitem.TwoLineListItem
 import com.duckduckgo.common.ui.view.show
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.settings.api.CompleteSetupSettingsPlugin
 import com.duckduckgo.settings.api.SettingsPageFeature
 import com.squareup.anvil.annotations.ContributesMultibinding
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @ContributesMultibinding(ActivityScope::class)
@@ -47,6 +52,7 @@ class GetDesktopBrowserCompleteSetupSettings @Inject constructor(
     private val settingsDataStore: SettingsDataStore,
     private val activity: AppCompatActivity,
     private val globalActivityStarter: GlobalActivityStarter,
+    private val dispatchers: DispatcherProvider,
     private val pixel: Pixel,
 ) : CompleteSetupSettingsPlugin {
 
@@ -65,38 +71,48 @@ class GetDesktopBrowserCompleteSetupSettings @Inject constructor(
     }
 
     private fun TwoLineListItem.showIfEnabledAndNotDismissed() {
-        if (settingsPageFeature.newDesktopBrowserSettingEnabled().isEnabled() &&
-            !settingsDataStore.getDesktopBrowserSettingDismissed
-        ) {
-            pixel.fire(AppPixelName.GET_DESKTOP_BROWSER_COMPLETE_SETUP_IMPRESSION)
-
-            activity.lifecycle.addObserver(
-                @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
-                object : DefaultLifecycleObserver {
-                    override fun onResume(owner: LifecycleOwner) {
-                        if (settingsDataStore.getDesktopBrowserSettingDismissed) {
-                            gone()
-                        }
-                    }
-                },
-            )
-
-            val intent = globalActivityStarter.startIntent(
-                activity,
-                GetDesktopBrowserActivityParams(
-                    source = GetDesktopBrowserActivityParams.Source.COMPLETE_SETUP,
-                ),
-            ) ?: return
-
-            setOnClickListener {
-                pixel.fire(
-                    AppPixelName.GET_DESKTOP_BROWSER_CLICKED,
-                    mapOf(GET_DESKTOP_BROWSER_SOURCE_PIXEL_PARAM to GET_DESKTOP_BROWSER_SOURCE_COMPLETE_SETUP),
-                )
-                context.startActivity(intent)
+        activity.lifecycleScope.launch {
+            val canShowItem = withContext(dispatchers.io()) {
+                settingsPageFeature.newDesktopBrowserSettingEnabled().isEnabled() &&
+                    !settingsDataStore.getDesktopBrowserSettingDismissed
             }
 
-            show()
+            if (canShowItem) {
+                pixel.fire(AppPixelName.GET_DESKTOP_BROWSER_COMPLETE_SETUP_IMPRESSION)
+
+                activity.lifecycle.addObserver(
+                    @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
+                    object : DefaultLifecycleObserver {
+                        override fun onResume(owner: LifecycleOwner) {
+                            activity.lifecycleScope.launch {
+                                val isDismissed = withContext(dispatchers.io()) {
+                                    settingsDataStore.getDesktopBrowserSettingDismissed
+                                }
+                                if (isDismissed) {
+                                    gone()
+                                }
+                            }
+                        }
+                    },
+                )
+
+                val intent = globalActivityStarter.startIntent(
+                    activity,
+                    GetDesktopBrowserActivityParams(
+                        source = GetDesktopBrowserActivityParams.Source.COMPLETE_SETUP,
+                    ),
+                ) ?: return@launch
+
+                setOnClickListener {
+                    pixel.fire(
+                        AppPixelName.GET_DESKTOP_BROWSER_CLICKED,
+                        mapOf(GET_DESKTOP_BROWSER_SOURCE_PIXEL_PARAM to GET_DESKTOP_BROWSER_SOURCE_COMPLETE_SETUP),
+                    )
+                    context.startActivity(intent)
+                }
+
+                show()
+            }
         }
     }
 
@@ -118,12 +134,17 @@ class GetDesktopBrowserCompleteSetupSettings @Inject constructor(
 
         popupMenu.apply {
             onMenuItemClicked(hideButton) {
-                rootView.gone()
-                pixel.fire(
-                    AppPixelName.GET_DESKTOP_BROWSER_DISMISSED,
-                    mapOf(GET_DESKTOP_BROWSER_SOURCE_PIXEL_PARAM to GET_DESKTOP_BROWSER_SOURCE_HIDE),
-                )
-                settingsDataStore.getDesktopBrowserSettingDismissed = true
+                rootView.findViewTreeLifecycleOwner()?.lifecycleScope?.launch(dispatchers.main()) {
+                    rootView.gone()
+
+                    withContext(dispatchers.io()) {
+                        pixel.fire(
+                            AppPixelName.GET_DESKTOP_BROWSER_DISMISSED,
+                            mapOf(GET_DESKTOP_BROWSER_SOURCE_PIXEL_PARAM to GET_DESKTOP_BROWSER_SOURCE_HIDE),
+                        )
+                        settingsDataStore.getDesktopBrowserSettingDismissed = true
+                    }
+                }
             }
         }
 
