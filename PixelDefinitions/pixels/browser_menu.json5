@@ -5,12 +5,11 @@
         "triggers": ["other"],
         "suffixes": ["form_factor"],
         "parameters": [
-            "status",
+            "vpnMenuItemStatus",
             {
                 "key": "from_focused_ntp",
-                "type": "string",
                 "description": "Whether the menu was opened while the address bar was focused on the new tab page",
-                "enum": ["true", "false"]
+                "type": "boolean"
             }
         ]
     },
@@ -19,6 +18,6 @@
         "owners": ["nalcalag"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
-        "parameters": ["status"]
+        "parameters": ["vpnMenuItemStatus"]
     }
 }
