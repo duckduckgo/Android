@@ -11543,7 +11543,8 @@
     return Array.from(elements).map((link) => {
       const href = link.href || "";
       const rel = link.getAttribute("rel") || "";
-      return { href, rel };
+      const type = link.type || "";
+      return { href, rel, type };
     });
   }
 
