@@ -201,6 +201,7 @@ class PrivacyDashboardHybridViewModelTest {
             val brokenSiteContext: BrokenSiteContext = mock { brokenSiteContext ->
                 whenever(brokenSiteContext.userRefreshCount).thenReturn(userRefreshCount)
                 whenever(brokenSiteContext.jsPerformance).thenReturn(jsPerformance)
+                whenever(brokenSiteContext.breakageData).thenReturn(null)
             }
             whenever(site.realBrokenSiteContext).thenReturn(brokenSiteContext)
         }
@@ -236,6 +237,7 @@ class PrivacyDashboardHybridViewModelTest {
             jsPerformance = jsPerformance.toList(),
             contentScopeExperiments = null,
             debugFlags = null,
+            breakageData = null,
         )
 
         val isToggleReport = false
@@ -265,6 +267,7 @@ class PrivacyDashboardHybridViewModelTest {
             val brokenSiteContext: BrokenSiteContext = mock { brokenSiteContext ->
                 whenever(brokenSiteContext.userRefreshCount).thenReturn(userRefreshCount)
                 whenever(brokenSiteContext.jsPerformance).thenReturn(jsPerformance)
+                whenever(brokenSiteContext.breakageData).thenReturn(null)
             }
             whenever(site.realBrokenSiteContext).thenReturn(brokenSiteContext)
         }
@@ -300,6 +303,7 @@ class PrivacyDashboardHybridViewModelTest {
             jsPerformance = jsPerformance.toList(),
             contentScopeExperiments = listOf(mockToggle),
             debugFlags = null,
+            breakageData = null,
         )
 
         val isToggleReport = false
@@ -329,6 +333,7 @@ class PrivacyDashboardHybridViewModelTest {
             val brokenSiteContext: BrokenSiteContext = mock { brokenSiteContext ->
                 whenever(brokenSiteContext.userRefreshCount).thenReturn(userRefreshCount)
                 whenever(brokenSiteContext.jsPerformance).thenReturn(jsPerformance)
+                whenever(brokenSiteContext.breakageData).thenReturn(null)
             }
             whenever(site.realBrokenSiteContext).thenReturn(brokenSiteContext)
         }
@@ -364,6 +369,73 @@ class PrivacyDashboardHybridViewModelTest {
             jsPerformance = jsPerformance.toList(),
             contentScopeExperiments = null,
             debugFlags = debugFlags,
+            breakageData = null,
+        )
+
+        val isToggleReport = false
+
+        verify(brokenSiteSender).submitBrokenSiteFeedback(expectedBrokenSite, isToggleReport)
+        verify(pixel).fire(REPORT_BROKEN_SITE_SENT, mapOf("opener" to "dashboard"), type = Count)
+    }
+
+    @Test
+    fun whenUserClicksOnSubmitReportWithBreakageDataThenSubmitsReportWithBreakageData() = runTest {
+        val siteUrl = "https://example.com"
+        val userRefreshCount = 3
+        val jsPerformance = doubleArrayOf(1.0, 2.0, 3.0)
+        val breakageData = "%7B%22test%22%3A%22value%22%7D"
+
+        val site: Site = mock { site ->
+            whenever(site.uri).thenReturn(siteUrl.toUri())
+            whenever(site.url).thenReturn(siteUrl)
+            whenever(site.userAllowList).thenReturn(true)
+            whenever(site.isDesktopMode).thenReturn(false)
+            whenever(site.upgradedHttps).thenReturn(true)
+            whenever(site.consentManaged).thenReturn(true)
+            whenever(site.errorCodeEvents).thenReturn(listOf("401", "401", "500"))
+            whenever(site.activeContentScopeExperiments).thenReturn(null)
+            whenever(site.debugFlags).thenReturn(null)
+
+            val brokenSiteContext: BrokenSiteContext = mock { brokenSiteContext ->
+                whenever(brokenSiteContext.userRefreshCount).thenReturn(userRefreshCount)
+                whenever(brokenSiteContext.jsPerformance).thenReturn(jsPerformance)
+                whenever(brokenSiteContext.breakageData).thenReturn(breakageData)
+            }
+            whenever(site.realBrokenSiteContext).thenReturn(brokenSiteContext)
+        }
+
+        testee.onSiteChanged(site)
+
+        val category = "login"
+        val description = "I can't sign in!"
+        testee.onSubmitBrokenSiteReport(
+            payload = """{"category":"$category","description":"$description"}""",
+            reportFlow = DASHBOARD,
+            opener = DashboardOpener.DASHBOARD,
+        )
+
+        val expectedBrokenSite = BrokenSite(
+            category = category,
+            description = description,
+            siteUrl = siteUrl,
+            upgradeHttps = true,
+            blockedTrackers = "",
+            surrogates = "",
+            siteType = "mobile",
+            urlParametersRemoved = false,
+            consentManaged = true,
+            consentOptOutFailed = false,
+            consentSelfTestFailed = false,
+            errorCodes = """["401","401","500"]""",
+            httpErrorCodes = "",
+            loginSite = null,
+            reportFlow = DASHBOARD,
+            userRefreshCount = userRefreshCount,
+            openerContext = null,
+            jsPerformance = jsPerformance.toList(),
+            contentScopeExperiments = null,
+            debugFlags = null,
+            breakageData = breakageData,
         )
 
         val isToggleReport = false
