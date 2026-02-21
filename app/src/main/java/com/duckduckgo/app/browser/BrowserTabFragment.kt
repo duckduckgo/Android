@@ -3500,6 +3500,7 @@ class BrowserTabFragment :
             requireContext(),
         ) {
             showDuckChatContextualSheet(tabId)
+            viewModel.onContextualOpenedAfterOnboarding()
         }
     }
 
