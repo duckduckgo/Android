@@ -130,6 +130,7 @@ import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.tabs.TabManager
 import com.duckduckgo.app.browser.trafficquality.AndroidFeaturesHeaderPlugin.Companion.X_DUCKDUCKGO_ANDROID_HEADER
 import com.duckduckgo.app.browser.ui.dialogs.widgetprompt.OnboardingHomeScreenWidgetToggles
+import com.duckduckgo.app.browser.uilock.BrowserUiLockFeature
 import com.duckduckgo.app.browser.urldisplay.UrlDisplayRepository
 import com.duckduckgo.app.browser.viewstate.BrowserViewState
 import com.duckduckgo.app.browser.viewstate.CtaViewState
@@ -632,6 +633,7 @@ class BrowserTabViewModelTest {
 
     private lateinit var fakeContentScopeScriptsSubscriptionEventPluginPoint: FakeContentScopeScriptsSubscriptionEventPluginPoint
     private var serpSettingsFeature = FakeFeatureToggleFactory.create(SerpSettingsFeature::class.java)
+    private var fakeBrowserUiLockFeature = FakeFeatureToggleFactory.create(BrowserUiLockFeature::class.java)
     private val mockSerpEasterEggLogosToggles: SerpEasterEggLogosToggles = mock()
     private val mockSetFavouriteToggle: Toggle = mock()
     private val mockSerpLogos: SerpLogos = mock()
@@ -912,6 +914,7 @@ class BrowserTabViewModelTest {
                 serpEasterEggLogosToggles = mockSerpEasterEggLogosToggles,
                 serpLogos = mockSerpLogos,
                 tabVisitedSitesRepository = mockTabVisitedSitesRepository,
+                browserUiLockFeature = fakeBrowserUiLockFeature,
             )
 
         testee.loadData("abc", null, false, false)
@@ -5416,6 +5419,58 @@ class BrowserTabViewModelTest {
                 { "someUrl" },
             )
             assertCommandIssued<Command.ScreenUnlock>()
+        }
+
+    @Test
+    fun whenProcessJsCallbackMessageUiLockChangedAndFeatureEnabledThenSendCommand() =
+        runTest {
+            fakeBrowserUiLockFeature.self().setRawStoredState(State(enable = true))
+            testee.processJsCallbackMessage(
+                "browserUiLock",
+                "uiLockChanged",
+                null,
+                JSONObject("""{ "locked": true }"""),
+                false,
+                null,
+                { "someUrl" },
+            )
+            assertCommandIssued<Command.UiLockChanged> {
+                assertTrue(this.locked)
+            }
+        }
+
+    @Test
+    fun whenProcessJsCallbackMessageUiLockChangedUnlockedAndFeatureEnabledThenSendCommand() =
+        runTest {
+            fakeBrowserUiLockFeature.self().setRawStoredState(State(enable = true))
+            testee.processJsCallbackMessage(
+                "browserUiLock",
+                "uiLockChanged",
+                null,
+                JSONObject("""{ "locked": false }"""),
+                false,
+                null,
+                { "someUrl" },
+            )
+            assertCommandIssued<Command.UiLockChanged> {
+                assertFalse(this.locked)
+            }
+        }
+
+    @Test
+    fun whenProcessJsCallbackMessageUiLockChangedAndFeatureDisabledThenDoNotSendCommand() =
+        runTest {
+            fakeBrowserUiLockFeature.self().setRawStoredState(State(enable = false))
+            testee.processJsCallbackMessage(
+                "browserUiLock",
+                "uiLockChanged",
+                null,
+                JSONObject("""{ "locked": true }"""),
+                false,
+                null,
+                { "someUrl" },
+            )
+            assertCommandNotIssued<Command.UiLockChanged>()
         }
 
     @Test

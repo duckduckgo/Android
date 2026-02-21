@@ -82,6 +82,7 @@ class BottomAppBarBehavior<V : View>(
         axes: Int,
         type: Int,
     ): Boolean {
+        if (!omnibar.isOmnibarScrollingEnabled()) return false
         if (axes == ViewCompat.SCROLL_AXIS_VERTICAL) {
             lastStartedType = type
             offsetAnimator?.cancel()

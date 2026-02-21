@@ -162,6 +162,7 @@ import com.duckduckgo.app.browser.commands.Command.ShowWarningMaliciousSite
 import com.duckduckgo.app.browser.commands.Command.ShowWebContent
 import com.duckduckgo.app.browser.commands.Command.ShowWebPageTitle
 import com.duckduckgo.app.browser.commands.Command.ToggleReportFeedback
+import com.duckduckgo.app.browser.commands.Command.UiLockChanged
 import com.duckduckgo.app.browser.commands.Command.WebShareRequest
 import com.duckduckgo.app.browser.commands.Command.WebViewCompatScreenLock
 import com.duckduckgo.app.browser.commands.Command.WebViewCompatWebShareRequest
@@ -202,6 +203,7 @@ import com.duckduckgo.app.browser.refreshpixels.RefreshPixelSender
 import com.duckduckgo.app.browser.santize.NonHttpAppLinkChecker
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.tabs.TabManager
+import com.duckduckgo.app.browser.uilock.BrowserUiLockFeature
 import com.duckduckgo.app.browser.urldisplay.UrlDisplayRepository
 import com.duckduckgo.app.browser.urlextraction.UrlExtractionListener
 import com.duckduckgo.app.browser.viewstate.AccessibilityViewState
@@ -502,6 +504,7 @@ class BrowserTabViewModel @Inject constructor(
     private val serpEasterEggLogosToggles: SerpEasterEggLogosToggles,
     private val serpLogos: SerpLogos,
     private val tabVisitedSitesRepository: TabVisitedSitesRepository,
+    private val browserUiLockFeature: BrowserUiLockFeature,
 ) : ViewModel(),
     WebViewClientListener,
     EditSavedSiteListener,
@@ -4047,6 +4050,15 @@ class BrowserTabViewModel @Inject constructor(
                 }
             }
 
+            "browserUiLock" -> {
+                when (method) {
+                    "uiLockChanged" -> {
+                        val locked = data?.optBoolean("locked", false) ?: false
+                        uiLockChanged(locked)
+                    }
+                }
+            }
+
             "breakageReporting" ->
                 if (data != null) {
                     when (method) {
@@ -4103,6 +4115,11 @@ class BrowserTabViewModel @Inject constructor(
                 }
 
             "screenUnlock" -> screenUnlock()
+
+            "uiLockChanged" -> {
+                val locked = data?.optBoolean("locked", false) ?: false
+                uiLockChanged(locked)
+            }
 
             "breakageReportResult" ->
                 if (data != null) {
@@ -4295,6 +4312,13 @@ class BrowserTabViewModel @Inject constructor(
                     command.value = ScreenUnlock
                 }
             }
+        }
+    }
+
+    private fun uiLockChanged(locked: Boolean) {
+        if (!browserUiLockFeature.self().isEnabled()) return
+        viewModelScope.launch(dispatchers.main()) {
+            command.value = UiLockChanged(locked)
         }
     }
 
