@@ -741,7 +741,7 @@ class InputScreenViewModel @AssistedInject constructor(
         inputScreenConfigResolver.mainButtonsEnabled() &&
         omnibarRepository.omnibarType != OmnibarType.SPLIT
 
-    fun onChatSuggestionSelected(chatId: String) {
+    fun onChatSuggestionSelected(chatId: String, pinned: Boolean) {
         viewModelScope.launch {
             val url = duckChat.getDuckChatUrl("", false)
                 .toUri()
@@ -750,6 +750,14 @@ class InputScreenViewModel @AssistedInject constructor(
                 .build()
                 .toString()
             command.value = Command.SubmitSearch(url)
+
+            if (pinned) {
+                pixel.fire(DuckChatPixelName.DUCK_CHAT_RECENT_CHAT_SELECTED_PINNED_COUNT)
+                pixel.fire(DuckChatPixelName.DUCK_CHAT_RECENT_CHAT_SELECTED_PINNED_DAILY, type = Daily())
+            } else {
+                pixel.fire(DuckChatPixelName.DUCK_CHAT_RECENT_CHAT_SELECTED_COUNT)
+                pixel.fire(DuckChatPixelName.DUCK_CHAT_RECENT_CHAT_SELECTED_DAILY, type = Daily())
+            }
         }
     }
 

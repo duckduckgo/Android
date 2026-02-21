@@ -2179,10 +2179,32 @@ class InputScreenViewModelTest {
         runTest {
             val viewModel = createViewModel()
 
-            viewModel.onChatSuggestionSelected("test-chat-id")
+            viewModel.onChatSuggestionSelected("test-chat-id", pinned = false)
 
             val expectedUrl = "$duckChatURL&chatID=test-chat-id"
             assertEquals(SubmitSearch(expectedUrl), viewModel.command.value)
+        }
+
+    @Test
+    fun `when onChatSuggestionSelected with pinned true then fire pinned pixels`() =
+        runTest {
+            val viewModel = createViewModel()
+
+            viewModel.onChatSuggestionSelected("test-chat-id", pinned = true)
+
+            verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_RECENT_CHAT_SELECTED_PINNED_COUNT)
+            verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_RECENT_CHAT_SELECTED_PINNED_DAILY, type = Daily())
+        }
+
+    @Test
+    fun `when onChatSuggestionSelected with pinned false then fire non-pinned pixels`() =
+        runTest {
+            val viewModel = createViewModel()
+
+            viewModel.onChatSuggestionSelected("test-chat-id", pinned = false)
+
+            verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_RECENT_CHAT_SELECTED_COUNT)
+            verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_RECENT_CHAT_SELECTED_DAILY, type = Daily())
         }
 
     @SuppressLint("DenyListedApi")

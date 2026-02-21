@@ -434,6 +434,10 @@ enum class DuckChatPixelName(override val pixelName: String) : Pixel.PixelName {
     DUCK_CHAT_CONTEXTUAL_SETTING_AUTOMATIC_PAGE_CONTENT_DISABLED_COUNT("m_aichat_settings_auto_context_disabled_count"),
     DUCK_CHAT_CONTEXTUAL_SETTING_AUTOMATIC_PAGE_CONTENT_DISABLED_DAILY("m_aichat_settings_auto_context_disabled_daily"),
     DUCK_CHAT_CONTEXTUAL_SETTING_AUTOMATIC_PAGE_CONTENT_DAILY("m_aichat_settings_auto_context"),
+    DUCK_CHAT_RECENT_CHAT_SELECTED_COUNT("m_aichat_recent_chat_selected_count"),
+    DUCK_CHAT_RECENT_CHAT_SELECTED_DAILY("m_aichat_recent_chat_selected_daily"),
+    DUCK_CHAT_RECENT_CHAT_SELECTED_PINNED_COUNT("m_aichat_recent_chat_selected_pinned_count"),
+    DUCK_CHAT_RECENT_CHAT_SELECTED_PINNED_DAILY("m_aichat_recent_chat_selected_pinned_daily"),
 
     SYNC_AI_CHAT_ACTIVE("sync_ai_chat_active"),
 }
@@ -559,6 +563,10 @@ class DuckChatParamRemovalPlugin @Inject constructor() : PixelParamRemovalPlugin
             DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_SETTING_AUTOMATIC_PAGE_CONTENT_DISABLED_COUNT.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_SETTING_AUTOMATIC_PAGE_CONTENT_DISABLED_DAILY.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_SETTING_AUTOMATIC_PAGE_CONTENT_DAILY.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_RECENT_CHAT_SELECTED_COUNT.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_RECENT_CHAT_SELECTED_DAILY.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_RECENT_CHAT_SELECTED_PINNED_COUNT.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_RECENT_CHAT_SELECTED_PINNED_DAILY.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.SYNC_AI_CHAT_ACTIVE.pixelName to PixelParameter.removeAtb(),
         )
     }

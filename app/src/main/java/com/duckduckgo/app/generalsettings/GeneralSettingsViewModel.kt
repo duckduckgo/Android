@@ -27,11 +27,14 @@ import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_GENERAL_SETTINGS_TOGG
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_GENERAL_SETTINGS_TOGGLED_ON
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_RECENT_SITES_GENERAL_SETTINGS_TOGGLED_OFF
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_RECENT_SITES_GENERAL_SETTINGS_TOGGLED_ON
-import com.duckduckgo.app.pixels.AppPixelName.CHAT_SUGGESTIONS_GENERAL_SETTINGS_TOGGLED_OFF
-import com.duckduckgo.app.pixels.AppPixelName.CHAT_SUGGESTIONS_GENERAL_SETTINGS_TOGGLED_ON
+import com.duckduckgo.app.pixels.AppPixelName.CHAT_SUGGESTIONS_GENERAL_SETTINGS_TOGGLED_OFF_COUNT
+import com.duckduckgo.app.pixels.AppPixelName.CHAT_SUGGESTIONS_GENERAL_SETTINGS_TOGGLED_OFF_DAILY
+import com.duckduckgo.app.pixels.AppPixelName.CHAT_SUGGESTIONS_GENERAL_SETTINGS_TOGGLED_ON_COUNT
+import com.duckduckgo.app.pixels.AppPixelName.CHAT_SUGGESTIONS_GENERAL_SETTINGS_TOGGLED_ON_DAILY
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
@@ -200,9 +203,11 @@ class GeneralSettingsViewModel @Inject constructor(
         viewModelScope.launch(dispatcherProvider.io()) {
             duckChat.setChatSuggestionsUserSetting(enabled)
             if (enabled) {
-                pixel.fire(CHAT_SUGGESTIONS_GENERAL_SETTINGS_TOGGLED_ON)
+                pixel.fire(CHAT_SUGGESTIONS_GENERAL_SETTINGS_TOGGLED_ON_COUNT)
+                pixel.fire(CHAT_SUGGESTIONS_GENERAL_SETTINGS_TOGGLED_ON_DAILY, type = Daily())
             } else {
-                pixel.fire(CHAT_SUGGESTIONS_GENERAL_SETTINGS_TOGGLED_OFF)
+                pixel.fire(CHAT_SUGGESTIONS_GENERAL_SETTINGS_TOGGLED_OFF_COUNT)
+                pixel.fire(CHAT_SUGGESTIONS_GENERAL_SETTINGS_TOGGLED_OFF_DAILY, type = Daily())
             }
             _viewState.value = _viewState.value?.copy(chatSuggestionsEnabled = enabled)
         }

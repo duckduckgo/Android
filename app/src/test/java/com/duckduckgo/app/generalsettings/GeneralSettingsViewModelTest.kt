@@ -481,7 +481,8 @@ internal class GeneralSettingsViewModelTest {
         testee.onChatSuggestionsSettingChanged(true)
 
         verify(mockDuckChat).setChatSuggestionsUserSetting(true)
-        verify(mockPixel).fire(AppPixelName.CHAT_SUGGESTIONS_GENERAL_SETTINGS_TOGGLED_ON)
+        verify(mockPixel).fire(AppPixelName.CHAT_SUGGESTIONS_GENERAL_SETTINGS_TOGGLED_ON_COUNT)
+        verify(mockPixel).fire(AppPixelName.CHAT_SUGGESTIONS_GENERAL_SETTINGS_TOGGLED_ON_DAILY, type = Pixel.PixelType.Daily())
     }
 
     @Test
@@ -491,7 +492,8 @@ internal class GeneralSettingsViewModelTest {
         testee.onChatSuggestionsSettingChanged(false)
 
         verify(mockDuckChat).setChatSuggestionsUserSetting(false)
-        verify(mockPixel).fire(AppPixelName.CHAT_SUGGESTIONS_GENERAL_SETTINGS_TOGGLED_OFF)
+        verify(mockPixel).fire(AppPixelName.CHAT_SUGGESTIONS_GENERAL_SETTINGS_TOGGLED_OFF_COUNT)
+        verify(mockPixel).fire(AppPixelName.CHAT_SUGGESTIONS_GENERAL_SETTINGS_TOGGLED_OFF_DAILY, type = Pixel.PixelType.Daily())
     }
 
     private fun defaultViewState() = GeneralSettingsViewModel.ViewState(
