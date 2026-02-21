@@ -209,6 +209,17 @@
     <string name="webTrackingProtectionGlobalPrivacyControlTitle">Global Privacy Control (GPC)</string>
     <string name="webTrackingProtectionGlobalPrivacyControlDescription">Uttrykker på dine vegne retten til å reservere seg, ved å be nettsteder om ikke å selge eller dele personopplysningene dine.</string>
 
+    <!-- Get Desktop Browser -->
+    <string name="getDesktopBrowserSettingItemTitle">Skaff deg nettleseren for datamaskin</string>
+    <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo for Mac og Windows</string>
+    <string name="getDesktopBrowserTitle">Beskytt personopplysningene dine på Mac og Windows også!</string>
+    <string name="getDesktopBrowserBody">For å laste ned DuckDuckGo på Mac eller Windows kan du gå til:</string>
+    <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
+    <string name="getDesktopBrowserShareDownloadLink">Del nedlastingslenke</string>
+    <string name="getDesktopBrowserNoThanks">Nei takk</string>
+    <string name="getDesktopBrowserHideItem">Skjul</string>
+    <string name="getDesktopBrowserUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Lenken er kopiert</string>
+
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Beskyttelse mot popup-vinduer om informasjonskapsler</string>
 

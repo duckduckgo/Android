@@ -209,6 +209,17 @@
     <string name="webTrackingProtectionGlobalPrivacyControlTitle">Global Privacy Control</string>
     <string name="webTrackingProtectionGlobalPrivacyControlDescription">Formule des droits de retrait en votre nom en indiquant aux sites de ne pas vendre ou partager vos informations personnelles.</string>
 
+    <!-- Get Desktop Browser -->
+    <string name="getDesktopBrowserSettingItemTitle">Télécharger le navigateur de bureau</string>
+    <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo pour Mac et Windows</string>
+    <string name="getDesktopBrowserTitle">Protégez aussi vos informations personnelles sur Mac et Windows !</string>
+    <string name="getDesktopBrowserBody">Pour télécharger DuckDuckGo sur Mac ou Windows, visitez :</string>
+    <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
+    <string name="getDesktopBrowserShareDownloadLink">Partager le lien de téléchargement</string>
+    <string name="getDesktopBrowserNoThanks">Non merci</string>
+    <string name="getDesktopBrowserHideItem">Masquer</string>
+    <string name="getDesktopBrowserUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Lien copié</string>
+
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Protection contre les fenêtres contextuelles des cookies</string>
 

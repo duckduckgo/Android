@@ -210,6 +210,17 @@
     <string name="webTrackingProtectionGlobalPrivacyControlTitle">Controlul global al confidențialității</string>
     <string name="webTrackingProtectionGlobalPrivacyControlDescription">Exprimă drepturile de retragere în numele tău, comunicând site-urilor să nu vândă sau să nu partajeze informațiile tale personale.</string>
 
+    <!-- Get Desktop Browser -->
+    <string name="getDesktopBrowserSettingItemTitle">Obține browserul pentru desktop</string>
+    <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo pentru Mac și Windows</string>
+    <string name="getDesktopBrowserTitle">Protejează-ți informațiile personale și pe Mac și Windows!</string>
+    <string name="getDesktopBrowserBody">Pentru a descărca DuckDuckGo pe Mac sau Windows, vizitează:</string>
+    <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
+    <string name="getDesktopBrowserShareDownloadLink">Trimite linkul de descărcare</string>
+    <string name="getDesktopBrowserNoThanks">Nu, mulțumesc</string>
+    <string name="getDesktopBrowserHideItem">Ascunde</string>
+    <string name="getDesktopBrowserUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Link copiat</string>
+
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Protecție pentru ferestre pop-up aferente modulelor cookie</string>
 

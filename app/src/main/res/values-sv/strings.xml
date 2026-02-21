@@ -209,6 +209,17 @@
     <string name="webTrackingProtectionGlobalPrivacyControlTitle">Global Privacy Control</string>
     <string name="webTrackingProtectionGlobalPrivacyControlDescription">Uttrycker rätten att tacka nej för din räkning genom att säga till webbplatser att inte sälja eller dela dina personuppgifter.</string>
 
+    <!-- Get Desktop Browser -->
+    <string name="getDesktopBrowserSettingItemTitle">Hämta webbläsare för dator</string>
+    <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo för Mac och Windows</string>
+    <string name="getDesktopBrowserTitle">Skydda din personliga information på Mac och Windows också!</string>
+    <string name="getDesktopBrowserBody">För att ladda ner DuckDuckGo på Mac eller Windows, besök:</string>
+    <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
+    <string name="getDesktopBrowserShareDownloadLink">Dela nedladdningslänk</string>
+    <string name="getDesktopBrowserNoThanks">Nej tack</string>
+    <string name="getDesktopBrowserHideItem">Dölj</string>
+    <string name="getDesktopBrowserUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Länken har kopierats</string>
+
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Skydd mot popup-fönster för cookies</string>
 

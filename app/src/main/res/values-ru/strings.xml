@@ -211,6 +211,17 @@
     <string name="webTrackingProtectionGlobalPrivacyControlTitle">Глобальный контроль конфиденциальности</string>
     <string name="webTrackingProtectionGlobalPrivacyControlDescription">От вашего имени задействует право на отказ от распространения данных и запрещает сайтам продавать или передавать вашу личную информацию.</string>
 
+    <!-- Get Desktop Browser -->
+    <string name="getDesktopBrowserSettingItemTitle">Скачать настольный браузер</string>
+    <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo для Mac и Windows</string>
+    <string name="getDesktopBrowserTitle">Защитите личную информацию на Mac и Windows!</string>
+    <string name="getDesktopBrowserBody">Скачивайте DuckDuckGo:</string>
+    <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
+    <string name="getDesktopBrowserShareDownloadLink">Поделиться ссылкой для загрузки</string>
+    <string name="getDesktopBrowserNoThanks">Нет, спасибо</string>
+    <string name="getDesktopBrowserHideItem">Скрыть</string>
+    <string name="getDesktopBrowserUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Ссылка скопирована</string>
+
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Защита от всплывающих окон куки</string>
 
