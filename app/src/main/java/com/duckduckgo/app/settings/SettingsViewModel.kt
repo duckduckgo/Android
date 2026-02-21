@@ -24,6 +24,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
+import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.PRODUCT_TELEMETRY_SURFACE_SETTINGS_OPENED
 import com.duckduckgo.app.pixels.AppPixelName.PRODUCT_TELEMETRY_SURFACE_SETTINGS_OPENED_DAILY
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_ABOUT_DDG_SHARE_FEEDBACK_PRESSED
@@ -44,6 +45,7 @@ import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_PRIVATE_SEARCH_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_WEB_TRACKING_PROTECTION_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_WHATS_NEW_PRESSED
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
+import com.duckduckgo.app.settings.GetDesktopBrowserCompleteSetupSettings.Companion.GET_DESKTOP_BROWSER_SOURCE_PIXEL_PARAM
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchAboutScreen
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchAccessibilitySettings
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchAddHomeScreenWidget
@@ -438,10 +440,16 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun onGetDesktopBrowserClicked() {
+        pixel.fire(
+            AppPixelName.GET_DESKTOP_BROWSER_CLICKED,
+            mapOf(GET_DESKTOP_BROWSER_SOURCE_PIXEL_PARAM to GET_DESKTOP_BROWSER_SOURCE_SETTINGS),
+        )
         viewModelScope.launch { command.send(Command.LaunchGetDesktopBrowser) }
     }
 
     companion object {
         const val EMAIL_PROTECTION_URL = "https://duckduckgo.com/email"
+
+        private const val GET_DESKTOP_BROWSER_SOURCE_SETTINGS = "settings"
     }
 }
