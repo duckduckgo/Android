@@ -41,6 +41,7 @@ import com.duckduckgo.savedsites.impl.newtab.FavouriteNewTabSectionsItem.Placeho
 import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionsAdapter.FavouriteViewHolder.ItemState.Drag
 import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionsAdapter.FavouriteViewHolder.ItemState.LongPress
 import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionsAdapter.FavouriteViewHolder.ItemState.Stale
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlin.math.absoluteValue
 
@@ -148,6 +149,7 @@ class FavouritesNewTabSectionsAdapter(
 
         private var itemState: ItemState = Stale
         private var popupMenu: PopupMenu? = null
+        private var faviconJob: Job? = null
 
         sealed class ItemState {
             data object Stale : ItemState()
@@ -173,6 +175,7 @@ class FavouritesNewTabSectionsAdapter(
         fun bind(
             item: FavouriteItemFavourite,
         ) {
+            faviconJob?.cancel()
             with(binding.root) {
                 setItemType(FavouriteItemType.Favicon)
                 setPrimaryText(item.favorite.title)
@@ -183,7 +186,7 @@ class FavouritesNewTabSectionsAdapter(
         }
 
         private fun loadFavicon(url: String) {
-            lifecycleOwner.lifecycleScope.launch {
+            faviconJob = lifecycleOwner.lifecycleScope.launch {
                 faviconManager.loadToViewMaybeFromRemoteWithPlaceholder(url = url, view = binding.root.favicon())
             }
         }
