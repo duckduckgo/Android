@@ -8858,6 +8858,57 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenOnContextualOpenedAfterOnboardingThenPageContextSubscriptionEventSent() = runTest {
+        val expectedEvent = SubscriptionEventData(
+            featureName = PAGE_CONTEXT_FEATURE_NAME,
+            subscriptionName = "collect",
+            params = JSONObject(),
+        )
+        whenever(mockPageContextJSHelper.onContextualOpened()).thenReturn(expectedEvent)
+
+        testee.onContextualOpenedAfterOnboarding()
+
+        testee.subscriptionEventDataFlow.test {
+            val emittedEvent = awaitItem()
+            assertEquals(PAGE_CONTEXT_FEATURE_NAME, emittedEvent.featureName)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenOnDuckChatOmnibarButtonClickedAndOnboardingNotCompletedThenNoPageContextSubscriptionEventSent() = runTest {
+        mockDuckAiContextualModeFlow.emit(true)
+        whenever(mockDuckChat.isContextualOnboardingCompleted()).thenReturn(false)
+
+        testee.subscriptionEventDataFlow.test {
+            testee.onDuckChatOmnibarButtonClicked(query = "example", hasFocus = false, isNtp = false)
+
+            expectNoEvents()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenOnDuckChatOmnibarButtonClickedAndOnboardingCompletedThenPageContextSubscriptionEventSent() = runTest {
+        val expectedEvent = SubscriptionEventData(
+            featureName = PAGE_CONTEXT_FEATURE_NAME,
+            subscriptionName = "collect",
+            params = JSONObject(),
+        )
+        whenever(mockPageContextJSHelper.onContextualOpened()).thenReturn(expectedEvent)
+        mockDuckAiContextualModeFlow.emit(true)
+        whenever(mockDuckChat.isContextualOnboardingCompleted()).thenReturn(true)
+
+        testee.onDuckChatOmnibarButtonClicked(query = "example", hasFocus = false, isNtp = false)
+
+        testee.subscriptionEventDataFlow.test {
+            val emittedEvent = awaitItem()
+            assertEquals(PAGE_CONTEXT_FEATURE_NAME, emittedEvent.featureName)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
     fun whenSubscriptionChangesWhileOnDuckAiThenAuthUpdateEventSent() = runTest {
         val duckAiUrl = "https://duck.ai/chat"
         whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
