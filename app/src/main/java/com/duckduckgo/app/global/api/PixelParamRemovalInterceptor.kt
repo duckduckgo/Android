@@ -123,6 +123,7 @@ object PixelInterceptorPixelsRequiringDataCleaning : PixelParamRemovalPlugin {
             AppPixelName.PREONBOARDING_SKIP_ONBOARDING_PRESSED.pixelName to PixelParameter.removeAtb(),
             AppPixelName.PREONBOARDING_CONFIRM_SKIP_ONBOARDING_PRESSED.pixelName to PixelParameter.removeAtb(),
             AppPixelName.PREONBOARDING_RESUME_ONBOARDING_PRESSED.pixelName to PixelParameter.removeAtb(),
+            AppPixelName.PREONBOARDING_DEFAULT_BROWSER_PAGE_SHOWN.pixelName to PixelParameter.removeAtb(),
             AppPixelName.PREONBOARDING_CHOOSE_SEARCH_EXPERIENCE_IMPRESSIONS_UNIQUE.pixelName to PixelParameter.removeAtb(),
             AppPixelName.PREONBOARDING_AICHAT_SELECTED.pixelName to PixelParameter.removeAtb(),
             AppPixelName.PREONBOARDING_SEARCH_ONLY_SELECTED.pixelName to PixelParameter.removeAtb(),
