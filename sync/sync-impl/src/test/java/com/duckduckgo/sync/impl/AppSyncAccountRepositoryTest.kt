@@ -81,6 +81,7 @@ import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrlWrapper
 import com.duckduckgo.sync.store.SyncStore
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
@@ -665,7 +666,7 @@ class AppSyncAccountRepositoryTest {
     }
 
     @Test
-    fun whenGetConnectQRThenReturnExpectedJson() {
+    fun whenGetConnectQRThenReturnExpectedJson() = runTest {
         whenever(nativeLib.prepareForConnect()).thenReturn(connectKeys)
         prepareToProvideDeviceIds()
 
@@ -836,7 +837,7 @@ class AppSyncAccountRepositoryTest {
     }
 
     @Test
-    fun whenConnectCodeRetrievedItRespectsUrlBasedFeatureFlag() {
+    fun whenConnectCodeRetrievedItRespectsUrlBasedFeatureFlag() = runTest {
         whenever(nativeLib.prepareForConnect()).thenReturn(connectKeys)
         prepareToProvideDeviceIds()
         val decoratedCode = "decorated"
