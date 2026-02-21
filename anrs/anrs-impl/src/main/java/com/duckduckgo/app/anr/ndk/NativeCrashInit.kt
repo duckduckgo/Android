@@ -75,6 +75,7 @@ class NativeCrashInit @Inject constructor(
         isCustomTab: Boolean,
         webViewPackage: String,
         webViewVersion: String,
+        includeCrashLocation: Boolean,
     )
 
     override fun onCreate(owner: LifecycleOwner) {
@@ -108,7 +109,16 @@ class NativeCrashInit @Inject constructor(
             } else {
                 Log.ASSERT
             }
-            jni_register_sighandler(logLevel, appBuildConfig.versionName, processName, isCustomTab, webViewPackage, webViewVersion)
+            val includeCrashLocation = nativeCrashFeature.nativeCrashReportsCrashLocation().isEnabled()
+            jni_register_sighandler(
+                logLevel,
+                appBuildConfig.versionName,
+                processName,
+                isCustomTab,
+                webViewPackage,
+                webViewVersion,
+                includeCrashLocation,
+            )
         }.onFailure {
             logcat(ERROR) { "ndk-crash: Error calling jni_register_sighandler: ${it.asLog()}" }
         }
