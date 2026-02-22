@@ -209,6 +209,17 @@
     <string name="webTrackingProtectionGlobalPrivacyControlTitle">Global Privacy Control</string>
     <string name="webTrackingProtectionGlobalPrivacyControlDescription">Sitelere kişisel bilgilerinizi satmamalarını veya paylaşmamalarını söyleyerek sizin adınıza devre dışı bırakma haklarını ifade eder.</string>
 
+    <!-- Get Desktop Browser -->
+    <string name="getDesktopBrowserSettingItemTitle">Masaüstü Tarayıcısını Edinin</string>
+    <string name="getDesktopBrowserSettingItemSubtitleTitle">Mac ve Windows için DuckDuckGo</string>
+    <string name="getDesktopBrowserTitle">Mac ve Windows\'ta da kişisel bilgilerinizi koruyun!</string>
+    <string name="getDesktopBrowserBody">DuckDuckGo\'yu Mac veya Windows\'ta indirmek için şu adresi ziyaret edin:</string>
+    <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
+    <string name="getDesktopBrowserShareDownloadLink">İndirme Bağlantısını Paylaş</string>
+    <string name="getDesktopBrowserNoThanks">Hayır Teşekkürler</string>
+    <string name="getDesktopBrowserHideItem">Gizle</string>
+    <string name="getDesktopBrowserUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Bağlantı kopyalandı</string>
+
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Çerez Açılır Pencere Engelleyici</string>
 
