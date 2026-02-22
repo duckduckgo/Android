@@ -33,4 +33,5 @@ enum class DuckPlayerPixelName(override val pixelName: String) : Pixel.PixelName
     DUCK_PLAYER_SETTINGS_PRESSED("duckplayer_setting_pressed"),
     DUCK_PLAYER_NEWTAB_SETTING_ON("duckplayer_newtab_setting-on"),
     DUCK_PLAYER_NEWTAB_SETTING_OFF("duckplayer_newtab_setting-off"),
+    DUCK_PLAYER_JS_ERROR("duckplayer_js-error"),
 }
