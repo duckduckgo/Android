@@ -126,7 +126,6 @@ class FavoritesQuickAccessAdapter(
             item: QuickAccessFavorite,
             payloads: MutableList<Any>,
         ) {
-            faviconJob?.cancel()
             for (payload in payloads) {
                 val bundle = payload as Bundle
 
@@ -139,6 +138,7 @@ class FavoritesQuickAccessAdapter(
                 }
 
                 bundle[DIFF_KEY_URL]?.let {
+                    faviconJob?.cancel()
                     loadFavicon(it as String)
                 }
 
