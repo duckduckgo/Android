@@ -209,6 +209,17 @@
     <string name="webTrackingProtectionGlobalPrivacyControlTitle">Global Privacy Control (GPC)</string>
     <string name="webTrackingProtectionGlobalPrivacyControlDescription">Udtrykker fravalgsrettigheder på dine vegne ved at fortælle websteder, at de ikke må sælge eller dele dine personlige oplysninger.</string>
 
+    <!-- Get Desktop Browser -->
+    <string name="getDesktopBrowserSettingItemTitle">Hent browser til computeren</string>
+    <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo til Mac og Windows</string>
+    <string name="getDesktopBrowserTitle">Beskyt dine personlige oplysninger, også på Mac og Windows!</string>
+    <string name="getDesktopBrowserBody">For at downloade DuckDuckGo på Mac eller Windows, skal du besøge:</string>
+    <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
+    <string name="getDesktopBrowserShareDownloadLink">Del downloadlink</string>
+    <string name="getDesktopBrowserNoThanks">Nej tak</string>
+    <string name="getDesktopBrowserHideItem">Skjul</string>
+    <string name="getDesktopBrowserUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Link kopieret</string>
+
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Beskyttelse mod pop op-beskeder om cookies</string>
 
