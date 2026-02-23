@@ -589,7 +589,7 @@ afterEvaluate {
                 tasks.named(it),
                 ANDROID_FIREBASE
         ).configure {
-            reports.from(file("fladleResults/JUnitReport.xml"))
+            reports.from(file("build/fladle/fladleResults/JUnitReport.xml"))
         }
     }
 }
