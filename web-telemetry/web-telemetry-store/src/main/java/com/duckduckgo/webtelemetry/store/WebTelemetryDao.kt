@@ -54,4 +54,19 @@ interface WebTelemetryDao {
 
     @Query("DELETE FROM web_telemetry_pixel_state")
     fun deleteAllPixelStates()
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertWebEventsConfig(entity: WebEventsConfigEntity)
+
+    @Transaction
+    fun updateWebEventsConfig(entity: WebEventsConfigEntity) {
+        deleteWebEventsConfig()
+        insertWebEventsConfig(entity)
+    }
+
+    @Query("SELECT * FROM web_events_config LIMIT 1")
+    fun getWebEventsConfig(): WebEventsConfigEntity?
+
+    @Query("DELETE FROM web_events_config")
+    fun deleteWebEventsConfig()
 }

@@ -23,13 +23,13 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
-class EventHubContentScopeConfigPlugin @Inject constructor(
+class WebEventsContentScopeConfigPlugin @Inject constructor(
     private val repository: WebTelemetryRepository,
 ) : ContentScopeConfigPlugin {
 
     override fun config(): String {
-        val featureName = EventHubFeatureName.EventHub.value
-        val config = repository.getConfigEntity().json
+        val featureName = WebTelemetryFeatureName.WebEvents.value
+        val config = repository.getWebEventsConfigEntity().json
         return "\"$featureName\":$config"
     }
 

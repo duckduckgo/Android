@@ -25,6 +25,7 @@ import androidx.room.migration.Migration
     version = 1,
     entities = [
         WebTelemetryConfigEntity::class,
+        WebEventsConfigEntity::class,
         WebTelemetryPixelStateEntity::class,
     ],
 )

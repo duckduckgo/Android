@@ -56,7 +56,7 @@ class EventHubContentScopeJsMessageHandler @Inject constructor(
         }
 
         override val allowedDomains: List<String> = emptyList()
-        override val featureName: String = "eventHub"
+        override val featureName: String = "webEvents"
         override val methods: List<String> = listOf("webEvent")
     }
 }

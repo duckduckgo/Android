@@ -25,6 +25,12 @@ data class WebTelemetryConfigEntity(
     val json: String,
 )
 
+@Entity(tableName = "web_events_config")
+data class WebEventsConfigEntity(
+    @PrimaryKey val id: Int = 1,
+    val json: String,
+)
+
 /**
  * Persists per-pixel runtime state.
  * [periodStartMillis] UTC timestamp when the current period began.

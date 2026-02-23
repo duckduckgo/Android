@@ -18,6 +18,7 @@ package com.duckduckgo.webtelemetry.impl
 
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
+import com.duckduckgo.webtelemetry.store.WebEventsConfigEntity
 import com.duckduckgo.webtelemetry.store.WebTelemetryConfigEntity
 import com.duckduckgo.webtelemetry.store.WebTelemetryRepository
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -30,8 +31,7 @@ class EventHubFeaturePlugin @Inject constructor(
 ) : PrivacyFeaturePlugin {
 
     override fun store(featureName: String, jsonString: String): Boolean {
-        val feature = eventHubFeatureValueOf(featureName) ?: return false
-        if (feature.value == this.featureName) {
+        if (featureName == this.featureName) {
             repository.updateConfig(WebTelemetryConfigEntity(json = jsonString))
             pixelManager.onConfigChanged()
             return true
@@ -39,5 +39,21 @@ class EventHubFeaturePlugin @Inject constructor(
         return false
     }
 
-    override val featureName: String = EventHubFeatureName.EventHub.value
+    override val featureName: String = WebTelemetryFeatureName.EventHub.value
+}
+
+@ContributesMultibinding(AppScope::class)
+class WebEventsFeaturePlugin @Inject constructor(
+    private val repository: WebTelemetryRepository,
+) : PrivacyFeaturePlugin {
+
+    override fun store(featureName: String, jsonString: String): Boolean {
+        if (featureName == this.featureName) {
+            repository.updateWebEventsConfig(WebEventsConfigEntity(json = jsonString))
+            return true
+        }
+        return false
+    }
+
+    override val featureName: String = WebTelemetryFeatureName.WebEvents.value
 }
