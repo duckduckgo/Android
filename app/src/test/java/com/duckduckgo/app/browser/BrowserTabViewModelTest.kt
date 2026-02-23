@@ -8442,6 +8442,48 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenVpnMenuClickedWithNotSubscribedStateThenPixelFiredWithPillStatus() {
+        testee.browserViewState.value = browserViewState().copy(
+            vpnMenuState = VpnMenuState.NotSubscribed,
+        )
+
+        testee.onVpnMenuClicked()
+
+        verify(mockPixel).fire(
+            AppPixelName.MENU_ACTION_VPN_PRESSED,
+            mapOf(PixelParameter.STATUS to VpnMenuState.NotSubscribed.pixelParam),
+        )
+    }
+
+    @Test
+    fun whenVpnMenuClickedWithNotSubscribedNoPillStateThenPixelFiredWithNoPillStatus() {
+        testee.browserViewState.value = browserViewState().copy(
+            vpnMenuState = VpnMenuState.NotSubscribedNoPill,
+        )
+
+        testee.onVpnMenuClicked()
+
+        verify(mockPixel).fire(
+            AppPixelName.MENU_ACTION_VPN_PRESSED,
+            mapOf(PixelParameter.STATUS to VpnMenuState.NotSubscribedNoPill.pixelParam),
+        )
+    }
+
+    @Test
+    fun whenVpnMenuClickedWithSubscribedStateThenPixelFiredWithSubscribedStatus() {
+        testee.browserViewState.value = browserViewState().copy(
+            vpnMenuState = VpnMenuState.Subscribed(isVpnEnabled = true),
+        )
+
+        testee.onVpnMenuClicked()
+
+        verify(mockPixel).fire(
+            AppPixelName.MENU_ACTION_VPN_PRESSED,
+            mapOf(PixelParameter.STATUS to VpnMenuState.Subscribed(isVpnEnabled = true).pixelParam),
+        )
+    }
+
+    @Test
     fun whenDuckChatNativeNewChatRequested() = runTest {
         val expectedEvent = SubscriptionEventData(
             featureName = "event1",
@@ -8914,7 +8956,7 @@ class BrowserTabViewModelTest {
     fun whenOnSiteVisitedAndFeatureEnabledThenDomainRecorded() = runTest {
         fakeAndroidConfigBrowserFeature.singleTabFireDialog().setRawStoredState(State(enable = true))
 
-        testee.onSiteVisited(Uri.parse("https://sub.example.com/path"))
+        testee.onSiteVisited("https://sub.example.com/path", null)
 
         verify(mockTabVisitedSitesRepository).recordVisitedSite("abc", "example.com")
     }
@@ -8923,7 +8965,7 @@ class BrowserTabViewModelTest {
     fun whenOnSiteVisitedAndFeatureDisabledThenNothingRecorded() = runTest {
         fakeAndroidConfigBrowserFeature.singleTabFireDialog().setRawStoredState(State(enable = false))
 
-        testee.onSiteVisited(Uri.parse("https://sub.example.com/path"))
+        testee.onSiteVisited("https://sub.example.com/path", null)
 
         verify(mockTabVisitedSitesRepository, never()).recordVisitedSite(any(), any())
     }
@@ -8932,7 +8974,7 @@ class BrowserTabViewModelTest {
     fun whenOnSiteVisitedWithNoHostThenNothingRecorded() = runTest {
         fakeAndroidConfigBrowserFeature.singleTabFireDialog().setRawStoredState(State(enable = true))
 
-        testee.onSiteVisited(Uri.parse("about:blank"))
+        testee.onSiteVisited("about:blank", null)
 
         verify(mockTabVisitedSitesRepository, never()).recordVisitedSite(any(), any())
     }

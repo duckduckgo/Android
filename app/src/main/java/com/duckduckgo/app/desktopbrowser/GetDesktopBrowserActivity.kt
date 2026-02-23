@@ -50,9 +50,6 @@ class GetDesktopBrowserActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var getDesktopBrowserViewModelFactory: GetDesktopBrowserViewModel.Factory
 
-    @Inject
-    lateinit var shareEventHandler: GetDesktopBrowserShareEventHandler
-
     private val binding: ActivityGetDesktopBrowserBinding by viewBinding()
 
     private val viewModel by lazy {
@@ -81,18 +78,6 @@ class GetDesktopBrowserActivity : DuckDuckGoActivity() {
             .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
             .onEach { processCommand(it) }
             .launchIn(lifecycleScope)
-
-        // Observe share events and close activity when link is shared
-        shareEventHandler.linkShared
-            .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
-            .onEach { shared ->
-                if (shared) {
-                    shareEventHandler.consumeEvent()
-                    setResult(RESULT_DISMISSED_OR_SHARED)
-                    finish()
-                }
-            }
-            .launchIn(lifecycleScope)
     }
 
     private fun render(viewState: GetDesktopBrowserViewModel.ViewState) {
@@ -106,7 +91,6 @@ class GetDesktopBrowserActivity : DuckDuckGoActivity() {
             }
 
             is GetDesktopBrowserViewModel.Command.Dismissed -> {
-                setResult(RESULT_DISMISSED_OR_SHARED)
                 finish()
             }
 
@@ -177,10 +161,6 @@ class GetDesktopBrowserActivity : DuckDuckGoActivity() {
         },
         extras = this.defaultViewModelCreationExtras,
     )[GetDesktopBrowserViewModel::class.java]
-
-    companion object {
-        const val RESULT_DISMISSED_OR_SHARED = 100
-    }
 }
 
 data class GetDesktopBrowserActivityParams(

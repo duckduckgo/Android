@@ -20,13 +20,9 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.settings.db.SettingsDataStore
-import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ReceiverScope
 import dagger.android.AndroidInjection
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @InjectWith(ReceiverScope::class)
@@ -35,27 +31,11 @@ class GetDesktopBrowserShareBroadcastReceiver : BroadcastReceiver() {
     @Inject
     lateinit var settingsDataStore: SettingsDataStore
 
-    @Inject
-    lateinit var sharedEvent: GetDesktopBrowserShareEventHandler
-
-    @Inject
-    lateinit var dispatcherProvider: DispatcherProvider
-
-    @Inject
-    @AppCoroutineScope
-    lateinit var coroutineScope: CoroutineScope
-
     override fun onReceive(
         context: Context,
         intent: Intent,
     ) {
         AndroidInjection.inject(this, context)
-
-        val pendingResult = goAsync()
-        coroutineScope.launch(dispatcherProvider.io()) {
-            settingsDataStore.getDesktopBrowserSettingDismissed = true
-            sharedEvent.onLinkShared()
-            pendingResult.finish()
-        }
+        settingsDataStore.getDesktopBrowserSettingDismissed = true
     }
 }

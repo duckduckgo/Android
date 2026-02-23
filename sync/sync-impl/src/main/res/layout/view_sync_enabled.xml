@@ -35,21 +35,21 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:visibility="gone"
+        app:contentOrientation="start"
+        app:dismissIcon="true"
         app:primaryText="@string/sync_notify_me_title"
         app:secondaryText="@string/sync_notify_me_description"
-        app:dismissIcon="true"
-        app:contentOrientation="start"
         app:sharedPrefsKeyForDismiss="key_component_dismissed_in_sync_settings" />
 
     <com.duckduckgo.sync.impl.ui.SyncDisabledView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content" />
 
     <LinearLayout
         android:id="@+id/syncFeatureWarningsContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"/>
+        android:orientation="vertical" />
 
     <com.duckduckgo.common.ui.view.divider.HorizontalDivider
         android:layout_width="match_parent"
@@ -80,9 +80,19 @@
         android:id="@+id/syncSetupOtherPlatforms"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:leadingIconBackground="circular"
         app:leadingIcon="@drawable/ic_duckduckgo_silhouette_onlight_24"
+        app:leadingIconBackground="circular"
         app:primaryText="@string/syncGetAppsOnOtherPlatforms" />
+
+    <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+        android:id="@+id/getDesktopBrowser"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:leadingIcon="@drawable/ic_device_laptop_install_color_24"
+        app:leadingIconBackground="circular"
+        app:primaryText="@string/getDesktopBrowserSettingItemTitle"
+        app:secondaryText="@string/getDesktopBrowserSettingItemSubtitleTitle" />
 
     <com.duckduckgo.common.ui.view.divider.HorizontalDivider
         android:layout_width="match_parent"
@@ -92,7 +102,7 @@
         android:id="@+id/syncSettingsOptions"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical" >
+        android:orientation="vertical">
 
         <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
             android:layout_width="match_parent"

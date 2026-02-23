@@ -1066,6 +1066,13 @@
             }
         ]
     },
+    "m_dbp_initial-scan_incomplete": {
+        "description": "Fired when the PIR dashboard detects an incomplete initial scan that could be resumed (scan was interrupted with remaining brokers).",
+        "owners": ["karlenDimla", "landomen"],
+        "triggers": ["other"],
+        "suffixes": ["daily_count_short", "form_factor"],
+        "parameters": ["appVersion"]
+    },
     "m_dbp_foreground-run_started": {
         "description": "Fired when pir run is started in the foreground",
         "owners": ["karlenDimla", "landomen"],
