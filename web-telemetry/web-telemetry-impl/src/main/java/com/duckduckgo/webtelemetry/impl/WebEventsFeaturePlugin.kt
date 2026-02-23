@@ -18,42 +18,42 @@ package com.duckduckgo.webtelemetry.impl
 
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
-import com.duckduckgo.webtelemetry.store.WebEventsConfigEntity
-import com.duckduckgo.webtelemetry.store.WebTelemetryConfigEntity
-import com.duckduckgo.webtelemetry.store.WebTelemetryRepository
+import com.duckduckgo.webtelemetry.store.WebEventsFeatureConfigEntity
+import com.duckduckgo.webtelemetry.store.EventHubConfigEntity
+import com.duckduckgo.webtelemetry.store.WebEventsRepository
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
 class EventHubFeaturePlugin @Inject constructor(
-    private val repository: WebTelemetryRepository,
+    private val repository: WebEventsRepository,
     private val pixelManager: EventHubPixelManager,
 ) : PrivacyFeaturePlugin {
 
     override fun store(featureName: String, jsonString: String): Boolean {
         if (featureName == this.featureName) {
-            repository.updateConfig(WebTelemetryConfigEntity(json = jsonString))
+            repository.updateConfig(EventHubConfigEntity(json = jsonString))
             pixelManager.onConfigChanged()
             return true
         }
         return false
     }
 
-    override val featureName: String = WebTelemetryFeatureName.EventHub.value
+    override val featureName: String = WebEventsFeatureName.EventHub.value
 }
 
 @ContributesMultibinding(AppScope::class)
 class WebEventsFeaturePlugin @Inject constructor(
-    private val repository: WebTelemetryRepository,
+    private val repository: WebEventsRepository,
 ) : PrivacyFeaturePlugin {
 
     override fun store(featureName: String, jsonString: String): Boolean {
         if (featureName == this.featureName) {
-            repository.updateWebEventsConfig(WebEventsConfigEntity(json = jsonString))
+            repository.updateWebEventsConfig(WebEventsFeatureConfigEntity(json = jsonString))
             return true
         }
         return false
     }
 
-    override val featureName: String = WebTelemetryFeatureName.WebEvents.value
+    override val featureName: String = WebEventsFeatureName.WebEvents.value
 }
