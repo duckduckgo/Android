@@ -607,7 +607,12 @@ afterEvaluate {
 
 tasks.register("importJUnitXmlForFlankPrivacyTests", ImportJUnitXmlReports) {
     dialect = ANDROID_FIREBASE
-    reports.from(file("build/fladle/fladleResults/JUnitReport.xml"))
+    reports.from(file("fladle/fladleResults/JUnitReport.xml"))
+}
+
+tasks.register("importJUnitXml", ImportJUnitXmlReports) {
+    dialect = ANDROID_FIREBASE
+    reports.from(file("fladleResults/JUnitReport.xml"))
 }
 
 tasks.register('fastlaneVersionCode') {
