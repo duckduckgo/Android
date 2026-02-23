@@ -35,6 +35,7 @@ import com.duckduckgo.sync.impl.databinding.ActivitySyncGetOnOtherDevicesBinding
 import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsViewModel.Command
 import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsViewModel.Command.ShareLink
 import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsViewModel.Command.ShowCopiedNotification
+import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsViewModel.ViewState
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -42,6 +43,7 @@ import logcat.LogPriority.WARN
 import logcat.asLog
 import logcat.logcat
 import javax.inject.Inject
+import com.duckduckgo.mobile.android.R as CommonR
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(SyncGetOnOtherPlatformsParams::class)
@@ -60,6 +62,10 @@ class SyncGetOnOtherPlatformsActivity : DuckDuckGoActivity() {
             .onEach { executeCommand(it) }
             .launchIn(lifecycleScope)
 
+        viewModel.viewState.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+            .onEach { renderViewState(it) }
+            .launchIn(lifecycleScope)
+
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
         configureUiEventHandlers()
@@ -74,6 +80,12 @@ class SyncGetOnOtherPlatformsActivity : DuckDuckGoActivity() {
         }
         binding.downloadLinkText.setOnClickListener {
             viewModel.onLinkClicked(extractLaunchSource())
+        }
+    }
+
+    private fun renderViewState(viewState: ViewState) {
+        if (viewState.showDesktopBrowserUrl) {
+            binding.downloadLinkText.text = getString(CommonR.string.getDesktopBrowserUrl)
         }
     }
 

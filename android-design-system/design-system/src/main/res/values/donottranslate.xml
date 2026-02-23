@@ -65,4 +65,9 @@
     <!-- Duck.ai updates - O-A -->
     <string name="duckAIUpdateTitle">Duck.ai PoC</string>
     <string name="duckAIUpdateMessage">This feature is in active development, intended for feedback purposes.</string>
+
+    <!-- Get Desktop Browser -->
+    <string name="getDesktopBrowserSettingItemTitle">Get Desktop Browser</string>
+    <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo for Mac and Windows</string>
+    <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
 </resources>

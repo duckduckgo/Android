@@ -37,6 +37,7 @@ import com.duckduckgo.settings.api.CompleteSetupSettingsPlugin
 import com.duckduckgo.settings.api.SettingsPageFeature
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
+import com.duckduckgo.mobile.android.R as CommonR
 
 @ContributesMultibinding(ActivityScope::class)
 @PriorityKey(200)
@@ -49,9 +50,9 @@ class GetDesktopBrowserCompleteSetupSettings @Inject constructor(
 
     override fun getView(context: Context): View {
         return TwoLineListItem(context = activity).apply {
-            setPrimaryText(activity.getString(R.string.getDesktopBrowserSettingItemTitle))
-            setSecondaryText(activity.getString(R.string.getDesktopBrowserSettingItemSubtitleTitle))
-            setLeadingIconResource(R.drawable.ic_device_laptop_install_color_24)
+            setPrimaryText(activity.getString(CommonR.string.getDesktopBrowserSettingItemTitle))
+            setSecondaryText(activity.getString(CommonR.string.getDesktopBrowserSettingItemSubtitleTitle))
+            setLeadingIconResource(CommonR.drawable.ic_device_laptop_install_color_24)
 
             configureOverflowMenu()
 
