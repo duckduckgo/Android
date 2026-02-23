@@ -115,10 +115,10 @@ class RealPageLoadWideEvent @Inject constructor(
 
     override fun onPageStarted(tabId: String, url: String) {
         if (!shouldTrackUrl(url)) return
-        if (isInProgress(tabId, url)) return
         coroutineScope.launch {
             mutex.withLock {
                 if (!isFeatureEnabled()) return@launch
+                if (isInProgress(tabId, url)) return@launch
 
                 val existingState = activeFlows[tabId]
                 if (existingState != null && existingState.url != url) {
@@ -163,8 +163,7 @@ class RealPageLoadWideEvent @Inject constructor(
     }
 
     override fun onPageVisible(tabId: String, url: String, progress: Int) {
-        if (!isInProgress(tabId, url)) return
-        updateWideEventAsync(tabId) { flowId ->
+        updateWideEventAsync(tabId, url) { flowId ->
             wideEventClient.intervalEnd(
                 wideEventId = flowId,
                 key = KEY_ELAPSED_TIME_TO_VISIBLE,
@@ -183,8 +182,7 @@ class RealPageLoadWideEvent @Inject constructor(
     }
 
     override fun onProgressChanged(tabId: String, url: String) {
-        if (!isInProgress(tabId, url)) return
-        updateWideEventAsync(tabId) { flowId ->
+        updateWideEventAsync(tabId, url) { flowId ->
             wideEventClient.intervalEnd(
                 wideEventId = flowId,
                 key = KEY_ELAPSED_TIME_TO_ESCAPED_FIXED_PROGRESS,
@@ -205,11 +203,10 @@ class RealPageLoadWideEvent @Inject constructor(
         activeRequestsOnLoadStart: Int,
         concurrentRequestsOnFinish: Int,
     ) {
-        if (!isInProgress(tabId, url)) return
-        val isSuccess = errorDescription == null
-        val outcome = if (isSuccess) "success" else "error"
-        updateWideEventAsync(tabId) { flowId ->
+        updateWideEventAsync(tabId, url) { flowId ->
             popActiveFlowId(tabId)
+            val isSuccess = errorDescription == null
+            val outcome = if (isSuccess) "success" else "error"
 
             wideEventClient.intervalEnd(
                 wideEventId = flowId,
@@ -263,10 +260,14 @@ class RealPageLoadWideEvent @Inject constructor(
         }.getOrDefault(false)
     }
 
-    private fun updateWideEventAsync(tabId: String, operation: suspend (Long) -> Unit) {
+    private fun updateWideEventAsync(
+        tabId: String,
+        url: String,
+        operation: suspend (Long) -> Unit,
+    ) {
         coroutineScope.launch {
             mutex.withLock {
-                if (isFeatureEnabled()) {
+                if (isFeatureEnabled() && isInProgress(tabId, url)) {
                     getActiveFlowId(tabId)?.let { flowId -> operation(flowId) }
                 }
             }
