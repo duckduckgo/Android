@@ -72,7 +72,7 @@ runs:
         status=$(echo $response | jq -r '.errors')
 
         if [ "$status" == "null" ]; then
-          echo "Task $found_task_id successfully assigned to user INPUT_ASANA_USER_ID."
+          echo "Task $found_task_id successfully assigned to user $INPUT_ASANA_USER_ID."
           echo "task_id=$found_task_id" >> "$GITHUB_OUTPUT"
         else
           echo "Failed to assign task: $status"
