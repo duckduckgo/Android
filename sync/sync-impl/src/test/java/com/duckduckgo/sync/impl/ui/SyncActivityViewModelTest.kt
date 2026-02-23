@@ -16,6 +16,7 @@
 
 package com.duckduckgo.sync.impl.ui
 
+import android.annotation.SuppressLint
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -85,6 +86,8 @@ class SyncActivityViewModelTest {
     private val syncFeatureToggle: SyncFeatureToggle = mock()
     private val syncPixels: SyncPixels = mock()
     private val deviceAuthenticator: DeviceAuthenticator = mock()
+
+    @SuppressLint("DenyListedApi")
     private val fakeSettingsPageFeature = FakeFeatureToggleFactory.create(SettingsPageFeature::class.java)
 
     private val stateFlow = MutableStateFlow(SyncState.READY)
