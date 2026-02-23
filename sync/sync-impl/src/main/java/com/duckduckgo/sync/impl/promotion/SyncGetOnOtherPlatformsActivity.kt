@@ -43,7 +43,6 @@ import logcat.LogPriority.WARN
 import logcat.asLog
 import logcat.logcat
 import javax.inject.Inject
-import com.duckduckgo.mobile.android.R as CommonR
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(SyncGetOnOtherPlatformsParams::class)
@@ -85,7 +84,7 @@ class SyncGetOnOtherPlatformsActivity : DuckDuckGoActivity() {
 
     private fun renderViewState(viewState: ViewState) {
         if (viewState.showDesktopBrowserUrl) {
-            binding.downloadLinkText.text = getString(CommonR.string.getDesktopBrowserUrl)
+            binding.downloadLinkText.text = getString(R.string.getDesktopBrowserUrl)
         }
     }
 

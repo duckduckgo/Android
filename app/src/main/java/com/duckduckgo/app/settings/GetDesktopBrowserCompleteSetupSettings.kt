@@ -50,8 +50,8 @@ class GetDesktopBrowserCompleteSetupSettings @Inject constructor(
 
     override fun getView(context: Context): View {
         return TwoLineListItem(context = activity).apply {
-            setPrimaryText(activity.getString(CommonR.string.getDesktopBrowserSettingItemTitle))
-            setSecondaryText(activity.getString(CommonR.string.getDesktopBrowserSettingItemSubtitleTitle))
+            setPrimaryText(activity.getString(R.string.getDesktopBrowserSettingItemTitle))
+            setSecondaryText(activity.getString(R.string.getDesktopBrowserSettingItemSubtitleTitle))
             setLeadingIconResource(CommonR.drawable.ic_device_laptop_install_color_24)
 
             configureOverflowMenu()
