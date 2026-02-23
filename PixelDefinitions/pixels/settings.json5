@@ -25,7 +25,9 @@
             "appVersion",
             {
                 "key": "source",
-                "description": "The source from which the user clicked the 'Get Desktop Browser' item (e.g. 'settings', 'complete_setup')."
+                "description": "The source from which the user clicked the 'Get Desktop Browser' item",
+                "type": "string",
+                "enum": ["settings", "complete_setup"]
             }
         ]
     },
@@ -38,7 +40,9 @@
             "appVersion",
             {
                 "key": "source",
-                "description": "The source of the dismissal (e.g. 'no_thanks', 'hide')."
+                "description": "The source of the dismissal",
+                "type": "string",
+                "enum": ["no_thanks", "hide"]
             }
         ]
     },
