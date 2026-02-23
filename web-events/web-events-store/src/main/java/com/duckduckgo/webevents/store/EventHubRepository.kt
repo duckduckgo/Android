@@ -20,28 +20,28 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-interface WebEventsRepository {
+interface EventHubRepository {
     fun updateEventHubConfig(entity: EventHubConfigEntity)
     fun getEventHubConfigEntity(): EventHubConfigEntity
 
     fun updateWebEventsFeatureConfig(entity: WebEventsFeatureConfigEntity)
     fun getWebEventsFeatureConfigEntity(): WebEventsFeatureConfigEntity
 
-    fun getPixelState(name: String): WebEventsPixelStateEntity?
-    fun getAllPixelStates(): List<WebEventsPixelStateEntity>
-    fun savePixelState(entity: WebEventsPixelStateEntity)
+    fun getPixelState(name: String): EventHubPixelStateEntity?
+    fun getAllPixelStates(): List<EventHubPixelStateEntity>
+    fun savePixelState(entity: EventHubPixelStateEntity)
     fun deletePixelState(name: String)
     fun deleteAllPixelStates()
 }
 
-class RealWebEventsRepository constructor(
-    database: WebEventsDatabase,
+class RealEventHubRepository constructor(
+    database: EventHubDatabase,
     coroutineScope: CoroutineScope,
     dispatcherProvider: DispatcherProvider,
     isMainProcess: Boolean,
-) : WebEventsRepository {
+) : EventHubRepository {
 
-    private val dao: WebEventsDao = database.webEventsDao()
+    private val dao: EventHubDao = database.webEventsDao()
     private var eventHubConfigEntity = EventHubConfigEntity(json = EMPTY_JSON)
     private var webEventsFeatureConfigEntity = WebEventsFeatureConfigEntity(json = EMPTY_JSON)
 
@@ -71,15 +71,15 @@ class RealWebEventsRepository constructor(
         return webEventsFeatureConfigEntity
     }
 
-    override fun getPixelState(name: String): WebEventsPixelStateEntity? {
+    override fun getPixelState(name: String): EventHubPixelStateEntity? {
         return dao.getPixelState(name)
     }
 
-    override fun getAllPixelStates(): List<WebEventsPixelStateEntity> {
+    override fun getAllPixelStates(): List<EventHubPixelStateEntity> {
         return dao.getAllPixelStates()
     }
 
-    override fun savePixelState(entity: WebEventsPixelStateEntity) {
+    override fun savePixelState(entity: EventHubPixelStateEntity) {
         dao.insertPixelState(entity)
     }
 

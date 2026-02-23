@@ -41,7 +41,7 @@ data class WebEventsFeatureConfigEntity(
  * [stopCountingJson] JSON set of param names that have hit their max bucket, e.g. ["count"]
  */
 @Entity(tableName = "web_events_pixel_state")
-data class WebEventsPixelStateEntity(
+data class EventHubPixelStateEntity(
     @PrimaryKey val pixelName: String,
     val periodStartMillis: Long,
     val periodEndMillis: Long,

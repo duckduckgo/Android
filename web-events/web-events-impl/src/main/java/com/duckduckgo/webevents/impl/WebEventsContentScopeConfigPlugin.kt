@@ -18,17 +18,17 @@ package com.duckduckgo.webevents.impl
 
 import com.duckduckgo.contentscopescripts.api.ContentScopeConfigPlugin
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.webevents.store.WebEventsRepository
+import com.duckduckgo.webevents.store.EventHubRepository
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
 class WebEventsContentScopeConfigPlugin @Inject constructor(
-    private val repository: WebEventsRepository,
+    private val repository: EventHubRepository,
 ) : ContentScopeConfigPlugin {
 
     override fun config(): String {
-        val featureName = WebEventsFeatureName.WebEvents.value
+        val featureName = EventHubFeatureName.WebEvents.value
         val config = repository.getWebEventsFeatureConfigEntity().json
         return "\"$featureName\":$config"
     }
