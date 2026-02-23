@@ -28,9 +28,9 @@ import com.duckduckgo.webevents.impl.RealEventHubPixelManager
 import com.duckduckgo.webevents.impl.RealTimeProvider
 import com.duckduckgo.webevents.impl.TimeProvider
 import com.duckduckgo.webevents.store.ALL_MIGRATIONS
-import com.duckduckgo.webevents.store.RealEventHubRepository
 import com.duckduckgo.webevents.store.EventHubDatabase
 import com.duckduckgo.webevents.store.EventHubRepository
+import com.duckduckgo.webevents.store.RealEventHubRepository
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
