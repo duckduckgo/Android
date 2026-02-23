@@ -215,4 +215,9 @@
     <!-- Sync promo in bookmark added confirmation dialog -->
     <string name="addBookmarkDialogSyncPromoText">Könyvjelzők eszközök közötti szinkronizálása</string>
     <string name="addBookmarkDialogHideSyncSuggestion">Elrejtés</string>
+
+    <!-- Get Desktop Browser -->
+    <string name="getDesktopBrowserSettingItemTitle">Asztali böngésző letöltése</string>
+    <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo Mac és Windows rendszerre</string>
+    <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
 </resources>

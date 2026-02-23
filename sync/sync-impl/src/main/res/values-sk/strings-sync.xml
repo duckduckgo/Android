@@ -215,4 +215,9 @@
     <!-- Sync promo in bookmark added confirmation dialog -->
     <string name="addBookmarkDialogSyncPromoText">Synchronizuj záložky medzi zariadeniami</string>
     <string name="addBookmarkDialogHideSyncSuggestion">Skryť</string>
+
+    <!-- Get Desktop Browser -->
+    <string name="getDesktopBrowserSettingItemTitle">Získajte prehliadač pre desktop PC</string>
+    <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo pre Mac a Windows</string>
+    <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
 </resources>

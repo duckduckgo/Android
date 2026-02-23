@@ -215,4 +215,9 @@
     <!-- Sync promo in bookmark added confirmation dialog -->
     <string name="addBookmarkDialogSyncPromoText">Synkronoi kirjanmerkit laitteidesi välillä</string>
     <string name="addBookmarkDialogHideSyncSuggestion">Piilota</string>
+
+    <!-- Get Desktop Browser -->
+    <string name="getDesktopBrowserSettingItemTitle">Hanki pöytäkoneselain</string>
+    <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo Mac- ja Windows-laitteeseen</string>
+    <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
 </resources>
