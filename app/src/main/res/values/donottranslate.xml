@@ -79,18 +79,6 @@
       }]
     </string>
 
-    <!-- Get Desktop Browser -->
-    <string name="getDesktopBrowserSettingItemTitle">Get Desktop Browser</string>
-    <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo for Mac and Windows</string>
-    <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
-    <string name="getDesktopBrowserTitle">Protect your personal info on Mac and Windows too!</string>
-    <string name="getDesktopBrowserBody">To download DuckDuckGo on Mac or Windows, visit:</string>
-    <string name="getDesktopBrowserShareDownloadLink">Share Download Link</string>
-    <string name="getDesktopBrowserNoThanks">No Thanks</string>
-    <string name="getDesktopBrowserHideItem">Hide</string>
-    <string name="getDesktopBrowserUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Link copied</string>
-
-
     <!-- Single tab burning -->
     <string name="singleTabFireDialogTitle">Delete tabs and site data?</string>
     <string name="singleTabFireDialogTitleWithChats">Delete tabs, site data, and chats?</string>
