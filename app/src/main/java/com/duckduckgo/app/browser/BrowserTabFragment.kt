@@ -3431,6 +3431,8 @@ class BrowserTabFragment :
 
         reactToDuckChatContextualSheetResult()
         ensureBrowserIsCompatibleWithContextualSheetState()
+
+        viewModel.collectPageContext()
     }
 
     private fun createNewContextualFragment(tabId: String) {
@@ -3500,7 +3502,6 @@ class BrowserTabFragment :
             requireContext(),
         ) {
             showDuckChatContextualSheet(tabId)
-            viewModel.onContextualOpenedAfterOnboarding()
         }
     }
 

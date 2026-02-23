@@ -8858,7 +8858,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenOnContextualOpenedAfterOnboardingThenPageContextSubscriptionEventSent() = runTest {
+    fun whenCollectPageContextThenPageContextSubscriptionEventSent() = runTest {
         val expectedEvent = SubscriptionEventData(
             featureName = PAGE_CONTEXT_FEATURE_NAME,
             subscriptionName = "collect",
@@ -8866,7 +8866,7 @@ class BrowserTabViewModelTest {
         )
         whenever(mockPageContextJSHelper.onContextualOpened()).thenReturn(expectedEvent)
 
-        testee.onContextualOpenedAfterOnboarding()
+        testee.collectPageContext()
 
         testee.subscriptionEventDataFlow.test {
             val emittedEvent = awaitItem()
@@ -8884,26 +8884,6 @@ class BrowserTabViewModelTest {
             testee.onDuckChatOmnibarButtonClicked(query = "example", hasFocus = false, isNtp = false)
 
             expectNoEvents()
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenOnDuckChatOmnibarButtonClickedAndOnboardingCompletedThenPageContextSubscriptionEventSent() = runTest {
-        val expectedEvent = SubscriptionEventData(
-            featureName = PAGE_CONTEXT_FEATURE_NAME,
-            subscriptionName = "collect",
-            params = JSONObject(),
-        )
-        whenever(mockPageContextJSHelper.onContextualOpened()).thenReturn(expectedEvent)
-        mockDuckAiContextualModeFlow.emit(true)
-        whenever(mockDuckChat.isContextualOnboardingCompleted()).thenReturn(true)
-
-        testee.onDuckChatOmnibarButtonClicked(query = "example", hasFocus = false, isNtp = false)
-
-        testee.subscriptionEventDataFlow.test {
-            val emittedEvent = awaitItem()
-            assertEquals(PAGE_CONTEXT_FEATURE_NAME, emittedEvent.featureName)
             cancelAndIgnoreRemainingEvents()
         }
     }
