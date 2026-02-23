@@ -18,9 +18,9 @@ package com.duckduckgo.webevents.impl
 
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
-import com.duckduckgo.webevents.store.WebEventsFeatureConfigEntity
 import com.duckduckgo.webevents.store.EventHubConfigEntity
 import com.duckduckgo.webevents.store.EventHubRepository
+import com.duckduckgo.webevents.store.WebEventsFeatureConfigEntity
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 
