@@ -23,7 +23,7 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
-class WebEventsPixelParamRemovalPlugin @Inject constructor() : PixelParamRemovalPlugin {
+class EventHubPixelParamRemovalPlugin @Inject constructor() : PixelParamRemovalPlugin {
     override fun names(): List<Pair<String, Set<PixelParameter>>> {
         return listOf(
             PIXEL_PREFIX to PixelParameter.removeAll(),

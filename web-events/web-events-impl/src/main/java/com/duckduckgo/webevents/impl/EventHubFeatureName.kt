@@ -14,23 +14,13 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.webevents.store
+package com.duckduckgo.webevents.impl
 
-import androidx.room.Database
-import androidx.room.RoomDatabase
-import androidx.room.migration.Migration
-
-@Database(
-    exportSchema = true,
-    version = 1,
-    entities = [
-        EventHubConfigEntity::class,
-        WebEventsFeatureConfigEntity::class,
-        WebEventsPixelStateEntity::class,
-    ],
-)
-abstract class WebEventsDatabase : RoomDatabase() {
-    abstract fun webEventsDao(): WebEventsDao
+enum class EventHubFeatureName(val value: String) {
+    EventHub("eventHub"),
+    WebEvents("webEvents"),
 }
 
-val ALL_MIGRATIONS = emptyArray<Migration>()
+fun eventHubFeatureValueOf(value: String): EventHubFeatureName? {
+    return EventHubFeatureName.entries.find { it.value == value }
+}

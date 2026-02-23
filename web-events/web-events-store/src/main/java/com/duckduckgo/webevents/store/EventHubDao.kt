@@ -23,7 +23,7 @@ import androidx.room.Query
 import androidx.room.Transaction
 
 @Dao
-interface WebEventsDao {
+interface EventHubDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertEventHubConfig(entity: EventHubConfigEntity)
@@ -56,13 +56,13 @@ interface WebEventsDao {
     fun deleteWebEventsFeatureConfig()
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertPixelState(entity: WebEventsPixelStateEntity)
+    fun insertPixelState(entity: EventHubPixelStateEntity)
 
     @Query("SELECT * FROM web_events_pixel_state WHERE pixelName = :name")
-    fun getPixelState(name: String): WebEventsPixelStateEntity?
+    fun getPixelState(name: String): EventHubPixelStateEntity?
 
     @Query("SELECT * FROM web_events_pixel_state")
-    fun getAllPixelStates(): List<WebEventsPixelStateEntity>
+    fun getAllPixelStates(): List<EventHubPixelStateEntity>
 
     @Query("DELETE FROM web_events_pixel_state WHERE pixelName = :name")
     fun deletePixelState(name: String)
