@@ -16,21 +16,24 @@
 
 package com.duckduckgo.webtelemetry.impl
 
-import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin
-import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin.PixelParameter
+import com.duckduckgo.contentscopescripts.api.ContentScopeConfigPlugin
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.webtelemetry.store.WebEventsRepository
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
-class WebTelemetryPixelParamRemovalPlugin @Inject constructor() : PixelParamRemovalPlugin {
-    override fun names(): List<Pair<String, Set<PixelParameter>>> {
-        return listOf(
-            PIXEL_PREFIX to PixelParameter.removeAll(),
-        )
+class WebEventsContentScopeConfigPlugin @Inject constructor(
+    private val repository: WebEventsRepository,
+) : ContentScopeConfigPlugin {
+
+    override fun config(): String {
+        val featureName = WebEventsFeatureName.WebEvents.value
+        val config = repository.getWebEventsFeatureConfigEntity().json
+        return "\"$featureName\":$config"
     }
 
-    companion object {
-        private const val PIXEL_PREFIX = "webTelemetry."
+    override fun preferences(): String? {
+        return null
     }
 }

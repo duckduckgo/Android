@@ -19,27 +19,29 @@ package com.duckduckgo.webtelemetry.store
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "web_telemetry_config")
-data class WebTelemetryConfigEntity(
+/** Stores the eventHub feature JSON (telemetry pixel definitions). */
+@Entity(tableName = "event_hub_config")
+data class EventHubConfigEntity(
     @PrimaryKey val id: Int = 1,
     val json: String,
 )
 
-@Entity(tableName = "web_events_config")
-data class WebEventsConfigEntity(
+/** Stores the webEvents CSS feature JSON. */
+@Entity(tableName = "web_events_feature_config")
+data class WebEventsFeatureConfigEntity(
     @PrimaryKey val id: Int = 1,
     val json: String,
 )
 
 /**
- * Persists per-pixel runtime state.
+ * Per-pixel runtime state.
  * [periodStartMillis] UTC timestamp when the current period began.
  * [periodEndMillis] UTC timestamp when the current period ends (fire time).
  * [paramsJson] parameter data as JSON, e.g. {"count": 5}
  * [stopCountingJson] JSON set of param names that have hit their max bucket, e.g. ["count"]
  */
-@Entity(tableName = "web_telemetry_pixel_state")
-data class WebTelemetryPixelStateEntity(
+@Entity(tableName = "web_events_pixel_state")
+data class WebEventsPixelStateEntity(
     @PrimaryKey val pixelName: String,
     val periodStartMillis: Long,
     val periodEndMillis: Long,
