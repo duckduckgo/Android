@@ -73,6 +73,7 @@ import org.mockito.kotlin.whenever
 import java.lang.String.format
 import kotlin.reflect.KClass
 
+@SuppressLint("DenyListedApi")
 @RunWith(AndroidJUnit4::class)
 class SyncActivityViewModelTest {
 
@@ -87,7 +88,6 @@ class SyncActivityViewModelTest {
     private val syncPixels: SyncPixels = mock()
     private val deviceAuthenticator: DeviceAuthenticator = mock()
 
-    @SuppressLint("DenyListedApi")
     private val fakeSettingsPageFeature = FakeFeatureToggleFactory.create(SettingsPageFeature::class.java)
 
     private val stateFlow = MutableStateFlow(SyncState.READY)
