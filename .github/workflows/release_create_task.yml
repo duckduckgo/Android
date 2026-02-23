@@ -63,7 +63,6 @@ jobs:
           task_name: 'Android Release ${{ inputs.app-version }}'
           asana_token: ${{ secrets.ASANA_ACCESS_TOKEN }}
           project_gid: ${{ vars.GH_ANDROID_RELEASE_BOARD_PROJECT_ID }}
-          username: ${{ github.actor }}
           github_token: ${{ secrets.DAXMOBILE_ANDROID_AUTOMATION }}
 
       - name: Get Asana Task Permalink
