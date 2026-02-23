@@ -198,7 +198,7 @@ import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.browser.omnibar.QueryOrigin
 import com.duckduckgo.app.browser.omnibar.QueryOrigin.FromAutocomplete
-import com.duckduckgo.app.browser.pageload.PageLoadPerformanceMonitor
+import com.duckduckgo.app.browser.pageload.PageLoadWideEvent
 import com.duckduckgo.app.browser.refreshpixels.RefreshPixelSender
 import com.duckduckgo.app.browser.santize.NonHttpAppLinkChecker
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
@@ -503,7 +503,7 @@ class BrowserTabViewModel @Inject constructor(
     private val serpEasterEggLogosToggles: SerpEasterEggLogosToggles,
     private val serpLogos: SerpLogos,
     private val tabVisitedSitesRepository: TabVisitedSitesRepository,
-    private val pageLoadMonitor: PageLoadPerformanceMonitor,
+    private val pageLoadWideEvent: PageLoadWideEvent,
 ) : ViewModel(),
     WebViewClientListener,
     EditSavedSiteListener,
@@ -2121,7 +2121,7 @@ class BrowserTabViewModel @Inject constructor(
         val currentUrl = webViewNavigationState.currentUrl
         if (!hasExitedFixedProgress && currentUrl != null && newProgress > FIXED_PROGRESS) {
             hasExitedFixedProgress = true
-            pageLoadMonitor.onProgressChanged(tabId, currentUrl)
+            pageLoadWideEvent.onProgressChanged(tabId, currentUrl)
         }
 
         loadingViewState.value = progress.copy(isLoading = isLoading, progress = visualProgress, url = site?.url ?: "")
