@@ -93,7 +93,7 @@
             {
                 "key": "feature.data.ext.step.page_finish.outcome",
                 "description": "Final outcome of the page load",
-                "enum": ["success", "error", "timeout"]
+                "enum": ["success", "error"]
             },
             {
                 "key": "feature.data.ext.step.page_finish.error_code",
