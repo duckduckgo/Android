@@ -19,6 +19,9 @@ package com.duckduckgo.sync.impl.ui
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle.State
+import com.duckduckgo.settings.api.SettingsPageFeature
 import com.duckduckgo.sync.TestSyncFixtures
 import com.duckduckgo.sync.TestSyncFixtures.connectedDevice
 import com.duckduckgo.sync.TestSyncFixtures.deviceId
@@ -82,6 +85,7 @@ class SyncActivityViewModelTest {
     private val syncFeatureToggle: SyncFeatureToggle = mock()
     private val syncPixels: SyncPixels = mock()
     private val deviceAuthenticator: DeviceAuthenticator = mock()
+    private val fakeSettingsPageFeature = FakeFeatureToggleFactory.create(SettingsPageFeature::class.java)
 
     private val stateFlow = MutableStateFlow(SyncState.READY)
 
@@ -96,6 +100,7 @@ class SyncActivityViewModelTest {
             syncEngine = syncEngine,
             recoveryCodePDF = recoveryPDF,
             syncFeatureToggle = syncFeatureToggle,
+            settingsPageFeature = fakeSettingsPageFeature,
             syncPixels = syncPixels,
             deviceAuthenticator = deviceAuthenticator,
         )
@@ -639,6 +644,52 @@ class SyncActivityViewModelTest {
             awaitItem().also {
                 assertEquals("not_activated", (it as LaunchSyncGetOnOtherPlatforms).source.value)
             }
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenDesktopBrowserFeatureEnabledAndSignedOutThenViewStateShowsNewDesktopBrowserSetting() = runTest {
+        fakeSettingsPageFeature.newDesktopBrowserSettingEnabled().setRawStoredState(State(true))
+
+        testee.viewState().test {
+            val viewState = expectMostRecentItem()
+            assertTrue(viewState.newDesktopBrowserSettingEnabled)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenDesktopBrowserFeatureDisabledAndSignedOutThenViewStateDoesNotShowNewDesktopBrowserSetting() = runTest {
+        fakeSettingsPageFeature.newDesktopBrowserSettingEnabled().setRawStoredState(State(false))
+
+        testee.viewState().test {
+            val viewState = expectMostRecentItem()
+            assertFalse(viewState.newDesktopBrowserSettingEnabled)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenDesktopBrowserFeatureEnabledAndSignedInThenViewStateShowsNewDesktopBrowserSetting() = runTest {
+        fakeSettingsPageFeature.newDesktopBrowserSettingEnabled().setRawStoredState(State(true))
+        givenAuthenticatedUser()
+
+        testee.viewState().test {
+            val viewState = expectMostRecentItem()
+            assertTrue(viewState.newDesktopBrowserSettingEnabled)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenDesktopBrowserFeatureDisabledAndSignedInThenViewStateDoesNotShowNewDesktopBrowserSetting() = runTest {
+        fakeSettingsPageFeature.newDesktopBrowserSettingEnabled().setRawStoredState(State(false))
+        givenAuthenticatedUser()
+
+        testee.viewState().test {
+            val viewState = expectMostRecentItem()
+            assertFalse(viewState.newDesktopBrowserSettingEnabled)
             cancelAndIgnoreRemainingEvents()
         }
     }
