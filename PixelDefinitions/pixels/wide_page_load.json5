@@ -77,8 +77,8 @@
             },
             {
                 "key": "feature.data.ext.step.page_visible.progress",
-                "description": "WebView progress (0-100) when page became visible",
-                "type": "string"
+                "description": "True if page became visible at or after fixed progress threshold (50%), false if before",
+                "type": "boolean"
             },
             {
                 "key": "feature.data.ext.step.page_escaped_fixed_progress",

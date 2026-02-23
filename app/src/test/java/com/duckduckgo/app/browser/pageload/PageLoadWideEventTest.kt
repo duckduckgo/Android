@@ -124,7 +124,7 @@ class PageLoadWideEventTest {
             wideEventId = 456L,
             stepName = "page_visible",
             success = true,
-            metadata = mapOf("progress" to "50"),
+            metadata = mapOf("progress" to "true"),
         )
     }
 
@@ -301,13 +301,13 @@ class PageLoadWideEventTest {
             wideEventId = 100L,
             stepName = "page_visible",
             success = true,
-            metadata = mapOf("progress" to "30"),
+            metadata = mapOf("progress" to "false"),
         )
         verify(wideEventClient).flowStep(
             wideEventId = 200L,
             stepName = "page_visible",
             success = true,
-            metadata = mapOf("progress" to "40"),
+            metadata = mapOf("progress" to "false"),
         )
     }
 
@@ -354,7 +354,7 @@ class PageLoadWideEventTest {
 
         // Verify all steps were recorded
         verify(wideEventClient).flowStep(500L, "page_start", true, emptyMap())
-        verify(wideEventClient).flowStep(500L, "page_visible", true, mapOf("progress" to "45"))
+        verify(wideEventClient).flowStep(500L, "page_visible", true, mapOf("progress" to "false"))
         verify(wideEventClient).flowStep(500L, "page_escaped_fixed_progress", true, emptyMap())
         verify(wideEventClient).flowStep(
             wideEventId = 500L,

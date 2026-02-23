@@ -139,8 +139,6 @@ class RealPageLoadWideEvent @Inject constructor(
                     wideEventClient.flowStep(
                         wideEventId = flowId,
                         stepName = STEP_PAGE_START,
-                        success = true,
-                        metadata = emptyMap(),
                     )
 
                     wideEventClient.intervalStart(
@@ -175,9 +173,8 @@ class RealPageLoadWideEvent @Inject constructor(
             wideEventClient.flowStep(
                 wideEventId = flowId,
                 stepName = STEP_PAGE_VISIBLE,
-                success = true,
                 metadata = mapOf(
-                    KEY_PROGRESS to progress.toString(),
+                    KEY_PROGRESS to (progress >= FIXED_PROGRESS_THRESHOLD).toString(),
                 ),
             )
 
@@ -195,8 +192,6 @@ class RealPageLoadWideEvent @Inject constructor(
             wideEventClient.flowStep(
                 wideEventId = flowId,
                 stepName = STEP_PAGE_ESCAPED_FIXED_PROGRESS,
-                success = true,
-                metadata = emptyMap(),
             )
             logcat { "Exited fixed progress: flowId=$flowId" }
         }
@@ -324,5 +319,6 @@ class RealPageLoadWideEvent @Inject constructor(
         const val KEY_IS_TAB_IN_FOREGROUND_ON_FINISH = "is_tab_in_foreground_on_finish"
         const val KEY_ACTIVE_REQUESTS_ON_LOAD_START = "active_requests_on_load_start"
         const val KEY_CONCURRENT_REQUESTS_ON_FINISH = "concurrent_requests_on_finish"
+        const val FIXED_PROGRESS_THRESHOLD = 50
     }
 }
