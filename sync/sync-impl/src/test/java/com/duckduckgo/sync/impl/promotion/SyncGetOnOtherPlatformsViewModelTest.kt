@@ -16,6 +16,7 @@
 
 package com.duckduckgo.sync.impl.promotion
 
+import android.annotation.SuppressLint
 import app.cash.turbine.test
 import com.duckduckgo.app.clipboard.ClipboardInteractor
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -37,6 +38,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
+@SuppressLint("DenyListedApi")
 class SyncGetOnOtherPlatformsViewModelTest {
 
     @get:Rule
