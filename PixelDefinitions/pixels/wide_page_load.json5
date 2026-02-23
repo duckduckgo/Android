@@ -86,11 +86,6 @@
                 "type": "boolean"
             },
             {
-                "key": "feature.data.ext.step.page_escaped_fixed_progress.progress",
-                "description": "Actual progress value when escaping fixed zone",
-                "type": "string"
-            },
-            {
                 "key": "feature.data.ext.step.page_finish",
                 "description": "Parameter present when page load completes or fails",
                 "type": "boolean"
