@@ -210,6 +210,17 @@
     <string name="webTrackingProtectionGlobalPrivacyControlTitle">Vispārēja privātuma pārvaldība</string>
     <string name="webTrackingProtectionGlobalPrivacyControlDescription">Tavā vārdā pauž atteikšanās tiesības, liekot vietnēm nepārdot un nekopīgot tavu personisko informāciju.</string>
 
+    <!-- Get Desktop Browser -->
+    <string name="getDesktopBrowserSettingItemTitle">Iegūsti galddatora pārlūku</string>
+    <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo operētājsistēmām Mac un Windows</string>
+    <string name="getDesktopBrowserTitle">Aizsargā savu personisko informāciju arī Mac un Windows!</string>
+    <string name="getDesktopBrowserBody">Lai lejupielādētu DuckDuckGo operētājsistēmā Mac vai Windows, apmeklē:</string>
+    <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
+    <string name="getDesktopBrowserShareDownloadLink">Kopīgot lejupielādes saiti</string>
+    <string name="getDesktopBrowserNoThanks">Nē, paldies</string>
+    <string name="getDesktopBrowserHideItem">Paslēpt</string>
+    <string name="getDesktopBrowserUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Saite nokopēta</string>
+
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Sīkfailu uznirstošo logu aizsardzība</string>
 
