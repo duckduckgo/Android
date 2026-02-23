@@ -195,4 +195,22 @@
     <string name="switchBottomSheetPrimaryButtonDowngrade">Ponechať ročný plán</string>
     <string name="switchBottomSheetSecondaryButtonDowngrade" instruction="%1$s is the monthly plan price (e.g. $9.99)">Prejsť na mesačný plán (%1$s/mesiac)</string>
 
+    <!-- Pro tier changes -->
+    <string name="feedbackSubCategorySubsUnableToAccessProFeatures">Nie je možné získať prístup k funkciám úrovne Plus alebo Pro</string>
+    <string name="subscriptionsProUpgradeTitle">Aktualizovať na Pro</string>
+    <string name="subscriptionsProUpgradeMessage">Odomkni silnejšiu umelú inteligenciu</string>
+    <string name="subscriptionSettingSectionManageSubscription">Spravovať predplatné</string>
+    <string name="subscriptionSettingViewAllPlans">Zobraziť všetky plány</string>
+    <string name="subscriptionSettingManagePaymentOrCancel">Spravovať platbu alebo zrušiť</string>
+
+    <!-- Pending plan changes -->
+    <string name="subscriptionPendingPlanChangeUpgrade" instruction="First placeholder is the plan name (e.g. Plus Yearly), third is a date">Tvoj plán prejde na vyššiu úroveň %1$s dňa %2$s.</string>
+    <string name="subscriptionPendingPlanChangeDowngrade" instruction="First placeholder is the plan name (e.g. Plus Yearly), third is a date">Tvoj plán prejde na nižšiu úroveň %1$s dňa %2$s.</string>
+    <string name="planNamePlusMonthly">Plus mesačne</string>
+    <string name="planNamePlusYearly">Plus ročne</string>
+    <string name="planNameProMonthly">Pro mesačne</string>
+    <string name="planNameProYearly">Pro ročne</string>
+    <string name="tierPlusName" translatable="false">PLUS</string>
+    <string name="tierProName" translatable="false">PRO</string>
+
 </resources>
