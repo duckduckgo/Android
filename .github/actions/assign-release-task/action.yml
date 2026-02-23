@@ -10,9 +10,6 @@ inputs:
   project_gid:
     description: 'Asana Project GID to search within'
     required: true
-  username:
-    description: 'The Github username to search for'
-    required: true
   github_token:
     description: 'GitHub token for private mapping repo access'
     required: true
