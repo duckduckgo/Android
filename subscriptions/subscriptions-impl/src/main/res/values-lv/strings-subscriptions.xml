@@ -195,4 +195,22 @@
     <string name="switchBottomSheetPrimaryButtonDowngrade">Atstāt ikgadējo plānu</string>
     <string name="switchBottomSheetSecondaryButtonDowngrade" instruction="%1$s is the monthly plan price (e.g. $9.99)">Maini plānu uz ikmēneša (%1$smēnesī)</string>
 
+    <!-- Pro tier changes -->
+    <string name="feedbackSubCategorySubsUnableToAccessProFeatures">Nevar piekļūt Plus vai Pro līmeņa funkcijām</string>
+    <string name="subscriptionsProUpgradeTitle">Jaunināt uz Pro</string>
+    <string name="subscriptionsProUpgradeMessage">Piekļūsti jaudīgākam MI</string>
+    <string name="subscriptionSettingSectionManageSubscription">Pārvaldīt abonementu</string>
+    <string name="subscriptionSettingViewAllPlans">Skatīt visus plānus</string>
+    <string name="subscriptionSettingManagePaymentOrCancel">Pārvaldīt maksājumu vai atcelt</string>
+
+    <!-- Pending plan changes -->
+    <string name="subscriptionPendingPlanChangeUpgrade" instruction="First placeholder is the plan name (e.g. Plus Yearly), third is a date">Tavs plāns tiks jaunināts uz %1$s šādā datumā: %2$s.</string>
+    <string name="subscriptionPendingPlanChangeDowngrade" instruction="First placeholder is the plan name (e.g. Plus Yearly), third is a date">Tavs plāns tiks pazemināts uz %1$s šādā datumā: %2$s.</string>
+    <string name="planNamePlusMonthly">Plus ik mēnesi</string>
+    <string name="planNamePlusYearly">Plus katru gadu</string>
+    <string name="planNameProMonthly">Pro ik mēnesi</string>
+    <string name="planNameProYearly">Pro katru gadu</string>
+    <string name="tierPlusName" translatable="false">PLUS</string>
+    <string name="tierProName" translatable="false">PRO</string>
+
 </resources>
