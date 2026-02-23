@@ -241,11 +241,11 @@ class SyncActivity : DuckDuckGoActivity() {
         }
 
         binding.viewSyncEnabled.getDesktopBrowser.setOnClickListener {
-            viewModel.onGetOnOtherPlatformsClickedWhenSyncDisabled()
+            viewModel.onGetOnOtherPlatformsClickedWhenSyncEnabled()
         }
 
         binding.viewSyncDisabled.syncSetupOtherPlatforms.setOnClickListener {
-            viewModel.onGetOnOtherPlatformsClickedWhenSyncEnabled()
+            viewModel.onGetOnOtherPlatformsClickedWhenSyncDisabled()
         }
 
         binding.viewSyncDisabled.getDesktopBrowser.setOnClickListener {
