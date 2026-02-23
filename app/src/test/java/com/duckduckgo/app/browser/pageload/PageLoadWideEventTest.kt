@@ -106,7 +106,7 @@ class PageLoadWideEventTest {
         )
         verify(wideEventClient).intervalStart(123L, "elapsed_time_to_finish_ms_bucketed", null)
         verify(wideEventClient).intervalStart(123L, "elapsed_time_to_visible_ms_bucketed", null)
-        verify(wideEventClient).intervalStart(123L, "elapsed_time_to_elapsed_fixed_progress_ms_bucketed", null)
+        verify(wideEventClient).intervalStart(123L, "elapsed_time_to_escaped_fixed_progress_ms_bucketed", null)
     }
 
     @Test
@@ -147,7 +147,7 @@ class PageLoadWideEventTest {
         pageLoadWideEvent.onProgressChanged("tab_3", "https://reddit.com")
         coroutineRule.testScope.testScheduler.advanceUntilIdle()
 
-        verify(wideEventClient).intervalEnd(789L, "elapsed_time_to_elapsed_fixed_progress_ms_bucketed")
+        verify(wideEventClient).intervalEnd(789L, "elapsed_time_to_escaped_fixed_progress_ms_bucketed")
         verify(wideEventClient).flowStep(
             wideEventId = 789L,
             stepName = "page_escaped_fixed_progress",
@@ -366,9 +366,9 @@ class PageLoadWideEventTest {
         // Verify all intervals were managed
         verify(wideEventClient).intervalStart(500L, "elapsed_time_to_finish_ms_bucketed", null)
         verify(wideEventClient).intervalStart(500L, "elapsed_time_to_visible_ms_bucketed", null)
-        verify(wideEventClient).intervalStart(500L, "elapsed_time_to_elapsed_fixed_progress_ms_bucketed", null)
+        verify(wideEventClient).intervalStart(500L, "elapsed_time_to_escaped_fixed_progress_ms_bucketed", null)
         verify(wideEventClient).intervalEnd(500L, "elapsed_time_to_visible_ms_bucketed")
-        verify(wideEventClient).intervalEnd(500L, "elapsed_time_to_elapsed_fixed_progress_ms_bucketed")
+        verify(wideEventClient).intervalEnd(500L, "elapsed_time_to_escaped_fixed_progress_ms_bucketed")
         verify(wideEventClient).intervalEnd(500L, "elapsed_time_to_finish_ms_bucketed")
 
         // Verify flow was finished

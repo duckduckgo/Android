@@ -309,7 +309,7 @@ class RealPageLoadWideEvent @Inject constructor(
         const val STEP_PAGE_FINISH = "page_finish"
         const val KEY_ELAPSED_TIME_TO_FINISH = "elapsed_time_to_finish_ms_bucketed"
         const val KEY_ELAPSED_TIME_TO_VISIBLE = "elapsed_time_to_visible_ms_bucketed"
-        const val KEY_ELAPSED_TIME_TO_ESCAPED_FIXED_PROGRESS = "elapsed_time_to_elapsed_fixed_progress_ms_bucketed"
+        const val KEY_ELAPSED_TIME_TO_ESCAPED_FIXED_PROGRESS = "elapsed_time_to_escaped_fixed_progress_ms_bucketed"
         const val KEY_PROGRESS = "progress"
         const val KEY_OUTCOME = "outcome"
         const val KEY_ERROR_CODE = "error_code"
