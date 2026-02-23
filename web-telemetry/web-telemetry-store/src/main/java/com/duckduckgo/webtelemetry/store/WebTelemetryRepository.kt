@@ -24,6 +24,9 @@ interface WebTelemetryRepository {
     fun updateConfig(entity: WebTelemetryConfigEntity)
     fun getConfigEntity(): WebTelemetryConfigEntity
 
+    fun updateWebEventsConfig(entity: WebEventsConfigEntity)
+    fun getWebEventsConfigEntity(): WebEventsConfigEntity
+
     fun getPixelState(name: String): WebTelemetryPixelStateEntity?
     fun getAllPixelStates(): List<WebTelemetryPixelStateEntity>
     fun savePixelState(entity: WebTelemetryPixelStateEntity)
@@ -40,6 +43,7 @@ class RealWebTelemetryRepository constructor(
 
     private val dao: WebTelemetryDao = database.webTelemetryDao()
     private var configEntity = WebTelemetryConfigEntity(json = EMPTY_JSON)
+    private var webEventsConfigEntity = WebEventsConfigEntity(json = EMPTY_JSON)
 
     init {
         coroutineScope.launch(dispatcherProvider.io()) {
@@ -56,6 +60,15 @@ class RealWebTelemetryRepository constructor(
 
     override fun getConfigEntity(): WebTelemetryConfigEntity {
         return configEntity
+    }
+
+    override fun updateWebEventsConfig(entity: WebEventsConfigEntity) {
+        dao.updateWebEventsConfig(entity)
+        webEventsConfigEntity = entity
+    }
+
+    override fun getWebEventsConfigEntity(): WebEventsConfigEntity {
+        return webEventsConfigEntity
     }
 
     override fun getPixelState(name: String): WebTelemetryPixelStateEntity? {
@@ -80,6 +93,7 @@ class RealWebTelemetryRepository constructor(
 
     private fun loadConfigToMemory() {
         configEntity = dao.getConfig() ?: WebTelemetryConfigEntity(json = EMPTY_JSON)
+        webEventsConfigEntity = dao.getWebEventsConfig() ?: WebEventsConfigEntity(json = EMPTY_JSON)
     }
 
     companion object {
