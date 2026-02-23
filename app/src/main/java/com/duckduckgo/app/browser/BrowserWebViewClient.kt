@@ -616,14 +616,27 @@ class BrowserWebViewClient @Inject constructor(
         detail: RenderProcessGoneDetail?,
     ): Boolean {
         logcat(WARN) { "onRenderProcessGone. Did it crash? ${detail?.didCrash()}" }
-        if (detail?.didCrash() == true) {
+        val didCrash = detail?.didCrash() == true
+        if (didCrash) {
             pixel.fire(WEB_RENDERER_GONE_CRASH)
         } else {
             pixel.fire(WEB_RENDERER_GONE_KILLED)
         }
 
         if (this.start != null) {
-            decrementLoadCountAndGet()
+            val concurrentRequestsOnFinish = decrementLoadCountAndGet()
+            view?.url?.let { url ->
+                webViewClientListener?.getCurrentTabId()?.let { tabId ->
+                    pageLoadMonitor.onPageLoadFailed(
+                        tabId = tabId,
+                        url = url,
+                        errorDescription = if (didCrash) "ERROR_RENDERER_CRASHED" else "ERROR_RENDERER_KILLED",
+                        isTabInForegroundOnFinish = webViewClientListener?.isTabInForeground() ?: true,
+                        activeRequestsOnLoadStart = parallelRequestsOnStart,
+                        concurrentRequestsOnFinish = concurrentRequestsOnFinish,
+                    )
+                }
+            }
             this.start = null
         }
 

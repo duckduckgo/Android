@@ -387,6 +387,95 @@ class BrowserWebViewClientTest {
     }
 
     @Test
+    fun whenRenderProcessCrashesDuringPageLoadThenManagerOnPageLoadFailedCalled() {
+        val mockWebView = getImmediatelyInvokedMockWebView()
+        val tabId = "test-tab-crash"
+        val url = "https://crash-example.com"
+        val detail: RenderProcessGoneDetail = mock()
+        whenever(mockWebView.safeCopyBackForwardList()).thenReturn(TestBackForwardList())
+        whenever(mockWebView.settings).thenReturn(mock())
+        whenever(mockWebView.url).thenReturn(url)
+        whenever(detail.didCrash()).thenReturn(true)
+        whenever(listener.getCurrentTabId()).thenReturn(tabId)
+        whenever(listener.isTabInForeground()).thenReturn(true)
+
+        testee.onPageStarted(mockWebView, url, null)
+        testee.onRenderProcessGone(mockWebView, detail)
+
+        val tabIdCaptor = argumentCaptor<String>()
+        val urlCaptor = argumentCaptor<String>()
+        val errorCaptor = argumentCaptor<String>()
+
+        verify(pageLoadPerformanceMonitor).onPageLoadFailed(
+            tabId = tabIdCaptor.capture(),
+            url = urlCaptor.capture(),
+            errorDescription = errorCaptor.capture(),
+            isTabInForegroundOnFinish = any(),
+            activeRequestsOnLoadStart = any(),
+            concurrentRequestsOnFinish = any(),
+        )
+
+        assertEquals(tabId, tabIdCaptor.firstValue)
+        assertEquals(url, urlCaptor.firstValue)
+        assertEquals("ERROR_RENDERER_CRASHED", errorCaptor.firstValue)
+    }
+
+    @Test
+    fun whenRenderProcessKilledDuringPageLoadThenManagerOnPageLoadFailedCalled() {
+        val mockWebView = getImmediatelyInvokedMockWebView()
+        val tabId = "test-tab-killed"
+        val url = "https://killed-example.com"
+        val detail: RenderProcessGoneDetail = mock()
+        whenever(mockWebView.safeCopyBackForwardList()).thenReturn(TestBackForwardList())
+        whenever(mockWebView.settings).thenReturn(mock())
+        whenever(mockWebView.url).thenReturn(url)
+        whenever(detail.didCrash()).thenReturn(false)
+        whenever(listener.getCurrentTabId()).thenReturn(tabId)
+        whenever(listener.isTabInForeground()).thenReturn(true)
+
+        testee.onPageStarted(mockWebView, url, null)
+        testee.onRenderProcessGone(mockWebView, detail)
+
+        val tabIdCaptor = argumentCaptor<String>()
+        val urlCaptor = argumentCaptor<String>()
+        val errorCaptor = argumentCaptor<String>()
+
+        verify(pageLoadPerformanceMonitor).onPageLoadFailed(
+            tabId = tabIdCaptor.capture(),
+            url = urlCaptor.capture(),
+            errorDescription = errorCaptor.capture(),
+            isTabInForegroundOnFinish = any(),
+            activeRequestsOnLoadStart = any(),
+            concurrentRequestsOnFinish = any(),
+        )
+
+        assertEquals(tabId, tabIdCaptor.firstValue)
+        assertEquals(url, urlCaptor.firstValue)
+        assertEquals("ERROR_RENDERER_KILLED", errorCaptor.firstValue)
+    }
+
+    @Test
+    fun whenRenderProcessGoneWithNoActivePageLoadThenManagerOnPageLoadFailedNotCalled() {
+        val mockWebView = getImmediatelyInvokedMockWebView()
+        val detail: RenderProcessGoneDetail = mock()
+        whenever(mockWebView.safeCopyBackForwardList()).thenReturn(TestBackForwardList())
+        whenever(mockWebView.settings).thenReturn(mock())
+        whenever(detail.didCrash()).thenReturn(true)
+
+        // Don't call onPageStarted - this.start should be null
+        testee.onRenderProcessGone(mockWebView, detail)
+
+        verify(pageLoadPerformanceMonitor, never()).onPageLoadFailed(
+            any(),
+            any(),
+            any(),
+            any(),
+            any(),
+            any(),
+        )
+    }
+
+    @Test
     fun whenOnPageFinishedCalledIfUrlIsNullThenDoNotCallPrefetchIcon() {
         testee.onPageFinished(webView, null)
         verify(listener, never()).prefetchFavicon(any())
