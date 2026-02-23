@@ -32,7 +32,7 @@ class EventHubFeaturePlugin @Inject constructor(
 
     override fun store(featureName: String, jsonString: String): Boolean {
         if (featureName == this.featureName) {
-            repository.updateConfig(EventHubConfigEntity(json = jsonString))
+            repository.updateEventHubConfig(EventHubConfigEntity(json = jsonString))
             pixelManager.onConfigChanged()
             return true
         }
@@ -49,7 +49,7 @@ class WebEventsFeaturePlugin @Inject constructor(
 
     override fun store(featureName: String, jsonString: String): Boolean {
         if (featureName == this.featureName) {
-            repository.updateWebEventsConfig(WebEventsFeatureConfigEntity(json = jsonString))
+            repository.updateWebEventsFeatureConfig(WebEventsFeatureConfigEntity(json = jsonString))
             return true
         }
         return false
