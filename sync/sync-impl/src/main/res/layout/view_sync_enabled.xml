@@ -88,6 +88,7 @@
         android:id="@+id/getDesktopBrowser"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:visibility="gone"
         app:leadingIcon="@drawable/ic_device_laptop_install_color_24"
         app:leadingIconBackground="circular"
         app:primaryText="@string/getDesktopBrowserSettingItemTitle"
