@@ -28,9 +28,9 @@ import com.duckduckgo.webevents.impl.RealEventHubPixelManager
 import com.duckduckgo.webevents.impl.RealTimeProvider
 import com.duckduckgo.webevents.impl.TimeProvider
 import com.duckduckgo.webevents.store.ALL_MIGRATIONS
-import com.duckduckgo.webevents.store.RealWebEventsRepository
-import com.duckduckgo.webevents.store.WebEventsDatabase
-import com.duckduckgo.webevents.store.WebEventsRepository
+import com.duckduckgo.webevents.store.RealEventHubRepository
+import com.duckduckgo.webevents.store.EventHubDatabase
+import com.duckduckgo.webevents.store.EventHubRepository
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
@@ -39,12 +39,12 @@ import kotlinx.coroutines.CoroutineScope
 
 @Module
 @ContributesTo(AppScope::class)
-object WebEventsModule {
+object EventHubModule {
 
     @SingleInstanceIn(AppScope::class)
     @Provides
-    fun provideWebEventsDatabase(context: Context): WebEventsDatabase {
-        return Room.databaseBuilder(context, WebEventsDatabase::class.java, "web_events.db")
+    fun provideEventHubDatabase(context: Context): EventHubDatabase {
+        return Room.databaseBuilder(context, EventHubDatabase::class.java, "web_events.db")
             .enableMultiInstanceInvalidation()
             .fallbackToDestructiveMigration()
             .addMigrations(*ALL_MIGRATIONS)
@@ -53,13 +53,13 @@ object WebEventsModule {
 
     @SingleInstanceIn(AppScope::class)
     @Provides
-    fun provideWebEventsRepository(
-        database: WebEventsDatabase,
+    fun provideEventHubRepository(
+        database: EventHubDatabase,
         @AppCoroutineScope appCoroutineScope: CoroutineScope,
         dispatcherProvider: DispatcherProvider,
         @IsMainProcess isMainProcess: Boolean,
-    ): WebEventsRepository {
-        return RealWebEventsRepository(database, appCoroutineScope, dispatcherProvider, isMainProcess)
+    ): EventHubRepository {
+        return RealEventHubRepository(database, appCoroutineScope, dispatcherProvider, isMainProcess)
     }
 
     @SingleInstanceIn(AppScope::class)
@@ -69,7 +69,7 @@ object WebEventsModule {
     @SingleInstanceIn(AppScope::class)
     @Provides
     fun provideEventHubPixelManager(
-        repository: WebEventsRepository,
+        repository: EventHubRepository,
         pixel: Pixel,
         timeProvider: TimeProvider,
     ): EventHubPixelManager {

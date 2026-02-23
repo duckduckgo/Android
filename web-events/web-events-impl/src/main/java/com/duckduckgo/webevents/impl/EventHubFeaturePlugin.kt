@@ -20,13 +20,13 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
 import com.duckduckgo.webevents.store.WebEventsFeatureConfigEntity
 import com.duckduckgo.webevents.store.EventHubConfigEntity
-import com.duckduckgo.webevents.store.WebEventsRepository
+import com.duckduckgo.webevents.store.EventHubRepository
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
 class EventHubFeaturePlugin @Inject constructor(
-    private val repository: WebEventsRepository,
+    private val repository: EventHubRepository,
     private val pixelManager: EventHubPixelManager,
 ) : PrivacyFeaturePlugin {
 
@@ -39,12 +39,12 @@ class EventHubFeaturePlugin @Inject constructor(
         return false
     }
 
-    override val featureName: String = WebEventsFeatureName.EventHub.value
+    override val featureName: String = EventHubFeatureName.EventHub.value
 }
 
 @ContributesMultibinding(AppScope::class)
 class WebEventsFeaturePlugin @Inject constructor(
-    private val repository: WebEventsRepository,
+    private val repository: EventHubRepository,
 ) : PrivacyFeaturePlugin {
 
     override fun store(featureName: String, jsonString: String): Boolean {
@@ -55,5 +55,5 @@ class WebEventsFeaturePlugin @Inject constructor(
         return false
     }
 
-    override val featureName: String = WebEventsFeatureName.WebEvents.value
+    override val featureName: String = EventHubFeatureName.WebEvents.value
 }
