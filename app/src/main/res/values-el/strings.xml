@@ -209,6 +209,17 @@
     <string name="webTrackingProtectionGlobalPrivacyControlTitle">Παγκόσμιος έλεγχος απορρήτου</string>
     <string name="webTrackingProtectionGlobalPrivacyControlDescription">Εκφράζει τα δικαιώματα εξαίρεσης εκ μέρους σας, ζητώντας από τους ιστότοπους να μην πωλούν ή κοινοποιούν τις προσωπικές πληροφορίες σας.</string>
 
+    <!-- Get Desktop Browser -->
+    <string name="getDesktopBrowserSettingItemTitle">Αποκτήστε το πρόγραμμα περιήγησης για υπολογιστές</string>
+    <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo για Mac και Windows</string>
+    <string name="getDesktopBrowserTitle">Προστατέψτε τα προσωπικά στοιχεία σας τόσο σε Mac όσο και σε Windows!</string>
+    <string name="getDesktopBrowserBody">Για να κάνετ ελήψη του DuckDuckGo σε Mac ή Windows, επισκεφθείτε τη διεύθυνση:</string>
+    <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
+    <string name="getDesktopBrowserShareDownloadLink">Κοινή χρήση συνδέσμου λήψης</string>
+    <string name="getDesktopBrowserNoThanks">Όχι, ευχαριστώ</string>
+    <string name="getDesktopBrowserHideItem">Αποκρυψη</string>
+    <string name="getDesktopBrowserUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Ο σύνδεσμος αντιγράφηκε</string>
+
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Προστασία αναδυόμενων παραθύρων για cookies</string>
 
