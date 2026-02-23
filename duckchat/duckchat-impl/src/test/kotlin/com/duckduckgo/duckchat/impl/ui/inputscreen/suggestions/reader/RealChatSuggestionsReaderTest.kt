@@ -16,13 +16,18 @@
 
 package com.duckduckgo.duckchat.impl.ui.inputscreen.suggestions.reader
 
+import android.annotation.SuppressLint
 import android.content.Context
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.duckchat.impl.feature.DuckAiChatHistoryFeature
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.ChatSuggestion
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.reader.ChatSuggestionsJsMessaging
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.reader.RealChatSuggestionsReader
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.FeatureException
+import com.duckduckgo.feature.toggles.api.Toggle.State
 import org.json.JSONArray
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
@@ -36,6 +41,7 @@ import org.mockito.kotlin.mock
 import java.time.LocalDateTime
 import java.time.ZoneId
 
+@SuppressLint("DenyListedApi")
 @RunWith(AndroidJUnit4::class)
 class RealChatSuggestionsReaderTest {
 
@@ -45,6 +51,7 @@ class RealChatSuggestionsReaderTest {
     private val context: Context = mock()
     private val appBuildConfig: AppBuildConfig = mock()
     private val messaging: ChatSuggestionsJsMessaging = mock()
+    private val duckAiChatHistoryFeature = FakeFeatureToggleFactory.create(DuckAiChatHistoryFeature::class.java)
 
     private lateinit var reader: RealChatSuggestionsReader
 
@@ -55,6 +62,7 @@ class RealChatSuggestionsReaderTest {
             dispatchers = coroutineRule.testDispatcherProvider,
             appBuildConfig = appBuildConfig,
             messaging = messaging,
+            duckAiChatHistoryFeature = duckAiChatHistoryFeature,
         )
     }
 
@@ -425,6 +433,113 @@ class RealChatSuggestionsReaderTest {
     fun `when tearDown called multiple times then app does not crash`() {
         reader.tearDown()
         reader.tearDown()
+    }
+
+    // endregion
+
+    // region getContentScopeJson
+
+    @Test
+    fun `when feature is enabled then content scope state is enabled`() {
+        duckAiChatHistoryFeature.self().setRawStoredState(State(enable = true))
+
+        val result = JSONObject(reader.getContentScopeJson())
+        val feature = result.getJSONObject("features").getJSONObject("duckAiChatHistory")
+
+        assertEquals("enabled", feature.getString("state"))
+    }
+
+    @Test
+    fun `when feature is disabled then content scope state is disabled`() {
+        duckAiChatHistoryFeature.self().setRawStoredState(State(enable = false))
+
+        val result = JSONObject(reader.getContentScopeJson())
+        val feature = result.getJSONObject("features").getJSONObject("duckAiChatHistory")
+
+        assertEquals("disabled", feature.getString("state"))
+    }
+
+    @Test
+    fun `when feature has settings then content scope includes settings`() {
+        duckAiChatHistoryFeature.self().setRawStoredState(
+            State(enable = true, settings = """{"maxHistoryCount":5,"chatsLocalStorageKeys":["savedAIChats"]}"""),
+        )
+
+        val result = JSONObject(reader.getContentScopeJson())
+        val settings = result.getJSONObject("features").getJSONObject("duckAiChatHistory").getJSONObject("settings")
+
+        assertEquals(5, settings.getInt("maxHistoryCount"))
+        assertEquals("savedAIChats", settings.getJSONArray("chatsLocalStorageKeys").getString(0))
+    }
+
+    @Test
+    fun `when feature has no settings then content scope has empty settings`() {
+        duckAiChatHistoryFeature.self().setRawStoredState(State(enable = true))
+
+        val result = JSONObject(reader.getContentScopeJson())
+        val settings = result.getJSONObject("features").getJSONObject("duckAiChatHistory").getJSONObject("settings")
+
+        assertEquals(0, settings.length())
+    }
+
+    @Test
+    fun `when feature has exceptions then content scope includes exceptions`() {
+        duckAiChatHistoryFeature.self().setRawStoredState(
+            State(
+                enable = true,
+                exceptions = listOf(FeatureException(domain = "example.com", reason = "test reason")),
+            ),
+        )
+
+        val result = JSONObject(reader.getContentScopeJson())
+        val exceptions = result.getJSONObject("features").getJSONObject("duckAiChatHistory").getJSONArray("exceptions")
+
+        assertEquals(1, exceptions.length())
+        assertEquals("example.com", exceptions.getJSONObject(0).getString("domain"))
+        assertEquals("test reason", exceptions.getJSONObject(0).getString("reason"))
+    }
+
+    @Test
+    fun `when getContentScopeJson called then result has unprotectedTemporary empty array`() {
+        val result = JSONObject(reader.getContentScopeJson())
+
+        assertEquals(0, result.getJSONArray("unprotectedTemporary").length())
+    }
+
+    // endregion
+
+    // region getMaxHistoryCount
+
+    @Test
+    fun `when settings has maxHistoryCount then returns that value`() {
+        duckAiChatHistoryFeature.self().setRawStoredState(
+            State(enable = true, settings = """{"maxHistoryCount":5}"""),
+        )
+
+        assertEquals(5, reader.getMaxHistoryCount())
+    }
+
+    @Test
+    fun `when settings has no maxHistoryCount then returns default`() {
+        duckAiChatHistoryFeature.self().setRawStoredState(
+            State(enable = true, settings = """{}"""),
+        )
+
+        assertEquals(10, reader.getMaxHistoryCount())
+    }
+
+    @Test
+    fun `when settings is null then returns default`() {
+        assertEquals(10, reader.getMaxHistoryCount())
+    }
+
+    @Test
+    fun `when settings has invalid json then returns default`() {
+        duckAiChatHistoryFeature.self().setRawStoredState(
+            State(enable = true, settings = "invalid"),
+        )
+
+        assertEquals(10, reader.getMaxHistoryCount())
     }
 
     // endregion

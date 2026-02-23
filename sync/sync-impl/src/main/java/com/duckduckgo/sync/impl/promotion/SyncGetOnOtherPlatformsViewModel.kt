@@ -23,14 +23,18 @@ import com.duckduckgo.app.clipboard.ClipboardInteractor
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.settings.api.SettingsPageFeature
 import com.duckduckgo.sync.impl.pixels.SyncPixelName
 import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.GET_OTHER_DEVICES_SCREEN_LAUNCH_SOURCE
 import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsViewModel.Command.ShareLink
 import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsViewModel.Command.ShowCopiedNotification
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @ContributesViewModel(ActivityScope::class)
@@ -38,20 +42,33 @@ class SyncGetOnOtherPlatformsViewModel @Inject constructor(
     private val pixel: Pixel,
     private val dispatchers: DispatcherProvider,
     private val clipboardInteractor: ClipboardInteractor,
+    private val settingsPageFeature: SettingsPageFeature,
 ) : ViewModel() {
 
     private val commandChannel = Channel<Command>(capacity = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
     val commands = commandChannel.receiveAsFlow()
+
+    private val _viewState = MutableStateFlow(ViewState())
+    val viewState = _viewState.asStateFlow()
 
     sealed class Command {
         data class ShareLink(val link: String) : Command()
         data object ShowCopiedNotification : Command()
     }
 
-    data class ViewState(val windowsFeatureEnabled: Boolean)
+    data class ViewState(val showDesktopBrowserUrl: Boolean = false)
+
+    init {
+        viewModelScope.launch {
+            val isEnabled = withContext(dispatchers.io()) {
+                settingsPageFeature.newDesktopBrowserSettingEnabled().isEnabled()
+            }
+            _viewState.value = ViewState(showDesktopBrowserUrl = isEnabled)
+        }
+    }
 
     fun onShareClicked(launchSource: String?) {
-        viewModelScope.launch {
+        viewModelScope.launch(dispatchers.io()) {
             commandChannel.send(ShareLink(buildLink()))
 
             pixel.fire(SyncPixelName.SYNC_GET_OTHER_DEVICES_LINK_SHARED, buildSourceMap(launchSource))
@@ -69,7 +86,8 @@ class SyncGetOnOtherPlatformsViewModel @Inject constructor(
     }
 
     private fun buildLink(): String {
-        return "$BASE_LINK?$ATTRIBUTION"
+        val baseLink = if (settingsPageFeature.newDesktopBrowserSettingEnabled().isEnabled()) DESKTOP_BROWSER_LINK else BASE_LINK
+        return "$baseLink?$ATTRIBUTION"
     }
 
     fun onScreenShownToUser(launchSource: String?) {
@@ -86,6 +104,7 @@ class SyncGetOnOtherPlatformsViewModel @Inject constructor(
 
     companion object {
         private const val BASE_LINK = "https://duckduckgo.com/app"
+        private const val DESKTOP_BROWSER_LINK = "https://duckduckgo.com/browser"
         private const val ATTRIBUTION = "origin=funnel_browser_android_sync"
     }
 }

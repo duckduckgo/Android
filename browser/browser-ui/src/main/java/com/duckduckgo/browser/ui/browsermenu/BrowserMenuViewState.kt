@@ -68,13 +68,23 @@ sealed class BrowserMenuViewState {
 }
 
 sealed class VpnMenuState {
-    data object Hidden : VpnMenuState()
+    abstract val pixelParam: String
 
-    data object NotSubscribed : VpnMenuState()
+    data object Hidden : VpnMenuState() {
+        override val pixelParam: String = "hidden"
+    }
 
-    data object NotSubscribedNoPill : VpnMenuState()
+    data object NotSubscribed : VpnMenuState() {
+        override val pixelParam: String = "pill"
+    }
+
+    data object NotSubscribedNoPill : VpnMenuState() {
+        override val pixelParam: String = "no_pill"
+    }
 
     data class Subscribed(
         val isVpnEnabled: Boolean,
-    ) : VpnMenuState()
+    ) : VpnMenuState() {
+        override val pixelParam: String = "subscribed"
+    }
 }

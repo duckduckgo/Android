@@ -16,6 +16,7 @@
 
 package com.duckduckgo.pir.impl.dashboard.state
 
+import android.content.Context
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.pir.impl.dashboard.state.PirDashboardInitialScanStateProvider.DashboardBrokerWithStatus.Status
@@ -50,6 +51,7 @@ class RealPirDashboardInitialScanStateProviderTest {
     private val mockCurrentTimeProvider: CurrentTimeProvider = mock()
     private val mockPirRepository: PirRepository = mock()
     private val mockPirSchedulingRepository: PirSchedulingRepository = mock()
+    private val mockContext: Context = mock()
 
     private val currentTime = 1640995200000L
 
@@ -60,6 +62,7 @@ class RealPirDashboardInitialScanStateProviderTest {
             currentTimeProvider = mockCurrentTimeProvider,
             pirRepository = mockPirRepository,
             pirSchedulingRepository = mockPirSchedulingRepository,
+            context = mockContext,
         )
 
         whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(currentTime)
@@ -596,6 +599,123 @@ class RealPirDashboardInitialScanStateProviderTest {
         assertEquals(2, result.size)
         assertEquals("John Doe", result[0].extractedProfile.name)
         assertEquals("Joe Smith", result[1].extractedProfile.name)
+    }
+
+    @Test
+    fun whenNoNotExecutedJobsThenShouldNotRestartScan() = runTest {
+        // Given - all jobs are completed (no NOT_EXECUTED jobs)
+        val completedJobs = listOf(
+            createScanJobRecord("Broker1", 1L, ScanJobStatus.NO_MATCH_FOUND, 1000L),
+            createScanJobRecord("Broker2", 1L, ScanJobStatus.MATCHES_FOUND, 2000L),
+            createScanJobRecord("Broker3", 1L, ScanJobStatus.NO_MATCH_FOUND, 3000L),
+        )
+        whenever(mockPirSchedulingRepository.getAllValidScanJobRecords()).thenReturn(completedJobs)
+
+        // When
+        val result = testee.shouldRestartInitialScan()
+
+        // Then
+        assertFalse("Should not restart scan when all jobs are completed", result)
+    }
+
+    @Test
+    fun whenNotExecutedJobsAlreadyScannedThenShouldNotRestartScan() = runTest {
+        // Given - NOT_EXECUTED jobs exist but have been scanned (lastScanDateInMillis != 0)
+        val alreadyScannedJobs = listOf(
+            createScanJobRecord("Broker1", 1L, ScanJobStatus.NOT_EXECUTED, 1000L),
+            createScanJobRecord("Broker2", 1L, ScanJobStatus.NOT_EXECUTED, 2000L),
+        )
+        whenever(mockPirSchedulingRepository.getAllValidScanJobRecords()).thenReturn(alreadyScannedJobs)
+
+        // When
+        val result = testee.shouldRestartInitialScan()
+
+        // Then
+        assertFalse("Should not restart scan when NOT_EXECUTED jobs were already scanned", result)
+    }
+
+    @Test
+    fun whenHasUnscannedNotExecutedJobsThenShouldRestartScan() = runTest {
+        // Given - has NOT_EXECUTED jobs with lastScanDateInMillis == 0 (truly unscanned jobs)
+        val unscannedJobs = listOf(
+            createScanJobRecord("Broker1", 1L, ScanJobStatus.NO_MATCH_FOUND, 1000L),
+            createScanJobRecord("Broker2", 1L, ScanJobStatus.NOT_EXECUTED, 0L),
+            createScanJobRecord("Broker3", 1L, ScanJobStatus.NOT_EXECUTED, 0L),
+        )
+        whenever(mockPirSchedulingRepository.getAllValidScanJobRecords()).thenReturn(unscannedJobs)
+
+        // When
+        val result = testee.shouldRestartInitialScan()
+
+        // Then
+        assertTrue("Should restart scan when there are unscanned NOT_EXECUTED jobs", result)
+    }
+
+    @Test
+    fun whenMixedJobStatusesThenOnlyConsidersUnscannedNotExecutedJobs() = runTest {
+        // Given - mix of job statuses with only some qualifying for restart
+        val mixedJobs = listOf(
+            // This one qualifies: NOT_EXECUTED with lastScanDateInMillis == 0
+            createScanJobRecord("Broker1", 1L, ScanJobStatus.NOT_EXECUTED, 0L),
+            // These don't qualify:
+            createScanJobRecord("Broker2", 1L, ScanJobStatus.NOT_EXECUTED, 1000L),
+            createScanJobRecord("Broker3", 1L, ScanJobStatus.NO_MATCH_FOUND, 0L),
+            createScanJobRecord("Broker4", 1L, ScanJobStatus.MATCHES_FOUND, 2000L),
+            createScanJobRecord("Broker5", 1L, ScanJobStatus.ERROR, 3000L),
+        )
+        whenever(mockPirSchedulingRepository.getAllValidScanJobRecords()).thenReturn(mixedJobs)
+
+        // When
+        val result = testee.shouldRestartInitialScan()
+
+        // Then
+        assertTrue("Should restart scan when at least one job qualifies", result)
+    }
+
+    @Test
+    fun whenOnlyOneUnscannedNotExecutedJobThenShouldRestartScan() = runTest {
+        // Given - only one unscanned NOT_EXECUTED job among many completed ones
+        val jobsWithOneUnscanned = listOf(
+            createScanJobRecord("Broker1", 1L, ScanJobStatus.NO_MATCH_FOUND, 1000L),
+            createScanJobRecord("Broker2", 1L, ScanJobStatus.MATCHES_FOUND, 2000L),
+            createScanJobRecord("Broker3", 1L, ScanJobStatus.NO_MATCH_FOUND, 3000L),
+            createScanJobRecord("Broker4", 1L, ScanJobStatus.NOT_EXECUTED, 0L), // Only this one qualifies
+        )
+        whenever(mockPirSchedulingRepository.getAllValidScanJobRecords()).thenReturn(jobsWithOneUnscanned)
+
+        // When
+        val result = testee.shouldRestartInitialScan()
+
+        // Then
+        assertTrue("Should restart scan even with just one unscanned NOT_EXECUTED job", result)
+    }
+
+    @Test
+    fun whenEmptyJobListThenShouldNotRestartScan() = runTest {
+        // Given - no jobs at all
+        whenever(mockPirSchedulingRepository.getAllValidScanJobRecords()).thenReturn(emptyList())
+
+        // When
+        val result = testee.shouldRestartInitialScan()
+
+        // Then
+        assertFalse("Should not restart scan when there are no jobs", result)
+    }
+
+    @Test
+    fun whenAllJobsAreErrorsThenShouldNotRestartScan() = runTest {
+        // Given - all jobs failed with errors
+        val errorJobs = listOf(
+            createScanJobRecord("Broker1", 1L, ScanJobStatus.ERROR, 1000L),
+            createScanJobRecord("Broker2", 1L, ScanJobStatus.ERROR, 2000L),
+        )
+        whenever(mockPirSchedulingRepository.getAllValidScanJobRecords()).thenReturn(errorJobs)
+
+        // When
+        val result = testee.shouldRestartInitialScan()
+
+        // Then
+        assertFalse("Should not restart scan when all jobs are in ERROR state", result)
     }
 
     private suspend fun setupForEmptyBrokersAndJobs() {

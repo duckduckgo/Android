@@ -302,15 +302,57 @@
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"]
     },
-    "m_aichat_settings_chat_suggestions_turned_on": {
+    "m_aichat_settings_chat_suggestions_turned_on_count": {
         "description": "User enabled the Chat Suggestions toggle in General Settings",
         "owners": ["YoussefKeyrouz"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"]
     },
-    "m_aichat_settings_chat_suggestions_turned_off": {
+    "m_aichat_settings_chat_suggestions_turned_on_daily": {
+        "description": "(Daily Pixel) User enabled the Chat Suggestions toggle in General Settings",
+        "owners": ["YoussefKeyrouz"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_settings_chat_suggestions_turned_off_count": {
         "description": "User disabled the Chat Suggestions toggle in General Settings",
+        "owners": ["YoussefKeyrouz"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_settings_chat_suggestions_turned_off_daily": {
+        "description": "(Daily Pixel) User disabled the Chat Suggestions toggle in General Settings",
+        "owners": ["YoussefKeyrouz"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_recent_chat_selected_count": {
+        "description": "User selected a recent chat suggestion",
+        "owners": ["YoussefKeyrouz"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_recent_chat_selected_daily": {
+        "description": "(Daily Pixel) User selected a recent chat suggestion",
+        "owners": ["YoussefKeyrouz"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_recent_chat_selected_pinned_count": {
+        "description": "User selected a pinned chat suggestion",
+        "owners": ["YoussefKeyrouz"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_recent_chat_selected_pinned_daily": {
+        "description": "(Daily Pixel) User selected a pinned chat suggestion",
         "owners": ["YoussefKeyrouz"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],

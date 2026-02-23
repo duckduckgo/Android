@@ -1,0 +1,23 @@
+{
+    "m_nav_pm_o": {
+        "description": "Fires when the browser overflow menu popup is opened",
+        "owners": ["nalcalag"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "vpnMenuItemStatus",
+            {
+                "key": "from_focused_ntp",
+                "description": "Whether the menu was opened while the address bar was focused on the new tab page",
+                "type": "boolean"
+            }
+        ]
+    },
+    "m_nav_vpn_menu_item_pressed": {
+        "description": "Fires when the user taps the VPN menu item in the browser overflow menu",
+        "owners": ["nalcalag"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["vpnMenuItemStatus"]
+    }
+}

@@ -16,8 +16,10 @@
 
 package com.duckduckgo.pir.impl.scan
 
+import android.app.ActivityManager
 import android.app.Notification
 import android.app.Service
+import android.content.Context
 import android.content.Intent
 import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
 import android.os.Build
@@ -137,5 +139,25 @@ class PirForegroundScanService : Service(), CoroutineScope by MainScope() {
 
     companion object {
         private const val PIR_SCAN_NOTIFICATION_ID = 8791
+
+        // This method was deprecated in API level 26. As of Build.VERSION_CODES.O,
+        // this method is no longer available to third party applications.
+        // For backwards compatibility, it will still return the caller's own services.
+        // So for us it's still valid because we don't need to know third party services, just ours.
+        @Suppress("DEPRECATION")
+        internal fun isServiceRunning(context: Context): Boolean {
+            val manager = kotlin.runCatching {
+                context.getSystemService(ACTIVITY_SERVICE) as ActivityManager
+            }.getOrElse {
+                return false
+            }
+
+            for (service in manager.getRunningServices(Int.MAX_VALUE)) {
+                if (PirForegroundScanService::class.java.name == service.service.className) {
+                    return true
+                }
+            }
+            return false
+        }
     }
 }

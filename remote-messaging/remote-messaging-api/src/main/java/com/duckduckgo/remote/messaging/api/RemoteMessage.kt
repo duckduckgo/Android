@@ -119,6 +119,8 @@ sealed class Content(val messageType: MessageType) {
         RADAR("Radar"),
         KEY_IMPORT("KeyImport"),
         SPLIT_BAR_SETTINGS("SplitBarSettings"),
+        BOOKMARKS_IMPORT("BookmarksImport"),
+        NEW_TAB_OPTIONS("NewTabOptions"),
         ;
 
         companion object {

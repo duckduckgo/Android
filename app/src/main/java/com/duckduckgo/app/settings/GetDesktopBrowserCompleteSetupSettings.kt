@@ -44,6 +44,7 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
+import com.duckduckgo.mobile.android.R as CommonR
 
 @ContributesMultibinding(ActivityScope::class)
 @PriorityKey(200)
@@ -60,7 +61,7 @@ class GetDesktopBrowserCompleteSetupSettings @Inject constructor(
         return TwoLineListItem(context = activity).apply {
             setPrimaryText(activity.getString(R.string.getDesktopBrowserSettingItemTitle))
             setSecondaryText(activity.getString(R.string.getDesktopBrowserSettingItemSubtitleTitle))
-            setLeadingIconResource(R.drawable.ic_device_laptop_install_color_24)
+            setLeadingIconResource(CommonR.drawable.ic_device_laptop_install_color_24)
 
             configureOverflowMenu()
 

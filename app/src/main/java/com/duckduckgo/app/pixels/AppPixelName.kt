@@ -245,8 +245,10 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     AUTOCOMPLETE_RESULT_DELETED("m_autocomplete_result_deleted"),
     AUTOCOMPLETE_RESULT_DELETED_DAILY("m_autocomplete_result_deleted_daily"),
 
-    CHAT_SUGGESTIONS_GENERAL_SETTINGS_TOGGLED_ON("m_aichat_settings_chat_suggestions_turned_on"),
-    CHAT_SUGGESTIONS_GENERAL_SETTINGS_TOGGLED_OFF("m_aichat_settings_chat_suggestions_turned_off"),
+    CHAT_SUGGESTIONS_GENERAL_SETTINGS_TOGGLED_ON_COUNT("m_aichat_settings_chat_suggestions_turned_on_count"),
+    CHAT_SUGGESTIONS_GENERAL_SETTINGS_TOGGLED_ON_DAILY("m_aichat_settings_chat_suggestions_turned_on_daily"),
+    CHAT_SUGGESTIONS_GENERAL_SETTINGS_TOGGLED_OFF_COUNT("m_aichat_settings_chat_suggestions_turned_off_count"),
+    CHAT_SUGGESTIONS_GENERAL_SETTINGS_TOGGLED_OFF_DAILY("m_aichat_settings_chat_suggestions_turned_off_daily"),
 
     SERP_REQUERY("rq_%s"),
 
@@ -274,6 +276,7 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     MENU_ACTION_APP_LINKS_OPEN_PRESSED("m_nav_app_links_open_menu_item_pressed"),
     MENU_ACTION_DOWNLOADS_PRESSED("m_nav_downloads_menu_item_pressed"),
     MENU_ACTION_AUTOFILL_PRESSED("m_nav_autofill_menu_item_pressed"),
+    MENU_ACTION_VPN_PRESSED("m_nav_vpn_menu_item_pressed"),
 
     EXPERIMENTAL_MENU_USED("m_experimental-browsing-menu_used"),
     EXPERIMENTAL_MENU_USED_UNIQUE("m_experimental-browsing-menu_used_unique"),

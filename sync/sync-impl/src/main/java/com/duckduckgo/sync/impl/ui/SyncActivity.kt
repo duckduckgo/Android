@@ -240,7 +240,15 @@ class SyncActivity : DuckDuckGoActivity() {
             viewModel.onGetOnOtherPlatformsClickedWhenSyncEnabled()
         }
 
+        binding.viewSyncEnabled.getDesktopBrowser.setOnClickListener {
+            viewModel.onGetOnOtherPlatformsClickedWhenSyncEnabled()
+        }
+
         binding.viewSyncDisabled.syncSetupOtherPlatforms.setOnClickListener {
+            viewModel.onGetOnOtherPlatformsClickedWhenSyncDisabled()
+        }
+
+        binding.viewSyncDisabled.getDesktopBrowser.setOnClickListener {
             viewModel.onGetOnOtherPlatformsClickedWhenSyncDisabled()
         }
     }
@@ -454,6 +462,12 @@ class SyncActivity : DuckDuckGoActivity() {
 
     private fun renderViewState(viewState: ViewState) {
         binding.viewSwitcher.displayedChild = if (viewState.showAccount) 1 else 0
+
+        binding.viewSyncEnabled.getDesktopBrowser.isVisible = viewState.newDesktopBrowserSettingEnabled
+        binding.viewSyncEnabled.syncSetupOtherPlatforms.isVisible = !viewState.newDesktopBrowserSettingEnabled
+
+        binding.viewSyncDisabled.getDesktopBrowser.isVisible = viewState.newDesktopBrowserSettingEnabled
+        binding.viewSyncDisabled.syncSetupOtherPlatforms.isVisible = !viewState.newDesktopBrowserSettingEnabled
 
         if (viewState.showAccount) {
             syncedDevicesAdapter.updateData(viewState.syncedDevices)
