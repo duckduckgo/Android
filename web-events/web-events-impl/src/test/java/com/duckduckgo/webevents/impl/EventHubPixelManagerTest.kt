@@ -73,7 +73,7 @@ class EventHubPixelManagerTest {
 
     @Before
     fun setup() {
-        whenever(repository.getConfigEntity()).thenReturn(EventHubConfigEntity(json = fullConfig))
+        whenever(repository.getEventHubConfigEntity()).thenReturn(EventHubConfigEntity(json = fullConfig))
         whenever(repository.getAllPixelStates()).thenReturn(emptyList())
         manager = RealEventHubPixelManager(repository, pixel, timeProvider)
     }
@@ -213,7 +213,7 @@ class EventHubPixelManagerTest {
                 }
             }
         """.trimIndent()
-        whenever(repository.getConfigEntity()).thenReturn(EventHubConfigEntity(json = configWithGap))
+        whenever(repository.getEventHubConfigEntity()).thenReturn(EventHubConfigEntity(json = configWithGap))
         manager = RealEventHubPixelManager(repository, pixel, timeProvider)
 
         val state = EventHubPixelStateEntity(
@@ -269,7 +269,7 @@ class EventHubPixelManagerTest {
 
     @Test
     fun `onConfigChanged deletes all when feature disabled`() {
-        whenever(repository.getConfigEntity()).thenReturn(EventHubConfigEntity(json = """{"state": "disabled"}"""))
+        whenever(repository.getEventHubConfigEntity()).thenReturn(EventHubConfigEntity(json = """{"state": "disabled"}"""))
 
         manager.onConfigChanged()
 
