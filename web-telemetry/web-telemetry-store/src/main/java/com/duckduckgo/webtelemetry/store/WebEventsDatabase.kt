@@ -24,13 +24,13 @@ import androidx.room.migration.Migration
     exportSchema = true,
     version = 1,
     entities = [
-        WebTelemetryConfigEntity::class,
-        WebEventsConfigEntity::class,
-        WebTelemetryPixelStateEntity::class,
+        EventHubConfigEntity::class,
+        WebEventsFeatureConfigEntity::class,
+        WebEventsPixelStateEntity::class,
     ],
 )
-abstract class WebTelemetryDatabase : RoomDatabase() {
-    abstract fun webTelemetryDao(): WebTelemetryDao
+abstract class WebEventsDatabase : RoomDatabase() {
+    abstract fun webEventsDao(): WebEventsDao
 }
 
 val ALL_MIGRATIONS = emptyArray<Migration>()

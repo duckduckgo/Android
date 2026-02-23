@@ -18,9 +18,9 @@ package com.duckduckgo.webtelemetry.impl
 
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
-import com.duckduckgo.webtelemetry.store.WebTelemetryConfigEntity
-import com.duckduckgo.webtelemetry.store.WebTelemetryPixelStateEntity
-import com.duckduckgo.webtelemetry.store.WebTelemetryRepository
+import com.duckduckgo.webtelemetry.store.EventHubConfigEntity
+import com.duckduckgo.webtelemetry.store.WebEventsPixelStateEntity
+import com.duckduckgo.webtelemetry.store.WebEventsRepository
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -36,7 +36,7 @@ import java.util.concurrent.TimeUnit
 
 class EventHubPixelManagerTest {
 
-    private val repository: WebTelemetryRepository = mock()
+    private val repository: WebEventsRepository = mock()
     private val pixel: Pixel = mock()
     private val timeProvider = FakeTimeProvider()
 
@@ -73,7 +73,7 @@ class EventHubPixelManagerTest {
 
     @Before
     fun setup() {
-        whenever(repository.getConfigEntity()).thenReturn(WebTelemetryConfigEntity(json = fullConfig))
+        whenever(repository.getConfigEntity()).thenReturn(EventHubConfigEntity(json = fullConfig))
         whenever(repository.getAllPixelStates()).thenReturn(emptyList())
         manager = RealEventHubPixelManager(repository, pixel, timeProvider)
     }
@@ -87,7 +87,7 @@ class EventHubPixelManagerTest {
 
         manager.handleWebEvent("adwall")
 
-        val captor = argumentCaptor<WebTelemetryPixelStateEntity>()
+        val captor = argumentCaptor<WebEventsPixelStateEntity>()
         verify(repository).savePixelState(captor.capture())
         assertEquals(4, RealEventHubPixelManager.parseParamsJson(captor.firstValue.paramsJson)["count"])
     }
@@ -110,7 +110,7 @@ class EventHubPixelManagerTest {
 
         manager.handleWebEvent("adwall")
 
-        val captor = argumentCaptor<WebTelemetryPixelStateEntity>()
+        val captor = argumentCaptor<WebEventsPixelStateEntity>()
         verify(repository).savePixelState(captor.capture())
         assertEquals(40, RealEventHubPixelManager.parseParamsJson(captor.firstValue.paramsJson)["count"])
         val stopCounting = RealEventHubPixelManager.parseStopCountingJson(captor.firstValue.stopCountingJson)
@@ -145,7 +145,7 @@ class EventHubPixelManagerTest {
         val periodEnd = periodStart + TimeUnit.DAYS.toMillis(1)
         timeProvider.time = periodEnd + 1
 
-        val state = WebTelemetryPixelStateEntity(
+        val state = WebEventsPixelStateEntity(
             pixelName = "webTelemetry_adwallDetection_day",
             periodStartMillis = periodStart,
             periodEndMillis = periodEnd,
@@ -174,7 +174,7 @@ class EventHubPixelManagerTest {
         val periodEnd = periodStart + TimeUnit.DAYS.toMillis(1)
         timeProvider.time = periodStart + TimeUnit.HOURS.toMillis(12)
 
-        val state = WebTelemetryPixelStateEntity(
+        val state = WebEventsPixelStateEntity(
             pixelName = "webTelemetry_adwallDetection_day",
             periodStartMillis = periodStart,
             periodEndMillis = periodEnd,
@@ -213,10 +213,10 @@ class EventHubPixelManagerTest {
                 }
             }
         """.trimIndent()
-        whenever(repository.getConfigEntity()).thenReturn(WebTelemetryConfigEntity(json = configWithGap))
+        whenever(repository.getConfigEntity()).thenReturn(EventHubConfigEntity(json = configWithGap))
         manager = RealEventHubPixelManager(repository, pixel, timeProvider)
 
-        val state = WebTelemetryPixelStateEntity(
+        val state = WebEventsPixelStateEntity(
             pixelName = "test",
             periodStartMillis = periodStart,
             periodEndMillis = periodEnd,
@@ -235,7 +235,7 @@ class EventHubPixelManagerTest {
         val periodEnd = periodStart + TimeUnit.DAYS.toMillis(1)
         timeProvider.time = periodEnd + 1
 
-        val state = WebTelemetryPixelStateEntity(
+        val state = WebEventsPixelStateEntity(
             pixelName = "webTelemetry_adwallDetection_day",
             periodStartMillis = periodStart,
             periodEndMillis = periodEnd,
@@ -246,7 +246,7 @@ class EventHubPixelManagerTest {
         manager.checkPixels()
 
         verify(repository).deletePixelState("webTelemetry_adwallDetection_day")
-        val captor = argumentCaptor<WebTelemetryPixelStateEntity>()
+        val captor = argumentCaptor<WebEventsPixelStateEntity>()
         verify(repository).savePixelState(captor.capture())
         assertEquals(timeProvider.time, captor.firstValue.periodStartMillis)
         assertEquals(0, RealEventHubPixelManager.parseParamsJson(captor.firstValue.paramsJson)["count"])
@@ -261,7 +261,7 @@ class EventHubPixelManagerTest {
 
         manager.onConfigChanged()
 
-        val captor = argumentCaptor<WebTelemetryPixelStateEntity>()
+        val captor = argumentCaptor<WebEventsPixelStateEntity>()
         verify(repository).savePixelState(captor.capture())
         assertEquals("webTelemetry_adwallDetection_day", captor.firstValue.pixelName)
         assertEquals(5000L, captor.firstValue.periodStartMillis)
@@ -269,7 +269,7 @@ class EventHubPixelManagerTest {
 
     @Test
     fun `onConfigChanged deletes all when feature disabled`() {
-        whenever(repository.getConfigEntity()).thenReturn(WebTelemetryConfigEntity(json = """{"state": "disabled"}"""))
+        whenever(repository.getConfigEntity()).thenReturn(EventHubConfigEntity(json = """{"state": "disabled"}"""))
 
         manager.onConfigChanged()
 
@@ -307,8 +307,8 @@ class EventHubPixelManagerTest {
         params: Map<String, Int>,
         periodEnd: Long = Long.MAX_VALUE,
         stopCounting: Set<String> = emptySet(),
-    ): WebTelemetryPixelStateEntity {
-        return WebTelemetryPixelStateEntity(
+    ): WebEventsPixelStateEntity {
+        return WebEventsPixelStateEntity(
             pixelName = name,
             periodStartMillis = 1000L,
             periodEndMillis = periodEnd,

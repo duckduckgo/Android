@@ -28,9 +28,9 @@ import com.duckduckgo.webtelemetry.impl.RealEventHubPixelManager
 import com.duckduckgo.webtelemetry.impl.RealTimeProvider
 import com.duckduckgo.webtelemetry.impl.TimeProvider
 import com.duckduckgo.webtelemetry.store.ALL_MIGRATIONS
-import com.duckduckgo.webtelemetry.store.RealWebTelemetryRepository
-import com.duckduckgo.webtelemetry.store.WebTelemetryDatabase
-import com.duckduckgo.webtelemetry.store.WebTelemetryRepository
+import com.duckduckgo.webtelemetry.store.RealWebEventsRepository
+import com.duckduckgo.webtelemetry.store.WebEventsDatabase
+import com.duckduckgo.webtelemetry.store.WebEventsRepository
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
@@ -39,12 +39,12 @@ import kotlinx.coroutines.CoroutineScope
 
 @Module
 @ContributesTo(AppScope::class)
-object WebTelemetryModule {
+object WebEventsModule {
 
     @SingleInstanceIn(AppScope::class)
     @Provides
-    fun provideWebTelemetryDatabase(context: Context): WebTelemetryDatabase {
-        return Room.databaseBuilder(context, WebTelemetryDatabase::class.java, "web_telemetry.db")
+    fun provideWebEventsDatabase(context: Context): WebEventsDatabase {
+        return Room.databaseBuilder(context, WebEventsDatabase::class.java, "web_telemetry.db")
             .enableMultiInstanceInvalidation()
             .fallbackToDestructiveMigration()
             .addMigrations(*ALL_MIGRATIONS)
@@ -53,13 +53,13 @@ object WebTelemetryModule {
 
     @SingleInstanceIn(AppScope::class)
     @Provides
-    fun provideWebTelemetryRepository(
-        database: WebTelemetryDatabase,
+    fun provideWebEventsRepository(
+        database: WebEventsDatabase,
         @AppCoroutineScope appCoroutineScope: CoroutineScope,
         dispatcherProvider: DispatcherProvider,
         @IsMainProcess isMainProcess: Boolean,
-    ): WebTelemetryRepository {
-        return RealWebTelemetryRepository(database, appCoroutineScope, dispatcherProvider, isMainProcess)
+    ): WebEventsRepository {
+        return RealWebEventsRepository(database, appCoroutineScope, dispatcherProvider, isMainProcess)
     }
 
     @SingleInstanceIn(AppScope::class)
@@ -69,7 +69,7 @@ object WebTelemetryModule {
     @SingleInstanceIn(AppScope::class)
     @Provides
     fun provideEventHubPixelManager(
-        repository: WebTelemetryRepository,
+        repository: WebEventsRepository,
         pixel: Pixel,
         timeProvider: TimeProvider,
     ): EventHubPixelManager {

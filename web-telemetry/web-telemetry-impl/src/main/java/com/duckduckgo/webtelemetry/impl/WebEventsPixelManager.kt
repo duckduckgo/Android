@@ -17,8 +17,8 @@
 package com.duckduckgo.webtelemetry.impl
 
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.webtelemetry.store.WebTelemetryPixelStateEntity
-import com.duckduckgo.webtelemetry.store.WebTelemetryRepository
+import com.duckduckgo.webtelemetry.store.WebEventsPixelStateEntity
+import com.duckduckgo.webtelemetry.store.WebEventsRepository
 import org.json.JSONArray
 import org.json.JSONObject
 import javax.inject.Inject
@@ -30,7 +30,7 @@ interface EventHubPixelManager {
 }
 
 class RealEventHubPixelManager @Inject constructor(
-    private val repository: WebTelemetryRepository,
+    private val repository: WebEventsRepository,
     private val pixel: Pixel,
     private val timeProvider: TimeProvider,
 ) : EventHubPixelManager {
@@ -107,7 +107,7 @@ class RealEventHubPixelManager @Inject constructor(
         }
     }
 
-    private fun fireTelemetry(pixelConfig: TelemetryPixelConfig, state: WebTelemetryPixelStateEntity) {
+    private fun fireTelemetry(pixelConfig: TelemetryPixelConfig, state: WebEventsPixelStateEntity) {
         if (state.periodStartMillis == 0L || state.periodEndMillis == 0L) return
 
         val pixelData = buildPixel(pixelConfig, state)
@@ -141,7 +141,7 @@ class RealEventHubPixelManager @Inject constructor(
         val initialParams = pixelConfig.parameters.keys.associateWith { 0 }.toMutableMap()
 
         repository.savePixelState(
-            WebTelemetryPixelStateEntity(
+            WebEventsPixelStateEntity(
                 pixelName = pixelConfig.name,
                 periodStartMillis = nowMillis,
                 periodEndMillis = nowMillis + periodMillis,
@@ -153,7 +153,7 @@ class RealEventHubPixelManager @Inject constructor(
 
     private fun buildPixel(
         pixelConfig: TelemetryPixelConfig,
-        state: WebTelemetryPixelStateEntity,
+        state: WebEventsPixelStateEntity,
     ): Map<String, String> {
         val params = parseParamsJson(state.paramsJson)
         val pixelData = mutableMapOf<String, String>()
