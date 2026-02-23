@@ -594,15 +594,15 @@ afterEvaluate {
     }
 }
 
-afterEvaluate {
-    tasks.withType(DeviceProviderInstrumentTestTask).names.each {
-        ImportJUnitXmlReports.register(
-                tasks,
-                tasks.named(it),
-                ANDROID_CONNECTED
-        )
-    }
-}
+//afterEvaluate {
+//    tasks.withType(DeviceProviderInstrumentTestTask).names.each {
+//        ImportJUnitXmlReports.register(
+//                tasks,
+//                tasks.named(it),
+//                ANDROID_CONNECTED
+//        )
+//    }
+//}
 
 //tasks.register("importJUnitXmlForFlankPrivacyTests", ImportJUnitXmlReports) {
 //    dialect = ANDROID_FIREBASE
