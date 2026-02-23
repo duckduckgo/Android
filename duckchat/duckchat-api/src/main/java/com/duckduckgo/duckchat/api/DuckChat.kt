@@ -51,6 +51,14 @@ interface DuckChat {
     fun openDuckChatWithAutoPrompt(query: String)
 
     /**
+     * Opens Duck Chat, auto-submits [query], and attaches [context] as page context.
+     * The context is a JSON string sent separately from the prompt via the native prompt mechanism.
+     * @param query The user's query to auto-submit.
+     * @param context A JSON string containing structured context data (e.g., browser history entries).
+     */
+    fun openDuckChatWithAutoPromptAndContext(query: String, context: String)
+
+    /**
      * Opens Duck Chat with a prefilled [String] query.
      */
     fun openDuckChatWithPrefill(query: String)

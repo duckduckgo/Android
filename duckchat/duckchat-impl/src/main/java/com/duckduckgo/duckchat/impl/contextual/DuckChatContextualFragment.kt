@@ -56,6 +56,7 @@ import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.view.dialog.ActionBottomSheetDialog
 import com.duckduckgo.common.ui.view.gone
@@ -74,8 +75,11 @@ import com.duckduckgo.downloads.api.DownloadConfirmationDialogListener
 import com.duckduckgo.downloads.api.DownloadStateListener
 import com.duckduckgo.downloads.api.DownloadsFileActions
 import com.duckduckgo.downloads.api.FileDownloader
+import com.duckduckgo.duckchat.api.DuckChatContextualResult
+import com.duckduckgo.duckchat.api.DuckChatInputCommandPlugin
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.R
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.duckchat.impl.databinding.FragmentContextualDuckAiBinding
 import com.duckduckgo.duckchat.impl.feature.AIChatDownloadFeature
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
@@ -175,6 +179,9 @@ class DuckChatContextualFragment :
 
     @Inject
     lateinit var faviconManager: FaviconManager
+
+    @Inject
+    lateinit var inputCommandPlugins: PluginPoint<DuckChatInputCommandPlugin>
 
     private val cookieManager: CookieManager by lazy { CookieManager.getInstance() }
 
@@ -344,7 +351,7 @@ class DuckChatContextualFragment :
                         when (featureName) {
                             RealDuckChatJSHelper.DUCK_CHAT_FEATURE_NAME -> {
                                 appCoroutineScope.launch(dispatcherProvider.io()) {
-                                    if (!viewModel.handleJSCall(method)) {
+                                    if (!viewModel.handleJSCall(method, data)) {
                                         duckChatJSHelper.processJsCallbackMessage(
                                             featureName,
                                             method,
@@ -457,6 +464,12 @@ class DuckChatContextualFragment :
             hideKeyboard(binding.inputField)
             viewModel.onNewChatRequested()
         }
+        if (appBuildConfig.isInternalBuild()) {
+            binding.contextualNewChat.setOnLongClickListener {
+                simulateNativeCommand()
+                true
+            }
+        }
         binding.contextualModeButtons.setOnClickListener { }
         binding.contextualModeRoot.setOnClickListener { }
         binding.inputField.setOnEditorActionListener(
@@ -517,6 +530,33 @@ class DuckChatContextualFragment :
         }
     }
 
+    /**
+     * Internal-build test helper: simulates Duck.ai JS calling `submitNativeCommand`.
+     * Shows a dialog to enter a query, then injects the message directly into the content scope
+     * scripts bridge — identical to what the real Duck.ai frontend will do when the FE ships.
+     * Triggered by long-pressing the New Chat button.
+     */
+    private fun simulateNativeCommand() {
+        val input = android.widget.EditText(requireContext()).apply {
+            hint = "e.g. what was I reading about AI last week?"
+        }
+        android.app.AlertDialog.Builder(requireContext())
+            .setTitle("[Dev] Simulate @history command")
+            .setView(input)
+            .setPositiveButton("Send") { _, _ ->
+                val query = input.text.toString().trim().ifEmpty { "what was I reading last week?" }
+                viewModel.handleJSCall(
+                    RealDuckChatJSHelper.METHOD_SUBMIT_NATIVE_COMMAND,
+                    org.json.JSONObject().apply {
+                        put("command", "history")
+                        put("query", query)
+                    },
+                )
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+
     private fun clearInputField() {
         binding.inputField.text.clear()
         binding.inputField.setSelection(0)
@@ -526,6 +566,29 @@ class DuckChatContextualFragment :
     private fun sendNativePrompt() {
         val prompt = binding.inputField.text.toString()
         if (prompt.isNotEmpty()) {
+            val trimmed = prompt.trim()
+            if (trimmed.startsWith("@")) {
+                val commandToken = trimmed.substringBefore(" ").removePrefix("@").lowercase()
+                val query = trimmed.substringAfter(" ", "").trim()
+                val plugin = inputCommandPlugins.getPlugins().firstOrNull { it.command == commandToken }
+                if (plugin != null) {
+                    clearInputField()
+                    hideKeyboard(binding.inputField)
+                    appCoroutineScope.launch {
+                        when (val result = plugin.execute(query)) {
+                            is DuckChatContextualResult.Submit ->
+                                withContext(dispatcherProvider.main()) {
+                                    viewModel.onHistoryPromptSent(result.prompt, result.context)
+                                }
+                            is DuckChatContextualResult.ShowError ->
+                                withContext(dispatcherProvider.main()) {
+                                    root.makeSnackbarWithNoBottomInset(result.message, Snackbar.LENGTH_SHORT)?.show()
+                                }
+                        }
+                    }
+                    return
+                }
+            }
             viewModel.onPromptSent(prompt)
             clearInputField()
             hideKeyboard(binding.inputField)

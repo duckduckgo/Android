@@ -41,6 +41,7 @@ import com.duckduckgo.duckchat.impl.DuckChatConstants.HOST_DUCK_AI
 import com.duckduckgo.duckchat.impl.clearing.DuckChatDeleter
 import com.duckduckgo.duckchat.impl.feature.AIChatImageUploadFeature
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
+import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper.Companion.DUCK_CHAT_FEATURE_NAME
 import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarCallback
 import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarOptionBottomSheetDialogFactory
 import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarSelection
@@ -52,6 +53,7 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_NEW_ADDRES
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelParameters.NEW_ADDRESS_BAR_SELECTION
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
 import com.duckduckgo.duckchat.impl.sync.DuckChatSyncRepository
+import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import com.duckduckgo.sync.api.DeviceSyncState
@@ -71,6 +73,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import logcat.logcat
 import okhttp3.HttpUrl.Companion.toHttpUrl
+import org.json.JSONObject
 import javax.inject.Inject
 
 interface DuckChatInternal : DuckChat {
@@ -238,6 +241,17 @@ interface DuckChatInternal : DuckChat {
      * Indicates whether the three main button should be shown in the Input Screen
      */
     val showMainButtonsInInputScreen: StateFlow<Boolean>
+
+    /**
+     * The pending native prompt event to be sent to the Duck.ai WebView after it loads.
+     * Set by [openDuckChatWithAutoPromptAndContext] and consumed by the WebView ViewModel.
+     */
+    val pendingNativePromptEvent: StateFlow<SubscriptionEventData?>
+
+    /**
+     * Clears the pending native prompt event after it has been consumed by the WebView.
+     */
+    fun consumePendingNativePromptEvent()
 }
 
 enum class ChatState(
@@ -333,6 +347,7 @@ class RealDuckChat @Inject constructor(
     private val _showMainButtonsInInputScreen = MutableStateFlow(false)
 
     private val _chatState = MutableStateFlow(ChatState.HIDE)
+    private val _pendingNativePromptEvent = MutableStateFlow<SubscriptionEventData?>(null)
     private val _showInputScreenOnSystemSearchLaunch = MutableStateFlow(false)
     private val _showVoiceSearchToggle = MutableStateFlow(false)
     private val _showFullScreenMode = MutableStateFlow(false)
@@ -556,6 +571,35 @@ class RealDuckChat @Inject constructor(
         logcat { "Duck.ai: openDuckChatWithAutoPrompt query $query" }
         val parameters = addChatParameters(query, autoPrompt = true, sidebar = false)
         openDuckChat(parameters, forceNewSession = true)
+    }
+
+    override fun openDuckChatWithAutoPromptAndContext(query: String, context: String) {
+        logcat { "Duck.ai: openDuckChatWithAutoPromptAndContext query=$query" }
+        val params = JSONObject().apply {
+            put("platform", "android")
+            put("tool", "query")
+            put(
+                "query",
+                JSONObject().apply {
+                    put("prompt", query)
+                    put("autoSubmit", true)
+                },
+            )
+            runCatching { put("pageContext", JSONObject(context)) }
+                .onFailure { logcat { "Duck.ai: failed to parse context JSON: ${it.message}" } }
+        }
+        _pendingNativePromptEvent.value = SubscriptionEventData(
+            featureName = DUCK_CHAT_FEATURE_NAME,
+            subscriptionName = "submitAIChatNativePrompt",
+            params = params,
+        )
+        openDuckChat(emptyMap(), forceNewSession = true)
+    }
+
+    override val pendingNativePromptEvent: StateFlow<SubscriptionEventData?> = _pendingNativePromptEvent.asStateFlow()
+
+    override fun consumePendingNativePromptEvent() {
+        _pendingNativePromptEvent.value = null
     }
 
     override fun openDuckChatWithPrefill(query: String) {

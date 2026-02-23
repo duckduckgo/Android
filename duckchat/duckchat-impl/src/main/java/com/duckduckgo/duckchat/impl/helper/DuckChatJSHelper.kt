@@ -52,6 +52,13 @@ interface DuckChatJSHelper {
     ): JsCallbackData?
 
     fun onNativeAction(action: NativeAction): SubscriptionEventData
+
+    /**
+     * Returns and consumes the pending native prompt event (set by [DuckChat.openDuckChatWithAutoPromptAndContext]),
+     * or null if there is no pending event. Should be called after [METHOD_GET_AI_CHAT_NATIVE_CONFIG_VALUES]
+     * is responded to, at which point Duck.ai JS is ready to receive subscription events.
+     */
+    fun consumePendingNativePrompt(): SubscriptionEventData?
 }
 
 enum class Mode {
@@ -200,6 +207,13 @@ class RealDuckChatJSHelper @Inject constructor(
         }
     }
 
+    override fun consumePendingNativePrompt(): SubscriptionEventData? {
+        val event = duckChat.pendingNativePromptEvent.value ?: return null
+        duckChat.consumePendingNativePromptEvent()
+        logcat { "Duck.ai: consumePendingNativePrompt — delivering event subscriptionName=${event.subscriptionName}" }
+        return event
+    }
+
     override fun onNativeAction(action: NativeAction): SubscriptionEventData {
         val subscriptionName = when (action) {
             NativeAction.NEW_CHAT -> SUBSCRIPTION_NEW_CHAT
@@ -234,6 +248,9 @@ class RealDuckChatJSHelper @Inject constructor(
         id: String,
         mode: Mode,
     ): JsCallbackData {
+        // When a native prompt is pending (e.g. from AI history search), duck.ai JS needs
+        // supportsAIChatContextualMode=true to register its submitAIChatNativePrompt handler.
+        val effectiveMode = if (duckChat.pendingNativePromptEvent.value != null) Mode.CONTEXTUAL else mode
         val jsonPayload =
             JSONObject().apply {
                 put(PLATFORM, ANDROID)
@@ -241,13 +258,14 @@ class RealDuckChatJSHelper @Inject constructor(
                 put(SUPPORTS_CLOSING_AI_CHAT, true)
                 put(SUPPORTS_OPENING_SETTINGS, true)
                 put(SUPPORTS_NATIVE_CHAT_INPUT, dataStore.isNativeInputFieldUserSettingEnabled())
+                put(SUPPORTS_NATIVE_COMMANDS, true)
                 put(SUPPORTS_CHAT_ID_RESTORATION, duckChat.isDuckChatFullScreenModeEnabled())
                 put(SUPPORTS_IMAGE_UPLOAD, duckChat.isImageUploadEnabled())
                 put(SUPPORTS_STANDALONE_MIGRATION, duckChat.isStandaloneMigrationEnabled())
-                put(SUPPORTS_CHAT_FULLSCREEN_MODE, duckChat.isDuckChatFullScreenModeEnabled() && mode == Mode.FULL)
-                put(SUPPORTS_CHAT_CONTEXTUAL_MODE, duckChat.isDuckChatContextualModeEnabled() && mode == Mode.CONTEXTUAL)
+                put(SUPPORTS_CHAT_FULLSCREEN_MODE, duckChat.isDuckChatFullScreenModeEnabled() && effectiveMode == Mode.FULL)
+                put(SUPPORTS_CHAT_CONTEXTUAL_MODE, duckChat.isDuckChatContextualModeEnabled() && effectiveMode == Mode.CONTEXTUAL)
                 put(SUPPORTS_CHAT_SYNC, duckChat.isChatSyncFeatureEnabled())
-                put(SUPPORTS_PAGE_CONTEXT, duckChat.isDuckChatContextualModeEnabled() && mode == Mode.CONTEXTUAL)
+                put(SUPPORTS_PAGE_CONTEXT, duckChat.isDuckChatContextualModeEnabled() && effectiveMode == Mode.CONTEXTUAL)
                 put(
                     SUPPORTS_MULTIPLE_PAGE_CONTEXT,
                     duckChat.isDuckChatContextualModeEnabled() &&
@@ -334,6 +352,8 @@ class RealDuckChatJSHelper @Inject constructor(
         private const val SUPPORTS_CLOSING_AI_CHAT = "supportsClosingAIChat"
         private const val SUPPORTS_OPENING_SETTINGS = "supportsOpeningSettings"
         private const val SUPPORTS_NATIVE_CHAT_INPUT = "supportsNativeChatInput"
+        const val METHOD_SUBMIT_NATIVE_COMMAND = "submitNativeCommand"
+        private const val SUPPORTS_NATIVE_COMMANDS = "supportsNativeCommands"
         private const val SUPPORTS_IMAGE_UPLOAD = "supportsImageUpload"
         private const val SUPPORTS_CHAT_ID_RESTORATION = "supportsURLChatIDRestoration"
         private const val SUPPORTS_STANDALONE_MIGRATION = "supportsStandaloneMigration"
