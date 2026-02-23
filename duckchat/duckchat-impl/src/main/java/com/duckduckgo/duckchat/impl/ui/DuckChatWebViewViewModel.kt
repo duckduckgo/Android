@@ -31,11 +31,16 @@ import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.duckduckgo.subscriptions.api.Subscriptions
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import logcat.logcat
 import okhttp3.HttpUrl.Companion.toHttpUrl
@@ -62,6 +67,7 @@ class DuckChatWebViewViewModel @Inject constructor(
     init {
         observeSubscriptionChanges()
         observeSyncStatusChanges()
+        observePendingNativePrompt()
     }
 
     fun handleOnSameWebView(url: String): Boolean {
@@ -85,6 +91,28 @@ class DuckChatWebViewViewModel @Inject constructor(
             .onEach { _ ->
                 commandChannel.trySend(Command.SendSubscriptionAuthUpdateEvent)
             }.launchIn(viewModelScope)
+    }
+
+    // Signals that Duck.ai JS has called getAIChatNativeConfigValues, meaning it's initialized
+    // and ready to receive subscription events like submitAIChatNativePrompt.
+    private val jsBridgeReadySignal = MutableStateFlow(false)
+
+    fun onJsBridgeReady() {
+        jsBridgeReadySignal.value = true
+    }
+
+    private fun observePendingNativePrompt() {
+        viewModelScope.launch {
+            duckChat.pendingNativePromptEvent
+                .filterNotNull()
+                .collect { event ->
+                    // Wait until Duck.ai JS has called getAIChatNativeConfigValues, meaning
+                    // it's initialized and the submitAIChatNativePrompt handler is registered.
+                    jsBridgeReadySignal.filter { it }.first()
+                    duckChat.consumePendingNativePromptEvent()
+                    _subscriptionEventDataChannel.trySend(event)
+                }
+        }
     }
 
     private fun observeSyncStatusChanges() {

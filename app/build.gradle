@@ -246,6 +246,7 @@ fladle {
 dependencies {
 	implementation project(":duckchat-api")
 	implementation project(":duckchat-impl")
+	implementation project(":ai-history-search-impl")
 	implementation project(":malicious-site-protection-impl")
 	implementation project(":malicious-site-protection-api")
 	implementation project(":custom-tabs-impl")

@@ -78,6 +78,7 @@ import com.duckduckgo.duckchat.impl.databinding.ActivityDuckChatWebviewBinding
 import com.duckduckgo.duckchat.impl.feature.AIChatDownloadFeature
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper.Companion.DUCK_CHAT_FEATURE_NAME
+import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper.Companion.METHOD_GET_AI_CHAT_NATIVE_CONFIG_VALUES
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper.Companion.METHOD_OPEN_KEYBOARD
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper.Companion.SELECTOR
 import com.duckduckgo.duckchat.impl.ui.filechooser.FileChooserIntentBuilder
@@ -202,6 +203,7 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
         cookieManager.setAcceptThirdPartyCookies(simpleWebview, true)
 
         simpleWebview.let {
+            webViewClient.onPageFinishedListener = { url -> logcat { "Duck.ai: onPageFinished url=$url" } }
             it.webViewClient = webViewClient
             it.webChromeClient = object : WebChromeClient() {
                 override fun onCreateWindow(
@@ -289,6 +291,11 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
                                                 showSoftKeyboard()
                                             }
                                             contentScopeScripts.onResponse(response)
+                                            // After responding to getAIChatNativeConfigValues, Duck.ai JS
+                                            // is fully initialized and subscription handlers are registered.
+                                            if (response.method == METHOD_GET_AI_CHAT_NATIVE_CONFIG_VALUES) {
+                                                viewModel.onJsBridgeReady()
+                                            }
                                         }
                                     }
                                 }
@@ -370,9 +377,12 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
     private fun observeSyncStatusChanges() {
         viewModel.subscriptionEventDataFlow
             .onEach { event ->
-                // Only send if this fragment is actually visible
+                logcat { "Duck.ai: subscriptionEventDataFlow received event: ${event.subscriptionName}, isVisible=$isVisible" }
                 if (isVisible) {
+                    logcat { "Duck.ai: sending subscription event to contentScopeScripts: ${event.subscriptionName}" }
                     contentScopeScripts.sendSubscriptionEvent(event)
+                } else {
+                    logcat { "Duck.ai: WARNING — fragment not visible, subscription event dropped: ${event.subscriptionName}" }
                 }
             }
             .launchIn(lifecycleScope)

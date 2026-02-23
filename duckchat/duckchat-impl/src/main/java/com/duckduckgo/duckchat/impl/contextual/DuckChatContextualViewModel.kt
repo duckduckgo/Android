@@ -21,8 +21,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.api.DuckChatContextualResult
+import com.duckduckgo.duckchat.api.DuckChatInputCommandPlugin
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
 import com.duckduckgo.duckchat.impl.helper.NativeAction
@@ -54,6 +57,7 @@ class DuckChatContextualViewModel @Inject constructor(
     private val sessionTimeoutProvider: DuckChatContextualSessionTimeoutProvider,
     private val timeProvider: DuckChatContextualTimeProvider,
     private val duckChatPixels: DuckChatPixels,
+    private val inputCommandPlugins: PluginPoint<DuckChatInputCommandPlugin>,
 ) : ViewModel() {
 
     private val commandChannel = Channel<Command>(capacity = 1, onBufferOverflow = DROP_OLDEST)
@@ -305,6 +309,38 @@ class DuckChatContextualViewModel @Inject constructor(
         )
     }
 
+    fun onHistoryPromptSent(prompt: String, context: String) {
+        viewModelScope.launch(dispatchers.io()) {
+            val pageContext = context.takeIf { it.isNotBlank() }
+                ?.let { runCatching { JSONObject(it) }.getOrNull() }
+
+            val params = JSONObject().apply {
+                put("platform", "android")
+                put("tool", "query")
+                put(
+                    "query",
+                    JSONObject().apply {
+                        put("prompt", prompt)
+                        put("autoSubmit", true)
+                    },
+                )
+                pageContext?.let { put("pageContext", it) }
+            }
+
+            val event = SubscriptionEventData(
+                featureName = RealDuckChatJSHelper.DUCK_CHAT_FEATURE_NAME,
+                subscriptionName = "submitAIChatNativePrompt",
+                params = params,
+            )
+
+            withContext(dispatchers.main()) {
+                _viewState.value = _viewState.value.copy(sheetMode = SheetMode.WEBVIEW, prompt = "")
+                _subscriptionEventDataChannel.trySend(event)
+                commandChannel.trySend(Command.ChangeSheetState(BottomSheetBehavior.STATE_EXPANDED))
+            }
+        }
+    }
+
     fun onContextualClose() {
         viewModelScope.launch(dispatchers.main()) {
             commandChannel.trySend(Command.ChangeSheetState(BottomSheetBehavior.STATE_HIDDEN))
@@ -486,11 +522,29 @@ class DuckChatContextualViewModel @Inject constructor(
         }
     }
 
-    fun handleJSCall(method: String): Boolean {
+    fun handleJSCall(method: String, data: JSONObject? = null): Boolean {
         when (method) {
             RealDuckChatJSHelper.METHOD_CLOSE_AI_CHAT -> {
                 logcat { "Duck.ai: $method handled at the VM level" }
                 onContextualClose()
+                return true
+            }
+
+            RealDuckChatJSHelper.METHOD_SUBMIT_NATIVE_COMMAND -> {
+                val command = data?.optString("command").orEmpty()
+                val query = data?.optString("query").orEmpty()
+                logcat { "Duck.ai: submitNativeCommand command=$command query=$query" }
+                val plugin = inputCommandPlugins.getPlugins().firstOrNull { it.command == command }
+                if (plugin == null) {
+                    logcat { "Duck.ai: no plugin found for command=$command" }
+                    return false
+                }
+                viewModelScope.launch(dispatchers.io()) {
+                    when (val result = plugin.execute(query)) {
+                        is DuckChatContextualResult.Submit -> onHistoryPromptSent(result.prompt, result.context)
+                        is DuckChatContextualResult.ShowError -> logcat { "Duck.ai: command error: ${result.message}" }
+                    }
+                }
                 return true
             }
 

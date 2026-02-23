@@ -332,6 +332,8 @@ import com.duckduckgo.duckchat.impl.contextual.RealPageContextJSHelper.Companion
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
 import com.duckduckgo.duckchat.impl.helper.NativeAction
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper.Companion.DUCK_CHAT_FEATURE_NAME
+import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper.Companion.METHOD_GET_AI_CHAT_NATIVE_CONFIG_VALUES
+import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper.Companion.METHOD_GET_AI_CHAT_NATIVE_HANDOFF_DATA
 import com.duckduckgo.duckchat.impl.messaging.sync.SyncStatusChangedObserver
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckplayer.api.DuckPlayer
@@ -4190,6 +4192,19 @@ class BrowserTabViewModel @Inject constructor(
                         response?.let {
                             command.value = SendResponseToJs(it)
                         }
+                        // Deliver any pending native prompt (e.g. from AI history search) after
+                        // getAIChatNativeHandoffData is responded to. By this point duck.ai JS has
+                        // processed both the config values and the handoff data, so its chat session
+                        // is fully initialized and the submitAIChatNativePrompt handler is registered.
+                        if (method == METHOD_GET_AI_CHAT_NATIVE_HANDOFF_DATA) {
+                            duckChatJSHelper.consumePendingNativePrompt()?.let { event ->
+                                // Small delay to let duck.ai finish rendering the chat UI
+                                // before we push the auto-submit event.
+                                delay(DUCK_AI_PROMPT_DELIVERY_DELAY_MS)
+                                val result = _subscriptionEventDataChannel.trySend(event)
+                                logcat { "Duck.ai: pending native prompt delivered after handoff, trySend result=$result, subscriptionName=${event.subscriptionName}" }
+                            }
+                        }
                     }
                 }
             }
@@ -4872,6 +4887,10 @@ class BrowserTabViewModel @Inject constructor(
         private const val CLIENT_SIDE_HIT_KEY = "clientSideHit"
 
         private const val ABOUT_BLANK = "about:blank"
+
+        // Delay after getAIChatNativeHandoffData before delivering the pending native prompt,
+        // to ensure duck.ai's chat session is fully ready to receive submitAIChatNativePrompt.
+        private const val DUCK_AI_PROMPT_DELIVERY_DELAY_MS = 200L
 
         // https://www.iso.org/iso-3166-country-codes.html
         private val PRINT_LETTER_FORMAT_COUNTRIES_ISO3166_2 =
