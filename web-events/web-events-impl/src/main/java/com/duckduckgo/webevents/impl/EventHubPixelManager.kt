@@ -172,7 +172,7 @@ class RealEventHubPixelManager @Inject constructor(
     }
 
     private fun getParsedConfig(): EventHubConfigParser.ParsedConfig {
-        return EventHubConfigParser.parse(repository.getConfigEntity().json)
+        return EventHubConfigParser.parse(repository.getEventHubConfigEntity().json)
     }
 
     companion object {
