@@ -935,7 +935,7 @@ class BrowserWebViewClientTest {
     }
 
     @Test
-    fun whenOnReceivedErrorWithNonOmittedErrorThenPageLoadManagerOnPageLoadFailedIsCalled() {
+    fun whenOnReceivedErrorWithNonOmittedErrorThenPageLoadMonitorOnPageLoadFailedIsCalled() {
         val mockWebView = getImmediatelyInvokedMockWebView()
         val requestUrl = "https://example.com"
         val tabId = "test-tab-456"
@@ -962,7 +962,7 @@ class BrowserWebViewClientTest {
     }
 
     @Test
-    fun whenOnReceivedErrorWithOmittedErrorThenPageLoadManagerOnPageLoadFailedIsNotCalled() {
+    fun whenOnReceivedErrorWithOmittedErrorThenPageLoadMonitorOnPageLoadFailedIsNotCalled() {
         val mockWebView = getImmediatelyInvokedMockWebView()
         val requestUrl = "https://example.com"
         val tabId = "test-tab-789"

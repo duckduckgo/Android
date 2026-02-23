@@ -503,7 +503,7 @@ class BrowserTabViewModel @Inject constructor(
     private val serpEasterEggLogosToggles: SerpEasterEggLogosToggles,
     private val serpLogos: SerpLogos,
     private val tabVisitedSitesRepository: TabVisitedSitesRepository,
-    private val pageLoadManager: PageLoadPerformanceMonitor,
+    private val pageLoadMonitor: PageLoadPerformanceMonitor,
 ) : ViewModel(),
     WebViewClientListener,
     EditSavedSiteListener,
@@ -2121,7 +2121,7 @@ class BrowserTabViewModel @Inject constructor(
         val currentUrl = webViewNavigationState.currentUrl
         if (!hasExitedFixedProgress && currentUrl != null && newProgress > FIXED_PROGRESS) {
             hasExitedFixedProgress = true
-            pageLoadManager.onProgressChanged(tabId, currentUrl)
+            pageLoadMonitor.onProgressChanged(tabId, currentUrl)
         }
 
         loadingViewState.value = progress.copy(isLoading = isLoading, progress = visualProgress, url = site?.url ?: "")

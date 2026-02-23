@@ -916,7 +916,7 @@ class BrowserTabViewModelTest {
                 serpEasterEggLogosToggles = mockSerpEasterEggLogosToggles,
                 serpLogos = mockSerpLogos,
                 tabVisitedSitesRepository = mockTabVisitedSitesRepository,
-                pageLoadManager = mockPageLoadWideEvent,
+                pageLoadMonitor = mockPageLoadWideEvent,
             )
 
         testee.loadData("abc", null, false, false)

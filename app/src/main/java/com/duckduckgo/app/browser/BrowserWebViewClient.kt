@@ -120,7 +120,7 @@ class BrowserWebViewClient @Inject constructor(
     private val jsPlugins: PluginPoint<JsInjectorPlugin>,
     private val currentTimeProvider: CurrentTimeProvider,
     private val pageLoadedHandler: PageLoadedHandler,
-    private val pageLoadManager: PageLoadPerformanceMonitor,
+    private val pageLoadMonitor: PageLoadPerformanceMonitor,
     private val shouldSendPagePaintedPixel: PagePaintedHandler,
     private val mediaPlayback: MediaPlayback,
     private val subscriptions: Subscriptions,
@@ -441,7 +441,7 @@ class BrowserWebViewClient @Inject constructor(
             val navigationList = webView.safeCopyBackForwardList() ?: return
             webViewClientListener?.onPageCommitVisible(WebViewNavigationState(navigationList), url)
             webViewClientListener?.getCurrentTabId()?.let { tabId ->
-                pageLoadManager.onPageVisible(tabId, url, webView.progress)
+                pageLoadMonitor.onPageVisible(tabId, url, webView.progress)
             }
         }
     }
@@ -480,7 +480,7 @@ class BrowserWebViewClient @Inject constructor(
             if (it != ABOUT_BLANK && start == null) {
                 start = currentTimeProvider.elapsedRealtime()
                 webViewClientListener?.getCurrentTabId()?.let { tabId ->
-                    pageLoadManager.onPageStarted(tabId, it)
+                    pageLoadMonitor.onPageStarted(tabId, it)
                 }
                 incrementAndTrackLoad() // increment the request counter
                 requestInterceptor.onPageStarted(url)
@@ -551,7 +551,7 @@ class BrowserWebViewClient @Inject constructor(
                 start?.let { safeStart ->
                     val concurrentRequestsOnFinish = decrementLoadCountAndGet()
                     webViewClientListener?.getCurrentTabId()?.let { tabId ->
-                        pageLoadManager.onPageLoadSucceeded(
+                        pageLoadMonitor.onPageLoadSucceeded(
                             tabId = tabId,
                             url = url,
                             isTabInForegroundOnFinish = webViewClientListener?.isTabInForeground() ?: true,
@@ -734,7 +734,7 @@ class BrowserWebViewClient @Inject constructor(
                         val concurrentRequestsOnFinish = decrementLoadCountAndGet()
                         request.url?.toString()?.let { url ->
                             webViewClientListener?.getCurrentTabId()?.let { tabId ->
-                                pageLoadManager.onPageLoadFailed(
+                                pageLoadMonitor.onPageLoadFailed(
                                     tabId = tabId,
                                     url = url,
                                     errorDescription = webResourceError.errorCode.asStringErrorCode(),
