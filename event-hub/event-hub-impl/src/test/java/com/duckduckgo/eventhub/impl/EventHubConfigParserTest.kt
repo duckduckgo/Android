@@ -170,4 +170,113 @@ class EventHubConfigParserTest {
         """.trimIndent()
         assertTrue(EventHubConfigParser.parse(json).telemetry.isEmpty())
     }
+
+    @Test
+    fun `malformed JSON returns EMPTY`() {
+        val config = EventHubConfigParser.parse("not valid json")
+        assertFalse(config.featureEnabled)
+        assertTrue(config.telemetry.isEmpty())
+    }
+
+    @Test
+    fun `missing settings key returns empty telemetry`() {
+        val json = """{"state": "enabled"}"""
+        val config = EventHubConfigParser.parse(json)
+        assertTrue(config.featureEnabled)
+        assertTrue(config.telemetry.isEmpty())
+    }
+
+    @Test
+    fun `missing telemetry key returns empty telemetry`() {
+        val json = """{"state": "enabled", "settings": {}}"""
+        val config = EventHubConfigParser.parse(json)
+        assertTrue(config.featureEnabled)
+        assertTrue(config.telemetry.isEmpty())
+    }
+
+    @Test
+    fun `all-zero period returns no telemetry`() {
+        val json = """
+            {
+                "state": "enabled",
+                "settings": {
+                    "telemetry": {
+                        "test": {
+                            "state": "enabled",
+                            "trigger": { "period": { "seconds": 0, "minutes": 0, "hours": 0, "days": 0 } },
+                            "parameters": {
+                                "c": {
+                                    "template": "counter",
+                                    "source": "e",
+                                    "buckets": {"0+": {"gte": 0}}
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        """.trimIndent()
+        assertTrue(EventHubConfigParser.parse(json).telemetry.isEmpty())
+    }
+
+    @Test
+    fun `non-counter template is skipped`() {
+        val json = """
+            {
+                "state": "enabled",
+                "settings": {
+                    "telemetry": {
+                        "test": {
+                            "state": "enabled",
+                            "trigger": { "period": { "days": 1 } },
+                            "parameters": {
+                                "c": {
+                                    "template": "unknown_template",
+                                    "source": "e"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        """.trimIndent()
+        assertTrue(EventHubConfigParser.parse(json).telemetry.isEmpty())
+    }
+
+    @Test
+    fun `parseSinglePixelConfig with malformed JSON returns null`() {
+        assertNull(EventHubConfigParser.parseSinglePixelConfig("test", "not json"))
+    }
+
+    @Test
+    fun `parseSinglePixelConfig with empty object returns null`() {
+        assertNull(EventHubConfigParser.parseSinglePixelConfig("test", "{}"))
+    }
+
+    @Test
+    fun `multi-unit period combines correctly`() {
+        val json = """
+            {
+                "state": "enabled",
+                "settings": {
+                    "telemetry": {
+                        "test": {
+                            "state": "enabled",
+                            "trigger": { "period": { "hours": 1, "minutes": 30 } },
+                            "parameters": {
+                                "c": {
+                                    "template": "counter",
+                                    "source": "e",
+                                    "buckets": {"0+": {"gte": 0}}
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        """.trimIndent()
+        val config = EventHubConfigParser.parse(json)
+        assertEquals(1, config.telemetry.size)
+        assertEquals(5400L, config.telemetry[0].trigger.period.periodSeconds) // 1h30m = 5400s
+    }
 }
