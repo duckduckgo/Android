@@ -23,6 +23,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extensions.toTldPlusOne
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.contentscopescripts.api.ContentScopeJsMessageHandlersPlugin
+import com.duckduckgo.contentscopescripts.impl.ContentScopeScriptsFeature
 import com.duckduckgo.contentscopescripts.impl.CoreContentScopeScripts
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.js.messaging.api.JsCallbackData
@@ -49,6 +50,7 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val coreContentScopeScripts: CoreContentScopeScripts,
     private val handlers: PluginPoint<ContentScopeJsMessageHandlersPlugin>,
+    private val contentScopeScriptsFeature: ContentScopeScriptsFeature,
 ) : JsMessaging {
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
 
@@ -104,6 +106,10 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
         if (jsMessageCallback == null) throw Exception("Callback cannot be null")
         this.webView = webView
         this.jsMessageCallback = jsMessageCallback
+
+        // Skip legacy @JavascriptInterface registration when the new WebMessageListener path is active
+        if (contentScopeScriptsFeature.useWebMessageListener().isEnabled()) return
+
         this.webView.addJavascriptInterface(this, coreContentScopeScripts.javascriptInterface)
     }
 

@@ -29,9 +29,9 @@ interface ContentScopeScriptsFeature {
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun self(): Toggle
 
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun useNewWebCompatApis(): Toggle
 
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun useWebMessageListener(): Toggle
 }

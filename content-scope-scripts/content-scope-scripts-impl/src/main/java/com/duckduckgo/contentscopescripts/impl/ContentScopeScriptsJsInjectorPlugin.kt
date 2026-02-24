@@ -27,6 +27,7 @@ import javax.inject.Inject
 @ContributesMultibinding(AppScope::class)
 class ContentScopeScriptsJsInjectorPlugin @Inject constructor(
     private val coreContentScopeScripts: CoreContentScopeScripts,
+    private val contentScopeScriptsFeature: ContentScopeScriptsFeature,
 ) : JsInjectorPlugin {
     override fun onPageStarted(
         webView: WebView,
@@ -34,6 +35,9 @@ class ContentScopeScriptsJsInjectorPlugin @Inject constructor(
         isDesktopMode: Boolean?,
         activeExperiments: List<Toggle>,
     ) {
+        // Skip legacy injection when the new addDocumentStartJavaScript path is active
+        if (contentScopeScriptsFeature.useNewWebCompatApis().isEnabled()) return
+
         if (coreContentScopeScripts.isEnabled()) {
             webView.evaluateJavascript("javascript:${coreContentScopeScripts.getScript(isDesktopMode, activeExperiments)}", null)
         }
