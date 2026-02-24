@@ -26,8 +26,13 @@ import org.json.JSONArray
 import org.json.JSONObject
 import javax.inject.Inject
 
+data class WebEventContext(
+    val tabId: String,
+    val documentUrl: String,
+)
+
 interface EventHubPixelManager {
-    fun handleWebEvent(eventType: String, tabId: String, documentUrl: String)
+    fun handleWebEvent(eventType: String, context: WebEventContext)
     fun checkPixels()
     fun onConfigChanged()
 }
@@ -40,10 +45,12 @@ class RealEventHubPixelManager @Inject constructor(
 
     private val dedupState = java.util.concurrent.ConcurrentHashMap<String, String>()
 
-    override fun handleWebEvent(eventType: String, tabId: String, documentUrl: String) {
+    override fun handleWebEvent(eventType: String, context: WebEventContext) {
         val config = getParsedConfig()
         if (!config.featureEnabled) return
 
+        val tabId = context.tabId
+        val documentUrl = context.documentUrl
         val nowMillis = timeProvider.currentTimeMillis()
 
         for (state in repository.getAllPixelStates()) {

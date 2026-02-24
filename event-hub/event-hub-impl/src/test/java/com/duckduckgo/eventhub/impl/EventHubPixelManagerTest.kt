@@ -39,6 +39,7 @@ class EventHubPixelManagerTest {
     private val repository: EventHubRepository = mock()
     private val pixel: Pixel = mock()
     private val timeProvider = FakeTimeProvider()
+    private val NO_CONTEXT = WebEventContext(tabId = "", documentUrl = "")
 
     private lateinit var manager: RealEventHubPixelManager
 
@@ -90,7 +91,7 @@ class EventHubPixelManagerTest {
         val state = pixelState("webTelemetry_adwallDetection_day", mapOf("count" to 3))
         stubPixelStates(state)
 
-        manager.handleWebEvent("adwall", "", "")
+        manager.handleWebEvent("adwall", NO_CONTEXT)
 
         val captor = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(captor.capture())
@@ -103,7 +104,7 @@ class EventHubPixelManagerTest {
         val state = pixelState("webTelemetry_adwallDetection_day", mapOf("count" to 0), periodEnd = 100_000L)
         stubPixelStates(state)
 
-        manager.handleWebEvent("adwall", "", "")
+        manager.handleWebEvent("adwall", NO_CONTEXT)
 
         verify(repository, never()).savePixelState(any())
     }
@@ -113,7 +114,7 @@ class EventHubPixelManagerTest {
         val state = pixelState("webTelemetry_adwallDetection_day", mapOf("count" to 39))
         stubPixelStates(state)
 
-        manager.handleWebEvent("adwall", "", "")
+        manager.handleWebEvent("adwall", NO_CONTEXT)
 
         val captor = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(captor.capture())
@@ -127,7 +128,7 @@ class EventHubPixelManagerTest {
         val state = pixelState("webTelemetry_adwallDetection_day", mapOf("count" to 50), stopCounting = setOf("count"))
         stubPixelStates(state)
 
-        manager.handleWebEvent("adwall", "", "")
+        manager.handleWebEvent("adwall", NO_CONTEXT)
 
         verify(repository, never()).savePixelState(any())
     }
@@ -160,7 +161,7 @@ class EventHubPixelManagerTest {
         val state = pixelState("test", mapOf("count" to 0))
         stubPixelStates(state)
 
-        manager.handleWebEvent("evt", "", "")
+        manager.handleWebEvent("evt", NO_CONTEXT)
 
         val captor = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(captor.capture())
@@ -174,7 +175,7 @@ class EventHubPixelManagerTest {
         val state = pixelState("webTelemetry_adwallDetection_day", mapOf("count" to 40))
         stubPixelStates(state)
 
-        manager.handleWebEvent("adwall", "", "")
+        manager.handleWebEvent("adwall", NO_CONTEXT)
 
         val captor = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(captor.capture())
@@ -188,7 +189,7 @@ class EventHubPixelManagerTest {
         val state = pixelState("webTelemetry_adwallDetection_day", mapOf("count" to 0))
         stubPixelStates(state)
 
-        manager.handleWebEvent("unknownEvent", "", "")
+        manager.handleWebEvent("unknownEvent", NO_CONTEXT)
 
         verify(repository, never()).savePixelState(any())
     }
@@ -199,7 +200,7 @@ class EventHubPixelManagerTest {
         stubPixelStates(state)
         whenever(repository.getEventHubConfigEntity()).thenReturn(EventHubConfigEntity(json = """{"state": "disabled"}"""))
 
-        manager.handleWebEvent("adwall", "", "")
+        manager.handleWebEvent("adwall", NO_CONTEXT)
 
         verify(repository, never()).savePixelState(any())
     }
@@ -209,7 +210,7 @@ class EventHubPixelManagerTest {
         val state = pixelState("webTelemetry_adwallDetection_day", mapOf("count" to 0), periodStart = 0L)
         stubPixelStates(state)
 
-        manager.handleWebEvent("adwall", "", "")
+        manager.handleWebEvent("adwall", NO_CONTEXT)
 
         verify(repository, never()).savePixelState(any())
     }
@@ -219,7 +220,7 @@ class EventHubPixelManagerTest {
         val state = pixelState("webTelemetry_adwallDetection_day", mapOf("count" to 0))
         stubPixelStates(state)
 
-        manager.handleWebEvent("adwall", "tab1", "https://example.com/page1")
+        manager.handleWebEvent("adwall", WebEventContext(tabId = "tab1", documentUrl = "https://example.com/page1"))
 
         val firstCaptor = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(firstCaptor.capture())
@@ -230,7 +231,7 @@ class EventHubPixelManagerTest {
         whenever(repository.getEventHubConfigEntity()).thenReturn(EventHubConfigEntity(json = fullConfig))
         stubPixelStates(firstCaptor.firstValue)
 
-        manager.handleWebEvent("adwall", "tab1", "")
+        manager.handleWebEvent("adwall", WebEventContext(tabId = "tab1", documentUrl = ""))
 
         val secondCaptor = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(secondCaptor.capture())
@@ -244,7 +245,7 @@ class EventHubPixelManagerTest {
         val state = pixelState("webTelemetry_adwallDetection_day", mapOf("count" to 0))
         stubPixelStates(state)
 
-        manager.handleWebEvent("adwall", "tab1", "https://example.com/page1")
+        manager.handleWebEvent("adwall", WebEventContext(tabId = "tab1", documentUrl = "https://example.com/page1"))
 
         val captor = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(captor.capture())
@@ -254,7 +255,7 @@ class EventHubPixelManagerTest {
         whenever(repository.getEventHubConfigEntity()).thenReturn(EventHubConfigEntity(json = fullConfig))
         stubPixelStates(captor.firstValue)
 
-        manager.handleWebEvent("adwall", "tab1", "https://example.com/page1")
+        manager.handleWebEvent("adwall", WebEventContext(tabId = "tab1", documentUrl = "https://example.com/page1"))
 
         verify(repository, never()).savePixelState(any())
     }
@@ -264,7 +265,7 @@ class EventHubPixelManagerTest {
         val state = pixelState("webTelemetry_adwallDetection_day", mapOf("count" to 5))
         stubPixelStates(state)
 
-        manager.handleWebEvent("adwall", "tab1", "https://example.com/page1")
+        manager.handleWebEvent("adwall", WebEventContext(tabId = "tab1", documentUrl = "https://example.com/page1"))
 
         val captor = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(captor.capture())
@@ -275,7 +276,7 @@ class EventHubPixelManagerTest {
             whenever(repository.getEventHubConfigEntity()).thenReturn(EventHubConfigEntity(json = fullConfig))
             stubPixelStates(captor.firstValue)
 
-            manager.handleWebEvent("adwall", "tab1", "https://example.com/page1")
+            manager.handleWebEvent("adwall", WebEventContext(tabId = "tab1", documentUrl = "https://example.com/page1"))
 
             verify(repository, never()).savePixelState(any())
         }
@@ -286,7 +287,7 @@ class EventHubPixelManagerTest {
         val state = pixelState("webTelemetry_adwallDetection_day", mapOf("count" to 0))
         stubPixelStates(state)
 
-        manager.handleWebEvent("adwall", "tab1", "https://example.com/page1")
+        manager.handleWebEvent("adwall", WebEventContext(tabId = "tab1", documentUrl = "https://example.com/page1"))
 
         val firstCaptor = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(firstCaptor.capture())
@@ -297,7 +298,7 @@ class EventHubPixelManagerTest {
         whenever(repository.getEventHubConfigEntity()).thenReturn(EventHubConfigEntity(json = fullConfig))
         stubPixelStates(firstCaptor.firstValue)
 
-        manager.handleWebEvent("adwall", "tab1", "https://example.com/page2")
+        manager.handleWebEvent("adwall", WebEventContext(tabId = "tab1", documentUrl = "https://example.com/page2"))
 
         val secondCaptor = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(secondCaptor.capture())
@@ -309,7 +310,7 @@ class EventHubPixelManagerTest {
         val state = pixelState("webTelemetry_adwallDetection_day", mapOf("count" to 0))
         stubPixelStates(state)
 
-        manager.handleWebEvent("adwall", "tab1", "https://example.com/page1")
+        manager.handleWebEvent("adwall", WebEventContext(tabId = "tab1", documentUrl = "https://example.com/page1"))
 
         val captor = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(captor.capture())
@@ -320,7 +321,7 @@ class EventHubPixelManagerTest {
         whenever(repository.getEventHubConfigEntity()).thenReturn(EventHubConfigEntity(json = fullConfig))
         stubPixelStates(captor.firstValue)
 
-        manager.handleWebEvent("adwall", "tab1", "https://example.com/page1")
+        manager.handleWebEvent("adwall", WebEventContext(tabId = "tab1", documentUrl = "https://example.com/page1"))
 
         verify(repository, never()).savePixelState(any())
     }
@@ -358,7 +359,7 @@ class EventHubPixelManagerTest {
         val state = pixelState("test", mapOf("adwallCount" to 0, "trackerCount" to 0))
         stubPixelStates(state)
 
-        manager.handleWebEvent("adwall", "tab1", "https://example.com/page1")
+        manager.handleWebEvent("adwall", WebEventContext(tabId = "tab1", documentUrl = "https://example.com/page1"))
 
         val firstCaptor = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(firstCaptor.capture())
@@ -370,7 +371,7 @@ class EventHubPixelManagerTest {
         whenever(repository.getEventHubConfigEntity()).thenReturn(EventHubConfigEntity(json = twoSourceConfig))
         stubPixelStates(firstCaptor.firstValue)
 
-        manager.handleWebEvent("trackerBlocked", "tab1", "https://example.com/page1")
+        manager.handleWebEvent("trackerBlocked", WebEventContext(tabId = "tab1", documentUrl = "https://example.com/page1"))
 
         val secondCaptor = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(secondCaptor.capture())
@@ -389,7 +390,7 @@ class EventHubPixelManagerTest {
         val stateB = pixelState("pixel_b", mapOf("count" to 0))
         stubPixelStates(stateA, stateB)
 
-        manager.handleWebEvent("evt", "tab1", "https://example.com/page1")
+        manager.handleWebEvent("evt", WebEventContext(tabId = "tab1", documentUrl = "https://example.com/page1"))
 
         val captor = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository, org.mockito.kotlin.times(2)).savePixelState(captor.capture())
@@ -402,7 +403,7 @@ class EventHubPixelManagerTest {
         whenever(repository.getEventHubConfigEntity()).thenReturn(EventHubConfigEntity(json = twoPixelConf))
         stubPixelStates(savedA, savedB)
 
-        manager.handleWebEvent("evt", "tab1", "https://example.com/page1")
+        manager.handleWebEvent("evt", WebEventContext(tabId = "tab1", documentUrl = "https://example.com/page1"))
 
         verify(repository, never()).savePixelState(any())
     }
@@ -412,7 +413,7 @@ class EventHubPixelManagerTest {
         val state = pixelState("webTelemetry_adwallDetection_day", mapOf("count" to 0))
         stubPixelStates(state)
 
-        manager.handleWebEvent("adwall", "", "https://example.com/page1")
+        manager.handleWebEvent("adwall", WebEventContext(tabId = "", documentUrl = "https://example.com/page1"))
 
         val firstCaptor = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(firstCaptor.capture())
@@ -422,7 +423,7 @@ class EventHubPixelManagerTest {
         whenever(repository.getEventHubConfigEntity()).thenReturn(EventHubConfigEntity(json = fullConfig))
         stubPixelStates(firstCaptor.firstValue)
 
-        manager.handleWebEvent("adwall", "", "https://example.com/page1")
+        manager.handleWebEvent("adwall", WebEventContext(tabId = "", documentUrl = "https://example.com/page1"))
 
         val secondCaptor = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(secondCaptor.capture())
@@ -434,7 +435,7 @@ class EventHubPixelManagerTest {
         val state = pixelState("webTelemetry_adwallDetection_day", mapOf("count" to 0))
         stubPixelStates(state)
 
-        manager.handleWebEvent("adwall", "tab1", "https://example.com/page1")
+        manager.handleWebEvent("adwall", WebEventContext(tabId = "tab1", documentUrl = "https://example.com/page1"))
         val first = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(first.capture())
         assertEquals(1, RealEventHubPixelManager.parseParamsJson(first.firstValue.paramsJson)["count"])
@@ -444,7 +445,7 @@ class EventHubPixelManagerTest {
         whenever(repository.getEventHubConfigEntity()).thenReturn(EventHubConfigEntity(json = fullConfig))
         stubPixelStates(first.firstValue)
 
-        manager.handleWebEvent("adwall", "tab1", "https://example.com/page2")
+        manager.handleWebEvent("adwall", WebEventContext(tabId = "tab1", documentUrl = "https://example.com/page2"))
         val second = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(second.capture())
         assertEquals(2, RealEventHubPixelManager.parseParamsJson(second.firstValue.paramsJson)["count"])
@@ -454,7 +455,7 @@ class EventHubPixelManagerTest {
         whenever(repository.getEventHubConfigEntity()).thenReturn(EventHubConfigEntity(json = fullConfig))
         stubPixelStates(second.firstValue)
 
-        manager.handleWebEvent("adwall", "tab1", "https://example.com/page1")
+        manager.handleWebEvent("adwall", WebEventContext(tabId = "tab1", documentUrl = "https://example.com/page1"))
         val third = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(third.capture())
         assertEquals(3, RealEventHubPixelManager.parseParamsJson(third.firstValue.paramsJson)["count"])
@@ -467,7 +468,7 @@ class EventHubPixelManagerTest {
         stubPixelStates(state)
 
         // Tab 1 fires event
-        manager.handleWebEvent("adwall", "tab1", url)
+        manager.handleWebEvent("adwall", WebEventContext(tabId = "tab1", documentUrl = url))
         val firstCaptor = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(firstCaptor.capture())
         assertEquals(1, RealEventHubPixelManager.parseParamsJson(firstCaptor.firstValue.paramsJson)["count"])
@@ -477,7 +478,7 @@ class EventHubPixelManagerTest {
         whenever(repository.getEventHubConfigEntity()).thenReturn(EventHubConfigEntity(json = fullConfig))
         stubPixelStates(firstCaptor.firstValue)
 
-        manager.handleWebEvent("adwall", "tab2", url)
+        manager.handleWebEvent("adwall", WebEventContext(tabId = "tab2", documentUrl = url))
         val secondCaptor = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(secondCaptor.capture())
         assertEquals(2, RealEventHubPixelManager.parseParamsJson(secondCaptor.firstValue.paramsJson)["count"])
@@ -487,7 +488,7 @@ class EventHubPixelManagerTest {
         whenever(repository.getEventHubConfigEntity()).thenReturn(EventHubConfigEntity(json = fullConfig))
         stubPixelStates(secondCaptor.firstValue)
 
-        manager.handleWebEvent("adwall", "tab1", url)
+        manager.handleWebEvent("adwall", WebEventContext(tabId = "tab1", documentUrl = url))
         verify(repository, never()).savePixelState(any())
     }
 
@@ -855,7 +856,7 @@ class EventHubPixelManagerTest {
         val changedConfig = configWithBuckets(*changedBuckets)
         whenever(repository.getEventHubConfigEntity()).thenReturn(EventHubConfigEntity(json = changedConfig))
 
-        manager.handleWebEvent("evt", "", "")
+        manager.handleWebEvent("evt", NO_CONTEXT)
 
         val captor = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(captor.capture())
@@ -900,7 +901,7 @@ class EventHubPixelManagerTest {
         whenever(repository.getEventHubConfigEntity()).thenReturn(EventHubConfigEntity(json = changedSourceConfig))
 
         // Event matches stored source ("evt"), not live source ("different_source")
-        manager.handleWebEvent("evt", "", "")
+        manager.handleWebEvent("evt", NO_CONTEXT)
 
         val captor = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(captor.capture())
@@ -943,7 +944,7 @@ class EventHubPixelManagerTest {
         whenever(repository.getEventHubConfigEntity()).thenReturn(EventHubConfigEntity(json = changedSourceConfig))
 
         // "new_source" matches live config but NOT stored config — should be ignored
-        manager.handleWebEvent("new_source", "", "")
+        manager.handleWebEvent("new_source", NO_CONTEXT)
 
         verify(repository, never()).savePixelState(any())
     }
@@ -1204,7 +1205,7 @@ class EventHubPixelManagerTest {
         stubPixelStates(stateA1WithCount, stateB1WithCount)
 
         // Events still use config [1] stored in state
-        manager.handleWebEvent("evt", "", "")
+        manager.handleWebEvent("evt", NO_CONTEXT)
 
         val savedAfterEvent = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository, org.mockito.kotlin.times(2)).savePixelState(savedAfterEvent.capture())
@@ -1243,7 +1244,7 @@ class EventHubPixelManagerTest {
         whenever(repository.getEventHubConfigEntity()).thenReturn(EventHubConfigEntity(json = config3))
         stubPixelStates(newStateA2, updatedB)
 
-        manager.handleWebEvent("evt", "", "")
+        manager.handleWebEvent("evt", NO_CONTEXT)
 
         val savedAfterConfig3 = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository, org.mockito.kotlin.times(2)).savePixelState(savedAfterConfig3.capture())
@@ -1290,7 +1291,7 @@ class EventHubPixelManagerTest {
         )
         stubPixelStates(state)
 
-        manager.handleWebEvent("adwall", "", "")
+        manager.handleWebEvent("adwall", NO_CONTEXT)
 
         verify(repository, never()).savePixelState(any())
     }
