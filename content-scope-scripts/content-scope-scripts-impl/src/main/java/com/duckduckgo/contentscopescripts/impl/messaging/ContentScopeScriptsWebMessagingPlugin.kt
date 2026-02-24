@@ -79,9 +79,6 @@ class ContentScopeScriptsWebMessagingPlugin @Inject constructor(
 
             jsMessage?.let {
                 if (context == jsMessage.context) {
-                    jsMessage.params.put("documentUrl", webView.url.orEmpty())
-                    jsMessage.params.put("webViewId", System.identityHashCode(webView).toString())
-
                     // Setup reply proxy so we can send subscription events
                     if (jsMessage.featureName == "messaging" && jsMessage.method == "initialPing") {
                         globalReplyProxy = replyProxy

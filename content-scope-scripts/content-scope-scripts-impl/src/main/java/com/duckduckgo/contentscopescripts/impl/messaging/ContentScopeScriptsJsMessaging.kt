@@ -52,7 +52,8 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
 ) : JsMessaging {
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
 
-    private lateinit var webView: WebView
+    override var registeredWebView: WebView? = null
+        private set
     private lateinit var jsMessageCallback: JsMessageCallback
 
     override val context: String = "contentScopeScripts"
@@ -68,10 +69,9 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
         try {
             val adapter = moshi.adapter(JsMessage::class.java)
             val jsMessage = adapter.fromJson(message)
-            val (domain, documentUrl) =
+            val domain =
                 runBlocking(dispatcherProvider.main()) {
-                    val url = webView.url
-                    Pair(url?.toUri()?.host, url.orEmpty())
+                    registeredWebView?.url?.toUri()?.host
                 }
             jsMessage?.let {
                 if (this.secret == secret && context == jsMessage.context && isUrlAllowed(allowedDomains, domain)) {
@@ -84,8 +84,6 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
                             data = jsMessage.params,
                         )
                     }
-                    jsMessage.params.put("documentUrl", documentUrl)
-                    jsMessage.params.put("webViewId", System.identityHashCode(webView).toString())
                     handlers
                         .getPlugins()
                         .map { it.getJsMessageHandler() }
@@ -105,9 +103,9 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
         jsMessageCallback: JsMessageCallback?,
     ) {
         if (jsMessageCallback == null) throw Exception("Callback cannot be null")
-        this.webView = webView
+        this.registeredWebView = webView
         this.jsMessageCallback = jsMessageCallback
-        this.webView.addJavascriptInterface(this, coreContentScopeScripts.javascriptInterface)
+        webView.addJavascriptInterface(this, coreContentScopeScripts.javascriptInterface)
     }
 
     override fun sendSubscriptionEvent(subscriptionEventData: SubscriptionEventData) {
@@ -118,12 +116,13 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
                 subscriptionEventData.subscriptionName,
                 subscriptionEventData.params,
             )
-        if (::webView.isInitialized) {
-            jsMessageHelper.sendSubscriptionEvent(subscriptionEvent, callbackName, secret, webView)
+        registeredWebView?.let {
+            jsMessageHelper.sendSubscriptionEvent(subscriptionEvent, callbackName, secret, it)
         }
     }
 
     override fun onResponse(response: JsCallbackData) {
+        val webView = registeredWebView ?: return
         val jsResponse =
             JsRequestResponse.Success(
                 context = context,
