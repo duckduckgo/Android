@@ -128,6 +128,57 @@ class EventHubPixelManagerTest {
     }
 
     @Test
+    fun `handleWebEvent does not increment when already at max bucket`() {
+        val singleBucketConfig = """
+            {
+                "state": "enabled",
+                "settings": {
+                    "telemetry": {
+                        "test": {
+                            "state": "enabled",
+                            "trigger": { "period": { "days": 1 } },
+                            "parameters": {
+                                "count": {
+                                    "template": "counter",
+                                    "source": "evt",
+                                    "buckets": {"0+": {"gte": 0}}
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        """.trimIndent()
+        whenever(repository.getEventHubConfigEntity()).thenReturn(EventHubConfigEntity(json = singleBucketConfig))
+        manager = RealEventHubPixelManager(repository, pixel, timeProvider)
+
+        val state = pixelState("test", mapOf("count" to 0))
+        whenever(repository.getPixelState("test")).thenReturn(state)
+
+        manager.handleWebEvent("evt")
+
+        val captor = argumentCaptor<EventHubPixelStateEntity>()
+        verify(repository).savePixelState(captor.capture())
+        assertEquals(0, RealEventHubPixelManager.parseParamsJson(captor.firstValue.paramsJson)["count"])
+        val stopCounting = RealEventHubPixelManager.parseStopCountingJson(captor.firstValue.stopCountingJson)
+        assertTrue("count" in stopCounting)
+    }
+
+    @Test
+    fun `handleWebEvent does not increment when count already in highest bucket`() {
+        val state = pixelState("webTelemetry_adwallDetection_day", mapOf("count" to 40))
+        whenever(repository.getPixelState("webTelemetry_adwallDetection_day")).thenReturn(state)
+
+        manager.handleWebEvent("adwall")
+
+        val captor = argumentCaptor<EventHubPixelStateEntity>()
+        verify(repository).savePixelState(captor.capture())
+        assertEquals(40, RealEventHubPixelManager.parseParamsJson(captor.firstValue.paramsJson)["count"])
+        val stopCounting = RealEventHubPixelManager.parseStopCountingJson(captor.firstValue.stopCountingJson)
+        assertTrue("count" in stopCounting)
+    }
+
+    @Test
     fun `handleWebEvent ignores unknown event type`() {
         val state = pixelState("webTelemetry_adwallDetection_day", mapOf("count" to 0))
         whenever(repository.getPixelState("webTelemetry_adwallDetection_day")).thenReturn(state)
