@@ -61,6 +61,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/pageIcon"
+                app:layout_constraintWidth_max="@dimen/getDesktopAppMaxItemWidth"
                 app:typography="title" />
 
             <com.duckduckgo.common.ui.view.text.DaxTextView
@@ -73,6 +74,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/title"
+                app:layout_constraintWidth_max="@dimen/getDesktopAppMaxItemWidth"
                 app:textType="secondary"
                 app:typography="body1" />
 
@@ -92,6 +94,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/instructions"
                 app:layout_constraintVertical_bias="0"
                 app:layout_constraintWidth_default="wrap"
+                app:layout_constraintWidth_max="@dimen/getDesktopAppMaxItemWidth"
                 app:typography="body1_bold" />
 
             <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
@@ -103,7 +106,8 @@
                 app:daxButtonSize="large"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent" />
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintWidth_max="@dimen/getDesktopAppMaxItemWidth" />
 
 
         </androidx.constraintlayout.widget.ConstraintLayout>
