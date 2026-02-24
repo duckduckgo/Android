@@ -13,8 +13,18 @@
                 "enum": ["cold", "warm", "hot", "unknown"]
             },
             {
-                "key": "duration_ms",
+                "key": "ttid_duration_ms",
+                "description": "Time from process start to first frame state in milliseconds",
+                "type": "integer"
+            },
+            {
+                "key": "ttfd_duration_ms",
                 "description": "Time from process start to interactive state in milliseconds",
+                "type": "integer"
+            },
+            {
+                "key": "ttfd_manual_duration_ms",
+                "description": "Manual measurement time from process start to interactive state in milliseconds",
                 "type": "integer"
             },
             {
