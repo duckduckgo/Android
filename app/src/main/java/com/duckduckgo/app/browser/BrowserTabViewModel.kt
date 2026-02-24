@@ -205,6 +205,7 @@ import com.duckduckgo.app.browser.refreshpixels.RefreshPixelSender
 import com.duckduckgo.app.browser.santize.NonHttpAppLinkChecker
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.tabs.TabManager
+import com.duckduckgo.app.browser.uilock.BROWSER_UI_LOCK_FEATURE_NAME
 import com.duckduckgo.app.browser.uilock.BrowserUiLockFeature
 import com.duckduckgo.app.browser.urldisplay.UrlDisplayRepository
 import com.duckduckgo.app.browser.urlextraction.UrlExtractionListener
@@ -4064,15 +4065,6 @@ class BrowserTabViewModel @Inject constructor(
                 }
             }
 
-            "browserUiLock" -> {
-                when (method) {
-                    "uiLockChanged" -> {
-                        val locked = data?.optBoolean("locked", false) ?: false
-                        uiLockChanged(locked)
-                    }
-                }
-            }
-
             "breakageReporting" ->
                 if (data != null) {
                     when (method) {
@@ -4130,11 +4122,6 @@ class BrowserTabViewModel @Inject constructor(
 
             "screenUnlock" -> screenUnlock()
 
-            "uiLockChanged" -> {
-                val locked = data?.optBoolean("locked", false) ?: false
-                uiLockChanged(locked)
-            }
-
             "breakageReportResult" ->
                 if (data != null) {
                     breakageReportResult(data)
@@ -4168,6 +4155,11 @@ class BrowserTabViewModel @Inject constructor(
         }
 
         when (featureName) {
+            BROWSER_UI_LOCK_FEATURE_NAME -> {
+                val locked = data?.optBoolean("locked", false) ?: false
+                uiLockChanged(locked)
+            }
+
             DUCK_PLAYER_FEATURE_NAME, DUCK_PLAYER_PAGE_FEATURE_NAME -> {
                 viewModelScope.launch(dispatchers.io()) {
                     val webViewUrl = withContext(dispatchers.main()) { getWebViewUrl() }

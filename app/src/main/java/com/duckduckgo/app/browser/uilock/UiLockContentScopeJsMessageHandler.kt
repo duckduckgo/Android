@@ -25,6 +25,8 @@ import com.duckduckgo.js.messaging.api.JsMessaging
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 
+const val BROWSER_UI_LOCK_FEATURE_NAME = "browserUiLock"
+
 @ContributesMultibinding(AppScope::class)
 class UiLockContentScopeJsMessageHandler @Inject constructor() : ContentScopeJsMessageHandlersPlugin {
 
@@ -38,7 +40,7 @@ class UiLockContentScopeJsMessageHandler @Inject constructor() : ContentScopeJsM
         }
 
         override val allowedDomains: List<String> = emptyList()
-        override val featureName: String = "browserUiLock"
+        override val featureName: String = BROWSER_UI_LOCK_FEATURE_NAME
         override val methods: List<String> = listOf("uiLockChanged")
     }
 }
