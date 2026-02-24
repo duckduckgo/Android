@@ -39,7 +39,7 @@ class RealEventHubPixelManager @Inject constructor(
     private val timeProvider: TimeProvider,
 ) : EventHubPixelManager {
 
-    private val dedupState = mutableMapOf<String, String>()
+    private val dedupState = java.util.concurrent.ConcurrentHashMap<String, String>()
 
     override fun handleWebEvent(eventType: String, webView: WebView?) {
         val config = getParsedConfig()
@@ -49,10 +49,8 @@ class RealEventHubPixelManager @Inject constructor(
         val documentUrl = webView?.url ?: ""
         val nowMillis = timeProvider.currentTimeMillis()
 
-        for (pixelConfig in config.telemetry) {
-            if (!pixelConfig.isEnabled) continue
-            val state = repository.getPixelState(pixelConfig.name) ?: continue
-            val storedConfig = EventHubConfigParser.parseSinglePixelConfig(pixelConfig.name, state.configJson) ?: continue
+        for (state in repository.getAllPixelStates()) {
+            val storedConfig = EventHubConfigParser.parseSinglePixelConfig(state.pixelName, state.configJson) ?: continue
 
             if (state.periodStartMillis == 0L || state.periodEndMillis == 0L) continue
             if (nowMillis > state.periodEndMillis) continue
@@ -114,10 +112,8 @@ class RealEventHubPixelManager @Inject constructor(
 
         val nowMillis = timeProvider.currentTimeMillis()
 
-        for (pixelConfig in config.telemetry) {
-            if (!pixelConfig.isEnabled) continue
-            val state = repository.getPixelState(pixelConfig.name) ?: continue
-            val storedConfig = EventHubConfigParser.parseSinglePixelConfig(pixelConfig.name, state.configJson) ?: continue
+        for (state in repository.getAllPixelStates()) {
+            val storedConfig = EventHubConfigParser.parseSinglePixelConfig(state.pixelName, state.configJson) ?: continue
 
             if (nowMillis >= state.periodEndMillis && state.periodEndMillis > 0) {
                 fireTelemetry(storedConfig, state)
