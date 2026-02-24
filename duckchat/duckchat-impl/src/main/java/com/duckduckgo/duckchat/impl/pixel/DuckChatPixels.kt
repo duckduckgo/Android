@@ -23,6 +23,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin
 import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin.PixelParameter
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.impl.ModelTier
 import com.duckduckgo.duckchat.impl.ReportMetric
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_CREATE_NEW_CHAT
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_OPEN_HISTORY
@@ -114,7 +115,7 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 interface DuckChatPixels {
-    fun sendReportMetricPixel(reportMetric: ReportMetric)
+    fun sendReportMetricPixel(reportMetric: ReportMetric, modelTier: ModelTier? = null)
     fun reportOpen()
     fun reportContextualSheetOpened()
     fun reportContextualSheetDismissed()
@@ -147,7 +148,7 @@ class RealDuckChatPixels @Inject constructor(
     private val duckAiMetricCollector: DuckAiMetricCollector,
 ) : DuckChatPixels {
 
-    override fun sendReportMetricPixel(reportMetric: ReportMetric) {
+    override fun sendReportMetricPixel(reportMetric: ReportMetric, modelTier: ModelTier?) {
         appCoroutineScope.launch(dispatcherProvider.io()) {
             var refreshAtb = false
             val sessionParams = mapOf(
@@ -171,7 +172,7 @@ class RealDuckChatPixels @Inject constructor(
             withContext(dispatcherProvider.main()) {
                 pixel.fire(pixelName, parameters = params)
                 if (refreshAtb) {
-                    statisticsUpdater.refreshDuckAiRetentionAtb()
+                    statisticsUpdater.refreshDuckAiRetentionAtb(mapOf("modelTier" to modelTier?.name))
                     duckAiMetricCollector.onMessageSent()
                 }
             }
