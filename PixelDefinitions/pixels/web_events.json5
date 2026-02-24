@@ -13,7 +13,7 @@
             {
                 "key": "attributionPeriod",
                 "type": "integer",
-                "description": "Unix timestamp (UTC) denoting the start of the period in which the attribution window closed"
+                "description": "Unix timestamp (UTC) denoting the start of the measurement period"
             }
         ]
     },
@@ -31,7 +31,7 @@
             {
                 "key": "attributionPeriod",
                 "type": "integer",
-                "description": "Unix timestamp (UTC) denoting the start of the period in which the attribution window closed"
+                "description": "Unix timestamp (UTC) denoting the start of the measurement period"
             }
         ]
     }
