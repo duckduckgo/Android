@@ -17,10 +17,10 @@
 package com.duckduckgo.eventhub.impl
 
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
 import com.duckduckgo.eventhub.store.EventHubConfigEntity
 import com.duckduckgo.eventhub.store.EventHubRepository
 import com.duckduckgo.eventhub.store.WebEventsFeatureConfigEntity
+import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
 import com.squareup.anvil.annotations.ContributesMultibinding
 import logcat.LogPriority.DEBUG
 import logcat.logcat
