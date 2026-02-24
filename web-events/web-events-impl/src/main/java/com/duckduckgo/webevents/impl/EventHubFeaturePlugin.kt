@@ -22,6 +22,8 @@ import com.duckduckgo.webevents.store.EventHubConfigEntity
 import com.duckduckgo.webevents.store.EventHubRepository
 import com.duckduckgo.webevents.store.WebEventsFeatureConfigEntity
 import com.squareup.anvil.annotations.ContributesMultibinding
+import logcat.LogPriority.DEBUG
+import logcat.logcat
 import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
@@ -32,6 +34,7 @@ class EventHubFeaturePlugin @Inject constructor(
 
     override fun store(featureName: String, jsonString: String): Boolean {
         if (featureName == this.featureName) {
+            logcat(DEBUG) { "EventHub: storing eventHub config (${jsonString.length} chars)" }
             repository.updateEventHubConfig(EventHubConfigEntity(json = jsonString))
             pixelManager.onConfigChanged()
             return true
