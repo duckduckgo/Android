@@ -39,6 +39,8 @@ data class WebEventsFeatureConfigEntity(
  * [periodEndMillis] UTC timestamp when the current period ends (fire time).
  * [paramsJson] parameter data as JSON, e.g. {"count": 5}
  * [stopCountingJson] JSON set of param names that have hit their max bucket, e.g. ["count"]
+ * [configJson] snapshot of the per-pixel telemetry config at period start — used for all
+ *   processing during the period so that mid-period config changes don't affect the running pixel.
  */
 @Entity(tableName = "event_hub_pixel_state")
 data class EventHubPixelStateEntity(
@@ -47,4 +49,5 @@ data class EventHubPixelStateEntity(
     val periodEndMillis: Long,
     val paramsJson: String,
     val stopCountingJson: String = "[]",
+    val configJson: String = "{}",
 )

@@ -42,6 +42,11 @@ class EventHubPixelManagerTest {
 
     private lateinit var manager: RealEventHubPixelManager
 
+    private val dayPixelConfigJson: String by lazy {
+        val parsed = EventHubConfigParser.parse(fullConfig)
+        EventHubConfigParser.serializePixelConfig(parsed.telemetry.first { it.name == "webTelemetry_adwallDetection_day" })
+    }
+
     private val fullConfig = """
         {
             "state": "enabled",
@@ -201,6 +206,7 @@ class EventHubPixelManagerTest {
             periodStartMillis = periodStart,
             periodEndMillis = periodEnd,
             paramsJson = """{"count": 15}""",
+            configJson = dayPixelConfigJson,
         )
         whenever(repository.getPixelState("webTelemetry_adwallDetection_day")).thenReturn(state)
 
@@ -230,6 +236,7 @@ class EventHubPixelManagerTest {
             periodStartMillis = periodStart,
             periodEndMillis = periodEnd,
             paramsJson = """{"count": 5}""",
+            configJson = dayPixelConfigJson,
         )
         whenever(repository.getPixelState("webTelemetry_adwallDetection_day")).thenReturn(state)
 
@@ -267,11 +274,13 @@ class EventHubPixelManagerTest {
         whenever(repository.getEventHubConfigEntity()).thenReturn(EventHubConfigEntity(json = configWithGap))
         manager = RealEventHubPixelManager(repository, pixel, timeProvider)
 
+        val testPixelConfig = EventHubConfigParser.parse(configWithGap).telemetry.first()
         val state = EventHubPixelStateEntity(
             pixelName = "test",
             periodStartMillis = periodStart,
             periodEndMillis = periodEnd,
             paramsJson = """{"count": 2}""",
+            configJson = EventHubConfigParser.serializePixelConfig(testPixelConfig),
         )
         whenever(repository.getPixelState("test")).thenReturn(state)
 
@@ -291,6 +300,7 @@ class EventHubPixelManagerTest {
             periodStartMillis = periodStart,
             periodEndMillis = periodEnd,
             paramsJson = """{"count": 5}""",
+            configJson = dayPixelConfigJson,
         )
         whenever(repository.getPixelState("webTelemetry_adwallDetection_day")).thenReturn(state)
 
@@ -327,6 +337,485 @@ class EventHubPixelManagerTest {
         verify(repository).deleteAllPixelStates()
     }
 
+    // --- config isolation: live config changes must not affect running pixel lifecycle ---
+
+    private fun configWithBuckets(vararg buckets: Pair<String, String>): String {
+        val bucketEntries = buckets.joinToString(",") { (name, body) -> "\"$name\": $body" }
+        return """
+            {
+                "state": "enabled",
+                "settings": {
+                    "telemetry": {
+                        "test_pixel": {
+                            "state": "enabled",
+                            "trigger": { "period": { "seconds": 120 } },
+                            "parameters": {
+                                "count": {
+                                    "template": "counter",
+                                    "source": "evt",
+                                    "buckets": { $bucketEntries }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        """.trimIndent()
+    }
+
+    private val originalBuckets = arrayOf(
+        "0-4" to """{"gte": 0, "lt": 5}""",
+        "5+" to """{"gte": 5}""",
+    )
+
+    private val changedBuckets = arrayOf(
+        "0-2" to """{"gte": 0, "lt": 3}""",
+        "3+" to """{"gte": 3}""",
+    )
+
+    @Test
+    fun `handleWebEvent uses stored config buckets, not live config`() {
+        val originalConfig = configWithBuckets(*originalBuckets)
+        whenever(repository.getEventHubConfigEntity()).thenReturn(EventHubConfigEntity(json = originalConfig))
+        manager = RealEventHubPixelManager(repository, pixel, timeProvider)
+
+        val originalPixelConfig = EventHubConfigParser.parse(originalConfig).telemetry.first()
+        val storedConfigJson = EventHubConfigParser.serializePixelConfig(originalPixelConfig)
+
+        // count=4 is in "0-4" with original buckets, would be in "3+" with changed buckets
+        val state = pixelState("test_pixel", mapOf("count" to 4), configJson = storedConfigJson)
+        whenever(repository.getPixelState("test_pixel")).thenReturn(state)
+
+        // Change live config to different buckets
+        val changedConfig = configWithBuckets(*changedBuckets)
+        whenever(repository.getEventHubConfigEntity()).thenReturn(EventHubConfigEntity(json = changedConfig))
+
+        manager.handleWebEvent("evt")
+
+        val captor = argumentCaptor<EventHubPixelStateEntity>()
+        verify(repository).savePixelState(captor.capture())
+        val savedCount = RealEventHubPixelManager.parseParamsJson(captor.firstValue.paramsJson)["count"]
+        // Should increment to 5 — original config has "5+" at gte=5 so shouldStopCounting is false at 4
+        assertEquals(5, savedCount)
+    }
+
+    @Test
+    fun `handleWebEvent uses stored config source, not live config`() {
+        val originalConfig = configWithBuckets(*originalBuckets)
+        whenever(repository.getEventHubConfigEntity()).thenReturn(EventHubConfigEntity(json = originalConfig))
+        manager = RealEventHubPixelManager(repository, pixel, timeProvider)
+
+        val originalPixelConfig = EventHubConfigParser.parse(originalConfig).telemetry.first()
+        val storedConfigJson = EventHubConfigParser.serializePixelConfig(originalPixelConfig)
+
+        val state = pixelState("test_pixel", mapOf("count" to 0), configJson = storedConfigJson)
+        whenever(repository.getPixelState("test_pixel")).thenReturn(state)
+
+        // Change live config to use a different source
+        val changedSourceConfig = """
+            {
+                "state": "enabled",
+                "settings": {
+                    "telemetry": {
+                        "test_pixel": {
+                            "state": "enabled",
+                            "trigger": { "period": { "seconds": 120 } },
+                            "parameters": {
+                                "count": {
+                                    "template": "counter",
+                                    "source": "different_source",
+                                    "buckets": { "0-4": {"gte": 0, "lt": 5}, "5+": {"gte": 5} }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        """.trimIndent()
+        whenever(repository.getEventHubConfigEntity()).thenReturn(EventHubConfigEntity(json = changedSourceConfig))
+
+        // Event matches stored source ("evt"), not live source ("different_source")
+        manager.handleWebEvent("evt")
+
+        val captor = argumentCaptor<EventHubPixelStateEntity>()
+        verify(repository).savePixelState(captor.capture())
+        assertEquals(1, RealEventHubPixelManager.parseParamsJson(captor.firstValue.paramsJson)["count"])
+    }
+
+    @Test
+    fun `handleWebEvent ignores event matching only live config source`() {
+        val originalConfig = configWithBuckets(*originalBuckets)
+        whenever(repository.getEventHubConfigEntity()).thenReturn(EventHubConfigEntity(json = originalConfig))
+        manager = RealEventHubPixelManager(repository, pixel, timeProvider)
+
+        val originalPixelConfig = EventHubConfigParser.parse(originalConfig).telemetry.first()
+        val storedConfigJson = EventHubConfigParser.serializePixelConfig(originalPixelConfig)
+
+        val state = pixelState("test_pixel", mapOf("count" to 0), configJson = storedConfigJson)
+        whenever(repository.getPixelState("test_pixel")).thenReturn(state)
+
+        // Change live config to use a different source
+        val changedSourceConfig = """
+            {
+                "state": "enabled",
+                "settings": {
+                    "telemetry": {
+                        "test_pixel": {
+                            "state": "enabled",
+                            "trigger": { "period": { "seconds": 120 } },
+                            "parameters": {
+                                "count": {
+                                    "template": "counter",
+                                    "source": "new_source",
+                                    "buckets": { "0-4": {"gte": 0, "lt": 5}, "5+": {"gte": 5} }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        """.trimIndent()
+        whenever(repository.getEventHubConfigEntity()).thenReturn(EventHubConfigEntity(json = changedSourceConfig))
+
+        // "new_source" matches live config but NOT stored config — should be ignored
+        manager.handleWebEvent("new_source")
+
+        verify(repository, never()).savePixelState(any())
+    }
+
+    @Test
+    fun `checkPixels fires pixel using stored config buckets, not live config`() {
+        val originalConfig = configWithBuckets(*originalBuckets)
+        whenever(repository.getEventHubConfigEntity()).thenReturn(EventHubConfigEntity(json = originalConfig))
+        manager = RealEventHubPixelManager(repository, pixel, timeProvider)
+
+        val originalPixelConfig = EventHubConfigParser.parse(originalConfig).telemetry.first()
+        val storedConfigJson = EventHubConfigParser.serializePixelConfig(originalPixelConfig)
+
+        val periodStart = 1000L
+        val periodEnd = periodStart + 120_000L
+        timeProvider.time = periodEnd + 1
+
+        // count=4 → "0-4" with original buckets, but "3+" with changed buckets
+        val state = EventHubPixelStateEntity(
+            pixelName = "test_pixel",
+            periodStartMillis = periodStart,
+            periodEndMillis = periodEnd,
+            paramsJson = """{"count": 4}""",
+            configJson = storedConfigJson,
+        )
+        whenever(repository.getPixelState("test_pixel")).thenReturn(state)
+
+        // Change live config to different buckets before firing
+        val changedConfig = configWithBuckets(*changedBuckets)
+        whenever(repository.getEventHubConfigEntity()).thenReturn(EventHubConfigEntity(json = changedConfig))
+
+        manager.checkPixels()
+
+        val expectedAttribution = RealEventHubPixelManager.calculateAttributionPeriod(
+            periodStart,
+            TelemetryPeriodConfig(seconds = 120),
+        ).toString()
+
+        // Must use original bucket "0-4", not changed bucket "3+"
+        verify(pixel).enqueueFire(
+            pixelName = eq("test_pixel"),
+            parameters = eq(mapOf("count" to "0-4", "attributionPeriod" to expectedAttribution)),
+            encodedParameters = eq(emptyMap()),
+            type = eq(Count),
+        )
+    }
+
+    @Test
+    fun `checkPixels uses stored config period for attributionPeriod, not live config`() {
+        val originalConfig = configWithBuckets(*originalBuckets)
+        whenever(repository.getEventHubConfigEntity()).thenReturn(EventHubConfigEntity(json = originalConfig))
+        manager = RealEventHubPixelManager(repository, pixel, timeProvider)
+
+        val originalPixelConfig = EventHubConfigParser.parse(originalConfig).telemetry.first()
+        val storedConfigJson = EventHubConfigParser.serializePixelConfig(originalPixelConfig)
+
+        val periodStart = 120_000L
+        val periodEnd = periodStart + 120_000L
+        timeProvider.time = periodEnd + 1
+
+        val state = EventHubPixelStateEntity(
+            pixelName = "test_pixel",
+            periodStartMillis = periodStart,
+            periodEndMillis = periodEnd,
+            paramsJson = """{"count": 1}""",
+            configJson = storedConfigJson,
+        )
+        whenever(repository.getPixelState("test_pixel")).thenReturn(state)
+
+        // Change live config to a different period (1 hour instead of 120s)
+        val changedPeriodConfig = """
+            {
+                "state": "enabled",
+                "settings": {
+                    "telemetry": {
+                        "test_pixel": {
+                            "state": "enabled",
+                            "trigger": { "period": { "hours": 1 } },
+                            "parameters": {
+                                "count": {
+                                    "template": "counter",
+                                    "source": "evt",
+                                    "buckets": { "0-4": {"gte": 0, "lt": 5}, "5+": {"gte": 5} }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        """.trimIndent()
+        whenever(repository.getEventHubConfigEntity()).thenReturn(EventHubConfigEntity(json = changedPeriodConfig))
+
+        manager.checkPixels()
+
+        // Attribution period must be based on stored 120s period, not live 1hr
+        val expectedAttribution = RealEventHubPixelManager.calculateAttributionPeriod(
+            periodStart,
+            TelemetryPeriodConfig(seconds = 120),
+        ).toString()
+
+        verify(pixel).enqueueFire(
+            pixelName = eq("test_pixel"),
+            parameters = eq(mapOf("count" to "0-4", "attributionPeriod" to expectedAttribution)),
+            encodedParameters = eq(emptyMap()),
+            type = eq(Count),
+        )
+    }
+
+    @Test
+    fun `new period after firing uses latest config, not stored config`() {
+        val originalConfig = configWithBuckets(*originalBuckets)
+        whenever(repository.getEventHubConfigEntity()).thenReturn(EventHubConfigEntity(json = originalConfig))
+        manager = RealEventHubPixelManager(repository, pixel, timeProvider)
+
+        val originalPixelConfig = EventHubConfigParser.parse(originalConfig).telemetry.first()
+        val storedConfigJson = EventHubConfigParser.serializePixelConfig(originalPixelConfig)
+
+        val periodStart = 1000L
+        val periodEnd = periodStart + 120_000L
+        timeProvider.time = periodEnd + 1
+
+        val state = EventHubPixelStateEntity(
+            pixelName = "test_pixel",
+            periodStartMillis = periodStart,
+            periodEndMillis = periodEnd,
+            paramsJson = """{"count": 1}""",
+            configJson = storedConfigJson,
+        )
+        whenever(repository.getPixelState("test_pixel")).thenReturn(state)
+
+        // Change live config to 1 hour period before firing
+        val changedPeriodConfig = """
+            {
+                "state": "enabled",
+                "settings": {
+                    "telemetry": {
+                        "test_pixel": {
+                            "state": "enabled",
+                            "trigger": { "period": { "hours": 1 } },
+                            "parameters": {
+                                "count": {
+                                    "template": "counter",
+                                    "source": "evt",
+                                    "buckets": { "0-4": {"gte": 0, "lt": 5}, "5+": {"gte": 5} }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        """.trimIndent()
+        whenever(repository.getEventHubConfigEntity()).thenReturn(EventHubConfigEntity(json = changedPeriodConfig))
+
+        manager.checkPixels()
+
+        // The NEW period should use the latest config (1 hour = 3600s = 3600000ms)
+        verify(repository).deletePixelState("test_pixel")
+        val captor = argumentCaptor<EventHubPixelStateEntity>()
+        verify(repository).savePixelState(captor.capture())
+
+        val newState = captor.firstValue
+        val expectedPeriodMillis = 3600L * 1000
+        assertEquals(timeProvider.time + expectedPeriodMillis, newState.periodEndMillis)
+
+        // And the stored config in the new period should reflect the latest config
+        val newStoredConfig = EventHubConfigParser.parseSinglePixelConfig("test_pixel", newState.configJson)!!
+        assertEquals(3600L, newStoredConfig.trigger.period.periodSeconds)
+    }
+
+    @Test
+    fun `onConfigChanged stores config snapshot in new pixel state`() {
+        whenever(repository.getPixelState("webTelemetry_adwallDetection_day")).thenReturn(null)
+        timeProvider.time = 5000L
+
+        manager.onConfigChanged()
+
+        val captor = argumentCaptor<EventHubPixelStateEntity>()
+        verify(repository).savePixelState(captor.capture())
+
+        val storedConfig = EventHubConfigParser.parseSinglePixelConfig(
+            captor.firstValue.pixelName,
+            captor.firstValue.configJson,
+        )!!
+        assertEquals("adwall", storedConfig.parameters["count"]!!.source)
+        assertEquals(86400L, storedConfig.trigger.period.periodSeconds)
+        assertEquals(7, storedConfig.parameters["count"]!!.buckets.size)
+    }
+
+    // --- multi-pixel config lifecycle ---
+
+    private fun twoPixelConfig(periodSecondsA: Int, periodSecondsB: Int, bucketDef: String): String {
+        return """
+            {
+                "state": "enabled",
+                "settings": {
+                    "telemetry": {
+                        "pixel_a": {
+                            "state": "enabled",
+                            "trigger": { "period": { "seconds": $periodSecondsA } },
+                            "parameters": {
+                                "count": {
+                                    "template": "counter",
+                                    "source": "evt",
+                                    "buckets": { $bucketDef }
+                                }
+                            }
+                        },
+                        "pixel_b": {
+                            "state": "enabled",
+                            "trigger": { "period": { "seconds": $periodSecondsB } },
+                            "parameters": {
+                                "count": {
+                                    "template": "counter",
+                                    "source": "evt",
+                                    "buckets": { $bucketDef }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        """.trimIndent()
+    }
+
+    @Test
+    fun `multi-pixel lifecycle - each pixel uses its own config snapshot independently`() {
+        val buckets = """"0-4": {"gte": 0, "lt": 5}, "5+": {"gte": 5}"""
+
+        // Step 1: config [1] loads — both pixels registered with 60s/120s periods
+        val config1 = twoPixelConfig(60, 120, buckets)
+        whenever(repository.getEventHubConfigEntity()).thenReturn(EventHubConfigEntity(json = config1))
+        manager = RealEventHubPixelManager(repository, pixel, timeProvider)
+
+        timeProvider.time = 10_000L
+        whenever(repository.getPixelState("pixel_a")).thenReturn(null)
+        whenever(repository.getPixelState("pixel_b")).thenReturn(null)
+        manager.onConfigChanged()
+
+        val savedStates = argumentCaptor<EventHubPixelStateEntity>()
+        verify(repository, org.mockito.kotlin.times(2)).savePixelState(savedStates.capture())
+        val stateA1 = savedStates.allValues.find { it.pixelName == "pixel_a" }!!
+        val stateB1 = savedStates.allValues.find { it.pixelName == "pixel_b" }!!
+
+        // Both use config [1]
+        val configA1 = EventHubConfigParser.parseSinglePixelConfig("pixel_a", stateA1.configJson)!!
+        val configB1 = EventHubConfigParser.parseSinglePixelConfig("pixel_b", stateB1.configJson)!!
+        assertEquals(60L, configA1.trigger.period.periodSeconds)
+        assertEquals(120L, configB1.trigger.period.periodSeconds)
+
+        // Step 2: config [2] loads — pixels A and B still use config [1]
+        org.mockito.Mockito.reset(repository, pixel)
+        val config2 = twoPixelConfig(90, 180, buckets)
+        whenever(repository.getEventHubConfigEntity()).thenReturn(EventHubConfigEntity(json = config2))
+
+        // Simulate accumulated state on both pixels
+        val stateA1WithCount = stateA1.copy(paramsJson = """{"count": 2}""")
+        val stateB1WithCount = stateB1.copy(paramsJson = """{"count": 3}""")
+        whenever(repository.getPixelState("pixel_a")).thenReturn(stateA1WithCount)
+        whenever(repository.getPixelState("pixel_b")).thenReturn(stateB1WithCount)
+
+        // Events still use config [1] stored in state
+        manager.handleWebEvent("evt")
+
+        val savedAfterEvent = argumentCaptor<EventHubPixelStateEntity>()
+        verify(repository, org.mockito.kotlin.times(2)).savePixelState(savedAfterEvent.capture())
+        val updatedA = savedAfterEvent.allValues.find { it.pixelName == "pixel_a" }!!
+        val updatedB = savedAfterEvent.allValues.find { it.pixelName == "pixel_b" }!!
+        assertEquals(3, RealEventHubPixelManager.parseParamsJson(updatedA.paramsJson)["count"])
+        assertEquals(4, RealEventHubPixelManager.parseParamsJson(updatedB.paramsJson)["count"])
+        // Stored configs unchanged — still config [1]
+        assertEquals(stateA1.configJson, updatedA.configJson)
+        assertEquals(stateB1.configJson, updatedB.configJson)
+
+        // Step 3: pixel A fires — new cycle uses config [2], pixel B still on config [1]
+        org.mockito.Mockito.reset(repository, pixel)
+        whenever(repository.getEventHubConfigEntity()).thenReturn(EventHubConfigEntity(json = config2))
+
+        timeProvider.time = stateA1.periodEndMillis + 1
+        whenever(repository.getPixelState("pixel_a")).thenReturn(updatedA)
+        whenever(repository.getPixelState("pixel_b")).thenReturn(updatedB)
+
+        manager.checkPixels()
+
+        verify(repository).deletePixelState("pixel_a")
+        verify(repository, never()).deletePixelState("pixel_b")
+
+        val savedAfterFire = argumentCaptor<EventHubPixelStateEntity>()
+        verify(repository).savePixelState(savedAfterFire.capture())
+        val newStateA2 = savedAfterFire.firstValue
+        assertEquals("pixel_a", newStateA2.pixelName)
+
+        // New pixel A cycle uses config [2] (90s period)
+        val configA2 = EventHubConfigParser.parseSinglePixelConfig("pixel_a", newStateA2.configJson)!!
+        assertEquals(90L, configA2.trigger.period.periodSeconds)
+
+        // Step 4: config [3] loads — pixel A on [2], pixel B still on [1]
+        org.mockito.Mockito.reset(repository, pixel)
+        val config3 = twoPixelConfig(45, 300, buckets)
+        whenever(repository.getEventHubConfigEntity()).thenReturn(EventHubConfigEntity(json = config3))
+        whenever(repository.getPixelState("pixel_a")).thenReturn(newStateA2)
+        whenever(repository.getPixelState("pixel_b")).thenReturn(updatedB)
+
+        manager.handleWebEvent("evt")
+
+        val savedAfterConfig3 = argumentCaptor<EventHubPixelStateEntity>()
+        verify(repository, org.mockito.kotlin.times(2)).savePixelState(savedAfterConfig3.capture())
+        val aAfter3 = savedAfterConfig3.allValues.find { it.pixelName == "pixel_a" }!!
+        val bAfter3 = savedAfterConfig3.allValues.find { it.pixelName == "pixel_b" }!!
+        // A still uses config [2], B still uses config [1]
+        assertEquals(newStateA2.configJson, aAfter3.configJson)
+        assertEquals(stateB1.configJson, bAfter3.configJson)
+
+        // Step 5: pixel B fires — new cycle uses config [3]
+        org.mockito.Mockito.reset(repository, pixel)
+        whenever(repository.getEventHubConfigEntity()).thenReturn(EventHubConfigEntity(json = config3))
+
+        timeProvider.time = stateB1.periodEndMillis + 1
+        whenever(repository.getPixelState("pixel_a")).thenReturn(aAfter3)
+        whenever(repository.getPixelState("pixel_b")).thenReturn(bAfter3)
+
+        manager.checkPixels()
+
+        verify(repository).deletePixelState("pixel_b")
+        val savedAfterBFire = argumentCaptor<EventHubPixelStateEntity>()
+        verify(repository).savePixelState(savedAfterBFire.capture())
+        val newStateB3 = savedAfterBFire.firstValue
+        assertEquals("pixel_b", newStateB3.pixelName)
+
+        // New pixel B cycle uses config [3] (300s period)
+        val configB3 = EventHubConfigParser.parseSinglePixelConfig("pixel_b", newStateB3.configJson)!!
+        assertEquals(300L, configB3.trigger.period.periodSeconds)
+
+        // Pixel A is still on config [2]
+        val configAStill2 = EventHubConfigParser.parseSinglePixelConfig("pixel_a", aAfter3.configJson)!!
+        assertEquals(90L, configAStill2.trigger.period.periodSeconds)
+    }
+
     // --- calculateAttributionPeriod ---
 
     @Test
@@ -355,14 +844,22 @@ class EventHubPixelManagerTest {
         name: String,
         params: Map<String, Int>,
         periodEnd: Long = Long.MAX_VALUE,
+        periodStart: Long = 1000L,
         stopCounting: Set<String> = emptySet(),
+        configJson: String? = null,
     ): EventHubPixelStateEntity {
+        val resolvedConfigJson = configJson ?: run {
+            val config = EventHubConfigParser.parse(repository.getEventHubConfigEntity().json)
+            val pixelConfig = config.telemetry.find { it.name == name }
+            pixelConfig?.let { EventHubConfigParser.serializePixelConfig(it) } ?: "{}"
+        }
         return EventHubPixelStateEntity(
             pixelName = name,
-            periodStartMillis = 1000L,
+            periodStartMillis = periodStart,
             periodEndMillis = periodEnd,
             paramsJson = RealEventHubPixelManager.serializeParams(params),
             stopCountingJson = RealEventHubPixelManager.serializeStopCounting(stopCounting),
+            configJson = resolvedConfigJson,
         )
     }
 
