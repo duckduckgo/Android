@@ -4692,6 +4692,13 @@ class BrowserTabViewModel @Inject constructor(
         duckChat.openDuckChat()
     }
 
+    fun collectPageContext() {
+        viewModelScope.launch {
+            val subscriptionEvent = pageContextJSHelper.onContextualOpened()
+            _subscriptionEventDataChannel.send(subscriptionEvent)
+        }
+    }
+
     fun onDuckChatOmnibarButtonClicked(
         query: String?,
         hasFocus: Boolean,
@@ -4711,10 +4718,6 @@ class BrowserTabViewModel @Inject constructor(
                 viewModelScope.launch {
                     if (duckChat.isContextualOnboardingCompleted()) {
                         command.value = Command.ShowDuckAIContextualMode(tabId)
-                        viewModelScope.launch {
-                            val subscriptionEvent = pageContextJSHelper.onContextualOpened()
-                            _subscriptionEventDataChannel.send(subscriptionEvent)
-                        }
                     } else {
                         command.value = Command.ShowDuckAIContextualOnboarding
                     }

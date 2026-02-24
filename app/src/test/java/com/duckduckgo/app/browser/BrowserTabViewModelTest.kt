@@ -8858,6 +8858,37 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenCollectPageContextThenPageContextSubscriptionEventSent() = runTest {
+        val expectedEvent = SubscriptionEventData(
+            featureName = PAGE_CONTEXT_FEATURE_NAME,
+            subscriptionName = "collect",
+            params = JSONObject(),
+        )
+        whenever(mockPageContextJSHelper.onContextualOpened()).thenReturn(expectedEvent)
+
+        testee.collectPageContext()
+
+        testee.subscriptionEventDataFlow.test {
+            val emittedEvent = awaitItem()
+            assertEquals(PAGE_CONTEXT_FEATURE_NAME, emittedEvent.featureName)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenOnDuckChatOmnibarButtonClickedAndOnboardingNotCompletedThenNoPageContextSubscriptionEventSent() = runTest {
+        mockDuckAiContextualModeFlow.emit(true)
+        whenever(mockDuckChat.isContextualOnboardingCompleted()).thenReturn(false)
+
+        testee.subscriptionEventDataFlow.test {
+            testee.onDuckChatOmnibarButtonClicked(query = "example", hasFocus = false, isNtp = false)
+
+            expectNoEvents()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
     fun whenSubscriptionChangesWhileOnDuckAiThenAuthUpdateEventSent() = runTest {
         val duckAiUrl = "https://duck.ai/chat"
         whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)

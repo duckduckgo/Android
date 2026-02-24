@@ -3431,6 +3431,8 @@ class BrowserTabFragment :
 
         reactToDuckChatContextualSheetResult()
         ensureBrowserIsCompatibleWithContextualSheetState()
+
+        viewModel.collectPageContext()
     }
 
     private fun createNewContextualFragment(tabId: String) {
