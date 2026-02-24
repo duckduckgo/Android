@@ -22,6 +22,20 @@
     android:background="@color/cardsListBackground"
     tools:ignore="InvalidColorAttribute">
 
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/cardItemsRecyclerView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:clipToPadding="false"
+        android:paddingTop="56dp"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintBottom_toTopOf="@id/actionButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_goneMarginBottom="0dp"
+        tools:listitem="@layout/view_remote_message_card_item" />
+
     <!-- Close Button - Top Left -->
     <ImageButton
         android:id="@+id/closeButton"
@@ -33,68 +47,6 @@
         android:src="@drawable/ic_close_24"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-
-    <!-- Header Section - Always Visible -->
-    <ImageView
-        android:id="@+id/headerImage"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:importantForAccessibility="no"
-        android:visibility="gone"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/closeButton"
-        tools:src="@drawable/ic_ddg_announce" />
-
-    <ImageView
-        android:id="@+id/remoteImage"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:visibility="gone"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/closeButton" />
-
-    <androidx.constraintlayout.widget.Barrier
-        android:id="@+id/illustrationBarrier"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:barrierAllowsGoneWidgets="false"
-        app:barrierDirection="bottom"
-        app:constraint_referenced_ids="headerImage,remoteImage" />
-
-    <com.duckduckgo.common.ui.view.text.DaxTextView
-        android:id="@+id/headerTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:padding="24dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/illustrationBarrier"
-        app:textType="primary"
-        app:typography="title"
-        tools:text="What's new" />
-
-    <!-- Barrier to ensure RecyclerView starts below the tallest header element -->
-    <androidx.constraintlayout.widget.Barrier
-        android:id="@+id/headerBarrier"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:barrierDirection="bottom"
-        app:constraint_referenced_ids="headerImage,headerTitle" />
-
-    <!-- RecyclerView - Scrollable -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/cardItemsRecyclerView"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        app:layout_constraintBottom_toTopOf="@id/actionButton"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/headerBarrier"
-        app:layout_goneMarginBottom="0dp"
-        tools:listitem="@layout/view_remote_message_card_item" />
 
     <!-- Bottom Button - Optional -->
     <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
@@ -109,6 +61,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintWidth_max="@dimen/messageContentMaxWidth"
         tools:text="Got it" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -47,8 +47,8 @@
             },
             {
                 "key": "feature.data.ext.service_start_duration_ms_bucketed",
-                "description": "The duration of TrackerBlockingVpnService (re)start in milliseconds, bucketed (using the upper end of each range)",
-                "enum": ["1000", "5000", "10000", "30000", "60000", "300000", "600000"]
+                "description": "The duration of TrackerBlockingVpnService (re)start in milliseconds, bucketed using the lower bucket boundary",
+                "enum": ["0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
             },
             {
                 "key": "feature.data.ext.step.show_vpn_conflict_dialog",

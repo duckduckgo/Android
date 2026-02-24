@@ -465,6 +465,7 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                                         localeLanguage = target.localeLanguage,
                                         isReturningUser = target.isReturningUser,
                                         isPrivacyProEligible = target.isPrivacyProEligible,
+                                        entitlement = target.entitlement,
                                         minSdkVersion = target.minSdkVersion,
                                     )
                                 } ?: emptyList()
@@ -676,6 +677,7 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                     .addParameter("localeLanguage", String::class.asClassName())
                     .addParameter("isReturningUser", Boolean::class.asClassName().copy(nullable = true))
                     .addParameter("isPrivacyProEligible", Boolean::class.asClassName().copy(nullable = true))
+                    .addParameter("entitlement", String::class.asClassName().copy(nullable = true))
                     .addParameter("minSdkVersion", Int::class.asClassName().copy(nullable = true))
                     .build(),
             )
@@ -695,6 +697,12 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                 PropertySpec
                     .builder("minSdkVersion", Int::class.asClassName().copy(nullable = true))
                     .initializer("minSdkVersion")
+                    .build(),
+            )
+            .addProperty(
+                PropertySpec
+                    .builder("entitlement", String::class.asClassName().copy(nullable = true))
+                    .initializer("entitlement")
                     .build(),
             )
             .build()

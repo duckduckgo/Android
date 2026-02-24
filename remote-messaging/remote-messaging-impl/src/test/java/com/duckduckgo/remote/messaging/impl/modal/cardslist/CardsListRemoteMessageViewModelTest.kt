@@ -23,6 +23,7 @@ import com.duckduckgo.remote.messaging.api.Action
 import com.duckduckgo.remote.messaging.api.CardItem
 import com.duckduckgo.remote.messaging.api.CardItemType
 import com.duckduckgo.remote.messaging.api.Content
+import com.duckduckgo.remote.messaging.api.Content.Placeholder
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.api.RemoteMessageModel
 import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
@@ -94,22 +95,21 @@ class CardsListRemoteMessageViewModelTest {
     @Test
     fun whenInitCalledWithValidMessageIdThenViewStateUpdatedWithCardsListContent() = runTest {
         val messageId = "message-123"
+        val cardItem = CardItem.ListItem(
+            id = "id",
+            type = CardItemType.TWO_LINE_LIST_ITEM,
+            placeholder = Placeholder.CRITICAL_UPDATE,
+            titleText = "Card 1",
+            descriptionText = "Description 1",
+            primaryAction = Action.Dismiss,
+            matchingRules = emptyList(),
+            exclusionRules = emptyList(),
+        )
         val cardsList = Content.CardsList(
             titleText = "Test Cards",
             descriptionText = "Description",
-            placeholder = Content.Placeholder.DDG_ANNOUNCE,
-            listItems = listOf(
-                CardItem.ListItem(
-                    id = "id",
-                    type = CardItemType.TWO_LINE_LIST_ITEM,
-                    placeholder = Content.Placeholder.CRITICAL_UPDATE,
-                    titleText = "Card 1",
-                    descriptionText = "Description 1",
-                    primaryAction = Action.Dismiss,
-                    matchingRules = emptyList(),
-                    exclusionRules = emptyList(),
-                ),
-            ),
+            placeholder = Placeholder.DDG_ANNOUNCE,
+            listItems = listOf(cardItem),
             primaryActionText = "Dismiss",
             primaryAction = Action.Dismiss,
         )
@@ -129,10 +129,22 @@ class CardsListRemoteMessageViewModelTest {
 
             val viewState = awaitItem()
             assertNotNull(viewState)
-            assertEquals(cardsList, viewState?.cardsLists)
-            assertEquals("Test Cards", viewState?.cardsLists?.titleText)
-            assertEquals(1, viewState?.cardsLists?.listItems?.size)
-            assertNull(viewState?.cardsListImageFilePath)
+
+            // Verify header is first item
+            val header = viewState?.modalListItems?.firstOrNull() as? ModalListItem.Header
+            assertNotNull(header)
+            assertEquals("Test Cards", header?.titleText)
+            assertEquals(Placeholder.DDG_ANNOUNCE, header?.placeholder)
+            assertNull(header?.imageFilePath)
+
+            // Verify card items
+            val cardItems = viewState?.modalListItems?.filterIsInstance<ModalListItem.CardListItem>()
+            assertEquals(1, cardItems?.size)
+            assertEquals(cardItem, cardItems?.first()?.cardItem)
+
+            // Verify action
+            assertEquals("Dismiss", viewState?.primaryActionText)
+            assertEquals(Action.Dismiss, viewState?.primaryAction)
 
             cancelAndIgnoreRemainingEvents()
         }
@@ -141,22 +153,21 @@ class CardsListRemoteMessageViewModelTest {
     @Test
     fun whenInitCalledWithValidMessageIdAndExistingImageFileThenViewStateUpdatedWithCardsListContent() = runTest {
         val messageId = "message-123"
+        val cardItem = CardItem.ListItem(
+            id = "id",
+            type = CardItemType.TWO_LINE_LIST_ITEM,
+            placeholder = Content.Placeholder.CRITICAL_UPDATE,
+            titleText = "Card 1",
+            descriptionText = "Description 1",
+            primaryAction = Action.Dismiss,
+            matchingRules = emptyList(),
+            exclusionRules = emptyList(),
+        )
         val cardsList = Content.CardsList(
             titleText = "Test Cards",
             descriptionText = "Description",
             placeholder = Content.Placeholder.DDG_ANNOUNCE,
-            listItems = listOf(
-                CardItem.ListItem(
-                    id = "id",
-                    type = CardItemType.TWO_LINE_LIST_ITEM,
-                    placeholder = Content.Placeholder.CRITICAL_UPDATE,
-                    titleText = "Card 1",
-                    descriptionText = "Description 1",
-                    primaryAction = Action.Dismiss,
-                    matchingRules = emptyList(),
-                    exclusionRules = emptyList(),
-                ),
-            ),
+            listItems = listOf(cardItem),
             primaryActionText = "Dismiss",
             primaryAction = Action.Dismiss,
         )
@@ -168,7 +179,7 @@ class CardsListRemoteMessageViewModelTest {
             surfaces = listOf(Surface.MODAL),
         )
         whenever(remoteMessagingRepository.getMessageById(eq(messageId))).thenReturn(message)
-        whenever(remoteMessagingModel.getRemoteMessageImageFile()).thenReturn("imageFile")
+        whenever(remoteMessagingModel.getRemoteMessageImageFile(Surface.MODAL)).thenReturn("imageFile")
 
         viewModel.viewState.test {
             assertNull(awaitItem()) // Initial state
@@ -177,10 +188,22 @@ class CardsListRemoteMessageViewModelTest {
 
             val viewState = awaitItem()
             assertNotNull(viewState)
-            assertEquals(cardsList, viewState?.cardsLists)
-            assertEquals("Test Cards", viewState?.cardsLists?.titleText)
-            assertEquals(1, viewState?.cardsLists?.listItems?.size)
-            assertEquals("imageFile", viewState?.cardsListImageFilePath)
+
+            // Verify header is first item with image file path
+            val header = viewState?.modalListItems?.firstOrNull() as? ModalListItem.Header
+            assertNotNull(header)
+            assertEquals("Test Cards", header?.titleText)
+            assertEquals(Placeholder.DDG_ANNOUNCE, header?.placeholder)
+            assertEquals("imageFile", header?.imageFilePath)
+
+            // Verify card items
+            val cardItems = viewState?.modalListItems?.filterIsInstance<ModalListItem.CardListItem>()
+            assertEquals(1, cardItems?.size)
+            assertEquals(cardItem, cardItems?.first()?.cardItem)
+
+            // Verify action
+            assertEquals("Dismiss", viewState?.primaryActionText)
+            assertEquals(Action.Dismiss, viewState?.primaryAction)
 
             cancelAndIgnoreRemainingEvents()
         }

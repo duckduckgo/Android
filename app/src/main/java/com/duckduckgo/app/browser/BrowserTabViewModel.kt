@@ -198,6 +198,7 @@ import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.browser.omnibar.QueryOrigin
 import com.duckduckgo.app.browser.omnibar.QueryOrigin.FromAutocomplete
+import com.duckduckgo.app.browser.pageload.PageLoadWideEvent
 import com.duckduckgo.app.browser.refreshpixels.RefreshPixelSender
 import com.duckduckgo.app.browser.santize.NonHttpAppLinkChecker
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
@@ -236,6 +237,7 @@ import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.fire.fireproofwebsite.ui.AutomaticFireproofSetting.ALWAYS
 import com.duckduckgo.app.fire.fireproofwebsite.ui.AutomaticFireproofSetting.ASK_EVERY_TIME
+import com.duckduckgo.app.fire.store.TabVisitedSitesRepository
 import com.duckduckgo.app.generalsettings.showonapplaunch.ShowOnAppLaunchOptionHandler
 import com.duckduckgo.app.global.events.db.UserEventKey
 import com.duckduckgo.app.global.events.db.UserEventsStore
@@ -307,6 +309,7 @@ import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.common.utils.baseHost
 import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.extensions.asLocationPermissionOrigin
+import com.duckduckgo.common.utils.extensions.toTldPlusOne
 import com.duckduckgo.common.utils.isMobileSite
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.common.utils.plugins.headers.CustomHeadersProvider
@@ -319,6 +322,8 @@ import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.impl.contextual.PageContextJSHelper
+import com.duckduckgo.duckchat.impl.contextual.RealPageContextJSHelper.Companion.PAGE_CONTEXT_FEATURE_NAME
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
 import com.duckduckgo.duckchat.impl.helper.NativeAction
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper.Companion.DUCK_CHAT_FEATURE_NAME
@@ -351,7 +356,9 @@ import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.savedsites.impl.SavedSitesPixelName
 import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment.DeleteBookmarkListener
 import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment.EditSavedSiteListener
+import com.duckduckgo.serp.logos.api.SerpEasterEggLogosToggles
 import com.duckduckgo.serp.logos.api.SerpLogo
+import com.duckduckgo.serp.logos.api.SerpLogos
 import com.duckduckgo.settings.api.SerpSettingsFeature
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.LocationPermissionRequest
@@ -381,6 +388,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
@@ -490,7 +498,12 @@ class BrowserTabViewModel @Inject constructor(
     private val omnibarRepository: OmnibarRepository,
     private val contentScopeScriptsSubscriptionEventPluginPoint: PluginPoint<ContentScopeScriptsSubscriptionEventPlugin>,
     private val serpSettingsFeature: SerpSettingsFeature,
+    private val pageContextJSHelper: PageContextJSHelper,
     private val syncStatusChangedObserver: SyncStatusChangedObserver,
+    private val serpEasterEggLogosToggles: SerpEasterEggLogosToggles,
+    private val serpLogos: SerpLogos,
+    private val tabVisitedSitesRepository: TabVisitedSitesRepository,
+    private val pageLoadWideEvent: PageLoadWideEvent,
 ) : ViewModel(),
     WebViewClientListener,
     EditSavedSiteListener,
@@ -576,6 +589,7 @@ class BrowserTabViewModel @Inject constructor(
         )
 
     private var autoCompleteJob = ConflatedJob()
+    private var serpLogoJob = ConflatedJob()
 
     private var site: Site? = null
         set(value) {
@@ -585,7 +599,9 @@ class BrowserTabViewModel @Inject constructor(
                 siteHttpErrorHandler.assignErrorsAndClearCache(value)
             }
         }
-    private var previousUrl: String? = null
+
+    @VisibleForTesting
+    internal var previousUrl: String? = null
     private lateinit var tabId: String
     private var webNavigationState: WebNavigationState? = null
     private var httpsUpgraded = false
@@ -595,10 +611,11 @@ class BrowserTabViewModel @Inject constructor(
     private var accessibilityObserver: Job? = null
     private var isProcessingTrackingLink = false
     private var isLinkOpenedInNewTab = false
+    private var hasExitedFixedProgress = false
     private var allowlistRefreshTriggerJob: Job? = null
     private var isCustomTabScreen: Boolean = false
     private var alreadyShownKeyboard: Boolean = false
-    private var handleAboutBlankEnabled: Boolean = false
+    private var pendingDuckChatAuthUpdate: Boolean = false
 
     private val isFullUrlEnabled = urlDisplayRepository.isFullUrlEnabled
         .stateIn(
@@ -698,6 +715,7 @@ class BrowserTabViewModel @Inject constructor(
         }
 
         observeSyncStatusChangesForDuckChat()
+        observeSubscriptionChangesForDuckChat()
 
         tabRepository.childClosedTabs
             .onEach { closedTab ->
@@ -779,6 +797,27 @@ class BrowserTabViewModel @Inject constructor(
             }.flowOn(dispatchers.main())
             .launchIn(viewModelScope)
 
+        combine(
+            serpEasterEggLogosToggles.setFavourite().enabled(),
+            serpLogos.favouriteSerpEasterEggLogoUrlFlow,
+        ) { isEnabled, favouriteUrl ->
+            isEnabled to favouriteUrl
+        }.flowOn(dispatchers.io())
+            .onEach { (isEnabled, favouriteUrl) ->
+                val currentUrl = url
+                if (currentUrl != null && duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(currentUrl)) {
+                    if (isEnabled && favouriteUrl != null) {
+                        // Favourite is set - show it
+                        omnibarViewState.value =
+                            currentOmnibarViewState().copy(serpLogo = SerpLogo.EasterEgg(logoUrl = favouriteUrl, isFavourite = true))
+                    } else if (isEnabled && favouriteUrl == null || !isEnabled) {
+                        // Favourite was cleared - show Dax (Normal logo)
+                        omnibarViewState.value = currentOmnibarViewState().copy(serpLogo = SerpLogo.Normal)
+                    }
+                }
+            }
+            .launchIn(viewModelScope)
+
         additionalDefaultBrowserPrompts.showSetAsDefaultPopupMenuItem
             .onEach {
                 browserViewState.value = currentBrowserViewState().copy(showSelectDefaultBrowserMenuItem = it)
@@ -804,10 +843,6 @@ class BrowserTabViewModel @Inject constructor(
                 }
             }.launchIn(viewModelScope)
 
-        viewModelScope.launch(dispatchers.io()) {
-            handleAboutBlankEnabled = androidBrowserConfig.handleAboutBlank().isEnabled()
-        }
-
         isFullUrlEnabled
             .onEach {
                 command.value = Command.RefreshOmnibar
@@ -831,12 +866,19 @@ class BrowserTabViewModel @Inject constructor(
         skipHome: Boolean,
         isExternal: Boolean,
     ) {
+        logcat { "loadData tabId=$tabId, initialUrl=$initialUrl, skipHome=$skipHome, isExternal=$isExternal" }
         this.tabId = tabId
         this.skipHome = skipHome
         siteLiveData = tabRepository.retrieveSiteData(tabId)
         site = siteLiveData.value
 
-        initialUrl?.let { buildSiteFactory(it, stillExternal = isExternal) }
+        initialUrl?.let {
+            // initialUrl is the previousUrl from previous session unless it's launched from an external app
+            if (androidBrowserConfig.disableTrackerAnimationOnRestart().isEnabled() && !isExternal) {
+                previousUrl = it
+            }
+            buildSiteFactory(it, stillExternal = isExternal)
+        }
     }
 
     fun setIsCustomTab(isCustomTab: Boolean) {
@@ -893,7 +935,60 @@ class BrowserTabViewModel @Inject constructor(
             .launchIn(viewModelScope)
     }
 
+    private fun observeSubscriptionChangesForDuckChat() {
+        subscriptions.getSubscriptionStatusFlow()
+            .distinctUntilChanged()
+            .onEach { _ ->
+                if (!androidBrowserConfig.refreshDuckAiOnSubscriptionChanges().isEnabled()) return@onEach
+
+                // Only send subscription auth events when viewing duck.ai
+                val currentUrl = url
+                if (currentUrl != null && duckChat.isDuckChatUrl(currentUrl.toUri())) {
+                    // Mark pending in case WebView is paused (e.g., during purchase flow)
+                    pendingDuckChatAuthUpdate = true
+                    // Try to send immediately (will work if WebView is active)
+                    withContext(dispatchers.main()) {
+                        sendDuckChatAuthUpdate()
+                    }
+                }
+            }
+            .flowOn(dispatchers.io())
+            .launchIn(viewModelScope)
+    }
+
+    private fun sendDuckChatAuthUpdate() {
+        val authUpdateEvent = SubscriptionEventData(
+            featureName = SUBSCRIPTIONS_FEATURE_NAME,
+            subscriptionName = "authUpdate",
+            params = JSONObject(),
+        )
+        _subscriptionEventDataChannel.trySend(authUpdateEvent)
+        logcat { "DuckChat-Subscription: sent authUpdate event from BrowserTabViewModel" }
+    }
+
     override fun getCurrentTabId(): String = tabId
+
+    override fun onSiteVisited(url: String, title: String?) {
+        viewModelScope.launch(dispatchers.io()) {
+            val uri = url.toUri()
+
+            if (duckPlayer.getDuckPlayerState() == ENABLED && duckPlayer.isSimulatedYoutubeNoCookie(uri)) {
+                val duckPlayerUrl = duckPlayer.createDuckPlayerUriFromYoutubeNoCookie(uri)
+                if (duckPlayerUrl != null) {
+                    history.saveToHistory(duckPlayerUrl, title, tabId)
+                }
+            } else {
+                history.saveToHistory(url, title, tabId)
+            }
+
+            if (androidBrowserConfig.singleTabFireDialog().isEnabled()) {
+                val domain = uri.host?.toTldPlusOne() ?: uri.host
+                if (domain != null) {
+                    tabVisitedSitesRepository.recordVisitedSite(tabId, domain)
+                }
+            }
+        }
+    }
 
     fun onMessageProcessed() {
         showBrowser()
@@ -1020,6 +1115,16 @@ class BrowserTabViewModel @Inject constructor(
         viewModelScope.launch {
             refreshOnViewVisible.emit(true)
         }
+
+        // Send pending auth update if returning to duck.ai after subscription change (e.g., after purchase flow)
+        // ensures we emit the event even if the WebView was paused
+        if (pendingDuckChatAuthUpdate) {
+            val currentUrl = url
+            if (currentUrl != null && duckChat.isDuckChatUrl(currentUrl.toUri())) {
+                sendDuckChatAuthUpdate()
+                pendingDuckChatAuthUpdate = false
+            }
+        }
     }
 
     fun onViewHidden() {
@@ -1117,7 +1222,7 @@ class BrowserTabViewModel @Inject constructor(
         query: String,
         queryOrigin: QueryOrigin = QueryOrigin.FromUser,
     ) {
-        logcat { "Duck.ai: onUserSubmittedQuery $query" }
+        logcat { "onUserSubmittedQuery $query" }
         navigationAwareLoginDetector.onEvent(NavigationEvent.UserAction.NewQuerySubmitted)
 
         if (query.isBlank()) {
@@ -1167,8 +1272,6 @@ class BrowserTabViewModel @Inject constructor(
 
         val verticalParameter = extractVerticalParameter(url)
         var urlToNavigate = queryUrlConverter.convertQueryToUrl(trimmedInput, verticalParameter, queryOrigin)
-
-        logcat { "Duck.ai: urlToNavigate $urlToNavigate" }
 
         when (val type = specialUrlDetector.determineType(trimmedInput)) {
             is ShouldLaunchDuckChatLink -> {
@@ -1369,11 +1472,7 @@ class BrowserTabViewModel @Inject constructor(
         if (swipingTabsFeature.isEnabled) {
             viewModelScope.launch {
                 val emptyTab = tabRepository.getTabs().firstOrNull {
-                    if (handleAboutBlankEnabled) {
-                        it.url.isNullOrBlank() && it.sourceTabId.isNullOrBlank()
-                    } else {
-                        it.url.isNullOrBlank()
-                    }
+                    it.url.isNullOrBlank() && it.sourceTabId.isNullOrBlank()
                 }?.tabId
                 if (emptyTab != null) {
                     tabRepository.select(tabId = emptyTab)
@@ -1472,7 +1571,7 @@ class BrowserTabViewModel @Inject constructor(
         navigationAwareLoginDetector.onEvent(NavigationEvent.UserAction.NavigateBack)
         val hasSourceTab = tabRepository.liveSelectedTab.value?.sourceTabId != null
 
-        if (isNavigationToEmptyUrlFromParent(hasSourceTab, isCustomTab) && handleAboutBlankEnabled) {
+        if (isNavigationToEmptyUrlFromParent(hasSourceTab, isCustomTab)) {
             viewModelScope.launch {
                 removeCurrentTabFromRepository()
             }
@@ -1599,7 +1698,7 @@ class BrowserTabViewModel @Inject constructor(
 
         when (stateChange) {
             is WebNavigationStateChange.NewPage -> {
-                logcat { "Duck.ai: WebNavigationStateChange.NewPage ${stateChange.url.toUri()}" }
+                logcat { "WebNavigationStateChange.NewPage ${stateChange.url.toUri()}" }
                 val uri = stateChange.url.toUri()
                 viewModelScope.launch(dispatchers.io()) {
                     if (duckPlayer.getDuckPlayerState() == ENABLED && duckPlayer.isSimulatedYoutubeNoCookie(uri)) {
@@ -1626,7 +1725,6 @@ class BrowserTabViewModel @Inject constructor(
 
             is WebNavigationStateChange.PageCleared -> pageCleared()
             is WebNavigationStateChange.UrlUpdated -> {
-                logcat { "Duck.ai: urlUpdated ${stateChange.url}" }
                 val uri = stateChange.url.toUri()
                 viewModelScope.launch(dispatchers.io()) {
                     if (duckPlayer.getDuckPlayerState() == ENABLED && duckPlayer.isSimulatedYoutubeNoCookie(uri)) {
@@ -1684,7 +1782,7 @@ class BrowserTabViewModel @Inject constructor(
         url: String,
         title: String?,
     ) {
-        logcat(VERBOSE) { "Duck.ai: Page changed: $url" }
+        logcat(VERBOSE) { "Page changed: $url" }
         cleanupBlobDownloadReplyProxyMaps(url)
 
         hasCtaBeenShownForCurrentPage.set(false)
@@ -1769,6 +1867,7 @@ class BrowserTabViewModel @Inject constructor(
 
         isProcessingTrackingLink = false
         isLinkOpenedInNewTab = false
+        hasExitedFixedProgress = false
 
         automaticSavedLoginsMonitor.clearAutoSavedLoginId(tabId)
     }
@@ -1830,6 +1929,9 @@ class BrowserTabViewModel @Inject constructor(
         site: Site?,
         previousUrl: String?,
     ): Boolean {
+        if (!settingsDataStore.showTrackersCountInAddressBar) {
+            return false
+        }
         val canShowTrackerAnimation = !(privacyProtectionDisabled || maliciousSiteBlocked) &&
             site?.privacyProtection() ?: PrivacyShield.UNKNOWN != PrivacyShield.UNPROTECTED
 
@@ -1910,7 +2012,7 @@ class BrowserTabViewModel @Inject constructor(
 
     private fun shouldShowLocationPermissionMessage(): Boolean {
         val url = site?.url ?: return true
-        return !duckDuckGoUrlDetector.isDuckDuckGoChatUrl(url)
+        return !duckChat.isDuckChatUrl(Uri.parse(url))
     }
 
     private fun urlUpdated(url: String) {
@@ -2007,12 +2109,20 @@ class BrowserTabViewModel @Inject constructor(
         val isLoading = newProgress < 100 || isProcessingTrackingLink
         val progress = currentLoadingViewState()
         if (progress.progress == newProgress) return
+
         val visualProgress =
             if (newProgress < FIXED_PROGRESS || isProcessingTrackingLink) {
                 FIXED_PROGRESS
             } else {
                 newProgress
             }
+
+        // Track the first time we escape from fixed progress for Wide Events
+        val currentUrl = webViewNavigationState.currentUrl
+        if (!hasExitedFixedProgress && currentUrl != null && newProgress > FIXED_PROGRESS) {
+            hasExitedFixedProgress = true
+            pageLoadWideEvent.onProgressChanged(tabId, currentUrl)
+        }
 
         loadingViewState.value = progress.copy(isLoading = isLoading, progress = visualProgress, url = site?.url ?: "")
 
@@ -2032,24 +2142,37 @@ class BrowserTabViewModel @Inject constructor(
             url?.let { prefetchFavicon(url) }
 
             evaluateDuckAIPage(url)
-            evaluateSerpLogoState(url)
+            serpLogoJob += viewModelScope.launch {
+                evaluateSerpLogoState(url)
+            }
         }
     }
 
-    private fun evaluateSerpLogoState(url: String?) {
+    private suspend fun evaluateSerpLogoState(url: String?) {
         if (url != null && duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
-            command.value = ExtractSerpLogo(url)
+            val isSetFavouriteEnabled = serpEasterEggLogosToggles.setFavourite().isEnabled()
+            val favouriteLogoUrl = serpLogos.favouriteSerpEasterEggLogoUrlFlow.firstOrNull()
+
+            // Don't extract logo if favourite feature is enabled AND a favourite is set
+            if (isSetFavouriteEnabled && favouriteLogoUrl != null) {
+                omnibarViewState.value = currentOmnibarViewState().copy(
+                    serpLogo = SerpLogo.EasterEgg(
+                        logoUrl = favouriteLogoUrl,
+                        isFavourite = true,
+                    ),
+                )
+            } else {
+                command.value = ExtractSerpLogo(url)
+            }
         } else {
             omnibarViewState.value = currentOmnibarViewState().copy(serpLogo = null)
         }
     }
 
     private fun evaluateDuckAIPage(url: String?) {
-        logcat { "Duck.ai: evaluateDuckAIPage $url" }
         url?.let {
             if (duckAiFeatureState.showFullScreenMode.value) {
-                if (duckDuckGoUrlDetector.isDuckDuckGoChatUrl(it)) {
-                    logcat { "Duck.ai: AI Chat page loaded $it" }
+                if (duckChat.isDuckChatUrl(Uri.parse(it))) {
                     command.value = Command.EnableDuckAIFullScreen(currentBrowserViewState())
                 } else {
                     command.value = Command.DisableDuckAIFullScreen(url)
@@ -3276,10 +3399,12 @@ class BrowserTabViewModel @Inject constructor(
             is Omnibar.ViewMode.DuckAI -> {
                 pixel.fire(DuckChatPixelName.DUCK_CHAT_TAB_SWITCHER_OPENED)
             }
+
             is Omnibar.ViewMode.NewTab -> {
                 val params = mapOf(PixelParameter.FROM_FOCUSED_NTP to hasFocus.toString())
                 pixel.fire(AppPixelName.TAB_MANAGER_OPENED_FROM_NEW_TAB, parameters = params)
             }
+
             else -> {
                 val url = site?.url
                 if (url != null) {
@@ -3859,7 +3984,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun handleNewTabIfEmptyUrl() {
-        val shouldDisplayAboutBlank = handleAboutBlankEnabled && webNavigationState == null
+        val shouldDisplayAboutBlank = webNavigationState == null
         if (shouldDisplayAboutBlank) {
             if (isCustomTabScreen) {
                 handleNewTabForEmptyUrlOnCustomTab()
@@ -3867,6 +3992,15 @@ class BrowserTabViewModel @Inject constructor(
             omnibarViewState.value = currentOmnibarViewState().copy(
                 omnibarText = ABOUT_BLANK,
             )
+            site = siteFactory.buildSite(
+                url = "",
+                tabId = tabId,
+                title = ABOUT_BLANK,
+                httpUpgraded = httpsUpgraded,
+            )
+            viewModelScope.launch(dispatchers.io()) {
+                tabRepository.update(tabId, site)
+            }
         }
     }
 
@@ -4029,8 +4163,12 @@ class BrowserTabViewModel @Inject constructor(
 
             DUCK_CHAT_FEATURE_NAME -> {
                 viewModelScope.launch(dispatchers.io()) {
-                    val response = duckChatJSHelper.processJsCallbackMessage(featureName, method, id, data)
-                    logcat { "Duck.ai: btf response $response" }
+                    val response = duckChatJSHelper.processJsCallbackMessage(
+                        featureName,
+                        method,
+                        id,
+                        data,
+                    )
                     withContext(dispatchers.main()) {
                         response?.let {
                             command.value = SendResponseToJs(it)
@@ -4045,6 +4183,17 @@ class BrowserTabViewModel @Inject constructor(
                     withContext(dispatchers.main()) {
                         response?.let {
                             command.value = SendResponseToJs(it)
+                        }
+                    }
+                }
+            }
+
+            PAGE_CONTEXT_FEATURE_NAME -> {
+                viewModelScope.launch(dispatchers.io()) {
+                    val pageContext = pageContextJSHelper.processPageContext(featureName, method, data, tabId)
+                    if (pageContext != null) {
+                        withContext(dispatchers.main()) {
+                            command.value = Command.PageContextReceived(tabId, pageContext)
                         }
                     }
                 }
@@ -4559,7 +4708,17 @@ class BrowserTabViewModel @Inject constructor(
 
         when {
             duckAiFeatureState.showContextualMode.value && !isNtp -> {
-                command.value = Command.ShowDuckAIContextualMode
+                viewModelScope.launch {
+                    if (duckChat.isContextualOnboardingCompleted()) {
+                        command.value = Command.ShowDuckAIContextualMode(tabId)
+                        viewModelScope.launch {
+                            val subscriptionEvent = pageContextJSHelper.onContextualOpened()
+                            _subscriptionEventDataChannel.send(subscriptionEvent)
+                        }
+                    } else {
+                        command.value = Command.ShowDuckAIContextualOnboarding
+                    }
+                }
             }
 
             duckAiFeatureState.showFullScreenMode.value -> {
@@ -4582,15 +4741,15 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onVpnMenuClicked() {
-        when (currentBrowserViewState().vpnMenuState) {
-            is VpnMenuState.Subscribed -> {
-                command.value = LaunchVpnManagement
-            }
-
-            VpnMenuState.Hidden -> {} // Should not happen as menu item should not be visible
-            else -> {
+        val state = currentBrowserViewState().vpnMenuState
+        when (state) {
+            VpnMenuState.NotSubscribed, VpnMenuState.NotSubscribedNoPill ->
                 command.value = LaunchPrivacyPro("https://duckduckgo.com/pro?origin=funnel_appmenu_android".toUri())
-            }
+            is VpnMenuState.Subscribed -> command.value = LaunchVpnManagement
+            VpnMenuState.Hidden -> {} // Menu item not visible
+        }
+        if (state != VpnMenuState.Hidden) {
+            pixel.fire(AppPixelName.MENU_ACTION_VPN_PRESSED, mapOf(PixelParameter.STATUS to state.pixelParam))
         }
     }
 

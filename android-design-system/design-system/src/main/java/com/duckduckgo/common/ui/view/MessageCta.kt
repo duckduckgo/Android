@@ -88,6 +88,13 @@ class MessageCta : FrameLayout {
         }
     }
 
+    fun disableStateSaving() {
+        binding.remoteMessage.actionButton.isSaveEnabled = false
+        binding.remoteMessage.primaryActionButton.isSaveEnabled = false
+        binding.remoteMessage.secondaryActionButton.isSaveEnabled = false
+        binding.promoRemoteMessage.actionButton.isSaveEnabled = false
+    }
+
     private fun setRemoteMessage(message: Message) {
         binding.remoteMessage.root.show()
         binding.promoRemoteMessage.root.gone()

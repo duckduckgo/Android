@@ -3,7 +3,7 @@
         "description": "Fired when an opt-out submission succeeds.",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["other"],
-        "suffixes": ["form_factor"],
+        "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
             "appVersion",
             {
@@ -48,7 +48,7 @@
         "description": "Fired when an opt-out attempt fails.",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["other"],
-        "suffixes": ["form_factor"],
+        "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
             "appVersion",
             {
@@ -124,7 +124,7 @@
         "description": "Pixel that contains a broker's opt-out 24h submission success rate.",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["other"],
-        "suffixes": ["form_factor"],
+        "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
             "appVersion",
             {
@@ -143,7 +143,7 @@
         "description": "Pixel that contains if any submitted opt-out has been confirmed 7 days after submission.",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["other"],
-        "suffixes": ["form_factor"],
+        "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
             "appVersion",
             {
@@ -157,7 +157,7 @@
         "description": "Pixel that contains if any submitted opt-out are still unconfirmed 7 days after submission.",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["other"],
-        "suffixes": ["form_factor"],
+        "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
             "appVersion",
             {
@@ -171,7 +171,7 @@
         "description": "Pixel that contains if any submitted opt-out has been confirmed 14 days after submission.",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["other"],
-        "suffixes": ["form_factor"],
+        "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
             "appVersion",
             {
@@ -185,7 +185,7 @@
         "description": "Pixel that contains if any submitted opt-out are still unconfirmed 14 days after submission.",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["other"],
-        "suffixes": ["form_factor"],
+        "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
             "appVersion",
             {
@@ -199,7 +199,7 @@
         "description": "Pixel that contains if any submitted opt-out has been confirmed 21 days after submission.",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["other"],
-        "suffixes": ["form_factor"],
+        "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
             "appVersion",
             {
@@ -213,7 +213,7 @@
         "description": "Pixel that contains if any submitted opt-out are still unconfirmed 21 days after submission.",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["other"],
-        "suffixes": ["form_factor"],
+        "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
             "appVersion",
             {
@@ -227,7 +227,7 @@
         "description": "Pixel that contains if any submitted opt-out has been confirmed 42 days after submission.",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["other"],
-        "suffixes": ["form_factor"],
+        "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
             "appVersion",
             {
@@ -241,7 +241,7 @@
         "description": "Pixel that contains if any submitted opt-out are still unconfirmed 42 days after submission.",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["other"],
-        "suffixes": ["form_factor"],
+        "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
             "appVersion",
             {
@@ -255,28 +255,28 @@
         "description": "Pixel for PIR daily active users.",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["other"],
-        "suffixes": ["form_factor"],
+        "suffixes": ["daily_count_short", "form_factor"],
         "parameters": ["appVersion"]
     },
     "m_dbp_engagement_wau": {
         "description": "Pixel for PIR weekly active users.",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["other"],
-        "suffixes": ["form_factor"],
+        "suffixes": ["daily_count_short", "form_factor"],
         "parameters": ["appVersion"]
     },
     "m_dbp_engagement_mau": {
         "description": "Pixel for PIR monthly active users.",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["other"],
-        "suffixes": ["form_factor"],
+        "suffixes": ["daily_count_short", "form_factor"],
         "parameters": ["appVersion"]
     },
     "m_dbp_weekly_child-broker_orphaned-optouts": {
         "description": "Pixel to know orphaned opt-out records on child data brokers that don't have matching profiles on their parent broker.",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["other"],
-        "suffixes": ["form_factor"],
+        "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
             "appVersion",
             {
@@ -300,7 +300,7 @@
         "description": "Pixel emitted when scan is started for a broker",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["other"],
-        "suffixes": ["form_factor"],
+        "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
             "appVersion",
             {
@@ -314,7 +314,7 @@
         "description": "Pixel emitted for every stage of a scan for a broker x profile.",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["other"],
-        "suffixes": ["form_factor"],
+        "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
             "appVersion",
             {
@@ -364,7 +364,7 @@
         "description": "Pixel emitted when the scan is completed with results.",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["other"],
-        "suffixes": ["form_factor"],
+        "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
             "appVersion",
             {
@@ -409,7 +409,7 @@
         "description": "Pixel for PIR monthly active users.",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["other"],
-        "suffixes": ["form_factor"],
+        "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
             "appVersion",
             {
@@ -475,7 +475,7 @@
         "description": "Pixel for PIR monthly active users.",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["other"],
-        "suffixes": ["form_factor"],
+        "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
             "appVersion",
             {
@@ -551,7 +551,7 @@
         "description": "Fired at the start stage of an opt-out attempt.",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["other"],
-        "suffixes": ["form_factor"],
+        "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
             "appVersion",
             {
@@ -570,7 +570,7 @@
         "description": "Fired at the email generation stage of an opt-out attempt.",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["other"],
-        "suffixes": ["form_factor"],
+        "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
             "appVersion",
             {
@@ -609,7 +609,7 @@
         "description": "Fired at the captcha parse stage of an opt-out attempt.",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["other"],
-        "suffixes": ["form_factor"],
+        "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
             "appVersion",
             {
@@ -648,7 +648,7 @@
         "description": "Fired at the captcha send stage of an opt-out attempt.",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["other"],
-        "suffixes": ["form_factor"],
+        "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
             "appVersion",
             {
@@ -687,7 +687,7 @@
         "description": "Fired at the captcha solve stage of an opt-out attempt.",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["other"],
-        "suffixes": ["form_factor"],
+        "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
             "appVersion",
             {
@@ -726,7 +726,7 @@
         "description": "Fired at the submit stage of an opt-out attempt.",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["other"],
-        "suffixes": ["form_factor"],
+        "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
             "appVersion",
             {
@@ -765,7 +765,7 @@
         "description": "Fired when DBP runs a condition action and its expectation is met",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["other"],
-        "suffixes": ["form_factor"],
+        "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
             "appVersion",
             {
@@ -804,7 +804,7 @@
         "description": "Fired when PIR runs a condition action and its expectation is not met",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["other"],
-        "suffixes": ["form_factor"],
+        "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
             "appVersion",
             {
@@ -843,7 +843,7 @@
         "description": "Fired at the validation stage of an opt-out attempt.",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["other"],
-        "suffixes": ["form_factor"],
+        "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
             "appVersion",
             {
@@ -882,7 +882,7 @@
         "description": "Fired at the fill-form stage of an opt-out attempt.",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["other"],
-        "suffixes": ["form_factor"],
+        "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
             "appVersion",
             {
@@ -921,7 +921,7 @@
         "description": "Fired at the finish stage of an opt-out attempt.",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["other"],
-        "suffixes": ["form_factor"],
+        "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
             "appVersion",
             {
@@ -945,7 +945,7 @@
         "description": "Fired when a data broker JSON is updated successfuly.",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["other"],
-        "suffixes": ["form_factor"],
+        "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
             "appVersion",
             {
@@ -964,7 +964,7 @@
         "description": "Fired when a data broker JSON update has failed.",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["other"],
-        "suffixes": ["form_factor"],
+        "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
             "appVersion",
             {
@@ -983,7 +983,7 @@
         "description": "Android specific pixel which is fired when downloading the main config failed due to a BE error.",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["other"],
-        "suffixes": ["form_factor"],
+        "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
             "appVersion",
             {
@@ -997,14 +997,14 @@
         "description": "Android specific pixel which is fired when downloading the main config failed.",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["other"],
-        "suffixes": ["form_factor"],
+        "suffixes": ["daily_count_short", "form_factor"],
         "parameters": ["appVersion"]
     },
     "m_dbp_data_broker_action-failed_error": {
         "description": "Fired when a scan or opt-out action fails while processing a data broker.",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["other"],
-        "suffixes": ["form_factor"],
+        "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
             "appVersion",
             {
@@ -1044,14 +1044,14 @@
         "description": "Android specific pixel which is fired when the PIR dashboard is opened",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["other"],
-        "suffixes": ["form_factor"],
+        "suffixes": ["daily_count_short", "form_factor"],
         "parameters": ["appVersion"]
     },
     "m_dbp_initial_scan_duration": {
         "description": "Fired when the initial scan for all brokers and profile combination are completed.",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["other"],
-        "suffixes": ["form_factor"],
+        "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
             "appVersion",
             {
@@ -1066,15 +1066,22 @@
             }
         ]
     },
+    "m_dbp_initial-scan_incomplete": {
+        "description": "Fired when the PIR dashboard detects an incomplete initial scan that could be resumed (scan was interrupted with remaining brokers).",
+        "owners": ["karlenDimla", "landomen"],
+        "triggers": ["other"],
+        "suffixes": ["daily_count_short", "form_factor"],
+        "parameters": ["appVersion"]
+    },
     "m_dbp_foreground-run_started": {
         "description": "Fired when pir run is started in the foreground",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["other"],
-        "suffixes": ["form_factor"],
+        "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
             "appVersion",
             {
-                "key": "man",
+                "key": "manufacturer",
                 "description": "Manufacturer of the device",
                 "type": "string"
             }
@@ -1084,7 +1091,7 @@
         "description": "Fired when pir run is completed in the foreground",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["other"],
-        "suffixes": ["form_factor"],
+        "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
             "appVersion",
             {
@@ -1093,7 +1100,35 @@
                 "type": "string"
             },
             {
-                "key": "man",
+                "key": "manufacturer",
+                "description": "Manufacturer of the device",
+                "type": "string"
+            }
+        ]
+    },
+    "m_dbp_foreground-run_start-failed": {
+        "description": "Fired when pir foreground service fails to start as foreground",
+        "owners": ["karlenDimla", "landomen"],
+        "triggers": ["other"],
+        "suffixes": ["daily_count_short", "form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "manufacturer",
+                "description": "Manufacturer of the device",
+                "type": "string"
+            }
+        ]
+    },
+    "m_dbp_foreground-run_low-memory": {
+        "description": "Fired when pir foreground service is running low on memory",
+        "owners": ["karlenDimla", "landomen"],
+        "triggers": ["other"],
+        "suffixes": ["daily_count_short", "form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "manufacturer",
                 "description": "Manufacturer of the device",
                 "type": "string"
             }
@@ -1103,18 +1138,18 @@
         "description": "Fired when the pir scheduled runs are scheduled",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["other"],
-        "suffixes": ["form_factor"],
+        "suffixes": ["daily_count_short", "form_factor"],
         "parameters": ["appVersion"]
     },
     "m_dbp_scheduled-run_started": {
         "description": "Fired when the pir scheduled run is started",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["other"],
-        "suffixes": ["form_factor"],
+        "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
             "appVersion",
             {
-                "key": "man",
+                "key": "manufacturer",
                 "description": "Manufacturer of the device",
                 "type": "string"
             }
@@ -1124,7 +1159,7 @@
         "description": "Fired when the pir scheduled run is completed",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["other"],
-        "suffixes": ["form_factor"],
+        "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
             "appVersion",
             {
@@ -1133,7 +1168,7 @@
                 "type": "string"
             },
             {
-                "key": "man",
+                "key": "manufacturer",
                 "description": "Manufacturer of the device",
                 "type": "string"
             }
@@ -1143,7 +1178,7 @@
         "description": "Fired when the CPU Usage threshold has been reached while executing PIR related work.",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["other"],
-        "suffixes": ["form_factor"],
+        "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
             "appVersion",
             {
@@ -1157,7 +1192,7 @@
         "description": "Fired when the client persists a confirmation link provided by the backend",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["other"],
-        "suffixes": ["form_factor"],
+        "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
             "appVersion",
             {
@@ -1181,7 +1216,7 @@
         "description": "Fired when the backend returns an unknown/error status while polling email data",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["other"],
-        "suffixes": ["form_factor"],
+        "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
             "appVersion",
             {
@@ -1212,7 +1247,7 @@
         "description": "Fired when the opt-out form is submitted and the operation is awaiting email confirmation",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["other"],
-        "suffixes": ["form_factor"],
+        "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
             "appVersion",
             {
@@ -1246,7 +1281,7 @@
         "description": "Fired when an email confirmation attempt is starting",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["other"],
-        "suffixes": ["form_factor"],
+        "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
             "appVersion",
             {
@@ -1275,7 +1310,7 @@
         "description": "Fired when an email confirmation attempt succeeds",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["other"],
-        "suffixes": ["form_factor"],
+        "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
             "appVersion",
             {
@@ -1309,7 +1344,7 @@
         "description": "Fired when an email confirmation attempt fails (non-final).",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["other"],
-        "suffixes": ["form_factor"],
+        "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
             "appVersion",
             {
@@ -1343,7 +1378,7 @@
         "description": "Fired when the email confirmation job hits the maximum number of retries (final failure).",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["other"],
-        "suffixes": ["form_factor"],
+        "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
             "appVersion",
             {
@@ -1367,7 +1402,7 @@
         "description": "Fired when the email confirmation job finishes successfully (after any number of attempts).",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["other"],
-        "suffixes": ["form_factor"],
+        "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
             "appVersion",
             {
@@ -1386,11 +1421,11 @@
         "description": "Android specific pixel which is fired when the email confirmation job starts",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["other"],
-        "suffixes": ["form_factor"],
+        "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
             "appVersion",
             {
-                "key": "man",
+                "key": "manufacturer",
                 "description": "Manufacturer of the device",
                 "type": "string"
             }
@@ -1400,7 +1435,7 @@
         "description": "Android specific pixel which is fired when the email confirmation job completes",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["other"],
-        "suffixes": ["form_factor"],
+        "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
             "appVersion",
             {
@@ -1419,7 +1454,7 @@
                 "type": "number"
             },
             {
-                "key": "man",
+                "key": "manufacturer",
                 "description": "Manufacturer of the device",
                 "type": "string"
             }
@@ -1429,14 +1464,14 @@
         "description": "Android specific pixel which is fired when we detect that the secure storage is unavailable",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["other"],
-        "suffixes": ["form_factor"],
+        "suffixes": ["daily_count_short", "form_factor"],
         "parameters": ["appVersion"]
     },
     "m_dbp_background-run_stats": {
         "description": "Android specific pixel fired once daily to report if expected runs have occurred within the expected threshold",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["other"],
-        "suffixes": ["form_factor"],
+        "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
             "appVersion",
             {
@@ -1450,7 +1485,7 @@
         "description": "Android specific pixel fired whenever an invalid event occurs during scan processing",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["other"],
-        "suffixes": ["form_factor"],
+        "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
             "appVersion",
             {
@@ -1469,7 +1504,7 @@
         "description": "Android specific pixel fired whenever an invalid even occurs during optout processing",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["other"],
-        "suffixes": ["form_factor"],
+        "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
             "appVersion",
             {

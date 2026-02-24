@@ -18,41 +18,15 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Set up JDK version
-        uses: actions/setup-java@v4
+      - name: Assemble APKs
+        id: assemble
+        uses: ./.github/actions/checkout-and-assemble
         with:
-          java-version-file: .github/.java-version
-          distribution: 'adopt'
-
-      - name: Create folder
-        if: always()
-        run: mkdir apk
-
-      - name: Decode keys
-        uses: davidSchuppa/base64Secret-toFile-action@v2
-        with:
-          secret: ${{ secrets.FAKE_RELEASE_PROPERTIES }}
-          fileName: ddg_android_build.properties
-          destination-path: $HOME/jenkins_static/com.duckduckgo.mobile.android/
-
-      - name: Decode key file
-        uses: davidSchuppa/base64Secret-toFile-action@v2
-        with:
-          secret: ${{ secrets.FAKE_RELEASE_KEY }}
-          fileName: android
-          destination-path: $HOME/jenkins_static/com.duckduckgo.mobile.android/
-
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v5
-        with:
-          cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
-
-      - name: Assemble internal release APK
-        run: ./gradlew assembleInternalRelease -Pforce-default-variant -Pskip-onboarding
-
-      - name: Move APK to new folder
-        if: always()
-        run: find . -name "*internal-release*.apk" -exec mv '{}' apk/internal.apk \;
+          flavours: 'internal'
+          release_properties: ${{ secrets.FAKE_RELEASE_PROPERTIES }}
+          release_key: ${{ secrets.FAKE_RELEASE_KEY }}
+          gradle_encryption_key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
+          develocity_access_key: ${{ secrets.DEVELOCITY_ACCESS_KEY }}
 
       - name: Run Security Internal Maestro Tests
         id: maestro-cloud-asana
@@ -63,7 +37,7 @@ jobs:
           maestro_project_id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
           maestro_test_name: internalSecurityTest_${{ github.sha }}
           maestro_timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
-          maestro_app_file: apk/internal.apk
+          maestro_app_file: ${{ steps.assemble.outputs.internal_apk_path }}
           maestro_include_tags: securityTestInternal
           test_suite_name: Security Internal
           maestro_api_level: 30

@@ -152,8 +152,8 @@
     <string name="feedbackSubCategoryItrAdvisorUnhelpful">Разговорът с консултанта не беше полезен</string>
     <string name="feedbackSubCategoryItrOther">Други</string>
 
-    <string name="feedbackSubCategorySubsOtp">Еднократна парола</string>
-    <string name="feedbackSubCategorySubsOther">Други</string>
+    <string name="feedbackSubCategorySubsOtp">Проблем с еднократна парола</string>
+    <string name="feedbackSubCategorySubsOther">Нещо друго</string>
 
     <string name="feedbackSubmitVpnHeader">Попаднахте на проблем, който не е разгледан в нашия <annotation type="faqs_link">помощен център</annotation>? Определено искаме да научим за него.</string>
     <string name="feedbackSubmitVpnDescriptionHint">Кажете ни какъв е проблемът...</string>

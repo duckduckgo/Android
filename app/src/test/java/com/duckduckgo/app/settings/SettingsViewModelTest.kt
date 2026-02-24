@@ -28,6 +28,7 @@ import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchDataClearingS
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchFireButtonScreen
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchWhatsNew
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
@@ -57,6 +58,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -369,6 +371,24 @@ class SettingsViewModelTest {
     }
 
     @Test
+    fun `when new desktop browser setting disabled then don't show new desktop browser setting `() = runTest {
+        fakeSettingsPageFeature.newDesktopBrowserSettingEnabled().setRawStoredState(State(false))
+
+        testee.start()
+
+        assertFalse(testee.viewState().first().showGetDesktopBrowser)
+    }
+
+    @Test
+    fun `when new desktop browser setting enabled then show new desktop browser setting `() = runTest {
+        fakeSettingsPageFeature.newDesktopBrowserSettingEnabled().setRawStoredState(State(true))
+
+        testee.start()
+
+        assertTrue(testee.viewState().first().showGetDesktopBrowser)
+    }
+
+    @Test
     fun `when whats new clicked and message id is null then no command is sent`() = runTest {
         whenever(modalSurfaceStoreMock.getLastShownRemoteMessageId()).thenReturn(null)
         whenever(modalSurfaceStoreMock.getLastShownRemoteMessageType()).thenReturn(MessageType.MEDIUM)
@@ -390,5 +410,38 @@ class SettingsViewModelTest {
 
             expectNoEvents()
         }
+    }
+
+    @Test
+    fun `when what new clicked and message id and type exist then pixel event is fired`() = runTest {
+        val messageId = "test-message-id"
+        val messageType = MessageType.MEDIUM
+        whenever(modalSurfaceStoreMock.getLastShownRemoteMessageId()).thenReturn(messageId)
+        whenever(modalSurfaceStoreMock.getLastShownRemoteMessageType()).thenReturn(messageType)
+
+        testee.onWhatsNewClicked()
+
+        verify(pixelMock).fire(AppPixelName.SETTINGS_WHATS_NEW_PRESSED)
+    }
+
+    @Test
+    fun `when get desktop browser clicked then launch get desktop browser command is sent`() = runTest {
+        testee.commands().test {
+            testee.onGetDesktopBrowserClicked()
+
+            assertEquals(SettingsViewModel.Command.LaunchGetDesktopBrowser, awaitItem())
+        }
+    }
+
+    @Test
+    fun `when get desktop browser clicked then pixel is fired`() = runTest {
+        testee.onGetDesktopBrowserClicked()
+
+        verify(pixelMock).fire(
+            eq(AppPixelName.GET_DESKTOP_BROWSER_CLICKED),
+            eq(mapOf("source" to "settings")),
+            eq(emptyMap()),
+            eq(Count),
+        )
     }
 }

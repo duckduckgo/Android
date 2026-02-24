@@ -517,8 +517,10 @@ platform :android do
        lane :"hotfix-finish" do
             ensure_git_status_clean
             ensure_git_branch( branch: '^hotfix/*' )
-
             version = property_file_read(file: "app/version/version.properties")["VERSION"]
+            sh('git checkout main && git pull')
+            sh('git checkout develop && git pull')
+            sh("git checkout hotfix/#{version}")
             sh("git flow hotfix finish -m '#{version}' '#{version}'")
 
             sh "git push origin #{version}"

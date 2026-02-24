@@ -275,6 +275,35 @@
                 app:showSwitch="true" />
 
             <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+                android:id="@+id/trackersAnimationSectionDivider"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="0dp" />
+
+            <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+                android:id="@+id/trackersAnimationSettingsTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="@string/settingsTrackersBlockedAnimationHeaderTitle" />
+
+            <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+                android:id="@+id/showTrackersCountInAddressBar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="@string/showTrackerCountInAddressBar"
+                app:primaryTextTruncated="false"
+                app:showSwitch="true" />
+
+
+            <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+                android:id="@+id/showTrackersCountInTabSwitcher"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="@string/showWeeklyTrackerCountInTabSwitcher"
+                app:primaryTextTruncated="false"
+                app:showSwitch="true" />
+
+            <com.duckduckgo.common.ui.view.divider.HorizontalDivider
                 android:id="@+id/bottomSheetMenuSettingDivider"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -290,21 +319,9 @@
                 app:showSwitch="true"
                 tools:visibility="visible" />
 
-            <com.duckduckgo.common.ui.view.divider.HorizontalDivider
-                android:id="@+id/trackersAnimationSettingDivider"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingBottom="0dp" />
-
-            <com.duckduckgo.common.ui.view.listitem.OneLineListItem
-                android:id="@+id/showTrackersCountInTabSwitcher"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:primaryText="@string/showTrackerCountInTabSwitcher"
-                app:primaryTextTruncated="false"
-                app:showSwitch="true" />
-
         </LinearLayout>
 
     </ScrollView>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+

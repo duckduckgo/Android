@@ -2,6 +2,94 @@
 <issues format="6" by="lint 8.8.2" type="baseline" client="gradle" dependencies="false" name="AGP (8.7.3)" variant="all" version="8.8.2">
 
     <issue
+        id="NoLifecycleScopeInFragment"
+        message="Use viewLifecycleOwner.lifecycleScope instead of lifecycleScope in Fragments. Fragment views can be destroyed while the fragment is still alive (backstack, ViewPager), which can cause crashes when coroutines try to update destroyed views."
+        errorLine1="            .launchIn(lifecycleScope)"
+        errorLine2="                      ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/sync/impl/ui/setup/SaveRecoveryCodeFragment.kt"
+            line="111"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="NoLifecycleScopeInFragment"
+        message="Use viewLifecycleOwner.lifecycleScope instead of lifecycleScope in Fragments. Fragment views can be destroyed while the fragment is still alive (backstack, ViewPager), which can cause crashes when coroutines try to update destroyed views."
+        errorLine1="            .launchIn(lifecycleScope)"
+        errorLine2="                      ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/sync/impl/ui/setup/SaveRecoveryCodeFragment.kt"
+            line="117"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="NoLifecycleScopeInFragment"
+        message="Use viewLifecycleOwner.lifecycleScope instead of lifecycleScope in Fragments. Fragment views can be destroyed while the fragment is still alive (backstack, ViewPager), which can cause crashes when coroutines try to update destroyed views."
+        errorLine1="            .launchIn(lifecycleScope)"
+        errorLine2="                      ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/sync/impl/ui/setup/SyncCreateAccountFragment.kt"
+            line="77"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="NoLifecycleScopeInFragment"
+        message="Use viewLifecycleOwner.lifecycleScope instead of lifecycleScope in Fragments. Fragment views can be destroyed while the fragment is still alive (backstack, ViewPager), which can cause crashes when coroutines try to update destroyed views."
+        errorLine1="            .launchIn(lifecycleScope)"
+        errorLine2="                      ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/sync/impl/ui/setup/SyncCreateAccountFragment.kt"
+            line="83"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="NoLifecycleScopeInFragment"
+        message="Use viewLifecycleOwner.lifecycleScope instead of lifecycleScope in Fragments. Fragment views can be destroyed while the fragment is still alive (backstack, ViewPager), which can cause crashes when coroutines try to update destroyed views."
+        errorLine1="            .launchIn(lifecycleScope)"
+        errorLine2="                      ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/sync/impl/ui/setup/SyncDeviceConnectedFragment.kt"
+            line="68"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="NoLifecycleScopeInFragment"
+        message="Use viewLifecycleOwner.lifecycleScope instead of lifecycleScope in Fragments. Fragment views can be destroyed while the fragment is still alive (backstack, ViewPager), which can cause crashes when coroutines try to update destroyed views."
+        errorLine1="            .launchIn(lifecycleScope)"
+        errorLine2="                      ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/sync/impl/ui/setup/SyncSetupDeepLinkFragment.kt"
+            line="97"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="NoLifecycleScopeInFragment"
+        message="Use viewLifecycleOwner.lifecycleScope instead of lifecycleScope in Fragments. Fragment views can be destroyed while the fragment is still alive (backstack, ViewPager), which can cause crashes when coroutines try to update destroyed views."
+        errorLine1="            .launchIn(lifecycleScope)"
+        errorLine2="                      ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/sync/impl/ui/setup/SyncSetupIntroFragment.kt"
+            line="83"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="NoLifecycleScopeInFragment"
+        message="Use viewLifecycleOwner.lifecycleScope instead of lifecycleScope in Fragments. Fragment views can be destroyed while the fragment is still alive (backstack, ViewPager), which can cause crashes when coroutines try to update destroyed views."
+        errorLine1="            .launchIn(lifecycleScope)"
+        errorLine2="                      ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/sync/impl/ui/setup/SyncSetupIntroFragment.kt"
+            line="89"
+            column="23"/>
+    </issue>
+
+    <issue
         id="DefaultLocale"
         message="Implicitly using the default locale is a common source of bugs: Use `String.format(Locale, ...)` instead"
         errorLine1="                onResult(Error(String.format(&quot;(%d) %s&quot;, errorCode, errString)))"
@@ -162,7 +250,7 @@
         errorLine2="                             ~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/sync/impl/SyncFeatureToggle.kt"
-            line="121"
+            line="134"
             column="30"/>
     </issue>
 
@@ -184,7 +272,7 @@
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/sync/impl/promotion/SyncPromotionsImplTest.kt"
-            line="76"
+            line="82"
             column="9"/>
     </issue>
 
@@ -195,7 +283,7 @@
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/sync/impl/promotion/SyncPromotionsImplTest.kt"
-            line="88"
+            line="94"
             column="9"/>
     </issue>
 
@@ -206,7 +294,7 @@
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/sync/impl/promotion/SyncPromotionsImplTest.kt"
-            line="140"
+            line="158"
             column="9"/>
     </issue>
 
@@ -217,7 +305,7 @@
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/sync/impl/promotion/SyncPromotionsImplTest.kt"
-            line="141"
+            line="159"
             column="9"/>
     </issue>
 
@@ -228,173 +316,8 @@
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/sync/impl/promotion/SyncPromotionsImplTest.kt"
-            line="142"
+            line="160"
             column="9"/>
-    </issue>
-
-    <issue
-        id="DenyListedApi"
-        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="        syncFeature.self().setRawStoredState(State(enable = true))"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/test/java/com/duckduckgo/sync/impl/SyncRemoteFeatureToggleTest.kt"
-            line="62"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="DenyListedApi"
-        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="        syncFeature.self().setRawStoredState(State(enable = false))"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/test/java/com/duckduckgo/sync/impl/SyncRemoteFeatureToggleTest.kt"
-            line="68"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="DenyListedApi"
-        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="        syncFeature.self().setRawStoredState(State(enable = false))"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/test/java/com/duckduckgo/sync/impl/SyncRemoteFeatureToggleTest.kt"
-            line="77"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="DenyListedApi"
-        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="        syncFeature.level0ShowSync().setRawStoredState(State(enable = false))"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/test/java/com/duckduckgo/sync/impl/SyncRemoteFeatureToggleTest.kt"
-            line="85"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="DenyListedApi"
-        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="        syncFeature.level1AllowDataSyncing().setRawStoredState(State(enable = false))"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/test/java/com/duckduckgo/sync/impl/SyncRemoteFeatureToggleTest.kt"
-            line="95"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="DenyListedApi"
-        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="        syncFeature.level1AllowDataSyncing().setRawStoredState(State(enable = true, minSupportedVersion = 2))"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/test/java/com/duckduckgo/sync/impl/SyncRemoteFeatureToggleTest.kt"
-            line="104"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="DenyListedApi"
-        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="        syncFeature.level1AllowDataSyncing().setRawStoredState(State(enable = false))"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/test/java/com/duckduckgo/sync/impl/SyncRemoteFeatureToggleTest.kt"
-            line="113"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="DenyListedApi"
-        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="        syncFeature.level2AllowSetupFlows().setRawStoredState(State(enable = false))"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/test/java/com/duckduckgo/sync/impl/SyncRemoteFeatureToggleTest.kt"
-            line="122"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="DenyListedApi"
-        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="        syncFeature.level2AllowSetupFlows().setRawStoredState(State(enable = true, minSupportedVersion = 2))"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/test/java/com/duckduckgo/sync/impl/SyncRemoteFeatureToggleTest.kt"
-            line="131"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="DenyListedApi"
-        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="        syncFeature.level2AllowSetupFlows().setRawStoredState(State(enable = false))"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/test/java/com/duckduckgo/sync/impl/SyncRemoteFeatureToggleTest.kt"
-            line="140"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="DenyListedApi"
-        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="        syncFeature.level3AllowCreateAccount().setRawStoredState(State(enable = false))"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/test/java/com/duckduckgo/sync/impl/SyncRemoteFeatureToggleTest.kt"
-            line="149"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="DenyListedApi"
-        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="        syncFeature.level3AllowCreateAccount().setRawStoredState(State(enable = true, minSupportedVersion = 2))"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/test/java/com/duckduckgo/sync/impl/SyncRemoteFeatureToggleTest.kt"
-            line="158"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="DenyListedApi"
-        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="        syncFeature.level3AllowCreateAccount().setRawStoredState(State(enable = false))"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/test/java/com/duckduckgo/sync/impl/SyncRemoteFeatureToggleTest.kt"
-            line="167"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="DenyListedApi"
-        message="Use com.duckduckgo.data.store.api.SharedPreferencesProvider instead"
-        errorLine1="        return context.getSharedPreferences(fileName, Context.MODE_PRIVATE)"
-        errorLine2="               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/test/java/com/duckduckgo/sync/impl/SyncRemoteFeatureToggleTest.kt"
-            line="190"
-            column="16"/>
-    </issue>
-
-    <issue
-        id="DenyListedApi"
-        message="Use com.duckduckgo.data.store.api.SharedPreferencesProvider instead"
-        errorLine1="        return context.getSharedPreferences(fileName, Context.MODE_PRIVATE)"
-        errorLine2="               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/test/java/com/duckduckgo/sync/impl/SyncRemoteFeatureToggleTest.kt"
-            line="194"
-            column="16"/>
     </issue>
 
     <issue
@@ -525,7 +448,7 @@
         errorLine2="                                                            ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-bg/strings-sync.xml"
-            line="193"
+            line="196"
             column="61"/>
     </issue>
 
@@ -536,7 +459,7 @@
         errorLine2="                                                            ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-cs/strings-sync.xml"
-            line="193"
+            line="196"
             column="61"/>
     </issue>
 
@@ -547,7 +470,7 @@
         errorLine2="                                                            ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-da/strings-sync.xml"
-            line="193"
+            line="196"
             column="61"/>
     </issue>
 
@@ -558,7 +481,7 @@
         errorLine2="                                                            ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-de/strings-sync.xml"
-            line="193"
+            line="196"
             column="61"/>
     </issue>
 
@@ -569,7 +492,7 @@
         errorLine2="                                                            ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-el/strings-sync.xml"
-            line="193"
+            line="196"
             column="61"/>
     </issue>
 
@@ -580,7 +503,7 @@
         errorLine2="                                                            ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-es/strings-sync.xml"
-            line="193"
+            line="196"
             column="61"/>
     </issue>
 
@@ -591,7 +514,7 @@
         errorLine2="                                                            ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-et/strings-sync.xml"
-            line="193"
+            line="196"
             column="61"/>
     </issue>
 
@@ -602,7 +525,7 @@
         errorLine2="                                                            ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-fi/strings-sync.xml"
-            line="193"
+            line="196"
             column="61"/>
     </issue>
 
@@ -613,7 +536,7 @@
         errorLine2="                                                            ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-fr/strings-sync.xml"
-            line="193"
+            line="196"
             column="61"/>
     </issue>
 
@@ -624,7 +547,7 @@
         errorLine2="                                                            ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-hr/strings-sync.xml"
-            line="193"
+            line="196"
             column="61"/>
     </issue>
 
@@ -635,7 +558,7 @@
         errorLine2="                                                            ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-hu/strings-sync.xml"
-            line="193"
+            line="196"
             column="61"/>
     </issue>
 
@@ -646,7 +569,7 @@
         errorLine2="                                                            ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-it/strings-sync.xml"
-            line="193"
+            line="196"
             column="61"/>
     </issue>
 
@@ -657,7 +580,7 @@
         errorLine2="                                                            ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-lt/strings-sync.xml"
-            line="193"
+            line="196"
             column="61"/>
     </issue>
 
@@ -668,7 +591,7 @@
         errorLine2="                                                            ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-lv/strings-sync.xml"
-            line="193"
+            line="196"
             column="61"/>
     </issue>
 
@@ -679,7 +602,7 @@
         errorLine2="                                                            ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-nb/strings-sync.xml"
-            line="193"
+            line="196"
             column="61"/>
     </issue>
 
@@ -690,7 +613,7 @@
         errorLine2="                                                            ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-nl/strings-sync.xml"
-            line="193"
+            line="196"
             column="61"/>
     </issue>
 
@@ -701,7 +624,7 @@
         errorLine2="                                                            ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-pl/strings-sync.xml"
-            line="193"
+            line="196"
             column="61"/>
     </issue>
 
@@ -712,7 +635,7 @@
         errorLine2="                                                            ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-pt/strings-sync.xml"
-            line="193"
+            line="196"
             column="61"/>
     </issue>
 
@@ -723,7 +646,7 @@
         errorLine2="                                                            ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-ro/strings-sync.xml"
-            line="193"
+            line="196"
             column="61"/>
     </issue>
 
@@ -734,7 +657,7 @@
         errorLine2="                                                            ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-ru/strings-sync.xml"
-            line="193"
+            line="196"
             column="61"/>
     </issue>
 
@@ -745,7 +668,7 @@
         errorLine2="                                                            ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-sk/strings-sync.xml"
-            line="193"
+            line="196"
             column="61"/>
     </issue>
 
@@ -756,7 +679,7 @@
         errorLine2="                                                            ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-sl/strings-sync.xml"
-            line="193"
+            line="196"
             column="61"/>
     </issue>
 
@@ -767,7 +690,7 @@
         errorLine2="                                                            ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-sv/strings-sync.xml"
-            line="193"
+            line="196"
             column="61"/>
     </issue>
 
@@ -778,7 +701,7 @@
         errorLine2="                                                            ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-tr/strings-sync.xml"
-            line="193"
+            line="196"
             column="61"/>
     </issue>
 
@@ -928,6 +851,17 @@
     <issue
         id="Overdraw"
         message="Possible overdraw: Root element paints background `@drawable/popup_menu_bg` with a theme that also paints a background (inferred theme is `@android:style/Theme.Holo`)"
+        errorLine1="    android:background=&quot;@drawable/popup_menu_bg&quot;"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/popup_window_hide_sync_suggestion_menu.xml"
+            line="21"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="Overdraw"
+        message="Possible overdraw: Root element paints background `@drawable/popup_menu_bg` with a theme that also paints a background (inferred theme is `@android:style/Theme.Holo`)"
         errorLine1="              android:background=&quot;@drawable/popup_menu_bg&quot;>"
         errorLine2="              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -959,13 +893,24 @@
     </issue>
 
     <issue
+        id="Overdraw"
+        message="Possible overdraw: Root element paints background `@drawable/selectable_rounded_container_ripple` with a theme that also paints a background (inferred theme is `@android:style/Theme.Holo`)"
+        errorLine1="    android:background=&quot;@drawable/selectable_rounded_container_ripple&quot;"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/view_sync_setup_bookmark_added_promo.xml"
+            line="26"
+            column="5"/>
+    </issue>
+
+    <issue
         id="TypographyEllipsis"
         message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
         errorLine1="    &lt;string name=&quot;sync_enable_connecting&quot;>Připojování...&lt;/string>"
         errorLine2="                                          ~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-cs/strings-sync.xml"
-            line="51"
+            line="53"
             column="43"/>
     </issue>
 
@@ -976,7 +921,7 @@
         errorLine2="                                          ~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-da/strings-sync.xml"
-            line="51"
+            line="53"
             column="43"/>
     </issue>
 
@@ -987,7 +932,7 @@
         errorLine2="                                          ~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-de/strings-sync.xml"
-            line="51"
+            line="53"
             column="43"/>
     </issue>
 
@@ -998,7 +943,7 @@
         errorLine2="                                          ~~~~~~~~~~">
         <location
             file="src/main/res/values-el/strings-sync.xml"
-            line="51"
+            line="53"
             column="43"/>
     </issue>
 
@@ -1009,7 +954,7 @@
         errorLine2="                                          ~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-es/strings-sync.xml"
-            line="51"
+            line="53"
             column="43"/>
     </issue>
 
@@ -1020,7 +965,7 @@
         errorLine2="                                          ~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-et/strings-sync.xml"
-            line="51"
+            line="53"
             column="43"/>
     </issue>
 
@@ -1031,7 +976,7 @@
         errorLine2="                                          ~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-hr/strings-sync.xml"
-            line="51"
+            line="53"
             column="43"/>
     </issue>
 
@@ -1042,7 +987,7 @@
         errorLine2="                                          ~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-lt/strings-sync.xml"
-            line="51"
+            line="53"
             column="43"/>
     </issue>
 
@@ -1053,7 +998,7 @@
         errorLine2="                                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-nl/strings-sync.xml"
-            line="51"
+            line="53"
             column="43"/>
     </issue>
 
@@ -1064,7 +1009,7 @@
         errorLine2="                                          ~~~~~~~~~~~">
         <location
             file="src/main/res/values-pl/strings-sync.xml"
-            line="51"
+            line="53"
             column="43"/>
     </issue>
 
@@ -1075,7 +1020,7 @@
         errorLine2="                                          ~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-ru/strings-sync.xml"
-            line="51"
+            line="53"
             column="43"/>
     </issue>
 
@@ -1086,7 +1031,7 @@
         errorLine2="                                          ~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-sk/strings-sync.xml"
-            line="51"
+            line="53"
             column="43"/>
     </issue>
 
@@ -1097,7 +1042,7 @@
         errorLine2="                                          ~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-sl/strings-sync.xml"
-            line="51"
+            line="53"
             column="43"/>
     </issue>
 
@@ -1108,7 +1053,7 @@
         errorLine2="                                          ~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-tr/strings-sync.xml"
-            line="51"
+            line="53"
             column="43"/>
     </issue>
 
@@ -1119,7 +1064,7 @@
         errorLine2="                                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-cs/strings-sync.xml"
-            line="107"
+            line="110"
             column="45"/>
     </issue>
 
@@ -1130,7 +1075,7 @@
         errorLine2="                                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-da/strings-sync.xml"
-            line="107"
+            line="110"
             column="45"/>
     </issue>
 
@@ -1141,7 +1086,7 @@
         errorLine2="                                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-es/strings-sync.xml"
-            line="107"
+            line="110"
             column="45"/>
     </issue>
 
@@ -1152,7 +1097,7 @@
         errorLine2="                                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-it/strings-sync.xml"
-            line="107"
+            line="110"
             column="45"/>
     </issue>
 
@@ -1163,7 +1108,7 @@
         errorLine2="                                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-nl/strings-sync.xml"
-            line="107"
+            line="110"
             column="45"/>
     </issue>
 
@@ -1174,7 +1119,7 @@
         errorLine2="                                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-pl/strings-sync.xml"
-            line="107"
+            line="110"
             column="45"/>
     </issue>
 
@@ -1185,7 +1130,7 @@
         errorLine2="                                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-ro/strings-sync.xml"
-            line="107"
+            line="110"
             column="45"/>
     </issue>
 
@@ -1196,7 +1141,7 @@
         errorLine2="                                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-ru/strings-sync.xml"
-            line="107"
+            line="110"
             column="45"/>
     </issue>
 
@@ -1207,7 +1152,7 @@
         errorLine2="                                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-sk/strings-sync.xml"
-            line="107"
+            line="110"
             column="45"/>
     </issue>
 
@@ -1218,7 +1163,7 @@
         errorLine2="                                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-sl/strings-sync.xml"
-            line="107"
+            line="110"
             column="45"/>
     </issue>
 
@@ -1229,7 +1174,7 @@
         errorLine2="                                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-da/strings-sync.xml"
-            line="108"
+            line="111"
             column="43"/>
     </issue>
 
@@ -1240,7 +1185,7 @@
         errorLine2="                                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-el/strings-sync.xml"
-            line="108"
+            line="111"
             column="43"/>
     </issue>
 
@@ -1251,7 +1196,7 @@
         errorLine2="                                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-es/strings-sync.xml"
-            line="108"
+            line="111"
             column="43"/>
     </issue>
 
@@ -1262,7 +1207,7 @@
         errorLine2="                                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-lt/strings-sync.xml"
-            line="108"
+            line="111"
             column="43"/>
     </issue>
 
@@ -1273,7 +1218,7 @@
         errorLine2="                                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-nl/strings-sync.xml"
-            line="108"
+            line="111"
             column="43"/>
     </issue>
 
@@ -1284,7 +1229,7 @@
         errorLine2="                                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-ro/strings-sync.xml"
-            line="108"
+            line="111"
             column="43"/>
     </issue>
 
@@ -1295,7 +1240,7 @@
         errorLine2="                                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-ru/strings-sync.xml"
-            line="108"
+            line="111"
             column="43"/>
     </issue>
 
@@ -1306,7 +1251,7 @@
         errorLine2="                                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-sk/strings-sync.xml"
-            line="108"
+            line="111"
             column="43"/>
     </issue>
 
@@ -1317,7 +1262,7 @@
         errorLine2="                                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-sl/strings-sync.xml"
-            line="108"
+            line="111"
             column="43"/>
     </issue>
 
@@ -1328,7 +1273,7 @@
         errorLine2="                                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-tr/strings-sync.xml"
-            line="108"
+            line="111"
             column="43"/>
     </issue>
 
@@ -1339,7 +1284,7 @@
         errorLine2="                                    ~~~~~~~~~~~">
         <location
             file="src/main/res/values-cs/strings-sync.xml"
-            line="118"
+            line="121"
             column="37"/>
     </issue>
 
@@ -1350,7 +1295,7 @@
         errorLine2="                                    ~~~~~~~~~~~">
         <location
             file="src/main/res/values-da/strings-sync.xml"
-            line="118"
+            line="121"
             column="37"/>
     </issue>
 
@@ -1361,7 +1306,7 @@
         errorLine2="                                    ~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-el/strings-sync.xml"
-            line="118"
+            line="121"
             column="37"/>
     </issue>
 
@@ -1372,7 +1317,7 @@
         errorLine2="                                    ~~~~~~">
         <location
             file="src/main/res/values-fi/strings-sync.xml"
-            line="118"
+            line="121"
             column="37"/>
     </issue>
 
@@ -1383,7 +1328,7 @@
         errorLine2="                                    ~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-hr/strings-sync.xml"
-            line="118"
+            line="121"
             column="37"/>
     </issue>
 
@@ -1394,7 +1339,7 @@
         errorLine2="                                    ~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-lt/strings-sync.xml"
-            line="118"
+            line="121"
             column="37"/>
     </issue>
 
@@ -1405,7 +1350,7 @@
         errorLine2="                                    ~~~~~~~~~~~~">
         <location
             file="src/main/res/values-nl/strings-sync.xml"
-            line="118"
+            line="121"
             column="37"/>
     </issue>
 
@@ -1416,7 +1361,7 @@
         errorLine2="                                    ~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-pt/strings-sync.xml"
-            line="118"
+            line="121"
             column="37"/>
     </issue>
 
@@ -1427,7 +1372,7 @@
         errorLine2="                                    ~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-ro/strings-sync.xml"
-            line="118"
+            line="121"
             column="37"/>
     </issue>
 
@@ -1438,7 +1383,7 @@
         errorLine2="                                    ~~~~~~~~~~~~">
         <location
             file="src/main/res/values-sk/strings-sync.xml"
-            line="118"
+            line="121"
             column="37"/>
     </issue>
 
@@ -1449,7 +1394,7 @@
         errorLine2="                                                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/sync/impl/ui/SyncInternalSettingsActivity.kt"
-            line="176"
+            line="179"
             column="52"/>
     </issue>
 
@@ -1577,7 +1522,7 @@
         errorLine2="    ~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/sync/impl/engine/SyncEngineTest.kt"
-            line="157"
+            line="168"
             column="5"/>
     </issue>
 
@@ -1588,7 +1533,7 @@
         errorLine2="    ~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/sync/impl/engine/SyncEngineTest.kt"
-            line="182"
+            line="193"
             column="5"/>
     </issue>
 
@@ -1599,7 +1544,7 @@
         errorLine2="    ~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/sync/impl/engine/SyncEngineTest.kt"
-            line="219"
+            line="230"
             column="5"/>
     </issue>
 
@@ -1610,7 +1555,7 @@
         errorLine2="    ~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/sync/impl/engine/SyncEngineTest.kt"
-            line="243"
+            line="254"
             column="5"/>
     </issue>
 
@@ -1621,7 +1566,7 @@
         errorLine2="    ~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/sync/impl/engine/SyncEngineTest.kt"
-            line="267"
+            line="278"
             column="5"/>
     </issue>
 
@@ -1632,7 +1577,7 @@
         errorLine2="    ~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/sync/impl/engine/SyncEngineTest.kt"
-            line="291"
+            line="302"
             column="5"/>
     </issue>
 
@@ -1643,7 +1588,7 @@
         errorLine2="    ~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/sync/impl/engine/SyncEngineTest.kt"
-            line="328"
+            line="339"
             column="5"/>
     </issue>
 
@@ -1654,7 +1599,7 @@
         errorLine2="    ~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/sync/impl/engine/SyncEngineTest.kt"
-            line="361"
+            line="372"
             column="5"/>
     </issue>
 
@@ -1665,7 +1610,7 @@
         errorLine2="    ~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/sync/impl/engine/SyncEngineTest.kt"
-            line="401"
+            line="412"
             column="5"/>
     </issue>
 
@@ -1676,7 +1621,7 @@
         errorLine2="    ~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/sync/impl/engine/SyncEngineTest.kt"
-            line="415"
+            line="426"
             column="5"/>
     </issue>
 

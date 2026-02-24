@@ -59,6 +59,7 @@ import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType.GRID
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType.LIST
+import com.duckduckgo.app.tabs.model.isAboutBlank
 import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder.Companion.GRID_TAB
 import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder.Companion.LIST_TAB
 import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder.Companion.TAB_GROUP
@@ -68,6 +69,7 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.SelectableTab
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.TrackersAnimationInfoPanel.Companion.ANIMATED_TILE_DEFAULT_ALPHA
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.TrackersAnimationInfoPanel.Companion.ANIMATED_TILE_NO_REPLACE_ALPHA
+import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.toPx
@@ -294,6 +296,11 @@ class TabSwitcherAdapter(
                 itemClickListener.onTabSelected(tabId)
             }
         }
+        tabViewHolder.selectionIndicator.setOnClickListener {
+            if (!isDragging) {
+                itemClickListener.onTabSelected(tabId)
+            }
+        }
         tabViewHolder.close.setOnClickListener(
             createCloseClickListener(
                 bindingAdapterPosition = bindingAdapterPosition,
@@ -314,7 +321,7 @@ class TabSwitcherAdapter(
                 }
                 holder.selectionIndicator.show()
                 holder.close.isClickable = false
-                holder.close.hide()
+                holder.close.gone()
             }
             else -> {
                 holder.selectionIndicator.hide()
@@ -436,6 +443,11 @@ class TabSwitcherAdapter(
     }
 
     private fun loadFavicon(tab: TabEntity, glide: RequestManager, view: ImageView) {
+        if (tab.isAboutBlank) {
+            glide.clear(view)
+            glide.load(AndroidR.drawable.ic_globe_24).into(view)
+            return
+        }
         val url = tab.url
         if (url.isNullOrBlank()) {
             glide.clear(view)
@@ -491,7 +503,7 @@ class TabSwitcherAdapter(
 
         val previewFile = tab.tabPreviewFile
 
-        if (showDaxIconFallback && tab.url.isNullOrBlank()) {
+        if (showDaxIconFallback && tab.url.isNullOrBlank() && !tab.isAboutBlank) {
             glide.load(AndroidR.drawable.ic_dax_icon_72).into(imageView)
             return
         }

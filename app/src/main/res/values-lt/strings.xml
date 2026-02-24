@@ -130,6 +130,7 @@
     <string name="settingsMenuItemTitle">Nustatymai</string>
     <string name="settingsHeadingProtections">Apsaugos</string>
     <string name="settingsHeadingAppearance">Išvaizda</string>
+    <string name="settingsWhatsNew">Kas naujo</string>
     <string name="settingsHeadingAbout">Apie</string>
     <string name="settingsAboutDuckduckgo">Apie „DuckDuckGo“</string>
     <string name="settingsVersion">Versija</string>
@@ -177,6 +178,8 @@
     <string name="improvedAutoCompleteIAMContent">Dabar automatinio užbaigimo pasiūlymuose bus rodomos ir neseniai aplankytos svetainės. Išjunkite nustatymuose arba bet kada išvalykite naudodami mygtuką 🔥 „Fire Button“.</string>
     <string name="improvedAutoCompleteIAMTitle">Tas pats privatumas.\nGeresni paieškos pasiūlymai!</string>
     <string name="openAutoCompleteSettings">Atidaryti nustatymus</string>
+    <string name="privateSearchChatSuggestionsToggle">Pokalbių pasiūlymai</string>
+    <string name="privateSearchAutocompleteHintWithChatSuggestions">Rodyti pasiūlymus iš jūsų istorijos, žymių ir (pasirinktinai) „Duck.ai“ pokalbių istorijos, kai rašai paieškos juostoje. Visos paieškos yra privačios.</string>
 
     <!-- General Settings -->
     <string name="generalSettingsActivityTitle" instruction="Title of the general settings screen">Bendrieji</string>
@@ -207,6 +210,17 @@
     <string name="webTrackingProtectionGoogleSigninPopupsDescription">Blokuoja „Google“ prisijungimo iššokančiuosius langus svetainėse, kurios nepriklauso „Google“.</string>
     <string name="webTrackingProtectionGlobalPrivacyControlTitle">Visuotinė privatumo kontrolė</string>
     <string name="webTrackingProtectionGlobalPrivacyControlDescription">Išreiškia atsisakymo teises jūsų vardu, liepdamas svetainėms nepardavinėti jūsų asmens informacijos ir jos nebendrinti.</string>
+
+    <!-- Get Desktop Browser -->
+    <string name="getDesktopBrowserSettingItemTitle">Gaukite kompiuterio naršyklę</string>
+    <string name="getDesktopBrowserSettingItemSubtitleTitle">„DuckDuckGo“, skirta „Mac“ ir „Windows“</string>
+    <string name="getDesktopBrowserTitle">Apsaugok asmeninę informaciją ir „Mac“ bei „Windows“ kompiuteriuose!</string>
+    <string name="getDesktopBrowserBody">Kad atsisiųstum „DuckDuckGo“ į „Mac“ arba „Windows“, apsilankyk:</string>
+    <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
+    <string name="getDesktopBrowserShareDownloadLink">Bendrinti atsisiuntimo nuorodą</string>
+    <string name="getDesktopBrowserNoThanks">Ne, dėkoju</string>
+    <string name="getDesktopBrowserHideItem">Slėpti</string>
+    <string name="getDesktopBrowserUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Nuoroda nukopijuota</string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Apsauga nuo slapukų iškylančiųjų langų</string>
@@ -962,11 +976,16 @@
     <string name="settingsHeadingCompleteSetup">Užbaik savo sąranką</string>
 
     <!--TabSwitcher Trackers Animation-->
-    <string name="showTrackerCountInTabSwitcher">Rodyti sekiklių skaičių skirtukų perjungiklyje</string>
+    <string name="trackerBlockedInTheLast7days" instruction="Placeholder is 1 tracker blocked">&lt;b&gt;%1$s sekikliai (-ių) užblokuoti &lt;/b&gt; per paskutines 7 dienas</string>
     <string name="tabSwitcherAnimationTileRemovalDialogTitle" instruction="A title for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Slėpti sekiklių skaičių?</string>
     <string name="tabSwitcherAnimationTileRemovalDialogBody" instruction="A message for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Šią funkciją galima vėl įjungti nustatymuose &gt; Išvaizda.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Slėpti</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Laikyti</string>
+
+    <!-- Trackers blocked animation-->
+    <string name="settingsTrackersBlockedAnimationHeaderTitle">Blokuojamų sekiklių animacija</string>
+    <string name="showTrackerCountInAddressBar">Rodyti adreso juostoje</string>
+    <string name="showWeeklyTrackerCountInTabSwitcher">Rodyti skirtukų tvarkyklėje</string>
 
     <!-- Widgets -->
     <string name="searchOnlyWidgetLabel" instruction="Label for the search-only widget">Tik paieška</string>

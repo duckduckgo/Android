@@ -2,6 +2,28 @@
 <issues format="6" by="lint 8.8.2" type="baseline" client="gradle" dependencies="false" name="AGP (8.7.3)" variant="all" version="8.8.2">
 
     <issue
+        id="InlinedApi"
+        message="Field requires API level 35 (current min is 26): `android.provider.Settings#ACTION_CREDENTIAL_PROVIDER`"
+        errorLine1="                Intent(Settings.ACTION_CREDENTIAL_PROVIDER).apply {"
+        errorLine2="                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/remote/messaging/impl/modal/cardslist/CardsListRemoteMessageView.kt"
+            line="200"
+            column="24"/>
+    </issue>
+
+    <issue
+        id="InlinedApi"
+        message="Field requires API level 35 (current min is 26): `android.provider.Settings#ACTION_CREDENTIAL_PROVIDER`"
+        errorLine1="                Intent(Settings.ACTION_CREDENTIAL_PROVIDER).apply {"
+        errorLine2="                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/remote/messaging/impl/newtab/RemoteMessageView.kt"
+            line="210"
+            column="24"/>
+    </issue>
+
+    <issue
         id="SimpleDateFormat"
         message="To get local formatting use `getDateInstance()`, `getDateTimeInstance()`, or `getTimeInstance()`, or use `new SimpleDateFormat(String template, Locale locale)` with for example `Locale.US` for ASCII dates."
         errorLine1="private val dateFormatter = SimpleDateFormat(&quot;yyyy-mm-dd&quot;)"
@@ -10,6 +32,17 @@
             file="src/main/java/com/duckduckgo/remote/messaging/impl/mappers/JsonRulesMapper.kt"
             line="30"
             column="29"/>
+    </issue>
+
+    <issue
+        id="ContentDescription"
+        message="Missing `contentDescription` attribute on image"
+        errorLine1="    &lt;ImageView"
+        errorLine2="     ~~~~~~~~~">
+        <location
+            file="src/main/res/layout/view_remote_message_header.xml"
+            line="43"
+            column="6"/>
     </issue>
 
 </issues>

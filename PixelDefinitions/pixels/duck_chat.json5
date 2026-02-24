@@ -1,4 +1,5 @@
 // Duck Chat Fullscreen pixels: https://app.asana.com/1/137249556945/project/1174433894299346/task/1211821261289598?focus=true.
+// Duck Chat Contextual pixels: https://app.asana.com/1/137249556945/project/1174433894299346/task/1211821261289598?focus=true.
 {
     "m_aichat_settings_menu_opened": {
         "description": "Duck.ai Browser Menu opened",
@@ -24,6 +25,335 @@
     "m_aichat_fire_button_tapped": {
         "description": "Fire Button opened from Duck.ai",
         "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_onboarding_displayed": {
+        "description": "Contextual onboarding sheet displayed when user first opens Duck.ai contextual mode",
+        "owners": ["joshliebe"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_onboarding_confirm_pressed": {
+        "description": "User pressed 'Got it' button on contextual onboarding sheet",
+        "owners": ["joshliebe"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_onboarding_settings_pressed": {
+        "description": "User pressed 'View settings' button on contextual onboarding sheet",
+        "owners": ["joshliebe"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_sheet_opened_count": {
+        "description": "User opened the Contextual sheet via the Duck.ai button in the Omnibar.",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_sheet_opened_daily": {
+        "description": "(Daily Pixel) User opened the Contextual sheet via the Duck.ai button in the Omnibar.",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_sheet_dismissed_count": {
+        "description": "User dismissed the Contextual sheet. Dragging or closing directly",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_sheet_dismissed_daily": {
+        "description": "(Daily Pixel) User dismissed the Contextual sheet. Dragging or closing directly",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_session_restored_count": {
+        "description": "A previously saved chat has been restored after opening the Contextual sheet",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_session_restored_daily": {
+        "description": "(Daily Pixel) A previously saved chat has been restored after opening the Contextual sheet",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_expand_button_tapped_count": {
+        "description": "User moved the contextual chat to fullscreen",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_expand_button_tapped_daily": {
+        "description": "(Daily Pixel) User moved the contextual chat to fullscreen",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_new_chat_button_tapped_count": {
+        "description": "User started a new chat inside the contextual sheet",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_new_chat_button_tapped_daily": {
+        "description": "(Daily Pixel) User started a new chat inside the contextual sheet",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_quick_action_summarize_selected_count": {
+        "description": "User used the summarize prompt presented in the Contextual sheet",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_quick_action_summarize_selected_daily": {
+        "description": "(Daily Pixel) User used the summarize prompt presented in the Contextual sheet",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_page_context_placeholder_shown_count": {
+        "description": "User has seen the page context placeholder presented in the Contextual sheet",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_page_context_placeholder_shown_daily": {
+        "description": "(Daily Pixel) User has seen the page context placeholder presented in the Contextual sheet",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_page_context_placeholder_tapped_count": {
+        "description": "User has added the page context via the placeholder shown in the native side of the Contextual sheet",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_page_context_placeholder_tapped_daily": {
+        "description": "(Daily Pixel) User has added the page context via the placeholder shown in the native side of the Contextual sheet",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_page_context_auto_attached_count": {
+        "description": "The page context has been automatically attached to the Contextual sheet",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_page_context_auto_attached_daily": {
+        "description": "(Daily Pixel) The page context has been automatically attached to the Contextual sheet",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_page_context_manually_attached_native_count": {
+        "description": "The page context has been manually attached to the Contextual sheet in the Native side",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_page_context_manually_attached_native_daily": {
+        "description": "(Daily Pixel) The page context has been manually attached to the Contextual sheet in the Native side",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_page_context_manually_attached_frontend_count": {
+        "description": "The page context has been manually attached to the Contextual sheet in the Frontend side",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_page_context_manually_attached_frontend_daily": {
+        "description": "(Daily Pixel) The page context has been manually attached to the Contextual sheet in the Frontend side",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_page_context_removed_native_count": {
+        "description": "The page context has been manually removed from to the Contextual sheet in the native side",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_page_context_removed_native_daily": {
+        "description": "(Daily Pixel) The page context has been manually removed from to the Contextual sheet in the native side",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_page_context_removed_frontend_count": {
+        "description": "The page context has been manually removed from to the Contextual sheet in the Frontend side",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_page_context_removed_frontend_daily": {
+        "description": "(Daily Pixel) The page context has been manually removed from to the Contextual sheet in the Frontend side",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_prompt_submitted_with_context_native_count": {
+        "description": "The user has submitted a prompt to Contextual Duck.ai with the page context attached",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_prompt_submitted_with_context_native_daily": {
+        "description": "(Daily Pixel) The user has submitted a prompt to Contextual Duck.ai with the page context attached",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_prompt_submitted_without_context_native_count": {
+        "description": "The user has submitted a prompt to Contextual Duck.ai without the page context attached",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_prompt_submitted_without_context_native_daily": {
+        "description": "(Daily Pixel) The user has submitted a prompt to Contextual Duck.ai without the page context attached",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_page_context_collection_empty": {
+        "description": "The page context collected via content scripts is not valid / is empty",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_settings_auto_context_enabled_count": {
+        "description": "The user has enabled automatic page context collection in Duck.ai Settings",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_settings_auto_context_enabled_daily": {
+        "description": "(Daily Pixel) The user has enabled automatic page context collection in Duck.ai Settings",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_settings_auto_context_disabled_count": {
+        "description": "The user has disabled automatic page context collection in Duck.ai Settings",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_settings_auto_context_disabled_daily": {
+        "description": "(Daily Pixel) The user has disabled automatic page context collection in Duck.ai Settings",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_settings_auto_context": {
+        "description": "(Daily Pixel) Indicates if the user has automatic context collection enabled or not",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_settings_chat_suggestions_turned_on_count": {
+        "description": "User enabled the Chat Suggestions toggle in General Settings",
+        "owners": ["YoussefKeyrouz"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_settings_chat_suggestions_turned_on_daily": {
+        "description": "(Daily Pixel) User enabled the Chat Suggestions toggle in General Settings",
+        "owners": ["YoussefKeyrouz"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_settings_chat_suggestions_turned_off_count": {
+        "description": "User disabled the Chat Suggestions toggle in General Settings",
+        "owners": ["YoussefKeyrouz"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_settings_chat_suggestions_turned_off_daily": {
+        "description": "(Daily Pixel) User disabled the Chat Suggestions toggle in General Settings",
+        "owners": ["YoussefKeyrouz"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_recent_chat_selected_count": {
+        "description": "User selected a recent chat suggestion",
+        "owners": ["YoussefKeyrouz"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_recent_chat_selected_daily": {
+        "description": "(Daily Pixel) User selected a recent chat suggestion",
+        "owners": ["YoussefKeyrouz"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_recent_chat_selected_pinned_count": {
+        "description": "User selected a pinned chat suggestion",
+        "owners": ["YoussefKeyrouz"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_recent_chat_selected_pinned_daily": {
+        "description": "(Daily Pixel) User selected a pinned chat suggestion",
+        "owners": ["YoussefKeyrouz"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"]

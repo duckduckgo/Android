@@ -177,6 +177,7 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
     private val cookieManager: CookieManager by lazy { CookieManager.getInstance() }
 
     private var pendingFileDownload: PendingFileDownload? = null
+
     private val downloadMessagesJob = ConflatedJob()
 
     private val binding: ActivityDuckChatWebviewBinding by viewBinding()
@@ -195,6 +196,10 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
         super.onViewCreated(view, savedInstanceState)
 
         val url = arguments?.getString(KEY_DUCK_AI_URL) ?: "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5"
+
+        // Explicitly enable cookies for this WebView
+        cookieManager.setAcceptCookie(true)
+        cookieManager.setAcceptThirdPartyCookies(simpleWebview, true)
 
         simpleWebview.let {
             it.webViewClient = webViewClient
@@ -269,7 +274,12 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
                         when (featureName) {
                             DUCK_CHAT_FEATURE_NAME -> {
                                 appCoroutineScope.launch(dispatcherProvider.io()) {
-                                    duckChatJSHelper.processJsCallbackMessage(featureName, method, id, data)?.let { response ->
+                                    duckChatJSHelper.processJsCallbackMessage(
+                                        featureName,
+                                        method,
+                                        id,
+                                        data,
+                                    )?.let { response ->
                                         withContext(dispatcherProvider.main()) {
                                             if (response.method == METHOD_OPEN_KEYBOARD) {
                                                 simpleWebview.evaluateJavascript(
@@ -712,9 +722,6 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
 
     override fun onDestroyView() {
         super.onDestroyView()
-        appCoroutineScope.launch(dispatcherProvider.io()) {
-            cookieManager.flush()
-        }
     }
 
     companion object {

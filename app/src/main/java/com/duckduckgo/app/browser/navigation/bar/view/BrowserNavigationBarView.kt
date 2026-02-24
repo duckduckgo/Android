@@ -128,6 +128,15 @@ class BrowserNavigationBarView @JvmOverloads constructor(
         }
     }
 
+    fun disableViewStateSaving() {
+        binding.browserMenuImageView.isSaveEnabled = false
+        binding.tabsButton.isSaveEnabled = false
+        binding.fireIconImageView.isSaveEnabled = false
+        binding.bookmarksImageView.isSaveEnabled = false
+        binding.autofillButtonImageView.isSaveEnabled = false
+        binding.newTabButtonImageView.isSaveEnabled = false
+    }
+
     override fun onAttachedToWindow() {
         AndroidSupportInjection.inject(this)
         super.onAttachedToWindow()

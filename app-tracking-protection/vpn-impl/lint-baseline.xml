@@ -2,6 +2,39 @@
 <issues format="6" by="lint 8.8.2" type="baseline" client="gradle" dependencies="false" name="AGP (8.7.3)" variant="all" version="8.8.2">
 
     <issue
+        id="NoLifecycleScopeInFragment"
+        message="Use viewLifecycleOwner.lifecycleScope instead of lifecycleScope in Fragments. Fragment views can be destroyed while the fragment is still alive (backstack, ViewPager), which can cause crashes when coroutines try to update destroyed views."
+        errorLine1="        lifecycleScope.launch {"
+        errorLine2="        ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/mobile/android/vpn/ui/tracker_activity/DeviceShieldActivityFeedFragment.kt"
+            line="86"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="NoLifecycleScopeInFragment"
+        message="Use viewLifecycleOwner.lifecycleScope instead of lifecycleScope in Fragments. Fragment views can be destroyed while the fragment is still alive (backstack, ViewPager), which can cause crashes when coroutines try to update destroyed views."
+        errorLine1="        lifecycleScope.launch {"
+        errorLine2="        ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/mobile/android/vpn/ui/tracker_activity/DeviceShieldActivityFeedFragment.kt"
+            line="99"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="NoLifecycleScopeInFragment"
+        message="Use viewLifecycleOwner.lifecycleScope instead of lifecycleScope in Fragments. Fragment views can be destroyed while the fragment is still alive (backstack, ViewPager), which can cause crashes when coroutines try to update destroyed views."
+        errorLine1="            }.launchIn(lifecycleScope)"
+        errorLine2="                       ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/mobile/android/vpn/ui/privacyreport/DeviceShieldFragment.kt"
+            line="106"
+            column="24"/>
+    </issue>
+
+    <issue
         id="DefaultLocale"
         message="Implicitly using the default locale is a common source of bugs: Use `String.format(Locale, ...)` instead"
         errorLine1="            val sb = StringBuilder(String.format(&quot;Found %d packages for uid:%d&quot;, packages.size, uid))"
@@ -27,7 +60,7 @@
         id="BadPeriodicWorkRequestEnqueue"
         message="Use `enqueueUniquePeriodicWork()` instead of `enqueue()`">
         <location
-            file="$GRADLE_USER_HOME/caches/8.10.2/transforms/2a4e339704b1b0d41939a899d56b03a7/transformed/work-runtime-2.9.1/jars/classes.jar!/androidx/work/WorkManager.class"/>
+            file="$GRADLE_USER_HOME/caches/8.10.2/transforms/fa72d36956e3d391075d1c366a41df7e/transformed/work-runtime-2.9.1/jars/classes.jar!/androidx/work/WorkManager.class"/>
     </issue>
 
     <issue
@@ -136,7 +169,7 @@
         errorLine2="                                     ~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/mobile/android/vpn/service/TrackerBlockingVpnService.kt"
-            line="657"
+            line="668"
             column="38"/>
     </issue>
 
@@ -1164,13 +1197,6 @@
     </issue>
 
     <issue
-        id="ObsoleteSdkInt"
-        message="This folder configuration (`v23`) is unnecessary; `minSdkVersion` is 26. Merge all the resources in this folder into `drawable`.">
-        <location
-            file="src/main/res/drawable-v23"/>
-    </issue>
-
-    <issue
         id="VectorPath"
         message="Very long vector path (1606 characters), which is bad for performance. Considering reducing precision, removing minor details or rasterizing vector."
         errorLine1="      android:pathData=&quot;M85.98,54.22C85.66,54.22 85.43,54.34 85.33,54.45C83.32,56.47 81.29,57.83 78.99,58.56C76.72,59.29 74.25,59.38 71.36,59.02C71.05,58.98 70.78,59.07 70.62,59.19C70.55,59.24 70.52,59.29 70.51,59.31C70.51,59.32 70.5,59.32 70.5,59.33C70.43,68.37 71.77,73.46 74.02,76.82C76.45,80.45 80.09,82.36 85.09,84.89C85.09,84.89 85.09,84.89 85.09,84.89L85.21,84.95L85.21,84.95L85.22,84.95L85.22,84.96L85.52,85.11C85.8,85.25 86.19,85.25 86.48,85.11L86.79,84.95L86.79,84.95L86.79,84.95L86.79,84.95L86.8,84.95L86.8,84.95L86.91,84.89C86.91,84.89 86.91,84.89 86.91,84.89C91.91,82.36 95.55,80.45 97.98,76.82C100.23,73.46 101.57,68.37 101.5,59.33C101.5,59.32 101.49,59.32 101.49,59.31C101.48,59.29 101.45,59.24 101.38,59.19C101.22,59.07 100.95,58.98 100.64,59.02C97.79,59.38 95.33,59.32 93.06,58.61C90.74,57.89 88.68,56.53 86.64,54.45C86.53,54.34 86.31,54.22 85.98,54.22ZM81.78,50.92C82.9,49.79 84.45,49.21 86,49.22C87.54,49.22 89.09,49.81 90.2,50.95C91.82,52.59 93.19,53.42 94.54,53.83C95.89,54.25 97.57,54.37 100,54.06C101.53,53.86 103.12,54.25 104.38,55.19C105.64,56.14 106.48,57.62 106.5,59.28C106.58,68.72 105.21,75 102.13,79.6C98.91,84.41 94.13,86.84 89.42,89.22C89.34,89.27 89.25,89.31 89.17,89.35L89.06,89.41L89.06,89.41L89.05,89.41L88.74,89.57C87.03,90.43 84.97,90.43 83.26,89.57C83.26,89.57 83.26,89.57 83.26,89.57L82.95,89.41L82.94,89.41L82.94,89.41L82.94,89.41L82.83,89.35C82.75,89.31 82.66,89.27 82.58,89.22C77.87,86.84 73.09,84.41 69.87,79.6C66.79,75 65.42,68.72 65.5,59.28C65.52,57.62 66.35,56.14 67.62,55.19C68.87,54.25 70.46,53.87 71.99,54.06C74.43,54.37 76.11,54.23 77.47,53.8C78.82,53.37 80.18,52.54 81.78,50.92Z&quot;"
@@ -1711,7 +1737,7 @@
 
     <issue
         id="Overdraw"
-        message="Possible overdraw: Root element paints background `?attr/daxColorSurface` with a theme that also paints a background (inferred theme is `@style/Theme.DuckDuckGo.Light`)"
+        message="Possible overdraw: Root element paints background `?attr/daxColorSurface` with a theme that also paints a background (inferred theme is `@style/Theme.DuckDuckGo.App`)"
         errorLine1="        android:background=&quot;?attr/daxColorSurface&quot;"
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -1722,7 +1748,7 @@
 
     <issue
         id="Overdraw"
-        message="Possible overdraw: Root element paints background `?attr/daxColorSurface` with a theme that also paints a background (inferred theme is `@style/Theme.DuckDuckGo.Light`)"
+        message="Possible overdraw: Root element paints background `?attr/daxColorSurface` with a theme that also paints a background (inferred theme is `@style/Theme.DuckDuckGo.App`)"
         errorLine1="        android:background=&quot;?attr/daxColorSurface&quot;"
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -1733,7 +1759,7 @@
 
     <issue
         id="Overdraw"
-        message="Possible overdraw: Root element paints background `?attr/daxColorSurface` with a theme that also paints a background (inferred theme is `@style/Theme.DuckDuckGo.Light`)"
+        message="Possible overdraw: Root element paints background `?attr/daxColorSurface` with a theme that also paints a background (inferred theme is `@style/Theme.DuckDuckGo.App`)"
         errorLine1="    android:background=&quot;?attr/daxColorSurface&quot;>"
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -1744,7 +1770,7 @@
 
     <issue
         id="Overdraw"
-        message="Possible overdraw: Root element paints background `?attr/selectableItemBackground` with a theme that also paints a background (inferred theme is `@style/Theme.DuckDuckGo.Light`)"
+        message="Possible overdraw: Root element paints background `?attr/selectableItemBackground` with a theme that also paints a background (inferred theme is `@style/Theme.DuckDuckGo.App`)"
         errorLine1="    android:background=&quot;?attr/selectableItemBackground&quot;>"
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -1755,7 +1781,7 @@
 
     <issue
         id="Overdraw"
-        message="Possible overdraw: Root element paints background `?attr/selectableItemBackground` with a theme that also paints a background (inferred theme is `@style/Theme.DuckDuckGo.Light`)"
+        message="Possible overdraw: Root element paints background `?attr/selectableItemBackground` with a theme that also paints a background (inferred theme is `@style/Theme.DuckDuckGo.App`)"
         errorLine1="    android:background=&quot;?attr/selectableItemBackground&quot;>"
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -1766,7 +1792,7 @@
 
     <issue
         id="Overdraw"
-        message="Possible overdraw: Root element paints background `?android:windowBackground` with a theme that also paints a background (inferred theme is `@style/Theme.DuckDuckGo.Light`)"
+        message="Possible overdraw: Root element paints background `?android:windowBackground` with a theme that also paints a background (inferred theme is `@style/Theme.DuckDuckGo.App`)"
         errorLine1="    android:background=&quot;?android:windowBackground&quot;"
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -1777,7 +1803,7 @@
 
     <issue
         id="Overdraw"
-        message="Possible overdraw: Root element paints background `?selectableItemBackground` with a theme that also paints a background (inferred theme is `@style/Theme.DuckDuckGo.Light`)"
+        message="Possible overdraw: Root element paints background `?selectableItemBackground` with a theme that also paints a background (inferred theme is `@style/Theme.DuckDuckGo.App`)"
         errorLine1="        android:background=&quot;?selectableItemBackground&quot;"
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location

@@ -22,6 +22,8 @@ jobs:
   code_formatting:
     name: Code Formatting
     runs-on: android-large-runner
+    env:
+      DEVELOCITY_ACCESS_KEY: ${{ secrets.DEVELOCITY_ACCESS_KEY }}
 
     steps:
       - name: Checkout repository
@@ -48,6 +50,8 @@ jobs:
   unit_tests:
     name: Unit tests
     runs-on: android-large-runner
+    env:
+      DEVELOCITY_ACCESS_KEY: ${{ secrets.DEVELOCITY_ACCESS_KEY }}
 
     steps:
       - name: Checkout repository
@@ -84,6 +88,8 @@ jobs:
   lint:
     name: Lint
     runs-on: android-large-runner
+    env:
+      DEVELOCITY_ACCESS_KEY: ${{ secrets.DEVELOCITY_ACCESS_KEY }}
 
     steps:
       - name: Checkout repository
@@ -125,6 +131,8 @@ jobs:
   android_tests:
     runs-on: android-large-runner
     name: Android CI checks
+    env:
+      DEVELOCITY_ACCESS_KEY: ${{ secrets.DEVELOCITY_ACCESS_KEY }}
 
     steps:
       - name: Checkout repository

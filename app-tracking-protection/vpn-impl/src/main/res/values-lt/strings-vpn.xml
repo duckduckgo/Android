@@ -137,8 +137,6 @@
     <string name="atp_NewTabDisabled"><b> Apsauga nuo programėlių sekimo išjungta. </b>\nBakstelėkite, kad toliau blokuotumėte bandymus sekti visose programėlėse.</string>
     <string name="atp_NewTabRevoked"><b>VPV programa jūsų įrenginyje išjungė apsaugą nuo programėlių sekimo.</b>\nPalieskite, kad vėl įjungtumėte.</string>
     <string name="atp_NewTabEnabled"><b>Apsauga nuo programėlių sekimo įjungta</b> ir blokuoja sekimo bandymus visose programėlėse.</string>
-    <!-- smartling.character_limit = 15 -->
-    <string name="vpnMenuYellowPill">Išbandykite nemokamai</string>
 
     <!-- Exclusion List -->
     <string name="atp_ExclusionListActivityTitle">Visos programėlės</string>

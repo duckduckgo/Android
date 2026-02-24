@@ -93,4 +93,16 @@
     <string name="duck_ai_paid_settings_enable_in_settings">Ota käyttöön tekoälyominaisuuksien asetuksissa</string>
     <string name="duck_ai_paid_settings_manage_in_settings">Hallinnoi tekoälyominaisuuksien asetuksissa</string>
     <string name="duck_ai_paid_settings_manage_secondary">Määritä Duck.ai tekoälyominaisuuksien asetuksissa.</string>
+
+    <!-- Duck AI contextual onboarding -->
+    <string name="duck_chat_contextual_onboarding_title" instruction="Title for contextual Duck AI onboarding sheet">Kysy tästä sivusta</string>
+    <string name="duck_chat_contextual_onboarding_body" instruction="Body text for contextual Duck AI onboarding sheet">Duck.ai voi nyt auttaa vastaamaan katselemaasi sivuun liittyviin kysymyksiin.\n\nSivun sisältö sisällytetään vain, kun liität sen. Voit muuttaa tätä milloin tahansa asetuksista.</string>
+    <string name="duck_chat_contextual_onboarding_primary" instruction="Button to continue to contextual Duck AI sheet">Selvä</string>
+    <string name="duck_chat_contextual_onboarding_secondary" instruction="Button to go to AI settings">Näytä asetukset</string>
+
+    <!-- Duck.ai Contextual Bottom Sheet -->
+    <string name="duckAIContextualPromptSummarize">Yhteenveto tästä sivusta</string>
+    <string name="duckAIContextualAutomaticContextTitle">Lähetä sivun sisältö automaattisesti</string>
+    <string name="duckAIContextualAutomaticContextMessage">Lähetä sivun sisältö automaattisesti Duck.ai:lle</string>
+    <string name="duckAIContextualAttachPageContent">Liitä sivun sisältö</string>
 </resources>

@@ -1,7 +1,98 @@
 {
     "autofill_harmony_preferences_retrieval_failed": {
-        "description": "Retrieving harmony preferences failed.",
+        "description": "Retrieving autofill harmony preferences failed (daily unique)",
         "owners": ["CrisBarreiro"],
+        "triggers": ["exception"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "error",
+                "description": "The stacktrace for the error thrown, sanitized to remove potentially sensitive data",
+                "type": "string"
+            }
+        ]
+    },
+    "autofill_preferences_retrieval_failed": {
+        "description": "Retrieving autofill preferences failed (daily unique)",
+        "owners": ["CrisBarreiro"],
+        "triggers": ["exception"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "error",
+                "description": "The stacktrace for the error thrown, sanitized to remove potentially sensitive data",
+                "type": "string"
+            }
+        ]
+    },
+    "autofill_preferences_update_key_failed": {
+        "description": "Updating key on autofill preferences failed (daily unique)",
+        "owners": ["CrisBarreiro"],
+        "triggers": ["exception"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "error",
+                "description": "The stacktrace for the error thrown, sanitized to remove potentially sensitive data",
+                "type": "string"
+            }
+        ]
+    },
+    "autofill_harmony_preferences_update_key_failed": {
+        "description": "Updating key on autofill harmony preferences failed (daily unique)",
+        "owners": ["CrisBarreiro"],
+        "triggers": ["exception"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "error",
+                "description": "The stacktrace for the error thrown, sanitized to remove potentially sensitive data",
+                "type": "string"
+            }
+        ]
+    },
+    "autofill_harmony_preferences_get_key_failed": {
+        "description": "Getting key on autofill harmony preferences failed (daily unique)",
+        "owners": ["CrisBarreiro"],
+        "triggers": ["exception"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "error",
+                "description": "The stacktrace for the error thrown, sanitized to remove potentially sensitive data",
+                "type": "string"
+            }
+        ]
+    },
+    "autofill_preferences_get_key_failed": {
+        "description": "Getting key on autofill preferences failed (daily unique)",
+        "owners": ["CrisBarreiro"],
+        "triggers": ["exception"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "error",
+                "description": "The stacktrace for the error thrown, sanitized to remove potentially sensitive data",
+                "type": "string"
+            }
+        ]
+    },
+    "library_load_timeout_sqlcipher": {
+        "description": "Fired when the sqlcipher native library takes longer than the timeout period to load asynchronously",
+        "owners": ["CDRussell"],
+        "triggers": ["exception"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "library_load_failure_sqlcipher": {
+        "description": "Fired when the sqlcipher native library fails to load asynchronously due to an exception",
+        "owners": ["CDRussell"],
         "triggers": ["exception"],
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"]

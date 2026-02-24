@@ -36,6 +36,21 @@ enum class PirPixel(
         type = Count,
     ),
 
+    PIR_FOREGROUND_RUN_START_FAILED(
+        baseName = "m_dbp_foreground-run_start-failed",
+        type = Count,
+    ),
+
+    PIR_FOREGROUND_RUN_LOW_MEMORY(
+        baseName = "m_dbp_foreground-run_low-memory",
+        type = Count,
+    ),
+
+    PIR_INITIAL_SCAN_INCOMPLETE(
+        baseName = "m_dbp_initial-scan_incomplete",
+        type = Count,
+    ),
+
     PIR_SCHEDULED_RUN_SCHEDULED(
         baseName = "m_dbp_scheduled-run_scheduled",
         type = Count,

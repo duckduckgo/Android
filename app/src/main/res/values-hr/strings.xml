@@ -130,6 +130,7 @@
     <string name="settingsMenuItemTitle">Postavke</string>
     <string name="settingsHeadingProtections">Zaštite</string>
     <string name="settingsHeadingAppearance">Izgled</string>
+    <string name="settingsWhatsNew">Što je novo</string>
     <string name="settingsHeadingAbout">O nama</string>
     <string name="settingsAboutDuckduckgo">O DuckDuckGou</string>
     <string name="settingsVersion">Verzija</string>
@@ -177,6 +178,8 @@
     <string name="improvedAutoCompleteIAMContent">Prijedlozi za automatsko popunjavanje sada uključuju i nedavno posjećena mrežna mjesta. Isključi u Postavkama ili izbriši u bilo kojem trenutku pomoću Fire Buttona 🔥.</string>
     <string name="improvedAutoCompleteIAMTitle">Ista privatnost.\nBolji prijedlozi za pretraživanje!</string>
     <string name="openAutoCompleteSettings">Otvori postavke</string>
+    <string name="privateSearchChatSuggestionsToggle">Prijedlozi za čavrljanje</string>
+    <string name="privateSearchAutocompleteHintWithChatSuggestions">Prikaži prijedloge iz tvoje povijesti, oznaka i (izborno) povijesti čavrljanja na Duck.ai dok tipkaš u traku za pretraživanje. Sva su pretraživanja privatna.</string>
 
     <!-- General Settings -->
     <string name="generalSettingsActivityTitle" instruction="Title of the general settings screen">Općenito</string>
@@ -207,6 +210,17 @@
     <string name="webTrackingProtectionGoogleSigninPopupsDescription">Blokira skočne prozore za prijavu na Google na internetskim stranicama koje Google ne posjeduje.</string>
     <string name="webTrackingProtectionGlobalPrivacyControlTitle">Global Privacy Control</string>
     <string name="webTrackingProtectionGlobalPrivacyControlDescription">Izražava prava na isključenje u tvoje ime, govoreći stranicama da ne prodaju i ne dijele tvoje osobne podatke.</string>
+
+    <!-- Get Desktop Browser -->
+    <string name="getDesktopBrowserSettingItemTitle">Nabavi preglednik za PC</string>
+    <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo za Mac i Windows</string>
+    <string name="getDesktopBrowserTitle">Zaštiti svoje osobne podatke na Macu i Windowsima!</string>
+    <string name="getDesktopBrowserBody">Za preuzimanje DuckDuckGo na Mac ili Windows, posjeti:</string>
+    <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
+    <string name="getDesktopBrowserShareDownloadLink">Podijeli poveznicu za preuzimanje</string>
+    <string name="getDesktopBrowserNoThanks">Ne, hvala</string>
+    <string name="getDesktopBrowserHideItem">Sakrij</string>
+    <string name="getDesktopBrowserUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Poveznica je kopirana</string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Zaštita od skočnih prozora kolačića</string>
@@ -962,11 +976,16 @@
     <string name="settingsHeadingCompleteSetup">Dovrši postavljanje</string>
 
     <!--TabSwitcher Trackers Animation-->
-    <string name="showTrackerCountInTabSwitcher">Prikaži broj alata za praćenje (tragača) u prebacivaču kartica (Tab Switcher)</string>
+    <string name="trackerBlockedInTheLast7days" instruction="Placeholder is 1 tracker blocked">&lt;b&gt;%1$s alat za praćenje blokiran &lt;/b&gt; u posljednjih 7 dana</string>
     <string name="tabSwitcherAnimationTileRemovalDialogTitle" instruction="A title for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Sakrij broj tragača?</string>
     <string name="tabSwitcherAnimationTileRemovalDialogBody" instruction="A message for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Ovo možeš ponovno uključiti kroz Postavke &gt; Izgled.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Sakrij</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Zadrži</string>
+
+    <!-- Trackers blocked animation-->
+    <string name="settingsTrackersBlockedAnimationHeaderTitle">Animacija blokiranih alata za praćenje</string>
+    <string name="showTrackerCountInAddressBar">Prikaži u adresnoj traci</string>
+    <string name="showWeeklyTrackerCountInTabSwitcher">Prikaži u upravitelju kartica</string>
 
     <!-- Widgets -->
     <string name="searchOnlyWidgetLabel" instruction="Label for the search-only widget">Samo pretraživanje</string>

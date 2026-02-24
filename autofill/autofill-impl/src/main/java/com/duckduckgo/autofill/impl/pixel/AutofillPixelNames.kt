@@ -72,6 +72,8 @@ import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.BOOKMARK_IMPORT_FRO
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.EMAIL_TOOLTIP_DISMISSED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.EMAIL_USE_ADDRESS
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.EMAIL_USE_ALIAS
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.LIBRARY_LOAD_FAILURE_SQLCIPHER
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.LIBRARY_LOAD_TIMEOUT_SQLCIPHER
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.PRODUCT_TELEMETRY_SURFACE_PASSWORDS_OPENED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.PRODUCT_TELEMETRY_SURFACE_PASSWORDS_OPENED_DAILY
 import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin
@@ -227,6 +229,13 @@ enum class AutofillPixelNames(override val pixelName: String) : Pixel.PixelName 
     PRODUCT_TELEMETRY_SURFACE_PASSWORDS_OPENED("m_product_telemetry_surface_usage_passwords_page"),
     PRODUCT_TELEMETRY_SURFACE_PASSWORDS_OPENED_DAILY("m_product_telemetry_surface_usage_passwords_page_daily"),
     AUTOFILL_HARMONY_PREFERENCES_RETRIEVAL_FAILED("autofill_harmony_preferences_retrieval_failed"),
+    AUTOFILL_PREFERENCES_RETRIEVAL_FAILED("autofill_preferences_retrieval_failed"),
+    AUTOFILL_PREFERENCES_GET_KEY_FAILED("autofill_preferences_get_key_failed"),
+    AUTOFILL_HARMONY_PREFERENCES_GET_KEY_FAILED("autofill_harmony_preferences_get_key_failed"),
+    AUTOFILL_PREFERENCES_UPDATE_KEY_FAILED("autofill_preferences_update_key_failed"),
+    AUTOFILL_HARMONY_PREFERENCES_UPDATE_KEY_FAILED("autofill_harmony_preferences_update_key_failed"),
+    LIBRARY_LOAD_TIMEOUT_SQLCIPHER("library_load_timeout_sqlcipher"),
+    LIBRARY_LOAD_FAILURE_SQLCIPHER("library_load_failure_sqlcipher"),
 }
 
 object AutofillPixelParameters {
@@ -313,6 +322,9 @@ object AutofillPixelsRequiringDataCleaning : PixelParamRemovalPlugin {
             BOOKMARK_IMPORT_FROM_GOOGLE_FLOW_ERROR.pixelName to PixelParameter.removeAtb(),
             BOOKMARK_IMPORT_FROM_GOOGLE_FLOW_CANCELLED.pixelName to PixelParameter.removeAtb(),
             BOOKMARK_IMPORT_FROM_GOOGLE_FLOW_EXTRA_CHROME_EXPORT.pixelName to PixelParameter.removeAtb(),
+
+            LIBRARY_LOAD_TIMEOUT_SQLCIPHER.pixelName to PixelParameter.removeAtb(),
+            LIBRARY_LOAD_FAILURE_SQLCIPHER.pixelName to PixelParameter.removeAtb(),
         )
     }
 }

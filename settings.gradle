@@ -1,5 +1,34 @@
+pluginManagement {
+    repositories {
+        google()
+        gradlePluginPortal()
+    }
+}
+
 plugins {
     id("de.fayard.refreshVersions") version "0.60.5"
+    id("com.gradle.develocity") version "4.3.1"
+    id("com.gradle.common-custom-user-data-gradle-plugin") version "2.4.0"
+}
+
+rootProject.name = "androidRoot"
+
+def isCI = System.getenv('CI') != null
+
+develocity {
+    server = 'https://duckduckgo.develocity.cloud/'
+    allowUntrustedServer = false
+
+    buildScan {
+        uploadInBackground = !isCI
+        publishing.onlyIf { it.authenticated }
+        obfuscation {
+            ipAddresses { addresses -> addresses.collect { address -> "0.0.0.0" } }
+            hostname { host -> isCI ? "ci" : "dev" }
+            username { name -> "dax" }
+            externalProcessName { processName -> 'non-build-process' }
+        }
+    }
 }
 
 rootDir.eachFile(groovy.io.FileType.DIRECTORIES) { File parent ->
@@ -68,5 +97,11 @@ buildCache {
         // configure local build cache directory so that it is local to the project dir
         directory = new File(rootDir, 'build-cache')
         removeUnusedEntriesAfterDays = 7
+    }
+
+    remote(develocity.buildCache) {
+        enabled = true
+        def accessKey = System.getenv("DEVELOCITY_ACCESS_KEY")
+        push = isCI && accessKey != null && !accessKey.isEmpty()
     }
 }

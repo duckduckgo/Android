@@ -36,6 +36,7 @@ class SubscriptionsContentScopeJsMessageHandler @Inject constructor() : ContentS
 
         override val allowedDomains: List<String> = listOf(
             AppUrl.Url.HOST,
+            AppUrl.Url.DUCK_AI_HOST,
         )
 
         override val featureName: String = "subscriptions"
@@ -47,6 +48,7 @@ class SubscriptionsContentScopeJsMessageHandler @Inject constructor() : ContentS
             "backToSettings",
             "openSubscriptionActivation",
             "openSubscriptionPurchase",
+            "openSubscriptionUpgrade",
         )
     }
 }

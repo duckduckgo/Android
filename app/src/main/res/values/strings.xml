@@ -127,6 +127,7 @@
     <string name="settingsMenuItemTitle">Settings</string>
     <string name="settingsHeadingProtections">Protections</string>
     <string name="settingsHeadingAppearance">Appearance</string>
+    <string name="settingsWhatsNew">What\'s New</string>
     <string name="settingsHeadingAbout">About</string>
     <string name="settingsAboutDuckduckgo">About DuckDuckGo</string>
     <string name="settingsVersion">Version</string>
@@ -174,6 +175,8 @@
     <string name="improvedAutoCompleteIAMContent">Autocomplete Suggestions now include your recently visited sites. Turn off in Settings, or clear anytime with the 🔥 Fire Button.</string>
     <string name="improvedAutoCompleteIAMTitle">Same privacy.\nBetter search suggestions!</string>
     <string name="openAutoCompleteSettings">Open Settings</string>
+    <string name="privateSearchChatSuggestionsToggle">Chat Suggestions</string>
+    <string name="privateSearchAutocompleteHintWithChatSuggestions">Show suggestions from your history, bookmarks, and (optionally) Duck.ai chat history as you type in the search bar. All searches are private.</string>
 
     <!-- General Settings -->
     <string name="generalSettingsActivityTitle" instruction="Title of the general settings screen">General</string>
@@ -204,6 +207,17 @@
     <string name="webTrackingProtectionGoogleSigninPopupsDescription">Blocks Google sign-in pop-ups on sites Google doesn\'t own.</string>
     <string name="webTrackingProtectionGlobalPrivacyControlTitle">Global Privacy Control</string>
     <string name="webTrackingProtectionGlobalPrivacyControlDescription">Expresses opt-out rights on your behalf by telling sites not to sell or share your personal info.</string>
+
+    <!-- Get Desktop Browser -->
+    <string name="getDesktopBrowserSettingItemTitle">Get Desktop Browser</string>
+    <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo for Mac and Windows</string>
+    <string name="getDesktopBrowserTitle">Protect your personal info on Mac and Windows too!</string>
+    <string name="getDesktopBrowserBody">To download DuckDuckGo on Mac or Windows, visit:</string>
+    <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
+    <string name="getDesktopBrowserShareDownloadLink">Share Download Link</string>
+    <string name="getDesktopBrowserNoThanks">No Thanks</string>
+    <string name="getDesktopBrowserHideItem">Hide</string>
+    <string name="getDesktopBrowserUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Link copied</string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Cookie Pop-Up Protection</string>
@@ -933,11 +947,16 @@
     <string name="settingsHeadingCompleteSetup">Complete Your Setup</string>
 
     <!--TabSwitcher Trackers Animation-->
-    <string name="showTrackerCountInTabSwitcher">Show Tracker Count in Tab Switcher</string>
+    <string name="trackerBlockedInTheLast7days" instruction="Placeholder is 1 tracker blocked" >&lt;b&gt;%1$s tracker blocked &lt;/b&gt; in the last 7 days</string>
     <string name="tabSwitcherAnimationTileRemovalDialogTitle" instruction="A title for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Hide tracker count?</string>
     <string name="tabSwitcherAnimationTileRemovalDialogBody" instruction="A message for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">You can turn this back on in Settings > Appearance.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Hide</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Keep</string>
+
+    <!-- Trackers blocked animation-->
+    <string name="settingsTrackersBlockedAnimationHeaderTitle">Trackers Blocked Animation</string>
+    <string name="showTrackerCountInAddressBar">Show in Address Bar</string>
+    <string name="showWeeklyTrackerCountInTabSwitcher">Show in Tabs Manager</string>
 
     <!-- Widgets -->
     <string name="searchOnlyWidgetLabel" instruction="Label for the search-only widget">Search Only</string>

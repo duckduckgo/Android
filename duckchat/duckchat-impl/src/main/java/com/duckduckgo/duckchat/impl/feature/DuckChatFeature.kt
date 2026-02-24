@@ -138,10 +138,23 @@ interface DuckChatFeature {
     fun sendInputScreenOnboardingWideEvent(): Toggle
 
     /**
+     * @return `true` when the contextual mode killswitch is enabled
+     * This overrules contextualMode and standaloneMigration
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun contextualModeKillSwitch(): Toggle
+
+    /**
      * @return `true` when the contextual mode is enabled
      */
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun contextualMode(): Toggle
+
+    /**
+     * @return `true` when the feature flag for automatic page context attachment in contextual mode is enabled
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun automaticContextAttachment(): Toggle
 
     /**
      * @return `true` when the Duck.ai Paid Settings status indicator and navigation features are enabled.
@@ -158,4 +171,11 @@ interface DuckChatFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun supportsSyncChatsDeletion(): Toggle
+
+    /**
+     * @return `true` when the AI chat suggestions (pinned and recent chats) are enabled
+     * If the remote feature is not present defaults to `internal`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun aiChatSuggestions(): Toggle
 }

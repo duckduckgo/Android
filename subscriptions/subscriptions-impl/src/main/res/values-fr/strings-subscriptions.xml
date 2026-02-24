@@ -152,7 +152,7 @@
     <string name="feedbackSubCategoryItrAdvisorUnhelpful">Appel au conseiller inutile</string>
     <string name="feedbackSubCategoryItrOther">Autre</string>
 
-    <string name="feedbackSubCategorySubsOtp">Mot de passe à usage unique</string>
+    <string name="feedbackSubCategorySubsOtp">Problème lié au mot de passe à usage unique</string>
     <string name="feedbackSubCategorySubsOther">Autre</string>
 
     <string name="feedbackSubmitVpnHeader">Vous avez rencontré un problème qui n\'est pas traité dans notre <annotation type="faqs_link">centre d\'aide</annotation> ? Nous tenons vraiment à savoir de quoi il s\'agit.</string>

@@ -28,6 +28,8 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.di.DuckChat
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_AI_AUTOMATIC_CONTEXT_ATTACHMENT
+import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_AI_CHAT_SUGGESTIONS_USER_SETTING
+import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_AI_CONTEXTUAL_ONBOARDING_DISMISSED
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_AI_INPUT_SCREEN_COSMETIC_SETTING
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_AI_INPUT_SCREEN_USER_SETTING
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_CHAT_BACKGROUND_TIMESTAMP
@@ -53,6 +55,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.Boolean
 
 interface DuckChatDataStore {
     suspend fun setDuckChatUserEnabled(enabled: Boolean)
@@ -87,6 +90,8 @@ interface DuckChatDataStore {
 
     fun observeShowInVoiceSearch(): Flow<Boolean>
 
+    fun observeChatSuggestionsUserSettingEnabled(): Flow<Boolean>
+
     suspend fun isDuckChatUserEnabled(): Boolean
 
     suspend fun isInputScreenUserSettingEnabled(): Boolean
@@ -118,6 +123,14 @@ interface DuckChatDataStore {
     suspend fun setAIChatHistoryEnabled(enabled: Boolean)
 
     suspend fun isAIChatHistoryEnabled(): Boolean
+
+    suspend fun setContextualOnboardingCompleted(completed: Boolean)
+
+    suspend fun isContextualOnboardingCompleted(): Boolean
+
+    suspend fun isAutomaticPageContextAttachmentEnabled(): Boolean
+
+    suspend fun setChatSuggestionsUserSetting(enabled: Boolean)
 }
 
 @ContributesBinding(AppScope::class)
@@ -143,6 +156,8 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
         val DUCK_CHAT_BACKGROUND_TIMESTAMP = longPreferencesKey(name = "DUCK_CHAT_BACKGROUND_TIMESTAMP")
         val DUCK_CHAT_HISTORY_ENABLED = booleanPreferencesKey(name = "DUCK_CHAT_HISTORY_ENABLED")
         val DUCK_AI_AUTOMATIC_CONTEXT_ATTACHMENT = booleanPreferencesKey(name = "DUCK_AI_AUTOMATIC_CONTEXT_ATTACHMENT")
+        val DUCK_AI_CONTEXTUAL_ONBOARDING_DISMISSED = booleanPreferencesKey(name = "DUCK_AI_CONTEXTUAL_ONBOARDING_DISMISSED")
+        val DUCK_AI_CHAT_SUGGESTIONS_USER_SETTING = booleanPreferencesKey(name = "DUCK_AI_CHAT_SUGGESTIONS_USER_SETTING")
     }
 
     private fun Preferences.defaultShowInAddressBar(): Boolean =
@@ -208,6 +223,12 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
             .distinctUntilChanged()
             .stateIn(appCoroutineScope, SharingStarted.Eagerly, true)
 
+    private val chatSuggestionsUserSettingEnabled: StateFlow<Boolean> =
+        store.data
+            .map { prefs -> prefs[DUCK_AI_CHAT_SUGGESTIONS_USER_SETTING] ?: true }
+            .distinctUntilChanged()
+            .stateIn(appCoroutineScope, SharingStarted.Eagerly, true)
+
     override suspend fun setDuckChatUserEnabled(enabled: Boolean) {
         store.edit { prefs -> prefs[DUCK_CHAT_USER_ENABLED] = enabled }
     }
@@ -256,6 +277,8 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
     override fun observeShowInAddressBar(): Flow<Boolean> = duckChatShowInAddressBar
 
     override fun observeShowInVoiceSearch(): Flow<Boolean> = duckChatShowInVoiceSearch
+
+    override fun observeChatSuggestionsUserSettingEnabled(): Flow<Boolean> = chatSuggestionsUserSettingEnabled
 
     override suspend fun isDuckChatUserEnabled(): Boolean = store.data.firstOrNull()?.let { it[DUCK_CHAT_USER_ENABLED] } ?: true
 
@@ -326,4 +349,19 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
     }
 
     override suspend fun isAIChatHistoryEnabled(): Boolean = store.data.firstOrNull()?.let { it[DUCK_CHAT_HISTORY_ENABLED] } ?: false
+
+    override suspend fun setContextualOnboardingCompleted(completed: Boolean) {
+        store.edit { it[DUCK_AI_CONTEXTUAL_ONBOARDING_DISMISSED] = completed }
+    }
+
+    override suspend fun isContextualOnboardingCompleted(): Boolean = store.data.firstOrNull()?.let {
+        it[DUCK_AI_CONTEXTUAL_ONBOARDING_DISMISSED]
+    } ?: false
+
+    override suspend fun isAutomaticPageContextAttachmentEnabled() =
+        store.data.firstOrNull()?.let { it[DUCK_AI_AUTOMATIC_CONTEXT_ATTACHMENT] } ?: false
+
+    override suspend fun setChatSuggestionsUserSetting(enabled: Boolean) {
+        store.edit { prefs -> prefs[DUCK_AI_CHAT_SUGGESTIONS_USER_SETTING] = enabled }
+    }
 }

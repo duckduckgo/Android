@@ -34,17 +34,26 @@ dependencies {
     implementation project(':serp-logos-api')
 
     implementation AndroidX.appCompat
+    implementation AndroidX.core
     implementation AndroidX.constraintLayout
     implementation KotlinX.coroutines.android
     implementation Google.dagger
+    implementation Google.android.material
 
     implementation "com.github.bumptech.glide:glide:_"
 
     implementation "com.squareup.logcat:logcat:_"
 
+    implementation AndroidX.dataStore.preferences
+
+    implementation AndroidX.lifecycle.viewModelKtx
+    implementation AndroidX.lifecycle.runtime.ktx
+
     testImplementation Testing.junit4
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
+    testImplementation CashApp.turbine
     testImplementation project(':common-test')
+    testImplementation project(':feature-toggles-test')
     testImplementation(KotlinX.coroutines.test) {
         // https://github.com/Kotlin/kotlinx.coroutines/issues/2023
         // conflicts with mockito due to direct inclusion of byte buddy

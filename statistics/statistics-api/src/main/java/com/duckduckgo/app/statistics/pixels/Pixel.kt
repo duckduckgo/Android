@@ -71,6 +71,7 @@ interface Pixel {
         const val IS_TAB_SWITCHER_BUTTON_SHOWN = "is_tab_switcher_button_shown"
         const val IS_FIRE_BUTTON_SHOWN = "is_fire_button_shown"
         const val IS_BROWSER_MENU_BUTTON_SHOWN = "is_browser_menu_button_shown"
+        const val STATUS = "status"
         const val DATA_CLEAR_TYPE_TABS = "tabs"
         const val DATA_CLEAR_TYPE_DATA = "data"
         const val DATA_CLEAR_TYPE_CHATS = "chats"
@@ -162,11 +163,13 @@ interface Pixel {
      * @param pixel The name of the pixel event to be sent.
      * @param parameters A map of parameters to be included with the pixel event. These parameters are URL-encoded before being sent.
      * @param encodedParameters A map of parameters that are already URL-encoded. Use this when the parameters are pre-encoded.
+     * @param type The type of pixel event to be sent.
      */
     fun enqueueFire(
         pixel: PixelName,
         parameters: Map<String, String> = emptyMap(),
         encodedParameters: Map<String, String> = emptyMap(),
+        type: PixelType = Count,
     )
 
     /**
@@ -178,10 +181,12 @@ interface Pixel {
      * @param pixelName The name of the pixel event to be sent.
      * @param parameters A map of parameters to be included with the pixel event. These parameters are URL-encoded before being sent.
      * @param encodedParameters A map of parameters that are already URL-encoded. Use this when the parameters are pre-encoded.
+     * @param type The type of pixel event to be sent.
      */
     fun enqueueFire(
         pixelName: String,
         parameters: Map<String, String> = emptyMap(),
         encodedParameters: Map<String, String> = emptyMap(),
+        type: PixelType = Count,
     )
 }

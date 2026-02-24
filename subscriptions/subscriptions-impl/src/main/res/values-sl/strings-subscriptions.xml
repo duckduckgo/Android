@@ -152,8 +152,8 @@
     <string name="feedbackSubCategoryItrAdvisorUnhelpful">Klic s svetovalcem ni bil koristen</string>
     <string name="feedbackSubCategoryItrOther">Drugo</string>
 
-    <string name="feedbackSubCategorySubsOtp">Enkratno geslo</string>
-    <string name="feedbackSubCategorySubsOther">Drugo</string>
+    <string name="feedbackSubCategorySubsOtp">Težava z enkratnim geslom</string>
+    <string name="feedbackSubCategorySubsOther">Nekaj drugega</string>
 
     <string name="feedbackSubmitVpnHeader">Ste našli težavo, ki ni zajeta v našem <annotation type="faqs_link">centru za pomoč</annotation>? Vsekakor želimo izvedeti o tem.</string>
     <string name="feedbackSubmitVpnDescriptionHint">Povejte nam, kaj se dogaja ...</string>

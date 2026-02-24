@@ -53,12 +53,14 @@ import com.duckduckgo.pir.impl.integration.fakes.FakeCurrentTimeProvider
 import com.duckduckgo.pir.impl.integration.fakes.FakeDbpService
 import com.duckduckgo.pir.impl.integration.fakes.FakeEventHandlerPluginPoint
 import com.duckduckgo.pir.impl.integration.fakes.FakeNativeBrokerActionHandler
+import com.duckduckgo.pir.impl.integration.fakes.FakeNetworkProtectionState
 import com.duckduckgo.pir.impl.integration.fakes.FakePirCssScriptLoader
 import com.duckduckgo.pir.impl.integration.fakes.FakePirDataStore
 import com.duckduckgo.pir.impl.integration.fakes.FakePirDetachedWebViewProvider
 import com.duckduckgo.pir.impl.integration.fakes.FakePirMessagingInterface
 import com.duckduckgo.pir.impl.integration.fakes.FakePixel
 import com.duckduckgo.pir.impl.integration.fakes.FakePluginPoint
+import com.duckduckgo.pir.impl.integration.fakes.FakeWebViewDataCleaner
 import com.duckduckgo.pir.impl.integration.fakes.TestPirActionsRunnerFactory
 import com.duckduckgo.pir.impl.integration.fakes.TestPirSecureStorageDatabaseFactory
 import com.duckduckgo.pir.impl.models.Address
@@ -165,6 +167,8 @@ class PirEndToEndTest {
     private lateinit var fakePirDetachedWebViewProvider: FakePirDetachedWebViewProvider
     private lateinit var fakeNativeBrokerActionHandler: FakeNativeBrokerActionHandler
     private lateinit var fakePirCssScriptLoader: FakePirCssScriptLoader
+    private lateinit var fakePirWebViewDataCleaner: FakeWebViewDataCleaner
+    private lateinit var fakeNetworkProtectionState: FakeNetworkProtectionState
 
     private val activeBrokerName = "FakeBroker"
     private val removedBrokerName = "FakeRemovedBroker"
@@ -238,6 +242,8 @@ class PirEndToEndTest {
 
         fakePixel = FakePixel()
         pixelSender = RealPirPixelSender(fakePixel)
+        fakePirWebViewDataCleaner = FakeWebViewDataCleaner()
+        fakeNetworkProtectionState = FakeNetworkProtectionState()
 
         pirRepository = RealPirRepository(
             dispatcherProvider = dispatcherProvider,
@@ -284,6 +290,7 @@ class PirEndToEndTest {
             pirSchedulingRepository = pirSchedulingRepository,
             currentTimeProvider = fakeTimeProvider,
             moshi = moshi,
+            networkProtectionState = fakeNetworkProtectionState,
         )
 
         brokerActionProcessor = RealBrokerActionProcessor(fakePirMessagingInterface, moshi)
@@ -318,6 +325,7 @@ class PirEndToEndTest {
             currentTimeProvider = fakeTimeProvider,
             dispatcherProvider = dispatcherProvider,
             callbacks = pirCallbacksPluginPoint,
+            webViewDataCleaner = fakePirWebViewDataCleaner,
         )
 
         pirOptOut = RealPirOptOut(
@@ -329,6 +337,7 @@ class PirEndToEndTest {
             currentTimeProvider = fakeTimeProvider,
             dispatcherProvider = dispatcherProvider,
             callbacks = pirCallbacksPluginPoint,
+            webViewDataCleaner = fakePirWebViewDataCleaner,
         )
 
         eligibleScanJobProvider = RealEligibleScanJobProvider(
@@ -361,6 +370,7 @@ class PirEndToEndTest {
             pirActionsRunnerFactory = pirActionsRunnerFactory,
             dispatcherProvider = dispatcherProvider,
             callbacks = pirCallbacksPluginPoint,
+            webViewDataCleaner = fakePirWebViewDataCleaner,
         )
 
         pirEmailConfirmationJobsRunner = RealPirEmailConfirmationJobsRunner(

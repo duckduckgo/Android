@@ -27,10 +27,11 @@ class SubscriptionsContentScopeJsMessageHandlerTest {
     }
 
     @Test
-    fun `only allow duckduckgo dot com domains`() = runTest {
+    fun `only allow duckduckgo dot com or duck dot ai domains`() = runTest {
         val domains = handler.allowedDomains
-        assertTrue(domains.size == 1)
-        assertTrue(domains.first() == "duckduckgo.com")
+        assertTrue(domains.size == 2)
+        assertTrue(domains[0] == "duckduckgo.com")
+        assertTrue(domains[1] == "duck.ai")
     }
 
     @Test
@@ -41,7 +42,7 @@ class SubscriptionsContentScopeJsMessageHandlerTest {
     @Test
     fun `only contains valid methods`() = runTest {
         val methods = handler.methods
-        assertTrue(methods.size == 7)
+        assertTrue(methods.size == 8)
         assertTrue(methods.contains("handshake"))
         assertTrue(methods.contains("subscriptionDetails"))
         assertTrue(methods.contains("getAuthAccessToken"))
@@ -49,6 +50,7 @@ class SubscriptionsContentScopeJsMessageHandlerTest {
         assertTrue(methods.contains("backToSettings"))
         assertTrue(methods.contains("openSubscriptionActivation"))
         assertTrue(methods.contains("openSubscriptionPurchase"))
+        assertTrue(methods.contains("openSubscriptionUpgrade"))
     }
 
     private val callback = object : JsMessageCallback() {

@@ -1,0 +1,15 @@
+// https://app.asana.com/1/137249556945/project/72649045549333/task/1212695169153021?focus=true
+{
+    "m_appearance_settings_is_tracker_count_in_address_bar_toggled": {
+        "description": "Fired when the user toggles the 'Show tracker count in address bar' setting in appearance settings.",
+        "owners": ["aibrahim-"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            {
+                "key": "is_enabled",
+                "description": "whether the setting is enabled or disabled after the toggle"
+            }
+        ]
+    }
+}

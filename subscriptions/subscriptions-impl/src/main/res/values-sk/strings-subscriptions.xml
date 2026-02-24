@@ -152,8 +152,8 @@
     <string name="feedbackSubCategoryItrAdvisorUnhelpful">Telefonát poradcovi nebol nápomocný</string>
     <string name="feedbackSubCategoryItrOther">Iné</string>
 
-    <string name="feedbackSubCategorySubsOtp">Jednorazové heslo</string>
-    <string name="feedbackSubCategorySubsOther">Iné</string>
+    <string name="feedbackSubCategorySubsOtp">Problém s jednorazovým heslom</string>
+    <string name="feedbackSubCategorySubsOther">Niečo iné</string>
 
     <string name="feedbackSubmitVpnHeader">Našiel/našla si problém, ktorý nepokrýva naše <annotation type="faqs_link">centrum pomoci</annotation> ? Určite o tom chceme vedieť.</string>
     <string name="feedbackSubmitVpnDescriptionHint">Povedz nám, čo sa deje...</string>

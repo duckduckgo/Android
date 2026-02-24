@@ -62,13 +62,13 @@
             tools:ignore="InvalidColorAttribute"
             tools:text="Title" />
 
-        <ImageView
-            android:id="@+id/newPill"
+        <com.duckduckgo.common.ui.view.DaxYellowPill
+            android:id="@+id/yellowPill"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/keyline_2"
-            android:src="@drawable/ic_new_pill"
             android:visibility="gone"
+            tools:text="Beta"
             tools:visibility="visible" />
 
     </LinearLayout>

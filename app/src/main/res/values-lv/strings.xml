@@ -129,6 +129,7 @@
     <string name="settingsMenuItemTitle">Iestatījumi</string>
     <string name="settingsHeadingProtections">Aizsardzība</string>
     <string name="settingsHeadingAppearance">Izskats</string>
+    <string name="settingsWhatsNew">Kas jauns</string>
     <string name="settingsHeadingAbout">Par</string>
     <string name="settingsAboutDuckduckgo">Par DuckDuckGo</string>
     <string name="settingsVersion">Versija</string>
@@ -176,6 +177,8 @@
     <string name="improvedAutoCompleteIAMContent">Automātiskās pabeigšanas ieteikumi tagad ietver tavas nesen apmeklētās vietnes. Izslēdz sadaļā Iestatījumi vai jebkurā laikā notīri ar 🔥 Fire Button.</string>
     <string name="improvedAutoCompleteIAMTitle">Tas pats privātums.\nLabāki meklēšanas ieteikumi!</string>
     <string name="openAutoCompleteSettings">Atvērt iestatījumus</string>
+    <string name="privateSearchChatSuggestionsToggle">Tērzēšanas ieteikumi</string>
+    <string name="privateSearchAutocompleteHintWithChatSuggestions">Rādīt ieteikumus no tavas vēstures, grāmatzīmēm un (pēc izvēles) Duck.ai tērzēšanas vēstures, rakstot meklēšanas joslā. Visi meklējumi ir privāti.</string>
 
     <!-- General Settings -->
     <string name="generalSettingsActivityTitle" instruction="Title of the general settings screen">Vispārīgi</string>
@@ -206,6 +209,17 @@
     <string name="webTrackingProtectionGoogleSigninPopupsDescription">Bloķē Google pierakstīšanās uznirstošos logus vietnēs, kas nepieder Google.</string>
     <string name="webTrackingProtectionGlobalPrivacyControlTitle">Vispārēja privātuma pārvaldība</string>
     <string name="webTrackingProtectionGlobalPrivacyControlDescription">Tavā vārdā pauž atteikšanās tiesības, liekot vietnēm nepārdot un nekopīgot tavu personisko informāciju.</string>
+
+    <!-- Get Desktop Browser -->
+    <string name="getDesktopBrowserSettingItemTitle">Iegūsti galddatora pārlūku</string>
+    <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo operētājsistēmām Mac un Windows</string>
+    <string name="getDesktopBrowserTitle">Aizsargā savu personisko informāciju arī Mac un Windows!</string>
+    <string name="getDesktopBrowserBody">Lai lejupielādētu DuckDuckGo operētājsistēmā Mac vai Windows, apmeklē:</string>
+    <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
+    <string name="getDesktopBrowserShareDownloadLink">Kopīgot lejupielādes saiti</string>
+    <string name="getDesktopBrowserNoThanks">Nē, paldies</string>
+    <string name="getDesktopBrowserHideItem">Paslēpt</string>
+    <string name="getDesktopBrowserUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Saite nokopēta</string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Sīkfailu uznirstošo logu aizsardzība</string>
@@ -943,11 +957,16 @@
     <string name="settingsHeadingCompleteSetup">Pabeidz iestatīšanu</string>
 
     <!--TabSwitcher Trackers Animation-->
-    <string name="showTrackerCountInTabSwitcher">Rādīt izsekotāju skaitu ciļņu pārslēdzējā</string>
+    <string name="trackerBlockedInTheLast7days" instruction="Placeholder is 1 tracker blocked">Pēdējo 7 dienu laikā &lt;b&gt;bloķēts%1$s izsekotājs &lt;/b&gt;</string>
     <string name="tabSwitcherAnimationTileRemovalDialogTitle" instruction="A title for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Vai slēpt izsekotāju skaitu?</string>
     <string name="tabSwitcherAnimationTileRemovalDialogBody" instruction="A message for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Vari to atkal ieslēgt sadaļā Iestatījumi &gt; Izskats.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Paslēpt</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Saglabāt</string>
+
+    <!-- Trackers blocked animation-->
+    <string name="settingsTrackersBlockedAnimationHeaderTitle">Izsekotāju bloķēšanas animācija</string>
+    <string name="showTrackerCountInAddressBar">Rādīt adreses joslā</string>
+    <string name="showWeeklyTrackerCountInTabSwitcher">Rādīt ciļņu pārvaldniekā</string>
 
     <!-- Widgets -->
     <string name="searchOnlyWidgetLabel" instruction="Label for the search-only widget">Meklēt tikai</string>

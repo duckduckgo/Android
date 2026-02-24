@@ -95,6 +95,7 @@ class InitMessageHandlerPlugin @Inject constructor(
                             disabledCmps,
                             enablePreHide,
                             detectRetries,
+                            isMainWorld = true,
                             enableCosmeticRules = true,
                             enableHeuristicDetection = true,
                         )
@@ -223,6 +224,7 @@ class InitMessageHandlerPlugin @Inject constructor(
         val disabledCmps: List<String>,
         val enablePrehide: Boolean,
         val detectRetries: Int,
+        val isMainWorld: Boolean,
         val enableCosmeticRules: Boolean,
         val enableHeuristicDetection: Boolean,
     )

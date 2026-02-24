@@ -25,8 +25,10 @@ import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.browser.certificates.BypassedSSLCertificatesRepository
 import com.duckduckgo.app.browser.favicon.FaviconManager
+import com.duckduckgo.app.browser.omnibar.StandardizedLeadingIconFeatureToggle
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
+import com.duckduckgo.app.fire.store.TabVisitedSitesRepository
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.model.SiteFactoryImpl
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
@@ -41,6 +43,7 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.InstantSchedulersRule
 import com.duckduckgo.common.test.blockingObserve
 import com.duckduckgo.common.utils.CurrentTimeProvider
+import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
@@ -88,6 +91,7 @@ class TabDataRepositoryTest {
     private val mockDao: TabsDao = mock()
 
     private val mockDuckPlayer: DuckPlayer = mock()
+    private val mockStandardizedLeadingIconToggle: StandardizedLeadingIconFeatureToggle = mock()
 
     private val daoDeletableTabs = Channel<List<TabEntity>>()
 
@@ -100,6 +104,10 @@ class TabDataRepositoryTest {
     private val mockWebViewPreviewPersister: WebViewPreviewPersister = mock()
 
     private val mockFaviconManager: FaviconManager = mock()
+
+    private val mockDuckChatContextualDataStore: DuckChatContextualDataStore = mock()
+
+    private val mockTabVisitedSitesRepository: TabVisitedSitesRepository = mock()
 
     @After
     fun after() {
@@ -217,6 +225,7 @@ class TabDataRepositoryTest {
 
         verify(mockDao).deleteTabAndUpdateSelection(any())
         assertNotSame(siteData, testee.retrieveSiteData(addedTabId))
+        verify(mockTabVisitedSitesRepository).clearTab(addedTabId)
     }
 
     @Test
@@ -235,6 +244,8 @@ class TabDataRepositoryTest {
         verify(mockFaviconManager).deleteAllTemp()
         verify(mockAdClickManager).clearAll()
         verify(mockWebViewSessionStorage).deleteAllSessions()
+        verify(mockDuckChatContextualDataStore).clearAll()
+        verify(mockTabVisitedSitesRepository).clearAll()
         assertNotSame(siteData, testee.retrieveSiteData(addedTabId))
     }
 
@@ -369,6 +380,7 @@ class TabDataRepositoryTest {
 
         currentSelectedTabId = testee.liveSelectedTab.blockingObserve()?.tabId
         assertEquals(currentSelectedTabId, sourceTab.tabId)
+        verify(mockTabVisitedSitesRepository).clearTab("tabToDeleteId")
     }
 
     @Test
@@ -633,6 +645,8 @@ class TabDataRepositoryTest {
             assertNull(testee.retrieveSiteData(tabId).value)
             verify(mockWebViewSessionStorage).deleteSession(tabId)
             verify(mockAdClickManager).clearTabId(tabId)
+            verify(mockDuckChatContextualDataStore).clearTabChatUrl(tabId)
+            verify(mockTabVisitedSitesRepository).clearTab(tabId)
         }
     }
 
@@ -649,6 +663,8 @@ class TabDataRepositoryTest {
             assertNull(testee.retrieveSiteData(tabId).value)
             verify(mockWebViewSessionStorage).deleteSession(tabId)
             verify(mockAdClickManager).clearTabId(tabId)
+            verify(mockDuckChatContextualDataStore).clearTabChatUrl(tabId)
+            verify(mockTabVisitedSitesRepository).clearTab(tabId)
         }
     }
 
@@ -738,6 +754,8 @@ class TabDataRepositoryTest {
         tabSwitcherDataStore: TabSwitcherDataStore = mock(),
         duckDuckGoUrlDetector: DuckDuckGoUrlDetector = mock(),
         timeProvider: CurrentTimeProvider = FakeTimeProvider(),
+        contextualDataStore: DuckChatContextualDataStore = mockDuckChatContextualDataStore,
+        tabVisitedSitesRepository: TabVisitedSitesRepository = mockTabVisitedSitesRepository,
     ): TabDataRepository {
         return TabDataRepository(
             dao,
@@ -750,6 +768,7 @@ class TabDataRepositoryTest {
                 coroutinesTestRule.testDispatcherProvider,
                 duckDuckGoUrlDetector,
                 mockDuckPlayer,
+                mockStandardizedLeadingIconToggle,
             ),
             webViewPreviewPersister,
             faviconManager,
@@ -760,6 +779,8 @@ class TabDataRepositoryTest {
             mockAdClickManager,
             mockWebViewSessionStorage,
             tabManagerFeatureFlags,
+            contextualDataStore,
+            tabVisitedSitesRepository,
         )
     }
 

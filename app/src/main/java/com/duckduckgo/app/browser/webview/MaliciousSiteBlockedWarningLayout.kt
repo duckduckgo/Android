@@ -79,6 +79,17 @@ class MaliciousSiteBlockedWarningLayout @JvmOverloads constructor(
         setListeners(actionHandler)
     }
 
+    fun disableViewStateSaving() {
+        binding.maliciousSiteLayout.isSaveEnabled = false
+        binding.alertImage.isSaveEnabled = false
+        binding.errorHeadline.isSaveEnabled = false
+        binding.errorTitle.isSaveEnabled = false
+        binding.expandedHeadline.isSaveEnabled = false
+        binding.expandedCTA.isSaveEnabled = false
+        binding.leaveSiteCTA.isSaveEnabled = false
+        binding.advancedCTA.isSaveEnabled = false
+    }
+
     private fun resetViewState() {
         with(binding) {
             advancedCTA.show()

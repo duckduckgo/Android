@@ -18,6 +18,7 @@ package com.duckduckgo.pir.impl.common
 
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.CurrentTimeProvider
+import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.pir.impl.common.PirJob.RunType
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerRecordEmailConfirmationCompleted
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerRecordEmailConfirmationNeeded
@@ -83,6 +84,7 @@ class RealPirRunStateHandlerTest {
     private val mockSchedulingRepository: PirSchedulingRepository = mock()
     private val mockCurrentTimeProvider: CurrentTimeProvider = mock()
     private val moshi: Moshi = Moshi.Builder().build()
+    private val networkProtectionState: NetworkProtectionState = mock()
 
     @Before
     fun setUp() {
@@ -96,6 +98,7 @@ class RealPirRunStateHandlerTest {
                 pirSchedulingRepository = mockSchedulingRepository,
                 currentTimeProvider = mockCurrentTimeProvider,
                 moshi = moshi,
+                networkProtectionState = networkProtectionState,
             )
 
         whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(testEventTimeInMillis)
@@ -226,6 +229,7 @@ class RealPirRunStateHandlerTest {
                     lastAction = BrokerAction.Navigate(id = "1234", url = "hello.com"),
                 )
             whenever(mockRepository.getExtractedProfiles(any(), any())).thenReturn(emptyList())
+            whenever(networkProtectionState.isRunning()).thenReturn(true)
             testee.handleState(state)
 
             verify(mockPixelSender).reportScanNoMatch(
@@ -236,6 +240,7 @@ class RealPirRunStateHandlerTest {
                 parentUrl = "",
                 actionId = "1234",
                 actionType = "navigate",
+                isVpnRunning = true,
             )
             verify(mockEventsRepository).saveBrokerScanLog(
                 PirBrokerScanLog(
@@ -270,6 +275,7 @@ class RealPirRunStateHandlerTest {
             whenever(mockRepository.getExtractedProfiles(any(), any())).thenReturn(
                 listOf(testExtractedProfile),
             )
+            whenever(networkProtectionState.isRunning()).thenReturn(true)
             testee.handleState(state)
 
             verify(mockPixelSender).reportScanMatches(
@@ -278,6 +284,7 @@ class RealPirRunStateHandlerTest {
                 inManualStarted = true,
                 parentUrl = "",
                 totalMatches = 1,
+                isVpnRunning = true,
             )
             verify(mockEventsRepository).saveBrokerScanLog(
                 PirBrokerScanLog(
@@ -312,6 +319,8 @@ class RealPirRunStateHandlerTest {
                     failedAction = BrokerAction.Navigate(id = "123243", url = "test.com"),
                 )
 
+            whenever(networkProtectionState.isRunning()).thenReturn(false)
+
             testee.handleState(state)
 
             verify(mockPixelSender).reportScanError(
@@ -324,6 +333,7 @@ class RealPirRunStateHandlerTest {
                 parentUrl = "",
                 actionId = "123243",
                 actionType = "navigate",
+                isVpnRunning = false,
             )
             verify(mockEventsRepository).saveBrokerScanLog(
                 PirBrokerScanLog(
@@ -491,6 +501,7 @@ class RealPirRunStateHandlerTest {
                     optOutRemovedDateInMillis = 0L,
                 ),
             )
+            whenever(networkProtectionState.isRunning()).thenReturn(false)
 
             testee.handleState(state)
 
@@ -508,6 +519,7 @@ class RealPirRunStateHandlerTest {
                 durationMs = testEventTimeInMillis - testStartTimeInMillis,
                 optOutAttemptCount = 2,
                 emailPattern = state.emailPattern,
+                isVpnRunning = false,
             )
         }
 
@@ -541,6 +553,7 @@ class RealPirRunStateHandlerTest {
                     optOutRemovedDateInMillis = 0L,
                 ),
             )
+            whenever(networkProtectionState.isRunning()).thenReturn(true)
 
             testee.handleState(state)
 
@@ -562,6 +575,7 @@ class RealPirRunStateHandlerTest {
                 emailPattern = state.emailPattern,
                 actionId = state.failedAction.id,
                 actionType = state.failedAction.asActionType(),
+                isVpnRunning = true,
             )
         }
 
@@ -640,6 +654,7 @@ class RealPirRunStateHandlerTest {
                 )
             whenever(mockRepository.getBrokerForName(testBrokerName)).thenReturn(testBroker)
             whenever(mockSchedulingRepository.getEmailConfirmationJob(testExtractedProfileId)).thenReturn(testEmailConfirmationJob)
+            whenever(networkProtectionState.isRunning()).thenThrow(RuntimeException())
 
             testee.handleState(state)
 
@@ -668,6 +683,7 @@ class RealPirRunStateHandlerTest {
                 durationMs = state.totalTimeMillis,
                 optOutAttemptCount = testEmailConfirmationJob.jobAttemptData.jobAttemptCount,
                 emailPattern = state.emailPattern,
+                isVpnRunning = false,
             )
             verifyNoMoreInteractions(mockPixelSender)
             verifyNoMoreInteractions(mockJobRecordUpdater)

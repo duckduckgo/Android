@@ -129,6 +129,7 @@
     <string name="settingsMenuItemTitle">Setări</string>
     <string name="settingsHeadingProtections">Protecții</string>
     <string name="settingsHeadingAppearance">Aspect</string>
+    <string name="settingsWhatsNew">Noutăți</string>
     <string name="settingsHeadingAbout">Despre</string>
     <string name="settingsAboutDuckduckgo">Despre DuckDuckGo</string>
     <string name="settingsVersion">Versiune</string>
@@ -176,6 +177,8 @@
     <string name="improvedAutoCompleteIAMContent">Sugestiile de completare automată includ acum site-urile accesate recent. Dezactivează-le din Setări sau șterge-le în orice moment cu ajutorul Fire Button 🔥.</string>
     <string name="improvedAutoCompleteIAMTitle">Aceeași confidențialitate.\nSugestii de căutare mai bune!</string>
     <string name="openAutoCompleteSettings">Deschide Setări</string>
+    <string name="privateSearchChatSuggestionsToggle">Sugestii de chat</string>
+    <string name="privateSearchAutocompleteHintWithChatSuggestions">Afișează sugestii din istoricul tău, marcaje și (opțional) istoricul chaturilor Duck.ai pe măsură ce tastezi în bara de căutare. Toate căutările sunt private.</string>
 
     <!-- General Settings -->
     <string name="generalSettingsActivityTitle" instruction="Title of the general settings screen">Generalități</string>
@@ -206,6 +209,17 @@
     <string name="webTrackingProtectionGoogleSigninPopupsDescription">Blochează ferestrele pop-up de conectare Google pe site-urile pe care nu le deține Google.</string>
     <string name="webTrackingProtectionGlobalPrivacyControlTitle">Controlul global al confidențialității</string>
     <string name="webTrackingProtectionGlobalPrivacyControlDescription">Exprimă drepturile de retragere în numele tău, comunicând site-urilor să nu vândă sau să nu partajeze informațiile tale personale.</string>
+
+    <!-- Get Desktop Browser -->
+    <string name="getDesktopBrowserSettingItemTitle">Obține browserul pentru desktop</string>
+    <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo pentru Mac și Windows</string>
+    <string name="getDesktopBrowserTitle">Protejează-ți informațiile personale și pe Mac și Windows!</string>
+    <string name="getDesktopBrowserBody">Pentru a descărca DuckDuckGo pe Mac sau Windows, vizitează:</string>
+    <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
+    <string name="getDesktopBrowserShareDownloadLink">Trimite linkul de descărcare</string>
+    <string name="getDesktopBrowserNoThanks">Nu, mulțumesc</string>
+    <string name="getDesktopBrowserHideItem">Ascunde</string>
+    <string name="getDesktopBrowserUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Link copiat</string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Protecție pentru ferestre pop-up aferente modulelor cookie</string>
@@ -943,11 +957,16 @@
     <string name="settingsHeadingCompleteSetup">Finalizează configurarea</string>
 
     <!--TabSwitcher Trackers Animation-->
-    <string name="showTrackerCountInTabSwitcher">Afișează numărul de tehnologii de urmărire în comutatorul de file</string>
+    <string name="trackerBlockedInTheLast7days" instruction="Placeholder is 1 tracker blocked">&lt;b&gt;%1$s tehnologie de urmărire blocată &lt;/b&gt; în ultimele 7 zile</string>
     <string name="tabSwitcherAnimationTileRemovalDialogTitle" instruction="A title for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Ascunzi contorul tehnologiilor de urmărire?</string>
     <string name="tabSwitcherAnimationTileRemovalDialogBody" instruction="A message for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Poți să activezi din nou această opțiune în Setări &gt; Aspect.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Ascunde</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Păstrează</string>
+
+    <!-- Trackers blocked animation-->
+    <string name="settingsTrackersBlockedAnimationHeaderTitle">Animația de blocare a tehnologiilor de urmărire</string>
+    <string name="showTrackerCountInAddressBar">Afișează în bara de adrese</string>
+    <string name="showWeeklyTrackerCountInTabSwitcher">Afișează în managerul de file</string>
 
     <!-- Widgets -->
     <string name="searchOnlyWidgetLabel" instruction="Label for the search-only widget">Doar căutare</string>

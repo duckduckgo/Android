@@ -384,6 +384,11 @@
             android:label="@string/aboutActivityTitle"
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
         <activity
+            android:name="com.duckduckgo.app.desktopbrowser.GetDesktopBrowserActivity"
+            android:exported="false"
+            android:label="@string/getDesktopBrowserSettingItemTitle"
+            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
+        <activity
             android:name="com.duckduckgo.app.fire.fireproofwebsite.ui.FireproofWebsitesActivity"
             android:exported="false"
             android:label="@string/fireproofWebsitesActivityTitle"
@@ -503,16 +508,6 @@
             />
 
         <service
-            android:name="com.duckduckgo.widget.FavoritesWidgetService"
-            android:exported="false"
-            android:permission="android.permission.BIND_REMOTEVIEWS" />
-
-        <service
-            android:name="com.duckduckgo.widget.EmptyFavoritesWidgetService"
-            android:exported="false"
-            android:permission="android.permission.BIND_REMOTEVIEWS" />
-
-        <service
             android:name="com.duckduckgo.customtabs.impl.service.DuckDuckGoCustomTabService"
             android:exported="true"
             tools:ignore="ExportedService">
@@ -529,6 +524,10 @@
             tools:ignore="MissingClass" />
 
         <receiver android:name=".shortcut.ShortcutReceiver" android:exported="false" />
+
+        <receiver
+            android:name="com.duckduckgo.app.desktopbrowser.GetDesktopBrowserShareBroadcastReceiver"
+            android:exported="false" />
 
         <receiver
             android:name="com.duckduckgo.widget.SearchWidget"

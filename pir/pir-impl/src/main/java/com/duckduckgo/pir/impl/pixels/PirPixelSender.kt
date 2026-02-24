@@ -46,8 +46,11 @@ import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_ENGAGEMENT_DAU
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_ENGAGEMENT_MAU
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_ENGAGEMENT_WAU
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_FOREGROUND_RUN_COMPLETED
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_FOREGROUND_RUN_LOW_MEMORY
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_FOREGROUND_RUN_STARTED
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_FOREGROUND_RUN_START_FAILED
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INITIAL_SCAN_DURATION
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INITIAL_SCAN_INCOMPLETE
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INTERNAL_SECURE_STORAGE_UNAVAILABLE
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_OPTOUT_INVALID_EVENT
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_OPTOUT_STAGE_CAPTCHA_PARSE
@@ -99,6 +102,16 @@ interface PirPixelSender {
     )
 
     /**
+     * Emits a pixel to signal that a manually initiated scan failed to start as foreground.
+     */
+    fun reportManualScanStartFailed()
+
+    /**
+     * Emits a pixel to signal that the foreground scan service is running low on memory.
+     */
+    fun reportManualScanLowMemory()
+
+    /**
      * Emits a pixel to signal that the scheduled scan has been scheduled.
      */
     fun reportScheduledScanScheduled()
@@ -130,6 +143,7 @@ interface PirPixelSender {
         durationMs: Long,
         optOutAttemptCount: Int,
         emailPattern: String?,
+        isVpnRunning: Boolean,
     )
 
     /**
@@ -155,6 +169,7 @@ interface PirPixelSender {
         emailPattern: String?,
         actionId: String,
         actionType: String,
+        isVpnRunning: Boolean,
     )
 
     /**
@@ -394,6 +409,7 @@ interface PirPixelSender {
         durationMs: Long,
         inManualStarted: Boolean,
         parentUrl: String,
+        isVpnRunning: Boolean,
     )
 
     fun reportScanNoMatch(
@@ -404,6 +420,7 @@ interface PirPixelSender {
         parentUrl: String,
         actionId: String,
         actionType: String,
+        isVpnRunning: Boolean,
     )
 
     fun reportScanError(
@@ -416,6 +433,7 @@ interface PirPixelSender {
         parentUrl: String,
         actionId: String,
         actionType: String,
+        isVpnRunning: Boolean,
     )
 
     fun reportOptOutStageStart(
@@ -537,6 +555,8 @@ interface PirPixelSender {
 
     fun reportDashboardOpened()
 
+    fun reportInitialScanIncomplete()
+
     fun reportInitialScanDuration(
         durationMs: Long,
         profileQueryCount: Int,
@@ -574,6 +594,14 @@ class RealPirPixelSender @Inject constructor(
         fire(PIR_FOREGROUND_RUN_COMPLETED, params)
     }
 
+    override fun reportManualScanStartFailed() {
+        enqueueFire(PIR_FOREGROUND_RUN_START_FAILED)
+    }
+
+    override fun reportManualScanLowMemory() {
+        enqueueFire(PIR_FOREGROUND_RUN_LOW_MEMORY)
+    }
+
     override fun reportScheduledScanScheduled() {
         fire(PIR_SCHEDULED_RUN_SCHEDULED)
     }
@@ -597,6 +625,7 @@ class RealPirPixelSender @Inject constructor(
         durationMs: Long,
         optOutAttemptCount: Int,
         emailPattern: String?,
+        isVpnRunning: Boolean,
     ) {
         val params = mapOf(
             PARAM_KEY_BROKER to brokerUrl,
@@ -604,8 +633,17 @@ class RealPirPixelSender @Inject constructor(
             PARAM_DURATION to durationMs.toString(),
             PARAM_TRIES to optOutAttemptCount.toString(),
             PARAM_KEY_PATTERN to (emailPattern ?: ""),
+            PARAM_KEY_VPN_STATE to isVpnRunning.toVpnConnectionState(),
         )
         fire(PIR_OPTOUT_SUBMIT_SUCCESS, params)
+    }
+
+    private fun Boolean.toVpnConnectionState(): String {
+        return if (this) {
+            "connected"
+        } else {
+            "disconnected"
+        }
     }
 
     override fun reportOptOutFailed(
@@ -618,6 +656,7 @@ class RealPirPixelSender @Inject constructor(
         emailPattern: String?,
         actionId: String,
         actionType: String,
+        isVpnRunning: Boolean,
     ) {
         val params = mapOf(
             PARAM_KEY_BROKER to brokerUrl,
@@ -629,6 +668,7 @@ class RealPirPixelSender @Inject constructor(
             PARAM_KEY_PATTERN to (emailPattern ?: ""),
             PARAM_ACTION_ID to actionId,
             PARAM_KEY_ACTION_TYPE to actionType,
+            PARAM_KEY_VPN_STATE to isVpnRunning.toVpnConnectionState(),
         )
 
         fire(PIR_OPTOUT_SUBMIT_FAILURE, params)
@@ -916,6 +956,7 @@ class RealPirPixelSender @Inject constructor(
         durationMs: Long,
         inManualStarted: Boolean,
         parentUrl: String,
+        isVpnRunning: Boolean,
     ) {
         val params = mapOf(
             PARAM_KEY_BROKER to brokerUrl,
@@ -924,6 +965,7 @@ class RealPirPixelSender @Inject constructor(
             PARAM_KEY_PARENT to parentUrl,
             PARAM_KEY_MANUAL_STARTED to inManualStarted.toString(),
             PARAM_KEY_PARENT to parentUrl,
+            PARAM_KEY_VPN_STATE to isVpnRunning.toVpnConnectionState(),
         )
 
         fire(PIR_SCAN_STAGE_RESULT_MATCHES, params)
@@ -937,6 +979,7 @@ class RealPirPixelSender @Inject constructor(
         parentUrl: String,
         actionId: String,
         actionType: String,
+        isVpnRunning: Boolean,
     ) {
         val params = mapOf(
             PARAM_KEY_BROKER to brokerUrl,
@@ -946,6 +989,7 @@ class RealPirPixelSender @Inject constructor(
             PARAM_KEY_PARENT to parentUrl,
             PARAM_ACTION_ID to actionId,
             PARAM_KEY_ACTION_TYPE to actionType,
+            PARAM_KEY_VPN_STATE to isVpnRunning.toVpnConnectionState(),
         )
 
         fire(PIR_SCAN_STAGE_RESULT_NO_MATCH, params)
@@ -961,6 +1005,7 @@ class RealPirPixelSender @Inject constructor(
         parentUrl: String,
         actionId: String,
         actionType: String,
+        isVpnRunning: Boolean,
     ) {
         val params = mapOf(
             PARAM_KEY_BROKER to brokerUrl,
@@ -972,6 +1017,7 @@ class RealPirPixelSender @Inject constructor(
             PARAM_KEY_PARENT to parentUrl,
             PARAM_ACTION_ID to actionId,
             PARAM_KEY_ACTION_TYPE to actionType,
+            PARAM_KEY_VPN_STATE to isVpnRunning.toVpnConnectionState(),
         )
 
         fire(PIR_SCAN_STAGE_RESULT_ERROR, params)
@@ -1270,6 +1316,10 @@ class RealPirPixelSender @Inject constructor(
         fire(PIR_DASHBOARD_OPENED)
     }
 
+    override fun reportInitialScanIncomplete() {
+        fire(PIR_INITIAL_SCAN_INCOMPLETE)
+    }
+
     override fun reportInitialScanDuration(
         durationMs: Long,
         profileQueryCount: Int,
@@ -1321,6 +1371,16 @@ class RealPirPixelSender @Inject constructor(
         }
     }
 
+    private fun enqueueFire(
+        pixel: PirPixel,
+        params: Map<String, String> = emptyMap(),
+    ) {
+        pixel.getPixelNames().forEach { (_, pixelName) ->
+            logcat { "PIR-LOGGING: $pixelName params: $params" }
+            pixelSender.enqueueFire(pixelName = pixelName, parameters = params)
+        }
+    }
+
     companion object {
         private const val PARAM_KEY_TOTAL_TIME = "totalTimeInMillis"
         private const val PARAM_KEY_CPU_USAGE = "cpuUsage"
@@ -1354,5 +1414,6 @@ class RealPirPixelSender @Inject constructor(
         private const val PARAM_KEY_DURATION_MS = "duration_in_ms"
         private const val PARAM_KEY_PROFILE_QUERY_COUNT = "profile_queries"
         private const val PARAM_KEY_SCAN_FREQUENCY = "scanFrequencyWithinThreshold"
+        private const val PARAM_KEY_VPN_STATE = "vpn_connection_state"
     }
 }

@@ -24,6 +24,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
+import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.PRODUCT_TELEMETRY_SURFACE_SETTINGS_OPENED
 import com.duckduckgo.app.pixels.AppPixelName.PRODUCT_TELEMETRY_SURFACE_SETTINGS_OPENED_DAILY
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_ABOUT_DDG_SHARE_FEEDBACK_PRESSED
@@ -42,7 +43,9 @@ import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_PASSWORDS_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_PERMISSIONS_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_PRIVATE_SEARCH_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_WEB_TRACKING_PROTECTION_PRESSED
+import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_WHATS_NEW_PRESSED
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
+import com.duckduckgo.app.settings.GetDesktopBrowserCompleteSetupSettings.Companion.GET_DESKTOP_BROWSER_SOURCE_PIXEL_PARAM
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchAboutScreen
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchAccessibilitySettings
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchAddHomeScreenWidget
@@ -146,6 +149,7 @@ class SettingsViewModel @Inject constructor(
         val isAddWidgetInProtectionsVisible: Boolean = false,
         val widgetsInstalled: Boolean = false,
         val showWhatsNew: Boolean = false,
+        val showGetDesktopBrowser: Boolean = false,
     )
 
     sealed class Command {
@@ -172,6 +176,7 @@ class SettingsViewModel @Inject constructor(
         data object LaunchFeedback : Command()
         data object LaunchPproUnifiedFeedback : Command()
         data object LaunchOtherPlatforms : Command()
+        data object LaunchGetDesktopBrowser : Command()
         data class LaunchWhatsNew(
             val messageId: String,
             val messageType: Content.MessageType,
@@ -233,6 +238,9 @@ class SettingsViewModel @Inject constructor(
                     showWhatsNew = withContext(dispatcherProvider.io()) {
                         settingsPageFeature.whatsNewEnabled().isEnabled() && modalSurfaceStore.getLastShownRemoteMessageId() != null
                     },
+                    showGetDesktopBrowser = withContext(dispatcherProvider.io()) {
+                        settingsPageFeature.newDesktopBrowserSettingEnabled().isEnabled()
+                    },
                 ),
             )
         }
@@ -269,6 +277,7 @@ class SettingsViewModel @Inject constructor(
             val messageId = modalSurfaceStore.getLastShownRemoteMessageId()
             val messageType = modalSurfaceStore.getLastShownRemoteMessageType()
             if (messageId != null && messageType != null) {
+                pixel.fire(SETTINGS_WHATS_NEW_PRESSED)
                 command.send(Command.LaunchWhatsNew(messageId, messageType))
             }
         }
@@ -430,7 +439,17 @@ class SettingsViewModel @Inject constructor(
         viewModelScope.launch { command.send(LaunchOtherPlatforms) }
     }
 
+    fun onGetDesktopBrowserClicked() {
+        pixel.fire(
+            AppPixelName.GET_DESKTOP_BROWSER_CLICKED,
+            mapOf(GET_DESKTOP_BROWSER_SOURCE_PIXEL_PARAM to GET_DESKTOP_BROWSER_SOURCE_SETTINGS),
+        )
+        viewModelScope.launch { command.send(Command.LaunchGetDesktopBrowser) }
+    }
+
     companion object {
         const val EMAIL_PROTECTION_URL = "https://duckduckgo.com/email"
+
+        private const val GET_DESKTOP_BROWSER_SOURCE_SETTINGS = "settings"
     }
 }

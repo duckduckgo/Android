@@ -130,6 +130,7 @@
     <string name="settingsMenuItemTitle">Nastavení</string>
     <string name="settingsHeadingProtections">Ochrany</string>
     <string name="settingsHeadingAppearance">Vzhled</string>
+    <string name="settingsWhatsNew">Co je nového</string>
     <string name="settingsHeadingAbout">O nás</string>
     <string name="settingsAboutDuckduckgo">O DuckDuckGo</string>
     <string name="settingsVersion">Verze</string>
@@ -177,6 +178,8 @@
     <string name="improvedAutoCompleteIAMContent">Návrhy automatického doplňování teď zahrnují tvoje nedávno navštívené stránky. Vypnout se dají v nastavení nebo je můžeš kdykoli vymazat tlačítkem 🔥 Fire Button.</string>
     <string name="improvedAutoCompleteIAMTitle">Stejné soukromí.\nLepší návrhy pro vyhledávání!</string>
     <string name="openAutoCompleteSettings">Otevřít nastavení</string>
+    <string name="privateSearchChatSuggestionsToggle">Návrhy chatu</string>
+    <string name="privateSearchAutocompleteHintWithChatSuggestions">Při psaní do vyhledávacího pole si nech zobrazovat návrhy z historie, záložek a volitelně i historie chatu Duck.ai. Všechna vyhledávání jsou soukromá.</string>
 
     <!-- General Settings -->
     <string name="generalSettingsActivityTitle" instruction="Title of the general settings screen">Obecné</string>
@@ -207,6 +210,17 @@
     <string name="webTrackingProtectionGoogleSigninPopupsDescription">Blokuje vyskakovací okna pro přihlášení na Google na webech, které Google nevlastní.</string>
     <string name="webTrackingProtectionGlobalPrivacyControlTitle">Celoplošná ochrana soukromí</string>
     <string name="webTrackingProtectionGlobalPrivacyControlDescription">Uplatní tvoje právo odmítnout předávání osobních údajů. Požádá za tebe weby, aby tyto údaje neprodávaly ani nesdílely.</string>
+
+    <!-- Get Desktop Browser -->
+    <string name="getDesktopBrowserSettingItemTitle">Nainstalovat prohlížeč pro počítač</string>
+    <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo pro Mac a Windows</string>
+    <string name="getDesktopBrowserTitle">Chraň své osobní údaje i na Macu a Windows!</string>
+    <string name="getDesktopBrowserBody">DuckDuckGo pro Mac nebo Windows si můžeš stáhnout na:</string>
+    <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
+    <string name="getDesktopBrowserShareDownloadLink">Sdílet odkaz ke stažení</string>
+    <string name="getDesktopBrowserNoThanks">Ne, děkuji</string>
+    <string name="getDesktopBrowserHideItem">Skrýt</string>
+    <string name="getDesktopBrowserUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Odkaz se zkopíroval</string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Ochrana před vyskakovacími okny ohledně cookies</string>
@@ -962,11 +976,16 @@
     <string name="settingsHeadingCompleteSetup">Dokonči své nastavení</string>
 
     <!--TabSwitcher Trackers Animation-->
-    <string name="showTrackerCountInTabSwitcher">Zobrazit počet trackerů v přepínači karet</string>
+    <string name="trackerBlockedInTheLast7days" instruction="Placeholder is 1 tracker blocked">&lt;b&gt;Počet zablokovaných trackerů: %1$s &lt;/b&gt; za posledních 7 dní</string>
     <string name="tabSwitcherAnimationTileRemovalDialogTitle" instruction="A title for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Skrýt počet trackerů?</string>
     <string name="tabSwitcherAnimationTileRemovalDialogBody" instruction="A message for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Tuhle funkci můžeš zase zapnout v Nastavení &gt; Vzhled.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Skrýt</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Ponechat</string>
+
+    <!-- Trackers blocked animation-->
+    <string name="settingsTrackersBlockedAnimationHeaderTitle">Animace zablokovaných trackerů</string>
+    <string name="showTrackerCountInAddressBar">Zobrazit v adresním řádku</string>
+    <string name="showWeeklyTrackerCountInTabSwitcher">Zobrazit ve Správci karet</string>
 
     <!-- Widgets -->
     <string name="searchOnlyWidgetLabel" instruction="Label for the search-only widget">Jen vyhledávání</string>

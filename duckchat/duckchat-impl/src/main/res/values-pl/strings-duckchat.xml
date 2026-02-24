@@ -93,4 +93,16 @@
     <string name="duck_ai_paid_settings_enable_in_settings">Włącz w ustawieniach funkcji AI</string>
     <string name="duck_ai_paid_settings_manage_in_settings">Zarządzaj w ustawieniach funkcji AI</string>
     <string name="duck_ai_paid_settings_manage_secondary">Skonfiguruj Duck.ai w ustawieniach funkcji AI.</string>
+
+    <!-- Duck AI contextual onboarding -->
+    <string name="duck_chat_contextual_onboarding_title" instruction="Title for contextual Duck AI onboarding sheet">Zapytaj o tę stronę</string>
+    <string name="duck_chat_contextual_onboarding_body" instruction="Body text for contextual Duck AI onboarding sheet">Duck.ai może teraz pomóc w uzyskaniu odpowiedzi na pytania dotyczące przeglądanej strony.\n\nTreść strony jest uwzględniana tylko w przypadku, gdy ją dołączysz. Możesz to zmienić w dowolnym momencie w Ustawieniach.</string>
+    <string name="duck_chat_contextual_onboarding_primary" instruction="Button to continue to contextual Duck AI sheet">Rozumiem</string>
+    <string name="duck_chat_contextual_onboarding_secondary" instruction="Button to go to AI settings">Wyświetl ustawienia</string>
+
+    <!-- Duck.ai Contextual Bottom Sheet -->
+    <string name="duckAIContextualPromptSummarize">Podsumuj tę stronę</string>
+    <string name="duckAIContextualAutomaticContextTitle">Automatycznie wysyłaj zawartość strony</string>
+    <string name="duckAIContextualAutomaticContextMessage">Automatycznie wysyłaj zawartość strony do Duck.ai</string>
+    <string name="duckAIContextualAttachPageContent">Dołącz zawartość strony</string>
 </resources>

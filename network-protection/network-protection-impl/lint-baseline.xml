@@ -2,6 +2,28 @@
 <issues format="6" by="lint 8.8.2" type="baseline" client="gradle" dependencies="false" name="AGP (8.7.3)" variant="all" version="8.8.2">
 
     <issue
+        id="NoLifecycleScopeInFragment"
+        message="Use viewLifecycleOwner.lifecycleScope instead of lifecycleScope in Fragments. Fragment views can be destroyed while the fragment is still alive (backstack, ViewPager), which can cause crashes when coroutines try to update destroyed views."
+        errorLine1="            lifecycleScope.launch(dispatcherProvider.io()) {"
+        errorLine2="            ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/networkprotection/impl/settings/geoswitching/NetpGeoswitchingCityChoiceDialogFragment.kt"
+            line="92"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="NoLifecycleScopeInFragment"
+        message="Use viewLifecycleOwner.lifecycleScope instead of lifecycleScope in Fragments. Fragment views can be destroyed while the fragment is still alive (backstack, ViewPager), which can cause crashes when coroutines try to update destroyed views."
+        errorLine1="            .launchIn(lifecycleScope)"
+        errorLine2="                      ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/networkprotection/impl/autoexclude/VpnAutoExcludePromptFragment.kt"
+            line="113"
+            column="23"/>
+    </issue>
+
+    <issue
         id="DenyListedApi"
         message="No one remembers what these constants map to. Use the API level integer value directly since it&apos;s self-defining."
         errorLine1="        val uid = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {"
@@ -140,7 +162,7 @@
         errorLine2="                                                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/networkprotection/impl/quickaccess/VpnTileService.kt"
-            line="93"
+            line="99"
             column="54"/>
     </issue>
 

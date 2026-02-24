@@ -180,6 +180,14 @@ interface AndroidBrowserConfigFeature {
     fun vpnMenuItem(): Toggle
 
     /**
+     * @return `true` when the remote config has the global "vpnMenuItemInternational" androidBrowserConfig
+     * sub-feature flag enabled
+     * If the remote feature is not present defaults to `false`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun vpnMenuItemInternational(): Toggle
+
+    /**
      * @return `true` when the remote config has the global "splitOmnibar" androidBrowserConfig
      * sub-feature flag enabled
      * If the remote feature is not present defaults to `false`
@@ -189,21 +197,22 @@ interface AndroidBrowserConfigFeature {
     fun splitOmnibar(): Toggle
 
     /**
+     * Controls whether the split omnibar option is shown in the welcome page onboarding flow.
+     * @return `true` when the remote config has the global "splitOmnibarWelcomePage" androidBrowserConfig
+     * sub-feature flag enabled
+     * If the remote feature is not present defaults to `true`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    @Toggle.InternalAlwaysEnabled
+    fun splitOmnibarWelcomePage(): Toggle
+
+    /**
      * @return `true` when the remote config has the global "repotWebViewCapabilities" androidBrowserConfig
      * sub-feature flag enabled
      * If the remote feature is not present defaults to `false`
      */
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun reportWebViewCapabilities(): Toggle
-
-    /**
-     * @return `true` when the remote config has the global "handleAboutBlank" androidBrowserConfig
-     * sub-feature flag enabled
-     * If the remote feature is not present defaults to `false`
-     */
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
-    @Toggle.InternalAlwaysEnabled
-    fun handleAboutBlank(): Toggle
 
     /**
      * @return `true` when the remote config has the global "useUrlPredictor" androidBrowserConfig
@@ -275,4 +284,50 @@ interface AndroidBrowserConfigFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun sendVerifiedInstallPixels(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun refreshDuckAiOnSubscriptionChanges(): Toggle
+
+    /**
+     * Controls whether tracker animation is disabled when the app restarts.
+     * @return `true` when the remote config has the global "disableTrackerAnimationOnRestart" androidBrowserConfig
+     * sub-feature flag enabled
+     * If the remote feature is not present defaults to `true`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun disableTrackerAnimationOnRestart(): Toggle
+
+    /**
+     * Controls whether data clearing wide events are sent.
+     * @return `true` when the remote config has the global "sendDataClearingWideEvent" androidBrowserConfig
+     * sub-feature flag enabled
+     * If the remote feature is not present defaults to `true`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun sendDataClearingWideEvent(): Toggle
+
+    /**
+     * Controls the single tab fire dialog that allows deleting a single tab's data.
+     * @return `true` when the remote config has the global "singleTabFireDialog" androidBrowserConfig
+     * sub-feature flag enabled
+     * If the remote feature is not present defaults to `false`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun singleTabFireDialog(): Toggle
+
+    /**
+     * Controls whether the state saving for some of the views inside the BrowserTabFragment is disabled or not
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    @Toggle.InternalAlwaysEnabled
+    fun reduceBrowserTabBundleSize(): Toggle
+
+    /**
+     * Controls whether page load wide events are sent.
+     * @return `true` when the remote config has the global "sendPageLoadWideEvent" androidBrowserConfig
+     * sub-feature flag enabled
+     * If the remote feature is not present defaults to `internal`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun sendPageLoadWideEvent(): Toggle
 }

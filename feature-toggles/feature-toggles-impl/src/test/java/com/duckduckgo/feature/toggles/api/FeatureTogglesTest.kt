@@ -19,6 +19,7 @@ package com.duckduckgo.feature.toggles.api
 import android.annotation.SuppressLint
 import app.cash.turbine.test
 import com.duckduckgo.appbuildconfig.api.BuildFlavor
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.Cohorts.CONTROL
 import com.duckduckgo.feature.toggles.api.Cohorts.TREATMENT
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
@@ -38,11 +39,15 @@ import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import java.lang.IllegalStateException
 
 @SuppressLint("DenyListedApi") // getRawStoredState
 class FeatureTogglesTest {
+
+    @get:Rule
+    val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
     private lateinit var feature: TestFeature
     private lateinit var provider: FakeProvider
@@ -62,6 +67,7 @@ class FeatureTogglesTest {
             .forceDefaultVariantProvider { provider.variantKey = "" }
             .callback(callback)
             .featureName("test")
+            .ioDispatcher(coroutineTestRule.testDispatcher)
             .build()
             .create(TestFeature::class.java)
     }
@@ -251,7 +257,7 @@ class FeatureTogglesTest {
         toggleStore.set(
             "test_forcesDefaultVariant",
             State(
-                targets = listOf(State.Target("na", localeCountry = null, localeLanguage = null, null, null, null)),
+                targets = listOf(State.Target("na", localeCountry = null, localeLanguage = null, null, null, null, null)),
             ),
         )
         assertNull(provider.variantKey)
@@ -523,7 +529,7 @@ class FeatureTogglesTest {
         val state = Toggle.State(
             remoteEnableState = null,
             enable = true,
-            targets = listOf(State.Target("ma", localeCountry = null, localeLanguage = null, null, null, null)),
+            targets = listOf(State.Target("ma", localeCountry = null, localeLanguage = null, null, null, null, null)),
         )
 
         // Use directly the store because setRawStoredState() populates the local state when the remote state is null
@@ -541,7 +547,7 @@ class FeatureTogglesTest {
         val state = Toggle.State(
             remoteEnableState = null,
             enable = true,
-            targets = listOf(State.Target(provider.variantKey!!, localeCountry = null, localeLanguage = null, null, null, null)),
+            targets = listOf(State.Target(provider.variantKey!!, localeCountry = null, localeLanguage = null, null, null, null, null)),
         )
 
         // Use directly the store because setRawStoredState() populates the local state when the remote state is null
@@ -559,7 +565,7 @@ class FeatureTogglesTest {
         val state = Toggle.State(
             remoteEnableState = null,
             enable = true,
-            targets = listOf(State.Target("zz", localeCountry = null, localeLanguage = null, null, null, null)),
+            targets = listOf(State.Target("zz", localeCountry = null, localeLanguage = null, null, null, null, null)),
         )
 
         // Use directly the store because setRawStoredState() populates the local state when the remote state is null
@@ -586,8 +592,8 @@ class FeatureTogglesTest {
             remoteEnableState = null,
             enable = true,
             targets = listOf(
-                State.Target("ma", localeCountry = null, localeLanguage = null, null, null, null),
-                State.Target("mb", localeCountry = null, localeLanguage = null, null, null, null),
+                State.Target("ma", localeCountry = null, localeLanguage = null, null, null, null, null),
+                State.Target("mb", localeCountry = null, localeLanguage = null, null, null, null, null),
             ),
         )
 
@@ -607,8 +613,8 @@ class FeatureTogglesTest {
             remoteEnableState = null,
             enable = true,
             targets = listOf(
-                State.Target("ma", localeCountry = null, localeLanguage = null, null, null, null),
-                State.Target("zz", localeCountry = null, localeLanguage = null, null, null, null),
+                State.Target("ma", localeCountry = null, localeLanguage = null, null, null, null, null),
+                State.Target("zz", localeCountry = null, localeLanguage = null, null, null, null, null),
             ),
         )
 
@@ -797,6 +803,7 @@ interface TestFeature {
     fun experimentEnabledByDefault(): Toggle
 }
 
+@SuppressLint("DenyListedApi") // getRawStoredState
 private fun Toggle.rolloutThreshold(): Double {
     return getRawStoredState()?.rolloutThreshold!!
 }

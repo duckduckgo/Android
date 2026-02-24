@@ -55,11 +55,15 @@ interface DuckChatFeatureRepository {
 
     fun observeShowInVoiceSearch(): Flow<Boolean>
 
+    fun observeChatSuggestionsUserSettingEnabled(): Flow<Boolean>
+
     suspend fun isDuckChatUserEnabled(): Boolean
 
     suspend fun isInputScreenUserSettingEnabled(): Boolean
 
     suspend fun isFullScreenModeUserSettingEnabled(): Boolean
+
+    suspend fun isAutomaticPageContextAttachmentUserSettingEnabled(): Boolean
 
     suspend fun shouldShowInBrowserMenu(): Boolean
 
@@ -82,6 +86,12 @@ interface DuckChatFeatureRepository {
     suspend fun setAIChatHistoryEnabled(enabled: Boolean)
 
     suspend fun isAIChatHistoryEnabled(): Boolean
+
+    suspend fun setContextualOnboardingCompleted(completed: Boolean)
+
+    suspend fun isContextualOnboardingCompleted(): Boolean
+
+    suspend fun setChatSuggestionsUserSetting(enabled: Boolean)
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -133,11 +143,16 @@ class RealDuckChatFeatureRepository @Inject constructor(
 
     override fun observeShowInVoiceSearch(): Flow<Boolean> = duckChatDataStore.observeShowInVoiceSearch()
 
+    override fun observeChatSuggestionsUserSettingEnabled(): Flow<Boolean> =
+        duckChatDataStore.observeChatSuggestionsUserSettingEnabled()
+
     override suspend fun isDuckChatUserEnabled(): Boolean = duckChatDataStore.isDuckChatUserEnabled()
 
     override suspend fun isInputScreenUserSettingEnabled(): Boolean = duckChatDataStore.isInputScreenUserSettingEnabled()
 
     override suspend fun isFullScreenModeUserSettingEnabled(): Boolean = duckChatDataStore.isFullScreenUserSettingEnabled()
+
+    override suspend fun isAutomaticPageContextAttachmentUserSettingEnabled() = duckChatDataStore.isAutomaticPageContextAttachmentEnabled()
 
     override suspend fun shouldShowInBrowserMenu(): Boolean = duckChatDataStore.getShowInBrowserMenu()
 
@@ -169,6 +184,16 @@ class RealDuckChatFeatureRepository @Inject constructor(
     }
 
     override suspend fun isAIChatHistoryEnabled(): Boolean = duckChatDataStore.isAIChatHistoryEnabled()
+
+    override suspend fun setContextualOnboardingCompleted(completed: Boolean) {
+        duckChatDataStore.setContextualOnboardingCompleted(completed)
+    }
+
+    override suspend fun isContextualOnboardingCompleted(): Boolean = duckChatDataStore.isContextualOnboardingCompleted()
+
+    override suspend fun setChatSuggestionsUserSetting(enabled: Boolean) {
+        duckChatDataStore.setChatSuggestionsUserSetting(enabled)
+    }
 
     private fun updateWidgets() {
         val intent = Intent(AppWidgetManager.ACTION_APPWIDGET_UPDATE)

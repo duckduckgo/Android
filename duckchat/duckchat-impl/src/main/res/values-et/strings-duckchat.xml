@@ -93,4 +93,16 @@
     <string name="duck_ai_paid_settings_enable_in_settings">Luba tehisintellekti funktsioonide seadetes</string>
     <string name="duck_ai_paid_settings_manage_in_settings">Halda tehisintellekti funktsioonide seadetes</string>
     <string name="duck_ai_paid_settings_manage_secondary">Konfigureerige Duck.ai tehisintellekti funktsioonide seadetes.</string>
+
+    <!-- Duck AI contextual onboarding -->
+    <string name="duck_chat_contextual_onboarding_title" instruction="Title for contextual Duck AI onboarding sheet">Küsi selle lehekülje kohta</string>
+    <string name="duck_chat_contextual_onboarding_body" instruction="Body text for contextual Duck AI onboarding sheet">Duck.ai aitab nüüd aidata leida vastused küsimustele lehe kohta, mida parasjagu vaatate.\n\nLehe sisu lisatakse ainult siis, kui selle manustate. Seda saate seadetes igal ajal muuta.</string>
+    <string name="duck_chat_contextual_onboarding_primary" instruction="Button to continue to contextual Duck AI sheet">Sain aru</string>
+    <string name="duck_chat_contextual_onboarding_secondary" instruction="Button to go to AI settings">Vaata sätteid</string>
+
+    <!-- Duck.ai Contextual Bottom Sheet -->
+    <string name="duckAIContextualPromptSummarize">Loo lehekülje kokkuvõte</string>
+    <string name="duckAIContextualAutomaticContextTitle">Saada lehe sisu automaatselt</string>
+    <string name="duckAIContextualAutomaticContextMessage">Saada lehe sisu automaatselt Duck.ai-le</string>
+    <string name="duckAIContextualAttachPageContent">Lisa lehe sisu</string>
 </resources>

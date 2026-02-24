@@ -29,6 +29,7 @@ enum class SubscriptionPixel(
     private val types: Set<PixelType>,
     private val withSuffix: Boolean = true,
     val includedParameters: Set<PixelParameter> = emptySet(),
+    val enqueue: Boolean = false,
 ) {
     SUBSCRIPTION_ACTIVE(
         baseName = "m_privacy-pro_app_subscription_active",
@@ -256,11 +257,6 @@ enum class SubscriptionPixel(
         types = setOf(Count, Daily()),
         includedParameters = setOf(APP_VERSION),
     ),
-    AUTH_V1_SIGN_IN_ATTEMPT(
-        baseName = "subscription_auth_v1_sign_in_attempt",
-        types = setOf(Count, Daily()),
-        includedParameters = setOf(APP_VERSION),
-    ),
     FREE_TRIAL_START(
         baseName = "subscription_free_trial_start",
         type = Unique(),
@@ -270,6 +266,7 @@ enum class SubscriptionPixel(
         baseName = "subscription_free_trial_vpn_activation",
         type = Unique(),
         includedParameters = setOf(APP_VERSION),
+        enqueue = true,
     ),
     ;
 
@@ -278,7 +275,8 @@ enum class SubscriptionPixel(
         type: PixelType,
         withSuffix: Boolean = true,
         includedParameters: Set<PixelParameter> = emptySet(),
-    ) : this(baseName, setOf(type), withSuffix, includedParameters)
+        enqueue: Boolean = false,
+    ) : this(baseName, setOf(type), withSuffix, includedParameters, enqueue)
 
     fun getPixelNames(): Map<PixelType, String> =
         types.associateWith { type -> if (withSuffix) "${baseName}_${type.pixelNameSuffix}" else baseName }
@@ -290,6 +288,7 @@ object SubscriptionPixelParameter {
     const val OS_VERSION = "os_version"
     const val PETAL = "petal"
     const val ACTIVATION_DAY = "activation_day"
+    const val ACTIVATION_PLATFORM = "activation_platform"
 }
 
 internal val PixelType.pixelNameSuffix: String

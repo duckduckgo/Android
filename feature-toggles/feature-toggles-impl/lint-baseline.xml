@@ -4,17 +4,6 @@
     <issue
         id="DenyListedApi"
         message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="    return getRawStoredState()?.rolloutThreshold!!"
-        errorLine2="           ~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/test/java/com/duckduckgo/feature/toggles/api/FeatureTogglesTest.kt"
-            line="730"
-            column="12"/>
-    </issue>
-
-    <issue
-        id="DenyListedApi"
-        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
         errorLine1="                val cohortName = metric.toggle.getRawStoredState()?.assignedCohort?.name"
         errorLine2="                                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location

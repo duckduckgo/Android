@@ -130,6 +130,7 @@
     <string name="settingsMenuItemTitle">Настройки</string>
     <string name="settingsHeadingProtections">Средства защиты</string>
     <string name="settingsHeadingAppearance">Внешний вид</string>
+    <string name="settingsWhatsNew">Что нового</string>
     <string name="settingsHeadingAbout">О нас</string>
     <string name="settingsAboutDuckduckgo">Несколько слов о DuckDuckGo</string>
     <string name="settingsVersion">Версия</string>
@@ -177,6 +178,8 @@
     <string name="improvedAutoCompleteIAMContent">Теперь рекомендации по автозаполнению включают недавно посещенные вами сайты. Их можно отключить в настройках или очистить с помощью кнопки Fire Button 🔥.</string>
     <string name="improvedAutoCompleteIAMTitle">Та же конфиденциальность.\nЛучшие поисковые рекомендации!</string>
     <string name="openAutoCompleteSettings">Открыть Настройки</string>
+    <string name="privateSearchChatSuggestionsToggle">Рекомендации в чате</string>
+    <string name="privateSearchAutocompleteHintWithChatSuggestions">При вводе запроса в адресную строку показывать рекомендации из поисковой истории, закладок и (по желанию) журнала чатов Duck.ai. Все поисковые запросы конфиденциальны.</string>
 
     <!-- General Settings -->
     <string name="generalSettingsActivityTitle" instruction="Title of the general settings screen">Общие настройки</string>
@@ -207,6 +210,17 @@
     <string name="webTrackingProtectionGoogleSigninPopupsDescription">Блокирует всплывающие окна входа в Google на сайтах, не принадлежащих компании.</string>
     <string name="webTrackingProtectionGlobalPrivacyControlTitle">Глобальный контроль конфиденциальности</string>
     <string name="webTrackingProtectionGlobalPrivacyControlDescription">От вашего имени задействует право на отказ от распространения данных и запрещает сайтам продавать или передавать вашу личную информацию.</string>
+
+    <!-- Get Desktop Browser -->
+    <string name="getDesktopBrowserSettingItemTitle">Скачать настольный браузер</string>
+    <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo для Mac и Windows</string>
+    <string name="getDesktopBrowserTitle">Защитите личную информацию на Mac и Windows!</string>
+    <string name="getDesktopBrowserBody">Скачивайте DuckDuckGo:</string>
+    <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
+    <string name="getDesktopBrowserShareDownloadLink">Поделиться ссылкой для загрузки</string>
+    <string name="getDesktopBrowserNoThanks">Нет, спасибо</string>
+    <string name="getDesktopBrowserHideItem">Скрыть</string>
+    <string name="getDesktopBrowserUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Ссылка скопирована</string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Защита от всплывающих окон куки</string>
@@ -962,11 +976,16 @@
     <string name="settingsHeadingCompleteSetup">Завершение настройки</string>
 
     <!--TabSwitcher Trackers Animation-->
-    <string name="showTrackerCountInTabSwitcher">Показывать счетчик трекеров в переключателе вкладок</string>
+    <string name="trackerBlockedInTheLast7days" instruction="Placeholder is 1 tracker blocked">&lt;b&gt;Заблокировано трекеров: %1$s &lt;/b&gt; (за последние 7 дней)</string>
     <string name="tabSwitcherAnimationTileRemovalDialogTitle" instruction="A title for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Скрыть счетчик трекеров?</string>
     <string name="tabSwitcherAnimationTileRemovalDialogBody" instruction="A message for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Вы можете включить его снова в разделе «Настройки &gt; Внешний вид».</string>
     <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Скрыть</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Оставить</string>
+
+    <!-- Trackers blocked animation-->
+    <string name="settingsTrackersBlockedAnimationHeaderTitle">Анимация блокировки трекеров</string>
+    <string name="showTrackerCountInAddressBar">Показывать в адресной строке</string>
+    <string name="showWeeklyTrackerCountInTabSwitcher">Показывать в диспетчере вкладок</string>
 
     <!-- Widgets -->
     <string name="searchOnlyWidgetLabel" instruction="Label for the search-only widget">Только поиск</string>

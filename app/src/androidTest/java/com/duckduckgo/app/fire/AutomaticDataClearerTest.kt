@@ -25,6 +25,7 @@ import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
 import androidx.work.WorkRequest
 import com.duckduckgo.app.fire.store.FireDataStore
+import com.duckduckgo.app.fire.wideevents.DataClearingWideEvent
 import com.duckduckgo.app.global.view.ClearDataAction
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.clear.ClearWhatOption
@@ -76,6 +77,7 @@ class AutomaticDataClearerTest {
             coroutineTestRule.testScope,
             coroutineTestRule.testDispatcherProvider,
         )
+    private val dataClearingWideEvent: DataClearingWideEvent = mock()
 
     @UiThreadTest
     @Before
@@ -91,6 +93,7 @@ class AutomaticDataClearerTest {
             dataClearerForegroundAppRestartPixel = dataClearerForegroundAppRestartPixel,
             dispatchers = coroutineTestRule.testDispatcherProvider,
             fireDataStore = mockFireDataStore,
+            dataClearingWideEvent = dataClearingWideEvent,
         )
     }
 

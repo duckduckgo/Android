@@ -63,6 +63,9 @@ data class TabEntity(
 val TabEntity.isBlank: Boolean
     get() = title == null && url == null
 
+val TabEntity.isAboutBlank: Boolean
+    get() = title?.equals("about:blank", ignoreCase = true) == true
+
 class LocalDateTimeTypeConverter {
     @TypeConverter
     fun convertForDb(date: LocalDateTime): String = DatabaseDateFormatter.timestamp(date)

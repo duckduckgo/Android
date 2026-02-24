@@ -76,6 +76,7 @@ class RealPirDetachedWebViewProvider @Inject constructor() :
         return setupWebView(WebView(context), scriptToLoad, onPageLoaded, onPageLoadFailed)
     }
 
+    @SuppressLint("SetJavaScriptEnabled")
     override fun setupWebView(
         webView: WebView,
         scriptToLoad: String,
@@ -118,6 +119,7 @@ class RealPirDetachedWebViewProvider @Inject constructor() :
                     logcat { "PIR-SCAN: webview onPageStarted $url" }
                     requestedUrl = url
                     receivedError = false
+                    view?.evaluateJavascript("javascript:$scriptToLoad", null)
                 }
 
                 override fun onPageFinished(
@@ -126,7 +128,6 @@ class RealPirDetachedWebViewProvider @Inject constructor() :
                 ) {
                     if (!receivedError) {
                         logcat { "PIR-SCAN: webview onPageFinished receivedError $receivedError requestedUrl $requestedUrl for url $url" }
-                        view?.evaluateJavascript("javascript:$scriptToLoad", null)
                         onPageLoaded(url)
                     }
                     super.onPageFinished(view, url)
@@ -159,12 +160,8 @@ class RealPirDetachedWebViewProvider @Inject constructor() :
                 domStorageEnabled = true
                 loadWithOverviewMode = true
                 useWideViewPort = true
-                builtInZoomControls = true
-                displayZoomControls = false
                 mixedContentMode = WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE
-                setSupportMultipleWindows(false)
-                databaseEnabled = false
-                setSupportZoom(true)
+                cacheMode = WebSettings.LOAD_NO_CACHE
             }
         }
     }

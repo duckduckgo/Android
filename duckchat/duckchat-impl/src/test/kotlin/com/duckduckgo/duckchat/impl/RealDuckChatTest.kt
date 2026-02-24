@@ -19,6 +19,7 @@ package com.duckduckgo.duckchat.impl
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.webkit.CookieManager
 import androidx.core.net.toUri
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.Lifecycle.State.CREATED
@@ -27,6 +28,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.utils.AppUrl
+import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
 import com.duckduckgo.duckchat.impl.feature.AIChatImageUploadFeature
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
@@ -41,6 +44,7 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_NEW_ADDRES
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_NOT_NOW
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelParameters.NEW_ADDRESS_BAR_SELECTION
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
+import com.duckduckgo.duckchat.impl.ui.DuckAiContextualOnboardingBottomSheetDialogFactory
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.navigation.api.GlobalActivityStarter
@@ -92,7 +96,9 @@ class RealDuckChatTest {
     private val imageUploadFeature: AIChatImageUploadFeature = FakeFeatureToggleFactory.create(AIChatImageUploadFeature::class.java)
     private val mockNewAddressBarOptionBottomSheetDialogFactory: NewAddressBarOptionBottomSheetDialogFactory = mock()
     private val mockNewAddressBarOptionBottomSheetDialog: NewAddressBarOptionBottomSheetDialog = mock()
+    private val mockDuckAiContextualOnboardingBottomSheetDialogFactory: DuckAiContextualOnboardingBottomSheetDialogFactory = mock()
     private val mockDeviceSyncState: DeviceSyncState = mock()
+    private val cookiesManager: CookieManagerProvider = mock()
 
     private lateinit var testee: RealDuckChat
 
@@ -106,6 +112,7 @@ class RealDuckChatTest {
         whenever(mockDuckChatFeatureRepository.isFullScreenModeUserSettingEnabled()).thenReturn(true)
         whenever(mockDuckChatFeatureRepository.sessionDeltaInMinutes()).thenReturn(10L)
         whenever(mockDuckChatFeatureRepository.lastSessionTimestamp()).thenReturn(0L)
+        whenever(mockDuckChatFeatureRepository.isContextualOnboardingCompleted()).thenReturn(false)
         whenever(mockContext.getString(any())).thenReturn("Duck.ai")
         duckChatFeature.self().setRawStoredState(State(enable = true))
         duckChatFeature.duckAiInputScreen().setRawStoredState(State(enable = true))
@@ -126,7 +133,9 @@ class RealDuckChatTest {
                 imageUploadFeature,
                 mockBrowserNav,
                 mockNewAddressBarOptionBottomSheetDialogFactory,
+                mockDuckAiContextualOnboardingBottomSheetDialogFactory,
                 mockDeviceSyncState,
+                cookiesManager,
             ),
         )
         coroutineRule.testScope.advanceUntilIdle()
@@ -166,6 +175,18 @@ class RealDuckChatTest {
         testee.setAutomaticPageContextUserSetting(false)
 
         verify(mockDuckChatFeatureRepository).setAutomaticPageContextAttachment(false)
+    }
+
+    @Test
+    fun whenContextualOnboardingIsCompletedThenReturnTrue() = runTest {
+        whenever(mockDuckChatFeatureRepository.isContextualOnboardingCompleted()).thenReturn(true)
+        assertTrue(testee.isContextualOnboardingCompleted())
+    }
+
+    @Test
+    fun whenContextualOnboardingIsNotCompletedThenReturnFalse() = runTest {
+        whenever(mockDuckChatFeatureRepository.isContextualOnboardingCompleted()).thenReturn(false)
+        assertFalse(testee.isContextualOnboardingCompleted())
     }
 
     @Test
@@ -243,6 +264,42 @@ class RealDuckChatTest {
 
         assertTrue(results[0])
         assertFalse(results[1])
+    }
+
+    @Test
+    fun whenSetChatSuggestionsUserSettingThenRepositorySetCalled() = runTest {
+        testee.setChatSuggestionsUserSetting(true)
+        verify(mockDuckChatFeatureRepository).setChatSuggestionsUserSetting(true)
+    }
+
+    @Test
+    fun whenSetChatSuggestionsUserSettingFalseThenRepositorySetCalled() = runTest {
+        testee.setChatSuggestionsUserSetting(false)
+        verify(mockDuckChatFeatureRepository).setChatSuggestionsUserSetting(false)
+    }
+
+    @Test
+    fun whenObserveChatSuggestionsUserSettingEnabledThenEmitCorrectValues() = runTest {
+        whenever(mockDuckChatFeatureRepository.observeChatSuggestionsUserSettingEnabled()).thenReturn(flowOf(true, false))
+
+        val results = testee.observeChatSuggestionsUserSettingEnabled().take(2).toList()
+
+        assertTrue(results[0])
+        assertFalse(results[1])
+    }
+
+    @Test
+    fun whenAiChatSuggestionsFeatureEnabledThenIsChatSuggestionsFeatureAvailableReturnsTrue() {
+        duckChatFeature.aiChatSuggestions().setRawStoredState(State(enable = true))
+
+        assertTrue(testee.isChatSuggestionsFeatureAvailable())
+    }
+
+    @Test
+    fun whenAiChatSuggestionsFeatureDisabledThenIsChatSuggestionsFeatureAvailableReturnsFalse() {
+        duckChatFeature.aiChatSuggestions().setRawStoredState(State(enable = false))
+
+        assertFalse(testee.isChatSuggestionsFeatureAvailable())
     }
 
     @Test
@@ -1126,30 +1183,51 @@ class RealDuckChatTest {
 
     @Test
     fun `when get duck chat url with query and autoprompt then return correct url`() = runTest {
-        val url = testee.getDuckChatUrl("query", true)
+        val url = testee.getDuckChatUrl(query = "query", autoPrompt = true, sidebar = false)
 
         assertTrue(url == "https://duckduckgo.com/?q=query&prompt=1&ia=chat&duckai=5")
     }
 
     @Test
     fun `when get duck chat url with query and no autoprompt then return correct url`() = runTest {
-        val url = testee.getDuckChatUrl("query", false)
+        val url = testee.getDuckChatUrl(query = "query", autoPrompt = false, sidebar = false)
 
         assertTrue(url == "https://duckduckgo.com/?q=query&ia=chat&duckai=5")
     }
 
     @Test
     fun `when get duck chat url with empty query and no autoprompt then return correct url`() = runTest {
-        val url = testee.getDuckChatUrl("", false)
+        val url = testee.getDuckChatUrl(query = "", autoPrompt = false, sidebar = false)
 
         assertTrue(url == "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5")
     }
 
     @Test
     fun `when get duck chat url with empty query and autoprompt then return correct url`() = runTest {
-        val url = testee.getDuckChatUrl("", true)
+        val url = testee.getDuckChatUrl(query = "", autoPrompt = true, sidebar = false)
 
         assertTrue(url == "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5")
+    }
+
+    @Test
+    fun `when get duck chat url with query and sidebar then return url with placement parameter`() = runTest {
+        val url = testee.getDuckChatUrl(query = "query", autoPrompt = false, sidebar = true)
+
+        assertTrue(url == "https://duckduckgo.com/?q=query&placement=sidebar&ia=chat&duckai=5")
+    }
+
+    @Test
+    fun `when get duck chat url with query autoprompt and sidebar then return url with placement and prompt`() = runTest {
+        val url = testee.getDuckChatUrl(query = "query", autoPrompt = true, sidebar = true)
+
+        assertTrue(url == "https://duckduckgo.com/?q=query&prompt=1&placement=sidebar&ia=chat&duckai=5")
+    }
+
+    @Test
+    fun `when get duck chat url with empty query and sidebar then return correct url`() = runTest {
+        val url = testee.getDuckChatUrl(query = "", autoPrompt = false, sidebar = true)
+
+        assertTrue(url == "https://duckduckgo.com/?placement=sidebar&q=DuckDuckGo%20AI%20Chat&ia=chat&duckai=5")
     }
 
     @Test
@@ -1197,6 +1275,7 @@ class RealDuckChatTest {
     @Test
     fun `when contextual mode enabled, isDuckChatContextualModeEnabled returns true`() = runTest {
         duckChatFeature.contextualMode().setRawStoredState(State(enable = true))
+        duckChatFeature.contextualModeKillSwitch().setRawStoredState(State(enable = true))
         testee.onPrivacyConfigDownloaded()
 
         assertTrue(testee.isDuckChatContextualModeEnabled())
@@ -1205,9 +1284,48 @@ class RealDuckChatTest {
     @Test
     fun `when contextual mode disabled, isDuckChatContextualModeEnabled returns false`() = runTest {
         duckChatFeature.contextualMode().setRawStoredState(State(enable = false))
+        duckChatFeature.contextualModeKillSwitch().setRawStoredState(State(enable = true))
         testee.onPrivacyConfigDownloaded()
 
         assertFalse(testee.isDuckChatContextualModeEnabled())
+    }
+
+    @Test
+    fun `when migration cookie present and kill switch enabled then isDuckChatContextualModeEnabled returns true`() = runTest {
+        val cookieManager = mock<CookieManager>()
+        whenever(cookiesManager.get()).thenReturn(cookieManager)
+        whenever(cookieManager.getCookie(AppUrl.Url.COOKIES)).thenReturn("migration_status_dev_01=migrated_dev_01")
+        duckChatFeature.contextualMode().setRawStoredState(State(enable = false))
+        duckChatFeature.contextualModeKillSwitch().setRawStoredState(State(enable = true))
+
+        testee.onPrivacyConfigDownloaded()
+
+        assertTrue(testee.isDuckChatContextualModeEnabled())
+    }
+
+    @Test
+    fun `when migration cookie present then isStandaloneMigrationCompleted returns true`() = runTest {
+        val cookieManager = mock<CookieManager>()
+        whenever(cookiesManager.get()).thenReturn(cookieManager)
+        whenever(cookieManager.getCookie(AppUrl.Url.COOKIES)).thenReturn("a=b;migration_status_dev_01=migrated_dev_01;c=d")
+
+        assertTrue(testee.isStandaloneMigrationCompleted())
+    }
+
+    @Test
+    fun `when migration cookie missing then isStandaloneMigrationCompleted returns false`() = runTest {
+        val cookieManager = mock<CookieManager>()
+        whenever(cookiesManager.get()).thenReturn(cookieManager)
+        whenever(cookieManager.getCookie(AppUrl.Url.COOKIES)).thenReturn("a=b; c=d")
+
+        assertFalse(testee.isStandaloneMigrationCompleted())
+    }
+
+    @Test
+    fun `when cookie manager is null then isStandaloneMigrationCompleted returns false`() = runTest {
+        whenever(cookiesManager.get()).thenReturn(null)
+
+        assertFalse(testee.isStandaloneMigrationCompleted())
     }
 
     companion object {

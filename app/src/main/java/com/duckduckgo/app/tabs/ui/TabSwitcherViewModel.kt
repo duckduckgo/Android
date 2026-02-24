@@ -28,7 +28,6 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.TAB_MANAGER_GRID_VIEW_BUTTON_CLICKED
 import com.duckduckgo.app.pixels.AppPixelName.TAB_MANAGER_LIST_VIEW_BUTTON_CLICKED
 import com.duckduckgo.app.pixels.duckchat.createWasUsedBeforePixelParams
-import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.tabs.model.TabEntity
@@ -100,7 +99,6 @@ class TabSwitcherViewModel @Inject constructor(
     private val savedSitesRepository: SavedSitesRepository,
     private val trackersAnimationInfoPanelPixels: TrackersAnimationInfoPanelPixels,
     private val omnibarRepository: OmnibarRepository,
-    private val androidBrowserConfig: AndroidBrowserConfigFeature,
 ) : ViewModel() {
     val deletableTabs: LiveData<List<TabEntity>> = tabRepository.flowDeletableTabs.asLiveData(
         context = viewModelScope.coroutineContext,
@@ -201,16 +199,8 @@ class TabSwitcherViewModel @Inject constructor(
 
     fun onNewTabRequested(fromOverflowMenu: Boolean = false) = viewModelScope.launch {
         if (swipingTabsFeature.isEnabled) {
-            val handleAboutBlankEnabled = withContext(dispatcherProvider.io()) {
-                androidBrowserConfig.handleAboutBlank().isEnabled()
-            }
-
             val newTab = tabs.firstOrNull { tabItem ->
-                if (handleAboutBlankEnabled) {
-                    tabItem.isNewTabPage && !tabItem.hasSourceTab
-                } else {
-                    tabItem.isNewTabPage
-                }
+                tabItem.isNewTabPage && !tabItem.hasSourceTab
             }
             if (newTab != null) {
                 tabRepository.select(tabId = newTab.id)

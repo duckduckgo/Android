@@ -21,6 +21,7 @@ import app.cash.turbine.test
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.playstore.PlayStoreUtils
+import com.duckduckgo.remote.messaging.api.Action
 import com.duckduckgo.remote.messaging.api.Action.DefaultBrowser
 import com.duckduckgo.remote.messaging.api.Action.Survey
 import com.duckduckgo.remote.messaging.api.Content
@@ -39,7 +40,9 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -133,6 +136,7 @@ class RemoteMessageViewModelTest {
 
         testee.onMessageCloseButtonClicked()
         verify(remoteMessageModel).onMessageDismissed(remoteMessage)
+        verify(remoteMessageModel).clearMessageImage(Surface.NEW_TAB_PAGE)
     }
 
     @Test
@@ -145,6 +149,7 @@ class RemoteMessageViewModelTest {
         testee.commands().test {
             testee.onMessagePrimaryButtonClicked()
             verify(remoteMessageModel).onPrimaryActionClicked(remoteMessage)
+            verify(remoteMessageModel).clearMessageImage(Surface.NEW_TAB_PAGE)
             val command = awaitItem()
             assertTrue(command is RemoteMessageViewModel.Command.LaunchDefaultBrowser)
         }
@@ -160,6 +165,7 @@ class RemoteMessageViewModelTest {
         testee.commands().test {
             testee.onMessageSecondaryButtonClicked()
             verify(remoteMessageModel).onSecondaryActionClicked(remoteMessage)
+            verify(remoteMessageModel).clearMessageImage(Surface.NEW_TAB_PAGE)
             val command = awaitItem()
             assertTrue(command is RemoteMessageViewModel.Command.LaunchDefaultBrowser)
         }
@@ -175,8 +181,26 @@ class RemoteMessageViewModelTest {
         testee.commands().test {
             testee.onMessageActionButtonClicked()
             verify(remoteMessageModel).onActionClicked(remoteMessage)
+            verify(remoteMessageModel).clearMessageImage(Surface.NEW_TAB_PAGE)
             val command = awaitItem()
             assertTrue(command is RemoteMessageViewModel.Command.LaunchDefaultBrowser)
+        }
+    }
+
+    @Test
+    fun whenMessageActionClickedIsShareThenImageNotCleared() = runTest {
+        val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList(), listOf(Surface.NEW_TAB_PAGE))
+        val shareAction = Action.Share("https://example.com", mapOf("title" to "Share Title"))
+        whenever(remoteMessageModel.getActiveMessages()).thenReturn(flowOf(remoteMessage))
+        whenever(remoteMessageModel.onActionClicked(remoteMessage)).thenReturn(shareAction)
+        testee.onStart(mockLifecycleOwner)
+
+        testee.commands().test {
+            testee.onMessageActionButtonClicked()
+            verify(remoteMessageModel).onActionClicked(remoteMessage)
+            verify(remoteMessageModel, never()).clearMessageImage(any())
+            val command = awaitItem()
+            assertTrue(command is RemoteMessageViewModel.Command.SharePromoLinkRMF)
         }
     }
 
@@ -193,6 +217,7 @@ class RemoteMessageViewModelTest {
         testee.commands().test {
             testee.onMessagePrimaryButtonClicked()
             verify(remoteMessageModel).onPrimaryActionClicked(remoteMessage)
+            verify(remoteMessageModel).clearMessageImage(Surface.NEW_TAB_PAGE)
             val command = awaitItem()
             assertTrue(command is SubmitUrl)
             assertEquals("https://example.com?atb", (command as SubmitUrl).url)
@@ -233,7 +258,7 @@ class RemoteMessageViewModelTest {
     private suspend fun whenRemoteMessageAvailable(imageFilePath: String? = null): RemoteMessage {
         val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList(), listOf(Surface.NEW_TAB_PAGE))
         whenever(remoteMessageModel.getActiveMessages()).thenReturn(flowOf(remoteMessage))
-        whenever(remoteMessageModel.getRemoteMessageImageFile()).thenReturn(imageFilePath)
+        whenever(remoteMessageModel.getRemoteMessageImageFile(Surface.NEW_TAB_PAGE)).thenReturn(imageFilePath)
         testee.onStart(mockLifecycleOwner)
         return remoteMessage
     }

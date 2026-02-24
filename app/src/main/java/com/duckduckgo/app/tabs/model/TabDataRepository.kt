@@ -26,6 +26,7 @@ import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.fire.store.TabVisitedSitesRepository
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.tabs.TabManagerFeatureFlags
@@ -38,6 +39,7 @@ import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
 import dagger.SingleInstanceIn
 import io.reactivex.Scheduler
 import io.reactivex.schedulers.Schedulers
@@ -70,6 +72,8 @@ class TabDataRepository @Inject constructor(
     private val adClickManager: AdClickManager,
     private val webViewSessionStorage: WebViewSessionStorage,
     private val tabManagerFeatureFlags: TabManagerFeatureFlags,
+    private val duckChatContextualDataStore: DuckChatContextualDataStore,
+    private val tabVisitedSitesRepository: TabVisitedSitesRepository,
 ) : TabRepository {
 
     override val liveTabs: LiveData<List<TabEntity>> = tabsDao.liveTabs().distinctUntilChanged()
@@ -323,6 +327,7 @@ class TabDataRepository @Inject constructor(
             tabsDao.deleteTabAndUpdateSelection(tab)
         }
         siteData.remove(tab.tabId)
+        tabVisitedSitesRepository.clearTab(tab.tabId)
     }
 
     override suspend fun deleteTabs(tabIds: List<String>) {
@@ -330,6 +335,7 @@ class TabDataRepository @Inject constructor(
             tabsDao.deleteTabsAndUpdateSelection(tabIds)
             clearAllSiteData(tabIds)
         }
+        tabIds.forEach { tabVisitedSitesRepository.clearTab(it) }
     }
 
     private fun clearAllSiteData(tabIds: List<String>) {
@@ -339,6 +345,7 @@ class TabDataRepository @Inject constructor(
             deleteOldPreviewImages(tabId)
             deleteOldFavicon(tabId)
             siteData.remove(tabId)
+            duckChatContextualDataStore.clearTabChatUrl(tabId)
         }
     }
 
@@ -367,7 +374,9 @@ class TabDataRepository @Inject constructor(
     }
 
     override suspend fun purgeDeletableTabs() = withContext(dispatchers.io()) {
-        clearAllSiteData(getDeletableTabIds())
+        val deletableTabIds = getDeletableTabIds()
+        clearAllSiteData(deletableTabIds)
+        deletableTabIds.forEach { tabVisitedSitesRepository.clearTab(it) }
 
         purgeDeletableTabsJob += appCoroutineScope.launch(dispatchers.io()) {
             tabsDao.purgeDeletableTabsAndUpdateSelection()
@@ -398,6 +407,7 @@ class TabDataRepository @Inject constructor(
                 }
             }
         }
+        tabVisitedSitesRepository.clearTab(tabId)
     }
 
     override suspend fun deleteAll() {
@@ -408,6 +418,8 @@ class TabDataRepository @Inject constructor(
         adClickManager.clearAll()
         webViewSessionStorage.deleteAllSessions()
         siteData.clear()
+        duckChatContextualDataStore.clearAll()
+        tabVisitedSitesRepository.clearAll()
     }
 
     override suspend fun getSelectedTab(): TabEntity? =

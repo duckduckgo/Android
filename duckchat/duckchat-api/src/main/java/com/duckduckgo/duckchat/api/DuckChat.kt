@@ -50,11 +50,14 @@ interface DuckChat {
     /**
      * Returns the Duck Chat URL to be used
      */
-    fun getDuckChatUrl(query: String, autoPrompt: Boolean): String
+    fun getDuckChatUrl(query: String, autoPrompt: Boolean, sidebar: Boolean = false): String
 
     /**
      * Determines whether a given [Uri] is a DuckChat URL.
-     *
+     * There are two Duck Chat URLs
+     * Legacy: https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5
+     * After Migration: https://duck.ai/chat?q=DuckDuckGo+AI+Chat&duckai=5&atb=v520-1ru&ko=-1&t=ddg_android&migration=native-import
+     * https://app.asana.com/1/137249556945/task/1210497696306780
      * @return true if it is a DuckChat URL, false otherwise.
      */
     fun isDuckChatUrl(uri: Uri): Boolean
@@ -94,4 +97,35 @@ interface DuckChat {
      * Observes the value for the automatic context attachment for Contextual Mode
      */
     fun observeAutomaticContextAttachmentUserSettingEnabled(): Flow<Boolean>
+
+    /**
+     * Shows the contextual onboarding bottom sheet dialog.
+     * @param context The context to show the dialog in.
+     * @param onConfirmed Callback invoked when the user confirms the dialog.
+     */
+    fun showContextualOnboarding(context: Context, onConfirmed: () -> Unit)
+
+    /**
+     * Checks if the contextual onboarding has been completed.
+     * @return true if the onboarding was completed, false otherwise.
+     */
+    suspend fun isContextualOnboardingCompleted(): Boolean
+
+    suspend fun isStandaloneMigrationCompleted(): Boolean
+
+    /**
+     * Set user preference for whether chat suggestions are shown in the input screen.
+     */
+    suspend fun setChatSuggestionsUserSetting(enabled: Boolean)
+
+    /**
+     * Observes whether the user has enabled chat suggestions.
+     */
+    fun observeChatSuggestionsUserSettingEnabled(): Flow<Boolean>
+
+    /**
+     * Returns whether the chat suggestions feature is available (feature flag is enabled).
+     * Does not consider user preference — use for visibility checks.
+     */
+    fun isChatSuggestionsFeatureAvailable(): Boolean
 }

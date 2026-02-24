@@ -251,6 +251,7 @@ class DefaultAutofillEngagementRepositoryTest {
             pixel: PixelName,
             parameters: Map<String, String>,
             encodedParameters: Map<String, String>,
+            type: PixelType,
         ) {
             firedPixels[pixel.pixelName] = parameters
         }
@@ -259,6 +260,7 @@ class DefaultAutofillEngagementRepositoryTest {
             pixelName: String,
             parameters: Map<String, String>,
             encodedParameters: Map<String, String>,
+            type: PixelType,
         ) {
             firedPixels[pixelName] = parameters
         }

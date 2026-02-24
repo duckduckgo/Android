@@ -47,6 +47,8 @@
     <string name="browserMenuChatHistory">Keskusteluhistoria</string>
     <string name="browserMenuChatSettings">Duck.ai-asetukset</string>
     <string name="browserMenuVPN">VPN</string>
+    <!-- smartling.character_limit = 15 -->
+    <string name="browserMenuVpnTryForFree">Ilmaiskokeilu</string>
 
     <!-- Browser Menu Content Description -->
     <string name="browserMenuBack">Takaisin</string>

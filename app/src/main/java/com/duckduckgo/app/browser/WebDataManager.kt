@@ -24,6 +24,8 @@ import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
 import com.duckduckgo.app.browser.indexeddb.IndexedDBManager
 import com.duckduckgo.app.browser.weblocalstorage.WebLocalStorageManager
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.fire.wideevents.DataClearingFlowStep
+import com.duckduckgo.app.fire.wideevents.DataClearingWideEvent
 import com.duckduckgo.app.global.file.FileDeleter
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.db.SettingsDataStore
@@ -81,6 +83,7 @@ class WebViewDataManager @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val appBuildConfig: AppBuildConfig,
     private val settingsDataStore: SettingsDataStore,
+    private val dataClearingWideEvent: DataClearingWideEvent,
 ) : WebDataManager {
 
     override suspend fun clearData(
@@ -134,7 +137,10 @@ class WebViewDataManager @Inject constructor(
             if (androidBrowserConfigFeature.webLocalStorage().isEnabled()) {
                 kotlin.runCatching {
                     webLocalStorageManager.clearWebLocalStorage()
+                }.onSuccess {
+                    dataClearingWideEvent.stepSuccess(DataClearingFlowStep.WEB_STORAGE_CLEAR)
                 }.onFailure { e ->
+                    dataClearingWideEvent.stepFailure(DataClearingFlowStep.WEB_STORAGE_CLEAR, e)
                     logcat(ERROR) { "WebDataManager: Could not selectively clear web storage: ${e.asLog()}" }
                     if (appBuildConfig.isInternalBuild()) {
                         sendCrashPixel(e)
@@ -157,7 +163,10 @@ class WebViewDataManager @Inject constructor(
             if (androidBrowserConfigFeature.webLocalStorage().isEnabled()) {
                 kotlin.runCatching {
                     webLocalStorageManager.clearWebLocalStorage(shouldClearBrowserData, shouldClearDuckAiData)
+                }.onSuccess {
+                    dataClearingWideEvent.stepSuccess(DataClearingFlowStep.WEB_STORAGE_CLEAR_GRANULAR)
                 }.onFailure { e ->
+                    dataClearingWideEvent.stepFailure(DataClearingFlowStep.WEB_STORAGE_CLEAR_GRANULAR, e)
                     logcat(ERROR) { "WebDataManager: Could not selectively clear web storage: ${e.asLog()}" }
                     if (appBuildConfig.isInternalBuild()) {
                         sendCrashPixel(e)
@@ -205,7 +214,14 @@ class WebViewDataManager @Inject constructor(
      */
     private suspend fun clearWebViewDirectories(shouldClearDuckAiData: Boolean) = withContext(dispatcherProvider.io()) {
         val dataDir = context.applicationInfo.dataDir
+
         fileDeleter.deleteContents(File(dataDir, "app_webview"), listOf("Default", "Cookies"))
+            .onSuccess {
+                dataClearingWideEvent.stepSuccess(DataClearingFlowStep.WEBVIEW_APP_WEBVIEW_CLEAR)
+            }
+            .onFailure { e ->
+                dataClearingWideEvent.stepFailure(DataClearingFlowStep.WEBVIEW_APP_WEBVIEW_CLEAR, e)
+            }
 
         // We don't delete the Default dir as Cookies may be inside however we do clear any other content
         val excludedDirectories = mutableListOf("Cookies")
@@ -218,11 +234,20 @@ class WebViewDataManager @Inject constructor(
                 indexedDBManager.clearIndexedDB(shouldClearDuckAiData)
             }.onSuccess {
                 excludedDirectories.add("IndexedDB")
+                dataClearingWideEvent.stepSuccess(DataClearingFlowStep.INDEXEDDB_CLEAR_SELECTIVE)
             }.onFailure { t ->
+                dataClearingWideEvent.stepFailure(DataClearingFlowStep.INDEXEDDB_CLEAR_SELECTIVE, t)
                 logcat(WARN) { "Failed to clear IndexedDB, will delete it instead: ${t.asLog()}" }
             }
         }
+
         fileDeleter.deleteContents(File(dataDir, "app_webview/Default"), excludedDirectories)
+            .onSuccess {
+                dataClearingWideEvent.stepSuccess(DataClearingFlowStep.WEBVIEW_DEFAULT_CLEAR)
+            }
+            .onFailure { e ->
+                dataClearingWideEvent.stepFailure(DataClearingFlowStep.WEBVIEW_DEFAULT_CLEAR, e)
+            }
     }
 
     /**
@@ -235,7 +260,10 @@ class WebViewDataManager @Inject constructor(
             if (androidBrowserConfigFeature.indexedDB().isEnabled()) {
                 runCatching {
                     indexedDBManager.clearOnlyDuckAiData()
+                }.onSuccess {
+                    dataClearingWideEvent.stepSuccess(DataClearingFlowStep.INDEXEDDB_CLEAR_DUCKAI_ONLY)
                 }.onFailure { t ->
+                    dataClearingWideEvent.stepFailure(DataClearingFlowStep.INDEXEDDB_CLEAR_DUCKAI_ONLY, t)
                     logcat(WARN) { "Failed to clear DuckAI data from IndexedDB: ${t.asLog()}" }
                 }
             }

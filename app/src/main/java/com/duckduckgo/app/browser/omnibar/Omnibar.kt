@@ -301,6 +301,10 @@ class Omnibar(
         omnibarView.setOmnibarTextListener(listener)
     }
 
+    fun disableViewStateSaving() {
+        omnibarView.disableViewStateSaving()
+    }
+
     fun configureFindInPage(listener: FindInPageListener) {
         // we could move this to the layout once the refactor is do
         findInPage.findInPageInput.setOnFocusChangeListener { _, hasFocus ->
@@ -393,6 +397,10 @@ class Omnibar(
 
     fun cancelTrackersAnimation() {
         omnibarView.decorate(Decoration.CancelAnimations)
+    }
+
+    fun cancelEasterEggLogoAnimation() {
+        omnibarView.decorate(Decoration.CancelEasterEggLogoAnimation)
     }
 
     fun startTrackersAnimation(events: List<Entity>?) {
