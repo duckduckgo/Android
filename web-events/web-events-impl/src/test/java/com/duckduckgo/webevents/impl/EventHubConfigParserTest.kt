@@ -38,15 +38,15 @@ class EventHubConfigParserTest {
                             "count": {
                                 "template": "counter",
                                 "source": "adwall",
-                                "buckets": [
-                                    {"minInclusive": 0,  "maxExclusive": 1,  "name": "0"},
-                                    {"minInclusive": 1,  "maxExclusive": 3,  "name": "1-2"},
-                                    {"minInclusive": 3,  "maxExclusive": 6,  "name": "3-5"},
-                                    {"minInclusive": 6,  "maxExclusive": 11, "name": "6-10"},
-                                    {"minInclusive": 11, "maxExclusive": 21, "name": "11-20"},
-                                    {"minInclusive": 21, "maxExclusive": 40, "name": "21-39"},
-                                    {"minInclusive": 40, "name": "40+"}
-                                ]
+                                "buckets": {
+                                    "0":     {"gte": 0,  "lt": 1},
+                                    "1-2":   {"gte": 1,  "lt": 3},
+                                    "3-5":   {"gte": 3,  "lt": 6},
+                                    "6-10":  {"gte": 6,  "lt": 11},
+                                    "11-20": {"gte": 11, "lt": 21},
+                                    "21-39": {"gte": 21, "lt": 40},
+                                    "40+":   {"gte": 40}
+                                }
                             }
                         }
                     }
@@ -68,7 +68,7 @@ class EventHubConfigParserTest {
     }
 
     @Test
-    fun `counter parameter with object buckets parsed correctly`() {
+    fun `counter parameter with map buckets parsed correctly`() {
         val config = EventHubConfigParser.parse(fullConfig)
         val param = config.telemetry[0].parameters["count"]!!
 
@@ -76,15 +76,13 @@ class EventHubConfigParserTest {
         assertEquals("adwall", param.source)
         assertEquals(7, param.buckets.size)
 
-        val first = param.buckets[0]
-        assertEquals(0, first.minInclusive)
-        assertEquals(1, first.maxExclusive)
-        assertEquals("0", first.name)
+        val first = param.buckets["0"]!!
+        assertEquals(0, first.gte)
+        assertEquals(1, first.lt)
 
-        val last = param.buckets[6]
-        assertEquals(40, last.minInclusive)
-        assertNull(last.maxExclusive)
-        assertEquals("40+", last.name)
+        val last = param.buckets["40+"]!!
+        assertEquals(40, last.gte)
+        assertNull(last.lt)
     }
 
     @Test
@@ -101,7 +99,7 @@ class EventHubConfigParserTest {
                                 "c": {
                                     "template": "counter",
                                     "source": "e",
-                                    "buckets": [{"minInclusive": 0, "name": "0+"}]
+                                    "buckets": {"0+": {"gte": 0}}
                                 }
                             }
                         }
@@ -138,7 +136,7 @@ class EventHubConfigParserTest {
                             "parameters": {
                                 "c": {
                                     "template": "counter", "source": "e",
-                                    "buckets": [{"minInclusive": 0, "name": "0+"}]
+                                    "buckets": {"0+": {"gte": 0}}
                                 }
                             }
                         }
@@ -150,7 +148,7 @@ class EventHubConfigParserTest {
     }
 
     @Test
-    fun `bucket missing minInclusive is skipped`() {
+    fun `bucket missing gte is skipped`() {
         val json = """
             {
                 "state": "enabled",
@@ -162,7 +160,7 @@ class EventHubConfigParserTest {
                             "parameters": {
                                 "c": {
                                     "template": "counter", "source": "e",
-                                    "buckets": [{"name": "bad"}]
+                                    "buckets": {"bad": {"lt": 5}}
                                 }
                             }
                         }
