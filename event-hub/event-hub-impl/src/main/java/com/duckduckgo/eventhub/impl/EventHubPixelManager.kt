@@ -16,7 +16,6 @@
 
 package com.duckduckgo.eventhub.impl
 
-import android.webkit.WebView
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.eventhub.store.EventHubPixelStateEntity
 import com.duckduckgo.eventhub.store.EventHubRepository
@@ -28,7 +27,7 @@ import org.json.JSONObject
 import javax.inject.Inject
 
 interface EventHubPixelManager {
-    fun handleWebEvent(eventType: String, webView: WebView?)
+    fun handleWebEvent(eventType: String, tabId: String, documentUrl: String)
     fun checkPixels()
     fun onConfigChanged()
 }
@@ -41,12 +40,10 @@ class RealEventHubPixelManager @Inject constructor(
 
     private val dedupState = java.util.concurrent.ConcurrentHashMap<String, String>()
 
-    override fun handleWebEvent(eventType: String, webView: WebView?) {
+    override fun handleWebEvent(eventType: String, tabId: String, documentUrl: String) {
         val config = getParsedConfig()
         if (!config.featureEnabled) return
 
-        val tabId = webView?.let { System.identityHashCode(it).toString() } ?: ""
-        val documentUrl = webView?.url ?: ""
         val nowMillis = timeProvider.currentTimeMillis()
 
         for (state in repository.getAllPixelStates()) {

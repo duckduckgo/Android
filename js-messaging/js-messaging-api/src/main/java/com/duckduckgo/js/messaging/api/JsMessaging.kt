@@ -62,11 +62,6 @@ interface JsMessaging {
      * List of domains where the interface can be added
      */
     val allowedDomains: List<String>
-
-    /**
-     * The WebView instance registered with this messaging interface, or null if not yet registered.
-     */
-    val registeredWebView: WebView? get() = null
 }
 
 abstract class JsMessageCallback {

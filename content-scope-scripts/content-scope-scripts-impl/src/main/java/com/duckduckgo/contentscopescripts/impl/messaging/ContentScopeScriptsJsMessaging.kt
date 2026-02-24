@@ -52,8 +52,7 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
 ) : JsMessaging {
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
 
-    override var registeredWebView: WebView? = null
-        private set
+    private lateinit var webView: WebView
     private lateinit var jsMessageCallback: JsMessageCallback
 
     override val context: String = "contentScopeScripts"
@@ -71,7 +70,7 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
             val jsMessage = adapter.fromJson(message)
             val domain =
                 runBlocking(dispatcherProvider.main()) {
-                    registeredWebView?.url?.toUri()?.host
+                    webView.url?.toUri()?.host
                 }
             jsMessage?.let {
                 if (this.secret == secret && context == jsMessage.context && isUrlAllowed(allowedDomains, domain)) {
@@ -103,9 +102,9 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
         jsMessageCallback: JsMessageCallback?,
     ) {
         if (jsMessageCallback == null) throw Exception("Callback cannot be null")
-        this.registeredWebView = webView
+        this.webView = webView
         this.jsMessageCallback = jsMessageCallback
-        webView.addJavascriptInterface(this, coreContentScopeScripts.javascriptInterface)
+        this.webView.addJavascriptInterface(this, coreContentScopeScripts.javascriptInterface)
     }
 
     override fun sendSubscriptionEvent(subscriptionEventData: SubscriptionEventData) {
@@ -116,13 +115,12 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
                 subscriptionEventData.subscriptionName,
                 subscriptionEventData.params,
             )
-        registeredWebView?.let {
-            jsMessageHelper.sendSubscriptionEvent(subscriptionEvent, callbackName, secret, it)
+        if (::webView.isInitialized) {
+            jsMessageHelper.sendSubscriptionEvent(subscriptionEvent, callbackName, secret, webView)
         }
     }
 
     override fun onResponse(response: JsCallbackData) {
-        val webView = registeredWebView ?: return
         val jsResponse =
             JsRequestResponse.Success(
                 context = context,

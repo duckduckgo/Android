@@ -321,6 +321,8 @@ import com.duckduckgo.downloads.api.DownloadStateListener
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
+import com.duckduckgo.eventhub.impl.EVENT_HUB_FEATURE_NAME
+import com.duckduckgo.eventhub.impl.EventHubPixelManager
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.contextual.PageContextJSHelper
 import com.duckduckgo.duckchat.impl.contextual.RealPageContextJSHelper.Companion.PAGE_CONTEXT_FEATURE_NAME
@@ -499,6 +501,7 @@ class BrowserTabViewModel @Inject constructor(
     private val contentScopeScriptsSubscriptionEventPluginPoint: PluginPoint<ContentScopeScriptsSubscriptionEventPlugin>,
     private val serpSettingsFeature: SerpSettingsFeature,
     private val pageContextJSHelper: PageContextJSHelper,
+    private val eventHubPixelManager: EventHubPixelManager,
     private val syncStatusChangedObserver: SyncStatusChangedObserver,
     private val serpEasterEggLogosToggles: SerpEasterEggLogosToggles,
     private val serpLogos: SerpLogos,
@@ -4195,6 +4198,16 @@ class BrowserTabViewModel @Inject constructor(
                         withContext(dispatchers.main()) {
                             command.value = Command.PageContextReceived(tabId, pageContext)
                         }
+                    }
+                }
+            }
+
+            EVENT_HUB_FEATURE_NAME -> {
+                val eventType = data?.optString("type", "") ?: ""
+                if (eventType.isNotEmpty()) {
+                    viewModelScope.launch(dispatchers.io()) {
+                        val url = withContext(dispatchers.main()) { getWebViewUrl() }
+                        eventHubPixelManager.handleWebEvent(eventType, tabId, url ?: "")
                     }
                 }
             }

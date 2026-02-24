@@ -16,8 +16,6 @@
 
 package com.duckduckgo.eventhub.impl
 
-import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.contentscopescripts.api.ContentScopeJsMessageHandlersPlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.js.messaging.api.JsMessage
@@ -25,19 +23,15 @@ import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessageHandler
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.squareup.anvil.annotations.ContributesMultibinding
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 import logcat.LogPriority.VERBOSE
 import logcat.LogPriority.WARN
 import logcat.logcat
 import javax.inject.Inject
 
+const val EVENT_HUB_FEATURE_NAME = "webEvents"
+
 @ContributesMultibinding(AppScope::class)
-class EventHubContentScopeJsMessageHandler @Inject constructor(
-    private val pixelManager: EventHubPixelManager,
-    private val dispatcherProvider: DispatcherProvider,
-    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
-) : ContentScopeJsMessageHandlersPlugin {
+class EventHubContentScopeJsMessageHandler @Inject constructor() : ContentScopeJsMessageHandlersPlugin {
 
     override fun getJsMessageHandler(): JsMessageHandler = object : JsMessageHandler {
         override fun process(
@@ -52,13 +46,11 @@ class EventHubContentScopeJsMessageHandler @Inject constructor(
             }
 
             logcat(VERBOSE) { "EventHub: received webEvent type=$eventType" }
-            appCoroutineScope.launch(dispatcherProvider.io()) {
-                pixelManager.handleWebEvent(eventType, jsMessaging.registeredWebView)
-            }
+            jsMessageCallback?.process(jsMessage.featureName, jsMessage.method, jsMessage.id, jsMessage.params)
         }
 
         override val allowedDomains: List<String> = emptyList()
-        override val featureName: String = "webEvents"
+        override val featureName: String = EVENT_HUB_FEATURE_NAME
         override val methods: List<String> = listOf("webEvent")
     }
 }
