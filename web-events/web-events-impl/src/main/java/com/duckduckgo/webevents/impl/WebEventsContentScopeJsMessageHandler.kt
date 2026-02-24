@@ -27,6 +27,7 @@ import com.duckduckgo.js.messaging.api.JsMessaging
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import logcat.LogPriority.VERBOSE
 import logcat.LogPriority.WARN
 import logcat.logcat
 import javax.inject.Inject
@@ -50,6 +51,7 @@ class EventHubContentScopeJsMessageHandler @Inject constructor(
                 return
             }
 
+            logcat(VERBOSE) { "EventHub: received webEvent type=$eventType" }
             appCoroutineScope.launch(dispatcherProvider.io()) {
                 pixelManager.handleWebEvent(eventType)
             }
