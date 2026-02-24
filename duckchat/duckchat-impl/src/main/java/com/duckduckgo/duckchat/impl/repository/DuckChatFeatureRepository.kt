@@ -93,10 +93,6 @@ interface DuckChatFeatureRepository {
 
     suspend fun isAIChatHistoryEnabled(): Boolean
 
-    suspend fun setContextualOnboardingCompleted(completed: Boolean)
-
-    suspend fun isContextualOnboardingCompleted(): Boolean
-
     suspend fun setChatSuggestionsUserSetting(enabled: Boolean)
 }
 
@@ -199,12 +195,6 @@ class RealDuckChatFeatureRepository @Inject constructor(
     }
 
     override suspend fun isAIChatHistoryEnabled(): Boolean = duckChatDataStore.isAIChatHistoryEnabled()
-
-    override suspend fun setContextualOnboardingCompleted(completed: Boolean) {
-        duckChatDataStore.setContextualOnboardingCompleted(completed)
-    }
-
-    override suspend fun isContextualOnboardingCompleted(): Boolean = duckChatDataStore.isContextualOnboardingCompleted()
 
     override suspend fun setChatSuggestionsUserSetting(enabled: Boolean) {
         duckChatDataStore.setChatSuggestionsUserSetting(enabled)

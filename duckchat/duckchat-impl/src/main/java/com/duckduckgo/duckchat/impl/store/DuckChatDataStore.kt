@@ -29,7 +29,6 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.di.DuckChat
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_AI_AUTOMATIC_CONTEXT_ATTACHMENT
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_AI_CHAT_SUGGESTIONS_USER_SETTING
-import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_AI_CONTEXTUAL_ONBOARDING_DISMISSED
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_AI_INPUT_SCREEN_COSMETIC_SETTING
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_AI_INPUT_SCREEN_USER_SETTING
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_AI_NATIVE_INPUT_FIELD_SETTING
@@ -129,10 +128,6 @@ interface DuckChatDataStore {
 
     suspend fun isAIChatHistoryEnabled(): Boolean
 
-    suspend fun setContextualOnboardingCompleted(completed: Boolean)
-
-    suspend fun isContextualOnboardingCompleted(): Boolean
-
     suspend fun isAutomaticPageContextAttachmentEnabled(): Boolean
 
     suspend fun isNativeInputFieldUserSettingEnabled(): Boolean
@@ -164,7 +159,6 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
         val DUCK_CHAT_HISTORY_ENABLED = booleanPreferencesKey(name = "DUCK_CHAT_HISTORY_ENABLED")
         val DUCK_AI_AUTOMATIC_CONTEXT_ATTACHMENT = booleanPreferencesKey(name = "DUCK_AI_AUTOMATIC_CONTEXT_ATTACHMENT")
         val DUCK_AI_NATIVE_INPUT_FIELD_SETTING = booleanPreferencesKey(name = "DUCK_AI_NATIVE_INPUT_FIELD_SETTING")
-        val DUCK_AI_CONTEXTUAL_ONBOARDING_DISMISSED = booleanPreferencesKey(name = "DUCK_AI_CONTEXTUAL_ONBOARDING_DISMISSED")
         val DUCK_AI_CHAT_SUGGESTIONS_USER_SETTING = booleanPreferencesKey(name = "DUCK_AI_CHAT_SUGGESTIONS_USER_SETTING")
     }
 
@@ -369,14 +363,6 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
     }
 
     override suspend fun isAIChatHistoryEnabled(): Boolean = store.data.firstOrNull()?.let { it[DUCK_CHAT_HISTORY_ENABLED] } ?: false
-
-    override suspend fun setContextualOnboardingCompleted(completed: Boolean) {
-        store.edit { it[DUCK_AI_CONTEXTUAL_ONBOARDING_DISMISSED] = completed }
-    }
-
-    override suspend fun isContextualOnboardingCompleted(): Boolean = store.data.firstOrNull()?.let {
-        it[DUCK_AI_CONTEXTUAL_ONBOARDING_DISMISSED]
-    } ?: false
 
     override suspend fun isAutomaticPageContextAttachmentEnabled() =
         store.data.firstOrNull()?.let { it[DUCK_AI_AUTOMATIC_CONTEXT_ATTACHMENT] } ?: false

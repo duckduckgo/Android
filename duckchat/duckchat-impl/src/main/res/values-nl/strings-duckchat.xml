@@ -94,11 +94,6 @@
     <string name="duck_ai_paid_settings_manage_in_settings">Beheren in de instellingen voor AI-functies</string>
     <string name="duck_ai_paid_settings_manage_secondary">Configureer Duck.ai in de instellingen voor AI-functies.</string>
 
-    <!-- Duck AI contextual onboarding -->
-    <string name="duck_chat_contextual_onboarding_title" instruction="Title for contextual Duck AI onboarding sheet">Stel een vraag over deze pagina</string>
-    <string name="duck_chat_contextual_onboarding_body" instruction="Body text for contextual Duck AI onboarding sheet">Duck.ai kan nu helpen bij het beantwoorden van vragen over de pagina die je bekijkt.\n\nDe inhoud van de pagina is alleen inbegrepen als je deze bijvoegt. Je kunt dit op elk moment wijzigen in Instellingen.</string>
-    <string name="duck_chat_contextual_onboarding_primary" instruction="Button to continue to contextual Duck AI sheet">Ik snap het</string>
-    <string name="duck_chat_contextual_onboarding_secondary" instruction="Button to go to AI settings">Instellingen bekijken</string>
 
     <!-- Duck.ai Contextual Bottom Sheet -->
     <string name="duckAIContextualPromptSummarize">Deze pagina samenvatten</string>
