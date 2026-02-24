@@ -125,6 +125,58 @@ class UserSegmentsPixelSenderTest {
     }
 
     @Test
+    fun whenDuckAiRetentionAtbRefreshedWithEmptyMetadata_thenPixelFiredWithSegmentParamsOnly() = runTest {
+        val usageHistoryList = listOf("v123-1", "v123-2")
+        val userSegment = SegmentCalculation.UserSegment(
+            activityType = "duckai",
+            cohortAtb = "v123-1",
+            newSetAtb = "v123-2",
+            countAsWau = true,
+            countAsMau = "tttt",
+            segmentsToday = listOf("first_month"),
+            segmentsPrevWeek = emptyList(),
+        )
+        whenever(usageHistory.getDuckAiHistory()).thenReturn(usageHistoryList)
+        whenever(segmentCalculation.computeUserSegmentForActivityType(DUCKAI, usageHistoryList)).thenReturn(userSegment)
+
+        testee.onDuckAiRetentionAtbRefreshed("v123-1", "v123-2", emptyMap())
+        advanceUntilIdle()
+
+        verify(pixel).fire(
+            pixelName = eq(StatisticsPixelName.RETENTION_SEGMENTS.pixelName),
+            parameters = eq(userSegment.toPixelParams()),
+            encodedParameters = any(),
+            type = any(),
+        )
+    }
+
+    @Test
+    fun whenDuckAiRetentionAtbRefreshedWithMetadata_andAtbChanges_thenPixelStillFired() = runTest {
+        val usageHistoryList = listOf("v123-1", "v123-2")
+        val userSegment = SegmentCalculation.UserSegment(
+            activityType = "duckai",
+            cohortAtb = "v123-1",
+            newSetAtb = "v123-2",
+            countAsWau = true,
+            countAsMau = "tttt",
+            segmentsToday = listOf("first_month"),
+            segmentsPrevWeek = emptyList(),
+        )
+        whenever(usageHistory.getDuckAiHistory()).thenReturn(usageHistoryList)
+        whenever(segmentCalculation.computeUserSegmentForActivityType(DUCKAI, usageHistoryList)).thenReturn(userSegment)
+
+        testee.onDuckAiRetentionAtbRefreshed("v123-1", "v123-2", mapOf("modelTier" to "tier1"))
+        advanceUntilIdle()
+
+        verify(pixel).fire(
+            pixelName = eq(StatisticsPixelName.RETENTION_SEGMENTS.pixelName),
+            parameters = eq(userSegment.toPixelParams()),
+            encodedParameters = any(),
+            type = any(),
+        )
+    }
+
+    @Test
     fun whenAppRetentionAtbRefreshedAndAtbUnchangedThenPixelNotFired() = runTest {
         whenever(usageHistory.getAppUsageHistory()).thenReturn(listOf("v123-1"))
 
