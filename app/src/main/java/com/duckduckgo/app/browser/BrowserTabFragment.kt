@@ -308,10 +308,14 @@ import com.duckduckgo.duckchat.impl.contextual.DuckChatContextualSharedViewModel
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayerSettingsNoParams
+import com.duckduckgo.js.messaging.api.AddDocumentStartJavaScriptPlugin
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
+import com.duckduckgo.js.messaging.api.PostMessageWrapperPlugin
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
+import com.duckduckgo.js.messaging.api.WebMessagingPlugin
+import com.duckduckgo.js.messaging.api.WebViewCompatMessageCallback
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
 import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreens.AppTrackerOnboardingActivityWithEmptyParamsParams
 import com.duckduckgo.navigation.api.GlobalActivityStarter
@@ -596,6 +600,15 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var webViewCompatWrapper: WebViewCompatWrapper
+
+    @Inject
+    lateinit var addDocumentStartJavaScriptPlugins: PluginPoint<AddDocumentStartJavaScriptPlugin>
+
+    @Inject
+    lateinit var webMessagingPlugins: PluginPoint<WebMessagingPlugin>
+
+    @Inject
+    lateinit var postMessageWrapperPlugins: PluginPoint<PostMessageWrapperPlugin>
 
     @Inject
     lateinit var omnibarRepository: OmnibarRepository
@@ -999,7 +1012,14 @@ class BrowserTabFragment :
 
     private fun observeSubscriptionEventDataChannel() {
         viewModel.subscriptionEventDataFlow.onEach { subscriptionEventData ->
-            contentScopeScripts.sendSubscriptionEvent(subscriptionEventData)
+            webView?.let { wv ->
+                postMessageWrapperPlugins.getPlugins().forEach { plugin ->
+                    plugin.postMessage(subscriptionEventData, wv)
+                }
+            } ?: run {
+                // Fallback if webView not yet ready
+                contentScopeScripts.sendSubscriptionEvent(subscriptionEventData)
+            }
         }.launchIn(lifecycleScope)
     }
 
@@ -1322,7 +1342,7 @@ class BrowserTabFragment :
     private fun onOmnibarCustomTabPrivacyDashboardPressed() {
         val params = PrivacyDashboardPrimaryScreen(tabId)
         val intent = globalActivityStarter.startIntent(requireContext(), params)
-        contentScopeScripts.sendSubscriptionEvent(createBreakageReportingEventData())
+        sendSubscriptionEvent(createBreakageReportingEventData())
         intent?.let { activityResultPrivacyDashboard.launch(intent) }
         pixel.fire(CustomTabPixelNames.CUSTOM_TABS_PRIVACY_DASHBOARD_OPENED)
     }
@@ -1334,7 +1354,7 @@ class BrowserTabFragment :
     }
 
     private fun onBrowserMenuButtonPressed() {
-        contentScopeScripts.sendSubscriptionEvent(createBreakageReportingEventData())
+        sendSubscriptionEvent(createBreakageReportingEventData())
         viewModel.onBrowserMenuClicked(isCustomTab = isActiveCustomTab())
 
         lifecycleScope.launch {
@@ -1349,7 +1369,7 @@ class BrowserTabFragment :
     }
 
     private fun onOmnibarPrivacyShieldButtonPressed() {
-        contentScopeScripts.sendSubscriptionEvent(createBreakageReportingEventData())
+        sendSubscriptionEvent(createBreakageReportingEventData())
         launchPrivacyDashboard(toggle = false)
     }
 
@@ -2635,7 +2655,7 @@ class BrowserTabFragment :
             }
 
             is Command.SendSubscriptions -> {
-                contentScopeScripts.sendSubscriptionEvent(it.cssData)
+                sendSubscriptionEvent(it.cssData)
                 duckPlayerScripts.sendSubscriptionEvent(it.duckPlayerData)
             }
 
@@ -3726,6 +3746,8 @@ class BrowserTabFragment :
                     }
                 },
             )
+
+            configureWebViewCompatMessaging(it)
         }
 
         WebView.setWebContentsDebuggingEnabled(webContentDebugging.isEnabled())
@@ -3786,6 +3808,56 @@ class BrowserTabFragment :
     private fun hideDaxBubbleCta() {
         newBrowserTab.browserBackground.setImageResource(0)
         daxDialogIntroBubble.root.gone()
+    }
+
+    private fun sendSubscriptionEvent(subscriptionEventData: SubscriptionEventData) {
+        lifecycleScope.launch {
+            webView?.let { wv ->
+                postMessageWrapperPlugins.getPlugins().forEach { plugin ->
+                    plugin.postMessage(subscriptionEventData, wv)
+                }
+            } ?: run {
+                contentScopeScripts.sendSubscriptionEvent(subscriptionEventData)
+            }
+        }
+    }
+
+    private fun configureWebViewCompatMessaging(webView: DuckDuckGoWebView) {
+        lifecycleScope.launch {
+            // Register addDocumentStartJavaScript plugins (injects C-S-S at document start)
+            addDocumentStartJavaScriptPlugins.getPlugins().forEach { plugin ->
+                plugin.addDocumentStartJavaScript(webView)
+            }
+
+            // Register WebMessagingPlugin plugins (addWebMessageListener for postMessage-based messaging)
+            webMessagingPlugins.getPlugins().forEach { plugin ->
+                plugin.register(
+                    jsMessageCallback = object : WebViewCompatMessageCallback {
+                        override fun process(
+                            context: String,
+                            featureName: String,
+                            method: String,
+                            id: String?,
+                            data: JSONObject?,
+                            onResponse: suspend (params: JSONObject) -> Unit,
+                        ) {
+                            viewModel.webViewCompatProcessJsCallbackMessage(
+                                context = context,
+                                featureName = featureName,
+                                method = method,
+                                id = id,
+                                data = data,
+                                onResponse = onResponse,
+                                isActiveCustomTab = isActiveCustomTab(),
+                                activityContext = requireActivity(),
+                                getWebViewUrl = { webView.url },
+                            )
+                        }
+                    },
+                    webView = webView,
+                )
+            }
+        }
     }
 
     @SuppressLint("AddDocumentStartJavaScriptUsage")

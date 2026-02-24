@@ -97,7 +97,13 @@ class ContentScopeScriptsWebMessagingPlugin @Inject constructor(
                                     }
                                     is SendResponse -> {
                                         webView.findViewTreeLifecycleOwner()?.lifecycleScope?.launch {
-                                            onResponse(webView, jsMessage, replyProxy)
+                                            val callbackData = JsCallbackData(
+                                                id = jsMessage.id ?: "",
+                                                params = processResult.response,
+                                                featureName = jsMessage.featureName,
+                                                method = jsMessage.method,
+                                            )
+                                            onResponse(webView, callbackData, replyProxy)
                                         }
                                     }
                                 }
@@ -118,7 +124,13 @@ class ContentScopeScriptsWebMessagingPlugin @Inject constructor(
                                 }
                                 is SendResponse -> {
                                     webView.findViewTreeLifecycleOwner()?.lifecycleScope?.launch {
-                                        onResponse(webView, jsMessage, replyProxy)
+                                        val callbackData = JsCallbackData(
+                                            id = jsMessage.id ?: "",
+                                            params = processResult.response,
+                                            featureName = jsMessage.featureName,
+                                            method = jsMessage.method,
+                                        )
+                                        onResponse(webView, callbackData, replyProxy)
                                     }
                                 }
                             }

@@ -3950,6 +3950,9 @@ class BrowserTabViewModel @Inject constructor(
         id: String?,
         data: JSONObject?,
         onResponse: suspend (JSONObject) -> Unit,
+        isActiveCustomTab: Boolean = false,
+        activityContext: Context? = null,
+        getWebViewUrl: () -> String? = { null },
     ) {
         processGlobalMessages(
             featureName = featureName,
@@ -3967,6 +3970,9 @@ class BrowserTabViewModel @Inject constructor(
                     id = id,
                     data = data,
                     onResponse = onResponse,
+                    isActiveCustomTab = isActiveCustomTab,
+                    context = activityContext,
+                    getWebViewUrl = getWebViewUrl,
                 )
         }
     }
@@ -4024,6 +4030,9 @@ class BrowserTabViewModel @Inject constructor(
         id: String?,
         data: JSONObject?,
         onResponse: suspend (JSONObject) -> Unit,
+        isActiveCustomTab: Boolean = false,
+        context: Context? = null,
+        getWebViewUrl: () -> String?,
     ) {
         when (featureName) {
             "webCompat" -> {
@@ -4059,7 +4068,6 @@ class BrowserTabViewModel @Inject constructor(
             "messaging" ->
                 when (method) {
                     "initialPing" -> {
-                        // TODO: Eventually, we might want plugins here
                         val response =
                             JSONObject(
                                 mapOf(
@@ -4072,6 +4080,54 @@ class BrowserTabViewModel @Inject constructor(
                         }
                     }
                 }
+
+            DUCK_PLAYER_FEATURE_NAME, DUCK_PLAYER_PAGE_FEATURE_NAME -> {
+                viewModelScope.launch(dispatchers.io()) {
+                    val webViewUrl = withContext(dispatchers.main()) { getWebViewUrl() }
+                    val result = duckPlayerJSHelper.processJsCallbackMessage(featureName, method, id, data, webViewUrl, tabId, isActiveCustomTab)
+                    result?.let {
+                        when (it) {
+                            is Command.SendResponseToJs -> onResponse(it.data.params)
+                            is Command.SendResponseToDuckPlayer -> onResponse(it.data.params)
+                            else -> withContext(dispatchers.main()) { command.value = it }
+                        }
+                    }
+                }
+            }
+
+            DUCK_CHAT_FEATURE_NAME -> {
+                viewModelScope.launch(dispatchers.io()) {
+                    val response = duckChatJSHelper.processJsCallbackMessage(
+                        featureName,
+                        method,
+                        id,
+                        data,
+                    )
+                    response?.let {
+                        onResponse(it.params)
+                    }
+                }
+            }
+
+            SUBSCRIPTIONS_FEATURE_NAME -> {
+                viewModelScope.launch(dispatchers.io()) {
+                    val response = subscriptionsJSHelper.processJsCallbackMessage(featureName, method, id, data, context)
+                    response?.let {
+                        onResponse(it.params)
+                    }
+                }
+            }
+
+            PAGE_CONTEXT_FEATURE_NAME -> {
+                viewModelScope.launch(dispatchers.io()) {
+                    val pageContext = pageContextJSHelper.processPageContext(featureName, method, data, tabId)
+                    if (pageContext != null) {
+                        withContext(dispatchers.main()) {
+                            command.value = Command.PageContextReceived(tabId, pageContext)
+                        }
+                    }
+                }
+            }
         }
     }
 
