@@ -19,7 +19,7 @@ jobs:
   pr-sync:
     runs-on: ubuntu-latest
     steps:
-      - uses: malmstein/native-github-asana-sync@v2.0
+      - uses: malmstein/asana-github-sync@v1.0.0
         if: github.event.pull_request.merged
         with:
           GITHUB_TOKEN: ${{ secrets.GT_DAXMOBILE }}
