@@ -25,6 +25,8 @@ import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import logcat.LogPriority.VERBOSE
+import logcat.logcat
 import javax.inject.Inject
 
 /**
@@ -42,6 +44,7 @@ class EventHubLifecycleObserver @Inject constructor(
 
     @UiThread
     override fun onStart(owner: LifecycleOwner) {
+        logcat(VERBOSE) { "EventHub: app foregrounded, checking pixels" }
         appCoroutineScope.launch(dispatcherProvider.io()) {
             pixelManager.checkPixels()
         }

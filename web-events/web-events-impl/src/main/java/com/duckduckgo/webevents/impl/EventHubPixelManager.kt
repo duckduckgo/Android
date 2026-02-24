@@ -19,6 +19,9 @@ package com.duckduckgo.webevents.impl
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.webevents.store.EventHubPixelStateEntity
 import com.duckduckgo.webevents.store.EventHubRepository
+import logcat.LogPriority.DEBUG
+import logcat.LogPriority.VERBOSE
+import logcat.logcat
 import org.json.JSONArray
 import org.json.JSONObject
 import javax.inject.Inject
@@ -59,9 +62,11 @@ class RealEventHubPixelManager @Inject constructor(
                     val newValue = (params[paramName] ?: 0) + 1
                     params[paramName] = newValue
                     changed = true
+                    logcat(VERBOSE) { "EventHub: ${pixelConfig.name}.$paramName incremented to $newValue" }
 
                     if (BucketCounter.shouldStopCounting(newValue, paramConfig.buckets)) {
                         stopCounting.add(paramName)
+                        logcat(VERBOSE) { "EventHub: ${pixelConfig.name}.$paramName reached max bucket, stopCounting" }
                     }
                 }
             }
@@ -96,12 +101,15 @@ class RealEventHubPixelManager @Inject constructor(
     override fun onConfigChanged() {
         val config = getParsedConfig()
         if (!config.featureEnabled) {
+            logcat(DEBUG) { "EventHub: feature disabled, clearing all pixel states" }
             repository.deleteAllPixelStates()
             return
         }
 
+        logcat(DEBUG) { "EventHub: onConfigChanged — feature enabled, ${config.telemetry.size} telemetry pixel(s) in config" }
         for (pixelConfig in config.telemetry) {
             if (repository.getPixelState(pixelConfig.name) == null && pixelConfig.isEnabled) {
+                logcat(DEBUG) { "EventHub: registering pixel ${pixelConfig.name}" }
                 startNewPeriod(pixelConfig)
             }
         }
@@ -119,10 +127,14 @@ class RealEventHubPixelManager @Inject constructor(
                     pixelConfig.trigger.period,
                 ).toString(),
             )
+            val allParams = pixelData + additionalParams
+            logcat(DEBUG) { "EventHub: firing pixel ${pixelConfig.name} params=$allParams" }
             pixel.enqueueFire(
                 pixelName = pixelConfig.name,
-                parameters = pixelData + additionalParams,
+                parameters = allParams,
             )
+        } else {
+            logcat(VERBOSE) { "EventHub: skipping pixel ${pixelConfig.name}, no params" }
         }
 
         // Deregister and re-register: resets state and picks up any config changes
@@ -140,6 +152,7 @@ class RealEventHubPixelManager @Inject constructor(
         val periodMillis = pixelConfig.trigger.period.periodSeconds * 1000
         val initialParams = pixelConfig.parameters.keys.associateWith { 0 }.toMutableMap()
 
+        logcat(DEBUG) { "EventHub: startNewPeriod ${pixelConfig.name} start=$nowMillis end=${nowMillis + periodMillis}" }
         repository.savePixelState(
             EventHubPixelStateEntity(
                 pixelName = pixelConfig.name,
