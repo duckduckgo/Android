@@ -1636,7 +1636,9 @@ class EventHubPixelManagerTest {
         for (i in 1..3) {
             org.mockito.Mockito.reset(repository)
             whenever(repository.getEventHubConfigEntity()).thenReturn(EventHubConfigEntity(json = fullConfig))
-            val currentState = if (i == 1) state else {
+            val currentState = if (i == 1) {
+                state
+            } else {
                 pixelState("webTelemetry_adwallDetection_day", mapOf("count" to i - 1), periodStart = periodStart, periodEnd = periodEnd)
             }
             stubPixelStates(currentState)
