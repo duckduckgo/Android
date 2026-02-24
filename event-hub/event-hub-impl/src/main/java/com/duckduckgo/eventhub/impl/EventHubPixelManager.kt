@@ -47,6 +47,7 @@ class RealEventHubPixelManager @Inject constructor(
         for (pixelConfig in config.telemetry) {
             if (!pixelConfig.isEnabled) continue
             val state = repository.getPixelState(pixelConfig.name) ?: continue
+            val storedConfig = EventHubConfigParser.parseSinglePixelConfig(pixelConfig.name, state.configJson) ?: continue
 
             if (state.periodStartMillis == 0L || state.periodEndMillis == 0L) continue
             if (nowMillis > state.periodEndMillis) continue
@@ -55,26 +56,25 @@ class RealEventHubPixelManager @Inject constructor(
             val stopCounting = parseStopCountingJson(state.stopCountingJson)
             var changed = false
 
-            for ((paramName, paramConfig) in pixelConfig.parameters) {
+            for ((paramName, paramConfig) in storedConfig.parameters) {
                 if (paramConfig.isCounter && paramConfig.source == eventType) {
                     if (paramName in stopCounting) continue
 
-                    // we know we're going to make a storable change at this point (either updating the value or stopping counting)
                     changed = true
                     val currentValue = params[paramName] ?: 0
                     if (BucketCounter.shouldStopCounting(currentValue, paramConfig.buckets)) {
                         stopCounting.add(paramName)
-                        logcat(VERBOSE) { "EventHub: ${pixelConfig.name}.$paramName already at max bucket, stopCounting" }
+                        logcat(VERBOSE) { "EventHub: ${storedConfig.name}.$paramName already at max bucket, stopCounting" }
                         continue
                     }
 
                     val newValue = currentValue + 1
                     params[paramName] = newValue
-                    logcat(VERBOSE) { "EventHub: ${pixelConfig.name}.$paramName incremented to $newValue" }
+                    logcat(VERBOSE) { "EventHub: ${storedConfig.name}.$paramName incremented to $newValue" }
 
                     if (BucketCounter.shouldStopCounting(newValue, paramConfig.buckets)) {
                         stopCounting.add(paramName)
-                        logcat(VERBOSE) { "EventHub: ${pixelConfig.name}.$paramName reached max bucket, stopCounting" }
+                        logcat(VERBOSE) { "EventHub: ${storedConfig.name}.$paramName reached max bucket, stopCounting" }
                     }
                 }
             }
@@ -99,9 +99,10 @@ class RealEventHubPixelManager @Inject constructor(
         for (pixelConfig in config.telemetry) {
             if (!pixelConfig.isEnabled) continue
             val state = repository.getPixelState(pixelConfig.name) ?: continue
+            val storedConfig = EventHubConfigParser.parseSinglePixelConfig(pixelConfig.name, state.configJson) ?: continue
 
             if (nowMillis >= state.periodEndMillis && state.periodEndMillis > 0) {
-                fireTelemetry(pixelConfig, state)
+                fireTelemetry(storedConfig, state)
             }
         }
     }
@@ -168,6 +169,7 @@ class RealEventHubPixelManager @Inject constructor(
                 periodEndMillis = nowMillis + periodMillis,
                 paramsJson = serializeParams(initialParams),
                 stopCountingJson = "[]",
+                configJson = EventHubConfigParser.serializePixelConfig(pixelConfig),
             ),
         )
     }
@@ -224,7 +226,7 @@ class RealEventHubPixelManager @Inject constructor(
         }
 
         fun serializeParams(params: Map<String, Int>): String {
-            return JSONObject(params.mapValues { it.value as Any }).toString()
+            return JSONObject(params.mapValues { it.value }).toString()
         }
 
         fun parseStopCountingJson(json: String): MutableSet<String> {
