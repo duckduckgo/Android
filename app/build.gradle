@@ -583,7 +583,7 @@ dependencies {
 // Develocity Android Instrumented Test Support
 afterEvaluate {
     // Firebase Test Lab (Flank) tests
-    tasks.matching { it.name.startsWith("runFlankAndroidTests") }.names.each {
+    tasks.matching { it.name.startsWith("execFlankAndroidTests") }.names.each {
         ImportJUnitXmlReports.register(
                 tasks,
                 tasks.named(it),
