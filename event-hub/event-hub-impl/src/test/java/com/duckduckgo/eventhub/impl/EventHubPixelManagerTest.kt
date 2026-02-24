@@ -16,6 +16,7 @@
 
 package com.duckduckgo.eventhub.impl
 
+import android.webkit.WebView
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.eventhub.store.EventHubConfigEntity
@@ -90,7 +91,7 @@ class EventHubPixelManagerTest {
         val state = pixelState("webTelemetry_adwallDetection_day", mapOf("count" to 3))
         whenever(repository.getPixelState("webTelemetry_adwallDetection_day")).thenReturn(state)
 
-        manager.handleWebEvent("adwall", "", "")
+        manager.handleWebEvent("adwall", null)
 
         val captor = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(captor.capture())
@@ -103,7 +104,7 @@ class EventHubPixelManagerTest {
         val state = pixelState("webTelemetry_adwallDetection_day", mapOf("count" to 0), periodEnd = 100_000L)
         whenever(repository.getPixelState("webTelemetry_adwallDetection_day")).thenReturn(state)
 
-        manager.handleWebEvent("adwall", "", "")
+        manager.handleWebEvent("adwall", null)
 
         verify(repository, never()).savePixelState(any())
     }
@@ -113,7 +114,7 @@ class EventHubPixelManagerTest {
         val state = pixelState("webTelemetry_adwallDetection_day", mapOf("count" to 39))
         whenever(repository.getPixelState("webTelemetry_adwallDetection_day")).thenReturn(state)
 
-        manager.handleWebEvent("adwall", "", "")
+        manager.handleWebEvent("adwall", null)
 
         val captor = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(captor.capture())
@@ -127,7 +128,7 @@ class EventHubPixelManagerTest {
         val state = pixelState("webTelemetry_adwallDetection_day", mapOf("count" to 50), stopCounting = setOf("count"))
         whenever(repository.getPixelState("webTelemetry_adwallDetection_day")).thenReturn(state)
 
-        manager.handleWebEvent("adwall", "", "")
+        manager.handleWebEvent("adwall", null)
 
         verify(repository, never()).savePixelState(any())
     }
@@ -160,7 +161,7 @@ class EventHubPixelManagerTest {
         val state = pixelState("test", mapOf("count" to 0))
         whenever(repository.getPixelState("test")).thenReturn(state)
 
-        manager.handleWebEvent("evt", "", "")
+        manager.handleWebEvent("evt", null)
 
         val captor = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(captor.capture())
@@ -174,7 +175,7 @@ class EventHubPixelManagerTest {
         val state = pixelState("webTelemetry_adwallDetection_day", mapOf("count" to 40))
         whenever(repository.getPixelState("webTelemetry_adwallDetection_day")).thenReturn(state)
 
-        manager.handleWebEvent("adwall", "", "")
+        manager.handleWebEvent("adwall", null)
 
         val captor = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(captor.capture())
@@ -188,56 +189,56 @@ class EventHubPixelManagerTest {
         val state = pixelState("webTelemetry_adwallDetection_day", mapOf("count" to 0))
         whenever(repository.getPixelState("webTelemetry_adwallDetection_day")).thenReturn(state)
 
-        manager.handleWebEvent("unknownEvent", "", "")
+        manager.handleWebEvent("unknownEvent", null)
 
         verify(repository, never()).savePixelState(any())
     }
 
     // --- deduplication: multiple events on same page should count as one ---
 
+    private fun mockWebView(url: String): WebView = mock<WebView>().also {
+        whenever(it.url).thenReturn(url)
+    }
+
     @Test
     fun `same page same source - second event is deduplicated`() {
-        val tab = "tab1"
-        val url = "https://example.com/page1"
+        val webView = mockWebView("https://example.com/page1")
         val state = pixelState("webTelemetry_adwallDetection_day", mapOf("count" to 0))
         whenever(repository.getPixelState("webTelemetry_adwallDetection_day")).thenReturn(state)
 
-        manager.handleWebEvent("adwall", tab, url)
+        manager.handleWebEvent("adwall", webView)
 
         val captor = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(captor.capture())
         assertEquals(1, RealEventHubPixelManager.parseParamsJson(captor.firstValue.paramsJson)["count"])
 
-        // Second event from same page (e.g., different detector firing same source)
         org.mockito.Mockito.reset(repository)
         whenever(repository.getEventHubConfigEntity()).thenReturn(EventHubConfigEntity(json = fullConfig))
         whenever(repository.getPixelState("webTelemetry_adwallDetection_day")).thenReturn(captor.firstValue)
 
-        manager.handleWebEvent("adwall", tab, url)
+        manager.handleWebEvent("adwall", webView)
 
         verify(repository, never()).savePixelState(any())
     }
 
     @Test
     fun `same page multiple events - all after first are deduplicated`() {
-        val tab = "tab1"
-        val url = "https://example.com/page1"
+        val webView = mockWebView("https://example.com/page1")
         val state = pixelState("webTelemetry_adwallDetection_day", mapOf("count" to 5))
         whenever(repository.getPixelState("webTelemetry_adwallDetection_day")).thenReturn(state)
 
-        manager.handleWebEvent("adwall", tab, url)
+        manager.handleWebEvent("adwall", webView)
 
         val captor = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(captor.capture())
         assertEquals(6, RealEventHubPixelManager.parseParamsJson(captor.firstValue.paramsJson)["count"])
 
-        // Multiple subsequent events from the same page
         for (i in 1..5) {
             org.mockito.Mockito.reset(repository)
             whenever(repository.getEventHubConfigEntity()).thenReturn(EventHubConfigEntity(json = fullConfig))
             whenever(repository.getPixelState("webTelemetry_adwallDetection_day")).thenReturn(captor.firstValue)
 
-            manager.handleWebEvent("adwall", tab, url)
+            manager.handleWebEvent("adwall", webView)
 
             verify(repository, never()).savePixelState(any())
         }
@@ -245,22 +246,23 @@ class EventHubPixelManagerTest {
 
     @Test
     fun `navigation to new page resets dedup - event on new page increments`() {
-        val tab = "tab1"
+        val webView = mockWebView("https://example.com/page1")
         val state = pixelState("webTelemetry_adwallDetection_day", mapOf("count" to 0))
         whenever(repository.getPixelState("webTelemetry_adwallDetection_day")).thenReturn(state)
 
-        manager.handleWebEvent("adwall", tab, "https://example.com/page1")
+        manager.handleWebEvent("adwall", webView)
 
         val firstCaptor = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(firstCaptor.capture())
         assertEquals(1, RealEventHubPixelManager.parseParamsJson(firstCaptor.firstValue.paramsJson)["count"])
 
-        // Navigate to new page — different URL means new page visit
+        // Navigate — same WebView, different URL
         org.mockito.Mockito.reset(repository)
+        whenever(webView.url).thenReturn("https://example.com/page2")
         whenever(repository.getEventHubConfigEntity()).thenReturn(EventHubConfigEntity(json = fullConfig))
         whenever(repository.getPixelState("webTelemetry_adwallDetection_day")).thenReturn(firstCaptor.firstValue)
 
-        manager.handleWebEvent("adwall", tab, "https://example.com/page2")
+        manager.handleWebEvent("adwall", webView)
 
         val secondCaptor = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(secondCaptor.capture())
@@ -269,23 +271,22 @@ class EventHubPixelManagerTest {
 
     @Test
     fun `subframe event on same page is deduplicated`() {
-        val tab = "tab1"
-        val url = "https://example.com/page1"
+        val webView = mockWebView("https://example.com/page1")
         val state = pixelState("webTelemetry_adwallDetection_day", mapOf("count" to 0))
         whenever(repository.getPixelState("webTelemetry_adwallDetection_day")).thenReturn(state)
 
-        manager.handleWebEvent("adwall", tab, url)
+        manager.handleWebEvent("adwall", webView)
 
         val captor = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(captor.capture())
         assertEquals(1, RealEventHubPixelManager.parseParamsJson(captor.firstValue.paramsJson)["count"])
 
-        // Subframe event — same tab + same top-level URL = deduped
+        // Subframe event — same WebView instance + same URL = deduped
         org.mockito.Mockito.reset(repository)
         whenever(repository.getEventHubConfigEntity()).thenReturn(EventHubConfigEntity(json = fullConfig))
         whenever(repository.getPixelState("webTelemetry_adwallDetection_day")).thenReturn(captor.firstValue)
 
-        manager.handleWebEvent("adwall", tab, url)
+        manager.handleWebEvent("adwall", webView)
 
         verify(repository, never()).savePixelState(any())
     }
@@ -320,12 +321,11 @@ class EventHubPixelManagerTest {
         whenever(repository.getEventHubConfigEntity()).thenReturn(EventHubConfigEntity(json = twoSourceConfig))
         manager = RealEventHubPixelManager(repository, pixel, timeProvider)
 
-        val tab = "tab1"
-        val url = "https://example.com/page1"
+        val webView = mockWebView("https://example.com/page1")
         val state = pixelState("test", mapOf("adwallCount" to 0, "trackerCount" to 0))
         whenever(repository.getPixelState("test")).thenReturn(state)
 
-        manager.handleWebEvent("adwall", tab, url)
+        manager.handleWebEvent("adwall", webView)
 
         val firstCaptor = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(firstCaptor.capture())
@@ -333,12 +333,11 @@ class EventHubPixelManagerTest {
         assertEquals(1, paramsAfterAdwall["adwallCount"])
         assertEquals(0, paramsAfterAdwall["trackerCount"])
 
-        // Different source on same page — should NOT be deduped
         org.mockito.Mockito.reset(repository)
         whenever(repository.getEventHubConfigEntity()).thenReturn(EventHubConfigEntity(json = twoSourceConfig))
         whenever(repository.getPixelState("test")).thenReturn(firstCaptor.firstValue)
 
-        manager.handleWebEvent("trackerBlocked", tab, url)
+        manager.handleWebEvent("trackerBlocked", webView)
 
         val secondCaptor = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(secondCaptor.capture())
@@ -353,15 +352,13 @@ class EventHubPixelManagerTest {
         whenever(repository.getEventHubConfigEntity()).thenReturn(EventHubConfigEntity(json = twoPixelConf))
         manager = RealEventHubPixelManager(repository, pixel, timeProvider)
 
-        val tab = "tab1"
-        val url = "https://example.com/page1"
+        val webView = mockWebView("https://example.com/page1")
         val stateA = pixelState("pixel_a", mapOf("count" to 0))
         val stateB = pixelState("pixel_b", mapOf("count" to 0))
         whenever(repository.getPixelState("pixel_a")).thenReturn(stateA)
         whenever(repository.getPixelState("pixel_b")).thenReturn(stateB)
 
-        // First event — both pixels should increment
-        manager.handleWebEvent("evt", tab, url)
+        manager.handleWebEvent("evt", webView)
 
         val captor = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository, org.mockito.kotlin.times(2)).savePixelState(captor.capture())
@@ -370,34 +367,32 @@ class EventHubPixelManagerTest {
         assertEquals(1, RealEventHubPixelManager.parseParamsJson(savedA.paramsJson)["count"])
         assertEquals(1, RealEventHubPixelManager.parseParamsJson(savedB.paramsJson)["count"])
 
-        // Second event from same page — both should be deduped
         org.mockito.Mockito.reset(repository)
         whenever(repository.getEventHubConfigEntity()).thenReturn(EventHubConfigEntity(json = twoPixelConf))
         whenever(repository.getPixelState("pixel_a")).thenReturn(savedA)
         whenever(repository.getPixelState("pixel_b")).thenReturn(savedB)
 
-        manager.handleWebEvent("evt", tab, url)
+        manager.handleWebEvent("evt", webView)
 
         verify(repository, never()).savePixelState(any())
     }
 
     @Test
-    fun `empty pageId disables dedup`() {
+    fun `null webView disables dedup`() {
         val state = pixelState("webTelemetry_adwallDetection_day", mapOf("count" to 0))
         whenever(repository.getPixelState("webTelemetry_adwallDetection_day")).thenReturn(state)
 
-        manager.handleWebEvent("adwall", "", "")
+        manager.handleWebEvent("adwall", null)
 
         val firstCaptor = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(firstCaptor.capture())
         assertEquals(1, RealEventHubPixelManager.parseParamsJson(firstCaptor.firstValue.paramsJson)["count"])
 
-        // Second event also with empty URL — no dedup, both increment
         org.mockito.Mockito.reset(repository)
         whenever(repository.getEventHubConfigEntity()).thenReturn(EventHubConfigEntity(json = fullConfig))
         whenever(repository.getPixelState("webTelemetry_adwallDetection_day")).thenReturn(firstCaptor.firstValue)
 
-        manager.handleWebEvent("adwall", "", "")
+        manager.handleWebEvent("adwall", null)
 
         val secondCaptor = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(secondCaptor.capture())
@@ -406,32 +401,33 @@ class EventHubPixelManagerTest {
 
     @Test
     fun `returning to same URL after navigating away counts as new visit`() {
-        val tab = "tab1"
+        val webView = mockWebView("https://example.com/page1")
         val state = pixelState("webTelemetry_adwallDetection_day", mapOf("count" to 0))
         whenever(repository.getPixelState("webTelemetry_adwallDetection_day")).thenReturn(state)
 
-        // Visit page1
-        manager.handleWebEvent("adwall", tab, "https://example.com/page1")
+        manager.handleWebEvent("adwall", webView)
         val first = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(first.capture())
         assertEquals(1, RealEventHubPixelManager.parseParamsJson(first.firstValue.paramsJson)["count"])
 
         // Navigate to page2
         org.mockito.Mockito.reset(repository)
+        whenever(webView.url).thenReturn("https://example.com/page2")
         whenever(repository.getEventHubConfigEntity()).thenReturn(EventHubConfigEntity(json = fullConfig))
         whenever(repository.getPixelState("webTelemetry_adwallDetection_day")).thenReturn(first.firstValue)
 
-        manager.handleWebEvent("adwall", tab, "https://example.com/page2")
+        manager.handleWebEvent("adwall", webView)
         val second = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(second.capture())
         assertEquals(2, RealEventHubPixelManager.parseParamsJson(second.firstValue.paramsJson)["count"])
 
-        // Navigate back to page1 — this is a new visit, should increment
+        // Navigate back to page1
         org.mockito.Mockito.reset(repository)
+        whenever(webView.url).thenReturn("https://example.com/page1")
         whenever(repository.getEventHubConfigEntity()).thenReturn(EventHubConfigEntity(json = fullConfig))
         whenever(repository.getPixelState("webTelemetry_adwallDetection_day")).thenReturn(second.firstValue)
 
-        manager.handleWebEvent("adwall", tab, "https://example.com/page1")
+        manager.handleWebEvent("adwall", webView)
         val third = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(third.capture())
         assertEquals(3, RealEventHubPixelManager.parseParamsJson(third.firstValue.paramsJson)["count"])
@@ -440,31 +436,33 @@ class EventHubPixelManagerTest {
     @Test
     fun `same URL in different tabs counts independently`() {
         val url = "https://example.com/page1"
+        val tab1WebView = mockWebView(url)
+        val tab2WebView = mockWebView(url)
         val state = pixelState("webTelemetry_adwallDetection_day", mapOf("count" to 0))
         whenever(repository.getPixelState("webTelemetry_adwallDetection_day")).thenReturn(state)
 
         // Tab 1 fires event
-        manager.handleWebEvent("adwall", "tab1", url)
+        manager.handleWebEvent("adwall", tab1WebView)
         val firstCaptor = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(firstCaptor.capture())
         assertEquals(1, RealEventHubPixelManager.parseParamsJson(firstCaptor.firstValue.paramsJson)["count"])
 
-        // Tab 2 fires same source on same URL — different tab, should count
+        // Tab 2 fires same source on same URL — different WebView instance, should count
         org.mockito.Mockito.reset(repository)
         whenever(repository.getEventHubConfigEntity()).thenReturn(EventHubConfigEntity(json = fullConfig))
         whenever(repository.getPixelState("webTelemetry_adwallDetection_day")).thenReturn(firstCaptor.firstValue)
 
-        manager.handleWebEvent("adwall", "tab2", url)
+        manager.handleWebEvent("adwall", tab2WebView)
         val secondCaptor = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(secondCaptor.capture())
         assertEquals(2, RealEventHubPixelManager.parseParamsJson(secondCaptor.firstValue.paramsJson)["count"])
 
-        // Tab 1 fires again on same page — same tab+URL, should dedup
+        // Tab 1 fires again on same page — same WebView + same URL, should dedup
         org.mockito.Mockito.reset(repository)
         whenever(repository.getEventHubConfigEntity()).thenReturn(EventHubConfigEntity(json = fullConfig))
         whenever(repository.getPixelState("webTelemetry_adwallDetection_day")).thenReturn(secondCaptor.firstValue)
 
-        manager.handleWebEvent("adwall", "tab1", url)
+        manager.handleWebEvent("adwall", tab1WebView)
         verify(repository, never()).savePixelState(any())
     }
 
@@ -665,7 +663,7 @@ class EventHubPixelManagerTest {
         val changedConfig = configWithBuckets(*changedBuckets)
         whenever(repository.getEventHubConfigEntity()).thenReturn(EventHubConfigEntity(json = changedConfig))
 
-        manager.handleWebEvent("evt", "", "")
+        manager.handleWebEvent("evt", null)
 
         val captor = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(captor.capture())
@@ -710,7 +708,7 @@ class EventHubPixelManagerTest {
         whenever(repository.getEventHubConfigEntity()).thenReturn(EventHubConfigEntity(json = changedSourceConfig))
 
         // Event matches stored source ("evt"), not live source ("different_source")
-        manager.handleWebEvent("evt", "", "")
+        manager.handleWebEvent("evt", null)
 
         val captor = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(captor.capture())
@@ -753,7 +751,7 @@ class EventHubPixelManagerTest {
         whenever(repository.getEventHubConfigEntity()).thenReturn(EventHubConfigEntity(json = changedSourceConfig))
 
         // "new_source" matches live config but NOT stored config — should be ignored
-        manager.handleWebEvent("new_source", "", "")
+        manager.handleWebEvent("new_source", null)
 
         verify(repository, never()).savePixelState(any())
     }
@@ -1015,7 +1013,7 @@ class EventHubPixelManagerTest {
         whenever(repository.getPixelState("pixel_b")).thenReturn(stateB1WithCount)
 
         // Events still use config [1] stored in state
-        manager.handleWebEvent("evt", "", "")
+        manager.handleWebEvent("evt", null)
 
         val savedAfterEvent = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository, org.mockito.kotlin.times(2)).savePixelState(savedAfterEvent.capture())
@@ -1056,7 +1054,7 @@ class EventHubPixelManagerTest {
         whenever(repository.getPixelState("pixel_a")).thenReturn(newStateA2)
         whenever(repository.getPixelState("pixel_b")).thenReturn(updatedB)
 
-        manager.handleWebEvent("evt", "", "")
+        manager.handleWebEvent("evt", null)
 
         val savedAfterConfig3 = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository, org.mockito.kotlin.times(2)).savePixelState(savedAfterConfig3.capture())
