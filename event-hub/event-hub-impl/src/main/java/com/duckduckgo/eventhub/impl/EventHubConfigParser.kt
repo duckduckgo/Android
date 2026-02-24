@@ -53,6 +53,49 @@ object EventHubConfigParser {
         }
     }
 
+    fun parseSinglePixelConfig(name: String, json: String): TelemetryPixelConfig? {
+        return try {
+            parseTelemetryPixel(name, JSONObject(json))
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    fun serializePixelConfig(config: TelemetryPixelConfig): String {
+        val json = JSONObject()
+        json.put("state", config.state)
+
+        val triggerJson = JSONObject()
+        val periodJson = JSONObject()
+        config.trigger.period.let { p ->
+            if (p.seconds != 0) periodJson.put("seconds", p.seconds)
+            if (p.minutes != 0) periodJson.put("minutes", p.minutes)
+            if (p.hours != 0) periodJson.put("hours", p.hours)
+            if (p.days != 0) periodJson.put("days", p.days)
+        }
+        triggerJson.put("period", periodJson)
+        json.put("trigger", triggerJson)
+
+        val paramsJson = JSONObject()
+        for ((paramName, paramConfig) in config.parameters) {
+            val paramObj = JSONObject()
+            paramObj.put("template", paramConfig.template)
+            paramObj.put("source", paramConfig.source)
+            val bucketsObj = JSONObject()
+            for ((bucketName, bucket) in paramConfig.buckets) {
+                val bucketObj = JSONObject()
+                bucketObj.put("gte", bucket.gte)
+                if (bucket.lt != null) bucketObj.put("lt", bucket.lt)
+                bucketsObj.put(bucketName, bucketObj)
+            }
+            paramObj.put("buckets", bucketsObj)
+            paramsJson.put(paramName, paramObj)
+        }
+        json.put("parameters", paramsJson)
+
+        return json.toString()
+    }
+
     private fun parseTelemetryPixel(name: String, json: JSONObject): TelemetryPixelConfig? {
         if (!json.has("state")) return null
         val state = json.getString("state")
