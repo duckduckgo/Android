@@ -198,6 +198,7 @@ import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.browser.omnibar.QueryOrigin
 import com.duckduckgo.app.browser.omnibar.QueryOrigin.FromAutocomplete
+import com.duckduckgo.app.browser.pageload.PageLoadWideEvent
 import com.duckduckgo.app.browser.refreshpixels.RefreshPixelSender
 import com.duckduckgo.app.browser.santize.NonHttpAppLinkChecker
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
@@ -502,6 +503,7 @@ class BrowserTabViewModel @Inject constructor(
     private val serpEasterEggLogosToggles: SerpEasterEggLogosToggles,
     private val serpLogos: SerpLogos,
     private val tabVisitedSitesRepository: TabVisitedSitesRepository,
+    private val pageLoadWideEvent: PageLoadWideEvent,
 ) : ViewModel(),
     WebViewClientListener,
     EditSavedSiteListener,
@@ -609,6 +611,7 @@ class BrowserTabViewModel @Inject constructor(
     private var accessibilityObserver: Job? = null
     private var isProcessingTrackingLink = false
     private var isLinkOpenedInNewTab = false
+    private var hasExitedFixedProgress = false
     private var allowlistRefreshTriggerJob: Job? = null
     private var isCustomTabScreen: Boolean = false
     private var alreadyShownKeyboard: Boolean = false
@@ -1864,6 +1867,7 @@ class BrowserTabViewModel @Inject constructor(
 
         isProcessingTrackingLink = false
         isLinkOpenedInNewTab = false
+        hasExitedFixedProgress = false
 
         automaticSavedLoginsMonitor.clearAutoSavedLoginId(tabId)
     }
@@ -2105,12 +2109,20 @@ class BrowserTabViewModel @Inject constructor(
         val isLoading = newProgress < 100 || isProcessingTrackingLink
         val progress = currentLoadingViewState()
         if (progress.progress == newProgress) return
+
         val visualProgress =
             if (newProgress < FIXED_PROGRESS || isProcessingTrackingLink) {
                 FIXED_PROGRESS
             } else {
                 newProgress
             }
+
+        // Track the first time we escape from fixed progress for Wide Events
+        val currentUrl = webViewNavigationState.currentUrl
+        if (!hasExitedFixedProgress && currentUrl != null && newProgress > FIXED_PROGRESS) {
+            hasExitedFixedProgress = true
+            pageLoadWideEvent.onProgressChanged(tabId, currentUrl)
+        }
 
         loadingViewState.value = progress.copy(isLoading = isLoading, progress = visualProgress, url = site?.url ?: "")
 

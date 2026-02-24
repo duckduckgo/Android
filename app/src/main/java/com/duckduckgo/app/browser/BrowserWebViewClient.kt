@@ -56,6 +56,7 @@ import com.duckduckgo.app.browser.logindetection.WebNavigationEvent
 import com.duckduckgo.app.browser.mediaplayback.MediaPlayback
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.navigation.safeCopyBackForwardList
+import com.duckduckgo.app.browser.pageload.PageLoadWideEvent
 import com.duckduckgo.app.browser.pageloadpixel.PageLoadedHandler
 import com.duckduckgo.app.browser.pageloadpixel.firstpaint.PagePaintedHandler
 import com.duckduckgo.app.browser.print.PrintInjector
@@ -119,6 +120,7 @@ class BrowserWebViewClient @Inject constructor(
     private val jsPlugins: PluginPoint<JsInjectorPlugin>,
     private val currentTimeProvider: CurrentTimeProvider,
     private val pageLoadedHandler: PageLoadedHandler,
+    private val pageLoadWideEvent: PageLoadWideEvent,
     private val shouldSendPagePaintedPixel: PagePaintedHandler,
     private val mediaPlayback: MediaPlayback,
     private val subscriptions: Subscriptions,
@@ -438,6 +440,9 @@ class BrowserWebViewClient @Inject constructor(
         if (webView.url == url) {
             val navigationList = webView.safeCopyBackForwardList() ?: return
             webViewClientListener?.onPageCommitVisible(WebViewNavigationState(navigationList), url)
+            webViewClientListener?.getCurrentTabId()?.let { tabId ->
+                pageLoadWideEvent.onPageVisible(tabId, url, webView.progress)
+            }
         }
     }
 
@@ -474,9 +479,13 @@ class BrowserWebViewClient @Inject constructor(
             // See https://app.asana.com/0/0/1206159443951489/f (WebView limitations)
             if (it != ABOUT_BLANK && start == null) {
                 start = currentTimeProvider.elapsedRealtime()
+                webViewClientListener?.getCurrentTabId()?.let { tabId ->
+                    pageLoadWideEvent.onPageStarted(tabId, it)
+                }
                 incrementAndTrackLoad() // increment the request counter
                 requestInterceptor.onPageStarted(url)
             }
+
             handleMediaPlayback(webView, it)
             autoconsent.injectAutoconsent(webView, url)
             adClickManager.detectAdDomain(url)
@@ -540,6 +549,18 @@ class BrowserWebViewClient @Inject constructor(
 
             if (url != null && url != ABOUT_BLANK) {
                 start?.let { safeStart ->
+                    val concurrentRequestsOnFinish = decrementLoadCountAndGet()
+                    webViewClientListener?.getCurrentTabId()?.let { tabId ->
+                        pageLoadWideEvent.onPageLoadFinished(
+                            tabId = tabId,
+                            url = url,
+                            errorDescription = null,
+                            isTabInForegroundOnFinish = webViewClientListener?.isTabInForeground() ?: true,
+                            activeRequestsOnLoadStart = parallelRequestsOnStart,
+                            concurrentRequestsOnFinish = concurrentRequestsOnFinish,
+                        )
+                    }
+
                     // TODO (cbarreiro - 22/05/2024): Extract to plugins
                     pageLoadedHandler.onPageLoaded(
                         url = url,
@@ -548,7 +569,7 @@ class BrowserWebViewClient @Inject constructor(
                         end = currentTimeProvider.elapsedRealtime(),
                         isTabInForegroundOnFinish = webViewClientListener?.isTabInForeground() ?: true,
                         activeRequestsOnLoadStart = parallelRequestsOnStart,
-                        concurrentRequestsOnFinish = decrementLoadCountAndGet(),
+                        concurrentRequestsOnFinish = concurrentRequestsOnFinish,
                     )
                     shouldSendPagePaintedPixel(webView = webView, url = url)
                     appCoroutineScope.launch(dispatcherProvider.io()) {
@@ -596,14 +617,27 @@ class BrowserWebViewClient @Inject constructor(
         detail: RenderProcessGoneDetail?,
     ): Boolean {
         logcat(WARN) { "onRenderProcessGone. Did it crash? ${detail?.didCrash()}" }
-        if (detail?.didCrash() == true) {
+        val didCrash = detail?.didCrash() == true
+        if (didCrash) {
             pixel.fire(WEB_RENDERER_GONE_CRASH)
         } else {
             pixel.fire(WEB_RENDERER_GONE_KILLED)
         }
 
         if (this.start != null) {
-            decrementLoadCountAndGet()
+            val concurrentRequestsOnFinish = decrementLoadCountAndGet()
+            view?.url?.let { url ->
+                webViewClientListener?.getCurrentTabId()?.let { tabId ->
+                    pageLoadWideEvent.onPageLoadFinished(
+                        tabId = tabId,
+                        url = url,
+                        errorDescription = if (didCrash) "ERROR_RENDERER_CRASHED" else "ERROR_RENDERER_KILLED",
+                        isTabInForegroundOnFinish = webViewClientListener?.isTabInForeground() ?: true,
+                        activeRequestsOnLoadStart = parallelRequestsOnStart,
+                        concurrentRequestsOnFinish = concurrentRequestsOnFinish,
+                    )
+                }
+            }
             this.start = null
         }
 
@@ -710,7 +744,20 @@ class BrowserWebViewClient @Inject constructor(
             if (request?.isForMainFrame == true) {
                 if (parsedError != OMITTED) {
                     if (this.start != null) {
-                        decrementLoadCountAndGet()
+                        // Trigger Wide Event failure for main frame errors
+                        val concurrentRequestsOnFinish = decrementLoadCountAndGet()
+                        request.url?.toString()?.let { url ->
+                            webViewClientListener?.getCurrentTabId()?.let { tabId ->
+                                pageLoadWideEvent.onPageLoadFinished(
+                                    tabId = tabId,
+                                    url = url,
+                                    errorDescription = webResourceError.errorCode.asStringErrorCode(),
+                                    isTabInForegroundOnFinish = webViewClientListener?.isTabInForeground() ?: true,
+                                    activeRequestsOnLoadStart = parallelRequestsOnStart,
+                                    concurrentRequestsOnFinish = concurrentRequestsOnFinish,
+                                )
+                            }
+                        }
                         this.start = null
                     }
                     webViewClientListener?.onReceivedError(parsedError, request.url.toString())
