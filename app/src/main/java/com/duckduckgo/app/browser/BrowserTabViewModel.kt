@@ -323,6 +323,7 @@ import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.eventhub.impl.EVENT_HUB_FEATURE_NAME
 import com.duckduckgo.eventhub.impl.EventHubPixelManager
+import com.duckduckgo.eventhub.impl.WebEventContext
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.contextual.PageContextJSHelper
 import com.duckduckgo.duckchat.impl.contextual.RealPageContextJSHelper.Companion.PAGE_CONTEXT_FEATURE_NAME
@@ -4207,7 +4208,7 @@ class BrowserTabViewModel @Inject constructor(
                 if (eventType.isNotEmpty()) {
                     viewModelScope.launch(dispatchers.io()) {
                         val url = withContext(dispatchers.main()) { getWebViewUrl() }
-                        eventHubPixelManager.handleWebEvent(eventType, tabId, url ?: "")
+                        eventHubPixelManager.handleWebEvent(eventType, WebEventContext(tabId = tabId, documentUrl = url ?: ""))
                     }
                 }
             }
