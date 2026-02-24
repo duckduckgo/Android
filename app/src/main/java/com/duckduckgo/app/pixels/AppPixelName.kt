@@ -42,7 +42,7 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     PREONBOARDING_INTRO_SHOWN_UNIQUE("m_preonboarding_intro_shown_unique"),
     PREONBOARDING_INTRO_REINSTALL_USER_SHOWN_UNIQUE("m_preonboarding_intro_reinstall_user_shown_unique"),
     PREONBOARDING_COMPARISON_CHART_SHOWN_UNIQUE("m_preonboarding_comparison_chart_shown_unique"),
-    PREONBOARDING_DEFAULT_BROWSER_PAGE_SHOWN("m_preonboarding_default_browser_page_shown"),
+    PREONBOARDING_DEFAULT_BROWSER_PAGE_SHOWN_UNIQUE("m_preonboarding_default_browser_page_shown_unique"),
     PREONBOARDING_CHOOSE_BROWSER_PRESSED("m_preonboarding_choose_browser_pressed"),
     PREONBOARDING_ADDRESS_BAR_POSITION_SHOWN_UNIQUE("m_preonboarding_address_bar_position_dialog_shown_unique"),
     PREONBOARDING_BOTTOM_ADDRESS_BAR_SELECTED_UNIQUE("m_preonboarding_bottom_address_bar_selected_unique"),

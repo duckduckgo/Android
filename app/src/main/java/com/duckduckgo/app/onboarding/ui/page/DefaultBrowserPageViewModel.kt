@@ -67,7 +67,7 @@ class DefaultBrowserPageViewModel @Inject constructor(
     fun onPageShown() {
         if (!hasPageBeenShown) {
             hasPageBeenShown = true
-            pixel.fire(pixel = AppPixelName.PREONBOARDING_DEFAULT_BROWSER_PAGE_SHOWN, type = Unique())
+            pixel.fire(pixel = AppPixelName.PREONBOARDING_DEFAULT_BROWSER_PAGE_SHOWN_UNIQUE, type = Unique())
         }
     }
 

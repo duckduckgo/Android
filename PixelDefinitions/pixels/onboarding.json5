@@ -1,5 +1,5 @@
 {
-    "m_preonboarding_default_browser_page_shown": {
+    "m_preonboarding_default_browser_page_shown_unique": {
         "description": "Fires when the the default browser page is shown during onboarding",
         "owners": ["mikescamell"],
         "triggers": ["other"],

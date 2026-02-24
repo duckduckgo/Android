@@ -367,14 +367,14 @@ class DefaultBrowserPageViewModelTest {
     fun whenViewModelInitializedThenPageShownPixelIsNotFired() {
         testee = DefaultBrowserPageViewModel(mockDefaultBrowserDetector, mockPixel, mockInstallStore)
 
-        verify(mockPixel, never()).fire(AppPixelName.PREONBOARDING_DEFAULT_BROWSER_PAGE_SHOWN, type = Unique())
+        verify(mockPixel, never()).fire(AppPixelName.PREONBOARDING_DEFAULT_BROWSER_PAGE_SHOWN_UNIQUE, type = Unique())
     }
 
     @Test
     fun whenOnPageShownCalledThenPageShownPixelIsFired() {
         testee.onPageShown()
 
-        verify(mockPixel).fire(AppPixelName.PREONBOARDING_DEFAULT_BROWSER_PAGE_SHOWN, type = Unique())
+        verify(mockPixel).fire(AppPixelName.PREONBOARDING_DEFAULT_BROWSER_PAGE_SHOWN_UNIQUE, type = Unique())
     }
 
     @Test
@@ -383,7 +383,7 @@ class DefaultBrowserPageViewModelTest {
         testee.onPageShown()
         testee.onPageShown()
 
-        verify(mockPixel, times(1)).fire(AppPixelName.PREONBOARDING_DEFAULT_BROWSER_PAGE_SHOWN, type = Unique())
+        verify(mockPixel, times(1)).fire(AppPixelName.PREONBOARDING_DEFAULT_BROWSER_PAGE_SHOWN_UNIQUE, type = Unique())
     }
 
     private fun captureCommands(): KArgumentCaptor<Command> {
