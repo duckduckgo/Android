@@ -581,18 +581,18 @@ dependencies {
 }
 
 // Develocity Android Instrumented Test Support
-afterEvaluate {
-    // Firebase Test Lab (Flank) tests
-    tasks.matching { it.name.startsWith("execFlankAndroidTests") }.names.each {
-        ImportJUnitXmlReports.register(
-                tasks,
-                tasks.named(it),
-                ANDROID_FIREBASE
-        ).configure {
-            reports.from(file("build/fladle/fladleResults/JUnitReport.xml"))
-        }
-    }
-}
+//afterEvaluate {
+//    // Firebase Test Lab (Flank) tests
+//    tasks.matching { it.name.startsWith("execFlank") }.names.each {
+//        ImportJUnitXmlReports.register(
+//                tasks,
+//                tasks.named(it),
+//                ANDROID_FIREBASE
+//        ).configure {
+//            reports.from(file("build/fladle/fladleResults/JUnitReport.xml"))
+//        }
+//    }
+//}
 
 //afterEvaluate {
 //    tasks.withType(DeviceProviderInstrumentTestTask).names.each {
