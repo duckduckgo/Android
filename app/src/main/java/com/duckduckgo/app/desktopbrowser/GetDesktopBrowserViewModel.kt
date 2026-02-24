@@ -20,7 +20,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.app.clipboard.ClipboardInteractor
 import com.duckduckgo.app.desktopbrowser.GetDesktopBrowserActivityParams.Source
+import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.app.settings.GetDesktopBrowserCompleteSetupSettings.Companion.GET_DESKTOP_BROWSER_SOURCE_PIXEL_PARAM
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.DispatcherProvider
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -32,12 +35,14 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class GetDesktopBrowserViewModel @AssistedInject constructor(
     @Assisted private val params: GetDesktopBrowserActivityParams,
     private val settingsDataStore: SettingsDataStore,
     private val dispatchers: DispatcherProvider,
     private val clipboardInteractor: ClipboardInteractor,
+    private val pixel: Pixel,
 ) : ViewModel() {
 
     private val _viewState = MutableStateFlow(
@@ -50,6 +55,7 @@ class GetDesktopBrowserViewModel @AssistedInject constructor(
 
     fun onShareDownloadLinkClicked() {
         viewModelScope.launch {
+            pixel.fire(AppPixelName.GET_DESKTOP_BROWSER_SHARE_DOWNLOAD_LINK_CLICK)
             _command.send(
                 Command.ShareDownloadLink(
                     url = DESKTOP_BROWSER_URL,
@@ -60,7 +66,13 @@ class GetDesktopBrowserViewModel @AssistedInject constructor(
 
     fun onNoThanksClicked() {
         viewModelScope.launch {
-            settingsDataStore.getDesktopBrowserSettingDismissed = true
+            withContext(dispatchers.io()) {
+                pixel.fire(
+                    AppPixelName.GET_DESKTOP_BROWSER_DISMISSED,
+                    mapOf(GET_DESKTOP_BROWSER_SOURCE_PIXEL_PARAM to GET_DESKTOP_BROWSER_SOURCE_NO_THANKS),
+                )
+                settingsDataStore.getDesktopBrowserSettingDismissed = true
+            }
             _command.send(Command.Dismissed)
         }
     }
@@ -73,6 +85,7 @@ class GetDesktopBrowserViewModel @AssistedInject constructor(
 
     fun onLinkClicked() {
         viewModelScope.launch(dispatchers.io()) {
+            pixel.fire(AppPixelName.GET_DESKTOP_BROWSER_LINK_CLICK)
             if (!clipboardInteractor.copyToClipboard(DESKTOP_BROWSER_URL, isSensitive = false)) {
                 _command.send(Command.ShowCopiedNotification)
             }
@@ -98,5 +111,7 @@ class GetDesktopBrowserViewModel @AssistedInject constructor(
 
     companion object {
         private const val DESKTOP_BROWSER_URL = "https://duckduckgo.com/browser?origin=funnel_appsettings_android"
+
+        private const val GET_DESKTOP_BROWSER_SOURCE_NO_THANKS = "no_thanks"
     }
 }

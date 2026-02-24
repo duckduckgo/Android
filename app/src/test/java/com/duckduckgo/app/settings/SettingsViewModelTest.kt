@@ -28,6 +28,7 @@ import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchDataClearingS
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchFireButtonScreen
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchWhatsNew
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
@@ -57,6 +58,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -429,5 +431,17 @@ class SettingsViewModelTest {
 
             assertEquals(SettingsViewModel.Command.LaunchGetDesktopBrowser, awaitItem())
         }
+    }
+
+    @Test
+    fun `when get desktop browser clicked then pixel is fired`() = runTest {
+        testee.onGetDesktopBrowserClicked()
+
+        verify(pixelMock).fire(
+            eq(AppPixelName.GET_DESKTOP_BROWSER_CLICKED),
+            eq(mapOf("source" to "settings")),
+            eq(emptyMap()),
+            eq(Count),
+        )
     }
 }

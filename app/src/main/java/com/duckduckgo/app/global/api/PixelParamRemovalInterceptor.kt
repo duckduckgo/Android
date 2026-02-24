@@ -184,6 +184,11 @@ object PixelInterceptorPixelsRequiringDataCleaning : PixelParamRemovalPlugin {
             AppPixelName.CHAT_SUGGESTIONS_GENERAL_SETTINGS_TOGGLED_ON_DAILY.pixelName to PixelParameter.removeAtb(),
             AppPixelName.CHAT_SUGGESTIONS_GENERAL_SETTINGS_TOGGLED_OFF_COUNT.pixelName to PixelParameter.removeAtb(),
             AppPixelName.CHAT_SUGGESTIONS_GENERAL_SETTINGS_TOGGLED_OFF_DAILY.pixelName to PixelParameter.removeAtb(),
+            AppPixelName.GET_DESKTOP_BROWSER_COMPLETE_SETUP_IMPRESSION.pixelName to PixelParameter.removeAtb(),
+            AppPixelName.GET_DESKTOP_BROWSER_CLICKED.pixelName to PixelParameter.removeAtb(),
+            AppPixelName.GET_DESKTOP_BROWSER_DISMISSED.pixelName to PixelParameter.removeAtb(),
+            AppPixelName.GET_DESKTOP_BROWSER_SHARE_DOWNLOAD_LINK_CLICK.pixelName to PixelParameter.removeAtb(),
+            AppPixelName.GET_DESKTOP_BROWSER_LINK_CLICK.pixelName to PixelParameter.removeAtb(),
         )
     }
 }

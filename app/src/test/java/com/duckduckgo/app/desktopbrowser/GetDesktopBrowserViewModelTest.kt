@@ -20,7 +20,10 @@ import app.cash.turbine.test
 import com.duckduckgo.app.clipboard.ClipboardInteractor
 import com.duckduckgo.app.desktopbrowser.GetDesktopBrowserActivityParams.Source
 import com.duckduckgo.app.desktopbrowser.GetDesktopBrowserViewModel.Command
+import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.common.test.CoroutineTestRule
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -29,6 +32,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
@@ -41,12 +45,14 @@ class GetDesktopBrowserViewModelTest {
 
     private val settingsDataStoreMock: SettingsDataStore = mock()
     private val clipboardInteractorMock: ClipboardInteractor = mock()
+    private val pixelMock: Pixel = mock()
 
     private var testee: GetDesktopBrowserViewModel = GetDesktopBrowserViewModel(
         params = GetDesktopBrowserActivityParams(Source.COMPLETE_SETUP),
         settingsDataStore = settingsDataStoreMock,
         dispatchers = coroutineTestRule.testDispatcherProvider,
         clipboardInteractor = clipboardInteractorMock,
+        pixel = pixelMock,
     )
 
     @Test
@@ -64,6 +70,7 @@ class GetDesktopBrowserViewModelTest {
             settingsDataStore = settingsDataStoreMock,
             dispatchers = coroutineTestRule.testDispatcherProvider,
             clipboardInteractor = clipboardInteractorMock,
+            pixel = pixelMock,
         )
 
         testee.viewState.test {
@@ -125,5 +132,39 @@ class GetDesktopBrowserViewModelTest {
             val command = awaitItem()
             assertEquals(Command.ShowCopiedNotification, command)
         }
+    }
+
+    @Test
+    fun whenOnShareDownloadLinkClickedThenPixelIsFired() = runTest {
+        testee.commands.test {
+            testee.onShareDownloadLinkClicked()
+            awaitItem()
+        }
+
+        verify(pixelMock).fire(AppPixelName.GET_DESKTOP_BROWSER_SHARE_DOWNLOAD_LINK_CLICK)
+    }
+
+    @Test
+    fun whenOnNoThanksClickedThenPixelIsFired() = runTest {
+        testee.commands.test {
+            testee.onNoThanksClicked()
+            awaitItem()
+        }
+
+        verify(pixelMock).fire(
+            eq(AppPixelName.GET_DESKTOP_BROWSER_DISMISSED),
+            eq(mapOf("source" to "no_thanks")),
+            eq(emptyMap()),
+            eq(Count),
+        )
+    }
+
+    @Test
+    fun whenOnLinkClickedThenPixelIsFired() = runTest {
+        whenever(clipboardInteractorMock.copyToClipboard(any(), any())).thenReturn(true)
+
+        testee.onLinkClicked()
+
+        verify(pixelMock).fire(AppPixelName.GET_DESKTOP_BROWSER_LINK_CLICK)
     }
 }
