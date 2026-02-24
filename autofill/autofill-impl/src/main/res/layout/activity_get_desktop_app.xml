@@ -28,91 +28,82 @@
     <androidx.core.widget.NestedScrollView
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:fillViewport="true"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/includeToolbar"
-        android:fillViewport="true">
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/includeToolbar">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <androidx.constraintlayout.widget.Guideline
-                android:id="@+id/topContentGuidelineStart"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                app:layout_constraintGuide_begin="@dimen/keyline_7" />
-
-            <androidx.constraintlayout.widget.Guideline
-                android:id="@+id/topContentGuidelineEnd"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                app:layout_constraintGuide_end="@dimen/keyline_7" />
+            android:layout_height="wrap_content"
+            android:paddingStart="@dimen/keyline_5"
+            android:paddingEnd="@dimen/keyline_5">
 
             <ImageView
                 android:id="@+id/pageIcon"
-                android:importantForAccessibility="no"
-                app:layout_constraintStart_toStartOf="@id/topContentGuidelineStart"
-                app:layout_constraintEnd_toEndOf="@id/topContentGuidelineEnd"
-                app:layout_constraintTop_toTopOf="parent"
-                android:src="@drawable/ic_app_download_128"
-                android:layout_marginTop="@dimen/keyline_4"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/keyline_5"
+                android:importantForAccessibility="no"
+                android:src="@drawable/ic_app_download_128"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/title"
-                app:layout_constraintTop_toBottomOf="@id/pageIcon"
-                app:layout_constraintStart_toStartOf="@id/topContentGuidelineStart"
-                app:layout_constraintEnd_toEndOf="@id/topContentGuidelineEnd"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/keyline_4"
+                android:layout_marginTop="@dimen/keyline_5"
                 android:gravity="center"
-                app:typography="h2"
-                android:text="@string/autofillManagementImportPasswordsGetDesktopAppSubtitle" />
+                android:text="@string/autofillManagementImportPasswordsGetDesktopAppSubtitle"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/pageIcon"
+                app:typography="title" />
 
             <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/instructions"
-                app:layout_constraintTop_toBottomOf="@id/title"
-                app:layout_constraintStart_toStartOf="@id/topContentGuidelineStart"
-                app:layout_constraintEnd_toEndOf="@id/topContentGuidelineEnd"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/keyline_5"
                 android:gravity="center"
-                android:layout_marginTop="@dimen/keyline_4"
-                app:typography="body1"
+                android:text="@string/autofillManagementImportPasswordsGetDesktopAppInstruction"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/title"
                 app:textType="secondary"
-                android:text="@string/autofillManagementImportPasswordsGetDesktopAppInstruction" />
+                app:typography="body1" />
 
             <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/downloadLinkText"
-                app:typography="body1_bold"
-                android:textColor="?daxColorAccentBlue"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="@string/autofillManagementImportPasswordsGetDesktopAppUrl"
+                android:layout_marginTop="@dimen/keyline_2"
+                android:drawableEnd="@drawable/ic_copy_24"
+                android:drawablePadding="@dimen/keyline_2"
                 android:gravity="center"
-                app:layout_constraintStart_toStartOf="@id/topContentGuidelineStart"
-                app:layout_constraintEnd_toEndOf="@id/topContentGuidelineEnd"
-                app:layout_constraintTop_toBottomOf="@+id/instructions" />
+                android:text="@string/autofillManagementImportPasswordsGetDesktopAppUrl"
+                android:textColor="?daxColorAccentBlue"
+                app:layout_constraintBottom_toTopOf="@id/shareLinkButton"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/instructions"
+                app:layout_constraintVertical_bias="0"
+                app:layout_constraintWidth_default="wrap"
+                app:typography="body1_bold" />
 
             <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
                 android:id="@+id/shareLinkButton"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/keyline_4"
-                app:layout_constraintTop_toBottomOf="@id/downloadLinkText"
-                app:layout_constraintStart_toStartOf="@id/topContentGuidelineStart"
-                app:layout_constraintEnd_toEndOf="@id/topContentGuidelineEnd"
-                android:layout_marginStart="@dimen/keyline_6"
-                android:layout_marginEnd="@dimen/keyline_6"
+                android:layout_marginBottom="@dimen/keyline_4"
+                android:text="@string/autofillManagementImportPasswordsGetDesktopAppShareDownloadButtonText"
                 app:daxButtonSize="large"
-                app:icon="@drawable/ic_share_android_16"
-                android:text="@string/autofillManagementImportPasswordsGetDesktopAppShareDownloadButtonText" />
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
 
 
         </androidx.constraintlayout.widget.ConstraintLayout>
