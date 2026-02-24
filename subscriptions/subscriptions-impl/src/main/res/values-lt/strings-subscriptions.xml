@@ -195,4 +195,22 @@
     <string name="switchBottomSheetPrimaryButtonDowngrade">Išsaugoti metinį planą</string>
     <string name="switchBottomSheetSecondaryButtonDowngrade" instruction="%1$s is the monthly plan price (e.g. $9.99)">Pereiti prie mėnesinio plano (%1$s/mėn.)</string>
 
+    <!-- Pro tier changes -->
+    <string name="feedbackSubCategorySubsUnableToAccessProFeatures">Nepavyksta pasiekti „Plus“ arba „Pro“ lygio funkcijų</string>
+    <string name="subscriptionsProUpgradeTitle">Atnaujinkite į „Pro“</string>
+    <string name="subscriptionsProUpgradeMessage">Pasiek galingesnį DI</string>
+    <string name="subscriptionSettingSectionManageSubscription">Tvarkyti prenumeratą</string>
+    <string name="subscriptionSettingViewAllPlans">Peržiūrėti visus planus</string>
+    <string name="subscriptionSettingManagePaymentOrCancel">Tvarkyti mokėjimą arba atšaukti</string>
+
+    <!-- Pending plan changes -->
+    <string name="subscriptionPendingPlanChangeUpgrade" instruction="First placeholder is the plan name (e.g. Plus Yearly), third is a date">%2$s tavo planas atsinaujins į %1$s.</string>
+    <string name="subscriptionPendingPlanChangeDowngrade" instruction="First placeholder is the plan name (e.g. Plus Yearly), third is a date">%2$s tavo planas pasikeis į žemesnio lygio %1$s.</string>
+    <string name="planNamePlusMonthly">Mėnesinis „Plus“</string>
+    <string name="planNamePlusYearly">Metinis „Plus“</string>
+    <string name="planNameProMonthly">Mėnesinis „Pro“</string>
+    <string name="planNameProYearly">Metinis „Pro“</string>
+    <string name="tierPlusName" translatable="false">PLUS</string>
+    <string name="tierProName" translatable="false">PRO</string>
+
 </resources>

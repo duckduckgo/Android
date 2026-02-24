@@ -195,4 +195,22 @@
     <string name="switchBottomSheetPrimaryButtonDowngrade">Mantener el plan anual</string>
     <string name="switchBottomSheetSecondaryButtonDowngrade" instruction="%1$s is the monthly plan price (e.g. $9.99)">Cambiar a plan mensual (%1$s/mes)</string>
 
+    <!-- Pro tier changes -->
+    <string name="feedbackSubCategorySubsUnableToAccessProFeatures">No puedes acceder a las funciones de los niveles Plus o Pro</string>
+    <string name="subscriptionsProUpgradeTitle">Actualiza a Pro</string>
+    <string name="subscriptionsProUpgradeMessage">Desbloquea una IA más potente</string>
+    <string name="subscriptionSettingSectionManageSubscription">Gestionar suscripción</string>
+    <string name="subscriptionSettingViewAllPlans">Ver todos los planes</string>
+    <string name="subscriptionSettingManagePaymentOrCancel">Gestionar el pago o cancelar</string>
+
+    <!-- Pending plan changes -->
+    <string name="subscriptionPendingPlanChangeUpgrade" instruction="First placeholder is the plan name (e.g. Plus Yearly), third is a date">Tu plan se actualizará a %1$s el %2$s.</string>
+    <string name="subscriptionPendingPlanChangeDowngrade" instruction="First placeholder is the plan name (e.g. Plus Yearly), third is a date">Tu plan se revertirá a %1$s el %2$s.</string>
+    <string name="planNamePlusMonthly">Plus mensual</string>
+    <string name="planNamePlusYearly">Plus anual</string>
+    <string name="planNameProMonthly">Pro mensual</string>
+    <string name="planNameProYearly">Pro anual</string>
+    <string name="tierPlusName" translatable="false">PLUS</string>
+    <string name="tierProName" translatable="false">PRO</string>
+
 </resources>

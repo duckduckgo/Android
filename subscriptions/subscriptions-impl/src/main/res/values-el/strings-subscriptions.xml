@@ -195,4 +195,22 @@
     <string name="switchBottomSheetPrimaryButtonDowngrade">Διατήρηση ετήσιου προγράμματος</string>
     <string name="switchBottomSheetSecondaryButtonDowngrade" instruction="%1$s is the monthly plan price (e.g. $9.99)">Αλλαγή σε μηνιαίο (%1$s/μήνα)</string>
 
+    <!-- Pro tier changes -->
+    <string name="feedbackSubCategorySubsUnableToAccessProFeatures">Δεν είναι δυνατή η πρόσβαση στις λειτουργίες επιπέδου Plus ή Pro</string>
+    <string name="subscriptionsProUpgradeTitle">Αναβάθμιση σε Pro</string>
+    <string name="subscriptionsProUpgradeMessage">Ξεκλείδωσε μια πιο ισχυρή τεχνητή νοημοσύνη</string>
+    <string name="subscriptionSettingSectionManageSubscription">Διαχείριση συνδρομής</string>
+    <string name="subscriptionSettingViewAllPlans">Δείτε όλα τα προγράμματα</string>
+    <string name="subscriptionSettingManagePaymentOrCancel">Διαχείριση πληρωμής ή ακύρωση</string>
+
+    <!-- Pending plan changes -->
+    <string name="subscriptionPendingPlanChangeUpgrade" instruction="First placeholder is the plan name (e.g. Plus Yearly), third is a date">Το πρόγραμμά σας θα αναβαθμιστεί σε %1$s στις %2$s.</string>
+    <string name="subscriptionPendingPlanChangeDowngrade" instruction="First placeholder is the plan name (e.g. Plus Yearly), third is a date">Το πρόγραμμά σας θα υποβαθμιστεί σε %1$s στις %2$s.</string>
+    <string name="planNamePlusMonthly">Plus Μηνιαίο</string>
+    <string name="planNamePlusYearly">Plus Ετήσιο</string>
+    <string name="planNameProMonthly">Pro Μηνιαίο</string>
+    <string name="planNameProYearly">Pro Ετήσιο</string>
+    <string name="tierPlusName" translatable="false">PLUS</string>
+    <string name="tierProName" translatable="false">PRO</string>
+
 </resources>

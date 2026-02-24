@@ -195,4 +195,22 @@
     <string name="switchBottomSheetPrimaryButtonDowngrade">Păstrează planul anual</string>
     <string name="switchBottomSheetSecondaryButtonDowngrade" instruction="%1$s is the monthly plan price (e.g. $9.99)">Treci la planul lunar (%1$s/lună)</string>
 
+    <!-- Pro tier changes -->
+    <string name="feedbackSubCategorySubsUnableToAccessProFeatures">Nu poți accesa funcțiile de nivel Plus sau Pro</string>
+    <string name="subscriptionsProUpgradeTitle">Fă upgrade la Pro</string>
+    <string name="subscriptionsProUpgradeMessage">Deblochează o IA mai puternică</string>
+    <string name="subscriptionSettingSectionManageSubscription">Gestionează abonamentul</string>
+    <string name="subscriptionSettingViewAllPlans">Vezi toate planurile</string>
+    <string name="subscriptionSettingManagePaymentOrCancel">Gestionează plata sau anulează</string>
+
+    <!-- Pending plan changes -->
+    <string name="subscriptionPendingPlanChangeUpgrade" instruction="First placeholder is the plan name (e.g. Plus Yearly), third is a date">Planul tău va fi actualizat la %1$s la data de %2$s.</string>
+    <string name="subscriptionPendingPlanChangeDowngrade" instruction="First placeholder is the plan name (e.g. Plus Yearly), third is a date">Planul tău va fi retrogradat la %1$s la data de %2$s.</string>
+    <string name="planNamePlusMonthly">Plus lunar</string>
+    <string name="planNamePlusYearly">Plus anual</string>
+    <string name="planNameProMonthly">Pro lunar</string>
+    <string name="planNameProYearly">Pro anual</string>
+    <string name="tierPlusName" translatable="false">PLUS</string>
+    <string name="tierProName" translatable="false">PRO</string>
+
 </resources>
