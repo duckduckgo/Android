@@ -26,6 +26,7 @@ import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPageViewModel.Origin
 import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPageViewModel.ViewState.*
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelValues.DEFAULT_BROWSER_DIALOG
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelValues.DEFAULT_BROWSER_SETTINGS
 import org.junit.After
@@ -366,14 +367,14 @@ class DefaultBrowserPageViewModelTest {
     fun whenViewModelInitializedThenPageShownPixelIsNotFired() {
         testee = DefaultBrowserPageViewModel(mockDefaultBrowserDetector, mockPixel, mockInstallStore)
 
-        verify(mockPixel, never()).fire(AppPixelName.PREONBOARDING_DEFAULT_BROWSER_PAGE_SHOWN)
+        verify(mockPixel, never()).fire(AppPixelName.PREONBOARDING_DEFAULT_BROWSER_PAGE_SHOWN, type = Unique())
     }
 
     @Test
     fun whenOnPageShownCalledThenPageShownPixelIsFired() {
         testee.onPageShown()
 
-        verify(mockPixel).fire(AppPixelName.PREONBOARDING_DEFAULT_BROWSER_PAGE_SHOWN)
+        verify(mockPixel).fire(AppPixelName.PREONBOARDING_DEFAULT_BROWSER_PAGE_SHOWN, type = Unique())
     }
 
     @Test
@@ -382,7 +383,7 @@ class DefaultBrowserPageViewModelTest {
         testee.onPageShown()
         testee.onPageShown()
 
-        verify(mockPixel, times(1)).fire(AppPixelName.PREONBOARDING_DEFAULT_BROWSER_PAGE_SHOWN)
+        verify(mockPixel, times(1)).fire(AppPixelName.PREONBOARDING_DEFAULT_BROWSER_PAGE_SHOWN, type = Unique())
     }
 
     private fun captureCommands(): KArgumentCaptor<Command> {
