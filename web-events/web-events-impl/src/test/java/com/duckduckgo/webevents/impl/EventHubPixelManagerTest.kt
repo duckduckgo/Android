@@ -285,8 +285,7 @@ class EventHubPixelManagerTest {
         val period = TelemetryPeriodConfig(days = 1)
         val result = RealEventHubPixelManager.calculateAttributionPeriod(startMillis, period)
         // toStartOfInterval => 2026-01-02T00:00:00Z = 1767312000
-        // + 86400 => 2026-01-03T00:00:00Z = 1767398400
-        assertEquals(1767398400L, result)
+        assertEquals(1767312000L, result)
     }
 
     @Test
@@ -296,8 +295,7 @@ class EventHubPixelManagerTest {
         val period = TelemetryPeriodConfig(hours = 1)
         val result = RealEventHubPixelManager.calculateAttributionPeriod(startMillis, period)
         // toStartOfInterval => 2026-01-02T17:00:00Z = 1767373200
-        // + 3600 => 2026-01-02T18:00:00Z = 1767376800
-        assertEquals(1767376800L, result)
+        assertEquals(1767373200L, result)
     }
 
     // --- helpers ---

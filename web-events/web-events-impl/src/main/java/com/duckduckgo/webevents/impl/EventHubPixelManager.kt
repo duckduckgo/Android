@@ -179,8 +179,7 @@ class RealEventHubPixelManager @Inject constructor(
         const val PARAM_ATTRIBUTION_PERIOD = "attributionPeriod"
 
         fun calculateAttributionPeriod(periodStartMillis: Long, period: TelemetryPeriodConfig): Long {
-            val periodSecs = period.periodSeconds
-            return toStartOfInterval(periodStartMillis, periodSecs) + periodSecs
+            return toStartOfInterval(periodStartMillis, period.periodSeconds)
         }
 
         fun toStartOfInterval(timestampMillis: Long, periodSeconds: Long): Long {
