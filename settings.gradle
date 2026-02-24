@@ -70,38 +70,11 @@ rootProject.children.each { subproject ->
 
 
 buildCache {
-
-    def getFile = { dir, filename ->
-        File file = new File("$dir$File.separator$filename")
-        file?.exists() ? file : null
-    }
-
-    def getLocalProperties = { dir ->
-        def file = getFile(dir, "local.properties")
-        if (!file) {
-            return null
-        }
-
-        Properties properties = new Properties()
-        properties.load(file.newInputStream())
-        return properties
-    }
-
-    local {
-        def properties = getLocalProperties(rootDir)
-        if (properties != null) {
-            enabled = "true" == properties.getProperty("local.build.cache", "true")
-        } else {
-            enabled = true
-        }
-        // configure local build cache directory so that it is local to the project dir
-        directory = new File(rootDir, 'build-cache')
-        removeUnusedEntriesAfterDays = 7
-    }
-
+    local { enabled = false } // must be false for this experiment
     remote(develocity.buildCache) {
-        enabled = true
-        def accessKey = System.getenv("DEVELOCITY_ACCESS_KEY")
-        push = isCI && accessKey != null && !accessKey.isEmpty()
+        enabled = true // must be true for this experiment
+        allowUntrustedServer = true // set to false if a trusted certificate is configured for the Develocity server
+        path = "cache/exp5-2026-02-24-01" // update for each new run of the experiment
+        push = System.getenv("CI") != null // adjust to an env var that is always present only in your CI environment
     }
 }
