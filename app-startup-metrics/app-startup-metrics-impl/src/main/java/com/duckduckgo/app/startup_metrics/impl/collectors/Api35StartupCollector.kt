@@ -29,13 +29,13 @@ import com.duckduckgo.app.startup_metrics.impl.metrics.MemoryCollector
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import kotlinx.coroutines.suspendCancellableCoroutine
 import logcat.logcat
+import javax.inject.Inject
 import kotlin.coroutines.resume
 
 /**
  * Collects startup metrics using Android 15+ (API 35+) ApplicationStartInfo API.
  */
-@RequiresApi(35)
-class Api35StartupCollector(
+class Api35StartupCollector @Inject constructor(
     private val context: Context,
     private val memoryCollector: MemoryCollector,
     private val cpuCollector: CpuCollector,
@@ -47,9 +47,8 @@ class Api35StartupCollector(
         context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
     }
 
-    override suspend fun collectStartupMetrics(
-        startupType: StartupType,
-    ): StartupMetricEvent? {
+    @RequiresApi(35)
+    override suspend fun collectStartupMetrics(): StartupMetricEvent? {
         val fullyDrawnTimeMs = timeProvider.uptimeMillis()
         val startInfo = suspendCancellableCoroutine { continuation ->
             try {

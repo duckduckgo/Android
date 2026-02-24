@@ -17,9 +17,9 @@
 package com.duckduckgo.app.startup_metrics.impl.collectors
 
 import com.duckduckgo.app.startup_metrics.impl.StartupMetricEvent
-import com.duckduckgo.app.startup_metrics.impl.StartupType
 import com.duckduckgo.app.startup_metrics.impl.android.ApiLevelProvider
 import com.duckduckgo.app.startup_metrics.impl.android.ProcessStartupTimeProvider
+import com.duckduckgo.app.startup_metrics.impl.lifecycle.StartupTypeDetectionLifecycleObserver
 import com.duckduckgo.app.startup_metrics.impl.metrics.CpuCollector
 import com.duckduckgo.app.startup_metrics.impl.metrics.MeasurementMethod
 import com.duckduckgo.app.startup_metrics.impl.metrics.MemoryCollector
@@ -35,10 +35,10 @@ class LegacyStartupCollector @Inject constructor(
     private val timeProvider: CurrentTimeProvider,
     private val processStartupTimeProvider: ProcessStartupTimeProvider,
     private val apiLevelProvider: ApiLevelProvider,
+    private val startupTypeDetectionObserver: StartupTypeDetectionLifecycleObserver,
 ) : StartupCollector {
-    override suspend fun collectStartupMetrics(
-        startupType: StartupType,
-    ): StartupMetricEvent {
+    override suspend fun collectStartupMetrics(): StartupMetricEvent {
+        val startupType = startupTypeDetectionObserver.getDetectedStartupType()
         val startTimeMs = processStartupTimeProvider.getStartUptimeMillis()
         val currentUptimeMs = timeProvider.uptimeMillis()
         val duration = currentUptimeMs - startTimeMs

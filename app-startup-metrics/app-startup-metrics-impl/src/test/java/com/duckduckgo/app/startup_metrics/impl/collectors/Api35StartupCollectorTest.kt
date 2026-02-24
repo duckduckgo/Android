@@ -56,7 +56,7 @@ class Api35StartupCollectorTest {
     fun `when ApplicationStartInfo reports cold start then returns COLD with duration`() = runTest {
         setupCallbackMock(ApplicationStartInfo.START_TYPE_COLD, startTimeMs = 10000L, firstFrameTimeMs = 11000L)
 
-        val event = collector.collectStartupMetrics(startupType = StartupType.COLD)!!
+        val event = collector.collectStartupMetrics()!!
 
         assertEquals(StartupType.COLD, event.startupType)
         assertEquals(1000L, event.ttidDurationMs) // 11000 - 10000
@@ -70,7 +70,7 @@ class Api35StartupCollectorTest {
     fun `when ApplicationStartInfo reports WARM start then returns WARM`() = runTest {
         setupCallbackMock(ApplicationStartInfo.START_TYPE_WARM, startTimeMs = 10000L, firstFrameTimeMs = 11500L)
 
-        val event = collector.collectStartupMetrics(startupType = StartupType.COLD)!!
+        val event = collector.collectStartupMetrics()!!
 
         assertEquals(StartupType.WARM, event.startupType)
         assertEquals(1500L, event.ttidDurationMs) // 11500 - 10000
@@ -81,7 +81,7 @@ class Api35StartupCollectorTest {
     fun `when ApplicationStartInfo reports HOT start then returns HOT`() = runTest {
         setupCallbackMock(ApplicationStartInfo.START_TYPE_HOT, startTimeMs = 10000L, firstFrameTimeMs = 10500L)
 
-        val event = collector.collectStartupMetrics(startupType = StartupType.COLD)!!
+        val event = collector.collectStartupMetrics()!!
 
         assertEquals(StartupType.HOT, event.startupType)
         assertEquals(500L, event.ttidDurationMs) // 10500 - 10000
@@ -92,7 +92,7 @@ class Api35StartupCollectorTest {
     fun `when unrecognized start type then returns unknown type`() = runTest {
         setupCallbackMock(999, startTimeMs = 10000L, firstFrameTimeMs = 10200L)
 
-        val event = collector.collectStartupMetrics(startupType = StartupType.COLD)!!
+        val event = collector.collectStartupMetrics()!!
 
         assertEquals(StartupType.UNKNOWN, event.startupType)
         assertEquals(200L, event.ttidDurationMs)
@@ -104,7 +104,7 @@ class Api35StartupCollectorTest {
         whenever(activityManager.addApplicationStartInfoCompletionListener(any(), any()))
             .thenThrow(RuntimeException("Test exception"))
 
-        val event = collector.collectStartupMetrics(startupType = StartupType.WARM)
+        val event = collector.collectStartupMetrics()
 
         assertNull(event)
     }
@@ -115,7 +115,7 @@ class Api35StartupCollectorTest {
         whenever(memoryCollector.collectDeviceRamBucket()).thenReturn("8GB")
         whenever(cpuCollector.collectCpuArchitecture()).thenReturn("armeabi-v7a")
 
-        val event = collector.collectStartupMetrics(startupType = StartupType.COLD)!!
+        val event = collector.collectStartupMetrics()!!
 
         assertEquals("8GB", event.deviceRamBucket)
         assertEquals("armeabi-v7a", event.cpuArchitecture)
@@ -125,7 +125,7 @@ class Api35StartupCollectorTest {
     fun `when collector called then registers callback listener`() = runTest {
         setupCallbackMock(ApplicationStartInfo.START_TYPE_COLD, startTimeMs = 10000L)
 
-        collector.collectStartupMetrics(startupType = StartupType.COLD)
+        collector.collectStartupMetrics()
 
         verify(activityManager).addApplicationStartInfoCompletionListener(eq(mainExecutor), any())
     }
@@ -135,7 +135,7 @@ class Api35StartupCollectorTest {
         setupCallbackMock(ApplicationStartInfo.START_TYPE_COLD, startTimeMs = 15000L, firstFrameTimeMs = 14000L)
         whenever(timeProvider.uptimeMillis()).thenReturn(8000L)
 
-        val event = collector.collectStartupMetrics(startupType = StartupType.COLD)!!
+        val event = collector.collectStartupMetrics()!!
 
         assertEquals(0L, event.ttfdDurationMs) // 8000 - 15000 = -7000 → 0
         assertNull(event.ttidDurationMs) // 14000 - 15000 = -1000 → null

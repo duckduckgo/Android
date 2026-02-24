@@ -17,9 +17,10 @@
 package com.duckduckgo.app.startup_metrics.impl
 
 import android.annotation.SuppressLint
-import com.duckduckgo.app.startup_metrics.impl.collectors.StartupCollectorProvider
+import com.duckduckgo.app.startup_metrics.impl.android.ApiLevelProvider
+import com.duckduckgo.app.startup_metrics.impl.collectors.Api35StartupCollector
+import com.duckduckgo.app.startup_metrics.impl.collectors.LegacyStartupCollector
 import com.duckduckgo.app.startup_metrics.impl.feature.StartupMetricsFeature
-import com.duckduckgo.app.startup_metrics.impl.lifecycle.StartupTypeDetectionLifecycleObserver
 import com.duckduckgo.app.startup_metrics.impl.metrics.MeasurementMethod
 import com.duckduckgo.app.startup_metrics.impl.pixels.StartupMetricsPixelName
 import com.duckduckgo.app.startup_metrics.impl.pixels.StartupMetricsPixelParameters
@@ -41,8 +42,9 @@ import org.mockito.kotlin.whenever
 @SuppressLint("DenyListedApi")
 class RealStartupMetricsReporterTest {
     private val startupMetricsFeature = FakeFeatureToggleFactory.create(StartupMetricsFeature::class.java)
-    private lateinit var collectorProvider: StartupCollectorProvider
-    private lateinit var startupTypeDetectionObserver: StartupTypeDetectionLifecycleObserver
+    private lateinit var legacyCollector: LegacyStartupCollector
+    private lateinit var api35Collector: Api35StartupCollector
+    private lateinit var apiLevelProvider: ApiLevelProvider
     private lateinit var samplingDecider: SamplingDecider
     private lateinit var pixel: Pixel
     private lateinit var testScope: TestScope
@@ -50,20 +52,22 @@ class RealStartupMetricsReporterTest {
 
     @Before
     fun setup() {
-        collectorProvider = mock()
-        startupTypeDetectionObserver = mock()
+        legacyCollector = mock()
+        api35Collector = mock()
+        apiLevelProvider = mock()
         samplingDecider = mock()
         pixel = mock()
         testScope = TestScope()
 
         startupMetricsFeature.self().setRawStoredState(State(true))
         whenever(samplingDecider.shouldSample()).thenReturn(true)
-        whenever(startupTypeDetectionObserver.getDetectedStartupType()).thenReturn(StartupType.COLD)
+        whenever(apiLevelProvider.getApiLevel()).thenReturn(34) // Default to API 34 for most tests
 
         reporter = RealStartupMetricsReporter(
             startupMetricsFeature = startupMetricsFeature,
-            collectorProvider = collectorProvider,
-            startupTypeDetectionObserver = startupTypeDetectionObserver,
+            legacyCollector = legacyCollector,
+            api35Collector = api35Collector,
+            apiLevelProvider = apiLevelProvider,
             samplingDecider = samplingDecider,
             pixel = pixel,
             appCoroutineScope = testScope,
@@ -77,7 +81,7 @@ class RealStartupMetricsReporterTest {
         reporter.reportStartupComplete()
         testScope.testScheduler.advanceUntilIdle()
 
-        verify(collectorProvider, never()).collectStartupMetrics(any())
+        verify(legacyCollector, never()).collectStartupMetrics()
         verify(pixel, never()).fire(
             pixel = any<Pixel.PixelName>(),
             parameters = any(),
@@ -88,50 +92,44 @@ class RealStartupMetricsReporterTest {
 
     @Test
     fun `when COLD start detected by global observer then uses COLD type`() = runTest {
-        whenever(startupTypeDetectionObserver.getDetectedStartupType()).thenReturn(StartupType.COLD)
         val mockEvent = createMockStartupMetricEvent(StartupType.COLD)
-        whenever(collectorProvider.collectStartupMetrics(any())).thenReturn(mockEvent)
+        whenever(legacyCollector.collectStartupMetrics()).thenReturn(mockEvent)
 
         reporter.reportStartupComplete()
         testScope.testScheduler.advanceUntilIdle()
 
         // Verify COLD start was used
-        verify(startupTypeDetectionObserver).getDetectedStartupType()
-        verify(collectorProvider).collectStartupMetrics(startupType = StartupType.COLD)
+        verify(legacyCollector).collectStartupMetrics()
     }
 
     @Test
     fun `when WARM start detected by global observer then uses WARM type`() = runTest {
-        whenever(startupTypeDetectionObserver.getDetectedStartupType()).thenReturn(StartupType.WARM)
         val mockEvent = createMockStartupMetricEvent(StartupType.WARM)
-        whenever(collectorProvider.collectStartupMetrics(any())).thenReturn(mockEvent)
+        whenever(legacyCollector.collectStartupMetrics()).thenReturn(mockEvent)
 
         reporter.reportStartupComplete()
         testScope.testScheduler.advanceUntilIdle()
 
         // Verify WARM start was used
-        verify(startupTypeDetectionObserver).getDetectedStartupType()
-        verify(collectorProvider).collectStartupMetrics(startupType = StartupType.WARM)
+        verify(legacyCollector).collectStartupMetrics()
     }
 
     @Test
     fun `when HOT start detected by global observer then uses HOT type`() = runTest {
-        whenever(startupTypeDetectionObserver.getDetectedStartupType()).thenReturn(StartupType.HOT)
         val mockEvent = createMockStartupMetricEvent(StartupType.HOT)
-        whenever(collectorProvider.collectStartupMetrics(any())).thenReturn(mockEvent)
+        whenever(legacyCollector.collectStartupMetrics()).thenReturn(mockEvent)
 
         reporter.reportStartupComplete()
         testScope.testScheduler.advanceUntilIdle()
 
         // Verify HOT start was used
-        verify(startupTypeDetectionObserver).getDetectedStartupType()
-        verify(collectorProvider).collectStartupMetrics(startupType = StartupType.HOT)
+        verify(legacyCollector).collectStartupMetrics()
     }
 
     @Test
     fun `when COLD start then reportStartupComplete emits pixel with correct parameters`() = runTest {
         val mockEvent = createMockStartupMetricEvent(StartupType.COLD)
-        whenever(collectorProvider.collectStartupMetrics(any())).thenReturn(mockEvent)
+        whenever(legacyCollector.collectStartupMetrics()).thenReturn(mockEvent)
 
         reporter.reportStartupComplete()
         testScope.testScheduler.advanceUntilIdle()
@@ -156,25 +154,24 @@ class RealStartupMetricsReporterTest {
         assert(parameters[StartupMetricsPixelParameters.STARTUP_TYPE] == "cold")
         assert(parameters[StartupMetricsPixelParameters.TTFD_MANUAL_DURATION_MS] == "1000")
         assert(parameters[StartupMetricsPixelParameters.DEVICE_RAM_BUCKET] == "4GB")
-        assert(parameters[StartupMetricsPixelParameters.MEASUREMENT_METHOD] == "legacy_manual")
         assert(parameters[StartupMetricsPixelParameters.API_LEVEL] == "34")
         assert(parameters[StartupMetricsPixelParameters.CPU_ARCHITECTURE] == null)
-        assert(parameters[StartupMetricsPixelParameters.TTID_DURATION_MS] == null) // Legacy doesn't have TTID
-        assert(parameters[StartupMetricsPixelParameters.TTFD_DURATION_MS] == null) // Legacy uses manual
+        assert(parameters[StartupMetricsPixelParameters.TTID_DURATION_MS] == null) // No native collector
+        assert(parameters[StartupMetricsPixelParameters.TTFD_DURATION_MS] == null) // No native collector
     }
 
     @Test
     fun `when CPU data present then reportStartupComplete emits pixel with CPU data`() = runTest {
         val mockEvent = StartupMetricEvent(
             startupType = StartupType.WARM,
-            ttidDurationMs = 300L,
+            ttidDurationMs = null,
             ttfdDurationMs = 750L,
             deviceRamBucket = "2GB",
             cpuArchitecture = "arm64-v8a",
-            measurementMethod = MeasurementMethod.API_35_NATIVE,
-            apiLevel = 35,
+            measurementMethod = MeasurementMethod.LEGACY_MANUAL,
+            apiLevel = 34,
         )
-        whenever(collectorProvider.collectStartupMetrics(any())).thenReturn(mockEvent)
+        whenever(legacyCollector.collectStartupMetrics()).thenReturn(mockEvent)
 
         reporter.reportStartupComplete()
         testScope.testScheduler.advanceUntilIdle()
@@ -190,13 +187,12 @@ class RealStartupMetricsReporterTest {
 
         val parameters = parametersCaptor.firstValue
         assert(parameters[StartupMetricsPixelParameters.STARTUP_TYPE] == "warm")
-        assert(parameters[StartupMetricsPixelParameters.TTID_DURATION_MS] == "300")
-        assert(parameters[StartupMetricsPixelParameters.TTFD_DURATION_MS] == "750")
+        assert(parameters[StartupMetricsPixelParameters.TTFD_MANUAL_DURATION_MS] == "750")
         assert(parameters[StartupMetricsPixelParameters.DEVICE_RAM_BUCKET] == "2GB")
         assert(parameters[StartupMetricsPixelParameters.CPU_ARCHITECTURE] == "arm64-v8a")
-        assert(parameters[StartupMetricsPixelParameters.MEASUREMENT_METHOD] == "api_35_native")
-        assert(parameters[StartupMetricsPixelParameters.API_LEVEL] == "35")
-        assert(parameters[StartupMetricsPixelParameters.TTFD_MANUAL_DURATION_MS] == null) // API 35+ uses native TTFD
+        assert(parameters[StartupMetricsPixelParameters.API_LEVEL] == "34")
+        assert(parameters[StartupMetricsPixelParameters.TTID_DURATION_MS] == null)
+        assert(parameters[StartupMetricsPixelParameters.TTFD_DURATION_MS] == null)
     }
 
     @Test
@@ -208,13 +204,89 @@ class RealStartupMetricsReporterTest {
 
         // Verify sampling was checked but no metrics collected
         verify(samplingDecider).shouldSample()
-        verify(collectorProvider, never()).collectStartupMetrics(any())
+        verify(legacyCollector, never()).collectStartupMetrics()
         verify(pixel, never()).fire(
             any<Pixel.PixelName>(),
             any(),
             any(),
             any(),
         )
+    }
+
+    @Test
+    fun `when both legacy and API35 collectors return data then pixel includes both manual and native metrics`() = runTest {
+        whenever(apiLevelProvider.getApiLevel()).thenReturn(35) // API 35
+        val legacyEvent = StartupMetricEvent(
+            startupType = StartupType.COLD,
+            ttidDurationMs = null,
+            ttfdDurationMs = 1200L,
+            deviceRamBucket = "8GB",
+            cpuArchitecture = "arm64-v8a",
+            measurementMethod = MeasurementMethod.LEGACY_MANUAL,
+            apiLevel = 35,
+        )
+        val api35Event = StartupMetricEvent(
+            startupType = StartupType.COLD,
+            ttidDurationMs = 800L,
+            ttfdDurationMs = 1150L,
+            deviceRamBucket = "8GB",
+            cpuArchitecture = "arm64-v8a",
+            measurementMethod = MeasurementMethod.API_35_NATIVE,
+            apiLevel = 35,
+        )
+        whenever(legacyCollector.collectStartupMetrics()).thenReturn(legacyEvent)
+        whenever(api35Collector.collectStartupMetrics()).thenReturn(api35Event)
+
+        reporter.reportStartupComplete()
+        testScope.testScheduler.advanceUntilIdle()
+
+        // Verify both collectors were called
+        verify(legacyCollector).collectStartupMetrics()
+        verify(api35Collector).collectStartupMetrics()
+
+        // Verify pixel includes parameters from both collectors
+        val parametersCaptor = argumentCaptor<Map<String, String>>()
+        verify(pixel).fire(
+            any<Pixel.PixelName>(),
+            parametersCaptor.capture(),
+            any(),
+            any(),
+        )
+
+        val parameters = parametersCaptor.firstValue
+        // Manual TTFD should always be present
+        assert(parameters[StartupMetricsPixelParameters.TTFD_MANUAL_DURATION_MS] == "1200")
+        // Native metrics should be included on API 35+
+        assert(parameters[StartupMetricsPixelParameters.TTID_DURATION_MS] == "800")
+        assert(parameters[StartupMetricsPixelParameters.TTFD_DURATION_MS] == "1150")
+    }
+
+    @Test
+    fun `when API level is less than 35 then API35 collector is not called`() = runTest {
+        whenever(apiLevelProvider.getApiLevel()).thenReturn(34) // API 34
+        val legacyEvent = createMockStartupMetricEvent(StartupType.COLD)
+        whenever(legacyCollector.collectStartupMetrics()).thenReturn(legacyEvent)
+
+        reporter.reportStartupComplete()
+        testScope.testScheduler.advanceUntilIdle()
+
+        // Verify only legacy collector was called
+        verify(legacyCollector).collectStartupMetrics()
+        verify(api35Collector, never()).collectStartupMetrics()
+
+        // Verify pixel was emitted without native metrics
+        val parametersCaptor = argumentCaptor<Map<String, String>>()
+        verify(pixel).fire(
+            any<Pixel.PixelName>(),
+            parametersCaptor.capture(),
+            any(),
+            any(),
+        )
+
+        val parameters = parametersCaptor.firstValue
+        assert(parameters[StartupMetricsPixelParameters.TTFD_MANUAL_DURATION_MS] == "1000")
+        assert(parameters[StartupMetricsPixelParameters.TTID_DURATION_MS] == null)
+        assert(parameters[StartupMetricsPixelParameters.TTFD_DURATION_MS] == null)
     }
 
     private fun createMockStartupMetricEvent(type: StartupType) = StartupMetricEvent(

@@ -3,6 +3,7 @@ package com.duckduckgo.app.startup_metrics.impl.collectors
 import com.duckduckgo.app.startup_metrics.impl.StartupType
 import com.duckduckgo.app.startup_metrics.impl.android.ApiLevelProvider
 import com.duckduckgo.app.startup_metrics.impl.android.ProcessStartupTimeProvider
+import com.duckduckgo.app.startup_metrics.impl.lifecycle.StartupTypeDetectionLifecycleObserver
 import com.duckduckgo.app.startup_metrics.impl.metrics.CpuCollector
 import com.duckduckgo.app.startup_metrics.impl.metrics.MeasurementMethod
 import com.duckduckgo.app.startup_metrics.impl.metrics.MemoryCollector
@@ -22,6 +23,7 @@ class LegacyStartupCollectorTest {
     private lateinit var timeProvider: CurrentTimeProvider
     private lateinit var processStartupTimeProvider: ProcessStartupTimeProvider
     private lateinit var apiLevelProvider: ApiLevelProvider
+    private lateinit var startupTypeDetectionObserver: StartupTypeDetectionLifecycleObserver
     private lateinit var collector: LegacyStartupCollector
 
     @Before
@@ -31,6 +33,7 @@ class LegacyStartupCollectorTest {
         timeProvider = mock()
         processStartupTimeProvider = mock()
         apiLevelProvider = mock()
+        startupTypeDetectionObserver = mock()
 
         // Default mock responses to prevent NullPointerException
         whenever(memoryCollector.collectDeviceRamBucket()).thenReturn("4GB")
@@ -39,6 +42,7 @@ class LegacyStartupCollectorTest {
         whenever(timeProvider.uptimeMillis()).thenReturn(12000L)
         whenever(processStartupTimeProvider.getStartUptimeMillis()).thenReturn(10000L)
         whenever(apiLevelProvider.getApiLevel()).thenReturn(30)
+        whenever(startupTypeDetectionObserver.getDetectedStartupType()).thenReturn(StartupType.COLD)
 
         collector = LegacyStartupCollector(
             memoryCollector,
@@ -46,6 +50,7 @@ class LegacyStartupCollectorTest {
             timeProvider,
             processStartupTimeProvider,
             apiLevelProvider,
+            startupTypeDetectionObserver,
         )
     }
 
@@ -55,8 +60,9 @@ class LegacyStartupCollectorTest {
         whenever(timeProvider.uptimeMillis()).thenReturn(13000L)
         whenever(memoryCollector.collectDeviceRamBucket()).thenReturn("4GB")
         whenever(cpuCollector.collectCpuArchitecture()).thenReturn("arm64-v8a")
+        whenever(startupTypeDetectionObserver.getDetectedStartupType()).thenReturn(StartupType.COLD)
 
-        val event = collector.collectStartupMetrics(StartupType.COLD)
+        val event = collector.collectStartupMetrics()
 
         assertEquals(StartupType.COLD, event.startupType)
         assertNull(event.ttidDurationMs) // Legacy doesn't support TTID
@@ -74,7 +80,9 @@ class LegacyStartupCollectorTest {
         whenever(memoryCollector.collectDeviceRamBucket()).thenReturn("2GB")
         whenever(cpuCollector.collectCpuArchitecture()).thenReturn("armeabi-v7a")
 
-        val event = collector.collectStartupMetrics(StartupType.WARM)
+        whenever(startupTypeDetectionObserver.getDetectedStartupType()).thenReturn(StartupType.WARM)
+
+        val event = collector.collectStartupMetrics()
 
         assertEquals(StartupType.WARM, event.startupType)
         assertEquals(800L, event.ttfdDurationMs)
@@ -88,7 +96,9 @@ class LegacyStartupCollectorTest {
         whenever(memoryCollector.collectDeviceRamBucket()).thenReturn("6GB")
         whenever(cpuCollector.collectCpuArchitecture()).thenReturn("arm64-v8a")
 
-        val event = collector.collectStartupMetrics(StartupType.HOT)
+        whenever(startupTypeDetectionObserver.getDetectedStartupType()).thenReturn(StartupType.HOT)
+
+        val event = collector.collectStartupMetrics()
 
         assertEquals(StartupType.HOT, event.startupType)
         assertEquals(75L, event.ttfdDurationMs)
@@ -102,7 +112,7 @@ class LegacyStartupCollectorTest {
         whenever(memoryCollector.collectDeviceRamBucket()).thenReturn("4GB")
         whenever(cpuCollector.collectCpuArchitecture()).thenReturn("arm64-v8a")
 
-        val event = collector.collectStartupMetrics(StartupType.COLD)
+        val event = collector.collectStartupMetrics()
 
         // Verify all collectors called
         verify(memoryCollector).collectDeviceRamBucket()
@@ -119,7 +129,7 @@ class LegacyStartupCollectorTest {
         whenever(memoryCollector.collectDeviceRamBucket()).thenReturn("4GB")
         whenever(cpuCollector.collectCpuArchitecture()).thenReturn("arm64-v8a")
 
-        val event = collector.collectStartupMetrics(StartupType.COLD)
+        val event = collector.collectStartupMetrics()
 
         assertEquals(0L, event.ttfdDurationMs)
     }
@@ -131,7 +141,7 @@ class LegacyStartupCollectorTest {
         whenever(memoryCollector.collectDeviceRamBucket()).thenReturn("4GB")
         whenever(cpuCollector.collectCpuArchitecture()).thenReturn(null)
 
-        val event = collector.collectStartupMetrics(StartupType.COLD)
+        val event = collector.collectStartupMetrics()
 
         assertNull("CPU architecture should be null when unavailable", event.cpuArchitecture)
     }
@@ -143,14 +153,16 @@ class LegacyStartupCollectorTest {
         whenever(memoryCollector.collectDeviceRamBucket()).thenReturn("4GB")
         whenever(cpuCollector.collectCpuArchitecture()).thenReturn("arm64-v8a")
 
-        val coldEvent = collector.collectStartupMetrics(StartupType.COLD)
+        val coldEvent = collector.collectStartupMetrics()
         assertEquals(1100L, coldEvent.ttfdDurationMs)
 
         // Now baseline is reset to activity creation time for WARM start
         whenever(processStartupTimeProvider.getStartUptimeMillis()).thenReturn(5000L)
         whenever(timeProvider.uptimeMillis()).thenReturn(5843L)
 
-        val warmEvent = collector.collectStartupMetrics(StartupType.WARM)
+        whenever(startupTypeDetectionObserver.getDetectedStartupType()).thenReturn(StartupType.WARM)
+
+        val warmEvent = collector.collectStartupMetrics()
         assertEquals(843L, warmEvent.ttfdDurationMs)
     }
 }

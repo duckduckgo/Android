@@ -33,8 +33,7 @@ interface StartupCollector {
     /**
      * Collect complete startup metrics.
      *
-     * @param startupType Detected startup type
      * @return Complete startup metric event
      */
-    suspend fun collectStartupMetrics(startupType: StartupType): StartupMetricEvent?
+    suspend fun collectStartupMetrics(): StartupMetricEvent?
 }
