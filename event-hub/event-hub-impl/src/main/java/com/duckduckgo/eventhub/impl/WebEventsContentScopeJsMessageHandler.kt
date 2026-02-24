@@ -51,9 +51,11 @@ class EventHubContentScopeJsMessageHandler @Inject constructor(
                 return
             }
 
-            logcat(VERBOSE) { "EventHub: received webEvent type=$eventType" }
+            val documentUrl = jsMessage.params.optString("documentUrl", "")
+            val tabId = jsMessage.params.optString("webViewId", "")
+            logcat(VERBOSE) { "EventHub: received webEvent type=$eventType tabId=$tabId documentUrl=$documentUrl" }
             appCoroutineScope.launch(dispatcherProvider.io()) {
-                pixelManager.handleWebEvent(eventType)
+                pixelManager.handleWebEvent(eventType, tabId, documentUrl)
             }
         }
 

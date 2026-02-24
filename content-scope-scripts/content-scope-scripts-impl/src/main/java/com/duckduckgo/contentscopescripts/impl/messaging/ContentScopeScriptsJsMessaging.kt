@@ -68,9 +68,10 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
         try {
             val adapter = moshi.adapter(JsMessage::class.java)
             val jsMessage = adapter.fromJson(message)
-            val domain =
+            val (domain, documentUrl) =
                 runBlocking(dispatcherProvider.main()) {
-                    webView.url?.toUri()?.host
+                    val url = webView.url
+                    Pair(url?.toUri()?.host, url.orEmpty())
                 }
             jsMessage?.let {
                 if (this.secret == secret && context == jsMessage.context && isUrlAllowed(allowedDomains, domain)) {
@@ -83,6 +84,8 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
                             data = jsMessage.params,
                         )
                     }
+                    jsMessage.params.put("documentUrl", documentUrl)
+                    jsMessage.params.put("webViewId", System.identityHashCode(webView).toString())
                     handlers
                         .getPlugins()
                         .map { it.getJsMessageHandler() }

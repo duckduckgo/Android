@@ -27,7 +27,7 @@ import org.json.JSONObject
 import javax.inject.Inject
 
 interface EventHubPixelManager {
-    fun handleWebEvent(eventType: String)
+    fun handleWebEvent(eventType: String, tabId: String, documentUrl: String)
     fun checkPixels()
     fun onConfigChanged()
 }
@@ -38,7 +38,9 @@ class RealEventHubPixelManager @Inject constructor(
     private val timeProvider: TimeProvider,
 ) : EventHubPixelManager {
 
-    override fun handleWebEvent(eventType: String) {
+    private val dedupState = mutableMapOf<String, String>()
+
+    override fun handleWebEvent(eventType: String, tabId: String, documentUrl: String) {
         val config = getParsedConfig()
         if (!config.featureEnabled) return
 
@@ -59,6 +61,7 @@ class RealEventHubPixelManager @Inject constructor(
             for ((paramName, paramConfig) in storedConfig.parameters) {
                 if (paramConfig.isCounter && paramConfig.source == eventType) {
                     if (paramName in stopCounting) continue
+                    if (isDuplicateEvent(storedConfig.name, paramName, eventType, tabId, documentUrl)) continue
 
                     changed = true
                     val currentValue = params[paramName] ?: 0
@@ -88,6 +91,18 @@ class RealEventHubPixelManager @Inject constructor(
                 )
             }
         }
+    }
+
+    private fun isDuplicateEvent(pixelName: String, paramName: String, source: String, tabId: String, documentUrl: String): Boolean {
+        if (tabId.isEmpty() || documentUrl.isEmpty()) return false
+        val key = "$pixelName:$paramName:$source:$tabId"
+        val lastUrl = dedupState[key]
+        if (lastUrl == documentUrl) {
+            logcat(VERBOSE) { "EventHub: dedup $key (same page: $documentUrl)" }
+            return true
+        }
+        dedupState[key] = documentUrl
+        return false
     }
 
     override fun checkPixels() {
