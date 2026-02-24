@@ -326,8 +326,8 @@ interface AndroidBrowserConfigFeature {
      * Controls whether page load wide events are sent.
      * @return `true` when the remote config has the global "sendPageLoadWideEvent" androidBrowserConfig
      * sub-feature flag enabled
-     * If the remote feature is not present defaults to `true`
+     * If the remote feature is not present defaults to `internal`
      */
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun sendPageLoadWideEvent(): Toggle
 }
