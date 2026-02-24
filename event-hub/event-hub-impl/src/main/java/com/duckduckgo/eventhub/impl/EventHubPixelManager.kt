@@ -59,9 +59,17 @@ class RealEventHubPixelManager @Inject constructor(
                 if (paramConfig.isCounter && paramConfig.source == eventType) {
                     if (paramName in stopCounting) continue
 
-                    val newValue = (params[paramName] ?: 0) + 1
-                    params[paramName] = newValue
+                    // we know we're going to make a storable change at this point (either updating the value or stopping counting)
                     changed = true
+                    val currentValue = params[paramName] ?: 0
+                    if (BucketCounter.shouldStopCounting(currentValue, paramConfig.buckets)) {
+                        stopCounting.add(paramName)
+                        logcat(VERBOSE) { "EventHub: ${pixelConfig.name}.$paramName already at max bucket, stopCounting" }
+                        continue
+                    }
+
+                    val newValue = currentValue + 1
+                    params[paramName] = newValue
                     logcat(VERBOSE) { "EventHub: ${pixelConfig.name}.$paramName incremented to $newValue" }
 
                     if (BucketCounter.shouldStopCounting(newValue, paramConfig.buckets)) {
