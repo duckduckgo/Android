@@ -91,12 +91,12 @@
                 android:paddingStart="@dimen/keyline_6"
                 android:paddingEnd="@dimen/keyline_6"
                 android:text="@string/syncGetAppsOnOtherPlatformInstructionUrl"
-                android:textColor="?daxColorAccentBlue"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/instructions"
                 app:layout_constraintWidth_default="wrap"
                 app:layout_constraintWidth_max="@dimen/syncOtherDevicesMaxItemWidth"
+                app:textType="secondary"
                 app:typography="body1_bold" />
 
             <com.duckduckgo.common.ui.view.button.DaxButtonPrimary

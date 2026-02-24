@@ -93,13 +93,13 @@
                 android:paddingStart="@dimen/keyline_6"
                 android:paddingEnd="@dimen/keyline_6"
                 android:text="@string/getDesktopBrowserUrl"
-                android:textColor="?daxColorAccentBlue"
                 app:layout_constraintBottom_toTopOf="@id/shareDownloadLinkButton"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/bodyText"
                 app:layout_constraintWidth_default="wrap"
                 app:layout_constraintWidth_max="@dimen/getDesktopBrowserMaxItemWidth"
+                app:textType="secondary"
                 app:typography="body1_bold" />
 
             <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
