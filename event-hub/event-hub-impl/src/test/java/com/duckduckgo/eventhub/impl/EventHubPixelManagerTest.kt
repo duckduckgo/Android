@@ -89,7 +89,7 @@ class EventHubPixelManagerTest {
     @Test
     fun `handleWebEvent increments matching counter`() {
         val state = pixelState("webTelemetry_adwallDetection_day", mapOf("count" to 3))
-        whenever(repository.getPixelState("webTelemetry_adwallDetection_day")).thenReturn(state)
+        stubPixelStates(state)
 
         manager.handleWebEvent("adwall", null)
 
@@ -102,7 +102,7 @@ class EventHubPixelManagerTest {
     fun `handleWebEvent ignores events past periodEnd`() {
         timeProvider.time = 200_000L
         val state = pixelState("webTelemetry_adwallDetection_day", mapOf("count" to 0), periodEnd = 100_000L)
-        whenever(repository.getPixelState("webTelemetry_adwallDetection_day")).thenReturn(state)
+        stubPixelStates(state)
 
         manager.handleWebEvent("adwall", null)
 
@@ -112,7 +112,7 @@ class EventHubPixelManagerTest {
     @Test
     fun `handleWebEvent sets stopCounting when max bucket reached`() {
         val state = pixelState("webTelemetry_adwallDetection_day", mapOf("count" to 39))
-        whenever(repository.getPixelState("webTelemetry_adwallDetection_day")).thenReturn(state)
+        stubPixelStates(state)
 
         manager.handleWebEvent("adwall", null)
 
@@ -126,7 +126,7 @@ class EventHubPixelManagerTest {
     @Test
     fun `handleWebEvent skips param with stopCounting set`() {
         val state = pixelState("webTelemetry_adwallDetection_day", mapOf("count" to 50), stopCounting = setOf("count"))
-        whenever(repository.getPixelState("webTelemetry_adwallDetection_day")).thenReturn(state)
+        stubPixelStates(state)
 
         manager.handleWebEvent("adwall", null)
 
@@ -159,7 +159,7 @@ class EventHubPixelManagerTest {
         manager = RealEventHubPixelManager(repository, pixel, timeProvider)
 
         val state = pixelState("test", mapOf("count" to 0))
-        whenever(repository.getPixelState("test")).thenReturn(state)
+        stubPixelStates(state)
 
         manager.handleWebEvent("evt", null)
 
@@ -173,7 +173,7 @@ class EventHubPixelManagerTest {
     @Test
     fun `handleWebEvent does not increment when count already in highest bucket`() {
         val state = pixelState("webTelemetry_adwallDetection_day", mapOf("count" to 40))
-        whenever(repository.getPixelState("webTelemetry_adwallDetection_day")).thenReturn(state)
+        stubPixelStates(state)
 
         manager.handleWebEvent("adwall", null)
 
@@ -187,11 +187,57 @@ class EventHubPixelManagerTest {
     @Test
     fun `handleWebEvent ignores unknown event type`() {
         val state = pixelState("webTelemetry_adwallDetection_day", mapOf("count" to 0))
-        whenever(repository.getPixelState("webTelemetry_adwallDetection_day")).thenReturn(state)
+        stubPixelStates(state)
 
         manager.handleWebEvent("unknownEvent", null)
 
         verify(repository, never()).savePixelState(any())
+    }
+
+    @Test
+    fun `handleWebEvent ignores events when feature disabled`() {
+        val state = pixelState("webTelemetry_adwallDetection_day", mapOf("count" to 0))
+        stubPixelStates(state)
+        whenever(repository.getEventHubConfigEntity()).thenReturn(EventHubConfigEntity(json = """{"state": "disabled"}"""))
+
+        manager.handleWebEvent("adwall", null)
+
+        verify(repository, never()).savePixelState(any())
+    }
+
+    @Test
+    fun `handleWebEvent ignores events when periodStart is zero`() {
+        val state = pixelState("webTelemetry_adwallDetection_day", mapOf("count" to 0), periodStart = 0L)
+        stubPixelStates(state)
+
+        manager.handleWebEvent("adwall", null)
+
+        verify(repository, never()).savePixelState(any())
+    }
+
+    @Test
+    fun `handleWebEvent with WebView that has null URL disables dedup`() {
+        val webView = mockWebView("https://example.com/page1")
+        val state = pixelState("webTelemetry_adwallDetection_day", mapOf("count" to 0))
+        stubPixelStates(state)
+
+        manager.handleWebEvent("adwall", webView)
+
+        val firstCaptor = argumentCaptor<EventHubPixelStateEntity>()
+        verify(repository).savePixelState(firstCaptor.capture())
+        assertEquals(1, RealEventHubPixelManager.parseParamsJson(firstCaptor.firstValue.paramsJson)["count"])
+
+        // WebView now returns null URL — dedup disabled, should increment again
+        org.mockito.Mockito.reset(repository)
+        whenever(webView.url).thenReturn(null)
+        whenever(repository.getEventHubConfigEntity()).thenReturn(EventHubConfigEntity(json = fullConfig))
+        stubPixelStates(firstCaptor.firstValue)
+
+        manager.handleWebEvent("adwall", webView)
+
+        val secondCaptor = argumentCaptor<EventHubPixelStateEntity>()
+        verify(repository).savePixelState(secondCaptor.capture())
+        assertEquals(2, RealEventHubPixelManager.parseParamsJson(secondCaptor.firstValue.paramsJson)["count"])
     }
 
     // --- deduplication: multiple events on same page should count as one ---
@@ -204,7 +250,7 @@ class EventHubPixelManagerTest {
     fun `same page same source - second event is deduplicated`() {
         val webView = mockWebView("https://example.com/page1")
         val state = pixelState("webTelemetry_adwallDetection_day", mapOf("count" to 0))
-        whenever(repository.getPixelState("webTelemetry_adwallDetection_day")).thenReturn(state)
+        stubPixelStates(state)
 
         manager.handleWebEvent("adwall", webView)
 
@@ -214,7 +260,7 @@ class EventHubPixelManagerTest {
 
         org.mockito.Mockito.reset(repository)
         whenever(repository.getEventHubConfigEntity()).thenReturn(EventHubConfigEntity(json = fullConfig))
-        whenever(repository.getPixelState("webTelemetry_adwallDetection_day")).thenReturn(captor.firstValue)
+        stubPixelStates(captor.firstValue)
 
         manager.handleWebEvent("adwall", webView)
 
@@ -225,7 +271,7 @@ class EventHubPixelManagerTest {
     fun `same page multiple events - all after first are deduplicated`() {
         val webView = mockWebView("https://example.com/page1")
         val state = pixelState("webTelemetry_adwallDetection_day", mapOf("count" to 5))
-        whenever(repository.getPixelState("webTelemetry_adwallDetection_day")).thenReturn(state)
+        stubPixelStates(state)
 
         manager.handleWebEvent("adwall", webView)
 
@@ -236,7 +282,7 @@ class EventHubPixelManagerTest {
         for (i in 1..5) {
             org.mockito.Mockito.reset(repository)
             whenever(repository.getEventHubConfigEntity()).thenReturn(EventHubConfigEntity(json = fullConfig))
-            whenever(repository.getPixelState("webTelemetry_adwallDetection_day")).thenReturn(captor.firstValue)
+            stubPixelStates(captor.firstValue)
 
             manager.handleWebEvent("adwall", webView)
 
@@ -248,7 +294,7 @@ class EventHubPixelManagerTest {
     fun `navigation to new page resets dedup - event on new page increments`() {
         val webView = mockWebView("https://example.com/page1")
         val state = pixelState("webTelemetry_adwallDetection_day", mapOf("count" to 0))
-        whenever(repository.getPixelState("webTelemetry_adwallDetection_day")).thenReturn(state)
+        stubPixelStates(state)
 
         manager.handleWebEvent("adwall", webView)
 
@@ -260,7 +306,7 @@ class EventHubPixelManagerTest {
         org.mockito.Mockito.reset(repository)
         whenever(webView.url).thenReturn("https://example.com/page2")
         whenever(repository.getEventHubConfigEntity()).thenReturn(EventHubConfigEntity(json = fullConfig))
-        whenever(repository.getPixelState("webTelemetry_adwallDetection_day")).thenReturn(firstCaptor.firstValue)
+        stubPixelStates(firstCaptor.firstValue)
 
         manager.handleWebEvent("adwall", webView)
 
@@ -273,7 +319,7 @@ class EventHubPixelManagerTest {
     fun `subframe event on same page is deduplicated`() {
         val webView = mockWebView("https://example.com/page1")
         val state = pixelState("webTelemetry_adwallDetection_day", mapOf("count" to 0))
-        whenever(repository.getPixelState("webTelemetry_adwallDetection_day")).thenReturn(state)
+        stubPixelStates(state)
 
         manager.handleWebEvent("adwall", webView)
 
@@ -284,7 +330,7 @@ class EventHubPixelManagerTest {
         // Subframe event — same WebView instance + same URL = deduped
         org.mockito.Mockito.reset(repository)
         whenever(repository.getEventHubConfigEntity()).thenReturn(EventHubConfigEntity(json = fullConfig))
-        whenever(repository.getPixelState("webTelemetry_adwallDetection_day")).thenReturn(captor.firstValue)
+        stubPixelStates(captor.firstValue)
 
         manager.handleWebEvent("adwall", webView)
 
@@ -323,7 +369,7 @@ class EventHubPixelManagerTest {
 
         val webView = mockWebView("https://example.com/page1")
         val state = pixelState("test", mapOf("adwallCount" to 0, "trackerCount" to 0))
-        whenever(repository.getPixelState("test")).thenReturn(state)
+        stubPixelStates(state)
 
         manager.handleWebEvent("adwall", webView)
 
@@ -335,7 +381,7 @@ class EventHubPixelManagerTest {
 
         org.mockito.Mockito.reset(repository)
         whenever(repository.getEventHubConfigEntity()).thenReturn(EventHubConfigEntity(json = twoSourceConfig))
-        whenever(repository.getPixelState("test")).thenReturn(firstCaptor.firstValue)
+        stubPixelStates(firstCaptor.firstValue)
 
         manager.handleWebEvent("trackerBlocked", webView)
 
@@ -355,8 +401,7 @@ class EventHubPixelManagerTest {
         val webView = mockWebView("https://example.com/page1")
         val stateA = pixelState("pixel_a", mapOf("count" to 0))
         val stateB = pixelState("pixel_b", mapOf("count" to 0))
-        whenever(repository.getPixelState("pixel_a")).thenReturn(stateA)
-        whenever(repository.getPixelState("pixel_b")).thenReturn(stateB)
+        stubPixelStates(stateA, stateB)
 
         manager.handleWebEvent("evt", webView)
 
@@ -369,8 +414,7 @@ class EventHubPixelManagerTest {
 
         org.mockito.Mockito.reset(repository)
         whenever(repository.getEventHubConfigEntity()).thenReturn(EventHubConfigEntity(json = twoPixelConf))
-        whenever(repository.getPixelState("pixel_a")).thenReturn(savedA)
-        whenever(repository.getPixelState("pixel_b")).thenReturn(savedB)
+        stubPixelStates(savedA, savedB)
 
         manager.handleWebEvent("evt", webView)
 
@@ -380,7 +424,7 @@ class EventHubPixelManagerTest {
     @Test
     fun `null webView disables dedup`() {
         val state = pixelState("webTelemetry_adwallDetection_day", mapOf("count" to 0))
-        whenever(repository.getPixelState("webTelemetry_adwallDetection_day")).thenReturn(state)
+        stubPixelStates(state)
 
         manager.handleWebEvent("adwall", null)
 
@@ -390,7 +434,7 @@ class EventHubPixelManagerTest {
 
         org.mockito.Mockito.reset(repository)
         whenever(repository.getEventHubConfigEntity()).thenReturn(EventHubConfigEntity(json = fullConfig))
-        whenever(repository.getPixelState("webTelemetry_adwallDetection_day")).thenReturn(firstCaptor.firstValue)
+        stubPixelStates(firstCaptor.firstValue)
 
         manager.handleWebEvent("adwall", null)
 
@@ -403,7 +447,7 @@ class EventHubPixelManagerTest {
     fun `returning to same URL after navigating away counts as new visit`() {
         val webView = mockWebView("https://example.com/page1")
         val state = pixelState("webTelemetry_adwallDetection_day", mapOf("count" to 0))
-        whenever(repository.getPixelState("webTelemetry_adwallDetection_day")).thenReturn(state)
+        stubPixelStates(state)
 
         manager.handleWebEvent("adwall", webView)
         val first = argumentCaptor<EventHubPixelStateEntity>()
@@ -414,7 +458,7 @@ class EventHubPixelManagerTest {
         org.mockito.Mockito.reset(repository)
         whenever(webView.url).thenReturn("https://example.com/page2")
         whenever(repository.getEventHubConfigEntity()).thenReturn(EventHubConfigEntity(json = fullConfig))
-        whenever(repository.getPixelState("webTelemetry_adwallDetection_day")).thenReturn(first.firstValue)
+        stubPixelStates(first.firstValue)
 
         manager.handleWebEvent("adwall", webView)
         val second = argumentCaptor<EventHubPixelStateEntity>()
@@ -425,7 +469,7 @@ class EventHubPixelManagerTest {
         org.mockito.Mockito.reset(repository)
         whenever(webView.url).thenReturn("https://example.com/page1")
         whenever(repository.getEventHubConfigEntity()).thenReturn(EventHubConfigEntity(json = fullConfig))
-        whenever(repository.getPixelState("webTelemetry_adwallDetection_day")).thenReturn(second.firstValue)
+        stubPixelStates(second.firstValue)
 
         manager.handleWebEvent("adwall", webView)
         val third = argumentCaptor<EventHubPixelStateEntity>()
@@ -439,7 +483,7 @@ class EventHubPixelManagerTest {
         val tab1WebView = mockWebView(url)
         val tab2WebView = mockWebView(url)
         val state = pixelState("webTelemetry_adwallDetection_day", mapOf("count" to 0))
-        whenever(repository.getPixelState("webTelemetry_adwallDetection_day")).thenReturn(state)
+        stubPixelStates(state)
 
         // Tab 1 fires event
         manager.handleWebEvent("adwall", tab1WebView)
@@ -450,7 +494,7 @@ class EventHubPixelManagerTest {
         // Tab 2 fires same source on same URL — different WebView instance, should count
         org.mockito.Mockito.reset(repository)
         whenever(repository.getEventHubConfigEntity()).thenReturn(EventHubConfigEntity(json = fullConfig))
-        whenever(repository.getPixelState("webTelemetry_adwallDetection_day")).thenReturn(firstCaptor.firstValue)
+        stubPixelStates(firstCaptor.firstValue)
 
         manager.handleWebEvent("adwall", tab2WebView)
         val secondCaptor = argumentCaptor<EventHubPixelStateEntity>()
@@ -460,7 +504,7 @@ class EventHubPixelManagerTest {
         // Tab 1 fires again on same page — same WebView + same URL, should dedup
         org.mockito.Mockito.reset(repository)
         whenever(repository.getEventHubConfigEntity()).thenReturn(EventHubConfigEntity(json = fullConfig))
-        whenever(repository.getPixelState("webTelemetry_adwallDetection_day")).thenReturn(secondCaptor.firstValue)
+        stubPixelStates(secondCaptor.firstValue)
 
         manager.handleWebEvent("adwall", tab1WebView)
         verify(repository, never()).savePixelState(any())
@@ -481,7 +525,7 @@ class EventHubPixelManagerTest {
             paramsJson = """{"count": 15}""",
             configJson = dayPixelConfigJson,
         )
-        whenever(repository.getPixelState("webTelemetry_adwallDetection_day")).thenReturn(state)
+        stubPixelStates(state)
 
         manager.checkPixels()
 
@@ -511,7 +555,7 @@ class EventHubPixelManagerTest {
             paramsJson = """{"count": 5}""",
             configJson = dayPixelConfigJson,
         )
-        whenever(repository.getPixelState("webTelemetry_adwallDetection_day")).thenReturn(state)
+        stubPixelStates(state)
 
         manager.checkPixels()
 
@@ -555,7 +599,7 @@ class EventHubPixelManagerTest {
             paramsJson = """{"count": 2}""",
             configJson = EventHubConfigParser.serializePixelConfig(testPixelConfig),
         )
-        whenever(repository.getPixelState("test")).thenReturn(state)
+        stubPixelStates(state)
 
         manager.checkPixels()
 
@@ -575,7 +619,7 @@ class EventHubPixelManagerTest {
             paramsJson = """{"count": 5}""",
             configJson = dayPixelConfigJson,
         )
-        whenever(repository.getPixelState("webTelemetry_adwallDetection_day")).thenReturn(state)
+        stubPixelStates(state)
 
         manager.checkPixels()
 
@@ -584,6 +628,114 @@ class EventHubPixelManagerTest {
         verify(repository).savePixelState(captor.capture())
         assertEquals(timeProvider.time, captor.firstValue.periodStartMillis)
         assertEquals(0, RealEventHubPixelManager.parseParamsJson(captor.firstValue.paramsJson)["count"])
+    }
+
+    @Test
+    fun `checkPixels still fires pixel that is disabled in current config`() {
+        val periodStart = 1000L
+        val periodEnd = periodStart + 120_000L
+        timeProvider.time = periodEnd + 1
+
+        val originalConfig = configWithBuckets(*originalBuckets)
+        val originalPixelConfig = EventHubConfigParser.parse(originalConfig).telemetry.first()
+        val storedConfigJson = EventHubConfigParser.serializePixelConfig(originalPixelConfig)
+
+        val state = EventHubPixelStateEntity(
+            pixelName = "test_pixel",
+            periodStartMillis = periodStart,
+            periodEndMillis = periodEnd,
+            paramsJson = """{"count": 2}""",
+            configJson = storedConfigJson,
+        )
+        stubPixelStates(state)
+
+        // Current config has the pixel DISABLED
+        val disabledConfig = """
+            {
+                "state": "enabled",
+                "settings": {
+                    "telemetry": {
+                        "test_pixel": {
+                            "state": "disabled",
+                            "trigger": { "period": { "seconds": 120 } },
+                            "parameters": {
+                                "count": {
+                                    "template": "counter",
+                                    "source": "evt",
+                                    "buckets": { "0-4": {"gte": 0, "lt": 5}, "5+": {"gte": 5} }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        """.trimIndent()
+        whenever(repository.getEventHubConfigEntity()).thenReturn(EventHubConfigEntity(json = disabledConfig))
+
+        manager.checkPixels()
+
+        // Should STILL fire using stored config (per design: "still fire the telemetry, as it was enabled when initialised")
+        verify(pixel).enqueueFire(
+            pixelName = eq("test_pixel"),
+            parameters = any(),
+            encodedParameters = eq(emptyMap()),
+            type = eq(Count),
+        )
+    }
+
+    @Test
+    fun `checkPixels does not re-register disabled pixel after firing`() {
+        val periodStart = 1000L
+        val periodEnd = periodStart + 120_000L
+        timeProvider.time = periodEnd + 1
+
+        val state = pixelState("webTelemetry_adwallDetection_day", mapOf("count" to 5), periodStart = periodStart, periodEnd = periodEnd)
+        stubPixelStates(state)
+
+        // Pixel disabled in current config
+        val disabledPixelConfig = """
+            {
+                "state": "enabled",
+                "settings": {
+                    "telemetry": {
+                        "webTelemetry_adwallDetection_day": {
+                            "state": "disabled",
+                            "trigger": { "period": { "days": 1 } },
+                            "parameters": {
+                                "count": {
+                                    "template": "counter",
+                                    "source": "adwall",
+                                    "buckets": { "0": {"gte": 0, "lt": 1}, "1-2": {"gte": 1, "lt": 3}, "3-5": {"gte": 3, "lt": 6}, "6-10": {"gte": 6, "lt": 11}, "11-20": {"gte": 11, "lt": 21}, "21-39": {"gte": 21, "lt": 40}, "40+": {"gte": 40} }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        """.trimIndent()
+        whenever(repository.getEventHubConfigEntity()).thenReturn(EventHubConfigEntity(json = disabledPixelConfig))
+
+        manager.checkPixels()
+
+        // Fires the pixel
+        verify(pixel).enqueueFire(any<String>(), any(), any(), any())
+        // Deletes old state
+        verify(repository).deletePixelState("webTelemetry_adwallDetection_day")
+        // Does NOT re-register (pixel disabled in current config)
+        verify(repository, never()).savePixelState(any())
+    }
+
+    @Test
+    fun `checkPixels does not fire any telemetry when feature disabled`() {
+        val state = pixelState("webTelemetry_adwallDetection_day", mapOf("count" to 5), periodStart = 1000L, periodEnd = 2000L)
+        stubPixelStates(state)
+        timeProvider.time = 3000L
+
+        whenever(repository.getEventHubConfigEntity()).thenReturn(EventHubConfigEntity(json = """{"state": "disabled"}"""))
+
+        manager.checkPixels()
+
+        verify(pixel, never()).enqueueFire(any<String>(), any(), any(), any())
     }
 
     // --- onConfigChanged ---
@@ -604,6 +756,65 @@ class EventHubPixelManagerTest {
     @Test
     fun `onConfigChanged deletes all when feature disabled`() {
         whenever(repository.getEventHubConfigEntity()).thenReturn(EventHubConfigEntity(json = """{"state": "disabled"}"""))
+
+        manager.onConfigChanged()
+
+        verify(repository).deleteAllPixelStates()
+    }
+
+    @Test
+    fun `onConfigChanged does not re-register existing pixel`() {
+        val existingState = pixelState("webTelemetry_adwallDetection_day", mapOf("count" to 3))
+        stubPixelStates(existingState)
+
+        manager.onConfigChanged()
+
+        verify(repository, never()).savePixelState(any())
+    }
+
+    @Test
+    fun `onConfigChanged does not register disabled pixel`() {
+        val disabledPixelConfig = """
+            {
+                "state": "enabled",
+                "settings": {
+                    "telemetry": {
+                        "test_pixel": {
+                            "state": "disabled",
+                            "trigger": { "period": { "days": 1 } },
+                            "parameters": {
+                                "count": {
+                                    "template": "counter",
+                                    "source": "evt",
+                                    "buckets": {"0+": {"gte": 0}}
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        """.trimIndent()
+        whenever(repository.getEventHubConfigEntity()).thenReturn(EventHubConfigEntity(json = disabledPixelConfig))
+        whenever(repository.getPixelState("test_pixel")).thenReturn(null)
+        manager = RealEventHubPixelManager(repository, pixel, timeProvider)
+
+        manager.onConfigChanged()
+
+        verify(repository, never()).savePixelState(any())
+    }
+
+    @Test
+    fun `onConfigChanged treats absent feature as disabled`() {
+        whenever(repository.getEventHubConfigEntity()).thenReturn(EventHubConfigEntity(json = "{}"))
+
+        manager.onConfigChanged()
+
+        verify(repository).deleteAllPixelStates()
+    }
+
+    @Test
+    fun `onConfigChanged treats missing feature in config as disabled`() {
+        whenever(repository.getEventHubConfigEntity()).thenReturn(EventHubConfigEntity(json = """{"unrelated": true}"""))
 
         manager.onConfigChanged()
 
@@ -657,7 +868,7 @@ class EventHubPixelManagerTest {
 
         // count=4 is in "0-4" with original buckets, would be in "3+" with changed buckets
         val state = pixelState("test_pixel", mapOf("count" to 4), configJson = storedConfigJson)
-        whenever(repository.getPixelState("test_pixel")).thenReturn(state)
+        stubPixelStates(state)
 
         // Change live config to different buckets
         val changedConfig = configWithBuckets(*changedBuckets)
@@ -682,7 +893,7 @@ class EventHubPixelManagerTest {
         val storedConfigJson = EventHubConfigParser.serializePixelConfig(originalPixelConfig)
 
         val state = pixelState("test_pixel", mapOf("count" to 0), configJson = storedConfigJson)
-        whenever(repository.getPixelState("test_pixel")).thenReturn(state)
+        stubPixelStates(state)
 
         // Change live config to use a different source
         val changedSourceConfig = """
@@ -725,7 +936,7 @@ class EventHubPixelManagerTest {
         val storedConfigJson = EventHubConfigParser.serializePixelConfig(originalPixelConfig)
 
         val state = pixelState("test_pixel", mapOf("count" to 0), configJson = storedConfigJson)
-        whenever(repository.getPixelState("test_pixel")).thenReturn(state)
+        stubPixelStates(state)
 
         // Change live config to use a different source
         val changedSourceConfig = """
@@ -777,7 +988,7 @@ class EventHubPixelManagerTest {
             paramsJson = """{"count": 4}""",
             configJson = storedConfigJson,
         )
-        whenever(repository.getPixelState("test_pixel")).thenReturn(state)
+        stubPixelStates(state)
 
         // Change live config to different buckets before firing
         val changedConfig = configWithBuckets(*changedBuckets)
@@ -819,7 +1030,7 @@ class EventHubPixelManagerTest {
             paramsJson = """{"count": 1}""",
             configJson = storedConfigJson,
         )
-        whenever(repository.getPixelState("test_pixel")).thenReturn(state)
+        stubPixelStates(state)
 
         // Change live config to a different period (1 hour instead of 120s)
         val changedPeriodConfig = """
@@ -880,7 +1091,7 @@ class EventHubPixelManagerTest {
             paramsJson = """{"count": 1}""",
             configJson = storedConfigJson,
         )
-        whenever(repository.getPixelState("test_pixel")).thenReturn(state)
+        stubPixelStates(state)
 
         // Change live config to 1 hour period before firing
         val changedPeriodConfig = """
@@ -1009,8 +1220,7 @@ class EventHubPixelManagerTest {
         // Simulate accumulated state on both pixels
         val stateA1WithCount = stateA1.copy(paramsJson = """{"count": 2}""")
         val stateB1WithCount = stateB1.copy(paramsJson = """{"count": 3}""")
-        whenever(repository.getPixelState("pixel_a")).thenReturn(stateA1WithCount)
-        whenever(repository.getPixelState("pixel_b")).thenReturn(stateB1WithCount)
+        stubPixelStates(stateA1WithCount, stateB1WithCount)
 
         // Events still use config [1] stored in state
         manager.handleWebEvent("evt", null)
@@ -1030,8 +1240,7 @@ class EventHubPixelManagerTest {
         whenever(repository.getEventHubConfigEntity()).thenReturn(EventHubConfigEntity(json = config2))
 
         timeProvider.time = stateA1.periodEndMillis + 1
-        whenever(repository.getPixelState("pixel_a")).thenReturn(updatedA)
-        whenever(repository.getPixelState("pixel_b")).thenReturn(updatedB)
+        stubPixelStates(updatedA, updatedB)
 
         manager.checkPixels()
 
@@ -1051,8 +1260,7 @@ class EventHubPixelManagerTest {
         org.mockito.Mockito.reset(repository, pixel)
         val config3 = twoPixelConfig(45, 300, buckets)
         whenever(repository.getEventHubConfigEntity()).thenReturn(EventHubConfigEntity(json = config3))
-        whenever(repository.getPixelState("pixel_a")).thenReturn(newStateA2)
-        whenever(repository.getPixelState("pixel_b")).thenReturn(updatedB)
+        stubPixelStates(newStateA2, updatedB)
 
         manager.handleWebEvent("evt", null)
 
@@ -1069,8 +1277,7 @@ class EventHubPixelManagerTest {
         whenever(repository.getEventHubConfigEntity()).thenReturn(EventHubConfigEntity(json = config3))
 
         timeProvider.time = stateB1.periodEndMillis + 1
-        whenever(repository.getPixelState("pixel_a")).thenReturn(aAfter3)
-        whenever(repository.getPixelState("pixel_b")).thenReturn(bAfter3)
+        stubPixelStates(aAfter3, bAfter3)
 
         manager.checkPixels()
 
@@ -1087,6 +1294,78 @@ class EventHubPixelManagerTest {
         // Pixel A is still on config [2]
         val configAStill2 = EventHubConfigParser.parseSinglePixelConfig("pixel_a", aAfter3.configJson)!!
         assertEquals(90L, configAStill2.trigger.period.periodSeconds)
+    }
+
+    // --- robustness ---
+
+    @Test
+    fun `handleWebEvent skips pixel with malformed stored configJson`() {
+        val state = EventHubPixelStateEntity(
+            pixelName = "webTelemetry_adwallDetection_day",
+            periodStartMillis = 1000L,
+            periodEndMillis = Long.MAX_VALUE,
+            paramsJson = """{"count": 0}""",
+            configJson = "not valid json",
+        )
+        stubPixelStates(state)
+
+        manager.handleWebEvent("adwall", null)
+
+        verify(repository, never()).savePixelState(any())
+    }
+
+    @Test
+    fun `checkPixels skips pixel with malformed stored configJson`() {
+        val state = EventHubPixelStateEntity(
+            pixelName = "webTelemetry_adwallDetection_day",
+            periodStartMillis = 1000L,
+            periodEndMillis = 2000L,
+            paramsJson = """{"count": 5}""",
+            configJson = "{broken",
+        )
+        stubPixelStates(state)
+        timeProvider.time = 3000L
+
+        manager.checkPixels()
+
+        verify(pixel, never()).enqueueFire(any<String>(), any(), any(), any())
+    }
+
+    @Test
+    fun `config round-trip preserves all fields`() {
+        val config = EventHubConfigParser.parse(fullConfig)
+        val pixelConfig = config.telemetry.first()
+
+        val serialized = EventHubConfigParser.serializePixelConfig(pixelConfig)
+        val restored = EventHubConfigParser.parseSinglePixelConfig(pixelConfig.name, serialized)!!
+
+        assertEquals(pixelConfig.name, restored.name)
+        assertEquals(pixelConfig.state, restored.state)
+        assertEquals(pixelConfig.trigger.period.days, restored.trigger.period.days)
+        assertEquals(pixelConfig.trigger.period.periodSeconds, restored.trigger.period.periodSeconds)
+        assertEquals(pixelConfig.parameters.size, restored.parameters.size)
+
+        val originalParam = pixelConfig.parameters["count"]!!
+        val restoredParam = restored.parameters["count"]!!
+        assertEquals(originalParam.template, restoredParam.template)
+        assertEquals(originalParam.source, restoredParam.source)
+        assertEquals(originalParam.buckets.size, restoredParam.buckets.size)
+        assertEquals(originalParam.buckets["0"]!!.gte, restoredParam.buckets["0"]!!.gte)
+        assertEquals(originalParam.buckets["0"]!!.lt, restoredParam.buckets["0"]!!.lt)
+        assertEquals(originalParam.buckets["40+"]!!.gte, restoredParam.buckets["40+"]!!.gte)
+        assertEquals(originalParam.buckets["40+"]!!.lt, restoredParam.buckets["40+"]!!.lt)
+    }
+
+    @Test
+    fun `parseParamsJson with malformed JSON returns empty map`() {
+        val result = RealEventHubPixelManager.parseParamsJson("not json")
+        assertTrue(result.isEmpty())
+    }
+
+    @Test
+    fun `parseStopCountingJson with malformed JSON returns empty set`() {
+        val result = RealEventHubPixelManager.parseStopCountingJson("{bad")
+        assertTrue(result.isEmpty())
     }
 
     // --- calculateAttributionPeriod ---
@@ -1134,6 +1413,13 @@ class EventHubPixelManagerTest {
             stopCountingJson = RealEventHubPixelManager.serializeStopCounting(stopCounting),
             configJson = resolvedConfigJson,
         )
+    }
+
+    private fun stubPixelStates(vararg states: EventHubPixelStateEntity) {
+        whenever(repository.getAllPixelStates()).thenReturn(states.toList())
+        for (state in states) {
+            whenever(repository.getPixelState(state.pixelName)).thenReturn(state)
+        }
     }
 
     private class FakeTimeProvider : TimeProvider {
