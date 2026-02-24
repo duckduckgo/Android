@@ -58,17 +58,12 @@ class DefaultBrowserPageViewModel @Inject constructor(
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
     var timesPressedJustOnce: Int = 0
 
-    private var hasPageBeenShown = false
-
     init {
         viewState.value = newViewState()
     }
 
     fun onPageShown() {
-        if (!hasPageBeenShown) {
-            hasPageBeenShown = true
-            pixel.fire(pixel = AppPixelName.PREONBOARDING_DEFAULT_BROWSER_PAGE_SHOWN_UNIQUE, type = Unique())
-        }
+        pixel.fire(pixel = AppPixelName.PREONBOARDING_DEFAULT_BROWSER_PAGE_SHOWN_UNIQUE, type = Unique())
     }
 
     fun loadUI() {
