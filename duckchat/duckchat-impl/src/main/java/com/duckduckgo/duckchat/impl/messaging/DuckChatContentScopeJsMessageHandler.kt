@@ -29,6 +29,11 @@ import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
 class DuckChatContentScopeJsMessageHandler @Inject constructor() : ContentScopeJsMessageHandlersPlugin {
+
+    val testDomain: List<String> = listOf(
+        "euw-serp-dev-testing8.duck.ai",
+    )
+
     override fun getJsMessageHandler(): JsMessageHandler =
         object : JsMessageHandler {
             override fun process(
@@ -43,7 +48,7 @@ class DuckChatContentScopeJsMessageHandler @Inject constructor() : ContentScopeJ
                 listOf(
                     AppUrl.Url.HOST,
                     HOST_DUCK_AI,
-                )
+                ).plus(testDomain)
 
             override val featureName: String = "aiChat"
             override val methods: List<String> =
