@@ -54,15 +54,15 @@ class EventHubPixelManagerTest {
                             "count": {
                                 "template": "counter",
                                 "source": "adwall",
-                                "buckets": [
-                                    {"minInclusive": 0,  "maxExclusive": 1,  "name": "0"},
-                                    {"minInclusive": 1,  "maxExclusive": 3,  "name": "1-2"},
-                                    {"minInclusive": 3,  "maxExclusive": 6,  "name": "3-5"},
-                                    {"minInclusive": 6,  "maxExclusive": 11, "name": "6-10"},
-                                    {"minInclusive": 11, "maxExclusive": 21, "name": "11-20"},
-                                    {"minInclusive": 21, "maxExclusive": 40, "name": "21-39"},
-                                    {"minInclusive": 40, "name": "40+"}
-                                ]
+                                "buckets": {
+                                    "0":     {"gte": 0,  "lt": 1},
+                                    "1-2":   {"gte": 1,  "lt": 3},
+                                    "3-5":   {"gte": 3,  "lt": 6},
+                                    "6-10":  {"gte": 6,  "lt": 11},
+                                    "11-20": {"gte": 11, "lt": 21},
+                                    "21-39": {"gte": 21, "lt": 40},
+                                    "40+":   {"gte": 40}
+                                }
                             }
                         }
                     }
@@ -205,7 +205,7 @@ class EventHubPixelManagerTest {
                                 "count": {
                                     "template": "counter",
                                     "source": "evt",
-                                    "buckets": [{"minInclusive": 5, "maxExclusive": 10, "name": "5-9"}]
+                                    "buckets": {"5-9": {"gte": 5, "lt": 10}}
                                 }
                             }
                         }

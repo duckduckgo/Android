@@ -42,13 +42,12 @@ data class TelemetryPeriodConfig(
 data class TelemetryParameterConfig(
     val template: String,
     val source: String,
-    val buckets: List<BucketConfig>,
+    val buckets: Map<String, BucketConfig>,
 ) {
     val isCounter: Boolean get() = template == "counter"
 }
 
 data class BucketConfig(
-    val minInclusive: Int,
-    val maxExclusive: Int?,
-    val name: String,
+    val gte: Int,
+    val lt: Int?,
 )

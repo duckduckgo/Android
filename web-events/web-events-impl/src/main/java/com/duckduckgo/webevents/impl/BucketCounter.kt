@@ -20,24 +20,22 @@ object BucketCounter {
 
     /**
      * Find the first bucket matching the given count.
-     * Returns the bucket's [BucketConfig.name], or null if no bucket matches.
+     * Returns the bucket name (map key), or null if no bucket matches.
      */
-    fun bucketCount(count: Int, buckets: List<BucketConfig>): String? {
-        for (bucket in buckets) {
-            if (count >= bucket.minInclusive) {
-                if (bucket.maxExclusive == null || count < bucket.maxExclusive) {
-                    return bucket.name
-                }
-            }
+    fun bucketCount(count: Int, buckets: Map<String, BucketConfig>): String? {
+        for ((name, bucket) in buckets) {
+            if (count < bucket.gte) continue
+            if (bucket.lt != null && count >= bucket.lt) continue
+            return name
         }
         return null
     }
 
     /**
      * Returns true if no future counting can change the bucket outcome
-     * (i.e., no bucket has a minInclusive greater than the current count).
+     * (i.e., no bucket has a gte greater than the current count).
      */
-    fun shouldStopCounting(count: Int, buckets: List<BucketConfig>): Boolean {
-        return !buckets.any { count < it.minInclusive }
+    fun shouldStopCounting(count: Int, buckets: Map<String, BucketConfig>): Boolean {
+        return !buckets.values.any { count < it.gte }
     }
 }
