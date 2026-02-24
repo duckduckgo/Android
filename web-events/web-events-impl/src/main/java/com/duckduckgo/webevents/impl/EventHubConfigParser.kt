@@ -94,14 +94,16 @@ object EventHubConfigParser {
             "counter" -> {
                 if (!json.has("source")) return null
                 val source = json.getString("source")
-                val bucketsArray = json.optJSONArray("buckets") ?: return null
-                val buckets = (0 until bucketsArray.length()).mapNotNull { i ->
-                    val bucketJson = bucketsArray.optJSONObject(i) ?: return@mapNotNull null
-                    if (!bucketJson.has("minInclusive") || !bucketJson.has("name")) return@mapNotNull null
-                    BucketConfig(
-                        minInclusive = bucketJson.getInt("minInclusive"),
-                        maxExclusive = if (bucketJson.has("maxExclusive")) bucketJson.getInt("maxExclusive") else null,
-                        name = bucketJson.getString("name"),
+                val bucketsJson = json.optJSONObject("buckets") ?: return null
+                val buckets = linkedMapOf<String, BucketConfig>()
+                val keys = bucketsJson.keys()
+                while (keys.hasNext()) {
+                    val bucketName = keys.next()
+                    val bucketJson = bucketsJson.optJSONObject(bucketName) ?: continue
+                    if (!bucketJson.has("gte")) continue
+                    buckets[bucketName] = BucketConfig(
+                        gte = bucketJson.getInt("gte"),
+                        lt = if (bucketJson.has("lt")) bucketJson.getInt("lt") else null,
                     )
                 }
                 if (buckets.isEmpty()) return null

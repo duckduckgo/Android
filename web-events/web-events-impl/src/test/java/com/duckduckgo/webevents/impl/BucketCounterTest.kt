@@ -24,14 +24,14 @@ import org.junit.Test
 
 class BucketCounterTest {
 
-    private val buckets = listOf(
-        BucketConfig(minInclusive = 0, maxExclusive = 1, name = "0"),
-        BucketConfig(minInclusive = 1, maxExclusive = 3, name = "1-2"),
-        BucketConfig(minInclusive = 3, maxExclusive = 6, name = "3-5"),
-        BucketConfig(minInclusive = 6, maxExclusive = 11, name = "6-10"),
-        BucketConfig(minInclusive = 11, maxExclusive = 21, name = "11-20"),
-        BucketConfig(minInclusive = 21, maxExclusive = 40, name = "21-39"),
-        BucketConfig(minInclusive = 40, maxExclusive = null, name = "40+"),
+    private val buckets = linkedMapOf(
+        "0" to BucketConfig(gte = 0, lt = 1),
+        "1-2" to BucketConfig(gte = 1, lt = 3),
+        "3-5" to BucketConfig(gte = 3, lt = 6),
+        "6-10" to BucketConfig(gte = 6, lt = 11),
+        "11-20" to BucketConfig(gte = 11, lt = 21),
+        "21-39" to BucketConfig(gte = 21, lt = 40),
+        "40+" to BucketConfig(gte = 40, lt = null),
     )
 
     @Test
@@ -71,19 +71,17 @@ class BucketCounterTest {
 
     @Test
     fun `no matching bucket returns null`() {
-        val restrictedBuckets = listOf(
-            BucketConfig(minInclusive = 5, maxExclusive = 10, name = "5-9"),
-        )
-        assertNull(BucketCounter.bucketCount(3, restrictedBuckets))
+        val restricted = linkedMapOf("5-9" to BucketConfig(gte = 5, lt = 10))
+        assertNull(BucketCounter.bucketCount(3, restricted))
     }
 
     @Test
     fun `empty buckets returns null`() {
-        assertNull(BucketCounter.bucketCount(5, emptyList()))
+        assertNull(BucketCounter.bucketCount(5, emptyMap()))
     }
 
     @Test
-    fun `maxExclusive is exclusive`() {
+    fun `lt is exclusive`() {
         assertEquals("6-10", BucketCounter.bucketCount(10, buckets))
         assertEquals("11-20", BucketCounter.bucketCount(11, buckets))
     }
