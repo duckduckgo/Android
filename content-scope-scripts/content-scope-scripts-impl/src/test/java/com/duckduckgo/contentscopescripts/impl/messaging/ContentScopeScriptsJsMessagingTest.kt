@@ -21,7 +21,9 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.contentscopescripts.api.ContentScopeJsMessageHandlersPlugin
+import com.duckduckgo.contentscopescripts.impl.ContentScopeScriptsFeature
 import com.duckduckgo.contentscopescripts.impl.CoreContentScopeScripts
+import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessageHandler
@@ -48,6 +50,8 @@ class ContentScopeScriptsJsMessagingTest {
     private val jsMessageHelper: JsMessageHelper = mock()
     private val coreContentScopeScripts: CoreContentScopeScripts = mock()
     private val handlers: PluginPoint<ContentScopeJsMessageHandlersPlugin> = FakePluginPoint()
+    private val contentScopeScriptsFeature: ContentScopeScriptsFeature = mock()
+    private val mockUseWebMessageListenerToggle: Toggle = mock()
     private lateinit var contentScopeScriptsJsMessaging: ContentScopeScriptsJsMessaging
 
     private class FakePluginPoint : PluginPoint<ContentScopeJsMessageHandlersPlugin> {
@@ -76,12 +80,15 @@ class ContentScopeScriptsJsMessagingTest {
         whenever(coreContentScopeScripts.secret).thenReturn("secret")
         whenever(coreContentScopeScripts.javascriptInterface).thenReturn("javascriptInterface")
         whenever(coreContentScopeScripts.callbackName).thenReturn("callbackName")
+        whenever(contentScopeScriptsFeature.useWebMessageListener()).thenReturn(mockUseWebMessageListenerToggle)
+        whenever(mockUseWebMessageListenerToggle.isEnabled()).thenReturn(false)
         contentScopeScriptsJsMessaging =
             ContentScopeScriptsJsMessaging(
                 jsMessageHelper,
                 coroutineRule.testDispatcherProvider,
                 coreContentScopeScripts,
                 handlers,
+                contentScopeScriptsFeature,
             )
     }
 
@@ -145,6 +152,14 @@ class ContentScopeScriptsJsMessagingTest {
         contentScopeScriptsJsMessaging.register(mockWebView, callback)
 
         verify(mockWebView).addJavascriptInterface(any(), anyOrNull())
+    }
+
+    @Test
+    fun `when useWebMessageListener is enabled then skip legacy javascript interface registration`() {
+        whenever(mockUseWebMessageListenerToggle.isEnabled()).thenReturn(true)
+        contentScopeScriptsJsMessaging.register(mockWebView, callback)
+
+        verifyNoInteractions(mockWebView)
     }
 
     @Test
