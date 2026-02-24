@@ -86,6 +86,7 @@ class GetDesktopBrowserViewModel @AssistedInject constructor(
     fun onLinkClicked() {
         viewModelScope.launch(dispatchers.io()) {
             pixel.fire(AppPixelName.GET_DESKTOP_BROWSER_LINK_CLICK)
+            settingsDataStore.getDesktopBrowserSettingDismissed = true
             if (!clipboardInteractor.copyToClipboard(DESKTOP_BROWSER_URL, isSensitive = false)) {
                 _command.send(Command.ShowCopiedNotification)
             }
