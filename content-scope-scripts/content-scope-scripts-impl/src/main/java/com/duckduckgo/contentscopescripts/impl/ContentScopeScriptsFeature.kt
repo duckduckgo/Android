@@ -29,9 +29,11 @@ interface ContentScopeScriptsFeature {
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun self(): Toggle
 
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    @Deprecated("Modern path is now the default. Kept to avoid remote config errors.")
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun useNewWebCompatApis(): Toggle
 
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    @Deprecated("Modern messaging is now the default. Kept to avoid remote config errors.")
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun useWebMessageListener(): Toggle
 }

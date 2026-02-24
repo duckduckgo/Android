@@ -37,7 +37,7 @@ class RealWebViewCompatContentScopeJSReader @Inject constructor(
 
     override suspend fun getContentScopeJS(): String {
         if (!this@RealWebViewCompatContentScopeJSReader::contentScopeJS.isInitialized) {
-            contentScopeJS = loadJs("adsjsContentScope.js")
+            contentScopeJS = loadJs("contentScope.js")
         }
         return contentScopeJS
     }

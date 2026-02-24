@@ -120,13 +120,13 @@ class RealWebViewCompatContentScopeScripts @Inject constructor(
 
     override suspend fun isEnabled(): Boolean {
         return withContext(dispatcherProvider.io()) {
-            contentScopeScriptsFeature.self().isEnabled() && contentScopeScriptsFeature.useNewWebCompatApis().isEnabled()
+            contentScopeScriptsFeature.self().isEnabled()
         }
     }
 
     override suspend fun isWebMessagingEnabled(): Boolean {
         return withContext(dispatcherProvider.io()) {
-            isEnabled() && contentScopeScriptsFeature.useWebMessageListener().isEnabled()
+            isEnabled()
         }
     }
 

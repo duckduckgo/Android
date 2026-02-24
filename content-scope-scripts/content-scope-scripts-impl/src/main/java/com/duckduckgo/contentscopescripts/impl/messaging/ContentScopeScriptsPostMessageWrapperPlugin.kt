@@ -18,6 +18,8 @@ package com.duckduckgo.contentscopescripts.impl.messaging
 
 import android.annotation.SuppressLint
 import android.webkit.WebView
+import com.duckduckgo.app.browser.api.WebViewCapabilityChecker
+import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability.WebMessageListener
 import com.duckduckgo.contentscopescripts.impl.CoreContentScopeScripts
 import com.duckduckgo.contentscopescripts.impl.WebViewCompatContentScopeScripts
 import com.duckduckgo.di.scopes.FragmentScope
@@ -36,13 +38,14 @@ class ContentScopeScriptsPostMessageWrapperPlugin @Inject constructor(
     private val jsMessageHelper: JsMessageHelper,
     private val coreContentScopeScripts: CoreContentScopeScripts,
     private val webViewCompatContentScopeScripts: WebViewCompatContentScopeScripts,
+    private val webViewCapabilityChecker: WebViewCapabilityChecker,
 ) : PostMessageWrapperPlugin {
     @SuppressLint("PostMessageUsage")
     override suspend fun postMessage(
         message: SubscriptionEventData,
         webView: WebView,
     ) {
-        if (webViewCompatContentScopeScripts.isWebMessagingEnabled()) {
+        if (webViewCompatContentScopeScripts.isWebMessagingEnabled() && webViewCapabilityChecker.isSupported(WebMessageListener)) {
             webMessagingPlugin.postMessage(webView, message)
         } else {
             jsMessageHelper.sendSubscriptionEvent(

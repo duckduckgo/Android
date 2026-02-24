@@ -306,53 +306,26 @@ class RealWebViewCompatContentScopeScriptsTest {
     }
 
     @Test
-    fun whenContentScopeScriptsAndUseNewWebCompatApisAreEnabledThenReturnTrue() = runTest {
+    fun whenContentScopeScriptsIsEnabledThenIsEnabledReturnsTrue() = runTest {
         contentScopeScriptsFeature.self().setRawStoredState(State(enable = true))
-        contentScopeScriptsFeature.useNewWebCompatApis().setRawStoredState(State(enable = true))
         assertTrue(testee.isEnabled())
     }
 
     @Test
-    fun whenContentScopeScriptsAndUseNewWebCompatApisAndUseWebMessageListenerAreEnabledThenReturnTrue() = runTest {
+    fun whenContentScopeScriptsIsEnabledThenIsWebMessagingEnabledReturnsTrue() = runTest {
         contentScopeScriptsFeature.self().setRawStoredState(State(enable = true))
-        contentScopeScriptsFeature.useNewWebCompatApis().setRawStoredState(State(enable = true))
-        contentScopeScriptsFeature.useWebMessageListener().setRawStoredState(State(enable = true))
         assertTrue(testee.isWebMessagingEnabled())
     }
 
     @Test
-    fun whenContentScopeScriptsIsDisabledThenReturnFalse() = runTest {
+    fun whenContentScopeScriptsIsDisabledThenIsEnabledReturnsFalse() = runTest {
         contentScopeScriptsFeature.self().setRawStoredState(State(enable = false))
         assertFalse(testee.isEnabled())
     }
 
     @Test
-    fun whenContentScopeScriptsIsDisabledAndUseNewWebCompatApisAndUseWebMessageListenerAreEnabledThenReturnFalse() = runTest {
+    fun whenContentScopeScriptsIsDisabledThenIsWebMessagingEnabledReturnsFalse() = runTest {
         contentScopeScriptsFeature.self().setRawStoredState(State(enable = false))
-        contentScopeScriptsFeature.useNewWebCompatApis().setRawStoredState(State(enable = true))
-        contentScopeScriptsFeature.useWebMessageListener().setRawStoredState(State(enable = true))
-        assertFalse(testee.isWebMessagingEnabled())
-    }
-
-    @Test
-    fun whenUseNewWebCompatApisIsDisabledThenReturnFalse() = runTest {
-        contentScopeScriptsFeature.useNewWebCompatApis().setRawStoredState(State(enable = false))
-        assertFalse(testee.isEnabled())
-    }
-
-    @Test
-    fun whenUseNewWebCompatApisIsDisabledAndContentScopeScriptsAndUseWebMessageListenerAreEnabledThenReturnFalse() = runTest {
-        contentScopeScriptsFeature.useNewWebCompatApis().setRawStoredState(State(enable = false))
-        contentScopeScriptsFeature.useWebMessageListener().setRawStoredState(State(enable = true))
-
-        assertFalse(testee.isWebMessagingEnabled())
-    }
-
-    @Test
-    fun whenContentScopeScriptsAndUseNewWebCompatApisAreEnabledAndAndUseWebMessageListenerIsDisabledThenReturnFalse() = runTest {
-        contentScopeScriptsFeature.self().setRawStoredState(State(enable = true))
-        contentScopeScriptsFeature.useNewWebCompatApis().setRawStoredState(State(enable = true))
-        contentScopeScriptsFeature.useWebMessageListener().setRawStoredState(State(enable = false))
         assertFalse(testee.isWebMessagingEnabled())
     }
 

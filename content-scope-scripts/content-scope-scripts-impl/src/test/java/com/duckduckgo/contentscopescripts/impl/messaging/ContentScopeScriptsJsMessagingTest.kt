@@ -18,6 +18,8 @@ package com.duckduckgo.contentscopescripts.impl.messaging
 
 import android.webkit.WebView
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.app.browser.api.WebViewCapabilityChecker
+import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability.WebMessageListener
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.contentscopescripts.api.ContentScopeJsMessageHandlersPlugin
@@ -38,6 +40,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
@@ -48,6 +51,7 @@ class ContentScopeScriptsJsMessagingTest {
     private val jsMessageHelper: JsMessageHelper = mock()
     private val coreContentScopeScripts: CoreContentScopeScripts = mock()
     private val handlers: PluginPoint<ContentScopeJsMessageHandlersPlugin> = FakePluginPoint()
+    private val mockWebViewCapabilityChecker: WebViewCapabilityChecker = mock()
     private lateinit var contentScopeScriptsJsMessaging: ContentScopeScriptsJsMessaging
 
     private class FakePluginPoint : PluginPoint<ContentScopeJsMessageHandlersPlugin> {
@@ -72,16 +76,18 @@ class ContentScopeScriptsJsMessagingTest {
     }
 
     @Before
-    fun setUp() {
+    fun setUp() = runTest {
         whenever(coreContentScopeScripts.secret).thenReturn("secret")
         whenever(coreContentScopeScripts.javascriptInterface).thenReturn("javascriptInterface")
         whenever(coreContentScopeScripts.callbackName).thenReturn("callbackName")
+        whenever(mockWebViewCapabilityChecker.isSupported(WebMessageListener)).thenReturn(false)
         contentScopeScriptsJsMessaging =
             ContentScopeScriptsJsMessaging(
                 jsMessageHelper,
                 coroutineRule.testDispatcherProvider,
                 coreContentScopeScripts,
                 handlers,
+                mockWebViewCapabilityChecker,
             )
     }
 
@@ -145,6 +151,21 @@ class ContentScopeScriptsJsMessagingTest {
         contentScopeScriptsJsMessaging.register(mockWebView, callback)
 
         verify(mockWebView).addJavascriptInterface(any(), anyOrNull())
+    }
+
+    @Test
+    fun `when modern messaging available then register does nothing`() = runTest {
+        whenever(mockWebViewCapabilityChecker.isSupported(WebMessageListener)).thenReturn(true)
+        val modernMessaging = ContentScopeScriptsJsMessaging(
+            jsMessageHelper,
+            coroutineRule.testDispatcherProvider,
+            coreContentScopeScripts,
+            handlers,
+            mockWebViewCapabilityChecker,
+        )
+        modernMessaging.register(mockWebView, callback)
+
+        verifyNoInteractions(mockWebView)
     }
 
     @Test

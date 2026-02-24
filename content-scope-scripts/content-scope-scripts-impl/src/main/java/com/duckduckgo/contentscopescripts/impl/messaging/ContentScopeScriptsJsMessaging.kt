@@ -19,6 +19,8 @@ package com.duckduckgo.contentscopescripts.impl.messaging
 import android.webkit.JavascriptInterface
 import android.webkit.WebView
 import androidx.core.net.toUri
+import com.duckduckgo.app.browser.api.WebViewCapabilityChecker
+import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability.WebMessageListener
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extensions.toTldPlusOne
 import com.duckduckgo.common.utils.plugins.PluginPoint
@@ -49,8 +51,15 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val coreContentScopeScripts: CoreContentScopeScripts,
     private val handlers: PluginPoint<ContentScopeJsMessageHandlersPlugin>,
+    private val webViewCapabilityChecker: WebViewCapabilityChecker,
 ) : JsMessaging {
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
+
+    private val isModernMessagingAvailable by lazy {
+        runBlocking(dispatcherProvider.io()) {
+            webViewCapabilityChecker.isSupported(WebMessageListener)
+        }
+    }
 
     private lateinit var webView: WebView
     private lateinit var jsMessageCallback: JsMessageCallback
@@ -101,6 +110,7 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
         webView: WebView,
         jsMessageCallback: JsMessageCallback?,
     ) {
+        if (isModernMessagingAvailable) return
         if (jsMessageCallback == null) throw Exception("Callback cannot be null")
         this.webView = webView
         this.jsMessageCallback = jsMessageCallback
@@ -108,6 +118,7 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
     }
 
     override fun sendSubscriptionEvent(subscriptionEventData: SubscriptionEventData) {
+        if (isModernMessagingAvailable) return
         val subscriptionEvent =
             SubscriptionEvent(
                 context,
@@ -121,6 +132,7 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
     }
 
     override fun onResponse(response: JsCallbackData) {
+        if (isModernMessagingAvailable) return
         val jsResponse =
             JsRequestResponse.Success(
                 context = context,
