@@ -2387,7 +2387,6 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         var currentTime: Instant = Instant.parse("2024-10-28T00:00:00Z")
 
         override fun elapsedRealtime(): Long = throw UnsupportedOperationException()
-        override fun uptimeMillis(): Long = throw UnsupportedOperationException()
         override fun currentTimeMillis(): Long = currentTime.toEpochMilli()
         override fun localDateTimeNow(): LocalDateTime = throw UnsupportedOperationException()
     }

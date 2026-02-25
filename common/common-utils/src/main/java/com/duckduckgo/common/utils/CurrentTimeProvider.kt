@@ -25,8 +25,6 @@ import javax.inject.Inject
 interface CurrentTimeProvider {
     fun elapsedRealtime(): Long
 
-    fun uptimeMillis(): Long
-
     fun currentTimeMillis(): Long
 
     fun localDateTimeNow(): LocalDateTime
@@ -35,8 +33,6 @@ interface CurrentTimeProvider {
 @ContributesBinding(AppScope::class)
 class RealCurrentTimeProvider @Inject constructor() : CurrentTimeProvider {
     override fun elapsedRealtime(): Long = SystemClock.elapsedRealtime()
-
-    override fun uptimeMillis(): Long = SystemClock.uptimeMillis()
 
     override fun currentTimeMillis(): Long = System.currentTimeMillis()
 
