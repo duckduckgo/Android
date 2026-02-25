@@ -17,6 +17,7 @@
 package com.duckduckgo.eventhub.impl
 
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.eventhub.api.EventHubPixelManager
 import com.duckduckgo.eventhub.store.EventHubConfigEntity
 import com.duckduckgo.eventhub.store.EventHubRepository
 import com.duckduckgo.eventhub.store.WebEventsFeatureConfigEntity

@@ -18,6 +18,7 @@ package com.duckduckgo.eventhub.impl
 
 import com.duckduckgo.contentscopescripts.api.ContentScopeJsMessageHandlersPlugin
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.eventhub.api.EVENT_HUB_FEATURE_NAME
 import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessageHandler
@@ -27,8 +28,6 @@ import logcat.LogPriority.VERBOSE
 import logcat.LogPriority.WARN
 import logcat.logcat
 import javax.inject.Inject
-
-const val EVENT_HUB_FEATURE_NAME = "webEvents"
 
 @ContributesMultibinding(AppScope::class)
 class EventHubContentScopeJsMessageHandler @Inject constructor() : ContentScopeJsMessageHandlersPlugin {
