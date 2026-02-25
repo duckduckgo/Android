@@ -336,8 +336,8 @@ class RealDuckChatJSHelper @Inject constructor(
 
     companion object {
         const val DUCK_CHAT_FEATURE_NAME = "aiChat"
-        private const val METHOD_GET_AI_CHAT_NATIVE_HANDOFF_DATA = "getAIChatNativeHandoffData"
-        private const val METHOD_GET_AI_CHAT_NATIVE_CONFIG_VALUES = "getAIChatNativeConfigValues"
+        const val METHOD_GET_AI_CHAT_NATIVE_HANDOFF_DATA = "getAIChatNativeHandoffData"
+        const val METHOD_GET_AI_CHAT_NATIVE_CONFIG_VALUES = "getAIChatNativeConfigValues"
         private const val METHOD_OPEN_AI_CHAT = "openAIChat"
         const val METHOD_CLOSE_AI_CHAT = "closeAIChat"
         private const val METHOD_OPEN_AI_CHAT_SETTINGS = "openAIChatSettings"
