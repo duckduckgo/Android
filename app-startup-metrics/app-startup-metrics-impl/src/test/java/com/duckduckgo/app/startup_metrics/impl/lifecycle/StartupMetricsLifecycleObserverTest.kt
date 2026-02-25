@@ -32,8 +32,12 @@ import com.duckduckgo.app.startup_metrics.impl.pixels.StartupMetricsPixelParamet
 import com.duckduckgo.app.startup_metrics.impl.sampling.SamplingDecider
 import com.duckduckgo.app.startup_metrics.impl.store.StartupMetricsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
@@ -46,9 +50,9 @@ import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
-import java.util.concurrent.Executor
 import java.util.function.Consumer
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @SuppressLint("DenyListedApi")
 class StartupMetricsLifecycleObserverTest {
 
@@ -60,6 +64,8 @@ class StartupMetricsLifecycleObserverTest {
     private lateinit var pixel: Pixel
     private val startupMetricsFeature = FakeFeatureToggleFactory.create(StartupMetricsFeature::class.java)
     private lateinit var samplingDecider: SamplingDecider
+    private lateinit var dispatcherProvider: DispatcherProvider
+    private lateinit var testDispatcher: CoroutineDispatcher
     private lateinit var activityManager: ActivityManager
     private lateinit var lifecycleOwner: LifecycleOwner
     private lateinit var lifecycle: Lifecycle
@@ -75,17 +81,19 @@ class StartupMetricsLifecycleObserverTest {
         memoryCollector = mock()
         pixel = mock()
         samplingDecider = mock()
+        dispatcherProvider = mock()
+        testDispatcher = UnconfinedTestDispatcher()
         activityManager = mock()
         lifecycleOwner = mock()
         lifecycle = mock()
 
         whenever(context.applicationContext).thenReturn(application)
         whenever(context.getSystemService(Context.ACTIVITY_SERVICE)).thenReturn(activityManager)
-        whenever(context.mainExecutor).thenReturn(Executor { it.run() })
         whenever(lifecycleOwner.lifecycle).thenReturn(lifecycle)
         whenever(apiLevelProvider.getApiLevel()).thenReturn(35)
         whenever(dataStore.getLastCollectedLaunchTime()).thenReturn(0L)
         whenever(samplingDecider.shouldSample()).thenReturn(true)
+        whenever(dispatcherProvider.io()).thenReturn(testDispatcher)
         startupMetricsFeature.self().setRawStoredState(Toggle.State(true))
 
         // Capture the registered callbacks
@@ -101,6 +109,7 @@ class StartupMetricsLifecycleObserverTest {
             pixel = pixel,
             startupMetricsFeature = startupMetricsFeature,
             samplingDecider = samplingDecider,
+            dispatcherProvider = dispatcherProvider,
         )
     }
 
@@ -120,6 +129,25 @@ class StartupMetricsLifecycleObserverTest {
         observer.onCreate(lifecycleOwner)
 
         verify(application, never()).registerActivityLifecycleCallbacks(any())
+    }
+
+    @Test
+    fun `when onDestroy called then unregisters activity lifecycle callbacks`() {
+        setupCallbackCapture()
+
+        observer.onDestroy(lifecycleOwner)
+
+        verify(application).unregisterActivityLifecycleCallbacks(capturedCallbacks)
+    }
+
+    @Test
+    fun `when API level is below 35 then onDestroy does not unregister callbacks`() {
+        whenever(apiLevelProvider.getApiLevel()).thenReturn(34)
+        observer.onCreate(lifecycleOwner)
+
+        observer.onDestroy(lifecycleOwner)
+
+        verify(application, never()).unregisterActivityLifecycleCallbacks(any())
     }
 
     @Test
@@ -289,6 +317,48 @@ class StartupMetricsLifecycleObserverTest {
         capturedCallbacks.onActivityPaused(activity)
 
         verifyNoInteractions(pixel)
+    }
+
+    @Test
+    fun `when multiple callbacks fire simultaneously then only processes first one`() {
+        setupCallbackCapture()
+        val activity = createMockActivity()
+        var storedLaunchTime = 0L
+
+        // Mock dataStore to return the updated value after setLastCollectedLaunchTime
+        whenever(dataStore.getLastCollectedLaunchTime()).thenAnswer { storedLaunchTime }
+        whenever(dataStore.setLastCollectedLaunchTime(any())).thenAnswer { invocation ->
+            storedLaunchTime = invocation.getArgument(0)
+            null
+        }
+
+        val startInfo = createMockApplicationStartInfo(
+            startType = ApplicationStartInfo.START_TYPE_COLD,
+            launchTimestamp = 1000L * 1_000_000L,
+            firstFrameTimestamp = 3000L * 1_000_000L,
+        )
+
+        // Setup ActivityManager to fire callback multiple times (simulating race condition)
+        whenever(activityManager.addApplicationStartInfoCompletionListener(any(), any())).then { invocation ->
+            val listener = invocation.getArgument<Consumer<ApplicationStartInfo>>(1)
+            // Simulate 3 simultaneous callbacks
+            listener.accept(startInfo)
+            listener.accept(startInfo)
+            listener.accept(startInfo)
+            null
+        }
+
+        capturedCallbacks.onActivityPaused(activity)
+
+        // Should only fire pixel once due to synchronized block
+        verify(pixel, times(1)).fire(
+            pixel = eq(StartupMetricsPixelName.APP_STARTUP_TIME),
+            parameters = any(),
+            encodedParameters = any(),
+            type = any(),
+        )
+        // Should only store timestamp once
+        verify(dataStore, times(1)).setLastCollectedLaunchTime(1000L)
     }
 
     @Test

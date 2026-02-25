@@ -35,8 +35,10 @@ import com.duckduckgo.app.startup_metrics.impl.pixels.StartupMetricsPixelParamet
 import com.duckduckgo.app.startup_metrics.impl.sampling.SamplingDecider
 import com.duckduckgo.app.startup_metrics.impl.store.StartupMetricsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
+import kotlinx.coroutines.asExecutor
 import logcat.logcat
 import javax.inject.Inject
 
@@ -53,6 +55,7 @@ class StartupMetricsLifecycleObserver @Inject constructor(
     private val pixel: Pixel,
     private val startupMetricsFeature: StartupMetricsFeature,
     private val samplingDecider: SamplingDecider,
+    private val dispatcherProvider: DispatcherProvider,
 ) : MainProcessLifecycleObserver {
 
     @Volatile
@@ -110,15 +113,20 @@ class StartupMetricsLifecycleObserver @Inject constructor(
         }
     }
 
+    override fun onDestroy(owner: LifecycleOwner) {
+        super.onDestroy(owner)
+        if (apiLevelProvider.getApiLevel() >= 35) {
+            (context.applicationContext as? Application)
+                ?.unregisterActivityLifecycleCallbacks(activityLifecycleCallbacks)
+        }
+    }
+
     @RequiresApi(35)
     private fun collectAndEmitStartupMetrics() {
-        // Check if already collected this launch
-        val lastCollectedLaunchTimeMs = dataStore.getLastCollectedLaunchTime()
-
         try {
             val activityManager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
-            activityManager.addApplicationStartInfoCompletionListener(context.mainExecutor) { startInfo ->
-                processStartupInfo(startInfo, lastCollectedLaunchTimeMs)
+            activityManager.addApplicationStartInfoCompletionListener(dispatcherProvider.io().asExecutor()) { startInfo ->
+                processStartupInfo(startInfo)
             }
         } catch (e: Exception) {
             logcat { "Error querying ApplicationStartInfo: $e" }
@@ -126,23 +134,26 @@ class StartupMetricsLifecycleObserver @Inject constructor(
     }
 
     @RequiresApi(35)
-    private fun processStartupInfo(
-        startInfo: ApplicationStartInfo,
-        lastCollectedLaunchTimeMs: Long,
-    ) {
+    private fun processStartupInfo(startInfo: ApplicationStartInfo) {
         val launchTimeMs = startInfo.startupTimestamps[ApplicationStartInfo.START_TIMESTAMP_LAUNCH]
             ?.let { it / 1_000_000L }
         if (launchTimeMs == null) {
             logcat { "No launch timestamp in ApplicationStartInfo" }
             return
+        } else {
+            logcat { "Launch timestamp from ApplicationStartInfo: $launchTimeMs ms" }
         }
 
-        // Check if this is a new launch (not already collected)
-        if (launchTimeMs <= lastCollectedLaunchTimeMs) {
-            logcat { "Startup metrics already collected for this launch: $launchTimeMs" }
-            return
+        // Thread-safe deduplication: re-check inside synchronized block to prevent race conditions
+        // when multiple callbacks fire simultaneously for the same launch
+        synchronized(this) {
+            val currentLastCollected = dataStore.getLastCollectedLaunchTime()
+            if (launchTimeMs <= currentLastCollected) {
+                logcat { "Startup metrics already collected for this launch: $launchTimeMs ms" }
+                return
+            }
+            dataStore.setLastCollectedLaunchTime(launchTimeMs)
         }
-        dataStore.setLastCollectedLaunchTime(launchTimeMs)
 
         // Check feature flag and sampling
         if (!startupMetricsFeature.self().isEnabled()) {
