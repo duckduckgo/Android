@@ -164,6 +164,7 @@ interface DuckChatFeature {
 
     /**
      * @return `true` when the contextual mode can attach more tha one context
+     * This is a capability flag, so it defaults to enabled unless remote config disables it.
      */
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun supportsMultipleContexts(): Toggle

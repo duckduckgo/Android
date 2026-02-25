@@ -503,6 +503,7 @@ class RealDuckChatJSHelperTest {
             put("supportsAIChatContextualMode", false)
             put("supportsAIChatSync", false)
             put("supportsPageContext", false)
+            put("supportsMultipleContexts", false)
         }
 
         val expected = JsCallbackData(jsonPayload, featureName, method, id)
@@ -544,6 +545,7 @@ class RealDuckChatJSHelperTest {
             put("supportsAIChatContextualMode", false)
             put("supportsAIChatSync", false)
             put("supportsPageContext", false)
+            put("supportsMultipleContexts", false)
         }
 
         val expected = JsCallbackData(jsonPayload, featureName, method, id)
@@ -690,6 +692,50 @@ class RealDuckChatJSHelperTest {
             put("supportsAIChatContextualMode", true)
             put("supportsAIChatSync", false)
             put("supportsPageContext", true)
+            put("supportsMultipleContexts", false)
+        }
+
+        val expected = JsCallbackData(jsonPayload, featureName, method, id)
+
+        assertEquals(expected.id, result!!.id)
+        assertEquals(expected.method, result.method)
+        assertEquals(expected.featureName, result.featureName)
+        assertEquals(expected.params.toString(), result.params.toString())
+    }
+
+    @Test
+    fun whenGetAIChatNativeConfigValuesAndContextualModeAndMultipleContextsEnabledThenReturnsSupportsMultipleContexts() = runTest {
+        val featureName = "aiChat"
+        val method = "getAIChatNativeConfigValues"
+        val id = "123"
+
+        whenever(mockDuckChat.isDuckChatFeatureEnabled()).thenReturn(true)
+        whenever(mockDuckChat.isDuckChatContextualModeEnabled()).thenReturn(true)
+        whenever(mockDuckChat.areMultipleContentAttachmentsEnabled()).thenReturn(true)
+
+        val result = testee.processJsCallbackMessage(
+            featureName,
+            method,
+            id,
+            null,
+            Mode.CONTEXTUAL,
+            viewModel.updatedPageContext,
+        )
+
+        val jsonPayload = JSONObject().apply {
+            put("platform", "android")
+            put("isAIChatHandoffEnabled", true)
+            put("supportsClosingAIChat", true)
+            put("supportsOpeningSettings", true)
+            put("supportsNativeChatInput", false)
+            put("supportsURLChatIDRestoration", false)
+            put("supportsImageUpload", false)
+            put("supportsStandaloneMigration", false)
+            put("supportsAIChatFullMode", false)
+            put("supportsAIChatContextualMode", true)
+            put("supportsAIChatSync", false)
+            put("supportsPageContext", true)
+            put("supportsMultipleContexts", true)
         }
 
         val expected = JsCallbackData(jsonPayload, featureName, method, id)
@@ -730,6 +776,7 @@ class RealDuckChatJSHelperTest {
             put("supportsAIChatContextualMode", false)
             put("supportsAIChatSync", false)
             put("supportsPageContext", false)
+            put("supportsMultipleContexts", false)
         }
 
         val expected = JsCallbackData(jsonPayload, featureName, method, id)
@@ -992,6 +1039,7 @@ class RealDuckChatJSHelperTest {
             put("supportsAIChatContextualMode", false)
             put("supportsAIChatSync", false)
             put("supportsPageContext", false)
+            put("supportsMultipleContexts", false)
         }
 
         assertEquals(expectedPayload.toString(), result!!.params.toString())
@@ -1065,6 +1113,7 @@ class RealDuckChatJSHelperTest {
             put("supportsAIChatContextualMode", false)
             put("supportsAIChatSync", true)
             put("supportsPageContext", false)
+            put("supportsMultipleContexts", false)
         }
 
         assertEquals(expectedPayload.toString(), result!!.params.toString())
