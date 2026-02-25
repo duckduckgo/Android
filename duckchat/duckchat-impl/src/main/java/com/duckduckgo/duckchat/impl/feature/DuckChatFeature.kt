@@ -163,6 +163,12 @@ interface DuckChatFeature {
     fun automaticContextAttachment(): Toggle
 
     /**
+     * @return `true` when the contextual mode can attach more tha one context
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun supportsMultipleContexts(): Toggle
+
+    /**
      * @return `true` when the Duck.ai Paid Settings status indicator and navigation features are enabled.
      * This controls syncing the status indicator with DuckChat enabled state and showing the
      * "Enable/Manage in AI Features Settings" item.
