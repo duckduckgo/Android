@@ -24,9 +24,9 @@ import com.duckduckgo.eventhub.store.EventHubConfigEntity
 import com.duckduckgo.eventhub.store.EventHubPixelStateEntity
 import com.duckduckgo.eventhub.store.EventHubRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestScope
-import kotlinx.coroutines.cancel
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -224,7 +224,6 @@ class EventHubPixelManagerTest {
 
         verify(repository, never()).savePixelState(any())
     }
-
 
     @Test
     fun `handleWebEvent with empty URL disables dedup`() {

@@ -189,7 +189,6 @@ class RealEventHubPixelManager @Inject constructor(
     }
 
     private fun fireTelemetry(pixelConfig: TelemetryPixelConfig, state: EventHubPixelStateEntity) {
-
         cancelScheduledFire(pixelConfig.name)
 
         val pixelData = buildPixel(pixelConfig, state)
