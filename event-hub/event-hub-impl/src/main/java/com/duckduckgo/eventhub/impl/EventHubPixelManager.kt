@@ -20,8 +20,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.eventhub.api.EventHubPixelManager
 import com.duckduckgo.eventhub.api.WebEventContext
-import com.duckduckgo.eventhub.store.EventHubPixelStateEntity
-import com.duckduckgo.eventhub.store.EventHubRepository
+import com.duckduckgo.eventhub.impl.store.EventHubPixelStateEntity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -260,7 +259,7 @@ class RealEventHubPixelManager @Inject constructor(
     }
 
     private fun getParsedConfig(): EventHubConfigParser.ParsedConfig {
-        return EventHubConfigParser.parse(repository.getEventHubConfigEntity().json)
+        return EventHubConfigParser.parse(repository.getEventHubConfigJson())
     }
 
     companion object {

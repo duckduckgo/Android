@@ -14,46 +14,15 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.eventhub.store
+package com.duckduckgo.eventhub.impl.store
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import androidx.room.Transaction
 
 @Dao
-interface EventHubDao {
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertEventHubConfig(entity: EventHubConfigEntity)
-
-    @Transaction
-    fun updateEventHubConfig(entity: EventHubConfigEntity) {
-        deleteEventHubConfig()
-        insertEventHubConfig(entity)
-    }
-
-    @Query("SELECT * FROM event_hub_config LIMIT 1")
-    fun getEventHubConfig(): EventHubConfigEntity?
-
-    @Query("DELETE FROM event_hub_config")
-    fun deleteEventHubConfig()
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertWebEventsFeatureConfig(entity: WebEventsFeatureConfigEntity)
-
-    @Transaction
-    fun updateWebEventsFeatureConfig(entity: WebEventsFeatureConfigEntity) {
-        deleteWebEventsFeatureConfig()
-        insertWebEventsFeatureConfig(entity)
-    }
-
-    @Query("SELECT * FROM web_events_css_config LIMIT 1")
-    fun getWebEventsFeatureConfig(): WebEventsFeatureConfigEntity?
-
-    @Query("DELETE FROM web_events_css_config")
-    fun deleteWebEventsFeatureConfig()
+interface EventHubPixelStateDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertPixelState(entity: EventHubPixelStateEntity)
