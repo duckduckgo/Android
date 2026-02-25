@@ -25,6 +25,4 @@ data class WebEventContext(
 
 interface EventHubPixelManager {
     fun handleWebEvent(eventType: String, context: WebEventContext)
-    fun checkPixels()
-    fun onConfigChanged()
 }
