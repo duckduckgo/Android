@@ -17,7 +17,6 @@
 package com.duckduckgo.eventhub.impl
 
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.eventhub.api.EventHubPixelManager
 import com.duckduckgo.eventhub.store.EventHubConfigEntity
 import com.duckduckgo.eventhub.store.EventHubRepository
 import com.duckduckgo.eventhub.store.WebEventsFeatureConfigEntity
@@ -30,7 +29,7 @@ import javax.inject.Inject
 @ContributesMultibinding(AppScope::class)
 class EventHubFeaturePlugin @Inject constructor(
     private val repository: EventHubRepository,
-    private val pixelManager: EventHubPixelManager,
+    private val pixelManager: RealEventHubPixelManager,
 ) : PrivacyFeaturePlugin {
 
     override fun store(featureName: String, jsonString: String): Boolean {
