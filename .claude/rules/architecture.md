@@ -105,9 +105,14 @@ interface MyPlugin { fun doThing() }
 @ContributesMultibinding(AppScope::class)
 class MyPluginImpl @Inject constructor() : MyPlugin
 
+// Contribute with explicit ordering (lower value = higher priority)
+@ContributesMultibinding(AppScope::class)
+@PriorityKey(100)
+class MyPluginImpl @Inject constructor() : MyPlugin
+
 // Consume
 class Foo @Inject constructor(private val plugins: PluginPoint<MyPlugin>)
-// plugins.getPlugins() → all plugins, always
+// plugins.getPlugins() → all plugins, in priority order if @PriorityKey is used
 ```
 
 ### `@ContributesActivePluginPoint` — with remote feature flags + codegen
