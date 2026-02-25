@@ -206,7 +206,7 @@ class FreeTrialConversionWideEventImpl @Inject constructor(
         const val FAILURE_REASON_TIMEOUT = "timeout"
 
         // Steps
-        const val STEP_DUCK_AI_PAID_USED = "step_duck_ai_paid_used"
+        const val STEP_DUCK_AI_PAID_USED = "duck_ai_paid_used"
         const val STEP_VPN_ACTIVATED_D1 = "vpn_activated_d1"
         const val STEP_VPN_ACTIVATED_D2_TO_D7 = "vpn_activated_d2_to_d7"
     }

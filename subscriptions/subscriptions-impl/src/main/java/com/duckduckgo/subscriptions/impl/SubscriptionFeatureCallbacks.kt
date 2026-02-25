@@ -30,9 +30,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /**
- * Handles subscription-related callbacks from multiple sources
- *
- * Bridges these events into subscription wide events and analytics (e.g. [FreeTrialConversionWideEvent]).
+ * Handles subscription features related callbacks from multiple sources [e.g. VPN, DuckChat]
  */
 @ContributesMultibinding(VpnScope::class, boundType = VpnServiceCallbacks::class)
 @ContributesMultibinding(AppScope::class, boundType = AtbLifecyclePlugin::class)
