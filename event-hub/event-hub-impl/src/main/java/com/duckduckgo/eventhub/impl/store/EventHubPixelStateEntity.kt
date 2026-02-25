@@ -14,24 +14,10 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.eventhub.store
+package com.duckduckgo.eventhub.impl.store
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-
-/** Stores the eventHub feature JSON (telemetry pixel definitions). */
-@Entity(tableName = "event_hub_config")
-data class EventHubConfigEntity(
-    @PrimaryKey val id: Int = 1,
-    val json: String,
-)
-
-/** Stores the webEvents CSS feature JSON. */
-@Entity(tableName = "web_events_css_config")
-data class WebEventsFeatureConfigEntity(
-    @PrimaryKey val id: Int = 1,
-    val json: String,
-)
 
 /**
  * Per-pixel runtime state.

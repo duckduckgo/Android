@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 DuckDuckGo
+ * Copyright (c) 2026 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +17,6 @@
 package com.duckduckgo.eventhub.impl
 
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.eventhub.store.EventHubConfigEntity
-import com.duckduckgo.eventhub.store.EventHubRepository
-import com.duckduckgo.eventhub.store.WebEventsFeatureConfigEntity
 import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
 import com.squareup.anvil.annotations.ContributesMultibinding
 import logcat.LogPriority.DEBUG
@@ -35,7 +32,7 @@ class EventHubFeaturePlugin @Inject constructor(
     override fun store(featureName: String, jsonString: String): Boolean {
         if (featureName == this.featureName) {
             logcat(DEBUG) { "EventHub: storing eventHub config (${jsonString.length} chars)" }
-            repository.updateEventHubConfig(EventHubConfigEntity(json = jsonString))
+            repository.setEventHubConfigJson(jsonString)
             pixelManager.onConfigChanged()
             return true
         }
@@ -52,7 +49,7 @@ class WebEventsFeaturePlugin @Inject constructor(
 
     override fun store(featureName: String, jsonString: String): Boolean {
         if (featureName == this.featureName) {
-            repository.updateWebEventsFeatureConfig(WebEventsFeatureConfigEntity(json = jsonString))
+            repository.setWebEventsConfigJson(jsonString)
             return true
         }
         return false
