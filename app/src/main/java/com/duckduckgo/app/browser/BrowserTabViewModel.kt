@@ -4156,8 +4156,12 @@ class BrowserTabViewModel @Inject constructor(
 
         when (featureName) {
             BROWSER_UI_LOCK_FEATURE_NAME -> {
-                val locked = data?.optBoolean("locked", false) ?: false
-                uiLockChanged(locked)
+                when (method) {
+                    "uiLockChanged" -> {
+                        val locked = data?.optBoolean("locked", false) ?: false
+                        uiLockChanged(locked)
+                    }
+                }
             }
 
             DUCK_PLAYER_FEATURE_NAME, DUCK_PLAYER_PAGE_FEATURE_NAME -> {
@@ -4322,12 +4326,9 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private fun uiLockChanged(locked: Boolean) {
-        viewModelScope.launch {
-            val isEnabled = withContext(dispatchers.io()) { browserUiLockFeature.self().isEnabled() }
-            if (isEnabled) {
-                withContext(dispatchers.main()) {
-                    command.value = UiLockChanged(locked)
-                }
+        if (browserUiLockFeature.self().isEnabled()) {
+            viewModelScope.launch(dispatchers.main()) {
+                command.value = UiLockChanged(locked)
             }
         }
     }
