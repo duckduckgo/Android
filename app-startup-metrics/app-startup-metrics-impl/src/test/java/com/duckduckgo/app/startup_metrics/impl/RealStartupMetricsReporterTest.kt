@@ -18,7 +18,6 @@ package com.duckduckgo.app.startup_metrics.impl
 
 import android.annotation.SuppressLint
 import com.duckduckgo.app.startup_metrics.impl.android.ApiLevelProvider
-import com.duckduckgo.app.startup_metrics.impl.collectors.Api35StartupCollector
 import com.duckduckgo.app.startup_metrics.impl.collectors.LegacyStartupCollector
 import com.duckduckgo.app.startup_metrics.impl.feature.StartupMetricsFeature
 import com.duckduckgo.app.startup_metrics.impl.metrics.MeasurementMethod
@@ -43,8 +42,6 @@ import org.mockito.kotlin.whenever
 class RealStartupMetricsReporterTest {
     private val startupMetricsFeature = FakeFeatureToggleFactory.create(StartupMetricsFeature::class.java)
     private lateinit var legacyCollector: LegacyStartupCollector
-    private lateinit var api35Collector: Api35StartupCollector
-    private lateinit var apiLevelProvider: ApiLevelProvider
     private lateinit var samplingDecider: SamplingDecider
     private lateinit var pixel: Pixel
     private lateinit var testScope: TestScope
@@ -53,21 +50,16 @@ class RealStartupMetricsReporterTest {
     @Before
     fun setup() {
         legacyCollector = mock()
-        api35Collector = mock()
-        apiLevelProvider = mock()
         samplingDecider = mock()
         pixel = mock()
         testScope = TestScope()
 
         startupMetricsFeature.self().setRawStoredState(State(true))
         whenever(samplingDecider.shouldSample()).thenReturn(true)
-        whenever(apiLevelProvider.getApiLevel()).thenReturn(34) // Default to API 34 for most tests
 
         reporter = RealStartupMetricsReporter(
             startupMetricsFeature = startupMetricsFeature,
             legacyCollector = legacyCollector,
-            api35Collector = api35Collector,
-            apiLevelProvider = apiLevelProvider,
             samplingDecider = samplingDecider,
             pixel = pixel,
             appCoroutineScope = testScope,
@@ -214,56 +206,7 @@ class RealStartupMetricsReporterTest {
     }
 
     @Test
-    fun `when both legacy and API35 collectors return data then pixel includes both manual and native metrics`() = runTest {
-        whenever(apiLevelProvider.getApiLevel()).thenReturn(35) // API 35
-        val legacyEvent = StartupMetricEvent(
-            startupType = StartupType.COLD,
-            ttidDurationMs = null,
-            ttfdDurationMs = 1200L,
-            deviceRamBucket = "8GB",
-            cpuArchitecture = "arm64-v8a",
-            measurementMethod = MeasurementMethod.LEGACY_MANUAL,
-            apiLevel = 35,
-        )
-        val api35Event = StartupMetricEvent(
-            startupType = StartupType.COLD,
-            ttidDurationMs = 800L,
-            ttfdDurationMs = 1150L,
-            deviceRamBucket = "8GB",
-            cpuArchitecture = "arm64-v8a",
-            measurementMethod = MeasurementMethod.API_35_NATIVE,
-            apiLevel = 35,
-        )
-        whenever(legacyCollector.collectStartupMetrics()).thenReturn(legacyEvent)
-        whenever(api35Collector.collectStartupMetrics()).thenReturn(api35Event)
-
-        reporter.reportStartupComplete()
-        testScope.testScheduler.advanceUntilIdle()
-
-        // Verify both collectors were called
-        verify(legacyCollector).collectStartupMetrics()
-        verify(api35Collector).collectStartupMetrics()
-
-        // Verify pixel includes parameters from both collectors
-        val parametersCaptor = argumentCaptor<Map<String, String>>()
-        verify(pixel).fire(
-            any<Pixel.PixelName>(),
-            parametersCaptor.capture(),
-            any(),
-            any(),
-        )
-
-        val parameters = parametersCaptor.firstValue
-        // Manual TTFD should always be present
-        assert(parameters[StartupMetricsPixelParameters.TTFD_MANUAL_DURATION_MS] == "1200")
-        // Native metrics should be included on API 35+
-        assert(parameters[StartupMetricsPixelParameters.TTID_DURATION_MS] == "800")
-        assert(parameters[StartupMetricsPixelParameters.TTFD_DURATION_MS] == "1150")
-    }
-
-    @Test
     fun `when API level is less than 35 then API35 collector is not called`() = runTest {
-        whenever(apiLevelProvider.getApiLevel()).thenReturn(34) // API 34
         val legacyEvent = createMockStartupMetricEvent(StartupType.COLD)
         whenever(legacyCollector.collectStartupMetrics()).thenReturn(legacyEvent)
 
@@ -272,7 +215,6 @@ class RealStartupMetricsReporterTest {
 
         // Verify only legacy collector was called
         verify(legacyCollector).collectStartupMetrics()
-        verify(api35Collector, never()).collectStartupMetrics()
 
         // Verify pixel was emitted without native metrics
         val parametersCaptor = argumentCaptor<Map<String, String>>()

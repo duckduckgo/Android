@@ -19,8 +19,6 @@ package com.duckduckgo.app.startup_metrics.impl
 import android.annotation.SuppressLint
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.startup_metrics.api.StartupMetricsReporter
-import com.duckduckgo.app.startup_metrics.impl.android.ApiLevelProvider
-import com.duckduckgo.app.startup_metrics.impl.collectors.Api35StartupCollector
 import com.duckduckgo.app.startup_metrics.impl.collectors.LegacyStartupCollector
 import com.duckduckgo.app.startup_metrics.impl.feature.StartupMetricsFeature
 import com.duckduckgo.app.startup_metrics.impl.pixels.StartupMetricsPixelName
@@ -41,8 +39,6 @@ import javax.inject.Inject
 class RealStartupMetricsReporter @Inject constructor(
     private val startupMetricsFeature: StartupMetricsFeature,
     private val legacyCollector: LegacyStartupCollector,
-    private val api35Collector: Api35StartupCollector,
-    private val apiLevelProvider: ApiLevelProvider,
     private val samplingDecider: SamplingDecider,
     private val pixel: Pixel,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
@@ -64,15 +60,8 @@ class RealStartupMetricsReporter @Inject constructor(
             // Always collect manual TTFD measurement
             val manualEvent = legacyCollector.collectStartupMetrics()
 
-            // On API 35+, also collect native TTID and TTFD
-            val nativeEvent = if (apiLevelProvider.getApiLevel() >= 35) {
-                api35Collector.collectStartupMetrics()
-            } else {
-                null
-            }
-
-            logcat { "Reporting startup metrics - Manual: $manualEvent, Native: $nativeEvent" }
-            emitStartupMetricsPixel(manualEvent, nativeEvent)
+            logcat { "Reporting startup metrics - Manual: $manualEvent" }
+            emitStartupMetricsPixel(manualEvent)
         }
     }
 
@@ -80,11 +69,9 @@ class RealStartupMetricsReporter @Inject constructor(
      * Emits a pixel with startup metrics to the analytics backend.
      *
      * @param manualEvent Manual TTFD measurement (always available)
-     * @param nativeEvent Native TTID/TTFD measurement (API 35+ only)
      */
     private fun emitStartupMetricsPixel(
         manualEvent: StartupMetricEvent,
-        nativeEvent: StartupMetricEvent?,
     ) {
         val parameters = buildMap {
             put(StartupMetricsPixelParameters.STARTUP_TYPE, manualEvent.startupType.name.lowercase())
@@ -92,12 +79,6 @@ class RealStartupMetricsReporter @Inject constructor(
 
             // Always include manual TTFD measurement
             put(StartupMetricsPixelParameters.TTFD_MANUAL_DURATION_MS, manualEvent.ttfdDurationMs.toString())
-
-            // On API 35+, also include native measurements
-            if (nativeEvent != null) {
-                nativeEvent.ttidDurationMs?.let { put(StartupMetricsPixelParameters.TTID_DURATION_MS, it.toString()) }
-                put(StartupMetricsPixelParameters.TTFD_DURATION_MS, nativeEvent.ttfdDurationMs.toString())
-            }
 
             manualEvent.deviceRamBucket?.let { put(StartupMetricsPixelParameters.DEVICE_RAM_BUCKET, it) }
             manualEvent.cpuArchitecture?.let { put(StartupMetricsPixelParameters.CPU_ARCHITECTURE, it) }
