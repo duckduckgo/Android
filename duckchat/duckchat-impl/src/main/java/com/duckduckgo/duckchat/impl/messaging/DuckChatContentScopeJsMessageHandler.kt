@@ -65,6 +65,7 @@ class DuckChatContentScopeJsMessageHandler @Inject constructor() : ContentScopeJ
                     "openKeyboard",
                     "getAIChatPageContext",
                     "togglePageContextTelemetry",
+                    "submitAIChatPageContext",
                 )
         }
 }
