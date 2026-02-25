@@ -241,8 +241,6 @@ fladle {
 }
 
 dependencies {
-	implementation project(":app-startup-metrics-api")
-	implementation project(":app-startup-metrics-impl")
 	implementation project(":duckchat-api")
 	implementation project(":duckchat-impl")
 	implementation project(":malicious-site-protection-impl")
@@ -436,6 +434,8 @@ dependencies {
 
     implementation project(':serp-logos-api')
     implementation project(':serp-logos-impl')
+
+    implementation project(":app-startup-metrics-impl")
 
     // Widgets
     implementation "androidx.core:core-remoteviews:1.1.0"

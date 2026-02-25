@@ -27,7 +27,6 @@ dependencies {
     implementation project(path: ':anvil-annotations')
     implementation project(path: ':di')
     
-    implementation project(':app-startup-metrics-api')
     implementation project(':browser-api')
     implementation project(':common-utils')
     implementation project(':data-store-api')
