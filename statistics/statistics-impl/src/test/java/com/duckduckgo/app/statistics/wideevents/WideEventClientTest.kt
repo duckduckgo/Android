@@ -68,7 +68,7 @@ class WideEventClientTest {
             val metadata = mapOf("free_trial_eligible" to "true", "user_type" to "premium")
             val cleanupPolicy = CleanupPolicy.OnProcessStart(ignoreIfIntervalTimeoutPresent = true)
 
-            whenever(wideEventRepository.insertWideEvent(any(), any(), any(), anyOrNull()))
+            whenever(wideEventRepository.insertWideEvent(any(), any(), any(), anyOrNull(), any()))
                 .thenReturn(expectedEventId)
 
             val result = wideEventClient.flowStart(name, flowEntryPoint, metadata, cleanupPolicy)
@@ -85,6 +85,7 @@ class WideEventClientTest {
                     status = WideEventRepository.WideEventStatus.UNKNOWN,
                     metadata = emptyMap(),
                 ),
+                samplingProbability = 1.0f,
             )
         }
 
@@ -94,7 +95,7 @@ class WideEventClientTest {
             val expectedEventId = 456L
             val name = "login_flow"
 
-            whenever(wideEventRepository.insertWideEvent(any(), anyOrNull(), any(), anyOrNull()))
+            whenever(wideEventRepository.insertWideEvent(any(), anyOrNull(), any(), anyOrNull(), any()))
                 .thenReturn(expectedEventId)
 
             val result = wideEventClient.flowStart(name)
@@ -111,6 +112,7 @@ class WideEventClientTest {
                     status = WideEventRepository.WideEventStatus.UNKNOWN,
                     metadata = emptyMap(),
                 ),
+                samplingProbability = 1.0f,
             )
         }
 
@@ -118,7 +120,7 @@ class WideEventClientTest {
     fun `when flowStart encounters repository exception then returns failure`() =
         runTest {
             val exception = RuntimeException("Database error")
-            whenever(wideEventRepository.insertWideEvent(any(), anyOrNull(), any(), anyOrNull()))
+            whenever(wideEventRepository.insertWideEvent(any(), anyOrNull(), any(), anyOrNull(), any()))
                 .thenThrow(exception)
 
             val result = wideEventClient.flowStart("test_flow")
@@ -433,7 +435,7 @@ class WideEventClientTest {
                     flowStatus = FlowStatus.Failure("timeout"),
                 )
 
-            whenever(wideEventRepository.insertWideEvent(any(), anyOrNull(), any(), anyOrNull()))
+            whenever(wideEventRepository.insertWideEvent(any(), anyOrNull(), any(), anyOrNull(), any()))
                 .thenReturn(wideEventId)
 
             val result =
@@ -454,6 +456,7 @@ class WideEventClientTest {
                     status = WideEventRepository.WideEventStatus.FAILURE,
                     metadata = mapOf("failure_reason" to "timeout"),
                 ),
+                samplingProbability = 1.0f,
             )
         }
 }
