@@ -252,6 +252,7 @@ class RealDuckChatJSHelperTest {
             put("supportsAIChatContextualMode", false)
             put("supportsAIChatSync", false)
             put("supportsPageContext", false)
+            put("supportsMultipleContexts", false)
         }
 
         val expected = JsCallbackData(jsonPayload, featureName, method, id)
