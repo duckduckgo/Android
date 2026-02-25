@@ -32,22 +32,6 @@
                 "description": "Device memory capacity bucket for classification",
                 "type": "string",
                 "enum": ["<1GB", "1GB", "2GB", "4GB", "6GB", "8GB", "12GB", "16GB+"]
-            },
-            {
-                "key": "cpu_architecture",
-                "description": "CPU architecture of the device",
-                "type": "string"
-            },
-            {
-                "key": "measurement_method",
-                "description": "Measurement approach used to collect startup metrics",
-                "type": "string",
-                "enum": ["api_35_native", "legacy_manual"]
-            },
-            {
-                "key": "api_level",
-                "description": "Android API level of the device",
-                "type": "integer"
             }
         ]
     }
