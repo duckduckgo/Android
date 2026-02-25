@@ -101,7 +101,7 @@ class RealEventHubPixelManager @Inject constructor(
         return false
     }
 
-    override fun checkPixels() {
+    fun checkPixels() {
         val config = getParsedConfig()
         if (!config.featureEnabled) return
 
@@ -116,7 +116,7 @@ class RealEventHubPixelManager @Inject constructor(
         }
     }
 
-    override fun onConfigChanged() {
+    fun onConfigChanged() {
         val config = getParsedConfig()
         if (!config.featureEnabled) {
             logcat(DEBUG) { "EventHub: feature disabled, clearing all pixel states" }

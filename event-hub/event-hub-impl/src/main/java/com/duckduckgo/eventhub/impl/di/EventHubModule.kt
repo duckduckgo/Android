@@ -68,11 +68,16 @@ object EventHubModule {
 
     @SingleInstanceIn(AppScope::class)
     @Provides
-    fun provideEventHubPixelManager(
+    fun provideRealEventHubPixelManager(
         repository: EventHubRepository,
         pixel: Pixel,
         timeProvider: TimeProvider,
-    ): EventHubPixelManager {
+    ): RealEventHubPixelManager {
         return RealEventHubPixelManager(repository, pixel, timeProvider)
     }
+
+    @Provides
+    fun provideEventHubPixelManager(
+        real: RealEventHubPixelManager,
+    ): EventHubPixelManager = real
 }
