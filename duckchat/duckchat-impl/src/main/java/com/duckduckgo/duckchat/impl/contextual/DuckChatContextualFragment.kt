@@ -357,6 +357,9 @@ class DuckChatContextualFragment :
                                             withContext(dispatcherProvider.main()) {
                                                 contentScopeScripts.onResponse(response)
                                             }
+                                            if (method == RealDuckChatJSHelper.METHOD_GET_AI_CHAT_NATIVE_HANDOFF_DATA) {
+                                                sharedContextualViewModel.requestPageContext()
+                                            }
                                         }
                                     }
                                 }
@@ -571,6 +574,8 @@ class DuckChatContextualFragment :
                         setupKeyboardVisibilityListener()
                         viewModel.onSheetReopened()
                     }
+
+                    else -> {}
                 }
             }.launchIn(lifecycleScope)
 
