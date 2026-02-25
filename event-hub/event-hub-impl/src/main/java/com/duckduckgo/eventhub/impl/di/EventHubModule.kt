@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 DuckDuckGo
+ * Copyright (c) 2026 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,20 +17,24 @@
 package com.duckduckgo.eventhub.impl.di
 
 import android.content.Context
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.preferencesDataStore
 import androidx.room.Room
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.eventhub.api.EventHubPixelManager
+import com.duckduckgo.eventhub.impl.EventHubDataStore
+import com.duckduckgo.eventhub.impl.EventHubPrefs
+import com.duckduckgo.eventhub.impl.EventHubRepository
 import com.duckduckgo.eventhub.impl.RealEventHubPixelManager
+import com.duckduckgo.eventhub.impl.RealEventHubRepository
 import com.duckduckgo.eventhub.impl.RealTimeProvider
 import com.duckduckgo.eventhub.impl.TimeProvider
-import com.duckduckgo.eventhub.store.ALL_MIGRATIONS
-import com.duckduckgo.eventhub.store.EventHubDatabase
-import com.duckduckgo.eventhub.store.EventHubRepository
-import com.duckduckgo.eventhub.store.RealEventHubRepository
+import com.duckduckgo.eventhub.impl.store.ALL_MIGRATIONS
+import com.duckduckgo.eventhub.impl.store.EventHubPixelStateDatabase
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
@@ -41,10 +45,18 @@ import kotlinx.coroutines.CoroutineScope
 @ContributesTo(AppScope::class)
 object EventHubModule {
 
+    private val Context.eventHubDataStore: DataStore<Preferences> by preferencesDataStore(
+        name = "event_hub",
+    )
+
+    @Provides
+    @EventHubPrefs
+    fun provideEventHubDataStore(context: Context): DataStore<Preferences> = context.eventHubDataStore
+
     @SingleInstanceIn(AppScope::class)
     @Provides
-    fun provideEventHubDatabase(context: Context): EventHubDatabase {
-        return Room.databaseBuilder(context, EventHubDatabase::class.java, "event_hub.db")
+    fun provideEventHubPixelStateDatabase(context: Context): EventHubPixelStateDatabase {
+        return Room.databaseBuilder(context, EventHubPixelStateDatabase::class.java, "event_hub_pixel_state.db")
             .enableMultiInstanceInvalidation()
             .fallbackToDestructiveMigration()
             .addMigrations(*ALL_MIGRATIONS)
@@ -54,12 +66,10 @@ object EventHubModule {
     @SingleInstanceIn(AppScope::class)
     @Provides
     fun provideEventHubRepository(
-        database: EventHubDatabase,
-        @AppCoroutineScope appCoroutineScope: CoroutineScope,
-        dispatcherProvider: DispatcherProvider,
-        @IsMainProcess isMainProcess: Boolean,
+        dataStore: EventHubDataStore,
+        database: EventHubPixelStateDatabase,
     ): EventHubRepository {
-        return RealEventHubRepository(database, appCoroutineScope, dispatcherProvider, isMainProcess)
+        return RealEventHubRepository(dataStore, database.pixelStateDao())
     }
 
     @SingleInstanceIn(AppScope::class)

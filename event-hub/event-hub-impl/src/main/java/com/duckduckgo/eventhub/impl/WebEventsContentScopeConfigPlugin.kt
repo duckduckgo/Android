@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 DuckDuckGo
+ * Copyright (c) 2026 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ package com.duckduckgo.eventhub.impl
 
 import com.duckduckgo.contentscopescripts.api.ContentScopeConfigPlugin
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.eventhub.store.EventHubRepository
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 
@@ -29,7 +28,7 @@ class WebEventsContentScopeConfigPlugin @Inject constructor(
 
     override fun config(): String {
         val featureName = EventHubFeatureName.WebEvents.value
-        val config = repository.getWebEventsFeatureConfigEntity().json
+        val config = repository.getWebEventsConfigJson()
         return "\"$featureName\":$config"
     }
 

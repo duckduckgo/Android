@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 DuckDuckGo
+ * Copyright (c) 2026 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ plugins {
     id 'com.android.library'
     id 'kotlin-android'
     id 'com.squareup.anvil'
+    id 'com.google.devtools.ksp'
 }
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
@@ -27,6 +28,11 @@ android {
         generateDaggerFactories = true // default is false
     }
     namespace 'com.duckduckgo.eventhub.impl'
+
+
+    ksp {
+        arg("room.schemaLocation", "$projectDir/schemas")
+    }
 }
 
 dependencies {
@@ -35,25 +41,24 @@ dependencies {
     implementation project(path: ':di')
     implementation project(path: ':common-utils')
     implementation project(path: ':privacy-config-api')
-    implementation project(path: ':feature-toggles-api')
-    implementation project(path: ':app-build-config-api')
-    implementation project(path: ':event-hub-api')
-    implementation project(path: ':event-hub-store')
     implementation project(path: ':content-scope-scripts-api')
-    implementation project(path: ':js-messaging-api')
     implementation project(path: ':statistics-api')
+    implementation project(path: ':js-messaging-api')
+    implementation project(path: ':event-hub-api')
 
-    // Lifecycle
-    implementation AndroidX.lifecycle.commonJava8
+    implementation AndroidX.lifecycle.common
+
+    api AndroidX.dataStore.preferences
 
     // Room
     implementation AndroidX.room.runtime
-    implementation AndroidX.room.rxJava2
     implementation AndroidX.room.ktx
-    testImplementation AndroidX.room.testing
+    ksp AndroidX.room.compiler
 
     // Dagger
     implementation Google.dagger
+
+    implementation "com.squareup.logcat:logcat:_"
 
     implementation KotlinX.coroutines.core
 
@@ -63,11 +68,8 @@ dependencies {
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }
 
-    implementation "com.squareup.logcat:logcat:_"
-
     // Testing dependencies
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation Testing.junit4
-    testImplementation 'org.json:json:_'
-    testImplementation project(path: ':common-test')
+    testImplementation "org.json:json:_"
 }
