@@ -1,4 +1,12 @@
 {
+    "m_preonboarding_default_browser_page_shown_unique": {
+        "description": "Fires when the the default browser page is shown during onboarding",
+        "owners": ["mikescamell"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"],
+        "expires": "2026-04-05"
+    },
     "m_preonboarding_choose_search_experience_impressions_unique": {
         "description": "Fires during onboarding when the Search Experience view appears",
         "owners": ["joshliebe"],
