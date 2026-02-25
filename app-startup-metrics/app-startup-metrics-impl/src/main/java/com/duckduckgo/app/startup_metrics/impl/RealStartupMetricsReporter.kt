@@ -63,14 +63,14 @@ class RealStartupMetricsReporter @Inject constructor(
 
             // Always collect manual TTFD measurement
             val manualEvent = legacyCollector.collectStartupMetrics()
-            
+
             // On API 35+, also collect native TTID and TTFD
             val nativeEvent = if (apiLevelProvider.getApiLevel() >= 35) {
                 api35Collector.collectStartupMetrics()
             } else {
                 null
             }
-            
+
             logcat { "Reporting startup metrics - Manual: $manualEvent, Native: $nativeEvent" }
             emitStartupMetricsPixel(manualEvent, nativeEvent)
         }
@@ -78,7 +78,7 @@ class RealStartupMetricsReporter @Inject constructor(
 
     /**
      * Emits a pixel with startup metrics to the analytics backend.
-     * 
+     *
      * @param manualEvent Manual TTFD measurement (always available)
      * @param nativeEvent Native TTID/TTFD measurement (API 35+ only)
      */

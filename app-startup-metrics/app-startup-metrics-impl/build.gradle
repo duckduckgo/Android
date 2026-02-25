@@ -30,6 +30,7 @@ dependencies {
     implementation project(':app-startup-metrics-api')
     implementation project(':browser-api')
     implementation project(':common-utils')
+    implementation project(':data-store-api')
     implementation project(':statistics-api')
     implementation project(':feature-toggles-api')
     

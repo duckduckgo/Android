@@ -17,7 +17,6 @@
 package com.duckduckgo.app.startup_metrics.impl.collectors
 
 import com.duckduckgo.app.startup_metrics.impl.StartupMetricEvent
-import com.duckduckgo.app.startup_metrics.impl.StartupType
 
 /**
  * Unified interface for collecting startup metrics across all Android API levels.
