@@ -561,8 +561,8 @@ class RealDuckChat @Inject constructor(
         autoPrompt: Boolean,
         sidebar: Boolean,
     ): String {
-        val parameters = addChatParameters(query, autoPrompt = autoPrompt, sidebar = sidebar)
-        val url = appendParameters(parameters, "https://euw-serp-dev-testing8.duck.ai")
+        val parameters = addChatParameters(query, autoPrompt = autoPrompt, sidebar = false)
+        val url = appendParameters(parameters, duckChatLink)
         return url
     }
 
@@ -770,6 +770,7 @@ class RealDuckChat @Inject constructor(
                 }
 
             duckChatLink = settingsJson?.aiChatURL ?: DUCK_CHAT_WEB_LINK
+            duckChatLink = "https://euw-serp-dev-testing8.duck.ai"
             logcat { "Duck.ai: duckChatLink $duckChatLink" }
 
             settingsJson
