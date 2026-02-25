@@ -4322,9 +4322,13 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private fun uiLockChanged(locked: Boolean) {
-        if (!browserUiLockFeature.self().isEnabled()) return
-        viewModelScope.launch(dispatchers.main()) {
-            command.value = UiLockChanged(locked)
+        viewModelScope.launch {
+            val isEnabled = withContext(dispatchers.io()) { browserUiLockFeature.self().isEnabled() }
+            if (isEnabled) {
+                withContext(dispatchers.main()) {
+                    command.value = UiLockChanged(locked)
+                }
+            }
         }
     }
 
