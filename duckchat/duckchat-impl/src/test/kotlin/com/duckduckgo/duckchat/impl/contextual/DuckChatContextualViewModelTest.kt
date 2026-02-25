@@ -557,6 +557,35 @@ class DuckChatContextualViewModelTest {
         }
 
     @Test
+    fun `when page context received in webview mode with multiple attachments disabled then event emitted with null pageContext`() =
+        runTest {
+            whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(true)
+            whenever(duckChatInternal.areMultipleContentAttachmentsEnabled()).thenReturn(false)
+            val serializedPageData =
+                """
+                {
+                    "title": "Ctx Title",
+                    "url": "https://ctx.com",
+                    "content": "content"
+                }
+                """.trimIndent()
+
+            testee.subscriptionEventDataFlow.test {
+                testee.onPromptSent("hello")
+                awaitItem()
+
+                testee.onPageContextReceived("tab-1", serializedPageData)
+
+                val event = awaitItem()
+                assertEquals("submitAIChatPageContext", event.subscriptionName)
+                assertEquals(RealDuckChatJSHelper.DUCK_CHAT_FEATURE_NAME, event.featureName)
+                assertTrue(event.params.isNull("pageContext"))
+
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
     fun `when page context received after user removed context then auto-attached pixel not fired`() =
         runTest {
             val serializedPageData =
