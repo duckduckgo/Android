@@ -26,7 +26,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.startup_metrics.impl.android.ApiLevelProvider
 import com.duckduckgo.app.startup_metrics.impl.feature.StartupMetricsFeature
-import com.duckduckgo.app.startup_metrics.impl.metrics.CpuCollector
 import com.duckduckgo.app.startup_metrics.impl.metrics.MemoryCollector
 import com.duckduckgo.app.startup_metrics.impl.pixels.StartupMetricsPixelName
 import com.duckduckgo.app.startup_metrics.impl.pixels.StartupMetricsPixelParameters
@@ -58,7 +57,6 @@ class StartupMetricsLifecycleObserverTest {
     private lateinit var apiLevelProvider: ApiLevelProvider
     private lateinit var dataStore: StartupMetricsDataStore
     private lateinit var memoryCollector: MemoryCollector
-    private lateinit var cpuCollector: CpuCollector
     private lateinit var pixel: Pixel
     private val startupMetricsFeature = FakeFeatureToggleFactory.create(StartupMetricsFeature::class.java)
     private lateinit var samplingDecider: SamplingDecider
@@ -75,7 +73,6 @@ class StartupMetricsLifecycleObserverTest {
         apiLevelProvider = mock()
         dataStore = mock()
         memoryCollector = mock()
-        cpuCollector = mock()
         pixel = mock()
         samplingDecider = mock()
         activityManager = mock()
@@ -101,7 +98,6 @@ class StartupMetricsLifecycleObserverTest {
             apiLevelProvider = apiLevelProvider,
             dataStore = dataStore,
             memoryCollector = memoryCollector,
-            cpuCollector = cpuCollector,
             pixel = pixel,
             startupMetricsFeature = startupMetricsFeature,
             samplingDecider = samplingDecider,
@@ -181,7 +177,6 @@ class StartupMetricsLifecycleObserverTest {
         setupCallbackCapture()
         val activity = createMockActivity()
         whenever(memoryCollector.collectDeviceRamBucket()).thenReturn("4gb")
-        whenever(cpuCollector.collectCpuArchitecture()).thenReturn("arm64-v8a")
 
         val startInfo = createMockApplicationStartInfo(
             startType = ApplicationStartInfo.START_TYPE_COLD,
@@ -203,10 +198,8 @@ class StartupMetricsLifecycleObserverTest {
             val params = firstValue
             assertEquals("cold", params[StartupMetricsPixelParameters.STARTUP_TYPE])
             assertEquals("2000", params[StartupMetricsPixelParameters.TTID_DURATION_MS])
-            assertEquals("api_35_native", params[StartupMetricsPixelParameters.MEASUREMENT_METHOD])
             assertEquals("35", params[StartupMetricsPixelParameters.API_LEVEL])
             assertEquals("4gb", params[StartupMetricsPixelParameters.DEVICE_RAM_BUCKET])
-            assertEquals("arm64-v8a", params[StartupMetricsPixelParameters.CPU_ARCHITECTURE])
         }
     }
 

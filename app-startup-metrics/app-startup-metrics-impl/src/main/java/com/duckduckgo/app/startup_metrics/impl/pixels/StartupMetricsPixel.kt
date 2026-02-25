@@ -48,54 +48,12 @@ object StartupMetricsPixelParameters {
     const val TTID_DURATION_MS = "ttid_duration_ms"
 
     /**
-     * Time from process start to fully drawn state in milliseconds.
-     * Type: Integer
-     * Required: Yes
-     * Valid range: 0-60000
-     */
-    const val TTFD_DURATION_MS = "ttfd_duration_ms"
-
-    /**
-     * Manual measurement time from process start to interactive state in milliseconds (legacy only).
-     * Type: Integer
-     * Required: No (only for legacy measurement method)
-     * Valid range: 0-60000
-     */
-    const val TTFD_MANUAL_DURATION_MS = "ttfd_manual_duration_ms"
-
-    /**
-     * Time from process start to interactive state in milliseconds.
-     * Type: Integer
-     * Required: Yes
-     * Valid range: 0-60000
-     *
-     * @deprecated Use TTFD_DURATION_MS instead
-     */
-    @Deprecated("Use TTFD_DURATION_MS for API 35+ and TTFD_MANUAL_DURATION_MS for legacy")
-    const val DURATION_MS = "duration_ms"
-
-    /**
      * Device memory capacity bucket for classification.
      * Type: String
      * Required: No (null if privacy review fails)
      * Valid values: <1GB, 1GB, 2GB, 4GB, 6GB, 8GB, 12GB, 16GB+
      */
     const val DEVICE_RAM_BUCKET = "device_ram_bucket"
-
-    /**
-     * CPU architecture of the device.
-     * Type: String
-     * Required: No (null if privacy review fails)
-     * Valid values: arm64-v8a, armeabi-v7a, armeabi, x86, x86_64, unknown
-     */
-    const val CPU_ARCHITECTURE = "cpu_architecture"
-
-    /**
-     * Measurement approach used (api_35_native/legacy_manual).
-     * Type: String (enum)
-     * Required: Yes
-     */
-    const val MEASUREMENT_METHOD = "measurement_method"
 
     /**
      * Android API level of device.

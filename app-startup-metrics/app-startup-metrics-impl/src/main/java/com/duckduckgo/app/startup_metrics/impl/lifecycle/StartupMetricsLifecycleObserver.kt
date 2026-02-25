@@ -29,8 +29,6 @@ import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.startup_metrics.impl.StartupType
 import com.duckduckgo.app.startup_metrics.impl.android.ApiLevelProvider
 import com.duckduckgo.app.startup_metrics.impl.feature.StartupMetricsFeature
-import com.duckduckgo.app.startup_metrics.impl.metrics.CpuCollector
-import com.duckduckgo.app.startup_metrics.impl.metrics.MeasurementMethod
 import com.duckduckgo.app.startup_metrics.impl.metrics.MemoryCollector
 import com.duckduckgo.app.startup_metrics.impl.pixels.StartupMetricsPixelName
 import com.duckduckgo.app.startup_metrics.impl.pixels.StartupMetricsPixelParameters
@@ -52,7 +50,6 @@ class StartupMetricsLifecycleObserver @Inject constructor(
     private val apiLevelProvider: ApiLevelProvider,
     private val dataStore: StartupMetricsDataStore,
     private val memoryCollector: MemoryCollector,
-    private val cpuCollector: CpuCollector,
     private val pixel: Pixel,
     private val startupMetricsFeature: StartupMetricsFeature,
     private val samplingDecider: SamplingDecider,
@@ -180,14 +177,10 @@ class StartupMetricsLifecycleObserver @Inject constructor(
         val parameters = buildMap {
             put(StartupMetricsPixelParameters.STARTUP_TYPE, startupType.name.lowercase())
             put(StartupMetricsPixelParameters.TTID_DURATION_MS, ttidDurationMs.toString())
-            put(StartupMetricsPixelParameters.MEASUREMENT_METHOD, MeasurementMethod.API_35_NATIVE.name.lowercase())
             put(StartupMetricsPixelParameters.API_LEVEL, apiLevelProvider.getApiLevel().toString())
 
             memoryCollector.collectDeviceRamBucket()?.let {
                 put(StartupMetricsPixelParameters.DEVICE_RAM_BUCKET, it)
-            }
-            cpuCollector.collectCpuArchitecture()?.let {
-                put(StartupMetricsPixelParameters.CPU_ARCHITECTURE, it)
             }
         }
 
